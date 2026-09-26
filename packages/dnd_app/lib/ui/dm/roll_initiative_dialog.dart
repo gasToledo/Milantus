@@ -28,11 +28,15 @@ Future<Map<String, int>?> showRollInitiativeDialog(
   BuildContext context, {
   required List<Combatant> combatants,
   required Map<String, int> suggested,
+  Map<String, int> playerModifiers = const {},
 }) {
   return showDialog<Map<String, int>>(
     context: context,
-    builder: (context) =>
-        _RollInitiativeDialog(combatants: combatants, suggested: suggested),
+    builder: (context) => _RollInitiativeDialog(
+      combatants: combatants,
+      suggested: suggested,
+      playerModifiers: playerModifiers,
+    ),
   );
 }
 
@@ -40,9 +44,15 @@ class _RollInitiativeDialog extends StatefulWidget {
   final List<Combatant> combatants;
   final Map<String, int> suggested;
 
+  /// Modificador de iniciativa de cada jugador, por id de combatiente. Va
+  /// junto al nombre: el casillero queda en blanco porque el número lo canta
+  /// el jugador, pero el DM tiene que poder ver si cierra.
+  final Map<String, int> playerModifiers;
+
   const _RollInitiativeDialog({
     required this.combatants,
     required this.suggested,
+    this.playerModifiers = const {},
   });
 
   @override
@@ -203,6 +213,15 @@ class _RollInitiativeDialogState extends State<_RollInitiativeDialog> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  if (widget.playerModifiers[combatant.id] case final mod?)
+                    Text(
+                      'd20 ${mod >= 0 ? '+' : '−'} ${mod.abs()}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: pal.textMuted,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
+                    ),
                   const SizedBox(width: 8),
                   SizedBox(
                     width: 64,

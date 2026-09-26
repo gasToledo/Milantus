@@ -158,6 +158,44 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  // No hay vuelta atrás: el aviso tiene que nombrar lo que se pierde. Antes
+  // solo hablaba de los personajes, que es justo lo que no se pierde.
+  testWidgets('borrar una campaña avisa todo lo que se pierde', (tester) async {
+    final server = await pumpDmMode(
+      tester,
+      seed: (server) => server.campaigns['tumba'] = const Campaign(
+        id: 'tumba',
+        name: 'La Tumba',
+      ),
+    );
+
+    await tester.tap(find.byTooltip('Acciones de campaña'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Borrar campaña'));
+    await tester.pumpAndSettle();
+
+    final aviso = find.descendant(
+      of: find.byType(AppDialog),
+      matching: find.textContaining('No se puede deshacer'),
+    );
+    expect(aviso, findsOneWidget);
+    final texto = tester.widget<Text>(aviso).data!;
+    for (final pierde in [
+      'capítulos',
+      'notas del Cuaderno',
+      'combate abierto',
+      'historial de combates',
+    ]) {
+      expect(texto, contains(pierde));
+    }
+    expect(texto, contains('PNJ se quedan en tu biblioteca'));
+
+    await tester.tap(dialogAction('Borrar campaña'));
+    await tester.pumpAndSettle();
+    expect(server.campaigns, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('la acción principal acompaña la sección elegida', (
     tester,
   ) async {
@@ -818,7 +856,7 @@ void main() {
       expect(
         combatants.map((c) => c.name),
         containsAll([
-          'Guerrero goblin',
+          'Guerrero goblin 1',
           'Guerrero goblin 2',
           'Guerrero goblin 3',
         ]),
@@ -1122,7 +1160,7 @@ void main() {
     testWidgets('el diálogo propone la tirada de los monstruos', (
       tester,
     ) async {
-      await pumpDmMode(tester, seed: seedTable);
+      final server = await pumpDmMode(tester, seed: seedTable);
       await enterCode(tester, 'CODE-0001');
       await openCombate(tester);
       await tester.tap(find.text('Armar combate'));
@@ -1152,6 +1190,46 @@ void main() {
 
       expect(valorDe('Sagan'), isEmpty);
       expect(int.tryParse(valorDe('Guerrero goblin')), isNotNull);
+
+      // Al jugador se le deja el casillero en blanco, pero con su modificador
+      // a la vista: el DM tiene que poder ver si el número que le cantan
+      // cierra. Sale de la ficha compilada, y solo va en los jugadores.
+      final mod = CharacterCompiler(
+        repo,
+      ).compile(server.characters['sagan']!).initiative;
+      final enDialogo = find.descendant(
+        of: find.byType(AppDialog),
+        matching: find.textContaining('d20 '),
+      );
+      expect(enDialogo, findsOneWidget);
+      expect(
+        tester.widget<Text>(enDialogo).data,
+        'd20 ${mod >= 0 ? '+' : '−'} ${mod.abs()}',
+      );
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('cada fila del combate rotula su CA', (tester) async {
+      await pumpDmMode(tester, seed: seedTable);
+      await enterCode(tester, 'CODE-0001');
+      await openCombate(tester);
+      await tester.tap(find.text('Armar combate'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Sumar'));
+      await tester.pumpAndSettle();
+      await addMonsters(tester, 'goblin', 'Guerrero goblin');
+
+      // Un número suelto al lado de los PG no decía qué era: el jugador y el
+      // goblin llevan cada uno su rótulo. Se busca en las filas: el panel del
+      // bestiario tiene su propia «CA».
+      final filas = find.byWidgetPredicate(
+        (w) => w.runtimeType.toString() == '_CombatantRow',
+      );
+      expect(filas, findsNWidgets(2));
+      expect(
+        find.descendant(of: filas, matching: find.text('CA')),
+        findsNWidgets(2),
+      );
       expect(tester.takeException(), isNull);
     });
 
@@ -2465,7 +2543,7 @@ void main() {
       final encounter = server.encounters['tumba']!;
       expect(encounter.isPreparing, isTrue);
       expect(encounter.combatants.map((c) => c.name), [
-        goblin.name,
+        '${goblin.name} 1',
         '${goblin.name} 2',
         '${goblin.name} 3',
         '${goblin.name} 4',
@@ -2553,7 +2631,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(server.encounters['tumba']!.combatants.map((c) => c.name), [
-        goblin.name,
+        '${goblin.name} 1',
         '${goblin.name} 2',
         '${goblin.name} 3',
         '${goblin.name} 4',

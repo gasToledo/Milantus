@@ -162,41 +162,49 @@ class _CampaignNpcsViewState extends State<CampaignNpcsView> {
     final pal = context.palette;
     final npc = entry.npc;
     final dead = entry.status == NpcStatus.dead;
-    final identity = Row(
-      children: [
-        Medallion(
-          portraitKey: npcPortraitKey(npc, entry.sheet),
-          fallback: npc.name.characters.first,
-          size: 36,
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                npc.name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontFamily: 'Georgia',
-                  fontSize: 16,
-                  // Tachado y atenuado, no solo en rojo: el estado se tiene que
-                  // leer sin distinguir colores.
-                  decoration: dead ? TextDecoration.lineThrough : null,
-                  color: dead ? pal.textMuted : null,
-                ),
-              ),
-              Text(
-                npcTypeLine(npc, entry.sheet, widget.repo),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 12, color: pal.textMuted),
-              ),
-            ],
+    // Se toca la identidad y no la fila entera: en la fila también están el
+    // selector de estado y el menú, cada uno con su toque. Antes solo se
+    // abría por ⋯ → «Abrir ficha», mientras que en la biblioteca alcanza con
+    // tocar la tarjeta.
+    final identity = InkWell(
+      onTap: () => widget.onOpen(entry),
+      borderRadius: BorderRadius.circular(8),
+      child: Row(
+        children: [
+          Medallion(
+            portraitKey: npcPortraitKey(npc, entry.sheet),
+            fallback: npc.name.characters.first,
+            size: 36,
           ),
-        ),
-      ],
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  npc.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: 'Georgia',
+                    fontSize: 16,
+                    // Tachado y atenuado, no solo en rojo: el estado se tiene que
+                    // leer sin distinguir colores.
+                    decoration: dead ? TextDecoration.lineThrough : null,
+                    color: dead ? pal.textMuted : null,
+                  ),
+                ),
+                Text(
+                  npcTypeLine(npc, entry.sheet, widget.repo),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 12, color: pal.textMuted),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
     final status = NpcStatusSelector(
       status: entry.status,

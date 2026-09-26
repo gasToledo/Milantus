@@ -246,11 +246,15 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
-## [Unreleased]
+## [0.16.0+1] - 2026-09-26
 
 ### Nuevo
 
-- Sin cambios.
+- La placa de Iniciativa de la ficha se toca y dice de dónde sale el número:
+  la Destreza, cada bono con su fuente (Alerta, Emboscador Temible) y el
+  Cansancio si lo hay.
+- Al tirar iniciativa, cada jugador muestra su modificador junto al casillero
+  («d20 + 4»), para ver si el número que canta cierra.
 
 ### Modificado
 
@@ -290,9 +294,35 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   fila se reacomodaba y el toque siguiente caía en otra opción (estilos de
   combate, idiomas, maestrías). La selección se sigue viendo por el borde, el
   fondo y el texto dorados.
+- Borrar una campaña avisa todo lo que se pierde —capítulos, notas del
+  Cuaderno, combate abierto e historial de combates— y que los PNJ se quedan en
+  la biblioteca. Antes solo hablaba de los personajes, que no se pierden.
+- En la lista de PNJ de la campaña, tocar el nombre abre el PNJ, como en la
+  biblioteca. Antes solo se llegaba por ⋯ → «Abrir ficha».
+- El creador de un PNJ jugable dice «Crear PNJ» y «¿Descartar este PNJ?» en
+  vez de hablar de un personaje.
+- Las filas del combate rotulan la CA; el número suelto no decía qué era.
+- Los monstruos repetidos llevan todos número: con dos esqueletos quedan
+  «Esqueleto 1» y «Esqueleto 2», y el que estaba solo pasa a ser el 1. La
+  numeración sigue desde el número más alto, así que sacar uno no hace que el
+  siguiente repita un número en uso.
 
 ### Eliminado
 
 - El Códice ya no muestra las criaturas: lo abre cualquier jugador y los
   perfiles de los monstruos son del DM. Se siguen leyendo en el Bestiario del
   Modo DM.
+
+## [Unreleased]
+
+### Nuevo
+
+- Sin cambios.
+
+### Modificado
+
+- Sin cambios.
+
+### Eliminado
+
+- Sin cambios.

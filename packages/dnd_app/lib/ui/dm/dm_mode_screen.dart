@@ -189,10 +189,17 @@ class _DmModeScreenState extends State<DmModeScreen> {
         icon: Icons.warning_amber_rounded,
         iconColor: context.palette.crimson,
         title: 'Borrar campaña',
+        // Dice todo lo que se pierde, porque no hay vuelta atrás: en la base,
+        // capítulos, notas (que cuelgan de los capítulos) y combates caen en
+        // cascada con la campaña. Antes solo nombraba a los personajes, que es
+        // justo lo que *no* se pierde.
         content: Text(
-          'Se borra «${campaign.name}» y se sueltan los personajes que los '
-          'jugadores le compartieron. Las fichas no se tocan: siguen siendo '
-          'de sus dueños.',
+          'Se borra «${campaign.name}» con sus capítulos, las notas del '
+          'Cuaderno, el combate abierto y el historial de combates. No se '
+          'puede deshacer.\n\n'
+          'Los personajes que los jugadores le compartieron se sueltan, y sus '
+          'fichas siguen siendo de sus dueños. Los PNJ se quedan en tu '
+          'biblioteca.',
         ),
         actions: [
           DialogAction(
@@ -1469,10 +1476,21 @@ class _CampaignDetailState extends State<_CampaignDetail> {
       for (final c in encounter.combatants) c.id: ?_suggestedInitiative(c),
     };
 
+    // El modificador de cada jugador, para que el DM no tenga que ir a la
+    // ficha a ver si el número que le cantan cierra. Sale de la ficha
+    // compilada: con Alerta ya no es la Destreza.
+    final members = {for (final m in _members ?? const []) m.memberId: m};
+    final playerModifiers = <String, int>{
+      for (final c in encounter.combatants)
+        if (members[c.memberId] case final m?)
+          c.id: CharacterCompiler(widget.repo).compile(m.character).initiative,
+    };
+
     final values = await showRollInitiativeDialog(
       context,
       combatants: encounter.combatants,
       suggested: suggested,
+      playerModifiers: playerModifiers,
     );
     if (values == null || !mounted) return;
     _saveEncounter((current) => current?.start(values));

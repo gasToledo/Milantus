@@ -24,13 +24,46 @@ void main() {
           const Encounter(id: 'e').withMonsters(goblin, 2, newId: newId);
       final four = two.withMonsters(goblin, 2, newId: newId);
 
+      // Todos con número: antes el primero quedaba «Goblin» a secas y
+      // parecía otro bicho.
       expect(four.combatants.map((c) => c.name), [
-        goblin.name,
+        '${goblin.name} 1',
         '${goblin.name} 2',
         '${goblin.name} 3',
         '${goblin.name} 4',
       ]);
       expect(four.combatants.map((c) => c.id).toSet(), hasLength(4));
+    });
+
+    test('uno solo va sin número, y al sumar otro pasa a ser el 1', () {
+      final one =
+          const Encounter(id: 'e').withMonsters(goblin, 1, newId: newId);
+      expect(one.combatants.single.name, goblin.name);
+
+      final firstId = one.combatants.single.id;
+      final two = one.withMonsters(goblin, 1, newId: newId);
+      expect(two.combatants.map((c) => c.name), [
+        '${goblin.name} 1',
+        '${goblin.name} 2',
+      ]);
+      // Es el mismo combatiente, renombrado en su lugar: no uno nuevo.
+      expect(two.combatants.first.id, firstId);
+    });
+
+    test('sigue desde el número más alto y no repite uno en uso', () {
+      final three =
+          const Encounter(id: 'e').withMonsters(goblin, 3, newId: newId);
+      // Se va el 1: quedan el 2 y el 3.
+      final withoutFirst = Encounter(
+        id: 'e',
+        combatants: three.combatants.skip(1).toList(),
+      );
+      final next = withoutFirst.withMonsters(goblin, 1, newId: newId);
+      expect(next.combatants.map((c) => c.name), [
+        '${goblin.name} 2',
+        '${goblin.name} 3',
+        '${goblin.name} 4',
+      ]);
     });
 
     test('sin tirar, todas las copias arrancan con el promedio del libro', () {

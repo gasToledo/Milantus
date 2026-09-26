@@ -42,11 +42,18 @@ class CreationWizard extends StatefulWidget {
   /// El nombre con el que arranca el paso Detalles. Un PNJ ya se nombró en el
   /// diálogo que lo crea: pedirlo de nuevo en blanco sería preguntar dos veces.
   final String initialName;
+
+  /// Se está armando la ficha de un PNJ jugable y no un personaje propio. El
+  /// camino es el mismo; cambian los textos que nombran lo que se crea, que
+  /// decían «Crear personaje» aunque el DM viniera de «Nuevo PNJ».
+  final bool npc;
+
   const CreationWizard({
     super.key,
     required this.repo,
     required this.onCreate,
     this.initialName = '',
+    this.npc = false,
   });
 
   @override
@@ -62,6 +69,7 @@ class _CreationWizardState extends State<CreationWizard> {
 
   static const _steps = CreationStep.values;
   bool get _isLast => _step == _steps.last;
+  String get _createLabel => widget.npc ? 'Crear PNJ' : 'Crear personaje';
 
   @override
   void initState() {
@@ -137,7 +145,9 @@ class _CreationWizardState extends State<CreationWizard> {
           builder: (ctx) => AppDialog(
             icon: Icons.warning_amber_rounded,
             iconColor: context.palette.crimson,
-            title: '¿Descartar este personaje?',
+            title: widget.npc
+                ? '¿Descartar este PNJ?'
+                : '¿Descartar este personaje?',
             content: const Text(
               'Las elecciones realizadas en el asistente se perderán.',
             ),
@@ -339,7 +349,7 @@ class _CreationWizardState extends State<CreationWizard> {
             children: [
               Expanded(
                 child: Text(
-                  'Crear personaje',
+                  _createLabel,
                   style: TextStyle(
                     fontFamily: 'Georgia',
                     fontSize: 26,
@@ -523,7 +533,7 @@ class _CreationWizardState extends State<CreationWizard> {
                   _isLast ? Icons.check : Icons.arrow_forward,
                   size: 20,
                 ),
-                label: Text(_isLast ? 'Crear personaje' : 'Siguiente'),
+                label: Text(_isLast ? _createLabel : 'Siguiente'),
               ),
             ],
           );

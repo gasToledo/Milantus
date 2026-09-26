@@ -1263,11 +1263,17 @@ extension _SheetGeneralSection on _SheetScreenState {
           ),
           width: 208,
         ),
+        // Se toca, como las plaquetas de característica: con Alerta el número
+        // ya no es la Destreza y hay que poder explicarlo en la mesa.
         box(
-          StatTile(
-            icon: Icons.bolt,
-            label: 'Iniciativa',
-            value: _signed(s.initiative),
+          InkWell(
+            onTap: () => _showInitiativeBreakdown(s),
+            borderRadius: BorderRadius.circular(12),
+            child: StatTile(
+              icon: Icons.bolt,
+              label: 'Iniciativa',
+              value: _signed(s.initiative),
+            ),
           ),
         ),
         box(
@@ -1357,15 +1363,11 @@ extension _SheetGeneralSection on _SheetScreenState {
   /// Existe por un caso concreto de mesa: el DM preguntó por qué Inteligencia
   /// daba +7 y la ficha mostraba el resultado pero no el camino. Cada línea es
   /// una suma verificable, no un número suelto.
-  void _showAbilityBreakdown(ComputedSheet s, Ability ability) {
-    final pal = context.palette;
+  /// Un renglón de desglose: rótulo a la izquierda, número a la derecha. El
+  /// total va `strong`, en oro.
+  Widget _breakdownLine(String label, String value, {bool strong = false}) {
     final muted = Theme.of(context).colorScheme.onSurfaceVariant;
-    final score = s.abilityScores[ability]!;
-    final mod = s.abilityModifiers[ability]!;
-    final bonuses = s.bonusesFor(ability);
-    final sc = s.spellcasting;
-
-    Widget line(String label, String value, {bool strong = false}) => Padding(
+    return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1386,12 +1388,52 @@ extension _SheetGeneralSection on _SheetScreenState {
             style: TextStyle(
               fontSize: 13,
               fontWeight: strong ? FontWeight.w600 : FontWeight.w500,
-              color: strong ? pal.gold : null,
+              color: strong ? context.palette.gold : null,
             ),
           ),
         ],
       ),
     );
+  }
+
+  /// Explica de dónde sale la iniciativa. Con Alerta o Emboscador Temible el
+  /// número deja de ser la Destreza, y la placa mostraba el total sin decir
+  /// por qué. Cada renglón sale de la ficha compilada: acá no se suma nada
+  /// que el engine no haya dicho.
+  void _showInitiativeBreakdown(ComputedSheet s) {
+    final line = _breakdownLine;
+    _infoDialog(
+      'Iniciativa',
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Eyebrow('De dónde sale'),
+          line(
+            'Modificador de Destreza',
+            _signed(s.abilityModifiers[Ability.dexterity]!),
+          ),
+          for (final b in s.initiativeBonuses)
+            line(b.source.isEmpty ? 'Otro rasgo' : b.source, _signed(b.amount)),
+          if (s.d20Modifier != 0)
+            line(
+              'Cansancio nivel ${_c.combat.exhaustion}',
+              _signed(s.d20Modifier),
+            ),
+          const Divider(height: 16),
+          line('Iniciativa', _signed(s.initiative), strong: true),
+        ],
+      ),
+    );
+  }
+
+  void _showAbilityBreakdown(ComputedSheet s, Ability ability) {
+    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
+    final score = s.abilityScores[ability]!;
+    final mod = s.abilityModifiers[ability]!;
+    final bonuses = s.bonusesFor(ability);
+    final sc = s.spellcasting;
+    final line = _breakdownLine;
 
     // Solo las habilidades en las que sos competente. Las demás tiran con el
     // modificador pelado, que ya está arriba: listarlas todas eran seis líneas

@@ -103,6 +103,33 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  // Con Alerta la iniciativa ya no es la Destreza, y la placa mostraba el
+  // total sin decir por qué. Cada renglón sale de la ficha compilada.
+  testWidgets('la placa de iniciativa dice de dónde sale', (tester) async {
+    final guardia = Character.fromJson(
+      demoSagan().toJson()..['backgroundId'] = 'guard',
+    );
+    final sheet = CharacterCompiler(repo).compile(guardia);
+    final alerta = sheet.initiativeBonuses.single;
+    expect(alerta.source, repo.feat('alert')!.name, reason: 'premisa');
+    await pumpSheet(tester, guardia);
+
+    await tester.tap(find.widgetWithIcon(InkWell, Icons.bolt));
+    await tester.pumpAndSettle();
+
+    String signo(int n) => n >= 0 ? '+$n' : '$n';
+    Finder enDialogo(String texto) =>
+        find.descendant(of: find.byType(AppDialog), matching: find.text(texto));
+    expect(enDialogo('Modificador de Destreza'), findsOneWidget);
+    expect(
+      enDialogo(signo(sheet.abilityModifiers[Ability.dexterity]!)),
+      findsWidgets,
+    );
+    expect(enDialogo(alerta.source), findsOneWidget);
+    expect(enDialogo(signo(sheet.initiative)), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('Lanzamiento de la Marca se ve y vuelve con el descanso corto', (
     tester,
   ) async {

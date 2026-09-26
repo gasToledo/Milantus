@@ -59,6 +59,15 @@ void main() {
     expect(s.initiative, 4);
   });
 
+  test('la ficha dice de dónde sale cada aporte', () {
+    // Sin esto el +4 no se explica: la placa mostraba el total y nada más.
+    final s = sheet(backgroundId: 'guard');
+    expect(s.initiativeBonuses, hasLength(1));
+    expect(s.initiativeBonuses.single.source, repo.feat('alert')!.name);
+    expect(s.initiativeBonuses.single.amount, s.proficiencyBonus);
+    expect(sheet(backgroundId: 'soldier').initiativeBonuses, isEmpty);
+  });
+
   test('el bono de Alerta sube con el nivel', () {
     // A nivel 5 el bonificador pasa a +3: un bono guardado como número fijo
     // se habría quedado en +2.

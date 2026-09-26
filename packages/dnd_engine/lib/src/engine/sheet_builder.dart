@@ -155,16 +155,12 @@ class SheetBuilder {
   int bonusMaxHpFlat = 0;
   int bonusMaxHpPerLevel = 0;
   int acBonus = 0;
-  int initiativeBonus = 0;
 
-  /// Bandera y no suma: el bonificador por competencia depende del nivel
-  /// total, que el compilador conoce al final, y dos fuentes no lo duplican.
-  bool initiativeAddsProficiency = false;
-
-  /// Características cuyo modificador se suma a la iniciativa. Mismo motivo:
-  /// los modificadores finales se conocen recién al terminar de aplicar
-  /// efectos.
-  final Set<Ability> initiativeAbilities = {};
+  /// Efectos de iniciativa con su fuente. Se guardan sin resolver porque el
+  /// bonificador por competencia y los modificadores finales se conocen recién
+  /// al terminar de aplicar efectos; ver [resolveInitiativeBonuses].
+  final List<({InitiativeBonusEffect effect, String source})>
+      initiativeEffects = [];
 
   SheetBuilder({required this.baseScores, this.level = 1});
 
@@ -224,6 +220,37 @@ class SheetBuilder {
       (out[e.skill] ??= []).add(
         SkillBonus(amount: amount, source: entry.source),
       );
+    }
+    return out;
+  }
+
+  /// Resuelve los aportes a la iniciativa, cada uno con su fuente, para que la
+  /// ficha pueda explicar el número y no solo mostrarlo.
+  ///
+  /// El bonificador por competencia y el modificador de una misma
+  /// característica cuentan una sola vez aunque dos fuentes los declaren: son
+  /// el mismo número, no dos bonos. El modificador tiene piso en 0 porque las
+  /// reglas que lo dan dicen "podés sumar".
+  List<InitiativeBonus> resolveInitiativeBonuses(
+    Map<Ability, int> mods,
+    int proficiencyBonus,
+  ) {
+    final out = <InitiativeBonus>[];
+    var proficiencyTaken = false;
+    final abilitiesTaken = <Ability>{};
+    for (final (:effect, :source) in initiativeEffects) {
+      var amount = effect.amount;
+      if (effect.addProficiency && !proficiencyTaken) {
+        proficiencyTaken = true;
+        amount += proficiencyBonus;
+      }
+      if (effect.fromAbility case final a?
+          when abilitiesTaken.add(a) && mods[a]! > 0) {
+        amount += mods[a]!;
+      }
+      if (amount != 0) {
+        out.add(InitiativeBonus(amount: amount, source: source));
+      }
     }
     return out;
   }
@@ -396,14 +423,8 @@ class SheetBuilder {
         bonusMaxHpPerLevel += perLevel;
       case ArmorClassBonusEffect(:final amount):
         acBonus += amount;
-      case InitiativeBonusEffect(
-          :final amount,
-          :final addProficiency,
-          :final fromAbility
-        ):
-        initiativeBonus += amount;
-        if (addProficiency) initiativeAddsProficiency = true;
-        if (fromAbility != null) initiativeAbilities.add(fromAbility);
+      case InitiativeBonusEffect():
+        initiativeEffects.add((effect: e, source: sourceName));
       case UnarmoredDefenseEffect(:final ability, :final allowShield):
         unarmoredDefenseOptions.add(
           (classId: sourceClassId, ability: ability, allowShield: allowShield),

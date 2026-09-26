@@ -1875,14 +1875,28 @@ class _CombatantRow extends StatelessWidget {
     return Semantics(
       label: 'Clase de armadura: $ac',
       excludeSemantics: true,
-      child: Text(
-        ac,
-        textAlign: TextAlign.center,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w700,
-          fontFeatures: [FontFeature.tabularFigures()],
-        ),
+      // Con rótulo: el número suelto al lado de los PG no decía qué era.
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'CA',
+            style: TextStyle(
+              fontSize: 10,
+              letterSpacing: 0.8,
+              color: context.palette.textMuted,
+            ),
+          ),
+          Text(
+            ac,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              fontFeatures: [FontFeature.tabularFigures()],
+            ),
+          ),
+        ],
       ),
     );
   }

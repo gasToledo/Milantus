@@ -744,6 +744,15 @@ class SkillBonus {
   const SkillBonus({required this.amount, required this.source});
 }
 
+/// Un aporte a la iniciativa además del mod. de Destreza: la dote Alerta
+/// (bonificador por competencia), Emboscador Temible (mod. de Sabiduría).
+/// Lleva la fuente por el mismo motivo que [AbilityBonus].
+class InitiativeBonus {
+  final int amount;
+  final String source;
+  const InitiativeBonus({required this.amount, required this.source});
+}
+
 /// Centinela para distinguir "no se pasó el argumento" de "se pasó null" en
 /// los `copyWith` de este archivo.
 ///
@@ -830,7 +839,13 @@ class ComputedSheet {
   final String size;
 
   final int speed;
+
+  /// Mod. de Destreza más [initiativeBonuses]. Se guarda sumado porque es lo
+  /// que lee casi todo el mundo; el desglose va al lado.
   final int initiative;
+
+  /// Lo que se suma a la iniciativa además de la Destreza, con su fuente.
+  final List<InitiativeBonus> initiativeBonuses;
   final int? darkvision;
 
   final Set<String> resistances;
@@ -954,6 +969,7 @@ class ComputedSheet {
     this.size = 'Mediano',
     required this.speed,
     required this.initiative,
+    this.initiativeBonuses = const [],
     required this.darkvision,
     required this.resistances,
     required this.immunities,
@@ -1021,6 +1037,7 @@ class ComputedSheet {
     String? size,
     int? speed,
     int? initiative,
+    List<InitiativeBonus>? initiativeBonuses,
     Object? darkvision = _unset,
     Set<String>? resistances,
     Set<String>? immunities,
@@ -1082,6 +1099,7 @@ class ComputedSheet {
         size: size ?? this.size,
         speed: speed ?? this.speed,
         initiative: initiative ?? this.initiative,
+        initiativeBonuses: initiativeBonuses ?? this.initiativeBonuses,
         darkvision: identical(darkvision, _unset)
             ? this.darkvision
             : darkvision as int?,

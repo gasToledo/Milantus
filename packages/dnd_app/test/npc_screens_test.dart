@@ -526,6 +526,44 @@ void main() {
       expect(find.text('Garrick'), findsNothing);
       expect(tester.takeException(), isNull);
     });
+
+    // Antes solo se llegaba por ⋯ → «Abrir ficha»; en la biblioteca alcanza
+    // con tocar la tarjeta, y acá tiene que ser igual.
+    testWidgets('tocar el nombre abre el PNJ', (tester) async {
+      await pumpDm(tester, (s) {
+        seedLibrary(s);
+        s.campaigns.remove('costa');
+        s.campaignNpcs.remove((campaignId: 'costa', npcId: 'garrick'));
+      });
+      await openCampaignNpcs(tester);
+
+      await tester.tap(find.text('Mirra'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(NpcDetailScreen), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    // El creador es el mismo que el de un personaje propio, pero lo que se
+    // crea es un PNJ, y así lo tiene que decir.
+    testWidgets('el creador de un PNJ jugable dice que crea un PNJ', (
+      tester,
+    ) async {
+      await pumpDm(tester, seedLibrary);
+      await openCampaignNpcs(tester);
+
+      await tester.tap(find.text('Nuevo PNJ'));
+      await tester.pumpAndSettle();
+      await tester.enterText(inDialog(find.byType(TextField)).first, 'Kael');
+      await tester.tap(find.text('Personaje jugable'));
+      await tester.pumpAndSettle();
+      await tester.tap(dialogAction('Continuar al creador'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Crear PNJ'), findsOneWidget);
+      expect(find.text('Crear personaje'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
   });
 
   group('Exportar e importar', () {

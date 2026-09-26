@@ -213,6 +213,7 @@ Future<NpcEntry?> createNpcFlow(
         builder: (_) => CreationWizard(
           repo: repo,
           initialName: choice.name,
+          npc: true,
           onCreate: (created) => sheet = created,
         ),
       ),

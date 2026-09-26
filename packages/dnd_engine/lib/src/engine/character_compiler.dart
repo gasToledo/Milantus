@@ -601,6 +601,7 @@ class CharacterCompiler {
     final profBonus = proficiencyBonusForLevel(totalLevel);
     final conMod = mods[Ability.constitution]!;
     final dexMod = mods[Ability.dexterity]!;
+    final initiativeBonuses = builder.resolveInitiativeBonuses(mods, profBonus);
 
     final baseHp = c.hpPerLevel.fold<int>(0, (s, v) => s + v);
     final maxHp = baseHp +
@@ -770,11 +771,9 @@ class CharacterCompiler {
       carriedWeight: InventoryOps.carriedWeight(c, repo),
       size: size,
       speed: speed,
-      initiative: dexMod +
-          builder.initiativeBonus +
-          (builder.initiativeAddsProficiency ? profBonus : 0) +
-          builder.initiativeAbilities
-              .fold<int>(0, (s, a) => s + max(0, mods[a]!)),
+      initiative:
+          dexMod + initiativeBonuses.fold<int>(0, (s, b) => s + b.amount),
+      initiativeBonuses: List.unmodifiable(initiativeBonuses),
       darkvision: builder.darkvision,
       resistances: builder.resistances,
       immunities: builder.immunities,
