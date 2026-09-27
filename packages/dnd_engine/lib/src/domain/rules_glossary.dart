@@ -169,11 +169,11 @@ const raceSizeOptionsRule =
     'o ninguno vale el tamaño de arriba.';
 
 const skillProficiencyRule =
-    'Ser competente suma el bonificador de competencia a las pruebas de esa '
+    'Ser competente suma el bonificador por competencia a las pruebas de esa '
     'habilidad.';
 
 const toolProficiencyRule =
-    'Ser competente suma el bonificador de competencia a las pruebas con esa '
+    'Ser competente suma el bonificador por competencia a las pruebas con esa '
     'herramienta.';
 
 const backgroundAbilitiesRule =
@@ -249,7 +249,7 @@ const Map<String, String> creatureSizeRules = {
 
 const creatureCrRule =
     'Cuán peligrosa es: una de VD igual al nivel del grupo es un combate '
-    'parejo para cuatro personajes. Fija su bonificador de competencia y la '
+    'parejo para cuatro personajes. Fija su bonificador por competencia y la '
     'experiencia que da.';
 
 const creatureAttackBonusRule =

@@ -1192,29 +1192,34 @@ extension _SheetGeneralSection on _SheetScreenState {
         children: [
           for (var i = 0; i < s.passives.length; i++) ...[
             if (i > 0) Divider(height: 1, color: context.palette.hairline),
-            ExpansionTile(
-              title: Text(s.passives[i].name),
-              childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-              expandedAlignment: Alignment.centerLeft,
-              children: [
-                // Un rasgo largo es un párrafo, no una celda: se acota a unos
-                // 60 caracteres por línea y se interlinea, que es lo que hace
-                // que se lea de corrido. En la columna ancha del escritorio,
-                // sin tope, la línea llegaba a los 120 y el ojo perdía el
-                // renglón al volver.
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 60 * 7.2),
-                  child: Text(
-                    s.passives[i].description,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontSize: 13.5,
-                      height: 1.55,
+            // Sin descripción no hay nada que desplegar: una dote como Duro,
+            // que es solo un efecto, abría un panel vacío.
+            if (s.passives[i].description.trim().isEmpty)
+              ListTile(title: Text(s.passives[i].name))
+            else
+              ExpansionTile(
+                title: Text(s.passives[i].name),
+                childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+                expandedAlignment: Alignment.centerLeft,
+                children: [
+                  // Un rasgo largo es un párrafo, no una celda: se acota a unos
+                  // 60 caracteres por línea y se interlinea, que es lo que hace
+                  // que se lea de corrido. En la columna ancha del escritorio,
+                  // sin tope, la línea llegaba a los 120 y el ojo perdía el
+                  // renglón al volver.
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 60 * 7.2),
+                    child: Text(
+                      s.passives[i].description,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontSize: 13.5,
+                        height: 1.55,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
           ],
         ],
       ),

@@ -81,6 +81,44 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  // Una dote homebrew tiene la historia en la descripción y lo mecánico en
+  // efectos sueltos: el panel mostraba solo la descripción y se elegía sin
+  // saber qué daba.
+  testWidgets('el detalle de una dote homebrew dice qué concede', (
+    tester,
+  ) async {
+    repo.feats['hb-vigia'] = const Feat(
+      id: 'hb-vigia',
+      name: 'Vigía de prueba',
+      source: ContentSource.homebrew,
+      category: 'general',
+      description: 'Años de guardia entre tumbas.',
+      effects: [
+        AbilityScoreBonusEffect(ability: Ability.wisdom, amount: 1),
+        SkillProficiencyEffect('perception'),
+      ],
+    );
+    addTearDown(() => repo.feats.remove('hb-vigia'));
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.dark,
+        home: LevelUpScreen(character: fighterL3(), repo: repo, onDone: (_) {}),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await goToAsi(tester);
+    await tester.tap(find.text('Tomar dote'));
+    await tester.pumpAndSettle();
+    // No el nombre entero: el buscador también mostraría ese texto.
+    await searchFeat(tester, 'Vigía de');
+    await tester.tap(find.text('Vigía de prueba').first);
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Concede:'), findsOneWidget);
+    expect(find.textContaining('SAB +1'), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
+
   // Se elegía la subclase leyendo una línea de sabor: lo que daba de verdad
   // recién se veía en el resumen, después de decidir.
   testWidgets('la subclase elegida muestra los rasgos que da en este nivel', (

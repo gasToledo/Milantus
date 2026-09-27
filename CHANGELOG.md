@@ -375,7 +375,19 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   trae equipo inicial.
 - Toda dote tomada aparece en «Rasgos y dotes». Las homebrew, y Duro y tres de
   las Resilientes del catálogo, se aplicaban sin figurar en la ficha; ahora se
-  muestran con su nombre y su descripción.
+  muestran con su nombre y su descripción. Un rasgo sin descripción ya no abre
+  un panel vacío.
+- Al elegir una dote en la subida de nivel, el detalle dice qué concede
+  («Concede: SAB +1 · Competencia: Percepción») cuando la dote no lo cuenta
+  en un rasgo: las homebrew mostraban solo su descripción.
+- El detalle de un trasfondo en la creación nombra las herramientas que da,
+  que no se eligen en ningún paso.
+- Un objeto homebrew con rareza se rotula «Objeto mágico» en el inventario y
+  el buscador; decía «Equipo» y quedaba entre las mochilas.
+- El aviso de una elección que quedó sin rasgo nombra el rasgo («Estilo de
+  Combate (Guerrero)») en vez de su id interno.
+- Los textos de reglas escritos en la app dicen «bonificador por
+  competencia», como pide el glosario.
 
 ### Eliminado
 

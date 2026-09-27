@@ -16,6 +16,13 @@ const _invFilterAll = 'Todos';
 const _invFilterEquipped = 'Equipados';
 const _invFilterMagic = 'Mágicos';
 
+/// La familia con la que se agrupa y rotula un objeto. Los mágicos del
+/// catálogo traen la categoría `magic`, pero en el homebrew lo mágico lo da la
+/// rareza y la categoría es la del formulario: un amuleto con rareza se
+/// rotulaba «Equipo» y quedaba entre las mochilas.
+String? _itemFamily(Item? item) =>
+    item == null ? null : (item.isMagic ? 'magic' : item.category);
+
 /// Etiqueta visible de la familia. La comparten la fila y el buscador para que
 /// el jugador lea lo mismo en los dos lados.
 String _itemKindLabel(String kind, String? category) => switch (kind) {
@@ -1586,8 +1593,8 @@ extension _SheetInventorySection on _SheetScreenState {
         : entry.kind;
     return _ItemInfo(
       name: resolved.name,
-      kindLabel: _itemKindLabel(kind, item?.category),
-      icon: _itemIcon(kind, item?.category),
+      kindLabel: _itemKindLabel(kind, _itemFamily(item)),
+      icon: _itemIcon(kind, _itemFamily(item)),
       weight: resolved.weight,
       bundleSize: item?.bundleSize ?? 1,
       equippable:
@@ -1709,9 +1716,9 @@ class _AddItemDialogState extends State<_AddItemDialog> {
         (
           id: i.id,
           name: i.name,
-          family: _itemKindLabel('item', i.category),
+          family: _itemKindLabel('item', _itemFamily(i)),
           detail: [
-            _itemKindLabel('item', i.category),
+            _itemKindLabel('item', _itemFamily(i)),
             if (i.bundleSize > 1) 'paquete de ${i.bundleSize}',
             if (i.requiresAttunement) 'sintonización',
           ].join(' · '),

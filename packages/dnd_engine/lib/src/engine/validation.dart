@@ -33,6 +33,58 @@ class CharacterValidator {
   final ContentRepository repo;
   const CharacterValidator(this.repo);
 
+  /// Nombre legible del grupo de una elección huérfana, para el aviso.
+  ///
+  /// El aviso mostraba el id («fighter:fighting-style»), que es un dato
+  /// interno. Como el rasgo que declaraba el grupo ya no está en la ficha, el
+  /// nombre se busca en todo el contenido; si nada lo declara —porque se
+  /// retiró—, queda el id, que es lo único que hay. Con prefijo de clase, la
+  /// clase va entre paréntesis: «Estilo de Combate (Guerrero)».
+  String _choiceLabel(String groupId) {
+    final separator = groupId.indexOf(':');
+    final klass =
+        separator > 0 ? repo.classes[groupId.substring(0, separator)] : null;
+    // Hay grupos legacy con `:` que no son de ninguna clase
+    // (`class:wizard:signature-spells`): esos se buscan enteros.
+    final rawGroup = klass == null ? groupId : groupId.substring(separator + 1);
+
+    Iterable<Effect> allEffects() sync* {
+      for (final c in repo.classes.values) {
+        for (final f in c.features) {
+          yield* f.effects;
+        }
+      }
+      for (final s in repo.subclasses.values) {
+        for (final f in s.features) {
+          yield* f.effects;
+        }
+      }
+      for (final r in repo.races.values) {
+        yield* r.effects;
+      }
+      for (final b in repo.backgrounds.values) {
+        yield* b.effects;
+      }
+      for (final f in repo.feats.values) {
+        yield* f.effects;
+      }
+    }
+
+    String? name;
+    for (final e in allEffects()) {
+      if (e is FeatureChoiceEffect && e.groupId == rawGroup) {
+        name = e.name;
+      } else if (e is SpellChoiceEffect &&
+          e.groupId == rawGroup &&
+          e.name.isNotEmpty) {
+        name = e.name;
+      }
+      if (name != null) break;
+    }
+    final label = name ?? rawGroup;
+    return klass == null ? label : '$label (${klass.name})';
+  }
+
   List<ValidationWarning> validate(Character c) {
     final w = <ValidationWarning>[];
 
@@ -479,7 +531,7 @@ class CharacterValidator {
       if (slots.containsKey(groupId)) continue;
       w.add(ValidationWarning(
         'feature_choice_orphan',
-        'Tenés elecciones guardadas de "$groupId", un rasgo que ya no tenés.',
+        'Tenés elecciones guardadas de «${_choiceLabel(groupId)}», un rasgo que ya no tenés.',
         WarningSeverity.info,
       ));
     }
@@ -494,7 +546,7 @@ class CharacterValidator {
         if (slots.containsKey(scopedId)) continue;
         w.add(ValidationWarning(
           'feature_choice_orphan',
-          'Tenés elecciones guardadas de "$scopedId", un rasgo que ya no tenés.',
+          'Tenés elecciones guardadas de «${_choiceLabel(scopedId)}», un rasgo que ya no tenés.',
           WarningSeverity.info,
         ));
       }
@@ -557,7 +609,7 @@ class CharacterValidator {
       if (slots.containsKey(groupId)) continue;
       w.add(ValidationWarning(
         'spell_choice_orphan',
-        'Tenés conjuros elegidos de "$groupId", un rasgo que ya no tenés.',
+        'Tenés conjuros elegidos de «${_choiceLabel(groupId)}», un rasgo que ya no tenés.',
         WarningSeverity.info,
       ));
     }
@@ -572,7 +624,7 @@ class CharacterValidator {
         if (slots.containsKey(scopedId)) continue;
         w.add(ValidationWarning(
           'spell_choice_orphan',
-          'Tenés conjuros elegidos de "$scopedId", un rasgo que ya no tenés.',
+          'Tenés conjuros elegidos de «${_choiceLabel(scopedId)}», un rasgo que ya no tenés.',
           WarningSeverity.info,
         ));
       }

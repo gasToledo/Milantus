@@ -87,7 +87,7 @@ const Map<String, WeaponMastery> weaponMasteries = {
     description:
         'Si acertás a una criatura con esta arma, podés obligarla a hacer una '
         'salvación de Constitución (CD 8 + tu modificador de característica '
-        'del ataque + tu bonificador de competencia). Si falla, queda '
+        'del ataque + tu bonificador por competencia). Si falla, queda '
         'derribada.',
   ),
   'vex': WeaponMastery(

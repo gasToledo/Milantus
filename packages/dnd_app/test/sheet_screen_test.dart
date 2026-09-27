@@ -446,6 +446,32 @@ void main() {
       expect(CharacterCompiler(repo).compile(saved(controller)).armorClass, 18);
     });
 
+    // En el homebrew lo mágico lo da la rareza, no la categoría: un amuleto
+    // infrecuente se rotulaba «Equipo» y quedaba entre las mochilas.
+    testWidgets('un objeto homebrew con rareza se rotula mágico', (
+      tester,
+    ) async {
+      repo.items['hb-amuleto'] = const Item(
+        id: 'hb-amuleto',
+        name: 'Amuleto de prueba',
+        source: ContentSource.homebrew,
+        category: 'gear',
+        rarity: 'uncommon',
+        requiresAttunement: true,
+      );
+      addTearDown(() => repo.items.remove('hb-amuleto'));
+      await pumpSheet(tester, mochilera());
+      await tester.tap(find.text('Inventario'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Agregar objeto'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).last, 'Amuleto de prueba');
+      await tester.pumpAndSettle();
+
+      expect(find.text('Objeto mágico · sintonización'), findsOneWidget);
+      expect(find.text('Equipo · sintonización'), findsNothing);
+    });
+
     // Quitar es el único borrado de la ficha que no pregunta nada, y tampoco
     // decía nada: el objeto desaparecía y listo. En vez de un diálogo —quitar
     // cosas de la mochila es rutina— va la salida.

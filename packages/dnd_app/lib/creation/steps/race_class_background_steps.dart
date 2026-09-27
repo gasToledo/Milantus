@@ -326,9 +326,19 @@ class _BackgroundStep extends StatelessWidget {
                   title: bg.name,
                   facts: [
                     (
-                      'Competencias',
+                      'Habilidades',
                       bg.skillProficiencies.map(Skill.labelFor).join(', '),
                     ),
+                    // Las herramientas también son del trasfondo y no se
+                    // eligen en ningún paso: si no se dicen acá, el jugador
+                    // se entera recién en la ficha.
+                    if (bg.toolProficiencies.isNotEmpty)
+                      (
+                        'Herramientas',
+                        bg.toolProficiencies
+                            .map(toolProficiencyLabel)
+                            .join(', '),
+                      ),
                     if (bg.originFeatId != null)
                       (
                         'Dote de origen',

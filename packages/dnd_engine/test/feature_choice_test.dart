@@ -544,6 +544,29 @@ void main() {
       expect(codes, isNot(contains('feature_choice_orphan')));
     });
 
+    test('el aviso de una elección huérfana nombra el rasgo, no el id', () {
+      // Un Mago con el estilo que guardó cuando era Guerrero.
+      final mago = Character(
+        id: 'mago',
+        name: 'Prueba',
+        raceId: 'human',
+        classId: 'wizard',
+        backgroundId: 'sage',
+        level: 1,
+        assignedScores: {for (final a in Ability.values) a: 12},
+        hpPerLevel: const [6],
+        featureChoices: const {
+          'fighting-style': ['fs-defense'],
+        },
+      );
+      final aviso = CharacterValidator(repo)
+          .validate(mago)
+          .singleWhere((w) => w.code == 'feature_choice_orphan');
+
+      expect(aviso.message, contains('«Estilo de Combate»'));
+      expect(aviso.message, isNot(contains('fighting-style')));
+    });
+
     test('con una sola clase, la copia vieja no suma su dote', () {
       // El jugador cambió el estilo después de la migración: la ficha edita
       // el campo plano y la copia por clase quedó con el anterior.

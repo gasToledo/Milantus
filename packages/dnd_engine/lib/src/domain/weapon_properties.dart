@@ -113,5 +113,5 @@ const Map<String, String> weaponCategoryRules = {
       'Todas las clases del manual son competentes con las armas simples.',
   'martial':
       'Sin competencia con armas marciales se puede atacar igual, pero sin '
-          'sumar el bonificador de competencia y sin usar su maestría.',
+          'sumar el bonificador por competencia y sin usar su maestría.',
 };

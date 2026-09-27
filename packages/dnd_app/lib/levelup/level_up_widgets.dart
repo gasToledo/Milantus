@@ -517,6 +517,15 @@ class _FeatDetail extends StatelessWidget {
     final pal = context.palette;
     final scheme = Theme.of(context).colorScheme;
     final summary = featSummary(feat, repo);
+    // Con descripción, el resumen es solo la descripción. Una dote del
+    // catálogo cuenta lo que hace en sus rasgos pasivos, pero una homebrew
+    // del formulario tiene la historia en la descripción y lo mecánico en
+    // efectos sueltos: se elegía sin saber que daba SAB +1 y Percepción.
+    final grants =
+        feat.description.isNotEmpty &&
+            !feat.effects.any((e) => e is PassiveTraitEffect)
+        ? [for (final e in feat.effects) ?describeEffect(e, repo)]
+        : const <String>[];
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
@@ -555,6 +564,13 @@ class _FeatDetail extends StatelessWidget {
                 height: 1.45,
                 color: scheme.onSurfaceVariant,
               ),
+            ),
+          ],
+          if (grants.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Concede: ${grants.join(' · ')}',
+              style: const TextStyle(fontSize: 13, height: 1.45),
             ),
           ],
           if (feat.repeatable) ...[

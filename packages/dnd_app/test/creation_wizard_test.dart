@@ -442,6 +442,15 @@ void main() {
     // el nombre tiene que salir una sola vez.
     expect(rasgo.name, dote.name, reason: 'premisa del caso');
     expect(find.text(dote.name), findsOneWidget);
+
+    // Las herramientas del trasfondo no se eligen en ningún paso, y el detalle
+    // no las nombraba: el jugador se enteraba en la ficha.
+    final herramientas = repo.background('soldier')!.toolProficiencies;
+    expect(herramientas, isNotEmpty, reason: 'premisa del caso');
+    expect(
+      find.text(herramientas.map(toolProficiencyLabel).join(', ')),
+      findsOneWidget,
+    );
   });
 
   // Los rasgos de una especie eran una línea de nombres pegados con comas, que
