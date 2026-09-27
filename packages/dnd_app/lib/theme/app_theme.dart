@@ -199,6 +199,10 @@ class AppTheme {
     return base.copyWith(
       colorScheme: scheme,
       scaffoldBackgroundColor: scaffold,
+      // El menú abierto de un `DropdownButton` se pinta con `canvasColor`, que
+      // `copyWith` no deriva del `colorScheme` nuevo: quedaba el de `base`, el
+      // violeta de Material, en todos los desplegables de la aplicación.
+      canvasColor: surface,
       extensions: [palette],
       textTheme: base.textTheme
           .copyWith(

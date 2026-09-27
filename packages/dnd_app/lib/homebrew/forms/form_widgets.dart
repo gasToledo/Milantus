@@ -267,43 +267,53 @@ class _FormSection extends StatelessWidget {
                       ? Border(bottom: BorderSide(color: pal.hairline))
                       : null,
                 ),
-                child: Row(
-                  children: [
-                    Icon(icon, size: 18, color: pal.gold),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        title,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontFamily: 'Georgia',
-                          fontSize: 16,
+                // El título va a su ancho, con techo, y no en un `Flexible`:
+                // con el resumen en `Expanded` la fila le daba media a cada
+                // uno, lo que el título no usaba de su mitad quedaba vacío al
+                // final, y el resumen y el chevrón caían en otro lugar en cada
+                // sección según el largo del título.
+                child: LayoutBuilder(
+                  builder: (context, constraints) => Row(
+                    children: [
+                      Icon(icon, size: 18, color: pal.gold),
+                      const SizedBox(width: 8),
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: constraints.maxWidth * 0.6,
+                        ),
+                        child: Text(
+                          title,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontFamily: 'Georgia',
+                            fontSize: 16,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        expanded ? '' : summary,
-                        textAlign: TextAlign.right,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 13, color: pal.textMuted),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          expanded ? '' : summary,
+                          textAlign: TextAlign.right,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 13, color: pal.textMuted),
+                        ),
                       ),
-                    ),
-                    AnimatedRotation(
-                      turns: expanded ? 0 : -0.25,
-                      duration: context.motion(
-                        const Duration(milliseconds: 150),
+                      AnimatedRotation(
+                        turns: expanded ? 0 : -0.25,
+                        duration: context.motion(
+                          const Duration(milliseconds: 150),
+                        ),
+                        child: Icon(
+                          Icons.expand_more,
+                          size: 20,
+                          color: pal.textMuted,
+                          semanticLabel: expanded ? 'Plegar' : 'Desplegar',
+                        ),
                       ),
-                      child: Icon(
-                        Icons.expand_more,
-                        size: 20,
-                        color: pal.textMuted,
-                        semanticLabel: expanded ? 'Plegar' : 'Desplegar',
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -755,9 +765,15 @@ String? _weightValue(String? value) {
 
 // ------------------------------------------------------------------ Campos
 
+/// Campo de texto con rótulo flotante.
+///
+/// [hint] es el ejemplo, y aparece recién al entrar al campo. En un campo
+/// angosto, el ejemplo metido en el rótulo cortaba el rótulo mismo: «Valor de
+/// desafío (p.ej. 1/4 o …».
 Widget _text(
   TextEditingController c,
   String label, {
+  String? hint,
   bool number = false,
   int maxLines = 1,
   String? Function(String?)? validator,
@@ -772,6 +788,7 @@ Widget _text(
     onTap: onTap,
     decoration: InputDecoration(
       labelText: label,
+      hintText: hint,
       border: const OutlineInputBorder(),
     ),
   ),
@@ -813,7 +830,7 @@ Widget _damageTypeDropdown(
   // Un arma homebrew vieja puede tener un tipo fuera del catálogo: se conserva
   // como opción para que editarla no lo cambie por la espalda.
   final ids = [
-    for (final t in DamageType.values) t.id,
+    ..._damageTypeOptions.keys,
     if (DamageType.fromId(value) == null) value,
   ];
   return _idDropdown(

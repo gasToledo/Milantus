@@ -53,6 +53,27 @@ class _ArmorFormState extends State<ArmorForm> with _GuidedForm {
 
   void _save() => Navigator.of(context).pop(_armor());
 
+  /// Elegir la categoría trae la Destreza del manual: media hasta +2, pesada
+  /// sin Destreza. Antes la categoría solo cambiaba la pill, y una armadura
+  /// «Media» se guardaba con la Destreza entera de la ligera que venía por
+  /// defecto: la ficha le daba 17 a un personaje con DES +3 donde el manual
+  /// dice 16. Es un punto de partida y no un candado, porque el homebrew está
+  /// para salirse del manual: después se ajusta en la sección de abajo. El
+  /// escudo no toca nada, porque no suma Destreza.
+  void _applyCategoryDex(String category) {
+    switch (category) {
+      case 'light':
+        _addDex = true;
+        _maxDex.text = '';
+      case 'medium':
+        _addDex = true;
+        _maxDex.text = '2';
+      case 'heavy':
+        _addDex = false;
+        _maxDex.text = '';
+    }
+  }
+
   bool get _shield => _category == 'shield';
 
   @override
@@ -172,6 +193,7 @@ class _ArmorFormState extends State<ArmorForm> with _GuidedForm {
               _category,
               (v) => setState(() {
                 _category = v;
+                _applyCategoryDex(v);
                 focus = 'category';
               }),
               onTap: () => focusOn('category'),

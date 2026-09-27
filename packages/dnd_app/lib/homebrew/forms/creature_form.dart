@@ -239,7 +239,7 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
     return switch (parts[2]) {
       'bonus' => _explained(
         'Acción',
-        'Bono de ataque',
+        'Bonificador de ataque',
         creatureAttackBonusRule,
       ),
       'kind' => switch (creatureActionKindRules[action.kind.id]) {
@@ -326,7 +326,7 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
               }),
               onTap: () => focusOn('size'),
             ),
-            _text(_speed, 'Velocidad (p.ej. 30 pies, volar 60 pies)'),
+            _text(_speed, 'Velocidad', hint: 'p.ej. 30 pies, volar 60 pies'),
           ],
         ),
         Padding(
@@ -353,7 +353,8 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
             ),
             _text(
               _hitDice,
-              'Dados de golpe (opcional, p.ej. 2d6 + 2)',
+              'Dados de golpe (opcional)',
+              hint: 'p.ej. 2d6 + 2',
               validator: _hitDiceValue,
               onTap: () => focusOn('hitDice'),
             ),
@@ -368,20 +369,28 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
             for (final a in Ability.values) _abilities[a]!.text.trim(),
           ].join(' · '),
           children: [
-            Wrap(
-              spacing: 12,
-              children: [
-                for (final a in Ability.values)
-                  SizedBox(
-                    width: 92,
-                    child: _text(
-                      _abilities[a]!,
-                      a.abbr,
-                      number: true,
-                      validator: (v) => _intInRange(v, 1, 30, optional: false),
+            // Tres por fila, como la vista previa y como el bloque del manual.
+            // Con un ancho fijo de 92 px quedaban cinco y CAR sola abajo.
+            LayoutBuilder(
+              builder: (context, constraints) => Wrap(
+                spacing: 12,
+                children: [
+                  for (final a in Ability.values)
+                    SizedBox(
+                      // Redondeado para abajo: tres anchos con decimales
+                      // pueden sumar un pelo más que la fila y mandar el
+                      // tercero abajo.
+                      width: ((constraints.maxWidth - 24) / 3).floorToDouble(),
+                      child: _text(
+                        _abilities[a]!,
+                        a.abbr,
+                        number: true,
+                        validator: (v) =>
+                            _intInRange(v, 1, 30, optional: false),
+                      ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -393,13 +402,15 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
             _fieldRow([
               _text(
                 _cr,
-                'Valor de desafío (p.ej. 1/4 o 5)',
+                'Valor de desafío',
+                hint: 'p.ej. 1/4 o 5',
                 validator: _crValue,
                 onTap: () => focusOn('cr'),
               ),
               _text(
                 _initiative,
-                'Bono de iniciativa (vacío = DES)',
+                'Iniciativa',
+                hint: 'Vacío: el mod. de DES',
                 number: true,
                 validator: (v) => _intInRange(v, -10, 20, optional: true),
               ),
@@ -413,12 +424,17 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
               ),
               _text(
                 _legendary,
-                'Acciones legendarias por ronda',
+                'Acciones legendarias',
+                hint: 'Por ronda',
                 number: true,
                 validator: (v) => _intInRange(v, 1, 10, optional: true),
               ),
             ]),
-            _text(_senses, 'Sentidos (p.ej. visión en la oscuridad 60 pies)'),
+            _text(
+              _senses,
+              'Sentidos',
+              hint: 'p.ej. visión en la oscuridad 60 pies',
+            ),
             _text(_languages, 'Idiomas'),
             _text(_defenses, 'Resistencias, inmunidades y vulnerabilidades'),
             explainHere((f) => f == 'cr'),
@@ -534,7 +550,7 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
     _fieldRow([
       _text(
         a.attackBonus,
-        'Bono de ataque (vacío = no es ataque)',
+        'Bonificador de ataque (vacío = no es ataque)',
         number: true,
         validator: (v) => _intInRange(v, -10, 30, optional: true),
         onTap: () => focusOn('action:$index:bonus'),
@@ -546,10 +562,7 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
       _idDropdown(
         label: 'Tipo de daño',
         value: a.damageType,
-        options: {
-          '': 'Sin daño',
-          for (final t in DamageType.values) t.id: t.label,
-        },
+        options: {'': 'Sin daño', ..._damageTypeOptions},
         onChanged: (v) => setState(() {
           a.damageType = v;
           focus = 'action:$index:damageType';

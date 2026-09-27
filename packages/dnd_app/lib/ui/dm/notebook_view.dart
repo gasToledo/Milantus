@@ -232,8 +232,12 @@ String _logTitle(EncounterLog log) => log.enemies.isEmpty
     ? 'Combate'
     : 'Combate contra ${log.enemies.map((m) => m.name).join(', ')}';
 
+/// La cantidad va detrás, «Esqueleto ×2», como en el equipo. «2 Esqueleto»
+/// pedía un plural, y el nombre sale del catálogo o del homebrew: «Lobo
+/// terrible», «Guerrero goblin», «Tiranosaurio rex». Pluralizar eso con reglas
+/// se equivoca justo en los nombres compuestos, que son la mitad del bestiario.
 String _logNames(List<EncounterLogMonsters> group, String joiner) => [
-  for (final m in group) m.count == 1 ? m.name : '${m.count} ${m.name}',
+  for (final m in group) m.count == 1 ? m.name : '${m.name} ×${m.count}',
 ].join(joiner);
 
 /// Un capítulo del cuaderno: plegado muestra un resumen, abierto muestra sus
@@ -540,7 +544,7 @@ String _logBody(EncounterLog log) {
   }
   final against = _logNames(log.enemies, ' y ');
   // El sujeto va siempre explícito: "cayeron todos" a secas, al lado de
-  // "Sagan, Lyra contra 3 Goblins", se puede leer como que cayó el grupo.
+  // "Sagan, Lyra contra Goblin ×3", se puede leer como que cayó el grupo.
   final fell = log.totalDefeated == 0
       ? 'No cayó ningún enemigo.'
       : log.totalDefeated == log.totalMonsters

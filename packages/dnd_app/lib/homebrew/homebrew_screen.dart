@@ -26,7 +26,31 @@ part 'homebrew_sections.dart';
 // es que dejan de estar a la vista. Las habilidades salen de `Skill`, que ya es
 // la única fuente de la traducción (ver `skill.dart`) — repetirlas acá era
 // arriesgarse a que las dos listas se separaran.
-final _skillOptions = {for (final id in Skill.allIds) id: Skill.labelFor(id)};
+final _skillOptions = _sortedByLabel({
+  for (final id in Skill.allIds) id: Skill.labelFor(id),
+});
+
+/// Tipos de daño por su nombre, en el mismo orden que [_skillOptions].
+final _damageTypeOptions = _sortedByLabel({
+  for (final t in DamageType.values) t.id: t.label,
+});
+
+/// Las opciones en orden alfabético castellano. Los ids vienen en el orden
+/// del manual en inglés, y mostrados tal cual dejaban «Trato con Animales»
+/// segunda y «Relámpago» antes de «Necrótico»: quien busca una opción en
+/// castellano no la encuentra donde la espera.
+Map<String, String> _sortedByLabel(Map<String, String> options) =>
+    Map.fromEntries(
+      options.entries.toList()
+        ..sort((a, b) => _sortKey(a.value).compareTo(_sortKey(b.value))),
+    );
+
+/// Sin tildes y en minúscula, para que «Ácido» no quede después de la z.
+String _sortKey(String label) => label.toLowerCase().replaceAllMapped(
+  RegExp('[áéíóúü]'),
+  (m) =>
+      const {'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ü': 'u'}[m[0]]!,
+);
 
 /// Propiedades de arma, tomadas del glosario del motor: la misma fuente que
 /// explica cada una en el formulario, así el nombre y la regla no se separan.

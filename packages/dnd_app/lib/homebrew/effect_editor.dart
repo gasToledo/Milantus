@@ -15,11 +15,18 @@ class EffectEditor extends StatefulWidget {
   /// Para nombrar y ofrecer el contenido que un efecto puede conceder.
   final ContentRepository repo;
   final VoidCallback onChanged;
+
+  /// Tipos que no se ofrecen, por el nombre de su `_EffectKind`. El objeto
+  /// esconde la CA y las resistencias porque ya tiene campos propios para
+  /// eso: ofrecerlos dos veces permitía sumar la misma CA dos veces.
+  final Set<String> hiddenKinds;
+
   const EffectEditor({
     super.key,
     required this.effects,
     required this.repo,
     required this.onChanged,
+    this.hiddenKinds = const {},
   });
 
   @override
@@ -85,7 +92,13 @@ class _EffectEditorState extends State<EffectEditor> {
   Future<void> _add() async {
     final effect = await showDialog<Effect>(
       context: context,
-      builder: (_) => _AddEffectDialog(repo: widget.repo),
+      builder: (_) => _AddEffectDialog(
+        repo: widget.repo,
+        kinds: [
+          for (final k in _EffectKind.values)
+            if (!widget.hiddenKinds.contains(k.name)) k,
+        ],
+      ),
     );
     if (effect != null) {
       setState(() => widget.effects.add(effect));
@@ -103,9 +116,10 @@ enum _EffectKind {
   hpPerLevel('PG máx por nivel'),
   hpFlat('PG máx, una vez'),
   acBonus('Bonificador a la CA'),
-  speedBonus('Bonificador de velocidad'),
-  setSpeed('Fijar la velocidad'),
-  darkvision('Visión en la oscuridad'),
+  initiativeBonus('Bonificador a la iniciativa'),
+  speedBonus('Bonificador de velocidad', unit: 'Pies', start: 10),
+  setSpeed('Fijar la velocidad', unit: 'Pies', start: 30),
+  darkvision('Visión en la oscuridad', unit: 'Alcance en pies', start: 60),
   skillProf('Competencia en habilidad'),
   saveProf('Competencia en salvación'),
   saveBonus('Bonificador a las salvaciones'),
@@ -124,21 +138,31 @@ enum _EffectKind {
   passive('Rasgo pasivo');
 
   final String label;
-  const _EffectKind(this.label);
+
+  /// Qué es el número, cuando no se entiende solo. Una visión en la oscuridad
+  /// de «1» se guardaba sin que nada avisara que eran pies.
+  final String unit;
+
+  /// El valor con el que arranca el campo: el más común en el manual. Con
+  /// un 1 para todo, la visión en la oscuridad nacía de un pie.
+  final int start;
+
+  const _EffectKind(this.label, {this.unit = 'Valor', this.start = 1});
 }
 
 class _AddEffectDialog extends StatefulWidget {
   final ContentRepository repo;
-  const _AddEffectDialog({required this.repo});
+  final List<_EffectKind> kinds;
+  const _AddEffectDialog({required this.repo, required this.kinds});
   @override
   State<_AddEffectDialog> createState() => _AddEffectDialogState();
 }
 
 class _AddEffectDialogState extends State<_AddEffectDialog> {
-  _EffectKind _kind = _EffectKind.abilityBonus;
+  late _EffectKind _kind = widget.kinds.first;
   Ability _ability = Ability.strength;
   late String _skill = _skillOptions.keys.first;
-  late String _damageType = DamageType.values.first.id;
+  late String _damageType = _damageTypeOptions.keys.first;
   late String _weaponCategory = weaponProficiencyIds.first;
   late String _armorCategory = armorTrainingIds.first;
   late String _tool = toolProficiencyIds.first;
@@ -151,7 +175,10 @@ class _AddEffectDialogState extends State<_AddEffectDialog> {
   late String? _featId = widget.repo.featsSorted.firstOrNull?.id;
   InnateSpellUse _spellUse = InnateSpellUse.atWill;
 
-  final _amountCtrl = TextEditingController(text: '1');
+  /// Suma el bonificador por competencia a la iniciativa, como Alerta.
+  bool _initiativeProficiency = false;
+
+  late final _amountCtrl = TextEditingController(text: '${_kind.start}');
   final _nameCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
 
@@ -177,6 +204,10 @@ class _AddEffectDialogState extends State<_AddEffectDialog> {
     _EffectKind.hpPerLevel => BonusMaxHpPerLevelEffect(_amount),
     _EffectKind.hpFlat => BonusMaxHpFlatEffect(_amount),
     _EffectKind.acBonus => ArmorClassBonusEffect(_amount),
+    _EffectKind.initiativeBonus => InitiativeBonusEffect(
+      amount: _amount,
+      addProficiency: _initiativeProficiency,
+    ),
     _EffectKind.speedBonus => SpeedBonusEffect(_amount),
     _EffectKind.setSpeed => SetSpeedEffect(_amount),
     _EffectKind.darkvision => DarkvisionEffect(_amount),
@@ -221,9 +252,13 @@ class _AddEffectDialogState extends State<_AddEffectDialog> {
           _idDropdown(
             label: 'Tipo',
             value: _kind.name,
-            options: {for (final k in _EffectKind.values) k.name: k.label},
-            onChanged: (v) =>
-                setState(() => _kind = _EffectKind.values.byName(v)),
+            options: {for (final k in widget.kinds) k.name: k.label},
+            // Cambiar de tipo cambia qué significa el número: «1» de CA no
+            // es «1» pie de visión. Se vuelve al valor de partida del tipo.
+            onChanged: (v) => setState(() {
+              _kind = _EffectKind.values.byName(v);
+              _amountCtrl.text = '${_kind.start}';
+            }),
           ),
           ..._fields(),
         ],
@@ -268,6 +303,17 @@ class _AddEffectDialogState extends State<_AddEffectDialog> {
     _EffectKind.saveBonus ||
     _EffectKind.extraAttack ||
     _EffectKind.masterySlots => [_amountField()],
+    // El bonificador por competencia va como interruptor y no como número:
+    // sube con el nivel, y un número fijo quedaría viejo al subir.
+    _EffectKind.initiativeBonus => [
+      _amountField(),
+      SwitchListTile(
+        contentPadding: EdgeInsets.zero,
+        title: const Text('Suma el bonificador por competencia'),
+        value: _initiativeProficiency,
+        onChanged: (v) => setState(() => _initiativeProficiency = v),
+      ),
+    ],
     _EffectKind.saveProf => [_abilityDropdown()],
     _EffectKind.skillProf => [
       _idDropdown(
@@ -378,7 +424,7 @@ class _AddEffectDialogState extends State<_AddEffectDialog> {
     onChanged: (v) => setState(() => _ability = Ability.values.byName(v)),
   );
 
-  Widget _amountField() => _text(_amountCtrl, 'Valor', number: true);
+  Widget _amountField() => _text(_amountCtrl, _kind.unit, number: true);
 }
 
 /// Valor del desplegable de dote que significa "la elige el jugador". Va como

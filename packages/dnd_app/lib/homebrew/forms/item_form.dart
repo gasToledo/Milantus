@@ -50,6 +50,16 @@ class _ItemFormState extends State<ItemForm> with _GuidedForm {
       if (e is ResistanceEffect) e.damageType,
   };
 
+  /// Los efectos que no son CA ni resistencia: se editan con el editor de las
+  /// dotes. Antes solo se conservaban, y no había forma de armar una Capa de
+  /// protección (salvaciones) ni unos Guanteletes de fuerza de ogro (fijar la
+  /// Fuerza) sin escribir el JSON.
+  late final List<Effect> _otherEffects = [
+    ...?widget.initial?.effects.where(
+      (e) => e is! ArmorClassBonusEffect && e is! ResistanceEffect,
+    ),
+  ];
+
   static int _initialAcBonus(Item? item) {
     for (final e in item?.effects ?? const <Effect>[]) {
       if (e is ArmorClassBonusEffect) return e.amount;
@@ -81,11 +91,7 @@ class _ItemFormState extends State<ItemForm> with _GuidedForm {
     effects: [
       if (_acBonusValue != 0) ArmorClassBonusEffect(_acBonusValue),
       for (final type in _resistances) ResistanceEffect(type),
-      // El formulario solo sabe de esos dos efectos: el resto se conserva
-      // tal cual en vez de desaparecer al guardar.
-      ...?widget.initial?.effects.where(
-        (e) => e is! ArmorClassBonusEffect && e is! ResistanceEffect,
-      ),
+      ..._otherEffects,
     ],
   );
 
@@ -154,16 +160,20 @@ class _ItemFormState extends State<ItemForm> with _GuidedForm {
     if (_rarity != null) 'rarity',
     if (_attunement) 'attunement',
     if (_acBonusValue != 0) 'acBonus',
-    for (final t in DamageType.values)
-      if (_resistances.contains(t.id)) 'res:${t.id}',
+    for (final id in _damageTypeOptions.keys)
+      if (_resistances.contains(id)) 'res:$id',
     if (_baseItemKind != 'none') 'base',
     if (_magicBonusValue != 0) 'magicBonus',
   ];
 
   String get _effectsSummary => _orNone([
     if (_acBonusValue != 0) 'CA ${_signed(_acBonusValue)}',
-    for (final t in DamageType.values)
-      if (_resistances.contains(t.id)) 'Resistencia: ${t.label}',
+    for (final MapEntry(key: id, value: label) in _damageTypeOptions.entries)
+      if (_resistances.contains(id)) 'Resistencia: $label',
+    if (_otherEffects.isNotEmpty)
+      _otherEffects.length == 1
+          ? '1 efecto más'
+          : '${_otherEffects.length} efectos más',
   ], 'ninguno');
 
   @override
@@ -268,12 +278,21 @@ class _ItemFormState extends State<ItemForm> with _GuidedForm {
             const Text('Resistencias'),
             const SizedBox(height: 6),
             _idChips(
-              {for (final t in DamageType.values) t.id: t.label},
+              _damageTypeOptions,
               _resistances,
               redraw,
               onTap: (id) => focus = 'res:$id',
             ),
             explainHere((f) => f == 'acBonus' || f.startsWith('res:')),
+            const SizedBox(height: 12),
+            const Text('Otros efectos'),
+            const SizedBox(height: 6),
+            EffectEditor(
+              effects: _otherEffects,
+              repo: widget.repo,
+              onChanged: redraw,
+              hiddenKinds: const {'acBonus', 'resistance'},
+            ),
           ],
         ),
         section(

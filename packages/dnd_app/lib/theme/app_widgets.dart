@@ -1854,7 +1854,7 @@ String? describeEffect(Effect e, ContentRepository repo) => switch (e) {
     :final addProficiency,
     :final fromAbility,
   ) =>
-    'Iniciativa ${[if (amount != 0) '+$amount', if (addProficiency) '+ bonif. de competencia', if (fromAbility != null) '+ mod. de ${fromAbility.abbr}'].join(' ')}',
+    'Iniciativa ${[if (amount != 0) '+$amount', if (addProficiency) '+ bonif. por competencia', if (fromAbility != null) '+ mod. de ${fromAbility.abbr}'].join(' ')}',
   BonusMaxHpPerLevelEffect(:final perLevel) => 'PG máx +$perLevel por nivel',
   BonusMaxHpFlatEffect(:final amount) => 'PG máx +$amount',
   PassiveTraitEffect(:final name) => 'Pasiva: $name',
@@ -2121,7 +2121,11 @@ Widget spellDetailsBody(
     mainAxisSize: MainAxisSize.min,
     children: [
       Text(
-        '${spell.isCantrip ? "Truco" : "Nivel ${spell.level}"} · ${spell.school}',
+        // Un conjuro homebrew puede no tener escuela, y quedaba «Truco ·».
+        [
+          spell.isCantrip ? 'Truco' : 'Nivel ${spell.level}',
+          if (spell.school.trim().isNotEmpty) spell.school,
+        ].join(' · '),
         style: TextStyle(color: muted),
       ),
       const SizedBox(height: 10),
@@ -2439,12 +2443,14 @@ Widget _profileNumbers(
             semantics: 'Clase de armadura: ${c.ac}',
           ),
         if (!dense)
+          // Suelta, cada celda mide 118 px y la forma larga se cortaba en
+          // «PUNTOS DE GO…»: ahí va la abreviatura, como dice el glosario.
           (
-            label: 'Puntos de golpe',
+            label: wide ? 'Puntos de golpe' : 'PG',
             value: c.hp,
             suffix: wide ? c.hitDice : null,
             color: pal.crimson,
-            semantics: null,
+            semantics: wide ? null : 'Puntos de golpe: ${c.hp}',
           ),
         // Tampoco la iniciativa: ahí ya está la tirada de esta mesa, que es la
         // que manda sobre el modificador impreso.
@@ -2458,11 +2464,13 @@ Widget _profileNumbers(
           ),
         if (c.cr != null)
           (
-            label: 'Valor de desafío',
+            label: wide ? 'Valor de desafío' : 'VD',
             value: challengeRatingLabel(c.cr!),
             suffix: null,
             color: pal.gold,
-            semantics: null,
+            semantics: wide
+                ? null
+                : 'Valor de desafío: ${challengeRatingLabel(c.cr!)}',
           ),
         if (c.passivePerceptionValue case final p?)
           (

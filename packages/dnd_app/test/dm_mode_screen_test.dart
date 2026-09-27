@@ -2032,7 +2032,7 @@ void main() {
 
       expect(find.text('Combate contra Esqueleto'), findsOneWidget);
       expect(
-        find.textContaining('Sagan, Mirna contra 2 Esqueleto'),
+        find.textContaining('Sagan, Mirna contra Esqueleto ×2.'),
         findsOneWidget,
       );
       expect(find.textContaining('Cayeron todos'), findsOneWidget);

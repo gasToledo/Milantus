@@ -1230,6 +1230,44 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  // El efecto llegó con Alerta y el editor no lo ofrecía: una dote propia que
+  // mejorara la iniciativa solo se podía cargar por JSON.
+  testWidgets('el editor suma un bonificador a la iniciativa', (tester) async {
+    final effects = await runEffectEditor(tester);
+
+    await tester.tap(find.text('Agregar efecto'));
+    await tester.pumpAndSettle();
+    await pickOption(tester, 'Tipo', 'Bonificador a la iniciativa');
+    await tester.tap(find.text('Suma el bonificador por competencia'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Agregar'));
+    await tester.pumpAndSettle();
+
+    final effect = effects.single as InitiativeBonusEffect;
+    expect(effect.amount, 1);
+    expect(effect.addProficiency, isTrue);
+    expect(tester.takeException(), isNull);
+  });
+
+  // Arrancaba en 1 con el rótulo «Valor»: nada decía que eran pies, y una
+  // visión de un pie se guardaba sin aviso.
+  testWidgets('la visión en la oscuridad arranca en 60 pies', (tester) async {
+    final effects = await runEffectEditor(tester);
+
+    await tester.tap(find.text('Agregar efecto'));
+    await tester.pumpAndSettle();
+    await pickOption(tester, 'Tipo', 'Visión en la oscuridad');
+    expect(
+      find.widgetWithText(TextFormField, 'Alcance en pies'),
+      findsOneWidget,
+    );
+    await tester.tap(find.text('Agregar'));
+    await tester.pumpAndSettle();
+
+    expect((effects.single as DarkvisionEffect).range, 60);
+    expect(tester.takeException(), isNull);
+  });
+
   // Lo que se guarda es el id —el contrato con el motor— pero lo que se lee es
   // el nombre del catálogo: una lista de ids no dice qué concede el rasgo.
   testWidgets('la lista nombra el conjuro y la dote que el rasgo concede', (
@@ -1326,6 +1364,82 @@ void main() {
         expect(find.text('CA con DES +3'.toUpperCase()), findsOneWidget);
       },
     );
+    expect(tester.takeException(), isNull);
+  });
+
+  // Elegir «Media» cambiaba solo la pill: la armadura se guardaba con la
+  // Destreza entera de la ligera y la ficha daba de más.
+  testWidgets('la categoría trae la Destreza del manual', (tester) async {
+    final media = repo.armorPiece('breastplate')!;
+    final pesada = repo.armorPiece('plate')!;
+    Future<void> pickCategory(String label) async {
+      // «Ligera» también es la pill de la vista previa: se toca el
+      // desplegable, que es el único del formulario.
+      await tester.tap(find.byType(DropdownButtonFormField<String>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(label).last);
+      await tester.pumpAndSettle();
+    }
+
+    final asMedium = await runForm<Armor>(
+      tester,
+      const ArmorForm(),
+      edit: () async {
+        await tester.enterText(
+          find.widgetWithText(TextFormField, 'Nombre'),
+          'Coraza de escamas',
+        );
+        await pickCategory('Media');
+      },
+    );
+    expect(asMedium?.addDexMod, media.addDexMod);
+    expect(asMedium?.maxDexBonus, media.maxDexBonus);
+
+    final asHeavy = await runForm<Armor>(
+      tester,
+      const ArmorForm(),
+      edit: () async {
+        await tester.enterText(
+          find.widgetWithText(TextFormField, 'Nombre'),
+          'Placas de hueso',
+        );
+        await pickCategory('Pesada');
+      },
+    );
+    expect(asHeavy?.addDexMod, pesada.addDexMod);
+    expect(asHeavy?.maxDexBonus, pesada.maxDexBonus);
+    expect(tester.takeException(), isNull);
+  });
+
+  // El objeto solo ofrecía CA y resistencias: una Capa de protección, que
+  // también suma a las salvaciones, no se podía armar sin escribir JSON.
+  testWidgets('un objeto propio suma a las salvaciones', (tester) async {
+    final saved = await runForm<Item>(
+      tester,
+      ItemForm(repo: repo),
+      edit: () async {
+        await tester.enterText(
+          find.widgetWithText(TextFormField, 'Nombre'),
+          'Capa del vigía',
+        );
+        await tester.tap(find.text('Efectos mientras esté equipado'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Agregar efecto'));
+        await tester.pumpAndSettle();
+        // La CA ya tiene su campo: ofrecerla de nuevo dejaba sumarla dos veces.
+        await tester.tap(
+          find.widgetWithText(DropdownButtonFormField<String>, 'Tipo'),
+        );
+        await tester.pumpAndSettle();
+        expect(find.text('Bonificador a la CA'), findsNothing);
+        await tester.tap(find.text('Bonificador a las salvaciones').last);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Agregar'));
+        await tester.pumpAndSettle();
+      },
+    );
+
+    expect(saved?.effects.whereType<SavingThrowBonusEffect>().single.amount, 1);
     expect(tester.takeException(), isNull);
   });
 
@@ -1433,10 +1547,7 @@ void main() {
           'Cosa',
         );
         await tester.enterText(
-          find.widgetWithText(
-            TextFormField,
-            'Dados de golpe (opcional, p.ej. 2d6 + 2)',
-          ),
+          find.widgetWithText(TextFormField, 'Dados de golpe (opcional)'),
           'un montón',
         );
       },

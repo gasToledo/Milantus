@@ -186,7 +186,7 @@ class _RaceFormState extends State<RaceForm> with _GuidedForm {
             ),
             _text(
               _speed,
-              'Velocidad (ft)',
+              'Velocidad (pies)',
               number: true,
               validator: (v) => _intInRange(v, 0, 120, optional: false),
               onTap: () => focusOn('speed'),
@@ -203,7 +203,7 @@ class _RaceFormState extends State<RaceForm> with _GuidedForm {
             if (_description.text.trim().isNotEmpty) 'descripción',
           ], 'sin cargar'),
           children: [
-            _text(_tagline, 'Lema (una línea, se ve en la lista)'),
+            _text(_tagline, 'Lema (una línea, se ve al elegirla)'),
             _text(_description, 'Descripción', maxLines: 5),
           ],
         ),

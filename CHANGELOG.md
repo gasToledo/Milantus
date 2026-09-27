@@ -313,6 +313,48 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   perfiles de los monstruos son del DM. Se siguen leyendo en el Bestiario del
   Modo DM.
 
+## [0.17.0+1] - 2026-09-27
+
+### Nuevo
+
+- El editor de efectos del homebrew ofrece «Bonificador a la iniciativa», con
+  un valor fijo y la opción de sumar el bonificador por competencia, como
+  Alerta. Una dote propia que mejorara la iniciativa solo se podía cargar por
+  JSON.
+- Los objetos homebrew tienen «Otros efectos», con el mismo editor que las
+  dotes: además de CA y resistencias, ya se puede armar una Capa de protección
+  (salvaciones) o unos Guanteletes de fuerza de ogro (fijar la Fuerza).
+
+### Modificado
+
+- Elegir la categoría de una armadura homebrew trae la Destreza del manual:
+  media hasta +2, pesada sin Destreza. Una armadura media se guardaba sumando
+  la Destreza entera y la ficha daba un punto de CA de más con DES +3.
+- En el editor de efectos, los valores dicen su unidad («Alcance en pies»,
+  «Pies») y arrancan en el número del manual: la visión en la oscuridad nacía
+  de un pie.
+- Habilidades y tipos de daño salen en orden alfabético castellano en todo el
+  homebrew; seguían el orden del manual en inglés.
+- El formulario de criatura usa rótulos cortos con el ejemplo dentro del
+  campo, y dice «Bonificador de ataque» e «Iniciativa» en vez de «Bono». Se
+  cortaban en «Valor de desafío (p.ej. 1/4 o …». En la vista previa angosta,
+  las placas dicen «PG» y «VD» en vez de «PUNTOS DE GO…».
+- Las características de una criatura homebrew se cargan en dos filas de tres;
+  quedaban cinco y Carisma sola abajo.
+- La especie homebrew dice «Velocidad (pies)» en vez de «(ft)», y el lema
+  aclara que se ve al elegirla.
+- Un conjuro sin escuela ya no muestra «Truco ·» con el separador colgando.
+- Los menús desplegables se abren con el fondo de las tarjetas, en toda la
+  aplicación. Tenían el fondo violeta de Material.
+- En los formularios del homebrew, el resumen de cada sección plegada queda
+  contra el borde derecho; cambiaba de lugar según el largo del título.
+- El Cuaderno resume un combate como «contra Esqueleto ×2»; decía «contra
+  2 Esqueleto», sin plural.
+
+### Eliminado
+
+- Sin cambios.
+
 ## [Unreleased]
 
 ### Nuevo
