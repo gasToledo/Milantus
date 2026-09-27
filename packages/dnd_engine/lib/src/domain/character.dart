@@ -647,6 +647,37 @@ class Character {
   /// la migración desde `fightingStyleId` tiene que nombrarlo.
   static const String fightingStyleGroup = 'fighting-style';
 
+  /// Si la ficha tiene más de una clase. Es el mismo criterio que usa el
+  /// compilador para decidir si lee las elecciones por clase.
+  bool get hasMultipleClasses => classHistory.toSet().length > 1;
+
+  /// Las opciones elegidas en elecciones abiertas que pesan en la ficha: las
+  /// dotes de Estilo de Combate, las Invocaciones, etc.
+  ///
+  /// Con una sola clase, las elecciones viven en [featureChoices] y el
+  /// compilador lee solo de ahí. La migración al esquema 24 dejó además una
+  /// copia en [classFeatureChoices], preparada para una multiclase futura.
+  /// Contarla hacía ver la dote dos veces («no se puede elegir más de una
+  /// vez») y marcaba la copia como huérfana, dos avisos que el jugador no
+  /// tenía forma de sacar. Peor: al cambiar el estilo, la copia vieja seguía
+  /// sumando su dote.
+  ///
+  /// ponytail: la copia se ignora pero no se borra. Si esa ficha multiclasea
+  /// después de cambiar el estilo, la copia vieja pasa a ser la que manda.
+  /// Si llega a pasar, la salida es que la subida de nivel que suma la
+  /// segunda clase mude las elecciones planas a las de la clase inicial.
+  Iterable<String> get chosenFeatureOptionIds sync* {
+    for (final chosen in featureChoices.values) {
+      yield* chosen;
+    }
+    if (!hasMultipleClasses) return;
+    for (final choices in classFeatureChoices.values) {
+      for (final chosen in choices.values) {
+        yield* chosen;
+      }
+    }
+  }
+
   /// Lectura de conveniencia del estilo elegido. Para escribir va siempre por
   /// [featureChoices].
   String? get fightingStyleId {

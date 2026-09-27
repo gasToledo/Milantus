@@ -348,9 +348,7 @@ class CharacterCompiler {
       ...c.featIds,
       // Las elecciones abiertas (Estilo de Combate, Invocaciones) son dotes:
       // sus efectos se aplican por el mismo camino que el resto.
-      for (final chosen in c.featureChoices.values) ...chosen,
-      for (final choices in c.classFeatureChoices.values)
-        for (final chosen in choices.values) ...chosen,
+      ...c.chosenFeatureOptionIds,
     ];
     final appliedOnce = <String>{};
     final featSourceCounts = <String, int>{};

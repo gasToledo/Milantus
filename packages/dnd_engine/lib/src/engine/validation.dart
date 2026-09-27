@@ -356,9 +356,7 @@ class CharacterValidator {
     final heldList = <String?>[
       repo.background(c.backgroundId)?.originFeatId,
       ...c.featIds,
-      for (final chosen in c.featureChoices.values) ...chosen,
-      for (final choices in c.classFeatureChoices.values)
-        for (final chosen in choices.values) ...chosen,
+      ...c.chosenFeatureOptionIds,
     ].whereType<String>().toList();
     final held = heldList.toSet();
 
@@ -485,6 +483,10 @@ class CharacterValidator {
         WarningSeverity.info,
       ));
     }
+    // Con una sola clase, lo guardado por clase es la copia que dejó la
+    // migración al esquema 24 y el compilador no la lee: avisar de ella era un
+    // aviso sin arreglo posible (ver `Character.chosenFeatureOptionIds`).
+    if (!c.hasMultipleClasses) return;
     for (final classEntry in c.classFeatureChoices.entries) {
       for (final groupId in classEntry.value.keys) {
         final scopedId = '${classEntry.key}:$groupId';
@@ -559,6 +561,10 @@ class CharacterValidator {
         WarningSeverity.info,
       ));
     }
+    // Mismo caso que en las elecciones de rasgo: con una sola clase, lo
+    // guardado por clase es la copia de la migración y el compilador lee
+    // solo `spellChoices`.
+    if (!c.hasMultipleClasses) return;
     for (final classEntry in c.classSpellChoices.entries) {
       for (final groupId in classEntry.value.keys) {
         final scopedId = '${classEntry.key}:$groupId';
@@ -908,9 +914,7 @@ class CharacterValidator {
         // Todos los grupos, no solo el estilo de combate: es lo que hace que un
         // prerrequisito entre opciones (una invocación que exige otra) funcione
         // sin que la validación sepa de qué grupo se trata.
-        for (final chosen in c.featureChoices.values) ...chosen,
-        for (final choices in c.classFeatureChoices.values)
-          for (final chosen in choices.values) ...chosen,
+        ...c.chosenFeatureOptionIds,
       ].whereType<String>().toSet();
 
   /// Descripción del primer prerrequisito de [feat] que [c] no cumple, o null

@@ -363,7 +363,12 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
-- Sin cambios.
+- Las fichas de una sola clase guardadas antes de la multiclase ya no avisan
+  que su Estilo de Combate «no se puede elegir más de una vez» ni que tienen
+  elecciones de «un rasgo que ya no tenés». La migración había dejado una
+  copia de cada elección por clase, y la validación la contaba como una
+  segunda. Tampoco la suma el compilador: si el jugador cambiaba de estilo, la
+  copia vieja seguía aplicando su dote.
 
 ### Eliminado
 

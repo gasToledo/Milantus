@@ -521,6 +521,48 @@ void main() {
       expect(sheet.attacks.length, sinEstilo.attacks.length);
     });
 
+    // La migración al esquema 24 copió cada elección bajo su clase, para una
+    // multiclase futura. Con una sola clase la validación contaba igual la
+    // copia: Tylla y Sunniva cargaban «no se puede elegir más de una vez» y
+    // «un rasgo que ya no tenés» sin forma de sacarlos.
+    test('un Guerrero que pasó por el esquema 24 no ve su estilo dos veces',
+        () {
+      final v23 = guerrero(estilo: 'fs-great-weapon').toJson()
+        ..['schemaVersion'] = 23
+        ..remove('classHistory')
+        ..remove('classFeatureChoices');
+      final migrado = Character.fromJson(v23);
+
+      // Así queda la ficha guardada: con la copia por clase.
+      expect(migrado.classFeatureChoices['fighter']?['fighting-style'],
+          ['fs-great-weapon']);
+      final codes = CharacterValidator(repo)
+          .validate(migrado)
+          .map((w) => w.code)
+          .toList();
+      expect(codes, isNot(contains('feat_duplicate')));
+      expect(codes, isNot(contains('feature_choice_orphan')));
+    });
+
+    test('con una sola clase, la copia vieja no suma su dote', () {
+      // El jugador cambió el estilo después de la migración: la ficha edita
+      // el campo plano y la copia por clase quedó con el anterior.
+      final c = guerrero(estilo: 'fs-defense').copyWith(
+        classFeatureChoices: const {
+          'fighter': {
+            'fighting-style': ['fs-archery'],
+          },
+        },
+      );
+      final nombres = CharacterCompiler(repo).compile(c).passives.map(
+            (p) => p.name,
+          );
+
+      expect(nombres, contains('Defensa'));
+      // El pasivo de Tiro con Arco se llama «Arquería».
+      expect(nombres, isNot(contains('Arquería')));
+    });
+
     test('las opciones salen de la categoría, sin lista de ids', () {
       final slot = CharacterCompiler(
         repo,
