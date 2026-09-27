@@ -129,40 +129,50 @@ class _StartingEquipmentSection extends StatelessWidget {
     List<StartingEquipmentOption> options,
     String? selected,
     ValueChanged<String?> changed,
-  ) => DropdownButtonFormField<String>(
-    key: ValueKey('starting-equipment-${label.toLowerCase()}'),
-    initialValue: options.any((e) => e.id == selected) ? selected : null,
-    decoration: InputDecoration(labelText: 'Opción de ${label.toLowerCase()}'),
-    // Cada opción dice qué trae: «Opción A» y «Opción B» a secas obligaban a
-    // elegir a ciegas y enterarse después. Cerrado muestra solo el rótulo,
-    // porque la lista completa ya aparece debajo una vez elegido.
-    isExpanded: true,
-    itemHeight: null,
-    selectedItemBuilder: (_) => [
-      for (final option in options) Text(option.label),
-    ],
-    items: [
-      for (final option in options)
-        DropdownMenuItem(
-          value: option.id,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(option.label),
-                Text(
-                  _optionContents(option),
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
-            ),
+  ) => options.isEmpty
+      // Un desplegable sin opciones se veía deshabilitado y no decía por qué.
+      ? Text(
+          'Este ${label.toLowerCase()} no trae equipo inicial.',
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
-        ),
-    ],
-    onChanged: changed,
-  );
+        )
+      : DropdownButtonFormField<String>(
+          key: ValueKey('starting-equipment-${label.toLowerCase()}'),
+          initialValue: options.any((e) => e.id == selected) ? selected : null,
+          decoration: InputDecoration(
+            labelText: 'Opción de ${label.toLowerCase()}',
+          ),
+          // Cada opción dice qué trae: «Opción A» y «Opción B» a secas obligaban a
+          // elegir a ciegas y enterarse después. Cerrado muestra solo el rótulo,
+          // porque la lista completa ya aparece debajo una vez elegido.
+          isExpanded: true,
+          itemHeight: null,
+          selectedItemBuilder: (_) => [
+            for (final option in options) Text(option.label),
+          ],
+          items: [
+            for (final option in options)
+              DropdownMenuItem(
+                value: option.id,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(option.label),
+                      Text(
+                        _optionContents(option),
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+          onChanged: changed,
+        );
 
   String _optionContents(StartingEquipmentOption option) => [
     for (final grant in option.grants) ...[

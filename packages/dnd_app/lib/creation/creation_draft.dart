@@ -1054,9 +1054,16 @@ class CreationDraft {
         // Los conjuros a elección se cuentan aunque la clase no lance: el rasgo
         // que los concede no depende de la magia de clase. El selector está en
         // este mismo paso, así que exigirlos nunca deja al jugador sin salida.
+        // Solo se exige elegir entre opciones que existen. Un trasfondo
+        // homebrew no trae equipo —el formulario todavía no lo edita— y el
+        // paso pedía elegirlo con un desplegable vacío: la creación quedaba
+        // trabada sin salida.
         final equipmentPending = <String>[
-          if (classEquipmentOption == null) 'Elegí el equipo de clase.',
-          if (backgroundEquipmentOption == null)
+          if (classEquipmentOption == null &&
+              (klass?.startingEquipment ?? const []).isNotEmpty)
+            'Elegí el equipo de clase.',
+          if (backgroundEquipmentOption == null &&
+              (background?.startingEquipment ?? const []).isNotEmpty)
             'Elegí el equipo de trasfondo.',
           if (selectedEquipmentGrants.any(
             (e) => e.grant.isChoice && equipmentChoices[e.key] == null,

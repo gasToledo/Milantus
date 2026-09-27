@@ -283,6 +283,27 @@ void main() {
       return d;
     }
 
+    // Un trasfondo homebrew no trae equipo y el paso exigía elegirlo igual,
+    // con un desplegable vacío: la creación no se podía terminar.
+    test('sin equipo inicial no se exige elegirlo', () {
+      final pendientes = casterConCupo().pendingFor(CreationStep.equipo);
+      expect(pendientes, isNot(contains('Elegí el equipo de trasfondo.')));
+      expect(pendientes, isNot(contains('Elegí el equipo de clase.')));
+
+      // Con opciones, se sigue exigiendo.
+      final oficial = CreationDraft(repo)
+        ..classId = 'wizard'
+        ..raceId = 'human'
+        ..backgroundId = 'soldier';
+      expect(
+        oficial.pendingFor(CreationStep.equipo),
+        containsAll([
+          'Elegí el equipo de clase.',
+          'Elegí el equipo de trasfondo.',
+        ]),
+      );
+    });
+
     test('el cupo pendiente bloquea el paso de equipo', () {
       final d = casterConCupo();
       expect(

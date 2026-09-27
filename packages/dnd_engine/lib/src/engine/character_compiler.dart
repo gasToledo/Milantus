@@ -378,7 +378,16 @@ class CharacterCompiler {
             feat.id +
             (feat.repeatable ? ':' + occurrence.toString() : ''),
         feat.name,
-        feat.effects,
+        [
+          ...feat.effects,
+          // «Rasgos y dotes» lista los pasivos. Las dotes del catálogo traen
+          // el suyo, pero una homebrew armada en el formulario tiene solo
+          // efectos mecánicos: se aplicaba y no aparecía en ninguna parte
+          // de la ficha. Sin pasivo propio, la dote se presenta con su nombre
+          // y su descripción.
+          if (!feat.effects.any((e) => e is PassiveTraitEffect))
+            PassiveTraitEffect(name: feat.name, description: feat.description),
+        ],
         // Iniciado en la Magia deja elegir INT, SAB o CAR al tomar la dote.
         // Sin elección, manda la que declare el contenido.
         spellAbilityOverride: c.featSpellcastingAbilities[feat.id],

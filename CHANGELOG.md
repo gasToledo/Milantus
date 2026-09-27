@@ -369,6 +369,13 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   copia de cada elección por clase, y la validación la contaba como una
   segunda. Tampoco la suma el compilador: si el jugador cambiaba de estilo, la
   copia vieja seguía aplicando su dote.
+- La creación de personajes ya no exige elegir el equipo de un trasfondo (o
+  una clase) que no trae ninguno: con un trasfondo homebrew el paso pedía
+  elegir en un desplegable vacío y no se podía terminar. Ahora dice que no
+  trae equipo inicial.
+- Toda dote tomada aparece en «Rasgos y dotes». Las homebrew, y Duro y tres de
+  las Resilientes del catálogo, se aplicaban sin figurar en la ficha; ahora se
+  muestran con su nombre y su descripción.
 
 ### Eliminado
 

@@ -563,6 +563,28 @@ void main() {
       expect(nombres, isNot(contains('Arquería')));
     });
 
+    // «Rasgos y dotes» lista los pasivos, y una dote sin pasivo propio —las
+    // homebrew del formulario, y Duro del catálogo— se aplicaba sin aparecer
+    // en ninguna parte de la ficha.
+    test('una dote sin pasivo propio igual se ve en la ficha', () {
+      final duro = repo.feat('tough')!;
+      expect(duro.effects.whereType<PassiveTraitEffect>(), isEmpty);
+
+      final sheet = CharacterCompiler(repo).compile(
+        guerrero().copyWith(featIds: const ['tough']),
+      );
+      final pasivo = sheet.passives.where((p) => p.name == duro.name);
+
+      expect(pasivo, hasLength(1));
+      expect(pasivo.single.description, duro.description);
+    });
+
+    test('una dote con pasivo propio no se duplica', () {
+      final sheet =
+          CharacterCompiler(repo).compile(guerrero(estilo: 'fs-defense'));
+      expect(sheet.passives.where((p) => p.name == 'Defensa'), hasLength(1));
+    });
+
     test('las opciones salen de la categoría, sin lista de ids', () {
       final slot = CharacterCompiler(
         repo,
