@@ -243,6 +243,29 @@ void main() {
     },
   );
 
+  testWidgets('en el nivel máximo no se ofrece subir otro nivel', (
+    tester,
+  ) async {
+    // La ficha de un Paladín 20 abría «Subir a nivel 21».
+    final base = demoSagan();
+    final tope = base.copyWith(
+      level: maxCharacterLevel,
+      hpPerLevel: [
+        ...base.hpPerLevel,
+        for (var i = base.level; i < maxCharacterLevel; i++) 6,
+      ],
+    );
+    await pumpSheet(tester, tope, size: const Size(360, 1400));
+
+    final boton = tester.widget<IconButton>(
+      find.widgetWithIcon(IconButton, Icons.arrow_upward),
+    );
+    expect(boton.onPressed, isNull);
+    expect(find.byTooltip('Nivel máximo'), findsOneWidget);
+    expect(find.byTooltip('Subir nivel'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('el encabezado de datos solo aparece en Personaje y Combate', (
     tester,
   ) async {

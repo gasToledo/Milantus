@@ -532,8 +532,15 @@ class _LevelUpScreenState extends State<LevelUpScreen> {
   /// El paso aparece si falta elegir algo o si algún grupo se puede revisar.
   /// Un grupo completo y no revisable (el Estilo de Combate, que se elige una
   /// vez) no vuelve a mostrarse en cada subida.
-  bool get _hasFeatureChoices =>
-      _pendingChoices > 0 || _choiceSlots.any((s) => s.replaceable);
+  bool get _hasFeatureChoices => _openChoiceSlots.isNotEmpty;
+
+  /// Los grupos que esta subida pone delante del jugador: los que tienen algo
+  /// sin elegir y los que se pueden revisar. El resumen los listaba todos, y
+  /// un Paladín veía «Estilo de Combate — ELEGÍS VOS» en cada nivel hasta el
+  /// 20 sin que el paso apareciera nunca.
+  List<FeatureChoiceSlot> get _openChoiceSlots => _choiceSlots
+      .where((s) => s.replaceable || _choicesFor(s.groupId).length < s.count)
+      .toList();
 
   void _updateState(VoidCallback update) => setState(update);
 
@@ -714,7 +721,11 @@ class _LevelUpScreenState extends State<LevelUpScreen> {
     _LevelUpStepKind.abilityScore
         when _asiKind == _AsiKind.improve && !_asiComplete =>
       'Completá la mejora de características.',
-    _LevelUpStepKind.abilityScore when _featId == null =>
+    // Sin el `_asiKind`, una mejora de características completa caía acá
+    // (no hay dote elegida) y mostraba el aviso en rojo aunque «Continuar»
+    // ya avanzara.
+    _LevelUpStepKind.abilityScore
+        when _asiKind == _AsiKind.feat && _featId == null =>
       'Elegí una dote para continuar.',
     _LevelUpStepKind.abilityScore
         when _featAbilityChoice != null && _abilityA == null =>

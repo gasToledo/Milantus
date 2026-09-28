@@ -395,9 +395,9 @@ class _SheetScreenState extends State<SheetScreen> {
               // También queda en el Drawer, pero ahí es la acción más
               // importante de la ficha escondida detrás de un menú.
               IconButton(
-                tooltip: 'Subir nivel',
+                tooltip: _c.canLevelUp ? 'Subir nivel' : 'Nivel máximo',
                 icon: const Icon(Icons.arrow_upward),
-                onPressed: _openLevelUp,
+                onPressed: _c.canLevelUp ? _openLevelUp : null,
               ),
               Padding(
                 padding: const EdgeInsets.only(right: 12),

@@ -166,16 +166,16 @@ extension _LevelUpSections on _LevelUpScreenState {
             'sola.',
         tag: 'ELEGÍS VOS',
       ),
-      if (_choiceSlots.isNotEmpty)
+      if (_openChoiceSlots case final open when open.isNotEmpty)
         _LevelUpCard(
           icon: Icons.style,
-          title: _choiceSlots.length == 1
-              ? _choiceSlots.single.name
-              : 'Elecciones de rasgos',
-          body: _choiceSlots.length == 1
+          title: open.length == 1 ? open.single.name : 'Elecciones de rasgos',
+          body: open.length == 1
               ? 'Un rasgo de este nivel te deja elegir entre varias opciones.'
-              : _choiceSlots.map((s) => s.name).join(' · '),
-          tag: 'ELEGÍS VOS',
+              : open.map((s) => s.name).join(' · '),
+          // Igual que la tarjeta de conjuros: si todo está elegido y solo
+          // queda revisar, no es una decisión obligatoria.
+          tag: _pendingChoices > 0 ? 'ELEGÍS VOS' : 'OPCIONAL',
         ),
       if (_needsSubclass)
         const _LevelUpCard(

@@ -146,11 +146,13 @@ extension _SheetNavigation on _SheetScreenState {
             label: 'Retrato',
             onTap: () => run(_openPortrait),
           ),
+        // En el tope queda a la vista pero sin acción: que el rótulo diga por
+        // qué no hay nada que subir, en vez de que el botón desaparezca.
         appNavItem(
           context,
           icon: Icons.arrow_upward,
-          label: 'Subir nivel',
-          onTap: () => run(_openLevelUp),
+          label: _c.canLevelUp ? 'Subir nivel' : 'Nivel máximo',
+          onTap: _c.canLevelUp ? () => run(_openLevelUp) : null,
         ),
         // Va en el panel y no en el AppBar porque el AppBar solo existe en
         // ventana angosta: acá se ve en los dos layouts. La ficha de un PNJ no

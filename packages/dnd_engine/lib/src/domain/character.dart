@@ -160,6 +160,14 @@ class CompanionInstance {
 /// `CombatState.fromJson` para normalizar, y el dominio no importa al motor.
 const int maxExhaustionLevel = 6;
 
+/// Nivel de personaje máximo de las reglas.
+///
+/// Nada lo imponía: el nivel sale del largo de `classHistory`, y la ficha de
+/// un Paladín 20 ofrecía «Subir a nivel 21» con un paso de rasgos vacío. Vive
+/// en el dominio para que la app pregunte [Character.canLevelUp] en vez de
+/// escribir el 20 en cada botón.
+const int maxCharacterLevel = 20;
+
 /// Estado mutable durante la partida. No influye en la ficha derivada
 /// (`ComputedSheet`); se persiste aparte y se guarda con debounce.
 class CombatState {
@@ -865,6 +873,9 @@ class Character {
   /// Nivel total derivado de la historia. [level] se mantiene como alias de
   /// compatibilidad hasta que todos los consumidores pasen a esta API.
   int get totalLevel => classHistory.length;
+
+  /// Si todavía queda un nivel por subir. Ver [maxCharacterLevel].
+  bool get canLevelUp => totalLevel < maxCharacterLevel;
 
   /// Nivel alcanzado en [id].
   int classLevel(String id) =>

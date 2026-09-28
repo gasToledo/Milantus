@@ -99,9 +99,18 @@ void main() {
     Character? saved;
     await pump(tester, antes, onDone: (c) => saved = c);
 
-    // El resumen ya no dice que revisar conjuros es opcional.
-    expect(find.text('ELEGÍS VOS'), findsWidgets);
-    expect(find.text('OPCIONAL'), findsNothing);
+    // El resumen ya no dice que revisar conjuros es opcional. Se mira esa
+    // tarjeta sola: las invocaciones, completas y revisables, sí lo son.
+    final tarjetaConjuros = find.ancestor(
+      of: find.text('Revisar conjuros'),
+      matching: find.byWidgetPredicate(
+        (w) => w.runtimeType.toString() == '_LevelUpCard',
+      ),
+    );
+    expect(
+      find.descendant(of: tarjetaConjuros, matching: find.text('ELEGÍS VOS')),
+      findsOneWidget,
+    );
 
     for (
       var i = 0;

@@ -831,6 +831,24 @@ void main() {
     await pumpLevelUp(tester, fighterL3());
 
     expect(find.text('Elecciones'), findsNothing);
+    // Tampoco el resumen: listaba el estilo como «ELEGÍS VOS» en cada nivel
+    // aunque el paso nunca apareciera.
+    expect(find.text('Estilo de Combate'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('una mejora de características completa no pide una dote', (
+    tester,
+  ) async {
+    await pumpLevelUp(tester, fighterL3());
+    await goToAsi(tester);
+
+    expect(find.text('Completá la mejora de características.'), findsOneWidget);
+    await tester.tap(find.text(Ability.strength.label));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Completá la mejora de características.'), findsNothing);
+    expect(find.text('Elegí una dote para continuar.'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
