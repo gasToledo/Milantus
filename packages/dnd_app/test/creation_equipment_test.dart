@@ -270,6 +270,51 @@ void main() {
     expect(find.text('Trucos'), findsNothing);
     // Sin magia no hay nada que explicar: la ayuda no aparece vacía.
     expect(find.text('Cómo funciona tu magia'), findsNothing);
+
+    // --- Compras. Va en este recorrido para no pagar otros cinco pasos: el
+    // oro de las opciones (Soldado B) se gasta desde el catálogo y lo
+    // comprado aparece para ponérselo.
+    final escudo = repo.armorPiece('shield')!;
+    expect(find.text('COMPRAS'), findsOneWidget);
+    final abrir = find.byKey(const ValueKey('open-shop'));
+    await tester.ensureVisible(abrir);
+    await tester.pumpAndSettle();
+    await tester.tap(abrir);
+    await tester.pumpAndSettle();
+    expect(find.text('Comprar equipo'), findsOneWidget);
+    int oroDe(List<StartingEquipmentOption> options, String id) => options
+        .firstWhere((o) => o.id == id)
+        .grants
+        .fold(0, (sum, g) => sum + CoinOps.totalCp(g.coins));
+    final oro =
+        oroDe(repo.classes['fighter']!.startingEquipment, 'A') +
+        oroDe(repo.backgrounds['soldier']!.startingEquipment, 'B');
+    final quedabaTexto = 'Quedan ${CoinOps.formatAmount(oro)}';
+    expect(find.text(quedabaTexto), findsWidgets);
+
+    await tester.enterText(find.byType(TextField).last, escudo.name);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('buy-shield')));
+    await tester.pumpAndSettle();
+    // El catálogo no se cierra y la píldora baja.
+    expect(find.text('Comprar equipo'), findsOneWidget);
+    expect(find.text('×1'), findsOneWidget);
+    expect(find.text(quedabaTexto), findsNothing);
+    expect(
+      find.text('Quedan ${CoinOps.formatAmount(oro - escudo.costCp)}'),
+      findsWidgets,
+    );
+    await tester.tap(find.text('Cerrar'));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('purchase-shield')), findsOneWidget);
+    final chip = tester.widget<FilterChip>(
+      find.ancestor(
+        of: find.text(escudo.name),
+        matching: find.byType(FilterChip),
+      ),
+    );
+    expect(chip.selected, isTrue, reason: 'el Guerrero sabe usar escudo');
     expect(tester.takeException(), isNull);
   });
 }

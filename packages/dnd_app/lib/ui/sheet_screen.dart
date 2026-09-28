@@ -18,6 +18,7 @@ import '../theme/class_visuals.dart';
 import '../web/browser.dart' as browser;
 import 'conditions.dart';
 import 'dm/share_character_dialog.dart';
+import 'item_catalog.dart';
 import 'portrait_image.dart';
 import 'portrait_screen.dart';
 import 'save_status_indicator.dart';
@@ -135,7 +136,7 @@ class _SheetScreenState extends State<SheetScreen> {
   /// todavía puesto, escondiendo el primer objeto que se agregara.
   final _invSearchCtrl = TextEditingController();
   String _invQuery = '';
-  String _invFilter = _invFilterAll;
+  String _invFilter = itemFilterAll;
 
   final _amountCtrl = TextEditingController();
 

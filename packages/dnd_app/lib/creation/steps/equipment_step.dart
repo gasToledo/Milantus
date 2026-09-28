@@ -13,6 +13,10 @@ class _EquipmentStep extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _StartingEquipmentSection(draft: draft, onChanged: onChanged),
+        // Antes de «Equipo puesto»: lo que se compra (una armadura, un escudo)
+        // tiene que aparecer abajo para ponérselo.
+        const SizedBox(height: 26),
+        _PurchasesSection(draft: draft, onChanged: onChanged),
         const SizedBox(height: 26),
         const _SectionHeader(title: 'Equipo puesto'),
         const SizedBox(height: 12),
@@ -104,16 +108,17 @@ class _StartingEquipmentSection extends StatelessWidget {
             },
           ),
         ],
-      if (draft.startingInventory.isNotEmpty ||
-          draft.startingCoins.isNotEmpty) ...[
+      // Lo que traen las opciones, sin las compras: eso va en su sección, y
+      // mezclado acá el oro aparecía ya descontado sin decir por qué.
+      if (draft.grantedItems.isNotEmpty || draft.grantedCoins.isNotEmpty) ...[
         const SizedBox(height: 16),
         Text(
           [
-            ...draft.startingInventory.map((e) {
+            ...draft.grantedItems.map((e) {
               final name = draft.repo.catalogEntry(e.itemId)?.name ?? e.itemId;
               return e.quantity == 1 ? name : '$name ×${e.quantity}';
             }),
-            ...draft.startingCoins.entries.map(
+            ...draft.grantedCoins.entries.map(
               (e) => '${e.value} ${coinLabels[e.key]}',
             ),
           ].join(' · '),
@@ -191,6 +196,233 @@ class _StartingEquipmentSection extends StatelessWidget {
   ].join(' · ');
 
   String _itemName(String id) => draft.repo.catalogEntry(id)?.name ?? id;
+}
+
+/// Compras con el oro de partida.
+///
+/// El PHB 2024 deja elegir el oro en vez del paquete (el Paladín puede nacer
+/// con 150 po), y hasta acá ese oro quedaba en la bolsa sin forma de
+/// gastarlo: había que terminar el personaje y comprar desde la ficha. Acá
+/// se compra al precio del manual y sin diálogo de pago, porque todo el paso
+/// se puede rehacer hasta terminar.
+class _PurchasesSection extends StatelessWidget {
+  final CreationDraft draft;
+  final VoidCallback onChanged;
+  const _PurchasesSection({required this.draft, required this.onChanged});
+
+  void _set(String itemId, int quantity) {
+    draft.setPurchase(itemId, quantity);
+    draft.pruneEquipment();
+    onChanged();
+  }
+
+  Future<void> _openShop(BuildContext context) => showDialog<void>(
+    context: context,
+    builder: (_) => ItemCatalogDialog(
+      repo: draft.repo,
+      title: 'Comprar equipo',
+      purseLabel: 'Quedan',
+      purseCp: () => draft.goldLeftCp,
+      countOf: (id) => draft.purchases[id] ?? 0,
+      hint:
+          'Cada toque suma uno a tus compras. La cantidad se ajusta en la '
+          'lista del paso.',
+      // No cierra: se arma el equipo entero sin volver a abrir el catálogo.
+      onBuy: (row) async {
+        draft.buy(row.id);
+        draft.pruneEquipment();
+        onChanged();
+        return false;
+      },
+    ),
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.palette;
+    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
+    final granted = CoinOps.totalCp(draft.grantedCoins);
+    final left = draft.goldLeftCp;
+
+    Widget plaque(String label, String value, {bool highlight = false}) =>
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
+            decoration: BoxDecoration(
+              color: pal.plaque,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: highlight ? pal.gold : pal.hairline),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label.toUpperCase(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 10,
+                    letterSpacing: 1.2,
+                    color: pal.textMuted,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: highlight ? pal.gold : null,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _SectionHeader(
+          title: 'Compras',
+          counterIcon: Icons.savings_outlined,
+          counter: left < 0
+              ? 'Faltan ${CoinOps.formatAmount(-left)}'
+              : 'Quedan ${CoinOps.formatAmount(left)}',
+        ),
+        const SizedBox(height: 12),
+        Text(
+          granted == 0
+              ? 'Las opciones elegidas no traen oro para comprar.'
+              : 'Lo que no traés en el paquete lo comprás con el oro de '
+                    'partida, al precio del manual. Lo que sobre queda en la '
+                    'bolsa.',
+          style: TextStyle(fontSize: 13, height: 1.5, color: muted),
+        ),
+        if (draft.purchases.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: pal.hairline),
+            ),
+            child: Column(
+              children: [
+                for (final (index, e) in draft.purchases.entries.indexed) ...[
+                  if (index > 0) Divider(height: 1, color: pal.hairline),
+                  _row(context, e.key, e.value),
+                ],
+              ],
+            ),
+          ),
+        ],
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            plaque('Oro de partida', CoinOps.formatAmount(granted)),
+            const SizedBox(width: 10),
+            plaque('En compras', CoinOps.formatAmount(draft.purchasesCp)),
+            const SizedBox(width: 10),
+            plaque(
+              left < 0 ? 'Faltan' : 'Te quedan',
+              CoinOps.formatAmount(left.abs()),
+              highlight: true,
+            ),
+          ],
+        ),
+        if (left < 0) ...[
+          const SizedBox(height: 8),
+          Text(
+            'Las compras superan el oro de partida: sacá algo o elegí otra '
+            'opción de equipo.',
+            style: TextStyle(fontSize: 13, color: pal.crimson),
+          ),
+        ],
+        const SizedBox(height: 12),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: OutlinedButton.icon(
+            key: const ValueKey('open-shop'),
+            onPressed: granted == 0 && draft.purchases.isEmpty
+                ? null
+                : () => _openShop(context),
+            icon: const Icon(Icons.add, size: 18),
+            label: const Text('Comprar objetos'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _row(BuildContext context, String itemId, int quantity) {
+    final pal = context.palette;
+    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
+    final name = draft.repo.catalogEntry(itemId)?.name ?? itemId;
+    final unit = InventoryOps.catalogPriceCp(itemId, draft.repo);
+    final bundle = draft.repo.item(itemId)?.bundleSize ?? 1;
+    return Padding(
+      key: ValueKey('purchase-$itemId'),
+      padding: const EdgeInsets.fromLTRB(16, 6, 4, 6),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(name, maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text(
+                  bundle > 1
+                      ? '${formatCost(unit)} el paquete de $bundle'
+                      : '${formatCost(unit)} c/u',
+                  style: TextStyle(fontSize: 12, color: muted),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            tooltip: 'Uno menos de $name',
+            onPressed: quantity > 1 ? () => _set(itemId, quantity - 1) : null,
+            icon: const Icon(Icons.remove, size: 18),
+          ),
+          SizedBox(
+            width: 24,
+            child: Text(
+              '$quantity',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontFeatures: [FontFeature.tabularFigures()],
+              ),
+            ),
+          ),
+          IconButton(
+            tooltip: 'Uno más de $name',
+            onPressed: () => _set(itemId, quantity + 1),
+            icon: const Icon(Icons.add, size: 18),
+          ),
+          SizedBox(
+            width: 72,
+            child: Text(
+              CoinOps.formatAmount(unit * quantity),
+              textAlign: TextAlign.end,
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                color: pal.gold,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
+          ),
+          IconButton(
+            tooltip: 'Sacar $name de las compras',
+            onPressed: () => _set(itemId, 0),
+            icon: const Icon(Icons.close, size: 18),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _ReceivedEquipmentSection extends StatelessWidget {

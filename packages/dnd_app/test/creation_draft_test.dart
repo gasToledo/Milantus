@@ -977,4 +977,81 @@ void main() {
     d.applyScoreMethod(ScoreMethod.pointBuy);
     expect(d.suggestedScores, isEmpty);
   });
+
+  group('Compras en la creación', () {
+    /// Paladín con la opción de oro de clase (150 po) y la de trasfondo
+    /// (50 po): el caso que motivó la sección, oro sin dónde gastarlo.
+    CreationDraft paladinConOro() {
+      final d = CreationDraft(repo)
+        ..classId = 'paladin'
+        ..raceId = 'human'
+        ..backgroundId = 'noble';
+      d.assignedScores.addAll({for (final a in Ability.values) a: 12});
+      d.classEquipmentOptionId = d.klass!.startingEquipment
+          .firstWhere((o) => o.grants.every((g) => g.itemId == null))
+          .id;
+      d.backgroundEquipmentOptionId = d.background!.startingEquipment
+          .firstWhere((o) => o.grants.every((g) => g.itemId == null))
+          .id;
+      d.pruneEquipment();
+      return d;
+    }
+
+    int precio(String id) => InventoryOps.catalogPriceCp(id, repo);
+
+    test('lo comprado se descuenta y llega al personaje, y se lo pone', () {
+      final d = paladinConOro();
+      final oro = CoinOps.totalCp(d.grantedCoins);
+      expect(oro, greaterThan(0));
+
+      d
+        ..buy('chain-mail')
+        ..buy('shield')
+        ..buy('longsword');
+      d.pruneEquipment();
+      final gastado =
+          precio('chain-mail') + precio('shield') + precio('longsword');
+      expect(d.goldLeftCp, oro - gastado);
+
+      // Mientras el jugador no tocó «Equipo puesto», lo comprado que sabe
+      // usar se pone solo, igual que lo que trae un paquete.
+      expect(d.equippedArmorId, 'chain-mail');
+      expect(d.shieldEquipped, isTrue);
+
+      final c = d.build();
+      expect(
+        c.inventory.map((e) => e.itemId),
+        containsAll(['chain-mail', 'shield', 'longsword']),
+      );
+      expect(CoinOps.totalCp(c.coins), oro - gastado);
+    });
+
+    test('si las compras superan el oro, el paso no se cierra', () {
+      final d = paladinConOro();
+      final oro = CoinOps.totalCp(d.grantedCoins);
+      while (d.goldLeftCp >= 0) {
+        d.buy('chain-mail');
+      }
+      expect(
+        d.pendingFor(CreationStep.equipo),
+        contains(startsWith('Las compras superan el oro de partida')),
+      );
+      // La bolsa no se paga a medias: queda entera hasta que se ajuste.
+      expect(CoinOps.totalCp(d.startingCoins), oro);
+
+      d.setPurchase('chain-mail', 1);
+      expect(
+        d.pendingFor(CreationStep.equipo),
+        isNot(contains(startsWith('Las compras superan'))),
+      );
+    });
+
+    test('el round-trip conserva las compras', () {
+      final d = paladinConOro()
+        ..buy('longsword')
+        ..buy('longsword');
+      final back = CreationDraft.fromJson(d.repo, d.toJson());
+      expect(back.purchases, {'longsword': 2});
+    });
+  });
 }

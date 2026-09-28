@@ -427,6 +427,29 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
+## [0.19.0+1] - 2026-09-28
+
+### Nuevo
+
+- La creación de personaje deja gastar el oro de partida. En el paso Equipo,
+  entre «Equipo inicial» y «Equipo puesto», la sección «Compras» dice cuánto
+  queda y abre el catálogo en modo compra: cada toque suma uno, sin diálogo,
+  al precio del manual. La lista permite ajustar la cantidad o sacar algo, y
+  lo comprado aparece en «Equipo puesto» (puesto si el personaje sabe
+  usarlo). El Paladín que elegía 150 po nacía con el oro y sin forma de
+  gastarlo hasta terminar.
+
+### Modificado
+
+- En la creación, el resumen de «Equipo inicial» muestra lo que traen las
+  opciones, sin las compras. Si cambiar de opción deja compras que el oro ya
+  no cubre, no se borran: el paso avisa cuánto falta y no se puede cerrar
+  hasta ajustarlas.
+
+### Eliminado
+
+- Sin cambios.
+
 ## [Unreleased]
 
 ### Nuevo

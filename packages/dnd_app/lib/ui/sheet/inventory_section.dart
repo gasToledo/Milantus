@@ -12,60 +12,8 @@ const _colEquipped = 76.0;
 const _colWeight = 76.0;
 const _colMenu = 44.0;
 
-const _invFilterAll = 'Todos';
 const _invFilterEquipped = 'Equipados';
 const _invFilterMagic = 'Mágicos';
-
-/// La familia con la que se agrupa y rotula un objeto. Los mágicos del
-/// catálogo traen la categoría `magic`, pero en el homebrew lo mágico lo da la
-/// rareza y la categoría es la del formulario: un amuleto con rareza se
-/// rotulaba «Equipo» y quedaba entre las mochilas.
-String? _itemFamily(Item? item) =>
-    item == null ? null : (item.isMagic ? 'magic' : item.category);
-
-/// Etiqueta visible de la familia. La comparten la fila y el buscador para que
-/// el jugador lea lo mismo en los dos lados.
-String _itemKindLabel(String kind, String? category) => switch (kind) {
-  'weapon' => 'Arma',
-  'armor' => 'Armadura',
-  _ => switch (category) {
-    'tool' => 'Herramienta',
-    'ammunition' => 'Munición',
-    'focus' => 'Canalizador',
-    'pack' => 'Paquete',
-    'container' => 'Contenedor',
-    'magic' => 'Objeto mágico',
-    _ => 'Equipo',
-  },
-};
-
-/// Orden en que se muestran las familias, y su título en plural.
-///
-/// El orden no es alfabético: primero lo que se empuña, después lo que se
-/// gasta, y al final lo que solo se lleva encima. Una familia que no esté acá
-/// —homebrew con una categoría nueva— va al fondo con su propio nombre, en vez
-/// de desaparecer.
-const _groupTitles = <String, String>{
-  'Arma': 'Armas',
-  'Armadura': 'Armaduras',
-  'Munición': 'Munición',
-  'Canalizador': 'Canalizadores',
-  'Objeto mágico': 'Objetos mágicos',
-  'Herramienta': 'Herramientas',
-  'Contenedor': 'Contenedores',
-  'Paquete': 'Paquetes',
-  'Equipo': 'Equipo',
-};
-
-/// Nombre largo de cada denominación. La abreviatura sola («PE») es un rótulo
-/// de formulario: en la mesa nadie recuerda cuál es electro y cuál platino.
-const _coinNames = <String, String>{
-  'cp': 'cobre',
-  'sp': 'plata',
-  'ep': 'electro',
-  'gp': 'oro',
-  'pp': 'platino',
-};
 
 /// Ícono por familia de objeto. Es lo único que distingue el tipo dentro de un
 /// grupo: §8.7 prohíbe explícitamente asignar un color distinto a cada uno.
@@ -172,7 +120,7 @@ extension _SheetInventorySection on _SheetScreenState {
     final pal = context.palette;
     final abbr = coinLabels[key]!.toUpperCase();
     return Semantics(
-      label: 'Monedas de ${_coinNames[key]} ($abbr)',
+      label: 'Monedas de ${coinNames[key]} ($abbr)',
       child: Container(
         width: 100,
         padding: const EdgeInsets.fromLTRB(10, 7, 10, 2),
@@ -199,7 +147,7 @@ extension _SheetInventorySection on _SheetScreenState {
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    _coinNames[key]!,
+                    coinNames[key]!,
                     textAlign: TextAlign.end,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -498,7 +446,7 @@ extension _SheetInventorySection on _SheetScreenState {
   }
 
   /// Agrupa por la misma familia que ya calcula el catálogo, en el orden de
-  /// [_groupTitles]. Las familias desconocidas van al final, en el orden en que
+  /// [itemGroupTitles]. Las familias desconocidas van al final, en el orden en que
   /// aparecen.
   List<({String title, List<_Line> lines})> _grouped(List<_Line> lines) {
     final byKind = <String, List<_Line>>{};
@@ -506,12 +454,12 @@ extension _SheetInventorySection on _SheetScreenState {
       byKind.putIfAbsent(line.info.kindLabel, () => []).add(line);
     }
     final order = [
-      ...(_groupTitles.keys.where(byKind.containsKey)),
-      ...byKind.keys.where((k) => !_groupTitles.containsKey(k)),
+      ...(itemGroupTitles.keys.where(byKind.containsKey)),
+      ...byKind.keys.where((k) => !itemGroupTitles.containsKey(k)),
     ];
     return [
       for (final kind in order)
-        (title: _groupTitles[kind] ?? kind, lines: byKind[kind]!),
+        (title: itemGroupTitles[kind] ?? kind, lines: byKind[kind]!),
     ];
   }
 
@@ -634,7 +582,7 @@ extension _SheetInventorySection on _SheetScreenState {
         ),
       ),
       for (final filter in const [
-        _invFilterAll,
+        itemFilterAll,
         _invFilterEquipped,
         _invFilterMagic,
       ])
@@ -1187,11 +1135,13 @@ extension _SheetInventorySection on _SheetScreenState {
   /// trabajo.
   void _addInventoryItem() => showDialog<void>(
     context: context,
-    builder: (_) => _AddItemDialog(
+    builder: (_) => ItemCatalogDialog(
       repo: repo,
-      coins: () => _c.coins,
+      purseCp: () => CoinOps.totalCp(_c.coins),
       onAdd: (id) => _replace(InventoryOps.add(_c, id)),
       onBuy: _buyFromCatalog,
+      hint:
+          'Agregar es gratis y deja seguir sumando; comprar paga de la bolsa.',
     ),
   );
 
@@ -1199,10 +1149,10 @@ extension _SheetInventorySection on _SheetScreenState {
   /// solo cambio. Devuelve si compró, para que el catálogo se cierre: el
   /// cartel con «Deshacer» vive en la ficha, y con el catálogo abierto encima
   /// su botón quedaba detrás de la barrera del diálogo.
-  Future<bool> _buyFromCatalog(_CatalogRow row) async {
-    final trade = await showDialog<_Trade>(
+  Future<bool> _buyFromCatalog(CatalogRow row) async {
+    final trade = await showDialog<Trade>(
       context: context,
-      builder: (_) => _TradeDialog(
+      builder: (_) => TradeDialog(
         buying: true,
         title: 'Comprar ${row.name}',
         detail: row.detail,
@@ -1235,9 +1185,9 @@ extension _SheetInventorySection on _SheetScreenState {
   /// Vende parte o todo de una entrada y cobra en la bolsa.
   Future<void> _sell(InventoryEntry e) async {
     final info = _itemInfo(e);
-    final trade = await showDialog<_Trade>(
+    final trade = await showDialog<Trade>(
       context: context,
-      builder: (_) => _TradeDialog(
+      builder: (_) => TradeDialog(
         buying: false,
         title: 'Vender ${info.name}',
         detail:
@@ -1672,8 +1622,8 @@ extension _SheetInventorySection on _SheetScreenState {
         : entry.kind;
     return _ItemInfo(
       name: resolved.name,
-      kindLabel: _itemKindLabel(kind, _itemFamily(item)),
-      icon: _itemIcon(kind, _itemFamily(item)),
+      kindLabel: itemKindLabel(kind, itemFamily(item)),
+      icon: _itemIcon(kind, itemFamily(item)),
       weight: resolved.weight,
       bundleSize: item?.bundleSize ?? 1,
       equippable:
@@ -1736,616 +1686,4 @@ class _ItemInfo {
     required this.rangeHint,
     required this.twoHandedHint,
   });
-}
-
-/// Buscador sobre los tres catálogos que pueden entrar en la mochila.
-///
-/// Muestra la categoría al lado del nombre porque los ids son distintos pero
-/// los nombres no siempre: el SRD traduce *Pole* y *Rod* como "Vara".
-///
-/// Los tres desplegables de antes (tipo, rareza, sintonización) ocupaban media
-/// pantalla para filtrar una lista que casi siempre cabe entera: quedaron
-/// reducidos a las mismas familias con que se agrupa la mochila, en píldoras.
-/// El peso viaja al lado del precio, que es lo que decide si el objeto entra.
-class _AddItemDialog extends StatefulWidget {
-  final ContentRepository repo;
-
-  /// La bolsa en este momento. Función y no valor porque el diálogo sigue
-  /// abierto mientras la ficha cambia debajo.
-  final Map<String, int> Function() coins;
-  final ValueChanged<String> onAdd;
-
-  /// Abre «Comprar». Devuelve si compró, y entonces el catálogo se cierra.
-  final Future<bool> Function(_CatalogRow row) onBuy;
-  const _AddItemDialog({
-    required this.repo,
-    required this.coins,
-    required this.onAdd,
-    required this.onBuy,
-  });
-
-  @override
-  State<_AddItemDialog> createState() => _AddItemDialogState();
-}
-
-typedef _CatalogRow = ({
-  String id,
-  String name,
-  String family,
-  String detail,
-  double weight,
-  int costCp,
-});
-
-class _AddItemDialogState extends State<_AddItemDialog> {
-  String _query = '';
-  String _family = _invFilterAll;
-  int _added = 0;
-
-  List<_CatalogRow> get _all {
-    final repo = widget.repo;
-    return [
-      for (final w in repo.weaponsSorted)
-        (
-          id: w.id,
-          name: w.name,
-          family: 'Arma',
-          detail: _itemKindLabel('weapon', null),
-          weight: w.weight,
-          costCp: w.costCp,
-        ),
-      for (final a in repo.armorSorted)
-        (
-          id: a.id,
-          name: a.name,
-          family: 'Armadura',
-          detail: a.isShield ? 'Escudo' : _itemKindLabel('armor', null),
-          weight: a.weight,
-          costCp: a.costCp,
-        ),
-      for (final i in repo.itemsSorted)
-        (
-          id: i.id,
-          name: i.name,
-          family: _itemKindLabel('item', _itemFamily(i)),
-          detail: [
-            _itemKindLabel('item', _itemFamily(i)),
-            if (i.bundleSize > 1) 'paquete de ${i.bundleSize}',
-            if (i.requiresAttunement) 'sintonización',
-          ].join(' · '),
-          weight: i.weight,
-          costCp: i.costCp,
-        ),
-    ];
-  }
-
-  /// Una fila del catálogo con sus dos salidas: «Agregar» es botín o regalo y
-  /// no cuesta nada; «Comprar» paga de la bolsa. Lo que no alcanza deshabilita
-  /// «Comprar» y dice cuánto falta, en vez de dejar tocar para enterarse.
-  ///
-  /// Angosta, los botones bajan a una segunda línea: al lado del nombre, del
-  /// peso y del precio no quedaba lugar para leer el objeto.
-  Widget _catalogRow(
-    _CatalogRow e, {
-    required int purseCp,
-    required Color muted,
-  }) {
-    final pal = context.palette;
-    final missing = e.costCp - purseCp;
-    final weight = e.weight == 0 ? '—' : '${formatPounds(e.weight)} lb';
-    final buttons = Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        TextButton(
-          key: ValueKey('add-${e.id}'),
-          onPressed: () {
-            widget.onAdd(e.id);
-            setState(() => _added++);
-          },
-          child: const Text('Agregar'),
-        ),
-        const SizedBox(width: 4),
-        OutlinedButton(
-          key: ValueKey('buy-${e.id}'),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: pal.gold,
-            side: BorderSide(color: missing > 0 ? pal.hairline : pal.gold),
-          ),
-          onPressed: missing > 0
-              ? null
-              : () async {
-                  final bought = await widget.onBuy(e);
-                  if (!mounted) return;
-                  if (bought) {
-                    Navigator.pop(context);
-                  } else {
-                    setState(() {});
-                  }
-                },
-          child: const Text('Comprar'),
-        ),
-      ],
-    );
-    final cost = Text(
-      formatCost(e.costCp),
-      textAlign: TextAlign.end,
-      style: TextStyle(
-        fontSize: 12.5,
-        color: pal.gold,
-        fontFeatures: const [FontFeature.tabularFigures()],
-      ),
-    );
-    return LayoutBuilder(
-      builder: (context, box) {
-        final narrow = box.maxWidth < 460;
-        final info = Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(e.name, maxLines: 1, overflow: TextOverflow.ellipsis),
-            Text(
-              [
-                e.detail,
-                if (narrow) weight,
-                if (missing > 0) 'te faltan ${CoinOps.formatAmount(missing)}',
-              ].join(' · '),
-              style: TextStyle(fontSize: 11.5, color: muted),
-            ),
-          ],
-        );
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          child: narrow
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(child: info),
-                        SizedBox(width: 66, child: cost),
-                      ],
-                    ),
-                    buttons,
-                  ],
-                )
-              : Row(
-                  children: [
-                    Expanded(child: info),
-                    SizedBox(
-                      width: 60,
-                      child: Text(
-                        weight,
-                        textAlign: TextAlign.end,
-                        style: TextStyle(fontSize: 12.5, color: muted),
-                      ),
-                    ),
-                    SizedBox(width: 66, child: cost),
-                    const SizedBox(width: 10),
-                    buttons,
-                  ],
-                ),
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final pal = context.palette;
-    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
-    final all = _all;
-    final needle = _query.trim().toLowerCase();
-    final matches = [
-      for (final e in all)
-        if ((needle.isEmpty || e.name.toLowerCase().contains(needle)) &&
-            (_family == _invFilterAll || e.family == _family))
-          e,
-    ];
-    // Solo las familias que existen en el catálogo cargado: con homebrew, una
-    // píldora fija dejaría fuera categorías nuevas y ofrecería vacías.
-    final families = {for (final e in all) e.family};
-
-    final purseCp = CoinOps.totalCp(widget.coins());
-
-    return AppDialog(
-      title: 'Agregar objeto',
-      // Lo que hay en la bolsa, para saber qué se puede comprar sin cerrar.
-      titleTrailing: GoldPill('Bolsa ${CoinOps.formatAmount(purseCp)}'),
-      width: 560,
-      scrollable: false,
-      content: SizedBox(
-        height: 460,
-        child: Column(
-          children: [
-            TextField(
-              autofocus: true,
-              decoration: const InputDecoration(
-                isDense: true,
-                prefixIcon: Icon(Icons.search, size: 20),
-                hintText: 'Buscar objeto…',
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (v) => setState(() => _query = v),
-            ),
-            const SizedBox(height: 10),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Wrap(
-                spacing: 6,
-                runSpacing: 6,
-                children: [
-                  for (final family in [
-                    _invFilterAll,
-                    ..._groupTitles.keys.where(families.contains),
-                    ...families.where((f) => !_groupTitles.containsKey(f)),
-                  ])
-                    ChoiceChip(
-                      label: Text(
-                        family == _invFilterAll
-                            ? family
-                            : _groupTitles[family] ?? family,
-                      ),
-                      selected: _family == family,
-                      showCheckmark: false,
-                      visualDensity: VisualDensity.compact,
-                      onSelected: (_) => setState(() => _family = family),
-                    ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 10),
-            Expanded(
-              child: matches.isEmpty
-                  ? const Center(child: Text('Sin coincidencias.'))
-                  : ListView.separated(
-                      itemCount: matches.length,
-                      separatorBuilder: (_, _) =>
-                          Divider(height: 1, color: pal.hairline),
-                      itemBuilder: (_, i) => _catalogRow(
-                        matches[i],
-                        purseCp: purseCp,
-                        muted: muted,
-                      ),
-                    ),
-            ),
-            // El contador vive abajo del cuerpo: el pie es una fila de celdas
-            // que se tocan y un texto ahí se lee como un botón muerto.
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                _added == 0
-                    ? 'Agregar es gratis y deja seguir sumando; comprar paga de la bolsa.'
-                    : _added == 1
-                    ? '1 objeto agregado a la mochila.'
-                    : '$_added objetos agregados a la mochila.',
-                style: TextStyle(fontSize: 12, color: muted),
-              ),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        DialogAction(
-          'Cerrar',
-          primary: true,
-          keyHint: 'Esc',
-          onPressed: () => Navigator.pop(context),
-        ),
-      ],
-    );
-  }
-}
-
-/// Lo que se acordó en «Comprar» o «Vender»: cuántas unidades (paquetes, en
-/// la munición) y a qué precio cada una, en cobre.
-typedef _Trade = ({int quantity, int unitCp, int totalCp});
-
-/// Comprar y vender comparten el diálogo: cantidad, precio en po · pp · pc y
-/// cómo queda la bolsa. La cuenta no vive acá: el pago sale de
-/// [CoinOps.plan], el mismo que después aplica `InventoryOps.buy`, así lo que
-/// se muestra es lo que pasa.
-class _TradeDialog extends StatefulWidget {
-  final bool buying;
-  final String title;
-  final String detail;
-  final int bundleSize;
-
-  /// El precio de partida por unidad: el de catálogo al comprar, la mitad al
-  /// vender. Se puede corregir; el botón de volver lo repone.
-  final int catalogCp;
-
-  /// Tope de la cantidad al vender (lo que hay). Null al comprar.
-  final int? maxQuantity;
-  final Map<String, int> coins;
-
-  const _TradeDialog({
-    required this.buying,
-    required this.title,
-    required this.detail,
-    required this.bundleSize,
-    required this.catalogCp,
-    required this.coins,
-    this.maxQuantity,
-  });
-
-  @override
-  State<_TradeDialog> createState() => _TradeDialogState();
-}
-
-class _TradeDialogState extends State<_TradeDialog> {
-  int _quantity = 1;
-
-  /// Tres campos y no número + moneda: la mitad de 15 po son 7 po 5 pp, y con
-  /// una sola moneda eso solo se escribía «75 pp».
-  late final Map<String, TextEditingController> _price = {
-    for (final k in const ['gp', 'sp', 'cp']) k: TextEditingController(),
-  };
-
-  @override
-  void initState() {
-    super.initState();
-    _setPrice(widget.catalogCp);
-  }
-
-  @override
-  void dispose() {
-    for (final c in _price.values) {
-      c.dispose();
-    }
-    super.dispose();
-  }
-
-  void _setPrice(int cp) {
-    final parts = CoinOps.changeFor(cp);
-    for (final k in _price.keys) {
-      _price[k]!.text = '${parts[k] ?? 0}';
-    }
-  }
-
-  int get _unitCp {
-    var cp = 0;
-    for (final e in _price.entries) {
-      final n = int.tryParse(e.value.text.trim()) ?? 0;
-      if (n > 0) cp += n * coinValueCp[e.key]!;
-    }
-    return cp;
-  }
-
-  String get _unitWord => widget.bundleSize > 1 ? 'paquete' : 'unidad';
-
-  String _units(int n) => n == 1
-      ? '1 $_unitWord'
-      : '$n ${widget.bundleSize > 1 ? 'paquetes' : 'unidades'}';
-
-  @override
-  Widget build(BuildContext context) {
-    final pal = context.palette;
-    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
-    final unit = _unitCp;
-    final total = unit * _quantity;
-    final plan = widget.buying ? CoinOps.plan(widget.coins, total) : null;
-    final after = widget.buying
-        ? (plan?.purse ?? widget.coins)
-        : CoinOps.receive(widget.coins, total);
-    final short = widget.buying && plan == null;
-    final max = widget.maxQuantity;
-    final afterCoins = CoinOps.formatCoins(after);
-
-    Widget eyebrow(String text) => Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Text(
-        text.toUpperCase(),
-        style: TextStyle(
-          fontSize: 11,
-          letterSpacing: 1.6,
-          fontWeight: FontWeight.w500,
-          color: pal.textMuted,
-        ),
-      ),
-    );
-
-    return AppDialog(
-      title: widget.title,
-      width: 480,
-      content: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(widget.detail, style: TextStyle(fontSize: 12.5, color: muted)),
-          const SizedBox(height: 18),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    eyebrow('Cantidad'),
-                    Text(
-                      [
-                        _units(_quantity),
-                        if (widget.bundleSize > 1)
-                          '${_quantity * widget.bundleSize} en total',
-                        if (max != null) 'te quedan ${max - _quantity}',
-                      ].join(' · '),
-                      style: TextStyle(fontSize: 12.5, color: muted),
-                    ),
-                  ],
-                ),
-              ),
-              IconButton.outlined(
-                tooltip: 'Uno menos',
-                onPressed: _quantity > 1
-                    ? () => setState(() => _quantity--)
-                    : null,
-                icon: const Icon(Icons.remove),
-              ),
-              SizedBox(
-                width: 44,
-                child: Text(
-                  '$_quantity',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    fontFeatures: [FontFeature.tabularFigures()],
-                  ),
-                ),
-              ),
-              IconButton.outlined(
-                tooltip: 'Uno más',
-                onPressed: max == null || _quantity < max
-                    ? () => setState(() => _quantity++)
-                    : null,
-                icon: const Icon(Icons.add),
-              ),
-            ],
-          ),
-          const SizedBox(height: 18),
-          eyebrow(
-            widget.buying ? 'Precio por $_unitWord' : 'Te pagan por $_unitWord',
-          ),
-          Wrap(
-            spacing: 9,
-            runSpacing: 9,
-            children: [for (final k in _price.keys) _priceField(k)],
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  widget.buying
-                      ? 'Catálogo: ${formatCost(widget.catalogCp)}'
-                      : 'Sugerido: la mitad del catálogo, '
-                            '${CoinOps.formatAmount(widget.catalogCp)}.',
-                  style: TextStyle(fontSize: 12.5, color: muted),
-                ),
-              ),
-              if (unit != widget.catalogCp)
-                TextButton(
-                  onPressed: () => setState(() => _setPrice(widget.catalogCp)),
-                  child: Text(
-                    widget.buying
-                        ? 'Volver al del catálogo'
-                        : 'Volver al sugerido',
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: pal.plaque,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: pal.hairline),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        widget.buying ? 'TOTAL' : 'COBRÁS',
-                        style: TextStyle(
-                          fontSize: 11,
-                          letterSpacing: 1.6,
-                          fontWeight: FontWeight.w500,
-                          color: pal.textMuted,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      CoinOps.formatAmount(total),
-                      style: TextStyle(
-                        fontFamily: 'Georgia',
-                        fontSize: 24,
-                        color: pal.gold,
-                        fontFeatures: const [FontFeature.tabularFigures()],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                if (short)
-                  Text(
-                    'Te faltan '
-                    '${CoinOps.formatAmount(total - CoinOps.totalCp(widget.coins))}. '
-                    'Si el DM te lo regala o te lo fía, cerrá y usá «Agregar».',
-                    style: TextStyle(fontSize: 13, color: pal.crimson),
-                  )
-                else ...[
-                  if (plan != null && plan.spent.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 6),
-                      child: Text(
-                        [
-                          'Sale de la bolsa: ${CoinOps.formatCoins(plan.spent)}.',
-                          if (plan.change.isNotEmpty)
-                            'Te vuelven ${CoinOps.formatCoins(plan.change)}.',
-                        ].join(' '),
-                        style: const TextStyle(fontSize: 13),
-                      ),
-                    ),
-                  Text(
-                    'La bolsa queda en '
-                    '${CoinOps.formatAmount(CoinOps.totalCp(after))}'
-                    '${afterCoins.isEmpty ? '.' : ' ($afterCoins).'}',
-                    style: TextStyle(fontSize: 12.5, color: muted),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ],
-      ),
-      actions: [
-        DialogAction(
-          'Cancelar',
-          keyHint: 'Esc',
-          onPressed: () => Navigator.pop(context),
-        ),
-        DialogAction(
-          widget.buying ? 'Comprar' : 'Vender',
-          primary: true,
-          onPressed: short
-              ? null
-              : () => Navigator.pop<_Trade>(context, (
-                  quantity: _quantity,
-                  unitCp: unit,
-                  totalCp: total,
-                )),
-        ),
-      ],
-    );
-  }
-
-  /// Un campo por moneda, con su abreviatura y su nombre, como en la bolsa
-  /// de la ficha: el precio se lee como plata en la mano.
-  Widget _priceField(String key) {
-    final pal = context.palette;
-    return SizedBox(
-      width: 100,
-      child: TextField(
-        key: ValueKey('price-$key'),
-        controller: _price[key],
-        keyboardType: TextInputType.number,
-        textAlign: TextAlign.end,
-        onChanged: (_) => setState(() {}),
-        style: const TextStyle(
-          fontSize: 17,
-          fontWeight: FontWeight.w600,
-          fontFeatures: [FontFeature.tabularFigures()],
-        ),
-        decoration: InputDecoration(
-          isDense: true,
-          filled: true,
-          fillColor: pal.plaque,
-          labelText: '${coinLabels[key]!.toUpperCase()} · ${_coinNames[key]}',
-          border: const OutlineInputBorder(),
-        ),
-      ),
-    );
-  }
 }

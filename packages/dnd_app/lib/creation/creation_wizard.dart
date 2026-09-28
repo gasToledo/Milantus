@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_widgets.dart';
 import '../theme/class_visuals.dart';
+import '../ui/item_catalog.dart';
 import 'creation_draft.dart';
 
 part 'steps/aptitudes_step.dart';

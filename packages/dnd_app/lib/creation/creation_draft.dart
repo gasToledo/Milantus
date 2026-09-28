@@ -249,6 +249,16 @@ class CreationDraft {
         }
       }
     }
+    // Sin filtrar contra el catálogo acá: `pruneEquipment` suelta lo que ya no
+    // exista, igual que con el resto del equipo.
+    final rawPurchases = json['purchases'];
+    if (rawPurchases is Map) {
+      for (final e in rawPurchases.entries) {
+        if (e.key is String && e.value is int && (e.value as int) > 0) {
+          draft.purchases[e.key as String] = e.value as int;
+        }
+      }
+    }
     final armorId = json['equippedArmorId'];
     if (armorId is String && repo.armorPiece(armorId) != null) {
       draft.equippedArmorId = armorId;
@@ -414,6 +424,7 @@ class CreationDraft {
     'classEquipmentOptionId': classEquipmentOptionId,
     'backgroundEquipmentOptionId': backgroundEquipmentOptionId,
     'equipmentChoices': equipmentChoices,
+    'purchases': purchases,
     'shieldEquipped': shieldEquipped,
     'weaponIds': weaponIds,
     'weaponOffHand': weaponOffHand,
@@ -476,13 +487,59 @@ class CreationDraft {
         (key: 'background:${option.id}:$index', grant: grant),
   ];
 
-  List<InventoryEntry> get startingInventory {
+  /// Lo que traen las opciones de equipo elegidas, sin las compras.
+  Map<String, int> get _grantedQuantities {
     final quantities = <String, int>{};
     for (final (:key, :grant) in selectedEquipmentGrants) {
       final itemId = grant.itemId ?? equipmentChoices[key];
       if (itemId != null) {
         quantities[itemId] = (quantities[itemId] ?? 0) + grant.quantity;
       }
+    }
+    return quantities;
+  }
+
+  /// El resumen de lo que traen las opciones: objetos y cantidad.
+  List<({String itemId, int quantity})> get grantedItems => [
+    for (final e in _grantedQuantities.entries)
+      (itemId: e.key, quantity: e.value),
+  ];
+
+  /// Compras del paso Equipo: objeto → cantidad, en el orden en que se
+  /// agregaron. Se pagan con el oro de las opciones al construir el
+  /// personaje; hasta entonces son una lista que se puede rehacer.
+  final Map<String, int> purchases = {};
+
+  /// Suma uno de [itemId] a las compras.
+  void buy(String itemId) => purchases[itemId] = (purchases[itemId] ?? 0) + 1;
+
+  /// Fija la cantidad comprada; 0 la saca de la lista.
+  void setPurchase(String itemId, int quantity) {
+    if (quantity <= 0) {
+      purchases.remove(itemId);
+    } else {
+      purchases[itemId] = quantity;
+    }
+  }
+
+  /// Lo que cuestan las compras, al precio del manual.
+  ///
+  /// Sin precio editable, a diferencia de la ficha: acá todavía no hay DM con
+  /// quien regatear, y el oro de partida del manual supone la tabla.
+  int get purchasesCp => purchases.entries.fold(
+    0,
+    (sum, e) => sum + InventoryOps.catalogPriceCp(e.key, repo) * e.value,
+  );
+
+  /// Oro de las opciones menos las compras, en cobre. Negativo si cambiar de
+  /// opción dejó compras que ya no se pagan: el paso no se cierra hasta
+  /// ajustarlas, en vez de borrarlas sin avisar.
+  int get goldLeftCp => CoinOps.totalCp(grantedCoins) - purchasesCp;
+
+  List<InventoryEntry> get startingInventory {
+    final quantities = _grantedQuantities;
+    for (final e in purchases.entries) {
+      quantities[e.key] = (quantities[e.key] ?? 0) + e.value;
     }
     final equipped = {
       ?equippedArmorId,
@@ -500,7 +557,8 @@ class CreationDraft {
     ];
   }
 
-  Map<String, int> get startingCoins {
+  /// Las monedas que traen las opciones de equipo, antes de comprar.
+  Map<String, int> get grantedCoins {
     final out = <String, int>{};
     for (final selected in selectedEquipmentGrants) {
       final grant = selected.grant;
@@ -511,10 +569,21 @@ class CreationDraft {
     return out;
   }
 
+  /// La bolsa con la que nace el personaje: lo de las opciones, pagadas las
+  /// compras con la misma cuenta que la ficha. Si no alcanza, las monedas
+  /// quedan enteras; [goldLeftCp] negativo ya impide terminar el paso.
+  Map<String, int> get startingCoins =>
+      CoinOps.pay(grantedCoins, purchasesCp) ?? grantedCoins;
+
   Set<String> get receivedItemIds =>
       startingInventory.map((e) => e.itemId).toSet();
 
   void pruneEquipment() {
+    // Un objeto que ya no está en el catálogo (homebrew que se borró) no se
+    // puede ni pagar ni mostrar.
+    purchases.removeWhere(
+      (id, quantity) => quantity <= 0 || repo.catalogEntry(id) == null,
+    );
     equipmentChoices.removeWhere((key, value) {
       final grant = selectedEquipmentGrants
           .where((e) => e.key == key)
@@ -1069,6 +1138,9 @@ class CreationDraft {
             (e) => e.grant.isChoice && equipmentChoices[e.key] == null,
           ))
             'Completá las elecciones internas de equipo.',
+          if (goldLeftCp < 0)
+            'Las compras superan el oro de partida por '
+                '${CoinOps.formatAmount(-goldLeftCp)}.',
         ];
         final elegidos = pendingSpellChoices;
         final sc = spellcasting;
