@@ -609,6 +609,52 @@ void main() {
           reason: 'declaran el +1 y además lo repiten como rasgo de texto');
     });
 
+    test('ninguna dote muestra su +1 como «Mejora de Característica»', () {
+      // La ficha lista rasgos por nombre: Don de la Fortaleza aparecía como
+      // «Mejora de Característica», que es otra dote, y no se encontraba.
+      const genericos = {
+        'Mejora de Característica',
+        'Aumento de Característica'
+      };
+      final confunden = [
+        for (final f in repo.feats.values)
+          if (f.id != 'ability-score-improvement' &&
+              f.effects
+                  .whereType<PassiveTraitEffect>()
+                  .any((e) => genericos.contains(e.name)))
+            f.id,
+      ];
+      expect(confunden, isEmpty);
+    });
+
+    test('un don que acota su +1 avisa si se guardó en otra característica',
+        () {
+      final don = repo.feat('boon-of-irresistible-offense')!;
+      final choice = don.effects.whereType<AbilityScoreChoiceEffect>().single;
+      expect(choice.allowed, [Ability.strength, Ability.dexterity]);
+
+      Character conDon(Ability a) => Character(
+            id: 'acotado',
+            name: 'Prueba',
+            raceId: 'human',
+            classId: 'fighter',
+            backgroundId: 'soldier',
+            level: 19,
+            assignedScores: {for (final x in Ability.values) x: 12},
+            hpPerLevel: List.filled(19, 6),
+            featIds: [don.id],
+            asiChoices: [
+              AsiChoice(level: 19, featId: don.id, abilityIncreases: {a: 1}),
+            ],
+          );
+
+      bool avisa(Ability a) => CharacterValidator(repo)
+          .validate(conDon(a))
+          .any((w) => w.code == 'feat_ability_not_allowed');
+      expect(avisa(Ability.strength), isFalse);
+      expect(avisa(Ability.charisma), isTrue);
+    });
+
     test('las doce marcas mayores conceden su +1 con el techo normal', () {
       final mayores = repo.feats.values
           .where((f) => f.id.startsWith('greater-mark-of-'))

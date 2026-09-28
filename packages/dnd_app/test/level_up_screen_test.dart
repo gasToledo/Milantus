@@ -1076,6 +1076,57 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('un don que acota su +1 solo ofrece esas características', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1200, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    await pumpLevelUp(tester, fighterL3().copyWith(level: 18));
+
+    await goToAsi(tester);
+    await tester.tap(find.text('Tomar dote'));
+    await tester.pumpAndSettle();
+
+    Future<void> elegirDon(String id) async {
+      final nombre = repo.feat(id)!.name;
+      await searchFeat(tester, nombre);
+      final don = find.widgetWithText(InkWell, nombre);
+      await tester.ensureVisible(don);
+      await tester.tap(don);
+      await tester.pumpAndSettle();
+    }
+
+    Finder carta(Ability a) => find.widgetWithText(InkWell, a.label);
+
+    // Con un don sin restricción, el Carisma se puede elegir.
+    await elegirDon('boon-of-fortitude');
+    await tester.ensureVisible(carta(Ability.charisma));
+    await tester.tap(carta(Ability.charisma));
+    await tester.pumpAndSettle();
+
+    // Al cambiar a uno que solo sube FUE o DES, el Carisma ya no vale.
+    await elegirDon('boon-of-irresistible-offense');
+    final permitidas = repo
+        .feat('boon-of-irresistible-offense')!
+        .effects
+        .whereType<AbilityScoreChoiceEffect>()
+        .single
+        .allowed;
+    for (final a in Ability.values) {
+      expect(
+        carta(a),
+        permitidas.contains(a) ? findsOneWidget : findsNothing,
+        reason: a.name,
+      );
+    }
+    expect(
+      find.text('Elegí a qué característica va el +1 de la dote.'),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   // --- Competencias ---------------------------------------------------------
 
   Character barbarian({int level = 2}) => Character(

@@ -391,6 +391,26 @@ class CharacterValidator {
                 'de ${classDefinition?.name ?? classId}.',
           ));
         }
+        // El +1 de un don con opciones restringidas guardado en otra
+        // característica: fichas previas a que el asistente las filtrara.
+        final featId = asi.featId;
+        final choice = featId == null
+            ? null
+            : repo
+                .feat(featId)
+                ?.effects
+                .whereType<AbilityScoreChoiceEffect>()
+                .firstOrNull;
+        if (choice == null) continue;
+        for (final a in asi.abilityIncreases.keys) {
+          if (!choice.allowed.contains(a)) {
+            w.add(ValidationWarning(
+              'feat_ability_not_allowed',
+              '${repo.feat(featId!)!.name} no puede subir ${a.abbr} '
+                  '(solo ${choice.allowed.map((x) => x.abbr).join(", ")}).',
+            ));
+          }
+        }
       }
     }
 

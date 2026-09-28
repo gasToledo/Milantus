@@ -1166,7 +1166,8 @@ extension _LevelUpSections on _LevelUpScreenState {
           spacing: 10,
           runSpacing: 10,
           children: [
-            for (final ability in Ability.values)
+            // Un don puede acotar a qué característica va su +1.
+            for (final ability in _featAbilityChoice?.allowed ?? Ability.values)
               SizedBox(
                 width: width,
                 child: _LevelUpCard(
@@ -1312,7 +1313,16 @@ extension _LevelUpSections on _LevelUpScreenState {
                           body: featSummary(feat, widget.repo),
                           selected: _featId == feat.id,
                           trailing: SourceBadge(feat.source),
-                          onTap: () => _updateState(() => _featId = feat.id),
+                          onTap: () => _updateState(() {
+                            _featId = feat.id;
+                            // El +1 elegido para otro don puede no valer en
+                            // este (Ataque Imparable solo sube FUE o DES).
+                            final allowed = _featAbilityChoice?.allowed;
+                            if (allowed != null &&
+                                !allowed.contains(_abilityA)) {
+                              _abilityA = null;
+                            }
+                          }),
                         );
                       },
                     ),

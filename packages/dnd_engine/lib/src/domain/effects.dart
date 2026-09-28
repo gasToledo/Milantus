@@ -39,6 +39,10 @@ sealed class Effect {
       'abilityScoreChoice' => AbilityScoreChoiceEffect(
           amount: json['amount'] as int? ?? 1,
           max: json['max'] as int? ?? 30,
+          options: [
+            for (final key in json['options'] as List? ?? const [])
+              Ability.fromKey(key as String),
+          ],
         ),
       'setAbilityScore' => SetAbilityScoreEffect(
           ability: Ability.fromKey(json['ability'] as String),
@@ -378,13 +382,26 @@ class AbilityScoreChoiceEffect extends Effect {
   final int amount;
   final int max;
 
-  const AbilityScoreChoiceEffect({this.amount = 1, this.max = 30});
+  /// Entre qué características se elige; vacío es cualquiera. El Don del
+  /// Ataque Imparable sube solo FUE o DES, y el del Recuerdo de Conjuros
+  /// solo INT, SAB o CAR: sin esto el asistente ofrecía las seis.
+  final List<Ability> options;
+
+  const AbilityScoreChoiceEffect({
+    this.amount = 1,
+    this.max = 30,
+    this.options = const [],
+  });
+
+  /// Las características que se pueden elegir.
+  List<Ability> get allowed => options.isEmpty ? Ability.values : options;
 
   @override
   Map<String, dynamic> toJson() => {
         'type': 'abilityScoreChoice',
         'amount': amount,
         'max': max,
+        if (options.isNotEmpty) 'options': [for (final a in options) a.name],
       };
 }
 

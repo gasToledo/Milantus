@@ -2033,7 +2033,7 @@
     "effects": [
       { "type": "abilityScoreBonus", "ability": "strength", "amount": 1 },
       { "type": "weaponProficiency", "category": "martial" },
-      { "type": "passiveTrait", "name": "Mejora de Característica", "description": "Aumenta Fuerza o Destreza en 1, hasta un máximo de 20." }
+      { "type": "passiveTrait", "name": "Entrenamiento con Armas Marciales", "description": "Ganás competencia con armas marciales." }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -2047,7 +2047,7 @@
     "effects": [
       { "type": "abilityScoreBonus", "ability": "dexterity", "amount": 1 },
       { "type": "weaponProficiency", "category": "martial" },
-      { "type": "passiveTrait", "name": "Mejora de Característica", "description": "Aumenta Fuerza o Destreza en 1, hasta un máximo de 20." }
+      { "type": "passiveTrait", "name": "Entrenamiento con Armas Marciales", "description": "Ganás competencia con armas marciales." }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -2060,7 +2060,6 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "strength", "amount": 1 },
-      { "type": "passiveTrait", "name": "Mejora de Característica", "description": "Aumenta Fuerza o Destreza en 1, hasta un máximo de 20." },
       { "type": "passiveTrait", "name": "Propiedad de Maestría", "description": "Podés usar la propiedad de maestría de un tipo de arma sencilla o marcial con la que seas competente. Podés cambiar el tipo de arma tras un descanso largo." }
     ],
     "prerequisite": { "minLevel": 4 }
@@ -2074,7 +2073,6 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "dexterity", "amount": 1 },
-      { "type": "passiveTrait", "name": "Mejora de Característica", "description": "Aumenta Fuerza o Destreza en 1, hasta un máximo de 20." },
       { "type": "passiveTrait", "name": "Propiedad de Maestría", "description": "Podés usar la propiedad de maestría de un tipo de arma sencilla o marcial con la que seas competente. Podés cambiar el tipo de arma tras un descanso largo." }
     ],
     "prerequisite": { "minLevel": 4 }
@@ -2320,13 +2318,8 @@
       {"type":"abilityScoreChoice","amount":1,"max":30},
       {
         "type": "passiveTrait",
-        "name": "Mejora de Característica",
-        "description": "Aumenta una característica en 1, hasta un máximo de 30."
-      },
-      {
-        "type": "passiveTrait",
-        "name": "Salud Fortalecida",
-        "description": "Tus puntos de golpe máximos aumentan en 40. Una vez por turno, cuando recuperás puntos de golpe, recuperás además tu modificador por Constitución."
+        "name": "Don de la Fortaleza",
+        "description": "Aumenta una característica en 1, hasta un máximo de 30. Tus puntos de golpe máximos aumentan en 40. Una vez por turno, cuando recuperás puntos de golpe, recuperás además tu modificador por Constitución."
       }
     ],
     "prerequisite": {
@@ -2471,7 +2464,7 @@
     "category": "epic-boon",
     "repeatable": false,
     "effects": [
-      {"type":"abilityScoreChoice","amount":1,"max":30},
+      {"type":"abilityScoreChoice","amount":1,"max":30,"options":["strength","dexterity"]},
       {
         "type": "passiveTrait",
         "name": "Ataque Imparable",
@@ -2525,7 +2518,7 @@
     "category": "epic-boon",
     "repeatable": false,
     "effects": [
-      {"type":"abilityScoreChoice","amount":1,"max":30},
+      {"type":"abilityScoreChoice","amount":1,"max":30,"options":["intelligence","wisdom","charisma"]},
       {
         "type": "passiveTrait",
         "name": "Lanzamiento Gratuito",
@@ -3390,11 +3383,6 @@
       {"type":"prepareSpellListAdditions"},
       {
         "type": "passiveTrait",
-        "name": "Aumento de Característica",
-        "description": "Aumentás en 1 la característica de lanzamiento que usa tu dote de marca, hasta un máximo de 20."
-      },
-      {
-        "type": "passiveTrait",
         "name": "Preparación de la Marca",
         "description": "Tenés siempre preparados los conjuros de tu lista de Conjuros de la Marca, si la tenés."
       },
@@ -3422,13 +3410,8 @@
       {"type":"abilityScoreChoice","amount":1,"max":30},
       {
         "type": "passiveTrait",
-        "name": "Aumento de Característica",
-        "description": "Aumentás en 1 una característica a tu elección, hasta un máximo de 30."
-      },
-      {
-        "type": "passiveTrait",
-        "name": "Magia Aberrante",
-        "description": "Elegís un conjuro de nivel 8 o menor de la lista de Hechicero, o uno de la tabla de conjuros de marca de Siberys: Aspectos Animales, Controlar el Clima, Semiplano, Festín de Héroes, Laberinto, Mente en Blanco, Desplazamiento entre Planos, Proyectar Imagen, Regenerar, Símbolo, Teletransporte, Visión Veraz. Lo tenés siempre preparado, podés lanzarlo gratis y sin componentes una vez por descanso corto o largo, y también con espacios del nivel adecuado. Tu aptitud mágica es Inteligencia, Sabiduría o Carisma (se elige al tomar la dote)."
+        "name": "Bendición de Siberys",
+        "description": "Aumentás en 1 una característica a tu elección, hasta un máximo de 30. Elegís un conjuro de nivel 8 o menor de la lista de Hechicero, o uno de la tabla de conjuros de marca de Siberys: Aspectos Animales, Controlar el Clima, Semiplano, Festín de Héroes, Laberinto, Mente en Blanco, Desplazamiento entre Planos, Proyectar Imagen, Regenerar, Símbolo, Teletransporte, Visión Veraz. Lo tenés siempre preparado, podés lanzarlo gratis y sin componentes una vez por descanso corto o largo, y también con espacios del nivel adecuado. Tu aptitud mágica es Inteligencia, Sabiduría o Carisma (se elige al tomar la dote)."
       }
     ],
     "prerequisite": {
