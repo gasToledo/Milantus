@@ -671,7 +671,9 @@ extension _LevelUpSections on _LevelUpScreenState {
         _ReviewRow(
           icon: Icons.bolt,
           label: resource.name,
-          note: 'Recurso de clase',
+          // Sin clase es de la especie o de una dote: el Ataque de Aliento
+          // figuraba como «Recurso de clase».
+          note: resource.classId == null ? 'Recurso' : 'Recurso de clase',
           before: '${previous?.max ?? 0}',
           after: '${resource.max}',
         ),

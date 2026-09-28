@@ -34,6 +34,9 @@ class CharacterResource {
   /// Dados de daño del tramo de nivel actual, o null si no causa daño.
   final String? damage;
 
+  /// Reserva que se gasta en cantidades. Ver [ResourceEffect.pool].
+  final bool pool;
+
   const CharacterResource({
     this.classId,
     required this.id,
@@ -45,6 +48,7 @@ class CharacterResource {
     this.saveDc,
     this.saveAbility,
     this.damage,
+    this.pool = false,
   });
 
   String get key => classId == null ? id : '$classId:$id';
@@ -60,6 +64,7 @@ class CharacterResource {
         if (saveDc != null) 'saveDc': saveDc,
         if (saveAbility != null) 'saveAbility': saveAbility!.name,
         if (damage != null) 'damage': damage,
+        if (pool) 'pool': true,
       };
 }
 

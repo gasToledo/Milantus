@@ -192,7 +192,9 @@ class SheetBuilder {
           ? proficiencyBonusForLevel(sourceLevel) * e.proficiencyMultiplier
           : e.maxFromAbility != null
               ? [e.max, mods[e.maxFromAbility]!].reduce((a, b) => a > b ? a : b)
-              : (e.maxPerLevel ? sourceLevel + e.max : e.max);
+              : (e.maxPerLevel
+                  ? sourceLevel * e.levelMultiplier + e.max
+                  : e.max);
       return CharacterResource(
         classId: entry.key.classId,
         id: e.id,
@@ -208,6 +210,7 @@ class SheetBuilder {
         // Tramos por nivel de personaje, no de la fuente: el Aliento escala
         // con el nivel total, como los trucos.
         damage: _tierFor(e.damageByLevel, level),
+        pool: e.pool,
       );
     }).toList();
   }

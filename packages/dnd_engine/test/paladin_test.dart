@@ -53,6 +53,16 @@ void main() {
     });
   });
 
+  test('Imponer las Manos es una reserva de 5 × nivel de Paladín', () {
+    CharacterResource reserva(int level) => compile(paladin(level))
+        .resources
+        .singleWhere((r) => r.id == 'lay_on_hands');
+    expect(reserva(1).max, 5);
+    expect(reserva(20).max, 100);
+    expect(reserva(20).pool, isTrue);
+    expect(reserva(20).recharge, RechargeOn.longRest);
+  });
+
   group('Golpes Radiantes', () {
     Attack attack(ComputedSheet s, String weaponId) =>
         s.attacks.firstWhere((a) => a.baseWeaponId == weaponId);

@@ -433,12 +433,22 @@ extension _SheetCombatSection on _SheetScreenState {
                       ),
                     ],
                     const SizedBox(height: 5),
-                    UsagePips(
-                      max: r.max,
-                      filled: r.max - used,
-                      filledIcon: Icons.bolt,
-                      emptyIcon: Icons.bolt_outlined,
-                    ),
+                    if (r.pool)
+                      Text(
+                        '${r.max - used} / ${r.max}',
+                        semanticsLabel: '${r.max - used} de ${r.max} puntos',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontFeatures: [FontFeature.tabularFigures()],
+                        ),
+                      )
+                    else
+                      UsagePips(
+                        max: r.max,
+                        filled: r.max - used,
+                        filledIcon: Icons.bolt,
+                        emptyIcon: Icons.bolt_outlined,
+                      ),
                   ],
                 ),
               ),
@@ -448,18 +458,55 @@ extension _SheetCombatSection on _SheetScreenState {
             spendTooltip: 'Usar',
             onSpend: used >= r.max
                 ? null
-                : () => _mutateCombat(
-                    () => _c.combat.resourceUsage[r.key] = used + 1,
-                  ),
+                : () async {
+                    final n = r.pool
+                        ? await _askPoints(r, 'gastar', r.max - used)
+                        : 1;
+                    if (n == null) return;
+                    _mutateCombat(
+                      () => _setUsed(
+                        r,
+                        (_c.combat.resourceUsage[r.key] ?? 0) + n,
+                      ),
+                    );
+                  },
             onRecover: used <= 0
                 ? null
-                : () => _mutateCombat(
-                    () => _c.combat.resourceUsage[r.key] = used - 1,
-                  ),
+                : () async {
+                    final n = r.pool
+                        ? await _askPoints(r, 'recuperar', used)
+                        : 1;
+                    if (n == null) return;
+                    _mutateCombat(
+                      () => _setUsed(
+                        r,
+                        (_c.combat.resourceUsage[r.key] ?? 0) - n,
+                      ),
+                    );
+                  },
           ),
         ],
       ),
     );
+  }
+
+  /// Deja el gasto dentro de [0, máximo]. En una reserva, lo que se pide
+  /// puede pasarse de lo que queda.
+  void _setUsed(CharacterResource r, int used) =>
+      _c.combat.resourceUsage[r.key] = used.clamp(0, r.max);
+
+  /// Cuántos puntos de una reserva gastar o recuperar. Null si se cancela o
+  /// no es un número positivo.
+  Future<int?> _askPoints(CharacterResource r, String verb, int limit) async {
+    final value = await showTextPromptDialog(
+      context,
+      title: r.name,
+      label: 'Puntos a $verb (hasta $limit)',
+      keyboardType: TextInputType.number,
+    );
+    final n = value == null ? null : int.tryParse(value.trim());
+    if (n == null || n <= 0) return null;
+    return n > limit ? limit : n;
   }
 
   Widget _attacksCard(ComputedSheet s) {

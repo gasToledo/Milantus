@@ -114,6 +114,8 @@ sealed class Effect {
           shortRestRecovery: json['shortRestRecovery'] as int? ?? 0,
           description: json['description'] as String? ?? '',
           maxPerLevel: json['maxPerLevel'] as bool? ?? false,
+          levelMultiplier: json['levelMultiplier'] as int? ?? 1,
+          pool: json['pool'] as bool? ?? false,
           maxFromAbility: json['maxFromAbility'] != null
               ? Ability.fromKey(json['maxFromAbility'] as String)
               : null,
@@ -1487,7 +1489,8 @@ class SpellcastingEffect extends Effect {
 /// - con [maxPerLevel] es el término constante y **se suma** al nivel, para
 ///   pozos del tipo "1 + nivel de Brujo" (Luz Sanadora del Patrón Celestial);
 ///   con `max: 0` queda el nivel pelado, que es el caso del Monje y el
-///   Hechicero;
+///   Hechicero. [levelMultiplier] multiplica el nivel antes de sumar: la
+///   reserva de Imponer las Manos es 5 × nivel de Paladín;
 /// - con [maxFromAbility] es el piso (normalmente 1, "mínimo una vez");
 /// - con [maxFromProficiency] se ignora, porque el bonificador nunca baja de 2.
 ///   Ahí el que escala es [proficiencyMultiplier], para "dos veces tu
@@ -1507,6 +1510,15 @@ class ResourceEffect extends Effect {
   final int shortRestRecovery;
   final String description;
   final bool maxPerLevel;
+
+  /// Factor sobre el nivel. Solo se lee cuando [maxPerLevel] es true.
+  final int levelMultiplier;
+
+  /// Se gasta en cantidades y no de a un uso: una reserva de puntos que se
+  /// reparte (Imponer las Manos). La ficha la muestra como número y pregunta
+  /// cuánto gastar, porque 100 casilleros no se leen y curar 7 PG eran
+  /// siete toques.
+  final bool pool;
   final Ability? maxFromAbility;
   final bool maxFromProficiency;
 
@@ -1535,6 +1547,8 @@ class ResourceEffect extends Effect {
     this.shortRestRecovery = 0,
     this.description = '',
     this.maxPerLevel = false,
+    this.levelMultiplier = 1,
+    this.pool = false,
     this.maxFromAbility,
     this.maxFromProficiency = false,
     this.proficiencyMultiplier = 1,
@@ -1552,6 +1566,8 @@ class ResourceEffect extends Effect {
         if (shortRestRecovery > 0) 'shortRestRecovery': shortRestRecovery,
         'description': description,
         'maxPerLevel': maxPerLevel,
+        if (levelMultiplier != 1) 'levelMultiplier': levelMultiplier,
+        if (pool) 'pool': true,
         if (maxFromAbility != null) 'maxFromAbility': maxFromAbility!.name,
         if (maxFromProficiency) 'maxFromProficiency': true,
         if (proficiencyMultiplier != 1)

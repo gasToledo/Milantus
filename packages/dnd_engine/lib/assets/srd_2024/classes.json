@@ -3570,6 +3570,17 @@
             "type": "passiveTrait",
             "name": "Imponer las Manos",
             "description": "Reserva de PG igual a 5 × tu nivel de Paladín. Como acción adicional tocás a una criatura y gastás PG de la reserva para curarla; 5 PG también quitan el estado de envenenado."
+          },
+          {
+            "type": "resource",
+            "id": "lay_on_hands",
+            "name": "Imponer las Manos",
+            "max": 0,
+            "maxPerLevel": true,
+            "levelMultiplier": 5,
+            "pool": true,
+            "recharge": "long",
+            "description": "Reserva de 5 × tu nivel de Paladín en puntos de curación: gastá los que quieras como acción adicional al tocar a una criatura. 5 puntos también quitan el estado de envenenado. Se recupera en un descanso largo."
           }
         ]
       },

@@ -168,6 +168,39 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('una reserva se gasta en cantidades y no de a un uso', (
+    tester,
+  ) async {
+    final paladin = demoSagan().copyWith(
+      classHistory: const ['paladin', 'paladin'],
+      hpPerLevel: const [10, 6],
+      featureChoices: const {},
+    );
+    await pumpSheet(tester, paladin, size: const Size(900, 6000));
+    await tester.tap(find.text('Combate'));
+    await tester.pumpAndSettle();
+
+    final max = CharacterCompiler(
+      repo,
+    ).compile(paladin).resources.singleWhere((r) => r.id == 'lay_on_hands').max;
+    // 10 casilleros, o 100 en nivel 20, no se leen: va el número.
+    expect(find.text('$max / $max'), findsOneWidget);
+
+    final fila = find
+        .ancestor(of: find.text('$max / $max'), matching: find.byType(Row))
+        .first;
+    await tester.tap(
+      find.descendant(of: fila, matching: find.byTooltip('Usar')),
+    );
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).last, '7');
+    await tester.tap(find.text('Guardar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('${max - 7} / $max'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('las pestañas marciales conservan sus flujos principales', (
     tester,
   ) async {

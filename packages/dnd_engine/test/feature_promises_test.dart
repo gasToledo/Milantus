@@ -188,11 +188,13 @@ void main() {
     // 46 desde que Lanzamiento de la Marca dejó de ser texto: es el único
     // recurso del catálogo que representa un espacio de conjuro y no un pozo
     // de usos, porque el motor no sabe modelar un espacio fuera de la tabla.
-    expect(recursos, hasLength(46));
+    // 47 con la reserva de Imponer las Manos, que antes era solo prosa.
+    expect(recursos, hasLength(47));
 
     var porCaracteristica = 0;
     var porNivel = 0;
     var porDobleCompetencia = 0;
+    var porMultiploDeNivel = 0;
 
     for (final (:where, :e) in recursos) {
       // El nombre de la característica sale de `Ability.label`, así que este
@@ -216,6 +218,12 @@ void main() {
             reason: '$where: la descripción ata el pozo al nivel y el recurso '
                 'tiene un máximo fijo');
       }
+      if (RegExp(r'(\d+) × tu nivel').firstMatch(e.description) case final m?) {
+        porMultiploDeNivel++;
+        expect(e.maxPerLevel && e.levelMultiplier == int.parse(m[1]!), isTrue,
+            reason: '$where: la descripción dice ${m[0]} y el recurso no '
+                'escala así');
+      }
       if (e.description.contains('dos veces tu bonif. por competencia')) {
         porDobleCompetencia++;
         expect(e.maxFromProficiency && e.proficiencyMultiplier == 2, isTrue,
@@ -229,6 +237,7 @@ void main() {
     expect(porNivel, 3,
         reason: 'Puntos de Enfoque, Puntos de Hechicería, Luz Sanadora');
     expect(porDobleCompetencia, 2, reason: 'los dos Energía Psiónica');
+    expect(porMultiploDeNivel, 1, reason: 'Imponer las Manos');
   });
 
   test('no crecen los rasgos que solo se describen y no se modelan', () {
@@ -244,10 +253,11 @@ void main() {
     // modelar todavía, bajá el número a mano y explicá por qué en el commit:
     // el historial de este número es el registro de deuda, y sale más barato
     // que marcar 311 entradas con un motivo que nadie va a leer.
-    // Hoy son exactamente 300 —uno menos desde que Conocimiento Primigenio
-    // declara su elección de habilidad—. Va como cota y no como igualdad para
+    // Hoy son exactamente 297: Conocimiento Primigenio declara su elección
+    // de habilidad, y el Aura de Protección, los Golpes Radiantes e Imponer
+    // las Manos del Paladín dejaron de ser solo prosa. Va como cota y no como igualdad para
     // que pagar deuda no haga fallar el test: lo que tiene que doler es *sumar*.
-    expect(soloTexto, hasLength(lessThanOrEqualTo(300)),
+    expect(soloTexto, hasLength(lessThanOrEqualTo(297)),
         reason: 'hay más rasgos que solo son texto que antes:\n'
             '${soloTexto.join('\n')}');
   });
