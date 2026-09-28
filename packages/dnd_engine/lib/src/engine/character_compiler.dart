@@ -623,12 +623,17 @@ class CharacterCompiler {
     final attacksPerAction = 1 + builder.maxExtraAttack;
     final targetChoices = _resolveTargetChoices(c, builder);
 
-    // Cuántas armas se empuñan, por unidad: «ninguna otra arma» de Duelo.
+    // Cuántas armas se empuñan: «ninguna otra arma» de Duelo. Un montón
+    // equipado es un arma en la mano y el resto a mano, no todas empuñadas:
+    // contando por unidad, un montón de jabalinas solo ya eran «otras armas»
+    // para la jabalina que se lanza. La excepción son las ligeras, que se
+    // llevan de a dos (dos dagas), y más de dos no entran en las manos.
+    int inHand(Weapon w, InventoryEntry entry) =>
+        w.properties.contains('light') ? min(entry.quantity, 2) : 1;
     var wieldedWeapons = 0;
     for (final entry in c.inventory.where((e) => e.equipped)) {
-      if (InventoryOps.resolve(entry, repo).weapon != null) {
-        wieldedWeapons += entry.quantity;
-      }
+      final w = InventoryOps.resolve(entry, repo).weapon;
+      if (w != null) wieldedWeapons += inHand(w, entry);
     }
 
     final attacks = <Attack>[];
@@ -636,7 +641,9 @@ class CharacterCompiler {
       final resolved = InventoryOps.resolve(entry, repo);
       final w = resolved.weapon;
       if (w == null) continue;
-      for (var unit = 0; unit < entry.quantity; unit++) {
+      // Una fila por arma en la mano y no por unidad: ocho jabalinas eran
+      // ocho filas idénticas. Dos dagas siguen dando dos, una por mano.
+      for (var unit = 0; unit < inHand(w, entry); unit++) {
         attacks.add(_attack(
           c,
           w,

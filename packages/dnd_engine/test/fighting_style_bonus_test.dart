@@ -55,6 +55,30 @@ void main() {
     expect(attack(c, 'longsword').damage, '1d10 + 3');
   });
 
+  // Contando por unidad, ocho jabalinas eran ocho filas de ataque iguales y
+  // ocho armas empuñadas.
+  test('un montón equipado es un ataque y un arma en la mano', () {
+    final c = fighter('fs-dueling', weapons: const []).copyWith(
+      inventory: const [
+        InventoryEntry(itemId: 'javelin', quantity: 8, equipped: true),
+      ],
+    );
+    final ataques = CharacterCompiler(repo).compile(c).attacks;
+
+    expect(ataques.where((a) => a.baseWeaponId == 'javelin'), hasLength(1));
+    // Solo con el montón, la jabalina está sola en la mano: Duelo aplica.
+    expect(attack(c, 'javelin').damage, '1d6 + 5');
+  });
+
+  test('dos dagas en un montón siguen siendo dos armas', () {
+    final c = fighter('fs-dueling', weapons: const []).copyWith(
+      inventory: const [
+        InventoryEntry(itemId: 'dagger', quantity: 2, equipped: true),
+      ],
+    );
+    expect(attack(c, 'dagger').damage, '1d4 + 3');
+  });
+
   test('Duelo no aplica con otra arma equipada', () {
     final c = fighter('fs-dueling', weapons: const ['longsword', 'dagger']);
     expect(attack(c, 'longsword').damage, '1d8 + 3');

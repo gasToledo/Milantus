@@ -388,6 +388,9 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   Combate (Guerrero)») en vez de su id interno.
 - Los textos de reglas escritos en la app dicen «bonificador por
   competencia», como pide el glosario.
+- Un montón de armas equipado es un ataque y un arma en la mano: ocho
+  jabalinas eran ocho filas iguales en Ataques. Las armas ligeras siguen
+  contando hasta dos, una por mano.
 
 ### Eliminado
 
