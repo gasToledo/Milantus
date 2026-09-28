@@ -1,6 +1,7 @@
 import '../data/content_repository.dart';
 import 'dice.dart';
 import '../domain/character.dart';
+import 'coin_ops.dart';
 import '../domain/content.dart';
 
 /// Operaciones sobre la mochila. Puras: no mutan, devuelven una ficha nueva.
@@ -302,6 +303,121 @@ class InventoryOps {
       ],
     );
   }
+
+  /// Id fijo de la entrada del Diario donde se anotan compras y ventas. Fijo
+  /// para encontrarla sin buscar por título, que el jugador puede cambiar.
+  static const ledgerEntryId = 'diary-cuentas';
+
+  /// Precio de catálogo de [itemId] por unidad de `quantity` (un paquete, en
+  /// la munición). Un objeto mágico sobre una base suma los dos precios.
+  static int catalogPriceCp(
+    String itemId,
+    ContentRepository repo, {
+    String? baseItemId,
+  }) =>
+      resolve(
+        InventoryEntry(itemId: itemId, baseItemId: baseItemId),
+        repo,
+      ).costCp;
+
+  /// Lo que se ofrece al vender: la mitad del precio de catálogo (PHB 2024,
+  /// capítulo 6), redondeada hacia abajo a la pieza de cobre.
+  static int suggestedSalePriceCp(
+          InventoryEntry entry, ContentRepository repo) =>
+      resolve(entry, repo).costCp ~/ 2;
+
+  /// Compra [quantity] de [itemId] pagando con las monedas de la ficha, o null
+  /// si no alcanzan. Monedas, inventario y la línea en «Cuentas» cambian en
+  /// un solo paso, así que la ficha anterior sirve entera para deshacer.
+  ///
+  /// [unitPriceCp] reemplaza al precio de catálogo: regateo, un descuento del
+  /// DM o el precio de otra ciudad. [at] lo pasa quien llama para que la
+  /// función siga siendo pura.
+  static Character? buy(
+    Character c,
+    String itemId,
+    ContentRepository repo, {
+    int quantity = 1,
+    int? unitPriceCp,
+    required DateTime at,
+  }) {
+    if (quantity <= 0) return null;
+    final total = (unitPriceCp ?? catalogPriceCp(itemId, repo)) * quantity;
+    final coins = CoinOps.pay(c.coins, total);
+    if (coins == null) return null;
+    final bought = add(c.copyWith(coins: coins), itemId, quantity: quantity);
+    final item = resolve(InventoryEntry(itemId: itemId), repo);
+    return _ledger(
+      bought,
+      at,
+      'Compra: ${_units(quantity, item)} · ${formatCost(total)}',
+    );
+  }
+
+  /// Vende [quantity] de la entrada [entryId] y cobra en oro, plata y cobre.
+  /// Vender más de lo que hay vende lo que hay. Una entrada inexistente deja
+  /// la ficha como estaba.
+  static Character sell(
+    Character c,
+    String entryId,
+    ContentRepository repo, {
+    int quantity = 1,
+    required int unitPriceCp,
+    required DateTime at,
+  }) {
+    final entry = c.inventory.where((e) => e.entryId == entryId).firstOrNull;
+    if (entry == null || quantity <= 0) return c;
+    final sold = quantity > entry.quantity ? entry.quantity : quantity;
+    final total = unitPriceCp * sold;
+    final without = remove(c, entryId, repo, quantity: sold);
+    return _ledger(
+      without.copyWith(coins: CoinOps.receive(without.coins, total)),
+      at,
+      'Venta: ${_units(sold, resolve(entry, repo))} · '
+      '${formatCost(total)}',
+    );
+  }
+
+  /// «2 × Flechas (paquete de 20)».
+  static String _units(int quantity, ResolvedInventoryEntry item) {
+    final bundle = item.item?.bundleSize ?? 1;
+    return '$quantity × ${item.name}'
+        '${bundle > 1 ? ' (paquete de $bundle)' : ''}';
+  }
+
+  /// Suma una línea con fecha a «Cuentas», creándola al final del Diario si
+  /// no está. Una entrada sola y no una por operación: una tarde de compras
+  /// llenaba la grilla de tarjetas iguales.
+  static Character _ledger(Character c, DateTime at, String text) {
+    final line = '${_date(at)} · $text';
+    final existing =
+        c.diary.where((e) => e.entryId == ledgerEntryId).firstOrNull;
+    if (existing == null) {
+      return c.copyWith(
+        diary: [
+          ...c.diary,
+          DiaryEntry(
+            entryId: ledgerEntryId,
+            title: 'Cuentas',
+            body: line,
+            createdAt: at,
+          ),
+        ],
+      );
+    }
+    final updated = existing.copyWith(
+      body: existing.body.isEmpty ? line : '${existing.body}\n$line',
+      updatedAt: at,
+    );
+    return c.copyWith(
+      diary: [
+        for (final e in c.diary) e.entryId == ledgerEntryId ? updated : e,
+      ],
+    );
+  }
+
+  static String _date(DateTime d) => '${d.day.toString().padLeft(2, '0')}/'
+      '${d.month.toString().padLeft(2, '0')}/${d.year}';
 
   /// Lo que el personaje lleva encima, incluyendo lo que está equipado aunque
   /// nadie le haya agregado su línea.
