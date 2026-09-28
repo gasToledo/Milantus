@@ -61,7 +61,7 @@ const damageTypeRule =
 /// al menos se muestran en español.
 const _conditionLabels = <String, String>{
   'blinded': 'Cegado',
-  'charmed': 'Encantado',
+  'charmed': 'Hechizado',
   'deafened': 'Ensordecido',
   'frightened': 'Asustado',
   'grappled': 'Agarrado',

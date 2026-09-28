@@ -1372,7 +1372,8 @@
         "name": "Aura de Entrega",
         "description": "Vos y los aliados cercanos no pueden ser hechizados.",
         "effects": [
-          { "type": "passiveTrait", "name": "Aura de Entrega", "description": "Inmunidad a estar hechizado para vos y aliados en tu aura." }
+          { "type": "passiveTrait", "name": "Aura de Entrega", "description": "Inmunidad a estar hechizado para vos y aliados en tu aura." },
+          { "type": "immunity", "damageType": "charmed" }
         ]
       },
       {

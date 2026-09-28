@@ -63,6 +63,18 @@ void main() {
     expect(reserva(20).recharge, RechargeOn.longRest);
   });
 
+  test('las auras de Entrega y de Coraje dan inmunidad a sus estados', () {
+    ComputedSheet devocion(int level) => compile(
+          paladin(level).copyWith(subclassId: 'oath-devotion'),
+        );
+    expect(devocion(6).immunities, isEmpty);
+    expect(devocion(7).immunities, {'charmed'});
+    expect(devocion(10).immunities, {'charmed', 'frightened'});
+    // «Encantado» no aparecía en ningún otro lado: el catálogo y la lista de
+    // estados dicen «Hechizado».
+    expect(DamageType.labelFor('charmed'), 'Hechizado');
+  });
+
   group('Golpes Radiantes', () {
     Attack attack(ComputedSheet s, String weaponId) =>
         s.attacks.firstWhere((a) => a.baseWeaponId == weaponId);

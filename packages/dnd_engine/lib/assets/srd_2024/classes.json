@@ -3741,6 +3741,10 @@
             "type": "passiveTrait",
             "name": "Aura de Coraje",
             "description": "Vos y tus aliados tienen inmunidad al estado de asustado mientras estén dentro de tu Aura de Protección. Si un aliado asustado entra en el aura, el estado no le hace efecto mientras siga adentro."
+          },
+          {
+            "type": "immunity",
+            "damageType": "frightened"
           }
         ]
       },
