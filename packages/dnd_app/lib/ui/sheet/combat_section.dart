@@ -505,7 +505,7 @@ extension _SheetCombatSection on _SheetScreenState {
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Text(
-                      '${a.damage} ${DamageType.labelFor(a.damageType)}',
+                      a.damageText,
                       style: TextStyle(color: muted, fontSize: 13),
                     ),
                     // El alcance sale del catálogo y no del ataque: un

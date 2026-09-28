@@ -44,7 +44,13 @@ sealed class Effect {
           ability: Ability.fromKey(json['ability'] as String),
           score: json['score'] as int,
         ),
-      'savingThrowBonus' => SavingThrowBonusEffect(json['amount'] as int),
+      'savingThrowBonus' => SavingThrowBonusEffect(
+          json['amount'] as int? ?? 0,
+          fromAbility: json['fromAbility'] != null
+              ? Ability.fromKey(json['fromAbility'] as String)
+              : null,
+          minimum: json['minimum'] as int? ?? 0,
+        ),
       'speedBonus' => SpeedBonusEffect(json['feet'] as int),
       'setSpeed' => SetSpeedEffect(json['feet'] as int),
       'darkvision' => DarkvisionEffect(json['range'] as int),
@@ -171,6 +177,8 @@ sealed class Effect {
           attackBonus: json['attackBonus'] as int? ?? 0,
           damageBonus: json['damageBonus'] as int? ?? 0,
           aloneInOneHand: json['aloneInOneHand'] as bool? ?? false,
+          extraDamageDice: json['extraDamageDice'] as String?,
+          extraDamageType: json['extraDamageType'] as String?,
         ),
       'featureChoice' => FeatureChoiceEffect(
           groupId: json['groupId'] as String,
@@ -390,13 +398,34 @@ class SetAbilityScoreEffect extends Effect {
       {'type': 'setAbilityScore', 'ability': ability.name, 'score': score};
 }
 
-/// Bono plano a todas las salvaciones (Anillo/Capa de Protección).
+/// Bono a todas las salvaciones: plano (Anillo/Capa de Protección) o igual al
+/// modificador de una característica (Aura de Protección del Paladín).
+///
+/// El del Aura se guarda como referencia a la característica, igual que
+/// [InitiativeBonusEffect]: el Carisma sube con las mejoras y un `amount`
+/// fijo quedaría viejo. La ficha lo muestra siempre, aunque la regla lo
+/// apague si el paladín está incapacitado: eso es estado de la mesa.
 class SavingThrowBonusEffect extends Effect {
   final int amount;
-  const SavingThrowBonusEffect(this.amount);
+
+  /// Suma además el modificador de esta característica.
+  final Ability? fromAbility;
+
+  /// Piso de lo que aporta [fromAbility]. El Aura dice «mínimo +1».
+  final int minimum;
+
+  const SavingThrowBonusEffect(
+    this.amount, {
+    this.fromAbility,
+    this.minimum = 0,
+  });
   @override
-  Map<String, dynamic> toJson() =>
-      {'type': 'savingThrowBonus', 'amount': amount};
+  Map<String, dynamic> toJson() => {
+        'type': 'savingThrowBonus',
+        'amount': amount,
+        if (fromAbility != null) 'fromAbility': fromAbility!.name,
+        if (minimum != 0) 'minimum': minimum,
+      };
 }
 
 /// Suma pies a la velocidad base.
@@ -1218,6 +1247,13 @@ class WeaponRuleEffect extends Effect {
   /// que es la condición de Duelo. El escudo no es un arma y no cuenta.
   final bool aloneInOneHand;
 
+  /// Dados de daño que se suman en cada acierto, con su propio tipo: los
+  /// Golpes Radiantes del Paladín (1d8 radiante). Van aparte de
+  /// [damageBonus] porque no se suman al número del arma sino que se tiran
+  /// al lado, y la resistencia del objetivo se mira por tipo.
+  final String? extraDamageDice;
+  final String? extraDamageType;
+
   const WeaponRuleEffect({
     this.targetGroupId,
     this.filter = const WeaponFilter(),
@@ -1229,6 +1265,8 @@ class WeaponRuleEffect extends Effect {
     this.attackBonus = 0,
     this.damageBonus = 0,
     this.aloneInOneHand = false,
+    this.extraDamageDice,
+    this.extraDamageType,
   });
 
   @override
@@ -1246,6 +1284,8 @@ class WeaponRuleEffect extends Effect {
         if (attackBonus != 0) 'attackBonus': attackBonus,
         if (damageBonus != 0) 'damageBonus': damageBonus,
         if (aloneInOneHand) 'aloneInOneHand': true,
+        if (extraDamageDice != null) 'extraDamageDice': extraDamageDice,
+        if (extraDamageType != null) 'extraDamageType': extraDamageType,
       };
 }
 

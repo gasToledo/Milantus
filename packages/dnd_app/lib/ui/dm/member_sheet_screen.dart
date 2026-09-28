@@ -501,7 +501,7 @@ class _MemberSheetScreenState extends State<MemberSheetScreen> {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  '${a.damage} ${DamageType.labelFor(a.damageType)}',
+                  a.damageText,
                   style: TextStyle(color: pal.textMuted, fontSize: 13),
                 ),
               ],

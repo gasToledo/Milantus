@@ -1,5 +1,6 @@
 import 'ability.dart';
 import 'creature.dart';
+import 'damage_type.dart';
 import 'effects.dart';
 import 'skill.dart';
 import 'spell_slots.dart';
@@ -500,6 +501,16 @@ enum AttackAction {
 }
 
 /// Ataque calculado a partir del arma equipada.
+/// Dados de daño con tipo propio que un ataque suma en cada acierto.
+class WeaponExtraDamage {
+  final String dice;
+
+  /// Id de [DamageType].
+  final String type;
+
+  const WeaponExtraDamage({required this.dice, required this.type});
+}
+
 class Attack {
   final String weaponId;
   final String baseWeaponId;
@@ -513,6 +524,10 @@ class Attack {
   final String damage;
   final String damageType;
   final List<String> damageTypeOptions;
+
+  /// Dados que se tiran aparte en cada acierto, con su tipo (Golpes
+  /// Radiantes). Ver [WeaponRuleEffect.extraDamageDice].
+  final List<WeaponExtraDamage> extraDamage;
 
   /// Puede usarse como canalizador mientras esta regla de arma esté activa.
   final bool spellcastingFocus;
@@ -543,6 +558,7 @@ class Attack {
     required this.damage,
     required this.damageType,
     List<String>? damageTypeOptions,
+    this.extraDamage = const [],
     this.spellcastingFocus = false,
     this.attacksPerAction = 1,
     this.mastery,
@@ -550,6 +566,17 @@ class Attack {
     this.action = AttackAction.action,
   })  : baseWeaponId = baseWeaponId ?? weaponId,
         damageTypeOptions = damageTypeOptions ?? const [];
+
+  /// El daño completo para mostrar: «1d8 + 6 Cortante + 1d8 Radiante».
+  ///
+  /// La ficha y la vista del DM armaban cada una «daño + tipo» a mano; con
+  /// el daño extra, la que se olvidara de sumarlo mostraba menos de lo que
+  /// el personaje pega.
+  String get damageText => [
+        '$damage ${DamageType.labelFor(damageType)}'.trim(),
+        for (final extra in extraDamage)
+          '${extra.dice} ${DamageType.labelFor(extra.type)}',
+      ].join(' + ');
 
   /// Copia con los campos indicados reemplazados.
   ///
@@ -567,6 +594,7 @@ class Attack {
     String? damage,
     String? damageType,
     List<String>? damageTypeOptions,
+    List<WeaponExtraDamage>? extraDamage,
     bool? spellcastingFocus,
     int? attacksPerAction,
     Object? mastery = _unset,
@@ -586,6 +614,7 @@ class Attack {
         damage: damage ?? this.damage,
         damageType: damageType ?? this.damageType,
         damageTypeOptions: damageTypeOptions ?? this.damageTypeOptions,
+        extraDamage: extraDamage ?? this.extraDamage,
         spellcastingFocus: spellcastingFocus ?? this.spellcastingFocus,
         attacksPerAction: attacksPerAction ?? this.attacksPerAction,
         mastery: identical(mastery, _unset) ? this.mastery : mastery as String?,
@@ -604,6 +633,10 @@ class Attack {
         'damage': damage,
         'damageType': damageType,
         'damageTypeOptions': damageTypeOptions,
+        if (extraDamage.isNotEmpty)
+          'extraDamage': [
+            for (final e in extraDamage) {'dice': e.dice, 'type': e.type},
+          ],
         'spellcastingFocus': spellcastingFocus,
         'attacksPerAction': attacksPerAction,
         'mastery': mastery,

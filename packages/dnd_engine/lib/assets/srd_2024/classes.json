@@ -3700,6 +3700,12 @@
             "type": "passiveTrait",
             "name": "Aura de Protección",
             "description": "Irradiás un aura invisible en una emanación de 10 pies. Tus aliados dentro del aura y vos suman un bonificador a las tiradas de salvación igual a tu mod. de Carisma (mínimo +1). El aura se apaga si tenés el estado de incapacitado, y una criatura solo se beneficia de un Aura de Protección a la vez."
+          },
+          {
+            "type": "savingThrowBonus",
+            "amount": 0,
+            "fromAbility": "charisma",
+            "minimum": 1
           }
         ]
       },
@@ -3736,6 +3742,14 @@
             "type": "passiveTrait",
             "name": "Golpes Radiantes",
             "description": "Cuando acertás con un arma cuerpo a cuerpo o un ataque sin armas, el objetivo recibe 1d8 de daño radiante adicional."
+          },
+          {
+            "type": "weaponRule",
+            "filter": {
+              "melee": true
+            },
+            "extraDamageDice": "1d8",
+            "extraDamageType": "radiant"
           }
         ]
       },

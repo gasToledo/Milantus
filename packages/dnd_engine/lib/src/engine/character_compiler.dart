@@ -769,7 +769,7 @@ class CharacterCompiler {
       abilityModifiers: mods,
       abilityBonuses: List.unmodifiable(builder.abilityBonusSources),
       savingThrowProficiencies: builder.saveProficiencies,
-      savingThrowBonus: builder.savingThrowBonus,
+      savingThrowBonus: builder.resolveSavingThrowBonus(mods),
       heroicInspirationOnLongRest: builder.heroicInspirationOnLongRest,
       skillProficiencies: builder.skillProficiencies,
       expertiseSkills: builder.expertiseSkills,
@@ -1635,6 +1635,7 @@ class CharacterCompiler {
           dice, damageMod + w.magicBonus + magicBonus + context.damageBonus),
       damageType: w.damageType,
       damageTypeOptions: List.unmodifiable(context.damageTypeOptions),
+      extraDamage: List.unmodifiable(context.extraDamage),
       spellcastingFocus: context.spellcastingFocus,
       attacksPerAction: 1 + context.extraAttacks,
       mastery: hasMastery ? w.mastery : null,
@@ -1678,6 +1679,7 @@ class _WeaponAttackContext {
   int extraAttacks;
   int attackBonus = 0;
   int damageBonus = 0;
+  final List<WeaponExtraDamage> extraDamage = [];
 
   _WeaponAttackContext({
     required this.proficient,
@@ -1699,6 +1701,11 @@ class _WeaponAttackContext {
     extraAttacks = max(extraAttacks, rule.extraAttacks);
     attackBonus += rule.attackBonus;
     damageBonus += rule.damageBonus;
+    final dice = rule.extraDamageDice;
+    final type = rule.extraDamageType;
+    if (dice != null && type != null) {
+      extraDamage.add(WeaponExtraDamage(dice: dice, type: type));
+    }
   }
 }
 

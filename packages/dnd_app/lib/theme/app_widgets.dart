@@ -1833,7 +1833,8 @@ String? describeEffect(Effect e, ContentRepository repo) => switch (e) {
   SkillProficiencyEffect(:final skill) =>
     'Competencia: ${Skill.labelFor(skill)}',
   SavingThrowProficiencyEffect(:final ability) => 'Salvación: ${ability.abbr}',
-  SavingThrowBonusEffect(:final amount) => 'Salvaciones +$amount',
+  SavingThrowBonusEffect(:final amount, :final fromAbility) =>
+    'Salvaciones ${[if (amount != 0 || fromAbility == null) '+$amount', if (fromAbility != null) '+ mod. de ${fromAbility.abbr}'].join(' ')}',
   WeaponProficiencyEffect(:final category) =>
     'Competencia: ${repo.weapon(category)?.name ?? weaponProficiencyLabel(category)}',
   ArmorProficiencyEffect(:final category) =>

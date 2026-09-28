@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import '../domain/ability.dart';
 import '../domain/computed_sheet.dart';
 import '../domain/effects.dart';
@@ -15,6 +17,19 @@ class SheetBuilder {
   };
   final Map<Ability, int> minimumAbilityScores = {};
   int savingThrowBonus = 0;
+
+  /// Bonos a salvaciones que dependen de un modificador (Aura de Protección).
+  /// Se guardan y se resuelven al final, como los de iniciativa, porque los
+  /// modificadores definitivos todavía no existen mientras se aplican efectos.
+  final List<SavingThrowBonusEffect> savingThrowAbilityBonuses = [];
+
+  /// Total de salvaciones con [savingThrowAbilityBonuses] ya resueltos.
+  int resolveSavingThrowBonus(Map<Ability, int> mods) =>
+      savingThrowBonus +
+      savingThrowAbilityBonuses.fold<int>(
+        0,
+        (sum, e) => sum + max(e.minimum, mods[e.fromAbility]!),
+      );
 
   /// Los mismos aportes que suma [abilityBonuses], pero uno por uno y con su
   /// fuente. El mapa responde "cuánto"; esta lista responde "por qué".
@@ -292,8 +307,9 @@ class SheetBuilder {
       case SetAbilityScoreEffect(:final ability, :final score):
         final previous = minimumAbilityScores[ability] ?? 0;
         if (score > previous) minimumAbilityScores[ability] = score;
-      case SavingThrowBonusEffect(:final amount):
+      case SavingThrowBonusEffect(:final amount, :final fromAbility):
         savingThrowBonus += amount;
+        if (fromAbility != null) savingThrowAbilityBonuses.add(e);
       case SetSpeedEffect(:final feet):
         speed = feet;
       case SpeedBonusEffect(:final feet):
