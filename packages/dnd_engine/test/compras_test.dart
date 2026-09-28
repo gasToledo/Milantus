@@ -53,6 +53,30 @@ void main() {
       }
     });
 
+    test('al romper una moneda grande no se gasta de más en monedas chicas',
+        () {
+      // Sin devolver lo sobrante: 12 po, 8 pp y 30 pc gastados, se rompía el
+      // platino y volvían 8 po 1 pp. Con el platino y 4 po 7 pp 30 pc alcanza
+      // justo y no hay vuelto.
+      final p = CoinOps.plan({'pp': 1, 'gp': 12, 'sp': 8, 'cp': 30}, 1500)!;
+      expect(p.change, isEmpty);
+      expect(p.purse, {'gp': 8, 'sp': 1});
+    });
+
+    test('el desglose dice qué sale y cuál es el vuelto', () {
+      final p = CoinOps.plan({'pp': 1, 'cp': 3}, 300)!;
+      expect(p.spent, {'pp': 1});
+      expect(p.change, {'gp': 7});
+      expect(p.purse, CoinOps.pay({'pp': 1, 'cp': 3}, 300));
+      expect(CoinOps.plan({'gp': 2}, 300), isNull);
+    });
+
+    test('los montos se leen en oro, plata y cobre', () {
+      expect(CoinOps.formatAmount(750), '7 po 5 pp');
+      expect(CoinOps.formatAmount(0), '0 pc');
+      expect(CoinOps.formatCoins({'gp': 3, 'pp': 1, 'cp': 0}), '1 ppt, 3 po');
+    });
+
     test('cobrar suma en oro, plata y cobre', () {
       expect(CoinOps.receive({'gp': 1}, 255), {'cp': 5, 'sp': 5, 'gp': 3});
     });

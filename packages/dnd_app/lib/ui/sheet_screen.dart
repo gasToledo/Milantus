@@ -297,6 +297,15 @@ class _SheetScreenState extends State<SheetScreen> {
   void _filterInventory(String filter) => setState(() => _invFilter = filter);
 
   void _replace(Character next) {
+    // Los campos de monedas se escriben a mano y se leen al salir: si una
+    // compra, una venta o un «Deshacer» cambia la bolsa, hay que ponerlos al
+    // día, o el próximo toque afuera guardaría los números viejos encima.
+    if (!mapEquals(next.coins, _c.coins)) {
+      for (final k in coinDenominations) {
+        final n = next.coins[k] ?? 0;
+        _coinCtrls[k]!.text = n == 0 ? '' : '$n';
+      }
+    }
     setState(() => _c = next);
     ctrl.replace(next);
   }

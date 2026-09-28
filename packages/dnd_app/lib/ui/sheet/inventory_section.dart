@@ -1059,6 +1059,7 @@ extension _SheetInventorySection on _SheetScreenState {
             value: 'transmute',
             child: Text('Transmutar réplica…'),
           ),
+        const PopupMenuItem(value: 'sell', child: Text('Vender…')),
         const PopupMenuItem(value: 'remove', child: Text('Quitar')),
       ],
     );
@@ -1107,6 +1108,8 @@ extension _SheetInventorySection on _SheetScreenState {
         );
       case 'transmute':
         await _transmuteReplica(e);
+      case 'sell':
+        await _sell(e);
       // El único borrado de la ficha que no pregunta nada, y hasta acá tampoco
       // decía nada: el objeto desaparecía de la lista y listo. No le pongo un
       // diálogo —quitar cosas de la mochila es rutina y confirmarlas cada vez
@@ -1186,9 +1189,85 @@ extension _SheetInventorySection on _SheetScreenState {
     context: context,
     builder: (_) => _AddItemDialog(
       repo: repo,
+      coins: () => _c.coins,
       onAdd: (id) => _replace(InventoryOps.add(_c, id)),
+      onBuy: _buyFromCatalog,
     ),
   );
+
+  /// Abre «Comprar» sobre el catálogo y, si se confirma, paga y agrega en un
+  /// solo cambio. Devuelve si compró, para que el catálogo se cierre: el
+  /// cartel con «Deshacer» vive en la ficha, y con el catálogo abierto encima
+  /// su botón quedaba detrás de la barrera del diálogo.
+  Future<bool> _buyFromCatalog(_CatalogRow row) async {
+    final trade = await showDialog<_Trade>(
+      context: context,
+      builder: (_) => _TradeDialog(
+        buying: true,
+        title: 'Comprar ${row.name}',
+        detail: row.detail,
+        bundleSize: repo.item(row.id)?.bundleSize ?? 1,
+        catalogCp: row.costCp,
+        coins: _c.coins,
+      ),
+    );
+    if (trade == null || !mounted) return false;
+    final antes = _c;
+    final next = InventoryOps.buy(
+      _c,
+      row.id,
+      repo,
+      quantity: trade.quantity,
+      unitPriceCp: trade.unitCp,
+      at: DateTime.now(),
+    );
+    if (next == null) return false;
+    _replace(next);
+    showAppMessage(
+      context,
+      'Compraste ${trade.quantity} × ${row.name} por '
+      '${CoinOps.formatAmount(trade.totalCp)}.',
+      onUndo: () => _replace(antes),
+    );
+    return true;
+  }
+
+  /// Vende parte o todo de una entrada y cobra en la bolsa.
+  Future<void> _sell(InventoryEntry e) async {
+    final info = _itemInfo(e);
+    final trade = await showDialog<_Trade>(
+      context: context,
+      builder: (_) => _TradeDialog(
+        buying: false,
+        title: 'Vender ${info.name}',
+        detail:
+            'Tenés ${e.quantity} · catálogo '
+            '${formatCost(InventoryOps.resolve(e, repo).costCp)}',
+        bundleSize: info.bundleSize,
+        catalogCp: InventoryOps.suggestedSalePriceCp(e, repo),
+        maxQuantity: e.quantity,
+        coins: _c.coins,
+      ),
+    );
+    if (trade == null || !mounted) return;
+    final antes = _c;
+    _replace(
+      InventoryOps.sell(
+        _c.copyWith(inventory: _inventoryEntries),
+        e.entryId,
+        repo,
+        quantity: trade.quantity,
+        unitPriceCp: trade.unitCp,
+        at: DateTime.now(),
+      ),
+    );
+    showAppMessage(
+      context,
+      'Vendiste ${trade.quantity} × ${info.name} por '
+      '${CoinOps.formatAmount(trade.totalCp)}.',
+      onUndo: () => _replace(antes),
+    );
+  }
 
   // ------------------------------------------ Objetivos contextuales de arma
 
@@ -1670,8 +1749,20 @@ class _ItemInfo {
 /// El peso viaja al lado del precio, que es lo que decide si el objeto entra.
 class _AddItemDialog extends StatefulWidget {
   final ContentRepository repo;
+
+  /// La bolsa en este momento. Función y no valor porque el diálogo sigue
+  /// abierto mientras la ficha cambia debajo.
+  final Map<String, int> Function() coins;
   final ValueChanged<String> onAdd;
-  const _AddItemDialog({required this.repo, required this.onAdd});
+
+  /// Abre «Comprar». Devuelve si compró, y entonces el catálogo se cierra.
+  final Future<bool> Function(_CatalogRow row) onBuy;
+  const _AddItemDialog({
+    required this.repo,
+    required this.coins,
+    required this.onAdd,
+    required this.onBuy,
+  });
 
   @override
   State<_AddItemDialog> createState() => _AddItemDialogState();
@@ -1728,6 +1819,115 @@ class _AddItemDialogState extends State<_AddItemDialog> {
     ];
   }
 
+  /// Una fila del catálogo con sus dos salidas: «Agregar» es botín o regalo y
+  /// no cuesta nada; «Comprar» paga de la bolsa. Lo que no alcanza deshabilita
+  /// «Comprar» y dice cuánto falta, en vez de dejar tocar para enterarse.
+  ///
+  /// Angosta, los botones bajan a una segunda línea: al lado del nombre, del
+  /// peso y del precio no quedaba lugar para leer el objeto.
+  Widget _catalogRow(
+    _CatalogRow e, {
+    required int purseCp,
+    required Color muted,
+  }) {
+    final pal = context.palette;
+    final missing = e.costCp - purseCp;
+    final weight = e.weight == 0 ? '—' : '${formatPounds(e.weight)} lb';
+    final buttons = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        TextButton(
+          key: ValueKey('add-${e.id}'),
+          onPressed: () {
+            widget.onAdd(e.id);
+            setState(() => _added++);
+          },
+          child: const Text('Agregar'),
+        ),
+        const SizedBox(width: 4),
+        OutlinedButton(
+          key: ValueKey('buy-${e.id}'),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: pal.gold,
+            side: BorderSide(color: missing > 0 ? pal.hairline : pal.gold),
+          ),
+          onPressed: missing > 0
+              ? null
+              : () async {
+                  final bought = await widget.onBuy(e);
+                  if (!mounted) return;
+                  if (bought) {
+                    Navigator.pop(context);
+                  } else {
+                    setState(() {});
+                  }
+                },
+          child: const Text('Comprar'),
+        ),
+      ],
+    );
+    final cost = Text(
+      formatCost(e.costCp),
+      textAlign: TextAlign.end,
+      style: TextStyle(
+        fontSize: 12.5,
+        color: pal.gold,
+        fontFeatures: const [FontFeature.tabularFigures()],
+      ),
+    );
+    return LayoutBuilder(
+      builder: (context, box) {
+        final narrow = box.maxWidth < 460;
+        final info = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(e.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+            Text(
+              [
+                e.detail,
+                if (narrow) weight,
+                if (missing > 0) 'te faltan ${CoinOps.formatAmount(missing)}',
+              ].join(' · '),
+              style: TextStyle(fontSize: 11.5, color: muted),
+            ),
+          ],
+        );
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: narrow
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(child: info),
+                        SizedBox(width: 66, child: cost),
+                      ],
+                    ),
+                    buttons,
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(child: info),
+                    SizedBox(
+                      width: 60,
+                      child: Text(
+                        weight,
+                        textAlign: TextAlign.end,
+                        style: TextStyle(fontSize: 12.5, color: muted),
+                      ),
+                    ),
+                    SizedBox(width: 66, child: cost),
+                    const SizedBox(width: 10),
+                    buttons,
+                  ],
+                ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final pal = context.palette;
@@ -1744,9 +1944,13 @@ class _AddItemDialogState extends State<_AddItemDialog> {
     // píldora fija dejaría fuera categorías nuevas y ofrecería vacías.
     final families = {for (final e in all) e.family};
 
+    final purseCp = CoinOps.totalCp(widget.coins());
+
     return AppDialog(
       title: 'Agregar objeto',
-      width: 460,
+      // Lo que hay en la bolsa, para saber qué se puede comprar sin cerrar.
+      titleTrailing: GoldPill('Bolsa ${CoinOps.formatAmount(purseCp)}'),
+      width: 560,
       scrollable: false,
       content: SizedBox(
         height: 460,
@@ -1796,68 +2000,11 @@ class _AddItemDialogState extends State<_AddItemDialog> {
                       itemCount: matches.length,
                       separatorBuilder: (_, _) =>
                           Divider(height: 1, color: pal.hairline),
-                      itemBuilder: (_, i) {
-                        final e = matches[i];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      e.name,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    Text(
-                                      e.detail,
-                                      style: TextStyle(
-                                        fontSize: 11.5,
-                                        color: muted,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                width: 60,
-                                child: Text(
-                                  e.weight == 0
-                                      ? '—'
-                                      : '${formatPounds(e.weight)} lb',
-                                  textAlign: TextAlign.end,
-                                  style: TextStyle(
-                                    fontSize: 12.5,
-                                    color: muted,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 66,
-                                child: Text(
-                                  formatCost(e.costCp),
-                                  textAlign: TextAlign.end,
-                                  style: TextStyle(
-                                    fontSize: 12.5,
-                                    color: pal.gold,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              OutlinedButton(
-                                key: ValueKey('add-${e.id}'),
-                                onPressed: () {
-                                  widget.onAdd(e.id);
-                                  setState(() => _added++);
-                                },
-                                child: const Text('Agregar'),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                      itemBuilder: (_, i) => _catalogRow(
+                        matches[i],
+                        purseCp: purseCp,
+                        muted: muted,
+                      ),
                     ),
             ),
             // El contador vive abajo del cuerpo: el pie es una fila de celdas
@@ -1867,7 +2014,7 @@ class _AddItemDialogState extends State<_AddItemDialog> {
               alignment: Alignment.centerLeft,
               child: Text(
                 _added == 0
-                    ? 'Se pueden agregar varios sin cerrar.'
+                    ? 'Agregar es gratis y deja seguir sumando; comprar paga de la bolsa.'
                     : _added == 1
                     ? '1 objeto agregado a la mochila.'
                     : '$_added objetos agregados a la mochila.',
@@ -1885,6 +2032,320 @@ class _AddItemDialogState extends State<_AddItemDialog> {
           onPressed: () => Navigator.pop(context),
         ),
       ],
+    );
+  }
+}
+
+/// Lo que se acordó en «Comprar» o «Vender»: cuántas unidades (paquetes, en
+/// la munición) y a qué precio cada una, en cobre.
+typedef _Trade = ({int quantity, int unitCp, int totalCp});
+
+/// Comprar y vender comparten el diálogo: cantidad, precio en po · pp · pc y
+/// cómo queda la bolsa. La cuenta no vive acá: el pago sale de
+/// [CoinOps.plan], el mismo que después aplica `InventoryOps.buy`, así lo que
+/// se muestra es lo que pasa.
+class _TradeDialog extends StatefulWidget {
+  final bool buying;
+  final String title;
+  final String detail;
+  final int bundleSize;
+
+  /// El precio de partida por unidad: el de catálogo al comprar, la mitad al
+  /// vender. Se puede corregir; el botón de volver lo repone.
+  final int catalogCp;
+
+  /// Tope de la cantidad al vender (lo que hay). Null al comprar.
+  final int? maxQuantity;
+  final Map<String, int> coins;
+
+  const _TradeDialog({
+    required this.buying,
+    required this.title,
+    required this.detail,
+    required this.bundleSize,
+    required this.catalogCp,
+    required this.coins,
+    this.maxQuantity,
+  });
+
+  @override
+  State<_TradeDialog> createState() => _TradeDialogState();
+}
+
+class _TradeDialogState extends State<_TradeDialog> {
+  int _quantity = 1;
+
+  /// Tres campos y no número + moneda: la mitad de 15 po son 7 po 5 pp, y con
+  /// una sola moneda eso solo se escribía «75 pp».
+  late final Map<String, TextEditingController> _price = {
+    for (final k in const ['gp', 'sp', 'cp']) k: TextEditingController(),
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _setPrice(widget.catalogCp);
+  }
+
+  @override
+  void dispose() {
+    for (final c in _price.values) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  void _setPrice(int cp) {
+    final parts = CoinOps.changeFor(cp);
+    for (final k in _price.keys) {
+      _price[k]!.text = '${parts[k] ?? 0}';
+    }
+  }
+
+  int get _unitCp {
+    var cp = 0;
+    for (final e in _price.entries) {
+      final n = int.tryParse(e.value.text.trim()) ?? 0;
+      if (n > 0) cp += n * coinValueCp[e.key]!;
+    }
+    return cp;
+  }
+
+  String get _unitWord => widget.bundleSize > 1 ? 'paquete' : 'unidad';
+
+  String _units(int n) => n == 1
+      ? '1 $_unitWord'
+      : '$n ${widget.bundleSize > 1 ? 'paquetes' : 'unidades'}';
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.palette;
+    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
+    final unit = _unitCp;
+    final total = unit * _quantity;
+    final plan = widget.buying ? CoinOps.plan(widget.coins, total) : null;
+    final after = widget.buying
+        ? (plan?.purse ?? widget.coins)
+        : CoinOps.receive(widget.coins, total);
+    final short = widget.buying && plan == null;
+    final max = widget.maxQuantity;
+    final afterCoins = CoinOps.formatCoins(after);
+
+    Widget eyebrow(String text) => Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        text.toUpperCase(),
+        style: TextStyle(
+          fontSize: 11,
+          letterSpacing: 1.6,
+          fontWeight: FontWeight.w500,
+          color: pal.textMuted,
+        ),
+      ),
+    );
+
+    return AppDialog(
+      title: widget.title,
+      width: 480,
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(widget.detail, style: TextStyle(fontSize: 12.5, color: muted)),
+          const SizedBox(height: 18),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    eyebrow('Cantidad'),
+                    Text(
+                      [
+                        _units(_quantity),
+                        if (widget.bundleSize > 1)
+                          '${_quantity * widget.bundleSize} en total',
+                        if (max != null) 'te quedan ${max - _quantity}',
+                      ].join(' · '),
+                      style: TextStyle(fontSize: 12.5, color: muted),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton.outlined(
+                tooltip: 'Uno menos',
+                onPressed: _quantity > 1
+                    ? () => setState(() => _quantity--)
+                    : null,
+                icon: const Icon(Icons.remove),
+              ),
+              SizedBox(
+                width: 44,
+                child: Text(
+                  '$_quantity',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    fontFeatures: [FontFeature.tabularFigures()],
+                  ),
+                ),
+              ),
+              IconButton.outlined(
+                tooltip: 'Uno más',
+                onPressed: max == null || _quantity < max
+                    ? () => setState(() => _quantity++)
+                    : null,
+                icon: const Icon(Icons.add),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          eyebrow(
+            widget.buying ? 'Precio por $_unitWord' : 'Te pagan por $_unitWord',
+          ),
+          Wrap(
+            spacing: 9,
+            runSpacing: 9,
+            children: [for (final k in _price.keys) _priceField(k)],
+          ),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  widget.buying
+                      ? 'Catálogo: ${formatCost(widget.catalogCp)}'
+                      : 'Sugerido: la mitad del catálogo, '
+                            '${CoinOps.formatAmount(widget.catalogCp)}.',
+                  style: TextStyle(fontSize: 12.5, color: muted),
+                ),
+              ),
+              if (unit != widget.catalogCp)
+                TextButton(
+                  onPressed: () => setState(() => _setPrice(widget.catalogCp)),
+                  child: Text(
+                    widget.buying
+                        ? 'Volver al del catálogo'
+                        : 'Volver al sugerido',
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: pal.plaque,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: pal.hairline),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        widget.buying ? 'TOTAL' : 'COBRÁS',
+                        style: TextStyle(
+                          fontSize: 11,
+                          letterSpacing: 1.6,
+                          fontWeight: FontWeight.w500,
+                          color: pal.textMuted,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      CoinOps.formatAmount(total),
+                      style: TextStyle(
+                        fontFamily: 'Georgia',
+                        fontSize: 24,
+                        color: pal.gold,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                if (short)
+                  Text(
+                    'Te faltan '
+                    '${CoinOps.formatAmount(total - CoinOps.totalCp(widget.coins))}. '
+                    'Si el DM te lo regala o te lo fía, cerrá y usá «Agregar».',
+                    style: TextStyle(fontSize: 13, color: pal.crimson),
+                  )
+                else ...[
+                  if (plan != null && plan.spent.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 6),
+                      child: Text(
+                        [
+                          'Sale de la bolsa: ${CoinOps.formatCoins(plan.spent)}.',
+                          if (plan.change.isNotEmpty)
+                            'Te vuelven ${CoinOps.formatCoins(plan.change)}.',
+                        ].join(' '),
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    ),
+                  Text(
+                    'La bolsa queda en '
+                    '${CoinOps.formatAmount(CoinOps.totalCp(after))}'
+                    '${afterCoins.isEmpty ? '.' : ' ($afterCoins).'}',
+                    style: TextStyle(fontSize: 12.5, color: muted),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        DialogAction(
+          'Cancelar',
+          keyHint: 'Esc',
+          onPressed: () => Navigator.pop(context),
+        ),
+        DialogAction(
+          widget.buying ? 'Comprar' : 'Vender',
+          primary: true,
+          onPressed: short
+              ? null
+              : () => Navigator.pop<_Trade>(context, (
+                  quantity: _quantity,
+                  unitCp: unit,
+                  totalCp: total,
+                )),
+        ),
+      ],
+    );
+  }
+
+  /// Un campo por moneda, con su abreviatura y su nombre, como en la bolsa
+  /// de la ficha: el precio se lee como plata en la mano.
+  Widget _priceField(String key) {
+    final pal = context.palette;
+    return SizedBox(
+      width: 100,
+      child: TextField(
+        key: ValueKey('price-$key'),
+        controller: _price[key],
+        keyboardType: TextInputType.number,
+        textAlign: TextAlign.end,
+        onChanged: (_) => setState(() {}),
+        style: const TextStyle(
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+          fontFeatures: [FontFeature.tabularFigures()],
+        ),
+        decoration: InputDecoration(
+          isDense: true,
+          filled: true,
+          fillColor: pal.plaque,
+          labelText: '${coinLabels[key]!.toUpperCase()} · ${_coinNames[key]}',
+          border: const OutlineInputBorder(),
+        ),
+      ),
     );
   }
 }

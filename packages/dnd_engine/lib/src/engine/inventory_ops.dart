@@ -350,7 +350,7 @@ class InventoryOps {
     return _ledger(
       bought,
       at,
-      'Compra: ${_units(quantity, item)} · ${formatCost(total)}',
+      'Compra: ${_units(quantity, item)} · ${CoinOps.formatAmount(total)}',
     );
   }
 
@@ -374,7 +374,7 @@ class InventoryOps {
       without.copyWith(coins: CoinOps.receive(without.coins, total)),
       at,
       'Venta: ${_units(sold, resolve(entry, repo))} · '
-      '${formatCost(total)}',
+      '${CoinOps.formatAmount(total)}',
     );
   }
 

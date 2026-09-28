@@ -461,6 +461,108 @@ void main() {
       expect(attack.abilityUsed, Ability.charisma);
     });
 
+    testWidgets('comprar paga de la bolsa, anota en Cuentas y se deshace', (
+      tester,
+    ) async {
+      final espada = repo.weapon('longsword')!;
+      final controller = await pumpSheet(
+        tester,
+        mochilera().copyWith(coins: const {'gp': 50}),
+      );
+      await tester.tap(find.text('Inventario'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Agregar objeto'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).last, espada.name);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('buy-longsword')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Comprar ${espada.name}'), findsOneWidget);
+      // `.last`: el catálogo sigue abierto debajo, con sus propios «Comprar».
+      await tester.tap(dialogAction('Comprar').last);
+      await tester.pumpAndSettle();
+
+      final despues = saved(controller);
+      expect(CoinOps.totalCp(despues.coins), 5000 - espada.costCp);
+      expect(despues.inventory.single.itemId, 'longsword');
+      expect(despues.diary.single.entryId, InventoryOps.ledgerEntryId);
+      // El catálogo se cierra para que «Deshacer» quede a mano.
+      expect(find.text('Agregar objeto'), findsOneWidget);
+      // Los campos de la bolsa se ponen al día: si no, el próximo toque
+      // afuera guardaría los 50 po viejos encima de la compra.
+      final oro = tester.widget<TextField>(
+        find.byKey(const ValueKey('coin-gp')),
+      );
+      expect(oro.controller!.text, '${despues.coins['gp']}');
+
+      await tester.tap(find.text('Deshacer'));
+      await tester.pumpAndSettle();
+      expect(saved(controller).coins, {'gp': 50});
+      expect(saved(controller).inventory, isEmpty);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('sin fondos, Comprar no se puede tocar y dice cuánto falta', (
+      tester,
+    ) async {
+      final placas = repo.armorPiece('plate')!;
+      await pumpSheet(tester, mochilera().copyWith(coins: const {'gp': 1}));
+      await tester.tap(find.text('Inventario'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Agregar objeto'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).last, placas.name);
+      await tester.pumpAndSettle();
+
+      final comprar = tester.widget<OutlinedButton>(
+        find.byKey(const ValueKey('buy-plate')),
+      );
+      expect(comprar.onPressed, isNull);
+      expect(
+        find.textContaining(
+          'te faltan ${CoinOps.formatAmount(placas.costCp - 100)}',
+        ),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('vender cobra la mitad sugerida y se puede deshacer', (
+      tester,
+    ) async {
+      final espada = repo.weapon('longsword')!;
+      final controller = await pumpSheet(
+        tester,
+        mochilera().copyWith(
+          coins: const {'gp': 1},
+          inventory: const [
+            InventoryEntry(entryId: 'e1', itemId: 'longsword', quantity: 2),
+          ],
+        ),
+      );
+      await tester.tap(find.text('Inventario'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Acciones de ${espada.name}'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Vender…'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Vender ${espada.name}'), findsOneWidget);
+      await tester.tap(dialogAction('Vender'));
+      await tester.pumpAndSettle();
+
+      final despues = saved(controller);
+      expect(CoinOps.totalCp(despues.coins), 100 + espada.costCp ~/ 2);
+      expect(despues.inventory.single.quantity, 1);
+
+      await tester.tap(find.text('Deshacer'));
+      await tester.pumpAndSettle();
+      expect(saved(controller).inventory.single.quantity, 2);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('agregar y equipar una armadura mueve la CA y la carga', (
       tester,
     ) async {

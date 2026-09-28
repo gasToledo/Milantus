@@ -355,14 +355,45 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
-## [Unreleased]
+## [0.18.0+1] - 2026-09-28
 
 ### Nuevo
 
-- Sin cambios.
+- Comprar y vender con las monedas de la ficha. En «Agregar objeto» cada
+  fila suma «Comprar» junto a «Agregar» (que sigue siendo gratis, para el
+  botín), y arriba se ve la bolsa. Comprar pide la cantidad y el precio —el
+  del catálogo, corregible en po · pp · pc—, muestra qué monedas salen, el
+  vuelto y cómo queda la bolsa, y si no alcanza se deshabilita diciendo
+  cuánto falta. «Vender…», en el menú de cada objeto, sugiere la mitad del
+  precio. Las dos se deshacen desde el cartel y quedan anotadas en una
+  entrada «Cuentas» del Diario, que se crea sola.
+- Imponer las Manos es una reserva en Combate: 5 × nivel de Paladín, que se
+  ve como «restantes / máximo» y se gasta o recupera en cantidades. Era solo
+  texto.
 
 ### Modificado
 
+- Un personaje de nivel 20 ya no puede subir a 21: la flecha de la barra y
+  el ítem del panel dicen «Nivel máximo».
+- El resumen de la subida de nivel ya no anuncia «Estilo de Combate — ELEGÍS
+  VOS» en cada nivel cuando no hay nada que elegir; solo cuando falta elegir
+  o se puede revisar. Una mejora de características completa ya no muestra
+  en rojo «Elegí una dote para continuar».
+- El Aura de Protección suma el mod. de Carisma (mínimo +1) a todas las
+  salvaciones, y los Golpes Radiantes suman 1d8 radiante a las armas cuerpo
+  a cuerpo, en la ficha y en la vista del DM. Las Auras de Entrega y de
+  Coraje figuran en «Inmunidades».
+- El estado hechizado dice «Hechizado» también en «Inmunidades», donde decía
+  «Encantado».
+- Don de la Fortaleza y Bendición de Siberys aparecen con su nombre en
+  «Rasgos y dotes»; figuraban como «Mejora de Característica», que es otra
+  dote. Maestro de Armas y Marca Dracónica Potente ya no repiten su +1 como
+  un rasgo más.
+- Don del Ataque Imparable ofrece su +1 solo en Fuerza o Destreza, y Don del
+  Recuerdo de Conjuros solo en Inteligencia, Sabiduría o Carisma, como dice
+  su texto. La ficha avisa si una elección anterior quedó en otra.
+- La revisión de la subida de nivel dice «Recurso» para el Ataque de Aliento;
+  decía «Recurso de clase».
 - Las fichas de una sola clase guardadas antes de la multiclase ya no avisan
   que su Estilo de Combate «no se puede elegir más de una vez» ni que tienen
   elecciones de «un rasgo que ya no tenés». La migración había dejado una
@@ -391,6 +422,20 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 - Un montón de armas equipado es un ataque y un arma en la mano: ocho
   jabalinas eran ocho filas iguales en Ataques. Las armas ligeras siguen
   contando hasta dos, una por mano.
+
+### Eliminado
+
+- Sin cambios.
+
+## [Unreleased]
+
+### Nuevo
+
+- Sin cambios.
+
+### Modificado
+
+- Sin cambios.
 
 ### Eliminado
 
