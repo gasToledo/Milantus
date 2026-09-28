@@ -458,7 +458,14 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
-- Sin cambios.
+- En la creación, «Compras» pide elegir primero las opciones de equipo en vez
+  de decir que no traen oro, y el catálogo ya no ofrece objetos mágicos.
+- Un monto en cero se lee «0 po» en vez de «0 pc».
+- En ancho de teléfono, el catálogo de objetos muestra los filtros en un solo
+  renglón que se desliza, y los objetos sin peso ya no muestran una raya
+  suelta entre los datos.
+- El equipo recibido en la creación se pone solo hasta llenar las dos manos:
+  el Guerrero ya no nace empuñando cuatro armas a la vez.
 
 ### Eliminado
 

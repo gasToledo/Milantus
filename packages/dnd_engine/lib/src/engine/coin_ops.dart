@@ -97,7 +97,8 @@ class CoinOps {
   /// de tabla en una sola denominación («75 pp»): un total se cuenta en la
   /// mano como se cobra.
   static String formatAmount(int cp) {
-    if (cp <= 0) return '0 ${coinLabels['cp']}';
+    // «0 pc» se leía como una cuenta en cobre; «0 po» dice que no hay oro.
+    if (cp <= 0) return '0 ${coinLabels['gp']}';
     return [
       for (final e in changeFor(cp).entries) '${e.value} ${coinLabels[e.key]}',
     ].join(' ');

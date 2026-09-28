@@ -621,14 +621,20 @@ class CreationDraft {
       ..sort((a, b) => b.baseAc.compareTo(a.baseAc));
     equippedArmorId = body.firstOrNull?.id;
     shieldEquipped = armors.any((a) => a.isShield);
-    weaponIds
-      ..clear()
-      ..addAll([
-        for (final id in received)
-          if (repo.weapon(id) case final w?
-              when w.isProficientWith(sheet.weaponProficiencies))
-            id,
-      ]);
+    // Solo lo que cabe en dos manos, en el orden del paquete: el Guerrero
+    // nacía empuñando mandoble, mangual, jabalinas y hachas a la vez. El
+    // escudo ocupa una; el resto se recibe y queda en la mochila.
+    var hands = shieldEquipped ? 1 : 2;
+    weaponIds.clear();
+    for (final id in received) {
+      if (repo.weapon(id) case final w?
+          when w.isProficientWith(sheet.weaponProficiencies)) {
+        final need = w.requiresTwoHands() ? 2 : 1;
+        if (need > hands) continue;
+        weaponIds.add(id);
+        hands -= need;
+      }
+    }
   }
 
   /// Armas con las que la clase elegida es competente. La Maestría de Armas

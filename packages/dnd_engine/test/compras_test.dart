@@ -73,7 +73,7 @@ void main() {
 
     test('los montos se leen en oro, plata y cobre', () {
       expect(CoinOps.formatAmount(750), '7 po 5 pp');
-      expect(CoinOps.formatAmount(0), '0 pc');
+      expect(CoinOps.formatAmount(0), '0 po');
       expect(CoinOps.formatCoins({'gp': 3, 'pp': 1, 'cp': 0}), '1 ppt, 3 po');
     });
 

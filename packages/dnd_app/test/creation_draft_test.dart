@@ -1054,4 +1054,38 @@ void main() {
       expect(back.purchases, {'longsword': 2});
     });
   });
+
+  group('Armas puestas por defecto', () {
+    CreationDraft conPaquete(String classId) {
+      final d = CreationDraft(repo)
+        ..classId = classId
+        ..raceId = 'human'
+        ..backgroundId = 'noble';
+      d.assignedScores.addAll({for (final a in Ability.values) a: 12});
+      d.classEquipmentOptionId = d.klass!.startingEquipment.first.id;
+      d.pruneEquipment();
+      return d;
+    }
+
+    List<String> armasDelPaquete(CreationDraft d) => [
+      for (final id in d.receivedItemIds)
+        if (repo.weapon(id) != null) id,
+    ];
+
+    test('un arma a dos manos ocupa las dos: el resto queda en la mochila', () {
+      final d = conPaquete('fighter');
+      final dosManos = armasDelPaquete(
+        d,
+      ).where((id) => repo.weapon(id)!.requiresTwoHands()).first;
+      expect(armasDelPaquete(d).length, greaterThan(1));
+      expect(d.weaponIds, [dosManos]);
+    });
+
+    test('con escudo queda una mano para un arma', () {
+      final d = conPaquete('paladin');
+      expect(d.shieldEquipped, isTrue);
+      expect(d.weaponIds, hasLength(1));
+      expect(armasDelPaquete(d).length, greaterThan(1));
+    });
+  });
 }

@@ -101,6 +101,11 @@ class ItemCatalogDialog extends StatefulWidget {
   /// Texto al pie, antes de agregar nada.
   final String hint;
 
+  /// False esconde los objetos mágicos. En la creación no se compran: el oro
+  /// de partida no llega ni al más barato, y una Armadura de placas de
+  /// etereidad a 200000 po entre las mochilas solo estorba.
+  final bool includeMagic;
+
   const ItemCatalogDialog({
     super.key,
     required this.repo,
@@ -111,6 +116,7 @@ class ItemCatalogDialog extends StatefulWidget {
     this.onAdd,
     this.countOf,
     this.hint = '',
+    this.includeMagic = true,
   });
 
   @override
@@ -153,18 +159,19 @@ class _ItemCatalogDialogState extends State<ItemCatalogDialog> {
           costCp: a.costCp,
         ),
       for (final i in repo.itemsSorted)
-        (
-          id: i.id,
-          name: i.name,
-          family: itemKindLabel('item', itemFamily(i)),
-          detail: [
-            itemKindLabel('item', itemFamily(i)),
-            if (i.bundleSize > 1) 'paquete de ${i.bundleSize}',
-            if (i.requiresAttunement) 'sintonización',
-          ].join(' · '),
-          weight: i.weight,
-          costCp: i.costCp,
-        ),
+        if (widget.includeMagic || !i.isMagic)
+          (
+            id: i.id,
+            name: i.name,
+            family: itemKindLabel('item', itemFamily(i)),
+            detail: [
+              itemKindLabel('item', itemFamily(i)),
+              if (i.bundleSize > 1) 'paquete de ${i.bundleSize}',
+              if (i.requiresAttunement) 'sintonización',
+            ].join(' · '),
+            weight: i.weight,
+            costCp: i.costCp,
+          ),
     ];
   }
 
@@ -251,7 +258,9 @@ class _ItemCatalogDialogState extends State<ItemCatalogDialog> {
             Text(
               [
                 e.detail,
-                if (narrow) weight,
+                // Angosto, sin la columna que lo alinee, la raya de «sin
+                // peso» quedaba suelta entre los datos.
+                if (narrow && e.weight > 0) weight,
                 if (missing > 0) 'te faltan ${CoinOps.formatAmount(missing)}',
               ].join(' · '),
               style: TextStyle(fontSize: 11.5, color: muted),
@@ -337,12 +346,9 @@ class _ItemCatalogDialogState extends State<ItemCatalogDialog> {
               onChanged: (v) => setState(() => _query = v),
             ),
             const SizedBox(height: 10),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Wrap(
-                spacing: 6,
-                runSpacing: 6,
-                children: [
+            LayoutBuilder(
+              builder: (context, box) {
+                final chips = [
                   for (final family in [
                     itemFilterAll,
                     ...itemGroupTitles.keys.where(families.contains),
@@ -359,8 +365,28 @@ class _ItemCatalogDialogState extends State<ItemCatalogDialog> {
                       visualDensity: VisualDensity.compact,
                       onSelected: (_) => setState(() => _family = family),
                     ),
-                ],
-              ),
+                ];
+                // En un teléfono las píldoras envueltas ocupaban cuatro
+                // renglones, la mitad del diálogo, y de la lista quedaban dos
+                // filas: ahí van en un solo renglón que se desliza.
+                if (box.maxWidth < 460) {
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        for (final (i, chip) in chips.indexed) ...[
+                          if (i > 0) const SizedBox(width: 6),
+                          chip,
+                        ],
+                      ],
+                    ),
+                  );
+                }
+                return Align(
+                  alignment: Alignment.centerLeft,
+                  child: Wrap(spacing: 6, runSpacing: 6, children: chips),
+                );
+              },
             ),
             const SizedBox(height: 10),
             Expanded(

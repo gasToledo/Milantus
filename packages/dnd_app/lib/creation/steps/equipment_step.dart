@@ -234,6 +234,7 @@ class _PurchasesSection extends StatelessWidget {
         onChanged();
         return false;
       },
+      includeMagic: false,
     ),
   );
 
@@ -243,6 +244,28 @@ class _PurchasesSection extends StatelessWidget {
     final muted = Theme.of(context).colorScheme.onSurfaceVariant;
     final granted = CoinOps.totalCp(draft.grantedCoins);
     final left = draft.goldLeftCp;
+
+    // Sin opciones elegidas todavía no se sabe cuánto oro hay: «Quedan 0 po»
+    // y «no traen oro» decían algo falso de un paquete que nadie eligió.
+    final unchosen =
+        (draft.classEquipmentOption == null &&
+            (draft.klass?.startingEquipment ?? const []).isNotEmpty) ||
+        (draft.backgroundEquipmentOption == null &&
+            (draft.background?.startingEquipment ?? const []).isNotEmpty);
+    if (granted == 0 && unchosen && draft.purchases.isEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const _SectionHeader(title: 'Compras'),
+          const SizedBox(height: 12),
+          Text(
+            'Primero elegí las opciones de equipo: el oro para comprar sale '
+            'de ahí.',
+            style: TextStyle(fontSize: 13, height: 1.5, color: muted),
+          ),
+        ],
+      );
+    }
 
     Widget plaque(String label, String value, {bool highlight = false}) =>
         Expanded(

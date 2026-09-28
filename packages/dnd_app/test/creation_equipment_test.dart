@@ -117,6 +117,10 @@ void main() {
       await tester.pumpAndSettle();
     }
 
+    // Sin opciones elegidas no hay oro que contar todavía.
+    expect(find.textContaining('Primero elegí las opciones'), findsOneWidget);
+    expect(find.byKey(const ValueKey('open-shop')), findsNothing);
+
     await pickStartingOption('starting-equipment-clase', 'Opción A');
     // La opción monetaria evita elecciones internas del trasfondo: estos tests
     // verifican el equipo de clase y no necesitan resolver el juego de Soldado.
@@ -291,6 +295,12 @@ void main() {
         oroDe(repo.backgrounds['soldier']!.startingEquipment, 'B');
     final quedabaTexto = 'Quedan ${CoinOps.formatAmount(oro)}';
     expect(find.text(quedabaTexto), findsWidgets);
+
+    // Los mágicos no se ofrecen: ninguno se paga con el oro de partida.
+    final magico = repo.itemsSorted.firstWhere((i) => i.isMagic);
+    await tester.enterText(find.byType(TextField).last, magico.name);
+    await tester.pumpAndSettle();
+    expect(find.text('Sin coincidencias.'), findsOneWidget);
 
     await tester.enterText(find.byType(TextField).last, escudo.name);
     await tester.pumpAndSettle();
