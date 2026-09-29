@@ -2,6 +2,7 @@ import 'package:dnd_engine/dnd_engine.dart';
 import 'package:flutter/material.dart';
 
 import '../../theme/app_widgets.dart';
+import '../../l10n/l10n_context.dart';
 
 /// Escribir o corregir una nota del Cuaderno.
 ///
@@ -65,7 +66,7 @@ class _NoteEditorDialogState extends State<_NoteEditorDialog> {
     final title = _title.text.trim();
     // Misma regla que hace cumplir el servidor: sin título no se guarda.
     if (title.isEmpty) {
-      setState(() => _titleError = 'Poné un título para guardarla.');
+      setState(() => _titleError = context.l10n.dmNoteTitleRequired);
       return;
     }
     Navigator.of(context).pop(
@@ -89,13 +90,13 @@ class _NoteEditorDialogState extends State<_NoteEditorDialog> {
           DropdownButtonFormField<String>(
             initialValue: _chapterId,
             isExpanded: true,
-            decoration: const InputDecoration(labelText: 'Capítulo'),
+            decoration: InputDecoration(labelText: context.l10n.dmChapter),
             items: [
               for (final chapter in widget.chapters)
                 DropdownMenuItem(
                   value: chapter.id,
                   child: Text(
-                    '${chapter.name} · ${chapter.state.label}',
+                    '${chapter.name} · ${chapter.state.localized(context)}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -108,10 +109,10 @@ class _NoteEditorDialogState extends State<_NoteEditorDialog> {
             controller: _title,
             autofocus: true,
             decoration: InputDecoration(
-              labelText: 'Título',
+              labelText: context.l10n.diaryTitleLabel,
               // El título es campo aparte y no la primera línea del texto
               // porque es lo que se ve con la nota plegada y al buscar.
-              helperText: 'Es lo que se ve en el listado y al buscar.',
+              helperText: context.l10n.dmNoteTitleHelper,
               errorText: _titleError,
             ),
             onChanged: (_) {
@@ -124,8 +125,8 @@ class _NoteEditorDialogState extends State<_NoteEditorDialog> {
             controller: _body,
             minLines: 5,
             maxLines: 10,
-            decoration: const InputDecoration(
-              labelText: 'Nota',
+            decoration: InputDecoration(
+              labelText: context.l10n.invNoteTitle,
               alignLabelWithHint: true,
             ),
           ),
@@ -133,11 +134,11 @@ class _NoteEditorDialogState extends State<_NoteEditorDialog> {
       ),
       actions: [
         DialogAction(
-          'Cancelar',
+          context.l10n.commonCancel,
           keyHint: 'Esc',
           onPressed: () => Navigator.of(context).pop(),
         ),
-        DialogAction('Guardar', primary: true, onPressed: _save),
+        DialogAction(context.l10n.commonSave, primary: true, onPressed: _save),
       ],
     );
   }

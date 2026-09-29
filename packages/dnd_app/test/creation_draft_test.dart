@@ -1,3 +1,4 @@
+import 'fakes/localized_app.dart';
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:dnd_app/creation/creation_draft.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -91,7 +92,7 @@ void main() {
     test('la Pericia pendiente bloquea el paso de aptitudes', () {
       final d = rogue();
       expect(
-        d.pendingFor(CreationStep.aptitudes),
+        d.pendingFor(CreationStep.aptitudes, l10nEs),
         contains('Pericias pendientes: 2.'),
       );
 
@@ -101,7 +102,7 @@ void main() {
       ];
       expect(
         d
-            .pendingFor(CreationStep.aptitudes)
+            .pendingFor(CreationStep.aptitudes, l10nEs)
             .where((b) => b.contains('Pericia')),
         isEmpty,
       );
@@ -144,12 +145,17 @@ void main() {
     test('los dos del origen bloquean el paso de aptitudes', () {
       final d = picaro();
       expect(d.pendingLanguages, 2);
-      expect(d.pendingFor(CreationStep.aptitudes), contains('Idiomas: 0/2.'));
+      expect(
+        d.pendingFor(CreationStep.aptitudes, l10nEs),
+        contains('Idiomas: 0/2.'),
+      );
 
       d.languages.addAll(['goblin', 'orc']);
       expect(d.pendingLanguages, 0);
       expect(
-        d.pendingFor(CreationStep.aptitudes).where((b) => b == 'Idiomas: 0/2.'),
+        d
+            .pendingFor(CreationStep.aptitudes, l10nEs)
+            .where((b) => b == 'Idiomas: 0/2.'),
         isEmpty,
       );
     });
@@ -160,7 +166,7 @@ void main() {
       expect(slot.groupId, 'class:rogue:cant-language');
       expect(d.pendingLanguageChoices, 1);
       expect(
-        d.pendingFor(CreationStep.aptitudes),
+        d.pendingFor(CreationStep.aptitudes, l10nEs),
         contains('Idiomas por rasgo pendientes: 1.'),
       );
       // No ofrece lo que ya sabe por el origen ni la propia Jerga.
@@ -286,7 +292,10 @@ void main() {
     // Un trasfondo homebrew no trae equipo y el paso exigía elegirlo igual,
     // con un desplegable vacío: la creación no se podía terminar.
     test('sin equipo inicial no se exige elegirlo', () {
-      final pendientes = casterConCupo().pendingFor(CreationStep.equipo);
+      final pendientes = casterConCupo().pendingFor(
+        CreationStep.equipo,
+        l10nEs,
+      );
       expect(pendientes, isNot(contains('Elegí el equipo de trasfondo.')));
       expect(pendientes, isNot(contains('Elegí el equipo de clase.')));
 
@@ -296,7 +305,7 @@ void main() {
         ..raceId = 'human'
         ..backgroundId = 'soldier';
       expect(
-        oficial.pendingFor(CreationStep.equipo),
+        oficial.pendingFor(CreationStep.equipo, l10nEs),
         containsAll([
           'Elegí el equipo de clase.',
           'Elegí el equipo de trasfondo.',
@@ -307,13 +316,15 @@ void main() {
     test('el cupo pendiente bloquea el paso de equipo', () {
       final d = casterConCupo();
       expect(
-        d.pendingFor(CreationStep.equipo),
+        d.pendingFor(CreationStep.equipo, l10nEs),
         contains('Conjuros a elección: 1.'),
       );
 
       d.spellChoices['g'] = ['uno'];
       expect(
-        d.pendingFor(CreationStep.equipo).where((b) => b.contains('elección')),
+        d
+            .pendingFor(CreationStep.equipo, l10nEs)
+            .where((b) => b.contains('elección')),
         isEmpty,
       );
     });
@@ -381,7 +392,7 @@ void main() {
 
     expect(restored.raceId, 'elf');
     expect(restored.lineageId, isNull);
-    expect(restored.pendingFor(CreationStep.raza), isNotEmpty);
+    expect(restored.pendingFor(CreationStep.raza, l10nEs), isNotEmpty);
   });
 
   test(
@@ -721,23 +732,23 @@ void main() {
   group('pendingFor', () {
     test('Puntuaciones bloquea hasta asignar las 6', () {
       final d = newDraft();
-      expect(d.pendingFor(CreationStep.puntuaciones), isNotEmpty);
+      expect(d.pendingFor(CreationStep.puntuaciones, l10nEs), isNotEmpty);
       const order = [15, 14, 13, 12, 10, 8];
       for (var i = 0; i < Ability.values.length; i++) {
         d.assignScore(Ability.values[i], order[i]);
       }
-      expect(d.pendingFor(CreationStep.puntuaciones), isEmpty);
+      expect(d.pendingFor(CreationStep.puntuaciones, l10nEs), isEmpty);
     });
 
     test('Raza sin linajes ni elección de tamaño solo exige la especie', () {
       // El Enano no tiene linajes y es Mediano y punto. El Humano ya no sirve
       // de ejemplo: además de no tener linajes, elige tamaño.
       final d = newDraft();
-      expect(d.pendingFor(CreationStep.raza), isNotEmpty);
+      expect(d.pendingFor(CreationStep.raza, l10nEs), isNotEmpty);
       d.raceId = 'dwarf';
       expect(d.lineageOptions, isEmpty);
       expect(d.sizeOptions, isEmpty);
-      expect(d.pendingFor(CreationStep.raza), isEmpty);
+      expect(d.pendingFor(CreationStep.raza, l10nEs), isEmpty);
     });
 
     test('Elfo, Gnomo y Tiefling exigen elegir su linaje', () {
@@ -751,25 +762,25 @@ void main() {
         final d = newDraft()..raceId = entry.key;
         expect(d.lineageOptions, hasLength(entry.value.$2));
         expect(
-          d.pendingFor(CreationStep.raza),
+          d.pendingFor(CreationStep.raza, l10nEs),
           contains('Elegí un linaje de especie.'),
         );
 
         d.lineageId = entry.value.$1;
         expect(
-          d.pendingFor(CreationStep.raza),
+          d.pendingFor(CreationStep.raza, l10nEs),
           contains('Elegí la aptitud mágica del linaje.'),
         );
         d.speciesSpellcastingAbility = Ability.charisma;
         // El Tiefling además elige tamaño; el Elfo y el Gnomo no.
         if (d.sizeOptions.isNotEmpty) {
           expect(
-            d.pendingFor(CreationStep.raza),
+            d.pendingFor(CreationStep.raza, l10nEs),
             contains('Elegí el tamaño de la especie.'),
           );
           d.chosenSize = d.sizeOptions.first;
         }
-        expect(d.pendingFor(CreationStep.raza), isEmpty);
+        expect(d.pendingFor(CreationStep.raza, l10nEs), isEmpty);
       }
     });
 
@@ -785,13 +796,13 @@ void main() {
         final d = newDraft()..raceId = entry.key;
         expect(d.lineageOptions, hasLength(entry.value.$2));
         expect(
-          d.pendingFor(CreationStep.raza),
+          d.pendingFor(CreationStep.raza, l10nEs),
           contains('Elegí un linaje de especie.'),
         );
 
         d.lineageId = entry.value.$1;
         expect(d.lineageUsesSpellcastingAbility, isFalse);
-        expect(d.pendingFor(CreationStep.raza), isEmpty);
+        expect(d.pendingFor(CreationStep.raza, l10nEs), isEmpty);
       }
     });
 
@@ -799,18 +810,18 @@ void main() {
       final d = newDraft()..raceId = 'shifter';
       expect(d.lineageOptions, hasLength(4));
       expect(
-        d.pendingFor(CreationStep.raza),
+        d.pendingFor(CreationStep.raza, l10nEs),
         contains('Elegí un linaje de especie.'),
       );
 
       d.lineageId = 'shifter-wildhunt';
       expect(
-        d.pendingFor(CreationStep.raza),
+        d.pendingFor(CreationStep.raza, l10nEs),
         contains('Elegí el tamaño de la especie.'),
       );
       d.chosenSize = 'Pequeño';
       expect(d.lineageUsesSpellcastingAbility, isFalse);
-      expect(d.pendingFor(CreationStep.raza), isEmpty);
+      expect(d.pendingFor(CreationStep.raza, l10nEs), isEmpty);
     });
 
     test('Clase arranca sin elegir y lo pide', () {
@@ -819,14 +830,14 @@ void main() {
       final d = newDraft();
       expect(d.classId, isNull);
       expect(d.klass, isNull);
-      expect(d.pendingFor(CreationStep.clase), ['Elegí una clase.']);
+      expect(d.pendingFor(CreationStep.clase, l10nEs), ['Elegí una clase.']);
     });
 
     test('Clase (Guerrero) exige estilo de combate y maestrías', () {
       final d = newDraft()..classId = 'fighter';
-      expect(d.pendingFor(CreationStep.clase), isNotEmpty);
+      expect(d.pendingFor(CreationStep.clase, l10nEs), isNotEmpty);
       completeClase(d);
-      expect(d.pendingFor(CreationStep.clase), isEmpty);
+      expect(d.pendingFor(CreationStep.clase, l10nEs), isEmpty);
     });
 
     test('Clase (Brujo) exige la invocación de nivel 1', () {
@@ -837,10 +848,10 @@ void main() {
       final slot = d.featureChoiceSlots.single;
       expect(slot.groupId, 'warlock-invocation');
       expect(slot.count, 1);
-      expect(d.pendingFor(CreationStep.clase), isNotEmpty);
+      expect(d.pendingFor(CreationStep.clase, l10nEs), isNotEmpty);
 
       d.featureChoices['warlock-invocation'] = ['pact-of-the-tome'];
-      expect(d.pendingFor(CreationStep.clase), isEmpty);
+      expect(d.pendingFor(CreationStep.clase, l10nEs), isEmpty);
 
       // Y la elección llega al personaje construido.
       expect(d.build().featureChoices['warlock-invocation'], [
@@ -859,7 +870,7 @@ void main() {
         ..classId = 'warlock'
         ..featureChoices.clear();
       expect(d.featureChoiceSlots.single.groupId, 'warlock-invocation');
-      expect(d.pendingFor(CreationStep.clase), isNotEmpty);
+      expect(d.pendingFor(CreationStep.clase, l10nEs), isNotEmpty);
     });
 
     test('Aptitudes exige las habilidades y la dote de origen', () {
@@ -867,7 +878,7 @@ void main() {
       final race = repo.races.values.first;
       d.raceId = race.id;
       // Guerrero elige 2 habilidades de clase: el paso arranca pendiente.
-      expect(d.pendingFor(CreationStep.aptitudes), isNotEmpty);
+      expect(d.pendingFor(CreationStep.aptitudes, l10nEs), isNotEmpty);
       d.classSkills.addAll(['perception', 'survival']);
       // Algunas especies eligen "de cualquier lista" (skillChoiceFrom vacío).
       final pickable = race.skillChoiceFrom.isEmpty
@@ -877,15 +888,15 @@ void main() {
         d.raceSkills.add(s);
       }
       if (race.effects.any((e) => e is GrantFeatEffect)) {
-        expect(d.pendingFor(CreationStep.aptitudes), isNotEmpty);
+        expect(d.pendingFor(CreationStep.aptitudes, l10nEs), isNotEmpty);
         d.raceFeatId = repo.feats.values
             .firstWhere((f) => f.category == 'origin')
             .id;
       }
       // Los dos idiomas del origen también son parte de este paso.
-      expect(d.pendingFor(CreationStep.aptitudes), isNotEmpty);
+      expect(d.pendingFor(CreationStep.aptitudes, l10nEs), isNotEmpty);
       d.languages.addAll(['goblin', 'orc']);
-      expect(d.pendingFor(CreationStep.aptitudes), isEmpty);
+      expect(d.pendingFor(CreationStep.aptitudes, l10nEs), isEmpty);
     });
 
     test('Equipo exige paquetes; Detalles y Resumen no bloquean', () {
@@ -893,13 +904,13 @@ void main() {
         ..classId =
             'fighter' // no lanza conjuros
         ..backgroundId = 'soldier';
-      expect(d.pendingFor(CreationStep.equipo), isNotEmpty);
+      expect(d.pendingFor(CreationStep.equipo, l10nEs), isNotEmpty);
       d
         ..classEquipmentOptionId = 'C'
         ..backgroundEquipmentOptionId = 'B';
-      expect(d.pendingFor(CreationStep.equipo), isEmpty);
-      expect(d.pendingFor(CreationStep.detalles), isEmpty);
-      expect(d.pendingFor(CreationStep.resumen), isEmpty);
+      expect(d.pendingFor(CreationStep.equipo, l10nEs), isEmpty);
+      expect(d.pendingFor(CreationStep.detalles, l10nEs), isEmpty);
+      expect(d.pendingFor(CreationStep.resumen, l10nEs), isEmpty);
     });
 
     test(
@@ -912,11 +923,11 @@ void main() {
         // Otro origen ya tomó todas las opciones de clase menos una: queda 1 < 2.
         d.raceSkills.addAll(from.take(from.length - 1));
         // Con 0/2 elegidas pero solo 1 elegible, todavía debe pedir esa 1.
-        expect(d.pendingFor(CreationStep.aptitudes), isNotEmpty);
+        expect(d.pendingFor(CreationStep.aptitudes, l10nEs), isNotEmpty);
         // Elegida la única disponible, el gate se satisface (no exige el 2.º).
         d.classSkills.add(from.last);
         d.languages.addAll(['goblin', 'orc']);
-        expect(d.pendingFor(CreationStep.aptitudes), isEmpty);
+        expect(d.pendingFor(CreationStep.aptitudes, l10nEs), isEmpty);
       },
     );
   });
@@ -943,7 +954,7 @@ void main() {
       // Una especie que no pide nada más: el orden del catálogo no garantiza
       // que la primera esté completa con solo elegirla (Aasimar elige tamaño).
       d.raceId = 'dwarf';
-      expect(d.pendingFor(CreationStep.raza), isEmpty);
+      expect(d.pendingFor(CreationStep.raza, l10nEs), isEmpty);
       expect(d.canGoTo(CreationStep.clase), isTrue);
       expect(
         d.canGoTo(CreationStep.trasfondo),
@@ -1033,7 +1044,7 @@ void main() {
         d.buy('chain-mail');
       }
       expect(
-        d.pendingFor(CreationStep.equipo),
+        d.pendingFor(CreationStep.equipo, l10nEs),
         contains(startsWith('Las compras superan el oro de partida')),
       );
       // La bolsa no se paga a medias: queda entera hasta que se ajuste.
@@ -1041,7 +1052,7 @@ void main() {
 
       d.setPurchase('chain-mail', 1);
       expect(
-        d.pendingFor(CreationStep.equipo),
+        d.pendingFor(CreationStep.equipo, l10nEs),
         isNot(contains(startsWith('Las compras superan'))),
       );
     });

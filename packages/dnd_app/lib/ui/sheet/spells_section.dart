@@ -50,7 +50,7 @@ extension _SheetSpellsSection on _SheetScreenState {
 
     return sheetCard(
       icon: Icons.auto_stories,
-      title: 'Conjuros',
+      title: context.l10n.spellsTitle,
       trailing: sc == null || sheetArg.spellcastingBlocks.length > 1
           ? null
           : TextButton.icon(
@@ -58,8 +58,8 @@ extension _SheetSpellsSection on _SheetScreenState {
               icon: const Icon(Icons.edit, size: 16),
               label: Text(
                 sc.preparation == SpellPreparation.prepared
-                    ? 'Preparar'
-                    : 'Editar',
+                    ? context.l10n.spellsPrepare
+                    : context.l10n.commonEdit,
               ),
             ),
       child: Padding(
@@ -72,17 +72,15 @@ extension _SheetSpellsSection on _SheetScreenState {
                 children: [
                   Expanded(
                     child: StatPlaque(
-                      label: 'CD SALV.',
+                      label: context.l10n.spellsSaveDcShort,
                       value: '${sc.saveDc}',
-                      semantics:
-                          'Clase de dificultad de las salvaciones contra tus '
-                          'conjuros: ${sc.saveDc}',
+                      semantics: context.l10n.spellsSaveDcSemantics(sc.saveDc),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: StatPlaque(
-                      label: 'ATAQUE',
+                      label: context.l10n.spellsAttackUpper,
                       value:
                           '${sc.attackBonus >= 0 ? '+' : ''}${sc.attackBonus}',
                     ),
@@ -92,9 +90,11 @@ extension _SheetSpellsSection on _SheetScreenState {
                     // La placa muestra la abreviatura porque el ancho es un
                     // tercio de la fila; dicha en voz alta no se entiende.
                     child: StatPlaque(
-                      label: 'APTITUD',
+                      label: context.l10n.spellsAbilityUpper,
                       value: sc.ability.abbr,
-                      semantics: 'Aptitud mágica: ${sc.ability.label}',
+                      semantics: context.l10n.spellsAbilitySemantics(
+                        sc.ability.label,
+                      ),
                     ),
                   ),
                 ],
@@ -103,16 +103,22 @@ extension _SheetSpellsSection on _SheetScreenState {
               Text(
                 [
                   sc.preparation == SpellPreparation.prepared
-                      ? 'Preparados: ${spellIds.length} / ${sc.preparedCount}'
-                      : 'Conocidos: ${spellIds.length}',
+                      ? context.l10n.spellsPrepared(
+                          spellIds.length,
+                          sc.preparedCount,
+                        )
+                      : context.l10n.spellsKnown(spellIds.length),
                   if (sc.cantripsKnown > 0)
-                    'Trucos: ${cantrips.length} / ${sc.cantripsKnown}',
+                    context.l10n.spellsCantrips(
+                      cantrips.length,
+                      sc.cantripsKnown,
+                    ),
                 ].join(' · '),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               if (sheetArg.spellcastingBlocks.length > 1) ...[
                 const SizedBox(height: 12),
-                const Eyebrow('Fuentes de lanzamiento'),
+                Eyebrow(context.l10n.spellsSources),
                 DenseRows(
                   children: [
                     for (final block in sheetArg.spellcastingBlocks)
@@ -124,16 +130,23 @@ extension _SheetSpellsSection on _SheetScreenState {
                               block.classId,
                         ),
                         subtitle: Text(
-                          '${block.classLevel}° nivel · '
-                          '${block.spellcasting.ability.label} · '
-                          '${block.spellcasting.preparation == SpellPreparation.prepared ? 'preparados' : 'conocidos'}',
+                          block.spellcasting.preparation ==
+                                  SpellPreparation.prepared
+                              ? context.l10n.spellsSourcePrepared(
+                                  block.classLevel,
+                                  block.spellcasting.ability.label,
+                                )
+                              : context.l10n.spellsSourceKnown(
+                                  block.classLevel,
+                                  block.spellcasting.ability.label,
+                                ),
                         ),
                         trailing: TextButton(
                           onPressed: () => _openSpellEditor(
                             block.spellcasting,
                             classId: block.classId,
                           ),
-                          child: const Text('Editar'),
+                          child: Text(context.l10n.commonEdit),
                         ),
                       ),
                   ],
@@ -154,7 +167,7 @@ extension _SheetSpellsSection on _SheetScreenState {
               if (sc != null) const SizedBox(height: 20),
               // No solo de especie: desde las invocaciones del Brujo también
               // los concede una elección abierta.
-              const Eyebrow('Conjuros de rasgos'),
+              Eyebrow(context.l10n.spellsFromFeatures),
               const SizedBox(height: 6),
               DenseRows(
                 children: [
@@ -185,7 +198,7 @@ extension _SheetSpellsSection on _SheetScreenState {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'En forma de ${beast.name} no podés lanzar conjuros.',
+                        context.l10n.spellsWildShapeBlock(beast.name),
                       ),
                     ),
                   ],
@@ -210,14 +223,16 @@ extension _SheetSpellsSection on _SheetScreenState {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Concentrándote en ${combat.concentratingOn}',
+                        context.l10n.spellsConcentratingOn(
+                          combat.concentratingOn!,
+                        ),
                       ),
                     ),
                     TextButton(
                       onPressed: () => _mutateCombat(
                         () => CombatOps.endConcentration(combat),
                       ),
-                      child: const Text('Terminar'),
+                      child: Text(context.l10n.spellsEndConcentration),
                     ),
                   ],
                 ),
@@ -226,7 +241,7 @@ extension _SheetSpellsSection on _SheetScreenState {
 
             if (slotLevels.isNotEmpty) ...[
               const SizedBox(height: 20),
-              const Eyebrow('Espacios de conjuro'),
+              Eyebrow(context.l10n.spellsSlots),
               DenseRows(
                 children: [for (final lv in slotLevels) _slotRow(sc!, lv)],
               ),
@@ -236,7 +251,7 @@ extension _SheetSpellsSection on _SheetScreenState {
               (b) => b.spellcasting.progression == CasterProgression.pact,
             )) ...[
               const SizedBox(height: 20),
-              const Eyebrow('Espacios de Pacto'),
+              Eyebrow(context.l10n.spellsPactSlots),
               DenseRows(
                 children: [
                   for (final lv in block.spellcasting.slotsByLevel.keys)
@@ -247,17 +262,16 @@ extension _SheetSpellsSection on _SheetScreenState {
 
             if (cantrips.isNotEmpty) ...[
               const SizedBox(height: 20),
-              const Eyebrow('Trucos'),
+              Eyebrow(context.l10n.spellsCantripsTitle),
               DenseRows(children: [for (final s in cantrips) _spellRow(s)]),
             ],
 
             if (alwaysPrepared.isNotEmpty) ...[
               const SizedBox(height: 20),
-              const Eyebrow('Siempre preparados'),
+              Eyebrow(context.l10n.spellsAlwaysPrepared),
               const SizedBox(height: 6),
               Text(
-                'Los concede un rasgo y no ocupan cupo: se lanzan con tus '
-                'espacios de conjuro como cualquier preparado.',
+                context.l10n.spellsAlwaysPreparedHint,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               DenseRows(
@@ -269,8 +283,8 @@ extension _SheetSpellsSection on _SheetScreenState {
               const SizedBox(height: 20),
               Eyebrow(
                 sc!.preparation == SpellPreparation.prepared
-                    ? 'Conjuros preparados'
-                    : 'Conjuros conocidos',
+                    ? context.l10n.spellsPreparedTitle
+                    : context.l10n.spellsKnownTitle,
               ),
               DenseRows(children: [for (final s in spells) _spellRow(s)]),
             ],
@@ -282,7 +296,7 @@ extension _SheetSpellsSection on _SheetScreenState {
                 sheet.innateSpells.isEmpty) ...[
               const SizedBox(height: 20),
               Text(
-                'Todavía no elegiste conjuros. Editá al subir de nivel o al crear.',
+                context.l10n.spellsNoneChosen,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -295,15 +309,15 @@ extension _SheetSpellsSection on _SheetScreenState {
   Widget _innateSpellRow(InnateSpell innate) {
     final spell = repo.spell(innate.spellId);
     final use = switch (innate.use) {
-      InnateSpellUse.atWill => 'A voluntad',
-      InnateSpellUse.oncePerLongRest => '1/descanso largo',
-      InnateSpellUse.oncePerShortRest => '1/descanso corto',
+      InnateSpellUse.atWill => context.l10n.creatureAtWill,
+      InnateSpellUse.oncePerLongRest => context.l10n.spellsUseLongRest,
+      InnateSpellUse.oncePerShortRest => context.l10n.spellsUseShortRest,
       InnateSpellUse.proficiencyBonusPerLongRest =>
-        'Competencia/descanso largo',
+        context.l10n.spellsUseProficiency,
       // El número sale del sheet: la regla es "tantas como tu modificador",
       // y nombrar la característica sin el número obligaba a hacer la cuenta.
       InnateSpellUse.abilityModifierPerLongRest =>
-        '${innate.freeUses}/descanso largo (${innate.ability.abbr})',
+        context.l10n.spellsUseAbilityMod(innate.freeUses, innate.ability.abbr),
     };
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 8, 8, 8),
@@ -338,8 +352,10 @@ extension _SheetSpellsSection on _SheetScreenState {
                     [
                       use,
                       innate.ability.abbr,
-                      'CD ${innate.saveDc}',
-                      'Ataque ${_signed(innate.attackBonus)}',
+                      context.l10n.saveDc(innate.saveDc),
+                      context.l10n.creatureSpellAttack(
+                        _signed(innate.attackBonus),
+                      ),
                       ?_damageBonusText(innate.spellId),
                     ].join(' · '),
                     style: Theme.of(context).textTheme.bodySmall,
@@ -352,13 +368,13 @@ extension _SheetSpellsSection on _SheetScreenState {
             IconButton(
               onPressed: () => _openInnateCantripPicker(innate),
               icon: const Icon(Icons.swap_horiz, size: 20),
-              tooltip: 'Cambiar tras un descanso largo',
+              tooltip: context.l10n.spellsSwapTooltip,
             ),
           if (spell?.concentration == true)
             TextButton(
               key: ValueKey('concentrate-innate-${innate.spellId}'),
               onPressed: () => _concentrate(innate.name),
-              child: const Text('Concentrar'),
+              child: Text(context.l10n.spellsConcentrate),
             ),
         ],
       ),
@@ -384,17 +400,19 @@ extension _SheetSpellsSection on _SheetScreenState {
         if (i.concentration) repo.creature(i.creatureId)?.name ?? i.creatureId,
     ];
     final leaving = dependents.join(', ');
-    final goes = dependents.length == 1 ? 'se va' : 'se van';
 
     // Perder un compañero se pregunta antes; cambiar de conjuro sin nada que
     // dependa de él solo se avisa después, igual que en la invocación.
     if (dependents.isNotEmpty) {
       final ok = await _confirmDialog(
-        'Cortar la concentración',
-        'Concentrarte en $spell termina '
-            '${previous ?? 'tu concentración actual'}, y con ella $goes '
-            '$leaving.',
-        confirmLabel: 'Concentrar igual',
+        context.l10n.spellsCutTitle,
+        context.l10n.spellsCutBody(
+          spell,
+          previous ?? context.l10n.spellsCurrentConcentration,
+          dependents.length,
+          leaving,
+        ),
+        confirmLabel: context.l10n.spellsConcentrateAnyway,
       );
       if (!ok || !mounted) return;
     }
@@ -403,8 +421,13 @@ extension _SheetSpellsSection on _SheetScreenState {
     if (previous != null) {
       _snack(
         dependents.isEmpty
-            ? 'Te concentrás en $spell: dejaste $previous.'
-            : 'Te concentrás en $spell: dejaste $previous y $goes $leaving.',
+            ? context.l10n.spellsSwitched(spell, previous)
+            : context.l10n.spellsSwitchedDeps(
+                spell,
+                previous,
+                dependents.length,
+                leaving,
+              ),
       );
     }
   }
@@ -436,7 +459,9 @@ extension _SheetSpellsSection on _SheetScreenState {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AppDialog(
-        title: 'Cambiar ${granted?.name ?? innate.grantedSpellId}',
+        title: context.l10n.spellsSwapTitle(
+          granted?.name ?? innate.grantedSpellId,
+        ),
         width: 420,
         scrollable: false,
         content: SizedBox(
@@ -445,8 +470,7 @@ extension _SheetSpellsSection on _SheetScreenState {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Al terminar un descanso largo podés cambiarlo por otro truco '
-                'de ${_listNames(innate.replaceableFrom)}.',
+                context.l10n.spellsSwapBody(_listNames(innate.replaceableFrom)),
                 style: Theme.of(dialogContext).textTheme.bodySmall,
               ),
               const SizedBox(height: 12),
@@ -464,7 +488,7 @@ extension _SheetSpellsSection on _SheetScreenState {
                           value: spell.id,
                           title: Text(spell.name),
                           subtitle: spell.id == innate.grantedSpellId
-                              ? const Text('El del rasgo')
+                              ? Text(context.l10n.spellsSwapOriginal)
                               : null,
                         ),
                     ],
@@ -476,7 +500,7 @@ extension _SheetSpellsSection on _SheetScreenState {
         ),
         actions: [
           DialogAction(
-            'Cerrar',
+            context.l10n.commonClose,
             primary: true,
             keyHint: 'Esc',
             onPressed: () => Navigator.of(dialogContext).pop(),
@@ -504,8 +528,13 @@ extension _SheetSpellsSection on _SheetScreenState {
     final names = [
       for (final id in classIds) repo.characterClass(id)?.name ?? id,
     ];
-    if (names.length == 1) return 'la lista de ${names.single}';
-    return '${names.sublist(0, names.length - 1).join(", ")} o ${names.last}';
+    if (names.length == 1) {
+      return context.l10n.spellsListOf(names.single);
+    }
+    return context.l10n.listOr(
+      names.sublist(0, names.length - 1).join(", "),
+      names.last,
+    );
   }
 
   void _openSpellEditor(Spellcasting sc, {String? classId}) {
@@ -546,7 +575,7 @@ extension _SheetSpellsSection on _SheetScreenState {
           SizedBox(
             width: 78,
             child: Text(
-              'Nivel $level',
+              context.l10n.commonLevel(level),
               style: const TextStyle(fontWeight: FontWeight.w500),
             ),
           ),
@@ -564,8 +593,8 @@ extension _SheetSpellsSection on _SheetScreenState {
             style: TextStyle(color: pal.textMuted, fontSize: 12),
           ),
           SpendRecoverButtons(
-            spendTooltip: 'Gastar espacio',
-            recoverTooltip: 'Recuperar espacio',
+            spendTooltip: context.l10n.spellsSpendSlot,
+            recoverTooltip: context.l10n.spellsRecoverSlot,
             onSpend: remaining <= 0
                 ? null
                 : () => _mutateCombat(
@@ -629,7 +658,9 @@ extension _SheetSpellsSection on _SheetScreenState {
                         const SizedBox(height: 2),
                         Text(
                           [
-                            s.isCantrip ? 'Truco' : 'Nivel ${s.level}',
+                            s.isCantrip
+                                ? context.l10n.spellCantrip
+                                : context.l10n.spellLevel(s.level),
                             s.school,
                             ?_damageBonusText(s.id),
                           ].join(' · '),
@@ -647,7 +678,7 @@ extension _SheetSpellsSection on _SheetScreenState {
             TextButton(
               key: ValueKey('concentrate-${s.id}'),
               onPressed: () => _concentrate(s.name),
-              child: const Text('Concentrar'),
+              child: Text(context.l10n.spellsConcentrate),
             ),
         ],
       ),
@@ -667,14 +698,16 @@ extension _SheetSpellsSection on _SheetScreenState {
     showSpellDetailsDialog(
       context,
       s,
-      contextTitle: ability == null ? '' : 'Con este personaje',
+      contextTitle: ability == null ? '' : context.l10n.spellsWithCharacter,
       contextText: ability == null
           ? ''
-          : 'Lanzás con ${ability.label} '
-                '(${_signed(sheet.abilityModifiers[ability]!)}). '
-                'Ataque de conjuro ${_signed(attackBonus!)} · '
-                'CD de salvación $saveDc.'
-                '${damage == null ? '' : ' $damage.'}',
+          : context.l10n.spellsCastWith(
+                  ability.label,
+                  _signed(sheet.abilityModifiers[ability]!),
+                  _signed(attackBonus!),
+                  saveDc!,
+                ) +
+                (damage == null ? '' : ' $damage.'),
     );
   }
 
@@ -686,6 +719,6 @@ extension _SheetSpellsSection on _SheetScreenState {
     if (bonuses == null || bonuses.isEmpty) return null;
     final total = bonuses.fold<int>(0, (n, b) => n + b.bonus);
     final sources = bonuses.map((b) => b.source).toSet().join(', ');
-    return '${_signed(total)} al daño ($sources)';
+    return context.l10n.spellsDamageBonus(_signed(total), sources);
   }
 }

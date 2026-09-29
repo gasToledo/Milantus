@@ -34,11 +34,11 @@ extension _HomebrewSections on _HomebrewViewState {
             controller: _searchController,
             decoration: InputDecoration(
               isDense: true,
-              labelText: 'Buscar',
+              labelText: context.l10n.hbSearch,
               prefixIcon: const Icon(Icons.search, size: 20),
               suffixIcon: searching
                   ? IconButton(
-                      tooltip: 'Limpiar búsqueda',
+                      tooltip: context.l10n.rosterClearSearch,
                       icon: const Icon(Icons.close, size: 18),
                       onPressed: () => run(_clearSearch),
                     )
@@ -50,7 +50,7 @@ extension _HomebrewSections on _HomebrewViewState {
           appNavItem(
             context,
             icon: Icons.auto_fix_high,
-            label: 'Portada',
+            label: context.l10n.codexHome,
             // Buscando no hay sección abierta: marcar una sería mentir sobre
             // lo que se está mostrando.
             active: !searching && _section == null,
@@ -58,7 +58,9 @@ extension _HomebrewSections on _HomebrewViewState {
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(8, 14, 8, 0),
-            child: Eyebrow(searching ? 'Coincidencias' : 'Tu contenido'),
+            child: Eyebrow(
+              searching ? context.l10n.hbMatches : context.l10n.hbYourContent,
+            ),
           ),
           Expanded(
             child: ListView(
@@ -68,7 +70,7 @@ extension _HomebrewSections on _HomebrewViewState {
                   appNavItem(
                     context,
                     icon: category.icon,
-                    label: category.label,
+                    label: category.label(context.l10n),
                     active: !searching && _section == category,
                     count: '${_namesOf(category).length}',
                     onTap: () => run(() => _open(category)),
@@ -83,13 +85,13 @@ extension _HomebrewSections on _HomebrewViewState {
           appNavItem(
             context,
             icon: Icons.download,
-            label: 'Importar archivo',
+            label: context.l10n.hbImportFile,
             onTap: () => run(_importHomebrew),
           ),
           appNavItem(
             context,
             icon: Icons.upload_file,
-            label: 'Exportar todo',
+            label: context.l10n.hbExportAll,
             onTap: () => run(_exportHomebrew),
           ),
         ],
@@ -124,12 +126,12 @@ extension _HomebrewSections on _HomebrewViewState {
     if (total == 0) {
       return AppEmptyState(
         icon: Icons.search_off,
-        message: 'Nada de tu contenido coincide con «$_needle».',
+        message: context.l10n.hbNoMatch(_needle),
         actions: [
           OutlinedButton.icon(
             onPressed: _clearSearch,
             icon: const Icon(Icons.close, size: 20),
-            label: const Text('Limpiar búsqueda'),
+            label: Text(context.l10n.rosterClearSearch),
           ),
         ],
       );
@@ -144,7 +146,7 @@ extension _HomebrewSections on _HomebrewViewState {
             textBaseline: TextBaseline.alphabetic,
             children: [
               Text(
-                '$total ${total == 1 ? 'resultado' : 'resultados'}',
+                context.l10n.hbResults(total),
                 style: TextStyle(
                   fontFamily: 'Georgia',
                   fontSize: 18,
@@ -154,7 +156,7 @@ extension _HomebrewSections on _HomebrewViewState {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'para «$_needle»',
+                  context.l10n.hbFor(_needle),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -171,7 +173,7 @@ extension _HomebrewSections on _HomebrewViewState {
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
             children: [
               for (final group in groups.entries) ...[
-                Eyebrow(group.key.label),
+                Eyebrow(group.key.label(context.l10n)),
                 DenseRows(children: group.value),
                 const SizedBox(height: 18),
               ],
@@ -235,7 +237,7 @@ extension _HomebrewSections on _HomebrewViewState {
     return PageBody(
       children: [
         Text(
-          'Tu taller',
+          context.l10n.hbWorkshop,
           style: TextStyle(
             fontFamily: 'Georgia',
             fontSize: 22,
@@ -244,13 +246,11 @@ extension _HomebrewSections on _HomebrewViewState {
         ),
         const SizedBox(height: 6),
         Text(
-          '$total ${total == 1 ? 'entrada propia' : 'entradas propias'}. '
-          'Todo lo que crees acá se suma al catálogo: aparece en la creación '
-          'de personajes y en las fichas, igual que el contenido oficial.',
+          context.l10n.hbWorkshopIntro(total),
           style: TextStyle(fontSize: 13, color: context.palette.textMuted),
         ),
         const SizedBox(height: 20),
-        const Eyebrow('Categorías'),
+        Eyebrow(context.l10n.hbCategories),
         LayoutBuilder(
           builder: (context, box) {
             final columns = box.maxWidth >= 560 ? 2 : 1;
@@ -295,7 +295,7 @@ extension _HomebrewSections on _HomebrewViewState {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      category.label,
+                      category.label(context.l10n),
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         color: empty
@@ -320,7 +320,7 @@ extension _HomebrewSections on _HomebrewViewState {
               // Una muestra, no un resumen: dice de qué se trata lo que hay
               // adentro sin prometer que estén todos.
               Text(
-                empty ? 'Nada todavía.' : names.take(2).join(' · '),
+                empty ? context.l10n.hbNothingYet : names.take(2).join(' · '),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(fontSize: 13, color: pal.textMuted),
@@ -355,7 +355,7 @@ extension _HomebrewSections on _HomebrewViewState {
                 Icon(Icons.auto_fix_high, color: pal.gold, size: 32),
                 const SizedBox(height: 16),
                 Text(
-                  'Tu taller está vacío',
+                  context.l10n.hbWorkshopEmpty,
                   style: TextStyle(
                     fontFamily: 'Georgia',
                     fontSize: 20,
@@ -368,12 +368,8 @@ extension _HomebrewSections on _HomebrewViewState {
                 // en el Modo DM. La excepción —una bestia marcada disponible
                 // entra en Forma Salvaje— se explica en el formulario, donde se
                 // activa, y no hace falta cargarla acá.
-                const Text(
-                  'Homebrew es contenido tuyo: un arma, un conjuro, una '
-                  'criatura. Se guarda en tu cuenta y se suma al catálogo, al '
-                  'lado del oficial. Armas, armaduras, objetos, conjuros, dotes, '
-                  'especies y trasfondos aparecen en la creación de personajes '
-                  'y en las fichas; las criaturas, en el Bestiario y en Combate.',
+                Text(
+                  context.l10n.hbWorkshopEmptyBody,
                   style: TextStyle(height: 1.5),
                 ),
                 const SizedBox(height: 22),
@@ -384,12 +380,12 @@ extension _HomebrewSections on _HomebrewViewState {
                     FilledButton.icon(
                       onPressed: () => _open(_Category.weapons),
                       icon: const Icon(Icons.add, size: 20),
-                      label: const Text('Empezar por un arma'),
+                      label: Text(context.l10n.hbStartWeapon),
                     ),
                     OutlinedButton.icon(
                       onPressed: _importHomebrew,
                       icon: const Icon(Icons.download, size: 20),
-                      label: const Text('Importar un archivo'),
+                      label: Text(context.l10n.hbImportAFile),
                     ),
                   ],
                 ),
@@ -436,7 +432,7 @@ extension _HomebrewSections on _HomebrewViewState {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        category.label,
+                        category.label(context.l10n),
                         style: TextStyle(
                           fontFamily: 'Georgia',
                           fontSize: 18,
@@ -452,7 +448,7 @@ extension _HomebrewSections on _HomebrewViewState {
                     children: [
                       if (tight)
                         IconButton(
-                          tooltip: 'Duplicar del catálogo',
+                          tooltip: context.l10n.hbDuplicateFromCatalog,
                           icon: const Icon(Icons.content_copy_outlined),
                           onPressed: () => _duplicateFromCatalog(category),
                         )
@@ -463,13 +459,17 @@ extension _HomebrewSections on _HomebrewViewState {
                             Icons.content_copy_outlined,
                             size: 18,
                           ),
-                          label: const Text('Duplicar del catálogo'),
+                          label: Text(context.l10n.hbDuplicateFromCatalog),
                         ),
                       const SizedBox(width: 8),
                       FilledButton.icon(
                         onPressed: onAdd,
                         icon: const Icon(Icons.add),
-                        label: Text(tight ? 'Agregar' : category.addLabel),
+                        label: Text(
+                          tight
+                              ? context.l10n.commonAdd
+                              : category.addLabel(context.l10n),
+                        ),
                       ),
                     ],
                   ),
@@ -485,9 +485,9 @@ extension _HomebrewSections on _HomebrewViewState {
               // vacío. El botón de crear ya está en el encabezado, arriba.
               ? AppEmptyState(
                   icon: category.icon,
-                  message:
-                      'Todavía no agregaste nada en '
-                      '${category.label.toLowerCase()}.',
+                  message: context.l10n.hbNothingIn(
+                    category.label(context.l10n).toLowerCase(),
+                  ),
                 )
               : PageBody(
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
@@ -576,12 +576,12 @@ extension _HomebrewSections on _HomebrewViewState {
                 ],
                 const SizedBox(width: 4),
                 IconButton(
-                  tooltip: 'Duplicar $title',
+                  tooltip: context.l10n.hbDuplicateTitle(title),
                   icon: const Icon(Icons.content_copy_outlined),
                   onPressed: onDuplicate,
                 ),
                 IconButton(
-                  tooltip: 'Borrar $title',
+                  tooltip: context.l10n.hbDeleteTooltip(title),
                   icon: const Icon(Icons.delete_outline),
                   onPressed: onDelete,
                 ),
@@ -608,12 +608,12 @@ extension _HomebrewSections on _HomebrewViewState {
       for (final w in _filtered(store.weapons.values, (e) => e.name))
         _tile(
           w.name,
-          pills: _weaponPills(w),
-          stats: _weaponStats(w),
+          pills: _weaponPills(context.l10n, w),
+          stats: _weaponStats(context.l10n, w),
           onEdit: () => _editWeapon(w),
           onDuplicate: () => _openCopy(category, w.toJson()),
           onDelete: () => _delete(
-            'el arma',
+            context.l10n.hbKindWeapon,
             w.name,
             w.id,
             () => store.deleteWeapon(w.id),
@@ -625,12 +625,12 @@ extension _HomebrewSections on _HomebrewViewState {
       for (final a in _filtered(store.armor.values, (e) => e.name))
         _tile(
           a.name,
-          pills: _armorPills(a),
-          stats: _armorStats(a),
+          pills: _armorPills(context.l10n, a),
+          stats: _armorStats(context.l10n, a),
           onEdit: () => _editArmor(a),
           onDuplicate: () => _openCopy(category, a.toJson()),
           onDelete: () => _delete(
-            'la armadura',
+            context.l10n.hbKindArmor,
             a.name,
             a.id,
             () => store.deleteArmor(a.id),
@@ -642,12 +642,12 @@ extension _HomebrewSections on _HomebrewViewState {
       for (final i in _filtered(store.items.values, (e) => e.name))
         _tile(
           i.name,
-          pills: _itemPills(i),
-          stats: _itemStats(i),
+          pills: _itemPills(context.l10n, i),
+          stats: _itemStats(context.l10n, i),
           onEdit: () => _editItem(i),
           onDuplicate: () => _openCopy(category, i.toJson()),
           onDelete: () => _delete(
-            'el objeto',
+            context.l10n.hbKindItem,
             i.name,
             i.id,
             () => store.deleteItem(i.id),
@@ -660,14 +660,14 @@ extension _HomebrewSections on _HomebrewViewState {
         _tile(
           f.name,
           pills: [
-            _featCategories[f.category] ?? f.category,
-            if (f.repeatable) 'Repetible',
+            _featCategories(context.l10n)[f.category] ?? f.category,
+            if (f.repeatable) context.l10n.codexRepeatable,
           ],
-          stats: [('Efectos', '${f.effects.length}')],
+          stats: [(context.l10n.hbEffects, '${f.effects.length}')],
           onEdit: () => _editFeat(f),
           onDuplicate: () => _openCopy(category, f.toJson()),
           onDelete: () => _delete(
-            'la dote',
+            context.l10n.hbKindFeat,
             f.name,
             f.id,
             () => store.deleteFeat(f.id),
@@ -681,13 +681,13 @@ extension _HomebrewSections on _HomebrewViewState {
           r.name,
           pills: [r.size],
           stats: [
-            ('Velocidad', '${r.speed} pies'),
-            ('Rasgos', '${r.effects.length}'),
+            (context.l10n.creatureSpeed, context.l10n.feetValue(r.speed)),
+            (context.l10n.creatureTraits, '${r.effects.length}'),
           ],
           onEdit: () => _editRace(r),
           onDuplicate: () => _openCopy(category, r.toJson()),
           onDelete: () => _delete(
-            'la especie',
+            context.l10n.hbKindSpecies,
             r.name,
             r.id,
             () => store.deleteRace(r.id),
@@ -704,12 +704,12 @@ extension _HomebrewSections on _HomebrewViewState {
           ],
           stats: [
             if (b.toolProficiencies.isNotEmpty)
-              ('Herramientas', '${b.toolProficiencies.length}'),
+              (context.l10n.groupTools, '${b.toolProficiencies.length}'),
           ],
           onEdit: () => _editBackground(b),
           onDuplicate: () => _openCopy(category, b.toJson()),
           onDelete: () => _delete(
-            'el trasfondo',
+            context.l10n.hbKindBackground,
             b.name,
             b.id,
             () => store.deleteBackground(b.id),
@@ -731,16 +731,19 @@ extension _HomebrewSections on _HomebrewViewState {
         _tile(
           s.name,
           pills: [
-            s.isCantrip ? 'Truco' : 'Nivel ${s.level}',
+            s.isCantrip
+                ? context.l10n.spellCantrip
+                : context.l10n.spellLevel(s.level),
             if (s.school.isNotEmpty) s.school,
-            if (s.concentration) 'Concentración',
-            if (s.ritual) 'Ritual',
-            for (final klass in s.classes) _spellClasses[klass] ?? klass,
+            if (s.concentration) context.l10n.concentration,
+            if (s.ritual) context.l10n.hbRitual,
+            for (final klass in s.classes)
+              _spellClasses(context.l10n)[klass] ?? klass,
           ],
           onEdit: () => _editSpell(s),
           onDuplicate: () => _openCopy(category, s.toJson()),
           onDelete: () => _delete(
-            'el conjuro',
+            context.l10n.hbKindSpell,
             s.name,
             s.id,
             () => store.deleteSpell(s.id),
@@ -754,17 +757,18 @@ extension _HomebrewSections on _HomebrewViewState {
           c.name,
           pills: [
             c.kind,
-            if (c.availableToCharacters) 'Disponible para personajes',
+            if (c.availableToCharacters) context.l10n.hbAvailableToCharacters,
           ],
           stats: [
-            ('CA', c.ac),
-            ('PG', c.hp),
-            if (c.cr != null) ('VD', _formatCr(c.cr)),
+            (context.l10n.creatureAcShort, c.ac),
+            (context.l10n.hitPointsShort, c.hp),
+            if (c.cr != null)
+              (context.l10n.challengeRatingShort, _formatCr(c.cr)),
           ],
           onEdit: () => _editCreature(c),
           onDuplicate: () => _openCopy(category, c.toJson()),
           onDelete: () => _delete(
-            'la criatura',
+            context.l10n.hbKindCreature,
             c.name,
             c.id,
             () => store.deleteCreature(c.id),
@@ -1041,19 +1045,15 @@ extension _HomebrewSections on _HomebrewViewState {
       builder: (ctx) => AppDialog(
         icon: Icons.warning_amber_rounded,
         iconColor: pal.crimson,
-        title: '¿Borrar $kind «$name»?',
+        title: context.l10n.hbDeleteTitle(kind, name),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (users.isEmpty)
-              const Text('Ninguna de tus fichas lo está usando.')
+              Text(context.l10n.hbNoUsers)
             else ...[
-              Text(
-                users.length == 1
-                    ? 'Lo usa 1 ficha:'
-                    : 'Lo usan ${users.length} fichas:',
-              ),
+              Text(context.l10n.hbUsers(users.length)),
               const SizedBox(height: 10),
               Container(
                 decoration: BoxDecoration(
@@ -1098,24 +1098,22 @@ extension _HomebrewSections on _HomebrewViewState {
               ),
               const SizedBox(height: 12),
               Text(
-                users.length == 1
-                    ? 'Va a quedar con una advertencia en su ficha.'
-                    : 'Van a quedar con una advertencia en sus fichas.',
+                context.l10n.hbUsersWarning(users.length),
                 style: TextStyle(color: pal.textMuted),
               ),
             ],
             const SizedBox(height: 12),
-            const Text('Esta acción no se puede deshacer.'),
+            Text(context.l10n.commonCannotUndo),
           ],
         ),
         actions: [
           DialogAction(
-            'Cancelar',
+            context.l10n.commonCancel,
             keyHint: 'Esc',
             onPressed: () => Navigator.pop(ctx, false),
           ),
           DialogAction(
-            'Borrar',
+            context.l10n.commonDelete,
             primary: true,
             color: pal.crimson,
             onPressed: () => Navigator.pop(ctx, true),
@@ -1128,7 +1126,11 @@ extension _HomebrewSections on _HomebrewViewState {
     fromRepo();
     _refresh();
     if (mounted) {
-      showAppMessage(context, '$name se borró.', tone: AppMessageTone.success);
+      showAppMessage(
+        context,
+        context.l10n.hbDeleted(name),
+        tone: AppMessageTone.success,
+      );
     }
   }
 
@@ -1196,7 +1198,9 @@ class _CatalogPickerState extends State<_CatalogPicker> {
     final pal = context.palette;
     final results = _results;
     return AppDialog(
-      title: 'Duplicar ${widget.category.label.toLowerCase()}',
+      title: context.l10n.hbDuplicateDialog(
+        widget.category.label(context.l10n).toLowerCase(),
+      ),
       width: 420,
       scrollable: false,
       content: SizedBox(
@@ -1208,7 +1212,7 @@ class _CatalogPickerState extends State<_CatalogPicker> {
               autofocus: true,
               decoration: InputDecoration(
                 isDense: true,
-                labelText: 'Buscar en el catálogo',
+                labelText: context.l10n.hbSearchCatalog,
                 prefixIcon: const Icon(Icons.search, size: 20),
               ),
               onChanged: (value) => setState(() => _query = value),
@@ -1218,8 +1222,7 @@ class _CatalogPickerState extends State<_CatalogPicker> {
               child: results.isEmpty
                   ? AppEmptyState(
                       icon: Icons.search_off,
-                      message:
-                          'Nada del catálogo coincide con «${_query.trim()}».',
+                      message: context.l10n.hbCatalogNoMatch(_query.trim()),
                     )
                   : ListView.separated(
                       itemCount: results.length,
@@ -1245,7 +1248,7 @@ class _CatalogPickerState extends State<_CatalogPicker> {
       ),
       actions: [
         DialogAction(
-          'Cancelar',
+          context.l10n.commonCancel,
           keyHint: 'Esc',
           onPressed: () => Navigator.pop(context),
         ),

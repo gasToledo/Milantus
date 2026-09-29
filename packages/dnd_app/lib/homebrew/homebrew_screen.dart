@@ -9,6 +9,7 @@ import '../data/transfer_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_widgets.dart';
 import '../web/browser.dart' as browser;
+import '../l10n/l10n_context.dart';
 
 part 'effect_editor.dart';
 part 'forms/armor_form.dart';
@@ -46,6 +47,7 @@ Map<String, String> _sortedByLabel(Map<String, String> options) =>
     );
 
 /// Sin tildes y en minúscula, para que «Ácido» no quede después de la z.
+// l10n-ignore: tabla de acentos para ordenar, no texto de la interfaz.
 String _sortKey(String label) => label.toLowerCase().replaceAllMapped(
   RegExp('[áéíóúü]'),
   (m) =>
@@ -58,56 +60,63 @@ final _weaponPropOptions = {
   for (final p in weaponProperties.values) p.id: p.name,
 };
 
-const _weaponCategories = {'simple': 'Simple', 'martial': 'Marcial'};
+Map<String, String> _weaponCategories(AppLocalizations l10n) => {
+  'simple': l10n.hbSimple,
+  'martial': l10n.hbMartial,
+};
 
 /// Maestrías con arma, tomadas del glosario del motor: es la única fuente de
 /// la traducción y la ficha ya la usa para la píldora del ataque. La cadena
 /// vacía significa "sin maestría" por el mismo motivo que [_mundane]: el
 /// desplegable no acepta una opción nula.
-final _masteryOptions = {
-  '': 'Sin maestría',
+Map<String, String> _masteryOptions(AppLocalizations l10n) => {
+  '': l10n.hbNoMastery,
   for (final m in weaponMasteries.values) m.id: m.name,
 };
 
-const _armorCategories = {
-  'light': 'Ligera',
-  'medium': 'Media',
-  'heavy': 'Pesada',
-  'shield': 'Escudo',
+Map<String, String> _armorCategories(AppLocalizations l10n) => {
+  'light': l10n.hbLight,
+  'medium': l10n.hbMedium,
+  'heavy': l10n.hbHeavy,
+  'shield': l10n.kindShield,
 };
 
 /// Familias de objeto. `magic` no está: lo que hace mágico a un objeto es
 /// tener rareza, y ofrecer las dos cosas dejaría guardar un objeto de categoría
 /// mágica sin rareza, que el motor trata como mundano.
-const _itemCategories = {
-  'gear': 'Equipo',
-  'tool': 'Herramienta',
-  'ammunition': 'Munición',
-  'focus': 'Canalizador',
-  'pack': 'Paquete',
-  'container': 'Contenedor',
+Map<String, String> _itemCategories(AppLocalizations l10n) => {
+  'gear': l10n.kindGear,
+  'tool': l10n.kindTool,
+  'ammunition': l10n.kindAmmunition,
+  'focus': l10n.kindFocus,
+  'pack': l10n.kindPack,
+  'container': l10n.kindContainer,
 };
 
 /// Valor del desplegable de rareza que significa "no es mágico". Va como texto
 /// y no como null porque el desplegable no acepta una opción nula.
 const _mundane = 'mundane';
 
-const _itemRarities = {_mundane: 'Mundano', ...itemRarityLabels};
+Map<String, String> _itemRarities(AppLocalizations l10n) => {
+  _mundane: l10n.hbMundane,
+  ...itemRarityLabels,
+};
 
-const _featCategories = {
-  'origin': 'De origen',
-  'general': 'General',
-  'fighting-style': 'Estilo de combate',
-  'dragonmark': 'Marca dracónica',
-  'epic-boon': 'Don épico',
+Map<String, String> _featCategories(AppLocalizations l10n) => {
+  'origin': l10n.hbFeatOrigin,
+  'general': l10n.hbFeatGeneral,
+  'fighting-style': l10n.hbFeatFighting,
+  'dragonmark': l10n.hbFeatDragonmark,
+  'epic-boon': l10n.hbFeatEpic,
 };
 
 /// Tamaños que el contenido oficial usa. A diferencia del resto, acá el valor
 /// guardado ya está en español (`Race.size`), así que id y etiqueta coinciden.
-const _raceSizes = {
-  'Pequeño': 'Pequeño',
-  'Mediano': 'Mediano',
-  'Grande': 'Grande',
+// l10n-ignore: los ids son el valor guardado (`Race.size`), no texto.
+Map<String, String> _raceSizes(AppLocalizations l10n) => {
+  'Pequeño': l10n.sizeSmall,
+  'Mediano': l10n.sizeMedium,
+  'Grande': l10n.sizeLarge,
 };
 
 /// Las ocho categorías de contenido propio, en el orden en que se muestran.
@@ -118,20 +127,42 @@ const _raceSizes = {
 /// después se separan (que es lo que pasaba con las ocho pestañas escritas a
 /// mano al lado de las ocho vistas).
 enum _Category {
-  weapons('Armas', Icons.hardware, 'Agregar arma'),
-  armor('Armaduras', Icons.shield_outlined, 'Agregar armadura'),
-  items('Objetos', Icons.inventory_2_outlined, 'Agregar objeto'),
-  feats('Dotes', Icons.military_tech, 'Agregar dote'),
-  races('Especies', Icons.diversity_3, 'Agregar especie'),
-  backgrounds('Trasfondos', Icons.history_edu, 'Agregar trasfondo'),
-  spells('Conjuros', Icons.auto_stories, 'Agregar conjuro'),
-  creatures('Criaturas', Icons.pets_outlined, 'Agregar criatura');
+  weapons(Icons.hardware),
+  armor(Icons.shield_outlined),
+  items(Icons.inventory_2_outlined),
+  feats(Icons.military_tech),
+  races(Icons.diversity_3),
+  backgrounds(Icons.history_edu),
+  spells(Icons.auto_stories),
+  creatures(Icons.pets_outlined);
 
-  final String label;
   final IconData icon;
-  final String addLabel;
 
-  const _Category(this.label, this.icon, this.addLabel);
+  const _Category(this.icon);
+
+  /// El nombre de la categoría en el idioma activo.
+  String label(AppLocalizations l10n) => switch (this) {
+    _Category.weapons => l10n.groupWeapons,
+    _Category.armor => l10n.groupArmor,
+    _Category.items => l10n.catItems,
+    _Category.feats => l10n.catFeats,
+    _Category.races => l10n.catRaces,
+    _Category.backgrounds => l10n.catBackgrounds,
+    _Category.spells => l10n.spellsTitle,
+    _Category.creatures => l10n.catCreatures,
+  };
+
+  /// El rótulo del botón que agrega una entrada de esta categoría.
+  String addLabel(AppLocalizations l10n) => switch (this) {
+    _Category.weapons => l10n.hbAddWeapon,
+    _Category.armor => l10n.hbAddArmor,
+    _Category.items => l10n.catalogAddTitle,
+    _Category.feats => l10n.hbAddFeat,
+    _Category.races => l10n.hbAddSpecies,
+    _Category.backgrounds => l10n.hbAddBackground,
+    _Category.spells => l10n.hbAddSpell,
+    _Category.creatures => l10n.hbAddCreature,
+  };
 }
 
 /// Editor de contenido homebrew, una sección del Modo DM. Lo creado se fusiona
@@ -220,7 +251,7 @@ class _HomebrewViewState extends State<HomebrewView> {
     if (mounted) {
       showAppMessage(
         context,
-        '«$name» se guardó.',
+        context.l10n.hbSaved(name),
         tone: AppMessageTone.success,
       );
     }
@@ -229,7 +260,7 @@ class _HomebrewViewState extends State<HomebrewView> {
   /// Y su contrario: salir del formulario sin guardar tiene que decirlo, o
   /// queda la duda de si el cambio entró.
   void _discarded() {
-    if (mounted) showAppMessage(context, 'No se guardó ningún cambio.');
+    if (mounted) showAppMessage(context, context.l10n.hbNoChanges);
   }
 
   /// Ejecuta una escritura en disco del store homebrew; si falla (permisos,
@@ -242,7 +273,7 @@ class _HomebrewViewState extends State<HomebrewView> {
       if (mounted) {
         showAppMessage(
           context,
-          failureMessage('No se pudo guardar el contenido homebrew', e),
+          failureMessage(context.l10n.hbSaveError, e),
           tone: AppMessageTone.error,
         );
       }
@@ -254,7 +285,7 @@ class _HomebrewViewState extends State<HomebrewView> {
     final content = store.exportContent();
     final total = content.values.fold<int>(0, (s, l) => s + l.length);
     if (total == 0) {
-      showAppMessage(context, 'No hay contenido homebrew para exportar.');
+      showAppMessage(context, context.l10n.hbNothingToExport);
       return;
     }
     final transfer = TransferService(store.api);
@@ -265,7 +296,7 @@ class _HomebrewViewState extends State<HomebrewView> {
     );
     showAppMessage(
       context,
-      'Homebrew exportado (${total == 1 ? '1 entrada' : '$total entradas'}).',
+      context.l10n.hbExported(total),
       tone: AppMessageTone.success,
       duration: const Duration(seconds: 4),
     );
@@ -276,7 +307,7 @@ class _HomebrewViewState extends State<HomebrewView> {
       type: FileType.custom,
       allowedExtensions: ['json'],
       withData: true,
-      dialogTitle: 'Elegí un archivo de homebrew (.json)',
+      dialogTitle: context.l10n.hbPickFile,
     );
     final file = picked?.files.singleOrNull;
     if (file?.bytes == null || !mounted) return;
@@ -294,20 +325,16 @@ class _HomebrewViewState extends State<HomebrewView> {
           builder: (ctx) => AppDialog(
             icon: Icons.warning_amber_rounded,
             iconColor: context.palette.crimson,
-            title: 'Sobrescribir homebrew',
-            content: Text(
-              '${collisions == 1 ? '1 entrada del archivo comparte' : '$collisions entradas del archivo comparten'} '
-              'id con contenido que ya tenés. Al importar se reemplazarán. '
-              '¿Continuar?',
-            ),
+            title: context.l10n.hbOverwriteTitle,
+            content: Text(context.l10n.hbOverwriteBody(collisions)),
             actions: [
               DialogAction(
-                'Cancelar',
+                context.l10n.commonCancel,
                 keyHint: 'Esc',
                 onPressed: () => Navigator.pop(ctx, false),
               ),
               DialogAction(
-                'Sobrescribir',
+                context.l10n.hbOverwrite,
                 primary: true,
                 color: context.palette.crimson,
                 onPressed: () => Navigator.pop(ctx, true),
@@ -325,14 +352,14 @@ class _HomebrewViewState extends State<HomebrewView> {
       setState(() {});
       showAppMessage(
         context,
-        'Importadas $count entradas de homebrew.',
+        context.l10n.hbImported(count),
         tone: AppMessageTone.success,
       );
     } catch (e) {
       if (mounted) {
         showAppMessage(
           context,
-          failureMessage('No se pudo importar el homebrew', e),
+          failureMessage(context.l10n.hbImportError, e),
           tone: AppMessageTone.error,
         );
       }
@@ -365,14 +392,11 @@ class _HomebrewViewState extends State<HomebrewView> {
         iconColor: pal.textMuted,
         collapsedIconColor: pal.textMuted,
         title: Text(
-          n == 1
-              ? '1 entrada no se pudo cargar'
-              : '$n entradas no se pudieron cargar',
+          context.l10n.hbLoadIssues(n),
           style: const TextStyle(fontSize: 14),
         ),
         subtitle: Text(
-          '${n == 1 ? 'Se omitió' : 'Se omitieron'} al iniciar. El resto de '
-          'tu homebrew está intacto.',
+          context.l10n.hbSkipped(n),
           style: TextStyle(fontSize: 13, color: pal.textMuted),
         ),
         children: [
@@ -382,7 +406,7 @@ class _HomebrewViewState extends State<HomebrewView> {
               title: Text('${issue.category} · ${issue.id}'),
               subtitle: Text(issue.message),
               trailing: IconButton(
-                tooltip: 'Borrar entrada inválida',
+                tooltip: context.l10n.hbDeleteInvalid,
                 icon: const Icon(Icons.delete_outline),
                 onPressed: () => _deleteInvalid(issue),
               ),
@@ -412,15 +436,18 @@ class _HomebrewViewState extends State<HomebrewView> {
                   toolbarHeight: 48,
                   leading: Builder(
                     builder: (context) => IconButton(
-                      tooltip: 'Categorías de homebrew',
+                      tooltip: context.l10n.hbCategoriesTooltip,
                       icon: const Icon(Icons.category_outlined),
                       onPressed: () => Scaffold.of(context).openDrawer(),
                     ),
                   ),
                   title: Text(
                     _needle.isNotEmpty
-                        ? 'Homebrew · Búsqueda'
-                        : 'Homebrew · ${_section?.label ?? 'Portada'}',
+                        ? context.l10n.hbTitleSearch
+                        : context.l10n.hbTitleSection(
+                            _section?.label(context.l10n) ??
+                                context.l10n.codexHome,
+                          ),
                   ),
                 ),
           drawer: wide

@@ -187,6 +187,12 @@ Lo que más se olvida:
 - Para medir el ancho disponible, `LayoutBuilder` y **nunca `MediaQuery.size`**:
   el panel lateral de 236 px es invisible para `MediaQuery`.
 - Todo `IconButton` lleva `tooltip`.
+- **Todo texto visible sale de `context.l10n`** (`lib/l10n/app_es.arb` y
+  `app_en.arb`, las dos claves en el mismo commit): la interfaz se ofrece en
+  español e inglés. Nunca un literal suelto en un widget:
+  `test/l10n_no_literals_test.dart` falla, y `l10n_parity_test.dart` si falta
+  una clave en un idioma. Cómo agregar un texto y el glosario en inglés:
+  `docs/desarrollo/textos.md`.
 
 Los widgets de estado ya existen y se usan siempre los mismos: `AppErrorView`
 (con `onRetry`), `AppBusyLabel` (el texto es obligatorio) y `AppEmptyState`,
@@ -220,5 +226,6 @@ acá contenido de esas guías: enlazalo para que exista una sola fuente vigente.
 - `docs/arquitectura/modo-dm.md` — seguridad y contratos del Modo DM.
 - `docs/desarrollo/contenido-y-reglas.md` — fuentes, catálogo y validación.
 - `docs/desarrollo/diseno-web.md` — sistema visual y componentes.
-- `docs/desarrollo/textos.md` — glosario y convenciones de los textos visibles.
+- `docs/desarrollo/textos.md` — glosario y convenciones de los textos visibles,
+  en español e inglés.
 - `docs/operaciones/despliegue.md` — runbook del stack.

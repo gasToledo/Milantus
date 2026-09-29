@@ -6,6 +6,7 @@ import '../../api/api_exception.dart';
 import '../../api/api_models.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/app_widgets.dart';
+import '../../l10n/l10n_context.dart';
 
 /// Le da al jugador el código con el que su DM suma este personaje a una mesa,
 /// y le muestra dónde está compartido para que pueda dejar de estarlo.
@@ -83,19 +84,18 @@ class _ShareCharacterDialogState extends State<_ShareCharacterDialog> {
       builder: (ctx) => AppDialog(
         icon: Icons.warning_amber_rounded,
         iconColor: context.palette.crimson,
-        title: 'Dejar de compartir',
+        title: context.l10n.shareStop,
         content: Text(
-          'El DM de «${share.campaignName}» deja de ver a '
-          '${widget.characterName}. Tu ficha no se toca.',
+          context.l10n.shareStopBody(share.campaignName, widget.characterName),
         ),
         actions: [
           DialogAction(
-            'Cancelar',
+            context.l10n.commonCancel,
             keyHint: 'Esc',
             onPressed: () => Navigator.of(ctx).pop(false),
           ),
           DialogAction(
-            'Dejar de compartir',
+            context.l10n.shareStop,
             primary: true,
             color: context.palette.crimson,
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -109,7 +109,7 @@ class _ShareCharacterDialogState extends State<_ShareCharacterDialog> {
       await widget.api.deleteCampaignLink(share.memberId);
       await _loadShares();
       if (mounted) {
-        showAppMessage(context, 'Ya no se comparte con ${share.campaignName}.');
+        showAppMessage(context, context.l10n.shareStopped(share.campaignName));
       }
     } on ApiException catch (e) {
       if (mounted) {
@@ -122,15 +122,14 @@ class _ShareCharacterDialogState extends State<_ShareCharacterDialog> {
   Widget build(BuildContext context) {
     final pal = context.palette;
     return AppDialog(
-      title: 'Compartir a ${widget.characterName}',
+      title: context.l10n.shareTitle(widget.characterName),
       width: 420,
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Generá un código y pasáselo a tu DM. Lo pega en su campaña y '
-            've tu ficha; nunca puede editarla.',
+            context.l10n.shareIntro,
             style: TextStyle(fontSize: 13, color: pal.textMuted),
           ),
           const SizedBox(height: 16),
@@ -140,21 +139,25 @@ class _ShareCharacterDialogState extends State<_ShareCharacterDialog> {
             FilledButton.icon(
               onPressed: _generating ? null : _generate,
               icon: const Icon(Icons.key),
-              label: Text(_generating ? 'Generando…' : 'Generar código'),
+              label: Text(
+                _generating
+                    ? context.l10n.shareGenerating
+                    : context.l10n.shareGenerate,
+              ),
             ),
           if (_error case final error?) ...[
             const SizedBox(height: 12),
             Text(error, style: TextStyle(fontSize: 12, color: pal.crimson)),
           ],
           const SizedBox(height: 24),
-          const Eyebrow('Compartido con'),
+          Eyebrow(context.l10n.shareSharedWith),
           const SizedBox(height: 8),
           _sharesList(context),
         ],
       ),
       actions: [
         DialogAction(
-          'Cerrar',
+          context.l10n.commonClose,
           primary: true,
           keyHint: 'Esc',
           onPressed: () => Navigator.of(context).pop(),
@@ -195,7 +198,7 @@ class _ShareCharacterDialogState extends State<_ShareCharacterDialog> {
           children: [
             Expanded(
               child: Text(
-                'Sirve una sola vez y vence en 24 horas.',
+                context.l10n.shareCodeNote,
                 style: TextStyle(fontSize: 12, color: pal.textMuted),
               ),
             ),
@@ -203,11 +206,11 @@ class _ShareCharacterDialogState extends State<_ShareCharacterDialog> {
               onPressed: () async {
                 await Clipboard.setData(ClipboardData(text: code.code));
                 if (context.mounted) {
-                  showAppMessage(context, 'Código copiado.');
+                  showAppMessage(context, context.l10n.shareCopied);
                 }
               },
               icon: const Icon(Icons.copy, size: 16),
-              label: const Text('Copiar'),
+              label: Text(context.l10n.commonCopy),
             ),
           ],
         ),
@@ -218,10 +221,10 @@ class _ShareCharacterDialogState extends State<_ShareCharacterDialog> {
   Widget _sharesList(BuildContext context) {
     final pal = context.palette;
     final shares = _shares;
-    if (shares == null) return const AppBusyLabel('Buscando…');
+    if (shares == null) return AppBusyLabel(context.l10n.commonSearching);
     if (shares.isEmpty) {
       return Text(
-        'Todavía no lo compartiste con ninguna campaña.',
+        context.l10n.shareNone,
         style: TextStyle(fontSize: 13, color: pal.textMuted),
       );
     }
@@ -234,7 +237,7 @@ class _ShareCharacterDialogState extends State<_ShareCharacterDialog> {
             leading: Icon(Icons.menu_book_outlined, color: pal.gold, size: 20),
             title: Text(share.campaignName),
             trailing: IconButton(
-              tooltip: 'Dejar de compartir con ${share.campaignName}',
+              tooltip: context.l10n.shareStopWith(share.campaignName),
               onPressed: () => _stopSharing(share),
               icon: Icon(Icons.link_off, color: pal.crimson, size: 20),
             ),

@@ -77,7 +77,7 @@ class _LevelUpStepper extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Paso ${current + 1} de ${steps.length}',
+                  context.l10n.wizardStepOf(current + 1, steps.length),
                   style: TextStyle(fontSize: 11, color: pal.textMuted),
                 ),
               ],
@@ -234,7 +234,7 @@ class _LevelUpFooter extends StatelessWidget {
               OutlinedButton.icon(
                 onPressed: onBack,
                 icon: const Icon(Icons.arrow_back, size: 17),
-                label: Text(compact ? '' : 'Atrás'),
+                label: Text(compact ? '' : context.l10n.wizardBack),
               ),
               SizedBox(width: compact ? 8 : 14),
               Expanded(
@@ -243,7 +243,7 @@ class _LevelUpFooter extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Paso ${current + 1} de $total',
+                      context.l10n.wizardStepOf(current + 1, total),
                       style: TextStyle(fontSize: 11, color: pal.textMuted),
                     ),
                     if (pendingMessage != null)
@@ -266,9 +266,9 @@ class _LevelUpFooter extends StatelessWidget {
                 label: Text(
                   isReview
                       ? compact
-                            ? 'Confirmar'
-                            : 'Confirmar nivel $level'
-                      : 'Continuar',
+                            ? context.l10n.luConfirm
+                            : context.l10n.luConfirmLevel(level)
+                      : context.l10n.luContinue,
                 ),
               ),
             ],
@@ -516,7 +516,7 @@ class _FeatDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     final pal = context.palette;
     final scheme = Theme.of(context).colorScheme;
-    final summary = featSummary(feat, repo);
+    final summary = featSummary(context.l10n, feat, repo);
     // Con descripción, el resumen es solo la descripción. Una dote del
     // catálogo cuenta lo que hace en sus rasgos pasivos, pero una homebrew
     // del formulario tiene la historia en la descripción y lo mecánico en
@@ -524,7 +524,7 @@ class _FeatDetail extends StatelessWidget {
     final grants =
         feat.description.isNotEmpty &&
             !feat.effects.any((e) => e is PassiveTraitEffect)
-        ? [for (final e in feat.effects) ?describeEffect(e, repo)]
+        ? [for (final e in feat.effects) ?describeEffect(context.l10n, e, repo)]
         : const <String>[];
     return Container(
       width: double.infinity,
@@ -569,14 +569,14 @@ class _FeatDetail extends StatelessWidget {
           if (grants.isNotEmpty) ...[
             const SizedBox(height: 8),
             Text(
-              'Concede: ${grants.join(' · ')}',
+              context.l10n.luGrants(grants.join(' · ')),
               style: const TextStyle(fontSize: 13, height: 1.45),
             ),
           ],
           if (feat.repeatable) ...[
             const SizedBox(height: 8),
             Text(
-              'Se puede tomar más de una vez.',
+              context.l10n.luRepeatable,
               style: TextStyle(
                 fontSize: 12,
                 fontStyle: FontStyle.italic,
@@ -616,7 +616,7 @@ class _SlotBadge extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'Nv $level  ×$count',
+            context.l10n.luLevelCount(level, count),
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
@@ -665,7 +665,7 @@ class _FeatureChoiceGroup extends StatelessWidget {
     final pal = context.palette;
     if (options.isEmpty) {
       return Text(
-        'No hay opciones disponibles todavía.',
+        context.l10n.pickNoOptions,
         style: Theme.of(context).textTheme.bodySmall,
       );
     }
@@ -682,8 +682,7 @@ class _FeatureChoiceGroup extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Text(
-              'Ya están completas. Tocá una elegida para soltarla y poder '
-              'cambiarla.',
+              context.l10n.luComplete,
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ),
@@ -811,13 +810,13 @@ class _FeatureChoiceChip extends StatelessWidget {
                 // Sigue vivo con el chip deshabilitado, que es cuando más falta
                 // hace: el grupo lleno es justo el momento de comparar contra
                 // lo que no elegiste.
-                if (featSummary(feat, repo).isNotEmpty) ...[
+                if (featSummary(context.l10n, feat, repo).isNotEmpty) ...[
                   const SizedBox(width: 6),
                   InkWell(
                     onTap: () => showFeatDetailsDialog(context, feat, repo),
                     borderRadius: BorderRadius.circular(9),
                     child: Tooltip(
-                      message: 'Ver qué hace ${feat.name}',
+                      message: context.l10n.helpWhatItDoes(feat.name),
                       child: Padding(
                         padding: const EdgeInsets.all(2),
                         child: Icon(
@@ -835,7 +834,7 @@ class _FeatureChoiceChip extends StatelessWidget {
                     onTap: remove,
                     borderRadius: BorderRadius.circular(9),
                     child: Tooltip(
-                      message: 'Quitar una de ${feat.name}',
+                      message: context.l10n.luRemoveOne(feat.name),
                       child: Padding(
                         padding: const EdgeInsets.all(2),
                         child: Icon(Icons.remove, size: 16, color: accent),
@@ -878,7 +877,7 @@ class _SpellChoiceGroup extends StatelessWidget {
   Widget build(BuildContext context) {
     if (slot.options.isEmpty) {
       return Text(
-        'No hay conjuros disponibles para este rasgo.',
+        context.l10n.pickNoSpells,
         style: Theme.of(context).textTheme.bodySmall,
       );
     }
@@ -929,8 +928,8 @@ class _ProficiencyChoiceGroup extends StatelessWidget {
     if (slot.options.isEmpty) {
       return Text(
         slot.expertise
-            ? 'No tenés competencias sobre las que aplicar Pericia.'
-            : 'No quedan competencias disponibles para este rasgo.',
+            ? context.l10n.luNoExpertiseTargets
+            : context.l10n.luNoProficiencies,
         style: Theme.of(context).textTheme.bodySmall,
       );
     }

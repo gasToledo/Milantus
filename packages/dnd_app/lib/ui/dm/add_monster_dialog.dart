@@ -6,6 +6,7 @@ import '../../theme/app_theme.dart';
 import '../../theme/app_widgets.dart';
 import 'bestiary_view.dart';
 import 'npcs/npc_shared.dart';
+import '../../l10n/l10n_context.dart';
 
 /// Lo que se eligió sumar al combate.
 sealed class AddCombatantChoice {
@@ -159,7 +160,7 @@ class _AddCombatantDialogState extends State<_AddCombatantDialog> {
   Widget build(BuildContext context) {
     final choice = _choice;
     return AppDialog(
-      title: 'Sumar al combate',
+      title: context.l10n.dmAddToCombat,
       width: 440,
       // El buscador trae su propia lista con alto acotado.
       scrollable: false,
@@ -169,9 +170,15 @@ class _AddCombatantDialogState extends State<_AddCombatantDialog> {
         children: [
           SegmentedButton<_Tab>(
             showSelectedIcon: false,
-            segments: const [
-              ButtonSegment(value: _Tab.npcs, label: Text('PNJ')),
-              ButtonSegment(value: _Tab.bestiary, label: Text('Bestiario')),
+            segments: [
+              ButtonSegment(
+                value: _Tab.npcs,
+                label: Text(context.l10n.kindNpc),
+              ),
+              ButtonSegment(
+                value: _Tab.bestiary,
+                label: Text(context.l10n.dmBestiary),
+              ),
             ],
             selected: {_tab},
             onSelectionChanged: (s) => setState(() {
@@ -192,14 +199,14 @@ class _AddCombatantDialogState extends State<_AddCombatantDialog> {
       ),
       actions: [
         DialogAction(
-          'Cancelar',
+          context.l10n.commonCancel,
           keyHint: 'Esc',
           onPressed: () => Navigator.of(context).pop(),
         ),
         if (_creature != null && _tab == _Tab.bestiary ||
             _npc != null && _tab == _Tab.npcs)
           DialogAction(
-            'Sumar',
+            context.l10n.dmAddShort,
             primary: true,
             onPressed: choice == null
                 ? null
@@ -224,12 +231,12 @@ class _AddCombatantDialogState extends State<_AddCombatantDialog> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _searchField('Buscar en el bestiario'),
+        _searchField(context.l10n.dmSearchBestiary),
         const SizedBox(height: 8),
         SizedBox(
           height: 280,
           child: results.isEmpty
-              ? const Center(child: Text('Sin coincidencias.'))
+              ? Center(child: Text(context.l10n.catalogNoMatches))
               : ListView.builder(
                   itemCount: results.length,
                   itemBuilder: (context, i) {
@@ -240,7 +247,11 @@ class _AddCombatantDialogState extends State<_AddCombatantDialog> {
                       subtitle: Text(creature.kind),
                       trailing: creature.cr == null
                           ? null
-                          : Text('VD ${challengeRatingLabel(creature.cr!)}'),
+                          : Text(
+                              context.l10n.hbCrValue(
+                                challengeRatingLabel(creature.cr!),
+                              ),
+                            ),
                       onTap: () => setState(() => _creature = creature),
                     );
                   },
@@ -270,9 +281,9 @@ class _AddCombatantDialogState extends State<_AddCombatantDialog> {
       final inTable = widget.npcIdsInEncounter.contains(option.npc.id);
       final dead = option.status == NpcStatus.dead;
       final subtitle = [
-        if (dead) 'Muerto en esta campaña',
-        npcTypeLine(option.npc, option.sheet, widget.repo),
-        if (option.fromLibrary) 'al sumarlo, entra también a la campaña',
+        if (dead) context.l10n.dmDeadHere,
+        npcTypeLine(option.npc, option.sheet, widget.repo, context.l10n),
+        if (option.fromLibrary) context.l10n.dmAlsoJoinsCampaign,
       ].join(' · ');
       return ListTile(
         enabled: !inTable,
@@ -283,7 +294,7 @@ class _AddCombatantDialogState extends State<_AddCombatantDialog> {
         ),
         trailing: inTable
             ? Text(
-                'Ya está en el combate',
+                context.l10n.dmAlreadyInCombat,
                 style: TextStyle(fontSize: 12, color: pal.textMuted),
               )
             : null,
@@ -313,7 +324,7 @@ class _AddCombatantDialogState extends State<_AddCombatantDialog> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _searchField('Buscar PNJ'),
+        _searchField(context.l10n.dmSearchNpcs),
         const SizedBox(height: 8),
         SizedBox(
           height: 300,
@@ -332,16 +343,22 @@ class _AddCombatantDialogState extends State<_AddCombatantDialog> {
               ];
               return ListView(
                 children: [
-                  const Eyebrow('En esta campaña'),
+                  Eyebrow(context.l10n.dmInThisCampaign),
                   if (inCampaign.isEmpty)
-                    Text('Ninguno.', style: TextStyle(color: pal.textMuted)),
+                    Text(
+                      context.l10n.dmNoneDot,
+                      style: TextStyle(color: pal.textMuted),
+                    ),
                   for (final option in inCampaign) tile(option),
                   const SizedBox(height: 10),
-                  const Eyebrow('De tu biblioteca · no están en esta campaña'),
+                  Eyebrow(context.l10n.dmFromLibrary),
                   if (snapshot.connectionState != ConnectionState.done)
-                    const AppBusyLabel('Cargando tu biblioteca…')
+                    AppBusyLabel(context.l10n.dmLoadingLibrary)
                   else if (fromLibrary.isEmpty)
-                    Text('Ninguno.', style: TextStyle(color: pal.textMuted)),
+                    Text(
+                      context.l10n.dmNoneDot,
+                      style: TextStyle(color: pal.textMuted),
+                    ),
                   for (final option in fromLibrary) tile(option),
                 ],
               );
@@ -369,12 +386,12 @@ class _AddCombatantDialogState extends State<_AddCombatantDialog> {
             ),
             TextButton(
               onPressed: () => setState(() => _npc = null),
-              child: const Text('Cambiar'),
+              child: Text(context.l10n.sheetChange),
             ),
           ],
         ),
         Text(
-          npcTypeLine(option.npc, option.sheet, widget.repo),
+          npcTypeLine(option.npc, option.sheet, widget.repo, context.l10n),
           style: TextStyle(color: pal.textMuted),
         ),
         if (option.status == NpcStatus.dead) ...[
@@ -388,15 +405,12 @@ class _AddCombatantDialogState extends State<_AddCombatantDialog> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  '${option.npc.name} está muerto en esta campaña. Sumarlo '
-                  'al combate no cambia eso.',
-                ),
+                Text(context.l10n.dmDeadNote(option.npc.name)),
                 CheckboxListTile(
                   value: _revive,
                   contentPadding: EdgeInsets.zero,
                   controlAffinity: ListTileControlAffinity.leading,
-                  title: const Text('Volvió: marcarlo vivo otra vez'),
+                  title: Text(context.l10n.dmRevive),
                   onChanged: (v) => setState(() => _revive = v ?? false),
                 ),
               ],
@@ -404,9 +418,9 @@ class _AddCombatantDialogState extends State<_AddCombatantDialog> {
           ),
         ],
         const SizedBox(height: 14),
-        const Eyebrow('¿De qué lado pelea?'),
+        Eyebrow(context.l10n.dmWhichSide),
         SideSelector(
-          label: 'Bando',
+          label: context.l10n.dmSide,
           side: statless ? CombatantSide.neutral : _npcSide,
           onChanged: statless
               ? null
@@ -414,12 +428,7 @@ class _AddCombatantDialogState extends State<_AddCombatantDialog> {
         ),
         const SizedBox(height: 8),
         Text(
-          statless
-              ? 'Sin estadísticas no tiene PG que bajar: entra neutral, con su '
-                    'turno, y no cuenta para ningún bando.'
-              : 'Sin valor por defecto: el mismo PNJ puede ser aliado hoy y '
-                    'enemigo la sesión que viene. Un neutral tiene turno y puede '
-                    'tomar partido durante el combate.',
+          statless ? context.l10n.dmStatlessSide : context.l10n.dmNoDefaultSide,
           style: TextStyle(fontSize: 12, color: pal.textMuted),
         ),
       ],
@@ -478,7 +487,10 @@ class _MonsterQuantity extends StatelessWidget {
               ),
             ),
             if (onChange != null)
-              TextButton(onPressed: onChange, child: const Text('Cambiar')),
+              TextButton(
+                onPressed: onChange,
+                child: Text(context.l10n.sheetChange),
+              ),
           ],
         ),
         Text(creature.kind, style: TextStyle(color: pal.textMuted)),
@@ -487,7 +499,7 @@ class _MonsterQuantity extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             IconButton(
-              tooltip: 'Una copia menos',
+              tooltip: context.l10n.dmOneFewer,
               onPressed: count > 1 ? onLess : null,
               icon: const Icon(Icons.remove_circle_outline),
             ),
@@ -500,7 +512,7 @@ class _MonsterQuantity extends StatelessWidget {
               ),
             ),
             IconButton(
-              tooltip: 'Una copia más',
+              tooltip: context.l10n.dmOneMore,
               onPressed: onMore,
               icon: const Icon(Icons.add_circle_outline),
             ),
@@ -515,17 +527,17 @@ class _MonsterQuantity extends StatelessWidget {
             onChanged: (v) => onRollHp(v ?? false),
             contentPadding: EdgeInsets.zero,
             controlAffinity: ListTileControlAffinity.leading,
-            title: const Text('Tirar los PG de cada uno'),
+            title: Text(context.l10n.dmRollEachHp),
             subtitle: Text(
               rollHp
-                  ? 'Cada copia tira $formula por su cuenta.'
-                  : 'Todas arrancan con ${creature.hp}, el promedio del libro.',
+                  ? context.l10n.dmEachRolls(formula)
+                  : context.l10n.dmAllStartWith(creature.hp),
               style: TextStyle(fontSize: 12, color: pal.textMuted),
             ),
           ),
         const SizedBox(height: 8),
-        const Eyebrow('¿De qué lado pelea?'),
-        SideSelector(label: 'Bando', side: side, onChanged: onSide),
+        Eyebrow(context.l10n.dmWhichSide),
+        SideSelector(label: context.l10n.dmSide, side: side, onChanged: onSide),
       ],
     );
   }
@@ -565,7 +577,7 @@ class _AddMonsterDialogState extends State<_AddMonsterDialog> {
   @override
   Widget build(BuildContext context) {
     return AppDialog(
-      title: 'Sumar al combate de ${widget.campaignName}',
+      title: context.l10n.dmAddToCombatOf(widget.campaignName),
       width: 440,
       content: _MonsterQuantity(
         creature: widget.creature,
@@ -579,12 +591,12 @@ class _AddMonsterDialogState extends State<_AddMonsterDialog> {
       ),
       actions: [
         DialogAction(
-          'Cancelar',
+          context.l10n.commonCancel,
           keyHint: 'Esc',
           onPressed: () => Navigator.of(context).pop(),
         ),
         DialogAction(
-          'Sumar',
+          context.l10n.dmAddShort,
           primary: true,
           onPressed: () => Navigator.of(context).pop(
             AddMonsterChoice(

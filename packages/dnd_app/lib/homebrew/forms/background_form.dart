@@ -62,34 +62,38 @@ class _BackgroundFormState extends State<BackgroundForm> with _GuidedForm {
     switch (key) {
       case 'abilities':
         return _explained(
-          'Características',
-          'Las tres del aumento',
+          context.l10n.abilitiesTitle,
+          context.l10n.hbAllThree,
           backgroundAbilitiesRule,
         );
       case 'feat':
         final feat = _originFeat;
         return feat == null
             ? _explained(
-                'Dote de origen',
-                'Sin dote de origen',
+                context.l10n.factOriginFeat,
+                context.l10n.hbNoOriginFeat,
                 backgroundOriginFeatRule,
               )
             : _explained(
-                'Dote de origen',
+                context.l10n.factOriginFeat,
                 feat.name,
-                featSummary(feat, widget.repo),
+                featSummary(context.l10n, feat, widget.repo),
                 backgroundOriginFeatRule,
               );
       case 'skills':
         return _explained(
-          'Competencias',
-          _orNone([for (final s in _skills) Skill.labelFor(s)], 'Ninguna'),
+          context.l10n.stepProficiencies,
+          _orNone([
+            for (final s in _skills) Skill.labelFor(s),
+          ], context.l10n.hbNoneF),
           skillProficiencyRule,
         );
       case 'tools':
         return _explained(
-          'Herramientas',
-          _orNone([for (final t in _tools) toolProficiencyLabel(t)], 'Ninguna'),
+          context.l10n.groupTools,
+          _orNone([
+            for (final t in _tools) toolProficiencyLabel(t),
+          ], context.l10n.hbNoneF),
           toolProficiencyRule,
         );
     }
@@ -110,11 +114,11 @@ class _BackgroundFormState extends State<BackgroundForm> with _GuidedForm {
     final feat = _originFeat;
     final muted = Theme.of(context).colorScheme.onSurfaceVariant;
     return _FormScaffold(
-      title: 'Trasfondo',
+      title: context.l10n.stepBackground,
       onSave: _save,
       onInvalid: openAllSections,
       panel: guidePanel(
-        previewTitle: 'Cómo se va a ver al crear un personaje',
+        previewTitle: context.l10n.hbRacePreview,
         preview: DenseRows(
           children: [
             Padding(
@@ -128,21 +132,21 @@ class _BackgroundFormState extends State<BackgroundForm> with _GuidedForm {
                   const SizedBox(height: 10),
                   _statBand(context, [
                     (
-                      'Competencias',
+                      context.l10n.stepProficiencies,
                       _orNone([
                         for (final s in bg.skillProficiencies)
                           Skill.labelFor(s),
                       ], '—'),
                     ),
-                    if (feat != null) ('Dote de origen', feat.name),
+                    if (feat != null) (context.l10n.factOriginFeat, feat.name),
                     (
-                      'Aumento',
+                      context.l10n.hbIncrease,
                       _orNone([for (final a in bg.abilityOptions) a.abbr], '—'),
                     ),
                   ], wide: false),
                   if (feat != null) ...[
                     const SizedBox(height: 12),
-                    const Eyebrow('Qué te da su dote de origen'),
+                    Eyebrow(context.l10n.bgOriginFeatGives),
                     ..._traitsPreview(context, feat.effects, widget.repo),
                   ],
                 ],
@@ -150,28 +154,25 @@ class _BackgroundFormState extends State<BackgroundForm> with _GuidedForm {
             ),
           ],
         ),
-        hint:
-            'Tocá las características o la dote de origen para ver qué le dan '
-            'al personaje.',
+        hint: context.l10n.hbBgHint,
       ),
       children: [
         _text(
           _name,
-          'Nombre',
-          validator: (v) => _requiredText(v, 'el nombre del trasfondo'),
+          context.l10n.detailsName,
+          validator: (v) => _requiredText(v, context.l10n.hbReqBgName),
         ),
         const SizedBox(height: 8),
         // Un campo del formulario y no chips sueltos: con menos de tres, la
         // creación no puede repartir el +2/+1 y el trasfondo quedaba
         // guardado sin servir.
         FormField<void>(
-          validator: (_) => _abilities.length == 3
-              ? null
-              : 'Elegí exactamente tres características.',
+          validator: (_) =>
+              _abilities.length == 3 ? null : context.l10n.hbThreeAbilities,
           builder: (field) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Eyebrow('Características · elegí 3'),
+              Eyebrow(context.l10n.hbPick3),
               const SizedBox(height: 6),
               Wrap(
                 spacing: 6,
@@ -213,10 +214,10 @@ class _BackgroundFormState extends State<BackgroundForm> with _GuidedForm {
         ),
         const SizedBox(height: 8),
         _idDropdown(
-          label: 'Dote de origen',
+          label: context.l10n.factOriginFeat,
           value: _originFeatId,
           options: {
-            '': '(ninguna)',
+            '': context.l10n.hbNoneParen,
             for (final f in widget.repo.featsSorted)
               if (_originFeatCategories.contains(f.category)) f.id: f.name,
             // Una dote de otra categoría que ya traía el original se sigue
@@ -233,13 +234,13 @@ class _BackgroundFormState extends State<BackgroundForm> with _GuidedForm {
         ..._optionalRule,
         section(
           icon: Icons.school_outlined,
-          title: 'Competencias',
+          title: context.l10n.stepProficiencies,
           summary: _orNone([
             ...[for (final s in _skills) Skill.labelFor(s)],
             ...[for (final t in _tools) toolProficiencyLabel(t)],
-          ], 'ninguna'),
+          ], context.l10n.hbNone),
           children: [
-            const Eyebrow('Habilidades'),
+            Eyebrow(context.l10n.creatureSkills),
             _idChips(
               _skillOptions,
               _skills,
@@ -247,7 +248,7 @@ class _BackgroundFormState extends State<BackgroundForm> with _GuidedForm {
               onTap: (_) => focus = 'skills',
             ),
             const SizedBox(height: 12),
-            const Eyebrow('Herramientas'),
+            Eyebrow(context.l10n.groupTools),
             _idChips(
               {
                 for (final id in toolProficiencyIds)
@@ -266,20 +267,21 @@ class _BackgroundFormState extends State<BackgroundForm> with _GuidedForm {
         ),
         section(
           icon: Icons.menu_book_outlined,
-          title: 'Presentación',
+          title: context.l10n.hbPresentation,
           summary: _orNone([
-            if (_tagline.text.trim().isNotEmpty) 'lema',
-            if (_description.text.trim().isNotEmpty) 'descripción',
-          ], 'sin cargar'),
+            if (_tagline.text.trim().isNotEmpty) context.l10n.hbTaglineLower,
+            if (_description.text.trim().isNotEmpty)
+              context.l10n.hbDescriptionLower,
+          ], context.l10n.hbNotSet),
           children: [
-            _text(_tagline, 'Lema (una línea, se ve al elegirlo)'),
-            _text(_description, 'Descripción', maxLines: 5),
+            _text(_tagline, context.l10n.hbTaglineLabelM),
+            _text(_description, context.l10n.hbDescription, maxLines: 5),
           ],
         ),
         section(
           icon: Icons.auto_awesome,
-          title: 'Efectos adicionales',
-          summary: _effectsSummary(_effects),
+          title: context.l10n.hbExtraEffects,
+          summary: _effectsSummary(context.l10n, _effects),
           children: [
             EffectEditor(
               effects: _effects,

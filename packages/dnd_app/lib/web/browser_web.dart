@@ -52,3 +52,25 @@ void downloadBytes(
 void openInNewTab(String url) {
   html.window.open(url, '_blank', 'noopener,noreferrer');
 }
+
+/// Clave bajo la que se recuerda el idioma elegido. Una sola, y sin datos de
+/// la persona: solo `es` o `en`.
+const _localeKey = 'milantus.locale';
+
+/// Idioma guardado, o `null` si no hay. **Puede lanzar** si el navegador
+/// bloquea el almacenamiento (modo privado estricto, cookies desactivadas):
+/// quien llama (`AppLocaleController`) lo trata como «no hay».
+String? readStoredLocale() => html.window.localStorage[_localeKey];
+
+void writeStoredLocale(String code) {
+  html.window.localStorage[_localeKey] = code;
+}
+
+/// Idioma del navegador (`en-US`, `es-AR`…), o `null` si no lo informa.
+String? browserLanguage() => html.window.navigator.language;
+
+/// Mantiene `<html lang>` al día: lo usan los lectores de pantalla para elegir
+/// la voz y los navegadores para ofrecer traducir la página.
+void setDocumentLanguage(String code) {
+  html.document.documentElement?.setAttribute('lang', code);
+}

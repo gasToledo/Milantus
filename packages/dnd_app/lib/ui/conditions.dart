@@ -17,6 +17,9 @@ class ConditionInfo {
   const ConditionInfo(this.label, this.description);
 }
 
+// l10n-ignore: texto del libro (catálogo en español, fase 2). Lo que se guarda en
+// los tags del combate es la etiqueta, así que traducirla acá sin migrar los tags
+// ya escritos los dejaría sin marcar.
 const conditions = <String, ConditionInfo>{
   'blinded': ConditionInfo(
     'Cegado',

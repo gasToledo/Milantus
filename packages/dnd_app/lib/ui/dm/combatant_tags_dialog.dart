@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/app_widgets.dart';
 import '../conditions.dart';
+import '../../l10n/l10n_context.dart';
 
 /// Qué le está pasando a un combatiente, para que el DM no se olvide a mitad
 /// de una ronda.
@@ -83,7 +84,7 @@ class _TagsDialogState extends State<_TagsDialog> {
     ];
 
     return AppDialog(
-      title: 'Efectos de ${widget.name}',
+      title: context.l10n.dmEffectsOf(widget.name),
       width: 460,
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -96,9 +97,9 @@ class _TagsDialogState extends State<_TagsDialog> {
                   controller: _controller,
                   autofocus: true,
                   textCapitalization: TextCapitalization.sentences,
-                  decoration: const InputDecoration(
-                    labelText: 'Anotar un efecto',
-                    hintText: 'Marcado por el pícaro…',
+                  decoration: InputDecoration(
+                    labelText: context.l10n.dmNoteEffect,
+                    hintText: context.l10n.dmNoteEffectHint,
                     border: OutlineInputBorder(),
                   ),
                   onSubmitted: (_) => _addTyped(),
@@ -106,7 +107,7 @@ class _TagsDialogState extends State<_TagsDialog> {
               ),
               const SizedBox(width: 8),
               IconButton(
-                tooltip: 'Anotar',
+                tooltip: context.l10n.wildShapeAddForms,
                 onPressed: _addTyped,
                 icon: const Icon(Icons.add_circle_outline),
               ),
@@ -122,13 +123,13 @@ class _TagsDialogState extends State<_TagsDialog> {
                   InputChip(
                     label: Text(tag),
                     onDeleted: () => setState(() => _tags.remove(tag)),
-                    deleteButtonTooltipMessage: 'Sacar «$tag»',
+                    deleteButtonTooltipMessage: context.l10n.dmRemoveTag(tag),
                   ),
               ],
             ),
           ],
           const SizedBox(height: 20),
-          const Eyebrow('Condiciones del libro'),
+          Eyebrow(context.l10n.dmBookConditions),
           const SizedBox(height: 8),
           Wrap(
             spacing: 6,
@@ -148,20 +149,19 @@ class _TagsDialogState extends State<_TagsDialog> {
           ),
           const SizedBox(height: 12),
           Text(
-            'Los efectos son tuyos: al jugador no le llega nada, se lo '
-            'decís en la mesa.',
+            context.l10n.dmEffectsArePrivate,
             style: TextStyle(fontSize: 12, color: pal.textMuted),
           ),
         ],
       ),
       actions: [
         DialogAction(
-          'Cancelar',
+          context.l10n.commonCancel,
           keyHint: 'Esc',
           onPressed: () => Navigator.of(context).pop(),
         ),
         DialogAction(
-          'Guardar',
+          context.l10n.commonSave,
           primary: true,
           onPressed: () => Navigator.of(context).pop(_tags),
         ),

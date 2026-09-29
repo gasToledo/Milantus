@@ -3,11 +3,15 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
 import '../theme/app_widgets.dart';
+import '../l10n/l10n_context.dart';
 
 /// El catálogo de objetos y el diálogo de Comprar/Vender, compartidos por la
 /// ficha (Inventario) y la creación de personaje (paso Equipo).
 
 /// Filtro que muestra todas las familias.
+///
+/// l10n-ignore: es un identificador de filtro, no texto: el texto visible sale
+/// de [itemFilterText].
 const itemFilterAll = 'Todos';
 
 /// La familia con la que se agrupa y rotula un objeto. Los mágicos del
@@ -17,8 +21,12 @@ const itemFilterAll = 'Todos';
 String? itemFamily(Item? item) =>
     item == null ? null : (item.isMagic ? 'magic' : item.category);
 
-/// Etiqueta visible de la familia. La comparten la fila y el buscador para que
-/// el jugador lea lo mismo en los dos lados.
+/// Identificador de la familia. La comparten la fila y el buscador para que el
+/// jugador lea lo mismo en los dos lados.
+///
+/// l10n-ignore: son identificadores (claves de agrupación) que hoy coinciden
+/// con el texto en español, no texto para la persona: lo visible sale de
+/// [itemKindText] y [itemGroupTitle].
 String itemKindLabel(String kind, String? category) => switch (kind) {
   'weapon' => 'Arma',
   'armor' => 'Armadura',
@@ -33,32 +41,93 @@ String itemKindLabel(String kind, String? category) => switch (kind) {
   },
 };
 
-/// Orden en que se muestran las familias, y su título en plural.
+/// Orden en que se muestran las familias.
 ///
 /// El orden no es alfabético: primero lo que se empuña, después lo que se
 /// gasta, y al final lo que solo se lleva encima. Una familia que no esté acá
 /// —homebrew con una categoría nueva— va al fondo con su propio nombre, en vez
 /// de desaparecer.
-const itemGroupTitles = <String, String>{
-  'Arma': 'Armas',
-  'Armadura': 'Armaduras',
-  'Munición': 'Munición',
-  'Canalizador': 'Canalizadores',
-  'Objeto mágico': 'Objetos mágicos',
-  'Herramienta': 'Herramientas',
-  'Contenedor': 'Contenedores',
-  'Paquete': 'Paquetes',
-  'Equipo': 'Equipo',
+///
+/// l10n-ignore: identificadores, no texto (ver [itemKindLabel]).
+const itemGroupOrder = <String>[
+  'Arma',
+  'Armadura',
+  'Munición',
+  'Canalizador',
+  'Objeto mágico',
+  'Herramienta',
+  'Contenedor',
+  'Paquete',
+  'Equipo',
+];
+
+/// El texto visible de una familia, en singular, por su identificador. Una
+/// familia desconocida (homebrew) se muestra con su propio nombre.
+///
+/// l10n-ignore: los patrones son identificadores de familia, no texto.
+String itemKindText(AppLocalizations l10n, String kind) => switch (kind) {
+  'Arma' => l10n.kindWeapon,
+  'Armadura' => l10n.kindArmor,
+  'Munición' => l10n.kindAmmunition,
+  'Canalizador' => l10n.kindFocus,
+  'Objeto mágico' => l10n.kindMagicItem,
+  'Herramienta' => l10n.kindTool,
+  'Contenedor' => l10n.kindContainer,
+  'Paquete' => l10n.kindPack,
+  'Equipo' => l10n.kindGear,
+  _ => kind,
+};
+
+/// El título de un grupo de la mochila, en plural, por el identificador de la
+/// familia.
+///
+/// l10n-ignore: los patrones son identificadores de familia, no texto.
+String itemGroupTitle(AppLocalizations l10n, String kind) => switch (kind) {
+  'Arma' => l10n.groupWeapons,
+  'Armadura' => l10n.groupArmor,
+  'Munición' => l10n.kindAmmunition,
+  'Canalizador' => l10n.groupFocuses,
+  'Objeto mágico' => l10n.groupMagicItems,
+  'Herramienta' => l10n.groupTools,
+  'Contenedor' => l10n.groupContainers,
+  'Paquete' => l10n.groupPacks,
+  'Equipo' => l10n.kindGear,
+  'No está en el catálogo' => l10n.catalogNotInCatalog,
+  _ => kind,
+};
+
+/// El texto de una píldora de filtro: «Todos», «Equipados», «Mágicos» o una
+/// familia.
+///
+/// l10n-ignore: los patrones son identificadores de filtro, no texto.
+String itemFilterText(AppLocalizations l10n, String filter) => switch (filter) {
+  itemFilterAll => l10n.filterAll,
+  'Equipados' => l10n.filterEquipped,
+  'Mágicos' => l10n.filterMagic,
+  _ => itemGroupTitle(l10n, filter),
 };
 
 /// Nombre largo de cada denominación. La abreviatura sola («PE») es un rótulo
 /// de formulario: en la mesa nadie recuerda cuál es electro y cuál platino.
-const coinNames = <String, String>{
-  'cp': 'cobre',
-  'sp': 'plata',
-  'ep': 'electro',
-  'gp': 'oro',
-  'pp': 'platino',
+String coinName(AppLocalizations l10n, String key) => switch (key) {
+  'cp' => l10n.coinCopper,
+  'sp' => l10n.coinSilver,
+  'ep' => l10n.coinElectrum,
+  'gp' => l10n.coinGold,
+  'pp' => l10n.coinPlatinum,
+  _ => key,
+};
+
+/// La abreviatura de cada denominación en el idioma activo («po» en español,
+/// «gp» en inglés). Es la de la interfaz: las cuentas que arma el engine
+/// (`CoinOps.formatAmount`) siguen en español hasta la fase 2.
+String coinAbbr(AppLocalizations l10n, String key) => switch (key) {
+  'cp' => l10n.coinAbbrCopper,
+  'sp' => l10n.coinAbbrSilver,
+  'ep' => l10n.coinAbbrElectrum,
+  'gp' => l10n.coinAbbrGold,
+  'pp' => l10n.coinAbbrPlatinum,
+  _ => key,
 };
 
 /// Buscador sobre los tres catálogos que pueden entrar en la mochila.
@@ -77,7 +146,9 @@ const coinNames = <String, String>{
 /// reversible hasta terminar el personaje.
 class ItemCatalogDialog extends StatefulWidget {
   final ContentRepository repo;
-  final String title;
+
+  /// Null usa «Agregar objeto».
+  final String? title;
 
   /// Lo que se puede gastar ahora, en cobre. Función y no valor porque el
   /// diálogo sigue abierto mientras la ficha o el borrador cambian debajo.
@@ -86,7 +157,7 @@ class ItemCatalogDialog extends StatefulWidget {
 
   /// Rótulo de la píldora de arriba: «Bolsa» en la ficha, «Quedan» en la
   /// creación.
-  final String purseLabel;
+  final String? purseLabel;
 
   /// Null quita «Agregar»: en la creación todo se compra.
   final ValueChanged<String>? onAdd;
@@ -111,8 +182,8 @@ class ItemCatalogDialog extends StatefulWidget {
     required this.repo,
     required this.purseCp,
     required this.onBuy,
-    this.title = 'Agregar objeto',
-    this.purseLabel = 'Bolsa',
+    this.title,
+    this.purseLabel,
     this.onAdd,
     this.countOf,
     this.hint = '',
@@ -144,8 +215,8 @@ class _ItemCatalogDialogState extends State<ItemCatalogDialog> {
         (
           id: w.id,
           name: w.name,
-          family: 'Arma',
-          detail: itemKindLabel('weapon', null),
+          family: itemKindLabel('weapon', null),
+          detail: itemKindText(context.l10n, itemKindLabel('weapon', null)),
           weight: w.weight,
           costCp: w.costCp,
         ),
@@ -153,8 +224,10 @@ class _ItemCatalogDialogState extends State<ItemCatalogDialog> {
         (
           id: a.id,
           name: a.name,
-          family: 'Armadura',
-          detail: a.isShield ? 'Escudo' : itemKindLabel('armor', null),
+          family: itemKindLabel('armor', null),
+          detail: a.isShield
+              ? context.l10n.kindShield
+              : itemKindText(context.l10n, itemKindLabel('armor', null)),
           weight: a.weight,
           costCp: a.costCp,
         ),
@@ -165,9 +238,9 @@ class _ItemCatalogDialogState extends State<ItemCatalogDialog> {
             name: i.name,
             family: itemKindLabel('item', itemFamily(i)),
             detail: [
-              itemKindLabel('item', itemFamily(i)),
-              if (i.bundleSize > 1) 'paquete de ${i.bundleSize}',
-              if (i.requiresAttunement) 'sintonización',
+              itemKindText(context.l10n, itemKindLabel('item', itemFamily(i))),
+              if (i.bundleSize > 1) context.l10n.catalogBundleOf(i.bundleSize),
+              if (i.requiresAttunement) context.l10n.catalogAttunement,
             ].join(' · '),
             weight: i.weight,
             costCp: i.costCp,
@@ -214,7 +287,7 @@ class _ItemCatalogDialogState extends State<ItemCatalogDialog> {
               onAdd(e.id);
               setState(() => _added++);
             },
-            child: const Text('Agregar'),
+            child: Text(context.l10n.commonAdd),
           ),
           const SizedBox(width: 4),
         ],
@@ -235,7 +308,7 @@ class _ItemCatalogDialogState extends State<ItemCatalogDialog> {
                     setState(() {});
                   }
                 },
-          child: const Text('Comprar'),
+          child: Text(context.l10n.commonBuy),
         ),
       ],
     );
@@ -261,7 +334,8 @@ class _ItemCatalogDialogState extends State<ItemCatalogDialog> {
                 // Angosto, sin la columna que lo alinee, la raya de «sin
                 // peso» quedaba suelta entre los datos.
                 if (narrow && e.weight > 0) weight,
-                if (missing > 0) 'te faltan ${CoinOps.formatAmount(missing)}',
+                if (missing > 0)
+                  context.l10n.catalogMissing(CoinOps.formatAmount(missing)),
               ].join(' · '),
               style: TextStyle(fontSize: 11.5, color: muted),
             ),
@@ -322,12 +396,12 @@ class _ItemCatalogDialogState extends State<ItemCatalogDialog> {
     final purseCp = widget.purseCp();
 
     return AppDialog(
-      title: widget.title,
+      title: widget.title ?? context.l10n.catalogAddTitle,
       // Lo que hay para gastar, para saber qué se puede comprar sin cerrar.
       titleTrailing: GoldPill(
         purseCp < 0
-            ? 'Faltan ${CoinOps.formatAmount(-purseCp)}'
-            : '${widget.purseLabel} ${CoinOps.formatAmount(purseCp)}',
+            ? context.l10n.catalogShortBy(CoinOps.formatAmount(-purseCp))
+            : '${widget.purseLabel ?? context.l10n.commonBag} ${CoinOps.formatAmount(purseCp)}',
       ),
       width: 560,
       scrollable: false,
@@ -337,10 +411,10 @@ class _ItemCatalogDialogState extends State<ItemCatalogDialog> {
           children: [
             TextField(
               autofocus: true,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 isDense: true,
                 prefixIcon: Icon(Icons.search, size: 20),
-                hintText: 'Buscar objeto…',
+                hintText: context.l10n.catalogSearchHint,
                 border: OutlineInputBorder(),
               ),
               onChanged: (v) => setState(() => _query = v),
@@ -351,15 +425,11 @@ class _ItemCatalogDialogState extends State<ItemCatalogDialog> {
                 final chips = [
                   for (final family in [
                     itemFilterAll,
-                    ...itemGroupTitles.keys.where(families.contains),
-                    ...families.where((f) => !itemGroupTitles.containsKey(f)),
+                    ...itemGroupOrder.where(families.contains),
+                    ...families.where((f) => !itemGroupOrder.contains(f)),
                   ])
                     ChoiceChip(
-                      label: Text(
-                        family == itemFilterAll
-                            ? family
-                            : itemGroupTitles[family] ?? family,
-                      ),
+                      label: Text(itemFilterText(context.l10n, family)),
                       selected: _family == family,
                       showCheckmark: false,
                       visualDensity: VisualDensity.compact,
@@ -391,7 +461,7 @@ class _ItemCatalogDialogState extends State<ItemCatalogDialog> {
             const SizedBox(height: 10),
             Expanded(
               child: matches.isEmpty
-                  ? const Center(child: Text('Sin coincidencias.'))
+                  ? Center(child: Text(context.l10n.catalogNoMatches))
                   : ListView.separated(
                       itemCount: matches.length,
                       separatorBuilder: (_, _) =>
@@ -409,11 +479,7 @@ class _ItemCatalogDialogState extends State<ItemCatalogDialog> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                _added == 0
-                    ? widget.hint
-                    : _added == 1
-                    ? '1 objeto agregado a la mochila.'
-                    : '$_added objetos agregados a la mochila.',
+                _added == 0 ? widget.hint : context.l10n.catalogAdded(_added),
                 style: TextStyle(fontSize: 12, color: muted),
               ),
             ),
@@ -422,7 +488,7 @@ class _ItemCatalogDialogState extends State<ItemCatalogDialog> {
       ),
       actions: [
         DialogAction(
-          'Cerrar',
+          context.l10n.commonClose,
           primary: true,
           keyHint: 'Esc',
           onPressed: () => Navigator.pop(context),
@@ -508,11 +574,13 @@ class _TradeDialogState extends State<TradeDialog> {
     return cp;
   }
 
-  String get _unitWord => widget.bundleSize > 1 ? 'paquete' : 'unidad';
+  String get _unitWord => widget.bundleSize > 1
+      ? context.l10n.tradeUnitBundle
+      : context.l10n.tradeUnitItem;
 
-  String _units(int n) => n == 1
-      ? '1 $_unitWord'
-      : '$n ${widget.bundleSize > 1 ? 'paquetes' : 'unidades'}';
+  String _units(int n) => widget.bundleSize > 1
+      ? context.l10n.tradeBundles(n)
+      : context.l10n.tradeUnitsCount(n);
 
   @override
   Widget build(BuildContext context) {
@@ -556,13 +624,16 @@ class _TradeDialogState extends State<TradeDialog> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    eyebrow('Cantidad'),
+                    eyebrow(context.l10n.tradeQuantity),
                     Text(
                       [
                         _units(_quantity),
                         if (widget.bundleSize > 1)
-                          '${_quantity * widget.bundleSize} en total',
-                        if (max != null) 'te quedan ${max - _quantity}',
+                          context.l10n.tradeTotalUnits(
+                            _quantity * widget.bundleSize,
+                          ),
+                        if (max != null)
+                          context.l10n.tradeLeft(max - _quantity),
                       ].join(' · '),
                       style: TextStyle(fontSize: 12.5, color: muted),
                     ),
@@ -570,7 +641,7 @@ class _TradeDialogState extends State<TradeDialog> {
                 ),
               ),
               IconButton.outlined(
-                tooltip: 'Uno menos',
+                tooltip: context.l10n.tradeOneLess,
                 onPressed: _quantity > 1
                     ? () => setState(() => _quantity--)
                     : null,
@@ -589,7 +660,7 @@ class _TradeDialogState extends State<TradeDialog> {
                 ),
               ),
               IconButton.outlined(
-                tooltip: 'Uno más',
+                tooltip: context.l10n.tradeOneMore,
                 onPressed: max == null || _quantity < max
                     ? () => setState(() => _quantity++)
                     : null,
@@ -599,7 +670,9 @@ class _TradeDialogState extends State<TradeDialog> {
           ),
           const SizedBox(height: 18),
           eyebrow(
-            widget.buying ? 'Precio por $_unitWord' : 'Te pagan por $_unitWord',
+            widget.buying
+                ? context.l10n.tradeBuyPrice(_unitWord)
+                : context.l10n.tradeSellPrice(_unitWord),
           ),
           Wrap(
             spacing: 9,
@@ -612,9 +685,12 @@ class _TradeDialogState extends State<TradeDialog> {
               Expanded(
                 child: Text(
                   widget.buying
-                      ? 'Catálogo: ${formatCost(widget.catalogCp)}'
-                      : 'Sugerido: la mitad del catálogo, '
-                            '${CoinOps.formatAmount(widget.catalogCp)}.',
+                      ? context.l10n.tradeCatalogPrice(
+                          formatCost(widget.catalogCp),
+                        )
+                      : context.l10n.tradeSuggested(
+                          CoinOps.formatAmount(widget.catalogCp),
+                        ),
                   style: TextStyle(fontSize: 12.5, color: muted),
                 ),
               ),
@@ -623,8 +699,8 @@ class _TradeDialogState extends State<TradeDialog> {
                   onPressed: () => setState(() => _setPrice(widget.catalogCp)),
                   child: Text(
                     widget.buying
-                        ? 'Volver al del catálogo'
-                        : 'Volver al sugerido',
+                        ? context.l10n.tradeBackCatalog
+                        : context.l10n.tradeBackSuggested,
                   ),
                 ),
             ],
@@ -644,7 +720,9 @@ class _TradeDialogState extends State<TradeDialog> {
                   children: [
                     Expanded(
                       child: Text(
-                        widget.buying ? 'TOTAL' : 'COBRÁS',
+                        widget.buying
+                            ? context.l10n.tradeTotalBuy
+                            : context.l10n.tradeTotalSell,
                         style: TextStyle(
                           fontSize: 11,
                           letterSpacing: 1.6,
@@ -667,9 +745,11 @@ class _TradeDialogState extends State<TradeDialog> {
                 const SizedBox(height: 10),
                 if (short)
                   Text(
-                    'Te faltan '
-                    '${CoinOps.formatAmount(total - CoinOps.totalCp(widget.coins))}. '
-                    'Si el DM te lo regala o te lo fía, cerrá y usá «Agregar».',
+                    context.l10n.tradeShort(
+                      CoinOps.formatAmount(
+                        total - CoinOps.totalCp(widget.coins),
+                      ),
+                    ),
                     style: TextStyle(fontSize: 13, color: pal.crimson),
                   )
                 else ...[
@@ -678,17 +758,26 @@ class _TradeDialogState extends State<TradeDialog> {
                       padding: const EdgeInsets.only(bottom: 6),
                       child: Text(
                         [
-                          'Sale de la bolsa: ${CoinOps.formatCoins(plan.spent)}.',
+                          context.l10n.tradePaidFrom(
+                            CoinOps.formatCoins(plan.spent),
+                          ),
                           if (plan.change.isNotEmpty)
-                            'Te vuelven ${CoinOps.formatCoins(plan.change)}.',
+                            context.l10n.tradeChange(
+                              CoinOps.formatCoins(plan.change),
+                            ),
                         ].join(' '),
                         style: const TextStyle(fontSize: 13),
                       ),
                     ),
                   Text(
-                    'La bolsa queda en '
-                    '${CoinOps.formatAmount(CoinOps.totalCp(after))}'
-                    '${afterCoins.isEmpty ? '.' : ' ($afterCoins).'}',
+                    afterCoins.isEmpty
+                        ? context.l10n.tradeBagAfter(
+                            CoinOps.formatAmount(CoinOps.totalCp(after)),
+                          )
+                        : context.l10n.tradeBagAfterCoins(
+                            CoinOps.formatAmount(CoinOps.totalCp(after)),
+                            afterCoins,
+                          ),
                     style: TextStyle(fontSize: 12.5, color: muted),
                   ),
                 ],
@@ -699,12 +788,12 @@ class _TradeDialogState extends State<TradeDialog> {
       ),
       actions: [
         DialogAction(
-          'Cancelar',
+          context.l10n.commonCancel,
           keyHint: 'Esc',
           onPressed: () => Navigator.pop(context),
         ),
         DialogAction(
-          widget.buying ? 'Comprar' : 'Vender',
+          widget.buying ? context.l10n.commonBuy : context.l10n.commonSell,
           primary: true,
           onPressed: short
               ? null
@@ -739,7 +828,8 @@ class _TradeDialogState extends State<TradeDialog> {
           isDense: true,
           filled: true,
           fillColor: pal.plaque,
-          labelText: '${coinLabels[key]!.toUpperCase()} · ${coinNames[key]}',
+          labelText:
+              '${coinAbbr(context.l10n, key).toUpperCase()} · ${coinName(context.l10n, key)}',
           border: const OutlineInputBorder(),
         ),
       ),

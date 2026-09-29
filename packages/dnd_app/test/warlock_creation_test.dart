@@ -1,3 +1,4 @@
+import 'fakes/localized_app.dart';
 import 'dart:convert';
 
 import 'package:dnd_engine/dnd_engine.dart';
@@ -145,11 +146,11 @@ void main() {
       final d = brujo();
       final feat = d.originFeatWithAbilityChoice!;
       expect(
-        d.pendingFor(CreationStep.trasfondo),
+        d.pendingFor(CreationStep.trasfondo, l10nEs),
         contains('Elegí la aptitud mágica de ${feat.name}.'),
       );
       d.originFeatSpellcastingAbility = Ability.charisma;
-      expect(d.pendingFor(CreationStep.trasfondo), isEmpty);
+      expect(d.pendingFor(CreationStep.trasfondo, l10nEs), isEmpty);
     });
 
     test('el personaje nace con la aptitud y sin la advertencia', () {
@@ -165,7 +166,7 @@ void main() {
       final d = brujo(backgroundId: 'soldier')
         ..originFeatSpellcastingAbility = Ability.charisma;
       expect(d.originFeatWithAbilityChoice, isNull);
-      expect(d.pendingFor(CreationStep.trasfondo), isEmpty);
+      expect(d.pendingFor(CreationStep.trasfondo, l10nEs), isEmpty);
       expect(d.build().featSpellcastingAbilities, isEmpty);
     });
 
@@ -189,7 +190,7 @@ void main() {
         containsAll(['pact-of-the-tome:cantrips', 'pact-of-the-tome:rituals']),
       );
       expect(
-        d.pendingFor(CreationStep.equipo),
+        d.pendingFor(CreationStep.equipo, l10nEs),
         contains(
           'Conjuros a elección: ${slots.values.fold<int>(0, (n, s) => n + s.count)}.',
         ),
@@ -200,7 +201,7 @@ void main() {
       }
       expect(
         d
-            .pendingFor(CreationStep.equipo)
+            .pendingFor(CreationStep.equipo, l10nEs)
             .where((m) => m.startsWith('Conjuros a elección')),
         isEmpty,
       );

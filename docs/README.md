@@ -18,7 +18,8 @@ trabajar en el repositorio. Los detalles viven acá, una sola vez.
 - [Diseño web](desarrollo/diseno-web.md): lenguaje visual, componentes,
   responsividad y accesibilidad.
 - [Textos de la interfaz](desarrollo/textos.md): voz, glosario de términos,
-  etiquetas de acciones y mensajes de error.
+  etiquetas de acciones, mensajes de error y cómo agregar un texto en español
+  e inglés.
 - [Versionado y changelog](desarrollo/versionado-y-changelog.md): versión
   visible, flujo de releases y formato obligatorio de cambios.
 

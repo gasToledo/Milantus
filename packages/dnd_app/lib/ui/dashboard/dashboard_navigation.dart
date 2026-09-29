@@ -40,13 +40,13 @@ extension _DashboardNavigation on _DashboardScreenState {
                   child: Text.rich(
                     TextSpan(
                       children: [
-                        const TextSpan(text: 'Milantus\n'),
+                        const TextSpan(text: '$appName\n'),
                         // El subtítulo va más chico a propósito: a 17 no
                         // entra en los 236 de ancho del panel y parte la
                         // palabra, mientras que el nombre sí tiene que
                         // leerse como el título.
                         TextSpan(
-                          text: 'Asistente de Aventuras',
+                          text: context.l10n.appTagline,
                           style: TextStyle(
                             color: pal.gold,
                             fontSize: 11,
@@ -69,13 +69,13 @@ extension _DashboardNavigation on _DashboardScreenState {
           appNavItem(
             context,
             icon: Icons.groups,
-            label: 'Personajes',
+            label: context.l10n.navCharacters,
             active: true,
           ),
           appNavItem(
             context,
             icon: Icons.menu_book_outlined,
-            label: 'Códice',
+            label: context.l10n.navCodex,
             onTap: () => run(_openCodex),
           ),
           // Homebrew no está acá: crear contenido es trabajo del DM y se abre
@@ -83,7 +83,7 @@ extension _DashboardNavigation on _DashboardScreenState {
           appNavItem(
             context,
             icon: Icons.import_export,
-            label: 'Importar / Exportar',
+            label: context.l10n.transferTitle,
             onTap: () => run(_transferDialog),
           ),
           const Spacer(),
@@ -103,7 +103,7 @@ extension _DashboardNavigation on _DashboardScreenState {
                 side: BorderSide(color: pal.gold.withAlpha(110)),
                 textStyle: const TextStyle(fontSize: 12),
               ),
-              label: const Text('Modo DM'),
+              label: Text(context.l10n.dmModeButton),
             ),
           ),
           _accountFooter(context),
@@ -186,7 +186,7 @@ extension _DashboardNavigation on _DashboardScreenState {
               side: BorderSide(color: pal.crimson.withAlpha(110)),
               textStyle: const TextStyle(fontSize: 12),
             ),
-            child: const Text('Cerrar sesión'),
+            child: Text(context.l10n.accountSignOut),
           ),
         ],
       ),
@@ -207,7 +207,7 @@ extension _DashboardNavigation on _DashboardScreenState {
       if (mounted) {
         showAppMessage(
           context,
-          failureMessage('No se pudo cerrar la sesión', e),
+          failureMessage(context.l10n.signOutError, e),
           tone: AppMessageTone.error,
         );
       }

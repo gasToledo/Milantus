@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'fakes/fake_api_server.dart';
+import 'fakes/localized_app.dart';
 
 void main() {
   late ContentRepository repo;
@@ -33,7 +34,7 @@ void main() {
     AppSettings? settings,
     AppThemeController? theme,
     bool reduceMotion = false,
-  }) => MaterialApp(
+  }) => localizedApp(
     theme: AppTheme.dark,
     // El `builder` es la única forma de meter un MediaQuery **por dentro** de
     // MaterialApp, que es donde lo lee la aplicación.
@@ -109,7 +110,7 @@ void main() {
   ) async {
     await pumpDashboard(tester, const Size(390, 844));
 
-    await tester.tap(find.byTooltip('Open navigation menu'));
+    await tester.tap(find.byTooltip('Abrir el menú de navegación'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Códice'));
     await tester.pumpAndSettle();
@@ -604,11 +605,11 @@ void main() {
   ) async {
     await pumpDashboard(tester, const Size(390, 844));
 
-    await tester.tap(find.byTooltip('Open navigation menu'));
+    await tester.tap(find.byTooltip('Abrir el menú de navegación'));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('dm-mode-button')));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Open navigation menu'));
+    await tester.tap(find.byTooltip('Abrir el menú de navegación'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Homebrew'));
     await tester.pumpAndSettle();
@@ -621,7 +622,7 @@ void main() {
     expect(find.byIcon(Icons.category_outlined), findsOneWidget);
 
     // El menú del Modo DM sigue ahí y lleva a otra sección.
-    await tester.tap(find.byTooltip('Open navigation menu'));
+    await tester.tap(find.byTooltip('Abrir el menú de navegación'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Bestiario'));
     await tester.pumpAndSettle();
@@ -636,13 +637,13 @@ void main() {
   ) async {
     await pumpDashboard(tester, const Size(390, 844));
 
-    await tester.tap(find.byTooltip('Open navigation menu'));
+    await tester.tap(find.byTooltip('Abrir el menú de navegación'));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('dm-mode-button')));
     await tester.pumpAndSettle();
     expect(find.byType(DmModeScreen), findsOneWidget);
 
-    await tester.tap(find.byTooltip('Open navigation menu'));
+    await tester.tap(find.byTooltip('Abrir el menú de navegación'));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('exit-dm-mode')));
     await tester.pumpAndSettle();
@@ -689,7 +690,7 @@ void main() {
 
     // El panel no está fijo, pero sí accesible por el Drawer del AppBar.
     expect(find.text('Importar / Exportar'), findsNothing);
-    await tester.tap(find.byTooltip('Open navigation menu'));
+    await tester.tap(find.byTooltip('Abrir el menú de navegación'));
     await tester.pumpAndSettle();
     expect(find.text('Importar / Exportar'), findsOneWidget);
     expect(tester.takeException(), isNull);

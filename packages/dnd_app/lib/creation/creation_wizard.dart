@@ -9,6 +9,7 @@ import '../theme/app_widgets.dart';
 import '../theme/class_visuals.dart';
 import '../ui/item_catalog.dart';
 import 'creation_draft.dart';
+import '../l10n/l10n_context.dart';
 
 part 'steps/aptitudes_step.dart';
 part 'steps/choice_widgets.dart';
@@ -70,7 +71,8 @@ class _CreationWizardState extends State<CreationWizard> {
 
   static const _steps = CreationStep.values;
   bool get _isLast => _step == _steps.last;
-  String get _createLabel => widget.npc ? 'Crear PNJ' : 'Crear personaje';
+  String get _createLabel =>
+      widget.npc ? context.l10n.wizardCreateNpc : context.l10n.rosterCreate;
 
   @override
   void initState() {
@@ -114,7 +116,7 @@ class _CreationWizardState extends State<CreationWizard> {
   }
 
   Future<void> _finish() async {
-    final character = d.build();
+    final character = d.build(unnamed: context.l10n.characterUnnamed);
     // PG actuales al máximo al crear.
     final sheet = CharacterCompiler(widget.repo).compile(character);
     character.combat.currentHp = sheet.maxHp;
@@ -147,19 +149,17 @@ class _CreationWizardState extends State<CreationWizard> {
             icon: Icons.warning_amber_rounded,
             iconColor: context.palette.crimson,
             title: widget.npc
-                ? '¿Descartar este PNJ?'
-                : '¿Descartar este personaje?',
-            content: const Text(
-              'Las elecciones realizadas en el asistente se perderán.',
-            ),
+                ? context.l10n.wizardDiscardNpc
+                : context.l10n.wizardDiscardCharacter,
+            content: Text(context.l10n.wizardDiscardBody),
             actions: [
               DialogAction(
-                'Seguir creando',
+                context.l10n.wizardKeepCreating,
                 keyHint: 'Esc',
                 onPressed: () => Navigator.pop(ctx, false),
               ),
               DialogAction(
-                'Descartar',
+                context.l10n.wizardDiscard,
                 primary: true,
                 color: context.palette.crimson,
                 onPressed: () => Navigator.pop(ctx, true),
@@ -184,7 +184,7 @@ class _CreationWizardState extends State<CreationWizard> {
 
   @override
   Widget build(BuildContext context) {
-    final pending = d.pendingFor(_step);
+    final pending = d.pendingFor(_step, context.l10n);
     return PopScope(
       canPop: _allowPop || !_hasProgress,
       onPopInvokedWithResult: (didPop, _) {
@@ -277,13 +277,13 @@ class _CreationWizardState extends State<CreationWizard> {
                   child: Text.rich(
                     TextSpan(
                       children: [
-                        const TextSpan(text: 'Milantus\n'),
+                        const TextSpan(text: '$appName\n'),
                         // El subtítulo va más chico a propósito: a 17 no
                         // entra en los 236 de ancho del panel y parte la
                         // palabra, mientras que el nombre sí tiene que
                         // leerse como el título.
                         TextSpan(
-                          text: 'Asistente de Aventuras',
+                          text: context.l10n.appTagline,
                           style: TextStyle(
                             color: pal.gold,
                             fontSize: 11,
@@ -314,7 +314,7 @@ class _CreationWizardState extends State<CreationWizard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Eyebrow('Progreso'),
+                Eyebrow(context.l10n.wizardProgress),
                 const SizedBox(height: 8),
                 ThinBar(
                   ratio: (_step.index + 1) / _steps.length,
@@ -323,7 +323,7 @@ class _CreationWizardState extends State<CreationWizard> {
                 ),
                 const SizedBox(height: 9),
                 Text(
-                  'Paso ${_step.index + 1} de ${_steps.length}',
+                  context.l10n.wizardStepOf(_step.index + 1, _steps.length),
                   style: TextStyle(
                     fontFamily: 'Georgia',
                     fontSize: 13,
@@ -359,7 +359,7 @@ class _CreationWizardState extends State<CreationWizard> {
                 ),
               ),
               IconButton(
-                tooltip: 'Cancelar',
+                tooltip: context.l10n.commonCancel,
                 onPressed: _requestClose,
                 icon: const Icon(Icons.close, size: 20),
                 style: IconButton.styleFrom(
@@ -384,7 +384,8 @@ class _CreationWizardState extends State<CreationWizard> {
     final children = <Widget>[];
     for (final s in _steps) {
       final active = s == _step;
-      final done = s.index < _step.index && d.pendingFor(s).isEmpty;
+      final done =
+          s.index < _step.index && d.pendingFor(s, context.l10n).isEmpty;
       final reachable = d.canGoTo(s);
       final ring = active || done ? pal.gold : pal.hairline;
       final fill = active
@@ -403,9 +404,15 @@ class _CreationWizardState extends State<CreationWizard> {
           selected: active,
           button: true,
           enabled: reachable,
-          label: '${s.label}, paso ${s.index + 1} de ${_steps.length}',
+          label: context.l10n.wizardStepSemantics(
+            s.label(context.l10n),
+            s.index + 1,
+            _steps.length,
+          ),
           child: Tooltip(
-            message: reachable ? s.label : 'Completá los pasos anteriores',
+            message: reachable
+                ? s.label(context.l10n)
+                : context.l10n.wizardFinishPrevious,
             child: InkWell(
               onTap: reachable ? () => _goTo(s) : null,
               borderRadius: BorderRadius.circular(10),
@@ -426,7 +433,7 @@ class _CreationWizardState extends State<CreationWizard> {
                     ),
                     const SizedBox(height: 7),
                     Text(
-                      s.label.toUpperCase(),
+                      s.label(context.l10n).toUpperCase(),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -466,7 +473,7 @@ class _CreationWizardState extends State<CreationWizard> {
     );
     if (!compact) return row;
     return Semantics(
-      label: 'Progreso de creación',
+      label: context.l10n.wizardProgressSemantics,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: row,
@@ -499,12 +506,12 @@ class _CreationWizardState extends State<CreationWizard> {
                     ? IconButton(
                         onPressed: _back,
                         icon: const Icon(Icons.arrow_back, size: 18),
-                        tooltip: 'Atrás',
+                        tooltip: context.l10n.wizardBack,
                       )
                     : OutlinedButton.icon(
                         onPressed: _back,
                         icon: const Icon(Icons.arrow_back, size: 18),
-                        label: const Text('Atrás'),
+                        label: Text(context.l10n.wizardBack),
                       ),
               const SizedBox(width: 12),
               Expanded(
@@ -515,12 +522,13 @@ class _CreationWizardState extends State<CreationWizard> {
                   !blocked
                       ? ''
                       : pending.length == 1
-                      ? 'Falta: ${pending.single}'
+                      ? context.l10n.wizardMissing(pending.single)
                       // Cada faltante trae su punto final: sin sacarlo quedaba
                       // «0/2. (y 2 cosas más)».
-                      : 'Falta: ${pending.first.replaceFirst(RegExp(r'\.$'), '')} '
-                            '(y ${pending.length - 1} '
-                            '${pending.length == 2 ? 'cosa' : 'cosas'} más).',
+                      : context.l10n.wizardMissingMore(
+                          pending.first.replaceFirst(RegExp(r'\.$'), ''),
+                          pending.length - 1,
+                        ),
                   textAlign: TextAlign.end,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -534,7 +542,7 @@ class _CreationWizardState extends State<CreationWizard> {
                   _isLast ? Icons.check : Icons.arrow_forward,
                   size: 20,
                 ),
-                label: Text(_isLast ? _createLabel : 'Siguiente'),
+                label: Text(_isLast ? _createLabel : context.l10n.wizardNext),
               ),
             ],
           );

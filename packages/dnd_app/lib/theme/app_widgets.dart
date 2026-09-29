@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../api/api_exception.dart';
+import '../l10n/app_locale.dart';
+import '../l10n/l10n_context.dart';
 import '../ui/portrait_image.dart';
 import 'app_theme.dart';
 
@@ -68,7 +70,7 @@ void showAppMessage(
                 : const Duration(seconds: 3)),
         action: onUndo == null
             ? null
-            : SnackBarAction(label: 'Deshacer', onPressed: onUndo),
+            : SnackBarAction(label: context.l10n.commonUndo, onPressed: onUndo),
         content: Semantics(
           liveRegion: true,
           label: message,
@@ -166,49 +168,72 @@ class DisplayPreferences extends StatelessWidget {
 
 /// Selector de idioma.
 ///
-/// Está deshabilitado a propósito: la aplicación existe solo en español y no
-/// hay traducción que ofrecer todavía. Se muestra igual —y no se esconde—
-/// porque deja ver que el idioma es una preferencia prevista y no una
-/// imposición, y porque el día que haya una segunda no cambia el layout del
-/// panel. El tooltip dice por qué no se puede tocar, que es lo que un control
-/// gris sin explicación no dice.
+/// Con un [AppLocaleScope] arriba es un menú con los idiomas disponibles, cada
+/// uno con su propio nombre («Español», «English»): quien está en el idioma
+/// equivocado tiene que poder reconocer el suyo, así que esos nombres no
+/// pasan por el catálogo.
+///
+/// Sin scope (un widget suelto en un test) no hay a quién pedirle el cambio:
+/// muestra el idioma activo sin menú. En la aplicación real el scope siempre
+/// está, lo monta `DndApp`.
 class LanguageSelector extends StatelessWidget {
   const LanguageSelector({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = AppLocaleScope.maybeOf(context);
+    if (controller == null) {
+      final code = Localizations.localeOf(context).languageCode;
+      return _pill(context, languageNames[code] ?? code);
+    }
+    final current = controller.value.languageCode;
+    final name = languageNames[current] ?? current;
+    final l10n = AppLocalizations.of(context);
+    return Semantics(
+      label: l10n.languageSelectorLabel(name),
+      excludeSemantics: true,
+      child: PopupMenuButton<String>(
+        tooltip: l10n.languageSelectorTooltip,
+        initialValue: current,
+        onSelected: (code) => controller.choose(Locale(code)),
+        itemBuilder: (context) => [
+          for (final code in supportedLanguageCodes)
+            PopupMenuItem(
+              value: code,
+              child: Text(languageNames[code] ?? code),
+            ),
+        ],
+        child: _pill(context, name),
+      ),
+    );
+  }
+
+  Widget _pill(BuildContext context, String name) {
     final pal = context.palette;
     final muted = Theme.of(context).colorScheme.onSurfaceVariant;
-    return Tooltip(
-      message: 'Por ahora la aplicación está solo en español.',
-      child: Semantics(
-        label: 'Idioma: Español. Todavía no hay otros idiomas disponibles.',
-        excludeSemantics: true,
-        child: Container(
-          height: 40,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            border: Border.all(color: pal.hairline),
-            borderRadius: BorderRadius.circular(20),
+    return Container(
+      height: 40,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        border: Border.all(color: pal.hairline),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.language, size: 16, color: muted),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 12, color: muted),
+            ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.language, size: 16, color: muted),
-              const SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  'Español',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 12, color: muted),
-                ),
-              ),
-              const SizedBox(width: 4),
-              Icon(Icons.expand_more, size: 16, color: pal.textMuted),
-            ],
-          ),
-        ),
+          const SizedBox(width: 4),
+          Icon(Icons.expand_more, size: 16, color: pal.textMuted),
+        ],
       ),
     );
   }
@@ -228,22 +253,16 @@ class ThemeModeSelector extends StatelessWidget {
   /// El orden es claro → sistema → oscuro: «Sistema» va al medio porque es el
   /// punto intermedio entre los otros dos, no una tercera opción suelta.
   static const _segments = [
-    (
-      mode: ThemeMode.light,
-      icon: Icons.light_mode_outlined,
-      label: 'Tema claro',
-    ),
-    (
-      mode: ThemeMode.system,
-      icon: Icons.desktop_windows_outlined,
-      label: 'Seguir el tema del sistema',
-    ),
-    (
-      mode: ThemeMode.dark,
-      icon: Icons.dark_mode_outlined,
-      label: 'Tema oscuro',
-    ),
+    (mode: ThemeMode.light, icon: Icons.light_mode_outlined),
+    (mode: ThemeMode.system, icon: Icons.desktop_windows_outlined),
+    (mode: ThemeMode.dark, icon: Icons.dark_mode_outlined),
   ];
+
+  static String _label(AppLocalizations l10n, ThemeMode mode) => switch (mode) {
+    ThemeMode.light => l10n.themeLight,
+    ThemeMode.system => l10n.themeSystem,
+    ThemeMode.dark => l10n.themeDark,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -257,7 +276,7 @@ class ThemeModeSelector extends StatelessWidget {
               value: segment.mode,
               icon: Icon(segment.icon, size: 18),
               // Sin esto los tres botones no tienen nombre: son solo íconos.
-              tooltip: segment.label,
+              tooltip: _label(context.l10n, segment.mode),
             ),
         ],
         selected: {mode},
@@ -368,7 +387,7 @@ class AppErrorView extends StatelessWidget {
                 FilledButton.icon(
                   onPressed: onRetry,
                   icon: const Icon(Icons.refresh),
-                  label: const Text('Reintentar'),
+                  label: Text(context.l10n.commonRetry),
                 ),
               ],
               if (details != null) ...[
@@ -381,7 +400,7 @@ class AppErrorView extends StatelessWidget {
                   ).copyWith(dividerColor: Colors.transparent),
                   child: ExpansionTile(
                     title: Text(
-                      'Ver detalles',
+                      context.l10n.errorShowDetails,
                       style: TextStyle(
                         fontSize: 13,
                         color: scheme.onSurfaceVariant,
@@ -882,12 +901,12 @@ class _TextPromptDialogState extends State<_TextPromptDialog> {
     ),
     actions: [
       DialogAction(
-        'Cancelar',
+        context.l10n.commonCancel,
         keyHint: 'Esc',
         onPressed: () => Navigator.pop(context),
       ),
       DialogAction(
-        'Guardar',
+        context.l10n.commonSave,
         primary: true,
         // La tecla se dibuja solo donde el campo la ata de verdad.
         keyHint: widget.maxLines == 1 ? '↵' : null,
@@ -902,8 +921,8 @@ class _TextPromptDialogState extends State<_TextPromptDialog> {
 Future<String?> showRenameDialog(BuildContext context, String current) =>
     showTextPromptDialog(
       context,
-      title: 'Editar nombre',
-      label: 'Nombre del personaje',
+      title: context.l10n.renameTitle,
+      label: context.l10n.renameLabel,
       current: current,
       textCapitalization: TextCapitalization.words,
     );
@@ -1276,7 +1295,7 @@ class ShieldBadge extends StatelessWidget {
     final p = context.palette;
     final k = height / 52;
     return Semantics(
-      label: 'Clase de armadura: $value',
+      label: context.l10n.armorClassLabel(value),
       excludeSemantics: true,
       child: SizedBox(
         width: 46 * k,
@@ -1351,9 +1370,9 @@ class AbilityPlaque extends StatelessWidget {
     final mod = modifier >= 0 ? '+$modifier' : '$modifier';
     final abbr = ability.abbr;
     return Semantics(
-      label:
-          '${ability.label}: modificador $mod, puntuación $score'
-          '${saveProficient ? ', competente en salvación' : ''}',
+      label: saveProficient
+          ? context.l10n.abilityTileProficient(ability.label, mod, score)
+          : context.l10n.abilityTile(ability.label, mod, score),
       excludeSemantics: true,
       child: Container(
         padding: const EdgeInsets.fromLTRB(4, 8, 4, 9),
@@ -1385,7 +1404,7 @@ class AbilityPlaque extends StatelessWidget {
             ),
             const SizedBox(height: 5),
             Text(
-              'Punt. $score',
+              context.l10n.abilityScoreShort(score),
               style: TextStyle(
                 fontSize: 11,
                 color: p.textMuted,
@@ -1409,7 +1428,7 @@ class AbilityPlaque extends StatelessWidget {
                           Icon(Icons.shield, size: 9, color: p.gold),
                           const SizedBox(width: 3),
                           Text(
-                            'SALV',
+                            context.l10n.saveShort,
                             style: TextStyle(
                               fontSize: 9.5,
                               letterSpacing: 0.5,
@@ -1504,7 +1523,9 @@ class Medallion extends StatelessWidget {
 
     return Semantics(
       image: true,
-      label: key == null ? 'Emblema de $fallback' : 'Retrato de $fallback',
+      label: key == null
+          ? context.l10n.emblemLabel(fallback)
+          : context.l10n.portraitLabel(fallback),
       child: Container(
         width: size,
         height: size,
@@ -1644,7 +1665,7 @@ class CappedChipSelect extends StatelessWidget {
               onPressed: () => info(e.key),
               icon: const Icon(Icons.info_outline, size: 17),
               color: context.palette.textMuted,
-              tooltip: 'Ver qué hace ${e.value}',
+              tooltip: context.l10n.helpWhatItDoes(e.value),
               visualDensity: VisualDensity.compact,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
@@ -1677,7 +1698,7 @@ class UsagePips extends StatelessWidget {
   Widget build(BuildContext context) {
     final pal = context.palette;
     return Semantics(
-      label: '$filled de $max usos disponibles',
+      label: context.l10n.usesAvailable(filled, max),
       excludeSemantics: true,
       child: Wrap(
         children: List.generate(
@@ -1701,14 +1722,14 @@ class UsagePips extends StatelessWidget {
 class SpendRecoverButtons extends StatelessWidget {
   final VoidCallback? onSpend;
   final VoidCallback? onRecover;
-  final String spendTooltip;
-  final String recoverTooltip;
+  final String? spendTooltip;
+  final String? recoverTooltip;
   const SpendRecoverButtons({
     super.key,
     required this.onSpend,
     required this.onRecover,
-    this.spendTooltip = 'Usar',
-    this.recoverTooltip = 'Restaurar',
+    this.spendTooltip,
+    this.recoverTooltip,
   });
 
   @override
@@ -1717,12 +1738,12 @@ class SpendRecoverButtons extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         IconButton(
-          tooltip: spendTooltip,
+          tooltip: spendTooltip ?? context.l10n.commonUse,
           onPressed: onSpend,
           icon: const Icon(Icons.remove_circle_outline),
         ),
         IconButton(
-          tooltip: recoverTooltip,
+          tooltip: recoverTooltip ?? context.l10n.commonRestore,
           onPressed: onRecover,
           icon: const Icon(Icons.add_circle_outline),
         ),
@@ -1798,25 +1819,25 @@ class GoldPill extends StatelessWidget {
 /// secas no dice cuál de los dos es y son ediciones distintas: 5.2.1 es el de
 /// las reglas 2024, con las que juega la mesa, y 5.1 el de 2014. Que un rasgo
 /// venga de uno o del otro cambia la regla, no solo la licencia.
-String sourceLabel(ContentSource source) => switch (source) {
-  ContentSource.srd2024 => 'SRD 5.2.1',
-  ContentSource.phb2024 => 'PHB 2024',
-  ContentSource.foa2025 => 'Forge 2025',
-  ContentSource.srd2014 => 'SRD 5.1',
-  ContentSource.homebrew => 'Propio',
-};
+String sourceLabel(ContentSource source, AppLocalizations l10n) =>
+    switch (source) {
+      ContentSource.srd2024 => 'SRD 5.2.1',
+      ContentSource.phb2024 => 'PHB 2024',
+      ContentSource.foa2025 => 'Forge 2025', // l10n-ignore: nombre propio
+      ContentSource.srd2014 => 'SRD 5.1',
+      ContentSource.homebrew => l10n.sourceHomebrew,
+    };
 
-/// Cómo se usa un conjuro innato, en español. Lo leen el editor de efectos,
-/// para elegirlo, y [describeEffect], para nombrarlo.
-const innateSpellUseLabels = {
-  InnateSpellUse.atWill: 'a voluntad',
-  InnateSpellUse.oncePerLongRest: 'una vez por descanso largo',
-  InnateSpellUse.oncePerShortRest: 'una vez por descanso corto',
-  InnateSpellUse.proficiencyBonusPerLongRest:
-      'tantas veces como tu bono de competencia',
-  InnateSpellUse.abilityModifierPerLongRest:
-      'tantas veces como el modificador de la característica',
-};
+/// Cómo se usa un conjuro innato. Lo leen el editor de efectos, para elegirlo,
+/// y [describeEffect], para nombrarlo.
+String innateSpellUseLabel(AppLocalizations l10n, InnateSpellUse use) =>
+    switch (use) {
+      InnateSpellUse.atWill => l10n.innateAtWill,
+      InnateSpellUse.oncePerLongRest => l10n.innateOncePerLongRest,
+      InnateSpellUse.oncePerShortRest => l10n.innateOncePerShortRest,
+      InnateSpellUse.proficiencyBonusPerLongRest => l10n.innateProficiencyBonus,
+      InnateSpellUse.abilityModifierPerLongRest => l10n.innateAbilityModifier,
+    };
 
 /// Un efecto en una línea legible, o null si es maquinaria que un jugador no
 /// tiene por qué leer: recursos, listas de conjuros, elecciones.
@@ -1825,50 +1846,79 @@ const innateSpellUseLabels = {
 /// catálogo: guardado queda el id, que es el contrato con el motor, pero se lee
 /// el nombre. Un id que ya no existe cae al id crudo en vez de desaparecer,
 /// porque borrar una dote no debería volver ilegible al rasgo que la concedía.
-String? describeEffect(Effect e, ContentRepository repo) => switch (e) {
+String? describeEffect(
+  AppLocalizations l10n,
+  Effect e,
+  ContentRepository repo,
+) => switch (e) {
   AbilityScoreBonusEffect(:final ability, :final amount) =>
     '${ability.abbr} ${amount >= 0 ? '+$amount' : '$amount'}',
   SetAbilityScoreEffect(:final ability, :final score) =>
     '${ability.abbr} = $score',
-  SkillProficiencyEffect(:final skill) =>
-    'Competencia: ${Skill.labelFor(skill)}',
-  SavingThrowProficiencyEffect(:final ability) => 'Salvación: ${ability.abbr}',
-  SavingThrowBonusEffect(:final amount, :final fromAbility) =>
-    'Salvaciones ${[if (amount != 0 || fromAbility == null) '+$amount', if (fromAbility != null) '+ mod. de ${fromAbility.abbr}'].join(' ')}',
-  WeaponProficiencyEffect(:final category) =>
-    'Competencia: ${repo.weapon(category)?.name ?? weaponProficiencyLabel(category)}',
-  ArmorProficiencyEffect(:final category) =>
-    'Competencia: ${armorTrainingLabel(category)}',
-  ToolProficiencyEffect(:final tool) =>
-    'Competencia: ${toolProficiencyLabel(tool)}',
-  LanguageEffect(:final language) => 'Idioma: ${Language.labelFor(language)}',
-  ResistanceEffect(:final damageType) =>
-    'Resistencia: ${DamageType.labelFor(damageType)}',
-  ImmunityEffect(:final damageType) =>
-    'Inmunidad: ${DamageType.labelFor(damageType)}',
-  DarkvisionEffect(:final range) => 'Visión en la oscuridad: $range pies',
-  SpeedBonusEffect(:final feet) => 'Velocidad +$feet pies',
-  SetSpeedEffect(:final feet) => 'Velocidad = $feet pies',
-  ArmorClassBonusEffect(:final amount) => 'CA +$amount',
+  SkillProficiencyEffect(:final skill) => l10n.effectProficiency(
+    Skill.labelFor(skill),
+  ),
+  SavingThrowProficiencyEffect(:final ability) => l10n.effectSave(ability.abbr),
+  SavingThrowBonusEffect(:final amount, :final fromAbility) => l10n.effectSaves(
+    [
+      if (amount != 0 || fromAbility == null) '+$amount',
+      if (fromAbility != null) l10n.effectModOf(fromAbility.abbr),
+    ].join(' '),
+  ),
+  WeaponProficiencyEffect(:final category) => l10n.effectProficiency(
+    repo.weapon(category)?.name ?? weaponProficiencyLabel(category),
+  ),
+  ArmorProficiencyEffect(:final category) => l10n.effectProficiency(
+    armorTrainingLabel(category),
+  ),
+  ToolProficiencyEffect(:final tool) => l10n.effectProficiency(
+    toolProficiencyLabel(tool),
+  ),
+  LanguageEffect(:final language) => l10n.effectLanguage(
+    Language.labelFor(language),
+  ),
+  ResistanceEffect(:final damageType) => l10n.effectResistance(
+    DamageType.labelFor(damageType),
+  ),
+  ImmunityEffect(:final damageType) => l10n.effectImmunity(
+    DamageType.labelFor(damageType),
+  ),
+  DarkvisionEffect(:final range) => l10n.effectDarkvision(range),
+  SpeedBonusEffect(:final feet) => l10n.effectSpeedBonus(feet),
+  SetSpeedEffect(:final feet) => l10n.effectSpeedSet(feet),
+  ArmorClassBonusEffect(:final amount) => l10n.effectAcBonus(amount),
   InitiativeBonusEffect(
     :final amount,
     :final addProficiency,
     :final fromAbility,
   ) =>
-    'Iniciativa ${[if (amount != 0) '+$amount', if (addProficiency) '+ bonif. por competencia', if (fromAbility != null) '+ mod. de ${fromAbility.abbr}'].join(' ')}',
-  BonusMaxHpPerLevelEffect(:final perLevel) => 'PG máx +$perLevel por nivel',
-  BonusMaxHpFlatEffect(:final amount) => 'PG máx +$amount',
-  PassiveTraitEffect(:final name) => 'Pasiva: $name',
-  WeaponMasterySlotsEffect(:final count) => 'Maestrías de arma: $count',
-  ExtraAttackEffect(:final extra) => 'Ataque adicional +$extra',
-  GrantFeatEffect(:final featId) =>
-    'Dote: ${featId == null ? 'a elección' : repo.feat(featId)?.name ?? featId}',
-  GrantSpellEffect(:final spellId, :final use) =>
-    'Conjuro: ${repo.spell(spellId)?.name ?? spellId} (${innateSpellUseLabels[use]})',
-  AlwaysPreparedSpellEffect(:final spellId) =>
-    'Siempre preparado: ${repo.spell(spellId)?.name ?? spellId}',
-  SpellListAdditionEffect(:final spellId) =>
-    'Se suma a tu lista: ${repo.spell(spellId)?.name ?? spellId}',
+    l10n.effectInitiative(
+      [
+        if (amount != 0) '+$amount',
+        if (addProficiency) l10n.effectProficiencyBonusPart,
+        if (fromAbility != null) l10n.effectModOf(fromAbility.abbr),
+      ].join(' '),
+    ),
+  BonusMaxHpPerLevelEffect(:final perLevel) => l10n.effectMaxHpPerLevel(
+    perLevel,
+  ),
+  BonusMaxHpFlatEffect(:final amount) => l10n.effectMaxHpFlat(amount),
+  PassiveTraitEffect(:final name) => l10n.effectPassive(name),
+  WeaponMasterySlotsEffect(:final count) => l10n.effectWeaponMastery(count),
+  ExtraAttackEffect(:final extra) => l10n.effectExtraAttack(extra),
+  GrantFeatEffect(:final featId) => l10n.effectFeat(
+    featId == null ? l10n.effectFeatChoice : repo.feat(featId)?.name ?? featId,
+  ),
+  GrantSpellEffect(:final spellId, :final use) => l10n.effectSpell(
+    repo.spell(spellId)?.name ?? spellId,
+    innateSpellUseLabel(l10n, use),
+  ),
+  AlwaysPreparedSpellEffect(:final spellId) => l10n.effectAlwaysPrepared(
+    repo.spell(spellId)?.name ?? spellId,
+  ),
+  SpellListAdditionEffect(:final spellId) => l10n.effectAddedToList(
+    repo.spell(spellId)?.name ?? spellId,
+  ),
   _ => null,
 };
 
@@ -1880,6 +1930,7 @@ String? describeEffect(Effect e, ContentRepository repo) => switch (e) {
 /// veces. Sin rasgo —Duro, Resiliente, casi todo el homebrew hecho con el
 /// editor— la alternativa era no mostrar nada.
 List<({String name, String description})> readableTraits(
+  AppLocalizations l10n,
   List<Effect> effects,
   ContentRepository repo,
 ) {
@@ -1890,7 +1941,7 @@ List<({String name, String description})> readableTraits(
   if (traits.isNotEmpty) return traits;
   return [
     for (final e in effects)
-      if (describeEffect(e, repo) case final line?)
+      if (describeEffect(l10n, e, repo) case final line?)
         (name: line, description: ''),
   ];
 }
@@ -1900,9 +1951,9 @@ List<({String name, String description})> readableTraits(
 ///
 /// Vive acá, y no en una pantalla, porque lo usan tanto el paso de dotes de la
 /// creación como el selector de dote de la subida de nivel.
-String featSummary(Feat feat, ContentRepository repo) {
+String featSummary(AppLocalizations l10n, Feat feat, ContentRepository repo) {
   if (feat.description.isNotEmpty) return feat.description;
-  final traits = readableTraits(feat.effects, repo);
+  final traits = readableTraits(l10n, feat.effects, repo);
   // Los rasgos son prosa y se leen seguidos; las líneas de efecto son rótulos
   // cortos («FUE +1», «Salvación: FUE») que pegados con un espacio se mezclan.
   final prose = traits.any((t) => t.description.isNotEmpty);
@@ -1929,7 +1980,7 @@ void showFeatDetailsDialog(
   final bonuses = feat.effects.whereType<AbilityScoreBonusEffect>().toList();
   // Los aumentos ya van arriba en dorado: sin sacarlos, una dote sin rasgo como
   // Resiliente los diría dos veces.
-  final traits = readableTraits([
+  final traits = readableTraits(context.l10n, [
     for (final e in feat.effects)
       if (e is! AbilityScoreBonusEffect) e,
   ], repo);
@@ -1945,6 +1996,7 @@ void showFeatDetailsDialog(
           children: [
             for (final bonus in bonuses) ...[
               Text(
+                // l10n-ignore: nombre de la característica (catálogo) y signo
                 '${bonus.ability.label} '
                 '${bonus.amount >= 0 ? '+' : ''}${bonus.amount}',
                 style: TextStyle(color: context.palette.gold),
@@ -1976,7 +2028,7 @@ void showFeatDetailsDialog(
         ),
         actions: [
           DialogAction(
-            'Cerrar',
+            context.l10n.commonClose,
             keyHint: 'Esc',
             onPressed: () => Navigator.of(dialogContext).pop(),
           ),
@@ -2001,21 +2053,22 @@ void showFeatDetailsDialog(
 ({FaIconData icon, Color color, String label})? actionTypeBadge(
   SpellActionType type,
   AppPalette palette,
+  AppLocalizations l10n,
 ) => switch (type) {
   SpellActionType.action => (
     icon: FontAwesomeIcons.handFist,
     color: palette.verdant,
-    label: 'Acción',
+    label: l10n.spellActionAction,
   ),
   SpellActionType.bonusAction => (
     icon: FontAwesomeIcons.circlePlus,
     color: palette.crimson,
-    label: 'Acción adicional',
+    label: l10n.spellActionBonus,
   ),
   SpellActionType.reaction => (
     icon: FontAwesomeIcons.bolt,
     color: palette.gold,
-    label: 'Reacción',
+    label: l10n.spellActionReaction,
   ),
   SpellActionType.longer => null,
 };
@@ -2032,7 +2085,7 @@ class ActionTypeIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final badge = actionTypeBadge(type, context.palette);
+    final badge = actionTypeBadge(type, context.palette, context.l10n);
     if (badge == null) return const SizedBox.shrink();
     return Tooltip(
       message: badge.label,
@@ -2062,7 +2115,7 @@ class ActionTypeLegend extends StatelessWidget {
           SpellActionType.bonusAction,
           SpellActionType.reaction,
         ])
-          if (actionTypeBadge(type, pal) case final badge?)
+          if (actionTypeBadge(type, pal, context.l10n) case final badge?)
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -2101,7 +2154,7 @@ void showSpellDetailsDialog(
       ),
       actions: [
         DialogAction(
-          'Cerrar',
+          context.l10n.commonClose,
           keyHint: 'Esc',
           onPressed: () => Navigator.of(dialogContext).pop(),
         ),
@@ -2124,7 +2177,9 @@ Widget spellDetailsBody(
       Text(
         // Un conjuro homebrew puede no tener escuela, y quedaba «Truco ·».
         [
-          spell.isCantrip ? 'Truco' : 'Nivel ${spell.level}',
+          spell.isCantrip
+              ? context.l10n.spellCantrip
+              : context.l10n.spellLevel(spell.level),
           if (spell.school.trim().isNotEmpty) spell.school,
         ].join(' · '),
         style: TextStyle(color: muted),
@@ -2137,13 +2192,17 @@ Widget spellDetailsBody(
             const SizedBox(width: 6),
           ],
           Flexible(
-            child: _spellDetailMeta(context, 'Lanzamiento', spell.castingTime),
+            child: _spellDetailMeta(
+              context,
+              context.l10n.spellCastingTime,
+              spell.castingTime,
+            ),
           ),
         ],
       ),
-      _spellDetailMeta(context, 'Alcance', spell.range),
-      _spellDetailMeta(context, 'Componentes', spell.components),
-      _spellDetailMeta(context, 'Duración', spell.duration),
+      _spellDetailMeta(context, context.l10n.commonRange, spell.range),
+      _spellDetailMeta(context, context.l10n.spellComponents, spell.components),
+      _spellDetailMeta(context, context.l10n.spellDuration, spell.duration),
       const SizedBox(height: 10),
       Text(spell.description),
       if (contextText.isNotEmpty) ...[
@@ -2283,19 +2342,23 @@ String _signed(int v) => v >= 0 ? '+$v' : '$v';
 
 /// El encabezado de las legendarias lleva el presupuesto por ronda, que es la
 /// forma en que lo imprime el libro y el dato que el DM necesita ahí mismo.
-String _actionSectionLabel(CreatureActionKind kind, Creature c) {
+String _actionSectionLabel(
+  AppLocalizations l10n,
+  CreatureActionKind kind,
+  Creature c,
+) {
   if (kind != CreatureActionKind.legendary) {
     return switch (kind) {
-      CreatureActionKind.action => 'Acciones',
-      CreatureActionKind.bonus => 'Acciones adicionales',
-      CreatureActionKind.reaction => 'Reacciones',
-      _ => 'Acciones',
+      CreatureActionKind.action => l10n.creatureActions,
+      CreatureActionKind.bonus => l10n.creatureBonusActions,
+      CreatureActionKind.reaction => l10n.creatureReactions,
+      _ => l10n.creatureActions,
     };
   }
   final uses = c.legendaryActionsPerRound;
   return uses == null
-      ? 'Acciones legendarias'
-      : 'Acciones legendarias · $uses por ronda';
+      ? l10n.creatureLegendaryActions
+      : l10n.creatureLegendaryActionsPerRound(uses);
 }
 
 /// Ancho a partir del cual el perfil se dispone en bandas horizontales.
@@ -2343,8 +2406,10 @@ Widget _profileLabel(BuildContext context, String text, {TextAlign? align}) =>
 /// veces.
 String _sensesWithoutPassive(Creature c) {
   if (c.passivePerceptionValue == null) return c.senses;
+  // l10n-ignore: texto del catálogo SRD en español (fase 2)
+  final pasiva = RegExp(r'[;,]?\s*Percepción pasiva \d+');
   return c.senses
-      .replaceAll(RegExp(r'[;,]?\s*Percepción pasiva \d+'), '')
+      .replaceAll(pasiva, '')
       .trim()
       .replaceAll(RegExp(r'[;,]$'), '')
       .trim();
@@ -2437,27 +2502,27 @@ Widget _profileNumbers(
         // máximo del libro deja de ser cierto en el primer golpe.
         if (!dense)
           (
-            label: 'CA',
+            label: context.l10n.creatureAcShort,
             value: c.ac,
             suffix: null,
             color: null,
-            semantics: 'Clase de armadura: ${c.ac}',
+            semantics: context.l10n.armorClassLabel(c.ac),
           ),
         if (!dense)
           // Suelta, cada celda mide 118 px y la forma larga se cortaba en
           // «PUNTOS DE GO…»: ahí va la abreviatura, como dice el glosario.
           (
-            label: wide ? 'Puntos de golpe' : 'PG',
+            label: wide ? context.l10n.hitPoints : context.l10n.hitPointsShort,
             value: c.hp,
             suffix: wide ? c.hitDice : null,
             color: pal.crimson,
-            semantics: wide ? null : 'Puntos de golpe: ${c.hp}',
+            semantics: wide ? null : context.l10n.hitPointsLabel(c.hp),
           ),
         // Tampoco la iniciativa: ahí ya está la tirada de esta mesa, que es la
         // que manda sobre el modificador impreso.
         if (!dense)
           (
-            label: 'Iniciativa',
+            label: context.l10n.initiative,
             value: _signed(c.initiativeModifier),
             suffix: null,
             color: null,
@@ -2465,21 +2530,25 @@ Widget _profileNumbers(
           ),
         if (c.cr != null)
           (
-            label: wide ? 'Valor de desafío' : 'VD',
+            label: wide
+                ? context.l10n.challengeRating
+                : context.l10n.challengeRatingShort,
             value: challengeRatingLabel(c.cr!),
             suffix: null,
             color: pal.gold,
             semantics: wide
                 ? null
-                : 'Valor de desafío: ${challengeRatingLabel(c.cr!)}',
+                : context.l10n.challengeRatingSemantics(
+                    challengeRatingLabel(c.cr!),
+                  ),
           ),
         if (c.passivePerceptionValue case final p?)
           (
-            label: 'Perc. pasiva',
+            label: context.l10n.passivePerceptionShort,
             value: '$p',
             suffix: null,
             color: null,
-            semantics: 'Percepción pasiva: $p',
+            semantics: context.l10n.passivePerceptionLabel(p),
           ),
       ];
   if (cells.isEmpty) return const SizedBox.shrink();
@@ -2645,7 +2714,7 @@ Widget _profileAbilities(
           ),
           const SizedBox(height: 5),
           Text(
-            'Punt. ${c.abilityScores[a] ?? 10}',
+            context.l10n.abilityScoreShort(c.abilityScores[a] ?? 10),
             style: TextStyle(
               fontSize: 10.5,
               color: pal.textMuted,
@@ -2666,7 +2735,7 @@ Widget _profileAbilities(
                         Icon(Icons.shield, size: 9, color: pal.gold),
                         const SizedBox(width: 3),
                         Text(
-                          'SALV ${_signed(save)}',
+                          context.l10n.saveShortValue(_signed(save)),
                           style: TextStyle(
                             fontSize: 9.5,
                             letterSpacing: 0.4,
@@ -2736,10 +2805,13 @@ Widget _profileLines(BuildContext context, Creature c, {required bool wide}) {
 
   final rows = <({String label, Widget value})>[
     if (c.speed.isNotEmpty)
-      (label: 'Velocidad', value: _profileText(context, c.speed)),
+      (
+        label: context.l10n.creatureSpeed,
+        value: _profileText(context, c.speed),
+      ),
     if (c.skills.isNotEmpty)
       (
-        label: 'Habilidades',
+        label: context.l10n.creatureSkills,
         value: _profileText(
           context,
           [
@@ -2749,12 +2821,18 @@ Widget _profileLines(BuildContext context, Creature c, {required bool wide}) {
         ),
       ),
     if (sentidos.isNotEmpty)
-      (label: 'Sentidos', value: _profileText(context, sentidos)),
+      (
+        label: context.l10n.creatureSenses,
+        value: _profileText(context, sentidos),
+      ),
     if (c.languages.isNotEmpty)
-      (label: 'Idiomas', value: _profileText(context, c.languages)),
+      (
+        label: context.l10n.creatureLanguages,
+        value: _profileText(context, c.languages),
+      ),
     if (defensas.isNotEmpty)
       (
-        label: 'Defensas',
+        label: context.l10n.creatureDefenses,
         value: Wrap(
           spacing: 6,
           runSpacing: 6,
@@ -2817,7 +2895,7 @@ List<Widget> _profileTraits(BuildContext context, Creature c) {
     const SizedBox(height: 22),
     // «Rasgos» y no «Atributos»: en esta aplicación los atributos son las seis
     // características, que están tres bandas más arriba.
-    const Eyebrow('Rasgos'),
+    Eyebrow(context.l10n.creatureTraits),
     for (final trait in c.traits)
       Padding(
         padding: const EdgeInsets.only(top: 4),
@@ -2858,7 +2936,7 @@ List<Widget> _profileActions(
     final group = c.actions.where((a) => a.kind == kind).toList();
     if (group.isEmpty) continue;
     out.add(const SizedBox(height: 22));
-    out.add(Eyebrow(_actionSectionLabel(kind, c)));
+    out.add(Eyebrow(_actionSectionLabel(context.l10n, kind, c)));
     for (var i = 0; i < group.length; i++) {
       out.add(
         _profileAction(context, repo, c, group[i], wide: wide, first: i == 0),
@@ -2989,7 +3067,7 @@ Widget _profileAction(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     plaque(
-                      'Acierto',
+                      context.l10n.creatureToHit,
                       '+${a.attackBonus}',
                       color: pal.gold,
                       width: 74,
@@ -2997,7 +3075,7 @@ Widget _profileAction(
                     if (damageText.isNotEmpty) ...[
                       const SizedBox(width: 8),
                       plaque(
-                        'Daño',
+                        context.l10n.creatureDamage,
                         damageText,
                         width: 150,
                         detail: damageDetail,
@@ -3005,7 +3083,7 @@ Widget _profileAction(
                     ],
                     if (a.reach.isNotEmpty) ...[
                       const SizedBox(width: 8),
-                      plaque('Alcance', a.reach, width: 86),
+                      plaque(context.l10n.commonRange, a.reach, width: 86),
                     ],
                   ],
                 ),
@@ -3021,10 +3099,19 @@ Widget _profileAction(
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  plaque('Acierto', '+${a.attackBonus}', color: pal.gold),
+                  plaque(
+                    context.l10n.creatureToHit,
+                    '+${a.attackBonus}',
+                    color: pal.gold,
+                  ),
                   if (damageText.isNotEmpty)
-                    plaque('Daño', damageText, detail: damageDetail),
-                  if (a.reach.isNotEmpty) plaque('Alcance', a.reach),
+                    plaque(
+                      context.l10n.creatureDamage,
+                      damageText,
+                      detail: damageDetail,
+                    ),
+                  if (a.reach.isNotEmpty)
+                    plaque(context.l10n.commonRange, a.reach),
                 ],
               ),
             ],
@@ -3041,9 +3128,10 @@ Widget _creatureSpellcasting(
   final pal = context.palette;
   final castingSummary = [
     spellcasting.ability.label,
-    if (spellcasting.saveDc case final dc?) 'CD $dc',
+    if (spellcasting.saveDc case final dc?)
+      context.l10n.creatureSpellSaveDc(dc),
     if (spellcasting.attackBonus case final attack?)
-      'Ataque ${_signed(attack)}',
+      context.l10n.creatureSpellAttack(_signed(attack)),
   ].join(' · ');
 
   return Padding(
@@ -3064,8 +3152,8 @@ Widget _creatureSpellcasting(
           const SizedBox(height: 10),
           Text(
             group.usesPerDay == null
-                ? 'A voluntad'
-                : '${group.usesPerDay}/día cada uno',
+                ? context.l10n.creatureAtWill
+                : context.l10n.creatureUsesPerDay(group.usesPerDay!),
             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
           ),
           for (final ref in group.spells)
@@ -3094,7 +3182,8 @@ Widget _creatureSpellRow(
   final spell = repo.spell(ref.spellId);
   final pal = context.palette;
   final detail = [
-    if (ref.castAtLevel case final level?) 'Se lanza a nivel $level',
+    if (ref.castAtLevel case final level?)
+      context.l10n.creatureCastAtLevel(level),
     if (ref.note.isNotEmpty) ref.note,
   ].join(' · ');
   final contextText = [
@@ -3110,7 +3199,7 @@ Widget _creatureSpellRow(
         : () => showSpellDetailsDialog(
             context,
             spell,
-            contextTitle: 'Con ${creature.name}',
+            contextTitle: context.l10n.creatureSpellWith(creature.name),
             contextText: contextText,
           ),
     borderRadius: BorderRadius.circular(8),
@@ -3152,9 +3241,9 @@ class SourceBadge extends StatelessWidget {
   const SourceBadge(this.source, {super.key});
   @override
   Widget build(BuildContext context) {
-    final label = sourceLabel(source);
+    final label = sourceLabel(source, context.l10n);
     return Semantics(
-      label: 'Procedencia: $label',
+      label: context.l10n.sourceBadgeLabel(label),
       child: GoldPill(label, highlighted: source == ContentSource.srd2024),
     );
   }

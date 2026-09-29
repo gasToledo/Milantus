@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'api/api_client.dart';
 import 'api/api_models.dart';
 import 'app_version.dart';
+import 'l10n/app_locale.dart';
+import 'l10n/l10n_context.dart';
 import 'data/asset_content_loader.dart';
 import 'data/characters_controller.dart';
 import 'data/homebrew_store.dart';
@@ -31,7 +33,17 @@ class DndApp extends StatefulWidget {
   /// incluido en los assets del cliente.
   final Future<ContentRepository> Function()? contentLoader;
 
-  const DndApp({super.key, this.api, this.contentLoader});
+  /// Idioma alternativo. Solo lo pasan los tests, para no depender del
+  /// navegador; la aplicación real lo arma con el idioma guardado o el del
+  /// navegador (ver [AppLocaleController]).
+  final AppLocaleController? localeController;
+
+  const DndApp({
+    super.key,
+    this.api,
+    this.contentLoader,
+    this.localeController,
+  });
 
   @override
   State<DndApp> createState() => _DndAppState();
@@ -42,26 +54,37 @@ class _DndAppState extends State<DndApp> {
   // lo reemplaza en cuanto los ajustes cargan (ver `AppThemeController`).
   final _theme = AppThemeController();
 
+  // A diferencia del tema, el idioma vive en el navegador y se lee de forma
+  // sincrónica: el primer cuadro ya sale en el idioma correcto.
+  late final _locale = widget.localeController ?? AppLocaleController();
+
   @override
   void dispose() {
     _theme.dispose();
+    if (widget.localeController == null) _locale.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<ThemeMode>(
-      valueListenable: _theme,
-      builder: (context, mode, _) => MaterialApp(
-        title: 'Milantus — Asistente de Aventuras',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
-        themeMode: mode,
-        home: _Bootstrap(
-          theme: _theme,
-          api: widget.api,
-          contentLoader: widget.contentLoader,
+    return AppLocaleScope(
+      controller: _locale,
+      child: ListenableBuilder(
+        listenable: Listenable.merge([_theme, _locale]),
+        builder: (context, _) => MaterialApp(
+          onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: _locale.value,
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          themeMode: _theme.value,
+          home: _Bootstrap(
+            theme: _theme,
+            api: widget.api,
+            contentLoader: widget.contentLoader,
+          ),
         ),
       ),
     );
@@ -176,7 +199,7 @@ class _BootstrapState extends State<_Bootstrap> {
           if (mounted && generation == _generation) {
             showAppMessage(
               context,
-              'El tema cambió, pero no se pudo guardar la preferencia.',
+              context.l10n.bootThemeSaveFailed,
               tone: AppMessageTone.error,
             );
           }
@@ -234,25 +257,23 @@ class _BootstrapState extends State<_Bootstrap> {
       future: _future,
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: AppBusyLabel('Cargando datos…')),
+          return Scaffold(
+            body: Center(child: AppBusyLabel(context.l10n.bootLoading)),
           );
         }
         if (snap.hasError) {
           return Scaffold(
             body: AppErrorView(
-              message: 'No se pudo iniciar la aplicación.',
-              hint:
-                  'Suele ser un problema momentáneo de conexión. Probá de '
-                  'nuevo; si sigue igual, recargá la página.',
+              message: context.l10n.bootFailed,
+              hint: context.l10n.bootFailedHint,
               details: snap.error,
               onRetry: _retry,
             ),
           );
         }
         if (!snap.hasData) {
-          return const Scaffold(
-            body: Center(child: AppBusyLabel('Cargando datos…')),
+          return Scaffold(
+            body: Center(child: AppBusyLabel(context.l10n.bootLoading)),
           );
         }
         final data = snap.data!;
@@ -263,10 +284,8 @@ class _BootstrapState extends State<_Bootstrap> {
           return Scaffold(
             body: AppErrorView(
               icon: Icons.cloud_off,
-              message: 'No se pudo conectar con el servidor.',
-              hint:
-                  'Tus personajes están a salvo: no se pudieron leer, pero no '
-                  'se perdió nada. Revisá la conexión y reintentá.',
+              message: context.l10n.bootOffline,
+              hint: context.l10n.bootOfflineHint,
               onRetry: _retry,
             ),
           );

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'creation_helpers.dart';
+import 'fakes/localized_app.dart';
 
 /// Paso de Equipo y Conjuros.
 void main() {
@@ -23,7 +24,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: CreationWizard(repo: repo, onCreate: (_) {}),
       ),

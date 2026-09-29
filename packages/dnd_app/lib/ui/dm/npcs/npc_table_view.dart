@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_widgets.dart';
 import '../../portrait_image.dart';
+import '../../../l10n/l10n_context.dart';
 
 /// El retrato de un PNJ a pantalla completa, para girar la tablet y decir
 /// «este es el tipo que les habla».
@@ -32,7 +33,9 @@ class _NpcTableViewScreenState extends State<NpcTableViewScreen> {
       appBar: AppBar(
         actions: [
           IconButton(
-            tooltip: _nameHidden ? 'Mostrar el nombre' : 'Ocultar el nombre',
+            tooltip: _nameHidden
+                ? context.l10n.dmShowName
+                : context.l10n.dmHideName,
             icon: Icon(
               _nameHidden
                   ? Icons.visibility_outlined

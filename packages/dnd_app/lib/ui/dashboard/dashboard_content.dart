@@ -23,34 +23,29 @@ extension _DashboardContent on _DashboardScreenState {
                   // búsqueda.
                   ? AppEmptyState(
                       icon: Icons.shield_outlined,
-                      message:
-                          'Todavía no hay personajes en esta cuenta.\n'
-                          'Creá el primero, traé los que ya tenías, o '
-                          'mirá cómo es una ficha con uno de ejemplo.',
+                      message: context.l10n.rosterEmpty,
                       actions: [
                         FilledButton.icon(
                           onPressed: _openWizard,
                           icon: const Icon(Icons.add, size: 20),
-                          label: const Text('Crear personaje'),
+                          label: Text(context.l10n.rosterCreate),
                         ),
                         OutlinedButton.icon(
                           onPressed: _import,
                           icon: const Icon(Icons.download, size: 20),
-                          label: const Text('Importar respaldo'),
+                          label: Text(context.l10n.importBackupTitle),
                         ),
                         TextButton.icon(
                           onPressed: _tryExample,
                           icon: const Icon(Icons.visibility_outlined, size: 20),
-                          label: const Text('Probar con uno de ejemplo'),
+                          label: Text(context.l10n.rosterTryExample),
                         ),
                       ],
                     )
                   : list.isEmpty
                   ? AppEmptyState(
                       icon: Icons.search_off,
-                      message:
-                          'Ningún personaje coincide con «$_query».\n'
-                          'Se busca por nombre, clase y especie.',
+                      message: context.l10n.rosterNoMatch(_query),
                       actions: [
                         OutlinedButton.icon(
                           onPressed: () {
@@ -58,7 +53,7 @@ extension _DashboardContent on _DashboardScreenState {
                             _updateState(() => _query = '');
                           },
                           icon: const Icon(Icons.close, size: 20),
-                          label: const Text('Limpiar búsqueda'),
+                          label: Text(context.l10n.rosterClearSearch),
                         ),
                       ],
                     )
@@ -88,7 +83,7 @@ extension _DashboardContent on _DashboardScreenState {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Mis personajes',
+                    context.l10n.rosterTitle,
                     style: TextStyle(
                       fontFamily: 'Georgia',
                       fontSize: 28,
@@ -113,7 +108,7 @@ extension _DashboardContent on _DashboardScreenState {
                 child: FilledButton.icon(
                   onPressed: _openWizard,
                   icon: const Icon(Icons.add, size: 20),
-                  label: const Text('Crear personaje'),
+                  label: Text(context.l10n.rosterCreate),
                 ),
               ),
             ],
@@ -130,10 +125,9 @@ extension _DashboardContent on _DashboardScreenState {
   /// permanente no informa nada.
   String _rosterSummary(List<Character> all) {
     final fallen = all.where(_isFallen).length;
-    final total =
-        '${all.length} ${all.length == 1 ? 'personaje' : 'personajes'}';
+    final total = context.l10n.rosterCount(all.length);
     if (fallen == 0) return total;
-    return '$total · $fallen ${fallen == 1 ? 'caído' : 'caídos'}';
+    return '$total · ${context.l10n.rosterFallen(fallen)}';
   }
 
   /// Búsqueda, orden y estado del guardado en una sola región, como pide §8.3.
@@ -203,7 +197,7 @@ extension _DashboardContent on _DashboardScreenState {
         fillColor: pal.plaque,
         // El buscador también filtra por especie desde que `_visible` la mira:
         // decir solo "nombre o clase" escondía media función.
-        hintText: 'Buscar por nombre, clase o especie…',
+        hintText: context.l10n.rosterSearchHint,
         hintStyle: TextStyle(fontSize: 13, color: pal.textMuted),
         prefixIcon: Icon(Icons.search, size: 19, color: pal.textMuted),
         prefixIconConstraints: const BoxConstraints(
@@ -213,7 +207,7 @@ extension _DashboardContent on _DashboardScreenState {
         suffixIcon: _query.isEmpty
             ? null
             : IconButton(
-                tooltip: 'Limpiar búsqueda',
+                tooltip: context.l10n.rosterClearSearch,
                 icon: Icon(Icons.close, size: 16, color: pal.textMuted),
                 onPressed: () {
                   _searchCtrl.clear();
@@ -231,12 +225,12 @@ extension _DashboardContent on _DashboardScreenState {
   Widget _sortButton(BuildContext context) {
     final pal = context.palette;
     return PopupMenuButton<_SortMode>(
-      tooltip: 'Ordenar',
+      tooltip: context.l10n.rosterSort,
       initialValue: _sort,
       onSelected: _selectSort,
       itemBuilder: (_) => [
         for (final m in _SortMode.values)
-          PopupMenuItem(value: m, child: Text(m.label)),
+          PopupMenuItem(value: m, child: Text(m.label(context.l10n))),
       ],
       child: Container(
         height: 40,
@@ -252,7 +246,7 @@ extension _DashboardContent on _DashboardScreenState {
             Icon(Icons.swap_vert, size: 18, color: pal.textMuted),
             const SizedBox(width: 7),
             Text(
-              _sort.label,
+              _sort.label(context.l10n),
               style: TextStyle(
                 fontSize: 13,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,

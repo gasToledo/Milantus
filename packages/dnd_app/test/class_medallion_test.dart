@@ -4,6 +4,7 @@ import 'package:dnd_app/theme/app_widgets.dart';
 import 'package:dnd_app/theme/class_visuals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'fakes/localized_app.dart';
 
 /// El emblema de clase reemplaza a la inicial cuando no hay retrato.
 void main() {
@@ -16,7 +17,7 @@ void main() {
   });
 
   Future<void> pump(WidgetTester tester, Widget child) => tester.pumpWidget(
-    MaterialApp(
+    localizedApp(
       theme: AppTheme.dark,
       home: Scaffold(body: child),
     ),

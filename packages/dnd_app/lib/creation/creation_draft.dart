@@ -1,4 +1,10 @@
+import 'dart:ui' show Locale;
+
 import 'package:dnd_engine/dnd_engine.dart';
+import '../l10n/l10n_context.dart';
+
+// l10n-ignore: valor por defecto para las vistas previas, que no lo muestran; el asistente pasa el suyo al terminar.
+const _defaultUnnamed = 'Sin nombre';
 
 /// Las 18 habilidades de 2024, tomadas del catálogo del motor.
 final allSkills2024 = Skill.allIds;
@@ -28,17 +34,25 @@ const manualScoreMax = 30;
 /// Pasos del wizard de creación, en orden. Fijos (ya no dependen de si la clase
 /// lanza conjuros: los conjuros viven dentro de [equipo]).
 enum CreationStep {
-  raza('Especie'),
-  clase('Clase'),
-  trasfondo('Trasfondo'),
-  puntuaciones('Puntuaciones'),
-  aptitudes('Competencias'),
-  equipo('Equipo'),
-  detalles('Detalles'),
-  resumen('Resumen');
+  raza,
+  clase,
+  trasfondo,
+  puntuaciones,
+  aptitudes,
+  equipo,
+  detalles,
+  resumen;
 
-  const CreationStep(this.label);
-  final String label;
+  String label(AppLocalizations l10n) => switch (this) {
+    CreationStep.raza => l10n.stepSpecies,
+    CreationStep.clase => l10n.stepClass,
+    CreationStep.trasfondo => l10n.stepBackground,
+    CreationStep.puntuaciones => l10n.stepScores,
+    CreationStep.aptitudes => l10n.stepProficiencies,
+    CreationStep.equipo => l10n.stepEquipment,
+    CreationStep.detalles => l10n.stepDetails,
+    CreationStep.resumen => l10n.stepSummary,
+  };
 }
 
 /// Estado mutable del wizard de creación. Acumula las elecciones y sabe
@@ -992,6 +1006,11 @@ class CreationDraft {
   int _selectableSkills(List<String> from, Set<String> disabled) =>
       skillOptions(from).toSet().difference(disabled).length;
 
+  /// Textos para las consultas que solo miran si la lista está vacía: ahí el
+  /// idioma no importa, y así no hay que arrastrar un `AppLocalizations` por
+  /// `canGoTo` y `firstIncompleteStep`, que no muestran nada.
+  static final _l10nParaVacios = lookupAppLocalizations(const Locale('es'));
+
   /// Elecciones obligatorias que faltan en [step]. Lista vacía = el paso está
   /// completo y se puede avanzar. La UI la usa para bloquear "Siguiente",
   /// explicar qué falta y decidir a qué pasos se puede saltar desde el stepper.
@@ -999,56 +1018,56 @@ class CreationDraft {
   /// El requerido de habilidades se acota a lo realmente elegible: si otro
   /// origen ya tomó opciones y quedan menos que el cupo, se exige solo lo
   /// posible (así el gate nunca deja al usuario sin salida).
-  List<String> pendingFor(CreationStep step) {
+  List<String> pendingFor(CreationStep step, AppLocalizations l10n) {
     switch (step) {
       case CreationStep.raza:
-        if (race == null) return const ['Elegí una especie.'];
+        if (race == null) return [l10n.pendingPickSpecies];
         if (lineageOptions.isNotEmpty && lineage == null) {
-          return const ['Elegí un linaje de especie.'];
+          return [l10n.pendingPickLineage];
         }
         if (lineageUsesSpellcastingAbility &&
             speciesSpellcastingAbility == null) {
-          return const ['Elegí la aptitud mágica del linaje.'];
+          return [l10n.pendingPickLineageAbility];
         }
         if (sizeOptions.isNotEmpty && !sizeOptions.contains(chosenSize)) {
-          return const ['Elegí el tamaño de la especie.'];
+          return [l10n.pendingPickSize];
         }
         return const [];
 
       case CreationStep.clase:
         final k = klass;
-        if (k == null) return const ['Elegí una clase.'];
+        if (k == null) return [l10n.pendingPickClass];
         final out = <String>[];
         // Genérico sobre lo que declara el contenido: sumar una clase con otra
         // elección abierta no toca este gating.
         for (final slot in featureChoiceSlots) {
           final chosen = featureChoices[slot.groupId]?.length ?? 0;
           if (chosen < slot.count) {
-            out.add('${slot.name}: $chosen/${slot.count}.');
+            out.add(l10n.pendingSlotProgress(slot.name, chosen, slot.count));
           }
         }
         final slots = weaponMasterySlots;
         if (slots > 0 && weaponMasteries.length < slots) {
-          out.add('Maestría de armas: ${weaponMasteries.length}/$slots.');
+          out.add(l10n.pendingWeaponMastery(weaponMasteries.length, slots));
         }
         return out;
 
       case CreationStep.trasfondo:
-        if (background == null) return const ['Elegí un trasfondo.'];
+        if (background == null) return [l10n.pendingPickBackground];
         if (originFeatWithAbilityChoice case final feat?
             when originFeatSpellcastingAbility == null) {
-          return ['Elegí la aptitud mágica de ${feat.name}.'];
+          return [l10n.pendingPickFeatAbility(feat.name)];
         }
         if (spreadMode == AbilitySpreadMode.twoOne &&
             (spreadPlusTwo == null || spreadPlusOne == null)) {
-          return const ['Asigná el +2 y el +1 de característica.'];
+          return [l10n.pendingSpread];
         }
         return const [];
 
       case CreationStep.puntuaciones:
         if (!allScoresAssigned) {
           final n = Ability.values.where(assignedScores.containsKey).length;
-          return ['Asigná las 6 características ($n/6).'];
+          return [l10n.pendingAssignScores(n)];
         }
         return const [];
 
@@ -1065,8 +1084,7 @@ class CreationDraft {
               : selectable;
           if (classSkills.length < need) {
             out.add(
-              'Habilidades de clase: ${classSkills.length}/'
-              '${k.skillChoiceCount}.',
+              l10n.pendingClassSkills(classSkills.length, k.skillChoiceCount),
             );
           }
         }
@@ -1081,13 +1099,12 @@ class CreationDraft {
               : selectable;
           if (need > 0 && raceSkills.length < need) {
             out.add(
-              'Habilidades de especie: ${raceSkills.length}/'
-              '${r.skillChoiceCount}.',
+              l10n.pendingSpeciesSkills(raceSkills.length, r.skillChoiceCount),
             );
           }
           final grantsFeat = r.effects.any((e) => e is GrantFeatEffect);
           if (grantsFeat && raceFeatId == null) {
-            out.add('Elegí una dote de origen.');
+            out.add(l10n.pendingPickOriginFeat);
           }
         }
         // Competencias que declara una dote (Habilidoso del trasfondo o de la
@@ -1098,7 +1115,7 @@ class CreationDraft {
           (n, slot) => n + slot.pending,
         );
         if (faltan > 0) {
-          out.add('Competencias pendientes: $faltan.');
+          out.add(l10n.pendingProficiencies(faltan));
         }
         // La Pericia se nombra aparte: decirle "competencia" a lo que duplica
         // el bonificador confunde, y son dos secciones distintas del paso.
@@ -1107,18 +1124,17 @@ class CreationDraft {
           (n, slot) => n + slot.pending,
         );
         if (periciasFaltan > 0) {
-          out.add('Pericias pendientes: $periciasFaltan.');
+          out.add(l10n.pendingExpertise(periciasFaltan));
         }
         // Los dos del origen y los que deje elegir un rasgo. El selector está
         // en este mismo paso, así que exigirlos no deja al jugador sin salida.
         if (pendingLanguages > 0) {
           out.add(
-            'Idiomas: ${languages.length}/'
-            '${Language.originChoiceCount}.',
+            l10n.pendingLanguages(languages.length, Language.originChoiceCount),
           );
         }
         if (pendingLanguageChoices > 0) {
-          out.add('Idiomas por rasgo pendientes: $pendingLanguageChoices.');
+          out.add(l10n.pendingLanguageChoices(pendingLanguageChoices));
         }
         return out;
 
@@ -1136,35 +1152,34 @@ class CreationDraft {
         final equipmentPending = <String>[
           if (classEquipmentOption == null &&
               (klass?.startingEquipment ?? const []).isNotEmpty)
-            'Elegí el equipo de clase.',
+            l10n.pendingClassEquipment,
           if (backgroundEquipmentOption == null &&
               (background?.startingEquipment ?? const []).isNotEmpty)
-            'Elegí el equipo de trasfondo.',
+            l10n.pendingBackgroundEquipment,
           if (selectedEquipmentGrants.any(
             (e) => e.grant.isChoice && equipmentChoices[e.key] == null,
           ))
-            'Completá las elecciones internas de equipo.',
+            l10n.pendingEquipmentChoices,
           if (goldLeftCp < 0)
-            'Las compras superan el oro de partida por '
-                '${CoinOps.formatAmount(-goldLeftCp)}.',
+            l10n.pendingOverspent(CoinOps.formatAmount(-goldLeftCp)),
         ];
         final elegidos = pendingSpellChoices;
         final sc = spellcasting;
         if (sc == null) {
           return [
             ...equipmentPending,
-            if (elegidos > 0) 'Conjuros a elección: $elegidos.',
+            if (elegidos > 0) l10n.pendingSpellChoices(elegidos),
           ];
         }
         final out = <String>[
           ...equipmentPending,
-          if (elegidos > 0) 'Conjuros a elección: $elegidos.',
+          if (elegidos > 0) l10n.pendingSpellChoices(elegidos),
         ];
         if (cantrips.length < sc.cantripsKnown) {
-          out.add('Trucos: ${cantrips.length}/${sc.cantripsKnown}.');
+          out.add(l10n.pendingCantrips(cantrips.length, sc.cantripsKnown));
         }
         if (spells.length < sc.preparedCount) {
-          out.add('Conjuros: ${spells.length}/${sc.preparedCount}.');
+          out.add(l10n.pendingSpells(spells.length, sc.preparedCount));
         }
         return out;
 
@@ -1178,7 +1193,7 @@ class CreationDraft {
   /// para no dejar al usuario varado en un paso que dejó de ser alcanzable.
   CreationStep get firstIncompleteStep {
     for (final s in CreationStep.values) {
-      if (pendingFor(s).isNotEmpty) return s;
+      if (pendingFor(s, _l10nParaVacios).isNotEmpty) return s;
     }
     return CreationStep.values.last;
   }
@@ -1188,7 +1203,7 @@ class CreationDraft {
   bool canGoTo(CreationStep step) {
     for (final s in CreationStep.values) {
       if (s.index >= step.index) break;
-      if (pendingFor(s).isNotEmpty) return false;
+      if (pendingFor(s, _l10nParaVacios).isNotEmpty) return false;
     }
     return true;
   }
@@ -1202,10 +1217,10 @@ class CreationDraft {
       Ability.values.every(assignedScores.containsKey);
 
   /// Construye el personaje final. Los PG actuales se fijan luego compilando.
-  Character build() {
+  Character build({String unnamed = _defaultUnnamed}) {
     return Character(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
-      name: name.trim().isEmpty ? 'Sin nombre' : name.trim(),
+      name: name.trim().isEmpty ? unnamed : name.trim(),
       raceId: raceId ?? '',
       lineageId: lineage?.id,
       speciesSpellcastingAbility: speciesSpellcastingAbility,

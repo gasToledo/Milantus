@@ -1,0 +1,8 @@
+# Español es el idioma de origen: el código y los textos del proyecto ya
+# hablan en español rioplatense, y el inglés se traduce a partir de él.
+arb-dir: lib/l10n
+template-arb-file: app_es.arb
+output-localization-file: app_localizations.dart
+# `of(context)` sin nulo: una pantalla sin delegates es un error de armado
+# (un test que no usa `localizedApp`), no un estado que haya que tolerar.
+nullable-getter: false

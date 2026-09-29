@@ -49,7 +49,7 @@ class _PortraitViewer extends StatelessWidget {
                     top: 16,
                     right: 16,
                     child: IconButton(
-                      tooltip: 'Cerrar el retrato',
+                      tooltip: context.l10n.portraitClose,
                       icon: const Icon(Icons.close, color: Colors.white),
                       style: IconButton.styleFrom(
                         backgroundColor: Colors.black45,

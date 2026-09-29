@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 
 import '../../theme/app_theme.dart';
 import '../../theme/app_widgets.dart';
+import '../../l10n/l10n_context.dart';
 
 /// Editor de un capítulo: nombre, objetivo y qué reparte al cerrarse.
 ///
@@ -69,7 +70,7 @@ class _ChapterEditorDialogState extends State<_ChapterEditorDialog> {
   void _save() {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
-      setState(() => _nameError = 'Poné un nombre para guardarlo.');
+      setState(() => _nameError = context.l10n.dmChapterNameRequired);
       return;
     }
     Navigator.of(context).pop(
@@ -101,7 +102,7 @@ class _ChapterEditorDialogState extends State<_ChapterEditorDialog> {
             autofocus: true,
             textCapitalization: TextCapitalization.words,
             decoration: InputDecoration(
-              labelText: 'Nombre del capítulo',
+              labelText: context.l10n.dmChapterName,
               border: const OutlineInputBorder(),
               errorText: _nameError,
             ),
@@ -118,10 +119,10 @@ class _ChapterEditorDialogState extends State<_ChapterEditorDialog> {
             minLines: 2,
             maxLines: 4,
             keyboardType: TextInputType.multiline,
-            decoration: const InputDecoration(
-              labelText: 'Objetivo del capítulo',
-              hintText: 'Qué debería lograr o descubrir la mesa…',
-              helperText: 'Una guía breve; el relato va en el Cuaderno.',
+            decoration: InputDecoration(
+              labelText: context.l10n.dmChapterGoal,
+              hintText: context.l10n.dmChapterGoalHint,
+              helperText: context.l10n.dmChapterGoalHelper,
               alignLabelWithHint: true,
               border: OutlineInputBorder(),
             ),
@@ -132,16 +133,16 @@ class _ChapterEditorDialogState extends State<_ChapterEditorDialog> {
           // nivel ni la bolsa ni el inventario de un personaje los toca
           // nadie que no sea su jugador, así que conviene que el DM sepa
           // que está escribiendo un aviso y no una ficha.
-          const Eyebrow('Al cerrarlo se llevan'),
+          Eyebrow(context.l10n.dmOnCloseCarry),
           const SizedBox(height: 8),
           CheckboxListTile(
             value: _grantsLevel,
             onChanged: (value) => setState(() => _grantsLevel = value ?? false),
             contentPadding: EdgeInsets.zero,
             controlAffinity: ListTileControlAffinity.leading,
-            title: const Text('Un nivel'),
+            title: Text(context.l10n.dmOneLevel),
             subtitle: Text(
-              'La subida la hace cada jugador en su ficha.',
+              context.l10n.dmLevelUpNote,
               style: TextStyle(fontSize: 12, color: pal.textMuted),
             ),
           ),
@@ -152,11 +153,11 @@ class _ChapterEditorDialogState extends State<_ChapterEditorDialog> {
             // Solo dígitos: así el campo no puede producir oro negativo y
             // no hace falta ningún mensaje de error explicándolo.
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            decoration: const InputDecoration(
-              labelText: 'Oro para cada personaje',
+            decoration: InputDecoration(
+              labelText: context.l10n.dmGoldEach,
               hintText: '0',
-              helperText: 'Ya repartido: la app no divide el botín.',
-              suffixText: 'po',
+              helperText: context.l10n.dmGoldHelper,
+              suffixText: context.l10n.coinAbbrGold,
               border: OutlineInputBorder(),
             ),
           ),
@@ -167,10 +168,10 @@ class _ChapterEditorDialogState extends State<_ChapterEditorDialog> {
             maxLines: 6,
             keyboardType: TextInputType.multiline,
             textCapitalization: TextCapitalization.sentences,
-            decoration: const InputDecoration(
-              labelText: 'Ítems',
-              hintText: 'Uno por línea…',
-              helperText: 'Se los anota cada jugador en su inventario.',
+            decoration: InputDecoration(
+              labelText: context.l10n.dmItems,
+              hintText: context.l10n.dmItemsHint,
+              helperText: context.l10n.dmItemsHelper,
               alignLabelWithHint: true,
               border: OutlineInputBorder(),
             ),
@@ -179,11 +180,11 @@ class _ChapterEditorDialogState extends State<_ChapterEditorDialog> {
       ),
       actions: [
         DialogAction(
-          'Cancelar',
+          context.l10n.commonCancel,
           keyHint: 'Esc',
           onPressed: () => Navigator.of(context).pop(),
         ),
-        DialogAction('Guardar', primary: true, onPressed: _save),
+        DialogAction(context.l10n.commonSave, primary: true, onPressed: _save),
       ],
     );
   }

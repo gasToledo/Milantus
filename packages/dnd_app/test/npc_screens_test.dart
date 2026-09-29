@@ -18,6 +18,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'dialog_finders.dart';
 import 'fakes/fake_api_server.dart';
+import 'fakes/localized_app.dart';
 
 /// Las pantallas de PNJ fuera del combate: la biblioteca, la ficha, la
 /// sección de la campaña, el visor para la mesa y el pase entre DM.
@@ -91,7 +92,7 @@ void main() {
     final server = FakeApiServer();
     seed(server);
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: DmModeScreen(
           api: ApiClient(client: server.client),
@@ -112,7 +113,7 @@ void main() {
     final server = FakeApiServer();
     seed(server);
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: NpcDetailScreen(
           api: ApiClient(client: server.client),
@@ -594,7 +595,7 @@ void main() {
     }) async {
       NpcExportOptions? picked;
       await tester.pumpWidget(
-        MaterialApp(
+        localizedApp(
           theme: AppTheme.dark,
           home: Builder(
             builder: (context) => TextButton(
@@ -696,7 +697,7 @@ void main() {
         ),
       );
       await tester.pumpWidget(
-        MaterialApp(
+        localizedApp(
           theme: AppTheme.dark,
           home: Builder(
             builder: (context) => TextButton(
@@ -809,7 +810,7 @@ void main() {
         ..importNpcResult = full;
       final bytes = NpcBundleCodec.encode(npc: full);
       await tester.pumpWidget(
-        MaterialApp(
+        localizedApp(
           theme: AppTheme.dark,
           home: Builder(
             builder: (context) => TextButton(
@@ -891,7 +892,7 @@ void main() {
       expect(repo.weapon(arma.id), isNull);
 
       await tester.pumpWidget(
-        MaterialApp(
+        localizedApp(
           theme: AppTheme.dark,
           home: Builder(
             builder: (context) => TextButton(

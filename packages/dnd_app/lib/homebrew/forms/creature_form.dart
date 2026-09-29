@@ -199,7 +199,7 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
     switch (key) {
       case 'type':
         return _explained(
-          'Tipo',
+          context.l10n.identityCreatureTypeShort,
           _type.label,
           creatureTypeRule,
           _type == CreatureType.beast ? creatureBeastNote : null,
@@ -207,28 +207,36 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
       case 'size':
         final rule = creatureSizeRules[_size.id];
         if (rule == null) return null;
-        return _explained('Tamaño', _size.label, rule, sizeRule);
+        return _explained(
+          context.l10n.identitySize,
+          _size.label,
+          rule,
+          sizeRule,
+        );
       case 'hitDice':
         return _explained(
-          'Dados de golpe',
-          _hitDice.text.trim().isEmpty ? 'Sin cargar' : _hitDice.text.trim(),
-          'Con dados de golpe cargados, al sumarla a un combate se puede '
-              'pedir que cada copia tire los suyos.',
+          context.l10n.hbHitDice,
+          _hitDice.text.trim().isEmpty
+              ? context.l10n.hbNotFilled
+              : _hitDice.text.trim(),
+          context.l10n.hbHitDiceRule,
         );
       case 'cr':
         final cr = _parseCr(_cr.text);
         return _explained(
-          'Desafío',
-          cr == null ? 'Sin VD' : 'VD ${_formatCr(cr)}',
+          context.l10n.hbChallenge,
+          cr == null
+              ? context.l10n.hbNoCr
+              : context.l10n.hbCrValue(_formatCr(cr)),
           creatureCrRule,
         );
       case 'available':
         return _explained(
-          'Fuera de combate',
-          _available ? 'También para personajes' : 'Solo en tus combates',
-          'Hoy solo lo mira el pozo de Forma Salvaje: una bestia con valor de '
-              'desafío puede aparecer entre las formas del druida. Apagado, la '
-              'criatura vive únicamente en tus combates.',
+          context.l10n.hbOutOfCombat,
+          _available
+              ? context.l10n.hbAlsoCharacters
+              : context.l10n.hbOnlyYourCombats,
+          context.l10n.hbAvailableRule,
         );
     }
     final parts = key.split(':');
@@ -238,17 +246,21 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
     final action = _actions[index];
     return switch (parts[2]) {
       'bonus' => _explained(
-        'Acción',
-        'Bonificador de ataque',
+        context.l10n.spellActionAction,
+        context.l10n.hbAttackBonus,
         creatureAttackBonusRule,
       ),
       'kind' => switch (creatureActionKindRules[action.kind.id]) {
-        final rule? => _explained('Cuándo se usa', action.kind.label, rule),
+        final rule? => _explained(
+          context.l10n.hbWhenUsed,
+          action.kind.label,
+          rule,
+        ),
         null => null,
       },
       'damageType' => switch (DamageType.fromId(action.damageType)) {
         final type? => _explained(
-          'Tipo de daño',
+          context.l10n.hbDamageType,
           type.label,
           type.description,
           damageTypeRule,
@@ -268,20 +280,21 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
   ];
 
   String get _profileSummary => _orNone([
-    if (_parseCr(_cr.text) case final cr?) 'VD ${_formatCr(cr)}',
+    if (_parseCr(_cr.text) case final cr?)
+      context.l10n.hbCrValue(_formatCr(cr)),
     if (_senses.text.trim().isNotEmpty) _senses.text.trim(),
-  ], 'sin cargar');
+  ], context.l10n.hbNotSet);
 
   @override
   Widget build(BuildContext context) {
     final creature = _creature();
     final muted = Theme.of(context).colorScheme.onSurfaceVariant;
     return _FormScaffold(
-      title: 'Criatura',
+      title: context.l10n.hbCreature,
       onSave: _save,
       onInvalid: openAllSections,
       panel: guidePanel(
-        previewTitle: 'Cómo se va a ver en el Bestiario',
+        previewTitle: context.l10n.hbCreaturePreview,
         preview: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -291,21 +304,19 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
             ...creatureProfileBody(context, widget.repo, creature),
           ],
         ),
-        hint:
-            'Tocá el tipo, el tamaño o una acción para ver qué cambia en la '
-            'mesa.',
+        hint: context.l10n.hbCreatureHint,
       ),
       children: [
         _text(
           _name,
-          'Nombre',
-          validator: (v) => _requiredText(v, 'el nombre de la criatura'),
+          context.l10n.detailsName,
+          validator: (v) => _requiredText(v, context.l10n.hbReqCreatureName),
         ),
         _fieldRow(
           flex: const [3, 3, 3],
           [
             _enumDropdown<CreatureType>(
-              label: 'Tipo',
+              label: context.l10n.identityCreatureTypeShort,
               value: _type,
               options: CreatureType.values,
               labelOf: (t) => t.label,
@@ -316,7 +327,7 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
               onTap: () => focusOn('type'),
             ),
             _enumDropdown<CreatureSize>(
-              label: 'Tamaño',
+              label: context.l10n.identitySize,
               value: _size,
               options: CreatureSize.values,
               labelOf: (s) => s.label,
@@ -326,13 +337,17 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
               }),
               onTap: () => focusOn('size'),
             ),
-            _text(_speed, 'Velocidad', hint: 'p.ej. 30 pies, volar 60 pies'),
+            _text(
+              _speed,
+              context.l10n.creatureSpeed,
+              hint: context.l10n.hbSpeedHint,
+            ),
           ],
         ),
         Padding(
           padding: const EdgeInsets.only(top: 4, bottom: 8),
           child: Text(
-            'Se va a leer «$_kind».',
+            context.l10n.hbWillRead(_kind),
             style: TextStyle(fontSize: 13, color: muted),
           ),
         ),
@@ -341,21 +356,23 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
           [
             _text(
               _ac,
-              'CA',
+              context.l10n.creatureAcShort,
               number: true,
-              validator: (v) => _intInRange(v, 1, 40, optional: false),
+              validator: (v) =>
+                  _intInRange(context.l10n, v, 1, 40, optional: false),
             ),
             _text(
               _hp,
-              'PG',
+              context.l10n.hitPointsShort,
               number: true,
-              validator: (v) => _intInRange(v, 1, 999, optional: false),
+              validator: (v) =>
+                  _intInRange(context.l10n, v, 1, 999, optional: false),
             ),
             _text(
               _hitDice,
-              'Dados de golpe (opcional)',
-              hint: 'p.ej. 2d6 + 2',
-              validator: _hitDiceValue,
+              context.l10n.hbHitDiceOptional,
+              hint: context.l10n.hbDiceExample,
+              validator: (v) => _hitDiceValue(context.l10n, v),
               onTap: () => focusOn('hitDice'),
             ),
           ],
@@ -364,7 +381,7 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
         ..._optionalRule,
         section(
           icon: Icons.grid_view,
-          title: 'Características',
+          title: context.l10n.abilitiesTitle,
           summary: [
             for (final a in Ability.values) _abilities[a]!.text.trim(),
           ].join(' · '),
@@ -385,8 +402,13 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
                         _abilities[a]!,
                         a.abbr,
                         number: true,
-                        validator: (v) =>
-                            _intInRange(v, 1, 30, optional: false),
+                        validator: (v) => _intInRange(
+                          context.l10n,
+                          v,
+                          1,
+                          30,
+                          optional: false,
+                        ),
                       ),
                     ),
                 ],
@@ -396,71 +418,79 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
         ),
         section(
           icon: Icons.badge_outlined,
-          title: 'Perfil',
+          title: context.l10n.hbProfile,
           summary: _profileSummary,
           children: [
             _fieldRow([
               _text(
                 _cr,
-                'Valor de desafío',
-                hint: 'p.ej. 1/4 o 5',
-                validator: _crValue,
+                context.l10n.challengeRating,
+                hint: context.l10n.hbCrExample,
+                validator: (v) => _crValue(context.l10n, v),
                 onTap: () => focusOn('cr'),
               ),
               _text(
                 _initiative,
-                'Iniciativa',
-                hint: 'Vacío: el mod. de DES',
+                context.l10n.initiative,
+                hint: context.l10n.hbInitHint,
                 number: true,
-                validator: (v) => _intInRange(v, -10, 20, optional: true),
+                validator: (v) =>
+                    _intInRange(context.l10n, v, -10, 20, optional: true),
               ),
             ]),
             _fieldRow([
               _text(
                 _passive,
-                'Percepción pasiva (opcional)',
+                context.l10n.hbPassiveOptional,
                 number: true,
-                validator: (v) => _intInRange(v, 1, 40, optional: true),
+                validator: (v) =>
+                    _intInRange(context.l10n, v, 1, 40, optional: true),
               ),
               _text(
                 _legendary,
-                'Acciones legendarias',
-                hint: 'Por ronda',
+                context.l10n.creatureLegendaryActions,
+                hint: context.l10n.hbPerRound,
                 number: true,
-                validator: (v) => _intInRange(v, 1, 10, optional: true),
+                validator: (v) =>
+                    _intInRange(context.l10n, v, 1, 10, optional: true),
               ),
             ]),
             _text(
               _senses,
-              'Sentidos',
-              hint: 'p.ej. visión en la oscuridad 60 pies',
+              context.l10n.creatureSenses,
+              hint: context.l10n.hbSensesHint,
             ),
-            _text(_languages, 'Idiomas'),
-            _text(_defenses, 'Resistencias, inmunidades y vulnerabilidades'),
+            _text(_languages, context.l10n.creatureLanguages),
+            _text(_defenses, context.l10n.hbDefenses),
             explainHere((f) => f == 'cr'),
           ],
         ),
         section(
           icon: Icons.auto_awesome,
-          title: 'Rasgos',
+          title: context.l10n.creatureTraits,
           summary: _orNone([
             for (final t in _traits)
               if (t.name.text.trim().isNotEmpty) t.name.text.trim(),
-          ], 'sin rasgos'),
+          ], context.l10n.hbNoTraits),
           children: [
             for (final entry in _traits.asMap().entries)
               _block(
-                title: 'Rasgo',
+                title: context.l10n.hbTrait,
                 onRemove: () => setState(
                   () => _drop(_traits.removeAt(entry.key).controllers),
                 ),
                 children: [
                   _text(
                     entry.value.name,
-                    'Nombre',
-                    validator: (v) => _requiredText(v, 'el nombre del rasgo'),
+                    context.l10n.detailsName,
+                    validator: (v) =>
+                        _requiredText(v, context.l10n.hbReqTraitName),
                   ),
-                  _text(entry.value.description, 'Descripción', maxLines: 3),
+                  _text(
+                    entry.value.description,
+                    context.l10n.hbDescription,
+                    maxLines: 3,
+                  ),
                 ],
               ),
             Align(
@@ -469,19 +499,15 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
                 onPressed: () =>
                     setState(() => _traits.add(_listen(_TraitDraft()))),
                 icon: const Icon(Icons.add),
-                label: const Text('Agregar rasgo'),
+                label: Text(context.l10n.hbAddTrait),
               ),
             ),
           ],
         ),
         section(
           icon: Icons.bolt,
-          title: 'Acciones',
-          summary: switch (_actions.length) {
-            0 => 'sin acciones',
-            1 => '1 acción',
-            final n => '$n acciones',
-          },
+          title: context.l10n.creatureActions,
+          summary: context.l10n.hbActionsCount(_actions.length),
           children: [
             for (final entry in _actions.asMap().entries)
               _block(
@@ -497,21 +523,21 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
                 onPressed: () =>
                     setState(() => _actions.add(_listen(_ActionDraft()))),
                 icon: const Icon(Icons.add),
-                label: const Text('Agregar acción'),
+                label: Text(context.l10n.hbAddAction),
               ),
             ),
           ],
         ),
         section(
           icon: Icons.person_outline,
-          title: 'Fuera de combate',
+          title: context.l10n.hbOutOfCombat,
           summary: _available
-              ? 'también para personajes'
-              : 'solo en tus combates',
+              ? context.l10n.hbAlsoCharactersLower
+              : context.l10n.hbOnlyYourCombatsLower,
           children: [
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Disponible en la construcción de personajes'),
+              title: Text(context.l10n.hbAvailableSwitch),
               value: _available,
               onChanged: (v) => setState(() {
                 _available = v;
@@ -531,11 +557,11 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
       [
         _text(
           a.name,
-          'Nombre',
-          validator: (v) => _requiredText(v, 'el nombre de la acción'),
+          context.l10n.detailsName,
+          validator: (v) => _requiredText(v, context.l10n.hbReqActionName),
         ),
         _enumDropdown<CreatureActionKind>(
-          label: 'Cuándo se usa',
+          label: context.l10n.hbWhenUsed,
           value: a.kind,
           options: CreatureActionKind.values,
           labelOf: (k) => k.label,
@@ -550,19 +576,19 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
     _fieldRow([
       _text(
         a.attackBonus,
-        'Bonificador de ataque (vacío = no es ataque)',
+        context.l10n.hbAttackBonusLabel,
         number: true,
-        validator: (v) => _intInRange(v, -10, 30, optional: true),
+        validator: (v) => _intInRange(context.l10n, v, -10, 30, optional: true),
         onTap: () => focusOn('action:$index:bonus'),
       ),
-      _text(a.reach, 'Alcance (p.ej. 5 pies)'),
+      _text(a.reach, context.l10n.hbReachLabel),
     ]),
     _fieldRow([
-      _text(a.damage, 'Daño (p.ej. 1d8 + 3)'),
+      _text(a.damage, context.l10n.hbDamageLabel),
       _idDropdown(
-        label: 'Tipo de daño',
+        label: context.l10n.hbDamageType,
         value: a.damageType,
-        options: {'': 'Sin daño', ..._damageTypeOptions},
+        options: {'': context.l10n.hbNoDamage, ..._damageTypeOptions},
         onChanged: (v) => setState(() {
           a.damageType = v;
           focus = 'action:$index:damageType';
@@ -570,11 +596,7 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
         onTap: () => focusOn('action:$index:damageType'),
       ),
     ]),
-    _text(
-      a.description,
-      'Descripción (lo que pasa además del daño)',
-      maxLines: 3,
-    ),
+    _text(a.description, context.l10n.hbActionDescription, maxLines: 3),
     explainHere((f) => f.startsWith('action:$index:')),
   ];
 
@@ -598,7 +620,7 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
             children: [
               Expanded(child: Eyebrow(title)),
               IconButton(
-                tooltip: 'Quitar',
+                tooltip: context.l10n.invRemove,
                 icon: const Icon(Icons.delete_outline),
                 onPressed: onRemove,
               ),
@@ -660,21 +682,19 @@ String _formatCr(num? cr) => switch (cr) {
   final n => '${n.toInt()}',
 };
 
-String? _crValue(String? value) {
+String? _crValue(AppLocalizations l10n, String? value) {
   final text = (value ?? '').trim();
   if (text.isEmpty) return null;
   final cr = _parseCr(text);
-  if (cr == null) return 'Se espera un número o una fracción, como 1/4 o 5.';
-  return cr < 0 ? 'No puede ser negativo.' : null;
+  if (cr == null) return l10n.hbCrInvalid;
+  return cr < 0 ? l10n.hbNegative : null;
 }
 
 /// Los dados de golpe del perfil. Se validan con el mismo parser que después
 /// los tira, así lo que el formulario acepta es exactamente lo que el combate
 /// puede usar.
-String? _hitDiceValue(String? value) {
+String? _hitDiceValue(AppLocalizations l10n, String? value) {
   final text = (value ?? '').trim();
   if (text.isEmpty) return null;
-  return DiceFormula.tryParse(text) == null
-      ? 'Formato inválido: se espera algo como 2d6 + 2.'
-      : null;
+  return DiceFormula.tryParse(text) == null ? l10n.hbHitDiceInvalid : null;
 }

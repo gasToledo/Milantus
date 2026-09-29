@@ -18,6 +18,7 @@ import 'dm/dm_mode_screen.dart';
 import 'pending_events_gate.dart';
 import 'save_status_indicator.dart';
 import 'sheet_screen.dart';
+import '../l10n/l10n_context.dart';
 
 part 'dashboard/dashboard_actions.dart';
 part 'dashboard/dashboard_content.dart';
@@ -42,14 +43,19 @@ const _kCardSpacing = 16.0;
 /// en los ajustes (`AppSettings.sortMode`), así que renombrarla cambia lo que
 /// ya está guardado: un valor desconocido cae a [name].
 enum _SortMode {
-  manual('Manual'),
-  dateAdded('Más recientes'),
-  name('Nombre'),
-  level('Nivel'),
-  klass('Clase');
+  manual,
+  dateAdded,
+  name,
+  level,
+  klass;
 
-  const _SortMode(this.label);
-  final String label;
+  String label(AppLocalizations l10n) => switch (this) {
+    _SortMode.manual => l10n.sortManual,
+    _SortMode.dateAdded => l10n.sortRecent,
+    _SortMode.name => l10n.sortName,
+    _SortMode.level => l10n.sortLevel,
+    _SortMode.klass => l10n.sortClass,
+  };
 
   static _SortMode parse(String value) =>
       _SortMode.values.firstWhere((m) => m.name == value, orElse: () => name);
@@ -143,10 +149,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (mounted) {
         showAppMessage(
           context,
-          failureMessage(
-            'No se pudo guardar el orden de tus personajes',
-            error,
-          ),
+          failureMessage(context.l10n.sortSaveError, error),
           tone: AppMessageTone.error,
         );
       }
@@ -180,8 +183,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       // sobre todo que no hace falta arrastrar.
       showAppMessage(
         context,
-        'Orden manual: usá «Mover antes» y «Mover después» en el menú de cada '
-        'tarjeta, o arrastrala sobre otra.',
+        context.l10n.sortManualHint,
         duration: const Duration(seconds: 6),
       );
     }
@@ -264,7 +266,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       } else {
         showAppMessage(
           context,
-          failureMessage('No se pudieron guardar los últimos cambios', error),
+          failureMessage(context.l10n.saveLatestError, error),
           tone: AppMessageTone.error,
         );
       }
@@ -278,17 +280,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AppDialog(
-        title: 'La sesión terminó',
-        content: const Text(
-          'Los cambios que todavía no se pudieron guardar siguen en '
-          'pantalla. Iniciá sesión de nuevo para seguir editando.',
-        ),
+        title: context.l10n.sessionExpiredTitle,
+        content: Text(context.l10n.sessionExpiredBody),
         actions: [
           // Sin `keyHint: 'Esc'`: este diálogo abre con `barrierDismissible`
           // en false y la tecla no lo cierra. La tecla se dibuja solo cuando
           // hace algo.
           DialogAction(
-            'Iniciar sesión',
+            context.l10n.sessionSignIn,
             primary: true,
             onPressed: () =>
                 browser.redirectTo(controller.api.loginUri.toString()),
@@ -385,9 +384,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Milantus'),
+                const Text(appName),
                 Text(
-                  'Asistente de Aventuras',
+                  context.l10n.appTagline,
                   style: TextStyle(
                     fontSize: 11,
                     letterSpacing: 0.3,

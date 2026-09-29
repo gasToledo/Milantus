@@ -1,3 +1,4 @@
+// l10n-ignore-file: errores de validación de archivos que se muestran tal cual; la fase 2 los pasa a códigos de error traducibles.
 import 'dart:convert';
 import 'dart:typed_data';
 

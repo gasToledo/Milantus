@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../api/api_models.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/app_widgets.dart';
+import '../../l10n/l10n_context.dart';
 
 /// El Cuaderno de campaña: qué pasó en cada capítulo.
 ///
@@ -91,7 +92,8 @@ class _NotebookViewState extends State<NotebookView> {
             (_matches(note.title) || _matches(note.body)))
           (at: note.updatedAt, note: note, log: null),
       for (final log in notebook.encounterLogs)
-        if (log.chapterId == chapterId && _matches(_logTitle(log)))
+        if (log.chapterId == chapterId &&
+            _matches(_logTitle(log, context.l10n)))
           (at: log.endedAt, note: null, log: log),
     ];
     entries.sort((a, b) {
@@ -105,22 +107,20 @@ class _NotebookViewState extends State<NotebookView> {
   Widget build(BuildContext context) {
     if (widget.error != null) {
       return AppErrorView(
-        message: 'No se pudo leer el cuaderno.',
+        message: context.l10n.dmNotebookReadFail,
         details: '${widget.error}',
         onRetry: widget.onRetry,
       );
     }
     if (widget.loading) {
-      return const Center(child: AppBusyLabel('Cargando el cuaderno…'));
+      return Center(child: AppBusyLabel(context.l10n.dmNotebookLoading));
     }
 
     // Sin capítulos no hay dónde escribir: el cuaderno cuelga de ellos.
     if (widget.chapters.isEmpty) {
-      return const AppEmptyState(
+      return AppEmptyState(
         icon: Icons.menu_book_outlined,
-        message:
-            'El cuaderno se ordena por capítulo, así que primero hay que '
-            'crear uno. Desde Capítulos.',
+        message: context.l10n.dmNotebookNeedsChapter,
       );
     }
 
@@ -137,12 +137,12 @@ class _NotebookViewState extends State<NotebookView> {
           controller: _searchController,
           decoration: InputDecoration(
             isDense: true,
-            labelText: 'Buscar en el cuaderno',
+            labelText: context.l10n.dmSearchNotebook,
             prefixIcon: const Icon(Icons.search, size: 20),
             suffixIcon: _query.isEmpty
                 ? null
                 : IconButton(
-                    tooltip: 'Limpiar búsqueda',
+                    tooltip: context.l10n.rosterClearSearch,
                     icon: const Icon(Icons.close, size: 18),
                     onPressed: () {
                       _searchController.clear();
@@ -179,10 +179,10 @@ class _NotebookViewState extends State<NotebookView> {
             ),
         if (loose.isNotEmpty) ...[
           const SizedBox(height: 4),
-          const Eyebrow('Sin capítulo'),
+          Eyebrow(context.l10n.dmNoChapter),
           const SizedBox(height: 8),
           Text(
-            'Combates que se jugaron sin ningún capítulo en marcha.',
+            context.l10n.dmLooseFights,
             style: TextStyle(fontSize: 13, color: context.palette.textMuted),
           ),
           const SizedBox(height: 10),
@@ -206,16 +206,16 @@ class _NotebookViewState extends State<NotebookView> {
       builder: (ctx) => AppDialog(
         icon: Icons.warning_amber_rounded,
         iconColor: context.palette.crimson,
-        title: 'Borrar nota',
-        content: Text('Se borra «${note.title}» y no se puede deshacer.'),
+        title: context.l10n.dmDeleteNote,
+        content: Text(context.l10n.dmDeleteNoteBody(note.title)),
         actions: [
           DialogAction(
-            'Cancelar',
+            context.l10n.commonCancel,
             keyHint: 'Esc',
             onPressed: () => Navigator.of(ctx).pop(false),
           ),
           DialogAction(
-            'Borrar nota',
+            context.l10n.dmDeleteNote,
             primary: true,
             color: context.palette.crimson,
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -228,9 +228,9 @@ class _NotebookViewState extends State<NotebookView> {
 }
 
 /// El título nombra solo a los enemigos: «contra» un aliado no se pelea.
-String _logTitle(EncounterLog log) => log.enemies.isEmpty
-    ? 'Combate'
-    : 'Combate contra ${log.enemies.map((m) => m.name).join(', ')}';
+String _logTitle(EncounterLog log, AppLocalizations l10n) => log.enemies.isEmpty
+    ? l10n.dmCombat
+    : l10n.dmCombatAgainst(log.enemies.map((m) => m.name).join(', '));
 
 /// La cantidad va detrás, «Esqueleto ×2», como en el equipo. «2 Esqueleto»
 /// pedía un plural, y el nombre sale del catálogo o del homebrew: «Lobo
@@ -316,12 +316,15 @@ class _ChapterCard extends StatelessWidget {
                               color: isActive ? null : pal.textMuted,
                             ),
                           ),
-                          GoldPill(chapter.state.label, highlighted: isActive),
+                          GoldPill(
+                            chapter.state.localized(context),
+                            highlighted: isActive,
+                          ),
                         ],
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        _summary(),
+                        _summary(context.l10n),
                         style: TextStyle(fontSize: 13, color: pal.textMuted),
                       ),
                     ],
@@ -350,7 +353,7 @@ class _ChapterCard extends StatelessWidget {
                   ),
                   Expanded(
                     child: Text(
-                      'Se repartió ${chapter.grantsLabel}.',
+                      context.l10n.dmDistributed(chapter.grantsLabel),
                       style: TextStyle(fontSize: 13, color: pal.textMuted),
                     ),
                   ),
@@ -360,7 +363,7 @@ class _ChapterCard extends StatelessWidget {
             const SizedBox(height: 14),
             if (entries.isEmpty)
               Text(
-                'Todavía no hay nada anotado en este capítulo.',
+                context.l10n.dmNothingNoted,
                 style: TextStyle(fontSize: 13, color: pal.textMuted),
               )
             else
@@ -379,13 +382,13 @@ class _ChapterCard extends StatelessWidget {
     );
   }
 
-  String _summary() {
+  String _summary(AppLocalizations l10n) {
     final notes = entries.where((e) => e.note != null).length;
     final fights = entries.where((e) => e.log != null).length;
-    if (notes == 0 && fights == 0) return 'Sin entradas';
+    if (notes == 0 && fights == 0) return l10n.dmNoEntries;
     return [
-      if (notes > 0) notes == 1 ? '1 nota' : '$notes notas',
-      if (fights > 0) fights == 1 ? '1 combate' : '$fights combates',
+      if (notes > 0) l10n.dmNotesCount(notes),
+      if (fights > 0) l10n.dmFightsCount(fights),
     ].join(' · ');
   }
 }
@@ -440,13 +443,13 @@ class _EntryTile extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        note?.title ?? _logTitle(log!),
+                        note?.title ?? _logTitle(log!, context.l10n),
                         style: const TextStyle(fontWeight: FontWeight.w500),
                       ),
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      _stamp(),
+                      _stamp(context.l10n),
                       style: TextStyle(
                         fontSize: 12.5,
                         color: pal.textMuted,
@@ -457,7 +460,7 @@ class _EntryTile extends StatelessWidget {
                     // se corrige: no lleva menú.
                     if (note != null)
                       PopupMenuButton<_NoteAction>(
-                        tooltip: 'Acciones de la nota',
+                        tooltip: context.l10n.dmNoteActions,
                         icon: const Icon(Icons.more_horiz, size: 18),
                         padding: EdgeInsets.zero,
                         onSelected: (action) => switch (action) {
@@ -465,12 +468,12 @@ class _EntryTile extends StatelessWidget {
                           _NoteAction.delete => onDelete(note),
                         },
                         itemBuilder: (context) => [
-                          const PopupMenuItem(
+                          PopupMenuItem(
                             value: _NoteAction.edit,
                             child: ListTile(
                               contentPadding: EdgeInsets.zero,
-                              leading: Icon(Icons.edit_outlined),
-                              title: Text('Editar'),
+                              leading: const Icon(Icons.edit_outlined),
+                              title: Text(context.l10n.commonEdit),
                             ),
                           ),
                           PopupMenuItem(
@@ -482,7 +485,7 @@ class _EntryTile extends StatelessWidget {
                                 color: pal.crimson,
                               ),
                               title: Text(
-                                'Borrar',
+                                context.l10n.commonDelete,
                                 style: TextStyle(color: pal.crimson),
                               ),
                             ),
@@ -493,7 +496,7 @@ class _EntryTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  note?.body ?? _logBody(log!),
+                  note?.body ?? _logBody(log!, context.l10n),
                   style: TextStyle(
                     fontSize: 13,
                     height: 1.5,
@@ -508,17 +511,17 @@ class _EntryTile extends StatelessWidget {
     );
   }
 
-  String _stamp() {
+  String _stamp(AppLocalizations l10n) {
     final at = entry.at;
     if (at == null) return '';
     final rounds = entry.log == null
         ? ''
-        : ' · ${entry.log!.rounds} ronda${entry.log!.rounds == 1 ? '' : 's'}';
+        : ' · ${l10n.dmRounds(entry.log!.rounds)}';
     final days = DateTime.now().difference(at).inDays;
     final when = switch (days) {
-      0 => 'hoy',
-      1 => 'ayer',
-      < 30 => 'hace $days días',
+      0 => l10n.dmToday,
+      1 => l10n.dmYesterday,
+      < 30 => l10n.dmDaysAgo(days),
       _ => '${at.day}/${at.month}/${at.year}',
     };
     return '$when$rounds';
@@ -533,22 +536,23 @@ enum _NoteAction { edit, delete }
 /// Aliados y neutrales van en líneas propias, después de la pelea: es el
 /// cuaderno del DM y le sirve saber que Mirra estuvo del lado de la mesa, pero
 /// no cuentan en «cayeron N de M», que es de los enemigos.
-String _logBody(EncounterLog log) {
-  final who = log.players.isEmpty ? 'La mesa' : log.players.join(', ');
+String _logBody(EncounterLog log, AppLocalizations l10n) {
+  final who = log.players.isEmpty ? l10n.dmTheTable : log.players.join(', ');
   final extra = [
-    if (log.allies.isNotEmpty) 'Aliados: ${_logNames(log.allies, ', ')}.',
-    if (log.neutrals.isNotEmpty) 'Neutrales: ${_logNames(log.neutrals, ', ')}.',
+    if (log.allies.isNotEmpty) l10n.dmLogAllies(_logNames(log.allies, ', ')),
+    if (log.neutrals.isNotEmpty)
+      l10n.dmLogNeutrals(_logNames(log.neutrals, ', ')),
   ];
   if (log.enemies.isEmpty) {
-    return ['$who peleó sin enemigos cargados.', ...extra].join('\n');
+    return [l10n.dmLogNoEnemies(who), ...extra].join('\n');
   }
-  final against = _logNames(log.enemies, ' y ');
+  final against = _logNames(log.enemies, ' ${l10n.wordAnd} ');
   // El sujeto va siempre explícito: "cayeron todos" a secas, al lado de
   // "Sagan, Lyra contra Goblin ×3", se puede leer como que cayó el grupo.
   final fell = log.totalDefeated == 0
-      ? 'No cayó ningún enemigo.'
+      ? l10n.dmLogNoneFell
       : log.totalDefeated == log.totalMonsters
-      ? 'Cayeron todos los enemigos.'
-      : 'Cayeron ${log.totalDefeated} de ${log.totalMonsters} enemigos.';
-  return ['$who contra $against. $fell', ...extra].join('\n');
+      ? l10n.dmLogAllFell
+      : l10n.dmLogSomeFell(log.totalDefeated, log.totalMonsters);
+  return [l10n.dmLogAgainst(who, against, fell), ...extra].join('\n');
 }

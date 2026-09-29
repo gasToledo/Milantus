@@ -33,7 +33,7 @@ extension _SheetCombatSection on _SheetScreenState {
     final ratio = s.maxHp == 0 ? 0.0 : combat.currentHp / s.maxHp;
     return sheetCard(
       icon: Icons.favorite,
-      title: 'Puntos de golpe',
+      title: context.l10n.hitPoints,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -62,7 +62,7 @@ extension _SheetCombatSection on _SheetScreenState {
                   ),
                 ),
                 Text(
-                  '/ ${s.maxHp} PG',
+                  context.l10n.hpMaxSuffix(s.maxHp),
                   style: TextStyle(
                     fontFamily: 'Georgia',
                     fontSize: 18,
@@ -86,7 +86,7 @@ extension _SheetCombatSection on _SheetScreenState {
             _hpControls(s),
             if (combat.currentHp <= 0) ...[
               const SizedBox(height: 16),
-              const Eyebrow('Salvaciones de muerte'),
+              Eyebrow(context.l10n.deathSaves),
               _deathSaves(combat),
             ],
           ],
@@ -106,8 +106,8 @@ extension _SheetCombatSection on _SheetScreenState {
           child: TextField(
             controller: _amountCtrl,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Cantidad',
+            decoration: InputDecoration(
+              labelText: context.l10n.combatAmount,
               border: OutlineInputBorder(),
               isDense: true,
             ),
@@ -123,7 +123,7 @@ extension _SheetCombatSection on _SheetScreenState {
             _amountCtrl.clear();
           }),
           icon: const Icon(Icons.remove, size: 18),
-          label: const Text('Daño'),
+          label: Text(context.l10n.creatureDamage),
         ),
         OutlinedButton.icon(
           onPressed: () => _mutateCombat(() {
@@ -131,14 +131,14 @@ extension _SheetCombatSection on _SheetScreenState {
             _amountCtrl.clear();
           }),
           icon: const Icon(Icons.add, size: 18),
-          label: const Text('Curar'),
+          label: Text(context.l10n.combatHeal),
         ),
         OutlinedButton(
           onPressed: () => _mutateCombat(() {
             CombatOps.setTempHp(_c.combat, _amount);
             _amountCtrl.clear();
           }),
-          child: const Text('PG temp'),
+          child: Text(context.l10n.combatTempHp),
         ),
       ],
     );
@@ -161,9 +161,9 @@ extension _SheetCombatSection on _SheetScreenState {
           OutlinedButton(
             onPressed: () => _mutateCombat(() {
               final r = CombatOps.recordDeathSave(_c.combat, success: true);
-              if (r == 'stable') _snack('¡Estabilizado!');
+              if (r == 'stable') _snack(context.l10n.combatStabilized);
             }),
-            child: const Text('+Éxito'),
+            child: Text(context.l10n.combatSuccessPlus),
           ),
         ),
         group(
@@ -171,9 +171,9 @@ extension _SheetCombatSection on _SheetScreenState {
           OutlinedButton(
             onPressed: () => _mutateCombat(() {
               final r = CombatOps.recordDeathSave(_c.combat, success: false);
-              if (r == 'dead') _snack('El personaje ha muerto.');
+              if (r == 'dead') _snack(context.l10n.combatCharacterDied);
             }),
-            child: const Text('+Fallo'),
+            child: Text(context.l10n.combatFailurePlus),
           ),
         ),
       ],
@@ -186,8 +186,8 @@ extension _SheetCombatSection on _SheetScreenState {
         ? null
         : repo.armorPiece(_c.equippedArmorId!);
     final armorLine = [
-      armor?.name ?? 'Sin armadura',
-      if (_c.shieldEquipped) 'escudo',
+      armor?.name ?? context.l10n.combatNoArmor,
+      if (_c.shieldEquipped) context.l10n.combatShield,
     ].join(' + ');
     final resistances = [...s.resistances].map(DamageType.labelFor).toList()
       ..sort();
@@ -195,7 +195,7 @@ extension _SheetCombatSection on _SheetScreenState {
       ..sort();
     return sheetCard(
       icon: Icons.shield,
-      title: 'Defensa',
+      title: context.l10n.combatDefense,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -211,14 +211,14 @@ extension _SheetCombatSection on _SheetScreenState {
                   if (resistances.isNotEmpty) ...[
                     const SizedBox(height: 6),
                     Text(
-                      'Resistencias: ${resistances.join(", ")}',
+                      context.l10n.combatResistances(resistances.join(", ")),
                       style: TextStyle(fontSize: 12.5, color: pal.textMuted),
                     ),
                   ],
                   if (immunities.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Text(
-                      'Inmunidades: ${immunities.join(", ")}',
+                      context.l10n.combatImmunities(immunities.join(", ")),
                       style: TextStyle(fontSize: 12.5, color: pal.textMuted),
                     ),
                   ],
@@ -244,9 +244,8 @@ extension _SheetCombatSection on _SheetScreenState {
       ),
     );
     final msg = restored.isEmpty
-        ? 'Descanso corto. No cura PG: gastá dados de golpe para curarte.'
-        : 'Descanso corto: recuperaste ${restored.join(", ")}. '
-              'Para curarte, gastá dados de golpe.';
+        ? context.l10n.shortRestNoRestore
+        : context.l10n.shortRestRestored(restored.join(", "));
     _snack(msg);
   }
 
@@ -281,21 +280,17 @@ extension _SheetCombatSection on _SheetScreenState {
     );
     if (objetosRecargados > 0) _replace(conCargas);
 
-    final partes = <String>['PG al máximo y recursos recargados'];
+    final partes = <String>[context.l10n.longRestBase];
     if (cansancioPrevio > 0) {
-      partes.add('cansancio a nivel ${_c.combat.exhaustion}');
+      partes.add(context.l10n.longRestExhaustion(_c.combat.exhaustion));
     }
     if (!teniaInspiracion && _c.combat.heroicInspiration) {
-      partes.add('ganaste Inspiración Heroica');
+      partes.add(context.l10n.longRestInspiration);
     }
     if (objetosRecargados > 0) {
-      partes.add(
-        objetosRecargados == 1
-            ? '1 objeto mágico recuperó cargas'
-            : '$objetosRecargados objetos mágicos recuperaron cargas',
-      );
+      partes.add(context.l10n.longRestItemsRecharged(objetosRecargados));
     }
-    _snack('Descanso largo: ${partes.join('; ')}.');
+    _snack(context.l10n.longRestSummary(partes.join('; ')));
   }
 
   /// PG máximos de un compañero invocado, o null si su forma ya no está en el
@@ -317,15 +312,14 @@ extension _SheetCombatSection on _SheetScreenState {
     final muted = Theme.of(context).colorScheme.onSurfaceVariant;
     return sheetCard(
       icon: Icons.bolt,
-      title: 'Recursos y descansos',
+      title: context.l10n.combatResourcesTitle,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'El descanso corto no cura PG: recarga recursos de recarga '
-              'corta. Para curarte, gastá dados de golpe.',
+              context.l10n.combatRestExplainer,
               style: TextStyle(fontSize: 13, color: muted),
             ),
             const SizedBox(height: 10),
@@ -336,12 +330,12 @@ extension _SheetCombatSection on _SheetScreenState {
                 OutlinedButton.icon(
                   onPressed: () => _shortRest(s),
                   icon: const Icon(Icons.local_cafe, size: 18),
-                  label: const Text('Descanso corto'),
+                  label: Text(context.l10n.restShort),
                 ),
                 FilledButton.icon(
                   onPressed: () => _longRest(s),
                   icon: const Icon(Icons.bedtime, size: 18),
-                  label: const Text('Descanso largo'),
+                  label: Text(context.l10n.restLong),
                 ),
                 OutlinedButton.icon(
                   onPressed: _hitDiceUsed >= _c.level
@@ -353,11 +347,14 @@ extension _SheetCombatSection on _SheetScreenState {
                             _c.level,
                           );
                           _mutateCombat(() {});
-                          _snack('Recuperaste $healed PG (dado de golpe)');
+                          _snack(context.l10n.combatHitDieHealed(healed));
                         },
                   icon: const Icon(Icons.casino, size: 18),
                   label: Text(
-                    'Dado de golpe (${_c.level - _hitDiceUsed}/${_c.level})',
+                    context.l10n.combatHitDie(
+                      _c.level - _hitDiceUsed,
+                      _c.level,
+                    ),
                   ),
                 ),
               ],
@@ -421,8 +418,12 @@ extension _SheetCombatSection on _SheetScreenState {
                       Text(
                         [
                           if (r.saveDc case final dc?)
-                            'CD $dc'
-                                '${r.saveAbility == null ? '' : ' de ${r.saveAbility!.abbr}'}',
+                            r.saveAbility == null
+                                ? context.l10n.saveDc(dc)
+                                : context.l10n.saveDcAbility(
+                                    dc,
+                                    r.saveAbility!.abbr,
+                                  ),
                           ?r.damage,
                         ].join(' · '),
                         style: TextStyle(
@@ -436,7 +437,10 @@ extension _SheetCombatSection on _SheetScreenState {
                     if (r.pool)
                       Text(
                         '${r.max - used} / ${r.max}',
-                        semanticsLabel: '${r.max - used} de ${r.max} puntos',
+                        semanticsLabel: context.l10n.combatPointsOf(
+                          r.max - used,
+                          r.max,
+                        ),
                         style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           fontFeatures: [FontFeature.tabularFigures()],
@@ -455,12 +459,16 @@ extension _SheetCombatSection on _SheetScreenState {
             ),
           ),
           SpendRecoverButtons(
-            spendTooltip: 'Usar',
+            spendTooltip: context.l10n.commonUse,
             onSpend: used >= r.max
                 ? null
                 : () async {
                     final n = r.pool
-                        ? await _askPoints(r, 'gastar', r.max - used)
+                        ? await _askPoints(
+                            r,
+                            context.l10n.verbSpend,
+                            r.max - used,
+                          )
                         : 1;
                     if (n == null) return;
                     _mutateCombat(
@@ -474,7 +482,7 @@ extension _SheetCombatSection on _SheetScreenState {
                 ? null
                 : () async {
                     final n = r.pool
-                        ? await _askPoints(r, 'recuperar', used)
+                        ? await _askPoints(r, context.l10n.verbRecover, used)
                         : 1;
                     if (n == null) return;
                     _mutateCombat(
@@ -501,7 +509,7 @@ extension _SheetCombatSection on _SheetScreenState {
     final value = await showTextPromptDialog(
       context,
       title: r.name,
-      label: 'Puntos a $verb (hasta $limit)',
+      label: context.l10n.combatPointsPrompt(verb, limit),
       keyboardType: TextInputType.number,
     );
     final n = value == null ? null : int.tryParse(value.trim());
@@ -512,7 +520,7 @@ extension _SheetCombatSection on _SheetScreenState {
   Widget _attacksCard(ComputedSheet s) {
     return sheetCard(
       icon: Icons.gps_fixed,
-      title: 'Ataques',
+      title: context.l10n.combatAttacks,
       child: DenseRows(children: [for (final a in s.attacks) _attackRow(a)]),
     );
   }
@@ -522,7 +530,7 @@ extension _SheetCombatSection on _SheetScreenState {
   /// se muestra sin explicación, que es todo lo que se puede decir de ella.
   Widget _masteryPill(String id) {
     final m = weaponMasteries[id];
-    final pill = GoldPill('Maestría: ${weaponMasteryName(id)}');
+    final pill = GoldPill(context.l10n.combatMastery(weaponMasteryName(id)));
     if (m == null) return pill;
     return Tooltip(
       message: m.description,
@@ -560,15 +568,15 @@ extension _SheetCombatSection on _SheetScreenState {
                     // del catálogo detrás y entonces no muestra ninguno.
                     if (repo.weapon(a.baseWeaponId)?.rangeLabel case final r?)
                       Text(
-                        'Alcance $r',
+                        context.l10n.combatRangeValue(r),
                         style: TextStyle(color: muted, fontSize: 13),
                       ),
                     if (a.mastery != null) _masteryPill(a.mastery!),
                     // Mano y acción salen calculadas del motor: derivarlas acá
                     // sería reimplementar la regla de dos armas en la ficha.
-                    if (a.offHand) const GoldPill('Mano secundaria'),
+                    if (a.offHand) GoldPill(context.l10n.combatOffHand),
                     if (a.action == AttackAction.bonusAction)
-                      const GoldPill('Acción adicional'),
+                      GoldPill(context.l10n.spellActionBonus),
                   ],
                 ),
               ],
@@ -618,11 +626,11 @@ extension _SheetCombatSection on _SheetScreenState {
         children: [
           Icon(Icons.pets, size: 18, color: pal.gold),
           const SizedBox(width: 8),
-          Expanded(child: Text('Transformado en ${beast.name}')),
+          Expanded(child: Text(context.l10n.wildShapeAs(beast.name))),
           TextButton(
             onPressed: () =>
                 _mutateCombat(() => CombatOps.leaveWildShape(_c.combat)),
-            child: const Text('Volver'),
+            child: Text(context.l10n.commonBack),
           ),
         ],
       ),
@@ -639,11 +647,11 @@ extension _SheetCombatSection on _SheetScreenState {
 
     return sheetCard(
       icon: Icons.pets,
-      title: 'Forma Salvaje',
+      title: context.l10n.wildShapeTitle,
       trailing: TextButton.icon(
         onPressed: () => _editWildShapeForms(slot),
         icon: const Icon(Icons.edit, size: 16),
-        label: const Text('Anotar'),
+        label: Text(context.l10n.wildShapeAddForms),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -652,8 +660,9 @@ extension _SheetCombatSection on _SheetScreenState {
           children: [
             Text(
               [
-                if (uses != null) 'Usos: ${_resourceLeft(uses)} de ${uses.max}',
-                'Formas: ${slot.chosen.length} de ${slot.count}',
+                if (uses != null)
+                  context.l10n.wildShapeUses(_resourceLeft(uses), uses.max),
+                context.l10n.wildShapeForms(slot.chosen.length, slot.count),
               ].join(' · '),
               style: TextStyle(fontSize: 12.5, color: muted),
             ),
@@ -682,7 +691,7 @@ extension _SheetCombatSection on _SheetScreenState {
               Padding(
                 padding: const EdgeInsets.only(top: 10),
                 child: Text(
-                  'Todavía no anotaste ninguna forma.',
+                  context.l10n.wildShapeNoForms,
                   style: TextStyle(fontSize: 13, color: muted),
                 ),
               )
@@ -706,7 +715,7 @@ extension _SheetCombatSection on _SheetScreenState {
               children: [
                 Text(form.name),
                 Text(
-                  '${form.kind} · CA ${form.ac} · ${form.speed}',
+                  context.l10n.creatureLine3(form.kind, form.ac, form.speed),
                   style: TextStyle(fontSize: 12.5, color: muted),
                 ),
               ],
@@ -715,7 +724,7 @@ extension _SheetCombatSection on _SheetScreenState {
           const SizedBox(width: 8),
           OutlinedButton(
             onPressed: () => _enterWildShape(s, form),
-            child: const Text('Transformarse'),
+            child: Text(context.l10n.wildShapeTransform),
           ),
         ],
       ),
@@ -732,8 +741,8 @@ extension _SheetCombatSection on _SheetScreenState {
     });
     _snack(
       ok
-          ? 'Te transformaste en ${form.name}: +${s.level} PG temporales.'
-          : 'No te quedan usos de Forma Salvaje.',
+          ? context.l10n.wildShapeDone(form.name, s.level)
+          : context.l10n.wildShapeNoUses,
     );
   }
 
@@ -745,7 +754,7 @@ extension _SheetCombatSection on _SheetScreenState {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AppDialog(
-          title: 'Formas conocidas (${chosen.length}/${slot.count})',
+          title: context.l10n.wildShapeKnownTitle(chosen.length, slot.count),
           scrollable: false,
           content: SizedBox(
             // Alto fijo: el pozo tiene decenas de bestias y sin esto el
@@ -771,19 +780,21 @@ extension _SheetCombatSection on _SheetScreenState {
                             }
                           }),
                     title: Text(beast.name),
-                    subtitle: Text('${beast.kind} · CA ${beast.ac}'),
+                    subtitle: Text(
+                      context.l10n.creatureLine2(beast.kind, beast.ac),
+                    ),
                   ),
               ],
             ),
           ),
           actions: [
             DialogAction(
-              'Cancelar',
+              context.l10n.commonCancel,
               keyHint: 'Esc',
               onPressed: () => Navigator.of(dialogContext).pop(),
             ),
             DialogAction(
-              'Guardar',
+              context.l10n.commonSave,
               primary: true,
               onPressed: () => Navigator.of(dialogContext).pop(chosen),
             ),
@@ -798,7 +809,7 @@ extension _SheetCombatSection on _SheetScreenState {
   Widget _companionsCard(ComputedSheet s) {
     return sheetCard(
       icon: Icons.pets,
-      title: 'Compañeros',
+      title: context.l10n.companionsTitle,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -813,8 +824,8 @@ extension _SheetCombatSection on _SheetScreenState {
                 child: TextField(
                   controller: _companionAmountCtrl,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Cantidad de PG',
+                  decoration: InputDecoration(
+                    labelText: context.l10n.companionHpAmount,
                     border: OutlineInputBorder(),
                     isDense: true,
                   ),
@@ -845,7 +856,11 @@ extension _SheetCombatSection on _SheetScreenState {
             OutlinedButton.icon(
               onPressed: () => _summonCompanion(s, option),
               icon: const Icon(Icons.add_circle_outline, size: 18),
-              label: Text(active.isEmpty ? 'Invocar' : 'Invocar otro'),
+              label: Text(
+                active.isEmpty
+                    ? context.l10n.companionSummon
+                    : context.l10n.companionSummonAnother,
+              ),
             ),
           ],
         ),
@@ -855,7 +870,7 @@ extension _SheetCombatSection on _SheetScreenState {
           Padding(
             padding: const EdgeInsets.only(top: 8),
             child: Text(
-              'No hay ninguno invocado.',
+              context.l10n.companionNone,
               style: TextStyle(fontSize: 13, color: muted),
             ),
           ),
@@ -890,7 +905,7 @@ extension _SheetCombatSection on _SheetScreenState {
   Future<bool> _confirmDialog(
     String title,
     String message, {
-    String confirmLabel = 'Invocar igual',
+    String? confirmLabel,
   }) async {
     final ok = await showDialog<bool>(
       context: context,
@@ -899,12 +914,12 @@ extension _SheetCombatSection on _SheetScreenState {
         content: Text(message),
         actions: [
           DialogAction(
-            'Cancelar',
+            context.l10n.commonCancel,
             keyHint: 'Esc',
             onPressed: () => Navigator.of(dialogContext).pop(false),
           ),
           DialogAction(
-            confirmLabel,
+            confirmLabel ?? context.l10n.companionSummonAnyway,
             primary: true,
             onPressed: () => Navigator.of(dialogContext).pop(true),
           ),
@@ -926,25 +941,25 @@ extension _SheetCombatSection on _SheetScreenState {
     if (active.length >= option.maxActive) {
       final going = option.form(active.first.creatureId)?.name ?? option.name;
       final confirmed = await _confirmDialog(
-        option.maxActive == 1 ? 'Ya tenés uno en juego' : 'Llegaste al máximo',
         option.maxActive == 1
-            ? 'Invocar otro hace desaparecer a $going, con los puntos de golpe '
-                  'que tenga.'
-            : 'Ya tenés ${option.maxActive}. Invocar otro hace desaparecer al '
-                  'más viejo, $going.',
+            ? context.l10n.companionLimitOneTitle
+            : context.l10n.companionLimitMaxTitle,
+        option.maxActive == 1
+            ? context.l10n.companionLimitOneBody(going)
+            : context.l10n.companionLimitMaxBody(option.maxActive, going),
       );
-      if (!confirmed) return;
+      if (!confirmed || !mounted) return;
     }
 
     var form = option.forms.first;
     if (option.forms.length > 1) {
       final chosen = await _pickFromList<Creature>(
-        title: 'Elegí la forma',
+        title: context.l10n.companionPickForm,
         options: option.forms,
         label: (c) => c.name,
         subtitle: (c) => c.kind,
       );
-      if (chosen == null) return;
+      if (chosen == null || !mounted) return;
       form = chosen;
     }
 
@@ -980,19 +995,31 @@ extension _SheetCombatSection on _SheetScreenState {
           );
 
       if (choices.isEmpty) {
-        _snack('No te quedan espacios de nivel ${option.minSpellLevel} o más.');
+        _snack(context.l10n.companionNoSlots(option.minSpellLevel));
         return;
       }
       final chosen = await _pickFromList<({int level, bool free})>(
-        title: 'Cómo lo invocás',
+        title: context.l10n.companionHowSummon,
         options: choices,
-        label: (c) => c.free ? 'Sin gastar espacio' : 'Nivel ${c.level}',
+        label: (c) => c.free
+            ? context.l10n.companionNoSlotSpend
+            : context.l10n.commonLevel(c.level),
         subtitle: (c) => c.free
-            ? '${free!.name}: quedan ${_resourceLeft(free)} de ${free.max}'
-            : '${CombatOps.spellSlotsRemaining(_c.combat, s.spellcasting!, c.level)}'
-                  ' de ${s.spellcasting!.slotsByLevel[c.level]} disponibles',
+            ? context.l10n.companionFreeLeft(
+                free!.name,
+                _resourceLeft(free),
+                free.max,
+              )
+            : context.l10n.companionSlotsAvailable(
+                CombatOps.spellSlotsRemaining(
+                  _c.combat,
+                  s.spellcasting!,
+                  c.level,
+                ),
+                s.spellcasting!.slotsByLevel[c.level] ?? 0,
+              ),
       );
-      if (chosen == null) return;
+      if (chosen == null || !mounted) return;
       spellLevel = chosen.level;
       castsFree = chosen.free;
     }
@@ -1029,17 +1056,20 @@ extension _SheetCombatSection on _SheetScreenState {
     // Que la invocación te haya gastado un espacio o cortado otro conjuro no
     // puede ser una sorpresa que se descubra después mirando otra tarjeta.
     final notes = [
-      if (spendsSlot) 'gastaste un espacio de nivel $level',
-      if (castsFree) 'sin gastar espacio, por ${free!.name}',
+      if (spendsSlot) context.l10n.companionNoteSlot(level),
+      if (castsFree) context.l10n.companionNoteFree(free!.name),
       if (brokeConcentration)
-        'perdiste la concentración anterior'
+        context.l10n.companionNoteBroke
       else if (concentrates)
-        'quedás concentrado en él',
+        context.l10n.companionNoteConcentrating,
     ];
     _snack(
       notes.isEmpty
-          ? '${summoned.name} invocado.'
-          : '${summoned.name} invocado: ${notes.join('; ')}.',
+          ? context.l10n.companionSummoned(summoned.name)
+          : context.l10n.companionSummonedNotes(
+              summoned.name,
+              notes.join('; '),
+            ),
     );
   }
 
@@ -1071,7 +1101,7 @@ extension _SheetCombatSection on _SheetScreenState {
         ),
         actions: [
           DialogAction(
-            'Cancelar',
+            context.l10n.commonCancel,
             keyHint: 'Esc',
             onPressed: () => Navigator.of(dialogContext).pop(),
           ),
@@ -1091,9 +1121,9 @@ extension _SheetCombatSection on _SheetScreenState {
     if (form == null) {
       return ListTile(
         title: Text(instance.creatureId),
-        subtitle: const Text('Esta criatura ya no está en el catálogo.'),
+        subtitle: Text(context.l10n.companionGone),
         trailing: IconButton(
-          tooltip: 'Despedir',
+          tooltip: context.l10n.companionDismiss,
           icon: const Icon(Icons.close),
           onPressed: () => _mutateCombat(
             () => CombatOps.dismissCompanion(_c.combat, instance),
@@ -1128,7 +1158,7 @@ extension _SheetCombatSection on _SheetScreenState {
               ),
               const SizedBox(width: 8),
               Text(
-                'CA ${resolved.armorClass}',
+                context.l10n.acValue(resolved.armorClass),
                 style: TextStyle(fontSize: 13, color: muted),
               ),
             ],
@@ -1143,10 +1173,13 @@ extension _SheetCombatSection on _SheetScreenState {
                 runSpacing: 4,
                 children: [
                   if (instance.spellLevel > 0)
-                    GoldPill('Espacio de nivel ${instance.spellLevel}'),
+                    GoldPill(
+                      context.l10n.companionSlotLevel(instance.spellLevel),
+                    ),
                   // Que se vaya al cortar la concentración tiene que estar
                   // escrito en el compañero, no solo en la tarjeta de Conjuros.
-                  if (instance.concentration) const GoldPill('Concentración'),
+                  if (instance.concentration)
+                    GoldPill(context.l10n.concentration),
                 ],
               ),
             ),
@@ -1163,7 +1196,7 @@ extension _SheetCombatSection on _SheetScreenState {
             textBaseline: TextBaseline.alphabetic,
             children: [
               Text(
-                '${instance.currentHp} / ${resolved.maxHp} PG',
+                context.l10n.hpFraction(instance.currentHp, resolved.maxHp),
                 style: TextStyle(
                   fontFamily: 'Georgia',
                   fontSize: 16,
@@ -1202,10 +1235,12 @@ extension _SheetCombatSection on _SheetScreenState {
                   );
                   _mutateCombat(() => _companionAmountCtrl.clear());
                   // Desaparecer sin decir nada se lee como un error de la app.
-                  if (destroyed) _snack('${resolved.name} fue destruido.');
+                  if (destroyed) {
+                    _snack(context.l10n.companionDestroyed(resolved.name));
+                  }
                 },
                 icon: const Icon(Icons.remove, size: 18),
-                label: const Text('Daño'),
+                label: Text(context.l10n.creatureDamage),
               ),
               OutlinedButton.icon(
                 onPressed: () => _mutateCombat(() {
@@ -1217,21 +1252,21 @@ extension _SheetCombatSection on _SheetScreenState {
                   _companionAmountCtrl.clear();
                 }),
                 icon: const Icon(Icons.add, size: 18),
-                label: const Text('Curar'),
+                label: Text(context.l10n.combatHeal),
               ),
               OutlinedButton(
                 onPressed: () => _mutateCombat(() {
                   CombatOps.setCompanionTempHp(instance, _companionAmount);
                   _companionAmountCtrl.clear();
                 }),
-                child: const Text('PG temp'),
+                child: Text(context.l10n.combatTempHp),
               ),
               OutlinedButton.icon(
                 onPressed: () => _mutateCombat(
                   () => CombatOps.dismissCompanion(_c.combat, instance),
                 ),
                 icon: const Icon(Icons.close, size: 18),
-                label: const Text('Despedir'),
+                label: Text(context.l10n.companionDismiss),
               ),
             ],
           ),
@@ -1283,7 +1318,7 @@ extension _SheetCombatSection on _SheetScreenState {
   Widget _savesCard(ComputedSheet s) {
     return sheetCard(
       icon: Icons.security,
-      title: 'Salvaciones',
+      title: context.l10n.savesTitle,
       child: DenseRows(
         children: [for (final a in Ability.values) _saveRow(s, a)],
       ),
@@ -1348,14 +1383,6 @@ extension _SheetCombatSection on _SheetScreenState {
   /// No depende del nivel a propósito: es la letra chica del manual, y lo que
   /// sí cambia con el nivel —cuánto estás restando ahora mismo— se lee en la
   /// fila sin abrir nada.
-  static const _exhaustionRules =
-      'Cada nivel resta 2 a las pruebas de característica, salvaciones, '
-      'tiradas de ataque e iniciativa, y 5 pies a la velocidad. Al nivel '
-      '$maxExhaustionLevel el personaje muere.\n\n'
-      'La ficha ya trae la penalización aplicada en todos sus números: no la '
-      'restes de nuevo. También le entra a las salvaciones de muerte, aunque '
-      'esas no lleven número.\n\n'
-      'Un descanso largo baja un nivel.';
 
   /// Cansancio e Inspiración Heroica, en una sola tarjeta.
   ///
@@ -1373,7 +1400,7 @@ extension _SheetCombatSection on _SheetScreenState {
   Widget _stateCard(ComputedSheet s) {
     return sheetCard(
       icon: Icons.monitor_heart_outlined,
-      title: 'Estado',
+      title: context.l10n.combatState,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -1419,14 +1446,16 @@ extension _SheetCombatSection on _SheetScreenState {
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     InkWell(
-                      onTap: () =>
-                          _showInfoDialog('Cansancio', _exhaustionRules),
+                      onTap: () => _showInfoDialog(
+                        context.l10n.exhaustion,
+                        context.l10n.exhaustionRules(maxExhaustionLevel),
+                      ),
                       borderRadius: BorderRadius.circular(8),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text(
-                            'Cansancio',
+                          Text(
+                            context.l10n.exhaustion,
                             style: TextStyle(fontWeight: FontWeight.w500),
                           ),
                           const SizedBox(width: 5),
@@ -1436,7 +1465,7 @@ extension _SheetCombatSection on _SheetScreenState {
                     ),
                     if (n >= 1)
                       Text(
-                        '−${2 * n} a las tiradas · −${5 * n} pies',
+                        context.l10n.exhaustionPenalty(2 * n, 5 * n),
                         style: TextStyle(fontSize: 12, color: pal.crimson),
                       ),
                   ],
@@ -1446,7 +1475,10 @@ extension _SheetCombatSection on _SheetScreenState {
                   n,
                   maxExhaustionLevel,
                   pal.crimson,
-                  semantics: 'Cansancio: nivel $n de $maxExhaustionLevel',
+                  semantics: context.l10n.exhaustionLevelOf(
+                    n,
+                    maxExhaustionLevel,
+                  ),
                 ),
               ],
             ),
@@ -1455,8 +1487,8 @@ extension _SheetCombatSection on _SheetScreenState {
           // recurso: por eso los tooltips dicen la dirección en vez de "Usar"
           // y "Restaurar".
           SpendRecoverButtons(
-            spendTooltip: 'Bajar un nivel de cansancio',
-            recoverTooltip: 'Subir un nivel de cansancio',
+            spendTooltip: context.l10n.exhaustionLower,
+            recoverTooltip: context.l10n.exhaustionRaise,
             onSpend: n <= 0
                 ? null
                 : () => _mutateCombat(() => _c.combat.exhaustion = n - 1),
@@ -1467,8 +1499,7 @@ extension _SheetCombatSection on _SheetScreenState {
                     if (n + 1 >= maxExhaustionLevel) {
                       showAppMessage(
                         context,
-                        'Cansancio nivel $maxExhaustionLevel: tu personaje '
-                        'muere.',
+                        context.l10n.exhaustionDeath(maxExhaustionLevel),
                         tone: AppMessageTone.error,
                       );
                     }
@@ -1492,8 +1523,7 @@ extension _SheetCombatSection on _SheetScreenState {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Nivel $maxExhaustionLevel: tu personaje muere. La ficha no lo '
-              'aplica ni te toca los PG — esa decisión es de la mesa.',
+              context.l10n.exhaustionNote(maxExhaustionLevel),
               style: TextStyle(fontSize: 12, color: pal.crimson),
             ),
           ),
@@ -1520,12 +1550,14 @@ extension _SheetCombatSection on _SheetScreenState {
     final tiene = _c.combat.heroicInspiration;
     final acento = tiene ? pal.gold : pal.textMuted;
     final ayuda = tiene
-        ? 'Repetí un dado apenas lo tirás y quedate con el resultado nuevo'
+        ? context.l10n.inspirationUse
         : s.heroicInspirationOnLongRest
-        ? 'La recuperás al terminar un descanso largo'
-        : 'Marcala cuando el DM te la dé';
+        ? context.l10n.inspirationLongRest
+        : context.l10n.inspirationGrant;
     return Tooltip(
-      message: tiene ? 'Gastar la Inspiración Heroica' : 'Marcar que la tenés',
+      message: tiene
+          ? context.l10n.inspirationSpend
+          : context.l10n.inspirationMark,
       waitDuration: const Duration(milliseconds: 400),
       child: InkWell(
         onTap: () => _mutateCombat(() => _c.combat.heroicInspiration = !tiene),
@@ -1553,7 +1585,7 @@ extension _SheetCombatSection on _SheetScreenState {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Inspiración Heroica',
+                      context.l10n.heroicInspiration,
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         color: acento,
@@ -1566,7 +1598,9 @@ extension _SheetCombatSection on _SheetScreenState {
               ),
               const SizedBox(width: 8),
               Text(
-                tiene ? 'LA TENÉS' : 'GASTADA',
+                tiene
+                    ? context.l10n.inspirationHave
+                    : context.l10n.inspirationSpent,
                 style: TextStyle(
                   fontSize: 11,
                   letterSpacing: 1.2,
@@ -1584,7 +1618,7 @@ extension _SheetCombatSection on _SheetScreenState {
   Widget _conditionsCard() {
     return sheetCard(
       icon: Icons.emergency,
-      title: 'Condiciones',
+      title: context.l10n.conditionsTitle,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: _conditionChips(_c.combat.conditions),
@@ -1629,7 +1663,7 @@ extension _SheetCombatSection on _SheetScreenState {
         content: content,
         actions: [
           DialogAction(
-            'Cerrar',
+            context.l10n.commonClose,
             keyHint: 'Esc',
             onPressed: () => Navigator.of(context).pop(),
           ),

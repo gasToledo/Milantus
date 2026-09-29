@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'creation_helpers.dart';
+import 'fakes/localized_app.dart';
 
 /// Cubre el paso de Puntuaciones ya rediseñado: se llega navegando el wizard
 /// real (lo que además ejercita el gating y el stepper).
@@ -25,7 +26,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: CreationWizard(repo: repo, onCreate: (_) {}),
       ),

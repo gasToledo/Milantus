@@ -7,6 +7,7 @@ import '../../../api/api_models.dart';
 import '../../../creation/creation_wizard.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_widgets.dart';
+import '../../../l10n/l10n_context.dart';
 
 /// Piezas que comparten las pantallas de PNJ: cómo se nombra el tipo de un
 /// PNJ, qué retrato lo representa, sus números de combate y el flujo de
@@ -14,17 +15,22 @@ import '../../../theme/app_widgets.dart';
 
 /// La línea que dice qué es un PNJ, bajo su nombre: «Sin estadísticas»,
 /// «Caballero · CA 18 · PG 52» o «Ficha de personaje · Mago 7».
-String npcTypeLine(Npc npc, Character? sheet, ContentRepository repo) {
+String npcTypeLine(
+  Npc npc,
+  Character? sheet,
+  ContentRepository repo,
+  AppLocalizations l10n,
+) {
   switch (npc.sheetKind) {
     case NpcSheetKind.none:
-      return NpcSheetKind.none.label;
+      return NpcSheetKind.none.text(l10n);
     case NpcSheetKind.block:
       final block = npc.block;
-      if (block == null) return NpcSheetKind.block.label;
+      if (block == null) return NpcSheetKind.block.text(l10n);
       final base = npc.baseCreatureName ?? block.name;
-      return '$base · CA ${block.ac} · PG ${block.hp}';
+      return l10n.npcBlockLine(base, block.ac, block.hp);
     case NpcSheetKind.character:
-      if (sheet == null) return NpcSheetKind.character.label;
+      if (sheet == null) return NpcSheetKind.character.text(l10n);
       final classes = sheet.classHistory
           .toSet()
           .map(
@@ -32,7 +38,7 @@ String npcTypeLine(Npc npc, Character? sheet, ContentRepository repo) {
                 '${repo.characterClass(id)?.name ?? id} ${sheet.classLevel(id)}',
           )
           .join(' · ');
-      return 'Ficha de personaje · $classes';
+      return l10n.npcCharacterLine(classes);
   }
 }
 
@@ -109,7 +115,7 @@ class NpcStatusSelector extends StatelessWidget {
         ),
         segments: [
           for (final s in NpcStatus.values)
-            ButtonSegment(value: s, label: Text(s.label)),
+            ButtonSegment(value: s, label: Text(s.text(context.l10n))),
         ],
         selected: {status},
         onSelectionChanged: onChanged == null
@@ -158,7 +164,7 @@ class SideSelector extends StatelessWidget {
         ),
         segments: [
           for (final s in CombatantSide.values)
-            ButtonSegment(value: s, label: Text(s.label)),
+            ButtonSegment(value: s, label: Text(s.text(context.l10n))),
         ],
         selected: {?side},
         onSelectionChanged: onChanged == null
@@ -295,7 +301,7 @@ class _NewNpcDialogState extends State<_NewNpcDialog> {
   Widget build(BuildContext context) {
     final pal = context.palette;
     return AppDialog(
-      title: 'Nuevo PNJ',
+      title: context.l10n.npcNew,
       width: 600,
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -305,11 +311,11 @@ class _NewNpcDialogState extends State<_NewNpcDialog> {
             controller: _name,
             autofocus: true,
             textCapitalization: TextCapitalization.words,
-            decoration: const InputDecoration(labelText: 'Nombre'),
+            decoration: InputDecoration(labelText: context.l10n.detailsName),
             onChanged: (_) => setState(() {}),
           ),
           const SizedBox(height: 18),
-          const Eyebrow('¿Qué ficha lleva?'),
+          Eyebrow(context.l10n.npcWhichSheet),
           RadioGroup<NpcSheetKind>(
             groupValue: _kind,
             onChanged: (v) => setState(() => _kind = v ?? _kind),
@@ -320,20 +326,15 @@ class _NewNpcDialogState extends State<_NewNpcDialog> {
                     value: kind,
                     contentPadding: EdgeInsets.zero,
                     title: Text(switch (kind) {
-                      NpcSheetKind.none => 'PNJ sin estadísticas',
-                      NpcSheetKind.block => 'PNJ con bloque',
-                      NpcSheetKind.character => 'Personaje jugable',
+                      NpcSheetKind.none => context.l10n.npcNewNone,
+                      NpcSheetKind.block => context.l10n.npcNewBlock,
+                      NpcSheetKind.character => context.l10n.npcNewCharacter,
                     }),
                     subtitle: Text(switch (kind) {
-                      NpcSheetKind.none =>
-                        'Solo nombre, trasfondo y notas. El tabernero, el '
-                            'alcalde.',
-                      NpcSheetKind.block =>
-                        'Un bloque propio como los del bestiario: copiá el de '
-                            'una criatura y retocalo, o arrancá vacío.',
+                      NpcSheetKind.none => context.l10n.npcNewNoneHint,
+                      NpcSheetKind.block => context.l10n.npcNewBlockHint,
                       NpcSheetKind.character =>
-                        'Pasa por el creador de personajes: especie, clase, '
-                            'niveles y dotes. El villano de un trasfondo.',
+                        context.l10n.npcNewCharacterHint,
                     }),
                   ),
               ],
@@ -343,8 +344,8 @@ class _NewNpcDialogState extends State<_NewNpcDialog> {
             const SizedBox(height: 6),
             TextField(
               controller: _search,
-              decoration: const InputDecoration(
-                labelText: 'Partir de una criatura (opcional)',
+              decoration: InputDecoration(
+                labelText: context.l10n.npcStartFromCreature,
                 prefixIcon: Icon(Icons.search),
               ),
               onChanged: (_) => setState(() {}),
@@ -357,8 +358,8 @@ class _NewNpcDialogState extends State<_NewNpcDialog> {
                   ListTile(
                     dense: true,
                     selected: _base == null,
-                    title: const Text('Bloque vacío'),
-                    subtitle: const Text('Lo completás después.'),
+                    title: Text(context.l10n.npcEmptyBlock),
+                    subtitle: Text(context.l10n.npcFillLater),
                     onTap: () => setState(() => _base = null),
                   ),
                   for (final creature
@@ -373,7 +374,9 @@ class _NewNpcDialogState extends State<_NewNpcDialog> {
                       dense: true,
                       selected: _base?.id == creature.id,
                       title: Text(creature.name),
-                      subtitle: Text('CA ${creature.ac} · PG ${creature.hp}'),
+                      subtitle: Text(
+                        context.l10n.npcAcHp(creature.ac, creature.hp),
+                      ),
                       onTap: () => setState(() => _base = creature),
                     ),
                 ],
@@ -382,19 +385,21 @@ class _NewNpcDialogState extends State<_NewNpcDialog> {
           ],
           const SizedBox(height: 8),
           Text(
-            'El tipo no se cambia después: define con qué se edita.',
+            context.l10n.npcTypeFixed,
             style: TextStyle(fontSize: 12, color: pal.textMuted),
           ),
         ],
       ),
       actions: [
         DialogAction(
-          'Cancelar',
+          context.l10n.commonCancel,
           keyHint: 'Esc',
           onPressed: () => Navigator.of(context).pop(),
         ),
         DialogAction(
-          _kind == NpcSheetKind.character ? 'Continuar al creador' : 'Crear',
+          _kind == NpcSheetKind.character
+              ? context.l10n.npcContinueToCreator
+              : context.l10n.npcCreate,
           primary: true,
           onPressed: _ready ? _submit : null,
         ),

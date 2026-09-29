@@ -1,3 +1,4 @@
+// l10n-ignore-file: mensajes de error de red sin contexto de interfaz; la fase 2 los reemplaza por códigos que la pantalla traduce.
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';

@@ -16,20 +16,21 @@ class SpellForm extends StatefulWidget {
 }
 
 /// Clases lanzadoras a las que se puede asignar un conjuro (id → etiqueta).
-const _spellClasses = {
-  'wizard': 'Mago',
-  'sorcerer': 'Hechicero',
-  'cleric': 'Clérigo',
-  'druid': 'Druida',
-  'bard': 'Bardo',
-  'warlock': 'Brujo',
-  'paladin': 'Paladín',
-  'ranger': 'Explorador',
-  'artificer': 'Artífice',
+Map<String, String> _spellClasses(AppLocalizations l10n) => {
+  'wizard': l10n.classWizard,
+  'sorcerer': l10n.classSorcerer,
+  'cleric': l10n.classCleric,
+  'druid': l10n.classDruid,
+  'bard': l10n.classBard,
+  'warlock': l10n.classWarlock,
+  'paladin': l10n.classPaladin,
+  'ranger': l10n.classRanger,
+  'artificer': l10n.classArtificer,
 };
 
 /// Los tiempos de lanzamiento que usa el catálogo, sin las reacciones con
 /// disparador (que se conservan de a una, ver [SpellForm]).
+// l10n-ignore: valor guardado que el motor entiende (catálogo en español, fase 2), no texto de la interfaz.
 const _castingTimes = [
   'Acción',
   'Acción Adicional',
@@ -42,14 +43,20 @@ const _castingTimes = [
   '24 horas',
 ];
 
-const _componentNames = {'V': 'Verbal', 'S': 'Somático', 'M': 'Material'};
+Map<String, String> _componentNames(AppLocalizations l10n) => {
+  'V': l10n.compVerbal,
+  'S': l10n.compSomatic,
+  'M': l10n.compMaterial,
+};
 
 class _SpellFormState extends State<SpellForm> with _GuidedForm {
   late final _name = watch(widget.initial?.name ?? '');
   late String _level = '${widget.initial?.level ?? 0}';
   late String _school = widget.initial?.school ?? '';
+  // l10n-ignore: valor guardado que el motor entiende (catálogo en español, fase 2), no texto de la interfaz.
   late String _castingTime = widget.initial?.castingTime ?? 'Acción';
   late final _range = watch(widget.initial?.range ?? '');
+  // l10n-ignore: valor guardado que el motor entiende (catálogo en español, fase 2), no texto de la interfaz.
   late final _duration = watch(widget.initial?.duration ?? 'Instantánea');
   late final _description = watch(widget.initial?.description ?? '');
   late bool _concentration = widget.initial?.concentration ?? false;
@@ -79,7 +86,7 @@ class _SpellFormState extends State<SpellForm> with _GuidedForm {
 
   String get _componentsText {
     final letters = [
-      for (final c in _componentNames.keys)
+      for (final c in _componentNames(context.l10n).keys)
         if (_components.contains(c)) c,
     ].join(', ');
     final material = _material.text.trim();
@@ -114,32 +121,66 @@ class _SpellFormState extends State<SpellForm> with _GuidedForm {
       case 'level':
         final level = int.tryParse(_level) ?? 0;
         return level == 0
-            ? _explained('Nivel', 'Truco', spellCantripRule)
-            : _explained('Nivel', 'Nivel $level', spellLevelRule(level));
+            ? _explained(
+                context.l10n.sortLevel,
+                context.l10n.spellCantrip,
+                spellCantripRule,
+              )
+            : _explained(
+                context.l10n.sortLevel,
+                context.l10n.spellLevel(level),
+                spellLevelRule(level),
+              );
       case 'school':
         final rule = spellSchoolRules[_school];
         if (rule == null) return null;
-        return _explained('Escuela', _school, rule, spellSchoolNote);
+        return _explained(
+          context.l10n.hbSchool,
+          _school,
+          rule,
+          spellSchoolNote,
+        );
       case 'time':
         final type = _spell().actionType;
-        return _explained('Tiempo de lanzamiento', _castingTime, switch (type) {
-          SpellActionType.action => spellCastingTimeRules['Acción']!,
-          SpellActionType.bonusAction =>
-            spellCastingTimeRules['Acción Adicional']!,
-          SpellActionType.reaction => spellCastingTimeRules['Reacción']!,
-          SpellActionType.longer => spellLongCastingRule,
-        });
+        // l10n-ignore: las claves son los valores guardados del catálogo (fase 2).
+        return _explained(
+          context.l10n.hbCastingTime,
+          _castingTime,
+          switch (type) {
+            SpellActionType.action => spellCastingTimeRules['Acción']!,
+            SpellActionType.bonusAction =>
+              spellCastingTimeRules['Acción Adicional']!,
+            SpellActionType.reaction => spellCastingTimeRules['Reacción']!,
+            SpellActionType.longer => spellLongCastingRule,
+          },
+        );
       case 'concentration':
-        return _explained('Duración', 'Concentración', spellConcentrationRule);
+        return _explained(
+          context.l10n.spellDuration,
+          context.l10n.concentration,
+          spellConcentrationRule,
+        );
       case 'ritual':
-        return _explained('Lanzamiento', 'Ritual', spellRitualRule);
+        return _explained(
+          context.l10n.spellCastingTime,
+          context.l10n.hbRitual,
+          spellRitualRule,
+        );
       case 'classes':
-        return _explained('Listas de clase', _classesSummary, spellClassesRule);
+        return _explained(
+          context.l10n.hbClassLists,
+          _classesSummary,
+          spellClassesRule,
+        );
     }
     final letter = key.substring('comp:'.length);
     final rule = spellComponentRules[letter];
     if (rule == null) return null;
-    return _explained('Componente', _componentNames[letter]!, rule);
+    return _explained(
+      context.l10n.hbComponent,
+      _componentNames(context.l10n)[letter]!,
+      rule,
+    );
   }
 
   @override
@@ -147,7 +188,7 @@ class _SpellFormState extends State<SpellForm> with _GuidedForm {
     'level',
     if (_school.isNotEmpty) 'school',
     'time',
-    for (final c in _componentNames.keys)
+    for (final c in _componentNames(context.l10n).keys)
       if (_components.contains(c)) 'comp:$c',
     if (_concentration) 'concentration',
     if (_ritual) 'ritual',
@@ -156,24 +197,24 @@ class _SpellFormState extends State<SpellForm> with _GuidedForm {
 
   String get _classesSummary {
     final names = [
-      for (final e in _spellClasses.entries)
+      for (final e in _spellClasses(context.l10n).entries)
         if (_classes.contains(e.key)) e.value,
       // Una clase de un pack que el formulario no ofrece se sigue nombrando.
       for (final id in _classes)
-        if (!_spellClasses.containsKey(id)) id,
+        if (!_spellClasses(context.l10n).containsKey(id)) id,
     ];
-    return names.isEmpty ? 'ninguna' : names.join(', ');
+    return names.isEmpty ? context.l10n.hbNone : names.join(', ');
   }
 
   @override
   Widget build(BuildContext context) {
     final spell = _spell();
     return _FormScaffold(
-      title: 'Conjuro',
+      title: context.l10n.hbSpell,
       onSave: _save,
       onInvalid: openAllSections,
       panel: guidePanel(
-        previewTitle: 'Cómo se va a ver en la ficha',
+        previewTitle: context.l10n.hbSpellPreview,
         preview: DenseRows(
           children: [
             Padding(
@@ -189,25 +230,23 @@ class _SpellFormState extends State<SpellForm> with _GuidedForm {
             ),
           ],
         ),
-        hint:
-            'Tocá el nivel, la escuela, el tiempo de lanzamiento o un '
-            'componente para ver qué implica.',
+        hint: context.l10n.hbSpellHint,
       ),
       children: [
         _text(
           _name,
-          'Nombre',
-          validator: (v) => _requiredText(v, 'el nombre del conjuro'),
+          context.l10n.detailsName,
+          validator: (v) => _requiredText(v, context.l10n.hbReqSpellName),
         ),
         _fieldRow(
           flex: const [2, 3],
           [
             _idDropdown(
-              label: 'Nivel',
+              label: context.l10n.sortLevel,
               value: _level,
               options: {
-                '0': 'Truco',
-                for (var n = 1; n <= 9; n++) '$n': 'Nivel $n',
+                '0': context.l10n.spellCantrip,
+                for (var n = 1; n <= 9; n++) '$n': context.l10n.spellLevel(n),
               },
               onChanged: (v) => setState(() {
                 _level = v;
@@ -216,10 +255,10 @@ class _SpellFormState extends State<SpellForm> with _GuidedForm {
               onTap: () => focusOn('level'),
             ),
             _idDropdown(
-              label: 'Escuela',
+              label: context.l10n.hbSchool,
               value: _school,
               options: {
-                '': 'Sin escuela',
+                '': context.l10n.hbNoSchool,
                 for (final s in spellSchoolRules.keys) s: s,
               },
               onChanged: (v) => setState(() {
@@ -232,7 +271,7 @@ class _SpellFormState extends State<SpellForm> with _GuidedForm {
         ),
         _fieldRow([
           _idDropdown(
-            label: 'Tiempo de lanzamiento',
+            label: context.l10n.hbCastingTime,
             value: _castingTime,
             // El tiempo que no está en la lista se ofrece con su texto y no
             // como «desconocido»: es una reacción legítima con su disparador.
@@ -247,19 +286,21 @@ class _SpellFormState extends State<SpellForm> with _GuidedForm {
             }),
             onTap: () => focusOn('time'),
           ),
-          _text(_range, 'Alcance (p.ej. 60 pies)'),
+          _text(_range, context.l10n.hbRangeExample),
         ]),
-        _text(_duration, 'Duración'),
+        _text(_duration, context.l10n.spellDuration),
         explainHere((f) => f == 'level' || f == 'school' || f == 'time'),
         ..._optionalRule,
         section(
           icon: Icons.back_hand_outlined,
-          title: 'Componentes',
-          summary: _componentsText.isEmpty ? 'ninguno' : _componentsText,
+          title: context.l10n.spellComponents,
+          summary: _componentsText.isEmpty
+              ? context.l10n.hbNoneM
+              : _componentsText,
           children: [
             _idChips(
               {
-                for (final e in _componentNames.entries)
+                for (final e in _componentNames(context.l10n).entries)
                   e.key: '${e.key} · ${e.value}',
               },
               _components,
@@ -267,21 +308,21 @@ class _SpellFormState extends State<SpellForm> with _GuidedForm {
               onTap: (c) => focus = 'comp:$c',
             ),
             if (_components.contains('M'))
-              _text(_material, 'Material (p.ej. una pizca de ceniza)'),
+              _text(_material, context.l10n.hbMaterialExample),
             explainHere((f) => f.startsWith('comp:')),
           ],
         ),
         section(
           icon: Icons.hourglass_bottom,
-          title: 'Concentración y ritual',
+          title: context.l10n.hbConcRitual,
           summary: _orNone([
-            if (_concentration) 'concentración',
-            if (_ritual) 'ritual',
-          ], 'ninguno'),
+            if (_concentration) context.l10n.hbConcentrationLower,
+            if (_ritual) context.l10n.hbRitualLower,
+          ], context.l10n.hbNoneM),
           children: [
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Concentración'),
+              title: Text(context.l10n.concentration),
               value: _concentration,
               onChanged: (v) => setState(() {
                 _concentration = v;
@@ -290,7 +331,7 @@ class _SpellFormState extends State<SpellForm> with _GuidedForm {
             ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Ritual'),
+              title: Text(context.l10n.hbRitual),
               value: _ritual,
               onChanged: (v) => setState(() {
                 _ritual = v;
@@ -302,11 +343,11 @@ class _SpellFormState extends State<SpellForm> with _GuidedForm {
         ),
         section(
           icon: Icons.groups_outlined,
-          title: 'Listas de clase',
+          title: context.l10n.hbClassLists,
           summary: _classesSummary,
           children: [
             _idChips(
-              _spellClasses,
+              _spellClasses(context.l10n),
               _classes,
               redraw,
               onTap: (_) => focus = 'classes',
@@ -316,9 +357,13 @@ class _SpellFormState extends State<SpellForm> with _GuidedForm {
         ),
         section(
           icon: Icons.menu_book_outlined,
-          title: 'Descripción',
-          summary: _description.text.trim().isEmpty ? 'sin cargar' : 'cargada',
-          children: [_text(_description, 'Qué hace el conjuro', maxLines: 8)],
+          title: context.l10n.hbDescription,
+          summary: _description.text.trim().isEmpty
+              ? context.l10n.hbNotSet
+              : context.l10n.hbLoaded,
+          children: [
+            _text(_description, context.l10n.hbSpellDoes, maxLines: 8),
+          ],
         ),
       ],
     );

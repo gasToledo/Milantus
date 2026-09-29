@@ -30,7 +30,7 @@ class _DetailsStepState extends State<_DetailsStep> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _SectionHeader(title: 'Emblema'),
+        _SectionHeader(title: context.l10n.detailsEmblem),
         const SizedBox(height: 12),
         Row(
           children: [
@@ -47,13 +47,14 @@ class _DetailsStepState extends State<_DetailsStep> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Hasta que le pongas un retrato, tu personaje usa el '
-                    'emblema de ${d.klass?.name ?? "su clase"}.',
+                    context.l10n.detailsEmblemBody(
+                      d.klass?.name ?? context.l10n.detailsYourClass,
+                    ),
                     style: TextStyle(color: scheme.onSurfaceVariant),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Podés generar o elegir un retrato después, desde la ficha.',
+                    context.l10n.detailsPortraitLater,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
@@ -62,13 +63,13 @@ class _DetailsStepState extends State<_DetailsStep> {
           ],
         ),
         const SizedBox(height: 26),
-        const _SectionHeader(title: 'Nombre'),
+        _SectionHeader(title: context.l10n.detailsName),
         const SizedBox(height: 12),
         TextField(
           controller: _name,
           textCapitalization: TextCapitalization.words,
-          decoration: const InputDecoration(
-            hintText: 'Nombre del personaje',
+          decoration: InputDecoration(
+            hintText: context.l10n.renameLabel,
             border: OutlineInputBorder(),
           ),
           onChanged: (v) {
@@ -77,14 +78,14 @@ class _DetailsStepState extends State<_DetailsStep> {
           },
         ),
         const SizedBox(height: 24),
-        const _SectionHeader(title: 'Alineamiento'),
+        _SectionHeader(title: context.l10n.identityAlignment),
         const SizedBox(height: 12),
         Wrap(
           spacing: 8,
           runSpacing: 8,
           children: [
             ChoiceChip(
-              label: const Text('Sin definir'),
+              label: Text(context.l10n.detailsUndefined),
               selected: d.alignment == null,
               onSelected: (_) {
                 setState(() => d.alignment = null);
@@ -103,14 +104,13 @@ class _DetailsStepState extends State<_DetailsStep> {
           ],
         ),
         const SizedBox(height: 26),
-        const _SectionHeader(title: 'Rasgo de personalidad'),
+        _SectionHeader(title: context.l10n.detailsTrait),
         const SizedBox(height: 12),
         TextField(
           controller: _trait,
           maxLines: 2,
-          decoration: const InputDecoration(
-            hintText:
-                'Una línea que lo defina. Ej: "Nunca deja una deuda sin pagar."',
+          decoration: InputDecoration(
+            hintText: context.l10n.detailsTraitHint,
             border: OutlineInputBorder(),
           ),
           onChanged: (v) {

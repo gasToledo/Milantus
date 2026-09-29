@@ -11,20 +11,15 @@ class _ScoresStep extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Eyebrow('Método'),
+        Eyebrow(context.l10n.scoresMethod),
         const SizedBox(height: 10),
         // Los cuatro botones no se leen como cuatro formas de hacer lo mismo
         // si no sabés que las puntuaciones se generan. Va antes de los botones
         // porque es lo que hace falta para elegir uno.
-        const AppHelpCallout(
+        AppHelpCallout(
           icon: Icons.casino_outlined,
-          title: '¿Qué método conviene?',
-          message:
-              'Los cuatro generan las seis puntuaciones del personaje, con '
-              'distinto grado de azar. El conjunto estándar reparte valores '
-              'fijos y equilibrados: es el camino corto. Tirar 4d6 los '
-              'sortea. El coste en puntos te deja armarlos con un '
-              'presupuesto. Escribir a mano sirve si ya los tenés decididos.',
+          title: context.l10n.scoresHelpTitle,
+          message: context.l10n.scoresHelpBody,
         ),
         const SizedBox(height: 14),
         Wrap(
@@ -33,7 +28,7 @@ class _ScoresStep extends StatelessWidget {
           children: [
             _MethodTab(
               icon: Icons.view_list,
-              label: 'Conjunto estándar',
+              label: context.l10n.scoresStandardArray,
               selected: draft.scoreMethod == ScoreMethod.standardArray,
               onTap: () {
                 draft.applyScoreMethod(ScoreMethod.standardArray);
@@ -42,7 +37,7 @@ class _ScoresStep extends StatelessWidget {
             ),
             _MethodTab(
               icon: Icons.casino,
-              label: 'Tirar 4d6',
+              label: context.l10n.scoresRoll4d6,
               selected: draft.scoreMethod == ScoreMethod.roll4d6,
               onTap: () {
                 draft.applyScoreMethod(ScoreMethod.roll4d6);
@@ -51,7 +46,7 @@ class _ScoresStep extends StatelessWidget {
             ),
             _MethodTab(
               icon: Icons.calculate,
-              label: 'Coste en puntos',
+              label: context.l10n.scoresPointBuy,
               selected: draft.scoreMethod == ScoreMethod.pointBuy,
               onTap: () {
                 draft.applyScoreMethod(ScoreMethod.pointBuy);
@@ -60,7 +55,7 @@ class _ScoresStep extends StatelessWidget {
             ),
             _MethodTab(
               icon: Icons.keyboard,
-              label: 'Escribir a mano',
+              label: context.l10n.scoresManual,
               selected: draft.scoreMethod == ScoreMethod.manual,
               onTap: () {
                 draft.applyScoreMethod(ScoreMethod.manual);
@@ -72,14 +67,12 @@ class _ScoresStep extends StatelessWidget {
         const SizedBox(height: 18),
         // Reemplaza a `_PoolBar` en modo manual: ahí no hay pool que repartir.
         if (draft.scoreMethod == ScoreMethod.manual)
-          const AppHelpCallout(
+          AppHelpCallout(
             icon: Icons.keyboard,
-            message:
-                'Escribí la puntuación base de cada característica '
-                '($manualScoreMin a $manualScoreMax), sin contar el aumento '
-                'del trasfondo. Si alguna queda fuera del rango habitual de '
-                'generación (3 a 18) la ficha lo va a señalar como aviso, '
-                'pero no te impide seguir.',
+            message: context.l10n.scoresManualHelp(
+              manualScoreMin,
+              manualScoreMax,
+            ),
           )
         else if (draft.scoreMethod == ScoreMethod.pointBuy)
           _PointBuyBar(draft: draft, onChanged: onChanged)
@@ -93,7 +86,7 @@ class _ScoresStep extends StatelessWidget {
           const SizedBox(height: 12),
           AppHelpCallout(
             icon: Icons.lightbulb_outline,
-            title: 'Reparto sugerido para ${draft.klass!.name}',
+            title: context.l10n.scoresSuggested(draft.klass!.name),
             message: [
               for (final a in Ability.values) '${a.abbr} ${suggested[a]}',
             ].join(' · '),
@@ -107,7 +100,7 @@ class _ScoresStep extends StatelessWidget {
                 onChanged();
               },
               icon: const Icon(Icons.auto_fix_high, size: 18),
-              label: const Text('Usar este reparto'),
+              label: Text(context.l10n.scoresUseSuggested),
             ),
           ),
         ],
@@ -233,7 +226,7 @@ class _PoolBar extends StatelessWidget {
         runSpacing: 10,
         children: [
           Text(
-            'Valores sin asignar',
+            context.l10n.scoresUnassigned,
             style: TextStyle(
               fontFamily: 'Georgia',
               fontSize: 15,
@@ -242,7 +235,7 @@ class _PoolBar extends StatelessWidget {
           ),
           if (unassigned.isEmpty)
             Text(
-              'Ninguno: ya están las 6.',
+              context.l10n.scoresNoneLeft,
               style: TextStyle(fontSize: 12, color: pal.textMuted),
             )
           else
@@ -258,7 +251,7 @@ class _PoolBar extends StatelessWidget {
                 onChanged();
               },
               icon: const Icon(Icons.casino, size: 18),
-              label: const Text('Tirar de nuevo'),
+              label: Text(context.l10n.scoresRollAgain),
             ),
           if (draft.assignedScores.isNotEmpty)
             TextButton.icon(
@@ -267,7 +260,7 @@ class _PoolBar extends StatelessWidget {
                 onChanged();
               },
               icon: const Icon(Icons.restart_alt, size: 18),
-              label: const Text('Limpiar'),
+              label: Text(context.l10n.scoresClear),
             ),
         ],
       ),
@@ -305,17 +298,17 @@ class _PointBuyBar extends StatelessWidget {
             runSpacing: 10,
             children: [
               Text(
-                'Puntos restantes',
+                context.l10n.scoresPointsLeft,
                 style: TextStyle(
                   fontFamily: 'Georgia',
                   fontSize: 15,
                   color: scheme.onSurface,
                 ),
               ),
-              GoldPill('$remaining de $pointBuyBudget'),
+              GoldPill(context.l10n.scoresOfBudget(remaining, pointBuyBudget)),
               if (remaining == 0)
                 Text(
-                  'Presupuesto completo.',
+                  context.l10n.scoresBudgetDone,
                   style: TextStyle(fontSize: 12, color: pal.textMuted),
                 ),
               if (draft.pointsSpent > 0)
@@ -325,7 +318,7 @@ class _PointBuyBar extends StatelessWidget {
                     onChanged();
                   },
                   icon: const Icon(Icons.restart_alt, size: 18),
-                  label: const Text('Limpiar'),
+                  label: Text(context.l10n.scoresClear),
                 ),
             ],
           ),
@@ -336,24 +329,20 @@ class _PointBuyBar extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               remaining == 1
-                  ? 'Te queda 1 punto sin gastar: si seguís, se pierde.'
-                  : 'Te quedan $remaining puntos sin gastar: si seguís, se '
-                        'pierden.',
+                  ? context.l10n.scoresOneUnspent
+                  : context.l10n.scoresUnspent(remaining),
               style: TextStyle(fontSize: 12, color: pal.crimson),
             ),
           ] else if (remaining == pointBuyBudget) ...[
             const SizedBox(height: 8),
             Text(
-              'Todas empiezan en $pointBuyMin: subí las que más te importan con '
-              '«+».',
+              context.l10n.scoresAllStartAt(pointBuyMin),
               style: TextStyle(fontSize: 12, color: pal.crimson),
             ),
           ],
           const SizedBox(height: 8),
           Text(
-            'Cada característica va de $pointBuyMin a $pointBuyMax. Los últimos '
-            'dos escalones cuestan el doble: 14 vale 7 puntos y 15 vale 9, no 6 '
-            'y 7.',
+            context.l10n.scoresCostNote(pointBuyMin, pointBuyMax),
             style: TextStyle(fontSize: 12, color: pal.textMuted),
           ),
         ],
@@ -405,7 +394,7 @@ class _PointBuyStepper extends StatelessWidget {
                       }
                     : null,
                 icon: const Icon(Icons.remove, size: 18),
-                tooltip: 'Bajar ${ability.abbr}',
+                tooltip: context.l10n.scoresLower(ability.abbr),
                 visualDensity: VisualDensity.compact,
               ),
               Text(
@@ -424,7 +413,7 @@ class _PointBuyStepper extends StatelessWidget {
                       }
                     : null,
                 icon: const Icon(Icons.add, size: 18),
-                tooltip: 'Subir ${ability.abbr}',
+                tooltip: context.l10n.scoresRaise(ability.abbr),
                 visualDensity: VisualDensity.compact,
               ),
             ],
@@ -433,8 +422,8 @@ class _PointBuyStepper extends StatelessWidget {
         const SizedBox(height: 6),
         Text(
           nextCost == null
-              ? 'al máximo · gastados ${pointBuyCost(value)}'
-              : 'subir cuesta $nextCost · gastados ${pointBuyCost(value)}',
+              ? context.l10n.scoresAtMax(pointBuyCost(value) ?? 0)
+              : context.l10n.scoresNextCost(nextCost, pointBuyCost(value) ?? 0),
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 11, color: pal.textMuted),
         ),
@@ -547,7 +536,9 @@ class _ScoreCard extends StatelessWidget {
           ),
           const SizedBox(height: 3),
           Text(
-            assigned == null ? 'sin asignar' : 'base $assigned',
+            assigned == null
+                ? context.l10n.scoresUnassignedShort
+                : context.l10n.scoresBase(assigned),
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 11, color: pal.textMuted),
           ),
@@ -577,7 +568,7 @@ class _ScoreCard extends StatelessWidget {
               menuMaxHeight: 300,
               borderRadius: BorderRadius.circular(10),
               hint: Text(
-                'Elegir valor',
+                context.l10n.scoresPickValue,
                 style: TextStyle(fontSize: 13, color: pal.textMuted),
               ),
               style: TextStyle(fontSize: 14, color: scheme.onSurface),
@@ -626,7 +617,9 @@ class _ScoreCard extends StatelessWidget {
             ),
           const SizedBox(height: 10),
           Text(
-            assigned == null ? 'MOD —' : 'MOD ${_signedMod(mod)}',
+            assigned == null
+                ? context.l10n.scoresModEmpty
+                : context.l10n.scoresMod(_signedMod(mod)),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 15,
@@ -680,7 +673,7 @@ class _ManualScoreFieldState extends State<_ManualScoreField> {
       ],
       style: TextStyle(fontSize: 14, color: scheme.onSurface),
       decoration: InputDecoration(
-        hintText: 'Valor',
+        hintText: context.l10n.scoresValue,
         hintStyle: TextStyle(fontSize: 13, color: pal.textMuted),
         filled: true,
         fillColor: pal.plaque,
@@ -732,9 +725,11 @@ class _ValueOption extends StatelessWidget {
     final note = !taken
         ? null
         : free > 0
-        ? 'en ${holders.map((a) => a.abbr).join(", ")} · '
-              '${free == 1 ? "queda 1" : "quedan $free"}'
-        : 'en ${holders.map((a) => a.abbr).join(", ")}';
+        ? context.l10n.scoresTakenFree(
+            holders.map((a) => a.abbr).join(", "),
+            free,
+          )
+        : context.l10n.scoresTaken(holders.map((a) => a.abbr).join(", "));
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),

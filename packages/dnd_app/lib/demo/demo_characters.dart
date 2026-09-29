@@ -1,3 +1,4 @@
+// l10n-ignore-file: el nombre de un personaje de ejemplo es contenido, no interfaz.
 import 'package:dnd_engine/dnd_engine.dart';
 
 /// Sagan "The Red" — Humano, Guerrero, Soldado (reglas 2024).

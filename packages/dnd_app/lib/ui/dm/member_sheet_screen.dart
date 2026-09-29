@@ -8,6 +8,7 @@ import '../../theme/app_widgets.dart';
 import '../../theme/class_visuals.dart';
 import '../conditions.dart';
 import '../portrait_image.dart';
+import '../../l10n/l10n_context.dart';
 
 const double _wideWidth = 720;
 
@@ -89,20 +90,20 @@ class _MemberSheetScreenState extends State<MemberSheetScreen> {
   Widget _body() {
     if (_error != null) {
       return AppErrorView(
-        message: 'No se pudo leer la ficha.',
+        message: context.l10n.dmSheetReadFail,
         details: '$_error',
         onRetry: _load,
       );
     }
     if (_notFound) {
-      return const AppEmptyState(
+      return AppEmptyState(
         icon: Icons.person_off_outlined,
-        message: 'Ya no ves esta ficha. Puede que te hayan cortado el vínculo.',
+        message: context.l10n.dmSheetGone,
       );
     }
     final member = _member;
     if (member == null) {
-      return const Center(child: AppBusyLabel('Cargando la ficha…'));
+      return Center(child: AppBusyLabel(context.l10n.dmSheetLoading));
     }
     return _sheet(member);
   }
@@ -223,14 +224,14 @@ class _MemberSheetScreenState extends State<MemberSheetScreen> {
                         .join(' · ')
                   else if (klass != null)
                     klass.name,
-                  'Nivel ${character.level}',
+                  context.l10n.commonLevel(character.level),
                 ].join(' · '),
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 11.5, color: pal.textMuted),
               ),
               if (character.combat.heroicInspiration) ...[
                 const SizedBox(height: 8),
-                const GoldPill('Inspiración Heroica'),
+                GoldPill(context.l10n.heroicInspiration),
               ],
             ],
           ),
@@ -243,25 +244,27 @@ class _MemberSheetScreenState extends State<MemberSheetScreen> {
               Expanded(
                 child: StatTile(
                   icon: Icons.shield,
-                  label: 'CA',
+                  label: context.l10n.creatureAcShort,
                   value: '${sheet.armorClass}',
-                  semantics: 'Clase de armadura: ${sheet.armorClass}',
+                  semantics: context.l10n.armorClassLabel(sheet.armorClass),
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: StatTile(
                   icon: Icons.bolt,
-                  label: 'Inic',
+                  label: context.l10n.dmAbbrInit,
                   value: _signed(sheet.initiative),
-                  semantics: 'Iniciativa: ${_signed(sheet.initiative)}',
+                  semantics: context.l10n.statInitiativeLabel(
+                    _signed(sheet.initiative),
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 8),
           StatTile(
-            label: 'Puntos de golpe',
+            label: context.l10n.hitPoints,
             labelTrailing: maxHp == 0
                 ? null
                 : '${(currentHp / maxHp * 100).round()}%',
@@ -280,25 +283,27 @@ class _MemberSheetScreenState extends State<MemberSheetScreen> {
               Expanded(
                 child: StatTile(
                   icon: Icons.keyboard_double_arrow_right,
-                  label: 'Vel',
+                  label: context.l10n.dmAbbrSpeed,
                   value: '${sheet.speed}',
-                  suffix: ' pies',
-                  semantics: 'Velocidad: ${sheet.speed} pies',
+                  suffix: context.l10n.unitFeetSuffix,
+                  semantics: context.l10n.statSpeedLabel(sheet.speed),
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: StatTile(
                   icon: Icons.visibility_outlined,
-                  label: 'Perc.',
+                  label: context.l10n.dmAbbrPerception,
                   value: '${sheet.passivePerception}',
-                  semantics: 'Percepción pasiva: ${sheet.passivePerception}',
+                  semantics: context.l10n.passivePerceptionLabel(
+                    sheet.passivePerception,
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 18),
-          const Eyebrow('Salvaciones'),
+          Eyebrow(context.l10n.savesTitle),
           DenseRows(
             children: [
               for (final a in Ability.values) _saveRow(context, sheet, a),
@@ -358,7 +363,7 @@ class _MemberSheetScreenState extends State<MemberSheetScreen> {
         _card(
           context,
           icon: Icons.warning_amber_rounded,
-          title: 'Condiciones activas',
+          title: context.l10n.dmActiveConditions,
           child: Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -370,10 +375,10 @@ class _MemberSheetScreenState extends State<MemberSheetScreen> {
       _card(
         context,
         icon: Icons.checklist_rtl,
-        title: 'Habilidades competentes',
+        title: context.l10n.dmProficientSkills,
         child: proficientSkills.isEmpty
             ? Text(
-                'Ninguna.',
+                context.l10n.dmNoneDotF,
                 style: TextStyle(color: context.palette.textMuted),
               )
             : Wrap(
@@ -388,10 +393,10 @@ class _MemberSheetScreenState extends State<MemberSheetScreen> {
       _card(
         context,
         icon: Icons.gps_fixed,
-        title: 'Ataques',
+        title: context.l10n.combatAttacks,
         child: sheet.attacks.isEmpty
             ? Text(
-                'No tiene ataques cargados.',
+                context.l10n.dmNoAttacks,
                 style: TextStyle(color: context.palette.textMuted),
               )
             : DenseRows(
@@ -529,7 +534,7 @@ class _MemberSheetScreenState extends State<MemberSheetScreen> {
     return _card(
       context,
       icon: Icons.auto_awesome,
-      title: 'Espacios de conjuro',
+      title: context.l10n.spellsSlots,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -552,7 +557,7 @@ class _MemberSheetScreenState extends State<MemberSheetScreen> {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          SizedBox(width: 64, child: Text('Nivel $level')),
+          SizedBox(width: 64, child: Text(context.l10n.spellLevel(level))),
           Expanded(
             child: UsagePips(
               max: max,

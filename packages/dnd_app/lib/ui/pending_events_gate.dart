@@ -5,6 +5,7 @@ import '../api/api_models.dart';
 import '../data/user_events_service.dart';
 import '../theme/app_widgets.dart';
 import 'user_event_messages.dart';
+import '../l10n/l10n_context.dart';
 
 /// Pide los avisos pendientes de esta cuenta, los muestra uno detrás de otro
 /// y los marca vistos. Se llama en un punto de entrada concreto (montar una
@@ -35,7 +36,7 @@ Future<void> checkPendingEvents(BuildContext context, ApiClient api) async {
   var first = true;
   for (final event in pending) {
     if (!context.mounted) return;
-    final message = messageForEvent(event);
+    final message = messageForEvent(event, context.l10n);
     // Un `kind` que este cliente no conoce igual se marca visto: el servidor
     // puede ser más nuevo que la pestaña abierta, y dejarlo pendiente lo
     // volvería a traer para siempre.

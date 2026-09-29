@@ -1,0 +1,5153 @@
+{
+  "@@locale": "es",
+  "appTitle": "Milantus — Asistente de Aventuras",
+  "@appTitle": {
+    "description": "Título de la aplicación (pestaña del navegador y conmutador de tareas)."
+  },
+  "languageSelectorLabel": "Idioma: {name}",
+  "@languageSelectorLabel": {
+    "description": "Lo que anuncia un lector de pantalla para el selector de idioma; {name} es el nombre del idioma activo en su propio idioma.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "languageSelectorTooltip": "Cambiar el idioma",
+  "@languageSelectorTooltip": {
+    "description": "Tooltip del selector de idioma del panel lateral."
+  },
+  "settingsLoadError": "No se pudo cargar la configuración",
+  "settingsSaveError": "No se pudieron guardar los ajustes",
+  "settingsTitle": "Ajustes · Generación de imágenes",
+  "settingsLoading": "Cargando ajustes…",
+  "settingsNoProviders": "Este servidor no tiene ningún proveedor de generación configurado. Igual podés subir tu propio retrato desde la ficha.",
+  "settingsProviderLabel": "Proveedor de retratos:",
+  "commonCancel": "Cancelar",
+  "commonSave": "Guardar",
+  "commonSaving": "Guardando…",
+  "commonRetry": "Reintentar",
+  "commonClose": "Cerrar",
+  "commonUndo": "Deshacer",
+  "saveStateFailed": "No se guardó",
+  "saveStateSaved": "Guardado",
+  "saveStateLabel": "Estado del guardado: {state}",
+  "@saveStateLabel": {
+    "description": "Lo que anuncia un lector de pantalla; {state} es «Guardando…», «Guardado» o «No se guardó».",
+    "placeholders": {
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "commonUse": "Usar",
+  "commonRestore": "Restaurar",
+  "commonRange": "Alcance",
+  "themeLight": "Tema claro",
+  "themeSystem": "Seguir el tema del sistema",
+  "themeDark": "Tema oscuro",
+  "errorShowDetails": "Ver detalles",
+  "renameTitle": "Editar nombre",
+  "renameLabel": "Nombre del personaje",
+  "armorClassLabel": "Clase de armadura: {value}",
+  "@armorClassLabel": {
+    "placeholders": {
+      "value": {
+        "type": "Object"
+      }
+    }
+  },
+  "abilityTile": "{name}: modificador {mod}, puntuación {score}",
+  "@abilityTile": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "mod": {
+        "type": "String"
+      },
+      "score": {
+        "type": "Object"
+      }
+    }
+  },
+  "abilityTileProficient": "{name}: modificador {mod}, puntuación {score}, competente en salvación",
+  "@abilityTileProficient": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "mod": {
+        "type": "String"
+      },
+      "score": {
+        "type": "Object"
+      }
+    }
+  },
+  "abilityScoreShort": "Punt. {score}",
+  "@abilityScoreShort": {
+    "placeholders": {
+      "score": {
+        "type": "Object"
+      }
+    }
+  },
+  "saveShort": "SALV",
+  "saveShortValue": "SALV {bonus}",
+  "@saveShortValue": {
+    "placeholders": {
+      "bonus": {
+        "type": "String"
+      }
+    }
+  },
+  "emblemLabel": "Emblema de {name}",
+  "@emblemLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "portraitLabel": "Retrato de {name}",
+  "@portraitLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "helpWhatItDoes": "Ver qué hace {name}",
+  "@helpWhatItDoes": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "usesAvailable": "{filled} de {max} usos disponibles",
+  "@usesAvailable": {
+    "placeholders": {
+      "filled": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "sourceHomebrew": "Propio",
+  "sourceBadgeLabel": "Procedencia: {source}",
+  "@sourceBadgeLabel": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "innateAtWill": "a voluntad",
+  "innateOncePerLongRest": "una vez por descanso largo",
+  "innateOncePerShortRest": "una vez por descanso corto",
+  "innateProficiencyBonus": "tantas veces como tu bono de competencia",
+  "innateAbilityModifier": "tantas veces como el modificador de la característica",
+  "effectProficiency": "Competencia: {name}",
+  "@effectProficiency": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "effectSave": "Salvación: {ability}",
+  "@effectSave": {
+    "placeholders": {
+      "ability": {
+        "type": "String"
+      }
+    }
+  },
+  "effectSaves": "Salvaciones {parts}",
+  "@effectSaves": {
+    "placeholders": {
+      "parts": {
+        "type": "String"
+      }
+    }
+  },
+  "effectModOf": "+ mod. de {ability}",
+  "@effectModOf": {
+    "placeholders": {
+      "ability": {
+        "type": "String"
+      }
+    }
+  },
+  "effectProficiencyBonusPart": "+ bonif. por competencia",
+  "effectLanguage": "Idioma: {name}",
+  "@effectLanguage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "effectResistance": "Resistencia: {name}",
+  "@effectResistance": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "effectImmunity": "Inmunidad: {name}",
+  "@effectImmunity": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "effectDarkvision": "Visión en la oscuridad: {range} pies",
+  "@effectDarkvision": {
+    "placeholders": {
+      "range": {
+        "type": "Object"
+      }
+    }
+  },
+  "effectSpeedBonus": "Velocidad +{feet} pies",
+  "@effectSpeedBonus": {
+    "placeholders": {
+      "feet": {
+        "type": "Object"
+      }
+    }
+  },
+  "effectSpeedSet": "Velocidad = {feet} pies",
+  "@effectSpeedSet": {
+    "placeholders": {
+      "feet": {
+        "type": "Object"
+      }
+    }
+  },
+  "effectAcBonus": "CA +{amount}",
+  "@effectAcBonus": {
+    "placeholders": {
+      "amount": {
+        "type": "Object"
+      }
+    }
+  },
+  "effectInitiative": "Iniciativa {parts}",
+  "@effectInitiative": {
+    "placeholders": {
+      "parts": {
+        "type": "String"
+      }
+    }
+  },
+  "effectMaxHpPerLevel": "PG máx +{perLevel} por nivel",
+  "@effectMaxHpPerLevel": {
+    "placeholders": {
+      "perLevel": {
+        "type": "Object"
+      }
+    }
+  },
+  "effectMaxHpFlat": "PG máx +{amount}",
+  "@effectMaxHpFlat": {
+    "placeholders": {
+      "amount": {
+        "type": "Object"
+      }
+    }
+  },
+  "effectPassive": "Pasiva: {name}",
+  "@effectPassive": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "effectWeaponMastery": "Maestrías de arma: {count}",
+  "@effectWeaponMastery": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "effectExtraAttack": "Ataque adicional +{extra}",
+  "@effectExtraAttack": {
+    "placeholders": {
+      "extra": {
+        "type": "Object"
+      }
+    }
+  },
+  "effectFeat": "Dote: {name}",
+  "@effectFeat": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "effectFeatChoice": "a elección",
+  "effectSpell": "Conjuro: {name} ({use})",
+  "@effectSpell": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "use": {
+        "type": "String"
+      }
+    }
+  },
+  "effectAlwaysPrepared": "Siempre preparado: {name}",
+  "@effectAlwaysPrepared": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "effectAddedToList": "Se suma a tu lista: {name}",
+  "@effectAddedToList": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spellActionAction": "Acción",
+  "spellActionBonus": "Acción adicional",
+  "spellActionReaction": "Reacción",
+  "spellCantrip": "Truco",
+  "spellLevel": "Nivel {level}",
+  "@spellLevel": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "spellCastingTime": "Lanzamiento",
+  "spellComponents": "Componentes",
+  "spellDuration": "Duración",
+  "creatureSpellWith": "Con {name}",
+  "@creatureSpellWith": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "creatureActions": "Acciones",
+  "creatureBonusActions": "Acciones adicionales",
+  "creatureReactions": "Reacciones",
+  "creatureLegendaryActions": "Acciones legendarias",
+  "creatureLegendaryActionsPerRound": "Acciones legendarias · {uses} por ronda",
+  "@creatureLegendaryActionsPerRound": {
+    "placeholders": {
+      "uses": {
+        "type": "Object"
+      }
+    }
+  },
+  "creatureAcShort": "CA",
+  "hitPoints": "Puntos de golpe",
+  "hitPointsShort": "PG",
+  "hitPointsLabel": "Puntos de golpe: {value}",
+  "@hitPointsLabel": {
+    "placeholders": {
+      "value": {
+        "type": "Object"
+      }
+    }
+  },
+  "initiative": "Iniciativa",
+  "challengeRating": "Valor de desafío",
+  "challengeRatingShort": "VD",
+  "challengeRatingSemantics": "Valor de desafío: {value}",
+  "@challengeRatingSemantics": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "passivePerceptionShort": "Perc. pasiva",
+  "passivePerceptionLabel": "Percepción pasiva: {value}",
+  "@passivePerceptionLabel": {
+    "placeholders": {
+      "value": {
+        "type": "Object"
+      }
+    }
+  },
+  "creatureSpeed": "Velocidad",
+  "creatureSkills": "Habilidades",
+  "creatureSenses": "Sentidos",
+  "creatureLanguages": "Idiomas",
+  "creatureDefenses": "Defensas",
+  "creatureTraits": "Rasgos",
+  "creatureToHit": "Acierto",
+  "creatureDamage": "Daño",
+  "creatureSpellSaveDc": "CD {dc}",
+  "@creatureSpellSaveDc": {
+    "placeholders": {
+      "dc": {
+        "type": "Object"
+      }
+    }
+  },
+  "creatureSpellAttack": "Ataque {bonus}",
+  "@creatureSpellAttack": {
+    "placeholders": {
+      "bonus": {
+        "type": "String"
+      }
+    }
+  },
+  "creatureAtWill": "A voluntad",
+  "creatureUsesPerDay": "{uses}/día cada uno",
+  "@creatureUsesPerDay": {
+    "placeholders": {
+      "uses": {
+        "type": "Object"
+      }
+    }
+  },
+  "creatureCastAtLevel": "Se lanza a nivel {level}",
+  "@creatureCastAtLevel": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "commonCannotUndo": "Esta acción no se puede deshacer.",
+  "commonDelete": "Borrar",
+  "commonImport": "Importar",
+  "commonLevel": "Nivel {level}",
+  "@commonLevel": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "transferTitle": "Importar / Exportar",
+  "transferImport": "Importar…",
+  "transferExportBackup": "Exportar respaldo completo",
+  "deleteCharacterTitle": "¿Borrar a {name}?",
+  "@deleteCharacterTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "exportingCharacter": "Exportando personaje…",
+  "exportCharacterError": "No se pudo exportar el personaje",
+  "creatingBackup": "Creando respaldo…",
+  "backupError": "No se pudo crear el respaldo",
+  "importPickTitle": "Elegí un respaldo (.zip)",
+  "importBackupTitle": "Importar respaldo",
+  "importBackupBody": "Se van a agregar los personajes (y el homebrew y las preferencias, si el respaldo los incluye) de \"{fileName}\" a esta cuenta. Los personajes existentes no se tocan; un id repetido se guarda como copia nueva.",
+  "@importBackupBody": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
+  "importingBackup": "Importando respaldo…",
+  "importDone": "Importados {characters, plural, =1{1 personaje} other{{characters} personajes}} y {images, plural, =1{1 imagen} other{{images} imágenes}}.",
+  "@importDone": {
+    "description": "«imágenes» y no «retratos»: la cuenta incluye las imágenes del Diario, que van al mismo almacén sin ser retratos.",
+    "placeholders": {
+      "characters": {
+        "type": "int"
+      },
+      "images": {
+        "type": "int"
+      }
+    }
+  },
+  "importError": "No se pudo importar",
+  "operationBusy": "Ya hay una operación en curso.",
+  "rosterEmpty": "Todavía no hay personajes en esta cuenta.\nCreá el primero, traé los que ya tenías, o mirá cómo es una ficha con uno de ejemplo.",
+  "rosterCreate": "Crear personaje",
+  "rosterTryExample": "Probar con uno de ejemplo",
+  "rosterNoMatch": "Ningún personaje coincide con «{query}».\nSe busca por nombre, clase y especie.",
+  "@rosterNoMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "rosterClearSearch": "Limpiar búsqueda",
+  "rosterTitle": "Mis personajes",
+  "rosterCount": "{count, plural, =1{1 personaje} other{{count} personajes}}",
+  "@rosterCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rosterFallen": "{count, plural, =1{1 caído} other{{count} caídos}}",
+  "@rosterFallen": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rosterSearchHint": "Buscar por nombre, clase o especie…",
+  "rosterSort": "Ordenar",
+  "sortManual": "Manual",
+  "sortRecent": "Más recientes",
+  "sortName": "Nombre",
+  "sortLevel": "Nivel",
+  "sortClass": "Clase",
+  "sortSaveError": "No se pudo guardar el orden de tus personajes",
+  "sortManualHint": "Orden manual: usá «Mover antes» y «Mover después» en el menú de cada tarjeta, o arrastrala sobre otra.",
+  "saveLatestError": "No se pudieron guardar los últimos cambios",
+  "sessionExpiredTitle": "La sesión terminó",
+  "sessionExpiredBody": "Los cambios que todavía no se pudieron guardar siguen en pantalla. Iniciá sesión de nuevo para seguir editando.",
+  "sessionSignIn": "Iniciar sesión",
+  "appTagline": "Asistente de Aventuras",
+  "navCharacters": "Personajes",
+  "navCodex": "Códice",
+  "dmModeButton": "Modo DM",
+  "accountSignOut": "Cerrar sesión",
+  "signOutError": "No se pudo cerrar la sesión",
+  "characterFallenBadge": "CAÍDO",
+  "hpLabelFallen": "SIN PUNTOS DE GOLPE",
+  "hpLabelCritical": "PG CRÍTICOS",
+  "hpLabelNormal": "PUNTOS DE GOLPE",
+  "cardActionsTooltip": "Acciones de {name}",
+  "@cardActionsTooltip": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cardFavorite": "Marcar como favorito",
+  "cardUnfavorite": "Quitar de favorito",
+  "cardMoveBefore": "Mover antes",
+  "cardMoveAfter": "Mover después",
+  "cardRename": "Renombrar",
+  "cardExport": "Exportar",
+  "statSpeedShort": "VEL",
+  "unitFeetSuffix": " pies",
+  "statSpeedLabel": "Velocidad: {speed} pies",
+  "@statSpeedLabel": {
+    "placeholders": {
+      "speed": {
+        "type": "Object"
+      }
+    }
+  },
+  "statInitiativeShort": "INIC",
+  "statInitiativeLabel": "Iniciativa: {bonus}",
+  "@statInitiativeLabel": {
+    "placeholders": {
+      "bonus": {
+        "type": "String"
+      }
+    }
+  },
+  "tabCharacter": "Personaje",
+  "tabCombat": "Combate",
+  "tabInventory": "Inventario",
+  "tabCampaign": "Campaña",
+  "tabJournal": "Diario",
+  "sheetHeaderTitle": "{name} · Nivel {level}",
+  "@sheetHeaderTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "levelUpAction": "Subir nivel",
+  "levelMaxReached": "Nivel máximo",
+  "portraitClose": "Cerrar el retrato",
+  "navBackToNpc": "Volver al PNJ",
+  "sheetClassSummary": "{summary} · nivel {level}",
+  "@sheetClassSummary": {
+    "placeholders": {
+      "summary": {
+        "type": "String"
+      },
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "navPortrait": "Retrato",
+  "navShare": "Compartir",
+  "turnNext": "Preparate, seguís vos.",
+  "turnActive": "Es tu turno.",
+  "commonExpand": "Desplegar",
+  "commonCollapse": "Plegar",
+  "campaignStateActive": "En curso",
+  "campaignStatePaused": "En pausa",
+  "campaignStateFinished": "Terminada",
+  "campaignsLoadError": "No se pudieron leer tus campañas.",
+  "campaignsLoading": "Cargando tus campañas…",
+  "campaignEmpty": "Este personaje todavía no está en ninguna campaña.\nCompartilo con tu DM y acá va a aparecer lo que jueguen.",
+  "campaignPartyAlso": "{count, plural, =1{En la mesa también juega {names}.} other{En la mesa también juegan {names}.}}",
+  "@campaignPartyAlso": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "campaignNoChapter": "Sin capítulo",
+  "campaignBattles": "Batallas",
+  "roundsCount": "{rounds, plural, =1{1 ronda} other{{rounds} rondas}}",
+  "@roundsCount": {
+    "placeholders": {
+      "rounds": {
+        "type": "int"
+      }
+    }
+  },
+  "campaignNoBattles": "Todavía no pelearon ninguna.",
+  "battleAlone": "Solo",
+  "battleWith": "Con {names}",
+  "@battleWith": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "battleGeneric": "Una pelea",
+  "battleAgainst": "Contra {names}",
+  "@battleAgainst": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "enemyOne": "un enemigo",
+  "enemiesCount": "{count} enemigos",
+  "@enemiesCount": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "battleNoEnemies": "sin enemigos",
+  "battleNoneDown": "no cayó ninguno",
+  "battleOneDown": "cayó",
+  "battleAllDown": "cayeron todos",
+  "battleSomeDown": "cayeron {down} de {total}",
+  "@battleSomeDown": {
+    "placeholders": {
+      "down": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "campaignClosedChapters": "Capítulos cerrados",
+  "campaignNoClosedChapters": "Todavía no cerraron ninguno. Cuando pase, acá va a quedar anotado lo que se repartió.",
+  "campaignNoRewards": "Sin recompensas",
+  "campaignYouTook": "Te llevaste {grants}",
+  "@campaignYouTook": {
+    "placeholders": {
+      "grants": {
+        "type": "String"
+      }
+    }
+  },
+  "listAnd": "{head} y {last}",
+  "@listAnd": {
+    "description": "Une una lista: «Mirna, Bardo y Yina».",
+    "placeholders": {
+      "head": {
+        "type": "String"
+      },
+      "last": {
+        "type": "String"
+      }
+    }
+  },
+  "commonBack": "Volver",
+  "hpMaxSuffix": "/ {max} PG",
+  "@hpMaxSuffix": {
+    "placeholders": {
+      "max": {
+        "type": "Object"
+      }
+    }
+  },
+  "deathSaves": "Salvaciones de muerte",
+  "combatAmount": "Cantidad",
+  "combatHeal": "Curar",
+  "combatTempHp": "PG temp",
+  "combatStabilized": "¡Estabilizado!",
+  "combatSuccessPlus": "+Éxito",
+  "combatCharacterDied": "El personaje ha muerto.",
+  "combatFailurePlus": "+Fallo",
+  "combatNoArmor": "Sin armadura",
+  "combatShield": "escudo",
+  "combatDefense": "Defensa",
+  "combatResistances": "Resistencias: {list}",
+  "@combatResistances": {
+    "placeholders": {
+      "list": {
+        "type": "String"
+      }
+    }
+  },
+  "combatImmunities": "Inmunidades: {list}",
+  "@combatImmunities": {
+    "placeholders": {
+      "list": {
+        "type": "String"
+      }
+    }
+  },
+  "shortRestNoRestore": "Descanso corto. No cura PG: gastá dados de golpe para curarte.",
+  "shortRestRestored": "Descanso corto: recuperaste {list}. Para curarte, gastá dados de golpe.",
+  "@shortRestRestored": {
+    "placeholders": {
+      "list": {
+        "type": "String"
+      }
+    }
+  },
+  "longRestBase": "PG al máximo y recursos recargados",
+  "longRestExhaustion": "cansancio a nivel {level}",
+  "@longRestExhaustion": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "longRestInspiration": "ganaste Inspiración Heroica",
+  "longRestItemsRecharged": "{count, plural, =1{1 objeto mágico recuperó cargas} other{{count} objetos mágicos recuperaron cargas}}",
+  "@longRestItemsRecharged": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "longRestSummary": "Descanso largo: {list}.",
+  "@longRestSummary": {
+    "placeholders": {
+      "list": {
+        "type": "String"
+      }
+    }
+  },
+  "combatResourcesTitle": "Recursos y descansos",
+  "combatRestExplainer": "El descanso corto no cura PG: recarga recursos de recarga corta. Para curarte, gastá dados de golpe.",
+  "restShort": "Descanso corto",
+  "restLong": "Descanso largo",
+  "combatHitDie": "Dado de golpe ({left}/{total})",
+  "@combatHitDie": {
+    "placeholders": {
+      "left": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "saveDc": "CD {dc}",
+  "@saveDc": {
+    "placeholders": {
+      "dc": {
+        "type": "Object"
+      }
+    }
+  },
+  "saveDcAbility": "CD {dc} de {ability}",
+  "@saveDcAbility": {
+    "placeholders": {
+      "dc": {
+        "type": "Object"
+      },
+      "ability": {
+        "type": "String"
+      }
+    }
+  },
+  "combatPointsOf": "{left} de {max} puntos",
+  "@combatPointsOf": {
+    "placeholders": {
+      "left": {
+        "type": "Object"
+      },
+      "max": {
+        "type": "Object"
+      }
+    }
+  },
+  "verbSpend": "gastar",
+  "verbRecover": "recuperar",
+  "combatPointsPrompt": "Puntos a {verb} (hasta {limit})",
+  "@combatPointsPrompt": {
+    "placeholders": {
+      "verb": {
+        "type": "String"
+      },
+      "limit": {
+        "type": "Object"
+      }
+    }
+  },
+  "combatAttacks": "Ataques",
+  "combatMastery": "Maestría: {name}",
+  "@combatMastery": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "combatRangeValue": "Alcance {range}",
+  "@combatRangeValue": {
+    "placeholders": {
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "combatOffHand": "Mano secundaria",
+  "wildShapeAs": "Transformado en {name}",
+  "@wildShapeAs": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "wildShapeTitle": "Forma Salvaje",
+  "wildShapeAddForms": "Anotar",
+  "wildShapeNoForms": "Todavía no anotaste ninguna forma.",
+  "creatureLine3": "{kind} · CA {ac} · {speed}",
+  "@creatureLine3": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      },
+      "ac": {
+        "type": "Object"
+      },
+      "speed": {
+        "type": "String"
+      }
+    }
+  },
+  "creatureLine2": "{kind} · CA {ac}",
+  "@creatureLine2": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      },
+      "ac": {
+        "type": "Object"
+      }
+    }
+  },
+  "wildShapeTransform": "Transformarse",
+  "wildShapeDone": "Te transformaste en {name}: +{level} PG temporales.",
+  "@wildShapeDone": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "wildShapeNoUses": "No te quedan usos de Forma Salvaje.",
+  "wildShapeKnownTitle": "Formas conocidas ({chosen}/{total})",
+  "@wildShapeKnownTitle": {
+    "placeholders": {
+      "chosen": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "companionsTitle": "Compañeros",
+  "companionHpAmount": "Cantidad de PG",
+  "companionSummon": "Invocar",
+  "companionSummonAnother": "Invocar otro",
+  "companionNone": "No hay ninguno invocado.",
+  "companionSummonAnyway": "Invocar igual",
+  "companionLimitOneTitle": "Ya tenés uno en juego",
+  "companionLimitMaxTitle": "Llegaste al máximo",
+  "companionLimitOneBody": "Invocar otro hace desaparecer a {going}, con los puntos de golpe que tenga.",
+  "@companionLimitOneBody": {
+    "placeholders": {
+      "going": {
+        "type": "String"
+      }
+    }
+  },
+  "companionLimitMaxBody": "Ya tenés {max}. Invocar otro hace desaparecer al más viejo, {going}.",
+  "@companionLimitMaxBody": {
+    "placeholders": {
+      "max": {
+        "type": "Object"
+      },
+      "going": {
+        "type": "String"
+      }
+    }
+  },
+  "companionPickForm": "Elegí la forma",
+  "companionNoSlots": "No te quedan espacios de nivel {level} o más.",
+  "@companionNoSlots": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "companionHowSummon": "Cómo lo invocás",
+  "companionNoSlotSpend": "Sin gastar espacio",
+  "companionFreeLeft": "{name}: quedan {left} de {max}",
+  "@companionFreeLeft": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "left": {
+        "type": "Object"
+      },
+      "max": {
+        "type": "Object"
+      }
+    }
+  },
+  "companionSlotsAvailable": "{left} de {total} disponibles",
+  "@companionSlotsAvailable": {
+    "placeholders": {
+      "left": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "companionNoteSlot": "gastaste un espacio de nivel {level}",
+  "@companionNoteSlot": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "companionNoteFree": "sin gastar espacio, por {name}",
+  "@companionNoteFree": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "companionNoteBroke": "perdiste la concentración anterior",
+  "companionNoteConcentrating": "quedás concentrado en él",
+  "companionSummoned": "{name} invocado.",
+  "@companionSummoned": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "companionSummonedNotes": "{name} invocado: {notes}.",
+  "@companionSummonedNotes": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "notes": {
+        "type": "String"
+      }
+    }
+  },
+  "companionGone": "Esta criatura ya no está en el catálogo.",
+  "companionDismiss": "Despedir",
+  "acValue": "CA {value}",
+  "@acValue": {
+    "placeholders": {
+      "value": {
+        "type": "Object"
+      }
+    }
+  },
+  "companionSlotLevel": "Espacio de nivel {level}",
+  "@companionSlotLevel": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "concentration": "Concentración",
+  "hpFraction": "{current} / {max} PG",
+  "@hpFraction": {
+    "placeholders": {
+      "current": {
+        "type": "Object"
+      },
+      "max": {
+        "type": "Object"
+      }
+    }
+  },
+  "companionDestroyed": "{name} fue destruido.",
+  "@companionDestroyed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "savesTitle": "Salvaciones",
+  "exhaustion": "Cansancio",
+  "exhaustionRules": "Cada nivel resta 2 a las pruebas de característica, salvaciones, tiradas de ataque e iniciativa, y 5 pies a la velocidad. Al nivel {max} el personaje muere.\n\nLa ficha ya trae la penalización aplicada en todos sus números: no la restes de nuevo. También le entra a las salvaciones de muerte, aunque esas no lleven número.\n\nUn descanso largo baja un nivel.",
+  "@exhaustionRules": {
+    "placeholders": {
+      "max": {
+        "type": "Object"
+      }
+    }
+  },
+  "combatState": "Estado",
+  "exhaustionPenalty": "−{rolls} a las tiradas · −{feet} pies",
+  "@exhaustionPenalty": {
+    "placeholders": {
+      "rolls": {
+        "type": "Object"
+      },
+      "feet": {
+        "type": "Object"
+      }
+    }
+  },
+  "exhaustionLower": "Bajar un nivel de cansancio",
+  "exhaustionRaise": "Subir un nivel de cansancio",
+  "exhaustionDeath": "Cansancio nivel {max}: tu personaje muere.",
+  "@exhaustionDeath": {
+    "placeholders": {
+      "max": {
+        "type": "Object"
+      }
+    }
+  },
+  "exhaustionNote": "Nivel {max}: tu personaje muere. La ficha no lo aplica ni te toca los PG — esa decisión es de la mesa.",
+  "@exhaustionNote": {
+    "placeholders": {
+      "max": {
+        "type": "Object"
+      }
+    }
+  },
+  "inspirationUse": "Repetí un dado apenas lo tirás y quedate con el resultado nuevo",
+  "inspirationLongRest": "La recuperás al terminar un descanso largo",
+  "inspirationGrant": "Marcala cuando el DM te la dé",
+  "inspirationSpend": "Gastar la Inspiración Heroica",
+  "inspirationMark": "Marcar que la tenés",
+  "heroicInspiration": "Inspiración Heroica",
+  "inspirationHave": "LA TENÉS",
+  "inspirationSpent": "GASTADA",
+  "conditionsTitle": "Condiciones",
+  "combatHitDieHealed": "Recuperaste {hp} PG (dado de golpe)",
+  "@combatHitDieHealed": {
+    "placeholders": {
+      "hp": {
+        "type": "Object"
+      }
+    }
+  },
+  "wildShapeUses": "Usos: {left} de {max}",
+  "@wildShapeUses": {
+    "placeholders": {
+      "left": {
+        "type": "Object"
+      },
+      "max": {
+        "type": "Object"
+      }
+    }
+  },
+  "wildShapeForms": "Formas: {chosen} de {total}",
+  "@wildShapeForms": {
+    "placeholders": {
+      "chosen": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "exhaustionLevelOf": "Cansancio: nivel {level} de {max}",
+  "@exhaustionLevelOf": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      },
+      "max": {
+        "type": "Object"
+      }
+    }
+  },
+  "replaceProficiency": "Competencia reemplazable",
+  "replaceChoice": "Elección reemplazable",
+  "replaceSpells": "Conjuros reemplazables",
+  "sheetWarnings": "Advertencias",
+  "sheetResolve": "Resolver",
+  "replaceableNoticeBody": "Este rasgo permite cambiar la elección que ya hiciste.",
+  "sheetChange": "Cambiar",
+  "pickExpertiseTitle": "Elegir Pericia",
+  "pickProficienciesTitle": "Elegir competencias",
+  "pickProficienciesHint": "Las opciones que ya tenés por otra vía quedan bloqueadas. En los cupos de Pericia es al revés: solo se ofrecen las habilidades en las que ya sos competente, y duplicás el bonificador en ellas.",
+  "pickSizeTitle": "Elegir tamaño",
+  "pickSizeHint": "Esta especie abarca cuerpos de tamaños distintos: elegí el de tu personaje.",
+  "pickLineageTitle": "Elegir linaje",
+  "pickLineageHint": "El linaje decide los rasgos que aporta la especie.",
+  "pickSpellAbilityTitle": "Elegir aptitud mágica",
+  "pickLineageSpellAbilityHint": "Se usa para la CD y los ataques de los conjuros del linaje.",
+  "pickFeatSpellAbilityTitle": "Aptitud mágica de {name}",
+  "@pickFeatSpellAbilityTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "pickFeatSpellAbilityHint": "Se usa para la CD y los ataques de los conjuros de esta dote.",
+  "pickFeaturesTitle": "Elegir rasgos",
+  "pickNoOptions": "No hay opciones disponibles todavía.",
+  "pickSpellsTitle": "Elegir conjuros",
+  "pickKnownSpellHint": "Elegí uno que ya conocés: no se suma a tus conjuros, le agrega el bono al daño.",
+  "pickNoSpells": "No hay conjuros disponibles para este rasgo.",
+  "pickLanguagesTitle": "Elegir idiomas",
+  "pickLanguagesIntro": "Todo personaje sabe {language}, que no ocupa una elección.",
+  "@pickLanguagesIntro": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "pickLanguagesOrigin": "De tu origen ({chosen}/{total})",
+  "@pickLanguagesOrigin": {
+    "placeholders": {
+      "chosen": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "identityAlignment": "Alineamiento",
+  "identityCreatureType": "Tipo de criatura",
+  "identitySize": "Tamaño",
+  "identityBackground": "Trasfondo",
+  "identityTrait": "Rasgo",
+  "identityTitle": "Identidad",
+  "abilitiesTitle": "Características",
+  "abilitiesHintLead": "La cifra grande es el modificador. ",
+  "abilitiesHintTail": " marca las salvaciones competentes; tocá una placa para ver de dónde sale.",
+  "unarmoredTitle": "Defensa sin armadura",
+  "unarmoredFormula": "Fórmula de CA",
+  "proficienciesTitle": "Competencias",
+  "armorUpper": "ARMADURA",
+  "passivePerception": "Percepción pasiva",
+  "darkvision": "Visión en la oscuridad",
+  "skillsLegendProficient": "Competente",
+  "skillsLegendExpertise": "Pericia · bonificador duplicado",
+  "skillExpertiseBadge": "PERICIA",
+  "traitsAndFeatsTitle": "Rasgos y dotes",
+  "statArmor": "Armadura",
+  "exhaustionSpeed": "Cansancio −{feet} pies",
+  "@exhaustionSpeed": {
+    "placeholders": {
+      "feet": {
+        "type": "Object"
+      }
+    }
+  },
+  "statProficiency": "Competencia",
+  "breakdownWhereFrom": "De dónde sale",
+  "breakdownDexModifier": "Modificador de Destreza",
+  "breakdownOtherTrait": "Otro rasgo",
+  "exhaustionLevel": "Cansancio nivel {level}",
+  "@exhaustionLevel": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "breakdownAssigned": "Asignada en la creación",
+  "breakdownScore": "Puntuación",
+  "breakdownModifier": "Modificador",
+  "breakdownWhatToRoll": "Qué se tira con esto",
+  "breakdownSave": "Salvación",
+  "breakdownSaveProficient": "Salvación (competente)",
+  "breakdownSkillExpertise": "{skill} (pericia)",
+  "@breakdownSkillExpertise": {
+    "placeholders": {
+      "skill": {
+        "type": "String"
+      }
+    }
+  },
+  "breakdownIncludes": "incluye {amount} de {source}",
+  "@breakdownIncludes": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "breakdownAbilityChecks": "Pruebas de característica",
+  "breakdownExhaustion": "incluye −{penalty} por cansancio nivel {level}",
+  "@breakdownExhaustion": {
+    "placeholders": {
+      "penalty": {
+        "type": "Object"
+      },
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "breakdownSpellAttack": "Ataque con conjuros",
+  "breakdownSaveDc": "CD de salvación",
+  "breakdownFooter": "Competencia +{bonus} a nivel {level}, ya incluida arriba. Solo se listan las habilidades en las que sos competente: el resto tira con la prueba de característica ({check}).",
+  "@breakdownFooter": {
+    "placeholders": {
+      "bonus": {
+        "type": "Object"
+      },
+      "level": {
+        "type": "Object"
+      },
+      "check": {
+        "type": "String"
+      }
+    }
+  },
+  "commonAdd": "Agregar",
+  "commonBuy": "Comprar",
+  "commonSell": "Vender",
+  "commonBag": "Bolsa",
+  "kindWeapon": "Arma",
+  "kindArmor": "Armadura",
+  "kindAmmunition": "Munición",
+  "kindFocus": "Canalizador",
+  "kindMagicItem": "Objeto mágico",
+  "kindTool": "Herramienta",
+  "kindContainer": "Contenedor",
+  "kindPack": "Paquete",
+  "kindGear": "Equipo",
+  "kindShield": "Escudo",
+  "groupWeapons": "Armas",
+  "groupArmor": "Armaduras",
+  "groupFocuses": "Canalizadores",
+  "groupMagicItems": "Objetos mágicos",
+  "groupTools": "Herramientas",
+  "groupContainers": "Contenedores",
+  "groupPacks": "Paquetes",
+  "catalogNotInCatalog": "No está en el catálogo",
+  "filterAll": "Todos",
+  "filterEquipped": "Equipados",
+  "filterMagic": "Mágicos",
+  "coinCopper": "cobre",
+  "coinSilver": "plata",
+  "coinElectrum": "electro",
+  "coinGold": "oro",
+  "coinPlatinum": "platino",
+  "coinAbbrCopper": "pc",
+  "coinAbbrSilver": "pp",
+  "coinAbbrElectrum": "pe",
+  "coinAbbrGold": "po",
+  "coinAbbrPlatinum": "ppt",
+  "catalogBundleOf": "paquete de {size}",
+  "@catalogBundleOf": {
+    "placeholders": {
+      "size": {
+        "type": "Object"
+      }
+    }
+  },
+  "catalogAttunement": "sintonización",
+  "catalogMissing": "te faltan {amount}",
+  "@catalogMissing": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "catalogShortBy": "Faltan {amount}",
+  "@catalogShortBy": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "catalogAddTitle": "Agregar objeto",
+  "catalogSearchHint": "Buscar objeto…",
+  "catalogNoMatches": "Sin coincidencias.",
+  "catalogAdded": "{count, plural, =1{1 objeto agregado a la mochila.} other{{count} objetos agregados a la mochila.}}",
+  "@catalogAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tradeUnitBundle": "paquete",
+  "tradeUnitItem": "unidad",
+  "tradeBundles": "{count, plural, =1{1 paquete} other{{count} paquetes}}",
+  "@tradeBundles": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tradeUnitsCount": "{count, plural, =1{1 unidad} other{{count} unidades}}",
+  "@tradeUnitsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tradeQuantity": "Cantidad",
+  "tradeTotalUnits": "{count} en total",
+  "@tradeTotalUnits": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "tradeLeft": "te quedan {count}",
+  "@tradeLeft": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "tradeOneLess": "Uno menos",
+  "tradeOneMore": "Uno más",
+  "tradeBuyPrice": "Precio por {unit}",
+  "@tradeBuyPrice": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeSellPrice": "Te pagan por {unit}",
+  "@tradeSellPrice": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeCatalogPrice": "Catálogo: {price}",
+  "@tradeCatalogPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeSuggested": "Sugerido: la mitad del catálogo, {price}.",
+  "@tradeSuggested": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeBackCatalog": "Volver al del catálogo",
+  "tradeBackSuggested": "Volver al sugerido",
+  "tradeTotalBuy": "TOTAL",
+  "tradeTotalSell": "COBRÁS",
+  "tradeShort": "Te faltan {amount}. Si el DM te lo regala o te lo fía, cerrá y usá «Agregar».",
+  "@tradeShort": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "tradePaidFrom": "Sale de la bolsa: {coins}.",
+  "@tradePaidFrom": {
+    "placeholders": {
+      "coins": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeChange": "Te vuelven {coins}.",
+  "@tradeChange": {
+    "placeholders": {
+      "coins": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeBagAfter": "La bolsa queda en {amount}.",
+  "@tradeBagAfter": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeBagAfterCoins": "La bolsa queda en {amount} ({coins}).",
+  "@tradeBagAfterCoins": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "coins": {
+        "type": "String"
+      }
+    }
+  },
+  "commonDone": "Listo",
+  "invCoins": "Monedas",
+  "invCoinsEquals": "Equivale a ",
+  "invCoinsWeigh": " po · pesan ",
+  "invCoinLabel": "Monedas de {name} ({abbr})",
+  "@invCoinLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "abbr": {
+        "type": "String"
+      }
+    }
+  },
+  "invLoad": "Carga",
+  "invLoadPercent": "{percent}% de la capacidad",
+  "@invLoadPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "Object"
+      }
+    }
+  },
+  "invLoadItems": "Objetos {weight} lb",
+  "@invLoadItems": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "invLoadCoins": "Monedas {weight} lb",
+  "@invLoadCoins": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "invOverCapacity": "Pasás tu capacidad de carga. En 2024 no hay penalización de reglas: es un aviso, no un bloqueo.",
+  "invAttunementUpper": "SINTONIZACIÓN",
+  "invAttunementHint": "Se sintoniza desde el menú de cada objeto; acá se ve cuántos cupos quedan y con qué están ocupados.",
+  "invAttuneSlotFree": "Cupo de sintonización libre",
+  "invAttunedName": "{name} — sintonizado",
+  "@invAttunedName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "invSlotFree": "Cupo libre",
+  "invTitle": "Inventario",
+  "invEmpty": "La mochila está vacía.",
+  "invPlansButton": "Planos y réplicas ({chosen}/{total})",
+  "@invPlansButton": {
+    "placeholders": {
+      "chosen": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "invSearchHint": "Buscar en la mochila…",
+  "invNoMatches": "Ningún objeto coincide con ese filtro.",
+  "invHeadItem": "OBJETO",
+  "invHeadQty": "CANT.",
+  "invHeadEquipped": "EQUIPADO",
+  "invHeadWeight": "PESO",
+  "invNoWeight": "Sin peso",
+  "invRemoveOne": "Quitar una unidad de {name}",
+  "@invRemoveOne": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "invAddOne": "Agregar una unidad de {name}",
+  "@invAddOne": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "invCharges": "{left} cargas",
+  "@invCharges": {
+    "placeholders": {
+      "left": {
+        "type": "Object"
+      }
+    }
+  },
+  "invChargesOf": "Cargas {left}/{max}",
+  "@invChargesOf": {
+    "placeholders": {
+      "left": {
+        "type": "Object"
+      },
+      "max": {
+        "type": "Object"
+      }
+    }
+  },
+  "invSpendCharge": "Gastar una carga de {name}",
+  "@invSpendCharge": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "invRecoverCharge": "Recuperar una carga de {name}",
+  "@invRecoverCharge": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "invSeeWhatItDoes": "Ver qué hace",
+  "invAttuned": "Sintonizado",
+  "invReplica": "Réplica",
+  "invNotEquippable": "No se equipa",
+  "invEquipped": "Equipado",
+  "invExactQuantity": "Cantidad exacta…",
+  "invNote": "Nota…",
+  "invUnattune": "Quitar sintonización",
+  "invAttune": "Sintonizar",
+  "invTwoHanded": "A dos manos",
+  "invTransmute": "Transmutar réplica…",
+  "invSellMenu": "Vender…",
+  "invRemove": "Quitar",
+  "invBundlesOf": "Paquetes de {size}",
+  "@invBundlesOf": {
+    "placeholders": {
+      "size": {
+        "type": "Object"
+      }
+    }
+  },
+  "invUnits": "Unidades",
+  "invNoteTitle": "Nota",
+  "invNoteLabel": "Qué dice, de dónde salió, para qué sirve",
+  "invRemoved": "Quitaste {name}.",
+  "@invRemoved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "invTransmuteInto": "Transmutar en",
+  "invCatalogHint": "Agregar es gratis y deja seguir sumando; comprar paga de la bolsa.",
+  "invBuyTitle": "Comprar {name}",
+  "@invBuyTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "invBought": "Compraste {quantity} × {name} por {amount}.",
+  "@invBought": {
+    "placeholders": {
+      "quantity": {
+        "type": "Object"
+      },
+      "name": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "invSellTitle": "Vender {name}",
+  "@invSellTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "invSellDetail": "Tenés {quantity} · catálogo {price}",
+  "@invSellDetail": {
+    "placeholders": {
+      "quantity": {
+        "type": "Object"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "invSold": "Vendiste {quantity} × {name} por {amount}.",
+  "@invSold": {
+    "placeholders": {
+      "quantity": {
+        "type": "Object"
+      },
+      "name": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "invTargetHint": "Elegí un ejemplar de la mochila o creá uno de los permitidos por el rasgo.",
+  "invInPack": "En la mochila",
+  "invNoEligible": "No hay ejemplares elegibles.",
+  "invCreatedByFeature": "Creada por este rasgo",
+  "invCreateWeapon": "Crear arma",
+  "invAddAndEquip": "Agregar y equipar",
+  "invClearLink": "Limpiar vínculo",
+  "invPlansIntro": "Elegís {count} planos. Después decidís cuál replicar: podés tener {active, plural, =1{1 réplica activa} other{{active} réplicas activas}} a la vez.",
+  "@invPlansIntro": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "active": {
+        "type": "int"
+      }
+    }
+  },
+  "invActiveReplicas": "Réplicas activas",
+  "invPlansMissing": "Falta elegir {count}.",
+  "@invPlansMissing": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "invPickBlueprint": "Elegí un plano para poder replicarlo.",
+  "invReplicaSlotsLeft": "{count, plural, =1{Queda 1 cupo libre.} other{Quedan {count} cupos libres.}}",
+  "@invReplicaSlotsLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "invReplicaNoSlots": "Sin cupos libres: quitá una réplica para crear otra.",
+  "invRemoveReplica": "Quitar la réplica de {name}",
+  "@invRemoveReplica": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "invCreateReplica": "Crear la réplica de {name}",
+  "@invCreateReplica": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "invNoReplicaSlots": "No quedan cupos de réplica",
+  "invPickBase": "Elegí el objeto base",
+  "invRangeHint": "alcance {range}",
+  "@invRangeHint": {
+    "placeholders": {
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "invTwoHandedMounted": "exige dos manos salvo montado",
+  "invTwoHandedHint": "exige dos manos",
+  "commonEdit": "Editar",
+  "diaryImportMd": "Importar un .md",
+  "diaryExportMd": "Exportar como .md",
+  "diaryFinishEditing": "Terminar de editar",
+  "diaryEditBackground": "Editar el trasfondo",
+  "diaryBackgroundHint": "De dónde viene, qué dejó atrás, qué le debe a quién…",
+  "diaryMarkdownHint": "Acepta Markdown: # para títulos, **negrita**, *itálica* y - para viñetas.",
+  "diaryUnknownOrigin": "Origen desconocido",
+  "diaryUnknownOriginBody": "Todavía nadie escribió de dónde viene {name}. Podés escribirlo acá, o traer un .md que ya tengas afuera.",
+  "@diaryUnknownOriginBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "diaryWriteBackground": "Escribir el trasfondo",
+  "diaryImportMdShort": "Importar .md",
+  "diaryPickMd": "Elegir un archivo .md",
+  "diaryOpenError": "No se pudo abrir el archivo",
+  "diaryReplaceTitle": "Reemplazar el trasfondo",
+  "diaryReplaceBody": "Lo que hay escrito se pierde y queda en su lugar el contenido del archivo. No hay forma de recuperarlo.",
+  "diaryReplace": "Reemplazar",
+  "diaryNotUtf8": "El archivo no parece texto en UTF-8.",
+  "diaryImported": "Trasfondo importado.",
+  "diaryFileSuffix": "trasfondo",
+  "diaryFileFallback": "personaje",
+  "diaryEntries": "Entradas",
+  "diaryAddEntryTooltip": "Agregar una entrada",
+  "diaryEmpty": "El diario de {name} todavía está en blanco.\nSumá arte, una historia corta, una manía — lo que te guste de este personaje.",
+  "@diaryEmpty": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "diaryAddEntry": "Agregar entrada",
+  "diaryDeleted": "Borraste «{title}».",
+  "@diaryDeleted": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "diaryDeleteBody": "«{title}» se va del diario.",
+  "@diaryDeleteBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "diaryDeleteBodyImage": "«{title}» se va del diario, y la imagen que subiste se borra con ella. No hay forma de recuperarla.",
+  "@diaryDeleteBodyImage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "diaryUntitled": "Sin título",
+  "diaryDragHint": "Mantené apretado para reordenar",
+  "diaryNoImage": "Sin imagen.",
+  "diaryKindText": "Texto",
+  "diaryKindImage": "Imagen",
+  "diaryKindLink": "Enlace",
+  "diaryEditedOn": "{date} · editada {edited}",
+  "@diaryEditedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "edited": {
+        "type": "String"
+      }
+    }
+  },
+  "diaryEntryNoImage": "Esta entrada no tiene imagen.",
+  "diarySeeFullImage": "Ver la imagen completa",
+  "diaryImageGone": "La imagen ya no está en el almacén.",
+  "diaryDeleteTitle": "Borrar la entrada",
+  "diaryPickImage": "Elegir una imagen",
+  "diaryUploadError": "No se pudo subir la imagen",
+  "diaryNewEntry": "Nueva entrada",
+  "diaryEditEntry": "Editar entrada",
+  "diaryTitleLabel": "Título",
+  "diaryEntryType": "Tipo de entrada",
+  "diaryBodyHint": "Lo que quieras contar de este personaje…",
+  "diaryUploading": "Subiendo la imagen…",
+  "diaryChooseImage": "Elegir imagen",
+  "diaryChangeImage": "Cambiar imagen",
+  "diaryImageFormats": "PNG, JPEG o WEBP. Mismo límite de tamaño que los retratos.",
+  "spellsTitle": "Conjuros",
+  "spellsPrepare": "Preparar",
+  "spellsSaveDcShort": "CD SALV.",
+  "spellsSaveDcSemantics": "Clase de dificultad de las salvaciones contra tus conjuros: {dc}",
+  "@spellsSaveDcSemantics": {
+    "placeholders": {
+      "dc": {
+        "type": "Object"
+      }
+    }
+  },
+  "spellsAttackUpper": "ATAQUE",
+  "spellsAbilityUpper": "APTITUD",
+  "spellsAbilitySemantics": "Aptitud mágica: {name}",
+  "@spellsAbilitySemantics": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spellsPrepared": "Preparados: {count} / {max}",
+  "@spellsPrepared": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      },
+      "max": {
+        "type": "Object"
+      }
+    }
+  },
+  "spellsKnown": "Conocidos: {count}",
+  "@spellsKnown": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "spellsCantrips": "Trucos: {count} / {max}",
+  "@spellsCantrips": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      },
+      "max": {
+        "type": "Object"
+      }
+    }
+  },
+  "spellsSources": "Fuentes de lanzamiento",
+  "spellsSourcePrepared": "{level}° nivel · {ability} · preparados",
+  "@spellsSourcePrepared": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      },
+      "ability": {
+        "type": "String"
+      }
+    }
+  },
+  "spellsSourceKnown": "{level}° nivel · {ability} · conocidos",
+  "@spellsSourceKnown": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      },
+      "ability": {
+        "type": "String"
+      }
+    }
+  },
+  "spellsFromFeatures": "Conjuros de rasgos",
+  "spellsWildShapeBlock": "En forma de {name} no podés lanzar conjuros.",
+  "@spellsWildShapeBlock": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spellsConcentratingOn": "Concentrándote en {spell}",
+  "@spellsConcentratingOn": {
+    "placeholders": {
+      "spell": {
+        "type": "String"
+      }
+    }
+  },
+  "spellsEndConcentration": "Terminar",
+  "spellsSlots": "Espacios de conjuro",
+  "spellsPactSlots": "Espacios de Pacto",
+  "spellsCantripsTitle": "Trucos",
+  "spellsAlwaysPrepared": "Siempre preparados",
+  "spellsAlwaysPreparedHint": "Los concede un rasgo y no ocupan cupo: se lanzan con tus espacios de conjuro como cualquier preparado.",
+  "spellsPreparedTitle": "Conjuros preparados",
+  "spellsKnownTitle": "Conjuros conocidos",
+  "spellsNoneChosen": "Todavía no elegiste conjuros. Editá al subir de nivel o al crear.",
+  "spellsUseLongRest": "1/descanso largo",
+  "spellsUseShortRest": "1/descanso corto",
+  "spellsUseProficiency": "Competencia/descanso largo",
+  "spellsUseAbilityMod": "{uses}/descanso largo ({ability})",
+  "@spellsUseAbilityMod": {
+    "placeholders": {
+      "uses": {
+        "type": "Object"
+      },
+      "ability": {
+        "type": "String"
+      }
+    }
+  },
+  "spellsSwapTooltip": "Cambiar tras un descanso largo",
+  "spellsConcentrate": "Concentrar",
+  "spellsCutTitle": "Cortar la concentración",
+  "spellsCutBody": "Concentrarte en {spell} termina {previous}, y con ella {count, plural, =1{se va} other{se van}} {names}.",
+  "@spellsCutBody": {
+    "placeholders": {
+      "spell": {
+        "type": "String"
+      },
+      "previous": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "spellsCurrentConcentration": "tu concentración actual",
+  "spellsConcentrateAnyway": "Concentrar igual",
+  "spellsSwitched": "Te concentrás en {spell}: dejaste {previous}.",
+  "@spellsSwitched": {
+    "placeholders": {
+      "spell": {
+        "type": "String"
+      },
+      "previous": {
+        "type": "String"
+      }
+    }
+  },
+  "spellsSwitchedDeps": "Te concentrás en {spell}: dejaste {previous} y {count, plural, =1{se va} other{se van}} {names}.",
+  "@spellsSwitchedDeps": {
+    "placeholders": {
+      "spell": {
+        "type": "String"
+      },
+      "previous": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "spellsSwapTitle": "Cambiar {name}",
+  "@spellsSwapTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "spellsSwapBody": "Al terminar un descanso largo podés cambiarlo por otro truco de {lists}.",
+  "@spellsSwapBody": {
+    "placeholders": {
+      "lists": {
+        "type": "String"
+      }
+    }
+  },
+  "spellsSwapOriginal": "El del rasgo",
+  "spellsListOf": "la lista de {name}",
+  "@spellsListOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "listOr": "{head} o {last}",
+  "@listOr": {
+    "placeholders": {
+      "head": {
+        "type": "String"
+      },
+      "last": {
+        "type": "String"
+      }
+    }
+  },
+  "spellsSpendSlot": "Gastar espacio",
+  "spellsRecoverSlot": "Recuperar espacio",
+  "spellsWithCharacter": "Con este personaje",
+  "spellsCastWith": "Lanzás con {ability} ({mod}). Ataque de conjuro {attack} · CD de salvación {dc}.",
+  "@spellsCastWith": {
+    "placeholders": {
+      "ability": {
+        "type": "String"
+      },
+      "mod": {
+        "type": "String"
+      },
+      "attack": {
+        "type": "String"
+      },
+      "dc": {
+        "type": "Object"
+      }
+    }
+  },
+  "spellsDamageBonus": "{bonus} al daño ({sources})",
+  "@spellsDamageBonus": {
+    "placeholders": {
+      "bonus": {
+        "type": "String"
+      },
+      "sources": {
+        "type": "String"
+      }
+    }
+  },
+  "stepSpecies": "Especie",
+  "stepClass": "Clase",
+  "stepBackground": "Trasfondo",
+  "stepScores": "Puntuaciones",
+  "stepProficiencies": "Competencias",
+  "stepEquipment": "Equipo",
+  "stepDetails": "Detalles",
+  "stepSummary": "Resumen",
+  "pendingPickSpecies": "Elegí una especie.",
+  "pendingPickLineage": "Elegí un linaje de especie.",
+  "pendingPickLineageAbility": "Elegí la aptitud mágica del linaje.",
+  "pendingPickSize": "Elegí el tamaño de la especie.",
+  "pendingPickClass": "Elegí una clase.",
+  "pendingSlotProgress": "{name}: {chosen}/{total}.",
+  "@pendingSlotProgress": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "chosen": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "pendingWeaponMastery": "Maestría de armas: {chosen}/{total}.",
+  "@pendingWeaponMastery": {
+    "placeholders": {
+      "chosen": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "pendingPickBackground": "Elegí un trasfondo.",
+  "pendingPickFeatAbility": "Elegí la aptitud mágica de {name}.",
+  "@pendingPickFeatAbility": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "pendingSpread": "Asigná el +2 y el +1 de característica.",
+  "pendingAssignScores": "Asigná las 6 características ({count}/6).",
+  "@pendingAssignScores": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "pendingClassSkills": "Habilidades de clase: {chosen}/{total}.",
+  "@pendingClassSkills": {
+    "placeholders": {
+      "chosen": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "pendingSpeciesSkills": "Habilidades de especie: {chosen}/{total}.",
+  "@pendingSpeciesSkills": {
+    "placeholders": {
+      "chosen": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "pendingPickOriginFeat": "Elegí una dote de origen.",
+  "pendingProficiencies": "Competencias pendientes: {count}.",
+  "@pendingProficiencies": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "pendingExpertise": "Pericias pendientes: {count}.",
+  "@pendingExpertise": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "pendingLanguages": "Idiomas: {chosen}/{total}.",
+  "@pendingLanguages": {
+    "placeholders": {
+      "chosen": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "pendingLanguageChoices": "Idiomas por rasgo pendientes: {count}.",
+  "@pendingLanguageChoices": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "pendingClassEquipment": "Elegí el equipo de clase.",
+  "pendingBackgroundEquipment": "Elegí el equipo de trasfondo.",
+  "pendingEquipmentChoices": "Completá las elecciones internas de equipo.",
+  "pendingOverspent": "Las compras superan el oro de partida por {amount}.",
+  "@pendingOverspent": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "pendingSpellChoices": "Conjuros a elección: {count}.",
+  "@pendingSpellChoices": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "pendingCantrips": "Trucos: {chosen}/{total}.",
+  "@pendingCantrips": {
+    "placeholders": {
+      "chosen": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "pendingSpells": "Conjuros: {chosen}/{total}.",
+  "@pendingSpells": {
+    "placeholders": {
+      "chosen": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "characterUnnamed": "Sin nombre",
+  "wizardCreateNpc": "Crear PNJ",
+  "wizardDiscardNpc": "¿Descartar este PNJ?",
+  "wizardDiscardCharacter": "¿Descartar este personaje?",
+  "wizardDiscardBody": "Las elecciones realizadas en el asistente se perderán.",
+  "wizardKeepCreating": "Seguir creando",
+  "wizardDiscard": "Descartar",
+  "wizardProgress": "Progreso",
+  "wizardStepOf": "Paso {step} de {total}",
+  "@wizardStepOf": {
+    "placeholders": {
+      "step": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "wizardStepSemantics": "{name}, paso {step} de {total}",
+  "@wizardStepSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "step": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "wizardFinishPrevious": "Completá los pasos anteriores",
+  "wizardProgressSemantics": "Progreso de creación",
+  "wizardBack": "Atrás",
+  "wizardMissing": "Falta: {item}",
+  "@wizardMissing": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "wizardMissingMore": "Falta: {first} (y {count} {count, plural, =1{cosa} other{cosas}} más).",
+  "@wizardMissingMore": {
+    "placeholders": {
+      "first": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "wizardNext": "Siguiente",
+  "detailsEmblem": "Emblema",
+  "detailsEmblemBody": "Hasta que le pongas un retrato, tu personaje usa el emblema de {klass}.",
+  "@detailsEmblemBody": {
+    "placeholders": {
+      "klass": {
+        "type": "String"
+      }
+    }
+  },
+  "detailsYourClass": "su clase",
+  "detailsPortraitLater": "Podés generar o elegir un retrato después, desde la ficha.",
+  "detailsName": "Nombre",
+  "detailsUndefined": "Sin definir",
+  "detailsTrait": "Rasgo de personalidad",
+  "detailsTraitHint": "Una línea que lo defina. Ej: \"Nunca deja una deuda sin pagar.\"",
+  "weaponSimple": "Simples",
+  "weaponMartial": "Marciales",
+  "weaponUnarmed": "Sin arma (puños)",
+  "weaponSearchHint": "Buscar arma…",
+  "summaryEquipped": "puesto",
+  "summaryTitle": "Revisá y confirmá",
+  "summaryLine": "{species} · {klass} · {background} · Nivel 1",
+  "@summaryLine": {
+    "placeholders": {
+      "species": {
+        "type": "String"
+      },
+      "klass": {
+        "type": "String"
+      },
+      "background": {
+        "type": "String"
+      }
+    }
+  },
+  "summaryInCombat": "En combate",
+  "summaryFeats": "Dotes",
+  "identityCreatureTypeShort": "Tipo",
+  "pickSpeciesHint": "Elegí una especie para ver su detalle.",
+  "factToChoose": "a elegir",
+  "feetValue": "{feet} pies",
+  "@feetValue": {
+    "placeholders": {
+      "feet": {
+        "type": "Object"
+      }
+    }
+  },
+  "factChoose": "{count} a elegir",
+  "@factChoose": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "raceLineageTitle": "Linaje de especie",
+  "raceLineageRequired": "Esta especie requiere elegir un linaje.",
+  "raceLineageLevel1": "Lo que te da a nivel 1",
+  "speciesSpellAbility": "Aptitud mágica",
+  "pickClassHint": "Elegí una clase para ver su detalle.",
+  "factHitDie": "Dado de golpe",
+  "classChooseCount": "{name} (elegí {count})",
+  "@classChooseCount": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "classWeaponMasteryTitle": "Maestría de armas (elegí {count})",
+  "@classWeaponMasteryTitle": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "classWeaponMasteryBody": "Dominás el arma lo suficiente como para sacarle un efecto extra cada vez que acertás —derribar, entorpecer, rozar—, sin gastar nada. Solo armas con las que {klass} es competente.",
+  "@classWeaponMasteryBody": {
+    "placeholders": {
+      "klass": {
+        "type": "String"
+      }
+    }
+  },
+  "pickBackgroundHint": "Elegí un trasfondo para ver su detalle.",
+  "factOriginFeat": "Dote de origen",
+  "bgOriginFeatGives": "Qué te da su dote de origen",
+  "bgFeatAbilityHint": "Se usa para la CD y los ataques de los conjuros de la dote.",
+  "bgAbilityIncrease": "Aumento de característica",
+  "bgEachPlusOne": "Cada una de {list} recibe +1.",
+  "@bgEachPlusOne": {
+    "placeholders": {
+      "list": {
+        "type": "String"
+      }
+    }
+  },
+  "aptHelpTitle": "Qué es una competencia",
+  "aptHelpBody": "Ser competente en algo te deja sumar tu bonificador por competencia cuando tirás con eso: una habilidad, un arma, una herramienta o una salvación. Acá elegís las tuyas entre las que ofrecen tu clase, tu especie y tu trasfondo; las que ya vienen dadas aparecen bloqueadas.",
+  "aptClassSkills": "Habilidades de clase",
+  "aptSpeciesSkills": "Habilidades de especie",
+  "aptGrantedByBackground": "Estas ya te las da el trasfondo:",
+  "creationChosen": "{count} / {total} elegidas",
+  "@creationChosen": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "creationChosenM": "{count} / {total} elegidos",
+  "@creationChosenM": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "creationNotChosen": "sin elegir",
+  "creationOneChosen": "1 elegida",
+  "aptOriginFeatNote": "En 2024 las dotes de nivel 1 vienen del origen: {species} te concede una a elección.",
+  "@aptOriginFeatNote": {
+    "placeholders": {
+      "species": {
+        "type": "String"
+      }
+    }
+  },
+  "aptProfChoices": "Competencias a elección",
+  "aptFeatChoose": "{name}: elegí {count}",
+  "@aptFeatChoose": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "aptExpertise": "Pericia",
+  "aptExpertiseHint": "Duplica tu bonificador por competencia en la habilidad elegida.",
+  "scoresMethod": "Método",
+  "scoresHelpTitle": "¿Qué método conviene?",
+  "scoresHelpBody": "Los cuatro generan las seis puntuaciones del personaje, con distinto grado de azar. El conjunto estándar reparte valores fijos y equilibrados: es el camino corto. Tirar 4d6 los sortea. El coste en puntos te deja armarlos con un presupuesto. Escribir a mano sirve si ya los tenés decididos.",
+  "scoresStandardArray": "Conjunto estándar",
+  "scoresRoll4d6": "Tirar 4d6",
+  "scoresPointBuy": "Coste en puntos",
+  "scoresManual": "Escribir a mano",
+  "scoresManualHelp": "Escribí la puntuación base de cada característica ({min} a {max}), sin contar el aumento del trasfondo. Si alguna queda fuera del rango habitual de generación (3 a 18) la ficha lo va a señalar como aviso, pero no te impide seguir.",
+  "@scoresManualHelp": {
+    "placeholders": {
+      "min": {
+        "type": "Object"
+      },
+      "max": {
+        "type": "Object"
+      }
+    }
+  },
+  "scoresSuggested": "Reparto sugerido para {klass}",
+  "@scoresSuggested": {
+    "placeholders": {
+      "klass": {
+        "type": "String"
+      }
+    }
+  },
+  "scoresUseSuggested": "Usar este reparto",
+  "scoresUnassigned": "Valores sin asignar",
+  "scoresNoneLeft": "Ninguno: ya están las 6.",
+  "scoresRollAgain": "Tirar de nuevo",
+  "scoresClear": "Limpiar",
+  "scoresPointsLeft": "Puntos restantes",
+  "scoresOfBudget": "{left} de {budget}",
+  "@scoresOfBudget": {
+    "placeholders": {
+      "left": {
+        "type": "Object"
+      },
+      "budget": {
+        "type": "Object"
+      }
+    }
+  },
+  "scoresBudgetDone": "Presupuesto completo.",
+  "scoresOneUnspent": "Te queda 1 punto sin gastar: si seguís, se pierde.",
+  "scoresUnspent": "Te quedan {count} puntos sin gastar: si seguís, se pierden.",
+  "@scoresUnspent": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "scoresAllStartAt": "Todas empiezan en {min}: subí las que más te importan con «+».",
+  "@scoresAllStartAt": {
+    "placeholders": {
+      "min": {
+        "type": "Object"
+      }
+    }
+  },
+  "scoresCostNote": "Cada característica va de {min} a {max}. Los últimos dos escalones cuestan el doble: 14 vale 7 puntos y 15 vale 9, no 6 y 7.",
+  "@scoresCostNote": {
+    "placeholders": {
+      "min": {
+        "type": "Object"
+      },
+      "max": {
+        "type": "Object"
+      }
+    }
+  },
+  "scoresLower": "Bajar {ability}",
+  "@scoresLower": {
+    "placeholders": {
+      "ability": {
+        "type": "String"
+      }
+    }
+  },
+  "scoresRaise": "Subir {ability}",
+  "@scoresRaise": {
+    "placeholders": {
+      "ability": {
+        "type": "String"
+      }
+    }
+  },
+  "scoresAtMax": "al máximo · gastados {spent}",
+  "@scoresAtMax": {
+    "placeholders": {
+      "spent": {
+        "type": "Object"
+      }
+    }
+  },
+  "scoresNextCost": "subir cuesta {cost} · gastados {spent}",
+  "@scoresNextCost": {
+    "placeholders": {
+      "cost": {
+        "type": "Object"
+      },
+      "spent": {
+        "type": "Object"
+      }
+    }
+  },
+  "scoresUnassignedShort": "sin asignar",
+  "scoresBase": "base {score}",
+  "@scoresBase": {
+    "placeholders": {
+      "score": {
+        "type": "Object"
+      }
+    }
+  },
+  "scoresPickValue": "Elegir valor",
+  "scoresModEmpty": "MOD —",
+  "scoresMod": "MOD {value}",
+  "@scoresMod": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "scoresValue": "Valor",
+  "scoresTaken": "en {abilities}",
+  "@scoresTaken": {
+    "placeholders": {
+      "abilities": {
+        "type": "String"
+      }
+    }
+  },
+  "scoresTakenFree": "en {abilities} · {free, plural, =1{queda 1} other{quedan {free}}}",
+  "@scoresTakenFree": {
+    "placeholders": {
+      "abilities": {
+        "type": "String"
+      },
+      "free": {
+        "type": "int"
+      }
+    }
+  },
+  "wordOr": "o",
+  "equipReceivedTitle": "Equipo puesto",
+  "equipStartingTitle": "Equipo inicial",
+  "equipPickClassItem": "Elegí un objeto del equipo de clase",
+  "equipPickBackgroundItem": "Elegí un objeto del equipo de trasfondo",
+  "equipNoStartingClass": "Esta clase no trae equipo inicial.",
+  "equipNoStartingBackground": "Este trasfondo no trae equipo inicial.",
+  "equipOptionClass": "Opción de clase",
+  "equipOptionBackground": "Opción de trasfondo",
+  "equipOrOther": "u otro",
+  "equipShopTitle": "Comprar equipo",
+  "equipLeftShort": "Quedan",
+  "equipShopHint": "Cada toque suma uno a tus compras. La cantidad se ajusta en la lista del paso.",
+  "equipPurchases": "Compras",
+  "equipPickFirst": "Primero elegí las opciones de equipo: el oro para comprar sale de ahí.",
+  "equipLeft": "Quedan {amount}",
+  "@equipLeft": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "equipNoGold": "Las opciones elegidas no traen oro para comprar.",
+  "equipGoldExplainer": "Lo que no traés en el paquete lo comprás con el oro de partida, al precio del manual. Lo que sobre queda en la bolsa.",
+  "equipStartingGold": "Oro de partida",
+  "equipInPurchases": "En compras",
+  "equipShortLabel": "Faltan",
+  "equipYouHaveLeft": "Te quedan",
+  "equipOverspent": "Las compras superan el oro de partida: sacá algo o elegí otra opción de equipo.",
+  "equipBuyItems": "Comprar objetos",
+  "equipOneLess": "Uno menos de {name}",
+  "@equipOneLess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "equipOneMore": "Uno más de {name}",
+  "@equipOneMore": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "equipRemovePurchase": "Sacar {name} de las compras",
+  "@equipRemovePurchase": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "equipTapPiece": "Tocá una pieza para sacártela o ponértela.",
+  "equipNothingToWear": "El paquete elegido no trae equipo para vestir o empuñar.",
+  "equipGrip": "Cómo las empuñás",
+  "equipOffHandNote": "El ataque de mano secundaria es una acción adicional y no suma tu modificador al daño, salvo con el estilo Combate con Dos Armas.",
+  "equipOffHandShort": "Secundaria",
+  "equipNoSpellsTitle": "Tu clase no lanza conjuros",
+  "equipNoSpellsBody": "Confiás en el acero y la maña. Seguí al próximo paso.",
+  "equipNoPreparedSlot": "No ocupan cupo de preparados.",
+  "equipCantripSuffix": "{name} (truco)",
+  "@equipCantripSuffix": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "equipLevelShort": "{name} (Nv {level})",
+  "@equipLevelShort": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "equipCasterLine": "CD de salvación {dc} · Ataque de conjuro {attack} ({ability})",
+  "@equipCasterLine": {
+    "placeholders": {
+      "dc": {
+        "type": "Object"
+      },
+      "attack": {
+        "type": "String"
+      },
+      "ability": {
+        "type": "String"
+      }
+    }
+  },
+  "equipMagicTitle": "Cómo funciona tu magia",
+  "equipMagicCantrips": "Los trucos se lanzan siempre y no gastan nada.",
+  "equipMagicPrepared": "Los conjuros preparados son los que dejás listos para usar; podés cambiarlos al descansar.",
+  "equipMagicKnown": "Los conjuros conocidos son los que aprendiste y quedan disponibles para lanzar.",
+  "equipMagicSlots": "Cada vez que lanzás uno gastás un espacio de conjuro, que es un recurso aparte: los espacios dicen cuántas veces podés lanzar, no cuántos conjuros tenés.",
+  "equipGrantedCantripOne": "Ya tenés {name} por otro rasgo: no ocupa un cupo de truco de clase.",
+  "@equipGrantedCantripOne": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "equipGrantedCantripMany": "Ya tenés {names} por otros rasgos: no ocupan cupos de truco de clase.",
+  "@equipGrantedCantripMany": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "equipGrantedLeveled": "Ya tenés {names} siempre preparado por otro rasgo: no ocupa un cupo.",
+  "@equipGrantedLeveled": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "equipMaxLevel": "Podés preparar conjuros de hasta nivel {level}.",
+  "@equipMaxLevel": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "wordAnd": "y",
+  "luStepSubclass": "Subclase",
+  "luStepAsi": "Mejora o dote",
+  "luStepChoices": "Elecciones",
+  "luStepSpellChoices": "Conjuros a elección",
+  "luStepReview": "Revisión",
+  "luPendingHp": "Tirá el dado o elegí el promedio para continuar.",
+  "luPendingSubclass": "Elegí una subclase para continuar.",
+  "luPendingImprove": "Completá la mejora de características.",
+  "luPendingFeat": "Elegí una dote para continuar.",
+  "luPendingFeatAbility": "Elegí a qué característica va el +1 de la dote.",
+  "luPendingChoices": "{count, plural, =1{Te falta una elección para continuar.} other{Te faltan {count} elecciones para continuar.}}",
+  "@luPendingChoices": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "luPendingExpertise": "{count, plural, =1{Elegí una habilidad para tu Pericia.} other{Elegí {count} habilidades para tu Pericia.}}",
+  "@luPendingExpertise": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "luPendingProficiency": "{count, plural, =1{Te falta una competencia para continuar.} other{Te faltan {count} competencias para continuar.}}",
+  "@luPendingProficiency": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "luPendingSpellChoices": "{count, plural, =1{Te falta elegir un conjuro para continuar.} other{Te faltan {count} conjuros para continuar.}}",
+  "@luPendingSpellChoices": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "luOneCantrip": "un truco",
+  "luCantrips": "{count} trucos",
+  "@luCantrips": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "luOneSpell": "un conjuro",
+  "luSpells": "{count} conjuros",
+  "@luSpells": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "luPendingClassSpells": "Te falta elegir {parts} para continuar.",
+  "@luPendingClassSpells": {
+    "placeholders": {
+      "parts": {
+        "type": "String"
+      }
+    }
+  },
+  "luTitle": "Subir a nivel {level}",
+  "@luTitle": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "luStatAttacks": "Ataques/acción",
+  "luStatMasteries": "Maestrías",
+  "luStatDarkvision": "Visión osc.",
+  "luSummaryTitle": "Subida de nivel",
+  "luHpMax": "+{hp} PG máximos",
+  "@luHpMax": {
+    "placeholders": {
+      "hp": {
+        "type": "Object"
+      }
+    }
+  },
+  "luHpCurrent": "Tus PG actuales suben lo mismo.",
+  "luNewProficiencies": "Nuevas competencias",
+  "luSavShort": "Salv. {ability}",
+  "@luSavShort": {
+    "placeholders": {
+      "ability": {
+        "type": "String"
+      }
+    }
+  },
+  "luNewFeatures": "Rasgos de clase ganados",
+  "luAlsoGain": "También ganás",
+  "luNewResources": "Recursos nuevos",
+  "luResourceLine": "Usos: {max} · recarga: {recharge}",
+  "@luResourceLine": {
+    "placeholders": {
+      "max": {
+        "type": "Object"
+      },
+      "recharge": {
+        "type": "String"
+      }
+    }
+  },
+  "restShortLower": "descanso corto",
+  "restLongLower": "descanso largo",
+  "luNewCompanions": "Compañeros nuevos",
+  "luCompanionOne": "Se invoca desde la pestaña Combate.",
+  "luCompanionMany": "{count} formas a elegir, desde la pestaña Combate.",
+  "@luCompanionMany": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "luFormsMore": "{count} formas más",
+  "@luFormsMore": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "luFormsNote": "Anotá las nuevas desde la pestaña Combate.",
+  "luDone": "¡Listo!",
+  "luLeveled": "¡Subiste a nivel {level}!",
+  "@luLeveled": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "luConfirm": "Confirmar",
+  "luConfirmLevel": "Confirmar nivel {level}",
+  "@luConfirmLevel": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "luContinue": "Continuar",
+  "luGrants": "Concede: {list}",
+  "@luGrants": {
+    "placeholders": {
+      "list": {
+        "type": "String"
+      }
+    }
+  },
+  "luRepeatable": "Se puede tomar más de una vez.",
+  "luLevelCount": "Nv {level}  ×{count}",
+  "@luLevelCount": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      },
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "luComplete": "Ya están completas. Tocá una elegida para soltarla y poder cambiarla.",
+  "luRemoveOne": "Quitar una de {name}",
+  "@luRemoveOne": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "luNoExpertiseTargets": "No tenés competencias sobre las que aplicar Pericia.",
+  "luNoProficiencies": "No quedan competencias disponibles para este rasgo.",
+  "luChooseEyebrow": "Elegís vos",
+  "luSubclassIntroTitle": "Tu camino dentro de la clase",
+  "luSubclassIntroBody": "La subclase define nuevos rasgos y decisiones para los próximos niveles. Revisá cada opción antes de continuar.",
+  "luAsiIntroTitle": "Mejora tu personaje",
+  "luAsiIntroBody": "Aumentá tus características o elegí una dote. La decisión se previsualiza antes de modificar la ficha.",
+  "luChoicesIntroTitle": "Tus elecciones de este nivel",
+  "luChoicesIntroBody": "Algunos rasgos te dejan elegir entre varias opciones. Podés revisarlas acá antes de confirmar la subida.",
+  "luProfBodyExpertise": "Duplicás tu bonificador por competencia en las habilidades que elijas. Solo se ofrecen las habilidades en las que ya sos competente.",
+  "luProfBody": "Lo que ya tenés por otra vía queda bloqueado, para no gastar el cupo en algo que ya sabés hacer. En los cupos de Pericia es al revés: solo se ofrecen las habilidades en las que ya sos competente.",
+  "luAlwaysPreparedTitle": "Conjuros que quedan siempre preparados",
+  "luAlwaysPreparedBody": "Estos conjuros no ocupan cupo de preparados y no se pueden desmarcar desde el editor. El pozo ya viene filtrado por lo que el rasgo permite.",
+  "luMagicEyebrow": "Magia",
+  "luYourSpellsAt": "Tus conjuros a nivel {level}",
+  "@luYourSpellsAt": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "luMagicBody": "Revisá los espacios y la cantidad de conjuros preparados. Podés actualizar tu selección sin salir de la subida de nivel.",
+  "luClassOfLevel": "Clase del nivel",
+  "luClassHelper": "Podés continuar con tu clase actual o comenzar una nueva.",
+  "luWhichClass": "¿En qué clase avanzás?",
+  "luClassLevelLine": "{level}° nivel de {name} · dado d{die}",
+  "@luClassLevelLine": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      },
+      "name": {
+        "type": "String"
+      },
+      "die": {
+        "type": "Object"
+      }
+    }
+  },
+  "luMulticlassReq": "No cumplís el requisito de multiclase: {requirement}. La mesa puede autorizarlo.",
+  "@luMulticlassReq": {
+    "placeholders": {
+      "requirement": {
+        "type": "String"
+      }
+    }
+  },
+  "luOverviewHp": "Elegís el promedio o tirás tu d{die}; la Constitución se suma sola.",
+  "@luOverviewHp": {
+    "placeholders": {
+      "die": {
+        "type": "Object"
+      }
+    }
+  },
+  "luTagYouChoose": "ELEGÍS VOS",
+  "luTagOptional": "OPCIONAL",
+  "luTagAuto": "AUTOMÁTICO",
+  "luFeatureChoicesTitle": "Elecciones de rasgos",
+  "luFeatureChoicesBody": "Un rasgo de este nivel te deja elegir entre varias opciones.",
+  "luChooseSubclass": "Elegir subclase",
+  "luChooseSubclassBody": "Define la especialización del personaje y sus rasgos futuros.",
+  "luAsiCardBody": "Repartí una mejora de características o incorporá una dote.",
+  "luReviewSpells": "Revisar conjuros",
+  "luReviewSpellsBody": "Comprobá tus espacios y actualizá los conjuros preparados.",
+  "luLevelUpper": "NIVEL",
+  "luCharacterLevels": "{name} sube a nivel {level}",
+  "@luCharacterLevels": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "luOverviewIntro": "Primero revisaremos qué cambia automáticamente y después resolveremos tus decisiones.",
+  "luOverviewHelp": "Solo aparecen los pasos que le tocan a este personaje en este nivel, así que la lista es distinta cada vez. Nada se guarda en la ficha hasta que confirmes la subida, así que podés rehacer cualquier elección antes de terminar.",
+  "luAutoChanges": "Cambios automáticos",
+  "luDecisions": "Decisiones de esta subida",
+  "luMoreHpTitle": "Más puntos de golpe",
+  "luMoreHpBody": "Elegí el promedio seguro o tirá tu dado de golpe d{die}. La Constitución se suma sola.",
+  "@luMoreHpBody": {
+    "placeholders": {
+      "die": {
+        "type": "Object"
+      }
+    }
+  },
+  "luHitDie": "Dado de golpe d{die}",
+  "@luHitDie": {
+    "placeholders": {
+      "die": {
+        "type": "Object"
+      }
+    }
+  },
+  "luNoResult": "Todavía no hay un resultado.",
+  "luBaseGain": "Ganancia base del nivel: +{hp} PG.",
+  "@luBaseGain": {
+    "placeholders": {
+      "hp": {
+        "type": "Object"
+      }
+    }
+  },
+  "luHpMaxTitle": "PG máximos",
+  "luRollToSee": "Tirá el dado para ver la cuenta.",
+  "luHpDie": "+{hp} del dado",
+  "@luHpDie": {
+    "placeholders": {
+      "hp": {
+        "type": "Object"
+      }
+    }
+  },
+  "luHpCon": "{value} de Constitución",
+  "@luHpCon": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "luHpFeatures": "{value} de tus rasgos",
+  "@luHpFeatures": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "luHpTotal": "{parts} = {total} PG.",
+  "@luHpTotal": {
+    "placeholders": {
+      "parts": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "luHpRecalc": "Si subís Constitución más adelante, se recalcula.",
+  "luAverage": "Promedio ({value})",
+  "@luAverage": {
+    "placeholders": {
+      "value": {
+        "type": "Object"
+      }
+    }
+  },
+  "luRoll": "Tirar",
+  "luRollDie": "Tirar el dado",
+  "luRollAgain": "Volver a tirar",
+  "luChosenEarlier": "Elegidos en niveles anteriores",
+  "luChangeOrKeep": "Podés cambiarlos o dejarlos como están.",
+  "luAutoEyebrow": "Automático",
+  "luFeaturesAt": "Rasgos ganados a nivel {level}",
+  "@luFeaturesAt": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "luFeaturesBody": "Estos rasgos provienen de tu clase y subclase. Se aplicarán automáticamente cuando confirmes la subida.",
+  "luResource": "Recurso",
+  "luClassResource": "Recurso de clase",
+  "luReviewMaxHp": "Puntos de golpe máximos",
+  "luReviewHpNote": "+{hp} en esta subida",
+  "@luReviewHpNote": {
+    "placeholders": {
+      "hp": {
+        "type": "Object"
+      }
+    }
+  },
+  "luReviewProfBonus": "Bonificador por competencia",
+  "luReviewProfBonusNote": "Se aplica a todas las competencias relevantes",
+  "luReviewSlotsNote": "Por nivel de conjuro",
+  "luReviewPreparedNote": "Capacidad del repertorio",
+  "luReviewCantripsNote": "Se lanzan sin gastar espacios",
+  "luReviewAttacks": "Ataques por acción",
+  "luReviewExtraAttack": "Ataque Adicional",
+  "luReviewMasteries": "Maestrías de armas",
+  "luReviewMasteriesNote": "Opciones disponibles",
+  "luReviewSubclassNote": "Nueva especialización",
+  "luFeat": "Dote",
+  "luReviewFeatNote": "Nueva capacidad",
+  "luReviewImproveNote": "Mejora permanente",
+  "luReviewChosenSpells": "Trucos y conjuros elegidos",
+  "luReviewChosenNote": "Selección actualizada",
+  "luFinalEyebrow": "Revisión final",
+  "luFinalTitle": "Así queda {name}",
+  "@luFinalTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "luFinalBody": "Revisá los cambios antes de escribirlos en la ficha. Podés volver a cualquier paso disponible desde la barra superior.",
+  "luIncorporated": "Rasgos incorporados",
+  "luSlotLine": "Nv{level} ×{count}",
+  "@luSlotLine": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      },
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "luSubclassAt": "Subclase (nivel {level})",
+  "@luSubclassAt": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "luSpellsEyebrow": "Conjuros a nivel {level}",
+  "@luSpellsEyebrow": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "luPrepare": "Preparás {count} conjuros",
+  "@luPrepare": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "luCantripsOf": "Trucos: {chosen} de {total}",
+  "@luCantripsOf": {
+    "placeholders": {
+      "chosen": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "luMissingCantrips": "{count, plural, =1{Te falta elegir un truco.} other{Te falta elegir {count} trucos.}}",
+  "@luMissingCantrips": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "luPreparedOf": "Preparados: {chosen} de {total}",
+  "@luPreparedOf": {
+    "placeholders": {
+      "chosen": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "luMissingPrepare": "{count, plural, =1{Te falta preparar un conjuro.} other{Te falta preparar {count} conjuros.}}",
+  "@luMissingPrepare": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "luSpellsUpdated": "Conjuros actualizados",
+  "luPrepareSpells": "Preparar conjuros",
+  "luAsiAt": "Mejora de característica (nivel {level})",
+  "@luAsiAt": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "luImproveAbilities": "Mejorar características",
+  "luTakeFeat": "Tomar dote",
+  "luFeatRaises": "La dote sube una característica (+{amount})",
+  "@luFeatRaises": {
+    "placeholders": {
+      "amount": {
+        "type": "Object"
+      }
+    }
+  },
+  "luFeatCap": "Esta dote llega hasta {max}, no hasta 20 como una mejora normal.",
+  "@luFeatCap": {
+    "placeholders": {
+      "max": {
+        "type": "Object"
+      }
+    }
+  },
+  "luPlusTwo": "+2 a una",
+  "luPlusOneTwo": "+1 a dos",
+  "luPickOneAbility": "Elegí una característica para sumar 2 puntos.",
+  "luPickTwoAbilities": "Elegí dos características distintas para sumar 1 punto a cada una.",
+  "luNoFeats": "No quedan dotes disponibles.",
+  "luSearchFeat": "Buscar dote",
+  "luNameOrEffect": "Nombre o efecto",
+  "luAvailable": "{count} disponibles",
+  "@luAvailable": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "luNoFeatMatch": "Ninguna dote coincide con «{query}».",
+  "@luNoFeatMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "luPickFeatTitle": "Elegí una dote",
+  "luPickFeatBody": "Cada dote cambia cómo se juega el personaje. Seleccioná una para revisar su efecto completo.",
+  "catRaces": "Especies",
+  "catLineages": "Linajes",
+  "catClasses": "Clases",
+  "catSubclasses": "Subclases",
+  "catBackgrounds": "Trasfondos",
+  "catFeats": "Dotes",
+  "codexGroupCharacter": "Personaje",
+  "codexGroupGear": "Magia y equipo",
+  "codexSearchTitle": "Códice · Búsqueda",
+  "codexSectionTitle": "Códice · {section}",
+  "@codexSectionTitle": {
+    "placeholders": {
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "codexCategoriesTooltip": "Categorías del Códice",
+  "codexSearchAll": "Buscar en todo el Códice",
+  "codexHome": "Portada",
+  "codexIntro": "Todo el contenido del juego para leer, sin crear un personaje ni editar nada. Tu homebrew aparece mezclado con el resto, con su marca de procedencia.",
+  "codexNoMatch": "Nada del Códice coincide con «{query}».",
+  "@codexNoMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "codexSeeAll": "Ver las {count} coincidencias en {category}",
+  "@codexSeeAll": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      },
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "codexPickEntry": "Elegí una entrada para leerla.",
+  "codexSearchIn": "Buscar en {category}",
+  "@codexSearchIn": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "codexNothingMatches": "Nada coincide con lo que buscaste.",
+  "codexClearFilters": "Limpiar filtros",
+  "codexBackToList": "Volver al listado",
+  "codexLineageOf": "Linaje de {race}",
+  "@codexLineageOf": {
+    "placeholders": {
+      "race": {
+        "type": "String"
+      }
+    }
+  },
+  "codexLevelN": "nivel {level}",
+  "@codexLevelN": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "codexPickAny": "elegí {count}, cualquiera",
+  "@codexPickAny": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "codexPickFrom": "elegí {count} entre {list}",
+  "@codexPickFrom": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      },
+      "list": {
+        "type": "String"
+      }
+    }
+  },
+  "codexSubclassOf": "Subclase de {klass}",
+  "@codexSubclassOf": {
+    "placeholders": {
+      "klass": {
+        "type": "String"
+      }
+    }
+  },
+  "commonYes": "Sí",
+  "codexCategory": "Categoría",
+  "codexRequirements": "Requisitos",
+  "codexRepeatable": "Repetible",
+  "codexRitual": "{time} o ritual",
+  "@codexRitual": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "codexConcentration": "Concentración, {duration}",
+  "@codexConcentration": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "codexCanPrepare": "Lo pueden preparar",
+  "codexRarityAttune": "{rarity} · sintonización",
+  "@codexRarityAttune": {
+    "placeholders": {
+      "rarity": {
+        "type": "String"
+      }
+    }
+  },
+  "codexRarity": "Rareza",
+  "codexAttunement": "Sintonización",
+  "codexRequires": "Requiere",
+  "codexNotRequired": "No requiere",
+  "codexCharges": "Cargas",
+  "codexWeight": "Peso",
+  "codexPrice": "Precio",
+  "codexMastery": "Maestría",
+  "codexProperties": "Propiedades",
+  "codexAcDex": "{ac} + mod. DES",
+  "@codexAcDex": {
+    "placeholders": {
+      "ac": {
+        "type": "Object"
+      }
+    }
+  },
+  "codexAcDexMax": "{ac} + mod. DES (máx. {max})",
+  "@codexAcDexMax": {
+    "placeholders": {
+      "ac": {
+        "type": "Object"
+      },
+      "max": {
+        "type": "Object"
+      }
+    }
+  },
+  "codexArmorSubtitle": "{category} · CA {ac}",
+  "@codexArmorSubtitle": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      },
+      "ac": {
+        "type": "String"
+      }
+    }
+  },
+  "codexStrength": "Fuerza",
+  "codexStealth": "Sigilo",
+  "codexDisadvantage": "Desventaja",
+  "codexPackOf": "Paquete de",
+  "codexPrereqFeat": "una dote de {category}",
+  "@codexPrereqFeat": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "codexPrereqCast": "lanzar conjuros",
+  "codexPrereqProf": "competencia: {proficiency}",
+  "@codexPrereqProf": {
+    "placeholders": {
+      "proficiency": {
+        "type": "String"
+      }
+    }
+  },
+  "styleDigitalFantasy": "Arte digital de fantasía",
+  "styleClassicOil": "Óleo clásico",
+  "styleComic": "Ilustración de cómic",
+  "styleCinematic": "Realista cinematográfico",
+  "styleWatercolor": "Acuarela",
+  "stylePixelArt": "Pixel art",
+  "stylePencilSketch": "Boceto a lápiz",
+  "styleCustom": "Personalizado",
+  "portraitDefaultError": "No se pudo fijar como predeterminado, pero vale para esta sesión.",
+  "portraitOffline": "Sin conexión con el servidor. La generación requiere red.",
+  "portraitGenerateError": "No se pudo generar: {message}",
+  "@portraitGenerateError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "portraitGenerateFailed": "No se pudo generar",
+  "portraitPickReference": "Elegir imagen de referencia",
+  "portraitReferenceError": "No se pudo elegir la imagen de referencia",
+  "portraitPickImage": "Elegir imagen de retrato",
+  "portraitImportError": "No se pudo importar la imagen",
+  "portraitSaveError": "No se pudo guardar el retrato",
+  "portraitSaved": "Retrato guardado.",
+  "portraitRestored": "Retrato restaurado.",
+  "portraitDeleteTitle": "Borrar retrato",
+  "portraitDeleteBody": "El retrato se borra para siempre y no se puede recuperar.",
+  "portraitDeleteError": "No se pudo borrar el retrato",
+  "portraitDeleted": "Retrato borrado.",
+  "portraitBackToThis": "Volver a este retrato",
+  "portraitDeleteThis": "Borrar este retrato",
+  "portraitCurrent": "Retrato actual",
+  "portraitPrevious": "Retrato anterior {index}",
+  "@portraitPrevious": {
+    "placeholders": {
+      "index": {
+        "type": "Object"
+      }
+    }
+  },
+  "portraitLoadingSettings": "Cargando configuración…",
+  "portraitUseThis": "Usar este retrato",
+  "portraitSavedTitle": "Retratos guardados",
+  "portraitSummoning": "INVOCANDO",
+  "portraitBaseDescription": "DESCRIPCIÓN BASE · AUTOMÁTICA",
+  "portraitUsedPrompt": "PROMPT USADO",
+  "portraitGenerateAi": "Generar con IA",
+  "portraitUpload": "Subir imagen",
+  "portraitNoProviders": "Este servidor no tiene ningún proveedor de generación configurado. Todavía podés subir tu propio retrato.",
+  "portraitEngine": "Motor de generación",
+  "portraitStyle": "Estilo",
+  "portraitCustomStyle": "Estilo personalizado",
+  "portraitExtraDetails": "Detalles adicionales",
+  "portraitAppearance": "Apariencia",
+  "portraitDetailsHint": "Color de pelo, cicatrices, actitud…",
+  "portraitReference": "Imagen de referencia · opcional",
+  "portraitChooseImage": "Elegir imagen…",
+  "portraitRemoveReference": "Quitar referencia",
+  "portraitGenerating": "Generando…",
+  "portraitGenerate": "Generar",
+  "portraitGenerateAgain": "Generar otra vez",
+  "portraitFreeNote": "El servicio gratuito puede tardar hasta ~1 min y genera 2 variantes de a una. Si aparece un error de límite (429), esperá unos segundos y reintentá.",
+  "portraitImporting": "Importando…",
+  "portraitImportTitle": "Importar imagen desde archivo",
+  "portraitImportHint": "Tocá para elegirla. PNG, JPG o WEBP.",
+  "portraitImportNote": "La imagen pasa a ser el retrato del personaje. Podés volver a generar con IA cuando quieras.",
+  "portraitAcceptsReference": "Acepta referencia",
+  "portraitTextOnly": "Solo texto",
+  "portraitPickStyle": "Elegir estilo",
+  "spellEditTitle": "Editar conjuros",
+  "spellEditTitleClass": "Editar conjuros · {klass}",
+  "@spellEditTitleClass": {
+    "placeholders": {
+      "klass": {
+        "type": "String"
+      }
+    }
+  },
+  "spellEditCantrips": "Trucos ({count}/{max})",
+  "@spellEditCantrips": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      },
+      "max": {
+        "type": "Object"
+      }
+    }
+  },
+  "spellEditGrantedCantrips": "Los trucos que ya tenés por otro rasgo no aparecen acá: no ocupan un cupo de truco de clase.",
+  "spellEditPrepared": "Conjuros preparados ({count}/{max})",
+  "@spellEditPrepared": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      },
+      "max": {
+        "type": "Object"
+      }
+    }
+  },
+  "spellEditKnown": "Conjuros conocidos ({count})",
+  "@spellEditKnown": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "spellEditUpTo": "Hasta nivel {level}.",
+  "@spellEditUpTo": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "hbSimple": "Simple",
+  "hbMartial": "Marcial",
+  "hbNoMastery": "Sin maestría",
+  "hbLight": "Ligera",
+  "hbMedium": "Media",
+  "hbHeavy": "Pesada",
+  "hbMundane": "Mundano",
+  "hbFeatOrigin": "De origen",
+  "hbFeatGeneral": "General",
+  "hbFeatFighting": "Estilo de combate",
+  "hbFeatDragonmark": "Marca dracónica",
+  "hbFeatEpic": "Don épico",
+  "sizeSmall": "Pequeño",
+  "sizeMedium": "Mediano",
+  "sizeLarge": "Grande",
+  "catItems": "Objetos",
+  "catCreatures": "Criaturas",
+  "hbAddWeapon": "Agregar arma",
+  "hbAddArmor": "Agregar armadura",
+  "hbAddFeat": "Agregar dote",
+  "hbAddSpecies": "Agregar especie",
+  "hbAddBackground": "Agregar trasfondo",
+  "hbAddSpell": "Agregar conjuro",
+  "hbAddCreature": "Agregar criatura",
+  "hbSaved": "«{name}» se guardó.",
+  "@hbSaved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "hbNoChanges": "No se guardó ningún cambio.",
+  "hbSaveError": "No se pudo guardar el contenido homebrew",
+  "hbNothingToExport": "No hay contenido homebrew para exportar.",
+  "hbExported": "Homebrew exportado ({count, plural, =1{1 entrada} other{{count} entradas}}).",
+  "@hbExported": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hbPickFile": "Elegí un archivo de homebrew (.json)",
+  "hbOverwriteTitle": "Sobrescribir homebrew",
+  "hbOverwriteBody": "{count, plural, =1{1 entrada del archivo comparte} other{{count} entradas del archivo comparten}} id con contenido que ya tenés. Al importar se reemplazarán. ¿Continuar?",
+  "@hbOverwriteBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hbOverwrite": "Sobrescribir",
+  "hbImported": "{count, plural, =1{Se importó 1 entrada de homebrew.} other{Se importaron {count} entradas de homebrew.}}",
+  "@hbImported": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hbImportError": "No se pudo importar el homebrew",
+  "hbLoadIssues": "{count, plural, =1{1 entrada no se pudo cargar} other{{count} entradas no se pudieron cargar}}",
+  "@hbLoadIssues": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hbSkipped": "{count, plural, =1{Se omitió} other{Se omitieron}} al iniciar. El resto de tu homebrew está intacto.",
+  "@hbSkipped": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hbDeleteInvalid": "Borrar entrada inválida",
+  "hbCategoriesTooltip": "Categorías de homebrew",
+  "hbTitleSearch": "Homebrew · Búsqueda",
+  "hbTitleSection": "Homebrew · {section}",
+  "@hbTitleSection": {
+    "placeholders": {
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "hbSearch": "Buscar",
+  "hbMatches": "Coincidencias",
+  "hbYourContent": "Tu contenido",
+  "hbImportFile": "Importar archivo",
+  "hbExportAll": "Exportar todo",
+  "hbNoMatch": "Nada de tu contenido coincide con «{query}».",
+  "@hbNoMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "hbResults": "{count, plural, =1{1 resultado} other{{count} resultados}}",
+  "@hbResults": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hbFor": "para «{query}»",
+  "@hbFor": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "hbWorkshop": "Tu taller",
+  "hbWorkshopIntro": "{count, plural, =1{1 entrada propia} other{{count} entradas propias}}. Todo lo que crees acá se suma al catálogo: aparece en la creación de personajes y en las fichas, igual que el contenido oficial.",
+  "@hbWorkshopIntro": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hbCategories": "Categorías",
+  "hbNothingYet": "Nada todavía.",
+  "hbWorkshopEmpty": "Tu taller está vacío",
+  "hbWorkshopEmptyBody": "Homebrew es contenido tuyo: un arma, un conjuro, una criatura. Se guarda en tu cuenta y se suma al catálogo, al lado del oficial. Armas, armaduras, objetos, conjuros, dotes, especies y trasfondos aparecen en la creación de personajes y en las fichas; las criaturas, en el Bestiario y en Combate.",
+  "hbStartWeapon": "Empezar por un arma",
+  "hbImportAFile": "Importar un archivo",
+  "hbDuplicateFromCatalog": "Duplicar del catálogo",
+  "hbNothingIn": "Todavía no agregaste nada en {category}.",
+  "@hbNothingIn": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "hbDuplicateTitle": "Duplicar {title}",
+  "@hbDuplicateTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "hbDeleteTooltip": "Borrar {title}",
+  "@hbDeleteTooltip": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "hbEffects": "Efectos",
+  "hbRitual": "Ritual",
+  "hbAvailableToCharacters": "Disponible para personajes",
+  "hbKindWeapon": "el arma",
+  "hbKindArmor": "la armadura",
+  "hbKindItem": "el objeto",
+  "hbKindFeat": "la dote",
+  "hbKindSpecies": "la especie",
+  "hbKindBackground": "el trasfondo",
+  "hbKindSpell": "el conjuro",
+  "hbKindCreature": "la criatura",
+  "hbDeleteTitle": "¿Borrar {kind} «{name}»?",
+  "@hbDeleteTitle": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "hbNoUsers": "Ninguna de tus fichas lo está usando.",
+  "hbUsers": "{count, plural, =1{Lo usa 1 ficha:} other{Lo usan {count} fichas:}}",
+  "@hbUsers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hbUsersWarning": "{count, plural, =1{Va a quedar con una advertencia en su ficha.} other{Van a quedar con una advertencia en sus fichas.}}",
+  "@hbUsersWarning": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hbDeleted": "{name} se borró.",
+  "@hbDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "hbDuplicateDialog": "Duplicar {category}",
+  "@hbDuplicateDialog": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "hbSearchCatalog": "Buscar en el catálogo",
+  "hbCatalogNoMatch": "Nada del catálogo coincide con «{query}».",
+  "@hbCatalogNoMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "hbLeaveTitle": "¿Salir sin guardar?",
+  "hbLeaveBody": "Lo que escribiste en «{title}» se pierde.",
+  "@hbLeaveBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "hbKeepEditing": "Seguir editando",
+  "hbLeave": "Salir sin guardar",
+  "hbFixFields": "No se guardó nada: revisá los campos marcados en rojo.",
+  "hbOptionalRule": "Lo demás es opcional",
+  "hbAlreadyChosen": "Lo que ya elegiste",
+  "hbNoNameYet": "Todavía sin nombre",
+  "hbGrantsNothing": "Todavía no concede nada.",
+  "hbDiceRequired": "Escribí un dado, por ejemplo 1d8.",
+  "hbDiceInvalid": "Formato de dado inválido: se espera algo como 1d8.",
+  "hbNumberRequired": "Escribí un número.",
+  "hbIntInvalid": "Tiene que ser un número entero.",
+  "hbRange": "Tiene que estar entre {min} y {max}.",
+  "@hbRange": {
+    "placeholders": {
+      "min": {
+        "type": "Object"
+      },
+      "max": {
+        "type": "Object"
+      }
+    }
+  },
+  "hbWeightRequired": "Escribí un peso, 0 si no cuenta.",
+  "hbNumberInvalid": "Tiene que ser un número.",
+  "hbNegative": "No puede ser negativo.",
+  "hbDamageType": "Tipo de daño",
+  "hbUnknownValue": "{value} (desconocido)",
+  "@hbUnknownValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "hbRangeLongMin": "No puede ser menor que el normal.",
+  "hbNoMasteryRule": "Al que tiene el rasgo Maestría con armas no le suma nada.",
+  "hbNoRange": "Sin alcance",
+  "hbRangeFeet": "{normal}/{long} pies",
+  "@hbRangeFeet": {
+    "placeholders": {
+      "normal": {
+        "type": "String"
+      },
+      "long": {
+        "type": "String"
+      }
+    }
+  },
+  "hbProperty": "Propiedad",
+  "hbNone": "ninguna",
+  "hbNoMasteryLower": "sin maestría",
+  "hbPreviewTitle": "Así queda en tu lista",
+  "hbWeaponHint": "Tocá la categoría, el tipo de daño, una propiedad o la maestría para ver qué hace.",
+  "hbReqWeaponName": "Escribí el nombre del arma.",
+  "hbDamageDie": "Dado de daño",
+  "hbVersatile": "Dado versátil (p.ej. 1d10)",
+  "hbRangeNormal": "Alcance normal (pies)",
+  "hbRangeLong": "Alcance largo (pies)",
+  "hbMasteryMagic": "Maestría y magia",
+  "hbMagicBonus": "Bonificador mágico (+0 a +3)",
+  "hbLegendWeapon": "Descripción (la leyenda del arma)",
+  "hbEconomy": "Economía",
+  "hbNotSet": "sin cargar",
+  "hbWeightLabel": "Peso en libras (0 si no cuenta)",
+  "hbPriceLabel": "Precio en piezas de cobre (1 po = 100)",
+  "hbLegend": "Leyenda",
+  "hbLoaded": "cargada",
+  "hbArmorBaseAc": "CA base",
+  "hbNotFilled": "Sin cargar",
+  "hbDexterity": "Destreza",
+  "hbAddsDex": "Suma Destreza",
+  "hbNoDex": "Sin Destreza",
+  "hbDexCap": "Tope de Destreza",
+  "hbNoCap": "Sin tope",
+  "hbUpTo": "Hasta +{cap}",
+  "@hbUpTo": {
+    "placeholders": {
+      "cap": {
+        "type": "String"
+      }
+    }
+  },
+  "hbDemand": "Exigencia",
+  "hbNoStrReq": "Sin requisito de Fuerza",
+  "hbStrength": "Fuerza {score}",
+  "@hbStrength": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "hbStealthDisadv": "Sigilo con desventaja",
+  "hbNoStealthDisadv": "Sin desventaja en Sigilo",
+  "hbNoDexLower": "sin Destreza",
+  "hbFullDex": "Destreza entera",
+  "hbUpToLower": "hasta +{cap}",
+  "@hbUpToLower": {
+    "placeholders": {
+      "cap": {
+        "type": "String"
+      }
+    }
+  },
+  "hbOnSheet": "En la ficha",
+  "hbAcWithDex": "CA con DES +{dex}",
+  "@hbAcWithDex": {
+    "placeholders": {
+      "dex": {
+        "type": "Object"
+      }
+    }
+  },
+  "hbArmorHint": "Tocá la categoría, la CA o cómo suma la Destreza para ver qué cambia.",
+  "hbReqArmorName": "Escribí el nombre de la armadura.",
+  "hbShieldAc": "CA que suma",
+  "hbHowDex": "Cómo suma la Destreza",
+  "hbAddsDexMod": "Suma modificador de DES",
+  "hbDexCapLabel": "Tope de DES (vacío = sin tope)",
+  "hbDemands": "Exigencias",
+  "hbStrReqLabel": "Requisito de Fuerza (opcional)",
+  "hbStealthLabel": "Desventaja en Sigilo",
+  "hbLegendArmor": "Descripción (la leyenda de la armadura)",
+  "hbNoneCap": "Ninguno",
+  "hbMagic": "Magia",
+  "hbNoAttunement": "Sin sintonización",
+  "hbEffect": "Efecto",
+  "hbBaseItem": "Objeto base",
+  "hbBonusValue": "Bonificador {value}",
+  "@hbBonusValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "hbMoreEffects": "{count, plural, =1{1 efecto más} other{{count} efectos más}}",
+  "@hbMoreEffects": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hbNoneM": "ninguno",
+  "hbItem": "Objeto",
+  "hbItemHint": "Tocá la categoría, la rareza o un efecto para ver qué hace el objeto en la ficha.",
+  "hbReqItemName": "Escribí el nombre del objeto.",
+  "hbWeightShort": "Peso (lb)",
+  "hbPriceCp": "Precio (pc)",
+  "hbMundaneLower": "mundano",
+  "hbRequiresAttunement": "Requiere sintonización",
+  "hbOnlyMagicAttune": "Solo los objetos mágicos se sintonizan.",
+  "hbEffectsEquipped": "Efectos mientras esté equipado",
+  "hbAcBonusLabel": "Bonificador a la Clase de Armadura",
+  "hbResistances": "Resistencias",
+  "hbOtherEffects": "Otros efectos",
+  "hbMagicBonusShort": "Bonificador mágico",
+  "hbAllowedBases": "Bases permitidas",
+  "hbAnyBase": "Sin marcar ninguna, sirve cualquiera de la familia elegida.",
+  "hbOnlyMarked": "Solo se va a poder usar lo que marques acá.",
+  "hbDescription": "Descripción",
+  "hbRepetition": "Repetición",
+  "hbOnce": "Una sola vez",
+  "hbFeatPreview": "Así la ve el jugador",
+  "hbFeatNoDescription": "Sin descripción, el jugador solo ve lo que concede. Una línea que diga qué la hace distinta ayuda a elegirla.",
+  "hbFeatHint": "Tocá la categoría para ver quién puede tomar la dote.",
+  "hbReqFeatName": "Escribí el nombre de la dote.",
+  "hbFeatDistinct": "Qué la hace distinta",
+  "hbGrants": "Qué concede",
+  "hbPrereqRepeat": "Requisitos y repetición",
+  "hbNoPrereq": "sin requisitos",
+  "hbWithPrereq": "con requisitos",
+  "hbRepeatableLower": "repetible",
+  "hbOnceLower": "una vez",
+  "hbRepeatSwitch": "Se puede tomar más de una vez",
+  "hbKeepPrereq": "Conserva el requisito de la dote original.",
+  "hbEffectsCount": "{count, plural, =0{sin efectos} =1{1 efecto} other{{count} efectos}}",
+  "@hbEffectsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hbNoType": "Sin tipo",
+  "hbAmongWhichChooses": "Entre cuáles elige",
+  "hbSizeToChoose": "Tamaño a elegir",
+  "hbAmongAll": "{count} entre todas",
+  "@hbAmongAll": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "hbAmongN": "{count} entre {n}",
+  "@hbAmongN": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      },
+      "n": {
+        "type": "Object"
+      }
+    }
+  },
+  "hbRacePreview": "Cómo se va a ver al crear un personaje",
+  "hbRaceHint": "Tocá el tipo, el tamaño, la velocidad o las habilidades para ver qué implican.",
+  "hbReqRaceName": "Escribí el nombre de la especie.",
+  "hbSpeedFeet": "Velocidad (pies)",
+  "hbPresentation": "Presentación",
+  "hbTaglineLower": "lema",
+  "hbDescriptionLower": "descripción",
+  "hbTaglineLabel": "Lema (una línea, se ve al elegirla)",
+  "hbHowMany": "Cuántas elige",
+  "hbAmongWhich": "Entre cuáles",
+  "hbOnlySize": "solo {size}",
+  "@hbOnlySize": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "hbAllThree": "Las tres del aumento",
+  "hbNoOriginFeat": "Sin dote de origen",
+  "hbNoneF": "Ninguna",
+  "hbIncrease": "Aumento",
+  "hbBgHint": "Tocá las características o la dote de origen para ver qué le dan al personaje.",
+  "hbReqBgName": "Escribí el nombre del trasfondo.",
+  "hbThreeAbilities": "Elegí exactamente tres características.",
+  "hbPick3": "Características · elegí 3",
+  "hbNoneParen": "(ninguna)",
+  "hbTaglineLabelM": "Lema (una línea, se ve al elegirlo)",
+  "hbExtraEffects": "Efectos adicionales",
+  "classWizard": "Mago",
+  "classSorcerer": "Hechicero",
+  "classCleric": "Clérigo",
+  "classDruid": "Druida",
+  "classBard": "Bardo",
+  "classWarlock": "Brujo",
+  "classPaladin": "Paladín",
+  "classRanger": "Explorador",
+  "classArtificer": "Artífice",
+  "compVerbal": "Verbal",
+  "compSomatic": "Somático",
+  "compMaterial": "Material",
+  "hbSchool": "Escuela",
+  "hbCastingTime": "Tiempo de lanzamiento",
+  "hbClassLists": "Listas de clase",
+  "hbComponent": "Componente",
+  "hbSpell": "Conjuro",
+  "hbSpellPreview": "Cómo se va a ver en la ficha",
+  "hbSpellHint": "Tocá el nivel, la escuela, el tiempo de lanzamiento o un componente para ver qué implica.",
+  "hbReqSpellName": "Escribí el nombre del conjuro.",
+  "hbNoSchool": "Sin escuela",
+  "hbRangeExample": "Alcance (p.ej. 60 pies)",
+  "hbMaterialExample": "Material (p.ej. una pizca de ceniza)",
+  "hbConcRitual": "Concentración y ritual",
+  "hbConcentrationLower": "concentración",
+  "hbRitualLower": "ritual",
+  "hbSpellDoes": "Qué hace el conjuro",
+  "hbHitDice": "Dados de golpe",
+  "hbHitDiceRule": "Con dados de golpe cargados, al sumarla a un combate se puede pedir que cada copia tire los suyos.",
+  "hbChallenge": "Desafío",
+  "hbNoCr": "Sin VD",
+  "hbCrValue": "VD {value}",
+  "@hbCrValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "hbOutOfCombat": "Fuera de combate",
+  "hbAlsoCharacters": "También para personajes",
+  "hbOnlyYourCombats": "Solo en tus combates",
+  "hbAvailableRule": "Hoy solo lo mira el pozo de Forma Salvaje: una bestia con valor de desafío puede aparecer entre las formas del druida. Apagado, la criatura vive únicamente en tus combates.",
+  "hbAttackBonus": "Bonificador de ataque",
+  "hbWhenUsed": "Cuándo se usa",
+  "hbCreature": "Criatura",
+  "hbCreaturePreview": "Cómo se va a ver en el Bestiario",
+  "hbCreatureHint": "Tocá el tipo, el tamaño o una acción para ver qué cambia en la mesa.",
+  "hbReqCreatureName": "Escribí el nombre de la criatura.",
+  "hbSpeedHint": "p.ej. 30 pies, volar 60 pies",
+  "hbWillRead": "Se va a leer «{kind}».",
+  "@hbWillRead": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      }
+    }
+  },
+  "hbHitDiceOptional": "Dados de golpe (opcional)",
+  "hbDiceExample": "p.ej. 2d6 + 2",
+  "hbProfile": "Perfil",
+  "hbCrExample": "p.ej. 1/4 o 5",
+  "hbInitHint": "Vacío: el mod. de DES",
+  "hbPassiveOptional": "Percepción pasiva (opcional)",
+  "hbPerRound": "Por ronda",
+  "hbSensesHint": "p.ej. visión en la oscuridad 60 pies",
+  "hbDefenses": "Resistencias, inmunidades y vulnerabilidades",
+  "hbNoTraits": "sin rasgos",
+  "hbTrait": "Rasgo",
+  "hbReqTraitName": "Escribí el nombre del rasgo.",
+  "hbAddTrait": "Agregar rasgo",
+  "hbActionsCount": "{count, plural, =0{sin acciones} =1{1 acción} other{{count} acciones}}",
+  "@hbActionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hbAddAction": "Agregar acción",
+  "hbAlsoCharactersLower": "también para personajes",
+  "hbOnlyYourCombatsLower": "solo en tus combates",
+  "hbAvailableSwitch": "Disponible en la construcción de personajes",
+  "hbReqActionName": "Escribí el nombre de la acción.",
+  "hbAttackBonusLabel": "Bonificador de ataque (vacío = no es ataque)",
+  "hbReachLabel": "Alcance (p.ej. 5 pies)",
+  "hbDamageLabel": "Daño (p.ej. 1d8 + 3)",
+  "hbNoDamage": "Sin daño",
+  "hbActionDescription": "Descripción (lo que pasa además del daño)",
+  "hbCrInvalid": "Se espera un número o una fracción, como 1/4 o 5.",
+  "hbHitDiceInvalid": "Formato inválido: se espera algo como 2d6 + 2.",
+  "effNone": "Sin efectos.",
+  "effRemove": "Quitar efecto",
+  "effAdd": "Agregar efecto",
+  "effKindAbilityBonus": "Bonificador a característica",
+  "effKindSetAbility": "Fijar una característica",
+  "effKindHpPerLevel": "PG máx por nivel",
+  "effKindHpFlat": "PG máx, una vez",
+  "effKindAcBonus": "Bonificador a la CA",
+  "effKindInitiative": "Bonificador a la iniciativa",
+  "effKindSpeedBonus": "Bonificador de velocidad",
+  "effKindSetSpeed": "Fijar la velocidad",
+  "effKindSkillProf": "Competencia en habilidad",
+  "effKindSaveProf": "Competencia en salvación",
+  "effKindSaveBonus": "Bonificador a las salvaciones",
+  "effKindWeaponProf": "Competencia con armas",
+  "effKindArmorProf": "Competencia con armadura",
+  "effKindToolProf": "Competencia con herramienta",
+  "effLanguage": "Idioma",
+  "effKindResistance": "Resistencia a daño",
+  "effKindImmunity": "Inmunidad a daño",
+  "effKindGrantSpell": "Conceder un conjuro",
+  "effKindAlwaysPrepared": "Conjuro siempre preparado",
+  "effKindSpellList": "Sumar un conjuro a tu lista",
+  "effKindGrantFeat": "Conceder una dote",
+  "effKindPassive": "Rasgo pasivo",
+  "effUnitFeet": "Pies",
+  "effUnitRangeFeet": "Alcance en pies",
+  "effUnitValue": "Valor",
+  "effAddsProfBonus": "Suma el bonificador por competencia",
+  "effSkill": "Habilidad",
+  "effHowUsed": "Cómo se usa",
+  "effCastAbility": "Característica para lanzarlo",
+  "effPlayerChoice": "A elección del jugador",
+  "effTraitName": "Nombre del rasgo",
+  "effSpellLevel": "{name} (nivel {level})",
+  "@effSpellLevel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "effAbility": "Característica",
+  "dmCampaignNameRequired": "Poné un nombre para guardarla.",
+  "dmCampaignName": "Nombre de la campaña",
+  "dmPremise": "Premisa",
+  "dmPremiseHint": "El conflicto que pone esta historia en marcha…",
+  "dmNoteTitleRequired": "Poné un título para guardarla.",
+  "dmChapter": "Capítulo",
+  "dmNoteTitleHelper": "Es lo que se ve en el listado y al buscar.",
+  "dmChapterNameRequired": "Poné un nombre para guardarlo.",
+  "dmChapterName": "Nombre del capítulo",
+  "dmChapterGoal": "Objetivo del capítulo",
+  "dmChapterGoalHint": "Qué debería lograr o descubrir la mesa…",
+  "dmChapterGoalHelper": "Una guía breve; el relato va en el Cuaderno.",
+  "dmOnCloseCarry": "Al cerrarlo se llevan",
+  "dmOneLevel": "Un nivel",
+  "dmLevelUpNote": "La subida la hace cada jugador en su ficha.",
+  "dmGoldEach": "Oro para cada personaje",
+  "dmGoldHelper": "Ya repartido: la app no divide el botín.",
+  "dmItems": "Ítems",
+  "dmItemsHint": "Uno por línea…",
+  "dmItemsHelper": "Se los anota cada jugador en su inventario.",
+  "dmEffectsOf": "Efectos de {name}",
+  "@dmEffectsOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dmNoteEffect": "Anotar un efecto",
+  "dmNoteEffectHint": "Marcado por el pícaro…",
+  "dmRemoveTag": "Sacar «{tag}»",
+  "@dmRemoveTag": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "dmBookConditions": "Condiciones del libro",
+  "dmEffectsArePrivate": "Los efectos son tuyos: al jugador no le llega nada, se lo decís en la mesa.",
+  "dmRollInitiative": "Tirar iniciativa",
+  "dmPlayers": "Jugadores",
+  "dmNoPlayers": "Ningún jugador.",
+  "dmMonstersAndNpcs": "Monstruos y PNJ",
+  "dmNoMonstersOrNpcs": "Ningún monstruo ni PNJ.",
+  "dmRoundOneStarts": "Al confirmar arranca la ronda 1.",
+  "dmInitiativeMissing": "Falta la iniciativa de {names}. Si alguien no vino, sacalo del combate: cuando llegue se suma con su tirada.",
+  "@dmInitiativeMissing": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "dmStart": "Empezar",
+  "evtLinked": "{character} se sumó a la campaña {campaign}.",
+  "@evtLinked": {
+    "placeholders": {
+      "character": {
+        "type": "String"
+      },
+      "campaign": {
+        "type": "String"
+      }
+    }
+  },
+  "evtUnlinkedByDm": "{character} ya no forma parte de {campaign}.",
+  "@evtUnlinkedByDm": {
+    "placeholders": {
+      "character": {
+        "type": "String"
+      },
+      "campaign": {
+        "type": "String"
+      }
+    }
+  },
+  "evtUnlinkedByOwner": "{character} salió de tu campaña {campaign}.",
+  "@evtUnlinkedByOwner": {
+    "placeholders": {
+      "character": {
+        "type": "String"
+      },
+      "campaign": {
+        "type": "String"
+      }
+    }
+  },
+  "evtDeletedByOwner": "{character} ya no está disponible en {campaign}.",
+  "@evtDeletedByOwner": {
+    "placeholders": {
+      "character": {
+        "type": "String"
+      },
+      "campaign": {
+        "type": "String"
+      }
+    }
+  },
+  "evtInspiration": "El DM te concedió Inspiración Heroica en {campaign}. Marcala en la ficha de {character}.",
+  "@evtInspiration": {
+    "placeholders": {
+      "campaign": {
+        "type": "String"
+      },
+      "character": {
+        "type": "String"
+      }
+    }
+  },
+  "evtChapterDone": "{character} terminó el capítulo {chapter} en {campaign}.",
+  "@evtChapterDone": {
+    "placeholders": {
+      "character": {
+        "type": "String"
+      },
+      "chapter": {
+        "type": "String"
+      },
+      "campaign": {
+        "type": "String"
+      }
+    }
+  },
+  "evtTakes": "Se lleva {rewards}.",
+  "@evtTakes": {
+    "placeholders": {
+      "rewards": {
+        "type": "String"
+      }
+    }
+  },
+  "evtCanLevelUp": "Podés subir de nivel.",
+  "evtSomeCharacter": "Un personaje",
+  "evtSomeChapter": "Un capítulo",
+  "evtSomeCampaign": "Una campaña",
+  "evtQuoted": "«{text}»",
+  "@evtQuoted": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "sideAlly": "Aliado",
+  "sideEnemy": "Enemigo",
+  "sideNeutral": "Neutral",
+  "kindPlayer": "Jugador",
+  "kindMonster": "Monstruo",
+  "kindNpc": "PNJ",
+  "npcKindNone": "Sin estadísticas",
+  "npcKindBlock": "Bloque propio",
+  "npcKindCharacter": "Ficha de personaje",
+  "npcAlive": "Vivo",
+  "npcDead": "Muerto",
+  "npcUnknown": "Desconocido",
+  "npcBlockLine": "{base} · CA {ac} · PG {hp}",
+  "@npcBlockLine": {
+    "placeholders": {
+      "base": {
+        "type": "String"
+      },
+      "ac": {
+        "type": "String"
+      },
+      "hp": {
+        "type": "String"
+      }
+    }
+  },
+  "npcCharacterLine": "Ficha de personaje · {classes}",
+  "@npcCharacterLine": {
+    "placeholders": {
+      "classes": {
+        "type": "String"
+      }
+    }
+  },
+  "npcNew": "Nuevo PNJ",
+  "npcWhichSheet": "¿Qué ficha lleva?",
+  "npcNewNone": "PNJ sin estadísticas",
+  "npcNewBlock": "PNJ con bloque",
+  "npcNewCharacter": "Personaje jugable",
+  "npcNewNoneHint": "Solo nombre, trasfondo y notas. El tabernero, el alcalde.",
+  "npcNewBlockHint": "Un bloque propio como los del bestiario: copiá el de una criatura y retocalo, o arrancá vacío.",
+  "npcNewCharacterHint": "Pasa por el creador de personajes: especie, clase, niveles y dotes. El villano de un trasfondo.",
+  "npcStartFromCreature": "Partir de una criatura (opcional)",
+  "npcEmptyBlock": "Bloque vacío",
+  "npcFillLater": "Lo completás después.",
+  "npcAcHp": "CA {ac} · PG {hp}",
+  "@npcAcHp": {
+    "placeholders": {
+      "ac": {
+        "type": "String"
+      },
+      "hp": {
+        "type": "String"
+      }
+    }
+  },
+  "npcTypeFixed": "El tipo no se cambia después: define con qué se edita.",
+  "npcContinueToCreator": "Continuar al creador",
+  "npcCreate": "Crear",
+  "shareStop": "Dejar de compartir",
+  "shareStopBody": "El DM de «{campaign}» deja de ver a {character}. Tu ficha no se toca.",
+  "@shareStopBody": {
+    "placeholders": {
+      "campaign": {
+        "type": "String"
+      },
+      "character": {
+        "type": "String"
+      }
+    }
+  },
+  "shareStopped": "Ya no se comparte con {campaign}.",
+  "@shareStopped": {
+    "placeholders": {
+      "campaign": {
+        "type": "String"
+      }
+    }
+  },
+  "shareTitle": "Compartir a {name}",
+  "@shareTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "shareIntro": "Generá un código y pasáselo a tu DM. Lo pega en su campaña y ve tu ficha; nunca puede editarla.",
+  "shareGenerating": "Generando…",
+  "shareGenerate": "Generar código",
+  "shareSharedWith": "Compartido con",
+  "shareCodeNote": "Sirve una sola vez y vence en 24 horas.",
+  "shareCopied": "Código copiado.",
+  "commonCopy": "Copiar",
+  "commonSearching": "Buscando…",
+  "shareNone": "Todavía no lo compartiste con ninguna campaña.",
+  "shareStopWith": "Dejar de compartir con {campaign}",
+  "@shareStopWith": {
+    "placeholders": {
+      "campaign": {
+        "type": "String"
+      }
+    }
+  },
+  "dmAddToCombat": "Sumar al combate",
+  "dmBestiary": "Bestiario",
+  "dmAddShort": "Sumar",
+  "dmSearchBestiary": "Buscar en el bestiario",
+  "dmDeadHere": "Muerto en esta campaña",
+  "dmAlsoJoinsCampaign": "al sumarlo, entra también a la campaña",
+  "dmAlreadyInCombat": "Ya está en el combate",
+  "dmSearchNpcs": "Buscar PNJ",
+  "dmInThisCampaign": "En esta campaña",
+  "dmNoneDot": "Ninguno.",
+  "dmFromLibrary": "De tu biblioteca · no están en esta campaña",
+  "dmLoadingLibrary": "Cargando tu biblioteca…",
+  "dmDeadNote": "{name} está muerto en esta campaña. Sumarlo al combate no cambia eso.",
+  "@dmDeadNote": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dmRevive": "Volvió: marcarlo vivo otra vez",
+  "dmWhichSide": "¿De qué lado pelea?",
+  "dmSide": "Bando",
+  "dmStatlessSide": "Sin estadísticas no tiene PG que bajar: entra neutral, con su turno, y no cuenta para ningún bando.",
+  "dmNoDefaultSide": "Sin valor por defecto: el mismo PNJ puede ser aliado hoy y enemigo la sesión que viene. Un neutral tiene turno y puede tomar partido durante el combate.",
+  "dmOneFewer": "Una copia menos",
+  "dmOneMore": "Una copia más",
+  "dmRollEachHp": "Tirar los PG de cada uno",
+  "dmEachRolls": "Cada copia tira {formula} por su cuenta.",
+  "@dmEachRolls": {
+    "placeholders": {
+      "formula": {
+        "type": "Object"
+      }
+    }
+  },
+  "dmAllStartWith": "Todas arrancan con {hp}, el promedio del libro.",
+  "@dmAllStartWith": {
+    "placeholders": {
+      "hp": {
+        "type": "Object"
+      }
+    }
+  },
+  "dmAddToCombatOf": "Sumar al combate de {campaign}",
+  "@dmAddToCombatOf": {
+    "placeholders": {
+      "campaign": {
+        "type": "String"
+      }
+    }
+  },
+  "chapterStatePlanned": "Próximamente",
+  "chapterStateActive": "En marcha",
+  "chapterStateCompleted": "Completado",
+  "dmAddedToCombat": "Sumaste {what} al combate de {campaign}.",
+  "@dmAddedToCombat": {
+    "placeholders": {
+      "what": {
+        "type": "String"
+      },
+      "campaign": {
+        "type": "String"
+      }
+    }
+  },
+  "dmAddToCombatFailed": "No se pudo sumar al combate",
+  "dmPickCreature": "Elegí una criatura para ver su perfil.",
+  "dmAny": "Cualquiera",
+  "dmSearchCreature": "Buscar criatura",
+  "dmAllTypes": "Todos los tipos",
+  "dmCrFrom": "VD desde",
+  "dmCrTo": "VD hasta",
+  "dmNoCreatureMatches": "Ninguna criatura coincide con lo que buscaste.",
+  "dmCreateCampaignFirst": "Para sumarla a un combate, primero creá una campaña.",
+  "dmChaptersReadFail": "No se pudieron leer los capítulos.",
+  "dmChaptersLoading": "Cargando los capítulos…",
+  "dmChaptersEmpty": "Todavía no dividiste esta campaña en capítulos. Sirven para llevar por dónde va la historia.",
+  "dmCloseChapterBody": "«{name}» pasa a completado y a cada jugador de la mesa le llega el aviso.",
+  "@dmCloseChapterBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dmCloseChapterBodyRewards": "«{name}» pasa a completado y a cada jugador de la mesa le llega el aviso, con que se llevan {rewards}. Eso lo anota cada uno en su ficha: la app no se lo aplica a nadie.",
+  "@dmCloseChapterBodyRewards": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "rewards": {
+        "type": "String"
+      }
+    }
+  },
+  "dmCloseChapter": "Cerrar capítulo",
+  "dmDeleteChapter": "Borrar capítulo",
+  "dmDeleteChapterBody": "Se borra «{name}» y lo que hayas escrito en él. A los jugadores no les llega nada.",
+  "@dmDeleteChapterBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dmLevelsUp": "Sube de nivel",
+  "dmGoalLine": "Objetivo: {goal}",
+  "@dmGoalLine": {
+    "placeholders": {
+      "goal": {
+        "type": "String"
+      }
+    }
+  },
+  "dmRewardsTook": "Se llevaron {rewards}",
+  "@dmRewardsTook": {
+    "placeholders": {
+      "rewards": {
+        "type": "String"
+      }
+    }
+  },
+  "dmRewardsTake": "Se llevan {rewards}",
+  "@dmRewardsTake": {
+    "placeholders": {
+      "rewards": {
+        "type": "String"
+      }
+    }
+  },
+  "dmViewInNotebook": "Ver en Cuaderno",
+  "dmNotebookReadFail": "No se pudo leer el cuaderno.",
+  "dmNotebookLoading": "Cargando el cuaderno…",
+  "dmNotebookNeedsChapter": "El cuaderno se ordena por capítulo, así que primero hay que crear uno. Desde Capítulos.",
+  "dmSearchNotebook": "Buscar en el cuaderno",
+  "dmNoChapter": "Sin capítulo",
+  "dmLooseFights": "Combates que se jugaron sin ningún capítulo en marcha.",
+  "dmDeleteNote": "Borrar nota",
+  "dmDeleteNoteBody": "Se borra «{title}» y no se puede deshacer.",
+  "@dmDeleteNoteBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "dmCombat": "Combate",
+  "dmCombatAgainst": "Combate contra {enemies}",
+  "@dmCombatAgainst": {
+    "placeholders": {
+      "enemies": {
+        "type": "String"
+      }
+    }
+  },
+  "dmDistributed": "Se repartió {grants}.",
+  "@dmDistributed": {
+    "placeholders": {
+      "grants": {
+        "type": "String"
+      }
+    }
+  },
+  "dmNothingNoted": "Todavía no hay nada anotado en este capítulo.",
+  "dmNoEntries": "Sin entradas",
+  "dmNotesCount": "{count, plural, =1{1 nota} other{{count} notas}}",
+  "@dmNotesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dmFightsCount": "{count, plural, =1{1 combate} other{{count} combates}}",
+  "@dmFightsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dmNoteActions": "Acciones de la nota",
+  "dmRounds": "{count, plural, =1{1 ronda} other{{count} rondas}}",
+  "@dmRounds": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dmToday": "hoy",
+  "dmYesterday": "ayer",
+  "dmDaysAgo": "hace {days} días",
+  "@dmDaysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "dmTheTable": "La mesa",
+  "dmLogAllies": "Aliados: {names}.",
+  "@dmLogAllies": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "dmLogNeutrals": "Neutrales: {names}.",
+  "@dmLogNeutrals": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "dmLogNoEnemies": "{who} peleó sin enemigos cargados.",
+  "@dmLogNoEnemies": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      }
+    }
+  },
+  "dmLogNoneFell": "No cayó ningún enemigo.",
+  "dmLogAllFell": "Cayeron todos los enemigos.",
+  "dmLogSomeFell": "Cayeron {defeated} de {total} enemigos.",
+  "@dmLogSomeFell": {
+    "placeholders": {
+      "defeated": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "dmLogAgainst": "{who} contra {against}. {fell}",
+  "@dmLogAgainst": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      },
+      "against": {
+        "type": "String"
+      },
+      "fell": {
+        "type": "String"
+      }
+    }
+  },
+  "dmSheetReadFail": "No se pudo leer la ficha.",
+  "dmSheetGone": "Ya no ves esta ficha. Puede que te hayan cortado el vínculo.",
+  "dmSheetLoading": "Cargando la ficha…",
+  "dmAbbrInit": "Inic",
+  "dmAbbrSpeed": "Vel",
+  "dmAbbrPerception": "Perc.",
+  "dmActiveConditions": "Condiciones activas",
+  "dmProficientSkills": "Habilidades competentes",
+  "dmNoneDotF": "Ninguna.",
+  "dmNoAttacks": "No tiene ataques cargados.",
+  "dmNpcsReadFail": "No se pudieron leer los PNJ de la campaña.",
+  "dmNpcsLoading": "Cargando los PNJ…",
+  "dmNpcsEmpty": "Esta campaña todavía no tiene PNJ. Traé los de tu biblioteca o creá uno nuevo.",
+  "dmBringFromLibrary": "Traer de la biblioteca",
+  "dmTagsCaps": "TAGS",
+  "dmNoNpcWithTag": "Ningún PNJ de esta campaña tiene ese tag.",
+  "dmClearFilter": "Limpiar filtro",
+  "dmStatusOf": "Estado de {name}",
+  "@dmStatusOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dmActionsOf": "Acciones de {name}",
+  "@dmActionsOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dmOpenSheet": "Abrir ficha",
+  "dmRemoveFromCampaign": "Quitar de esta campaña",
+  "dmRemoveFromCampaignNote": "Sigue en tu biblioteca y en tus otras campañas.",
+  "dmLibraryReadFail": "No se pudo leer tu biblioteca de PNJ.",
+  "dmLibraryLoading": "Cargando tus PNJ…",
+  "dmLibraryEmpty": "Tu biblioteca de PNJ está vacía. Creá el primero o importá uno: el de otro DM, o un personaje que exportó un jugador.",
+  "dmNoNpcMatches": "Ningún PNJ coincide con los filtros.",
+  "dmNpcLibrary": "Biblioteca de PNJ",
+  "dmLibraryCount": "{count, plural, =1{1 personaje · compartido entre tus campañas} other{{count} personajes · compartidos entre tus campañas}}",
+  "@dmLibraryCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dmImportNpc": "Importar PNJ",
+  "dmSearchByName": "Buscar por nombre",
+  "dmAllF": "Todas",
+  "dmNoCampaign": "Sin campaña",
+  "dmNoCampaignYet": "Sin campaña todavía",
+  "dmShowName": "Mostrar el nombre",
+  "dmHideName": "Ocultar el nombre",
+  "npcExportTitle": "Exportar PNJ",
+  "npcExportWhatTravels": "Qué viaja en el archivo",
+  "npcExportAlways": "Nombre, retrato, apariencia y «cómo habla»",
+  "npcExportNone": "Su tipo: sin estadísticas",
+  "npcExportBlock": "Su bloque",
+  "npcExportCharacter": "Su ficha de personaje y el homebrew que usa",
+  "npcTagsWord": "Tags",
+  "npcNotesWord": "Notas",
+  "npcNotesNote": "Son de tus mesas.",
+  "npcExportNever": "Nunca viaja en qué campañas está ni si vive o murió en cada una. Quien lo importe recibe su propia copia: lo que cambie después no te llega.",
+  "npcDownloadZip": "Descargar .zip",
+  "npcPickFile": "Elegir el archivo del PNJ o del personaje",
+  "npcNewerVersion": "El archivo viene de una versión más nueva de la app.",
+  "npcImportedHomebrewLate": "El PNJ se importó, pero su homebrew aparece recién al recargar la página.",
+  "npcPortraitsCount": "{count, plural, =1{1 retrato} other{{count} retratos}}",
+  "@npcPortraitsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "npcBackgroundLower": "trasfondo",
+  "npcNotesCount": "{count, plural, =1{1 nota} other{{count} notas}}",
+  "@npcNotesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "npcHomebrewList": "homebrew: {names}",
+  "@npcHomebrewList": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "npcCannotImport": "No se puede importar: su ficha usa contenido que esta instalación no tiene ({missing}).",
+  "@npcCannotImport": {
+    "placeholders": {
+      "missing": {
+        "type": "String"
+      }
+    }
+  },
+  "npcAlsoAddToCampaign": "Sumarlo también a una campaña (opcional)",
+  "npcNoCampaignOption": "Ninguna: queda sin campaña",
+  "npcImportNeverReplaces": "Importar nunca reemplaza nada: si ya tenés un PNJ con ese nombre, quedan los dos.",
+  "npcImporting": "Importando…",
+  "npcSaveFailed": "No se pudo guardar el cambio",
+  "npcEditName": "Editar nombre",
+  "npcNameLabel": "Nombre del PNJ",
+  "npcNewNote": "Nueva nota",
+  "npcAddToCampaign": "Sumar a una campaña",
+  "npcInAllCampaigns": "Ya está en todas tus campañas.",
+  "npcDeleteBodyLibrary": "Se borra de tu biblioteca, con su ficha, su trasfondo, sus notas y sus retratos. No se puede deshacer.",
+  "npcDeleteBodyCampaigns": "Se borra de tu biblioteca y de {campaigns}, con su ficha, su trasfondo, sus notas y sus retratos. No se puede deshacer.",
+  "@npcDeleteBodyCampaigns": {
+    "placeholders": {
+      "campaigns": {
+        "type": "String"
+      }
+    }
+  },
+  "npcDeleteTitle": "Borrar a {name}",
+  "@npcDeleteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "npcDeletePastBattles": "Las batallas pasadas lo siguen nombrando en el Cuaderno. Si está en un combate abierto, su fila queda con el nombre y sin perfil.",
+  "npcDeleteJustUnlink": "¿Solo querés sacarlo de una campaña? Usá «Quitar de esta campaña» desde la lista de PNJ de esa campaña.",
+  "npcDelete": "Borrar PNJ",
+  "npcDeleted": "{name} se borró.",
+  "@npcDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "npcDeleteFailed": "No se pudo borrar el PNJ",
+  "npcShowTable": "Mostrar a la mesa",
+  "npcMoreActions": "Más acciones",
+  "npcExport": "Exportar",
+  "npcReadFail": "No se pudo leer el PNJ.",
+  "npcLoading": "Cargando el PNJ…",
+  "npcGone": "Este PNJ ya no existe.",
+  "npcSpeech": "Cómo habla",
+  "npcSpeechHint": "Una o dos líneas para interpretarlo",
+  "npcSpeechEmpty": "Todavía no dice cómo habla.",
+  "npcNoBackground": "Sin trasfondo.",
+  "npcPortrait": "Retrato",
+  "npcRemoveTag": "Quitar «{tag}»",
+  "@npcRemoveTag": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "npcTagWord": "Tag",
+  "npcEditTitle": "Editar {title}",
+  "@npcEditTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "npcAddNote": "Agregar nota",
+  "npcNoNotes": "Sin notas.",
+  "npcStats": "Estadísticas",
+  "npcNoStatsNote": "Sin estadísticas. En combate entra como neutral, con turno y sin PG.",
+  "npcBlockTitle": "Bloque",
+  "npcBasedOn": "basado en {name}",
+  "@npcBasedOn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dmAbbrHp": "PG",
+  "npcEditBlock": "Editar bloque",
+  "npcBlockCopyNote": "Es una copia: si la criatura del bestiario cambia, este bloque no se toca.",
+  "npcSheetTitle": "Ficha",
+  "npcSheetReadFail": "No se pudo leer su ficha.",
+  "npcOpenFullSheet": "Abrir ficha completa",
+  "npcFullSheetNote": "Nombre, retrato, trasfondo y notas se editan acá; la ficha completa es para estadísticas, equipo y niveles.",
+  "npcInCampaigns": "En tus campañas",
+  "npcNoCampaignsYet": "Todavía no está en ninguna campaña.",
+  "npcStatusIn": "Estado en {campaign}",
+  "@npcStatusIn": {
+    "placeholders": {
+      "campaign": {
+        "type": "String"
+      }
+    }
+  },
+  "npcAddToAnother": "Sumar a otra campaña",
+  "npcAddTag": "Agregar tag",
+  "encReadFail": "No se pudo leer el combate.",
+  "encLoading": "Cargando el combate…",
+  "encNone": "No hay ningún combate en curso.",
+  "encEmptyOrder": "Todavía no hay nadie en el orden. Sumá jugadores o un monstruo para arrancar.",
+  "encPreparing": "Armando el combate",
+  "encPreparingNote": "Todavía nadie tiró iniciativa, y a los jugadores no les aparece nada en su ficha.",
+  "encRound": "Ronda",
+  "encTurnOf": "Turno {turn} de {total}",
+  "@encTurnOf": {
+    "placeholders": {
+      "turn": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "encStandingSemantics": "{what}: {up} de {total} en pie",
+  "@encStandingSemantics": {
+    "placeholders": {
+      "what": {
+        "type": "String"
+      },
+      "up": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "encStanding": "En pie",
+  "encAllies": "Aliados",
+  "encEnemies": "Enemigos",
+  "encNeutralsCount": "{count, plural, =1{1 neutral} other{{count} neutrales}}",
+  "@encNeutralsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "encAmountExplain": "Es el número que aplican los botones de dañar y curar de cualquier fila. Vale para todo el combate.",
+  "encDamageOrHeal": "Daño o curación",
+  "encSetAmount": "Poner {n}",
+  "@encSetAmount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "encDiscard": "Descartar combate",
+  "encFinish": "Terminar combate",
+  "encDiscardTitle": "¿Descartar el combate?",
+  "encDiscardBody": "Todavía no empezó: se borra lo que armaste y no queda registro.",
+  "encDiscardShort": "Descartar",
+  "encInitiativeOf": "Iniciativa de {name}",
+  "@encInitiativeOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "encWhatTheyGot": "Lo que sacó",
+  "encCombatant": "Combatiente",
+  "encEffects": "Efectos",
+  "encDamageHeal": "Daño o cura",
+  "encOfTurn": "Del turno",
+  "encNobodyTurn": "Todavía no le toca a nadie.",
+  "encPlayerTurn": "Le toca a {name}, y su ficha la lleva quien lo juega.",
+  "@encPlayerTurn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "encNoProfile": "No hay perfil cargado para {name}.",
+  "@encNoProfile": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "encTurnNow": "Le toca ahora",
+  "encSideOf": "Bando de {name}",
+  "@encSideOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "encNeutralNoStats": "Neutral · sin estadísticas",
+  "encBackgroundOf": "Trasfondo de {name}",
+  "@encBackgroundOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "encConvertToNpc": "Convertir en PNJ",
+  "encNoEffects": "Nadie tiene efectos anotados. Se anotan desde la fila de cada combatiente.",
+  "encRemoveEffect": "Sacar «{tag}» de {name}",
+  "@encRemoveEffect": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "encNobodyStanding": "No queda nadie en pie.",
+  "encNoEnemyStanding": "No queda ningún enemigo en pie.",
+  "encNoAllyStanding": "No queda ningún aliado en pie.",
+  "encWrapUp": "¿Damos el encuentro por terminado?",
+  "encNotInCombat": "Todavía no están en el combate",
+  "encJoinedLate": "Se sumaron tarde",
+  "encAddAll": "Sumar a todos",
+  "encAddToInitiative": "Sumar a la iniciativa",
+  "encWhatTheyRolled": "Lo que tiró en la mesa",
+  "encCloseExplain": "Se borra el orden de turnos en los dos casos. Si lo terminás queda un registro liviano de lo que pasó (sin PG ni daños: eso lo lleva cada jugador en su ficha). Si lo descartás no queda nada, como si nunca hubiera empezado.",
+  "encAnyDied": "¿Alguno murió?",
+  "encFellNote": "Quedaron a 0 PG. Los que marques pasan a muertos en esta campaña al terminar y guardar.",
+  "encDiscardNoSave": "Descartar sin guardar",
+  "encFinishAndSave": "Terminar y guardar",
+  "encSkips": "Salta",
+  "encTurnWord": "Turno",
+  "encActed": "Actuó",
+  "encFixInitiative": "Corregir iniciativa",
+  "encDownMeta": "Caído · se salta su turno",
+  "encFixedNeutral": "Sin estadísticas: neutral fijo",
+  "encConvertToNpcEllipsis": "Convertir en PNJ…",
+  "encPlayerMeta": "{race} · {klass} · nv {level}",
+  "@encPlayerMeta": {
+    "placeholders": {
+      "race": {
+        "type": "String"
+      },
+      "klass": {
+        "type": "String"
+      },
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "encBloodied": "MALTRECHO",
+  "encOnTheirSheet": "en su ficha",
+  "encHurt": "Dañar",
+  "encHeal": "Curar",
+  "encRemoveFromCombat": "Sacar del combate",
+  "dmNewCampaign": "Nueva campaña",
+  "dmEditCampaign": "Editar campaña",
+  "dmDeleteCampaign": "Borrar campaña",
+  "dmDeleteCampaignBody": "Se borra «{name}» con sus capítulos, las notas del Cuaderno, el combate abierto y el historial de combates. No se puede deshacer.\n\nLos personajes que los jugadores le compartieron se sueltan, y sus fichas siguen siendo de sus dueños. Los PNJ se quedan en tu biblioteca.",
+  "@dmDeleteCampaignBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dmHomebrew": "Homebrew",
+  "dmFinishedGroup": "Terminadas",
+  "dmCurrentCampaign": "Campaña actual",
+  "dmTable": "Mesa",
+  "dmChapters": "Capítulos",
+  "dmNotebook": "Cuaderno",
+  "dmPlayerMode": "Modo Jugador",
+  "dmCampaignsLoadFail": "No se pudieron cargar tus campañas.",
+  "dmOffline": "No hay conexión con el servidor.",
+  "dmOfflineHint": "Tus campañas están a salvo; solo no se pueden leer ahora.",
+  "dmCampaignsLoading": "Cargando campañas…",
+  "dmOnbTitle": "Prepará tu primera mesa",
+  "dmOnbBody": "Todavía no dirigís ninguna campaña. Este espacio reúne lo que necesitás antes y durante la partida.",
+  "dmOnb1Title": "Creá la campaña",
+  "dmOnb1Detail": "Poné nombre a la mesa y resumí su premisa.",
+  "dmOnb2Title": "Sumá los personajes",
+  "dmOnb2Detail": "Cada jugador te comparte su ficha con un código.",
+  "dmOnb3Title": "Dirigí la sesión",
+  "dmOnb3Detail": "Organizá capítulos y llevá la iniciativa del combate.",
+  "dmCreateCampaign": "Crear campaña",
+  "dmAddMember": "Sumar personaje",
+  "dmMemberCodeLabel": "Código que te pasó el jugador",
+  "dmMemberAdded": "{name} se sumó a {campaign}.",
+  "@dmMemberAdded": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "campaign": {
+        "type": "String"
+      }
+    }
+  },
+  "dmRemoveMember": "Echar personaje",
+  "dmRemoveMemberBody": "{name} sale de «{campaign}» y dejás de ver su ficha. El personaje sigue siendo de su dueño y no se toca; puede volver con un código nuevo.",
+  "@dmRemoveMemberBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "campaign": {
+        "type": "String"
+      }
+    }
+  },
+  "dmMemberLeft": "{name} salió de la mesa.",
+  "@dmMemberLeft": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dmInspirationSent": "Le avisamos a {name}. La marca en su ficha.",
+  "@dmInspirationSent": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dmWriteNote": "Escribir nota",
+  "dmEditNote": "Editar nota",
+  "dmNewChapter": "Nuevo capítulo",
+  "dmEditChapter": "Editar capítulo",
+  "dmChapterClosed": "Se cerró «{name}». Les llega el aviso a los jugadores.",
+  "@dmChapterClosed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dmSaveCombatFailed": "No se pudo guardar el combate",
+  "dmNoProfileToCopy": "No hay perfil de esa criatura para copiar.",
+  "dmNowNpc": "{name} ya es un PNJ de tu biblioteca y de esta campaña.",
+  "@dmNowNpc": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dmCombatPreparing": "Combate en preparación",
+  "dmCombatRound": "Combate · ronda {round}",
+  "@dmCombatRound": {
+    "placeholders": {
+      "round": {
+        "type": "int"
+      }
+    }
+  },
+  "dmCampaignActions": "Acciones de campaña",
+  "dmAddingMember": "Sumando personaje…",
+  "dmSetUpCombat": "Armar combate",
+  "dmNextTurn": "Siguiente turno",
+  "dmTableLoading": "Cargando la mesa…",
+  "dmNobodyShared": "Todavía nadie compartió su personaje.",
+  "dmCharactersAtTable": "{count, plural, =1{1 personaje en la mesa} other{{count} personajes en la mesa}}",
+  "@dmCharactersAtTable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dmTableReadFail": "No se pudo leer la mesa.",
+  "dmTableEmpty": "Pedile a cada jugador que abra su personaje, toque Compartir y te pase el código.",
+  "dmHpSemantics": "Puntos de golpe: {current} de {max}",
+  "@dmHpSemantics": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "dmHpShort": "PG {current}/{max}",
+  "@dmHpShort": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "dmGrantInspiration": "Conceder Inspiración Heroica",
+  "dmRemoveFromTable": "Echar de la mesa",
+  "dmAllNpcsInCampaign": "Todos tus PNJ ya están en esta campaña, o todavía no creaste ninguno.",
+  "dmAddCount": "Sumar {count}",
+  "@dmAddCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bootThemeSaveFailed": "El tema cambió, pero no se pudo guardar la preferencia.",
+  "bootLoading": "Cargando datos…",
+  "bootFailed": "No se pudo iniciar la aplicación.",
+  "bootFailedHint": "Suele ser un problema momentáneo de conexión. Probá de nuevo; si sigue igual, recargá la página.",
+  "bootOffline": "No se pudo conectar con el servidor.",
+  "bootOfflineHint": "Tus personajes están a salvo: no se pudieron leer, pero no se perdió nada. Revisá la conexión y reintentá."
+}

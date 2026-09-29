@@ -45,12 +45,18 @@ class _WeaponFormState extends State<WeaponForm> with _GuidedForm {
       _props.contains('ranged') || _props.contains('thrown');
 
   String? _rangeLongValue(String? value) {
-    final error = _intInRange(value, 5, 1000, optional: !_needsRange);
+    final error = _intInRange(
+      context.l10n,
+      value,
+      5,
+      1000,
+      optional: !_needsRange,
+    );
     if (error != null) return error;
     final normal = int.tryParse(_rangeNormal.text.trim());
     final long = int.tryParse((value ?? '').trim());
     return normal != null && long != null && long < normal
-        ? 'No puede ser menor que el normal.'
+        ? context.l10n.hbRangeLongMin
         : null;
   }
 
@@ -92,15 +98,15 @@ class _WeaponFormState extends State<WeaponForm> with _GuidedForm {
         final rule = weaponCategoryRules[_category];
         if (rule == null) return null;
         return _explained(
-          'Categoría',
-          _weaponCategories[_category] ?? _category,
+          context.l10n.codexCategory,
+          _weaponCategories(context.l10n)[_category] ?? _category,
           rule,
         );
       case 'type':
         final type = DamageType.fromId(_type);
         if (type == null) return null;
         return _explained(
-          'Tipo de daño',
+          context.l10n.hbDamageType,
           type.label,
           type.description,
           damageTypeRule,
@@ -108,15 +114,15 @@ class _WeaponFormState extends State<WeaponForm> with _GuidedForm {
       case 'mastery':
         if (_mastery.isEmpty) {
           return _explained(
-            'Maestría',
-            'Sin maestría',
-            'Al que tiene el rasgo Maestría con armas no le suma nada.',
+            context.l10n.codexMastery,
+            context.l10n.hbNoMastery,
+            context.l10n.hbNoMasteryRule,
           );
         }
         final mastery = weaponMasteries[_mastery];
         if (mastery == null) return null;
         return _explained(
-          'Maestría',
+          context.l10n.codexMastery,
           mastery.name,
           mastery.description,
           weaponMasteryRule,
@@ -125,14 +131,20 @@ class _WeaponFormState extends State<WeaponForm> with _GuidedForm {
         final normal = _rangeNormal.text.trim();
         final long = _rangeLong.text.trim();
         return _explained(
-          'Alcance',
-          normal.isEmpty ? 'Sin alcance' : '$normal/$long pies',
+          context.l10n.commonRange,
+          normal.isEmpty
+              ? context.l10n.hbNoRange
+              : context.l10n.hbRangeFeet(normal, long),
           weaponRangeRule,
         );
     }
     final property = weaponProperties[key.substring('prop:'.length)];
     if (property == null) return null;
-    return _explained('Propiedad', property.name, property.description);
+    return _explained(
+      context.l10n.hbProperty,
+      property.name,
+      property.description,
+    );
   }
 
   @override
@@ -149,13 +161,15 @@ class _WeaponFormState extends State<WeaponForm> with _GuidedForm {
       for (final p in weaponProperties.values)
         if (_props.contains(p.id)) p.name,
     ];
-    return names.isEmpty ? 'ninguna' : names.join(', ');
+    return names.isEmpty ? context.l10n.hbNone : names.join(', ');
   }
 
   String get _masterySummary {
     final bonus = int.tryParse(_magicBonus.text.trim()) ?? 0;
     return [
-      _mastery.isEmpty ? 'sin maestría' : weaponMasteryName(_mastery),
+      _mastery.isEmpty
+          ? context.l10n.hbNoMasteryLower
+          : weaponMasteryName(_mastery),
       if (bonus != 0) '+$bonus',
     ].join(' · ');
   }
@@ -164,31 +178,29 @@ class _WeaponFormState extends State<WeaponForm> with _GuidedForm {
   Widget build(BuildContext context) {
     final weapon = _weapon();
     return _FormScaffold(
-      title: 'Arma',
+      title: context.l10n.kindWeapon,
       onSave: _save,
       onInvalid: openAllSections,
       panel: guidePanel(
-        previewTitle: 'Así queda en tu lista',
+        previewTitle: context.l10n.hbPreviewTitle,
         preview: _rowPreview(
           weapon.name,
-          pills: _weaponPills(weapon),
-          stats: _weaponStats(weapon),
+          pills: _weaponPills(context.l10n, weapon),
+          stats: _weaponStats(context.l10n, weapon),
         ),
-        hint:
-            'Tocá la categoría, el tipo de daño, una propiedad o la maestría '
-            'para ver qué hace.',
+        hint: context.l10n.hbWeaponHint,
       ),
       children: [
         _text(
           _name,
-          'Nombre',
-          validator: (v) => _requiredText(v, 'el nombre del arma'),
+          context.l10n.detailsName,
+          validator: (v) => _requiredText(v, context.l10n.hbReqWeaponName),
         ),
         _fieldRow(
           flex: const [3, 2, 3],
           [
             _categoryDropdown(
-              _weaponCategories,
+              _weaponCategories(context.l10n),
               _category,
               (v) => setState(() {
                 _category = v;
@@ -198,8 +210,8 @@ class _WeaponFormState extends State<WeaponForm> with _GuidedForm {
             ),
             _text(
               _dice,
-              'Dado de daño',
-              validator: (v) => _diceValue(v, optional: false),
+              context.l10n.hbDamageDie,
+              validator: (v) => _diceValue(context.l10n, v, optional: false),
             ),
             _damageTypeDropdown(
               _type,
@@ -215,7 +227,7 @@ class _WeaponFormState extends State<WeaponForm> with _GuidedForm {
         ..._optionalRule,
         section(
           icon: Icons.tune,
-          title: 'Propiedades',
+          title: context.l10n.codexProperties,
           summary: _propertiesSummary,
           children: [
             _idChips(
@@ -232,8 +244,8 @@ class _WeaponFormState extends State<WeaponForm> with _GuidedForm {
               const SizedBox(height: 6),
               _text(
                 _versatile,
-                'Dado versátil (p.ej. 1d10)',
-                validator: (v) => _diceValue(v, optional: true),
+                context.l10n.hbVersatile,
+                validator: (v) => _diceValue(context.l10n, v, optional: true),
               ),
             ],
             // Mismo criterio que el dado versátil: un alcance ya cargado se
@@ -245,15 +257,20 @@ class _WeaponFormState extends State<WeaponForm> with _GuidedForm {
               _fieldRow([
                 _text(
                   _rangeNormal,
-                  'Alcance normal (pies)',
+                  context.l10n.hbRangeNormal,
                   number: true,
-                  validator: (v) =>
-                      _intInRange(v, 5, 1000, optional: !_needsRange),
+                  validator: (v) => _intInRange(
+                    context.l10n,
+                    v,
+                    5,
+                    1000,
+                    optional: !_needsRange,
+                  ),
                   onTap: () => focusOn('range'),
                 ),
                 _text(
                   _rangeLong,
-                  'Alcance largo (pies)',
+                  context.l10n.hbRangeLong,
                   number: true,
                   validator: _rangeLongValue,
                   onTap: () => focusOn('range'),
@@ -265,16 +282,16 @@ class _WeaponFormState extends State<WeaponForm> with _GuidedForm {
         ),
         section(
           icon: Icons.auto_awesome,
-          title: 'Maestría y magia',
+          title: context.l10n.hbMasteryMagic,
           summary: _masterySummary,
           children: [
             _fieldRow(
               flex: const [3, 2],
               [
                 _idDropdown(
-                  label: 'Maestría',
+                  label: context.l10n.codexMastery,
                   value: _mastery,
-                  options: _masteryOptions,
+                  options: _masteryOptions(context.l10n),
                   onChanged: (v) => setState(() {
                     _mastery = v;
                     focus = 'mastery';
@@ -283,9 +300,10 @@ class _WeaponFormState extends State<WeaponForm> with _GuidedForm {
                 ),
                 _text(
                   _magicBonus,
-                  'Bonificador mágico (+0 a +3)',
+                  context.l10n.hbMagicBonus,
                   number: true,
-                  validator: (v) => _intInRange(v, 0, 3, optional: false),
+                  validator: (v) =>
+                      _intInRange(context.l10n, v, 0, 3, optional: false),
                 ),
               ],
             ),
@@ -293,7 +311,7 @@ class _WeaponFormState extends State<WeaponForm> with _GuidedForm {
           ],
         ),
         _economySection(this, _weight, _costCp),
-        _legendSection(this, _description, 'la leyenda del arma'),
+        _legendSection(this, _description, context.l10n.hbLegendWeapon),
       ],
     );
   }
@@ -309,9 +327,9 @@ Widget _economySection(
   final cost = int.tryParse(costCp.text.trim()) ?? 0;
   return form.section(
     icon: Icons.paid_outlined,
-    title: 'Economía',
+    title: form.context.l10n.hbEconomy,
     summary: w <= 0 && cost <= 0
-        ? 'sin cargar'
+        ? form.context.l10n.hbNotSet
         : [
             if (w > 0) '${formatPounds(w)} lb',
             if (cost > 0) formatCost(cost),
@@ -320,15 +338,16 @@ Widget _economySection(
       _fieldRow([
         _text(
           weight,
-          'Peso en libras (0 si no cuenta)',
+          form.context.l10n.hbWeightLabel,
           number: true,
-          validator: _weightValue,
+          validator: (v) => _weightValue(form.context.l10n, v),
         ),
         _text(
           costCp,
-          'Precio en piezas de cobre (1 po = 100)',
+          form.context.l10n.hbPriceLabel,
           number: true,
-          validator: (v) => _intInRange(v, 0, 100000000, optional: false),
+          validator: (v) =>
+              _intInRange(form.context.l10n, v, 0, 100000000, optional: false),
         ),
       ]),
     ],
@@ -342,35 +361,37 @@ Widget _legendSection(
   String what,
 ) => form.section(
   icon: Icons.menu_book_outlined,
-  title: 'Leyenda',
-  summary: description.text.trim().isEmpty ? 'sin cargar' : 'cargada',
-  children: [_text(description, 'Descripción ($what)', maxLines: 5)],
+  title: form.context.l10n.hbLegend,
+  summary: description.text.trim().isEmpty
+      ? form.context.l10n.hbNotSet
+      : form.context.l10n.hbLoaded,
+  children: [_text(description, what, maxLines: 5)],
 );
 
 /// Las pills de un arma en la lista. Las comparten la lista y la vista previa
 /// del formulario: si se separaran, la vista previa mostraría otra fila.
-List<String> _weaponPills(Weapon w) => [
-  _weaponCategories[w.category] ?? w.category,
+List<String> _weaponPills(AppLocalizations l10n, Weapon w) => [
+  _weaponCategories(l10n)[w.category] ?? w.category,
   DamageType.labelFor(w.damageType),
   if (w.magicBonus != 0) '+${w.magicBonus}',
   for (final property in w.properties) _weaponPropOptions[property] ?? property,
 ];
 
 /// Las cifras de un arma en la lista, con el mismo motivo que [_weaponPills].
-List<(String, String)> _weaponStats(Weapon w) => [
+List<(String, String)> _weaponStats(AppLocalizations l10n, Weapon w) => [
   (
-    'Daño',
+    l10n.creatureDamage,
     w.versatileDice == null
         ? w.damageDice
         : '${w.damageDice} / ${w.versatileDice}',
   ),
   if (w.rangeNormal > 0)
     (
-      'Alcance',
+      l10n.commonRange,
       w.rangeLong > w.rangeNormal
           ? '${w.rangeNormal}/${w.rangeLong}'
           : '${w.rangeNormal}',
     ),
-  if (w.weight > 0) ('Peso', '${formatPounds(w.weight)} lb'),
-  if (w.costCp > 0) ('Precio', formatCost(w.costCp)),
+  if (w.weight > 0) (l10n.codexWeight, '${formatPounds(w.weight)} lb'),
+  if (w.costCp > 0) (l10n.codexPrice, formatCost(w.costCp)),
 ];

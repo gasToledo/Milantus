@@ -11,6 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'dialog_finders.dart';
 import 'fakes/fake_api_server.dart';
+import 'fakes/localized_app.dart';
 
 void main() {
   late ContentRepository repo;
@@ -29,7 +30,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: HomebrewView(repo: repo, store: HomebrewStore(ApiClient())),
       ),
@@ -101,7 +102,7 @@ void main() {
       );
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: HomebrewView(repo: repo, store: store),
       ),
@@ -134,7 +135,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: HomebrewView(repo: repo, store: HomebrewStore(ApiClient())),
       ),
@@ -171,7 +172,7 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: HomebrewView(repo: repo, store: store, characters: characters),
       ),
@@ -364,7 +365,7 @@ void main() {
       );
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: HomebrewView(repo: repo, store: store),
       ),
@@ -413,7 +414,7 @@ void main() {
       );
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: HomebrewView(repo: repo, store: store),
       ),
@@ -448,7 +449,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: HomebrewView(repo: repo, store: HomebrewStore(ApiClient())),
       ),
@@ -485,7 +486,7 @@ void main() {
     await store.load();
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: HomebrewView(repo: repo, store: store),
       ),
@@ -508,7 +509,7 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: HomebrewView(repo: repo, store: HomebrewStore(ApiClient())),
       ),
@@ -638,7 +639,7 @@ void main() {
 
     Future<void> abrir(Weapon inicial) async {
       await tester.pumpWidget(
-        MaterialApp(
+        localizedApp(
           theme: AppTheme.dark,
           home: Builder(
             builder: (context) => Scaffold(
@@ -741,7 +742,7 @@ void main() {
     Item? guardado;
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: Builder(
           builder: (context) => Scaffold(
@@ -857,7 +858,7 @@ void main() {
     );
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: Builder(
           builder: (context) => Scaffold(
@@ -922,7 +923,7 @@ void main() {
       final store = HomebrewStore(api);
 
       await tester.pumpWidget(
-        MaterialApp(
+        localizedApp(
           theme: AppTheme.dark,
           home: HomebrewView(repo: localRepo, store: store),
         ),
@@ -965,7 +966,7 @@ void main() {
         hpPerLevel: const [10],
       );
       await tester.pumpWidget(
-        MaterialApp(
+        localizedApp(
           theme: AppTheme.dark,
           home: SheetScreen(
             character: character,
@@ -1000,7 +1001,7 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: HomebrewView(repo: repo, store: HomebrewStore(ApiClient())),
       ),
@@ -1041,7 +1042,7 @@ void main() {
       );
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: HomebrewView(repo: repo, store: store),
       ),
@@ -1073,7 +1074,7 @@ void main() {
     addTearDown(tester.view.reset);
     Creature? saved;
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: Builder(
           builder: (context) => Scaffold(
@@ -1185,7 +1186,7 @@ void main() {
     addTearDown(tester.view.reset);
     final effects = [...initial];
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: Scaffold(
           body: EffectEditor(effects: effects, repo: repo, onChanged: () {}),
@@ -1302,7 +1303,7 @@ void main() {
     addTearDown(tester.view.reset);
     T? saved;
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: Builder(
           builder: (context) => Scaffold(

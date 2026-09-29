@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'fakes/fake_api_server.dart';
+import 'fakes/localized_app.dart';
 
 /// Cambio del truco innato desde la ficha (Alto Elfo).
 void main() {
@@ -59,7 +60,7 @@ void main() {
     addTearDown(controller.dispose);
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: SheetScreen(
           character: character,

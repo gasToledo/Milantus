@@ -3,6 +3,7 @@ import 'package:dnd_app/theme/app_theme.dart';
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'fakes/localized_app.dart';
 
 /// El Códice: todo el catálogo para leer, sin crear ni editar nada.
 void main() {
@@ -19,7 +20,7 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: CodexScreen(repo: repo),
       ),
@@ -51,7 +52,7 @@ void main() {
   ) async {
     late BuildContext context;
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: Builder(
           builder: (c) {
@@ -63,7 +64,7 @@ void main() {
     );
     var total = 0;
     for (final category in CodexCategory.values) {
-      for (final e in codexEntries(category, repo)) {
+      for (final e in codexEntries(category, repo, l10nEs)) {
         expect(e.name, isNotEmpty, reason: '${category.name}/${e.id}');
         e.body(context);
         total++;

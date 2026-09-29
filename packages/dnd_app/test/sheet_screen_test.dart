@@ -12,6 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'dialog_finders.dart';
 import 'fakes/fake_api_server.dart';
+import 'fakes/localized_app.dart';
 
 /// Si el `IconButton` con ese tooltip está deshabilitado.
 ///
@@ -55,7 +56,7 @@ void main() {
     );
     addTearDown(controller.dispose);
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: SheetScreen(
           character: character,

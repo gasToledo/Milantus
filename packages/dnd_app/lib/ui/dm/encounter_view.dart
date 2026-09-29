@@ -7,6 +7,7 @@ import '../../theme/app_widgets.dart';
 import 'add_monster_dialog.dart';
 import 'combatant_tags_dialog.dart';
 import 'npcs/npc_shared.dart';
+import '../../l10n/l10n_context.dart';
 
 /// Cómo termina un combate: archivado en el registro de la campaña, o
 /// descartado sin dejar rastro.
@@ -145,19 +146,19 @@ class _EncounterViewState extends State<EncounterView> {
   Widget build(BuildContext context) {
     if (widget.error != null) {
       return AppErrorView(
-        message: 'No se pudo leer el combate.',
+        message: context.l10n.encReadFail,
         details: '${widget.error}',
         onRetry: widget.onRetry,
       );
     }
     if (widget.loading) {
-      return const Center(child: AppBusyLabel('Cargando el combate…'));
+      return Center(child: AppBusyLabel(context.l10n.encLoading));
     }
     final current = widget.encounter;
     if (current == null) {
       return AppEmptyState(
         icon: Icons.local_fire_department_outlined,
-        message: 'No hay ningún combate en curso.',
+        message: context.l10n.encNone,
         actions: const [],
       );
     }
@@ -231,11 +232,7 @@ class _EncounterViewState extends State<EncounterView> {
       ],
       const SizedBox(height: 12),
       if (current.combatants.isEmpty)
-        Text(
-          'Todavía no hay nadie en el orden. Sumá jugadores o un monstruo '
-          'para arrancar.',
-          style: TextStyle(color: pal.textMuted),
-        )
+        Text(context.l10n.encEmptyOrder, style: TextStyle(color: pal.textMuted))
       else
         _ledger(context, current, columns: columns),
       if (unadded.isNotEmpty) ...[
@@ -266,14 +263,13 @@ class _EncounterViewState extends State<EncounterView> {
                 // «Combate» y no «mesa»: en el resto del Modo DM la mesa es el
                 // grupo de jugadores de la campaña, y acá se hablaba de «los
                 // que no están en la mesa» refiriéndose a esos mismos.
-                const Text(
-                  'Armando el combate',
-                  style: TextStyle(fontFamily: 'Georgia', fontSize: 20),
+                Text(
+                  context.l10n.encPreparing,
+                  style: const TextStyle(fontFamily: 'Georgia', fontSize: 20),
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  'Todavía nadie tiró iniciativa, y a los jugadores no les '
-                  'aparece nada en su ficha.',
+                  context.l10n.encPreparingNote,
                   style: TextStyle(fontSize: 12, color: pal.textMuted),
                 ),
               ],
@@ -306,7 +302,7 @@ class _EncounterViewState extends State<EncounterView> {
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [
-              _columnLabel(context, 'Ronda'),
+              _columnLabel(context, context.l10n.encRound),
               const SizedBox(width: 9),
               Text(
                 '${current.round}',
@@ -322,8 +318,10 @@ class _EncounterViewState extends State<EncounterView> {
           ),
           _divider(context),
           Text(
-            'Turno ${turn < 0 ? 1 : turn + 1} de '
-            '${current.combatants.length}',
+            context.l10n.encTurnOf(
+              turn < 0 ? 1 : turn + 1,
+              current.combatants.length,
+            ),
             style: TextStyle(
               fontSize: 12.5,
               color: pal.textMuted,
@@ -349,7 +347,7 @@ class _EncounterViewState extends State<EncounterView> {
     final pal = context.palette;
     Widget side(IconData icon, Color color, int up, int total, String what) {
       return Semantics(
-        label: '$what: $up de $total en pie',
+        label: context.l10n.encStandingSemantics(what, up, total),
         excludeSemantics: true,
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -373,14 +371,14 @@ class _EncounterViewState extends State<EncounterView> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _columnLabel(context, 'En pie'),
+        _columnLabel(context, context.l10n.encStanding),
         const SizedBox(width: 12),
         side(
           Icons.shield_outlined,
           pal.verdant,
           standing.alliesUp,
           standing.allies,
-          'Aliados',
+          context.l10n.encAllies,
         ),
         const SizedBox(width: 12),
         side(
@@ -388,16 +386,14 @@ class _EncounterViewState extends State<EncounterView> {
           pal.crimson,
           standing.enemiesUp,
           standing.enemies,
-          'Enemigos',
+          context.l10n.encEnemies,
         ),
         // Aparte y sin «en pie»: un neutral no gana ni pierde la pelea, y
         // sumarlo a un bando haría mentir al aviso de bando vencido.
         if (standing.neutrals > 0) ...[
           const SizedBox(width: 12),
           Text(
-            standing.neutrals == 1
-                ? '1 neutral'
-                : '${standing.neutrals} neutrales',
+            context.l10n.encNeutralsCount(standing.neutrals),
             style: TextStyle(fontSize: 12, color: pal.textMuted),
           ),
         ],
@@ -413,21 +409,19 @@ class _EncounterViewState extends State<EncounterView> {
   /// contar que la cifra es de toda la mesa y no de una fila, así que eso lo
   /// dice la etiqueta accesible del campo, que es donde se pregunta.
   Widget _quickAmount(BuildContext context) {
-    const explicacion =
-        'Es el número que aplican los botones de dañar y curar de cualquier '
-        'fila. Vale para todo el combate.';
+    final explicacion = context.l10n.encAmountExplain;
     return Wrap(
       crossAxisAlignment: WrapCrossAlignment.center,
       spacing: 10,
       runSpacing: 6,
       children: [
-        _columnLabel(context, 'Daño o curación'),
+        _columnLabel(context, context.l10n.encDamageOrHeal),
         SizedBox(
           width: 56,
           child: Tooltip(
             message: explicacion,
             child: Semantics(
-              label: 'Daño o curación. $explicacion',
+              label: '${context.l10n.encDamageOrHeal}. $explicacion',
               textField: true,
               child: TextField(
                 controller: _amountController,
@@ -443,7 +437,7 @@ class _EncounterViewState extends State<EncounterView> {
         for (final n in const [1, 5, 10])
           ActionChip(
             label: Text('$n'),
-            tooltip: 'Poner $n',
+            tooltip: context.l10n.encSetAmount(n),
             visualDensity: VisualDensity.compact,
             onPressed: () => setState(() {
               _amountController.text = '$n';
@@ -462,7 +456,7 @@ class _EncounterViewState extends State<EncounterView> {
         OutlinedButton.icon(
           onPressed: () => _add(context),
           icon: const Icon(Icons.add),
-          label: const Text('Sumar al combate'),
+          label: Text(context.l10n.dmAddToCombat),
         ),
         // Mientras se arma no hay nada que terminar: «Terminar combate» antes
         // de empezarlo no se entendía, y un registro de un combate que no se
@@ -471,7 +465,7 @@ class _EncounterViewState extends State<EncounterView> {
           OutlinedButton.icon(
             onPressed: () => _confirmDiscard(context),
             icon: const Icon(Icons.close),
-            label: const Text('Descartar combate'),
+            label: Text(context.l10n.encDiscard),
           )
         // Icono + texto y sin carmesí: un banderín rojo suelto se leía como
         // "rendirse". Terminar el combate es el final normal de un encuentro,
@@ -481,7 +475,7 @@ class _EncounterViewState extends State<EncounterView> {
           OutlinedButton.icon(
             onPressed: () => _confirmClose(context),
             icon: const Icon(Icons.done_all),
-            label: const Text('Terminar combate'),
+            label: Text(context.l10n.encFinish),
           ),
       ],
     );
@@ -494,18 +488,16 @@ class _EncounterViewState extends State<EncounterView> {
       builder: (ctx) => AppDialog(
         icon: Icons.warning_amber_rounded,
         iconColor: pal.crimson,
-        title: '¿Descartar el combate?',
-        content: const Text(
-          'Todavía no empezó: se borra lo que armaste y no queda registro.',
-        ),
+        title: context.l10n.encDiscardTitle,
+        content: Text(context.l10n.encDiscardBody),
         actions: [
           DialogAction(
-            'Cancelar',
+            context.l10n.commonCancel,
             keyHint: 'Esc',
             onPressed: () => Navigator.of(ctx).pop(),
           ),
           DialogAction(
-            'Descartar',
+            context.l10n.encDiscardShort,
             primary: true,
             color: pal.crimson,
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -538,8 +530,8 @@ class _EncounterViewState extends State<EncounterView> {
         if (!encounter.isPreparing) {
           final value = await showTextPromptDialog(
             context,
-            title: 'Iniciativa de ${picked.npc.name}',
-            label: 'Lo que sacó',
+            title: context.l10n.encInitiativeOf(picked.npc.name),
+            label: context.l10n.encWhatTheyGot,
             keyboardType: TextInputType.number,
           );
           final parsed = value == null ? null : int.tryParse(value.trim());
@@ -639,17 +631,25 @@ class _EncounterViewState extends State<EncounterView> {
       padding: const EdgeInsets.fromLTRB(14, 9, 14, 9),
       child: Row(
         children: [
-          cell('Inic', _kIniWidth, align: TextAlign.center),
+          cell(context.l10n.dmAbbrInit, _kIniWidth, align: TextAlign.center),
           const SizedBox(width: _kColGap),
-          cell('Combatiente', null),
+          cell(context.l10n.encCombatant, null),
           const SizedBox(width: _kColGap),
-          cell('Puntos de golpe', _kHpWidth),
+          cell(context.l10n.hitPoints, _kHpWidth),
           const SizedBox(width: _kColGap),
-          cell('CA', _kAcWidth, align: TextAlign.center),
+          cell(
+            context.l10n.creatureAcShort,
+            _kAcWidth,
+            align: TextAlign.center,
+          ),
           const SizedBox(width: _kColGap),
-          cell('Efectos', _kTagsWidth),
+          cell(context.l10n.encEffects, _kTagsWidth),
           const SizedBox(width: _kColGap),
-          cell('Daño o cura', _kActionsWidth, align: TextAlign.right),
+          cell(
+            context.l10n.encDamageHeal,
+            _kActionsWidth,
+            align: TextAlign.right,
+          ),
         ],
       ),
     );
@@ -705,13 +705,13 @@ class _EncounterViewState extends State<EncounterView> {
               _tabButton(
                 context,
                 _PanelTab.turno,
-                'Del turno',
+                context.l10n.encOfTurn,
                 Icons.pets_outlined,
               ),
               _tabButton(
                 context,
                 _PanelTab.efectos,
-                'Efectos',
+                context.l10n.encEffects,
                 Icons.label_outline,
                 count: effects.length,
               ),
@@ -806,9 +806,9 @@ class _EncounterViewState extends State<EncounterView> {
     final pal = context.palette;
     final combatant = current.current;
     if (combatant == null) {
-      return const AppEmptyState(
+      return AppEmptyState(
         icon: Icons.hourglass_empty,
-        message: 'Todavía no le toca a nadie.',
+        message: context.l10n.encNobodyTurn,
         actions: [],
       );
     }
@@ -820,9 +820,8 @@ class _EncounterViewState extends State<EncounterView> {
       return AppEmptyState(
         icon: Icons.person_outline,
         message: combatant.kind == CombatantKind.player
-            ? 'Le toca a ${combatant.name}, y su ficha la lleva quien lo '
-                  'juega.'
-            : 'No hay perfil cargado para ${combatant.name}.',
+            ? context.l10n.encPlayerTurn(combatant.name)
+            : context.l10n.encNoProfile(combatant.name),
         actions: const [],
       );
     }
@@ -831,14 +830,16 @@ class _EncounterViewState extends State<EncounterView> {
         ? (npc == null ? null : npcArmorClass(npc.npc, npc.sheet, widget.repo))
         : creature?.ac;
     final subtitle = isNpc
-        ? (npc == null ? 'PNJ' : npcTypeLine(npc.npc, npc.sheet, widget.repo))
+        ? (npc == null
+              ? context.l10n.kindNpc
+              : npcTypeLine(npc.npc, npc.sheet, widget.repo, context.l10n))
         : creature!.kind;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Le toca ahora',
+          context.l10n.encTurnNow,
           style: TextStyle(
             fontSize: 11,
             letterSpacing: 1.6,
@@ -867,17 +868,17 @@ class _EncounterViewState extends State<EncounterView> {
         if (combatant.canChangeSide)
           SideSelector(
             side: combatant.side,
-            label: 'Bando de ${combatant.name}',
+            label: context.l10n.encSideOf(combatant.name),
             onChanged: (side) => widget.onSetSide(combatant.id, side),
           )
         else
           Text(
-            'Neutral · sin estadísticas',
+            context.l10n.encNeutralNoStats,
             style: TextStyle(fontSize: 12, color: pal.textMuted),
           ),
         if (npc != null && npc.npc.speech.trim().isNotEmpty) ...[
           const SizedBox(height: 14),
-          const Eyebrow('Cómo habla'),
+          Eyebrow(context.l10n.npcSpeech),
           Text(
             npc.npc.speech,
             style: const TextStyle(fontStyle: FontStyle.italic, height: 1.4),
@@ -888,7 +889,7 @@ class _EncounterViewState extends State<EncounterView> {
           TextButton.icon(
             onPressed: () => _showBackground(context, npc.npc),
             icon: const Icon(Icons.menu_book_outlined, size: 18),
-            label: const Text('Trasfondo'),
+            label: Text(context.l10n.stepBackground),
           ),
         ],
         const SizedBox(height: 12),
@@ -902,16 +903,18 @@ class _EncounterViewState extends State<EncounterView> {
             children: [
               StatPlaque(
                 dense: true,
-                label: 'Inic',
+                label: context.l10n.dmAbbrInit,
                 value: '${combatant.initiative}',
-                semantics: 'Iniciativa: ${combatant.initiative}',
+                semantics: context.l10n.statInitiativeLabel(
+                  '${combatant.initiative}',
+                ),
               ),
               if (combatant.maxHp > 0) ...[
                 const SizedBox(width: 8),
                 Expanded(
                   child: StatPlaque(
                     dense: true,
-                    label: 'Puntos de golpe',
+                    label: context.l10n.hitPoints,
                     value: '${combatant.currentHp}/${combatant.maxHp}',
                     valueColor: pal.crimson,
                     footer: ThinBar(
@@ -926,9 +929,9 @@ class _EncounterViewState extends State<EncounterView> {
                 const SizedBox(width: 8),
                 StatPlaque(
                   dense: true,
-                  label: 'CA',
+                  label: context.l10n.creatureAcShort,
                   value: ac,
-                  semantics: 'Clase de armadura: $ac',
+                  semantics: context.l10n.armorClassLabel(ac),
                 ),
               ],
             ],
@@ -948,11 +951,11 @@ class _EncounterViewState extends State<EncounterView> {
     return showDialog<void>(
       context: context,
       builder: (ctx) => AppDialog(
-        title: 'Trasfondo de ${npc.name}',
+        title: context.l10n.encBackgroundOf(npc.name),
         content: Text(npc.background, style: const TextStyle(height: 1.45)),
         actions: [
           DialogAction(
-            'Cerrar',
+            context.l10n.commonClose,
             keyHint: 'Esc',
             primary: true,
             onPressed: () => Navigator.of(ctx).pop(),
@@ -965,8 +968,8 @@ class _EncounterViewState extends State<EncounterView> {
   Future<void> _convertToNpc(BuildContext context, Combatant combatant) async {
     final name = await showTextPromptDialog(
       context,
-      title: 'Convertir en PNJ',
-      label: 'Nombre del PNJ',
+      title: context.l10n.encConvertToNpc,
+      label: context.l10n.npcNameLabel,
       current: combatant.name,
       textCapitalization: TextCapitalization.words,
     );
@@ -986,11 +989,9 @@ class _EncounterViewState extends State<EncounterView> {
   ) {
     final pal = context.palette;
     if (effects.isEmpty) {
-      return const AppEmptyState(
+      return AppEmptyState(
         icon: Icons.label_outline,
-        message:
-            'Nadie tiene efectos anotados. Se anotan desde la fila de '
-            'cada combatiente.',
+        message: context.l10n.encNoEffects,
         actions: [],
       );
     }
@@ -1021,7 +1022,10 @@ class _EncounterViewState extends State<EncounterView> {
                   // Distinto del tooltip de la chip de la fila a propósito:
                   // el mismo efecto se puede sacar desde dos lugares y dos
                   // botones con el mismo rótulo no se distinguirían al leerlos.
-                  tooltip: 'Sacar «${effect.tag}» de ${effect.combatant.name}',
+                  tooltip: context.l10n.encRemoveEffect(
+                    effect.tag,
+                    effect.combatant.name,
+                  ),
                   onPressed: () => widget.onSetTags(effect.combatant.id, [
                     for (final t in effect.combatant.tags)
                       if (t != effect.tag) t,
@@ -1090,9 +1094,9 @@ class _EncounterViewState extends State<EncounterView> {
     if (!enemiesWiped && !alliesWiped) return null;
 
     final message = switch ((enemiesWiped, alliesWiped)) {
-      (true, true) => 'No queda nadie en pie.',
-      (true, false) => 'No queda ningún enemigo en pie.',
-      _ => 'No queda ningún aliado en pie.',
+      (true, true) => context.l10n.encNobodyStanding,
+      (true, false) => context.l10n.encNoEnemyStanding,
+      _ => context.l10n.encNoAllyStanding,
     };
 
     final pal = context.palette;
@@ -1115,15 +1119,13 @@ class _EncounterViewState extends State<EncounterView> {
               const SizedBox(width: 8),
               // Flexible y no suelto: el cartel convive con la columna
               // derecha, y ahí el aviso más largo no entra en una línea.
-              Flexible(
-                child: Text('$message ¿Damos el encuentro por terminado?'),
-              ),
+              Flexible(child: Text('$message ${context.l10n.encWrapUp}')),
             ],
           ),
           FilledButton.icon(
             onPressed: () => _confirmClose(context),
             icon: const Icon(Icons.done_all),
-            label: const Text('Terminar combate'),
+            label: Text(context.l10n.encFinish),
           ),
         ],
       ),
@@ -1151,8 +1153,8 @@ class _EncounterViewState extends State<EncounterView> {
               Expanded(
                 child: Text(
                   preparing
-                      ? 'Todavía no están en el combate'
-                      : 'Se sumaron tarde',
+                      ? context.l10n.encNotInCombat
+                      : context.l10n.encJoinedLate,
                   style: TextStyle(fontSize: 12, color: pal.textMuted),
                 ),
               ),
@@ -1170,7 +1172,7 @@ class _EncounterViewState extends State<EncounterView> {
                       );
                     }
                   },
-                  child: const Text('Sumar a todos'),
+                  child: Text(context.l10n.encAddAll),
                 ),
             ],
           ),
@@ -1195,7 +1197,11 @@ class _EncounterViewState extends State<EncounterView> {
                             0,
                           )
                         : _promptInitiative(context, member),
-                    child: Text(preparing ? 'Sumar' : 'Sumar a la iniciativa'),
+                    child: Text(
+                      preparing
+                          ? context.l10n.dmAddShort
+                          : context.l10n.encAddToInitiative,
+                    ),
                   ),
                 ],
               ),
@@ -1211,8 +1217,8 @@ class _EncounterViewState extends State<EncounterView> {
   ) async {
     final value = await showTextPromptDialog(
       context,
-      title: 'Iniciativa de ${member.character.name}',
-      label: 'Lo que tiró en la mesa',
+      title: context.l10n.encInitiativeOf(member.character.name),
+      label: context.l10n.encWhatTheyRolled,
       keyboardType: TextInputType.number,
     );
     final initiative = value == null ? null : int.tryParse(value.trim());
@@ -1226,8 +1232,8 @@ class _EncounterViewState extends State<EncounterView> {
   ) async {
     final value = await showTextPromptDialog(
       context,
-      title: 'Iniciativa de ${combatant.name}',
-      label: 'Iniciativa',
+      title: context.l10n.encInitiativeOf(combatant.name),
+      label: context.l10n.initiative,
       current: '${combatant.initiative}',
       keyboardType: TextInputType.number,
     );
@@ -1263,7 +1269,7 @@ class _EncounterViewState extends State<EncounterView> {
         builder: (ctx, setDialogState) => AppDialog(
           icon: Icons.warning_amber_rounded,
           iconColor: pal.crimson,
-          title: 'Terminar combate',
+          title: context.l10n.encFinish,
           // El carmesí queda para el camino irreversible y nada más. Terminar
           // guardando conserva el registro, así que va en verde heráldico: es
           // la salida esperada del combate, no una pérdida.
@@ -1271,18 +1277,12 @@ class _EncounterViewState extends State<EncounterView> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Se borra el orden de turnos en los dos casos. Si lo terminás '
-                'queda un registro liviano de lo que pasó (sin PG ni daños: eso '
-                'lo lleva cada jugador en su ficha). Si lo descartás no queda '
-                'nada, como si nunca hubiera empezado.',
-              ),
+              Text(context.l10n.encCloseExplain),
               if (fallen.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                const Eyebrow('¿Alguno murió?'),
+                Eyebrow(context.l10n.encAnyDied),
                 Text(
-                  'Quedaron a 0 PG. Los que marques pasan a muertos en esta '
-                  'campaña al terminar y guardar.',
+                  context.l10n.encFellNote,
                   style: TextStyle(fontSize: 12, color: pal.textMuted),
                 ),
                 for (final c in fallen)
@@ -1291,7 +1291,7 @@ class _EncounterViewState extends State<EncounterView> {
                     contentPadding: EdgeInsets.zero,
                     controlAffinity: ListTileControlAffinity.leading,
                     title: Text(c.name),
-                    subtitle: Text(c.side.label),
+                    subtitle: Text(c.side.text(context.l10n)),
                     onChanged: (v) => setDialogState(() {
                       v == true ? dead.add(c.npcId!) : dead.remove(c.npcId);
                     }),
@@ -1301,17 +1301,17 @@ class _EncounterViewState extends State<EncounterView> {
           ),
           actions: [
             DialogAction(
-              'Cancelar',
+              context.l10n.commonCancel,
               keyHint: 'Esc',
               onPressed: () => Navigator.of(ctx).pop(),
             ),
             DialogAction(
-              'Descartar sin guardar',
+              context.l10n.encDiscardNoSave,
               color: pal.crimson,
               onPressed: () => Navigator.of(ctx).pop(_CloseKind.discard),
             ),
             DialogAction(
-              'Terminar y guardar',
+              context.l10n.encFinishAndSave,
               primary: true,
               color: pal.verdant,
               onPressed: () => Navigator.of(ctx).pop(_CloseKind.save),
@@ -1594,9 +1594,9 @@ class _CombatantRow extends StatelessWidget {
     final pal = context.palette;
     final marker = switch (true) {
       _ when preparing => null,
-      _ when combatant.isDown => ('Salta', pal.crimson),
-      _ when active => ('Turno', pal.verdant),
-      _ when acted => ('Actuó', pal.textMuted),
+      _ when combatant.isDown => (context.l10n.encSkips, pal.crimson),
+      _ when active => (context.l10n.encTurnWord, pal.verdant),
+      _ when acted => (context.l10n.encActed, pal.textMuted),
       _ => null,
     };
     final cell = Column(
@@ -1634,7 +1634,7 @@ class _CombatantRow extends StatelessWidget {
     // Tocable para corregir: un número mal tipeado al tirar, o el de un
     // jugador que lo cantó distinto, no tiene otro lugar donde arreglarse.
     return Tooltip(
-      message: 'Corregir iniciativa',
+      message: context.l10n.encFixInitiative,
       child: InkWell(
         onTap: onEditInitiative,
         borderRadius: BorderRadius.circular(8),
@@ -1653,11 +1653,11 @@ class _CombatantRow extends StatelessWidget {
         : repo.creature(combatant.creatureId!);
     final npcEntry = npc;
     final meta = combatant.isDown
-        ? 'Caído · se salta su turno'
+        ? context.l10n.encDownMeta
         : _isPlayer
-        ? _playerMeta()
+        ? _playerMeta(context.l10n)
         : npcEntry != null
-        ? npcTypeLine(npcEntry.npc, npcEntry.sheet, repo)
+        ? npcTypeLine(npcEntry.npc, npcEntry.sheet, repo, context.l10n)
         : _monsterMeta(creature);
 
     return Column(
@@ -1739,16 +1739,16 @@ class _CombatantRow extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        combatant.side.label,
+        combatant.side.text(context.l10n),
         style: TextStyle(fontSize: 11, color: color),
       ),
     );
     if (!combatant.canChangeSide) {
-      return Tooltip(message: 'Sin estadísticas: neutral fijo', child: pill);
+      return Tooltip(message: context.l10n.encFixedNeutral, child: pill);
     }
     final isMonster = combatant.kind == CombatantKind.monster;
     return PopupMenuButton<Object>(
-      tooltip: 'Bando de ${combatant.name}',
+      tooltip: context.l10n.encSideOf(combatant.name),
       onSelected: (value) =>
           value is CombatantSide ? onSetSide(value) : onConvertToNpc(),
       itemBuilder: (context) => [
@@ -1756,13 +1756,13 @@ class _CombatantRow extends StatelessWidget {
           CheckedPopupMenuItem<Object>(
             value: side,
             checked: side == combatant.side,
-            child: Text(side.label),
+            child: Text(side.text(context.l10n)),
           ),
         if (isMonster) ...[
           const PopupMenuDivider(),
-          const PopupMenuItem<Object>(
+          PopupMenuItem<Object>(
             value: 'convertir',
-            child: Text('Convertir en PNJ…'),
+            child: Text(context.l10n.encConvertToNpcEllipsis),
           ),
         ],
       ],
@@ -1773,7 +1773,7 @@ class _CombatantRow extends StatelessWidget {
   /// «Especie · Clase nv N», igual que la tarjeta del roster. Sale del
   /// catálogo y no del `ComputedSheet` por la misma razón que allá: son
   /// nombres de contenido, no reglas calculadas.
-  String _playerMeta() {
+  String _playerMeta(AppLocalizations l10n) {
     final m = member;
     if (m == null) return '';
     final c = m.character;
@@ -1787,7 +1787,7 @@ class _CombatantRow extends StatelessWidget {
           (id) => '${repo.characterClass(id)?.name ?? id} ${c.classLevel(id)}',
         )
         .join(' · ');
-    return '$race · $klass · nv ${c.totalLevel}';
+    return l10n.encPlayerMeta(race, klass, c.totalLevel);
   }
 
   /// Lo que el DM necesita de un monstruo sin abrir nada: con qué pega.
@@ -1840,7 +1840,7 @@ class _CombatantRow extends StatelessWidget {
               const SizedBox(width: 8),
               Flexible(
                 child: Text(
-                  'MALTRECHO',
+                  context.l10n.encBloodied,
                   maxLines: 1,
                   overflow: TextOverflow.fade,
                   softWrap: false,
@@ -1873,14 +1873,14 @@ class _CombatantRow extends StatelessWidget {
         : creature?.ac;
     if (ac == null || ac.isEmpty) return const SizedBox.shrink();
     return Semantics(
-      label: 'Clase de armadura: $ac',
+      label: context.l10n.armorClassLabel(ac),
       excludeSemantics: true,
       // Con rótulo: el número suelto al lado de los PG no decía qué era.
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'CA',
+            context.l10n.creatureAcShort,
             style: TextStyle(
               fontSize: 10,
               letterSpacing: 0.8,
@@ -1917,7 +1917,7 @@ class _CombatantRow extends StatelessWidget {
               for (final t in combatant.tags)
                 if (t != tag) t,
             ]),
-            deleteButtonTooltipMessage: 'Sacar «$tag»',
+            deleteButtonTooltipMessage: context.l10n.dmRemoveTag(tag),
           ),
       ],
     );
@@ -1945,7 +1945,7 @@ class _CombatantRow extends StatelessWidget {
             // de PG va el motivo por el que no está.
             Expanded(
               child: Text(
-                'en su ficha',
+                context.l10n.encOnTheirSheet,
                 textAlign: TextAlign.right,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -1956,20 +1956,20 @@ class _CombatantRow extends StatelessWidget {
           // pero no barra de vida.
           else if (!combatant.isStatless) ...[
             IconButton(
-              tooltip: 'Dañar',
+              tooltip: context.l10n.encHurt,
               visualDensity: VisualDensity.compact,
               onPressed: () => onAdjustHp(-amount()),
               icon: Icon(Icons.remove_circle_outline, color: pal.crimson),
             ),
             IconButton(
-              tooltip: 'Curar',
+              tooltip: context.l10n.encHeal,
               visualDensity: VisualDensity.compact,
               onPressed: () => onAdjustHp(amount()),
               icon: Icon(Icons.add_circle_outline, color: pal.verdant),
             ),
           ],
           IconButton(
-            tooltip: 'Efectos',
+            tooltip: context.l10n.encEffects,
             visualDensity: VisualDensity.compact,
             onPressed: () async {
               final tags = await showCombatantTagsDialog(
@@ -1985,7 +1985,7 @@ class _CombatantRow extends StatelessWidget {
             ),
           ),
           IconButton(
-            tooltip: 'Sacar del combate',
+            tooltip: context.l10n.encRemoveFromCombat,
             visualDensity: VisualDensity.compact,
             onPressed: onRemove,
             icon: const Icon(Icons.close),

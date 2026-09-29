@@ -30,6 +30,7 @@ import 'npcs/npc_library_view.dart';
 import 'npcs/npc_shared.dart';
 import 'npcs/npc_transfer.dart';
 import 'roll_initiative_dialog.dart';
+import '../../l10n/l10n_context.dart';
 
 /// El otro sombrero de la misma cuenta.
 ///
@@ -143,7 +144,7 @@ class _DmModeScreenState extends State<DmModeScreen> {
     final draft = await showCampaignEditorDialog(
       context,
       current: const Campaign(id: 'draft', name: ''),
-      title: 'Nueva campaña',
+      title: context.l10n.dmNewCampaign,
     );
     if (draft == null || !mounted) return;
     try {
@@ -169,7 +170,7 @@ class _DmModeScreenState extends State<DmModeScreen> {
     final updated = await showCampaignEditorDialog(
       context,
       current: campaign,
-      title: 'Editar campaña',
+      title: context.l10n.dmEditCampaign,
     );
     if (updated == null || !mounted) return;
     try {
@@ -188,27 +189,20 @@ class _DmModeScreenState extends State<DmModeScreen> {
       builder: (ctx) => AppDialog(
         icon: Icons.warning_amber_rounded,
         iconColor: context.palette.crimson,
-        title: 'Borrar campaña',
+        title: context.l10n.dmDeleteCampaign,
         // Dice todo lo que se pierde, porque no hay vuelta atrás: en la base,
         // capítulos, notas (que cuelgan de los capítulos) y combates caen en
         // cascada con la campaña. Antes solo nombraba a los personajes, que es
         // justo lo que *no* se pierde.
-        content: Text(
-          'Se borra «${campaign.name}» con sus capítulos, las notas del '
-          'Cuaderno, el combate abierto y el historial de combates. No se '
-          'puede deshacer.\n\n'
-          'Los personajes que los jugadores le compartieron se sueltan, y sus '
-          'fichas siguen siendo de sus dueños. Los PNJ se quedan en tu '
-          'biblioteca.',
-        ),
+        content: Text(context.l10n.dmDeleteCampaignBody(campaign.name)),
         actions: [
           DialogAction(
-            'Cancelar',
+            context.l10n.commonCancel,
             keyHint: 'Esc',
             onPressed: () => Navigator.of(ctx).pop(false),
           ),
           DialogAction(
-            'Borrar campaña',
+            context.l10n.dmDeleteCampaign,
             primary: true,
             color: context.palette.crimson,
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -250,10 +244,10 @@ class _DmModeScreenState extends State<DmModeScreen> {
         }
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Modo DM'),
+            title: Text(context.l10n.dmModeButton),
             actions: [
               IconButton(
-                tooltip: 'Nueva campaña',
+                tooltip: context.l10n.dmNewCampaign,
                 onPressed: _createCampaign,
                 icon: const Icon(Icons.add),
               ),
@@ -288,7 +282,7 @@ class _DmModeScreenState extends State<DmModeScreen> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Modo DM',
+                    context.l10n.dmModeButton,
                     style: TextStyle(
                       fontFamily: 'Georgia',
                       fontSize: 18,
@@ -330,7 +324,7 @@ class _DmModeScreenState extends State<DmModeScreen> {
                     appNavItem(
                       context,
                       icon: Icons.pets_outlined,
-                      label: 'Bestiario',
+                      label: context.l10n.dmBestiary,
                       active:
                           _section == null && _tool == _GlobalTool.bestiario,
                       onTap: () => _selectSection(null, inDrawer: inDrawer),
@@ -342,7 +336,7 @@ class _DmModeScreenState extends State<DmModeScreen> {
                     appNavItem(
                       context,
                       icon: Icons.contacts_outlined,
-                      label: 'Biblioteca de PNJ',
+                      label: context.l10n.dmNpcLibrary,
                       active: _section == null && _tool == _GlobalTool.pnj,
                       onTap: () => _selectSection(
                         null,
@@ -357,7 +351,7 @@ class _DmModeScreenState extends State<DmModeScreen> {
                       appNavItem(
                         context,
                         icon: Icons.auto_fix_high,
-                        label: 'Homebrew',
+                        label: context.l10n.dmHomebrew,
                         active:
                             _section == null && _tool == _GlobalTool.homebrew,
                         onTap: () => _selectSection(
@@ -368,13 +362,13 @@ class _DmModeScreenState extends State<DmModeScreen> {
                       ),
                     const SizedBox(height: 12),
                     if (active.isNotEmpty) ...[
-                      const _CampaignGroupLabel('En curso'),
+                      _CampaignGroupLabel(context.l10n.campaignStateActive),
                       for (final campaign in active)
                         _campaignNavItem(context, campaign, inDrawer: inDrawer),
                     ],
                     if (paused.isNotEmpty) ...[
                       const SizedBox(height: 12),
-                      const _CampaignGroupLabel('En pausa'),
+                      _CampaignGroupLabel(context.l10n.campaignStatePaused),
                       for (final campaign in paused)
                         _campaignNavItem(context, campaign, inDrawer: inDrawer),
                     ],
@@ -396,7 +390,9 @@ class _DmModeScreenState extends State<DmModeScreen> {
                             (campaign) =>
                                 campaign.id == _effectiveSelection?.id,
                           ),
-                          title: const _CampaignGroupLabel('Terminadas'),
+                          title: _CampaignGroupLabel(
+                            context.l10n.dmFinishedGroup,
+                          ),
                           children: [
                             for (final campaign in finished)
                               _campaignNavItem(
@@ -412,11 +408,11 @@ class _DmModeScreenState extends State<DmModeScreen> {
                       const SizedBox(height: 16),
                       Divider(color: pal.hairline, height: 1),
                       const SizedBox(height: 14),
-                      const _CampaignGroupLabel('Campaña actual'),
+                      _CampaignGroupLabel(context.l10n.dmCurrentCampaign),
                       appNavItem(
                         context,
                         icon: Icons.groups_outlined,
-                        label: 'Mesa',
+                        label: context.l10n.dmTable,
                         active: _section == _CampaignSection.mesa,
                         onTap: () => _selectSection(
                           _CampaignSection.mesa,
@@ -426,7 +422,7 @@ class _DmModeScreenState extends State<DmModeScreen> {
                       appNavItem(
                         context,
                         icon: Icons.auto_stories_outlined,
-                        label: 'Capítulos',
+                        label: context.l10n.dmChapters,
                         active: _section == _CampaignSection.capitulos,
                         onTap: () => _selectSection(
                           _CampaignSection.capitulos,
@@ -436,7 +432,7 @@ class _DmModeScreenState extends State<DmModeScreen> {
                       appNavItem(
                         context,
                         icon: Icons.menu_book_outlined,
-                        label: 'Cuaderno',
+                        label: context.l10n.dmNotebook,
                         active: _section == _CampaignSection.cuaderno,
                         onTap: () => _selectSection(
                           _CampaignSection.cuaderno,
@@ -446,7 +442,7 @@ class _DmModeScreenState extends State<DmModeScreen> {
                       appNavItem(
                         context,
                         icon: Icons.groups_2_outlined,
-                        label: 'PNJ',
+                        label: context.l10n.kindNpc,
                         active: _section == _CampaignSection.pnj,
                         onTap: () => _selectSection(
                           _CampaignSection.pnj,
@@ -456,7 +452,7 @@ class _DmModeScreenState extends State<DmModeScreen> {
                       appNavItem(
                         context,
                         icon: Icons.local_fire_department_outlined,
-                        label: 'Combate',
+                        label: context.l10n.dmCombat,
                         active: _section == _CampaignSection.combate,
                         onTap: () => _selectSection(
                           _CampaignSection.combate,
@@ -473,7 +469,7 @@ class _DmModeScreenState extends State<DmModeScreen> {
           OutlinedButton.icon(
             onPressed: _createCampaign,
             icon: const Icon(Icons.add, size: 18),
-            label: const Text('Nueva campaña'),
+            label: Text(context.l10n.dmNewCampaign),
           ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
@@ -492,7 +488,7 @@ class _DmModeScreenState extends State<DmModeScreen> {
               side: BorderSide(color: pal.gold.withAlpha(110)),
               textStyle: const TextStyle(fontSize: 12),
             ),
-            label: const Text('Modo Jugador'),
+            label: Text(context.l10n.dmPlayerMode),
           ),
         ],
       ),
@@ -586,7 +582,7 @@ class _DmModeScreenState extends State<DmModeScreen> {
     }
     if (_loadError != null) {
       return AppErrorView(
-        message: 'No se pudieron cargar tus campañas.',
+        message: context.l10n.dmCampaignsLoadFail,
         details: '$_loadError',
         onRetry: _load,
       );
@@ -597,13 +593,13 @@ class _DmModeScreenState extends State<DmModeScreen> {
         if (_campaigns.loadFailedOffline) {
           return AppErrorView(
             icon: Icons.cloud_off,
-            message: 'No hay conexión con el servidor.',
-            hint: 'Tus campañas están a salvo; solo no se pueden leer ahora.',
+            message: context.l10n.dmOffline,
+            hint: context.l10n.dmOfflineHint,
             onRetry: _load,
           );
         }
         if (_campaigns.isLoading && _campaigns.campaigns.isEmpty) {
-          return const Center(child: AppBusyLabel('Cargando campañas…'));
+          return Center(child: AppBusyLabel(context.l10n.dmCampaignsLoading));
         }
         if (_campaigns.campaigns.isEmpty) {
           return _DmOnboardingState(onCreate: _createCampaign);
@@ -675,38 +671,36 @@ class _DmOnboardingState extends StatelessWidget {
               children: [
                 Icon(Icons.shield_moon_outlined, color: pal.gold, size: 32),
                 const SizedBox(height: 16),
-                const Text(
-                  'Prepará tu primera mesa',
-                  style: TextStyle(fontFamily: 'Georgia', fontSize: 26),
+                Text(
+                  context.l10n.dmOnbTitle,
+                  style: const TextStyle(fontFamily: 'Georgia', fontSize: 26),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Todavía no dirigís ninguna campaña. Este espacio reúne lo '
-                  'que necesitás antes y durante la partida.',
+                  context.l10n.dmOnbBody,
                   style: TextStyle(color: pal.textMuted),
                 ),
                 const SizedBox(height: 22),
-                const _OnboardingStep(
+                _OnboardingStep(
                   number: '1',
-                  title: 'Creá la campaña',
-                  detail: 'Poné nombre a la mesa y resumí su premisa.',
+                  title: context.l10n.dmOnb1Title,
+                  detail: context.l10n.dmOnb1Detail,
                 ),
-                const _OnboardingStep(
+                _OnboardingStep(
                   number: '2',
-                  title: 'Sumá los personajes',
-                  detail: 'Cada jugador te comparte su ficha con un código.',
+                  title: context.l10n.dmOnb2Title,
+                  detail: context.l10n.dmOnb2Detail,
                 ),
-                const _OnboardingStep(
+                _OnboardingStep(
                   number: '3',
-                  title: 'Dirigí la sesión',
-                  detail:
-                      'Organizá capítulos y llevá la iniciativa del combate.',
+                  title: context.l10n.dmOnb3Title,
+                  detail: context.l10n.dmOnb3Detail,
                 ),
                 const SizedBox(height: 22),
                 FilledButton.icon(
                   onPressed: onCreate,
                   icon: const Icon(Icons.add),
-                  label: const Text('Crear campaña'),
+                  label: Text(context.l10n.dmCreateCampaign),
                 ),
               ],
             ),
@@ -956,8 +950,8 @@ class _CampaignDetailState extends State<_CampaignDetail> {
   Future<void> _addMember() async {
     final code = await showTextPromptDialog(
       context,
-      title: 'Sumar personaje',
-      label: 'Código que te pasó el jugador',
+      title: context.l10n.dmAddMember,
+      label: context.l10n.dmMemberCodeLabel,
       // El código viaja en mayúsculas y el servidor lo normaliza igual, pero
       // verlo tal cual se dictó evita la duda de si se tipeó bien.
       textCapitalization: TextCapitalization.characters,
@@ -974,7 +968,7 @@ class _CampaignDetailState extends State<_CampaignDetail> {
       if (!mounted) return;
       showAppMessage(
         context,
-        '${member.character.name} se sumó a ${widget.campaign.name}.',
+        context.l10n.dmMemberAdded(member.character.name, widget.campaign.name),
         tone: AppMessageTone.success,
       );
       _checkEventsSoon();
@@ -1002,20 +996,21 @@ class _CampaignDetailState extends State<_CampaignDetail> {
       builder: (ctx) => AppDialog(
         icon: Icons.warning_amber_rounded,
         iconColor: context.palette.crimson,
-        title: 'Echar personaje',
+        title: context.l10n.dmRemoveMember,
         content: Text(
-          '${member.character.name} sale de «${widget.campaign.name}» y dejás '
-          'de ver su ficha. El personaje sigue siendo de su dueño y no se '
-          'toca; puede volver con un código nuevo.',
+          context.l10n.dmRemoveMemberBody(
+            member.character.name,
+            widget.campaign.name,
+          ),
         ),
         actions: [
           DialogAction(
-            'Cancelar',
+            context.l10n.commonCancel,
             keyHint: 'Esc',
             onPressed: () => Navigator.of(ctx).pop(false),
           ),
           DialogAction(
-            'Echar personaje',
+            context.l10n.dmRemoveMember,
             primary: true,
             color: context.palette.crimson,
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -1029,7 +1024,10 @@ class _CampaignDetailState extends State<_CampaignDetail> {
       await widget.api.deleteCampaignLink(member.memberId);
       await _loadMembers();
       if (mounted) {
-        showAppMessage(context, '${member.character.name} salió de la mesa.');
+        showAppMessage(
+          context,
+          context.l10n.dmMemberLeft(member.character.name),
+        );
         _checkEventsSoon();
       }
     } on ApiException catch (e) {
@@ -1054,7 +1052,7 @@ class _CampaignDetailState extends State<_CampaignDetail> {
       if (!mounted) return;
       showAppMessage(
         context,
-        'Le avisamos a ${member.character.name}. La marca en su ficha.',
+        context.l10n.dmInspirationSent(member.character.name),
         tone: AppMessageTone.success,
       );
     } on ApiException catch (e) {
@@ -1134,7 +1132,7 @@ class _CampaignDetailState extends State<_CampaignDetail> {
       context,
       current: Note(id: _newId('note'), chapterId: target.id),
       chapters: chapters,
-      title: 'Escribir nota',
+      title: context.l10n.dmWriteNote,
     );
     if (draft == null) return;
     await _noteAction(() => widget.api.createNote(widget.campaign.id, draft));
@@ -1145,7 +1143,7 @@ class _CampaignDetailState extends State<_CampaignDetail> {
       context,
       current: note,
       chapters: _chapters ?? const <Chapter>[],
-      title: 'Editar nota',
+      title: context.l10n.dmEditNote,
     );
     if (updated == null) return;
     await _noteAction(() => widget.api.updateNote(widget.campaign.id, updated));
@@ -1179,7 +1177,7 @@ class _CampaignDetailState extends State<_CampaignDetail> {
     final draft = await showChapterEditorDialog(
       context,
       current: Chapter(id: _newId('chapter'), name: ''),
-      title: 'Nuevo capítulo',
+      title: context.l10n.dmNewChapter,
     );
     if (draft == null) return;
     await _chapterAction(
@@ -1191,7 +1189,7 @@ class _CampaignDetailState extends State<_CampaignDetail> {
     final edited = await showChapterEditorDialog(
       context,
       current: chapter,
-      title: 'Editar capítulo',
+      title: context.l10n.dmEditChapter,
     );
     if (edited == null) return;
     await _chapterAction(
@@ -1213,7 +1211,7 @@ class _CampaignDetailState extends State<_CampaignDetail> {
     if (cerrado && mounted) {
       showAppMessage(
         context,
-        'Se cerró «${chapter.name}». Les llega el aviso a los jugadores.',
+        context.l10n.dmChapterClosed(chapter.name),
         tone: AppMessageTone.success,
       );
     }
@@ -1274,7 +1272,7 @@ class _CampaignDetailState extends State<_CampaignDetail> {
     if (!mounted) return;
     showAppMessage(
       context,
-      failureMessage('No se pudo guardar el combate', error),
+      failureMessage(context.l10n.dmSaveCombatFailed, error),
       tone: AppMessageTone.error,
     );
   }
@@ -1409,7 +1407,7 @@ class _CampaignDetailState extends State<_CampaignDetail> {
     if (combatant == null || creature == null) {
       showAppMessage(
         context,
-        'No hay perfil de esa criatura para copiar.',
+        context.l10n.dmNoProfileToCopy,
         tone: AppMessageTone.error,
       );
       return;
@@ -1448,7 +1446,7 @@ class _CampaignDetailState extends State<_CampaignDetail> {
     if (mounted) {
       showAppMessage(
         context,
-        '$name ya es un PNJ de tu biblioteca y de esta campaña.',
+        context.l10n.dmNowNpc(name),
         tone: AppMessageTone.success,
       );
     }
@@ -1634,7 +1632,7 @@ class _CampaignDetailState extends State<_CampaignDetail> {
                               ),
                             ),
                             GoldPill(
-                              widget.campaign.state.label,
+                              widget.campaign.state.localized(context),
                               highlighted:
                                   widget.campaign.state == CampaignState.active,
                             ),
@@ -1676,8 +1674,10 @@ class _CampaignDetailState extends State<_CampaignDetail> {
                                 // Mientras se arma no hay ronda: «ronda 1» al
                                 // lado de «Armando el combate» se contradecía.
                                 text: encounter.isPreparing
-                                    ? 'Combate en preparación'
-                                    : 'Combate · ronda ${encounter.round}',
+                                    ? context.l10n.dmCombatPreparing
+                                    : context.l10n.dmCombatRound(
+                                        encounter.round,
+                                      ),
                                 highlighted: true,
                               ),
                           ],
@@ -1689,7 +1689,7 @@ class _CampaignDetailState extends State<_CampaignDetail> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       PopupMenuButton<_CampaignMenuAction>(
-                        tooltip: 'Acciones de campaña',
+                        tooltip: context.l10n.dmCampaignActions,
                         onSelected: (action) {
                           switch (action) {
                             case _CampaignMenuAction.edit:
@@ -1699,12 +1699,12 @@ class _CampaignDetailState extends State<_CampaignDetail> {
                           }
                         },
                         itemBuilder: (context) => [
-                          const PopupMenuItem(
+                          PopupMenuItem(
                             value: _CampaignMenuAction.edit,
                             child: ListTile(
                               contentPadding: EdgeInsets.zero,
-                              leading: Icon(Icons.edit_outlined),
-                              title: Text('Editar campaña'),
+                              leading: const Icon(Icons.edit_outlined),
+                              title: Text(context.l10n.dmEditCampaign),
                             ),
                           ),
                           PopupMenuItem(
@@ -1716,7 +1716,7 @@ class _CampaignDetailState extends State<_CampaignDetail> {
                                 color: pal.crimson,
                               ),
                               title: Text(
-                                'Borrar campaña',
+                                context.l10n.dmDeleteCampaign,
                                 style: TextStyle(color: pal.crimson),
                               ),
                             ),
@@ -1734,9 +1734,9 @@ class _CampaignDetailState extends State<_CampaignDetail> {
           },
         ),
         if (_busy)
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24),
-            child: AppBusyLabel('Sumando personaje…'),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: AppBusyLabel(context.l10n.dmAddingMember),
           ),
         Expanded(
           child: switch (widget.section) {
@@ -1822,12 +1822,12 @@ class _CampaignDetailState extends State<_CampaignDetail> {
       _CampaignSection.mesa => FilledButton.icon(
         onPressed: _busy ? null : _addMember,
         icon: const Icon(Icons.person_add_alt),
-        label: const Text('Sumar personaje'),
+        label: Text(context.l10n.dmAddMember),
       ),
       _CampaignSection.capitulos => FilledButton.icon(
         onPressed: _chaptersLoading ? null : _createChapter,
         icon: const Icon(Icons.add),
-        label: const Text('Nuevo capítulo'),
+        label: Text(context.l10n.dmNewChapter),
       ),
       // Sin capítulos no hay dónde colgar una nota, y la propia sección lo
       // explica: el botón se apaga en vez de abrir un diálogo sin destino.
@@ -1836,12 +1836,12 @@ class _CampaignDetailState extends State<_CampaignDetail> {
             ? null
             : _createNote,
         icon: const Icon(Icons.add),
-        label: const Text('Escribir nota'),
+        label: Text(context.l10n.dmWriteNote),
       ),
       _CampaignSection.pnj => FilledButton.icon(
         onPressed: _createNpc,
         icon: const Icon(Icons.add),
-        label: const Text('Nuevo PNJ'),
+        label: Text(context.l10n.npcNew),
       ),
       _CampaignSection.combate when _encounter == null => FilledButton.icon(
         // Sin haber podido leer el combate no se sabe si hay uno en curso, y
@@ -1850,7 +1850,7 @@ class _CampaignDetailState extends State<_CampaignDetail> {
             ? null
             : _startEncounter,
         icon: const Icon(Icons.local_fire_department_outlined),
-        label: const Text('Armar combate'),
+        label: Text(context.l10n.dmSetUpCombat),
       ),
       // Mientras se arma la mesa, la acción principal es tirar iniciativa: es
       // lo que la pone a jugar. Recién ahí aparece «Siguiente turno».
@@ -1858,43 +1858,39 @@ class _CampaignDetailState extends State<_CampaignDetail> {
         FilledButton.icon(
           onPressed: _encounter!.combatants.isEmpty ? null : _rollInitiative,
           icon: const Icon(Icons.casino_outlined),
-          label: const Text('Tirar iniciativa'),
+          label: Text(context.l10n.dmRollInitiative),
         ),
       _ => FilledButton.icon(
         onPressed: _encounter!.combatants.isEmpty ? null : _nextTurn,
         icon: const Icon(Icons.skip_next),
-        label: const Text('Siguiente turno'),
+        label: Text(context.l10n.dmNextTurn),
       ),
     };
   }
 
   String _summary() {
     final count = _members?.length;
-    if (count == null) return 'Cargando la mesa…';
-    if (count == 0) return 'Todavía nadie compartió su personaje.';
-    return count == 1
-        ? '1 personaje en la mesa'
-        : '$count personajes en la mesa';
+    if (count == null) return context.l10n.dmTableLoading;
+    if (count == 0) return context.l10n.dmNobodyShared;
+    return context.l10n.dmCharactersAtTable(count);
   }
 
   Widget _roster(BuildContext context) {
     if (_error != null) {
       return AppErrorView(
-        message: 'No se pudo leer la mesa.',
+        message: context.l10n.dmTableReadFail,
         details: '$_error',
         onRetry: _loadMembers,
       );
     }
     final members = _members;
     if (members == null) {
-      return const Center(child: AppBusyLabel('Cargando la mesa…'));
+      return Center(child: AppBusyLabel(context.l10n.dmTableLoading));
     }
     if (members.isEmpty) {
       return AppEmptyState(
         icon: Icons.person_add_alt,
-        message:
-            'Pedile a cada jugador que abra su personaje, toque Compartir y '
-            'te pase el código.',
+        message: context.l10n.dmTableEmpty,
         actions: const [],
       );
     }
@@ -2092,7 +2088,10 @@ class _MemberCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  GoldPill('Nivel ${character.level}', highlighted: false),
+                  GoldPill(
+                    context.l10n.commonLevel(character.level),
+                    highlighted: false,
+                  ),
                 ],
               ),
               const SizedBox(height: 2),
@@ -2108,7 +2107,7 @@ class _MemberCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Semantics(
-                      label: 'Puntos de golpe: $currentHp de $maxHp',
+                      label: context.l10n.dmHpSemantics(currentHp, maxHp),
                       excludeSemantics: true,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2122,7 +2121,7 @@ class _MemberCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 5),
                               Text(
-                                'PG $currentHp/$maxHp',
+                                context.l10n.dmHpShort(currentHp, maxHp),
                                 style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
@@ -2148,7 +2147,7 @@ class _MemberCard extends StatelessWidget {
           ),
         ),
         PopupMenuButton<_MemberMenuAction>(
-          tooltip: 'Acciones de ${character.name}',
+          tooltip: context.l10n.dmActionsOf(character.name),
           // `switch` sobre el valor y no `(_) => onRemove()`: con un solo
           // ítem daba igual, pero con dos, elegir "conceder" echaría al
           // jugador de la mesa.
@@ -2166,7 +2165,7 @@ class _MemberCard extends StatelessWidget {
               child: ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: Icon(Icons.auto_awesome, color: pal.gold),
-                title: const Text('Conceder Inspiración Heroica'),
+                title: Text(context.l10n.dmGrantInspiration),
               ),
             ),
             PopupMenuItem(
@@ -2175,7 +2174,7 @@ class _MemberCard extends StatelessWidget {
                 contentPadding: EdgeInsets.zero,
                 leading: Icon(Icons.person_remove_outlined, color: pal.crimson),
                 title: Text(
-                  'Echar de la mesa',
+                  context.l10n.dmRemoveFromTable,
                   style: TextStyle(color: pal.crimson),
                 ),
               ),
@@ -2217,22 +2216,19 @@ class _PickNpcsDialogState extends State<_PickNpcsDialog> {
         if (e.npc.name.toLowerCase().contains(query)) e,
     ];
     return AppDialog(
-      title: 'Traer de la biblioteca',
+      title: context.l10n.dmBringFromLibrary,
       scrollable: false,
       content: widget.options.isEmpty
-          ? const Text(
-              'Todos tus PNJ ya están en esta campaña, o todavía no creaste '
-              'ninguno.',
-            )
+          ? Text(context.l10n.dmAllNpcsInCampaign)
           : Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 TextField(
                   controller: _search,
-                  decoration: const InputDecoration(
-                    labelText: 'Buscar PNJ',
-                    prefixIcon: Icon(Icons.search),
+                  decoration: InputDecoration(
+                    labelText: context.l10n.dmSearchNpcs,
+                    prefixIcon: const Icon(Icons.search),
                   ),
                   onChanged: (_) => setState(() {}),
                 ),
@@ -2247,7 +2243,12 @@ class _PickNpcsDialogState extends State<_PickNpcsDialog> {
                           controlAffinity: ListTileControlAffinity.leading,
                           title: Text(entry.npc.name),
                           subtitle: Text(
-                            npcTypeLine(entry.npc, entry.sheet, widget.repo),
+                            npcTypeLine(
+                              entry.npc,
+                              entry.sheet,
+                              widget.repo,
+                              context.l10n,
+                            ),
                           ),
                           onChanged: (on) => setState(
                             () => on == true
@@ -2262,12 +2263,14 @@ class _PickNpcsDialogState extends State<_PickNpcsDialog> {
             ),
       actions: [
         DialogAction(
-          'Cancelar',
+          context.l10n.commonCancel,
           keyHint: 'Esc',
           onPressed: () => Navigator.of(context).pop(),
         ),
         DialogAction(
-          _picked.length <= 1 ? 'Sumar' : 'Sumar ${_picked.length}',
+          _picked.length <= 1
+              ? context.l10n.dmAddShort
+              : context.l10n.dmAddCount(_picked.length),
           primary: true,
           onPressed: _picked.isEmpty
               ? null

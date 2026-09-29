@@ -6,6 +6,7 @@ import '../../../api/api_models.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_widgets.dart';
 import 'npc_shared.dart';
+import '../../../l10n/l10n_context.dart';
 
 /// La biblioteca de PNJ del DM: todos, estén o no en alguna campaña.
 ///
@@ -115,13 +116,13 @@ class _NpcLibraryViewState extends State<NpcLibraryView> {
     final entries = _entries;
     if (_error != null) {
       return AppErrorView(
-        message: 'No se pudo leer tu biblioteca de PNJ.',
+        message: context.l10n.dmLibraryReadFail,
         details: '$_error',
         onRetry: _load,
       );
     }
     if (entries == null) {
-      return const Center(child: AppBusyLabel('Cargando tus PNJ…'));
+      return Center(child: AppBusyLabel(context.l10n.dmLibraryLoading));
     }
     final visible = [
       for (final e in entries)
@@ -137,26 +138,23 @@ class _NpcLibraryViewState extends State<NpcLibraryView> {
           child: entries.isEmpty
               ? AppEmptyState(
                   icon: Icons.groups_2_outlined,
-                  message:
-                      'Tu biblioteca de PNJ está vacía. Creá el primero o '
-                      'importá uno: el de otro DM, o un personaje que '
-                      'exportó un jugador.',
+                  message: context.l10n.dmLibraryEmpty,
                   actions: [
                     FilledButton.icon(
                       onPressed: _create,
                       icon: const Icon(Icons.add),
-                      label: const Text('Nuevo PNJ'),
+                      label: Text(context.l10n.npcNew),
                     ),
                   ],
                 )
               : visible.isEmpty
               ? AppEmptyState(
                   icon: Icons.filter_alt_off_outlined,
-                  message: 'Ningún PNJ coincide con los filtros.',
+                  message: context.l10n.dmNoNpcMatches,
                   actions: [
                     TextButton(
                       onPressed: _clearFilters,
-                      child: const Text('Limpiar filtros'),
+                      child: Text(context.l10n.codexClearFilters),
                     ),
                   ],
                 )
@@ -180,14 +178,12 @@ class _NpcLibraryViewState extends State<NpcLibraryView> {
             crossAxisAlignment: WrapCrossAlignment.end,
             spacing: 12,
             children: [
-              const Text(
-                'Biblioteca de PNJ',
-                style: TextStyle(fontFamily: 'Georgia', fontSize: 28),
+              Text(
+                context.l10n.dmNpcLibrary,
+                style: const TextStyle(fontFamily: 'Georgia', fontSize: 28),
               ),
               Text(
-                count == 1
-                    ? '1 personaje · compartido entre tus campañas'
-                    : '$count personajes · compartidos entre tus campañas',
+                context.l10n.dmLibraryCount(count),
                 style: TextStyle(color: pal.textMuted),
               ),
             ],
@@ -198,12 +194,12 @@ class _NpcLibraryViewState extends State<NpcLibraryView> {
               OutlinedButton.icon(
                 onPressed: _import,
                 icon: const Icon(Icons.file_download_outlined),
-                label: const Text('Importar PNJ'),
+                label: Text(context.l10n.dmImportNpc),
               ),
               FilledButton.icon(
                 onPressed: _create,
                 icon: const Icon(Icons.add),
-                label: const Text('Nuevo PNJ'),
+                label: Text(context.l10n.npcNew),
               ),
             ],
           ),
@@ -239,15 +235,15 @@ class _NpcLibraryViewState extends State<NpcLibraryView> {
                 width: 260,
                 child: TextField(
                   controller: _search,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     isDense: true,
-                    prefixIcon: Icon(Icons.search),
-                    labelText: 'Buscar por nombre',
+                    prefixIcon: const Icon(Icons.search),
+                    labelText: context.l10n.dmSearchByName,
                   ),
                   onChanged: (_) => setState(() {}),
                 ),
               ),
-              campaignChip('Todas', null, entries.length),
+              campaignChip(context.l10n.dmAllF, null, entries.length),
               for (final campaign in widget.campaigns)
                 campaignChip(
                   campaign.name,
@@ -255,7 +251,7 @@ class _NpcLibraryViewState extends State<NpcLibraryView> {
                   entries.where((e) => e.isIn(campaign.id)).length,
                 ),
               campaignChip(
-                'Sin campaña',
+                context.l10n.dmNoCampaign,
                 _noCampaign,
                 entries.where((e) => e.campaigns.isEmpty).length,
               ),
@@ -269,7 +265,7 @@ class _NpcLibraryViewState extends State<NpcLibraryView> {
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Text(
-                  'TAGS',
+                  context.l10n.dmTagsCaps,
                   style: TextStyle(
                     fontSize: 10,
                     letterSpacing: 1.2,
@@ -373,7 +369,7 @@ class _NpcCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          npcTypeLine(npc, entry.sheet, repo),
+                          npcTypeLine(npc, entry.sheet, repo, context.l10n),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -395,7 +391,7 @@ class _NpcCard extends StatelessWidget {
               Divider(height: 14, color: pal.hairline),
               Text(
                 entry.campaigns.isEmpty
-                    ? 'Sin campaña todavía'
+                    ? context.l10n.dmNoCampaignYet
                     : entry.campaigns.map((c) => c.campaignName).join(' · '),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

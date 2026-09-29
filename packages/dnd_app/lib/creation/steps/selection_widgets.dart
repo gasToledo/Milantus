@@ -46,7 +46,7 @@ class _SingleSelect extends StatelessWidget {
                   onPressed: () => info(e.key),
                   icon: const Icon(Icons.info_outline, size: 17),
                   color: context.palette.textMuted,
-                  tooltip: 'Ver qué hace ${e.value}',
+                  tooltip: context.l10n.helpWhatItDoes(e.value),
                   visualDensity: VisualDensity.compact,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(
@@ -85,16 +85,16 @@ class _SingleSelect extends StatelessWidget {
   );
 }
 
-/// Etiqueta en español de la categoría de arma.
-String _weaponCategoryLabel(String category) =>
-    category == 'simple' ? 'Simples' : 'Marciales';
+/// Etiqueta de la categoría de arma.
+String _weaponCategoryLabel(AppLocalizations l10n, String category) =>
+    category == 'simple' ? l10n.weaponSimple : l10n.weaponMartial;
 
 /// Subtítulo con daño y (si aplica) la propiedad de maestría del arma.
-String _weaponSubtitle(Weapon w) {
+String _weaponSubtitle(AppLocalizations l10n, Weapon w) {
   final dmg = '${w.damageDice} ${DamageType.labelFor(w.damageType)}';
   return w.mastery == null
       ? dmg
-      : '$dmg · Maestría: ${weaponMasteryName(w.mastery!)}';
+      : '$dmg · ${l10n.combatMastery(weaponMasteryName(w.mastery!))}';
 }
 
 /// Encabezado de grupo (Simples / Marciales) dentro de un picker de armas.
@@ -168,7 +168,10 @@ class _WeaponChecklistState extends State<_WeaponChecklist> {
               children: [
                 for (final group in [('simple', simple), ('martial', martial)])
                   if (group.$2.isNotEmpty) ...[
-                    _weaponGroupHeader(context, _weaponCategoryLabel(group.$1)),
+                    _weaponGroupHeader(
+                      context,
+                      _weaponCategoryLabel(context.l10n, group.$1),
+                    ),
                     ...group.$2.map((w) {
                       final isSel = widget.selected.contains(w.id);
                       return CheckboxListTile(
@@ -176,7 +179,7 @@ class _WeaponChecklistState extends State<_WeaponChecklist> {
                         contentPadding: EdgeInsets.zero,
                         value: isSel,
                         title: Text(w.name),
-                        subtitle: Text(_weaponSubtitle(w)),
+                        subtitle: Text(_weaponSubtitle(context.l10n, w)),
                         onChanged: (isSel || !full)
                             ? (v) {
                                 if (v == true) {
@@ -197,7 +200,7 @@ class _WeaponChecklistState extends State<_WeaponChecklist> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     child: Text(
-                      'Sin coincidencias.',
+                      context.l10n.catalogNoMatches,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
@@ -257,7 +260,7 @@ class _WeaponSelectState extends State<_WeaponSelect> {
           child: Align(
             alignment: Alignment.centerLeft,
             child: ChoiceChip(
-              label: const Text('Sin arma (puños)'),
+              label: Text(context.l10n.weaponUnarmed),
               selected: widget.selected.isEmpty,
               onSelected: (_) => widget.onClear(),
             ),
@@ -279,7 +282,10 @@ class _WeaponSelectState extends State<_WeaponSelect> {
               children: [
                 for (final group in [('simple', simple), ('martial', martial)])
                   if (group.$2.isNotEmpty) ...[
-                    _weaponGroupHeader(context, _weaponCategoryLabel(group.$1)),
+                    _weaponGroupHeader(
+                      context,
+                      _weaponCategoryLabel(context.l10n, group.$1),
+                    ),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
@@ -298,7 +304,7 @@ class _WeaponSelectState extends State<_WeaponSelect> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     child: Text(
-                      'Sin coincidencias.',
+                      context.l10n.catalogNoMatches,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
@@ -319,10 +325,10 @@ class _WeaponSearchField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextField(
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         isDense: true,
         prefixIcon: Icon(Icons.search, size: 20),
-        hintText: 'Buscar arma…',
+        hintText: context.l10n.weaponSearchHint,
         border: OutlineInputBorder(),
       ),
       onChanged: onChanged,
@@ -411,7 +417,7 @@ class _FeatureChoiceSelect extends StatelessWidget {
 
     if (options.isEmpty) {
       return Text(
-        'No hay opciones disponibles todavía.',
+        context.l10n.pickNoOptions,
         style: Theme.of(context).textTheme.bodySmall,
       );
     }

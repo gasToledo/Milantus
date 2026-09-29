@@ -107,25 +107,25 @@ extension _DashboardActions on _DashboardScreenState {
       // molde de Material cuando la aplicación pasó al suyo. Las opciones van en
       // el cuerpo y el pie queda para salir, como en los selectores de la ficha.
       builder: (ctx) => AppDialog(
-        title: 'Importar / Exportar',
+        title: context.l10n.transferTitle,
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               leading: const Icon(Icons.download),
-              title: const Text('Importar…'),
+              title: Text(context.l10n.transferImport),
               onTap: () => Navigator.pop(ctx, 'import'),
             ),
             ListTile(
               leading: const Icon(Icons.upload_file),
-              title: const Text('Exportar respaldo completo'),
+              title: Text(context.l10n.transferExportBackup),
               onTap: () => Navigator.pop(ctx, 'backup'),
             ),
           ],
         ),
         actions: [
           DialogAction(
-            'Cancelar',
+            context.l10n.commonCancel,
             keyHint: 'Esc',
             onPressed: () => Navigator.pop(ctx),
           ),
@@ -153,16 +153,16 @@ extension _DashboardActions on _DashboardScreenState {
       builder: (ctx) => AppDialog(
         icon: Icons.warning_amber_rounded,
         iconColor: context.palette.crimson,
-        title: '¿Borrar a ${c.name}?',
-        content: const Text('Esta acción no se puede deshacer.'),
+        title: context.l10n.deleteCharacterTitle(c.name),
+        content: Text(context.l10n.commonCannotUndo),
         actions: [
           DialogAction(
-            'Cancelar',
+            context.l10n.commonCancel,
             keyHint: 'Esc',
             onPressed: () => Navigator.pop(ctx, false),
           ),
           DialogAction(
-            'Borrar',
+            context.l10n.commonDelete,
             primary: true,
             color: context.palette.crimson,
             onPressed: () => Navigator.pop(ctx, true),
@@ -174,7 +174,7 @@ extension _DashboardActions on _DashboardScreenState {
   }
 
   Future<void> _exportCharacter(Character c) async {
-    if (!_startOperation('Exportando personaje…')) return;
+    if (!_startOperation(context.l10n.exportingCharacter)) return;
     try {
       final transfer = TransferService(controller.api);
       final bytes = await transfer.exportCharacter(c);
@@ -187,7 +187,7 @@ extension _DashboardActions on _DashboardScreenState {
       if (mounted) {
         showAppMessage(
           context,
-          failureMessage('No se pudo exportar el personaje', e),
+          failureMessage(context.l10n.exportCharacterError, e),
           tone: AppMessageTone.error,
         );
       }
@@ -197,7 +197,7 @@ extension _DashboardActions on _DashboardScreenState {
   }
 
   Future<void> _exportBackup() async {
-    if (!_startOperation('Creando respaldo…')) return;
+    if (!_startOperation(context.l10n.creatingBackup)) return;
     try {
       final settings = await SettingsService(controller.api).load();
       final transfer = TransferService(controller.api);
@@ -215,7 +215,7 @@ extension _DashboardActions on _DashboardScreenState {
       if (mounted) {
         showAppMessage(
           context,
-          failureMessage('No se pudo crear el respaldo', e),
+          failureMessage(context.l10n.backupError, e),
           tone: AppMessageTone.error,
         );
       }
@@ -234,7 +234,7 @@ extension _DashboardActions on _DashboardScreenState {
       type: FileType.custom,
       allowedExtensions: ['zip'],
       withData: true,
-      dialogTitle: 'Elegí un respaldo (.zip)',
+      dialogTitle: context.l10n.importPickTitle,
     );
     final file = picked?.files.singleOrNull;
     if (file?.bytes == null || !mounted) return;
@@ -242,21 +242,16 @@ extension _DashboardActions on _DashboardScreenState {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AppDialog(
-        title: 'Importar respaldo',
-        content: Text(
-          'Se van a agregar los personajes (y el homebrew y las preferencias, '
-          'si el respaldo los incluye) de "${file!.name}" a esta cuenta. Los '
-          'personajes existentes no se tocan; un id repetido se guarda como '
-          'copia nueva.',
-        ),
+        title: context.l10n.importBackupTitle,
+        content: Text(context.l10n.importBackupBody(file!.name)),
         actions: [
           DialogAction(
-            'Cancelar',
+            context.l10n.commonCancel,
             keyHint: 'Esc',
             onPressed: () => Navigator.pop(ctx, false),
           ),
           DialogAction(
-            'Importar',
+            context.l10n.commonImport,
             primary: true,
             onPressed: () => Navigator.pop(ctx, true),
           ),
@@ -265,7 +260,7 @@ extension _DashboardActions on _DashboardScreenState {
     );
     if (confirmed != true || !mounted) return;
 
-    if (!_startOperation('Importando respaldo…')) return;
+    if (!_startOperation(context.l10n.importingBackup)) return;
     try {
       final summary = await controller.api.importBackup(file!.bytes!);
       await controller.load();
@@ -279,15 +274,17 @@ extension _DashboardActions on _DashboardScreenState {
         context,
         // «imágenes» y no «retratos»: la cuenta incluye las imágenes del
         // Diario, que van al mismo almacén sin ser retratos.
-        'Importados ${summary.charactersImported == 1 ? '1 personaje' : '${summary.charactersImported} personajes'} y '
-        '${summary.portraitsImported == 1 ? '1 imagen' : '${summary.portraitsImported} imágenes'}.',
+        context.l10n.importDone(
+          summary.charactersImported,
+          summary.portraitsImported,
+        ),
         tone: AppMessageTone.success,
       );
     } catch (e) {
       if (mounted) {
         showAppMessage(
           context,
-          failureMessage('No se pudo importar', e),
+          failureMessage(context.l10n.importError, e),
           tone: AppMessageTone.error,
         );
       }
@@ -298,7 +295,7 @@ extension _DashboardActions on _DashboardScreenState {
 
   bool _startOperation(String label) {
     if (_activeOperation != null) {
-      showAppMessage(context, 'Ya hay una operación en curso.');
+      showAppMessage(context, context.l10n.operationBusy);
       return false;
     }
     _updateState(() => _activeOperation = label);

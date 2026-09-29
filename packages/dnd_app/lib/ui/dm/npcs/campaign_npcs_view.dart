@@ -5,6 +5,7 @@ import '../../../api/api_models.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_widgets.dart';
 import 'npc_shared.dart';
+import '../../../l10n/l10n_context.dart';
 
 enum _RowAction { open, unlink }
 
@@ -47,26 +48,24 @@ class _CampaignNpcsViewState extends State<CampaignNpcsView> {
     final pal = context.palette;
     if (widget.error != null) {
       return AppErrorView(
-        message: 'No se pudieron leer los PNJ de la campaña.',
+        message: context.l10n.dmNpcsReadFail,
         details: '${widget.error}',
         onRetry: widget.onRetry,
       );
     }
     final npcs = widget.npcs;
     if (npcs == null) {
-      return const Center(child: AppBusyLabel('Cargando los PNJ…'));
+      return Center(child: AppBusyLabel(context.l10n.dmNpcsLoading));
     }
     if (npcs.isEmpty) {
       return AppEmptyState(
         icon: Icons.groups_2_outlined,
-        message:
-            'Esta campaña todavía no tiene PNJ. Traé los de tu biblioteca o '
-            'creá uno nuevo.',
+        message: context.l10n.dmNpcsEmpty,
         actions: [
           OutlinedButton.icon(
             onPressed: widget.onBringFromLibrary,
             icon: const Icon(Icons.library_add_outlined),
-            label: const Text('Traer de la biblioteca'),
+            label: Text(context.l10n.dmBringFromLibrary),
           ),
         ],
       );
@@ -100,7 +99,7 @@ class _CampaignNpcsViewState extends State<CampaignNpcsView> {
             ),
             if (tags.isNotEmpty)
               Text(
-                'TAGS',
+                context.l10n.dmTagsCaps,
                 style: TextStyle(
                   fontSize: 10,
                   letterSpacing: 1.2,
@@ -119,7 +118,7 @@ class _CampaignNpcsViewState extends State<CampaignNpcsView> {
             TextButton.icon(
               onPressed: widget.onBringFromLibrary,
               icon: const Icon(Icons.library_add_outlined, size: 18),
-              label: const Text('Traer de la biblioteca'),
+              label: Text(context.l10n.dmBringFromLibrary),
             ),
           ],
         ),
@@ -129,11 +128,11 @@ class _CampaignNpcsViewState extends State<CampaignNpcsView> {
             padding: const EdgeInsets.only(top: 24),
             child: AppEmptyState(
               icon: Icons.filter_alt_off_outlined,
-              message: 'Ningún PNJ de esta campaña tiene ese tag.',
+              message: context.l10n.dmNoNpcWithTag,
               actions: [
                 TextButton(
                   onPressed: () => setState(() => _tag = null),
-                  child: const Text('Limpiar filtro'),
+                  child: Text(context.l10n.dmClearFilter),
                 ),
               ],
             ),
@@ -195,7 +194,7 @@ class _CampaignNpcsViewState extends State<CampaignNpcsView> {
                   ),
                 ),
                 Text(
-                  npcTypeLine(npc, entry.sheet, widget.repo),
+                  npcTypeLine(npc, entry.sheet, widget.repo, context.l10n),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontSize: 12, color: pal.textMuted),
@@ -208,23 +207,26 @@ class _CampaignNpcsViewState extends State<CampaignNpcsView> {
     );
     final status = NpcStatusSelector(
       status: entry.status,
-      semanticLabel: 'Estado de ${npc.name}',
+      semanticLabel: context.l10n.dmStatusOf(npc.name),
       onChanged: (s) => widget.onStatus(entry, s),
     );
     final menu = PopupMenuButton<_RowAction>(
-      tooltip: 'Acciones de ${npc.name}',
+      tooltip: context.l10n.dmActionsOf(npc.name),
       onSelected: (action) => switch (action) {
         _RowAction.open => widget.onOpen(entry),
         _RowAction.unlink => widget.onUnlink(entry),
       },
-      itemBuilder: (context) => const [
-        PopupMenuItem(value: _RowAction.open, child: Text('Abrir ficha')),
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          value: _RowAction.open,
+          child: Text(context.l10n.dmOpenSheet),
+        ),
         PopupMenuItem(
           value: _RowAction.unlink,
           child: ListTile(
             contentPadding: EdgeInsets.zero,
-            title: Text('Quitar de esta campaña'),
-            subtitle: Text('Sigue en tu biblioteca y en tus otras campañas.'),
+            title: Text(context.l10n.dmRemoveFromCampaign),
+            subtitle: Text(context.l10n.dmRemoveFromCampaignNote),
           ),
         ),
       ],

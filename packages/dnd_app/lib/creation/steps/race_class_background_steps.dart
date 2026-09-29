@@ -12,10 +12,10 @@ class _RaceStep extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Eyebrow('Especie'),
+        Eyebrow(context.l10n.stepSpecies),
         const SizedBox(height: 10),
         _SplitSelect(
-          emptyHint: 'Elegí una especie para ver su detalle.',
+          emptyHint: context.l10n.pickSpeciesHint,
           selection: draft.raceId,
           options: [
             for (final r in draft.repo.racesSorted)
@@ -44,20 +44,29 @@ class _RaceStep extends StatelessWidget {
               : _DetailPanel(
                   title: race.name,
                   facts: [
-                    ('Tipo', race.creatureType),
+                    (context.l10n.identityCreatureTypeShort, race.creatureType),
                     (
-                      'Tamaño',
+                      context.l10n.identitySize,
                       race.sizeOptions.isEmpty
                           ? race.size
-                          : draft.chosenSize ?? 'a elegir',
+                          : draft.chosenSize ?? context.l10n.factToChoose,
                     ),
-                    ('Velocidad', '${race.speed} pies'),
+                    (
+                      context.l10n.creatureSpeed,
+                      context.l10n.feetValue(race.speed),
+                    ),
                     // Es un número, no prosa: ningún rasgo pasivo la cuenta,
                     // y la lista de rasgos solo lee los pasivos.
                     for (final dv in race.effects.whereType<DarkvisionEffect>())
-                      ('Visión en la oscuridad', '${dv.range} pies'),
+                      (
+                        context.l10n.darkvision,
+                        context.l10n.feetValue(dv.range),
+                      ),
                     if (race.skillChoiceCount > 0)
-                      ('Habilidades', '${race.skillChoiceCount} a elegir'),
+                      (
+                        context.l10n.creatureSkills,
+                        context.l10n.factChoose(race.skillChoiceCount),
+                      ),
                   ],
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,15 +75,16 @@ class _RaceStep extends StatelessWidget {
                         Text(race.description),
                         const SizedBox(height: 18),
                       ],
-                      const Eyebrow('Rasgos'),
+                      Eyebrow(context.l10n.creatureTraits),
                       const SizedBox(height: 8),
-                      _TraitList(readableTraits(race.effects, draft.repo)),
+                      _TraitList(
+                        readableTraits(context.l10n, race.effects, draft.repo),
+                      ),
                       if (race.sizeOptions.isNotEmpty) ...[
                         const SizedBox(height: 18),
-                        const Eyebrow('Tamaño'),
+                        Eyebrow(context.l10n.identitySize),
                         Text(
-                          'Esta especie abarca cuerpos de tamaños distintos: '
-                          'elegí el de tu personaje.',
+                          context.l10n.pickSizeHint,
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                         const SizedBox(height: 8),
@@ -91,9 +101,9 @@ class _RaceStep extends StatelessWidget {
                       ],
                       if (draft.lineageOptions.isNotEmpty) ...[
                         const SizedBox(height: 18),
-                        const Eyebrow('Linaje de especie'),
+                        Eyebrow(context.l10n.raceLineageTitle),
                         Text(
-                          'Esta especie requiere elegir un linaje.',
+                          context.l10n.raceLineageRequired,
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                         const SizedBox(height: 8),
@@ -119,7 +129,7 @@ class _RaceStep extends StatelessWidget {
                           if (lineage.featuresUpTo(1).isNotEmpty) ...[
                             const SizedBox(height: 10),
                             Text(
-                              'Lo que te da a nivel 1',
+                              context.l10n.raceLineageLevel1,
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                             const SizedBox(height: 6),
@@ -132,7 +142,7 @@ class _RaceStep extends StatelessWidget {
                         if (draft.lineageUsesSpellcastingAbility) ...[
                           const SizedBox(height: 14),
                           _AbilityDropdown(
-                            label: 'Aptitud mágica',
+                            label: context.l10n.speciesSpellAbility,
                             value: draft.speciesSpellcastingAbility,
                             options: const [
                               Ability.intelligence,
@@ -146,7 +156,7 @@ class _RaceStep extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Se usa para la CD y los ataques de los conjuros del linaje.',
+                            context.l10n.pickLineageSpellAbilityHint,
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
@@ -176,10 +186,10 @@ class _ClassStep extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Eyebrow('Clase'),
+        Eyebrow(context.l10n.stepClass),
         const SizedBox(height: 10),
         _SplitSelect(
-          emptyHint: 'Elegí una clase para ver su detalle.',
+          emptyHint: context.l10n.pickClassHint,
           selection: draft.classId,
           options: [
             for (final c in repo.classesSorted)
@@ -208,9 +218,9 @@ class _ClassStep extends StatelessWidget {
               : _DetailPanel(
                   title: klass.name,
                   facts: [
-                    ('Dado de golpe', 'd${klass.hitDie}'),
+                    (context.l10n.factHitDie, 'd${klass.hitDie}'),
                     (
-                      'Salvaciones',
+                      context.l10n.savesTitle,
                       klass.savingThrows.map((a) => a.abbr).join(' · '),
                     ),
                   ],
@@ -224,7 +234,10 @@ class _ClassStep extends StatelessWidget {
                         Eyebrow(
                           slot.count == 1
                               ? slot.name
-                              : '${slot.name} (elegí ${slot.count})',
+                              : context.l10n.classChooseCount(
+                                  slot.name,
+                                  slot.count,
+                                ),
                         ),
                         const SizedBox(height: 8),
                         _FeatureChoiceSelect(
@@ -236,16 +249,13 @@ class _ClassStep extends StatelessWidget {
                       ],
                       if (slots > 0) ...[
                         const SizedBox(height: 18),
-                        Eyebrow('Maestría de armas (elegí $slots)'),
+                        Eyebrow(context.l10n.classWeaponMasteryTitle(slots)),
                         // Faltaba la mitad de adelante: la lista dice de qué
                         // armas se puede elegir, pero no qué se gana al
                         // elegirlas. El nombre de cada maestría lo trae el
                         // subtítulo del arma.
                         Text(
-                          'Dominás el arma lo suficiente como para sacarle un '
-                          'efecto extra cada vez que acertás —derribar, '
-                          'entorpecer, rozar—, sin gastar nada. Solo armas con '
-                          'las que ${klass.name} es competente.',
+                          context.l10n.classWeaponMasteryBody(klass.name),
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                         const SizedBox(height: 6),
@@ -280,10 +290,10 @@ class _BackgroundStep extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Eyebrow('Trasfondo'),
+        Eyebrow(context.l10n.stepBackground),
         const SizedBox(height: 10),
         _SplitSelect(
-          emptyHint: 'Elegí un trasfondo para ver su detalle.',
+          emptyHint: context.l10n.pickBackgroundHint,
           selection: draft.backgroundId,
           options: [
             for (final b in repo.backgroundsSorted)
@@ -326,7 +336,7 @@ class _BackgroundStep extends StatelessWidget {
                   title: bg.name,
                   facts: [
                     (
-                      'Habilidades',
+                      context.l10n.creatureSkills,
                       bg.skillProficiencies.map(Skill.labelFor).join(', '),
                     ),
                     // Las herramientas también son del trasfondo y no se
@@ -334,14 +344,14 @@ class _BackgroundStep extends StatelessWidget {
                     // se entera recién en la ficha.
                     if (bg.toolProficiencies.isNotEmpty)
                       (
-                        'Herramientas',
+                        context.l10n.groupTools,
                         bg.toolProficiencies
                             .map(toolProficiencyLabel)
                             .join(', '),
                       ),
                     if (bg.originFeatId != null)
                       (
-                        'Dote de origen',
+                        context.l10n.factOriginFeat,
                         repo.feat(bg.originFeatId!)?.name ?? bg.originFeatId!,
                       ),
                   ],
@@ -363,13 +373,18 @@ class _BackgroundStep extends StatelessWidget {
                       // pasaba con Duro antes de describir sus efectos.
                       if (repo.feat(bg.originFeatId ?? '') case final feat?
                           when readableTraits(
+                            context.l10n,
                             feat.effects,
                             repo,
                           ).isNotEmpty) ...[
-                        const Eyebrow('Qué te da su dote de origen'),
+                        Eyebrow(context.l10n.bgOriginFeatGives),
                         const SizedBox(height: 8),
                         _TraitList([
-                          for (final t in readableTraits(feat.effects, repo))
+                          for (final t in readableTraits(
+                            context.l10n,
+                            feat.effects,
+                            repo,
+                          ))
                             // Casi toda dote de origen trae un rasgo único con
                             // su mismo nombre, y el renglón de datos de arriba
                             // ya lo dijo. Repetirlo no agrega nada.
@@ -386,7 +401,9 @@ class _BackgroundStep extends StatelessWidget {
                       if (draft.originFeatWithAbilityChoice
                           case final feat?) ...[
                         _AbilityDropdown(
-                          label: 'Aptitud mágica de ${feat.name}',
+                          label: context.l10n.pickFeatSpellAbilityTitle(
+                            feat.name,
+                          ),
                           value: draft.originFeatSpellcastingAbility,
                           options: feat.spellcastingAbilityOptions,
                           onChanged: (ability) {
@@ -396,13 +413,12 @@ class _BackgroundStep extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Se usa para la CD y los ataques de los conjuros de '
-                          'la dote.',
+                          context.l10n.bgFeatAbilityHint,
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                         const SizedBox(height: 18),
                       ],
-                      const Eyebrow('Aumento de característica'),
+                      Eyebrow(context.l10n.bgAbilityIncrease),
                       const SizedBox(height: 8),
                       SegmentedButton<AbilitySpreadMode>(
                         segments: const [
@@ -426,8 +442,9 @@ class _BackgroundStep extends StatelessWidget {
                         _TwoOnePicker(draft: draft, onChanged: onChanged)
                       else
                         Text(
-                          'Cada una de ${bg.abilityOptions.map((a) => a.abbr).join(", ")} '
-                          'recibe +1.',
+                          context.l10n.bgEachPlusOne(
+                            bg.abilityOptions.map((a) => a.abbr).join(", "),
+                          ),
                         ),
                     ],
                   ),

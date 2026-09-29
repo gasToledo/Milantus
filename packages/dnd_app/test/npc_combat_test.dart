@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'dialog_finders.dart';
 import 'fakes/fake_api_server.dart';
+import 'fakes/localized_app.dart';
 
 /// Los PNJ en el combate del DM: bandos, el diálogo «Sumar al combate», la
 /// conversión desde el tracker y el cierre que marca muertos.
@@ -72,7 +73,7 @@ void main() {
     seedCampaign(server);
     seed(server);
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: DmModeScreen(
           api: ApiClient(client: server.client),

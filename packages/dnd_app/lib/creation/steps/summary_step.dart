@@ -27,9 +27,10 @@ class _SummaryStep extends StatelessWidget {
       for (final entry in character.inventory)
         '${repo.catalogEntry(entry.itemId)?.name ?? entry.itemId}'
             '${entry.quantity == 1 ? '' : ' ×${entry.quantity}'}'
-            '${entry.equipped ? ' (puesto)' : ''}',
+            '${entry.equipped ? ' (${context.l10n.summaryEquipped})' : ''}',
       for (final coin in character.coins.entries)
-        if (coin.value != 0) '${coin.value} ${coinLabels[coin.key]}',
+        if (coin.value != 0)
+          '${coin.value} ${coinAbbr(context.l10n, coin.key)}',
     ];
 
     final feats = <String>[
@@ -48,7 +49,7 @@ class _SummaryStep extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const _SectionHeader(title: 'Revisá y confirmá'),
+        _SectionHeader(title: context.l10n.summaryTitle),
         const SizedBox(height: 14),
         Container(
           decoration: BoxDecoration(
@@ -87,7 +88,7 @@ class _SummaryStep extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '$species · $klass · $bg · Nivel 1',
+                            context.l10n.summaryLine(species, klass, bg),
                             style: TextStyle(
                               fontSize: 14,
                               color: scheme.onSurfaceVariant,
@@ -113,7 +114,7 @@ class _SummaryStep extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const _SummaryLabel('Puntuaciones'),
+                    _SummaryLabel(context.l10n.stepScores),
                     Row(
                       children: [
                         for (final a in Ability.values) ...[
@@ -167,36 +168,38 @@ class _SummaryStep extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 22),
-                    const _SummaryLabel('En combate'),
+                    _SummaryLabel(context.l10n.summaryInCombat),
                     Row(
                       children: [
                         Expanded(
                           child: StatPlaque(
-                            label: 'PG',
+                            label: context.l10n.hitPointsShort,
                             value: '${s.maxHp}',
                             valueColor: pal.crimson,
-                            semantics: 'Puntos de golpe: ${s.maxHp}',
+                            semantics: context.l10n.hitPointsLabel(s.maxHp),
                           ),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: StatPlaque(
-                            label: 'CA',
+                            label: context.l10n.creatureAcShort,
                             value: '${s.armorClass}',
-                            semantics: 'Clase de armadura: ${s.armorClass}',
+                            semantics: context.l10n.armorClassLabel(
+                              s.armorClass,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: StatPlaque(
-                            label: 'Velocidad',
+                            label: context.l10n.creatureSpeed,
                             value: '${s.speed}',
                           ),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: StatPlaque(
-                            label: 'Iniciativa',
+                            label: context.l10n.initiative,
                             value: _signedMod(s.initiative),
                           ),
                         ),
@@ -204,7 +207,7 @@ class _SummaryStep extends StatelessWidget {
                     ),
                     if (skills.isNotEmpty) ...[
                       const SizedBox(height: 22),
-                      const _SummaryLabel('Habilidades'),
+                      _SummaryLabel(context.l10n.creatureSkills),
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
@@ -215,7 +218,7 @@ class _SummaryStep extends StatelessWidget {
                       ),
                     ],
                     const SizedBox(height: 22),
-                    const _SummaryLabel('Equipo'),
+                    _SummaryLabel(context.l10n.stepEquipment),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
@@ -226,7 +229,7 @@ class _SummaryStep extends StatelessWidget {
                     ),
                     if (spells.isNotEmpty) ...[
                       const SizedBox(height: 22),
-                      const _SummaryLabel('Conjuros'),
+                      _SummaryLabel(context.l10n.spellsTitle),
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
@@ -238,7 +241,7 @@ class _SummaryStep extends StatelessWidget {
                     ],
                     if (feats.isNotEmpty) ...[
                       const SizedBox(height: 22),
-                      const _SummaryLabel('Dotes'),
+                      _SummaryLabel(context.l10n.summaryFeats),
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
@@ -250,7 +253,7 @@ class _SummaryStep extends StatelessWidget {
                     ],
                     if (draft.personalityTrait.trim().isNotEmpty) ...[
                       const SizedBox(height: 22),
-                      const _SummaryLabel('Rasgo de personalidad'),
+                      _SummaryLabel(context.l10n.detailsTrait),
                       Text(
                         draft.personalityTrait.trim(),
                         style: TextStyle(color: scheme.onSurfaceVariant),

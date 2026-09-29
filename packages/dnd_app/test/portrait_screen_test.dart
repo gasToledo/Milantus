@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'fakes/fake_api_server.dart';
+import 'fakes/localized_app.dart';
 
 /// La pantalla arma dos caminos —generar y subir— y antes convivían apilados en
 /// el mismo formulario. Lo que se prueba acá es el ruteo entre ambos, que es lo
@@ -33,7 +34,7 @@ void main() {
     addTearDown(tester.view.reset);
     final server = FakeApiServer()..providers = providers;
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: PortraitScreen(
           character: demoSagan(),
@@ -109,7 +110,7 @@ void main() {
     addTearDown(tester.view.reset);
     final server = FakeApiServer()..providers = [pollinations];
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: PortraitScreen.forNpc(
           npc: Npc(
@@ -244,7 +245,7 @@ void main() {
       addTearDown(tester.view.reset);
       final server = FakeApiServer()..providers = const [];
       await tester.pumpWidget(
-        MaterialApp(
+        localizedApp(
           theme: AppTheme.dark,
           home: Builder(
             builder: (context) => Scaffold(

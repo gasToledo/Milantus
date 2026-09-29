@@ -137,6 +137,7 @@ class AppThemeController extends ValueNotifier<ThemeMode> {
 
 /// Fuente serif para títulos (el nombre del personaje, rótulos display).
 /// Georgia está presente en Windows; en otras plataformas cae al serif genérico.
+// l10n-ignore: nombre de tipografía, no texto.
 const _displayFont = 'Georgia';
 
 class AppTheme {

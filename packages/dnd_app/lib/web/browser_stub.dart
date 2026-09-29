@@ -1,3 +1,4 @@
+// l10n-ignore-file: errores de programación (UnsupportedError) que no le llegan a la persona.
 import 'dart:typed_data';
 
 /// Sustituto sin `dart:html` que ocupa este punto de entrada cuando el
@@ -21,3 +22,14 @@ void downloadBytes(
 void openInNewTab(String url) {
   throw UnsupportedError('openInNewTab solo está disponible en el build web.');
 }
+
+// Lo que sigue **no** lanza: se llama al arrancar y desde los tests de
+// widget, que no tienen navegador pero tampoco están haciendo nada mal. Sin
+// almacenamiento ni idioma de navegador, la app cae al idioma por defecto.
+String? readStoredLocale() => null;
+
+void writeStoredLocale(String code) {}
+
+String? browserLanguage() => null;
+
+void setDocumentLanguage(String code) {}

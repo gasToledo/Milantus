@@ -18,12 +18,12 @@ class _EquipmentStep extends StatelessWidget {
         const SizedBox(height: 26),
         _PurchasesSection(draft: draft, onChanged: onChanged),
         const SizedBox(height: 26),
-        const _SectionHeader(title: 'Equipo puesto'),
+        _SectionHeader(title: context.l10n.equipReceivedTitle),
         const SizedBox(height: 12),
         _ReceivedEquipmentSection(draft: draft, onChanged: onChanged),
         _WeaponGripSection(draft: draft, onChanged: onChanged),
         const SizedBox(height: 26),
-        const _SectionHeader(title: 'Conjuros'),
+        _SectionHeader(title: context.l10n.spellsTitle),
         const SizedBox(height: 12),
         // Va antes de la magia de clase: lo elegido acá queda siempre preparado
         // y sale del pozo de abajo, así que preguntarlo después haría que el
@@ -53,11 +53,11 @@ class _StartingEquipmentSection extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      const _SectionHeader(title: 'Equipo inicial'),
+      _SectionHeader(title: context.l10n.equipStartingTitle),
       const SizedBox(height: 12),
       _optionPicker(
         context,
-        'Clase',
+        true,
         draft.klass?.startingEquipment ?? const [],
         draft.classEquipmentOptionId,
         (id) {
@@ -69,7 +69,7 @@ class _StartingEquipmentSection extends StatelessWidget {
       const SizedBox(height: 12),
       _optionPicker(
         context,
-        'Trasfondo',
+        false,
         draft.background?.startingEquipment ?? const [],
         draft.backgroundEquipmentOptionId,
         (id) {
@@ -91,8 +91,8 @@ class _StartingEquipmentSection extends StatelessWidget {
             // del trasfondo.
             decoration: InputDecoration(
               labelText: key.startsWith('class:')
-                  ? 'Elegí un objeto del equipo de clase'
-                  : 'Elegí un objeto del equipo de trasfondo',
+                  ? context.l10n.equipPickClassItem
+                  : context.l10n.equipPickBackgroundItem,
             ),
             items: [
               for (final id in grant.chooseFromItemIds)
@@ -119,7 +119,7 @@ class _StartingEquipmentSection extends StatelessWidget {
               return e.quantity == 1 ? name : '$name ×${e.quantity}';
             }),
             ...draft.grantedCoins.entries.map(
-              (e) => '${e.value} ${coinLabels[e.key]}',
+              (e) => '${e.value} ${coinAbbr(context.l10n, e.key)}',
             ),
           ].join(' · '),
           style: Theme.of(context).textTheme.bodyMedium,
@@ -130,23 +130,29 @@ class _StartingEquipmentSection extends StatelessWidget {
 
   Widget _optionPicker(
     BuildContext context,
-    String label,
+    bool forClass,
     List<StartingEquipmentOption> options,
     String? selected,
     ValueChanged<String?> changed,
   ) => options.isEmpty
       // Un desplegable sin opciones se veía deshabilitado y no decía por qué.
       ? Text(
-          'Este ${label.toLowerCase()} no trae equipo inicial.',
+          forClass
+              ? context.l10n.equipNoStartingClass
+              : context.l10n.equipNoStartingBackground,
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         )
       : DropdownButtonFormField<String>(
-          key: ValueKey('starting-equipment-${label.toLowerCase()}'),
+          key: ValueKey(
+            'starting-equipment-${forClass ? 'clase' : 'trasfondo'}',
+          ),
           initialValue: options.any((e) => e.id == selected) ? selected : null,
           decoration: InputDecoration(
-            labelText: 'Opción de ${label.toLowerCase()}',
+            labelText: forClass
+                ? context.l10n.equipOptionClass
+                : context.l10n.equipOptionBackground,
           ),
           // Cada opción dice qué trae: «Opción A» y «Opción B» a secas obligaban a
           // elegir a ciegas y enterarse después. Cerrado muestra solo el rótulo,
@@ -168,7 +174,7 @@ class _StartingEquipmentSection extends StatelessWidget {
                     children: [
                       Text(option.label),
                       Text(
-                        _optionContents(option),
+                        _optionContents(context, option),
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ],
@@ -179,7 +185,10 @@ class _StartingEquipmentSection extends StatelessWidget {
           onChanged: changed,
         );
 
-  String _optionContents(StartingEquipmentOption option) => [
+  String _optionContents(
+    BuildContext context,
+    StartingEquipmentOption option,
+  ) => [
     for (final grant in option.grants) ...[
       if (grant.itemId case final id?)
         grant.quantity == 1
@@ -187,11 +196,13 @@ class _StartingEquipmentSection extends StatelessWidget {
             : '${_itemName(id)} ×${grant.quantity}',
       if (grant.isChoice)
         grant.chooseFromItemIds.length <= 3
-            ? grant.chooseFromItemIds.map(_itemName).join(' o ')
+            ? grant.chooseFromItemIds
+                  .map(_itemName)
+                  .join(' ${context.l10n.wordOr} ')
             // «1 a elegir» no decía entre qué: se nombran las dos primeras.
-            : '${grant.chooseFromItemIds.take(2).map(_itemName).join(', ')} u otro',
+            : '${grant.chooseFromItemIds.take(2).map(_itemName).join(', ')} ${context.l10n.equipOrOther}',
       for (final coin in grant.coins.entries)
-        '${coin.value} ${coinLabels[coin.key] ?? coin.key}',
+        '${coin.value} ${coinAbbr(context.l10n, coin.key)}',
     ],
   ].join(' · ');
 
@@ -220,13 +231,11 @@ class _PurchasesSection extends StatelessWidget {
     context: context,
     builder: (_) => ItemCatalogDialog(
       repo: draft.repo,
-      title: 'Comprar equipo',
-      purseLabel: 'Quedan',
+      title: context.l10n.equipShopTitle,
+      purseLabel: context.l10n.equipLeftShort,
       purseCp: () => draft.goldLeftCp,
       countOf: (id) => draft.purchases[id] ?? 0,
-      hint:
-          'Cada toque suma uno a tus compras. La cantidad se ajusta en la '
-          'lista del paso.',
+      hint: context.l10n.equipShopHint,
       // No cierra: se arma el equipo entero sin volver a abrir el catálogo.
       onBuy: (row) async {
         draft.buy(row.id);
@@ -256,11 +265,10 @@ class _PurchasesSection extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const _SectionHeader(title: 'Compras'),
+          _SectionHeader(title: context.l10n.equipPurchases),
           const SizedBox(height: 12),
           Text(
-            'Primero elegí las opciones de equipo: el oro para comprar sale '
-            'de ahí.',
+            context.l10n.equipPickFirst,
             style: TextStyle(fontSize: 13, height: 1.5, color: muted),
           ),
         ],
@@ -308,19 +316,17 @@ class _PurchasesSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SectionHeader(
-          title: 'Compras',
+          title: context.l10n.equipPurchases,
           counterIcon: Icons.savings_outlined,
           counter: left < 0
-              ? 'Faltan ${CoinOps.formatAmount(-left)}'
-              : 'Quedan ${CoinOps.formatAmount(left)}',
+              ? context.l10n.catalogShortBy(CoinOps.formatAmount(-left))
+              : context.l10n.equipLeft(CoinOps.formatAmount(left)),
         ),
         const SizedBox(height: 12),
         Text(
           granted == 0
-              ? 'Las opciones elegidas no traen oro para comprar.'
-              : 'Lo que no traés en el paquete lo comprás con el oro de '
-                    'partida, al precio del manual. Lo que sobre queda en la '
-                    'bolsa.',
+              ? context.l10n.equipNoGold
+              : context.l10n.equipGoldExplainer,
           style: TextStyle(fontSize: 13, height: 1.5, color: muted),
         ),
         if (draft.purchases.isNotEmpty) ...[
@@ -344,12 +350,20 @@ class _PurchasesSection extends StatelessWidget {
         const SizedBox(height: 12),
         Row(
           children: [
-            plaque('Oro de partida', CoinOps.formatAmount(granted)),
-            const SizedBox(width: 10),
-            plaque('En compras', CoinOps.formatAmount(draft.purchasesCp)),
+            plaque(
+              context.l10n.equipStartingGold,
+              CoinOps.formatAmount(granted),
+            ),
             const SizedBox(width: 10),
             plaque(
-              left < 0 ? 'Faltan' : 'Te quedan',
+              context.l10n.equipInPurchases,
+              CoinOps.formatAmount(draft.purchasesCp),
+            ),
+            const SizedBox(width: 10),
+            plaque(
+              left < 0
+                  ? context.l10n.equipShortLabel
+                  : context.l10n.equipYouHaveLeft,
               CoinOps.formatAmount(left.abs()),
               highlight: true,
             ),
@@ -358,8 +372,7 @@ class _PurchasesSection extends StatelessWidget {
         if (left < 0) ...[
           const SizedBox(height: 8),
           Text(
-            'Las compras superan el oro de partida: sacá algo o elegí otra '
-            'opción de equipo.',
+            context.l10n.equipOverspent,
             style: TextStyle(fontSize: 13, color: pal.crimson),
           ),
         ],
@@ -372,7 +385,7 @@ class _PurchasesSection extends StatelessWidget {
                 ? null
                 : () => _openShop(context),
             icon: const Icon(Icons.add, size: 18),
-            label: const Text('Comprar objetos'),
+            label: Text(context.l10n.equipBuyItems),
           ),
         ),
       ],
@@ -405,7 +418,7 @@ class _PurchasesSection extends StatelessWidget {
             ),
           ),
           IconButton(
-            tooltip: 'Uno menos de $name',
+            tooltip: context.l10n.equipOneLess(name),
             onPressed: quantity > 1 ? () => _set(itemId, quantity - 1) : null,
             icon: const Icon(Icons.remove, size: 18),
           ),
@@ -421,7 +434,7 @@ class _PurchasesSection extends StatelessWidget {
             ),
           ),
           IconButton(
-            tooltip: 'Uno más de $name',
+            tooltip: context.l10n.equipOneMore(name),
             onPressed: () => _set(itemId, quantity + 1),
             icon: const Icon(Icons.add, size: 18),
           ),
@@ -438,7 +451,7 @@ class _PurchasesSection extends StatelessWidget {
             ),
           ),
           IconButton(
-            tooltip: 'Sacar $name de las compras',
+            tooltip: context.l10n.equipRemovePurchase(name),
             onPressed: () => _set(itemId, 0),
             icon: const Icon(Icons.close, size: 18),
           ),
@@ -471,7 +484,7 @@ class _ReceivedEquipmentSection extends StatelessWidget {
         // lista de lo recibido.
         if (armor.isNotEmpty || weapons.isNotEmpty) ...[
           Text(
-            'Tocá una pieza para sacártela o ponértela.',
+            context.l10n.equipTapPiece,
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: 10),
@@ -518,7 +531,7 @@ class _ReceivedEquipmentSection extends StatelessWidget {
             weapons.isEmpty &&
             draft.receivedItemIds.isNotEmpty)
           Text(
-            'El paquete elegido no trae equipo para vestir o empuñar.',
+            context.l10n.equipNothingToWear,
             style: Theme.of(context).textTheme.bodySmall,
           ),
       ],
@@ -555,11 +568,13 @@ class _WeaponGripSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 16),
-        Text('Cómo las empuñás', style: Theme.of(context).textTheme.titleSmall),
+        Text(
+          context.l10n.equipGrip,
+          style: Theme.of(context).textTheme.titleSmall,
+        ),
         if (dual)
           Text(
-            'El ataque de mano secundaria es una acción adicional y no suma tu '
-            'modificador al daño, salvo con el estilo Combate con Dos Armas.',
+            context.l10n.equipOffHandNote,
             style: Theme.of(context).textTheme.bodySmall,
           ),
         const SizedBox(height: 6),
@@ -572,7 +587,7 @@ class _WeaponGripSection extends StatelessWidget {
                   padding: const EdgeInsets.only(left: 6),
                   child: FilterChip(
                     key: ValueKey('off-hand-${w.id}'),
-                    label: const Text('Secundaria'),
+                    label: Text(context.l10n.equipOffHandShort),
                     selected: draft.weaponOffHand[w.id] ?? false,
                     onSelected: (v) {
                       // Solo se empuña un arma en la secundaria.
@@ -588,7 +603,7 @@ class _WeaponGripSection extends StatelessWidget {
                   padding: const EdgeInsets.only(left: 6),
                   child: FilterChip(
                     key: ValueKey('two-handed-${w.id}'),
-                    label: const Text('A dos manos'),
+                    label: Text(context.l10n.invTwoHanded),
                     selected: draft.weaponTwoHanded[w.id] ?? false,
                     onSelected: (v) {
                       draft.weaponTwoHanded[w.id] = v;
@@ -627,7 +642,7 @@ class _NoSpellsNotice extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Tu clase no lanza conjuros',
+                  context.l10n.equipNoSpellsTitle,
                   style: TextStyle(
                     fontFamily: 'Georgia',
                     fontSize: 16,
@@ -636,7 +651,7 @@ class _NoSpellsNotice extends StatelessWidget {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  'Confiás en el acero y la maña. Seguí al próximo paso.',
+                  context.l10n.equipNoSpellsBody,
                   style: TextStyle(
                     fontSize: 13,
                     color: scheme.onSurfaceVariant,
@@ -682,7 +697,7 @@ class _SpellChoicesSection extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'No ocupan cupo de preparados.',
+            context.l10n.equipNoPreparedSlot,
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: 10),
@@ -702,8 +717,10 @@ class _SpellChoicesSection extends StatelessWidget {
                 options: {
                   for (final s in spells)
                     s.id: s.isCantrip
-                        ? (mixed ? '${s.name} (truco)' : s.name)
-                        : '${s.name} (Nv ${s.level})',
+                        ? (mixed
+                              ? context.l10n.equipCantripSuffix(s.name)
+                              : s.name)
+                        : context.l10n.equipLevelShort(s.name, s.level),
                 },
                 selected: selected,
                 max: slot.count,
@@ -766,8 +783,11 @@ class _SpellsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'CD de salvación ${sc.saveDc} · Ataque de conjuro '
-          '${sc.attackBonus >= 0 ? '+' : ''}${sc.attackBonus} (${sc.ability.abbr})',
+          context.l10n.equipCasterLine(
+            sc.saveDc,
+            '${sc.attackBonus >= 0 ? '+' : ''}${sc.attackBonus}',
+            sc.ability.abbr,
+          ),
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         const SizedBox(height: 14),
@@ -776,24 +796,19 @@ class _SpellsSection extends StatelessWidget {
         // conocer no son lo mismo aunque la grilla de abajo se vea igual.
         AppHelpCallout(
           icon: Icons.auto_stories,
-          title: 'Cómo funciona tu magia',
+          title: context.l10n.equipMagicTitle,
           message: [
-            if (sc.cantripsKnown > 0)
-              'Los trucos se lanzan siempre y no gastan nada.',
+            if (sc.cantripsKnown > 0) context.l10n.equipMagicCantrips,
             prepared
-                ? 'Los conjuros preparados son los que dejás listos para usar; '
-                      'podés cambiarlos al descansar.'
-                : 'Los conjuros conocidos son los que aprendiste y quedan '
-                      'disponibles para lanzar.',
-            'Cada vez que lanzás uno gastás un espacio de conjuro, que es un '
-                'recurso aparte: los espacios dicen cuántas veces podés '
-                'lanzar, no cuántos conjuros tenés.',
+                ? context.l10n.equipMagicPrepared
+                : context.l10n.equipMagicKnown,
+            context.l10n.equipMagicSlots,
           ].join(' '),
         ),
         if (sc.cantripsKnown > 0) ...[
           const SizedBox(height: 18),
           _SpellGroupHeader(
-            title: 'Trucos',
+            title: context.l10n.spellsCantripsTitle,
             count: draft.cantrips.length,
             cap: sc.cantripsKnown,
           ),
@@ -804,10 +819,12 @@ class _SpellsSection extends StatelessWidget {
               // especie, la dote del trasfondo u otros rasgos, y decir
               // «tu especie» atribuía a la especie los de la dote.
               grantedCantripNames.length == 1
-                  ? 'Ya tenés ${grantedCantripNames.single} por otro rasgo: '
-                        'no ocupa un cupo de truco de clase.'
-                  : 'Ya tenés ${grantedCantripNames.join(', ')} por otros '
-                        'rasgos: no ocupan cupos de truco de clase.',
+                  ? context.l10n.equipGrantedCantripOne(
+                      grantedCantripNames.single,
+                    )
+                  : context.l10n.equipGrantedCantripMany(
+                      grantedCantripNames.join(', '),
+                    ),
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
@@ -822,18 +839,19 @@ class _SpellsSection extends StatelessWidget {
         ],
         const SizedBox(height: 20),
         _SpellGroupHeader(
-          title: prepared ? 'Conjuros preparados' : 'Conjuros conocidos',
+          title: prepared
+              ? context.l10n.spellsPreparedTitle
+              : context.l10n.spellsKnownTitle,
           count: draft.spells.length,
           cap: prepared ? sc.preparedCount : null,
         ),
         if (grantedLeveledNames.isNotEmpty)
           Text(
-            'Ya tenés ${grantedLeveledNames.join(', ')} siempre preparado por '
-            'otro rasgo: no ocupa un cupo.',
+            context.l10n.equipGrantedLeveled(grantedLeveledNames.join(', ')),
             style: Theme.of(context).textTheme.bodySmall,
           ),
         Text(
-          'Podés preparar conjuros de hasta nivel $maxLevel.',
+          context.l10n.equipMaxLevel(maxLevel),
           style: Theme.of(context).textTheme.bodySmall,
         ),
         const SizedBox(height: 10),
@@ -952,7 +970,9 @@ class _SpellChips extends StatelessWidget {
                         const SizedBox(width: 7),
                         Flexible(
                           child: Text(
-                            showLevel ? '${s.name} (Nv ${s.level})' : s.name,
+                            showLevel
+                                ? context.l10n.equipLevelShort(s.name, s.level)
+                                : s.name,
                             style: TextStyle(
                               fontSize: 13,
                               color: on
@@ -975,7 +995,7 @@ class _SpellChips extends StatelessWidget {
                           onTap: () => showSpellDetailsDialog(context, s),
                           customBorder: const CircleBorder(),
                           child: Tooltip(
-                            message: 'Ver qué hace ${s.name}',
+                            message: context.l10n.helpWhatItDoes(s.name),
                             child: Icon(
                               Icons.info_outline,
                               size: 15,

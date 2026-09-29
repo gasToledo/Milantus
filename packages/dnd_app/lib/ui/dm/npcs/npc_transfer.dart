@@ -13,6 +13,7 @@ import '../../../theme/app_theme.dart';
 import '../../../theme/app_widgets.dart';
 import '../../../web/browser.dart' as browser;
 import 'npc_shared.dart';
+import '../../../l10n/l10n_context.dart';
 
 /// Qué eligió el DM llevar en el archivo, además de lo que va siempre.
 typedef NpcExportOptions = ({bool background, bool tags, bool notes});
@@ -99,7 +100,7 @@ class _ExportNpcDialogState extends State<ExportNpcDialog> {
       title: Text(text),
     );
     return AppDialog(
-      title: 'Exportar PNJ',
+      title: context.l10n.npcExportTitle,
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -109,26 +110,25 @@ class _ExportNpcDialogState extends State<ExportNpcDialog> {
             style: const TextStyle(fontFamily: 'Georgia', fontSize: 18),
           ),
           const SizedBox(height: 12),
-          const Eyebrow('Qué viaja en el archivo'),
-          always('Nombre, retrato, apariencia y «cómo habla»'),
+          Eyebrow(context.l10n.npcExportWhatTravels),
+          always(context.l10n.npcExportAlways),
           always(switch (npc.sheetKind) {
-            NpcSheetKind.none => 'Su tipo: sin estadísticas',
-            NpcSheetKind.block => 'Su bloque',
-            NpcSheetKind.character =>
-              'Su ficha de personaje y el homebrew que usa',
+            NpcSheetKind.none => context.l10n.npcExportNone,
+            NpcSheetKind.block => context.l10n.npcExportBlock,
+            NpcSheetKind.character => context.l10n.npcExportCharacter,
           }),
           CheckboxListTile(
             value: _background,
             contentPadding: EdgeInsets.zero,
             controlAffinity: ListTileControlAffinity.leading,
-            title: const Text('Trasfondo'),
+            title: Text(context.l10n.stepBackground),
             onChanged: (v) => setState(() => _background = v ?? false),
           ),
           CheckboxListTile(
             value: _tags,
             contentPadding: EdgeInsets.zero,
             controlAffinity: ListTileControlAffinity.leading,
-            title: const Text('Tags'),
+            title: Text(context.l10n.npcTagsWord),
             subtitle: npc.tags.isEmpty ? null : Text(npc.tags.join(', ')),
             onChanged: (v) => setState(() => _tags = v ?? false),
           ),
@@ -136,27 +136,25 @@ class _ExportNpcDialogState extends State<ExportNpcDialog> {
             value: _notes,
             contentPadding: EdgeInsets.zero,
             controlAffinity: ListTileControlAffinity.leading,
-            title: const Text('Notas'),
-            subtitle: const Text('Son de tus mesas.'),
+            title: Text(context.l10n.npcNotesWord),
+            subtitle: Text(context.l10n.npcNotesNote),
             onChanged: (v) => setState(() => _notes = v ?? false),
           ),
           const SizedBox(height: 8),
           Text(
-            'Nunca viaja en qué campañas está ni si vive o murió en cada una. '
-            'Quien lo importe recibe su propia copia: lo que cambie después no '
-            'te llega.',
+            context.l10n.npcExportNever,
             style: TextStyle(fontSize: 12.5, color: pal.textMuted),
           ),
         ],
       ),
       actions: [
         DialogAction(
-          'Cancelar',
+          context.l10n.commonCancel,
           keyHint: 'Esc',
           onPressed: () => Navigator.of(context).pop(),
         ),
         DialogAction(
-          'Descargar .zip',
+          context.l10n.npcDownloadZip,
           primary: true,
           onPressed: () => Navigator.of(
             context,
@@ -179,7 +177,7 @@ Future<bool> importNpcFlow(
     type: FileType.custom,
     allowedExtensions: const ['zip'],
     withData: true,
-    dialogTitle: 'Elegir el archivo del PNJ o del personaje',
+    dialogTitle: context.l10n.npcPickFile,
   );
   final raw = picked?.files.singleOrNull?.bytes;
   if (raw == null || !context.mounted) return false;
@@ -195,7 +193,7 @@ Future<bool> importNpcFlow(
   } on UnsupportedDataVersionException {
     showAppMessage(
       context,
-      'El archivo viene de una versión más nueva de la app.',
+      context.l10n.npcNewerVersion,
       tone: AppMessageTone.error,
     );
     return false;
@@ -271,8 +269,7 @@ class _ImportNpcDialogState extends State<ImportNpcDialog> {
       if (mounted) {
         showAppMessage(
           context,
-          'El PNJ se importó, pero su homebrew aparece recién al recargar la '
-          'página.',
+          context.l10n.npcImportedHomebrewLate,
           tone: AppMessageTone.error,
         );
       }
@@ -307,7 +304,7 @@ class _ImportNpcDialogState extends State<ImportNpcDialog> {
     final preview = widget.preview;
     final npc = preview.npc;
     return AppDialog(
-      title: 'Importar PNJ',
+      title: context.l10n.dmImportNpc,
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -328,7 +325,7 @@ class _ImportNpcDialogState extends State<ImportNpcDialog> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  npcTypeLine(npc, preview.sheet, widget.repo),
+                  npcTypeLine(npc, preview.sheet, widget.repo, context.l10n),
                   style: TextStyle(fontSize: 12.5, color: pal.textMuted),
                 ),
                 if (npc.tags.isNotEmpty) ...[
@@ -339,13 +336,15 @@ class _ImportNpcDialogState extends State<ImportNpcDialog> {
                 Text(
                   [
                     if (preview.portraitCount > 0)
-                      preview.portraitCount == 1
-                          ? '1 retrato'
-                          : '${preview.portraitCount} retratos',
-                    if (npc.background.isNotEmpty) 'trasfondo',
-                    if (npc.notes.isNotEmpty) '${npc.notes.length} notas',
+                      context.l10n.npcPortraitsCount(preview.portraitCount),
+                    if (npc.background.isNotEmpty)
+                      context.l10n.npcBackgroundLower,
+                    if (npc.notes.isNotEmpty)
+                      context.l10n.npcNotesCount(npc.notes.length),
                     if (preview.homebrewNames.isNotEmpty)
-                      'homebrew: ${preview.homebrewNames.join(', ')}',
+                      context.l10n.npcHomebrewList(
+                        preview.homebrewNames.join(', '),
+                      ),
                   ].join(' · '),
                   style: TextStyle(fontSize: 12.5, color: pal.textMuted),
                 ),
@@ -355,8 +354,7 @@ class _ImportNpcDialogState extends State<ImportNpcDialog> {
           const SizedBox(height: 14),
           if (_missing.isNotEmpty)
             Text(
-              'No se puede importar: su ficha usa contenido que esta '
-              'instalación no tiene (${_missing.join(', ')}).',
+              context.l10n.npcCannotImport(_missing.join(', ')),
               style: TextStyle(color: pal.crimson),
             )
           else ...[
@@ -365,13 +363,13 @@ class _ImportNpcDialogState extends State<ImportNpcDialog> {
               // nombre de una campaña larga desborda el diálogo.
               isExpanded: true,
               initialValue: _campaignId,
-              decoration: const InputDecoration(
-                labelText: 'Sumarlo también a una campaña (opcional)',
+              decoration: InputDecoration(
+                labelText: context.l10n.npcAlsoAddToCampaign,
               ),
               items: [
-                const DropdownMenuItem(
+                DropdownMenuItem(
                   value: null,
-                  child: Text('Ninguna: queda sin campaña'),
+                  child: Text(context.l10n.npcNoCampaignOption),
                 ),
                 for (final c in widget.campaigns)
                   DropdownMenuItem(value: c.id, child: Text(c.name)),
@@ -380,8 +378,7 @@ class _ImportNpcDialogState extends State<ImportNpcDialog> {
             ),
             const SizedBox(height: 10),
             Text(
-              'Importar nunca reemplaza nada: si ya tenés un PNJ con ese '
-              'nombre, quedan los dos.',
+              context.l10n.npcImportNeverReplaces,
               style: TextStyle(fontSize: 12.5, color: pal.textMuted),
             ),
           ],
@@ -391,18 +388,18 @@ class _ImportNpcDialogState extends State<ImportNpcDialog> {
           ],
           if (_busy) ...[
             const SizedBox(height: 10),
-            const AppBusyLabel('Importando…'),
+            AppBusyLabel(context.l10n.npcImporting),
           ],
         ],
       ),
       actions: [
         DialogAction(
-          'Cancelar',
+          context.l10n.commonCancel,
           keyHint: 'Esc',
           onPressed: _busy ? null : () => Navigator.of(context).pop(),
         ),
         DialogAction(
-          'Importar',
+          context.l10n.commonImport,
           primary: true,
           onPressed: _busy || _missing.isNotEmpty ? null : _import,
         ),

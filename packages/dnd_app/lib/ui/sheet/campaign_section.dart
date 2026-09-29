@@ -18,15 +18,15 @@ extension _CampaignSection on _SheetScreenState {
   Widget _buildCampana() {
     if (_campaignsError != null) {
       return AppErrorView(
-        message: 'No se pudieron leer tus campañas.',
+        message: context.l10n.campaignsLoadError,
         details: '$_campaignsError',
         onRetry: _loadCampaigns,
       );
     }
     if (_loadingCampaigns && _campaigns == null) {
-      return const Padding(
+      return Padding(
         padding: EdgeInsets.symmetric(vertical: 40),
-        child: Center(child: AppBusyLabel('Cargando tus campañas…')),
+        child: Center(child: AppBusyLabel(context.l10n.campaignsLoading)),
       );
     }
 
@@ -36,14 +36,12 @@ extension _CampaignSection on _SheetScreenState {
       // acción que ya existe en el panel lateral.
       return AppEmptyState(
         icon: Icons.flag_outlined,
-        message:
-            'Este personaje todavía no está en ninguna campaña.\n'
-            'Compartilo con tu DM y acá va a aparecer lo que jueguen.',
+        message: context.l10n.campaignEmpty,
         actions: [
           OutlinedButton.icon(
             onPressed: _shareCharacter,
             icon: const Icon(Icons.ios_share, size: 20),
-            label: const Text('Compartir'),
+            label: Text(context.l10n.navShare),
           ),
         ],
       );
@@ -76,7 +74,7 @@ extension _CampaignSection on _SheetScreenState {
         trailing: Padding(
           padding: const EdgeInsets.only(right: 8),
           child: GoldPill(
-            pc.campaign.state.label,
+            pc.campaign.state.localized(context),
             highlighted: pc.campaign.state == CampaignState.active,
           ),
         ),
@@ -93,8 +91,10 @@ extension _CampaignSection on _SheetScreenState {
               if (pc.party.isNotEmpty) ...[
                 if (pc.campaign.premise.isNotEmpty) const SizedBox(height: 8),
                 Text(
-                  'En la mesa también ${pc.party.length == 1 ? 'juega' : 'juegan'} '
-                  '${_joinNames(pc.party)}.',
+                  context.l10n.campaignPartyAlso(
+                    pc.party.length,
+                    _joinNames(pc.party),
+                  ),
                   style: TextStyle(fontSize: 13, color: pal.textMuted),
                 ),
               ],
@@ -124,19 +124,19 @@ extension _CampaignSection on _SheetScreenState {
         if (pc.battlesOf(chapter.id) case final list when list.isNotEmpty)
           (chapter.name, list),
       if (pc.looseBattles case final list when list.isNotEmpty)
-        ('Sin capítulo', list),
+        (context.l10n.campaignNoChapter, list),
     ];
 
     return sheetCard(
       icon: Icons.sports_martial_arts,
-      title: 'Batallas',
+      title: context.l10n.campaignBattles,
       collapseKey: 'battles-${pc.memberId}',
       trailing: Padding(
         padding: const EdgeInsets.only(right: 10),
         child: Text(
           pc.battles.isEmpty
               ? '—'
-              : '${pc.battles.length} · $rounds ${rounds == 1 ? 'ronda' : 'rondas'}',
+              : '${pc.battles.length} · ${context.l10n.roundsCount(rounds)}',
           style: TextStyle(
             fontSize: 12,
             color: pal.textMuted,
@@ -148,7 +148,7 @@ extension _CampaignSection on _SheetScreenState {
         padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
         child: groups.isEmpty
             ? Text(
-                'Todavía no pelearon ninguna.',
+                context.l10n.campaignNoBattles,
                 style: TextStyle(fontSize: 13, color: pal.textMuted),
               )
             : Column(
@@ -198,7 +198,9 @@ extension _CampaignSection on _SheetScreenState {
                 const SizedBox(height: 3),
                 Text(
                   [
-                    others.isEmpty ? 'Solo' : 'Con ${_joinNames(others)}',
+                    others.isEmpty
+                        ? context.l10n.battleAlone
+                        : context.l10n.battleWith(_joinNames(others)),
                     _defeatedLabel(log),
                   ].join(' · '),
                   style: TextStyle(fontSize: 12, color: pal.textMuted),
@@ -208,7 +210,7 @@ extension _CampaignSection on _SheetScreenState {
           ),
           const SizedBox(width: 14),
           Text(
-            '${log.rounds} ${log.rounds == 1 ? 'ronda' : 'rondas'}',
+            context.l10n.roundsCount(log.rounds),
             style: TextStyle(
               fontSize: 12,
               color: pal.textMuted,
@@ -224,21 +226,30 @@ extension _CampaignSection on _SheetScreenState {
   /// `EncounterLog.playerView`): el jugador no tiene por qué saber cómo se
   /// llamaba, así que se lee «un enemigo».
   String _battleTitle(EncounterLog log) => log.monsters.isEmpty
-      ? 'Una pelea'
-      : 'Contra ${_joinNames([for (final m in log.monsters) switch ((m.name.isEmpty, m.count == 1)) {
-            (true, true) => 'un enemigo',
-            (true, false) => '${m.count} enemigos',
-            (false, true) => m.name,
-            (false, false) => '${m.count} ${m.name}',
-          }])}';
+      ? context.l10n.battleGeneric
+      : context.l10n.battleAgainst(
+          _joinNames([
+            for (final m in log.monsters)
+              switch ((m.name.isEmpty, m.count == 1)) {
+                (true, true) => context.l10n.enemyOne,
+                (true, false) => context.l10n.enemiesCount(m.count),
+                (false, true) => m.name,
+                (false, false) => '${m.count} ${m.name}',
+              },
+          ]),
+        );
 
   String _defeatedLabel(EncounterLog log) {
     final total = log.totalMonsters;
     final down = log.totalDefeated;
-    if (total == 0) return 'sin enemigos';
-    if (down == 0) return 'no cayó ninguno';
-    if (down == total) return total == 1 ? 'cayó' : 'cayeron todos';
-    return 'cayeron $down de $total';
+    if (total == 0) return context.l10n.battleNoEnemies;
+    if (down == 0) return context.l10n.battleNoneDown;
+    if (down == total) {
+      return total == 1
+          ? context.l10n.battleOneDown
+          : context.l10n.battleAllDown;
+    }
+    return context.l10n.battleSomeDown(down, total);
   }
 
   /// Los capítulos ya cerrados y lo que repartió cada uno.
@@ -250,7 +261,7 @@ extension _CampaignSection on _SheetScreenState {
 
     return sheetCard(
       icon: Icons.auto_stories_outlined,
-      title: 'Capítulos cerrados',
+      title: context.l10n.campaignClosedChapters,
       collapseKey: 'chapters-${pc.memberId}',
       trailing: Padding(
         padding: const EdgeInsets.only(right: 10),
@@ -267,8 +278,7 @@ extension _CampaignSection on _SheetScreenState {
         padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
         child: pc.chapters.isEmpty
             ? Text(
-                'Todavía no cerraron ninguno. Cuando pase, acá va a quedar '
-                'anotado lo que se repartió.',
+                context.l10n.campaignNoClosedChapters,
                 style: TextStyle(fontSize: 13, color: pal.textMuted),
               )
             : Column(
@@ -307,7 +317,7 @@ extension _CampaignSection on _SheetScreenState {
                 const SizedBox(height: 5),
                 if (chapter.grantsLabel.isEmpty)
                   Text(
-                    'Sin recompensas',
+                    context.l10n.campaignNoRewards,
                     style: TextStyle(fontSize: 13, color: pal.textMuted),
                   )
                 else
@@ -324,7 +334,7 @@ extension _CampaignSection on _SheetScreenState {
                       ),
                       Expanded(
                         child: Text(
-                          'Te llevaste ${chapter.grantsLabel}',
+                          context.l10n.campaignYouTook(chapter.grantsLabel),
                           style: TextStyle(fontSize: 13, color: pal.textMuted),
                         ),
                       ),
@@ -342,6 +352,9 @@ extension _CampaignSection on _SheetScreenState {
   /// botín de un capítulo, para que la pestaña entera suene igual.
   String _joinNames(List<String> names) {
     if (names.length <= 1) return names.join();
-    return '${names.take(names.length - 1).join(', ')} y ${names.last}';
+    return context.l10n.listAnd(
+      names.take(names.length - 1).join(', '),
+      names.last,
+    );
   }
 }

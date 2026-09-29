@@ -18,7 +18,9 @@ class RaceForm extends StatefulWidget {
 
 class _RaceFormState extends State<RaceForm> with _GuidedForm {
   late final _name = watch(widget.initial?.name ?? '');
+  // l10n-ignore: el tamaño por defecto es el valor guardado (`Race.size`), no texto.
   late String _size = widget.initial?.size ?? 'Mediano';
+  // l10n-ignore: tipo de criatura por defecto; el contenido del catálogo sigue en español (fase 2).
   late final _creatureType = watch(widget.initial?.creatureType ?? 'Humanoide');
   late final _tagline = watch(widget.initial?.tagline ?? '');
   late final _description = watch(widget.initial?.description ?? '');
@@ -43,7 +45,7 @@ class _RaceFormState extends State<RaceForm> with _GuidedForm {
     sizeOptions: _sizeOptions.length < 2
         ? const []
         : [
-            for (final s in _raceSizes.keys)
+            for (final s in _raceSizes(context.l10n).keys)
               if (_sizeOptions.contains(s)) s,
           ],
     skillChoiceFrom: _skillFrom.toList(),
@@ -59,35 +61,40 @@ class _RaceFormState extends State<RaceForm> with _GuidedForm {
   @override
   _Explained? explain(String key) => switch (key) {
     'type' => _explained(
-      'Tipo de criatura',
+      context.l10n.identityCreatureType,
       _creatureType.text.trim().isEmpty
-          ? 'Sin tipo'
+          ? context.l10n.hbNoType
           : _creatureType.text.trim(),
       raceCreatureTypeRule,
     ),
     'size' => switch (raceSizeRules[_size]) {
-      final rule? => _explained('Tamaño', _size, rule, sizeRule),
+      final rule? => _explained(
+        context.l10n.identitySize,
+        _raceSizes(context.l10n)[_size] ?? _size,
+        rule,
+        sizeRule,
+      ),
       null => null,
     },
     'speed' => _explained(
-      'Velocidad',
-      '${_speed.text.trim()} pies',
+      context.l10n.creatureSpeed,
+      context.l10n.feetValue(_speed.text.trim()),
       raceSpeedRule,
     ),
     'skillCount' => _explained(
-      'Habilidades',
-      _skillCountValue == 1 ? '1 a elegir' : '$_skillCountValue a elegir',
+      context.l10n.creatureSkills,
+      context.l10n.factChoose(_skillCountValue),
       raceSkillCountRule,
       skillProficiencyRule,
     ),
     'skillFrom' => _explained(
-      'Habilidades',
-      'Entre cuáles elige',
+      context.l10n.creatureSkills,
+      context.l10n.hbAmongWhichChooses,
       raceSkillFromRule,
     ),
     'sizeOptions' => _explained(
-      'Tamaño',
-      'Tamaño a elegir',
+      context.l10n.identitySize,
+      context.l10n.hbSizeToChoose,
       raceSizeOptionsRule,
     ),
     _ => null,
@@ -105,10 +112,10 @@ class _RaceFormState extends State<RaceForm> with _GuidedForm {
 
   String get _skillsSummary {
     final count = _skillCountValue;
-    if (count <= 0) return 'ninguna';
+    if (count <= 0) return context.l10n.hbNone;
     return _skillFrom.isEmpty
-        ? '$count entre todas'
-        : '$count entre ${_skillFrom.length}';
+        ? context.l10n.hbAmongAll(count)
+        : context.l10n.hbAmongN(count, _skillFrom.length);
   }
 
   @override
@@ -116,11 +123,11 @@ class _RaceFormState extends State<RaceForm> with _GuidedForm {
     final race = _race();
     final muted = Theme.of(context).colorScheme.onSurfaceVariant;
     return _FormScaffold(
-      title: 'Especie',
+      title: context.l10n.stepSpecies,
       onSave: _save,
       onInvalid: openAllSections,
       panel: guidePanel(
-        previewTitle: 'Cómo se va a ver al crear un personaje',
+        previewTitle: context.l10n.hbRacePreview,
         preview: DenseRows(
           children: [
             Padding(
@@ -133,51 +140,57 @@ class _RaceFormState extends State<RaceForm> with _GuidedForm {
                     Text(tagline, style: TextStyle(color: muted)),
                   const SizedBox(height: 10),
                   _statBand(context, [
-                    ('Tipo', race.creatureType),
+                    (context.l10n.identityCreatureTypeShort, race.creatureType),
                     (
-                      'Tamaño',
-                      race.sizeOptions.isEmpty ? race.size : 'a elegir',
+                      context.l10n.identitySize,
+                      race.sizeOptions.isEmpty
+                          ? race.size
+                          : context.l10n.factToChoose,
                     ),
-                    ('Velocidad', '${race.speed} pies'),
+                    (
+                      context.l10n.creatureSpeed,
+                      context.l10n.feetValue(race.speed),
+                    ),
                     if (race.skillChoiceCount > 0)
-                      ('Habilidades', '${race.skillChoiceCount} a elegir'),
+                      (
+                        context.l10n.creatureSkills,
+                        context.l10n.factChoose(race.skillChoiceCount),
+                      ),
                   ], wide: false),
                   if (race.description.isNotEmpty) ...[
                     const SizedBox(height: 10),
                     Text(race.description),
                   ],
                   const SizedBox(height: 12),
-                  const Eyebrow('Rasgos'),
+                  Eyebrow(context.l10n.creatureTraits),
                   ..._traitsPreview(context, race.effects, widget.repo),
                 ],
               ),
             ),
           ],
         ),
-        hint:
-            'Tocá el tipo, el tamaño, la velocidad o las habilidades para ver '
-            'qué implican.',
+        hint: context.l10n.hbRaceHint,
       ),
       children: [
         _text(
           _name,
-          'Nombre',
-          validator: (v) => _requiredText(v, 'el nombre de la especie'),
+          context.l10n.detailsName,
+          validator: (v) => _requiredText(v, context.l10n.hbReqRaceName),
         ),
         _fieldRow(
           flex: const [3, 2, 2],
           [
             _text(
               _creatureType,
-              'Tipo de criatura',
+              context.l10n.identityCreatureType,
               onTap: () => focusOn('type'),
             ),
             // Tamaño es un valor cerrado: escribirlo a mano dejaba pasar un
             // "mediano" en minúscula que el resto del motor no reconoce.
             _idDropdown(
-              label: 'Tamaño',
+              label: context.l10n.identitySize,
               value: _size,
-              options: _raceSizes,
+              options: _raceSizes(context.l10n),
               onChanged: (v) => setState(() {
                 _size = v;
                 focus = 'size';
@@ -186,9 +199,10 @@ class _RaceFormState extends State<RaceForm> with _GuidedForm {
             ),
             _text(
               _speed,
-              'Velocidad (pies)',
+              context.l10n.hbSpeedFeet,
               number: true,
-              validator: (v) => _intInRange(v, 0, 120, optional: false),
+              validator: (v) =>
+                  _intInRange(context.l10n, v, 0, 120, optional: false),
               onTap: () => focusOn('speed'),
             ),
           ],
@@ -197,31 +211,33 @@ class _RaceFormState extends State<RaceForm> with _GuidedForm {
         ..._optionalRule,
         section(
           icon: Icons.menu_book_outlined,
-          title: 'Presentación',
+          title: context.l10n.hbPresentation,
           summary: _orNone([
-            if (_tagline.text.trim().isNotEmpty) 'lema',
-            if (_description.text.trim().isNotEmpty) 'descripción',
-          ], 'sin cargar'),
+            if (_tagline.text.trim().isNotEmpty) context.l10n.hbTaglineLower,
+            if (_description.text.trim().isNotEmpty)
+              context.l10n.hbDescriptionLower,
+          ], context.l10n.hbNotSet),
           children: [
-            _text(_tagline, 'Lema (una línea, se ve al elegirla)'),
-            _text(_description, 'Descripción', maxLines: 5),
+            _text(_tagline, context.l10n.hbTaglineLabel),
+            _text(_description, context.l10n.hbDescription, maxLines: 5),
           ],
         ),
         section(
           icon: Icons.school_outlined,
-          title: 'Habilidades',
+          title: context.l10n.creatureSkills,
           summary: _skillsSummary,
           children: [
             _text(
               _skillCount,
-              'Cuántas elige',
+              context.l10n.hbHowMany,
               number: true,
-              validator: (v) => _intInRange(v, 0, 18, optional: false),
+              validator: (v) =>
+                  _intInRange(context.l10n, v, 0, 18, optional: false),
               onTap: () => focusOn('skillCount'),
             ),
             if (_skillCountValue > 0 || _skillFrom.isNotEmpty) ...[
               const SizedBox(height: 6),
-              const Eyebrow('Entre cuáles'),
+              Eyebrow(context.l10n.hbAmongWhich),
               _idChips(
                 _skillOptions,
                 _skillFrom,
@@ -234,16 +250,18 @@ class _RaceFormState extends State<RaceForm> with _GuidedForm {
         ),
         section(
           icon: Icons.height,
-          title: 'Tamaño a elegir',
+          title: context.l10n.hbSizeToChoose,
           summary: _sizeOptions.length < 2
-              ? 'solo $_size'
+              ? context.l10n.hbOnlySize(
+                  _raceSizes(context.l10n)[_size] ?? _size,
+                )
               : [
-                  for (final s in _raceSizes.keys)
-                    if (_sizeOptions.contains(s)) s,
-                ].join(' o '),
+                  for (final s in _raceSizes(context.l10n).keys)
+                    if (_sizeOptions.contains(s)) _raceSizes(context.l10n)[s]!,
+                ].join(' ${context.l10n.wordOr} '),
           children: [
             _idChips(
-              _raceSizes,
+              _raceSizes(context.l10n),
               _sizeOptions,
               redraw,
               onTap: (_) => focus = 'sizeOptions',
@@ -253,8 +271,8 @@ class _RaceFormState extends State<RaceForm> with _GuidedForm {
         ),
         section(
           icon: Icons.auto_awesome,
-          title: 'Rasgos',
-          summary: _effectsSummary(_effects),
+          title: context.l10n.creatureTraits,
+          summary: _effectsSummary(context.l10n, _effects),
           children: [
             EffectEditor(
               effects: _effects,

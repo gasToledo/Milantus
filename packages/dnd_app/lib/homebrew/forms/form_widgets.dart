@@ -70,16 +70,16 @@ class _FormScaffoldState extends State<_FormScaffold> {
       builder: (ctx) => AppDialog(
         icon: Icons.warning_amber_rounded,
         iconColor: pal.crimson,
-        title: '¿Salir sin guardar?',
-        content: Text('Lo que escribiste en «${widget.title}» se pierde.'),
+        title: context.l10n.hbLeaveTitle,
+        content: Text(context.l10n.hbLeaveBody(widget.title)),
         actions: [
           DialogAction(
-            'Seguir editando',
+            context.l10n.hbKeepEditing,
             keyHint: 'Esc',
             onPressed: () => Navigator.pop(ctx, false),
           ),
           DialogAction(
-            'Salir sin guardar',
+            context.l10n.hbLeave,
             primary: true,
             color: pal.crimson,
             onPressed: () => Navigator.pop(ctx, true),
@@ -99,7 +99,7 @@ class _FormScaffoldState extends State<_FormScaffold> {
     setState(() => _autovalidate = AutovalidateMode.onUserInteraction);
     showAppMessage(
       context,
-      'No se guardó nada: revisá los campos marcados en rojo.',
+      context.l10n.hbFixFields,
       tone: AppMessageTone.error,
     );
   }
@@ -173,7 +173,7 @@ class _FormScaffoldState extends State<_FormScaffold> {
               Expanded(
                 child: OutlinedButton(
                   onPressed: () => Navigator.maybePop(context),
-                  child: const Text('Cancelar'),
+                  child: Text(context.l10n.commonCancel),
                 ),
               ),
               const SizedBox(width: 12),
@@ -182,7 +182,7 @@ class _FormScaffoldState extends State<_FormScaffold> {
                 child: FilledButton.icon(
                   onPressed: _save,
                   icon: const Icon(Icons.save),
-                  label: const Text('Guardar'),
+                  label: Text(context.l10n.commonSave),
                 ),
               ),
             ],
@@ -309,7 +309,9 @@ class _FormSection extends StatelessWidget {
                           Icons.expand_more,
                           size: 20,
                           color: pal.textMuted,
-                          semanticLabel: expanded ? 'Plegar' : 'Desplegar',
+                          semanticLabel: expanded
+                              ? context.l10n.commonCollapse
+                              : context.l10n.commonExpand,
                         ),
                       ),
                     ],
@@ -336,9 +338,11 @@ class _FormSection extends StatelessWidget {
 }
 
 /// Separa lo que hace falta para guardar de lo que se puede dejar para después.
-const _optionalRule = [
-  SectionRule(),
-  Center(child: Eyebrow('Lo demás es opcional')),
+List<Widget> get _optionalRule => [
+  const SectionRule(),
+  Center(
+    child: Builder(builder: (context) => Eyebrow(context.l10n.hbOptionalRule)),
+  ),
 ];
 
 /// Lo que significa algo que se puede elegir: una propiedad, un tipo de daño,
@@ -422,7 +426,7 @@ class _ChosenList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Eyebrow('Lo que ya elegiste'),
+        Eyebrow(context.l10n.hbAlreadyChosen),
         for (final item in items)
           Container(
             padding: const EdgeInsets.symmetric(vertical: 9),
@@ -612,12 +616,15 @@ Widget _rowPreview(
   ),
 );
 
+// l10n-ignore: nombre de tipografía, no texto.
+const _previewFont = 'Georgia';
+
 /// El nombre de lo que se está armando, o un aviso atenuado mientras falta.
 Widget _previewName(BuildContext context, String name, {double? size}) => Text(
-  name.trim().isEmpty ? 'Todavía sin nombre' : name.trim(),
+  name.trim().isEmpty ? context.l10n.hbNoNameYet : name.trim(),
   style: TextStyle(
     fontWeight: size == null ? FontWeight.w500 : null,
-    fontFamily: size == null ? null : 'Georgia',
+    fontFamily: size == null ? null : _previewFont,
     fontSize: size,
     color: name.trim().isEmpty
         ? Theme.of(context).colorScheme.onSurfaceVariant
@@ -638,11 +645,11 @@ List<Widget> _traitsPreview(
   ContentRepository repo,
 ) {
   final muted = Theme.of(context).colorScheme.onSurfaceVariant;
-  final traits = readableTraits(effects, repo);
+  final traits = readableTraits(context.l10n, effects, repo);
   if (traits.isEmpty) {
     return [
       Text(
-        'Todavía no concede nada.',
+        context.l10n.hbGrantsNothing,
         style: TextStyle(fontSize: 13, color: muted),
       ),
     ];
@@ -729,38 +736,48 @@ Widget _statBand(
 // reemplazarse por un defecto que nadie pidió (que es lo que hacía el
 // `int.tryParse(...) ?? 10` de antes).
 
-String? _requiredText(String? value, String what) =>
-    (value ?? '').trim().isEmpty ? 'Escribí $what.' : null;
+/// [message] es la frase entera («Escribí el nombre de la dote.»): armarla
+/// con un sustantivo suelto no se traduce.
+String? _requiredText(String? value, String message) =>
+    (value ?? '').trim().isEmpty ? message : null;
 
 /// Dado de daño con la forma `NdM` (p.ej. `1d8`, `2d6`).
 final _dicePattern = RegExp(r'^\d+d\d+$');
 
-String? _diceValue(String? value, {required bool optional}) {
+String? _diceValue(
+  AppLocalizations l10n,
+  String? value, {
+  required bool optional,
+}) {
   final text = (value ?? '').trim();
   if (text.isEmpty) {
-    return optional ? null : 'Escribí un dado, por ejemplo 1d8.';
+    return optional ? null : l10n.hbDiceRequired;
   }
-  return _dicePattern.hasMatch(text)
-      ? null
-      : 'Formato de dado inválido: se espera algo como 1d8.';
+  return _dicePattern.hasMatch(text) ? null : l10n.hbDiceInvalid;
 }
 
-String? _intInRange(String? value, int min, int max, {required bool optional}) {
+String? _intInRange(
+  AppLocalizations l10n,
+  String? value,
+  int min,
+  int max, {
+  required bool optional,
+}) {
   final text = (value ?? '').trim();
-  if (text.isEmpty) return optional ? null : 'Escribí un número.';
+  if (text.isEmpty) return optional ? null : l10n.hbNumberRequired;
   final n = int.tryParse(text);
-  if (n == null) return 'Tiene que ser un número entero.';
-  return n < min || n > max ? 'Tiene que estar entre $min y $max.' : null;
+  if (n == null) return l10n.hbIntInvalid;
+  return n < min || n > max ? l10n.hbRange(min, max) : null;
 }
 
 /// Peso en libras. Admite fracciones decimales porque el catálogo incluye
 /// objetos de media libra y de un cuarto de libra.
-String? _weightValue(String? value) {
+String? _weightValue(AppLocalizations l10n, String? value) {
   final text = (value ?? '').trim();
-  if (text.isEmpty) return 'Escribí un peso, 0 si no cuenta.';
+  if (text.isEmpty) return l10n.hbWeightRequired;
   final n = double.tryParse(text);
-  if (n == null) return 'Tiene que ser un número.';
-  return n < 0 ? 'No puede ser negativo.' : null;
+  if (n == null) return l10n.hbNumberInvalid;
+  return n < 0 ? l10n.hbNegative : null;
 }
 
 // ------------------------------------------------------------------ Campos
@@ -833,12 +850,14 @@ Widget _damageTypeDropdown(
     ..._damageTypeOptions.keys,
     if (DamageType.fromId(value) == null) value,
   ];
-  return _idDropdown(
-    label: 'Tipo de daño',
-    value: value,
-    options: {for (final id in ids) id: DamageType.labelFor(id)},
-    onChanged: onChanged,
-    onTap: onTap,
+  return Builder(
+    builder: (context) => _idDropdown(
+      label: context.l10n.hbDamageType,
+      value: value,
+      options: {for (final id in ids) id: DamageType.labelFor(id)},
+      onChanged: onChanged,
+      onTap: onTap,
+    ),
   );
 }
 
@@ -856,24 +875,29 @@ Widget _idDropdown({
   VoidCallback? onTap,
 }) => Padding(
   padding: const EdgeInsets.symmetric(vertical: 6),
-  child: DropdownButtonFormField<String>(
-    // Un id fuera del catálogo (homebrew viejo, importado) se conserva como
-    // opción abajo, así que siempre hay exactamente una que corresponde a
-    // `value`: abrir el formulario no puede cambiarlo por la espalda.
-    initialValue: value,
-    isExpanded: true,
-    onTap: onTap,
-    decoration: InputDecoration(
-      labelText: label,
-      border: const OutlineInputBorder(),
+  child: Builder(
+    builder: (context) => DropdownButtonFormField<String>(
+      // Un id fuera del catálogo (homebrew viejo, importado) se conserva como
+      // opción abajo, así que siempre hay exactamente una que corresponde a
+      // `value`: abrir el formulario no puede cambiarlo por la espalda.
+      initialValue: value,
+      isExpanded: true,
+      onTap: onTap,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+      ),
+      items: [
+        for (final entry in options.entries)
+          DropdownMenuItem(value: entry.key, child: Text(entry.value)),
+        if (!options.containsKey(value))
+          DropdownMenuItem(
+            value: value,
+            child: Text(context.l10n.hbUnknownValue(value)),
+          ),
+      ],
+      onChanged: (v) => onChanged(v ?? value),
     ),
-    items: [
-      for (final entry in options.entries)
-        DropdownMenuItem(value: entry.key, child: Text(entry.value)),
-      if (!options.containsKey(value))
-        DropdownMenuItem(value: value, child: Text('$value (desconocido)')),
-    ],
-    onChanged: (v) => onChanged(v ?? value),
   ),
 );
 
@@ -882,12 +906,14 @@ Widget _categoryDropdown(
   String value,
   ValueChanged<String> onChanged, {
   VoidCallback? onTap,
-}) => _idDropdown(
-  label: 'Categoría',
-  value: value,
-  options: options,
-  onChanged: onChanged,
-  onTap: onTap,
+}) => Builder(
+  builder: (context) => _idDropdown(
+    label: context.l10n.codexCategory,
+    value: value,
+    options: options,
+    onChanged: onChanged,
+    onTap: onTap,
+  ),
 );
 
 /// Chips de selección múltiple sobre ids con etiqueta en español.

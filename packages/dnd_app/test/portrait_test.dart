@@ -6,6 +6,7 @@ import 'package:dnd_app/theme/app_widgets.dart';
 import 'package:dnd_app/ui/portrait_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'fakes/localized_app.dart';
 
 // La generación en sí (proveedores, servicios de Azure/Pollinations) vive
 // ahora en dnd_server (ver `packages/dnd_server/test/ai/`, capacidad
@@ -161,7 +162,7 @@ void main() {
 
     Future<void> pumpMedallion(WidgetTester tester, double size) =>
         tester.pumpWidget(
-          MaterialApp(
+          localizedApp(
             theme: AppTheme.dark,
             home: Medallion(
               portraitKey: 'sagan/x.png',

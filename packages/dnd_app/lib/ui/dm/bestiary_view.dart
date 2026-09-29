@@ -5,6 +5,7 @@ import '../../api/api_client.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/app_widgets.dart';
 import 'add_monster_dialog.dart';
+import '../../l10n/l10n_context.dart';
 
 /// El bestiario: buscar un monstruo, leer su perfil y sumarlo al combate.
 ///
@@ -150,13 +151,13 @@ class _BestiaryViewState extends State<BestiaryView> {
             : '${choice.count} × ${choice.creature.name}';
         showAppMessage(
           context,
-          'Sumaste $what al combate de ${campaign.name}.',
+          context.l10n.dmAddedToCombat(what, campaign.name),
         );
       } catch (error) {
         if (!mounted) return;
         showAppMessage(
           context,
-          failureMessage('No se pudo sumar al combate', error),
+          failureMessage(context.l10n.dmAddToCombatFailed, error),
           tone: AppMessageTone.error,
         );
       }
@@ -230,9 +231,9 @@ class _BestiaryViewState extends State<BestiaryView> {
             VerticalDivider(width: 1, color: context.palette.hairline),
             Expanded(
               child: _selected == null
-                  ? const AppEmptyState(
+                  ? AppEmptyState(
                       icon: Icons.pets_outlined,
-                      message: 'Elegí una criatura para ver su perfil.',
+                      message: context.l10n.dmPickCreature,
                     )
                   : _detail(context, _selected!),
             ),
@@ -251,7 +252,7 @@ class _BestiaryViewState extends State<BestiaryView> {
     // Igual con los VD: los que existen en lo cargado, homebrew incluido.
     final crs = <num>{for (final c in _all) ?c.cr}.toList()..sort();
     List<DropdownMenuItem<num?>> crItems() => [
-      const DropdownMenuItem(value: null, child: Text('Cualquiera')),
+      DropdownMenuItem(value: null, child: Text(context.l10n.dmAny)),
       for (final cr in crs)
         DropdownMenuItem(value: cr, child: Text(challengeRatingLabel(cr))),
     ];
@@ -267,13 +268,13 @@ class _BestiaryViewState extends State<BestiaryView> {
                 controller: _searchController,
                 decoration: InputDecoration(
                   isDense: true,
-                  labelText: 'Buscar criatura',
-                  hintText: 'Nombre',
+                  labelText: context.l10n.dmSearchCreature,
+                  hintText: context.l10n.detailsName,
                   prefixIcon: const Icon(Icons.search, size: 20),
                   suffixIcon: _query.isEmpty
                       ? null
                       : IconButton(
-                          tooltip: 'Limpiar búsqueda',
+                          tooltip: context.l10n.rosterClearSearch,
                           icon: const Icon(Icons.close, size: 18),
                           onPressed: () {
                             _searchController.clear();
@@ -294,14 +295,14 @@ class _BestiaryViewState extends State<BestiaryView> {
                 // Sin esto el desplegable se mide por su ítem más ancho y se
                 // desborda de la columna de 300 px.
                 isExpanded: true,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   isDense: true,
-                  labelText: 'Tipo',
+                  labelText: context.l10n.identityCreatureTypeShort,
                 ),
                 items: [
-                  const DropdownMenuItem(
+                  DropdownMenuItem(
                     value: _todos,
-                    child: Text('Todos los tipos'),
+                    child: Text(context.l10n.dmAllTypes),
                   ),
                   for (final t in types)
                     DropdownMenuItem(value: t.id, child: Text(t.label)),
@@ -317,9 +318,9 @@ class _BestiaryViewState extends State<BestiaryView> {
                       initialValue: _minCr,
                       isDense: true,
                       isExpanded: true,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         isDense: true,
-                        labelText: 'VD desde',
+                        labelText: context.l10n.dmCrFrom,
                       ),
                       items: crItems(),
                       onChanged: _setMinCr,
@@ -332,9 +333,9 @@ class _BestiaryViewState extends State<BestiaryView> {
                       initialValue: _maxCr,
                       isDense: true,
                       isExpanded: true,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         isDense: true,
-                        labelText: 'VD hasta',
+                        labelText: context.l10n.dmCrTo,
                       ),
                       items: crItems(),
                       onChanged: _setMaxCr,
@@ -364,9 +365,15 @@ class _BestiaryViewState extends State<BestiaryView> {
                   visualDensity: VisualDensity.compact,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                segments: const [
-                  ButtonSegment(value: false, label: Text('Nombre')),
-                  ButtonSegment(value: true, label: Text('VD')),
+                segments: [
+                  ButtonSegment(
+                    value: false,
+                    label: Text(context.l10n.sortName),
+                  ),
+                  ButtonSegment(
+                    value: true,
+                    label: Text(context.l10n.challengeRatingShort),
+                  ),
                 ],
                 selected: {_sortByCr},
                 onSelectionChanged: (s) => setState(() => _sortByCr = s.single),
@@ -379,11 +386,11 @@ class _BestiaryViewState extends State<BestiaryView> {
           child: results.isEmpty
               ? AppEmptyState(
                   icon: Icons.search_off,
-                  message: 'Ninguna criatura coincide con lo que buscaste.',
+                  message: context.l10n.dmNoCreatureMatches,
                   actions: [
                     OutlinedButton(
                       onPressed: _clearFilters,
-                      child: const Text('Limpiar filtros'),
+                      child: Text(context.l10n.codexClearFilters),
                     ),
                   ],
                 )
@@ -410,7 +417,11 @@ class _BestiaryViewState extends State<BestiaryView> {
                       ),
                       trailing: c.cr == null
                           ? null
-                          : Text('VD ${challengeRatingLabel(c.cr!)}'),
+                          : Text(
+                              context.l10n.hbCrValue(
+                                challengeRatingLabel(c.cr!),
+                              ),
+                            ),
                       onTap: () => setState(() => _selected = c),
                     );
                   },
@@ -431,7 +442,7 @@ class _BestiaryViewState extends State<BestiaryView> {
             child: TextButton.icon(
               onPressed: onBack,
               icon: const Icon(Icons.arrow_back, size: 18),
-              label: const Text('Volver al listado'),
+              label: Text(context.l10n.codexBackToList),
             ),
           ),
         Wrap(
@@ -459,7 +470,7 @@ class _BestiaryViewState extends State<BestiaryView> {
               onPressed: () => _addToCombat(c),
               icon: const Icon(Icons.add, size: 18),
               label: Text(
-                'Sumar al combate de ${campaign.name}',
+                context.l10n.dmAddToCombatOf(campaign.name),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -467,7 +478,7 @@ class _BestiaryViewState extends State<BestiaryView> {
           )
         else
           Text(
-            'Para sumarla a un combate, primero creá una campaña.',
+            context.l10n.dmCreateCampaignFirst,
             style: TextStyle(fontSize: 12.5, color: pal.textMuted),
           ),
         const SizedBox(height: 16),

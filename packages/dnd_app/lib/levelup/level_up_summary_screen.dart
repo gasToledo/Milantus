@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
 import '../theme/app_widgets.dart';
+import '../l10n/l10n_context.dart';
 
 /// Resumen de "lo ganado" tras subir de nivel: PG, características, ataques,
 /// rasgos de clase, pasivas de dote, competencias y recursos nuevos. Se abre con
@@ -73,22 +74,31 @@ class _LevelUpSummaryScreenState extends State<LevelUpSummaryScreen>
     final quickChips = <Widget>[
       if (diff.proficiencyBonusChanged)
         _StatChip(
-          'Competencia',
+          context.l10n.statProficiency,
           '+${diff.proficiencyBonusFrom} → +${diff.proficiencyBonusTo}',
         ),
       if (diff.extraAttacksGained > 0)
-        _StatChip('Ataques/acción', '+${diff.extraAttacksGained}'),
+        _StatChip(context.l10n.luStatAttacks, '+${diff.extraAttacksGained}'),
       if (diff.weaponMasterySlotsGained > 0)
-        _StatChip('Maestrías', '+${diff.weaponMasterySlotsGained}'),
+        _StatChip(
+          context.l10n.luStatMasteries,
+          '+${diff.weaponMasterySlotsGained}',
+        ),
       if (diff.speedGained != 0)
-        _StatChip('Velocidad', '${_signed(diff.speedGained)} pies'),
+        _StatChip(
+          context.l10n.creatureSpeed,
+          '${_signed(diff.speedGained)}${context.l10n.unitFeetSuffix}',
+        ),
       if (diff.newDarkvision != null)
-        _StatChip('Visión osc.', '${diff.newDarkvision} pies'),
+        _StatChip(
+          context.l10n.luStatDarkvision,
+          '${diff.newDarkvision}${context.l10n.unitFeetSuffix}',
+        ),
     ];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Subida de nivel'),
+        title: Text(context.l10n.luSummaryTitle),
         automaticallyImplyLeading: false,
       ),
       body: PageBody(
@@ -117,7 +127,7 @@ class _LevelUpSummaryScreenState extends State<LevelUpSummaryScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '+${diff.hpGained} PG máximos',
+                              context.l10n.luHpMax(diff.hpGained),
                               style: TextStyle(
                                 fontFamily: 'Georgia',
                                 fontSize: 24,
@@ -126,7 +136,7 @@ class _LevelUpSummaryScreenState extends State<LevelUpSummaryScreen>
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              'Tus PG actuales suben lo mismo.',
+                              context.l10n.luHpCurrent,
                               style: TextStyle(fontSize: 13, color: muted),
                             ),
                           ],
@@ -141,7 +151,7 @@ class _LevelUpSummaryScreenState extends State<LevelUpSummaryScreen>
                 ],
                 if (diff.abilityChanges.isNotEmpty) ...[
                   const SizedBox(height: 22),
-                  const Eyebrow('Características'),
+                  Eyebrow(context.l10n.abilitiesTitle),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -155,13 +165,13 @@ class _LevelUpSummaryScreenState extends State<LevelUpSummaryScreen>
                 if (diff.newSkillProficiencies.isNotEmpty ||
                     diff.newSaveProficiencies.isNotEmpty) ...[
                   const SizedBox(height: 22),
-                  const Eyebrow('Nuevas competencias'),
+                  Eyebrow(context.l10n.luNewProficiencies),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
                     children: [
                       ...diff.newSaveProficiencies.map(
-                        (a) => GoldPill('Salv. ${a.abbr}'),
+                        (a) => GoldPill(context.l10n.luSavShort(a.abbr)),
                       ),
                       ...diff.newSkillProficiencies.map(
                         (s) => GoldPill(titleCaseId(s)),
@@ -171,7 +181,7 @@ class _LevelUpSummaryScreenState extends State<LevelUpSummaryScreen>
                 ],
                 if (newFeatures.isNotEmpty) ...[
                   const SizedBox(height: 22),
-                  const Eyebrow('Rasgos de clase ganados'),
+                  Eyebrow(context.l10n.luNewFeatures),
                   DenseRows(
                     children: [
                       for (final f in newFeatures)
@@ -183,7 +193,7 @@ class _LevelUpSummaryScreenState extends State<LevelUpSummaryScreen>
                   const SizedBox(height: 22),
                   // No todo lo de acá es una dote: también caen opciones de un
                   // rasgo, como Arma Sagrada de Canalizar Divinidad.
-                  const Eyebrow('También ganás'),
+                  Eyebrow(context.l10n.luAlsoGain),
                   DenseRows(
                     children: [
                       for (final p in featPassives)
@@ -193,21 +203,24 @@ class _LevelUpSummaryScreenState extends State<LevelUpSummaryScreen>
                 ],
                 if (diff.newResources.isNotEmpty) ...[
                   const SizedBox(height: 22),
-                  const Eyebrow('Recursos nuevos'),
+                  Eyebrow(context.l10n.luNewResources),
                   DenseRows(
                     children: [
                       for (final r in diff.newResources)
                         _featureRow(
                           context,
                           r.name,
-                          'Usos: ${r.max} · recarga: ${_recharge(r.recharge)}',
+                          context.l10n.luResourceLine(
+                            r.max,
+                            _recharge(context.l10n, r.recharge),
+                          ),
                         ),
                     ],
                   ),
                 ],
                 if (diff.newCompanions.isNotEmpty) ...[
                   const SizedBox(height: 22),
-                  const Eyebrow('Compañeros nuevos'),
+                  Eyebrow(context.l10n.luNewCompanions),
                   DenseRows(
                     children: [
                       for (final c in diff.newCompanions)
@@ -215,22 +228,21 @@ class _LevelUpSummaryScreenState extends State<LevelUpSummaryScreen>
                           context,
                           c.name,
                           c.forms.length == 1
-                              ? 'Se invoca desde la pestaña Combate.'
-                              : '${c.forms.length} formas a elegir, desde la '
-                                    'pestaña Combate.',
+                              ? context.l10n.luCompanionOne
+                              : context.l10n.luCompanionMany(c.forms.length),
                         ),
                     ],
                   ),
                 ],
                 if (diff.wildShapeFormsGained > 0) ...[
                   const SizedBox(height: 22),
-                  const Eyebrow('Forma Salvaje'),
+                  Eyebrow(context.l10n.wildShapeTitle),
                   DenseRows(
                     children: [
                       _featureRow(
                         context,
-                        '${diff.wildShapeFormsGained} formas más',
-                        'Anotá las nuevas desde la pestaña Combate.',
+                        context.l10n.luFormsMore(diff.wildShapeFormsGained),
+                        context.l10n.luFormsNote,
                       ),
                     ],
                   ),
@@ -246,7 +258,7 @@ class _LevelUpSummaryScreenState extends State<LevelUpSummaryScreen>
           child: FilledButton.icon(
             onPressed: () => Navigator.of(context).pop(),
             icon: const Icon(Icons.check_circle),
-            label: const Text('¡Listo!'),
+            label: Text(context.l10n.luDone),
           ),
         ),
       ),
@@ -309,7 +321,7 @@ class _LevelUpSummaryScreenState extends State<LevelUpSummaryScreen>
         FadeTransition(
           opacity: _content,
           child: Text(
-            '¡Subiste a nivel $level!',
+            context.l10n.luLeveled(level),
             style: TextStyle(fontSize: 15, letterSpacing: 0.3, color: muted),
           ),
         ),
@@ -420,8 +432,8 @@ class _BurstPainter extends CustomPainter {
 
 String _signed(int v) => v >= 0 ? '+$v' : '$v';
 
-String _recharge(RechargeOn r) => switch (r) {
-  RechargeOn.shortRest => 'descanso corto',
-  RechargeOn.longRest => 'descanso largo',
+String _recharge(AppLocalizations l10n, RechargeOn r) => switch (r) {
+  RechargeOn.shortRest => l10n.restShortLower,
+  RechargeOn.longRest => l10n.restLongLower,
   RechargeOn.none => '—',
 };

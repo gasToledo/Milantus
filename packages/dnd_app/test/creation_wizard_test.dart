@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'creation_helpers.dart';
+import 'fakes/localized_app.dart';
 
 void main() {
   late ContentRepository repo;
@@ -46,7 +47,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: CreationWizard(repo: repo, onCreate: (_) {}),
       ),
@@ -59,9 +60,11 @@ void main() {
     // del paso abierto repite el nombre del primero («ESPECIE»).
     for (final s in CreationStep.values) {
       expect(
-        find.bySemanticsLabel(RegExp('^${s.label}, paso ${s.index + 1} de 8')),
+        find.bySemanticsLabel(
+          RegExp('^${s.label(l10nEs)}, paso ${s.index + 1} de 8'),
+        ),
         findsOneWidget,
-        reason: 'falta el paso ${s.label}',
+        reason: 'falta el paso ${s.label(l10nEs)}',
       );
     }
     // Arranca bloqueado: hay que elegir especie antes de avanzar.
@@ -79,7 +82,7 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.reset);
       await tester.pumpWidget(
-        MaterialApp(
+        localizedApp(
           theme: AppTheme.dark,
           home: CreationWizard(repo: repo, onCreate: (_) {}),
         ),
@@ -137,7 +140,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: CreationWizard(repo: repo, onCreate: (_) {}),
       ),
@@ -150,7 +153,10 @@ void main() {
       find.bySemanticsLabel(RegExp('^Especie, paso 1 de 8')),
       findsOneWidget,
     );
-    expect(find.text(CreationStep.resumen.label.toUpperCase()), findsOneWidget);
+    expect(
+      find.text(CreationStep.resumen.label(l10nEs).toUpperCase()),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -166,7 +172,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: CreationWizard(repo: repo, onCreate: (_) {}),
       ),
@@ -206,7 +212,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: CreationWizard(repo: repo, onCreate: (_) {}),
       ),
@@ -275,7 +281,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: CreationWizard(repo: repo, onCreate: (_) {}),
       ),
@@ -305,7 +311,7 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: CreationWizard(repo: repo, onCreate: (_) {}),
       ),

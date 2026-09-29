@@ -22,11 +22,11 @@ class ItemForm extends StatefulWidget {
   State<ItemForm> createState() => _ItemFormState();
 }
 
-const _baseItemKinds = {
-  'none': 'Ninguno',
-  'weapon': 'Arma',
-  'armor': 'Armadura',
-  'shield': 'Escudo',
+Map<String, String> _baseItemKinds(AppLocalizations l10n) => {
+  'none': l10n.hbNoneCap,
+  'weapon': l10n.kindWeapon,
+  'armor': l10n.kindArmor,
+  'shield': l10n.kindShield,
 };
 
 class _ItemFormState extends State<ItemForm> with _GuidedForm {
@@ -106,49 +106,55 @@ class _ItemFormState extends State<ItemForm> with _GuidedForm {
         final rule = itemCategoryRules[_category];
         if (rule == null) return null;
         return _explained(
-          'Categoría',
-          _itemCategories[_category] ?? _category,
+          context.l10n.codexCategory,
+          _itemCategories(context.l10n)[_category] ?? _category,
           rule,
           itemCategoryNote,
         );
       case 'rarity':
         final rarity = _rarity;
         return rarity == null
-            ? _explained('Rareza', 'Mundano', itemMundaneRule)
+            ? _explained(
+                context.l10n.codexRarity,
+                context.l10n.hbMundane,
+                itemMundaneRule,
+              )
             : _explained(
-                'Rareza',
-                _itemRarities[rarity] ?? rarity,
+                context.l10n.codexRarity,
+                _itemRarities(context.l10n)[rarity] ?? rarity,
                 itemRarityRule,
               );
       case 'attunement':
         return _explained(
-          'Magia',
-          _attunement ? 'Sintonización' : 'Sin sintonización',
+          context.l10n.hbMagic,
+          _attunement
+              ? context.l10n.codexAttunement
+              : context.l10n.hbNoAttunement,
           itemAttunementRule,
         );
       case 'acBonus':
         return _explained(
-          'Efecto',
-          'CA ${_signed(_acBonusValue)}',
+          context.l10n.hbEffect,
+          context.l10n.acValue(_signed(_acBonusValue)),
           itemAcBonusRule,
         );
       case 'base':
         return _explained(
-          'Objeto base',
-          _baseItemKinds[_baseItemKind] ?? _baseItemKind,
+          context.l10n.hbBaseItem,
+          _baseItemKinds(context.l10n)[_baseItemKind] ?? _baseItemKind,
           itemBaseRule,
         );
       case 'magicBonus':
         return _explained(
-          'Objeto base',
-          'Bonificador ${_signed(_magicBonusValue)}',
+          context.l10n.hbBaseItem,
+          context.l10n.hbBonusValue(_signed(_magicBonusValue)),
           itemMagicBonusRule,
         );
     }
     final type = key.substring('res:'.length);
     return _explained(
-      'Efecto',
-      'Resistencia: ${DamageType.labelFor(type)}',
+      context.l10n.hbEffect,
+      context.l10n.effectResistance(DamageType.labelFor(type)),
       itemResistanceRule,
       DamageType.fromId(type)?.description,
     );
@@ -167,44 +173,40 @@ class _ItemFormState extends State<ItemForm> with _GuidedForm {
   ];
 
   String get _effectsSummary => _orNone([
-    if (_acBonusValue != 0) 'CA ${_signed(_acBonusValue)}',
+    if (_acBonusValue != 0) context.l10n.acValue(_signed(_acBonusValue)),
     for (final MapEntry(key: id, value: label) in _damageTypeOptions.entries)
-      if (_resistances.contains(id)) 'Resistencia: $label',
+      if (_resistances.contains(id)) context.l10n.effectResistance(label),
     if (_otherEffects.isNotEmpty)
-      _otherEffects.length == 1
-          ? '1 efecto más'
-          : '${_otherEffects.length} efectos más',
-  ], 'ninguno');
+      context.l10n.hbMoreEffects(_otherEffects.length),
+  ], context.l10n.hbNoneM);
 
   @override
   Widget build(BuildContext context) {
     final item = _item();
     return _FormScaffold(
-      title: 'Objeto',
+      title: context.l10n.hbItem,
       onSave: _save,
       onInvalid: openAllSections,
       panel: guidePanel(
-        previewTitle: 'Así queda en tu lista',
+        previewTitle: context.l10n.hbPreviewTitle,
         preview: _rowPreview(
           item.name,
-          pills: _itemPills(item),
-          stats: _itemStats(item),
+          pills: _itemPills(context.l10n, item),
+          stats: _itemStats(context.l10n, item),
         ),
-        hint:
-            'Tocá la categoría, la rareza o un efecto para ver qué hace el '
-            'objeto en la ficha.',
+        hint: context.l10n.hbItemHint,
       ),
       children: [
         _text(
           _name,
-          'Nombre',
-          validator: (v) => _requiredText(v, 'el nombre del objeto'),
+          context.l10n.detailsName,
+          validator: (v) => _requiredText(v, context.l10n.hbReqItemName),
         ),
         _fieldRow(
           flex: const [3, 2, 2],
           [
             _categoryDropdown(
-              _itemCategories,
+              _itemCategories(context.l10n),
               _category,
               (v) => setState(() {
                 _category = v;
@@ -212,12 +214,18 @@ class _ItemFormState extends State<ItemForm> with _GuidedForm {
               }),
               onTap: () => focusOn('category'),
             ),
-            _text(_weight, 'Peso (lb)', number: true, validator: _weightValue),
+            _text(
+              _weight,
+              context.l10n.hbWeightShort,
+              number: true,
+              validator: (v) => _weightValue(context.l10n, v),
+            ),
             _text(
               _costCp,
-              'Precio (pc)',
+              context.l10n.hbPriceCp,
               number: true,
-              validator: (v) => _intInRange(v, 0, 100000000, optional: false),
+              validator: (v) =>
+                  _intInRange(context.l10n, v, 0, 100000000, optional: false),
             ),
           ],
         ),
@@ -225,16 +233,17 @@ class _ItemFormState extends State<ItemForm> with _GuidedForm {
         ..._optionalRule,
         section(
           icon: Icons.auto_awesome,
-          title: 'Magia',
+          title: context.l10n.hbMagic,
           summary: _orNone([
-            if (_rarity != null) _itemRarities[_rarity] ?? _rarity!,
-            if (_attunement) 'sintonización',
-          ], 'mundano'),
+            if (_rarity != null)
+              _itemRarities(context.l10n)[_rarity] ?? _rarity!,
+            if (_attunement) context.l10n.catalogAttunement,
+          ], context.l10n.hbMundaneLower),
           children: [
             _idDropdown(
-              label: 'Rareza',
+              label: context.l10n.codexRarity,
               value: _rarity ?? _mundane,
-              options: _itemRarities,
+              options: _itemRarities(context.l10n),
               onChanged: (v) => setState(() {
                 _rarity = v == _mundane ? null : v;
                 focus = 'rarity';
@@ -247,9 +256,9 @@ class _ItemFormState extends State<ItemForm> with _GuidedForm {
             ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Requiere sintonización'),
+              title: Text(context.l10n.hbRequiresAttunement),
               subtitle: _rarity == null
-                  ? const Text('Solo los objetos mágicos se sintonizan.')
+                  ? Text(context.l10n.hbOnlyMagicAttune)
                   : null,
               value: _attunement,
               onChanged: _rarity == null
@@ -264,18 +273,19 @@ class _ItemFormState extends State<ItemForm> with _GuidedForm {
         ),
         section(
           icon: Icons.shield_outlined,
-          title: 'Efectos mientras esté equipado',
+          title: context.l10n.hbEffectsEquipped,
           summary: _effectsSummary,
           children: [
             _text(
               _acBonus,
-              'Bonificador a la Clase de Armadura',
+              context.l10n.hbAcBonusLabel,
               number: true,
-              validator: (v) => _intInRange(v, -5, 10, optional: false),
+              validator: (v) =>
+                  _intInRange(context.l10n, v, -5, 10, optional: false),
               onTap: () => focusOn('acBonus'),
             ),
             const SizedBox(height: 8),
-            const Text('Resistencias'),
+            Text(context.l10n.hbResistances),
             const SizedBox(height: 6),
             _idChips(
               _damageTypeOptions,
@@ -285,7 +295,7 @@ class _ItemFormState extends State<ItemForm> with _GuidedForm {
             ),
             explainHere((f) => f == 'acBonus' || f.startsWith('res:')),
             const SizedBox(height: 12),
-            const Text('Otros efectos'),
+            Text(context.l10n.hbOtherEffects),
             const SizedBox(height: 6),
             EffectEditor(
               effects: _otherEffects,
@@ -297,11 +307,11 @@ class _ItemFormState extends State<ItemForm> with _GuidedForm {
         ),
         section(
           icon: Icons.layers_outlined,
-          title: 'Objeto base',
+          title: context.l10n.hbBaseItem,
           summary: _baseItemKind == 'none'
-              ? 'ninguno'
+              ? context.l10n.hbNoneM
               : _orNone([
-                  _baseItemKinds[_baseItemKind] ?? _baseItemKind,
+                  _baseItemKinds(context.l10n)[_baseItemKind] ?? _baseItemKind,
                   if (_magicBonusValue != 0) _signed(_magicBonusValue),
                 ], ''),
           children: [
@@ -309,9 +319,9 @@ class _ItemFormState extends State<ItemForm> with _GuidedForm {
               flex: const [3, 2],
               [
                 _idDropdown(
-                  label: 'Objeto base',
+                  label: context.l10n.hbBaseItem,
                   value: _baseItemKind,
-                  options: _baseItemKinds,
+                  options: _baseItemKinds(context.l10n),
                   // Las bases elegidas son de la familia anterior y no valen
                   // para la nueva: el motor las rechazaría igual
                   // (`_validBase`), pero quedarían guardadas y sin nada que
@@ -325,9 +335,10 @@ class _ItemFormState extends State<ItemForm> with _GuidedForm {
                 ),
                 _text(
                   _magicBonus,
-                  'Bonificador mágico',
+                  context.l10n.hbMagicBonusShort,
                   number: true,
-                  validator: (v) => _intInRange(v, -5, 10, optional: false),
+                  validator: (v) =>
+                      _intInRange(context.l10n, v, -5, 10, optional: false),
                   onTap: () => focusOn('magicBonus'),
                 ),
               ],
@@ -337,13 +348,12 @@ class _ItemFormState extends State<ItemForm> with _GuidedForm {
             // mano.
             if (_baseItemKind != 'none') ...[
               const SizedBox(height: 8),
-              const Eyebrow('Bases permitidas'),
+              Eyebrow(context.l10n.hbAllowedBases),
               const SizedBox(height: 4),
               Text(
                 _eligibleBases.isEmpty
-                    ? 'Sin marcar ninguna, sirve cualquiera de la familia '
-                          'elegida.'
-                    : 'Solo se va a poder usar lo que marques acá.',
+                    ? context.l10n.hbAnyBase
+                    : context.l10n.hbOnlyMarked,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               const SizedBox(height: 8),
@@ -354,9 +364,13 @@ class _ItemFormState extends State<ItemForm> with _GuidedForm {
         ),
         section(
           icon: Icons.menu_book_outlined,
-          title: 'Descripción',
-          summary: _description.text.trim().isEmpty ? 'sin cargar' : 'cargada',
-          children: [_text(_description, 'Descripción', maxLines: 5)],
+          title: context.l10n.hbDescription,
+          summary: _description.text.trim().isEmpty
+              ? context.l10n.hbNotSet
+              : context.l10n.hbLoaded,
+          children: [
+            _text(_description, context.l10n.hbDescription, maxLines: 5),
+          ],
         ),
       ],
     );
@@ -382,16 +396,16 @@ class _ItemFormState extends State<ItemForm> with _GuidedForm {
 String _signed(int v) => v >= 0 ? '+$v' : '$v';
 
 /// Las pills de un objeto en la lista y en la vista previa del formulario.
-List<String> _itemPills(Item i) => [
-  _itemCategories[i.category] ?? i.category,
-  if (i.rarity != null) _itemRarities[i.rarity] ?? i.rarity!,
-  if (i.requiresAttunement) 'Sintonización',
+List<String> _itemPills(AppLocalizations l10n, Item i) => [
+  _itemCategories(l10n)[i.category] ?? i.category,
+  if (i.rarity != null) _itemRarities(l10n)[i.rarity] ?? i.rarity!,
+  if (i.requiresAttunement) l10n.codexAttunement,
 ];
 
 /// Las cifras de un objeto, con el mismo motivo que [_itemPills].
-List<(String, String)> _itemStats(Item i) => [
-  if (i.weight > 0) ('Peso', '${formatPounds(i.weight)} lb'),
-  if (i.costCp > 0) ('Precio', formatCost(i.costCp)),
-  if (i.maxCharges != null) ('Cargas', '${i.maxCharges}'),
-  if (i.bundleSize > 1) ('Paquete', '${i.bundleSize}'),
+List<(String, String)> _itemStats(AppLocalizations l10n, Item i) => [
+  if (i.weight > 0) (l10n.codexWeight, '${formatPounds(i.weight)} lb'),
+  if (i.costCp > 0) (l10n.codexPrice, formatCost(i.costCp)),
+  if (i.maxCharges != null) (l10n.codexCharges, '${i.maxCharges}'),
+  if (i.bundleSize > 1) (l10n.kindPack, '${i.bundleSize}'),
 ];

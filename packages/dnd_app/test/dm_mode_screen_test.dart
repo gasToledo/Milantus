@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'dialog_finders.dart';
 import 'fakes/fake_api_server.dart';
+import 'fakes/localized_app.dart';
 
 void main() {
   late ContentRepository repo;
@@ -34,7 +35,7 @@ void main() {
     final server = FakeApiServer();
     seed?.call(server);
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: DmModeScreen(
           api: ApiClient(client: server.client),

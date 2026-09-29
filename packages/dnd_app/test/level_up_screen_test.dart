@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'level_up_helpers.dart';
+import 'fakes/localized_app.dart';
 
 /// Regresión: en la subida de nivel, la sección de conjuros previsualiza el
 /// personaje llamando a `_buildUpdated()` en cada build. Cambiar a "Tomar dote"
@@ -63,7 +64,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: LevelUpScreen(character: fighterL3(), repo: repo, onDone: (_) {}),
       ),
@@ -100,7 +101,7 @@ void main() {
     );
     addTearDown(() => repo.feats.remove('hb-vigia'));
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: LevelUpScreen(character: fighterL3(), repo: repo, onDone: (_) {}),
       ),
@@ -139,7 +140,7 @@ void main() {
     final campeon = repo.subclass('champion')!;
     final rasgo = campeon.featuresUpTo(3).first;
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: LevelUpScreen(character: nivel2, repo: repo, onDone: (_) {}),
       ),
@@ -166,7 +167,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: LevelUpScreen(character: fighterL3(), repo: repo, onDone: (_) {}),
       ),
@@ -192,7 +193,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: LevelUpScreen(character: fighterL3(), repo: repo, onDone: (_) {}),
       ),
@@ -250,7 +251,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: LevelUpScreen(
           character: sorcererL3(),
@@ -290,7 +291,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: LevelUpScreen(character: fighterL3(), repo: repo, onDone: (_) {}),
       ),
@@ -325,7 +326,7 @@ void main() {
   ) async {
     Character? saved;
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: LevelUpScreen(
           character: fighterL3(),
@@ -385,7 +386,7 @@ void main() {
     );
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: LevelUpScreen(character: c, repo: repo, onDone: (_) {}),
       ),
@@ -434,7 +435,7 @@ void main() {
 
   Future<void> openFeatPicker(WidgetTester tester, Character c) async {
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: LevelUpScreen(character: c, repo: repo, onDone: (_) {}),
       ),
@@ -533,7 +534,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: LevelUpScreen(character: fighterL3(), repo: repo, onDone: (_) {}),
       ),
@@ -556,7 +557,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // El texto sale de los rasgos pasivos de la dote, no de un literal.
-    final esperado = featSummary(repo.feat('chef-wisdom')!, repo);
+    final esperado = featSummary(l10nEs, repo.feat('chef-wisdom')!, repo);
     expect(esperado, isNotEmpty);
     // La tarjeta y el panel de detalle comparten el resumen.
     expect(find.text(esperado), findsWidgets);
@@ -590,7 +591,7 @@ void main() {
     );
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: LevelUpScreen(character: c, repo: repo, onDone: (_) {}),
       ),
@@ -641,7 +642,7 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: LevelUpScreen(character: c, repo: repo, onDone: onDone ?? (_) {}),
       ),
@@ -1372,7 +1373,7 @@ void main() {
     final rayo = repo.spell('ray-of-frost')!;
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: SpellEditScreen(
           character: personaje,
@@ -1477,7 +1478,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        localizedApp(
           theme: AppTheme.dark,
           home: SpellEditScreen(
             character: personaje,
@@ -1781,7 +1782,7 @@ void main() {
     final sc = CharacterCompiler(repo).compile(personaje).spellcasting!;
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: SpellEditScreen(
           character: personaje,

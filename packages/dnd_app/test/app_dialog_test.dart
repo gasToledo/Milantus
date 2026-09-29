@@ -4,6 +4,7 @@ import 'package:dnd_app/theme/app_theme.dart';
 import 'package:dnd_app/theme/app_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'fakes/localized_app.dart';
 
 /// Abre un [AppDialog] sobre un andamio con el tema real.
 ///
@@ -18,7 +19,7 @@ Future<void> _abrir(
   Widget content = const Text('Cuerpo del diálogo.'),
 }) async {
   await tester.pumpWidget(
-    MaterialApp(
+    localizedApp(
       theme: AppTheme.dark,
       home: Builder(
         builder: (context) => Scaffold(

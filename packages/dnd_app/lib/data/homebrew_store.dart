@@ -1,3 +1,4 @@
+// l10n-ignore-file: errores de validación de datos que se muestran tal cual; la fase 2 los pasa a códigos de error traducibles.
 import 'package:dnd_engine/dnd_engine.dart';
 
 import '../api/api_client.dart';

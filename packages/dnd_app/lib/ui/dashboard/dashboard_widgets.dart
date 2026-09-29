@@ -97,7 +97,7 @@ class _FallenBadge extends StatelessWidget {
           Icon(Icons.heart_broken, size: 11 * scale, color: crimson),
           SizedBox(width: 4 * scale),
           Text(
-            'CAÍDO',
+            context.l10n.characterFallenBadge,
             style: TextStyle(
               fontSize: 9.5 * scale,
               letterSpacing: 0.6,
@@ -304,9 +304,9 @@ class _CharacterCardState extends State<_CharacterCard> {
     // parpadeo: es información, no una alarma.
     final critical = !fallen && ratio <= 0.25;
     final (hpLabel, hpIcon) = switch ((fallen, critical)) {
-      (true, _) => ('SIN PUNTOS DE GOLPE', Icons.heart_broken),
-      (_, true) => ('PG CRÍTICOS', Icons.warning_amber_rounded),
-      _ => ('PUNTOS DE GOLPE', null),
+      (true, _) => (context.l10n.hpLabelFallen, Icons.heart_broken),
+      (_, true) => (context.l10n.hpLabelCritical, Icons.warning_amber_rounded),
+      _ => (context.l10n.hpLabelNormal, null),
     };
 
     Widget medallion = ClassMedallion(
@@ -451,7 +451,7 @@ class _CharacterCardState extends State<_CharacterCard> {
                                     runSpacing: 4,
                                     children: [
                                       GoldPill(
-                                        'Nivel ${c.level}',
+                                        context.l10n.commonLevel(c.level),
                                         highlighted: !fallen,
                                       ),
                                       if (background case final bg?)
@@ -472,7 +472,9 @@ class _CharacterCardState extends State<_CharacterCard> {
                             SizedBox(
                               width: 40 * k,
                               child: PopupMenuButton<String>(
-                                tooltip: 'Acciones de ${c.name}',
+                                tooltip: context.l10n.cardActionsTooltip(
+                                  c.name,
+                                ),
                                 padding: EdgeInsets.zero,
                                 icon: Icon(
                                   Icons.more_vert,
@@ -498,8 +500,8 @@ class _CharacterCardState extends State<_CharacterCard> {
                                     value: 'favorite',
                                     child: Text(
                                       widget.isFavorite
-                                          ? 'Quitar de favorito'
-                                          : 'Marcar como favorito',
+                                          ? context.l10n.cardUnfavorite
+                                          : context.l10n.cardFavorite,
                                     ),
                                   ),
                                   // El arrastre queda como atajo, pero el orden
@@ -509,24 +511,24 @@ class _CharacterCardState extends State<_CharacterCard> {
                                   PopupMenuItem(
                                     value: 'move-before',
                                     enabled: widget.onMoveBefore != null,
-                                    child: const Text('Mover antes'),
+                                    child: Text(context.l10n.cardMoveBefore),
                                   ),
                                   PopupMenuItem(
                                     value: 'move-after',
                                     enabled: widget.onMoveAfter != null,
-                                    child: const Text('Mover después'),
+                                    child: Text(context.l10n.cardMoveAfter),
                                   ),
-                                  const PopupMenuItem(
+                                  PopupMenuItem(
                                     value: 'rename',
-                                    child: Text('Renombrar'),
+                                    child: Text(context.l10n.cardRename),
                                   ),
-                                  const PopupMenuItem(
+                                  PopupMenuItem(
                                     value: 'export',
-                                    child: Text('Exportar'),
+                                    child: Text(context.l10n.cardExport),
                                   ),
-                                  const PopupMenuItem(
+                                  PopupMenuItem(
                                     value: 'delete',
-                                    child: Text('Borrar'),
+                                    child: Text(context.l10n.commonDelete),
                                   ),
                                 ],
                               ),
@@ -625,31 +627,35 @@ class _CharacterCardState extends State<_CharacterCard> {
                               children: [
                                 Expanded(
                                   child: _StatCell(
-                                    label: 'CA',
+                                    label: context.l10n.creatureAcShort,
                                     value: '${s.armorClass}',
                                     icon: Icons.shield,
-                                    semantics:
-                                        'Clase de armadura: ${s.armorClass}',
+                                    semantics: context.l10n.armorClassLabel(
+                                      s.armorClass,
+                                    ),
                                     scale: k,
                                   ),
                                 ),
                                 Container(width: 1, color: pal.hairline),
                                 Expanded(
                                   child: _StatCell(
-                                    label: 'VEL',
+                                    label: context.l10n.statSpeedShort,
                                     value: '${s.speed}',
-                                    suffix: ' pies',
-                                    semantics: 'Velocidad: ${s.speed} pies',
+                                    suffix: context.l10n.unitFeetSuffix,
+                                    semantics: context.l10n.statSpeedLabel(
+                                      s.speed,
+                                    ),
                                     scale: k,
                                   ),
                                 ),
                                 Container(width: 1, color: pal.hairline),
                                 Expanded(
                                   child: _StatCell(
-                                    label: 'INIC',
+                                    label: context.l10n.statInitiativeShort,
                                     value: _signed(s.initiative),
-                                    semantics:
-                                        'Iniciativa: ${_signed(s.initiative)}',
+                                    semantics: context.l10n.statInitiativeLabel(
+                                      _signed(s.initiative),
+                                    ),
                                     scale: k,
                                   ),
                                 ),

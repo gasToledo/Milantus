@@ -450,14 +450,28 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
-## [Unreleased]
+## [0.20.0+1] - 2026-09-29
 
 ### Nuevo
 
-- Sin cambios.
+- La aplicación se puede usar en inglés. El panel lateral tiene un selector de
+  idioma (Español · English) sobre el de tema: la elección se recuerda en el
+  navegador y, si no hay ninguna, se usa el idioma del navegador. Cambia toda
+  la interfaz al instante —fichas, creación, subida de nivel, códice, homebrew
+  y Modo DM—, el título de la pestaña y el idioma que declara la página, sin
+  perder lo que se estaba escribiendo.
+- Todo texto nuevo de la interfaz nace en los dos idiomas: un test falla si
+  aparece texto visible suelto en un widget, y otro si una clave existe en un
+  idioma y no en el otro.
 
 ### Modificado
 
+- Los nombres del catálogo del reglamento (clases, dotes, conjuros, criaturas,
+  condiciones), los avisos técnicos de red y de archivos, y el prompt del
+  generador de retratos siguen en español por ahora: es la segunda etapa de
+  este trabajo.
+- Los tooltips propios de Material (menú de navegación, calendario) salen en el
+  idioma elegido.
 - En la creación, «Compras» pide elegir primero las opciones de equipo en vez
   de decir que no traen oro, y el catálogo ya no ofrece objetos mágicos.
 - Un monto en cero se lee «0 po» en vez de «0 pc».
@@ -466,6 +480,20 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   suelta entre los datos.
 - El equipo recibido en la creación se pone solo hasta llenar las dos manos:
   el Guerrero ya no nace empuñando cuatro armas a la vez.
+
+### Eliminado
+
+- Sin cambios.
+
+## [Unreleased]
+
+### Nuevo
+
+- Sin cambios.
+
+### Modificado
+
+- Sin cambios.
 
 ### Eliminado
 

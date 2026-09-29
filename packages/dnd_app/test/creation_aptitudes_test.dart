@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'creation_helpers.dart';
+import 'fakes/localized_app.dart';
 
 /// Paso de Aptitudes: competencias de clase/especie y dote de origen.
 ///
@@ -33,10 +34,10 @@ void main() {
         isEmpty,
         reason: 'premisa del caso',
       );
-      expect(featSummary(duro, repo), isNotEmpty);
+      expect(featSummary(l10nEs, duro, repo), isNotEmpty);
       expect(
-        featSummary(duro, repo),
-        describeEffect(duro.effects.single, repo),
+        featSummary(l10nEs, duro, repo),
+        describeEffect(l10nEs, duro.effects.single, repo),
       );
     });
 
@@ -48,11 +49,12 @@ void main() {
             f.effects.any((e) => e is PassiveTraitEffect) &&
             f.effects.any(
               (e) =>
-                  e is! PassiveTraitEffect && describeEffect(e, repo) != null,
+                  e is! PassiveTraitEffect &&
+                  describeEffect(l10nEs, e, repo) != null,
             ),
       );
       expect(
-        readableTraits(conAmbos.effects, repo),
+        readableTraits(l10nEs, conAmbos.effects, repo),
         hasLength(conAmbos.effects.whereType<PassiveTraitEffect>().length),
       );
     });
@@ -68,7 +70,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: CreationWizard(repo: repo, onCreate: (_) {}),
       ),
@@ -168,7 +170,9 @@ void main() {
     await tester.pumpAndSettle();
     // El texto sale de los rasgos de la dote, no de un literal escrito acá.
     expect(
-      find.textContaining(featSummary(habilidoso, repo).split('.').first),
+      find.textContaining(
+        featSummary(l10nEs, habilidoso, repo).split('.').first,
+      ),
       findsWidgets,
     );
     await tester.tap(find.text('Cerrar'));

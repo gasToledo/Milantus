@@ -72,7 +72,9 @@ extension _SheetNavigation on _SheetScreenState {
         appNavItem(
           context,
           icon: Icons.arrow_back,
-          label: widget.npcMode ? 'Volver al PNJ' : 'Mis personajes',
+          label: widget.npcMode
+              ? context.l10n.navBackToNpc
+              : context.l10n.rosterTitle,
           onTap: () => run(() => Navigator.of(context).pop()),
         ),
         const SizedBox(height: 14),
@@ -116,7 +118,10 @@ extension _SheetNavigation on _SheetScreenState {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${_classSummary()} · nivel ${_c.totalLevel}',
+                      context.l10n.sheetClassSummary(
+                        _classSummary(),
+                        _c.totalLevel,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontSize: 11.5, color: pal.textMuted),
@@ -132,7 +137,7 @@ extension _SheetNavigation on _SheetScreenState {
           appNavItem(
             context,
             icon: tab.icon,
-            label: tab.label,
+            label: tab.label(context.l10n),
             active: _tab == tab,
             onTap: () => run(() => _selectTab(tab)),
           ),
@@ -143,7 +148,7 @@ extension _SheetNavigation on _SheetScreenState {
           appNavItem(
             context,
             icon: Icons.face_retouching_natural,
-            label: 'Retrato',
+            label: context.l10n.navPortrait,
             onTap: () => run(_openPortrait),
           ),
         // En el tope queda a la vista pero sin acción: que el rótulo diga por
@@ -151,7 +156,9 @@ extension _SheetNavigation on _SheetScreenState {
         appNavItem(
           context,
           icon: Icons.arrow_upward,
-          label: _c.canLevelUp ? 'Subir nivel' : 'Nivel máximo',
+          label: _c.canLevelUp
+              ? context.l10n.levelUpAction
+              : context.l10n.levelMaxReached,
           onTap: _c.canLevelUp ? () => run(_openLevelUp) : null,
         ),
         // Va en el panel y no en el AppBar porque el AppBar solo existe en
@@ -161,7 +168,7 @@ extension _SheetNavigation on _SheetScreenState {
           appNavItem(
             context,
             icon: Icons.ios_share,
-            label: 'Compartir',
+            label: context.l10n.navShare,
             onTap: () => run(_shareCharacter),
           ),
         const SizedBox(height: 8),
@@ -239,7 +246,7 @@ extension _SheetNavigation on _SheetScreenState {
             spacing: 8,
             runSpacing: 6,
             children: [
-              GoldPill('Nivel ${_c.level}'),
+              GoldPill(context.l10n.commonLevel(_c.level)),
               for (final id in _c.classHistory.toSet()) _classPill(id),
             ],
           ),
@@ -274,12 +281,8 @@ extension _SheetNavigation on _SheetScreenState {
   Widget? _turnBanner() {
     final pal = context.palette;
     final (icon, color, text) = switch (_turn) {
-      TurnStatus.next => (
-        Icons.hourglass_top,
-        pal.gold,
-        'Preparate, seguís vos.',
-      ),
-      TurnStatus.active => (Icons.bolt, pal.verdant, 'Es tu turno.'),
+      TurnStatus.next => (Icons.hourglass_top, pal.gold, context.l10n.turnNext),
+      TurnStatus.active => (Icons.bolt, pal.verdant, context.l10n.turnActive),
       TurnStatus.waiting || TurnStatus.none => (null, null, null),
     };
     if (text == null) return null;
@@ -390,7 +393,9 @@ extension _SheetNavigation on _SheetScreenState {
                       Icons.expand_more,
                       size: 20,
                       color: pal.textMuted,
-                      semanticLabel: collapsed ? 'Desplegar' : 'Plegar',
+                      semanticLabel: collapsed
+                          ? context.l10n.commonExpand
+                          : context.l10n.commonCollapse,
                     ),
                   ),
                 ],

@@ -83,41 +83,45 @@ class _ArmorFormState extends State<ArmorForm> with _GuidedForm {
         final rule = armorCategoryRules[_category];
         if (rule == null) return null;
         return _explained(
-          'Categoría',
-          _armorCategories[_category] ?? _category,
+          context.l10n.codexCategory,
+          _armorCategories(context.l10n)[_category] ?? _category,
           rule,
           armorTrainingRule,
         );
       case 'baseAc':
         return _explained(
-          'CA base',
-          _baseAc.text.trim().isEmpty ? 'Sin cargar' : _baseAc.text.trim(),
+          context.l10n.hbArmorBaseAc,
+          _baseAc.text.trim().isEmpty
+              ? context.l10n.hbNotFilled
+              : _baseAc.text.trim(),
           _shield ? shieldBaseAcRule : armorBaseAcRule,
         );
       case 'addDex':
         return _explained(
-          'Destreza',
-          _addDex ? 'Suma Destreza' : 'Sin Destreza',
+          context.l10n.hbDexterity,
+          _addDex ? context.l10n.hbAddsDex : context.l10n.hbNoDex,
           armorAddDexRule,
         );
       case 'maxDex':
         final cap = _maxDex.text.trim();
         return _explained(
-          'Tope de Destreza',
-          cap.isEmpty ? 'Sin tope' : 'Hasta +$cap',
+          context.l10n.hbDexCap,
+          cap.isEmpty ? context.l10n.hbNoCap : context.l10n.hbUpTo(cap),
           armorMaxDexRule,
         );
       case 'strength':
         final str = _strReq.text.trim();
         return _explained(
-          'Exigencia',
-          str.isEmpty ? 'Sin requisito de Fuerza' : 'Fuerza $str',
+          context.l10n.hbDemand,
+          str.isEmpty ? context.l10n.hbNoStrReq : context.l10n.hbStrength(str),
           armorStrengthRule,
         );
       case 'stealth':
         return _explained(
-          'Exigencia',
-          _stealth ? 'Sigilo con desventaja' : 'Sin desventaja en Sigilo',
+          context.l10n.hbDemand,
+          _stealth
+              ? context.l10n.hbStealthDisadv
+              : context.l10n.hbNoStealthDisadv,
           armorStealthRule,
         );
     }
@@ -133,63 +137,64 @@ class _ArmorFormState extends State<ArmorForm> with _GuidedForm {
   ];
 
   String get _dexSummary {
-    if (!_addDex) return 'sin Destreza';
+    if (!_addDex) return context.l10n.hbNoDexLower;
     final cap = _maxDex.text.trim();
-    return cap.isEmpty ? 'Destreza entera' : 'hasta +$cap';
+    return cap.isEmpty ? context.l10n.hbFullDex : context.l10n.hbUpToLower(cap);
   }
 
   String get _demandsSummary {
     final str = _strReq.text.trim();
     final parts = [
-      if (str.isNotEmpty) 'Fuerza $str',
-      if (_stealth) 'Sigilo con desventaja',
+      if (str.isNotEmpty) context.l10n.hbStrength(str),
+      if (_stealth) context.l10n.hbStealthDisadv,
     ];
-    return parts.isEmpty ? 'ninguna' : parts.join(' · ');
+    return parts.isEmpty ? context.l10n.hbNone : parts.join(' · ');
   }
 
   @override
   Widget build(BuildContext context) {
     final armor = _armor();
     return _FormScaffold(
-      title: 'Armadura',
+      title: context.l10n.kindArmor,
       onSave: _save,
       onInvalid: openAllSections,
       panel: guidePanel(
-        previewTitle: 'Así queda en tu lista',
+        previewTitle: context.l10n.hbPreviewTitle,
         preview: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _rowPreview(
               armor.name,
-              pills: _armorPills(armor),
-              stats: _armorStats(armor),
+              pills: _armorPills(context.l10n, armor),
+              stats: _armorStats(context.l10n, armor),
             ),
             // Un escudo no tiene una CA propia que mostrar: suma a la otra.
             if (!armor.isShield) ...[
               const SizedBox(height: 14),
-              const Eyebrow('En la ficha'),
+              Eyebrow(context.l10n.hbOnSheet),
               _statBand(context, [
                 for (final dex in _exampleDex)
-                  ('CA con DES +$dex', '${armor.armorClassFor(dex)}'),
+                  (
+                    context.l10n.hbAcWithDex(dex),
+                    '${armor.armorClassFor(dex)}',
+                  ),
               ], wide: false),
             ],
           ],
         ),
-        hint:
-            'Tocá la categoría, la CA o cómo suma la Destreza para ver qué '
-            'cambia.',
+        hint: context.l10n.hbArmorHint,
       ),
       children: [
         _text(
           _name,
-          'Nombre',
-          validator: (v) => _requiredText(v, 'el nombre de la armadura'),
+          context.l10n.detailsName,
+          validator: (v) => _requiredText(v, context.l10n.hbReqArmorName),
         ),
         _fieldRow(
           flex: const [3, 2],
           [
             _categoryDropdown(
-              _armorCategories,
+              _armorCategories(context.l10n),
               _category,
               (v) => setState(() {
                 _category = v;
@@ -200,9 +205,10 @@ class _ArmorFormState extends State<ArmorForm> with _GuidedForm {
             ),
             _text(
               _baseAc,
-              _shield ? 'CA que suma' : 'CA base',
+              _shield ? context.l10n.hbShieldAc : context.l10n.hbArmorBaseAc,
               number: true,
-              validator: (v) => _intInRange(v, 1, 30, optional: false),
+              validator: (v) =>
+                  _intInRange(context.l10n, v, 1, 30, optional: false),
               onTap: () => focusOn('baseAc'),
             ),
           ],
@@ -214,12 +220,12 @@ class _ArmorFormState extends State<ArmorForm> with _GuidedForm {
         if (!_shield)
           section(
             icon: Icons.directions_run,
-            title: 'Cómo suma la Destreza',
+            title: context.l10n.hbHowDex,
             summary: _dexSummary,
             children: [
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Suma modificador de DES'),
+                title: Text(context.l10n.hbAddsDexMod),
                 value: _addDex,
                 onChanged: (v) => setState(() {
                   _addDex = v;
@@ -229,9 +235,10 @@ class _ArmorFormState extends State<ArmorForm> with _GuidedForm {
               if (_addDex)
                 _text(
                   _maxDex,
-                  'Tope de DES (vacío = sin tope)',
+                  context.l10n.hbDexCapLabel,
                   number: true,
-                  validator: (v) => _intInRange(v, 0, 10, optional: true),
+                  validator: (v) =>
+                      _intInRange(context.l10n, v, 0, 10, optional: true),
                   onTap: () => focusOn('maxDex'),
                 ),
               explainHere((f) => f == 'addDex' || f == 'maxDex'),
@@ -239,19 +246,20 @@ class _ArmorFormState extends State<ArmorForm> with _GuidedForm {
           ),
         section(
           icon: Icons.fitness_center,
-          title: 'Exigencias',
+          title: context.l10n.hbDemands,
           summary: _demandsSummary,
           children: [
             _text(
               _strReq,
-              'Requisito de Fuerza (opcional)',
+              context.l10n.hbStrReqLabel,
               number: true,
-              validator: (v) => _intInRange(v, 1, 30, optional: true),
+              validator: (v) =>
+                  _intInRange(context.l10n, v, 1, 30, optional: true),
               onTap: () => focusOn('strength'),
             ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Desventaja en Sigilo'),
+              title: Text(context.l10n.hbStealthLabel),
               value: _stealth,
               onChanged: (v) => setState(() {
                 _stealth = v;
@@ -262,21 +270,21 @@ class _ArmorFormState extends State<ArmorForm> with _GuidedForm {
           ],
         ),
         _economySection(this, _weight, _costCp),
-        _legendSection(this, _description, 'la leyenda de la armadura'),
+        _legendSection(this, _description, context.l10n.hbLegendArmor),
       ],
     );
   }
 }
 
 /// Las pills de una armadura en la lista y en la vista previa del formulario.
-List<String> _armorPills(Armor a) => [
-  _armorCategories[a.category] ?? a.category,
-  if (a.stealthDisadvantage) 'Sigilo con desventaja',
+List<String> _armorPills(AppLocalizations l10n, Armor a) => [
+  _armorCategories(l10n)[a.category] ?? a.category,
+  if (a.stealthDisadvantage) l10n.hbStealthDisadv,
 ];
 
 /// Las cifras de una armadura, con el mismo motivo que [_armorPills].
-List<(String, String)> _armorStats(Armor a) => [
-  ('CA', a.isShield ? '+${a.baseAc}' : '${a.baseAc}'),
-  if (a.weight > 0) ('Peso', '${formatPounds(a.weight)} lb'),
-  if (a.costCp > 0) ('Precio', formatCost(a.costCp)),
+List<(String, String)> _armorStats(AppLocalizations l10n, Armor a) => [
+  (l10n.creatureAcShort, a.isShield ? '+${a.baseAc}' : '${a.baseAc}'),
+  if (a.weight > 0) (l10n.codexWeight, '${formatPounds(a.weight)} lb'),
+  if (a.costCp > 0) (l10n.codexPrice, formatCost(a.costCp)),
 ];

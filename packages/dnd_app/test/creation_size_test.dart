@@ -1,3 +1,4 @@
+import 'fakes/localized_app.dart';
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:dnd_app/creation/creation_draft.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,10 +17,12 @@ void main() {
   test('el paso Raza bloquea hasta elegir el tamaño', () {
     final d = CreationDraft(repo)..raceId = 'human';
     expect(d.sizeOptions, ['Mediano', 'Pequeño']);
-    expect(d.pendingFor(CreationStep.raza), ['Elegí el tamaño de la especie.']);
+    expect(d.pendingFor(CreationStep.raza, l10nEs), [
+      'Elegí el tamaño de la especie.',
+    ]);
 
     d.chosenSize = 'Pequeño';
-    expect(d.pendingFor(CreationStep.raza), isEmpty);
+    expect(d.pendingFor(CreationStep.raza, l10nEs), isEmpty);
   });
 
   test('una especie de tamaño fijo no bloquea', () {
@@ -28,7 +31,7 @@ void main() {
     // El Goliat sí exige linaje, así que se comprueba que lo que falta no es
     // el tamaño.
     expect(
-      d.pendingFor(CreationStep.raza),
+      d.pendingFor(CreationStep.raza, l10nEs),
       isNot(contains('Elegí el tamaño de la especie.')),
     );
   });
@@ -37,7 +40,9 @@ void main() {
     final d = CreationDraft(repo)
       ..raceId = 'human'
       ..chosenSize = 'Enorme';
-    expect(d.pendingFor(CreationStep.raza), ['Elegí el tamaño de la especie.']);
+    expect(d.pendingFor(CreationStep.raza, l10nEs), [
+      'Elegí el tamaño de la especie.',
+    ]);
   });
 
   test('el personaje construido lleva el tamaño elegido', () {

@@ -319,27 +319,24 @@ class _AptitudesStep extends StatelessWidget {
         // decir nunca qué es una. La pericia **no** se explica acá: ya está
         // dicha en su propia sección, que es donde se elige y donde puede no
         // aparecer.
-        const AppHelpCallout(
-          title: 'Qué es una competencia',
-          message:
-              'Ser competente en algo te deja sumar tu bonificador por '
-              'competencia cuando tirás con eso: una habilidad, un arma, una '
-              'herramienta o una salvación. Acá elegís las tuyas entre las que '
-              'ofrecen tu clase, tu especie y tu trasfondo; las que ya vienen '
-              'dadas aparecen bloqueadas.',
+        AppHelpCallout(
+          title: context.l10n.aptHelpTitle,
+          message: context.l10n.aptHelpBody,
         ),
         const SizedBox(height: 22),
         if (klass != null) ...[
           _SectionHeader(
-            title: 'Habilidades de clase',
+            title: context.l10n.aptClassSkills,
             counterIcon: Icons.task_alt,
-            counter:
-                '${draft.classSkills.length} / ${klass.skillChoiceCount} elegidas',
+            counter: context.l10n.creationChosen(
+              draft.classSkills.length,
+              klass.skillChoiceCount,
+            ),
           ),
           if (granted.isNotEmpty) ...[
             const SizedBox(height: 12),
             Text(
-              'Estas ya te las da el trasfondo:',
+              context.l10n.aptGrantedByBackground,
               style: Theme.of(context).textTheme.bodySmall,
             ),
             const SizedBox(height: 8),
@@ -365,10 +362,12 @@ class _AptitudesStep extends StatelessWidget {
         if (race != null && race.skillChoiceCount > 0) ...[
           const SizedBox(height: 26),
           _SectionHeader(
-            title: 'Habilidades de especie',
+            title: context.l10n.aptSpeciesSkills,
             counterIcon: Icons.task_alt,
-            counter:
-                '${draft.raceSkills.length} / ${race.skillChoiceCount} elegidas',
+            counter: context.l10n.creationChosen(
+              draft.raceSkills.length,
+              race.skillChoiceCount,
+            ),
           ),
           const SizedBox(height: 12),
           _SkillPicker(
@@ -384,14 +383,15 @@ class _AptitudesStep extends StatelessWidget {
         if (grantsFeat) ...[
           const SizedBox(height: 26),
           _SectionHeader(
-            title: 'Dote de origen',
+            title: context.l10n.factOriginFeat,
             counterIcon: Icons.workspace_premium,
-            counter: draft.raceFeatId == null ? 'sin elegir' : '1 elegida',
+            counter: draft.raceFeatId == null
+                ? context.l10n.creationNotChosen
+                : context.l10n.creationOneChosen,
           ),
           const SizedBox(height: 6),
           Text(
-            'En 2024 las dotes de nivel 1 vienen del origen: '
-            '${race!.name} te concede una a elección.',
+            context.l10n.aptOriginFeatNote(race!.name),
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: 12),
@@ -445,7 +445,7 @@ class _AptitudesStep extends StatelessWidget {
           return <Widget>[
             const SizedBox(height: 26),
             _SectionHeader(
-              title: 'Competencias a elecci\u00f3n',
+              title: context.l10n.aptProfChoices,
               counter: '$selected/$total',
             ),
             const SizedBox(height: 6),
@@ -460,7 +460,7 @@ class _AptitudesStep extends StatelessWidget {
               // se sabía qué elección contaba para cuál.
               if (slots.length > 1) ...[
                 Text(
-                  '${slot.featName}: elegí ${slot.count}',
+                  context.l10n.aptFeatChoose(slot.featName, slot.count),
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
                 const SizedBox(height: 6),
@@ -492,10 +492,13 @@ class _AptitudesStep extends StatelessWidget {
           );
           return <Widget>[
             const SizedBox(height: 26),
-            _SectionHeader(title: 'Pericia', counter: '$selected/$total'),
+            _SectionHeader(
+              title: context.l10n.aptExpertise,
+              counter: '$selected/$total',
+            ),
             const SizedBox(height: 6),
             Text(
-              'Duplica tu bonificador por competencia en la habilidad elegida.',
+              context.l10n.aptExpertiseHint,
               style: Theme.of(context).textTheme.bodySmall,
             ),
             const SizedBox(height: 12),
@@ -538,13 +541,15 @@ class _LanguagesSection extends StatelessWidget {
       children: [
         const SizedBox(height: 22),
         _SectionHeader(
-          title: 'Idiomas',
+          title: context.l10n.creatureLanguages,
           counterIcon: Icons.translate,
-          counter: '${elegidos.length} / $cupo elegidos',
+          counter: context.l10n.creationChosenM(elegidos.length, cupo),
         ),
         const SizedBox(height: 6),
         Text(
-          'Todo personaje sabe Común, que no ocupa una elección.',
+          context.l10n.pickLanguagesIntro(
+            Language.labelFor(Language.universal.id),
+          ),
           style: Theme.of(context).textTheme.bodySmall,
         ),
         const SizedBox(height: 12),
@@ -564,9 +569,10 @@ class _LanguagesSection extends StatelessWidget {
           _SectionHeader(
             title: slot.name,
             counterIcon: Icons.translate,
-            counter:
-                '${(draft.languageChoices[slot.groupId] ?? const []).length}'
-                ' / ${slot.count} elegidos',
+            counter: context.l10n.creationChosenM(
+              (draft.languageChoices[slot.groupId] ?? const []).length,
+              slot.count,
+            ),
           ),
           const SizedBox(height: 12),
           Builder(
@@ -677,10 +683,10 @@ class _FeatCard extends StatelessWidget {
                         color: scheme.onSurface,
                       ),
                     ),
-                    if (featSummary(feat, repo).isNotEmpty) ...[
+                    if (featSummary(context.l10n, feat, repo).isNotEmpty) ...[
                       const SizedBox(height: 5),
                       Text(
-                        featSummary(feat, repo),
+                        featSummary(context.l10n, feat, repo),
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -702,13 +708,13 @@ class _FeatCard extends StatelessWidget {
               //
               // Anida adentro de la tarjeta y funciona: es un `InkWell` propio
               // y no un `FilterChip`, que se queda con todos sus toques.
-              if (featSummary(feat, repo).isNotEmpty) ...[
+              if (featSummary(context.l10n, feat, repo).isNotEmpty) ...[
                 const SizedBox(width: 4),
                 InkWell(
                   onTap: () => showFeatDetailsDialog(context, feat, repo),
                   customBorder: const CircleBorder(),
                   child: Tooltip(
-                    message: 'Ver qué hace ${feat.name}',
+                    message: context.l10n.helpWhatItDoes(feat.name),
                     child: Padding(
                       padding: const EdgeInsets.all(6),
                       child: Icon(

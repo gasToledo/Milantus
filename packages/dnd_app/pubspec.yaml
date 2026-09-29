@@ -1,7 +1,7 @@
 name: dnd_app
 description: "Cliente Flutter Web de fichas D&D 5e conectado al servidor Milantus."
 publish_to: 'none'
-version: 0.19.0+1
+version: 0.20.0+1
 
 environment:
   # No subir a un patch (3.12.2) sin necesidad real: las imágenes
@@ -13,6 +13,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  # `intl` lo fija `flutter_localizations` (SDK): una cota propia rompería el
+  # `pub get` en cuanto el SDK suba, así que se deja en `any`.
+  intl: any
   http: ^1.2.2
   dnd_engine:
     path: ../dnd_engine
@@ -28,6 +33,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  generate: true
   assets:
     - packages/dnd_engine/assets/srd_2024/manifest.json
     - packages/dnd_engine/assets/srd_2024/races.json

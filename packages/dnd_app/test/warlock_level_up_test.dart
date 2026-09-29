@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'level_up_helpers.dart';
+import 'fakes/localized_app.dart';
 
 /// La subida del Brujo gnomo de la observación del 24/09/2026: el nivel 4 se
 /// confirmaba sin el truco ni el conjuro nuevos, y las invocaciones con
@@ -65,7 +66,7 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: LevelUpScreen(character: c, repo: repo, onDone: onDone ?? (_) {}),
       ),

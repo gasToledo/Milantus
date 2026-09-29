@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'fakes/fake_api_server.dart';
+import 'fakes/localized_app.dart';
 
 void main() {
   // Regresión directa del bug reportado: los avisos se chequeaban una sola
@@ -19,7 +20,7 @@ void main() {
     });
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: PendingEventsGate(
           api: ApiClient(client: server.client),
@@ -45,7 +46,7 @@ void main() {
     final api = ApiClient(client: server.client);
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: PendingEventsGate(
           api: api,
@@ -62,7 +63,7 @@ void main() {
     final server = FakeApiServer();
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: PendingEventsGate(
           api: ApiClient(client: server.client),
@@ -86,7 +87,7 @@ void main() {
     });
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: PendingEventsGate(
           api: ApiClient(client: server.client),
@@ -110,7 +111,7 @@ void main() {
     });
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: Scaffold(body: Builder(builder: (context) => const Text('x'))),
       ),

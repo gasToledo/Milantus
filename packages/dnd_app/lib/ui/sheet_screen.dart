@@ -23,6 +23,7 @@ import 'portrait_image.dart';
 import 'portrait_screen.dart';
 import 'save_status_indicator.dart';
 import 'spell_edit_screen.dart';
+import '../l10n/l10n_context.dart';
 
 part 'sheet/campaign_section.dart';
 part 'sheet/combat_section.dart';
@@ -38,15 +39,22 @@ part 'sheet/spells_section.dart';
 const _kSheetWideBreakpoint = 900.0;
 
 enum _SheetTab {
-  personaje('Personaje', Icons.person),
-  combate('Combate', Icons.sports_martial_arts),
-  inventario('Inventario', Icons.backpack),
-  campana('Campaña', Icons.flag_outlined),
-  diario('Diario', Icons.auto_stories_outlined);
+  personaje(Icons.person),
+  combate(Icons.sports_martial_arts),
+  inventario(Icons.backpack),
+  campana(Icons.flag_outlined),
+  diario(Icons.auto_stories_outlined);
 
-  const _SheetTab(this.label, this.icon);
-  final String label;
+  const _SheetTab(this.icon);
   final IconData icon;
+
+  String label(AppLocalizations l10n) => switch (this) {
+    _SheetTab.personaje => l10n.tabCharacter,
+    _SheetTab.combate => l10n.tabCombat,
+    _SheetTab.inventario => l10n.tabInventory,
+    _SheetTab.campana => l10n.tabCampaign,
+    _SheetTab.diario => l10n.tabJournal,
+  };
 }
 
 /// Ficha editable. Combate/Inventario/Diario modifican el personaje y disparan
@@ -397,7 +405,9 @@ class _SheetScreenState extends State<SheetScreen> {
         return Scaffold(
           appBar: AppBar(
             title: Text(
-              _showSheetHeader ? '${_c.name} · Nivel ${_c.level}' : _tab.label,
+              _showSheetHeader
+                  ? context.l10n.sheetHeaderTitle(_c.name, _c.level)
+                  : _tab.label(context.l10n),
             ),
             // En angosto el panel vive adentro del Drawer, o sea cerrado: el
             // estado del guardado tiene que estar acá o no se ve nunca.
@@ -405,7 +415,9 @@ class _SheetScreenState extends State<SheetScreen> {
               // También queda en el Drawer, pero ahí es la acción más
               // importante de la ficha escondida detrás de un menú.
               IconButton(
-                tooltip: _c.canLevelUp ? 'Subir nivel' : 'Nivel máximo',
+                tooltip: _c.canLevelUp
+                    ? context.l10n.levelUpAction
+                    : context.l10n.levelMaxReached,
                 icon: const Icon(Icons.arrow_upward),
                 onPressed: _c.canLevelUp ? _openLevelUp : null,
               ),

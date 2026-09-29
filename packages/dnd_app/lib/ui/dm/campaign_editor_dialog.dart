@@ -2,6 +2,7 @@ import 'package:dnd_engine/dnd_engine.dart';
 import 'package:flutter/material.dart';
 
 import '../../theme/app_widgets.dart';
+import '../../l10n/l10n_context.dart';
 
 /// Editor corto de la identidad de una campaña.
 ///
@@ -52,7 +53,7 @@ class _CampaignEditorDialogState extends State<_CampaignEditorDialog> {
   void _save() {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
-      setState(() => _nameError = 'Poné un nombre para guardarla.');
+      setState(() => _nameError = context.l10n.dmCampaignNameRequired);
       return;
     }
     Navigator.of(context).pop(
@@ -78,7 +79,7 @@ class _CampaignEditorDialogState extends State<_CampaignEditorDialog> {
             autofocus: true,
             textCapitalization: TextCapitalization.words,
             decoration: InputDecoration(
-              labelText: 'Nombre de la campaña',
+              labelText: context.l10n.dmCampaignName,
               border: const OutlineInputBorder(),
               errorText: _nameError,
             ),
@@ -97,9 +98,9 @@ class _CampaignEditorDialogState extends State<_CampaignEditorDialog> {
             minLines: 2,
             maxLines: 4,
             textCapitalization: TextCapitalization.sentences,
-            decoration: const InputDecoration(
-              labelText: 'Premisa',
-              hintText: 'El conflicto que pone esta historia en marcha…',
+            decoration: InputDecoration(
+              labelText: context.l10n.dmPremise,
+              hintText: context.l10n.dmPremiseHint,
               alignLabelWithHint: true,
               border: OutlineInputBorder(),
             ),
@@ -107,13 +108,16 @@ class _CampaignEditorDialogState extends State<_CampaignEditorDialog> {
           const SizedBox(height: 16),
           DropdownButtonFormField<CampaignState>(
             initialValue: _state,
-            decoration: const InputDecoration(
-              labelText: 'Estado',
+            decoration: InputDecoration(
+              labelText: context.l10n.combatState,
               border: OutlineInputBorder(),
             ),
             items: [
               for (final state in CampaignState.values)
-                DropdownMenuItem(value: state, child: Text(state.label)),
+                DropdownMenuItem(
+                  value: state,
+                  child: Text(state.localized(context)),
+                ),
             ],
             onChanged: (value) {
               if (value != null) setState(() => _state = value);
@@ -123,11 +127,11 @@ class _CampaignEditorDialogState extends State<_CampaignEditorDialog> {
       ),
       actions: [
         DialogAction(
-          'Cancelar',
+          context.l10n.commonCancel,
           keyHint: 'Esc',
           onPressed: () => Navigator.of(context).pop(),
         ),
-        DialogAction('Guardar', primary: true, onPressed: _save),
+        DialogAction(context.l10n.commonSave, primary: true, onPressed: _save),
       ],
     );
   }

@@ -38,39 +38,44 @@ class CodexEntry {
 }
 
 /// Las entradas de [category], ordenadas como las lista el Códice.
-List<CodexEntry> codexEntries(CodexCategory category, ContentRepository repo) =>
-    switch (category) {
-      CodexCategory.races => [for (final r in repo.racesSorted) _race(r, repo)],
-      CodexCategory.lineages => [
-        for (final l in sortedByName(repo.lineages.values, (e) => e.name))
-          _lineage(l, repo),
-      ],
-      CodexCategory.classes => [
-        for (final c in repo.classesSorted) _class(c, repo),
-      ],
-      CodexCategory.subclasses => [
-        for (final s in sortedByName(repo.subclasses.values, (e) => e.name))
-          _subclass(s, repo),
-      ],
-      CodexCategory.backgrounds => [
-        for (final b in repo.backgroundsSorted) _background(b, repo),
-      ],
-      CodexCategory.feats => [for (final f in repo.featsSorted) _feat(f, repo)],
-      // Por nivel y después por nombre, como en la ficha.
-      CodexCategory.spells => [
-        for (final s in repo.spellsSorted) _spell(s, repo),
-      ],
-      CodexCategory.magicItems => [
-        for (final i in repo.itemsSorted)
-          if (i.isMagic) _magicItem(i),
-      ],
-      CodexCategory.weapons => [for (final w in repo.weaponsSorted) _weapon(w)],
-      CodexCategory.armor => [for (final a in repo.armorSorted) _armor(a)],
-      CodexCategory.gear => [
-        for (final i in repo.itemsSorted)
-          if (!i.isMagic) _gear(i),
-      ],
-    };
+List<CodexEntry> codexEntries(
+  CodexCategory category,
+  ContentRepository repo,
+  AppLocalizations l10n,
+) => switch (category) {
+  CodexCategory.races => [for (final r in repo.racesSorted) _race(r, repo)],
+  CodexCategory.lineages => [
+    for (final l in sortedByName(repo.lineages.values, (e) => e.name))
+      _lineage(l, repo, l10n),
+  ],
+  CodexCategory.classes => [
+    for (final c in repo.classesSorted) _class(c, repo),
+  ],
+  CodexCategory.subclasses => [
+    for (final s in sortedByName(repo.subclasses.values, (e) => e.name))
+      _subclass(s, repo, l10n),
+  ],
+  CodexCategory.backgrounds => [
+    for (final b in repo.backgroundsSorted) _background(b, repo),
+  ],
+  CodexCategory.feats => [
+    for (final f in repo.featsSorted) _feat(f, repo, l10n),
+  ],
+  // Por nivel y después por nombre, como en la ficha.
+  CodexCategory.spells => [
+    for (final s in repo.spellsSorted) _spell(s, repo, l10n),
+  ],
+  CodexCategory.magicItems => [
+    for (final i in repo.itemsSorted)
+      if (i.isMagic) _magicItem(i, l10n),
+  ],
+  CodexCategory.weapons => [for (final w in repo.weaponsSorted) _weapon(w)],
+  CodexCategory.armor => [for (final a in repo.armorSorted) _armor(a, l10n)],
+  CodexCategory.gear => [
+    for (final i in repo.itemsSorted)
+      if (!i.isMagic) _gear(i),
+  ],
+};
 
 // ------------------------------------------------------------ Por tipo
 
@@ -83,28 +88,37 @@ CodexEntry _race(Race r, ContentRepository repo) {
     source: r.source,
     body: (context) => [
       _facts(context, [
-        ('Tipo', r.creatureType),
-        ('Tamaño', r.sizeOptions.isEmpty ? r.size : r.sizeOptions.join(' o ')),
-        ('Velocidad', '${r.speed} pies'),
+        (context.l10n.identityCreatureTypeShort, r.creatureType),
+        (
+          context.l10n.identitySize,
+          r.sizeOptions.isEmpty
+              ? r.size
+              : r.sizeOptions.join(' ${context.l10n.wordOr} '),
+        ),
+        (context.l10n.creatureSpeed, context.l10n.feetValue(r.speed)),
         for (final dv in r.effects.whereType<DarkvisionEffect>())
-          ('Visión en la oscuridad', '${dv.range} pies'),
+          (context.l10n.darkvision, context.l10n.feetValue(dv.range)),
       ]),
       if (r.description.isNotEmpty) _prose(context, r.description),
-      _traits(context, 'Rasgos', readableTraits(r.effects, repo)),
+      _traits(
+        context,
+        context.l10n.creatureTraits,
+        readableTraits(context.l10n, r.effects, repo),
+      ),
       if (lineages.isNotEmpty)
-        _section(context, 'Linajes', [
+        _section(context, context.l10n.catLineages, [
           _prose(context, lineages.map((l) => l.name).join(' · ')),
         ]),
     ],
   );
 }
 
-CodexEntry _lineage(Lineage l, ContentRepository repo) {
+CodexEntry _lineage(Lineage l, ContentRepository repo, AppLocalizations l10n) {
   final race = repo.race(l.raceId)?.name ?? l.raceId;
   return CodexEntry(
     id: l.id,
     name: l.name,
-    subtitle: 'Linaje de $race',
+    subtitle: l10n.codexLineageOf(race),
     source: l.source,
     body: (context) => [
       if (l.description.isNotEmpty) _prose(context, l.description),
@@ -123,45 +137,54 @@ CodexEntry _class(CharacterClass c, ContentRepository repo) {
     source: c.source,
     body: (context) => [
       _facts(context, [
-        ('Dado de golpe', 'd${c.hitDie}'),
-        ('Salvaciones', saves),
-        ('Subclase', 'nivel ${c.subclassLevel}'),
+        (context.l10n.factHitDie, 'd${c.hitDie}'),
+        (context.l10n.savesTitle, saves),
+        (
+          context.l10n.luStepSubclass,
+          context.l10n.codexLevelN(c.subclassLevel),
+        ),
       ]),
       _facts(context, [
         if (c.armorProficiencies.isNotEmpty)
           (
-            'Armaduras',
+            context.l10n.groupArmor,
             c.armorProficiencies.map(armorTrainingLabel).join(', '),
           ),
         if (c.weaponProficiencies.isNotEmpty)
           (
-            'Armas',
+            context.l10n.groupWeapons,
             c.weaponProficiencies.map(weaponProficiencyLabel).join(', '),
           ),
         if (c.skillChoiceCount > 0)
           (
-            'Habilidades',
+            context.l10n.creatureSkills,
             c.skillChoiceFrom.isEmpty
-                ? 'elegí ${c.skillChoiceCount}, cualquiera'
-                : 'elegí ${c.skillChoiceCount} entre '
-                      '${c.skillChoiceFrom.map(Skill.labelFor).join(', ')}',
+                ? context.l10n.codexPickAny(c.skillChoiceCount)
+                : context.l10n.codexPickFrom(
+                    c.skillChoiceCount,
+                    c.skillChoiceFrom.map(Skill.labelFor).join(', '),
+                  ),
           ),
       ]),
       _features(context, c.features),
       if (subclasses.isNotEmpty)
-        _section(context, 'Subclases', [
+        _section(context, context.l10n.catSubclasses, [
           _prose(context, subclasses.map((s) => s.name).join(' · ')),
         ]),
     ],
   );
 }
 
-CodexEntry _subclass(Subclass s, ContentRepository repo) {
+CodexEntry _subclass(
+  Subclass s,
+  ContentRepository repo,
+  AppLocalizations l10n,
+) {
   final klass = repo.characterClass(s.classId)?.name ?? s.classId;
   return CodexEntry(
     id: s.id,
     name: s.name,
-    subtitle: 'Subclase de $klass',
+    subtitle: l10n.codexSubclassOf(klass),
     source: s.source,
     facet: klass,
     body: (context) => [
@@ -181,24 +204,30 @@ CodexEntry _background(Background b, ContentRepository repo) {
     body: (context) => [
       _facts(context, [
         if (b.abilityOptions.isNotEmpty)
-          ('Características', b.abilityOptions.map((a) => a.abbr).join(' · ')),
+          (
+            context.l10n.abilitiesTitle,
+            b.abilityOptions.map((a) => a.abbr).join(' · '),
+          ),
         if (b.skillProficiencies.isNotEmpty)
-          ('Habilidades', b.skillProficiencies.map(Skill.labelFor).join(', ')),
+          (
+            context.l10n.creatureSkills,
+            b.skillProficiencies.map(Skill.labelFor).join(', '),
+          ),
         if (b.toolProficiencies.isNotEmpty)
           (
-            'Herramientas',
+            context.l10n.groupTools,
             b.toolProficiencies.map(toolProficiencyLabel).join(', '),
           ),
-        if (feat != null) ('Dote de origen', feat.name),
+        if (feat != null) (context.l10n.factOriginFeat, feat.name),
       ]),
       if (b.description.isNotEmpty) _prose(context, b.description),
     ],
   );
 }
 
-CodexEntry _feat(Feat f, ContentRepository repo) {
+CodexEntry _feat(Feat f, ContentRepository repo, AppLocalizations l10n) {
   final category = featCategoryLabels[f.category] ?? f.category;
-  final prerequisite = _prerequisite(f.prerequisite, repo);
+  final prerequisite = _prerequisite(f.prerequisite, repo, l10n);
   return CodexEntry(
     id: f.id,
     name: f.name,
@@ -208,17 +237,19 @@ CodexEntry _feat(Feat f, ContentRepository repo) {
     facetRank: featCategoryLabels.keys.toList().indexOf(f.category),
     body: (context) => [
       _facts(context, [
-        ('Categoría', category),
-        if (prerequisite != null) ('Requisitos', prerequisite),
-        if (f.repeatable) ('Repetible', 'Sí'),
+        (context.l10n.codexCategory, category),
+        if (prerequisite != null)
+          (context.l10n.codexRequirements, prerequisite),
+        if (f.repeatable)
+          (context.l10n.codexRepeatable, context.l10n.commonYes),
       ]),
-      _prose(context, featSummary(f, repo)),
+      _prose(context, featSummary(context.l10n, f, repo)),
     ],
   );
 }
 
-CodexEntry _spell(Spell s, ContentRepository repo) {
-  final level = s.level == 0 ? 'Truco' : 'Nivel ${s.level}';
+CodexEntry _spell(Spell s, ContentRepository repo, AppLocalizations l10n) {
+  final level = s.level == 0 ? l10n.spellCantrip : l10n.spellLevel(s.level);
   return CodexEntry(
     id: s.id,
     name: s.name,
@@ -228,18 +259,23 @@ CodexEntry _spell(Spell s, ContentRepository repo) {
     facetRank: s.level,
     body: (context) => [
       _facts(context, [
-        ('Lanzamiento', s.ritual ? '${s.castingTime} o ritual' : s.castingTime),
-        ('Alcance', s.range),
-        ('Componentes', s.components),
         (
-          'Duración',
-          s.concentration ? 'Concentración, ${s.duration}' : s.duration,
+          context.l10n.spellCastingTime,
+          s.ritual ? context.l10n.codexRitual(s.castingTime) : s.castingTime,
+        ),
+        (context.l10n.commonRange, s.range),
+        (context.l10n.spellComponents, s.components),
+        (
+          context.l10n.spellDuration,
+          s.concentration
+              ? context.l10n.codexConcentration(s.duration)
+              : s.duration,
         ),
       ]),
       if (s.classes.isNotEmpty)
         _facts(context, [
           (
-            'Lo pueden preparar',
+            context.l10n.codexCanPrepare,
             s.classes
                 .map((id) => repo.characterClass(id)?.name ?? id)
                 .join(', '),
@@ -250,22 +286,29 @@ CodexEntry _spell(Spell s, ContentRepository repo) {
   );
 }
 
-CodexEntry _magicItem(Item i) {
+CodexEntry _magicItem(Item i, AppLocalizations l10n) {
   final rarity = itemRarityLabels[i.rarity] ?? i.rarity!;
   return CodexEntry(
     id: i.id,
     name: i.name,
-    subtitle: i.requiresAttunement ? '$rarity · sintonización' : rarity,
+    subtitle: i.requiresAttunement ? l10n.codexRarityAttune(rarity) : rarity,
     source: i.source,
     facet: rarity,
     facetRank: itemRarityLabels.keys.toList().indexOf(i.rarity!),
     body: (context) => [
       _facts(context, [
-        ('Rareza', rarity),
-        ('Sintonización', i.requiresAttunement ? 'Requiere' : 'No requiere'),
-        if (i.maxCharges case final charges?) ('Cargas', '$charges'),
-        if (i.weight > 0) ('Peso', '${formatPounds(i.weight)} lb'),
-        if (i.costCp > 0) ('Precio', formatCost(i.costCp)),
+        (context.l10n.codexRarity, rarity),
+        (
+          context.l10n.codexAttunement,
+          i.requiresAttunement
+              ? context.l10n.codexRequires
+              : context.l10n.codexNotRequired,
+        ),
+        if (i.maxCharges case final charges?)
+          (context.l10n.codexCharges, '$charges'),
+        if (i.weight > 0)
+          (context.l10n.codexWeight, '${formatPounds(i.weight)} lb'),
+        if (i.costCp > 0) (context.l10n.codexPrice, formatCost(i.costCp)),
       ]),
       // La primera línea del texto es la de tipo y rareza, que ya está arriba.
       _prose(context, _withoutTypeLine(i.description)),
@@ -286,15 +329,17 @@ CodexEntry _weapon(Weapon w) {
     facetRank: w.category == 'simple' ? 0 : 1,
     body: (context) => [
       _facts(context, [
-        ('Daño', damage),
-        if (w.versatileDice case final v?) ('A dos manos', v),
-        if (w.rangeLabel case final range?) ('Alcance', range),
-        if (w.mastery case final m?) ('Maestría', weaponMasteryName(m)),
-        if (w.weight > 0) ('Peso', '${formatPounds(w.weight)} lb'),
-        if (w.costCp > 0) ('Precio', formatCost(w.costCp)),
+        (context.l10n.creatureDamage, damage),
+        if (w.versatileDice case final v?) (context.l10n.invTwoHanded, v),
+        if (w.rangeLabel case final range?) (context.l10n.commonRange, range),
+        if (w.mastery case final m?)
+          (context.l10n.codexMastery, weaponMasteryName(m)),
+        if (w.weight > 0)
+          (context.l10n.codexWeight, '${formatPounds(w.weight)} lb'),
+        if (w.costCp > 0) (context.l10n.codexPrice, formatCost(w.costCp)),
       ]),
       if (w.properties.isNotEmpty)
-        _traits(context, 'Propiedades', [
+        _traits(context, context.l10n.codexProperties, [
           for (final id in w.properties)
             (
               name: weaponProperties[id]?.name ?? id,
@@ -306,29 +351,32 @@ CodexEntry _weapon(Weapon w) {
   );
 }
 
-CodexEntry _armor(Armor a) {
+CodexEntry _armor(Armor a, AppLocalizations l10n) {
   final category = armorTrainingLabel(a.category);
   final ac = a.category == 'shield'
       ? '+${a.baseAc}'
       : !a.addDexMod
       ? '${a.baseAc}'
       : a.maxDexBonus == null
-      ? '${a.baseAc} + mod. DES'
-      : '${a.baseAc} + mod. DES (máx. ${a.maxDexBonus})';
+      ? l10n.codexAcDex(a.baseAc)
+      : l10n.codexAcDexMax(a.baseAc, a.maxDexBonus!);
   return CodexEntry(
     id: a.id,
     name: a.name,
-    subtitle: '$category · CA $ac',
+    subtitle: l10n.codexArmorSubtitle(category, ac),
     source: a.source,
     facet: category,
     facetRank: const ['light', 'medium', 'heavy', 'shield'].indexOf(a.category),
     body: (context) => [
       _facts(context, [
-        ('CA', ac),
-        if (a.strengthRequirement case final str?) ('Fuerza', '$str'),
-        if (a.stealthDisadvantage) ('Sigilo', 'Desventaja'),
-        if (a.weight > 0) ('Peso', '${formatPounds(a.weight)} lb'),
-        if (a.costCp > 0) ('Precio', formatCost(a.costCp)),
+        (context.l10n.creatureAcShort, ac),
+        if (a.strengthRequirement case final str?)
+          (context.l10n.codexStrength, '$str'),
+        if (a.stealthDisadvantage)
+          (context.l10n.codexStealth, context.l10n.codexDisadvantage),
+        if (a.weight > 0)
+          (context.l10n.codexWeight, '${formatPounds(a.weight)} lb'),
+        if (a.costCp > 0) (context.l10n.codexPrice, formatCost(a.costCp)),
       ]),
       if (a.description.isNotEmpty) _prose(context, a.description),
     ],
@@ -346,10 +394,11 @@ CodexEntry _gear(Item i) {
     facetRank: itemCategoryLabels.keys.toList().indexOf(i.category),
     body: (context) => [
       _facts(context, [
-        ('Categoría', category),
-        if (i.bundleSize > 1) ('Paquete de', '${i.bundleSize}'),
-        if (i.weight > 0) ('Peso', '${formatPounds(i.weight)} lb'),
-        if (i.costCp > 0) ('Precio', formatCost(i.costCp)),
+        (context.l10n.codexCategory, category),
+        if (i.bundleSize > 1) (context.l10n.codexPackOf, '${i.bundleSize}'),
+        if (i.weight > 0)
+          (context.l10n.codexWeight, '${formatPounds(i.weight)} lb'),
+        if (i.costCp > 0) (context.l10n.codexPrice, formatCost(i.costCp)),
       ]),
       if (i.description.isNotEmpty) _prose(context, i.description),
     ],
@@ -359,22 +408,32 @@ CodexEntry _gear(Item i) {
 // ------------------------------------------------------------ Piezas
 
 /// Los requisitos de una dote en una línea, o null si no tiene.
-String? _prerequisite(FeatPrerequisite? p, ContentRepository repo) {
+String? _prerequisite(
+  FeatPrerequisite? p,
+  ContentRepository repo,
+  AppLocalizations l10n,
+) {
   if (p == null || p.isEmpty) return null;
   String scores(Map<Ability, int> m, String join) =>
       m.entries.map((e) => '${e.key.abbr} ${e.value}').join(join);
   return [
-    if (p.minLevel case final level?) 'nivel $level',
-    if (p.minAbilityScores.isNotEmpty) scores(p.minAbilityScores, ' y '),
-    if (p.anyAbilityScores.isNotEmpty) scores(p.anyAbilityScores, ' o '),
+    if (p.minLevel case final level?) l10n.codexLevelN(level),
+    if (p.minAbilityScores.isNotEmpty)
+      scores(p.minAbilityScores, ' ${l10n.wordAnd} '),
+    if (p.anyAbilityScores.isNotEmpty)
+      scores(p.anyAbilityScores, ' ${l10n.wordOr} '),
     if (p.requiredClassId case final id?) repo.characterClass(id)?.name ?? id,
     ?p.requiredClassFeature,
     if (p.requiredFeatIds.isNotEmpty)
-      p.requiredFeatIds.map((id) => repo.feat(id)?.name ?? id).join(' o '),
+      p.requiredFeatIds
+          .map((id) => repo.feat(id)?.name ?? id)
+          .join(' ${l10n.wordOr} '),
     if (p.requiredFeatCategory case final category?)
-      'una dote de ${featCategoryLabels[category] ?? category}',
+      l10n.codexPrereqFeat(featCategoryLabels[category] ?? category),
     if (p.requiredProficiency case final prof?)
-      prof == 'spellcasting' ? 'lanzar conjuros' : 'competencia: $prof',
+      prof == 'spellcasting'
+          ? l10n.codexPrereqCast
+          : l10n.codexPrereqProf(prof),
   ].join(' · ');
 }
 
@@ -489,7 +548,7 @@ Widget _features(BuildContext context, List<ClassFeature> features) {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       for (final level in levels)
-        _traits(context, 'Nivel $level', [
+        _traits(context, context.l10n.commonLevel(level), [
           for (final f in byLevel[level]!)
             (name: f.name, description: f.description),
         ]),

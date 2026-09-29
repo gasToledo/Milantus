@@ -4,6 +4,7 @@ import '../api/api_client.dart';
 import '../api/api_models.dart';
 import '../data/settings_service.dart';
 import '../theme/app_widgets.dart';
+import '../l10n/l10n_context.dart';
 
 /// Selecciona el proveedor de retratos entre los ofrecidos por
 /// `GET /api/portraits/providers`. Las credenciales quedan en el servidor.
@@ -56,10 +57,8 @@ class _SettingsDialogState extends State<SettingsDialog> {
     } catch (error) {
       if (!mounted) return;
       setState(
-        () => _loadError = failureMessage(
-          'No se pudo cargar la configuración',
-          error,
-        ),
+        () =>
+            _loadError = failureMessage(context.l10n.settingsLoadError, error),
       );
     }
   }
@@ -77,7 +76,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
       if (!mounted) return;
       showAppMessage(
         context,
-        failureMessage('No se pudieron guardar los ajustes', error),
+        failureMessage(context.l10n.settingsSaveError, error),
         tone: AppMessageTone.error,
       );
       setState(() => _saving = false);
@@ -89,18 +88,18 @@ class _SettingsDialogState extends State<SettingsDialog> {
     // El alto lo acota el propio molde y el ancho angosto también, así que acá
     // no hace falta medir la ventana.
     return AppDialog(
-      title: 'Ajustes · Generación de imágenes',
+      title: context.l10n.settingsTitle,
       content: !_loaded && _loadError == null
-          ? const SizedBox(
+          ? SizedBox(
               height: 80,
-              child: Center(child: AppBusyLabel('Cargando ajustes…')),
+              child: Center(child: AppBusyLabel(context.l10n.settingsLoading)),
             )
           : _loadError != null
           ? _errorContent()
           : _formContent(),
       actions: [
         DialogAction(
-          'Cancelar',
+          context.l10n.commonCancel,
           keyHint: 'Esc',
           onPressed: _saving ? null : () => Navigator.of(context).pop(false),
         ),
@@ -108,7 +107,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
         // barra de celdas no entra el spinner de `AppBusyLabel`, y el texto es
         // lo que informa de todos modos.
         DialogAction(
-          _saving ? 'Guardando…' : 'Guardar',
+          _saving ? context.l10n.commonSaving : context.l10n.commonSave,
           primary: true,
           onPressed: _loaded && !_saving && _providerId != null ? _save : null,
         ),
@@ -128,17 +127,14 @@ class _SettingsDialogState extends State<SettingsDialog> {
       OutlinedButton.icon(
         onPressed: _load,
         icon: const Icon(Icons.refresh),
-        label: const Text('Reintentar'),
+        label: Text(context.l10n.commonRetry),
       ),
     ],
   );
 
   Widget _formContent() {
     if (_providers.isEmpty) {
-      return const Text(
-        'Este servidor no tiene ningún proveedor de generación configurado. '
-        'Igual podés subir tu propio retrato desde la ficha.',
-      );
+      return Text(context.l10n.settingsNoProviders);
     }
     return SingleChildScrollView(
       child: FocusTraversalGroup(
@@ -146,7 +142,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Proveedor de retratos:'),
+            Text(context.l10n.settingsProviderLabel),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
               initialValue: _providerId,

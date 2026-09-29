@@ -89,7 +89,7 @@ class _CodexCategoryViewState extends State<_CodexCategoryView> {
               child: _selected == null
                   ? AppEmptyState(
                       icon: widget.category.icon,
-                      message: 'Elegí una entrada para leerla.',
+                      message: context.l10n.codexPickEntry,
                     )
                   : _detail(context, _selected!),
             ),
@@ -111,12 +111,14 @@ class _CodexCategoryViewState extends State<_CodexCategoryView> {
             controller: _searchController,
             decoration: InputDecoration(
               isDense: true,
-              labelText: 'Buscar en ${widget.category.label.toLowerCase()}',
+              labelText: context.l10n.codexSearchIn(
+                widget.category.label(context.l10n).toLowerCase(),
+              ),
               prefixIcon: const Icon(Icons.search, size: 20),
               suffixIcon: _query.isEmpty
                   ? null
                   : IconButton(
-                      tooltip: 'Limpiar búsqueda',
+                      tooltip: context.l10n.rosterClearSearch,
                       icon: const Icon(Icons.close, size: 18),
                       onPressed: () {
                         _searchController.clear();
@@ -135,7 +137,7 @@ class _CodexCategoryViewState extends State<_CodexCategoryView> {
               runSpacing: 6,
               children: [
                 ChoiceChip(
-                  label: const Text('Todos'),
+                  label: Text(context.l10n.filterAll),
                   selected: _facet == null,
                   onSelected: (_) => setState(() => _facet = null),
                 ),
@@ -162,7 +164,7 @@ class _CodexCategoryViewState extends State<_CodexCategoryView> {
           child: results.isEmpty
               ? AppEmptyState(
                   icon: Icons.search_off,
-                  message: 'Nada coincide con lo que buscaste.',
+                  message: context.l10n.codexNothingMatches,
                   actions: [
                     OutlinedButton(
                       onPressed: () {
@@ -172,7 +174,7 @@ class _CodexCategoryViewState extends State<_CodexCategoryView> {
                           _facet = null;
                         });
                       },
-                      child: const Text('Limpiar filtros'),
+                      child: Text(context.l10n.codexClearFilters),
                     ),
                   ],
                 )
@@ -220,7 +222,7 @@ class _CodexCategoryViewState extends State<_CodexCategoryView> {
             child: TextButton.icon(
               onPressed: onBack,
               icon: const Icon(Icons.arrow_back, size: 18),
-              label: const Text('Volver al listado'),
+              label: Text(context.l10n.codexBackToList),
             ),
           ),
         Wrap(

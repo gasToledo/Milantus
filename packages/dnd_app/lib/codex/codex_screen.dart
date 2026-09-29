@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
 import '../theme/app_widgets.dart';
+import '../l10n/l10n_context.dart';
 
 part 'codex_category_view.dart';
 part 'codex_entries.dart';
@@ -14,27 +15,45 @@ part 'codex_entries.dart';
 /// contenido salen de acá, y sumar una categoría es sumar un valor y su `case`
 /// en [codexEntries].
 enum CodexCategory {
-  races('Especies', Icons.diversity_3, _personaje),
-  lineages('Linajes', Icons.account_tree_outlined, _personaje),
-  classes('Clases', Icons.shield_outlined, _personaje),
-  subclasses('Subclases', Icons.call_split, _personaje),
-  backgrounds('Trasfondos', Icons.history_edu, _personaje),
-  feats('Dotes', Icons.military_tech, _personaje),
-  spells('Conjuros', Icons.auto_stories, _magia),
-  magicItems('Objetos mágicos', Icons.auto_fix_high_outlined, _magia),
-  weapons('Armas', Icons.hardware, _magia),
-  armor('Armaduras', Icons.security, _magia),
-  gear('Equipo', Icons.inventory_2_outlined, _magia);
+  races(Icons.diversity_3, _personaje),
+  lineages(Icons.account_tree_outlined, _personaje),
+  classes(Icons.shield_outlined, _personaje),
+  subclasses(Icons.call_split, _personaje),
+  backgrounds(Icons.history_edu, _personaje),
+  feats(Icons.military_tech, _personaje),
+  spells(Icons.auto_stories, _magia),
+  magicItems(Icons.auto_fix_high_outlined, _magia),
+  weapons(Icons.hardware, _magia),
+  armor(Icons.security, _magia),
+  gear(Icons.inventory_2_outlined, _magia);
 
-  final String label;
+  /// El nombre de la categoría en el idioma activo.
+  String label(AppLocalizations l10n) => switch (this) {
+    CodexCategory.races => l10n.catRaces,
+    CodexCategory.lineages => l10n.catLineages,
+    CodexCategory.classes => l10n.catClasses,
+    CodexCategory.subclasses => l10n.catSubclasses,
+    CodexCategory.backgrounds => l10n.catBackgrounds,
+    CodexCategory.feats => l10n.catFeats,
+    CodexCategory.spells => l10n.spellsTitle,
+    CodexCategory.magicItems => l10n.groupMagicItems,
+    CodexCategory.weapons => l10n.groupWeapons,
+    CodexCategory.armor => l10n.groupArmor,
+    CodexCategory.gear => l10n.kindGear,
+  };
   final IconData icon;
   final String group;
 
-  const CodexCategory(this.label, this.icon, this.group);
+  const CodexCategory(this.icon, this.group);
 }
 
-const _personaje = 'Personaje';
-const _magia = 'Magia y equipo';
+// Identificadores de grupo; el título sale de [codexGroupTitle].
+const _personaje = 'personaje';
+const _magia = 'magia';
+
+/// El título de un grupo de categorías de la portada.
+String codexGroupTitle(AppLocalizations l10n, String group) =>
+    group == _personaje ? l10n.codexGroupCharacter : l10n.codexGroupGear;
 
 /// Cuántas coincidencias de cada categoría muestra la búsqueda general antes
 /// de ofrecer «Ver las N». Con una letra sola, «a» encuentra casi todo el
@@ -80,9 +99,21 @@ class _CodexScreenState extends State<CodexScreen> {
   /// Las entradas de cada categoría, armadas una vez: el catálogo no cambia
   /// mientras la pantalla está abierta, y el detalle se construye recién al
   /// abrirlo.
-  late final Map<CodexCategory, List<CodexEntry>> _entries = {
-    for (final c in CodexCategory.values) c: codexEntries(c, widget.repo),
-  };
+  ///
+  /// Se rearman si cambia el idioma: los subtítulos y los filtros llevan texto.
+  Map<CodexCategory, List<CodexEntry>>? _entriesCache;
+  Locale? _entriesLocale;
+  Map<CodexCategory, List<CodexEntry>> get _entries {
+    final locale = Localizations.localeOf(context);
+    if (_entriesCache == null || _entriesLocale != locale) {
+      _entriesLocale = locale;
+      _entriesCache = {
+        for (final c in CodexCategory.values)
+          c: codexEntries(c, widget.repo, context.l10n),
+      };
+    }
+    return _entriesCache!;
+  }
 
   @override
   void dispose() {
@@ -122,9 +153,11 @@ class _CodexScreenState extends State<CodexScreen> {
             // queda plegado y la lista sola no lo dice. Mismo criterio que la
             // barra de Homebrew.
             title: Text(switch ((_needle.isNotEmpty, _section)) {
-              (true, _) => 'Códice · Búsqueda',
-              (false, final section?) => 'Códice · ${section.label}',
-              (false, null) => 'Códice',
+              (true, _) => context.l10n.codexSearchTitle,
+              (false, final section?) => context.l10n.codexSectionTitle(
+                section.label(context.l10n),
+              ),
+              (false, null) => context.l10n.navCodex,
             }),
             // Angosto, el Drawer de categorías se quedaba con el lugar de la
             // flecha de volver y no había forma de salir del Códice. La
@@ -135,7 +168,7 @@ class _CodexScreenState extends State<CodexScreen> {
               if (!wide)
                 Builder(
                   builder: (context) => IconButton(
-                    tooltip: 'Categorías del Códice',
+                    tooltip: context.l10n.codexCategoriesTooltip,
                     icon: const Icon(Icons.menu),
                     onPressed: () => Scaffold.of(context).openDrawer(),
                   ),
@@ -181,11 +214,11 @@ class _CodexScreenState extends State<CodexScreen> {
             controller: _searchController,
             decoration: InputDecoration(
               isDense: true,
-              labelText: 'Buscar en todo el Códice',
+              labelText: context.l10n.codexSearchAll,
               prefixIcon: const Icon(Icons.search, size: 20),
               suffixIcon: searching
                   ? IconButton(
-                      tooltip: 'Limpiar búsqueda',
+                      tooltip: context.l10n.rosterClearSearch,
                       icon: const Icon(Icons.close, size: 18),
                       onPressed: () => run(() {
                         _searchController.clear();
@@ -200,7 +233,7 @@ class _CodexScreenState extends State<CodexScreen> {
           appNavItem(
             context,
             icon: Icons.menu_book_outlined,
-            label: 'Portada',
+            label: context.l10n.codexHome,
             active: !searching && _section == null,
             onTap: () => run(() => _open(null)),
           ),
@@ -213,12 +246,12 @@ class _CodexScreenState extends State<CodexScreen> {
                       c.group != CodexCategory.values[c.index - 1].group)
                     Padding(
                       padding: const EdgeInsets.fromLTRB(8, 14, 8, 0),
-                      child: Eyebrow(c.group),
+                      child: Eyebrow(codexGroupTitle(context.l10n, c.group)),
                     ),
                   appNavItem(
                     context,
                     icon: c.icon,
-                    label: c.label,
+                    label: c.label(context.l10n),
                     active: !searching && _section == c,
                     // Buscando, el panel cuenta coincidencias: dice dónde
                     // hay algo sin tener que bajar por los resultados.
@@ -258,7 +291,7 @@ class _CodexScreenState extends State<CodexScreen> {
       maxWidth: 900,
       children: [
         Text(
-          'Códice',
+          context.l10n.navCodex,
           style: TextStyle(
             fontFamily: 'Georgia',
             fontSize: 24,
@@ -267,14 +300,12 @@ class _CodexScreenState extends State<CodexScreen> {
         ),
         const SizedBox(height: 6),
         Text(
-          'Todo el contenido del juego para leer, sin crear un personaje ni '
-          'editar nada. Tu homebrew aparece mezclado con el resto, con su '
-          'marca de procedencia.',
+          context.l10n.codexIntro,
           style: TextStyle(fontSize: 13, color: pal.textMuted),
         ),
         for (final group in [_personaje, _magia]) ...[
           const SizedBox(height: 20),
-          Eyebrow(group),
+          Eyebrow(codexGroupTitle(context.l10n, group)),
           LayoutBuilder(
             builder: (context, box) {
               final columns = box.maxWidth >= 720
@@ -323,7 +354,7 @@ class _CodexScreenState extends State<CodexScreen> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      c.label,
+                      c.label(context.l10n),
                       style: const TextStyle(fontWeight: FontWeight.w500),
                     ),
                   ),
@@ -366,7 +397,7 @@ class _CodexScreenState extends State<CodexScreen> {
     if (total == 0) {
       return AppEmptyState(
         icon: Icons.search_off,
-        message: 'Nada del Códice coincide con «${_query.trim()}».',
+        message: context.l10n.codexNoMatch(_query.trim()),
         actions: [
           OutlinedButton.icon(
             onPressed: () {
@@ -374,7 +405,7 @@ class _CodexScreenState extends State<CodexScreen> {
               setState(() => _query = '');
             },
             icon: const Icon(Icons.close, size: 20),
-            label: const Text('Limpiar búsqueda'),
+            label: Text(context.l10n.rosterClearSearch),
           ),
         ],
       );
@@ -391,7 +422,7 @@ class _CodexScreenState extends State<CodexScreen> {
         ),
         const SizedBox(height: 14),
         for (final MapEntry(key: c, value: found) in groups.entries) ...[
-          Eyebrow('${c.label} · ${found.length}'),
+          Eyebrow('${c.label(context.l10n)} · ${found.length}'),
           DenseRows(
             children: [
               for (final e in found.take(_searchPreview))
@@ -406,7 +437,10 @@ class _CodexScreenState extends State<CodexScreen> {
                 ListTile(
                   dense: true,
                   title: Text(
-                    'Ver las ${found.length} coincidencias en ${c.label}',
+                    context.l10n.codexSeeAll(
+                      found.length,
+                      c.label(context.l10n),
+                    ),
                     style: TextStyle(color: pal.gold),
                   ),
                   onTap: () => _open(c, query: _query.trim()),

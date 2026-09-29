@@ -45,15 +45,15 @@ class _FeatFormState extends State<FeatForm> with _GuidedForm {
   _Explained? explain(String key) => switch (key) {
     'category' => switch (featCategoryRules[_category]) {
       final rule? => _explained(
-        'Categoría',
-        _featCategories[_category] ?? _category,
+        context.l10n.codexCategory,
+        _featCategories(context.l10n)[_category] ?? _category,
         rule,
       ),
       null => null,
     },
     'repeatable' => _explained(
-      'Repetición',
-      _repeatable ? 'Repetible' : 'Una sola vez',
+      context.l10n.hbRepetition,
+      _repeatable ? context.l10n.codexRepeatable : context.l10n.hbOnce,
       featRepeatableRule,
     ),
     _ => null,
@@ -70,11 +70,11 @@ class _FeatFormState extends State<FeatForm> with _GuidedForm {
     final feat = _feat();
     final muted = Theme.of(context).colorScheme.onSurfaceVariant;
     return _FormScaffold(
-      title: 'Dote',
+      title: context.l10n.luFeat,
       onSave: _save,
       onInvalid: openAllSections,
       panel: guidePanel(
-        previewTitle: 'Así la ve el jugador',
+        previewTitle: context.l10n.hbFeatPreview,
         preview: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -100,23 +100,22 @@ class _FeatFormState extends State<FeatForm> with _GuidedForm {
             if (feat.description.isEmpty) ...[
               const SizedBox(height: 8),
               Text(
-                'Sin descripción, el jugador solo ve lo que concede. Una línea '
-                'que diga qué la hace distinta ayuda a elegirla.',
+                context.l10n.hbFeatNoDescription,
                 style: TextStyle(fontSize: 12.5, height: 1.45, color: muted),
               ),
             ],
           ],
         ),
-        hint: 'Tocá la categoría para ver quién puede tomar la dote.',
+        hint: context.l10n.hbFeatHint,
       ),
       children: [
         _text(
           _name,
-          'Nombre',
-          validator: (v) => _requiredText(v, 'el nombre de la dote'),
+          context.l10n.detailsName,
+          validator: (v) => _requiredText(v, context.l10n.hbReqFeatName),
         ),
         _categoryDropdown(
-          _featCategories,
+          _featCategories(context.l10n),
           _category,
           (v) => setState(() {
             _category = v;
@@ -128,14 +127,18 @@ class _FeatFormState extends State<FeatForm> with _GuidedForm {
         ..._optionalRule,
         section(
           icon: Icons.menu_book_outlined,
-          title: 'Descripción',
-          summary: _description.text.trim().isEmpty ? 'sin cargar' : 'cargada',
-          children: [_text(_description, 'Qué la hace distinta', maxLines: 5)],
+          title: context.l10n.hbDescription,
+          summary: _description.text.trim().isEmpty
+              ? context.l10n.hbNotSet
+              : context.l10n.hbLoaded,
+          children: [
+            _text(_description, context.l10n.hbFeatDistinct, maxLines: 5),
+          ],
         ),
         section(
           icon: Icons.auto_awesome,
-          title: 'Qué concede',
-          summary: _effectsSummary(_effects),
+          title: context.l10n.hbGrants,
+          summary: _effectsSummary(context.l10n, _effects),
           children: [
             EffectEditor(
               effects: _effects,
@@ -146,15 +149,19 @@ class _FeatFormState extends State<FeatForm> with _GuidedForm {
         ),
         section(
           icon: Icons.repeat,
-          title: 'Requisitos y repetición',
+          title: context.l10n.hbPrereqRepeat,
           summary: [
-            feat.prerequisite == null ? 'sin requisitos' : 'con requisitos',
-            _repeatable ? 'repetible' : 'una vez',
+            feat.prerequisite == null
+                ? context.l10n.hbNoPrereq
+                : context.l10n.hbWithPrereq,
+            _repeatable
+                ? context.l10n.hbRepeatableLower
+                : context.l10n.hbOnceLower,
           ].join(' · '),
           children: [
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Se puede tomar más de una vez'),
+              title: Text(context.l10n.hbRepeatSwitch),
               value: _repeatable,
               onChanged: (v) => setState(() {
                 _repeatable = v;
@@ -165,7 +172,7 @@ class _FeatFormState extends State<FeatForm> with _GuidedForm {
             // suma cuando alguien arme una dote general propia con requisito.
             if (feat.prerequisite != null)
               Text(
-                'Conserva el requisito de la dote original.',
+                context.l10n.hbKeepPrereq,
                 style: TextStyle(fontSize: 13, color: muted),
               ),
             explainHere((f) => f == 'repeatable'),
@@ -177,8 +184,5 @@ class _FeatFormState extends State<FeatForm> with _GuidedForm {
 }
 
 /// El resumen de una lista de efectos en la cabecera de su sección.
-String _effectsSummary(List<Effect> effects) => switch (effects.length) {
-  0 => 'sin efectos',
-  1 => '1 efecto',
-  final n => '$n efectos',
-};
+String _effectsSummary(AppLocalizations l10n, List<Effect> effects) =>
+    l10n.hbEffectsCount(effects.length);

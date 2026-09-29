@@ -3,6 +3,10 @@ import 'package:dnd_app/theme/app_widgets.dart';
 import 'package:dnd_app/ui/user_event_messages.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'fakes/localized_app.dart';
+
+UserEventMessage? _message(UserEvent event) => messageForEvent(event, l10nEs);
+
 UserEvent event(
   String kind, {
   String character = 'Thorin',
@@ -22,7 +26,7 @@ void main() {
         'character_unlinked_by_owner',
         'character_deleted_by_owner',
       ]) {
-        final message = messageForEvent(event(kind));
+        final message = _message(event(kind));
 
         expect(message, isNotNull, reason: kind);
         expect(message!.text, contains('Thorin'), reason: kind);
@@ -31,10 +35,7 @@ void main() {
     });
 
     test('sumarse a una campaña es una buena noticia', () {
-      expect(
-        messageForEvent(event('character_linked'))!.tone,
-        AppMessageTone.success,
-      );
+      expect(_message(event('character_linked'))!.tone, AppMessageTone.success);
     });
 
     // Salir de una campaña no es un error: pasa a propósito y no hay nada que
@@ -45,22 +46,18 @@ void main() {
         'character_unlinked_by_owner',
         'character_deleted_by_owner',
       ]) {
-        expect(
-          messageForEvent(event(kind))!.tone,
-          AppMessageTone.info,
-          reason: kind,
-        );
+        expect(_message(event(kind))!.tone, AppMessageTone.info, reason: kind);
       }
     });
 
     // Si el servidor se actualiza antes que la pestaña abierta del navegador,
     // el aviso nuevo no puede tumbar la pantalla.
     test('un kind desconocido se ignora en vez de romper', () {
-      expect(messageForEvent(event('algo_que_todavia_no_existe')), isNull);
+      expect(_message(event('algo_que_todavia_no_existe')), isNull);
     });
 
     test('un aviso sin nombres igual dice algo legible', () {
-      final message = messageForEvent(
+      final message = _message(
         const UserEvent(id: 'e1', kind: 'character_linked', payload: {}),
       );
 
@@ -89,7 +86,7 @@ void main() {
     );
 
     test('nombra al personaje, al capítulo y a la campaña', () {
-      final message = messageForEvent(chapterEvent())!;
+      final message = _message(chapterEvent())!;
 
       expect(message.text, contains('Thorin'));
       expect(message.text, contains('La Cripta'));
@@ -98,7 +95,7 @@ void main() {
 
     // Cerrar un capítulo sin recompensa es una noticia, no un logro.
     test('sin nivel es informativo y no menciona subir', () {
-      final message = messageForEvent(chapterEvent())!;
+      final message = _message(chapterEvent())!;
 
       expect(message.tone, AppMessageTone.info);
       expect(message.text, isNot(contains('subir de nivel')));
@@ -106,14 +103,14 @@ void main() {
 
     // Es lo único accionable que puede traer un aviso, así que se destaca.
     test('con nivel lo dice y sube de tono', () {
-      final message = messageForEvent(chapterEvent(grantsLevel: true))!;
+      final message = _message(chapterEvent(grantsLevel: true))!;
 
       expect(message.text, contains('Podés subir de nivel.'));
       expect(message.tone, AppMessageTone.success);
     });
 
     test('el botín se dice entero y sube de tono', () {
-      final message = messageForEvent(
+      final message = _message(
         chapterEvent(
           grantsGold: 250,
           grantsItems: ['Espada larga +1', 'Poción de curación'],
@@ -130,7 +127,7 @@ void main() {
     // El aviso lo dice; la ficha la escribe el jugador. Si alguna vez esta
     // redacción sugiere que la app lo aplicó sola, está mintiendo.
     test('el botín se anuncia sin prometer que ya está aplicado', () {
-      final message = messageForEvent(chapterEvent(grantsGold: 250))!;
+      final message = _message(chapterEvent(grantsGold: 250))!;
 
       expect(message.text, contains('Se lleva 250 po.'));
       expect(message.text, isNot(contains('sumó')));
@@ -138,7 +135,7 @@ void main() {
     });
 
     test('sin botín no aparece ninguna línea de recompensa', () {
-      final message = messageForEvent(chapterEvent())!;
+      final message = _message(chapterEvent())!;
 
       expect(message.text, isNot(contains('Se lleva')));
     });
@@ -151,14 +148,14 @@ void main() {
         chapterEvent(grantsGold: '250', grantsItems: 'Espada'),
         chapterEvent(grantsGold: 0, grantsItems: const []),
       ]) {
-        final message = messageForEvent(event)!;
+        final message = _message(event)!;
         expect(message.text, isNot(contains('Se lleva')));
         expect(message.text, isNot(contains('null')));
       }
     });
 
     test('un aviso de capítulo sin nombres igual dice algo legible', () {
-      final message = messageForEvent(
+      final message = _message(
         const UserEvent(id: 'e1', kind: 'chapter_completed', payload: {}),
       );
 
@@ -170,7 +167,7 @@ void main() {
 
   group('Inspiración Heroica concedida por el DM', () {
     test('nombra al personaje, la campaña y dice que la marque él', () {
-      final message = messageForEvent(
+      final message = _message(
         const UserEvent(
           id: 'e9',
           kind: 'heroic_inspiration_granted',
@@ -186,7 +183,7 @@ void main() {
     });
 
     test('sin nombres igual dice algo legible', () {
-      final message = messageForEvent(
+      final message = _message(
         const UserEvent(
           id: 'e10',
           kind: 'heroic_inspiration_granted',

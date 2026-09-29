@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 
 import '../../theme/app_theme.dart';
 import '../../theme/app_widgets.dart';
+import '../../l10n/l10n_context.dart';
 
 /// La tirada de iniciativa de toda la mesa, de una.
 ///
@@ -104,7 +105,7 @@ class _RollInitiativeDialogState extends State<_RollInitiativeDialog> {
     final missing = _missing;
 
     return AppDialog(
-      title: 'Tirar iniciativa',
+      title: context.l10n.dmRollInitiative,
       // Más ancho que el molde: son dos bandos lado a lado, y por debajo de
       // 520 el propio `LayoutBuilder` los apila.
       width: 620,
@@ -118,12 +119,17 @@ class _RollInitiativeDialogState extends State<_RollInitiativeDialog> {
               // El corte lo decide el ancho real del diálogo, no la ventana.
               final wide = box.maxWidth >= 520;
               final columns = [
-                _side(context, 'Jugadores', players, vacio: 'Ningún jugador.'),
                 _side(
                   context,
-                  'Monstruos y PNJ',
+                  context.l10n.dmPlayers,
+                  players,
+                  vacio: context.l10n.dmNoPlayers,
+                ),
+                _side(
+                  context,
+                  context.l10n.dmMonstersAndNpcs,
                   monsters,
-                  vacio: 'Ningún monstruo ni PNJ.',
+                  vacio: context.l10n.dmNoMonstersOrNpcs,
                 ),
               ];
               return wide
@@ -150,11 +156,10 @@ class _RollInitiativeDialogState extends State<_RollInitiativeDialog> {
           const SizedBox(height: 14),
           Text(
             missing.isEmpty
-                ? 'Al confirmar arranca la ronda 1.'
-                : 'Falta la iniciativa de '
-                      '${_joinNames([for (final c in missing) c.name])}. '
-                      'Si alguien no vino, sacalo del combate: cuando llegue '
-                      'se suma con su tirada.',
+                ? context.l10n.dmRoundOneStarts
+                : context.l10n.dmInitiativeMissing(
+                    _joinNames([for (final c in missing) c.name]),
+                  ),
             style: TextStyle(
               fontSize: 12,
               color: missing.isEmpty ? pal.textMuted : pal.gold,
@@ -164,12 +169,12 @@ class _RollInitiativeDialogState extends State<_RollInitiativeDialog> {
       ),
       actions: [
         DialogAction(
-          'Cancelar',
+          context.l10n.commonCancel,
           keyHint: 'Esc',
           onPressed: () => Navigator.of(context).pop(),
         ),
         DialogAction(
-          'Empezar',
+          context.l10n.dmStart,
           primary: true,
           color: pal.verdant,
           onPressed: missing.isEmpty
@@ -183,7 +188,8 @@ class _RollInitiativeDialogState extends State<_RollInitiativeDialog> {
   /// «Mirna», «Mirna y Bardo», «Mirna, Bardo y Yina».
   String _joinNames(List<String> names) {
     if (names.length <= 1) return names.join();
-    return '${names.take(names.length - 1).join(', ')} y ${names.last}';
+    return '${names.take(names.length - 1).join(', ')} '
+        '${context.l10n.wordAnd} ${names.last}';
   }
 
   Widget _side(
@@ -215,6 +221,7 @@ class _RollInitiativeDialogState extends State<_RollInitiativeDialog> {
                   ),
                   if (widget.playerModifiers[combatant.id] case final mod?)
                     Text(
+                      // l10n-ignore: notación de dados, igual en todos los idiomas.
                       'd20 ${mod >= 0 ? '+' : '−'} ${mod.abs()}',
                       style: TextStyle(
                         fontSize: 12,

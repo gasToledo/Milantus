@@ -7,6 +7,7 @@ import '../theme/app_theme.dart';
 import '../theme/app_widgets.dart';
 import '../ui/spell_edit_screen.dart';
 import 'level_up_summary_screen.dart';
+import '../l10n/l10n_context.dart';
 
 part 'level_up_sections.dart';
 part 'level_up_widgets.dart';
@@ -562,28 +563,32 @@ class _LevelUpScreenState extends State<LevelUpScreen> {
 
   List<_LevelUpStep> _computeSteps() {
     return [
-      const _LevelUpStep(
+      _LevelUpStep(
         _LevelUpStepKind.overview,
-        'Resumen',
+        context.l10n.stepSummary,
         Icons.auto_awesome,
       ),
-      const _LevelUpStep(
+      _LevelUpStep(
         _LevelUpStepKind.hitPoints,
-        'Puntos de golpe',
+        context.l10n.hitPoints,
         Icons.favorite,
       ),
       if (_needsSubclass)
-        const _LevelUpStep(_LevelUpStepKind.subclass, 'Subclase', Icons.shield),
+        _LevelUpStep(
+          _LevelUpStepKind.subclass,
+          context.l10n.luStepSubclass,
+          Icons.shield,
+        ),
       if (_isAsi)
-        const _LevelUpStep(
+        _LevelUpStep(
           _LevelUpStepKind.abilityScore,
-          'Mejora o dote',
+          context.l10n.luStepAsi,
           Icons.trending_up,
         ),
       if (_keeps(_LevelUpStepKind.featureChoices, _hasFeatureChoices))
-        const _LevelUpStep(
+        _LevelUpStep(
           _LevelUpStepKind.featureChoices,
-          'Elecciones',
+          context.l10n.luStepChoices,
           Icons.style,
         ),
       if (_keeps(_LevelUpStepKind.proficiencies, _hasProficiencyChoices))
@@ -592,28 +597,34 @@ class _LevelUpScreenState extends State<LevelUpScreen> {
           // El rótulo sigue a lo que falta, no a lo que hay: si lo único
           // pendiente es Pericia, decir "Competencias" mandaría a buscar otra
           // cosa. Mismo criterio que el título del diálogo de la ficha.
-          _pendingAreAllExpertise ? 'Pericia' : 'Competencias',
+          _pendingAreAllExpertise
+              ? context.l10n.aptExpertise
+              : context.l10n.stepProficiencies,
           Icons.star,
         ),
       if (_gainedFeatures().isNotEmpty)
-        const _LevelUpStep(
+        _LevelUpStep(
           _LevelUpStepKind.features,
-          'Rasgos',
+          context.l10n.creatureTraits,
           Icons.workspace_premium,
         ),
       if (_keeps(_LevelUpStepKind.spellChoices, _hasSpellChoices))
-        const _LevelUpStep(
+        _LevelUpStep(
           _LevelUpStepKind.spellChoices,
-          'Conjuros a elección',
+          context.l10n.luStepSpellChoices,
           Icons.auto_fix_high,
         ),
       if (_hasSpellcasting)
-        const _LevelUpStep(
+        _LevelUpStep(
           _LevelUpStepKind.spells,
-          'Conjuros',
+          context.l10n.spellsTitle,
           Icons.auto_stories,
         ),
-      const _LevelUpStep(_LevelUpStepKind.review, 'Revisión', Icons.fact_check),
+      _LevelUpStep(
+        _LevelUpStepKind.review,
+        context.l10n.luStepReview,
+        Icons.fact_check,
+      ),
     ];
   }
 
@@ -715,52 +726,48 @@ class _LevelUpScreenState extends State<LevelUpScreen> {
   String? get _pendingMessage => switch (_activeStep.kind) {
     _LevelUpStepKind.hitPoints
         when _hpMethod == _HpMethod.roll && _rolledHp == null =>
-      'Tirá el dado o elegí el promedio para continuar.',
+      context.l10n.luPendingHp,
     _LevelUpStepKind.subclass when _subclassId == null =>
-      'Elegí una subclase para continuar.',
+      context.l10n.luPendingSubclass,
     _LevelUpStepKind.abilityScore
         when _asiKind == _AsiKind.improve && !_asiComplete =>
-      'Completá la mejora de características.',
+      context.l10n.luPendingImprove,
     // Sin el `_asiKind`, una mejora de características completa caía acá
     // (no hay dote elegida) y mostraba el aviso en rojo aunque «Continuar»
     // ya avanzara.
     _LevelUpStepKind.abilityScore
         when _asiKind == _AsiKind.feat && _featId == null =>
-      'Elegí una dote para continuar.',
+      context.l10n.luPendingFeat,
     _LevelUpStepKind.abilityScore
         when _featAbilityChoice != null && _abilityA == null =>
-      'Elegí a qué característica va el +1 de la dote.',
+      context.l10n.luPendingFeatAbility,
     _LevelUpStepKind.featureChoices when _pendingChoices > 0 =>
-      _pendingChoices == 1
-          ? 'Te falta una elección para continuar.'
-          : 'Te faltan $_pendingChoices elecciones para continuar.',
+      context.l10n.luPendingChoices(_pendingChoices),
     _LevelUpStepKind.proficiencies when _pendingProficiency > 0 => switch ((
       _pendingProficiency,
       _pendingAreAllExpertise,
     )) {
-      (1, true) => 'Elegí una habilidad para tu Pericia.',
-      (final n, true) => 'Elegí $n habilidades para tu Pericia.',
-      (1, false) => 'Te falta una competencia para continuar.',
-      (final n, false) => 'Te faltan $n competencias para continuar.',
+      (final n, true) => context.l10n.luPendingExpertise(n),
+      (final n, false) => context.l10n.luPendingProficiency(n),
     },
     _LevelUpStepKind.spellChoices when _pendingSpellChoices > 0 =>
-      _pendingSpellChoices == 1
-          ? 'Te falta elegir un conjuro para continuar.'
-          : 'Te faltan $_pendingSpellChoices conjuros para continuar.',
+      context.l10n.luPendingSpellChoices(_pendingSpellChoices),
     _LevelUpStepKind.spells when !_classSpellsComplete => _classSpellsMessage(
       _pendingClassSpells,
     ),
     _ => null,
   };
 
-  static String _classSpellsMessage(({int cantrips, int prepared}) p) {
+  String _classSpellsMessage(({int cantrips, int prepared}) p) {
     final parts = [
-      if (p.cantrips == 1) 'un truco',
-      if (p.cantrips > 1) '${p.cantrips} trucos',
-      if (p.prepared == 1) 'un conjuro',
-      if (p.prepared > 1) '${p.prepared} conjuros',
+      if (p.cantrips == 1) context.l10n.luOneCantrip,
+      if (p.cantrips > 1) context.l10n.luCantrips(p.cantrips),
+      if (p.prepared == 1) context.l10n.luOneSpell,
+      if (p.prepared > 1) context.l10n.luSpells(p.prepared),
     ];
-    return 'Te falta elegir ${parts.join(' y ')} para continuar.';
+    return context.l10n.luPendingClassSpells(
+      parts.join(' ${context.l10n.wordAnd} '),
+    );
   }
 
   /// Construye el personaje tal como quedará tras confirmar (nivel, ASI/dote,
@@ -889,7 +896,7 @@ class _LevelUpScreenState extends State<LevelUpScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Subir a nivel $_newLevel'),
+            Text(context.l10n.luTitle(_newLevel)),
             Text(
               '${widget.character.name} · ${_klass?.name ?? widget.character.classId}',
               style: TextStyle(

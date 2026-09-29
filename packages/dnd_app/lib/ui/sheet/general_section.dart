@@ -6,29 +6,29 @@ extension _SheetGeneralSection on _SheetScreenState {
   Widget _buildPersonaje() {
     final s = sheet;
     final warnings = CharacterValidator(repo).validate(_c);
-    // Lo pendiente ya sale como advertencia con su propio bot\u00f3n; ac\u00e1 queda
-    // s\u00f3lo lo que el motor no reporta, que es poder cambiar lo ya elegido.
+    // Lo pendiente ya sale como advertencia con su propio botón; acá queda
+    // sólo lo que el motor no reporta, que es poder cambiar lo ya elegido.
     final canReplace = <(String, IconData, VoidCallback)>[
       if (s.proficiencyChoiceSlots.any(
         (slot) => slot.replaceable && slot.pending == 0,
       ))
         (
-          'Competencia reemplazable',
+          context.l10n.replaceProficiency,
           Icons.handyman,
           _resolveProficiencyChoices,
         ),
       // `FeatureChoiceSlot` no lleva `chosen`: es declarativo y lo elegido vive
-      // en el personaje, as\u00ed que lo completo se cuenta desde ah\u00ed.
+      // en el personaje, así que lo completo se cuenta desde ahí.
       if (s.featureChoiceSlots.any(
         (slot) =>
             slot.replaceable &&
             (_c.featureChoices[slot.groupId]?.length ?? 0) >= slot.count,
       ))
-        ('Elecci\u00f3n reemplazable', Icons.style, _resolveFeatureChoices),
+        (context.l10n.replaceChoice, Icons.style, _resolveFeatureChoices),
       if (s.spellChoiceSlots.any(
         (slot) => slot.replaceable && slot.pending == 0,
       ))
-        ('Conjuros reemplazables', Icons.auto_fix_high, _resolveSpellChoices),
+        (context.l10n.replaceSpells, Icons.auto_fix_high, _resolveSpellChoices),
     ];
 
     return Column(
@@ -41,14 +41,14 @@ extension _SheetGeneralSection on _SheetScreenState {
         if (warnings.isNotEmpty) ...[
           sheetCard(
             icon: Icons.warning_amber,
-            title: 'Advertencias',
+            title: context.l10n.sheetWarnings,
             child: DenseRows(
               children: [
                 for (final w in warnings)
                   ListTile(
                     dense: true,
                     // Lo pendiente (info) no es una ficha rota: distinguirlo
-                    // evita que una elecci\u00f3n por hacer parezca un error.
+                    // evita que una elección por hacer parezca un error.
                     leading: Icon(
                       w.severity == WarningSeverity.info
                           ? Icons.info_outline
@@ -61,7 +61,7 @@ extension _SheetGeneralSection on _SheetScreenState {
                     trailing: switch (_resolverFor(w.code)) {
                       final resolver? => TextButton(
                         onPressed: resolver,
-                        child: const Text('Resolver'),
+                        child: Text(context.l10n.sheetResolve),
                       ),
                       _ => null,
                     },
@@ -129,7 +129,7 @@ extension _SheetGeneralSection on _SheetScreenState {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      'Este rasgo permite cambiar la elección que ya hiciste.',
+                      context.l10n.replaceableNoticeBody,
                       style: TextStyle(fontSize: 13, color: pal.textMuted),
                     ),
                   ],
@@ -142,7 +142,7 @@ extension _SheetGeneralSection on _SheetScreenState {
                 padding: const EdgeInsets.only(right: 16),
                 child: OutlinedButton(
                   onPressed: onPressed,
-                  child: const Text('Cambiar'),
+                  child: Text(context.l10n.sheetChange),
                 ),
               ),
             ),
@@ -234,8 +234,8 @@ extension _SheetGeneralSection on _SheetScreenState {
 
           return AppDialog(
             title: slots.isNotEmpty && slots.every((s) => s.expertise)
-                ? 'Elegir Pericia'
-                : 'Elegir competencias',
+                ? context.l10n.pickExpertiseTitle
+                : context.l10n.pickProficienciesTitle,
             // Más ancho que el molde: son varios cupos de chips en columna y a
             // 480 cada grupo se parte en demasiadas filas para compararlos.
             width: 720,
@@ -245,12 +245,7 @@ extension _SheetGeneralSection on _SheetScreenState {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Las opciones que ya ten\u00e9s por otra v\u00eda quedan '
-                    'bloqueadas. En los cupos de Pericia es al rev\u00e9s: '
-                    'solo se ofrecen las habilidades en las que ya sos '
-                    'competente, y duplic\u00e1s el bonificador en ellas.',
-                  ),
+                  Text(context.l10n.pickProficienciesHint),
                   const SizedBox(height: 16),
                   for (final slot in slots) ...[
                     Text(
@@ -314,12 +309,12 @@ extension _SheetGeneralSection on _SheetScreenState {
             ),
             actions: [
               DialogAction(
-                'Cancelar',
+                context.l10n.commonCancel,
                 keyHint: 'Esc',
                 onPressed: () => Navigator.pop(dialogContext),
               ),
               DialogAction(
-                'Guardar',
+                context.l10n.commonSave,
                 primary: true,
                 onPressed: complete()
                     ? () => Navigator.pop(dialogContext, choices)
@@ -370,7 +365,7 @@ extension _SheetGeneralSection on _SheetScreenState {
       ),
       actions: [
         DialogAction(
-          'Cancelar',
+          context.l10n.commonCancel,
           keyHint: 'Esc',
           onPressed: () => Navigator.pop(dialogContext),
         ),
@@ -382,10 +377,8 @@ extension _SheetGeneralSection on _SheetScreenState {
     final options = repo.race(_c.raceId)?.sizeOptions ?? const <String>[];
     if (options.isEmpty) return;
     final picked = await _pickOne<String>(
-      title: 'Elegir tamaño',
-      hint:
-          'Esta especie abarca cuerpos de tamaños distintos: elegí el de tu '
-          'personaje.',
+      title: context.l10n.pickSizeTitle,
+      hint: context.l10n.pickSizeHint,
       options: options,
       label: (size) => size,
       current: _c.chosenSize,
@@ -399,8 +392,8 @@ extension _SheetGeneralSection on _SheetScreenState {
     if (options.isEmpty) return;
     final current = options.where((l) => l.id == _c.lineageId).firstOrNull;
     final picked = await _pickOne<Lineage>(
-      title: 'Elegir linaje',
-      hint: 'El linaje decide los rasgos que aporta la especie.',
+      title: context.l10n.pickLineageTitle,
+      hint: context.l10n.pickLineageHint,
       options: options,
       label: (lineage) => lineage.name,
       current: current,
@@ -415,8 +408,8 @@ extension _SheetGeneralSection on _SheetScreenState {
 
   Future<void> _resolveSpeciesAbility() async {
     final picked = await _pickOne<Ability>(
-      title: 'Elegir aptitud mágica',
-      hint: 'Se usa para la CD y los ataques de los conjuros del linaje.',
+      title: context.l10n.pickSpellAbilityTitle,
+      hint: context.l10n.pickLineageSpellAbilityHint,
       options: const [Ability.intelligence, Ability.wisdom, Ability.charisma],
       label: (ability) => ability.label,
       current: _c.speciesSpellcastingAbility,
@@ -435,8 +428,8 @@ extension _SheetGeneralSection on _SheetScreenState {
       if (feat == null || feat.spellcastingAbilityOptions.isEmpty) continue;
       if (_c.featSpellcastingAbilities.containsKey(id)) continue;
       final picked = await _pickOne<Ability>(
-        title: 'Aptitud mágica de ${feat.name}',
-        hint: 'Se usa para la CD y los ataques de los conjuros de esta dote.',
+        title: context.l10n.pickFeatSpellAbilityTitle(feat.name),
+        hint: context.l10n.pickFeatSpellAbilityHint,
         options: feat.spellcastingAbilityOptions,
         label: (ability) => ability.label,
         current: null,
@@ -484,7 +477,7 @@ extension _SheetGeneralSection on _SheetScreenState {
           );
 
           return AppDialog(
-            title: 'Elegir rasgos',
+            title: context.l10n.pickFeaturesTitle,
             width: 720,
             scrollable: false,
             content: SingleChildScrollView(
@@ -515,7 +508,7 @@ extension _SheetGeneralSection on _SheetScreenState {
                             .toList();
                         if (options.isEmpty) {
                           return Text(
-                            'No hay opciones disponibles todavía.',
+                            context.l10n.pickNoOptions,
                             style: Theme.of(context).textTheme.bodySmall,
                           );
                         }
@@ -551,12 +544,12 @@ extension _SheetGeneralSection on _SheetScreenState {
             ),
             actions: [
               DialogAction(
-                'Cancelar',
+                context.l10n.commonCancel,
                 keyHint: 'Esc',
                 onPressed: () => Navigator.pop(dialogContext),
               ),
               DialogAction(
-                'Guardar',
+                context.l10n.commonSave,
                 primary: true,
                 onPressed: complete()
                     ? () => Navigator.pop(dialogContext, choices)
@@ -602,7 +595,7 @@ extension _SheetGeneralSection on _SheetScreenState {
           );
 
           return AppDialog(
-            title: 'Elegir conjuros',
+            title: context.l10n.pickSpellsTitle,
             width: 720,
             scrollable: false,
             content: SingleChildScrollView(
@@ -619,8 +612,7 @@ extension _SheetGeneralSection on _SheetScreenState {
                     // conjuro, apunta a uno que ya se conoce.
                     if (!slot.grantsSpells)
                       Text(
-                        'Elegí uno que ya conocés: no se suma a tus conjuros, '
-                        'le agrega el bono al daño.',
+                        context.l10n.pickKnownSpellHint,
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     Builder(
@@ -628,7 +620,7 @@ extension _SheetGeneralSection on _SheetScreenState {
                         final chosen = choices[slot.groupId] ??= [];
                         if (slot.options.isEmpty) {
                           return Text(
-                            'No hay conjuros disponibles para este rasgo.',
+                            context.l10n.pickNoSpells,
                             style: Theme.of(context).textTheme.bodySmall,
                           );
                         }
@@ -666,12 +658,12 @@ extension _SheetGeneralSection on _SheetScreenState {
             ),
             actions: [
               DialogAction(
-                'Cancelar',
+                context.l10n.commonCancel,
                 keyHint: 'Esc',
                 onPressed: () => Navigator.pop(dialogContext),
               ),
               DialogAction(
-                'Guardar',
+                context.l10n.commonSave,
                 primary: true,
                 onPressed: complete()
                     ? () => Navigator.pop(dialogContext, choices)
@@ -715,7 +707,7 @@ extension _SheetGeneralSection on _SheetScreenState {
               preview.languageChoiceSlots.every((s) => s.pending == 0);
 
           return AppDialog(
-            title: 'Elegir idiomas',
+            title: context.l10n.pickLanguagesTitle,
             width: 720,
             scrollable: false,
             content: SingleChildScrollView(
@@ -724,13 +716,14 @@ extension _SheetGeneralSection on _SheetScreenState {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Todo personaje sabe ${Language.labelFor(Language.universal.id)}, '
-                    'que no ocupa una elección.',
+                    context.l10n.pickLanguagesIntro(
+                      Language.labelFor(Language.universal.id),
+                    ),
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                   const SizedBox(height: 14),
                   Text(
-                    'De tu origen (${origen.length}/$cupo)',
+                    context.l10n.pickLanguagesOrigin(origen.length, cupo),
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 8),
@@ -772,12 +765,12 @@ extension _SheetGeneralSection on _SheetScreenState {
             ),
             actions: [
               DialogAction(
-                'Cancelar',
+                context.l10n.commonCancel,
                 keyHint: 'Esc',
                 onPressed: () => Navigator.pop(dialogContext, false),
               ),
               DialogAction(
-                'Guardar',
+                context.l10n.commonSave,
                 primary: true,
                 onPressed: completo
                     ? () => Navigator.pop(dialogContext, true)
@@ -797,17 +790,18 @@ extension _SheetGeneralSection on _SheetScreenState {
     final bg = repo.background(_c.backgroundId)?.name ?? '—';
     final creatureType = repo.race(_c.raceId)?.creatureType ?? '—';
     final rows = <(String, String)>[
-      ('Alineamiento', _c.alignment?.label ?? '—'),
-      ('Tipo de criatura', creatureType),
+      (context.l10n.identityAlignment, _c.alignment?.label ?? '—'),
+      (context.l10n.identityCreatureType, creatureType),
       // El tamaño resuelto lo da la ficha compilada, no la especie: las que
       // dejan elegir traen ahí sólo el valor por defecto.
-      ('Tamaño', sheet.size),
-      ('Trasfondo', bg),
-      if (_c.personalityTrait.isNotEmpty) ('Rasgo', _c.personalityTrait),
+      (context.l10n.identitySize, sheet.size),
+      (context.l10n.identityBackground, bg),
+      if (_c.personalityTrait.isNotEmpty)
+        (context.l10n.identityTrait, _c.personalityTrait),
     ];
     return sheetCard(
       icon: Icons.badge,
-      title: 'Identidad',
+      title: context.l10n.identityTitle,
       child: DenseRows(
         children: [
           for (final (label, value) in rows)
@@ -834,7 +828,7 @@ extension _SheetGeneralSection on _SheetScreenState {
     final pal = context.palette;
     return sheetCard(
       icon: Icons.fitness_center,
-      title: 'Características',
+      title: context.l10n.abilitiesTitle,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -851,17 +845,13 @@ extension _SheetGeneralSection on _SheetScreenState {
                 Expanded(
                   child: Text.rich(
                     TextSpan(
-                      text: 'La cifra grande es el modificador. ',
+                      text: context.l10n.abilitiesHintLead,
                       children: [
                         TextSpan(
-                          text: 'SALV',
+                          text: context.l10n.saveShort,
                           style: TextStyle(color: pal.gold),
                         ),
-                        const TextSpan(
-                          text:
-                              ' marca las salvaciones competentes; tocá una '
-                              'placa para ver de dónde sale.',
-                        ),
+                        TextSpan(text: context.l10n.abilitiesHintTail),
                       ],
                     ),
                     style: TextStyle(
@@ -884,22 +874,28 @@ extension _SheetGeneralSection on _SheetScreenState {
     final selected = s.selectedUnarmoredDefenseClassId;
     return sheetCard(
       icon: Icons.shield_outlined,
-      title: 'Defensa sin armadura',
+      title: context.l10n.unarmoredTitle,
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: DropdownButtonFormField<String>(
           initialValue: selected,
-          decoration: const InputDecoration(
-            labelText: 'Fórmula de CA',
+          decoration: InputDecoration(
+            labelText: context.l10n.unarmoredFormula,
             border: OutlineInputBorder(),
           ),
           items: [
             for (final option in options)
               DropdownMenuItem(
                 value: option.classId,
-                child: Text(
-                  '${repo.characterClass(option.classId ?? '')?.name ?? option.classId} · ${option.ability.label}${option.allowShield ? ' · escudo' : ''}',
-                ),
+                child: Text(() {
+                  final klass =
+                      repo.characterClass(option.classId ?? '')?.name ??
+                      option.classId;
+                  final shield = option.allowShield
+                      ? ' · ${context.l10n.combatShield}'
+                      : '';
+                  return '$klass · ${option.ability.label}$shield';
+                }()),
               ),
           ],
           onChanged: (classId) {
@@ -924,7 +920,7 @@ extension _SheetGeneralSection on _SheetScreenState {
     ]..sort(compareContentNames);
     return sheetCard(
       icon: Icons.verified_user,
-      title: 'Competencias',
+      title: context.l10n.proficienciesTitle,
       child: Padding(padding: const EdgeInsets.all(14), child: _chips(labels)),
     );
   }
@@ -946,7 +942,7 @@ extension _SheetGeneralSection on _SheetScreenState {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'ARMADURA',
+            context.l10n.armorUpper,
             style: TextStyle(
               fontSize: 10,
               letterSpacing: 1.2,
@@ -967,13 +963,17 @@ extension _SheetGeneralSection on _SheetScreenState {
   Widget _sensesCard(ComputedSheet s) {
     final pal = context.palette;
     final rows = <(String, String, String?)>[
-      ('Percepción pasiva', '${s.passivePerception}', null),
+      (context.l10n.passivePerception, '${s.passivePerception}', null),
       if (s.darkvision != null)
-        ('Visión en la oscuridad', '${s.darkvision}', ' pies'),
+        (
+          context.l10n.darkvision,
+          '${s.darkvision}',
+          context.l10n.unitFeetSuffix,
+        ),
     ];
     return sheetCard(
       icon: Icons.visibility,
-      title: 'Sentidos',
+      title: context.l10n.creatureSenses,
       child: DenseRows(
         children: [
           for (final (label, value, suffix) in rows)
@@ -1027,7 +1027,7 @@ extension _SheetGeneralSection on _SheetScreenState {
     ]..sort(compareContentNames);
     return sheetCard(
       icon: Icons.translate,
-      title: 'Idiomas',
+      title: context.l10n.creatureLanguages,
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: _chips([Language.labelFor(Language.universal.id), ...labels]),
@@ -1054,7 +1054,7 @@ extension _SheetGeneralSection on _SheetScreenState {
     );
     return sheetCard(
       icon: Icons.psychology,
-      title: 'Habilidades',
+      title: context.l10n.creatureSkills,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -1071,10 +1071,13 @@ extension _SheetGeneralSection on _SheetScreenState {
               spacing: 14,
               runSpacing: 6,
               children: [
-                legend(_skillDot(proficient: true), 'Competente'),
+                legend(
+                  _skillDot(proficient: true),
+                  context.l10n.skillsLegendProficient,
+                ),
                 legend(
                   _skillDot(proficient: true, expertise: true),
-                  'Pericia · bonificador duplicado',
+                  context.l10n.skillsLegendExpertise,
                 ),
               ],
             ),
@@ -1147,7 +1150,7 @@ extension _SheetGeneralSection on _SheetScreenState {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      'PERICIA',
+                      context.l10n.skillExpertiseBadge,
                       style: TextStyle(
                         fontSize: 9.5,
                         letterSpacing: 0.6,
@@ -1186,7 +1189,7 @@ extension _SheetGeneralSection on _SheetScreenState {
     if (s.passives.isEmpty) return const SizedBox.shrink();
     return sheetCard(
       icon: Icons.auto_awesome,
-      title: 'Rasgos y dotes',
+      title: context.l10n.traitsAndFeatsTitle,
       trailing: GoldPill('${s.passives.length}'),
       child: Column(
         children: [
@@ -1249,13 +1252,13 @@ extension _SheetGeneralSection on _SheetScreenState {
         box(
           StatTile(
             icon: Icons.shield,
-            label: 'Armadura',
+            label: context.l10n.statArmor,
             value: '${s.armorClass}',
           ),
         ),
         box(
           StatTile(
-            label: 'Puntos de golpe',
+            label: context.l10n.hitPoints,
             labelTrailing: '${(ratio * 100).round()}%',
             value: '${c.currentHp}',
             suffix: ' / ${s.maxHp}',
@@ -1276,7 +1279,7 @@ extension _SheetGeneralSection on _SheetScreenState {
             borderRadius: BorderRadius.circular(12),
             child: StatTile(
               icon: Icons.bolt,
-              label: 'Iniciativa',
+              label: context.l10n.initiative,
               value: _signed(s.initiative),
             ),
           ),
@@ -1284,12 +1287,12 @@ extension _SheetGeneralSection on _SheetScreenState {
         box(
           StatTile(
             icon: Icons.keyboard_double_arrow_right,
-            label: 'Velocidad',
+            label: context.l10n.creatureSpeed,
             // Al pie y no en `labelTrailing`, que es para un dato corto tipo
             // «85%»: con este texto la placa desborda en un teléfono.
             footer: _c.combat.exhaustion > 0
                 ? Text(
-                    'Cansancio −${5 * _c.combat.exhaustion} pies',
+                    context.l10n.exhaustionSpeed(5 * _c.combat.exhaustion),
                     style: TextStyle(
                       fontSize: 11,
                       color: context.palette.crimson,
@@ -1297,13 +1300,13 @@ extension _SheetGeneralSection on _SheetScreenState {
                   )
                 : null,
             value: '${s.speed}',
-            suffix: ' pies',
+            suffix: context.l10n.unitFeetSuffix,
           ),
         ),
         box(
           StatTile(
             icon: Icons.military_tech,
-            label: 'Competencia',
+            label: context.l10n.statProficiency,
             value: '+${s.proficiencyBonus}',
           ),
         ),
@@ -1408,25 +1411,28 @@ extension _SheetGeneralSection on _SheetScreenState {
   void _showInitiativeBreakdown(ComputedSheet s) {
     final line = _breakdownLine;
     _infoDialog(
-      'Iniciativa',
+      context.l10n.initiative,
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Eyebrow('De dónde sale'),
+          Eyebrow(context.l10n.breakdownWhereFrom),
           line(
-            'Modificador de Destreza',
+            context.l10n.breakdownDexModifier,
             _signed(s.abilityModifiers[Ability.dexterity]!),
           ),
           for (final b in s.initiativeBonuses)
-            line(b.source.isEmpty ? 'Otro rasgo' : b.source, _signed(b.amount)),
+            line(
+              b.source.isEmpty ? context.l10n.breakdownOtherTrait : b.source,
+              _signed(b.amount),
+            ),
           if (s.d20Modifier != 0)
             line(
-              'Cansancio nivel ${_c.combat.exhaustion}',
+              context.l10n.exhaustionLevel(_c.combat.exhaustion),
               _signed(s.d20Modifier),
             ),
           const Divider(height: 16),
-          line('Iniciativa', _signed(s.initiative), strong: true),
+          line(context.l10n.initiative, _signed(s.initiative), strong: true),
         ],
       ),
     );
@@ -1465,59 +1471,73 @@ extension _SheetGeneralSection on _SheetScreenState {
             style: TextStyle(fontSize: 12, color: muted),
           ),
           const SizedBox(height: 14),
-          const Eyebrow('De dónde sale'),
-          line('Asignada en la creación', '${s.baseAbilityScore(ability)}'),
+          Eyebrow(context.l10n.breakdownWhereFrom),
+          line(
+            context.l10n.breakdownAssigned,
+            '${s.baseAbilityScore(ability)}',
+          ),
           for (final b in bonuses)
             line(
-              b.source.isEmpty ? 'Otro rasgo' : b.source,
+              b.source.isEmpty ? context.l10n.breakdownOtherTrait : b.source,
               '${b.amount >= 0 ? '+' : ''}${b.amount}',
             ),
           const Divider(height: 16),
-          line('Puntuación', '$score', strong: true),
-          line('Modificador', _signed(mod), strong: true),
+          line(context.l10n.breakdownScore, '$score', strong: true),
+          line(context.l10n.breakdownModifier, _signed(mod), strong: true),
 
           const SizedBox(height: 16),
-          const Eyebrow('Qué se tira con esto'),
+          Eyebrow(context.l10n.breakdownWhatToRoll),
           line(
-            'Salvación'
-            '${s.savingThrowProficiencies.contains(ability) ? ' (competente)' : ''}',
+            s.savingThrowProficiencies.contains(ability)
+                ? context.l10n.breakdownSaveProficient
+                : context.l10n.breakdownSave,
             _signed(s.savingThrow(ability)),
           ),
           for (final sk in skills) ...[
             line(
-              '${sk.label}'
-              '${s.expertiseSkills.contains(sk.id) ? ' (pericia)' : ''}',
+              s.expertiseSkills.contains(sk.id)
+                  ? context.l10n.breakdownSkillExpertise(sk.label)
+                  : sk.label,
               _signed(s.skillModifier(sk.id)),
             ),
             for (final b in s.skillBonuses[sk.id] ?? const <SkillBonus>[])
               Padding(
                 padding: const EdgeInsets.only(left: 14),
-                child: line('incluye ${_signed(b.amount)} de ${b.source}', ''),
+                child: line(
+                  context.l10n.breakdownIncludes(_signed(b.amount), b.source),
+                  '',
+                ),
               ),
           ],
           // Se muestra siempre y no solo cuando la característica no tiene
           // habilidades: bajo Cansancio la prueba deja de coincidir con el
           // modificador, y el número que hay que tirar es este.
-          line('Pruebas de característica', _signed(s.abilityCheck(ability))),
+          line(
+            context.l10n.breakdownAbilityChecks,
+            _signed(s.abilityCheck(ability)),
+          ),
           if (_c.combat.exhaustion > 0)
             Padding(
               padding: const EdgeInsets.only(left: 14),
               child: line(
-                'incluye −${2 * _c.combat.exhaustion} '
-                    'por cansancio nivel ${_c.combat.exhaustion}',
+                context.l10n.breakdownExhaustion(
+                  2 * _c.combat.exhaustion,
+                  _c.combat.exhaustion,
+                ),
                 '',
               ),
             ),
           if (sc != null && sc.ability == ability) ...[
-            line('Ataque con conjuros', _signed(sc.attackBonus)),
-            line('CD de salvación', '${sc.saveDc}'),
+            line(context.l10n.breakdownSpellAttack, _signed(sc.attackBonus)),
+            line(context.l10n.breakdownSaveDc, '${sc.saveDc}'),
           ],
           const SizedBox(height: 10),
           Text(
-            'Competencia +${s.proficiencyBonus} a nivel ${s.level}, ya incluida '
-            'arriba. Solo se listan las habilidades en las que sos competente: '
-            'el resto tira con la prueba de característica '
-            '(${_signed(s.abilityCheck(ability))}).',
+            context.l10n.breakdownFooter(
+              s.proficiencyBonus,
+              s.level,
+              _signed(s.abilityCheck(ability)),
+            ),
             style: TextStyle(fontSize: 11, color: muted),
           ),
         ],

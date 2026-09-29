@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'creation_helpers.dart';
+import 'fakes/localized_app.dart';
 
 /// Recorrido completo del wizard: del primer paso al personaje creado.
 void main() {
@@ -25,7 +26,7 @@ void main() {
 
     Character? created;
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: CreationWizard(repo: repo, onCreate: (c) => created = c),
       ),

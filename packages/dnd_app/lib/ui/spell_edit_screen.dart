@@ -2,6 +2,7 @@ import 'package:dnd_engine/dnd_engine.dart';
 import 'package:flutter/material.dart';
 
 import '../theme/app_widgets.dart';
+import '../l10n/l10n_context.dart';
 
 /// Editor de trucos y conjuros preparados/conocidos. Se abre desde la ficha:
 /// un lanzador preparado (Mago) re-prepara tras cada descanso largo, así que la
@@ -111,19 +112,25 @@ class _SpellEditScreenState extends State<SpellEditScreen> {
       appBar: AppBar(
         title: Text(
           widget.classId == null
-              ? 'Editar conjuros'
-              : 'Editar conjuros · ${widget.repo.characterClass(_classId)?.name ?? _classId}',
+              ? context.l10n.spellEditTitle
+              : context.l10n.spellEditTitleClass(
+                  widget.repo.characterClass(_classId)?.name ?? _classId,
+                ),
         ),
       ),
       body: PageBody(
         children: [
           if (_sc.cantripsKnown > 0) ...[
-            Eyebrow('Trucos (${_cantrips.length}/${_sc.cantripsKnown})'),
+            Eyebrow(
+              context.l10n.spellEditCantrips(
+                _cantrips.length,
+                _sc.cantripsKnown,
+              ),
+            ),
             if (grantedCantrips) ...[
               const SizedBox(height: 4),
               Text(
-                'Los trucos que ya tenés por otro rasgo no '
-                'aparecen acá: no ocupan un cupo de truco de clase.',
+                context.l10n.spellEditGrantedCantrips,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -139,17 +146,19 @@ class _SpellEditScreenState extends State<SpellEditScreen> {
           ],
           Eyebrow(
             _prepared
-                ? 'Conjuros preparados (${_spells.length}/${_sc.preparedCount})'
-                : 'Conjuros conocidos (${_spells.length})',
+                ? context.l10n.spellEditPrepared(
+                    _spells.length,
+                    _sc.preparedCount,
+                  )
+                : context.l10n.spellEditKnown(_spells.length),
           ),
           Text(
-            'Hasta nivel $_maxSlotLevel.',
+            context.l10n.spellEditUpTo(_maxSlotLevel),
             style: Theme.of(context).textTheme.bodySmall,
           ),
           if (grantedLeveledNames.isNotEmpty)
             Text(
-              'Ya tenés ${grantedLeveledNames.join(', ')} siempre preparado '
-              'por otro rasgo: no ocupa un cupo.',
+              context.l10n.equipGrantedLeveled(grantedLeveledNames.join(', ')),
               style: Theme.of(context).textTheme.bodySmall,
             ),
           const SizedBox(height: 6),
@@ -173,7 +182,7 @@ class _SpellEditScreenState extends State<SpellEditScreen> {
               Navigator.of(context).pop();
             },
             icon: const Icon(Icons.check),
-            label: const Text('Guardar'),
+            label: Text(context.l10n.commonSave),
           ),
         ),
       ),

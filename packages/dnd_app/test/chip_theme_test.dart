@@ -1,6 +1,7 @@
 import 'package:dnd_app/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'fakes/localized_app.dart';
 
 /// Elegir un chip no puede cambiarle el ancho. El tilde de Material lo
 /// ensanchaba, y en un `Wrap` la fila se reacomodaba: al elegir un Estilo de
@@ -17,7 +18,7 @@ void main() {
       var choice = false;
       var filter = false;
       await tester.pumpWidget(
-        MaterialApp(
+        localizedApp(
           theme: theme,
           home: Scaffold(
             body: StatefulBuilder(

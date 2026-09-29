@@ -1,3 +1,4 @@
+// l10n-ignore-file: el prompt del generador de imágenes se redacta en español a propósito, y los estilos son valores guardados; traducirlos es una decisión de la fase 2.
 import 'package:dnd_engine/dnd_engine.dart';
 
 /// Estilos predeterminados para la generación de retratos.

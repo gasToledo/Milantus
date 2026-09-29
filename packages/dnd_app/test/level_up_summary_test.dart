@@ -3,6 +3,7 @@ import 'package:dnd_app/levelup/level_up_summary_screen.dart';
 import 'package:dnd_app/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'fakes/localized_app.dart';
 
 /// La pantalla de resumen abre con una animación (medallón con "pop" + estallido
 /// dibujado por CustomPainter). Verifica que monta y asienta sin excepciones.
@@ -27,7 +28,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: LevelUpSummaryScreen(
           level: 5,
@@ -57,7 +58,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: LevelUpSummaryScreen(
           level: 5,

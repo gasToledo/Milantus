@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'creation_helpers.dart';
+import 'fakes/localized_app.dart';
 
 /// Procedencia visible: solo el contenido del SRD 5.2.1 está cubierto por la
 /// atribución CC BY 4.0, así que el jugador tiene que poder distinguirlo.
@@ -23,18 +24,20 @@ void main() {
     // Los dos SRD se distinguen por versión, no por año: "SRD" a secas no dice
     // cuál de las dos ediciones es, y eso cambia la regla además de la
     // licencia.
-    expect(sourceLabel(ContentSource.srd2024), 'SRD 5.2.1');
-    expect(sourceLabel(ContentSource.phb2024), 'PHB 2024');
-    expect(sourceLabel(ContentSource.foa2025), 'Forge 2025');
-    expect(sourceLabel(ContentSource.srd2014), 'SRD 5.1');
-    expect(sourceLabel(ContentSource.homebrew), 'Propio');
+    expect(sourceLabel(ContentSource.srd2024, l10nEs), 'SRD 5.2.1');
+    expect(sourceLabel(ContentSource.phb2024, l10nEs), 'PHB 2024');
+    expect(sourceLabel(ContentSource.foa2025, l10nEs), 'Forge 2025');
+    expect(sourceLabel(ContentSource.srd2014, l10nEs), 'SRD 5.1');
+    expect(sourceLabel(ContentSource.homebrew, l10nEs), 'Propio');
   });
 
   test('ninguna procedencia se queda sin etiqueta', () {
     // El switch de sourceLabel es exhaustivo, así que agregar un valor al enum
     // rompe la compilación. Esta prueba cubre lo otro: que ninguna etiqueta
     // quede vacía o repetida, que sí compilaría.
-    final labels = ContentSource.values.map(sourceLabel).toList();
+    final labels = ContentSource.values
+        .map((s) => sourceLabel(s, l10nEs))
+        .toList();
     expect(labels.every((l) => l.isNotEmpty), isTrue);
     expect(labels.toSet(), hasLength(ContentSource.values.length));
   });
@@ -49,7 +52,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: CreationWizard(repo: repo, onCreate: (_) {}),
       ),
@@ -103,7 +106,7 @@ void main() {
     );
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: LevelUpScreen(character: c, repo: repo, onDone: (_) {}),
       ),

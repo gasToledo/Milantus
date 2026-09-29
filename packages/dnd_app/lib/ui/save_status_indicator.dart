@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../data/characters_controller.dart';
 import '../theme/app_theme.dart';
+import '../l10n/l10n_context.dart';
 
 /// El estado del guardado automático, en una placa.
 ///
@@ -37,21 +38,25 @@ class SaveStatusIndicator extends StatelessWidget {
     final pal = context.palette;
     final scheme = Theme.of(context).colorScheme;
     final (icon, label, color) = switch (state) {
-      CharacterSaveState.saving => (Icons.sync, 'Guardando…', pal.gold),
+      CharacterSaveState.saving => (
+        Icons.sync,
+        context.l10n.commonSaving,
+        pal.gold,
+      ),
       CharacterSaveState.error => (
         Icons.error_outline,
-        'No se guardó',
+        context.l10n.saveStateFailed,
         scheme.error,
       ),
       CharacterSaveState.saved => (
         Icons.cloud_done_outlined,
-        'Guardado',
+        context.l10n.saveStateSaved,
         scheme.onSurfaceVariant,
       ),
     };
 
     return Semantics(
-      label: 'Estado del guardado: $label',
+      label: context.l10n.saveStateLabel(label),
       child: Tooltip(
         // En compacto el ícono queda solo, y tres íconos parecidos no se
         // distinguen de memoria.

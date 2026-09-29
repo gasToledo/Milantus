@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'fakes/fake_api_server.dart';
+import 'fakes/localized_app.dart';
 
 /// Contraste WCAG entre dos colores opacos.
 double _contrast(Color a, Color b) {
@@ -93,7 +94,7 @@ void main() {
   });
   testWidgets('los avisos se anuncian como región viva', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: Builder(
           builder: (context) => Scaffold(
@@ -129,7 +130,7 @@ void main() {
 
   testWidgets('las estadísticas exponen una etiqueta completa', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: const Scaffold(
           body: Column(
@@ -161,7 +162,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: const Scaffold(
           body: AbilityPlaque(
@@ -202,7 +203,7 @@ void main() {
       ];
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: Scaffold(
           body: SettingsDialog(api: ApiClient(client: server.client)),
@@ -238,7 +239,7 @@ void main() {
         );
 
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: Column(
           children: [
@@ -257,7 +258,7 @@ void main() {
   // mostrar el valor final de una vez, no quedarse a medio camino.
   testWidgets('la barra de PG llega a su valor sin animación', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: MediaQuery(
           data: const MediaQueryData(disableAnimations: true),
@@ -290,7 +291,7 @@ void main() {
       final controller = AppThemeController();
       addTearDown(controller.dispose);
       await tester.pumpWidget(
-        MaterialApp(
+        localizedApp(
           theme: AppTheme.dark,
           home: Scaffold(
             body: Center(
@@ -343,22 +344,13 @@ void main() {
       );
     });
 
-    // El idioma se muestra aunque no se pueda cambiar; lo que no puede pasar es
-    // que parezca interactivo sin decir por qué no lo es.
-    testWidgets('el idioma se anuncia como no disponible todavía', (
-      tester,
-    ) async {
+    // Sin `AppLocaleScope` (acá se monta el panel suelto) no hay a quién pedirle
+    // el cambio: el idioma activo se muestra pero no ofrece un menú.
+    testWidgets('sin scope el idioma se muestra sin menú', (tester) async {
       await pump(tester);
-      final semantics = tester.ensureSemantics();
 
       expect(find.text('Español'), findsOneWidget);
-      expect(
-        find.bySemanticsLabel(
-          'Idioma: Español. Todavía no hay otros idiomas disponibles.',
-        ),
-        findsOneWidget,
-      );
-      semantics.dispose();
+      expect(find.byType(PopupMenuButton<String>), findsNothing);
     });
   });
 
@@ -368,7 +360,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: Scaffold(
           body: SpendRecoverButtons(
@@ -396,7 +388,7 @@ void main() {
   ) async {
     var retried = 0;
     await tester.pumpWidget(
-      MaterialApp(
+      localizedApp(
         theme: AppTheme.dark,
         home: Scaffold(
           body: AppErrorView(
@@ -425,7 +417,7 @@ void main() {
   // reducido no aparece, y el número nuevo alcanza para leerlo.
   testWidgets('el destello de PG marca si bajó o subió', (tester) async {
     Future<Color?> flashAfter(int from, int to, {bool reduced = false}) async {
-      Widget build(int value) => MaterialApp(
+      Widget build(int value) => localizedApp(
         theme: AppTheme.dark,
         home: MediaQuery(
           data: MediaQueryData(disableAnimations: reduced),

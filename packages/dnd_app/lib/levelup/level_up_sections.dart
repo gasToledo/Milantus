@@ -7,12 +7,10 @@ extension _LevelUpSections on _LevelUpScreenState {
     _LevelUpStepKind.subclass => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _LevelUpIntro(
-          eyebrow: 'Elegís vos',
-          title: 'Tu camino dentro de la clase',
-          body:
-              'La subclase define nuevos rasgos y decisiones para los próximos '
-              'niveles. Revisá cada opción antes de continuar.',
+        _LevelUpIntro(
+          eyebrow: context.l10n.luChooseEyebrow,
+          title: context.l10n.luSubclassIntroTitle,
+          body: context.l10n.luSubclassIntroBody,
         ),
         const SizedBox(height: 22),
         _buildSubclassSection(),
@@ -21,12 +19,10 @@ extension _LevelUpSections on _LevelUpScreenState {
     _LevelUpStepKind.abilityScore => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _LevelUpIntro(
-          eyebrow: 'Elegís vos',
-          title: 'Mejora tu personaje',
-          body:
-              'Aumentá tus características o elegí una dote. La decisión se '
-              'previsualiza antes de modificar la ficha.',
+        _LevelUpIntro(
+          eyebrow: context.l10n.luChooseEyebrow,
+          title: context.l10n.luAsiIntroTitle,
+          body: context.l10n.luAsiIntroBody,
         ),
         const SizedBox(height: 22),
         _buildAsi(),
@@ -35,12 +31,10 @@ extension _LevelUpSections on _LevelUpScreenState {
     _LevelUpStepKind.featureChoices => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _LevelUpIntro(
-          eyebrow: 'Elegís vos',
-          title: 'Tus elecciones de este nivel',
-          body:
-              'Algunos rasgos te dejan elegir entre varias opciones. Podés '
-              'revisarlas acá antes de confirmar la subida.',
+        _LevelUpIntro(
+          eyebrow: context.l10n.luChooseEyebrow,
+          title: context.l10n.luChoicesIntroTitle,
+          body: context.l10n.luChoicesIntroBody,
         ),
         const SizedBox(height: 22),
         _buildFeatureChoicesSection(),
@@ -50,16 +44,13 @@ extension _LevelUpSections on _LevelUpScreenState {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _LevelUpIntro(
-          eyebrow: 'Elegís vos',
-          title: _pendingAreAllExpertise ? 'Pericia' : 'Competencias',
+          eyebrow: context.l10n.luChooseEyebrow,
+          title: _pendingAreAllExpertise
+              ? context.l10n.aptExpertise
+              : context.l10n.stepProficiencies,
           body: _pendingAreAllExpertise
-              ? 'Duplicás tu bonificador por competencia en las habilidades '
-                    'que elijas. Solo se ofrecen las habilidades en las que ya '
-                    'sos competente.'
-              : 'Lo que ya tenés por otra vía queda bloqueado, para no gastar '
-                    'el cupo en algo que ya sabés hacer. En los cupos de '
-                    'Pericia es al revés: solo se ofrecen las habilidades en '
-                    'las que ya sos competente.',
+              ? context.l10n.luProfBodyExpertise
+              : context.l10n.luProfBody,
         ),
         const SizedBox(height: 22),
         _buildProficiencySection(),
@@ -69,13 +60,10 @@ extension _LevelUpSections on _LevelUpScreenState {
     _LevelUpStepKind.spellChoices => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _LevelUpIntro(
-          eyebrow: 'Elegís vos',
-          title: 'Conjuros que quedan siempre preparados',
-          body:
-              'Estos conjuros no ocupan cupo de preparados y no se pueden '
-              'desmarcar desde el editor. El pozo ya viene filtrado por lo que '
-              'el rasgo permite.',
+        _LevelUpIntro(
+          eyebrow: context.l10n.luChooseEyebrow,
+          title: context.l10n.luAlwaysPreparedTitle,
+          body: context.l10n.luAlwaysPreparedBody,
         ),
         const SizedBox(height: 22),
         _buildSpellChoicesSection(),
@@ -85,11 +73,9 @@ extension _LevelUpSections on _LevelUpScreenState {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _LevelUpIntro(
-          eyebrow: 'Magia',
-          title: 'Tus conjuros a nivel $_newLevel',
-          body:
-              'Revisá los espacios y la cantidad de conjuros preparados. '
-              'Podés actualizar tu selección sin salir de la subida de nivel.',
+          eyebrow: context.l10n.luMagicEyebrow,
+          title: context.l10n.luYourSpellsAt(_newLevel),
+          body: context.l10n.luMagicBody,
         ),
         const SizedBox(height: 18),
         _buildSpellSection(),
@@ -110,15 +96,14 @@ extension _LevelUpSections on _LevelUpScreenState {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Eyebrow('Clase del nivel'),
+        Eyebrow(context.l10n.luClassOfLevel),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
           key: ValueKey(_levelUpClassId),
           initialValue: _levelUpClassId,
-          decoration: const InputDecoration(
-            labelText: '¿En qué clase avanzás?',
-            helperText:
-                'Podés continuar con tu clase actual o comenzar una nueva.',
+          decoration: InputDecoration(
+            labelText: context.l10n.luWhichClass,
+            helperText: context.l10n.luClassHelper,
           ),
           items: [
             for (final klass in _classOptions)
@@ -131,7 +116,11 @@ extension _LevelUpSections on _LevelUpScreenState {
         if (selected != null) ...[
           const SizedBox(height: 6),
           Text(
-            '$_newClassLevel° nivel de ${selected.name} · dado d${selected.hitDie}',
+            context.l10n.luClassLevelLine(
+              _newClassLevel,
+              selected.name,
+              selected.hitDie,
+            ),
             style: TextStyle(color: muted, fontSize: 12.5),
           ),
         ],
@@ -139,8 +128,9 @@ extension _LevelUpSections on _LevelUpScreenState {
           Padding(
             padding: const EdgeInsets.only(top: 7),
             child: Text(
-              'No cumplís el requisito de multiclase: '
-              '${selected.multiclass!.requirementLabel}. La mesa puede autorizarlo.',
+              context.l10n.luMulticlassReq(
+                selected.multiclass!.requirementLabel,
+              ),
               style: TextStyle(
                 color: Theme.of(context).colorScheme.error,
                 fontSize: 12.5,
@@ -160,45 +150,49 @@ extension _LevelUpSections on _LevelUpScreenState {
       // le preguntara nada.
       _LevelUpCard(
         icon: Icons.favorite,
-        title: 'Puntos de golpe',
-        body:
-            'Elegís el promedio o tirás tu d$_hitDie; la Constitución se suma '
-            'sola.',
-        tag: 'ELEGÍS VOS',
+        title: context.l10n.hitPoints,
+        body: context.l10n.luOverviewHp(_hitDie),
+        tag: context.l10n.luTagYouChoose,
       ),
       if (_openChoiceSlots case final open when open.isNotEmpty)
         _LevelUpCard(
           icon: Icons.style,
-          title: open.length == 1 ? open.single.name : 'Elecciones de rasgos',
+          title: open.length == 1
+              ? open.single.name
+              : context.l10n.luFeatureChoicesTitle,
           body: open.length == 1
-              ? 'Un rasgo de este nivel te deja elegir entre varias opciones.'
+              ? context.l10n.luFeatureChoicesBody
               : open.map((s) => s.name).join(' · '),
           // Igual que la tarjeta de conjuros: si todo está elegido y solo
           // queda revisar, no es una decisión obligatoria.
-          tag: _pendingChoices > 0 ? 'ELEGÍS VOS' : 'OPCIONAL',
+          tag: _pendingChoices > 0
+              ? context.l10n.luTagYouChoose
+              : context.l10n.luTagOptional,
         ),
       if (_needsSubclass)
-        const _LevelUpCard(
+        _LevelUpCard(
           icon: Icons.shield,
-          title: 'Elegir subclase',
-          body: 'Define la especialización del personaje y sus rasgos futuros.',
-          tag: 'ELEGÍS VOS',
+          title: context.l10n.luChooseSubclass,
+          body: context.l10n.luChooseSubclassBody,
+          tag: context.l10n.luTagYouChoose,
         ),
       if (_isAsi)
-        const _LevelUpCard(
+        _LevelUpCard(
           icon: Icons.trending_up,
-          title: 'Mejora o dote',
-          body: 'Repartí una mejora de características o incorporá una dote.',
-          tag: 'ELEGÍS VOS',
+          title: context.l10n.luStepAsi,
+          body: context.l10n.luAsiCardBody,
+          tag: context.l10n.luTagYouChoose,
         ),
       if (_hasSpellcasting)
         _LevelUpCard(
           icon: Icons.auto_stories,
-          title: 'Revisar conjuros',
-          body: 'Comprobá tus espacios y actualizá los conjuros preparados.',
+          title: context.l10n.luReviewSpells,
+          body: context.l10n.luReviewSpellsBody,
           // Decía «OPCIONAL» aunque el nivel trajera un truco o un conjuro
           // nuevo, y el paso que sigue ahora no deja confirmar sin elegirlos.
-          tag: _classSpellsComplete ? 'OPCIONAL' : 'ELEGÍS VOS',
+          tag: _classSpellsComplete
+              ? context.l10n.luTagOptional
+              : context.l10n.luTagYouChoose,
         ),
     ];
     final automatic = <Widget>[
@@ -213,7 +207,7 @@ extension _LevelUpSections on _LevelUpScreenState {
           body: features.length == 1
               ? features.single.description.split('. ').first
               : features.map((feature) => feature.name).join(' · '),
-          tag: 'AUTOMÁTICO',
+          tag: context.l10n.luTagAuto,
         ),
     ];
 
@@ -242,7 +236,7 @@ extension _LevelUpSections on _LevelUpScreenState {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'NIVEL',
+                      context.l10n.luLevelUpper,
                       style: TextStyle(
                         color: context.palette.gold,
                         fontSize: 10,
@@ -263,14 +257,16 @@ extension _LevelUpSections on _LevelUpScreenState {
               const SizedBox(height: 20),
               Text(
                 // Sin «listo»: el personaje no tiene por qué ser varón.
-                '${widget.character.name} sube a nivel $_newLevel',
+                context.l10n.luCharacterLevels(
+                  widget.character.name,
+                  _newLevel,
+                ),
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontFamily: 'Georgia', fontSize: 28),
               ),
               const SizedBox(height: 7),
               Text(
-                'Primero revisaremos qué cambia automáticamente y después '
-                'resolveremos tus decisiones.',
+                context.l10n.luOverviewIntro,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -286,21 +282,15 @@ extension _LevelUpSections on _LevelUpScreenState {
         // cambia de personaje a personaje, ni que hasta el final no se tocó
         // nada: sin eso, salir del wizard da miedo. La única escritura es
         // `onDone`, y la hace `_confirm`.
-        const AppHelpCallout(
-          message:
-              'Solo aparecen los pasos que le tocan a este personaje en este '
-              'nivel, así que la lista es distinta cada vez. Nada se guarda en '
-              'la ficha hasta que confirmes la subida, así que podés rehacer '
-              'cualquier elección antes de terminar.',
-        ),
+        AppHelpCallout(message: context.l10n.luOverviewHelp),
         const SizedBox(height: 28),
         _buildClassChoicePicker(),
         if (automatic.isNotEmpty) ...[
-          const Eyebrow('Cambios automáticos'),
+          Eyebrow(context.l10n.luAutoChanges),
           _responsiveCards(automatic),
           const SizedBox(height: 24),
         ],
-        const Eyebrow('Decisiones de esta subida'),
+        Eyebrow(context.l10n.luDecisions),
         _responsiveCards(choices),
       ],
     );
@@ -334,11 +324,9 @@ extension _LevelUpSections on _LevelUpScreenState {
       children: [
         _LevelUpIntro(
           // Promedio o tirada es una decisión: «automático» decía lo contrario.
-          eyebrow: 'Elegís vos',
-          title: 'Más puntos de golpe',
-          body:
-              'Elegí el promedio seguro o tirá tu dado de golpe d$_hitDie. '
-              'La Constitución se suma sola.',
+          eyebrow: context.l10n.luChooseEyebrow,
+          title: context.l10n.luMoreHpTitle,
+          body: context.l10n.luMoreHpBody(_hitDie),
         ),
         const SizedBox(height: 22),
         LayoutBuilder(
@@ -346,10 +334,10 @@ extension _LevelUpSections on _LevelUpScreenState {
             final compact = constraints.maxWidth < 700;
             final picker = _LevelUpCard(
               icon: Icons.casino,
-              title: 'Dado de golpe d$_hitDie',
+              title: context.l10n.luHitDie(_hitDie),
               body: _hpMethod == _HpMethod.roll && _rolledHp == null
-                  ? 'Todavía no hay un resultado.'
-                  : 'Ganancia base del nivel: +$_hpGain PG.',
+                  ? context.l10n.luNoResult
+                  : context.l10n.luBaseGain(_hpGain),
               trailing: Text(
                 _hpMethod == _HpMethod.roll && _rolledHp == null
                     ? '—'
@@ -378,15 +366,15 @@ extension _LevelUpSections on _LevelUpScreenState {
             String firmado(int n) => n >= 0 ? '+$n' : '$n';
             final preview = _LevelUpCard(
               icon: Icons.favorite,
-              title: 'PG máximos',
+              title: context.l10n.luHpMaxTitle,
               // El aviso de la revisión final sale solo cuando este nivel trae
               // mejora de característica: sin un lugar donde subir Constitución
               // era un renglón que no le hablaba a nadie, y de paso empujaba
               // los botones de método fuera de una ventana baja.
               body: sinTirar
-                  ? 'Tirá el dado para ver la cuenta.'
-                  : '${['+$_hpGain del dado', '${firmado(conMod)} de Constitución', if (resto != 0) '${firmado(resto)} de tus rasgos'].join(' · ')} = ${firmado(delta)} PG.'
-                        '${_isAsi ? ' Si subís Constitución más adelante, se recalcula.' : ''}',
+                  ? context.l10n.luRollToSee
+                  : '${context.l10n.luHpTotal([context.l10n.luHpDie(_hpGain), context.l10n.luHpCon(firmado(conMod)), if (resto != 0) context.l10n.luHpFeatures(firmado(resto))].join(' · '), firmado(delta))}'
+                        '${_isAsi ? ' ${context.l10n.luHpRecalc}' : ''}',
               trailing: Text(
                 // Sin tirar, la cifra de la derecha era solo la Constitución y
                 // se leía como el resultado.
@@ -423,12 +411,14 @@ extension _LevelUpSections on _LevelUpScreenState {
                       ButtonSegment(
                         value: _HpMethod.average,
                         icon: const Icon(Icons.balance),
-                        label: Text('Promedio (${averageHitDie(_hitDie)})'),
+                        label: Text(
+                          context.l10n.luAverage(averageHitDie(_hitDie)),
+                        ),
                       ),
-                      const ButtonSegment(
+                      ButtonSegment(
                         value: _HpMethod.roll,
                         icon: Icon(Icons.casino),
-                        label: Text('Tirar'),
+                        label: Text(context.l10n.luRoll),
                       ),
                     ],
                     selected: {_hpMethod},
@@ -448,7 +438,9 @@ extension _LevelUpSections on _LevelUpScreenState {
                       ),
                       icon: const Icon(Icons.casino),
                       label: Text(
-                        _rolledHp == null ? 'Tirar el dado' : 'Volver a tirar',
+                        _rolledHp == null
+                            ? context.l10n.luRollDie
+                            : context.l10n.luRollAgain,
                       ),
                     ),
                   ),
@@ -547,12 +539,12 @@ extension _LevelUpSections on _LevelUpScreenState {
         for (final slot in fresh) ..._spellChoiceSlotWidgets(slot),
         if (fresh.isNotEmpty && revisable.isNotEmpty) ...[
           Text(
-            'Elegidos en niveles anteriores',
+            context.l10n.luChosenEarlier,
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 2),
           Text(
-            'Podés cambiarlos o dejarlos como están.',
+            context.l10n.luChangeOrKeep,
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: 16),
@@ -573,8 +565,7 @@ extension _LevelUpSections on _LevelUpScreenState {
     if (!slot.grantsSpells) ...[
       const SizedBox(height: 4),
       Text(
-        'Elegí uno que ya conocés: no se suma a tus conjuros, le agrega '
-        'el bono al daño.',
+        context.l10n.pickKnownSpellHint,
         style: Theme.of(context).textTheme.bodySmall,
       ),
     ],
@@ -594,11 +585,9 @@ extension _LevelUpSections on _LevelUpScreenState {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _LevelUpIntro(
-          eyebrow: 'Automático',
-          title: 'Rasgos ganados a nivel $_newLevel',
-          body:
-              'Estos rasgos provienen de tu clase y subclase. Se aplicarán '
-              'automáticamente cuando confirmes la subida.',
+          eyebrow: context.l10n.luAutoEyebrow,
+          title: context.l10n.luFeaturesAt(_newLevel),
+          body: context.l10n.luFeaturesBody,
         ),
         const SizedBox(height: 20),
         DenseRows(
@@ -673,7 +662,9 @@ extension _LevelUpSections on _LevelUpScreenState {
           label: resource.name,
           // Sin clase es de la especie o de una dote: el Ataque de Aliento
           // figuraba como «Recurso de clase».
-          note: resource.classId == null ? 'Recurso' : 'Recurso de clase',
+          note: resource.classId == null
+              ? context.l10n.luResource
+              : context.l10n.luClassResource,
           before: '${previous?.max ?? 0}',
           after: '${resource.max}',
         ),
@@ -686,23 +677,23 @@ extension _LevelUpSections on _LevelUpScreenState {
     final rows = <Widget>[
       _ReviewRow(
         icon: Icons.military_tech,
-        label: 'Nivel',
+        label: context.l10n.sortLevel,
         note: _klass?.name ?? widget.character.classId,
         before: '${widget.character.level}',
         after: '$_newLevel',
       ),
       _ReviewRow(
         icon: Icons.favorite,
-        label: 'Puntos de golpe máximos',
-        note: '+${diff.hpGained} en esta subida',
+        label: context.l10n.luReviewMaxHp,
+        note: context.l10n.luReviewHpNote(diff.hpGained),
         before: '${before.maxHp}',
         after: '${after.maxHp}',
       ),
       if (diff.proficiencyBonusChanged)
         _ReviewRow(
           icon: Icons.verified,
-          label: 'Bonificador por competencia',
-          note: 'Se aplica a todas las competencias relevantes',
+          label: context.l10n.luReviewProfBonus,
+          note: context.l10n.luReviewProfBonusNote,
           before: '+${diff.proficiencyBonusFrom}',
           after: '+${diff.proficiencyBonusTo}',
         ),
@@ -710,48 +701,48 @@ extension _LevelUpSections on _LevelUpScreenState {
       if (beforeSlots != afterSlots)
         _ReviewRow(
           icon: Icons.diamond_outlined,
-          label: 'Espacios de conjuro',
-          note: 'Por nivel de conjuro',
+          label: context.l10n.spellsSlots,
+          note: context.l10n.luReviewSlotsNote,
           before: beforeSlots,
           after: afterSlots,
         ),
       if (beforeSpells?.preparedCount != afterSpells?.preparedCount)
         _ReviewRow(
           icon: Icons.menu_book,
-          label: 'Conjuros preparados',
-          note: 'Capacidad del repertorio',
+          label: context.l10n.spellsPreparedTitle,
+          note: context.l10n.luReviewPreparedNote,
           before: '${beforeSpells?.preparedCount ?? 0}',
           after: '${afterSpells?.preparedCount ?? 0}',
         ),
       if (beforeSpells?.cantripsKnown != afterSpells?.cantripsKnown)
         _ReviewRow(
           icon: Icons.flare,
-          label: 'Trucos',
-          note: 'Se lanzan sin gastar espacios',
+          label: context.l10n.spellsCantripsTitle,
+          note: context.l10n.luReviewCantripsNote,
           before: '${beforeSpells?.cantripsKnown ?? 0}',
           after: '${afterSpells?.cantripsKnown ?? 0}',
         ),
       if (diff.extraAttacksGained > 0)
         _ReviewRow(
           icon: Icons.sports_martial_arts,
-          label: 'Ataques por acción',
-          note: 'Ataque Adicional',
+          label: context.l10n.luReviewAttacks,
+          note: context.l10n.luReviewExtraAttack,
           before: '${before.attacksPerAction}',
           after: '${after.attacksPerAction}',
         ),
       if (diff.weaponMasterySlotsGained > 0)
         _ReviewRow(
           icon: Icons.gavel,
-          label: 'Maestrías de armas',
-          note: 'Opciones disponibles',
+          label: context.l10n.luReviewMasteries,
+          note: context.l10n.luReviewMasteriesNote,
           before: '${before.weaponMasterySlots}',
           after: '${after.weaponMasterySlots}',
         ),
       if (_needsSubclass && _subclassId != null)
         _ReviewRow(
           icon: Icons.shield,
-          label: 'Subclase',
-          note: 'Nueva especialización',
+          label: context.l10n.luStepSubclass,
+          note: context.l10n.luReviewSubclassNote,
           before: '—',
           after: widget.repo.subclass(_subclassId!)?.name ?? _subclassId!,
         ),
@@ -760,10 +751,12 @@ extension _LevelUpSections on _LevelUpScreenState {
           icon: _asiKind == _AsiKind.feat
               ? Icons.workspace_premium
               : Icons.trending_up,
-          label: _asiKind == _AsiKind.feat ? 'Dote' : 'Características',
+          label: _asiKind == _AsiKind.feat
+              ? context.l10n.luFeat
+              : context.l10n.abilitiesTitle,
           note: _asiKind == _AsiKind.feat
-              ? 'Nueva capacidad'
-              : 'Mejora permanente',
+              ? context.l10n.luReviewFeatNote
+              : context.l10n.luReviewImproveNote,
           before: '—',
           after: _asiReviewLabel(),
         ),
@@ -772,8 +765,8 @@ extension _LevelUpSections on _LevelUpScreenState {
       if (_newCantrips != null || _newSpells != null)
         _ReviewRow(
           icon: Icons.auto_stories,
-          label: 'Trucos y conjuros elegidos',
-          note: 'Selección actualizada',
+          label: context.l10n.luReviewChosenSpells,
+          note: context.l10n.luReviewChosenNote,
           before:
               '${widget.character.cantripIdsFor(_levelUpClassId).length + widget.character.spellIdsFor(_levelUpClassId).length}',
           after:
@@ -785,17 +778,15 @@ extension _LevelUpSections on _LevelUpScreenState {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _LevelUpIntro(
-          eyebrow: 'Revisión final',
-          title: 'Así queda ${widget.character.name}',
-          body:
-              'Revisá los cambios antes de escribirlos en la ficha. Podés '
-              'volver a cualquier paso disponible desde la barra superior.',
+          eyebrow: context.l10n.luFinalEyebrow,
+          title: context.l10n.luFinalTitle(widget.character.name),
+          body: context.l10n.luFinalBody,
         ),
         const SizedBox(height: 20),
         DenseRows(children: rows),
         if (_gainedFeatures().isNotEmpty) ...[
           const SizedBox(height: 22),
-          const Eyebrow('Rasgos incorporados'),
+          Eyebrow(context.l10n.luIncorporated),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -821,7 +812,9 @@ extension _LevelUpSections on _LevelUpScreenState {
     if (slots.isEmpty) return '—';
     final entries = slots.entries.toList()
       ..sort((a, b) => a.key.compareTo(b.key));
-    return entries.map((entry) => 'Nv${entry.key} ×${entry.value}').join(' · ');
+    return entries
+        .map((entry) => context.l10n.luSlotLine(entry.key, entry.value))
+        .join(' · ');
   }
 
   Widget _buildSubclassSection() {
@@ -830,7 +823,7 @@ extension _LevelUpSections on _LevelUpScreenState {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Eyebrow('Subclase (nivel $_newLevel)'),
+        Eyebrow(context.l10n.luSubclassAt(_newLevel)),
         const SizedBox(height: 8),
         for (final s in _subclassOptions)
           Padding(
@@ -968,7 +961,7 @@ extension _LevelUpSections on _LevelUpScreenState {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 8),
-        Eyebrow('Conjuros a nivel $_newLevel'),
+        Eyebrow(context.l10n.luSpellsEyebrow(_newLevel)),
         const SizedBox(height: 6),
         Wrap(
           spacing: 8,
@@ -985,15 +978,19 @@ extension _LevelUpSections on _LevelUpScreenState {
         const SizedBox(height: 8),
         Text(
           [
-            'Preparás ${after.preparedCount} conjuros',
-            if (after.cantripsKnown > 0) '${after.cantripsKnown} trucos',
+            context.l10n.luPrepare(after.preparedCount),
+            if (after.cantripsKnown > 0)
+              context.l10n.luCantrips(after.cantripsKnown),
           ].join(' · '),
           style: TextStyle(color: muted, fontSize: 13),
         ),
         if (after.cantripsKnown > 0) ...[
           const SizedBox(height: 10),
           Text(
-            'Trucos: ${chosenCantrips.length} de ${after.cantripsKnown}',
+            context.l10n.luCantripsOf(
+              chosenCantrips.length,
+              after.cantripsKnown,
+            ),
             style: Theme.of(context).textTheme.titleSmall,
           ),
           if (chosenCantrips.isNotEmpty)
@@ -1003,16 +1000,14 @@ extension _LevelUpSections on _LevelUpScreenState {
             ),
           if (pending.cantrips > 0)
             Text(
-              pending.cantrips == 1
-                  ? 'Te falta elegir un truco.'
-                  : 'Te falta elegir ${pending.cantrips} trucos.',
+              context.l10n.luMissingCantrips(pending.cantrips),
               style: TextStyle(color: context.palette.gold, fontSize: 13),
             ),
         ],
         if (after.preparedCount > 0) ...[
           const SizedBox(height: 10),
           Text(
-            'Preparados: ${chosen.length} de ${after.preparedCount}',
+            context.l10n.luPreparedOf(chosen.length, after.preparedCount),
             style: Theme.of(context).textTheme.titleSmall,
           ),
           if (chosen.isNotEmpty)
@@ -1022,9 +1017,7 @@ extension _LevelUpSections on _LevelUpScreenState {
             ),
           if (pending.prepared > 0)
             Text(
-              pending.prepared == 1
-                  ? 'Te falta preparar un conjuro.'
-                  : 'Te falta preparar ${pending.prepared} conjuros.',
+              context.l10n.luMissingPrepare(pending.prepared),
               style: TextStyle(color: context.palette.gold, fontSize: 13),
             ),
         ],
@@ -1034,7 +1027,9 @@ extension _LevelUpSections on _LevelUpScreenState {
           // La tilde solo cuando no falta nada: con «Conjuros actualizados» y
           // un truco pendiente, nadie volvía a abrir el editor.
           icon: Icon(done ? Icons.check : Icons.auto_stories, size: 18),
-          label: Text(done ? 'Conjuros actualizados' : 'Preparar conjuros'),
+          label: Text(
+            done ? context.l10n.luSpellsUpdated : context.l10n.luPrepareSpells,
+          ),
         ),
       ],
     );
@@ -1070,14 +1065,17 @@ extension _LevelUpSections on _LevelUpScreenState {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Eyebrow('Mejora de característica (nivel $_newLevel)'),
+        Eyebrow(context.l10n.luAsiAt(_newLevel)),
         SegmentedButton<_AsiKind>(
-          segments: const [
+          segments: [
             ButtonSegment(
               value: _AsiKind.improve,
-              label: Text('Mejorar características'),
+              label: Text(context.l10n.luImproveAbilities),
             ),
-            ButtonSegment(value: _AsiKind.feat, label: Text('Tomar dote')),
+            ButtonSegment(
+              value: _AsiKind.feat,
+              label: Text(context.l10n.luTakeFeat),
+            ),
           ],
           selected: {_asiKind},
           onSelectionChanged: (s) => _updateState(() => _asiKind = s.first),
@@ -1093,7 +1091,7 @@ extension _LevelUpSections on _LevelUpScreenState {
           // no hay ningún +1 del que hablar.
           if (_featAbilityChoice case final aumento?) ...[
             const SizedBox(height: 22),
-            Eyebrow('La dote sube una característica (+${aumento.amount})'),
+            Eyebrow(context.l10n.luFeatRaises(aumento.amount)),
             const SizedBox(height: 10),
             _buildAbilityGrid(_sheetBefore, _updatedSheet),
             // El techo solo se aclara cuando no es el de siempre: decir "hasta
@@ -1101,8 +1099,7 @@ extension _LevelUpSections on _LevelUpScreenState {
             if (aumento.max != 20) ...[
               const SizedBox(height: 10),
               Text(
-                'Esta dote llega hasta ${aumento.max}, no hasta 20 como una '
-                'mejora normal.',
+                context.l10n.luFeatCap(aumento.max),
                 style: TextStyle(
                   fontSize: 12.5,
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -1122,11 +1119,14 @@ extension _LevelUpSections on _LevelUpScreenState {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SegmentedButton<_ImproveMode>(
-          segments: const [
-            ButtonSegment(value: _ImproveMode.plusTwo, label: Text('+2 a una')),
+          segments: [
+            ButtonSegment(
+              value: _ImproveMode.plusTwo,
+              label: Text(context.l10n.luPlusTwo),
+            ),
             ButtonSegment(
               value: _ImproveMode.plusOneTwo,
-              label: Text('+1 a dos'),
+              label: Text(context.l10n.luPlusOneTwo),
             ),
           ],
           selected: {_impMode},
@@ -1140,8 +1140,8 @@ extension _LevelUpSections on _LevelUpScreenState {
         const SizedBox(height: 14),
         Text(
           _impMode == _ImproveMode.plusTwo
-              ? 'Elegí una característica para sumar 2 puntos.'
-              : 'Elegí dos características distintas para sumar 1 punto a cada una.',
+              ? context.l10n.luPickOneAbility
+              : context.l10n.luPickTwoAbilities,
           style: TextStyle(
             fontSize: 12.5,
             color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -1258,7 +1258,7 @@ extension _LevelUpSections on _LevelUpScreenState {
         .toList();
     if (allFeats.isEmpty) {
       return Text(
-        'No quedan dotes disponibles.',
+        context.l10n.luNoFeats,
         style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
       );
     }
@@ -1270,6 +1270,7 @@ extension _LevelUpSections on _LevelUpScreenState {
                 (feat) =>
                     feat.name.toLowerCase().contains(query) ||
                     featSummary(
+                      context.l10n,
                       feat,
                       widget.repo,
                     ).toLowerCase().contains(query),
@@ -1284,10 +1285,10 @@ extension _LevelUpSections on _LevelUpScreenState {
         TextField(
           decoration: InputDecoration(
             prefixIcon: const Icon(Icons.search),
-            labelText: 'Buscar dote',
-            hintText: 'Nombre o efecto',
+            labelText: context.l10n.luSearchFeat,
+            hintText: context.l10n.luNameOrEffect,
             border: const OutlineInputBorder(),
-            suffixText: '${feats.length} disponibles',
+            suffixText: context.l10n.luAvailable(feats.length),
           ),
           onChanged: (value) => _updateState(() => _featQuery = value),
         ),
@@ -1300,7 +1301,7 @@ extension _LevelUpSections on _LevelUpScreenState {
               child: feats.isEmpty
                   ? Center(
                       child: Text(
-                        'Ninguna dote coincide con «$_featQuery».',
+                        context.l10n.luNoFeatMatch(_featQuery),
                         style: TextStyle(color: context.palette.textMuted),
                       ),
                     )
@@ -1312,7 +1313,7 @@ extension _LevelUpSections on _LevelUpScreenState {
                         return _LevelUpCard(
                           icon: Icons.workspace_premium,
                           title: feat.name,
-                          body: featSummary(feat, widget.repo),
+                          body: featSummary(context.l10n, feat, widget.repo),
                           selected: _featId == feat.id,
                           trailing: SourceBadge(feat.source),
                           onTap: () => _updateState(() {
@@ -1333,10 +1334,8 @@ extension _LevelUpSections on _LevelUpScreenState {
                 ? _FeatDetail(selected, widget.repo)
                 : _LevelUpCard(
                     icon: Icons.touch_app,
-                    title: 'Elegí una dote',
-                    body:
-                        'Cada dote cambia cómo se juega el personaje. '
-                        'Seleccioná una para revisar su efecto completo.',
+                    title: context.l10n.luPickFeatTitle,
+                    body: context.l10n.luPickFeatBody,
                   );
             if (!wide) {
               return Column(

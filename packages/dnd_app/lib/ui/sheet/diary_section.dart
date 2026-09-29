@@ -45,18 +45,18 @@ extension _SheetDiarySection on _SheetScreenState {
     final vacio = _c.background.trim().isEmpty;
     return sheetCard(
       icon: Icons.auto_stories_outlined,
-      title: 'Trasfondo',
+      title: context.l10n.identityBackground,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
-            tooltip: 'Importar un .md',
+            tooltip: context.l10n.diaryImportMd,
             onPressed: _importBackground,
             icon: const Icon(Icons.file_upload_outlined, size: 18),
             color: pal.textMuted,
           ),
           IconButton(
-            tooltip: 'Exportar como .md',
+            tooltip: context.l10n.diaryExportMd,
             // Sin trasfondo no hay archivo que bajar, y un botón que descarga
             // un archivo vacío es peor que uno apagado.
             onPressed: vacio ? null : _exportBackground,
@@ -65,8 +65,8 @@ extension _SheetDiarySection on _SheetScreenState {
           ),
           IconButton(
             tooltip: _editingBackground
-                ? 'Terminar de editar'
-                : 'Editar el trasfondo',
+                ? context.l10n.diaryFinishEditing
+                : context.l10n.diaryEditBackground,
             onPressed: () => _setEditingBackground(!_editingBackground),
             icon: Icon(
               _editingBackground ? Icons.check : Icons.edit_outlined,
@@ -117,8 +117,8 @@ extension _SheetDiarySection on _SheetScreenState {
           minLines: 10,
           maxLines: null,
           keyboardType: TextInputType.multiline,
-          decoration: const InputDecoration(
-            hintText: 'De dónde viene, qué dejó atrás, qué le debe a quién…',
+          decoration: InputDecoration(
+            hintText: context.l10n.diaryBackgroundHint,
             alignLabelWithHint: true,
             border: OutlineInputBorder(),
           ),
@@ -132,8 +132,7 @@ extension _SheetDiarySection on _SheetScreenState {
         ),
         const SizedBox(height: 8),
         Text(
-          'Acepta Markdown: # para títulos, **negrita**, *itálica* y - para '
-          'viñetas.',
+          context.l10n.diaryMarkdownHint,
           style: TextStyle(fontSize: 12, color: pal.textMuted),
         ),
       ],
@@ -148,7 +147,7 @@ extension _SheetDiarySection on _SheetScreenState {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Origen desconocido',
+          context.l10n.diaryUnknownOrigin,
           style: TextStyle(
             fontFamily: 'Georgia',
             fontSize: 15,
@@ -158,8 +157,7 @@ extension _SheetDiarySection on _SheetScreenState {
         ),
         const SizedBox(height: 7),
         Text(
-          'Todavía nadie escribió de dónde viene ${_c.name}. Podés escribirlo '
-          'acá, o traer un .md que ya tengas afuera.',
+          context.l10n.diaryUnknownOriginBody(_c.name),
           style: TextStyle(fontSize: 13, height: 1.5, color: pal.textMuted),
         ),
         const SizedBox(height: 16),
@@ -170,12 +168,12 @@ extension _SheetDiarySection on _SheetScreenState {
             OutlinedButton.icon(
               onPressed: () => _setEditingBackground(true),
               icon: const Icon(Icons.edit_outlined, size: 18),
-              label: const Text('Escribir el trasfondo'),
+              label: Text(context.l10n.diaryWriteBackground),
             ),
             OutlinedButton.icon(
               onPressed: _importBackground,
               icon: const Icon(Icons.file_upload_outlined, size: 18),
-              label: const Text('Importar .md'),
+              label: Text(context.l10n.diaryImportMdShort),
             ),
           ],
         ),
@@ -190,10 +188,10 @@ extension _SheetDiarySection on _SheetScreenState {
         type: FileType.custom,
         allowedExtensions: const ['md'],
         withData: true,
-        dialogTitle: 'Elegir un archivo .md',
+        dialogTitle: context.l10n.diaryPickMd,
       );
     } catch (e) {
-      if (mounted) _snack(failureMessage('No se pudo abrir el archivo', e));
+      if (mounted) _snack(failureMessage(context.l10n.diaryOpenError, e));
       return;
     }
     final bytes = picked?.files.singleOrNull?.bytes;
@@ -208,19 +206,16 @@ extension _SheetDiarySection on _SheetScreenState {
         builder: (ctx) => AppDialog(
           icon: Icons.warning_amber_rounded,
           iconColor: pal.crimson,
-          title: 'Reemplazar el trasfondo',
-          content: const Text(
-            'Lo que hay escrito se pierde y queda en su lugar el contenido del '
-            'archivo. No hay forma de recuperarlo.',
-          ),
+          title: context.l10n.diaryReplaceTitle,
+          content: Text(context.l10n.diaryReplaceBody),
           actions: [
             DialogAction(
-              'Cancelar',
+              context.l10n.commonCancel,
               keyHint: 'Esc',
               onPressed: () => Navigator.pop(ctx, false),
             ),
             DialogAction(
-              'Reemplazar',
+              context.l10n.diaryReplace,
               primary: true,
               color: pal.crimson,
               onPressed: () => Navigator.pop(ctx, true),
@@ -237,17 +232,17 @@ extension _SheetDiarySection on _SheetScreenState {
     } catch (_) {
       // Un .md no es cualquier cosa renombrada: si no es UTF-8, meterlo en la
       // ficha dejaría el trasfondo ilegible y guardado.
-      _snack('El archivo no parece texto en UTF-8.');
+      _snack(context.l10n.diaryNotUtf8);
       return;
     }
     _adoptBackground(texto);
-    _snack('Trasfondo importado.');
+    _snack(context.l10n.diaryImported);
   }
 
   void _exportBackground() {
     browser.downloadBytes(
       utf8.encode(_c.background),
-      fileName: '${_fileSlug(_c.name)}-trasfondo.md',
+      fileName: '${_fileSlug(_c.name)}-${context.l10n.diaryFileSuffix}.md',
       mimeType: 'text/markdown',
     );
   }
@@ -257,7 +252,7 @@ extension _SheetDiarySection on _SheetScreenState {
   String _fileSlug(String name) {
     final limpio = name.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-');
     final recortado = limpio.replaceAll(RegExp(r'^-+|-+$'), '');
-    return recortado.isEmpty ? 'personaje' : recortado;
+    return recortado.isEmpty ? context.l10n.diaryFileFallback : recortado;
   }
 
   // -------------------------------------------------------------- Entradas
@@ -267,7 +262,7 @@ extension _SheetDiarySection on _SheetScreenState {
     final entradas = _c.diary;
     return sheetCard(
       icon: Icons.grid_view_outlined,
-      title: 'Entradas',
+      title: context.l10n.diaryEntries,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -280,7 +275,7 @@ extension _SheetDiarySection on _SheetScreenState {
             ),
           ),
           IconButton(
-            tooltip: 'Agregar una entrada',
+            tooltip: context.l10n.diaryAddEntryTooltip,
             onPressed: () => _editEntry(null),
             icon: const Icon(Icons.add, size: 19),
             color: pal.gold,
@@ -290,15 +285,12 @@ extension _SheetDiarySection on _SheetScreenState {
       child: entradas.isEmpty
           ? AppEmptyState(
               icon: Icons.photo_library_outlined,
-              message:
-                  'El diario de ${_c.name} todavía está en blanco.\n'
-                  'Sumá arte, una historia corta, una manía — lo que te guste '
-                  'de este personaje.',
+              message: context.l10n.diaryEmpty(_c.name),
               actions: [
                 OutlinedButton.icon(
                   onPressed: () => _editEntry(null),
                   icon: const Icon(Icons.add, size: 18),
-                  label: const Text('Agregar entrada'),
+                  label: Text(context.l10n.diaryAddEntry),
                 ),
               ],
             )
@@ -388,7 +380,7 @@ extension _SheetDiarySection on _SheetScreenState {
                   const SizedBox(width: 7),
                   Expanded(
                     child: Text(
-                      e.title.isEmpty ? 'Sin título' : e.title,
+                      e.title.isEmpty ? context.l10n.diaryUntitled : e.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -420,7 +412,7 @@ extension _SheetDiarySection on _SheetScreenState {
                     Icons.drag_indicator,
                     size: 16,
                     color: pal.textMuted.withValues(alpha: 0.75),
-                    semanticLabel: 'Mantené apretado para reordenar',
+                    semanticLabel: context.l10n.diaryDragHint,
                   ),
                 ],
               ),
@@ -438,7 +430,7 @@ extension _SheetDiarySection on _SheetScreenState {
         final key = e.imageKey;
         if (key == null) {
           return Text(
-            'Sin imagen.',
+            context.l10n.diaryNoImage,
             style: TextStyle(fontSize: 12.5, color: pal.textMuted),
           );
         }
@@ -487,9 +479,9 @@ extension _SheetDiarySection on _SheetScreenState {
   }
 
   (IconData, String) _entryVisual(DiaryEntryKind kind) => switch (kind) {
-    DiaryEntryKind.text => (Icons.notes, 'Texto'),
-    DiaryEntryKind.image => (Icons.image_outlined, 'Imagen'),
-    DiaryEntryKind.link => (Icons.link, 'Enlace'),
+    DiaryEntryKind.text => (Icons.notes, context.l10n.diaryKindText),
+    DiaryEntryKind.image => (Icons.image_outlined, context.l10n.diaryKindImage),
+    DiaryEntryKind.link => (Icons.link, context.l10n.diaryKindLink),
   };
 
   /// «12/03», o «12/03 · editada 02/04» cuando se tocó después. Sin fecha —la
@@ -500,7 +492,7 @@ extension _SheetDiarySection on _SheetScreenState {
     final tocada = e.updatedAt;
     final base = _shortDate(creada);
     if (tocada == null || !tocada.isAfter(creada)) return base;
-    return '$base · editada ${_shortDate(tocada)}';
+    return context.l10n.diaryEditedOn(base, _shortDate(tocada));
   }
 
   String _shortDate(DateTime d) {
@@ -530,7 +522,7 @@ extension _SheetDiarySection on _SheetScreenState {
       context: context,
       builder: (ctx) => AppDialog(
         icon: icono,
-        title: e.title.isEmpty ? 'Sin título' : e.title,
+        title: e.title.isEmpty ? context.l10n.diaryUntitled : e.title,
         // 560 y no 480: el cuerpo puede ser una imagen, que con la medida de
         // lectura de un párrafo queda innecesariamente chica.
         width: 560,
@@ -554,12 +546,12 @@ extension _SheetDiarySection on _SheetScreenState {
         ),
         actions: [
           DialogAction(
-            'Cerrar',
+            context.l10n.commonClose,
             keyHint: 'Esc',
             onPressed: () => Navigator.pop(ctx, false),
           ),
           DialogAction(
-            'Editar',
+            context.l10n.commonEdit,
             primary: true,
             onPressed: () => Navigator.pop(ctx, true),
           ),
@@ -574,13 +566,13 @@ extension _SheetDiarySection on _SheetScreenState {
     switch (e.kind) {
       case DiaryEntryKind.image:
         final key = e.imageKey;
-        if (key == null) return const Text('Esta entrada no tiene imagen.');
+        if (key == null) return Text(context.l10n.diaryEntryNoImage);
         // Reusa el visor del retrato: misma clave, mismo almacén, y ya trae
         // zoom, arrastre y cierre con Escape. Se abre **encima** del diálogo,
         // así que cerrarlo devuelve a la entrada en vez de a la grilla.
         return Semantics(
           button: true,
-          label: 'Ver la imagen completa',
+          label: context.l10n.diarySeeFullImage,
           child: MouseRegion(
             cursor: SystemMouseCursors.click,
             child: GestureDetector(
@@ -591,8 +583,7 @@ extension _SheetDiarySection on _SheetScreenState {
                 child: Image.network(
                   PortraitImage.urlFor(key),
                   fit: BoxFit.contain,
-                  errorBuilder: (_, _, _) =>
-                      const Text('La imagen ya no está en el almacén.'),
+                  errorBuilder: (_, _, _) => Text(context.l10n.diaryImageGone),
                 ),
               ),
             ),
@@ -686,22 +677,27 @@ extension _SheetDiarySection on _SheetScreenState {
       builder: (ctx) => AppDialog(
         icon: Icons.warning_amber_rounded,
         iconColor: pal.crimson,
-        title: 'Borrar la entrada',
+        title: context.l10n.diaryDeleteTitle,
         content: Text(
-          '«${e.title.isEmpty ? 'Sin título' : e.title}» se va del diario'
-          // Con imagen no hay vuelta atrás: el blob se borra del servidor y
-          // no se puede reponer. Sin imagen sí, así que decirlo igual sería
-          // asustar de más por algo que el cartel de después deshace.
-          '${tieneImagen ? ', y la imagen que subiste se borra con ella. No hay forma de recuperarla.' : '.'}',
+          // Con imagen no hay vuelta atrás: el blob se borra del servidor y no se
+          // puede reponer. Sin imagen sí, así que decirlo igual sería asustar de
+          // más por algo que el cartel de después deshace.
+          tieneImagen
+              ? context.l10n.diaryDeleteBodyImage(
+                  e.title.isEmpty ? context.l10n.diaryUntitled : e.title,
+                )
+              : context.l10n.diaryDeleteBody(
+                  e.title.isEmpty ? context.l10n.diaryUntitled : e.title,
+                ),
         ),
         actions: [
           DialogAction(
-            'Cancelar',
+            context.l10n.commonCancel,
             keyHint: 'Esc',
             onPressed: () => Navigator.pop(ctx, false),
           ),
           DialogAction(
-            'Borrar',
+            context.l10n.commonDelete,
             primary: true,
             color: pal.crimson,
             onPressed: () => Navigator.pop(ctx, true),
@@ -727,7 +723,9 @@ extension _SheetDiarySection on _SheetScreenState {
       // Con imagen no, porque el blob ya se fue y volvería rota.
       showAppMessage(
         context,
-        'Borraste «${e.title.isEmpty ? 'Sin título' : e.title}».',
+        context.l10n.diaryDeleted(
+          e.title.isEmpty ? context.l10n.diaryUntitled : e.title,
+        ),
         onUndo: () => _replace(antes),
       );
       return;
@@ -861,7 +859,7 @@ class _DiaryEntryDialogState extends State<_DiaryEntryDialog> {
         type: FileType.custom,
         allowedExtensions: _extensiones,
         withData: true,
-        dialogTitle: 'Elegir una imagen',
+        dialogTitle: context.l10n.diaryPickImage,
       );
       final bytes = picked?.files.singleOrNull?.bytes;
       if (bytes == null) return; // el usuario canceló
@@ -879,7 +877,7 @@ class _DiaryEntryDialogState extends State<_DiaryEntryDialog> {
     } catch (e) {
       if (mounted) {
         setState(
-          () => _error = failureMessage('No se pudo subir la imagen', e),
+          () => _error = failureMessage(context.l10n.diaryUploadError, e),
         );
       }
     } finally {
@@ -915,7 +913,7 @@ class _DiaryEntryDialogState extends State<_DiaryEntryDialog> {
     final esNueva = widget.entry == null;
     return AppDialog(
       icon: esNueva ? Icons.add : Icons.edit_outlined,
-      title: esNueva ? 'Nueva entrada' : 'Editar entrada',
+      title: esNueva ? context.l10n.diaryNewEntry : context.l10n.diaryEditEntry,
       width: 560,
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -925,15 +923,15 @@ class _DiaryEntryDialogState extends State<_DiaryEntryDialog> {
             controller: _titleCtrl,
             autofocus: true,
             textCapitalization: TextCapitalization.sentences,
-            decoration: const InputDecoration(
-              labelText: 'Título',
+            decoration: InputDecoration(
+              labelText: context.l10n.diaryTitleLabel,
               border: OutlineInputBorder(),
             ),
             // El botón de guardar depende de que haya título.
             onChanged: (_) => setState(() {}),
           ),
           const SizedBox(height: 16),
-          const Eyebrow('Tipo de entrada'),
+          Eyebrow(context.l10n.diaryEntryType),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -941,9 +939,9 @@ class _DiaryEntryDialogState extends State<_DiaryEntryDialog> {
               for (final kind in DiaryEntryKind.values)
                 ChoiceChip(
                   label: Text(switch (kind) {
-                    DiaryEntryKind.text => 'Texto',
-                    DiaryEntryKind.image => 'Imagen',
-                    DiaryEntryKind.link => 'Enlace',
+                    DiaryEntryKind.text => context.l10n.diaryKindText,
+                    DiaryEntryKind.image => context.l10n.diaryKindImage,
+                    DiaryEntryKind.link => context.l10n.diaryKindLink,
                   }),
                   avatar: Icon(switch (kind) {
                     DiaryEntryKind.text => Icons.notes,
@@ -967,10 +965,12 @@ class _DiaryEntryDialogState extends State<_DiaryEntryDialog> {
                   ? TextInputType.url
                   : TextInputType.multiline,
               decoration: InputDecoration(
-                labelText: _kind == DiaryEntryKind.link ? 'Enlace' : 'Texto',
+                labelText: _kind == DiaryEntryKind.link
+                    ? context.l10n.diaryKindLink
+                    : context.l10n.diaryKindText,
                 hintText: _kind == DiaryEntryKind.link
                     ? 'https://…'
-                    : 'Lo que quieras contar de este personaje…',
+                    : context.l10n.diaryBodyHint,
                 alignLabelWithHint: true,
                 border: const OutlineInputBorder(),
               ),
@@ -983,20 +983,20 @@ class _DiaryEntryDialogState extends State<_DiaryEntryDialog> {
       ),
       actions: [
         DialogAction(
-          'Cancelar',
+          context.l10n.commonCancel,
           keyHint: 'Esc',
           onPressed: () => Navigator.pop(context),
         ),
         if (!esNueva)
           DialogAction(
-            'Borrar',
+            context.l10n.commonDelete,
             color: pal.crimson,
             // El borrado lo confirma la pestaña: este diálogo solo lo pide.
             onPressed: () =>
                 Navigator.pop(context, (entrada: null, borrar: true)),
           ),
         DialogAction(
-          'Guardar',
+          context.l10n.commonSave,
           primary: true,
           onPressed: _puedeGuardar ? _guardar : null,
         ),
@@ -1020,16 +1020,20 @@ class _DiaryEntryDialogState extends State<_DiaryEntryDialog> {
         const SizedBox(height: 12),
       ],
       if (_subiendo)
-        const AppBusyLabel('Subiendo la imagen…')
+        AppBusyLabel(context.l10n.diaryUploading)
       else
         OutlinedButton.icon(
           onPressed: _elegirImagen,
           icon: const Icon(Icons.file_upload_outlined, size: 18),
-          label: Text(key == null ? 'Elegir imagen' : 'Cambiar imagen'),
+          label: Text(
+            key == null
+                ? context.l10n.diaryChooseImage
+                : context.l10n.diaryChangeImage,
+          ),
         ),
       const SizedBox(height: 10),
       Text(
-        'PNG, JPEG o WEBP. Mismo límite de tamaño que los retratos.',
+        context.l10n.diaryImageFormats,
         style: TextStyle(fontSize: 12, color: pal.textMuted),
       ),
     ];

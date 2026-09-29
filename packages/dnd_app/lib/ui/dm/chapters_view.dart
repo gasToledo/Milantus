@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/app_theme.dart';
 import '../../theme/app_widgets.dart';
+import '../../l10n/l10n_context.dart';
 
 /// Los capítulos de una campaña: lo que se jugó, lo que se está jugando y lo
 /// que viene.
@@ -41,21 +42,19 @@ class ChaptersView extends StatelessWidget {
   Widget build(BuildContext context) {
     if (error != null) {
       return AppErrorView(
-        message: 'No se pudieron leer los capítulos.',
+        message: context.l10n.dmChaptersReadFail,
         details: '$error',
         onRetry: onRetry,
       );
     }
     if (loading) {
-      return const Center(child: AppBusyLabel('Cargando los capítulos…'));
+      return Center(child: AppBusyLabel(context.l10n.dmChaptersLoading));
     }
     final all = chapters ?? const <Chapter>[];
     if (all.isEmpty) {
       return AppEmptyState(
         icon: Icons.auto_stories_outlined,
-        message:
-            'Todavía no dividiste esta campaña en capítulos. Sirven para '
-            'llevar por dónde va la historia.',
+        message: context.l10n.dmChaptersEmpty,
         actions: const [],
       );
     }
@@ -81,7 +80,7 @@ class ChaptersView extends StatelessWidget {
         ])
           if (group.items.isNotEmpty) ...[
             const SizedBox(height: 12),
-            Eyebrow(group.state.label),
+            Eyebrow(group.state.localized(context)),
             const SizedBox(height: 8),
             for (final chapter in group.items)
               Padding(
@@ -105,29 +104,25 @@ class ChaptersView extends StatelessWidget {
   /// Insiste en que la app no aplica nada porque es la única acción del Modo
   /// DM que le escribe algo a otra cuenta, y lo que le escribe es un aviso:
   /// el nivel, el oro y los ítems los anota cada jugador en su ficha.
-  static String _closeMessage(Chapter chapter) {
-    final base =
-        '«${chapter.name}» pasa a completado y a cada jugador de la mesa le '
-        'llega el aviso';
-    if (chapter.grantsLabel.isEmpty) return '$base.';
-    return '$base, con que se llevan ${chapter.grantsLabel}. Eso lo anota '
-        'cada uno en su ficha: la app no se lo aplica a nadie.';
-  }
+  static String _closeMessage(Chapter chapter, AppLocalizations l10n) =>
+      chapter.grantsLabel.isEmpty
+      ? l10n.dmCloseChapterBody(chapter.name)
+      : l10n.dmCloseChapterBodyRewards(chapter.name, chapter.grantsLabel);
 
   Future<void> _confirmClose(BuildContext context, Chapter chapter) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AppDialog(
-        title: 'Cerrar capítulo',
-        content: Text(_closeMessage(chapter)),
+        title: context.l10n.dmCloseChapter,
+        content: Text(_closeMessage(chapter, context.l10n)),
         actions: [
           DialogAction(
-            'Cancelar',
+            context.l10n.commonCancel,
             keyHint: 'Esc',
             onPressed: () => Navigator.of(ctx).pop(false),
           ),
           DialogAction(
-            'Cerrar capítulo',
+            context.l10n.dmCloseChapter,
             primary: true,
             onPressed: () => Navigator.of(ctx).pop(true),
           ),
@@ -143,19 +138,16 @@ class ChaptersView extends StatelessWidget {
       builder: (ctx) => AppDialog(
         icon: Icons.warning_amber_rounded,
         iconColor: context.palette.crimson,
-        title: 'Borrar capítulo',
-        content: Text(
-          'Se borra «${chapter.name}» y lo que hayas escrito en él. A los '
-          'jugadores no les llega nada.',
-        ),
+        title: context.l10n.dmDeleteChapter,
+        content: Text(context.l10n.dmDeleteChapterBody(chapter.name)),
         actions: [
           DialogAction(
-            'Cancelar',
+            context.l10n.commonCancel,
             keyHint: 'Esc',
             onPressed: () => Navigator.of(ctx).pop(false),
           ),
           DialogAction(
-            'Borrar capítulo',
+            context.l10n.dmDeleteChapter,
             primary: true,
             color: context.palette.crimson,
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -220,14 +212,14 @@ class _ChapterCard extends StatelessWidget {
               ),
               if (chapter.grantsLevel) ...[
                 const SizedBox(width: 8),
-                const GoldPill('Sube de nivel'),
+                GoldPill(context.l10n.dmLevelsUp),
               ],
             ],
           ),
           if (chapter.summary.isNotEmpty) ...[
             const SizedBox(height: 8),
             Text(
-              'Objetivo: ${chapter.summary}',
+              context.l10n.dmGoalLine(chapter.summary),
               style: TextStyle(
                 fontSize: 13,
                 color: isDone ? pal.textMuted : null,
@@ -251,8 +243,8 @@ class _ChapterCard extends StatelessWidget {
                   child: Text(
                     // En pasado si ya se cerró: el aviso ya salió.
                     isDone
-                        ? 'Se llevaron ${chapter.rewardsLabel}'
-                        : 'Se llevan ${chapter.rewardsLabel}',
+                        ? context.l10n.dmRewardsTook(chapter.rewardsLabel)
+                        : context.l10n.dmRewardsTake(chapter.rewardsLabel),
                     style: TextStyle(fontSize: 13, color: pal.textMuted),
                   ),
                 ),
@@ -268,30 +260,30 @@ class _ChapterCard extends StatelessWidget {
               TextButton.icon(
                 onPressed: onOpenNotebook,
                 icon: const Icon(Icons.menu_book_outlined),
-                label: const Text('Ver en Cuaderno'),
+                label: Text(context.l10n.dmViewInNotebook),
               ),
               if (chapter.state == ChapterState.planned)
                 FilledButton.icon(
                   onPressed: onStart,
                   icon: const Icon(Icons.play_arrow),
-                  label: const Text('Empezar'),
+                  label: Text(context.l10n.dmStart),
                 ),
               if (isActive)
                 FilledButton.icon(
                   onPressed: onClose,
                   icon: const Icon(Icons.done_all),
-                  label: const Text('Cerrar capítulo'),
+                  label: Text(context.l10n.dmCloseChapter),
                 ),
               if (!isDone)
                 OutlinedButton.icon(
                   onPressed: onEdit,
                   icon: const Icon(Icons.edit_outlined),
-                  label: const Text('Editar'),
+                  label: Text(context.l10n.commonEdit),
                 ),
               TextButton.icon(
                 onPressed: onDelete,
                 icon: const Icon(Icons.delete_outline),
-                label: const Text('Borrar'),
+                label: Text(context.l10n.commonDelete),
                 style: TextButton.styleFrom(foregroundColor: pal.crimson),
               ),
             ],

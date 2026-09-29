@@ -14,6 +14,7 @@ import '../../sheet_screen.dart';
 import 'npc_shared.dart';
 import 'npc_table_view.dart';
 import 'npc_transfer.dart';
+import '../../../l10n/l10n_context.dart';
 
 /// La ficha de un PNJ: quién es, cómo habla, qué se sabe de él, con qué pelea
 /// y cómo está en cada campaña.
@@ -82,11 +83,11 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
     }
   }
 
-  void _report(Object error, [String what = 'No se pudo guardar el cambio']) {
+  void _report(Object error, [String? what]) {
     if (!mounted) return;
     showAppMessage(
       context,
-      failureMessage(what, error),
+      failureMessage(what ?? context.l10n.npcSaveFailed, error),
       tone: AppMessageTone.error,
     );
   }
@@ -138,8 +139,8 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
   Future<void> _rename(NpcEntry entry) async {
     final value = await showTextPromptDialog(
       context,
-      title: 'Editar nombre',
-      label: 'Nombre del PNJ',
+      title: context.l10n.npcEditName,
+      label: context.l10n.npcNameLabel,
       current: entry.npc.name,
       allowEmpty: false,
       textCapitalization: TextCapitalization.words,
@@ -190,8 +191,8 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
   Future<void> _addNote(Npc npc) async {
     final text = await showTextPromptDialog(
       context,
-      title: 'Nueva nota',
-      label: 'Nota',
+      title: context.l10n.npcNewNote,
+      label: context.l10n.invNoteTitle,
       maxLines: 5,
       textCapitalization: TextCapitalization.sentences,
     );
@@ -263,9 +264,9 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
     final picked = await showDialog<Campaign>(
       context: context,
       builder: (ctx) => AppDialog(
-        title: 'Sumar a una campaña',
+        title: context.l10n.npcAddToCampaign,
         content: options.isEmpty
-            ? const Text('Ya está en todas tus campañas.')
+            ? Text(context.l10n.npcInAllCampaigns)
             : Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -278,7 +279,7 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
               ),
         actions: [
           DialogAction(
-            'Cancelar',
+            context.l10n.commonCancel,
             keyHint: 'Esc',
             onPressed: () => Navigator.of(ctx).pop(),
           ),
@@ -296,47 +297,41 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
 
   Future<void> _delete(NpcEntry entry) async {
     final pal = context.palette;
-    final where = entry.campaigns.isEmpty
-        ? 'de tu biblioteca'
-        : 'de tu biblioteca y de '
-              '${entry.campaigns.map((c) => c.campaignName).join(', ')}';
+    final campaigns = entry.campaigns.map((c) => c.campaignName).join(', ');
+    final deleteBody = entry.campaigns.isEmpty
+        ? context.l10n.npcDeleteBodyLibrary
+        : context.l10n.npcDeleteBodyCampaigns(campaigns);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AppDialog(
         icon: Icons.warning_amber_rounded,
         iconColor: pal.crimson,
-        title: 'Borrar a ${entry.npc.name}',
+        title: context.l10n.npcDeleteTitle(entry.npc.name),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Se borra $where, con su ficha, su trasfondo, sus notas y sus '
-              'retratos. No se puede deshacer.',
-            ),
+            Text(deleteBody),
             const SizedBox(height: 10),
             Text(
-              'Las batallas pasadas lo siguen nombrando en el Cuaderno. Si '
-              'está en un combate abierto, su fila queda con el nombre y sin '
-              'perfil.',
+              context.l10n.npcDeletePastBattles,
               style: TextStyle(fontSize: 13, color: pal.textMuted),
             ),
             const SizedBox(height: 10),
             Text(
-              '¿Solo querés sacarlo de una campaña? Usá «Quitar de esta '
-              'campaña» desde la lista de PNJ de esa campaña.',
+              context.l10n.npcDeleteJustUnlink,
               style: TextStyle(fontSize: 13, color: pal.textMuted),
             ),
           ],
         ),
         actions: [
           DialogAction(
-            'Cancelar',
+            context.l10n.commonCancel,
             keyHint: 'Esc',
             onPressed: () => Navigator.of(ctx).pop(false),
           ),
           DialogAction(
-            'Borrar PNJ',
+            context.l10n.npcDelete,
             primary: true,
             color: pal.crimson,
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -350,12 +345,12 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
       if (!mounted) return;
       showAppMessage(
         context,
-        '${entry.npc.name} se borró.',
+        context.l10n.npcDeleted(entry.npc.name),
         tone: AppMessageTone.success,
       );
       Navigator.of(context).pop();
     } catch (error) {
-      _report(error, 'No se pudo borrar el PNJ');
+      _report(error, context.l10n.npcDeleteFailed);
     }
   }
 
@@ -395,11 +390,11 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         // Sin el nombre: ya encabeza la pantalla, más grande y con su lápiz.
-        title: const Text('PNJ'),
+        title: Text(context.l10n.kindNpc),
         actions: [
           if (entry != null) ...[
             IconButton(
-              tooltip: 'Mostrar a la mesa',
+              tooltip: context.l10n.npcShowTable,
               icon: const Icon(Icons.co_present_outlined),
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
@@ -411,7 +406,7 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
               ),
             ),
             PopupMenuButton<_NpcMenuAction>(
-              tooltip: 'Más acciones',
+              tooltip: context.l10n.npcMoreActions,
               onSelected: (action) => switch (action) {
                 _NpcMenuAction.export => exportNpcFlow(
                   context,
@@ -421,12 +416,12 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
                 _NpcMenuAction.delete => _delete(entry),
               },
               itemBuilder: (context) => [
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: _NpcMenuAction.export,
                   child: ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: Icon(Icons.file_upload_outlined),
-                    title: Text('Exportar'),
+                    leading: const Icon(Icons.file_upload_outlined),
+                    title: Text(context.l10n.npcExport),
                   ),
                 ),
                 PopupMenuItem(
@@ -438,7 +433,7 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
                       color: context.palette.crimson,
                     ),
                     title: Text(
-                      'Borrar PNJ',
+                      context.l10n.npcDelete,
                       style: TextStyle(color: context.palette.crimson),
                     ),
                   ),
@@ -455,7 +450,7 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
   Widget _body(BuildContext context) {
     if (_error != null) {
       return AppErrorView(
-        message: 'No se pudo leer el PNJ.',
+        message: context.l10n.npcReadFail,
         details: '$_error',
         onRetry: _load,
       );
@@ -463,14 +458,14 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
     final entry = _entry;
     if (entry == null) {
       return _loading
-          ? const Center(child: AppBusyLabel('Cargando el PNJ…'))
+          ? Center(child: AppBusyLabel(context.l10n.npcLoading))
           : AppEmptyState(
               icon: Icons.person_off_outlined,
-              message: 'Este PNJ ya no existe.',
+              message: context.l10n.npcGone,
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Volver'),
+                  child: Text(context.l10n.commonBack),
                 ),
               ],
             );
@@ -483,27 +478,31 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
           _identity(context, entry),
           _card(
             context,
-            title: 'Cómo habla',
+            title: context.l10n.npcSpeech,
             onEdit: () => _editText(
-              title: 'Cómo habla',
-              label: 'Una o dos líneas para interpretarlo',
+              title: context.l10n.npcSpeech,
+              label: context.l10n.npcSpeechHint,
               current: npc.speech,
               maxLines: 3,
               apply: (v) => npc.copyWith(speech: v),
             ),
-            child: _prose(context, npc.speech, 'Todavía no dice cómo habla.'),
+            child: _prose(context, npc.speech, context.l10n.npcSpeechEmpty),
           ),
           _card(
             context,
-            title: 'Trasfondo',
+            title: context.l10n.stepBackground,
             onEdit: () => _editText(
-              title: 'Trasfondo',
-              label: 'Trasfondo',
+              title: context.l10n.stepBackground,
+              label: context.l10n.stepBackground,
               current: npc.background,
               maxLines: 10,
               apply: (v) => npc.copyWith(background: v),
             ),
-            child: _prose(context, npc.background, 'Sin trasfondo.'),
+            child: _prose(
+              context,
+              npc.background,
+              context.l10n.npcNoBackground,
+            ),
           ),
           _notes(context, npc),
         ];
@@ -542,7 +541,7 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
           // ficha completa ya no ofrece la suya. El ícono sobre el aro es lo
           // que avisa que el medallón se toca.
           Tooltip(
-            message: 'Retrato',
+            message: context.l10n.npcPortrait,
             child: InkWell(
               onTap: () => _openPortrait(entry),
               customBorder: const CircleBorder(),
@@ -591,7 +590,7 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
                       ),
                     ),
                     IconButton(
-                      tooltip: 'Editar nombre',
+                      tooltip: context.l10n.npcEditName,
                       icon: const Icon(Icons.edit_outlined, size: 18),
                       onPressed: () => _rename(entry),
                     ),
@@ -603,7 +602,9 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
                   runSpacing: 6,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    GoldPill(npcTypeLine(npc, entry.sheet, widget.repo)),
+                    GoldPill(
+                      npcTypeLine(npc, entry.sheet, widget.repo, context.l10n),
+                    ),
                     for (final tag in npc.tags)
                       InputChip(
                         label: Text(tag),
@@ -620,12 +621,14 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
                             ],
                           ),
                         ),
-                        deleteButtonTooltipMessage: 'Quitar «$tag»',
+                        deleteButtonTooltipMessage: context.l10n.npcRemoveTag(
+                          tag,
+                        ),
                       ),
                     TextButton.icon(
                       onPressed: () => _addTag(npc),
                       icon: const Icon(Icons.add, size: 16),
-                      label: const Text('Tag'),
+                      label: Text(context.l10n.npcTagWord),
                     ),
                   ],
                 ),
@@ -677,7 +680,7 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
               ?trailing,
               if (onEdit != null)
                 IconButton(
-                  tooltip: 'Editar ${title.toLowerCase()}',
+                  tooltip: context.l10n.npcEditTitle(title.toLowerCase()),
                   icon: const Icon(Icons.edit_outlined, size: 18),
                   onPressed: onEdit,
                 ),
@@ -694,14 +697,14 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
     final pal = context.palette;
     return _card(
       context,
-      title: 'Notas',
+      title: context.l10n.npcNotesWord,
       trailing: TextButton.icon(
         onPressed: () => _addNote(npc),
         icon: const Icon(Icons.add, size: 16),
-        label: const Text('Agregar nota'),
+        label: Text(context.l10n.npcAddNote),
       ),
       child: npc.notes.isEmpty
-          ? _prose(context, '', 'Sin notas.')
+          ? _prose(context, '', context.l10n.npcNoNotes)
           : Column(
               children: [
                 for (final note in npc.notes)
@@ -734,7 +737,7 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
                           ),
                         ),
                         IconButton(
-                          tooltip: 'Borrar nota',
+                          tooltip: context.l10n.dmDeleteNote,
                           icon: const Icon(Icons.close, size: 16),
                           onPressed: () => _save(
                             npc.copyWith(
@@ -760,23 +763,18 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
       case NpcSheetKind.none:
         return _card(
           context,
-          title: 'Estadísticas',
-          child: _prose(
-            context,
-            '',
-            'Sin estadísticas. En combate entra como neutral, con turno y '
-                'sin PG.',
-          ),
+          title: context.l10n.npcStats,
+          child: _prose(context, '', context.l10n.npcNoStatsNote),
         );
       case NpcSheetKind.block:
         final block = npc.block ?? emptyNpcBlock(npc.name);
         return _card(
           context,
-          title: 'Bloque',
+          title: context.l10n.npcBlockTitle,
           trailing: npc.baseCreatureName == null
               ? null
               : Text(
-                  'basado en ${npc.baseCreatureName}',
+                  context.l10n.npcBasedOn(npc.baseCreatureName!),
                   style: TextStyle(fontSize: 12, color: pal.textMuted),
                 ),
           child: Column(
@@ -785,12 +783,15 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: StatPlaque(label: 'CA', value: block.ac),
+                    child: StatPlaque(
+                      label: context.l10n.creatureAcShort,
+                      value: block.ac,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: StatPlaque(
-                      label: 'PG',
+                      label: context.l10n.dmAbbrHp,
                       value: block.hp,
                       valueColor: pal.crimson,
                     ),
@@ -799,7 +800,7 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: StatPlaque(
-                        label: 'VD',
+                        label: context.l10n.challengeRatingShort,
                         value: challengeRatingLabel(block.cr!),
                       ),
                     ),
@@ -834,12 +835,11 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
               FilledButton.icon(
                 onPressed: () => _editBlock(npc),
                 icon: const Icon(Icons.edit_outlined),
-                label: const Text('Editar bloque'),
+                label: Text(context.l10n.npcEditBlock),
               ),
               const SizedBox(height: 8),
               Text(
-                'Es una copia: si la criatura del bestiario cambia, este '
-                'bloque no se toca.',
+                context.l10n.npcBlockCopyNote,
                 style: TextStyle(fontSize: 11.5, color: pal.textMuted),
               ),
             ],
@@ -849,9 +849,9 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
         final sheet = entry.sheet;
         return _card(
           context,
-          title: 'Ficha',
+          title: context.l10n.npcSheetTitle,
           child: sheet == null
-              ? _prose(context, '', 'No se pudo leer su ficha.')
+              ? _prose(context, '', context.l10n.npcSheetReadFail)
               // Especie, clase y nivel ya están en la pill bajo el nombre; acá
               // solo va lo que se hace con la ficha.
               : Column(
@@ -860,12 +860,11 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
                     FilledButton.icon(
                       onPressed: () => _openSheet(sheet),
                       icon: const Icon(Icons.open_in_new),
-                      label: const Text('Abrir ficha completa'),
+                      label: Text(context.l10n.npcOpenFullSheet),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Nombre, retrato, trasfondo y notas se editan acá; la '
-                      'ficha completa es para estadísticas, equipo y niveles.',
+                      context.l10n.npcFullSheetNote,
                       style: TextStyle(fontSize: 11.5, color: pal.textMuted),
                     ),
                   ],
@@ -877,12 +876,12 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
   Widget _campaigns(BuildContext context, NpcEntry entry) {
     return _card(
       context,
-      title: 'En tus campañas',
+      title: context.l10n.npcInCampaigns,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (entry.campaigns.isEmpty)
-            _prose(context, '', 'Todavía no está en ninguna campaña.'),
+            _prose(context, '', context.l10n.npcNoCampaignsYet),
           for (final link in entry.campaigns)
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
@@ -893,7 +892,7 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
                   const SizedBox(height: 6),
                   NpcStatusSelector(
                     status: link.status,
-                    semanticLabel: 'Estado en ${link.campaignName}',
+                    semanticLabel: context.l10n.npcStatusIn(link.campaignName),
                     onChanged: (s) => _setStatus(link.campaignId, s),
                   ),
                 ],
@@ -902,7 +901,7 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
           OutlinedButton.icon(
             onPressed: () => _linkToCampaign(entry),
             icon: const Icon(Icons.add),
-            label: const Text('Sumar a otra campaña'),
+            label: Text(context.l10n.npcAddToAnother),
           ),
         ],
       ),
@@ -937,7 +936,7 @@ class _TagDialogState extends State<_TagDialog> {
         if (tag.toLowerCase().contains(query)) tag,
     ];
     return AppDialog(
-      title: 'Agregar tag',
+      title: context.l10n.npcAddTag,
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -945,7 +944,7 @@ class _TagDialogState extends State<_TagDialog> {
           TextField(
             controller: _controller,
             autofocus: true,
-            decoration: const InputDecoration(labelText: 'Tag'),
+            decoration: InputDecoration(labelText: context.l10n.npcTagWord),
             onChanged: (_) => setState(() {}),
             onSubmitted: (v) => Navigator.of(context).pop(v),
           ),
@@ -967,12 +966,12 @@ class _TagDialogState extends State<_TagDialog> {
       ),
       actions: [
         DialogAction(
-          'Cancelar',
+          context.l10n.commonCancel,
           keyHint: 'Esc',
           onPressed: () => Navigator.of(context).pop(),
         ),
         DialogAction(
-          'Agregar',
+          context.l10n.commonAdd,
           primary: true,
           onPressed: () => Navigator.of(context).pop(_controller.text),
         ),

@@ -12,7 +12,9 @@ const _colEquipped = 76.0;
 const _colWeight = 76.0;
 const _colMenu = 44.0;
 
+// l10n-ignore: identificadores de filtro, no texto; lo visible sale de itemFilterText.
 const _invFilterEquipped = 'Equipados';
+// l10n-ignore: idem.
 const _invFilterMagic = 'Mágicos';
 
 /// Ícono por familia de objeto. Es lo único que distingue el tipo dentro de un
@@ -52,7 +54,7 @@ extension _SheetInventorySection on _SheetScreenState {
   /// justo el que necesitaban la barra de carga y los cupos.
   Widget _bagCard() => sheetCard(
     icon: Icons.savings_outlined,
-    title: 'Bolsa',
+    title: context.l10n.commonBag,
     child: Padding(
       padding: const EdgeInsets.all(16),
       child: responsiveColumns([
@@ -80,7 +82,7 @@ extension _SheetInventorySection on _SheetScreenState {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Eyebrow('Monedas'),
+        Eyebrow(context.l10n.invCoins),
         Wrap(
           spacing: 9,
           runSpacing: 9,
@@ -92,9 +94,9 @@ extension _SheetInventorySection on _SheetScreenState {
         Text.rich(
           TextSpan(
             children: [
-              const TextSpan(text: 'Equivale a '),
+              TextSpan(text: context.l10n.invCoinsEquals),
               TextSpan(text: formatPounds(totalCp / 100), style: strong),
-              const TextSpan(text: ' po · pesan '),
+              TextSpan(text: context.l10n.invCoinsWeigh),
               TextSpan(
                 text: formatPounds(count / coinsPerPound),
                 style: strong,
@@ -118,9 +120,9 @@ extension _SheetInventorySection on _SheetScreenState {
   /// quien no lo ve.
   Widget _coinField(String key) {
     final pal = context.palette;
-    final abbr = coinLabels[key]!.toUpperCase();
+    final abbr = coinAbbr(context.l10n, key).toUpperCase();
     return Semantics(
-      label: 'Monedas de ${coinNames[key]} ($abbr)',
+      label: context.l10n.invCoinLabel(coinName(context.l10n, key), abbr),
       child: Container(
         width: 100,
         padding: const EdgeInsets.fromLTRB(10, 7, 10, 2),
@@ -147,7 +149,7 @@ extension _SheetInventorySection on _SheetScreenState {
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    coinNames[key]!,
+                    coinName(context.l10n, key),
                     textAlign: TextAlign.end,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -213,10 +215,10 @@ extension _SheetInventorySection on _SheetScreenState {
     final over = s.isEncumbered;
     final color = over ? pal.crimson : pal.gold;
     return StatTile(
-      label: 'Carga',
+      label: context.l10n.invLoad,
       labelTrailing: cap <= 0
           ? null
-          : '${(s.carriedWeight / cap * 100).round()}% de la capacidad',
+          : context.l10n.invLoadPercent((s.carriedWeight / cap * 100).round()),
       value: formatPounds(s.carriedWeight),
       suffix: ' / $cap lb',
       valueColor: color,
@@ -229,10 +231,13 @@ extension _SheetInventorySection on _SheetScreenState {
             spacing: 12,
             runSpacing: 4,
             children: [
-              _loadLegend(color, 'Objetos ${formatPounds(itemsWeight)} lb'),
+              _loadLegend(
+                color,
+                context.l10n.invLoadItems(formatPounds(itemsWeight)),
+              ),
               _loadLegend(
                 pal.textMuted,
-                'Monedas ${formatPounds(coinWeight)} lb',
+                context.l10n.invLoadCoins(formatPounds(coinWeight)),
               ),
             ],
           ),
@@ -246,8 +251,7 @@ extension _SheetInventorySection on _SheetScreenState {
                   const SizedBox(width: 7),
                   Expanded(
                     child: Text(
-                      'Pasás tu capacidad de carga. En 2024 no hay penalización '
-                      'de reglas: es un aviso, no un bloqueo.',
+                      context.l10n.invOverCapacity,
                       style: TextStyle(
                         fontSize: 12,
                         height: 1.45,
@@ -350,7 +354,7 @@ extension _SheetInventorySection on _SheetScreenState {
             children: [
               Expanded(
                 child: Text(
-                  'SINTONIZACIÓN',
+                  context.l10n.invAttunementUpper,
                   style: TextStyle(
                     fontSize: 11,
                     letterSpacing: 1.1,
@@ -382,8 +386,7 @@ extension _SheetInventorySection on _SheetScreenState {
           ),
           const SizedBox(height: 8),
           Text(
-            'Se sintoniza desde el menú de cada objeto; acá se ve cuántos cupos '
-            'quedan y con qué están ocupados.',
+            context.l10n.invAttunementHint,
             style: TextStyle(
               fontSize: 11.5,
               height: 1.45,
@@ -399,7 +402,9 @@ extension _SheetInventorySection on _SheetScreenState {
     final pal = context.palette;
     final free = name == null;
     return Tooltip(
-      message: free ? 'Cupo de sintonización libre' : '$name — sintonizado',
+      message: free
+          ? context.l10n.invAttuneSlotFree
+          : context.l10n.invAttunedName(name),
       child: Container(
         height: 26,
         alignment: Alignment.center,
@@ -410,7 +415,7 @@ extension _SheetInventorySection on _SheetScreenState {
           border: Border.all(color: free ? pal.hairline : pal.gold),
         ),
         child: Text(
-          free ? 'Cupo libre' : name,
+          free ? context.l10n.invSlotFree : name,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
@@ -446,7 +451,7 @@ extension _SheetInventorySection on _SheetScreenState {
   }
 
   /// Agrupa por la misma familia que ya calcula el catálogo, en el orden de
-  /// [itemGroupTitles]. Las familias desconocidas van al final, en el orden en que
+  /// [itemGroupOrder]. Las familias desconocidas van al final, en el orden en que
   /// aparecen.
   List<({String title, List<_Line> lines})> _grouped(List<_Line> lines) {
     final byKind = <String, List<_Line>>{};
@@ -454,12 +459,12 @@ extension _SheetInventorySection on _SheetScreenState {
       byKind.putIfAbsent(line.info.kindLabel, () => []).add(line);
     }
     final order = [
-      ...(itemGroupTitles.keys.where(byKind.containsKey)),
-      ...byKind.keys.where((k) => !itemGroupTitles.containsKey(k)),
+      ...itemGroupOrder.where(byKind.containsKey),
+      ...byKind.keys.where((k) => !itemGroupOrder.contains(k)),
     ];
     return [
       for (final kind in order)
-        (title: itemGroupTitles[kind] ?? kind, lines: byKind[kind]!),
+        (title: itemGroupTitle(context.l10n, kind), lines: byKind[kind]!),
     ];
   }
 
@@ -468,7 +473,7 @@ extension _SheetInventorySection on _SheetScreenState {
     final lines = _visibleLines;
     return sheetCard(
       icon: Icons.backpack,
-      title: 'Inventario',
+      title: context.l10n.invTitle,
       trailing: total == 0
           ? null
           : GoldPill(
@@ -486,7 +491,7 @@ extension _SheetInventorySection on _SheetScreenState {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Text(
-                  'La mochila está vacía.',
+                  context.l10n.invEmpty,
                   style: TextStyle(
                     fontSize: 13,
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -530,16 +535,17 @@ extension _SheetInventorySection on _SheetScreenState {
                   OutlinedButton.icon(
                     onPressed: _addInventoryItem,
                     icon: const Icon(Icons.add, size: 18),
-                    label: const Text('Agregar objeto'),
+                    label: Text(context.l10n.catalogAddTitle),
                   ),
                   if (sheet.itemChoiceSlots.isNotEmpty)
                     OutlinedButton.icon(
                       onPressed: _manageMagicItemPlans,
                       icon: const Icon(Icons.auto_fix_high, size: 18),
                       label: Text(
-                        'Planos y réplicas '
-                        '(${_c.magicItemChoices.length}/'
-                        '${sheet.itemChoiceSlots.first.count})',
+                        context.l10n.invPlansButton(
+                          _c.magicItemChoices.length,
+                          sheet.itemChoiceSlots.first.count,
+                        ),
                       ),
                     ),
                   for (final slot in sheet.targetChoiceSlots)
@@ -572,10 +578,10 @@ extension _SheetInventorySection on _SheetScreenState {
         width: 240,
         child: TextField(
           controller: _invSearchCtrl,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             isDense: true,
             prefixIcon: Icon(Icons.search, size: 18),
-            hintText: 'Buscar en la mochila…',
+            hintText: context.l10n.invSearchHint,
             border: OutlineInputBorder(),
           ),
           onChanged: _searchInventory,
@@ -587,7 +593,7 @@ extension _SheetInventorySection on _SheetScreenState {
         _invFilterMagic,
       ])
         ChoiceChip(
-          label: Text(filter),
+          label: Text(itemFilterText(context.l10n, filter)),
           selected: _invFilter == filter,
           showCheckmark: false,
           onSelected: (_) => _filterInventory(filter),
@@ -605,7 +611,7 @@ extension _SheetInventorySection on _SheetScreenState {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Ningún objeto coincide con ese filtro.',
+              context.l10n.invNoMatches,
               style: TextStyle(fontSize: 13, color: muted),
             ),
           ),
@@ -624,18 +630,30 @@ extension _SheetInventorySection on _SheetScreenState {
       padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
       child: Row(
         children: [
-          Expanded(child: Text('OBJETO', style: style)),
+          Expanded(child: Text(context.l10n.invHeadItem, style: style)),
           SizedBox(
             width: _colQuantity,
-            child: Text('CANT.', style: style, textAlign: TextAlign.center),
+            child: Text(
+              context.l10n.invHeadQty,
+              style: style,
+              textAlign: TextAlign.center,
+            ),
           ),
           SizedBox(
             width: _colEquipped,
-            child: Text('EQUIPADO', style: style, textAlign: TextAlign.center),
+            child: Text(
+              context.l10n.invHeadEquipped,
+              style: style,
+              textAlign: TextAlign.center,
+            ),
           ),
           SizedBox(
             width: _colWeight,
-            child: Text('PESO', style: style, textAlign: TextAlign.end),
+            child: Text(
+              context.l10n.invHeadWeight,
+              style: style,
+              textAlign: TextAlign.end,
+            ),
           ),
           const SizedBox(width: _colMenu),
         ],
@@ -743,7 +761,7 @@ extension _SheetInventorySection on _SheetScreenState {
               if (info.equippable) _equippedControl(e, info, withLabel: true),
               Text(
                 info.weight == 0
-                    ? 'Sin peso'
+                    ? context.l10n.invNoWeight
                     : '${formatPounds(info.weight * e.quantity)} lb',
                 style: TextStyle(
                   fontSize: 12,
@@ -775,7 +793,7 @@ extension _SheetInventorySection on _SheetScreenState {
       children: [
         _stepButton(
           Icons.remove,
-          'Quitar una unidad de ${info.name}',
+          context.l10n.invRemoveOne(info.name),
           e.quantity > 1 ? () => set(e.quantity - 1) : null,
         ),
         SizedBox(
@@ -790,7 +808,7 @@ extension _SheetInventorySection on _SheetScreenState {
         ),
         _stepButton(
           Icons.add,
-          'Agregar una unidad de ${info.name}',
+          context.l10n.invAddOne(info.name),
           () => set(e.quantity + 1),
         ),
       ],
@@ -837,7 +855,9 @@ extension _SheetInventorySection on _SheetScreenState {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            max == 0 ? '$left cargas' : 'Cargas $left/$max',
+            max == 0
+                ? context.l10n.invCharges(left)
+                : context.l10n.invChargesOf(left, max),
             key: ValueKey('charges-${e.entryId}'),
             style: TextStyle(
               fontSize: 12,
@@ -846,8 +866,8 @@ extension _SheetInventorySection on _SheetScreenState {
             ),
           ),
           SpendRecoverButtons(
-            spendTooltip: 'Gastar una carga de ${info.name}',
-            recoverTooltip: 'Recuperar una carga de ${info.name}',
+            spendTooltip: context.l10n.invSpendCharge(info.name),
+            recoverTooltip: context.l10n.invRecoverCharge(info.name),
             onSpend: left <= 0 ? null : () => set(left - 1),
             onRecover: max != 0 && left >= max ? null : () => set(left + 1),
           ),
@@ -864,9 +884,9 @@ extension _SheetInventorySection on _SheetScreenState {
     // El nombre solo no alcanza cuando el SRD repite uno (Vara es a la vez
     // equipo y canalizador arcano), así que la categoría va debajo siempre.
     final detail = <String>[
-      info.kindLabel,
-      if (info.bundleSize > 1) 'paquete de ${info.bundleSize}',
-      if (info.rangeHint != null) 'alcance ${info.rangeHint}',
+      itemKindText(context.l10n, info.kindLabel),
+      if (info.bundleSize > 1) context.l10n.catalogBundleOf(info.bundleSize),
+      if (info.rangeHint != null) context.l10n.invRangeHint(info.rangeHint!),
       if (info.twoHandedHint != null) info.twoHandedHint!,
     ].join(' · ');
     return Row(
@@ -905,16 +925,16 @@ extension _SheetInventorySection on _SheetScreenState {
                           Icon(
                             Icons.info_outline,
                             size: 14,
-                            semanticLabel: 'Ver qué hace',
+                            semanticLabel: context.l10n.invSeeWhatItDoes,
                             color: context.palette.textMuted,
                           ),
                         ],
                       ),
                     ),
                   if (e.attuned && info.attunable)
-                    const GoldPill('Sintonizado'),
+                    GoldPill(context.l10n.invAttuned),
                   if (info.replica)
-                    const GoldPill('Réplica', highlighted: false),
+                    GoldPill(context.l10n.invReplica, highlighted: false),
                   for (final slot in sheet.targetChoiceSlots)
                     if (slot.chosenEntryIds.contains(e.entryId))
                       GoldPill(slot.name, highlighted: false),
@@ -950,7 +970,7 @@ extension _SheetInventorySection on _SheetScreenState {
       return withLabel
           ? const SizedBox.shrink()
           : Tooltip(
-              message: 'No se equipa',
+              message: context.l10n.invNotEquippable,
               child: Center(
                 child: Text(
                   '—',
@@ -968,7 +988,7 @@ extension _SheetInventorySection on _SheetScreenState {
     if (!withLabel) return Center(child: box);
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children: [box, const Text('Equipado')],
+      children: [box, Text(context.l10n.invEquipped)],
     );
   }
 
@@ -978,37 +998,42 @@ extension _SheetInventorySection on _SheetScreenState {
     final weapon = InventoryOps.resolve(e, repo).weapon;
     return PopupMenuButton<String>(
       key: ValueKey('menu-${e.entryId}'),
-      tooltip: 'Acciones de ${info.name}',
+      tooltip: context.l10n.cardActionsTooltip(info.name),
       icon: const Icon(Icons.more_vert, size: 18),
       onSelected: (action) => _runItemAction(action, e),
       itemBuilder: (_) => [
-        const PopupMenuItem(value: 'quantity', child: Text('Cantidad exacta…')),
-        const PopupMenuItem(value: 'note', child: Text('Nota…')),
+        PopupMenuItem(
+          value: 'quantity',
+          child: Text(context.l10n.invExactQuantity),
+        ),
+        PopupMenuItem(value: 'note', child: Text(context.l10n.invNote)),
         if (info.attunable)
           CheckedPopupMenuItem(
             value: 'attune',
             checked: e.attuned,
-            child: Text(e.attuned ? 'Quitar sintonización' : 'Sintonizar'),
+            child: Text(
+              e.attuned ? context.l10n.invUnattune : context.l10n.invAttune,
+            ),
           ),
         if (weapon != null && weapon.isLight)
           CheckedPopupMenuItem(
             value: 'off-hand',
             checked: _c.weaponOffHand[e.itemId] ?? false,
-            child: const Text('Mano secundaria'),
+            child: Text(context.l10n.combatOffHand),
           ),
         if (weapon?.versatileDice != null)
           CheckedPopupMenuItem(
             value: 'two-handed',
             checked: _c.weaponTwoHanded[e.itemId] ?? false,
-            child: const Text('A dos manos'),
+            child: Text(context.l10n.invTwoHanded),
           ),
         if (info.replica)
-          const PopupMenuItem(
+          PopupMenuItem(
             value: 'transmute',
-            child: Text('Transmutar réplica…'),
+            child: Text(context.l10n.invTransmute),
           ),
-        const PopupMenuItem(value: 'sell', child: Text('Vender…')),
-        const PopupMenuItem(value: 'remove', child: Text('Quitar')),
+        PopupMenuItem(value: 'sell', child: Text(context.l10n.invSellMenu)),
+        PopupMenuItem(value: 'remove', child: Text(context.l10n.invRemove)),
       ],
     );
   }
@@ -1019,10 +1044,10 @@ extension _SheetInventorySection on _SheetScreenState {
         final info = _itemInfo(e);
         final raw = await showTextPromptDialog(
           context,
-          title: 'Cantidad',
+          title: context.l10n.tradeQuantity,
           label: info.bundleSize > 1
-              ? 'Paquetes de ${info.bundleSize}'
-              : 'Unidades',
+              ? context.l10n.invBundlesOf(info.bundleSize)
+              : context.l10n.invUnits,
           current: '${e.quantity}',
           keyboardType: TextInputType.number,
         );
@@ -1032,8 +1057,8 @@ extension _SheetInventorySection on _SheetScreenState {
       case 'note':
         final note = await showTextPromptDialog(
           context,
-          title: 'Nota',
-          label: 'Qué dice, de dónde salió, para qué sirve',
+          title: context.l10n.invNoteTitle,
+          label: context.l10n.invNoteLabel,
           current: e.note,
           allowEmpty: true,
           maxLines: 4,
@@ -1078,7 +1103,7 @@ extension _SheetInventorySection on _SheetScreenState {
         );
         showAppMessage(
           context,
-          'Quitaste ${info.name}.',
+          context.l10n.invRemoved(info.name),
           onUndo: () => _replace(antes),
         );
     }
@@ -1089,7 +1114,7 @@ extension _SheetInventorySection on _SheetScreenState {
     // los tres diálogos que quedaron con el molde de Material cuando la
     // aplicación pasó al suyo.
     final itemId = await _pickFromList<String>(
-      title: 'Transmutar en',
+      title: context.l10n.invTransmuteInto,
       options: [
         for (final id in _c.magicItemChoices)
           if (id != entry.itemId) id,
@@ -1140,8 +1165,7 @@ extension _SheetInventorySection on _SheetScreenState {
       purseCp: () => CoinOps.totalCp(_c.coins),
       onAdd: (id) => _replace(InventoryOps.add(_c, id)),
       onBuy: _buyFromCatalog,
-      hint:
-          'Agregar es gratis y deja seguir sumando; comprar paga de la bolsa.',
+      hint: context.l10n.invCatalogHint,
     ),
   );
 
@@ -1154,7 +1178,7 @@ extension _SheetInventorySection on _SheetScreenState {
       context: context,
       builder: (_) => TradeDialog(
         buying: true,
-        title: 'Comprar ${row.name}',
+        title: context.l10n.invBuyTitle(row.name),
         detail: row.detail,
         bundleSize: repo.item(row.id)?.bundleSize ?? 1,
         catalogCp: row.costCp,
@@ -1175,8 +1199,11 @@ extension _SheetInventorySection on _SheetScreenState {
     _replace(next);
     showAppMessage(
       context,
-      'Compraste ${trade.quantity} × ${row.name} por '
-      '${CoinOps.formatAmount(trade.totalCp)}.',
+      context.l10n.invBought(
+        trade.quantity,
+        row.name,
+        CoinOps.formatAmount(trade.totalCp),
+      ),
       onUndo: () => _replace(antes),
     );
     return true;
@@ -1189,10 +1216,11 @@ extension _SheetInventorySection on _SheetScreenState {
       context: context,
       builder: (_) => TradeDialog(
         buying: false,
-        title: 'Vender ${info.name}',
-        detail:
-            'Tenés ${e.quantity} · catálogo '
-            '${formatCost(InventoryOps.resolve(e, repo).costCp)}',
+        title: context.l10n.invSellTitle(info.name),
+        detail: context.l10n.invSellDetail(
+          e.quantity,
+          formatCost(InventoryOps.resolve(e, repo).costCp),
+        ),
         bundleSize: info.bundleSize,
         catalogCp: InventoryOps.suggestedSalePriceCp(e, repo),
         maxQuantity: e.quantity,
@@ -1213,8 +1241,11 @@ extension _SheetInventorySection on _SheetScreenState {
     );
     showAppMessage(
       context,
-      'Vendiste ${trade.quantity} × ${info.name} por '
-      '${CoinOps.formatAmount(trade.totalCp)}.',
+      context.l10n.invSold(
+        trade.quantity,
+        info.name,
+        CoinOps.formatAmount(trade.totalCp),
+      ),
       onUndo: () => _replace(antes),
     );
   }
@@ -1261,18 +1292,17 @@ extension _SheetInventorySection on _SheetScreenState {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Elegí un ejemplar de la mochila o creá uno de los '
-                      'permitidos por el rasgo.',
+                      context.l10n.invTargetHint,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Eyebrow('En la mochila'),
+                    Eyebrow(context.l10n.invInPack),
                     if (existing.isEmpty)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 10),
-                        child: Text('No hay ejemplares elegibles.'),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Text(context.l10n.invNoEligible),
                       )
                     else
                       for (final entry in existing)
@@ -1286,7 +1316,7 @@ extension _SheetInventorySection on _SheetScreenState {
                           ),
                           title: Text(InventoryOps.resolve(entry, repo).name),
                           subtitle: entry.origin == 'effect-target:$groupId'
-                              ? const Text('Creada por este rasgo')
+                              ? Text(context.l10n.invCreatedByFeature)
                               : null,
                           enabled: chosen.contains(entry.entryId) || canReplace,
                           onTap: chosen.contains(entry.entryId) || !canReplace
@@ -1302,14 +1332,14 @@ extension _SheetInventorySection on _SheetScreenState {
                         ),
                     if (slot.creatableWeaponIds.isNotEmpty) ...[
                       const Divider(height: 28),
-                      const Eyebrow('Crear arma'),
+                      Eyebrow(context.l10n.invCreateWeapon),
                       for (final weaponId in slot.creatableWeaponIds)
                         ListTile(
                           key: ValueKey('target-create-$groupId-$weaponId'),
                           contentPadding: EdgeInsets.zero,
                           leading: const Icon(Icons.add_circle_outline),
                           title: Text(repo.weapon(weaponId)?.name ?? weaponId),
-                          subtitle: const Text('Agregar y equipar'),
+                          subtitle: Text(context.l10n.invAddAndEquip),
                           enabled: canReplace,
                           onTap: !canReplace
                               ? null
@@ -1331,13 +1361,13 @@ extension _SheetInventorySection on _SheetScreenState {
             actions: [
               if (chosen.isNotEmpty && slot.replaceable)
                 DialogAction(
-                  'Limpiar vínculo',
+                  context.l10n.invClearLink,
                   color: context.palette.crimson,
                   onPressed: () =>
                       apply(InventoryOps.clearEffectTargets(_c, groupId)),
                 ),
               DialogAction(
-                'Cerrar',
+                context.l10n.commonClose,
                 keyHint: 'Esc',
                 primary: true,
                 onPressed: () => Navigator.pop(context),
@@ -1383,10 +1413,7 @@ extension _SheetInventorySection on _SheetScreenState {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Elegís ${slot.count} planos. Después decidís cuál '
-                    'replicar: podés tener ${slot.maxActive} '
-                    '${slot.maxActive == 1 ? 'réplica activa' : 'réplicas activas'} '
-                    'a la vez.',
+                    context.l10n.invPlansIntro(slot.count, slot.maxActive),
                     style: TextStyle(
                       fontSize: 12.5,
                       height: 1.5,
@@ -1413,7 +1440,7 @@ extension _SheetInventorySection on _SheetScreenState {
                   const SizedBox(height: 16),
                   const Divider(height: 1),
                   const SizedBox(height: 14),
-                  const Eyebrow('Réplicas activas'),
+                  Eyebrow(context.l10n.invActiveReplicas),
                   _replicaBlock(slot, apply),
                   // El aviso de cupo vive en el cuerpo y no en el pie: la
                   // barra de acciones es de celdas que se tocan, y un texto
@@ -1421,7 +1448,7 @@ extension _SheetInventorySection on _SheetScreenState {
                   if (missing > 0) ...[
                     const SizedBox(height: 12),
                     Text(
-                      'Falta elegir $missing.',
+                      context.l10n.invPlansMissing(missing),
                       style: TextStyle(
                         fontSize: 12,
                         color: context.palette.gold,
@@ -1433,7 +1460,7 @@ extension _SheetInventorySection on _SheetScreenState {
             ),
             actions: [
               DialogAction(
-                'Listo',
+                context.l10n.commonDone,
                 primary: true,
                 keyHint: 'Esc',
                 onPressed: () => Navigator.pop(context),
@@ -1476,7 +1503,7 @@ extension _SheetInventorySection on _SheetScreenState {
     final chosen = _c.magicItemChoices;
     if (chosen.isEmpty) {
       return Text(
-        'Elegí un plano para poder replicarlo.',
+        context.l10n.invPickBlueprint,
         style: TextStyle(fontSize: 12.5, color: context.palette.textMuted),
       );
     }
@@ -1499,8 +1526,8 @@ extension _SheetInventorySection on _SheetScreenState {
         const SizedBox(height: 10),
         Text(
           free > 0
-              ? 'Quedan $free ${free == 1 ? 'cupo libre' : 'cupos libres'}.'
-              : 'Sin cupos libres: quitá una réplica para crear otra.',
+              ? context.l10n.invReplicaSlotsLeft(free)
+              : context.l10n.invReplicaNoSlots,
           style: TextStyle(fontSize: 12, color: context.palette.textMuted),
         ),
       ],
@@ -1530,7 +1557,7 @@ extension _SheetInventorySection on _SheetScreenState {
           ),
         ),
         deleteIcon: const Icon(Icons.close, size: 16),
-        deleteButtonTooltipMessage: 'Quitar la réplica de $name',
+        deleteButtonTooltipMessage: context.l10n.invRemoveReplica(name),
       );
     }
     return ActionChip(
@@ -1540,8 +1567,8 @@ extension _SheetInventorySection on _SheetScreenState {
       // planos elegidos no debería cambiar de largo según cuántas réplicas haya.
       onPressed: hasFreeSlot ? () => _createReplica(id, apply) : null,
       tooltip: hasFreeSlot
-          ? 'Crear la réplica de $name'
-          : 'No quedan cupos de réplica',
+          ? context.l10n.invCreateReplica(name)
+          : context.l10n.invNoReplicaSlots,
     );
   }
 
@@ -1581,7 +1608,7 @@ extension _SheetInventorySection on _SheetScreenState {
     // resuelve su propio alto, que es lo que pide una lista con todas las
     // armas del catálogo.
     return _pickFromList<String>(
-      title: 'Elegí el objeto base',
+      title: context.l10n.invPickBase,
       options: ids,
       label: (id) => repo.catalogEntry(id)?.name ?? id,
     );
@@ -1601,7 +1628,8 @@ extension _SheetInventorySection on _SheetScreenState {
       // avisar sería peor que mostrarle una línea incompleta.
       return _ItemInfo(
         name: e.itemId,
-        kindLabel: 'No está en el catálogo',
+        kindLabel:
+            'No está en el catálogo', // l10n-ignore: identificador; se muestra con itemGroupTitle
         icon: Icons.help_outline,
         weight: 0,
         bundleSize: 1,
@@ -1641,8 +1669,8 @@ extension _SheetInventorySection on _SheetScreenState {
           ? null
           // La lanza de caballería es el único caso: montado deja de exigirlas.
           : weapon.twoHandedUnlessMounted
-          ? 'exige dos manos salvo montado'
-          : 'exige dos manos',
+          ? context.l10n.invTwoHandedMounted
+          : context.l10n.invTwoHandedHint,
     );
   }
 }

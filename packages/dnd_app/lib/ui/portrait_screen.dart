@@ -14,6 +14,7 @@ import '../theme/app_theme.dart';
 import '../theme/app_widgets.dart';
 import '../theme/class_visuals.dart';
 import 'portrait_image.dart';
+import '../l10n/l10n_context.dart';
 
 /// Cómo se consigue el retrato. Antes los dos caminos convivían apilados en el
 /// mismo formulario, con el de archivo arriba de todo y separado por una regla
@@ -27,6 +28,7 @@ enum _PortraitMode { ia, upload }
 ///
 /// Se busca por nombre y no por posición para que reordenar [portraitStyles] no
 /// mezcle los colores; un estilo sin entrada cae en [_fallbackSwatch].
+// l10n-ignore: claves de estilo (identificadores que viajan en el prompt); lo visible sale de _styleLabel.
 const _styleSwatches = <String, (Color, Color)>{
   'Arte digital de fantasía': (Color(0xFF7A5CFF), Color(0xFF241A4A)),
   'Óleo clásico': (Color(0xFF8A5A2B), Color(0xFF2A1A0E)),
@@ -37,6 +39,25 @@ const _styleSwatches = <String, (Color, Color)>{
   'Boceto a lápiz': (Color(0xFF6E6A63), Color(0xFF1A1917)),
 };
 const _fallbackSwatch = (Color(0xFFA08A5E), Color(0xFF2D2618));
+
+// l10n-ignore: identificador del estilo propio, no texto.
+const _customStyleId = 'Personalizado';
+
+/// El nombre visible de un estilo. Los estilos son identificadores en español
+/// porque viajan tal cual en el prompt; solo lo que se muestra se traduce.
+///
+/// l10n-ignore: los patrones son identificadores, no texto.
+String _styleLabel(AppLocalizations l10n, String style) => switch (style) {
+  'Arte digital de fantasía' => l10n.styleDigitalFantasy,
+  'Óleo clásico' => l10n.styleClassicOil,
+  'Ilustración de cómic' => l10n.styleComic,
+  'Realista cinematográfico' => l10n.styleCinematic,
+  'Acuarela' => l10n.styleWatercolor,
+  'Pixel art' => l10n.stylePixelArt,
+  'Boceto a lápiz' => l10n.stylePencilSketch,
+  _customStyleId => l10n.styleCustom,
+  _ => style,
+};
 
 /// Generador de retratos por IA con proveedor enchufable. Auto-completa datos
 /// de la ficha, permite estilo + texto libre + referencia (si el proveedor la
@@ -228,7 +249,7 @@ class _PortraitScreenState extends State<PortraitScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _loadError = failureMessage('No se pudo cargar la configuración', e);
+        _loadError = failureMessage(context.l10n.settingsLoadError, e);
         _loading = false;
       });
     }
@@ -268,7 +289,7 @@ class _PortraitScreenState extends State<PortraitScreen> {
       if (!mounted) return;
       showAppMessage(
         context,
-        'No se pudo fijar como predeterminado, pero vale para esta sesión.',
+        context.l10n.portraitDefaultError,
         tone: AppMessageTone.error,
       );
     }
@@ -304,11 +325,11 @@ class _PortraitScreenState extends State<PortraitScreen> {
     } on ApiException catch (e) {
       _fail(
         e.isOffline
-            ? 'Sin conexión con el servidor. La generación requiere red.'
-            : 'No se pudo generar: ${e.message}',
+            ? context.l10n.portraitOffline
+            : context.l10n.portraitGenerateError(e.message),
       );
     } catch (e) {
-      _fail(failureMessage('No se pudo generar', e));
+      _fail(failureMessage(context.l10n.portraitGenerateFailed, e));
     } finally {
       if (mounted) setState(() => _generating = false);
     }
@@ -324,7 +345,7 @@ class _PortraitScreenState extends State<PortraitScreen> {
         type: FileType.custom,
         allowedExtensions: _importExtensions,
         withData: true,
-        dialogTitle: 'Elegir imagen de referencia',
+        dialogTitle: context.l10n.portraitPickReference,
       );
       if (!mounted) return;
       final file = result?.files.singleOrNull;
@@ -334,7 +355,7 @@ class _PortraitScreenState extends State<PortraitScreen> {
         _referenceName = file.name;
       });
     } catch (e) {
-      _fail(failureMessage('No se pudo elegir la imagen de referencia', e));
+      _fail(failureMessage(context.l10n.portraitReferenceError, e));
     }
   }
 
@@ -351,14 +372,15 @@ class _PortraitScreenState extends State<PortraitScreen> {
         type: FileType.custom,
         allowedExtensions: _importExtensions,
         withData: true,
-        dialogTitle: 'Elegir imagen de retrato',
+        dialogTitle: context.l10n.portraitPickImage,
       );
       if (!mounted) return;
       final bytes = result?.files.singleOrNull?.bytes;
       if (bytes == null) return; // el usuario canceló el diálogo
       await _use(bytes);
     } catch (e) {
-      _fail(failureMessage('No se pudo importar la imagen', e));
+      if (!mounted) return;
+      _fail(failureMessage(context.l10n.portraitImportError, e));
     } finally {
       if (mounted) setState(() => _importing = false);
     }
@@ -371,14 +393,19 @@ class _PortraitScreenState extends State<PortraitScreen> {
     try {
       key = await _saveBytes(bytes);
     } catch (e) {
-      if (mounted) setState(() => _saving = false);
-      _fail(failureMessage('No se pudo guardar el retrato', e));
+      if (!mounted) return;
+      setState(() => _saving = false);
+      _fail(failureMessage(context.l10n.portraitSaveError, e));
       return;
     }
     _apply([key, ..._paths], {..._prompts, key: ?prompt});
     if (!mounted) return;
     setState(() => _saving = false);
-    showAppMessage(context, 'Retrato guardado.', tone: AppMessageTone.success);
+    showAppMessage(
+      context,
+      context.l10n.portraitSaved,
+      tone: AppMessageTone.success,
+    );
     Navigator.of(context).pop();
   }
 
@@ -392,7 +419,7 @@ class _PortraitScreenState extends State<PortraitScreen> {
     _apply([key, ..._paths.where((p) => p != key)], _prompts);
     showAppMessage(
       context,
-      'Retrato restaurado.',
+      context.l10n.portraitRestored,
       tone: AppMessageTone.success,
     );
     Navigator.of(context).pop();
@@ -410,18 +437,16 @@ class _PortraitScreenState extends State<PortraitScreen> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AppDialog(
-        title: 'Borrar retrato',
-        content: const Text(
-          'El retrato se borra para siempre y no se puede recuperar.',
-        ),
+        title: context.l10n.portraitDeleteTitle,
+        content: Text(context.l10n.portraitDeleteBody),
         actions: [
           DialogAction(
-            'Cancelar',
+            context.l10n.commonCancel,
             keyHint: 'Esc',
             onPressed: () => Navigator.of(dialogContext).pop(false),
           ),
           DialogAction(
-            'Borrar',
+            context.l10n.commonDelete,
             primary: true,
             color: pal.crimson,
             onPressed: () => Navigator.of(dialogContext).pop(true),
@@ -435,8 +460,9 @@ class _PortraitScreenState extends State<PortraitScreen> {
     try {
       await widget.api.deletePortrait(key);
     } catch (e) {
-      if (mounted) setState(() => _saving = false);
-      _fail(failureMessage('No se pudo borrar el retrato', e));
+      if (!mounted) return;
+      setState(() => _saving = false);
+      _fail(failureMessage(context.l10n.portraitDeleteError, e));
       return;
     }
     _apply([
@@ -445,7 +471,11 @@ class _PortraitScreenState extends State<PortraitScreen> {
     ], {..._prompts}..remove(key));
     if (!mounted) return;
     setState(() => _saving = false);
-    showAppMessage(context, 'Retrato borrado.', tone: AppMessageTone.success);
+    showAppMessage(
+      context,
+      context.l10n.portraitDeleted,
+      tone: AppMessageTone.success,
+    );
     Navigator.of(context).pop();
   }
 
@@ -469,7 +499,7 @@ class _PortraitScreenState extends State<PortraitScreen> {
         FilledButton.icon(
           onPressed: _busy ? null : () => _restore(key),
           icon: const Icon(Icons.history),
-          label: const Text('Volver a este retrato'),
+          label: Text(context.l10n.portraitBackToThis),
         ),
       ],
       if (prompt != null && prompt.isNotEmpty) ...[
@@ -483,7 +513,7 @@ class _PortraitScreenState extends State<PortraitScreen> {
           onPressed: _busy ? null : () => _deletePortrait(key),
           style: TextButton.styleFrom(foregroundColor: context.palette.crimson),
           icon: const Icon(Icons.delete_outline, size: 18),
-          label: const Text('Borrar este retrato'),
+          label: Text(context.l10n.portraitDeleteThis),
         ),
       ),
     ];
@@ -518,7 +548,9 @@ class _PortraitScreenState extends State<PortraitScreen> {
           return Semantics(
             button: true,
             selected: on,
-            label: actual ? 'Retrato actual' : 'Retrato anterior $i',
+            label: actual
+                ? context.l10n.portraitCurrent
+                : context.l10n.portraitPrevious(i),
             child: InkWell(
               key: ValueKey('portrait-history-$key'),
               onTap: _busy
@@ -575,9 +607,9 @@ class _PortraitScreenState extends State<PortraitScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Retrato')),
+      appBar: AppBar(title: Text(context.l10n.navPortrait)),
       body: _loading
-          ? const Center(child: AppBusyLabel('Cargando configuración…'))
+          ? Center(child: AppBusyLabel(context.l10n.portraitLoadingSettings))
           : _loadError != null
           ? _loadFailed()
           : _workshop(),
@@ -597,7 +629,7 @@ class _PortraitScreenState extends State<PortraitScreen> {
           FilledButton.icon(
             onPressed: _load,
             icon: const Icon(Icons.refresh),
-            label: const Text('Reintentar'),
+            label: Text(context.l10n.commonRetry),
           ),
         ],
       ),
@@ -660,14 +692,18 @@ class _PortraitScreenState extends State<PortraitScreen> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const Icon(Icons.check),
-              label: Text(_saving ? 'Guardando…' : 'Usar este retrato'),
+              label: Text(
+                _saving
+                    ? context.l10n.commonSaving
+                    : context.l10n.portraitUseThis,
+              ),
             ),
           ],
           // Aparece con uno solo: aunque no haya adónde volver, sí hay qué
           // borrar y un prompt que leer.
           if (_paths.isNotEmpty) ...[
             const SizedBox(height: 16),
-            const Eyebrow('Retratos guardados'),
+            Eyebrow(context.l10n.portraitSavedTitle),
             const SizedBox(height: 8),
             _historyStrip(),
             ..._savedPortraitActions(),
@@ -830,7 +866,7 @@ class _PortraitScreenState extends State<PortraitScreen> {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'INVOCANDO',
+                          context.l10n.portraitSummoning,
                           style: TextStyle(
                             fontSize: 11,
                             letterSpacing: 1.6,
@@ -926,7 +962,7 @@ class _PortraitScreenState extends State<PortraitScreen> {
 
     return _descriptionCard(
       icon: Icons.description_outlined,
-      title: 'DESCRIPCIÓN BASE · AUTOMÁTICA',
+      title: context.l10n.portraitBaseDescription,
       body: Text.rich(
         TextSpan(
           children: [
@@ -951,7 +987,7 @@ class _PortraitScreenState extends State<PortraitScreen> {
   /// partida para otro intento.
   Widget _usedPromptPanel(String prompt) => _descriptionCard(
     icon: Icons.history_edu,
-    title: 'PROMPT USADO',
+    title: context.l10n.portraitUsedPrompt,
     body: SelectableText(
       prompt,
       style: TextStyle(
@@ -1088,8 +1124,12 @@ class _PortraitScreenState extends State<PortraitScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (_providers.isNotEmpty)
-            tab(_PortraitMode.ia, Icons.auto_awesome, 'Generar con IA'),
-          tab(_PortraitMode.upload, Icons.upload, 'Subir imagen'),
+            tab(
+              _PortraitMode.ia,
+              Icons.auto_awesome,
+              context.l10n.portraitGenerateAi,
+            ),
+          tab(_PortraitMode.upload, Icons.upload, context.l10n.portraitUpload),
         ],
       ),
     );
@@ -1101,27 +1141,26 @@ class _PortraitScreenState extends State<PortraitScreen> {
       return [
         const SizedBox(height: 20),
         Text(
-          'Este servidor no tiene ningún proveedor de generación configurado. '
-          'Todavía podés subir tu propio retrato.',
+          context.l10n.portraitNoProviders,
           style: Theme.of(context).textTheme.bodyMedium,
         ),
       ];
     }
     return [
       const SizedBox(height: 20),
-      _sectionHeader('Motor de generación'),
+      _sectionHeader(context.l10n.portraitEngine),
       const SizedBox(height: 10),
       _providerGrid(),
       const SizedBox(height: 20),
-      _sectionHeader('Estilo'),
+      _sectionHeader(context.l10n.portraitStyle),
       const SizedBox(height: 10),
       _styleSelector(),
       if (_customStyle) ...[
         const SizedBox(height: 10),
         TextField(
           controller: _customStyleCtrl,
-          decoration: const InputDecoration(
-            labelText: 'Estilo personalizado',
+          decoration: InputDecoration(
+            labelText: context.l10n.portraitCustomStyle,
             border: OutlineInputBorder(),
           ),
           onChanged: (_) => setState(() {}),
@@ -1136,8 +1175,10 @@ class _PortraitScreenState extends State<PortraitScreen> {
           // Rótulo además del ejemplo: el placeholder se borra con la primera
           // letra, y a mitad de escribir el campo quedaba sin decir para qué
           // era, a la vista y para un lector de pantalla.
-          labelText: widget.npc == null ? 'Detalles adicionales' : 'Apariencia',
-          hintText: 'Color de pelo, cicatrices, actitud…',
+          labelText: widget.npc == null
+              ? context.l10n.portraitExtraDetails
+              : context.l10n.portraitAppearance,
+          hintText: context.l10n.portraitDetailsHint,
           filled: true,
           fillColor: context.palette.plaque,
           border: OutlineInputBorder(
@@ -1149,7 +1190,7 @@ class _PortraitScreenState extends State<PortraitScreen> {
       ),
       if (provider.supportsReference) ...[
         const SizedBox(height: 16),
-        _sectionHeader('Imagen de referencia · opcional'),
+        _sectionHeader(context.l10n.portraitReference),
         const SizedBox(height: 10),
         Row(
           children: [
@@ -1158,14 +1199,14 @@ class _PortraitScreenState extends State<PortraitScreen> {
                 onPressed: _pickReference,
                 icon: const Icon(Icons.image_outlined),
                 label: Text(
-                  _referenceName ?? 'Elegir imagen…',
+                  _referenceName ?? context.l10n.portraitChooseImage,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
             ),
             if (_referenceBytes != null)
               IconButton(
-                tooltip: 'Quitar referencia',
+                tooltip: context.l10n.portraitRemoveReference,
                 icon: const Icon(Icons.close),
                 onPressed: () => setState(() {
                   _referenceBytes = null;
@@ -1188,10 +1229,10 @@ class _PortraitScreenState extends State<PortraitScreen> {
               : const Icon(Icons.auto_awesome),
           label: Text(
             _generating
-                ? 'Generando…'
+                ? context.l10n.portraitGenerating
                 : _results.isEmpty
-                ? 'Generar'
-                : 'Generar otra vez',
+                ? context.l10n.portraitGenerate
+                : context.l10n.portraitGenerateAgain,
           ),
         ),
       ),
@@ -1199,9 +1240,7 @@ class _PortraitScreenState extends State<PortraitScreen> {
         Padding(
           padding: const EdgeInsets.only(top: 10),
           child: Text(
-            'El servicio gratuito puede tardar hasta ~1 min y genera 2 '
-            'variantes de a una. Si aparece un error de límite (429), '
-            'esperá unos segundos y reintentá.',
+            context.l10n.portraitFreeNote,
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ),
@@ -1227,18 +1266,18 @@ class _PortraitScreenState extends State<PortraitScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (_importing)
-                const AppBusyLabel('Importando…')
+                AppBusyLabel(context.l10n.portraitImporting)
               else ...[
                 Icon(Icons.upload_file, size: 38, color: pal.gold),
                 const SizedBox(height: 10),
                 Text(
-                  'Importar imagen desde archivo',
+                  context.l10n.portraitImportTitle,
                   style: Theme.of(context).textTheme.titleMedium,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Tocá para elegirla. PNG, JPG o WEBP.',
+                  context.l10n.portraitImportHint,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
@@ -1249,8 +1288,7 @@ class _PortraitScreenState extends State<PortraitScreen> {
       ),
       const SizedBox(height: 12),
       Text(
-        'La imagen pasa a ser el retrato del personaje. Podés volver a '
-        'generar con IA cuando quieras.',
+        context.l10n.portraitImportNote,
         style: Theme.of(context).textTheme.bodySmall,
       ),
     ];
@@ -1337,7 +1375,9 @@ class _PortraitScreenState extends State<PortraitScreen> {
             Text(
               // Lo único que el servidor dice de cada proveedor además del
               // nombre. Inventar una etiqueta de precio sería adivinar.
-              p.supportsReference ? 'Acepta referencia' : 'Solo texto',
+              p.supportsReference
+                  ? context.l10n.portraitAcceptsReference
+                  : context.l10n.portraitTextOnly,
               style: TextStyle(fontSize: 10.5, color: pal.textMuted),
             ),
           ],
@@ -1368,7 +1408,7 @@ class _PortraitScreenState extends State<PortraitScreen> {
     }
 
     return PopupMenuButton<int>(
-      tooltip: 'Elegir estilo',
+      tooltip: context.l10n.portraitPickStyle,
       position: PopupMenuPosition.under,
       onSelected: (i) => setState(() {
         if (i == custom) {
@@ -1386,7 +1426,7 @@ class _PortraitScreenState extends State<PortraitScreen> {
             !_customStyle && _style == portraitStyles[i],
             swatch,
           ),
-        _styleItem(custom, 'Personalizado', _customStyle, swatch),
+        _styleItem(custom, _customStyleId, _customStyle, swatch),
       ],
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 11),
@@ -1397,11 +1437,14 @@ class _PortraitScreenState extends State<PortraitScreen> {
         ),
         child: Row(
           children: [
-            swatch(_customStyle ? 'Personalizado' : _style, 15),
+            swatch(_customStyle ? _customStyleId : _style, 15),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                _customStyle ? 'Personalizado' : _style,
+                _styleLabel(
+                  context.l10n,
+                  _customStyle ? _customStyleId : _style,
+                ),
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 13,
@@ -1427,7 +1470,12 @@ class _PortraitScreenState extends State<PortraitScreen> {
       children: [
         swatch(label, 13),
         const SizedBox(width: 9),
-        Expanded(child: Text(label, overflow: TextOverflow.ellipsis)),
+        Expanded(
+          child: Text(
+            _styleLabel(context.l10n, label),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
         if (selected) Icon(Icons.check, size: 15, color: context.palette.gold),
       ],
     ),
