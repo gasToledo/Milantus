@@ -6672,4 +6672,51 @@ class AppLocalizationsEs extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String npcCountTotal(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count PNJ',
+      one: '1 PNJ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String npcCountAlive(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count vivos',
+      one: '1 vivo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String npcCountDead(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count muertos',
+      one: '1 muerto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String npcCountUnknown(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count desconocidos',
+      one: '1 desconocido',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get creatureLegendaryAction => 'Acción legendaria';
 }

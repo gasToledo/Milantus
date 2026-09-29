@@ -742,8 +742,10 @@ class _PortraitScreenState extends State<PortraitScreen> {
     } else {
       final npc = widget.npc!;
       subtitle = [
-        'PNJ',
-        npc.baseCreatureName ?? npc.block?.name ?? npc.sheetKind.label,
+        context.l10n.kindNpc,
+        npc.baseCreatureName ??
+            npc.block?.name ??
+            npc.sheetKind.text(context.l10n),
       ];
     }
     final existing = _paths.firstOrNull;

@@ -1312,7 +1312,7 @@ extension _SheetCombatSection on _SheetScreenState {
     damage: a.damage,
     damageType: a.damageType,
     reach: a.reach,
-    tag: a.kind == CreatureActionKind.action ? null : a.kind.label,
+    tag: a.kind == CreatureActionKind.action ? null : a.kind.text(context.l10n),
   );
 
   Widget _savesCard(ComputedSheet s) {

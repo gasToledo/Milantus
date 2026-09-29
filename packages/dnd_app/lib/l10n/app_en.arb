@@ -1793,5 +1793,10 @@
   "equipCostEach": "{cost} each",
   "sheetSubclassAtLevel": "subclass at level {level}",
   "codexEntries": "{count, plural, =1{1 entry} other{{count} entries}}",
-  "bestiaryCreatureCount": "{count, plural, =1{1 creature} other{{count} creatures}}"
+  "bestiaryCreatureCount": "{count, plural, =1{1 creature} other{{count} creatures}}",
+  "npcCountTotal": "{count, plural, =1{1 NPC} other{{count} NPCs}}",
+  "npcCountAlive": "{count} alive",
+  "npcCountDead": "{count} dead",
+  "npcCountUnknown": "{count} unknown",
+  "creatureLegendaryAction": "Legendary Action"
 }

@@ -54,6 +54,16 @@ extension NpcSheetKindL10n on NpcSheetKind {
   };
 }
 
+/// Cuándo se usa una acción de criatura, en el idioma activo.
+extension CreatureActionKindL10n on CreatureActionKind {
+  String text(AppLocalizations l10n) => switch (this) {
+    CreatureActionKind.action => l10n.spellActionAction,
+    CreatureActionKind.bonus => l10n.spellActionBonus,
+    CreatureActionKind.reaction => l10n.spellActionReaction,
+    CreatureActionKind.legendary => l10n.creatureLegendaryAction,
+  };
+}
+
 /// Si un PNJ sigue vivo, en el idioma activo.
 extension NpcStatusL10n on NpcStatus {
   String text(AppLocalizations l10n) => switch (this) {

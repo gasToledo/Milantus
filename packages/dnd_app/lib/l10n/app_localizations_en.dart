@@ -6673,4 +6673,33 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String npcCountTotal(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count NPCs',
+      one: '1 NPC',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String npcCountAlive(int count) {
+    return '$count alive';
+  }
+
+  @override
+  String npcCountDead(int count) {
+    return '$count dead';
+  }
+
+  @override
+  String npcCountUnknown(int count) {
+    return '$count unknown';
+  }
+
+  @override
+  String get creatureLegendaryAction => 'Legendary Action';
 }

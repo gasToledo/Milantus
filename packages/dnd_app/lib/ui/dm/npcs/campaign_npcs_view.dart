@@ -77,12 +77,12 @@ class _CampaignNpcsViewState extends State<CampaignNpcsView> {
       for (final n in npcs)
         if (_tag == null || n.npc.hasTag(_tag!)) n,
     ];
+    final l10n = context.l10n;
     final summary = [
-      npcs.length == 1 ? '1 PNJ' : '${npcs.length} PNJ',
-      '${count(NpcStatus.alive)} ${count(NpcStatus.alive) == 1 ? 'vivo' : 'vivos'}',
-      '${count(NpcStatus.dead)} ${count(NpcStatus.dead) == 1 ? 'muerto' : 'muertos'}',
-      '${count(NpcStatus.unknown)} '
-          '${count(NpcStatus.unknown) == 1 ? 'desconocido' : 'desconocidos'}',
+      l10n.npcCountTotal(npcs.length),
+      l10n.npcCountAlive(count(NpcStatus.alive)),
+      l10n.npcCountDead(count(NpcStatus.dead)),
+      l10n.npcCountUnknown(count(NpcStatus.unknown)),
     ].join(' · ');
 
     return ListView(

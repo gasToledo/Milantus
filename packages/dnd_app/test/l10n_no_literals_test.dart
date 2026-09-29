@@ -49,6 +49,7 @@ void main() {
     expect(ve(r"final t = '${n} rasgos de clase';"), hasLength(1));
     expect(ve("final t = ok ? 'SIN CAMBIOS' : x;"), hasLength(1));
     expect(ve("final t = n == 1 ? '1 resultado' : x;"), hasLength(1));
+    expect(ve("final t = n == 1 ? 'vivo' : 'vivos';"), hasLength(2));
     // Lo que no es texto para la persona.
     expect(ve("// Text('Guardar')"), isEmpty);
     expect(ve("final a = 1; // dice 'Guardá'"), isEmpty);

@@ -33,6 +33,10 @@ final _posicionUi = RegExp(
   r'\bshowAppMessage\(\s*\w+(?:\.\w+)*,\s*)$',
 );
 
+// El plural a mano: `n == 1 ? 'vivo' : 'vivos'`. Las dos ramas son texto aunque
+// sean una palabra en minúscula, que en otro lado pasaría por identificador.
+final _plural = RegExp(r'''==\s*1\s*\?\s*(?:\x27[^\x27\n]*\x27\s*:\s*)?$''');
+
 /// El código sin comentarios de línea ni renglones exentos.
 ///
 /// Un renglón queda exento si lleva `l10n-ignore`, o si va después de un
@@ -119,7 +123,10 @@ List<String> literalesVisibles(String fuente, [List<int>? lineas]) {
     uiPrevio = ui;
     // Un nombre de tipografía no es texto para la persona.
     final tipografia = RegExp(r'fontFamily:\s*$').hasMatch(antes);
-    if (!tipografia && _esTexto(m.group(0)!, enPosicionUi: ui)) {
+    final plural =
+        _plural.hasMatch(antes) &&
+        RegExp('[A-Za-z]{2}').hasMatch(_cuerpo(m.group(0)!));
+    if (!tipografia && (plural || _esTexto(m.group(0)!, enPosicionUi: ui))) {
       salida.add(m.group(0)!);
       lineas?.add(RegExp('\n').allMatches(t.substring(0, m.start)).length + 1);
     }

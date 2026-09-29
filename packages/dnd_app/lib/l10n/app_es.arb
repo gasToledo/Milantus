@@ -5220,5 +5220,38 @@
         "type": "int"
       }
     }
-  }
+  },
+  "npcCountTotal": "{count, plural, =1{1 PNJ} other{{count} PNJ}}",
+  "@npcCountTotal": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "npcCountAlive": "{count, plural, =1{1 vivo} other{{count} vivos}}",
+  "@npcCountAlive": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "npcCountDead": "{count, plural, =1{1 muerto} other{{count} muertos}}",
+  "@npcCountDead": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "npcCountUnknown": "{count, plural, =1{1 desconocido} other{{count} desconocidos}}",
+  "@npcCountUnknown": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "creatureLegendaryAction": "Acción legendaria"
 }

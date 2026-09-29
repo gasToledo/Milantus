@@ -10866,6 +10866,36 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'{count, plural, =1{1 criatura} other{{count} criaturas}}'**
   String bestiaryCreatureCount(int count);
+
+  /// No description provided for @npcCountTotal.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 PNJ} other{{count} PNJ}}'**
+  String npcCountTotal(int count);
+
+  /// No description provided for @npcCountAlive.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 vivo} other{{count} vivos}}'**
+  String npcCountAlive(int count);
+
+  /// No description provided for @npcCountDead.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 muerto} other{{count} muertos}}'**
+  String npcCountDead(int count);
+
+  /// No description provided for @npcCountUnknown.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 desconocido} other{{count} desconocidos}}'**
+  String npcCountUnknown(int count);
+
+  /// No description provided for @creatureLegendaryAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Acción legendaria'**
+  String get creatureLegendaryAction;
 }
 
 class _AppLocalizationsDelegate

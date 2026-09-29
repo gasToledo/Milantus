@@ -254,7 +254,7 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
       'kind' => switch (creatureActionKindRules[action.kind.id]) {
         final rule? => _explained(
           context.l10n.hbWhenUsed,
-          action.kind.label,
+          action.kind.text(context.l10n),
           rule,
         ),
         null => null,
@@ -512,7 +512,7 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
           children: [
             for (final entry in _actions.asMap().entries)
               _block(
-                title: entry.value.kind.label,
+                title: entry.value.kind.text(context.l10n),
                 onRemove: () => setState(
                   () => _drop(_actions.removeAt(entry.key).controllers),
                 ),
