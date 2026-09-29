@@ -1160,8 +1160,7 @@ class CreationDraft {
             (e) => e.grant.isChoice && equipmentChoices[e.key] == null,
           ))
             l10n.pendingEquipmentChoices,
-          if (goldLeftCp < 0)
-            l10n.pendingOverspent(CoinOps.formatAmount(-goldLeftCp)),
+          if (goldLeftCp < 0) l10n.pendingOverspent(l10n.amount(-goldLeftCp)),
         ];
         final elegidos = pendingSpellChoices;
         final sc = spellcasting;

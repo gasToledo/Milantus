@@ -1202,7 +1202,7 @@ extension _SheetInventorySection on _SheetScreenState {
       context.l10n.invBought(
         trade.quantity,
         row.name,
-        CoinOps.formatAmount(trade.totalCp),
+        context.l10n.amount(trade.totalCp),
       ),
       onUndo: () => _replace(antes),
     );
@@ -1219,7 +1219,7 @@ extension _SheetInventorySection on _SheetScreenState {
         title: context.l10n.invSellTitle(info.name),
         detail: context.l10n.invSellDetail(
           e.quantity,
-          formatCost(InventoryOps.resolve(e, repo).costCp),
+          context.l10n.cost(InventoryOps.resolve(e, repo).costCp),
         ),
         bundleSize: info.bundleSize,
         catalogCp: InventoryOps.suggestedSalePriceCp(e, repo),
@@ -1244,7 +1244,7 @@ extension _SheetInventorySection on _SheetScreenState {
       context.l10n.invSold(
         trade.quantity,
         info.name,
-        CoinOps.formatAmount(trade.totalCp),
+        context.l10n.amount(trade.totalCp),
       ),
       onUndo: () => _replace(antes),
     );

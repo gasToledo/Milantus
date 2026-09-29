@@ -308,7 +308,8 @@ CodexEntry _magicItem(Item i, AppLocalizations l10n) {
           (context.l10n.codexCharges, '$charges'),
         if (i.weight > 0)
           (context.l10n.codexWeight, '${formatPounds(i.weight)} lb'),
-        if (i.costCp > 0) (context.l10n.codexPrice, formatCost(i.costCp)),
+        if (i.costCp > 0)
+          (context.l10n.codexPrice, context.l10n.cost(i.costCp)),
       ]),
       // La primera línea del texto es la de tipo y rareza, que ya está arriba.
       _prose(context, _withoutTypeLine(i.description)),
@@ -336,7 +337,8 @@ CodexEntry _weapon(Weapon w) {
           (context.l10n.codexMastery, weaponMasteryName(m)),
         if (w.weight > 0)
           (context.l10n.codexWeight, '${formatPounds(w.weight)} lb'),
-        if (w.costCp > 0) (context.l10n.codexPrice, formatCost(w.costCp)),
+        if (w.costCp > 0)
+          (context.l10n.codexPrice, context.l10n.cost(w.costCp)),
       ]),
       if (w.properties.isNotEmpty)
         _traits(context, context.l10n.codexProperties, [
@@ -376,7 +378,8 @@ CodexEntry _armor(Armor a, AppLocalizations l10n) {
           (context.l10n.codexStealth, context.l10n.codexDisadvantage),
         if (a.weight > 0)
           (context.l10n.codexWeight, '${formatPounds(a.weight)} lb'),
-        if (a.costCp > 0) (context.l10n.codexPrice, formatCost(a.costCp)),
+        if (a.costCp > 0)
+          (context.l10n.codexPrice, context.l10n.cost(a.costCp)),
       ]),
       if (a.description.isNotEmpty) _prose(context, a.description),
     ],
@@ -398,7 +401,8 @@ CodexEntry _gear(Item i) {
         if (i.bundleSize > 1) (context.l10n.codexPackOf, '${i.bundleSize}'),
         if (i.weight > 0)
           (context.l10n.codexWeight, '${formatPounds(i.weight)} lb'),
-        if (i.costCp > 0) (context.l10n.codexPrice, formatCost(i.costCp)),
+        if (i.costCp > 0)
+          (context.l10n.codexPrice, context.l10n.cost(i.costCp)),
       ]),
       if (i.description.isNotEmpty) _prose(context, i.description),
     ],

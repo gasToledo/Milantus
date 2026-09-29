@@ -319,8 +319,8 @@ class _PurchasesSection extends StatelessWidget {
           title: context.l10n.equipPurchases,
           counterIcon: Icons.savings_outlined,
           counter: left < 0
-              ? context.l10n.catalogShortBy(CoinOps.formatAmount(-left))
-              : context.l10n.equipLeft(CoinOps.formatAmount(left)),
+              ? context.l10n.catalogShortBy(context.l10n.amount(-left))
+              : context.l10n.equipLeft(context.l10n.amount(left)),
         ),
         const SizedBox(height: 12),
         Text(
@@ -352,19 +352,19 @@ class _PurchasesSection extends StatelessWidget {
           children: [
             plaque(
               context.l10n.equipStartingGold,
-              CoinOps.formatAmount(granted),
+              context.l10n.amount(granted),
             ),
             const SizedBox(width: 10),
             plaque(
               context.l10n.equipInPurchases,
-              CoinOps.formatAmount(draft.purchasesCp),
+              context.l10n.amount(draft.purchasesCp),
             ),
             const SizedBox(width: 10),
             plaque(
               left < 0
                   ? context.l10n.equipShortLabel
                   : context.l10n.equipYouHaveLeft,
-              CoinOps.formatAmount(left.abs()),
+              context.l10n.amount(left.abs()),
               highlight: true,
             ),
           ],
@@ -411,10 +411,10 @@ class _PurchasesSection extends StatelessWidget {
                 Text(
                   bundle > 1
                       ? context.l10n.equipCostPerBundle(
-                          formatCost(unit),
+                          context.l10n.cost(unit),
                           bundle,
                         )
-                      : context.l10n.equipCostEach(formatCost(unit)),
+                      : context.l10n.equipCostEach(context.l10n.cost(unit)),
                   style: TextStyle(fontSize: 12, color: muted),
                 ),
               ],
@@ -444,7 +444,7 @@ class _PurchasesSection extends StatelessWidget {
           SizedBox(
             width: 72,
             child: Text(
-              CoinOps.formatAmount(unit * quantity),
+              context.l10n.amount(unit * quantity),
               textAlign: TextAlign.end,
               style: TextStyle(
                 fontWeight: FontWeight.w700,

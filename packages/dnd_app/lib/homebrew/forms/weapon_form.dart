@@ -332,7 +332,7 @@ Widget _economySection(
         ? form.context.l10n.hbNotSet
         : [
             if (w > 0) '${formatPounds(w)} lb',
-            if (cost > 0) formatCost(cost),
+            if (cost > 0) form.context.l10n.cost(cost),
           ].join(' · '),
     children: [
       _fieldRow([
@@ -393,5 +393,5 @@ List<(String, String)> _weaponStats(AppLocalizations l10n, Weapon w) => [
           : '${w.rangeNormal}',
     ),
   if (w.weight > 0) (l10n.codexWeight, '${formatPounds(w.weight)} lb'),
-  if (w.costCp > 0) (l10n.codexPrice, formatCost(w.costCp)),
+  if (w.costCp > 0) (l10n.codexPrice, l10n.cost(w.costCp)),
 ];

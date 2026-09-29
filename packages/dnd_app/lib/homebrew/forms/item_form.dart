@@ -405,7 +405,7 @@ List<String> _itemPills(AppLocalizations l10n, Item i) => [
 /// Las cifras de un objeto, con el mismo motivo que [_itemPills].
 List<(String, String)> _itemStats(AppLocalizations l10n, Item i) => [
   if (i.weight > 0) (l10n.codexWeight, '${formatPounds(i.weight)} lb'),
-  if (i.costCp > 0) (l10n.codexPrice, formatCost(i.costCp)),
+  if (i.costCp > 0) (l10n.codexPrice, l10n.cost(i.costCp)),
   if (i.maxCharges != null) (l10n.codexCharges, '${i.maxCharges}'),
   if (i.bundleSize > 1) (l10n.kindPack, '${i.bundleSize}'),
 ];

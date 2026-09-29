@@ -95,19 +95,27 @@ class CoinOps {
   /// Un monto en la menor cantidad de monedas de oro, plata y cobre, para
   /// leer: 750 → «7 po 5 pp». Distinto de `formatCost`, que expresa un precio
   /// de tabla en una sola denominación («75 pp»): un total se cuenta en la
-  /// mano como se cobra.
-  static String formatAmount(int cp) {
+  /// mano como se cobra. Las abreviaturas las pone la app, igual que en
+  /// `formatCost`.
+  static String formatAmount(
+    int cp, {
+    Map<String, String> labels = coinLabels,
+  }) {
     // «0 pc» se leía como una cuenta en cobre; «0 po» dice que no hay oro.
-    if (cp <= 0) return '0 ${coinLabels['gp']}';
+    if (cp <= 0) return '0 ${labels['gp']}';
     return [
-      for (final e in changeFor(cp).entries) '${e.value} ${coinLabels[e.key]}',
+      for (final e in changeFor(cp).entries) '${e.value} ${labels[e.key]}',
     ].join(' ');
   }
 
   /// Monedas sueltas de mayor a menor: «1 ppt, 3 po».
-  static String formatCoins(Map<String, int> coins) => [
+  static String formatCoins(
+    Map<String, int> coins, {
+    Map<String, String> labels = coinLabels,
+  }) =>
+      [
         for (final k in coinDenominations.reversed)
-          if ((coins[k] ?? 0) > 0) '${coins[k]} ${coinLabels[k]}',
+          if ((coins[k] ?? 0) > 0) '${coins[k]} ${labels[k]}',
       ].join(', ');
 
   /// Suma [amountCp] al monedero, en oro, plata y cobre.

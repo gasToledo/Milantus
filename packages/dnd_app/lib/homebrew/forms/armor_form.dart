@@ -286,5 +286,5 @@ List<String> _armorPills(AppLocalizations l10n, Armor a) => [
 List<(String, String)> _armorStats(AppLocalizations l10n, Armor a) => [
   (l10n.creatureAcShort, a.isShield ? '+${a.baseAc}' : '${a.baseAc}'),
   if (a.weight > 0) (l10n.codexWeight, '${formatPounds(a.weight)} lb'),
-  if (a.costCp > 0) (l10n.codexPrice, formatCost(a.costCp)),
+  if (a.costCp > 0) (l10n.codexPrice, l10n.cost(a.costCp)),
 ];

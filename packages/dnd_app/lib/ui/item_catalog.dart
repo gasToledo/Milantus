@@ -118,18 +118,6 @@ String coinName(AppLocalizations l10n, String key) => switch (key) {
   _ => key,
 };
 
-/// La abreviatura de cada denominación en el idioma activo («po» en español,
-/// «gp» en inglés). Es la de la interfaz: las cuentas que arma el engine
-/// (`CoinOps.formatAmount`) siguen en español hasta la fase 2.
-String coinAbbr(AppLocalizations l10n, String key) => switch (key) {
-  'cp' => l10n.coinAbbrCopper,
-  'sp' => l10n.coinAbbrSilver,
-  'ep' => l10n.coinAbbrElectrum,
-  'gp' => l10n.coinAbbrGold,
-  'pp' => l10n.coinAbbrPlatinum,
-  _ => key,
-};
-
 /// Buscador sobre los tres catálogos que pueden entrar en la mochila.
 ///
 /// Muestra la categoría al lado del nombre porque los ids son distintos pero
@@ -313,7 +301,7 @@ class _ItemCatalogDialogState extends State<ItemCatalogDialog> {
       ],
     );
     final cost = Text(
-      formatCost(e.costCp),
+      context.l10n.cost(e.costCp),
       textAlign: TextAlign.end,
       style: TextStyle(
         fontSize: 12.5,
@@ -335,7 +323,7 @@ class _ItemCatalogDialogState extends State<ItemCatalogDialog> {
                 // peso» quedaba suelta entre los datos.
                 if (narrow && e.weight > 0) weight,
                 if (missing > 0)
-                  context.l10n.catalogMissing(CoinOps.formatAmount(missing)),
+                  context.l10n.catalogMissing(context.l10n.amount(missing)),
               ].join(' · '),
               style: TextStyle(fontSize: 11.5, color: muted),
             ),
@@ -400,8 +388,8 @@ class _ItemCatalogDialogState extends State<ItemCatalogDialog> {
       // Lo que hay para gastar, para saber qué se puede comprar sin cerrar.
       titleTrailing: GoldPill(
         purseCp < 0
-            ? context.l10n.catalogShortBy(CoinOps.formatAmount(-purseCp))
-            : '${widget.purseLabel ?? context.l10n.commonBag} ${CoinOps.formatAmount(purseCp)}',
+            ? context.l10n.catalogShortBy(context.l10n.amount(-purseCp))
+            : '${widget.purseLabel ?? context.l10n.commonBag} ${context.l10n.amount(purseCp)}',
       ),
       width: 560,
       scrollable: false,
@@ -594,7 +582,7 @@ class _TradeDialogState extends State<TradeDialog> {
         : CoinOps.receive(widget.coins, total);
     final short = widget.buying && plan == null;
     final max = widget.maxQuantity;
-    final afterCoins = CoinOps.formatCoins(after);
+    final afterCoins = context.l10n.coins(after);
 
     Widget eyebrow(String text) => Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -686,10 +674,10 @@ class _TradeDialogState extends State<TradeDialog> {
                 child: Text(
                   widget.buying
                       ? context.l10n.tradeCatalogPrice(
-                          formatCost(widget.catalogCp),
+                          context.l10n.cost(widget.catalogCp),
                         )
                       : context.l10n.tradeSuggested(
-                          CoinOps.formatAmount(widget.catalogCp),
+                          context.l10n.amount(widget.catalogCp),
                         ),
                   style: TextStyle(fontSize: 12.5, color: muted),
                 ),
@@ -732,7 +720,7 @@ class _TradeDialogState extends State<TradeDialog> {
                       ),
                     ),
                     Text(
-                      CoinOps.formatAmount(total),
+                      context.l10n.amount(total),
                       style: TextStyle(
                         fontFamily: 'Georgia',
                         fontSize: 24,
@@ -746,7 +734,7 @@ class _TradeDialogState extends State<TradeDialog> {
                 if (short)
                   Text(
                     context.l10n.tradeShort(
-                      CoinOps.formatAmount(
+                      context.l10n.amount(
                         total - CoinOps.totalCp(widget.coins),
                       ),
                     ),
@@ -759,11 +747,11 @@ class _TradeDialogState extends State<TradeDialog> {
                       child: Text(
                         [
                           context.l10n.tradePaidFrom(
-                            CoinOps.formatCoins(plan.spent),
+                            context.l10n.coins(plan.spent),
                           ),
                           if (plan.change.isNotEmpty)
                             context.l10n.tradeChange(
-                              CoinOps.formatCoins(plan.change),
+                              context.l10n.coins(plan.change),
                             ),
                         ].join(' '),
                         style: const TextStyle(fontSize: 13),
@@ -772,10 +760,10 @@ class _TradeDialogState extends State<TradeDialog> {
                   Text(
                     afterCoins.isEmpty
                         ? context.l10n.tradeBagAfter(
-                            CoinOps.formatAmount(CoinOps.totalCp(after)),
+                            context.l10n.amount(CoinOps.totalCp(after)),
                           )
                         : context.l10n.tradeBagAfterCoins(
-                            CoinOps.formatAmount(CoinOps.totalCp(after)),
+                            context.l10n.amount(CoinOps.totalCp(after)),
                             afterCoins,
                           ),
                     style: TextStyle(fontSize: 12.5, color: muted),

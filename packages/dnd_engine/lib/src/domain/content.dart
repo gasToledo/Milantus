@@ -1222,6 +1222,11 @@ const coinsPerPound = 50;
 /// Espacios de sintonización de un personaje (capítulo 6, "Sintonización").
 const attunementSlots = 3;
 
+/// Peso legible en libras, conservando centésimas (las monedas pesan de a
+/// 1/50 lb y el dardo pesa 1/4 lb) pero sin ceros finales.
+String formatPounds(double value) =>
+    value.toStringAsFixed(2).replaceFirst(RegExp(r'\.?0+$'), '');
+
 /// Formatea un precio guardado en cobre con la denominación más grande que lo
 /// exprese sin fracción: 1500 → "15 po", 5 → "5 pc".
 ///
@@ -1231,21 +1236,18 @@ const attunementSlots = 3;
 /// del personaje, que es otra cosa que un precio de tabla.
 ///
 /// Vive en el motor y no en la app para que la ficha, el catálogo homebrew y
-/// los tests no formateen cada uno a su manera.
-/// Peso legible en libras, conservando centésimas (las monedas pesan de a
-/// 1/50 lb y el dardo pesa 1/4 lb) pero sin ceros finales.
-String formatPounds(double value) =>
-    value.toStringAsFixed(2).replaceFirst(RegExp(r'\.?0+$'), '');
-
-String formatCost(int cp) {
+/// los tests no formateen cada uno a su manera. Las abreviaturas sí las pone
+/// la app ([labels]): en inglés «pp» es platino y no plata, así que un precio
+/// con las de acá leído en inglés no queda sin traducir, queda mal.
+String formatCost(int cp, {Map<String, String> labels = coinLabels}) {
   if (cp == 0) return '—';
   for (final key in const ['gp', 'sp']) {
     final value = coinValueCp[key]!;
     if (cp >= value && cp % value == 0) {
-      return '${cp ~/ value} ${coinLabels[key]}';
+      return '${cp ~/ value} ${labels[key]}';
     }
   }
-  return '$cp ${coinLabels['cp']}';
+  return '$cp ${labels['cp']}';
 }
 
 /// Nombre de cada rareza (`Item.rarity`), de la más común a la más rara: el

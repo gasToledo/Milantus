@@ -504,6 +504,11 @@ void main() {
       expect(formatCost(155), '155 pc', reason: 'no entra redondo en plata');
       expect(formatCost(100000), '1000 po');
       expect(formatCost(0), '—');
+      // Con otras abreviaturas, las de la app en inglés.
+      const en = {'cp': 'cp', 'sp': 'sp', 'ep': 'ep', 'gp': 'gp', 'pp': 'pp'};
+      expect(formatCost(150, labels: en), '15 sp');
+      expect(CoinOps.formatAmount(750, labels: en), '7 gp 5 sp');
+      expect(CoinOps.formatCoins({'gp': 3, 'pp': 1}, labels: en), '1 pp, 3 gp');
     });
 
     test('el peso conserva cuartos y centésimas sin ceros finales', () {

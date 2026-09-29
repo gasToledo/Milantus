@@ -12,6 +12,36 @@ extension L10nContext on BuildContext {
   AppLocalizations get l10n => AppLocalizations.of(this);
 }
 
+/// La abreviatura de cada denominación en el idioma activo («po» en español,
+/// «gp» en inglés).
+String coinAbbr(AppLocalizations l10n, String key) => switch (key) {
+  'cp' => l10n.coinAbbrCopper,
+  'sp' => l10n.coinAbbrSilver,
+  'ep' => l10n.coinAbbrElectrum,
+  'gp' => l10n.coinAbbrGold,
+  'pp' => l10n.coinAbbrPlatinum,
+  _ => key,
+};
+
+/// Precios y montos con las abreviaturas del idioma activo. Las cuentas son
+/// del motor; las abreviaturas no, porque en inglés «pp» es platino y no
+/// plata: un «2 pp» del motor leído en inglés vale cien veces más.
+extension CoinTextL10n on AppLocalizations {
+  Map<String, String> get _coinLabels => {
+    for (final k in coinDenominations) k: coinAbbr(this, k),
+  };
+
+  /// Un precio de tabla: `formatCost`.
+  String cost(int cp) => formatCost(cp, labels: _coinLabels);
+
+  /// Un monto en oro, plata y cobre: `CoinOps.formatAmount`.
+  String amount(int cp) => CoinOps.formatAmount(cp, labels: _coinLabels);
+
+  /// Monedas sueltas: `CoinOps.formatCoins`.
+  String coins(Map<String, int> coins) =>
+      CoinOps.formatCoins(coins, labels: _coinLabels);
+}
+
 /// El nombre de la aplicación. Es una marca: no se traduce ni va al catálogo.
 const appName = 'Milantus';
 
