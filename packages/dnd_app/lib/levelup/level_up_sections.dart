@@ -201,7 +201,7 @@ extension _LevelUpSections on _LevelUpScreenState {
           icon: Icons.workspace_premium,
           title: features.length == 1
               ? features.single.name
-              : '${features.length} rasgos de clase',
+              : context.l10n.luClassFeatures(features.length),
           // Con un solo rasgo, el cuerpo repetía el título («Canalizar
           // Divinidad / Canalizar Divinidad»): va su primera oración.
           body: features.length == 1
@@ -1179,7 +1179,7 @@ extension _LevelUpSections on _LevelUpScreenState {
                       '${before.abilityScores[ability] ?? 0} → '
                       '${after.abilityScores[ability] ?? before.abilityScores[ability] ?? 0}',
                   tag: _abilityIncreases[ability] == null
-                      ? 'SIN CAMBIOS'
+                      ? context.l10n.luUnchanged
                       : '+${_abilityIncreases[ability]}',
                   selected: _abilityIncreases.containsKey(ability),
                   onTap: () => _selectAbility(ability),

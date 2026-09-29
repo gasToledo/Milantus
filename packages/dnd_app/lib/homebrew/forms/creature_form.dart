@@ -94,6 +94,7 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
   late final _ac = watch(widget.initial?.ac ?? '12');
   late final _hp = watch(widget.initial?.hp ?? '10');
   late final _hitDice = watch(widget.initial?.hitDice ?? '');
+  // l10n-ignore: valor inicial del contenido homebrew, que se guarda en el idioma del catálogo (fase 2).
   late final _speed = watch(widget.initial?.speed ?? '30 pies');
   late final _senses = watch(widget.initial?.senses ?? '');
   late final _languages = watch(widget.initial?.languages ?? '');

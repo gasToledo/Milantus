@@ -413,7 +413,7 @@ class _CodexScreenState extends State<CodexScreen> {
     return PageBody(
       children: [
         Text(
-          total == 1 ? '1 resultado' : '$total resultados',
+          context.l10n.hbResults(total),
           style: TextStyle(
             fontFamily: 'Georgia',
             fontSize: 18,

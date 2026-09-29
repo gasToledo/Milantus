@@ -410,8 +410,11 @@ class _PurchasesSection extends StatelessWidget {
                 Text(name, maxLines: 1, overflow: TextOverflow.ellipsis),
                 Text(
                   bundle > 1
-                      ? '${formatCost(unit)} el paquete de $bundle'
-                      : '${formatCost(unit)} c/u',
+                      ? context.l10n.equipCostPerBundle(
+                          formatCost(unit),
+                          bundle,
+                        )
+                      : context.l10n.equipCostEach(formatCost(unit)),
                   style: TextStyle(fontSize: 12, color: muted),
                 ),
               ],

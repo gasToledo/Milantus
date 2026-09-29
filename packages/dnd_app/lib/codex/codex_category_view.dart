@@ -155,7 +155,7 @@ class _CodexCategoryViewState extends State<_CodexCategoryView> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            results.length == 1 ? '1 entrada' : '${results.length} entradas',
+            context.l10n.codexEntries(results.length),
             style: TextStyle(fontSize: 12, color: pal.textMuted),
           ),
         ),

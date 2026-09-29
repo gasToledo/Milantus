@@ -5149,5 +5149,76 @@
   "bootFailed": "No se pudo iniciar la aplicación.",
   "bootFailedHint": "Suele ser un problema momentáneo de conexión. Probá de nuevo; si sigue igual, recargá la página.",
   "bootOffline": "No se pudo conectar con el servidor.",
-  "bootOfflineHint": "Tus personajes están a salvo: no se pudieron leer, pero no se perdió nada. Revisá la conexión y reintentá."
+  "bootOfflineHint": "Tus personajes están a salvo: no se pudieron leer, pero no se perdió nada. Revisá la conexión y reintentá.",
+  "invItemCount": "{count, plural, =1{1 objeto} other{{count} objetos}}",
+  "@invItemCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "invShownOf": "{shown} de {total}",
+  "@invShownOf": {
+    "placeholders": {
+      "shown": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "luClassFeatures": "{count} rasgos de clase",
+  "@luClassFeatures": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "luUnchanged": "SIN CAMBIOS",
+  "equipCostPerBundle": "{cost} el paquete de {size}",
+  "@equipCostPerBundle": {
+    "placeholders": {
+      "cost": {
+        "type": "String"
+      },
+      "size": {
+        "type": "Object"
+      }
+    }
+  },
+  "equipCostEach": "{cost} c/u",
+  "@equipCostEach": {
+    "placeholders": {
+      "cost": {
+        "type": "String"
+      }
+    }
+  },
+  "sheetSubclassAtLevel": "subclase en nivel {level}",
+  "@sheetSubclassAtLevel": {
+    "placeholders": {
+      "level": {
+        "type": "Object"
+      }
+    }
+  },
+  "codexEntries": "{count, plural, =1{1 entrada} other{{count} entradas}}",
+  "@codexEntries": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bestiaryCreatureCount": "{count, plural, =1{1 criatura} other{{count} criaturas}}",
+  "@bestiaryCreatureCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

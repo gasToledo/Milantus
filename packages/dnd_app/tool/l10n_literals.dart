@@ -78,6 +78,14 @@ bool _esTexto(String literal, {required bool enPosicionUi}) {
   // Identificadores, rutas y claves: minúsculas pegadas, sin espacios.
   if (RegExp(r'^[a-z0-9_\-./:#@]+$').hasMatch(c)) return false;
   if (enPosicionUi) return true;
+  // Texto armado por partes que no tiene acento ni mayúscula inicial: dos
+  // palabras en minúscula («rasgos de clase»), un rótulo en mayúsculas
+  // («SIN CAMBIOS») o un número con su sustantivo («1 resultado»). Se
+  // escaparon así a la versión 0.20.0 y aparecieron en español con la
+  // interfaz en inglés.
+  if (RegExp(r'[a-z]{2,} [a-z]{2,}').hasMatch(c)) return true;
+  if (RegExp(r'^[A-Z]{3,}( [A-Z]{2,})+$').hasMatch(c)) return true;
+  if (RegExp(r'\d [a-z]{3,}').hasMatch(c)) return true;
   // Una frase suelta: empieza en mayúscula y sigue con más palabras.
   // También una palabra sola («Guardado») o con puntuación final.
   return RegExp(

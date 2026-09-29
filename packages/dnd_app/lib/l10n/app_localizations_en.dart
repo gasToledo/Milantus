@@ -6612,4 +6612,65 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get bootOfflineHint =>
       'Your characters are safe: they could not be read, but nothing was lost. Check your connection and try again.';
+
+  @override
+  String invItemCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items',
+      one: '1 item',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String invShownOf(Object shown, Object total) {
+    return '$shown of $total';
+  }
+
+  @override
+  String luClassFeatures(Object count) {
+    return '$count class features';
+  }
+
+  @override
+  String get luUnchanged => 'UNCHANGED';
+
+  @override
+  String equipCostPerBundle(String cost, Object size) {
+    return '$cost per pack of $size';
+  }
+
+  @override
+  String equipCostEach(String cost) {
+    return '$cost each';
+  }
+
+  @override
+  String sheetSubclassAtLevel(Object level) {
+    return 'subclass at level $level';
+  }
+
+  @override
+  String codexEntries(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count entries',
+      one: '1 entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String bestiaryCreatureCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count creatures',
+      one: '1 creature',
+    );
+    return '$_temp0';
+  }
 }

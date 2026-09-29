@@ -1784,5 +1784,14 @@
   "bootFailed": "The app could not start.",
   "bootFailedHint": "It is usually a momentary connection problem. Try again; if it keeps happening, reload the page.",
   "bootOffline": "Could not connect to the server.",
-  "bootOfflineHint": "Your characters are safe: they could not be read, but nothing was lost. Check your connection and try again."
+  "bootOfflineHint": "Your characters are safe: they could not be read, but nothing was lost. Check your connection and try again.",
+  "invItemCount": "{count, plural, =1{1 item} other{{count} items}}",
+  "invShownOf": "{shown} of {total}",
+  "luClassFeatures": "{count} class features",
+  "luUnchanged": "UNCHANGED",
+  "equipCostPerBundle": "{cost} per pack of {size}",
+  "equipCostEach": "{cost} each",
+  "sheetSubclassAtLevel": "subclass at level {level}",
+  "codexEntries": "{count, plural, =1{1 entry} other{{count} entries}}",
+  "bestiaryCreatureCount": "{count, plural, =1{1 creature} other{{count} creatures}}"
 }

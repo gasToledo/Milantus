@@ -20,7 +20,7 @@ extension _SheetNavigation on _SheetScreenState {
       detail: switch (_c.subclassForClass(id)) {
         final sub? => repo.subclass(sub)?.name ?? sub,
         null when klass != null && level < klass.subclassLevel =>
-          'subclase en nivel ${klass.subclassLevel}',
+          context.l10n.sheetSubclassAtLevel(klass.subclassLevel),
         null => null,
       },
     );

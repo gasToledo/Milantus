@@ -478,8 +478,8 @@ extension _SheetInventorySection on _SheetScreenState {
           ? null
           : GoldPill(
               lines.length == total
-                  ? '$total ${total == 1 ? 'objeto' : 'objetos'}'
-                  : '${lines.length} de $total',
+                  ? context.l10n.invItemCount(total)
+                  : context.l10n.invShownOf(lines.length, total),
               highlighted: false,
             ),
       child: Padding(

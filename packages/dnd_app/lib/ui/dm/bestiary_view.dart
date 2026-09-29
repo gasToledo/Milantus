@@ -352,9 +352,7 @@ class _BestiaryViewState extends State<BestiaryView> {
             children: [
               Expanded(
                 child: Text(
-                  results.length == 1
-                      ? '1 criatura'
-                      : '${results.length} criaturas',
+                  context.l10n.bestiaryCreatureCount(results.length),
                   style: TextStyle(fontSize: 12, color: pal.textMuted),
                 ),
               ),

@@ -45,6 +45,10 @@ void main() {
     expect(ve("Text(\n  'Una parte '\n  'y otra',\n)"), hasLength(2));
     // Una frase suelta que empieza en mayúscula.
     expect(ve("final m = 'No se pudo cargar';"), hasLength(1));
+    // Armado por partes, sin acento ni mayúscula inicial.
+    expect(ve(r"final t = '${n} rasgos de clase';"), hasLength(1));
+    expect(ve("final t = ok ? 'SIN CAMBIOS' : x;"), hasLength(1));
+    expect(ve("final t = n == 1 ? '1 resultado' : x;"), hasLength(1));
     // Lo que no es texto para la persona.
     expect(ve("// Text('Guardar')"), isEmpty);
     expect(ve("final a = 1; // dice 'Guardá'"), isEmpty);

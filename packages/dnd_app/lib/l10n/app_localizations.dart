@@ -10812,6 +10812,60 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Tus personajes están a salvo: no se pudieron leer, pero no se perdió nada. Revisá la conexión y reintentá.'**
   String get bootOfflineHint;
+
+  /// No description provided for @invItemCount.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 objeto} other{{count} objetos}}'**
+  String invItemCount(int count);
+
+  /// No description provided for @invShownOf.
+  ///
+  /// In es, this message translates to:
+  /// **'{shown} de {total}'**
+  String invShownOf(Object shown, Object total);
+
+  /// No description provided for @luClassFeatures.
+  ///
+  /// In es, this message translates to:
+  /// **'{count} rasgos de clase'**
+  String luClassFeatures(Object count);
+
+  /// No description provided for @luUnchanged.
+  ///
+  /// In es, this message translates to:
+  /// **'SIN CAMBIOS'**
+  String get luUnchanged;
+
+  /// No description provided for @equipCostPerBundle.
+  ///
+  /// In es, this message translates to:
+  /// **'{cost} el paquete de {size}'**
+  String equipCostPerBundle(String cost, Object size);
+
+  /// No description provided for @equipCostEach.
+  ///
+  /// In es, this message translates to:
+  /// **'{cost} c/u'**
+  String equipCostEach(String cost);
+
+  /// No description provided for @sheetSubclassAtLevel.
+  ///
+  /// In es, this message translates to:
+  /// **'subclase en nivel {level}'**
+  String sheetSubclassAtLevel(Object level);
+
+  /// No description provided for @codexEntries.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 entrada} other{{count} entradas}}'**
+  String codexEntries(int count);
+
+  /// No description provided for @bestiaryCreatureCount.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 criatura} other{{count} criaturas}}'**
+  String bestiaryCreatureCount(int count);
 }
 
 class _AppLocalizationsDelegate

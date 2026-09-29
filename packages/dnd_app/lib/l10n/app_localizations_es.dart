@@ -6611,4 +6611,65 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get bootOfflineHint =>
       'Tus personajes están a salvo: no se pudieron leer, pero no se perdió nada. Revisá la conexión y reintentá.';
+
+  @override
+  String invItemCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count objetos',
+      one: '1 objeto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String invShownOf(Object shown, Object total) {
+    return '$shown de $total';
+  }
+
+  @override
+  String luClassFeatures(Object count) {
+    return '$count rasgos de clase';
+  }
+
+  @override
+  String get luUnchanged => 'SIN CAMBIOS';
+
+  @override
+  String equipCostPerBundle(String cost, Object size) {
+    return '$cost el paquete de $size';
+  }
+
+  @override
+  String equipCostEach(String cost) {
+    return '$cost c/u';
+  }
+
+  @override
+  String sheetSubclassAtLevel(Object level) {
+    return 'subclase en nivel $level';
+  }
+
+  @override
+  String codexEntries(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count entradas',
+      one: '1 entrada',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String bestiaryCreatureCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count criaturas',
+      one: '1 criatura',
+    );
+    return '$_temp0';
+  }
 }
