@@ -565,7 +565,7 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
           label: context.l10n.hbWhenUsed,
           value: a.kind,
           options: CreatureActionKind.values,
-          labelOf: (k) => k.label,
+          labelOf: (k) => k.text(context.l10n),
           onChanged: (k) => setState(() {
             a.kind = k;
             focus = 'action:$index:kind';
