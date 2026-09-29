@@ -384,12 +384,23 @@ Handler buildHandler({
       authenticated((request) => _importHandler(request, importBackup)),
     );
 
-  // El router va primero: solo cae al build web estático cuando no reconoce
-  // la ruta (404), así que `/api/*` y `/auth/*` nunca pueden resolverse por
-  // accidente contra un archivo del cliente.
-  final rootHandler = webStaticHandler == null
-      ? router.call
-      : Cascade().add(router.call).add(webStaticHandler).handler;
+  // El router va primero y solo cae al build web estático ante un 404. Pero
+  // `/api/*` y `/auth/*` no pasan nunca por la cascada: la Cascade no
+  // distingue una ruta desconocida de un 404 a propósito («Código inválido o
+  // vencido.»), y el build web lo reemplazaba por un «Not Found» en texto
+  // plano que el cliente no puede mostrar.
+  final Handler rootHandler;
+  if (webStaticHandler == null) {
+    rootHandler = router.call;
+  } else {
+    final withStatic = Cascade().add(router.call).add(webStaticHandler).handler;
+    rootHandler = (request) {
+      final path = request.url.path;
+      return path.startsWith('api/') || path.startsWith('auth/')
+          ? router.call(request)
+          : withStatic(request);
+    };
+  }
 
   return const Pipeline()
       .addMiddleware(logRequests())

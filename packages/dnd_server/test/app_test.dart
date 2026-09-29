@@ -1876,6 +1876,39 @@ void main() {
 
       expect(response.headers['x-fuente'], isNull);
     });
+
+    // La Cascade pasa al siguiente handler ante cualquier 404, también los de
+    // la API a propósito («Código inválido o vencido.»): el build web
+    // contestaba «Not Found» en texto plano y el mensaje se perdía.
+    test('un 404 de la API no cae al build web', () async {
+      final withStatic = buildHandler(
+        auth: fakeAuth.dependencies,
+        portraits: portraits,
+        generation: generation,
+        importBackup: importBackup,
+        importHomebrew: importHomebrew,
+        characters: characters,
+        campaigns: campaigns,
+        chapters: chapters,
+        notes: notes,
+        encounters: encounters,
+        events: events,
+        npcs: npcs,
+        transactions: transactions,
+        homebrew: homebrewRepo,
+        settings: settingsRepo,
+        webStaticHandler: (request) =>
+            Response.ok('build web', headers: {'x-fuente': 'estatico'}),
+      );
+
+      for (final path in ['/api/no-existe', '/auth/no-existe']) {
+        final response = await withStatic(
+          Request('GET', Uri.parse('http://localhost$path')),
+        );
+        expect(response.statusCode, 404, reason: path);
+        expect(response.headers['x-fuente'], isNull, reason: path);
+      }
+    });
   });
 
   // Es la única parte del servidor donde una cuenta alcanza datos de otra, así
