@@ -11,6 +11,7 @@ import 'auth/auth_middleware.dart';
 import 'auth/oidc_service.dart';
 import 'auth/session_cookie.dart';
 import 'auth/session_store.dart';
+import 'feedback/feedback_mail.dart';
 import 'import/backup_bundle.dart';
 import 'import/homebrew_content.dart';
 import 'import/import_service.dart';
@@ -109,14 +110,25 @@ Handler buildHandler({
   /// suelta): las rutas de arriba siguen funcionando igual, simplemente no
   /// hay nada detrás para el resto de las peticiones.
   Handler? webStaticHandler,
+
+  /// Manda las sugerencias y reportes de error. `null` cuando el servidor no
+  /// tiene proveedor de correo configurado: `/api/me` lo avisa y la app
+  /// esconde el botón.
+  SendFeedbackFn? sendFeedback,
 }) {
   final authenticated = requireSession(auth.resolveUserId);
+  final feedbackLimiter = FeedbackRateLimiter();
   final router = Router()
     ..get('/health', _healthHandler)
     ..get('/auth/login', (request) => _loginHandler(request, auth))
     ..get('/auth/callback', (request) => _callbackHandler(request, auth))
     ..post('/auth/logout', (request) => _logoutHandler(request, auth))
-    ..get('/api/me', authenticated((request) => _meHandler(request, auth)))
+    ..get(
+      '/api/me',
+      authenticated(
+        (request) => _meHandler(request, auth, sendFeedback != null),
+      ),
+    )
     ..get(
       '/api/characters',
       authenticated((request) => _listCharactersHandler(request, characters)),
@@ -382,6 +394,13 @@ Handler buildHandler({
     ..post(
       '/api/import',
       authenticated((request) => _importHandler(request, importBackup)),
+    )
+    ..post(
+      '/api/feedback',
+      authenticated(
+        (request) =>
+            _feedbackHandler(request, auth, sendFeedback, feedbackLimiter),
+      ),
     );
 
   // El router va primero y solo cae al build web estático ante un 404. Pero
@@ -482,7 +501,11 @@ Future<Response> _logoutHandler(Request request, AuthDependencies auth) async {
 /// La cuenta de la sesión en curso. El `userId` es el id interno; el resto es
 /// lo que el proveedor OIDC afirmó al abrir la sesión, y puede venir en `null`
 /// (ver [SessionProfile]).
-Future<Response> _meHandler(Request request, AuthDependencies auth) async {
+Future<Response> _meHandler(
+  Request request,
+  AuthDependencies auth,
+  bool feedbackEnabled,
+) async {
   final token = readSessionToken(request.headers['cookie']);
   final profile = token == null ? null : await auth.sessionProfile(token);
   return Response.ok(
@@ -491,9 +514,95 @@ Future<Response> _meHandler(Request request, AuthDependencies auth) async {
       'name': profile?.name,
       'email': profile?.email,
       'pictureUrl': profile?.pictureUrl,
+      'feedbackEnabled': feedbackEnabled,
     }),
     headers: {'content-type': 'application/json'},
   );
+}
+
+const _feedbackMessageMaxChars = 5000;
+const _feedbackContextMaxChars = 4000;
+
+/// Manda una sugerencia o un reporte de error a la casilla del proyecto.
+///
+/// Quién escribe sale de la sesión, nunca del cuerpo: si el correo viniera de
+/// la petición, cualquiera podría mandar mensajes en nombre de otro y el
+/// «Responder» le llegaría a esa otra persona.
+Future<Response> _feedbackHandler(
+  Request request,
+  AuthDependencies auth,
+  SendFeedbackFn? sendFeedback,
+  FeedbackRateLimiter limiter,
+) async {
+  if (sendFeedback == null) {
+    return Response(
+      503,
+      body: jsonEncode({
+        'error': 'Este servidor no tiene configurado el envío de sugerencias.',
+      }),
+      headers: {'content-type': 'application/json'},
+    );
+  }
+  final body = await _readJsonBody(request);
+  final kind = FeedbackKind.values.asNameMap()[body['kind']];
+  if (kind == null) {
+    throw const FormatException('"kind" debe ser "idea" o "bug".');
+  }
+  final message = body['message'];
+  if (message is! String || message.trim().isEmpty) {
+    throw const FormatException('Falta "message".');
+  }
+  if (message.length > _feedbackMessageMaxChars) {
+    throw const PayloadTooLargeException('El mensaje es demasiado largo.');
+  }
+  final rawContext = body['context'];
+  // El contexto es una ayuda, no un requisito: un valor que no es texto se
+  // descarta y uno larguísimo (un detalle de error con stack) se recorta, en
+  // vez de rechazar el mensaje entero por un dato accesorio.
+  final context = <String, String>{
+    if (rawContext is Map)
+      for (final key in feedbackContextLabels.keys)
+        if (rawContext[key] case final String value)
+          key: value.length > _feedbackContextMaxChars
+              ? '${value.substring(0, _feedbackContextMaxChars)}…'
+              : value,
+  };
+
+  final userId = request.userId;
+  if (!limiter.allows(userId)) {
+    return Response(
+      429,
+      body: jsonEncode({
+        'error':
+            'Mandaste muchos mensajes seguidos. Probá de nuevo en un rato.',
+      }),
+      headers: {'content-type': 'application/json'},
+    );
+  }
+
+  final token = readSessionToken(request.headers['cookie']);
+  final profile = token == null ? null : await auth.sessionProfile(token);
+  final email = composeFeedbackEmail(
+    kind: kind,
+    message: message.trim(),
+    context: context,
+    receivedAt: DateTime.now(),
+    name: profile?.name,
+    email: profile?.email,
+    userAgent: request.headers['user-agent'],
+  );
+  try {
+    await sendFeedback(email);
+  } catch (error) {
+    print('No se pudo enviar el feedback: $error');
+    return Response(
+      502,
+      body: jsonEncode({'error': 'No se pudo enviar el mensaje.'}),
+      headers: {'content-type': 'application/json'},
+    );
+  }
+  limiter.record(userId);
+  return _jsonOk({'status': 'ok'});
 }
 
 Response _jsonOk(Map<String, dynamic> body) => Response.ok(

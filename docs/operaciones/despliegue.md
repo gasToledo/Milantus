@@ -104,6 +104,37 @@ Runbook operativo del stack de contenedores.
    personaje de prueba (ver requisito "Arranque desde cero" — sección más
    abajo).
 
+## Sugerencias y reportes de error por correo
+
+El botón «Sugerencias y errores» del panel lateral y «Reportar este error» de
+las vistas de error mandan un correo a la casilla del proyecto por la API de
+[Resend](https://resend.com). Es **opcional**: sin configurar, el servidor
+arranca igual, `/api/me` responde `feedbackEnabled: false` y la app no muestra
+ninguno de los dos botones.
+
+1. Crear la cuenta en Resend y agregar el dominio (`milantus.com.ar`). Resend
+   muestra unos registros DNS (SPF y DKIM); cargarlos en Cloudflare, o usar su
+   conexión automática con Cloudflare. Esperar a que el dominio figure como
+   verificado: sin eso Resend rechaza el envío y el servidor responde 502.
+2. Generar una API key con permiso de envío y completar en `.env`:
+   - `RESEND_API_KEY`: la clave.
+   - `FEEDBACK_TO`: la casilla que recibe los mensajes.
+   - `FEEDBACK_FROM` (opcional): el remitente, siempre con el dominio
+     verificado. Sin valor, `Milantus <feedback@milantus.com.ar>`. No hace
+     falta que esa dirección exista para recibir: solo figura como remitente.
+3. Reiniciar `server` (`docker compose up -d server`) y, con sesión, mandar un
+   mensaje de prueba desde el panel lateral.
+
+Cada correo trae el mensaje y, al pie, la cuenta (con «Responder a» apuntando
+a su correo), la hora, el navegador, la versión, el idioma, el tema, el tamaño
+de ventana, desde qué pantalla se abrió y, si vino de una vista de error, el
+detalle. Nada más: ni IP, ni cookies, ni contenido de personajes. Hay un tope
+de diez mensajes por hora y por cuenta.
+
+La misma cuenta de Resend sirve de SMTP para Zitadel (`smtp.resend.com`, puerto
+465, usuario `resend`, la API key como contraseña), que lo necesita para
+mandar sus propios correos de verificación y de recuperación de contraseña.
+
 ## Integración y despliegue continuo
 
 Dos workflows en `.github/workflows/`:

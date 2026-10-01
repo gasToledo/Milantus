@@ -107,6 +107,7 @@ extension _DashboardNavigation on _DashboardScreenState {
             ),
           ),
           _accountFooter(context),
+          const FeedbackButton(origin: FeedbackOrigin.dashboard),
           DisplayPreferences(controller: widget.theme),
           // Null solo en tests, donde no se resuelve `PackageInfo`.
           if (widget.appVersion case final version?) ...[

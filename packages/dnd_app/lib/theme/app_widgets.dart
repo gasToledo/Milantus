@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../api/api_exception.dart';
 import '../l10n/app_locale.dart';
 import '../l10n/l10n_context.dart';
+import '../ui/feedback.dart';
 import '../ui/portrait_image.dart';
 import 'app_theme.dart';
 
@@ -382,12 +383,39 @@ class AppErrorView extends StatelessWidget {
                   ),
                 ),
               ],
-              if (onRetry != null) ...[
+              // «Reportar» va al lado de «Reintentar» y no escondido en otro
+              // lado: es el momento en que alguien tiene ganas de contarlo.
+              // Sin canal (el arranque todavía no cargó la cuenta, o el
+              // servidor no tiene correo) no aparece.
+              if (onRetry != null || FeedbackScope.of(context) != null) ...[
                 const SizedBox(height: 16),
-                FilledButton.icon(
-                  onPressed: onRetry,
-                  icon: const Icon(Icons.refresh),
-                  label: Text(context.l10n.commonRetry),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 12,
+                  runSpacing: 8,
+                  children: [
+                    if (onRetry != null)
+                      FilledButton.icon(
+                        onPressed: onRetry,
+                        icon: const Icon(Icons.refresh),
+                        label: Text(context.l10n.commonRetry),
+                      ),
+                    if (FeedbackScope.of(context) != null)
+                      OutlinedButton.icon(
+                        key: const ValueKey('error-report-button'),
+                        onPressed: () => showFeedbackDialog(
+                          context,
+                          origin: FeedbackOrigin.errorView,
+                          initialKind: FeedbackKind.bug,
+                          errorDetail: [
+                            message,
+                            if (details != null) '$details',
+                          ].join('\n'),
+                        ),
+                        icon: const Icon(Icons.bug_report_outlined),
+                        label: Text(context.l10n.errorReport),
+                      ),
+                  ],
                 ),
               ],
               if (details != null) ...[

@@ -1798,5 +1798,17 @@
   "npcCountAlive": "{count} alive",
   "npcCountDead": "{count} dead",
   "npcCountUnknown": "{count} unknown",
-  "creatureLegendaryAction": "Legendary Action"
+  "creatureLegendaryAction": "Legendary Action",
+  "feedbackButton": "Ideas & bug reports",
+  "feedbackTitle": "Ideas & bug reports",
+  "feedbackKindIdea": "An idea",
+  "feedbackKindBug": "A bug",
+  "feedbackMessageLabel": "Message",
+  "feedbackHintIdea": "What would you like to be able to do, and how would you use it at your table?",
+  "feedbackHintBug": "What were you doing, what did you expect, and what happened?",
+  "feedbackReplyTo": "We'll reply to {email}.",
+  "feedbackSend": "Send",
+  "feedbackSendError": "Couldn't send the message",
+  "feedbackSent": "Thanks! We got your message.",
+  "errorReport": "Report this error"
 }

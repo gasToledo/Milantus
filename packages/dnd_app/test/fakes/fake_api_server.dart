@@ -98,6 +98,17 @@ class FakeApiServer {
   String? accountName = 'Ada Lovelace';
   String? accountEmail = 'ada@example.org';
 
+  /// Si `/api/me` avisa que hay envío de sugerencias. Apagado por defecto,
+  /// como un servidor sin proveedor de correo: el botón solo aparece en las
+  /// pruebas que lo piden.
+  bool feedbackEnabled = false;
+
+  /// Los cuerpos de `POST /api/feedback` tal como llegaron.
+  final List<Map<String, dynamic>> feedback = [];
+
+  /// Si no es null, `POST /api/feedback` responde con este código de error.
+  int? feedbackFailStatus;
+
   /// URL de cierre de sesión del proveedor que devuelve `/auth/logout`, y
   /// cuántas veces se llamó.
   String? logoutUrl = 'https://idp.example/end_session';
@@ -129,7 +140,32 @@ class FakeApiServer {
         'name': accountName,
         'email': accountEmail,
         'pictureUrl': null,
+        'feedbackEnabled': feedbackEnabled,
       });
+    }
+
+    if (method == 'POST' && path == '/api/feedback') {
+      // Las mismas podas que el servidor: sin proveedor, 503; tipo o mensaje
+      // inválidos, 400. El cupo por cuenta no se reproduce: es un detalle del
+      // servidor que el cliente solo ve como un error más.
+      if (!feedbackEnabled) {
+        return _json({
+          'error':
+              'Este servidor no tiene configurado el envío de sugerencias.',
+        }, 503);
+      }
+      final body = jsonDecode(request.body) as Map<String, dynamic>;
+      final message = body['message'];
+      if (!const {'idea', 'bug'}.contains(body['kind']) ||
+          message is! String ||
+          message.trim().isEmpty) {
+        return _json({'error': 'Mensaje inválido.'}, 400);
+      }
+      if (feedbackFailStatus case final status?) {
+        return _json({'error': 'No se pudo enviar el mensaje.'}, status);
+      }
+      feedback.add(body);
+      return _json({'status': 'ok'});
     }
 
     if (method == 'POST' && path == '/auth/logout') {

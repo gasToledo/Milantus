@@ -176,6 +176,7 @@ extension _SheetNavigation on _SheetScreenState {
         // saber si lo que se acaba de tipear llegó al servidor.
         SaveStatusIndicator(controller: ctrl),
         const SizedBox(height: 8),
+        const FeedbackButton(origin: FeedbackOrigin.sheet),
         DisplayPreferences(controller: widget.theme),
       ],
     );

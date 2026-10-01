@@ -5253,5 +5253,25 @@
       }
     }
   },
-  "creatureLegendaryAction": "Acción legendaria"
+  "creatureLegendaryAction": "Acción legendaria",
+  "feedbackButton": "Sugerencias y errores",
+  "feedbackTitle": "Sugerencias y errores",
+  "feedbackKindIdea": "Una idea",
+  "feedbackKindBug": "Un error",
+  "feedbackMessageLabel": "Mensaje",
+  "feedbackHintIdea": "¿Qué te gustaría poder hacer, y para qué lo usarías en tu mesa?",
+  "feedbackHintBug": "¿Qué estabas haciendo, qué esperabas y qué pasó?",
+  "feedbackReplyTo": "Te respondemos a {email}.",
+  "@feedbackReplyTo": {
+    "description": "Debajo del mensaje; {email} es el correo de la cuenta con la que se entró.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "feedbackSend": "Enviar",
+  "feedbackSendError": "No se pudo enviar el mensaje",
+  "feedbackSent": "¡Gracias! Recibimos tu mensaje.",
+  "errorReport": "Reportar este error"
 }

@@ -10896,6 +10896,78 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Acción legendaria'**
   String get creatureLegendaryAction;
+
+  /// No description provided for @feedbackButton.
+  ///
+  /// In es, this message translates to:
+  /// **'Sugerencias y errores'**
+  String get feedbackButton;
+
+  /// No description provided for @feedbackTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Sugerencias y errores'**
+  String get feedbackTitle;
+
+  /// No description provided for @feedbackKindIdea.
+  ///
+  /// In es, this message translates to:
+  /// **'Una idea'**
+  String get feedbackKindIdea;
+
+  /// No description provided for @feedbackKindBug.
+  ///
+  /// In es, this message translates to:
+  /// **'Un error'**
+  String get feedbackKindBug;
+
+  /// No description provided for @feedbackMessageLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Mensaje'**
+  String get feedbackMessageLabel;
+
+  /// No description provided for @feedbackHintIdea.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Qué te gustaría poder hacer, y para qué lo usarías en tu mesa?'**
+  String get feedbackHintIdea;
+
+  /// No description provided for @feedbackHintBug.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Qué estabas haciendo, qué esperabas y qué pasó?'**
+  String get feedbackHintBug;
+
+  /// Debajo del mensaje; {email} es el correo de la cuenta con la que se entró.
+  ///
+  /// In es, this message translates to:
+  /// **'Te respondemos a {email}.'**
+  String feedbackReplyTo(String email);
+
+  /// No description provided for @feedbackSend.
+  ///
+  /// In es, this message translates to:
+  /// **'Enviar'**
+  String get feedbackSend;
+
+  /// No description provided for @feedbackSendError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo enviar el mensaje'**
+  String get feedbackSendError;
+
+  /// No description provided for @feedbackSent.
+  ///
+  /// In es, this message translates to:
+  /// **'¡Gracias! Recibimos tu mensaje.'**
+  String get feedbackSent;
+
+  /// No description provided for @errorReport.
+  ///
+  /// In es, this message translates to:
+  /// **'Reportar este error'**
+  String get errorReport;
 }
 
 class _AppLocalizationsDelegate

@@ -8,6 +8,7 @@ import 'package:dnd_server/src/auth/session_store.dart';
 import 'package:dnd_server/src/config.dart';
 import 'package:dnd_server/src/db/database.dart';
 import 'package:dnd_server/src/db/migration_runner.dart';
+import 'package:dnd_server/src/feedback/feedback_mail.dart';
 import 'package:dnd_server/src/import/import_service.dart' as import_service;
 import 'package:dnd_server/src/portraits/disk_portrait_blob_store.dart';
 import 'package:dnd_server/src/repositories/account_repository.dart';
@@ -89,6 +90,13 @@ Future<void> main() async {
       homebrew: PostgresHomebrewRepository(pool),
       settings: PostgresSettingsRepository(pool),
       webStaticHandler: webStaticHandler,
+      sendFeedback: config.feedback.enabled
+          ? resendFeedbackSender(
+              apiKey: config.feedback.resendApiKey,
+              from: config.feedback.from,
+              to: config.feedback.to,
+            )
+          : null,
     ),
     config.host,
     config.port,

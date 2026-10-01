@@ -15,6 +15,7 @@ import 'data/settings_service.dart';
 import 'theme/app_theme.dart';
 import 'theme/app_widgets.dart';
 import 'ui/dashboard_screen.dart';
+import 'ui/feedback.dart';
 import 'ui/pending_events_gate.dart';
 import 'web/browser.dart' as browser;
 
@@ -58,9 +59,12 @@ class _DndAppState extends State<DndApp> {
   // sincrónica: el primer cuadro ya sale en el idioma correcto.
   late final _locale = widget.localeController ?? AppLocaleController();
 
+  final _feedback = ValueNotifier<FeedbackChannel?>(null);
+
   @override
   void dispose() {
     _theme.dispose();
+    _feedback.dispose();
     if (widget.localeController == null) _locale.dispose();
     super.dispose();
   }
@@ -69,21 +73,24 @@ class _DndAppState extends State<DndApp> {
   Widget build(BuildContext context) {
     return AppLocaleScope(
       controller: _locale,
-      child: ListenableBuilder(
-        listenable: Listenable.merge([_theme, _locale]),
-        builder: (context, _) => MaterialApp(
-          onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          locale: _locale.value,
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.light,
-          darkTheme: AppTheme.dark,
-          themeMode: _theme.value,
-          home: _Bootstrap(
-            theme: _theme,
-            api: widget.api,
-            contentLoader: widget.contentLoader,
+      child: FeedbackScope(
+        notifier: _feedback,
+        child: ListenableBuilder(
+          listenable: Listenable.merge([_theme, _locale]),
+          builder: (context, _) => MaterialApp(
+            onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: _locale.value,
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.light,
+            darkTheme: AppTheme.dark,
+            themeMode: _theme.value,
+            home: _Bootstrap(
+              theme: _theme,
+              api: widget.api,
+              contentLoader: widget.contentLoader,
+            ),
           ),
         ),
       ),
@@ -207,6 +214,19 @@ class _BootstrapState extends State<_Bootstrap> {
       });
 
       final version = await versionLoad;
+      _checkCurrent(generation);
+      // Recién acá hay con qué escribir: antes no se sabe a nombre de quién
+      // ni qué versión corre. Un error del arranque mismo queda sin botón de
+      // reporte, que es lo esperable: sin sesión el servidor no lo aceptaría.
+      // `_checkCurrent` ya garantiza `mounted`, pero el analizador no lo ve.
+      if (!mounted) throw const _BootstrapCancelled();
+      FeedbackScope.notifierOf(context)?.value = account.feedbackEnabled
+          ? FeedbackChannel(
+              api: _api,
+              email: account.email,
+              appVersion: version,
+            )
+          : null;
       return _AppData(
         repo,
         controller,

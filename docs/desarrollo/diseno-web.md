@@ -471,7 +471,8 @@ En `lib/homebrew/forms/form_widgets.dart`, para los ocho formularios de contenid
 | `AppBusyLabel` | Spinner de 18 px + texto, como región viva | El texto es obligatorio: un spinner solo no dice qué está pasando |
 | `_SaveStatusIndicator` | Píldora de estado del guardado con `AnimatedSwitcher` de 180 ms | Ícono + texto + color, los tres |
 | `AppEmptyState` | Ícono 40 px `onSurfaceVariant` + mensaje centrado + acciones opcionales | El mensaje es región viva. Distinguir **«no hay nada»** de **«nada coincide con la búsqueda»**: son situaciones distintas y piden acciones distintas |
-| `AppErrorView` | Ícono de error + mensaje + `SelectableText` del detalle + botón "Reintentar" | El detalle técnico se puede copiar. `onRetry` es lo que lo separa de un cartel muerto |
+| `AppErrorView` | Ícono de error + mensaje + `SelectableText` del detalle + botón "Reintentar" | El detalle técnico se puede copiar. `onRetry` es lo que lo separa de un cartel muerto. Con un `FeedbackScope` con canal suma «Reportar este error», que manda el mensaje y el detalle |
+| `FeedbackButton` / `showFeedbackDialog(…)` (`ui/feedback.dart`) | Entrada «Sugerencias y errores» del pie del panel lateral y su diálogo | Va en el pie de los tres paneles (dashboard, ficha, Modo DM), neutra y no dorada. Sin canal en `FeedbackScope` no ocupa lugar |
 | `showTextPromptDialog(…)` / `showRenameDialog(…)` | Diálogo de un solo campo de texto | Para más de un campo, diálogo propio (ver `chapter_editor_dialog.dart`) |
 | `AppDialog` | **El molde de diálogo**: placa del sistema con la barra de acciones a lo ancho | `title`, `icon`, `iconColor`, `titleTrailing`, `content`, `actions`, `width` (480), `scrollable` |
 | `DialogAction` | Una celda de esa barra | `label`, `onPressed`, `color`, `primary`, `keyHint` |

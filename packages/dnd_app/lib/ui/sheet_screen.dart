@@ -19,6 +19,7 @@ import '../web/browser.dart' as browser;
 import 'conditions.dart';
 import 'dm/share_character_dialog.dart';
 import 'item_catalog.dart';
+import 'feedback.dart';
 import 'portrait_image.dart';
 import 'portrait_screen.dart';
 import 'save_status_indicator.dart';

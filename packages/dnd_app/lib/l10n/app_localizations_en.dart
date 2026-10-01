@@ -6702,4 +6702,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get creatureLegendaryAction => 'Legendary Action';
+
+  @override
+  String get feedbackButton => 'Ideas & bug reports';
+
+  @override
+  String get feedbackTitle => 'Ideas & bug reports';
+
+  @override
+  String get feedbackKindIdea => 'An idea';
+
+  @override
+  String get feedbackKindBug => 'A bug';
+
+  @override
+  String get feedbackMessageLabel => 'Message';
+
+  @override
+  String get feedbackHintIdea =>
+      'What would you like to be able to do, and how would you use it at your table?';
+
+  @override
+  String get feedbackHintBug =>
+      'What were you doing, what did you expect, and what happened?';
+
+  @override
+  String feedbackReplyTo(String email) {
+    return 'We\'ll reply to $email.';
+  }
+
+  @override
+  String get feedbackSend => 'Send';
+
+  @override
+  String get feedbackSendError => 'Couldn\'t send the message';
+
+  @override
+  String get feedbackSent => 'Thanks! We got your message.';
+
+  @override
+  String get errorReport => 'Report this error';
 }

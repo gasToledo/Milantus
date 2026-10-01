@@ -33,11 +33,17 @@ class AccountInfo {
   final String? email;
   final String? pictureUrl;
 
+  /// Si el servidor tiene configurado el envío de sugerencias por correo. Sin
+  /// eso la app no muestra el botón: ofrecer algo que siempre falla es peor
+  /// que no ofrecerlo.
+  final bool feedbackEnabled;
+
   const AccountInfo({
     required this.userId,
     this.name,
     this.email,
     this.pictureUrl,
+    this.feedbackEnabled = false,
   });
 
   factory AccountInfo.fromJson(Map<String, dynamic> json) => AccountInfo(
@@ -45,6 +51,7 @@ class AccountInfo {
     name: json['name'] as String?,
     email: json['email'] as String?,
     pictureUrl: json['pictureUrl'] as String?,
+    feedbackEnabled: json['feedbackEnabled'] as bool? ?? false,
   );
 }
 

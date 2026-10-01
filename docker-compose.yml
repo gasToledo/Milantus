@@ -251,6 +251,9 @@ services:
       DND_PORTRAITS_ROOT: /app/data/portraits
       DND_AZURE_FLUX_API_KEY: ${AZURE_FLUX_API_KEY:-}
       DND_AZURE_OPENAI_API_KEY: ${AZURE_OPENAI_API_KEY:-}
+      DND_RESEND_API_KEY: ${RESEND_API_KEY:-}
+      DND_FEEDBACK_TO: ${FEEDBACK_TO:-}
+      DND_FEEDBACK_FROM: ${FEEDBACK_FROM:-Milantus <feedback@milantus.com.ar>}
     volumes:
       - portraits-data:/app/data/portraits
     depends_on:

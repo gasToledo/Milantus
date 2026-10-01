@@ -6719,4 +6719,44 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get creatureLegendaryAction => 'Acción legendaria';
+
+  @override
+  String get feedbackButton => 'Sugerencias y errores';
+
+  @override
+  String get feedbackTitle => 'Sugerencias y errores';
+
+  @override
+  String get feedbackKindIdea => 'Una idea';
+
+  @override
+  String get feedbackKindBug => 'Un error';
+
+  @override
+  String get feedbackMessageLabel => 'Mensaje';
+
+  @override
+  String get feedbackHintIdea =>
+      '¿Qué te gustaría poder hacer, y para qué lo usarías en tu mesa?';
+
+  @override
+  String get feedbackHintBug =>
+      '¿Qué estabas haciendo, qué esperabas y qué pasó?';
+
+  @override
+  String feedbackReplyTo(String email) {
+    return 'Te respondemos a $email.';
+  }
+
+  @override
+  String get feedbackSend => 'Enviar';
+
+  @override
+  String get feedbackSendError => 'No se pudo enviar el mensaje';
+
+  @override
+  String get feedbackSent => '¡Gracias! Recibimos tu mensaje.';
+
+  @override
+  String get errorReport => 'Reportar este error';
 }

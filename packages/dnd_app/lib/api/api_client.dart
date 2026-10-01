@@ -126,6 +126,18 @@ class ApiClient {
     return _json(response)['logoutUrl'] as String?;
   }
 
+  /// Manda una sugerencia o un reporte de error. [kind] es `idea` o `bug`; el
+  /// servidor agrega quién escribe desde la sesión.
+  Future<void> sendFeedback({
+    required String kind,
+    required String message,
+    required Map<String, String> context,
+  }) => _send(
+    'POST',
+    '/api/feedback',
+    jsonBody: {'kind': kind, 'message': message, 'context': context},
+  );
+
   // --- Personajes -------------------------------------------------------
 
   Future<List<StoredCharacter>> listCharacters() async {

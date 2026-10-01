@@ -134,6 +134,41 @@ class AiProvidersConfig {
   }
 }
 
+/// Envío de sugerencias y reportes de error por correo. Igual que
+/// [AiProvidersConfig], una ausencia degrada en vez de frenar el arranque: sin
+/// clave o sin destinatario el servidor sigue andando y la app esconde el
+/// botón (ver `feedbackEnabled` en `/api/me`). Así se puede desplegar antes de
+/// que exista la cuenta del proveedor.
+class FeedbackConfig {
+  final String resendApiKey;
+
+  /// La casilla que recibe los mensajes.
+  final String to;
+
+  /// El remitente, con el dominio verificado en Resend.
+  final String from;
+
+  const FeedbackConfig({
+    required this.resendApiKey,
+    required this.to,
+    required this.from,
+  });
+
+  bool get enabled => resendApiKey.isNotEmpty && to.isNotEmpty;
+
+  factory FeedbackConfig.fromEnvironment(Map<String, String> env) {
+    return FeedbackConfig(
+      resendApiKey: envOr(env, 'DND_RESEND_API_KEY', ''),
+      to: envOr(env, 'DND_FEEDBACK_TO', ''),
+      from: envOr(
+        env,
+        'DND_FEEDBACK_FROM',
+        'Milantus <feedback@milantus.com.ar>',
+      ),
+    );
+  }
+}
+
 /// Raíz del build web servido en el mismo origen que la API para compartir
 /// la cookie de sesión. Una cadena vacía deshabilita el servido estático
 /// en pruebas o cuando se ejecuta la API sola.
@@ -159,6 +194,7 @@ class ServerConfig {
   final OidcConfig oidc;
   final PortraitsConfig portraits;
   final AiProvidersConfig aiProviders;
+  final FeedbackConfig feedback;
   final WebConfig web;
 
   const ServerConfig({
@@ -168,6 +204,7 @@ class ServerConfig {
     required this.oidc,
     required this.portraits,
     required this.aiProviders,
+    required this.feedback,
     required this.web,
   });
 
@@ -179,6 +216,7 @@ class ServerConfig {
       oidc: OidcConfig.fromEnvironment(env),
       portraits: PortraitsConfig.fromEnvironment(env),
       aiProviders: AiProvidersConfig.fromEnvironment(env),
+      feedback: FeedbackConfig.fromEnvironment(env),
       web: WebConfig.fromEnvironment(env),
     );
   }
