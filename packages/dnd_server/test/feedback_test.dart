@@ -234,44 +234,61 @@ void main() {
     });
   });
 
-  group('resendFeedbackSender', () {
-    test('manda remitente, destino y responder-a a la API de Resend', () async {
-      late http.Request captured;
-      final send = resendFeedbackSender(
-        apiKey: 'clave',
-        from: 'Milantus <feedback@milantus.com.ar>',
-        to: 'casilla@example.org',
-        client: MockClient((request) async {
+  group('cloudflareFeedbackSender', () {
+    SendFeedbackFn sender(http.Response Function(http.Request) respond) =>
+        cloudflareFeedbackSender(
+          accountId: 'cuenta',
+          apiToken: 'token',
+          from: 'feedback@milantus.com.ar',
+          to: 'casilla@example.org',
+          client: MockClient((request) async => respond(request)),
+        );
+
+    test(
+      'manda remitente, destino y responder-a a la API de Cloudflare',
+      () async {
+        late http.Request captured;
+        final send = sender((request) {
           captured = request;
-          return http.Response('{"id":"1"}', 200);
-        }),
-      );
+          return http.Response('{"success":true,"errors":[]}', 200);
+        });
 
-      await send(
-        const FeedbackEmail(
-          subject: 'Asunto',
-          text: 'Cuerpo',
-          replyTo: 'tester@example.org',
-        ),
-      );
+        await send(
+          const FeedbackEmail(
+            subject: 'Asunto',
+            text: 'Cuerpo',
+            replyTo: 'tester@example.org',
+          ),
+        );
 
-      expect(captured.url.toString(), 'https://api.resend.com/emails');
-      expect(captured.headers['authorization'], 'Bearer clave');
-      expect(jsonDecode(captured.body), {
-        'from': 'Milantus <feedback@milantus.com.ar>',
-        'to': ['casilla@example.org'],
-        'subject': 'Asunto',
-        'text': 'Cuerpo',
-        'reply_to': 'tester@example.org',
-      });
+        expect(
+          captured.url.toString(),
+          'https://api.cloudflare.com/client/v4/accounts/cuenta/email/sending/send',
+        );
+        expect(captured.headers['authorization'], 'Bearer token');
+        expect(jsonDecode(captured.body), {
+          'from': 'feedback@milantus.com.ar',
+          'to': ['casilla@example.org'],
+          'subject': 'Asunto',
+          'text': 'Cuerpo',
+          'reply_to': 'tester@example.org',
+        });
+      },
+    );
+
+    test('un código de error lanza', () async {
+      final send = sender((_) => http.Response('{"success":false}', 403));
+
+      expect(
+        send(const FeedbackEmail(subject: 's', text: 't')),
+        throwsA(isA<StateError>()),
+      );
     });
 
-    test('una respuesta de error lanza', () async {
-      final send = resendFeedbackSender(
-        apiKey: 'clave',
-        from: 'a@b.c',
-        to: 'd@e.f',
-        client: MockClient((_) async => http.Response('dominio', 403)),
+    test('un 200 con success en false también lanza', () async {
+      final send = sender(
+        (_) =>
+            http.Response('{"success":false,"errors":[{"code":10001}]}', 200),
       );
 
       expect(
@@ -282,20 +299,23 @@ void main() {
   });
 
   group('FeedbackConfig', () {
-    test('sin clave o sin destino queda deshabilitado', () {
-      expect(FeedbackConfig.fromEnvironment(const {}).enabled, isFalse);
-      expect(
-        FeedbackConfig.fromEnvironment(const {
-          'DND_RESEND_API_KEY': 'k',
-        }).enabled,
-        isFalse,
-      );
-      final config = FeedbackConfig.fromEnvironment(const {
-        'DND_RESEND_API_KEY': 'k',
+    test('sin cuenta, token o destino queda deshabilitado', () {
+      const completa = {
+        'DND_CLOUDFLARE_ACCOUNT_ID': 'cuenta',
+        'DND_CLOUDFLARE_EMAIL_TOKEN': 'token',
         'DND_FEEDBACK_TO': 'casilla@example.org',
-      });
+      };
+      for (final falta in completa.keys) {
+        final env = {...completa}..remove(falta);
+        expect(
+          FeedbackConfig.fromEnvironment(env).enabled,
+          isFalse,
+          reason: 'sin $falta',
+        );
+      }
+      final config = FeedbackConfig.fromEnvironment(completa);
       expect(config.enabled, isTrue);
-      expect(config.from, 'Milantus <feedback@milantus.com.ar>');
+      expect(config.from, 'feedback@milantus.com.ar');
     });
   });
 }

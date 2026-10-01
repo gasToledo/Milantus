@@ -107,23 +107,35 @@ Runbook operativo del stack de contenedores.
 ## Sugerencias y reportes de error por correo
 
 El botón «Sugerencias y errores» del panel lateral y «Reportar este error» de
-las vistas de error mandan un correo a la casilla del proyecto por la API de
-[Resend](https://resend.com). Es **opcional**: sin configurar, el servidor
-arranca igual, `/api/me` responde `feedbackEnabled: false` y la app no muestra
-ninguno de los dos botones.
+las vistas de error mandan un correo a la casilla del proyecto por la API REST
+de [Cloudflare Email Service](https://developers.cloudflare.com/email-service/).
+Es **opcional**: sin configurar, el servidor arranca igual, `/api/me` responde
+`feedbackEnabled: false` y la app no muestra ninguno de los dos botones.
 
-1. Crear la cuenta en Resend y agregar el dominio (`milantus.com.ar`). Resend
-   muestra unos registros DNS (SPF y DKIM); cargarlos en Cloudflare, o usar su
-   conexión automática con Cloudflare. Esperar a que el dominio figure como
-   verificado: sin eso Resend rechaza el envío y el servidor responde 502.
-2. Generar una API key con permiso de envío y completar en `.env`:
-   - `RESEND_API_KEY`: la clave.
-   - `FEEDBACK_TO`: la casilla que recibe los mensajes.
-   - `FEEDBACK_FROM` (opcional): el remitente, siempre con el dominio
-     verificado. Sin valor, `Milantus <feedback@milantus.com.ar>`. No hace
-     falta que esa dirección exista para recibir: solo figura como remitente.
-3. Reiniciar `server` (`docker compose up -d server`) y, con sesión, mandar un
-   mensaje de prueba desde el panel lateral.
+El destinatario es siempre la casilla del proyecto (el tester solo va en
+«Responder a»), y mandar a una dirección verificada en Email Routing no se
+cobra en ningún plan. Email Sending todavía está en beta: si en el plan gratis
+la API rechazara el envío a la casilla verificada, la salida sin tocar la app
+es un Worker con el binding `send_email` que reciba el mensaje del servidor.
+
+1. En el panel de Cloudflare, `milantus.com.ar` → **Email** → **Email
+   Routing**: habilitarlo y agregar en **Destination addresses** la casilla que
+   va a recibir los mensajes. Llega un correo de verificación que hay que
+   confirmar.
+2. **Compute** → **Email Service** → **Email Sending**: habilitar el dominio.
+   Cloudflare carga solo los registros MX, SPF, DKIM y DMARC del subdominio
+   `cf-bounce`.
+3. Crear un token de API con el permiso **Email Sending: Edit** y completar en
+   `.env`:
+   - `CLOUDFLARE_ACCOUNT_ID`: el ID de la cuenta (en la portada del panel).
+   - `CLOUDFLARE_EMAIL_TOKEN`: el token.
+   - `FEEDBACK_TO`: la casilla verificada del paso 1.
+   - `FEEDBACK_FROM` (opcional): el remitente, en el dominio del paso 2. Sin
+     valor, `feedback@milantus.com.ar`. No hace falta que exista para
+     recibir: solo figura como remitente.
+4. Reiniciar `server` (`docker compose up -d server`) y, con sesión, mandar un
+   mensaje de prueba desde el panel lateral. Si falla, el motivo que devolvió
+   Cloudflare queda en el log del servidor (`docker compose logs server`).
 
 Cada correo trae el mensaje y, al pie, la cuenta (con «Responder a» apuntando
 a su correo), la hora, el navegador, la versión, el idioma, el tema, el tamaño
@@ -131,9 +143,10 @@ de ventana, desde qué pantalla se abrió y, si vino de una vista de error, el
 detalle. Nada más: ni IP, ni cookies, ni contenido de personajes. Hay un tope
 de diez mensajes por hora y por cuenta.
 
-La misma cuenta de Resend sirve de SMTP para Zitadel (`smtp.resend.com`, puerto
-465, usuario `resend`, la API key como contraseña), que lo necesita para
-mandar sus propios correos de verificación y de recuperación de contraseña.
+Zitadel necesita además un SMTP para sus propios correos (verificación de
+cuenta, recuperación de contraseña). Esos van a la casilla de cada usuario, no a
+una verificada, así que quedan fuera de lo gratuito: con el plan Workers Paid,
+Cloudflare ofrece SMTP en `smtp.mx.cloudflare.net`, puerto 465.
 
 ## Integración y despliegue continuo
 

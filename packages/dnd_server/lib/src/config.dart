@@ -136,35 +136,39 @@ class AiProvidersConfig {
 
 /// Envío de sugerencias y reportes de error por correo. Igual que
 /// [AiProvidersConfig], una ausencia degrada en vez de frenar el arranque: sin
-/// clave o sin destinatario el servidor sigue andando y la app esconde el
+/// cuenta, token o destinatario el servidor sigue andando y la app esconde el
 /// botón (ver `feedbackEnabled` en `/api/me`). Así se puede desplegar antes de
-/// que exista la cuenta del proveedor.
+/// que Cloudflare Email Service esté habilitado en el dominio.
 class FeedbackConfig {
-  final String resendApiKey;
+  final String cloudflareAccountId;
 
-  /// La casilla que recibe los mensajes.
+  /// Token de API con el permiso «Email Sending: Edit».
+  final String cloudflareApiToken;
+
+  /// La casilla que recibe los mensajes, verificada en Email Routing.
   final String to;
 
-  /// El remitente, con el dominio verificado en Resend.
+  /// El remitente, en el dominio habilitado para Email Sending.
   final String from;
 
   const FeedbackConfig({
-    required this.resendApiKey,
+    required this.cloudflareAccountId,
+    required this.cloudflareApiToken,
     required this.to,
     required this.from,
   });
 
-  bool get enabled => resendApiKey.isNotEmpty && to.isNotEmpty;
+  bool get enabled =>
+      cloudflareAccountId.isNotEmpty &&
+      cloudflareApiToken.isNotEmpty &&
+      to.isNotEmpty;
 
   factory FeedbackConfig.fromEnvironment(Map<String, String> env) {
     return FeedbackConfig(
-      resendApiKey: envOr(env, 'DND_RESEND_API_KEY', ''),
+      cloudflareAccountId: envOr(env, 'DND_CLOUDFLARE_ACCOUNT_ID', ''),
+      cloudflareApiToken: envOr(env, 'DND_CLOUDFLARE_EMAIL_TOKEN', ''),
       to: envOr(env, 'DND_FEEDBACK_TO', ''),
-      from: envOr(
-        env,
-        'DND_FEEDBACK_FROM',
-        'Milantus <feedback@milantus.com.ar>',
-      ),
+      from: envOr(env, 'DND_FEEDBACK_FROM', 'feedback@milantus.com.ar'),
     );
   }
 }

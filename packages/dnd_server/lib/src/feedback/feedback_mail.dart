@@ -80,10 +80,14 @@ FeedbackEmail composeFeedbackEmail({
 /// de correo cortan ahí y el resto se lee como si fuera otra cosa.
 String _oneLine(String value) => value.replaceAll(RegExp(r'[\r\n]+'), ' ');
 
-/// Envía por la API HTTP de Resend. Sin dependencias nuevas: alcanza con el
-/// paquete `http`, que el servidor ya usa para los proveedores de retratos.
-SendFeedbackFn resendFeedbackSender({
-  required String apiKey,
+/// Envía por la API REST de Cloudflare Email Service. Va por Cloudflare y no
+/// por un proveedor aparte porque el dominio ya vive ahí, y mandar a una
+/// dirección verificada en Email Routing —siempre la casilla del proyecto; el
+/// tester solo figura en «Responder a»— no se cobra. Sin dependencias nuevas:
+/// alcanza con el paquete `http`, que el servidor ya usa para los retratos.
+SendFeedbackFn cloudflareFeedbackSender({
+  required String accountId,
+  required String apiToken,
   required String from,
   required String to,
   http.Client? client,
@@ -93,9 +97,12 @@ SendFeedbackFn resendFeedbackSender({
     try {
       final response = await c
           .post(
-            Uri.parse('https://api.resend.com/emails'),
+            Uri.https(
+              'api.cloudflare.com',
+              '/client/v4/accounts/$accountId/email/sending/send',
+            ),
             headers: {
-              'authorization': 'Bearer $apiKey',
+              'authorization': 'Bearer $apiToken',
               'content-type': 'application/json',
             },
             body: jsonEncode({
@@ -107,17 +114,32 @@ SendFeedbackFn resendFeedbackSender({
             }),
           )
           .timeout(const Duration(seconds: 15));
-      if (response.statusCode < 200 || response.statusCode >= 300) {
-        // El cuerpo de Resend dice qué falló (dominio sin verificar, clave
-        // inválida): va al log del servidor, no a quien escribió.
+      // La API de Cloudflare informa el resultado en `success` además del
+      // código: se exigen los dos. El cuerpo dice qué falló (dominio sin
+      // habilitar, token sin permiso) y va al log del servidor, no a quien
+      // escribió.
+      final ok =
+          response.statusCode >= 200 &&
+          response.statusCode < 300 &&
+          _succeeded(response.body);
+      if (!ok) {
         throw StateError(
-          'Resend respondió ${response.statusCode}: ${response.body}',
+          'Cloudflare respondió ${response.statusCode}: ${response.body}',
         );
       }
     } finally {
       if (client == null) c.close();
     }
   };
+}
+
+bool _succeeded(String body) {
+  try {
+    final decoded = jsonDecode(body);
+    return decoded is Map && decoded['success'] == true;
+  } on FormatException {
+    return false;
+  }
 }
 
 /// Cuántos mensajes puede mandar una cuenta por ventana de tiempo. Solo
