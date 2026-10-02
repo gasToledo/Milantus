@@ -1,0 +1,9 @@
+{
+  "name": "milantus-feedback",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/mime.test.js",
+    "deploy": "wrangler deploy"
+  }
+}

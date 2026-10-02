@@ -107,36 +107,45 @@ Runbook operativo del stack de contenedores.
 ## Sugerencias y reportes de error por correo
 
 El ítem «Sugerencias y errores» del panel lateral y «Reportar este error» de
-las vistas de error mandan un correo a la casilla del proyecto por la API REST
-de [Cloudflare Email Service](https://developers.cloudflare.com/email-service/).
-Es **opcional** para el servidor: sin configurar arranca igual y `/api/me`
-responde `feedbackEnabled: false`. Por ahora la app muestra los botones igual,
-así que sin configurar el envío falla con un 503 que el diálogo informa.
+las vistas de error mandan un correo a la casilla del proyecto. El servidor
+arma el correo y se lo pasa a un Worker de Cloudflare (`feedback-worker/`), que
+lo entrega con el binding `send_email`. Es **opcional** para el servidor: sin
+configurar arranca igual y `/api/me` responde `feedbackEnabled: false`. Por
+ahora la app muestra los botones igual, así que sin configurar el envío falla
+con un 503 que el diálogo informa.
 
-El destinatario es siempre la casilla del proyecto (el tester solo va en
-«Responder a»), y mandar a una dirección verificada en Email Routing no se
-cobra en ningún plan. Email Sending todavía está en beta: si en el plan gratis
-la API rechazara el envío a la casilla verificada, la salida sin tocar la app
-es un Worker con el binding `send_email` que reciba el mensaje del servidor.
+Es gratis: un Worker puede mandar sin costo a una dirección verificada en
+Email Routing, y el destinatario es siempre la casilla del proyecto (el tester
+solo va en «Responder a»). La API de envío de Cloudflare (Email Sending) no
+hace falta, y esa sí es paga.
 
 1. En el panel de Cloudflare, `milantus.com.ar` → **Email** → **Email
    Routing**: habilitarlo y agregar en **Destination addresses** la casilla que
    va a recibir los mensajes. Llega un correo de verificación que hay que
    confirmar.
-2. **Compute** → **Email Service** → **Email Sending**: habilitar el dominio.
-   Cloudflare carga solo los registros MX, SPF, DKIM y DMARC del subdominio
-   `cf-bounce`.
-3. Crear un token de API con el permiso **Email Sending: Edit** y completar en
-   `.env`:
-   - `CLOUDFLARE_ACCOUNT_ID`: el ID de la cuenta (en la portada del panel).
-   - `CLOUDFLARE_EMAIL_TOKEN`: el token.
-   - `FEEDBACK_TO`: la casilla verificada del paso 1.
-   - `FEEDBACK_FROM` (opcional): el remitente, en el dominio del paso 2. Sin
-     valor, `feedback@milantus.com.ar`. No hace falta que exista para
-     recibir: solo figura como remitente.
-4. Reiniciar `server` (`docker compose up -d server`) y, con sesión, mandar un
-   mensaje de prueba desde el panel lateral. Si falla, el motivo que devolvió
-   Cloudflare queda en el log del servidor (`docker compose logs server`).
+2. Si la casilla no es `toledogaston@proton.me`, cambiarla en
+   `feedback-worker/wrangler.toml` (en `destination_address` y en
+   `FEEDBACK_TO`, que deben coincidir).
+3. Publicar el Worker y cargarle el secreto compartido, desde
+   `feedback-worker/` (pide iniciar sesión en Cloudflare la primera vez):
+
+   ```sh
+   npx wrangler deploy
+   npx wrangler secret put FEEDBACK_SECRET
+   ```
+
+   Como secreto sirve cualquier cadena larga al azar, por ejemplo la salida de
+   `openssl rand -hex 32`. `deploy` muestra la URL pública del Worker
+   (`https://milantus-feedback.<cuenta>.workers.dev`).
+4. Completar en `.env` `FEEDBACK_WORKER_URL` (la URL del paso 3) y
+   `FEEDBACK_WORKER_SECRET` (el mismo secreto), y recrear el contenedor:
+   `docker compose up -d server` (`restart` no vuelve a leer el `.env`).
+5. Con sesión, mandar un mensaje de prueba desde el panel lateral. Si falla,
+   el motivo queda en el log del servidor (`docker compose logs server`) y en
+   los del Worker (`npx wrangler tail`).
+
+Las pruebas del armado del correo del Worker corren con `npm test` dentro de
+`feedback-worker/` (solo Node, sin dependencias).
 
 Cada correo trae el mensaje y, al pie, la cuenta (con «Responder a» apuntando
 a su correo), la hora, el navegador, la versión, el idioma, el tema, el tamaño
@@ -146,8 +155,9 @@ de diez mensajes por hora y por cuenta.
 
 Zitadel necesita además un SMTP para sus propios correos (verificación de
 cuenta, recuperación de contraseña). Esos van a la casilla de cada usuario, no a
-una verificada, así que quedan fuera de lo gratuito: con el plan Workers Paid,
-Cloudflare ofrece SMTP en `smtp.mx.cloudflare.net`, puerto 465.
+una verificada, así que el Worker no sirve para eso: necesitan un envío que
+llegue a cualquier destinatario (el SMTP de Cloudflare con el plan Workers
+Paid, u otro proveedor).
 
 ## Integración y despliegue continuo
 

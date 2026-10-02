@@ -80,16 +80,15 @@ FeedbackEmail composeFeedbackEmail({
 /// de correo cortan ahí y el resto se lee como si fuera otra cosa.
 String _oneLine(String value) => value.replaceAll(RegExp(r'[\r\n]+'), ' ');
 
-/// Envía por la API REST de Cloudflare Email Service. Va por Cloudflare y no
-/// por un proveedor aparte porque el dominio ya vive ahí, y mandar a una
-/// dirección verificada en Email Routing —siempre la casilla del proyecto; el
-/// tester solo figura en «Responder a»— no se cobra. Sin dependencias nuevas:
-/// alcanza con el paquete `http`, que el servidor ya usa para los retratos.
-SendFeedbackFn cloudflareFeedbackSender({
-  required String accountId,
-  required String apiToken,
-  required String from,
-  required String to,
+/// Le pasa el correo al Worker de `feedback-worker/`, que lo entrega a la
+/// casilla del proyecto. Va por un Worker y no por la API de envío de
+/// Cloudflare porque esa es paga, mientras que un Worker manda gratis a una
+/// dirección verificada en Email Routing, y el destino es siempre esa casilla
+/// (el tester solo figura en «Responder a»). Sin dependencias nuevas: alcanza
+/// con el paquete `http`, que el servidor ya usa para los retratos.
+SendFeedbackFn workerFeedbackSender({
+  required Uri url,
+  required String secret,
   http.Client? client,
 }) {
   return (email) async {
@@ -97,34 +96,28 @@ SendFeedbackFn cloudflareFeedbackSender({
     try {
       final response = await c
           .post(
-            Uri.https(
-              'api.cloudflare.com',
-              '/client/v4/accounts/$accountId/email/sending/send',
-            ),
+            url,
             headers: {
-              'authorization': 'Bearer $apiToken',
+              'authorization': 'Bearer $secret',
               'content-type': 'application/json',
             },
             body: jsonEncode({
-              'from': from,
-              'to': [to],
               'subject': email.subject,
               'text': email.text,
-              'reply_to': ?email.replyTo,
+              'replyTo': ?email.replyTo,
             }),
           )
           .timeout(const Duration(seconds: 15));
-      // La API de Cloudflare informa el resultado en `success` además del
-      // código: se exigen los dos. El cuerpo dice qué falló (dominio sin
-      // habilitar, token sin permiso) y va al log del servidor, no a quien
-      // escribió.
+      // El Worker responde `{"ok": true}`; se exigen eso y el código. Si no,
+      // el cuerpo dice qué falló (secreto distinto, destino sin verificar) y
+      // va al log del servidor, no a quien escribió.
       final ok =
           response.statusCode >= 200 &&
           response.statusCode < 300 &&
           _succeeded(response.body);
       if (!ok) {
         throw StateError(
-          'Cloudflare respondió ${response.statusCode}: ${response.body}',
+          'El Worker respondió ${response.statusCode}: ${response.body}',
         );
       }
     } finally {
@@ -136,7 +129,7 @@ SendFeedbackFn cloudflareFeedbackSender({
 bool _succeeded(String body) {
   try {
     final decoded = jsonDecode(body);
-    return decoded is Map && decoded['success'] == true;
+    return decoded is Map && decoded['ok'] == true;
   } on FormatException {
     return false;
   }

@@ -91,11 +91,9 @@ Future<void> main() async {
       settings: PostgresSettingsRepository(pool),
       webStaticHandler: webStaticHandler,
       sendFeedback: config.feedback.enabled
-          ? cloudflareFeedbackSender(
-              accountId: config.feedback.cloudflareAccountId,
-              apiToken: config.feedback.cloudflareApiToken,
-              from: config.feedback.from,
-              to: config.feedback.to,
+          ? workerFeedbackSender(
+              url: Uri.parse(config.feedback.workerUrl),
+              secret: config.feedback.workerSecret,
             )
           : null,
     ),

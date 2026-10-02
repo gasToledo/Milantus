@@ -136,39 +136,28 @@ class AiProvidersConfig {
 
 /// Envío de sugerencias y reportes de error por correo. Igual que
 /// [AiProvidersConfig], una ausencia degrada en vez de frenar el arranque: sin
-/// cuenta, token o destinatario el servidor sigue andando y la app esconde el
-/// botón (ver `feedbackEnabled` en `/api/me`). Así se puede desplegar antes de
-/// que Cloudflare Email Service esté habilitado en el dominio.
+/// Worker configurado el servidor sigue andando y `/api/me` responde
+/// `feedbackEnabled: false`. Así se puede desplegar antes de publicar el
+/// Worker de `feedback-worker/`.
+///
+/// El destinatario y el remitente no viven acá sino en el Worker
+/// (`wrangler.toml`): es Cloudflare el que exige que el destino esté
+/// verificado, y tenerlo en un solo lugar evita que los dos difieran.
 class FeedbackConfig {
-  final String cloudflareAccountId;
+  /// La URL pública del Worker (`https://milantus-feedback.<cuenta>.workers.dev`).
+  final String workerUrl;
 
-  /// Token de API con el permiso «Email Sending: Edit».
-  final String cloudflareApiToken;
+  /// El mismo valor que el secreto `FEEDBACK_SECRET` del Worker.
+  final String workerSecret;
 
-  /// La casilla que recibe los mensajes, verificada en Email Routing.
-  final String to;
+  const FeedbackConfig({required this.workerUrl, required this.workerSecret});
 
-  /// El remitente, en el dominio habilitado para Email Sending.
-  final String from;
-
-  const FeedbackConfig({
-    required this.cloudflareAccountId,
-    required this.cloudflareApiToken,
-    required this.to,
-    required this.from,
-  });
-
-  bool get enabled =>
-      cloudflareAccountId.isNotEmpty &&
-      cloudflareApiToken.isNotEmpty &&
-      to.isNotEmpty;
+  bool get enabled => workerUrl.isNotEmpty && workerSecret.isNotEmpty;
 
   factory FeedbackConfig.fromEnvironment(Map<String, String> env) {
     return FeedbackConfig(
-      cloudflareAccountId: envOr(env, 'DND_CLOUDFLARE_ACCOUNT_ID', ''),
-      cloudflareApiToken: envOr(env, 'DND_CLOUDFLARE_EMAIL_TOKEN', ''),
-      to: envOr(env, 'DND_FEEDBACK_TO', ''),
-      from: envOr(env, 'DND_FEEDBACK_FROM', 'feedback@milantus.com.ar'),
+      workerUrl: envOr(env, 'DND_FEEDBACK_WORKER_URL', ''),
+      workerSecret: envOr(env, 'DND_FEEDBACK_WORKER_SECRET', ''),
     );
   }
 }

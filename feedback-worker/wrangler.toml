@@ -1,0 +1,21 @@
+# Worker de sugerencias y reportes de error. Pasos en
+# docs/operaciones/despliegue.md, sección «Sugerencias y reportes de error».
+name = "milantus-feedback"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+# El único destino posible. Tiene que estar verificado en Email Routing; si no,
+# Cloudflare rechaza el envío.
+[[send_email]]
+name = "EMAIL"
+destination_address = "toledogaston@proton.me"
+
+[vars]
+# Debe coincidir con `destination_address`: es la dirección del `To:`.
+FEEDBACK_TO = "toledogaston@proton.me"
+# Remitente: cualquier dirección del dominio con Email Routing activo. No hace
+# falta que exista como casilla.
+FEEDBACK_FROM = "feedback@milantus.com.ar"
+
+# FEEDBACK_SECRET no va acá: es un secreto (`npx wrangler secret put
+# FEEDBACK_SECRET`) y el mismo valor va en el .env del servidor.

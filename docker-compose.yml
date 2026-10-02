@@ -251,10 +251,8 @@ services:
       DND_PORTRAITS_ROOT: /app/data/portraits
       DND_AZURE_FLUX_API_KEY: ${AZURE_FLUX_API_KEY:-}
       DND_AZURE_OPENAI_API_KEY: ${AZURE_OPENAI_API_KEY:-}
-      DND_CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID:-}
-      DND_CLOUDFLARE_EMAIL_TOKEN: ${CLOUDFLARE_EMAIL_TOKEN:-}
-      DND_FEEDBACK_TO: ${FEEDBACK_TO:-}
-      DND_FEEDBACK_FROM: ${FEEDBACK_FROM:-feedback@milantus.com.ar}
+      DND_FEEDBACK_WORKER_URL: ${FEEDBACK_WORKER_URL:-}
+      DND_FEEDBACK_WORKER_SECRET: ${FEEDBACK_WORKER_SECRET:-}
     volumes:
       - portraits-data:/app/data/portraits
     depends_on:

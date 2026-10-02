@@ -234,50 +234,45 @@ void main() {
     });
   });
 
-  group('cloudflareFeedbackSender', () {
+  group('workerFeedbackSender', () {
     SendFeedbackFn sender(http.Response Function(http.Request) respond) =>
-        cloudflareFeedbackSender(
-          accountId: 'cuenta',
-          apiToken: 'token',
-          from: 'feedback@milantus.com.ar',
-          to: 'casilla@example.org',
+        workerFeedbackSender(
+          url: Uri.parse('https://milantus-feedback.example.workers.dev'),
+          secret: 'secreto',
           client: MockClient((request) async => respond(request)),
         );
 
-    test(
-      'manda remitente, destino y responder-a a la API de Cloudflare',
-      () async {
-        late http.Request captured;
-        final send = sender((request) {
-          captured = request;
-          return http.Response('{"success":true,"errors":[]}', 200);
-        });
+    test('le pasa asunto, texto y responder-a al Worker', () async {
+      late http.Request captured;
+      final send = sender((request) {
+        captured = request;
+        return http.Response('{"ok":true}', 200);
+      });
 
-        await send(
-          const FeedbackEmail(
-            subject: 'Asunto',
-            text: 'Cuerpo',
-            replyTo: 'tester@example.org',
-          ),
-        );
+      await send(
+        const FeedbackEmail(
+          subject: 'Asunto',
+          text: 'Cuerpo',
+          replyTo: 'tester@example.org',
+        ),
+      );
 
-        expect(
-          captured.url.toString(),
-          'https://api.cloudflare.com/client/v4/accounts/cuenta/email/sending/send',
-        );
-        expect(captured.headers['authorization'], 'Bearer token');
-        expect(jsonDecode(captured.body), {
-          'from': 'feedback@milantus.com.ar',
-          'to': ['casilla@example.org'],
-          'subject': 'Asunto',
-          'text': 'Cuerpo',
-          'reply_to': 'tester@example.org',
-        });
-      },
-    );
+      expect(
+        captured.url.toString(),
+        'https://milantus-feedback.example.workers.dev',
+      );
+      expect(captured.headers['authorization'], 'Bearer secreto');
+      expect(jsonDecode(captured.body), {
+        'subject': 'Asunto',
+        'text': 'Cuerpo',
+        'replyTo': 'tester@example.org',
+      });
+    });
 
     test('un código de error lanza', () async {
-      final send = sender((_) => http.Response('{"success":false}', 403));
+      final send = sender(
+        (_) => http.Response('{"error":"No autorizado."}', 401),
+      );
 
       expect(
         send(const FeedbackEmail(subject: 's', text: 't')),
@@ -285,11 +280,8 @@ void main() {
       );
     });
 
-    test('un 200 con success en false también lanza', () async {
-      final send = sender(
-        (_) =>
-            http.Response('{"success":false,"errors":[{"code":10001}]}', 200),
-      );
+    test('un 200 sin ok también lanza', () async {
+      final send = sender((_) => http.Response('<html>proxy</html>', 200));
 
       expect(
         send(const FeedbackEmail(subject: 's', text: 't')),
@@ -299,11 +291,11 @@ void main() {
   });
 
   group('FeedbackConfig', () {
-    test('sin cuenta, token o destino queda deshabilitado', () {
+    test('sin URL o sin secreto del Worker queda deshabilitado', () {
       const completa = {
-        'DND_CLOUDFLARE_ACCOUNT_ID': 'cuenta',
-        'DND_CLOUDFLARE_EMAIL_TOKEN': 'token',
-        'DND_FEEDBACK_TO': 'casilla@example.org',
+        'DND_FEEDBACK_WORKER_URL':
+            'https://milantus-feedback.example.workers.dev',
+        'DND_FEEDBACK_WORKER_SECRET': 'secreto',
       };
       for (final falta in completa.keys) {
         final env = {...completa}..remove(falta);
@@ -313,9 +305,7 @@ void main() {
           reason: 'sin $falta',
         );
       }
-      final config = FeedbackConfig.fromEnvironment(completa);
-      expect(config.enabled, isTrue);
-      expect(config.from, 'feedback@milantus.com.ar');
+      expect(FeedbackConfig.fromEnvironment(completa).enabled, isTrue);
     });
   });
 }
