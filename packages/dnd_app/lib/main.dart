@@ -220,13 +220,15 @@ class _BootstrapState extends State<_Bootstrap> {
       // reporte, que es lo esperable: sin sesión el servidor no lo aceptaría.
       // `_checkCurrent` ya garantiza `mounted`, pero el analizador no lo ve.
       if (!mounted) throw const _BootstrapCancelled();
-      FeedbackScope.notifierOf(context)?.value = account.feedbackEnabled
-          ? FeedbackChannel(
-              api: _api,
-              email: account.email,
-              appVersion: version,
-            )
-          : null;
+      // ponytail: el canal se abre aunque el servidor no tenga correo
+      // configurado (`account.feedbackEnabled`), a pedido: el botón se ve
+      // siempre y, sin configurar, el envío falla con el 503 del servidor.
+      // Para volver a esconderlo, condicionar esto a `feedbackEnabled`.
+      FeedbackScope.notifierOf(context)?.value = FeedbackChannel(
+        api: _api,
+        email: account.email,
+        appVersion: version,
+      );
       return _AppData(
         repo,
         controller,

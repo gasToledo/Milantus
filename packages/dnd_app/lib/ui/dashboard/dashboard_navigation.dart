@@ -86,6 +86,17 @@ extension _DashboardNavigation on _DashboardScreenState {
             label: context.l10n.transferTitle,
             onTap: () => run(_transferDialog),
           ),
+          // Último ítem a propósito: es una salida para quien prueba la
+          // aplicación, no una sección más de lo mismo.
+          appNavItem(
+            context,
+            icon: Icons.feedback_outlined,
+            label: context.l10n.feedbackButton,
+            onTap: () => run(
+              () =>
+                  showFeedbackDialog(context, origin: FeedbackOrigin.dashboard),
+            ),
+          ),
           const Spacer(),
           // El Modo DM va junto a la cuenta y no arriba con la navegación
           // primaria: no es otra sección de lo mismo, es el otro sombrero de
@@ -107,7 +118,6 @@ extension _DashboardNavigation on _DashboardScreenState {
             ),
           ),
           _accountFooter(context),
-          const FeedbackButton(origin: FeedbackOrigin.dashboard),
           DisplayPreferences(controller: widget.theme),
           // Null solo en tests, donde no se resuelve `PackageInfo`.
           if (widget.appVersion case final version?) ...[

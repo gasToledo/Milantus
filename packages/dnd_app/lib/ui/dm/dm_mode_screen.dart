@@ -13,7 +13,6 @@ import '../../homebrew/homebrew_screen.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/app_widgets.dart';
 import '../../theme/class_visuals.dart';
-import '../feedback.dart';
 import '../pending_events_gate.dart';
 import '../portrait_image.dart';
 import 'add_monster_dialog.dart';
@@ -491,8 +490,6 @@ class _DmModeScreenState extends State<DmModeScreen> {
             ),
             label: Text(context.l10n.dmPlayerMode),
           ),
-          const SizedBox(height: 10),
-          const FeedbackButton(origin: FeedbackOrigin.dmMode),
         ],
       ),
     );

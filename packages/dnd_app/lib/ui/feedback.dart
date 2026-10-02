@@ -20,16 +20,17 @@ class FeedbackChannel {
 
 /// Desde qué pantalla se abrió el diálogo. Viaja con el mensaje por su nombre:
 /// es un dato para quien lee el correo, no texto de la interfaz.
-enum FeedbackOrigin { dashboard, sheet, dmMode, errorView }
+enum FeedbackOrigin { dashboard, errorView }
 
 enum FeedbackKind { idea, bug }
 
 /// Da el [FeedbackChannel] a quien lo necesite. Va por encima de
-/// `MaterialApp` (lo monta `DndApp`) y no del dashboard porque la ficha y el
-/// Modo DM son rutas empujadas al `Navigator`: hermanas del dashboard, no hijas.
+/// `MaterialApp` (lo monta `DndApp`) y no del dashboard porque las vistas de
+/// error también aparecen en rutas empujadas al `Navigator` (la ficha, el Modo
+/// DM): hermanas del dashboard, no hijas.
 ///
-/// Vale `null` mientras arranca la app y también si el servidor no tiene
-/// correo configurado; en los dos casos no hay botón que mostrar.
+/// Vale `null` mientras arranca la app: sin sesión no hay a nombre de quién
+/// escribir, y «Reportar este error» no aparece.
 class FeedbackScope extends InheritedNotifier<ValueNotifier<FeedbackChannel?>> {
   const FeedbackScope({
     super.key,
@@ -45,38 +46,6 @@ class FeedbackScope extends InheritedNotifier<ValueNotifier<FeedbackChannel?>> {
   /// Para quien escribe el canal (el arranque), sin suscribirse a sus cambios.
   static ValueNotifier<FeedbackChannel?>? notifierOf(BuildContext context) =>
       context.getInheritedWidgetOfExactType<FeedbackScope>()?.notifier;
-}
-
-/// La entrada del pie del panel lateral. No ocupa lugar si no hay canal.
-///
-/// Va en el pie y no como ítem de navegación: no lleva a ninguna sección, y el
-/// pie es lo que tienen en común el dashboard, la ficha y el Modo DM, que es
-/// donde aparecen los errores.
-class FeedbackButton extends StatelessWidget {
-  final FeedbackOrigin origin;
-  const FeedbackButton({super.key, required this.origin});
-
-  @override
-  Widget build(BuildContext context) {
-    if (FeedbackScope.of(context) == null) return const SizedBox.shrink();
-    final pal = context.palette;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: OutlinedButton.icon(
-        key: const ValueKey('feedback-button'),
-        onPressed: () => showFeedbackDialog(context, origin: origin),
-        icon: const Icon(Icons.feedback_outlined, size: 16),
-        // Neutro y no dorado: el oro marca lo activo, y esto es una salida
-        // lateral que no compite con el Modo DM de arriba.
-        style: OutlinedButton.styleFrom(
-          foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
-          side: BorderSide(color: pal.hairline),
-          textStyle: const TextStyle(fontSize: 12),
-        ),
-        label: Text(context.l10n.feedbackButton),
-      ),
-    );
-  }
 }
 
 /// Abre el diálogo y, si el mensaje salió, lo confirma con un cartel.

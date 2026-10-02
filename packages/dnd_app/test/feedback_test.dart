@@ -49,14 +49,30 @@ void main() {
     return server;
   }
 
-  final button = find.byKey(const ValueKey('feedback-button'));
+  // El ítem de la navegación; el ícono es el mismo en los dos idiomas.
+  final button = find.byIcon(Icons.feedback_outlined);
 
-  testWidgets('sin envío configurado en el servidor no hay botón', (
+  testWidgets('el ítem está aunque el servidor no tenga correo configurado', (
     tester,
   ) async {
-    await mountApp(tester, feedbackEnabled: false);
+    final server = await mountApp(tester, feedbackEnabled: false);
 
-    expect(button, findsNothing);
+    expect(button, findsOne);
+    await tester.tap(button);
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('feedback-message')),
+      'Algo',
+    );
+    await tester.pump();
+    await tester.tap(find.text('Enviar'));
+    await tester.pumpAndSettle();
+
+    // Sin proveedor el servidor responde 503: el diálogo lo dice y queda
+    // abierto con el texto.
+    expect(server.feedback, isEmpty);
+    expect(find.textContaining('No se pudo enviar el mensaje'), findsOne);
+    expect(find.text('Algo'), findsOne);
     expect(tester.takeException(), isNull);
   });
 

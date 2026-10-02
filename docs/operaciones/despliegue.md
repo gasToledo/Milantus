@@ -106,11 +106,12 @@ Runbook operativo del stack de contenedores.
 
 ## Sugerencias y reportes de error por correo
 
-El botón «Sugerencias y errores» del panel lateral y «Reportar este error» de
+El ítem «Sugerencias y errores» del panel lateral y «Reportar este error» de
 las vistas de error mandan un correo a la casilla del proyecto por la API REST
 de [Cloudflare Email Service](https://developers.cloudflare.com/email-service/).
-Es **opcional**: sin configurar, el servidor arranca igual, `/api/me` responde
-`feedbackEnabled: false` y la app no muestra ninguno de los dos botones.
+Es **opcional** para el servidor: sin configurar arranca igual y `/api/me`
+responde `feedbackEnabled: false`. Por ahora la app muestra los botones igual,
+así que sin configurar el envío falla con un 503 que el diálogo informa.
 
 El destinatario es siempre la casilla del proyecto (el tester solo va en
 «Responder a»), y mandar a una dirección verificada en Email Routing no se
