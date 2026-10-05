@@ -1220,6 +1220,15 @@ const coinLabels = <String, String>{
   'pp': 'ppt',
 };
 
+/// Las abreviaturas del SRD en inglés. Ojo: ahí «pp» es platino, no plata.
+const coinLabelsEn = <String, String>{
+  'cp': 'cp',
+  'sp': 'sp',
+  'ep': 'ep',
+  'gp': 'gp',
+  'pp': 'pp',
+};
+
 /// Cincuenta monedas pesan una libra, sin importar el metal (capítulo 6).
 const coinsPerPound = 50;
 

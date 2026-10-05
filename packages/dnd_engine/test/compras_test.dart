@@ -118,6 +118,29 @@ void main() {
       expect(despues.diary.single.title, 'Cuentas');
     });
 
+    // La línea queda en el idioma del momento, como una nota, y las líneas
+    // anteriores no se reescriben. En inglés «pp» es platino: la plata va
+    // con las abreviaturas del SRD en inglés.
+    test('con el contenido en inglés la línea nueva queda en inglés', () {
+      addTearDown(() => ContentLanguage.current = ContentLanguage.es);
+      final espada = repo.weapon('longsword')!;
+      final primera =
+          InventoryOps.buy(conMonedas({'gp': 50}), 'longsword', repo, at: hoy)!;
+      ContentLanguage.current = ContentLanguage.en;
+      final segunda = InventoryOps.buy(primera, 'longsword', repo, at: hoy)!;
+
+      final [antes, despues] = cuentas(segunda).split('\n');
+      expect(antes, contains('Compra:'));
+      expect(despues, contains('Purchase: 1 × ${espada.name}'));
+      expect(
+        despues,
+        endsWith(
+          CoinOps.formatAmount(espada.costCp, labels: coinLabelsEn),
+        ),
+      );
+      expect(segunda.diary.single.title, 'Cuentas');
+    });
+
     test('sin fondos no compra', () {
       expect(
         InventoryOps.buy(conMonedas({'cp': 1}), 'longsword', repo, at: hoy),

@@ -1,3 +1,4 @@
+import 'content_language.dart';
 import 'data_version.dart';
 
 /// En qué punto de su vida está un capítulo.
@@ -187,13 +188,20 @@ class Chapter {
 /// [level] pone «un nivel» al frente. Es una sola lista y no dos frases para
 /// que no queden dos «y» seguidas: «un nivel y 250 po y una espada» se lee mal
 /// en cualquier boca.
+///
+/// Sale en el idioma activo ([ContentLanguage.current]): se arma al mostrarlo,
+/// no se guarda. En inglés la lista lleva la coma antes de «and».
 String describeRewards(int gold, List<String> items, {bool level = false}) {
   final parts = [
-    if (level) 'un nivel',
-    if (gold > 0) '$gold po',
+    if (level) localized('un nivel', 'a level'),
+    if (gold > 0) '$gold ${localized('po', 'gp')}',
     ...items,
   ];
   if (parts.isEmpty) return '';
   if (parts.length == 1) return parts.first;
-  return '${parts.take(parts.length - 1).join(', ')} y ${parts.last}';
+  final head = parts.take(parts.length - 1).join(', ');
+  return localized(
+    '$head y ${parts.last}',
+    parts.length == 2 ? '$head and ${parts.last}' : '$head, and ${parts.last}',
+  );
 }

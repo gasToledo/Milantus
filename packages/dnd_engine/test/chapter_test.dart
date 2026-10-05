@@ -138,6 +138,17 @@ void main() {
       expect(r.grantsItems, ['Espada larga +1']);
     });
 
+    test('en inglés, con la coma antes de «and» y las monedas del SRD', () {
+      addTearDown(() => ContentLanguage.current = ContentLanguage.es);
+      ContentLanguage.current = ContentLanguage.en;
+      expect(describeRewards(0, const [], level: true), 'a level');
+      expect(describeRewards(250, const ['Sword']), '250 gp and Sword');
+      expect(
+        describeRewards(250, const ['Sword'], level: true),
+        'a level, 250 gp, and Sword',
+      );
+    });
+
     test('el botín se nombra en una línea que se pueda leer en voz alta', () {
       expect(describeRewards(0, const []), '');
       expect(describeRewards(0, const [], level: true), 'un nivel');

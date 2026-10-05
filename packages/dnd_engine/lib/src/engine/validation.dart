@@ -4,6 +4,9 @@ import '../data/content_repository.dart';
 import '../domain/ability.dart';
 import '../domain/character.dart';
 import '../domain/computed_sheet.dart';
+import '../domain/content_language.dart';
+import '../domain/content_vocabulary.dart';
+import '../domain/proficiency_labels.dart';
 import '../domain/content.dart';
 import '../domain/effects.dart';
 import '../domain/language.dart';
@@ -91,7 +94,11 @@ class CharacterValidator {
     final race = repo.race(c.raceId);
     if (race == null) {
       w.add(ValidationWarning(
-          'missing_race', 'Raza "${c.raceId}" no encontrada.'));
+          'missing_race',
+          localized(
+            'Raza "${c.raceId}" no encontrada.',
+            'Species "${c.raceId}" not found.',
+          )));
     } else {
       // Linaje de especie: obligatorio si la especie ofrece alguno. Sin él, los
       // rasgos que dependen de la elección (resistencias, trucos) no se aplican.
@@ -101,26 +108,39 @@ class CharacterValidator {
         if (options.isNotEmpty) {
           w.add(ValidationWarning(
             'lineage_pending',
-            'Falta elegir el linaje de ${race.name} '
-                '(${options.map((l) => l.name).join(", ")}).',
+            localized(
+              'Falta elegir el linaje de ${race.name} '
+                  '(${options.map((l) => l.name).join(", ")}).',
+              'Choose a lineage for ${race.name} (${options.map((l) => l.name).join(", ")}).',
+            ),
           ));
         }
       } else {
         final lineage = repo.lineage(lineageId);
         if (lineage == null) {
           w.add(ValidationWarning(
-              'lineage_missing', 'Linaje "$lineageId" no encontrado.'));
+              'lineage_missing',
+              localized(
+                'Linaje "$lineageId" no encontrado.',
+                'Lineage "$lineageId" not found.',
+              )));
         } else if (lineage.raceId != c.raceId) {
           w.add(ValidationWarning(
             'lineage_wrong_race',
-            'El linaje "${lineage.name}" pertenece a ${lineage.raceId}, '
-                'no a ${c.raceId}.',
+            localized(
+              'El linaje "${lineage.name}" pertenece a ${lineage.raceId}, '
+                  'no a ${c.raceId}.',
+              'Lineage "${lineage.name}" belongs to ${lineage.raceId}, not ${c.raceId}.',
+            ),
           ));
         } else if (_lineageUsesSpellcasting(lineage) &&
             c.speciesSpellcastingAbility == null) {
-          w.add(const ValidationWarning(
+          w.add(ValidationWarning(
             'species_spellcasting_ability_pending',
-            'Falta elegir la aptitud mágica del linaje (INT, SAB o CAR).',
+            localized(
+              'Falta elegir la aptitud mágica del linaje (INT, SAB o CAR).',
+              'Choose the lineage’s spellcasting ability (INT, WIS, or CHA).',
+            ),
           ));
         }
       }
@@ -134,37 +154,57 @@ class CharacterValidator {
         if (chosenSize == null) {
           w.add(ValidationWarning(
             'size_pending',
-            'Falta elegir el tamaño de ${race.name} (${sizes.join(", ")}).',
+            localized(
+              'Falta elegir el tamaño de ${race.name} (${sizes.join(", ")}).',
+              'Choose a size for ${race.name} (${sizes.map((s) => vocabularyLabel(VocabularyField.size, s)).join(", ")}).',
+            ),
           ));
         } else if (!sizes.contains(chosenSize)) {
           w.add(ValidationWarning(
             'size_invalid',
-            'El tamaño "$chosenSize" no es una opción de ${race.name} '
-                '(${sizes.join(", ")}).',
+            localized(
+              'El tamaño "$chosenSize" no es una opción de ${race.name} '
+                  '(${sizes.join(", ")}).',
+              'Size "$chosenSize" isn’t an option for ${race.name} (${sizes.map((s) => vocabularyLabel(VocabularyField.size, s)).join(", ")}).',
+            ),
           ));
         }
       } else if (chosenSize != null && chosenSize != race.size) {
         w.add(ValidationWarning(
           'size_not_choosable',
-          '${race.name} no elige tamaño: es ${race.size}.',
+          localized(
+            '${race.name} no elige tamaño: es ${race.size}.',
+            '${race.name} doesn’t choose a size: it’s ${vocabularyLabel(VocabularyField.size, race.size)}.',
+          ),
         ));
       }
     }
     final klass = repo.characterClass(c.classId);
     if (klass == null) {
       w.add(ValidationWarning(
-          'missing_class', 'Clase "${c.classId}" no encontrada.'));
+          'missing_class',
+          localized(
+            'Clase "${c.classId}" no encontrada.',
+            'Class "${c.classId}" not found.',
+          )));
     }
     final background = repo.background(c.backgroundId);
     if (background == null) {
-      w.add(ValidationWarning('missing_background',
-          'Trasfondo "${c.backgroundId}" no encontrado.'));
+      w.add(ValidationWarning(
+          'missing_background',
+          localized(
+            'Trasfondo "${c.backgroundId}" no encontrado.',
+            'Background "${c.backgroundId}" not found.',
+          )));
     }
 
     if (c.hpPerLevel.length != c.level) {
       w.add(ValidationWarning(
         'hp_entries',
-        'Faltan aportes de PG: ${c.hpPerLevel.length} registrados para ${c.level} niveles.',
+        localized(
+          'Faltan aportes de PG: ${c.hpPerLevel.length} registrados para ${c.level} niveles.',
+          'Missing HP entries: ${c.hpPerLevel.length} recorded for ${c.level} levels.',
+        ),
       ));
     }
 
@@ -181,7 +221,10 @@ class CharacterValidator {
         if (classId != c.classId) {
           w.add(ValidationWarning(
             'missing_class',
-            'Clase "$classId" no encontrada.',
+            localized(
+              'Clase "$classId" no encontrada.',
+              'Class "$classId" not found.',
+            ),
           ));
         }
         continue;
@@ -191,8 +234,11 @@ class CharacterValidator {
           !multiclass.meetsAbilityRequirements(sheet.abilityScores)) {
         w.add(ValidationWarning(
           'multiclass_prerequisite',
-          'Para tomar niveles de ${classDefinition.name} necesitás cumplir '
-              'sus requisitos de multiclase (${multiclass.requirementLabel}).',
+          localized(
+            'Para tomar niveles de ${classDefinition.name} necesitás cumplir '
+                'sus requisitos de multiclase (${multiclass.requirementLabel}).',
+            'To take levels in ${classDefinition.name} you must meet its multiclass requirements (${multiclass.requirementLabel}).',
+          ),
         ));
       }
     }
@@ -218,7 +264,10 @@ class CharacterValidator {
       if (sheet.abilityScores[a]! > ceiling) {
         w.add(ValidationWarning(
           'ability_over_20',
-          '${a.abbr} supera $ceiling (${sheet.abilityScores[a]}).',
+          localized(
+            '${a.abbr} supera $ceiling (${sheet.abilityScores[a]}).',
+            '${a.abbr} exceeds $ceiling (${sheet.abilityScores[a]}).',
+          ),
         ));
       }
     }
@@ -226,7 +275,10 @@ class CharacterValidator {
     if (c.weaponMasteryChoices.length > sheet.weaponMasterySlots) {
       w.add(ValidationWarning(
         'too_many_masteries',
-        'Elegiste ${c.weaponMasteryChoices.length} maestrías pero tenés ${sheet.weaponMasterySlots} espacios.',
+        localized(
+          'Elegiste ${c.weaponMasteryChoices.length} maestrías pero tenés ${sheet.weaponMasterySlots} espacios.',
+          'You chose ${c.weaponMasteryChoices.length} masteries but have ${sheet.weaponMasterySlots} slots.',
+        ),
       ));
     }
 
@@ -242,7 +294,10 @@ class CharacterValidator {
       if (!proficient) {
         w.add(ValidationWarning(
           'mastery_not_proficient',
-          'No sos competente con ${weapon.name}: su maestría no se aplica.',
+          localized(
+            'No sos competente con ${weapon.name}: su maestría no se aplica.',
+            'You aren’t proficient with ${weapon.name}: its mastery doesn’t apply.',
+          ),
         ));
       }
     }
@@ -255,14 +310,20 @@ class CharacterValidator {
           !sheet.armorProficiencies.contains(armor.category)) {
         w.add(ValidationWarning(
           'armor_not_proficient',
-          'No sos competente con armadura ${armor.category}: desventaja y no podés lanzar conjuros.',
+          localized(
+            'No tenés entrenamiento con ${armorTrainingLabel(armor.category).toLowerCase()}: desventaja y no podés lanzar conjuros.',
+            'You aren’t trained with ${armorTrainingLabel(armor.category)}: Disadvantage, and you can’t cast spells.',
+          ),
         ));
       }
       final strReq = armor?.strengthRequirement;
       if (strReq != null && sheet.abilityScores[Ability.strength]! < strReq) {
         w.add(ValidationWarning(
           'armor_strength',
-          '${armor!.name} requiere Fuerza $strReq: tu velocidad baja 10 pies.',
+          localized(
+            '${armor!.name} requiere Fuerza $strReq: tu velocidad baja 10 pies.',
+            '${armor.name} requires Strength $strReq: your Speed drops by 10 feet.',
+          ),
           WarningSeverity.info,
         ));
       }
@@ -270,7 +331,12 @@ class CharacterValidator {
 
     if (sheet.attacks.isEmpty) {
       w.add(ValidationWarning(
-          'no_weapon', 'No hay arma equipada.', WarningSeverity.info));
+          'no_weapon',
+          localized(
+            'No hay arma equipada.',
+            'No weapon equipped.',
+          ),
+          WarningSeverity.info));
     }
 
     final warnedEntries = <String>{};
@@ -279,7 +345,10 @@ class CharacterValidator {
       if (!attack.proficient && warnedEntries.add(key)) {
         w.add(ValidationWarning(
           'weapon_not_proficient',
-          'No sos competente con ${attack.name}: no sumás el bono de competencia al ataque.',
+          localized(
+            'No sos competente con ${attack.name}: no sumás el bono de competencia al ataque.',
+            'You aren’t proficient with ${attack.name}: you don’t add your Proficiency Bonus to the attack.',
+          ),
         ));
       }
     }
@@ -295,7 +364,10 @@ class CharacterValidator {
       if (a < 3 || a > 18) {
         w.add(ValidationWarning(
           'ability_out_of_range',
-          'Una puntuación asignada ($a) está fuera del rango típico de generación (3-18).',
+          localized(
+            'Una puntuación asignada ($a) está fuera del rango típico de generación (3-18).',
+            'An assigned score ($a) is outside the typical generation range (3–18).',
+          ),
           WarningSeverity.info,
         ));
       }
@@ -318,20 +390,29 @@ class CharacterValidator {
       if (c.chosenSkills.length != expectedCount) {
         w.add(ValidationWarning(
           'skill_choice_count',
-          'Elegiste ${c.chosenSkills.length} habilidades pero corresponden $expectedCount.',
+          localized(
+            'Elegiste ${c.chosenSkills.length} habilidades pero corresponden $expectedCount.',
+            'You chose ${c.chosenSkills.length} skills but should have $expectedCount.',
+          ),
         ));
       }
       if (c.chosenSkills.toSet().length != c.chosenSkills.length) {
         w.add(ValidationWarning(
           'skill_choice_duplicate',
-          'Hay habilidades elegidas repetidas.',
+          localized(
+            'Hay habilidades elegidas repetidas.',
+            'Some chosen skills are repeated.',
+          ),
         ));
       }
       for (final s in c.chosenSkills) {
         if (!allowedSkills.contains(s)) {
           w.add(ValidationWarning(
             'skill_choice_invalid',
-            'Habilidad "$s" no está entre las opciones de raza/clase.',
+            localized(
+              'Habilidad "$s" no está entre las opciones de raza/clase.',
+              'Skill "${Skill.labelFor(s)}" isn’t among the species or class options.',
+            ),
           ));
         }
       }
@@ -350,8 +431,11 @@ class CharacterValidator {
           if (!hasChoice) {
             w.add(ValidationWarning(
               'asi_pending',
-              'Nivel $level: falta elegir mejora de característica o dote '
-                  'de ${classDefinition.name}.',
+              localized(
+                'Nivel $level: falta elegir mejora de característica o dote '
+                    'de ${classDefinition.name}.',
+                'Level $level: choose an Ability Score Improvement or feat for ${classDefinition.name}.',
+              ),
               WarningSeverity.info,
             ));
           }
@@ -362,8 +446,11 @@ class CharacterValidator {
           if (classLevel >= classDefinition.subclassLevel) {
             w.add(ValidationWarning(
               'subclass_pending',
-              'Nivel ${classDefinition.subclassLevel}: falta elegir '
-                  'subclase de ${classDefinition.name}.',
+              localized(
+                'Nivel ${classDefinition.subclassLevel}: falta elegir '
+                    'subclase de ${classDefinition.name}.',
+                'Level ${classDefinition.subclassLevel}: choose a subclass for ${classDefinition.name}.',
+              ),
               WarningSeverity.info,
             ));
           }
@@ -371,11 +458,18 @@ class CharacterValidator {
           final sub = repo.subclass(subId);
           if (sub == null) {
             w.add(ValidationWarning(
-                'subclass_missing', 'Subclase "$subId" no encontrada.'));
+                'subclass_missing',
+                localized(
+                  'Subclase "$subId" no encontrada.',
+                  'Subclass "$subId" not found.',
+                )));
           } else if (sub.classId != classId) {
             w.add(ValidationWarning(
               'subclass_wrong_class',
-              'La subclase ${sub.name} no pertenece a ${classDefinition.name}.',
+              localized(
+                'La subclase ${sub.name} no pertenece a ${classDefinition.name}.',
+                'Subclass ${sub.name} doesn’t belong to ${classDefinition.name}.',
+              ),
             ));
           }
         }
@@ -387,8 +481,11 @@ class CharacterValidator {
             !classDefinition.asiLevels.contains(asi.level)) {
           w.add(ValidationWarning(
             'asi_invalid_level',
-            'Nivel ${asi.level} no es un nivel de Mejora de Característica '
-                'de ${classDefinition?.name ?? classId}.',
+            localized(
+              'Nivel ${asi.level} no es un nivel de Mejora de Característica '
+                  'de ${classDefinition?.name ?? classId}.',
+              'Level ${asi.level} isn’t an Ability Score Improvement level for ${classDefinition?.name ?? classId}.',
+            ),
           ));
         }
         // El +1 de un don con opciones restringidas guardado en otra
@@ -406,8 +503,11 @@ class CharacterValidator {
           if (!choice.allowed.contains(a)) {
             w.add(ValidationWarning(
               'feat_ability_not_allowed',
-              '${repo.feat(featId!)!.name} no puede subir ${a.abbr} '
-                  '(solo ${choice.allowed.map((x) => x.abbr).join(", ")}).',
+              localized(
+                '${repo.feat(featId!)!.name} no puede subir ${a.abbr} '
+                    '(solo ${choice.allowed.map((x) => x.abbr).join(", ")}).',
+                '${repo.feat(featId)!.name} can’t raise ${a.abbr} (only ${choice.allowed.map((x) => x.abbr).join(", ")}).',
+              ),
             ));
           }
         }
@@ -418,7 +518,10 @@ class CharacterValidator {
       if (r.max <= 0) {
         w.add(ValidationWarning(
           'resource_zero_max',
-          'El recurso "${r.name}" tiene 0 usos: revisá su definición (falta "max"?).',
+          localized(
+            'El recurso "${r.name}" tiene 0 usos: revisá su definición (falta "max"?).',
+            'Resource "${r.name}" has 0 uses: check its definition (missing "max"?).',
+          ),
         ));
       }
     }
@@ -441,7 +544,10 @@ class CharacterValidator {
       if (feat != null && !feat.repeatable) {
         w.add(ValidationWarning(
           'feat_duplicate',
-          '${feat.name}: esta dote no se puede elegir más de una vez.',
+          localized(
+            '${feat.name}: esta dote no se puede elegir más de una vez.',
+            '${feat.name}: this feat can’t be taken more than once.',
+          ),
         ));
       }
     }
@@ -460,7 +566,10 @@ class CharacterValidator {
           entry.value.map((id) => repo.feat(id)?.name ?? id).join(', ');
       w.add(ValidationWarning(
         'feat_exclusive_group',
-        'Estas dotes son mutuamente excluyentes: $names.',
+        localized(
+          'Estas dotes son mutuamente excluyentes: $names.',
+          'These feats are mutually exclusive: $names.',
+        ),
       ));
     }
 
@@ -473,7 +582,10 @@ class CharacterValidator {
       if (missing != null) {
         w.add(ValidationWarning(
           'feat_prerequisite',
-          '${feat.name}: no cumplís el prerrequisito ($missing).',
+          localized(
+            '${feat.name}: no cumplís el prerrequisito ($missing).',
+            '${feat.name}: you don’t meet the prerequisite ($missing).',
+          ),
         ));
       }
       // La dote deja elegir su aptitud mágica y todavía no se eligió. Es
@@ -483,7 +595,10 @@ class CharacterValidator {
           !c.featSpellcastingAbilities.containsKey(feat.id)) {
         w.add(ValidationWarning(
           'feat_spellcasting_ability_pending',
-          '${feat.name}: falta elegir la aptitud mágica de sus conjuros.',
+          localized(
+            '${feat.name}: falta elegir la aptitud mágica de sus conjuros.',
+            '${feat.name}: choose the spellcasting ability for its spells.',
+          ),
           WarningSeverity.info,
         ));
       }
@@ -518,13 +633,19 @@ class CharacterValidator {
       if (chosen.length < slot.count) {
         w.add(ValidationWarning(
           'feature_choice_pending',
-          '${slot.name}: elegiste ${chosen.length} de ${slot.count}.',
+          localized(
+            '${slot.name}: elegiste ${chosen.length} de ${slot.count}.',
+            '${slot.name}: you chose ${chosen.length} of ${slot.count}.',
+          ),
           WarningSeverity.info,
         ));
       } else if (chosen.length > slot.count) {
         w.add(ValidationWarning(
           'too_many_feature_choices',
-          '${slot.name}: elegiste ${chosen.length} pero tenés ${slot.count} espacios.',
+          localized(
+            '${slot.name}: elegiste ${chosen.length} pero tenés ${slot.count} espacios.',
+            '${slot.name}: you chose ${chosen.length} but have ${slot.count} slots.',
+          ),
         ));
       }
 
@@ -537,7 +658,10 @@ class CharacterValidator {
         if (!pool.contains(id)) {
           w.add(ValidationWarning(
             'feature_choice_invalid',
-            '"$id" no es una opción de ${slot.name}.',
+            localized(
+              '"$id" no es una opción de ${slot.name}.',
+              '"$id" isn’t an option for ${slot.name}.',
+            ),
           ));
         }
       }
@@ -551,7 +675,10 @@ class CharacterValidator {
       if (slots.containsKey(groupId)) continue;
       w.add(ValidationWarning(
         'feature_choice_orphan',
-        'Tenés elecciones guardadas de «${_choiceLabel(groupId)}», un rasgo que ya no tenés.',
+        localized(
+          'Tenés elecciones guardadas de «${_choiceLabel(groupId)}», un rasgo que ya no tenés.',
+          'You have saved choices from “${_choiceLabel(groupId)}”, a feature you no longer have.',
+        ),
         WarningSeverity.info,
       ));
     }
@@ -566,7 +693,10 @@ class CharacterValidator {
         if (slots.containsKey(scopedId)) continue;
         w.add(ValidationWarning(
           'feature_choice_orphan',
-          'Tenés elecciones guardadas de «${_choiceLabel(scopedId)}», un rasgo que ya no tenés.',
+          localized(
+            'Tenés elecciones guardadas de «${_choiceLabel(scopedId)}», un rasgo que ya no tenés.',
+            'You have saved choices from “${_choiceLabel(scopedId)}”, a feature you no longer have.',
+          ),
           WarningSeverity.info,
         ));
       }
@@ -604,13 +734,19 @@ class CharacterValidator {
       if (slot.chosen.length < slot.count) {
         w.add(ValidationWarning(
           'spell_choice_pending',
-          '${slot.name}: elegiste ${slot.chosen.length} de ${slot.count}.',
+          localized(
+            '${slot.name}: elegiste ${slot.chosen.length} de ${slot.count}.',
+            '${slot.name}: you chose ${slot.chosen.length} of ${slot.count}.',
+          ),
           WarningSeverity.info,
         ));
       } else if (storedIds.length > slot.count) {
         w.add(ValidationWarning(
           'too_many_spell_choices',
-          '${slot.name}: elegiste ${storedIds.length} pero tenés ${slot.count} espacios.',
+          localized(
+            '${slot.name}: elegiste ${storedIds.length} pero tenés ${slot.count} espacios.',
+            '${slot.name}: you chose ${storedIds.length} but have ${slot.count} slots.',
+          ),
         ));
       }
 
@@ -618,7 +754,10 @@ class CharacterValidator {
         if (!slot.options.contains(id)) {
           w.add(ValidationWarning(
             'spell_choice_invalid',
-            '"$id" ya no es una opción de ${slot.name}.',
+            localized(
+              '"$id" ya no es una opción de ${slot.name}.',
+              '"$id" is no longer an option for ${slot.name}.',
+            ),
           ));
         }
       }
@@ -629,7 +768,10 @@ class CharacterValidator {
       if (slots.containsKey(groupId)) continue;
       w.add(ValidationWarning(
         'spell_choice_orphan',
-        'Tenés conjuros elegidos de «${_choiceLabel(groupId)}», un rasgo que ya no tenés.',
+        localized(
+          'Tenés conjuros elegidos de «${_choiceLabel(groupId)}», un rasgo que ya no tenés.',
+          'You have spells chosen from “${_choiceLabel(groupId)}”, a feature you no longer have.',
+        ),
         WarningSeverity.info,
       ));
     }
@@ -644,7 +786,10 @@ class CharacterValidator {
         if (slots.containsKey(scopedId)) continue;
         w.add(ValidationWarning(
           'spell_choice_orphan',
-          'Tenés conjuros elegidos de «${_choiceLabel(scopedId)}», un rasgo que ya no tenés.',
+          localized(
+            'Tenés conjuros elegidos de «${_choiceLabel(scopedId)}», un rasgo que ya no tenés.',
+            'You have spells chosen from “${_choiceLabel(scopedId)}”, a feature you no longer have.',
+          ),
           WarningSeverity.info,
         ));
       }
@@ -663,8 +808,11 @@ class CharacterValidator {
       if (slot.chosen.length < slot.count) {
         w.add(ValidationWarning(
           'language_choice_pending_feature',
-          '${slot.name}: elegiste ${slot.chosen.length} de ${slot.count} '
-              'idiomas.',
+          localized(
+            '${slot.name}: elegiste ${slot.chosen.length} de ${slot.count} '
+                'idiomas.',
+            '${slot.name}: you chose ${slot.chosen.length} of ${slot.count} languages.',
+          ),
           WarningSeverity.info,
         ));
       }
@@ -675,7 +823,10 @@ class CharacterValidator {
       if (slots.containsKey(groupId)) continue;
       w.add(ValidationWarning(
         'language_choice_orphan',
-        'Tenés idiomas elegidos de "$groupId", un rasgo que ya no tenés.',
+        localized(
+          'Tenés idiomas elegidos de "$groupId", un rasgo que ya no tenés.',
+          'You have languages chosen from "$groupId", a feature you no longer have.',
+        ),
         WarningSeverity.info,
       ));
     }
@@ -688,13 +839,19 @@ class CharacterValidator {
     if (elegidos.length < cupo) {
       w.add(ValidationWarning(
         'language_choice_pending',
-        'Idiomas: elegiste ${elegidos.length} de $cupo.',
+        localized(
+          'Idiomas: elegiste ${elegidos.length} de $cupo.',
+          'Languages: you chose ${elegidos.length} of $cupo.',
+        ),
         WarningSeverity.info,
       ));
     } else if (elegidos.length > cupo) {
       w.add(ValidationWarning(
         'too_many_languages',
-        'Idiomas: elegiste ${elegidos.length} pero te corresponden $cupo.',
+        localized(
+          'Idiomas: elegiste ${elegidos.length} pero te corresponden $cupo.',
+          'Languages: you chose ${elegidos.length} but get $cupo.',
+        ),
       ));
     }
 
@@ -703,7 +860,10 @@ class CharacterValidator {
       if (!vistos.add(id)) {
         w.add(ValidationWarning(
           'language_duplicate',
-          '${Language.labelFor(id)} está elegido dos veces.',
+          localized(
+            '${Language.labelFor(id)} está elegido dos veces.',
+            '${Language.labelFor(id)} is chosen twice.',
+          ),
         ));
         continue;
       }
@@ -712,8 +872,11 @@ class CharacterValidator {
       if (id == Language.universal.id) {
         w.add(ValidationWarning(
           'language_universal_chosen',
-          '${Language.labelFor(id)} lo sabe todo personaje: no ocupa una de '
-              'tus elecciones.',
+          localized(
+            '${Language.labelFor(id)} lo sabe todo personaje: no ocupa una de '
+                'tus elecciones.',
+            'Every character knows ${Language.labelFor(id)}: it doesn’t take one of your choices.',
+          ),
         ));
         continue;
       }
@@ -724,8 +887,11 @@ class CharacterValidator {
       if (lang != null && !lang.standard) {
         w.add(ValidationWarning(
           'language_not_standard',
-          '${lang.label} no está entre los idiomas estándar: solo se obtiene '
-              'por un rasgo.',
+          localized(
+            '${lang.label} no está entre los idiomas estándar: solo se obtiene '
+                'por un rasgo.',
+            '${lang.label} isn’t a standard language: it’s only gained through a feature.',
+          ),
         ));
       }
     }
@@ -742,8 +908,11 @@ class CharacterValidator {
     if (sheet.isEncumbered) {
       w.add(ValidationWarning(
         'encumbered',
-        'Llevás ${formatPounds(sheet.carriedWeight)} lb y tu capacidad es '
-            '${sheet.carryingCapacity} lb.',
+        localized(
+          'Llevás ${formatPounds(sheet.carriedWeight)} lb y tu capacidad es '
+              '${sheet.carryingCapacity} lb.',
+          'You’re carrying ${formatPounds(sheet.carriedWeight)} lb and your capacity is ${sheet.carryingCapacity} lb.',
+        ),
         WarningSeverity.info,
       ));
     }
@@ -752,8 +921,11 @@ class CharacterValidator {
     if (attuned > attunementSlots) {
       w.add(ValidationWarning(
         'attunement_over_limit',
-        'Tenés $attuned objetos sintonizados y solo podés mantener '
-            '$attunementSlots.',
+        localized(
+          'Tenés $attuned objetos sintonizados y solo podés mantener '
+              '$attunementSlots.',
+          'You have $attuned attuned items and can only keep $attunementSlots.',
+        ),
       ));
     }
   }
@@ -771,7 +943,10 @@ class CharacterValidator {
     if (offHandIds.length > 1) {
       w.add(ValidationWarning(
         'too_many_off_hands',
-        'Marcaste ${offHandIds.length} armas en la mano secundaria: solo se empuña una.',
+        localized(
+          'Marcaste ${offHandIds.length} armas en la mano secundaria: solo se empuña una.',
+          'You marked ${offHandIds.length} weapons in the off hand: only one can be wielded.',
+        ),
       ));
     }
 
@@ -780,7 +955,10 @@ class CharacterValidator {
       if (weapon != null && !weapon.isLight) {
         w.add(ValidationWarning(
           'off_hand_not_light',
-          '${weapon.name} no es Ligera: el ataque de mano secundaria exige un arma Ligera.',
+          localized(
+            '${weapon.name} no es Ligera: el ataque de mano secundaria exige un arma Ligera.',
+            '${weapon.name} isn’t Light: the off-hand attack requires a Light weapon.',
+          ),
         ));
       }
     }
@@ -792,7 +970,10 @@ class CharacterValidator {
     if (!hasLightMainHand) {
       w.add(ValidationWarning(
         'off_hand_without_pair',
-        'No hay otra arma Ligera en la mano principal: el ataque de mano secundaria no se puede hacer.',
+        localized(
+          'No hay otra arma Ligera en la mano principal: el ataque de mano secundaria no se puede hacer.',
+          'There’s no other Light weapon in the main hand: the off-hand attack can’t be made.',
+        ),
         WarningSeverity.info,
       ));
     }
@@ -877,7 +1058,10 @@ class CharacterValidator {
       if (hasSpells) {
         w.add(ValidationWarning(
           'spells_without_caster',
-          'Hay conjuros elegidos pero esta clase no lanza conjuros.',
+          localized(
+            'Hay conjuros elegidos pero esta clase no lanza conjuros.',
+            'Spells are chosen but this class doesn’t cast spells.',
+          ),
         ));
       }
       return;
@@ -898,8 +1082,11 @@ class CharacterValidator {
       if (cantripIds.length > sc.cantripsKnown) {
         w.add(ValidationWarning(
           'too_many_cantrips',
-          'Elegiste ${cantripIds.length} trucos para ${sc.spellList} pero '
-              'conocés ${sc.cantripsKnown}.',
+          localized(
+            'Elegiste ${cantripIds.length} trucos para ${sc.spellList} pero '
+                'conocés ${sc.cantripsKnown}.',
+            'You chose ${cantripIds.length} cantrips for ${sc.spellList} but know ${sc.cantripsKnown}.',
+          ),
         ));
       }
 
@@ -907,33 +1094,55 @@ class CharacterValidator {
       if (pending.cantrips > 0) {
         w.add(ValidationWarning(
           'cantrips_pending',
-          'Trucos de ${sc.spellList}: elegiste ${cantripIds.length} de '
-              '${sc.cantripsKnown}.',
+          localized(
+            'Trucos de ${sc.spellList}: elegiste ${cantripIds.length} de '
+                '${sc.cantripsKnown}.',
+            '${sc.spellList} cantrips: you chose ${cantripIds.length} of ${sc.cantripsKnown}.',
+          ),
           WarningSeverity.info,
         ));
       }
       if (pending.prepared > 0) {
         w.add(ValidationWarning(
           'prepared_pending',
-          'Conjuros de ${sc.spellList}: preparaste ${spellIds.length} de '
-              '${sc.preparedCount}.',
+          localized(
+            'Conjuros de ${sc.spellList}: preparaste ${spellIds.length} de '
+                '${sc.preparedCount}.',
+            '${sc.spellList} spells: you prepared ${spellIds.length} of ${sc.preparedCount}.',
+          ),
           WarningSeverity.info,
         ));
       }
       for (final id in cantripIds) {
         final sp = repo.spell(id);
         if (sp == null) {
-          w.add(
-              ValidationWarning('spell_missing', 'Truco "$id" no encontrado.'));
+          w.add(ValidationWarning(
+              'spell_missing',
+              localized(
+                'Truco "$id" no encontrado.',
+                'Cantrip "$id" not found.',
+              )));
         } else if (!sp.isCantrip) {
           w.add(ValidationWarning(
-              'cantrip_not_level_0', '${sp.name} no es un truco.'));
+              'cantrip_not_level_0',
+              localized(
+                '${sp.name} no es un truco.',
+                '${sp.name} isn’t a cantrip.',
+              )));
         } else if (!list.contains(id)) {
-          w.add(ValidationWarning('cantrip_wrong_list',
-              '${sp.name} no está en la lista de ${sc.spellList}.'));
+          w.add(ValidationWarning(
+              'cantrip_wrong_list',
+              localized(
+                '${sp.name} no está en la lista de ${sc.spellList}.',
+                '${sp.name} isn’t on the ${sc.spellList} list.',
+              )));
         } else if (grantedSpellIds.contains(id)) {
-          w.add(ValidationWarning('cantrip_already_granted',
-              '${sp.name} ya lo tenés por otro rasgo: elegirlo de clase ocupa un cupo de más.'));
+          w.add(ValidationWarning(
+              'cantrip_already_granted',
+              localized(
+                '${sp.name} ya lo tenés por otro rasgo: elegirlo de clase ocupa un cupo de más.',
+                'You already have ${sp.name} from another feature: choosing it from your class uses an extra slot.',
+              )));
         }
       }
 
@@ -941,35 +1150,57 @@ class CharacterValidator {
           spellIds.length > sc.preparedCount) {
         w.add(ValidationWarning(
           'too_many_prepared',
-          'Preparaste ${spellIds.length} conjuros de ${sc.spellList} pero '
-              'podés preparar ${sc.preparedCount}.',
+          localized(
+            'Preparaste ${spellIds.length} conjuros de ${sc.spellList} pero '
+                'podés preparar ${sc.preparedCount}.',
+            'You prepared ${spellIds.length} ${sc.spellList} spells but can prepare ${sc.preparedCount}.',
+          ),
         ));
       }
       for (final id in spellIds) {
         final sp = repo.spell(id);
         if (sp == null) {
           w.add(ValidationWarning(
-              'spell_missing', 'Conjuro "$id" no encontrado.'));
+              'spell_missing',
+              localized(
+                'Conjuro "$id" no encontrado.',
+                'Spell "$id" not found.',
+              )));
           continue;
         }
         if (sp.isCantrip) {
-          w.add(ValidationWarning('spell_is_cantrip',
-              '${sp.name} es un truco; va en la lista de trucos.'));
+          w.add(ValidationWarning(
+              'spell_is_cantrip',
+              localized(
+                '${sp.name} es un truco; va en la lista de trucos.',
+                '${sp.name} is a cantrip; it goes on the cantrip list.',
+              )));
           continue;
         }
         if (!list.contains(id)) {
-          w.add(ValidationWarning('spell_wrong_list',
-              '${sp.name} no está en la lista de ${sc.spellList}.'));
+          w.add(ValidationWarning(
+              'spell_wrong_list',
+              localized(
+                '${sp.name} no está en la lista de ${sc.spellList}.',
+                '${sp.name} isn’t on the ${sc.spellList} list.',
+              )));
         }
         if (grantedSpellIds.contains(id)) {
-          w.add(ValidationWarning('spell_already_granted',
-              '${sp.name} ya lo tenés siempre preparado por otro rasgo: prepararlo ocupa un cupo de más.'));
+          w.add(ValidationWarning(
+              'spell_already_granted',
+              localized(
+                '${sp.name} ya lo tenés siempre preparado por otro rasgo: prepararlo ocupa un cupo de más.',
+                '${sp.name} is always prepared from another feature: preparing it uses an extra slot.',
+              )));
         }
         if (maxSlotLevel > 0 && sp.level > maxSlotLevel) {
           w.add(ValidationWarning(
             'spell_level_too_high',
-            '${sp.name} (nivel ${sp.level}) supera tu mayor espacio '
-                '(nivel $maxSlotLevel).',
+            localized(
+              '${sp.name} (nivel ${sp.level}) supera tu mayor espacio '
+                  '(nivel $maxSlotLevel).',
+              '${sp.name} (level ${sp.level}) exceeds your highest slot (level $maxSlotLevel).',
+            ),
             WarningSeverity.info,
           ));
         }
@@ -1007,7 +1238,10 @@ class CharacterValidator {
         heldIds.any((id) =>
             id != feat.id &&
             repo.feat(id)?.effectiveExclusiveGroup == exclusiveGroup)) {
-      return 'no tener otra dote del grupo "$exclusiveGroup"';
+      return localized(
+        'no tener otra dote del grupo "$exclusiveGroup"',
+        'not having another feat from group "$exclusiveGroup"',
+      );
     }
     final prereq = feat.prerequisite;
     if (prereq == null || prereq.isEmpty) return null;
@@ -1027,7 +1261,9 @@ class CharacterValidator {
     final any = prereq.anyAbilityScores;
     if (any.isNotEmpty &&
         !any.entries.any((e) => sheet.abilityScores[e.key]! >= e.value)) {
-      return any.entries.map((e) => '${e.key.abbr} ${e.value}').join(' o ');
+      return any.entries
+          .map((e) => '${e.key.abbr} ${e.value}')
+          .join(localized(' o ', ' or '));
     }
     final reqProf = prereq.requiredProficiency;
     if (reqProf != null) {
@@ -1037,17 +1273,25 @@ class CharacterValidator {
               sheet.armorProficiencies.contains(reqProf) ||
               sheet.toolProficiencies.contains(reqProf) ||
               sheet.skillProficiencies.contains(reqProf));
-      if (!has) return 'competencia "$reqProf"';
+      if (!has) {
+        return localized('competencia "$reqProf"', 'proficiency "$reqProf"');
+      }
     }
     final reqFeats = prereq.requiredFeatIds;
     if (reqFeats.isNotEmpty && !reqFeats.any(heldFeatIds.contains)) {
       final names = reqFeats.map((id) => repo.feat(id)?.name ?? id);
-      return 'la dote ${names.join(' o ')}';
+      return localized(
+        'la dote ${names.join(' o ')}',
+        'the ${names.join(' or ')} feat',
+      );
     }
     final reqCategory = prereq.requiredFeatCategory;
     if (reqCategory != null &&
         !heldFeatIds.any((id) => repo.feat(id)?.category == reqCategory)) {
-      return 'alguna dote de categoría "$reqCategory"';
+      return localized(
+        'alguna dote de categoría "$reqCategory"',
+        'a feat of category "$reqCategory"',
+      );
     }
     final reqFeature = prereq.requiredClassFeature;
     if (reqFeature != null) {
@@ -1059,14 +1303,25 @@ class CharacterValidator {
             ) ??
             false;
       });
-      if (!has) return 'el rasgo de clase "$reqFeature"';
+      if (!has) {
+        return localized(
+          'el rasgo de clase "$reqFeature"',
+          'the class feature "$reqFeature"',
+        );
+      }
     }
     final reqClass = prereq.requiredClassId;
     if (reqClass != null && !sheet.classLevels.containsKey(reqClass)) {
-      return 'ser ${repo.characterClass(reqClass)?.name ?? reqClass}';
+      return localized(
+        'ser ${repo.characterClass(reqClass)?.name ?? reqClass}',
+        'being a ${repo.characterClass(reqClass)?.name ?? reqClass}',
+      );
     }
     if (prereq.minLevel != null && c.level < prereq.minLevel!) {
-      return 'nivel ${prereq.minLevel}';
+      return localized(
+        'nivel ${prereq.minLevel}',
+        'level ${prereq.minLevel}',
+      );
     }
     return null;
   }
@@ -1100,25 +1355,34 @@ extension _ProficiencyChoiceChecks on CharacterValidator {
       if (slot.chosen.length < slot.count) {
         w.add(ValidationWarning(
           'proficiency_choice_count',
-          slot.name +
-              ': elegiste ' +
-              slot.chosen.length.toString() +
-              ' de ' +
-              slot.count.toString() +
-              '.',
+          localized(
+            slot.name +
+                ': elegiste ' +
+                slot.chosen.length.toString() +
+                ' de ' +
+                slot.count.toString() +
+                '.',
+            '${slot.name}: you chose ${slot.chosen.length} of ${slot.count}.',
+          ),
           WarningSeverity.info,
         ));
       } else if (slot.chosen.length > slot.count) {
         w.add(ValidationWarning(
           'too_many_proficiency_choices',
-          slot.name + ': hay m\u00e1s elecciones que espacios disponibles.',
+          localized(
+            slot.name + ': hay m\u00e1s elecciones que espacios disponibles.',
+            '${slot.name}: there are more choices than available slots.',
+          ),
         ));
       }
     }
     if (slots.isEmpty && c.chosenProficiencies.isNotEmpty) {
       w.add(ValidationWarning(
         'proficiency_choice_count',
-        'Hay competencias elegidas pero ning\u00fan rasgo las concede.',
+        localized(
+          'Hay competencias elegidas pero ning\u00fan rasgo las concede.',
+          'Proficiencies are chosen but no feature grants them.',
+        ),
       ));
     }
 
@@ -1126,7 +1390,10 @@ extension _ProficiencyChoiceChecks on CharacterValidator {
         chosen.any((id) => c.chosenSkills.contains(id))) {
       w.add(ValidationWarning(
         'proficiency_choice_duplicate',
-        'Hay competencias elegidas m\u00e1s de una vez.',
+        localized(
+          'Hay competencias elegidas m\u00e1s de una vez.',
+          'Some proficiencies are chosen more than once.',
+        ),
       ));
     }
 
@@ -1137,7 +1404,10 @@ extension _ProficiencyChoiceChecks on CharacterValidator {
       if (!allowed.contains(id)) {
         w.add(ValidationWarning(
           'proficiency_choice_invalid',
-          'La competencia "$id" no está entre las opciones de tus dotes.',
+          localized(
+            'La competencia "$id" no está entre las opciones de tus dotes.',
+            'Proficiency "$id" isn’t among your feats’ options.',
+          ),
         ));
       }
     }

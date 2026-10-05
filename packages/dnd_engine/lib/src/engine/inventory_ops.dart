@@ -3,6 +3,7 @@ import 'dice.dart';
 import '../domain/character.dart';
 import 'coin_ops.dart';
 import '../domain/content.dart';
+import '../domain/content_language.dart';
 
 /// Operaciones sobre la mochila. Puras: no mutan, devuelven una ficha nueva.
 ///
@@ -350,7 +351,8 @@ class InventoryOps {
     return _ledger(
       bought,
       at,
-      'Compra: ${_units(quantity, item)} · ${CoinOps.formatAmount(total)}',
+      '${localized('Compra', 'Purchase')}: ${_units(quantity, item)} · '
+      '${_amount(total)}',
     );
   }
 
@@ -373,8 +375,8 @@ class InventoryOps {
     return _ledger(
       without.copyWith(coins: CoinOps.receive(without.coins, total)),
       at,
-      'Venta: ${_units(sold, resolve(entry, repo))} · '
-      '${CoinOps.formatAmount(total)}',
+      '${localized('Venta', 'Sale')}: ${_units(sold, resolve(entry, repo))} · '
+      '${_amount(total)}',
     );
   }
 
@@ -382,8 +384,13 @@ class InventoryOps {
   static String _units(int quantity, ResolvedInventoryEntry item) {
     final bundle = item.item?.bundleSize ?? 1;
     return '$quantity × ${item.name}'
-        '${bundle > 1 ? ' (paquete de $bundle)' : ''}';
+        '${bundle > 1 ? localized(' (paquete de $bundle)', ' (pack of $bundle)') : ''}';
   }
+
+  /// La línea del diario queda escrita en el idioma del momento, como una
+  /// nota: las monedas también, porque «2 pp» en inglés es platino.
+  static String _amount(int cp) =>
+      CoinOps.formatAmount(cp, labels: localized(coinLabels, coinLabelsEn));
 
   /// Suma una línea con fecha a «Cuentas», creándola al final del Diario si
   /// no está. Una entrada sola y no una por operación: una tarde de compras
@@ -398,7 +405,7 @@ class InventoryOps {
           ...c.diary,
           DiaryEntry(
             entryId: ledgerEntryId,
-            title: 'Cuentas',
+            title: localized('Cuentas', 'Accounts'),
             body: line,
             createdAt: at,
           ),
