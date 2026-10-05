@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dnd_engine/dnd_engine.dart';
@@ -1728,5 +1729,40 @@ void main() {
     expect(r.prerequisite!.requiredClassFeature, 'Estilo de Combate');
     expect(r.prerequisite!.minLevel, 4);
     expect(r.exclusiveGroup, 'prueba');
+  });
+
+  group('traducción al inglés', () {
+    // Las superposiciones `X.en.json` (ver `content_translation.dart`). Un
+    // catálogo sin superposición todavía no se exige: el inglés se completa de
+    // a poco y el español es el respaldo. Uno que la tiene, sí: cada entrada
+    // con su nombre y ninguna traducción desfasada respecto del español.
+    final superposiciones = Directory('lib/assets/srd_2024')
+        .listSync()
+        .whereType<File>()
+        .where((f) => f.path.endsWith('.en.json'));
+    File espanolDe(File f) => File(f.path.replaceFirst('.en.json', '.json'));
+
+    test('toda superposición tiene su catálogo en español', () {
+      for (final f in superposiciones) {
+        expect(espanolDe(f).existsSync(), isTrue, reason: f.path);
+      }
+    });
+
+    test('las superposiciones están completas y al día', () {
+      final problemas = <String>[
+        for (final f in superposiciones)
+          ...translationProblems(
+            espanolDe(f).uri.pathSegments.last.replaceFirst('.json', ''),
+            (jsonDecode(espanolDe(f).readAsStringSync()) as List)
+                .cast<Map<String, dynamic>>(),
+            (jsonDecode(f.readAsStringSync()) as Map).cast<String, dynamic>(),
+            requireName: true,
+          ),
+      ];
+      // Si el español cambió sin cambiar el sentido (por ejemplo después de
+      // `apply_voseo.dart`), `dart run tool/translate_content.dart --refresh`
+      // recalcula las huellas; si cambió el sentido, hay que retraducir.
+      expect(problemas, isEmpty, reason: problemas.join('\n'));
+    });
   });
 }

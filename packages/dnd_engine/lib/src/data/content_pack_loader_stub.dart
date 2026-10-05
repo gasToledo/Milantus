@@ -4,7 +4,10 @@ import 'content_repository.dart';
 /// compila para web. `loadFromDirectory` no tiene sentido sin sistema de
 /// archivos local: el cliente web carga el contenido oficial como asset
 /// empaquetado, no desde un directorio.
-Future<ContentRepository> loadContentRepositoryFromDirectory(String dirPath) {
+Future<ContentRepository> loadContentRepositoryFromDirectory(
+  String dirPath, {
+  String? translation,
+}) {
   throw UnsupportedError(
     'ContentRepository.loadFromDirectory no está disponible en la '
     'plataforma web; use el contenido empaquetado como asset.',

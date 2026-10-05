@@ -167,6 +167,12 @@ después: `generate_items.dart` le pone peso y precio a `weapons.json` y
 español está en tuteo). Si alguien regenera y se olvida de un paso,
 `content_integrity_test` lo dice.
 
+El inglés del catálogo vive aparte, en `X.en.json` junto a cada `X.json`, y
+se **corrige a mano**: es la excepción a no editar lo generado. Regenerar el
+español deja huellas desfasadas que el test señala; cómo completarlo y
+cuándo correr `translate_content.dart --refresh` está en
+`docs/desarrollo/contenido-y-reglas.md` §Traducción al inglés.
+
 ## Frontend
 
 La guía completa es

@@ -27,6 +27,7 @@ export 'src/domain/encounter.dart';
 export 'src/domain/encounter_log.dart';
 export 'src/domain/computed_sheet.dart';
 export 'src/data/content_repository.dart';
+export 'src/data/content_translation.dart';
 export 'src/engine/sheet_builder.dart';
 export 'src/engine/character_compiler.dart';
 export 'src/engine/validation.dart';

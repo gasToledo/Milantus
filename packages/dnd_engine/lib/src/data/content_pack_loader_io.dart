@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'content_repository.dart';
+import 'content_translation.dart';
 
 /// Carga un pack desde un directorio: exige un manifiesto válido y lee los
 /// catálogos JSON. Los catálogos faltantes se tratan como listas vacías.
@@ -11,13 +12,25 @@ import 'content_repository.dart';
 /// mediante una importación condicional para que un build web nunca lo
 /// resuelva (ver `content_pack_loader_stub.dart`).
 Future<ContentRepository> loadContentRepositoryFromDirectory(
-  String dirPath,
-) async {
+  String dirPath, {
+  String? translation,
+}) async {
   Future<List<Map<String, dynamic>>> read(String file) async {
     final f = File('$dirPath/$file');
     if (!await f.exists()) return const [];
-    return (jsonDecode(await f.readAsString()) as List)
+    final pack = (jsonDecode(await f.readAsString()) as List)
         .cast<Map<String, dynamic>>();
+    if (translation == null) return pack;
+    // Un catálogo sin superposición se queda en español: es el respaldo, no
+    // un error, y así el inglés se completa de a poco.
+    final overlay = File(
+      '$dirPath/${file.replaceFirst('.json', '.$translation.json')}',
+    );
+    if (!await overlay.exists()) return pack;
+    return applyContentTranslation(
+      pack,
+      (jsonDecode(await overlay.readAsString()) as Map).cast<String, dynamic>(),
+    );
   }
 
   final manifestFile = File('$dirPath/manifest.json');

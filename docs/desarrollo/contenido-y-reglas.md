@@ -90,6 +90,57 @@ Las herramientas viven en `packages/dnd_engine/tool/`:
 No se edita a mano un archivo generado. Si una extracción necesita una
 excepción, se documenta en el generador y se cubre con una prueba.
 
+## Traducción al inglés
+
+El español es la fuente del catálogo. El inglés vive en una superposición
+por catálogo, `X.en.json` junto a `X.json`, con solo los textos traducidos:
+
+```json
+{ "fireball": { "_es": "041c5f05", "name": "Fireball", "range": "150 feet" } }
+```
+
+La clave de primer nivel es el `id`; adentro, cada clave es la ruta del campo
+en la entrada en español, con índices para las listas
+(`features.3.effects.0.name`), porque los rasgos de clase no tienen id. `_es`
+es la huella del español del que salió la traducción. Lo que no está
+traducido se muestra en español. El formato y su aplicación están en
+`packages/dnd_engine/lib/src/data/content_translation.dart`.
+
+Es la excepción a «no se edita a mano»: la superposición se completa con una
+herramienta y **se corrige a mano**, y la herramienta nunca pisa lo que ya
+está traducido.
+
+```bash
+cd packages/dnd_engine && dart run tool/translate_content.dart --fill <directorio-5etools>
+```
+
+Agrega los nombres que encuentra en 5etools-src (cruce por id, que es su
+slug) y los alcances «N pies», y lista lo que queda para traducir a mano. El
+directorio se arma bajando, de la revisión pineada
+`e5f3e77b303a92df10487207857200245e71957c` de `5etools-mirror-3/5etools-src`,
+estos archivos de `data/`: `spells/spells-xphb.json`,
+`spells/spells-efa.json`, `bestiary/bestiary-xmm.json`,
+`bestiary/bestiary-efa.json`, `items.json`, `items-base.json`, `feats.json`,
+`optionalfeatures.json`, `races.json`, `backgrounds.json` y los
+`class/class-*.json` de las trece clases.
+
+La traducción a mano sigue el glosario en inglés de
+[Textos](textos.md). Lo que no es SRD (PHB 2024, EFA) se redacta como resumen
+propio, igual que en español: nunca copiado del libro.
+
+`content_integrity_test` falla si una superposición apunta a un id o una ruta
+que ya no existe, si a una entrada le falta el nombre, o si el español cambió
+después de traducirlo. Cuando el cambio del español no cambió el sentido —el
+caso típico es `apply_voseo.dart`, que va después de cualquier generador—, se
+recalculan las huellas:
+
+```bash
+cd packages/dnd_engine && dart run tool/translate_content.dart --refresh
+```
+
+Imprime qué entradas tocó. Se revisa ese diff antes de commitear: si el
+sentido cambió, se corrige la traducción.
+
 ## Verificación
 
 Ejecutar primero las suites focalizadas del cambio. Antes de entregar una

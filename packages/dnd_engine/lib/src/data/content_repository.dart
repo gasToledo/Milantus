@@ -301,6 +301,16 @@ class ContentRepository {
   /// Requiere `dart:io` y por eso se resuelve mediante importación
   /// condicional: en web queda inalcanzable en tiempo de compilación en vez
   /// de solo fallar en tiempo de ejecución.
-  static Future<ContentRepository> loadFromDirectory(String dirPath) =>
-      _loader.loadContentRepositoryFromDirectory(dirPath);
+  ///
+  /// Con [translation] (un código de idioma, p.ej. `en`) aplica encima la
+  /// superposición `X.<translation>.json` de cada catálogo que la tenga; ver
+  /// `content_translation.dart`.
+  static Future<ContentRepository> loadFromDirectory(
+    String dirPath, {
+    String? translation,
+  }) =>
+      _loader.loadContentRepositoryFromDirectory(
+        dirPath,
+        translation: translation,
+      );
 }
