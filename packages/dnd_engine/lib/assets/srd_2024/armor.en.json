@@ -1,0 +1,54 @@
+{
+  "padded": {
+    "_es": "fc7c01fb",
+    "name": "Padded Armor"
+  },
+  "leather": {
+    "_es": "6b133adc",
+    "name": "Leather Armor"
+  },
+  "studded-leather": {
+    "_es": "638d56b3",
+    "name": "Studded Leather Armor"
+  },
+  "hide": {
+    "_es": "87baf6a6",
+    "name": "Hide Armor"
+  },
+  "chain-shirt": {
+    "_es": "5cdbc39e",
+    "name": "Chain Shirt"
+  },
+  "scale-mail": {
+    "_es": "cec761bb",
+    "name": "Scale Mail"
+  },
+  "breastplate": {
+    "_es": "97597918",
+    "name": "Breastplate"
+  },
+  "half-plate": {
+    "_es": "52e35c81",
+    "name": "Half Plate Armor"
+  },
+  "ring-mail": {
+    "_es": "c3eaa734",
+    "name": "Ring Mail"
+  },
+  "chain-mail": {
+    "_es": "6896fae5",
+    "name": "Chain Mail"
+  },
+  "splint": {
+    "_es": "25fd7643",
+    "name": "Splint Armor"
+  },
+  "plate": {
+    "_es": "f2402dec",
+    "name": "Plate Armor"
+  },
+  "shield": {
+    "_es": "73512dc5",
+    "name": "Shield"
+  }
+}

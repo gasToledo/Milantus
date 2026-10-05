@@ -148,6 +148,12 @@ cd packages/dnd_engine && dart run tool/translate_content.dart --refresh
 Imprime qué entradas tocó. Se revisa ese diff antes de commitear: si el
 sentido cambió, se corrige la traducción.
 
+El mismo comando va después de **agregar o corregir a mano** una ruta de la
+superposición: la huella cubre las rutas traducidas, así que sumar una la
+cambia aunque el español sea el mismo. Un catálogo con superposición se
+registra además en los assets de `packages/dnd_app/pubspec.yaml`; lo verifica
+`asset_content_loader_test`.
+
 ## Verificación
 
 Ejecutar primero las suites focalizadas del cambio. Antes de entregar una

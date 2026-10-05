@@ -1734,15 +1734,38 @@ void main() {
   });
 
   group('traducción al inglés', () {
-    // Las superposiciones `X.en.json` (ver `content_translation.dart`). Un
-    // catálogo sin superposición todavía no se exige: el inglés se completa de
-    // a poco y el español es el respaldo. Uno que la tiene, sí: cada entrada
-    // con su nombre y ninguna traducción desfasada respecto del español.
+    // Las superposiciones `X.en.json` (ver `content_translation.dart`). Cada
+    // catálogo tiene la suya, con el nombre de cada entrada y ninguna
+    // traducción desfasada respecto del español. El resto de los textos se
+    // completa de a poco: lo que falta se muestra en español, el respaldo.
     final superposiciones = Directory('lib/assets/srd_2024')
         .listSync()
         .whereType<File>()
         .where((f) => f.path.endsWith('.en.json'));
     File espanolDe(File f) => File(f.path.replaceFirst('.en.json', '.json'));
+
+    test('todo catálogo tiene su superposición en inglés', () {
+      // Desde que el catálogo entero tiene nombre en inglés, uno nuevo nace
+      // con el suyo: sin superposición, sus nombres quedarían en español en
+      // la interfaz en inglés sin que nada lo señale.
+      final catalogos = Directory('lib/assets/srd_2024')
+          .listSync()
+          .whereType<File>()
+          .map((f) => f.uri.pathSegments.last)
+          .where((n) =>
+              n.endsWith('.json') &&
+              !n.endsWith('.en.json') &&
+              n != 'manifest.json' &&
+              !n.startsWith('expected_'));
+      for (final c in catalogos) {
+        expect(
+          File('lib/assets/srd_2024/${c.replaceFirst('.json', '.en.json')}')
+              .existsSync(),
+          isTrue,
+          reason: c,
+        );
+      }
+    });
 
     test('toda superposición tiene su catálogo en español', () {
       for (final f in superposiciones) {

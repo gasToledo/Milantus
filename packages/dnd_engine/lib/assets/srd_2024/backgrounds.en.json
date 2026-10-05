@@ -1,0 +1,233 @@
+{
+  "soldier": {
+    "_es": "80a71045",
+    "name": "Soldier",
+    "tagline": "Discipline forged on the battlefield",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "guard": {
+    "_es": "e80a16ad",
+    "name": "Guard",
+    "tagline": "An eye trained to keep watch",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "wayfarer": {
+    "_es": "13ad27ad",
+    "name": "Wayfarer",
+    "tagline": "The street was your school",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "artisan": {
+    "_es": "c97b33ca",
+    "name": "Artisan",
+    "tagline": "A trade in your hands",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "charlatan": {
+    "_es": "d5ac2116",
+    "name": "Charlatan",
+    "tagline": "You live by your wits and your tongue",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "criminal": {
+    "_es": "80a96807",
+    "name": "Criminal",
+    "tagline": "Contacts in the shadows",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "entertainer": {
+    "_es": "24a581bf",
+    "name": "Entertainer",
+    "tagline": "The audience is your field",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "farmer": {
+    "_es": "1f8065dd",
+    "name": "Farmer",
+    "tagline": "The quiet strength of the land",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "hermit": {
+    "_es": "ab99f55e",
+    "name": "Hermit",
+    "tagline": "Years of seclusion and study",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "merchant": {
+    "_es": "7b543186",
+    "name": "Merchant",
+    "tagline": "Caravans, deals, and routes",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "noble": {
+    "_es": "c8b3bd48",
+    "name": "Noble",
+    "tagline": "Title, privilege, and duty",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "scribe": {
+    "_es": "73c24c1f",
+    "name": "Scribe",
+    "tagline": "Ink, records, and precision",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "acolyte": {
+    "_es": "661ee40b",
+    "name": "Acolyte",
+    "tagline": "Devotion and study in a temple",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "sage": {
+    "_es": "28fce203",
+    "name": "Sage",
+    "tagline": "Years of arcane and historical study",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "guide": {
+    "_es": "88bfdd5f",
+    "name": "Guide",
+    "tagline": "You know every trail and shortcut",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "sailor": {
+    "_es": "74a9e1ca",
+    "name": "Sailor",
+    "tagline": "Fair winds and salt on your skin",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "aberrant-heir": {
+    "_es": "f1a83aad",
+    "name": "Aberrant Heir",
+    "tagline": "A mark the houses would rather not see",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "archaeologist": {
+    "_es": "9a117c4e",
+    "name": "Archaeologist",
+    "tagline": "The ruins of the past are your library",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "house-agent": {
+    "_es": "c4d611d2",
+    "name": "House Agent",
+    "tagline": "You serve a house without bearing its mark",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "house-cannith-heir": {
+    "_es": "33a8c16e",
+    "name": "House Cannith Heir",
+    "tagline": "The forge that made the modern world",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "house-deneith-heir": {
+    "_es": "fd9570f7",
+    "name": "House Deneith Heir",
+    "tagline": "Duty, honor, and a sword for hire",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "house-ghallanda-heir": {
+    "_es": "7ae9ce32",
+    "name": "House Ghallanda Heir",
+    "tagline": "Good food, good talk, good contacts",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "house-jorasco-heir": {
+    "_es": "fd4b7481",
+    "name": "House Jorasco Heir",
+    "tagline": "Healing is a trade, and it pays",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "house-kundarak-heir": {
+    "_es": "d3d7c70f",
+    "name": "House Kundarak Heir",
+    "tagline": "What you guard, no one opens",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "house-lyrandar-heir": {
+    "_es": "98e57d11",
+    "name": "House Lyrandar Heir",
+    "tagline": "The wind is your ally; the sky, your domain",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "house-medani-heir": {
+    "_es": "6cbdb987",
+    "name": "House Medani Heir",
+    "tagline": "The threat is stopped before it exists",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "house-orien-heir": {
+    "_es": "56e71a96",
+    "name": "House Orien Heir",
+    "tagline": "The roads of Khorvaire are yours",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "house-phiarlan-heir": {
+    "_es": "4eaa2c5e",
+    "name": "House Phiarlan Heir",
+    "tagline": "Art is the cover; the secret, the treasure",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "house-sivis-heir": {
+    "_es": "cd4f5e2d",
+    "name": "House Sivis Heir",
+    "tagline": "The written word holds up civilization",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "house-tharashk-heir": {
+    "_es": "01d92bb7",
+    "name": "House Tharashk Heir",
+    "tagline": "Young house, you learned to fend for yourself",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "house-thuranni-heir": {
+    "_es": "469cd7b0",
+    "name": "House Thuranni Heir",
+    "tagline": "Espionage dressed as a show",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "house-vadalis-heir": {
+    "_es": "d9beb9eb",
+    "name": "House Vadalis Heir",
+    "tagline": "Respect for family and for all living things",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  },
+  "inquisitive": {
+    "_es": "03cb33ad",
+    "name": "Inquisitive",
+    "tagline": "Bottomless curiosity and an eye for detail",
+    "startingEquipment.0.label": "Option A",
+    "startingEquipment.1.label": "Option B"
+  }
+}

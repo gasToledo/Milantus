@@ -1,0 +1,1021 @@
+{
+  "armor-of-shadows": {
+    "_es": "c318813a",
+    "name": "Armor of Shadows",
+    "effects.1.name": "Armor of Shadows"
+  },
+  "eldritch-smite": {
+    "_es": "196d71ef",
+    "name": "Eldritch Smite",
+    "effects.0.name": "Eldritch Smite"
+  },
+  "agonizing-blast": {
+    "_es": "724c31ea",
+    "name": "Agonizing Blast",
+    "effects.0.name": "Agonizing Blast: cantrip",
+    "effects.1.name": "Agonizing Blast"
+  },
+  "repelling-blast": {
+    "_es": "0a63d0a7",
+    "name": "Repelling Blast",
+    "effects.0.name": "Repelling Blast"
+  },
+  "lifedrinker": {
+    "_es": "93067ce7",
+    "name": "Lifedrinker",
+    "effects.0.name": "Lifedrinker"
+  },
+  "gift-of-the-depths": {
+    "_es": "a4d53892",
+    "name": "Gift of the Depths",
+    "effects.1.name": "Gift of the Depths"
+  },
+  "gift-of-the-protectors": {
+    "_es": "8f404b0b",
+    "name": "Gift of the Protectors",
+    "effects.0.name": "Gift of the Protectors"
+  },
+  "thirsting-blade": {
+    "_es": "eca005a2",
+    "name": "Thirsting Blade",
+    "effects.1.name": "Thirsting Blade"
+  },
+  "devouring-blade": {
+    "_es": "3045632a",
+    "name": "Devouring Blade",
+    "effects.1.name": "Devouring Blade"
+  },
+  "investment-of-the-chain-master": {
+    "_es": "68131ae7",
+    "name": "Investment of the Chain Master",
+    "effects.0.name": "Investment of the Chain Master"
+  },
+  "eldritch-spear": {
+    "_es": "7577d813",
+    "name": "Eldritch Spear",
+    "effects.0.name": "Eldritch Spear"
+  },
+  "lessons-of-the-first-ones": {
+    "_es": "6147c92f",
+    "name": "Lessons of the First Ones",
+    "effects.0.name": "Lessons of the First Ones"
+  },
+  "master-of-myriad-forms": {
+    "_es": "bd904622",
+    "name": "Master of Myriad Forms",
+    "effects.1.name": "Master of Myriad Forms"
+  },
+  "mask-of-many-faces": {
+    "_es": "a2841f3a",
+    "name": "Mask of Many Faces",
+    "effects.1.name": "Mask of Many Faces"
+  },
+  "eldritch-mind": {
+    "_es": "39450933",
+    "name": "Eldritch Mind",
+    "effects.0.name": "Eldritch Mind"
+  },
+  "gaze-of-two-minds": {
+    "_es": "62047bf7",
+    "name": "Gaze of Two Minds",
+    "effects.0.name": "Gaze of Two Minds"
+  },
+  "ascendant-step": {
+    "_es": "67f4060e",
+    "name": "Ascendant Step",
+    "effects.1.name": "Ascendant Step"
+  },
+  "otherworldly-leap": {
+    "_es": "ee3abc8a",
+    "name": "Otherworldly Leap",
+    "effects.1.name": "Otherworldly Leap"
+  },
+  "whispers-of-the-grave": {
+    "_es": "37a0dbb0",
+    "name": "Whispers of the Grave",
+    "effects.1.name": "Whispers of the Grave"
+  },
+  "one-with-shadows": {
+    "_es": "f9de9a32",
+    "name": "One with Shadows",
+    "effects.1.name": "One with Shadows"
+  },
+  "fiendish-vigor": {
+    "_es": "76889bea",
+    "name": "Fiendish Vigor",
+    "effects.1.name": "Fiendish Vigor"
+  },
+  "witch-sight": {
+    "_es": "a321712b",
+    "name": "Witch Sight",
+    "effects.0.name": "Witch Sight"
+  },
+  "misty-visions": {
+    "_es": "ab4509a0",
+    "name": "Misty Visions",
+    "effects.1.name": "Misty Visions"
+  },
+  "visions-of-distant-realms": {
+    "_es": "a8215e66",
+    "name": "Visions of Distant Realms",
+    "effects.1.name": "Visions of Distant Realms"
+  },
+  "devils-sight": {
+    "_es": "2596aa7a",
+    "name": "Devil's Sight",
+    "effects.1.name": "Devil's Sight"
+  },
+  "pact-of-the-chain": {
+    "_es": "88b3b348",
+    "name": "Pact of the Chain",
+    "effects.1.name": "Pact of the Chain",
+    "effects.2.name": "Pact Familiar"
+  },
+  "pact-of-the-blade": {
+    "_es": "017d55cf",
+    "name": "Pact of the Blade",
+    "effects.0.name": "Pact Weapon",
+    "effects.2.name": "Pact of the Blade"
+  },
+  "pact-of-the-tome": {
+    "_es": "5b9b3689",
+    "name": "Pact of the Tome",
+    "effects.0.name": "Book of Shadows: cantrips",
+    "effects.1.name": "Book of Shadows: rituals",
+    "effects.2.name": "Pact of the Tome"
+  },
+  "savage-attacker": {
+    "_es": "7cb6ffa7",
+    "name": "Savage Attacker",
+    "effects.0.name": "Savage Attacker"
+  },
+  "tough": {
+    "_es": "3a2ee6ba",
+    "name": "Tough"
+  },
+  "skilled": {
+    "_es": "6f1084ee",
+    "name": "Skilled",
+    "effects.1.name": "Skillful"
+  },
+  "alert": {
+    "_es": "61f68452",
+    "name": "Alert",
+    "effects.1.name": "Alert"
+  },
+  "lucky": {
+    "_es": "ea80f00f",
+    "name": "Lucky",
+    "effects.0.name": "Lucky"
+  },
+  "crafter": {
+    "_es": "e9dbbc05",
+    "name": "Crafter",
+    "effects.0.name": "Crafter: tools",
+    "effects.1.name": "Crafter"
+  },
+  "healer": {
+    "_es": "0d1afc19",
+    "name": "Healer",
+    "effects.0.name": "Healer"
+  },
+  "musician": {
+    "_es": "a62ecf07",
+    "name": "Musician",
+    "effects.0.name": "Musician"
+  },
+  "fs-defense": {
+    "_es": "6c6e825b",
+    "name": "Defense",
+    "effects.1.name": "Defense",
+    "prerequisite.requiredClassFeature": "Fighting Style"
+  },
+  "fs-dueling": {
+    "_es": "9c652449",
+    "name": "Dueling",
+    "effects.1.name": "Dueling",
+    "prerequisite.requiredClassFeature": "Fighting Style"
+  },
+  "fs-archery": {
+    "_es": "285e45b6",
+    "name": "Archery",
+    "effects.1.name": "Archery",
+    "prerequisite.requiredClassFeature": "Fighting Style"
+  },
+  "fs-great-weapon": {
+    "_es": "a7cc9496",
+    "name": "Great Weapon Fighting",
+    "effects.0.name": "Great Weapon",
+    "prerequisite.requiredClassFeature": "Fighting Style"
+  },
+  "great-weapon-master": {
+    "_es": "80a3bae2",
+    "name": "Great Weapon Master",
+    "effects.1.name": "Great Weapon Master"
+  },
+  "sharpshooter": {
+    "_es": "a513ca7a",
+    "name": "Sharpshooter",
+    "effects.1.name": "Sharpshooter"
+  },
+  "resilient-wisdom": {
+    "_es": "3fcf4ead",
+    "name": "Resilient (Wisdom)",
+    "effects.2.name": "Resilient (Wisdom)"
+  },
+  "actor": {
+    "_es": "576db4da",
+    "name": "Actor",
+    "effects.1.name": "Actor"
+  },
+  "athlete-strength": {
+    "_es": "88f7c3f8",
+    "name": "Athlete (Strength)",
+    "effects.1.name": "Athlete"
+  },
+  "athlete-dexterity": {
+    "_es": "1866d9ff",
+    "name": "Athlete (Dexterity)",
+    "effects.1.name": "Athlete"
+  },
+  "charger-strength": {
+    "_es": "956c1988",
+    "name": "Charger (Strength)",
+    "effects.1.name": "Charger"
+  },
+  "charger-dexterity": {
+    "_es": "dabc366f",
+    "name": "Charger (Dexterity)",
+    "effects.1.name": "Charger"
+  },
+  "chef-constitution": {
+    "_es": "ba38735e",
+    "name": "Chef (Constitution)",
+    "effects.2.name": "Chef"
+  },
+  "chef-wisdom": {
+    "_es": "f887fc4a",
+    "name": "Chef (Wisdom)",
+    "effects.2.name": "Chef"
+  },
+  "crusher-strength": {
+    "_es": "22a34404",
+    "name": "Crusher (Strength)",
+    "effects.1.name": "Crusher"
+  },
+  "crusher-constitution": {
+    "_es": "07c0a923",
+    "name": "Crusher (Constitution)",
+    "effects.1.name": "Crusher"
+  },
+  "crossbow-expert": {
+    "_es": "c5128d4a",
+    "name": "Crossbow Expert",
+    "effects.1.name": "Crossbow Expert"
+  },
+  "defensive-duelist": {
+    "_es": "4bf4a1de",
+    "name": "Defensive Duelist",
+    "effects.1.name": "Defensive Duelist"
+  },
+  "dual-wielder-strength": {
+    "_es": "04368be8",
+    "name": "Dual Wielder (Strength)",
+    "effects.1.name": "Dual Wielder"
+  },
+  "dual-wielder-dexterity": {
+    "_es": "828c69cf",
+    "name": "Dual Wielder (Dexterity)",
+    "effects.1.name": "Dual Wielder"
+  },
+  "durable": {
+    "_es": "70ea9322",
+    "name": "Durable",
+    "effects.1.name": "Tough"
+  },
+  "elemental-adept-intelligence": {
+    "_es": "10562479",
+    "name": "Elemental Adept (Intelligence)",
+    "effects.1.name": "Elemental Attunement"
+  },
+  "elemental-adept-wisdom": {
+    "_es": "d8fc4699",
+    "name": "Elemental Adept (Wisdom)",
+    "effects.1.name": "Elemental Attunement"
+  },
+  "elemental-adept-charisma": {
+    "_es": "fbe3440b",
+    "name": "Elemental Adept (Charisma)",
+    "effects.1.name": "Elemental Attunement"
+  },
+  "fey-touched-intelligence": {
+    "_es": "3ad78fb1",
+    "name": "Fey-Touched (Intelligence)",
+    "effects.1.name": "Fey-Touched"
+  },
+  "fey-touched-wisdom": {
+    "_es": "19be1e21",
+    "name": "Fey-Touched (Wisdom)",
+    "effects.1.name": "Fey-Touched"
+  },
+  "fey-touched-charisma": {
+    "_es": "a3eda453",
+    "name": "Fey-Touched (Charisma)",
+    "effects.1.name": "Fey-Touched"
+  },
+  "grappler-strength": {
+    "_es": "a87701cc",
+    "name": "Grappler (Strength)",
+    "effects.1.name": "Grappler"
+  },
+  "grappler-dexterity": {
+    "_es": "a5b22fcb",
+    "name": "Grappler (Dexterity)",
+    "effects.1.name": "Grappler"
+  },
+  "heavily-armored-constitution": {
+    "_es": "4fb3f466",
+    "name": "Heavily Armored (Constitution)",
+    "effects.2.name": "Heavily Armored"
+  },
+  "heavily-armored-strength": {
+    "_es": "86a8c655",
+    "name": "Heavily Armored (Strength)",
+    "effects.2.name": "Heavily Armored"
+  },
+  "heavy-armor-master-constitution": {
+    "_es": "d9858757",
+    "name": "Heavy Armor Master (Constitution)",
+    "effects.1.name": "Heavy Armor Master"
+  },
+  "heavy-armor-master-strength": {
+    "_es": "d3ec3650",
+    "name": "Heavy Armor Master (Strength)",
+    "effects.1.name": "Heavy Armor Master"
+  },
+  "inspiring-leader-wisdom": {
+    "_es": "c7089369",
+    "name": "Inspiring Leader (Wisdom)",
+    "effects.1.name": "Inspiring Leader"
+  },
+  "inspiring-leader-charisma": {
+    "_es": "c1d0593b",
+    "name": "Inspiring Leader (Charisma)",
+    "effects.1.name": "Inspiring Leader"
+  },
+  "keen-mind": {
+    "_es": "d0bcf761",
+    "name": "Keen Mind",
+    "effects.2.name": "Keen Mind"
+  },
+  "lightly-armored-strength": {
+    "_es": "7381603a",
+    "name": "Lightly Armored (Strength)",
+    "effects.3.name": "Lightly Armored"
+  },
+  "lightly-armored-dexterity": {
+    "_es": "242fe991",
+    "name": "Lightly Armored (Dexterity)",
+    "effects.3.name": "Lightly Armored"
+  },
+  "mage-slayer-strength": {
+    "_es": "b327600c",
+    "name": "Mage Slayer (Strength)",
+    "effects.1.name": "Mage Slayer"
+  },
+  "mage-slayer-dexterity": {
+    "_es": "4c19740b",
+    "name": "Mage Slayer (Dexterity)",
+    "effects.1.name": "Mage Slayer"
+  },
+  "magic-initiate-wizard": {
+    "_es": "4be846e8",
+    "name": "Magic Initiate (Wizard)",
+    "effects.0.name": "Magic Initiate: cantrips",
+    "effects.1.name": "Magic Initiate: level 1 spell",
+    "effects.2.name": "Magic Initiate (Wizard)"
+  },
+  "magic-initiate-druid": {
+    "_es": "8b67d2ba",
+    "name": "Magic Initiate (Druid)",
+    "effects.0.name": "Magic Initiate: cantrips",
+    "effects.1.name": "Magic Initiate: level 1 spell",
+    "effects.2.name": "Magic Initiate (Druid)"
+  },
+  "tavern-brawler": {
+    "_es": "3b5b1443",
+    "name": "Tavern Brawler",
+    "effects.0.name": "Tavern Brawler"
+  },
+  "magic-initiate-cleric": {
+    "_es": "4de22b26",
+    "name": "Magic Initiate (Cleric)",
+    "effects.0.name": "Magic Initiate: cantrips",
+    "effects.1.name": "Magic Initiate: level 1 spell",
+    "effects.2.name": "Magic Initiate (Cleric)"
+  },
+  "medium-armor-master-strength": {
+    "_es": "61573f4c",
+    "name": "Medium Armor Master (Strength)",
+    "effects.1.name": "Medium Armor Master"
+  },
+  "medium-armor-master-dexterity": {
+    "_es": "d1fa694b",
+    "name": "Medium Armor Master (Dexterity)",
+    "effects.1.name": "Medium Armor Master"
+  },
+  "moderately-armored-strength": {
+    "_es": "06c813eb",
+    "name": "Moderately Armored (Strength)",
+    "effects.2.name": "Moderately Armored"
+  },
+  "moderately-armored-dexterity": {
+    "_es": "a929ff08",
+    "name": "Moderately Armored (Dexterity)",
+    "effects.2.name": "Moderately Armored"
+  },
+  "mounted-combatant-strength": {
+    "_es": "17c077a8",
+    "name": "Mounted Combatant (Strength)",
+    "effects.1.name": "Mounted Combatant"
+  },
+  "mounted-combatant-dexterity": {
+    "_es": "8773958f",
+    "name": "Mounted Combatant (Dexterity)",
+    "effects.1.name": "Mounted Combatant"
+  },
+  "mounted-combatant-wisdom": {
+    "_es": "c273e181",
+    "name": "Mounted Combatant (Wisdom)",
+    "effects.1.name": "Mounted Combatant"
+  },
+  "observant-intelligence": {
+    "_es": "eeefa61c",
+    "name": "Observant (Intelligence)",
+    "effects.0.name": "Observant: skill",
+    "effects.2.name": "Observant"
+  },
+  "observant-wisdom": {
+    "_es": "14c57d4a",
+    "name": "Observant (Wisdom)",
+    "effects.0.name": "Observant: skill",
+    "effects.2.name": "Observant"
+  },
+  "piercer-strength": {
+    "_es": "600d0e80",
+    "name": "Piercer (Strength)",
+    "effects.1.name": "Piercer"
+  },
+  "piercer-dexterity": {
+    "_es": "d646ec47",
+    "name": "Piercer (Dexterity)",
+    "effects.1.name": "Piercer"
+  },
+  "poisoner-dexterity": {
+    "_es": "6d142d36",
+    "name": "Poisoner (Dexterity)",
+    "effects.2.name": "Poisoner"
+  },
+  "poisoner-intelligence": {
+    "_es": "bbb0c520",
+    "name": "Poisoner (Intelligence)",
+    "effects.2.name": "Poisoner"
+  },
+  "polearm-master-dexterity": {
+    "_es": "86b8e157",
+    "name": "Polearm Master (Dexterity)",
+    "effects.1.name": "Polearm Master"
+  },
+  "polearm-master-strength": {
+    "_es": "d9845bb0",
+    "name": "Polearm Master (Strength)",
+    "effects.1.name": "Polearm Master"
+  },
+  "resilient-constitution": {
+    "_es": "216fe1e5",
+    "name": "Resilient (Constitution)",
+    "effects.2.name": "Resilient (Constitution)"
+  },
+  "resilient-dexterity": {
+    "_es": "9a6f6a55",
+    "name": "Resilient (Dexterity)",
+    "effects.2.name": "Resilient (Dexterity)"
+  },
+  "ritual-caster-intelligence": {
+    "_es": "2139fb23",
+    "name": "Ritual Caster (Intelligence)",
+    "effects.0.name": "Ritual Caster: ritual spells",
+    "effects.2.name": "Ritual Caster"
+  },
+  "ritual-caster-wisdom": {
+    "_es": "6e916d1b",
+    "name": "Ritual Caster (Wisdom)",
+    "effects.0.name": "Ritual Caster: ritual spells",
+    "effects.2.name": "Ritual Caster"
+  },
+  "ritual-caster-charisma": {
+    "_es": "42322abd",
+    "name": "Ritual Caster (Charisma)",
+    "effects.0.name": "Ritual Caster: ritual spells",
+    "effects.2.name": "Ritual Caster"
+  },
+  "sentinel-strength": {
+    "_es": "fa6e2a10",
+    "name": "Sentinel (Strength)",
+    "effects.1.name": "Sentinel"
+  },
+  "sentinel-dexterity": {
+    "_es": "b38ac7b7",
+    "name": "Sentinel (Dexterity)",
+    "effects.1.name": "Sentinel"
+  },
+  "shadow-touched-intelligence": {
+    "_es": "df44f398",
+    "name": "Shadow-Touched (Intelligence)",
+    "effects.1.name": "Shadow-Touched"
+  },
+  "shadow-touched-wisdom": {
+    "_es": "b859f50e",
+    "name": "Shadow-Touched (Wisdom)",
+    "effects.1.name": "Shadow-Touched"
+  },
+  "shadow-touched-charisma": {
+    "_es": "17684174",
+    "name": "Shadow-Touched (Charisma)",
+    "effects.1.name": "Shadow-Touched"
+  },
+  "shield-master": {
+    "_es": "ee3310b2",
+    "name": "Shield Master",
+    "effects.1.name": "Shield Master"
+  },
+  "skill-expert-strength": {
+    "_es": "e4c0d200",
+    "name": "Skill Expert (Strength)",
+    "effects.1.name": "Skill Expert"
+  },
+  "skill-expert-dexterity": {
+    "_es": "762d1bc7",
+    "name": "Skill Expert (Dexterity)",
+    "effects.1.name": "Skill Expert"
+  },
+  "skill-expert-constitution": {
+    "_es": "9776d147",
+    "name": "Skill Expert (Constitution)",
+    "effects.1.name": "Skill Expert"
+  },
+  "skill-expert-intelligence": {
+    "_es": "0075fbf9",
+    "name": "Skill Expert (Intelligence)",
+    "effects.1.name": "Skill Expert"
+  },
+  "skill-expert-wisdom": {
+    "_es": "807e8c19",
+    "name": "Skill Expert (Wisdom)",
+    "effects.1.name": "Skill Expert"
+  },
+  "skill-expert-charisma": {
+    "_es": "adee168b",
+    "name": "Skill Expert (Charisma)",
+    "effects.1.name": "Skill Expert"
+  },
+  "skulker": {
+    "_es": "67be1bdc",
+    "name": "Skulker",
+    "effects.1.name": "Skulker"
+  },
+  "slasher-strength": {
+    "_es": "7318052d",
+    "name": "Slasher (Strength)",
+    "effects.1.name": "Slasher"
+  },
+  "slasher-dexterity": {
+    "_es": "5bf4433a",
+    "name": "Slasher (Dexterity)",
+    "effects.1.name": "Slasher"
+  },
+  "speedy-dexterity": {
+    "_es": "77189a34",
+    "name": "Speedy (Dexterity)",
+    "effects.2.name": "Speedy"
+  },
+  "speedy-constitution": {
+    "_es": "ea41e2f8",
+    "name": "Speedy (Constitution)",
+    "effects.2.name": "Speedy"
+  },
+  "spell-sniper-intelligence": {
+    "_es": "99fec855",
+    "name": "Spell Sniper (Intelligence)",
+    "effects.1.name": "Spell Sniper"
+  },
+  "spell-sniper-wisdom": {
+    "_es": "85abcded",
+    "name": "Spell Sniper (Wisdom)",
+    "effects.1.name": "Spell Sniper"
+  },
+  "spell-sniper-charisma": {
+    "_es": "66a27faf",
+    "name": "Spell Sniper (Charisma)",
+    "effects.1.name": "Spell Sniper"
+  },
+  "telekinetic-intelligence": {
+    "_es": "1f6bb5b1",
+    "name": "Telekinetic (Intelligence)",
+    "effects.1.name": "Telekinetic"
+  },
+  "telekinetic-wisdom": {
+    "_es": "b13cd021",
+    "name": "Telekinetic (Wisdom)",
+    "effects.1.name": "Telekinetic"
+  },
+  "telekinetic-charisma": {
+    "_es": "162c8653",
+    "name": "Telekinetic (Charisma)",
+    "effects.1.name": "Telekinetic"
+  },
+  "telepathic-intelligence": {
+    "_es": "4cd3bc11",
+    "name": "Telepathic (Intelligence)",
+    "effects.1.name": "Telepathic"
+  },
+  "telepathic-wisdom": {
+    "_es": "c928ca81",
+    "name": "Telepathic (Wisdom)",
+    "effects.1.name": "Telepathic"
+  },
+  "telepathic-charisma": {
+    "_es": "53f74133",
+    "name": "Telepathic (Charisma)",
+    "effects.1.name": "Telepathic"
+  },
+  "war-caster-intelligence": {
+    "_es": "6e3f6a1d",
+    "name": "War Caster (Intelligence)",
+    "effects.1.name": "War Caster"
+  },
+  "war-caster-wisdom": {
+    "_es": "d18b9445",
+    "name": "War Caster (Wisdom)",
+    "effects.1.name": "War Caster"
+  },
+  "war-caster-charisma": {
+    "_es": "b139c8c7",
+    "name": "War Caster (Charisma)",
+    "effects.1.name": "War Caster"
+  },
+  "ability-score-improvement": {
+    "_es": "75db8beb",
+    "name": "Ability Score Improvement",
+    "effects.0.name": "Ability Score Improvement"
+  },
+  "martial-weapon-training-strength": {
+    "_es": "358476ab",
+    "name": "Martial Weapon Training (Strength)",
+    "effects.2.name": "Martial Weapon Training"
+  },
+  "martial-weapon-training-dexterity": {
+    "_es": "f7b47cc8",
+    "name": "Martial Weapon Training (Dexterity)",
+    "effects.2.name": "Martial Weapon Training"
+  },
+  "weapon-master-strength": {
+    "_es": "25edd8f3",
+    "name": "Weapon Master (Strength)",
+    "effects.1.name": "Mastery Property"
+  },
+  "weapon-master-dexterity": {
+    "_es": "2e3bd3d0",
+    "name": "Weapon Master (Dexterity)",
+    "effects.1.name": "Mastery Property"
+  },
+  "fs-blind-fighting": {
+    "_es": "2ac32280",
+    "name": "Blind Fighting",
+    "effects.0.name": "Blind Fighting",
+    "prerequisite.requiredClassFeature": "Fighting Style"
+  },
+  "fs-interception": {
+    "_es": "30221ec8",
+    "name": "Interception",
+    "effects.0.name": "Interception",
+    "prerequisite.requiredClassFeature": "Fighting Style"
+  },
+  "fs-protection": {
+    "_es": "5c111ae4",
+    "name": "Protection",
+    "effects.0.name": "Protection",
+    "prerequisite.requiredClassFeature": "Fighting Style"
+  },
+  "fs-thrown-weapon-fighting": {
+    "_es": "04473de8",
+    "name": "Thrown Weapon Fighting",
+    "effects.0.name": "Thrown Weapon Fighting",
+    "prerequisite.requiredClassFeature": "Fighting Style"
+  },
+  "fs-two-weapon-fighting": {
+    "_es": "f49cc789",
+    "name": "Two-Weapon Fighting",
+    "effects.1.name": "Two-Weapon Fighting",
+    "prerequisite.requiredClassFeature": "Fighting Style"
+  },
+  "fs-unarmed-fighting": {
+    "_es": "d17fcaa8",
+    "name": "Unarmed Fighting",
+    "effects.0.name": "Unarmed Fighting",
+    "prerequisite.requiredClassFeature": "Fighting Style"
+  },
+  "fs-blessed-warrior": {
+    "_es": "ca7093da",
+    "name": "Blessed Warrior",
+    "effects.0.name": "Blessed Warrior: Cleric cantrips",
+    "effects.1.name": "Blessed Warrior",
+    "prerequisite.requiredClassFeature": "Fighting Style"
+  },
+  "fs-druidic-warrior": {
+    "_es": "f652f1bc",
+    "name": "Druidic Warrior",
+    "effects.0.name": "Druidic Warrior: Druid cantrips",
+    "effects.1.name": "Druidic Warrior",
+    "prerequisite.requiredClassFeature": "Fighting Style"
+  },
+  "resilient-strength": {
+    "_es": "7ee321e6",
+    "name": "Resilient (Strength)"
+  },
+  "resilient-intelligence": {
+    "_es": "bcb154bb",
+    "name": "Resilient (Intelligence)"
+  },
+  "resilient-charisma": {
+    "_es": "3f7c3705",
+    "name": "Resilient (Charisma)"
+  },
+  "boon-of-fortitude": {
+    "_es": "8a4b3595",
+    "name": "Boon of Fortitude",
+    "effects.2.name": "Boon of Fortitude"
+  },
+  "boon-of-skill": {
+    "_es": "954e4007",
+    "name": "Boon of Skill",
+    "effects.18.name": "Boon of Skill: Expertise",
+    "effects.20.name": "Boon of Skill"
+  },
+  "boon-of-combat-prowess": {
+    "_es": "8763c116",
+    "name": "Boon of Combat Prowess",
+    "effects.1.name": "Unerring Accuracy"
+  },
+  "boon-of-recovery": {
+    "_es": "1ede10ba",
+    "name": "Boon of Recovery",
+    "effects.1.name": "Boon of Recovery"
+  },
+  "boon-of-energy-resistance": {
+    "_es": "c369db96",
+    "name": "Boon of Energy Resistance",
+    "effects.1.name": "Energy Resistances"
+  },
+  "boon-of-speed": {
+    "_es": "a8bc1bdb",
+    "name": "Boon of Speed",
+    "effects.2.name": "Boon of Speed"
+  },
+  "boon-of-truesight": {
+    "_es": "6f312ac5",
+    "name": "Boon of Truesight",
+    "effects.1.name": "True Sight"
+  },
+  "boon-of-irresistible-offense": {
+    "_es": "9ad7ce2a",
+    "name": "Boon of Irresistible Offense",
+    "effects.1.name": "Unstoppable Attack"
+  },
+  "boon-of-fate": {
+    "_es": "f05e5b79",
+    "name": "Boon of Fate",
+    "effects.1.name": "Improve Fate"
+  },
+  "boon-of-the-night-spirit": {
+    "_es": "8cff038a",
+    "name": "Boon of the Night Spirit",
+    "effects.1.name": "Night Spirit"
+  },
+  "boon-of-spell-recall": {
+    "_es": "1d3955ce",
+    "name": "Boon of Spell Recall",
+    "effects.1.name": "Free Casting"
+  },
+  "boon-of-dimensional-travel": {
+    "_es": "16e0dde5",
+    "name": "Boon of Dimensional Travel",
+    "effects.1.name": "Beguiling Steps"
+  },
+  "aberrant-dragonmark": {
+    "_es": "8eb830a1",
+    "name": "Aberrant Dragonmark",
+    "effects.0.name": "Aberrant Magic: cantrip",
+    "effects.1.name": "Aberrant Magic: level 1 spell",
+    "effects.2.name": "Aberrant Fortitude",
+    "effects.3.name": "Aberrant Magic",
+    "effects.4.name": "Aberrant Surge"
+  },
+  "mark-of-detection": {
+    "_es": "a5ec13b4",
+    "name": "Mark of Detection",
+    "effects.3.name": "Deductive Intuition",
+    "effects.4.name": "Magic Detection",
+    "effects.5.name": "Mark Spells"
+  },
+  "mark-of-finding": {
+    "_es": "16f6f824",
+    "name": "Mark of Finding",
+    "effects.2.name": "Hunter's Intuition",
+    "effects.3.name": "Finder's Magic",
+    "effects.4.name": "Mark Spells"
+  },
+  "mark-of-handling": {
+    "_es": "2d0f5a45",
+    "name": "Mark of Handling",
+    "effects.2.name": "Wild Intuition",
+    "effects.3.name": "Primal Connection",
+    "effects.4.name": "Monstrous Bonds",
+    "effects.5.name": "Mark Spells"
+  },
+  "mark-of-healing": {
+    "_es": "ef72539d",
+    "name": "Mark of Healing",
+    "effects.2.name": "Medical Intuition",
+    "effects.3.name": "Healing Touch",
+    "effects.4.name": "Mark Spells"
+  },
+  "mark-of-hospitality": {
+    "_es": "2cdf2832",
+    "name": "Mark of Hospitality",
+    "effects.3.name": "Ever Hospitable",
+    "effects.4.name": "Innkeeper's Magic",
+    "effects.5.name": "Mark Spells"
+  },
+  "mark-of-making": {
+    "_es": "e00ee6d3",
+    "name": "Mark of Making",
+    "effects.2.name": "Artisan's Intuition",
+    "effects.3.name": "Spellsmith",
+    "effects.4.name": "Mark Spells"
+  },
+  "mark-of-passage": {
+    "_es": "73f60117",
+    "name": "Mark of Passage",
+    "effects.1.name": "Intuitive Movement",
+    "effects.2.name": "Magical Passage",
+    "effects.3.name": "Courier's Speed",
+    "effects.5.name": "Mark Spells"
+  },
+  "mark-of-scribing": {
+    "_es": "659859cb",
+    "name": "Mark of Scribing",
+    "effects.3.name": "Gifted Scribe",
+    "effects.4.name": "Scribe's Insight",
+    "effects.5.name": "Mark Spells"
+  },
+  "mark-of-sentinel": {
+    "_es": "953a412e",
+    "name": "Mark of Sentinel",
+    "effects.1.name": "Sentinel's Intuition",
+    "effects.2.name": "Guardian Shield",
+    "effects.3.name": "Vigilant Guardian",
+    "effects.4.name": "Mark Spells"
+  },
+  "mark-of-shadow": {
+    "_es": "61f74b1f",
+    "name": "Mark of Shadow",
+    "effects.2.name": "Cunning Insight",
+    "effects.3.name": "Shadow Shaping",
+    "effects.4.name": "Mark Spells"
+  },
+  "mark-of-storm": {
+    "_es": "87fc01db",
+    "name": "Mark of Storm",
+    "effects.2.name": "Wayfinder's Intuition",
+    "effects.3.name": "Storm Magic",
+    "effects.4.name": "Gift of the Storm",
+    "effects.6.name": "Mark Spells"
+  },
+  "mark-of-warding": {
+    "_es": "e8056493",
+    "name": "Mark of Warding",
+    "effects.3.name": "Warder's Intuition",
+    "effects.4.name": "Wards and Seals",
+    "effects.5.name": "Mark Spells"
+  },
+  "greater-aberrant-mark": {
+    "_es": "7fea6e34",
+    "name": "Greater Aberrant Mark",
+    "effects.1.name": "Improved Fortitude",
+    "effects.2.name": "Mark of Inspiration"
+  },
+  "greater-mark-of-detection": {
+    "_es": "ebff50e7",
+    "name": "Greater Mark of Detection",
+    "effects.1.name": "Improved Intuition",
+    "effects.2.name": "Shared Detection"
+  },
+  "greater-mark-of-finding": {
+    "_es": "0c69d146",
+    "name": "Greater Mark of Finding",
+    "effects.1.name": "Improved Intuition",
+    "effects.2.name": "Improved Tracking"
+  },
+  "greater-mark-of-handling": {
+    "_es": "70e0e17a",
+    "name": "Greater Mark of Handling",
+    "effects.1.name": "Improved Intuition",
+    "effects.2.name": "Improved Handling"
+  },
+  "greater-mark-of-healing": {
+    "_es": "6c7a4a9c",
+    "name": "Greater Mark of Healing",
+    "effects.1.name": "Improved Intuition",
+    "effects.2.name": "Improved Healing"
+  },
+  "greater-mark-of-hospitality": {
+    "_es": "746ca734",
+    "name": "Greater Mark of Hospitality",
+    "effects.1.name": "Improved Intuition",
+    "effects.2.name": "Inspired Hospitality"
+  },
+  "greater-mark-of-making": {
+    "_es": "31dfafe4",
+    "name": "Greater Mark of Making",
+    "effects.1.name": "Improved Intuition",
+    "effects.2.name": "Improved Creation"
+  },
+  "greater-mark-of-passage": {
+    "_es": "cefe4a0a",
+    "name": "Greater Mark of Passage",
+    "effects.1.name": "Improved Intuition",
+    "effects.2.name": "Inspired Passage"
+  },
+  "greater-mark-of-scribing": {
+    "_es": "bd54f26a",
+    "name": "Greater Mark of Scribing",
+    "effects.1.name": "Improved Intuition",
+    "effects.2.name": "Inspired Writing"
+  },
+  "greater-mark-of-sentinel": {
+    "_es": "75ea1dce",
+    "name": "Greater Mark of Sentinel",
+    "effects.1.name": "Improved Intuition",
+    "effects.2.name": "Improved Sentinel"
+  },
+  "greater-mark-of-shadow": {
+    "_es": "a2bac000",
+    "name": "Greater Mark of Shadow",
+    "effects.1.name": "Improved Intuition",
+    "effects.2.name": "Improved Shadow"
+  },
+  "greater-mark-of-storm": {
+    "_es": "5a9280b8",
+    "name": "Greater Mark of Storm",
+    "effects.1.name": "Improved Intuition",
+    "effects.2.name": "Improved Storm"
+  },
+  "greater-mark-of-warding": {
+    "_es": "2669f774",
+    "name": "Greater Mark of Warding",
+    "effects.1.name": "Improved Intuition",
+    "effects.2.name": "Improved Ward"
+  },
+  "potent-dragonmark": {
+    "_es": "ac8f448e",
+    "name": "Potent Dragonmark",
+    "effects.2.name": "Mark Preparation",
+    "effects.3.name": "Mark Spellcasting"
+  },
+  "boon-of-siberys": {
+    "_es": "6de440f6",
+    "name": "Boon of Siberys",
+    "effects.1.name": "Blessing of Siberys"
+  },
+  "druid-land-arid": {
+    "_es": "73679929",
+    "name": "Arid Land",
+    "effects.0.name": "Arid Land"
+  },
+  "druid-land-polar": {
+    "_es": "59a25327",
+    "name": "Polar Land",
+    "effects.0.name": "Polar Land"
+  },
+  "druid-land-temperate": {
+    "_es": "8399798b",
+    "name": "Temperate Land",
+    "effects.0.name": "Temperate Land"
+  },
+  "druid-land-tropical": {
+    "_es": "2d6081e3",
+    "name": "Tropical Land",
+    "effects.0.name": "Tropical Land"
+  }
+}

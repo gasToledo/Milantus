@@ -1,0 +1,1570 @@
+{
+  "druidcraft": {
+    "_es": "a20322fc",
+    "name": "Druidcraft"
+  },
+  "vicious-mockery": {
+    "_es": "b15782fc",
+    "name": "Vicious Mockery"
+  },
+  "shocking-grasp": {
+    "_es": "d6cc70ec",
+    "name": "Shocking Grasp"
+  },
+  "eldritch-blast": {
+    "_es": "906c5016",
+    "name": "Eldritch Blast"
+  },
+  "starry-wisp": {
+    "_es": "92391989",
+    "name": "Starry Wisp"
+  },
+  "true-strike": {
+    "_es": "ba101ad1",
+    "name": "True Strike"
+  },
+  "guidance": {
+    "_es": "89b8e438",
+    "name": "Guidance"
+  },
+  "minor-illusion": {
+    "_es": "1a1a8f6e",
+    "name": "Minor Illusion"
+  },
+  "sacred-flame": {
+    "_es": "5caf288c",
+    "name": "Sacred Flame"
+  },
+  "dancing-lights": {
+    "_es": "46ef5e16",
+    "name": "Dancing Lights"
+  },
+  "light": {
+    "_es": "db1d9b3f",
+    "name": "Light"
+  },
+  "mage-hand": {
+    "_es": "1ed3fc06",
+    "name": "Mage Hand"
+  },
+  "message": {
+    "_es": "dbd08cc9",
+    "name": "Message"
+  },
+  "spare-the-dying": {
+    "_es": "92215e6b",
+    "name": "Spare the Dying"
+  },
+  "shillelagh": {
+    "_es": "1627eadd",
+    "name": "Shillelagh"
+  },
+  "prestidigitation": {
+    "_es": "e245a256",
+    "name": "Prestidigitation"
+  },
+  "produce-flame": {
+    "_es": "da888720",
+    "name": "Produce Flame"
+  },
+  "ray-of-frost": {
+    "_es": "bfef46ae",
+    "name": "Ray of Frost"
+  },
+  "fire-bolt": {
+    "_es": "ef3fef8f",
+    "name": "Fire Bolt"
+  },
+  "mending": {
+    "_es": "f7d85c13",
+    "name": "Mending"
+  },
+  "resistance": {
+    "_es": "f093ef02",
+    "name": "Resistance"
+  },
+  "poison-spray": {
+    "_es": "fd4d7d86",
+    "name": "Poison Spray"
+  },
+  "acid-splash": {
+    "_es": "5a7e12e5",
+    "name": "Acid Splash"
+  },
+  "thaumaturgy": {
+    "_es": "7044c418",
+    "name": "Thaumaturgy"
+  },
+  "chill-touch": {
+    "_es": "c2be289b",
+    "name": "Chill Touch"
+  },
+  "goodberry": {
+    "_es": "9dd8071c",
+    "name": "Goodberry"
+  },
+  "bless": {
+    "_es": "7290a4e3",
+    "name": "Bless"
+  },
+  "feather-fall": {
+    "_es": "115012c8",
+    "name": "Feather Fall"
+  },
+  "comprehend-languages": {
+    "_es": "84ab6271",
+    "name": "Comprehend Languages"
+  },
+  "cure-wounds": {
+    "_es": "373a31df",
+    "name": "Cure Wounds"
+  },
+  "detect-magic": {
+    "_es": "f576fdd5",
+    "name": "Detect Magic"
+  },
+  "disguise-self": {
+    "_es": "57129e46",
+    "name": "Disguise Self"
+  },
+  "charm-person": {
+    "_es": "c6d6e076",
+    "name": "Charm Person"
+  },
+  "entangle": {
+    "_es": "fcef963a",
+    "name": "Entangle"
+  },
+  "shield": {
+    "_es": "73512dc5",
+    "name": "Shield"
+  },
+  "shield-of-faith": {
+    "_es": "0230cd2d",
+    "name": "Shield of Faith"
+  },
+  "faerie-fire": {
+    "_es": "461c98f9",
+    "name": "Faerie Fire"
+  },
+  "grease": {
+    "_es": "d3e04122",
+    "name": "Grease"
+  },
+  "identify": {
+    "_es": "4ae88ca8",
+    "name": "Identify"
+  },
+  "inflict-wounds": {
+    "_es": "c5616832",
+    "name": "Inflict Wounds"
+  },
+  "burning-hands": {
+    "_es": "fd033fcf",
+    "name": "Burning Hands"
+  },
+  "hunters-mark": {
+    "_es": "78f2db27",
+    "name": "Hunter's Mark"
+  },
+  "fog-cloud": {
+    "_es": "6e0f2560",
+    "name": "Fog Cloud"
+  },
+  "thunderwave": {
+    "_es": "8015c84d",
+    "name": "Thunderwave"
+  },
+  "command": {
+    "_es": "1ef278e1",
+    "name": "Command"
+  },
+  "healing-word": {
+    "_es": "e67c23d4",
+    "name": "Healing Word"
+  },
+  "protection-from-evil-and-good": {
+    "_es": "716d6e84",
+    "name": "Protection from Evil and Good"
+  },
+  "magic-missile": {
+    "_es": "0d34df5d",
+    "name": "Magic Missile"
+  },
+  "guiding-bolt": {
+    "_es": "b38c8f7c",
+    "name": "Guiding Bolt"
+  },
+  "expeditious-retreat": {
+    "_es": "d9cb2c4b",
+    "name": "Expeditious Retreat"
+  },
+  "sanctuary": {
+    "_es": "71f94a90",
+    "name": "Sanctuary"
+  },
+  "sleep": {
+    "_es": "b3f96097",
+    "name": "Sleep"
+  },
+  "longstrider": {
+    "_es": "496173eb",
+    "name": "Longstrider"
+  },
+  "spiritual-weapon": {
+    "_es": "97224ffb",
+    "name": "Spiritual Weapon"
+  },
+  "aid": {
+    "_es": "3f106f4f",
+    "name": "Aid"
+  },
+  "heat-metal": {
+    "_es": "ffa9065d",
+    "name": "Heat Metal"
+  },
+  "calm-emotions": {
+    "_es": "773f3e50",
+    "name": "Calm Emotions"
+  },
+  "blur": {
+    "_es": "001ffd3a",
+    "name": "Blur"
+  },
+  "flaming-sphere": {
+    "_es": "09aeef9f",
+    "name": "Flaming Sphere"
+  },
+  "hold-person": {
+    "_es": "d59e763c",
+    "name": "Hold Person"
+  },
+  "invisibility": {
+    "_es": "2150a869",
+    "name": "Invisibility"
+  },
+  "levitate": {
+    "_es": "721cadd5",
+    "name": "Levitate"
+  },
+  "darkness": {
+    "_es": "8c69de82",
+    "name": "Darkness"
+  },
+  "pass-without-trace": {
+    "_es": "06fcc2ac",
+    "name": "Pass without Trace"
+  },
+  "misty-step": {
+    "_es": "0c52a3ee",
+    "name": "Misty Step"
+  },
+  "prayer-of-healing": {
+    "_es": "88c334de",
+    "name": "Prayer of Healing"
+  },
+  "gust-of-wind": {
+    "_es": "9c13aeb8",
+    "name": "Gust of Wind"
+  },
+  "scorching-ray": {
+    "_es": "c55006f8",
+    "name": "Scorching Ray"
+  },
+  "moonbeam": {
+    "_es": "36e7e7e8",
+    "name": "Moonbeam"
+  },
+  "enhance-ability": {
+    "_es": "f0c9139b",
+    "name": "Enhance Ability"
+  },
+  "lesser-restoration": {
+    "_es": "f91eae8f",
+    "name": "Lesser Restoration"
+  },
+  "silence": {
+    "_es": "53cb570e",
+    "name": "Silence"
+  },
+  "web": {
+    "_es": "0f6bb633",
+    "name": "Web"
+  },
+  "spider-climb": {
+    "_es": "a476316e",
+    "name": "Spider Climb"
+  },
+  "see-invisibility": {
+    "_es": "629a7ea6",
+    "name": "See Invisibility"
+  },
+  "darkvision": {
+    "_es": "ebd23144",
+    "name": "Darkvision"
+  },
+  "animate-dead": {
+    "_es": "b0a03ffc",
+    "name": "Animate Dead"
+  },
+  "fireball": {
+    "_es": "f0c1a479",
+    "name": "Fireball"
+  },
+  "counterspell": {
+    "_es": "b1aadeab",
+    "name": "Counterspell"
+  },
+  "conjure-animals": {
+    "_es": "d32dde30",
+    "name": "Conjure Animals"
+  },
+  "dispel-magic": {
+    "_es": "d7a9accb",
+    "name": "Dispel Magic"
+  },
+  "spirit-guardians": {
+    "_es": "4255cb61",
+    "name": "Spirit Guardians"
+  },
+  "major-image": {
+    "_es": "9f98be7d",
+    "name": "Major Image"
+  },
+  "bestow-curse": {
+    "_es": "1f2fca6a",
+    "name": "Bestow Curse"
+  },
+  "call-lightning": {
+    "_es": "cea4a1f0",
+    "name": "Call Lightning"
+  },
+  "tongues": {
+    "_es": "4c725577",
+    "name": "Tongues"
+  },
+  "daylight": {
+    "_es": "3a6799e2",
+    "name": "Daylight"
+  },
+  "fear": {
+    "_es": "47254a1c",
+    "name": "Fear"
+  },
+  "stinking-cloud": {
+    "_es": "6e11d802",
+    "name": "Stinking Cloud"
+  },
+  "mass-healing-word": {
+    "_es": "6b95d4f1",
+    "name": "Mass Healing Word"
+  },
+  "hypnotic-pattern": {
+    "_es": "8d887ed7",
+    "name": "Hypnotic Pattern"
+  },
+  "haste": {
+    "_es": "b6c00b2d",
+    "name": "Haste"
+  },
+  "protection-from-energy": {
+    "_es": "f325de50",
+    "name": "Protection from Energy"
+  },
+  "remove-curse": {
+    "_es": "63a7d7b7",
+    "name": "Remove Curse"
+  },
+  "slow": {
+    "_es": "9f906752",
+    "name": "Slow"
+  },
+  "lightning-bolt": {
+    "_es": "df3d5666",
+    "name": "Lightning Bolt"
+  },
+  "water-breathing": {
+    "_es": "951b4f69",
+    "name": "Water Breathing"
+  },
+  "revivify": {
+    "_es": "e888cd51",
+    "name": "Revivify"
+  },
+  "vampiric-touch": {
+    "_es": "0d1ae7b0",
+    "name": "Vampiric Touch"
+  },
+  "sleet-storm": {
+    "_es": "9e7bdec6",
+    "name": "Sleet Storm"
+  },
+  "fly": {
+    "_es": "824b75b8",
+    "name": "Fly"
+  },
+  "phantasmal-killer": {
+    "_es": "ea4b87cb",
+    "name": "Phantasmal Killer"
+  },
+  "confusion": {
+    "_es": "b78b5a6a",
+    "name": "Confusion"
+  },
+  "banishment": {
+    "_es": "584f38df",
+    "name": "Banishment"
+  },
+  "fire-shield": {
+    "_es": "a261a514",
+    "name": "Fire Shield"
+  },
+  "greater-invisibility": {
+    "_es": "27ec7126",
+    "name": "Greater Invisibility"
+  },
+  "freedom-of-movement": {
+    "_es": "f9f67d95",
+    "name": "Freedom of Movement"
+  },
+  "blight": {
+    "_es": "585aa035",
+    "name": "Blight"
+  },
+  "polymorph": {
+    "_es": "dd49dfe5",
+    "name": "Polymorph"
+  },
+  "wall-of-fire": {
+    "_es": "fe586ce8",
+    "name": "Wall of Fire"
+  },
+  "stoneskin": {
+    "_es": "4d56140d",
+    "name": "Stoneskin"
+  },
+  "death-ward": {
+    "_es": "4dc17b8c",
+    "name": "Death Ward"
+  },
+  "dimension-door": {
+    "_es": "6ce689f8",
+    "name": "Dimension Door"
+  },
+  "ice-storm": {
+    "_es": "b6558152",
+    "name": "Ice Storm"
+  },
+  "animate-objects": {
+    "_es": "1c642d76",
+    "name": "Animate Objects"
+  },
+  "flame-strike": {
+    "_es": "8f134ded",
+    "name": "Flame Strike"
+  },
+  "cone-of-cold": {
+    "_es": "6cd2f3fa",
+    "name": "Cone of Cold"
+  },
+  "mass-cure-wounds": {
+    "_es": "4854c612",
+    "name": "Mass Cure Wounds"
+  },
+  "dominate-person": {
+    "_es": "a6e4b86e",
+    "name": "Dominate Person"
+  },
+  "scrying": {
+    "_es": "58df2d07",
+    "name": "Scrying"
+  },
+  "hold-monster": {
+    "_es": "f18d496f",
+    "name": "Hold Monster"
+  },
+  "raise-dead": {
+    "_es": "2c114770",
+    "name": "Raise Dead"
+  },
+  "geas": {
+    "_es": "8ac9724e",
+    "name": "Geas"
+  },
+  "wall-of-force": {
+    "_es": "b1998edf",
+    "name": "Wall of Force"
+  },
+  "wall-of-stone": {
+    "_es": "5d0ee12b",
+    "name": "Wall of Stone"
+  },
+  "cloudkill": {
+    "_es": "61995756",
+    "name": "Cloudkill"
+  },
+  "insect-plague": {
+    "_es": "b6a6ecce",
+    "name": "Insect Plague"
+  },
+  "greater-restoration": {
+    "_es": "f10db3d8",
+    "name": "Greater Restoration"
+  },
+  "telekinesis": {
+    "_es": "5bc08425",
+    "name": "Telekinesis"
+  },
+  "blade-barrier": {
+    "_es": "3f805f40",
+    "name": "Blade Barrier"
+  },
+  "circle-of-death": {
+    "_es": "17f7c946",
+    "name": "Circle of Death"
+  },
+  "harm": {
+    "_es": "dea73a71",
+    "name": "Harm"
+  },
+  "disintegrate": {
+    "_es": "96250e98",
+    "name": "Disintegrate"
+  },
+  "globe-of-invulnerability": {
+    "_es": "49817117",
+    "name": "Globe of Invulnerability"
+  },
+  "eyebite": {
+    "_es": "fe47e35f",
+    "name": "Eyebite"
+  },
+  "sunbeam": {
+    "_es": "8f7b1fd6",
+    "name": "Sunbeam"
+  },
+  "chain-lightning": {
+    "_es": "95a8d99f",
+    "name": "Chain Lightning"
+  },
+  "heal": {
+    "_es": "d90965f9",
+    "name": "Heal"
+  },
+  "mass-suggestion": {
+    "_es": "08c8bc42",
+    "name": "Mass Suggestion"
+  },
+  "true-seeing": {
+    "_es": "91f8f4b4",
+    "name": "True Seeing"
+  },
+  "delayed-blast-fireball": {
+    "_es": "546d172b",
+    "name": "Delayed Blast Fireball"
+  },
+  "plane-shift": {
+    "_es": "f9c03c83",
+    "name": "Plane Shift"
+  },
+  "finger-of-death": {
+    "_es": "6194918c",
+    "name": "Finger of Death"
+  },
+  "etherealness": {
+    "_es": "ad2f8c5e",
+    "name": "Etherealness"
+  },
+  "reverse-gravity": {
+    "_es": "7994edea",
+    "name": "Reverse Gravity"
+  },
+  "forcecage": {
+    "_es": "7f60b915",
+    "name": "Forcecage"
+  },
+  "regenerate": {
+    "_es": "d42184f1",
+    "name": "Regenerate"
+  },
+  "resurrection": {
+    "_es": "a459b176",
+    "name": "Resurrection"
+  },
+  "prismatic-spray": {
+    "_es": "34b4d0c2",
+    "name": "Prismatic Spray"
+  },
+  "teleport": {
+    "_es": "e806039a",
+    "name": "Teleport"
+  },
+  "fire-storm": {
+    "_es": "d38a1479",
+    "name": "Fire Storm"
+  },
+  "antimagic-field": {
+    "_es": "c4790eb7",
+    "name": "Antimagic Field"
+  },
+  "dominate-monster": {
+    "_es": "5e6cd7d1",
+    "name": "Dominate Monster"
+  },
+  "sunburst": {
+    "_es": "c196539c",
+    "name": "Sunburst"
+  },
+  "animal-shapes": {
+    "_es": "c6b71290",
+    "name": "Animal Shapes"
+  },
+  "befuddlement": {
+    "_es": "9446db56",
+    "name": "Befuddlement"
+  },
+  "mind-blank": {
+    "_es": "ea896ae9",
+    "name": "Mind Blank"
+  },
+  "incendiary-cloud": {
+    "_es": "4b0fa9dd",
+    "name": "Incendiary Cloud"
+  },
+  "power-word-stun": {
+    "_es": "72e0abc1",
+    "name": "Power Word Stun"
+  },
+  "earthquake": {
+    "_es": "03fb5f03",
+    "name": "Earthquake"
+  },
+  "wish": {
+    "_es": "24ea9e9a",
+    "name": "Wish"
+  },
+  "time-stop": {
+    "_es": "2e96357b",
+    "name": "Time Stop"
+  },
+  "imprisonment": {
+    "_es": "34785b19",
+    "name": "Imprisonment"
+  },
+  "meteor-swarm": {
+    "_es": "132247e8",
+    "name": "Meteor Swarm"
+  },
+  "prismatic-wall": {
+    "_es": "33ece188",
+    "name": "Prismatic Wall"
+  },
+  "power-word-kill": {
+    "_es": "d4a16381",
+    "name": "Power Word Kill"
+  },
+  "weird": {
+    "_es": "605b2755",
+    "name": "Weird"
+  },
+  "gate": {
+    "_es": "bf141778",
+    "name": "Gate"
+  },
+  "foresight": {
+    "_es": "a3218412",
+    "name": "Foresight"
+  },
+  "astral-projection": {
+    "_es": "459d9c44",
+    "name": "Astral Projection"
+  },
+  "true-resurrection": {
+    "_es": "ae28a092",
+    "name": "True Resurrection"
+  },
+  "mass-heal": {
+    "_es": "a4a31e8c",
+    "name": "Mass Heal"
+  },
+  "speak-with-animals": {
+    "_es": "12fde8da",
+    "name": "Speak with Animals"
+  },
+  "ray-of-sickness": {
+    "_es": "e6264baa",
+    "name": "Ray of Sickness"
+  },
+  "false-life": {
+    "_es": "9496919f",
+    "name": "False Life"
+  },
+  "ray-of-enfeeblement": {
+    "_es": "35533230",
+    "name": "Ray of Enfeeblement"
+  },
+  "hellish-rebuke": {
+    "_es": "fb5aa2a6",
+    "name": "Hellish Rebuke"
+  },
+  "friends": {
+    "_es": "4893ec3f",
+    "name": "Friends"
+  },
+  "elementalism": {
+    "_es": "77dc6975",
+    "name": "Elementalism"
+  },
+  "sorcerous-burst": {
+    "_es": "bc741959",
+    "name": "Sorcerous Burst"
+  },
+  "mind-sliver": {
+    "_es": "21f79a88",
+    "name": "Mind Sliver"
+  },
+  "blade-ward": {
+    "_es": "706960de",
+    "name": "Blade Ward"
+  },
+  "thorn-whip": {
+    "_es": "9a796ad4",
+    "name": "Thorn Whip"
+  },
+  "word-of-radiance": {
+    "_es": "d31c01de",
+    "name": "Word of Radiance"
+  },
+  "thunderclap": {
+    "_es": "060dac7a",
+    "name": "Thunderclap"
+  },
+  "alarm": {
+    "_es": "5e46f69e",
+    "name": "Alarm"
+  },
+  "armor-of-agathys": {
+    "_es": "6b7e6dd5",
+    "name": "Armor of Agathys"
+  },
+  "mage-armor": {
+    "_es": "5e7a66b0",
+    "name": "Mage Armor"
+  },
+  "arms-of-hadar": {
+    "_es": "c4d51050",
+    "name": "Arms of Hadar"
+  },
+  "searing-smite": {
+    "_es": "ffd44963",
+    "name": "Searing Smite"
+  },
+  "thunderous-smite": {
+    "_es": "4d5fdbe2",
+    "name": "Thunderous Smite"
+  },
+  "divine-smite": {
+    "_es": "e2cae3b9",
+    "name": "Divine Smite"
+  },
+  "wrathful-smite": {
+    "_es": "471502af",
+    "name": "Wrathful Smite"
+  },
+  "create-or-destroy-water": {
+    "_es": "537a2c24",
+    "name": "Create or Destroy Water"
+  },
+  "ice-knife": {
+    "_es": "39228d91",
+    "name": "Ice Knife"
+  },
+  "detect-evil-and-good": {
+    "_es": "16107b21",
+    "name": "Detect Evil and Good"
+  },
+  "detect-poison-and-disease": {
+    "_es": "c703660c",
+    "name": "Detect Poison and Disease"
+  },
+  "tensers-floating-disk": {
+    "_es": "38d1dfcd",
+    "name": "Tenser's Floating Disk"
+  },
+  "compelled-duel": {
+    "_es": "256c33de",
+    "name": "Compelled Duel"
+  },
+  "animal-friendship": {
+    "_es": "bcd2f798",
+    "name": "Animal Friendship"
+  },
+  "find-familiar": {
+    "_es": "1d76dac7",
+    "name": "Find Familiar"
+  },
+  "divine-favor": {
+    "_es": "ed319d05",
+    "name": "Divine Favor"
+  },
+  "ensnaring-strike": {
+    "_es": "9537df0e",
+    "name": "Ensnaring Strike"
+  },
+  "heroism": {
+    "_es": "7697d99a",
+    "name": "Heroism"
+  },
+  "silent-image": {
+    "_es": "d0b7f87f",
+    "name": "Silent Image"
+  },
+  "hex": {
+    "_es": "5c99ccbd",
+    "name": "Hex"
+  },
+  "chromatic-orb": {
+    "_es": "bdbe1425",
+    "name": "Chromatic Orb"
+  },
+  "bane": {
+    "_es": "10a8d061",
+    "name": "Bane"
+  },
+  "purify-food-and-drink": {
+    "_es": "6bcdb77e",
+    "name": "Purify Food and Drink"
+  },
+  "witch-bolt": {
+    "_es": "ab747f95",
+    "name": "Witch Bolt"
+  },
+  "tashas-hideous-laughter": {
+    "_es": "e6b46cf0",
+    "name": "Tasha's Hideous Laughter"
+  },
+  "color-spray": {
+    "_es": "126fcc03",
+    "name": "Color Spray"
+  },
+  "jump": {
+    "_es": "1d80e429",
+    "name": "Jump"
+  },
+  "unseen-servant": {
+    "_es": "068306e2",
+    "name": "Unseen Servant"
+  },
+  "dissonant-whispers": {
+    "_es": "c834ba17",
+    "name": "Dissonant Whispers"
+  },
+  "illusory-script": {
+    "_es": "2369b7ae",
+    "name": "Illusory Script"
+  },
+  "hail-of-thorns": {
+    "_es": "63d44fee",
+    "name": "Hail of Thorns"
+  },
+  "rope-trick": {
+    "_es": "4a94b587",
+    "name": "Rope Trick"
+  },
+  "knock": {
+    "_es": "394a08b2",
+    "name": "Knock"
+  },
+  "enlarge-reduce": {
+    "_es": "44949f03",
+    "name": "Enlarge/Reduce"
+  },
+  "dragons-breath": {
+    "_es": "29dc307a",
+    "name": "Dragon's Breath"
+  },
+  "alter-self": {
+    "_es": "87527506",
+    "name": "Alter Self"
+  },
+  "magic-weapon": {
+    "_es": "8c59dead",
+    "name": "Magic Weapon"
+  },
+  "augury": {
+    "_es": "cbb6e99e",
+    "name": "Augury"
+  },
+  "nystuls-magic-aura": {
+    "_es": "7ca3f439",
+    "name": "Nystul's Magic Aura"
+  },
+  "magic-mouth": {
+    "_es": "a81e9f8f",
+    "name": "Magic Mouth"
+  },
+  "shining-smite": {
+    "_es": "528b5683",
+    "name": "Shining Smite"
+  },
+  "arcane-lock": {
+    "_es": "a521b32d",
+    "name": "Arcane Lock"
+  },
+  "mind-spike": {
+    "_es": "12972724",
+    "name": "Mind Spike"
+  },
+  "cordon-of-arrows": {
+    "_es": "51ef1058",
+    "name": "Cordon of Arrows"
+  },
+  "crown-of-madness": {
+    "_es": "b8d5f280",
+    "name": "Crown of Madness"
+  },
+  "spike-growth": {
+    "_es": "e784c8a4",
+    "name": "Spike Growth"
+  },
+  "detect-thoughts": {
+    "_es": "26e5cdb6",
+    "name": "Detect Thoughts"
+  },
+  "find-traps": {
+    "_es": "b679d28a",
+    "name": "Find Traps"
+  },
+  "gentle-repose": {
+    "_es": "8290985b",
+    "name": "Gentle Repose"
+  },
+  "enthrall": {
+    "_es": "8904ab88",
+    "name": "Enthrall"
+  },
+  "melfs-acid-arrow": {
+    "_es": "3900cd1a",
+    "name": "Melf's Acid Arrow"
+  },
+  "phantasmal-force": {
+    "_es": "fb02b04a",
+    "name": "Phantasmal Force"
+  },
+  "shatter": {
+    "_es": "653f8e59",
+    "name": "Shatter"
+  },
+  "find-steed": {
+    "_es": "183bf422",
+    "name": "Find Steed"
+  },
+  "flame-blade": {
+    "_es": "e560a401",
+    "name": "Flame Blade"
+  },
+  "mirror-image": {
+    "_es": "e6373a28",
+    "name": "Mirror Image"
+  },
+  "summon-beast": {
+    "_es": "b9810618",
+    "name": "Summon Beast"
+  },
+  "continual-flame": {
+    "_es": "a9e470c0",
+    "name": "Continual Flame"
+  },
+  "locate-animals-or-plants": {
+    "_es": "36740b05",
+    "name": "Locate Animals or Plants"
+  },
+  "locate-object": {
+    "_es": "491e62b2",
+    "name": "Locate Object"
+  },
+  "animal-messenger": {
+    "_es": "2ab368fc",
+    "name": "Animal Messenger"
+  },
+  "cloud-of-daggers": {
+    "_es": "693020a3",
+    "name": "Cloud of Daggers"
+  },
+  "barkskin": {
+    "_es": "2b5641d7",
+    "name": "Barkskin"
+  },
+  "protection-from-poison": {
+    "_es": "a61e18da",
+    "name": "Protection from Poison"
+  },
+  "beast-sense": {
+    "_es": "d00d02c1",
+    "name": "Beast Sense"
+  },
+  "blindness-deafness": {
+    "_es": "6255da6f",
+    "name": "Blindness/Deafness"
+  },
+  "suggestion": {
+    "_es": "d92517ef",
+    "name": "Suggestion"
+  },
+  "warding-bond": {
+    "_es": "c22647a0",
+    "name": "Warding Bond"
+  },
+  "zone-of-truth": {
+    "_es": "6656fc5c",
+    "name": "Zone of Truth"
+  },
+  "arcane-vigor": {
+    "_es": "426bc8fd",
+    "name": "Arcane Vigor"
+  },
+  "elemental-weapon": {
+    "_es": "20dfd626",
+    "name": "Elemental Weapon"
+  },
+  "aura-of-vitality": {
+    "_es": "f3706826",
+    "name": "Aura of Vitality"
+  },
+  "water-walk": {
+    "_es": "829431db",
+    "name": "Water Walk"
+  },
+  "blinding-smite": {
+    "_es": "8d5db8f5",
+    "name": "Blinding Smite"
+  },
+  "magic-circle": {
+    "_es": "93962fb5",
+    "name": "Magic Circle"
+  },
+  "clairvoyance": {
+    "_es": "4a46b2aa",
+    "name": "Clairvoyance"
+  },
+  "conjure-barrage": {
+    "_es": "4eb1a92a",
+    "name": "Conjure Barrage"
+  },
+  "phantom-steed": {
+    "_es": "36c1d605",
+    "name": "Phantom Steed"
+  },
+  "create-food-and-water": {
+    "_es": "491e05cd",
+    "name": "Create Food and Water"
+  },
+  "plant-growth": {
+    "_es": "2ad51088",
+    "name": "Plant Growth"
+  },
+  "blink": {
+    "_es": "8e86ef14",
+    "name": "Blink"
+  },
+  "feign-death": {
+    "_es": "ea4ac5f5",
+    "name": "Feign Death"
+  },
+  "lightning-arrow": {
+    "_es": "b290c69a",
+    "name": "Lightning Arrow"
+  },
+  "gaseous-form": {
+    "_es": "a76a459e",
+    "name": "Gaseous Form"
+  },
+  "meld-into-stone": {
+    "_es": "788abdf0",
+    "name": "Meld into Stone"
+  },
+  "glyph-of-warding": {
+    "_es": "8be6de37",
+    "name": "Glyph of Warding"
+  },
+  "speak-with-plants": {
+    "_es": "fd525eab",
+    "name": "Speak with Plants"
+  },
+  "hunger-of-hadar": {
+    "_es": "ebfac9b4",
+    "name": "Hunger of Hadar"
+  },
+  "nondetection": {
+    "_es": "5671a1aa",
+    "name": "Nondetection"
+  },
+  "summon-fey": {
+    "_es": "57627885",
+    "name": "Summon Fey"
+  },
+  "summon-undead": {
+    "_es": "1f0fbd40",
+    "name": "Summon Undead"
+  },
+  "crusaders-mantle": {
+    "_es": "3550232a",
+    "name": "Crusader's Mantle"
+  },
+  "wind-wall": {
+    "_es": "8f91639b",
+    "name": "Wind Wall"
+  },
+  "leomunds-tiny-hut": {
+    "_es": "b2ed4bd4",
+    "name": "Leomund's Tiny Hut"
+  },
+  "sending": {
+    "_es": "d59fc16e",
+    "name": "Sending"
+  },
+  "beacon-of-hope": {
+    "_es": "8a40a8d6",
+    "name": "Beacon of Hope"
+  },
+  "divination": {
+    "_es": "365b462d",
+    "name": "Divination"
+  },
+  "aura-of-purity": {
+    "_es": "888d7ac5",
+    "name": "Aura of Purity"
+  },
+  "aura-of-life": {
+    "_es": "e42d7636",
+    "name": "Aura of Life"
+  },
+  "staggering-smite": {
+    "_es": "71738769",
+    "name": "Staggering Smite"
+  },
+  "leomunds-secret-chest": {
+    "_es": "8a31c51e",
+    "name": "Leomund's Secret Chest"
+  },
+  "compulsion": {
+    "_es": "d399beef",
+    "name": "Compulsion"
+  },
+  "conjure-minor-elementals": {
+    "_es": "40f4d070",
+    "name": "Conjure Minor Elementals"
+  },
+  "conjure-woodland-beings": {
+    "_es": "f790644c",
+    "name": "Conjure Woodland Beings"
+  },
+  "control-water": {
+    "_es": "bc574b1a",
+    "name": "Control Water"
+  },
+  "dominate-beast": {
+    "_es": "14d1549a",
+    "name": "Dominate Beast"
+  },
+  "grasping-vine": {
+    "_es": "e89cf33f",
+    "name": "Grasping Vine"
+  },
+  "otilukes-resilient-sphere": {
+    "_es": "e56cdc7a",
+    "name": "Otiluke's Resilient Sphere"
+  },
+  "vitriolic-sphere": {
+    "_es": "7444eaea",
+    "name": "Vitriolic Sphere"
+  },
+  "fabricate": {
+    "_es": "c7d88f7c",
+    "name": "Fabricate"
+  },
+  "fount-of-moonlight": {
+    "_es": "f1fb2213",
+    "name": "Fount of Moonlight"
+  },
+  "guardian-of-faith": {
+    "_es": "91bc5fe4",
+    "name": "Guardian of Faith"
+  },
+  "charm-monster": {
+    "_es": "58ee7469",
+    "name": "Charm Monster"
+  },
+  "giant-insect": {
+    "_es": "87d8e17a",
+    "name": "Giant Insect"
+  },
+  "summon-aberration": {
+    "_es": "2144e7bc",
+    "name": "Summon Aberration"
+  },
+  "summon-construct": {
+    "_es": "c874c492",
+    "name": "Summon Construct"
+  },
+  "summon-elemental": {
+    "_es": "67c75deb",
+    "name": "Summon Elemental"
+  },
+  "locate-creature": {
+    "_es": "64aa83d2",
+    "name": "Locate Creature"
+  },
+  "mordenkainens-faithful-hound": {
+    "_es": "a50e555c",
+    "name": "Mordenkainen's Faithful Hound"
+  },
+  "stone-shape": {
+    "_es": "be4b9bb8",
+    "name": "Stone Shape"
+  },
+  "arcane-eye": {
+    "_es": "1f297d20",
+    "name": "Arcane Eye"
+  },
+  "mordenkainens-private-sanctum": {
+    "_es": "1b8eb353",
+    "name": "Mordenkainen's Private Sanctum"
+  },
+  "evards-black-tentacles": {
+    "_es": "7bb877d3",
+    "name": "Evard's Black Tentacles"
+  },
+  "hallucinatory-terrain": {
+    "_es": "e518ccd1",
+    "name": "Hallucinatory Terrain"
+  },
+  "seeming": {
+    "_es": "06d30821",
+    "name": "Seeming"
+  },
+  "planar-binding": {
+    "_es": "8e103110",
+    "name": "Planar Binding"
+  },
+  "antilife-shell": {
+    "_es": "df028f81",
+    "name": "Antilife Shell"
+  },
+  "swift-quiver": {
+    "_es": "58299c80",
+    "name": "Swift Quiver"
+  },
+  "banishing-smite": {
+    "_es": "2ab29bff",
+    "name": "Banishing Smite"
+  },
+  "circle-of-power": {
+    "_es": "c7315e0c",
+    "name": "Circle of Power"
+  },
+  "teleportation-circle": {
+    "_es": "a552dd07",
+    "name": "Teleportation Circle"
+  },
+  "commune": {
+    "_es": "6b6d834a",
+    "name": "Commune"
+  },
+  "commune-with-nature": {
+    "_es": "feba6bde",
+    "name": "Commune with Nature"
+  },
+  "conjure-elemental": {
+    "_es": "76b85deb",
+    "name": "Conjure Elemental"
+  },
+  "conjure-volley": {
+    "_es": "f713624e",
+    "name": "Conjure Volley"
+  },
+  "legend-lore": {
+    "_es": "d69230de",
+    "name": "Legend Lore"
+  },
+  "hallow": {
+    "_es": "9b1b4450",
+    "name": "Hallow"
+  },
+  "contact-other-plane": {
+    "_es": "e93be8c9",
+    "name": "Contact Other Plane"
+  },
+  "contagion": {
+    "_es": "1f714e2a",
+    "name": "Contagion"
+  },
+  "creation": {
+    "_es": "6afde87c",
+    "name": "Creation"
+  },
+  "awaken": {
+    "_es": "a54b62b8",
+    "name": "Awaken"
+  },
+  "dispel-evil-and-good": {
+    "_es": "9c5c1657",
+    "name": "Dispel Evil and Good"
+  },
+  "mislead": {
+    "_es": "ad5a0101",
+    "name": "Mislead"
+  },
+  "rarys-telepathic-bond": {
+    "_es": "f9c270ab",
+    "name": "Rary's Telepathic Bond"
+  },
+  "dream": {
+    "_es": "382a6850",
+    "name": "Dream"
+  },
+  "synaptic-static": {
+    "_es": "17256c42",
+    "name": "Synaptic Static"
+  },
+  "steel-wind-strike": {
+    "_es": "17b35f4e",
+    "name": "Steel Wind Strike"
+  },
+  "summon-celestial": {
+    "_es": "fb607c7e",
+    "name": "Summon Celestial"
+  },
+  "summon-dragon": {
+    "_es": "a947b971",
+    "name": "Summon Dragon"
+  },
+  "bigbys-hand": {
+    "_es": "18b689b3",
+    "name": "Bigby's Hand"
+  },
+  "destructive-wave": {
+    "_es": "87816bae",
+    "name": "Destructive Wave"
+  },
+  "passwall": {
+    "_es": "4b0a1d67",
+    "name": "Passwall"
+  },
+  "tree-stride": {
+    "_es": "47e57a13",
+    "name": "Tree Stride"
+  },
+  "yolandes-regal-presence": {
+    "_es": "f66a5c67",
+    "name": "Yolande's Regal Presence"
+  },
+  "reincarnate": {
+    "_es": "8db67ea9",
+    "name": "Reincarnate"
+  },
+  "jallarzis-storm-of-radiance": {
+    "_es": "8a5c9e16",
+    "name": "Jallarzi's Storm of Radiance"
+  },
+  "planar-ally": {
+    "_es": "ca48ee1c",
+    "name": "Planar Ally"
+  },
+  "ottos-irresistible-dance": {
+    "_es": "65546b8b",
+    "name": "Otto's Irresistible Dance"
+  },
+  "tashas-bubbling-cauldron": {
+    "_es": "8f440b17",
+    "name": "Tasha's Bubbling Cauldron"
+  },
+  "conjure-fey": {
+    "_es": "66ab7885",
+    "name": "Conjure Fey"
+  },
+  "contingency": {
+    "_es": "962fde3c",
+    "name": "Contingency"
+  },
+  "create-undead": {
+    "_es": "24895277",
+    "name": "Create Undead"
+  },
+  "flesh-to-stone": {
+    "_es": "a24bf406",
+    "name": "Flesh to Stone"
+  },
+  "find-the-path": {
+    "_es": "47f79920",
+    "name": "Find the Path"
+  },
+  "otilukes-freezing-sphere": {
+    "_es": "94e0c274",
+    "name": "Otiluke's Freezing Sphere"
+  },
+  "heroes-feast": {
+    "_es": "3c710ec6",
+    "name": "Heroes' Feast"
+  },
+  "guards-and-wards": {
+    "_es": "e7d535f8",
+    "name": "Guards and Wards"
+  },
+  "programmed-illusion": {
+    "_es": "504b3a07",
+    "name": "Programmed Illusion"
+  },
+  "drawmijs-instant-summons": {
+    "_es": "dc1c96ec",
+    "name": "Drawmij's Instant Summons"
+  },
+  "summon-fiend": {
+    "_es": "b8610b29",
+    "name": "Summon Fiend"
+  },
+  "move-earth": {
+    "_es": "175808c9",
+    "name": "Move Earth"
+  },
+  "wall-of-thorns": {
+    "_es": "b8e99833",
+    "name": "Wall of Thorns"
+  },
+  "wall-of-ice": {
+    "_es": "c80d0e93",
+    "name": "Wall of Ice"
+  },
+  "word-of-recall": {
+    "_es": "e8fe8ce3",
+    "name": "Word of Recall"
+  },
+  "forbiddance": {
+    "_es": "7aa1aa4a",
+    "name": "Forbiddance"
+  },
+  "arcane-gate": {
+    "_es": "5eb99daf",
+    "name": "Arcane Gate"
+  },
+  "magic-jar": {
+    "_es": "cfea3ac2",
+    "name": "Magic Jar"
+  },
+  "wind-walk": {
+    "_es": "5d73085d",
+    "name": "Wind Walk"
+  },
+  "transport-via-plants": {
+    "_es": "372a618f",
+    "name": "Transport via Plants"
+  },
+  "conjure-celestial": {
+    "_es": "0a517c7e",
+    "name": "Conjure Celestial"
+  },
+  "mordenkainens-sword": {
+    "_es": "d80f9892",
+    "name": "Mordenkainen's Sword"
+  },
+  "mirage-arcane": {
+    "_es": "a1727481",
+    "name": "Mirage Arcane"
+  },
+  "mordenkainens-magnificent-mansion": {
+    "_es": "06361f8c",
+    "name": "Mordenkainen's Magnificent Mansion"
+  },
+  "power-word-fortify": {
+    "_es": "d3738157",
+    "name": "Power Word Fortify"
+  },
+  "divine-word": {
+    "_es": "bad7bea0",
+    "name": "Divine Word"
+  },
+  "project-image": {
+    "_es": "49bbaeb0",
+    "name": "Project Image"
+  },
+  "sequester": {
+    "_es": "98e09b38",
+    "name": "Sequester"
+  },
+  "symbol": {
+    "_es": "c9fa9a51",
+    "name": "Symbol"
+  },
+  "simulacrum": {
+    "_es": "a079f3e9",
+    "name": "Simulacrum"
+  },
+  "antipathy-sympathy": {
+    "_es": "a7fe62d4",
+    "name": "Antipathy/Sympathy"
+  },
+  "holy-aura": {
+    "_es": "93883116",
+    "name": "Holy Aura"
+  },
+  "clone": {
+    "_es": "74757438",
+    "name": "Clone"
+  },
+  "control-weather": {
+    "_es": "9368eb9f",
+    "name": "Control Weather"
+  },
+  "maze": {
+    "_es": "4e6987a4",
+    "name": "Maze"
+  },
+  "glibness": {
+    "_es": "b399a459",
+    "name": "Glibness"
+  },
+  "demiplane": {
+    "_es": "3dca0a20",
+    "name": "Demiplane"
+  },
+  "telepathy": {
+    "_es": "947624db",
+    "name": "Telepathy"
+  },
+  "tsunami": {
+    "_es": "405e7fc7",
+    "name": "Tsunami"
+  },
+  "shapechange": {
+    "_es": "45ba41dd",
+    "name": "Shapechange"
+  },
+  "power-word-heal": {
+    "_es": "66126829",
+    "name": "Power Word Heal"
+  },
+  "true-polymorph": {
+    "_es": "a0af74fb",
+    "name": "True Polymorph"
+  },
+  "storm-of-vengeance": {
+    "_es": "8827aff4",
+    "name": "Storm of Vengeance"
+  },
+  "modify-memory": {
+    "_es": "4efcfbf5",
+    "name": "Modify Memory"
+  },
+  "speak-with-dead": {
+    "_es": "6370d7a1",
+    "name": "Speak with Dead"
+  },
+  "toll-the-dead": {
+    "_es": "1093ba08",
+    "name": "Toll the Dead"
+  },
+  "homunculus-servant": {
+    "_es": "008c2cc4",
+    "name": "Homunculus Servant"
+  }
+}

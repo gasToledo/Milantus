@@ -62,6 +62,11 @@ Map<String, String> _rotulos() => {
       'weaponRangeRule': weaponRangeRule,
       'weaponMasteryRule': weaponMasteryRule,
       for (final e in weaponCategoryRules.entries) 'category/${e.key}': e.value,
+      for (final e in itemRarityLabels.entries) 'rarity/${e.key}': e.value,
+      for (final e in featCategoryLabels.entries)
+        if (e.key != 'general') 'featCategory/${e.key}': e.value,
+      for (final e in itemCategoryLabels.entries)
+        'itemCategory/${e.key}': e.value,
       // El glosario de los formularios homebrew.
       for (final (nombre, mapa) in [
         ('armorCategory', armorCategoryRules),

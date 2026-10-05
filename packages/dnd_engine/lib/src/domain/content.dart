@@ -1,6 +1,7 @@
 import 'ability.dart';
 import 'content_source.dart';
 import 'effects.dart';
+import 'content_language.dart';
 
 /// Raza (o especie, en terminología 2024).
 class Race {
@@ -181,9 +182,11 @@ class MulticlassRules {
   }
 
   String get requirementLabel => abilityRequirements.isEmpty
-      ? 'sin requisito declarado'
+      ? localized('sin requisito declarado', 'no declared requirement')
       : abilityRequirements.map((ability) => '${ability.label} 13+').join(
-            abilityRequirementMode == 'any' ? ' o ' : ' y ',
+            abilityRequirementMode == 'any'
+                ? localized(' o ', ' or ')
+                : localized(' y ', ' and '),
           );
 
   Map<String, dynamic> toJson() => {
@@ -826,8 +829,9 @@ class Weapon {
   bool get isRanged => properties.contains('ranged');
 
   /// "20/60 pies" para mostrar, o null si el arma no declara alcance.
-  String? get rangeLabel =>
-      rangeNormal == 0 ? null : '$rangeNormal/$rangeLong pies';
+  String? get rangeLabel => rangeNormal == 0
+      ? null
+      : '$rangeNormal/$rangeLong ${localized('pies', 'feet')}';
   bool get isFinesse => properties.contains('finesse');
 
   /// Propiedad Ligera: requisito del ataque de mano secundaria (2024).
@@ -1252,34 +1256,65 @@ String formatCost(int cp, {Map<String, String> labels = coinLabels}) {
 
 /// Nombre de cada rareza (`Item.rarity`), de la más común a la más rara: el
 /// orden de las claves es el que usan los filtros.
-const itemRarityLabels = {
-  'common': 'Común',
-  'uncommon': 'Infrecuente',
-  'rare': 'Raro',
-  'very-rare': 'Muy raro',
-  'legendary': 'Legendario',
-  'artifact': 'Artefacto',
-};
+Map<String, String> get itemRarityLabels => localized(
+      const {
+        'common': 'Común',
+        'uncommon': 'Infrecuente',
+        'rare': 'Raro',
+        'very-rare': 'Muy raro',
+        'legendary': 'Legendario',
+        'artifact': 'Artefacto',
+      },
+      const {
+        'common': 'Common',
+        'uncommon': 'Uncommon',
+        'rare': 'Rare',
+        'very-rare': 'Very Rare',
+        'legendary': 'Legendary',
+        'artifact': 'Artifact',
+      },
+    );
 
 /// Nombre de cada categoría de dote (`Feat.category`). Incluye las que no se
 /// eligen como dote —invocaciones, terrenos del druida—: el catálogo las guarda
 /// como dotes y el Códice las muestra igual.
-const featCategoryLabels = {
-  'origin': 'De origen',
-  'general': 'General',
-  'fighting-style': 'Estilo de combate',
-  'epic-boon': 'Don épico',
-  'dragonmark': 'Marca dracónica',
-  'warlock-invocation': 'Invocación sobrenatural',
-  'druid-land': 'Terreno del Círculo de la Tierra',
-};
+Map<String, String> get featCategoryLabels => localized(
+      const {
+        'origin': 'De origen',
+        'general': 'General',
+        'fighting-style': 'Estilo de combate',
+        'epic-boon': 'Don épico',
+        'dragonmark': 'Marca dracónica',
+        'warlock-invocation': 'Invocación sobrenatural',
+        'druid-land': 'Terreno del Círculo de la Tierra',
+      },
+      const {
+        'origin': 'Origin',
+        'general': 'General',
+        'fighting-style': 'Fighting Style',
+        'epic-boon': 'Epic Boon',
+        'dragonmark': 'Dragonmark',
+        'warlock-invocation': 'Eldritch Invocation',
+        'druid-land': 'Circle of the Land terrain',
+      },
+    );
 
 /// Nombre de cada familia de objeto común (`Item.category`).
-const itemCategoryLabels = {
-  'gear': 'Equipo',
-  'tool': 'Herramienta',
-  'ammunition': 'Munición',
-  'focus': 'Canalizador',
-  'pack': 'Paquete',
-  'container': 'Contenedor',
-};
+Map<String, String> get itemCategoryLabels => localized(
+      const {
+        'gear': 'Equipo',
+        'tool': 'Herramienta',
+        'ammunition': 'Munición',
+        'focus': 'Canalizador',
+        'pack': 'Paquete',
+        'container': 'Contenedor',
+      },
+      const {
+        'gear': 'Gear',
+        'tool': 'Tool',
+        'ammunition': 'Ammunition',
+        'focus': 'Focus',
+        'pack': 'Pack',
+        'container': 'Container',
+      },
+    );

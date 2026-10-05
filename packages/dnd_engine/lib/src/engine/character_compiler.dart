@@ -1,4 +1,5 @@
 import 'dart:math';
+import '../domain/content_language.dart';
 
 import '../data/content_repository.dart';
 import '../domain/ability.dart';
@@ -145,8 +146,10 @@ class CharacterCompiler {
     // Bonos de característica explícitos (trasfondo 2024 + ASI). No vienen de
     // un efecto, así que el nombre de la fuente se arma acá: es el único lugar
     // que sabe de qué trasfondo o de qué nivel salieron.
-    final backgroundLabel =
-        background == null ? 'Trasfondo' : 'Trasfondo: ${background.name}';
+    final backgroundWord = localized('Trasfondo', 'Background');
+    final backgroundLabel = background == null
+        ? backgroundWord
+        : '$backgroundWord: ${background.name}';
     c.backgroundAbilityBonuses.forEach(
       (a, amount) =>
           builder.addAbilityBonus(a, amount, source: backgroundLabel),
@@ -159,7 +162,10 @@ class CharacterCompiler {
       }
       asi.abilityIncreases.forEach(
         (a, amount) => builder.addAbilityBonus(a, amount,
-            source: 'Mejora de nivel ${asi.level}'),
+            source: localized(
+              'Mejora de nivel ${asi.level}',
+              'Level ${asi.level} improvement',
+            )),
       );
     }
 
@@ -242,11 +248,17 @@ class CharacterCompiler {
           if (rules.skillChoiceCount > 0) {
             proficiencySources.add((
               id: 'multiclass:$classId:skills',
-              name: '${classDefinition.name} (multiclase)',
+              name: localized(
+                '${classDefinition.name} (multiclase)',
+                '${classDefinition.name} (multiclass)',
+              ),
               effects: <Effect>[
                 ProficiencyChoiceEffect(
                   groupId: 'class:$classId:multiclass-skills',
-                  name: 'Habilidad de ${classDefinition.name}',
+                  name: localized(
+                    'Habilidad de ${classDefinition.name}',
+                    '${classDefinition.name} skill',
+                  ),
                   count: rules.skillChoiceCount,
                   skills: rules.skillChoiceFrom,
                 ),
@@ -256,11 +268,17 @@ class CharacterCompiler {
           if (rules.instrumentProficiencies.isNotEmpty) {
             proficiencySources.add((
               id: 'multiclass:$classId:instruments',
-              name: '${classDefinition.name} (multiclase)',
+              name: localized(
+                '${classDefinition.name} (multiclase)',
+                '${classDefinition.name} (multiclass)',
+              ),
               effects: <Effect>[
                 ProficiencyChoiceEffect(
                   groupId: 'class:$classId:multiclass-instruments',
-                  name: 'Instrumento de ${classDefinition.name}',
+                  name: localized(
+                    'Instrumento de ${classDefinition.name}',
+                    '${classDefinition.name} instrument',
+                  ),
                   count: rules.instrumentProficiencies.length,
                   includeSkills: false,
                   tools: rules.instrumentProficiencies,
@@ -1251,8 +1269,12 @@ class CharacterCompiler {
           recharge: g.use == InnateSpellUse.oncePerShortRest
               ? RechargeOn.shortRest
               : RechargeOn.longRest,
-          description: 'Lanzarlo sin gastar espacio de conjuro. '
-              'También podés lanzarlo gastando un espacio.',
+          description: localized(
+            'Lanzarlo sin gastar espacio de conjuro. '
+                'También podés lanzarlo gastando un espacio.',
+            'Cast it without expending a spell slot. You can also cast it '
+                'by expending a slot.',
+          ),
         ));
       }
     }

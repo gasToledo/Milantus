@@ -1,0 +1,530 @@
+{
+  "acid": {
+    "_es": "8c0c7ccc",
+    "name": "Acid"
+  },
+  "alchemists-fire": {
+    "_es": "1e6b999d",
+    "name": "Alchemist's Fire"
+  },
+  "alchemists-supplies": {
+    "_es": "af00568f",
+    "name": "Alchemist's Supplies"
+  },
+  "amulet": {
+    "_es": "51d9ac5b",
+    "name": "Amulet"
+  },
+  "antitoxin": {
+    "_es": "af0d2b1b",
+    "name": "Antitoxin"
+  },
+  "arrows": {
+    "_es": "e12e08ec",
+    "name": "Arrows"
+  },
+  "backpack": {
+    "_es": "91f7b031",
+    "name": "Backpack"
+  },
+  "bagpipes": {
+    "_es": "2eaef346",
+    "name": "Bagpipes"
+  },
+  "ball-bearings": {
+    "_es": "c349a747",
+    "name": "Ball Bearings"
+  },
+  "barrel": {
+    "_es": "636ab682",
+    "name": "Barrel"
+  },
+  "basket": {
+    "_es": "2a6e4fc4",
+    "name": "Basket"
+  },
+  "bedroll": {
+    "_es": "6b1e139f",
+    "name": "Bedroll"
+  },
+  "bell": {
+    "_es": "0ad31111",
+    "name": "Bell"
+  },
+  "blanket": {
+    "_es": "acde2717",
+    "name": "Blanket"
+  },
+  "block-and-tackle": {
+    "_es": "95cd0a2f",
+    "name": "Block and Tackle"
+  },
+  "bolts": {
+    "_es": "5bc83a30",
+    "name": "Bolts"
+  },
+  "book": {
+    "_es": "8aa4af66",
+    "name": "Book"
+  },
+  "bottle-glass": {
+    "_es": "51aa5396",
+    "name": "Glass Bottle"
+  },
+  "brewers-supplies": {
+    "_es": "17842acf",
+    "name": "Brewer's Supplies"
+  },
+  "bucket": {
+    "_es": "8e5f1127",
+    "name": "Bucket"
+  },
+  "bullets-firearm": {
+    "_es": "68009f2e",
+    "name": "Firearm Bullets"
+  },
+  "bullets-sling": {
+    "_es": "4894e0c6",
+    "name": "Sling Bullets"
+  },
+  "burglars-pack": {
+    "_es": "583cd90c",
+    "name": "Burglar's Pack"
+  },
+  "calligraphers-supplies": {
+    "_es": "2fb70221",
+    "name": "Calligrapher's Supplies"
+  },
+  "caltrops": {
+    "_es": "5323a376",
+    "name": "Caltrops"
+  },
+  "candle": {
+    "_es": "361df3a4",
+    "name": "Candle"
+  },
+  "carpenters-tools": {
+    "_es": "88d46d39",
+    "name": "Carpenter's Tools"
+  },
+  "cartographers-tools": {
+    "_es": "d08c3440",
+    "name": "Cartographer's Tools"
+  },
+  "case-crossbow-bolt": {
+    "_es": "2dc9e240",
+    "name": "Crossbow Bolt Case"
+  },
+  "case-map-or-scroll": {
+    "_es": "74e608c3",
+    "name": "Map or Scroll Case"
+  },
+  "chain": {
+    "_es": "99cd2a94",
+    "name": "Chain"
+  },
+  "chest": {
+    "_es": "e2ae1e61",
+    "name": "Chest"
+  },
+  "climbers-kit": {
+    "_es": "bcc61a10",
+    "name": "Climber's Kit"
+  },
+  "clothes-fine": {
+    "_es": "beda4f32",
+    "name": "Fine Clothes"
+  },
+  "clothes-travelers": {
+    "_es": "ca19a9fd",
+    "name": "Traveler's Clothes"
+  },
+  "cobblers-tools": {
+    "_es": "59122f24",
+    "name": "Cobbler's Tools"
+  },
+  "component-pouch": {
+    "_es": "545f58fe",
+    "name": "Component Pouch"
+  },
+  "cooks-utensils": {
+    "_es": "fee8124c",
+    "name": "Cook's Utensils"
+  },
+  "costume": {
+    "_es": "cc7d35c7",
+    "name": "Costume"
+  },
+  "crowbar": {
+    "_es": "fbaf9882",
+    "name": "Crowbar"
+  },
+  "crystal": {
+    "_es": "e0c9ebc4",
+    "name": "Crystal"
+  },
+  "dice-set": {
+    "_es": "ae5517b8",
+    "name": "Dice Set"
+  },
+  "diplomats-pack": {
+    "_es": "6b9b97f1",
+    "name": "Diplomat's Pack"
+  },
+  "disguise-kit": {
+    "_es": "fd2374d7",
+    "name": "Disguise Kit"
+  },
+  "dragonchess-set": {
+    "_es": "2088a010",
+    "name": "Dragonchess Set"
+  },
+  "drum": {
+    "_es": "a82699b5",
+    "name": "Drum"
+  },
+  "dulcimer": {
+    "_es": "c95555a6",
+    "name": "Dulcimer"
+  },
+  "dungeoneers-pack": {
+    "_es": "aee5d70d",
+    "name": "Dungeoneer's Pack"
+  },
+  "emblem": {
+    "_es": "c38a27f5",
+    "name": "Emblem"
+  },
+  "entertainers-pack": {
+    "_es": "c3c6685e",
+    "name": "Entertainer's Pack"
+  },
+  "explorers-pack": {
+    "_es": "f6e5ae08",
+    "name": "Explorer's Pack"
+  },
+  "flask": {
+    "_es": "54ed53b0",
+    "name": "Flask"
+  },
+  "flute": {
+    "_es": "f4b2c2db",
+    "name": "Flute"
+  },
+  "forgery-kit": {
+    "_es": "68d2ba89",
+    "name": "Forgery Kit"
+  },
+  "glassblowers-tools": {
+    "_es": "a7b23876",
+    "name": "Glassblower's Tools"
+  },
+  "grappling-hook": {
+    "_es": "e2a27771",
+    "name": "Grappling Hook"
+  },
+  "healers-kit": {
+    "_es": "d8e7bd8e",
+    "name": "Healer's Kit"
+  },
+  "herbalism-kit": {
+    "_es": "74d32d57",
+    "name": "Herbalism Kit"
+  },
+  "holy-water": {
+    "_es": "bba8f303",
+    "name": "Holy Water"
+  },
+  "horn": {
+    "_es": "029fd9de",
+    "name": "Horn"
+  },
+  "hunting-trap": {
+    "_es": "d9164d1c",
+    "name": "Hunting Trap"
+  },
+  "ink": {
+    "_es": "0621dada",
+    "name": "Ink"
+  },
+  "ink-pen": {
+    "_es": "2c3878dd",
+    "name": "Ink Pen"
+  },
+  "jewelers-tools": {
+    "_es": "c32dec5c",
+    "name": "Jeweler's Tools"
+  },
+  "jug": {
+    "_es": "449ff624",
+    "name": "Jug"
+  },
+  "ladder": {
+    "_es": "d5284a48",
+    "name": "Ladder"
+  },
+  "lamp": {
+    "_es": "7c30f33e",
+    "name": "Lamp"
+  },
+  "lantern-bullseye": {
+    "_es": "9b2941b8",
+    "name": "Bullseye Lantern"
+  },
+  "lantern-hooded": {
+    "_es": "ef400c1a",
+    "name": "Hooded Lantern"
+  },
+  "leatherworkers-tools": {
+    "_es": "9271c7c8",
+    "name": "Leatherworker's Tools"
+  },
+  "lock": {
+    "_es": "9ea2cd39",
+    "name": "Lock"
+  },
+  "lute": {
+    "_es": "87a2d34d",
+    "name": "Lute"
+  },
+  "lyre": {
+    "_es": "313d58e0",
+    "name": "Lyre"
+  },
+  "magnifying-glass": {
+    "_es": "c2ef04e6",
+    "name": "Magnifying Glass"
+  },
+  "manacles": {
+    "_es": "bb2f5d38",
+    "name": "Manacles"
+  },
+  "map": {
+    "_es": "755b6e45",
+    "name": "Map"
+  },
+  "masons-tools": {
+    "_es": "a9060d2c",
+    "name": "Mason's Tools"
+  },
+  "mirror": {
+    "_es": "3ebe5876",
+    "name": "Mirror"
+  },
+  "navigators-tools": {
+    "_es": "9fb771dd",
+    "name": "Navigator's Tools"
+  },
+  "needles": {
+    "_es": "ef12e0eb",
+    "name": "Needles"
+  },
+  "net": {
+    "_es": "49943fd3",
+    "name": "Net"
+  },
+  "oil": {
+    "_es": "1c3be6a9",
+    "name": "Oil"
+  },
+  "orb": {
+    "_es": "292dca42",
+    "name": "Orb"
+  },
+  "painters-supplies": {
+    "_es": "b067e98d",
+    "name": "Painter's Supplies"
+  },
+  "pan-flute": {
+    "_es": "31d24b0d",
+    "name": "Pan Flute"
+  },
+  "paper": {
+    "_es": "c1e991e2",
+    "name": "Paper"
+  },
+  "parchment": {
+    "_es": "44bddd9c",
+    "name": "Parchment"
+  },
+  "perfume": {
+    "_es": "97ed2e62",
+    "name": "Perfume"
+  },
+  "playing-card-set": {
+    "_es": "f3d702b4",
+    "name": "Playing Card Set"
+  },
+  "poison-basic": {
+    "_es": "5bbc1290",
+    "name": "Basic Poison"
+  },
+  "poisoner-kit": {
+    "_es": "903bba25",
+    "name": "Poisoner's Kit"
+  },
+  "pole": {
+    "_es": "798ac74e",
+    "name": "Pole"
+  },
+  "pot-iron": {
+    "_es": "b5e88de0",
+    "name": "Iron Pot"
+  },
+  "potion-of-healing": {
+    "_es": "78cf25b1",
+    "name": "Potion of Healing"
+  },
+  "potters-tools": {
+    "_es": "80d9f3dc",
+    "name": "Potter's Tools"
+  },
+  "pouch": {
+    "_es": "1cd13249",
+    "name": "Pouch"
+  },
+  "priests-pack": {
+    "_es": "e22d78f8",
+    "name": "Priest's Pack"
+  },
+  "quiver": {
+    "_es": "03221141",
+    "name": "Quiver"
+  },
+  "ram-portable": {
+    "_es": "661cc9d5",
+    "name": "Portable Ram"
+  },
+  "rations": {
+    "_es": "ed3542aa",
+    "name": "Rations"
+  },
+  "reliquary": {
+    "_es": "2d7985fa",
+    "name": "Reliquary"
+  },
+  "robe": {
+    "_es": "2dcafe0f",
+    "name": "Robe"
+  },
+  "rod": {
+    "_es": "798ac74e",
+    "name": "Rod"
+  },
+  "rope": {
+    "_es": "7ab75bb2",
+    "name": "Rope"
+  },
+  "sack": {
+    "_es": "cf3de720",
+    "name": "Sack"
+  },
+  "scholars-pack": {
+    "_es": "30759838",
+    "name": "Scholar's Pack"
+  },
+  "shawm": {
+    "_es": "e26a09fe",
+    "name": "Shawm"
+  },
+  "shovel": {
+    "_es": "b37eedba",
+    "name": "Shovel"
+  },
+  "signal-whistle": {
+    "_es": "d9fdb921",
+    "name": "Signal Whistle"
+  },
+  "smiths-tools": {
+    "_es": "1c1b3c7d",
+    "name": "Smith's Tools"
+  },
+  "spell-scroll-cantrip": {
+    "_es": "5081bebd",
+    "name": "Spell Scroll (Cantrip)"
+  },
+  "spell-scroll-level-1": {
+    "_es": "f862f121",
+    "name": "Spell Scroll (Level 1)"
+  },
+  "spellbook": {
+    "_es": "2d98daec",
+    "name": "Spellbook"
+  },
+  "spikes-iron": {
+    "_es": "12beca6f",
+    "name": "Iron Spikes"
+  },
+  "sprig-of-mistletoe": {
+    "_es": "eb35cc34",
+    "name": "Sprig of Mistletoe"
+  },
+  "spyglass": {
+    "_es": "0dc9fbd7",
+    "name": "Spyglass"
+  },
+  "staff": {
+    "_es": "a1ca09db",
+    "name": "Staff"
+  },
+  "string": {
+    "_es": "6c9e62a1",
+    "name": "String"
+  },
+  "tent": {
+    "_es": "6639771f",
+    "name": "Tent"
+  },
+  "thieves-tools": {
+    "_es": "5c6d1002",
+    "name": "Thieves' Tools"
+  },
+  "three-dragon-ante-set": {
+    "_es": "2addd0cd",
+    "name": "Three-Dragon Ante Set"
+  },
+  "tinderbox": {
+    "_es": "7af5dbe7",
+    "name": "Tinderbox"
+  },
+  "tinkers-tools": {
+    "_es": "d3779f9d",
+    "name": "Tinker's Tools"
+  },
+  "torch": {
+    "_es": "ef0ab2c0",
+    "name": "Torch"
+  },
+  "vial": {
+    "_es": "87aa03c6",
+    "name": "Vial"
+  },
+  "viol": {
+    "_es": "4856dfbd",
+    "name": "Viol"
+  },
+  "wand": {
+    "_es": "4a11f0bb",
+    "name": "Wand"
+  },
+  "waterskin": {
+    "_es": "d18844ee",
+    "name": "Waterskin"
+  },
+  "weavers-tools": {
+    "_es": "0a6addfb",
+    "name": "Weaver's Tools"
+  },
+  "woodcarvers-tools": {
+    "_es": "c30f38b3",
+    "name": "Woodcarver's Tools"
+  },
+  "wooden-staff": {
+    "_es": "a9a29cec",
+    "name": "Wooden Staff"
+  },
+  "yew-wand": {
+    "_es": "ca0e3be4",
+    "name": "Yew Wand"
+  }
+}

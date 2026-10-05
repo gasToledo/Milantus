@@ -49,3 +49,19 @@ flutter:
     - packages/dnd_engine/assets/srd_2024/efa_magic_items.json
     - packages/dnd_engine/assets/srd_2024/spells.json
     - packages/dnd_engine/assets/srd_2024/creatures.json
+    # Superposiciones en inglés: se piden solo con la interfaz en inglés
+    # (ver `asset_content_loader.dart`). Declarar una que no existe rompe el
+    # build, así que se suman al crearlas.
+    - packages/dnd_engine/assets/srd_2024/races.en.json
+    - packages/dnd_engine/assets/srd_2024/classes.en.json
+    - packages/dnd_engine/assets/srd_2024/subclasses.en.json
+    - packages/dnd_engine/assets/srd_2024/lineages.en.json
+    - packages/dnd_engine/assets/srd_2024/backgrounds.en.json
+    - packages/dnd_engine/assets/srd_2024/feats.en.json
+    - packages/dnd_engine/assets/srd_2024/weapons.en.json
+    - packages/dnd_engine/assets/srd_2024/armor.en.json
+    - packages/dnd_engine/assets/srd_2024/items.en.json
+    - packages/dnd_engine/assets/srd_2024/magic_items.en.json
+    - packages/dnd_engine/assets/srd_2024/efa_magic_items.en.json
+    - packages/dnd_engine/assets/srd_2024/spells.en.json
+    - packages/dnd_engine/assets/srd_2024/creatures.en.json

@@ -1,0 +1,175 @@
+{
+  "elf-drow": {
+    "_es": "fab5445c",
+    "name": "Drow",
+    "features.0.name": "Drow Lineage",
+    "features.1.name": "Drow Magic (level 3)",
+    "features.2.name": "Drow Magic (level 5)"
+  },
+  "elf-high": {
+    "_es": "d1409d78",
+    "name": "High Elf",
+    "features.0.name": "High Elf Lineage",
+    "features.1.name": "High Elf Magic (level 3)",
+    "features.2.name": "High Elf Magic (level 5)"
+  },
+  "elf-wood": {
+    "_es": "261cea1f",
+    "name": "Wood Elf",
+    "features.0.name": "Speedy",
+    "features.1.name": "Wood Elf Magic (level 3)",
+    "features.2.name": "Wood Elf Magic (level 5)"
+  },
+  "gnome-forest": {
+    "_es": "471a9171",
+    "name": "Forest Gnome",
+    "features.0.name": "Wood Elf Lineage"
+  },
+  "gnome-rock": {
+    "_es": "d49f90cd",
+    "name": "Rock Gnome",
+    "features.0.name": "Natural Artificer",
+    "features.0.effects.2.name": "Clockwork Device"
+  },
+  "tiefling-abyssal": {
+    "_es": "cc95f201",
+    "name": "Abyssal",
+    "features.0.name": "Abyssal Legacy",
+    "features.1.name": "Legacy Magic (level 3)",
+    "features.2.name": "Legacy Magic (level 5)"
+  },
+  "tiefling-chthonic": {
+    "_es": "a08e059f",
+    "name": "Chthonic",
+    "features.0.name": "Chthonic Legacy",
+    "features.1.name": "Legacy Magic (level 3)",
+    "features.2.name": "Legacy Magic (level 5)"
+  },
+  "tiefling-infernal": {
+    "_es": "2bc223c9",
+    "name": "Infernal",
+    "features.0.name": "Infernal Legacy",
+    "features.1.name": "Legacy Magic (level 3)",
+    "features.2.name": "Legacy Magic (level 5)"
+  },
+  "goliath-cloud": {
+    "_es": "6a1ff7fb",
+    "name": "Cloud Giant",
+    "features.0.name": "Cloud's Jaunt",
+    "features.0.effects.0.name": "Giant Ancestry"
+  },
+  "goliath-fire": {
+    "_es": "d9fcdab0",
+    "name": "Fire Giant",
+    "features.0.name": "Fire's Burn",
+    "features.0.effects.0.name": "Giant Ancestry"
+  },
+  "goliath-frost": {
+    "_es": "3435ce42",
+    "name": "Frost Giant",
+    "features.0.name": "Frost's Chill",
+    "features.0.effects.0.name": "Giant Ancestry"
+  },
+  "goliath-hill": {
+    "_es": "7dd85583",
+    "name": "Hill Giant",
+    "features.0.name": "Hill's Tumble",
+    "features.0.effects.0.name": "Giant Ancestry"
+  },
+  "goliath-stone": {
+    "_es": "73f802ae",
+    "name": "Stone Giant",
+    "features.0.name": "Stone's Endurance",
+    "features.0.effects.0.name": "Giant Ancestry"
+  },
+  "goliath-storm": {
+    "_es": "25706ef6",
+    "name": "Storm Giant",
+    "features.0.name": "Thunderbolt Strike",
+    "features.0.effects.0.name": "Giant Ancestry"
+  },
+  "dragonborn-black": {
+    "_es": "7af92a07",
+    "name": "Black Dragon",
+    "features.0.name": "Draconic Ancestry (Black)",
+    "features.0.effects.1.name": "Acid Breath"
+  },
+  "dragonborn-copper": {
+    "_es": "6e11655f",
+    "name": "Copper Dragon",
+    "features.0.name": "Draconic Ancestry (Copper)",
+    "features.0.effects.1.name": "Acid Breath"
+  },
+  "dragonborn-blue": {
+    "_es": "c6c29f49",
+    "name": "Blue Dragon",
+    "features.0.name": "Draconic Ancestry (Blue)",
+    "features.0.effects.1.name": "Lightning Breath"
+  },
+  "dragonborn-bronze": {
+    "_es": "3a46cca5",
+    "name": "Bronze Dragon",
+    "features.0.name": "Draconic Ancestry (Bronze)",
+    "features.0.effects.1.name": "Lightning Breath"
+  },
+  "dragonborn-white": {
+    "_es": "20fe6de7",
+    "name": "White Dragon",
+    "features.0.name": "Draconic Ancestry (White)",
+    "features.0.effects.1.name": "Cold Breath"
+  },
+  "dragonborn-silver": {
+    "_es": "aa3a6fed",
+    "name": "Silver Dragon",
+    "features.0.name": "Draconic Ancestry (Silver)",
+    "features.0.effects.1.name": "Cold Breath"
+  },
+  "dragonborn-green": {
+    "_es": "c39e9302",
+    "name": "Green Dragon",
+    "features.0.name": "Draconic Ancestry (Green)",
+    "features.0.effects.1.name": "Poison Breath"
+  },
+  "dragonborn-red": {
+    "_es": "c47a3703",
+    "name": "Red Dragon",
+    "features.0.name": "Draconic Ancestry (Red)",
+    "features.0.effects.1.name": "Fire Breath"
+  },
+  "dragonborn-gold": {
+    "_es": "c8db5e05",
+    "name": "Gold Dragon",
+    "features.0.name": "Draconic Ancestry (Gold)",
+    "features.0.effects.1.name": "Fire Breath"
+  },
+  "dragonborn-brass": {
+    "_es": "94e2e357",
+    "name": "Brass Dragon",
+    "features.0.name": "Draconic Ancestry (Brass)",
+    "features.0.effects.1.name": "Fire Breath"
+  },
+  "shifter-beasthide": {
+    "_es": "f4aaf37e",
+    "name": "Beasthide",
+    "features.0.name": "Beasthide",
+    "features.0.effects.0.name": "Beasthide"
+  },
+  "shifter-longtooth": {
+    "_es": "996d60d4",
+    "name": "Longtooth",
+    "features.0.name": "Longtooth",
+    "features.0.effects.0.name": "Longtooth"
+  },
+  "shifter-swiftstride": {
+    "_es": "74eecb77",
+    "name": "Swiftstride",
+    "features.0.name": "Swiftstride",
+    "features.0.effects.0.name": "Swiftstride"
+  },
+  "shifter-wildhunt": {
+    "_es": "9ae29864",
+    "name": "Wildhunt",
+    "features.0.name": "Wild Hunt",
+    "features.0.effects.0.name": "Wild Hunt"
+  }
+}

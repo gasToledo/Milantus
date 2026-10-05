@@ -81,9 +81,30 @@ void main() {
     });
     final ingles = await loadOfficialContent(translation: 'en', bundle: bundle);
     expect(ingles.spell(conjuro.id)!.name, 'Translated');
-    // Solo se pide lo que el manifiesto dice que existe.
-    expect(bundle.pedidos.where((p) => p.endsWith('.en.json')), [
+    // Solo se pide lo que el manifiesto dice que existe, y una vez cada uno.
+    final empaquetadas = (await AssetManifest.loadFromAssetBundle(
+      rootBundle,
+    )).listAssets().where((a) => a.endsWith('.en.json')).toSet();
+    final pedidas = bundle.pedidos.where((p) => p.endsWith('.en.json'));
+    expect(pedidas.toSet(), {
+      ...empaquetadas,
       'packages/dnd_engine/assets/srd_2024/spells.en.json',
-    ]);
+    });
+    expect(pedidas.length, pedidas.toSet().length);
+  });
+
+  test('cada catálogo empaquetado tiene su superposición en inglés', () async {
+    final assets = (await AssetManifest.loadFromAssetBundle(
+      rootBundle,
+    )).listAssets().toSet();
+    final catalogos = assets.where(
+      (a) =>
+          a.endsWith('.json') &&
+          !a.endsWith('.en.json') &&
+          !a.endsWith('manifest.json'),
+    );
+    for (final c in catalogos) {
+      expect(assets, contains(c.replaceFirst('.json', '.en.json')), reason: c);
+    }
   });
 }

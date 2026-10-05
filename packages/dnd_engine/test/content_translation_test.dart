@@ -172,7 +172,9 @@ void main() {
     setUp(() async {
       dir = await Directory.systemTemp.createTemp('pack_en');
       await for (final f in Directory('lib/assets/srd_2024').list()) {
-        if (f is File) {
+        // Solo el español: la prueba pone su propia superposición y mira que
+        // los catálogos sin superposición queden como estaban.
+        if (f is File && !f.path.endsWith('.en.json')) {
           await f.copy('${dir.path}/${f.uri.pathSegments.last}');
         }
       }

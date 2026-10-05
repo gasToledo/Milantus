@@ -1,0 +1,133 @@
+{
+  "human": {
+    "_es": "6e14f531",
+    "name": "Human",
+    "tagline": "Ambitious and adaptable",
+    "effects.0.name": "Skilled",
+    "effects.1.name": "Resourceful",
+    "effects.3.name": "Versatile"
+  },
+  "dwarf": {
+    "_es": "6cf10f93",
+    "name": "Dwarf",
+    "tagline": "Hardy as stone",
+    "effects.2.name": "Dwarven Resilience",
+    "effects.4.name": "Dwarven Toughness",
+    "effects.5.name": "Stonecunning"
+  },
+  "halfling": {
+    "_es": "dcca6dec",
+    "name": "Halfling",
+    "tagline": "Small, friendly, and lucky",
+    "effects.0.name": "Brave",
+    "effects.1.name": "Halfling Nimbleness",
+    "effects.2.name": "Luck",
+    "effects.3.name": "Naturally Stealthy"
+  },
+  "orc": {
+    "_es": "2780ab15",
+    "name": "Orc",
+    "tagline": "Relentless drive",
+    "effects.1.name": "Adrenaline Rush",
+    "effects.2.name": "Relentless Endurance"
+  },
+  "elf": {
+    "_es": "a482fd83",
+    "name": "Elf",
+    "tagline": "Graceful and keen-sensed",
+    "effects.1.name": "Fey Ancestry",
+    "effects.2.name": "Keen Senses",
+    "effects.3.name": "Trance",
+    "effects.4.name": "Elven Lineage"
+  },
+  "dragonborn": {
+    "_es": "3ca3b656",
+    "name": "Dragonborn",
+    "tagline": "Draconic heritage",
+    "effects.1.name": "Breath Weapon",
+    "effects.2.name": "Breath Weapon",
+    "effects.3.name": "Draconic Flight (level 5)"
+  },
+  "gnome": {
+    "_es": "aebff5c6",
+    "name": "Gnome",
+    "tagline": "Curious and clever",
+    "effects.1.name": "Gnomish Cunning",
+    "effects.2.name": "Gnomish Lineage"
+  },
+  "tiefling": {
+    "_es": "b2cefc76",
+    "name": "Tiefling",
+    "tagline": "Marked by an otherworldly legacy",
+    "effects.2.name": "Otherworldly Presence",
+    "effects.3.name": "Fiendish Legacy"
+  },
+  "goliath": {
+    "_es": "4d001c5a",
+    "name": "Goliath",
+    "tagline": "Giant blood",
+    "effects.0.name": "Powerful Build",
+    "effects.1.name": "Large Form (level 5)"
+  },
+  "aasimar": {
+    "_es": "341722b4",
+    "name": "Aasimar",
+    "tagline": "Touched by celestial light",
+    "effects.3.name": "Celestial Resistance",
+    "effects.4.name": "Healing Hands",
+    "effects.5.name": "Healing Hands",
+    "effects.6.name": "Light Bearer",
+    "effects.8.name": "Celestial Revelation (level 3)"
+  },
+  "changeling": {
+    "_es": "4e94905f",
+    "name": "Changeling",
+    "tagline": "Every face is a different life",
+    "effects.0.name": "Fey",
+    "effects.1.name": "Shifter Instincts",
+    "effects.2.name": "Shapechanger"
+  },
+  "kalashtar": {
+    "_es": "040c514f",
+    "name": "Kalashtar",
+    "tagline": "Two minds in one body",
+    "effects.1.name": "Aberration",
+    "effects.2.name": "Dual Mind",
+    "effects.3.name": "Mental Discipline",
+    "effects.4.name": "Mind Link",
+    "effects.5.name": "Dreamless"
+  },
+  "khoravar": {
+    "_es": "829a58af",
+    "name": "Khoravar",
+    "tagline": "Children of Khorvaire, the bridge between",
+    "effects.1.name": "Humanoid",
+    "effects.2.name": "Fey Ancestry",
+    "effects.3.name": "Fey Gift",
+    "effects.5.name": "Sleep Resistance",
+    "effects.6.name": "Skill Versatility",
+    "effects.7.name": "Skill Versatility"
+  },
+  "shifter": {
+    "_es": "deaa1eca",
+    "name": "Shifter",
+    "tagline": "The beast within, just beneath the skin",
+    "effects.1.name": "Humanoid",
+    "effects.2.name": "Beast Instincts",
+    "effects.3.name": "Transformation",
+    "effects.4.name": "Transformation",
+    "effects.5.name": "Bestial Nature"
+  },
+  "warforged": {
+    "_es": "736bb432",
+    "name": "Warforged",
+    "tagline": "Made for war, alive by accident",
+    "effects.2.name": "Construct",
+    "effects.3.name": "Constructed Resilience",
+    "effects.4.name": "Integrated Protection",
+    "effects.5.name": "Sentinel's Rest",
+    "effects.6.name": "Specialized Design: tool",
+    "effects.7.name": "Specialized Design",
+    "effects.8.name": "Tireless"
+  }
+}

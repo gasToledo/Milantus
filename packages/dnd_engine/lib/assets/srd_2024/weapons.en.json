@@ -1,0 +1,154 @@
+{
+  "club": {
+    "_es": "4d7e19e0",
+    "name": "Club"
+  },
+  "dagger": {
+    "_es": "8930c413",
+    "name": "Dagger"
+  },
+  "greatclub": {
+    "_es": "b831253f",
+    "name": "Greatclub"
+  },
+  "handaxe": {
+    "_es": "2d857e47",
+    "name": "Handaxe"
+  },
+  "javelin": {
+    "_es": "bd0005f8",
+    "name": "Javelin"
+  },
+  "light-hammer": {
+    "_es": "8d2757e6",
+    "name": "Light Hammer"
+  },
+  "mace": {
+    "_es": "e9213ab3",
+    "name": "Mace"
+  },
+  "quarterstaff": {
+    "_es": "a1ca09db",
+    "name": "Quarterstaff"
+  },
+  "sickle": {
+    "_es": "56d96651",
+    "name": "Sickle"
+  },
+  "spear": {
+    "_es": "b06027c4",
+    "name": "Spear"
+  },
+  "dart": {
+    "_es": "8760aec0",
+    "name": "Dart"
+  },
+  "light-crossbow": {
+    "_es": "bdbfe9ea",
+    "name": "Light Crossbow"
+  },
+  "shortbow": {
+    "_es": "e2881a72",
+    "name": "Shortbow"
+  },
+  "sling": {
+    "_es": "049b25f8",
+    "name": "Sling"
+  },
+  "battleaxe": {
+    "_es": "cc00f38b",
+    "name": "Battleaxe"
+  },
+  "flail": {
+    "_es": "1ebc4fa5",
+    "name": "Flail"
+  },
+  "glaive": {
+    "_es": "075f9795",
+    "name": "Glaive"
+  },
+  "greataxe": {
+    "_es": "35b82cd5",
+    "name": "Greataxe"
+  },
+  "greatsword": {
+    "_es": "a5b9c858",
+    "name": "Greatsword"
+  },
+  "halberd": {
+    "_es": "5bf88eac",
+    "name": "Halberd"
+  },
+  "lance": {
+    "_es": "7e7ec017",
+    "name": "Lance"
+  },
+  "longsword": {
+    "_es": "51f48f33",
+    "name": "Longsword"
+  },
+  "maul": {
+    "_es": "05125c3d",
+    "name": "Maul"
+  },
+  "morningstar": {
+    "_es": "1aedcc3b",
+    "name": "Morningstar"
+  },
+  "pike": {
+    "_es": "c431c133",
+    "name": "Pike"
+  },
+  "rapier": {
+    "_es": "482399d0",
+    "name": "Rapier"
+  },
+  "scimitar": {
+    "_es": "f52aecd6",
+    "name": "Scimitar"
+  },
+  "shortsword": {
+    "_es": "a0dc0aab",
+    "name": "Shortsword"
+  },
+  "trident": {
+    "_es": "e5b615cf",
+    "name": "Trident"
+  },
+  "war-pick": {
+    "_es": "709a5e8c",
+    "name": "War Pick"
+  },
+  "warhammer": {
+    "_es": "a17b7887",
+    "name": "Warhammer"
+  },
+  "whip": {
+    "_es": "b560a620",
+    "name": "Whip"
+  },
+  "hand-crossbow": {
+    "_es": "b60cb4e8",
+    "name": "Hand Crossbow"
+  },
+  "heavy-crossbow": {
+    "_es": "9011216c",
+    "name": "Heavy Crossbow"
+  },
+  "longbow": {
+    "_es": "b0ed581a",
+    "name": "Longbow"
+  },
+  "blowgun": {
+    "_es": "7d418e61",
+    "name": "Blowgun"
+  },
+  "musket": {
+    "_es": "2052c519",
+    "name": "Musket"
+  },
+  "pistol": {
+    "_es": "714532f8",
+    "name": "Pistol"
+  }
+}

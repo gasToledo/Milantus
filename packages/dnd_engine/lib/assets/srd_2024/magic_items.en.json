@@ -1,0 +1,1046 @@
+{
+  "abalorio-de-nutricion": {
+    "_es": "eb939391",
+    "name": "Bead of Nourishment"
+  },
+  "abanico-del-viento": {
+    "_es": "7b0e31b3",
+    "name": "Wind Fan"
+  },
+  "aceite-de-afilado": {
+    "_es": "4eaf4d2a",
+    "name": "Oil of Sharpness"
+  },
+  "aceite-de-etereidad": {
+    "_es": "81cc4c15",
+    "name": "Oil of Etherealness"
+  },
+  "aceite-escurridizo": {
+    "_es": "2446ae5c",
+    "name": "Oil of Slipperiness"
+  },
+  "agujero-portatil": {
+    "_es": "2533cb86",
+    "name": "Portable Hole"
+  },
+  "alas-de-vuelo": {
+    "_es": "a5e6955d",
+    "name": "Wings of Flying"
+  },
+  "alfombra-voladora": {
+    "_es": "b2dc0636",
+    "name": "Carpet of Flying"
+  },
+  "aljaba-eficiente": {
+    "_es": "8650c3db",
+    "name": "Efficient Quiver"
+  },
+  "amuleto-a-prueba-de-deteccion-y-localizacion": {
+    "_es": "c5eccb7b",
+    "name": "Amulet of Proof against Detection and Location"
+  },
+  "amuleto-de-los-planos": {
+    "_es": "ac7c15e1",
+    "name": "Amulet of the Planes"
+  },
+  "amuleto-de-salud": {
+    "_es": "e9e02adf",
+    "name": "Amulet of Health"
+  },
+  "anillo-de-almacenamiento-de-conjuros": {
+    "_es": "29f4bd80",
+    "name": "Ring of Spell Storing"
+  },
+  "anillo-de-caida-de-pluma": {
+    "_es": "d5d9bd06",
+    "name": "Ring of Feather Falling"
+  },
+  "anillo-de-calidez": {
+    "_es": "e52c5d2e",
+    "name": "Ring of Warmth"
+  },
+  "anillo-de-caminar-sobre-las-aguas": {
+    "_es": "a9b10517",
+    "name": "Ring of Water Walking"
+  },
+  "anillo-de-comandar-elementales": {
+    "_es": "63ec0df0",
+    "name": "Ring of Elemental Command"
+  },
+  "anillo-de-escudo-mental": {
+    "_es": "7ddc1fee",
+    "name": "Ring of Mind Shielding"
+  },
+  "anillo-de-estrellas-fugaces": {
+    "_es": "be733655",
+    "name": "Ring of Shooting Stars"
+  },
+  "anillo-de-evasion": {
+    "_es": "99dbc6e5",
+    "name": "Ring of Evasion"
+  },
+  "anillo-de-influencia-animal": {
+    "_es": "2f968d62",
+    "name": "Ring of Animal Influence"
+  },
+  "anillo-de-invisibilidad": {
+    "_es": "c659e7a7",
+    "name": "Ring of Invisibility"
+  },
+  "anillo-de-invocar-djinns": {
+    "_es": "bf1fe9a4",
+    "name": "Ring of Djinni Summoning"
+  },
+  "anillo-de-libertad-de-accion": {
+    "_es": "61d14c4b",
+    "name": "Ring of Free Action"
+  },
+  "anillo-de-los-tres-deseos": {
+    "_es": "d78261cf",
+    "name": "Ring of Three Wishes"
+  },
+  "anillo-de-natacion": {
+    "_es": "2aec10b1",
+    "name": "Ring of Swimming"
+  },
+  "anillo-de-proteccion": {
+    "_es": "8bec285c",
+    "name": "Ring of Protection"
+  },
+  "anillo-de-regeneracion": {
+    "_es": "613ca3c4",
+    "name": "Ring of Regeneration"
+  },
+  "anillo-de-resistencia": {
+    "_es": "a1fbf434",
+    "name": "Ring of Resistance"
+  },
+  "anillo-de-retorno-de-conjuros": {
+    "_es": "5b05a269",
+    "name": "Ring of Spell Turning"
+  },
+  "anillo-de-salto": {
+    "_es": "814b26e7",
+    "name": "Ring of Jumping"
+  },
+  "anillo-de-telequinesis": {
+    "_es": "6d703ceb",
+    "name": "Ring of Telekinesis"
+  },
+  "anillo-de-vision-de-rayos-x": {
+    "_es": "de86cc2b",
+    "name": "Ring of X-ray Vision"
+  },
+  "anillo-del-carnero": {
+    "_es": "50954aa4",
+    "name": "Ring of the Ram"
+  },
+  "anteojos-de-encantamiento": {
+    "_es": "385abdb0",
+    "name": "Eyes of Charming"
+  },
+  "anteojos-de-la-noche": {
+    "_es": "0e2596f4",
+    "name": "Goggles of Night"
+  },
+  "anteojos-de-vision-minuciosa": {
+    "_es": "2a4724d8",
+    "name": "Eyes of Minute Seeing"
+  },
+  "anteojos-de-vista-de-aguila": {
+    "_es": "9542998b",
+    "name": "Eyes of the Eagle"
+  },
+  "aparato-del-crustaceo": {
+    "_es": "fdc749e0",
+    "name": "Apparatus of the Crab"
+  },
+  "arco-de-energia": {
+    "_es": "68851bdf",
+    "name": "Energy Bow"
+  },
+  "arco-juramentado": {
+    "_es": "f25958c3",
+    "name": "Oathbow"
+  },
+  "arma-1": {
+    "_es": "bd2bcadb",
+    "name": "+1 Weapon"
+  },
+  "arma-2": {
+    "_es": "4b245ba0",
+    "name": "+2 Weapon"
+  },
+  "arma-3": {
+    "_es": "7126d609",
+    "name": "+3 Weapon"
+  },
+  "arma-de-advertencia": {
+    "_es": "3b970a52",
+    "name": "Weapon of Warning"
+  },
+  "arma-feroz": {
+    "_es": "9533d84d",
+    "name": "Vicious Weapon"
+  },
+  "armadura-1": {
+    "_es": "5ac04e91",
+    "name": "+1 Armor"
+  },
+  "armadura-2": {
+    "_es": "80c2c8fa",
+    "name": "+2 Armor"
+  },
+  "armadura-3": {
+    "_es": "a6c54363",
+    "name": "+3 Armor"
+  },
+  "armadura-adamantina": {
+    "_es": "95a7b5fb",
+    "name": "Adamantine Armor"
+  },
+  "armadura-de-invulnerabilidad": {
+    "_es": "27861b3b",
+    "name": "Armor of Invulnerability"
+  },
+  "armadura-de-mithral": {
+    "_es": "f5f92083",
+    "name": "Mithral Armor"
+  },
+  "armadura-de-placas-de-etereidad": {
+    "_es": "def61fc6",
+    "name": "Plate Armor of Etherealness"
+  },
+  "armadura-de-placas-enana": {
+    "_es": "4a56f3e5",
+    "name": "Dwarven Plate"
+  },
+  "armadura-de-resistencia": {
+    "_es": "5d12f08c",
+    "name": "Armor of Resistance"
+  },
+  "armadura-de-vulnerabilidad": {
+    "_es": "8b838eee",
+    "name": "Armor of Vulnerability"
+  },
+  "armadura-demoniaca": {
+    "_es": "381c5e04",
+    "name": "Demon Armor"
+  },
+  "babuchas-de-trepar-cual-aracnido": {
+    "_es": "c9d759e4",
+    "name": "Slippers of Spider Climbing"
+  },
+  "bandas-de-hierro": {
+    "_es": "7e6345a1",
+    "name": "Iron Bands"
+  },
+  "baraja-de-ilusiones": {
+    "_es": "e23ea035",
+    "name": "Deck of Illusions"
+  },
+  "baraja-misteriosa": {
+    "_es": "e86317f9",
+    "name": "Deck of Many Things"
+  },
+  "baston-de-acrobata": {
+    "_es": "38f66b93",
+    "name": "Quarterstaff of the Acrobat"
+  },
+  "baston-de-curacion": {
+    "_es": "35e8eba4",
+    "name": "Staff of Healing"
+  },
+  "baston-de-enjambre-de-insectos": {
+    "_es": "813c3f09",
+    "name": "Staff of Swarming Insects"
+  },
+  "baston-de-escarcha": {
+    "_es": "4e8cef50",
+    "name": "Staff of Frost"
+  },
+  "baston-de-fuego": {
+    "_es": "562687f2",
+    "name": "Staff of Fire"
+  },
+  "baston-de-impacto": {
+    "_es": "92eceb5d",
+    "name": "Staff of Striking"
+  },
+  "baston-de-la-piton": {
+    "_es": "9e59e855",
+    "name": "Staff of the Python"
+  },
+  "baston-de-los-bosques": {
+    "_es": "272e2990",
+    "name": "Staff of the Woodlands"
+  },
+  "baston-de-los-magos": {
+    "_es": "b7baad01",
+    "name": "Staff of the Magi"
+  },
+  "baston-de-marchitamiento": {
+    "_es": "7a200c57",
+    "name": "Staff of Withering"
+  },
+  "baston-de-poder": {
+    "_es": "fe33eed0",
+    "name": "Staff of Power"
+  },
+  "baston-de-truenos-y-relampagos": {
+    "_es": "b9f48254",
+    "name": "Staff of Thunder and Lightning"
+  },
+  "baston-del-cautivador": {
+    "_es": "e802ac5e",
+    "name": "Staff of Charming"
+  },
+  "bola-de-cristal": {
+    "_es": "f168bd41",
+    "name": "Crystal Ball"
+  },
+  "bola-de-cristal-de-leer-mentes": {
+    "_es": "35acef66",
+    "name": "Crystal Ball of Mind Reading"
+  },
+  "bola-de-cristal-de-telepatia": {
+    "_es": "73dad013",
+    "name": "Crystal Ball of Telepathy"
+  },
+  "bola-de-cristal-de-vision-veraz": {
+    "_es": "ca46c7dc",
+    "name": "Crystal Ball of True Seeing"
+  },
+  "bolsa-de-contencion": {
+    "_es": "8273cf90",
+    "name": "Bag of Holding"
+  },
+  "bolsa-de-judias": {
+    "_es": "11a09bc4",
+    "name": "Bag of Beans"
+  },
+  "bolsa-de-trucos": {
+    "_es": "7fe52c62",
+    "name": "Bag of Tricks"
+  },
+  "bolsa-devoradora": {
+    "_es": "95361f8c",
+    "name": "Bag of Devouring"
+  },
+  "botas-aladas": {
+    "_es": "f0b81c67",
+    "name": "Winged Boots"
+  },
+  "botas-de-las-tierras-invernales": {
+    "_es": "96c2cae1",
+    "name": "Boots of the Winterlands"
+  },
+  "botas-de-levitacion": {
+    "_es": "0655f506",
+    "name": "Boots of Levitation"
+  },
+  "botas-de-velocidad": {
+    "_es": "307505d1",
+    "name": "Boots of Speed"
+  },
+  "botas-de-zancadas-y-brincos": {
+    "_es": "54c198bc",
+    "name": "Boots of Striding and Springing"
+  },
+  "botas-elficas": {
+    "_es": "4949cfee",
+    "name": "Boots of Elvenkind"
+  },
+  "botella-de-ifrit": {
+    "_es": "ee79be26",
+    "name": "Efreeti Bottle"
+  },
+  "botella-siemprehumeante": {
+    "_es": "e0cdbd75",
+    "name": "Eversmoking Bottle"
+  },
+  "bote-plegable": {
+    "_es": "60e7879e",
+    "name": "Folding Boat"
+  },
+  "brasero-para-controlar-elementales-de-fuego": {
+    "_es": "e4605adc",
+    "name": "Brazier of Commanding Fire Elementals"
+  },
+  "brazales-de-arqueria": {
+    "_es": "e79998f3",
+    "name": "Bracers of Archery"
+  },
+  "brazales-de-defensa": {
+    "_es": "4500ba15",
+    "name": "Bracers of Defense"
+  },
+  "broche-escudo": {
+    "_es": "582919b8",
+    "name": "Brooch of Shielding"
+  },
+  "canica-de-fuerza": {
+    "_es": "e7eff33f",
+    "name": "Bead of Force"
+  },
+  "capa-aracnida": {
+    "_es": "46298f32",
+    "name": "Cloak of Arachnida"
+  },
+  "capa-de-desplazamiento": {
+    "_es": "5ad809d6",
+    "name": "Cloak of Displacement"
+  },
+  "capa-de-invisibilidad": {
+    "_es": "7b5ac897",
+    "name": "Cloak of Invisibility"
+  },
+  "capa-de-la-mantarraya": {
+    "_es": "c62ea8b3",
+    "name": "Cloak of the Manta Ray"
+  },
+  "capa-de-murcielago": {
+    "_es": "4cac095a",
+    "name": "Cloak of the Bat"
+  },
+  "capa-de-proteccion": {
+    "_es": "711924ec",
+    "name": "Cloak of Protection"
+  },
+  "capa-del-charlatan": {
+    "_es": "841e71ce",
+    "name": "Cape of the Mountebank"
+  },
+  "capa-elfica": {
+    "_es": "0af9aae9",
+    "name": "Cloak of Elvenkind"
+  },
+  "carillon-de-apertura": {
+    "_es": "e55bbb6d",
+    "name": "Chime of Opening"
+  },
+  "cimitarra-de-velocidad": {
+    "_es": "cf3116b0",
+    "name": "Scimitar of Speed"
+  },
+  "cinturon-de-fuerza-de-gigante": {
+    "_es": "acea9c96",
+    "name": "Belt of Giant Strength"
+  },
+  "cinturon-enano": {
+    "_es": "68131dd1",
+    "name": "Belt of Dwarvenkind"
+  },
+  "colgante-de-inmunidad-al-veneno": {
+    "_es": "6cf83e73",
+    "name": "Periapt of Proof against Poison"
+  },
+  "collar-de-adaptacion": {
+    "_es": "4a063314",
+    "name": "Necklace of Adaptation"
+  },
+  "collar-de-bolas-de-fuego": {
+    "_es": "0febb5c8",
+    "name": "Necklace of Fireballs"
+  },
+  "collar-de-plegarias": {
+    "_es": "492be21c",
+    "name": "Necklace of Prayer Beads"
+  },
+  "cota-de-escamas-de-dragon": {
+    "_es": "20df3b8d",
+    "name": "Dragon Scale Mail"
+  },
+  "cubo-de-fuerza": {
+    "_es": "fa76ab49",
+    "name": "Cube of Force"
+  },
+  "cuenco-para-controlar-elementales-de-agua": {
+    "_es": "f1141861",
+    "name": "Bowl of Commanding Water Elementals"
+  },
+  "cuerda-de-escalada": {
+    "_es": "c6776175",
+    "name": "Rope of Climbing"
+  },
+  "cuerda-enredadora": {
+    "_es": "cf47c0fd",
+    "name": "Rope of Entanglement"
+  },
+  "cuerno-de-estallido": {
+    "_es": "a790fa36",
+    "name": "Horn of Blasting"
+  },
+  "cuerno-del-valhalla": {
+    "_es": "f84b6e96",
+    "name": "Horn of Valhalla"
+  },
+  "cuero-tachonado-encantado": {
+    "_es": "65994ea2",
+    "name": "Glamoured Studded Leather"
+  },
+  "daga-de-la-ponzona": {
+    "_es": "bae7a295",
+    "name": "Dagger of Venom"
+  },
+  "decantador-de-agua-interminable": {
+    "_es": "94c689ca",
+    "name": "Decanter of Endless Water"
+  },
+  "defensora": {
+    "_es": "4cc83397",
+    "name": "Defender"
+  },
+  "diadema-de-estallidos": {
+    "_es": "a45e6e78",
+    "name": "Circlet of Blasting"
+  },
+  "diadema-de-intelecto": {
+    "_es": "4a49dc1f",
+    "name": "Headband of Intellect"
+  },
+  "disolvente-universal": {
+    "_es": "60be81b4",
+    "name": "Universal Solvent"
+  },
+  "elixir-de-salud": {
+    "_es": "a6b1fa87",
+    "name": "Elixir of Health"
+  },
+  "escarabajo-protector": {
+    "_es": "55521bc1",
+    "name": "Scarab of Protection"
+  },
+  "escoba-voladora": {
+    "_es": "caadb7b9",
+    "name": "Broom of Flying"
+  },
+  "escudo-1": {
+    "_es": "060e5c33",
+    "name": "+1 Shield"
+  },
+  "escudo-2": {
+    "_es": "9406ecf8",
+    "name": "+2 Shield"
+  },
+  "escudo-3": {
+    "_es": "ba096761",
+    "name": "+3 Shield"
+  },
+  "escudo-animado": {
+    "_es": "97e2e75a",
+    "name": "Animated Shield"
+  },
+  "escudo-atrapaflechas": {
+    "_es": "eff0b4dc",
+    "name": "Arrow-Catching Shield"
+  },
+  "escudo-centinela": {
+    "_es": "f954841c",
+    "name": "Sentinel Shield"
+  },
+  "escudo-de-atraer-proyectiles": {
+    "_es": "e702714a",
+    "name": "Shield of Missile Attraction"
+  },
+  "escudo-de-caballero": {
+    "_es": "aeedad1f",
+    "name": "Shield of the Cavalier"
+  },
+  "escudo-de-guarda-contra-conjuros": {
+    "_es": "3974c81a",
+    "name": "Spellguard Shield"
+  },
+  "esfera-de-aniquilacion": {
+    "_es": "3dcd4bfe",
+    "name": "Sphere of Annihilation"
+  },
+  "espada-danzarina": {
+    "_es": "26d97d8c",
+    "name": "Dancing Sword"
+  },
+  "espada-de-hoja-afilada": {
+    "_es": "72a525b7",
+    "name": "Sword of Sharpness"
+  },
+  "espada-hiriente": {
+    "_es": "8b391b8c",
+    "name": "Sword of Wounding"
+  },
+  "espada-ladrona-de-vida": {
+    "_es": "1f4d7f26",
+    "name": "Sword of Life Stealing"
+  },
+  "espada-solar": {
+    "_es": "bd7bdbf1",
+    "name": "Sun Blade"
+  },
+  "espada-vorpal": {
+    "_es": "2beab57a",
+    "name": "Vorpal Sword"
+  },
+  "espejo-atrapavidas": {
+    "_es": "d0053288",
+    "name": "Mirror of Life Trapping"
+  },
+  "estatuilla-de-poder-maravilloso": {
+    "_es": "959f8a36",
+    "name": "Figurine of Wondrous Power"
+  },
+  "ficha-de-pluma": {
+    "_es": "508cd021",
+    "name": "Feather Token"
+  },
+  "filo-de-la-fortuna": {
+    "_es": "b3120aeb",
+    "name": "Luck Blade"
+  },
+  "filtro-de-amor": {
+    "_es": "c759b6aa",
+    "name": "Philter of Love"
+  },
+  "flauta-de-la-aparicion": {
+    "_es": "815b14f9",
+    "name": "Pipes of Haunting"
+  },
+  "flauta-de-las-cloacas": {
+    "_es": "305c6bd4",
+    "name": "Pipes of the Sewers"
+  },
+  "fortaleza-instantanea": {
+    "_es": "44933580",
+    "name": "Instant Fortress"
+  },
+  "frasco-de-hierro": {
+    "_es": "350005c6",
+    "name": "Iron Flask"
+  },
+  "garrote-grande-atronador": {
+    "_es": "1b0f56e7",
+    "name": "Thunderous Greatclub"
+  },
+  "gema-del-resplandor": {
+    "_es": "9476b8e3",
+    "name": "Gem of Brightness"
+  },
+  "gema-de-vision": {
+    "_es": "ca24519b",
+    "name": "Gem of Seeing"
+  },
+  "gema-elemental": {
+    "_es": "f12bcc47",
+    "name": "Elemental Gem"
+  },
+  "grilletes-dimensionales": {
+    "_es": "5548307e",
+    "name": "Dimensional Shackles"
+  },
+  "guanteletes-de-fuerza-de-ogro": {
+    "_es": "fc686013",
+    "name": "Gauntlets of Ogre Power"
+  },
+  "guantes-atrapaflechas": {
+    "_es": "c00741f4",
+    "name": "Gloves of Missile Snaring"
+  },
+  "guantes-de-ladron": {
+    "_es": "4a6f761e",
+    "name": "Gloves of Thievery"
+  },
+  "guantes-de-natacion-y-escalada": {
+    "_es": "12a5d38a",
+    "name": "Gloves of Swimming and Climbing"
+  },
+  "hacha-berserker": {
+    "_es": "0d5b9e6c",
+    "name": "Berserker Axe"
+  },
+  "herraduras-de-velocidad": {
+    "_es": "54ed0271",
+    "name": "Horseshoes of Speed"
+  },
+  "herraduras-del-cefiro": {
+    "_es": "419d2410",
+    "name": "Horseshoes of a Zephyr"
+  },
+  "hierro-de-escarcha": {
+    "_es": "de6d7bf0",
+    "name": "Frost Brand"
+  },
+  "incensario-de-controlar-elementales-de-aire": {
+    "_es": "1f1efa7b",
+    "name": "Censer of Controlling Air Elementals"
+  },
+  "jabalina-del-relampago": {
+    "_es": "7a976143",
+    "name": "Javelin of Lightning"
+  },
+  "ladrona-de-nueve-vidas": {
+    "_es": "3ce950f6",
+    "name": "Nine Lives Stealer"
+  },
+  "lengua-de-fuego": {
+    "_es": "e4278f9b",
+    "name": "Flame Tongue"
+  },
+  "linterna-de-revelacion": {
+    "_es": "a9ac11da",
+    "name": "Lantern of Revealing"
+  },
+  "malla-elfica": {
+    "_es": "f7160ab7",
+    "name": "Elven Chain"
+  },
+  "manto-de-resistencia-a-conjuros": {
+    "_es": "ad285b4c",
+    "name": "Mantle of Spell Resistance"
+  },
+  "manual-de-golems": {
+    "_es": "eb6de298",
+    "name": "Manual of Golems"
+  },
+  "manual-de-la-salud-corporal": {
+    "_es": "2f2b7473",
+    "name": "Manual of Bodily Health"
+  },
+  "manual-de-rapidez-de-accion": {
+    "_es": "958e2642",
+    "name": "Manual of Quickness of Action"
+  },
+  "manual-del-ejercicio-beneficioso": {
+    "_es": "ea12b520",
+    "name": "Manual of Gainful Exercise"
+  },
+  "martillo-arrojadizo-enano": {
+    "_es": "27de822e",
+    "name": "Dwarven Thrower"
+  },
+  "martillo-de-rayos": {
+    "_es": "2649d8ad",
+    "name": "Hammer of Thunderbolts"
+  },
+  "matadragones": {
+    "_es": "fdde1bd8",
+    "name": "Dragon Slayer"
+  },
+  "matagigantes": {
+    "_es": "e1e11b47",
+    "name": "Giant Slayer"
+  },
+  "maza-castigadora": {
+    "_es": "62507a55",
+    "name": "Mace of Smiting"
+  },
+  "maza-del-terror": {
+    "_es": "23f4137a",
+    "name": "Mace of Terror"
+  },
+  "maza-disruptiva": {
+    "_es": "2b30849a",
+    "name": "Mace of Disruption"
+  },
+  "medallon-de-los-pensamientos": {
+    "_es": "25411177",
+    "name": "Medallion of Thoughts"
+  },
+  "morral-practico": {
+    "_es": "d0ff44ca",
+    "name": "Handy Haversack"
+  },
+  "municion-1": {
+    "_es": "24443a8c",
+    "name": "+1 Ammunition"
+  },
+  "municion-2": {
+    "_es": "964ba9c7",
+    "name": "+2 Ammunition"
+  },
+  "municion-3": {
+    "_es": "70492f5e",
+    "name": "+3 Ammunition"
+  },
+  "municion-asesina": {
+    "_es": "28aab8ce",
+    "name": "Ammunition of Slaying"
+  },
+  "orbe-dragontino": {
+    "_es": "357a0497",
+    "name": "Dragon Orb"
+  },
+  "pegamento-soberano": {
+    "_es": "6d1a918d",
+    "name": "Sovereign Glue"
+  },
+  "pergamino-de-conjuro": {
+    "_es": "b611e997",
+    "name": "Spell Scroll"
+  },
+  "perla-de-poder": {
+    "_es": "0f10f4c7",
+    "name": "Pearl of Power"
+  },
+  "piedra-de-controlar-elementales-de-tierra": {
+    "_es": "50020a11",
+    "name": "Stone of Controlling Earth Elementals"
+  },
+  "piedra-de-la-buena-fortuna-piedra-de-la-suerte": {
+    "_es": "7d26593f",
+    "name": "Stone of Good Luck (Luckstone)"
+  },
+  "piedra-ioun": {
+    "_es": "42e9d184",
+    "name": "Ioun Stone"
+  },
+  "piedras-mensajeras": {
+    "_es": "cf349475",
+    "name": "Sending Stones"
+  },
+  "pigmentos-maravillosos": {
+    "_es": "5510fbda",
+    "name": "Marvelous Pigments"
+  },
+  "pocion-de-amistad-animal": {
+    "_es": "3cb89fde",
+    "name": "Potion of Animal Friendship"
+  },
+  "pocion-de-clarividencia": {
+    "_es": "b76d02f3",
+    "name": "Potion of Clairvoyance"
+  },
+  "pocion-de-crecimiento": {
+    "_es": "eea36c47",
+    "name": "Potion of Growth"
+  },
+  "pocion-de-encoger": {
+    "_es": "01f61548",
+    "name": "Potion of Diminution"
+  },
+  "pocion-de-forma-gaseosa": {
+    "_es": "dd99300b",
+    "name": "Potion of Gaseous Form"
+  },
+  "pocion-de-fuerza-de-gigante": {
+    "_es": "7edd2c4e",
+    "name": "Potion of Giant Strength"
+  },
+  "pocion-de-heroismo": {
+    "_es": "853fab71",
+    "name": "Potion of Heroism"
+  },
+  "pocion-de-invisibilidad": {
+    "_es": "9055c1d0",
+    "name": "Potion of Invisibility"
+  },
+  "pocion-de-invulnerabilidad": {
+    "_es": "9138e82e",
+    "name": "Potion of Invulnerability"
+  },
+  "pocion-de-leer-mentes": {
+    "_es": "eede378b",
+    "name": "Potion of Mind Reading"
+  },
+  "pocion-de-longevidad": {
+    "_es": "cb3b0166",
+    "name": "Potion of Longevity"
+  },
+  "pocion-de-resistencia": {
+    "_es": "46c1fcb3",
+    "name": "Potion of Resistance"
+  },
+  "pocion-de-respirar-bajo-el-agua": {
+    "_es": "e3011d0c",
+    "name": "Potion of Water Breathing"
+  },
+  "pocion-de-trepar": {
+    "_es": "0754d149",
+    "name": "Potion of Climbing"
+  },
+  "pocion-de-velocidad": {
+    "_es": "bad5e4a8",
+    "name": "Potion of Speed"
+  },
+  "pocion-de-veneno": {
+    "_es": "3ea5486c",
+    "name": "Potion of Poison"
+  },
+  "pocion-de-vitalidad": {
+    "_es": "f5c4b0e5",
+    "name": "Potion of Vitality"
+  },
+  "pocion-de-vuelo": {
+    "_es": "98b16258",
+    "name": "Potion of Flying"
+  },
+  "pociones-de-curacion": {
+    "_es": "700c8bb5",
+    "name": "Potions of Healing"
+  },
+  "polvo-de-desaparicion": {
+    "_es": "a4f9ef7d",
+    "name": "Dust of Disappearance"
+  },
+  "polvo-de-estornudar-y-atragantarse": {
+    "_es": "3f264318",
+    "name": "Dust of Sneezing and Choking"
+  },
+  "polvo-de-sequedad": {
+    "_es": "1b57f96b",
+    "name": "Dust of Dryness"
+  },
+  "portal-cubico": {
+    "_es": "f2455f96",
+    "name": "Cubic Gate"
+  },
+  "pozo-de-los-muchos-mundos": {
+    "_es": "33ea62ae",
+    "name": "Well of Many Worlds"
+  },
+  "sombrero-de-disfraz": {
+    "_es": "a9439979",
+    "name": "Hat of Disguise"
+  },
+  "sombrero-de-multiples-conjuros": {
+    "_es": "c618dd7b",
+    "name": "Hat of Many Spells"
+  },
+  "talisman-de-cerrar-heridas": {
+    "_es": "5160590b",
+    "name": "Periapt of Wound Closure"
+  },
+  "talisman-de-la-esfera": {
+    "_es": "057030bb",
+    "name": "Talisman of the Sphere"
+  },
+  "talisman-de-salud": {
+    "_es": "3e9c75cb",
+    "name": "Periapt of Health"
+  },
+  "talisman-del-bien-puro": {
+    "_es": "0c3d4702",
+    "name": "Talisman of Pure Good"
+  },
+  "talisman-del-mal-definitivo": {
+    "_es": "5b8e9357",
+    "name": "Talisman of Ultimate Evil"
+  },
+  "tomo-de-entendimiento": {
+    "_es": "55cddda5",
+    "name": "Tome of Understanding"
+  },
+  "tomo-de-liderazgo-e-influencia": {
+    "_es": "f110e460",
+    "name": "Tome of Leadership and Influence"
+  },
+  "tomo-de-pensamiento-claro": {
+    "_es": "a859d280",
+    "name": "Tome of Clear Thought"
+  },
+  "tridente-de-comandar-peces": {
+    "_es": "5b6374ab",
+    "name": "Trident of Fish Command"
+  },
+  "tunica-de-colores-hipnoticos": {
+    "_es": "8f5cd003",
+    "name": "Robe of Scintillating Colors"
+  },
+  "tunica-del-archimago": {
+    "_es": "1a106295",
+    "name": "Robe of the Archmagi"
+  },
+  "tunica-de-las-estrellas": {
+    "_es": "03b9f5ab",
+    "name": "Robe of Stars"
+  },
+  "tunica-de-los-ojos": {
+    "_es": "410ece5f",
+    "name": "Robe of Eyes"
+  },
+  "tunica-de-objetos-utiles": {
+    "_es": "85065353",
+    "name": "Robe of Useful Items"
+  },
+  "varita-de-atadura": {
+    "_es": "fcc1df56",
+    "name": "Wand of Binding"
+  },
+  "varita-de-bolas-de-fuego": {
+    "_es": "ed635ea6",
+    "name": "Wand of Fireballs"
+  },
+  "varita-de-deteccion-magica": {
+    "_es": "c049bd76",
+    "name": "Wand of Magic Detection"
+  },
+  "varita-de-detectar-enemigos": {
+    "_es": "f4d76ac1",
+    "name": "Wand of Enemy Detection"
+  },
+  "varita-de-las-maravillas": {
+    "_es": "b28d9036",
+    "name": "Wand of Wonder"
+  },
+  "varita-de-paralisis": {
+    "_es": "f8473a5a",
+    "name": "Wand of Paralysis"
+  },
+  "varita-de-polimorfar": {
+    "_es": "19bb2dab",
+    "name": "Wand of Polymorph"
+  },
+  "varita-de-proyectiles-magicos": {
+    "_es": "e16ed556",
+    "name": "Wand of Magic Missiles"
+  },
+  "varita-de-relampagos": {
+    "_es": "ad08754b",
+    "name": "Wand of Lightning Bolts"
+  },
+  "varita-de-secretos": {
+    "_es": "3ab3f902",
+    "name": "Wand of Secrets"
+  },
+  "varita-de-telarana": {
+    "_es": "647d3111",
+    "name": "Wand of Web"
+  },
+  "varita-del-mago-de-guerra-1": {
+    "_es": "428bbe97",
+    "name": "+1 Wand of the War Mage"
+  },
+  "varita-del-mago-de-guerra-2": {
+    "_es": "d0844f5c",
+    "name": "+2 Wand of the War Mage"
+  },
+  "varita-del-mago-de-guerra-3": {
+    "_es": "f686c9c5",
+    "name": "+3 Wand of the War Mage"
+  },
+  "varita-del-terror": {
+    "_es": "b0928d72",
+    "name": "Wand of Fear"
+  },
+  "vela-de-invocacion": {
+    "_es": "6ed32cb4",
+    "name": "Candle of Invocation"
+  },
+  "vengadora-sagrada": {
+    "_es": "f3f2cd5c",
+    "name": "Holy Avenger"
+  },
+  "yelmo-de-entender-idiomas": {
+    "_es": "ab95d90c",
+    "name": "Helm of Comprehending Languages"
+  },
+  "yelmo-de-fulgor": {
+    "_es": "793b8698",
+    "name": "Helm of Brilliance"
+  },
+  "yelmo-de-telepatia": {
+    "_es": "ea1856c0",
+    "name": "Helm of Telepathy"
+  },
+  "yelmo-de-teletransporte": {
+    "_es": "ef3b619b",
+    "name": "Helm of Teleportation"
+  }
+}
