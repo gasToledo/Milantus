@@ -1594,7 +1594,7 @@
       {
         "level": 1,
         "name": "Lanzamiento de Conjuros",
-        "description": "Lanzás conjuros de Mago usando Inteligencia. Preparas conjuros de tu libro tras un descanso largo. Conocés 3 trucos a nivel 1.",
+        "description": "Lanzás conjuros de Mago usando Inteligencia. Preparás conjuros de tu libro tras un descanso largo. Conocés 3 trucos a nivel 1.",
         "effects": [
           {
             "type": "spellcasting",
@@ -1731,7 +1731,7 @@
           {
             "type": "passiveTrait",
             "name": "Libro de Conjuros",
-            "description": "Tu repertorio vive en tu libro de conjuros; preparas de ahí. Podés copiar conjuros de Mago que encuentres pagando tiempo y oro."
+            "description": "Tu repertorio vive en tu libro de conjuros; preparás de ahí. Podés copiar conjuros de Mago que encuentres pagando tiempo y oro."
           }
         ]
       },
@@ -1964,7 +1964,7 @@
       {
         "level": 1,
         "name": "Lanzamiento de Conjuros",
-        "description": "Lanzás conjuros de Clérigo usando Sabiduría; los preparas tras un descanso largo.",
+        "description": "Lanzás conjuros de Clérigo usando Sabiduría; los preparás tras un descanso largo.",
         "effects": [
           {
             "type": "spellcasting",
@@ -2267,7 +2267,7 @@
       {
         "level": 1,
         "name": "Lanzamiento de Conjuros",
-        "description": "Lanzás conjuros de Druida usando Sabiduría; los preparas tras un descanso largo.",
+        "description": "Lanzás conjuros de Druida usando Sabiduría; los preparás tras un descanso largo.",
         "effects": [
           {
             "type": "spellcasting",
@@ -2698,7 +2698,7 @@
       {
         "level": 1,
         "name": "Lanzamiento de Conjuros",
-        "description": "Lanzás conjuros de Bardo usando Carisma; los preparas tras un descanso largo.",
+        "description": "Lanzás conjuros de Bardo usando Carisma; los preparás tras un descanso largo.",
         "effects": [
           {
             "type": "spellcasting",
@@ -2953,7 +2953,7 @@
       {
         "level": 1,
         "name": "Lanzamiento de Conjuros",
-        "description": "Lanzás conjuros de Hechicero usando Carisma; los preparas de tu repertorio innato.",
+        "description": "Lanzás conjuros de Hechicero usando Carisma; los preparás de tu repertorio innato.",
         "effects": [
           {
             "type": "spellcasting",
@@ -3539,7 +3539,7 @@
       {
         "level": 1,
         "name": "Lanzamiento de Conjuros",
-        "description": "Lanzás conjuros de Paladín usando Carisma (semi-lanzador); los preparas tras un descanso largo.",
+        "description": "Lanzás conjuros de Paladín usando Carisma (semi-lanzador); los preparás tras un descanso largo.",
         "effects": [
           {
             "type": "spellcasting",
@@ -3902,7 +3902,7 @@
       {
         "level": 1,
         "name": "Lanzamiento de Conjuros",
-        "description": "Lanzás conjuros de Explorador usando Sabiduría (semi-lanzador); los preparas tras un descanso largo.",
+        "description": "Lanzás conjuros de Explorador usando Sabiduría (semi-lanzador); los preparás tras un descanso largo.",
         "effects": [
           {
             "type": "spellcasting",
@@ -4245,7 +4245,7 @@
       {
         "level": 1,
         "name": "Lanzamiento de Conjuros",
-        "description": "Lanzás conjuros de Artífice usando Inteligencia y un foco de conjuro (Herramientas de Ladrón, de Manitas u otras Herramientas de Artesano con las que tengas competencia). Preparas conjuros de nivel 1+ tras un descanso largo; conocés 2 trucos a nivel 1, y aprendés otro a niveles 10 y 14.",
+        "description": "Lanzás conjuros de Artífice usando Inteligencia y un foco de conjuro (Herramientas de Ladrón, de Manitas u otras Herramientas de Artesano con las que tengas competencia). Preparás conjuros de nivel 1+ tras un descanso largo; conocés 2 trucos a nivel 1, y aprendés otro a niveles 10 y 14.",
         "effects": [
           {
             "type": "spellcasting",

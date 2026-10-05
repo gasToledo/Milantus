@@ -667,7 +667,7 @@ void main() {
     // es un salto de línea escrito en el JSON.
     final tuteo = RegExp(
       r'(?<!(?<!\\)[\p{L}-])(puedes|tienes|debes|obtienes|recibes|sabes|eres|'
-      r'conoces|aprendes|tú|ti|podéis|tenéis|estéis)(?![\p{L}-])',
+      r'conoces|aprendes|preparas|tú|ti|podéis|tenéis|estéis)(?![\p{L}-])',
       caseSensitive: false,
       unicode: true,
     );
