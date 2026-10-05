@@ -208,6 +208,23 @@ void main() {
         ingles.characterClass(otro)!.name,
         espanol.characterClass(otro)!.name,
       );
+
+      // El cambio de idioma reemplaza el contenido en el mismo objeto, y la
+      // revisión avisa a quien memoizó algo compilado contra él.
+      final homebrew = ContentRepository(
+        spells: {
+          'hb': Spell.fromJson({...conjuro, 'id': 'hb', 'name': 'HB'})
+        },
+      );
+      espanol.addAll(homebrew);
+      final antes = espanol.revision;
+      espanol
+        ..replaceWith(ingles)
+        ..addAll(homebrew);
+      expect(espanol.spell(id)!.name, 'Translated');
+      expect(espanol.spell('hb')!.name, 'HB');
+      expect(espanol.spells.length, ingles.spells.length + 1);
+      expect(espanol.revision, greaterThan(antes));
     });
   });
 }

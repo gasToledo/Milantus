@@ -50,10 +50,46 @@ class AppLocaleController extends ValueNotifier<Locale> {
     setDocumentLanguage(value.languageCode);
   }
 
+  /// Lo que hay que preparar antes de mostrar el idioma nuevo: el arranque lo
+  /// usa para cargar el catálogo traducido (ver `main.dart`). Se espera
+  /// **antes** de cambiar [value] para que la interfaz y el contenido cambien
+  /// en el mismo cuadro, y no primero los rótulos y después los nombres.
+  Future<void> Function(Locale locale)? beforeChange;
+
+  Future<void> _pending = Future.value();
+
   /// Cambia el idioma, lo recuerda y actualiza `<html lang>`. Si el navegador
   /// bloquea el almacenamiento el cambio vale igual durante la sesión: lo único
   /// que se pierde es recordarlo.
-  void choose(Locale locale) {
+  ///
+  /// Los cambios se encadenan: elegir inglés y enseguida español, con el
+  /// inglés todavía cargando, termina en español con el contenido en español,
+  /// y no al revés según qué carga llegue última. Sin [beforeChange] el cambio
+  /// es inmediato.
+  Future<void> choose(Locale locale) {
+    if (beforeChange == null && _queued == 0) {
+      _set(locale);
+      return Future.value();
+    }
+    _queued++;
+    return _pending = _pending.then((_) async {
+      try {
+        if (locale != value) {
+          await beforeChange?.call(locale);
+        }
+      } catch (_) {
+        // Sin la traducción, el catálogo sigue en español, que es el respaldo;
+        // la interfaz cambia igual.
+      } finally {
+        _queued--;
+      }
+      _set(locale);
+    });
+  }
+
+  int _queued = 0;
+
+  void _set(Locale locale) {
     if (locale == value) return;
     value = locale;
     setDocumentLanguage(locale.languageCode);

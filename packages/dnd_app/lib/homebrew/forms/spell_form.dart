@@ -30,7 +30,7 @@ Map<String, String> _spellClasses(AppLocalizations l10n) => {
 
 /// Los tiempos de lanzamiento que usa el catálogo, sin las reacciones con
 /// disparador (que se conservan de a una, ver [SpellForm]).
-// l10n-ignore: valor guardado que el motor entiende (catálogo en español, fase 2), no texto de la interfaz.
+// l10n-ignore: valor guardado que el motor entiende (se muestra traducido con `vocabularyLabel`), no texto de la interfaz.
 const _castingTimes = [
   'Acción',
   'Acción Adicional',
@@ -53,10 +53,10 @@ class _SpellFormState extends State<SpellForm> with _GuidedForm {
   late final _name = watch(widget.initial?.name ?? '');
   late String _level = '${widget.initial?.level ?? 0}';
   late String _school = widget.initial?.school ?? '';
-  // l10n-ignore: valor guardado que el motor entiende (catálogo en español, fase 2), no texto de la interfaz.
+  // l10n-ignore: valor guardado que el motor entiende (se muestra traducido con `vocabularyLabel`), no texto de la interfaz.
   late String _castingTime = widget.initial?.castingTime ?? 'Acción';
   late final _range = watch(widget.initial?.range ?? '');
-  // l10n-ignore: valor guardado que el motor entiende (catálogo en español, fase 2), no texto de la interfaz.
+  // l10n-ignore: valor guardado que el motor entiende (se muestra traducido con `vocabularyLabel`), no texto de la interfaz.
   late final _duration = watch(widget.initial?.duration ?? 'Instantánea');
   late final _description = watch(widget.initial?.description ?? '');
   late bool _concentration = widget.initial?.concentration ?? false;
@@ -142,7 +142,7 @@ class _SpellFormState extends State<SpellForm> with _GuidedForm {
         );
       case 'time':
         final type = _spell().actionType;
-        // l10n-ignore: las claves son los valores guardados del catálogo (fase 2).
+        // l10n-ignore: las claves son los valores guardados del catálogo, en español.
         return _explained(
           context.l10n.hbCastingTime,
           _castingTime,
@@ -259,7 +259,10 @@ class _SpellFormState extends State<SpellForm> with _GuidedForm {
               value: _school,
               options: {
                 '': context.l10n.hbNoSchool,
-                for (final s in spellSchoolRules.keys) s: s,
+                // Se guarda el valor en español en cualquier idioma: es el
+                // del catálogo y el que entiende el homebrew ya guardado.
+                for (final s in spellSchoolRules.keys)
+                  s: vocabularyLabel(VocabularyField.school, s),
               },
               onChanged: (v) => setState(() {
                 _school = v;
@@ -276,9 +279,13 @@ class _SpellFormState extends State<SpellForm> with _GuidedForm {
             // El tiempo que no está en la lista se ofrece con su texto y no
             // como «desconocido»: es una reacción legítima con su disparador.
             options: {
-              for (final t in _castingTimes) t: t,
+              for (final t in _castingTimes)
+                t: vocabularyLabel(VocabularyField.castingTime, t),
               if (!_castingTimes.contains(_castingTime))
-                _castingTime: _castingTime,
+                _castingTime: vocabularyLabel(
+                  VocabularyField.castingTime,
+                  _castingTime,
+                ),
             },
             onChanged: (v) => setState(() {
               _castingTime = v;

@@ -104,8 +104,8 @@ extension NpcStatusL10n on NpcStatus {
 }
 
 /// Las etiquetas de enums del engine que son puramente de interfaz. Van acá y
-/// no en el engine porque el engine no habla ningún idioma en particular (el
-/// `label` en español que traen es lo que la fase 2 va a reemplazar).
+/// no en el engine porque son de la aplicación, no reglas: el vocabulario de
+/// reglas sí vive en el engine, en los dos idiomas (`ContentLanguage`).
 extension CampaignStateL10n on CampaignState {
   String localized(BuildContext context) {
     final l10n = context.l10n;

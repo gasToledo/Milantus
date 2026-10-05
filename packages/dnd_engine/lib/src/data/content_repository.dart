@@ -238,8 +238,39 @@ class ContentRepository {
       ? a.level.compareTo(b.level)
       : compareContentNames(a.name, b.name);
 
+  /// Cuántas veces cambió el contenido desde que se creó. Quien memoiza algo
+  /// compilado contra el repositorio (una ficha) lo suma a su clave: el mismo
+  /// objeto puede cambiar por dentro (ver [replaceWith]).
+  int get revision => _revision;
+  int _revision = 0;
+
+  /// Reemplaza todo el contenido por el de [other], **en el mismo objeto**.
+  ///
+  /// Existe para el cambio de idioma: las pantallas abiertas guardan la
+  /// referencia a este repositorio, y entregar uno nuevo no les llegaría. El
+  /// homebrew se vuelve a sumar después con [addAll].
+  void replaceWith(ContentRepository other) {
+    for (final map in [
+      races,
+      classes,
+      subclasses,
+      lineages,
+      backgrounds,
+      feats,
+      weapons,
+      armor,
+      items,
+      spells,
+      creatures,
+    ]) {
+      map.clear();
+    }
+    addAll(other);
+  }
+
   /// Incorpora contenido homebrew (mismo esquema) sobre el oficial.
   void addAll(ContentRepository other) {
+    _revision++;
     races.addAll(other.races);
     classes.addAll(other.classes);
     subclasses.addAll(other.subclasses);

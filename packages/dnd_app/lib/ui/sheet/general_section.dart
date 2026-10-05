@@ -788,13 +788,19 @@ extension _SheetGeneralSection on _SheetScreenState {
   Widget _identityCard() {
     final pal = context.palette;
     final bg = repo.background(_c.backgroundId)?.name ?? '—';
-    final creatureType = repo.race(_c.raceId)?.creatureType ?? '—';
+    final raceType = repo.race(_c.raceId)?.creatureType;
+    final creatureType = raceType == null
+        ? '—'
+        : vocabularyLabel(VocabularyField.creatureType, raceType);
     final rows = <(String, String)>[
       (context.l10n.identityAlignment, _c.alignment?.label ?? '—'),
       (context.l10n.identityCreatureType, creatureType),
       // El tamaño resuelto lo da la ficha compilada, no la especie: las que
       // dejan elegir traen ahí sólo el valor por defecto.
-      (context.l10n.identitySize, sheet.size),
+      (
+        context.l10n.identitySize,
+        vocabularyLabel(VocabularyField.size, sheet.size),
+      ),
       (context.l10n.identityBackground, bg),
       if (_c.personalityTrait.isNotEmpty)
         (context.l10n.identityTrait, _c.personalityTrait),

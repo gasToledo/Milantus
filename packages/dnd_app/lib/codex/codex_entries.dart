@@ -84,16 +84,23 @@ CodexEntry _race(Race r, ContentRepository repo) {
   return CodexEntry(
     id: r.id,
     name: r.name,
-    subtitle: r.tagline ?? r.creatureType,
+    subtitle:
+        r.tagline ??
+        vocabularyLabel(VocabularyField.creatureType, r.creatureType),
     source: r.source,
     body: (context) => [
       _facts(context, [
-        (context.l10n.identityCreatureTypeShort, r.creatureType),
+        (
+          context.l10n.identityCreatureTypeShort,
+          vocabularyLabel(VocabularyField.creatureType, r.creatureType),
+        ),
         (
           context.l10n.identitySize,
           r.sizeOptions.isEmpty
-              ? r.size
-              : r.sizeOptions.join(' ${context.l10n.wordOr} '),
+              ? vocabularyLabel(VocabularyField.size, r.size)
+              : r.sizeOptions
+                    .map((o) => vocabularyLabel(VocabularyField.size, o))
+                    .join(' ${context.l10n.wordOr} '),
         ),
         (context.l10n.creatureSpeed, context.l10n.feetValue(r.speed)),
         for (final dv in r.effects.whereType<DarkvisionEffect>())
@@ -253,7 +260,7 @@ CodexEntry _spell(Spell s, ContentRepository repo, AppLocalizations l10n) {
   return CodexEntry(
     id: s.id,
     name: s.name,
-    subtitle: '$level · ${s.school}',
+    subtitle: '$level · ${vocabularyLabel(VocabularyField.school, s.school)}',
     source: s.source,
     facet: level,
     facetRank: s.level,
@@ -261,15 +268,24 @@ CodexEntry _spell(Spell s, ContentRepository repo, AppLocalizations l10n) {
       _facts(context, [
         (
           context.l10n.spellCastingTime,
-          s.ritual ? context.l10n.codexRitual(s.castingTime) : s.castingTime,
+          s.ritual
+              ? context.l10n.codexRitual(
+                  vocabularyLabel(VocabularyField.castingTime, s.castingTime),
+                )
+              : vocabularyLabel(VocabularyField.castingTime, s.castingTime),
         ),
-        (context.l10n.commonRange, s.range),
+        (
+          context.l10n.commonRange,
+          vocabularyLabel(VocabularyField.range, s.range),
+        ),
         (context.l10n.spellComponents, s.components),
         (
           context.l10n.spellDuration,
           s.concentration
-              ? context.l10n.codexConcentration(s.duration)
-              : s.duration,
+              ? context.l10n.codexConcentration(
+                  vocabularyLabel(VocabularyField.duration, s.duration),
+                )
+              : vocabularyLabel(VocabularyField.duration, s.duration),
         ),
       ]),
       if (s.classes.isNotEmpty)

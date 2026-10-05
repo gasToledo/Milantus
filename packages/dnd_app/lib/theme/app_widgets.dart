@@ -2208,7 +2208,8 @@ Widget spellDetailsBody(
           spell.isCantrip
               ? context.l10n.spellCantrip
               : context.l10n.spellLevel(spell.level),
-          if (spell.school.trim().isNotEmpty) spell.school,
+          if (spell.school.trim().isNotEmpty)
+            vocabularyLabel(VocabularyField.school, spell.school),
         ].join(' · '),
         style: TextStyle(color: muted),
       ),
@@ -2223,14 +2224,22 @@ Widget spellDetailsBody(
             child: _spellDetailMeta(
               context,
               context.l10n.spellCastingTime,
-              spell.castingTime,
+              vocabularyLabel(VocabularyField.castingTime, spell.castingTime),
             ),
           ),
         ],
       ),
-      _spellDetailMeta(context, context.l10n.commonRange, spell.range),
+      _spellDetailMeta(
+        context,
+        context.l10n.commonRange,
+        vocabularyLabel(VocabularyField.range, spell.range),
+      ),
       _spellDetailMeta(context, context.l10n.spellComponents, spell.components),
-      _spellDetailMeta(context, context.l10n.spellDuration, spell.duration),
+      _spellDetailMeta(
+        context,
+        context.l10n.spellDuration,
+        vocabularyLabel(VocabularyField.duration, spell.duration),
+      ),
       const SizedBox(height: 10),
       Text(spell.description),
       if (contextText.isNotEmpty) ...[
@@ -2434,8 +2443,10 @@ Widget _profileLabel(BuildContext context, String text, {TextAlign? align}) =>
 /// veces.
 String _sensesWithoutPassive(Creature c) {
   if (c.passivePerceptionValue == null) return c.senses;
-  // l10n-ignore: texto del catálogo SRD en español (fase 2)
-  final pasiva = RegExp(r'[;,]?\s*Percepción pasiva \d+');
+  // l10n-ignore: patrón del texto del catálogo, en los dos idiomas.
+  final pasiva = RegExp(
+    r'[;,]?\s*(?:Percepción pasiva|Passive Perception) \d+',
+  );
   return c.senses
       .replaceAll(pasiva, '')
       .trim()

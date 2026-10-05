@@ -99,12 +99,16 @@ class _SheetScreenState extends State<SheetScreen> {
   // de combate (que se muta in situ conservando el mismo objeto _c). Se cachea
   // por identidad de _c: las ediciones de equipo/nivel producen un _c nuevo vía
   // copyWith e invalidan la caché, evitando recompilar varias veces por build.
+  // También la invalida un cambio del catálogo (otro idioma, ver
+  // `ContentRepository.revision`): la ficha trae nombres del catálogo.
   Character? _sheetFor;
+  int? _sheetRevision;
   ComputedSheet? _sheetCache;
   ComputedSheet get sheet {
-    if (!identical(_sheetFor, _c)) {
+    if (!identical(_sheetFor, _c) || _sheetRevision != repo.revision) {
       _sheetCache = CharacterCompiler(repo).compile(_c);
       _sheetFor = _c;
+      _sheetRevision = repo.revision;
     }
     // La Forma Salvaje se aplica encima y no se cachea: la caché va por
     // identidad de _c, y transformarse muta el estado de combate in situ sin

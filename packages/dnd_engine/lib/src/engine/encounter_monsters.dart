@@ -49,7 +49,11 @@ extension EncounterMonsters on Encounter {
       for (final c in combatants)
         if (c.creatureId == creature.id) c,
     ];
-    final numbered = RegExp('^${RegExp.escape(creature.name)} (\\d+)\$');
+    // El número se lee del final del nombre sin exigir que empiece con el de
+    // la criatura: ese nombre cambia con el idioma del catálogo, y «Búho 2»,
+    // sumado en español, tiene que seguir contando cuando la criatura ya se
+    // llama «Owl». Las copias ya son de esta criatura (`creatureId`).
+    final numbered = RegExp(r' (\d+)$');
     int? numberOf(Combatant c) => c.name == creature.name
         ? 1
         : int.tryParse(numbered.firstMatch(c.name)?.group(1) ?? '');

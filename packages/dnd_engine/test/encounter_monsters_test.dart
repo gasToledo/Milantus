@@ -50,6 +50,22 @@ void main() {
       expect(two.combatants.first.id, firstId);
     });
 
+    test('la numeración sigue aunque el catálogo cambie de idioma', () {
+      final two =
+          const Encounter(id: 'e').withMonsters(goblin, 2, newId: newId);
+      // El mismo goblin con el nombre del catálogo en inglés.
+      final english = Creature.fromJson({
+        ...goblin.toJson(),
+        'name': 'Goblin Warrior',
+      });
+      final three = two.withMonsters(english, 1, newId: newId);
+      expect(three.combatants.map((c) => c.name), [
+        '${goblin.name} 1',
+        '${goblin.name} 2',
+        'Goblin Warrior 3',
+      ]);
+    });
+
     test('sigue desde el número más alto y no repite uno en uso', () {
       final three =
           const Encounter(id: 'e').withMonsters(goblin, 3, newId: newId);

@@ -1078,6 +1078,37 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    // Los tags guardan la etiqueta en español: con el contenido en inglés lo
+    // marcado antes sigue marcado, y lo nuevo se guarda igual que siempre.
+    testWidgets('una condición marcada sigue marcada con el contenido en '
+        'inglés', (tester) async {
+      addTearDown(() => ContentLanguage.current = ContentLanguage.es);
+      final server = await withGoblin(tester);
+
+      await tester.tap(find.byTooltip('Efectos'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilterChip, 'Envenenado'));
+      await tester.pumpAndSettle();
+      await tester.tap(dialogAction('Guardar'));
+      await tester.pumpAndSettle();
+
+      ContentLanguage.current = ContentLanguage.en;
+      await tester.tap(find.byTooltip('Efectos'));
+      await tester.pumpAndSettle();
+      final poisoned = tester.widget<FilterChip>(
+        find.widgetWithText(FilterChip, 'Poisoned'),
+      );
+      expect(poisoned.selected, isTrue);
+      await tester.tap(find.widgetWithText(FilterChip, 'Prone'));
+      await tester.pumpAndSettle();
+      await tester.tap(dialogAction('Guardar'));
+      await tester.pumpAndSettle();
+
+      expect(tagsOf(server), ['Envenenado', 'Derribado']);
+      expect(find.widgetWithText(InputChip, 'Poisoned'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
     // En la ronda en que se termina un veneno, abrir el diálogo para
     // destildarlo sería un rodeo: se saca desde la propia fila.
     testWidgets('un efecto se saca desde la fila, sin abrir el diálogo', (

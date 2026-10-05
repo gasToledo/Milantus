@@ -36,7 +36,7 @@ void main() {
     await tester.pumpWidget(
       DndApp(
         api: ApiClient(client: server.client),
-        contentLoader: () async => ContentRepository(),
+        contentLoader: (_) async => ContentRepository(),
         localeController: AppLocaleController(
           read: () => language,
           write: (_) {},

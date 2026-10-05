@@ -94,7 +94,7 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
   late final _ac = watch(widget.initial?.ac ?? '12');
   late final _hp = watch(widget.initial?.hp ?? '10');
   late final _hitDice = watch(widget.initial?.hitDice ?? '');
-  // l10n-ignore: valor inicial del contenido homebrew, que se guarda en el idioma del catálogo (fase 2).
+  // l10n-ignore: valor inicial del contenido homebrew, que se guarda en español como el catálogo.
   late final _speed = watch(widget.initial?.speed ?? '30 pies');
   late final _senses = watch(widget.initial?.senses ?? '');
   late final _languages = watch(widget.initial?.languages ?? '');
@@ -157,8 +157,13 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
 
   /// La línea de perfil, compuesta con la concordancia que pide el tipo:
   /// «Bestia Mediana» pero «Gigante Grande».
+  ///
+  /// Siempre en español, también con la interfaz en inglés: es un dato que el
+  /// motor lee (tipo y tamaño salen de acá) y el homebrew se guarda igual en
+  /// los dos idiomas.
   String get _kind =>
-      '${_type.label} ${_type.feminine ? _size.feminineLabel : _size.label}';
+      '${_type.labelEs} '
+      '${_type.feminine ? _size.feminineLabelEs : _size.labelEs}';
 
   Creature _creature() => Creature(
     id: widget.initial?.id ?? homebrewId(_name.text),

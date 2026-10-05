@@ -33,7 +33,7 @@ void main() {
     );
 
     await tester.pumpWidget(
-      DndApp(api: api, contentLoader: () async => ContentRepository()),
+      DndApp(api: api, contentLoader: (_) async => ContentRepository()),
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 40));
@@ -56,7 +56,7 @@ void main() {
     );
 
     await tester.pumpWidget(
-      DndApp(api: api, contentLoader: () async => ContentRepository()),
+      DndApp(api: api, contentLoader: (_) async => ContentRepository()),
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 40));
@@ -85,7 +85,7 @@ void main() {
     );
 
     await tester.pumpWidget(
-      DndApp(api: api, contentLoader: () async => ContentRepository()),
+      DndApp(api: api, contentLoader: (_) async => ContentRepository()),
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 80));
@@ -112,7 +112,7 @@ void main() {
     );
 
     await tester.pumpWidget(
-      DndApp(api: api, contentLoader: () async => ContentRepository()),
+      DndApp(api: api, contentLoader: (_) async => ContentRepository()),
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 50));

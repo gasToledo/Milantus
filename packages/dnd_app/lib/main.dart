@@ -31,8 +31,9 @@ class DndApp extends StatefulWidget {
   final ApiClient? api;
 
   /// Loader alternativo para arranques controlados; producción usa el pack
-  /// incluido en los assets del cliente.
-  final Future<ContentRepository> Function()? contentLoader;
+  /// incluido en los assets del cliente. Recibe el idioma del catálogo
+  /// (`en`) o null para el español, que es la fuente.
+  final ContentLoader? contentLoader;
 
   /// Idioma alternativo. Solo lo pasan los tests, para no depender del
   /// navegador; la aplicación real lo arma con el idioma guardado o el del
@@ -88,6 +89,7 @@ class _DndAppState extends State<DndApp> {
             themeMode: _theme.value,
             home: _Bootstrap(
               theme: _theme,
+              locale: _locale,
               api: widget.api,
               contentLoader: widget.contentLoader,
             ),
@@ -121,9 +123,15 @@ class _AppData {
 /// cuenta autenticada antes del dashboard (ver capacidad `web-client`).
 class _Bootstrap extends StatefulWidget {
   final AppThemeController theme;
+  final AppLocaleController locale;
   final ApiClient? api;
-  final Future<ContentRepository> Function()? contentLoader;
-  const _Bootstrap({required this.theme, this.api, this.contentLoader});
+  final ContentLoader? contentLoader;
+  const _Bootstrap({
+    required this.theme,
+    required this.locale,
+    this.api,
+    this.contentLoader,
+  });
   @override
   State<_Bootstrap> createState() => _BootstrapState();
 }
@@ -172,7 +180,11 @@ class _BootstrapState extends State<_Bootstrap> {
       // de ejemplo le deja al jugador algo ajeno que borrar antes de empezar.
       // `demoSagan()` sigue existiendo como fixture de las pruebas.
       final controller = CharactersController(_api);
-      final content = (widget.contentLoader ?? loadOfficialContent)();
+      // El catálogo arranca en el idioma de la interfaz, y el vocabulario del
+      // motor también: los personajes se compilan después, ya traducidos.
+      final translation = _contentTranslation(widget.locale.value);
+      ContentLanguage.current = _contentLanguage(widget.locale.value);
+      final content = _loadContent(translation);
       final settingsLoad = _loadSettings();
       final versionLoad = currentAppVersion();
       await Future.wait([
@@ -187,6 +199,18 @@ class _BootstrapState extends State<_Bootstrap> {
       // Fusiona el contenido homebrew sobre el oficial (mismo esquema).
       final repo = await content;
       repo.addAll(homebrew.toRepository());
+      // Cambiar de idioma rehace el catálogo **dentro del mismo repositorio**:
+      // las pantallas abiertas guardan esa referencia. Corre antes de que el
+      // `Locale` cambie (ver `AppLocaleController.beforeChange`), así rótulos y
+      // nombres cambian en el mismo cuadro.
+      widget.locale.beforeChange = (locale) async {
+        final fresh = await _loadContent(_contentTranslation(locale));
+        if (!_isCurrent(generation)) return;
+        ContentLanguage.current = _contentLanguage(locale);
+        repo
+          ..replaceWith(fresh)
+          ..addAll(homebrew.toRepository());
+      };
       final settings = await settingsLoad;
       final settingsController = SettingsController(_api, settings);
 
@@ -246,6 +270,18 @@ class _BootstrapState extends State<_Bootstrap> {
     }
   }
 
+  Future<ContentRepository> _loadContent(String? translation) =>
+      (widget.contentLoader ?? (t) => loadOfficialContent(translation: t))(
+        translation,
+      );
+
+  /// El español es la fuente del catálogo: no lleva superposición.
+  static String? _contentTranslation(Locale locale) =>
+      locale.languageCode == 'en' ? 'en' : null;
+
+  static ContentLanguage _contentLanguage(Locale locale) =>
+      locale.languageCode == 'en' ? ContentLanguage.en : ContentLanguage.es;
+
   /// El favorito y el orden del roster viven acá (ver `AppSettings`), así que
   /// hacen falta antes de dibujar el dashboard. Un fallo al leerlos no puede
   /// dejar sin personajes a nadie: se cae a los valores por defecto, y por eso
@@ -268,6 +304,7 @@ class _BootstrapState extends State<_Bootstrap> {
 
   @override
   void dispose() {
+    widget.locale.beforeChange = null;
     _generation++;
     _api.cancelPendingRequests(recreateClient: false);
     super.dispose();

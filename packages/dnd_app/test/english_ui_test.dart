@@ -44,7 +44,7 @@ void main() {
     await tester.pumpWidget(
       DndApp(
         api: api,
-        contentLoader: () async => ContentRepository(),
+        contentLoader: (_) async => ContentRepository(),
         localeController: locale,
       ),
     );

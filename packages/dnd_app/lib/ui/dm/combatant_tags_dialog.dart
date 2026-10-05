@@ -46,27 +46,36 @@ class _TagsDialogState extends State<_TagsDialog> {
     super.dispose();
   }
 
-  /// Las condiciones oficiales se comparan por su etiqueta y no por su id: lo
-  /// que se guarda es lo que se muestra, así que un tag escrito a mano que
-  /// diga «Envenenado» es el mismo que el del atajo.
-  bool _has(String label) =>
-      _tags.any((t) => t.toLowerCase() == label.toLowerCase());
+  /// Las condiciones oficiales se comparan por su etiqueta y no por su id:
+  /// los tags guardan la etiqueta en español, y un tag escrito a mano que diga
+  /// «Envenenado» —o «Poisoned»— es el mismo que el del atajo (ver
+  /// [conditionForTag]).
+  bool _has(ConditionInfo condition) =>
+      _tags.any((t) => conditionForTag(t) == condition);
 
-  void _toggle(String label) => setState(() {
-    if (_has(label)) {
-      _tags.removeWhere((t) => t.toLowerCase() == label.toLowerCase());
+  void _toggle(ConditionInfo condition) => setState(() {
+    if (_has(condition)) {
+      _tags.removeWhere((t) => conditionForTag(t) == condition);
     } else {
-      _tags.add(label);
+      // Siempre la española, en cualquier idioma: es lo que reconocen los
+      // combates guardados y lo que se muestra traducido.
+      _tags.add(condition.labelEs);
     }
   });
 
   void _addTyped() {
     final text = _controller.text.trim();
-    if (text.isEmpty || _has(text)) {
+    // Escribir el nombre de una condición es marcarla: se guarda igual que
+    // desde el atajo, en español.
+    final condition = conditionForTag(text);
+    final repeated = condition != null
+        ? _has(condition)
+        : _tags.any((t) => t.toLowerCase() == text.toLowerCase());
+    if (text.isEmpty || repeated) {
       _controller.clear();
       return;
     }
-    setState(() => _tags.add(text));
+    setState(() => _tags.add(condition?.labelEs ?? text));
     _controller.clear();
   }
 
@@ -77,10 +86,7 @@ class _TagsDialogState extends State<_TagsDialog> {
     // marcadas abajo, y repetirlas acá haría que cada una apareciera dos veces.
     final libres = [
       for (final tag in _tags)
-        if (!conditions.values.any(
-          (c) => c.label.toLowerCase() == tag.toLowerCase(),
-        ))
-          tag,
+        if (conditionForTag(tag) == null) tag,
     ];
 
     return AppDialog(
@@ -141,8 +147,8 @@ class _TagsDialogState extends State<_TagsDialog> {
                   waitDuration: const Duration(milliseconds: 400),
                   child: FilterChip(
                     label: Text(condition.label),
-                    selected: _has(condition.label),
-                    onSelected: (_) => _toggle(condition.label),
+                    selected: _has(condition),
+                    onSelected: (_) => _toggle(condition),
                   ),
                 ),
             ],

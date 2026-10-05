@@ -679,7 +679,7 @@ extension _HomebrewSections on _HomebrewViewState {
       for (final r in _filtered(store.races.values, (e) => e.name))
         _tile(
           r.name,
-          pills: [r.size],
+          pills: [vocabularyLabel(VocabularyField.size, r.size)],
           stats: [
             (context.l10n.creatureSpeed, context.l10n.feetValue(r.speed)),
             (context.l10n.creatureTraits, '${r.effects.length}'),
@@ -734,7 +734,8 @@ extension _HomebrewSections on _HomebrewViewState {
             s.isCantrip
                 ? context.l10n.spellCantrip
                 : context.l10n.spellLevel(s.level),
-            if (s.school.isNotEmpty) s.school,
+            if (s.school.isNotEmpty)
+              vocabularyLabel(VocabularyField.school, s.school),
             if (s.concentration) context.l10n.concentration,
             if (s.ritual) context.l10n.hbRitual,
             for (final klass in s.classes)

@@ -702,6 +702,9 @@ class CreationDraft {
       (classSkills.toList()..sort()).join(','),
       (raceSkills.toList()..sort()).join(','),
       for (final a in Ability.values) assignedScores[a] ?? 10,
+      // El catálogo puede cambiar por dentro (otro idioma) y la ficha trae
+      // sus nombres.
+      repo.revision,
     ].join('|');
     if (sig != _sheetSig) {
       _sheetCache = CharacterCompiler(repo).compile(build());

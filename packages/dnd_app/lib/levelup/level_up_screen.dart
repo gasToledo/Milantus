@@ -413,10 +413,21 @@ class _LevelUpScreenState extends State<LevelUpScreen> {
       .toSet();
 
   /// La ficha antes de subir. El personaje no cambia mientras dura el
-  /// asistente, así que se compila una vez y la comparten todas las secciones.
-  late final ComputedSheet _sheetBefore = CharacterCompiler(
-    widget.repo,
-  ).compile(widget.character);
+  /// asistente, así que se compila una vez y la comparten todas las secciones;
+  /// solo se recompila si cambia el catálogo (otro idioma), porque trae sus
+  /// nombres.
+  ComputedSheet get _sheetBefore {
+    if (_sheetBeforeRevision != widget.repo.revision) {
+      _sheetBeforeCache = CharacterCompiler(
+        widget.repo,
+      ).compile(widget.character);
+      _sheetBeforeRevision = widget.repo.revision;
+    }
+    return _sheetBeforeCache!;
+  }
+
+  ComputedSheet? _sheetBeforeCache;
+  int? _sheetBeforeRevision;
 
   ({List<ProficiencyChoiceSlot> slots, Set<String> fixed})? _proficiencyCache;
   String? _proficiencySig;
@@ -642,7 +653,7 @@ class _LevelUpScreenState extends State<LevelUpScreen> {
   /// JSON no se olvida de ninguno.
   ComputedSheet get _updatedSheet {
     final updated = _buildUpdated();
-    final key = jsonEncode(updated.toJson());
+    final key = '${widget.repo.revision}|${jsonEncode(updated.toJson())}';
     if (key != _updatedSheetKey) {
       _updatedSheetCache = CharacterCompiler(widget.repo).compile(updated);
       _updatedSheetKey = key;

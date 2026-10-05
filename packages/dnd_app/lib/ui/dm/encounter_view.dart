@@ -5,6 +5,7 @@ import '../../api/api_models.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/app_widgets.dart';
 import 'add_monster_dialog.dart';
+import '../conditions.dart';
 import 'combatant_tags_dialog.dart';
 import 'npcs/npc_shared.dart';
 import '../../l10n/l10n_context.dart';
@@ -1011,7 +1012,10 @@ class _EncounterViewState extends State<EncounterView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(effect.tag, style: const TextStyle(fontSize: 13)),
+                      Text(
+                        conditionTagLabel(effect.tag),
+                        style: const TextStyle(fontSize: 13),
+                      ),
                       const SizedBox(height: 2),
                       Text(
                         effect.combatant.name,
@@ -1027,7 +1031,7 @@ class _EncounterViewState extends State<EncounterView> {
                   // el mismo efecto se puede sacar desde dos lugares y dos
                   // botones con el mismo rótulo no se distinguirían al leerlos.
                   tooltip: context.l10n.encRemoveEffect(
-                    effect.tag,
+                    conditionTagLabel(effect.tag),
                     effect.combatant.name,
                   ),
                   onPressed: () => widget.onSetTags(effect.combatant.id, [
@@ -1931,13 +1935,15 @@ class _CombatantRow extends StatelessWidget {
       children: [
         for (final tag in combatant.tags)
           InputChip(
-            label: Text(tag),
+            label: Text(conditionTagLabel(tag)),
             visualDensity: VisualDensity.compact,
             onDeleted: () => onSetTags([
               for (final t in combatant.tags)
                 if (t != tag) t,
             ]),
-            deleteButtonTooltipMessage: context.l10n.dmRemoveTag(tag),
+            deleteButtonTooltipMessage: context.l10n.dmRemoveTag(
+              conditionTagLabel(tag),
+            ),
           ),
       ],
     );

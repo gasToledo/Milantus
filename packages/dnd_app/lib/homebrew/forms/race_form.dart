@@ -20,7 +20,7 @@ class _RaceFormState extends State<RaceForm> with _GuidedForm {
   late final _name = watch(widget.initial?.name ?? '');
   // l10n-ignore: el tamaño por defecto es el valor guardado (`Race.size`), no texto.
   late String _size = widget.initial?.size ?? 'Mediano';
-  // l10n-ignore: tipo de criatura por defecto; el contenido del catálogo sigue en español (fase 2).
+  // l10n-ignore: tipo de criatura por defecto, el valor guardado en español (se muestra con `vocabularyLabel`).
   late final _creatureType = watch(widget.initial?.creatureType ?? 'Humanoide');
   late final _tagline = watch(widget.initial?.tagline ?? '');
   late final _description = watch(widget.initial?.description ?? '');
@@ -140,11 +140,17 @@ class _RaceFormState extends State<RaceForm> with _GuidedForm {
                     Text(tagline, style: TextStyle(color: muted)),
                   const SizedBox(height: 10),
                   _statBand(context, [
-                    (context.l10n.identityCreatureTypeShort, race.creatureType),
+                    (
+                      context.l10n.identityCreatureTypeShort,
+                      vocabularyLabel(
+                        VocabularyField.creatureType,
+                        race.creatureType,
+                      ),
+                    ),
                     (
                       context.l10n.identitySize,
                       race.sizeOptions.isEmpty
-                          ? race.size
+                          ? vocabularyLabel(VocabularyField.size, race.size)
                           : context.l10n.factToChoose,
                     ),
                     (

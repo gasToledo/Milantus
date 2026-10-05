@@ -1444,6 +1444,34 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  // La escuela se guarda en español en los dos idiomas: es el valor del
+  // catálogo y el que entiende el homebrew ya guardado.
+  testWidgets('con el contenido en inglés la escuela se elige traducida y se '
+      'guarda igual', (tester) async {
+    ContentLanguage.current = ContentLanguage.en;
+    addTearDown(() => ContentLanguage.current = ContentLanguage.es);
+    final saved = await runForm<Spell>(
+      tester,
+      const SpellForm(),
+      edit: () async {
+        await tester.enterText(
+          find.widgetWithText(TextFormField, 'Nombre'),
+          'Lanza de ceniza',
+        );
+        await tester.tap(
+          find.widgetWithText(DropdownButtonFormField<String>, 'Escuela'),
+        );
+        await tester.pumpAndSettle();
+        expect(find.text('Evocación'), findsNothing);
+        await tester.tap(find.text('Evocation').last);
+        await tester.pumpAndSettle();
+      },
+    );
+
+    expect(saved?.school, 'Evocación');
+    expect(tester.takeException(), isNull);
+  });
+
   // El catálogo entero guarda los componentes como una línea, y así los lee
   // el detalle del conjuro: elegirlos de a uno no puede cambiar ese formato.
   testWidgets('los componentes se eligen de a uno y se guardan en una línea', (

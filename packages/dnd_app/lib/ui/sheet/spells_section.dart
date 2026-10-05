@@ -661,7 +661,7 @@ extension _SheetSpellsSection on _SheetScreenState {
                             s.isCantrip
                                 ? context.l10n.spellCantrip
                                 : context.l10n.spellLevel(s.level),
-                            s.school,
+                            vocabularyLabel(VocabularyField.school, s.school),
                             ?_damageBonusText(s.id),
                           ].join(' · '),
                           style: TextStyle(fontSize: 12, color: muted),

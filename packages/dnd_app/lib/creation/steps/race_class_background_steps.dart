@@ -44,12 +44,23 @@ class _RaceStep extends StatelessWidget {
               : _DetailPanel(
                   title: race.name,
                   facts: [
-                    (context.l10n.identityCreatureTypeShort, race.creatureType),
+                    (
+                      context.l10n.identityCreatureTypeShort,
+                      vocabularyLabel(
+                        VocabularyField.creatureType,
+                        race.creatureType,
+                      ),
+                    ),
                     (
                       context.l10n.identitySize,
                       race.sizeOptions.isEmpty
-                          ? race.size
-                          : draft.chosenSize ?? context.l10n.factToChoose,
+                          ? vocabularyLabel(VocabularyField.size, race.size)
+                          : draft.chosenSize == null
+                          ? context.l10n.factToChoose
+                          : vocabularyLabel(
+                              VocabularyField.size,
+                              draft.chosenSize!,
+                            ),
                     ),
                     (
                       context.l10n.creatureSpeed,
