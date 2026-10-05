@@ -489,10 +489,15 @@ class Encounter {
   /// Los PG actuales de un monstruo, clampeados a `0..maxHp`. Es la única
   /// escritura del DM en toda esta fase: los PG de un jugador nunca se tocan
   /// desde acá.
+  ///
+  /// Fija [turnIndex] en quien tiene el turno **antes** del cambio. Si
+  /// apuntaba a un caído, el turno real ya era de otro; sin fijarlo, curar al
+  /// caído le devolvería el turno a mitad del de otro.
   Encounter withHp(String combatantId, int hp) => Encounter(
         id: id,
         round: round,
-        turnIndex: turnIndex,
+        turnIndex:
+            combatants.isEmpty || isPreparing ? turnIndex : _currentIndex,
         combatants: [
           for (final c in combatants)
             if (c.id == combatantId)

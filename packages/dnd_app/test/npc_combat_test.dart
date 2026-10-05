@@ -634,6 +634,8 @@ void main() {
 
         await startEmpty(tester);
         await openAdd(tester);
+        // El DM ve con qué va a entrar antes de elegirlo.
+        expect(inDialog(find.textContaining('PG 3/$full')), findsOneWidget);
         await tester.tap(inDialog(find.widgetWithText(ListTile, 'Mirra')));
         await tester.pumpAndSettle();
         await tester.tap(inDialog(find.text('Aliado')));

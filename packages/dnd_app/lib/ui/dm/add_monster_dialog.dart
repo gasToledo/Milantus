@@ -81,6 +81,7 @@ typedef _NpcOption = ({
   Character? sheet,
   NpcStatus? status,
   bool fromLibrary,
+  ({int current, int max})? hurt,
 });
 
 class _AddCombatantDialog extends StatefulWidget {
@@ -283,6 +284,8 @@ class _AddCombatantDialogState extends State<_AddCombatantDialog> {
       final subtitle = [
         if (dead) context.l10n.dmDeadHere,
         npcTypeLine(option.npc, option.sheet, widget.repo, context.l10n),
+        if (option.hurt case (:final current, :final max))
+          context.l10n.dmHpShort(current, max),
         if (option.fromLibrary) context.l10n.dmAlsoJoinsCampaign,
       ].join(' · ');
       return ListTile(
@@ -316,6 +319,7 @@ class _AddCombatantDialogState extends State<_AddCombatantDialog> {
             sheet: entry.sheet,
             status: entry.status,
             fromLibrary: false,
+            hurt: npcStoredHp(entry, widget.repo),
           ),
     ];
     final linkedIds = {for (final e in widget.campaignNpcs) e.npc.id};
@@ -339,6 +343,7 @@ class _AddCombatantDialogState extends State<_AddCombatantDialog> {
                       sheet: entry.sheet,
                       status: null,
                       fromLibrary: true,
+                      hurt: null,
                     ),
               ];
               return ListView(
@@ -394,6 +399,17 @@ class _AddCombatantDialogState extends State<_AddCombatantDialog> {
           npcTypeLine(option.npc, option.sheet, widget.repo, context.l10n),
           style: TextStyle(color: pal.textMuted),
         ),
+        // Con lo que va a entrar: el herido de un combate anterior no llega
+        // entero, y a 0 entra caído.
+        if (option.hurt case (:final current, :final max))
+          Text(
+            context.l10n.dmHpShort(current, max),
+            style: TextStyle(
+              color: pal.crimson,
+              fontWeight: FontWeight.w700,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
         if (option.status == NpcStatus.dead) ...[
           const SizedBox(height: 12),
           Container(

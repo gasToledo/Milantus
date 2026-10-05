@@ -71,3 +71,6 @@ packages/dnd_app/test/main_dev.dart
 docs/arquitectura/multiclase.md
 docs/desarrollo/identidad/
 docs/desarrollo/plan-ayudas-ux.md
+
+# Registro privado de pruebas manuales en producción.
+docs/operaciones/pruebas-en-produccion.md

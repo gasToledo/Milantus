@@ -328,6 +328,39 @@ void main() {
       expect(e.withHp('g', 999).combatants.single.currentHp, 7);
       expect(e.withHp('g', 3).combatants.single.currentHp, 3);
     });
+
+    // Pasó en producción: el combate arrancó con un PNJ caído primero en el
+    // orden, el turno real era del segundo, y curar al caído se lo devolvía.
+    test('curar a un caído no le devuelve el turno de otro', () {
+      final e = Encounter(
+        id: 'e',
+        stage: EncounterStage.running,
+        combatants: const [
+          Combatant(
+            id: 'kael',
+            kind: CombatantKind.npc,
+            name: 'Kael',
+            initiative: 22,
+            maxHp: 13,
+          ),
+          Combatant(
+            id: 'vessa',
+            kind: CombatantKind.npc,
+            name: 'Vessa',
+            initiative: 20,
+            currentHp: 81,
+            maxHp: 81,
+          ),
+        ],
+      );
+      expect(e.current!.id, 'vessa');
+
+      final healed = e.withHp('kael', 13);
+
+      expect(healed.current!.id, 'vessa');
+      expect(healed.next().current!.id, 'kael');
+      expect(healed.next().round, 2);
+    });
   });
 
   group('Combatant.isDown', () {

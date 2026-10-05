@@ -68,6 +68,18 @@ int npcMaxHp(Npc npc, Character? sheet, ContentRepository repo) {
   }
 }
 
+/// Los PG guardados de un PNJ en su campaña, solo si está vivo y herido. Uno
+/// muerto no pelea, y uno entero no tiene nada que avisar.
+({int current, int max})? npcStoredHp(
+  CampaignNpcEntry entry,
+  ContentRepository repo,
+) {
+  if (entry.status == NpcStatus.dead) return null;
+  final max = npcMaxHp(entry.npc, entry.sheet, repo);
+  final current = entry.combatHp(max);
+  return current < max ? (current: current, max: max) : null;
+}
+
 /// La CA a mostrar en la mesa, o `null` si no tiene.
 String? npcArmorClass(Npc npc, Character? sheet, ContentRepository repo) =>
     switch (npc.sheetKind) {
