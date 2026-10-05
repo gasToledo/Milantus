@@ -83,6 +83,10 @@ Las herramientas viven en `packages/dnd_engine/tool/`:
   `pdftotext -raw`: la lectura por columnas del generador mezclaba texto de
   objetos distintos y perdía los nombres en cursiva.
 - `apply_magic_item_charges.dart` aplica las cargas a los catálogos mágicos.
+- `apply_magic_item_kinds.dart` escribe si cada objeto mágico es maravilloso,
+  poción o pergamino, maldito o de rareza variable, leído de su descripción
+  en español. Los planos del Artífice dependen de eso, y la descripción se
+  traduce: por eso queda como dato y no se deduce al compilar.
 - `apply_voseo.dart` pasa a voseo la prosa de todos los catálogos salvo el
   bestiario. Se corre después de cualquier generador: el SRD en español está
   en tuteo.

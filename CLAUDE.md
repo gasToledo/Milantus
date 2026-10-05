@@ -159,12 +159,13 @@ Los catálogos grandes se generan con herramientas commiteadas en
 `generate_bestiary.dart`. Ojo que el PDF del SRD en español está **en metros** y
 el catálogo en pies.
 
-Cuatro de esas herramientas **parchean** en vez de generar, y hay que correrlas
+Cinco de esas herramientas **parchean** en vez de generar, y hay que correrlas
 después: `generate_items.dart` le pone peso y precio a `weapons.json` y
 `armor.json`; después de `generate_magic_items.py` van, en este orden,
 `extract_magic_item_text.dart` (la descripción, leída con `pdftotext`),
-`apply_magic_item_charges.dart` (las cargas) y `apply_voseo.dart` (el SRD en
-español está en tuteo). Si alguien regenera y se olvida de un paso,
+`apply_magic_item_charges.dart` (las cargas), `apply_magic_item_kinds.dart`
+(qué clase de objeto es, para los planos del Artífice) y `apply_voseo.dart`
+(el SRD en español está en tuteo). Si alguien regenera y se olvida de un paso,
 `content_integrity_test` lo dice.
 
 El inglés del catálogo vive aparte, en `X.en.json` junto a cada `X.json`, y

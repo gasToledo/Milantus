@@ -1733,6 +1733,27 @@ void main() {
     expect(r.exclusiveGroup, 'prueba');
   });
 
+  test('los objetos mágicos declaran lo que dice su descripción', () {
+    // Lo escribe `tool/apply_magic_item_kinds.dart`. Si alguien regenera el
+    // catálogo y se olvida de ese paso, o lo corre antes de que la
+    // descripción exista, los planos del Artífice cambian sin avisar.
+    for (final archivo in ['magic_items.json', 'efa_magic_items.json']) {
+      final datos = (jsonDecode(
+        File('lib/assets/srd_2024/$archivo').readAsStringSync(),
+      ) as List)
+          .cast<Map<String, dynamic>>();
+      for (final j in datos) {
+        final esperado =
+            Item.magicTraitsFrom(j['description'] as String? ?? '');
+        expect(
+          (j['magicItemType'], j['cursed'], j['variableRarity']),
+          (esperado.type, esperado.cursed, esperado.variableRarity),
+          reason: '${j['id']} ($archivo)',
+        );
+      }
+    }
+  });
+
   group('traducción al inglés', () {
     // Las superposiciones `X.en.json` (ver `content_translation.dart`). Cada
     // catálogo tiene la suya, con el nombre de cada entrada y ninguna

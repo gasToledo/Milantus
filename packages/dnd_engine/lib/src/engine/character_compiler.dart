@@ -45,15 +45,13 @@ class CharacterCompiler {
       // tirado, y la ficha se compila muchas veces por pantalla.
       final plans = sortedByName(
         repo.items.values.where((item) {
-          final description = item.description.trimLeft().toLowerCase();
-          final cursed = description.contains('maldici') ||
-              description.contains('maldito');
-          final variable = description.contains('rareza variable');
-          final potionOrScroll = description.startsWith('poción') ||
-              description.startsWith('pergamino');
-          final wondrous = description.startsWith('objeto maravilloso');
-          return !cursed &&
-              !variable &&
+          // Datos del catálogo y no la descripción, que se traduce: ver
+          // `Item.magicTraitsFrom`.
+          final potionOrScroll =
+              item.magicItemType == 'potion' || item.magicItemType == 'scroll';
+          final wondrous = item.magicItemType == 'wondrous';
+          return !item.cursed &&
+              !item.variableRarity &&
               (sourceLevel >= 2 && item.rarity == 'common' && !potionOrScroll ||
                   sourceLevel >= 10 && item.rarity == 'uncommon' && wondrous ||
                   sourceLevel >= 14 && item.rarity == 'rare' && wondrous);

@@ -9,7 +9,10 @@
     "description": "Objeto maravilloso, común\nEsta canica insípida y gelatinosa se disuelve en la lengua y proporciona tanto alimento como las raciones de 1 día.",
     "rarity": "common",
     "requiresAttunement": false,
-    "sourcePage": 228
+    "sourcePage": 228,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "abanico-del-viento",
@@ -21,7 +24,10 @@
     "description": "Objeto maravilloso, infrecuente\nMientras sostengas este abanico, podés lanzar ráfaga de viento (CD de salvación 13) desde él. Cada vez siguiente que se utilice el abanico antes del próximo amanecer, existe una posibilidad acumulativa del 20 % de que no funcione y se desgarre en jirones inútiles y carentes de magia.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 228
+    "sourcePage": 228,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "aceite-de-afilado",
@@ -33,7 +39,10 @@
     "description": "Poción, muy rara\nUn vial de este aceite puede recubrir un arma cuerpo a cuerpo o veinte unidades de munición, pero solo se verán afectadas las armas y munición no mágicas que causen daño cortante o perforante.\nSe tarda 1 minuto en aplicar el aceite, tras lo cual se filtra mágicamente en lo que recubra y convierte el arma en un arma +3 o la munición en munición +3.\nEste aceite transparente y gelatinoso brilla debido a las esquirlas de plata minúsculas y ultrafinas que contiene.",
     "rarity": "very-rare",
     "requiresAttunement": false,
-    "sourcePage": 228
+    "sourcePage": 228,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "aceite-de-etereidad",
@@ -45,7 +54,10 @@
     "description": "Poción, rara\nUn vial de este aceite puede cubrir a una criatura Mediana o más pequeña, así como el equipo que vista o lleve. Se necesita un vial extra por cada categoría de tamaño por encima de Mediano. Aplicar el aceite lleva 10 minutos. La criatura afectada obtiene el efecto del conjuro excursión etérea durante 1 hora.\nEn el exterior de este recipiente se forman gotitas de un aceite turbio y gris que se evaporan rápidamente.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 228
+    "sourcePage": 228,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "aceite-escurridizo",
@@ -57,7 +69,10 @@
     "description": "Poción, infrecuente\nUn vial de este aceite puede cubrir a una criatura Mediana o más pequeña, así como el equipo que vista o lleve. Se necesita un vial extra por cada categoría de tamaño por encima de Mediano. Aplicar el aceite lleva 10 minutos. La criatura afectada obtiene el efecto del conjuro libertad de movimiento durante 8 horas.\nDe forma alternativa, el aceite se puede verter en el suelo como acción de magia y cubrirá un cuadrado de 10 pies de lado que duplicará el efecto del conjuro grasa en la zona durante 8 horas.\nEste ungüento negro y pegajoso parece denso y pesado, pero fluye rápidamente cuando se vierte.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 228
+    "sourcePage": 228,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "agujero-portatil",
@@ -69,7 +84,10 @@
     "description": "Objeto maravilloso, raro\nEsta delicada tela negra, suave como la seda, está doblada para tener las dimensiones de un pañuelo.\nAl desdoblarla, se convierte en una sábana circular de 6 pies de diámetro.\nPodés utilizar una acción de magia para extender un agujero portátil y colocarlo sobre una superficie sólida o apoyarlo en ella, donde creará un agujero extradimensional de 10 pies de profundidad. El espacio cilíndrico en el interior del agujero se encuentra en otro plano de existencia, así que no sirve para crear pasadizos. Cualquier criatura que esté en el interior de un agujero portátil abierto podrá salir de él trepando.\nPodés utilizar una acción de magia para cerrar un agujero portátil sujetando los bordes de la tela y doblándola. Al doblar la tela se cierra el agujero y cualquier criatura u objeto que haya en su interior permanecerá en el espacio extradimensional.\nIndependientemente de su contenido, el agujero no pesa casi nada.\nSi se dobla, las criaturas que haya dentro del espacio extradimensional del agujero podrán utilizar una acción para realizar una prueba de Fuerza (Atletismo) con CD 10. Si la superan, se abrirán paso hacia la salida y aparecerán a 5 pies o menos del agujero portátil. Un agujero portátil cerrado contiene aire suficiente para respirar durante 1 hora, dividida entre el número de criaturas que necesiten respirar en su interior.\nMeter un agujero portátil en el espacio extradimensional creado por una bolsa de contención, un morral práctico o un objeto similar destruye instantáneamente ambos objetos y abre un portal al Plano Astral. El portal se crea en el sitio en el que un objeto se introdujo dentro del otro. El portal absorbe a todas las criaturas situadas a 10 pies o menos de él y que no estén tras cobertura completa, y las conduce a un lugar aleatorio del Plano Astral.\nDespués, el portal se cierra. El portal solo funciona en un sentido y no puede volver a abrirse.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 229
+    "sourcePage": 229,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "alas-de-vuelo",
@@ -81,7 +99,10 @@
     "description": "Objeto maravilloso, raro (requiere sintonización)\nMientras lleves puesta esta capa, podés emplear una acción de magia para convertirla en un par de alas que se colocan en tu espalda. Las alas durarán 1 hora o hasta que pongas fin al efecto antes de tiempo como acción de magia. Las alas te otorgan una velocidad volando de 60 pies. Si estás en el aire cuando desaparezcan las alas, caerás. Cuando desaparezcan, no podrás usarlas de nuevo durante 1d12 horas.",
     "rarity": "rare",
     "requiresAttunement": true,
-    "sourcePage": 229
+    "sourcePage": 229,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "alfombra-voladora",
@@ -93,7 +114,10 @@
     "description": "Objeto maravilloso, muy raro\nPodés utilizar una acción de magia y usar la palabra de activación de esta alfombra para hacer que levite y vuele. Se moverá según las indicaciones que le des si estás a 30 pies o menos de ella.\nExisten cuatro tamaños de alfombra voladora.\nTu GM elige el tamaño de la alfombra o lo determina al azar tirando en la tabla a continuación.\nLa alfombra puede transportar hasta el doble del peso mostrado en la tabla, pero su velocidad volando se reduce a la mitad si transporta un peso superior a su capacidad normal.\n1d100 Tamaño Capacidad Velocidad volando\n01–20 3 pies × 5 pies 200 libras 80 pies\n21–55 4 pies × 6 pies 400 libras 60 pies\n56–80 5 pies × 7 pies 600 libras 40 pies\n81–00 6 pies × 9 pies 800 libras 30 pies",
     "rarity": "very-rare",
     "requiresAttunement": false,
-    "sourcePage": 229
+    "sourcePage": 229,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "aljaba-eficiente",
@@ -105,7 +129,10 @@
     "description": "Objeto maravilloso, infrecuente\nCada uno de los tres compartimentos de esta aljaba está conectado con un espacio extradimensional, lo que le permite contener muchos objetos sin pesar nunca más de 2 libras. El compartimento más pequeño puede albergar hasta 60 flechas, virotes u objetos similares. El compartimento intermedio puede contener hasta 18 jabalinas u objetos parecidos. En el compartimento más grande caben hasta 6 objetos largos, como arcos, bastones o lanzas.\nPodés extraer cualquier objeto que contenga esta aljaba igual que lo harías con una aljaba o vaina normal.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 229
+    "sourcePage": 229,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "amuleto-a-prueba-de-deteccion-y-localizacion",
@@ -117,7 +144,10 @@
     "description": "Objeto maravilloso, infrecuente (requiere sintonización)\nMientras lleves puesto este amuleto, no podrás ser objetivo de conjuros de adivinación ni ser percibido mediante sensores mágicos de escudriñamiento salvo que lo permitas.",
     "rarity": "uncommon",
     "requiresAttunement": true,
-    "sourcePage": 229
+    "sourcePage": 229,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "amuleto-de-los-planos",
@@ -129,7 +159,10 @@
     "description": "Objeto maravilloso, muy raro (requiere sintonización)\nMientras lleves puesto este amuleto, podrás usar una acción de magia para nombrar un lugar que conozcas de otro plano de existencia. Después, hacé una prueba de Inteligencia (Conocimiento arcano) con CD 15. Si la superás, lanzarás desplazamiento entre planos. Si la fallás, vos y cualquier criatura u objeto que se encuentre a 15 pies o menos de vos se desplazan a un lugar al azar. Para ello, tirá 1d100 y consultá el destino en la tabla a continuación.\n1d100 Destino\n01–60 Un sitio al azar en el plano de existencia nombrado.\n61–70 Un sitio al azar en un Plano Interior, que se determina tirando 1d6: si sale un 1, el Plano de la Tierra; si sale un 2, el Plano del Agua; si sale un 3, el Plano del Aire; si sale un 4, el Plano del Fuego; si sale un 5, los Parajes Feéricos; si sale un 6, el Páramo Sombrío.\n71–80 Un sitio al azar en un Plano Exterior, que se determina tirando 1d8: si sale un 1, Arbórea; si sale un 2, Arcadia; si sale un 3, Bitopía; si sale un 4, Elíseo; si sale un 5, Mechanus; si sale un 6, el Monte Celestia; si sale un 7, las Tierras de las Bestias; si sale un 8, Ysgard.\n81–90 Un sitio al azar en un Plano Exterior, que se determina tirando 1d8: si sale un 1, el Abismo; si sale un 2, Aqueronte; si sale un 3, Carceri; si sale un 4; Gehenna; si sale un 5, Hades; si sale un 6, Limbo; si sale un 7, los Nueve Infiernos; si sale un 8, Pandemónium.\n91–00 Un sitio al azar en el Plano Astral.",
     "rarity": "very-rare",
     "requiresAttunement": true,
-    "sourcePage": 230
+    "sourcePage": 230,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "amuleto-de-salud",
@@ -148,7 +181,10 @@
         "score": 19
       }
     ],
-    "sourcePage": 230
+    "sourcePage": 230,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anillo-de-almacenamiento-de-conjuros",
@@ -160,7 +196,10 @@
     "description": "Anillo, raro (requiere sintonización)\nEste anillo almacena los conjuros que se lanzan sobre él y los conserva hasta que el portador sintonizado decida usarlos. El anillo puede guardar conjuros con un valor de hasta 5 niveles. Cuando lo encuentres, contendrá 1d6 − 1 niveles de conjuros almacenados, a elección de tu GM.\nCualquier criatura puede lanzar un conjuro de niveles 1 a 5 sobre el anillo si lo toca mientras lanza el conjuro. El único efecto que tendrá el conjuro es que quedará almacenado en el anillo. Si el anillo no puede albergarlo, el conjuro se gastará sin efecto.\nEl nivel del espacio utilizado para lanzar el conjuro determina cuánto espacio utiliza.\nMientras lleves puesto este anillo, podrás lanzar cualquiera de los conjuros almacenados. El conjuro utiliza el nivel del espacio, la CD de salvación de conjuros, el bonificador de ataque de conjuros y la aptitud mágica del lanzador original, pero, por lo demás, funciona como si vos lo hubieses lanzado.\nEl conjuro lanzado desde el anillo deja de estar almacenado en él, por lo que deja espacio libre.",
     "rarity": "rare",
     "requiresAttunement": true,
-    "sourcePage": 230
+    "sourcePage": 230,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anillo-de-caida-de-pluma",
@@ -172,7 +211,10 @@
     "description": "Anillo, raro (requiere sintonización)\nSi caés mientras llevás puesto este anillo, descenderás 60 pies por asalto y no sufrirás daño por la caída.",
     "rarity": "rare",
     "requiresAttunement": true,
-    "sourcePage": 230
+    "sourcePage": 230,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anillo-de-calidez",
@@ -190,7 +232,10 @@
         "damageType": "cold"
       }
     ],
-    "sourcePage": 230
+    "sourcePage": 230,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anillo-de-caminar-sobre-las-aguas",
@@ -202,7 +247,10 @@
     "description": "Anillo, infrecuente\nMientras lleves puesto este anillo, podés lanzar caminar sobre el agua desde él eligiéndote como objetivo solo a vos.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 230
+    "sourcePage": 230,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anillo-de-comandar-elementales",
@@ -216,7 +264,10 @@
     "requiresAttunement": true,
     "sourcePage": 230,
     "maxCharges": 5,
-    "rechargeAmount": "1d4 + 1"
+    "rechargeAmount": "1d4 + 1",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anillo-de-escudo-mental",
@@ -228,7 +279,10 @@
     "description": "Anillo, infrecuente (requiere sintonización)\nMientras lleves puesto este anillo, serás inmune a la magia que permita a otras criaturas leer tus pensamientos, determinar si mentís, saber tu alineamiento o averiguar tu tipo de criatura. Otras criaturas solo podrán comunicarse telepáticamente contigo si se lo permitís.\nPodés emplear una acción de magia para que el anillo se vuelva imperceptible hasta que uses otra acción de magia para hacerlo perceptible, hasta que te lo quites o hasta que mueras.\nSi morís mientras llevás puesto el anillo, tu alma entrará en él salvo que ya albergue otra alma.\nPodés permanecer en el anillo o partir al más allá.\nMientras tu alma se encuentre en el anillo, podrás comunicarte telepáticamente con cualquier criatura que lo lleve puesto. Quien lo utilice no podrá evitar esta comunicación telepática.",
     "rarity": "uncommon",
     "requiresAttunement": true,
-    "sourcePage": 231
+    "sourcePage": 231,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anillo-de-estrellas-fugaces",
@@ -242,7 +296,10 @@
     "requiresAttunement": true,
     "sourcePage": 231,
     "maxCharges": 6,
-    "rechargeAmount": "1d6"
+    "rechargeAmount": "1d6",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anillo-de-evasion",
@@ -256,7 +313,10 @@
     "requiresAttunement": true,
     "sourcePage": 231,
     "maxCharges": 3,
-    "rechargeAmount": "1d3"
+    "rechargeAmount": "1d3",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anillo-de-influencia-animal",
@@ -270,7 +330,10 @@
     "requiresAttunement": false,
     "sourcePage": 232,
     "maxCharges": 3,
-    "rechargeAmount": "1d3"
+    "rechargeAmount": "1d3",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anillo-de-invisibilidad",
@@ -282,7 +345,10 @@
     "description": "Anillo, legendario (requiere sintonización)\nMientras lleves puesto este anillo, podés utilizar una acción de magia para otorgarte el estado de invisible. Permanecerás invisible hasta que te quites el anillo o hasta que emplees una acción adicional para volverte visible de nuevo.",
     "rarity": "legendary",
     "requiresAttunement": true,
-    "sourcePage": 232
+    "sourcePage": 232,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anillo-de-invocar-djinns",
@@ -294,7 +360,10 @@
     "description": "Anillo, legendario (requiere sintonización)\nMientras lleves puesto este anillo, podrás utilizar una acción de magia invocar a un determinado djinn del Plano Elemental del Aire. El djinn aparecerá en un espacio sin ocupar que elijas a 120 pies o menos de vos. Permanecerá mientras mantengas la concentración, hasta un máximo de 1 hora o hasta que sus puntos de golpe se reduzcan a 0.\nMientras esté invocado, el djinn será amistoso contigo y tus aliados y obedecerá tus órdenes.\nSi no le das ninguna, el djinn se defenderá de los atacantes, pero no llevará a cabo ninguna otra acción.\nUna vez que se haya ido, no se podrá volver a invocarlo durante 24 horas. El anillo se volverá no mágico si el djinn muere.\nLos anillos de invocar djinns suelen ser obra de los propios djinns que invocan, que los entregan a los mortales como regalos de amistad o muestras de aprecio.",
     "rarity": "legendary",
     "requiresAttunement": true,
-    "sourcePage": 232
+    "sourcePage": 232,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anillo-de-libertad-de-accion",
@@ -306,7 +375,10 @@
     "description": "Anillo, raro (requiere sintonización)\nMientras lleves puesto este anillo, el terreno difícil no te costará movimiento adicional. Además, la magia no puede reducir ninguna de tus velocidades ni causar que tengas los estados de apresado o paralizado.",
     "rarity": "rare",
     "requiresAttunement": true,
-    "sourcePage": 232
+    "sourcePage": 232,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anillo-de-los-tres-deseos",
@@ -319,7 +391,10 @@
     "rarity": "legendary",
     "requiresAttunement": false,
     "sourcePage": 232,
-    "maxCharges": 3
+    "maxCharges": 3,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anillo-de-natacion",
@@ -331,7 +406,10 @@
     "description": "Anillo, infrecuente\nTenés una velocidad nadando de 40 pies mientras lleves puesto este anillo.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 232
+    "sourcePage": 232,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anillo-de-proteccion",
@@ -353,7 +431,10 @@
         "amount": 1
       }
     ],
-    "sourcePage": 232
+    "sourcePage": 232,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anillo-de-regeneracion",
@@ -365,7 +446,10 @@
     "description": "Anillo, muy raro (requiere sintonización)\nMientras lleves puesto este anillo, recuperarás 1d6 puntos de golpe cada 10 minutos si tenés al menos 1 punto de golpe. Si perdés una parte del cuerpo, el anillo hace que te vuelva a crecer y recupere su funcionalidad completa tras 1d6 + 1 días si te mantenés con al menos 1 punto de golpe durante todo ese tiempo.",
     "rarity": "very-rare",
     "requiresAttunement": true,
-    "sourcePage": 232
+    "sourcePage": 232,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anillo-de-resistencia",
@@ -377,7 +461,10 @@
     "description": "Anillo, raro\nMientras lleves puesto este anillo, tendrás resistencia a un tipo de daño. La piedra preciosa engastada indica el tipo, que tu GM elige o determina al azar tirando en la siguiente tabla.\n1d10 Tipo de daño Piedra preciosa\n1 Ácido Perla\n2 Frío Turmalina\n3 Fuego Granate\n4 Fuerza Zafiro\n5 Necrótico Azabache\n6 Psíquico Jade\n7 Radiante Topacio\n8 Relámpago Citrino\n9 Trueno Espinela\n10 Veneno Amatista",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 232
+    "sourcePage": 232,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anillo-de-retorno-de-conjuros",
@@ -389,7 +476,10 @@
     "description": "Anillo, legendario (requiere sintonización)\nMientras lleves puesto este anillo, tenés ventaja en las tiradas de salvación contra conjuros. Si superás la tirada de un conjuro de nivel 7 o inferior, dicho conjuro no tendrá ningún efecto sobre vos. Si el conjuro solo te hacía objetivo a vos y no creó un área de efecto, podés emplear una reacción para devolverle el conjuro al lanzador, que deberá hacer una tirada de salvación contra él usando su propia CD de salvación de conjuros.",
     "rarity": "legendary",
     "requiresAttunement": true,
-    "sourcePage": 232
+    "sourcePage": 232,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anillo-de-salto",
@@ -401,7 +491,10 @@
     "description": "Anillo, infrecuente (requiere sintonización)\nMientras lleves puesto este anillo, podés lanzar salto desde él, pero solo podés hacerte objetivo a vos.",
     "rarity": "uncommon",
     "requiresAttunement": true,
-    "sourcePage": 233
+    "sourcePage": 233,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anillo-de-telequinesis",
@@ -413,7 +506,10 @@
     "description": "Anillo, muy raro (requiere sintonización)\nMientras lleves puesto este anillo, podés lanzar telequinesis desde él.",
     "rarity": "very-rare",
     "requiresAttunement": true,
-    "sourcePage": 233
+    "sourcePage": 233,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anillo-de-vision-de-rayos-x",
@@ -425,7 +521,10 @@
     "description": "Anillo, raro (requiere sintonización)\nMientras lleves puesto este anillo, podés emplear una acción de magia para obtener visión de rayos X hasta 30 pies durante 1 minuto. Para vos, los objetos sólidos que haya dentro de ese radio se verán transparentes y no impedirán el paso de la luz.\nLa visión puede atravesar 1 pie de piedra, 1 pulgada de cualquier metal común o hasta 3 pies de madera o tierra. Una sustancia más gruesa o una lámina fina de plomo bloquearán la visión.\nCada vez que vuelvas a usar el anillo antes de hacer un descanso largo, deberás superar una tirada de salvación de Constitución con CD 15 o sumarás 1 nivel de cansancio.",
     "rarity": "rare",
     "requiresAttunement": true,
-    "sourcePage": 233
+    "sourcePage": 233,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anillo-del-carnero",
@@ -439,7 +538,10 @@
     "requiresAttunement": true,
     "sourcePage": 233,
     "maxCharges": 3,
-    "rechargeAmount": "1d3"
+    "rechargeAmount": "1d3",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anteojos-de-encantamiento",
@@ -453,7 +555,10 @@
     "requiresAttunement": true,
     "sourcePage": 233,
     "maxCharges": 3,
-    "rechargeAmount": "todas"
+    "rechargeAmount": "todas",
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anteojos-de-la-noche",
@@ -471,7 +576,10 @@
         "range": 18
       }
     ],
-    "sourcePage": 233
+    "sourcePage": 233,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anteojos-de-vision-minuciosa",
@@ -483,7 +591,10 @@
     "description": "Objeto maravilloso, infrecuente\nEstas lentes de cristal cubren los ojos. Mientras las lleves puestas, podrás ver mucho mejor de lo normal hasta una distancia de 1 pie: tendrás visión en la oscuridad hasta esa distancia y ventaja en las pruebas de Inteligencia (Investigación) para examinar algo a esa distancia o menos.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 233
+    "sourcePage": 233,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "anteojos-de-vista-de-aguila",
@@ -495,7 +606,10 @@
     "description": "Objeto maravilloso, infrecuente\nEstas lentes de cristal cubren los ojos. Mientras las lleves puestas, tendrás ventaja en las pruebas de Sabiduría (Percepción) que dependan de la vista.\nEn condiciones de buena visibilidad, podrás ver detalles de criaturas y objetos muy lejanos de incluso 2 pies de diámetro.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 233
+    "sourcePage": 233,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "aparato-del-crustaceo",
@@ -507,7 +621,10 @@
     "description": "Objeto maravilloso, legendario\nA simple vista, este objeto parece un barril de hierro sellado que pesa 500 libras. El barril tiene un pestillo escondido, que se puede encontrar si se supera una prueba de Inteligencia (Investigación) con CD 20. Si se abre el pestillo, se accede a una escotilla en un extremo del barril, en el que pueden entrar dos criaturas Medianas o más pequeñas arrastrándose. Al fondo hay diez palancas dispuestas en fila en posición neutra que pueden levantarse o bajarse.\nSi se usan determinadas palancas, el aparato se transforma en una especie de langosta gigante.\nEl aparato del crustáceo es un objeto Grande con el siguiente perfil: CA de 20, 200 pg, velocidad 30 pies, nadar 30 pies (o 0 pies en ambos casos si las patas no están extendidas) e inmunidad al daño psíquico y de veneno.\nEl aparato puede utilizarse como vehículo, pero requiere un piloto para ello. Mientras la escotilla esté cerrada, el compartimento es estanco y hermético. Contiene aire suficiente para respirar durante 10 horas, divididas entre el número de criaturas que necesiten respirar en su interior.\nEl aparato flota en el agua. También puede sumergirse a una profundidad de 900 pies. Por debajo de esta profundidad, el vehículo sufre 2d6 de daño contundente cada minuto debido a la presión.\nUna criatura que esté en el compartimento puede emplear una acción de utilizar para subir o bajar hasta dos de las palancas del aparato. Después de cada uso, la palanca regresa a su posición neutra.\nCada palanca, de izquierda a derecha, funciona como se muestra en la tabla “Palancas del aparato del crustáceo”.\nPalancas del aparato del crustáceo Palanca Subida Bajada 1 Las patas se extienden, lo que permite que el aparato camine y nade.\nLas patas se retraen, lo que reduce la velocidad y la velocidad nadando del aparato a 0 e impide que se beneficie de ningún bonificador a su velocidad.\n2 La persiana de la ventana delantera se abre. La persiana de la ventana delantera se cierra.\n3 Las persianas de las ventanas laterales se abren (dos por lado).\nLas persianas de las ventanas laterales se cierran (dos por lado).\n4 Se extienden dos pinzas desde la parte delantera del aparato.\nLas pinzas se retraen.\n5 Cada pinza extendida lleva a cabo el siguiente ataque cuerpo a cuerpo: +8 a acertar, alcance 5 pies. Acierto:\n7 (2d6) de daño contundente.\nCada pinza extendida lleva a cabo el siguiente ataque cuerpo a cuerpo: +8 a acertar, alcance 5 pies. Acierto: el objetivo tendrá el estado de agarrado (CD 15 para escapar).\n6 Si las patas están extendidas, el aparato camina o nada hacia delante.\nSi las patas están extendidas, el aparato camina o nada hacia atrás.\n7 Si las patas están extendidas, el aparato gira 90 grados a la izquierda.\nSi las patas están extendidas, el aparato gira 90 grados a la derecha.\n8 Unas linternas con forma de ojo emiten luz brillante en un radio de 30 pies y luz tenue 30 pies más allá.\nLa luz se apaga.\n9 El aparato desciende hasta 20 pies en un medio líquido. El aparato asciende hasta 20 pies en un medio líquido.\n10 La escotilla trasera se abre. La escotilla trasera se cierra.",
     "rarity": "legendary",
     "requiresAttunement": false,
-    "sourcePage": 233
+    "sourcePage": 233,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "arco-de-energia",
@@ -520,7 +637,10 @@
     "rarity": "very-rare",
     "requiresAttunement": true,
     "baseItemKind": "weapon",
-    "sourcePage": 234
+    "sourcePage": 234,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "arco-juramentado",
@@ -533,7 +653,10 @@
     "rarity": "very-rare",
     "requiresAttunement": true,
     "baseItemKind": "weapon",
-    "sourcePage": 234
+    "sourcePage": 234,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "arma-1",
@@ -546,7 +669,10 @@
     "rarity": "uncommon",
     "requiresAttunement": false,
     "magicBonus": 1,
-    "sourcePage": 235
+    "sourcePage": 235,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "arma-2",
@@ -559,7 +685,10 @@
     "rarity": "uncommon",
     "requiresAttunement": false,
     "magicBonus": 2,
-    "sourcePage": 235
+    "sourcePage": 235,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "arma-3",
@@ -572,7 +701,10 @@
     "rarity": "uncommon",
     "requiresAttunement": false,
     "magicBonus": 3,
-    "sourcePage": 235
+    "sourcePage": 235,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "arma-de-advertencia",
@@ -585,7 +717,10 @@
     "rarity": "uncommon",
     "requiresAttunement": true,
     "baseItemKind": "weapon",
-    "sourcePage": 235
+    "sourcePage": 235,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "arma-feroz",
@@ -598,7 +733,10 @@
     "rarity": "rare",
     "requiresAttunement": false,
     "baseItemKind": "weapon",
-    "sourcePage": 235
+    "sourcePage": 235,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "armadura-1",
@@ -611,7 +749,10 @@
     "rarity": "rare",
     "requiresAttunement": false,
     "magicBonus": 1,
-    "sourcePage": 235
+    "sourcePage": 235,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "armadura-2",
@@ -624,7 +765,10 @@
     "rarity": "rare",
     "requiresAttunement": false,
     "magicBonus": 2,
-    "sourcePage": 235
+    "sourcePage": 235,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "armadura-3",
@@ -637,7 +781,10 @@
     "rarity": "rare",
     "requiresAttunement": false,
     "magicBonus": 3,
-    "sourcePage": 235
+    "sourcePage": 235,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "armadura-adamantina",
@@ -650,7 +797,10 @@
     "rarity": "uncommon",
     "requiresAttunement": false,
     "baseItemKind": "armor",
-    "sourcePage": 235
+    "sourcePage": 235,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "armadura-de-invulnerabilidad",
@@ -663,7 +813,10 @@
     "rarity": "legendary",
     "requiresAttunement": true,
     "baseItemKind": "armor",
-    "sourcePage": 235
+    "sourcePage": 235,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "armadura-de-mithral",
@@ -676,7 +829,10 @@
     "rarity": "uncommon",
     "requiresAttunement": false,
     "baseItemKind": "armor",
-    "sourcePage": 235
+    "sourcePage": 235,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "armadura-de-placas-de-etereidad",
@@ -689,7 +845,10 @@
     "rarity": "legendary",
     "requiresAttunement": true,
     "baseItemKind": "armor",
-    "sourcePage": 235
+    "sourcePage": 235,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "armadura-de-placas-enana",
@@ -702,7 +861,10 @@
     "rarity": "very-rare",
     "requiresAttunement": false,
     "baseItemKind": "armor",
-    "sourcePage": 235
+    "sourcePage": 235,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "armadura-de-resistencia",
@@ -715,7 +877,10 @@
     "rarity": "rare",
     "requiresAttunement": true,
     "baseItemKind": "armor",
-    "sourcePage": 235
+    "sourcePage": 235,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "armadura-de-vulnerabilidad",
@@ -728,7 +893,10 @@
     "rarity": "rare",
     "requiresAttunement": true,
     "baseItemKind": "armor",
-    "sourcePage": 236
+    "sourcePage": 236,
+    "magicItemType": null,
+    "cursed": true,
+    "variableRarity": false
   },
   {
     "id": "armadura-demoniaca",
@@ -741,7 +909,10 @@
     "rarity": "very-rare",
     "requiresAttunement": true,
     "baseItemKind": "armor",
-    "sourcePage": 236
+    "sourcePage": 236,
+    "magicItemType": null,
+    "cursed": true,
+    "variableRarity": false
   },
   {
     "id": "babuchas-de-trepar-cual-aracnido",
@@ -753,7 +924,10 @@
     "description": "Objeto maravilloso, infrecuente (requiere sintonización)\nMientras lleves puesto este calzado ligero, podrás moverte hacia arriba, hacia abajo y de lado por superficies verticales, así como por techos. Esta manera de moverse no requiere del uso de las manos, que quedan libres. Tenés una velocidad trepando igual a tu velocidad. No obstante, las babuchas no te permiten desplazarte de esta forma por una superficie resbaladiza, como una zona cubierta por hielo o aceite.",
     "rarity": "uncommon",
     "requiresAttunement": true,
-    "sourcePage": 236
+    "sourcePage": 236,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "bandas-de-hierro",
@@ -765,7 +939,10 @@
     "description": "Objeto maravilloso, raro\nEsta esfera de hierro oxidada mide 3 pulgadas de diámetro y pesa 1 libra. Podés emplear una acción de magia para lanzarla contra una criatura Enorme o más pequeña que puedas ver a 60 pies o menos de vos.\nEn el recorrido del lanzamiento, la esfera se abre en una maraña de bandas de metal.\nRealiza una tirada de ataque a distancia con un bonificador de ataque igual a tu modificador por Destreza más tu bonificador por competencia.\nSi acierta, el objetivo tiene el estado de apresado hasta que utilices una acción adicional para dar una orden y liberarlo. Si hacés esto o si el ataque yerra, las bandas se contraerán y volverán a convertirse en una esfera.\nCualquier criatura que toque las bandas, incluida la que está apresada, puede emplear una acción para realizar una prueba de Fuerza (Atletismo) con CD 20 para romper las bandas de hierro. Si la supera, el objeto se destruye y la criatura apresada se libera. Si la falla, cualquier otro intento de romper las bandas por parte de la criatura fallará automáticamente hasta que hayan transcurrido 24 horas.\nUna vez que se utilizan las bandas, no podrán volver a usarse hasta el siguiente amanecer.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 236
+    "sourcePage": 236,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "baraja-de-ilusiones",
@@ -777,7 +954,10 @@
     "description": "Objeto maravilloso, infrecuente\nEsta caja contiene una baraja de cartas. Una baraja completa tiene 34 cartas: 32 de ellas muestran criaturas concretas y las otras 2 tienen una superficie espejada. A una baraja encontrada como tesoro le suelen faltar 1d20 − 1 cartas.\nLa magia de la baraja solo funciona si las cartas se roban al azar. Podés utilizar una acción de magia para robar una carta al azar de la baraja y tirarla al suelo, a un punto que esté a 30 pies o menos de vos. Una ilusión de una criatura, que se determina tirando en la tabla “Baraja de ilusiones”, se formará sobre la carta y permanecerá hasta que se disipe. La criatura ilusoria que crea la carta se parece a una criatura real de su tipo y se comporta como tal, excepto porque no puede hacer daño. Mientras estés a 120 pies o menos de una criatura ilusoria y puedas verla, podrás emplear una acción de magia para moverla a cualquier lugar situado a 30 pies o menos de la carta.\nCualquier interacción física con la criatura ilusoria revelará que es falsa, ya que los objetos la atravesarán. Si una criatura emplea una acción de estudiar para inspeccionarla, identificará que es una ilusión si supera una prueba de Inteligencia ( Investigación) con CD 15. La ilusión durará hasta que se disipe (mediante un conjuro disipar magia o un efecto similar) o hasta que alguien mueva la carta. Cuando la ilusión concluya, la imagen de la carta desaparecerá y esa carta no se podrá volver a usar.\nBaraja de ilusiones\n1d100 Ilusión*\n01–03 Archimago\n04–06 Asesino\n07–09 Basilisco\n10–12 Berserker\n13–15 Caballero\n16–18 Capitán bandido\n19–21 Dragón rojo adulto\n22–24 Druida\n25–27 Erinia\n28–30 Ettin\n31–33 Gigante de escarcha\n34–36 Gigante de fuego\n37–39 Gigante de las colinas\n40–42 Gigante de las nubes\n43–45 Gólem de hierro\n46–48 Guerrero gnoll\n49–51 Guerrero goblin\n52–54 Guerrero hobgoblin\n55–57 Guerrero kobold\n58–60 Guerrero osgo\n61–63 Guerrero veterano\n64–66 Guiverno\n67–69 Íncubo\n70–72 Liche\n73–75 Medusa\n76–78 Naga guardiana\n79–81 Ogro\n82–84 Oni\n85–87 Sacerdote\n88–90 Saga de la noche\n91–93 Súcubo\n94–96 Troll\n97–00 El dueño de la baraja *Los perfiles de las criaturas (salvo el dueño de la baraja) aparecen en el capítulo “Monstruos”.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 236
+    "sourcePage": 236,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "baraja-misteriosa",
@@ -789,7 +969,10 @@
     "description": "Objeto maravilloso, legendario\nEsta baraja, que normalmente se encuentra dentro de una caja o bolsa, contiene cartas hechas de marfil o vitela. La mayoría (el 75 %) de estas barajas tienen trece cartas, aunque algunas tienen veintidós. Utiliza la columna correspondiente de la tabla “Baraja misteriosa” para determinar al azar las cartas que se roban de la baraja.\nAntes de robar una carta, debés declarar cuántas pretendés robar y, a continuación, robarlas al azar.\nCualquier carta robada por encima de la cantidad declarada no tiene efecto. Por lo demás, en cuanto robes una carta de la baraja, su magia producirá el efecto que corresponda. Debés robar cada carta antes de que pase 1 hora desde el robo anterior.\nSi no robás la cantidad de cartas declaradas, las cartas restantes saldrán volando de la baraja por su cuenta y tendrán efecto a la vez.\nCuando robás una carta, desaparece. A menos que sea el Loco o el Bufón, la carta volverá a la baraja, por lo que será posible robarla dos veces (cuando el Loco o el Bufón hayan dejado la baraja, tirá de nuevo en la tabla si vuelve a salir una de ellas).\nBaraja misteriosa 1d100 (baraja de 13 cartas)\n1d100 (baraja de 22 cartas) Carta\n01–08 01–05 Bufón\n09–16 06–10 Caballero — 11–14 Calabozo\n17–24 15–18 Calavera\n25–32 19–22 Canalla — 23–27 Cometa\n33–36 28–31 El Vacío — 32–36 Equilibrio — 37–41 Erudito\n37–44 42–46 Estrella\n45–52 47–50 Euríale — 51–54 Garras — 55–59 Gema — 60–64 Hados\n53–60 65–68 Llamas\n61–68 69–73 Llave — 74–77 Loco\n69–76 78–82 Luna — 83–86 Rompecabezas\n77–84 87–90 Ruina\n85–92 91–95 Sol\n93–00 96–00 Trono Los efectos de cada carta se describen a continuación.\nBufón. Tenés ventaja en las pruebas con d20 durante las próximas 72 horas, o podés robar dos cartas más de las que declaraste.\nCaballero. Conseguís los servicios de un caballero, que aparece mágicamente en un espacio sin ocupar de tu elección a 30 pies o menos de vos. El caballero tiene tu mismo alineamiento y te servirá con lealtad hasta la muerte, creyendo que el destino le ha llevado hasta vos. Habla con tu GM para darle un nombre y un trasfondo a este PNJ. Tu GM puede emplear un perfil distinto para el caballero, según considere.\nCalabozo. Desaparecés y quedás sepultado en un estado de animación suspendida en una esfera extradimensional. Todo lo que llevaras y vistieras desaparece contigo salvo los artefactos, que se quedan en el espacio que ocupabas cuando desapareciste. Permanecerás encarcelado hasta que te encuentren y te saquen de la esfera. No se te puede localizar mediante magia de adivinación, pero sí mediante un conjuro deseo. No robás más cartas.\nCalavera. Un avatar de la muerte (consultá el perfil en esta página) aparece en un espacio sin ocupar lo más cerca posible de vos. El avatar se muestra como un esqueleto fantasmal vestido con una raída túnica negra, porta una guadaña espectral y solo te atacará a vos. El avatar desaparecerá cuando sus puntos de golpe se reduzcan a 0 o cuando mueras.\nSi uno de tus aliados intenta hacerle daño, ese aliado invocará otro avatar de la muerte. El nuevo avatar aparecerá en un espacio sin ocupar lo más cerca posible de ese aliado y solo le atacará a él. Tus aliados y vos solo pueden invocar un avatar cada uno como consecuencia de este robo. Cualquier criatura que sucumba ante un avatar no puede revivir.\nAvatar de la muerte Muerto viviente Mediano, neutral malvado CA: 20 Iniciativa: +3 (13)\nPG: la mitad de los pg máximos de su invocador Velocidad: 60 pies, volar 60 pies (levitar)\nMOD. SALV. MOD. SALV. MOD. SALV.\nFue 16 +3 +3 Des 16 +3 +3 Con 16 +3 +3 Int 16 +3 +3 Sab 16 +3 +3 Car 16 +3 +3 Inmunidades: necrótico, veneno; asustado, cansancio, envenenado, hechizado, inconsciente, paralizado, petrificado Sentidos: visión verdadera 60 pies, Percepción pasiva 13 Idiomas: todos los que conozca su invocador VD: ninguno (0 PX; BC igual al de su invocador)\nAtributos Movimiento incorpóreo. El avatar puede moverse a través de otras criaturas y objetos como si fueran terreno difícil. Recibe 5 (1d10) de daño de fuerza si acaba su turno dentro de un objeto.\nAcciones Ataque múltiple. El avatar realiza una cantidad de ataques con su guadaña segadora igual a la mitad del bonificador por competencia de su invocador (redondeando hacia arriba).\nGuadaña segadora. Tirada de ataque cuerpo a cuerpo: acierto automático, alcance 5 pies. Acierto: 7 (1d8 + 3) de daño cortante más 4 (1d8) de daño necrótico.\nCanalla. Un PNJ a elección de tu GM se vuelve hostil hacia vos. No conocés la identidad de este personaje hasta que el PNJ u otra persona la revelen.\nSalvo un conjuro deseo o la intercesión divina, nada puede hacer que esta hostilidad cese.\nCometa. La próxima vez que entables combate contra una o más criaturas hostiles, podés elegir a una como tu adversario cuando tires iniciativa.\nSi reducís a 0 los puntos de golpe de tu adversario durante el combate, tendrás ventaja en las tiradas de salvación contra muerte durante 1 año. Si alguien reduce a 0 los puntos de golpe de tu adversario elegido o si no elegís uno, esta carta no tendrá ningún efecto.\nEl Vacío. Tu alma se extrae de tu cuerpo y va a parar al interior de un objeto situado en un lugar a elección de tu GM. Uno o más seres poderosos custodian ese sitio. Mientras tu alma esté atrapada de esta manera, tu cuerpo permanece inerte, deja de envejecer y no necesita comida, agua ni aire. Un conjuro deseo no puede devolver tu alma a tu cuerpo, pero revelará el paradero del objeto que la alberga.\nNo robás más cartas.\nEquilibrio. Podés aumentar una de tus puntuaciones de característica en 2 hasta un máximo de 22, siempre y cuando reduzcas otra puntuación de característica en 2. No podés reducir una característica con una puntuación de 5 o menos. Como alternativa, podés decidir no ajustar tus puntuaciones de característica. En ese caso, esta carta no tendrá ningún efecto.\nErudito. En cualquier momento que quieras hasta un año después de robar esta carta, podrás hacer una pregunta mientras meditás y recibirás mentalmente una respuesta veraz a dicha cuestión.\nEstrella. Aumenta en 2 una de tus puntuaciones de característica, hasta un máximo de 24.\nEuríale. La cara de medusa de la carta te lanza una maldición. Recibís un penalizador de −2 a las tiradas de salvación mientras estés bajo su influjo.\nSolo un dios o la magia de la carta de los Hados pueden acabar con esta maldición.\nGarras. Todos los objetos mágicos que vistas o lleves contigo se desintegran. Los artefactos que poseas se desvanecerán.\nGema. Aparecen a tus pies veinticinco joyas con un valor de 2000 po cada una o cincuenta gemas con un valor de 1000 po cada una.\nHados. El tejido del universo se desteje y se teje de nuevo, lo que te permite evitar o borrar un suceso, como si nunca hubiera ocurrido. Podés usar esta magia tan pronto como robes la carta o en cualquier momento antes de morir.\nLlamas. Un poderoso diablo se convierte en tu enemigo. Buscará tu ruina y te atormentará, además de regodearse con tu sufrimiento antes de intentar matarte. Esta enemistad dura hasta que el diablo o vos mueran.\nLlave. Aparece en tus manos un arma mágica rara o de mayor rareza con la que sos competente.\nTu GM elige el arma.\nLoco. Tenés desventaja en las pruebas con d20 durante las próximas 72 horas. Roba otra carta, que no contará como uno de los robos declarados.\nLuna. Obtenés la capacidad de lanzar el conjuro deseo 1d3 veces.\nRompecabezas. Tu Inteligencia o Sabiduría se reducen permanentemente en 1d4 + 1 (hasta un mínimo de 1). Podés robar una carta más de las que declaraste.\nRuina. Perdés todas las riquezas que lleves o poseas, excepto los objetos mágicos. Las propiedades que puedas llevar encima desaparecen. Perdés todos los negocios, edificios y tierras que poseas de la manera que menos altere la realidad. Cualquier documento que pruebe que deberías poseer las riquezas perdidas por esta carta también desaparece.\nSol. Un objeto mágico (a elección de tu GM) aparece en tus manos. Además, hasta que mueras, obtenés 10 puntos de golpe temporales cada día, al amanecer.\nTrono. Obtenés competencia y pericia en Historia, Intimidación, Perspicacia o Persuasión, a tu elección. Además, obtenés de pleno derecho la propiedad de una pequeña fortaleza en alguna parte del mundo. Sin embargo, la fortaleza es hogar de uno o más monstruos, que deberás expulsar antes de reclamarla como tuya.",
     "rarity": "legendary",
     "requiresAttunement": false,
-    "sourcePage": 237
+    "sourcePage": 237,
+    "magicItemType": "wondrous",
+    "cursed": true,
+    "variableRarity": false
   },
   {
     "id": "baston-de-acrobata",
@@ -802,7 +985,10 @@
     "rarity": "very-rare",
     "requiresAttunement": true,
     "baseItemKind": "weapon",
-    "sourcePage": 239
+    "sourcePage": 239,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "baston-de-curacion",
@@ -816,7 +1002,10 @@
     "requiresAttunement": true,
     "sourcePage": 239,
     "maxCharges": 10,
-    "rechargeAmount": "1d6 + 4"
+    "rechargeAmount": "1d6 + 4",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "baston-de-enjambre-de-insectos",
@@ -830,7 +1019,10 @@
     "requiresAttunement": true,
     "sourcePage": 239,
     "maxCharges": 10,
-    "rechargeAmount": "1d6 + 4"
+    "rechargeAmount": "1d6 + 4",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "baston-de-escarcha",
@@ -844,7 +1036,10 @@
     "requiresAttunement": true,
     "sourcePage": 240,
     "maxCharges": 10,
-    "rechargeAmount": "1d6 + 4"
+    "rechargeAmount": "1d6 + 4",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "baston-de-fuego",
@@ -858,7 +1053,10 @@
     "requiresAttunement": true,
     "sourcePage": 240,
     "maxCharges": 10,
-    "rechargeAmount": "1d6 + 4"
+    "rechargeAmount": "1d6 + 4",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "baston-de-impacto",
@@ -872,7 +1070,10 @@
     "requiresAttunement": true,
     "sourcePage": 240,
     "maxCharges": 10,
-    "rechargeAmount": "1d6 + 4"
+    "rechargeAmount": "1d6 + 4",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "baston-de-la-piton",
@@ -884,7 +1085,10 @@
     "description": "Bastón, infrecuente (requiere sintonización)\nComo acción de magia, podés lanzar este bastón para que caiga en un espacio sin ocupar a 10 pies o menos de vos, lo que hará que se convierta en una serpiente constrictora gigante en ese espacio. La serpiente estará bajo tu control, compartirá tu orden de iniciativa y su turno irá justo después del tuyo.\nEn tu turno, podés dar órdenes mentales a la serpiente (no requiere acción) si se encuentra a 60 pies o menos de vos y no tenés el estado de incapacitado.\nVos decidís la acción que llevará a cabo la serpiente y adónde se desplazará durante su turno, o podés darle una orden general, como atacar a tus enemigos o proteger un lugar. Si no le das ninguna, se defenderá.\nComo acción adicional, podés hacer que la serpiente recupere su forma de bastón en el espacio en el que se encuentre, pero no podrás volver a usar esta propiedad durante 1 hora. Si los puntos de golpe de la serpiente se reducen a 0, morirá y recuperará su forma de bastón. Luego, el bastón se hará añicos y se destruirá. Si la serpiente recupera la forma de bastón antes de perder todos sus puntos de golpe, los recuperará todos.",
     "rarity": "uncommon",
     "requiresAttunement": true,
-    "sourcePage": 240
+    "sourcePage": 240,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "baston-de-los-bosques",
@@ -898,7 +1102,10 @@
     "requiresAttunement": true,
     "sourcePage": 240,
     "maxCharges": 6,
-    "rechargeAmount": "1d6"
+    "rechargeAmount": "1d6",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "baston-de-los-magos",
@@ -912,7 +1119,10 @@
     "requiresAttunement": true,
     "sourcePage": 241,
     "maxCharges": 50,
-    "rechargeAmount": "4d6 + 2"
+    "rechargeAmount": "4d6 + 2",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "baston-de-marchitamiento",
@@ -926,7 +1136,10 @@
     "requiresAttunement": true,
     "sourcePage": 241,
     "maxCharges": 3,
-    "rechargeAmount": "1d3"
+    "rechargeAmount": "1d3",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "baston-de-poder",
@@ -940,7 +1153,10 @@
     "requiresAttunement": true,
     "sourcePage": 241,
     "maxCharges": 20,
-    "rechargeAmount": "2d8 + 4"
+    "rechargeAmount": "2d8 + 4",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "baston-de-truenos-y-relampagos",
@@ -952,7 +1168,10 @@
     "description": "Bastón, muy raro (requiere sintonización)\nEste bastón se puede usar a modo de bastón mágico que otorga un bonificador de +2 a las tiradas de ataque y de daño realizadas con él. También tiene las propiedades adicionales que se mencionan a continuación. Cuando se utilice una de ellas, esa propiedad no podrá volver a usarse hasta el siguiente amanecer.\nGolpe atronador. Cuando aciertes con un ataque cuerpo a cuerpo usando el bastón, podrás hacer que el bastón emita un chasquido atronador que se oiga a 300 pies de distancia (no requiere acción). El objetivo golpeado deberá superar una tirada de salvación de Constitución con CD 17 o tendrá el estado de aturdido hasta el final de tu siguiente turno.\nGolpe relampagueante. Cuando aciertes con un ataque cuerpo a cuerpo usando el bastón, podrás hacer que el objetivo sufra 2d6 de daño de relámpago adicional (no requiere acción).\nRelámpago. Podés utilizar una acción de magia para que un relámpago surja de la punta del bastón en una línea de 5 pies de ancho y 120 pies de largo.\nTodas las criaturas situadas en la línea harán una tirada de salvación de Destreza con CD 17; sufrirán 9d6 de daño de relámpago si la fallan o la mitad del daño si la superan.\nTrueno. Podés emplear una acción de magia para hacer que el bastón emita un trueno ensordecedor audible a 600 pies de distancia. Todas las criaturas situadas en una emanación de 60 pies que se origina en vos harán una tirada de salvación de Constitución con CD 17. Si la fallan, sufrirán 2d6 de daño de trueno y tendrán el estado de ensordecidas durante 1 minuto. Si la superan, solo sufrirán la mitad de ese daño.\nTruenos y relámpagos. Inmediatamente después de acertar con un ataque cuerpo a cuerpo usando el bastón, podés emplear una acción adicional para utilizar a la vez las propiedades de golpe atronador y golpe relampagueante (consultalas más arriba).\nHacer esto no consume el uso diario de esas propiedades, solo de esta.",
     "rarity": "very-rare",
     "requiresAttunement": true,
-    "sourcePage": 242
+    "sourcePage": 242,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "baston-del-cautivador",
@@ -966,7 +1185,10 @@
     "requiresAttunement": true,
     "sourcePage": 242,
     "maxCharges": 10,
-    "rechargeAmount": "1d8 + 2"
+    "rechargeAmount": "1d8 + 2",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "bola-de-cristal",
@@ -978,7 +1200,10 @@
     "description": "Objeto maravilloso, muy raro (requiere sintonización)\nMientras tocás este orbe de cristal, podés lanzar escudriñar (CD de salvación 17) desde él.",
     "rarity": "very-rare",
     "requiresAttunement": true,
-    "sourcePage": 242
+    "sourcePage": 242,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "bola-de-cristal-de-leer-mentes",
@@ -990,7 +1215,10 @@
     "description": "Objeto maravilloso, legendario (requiere sintonización)\nMientras tocás este orbe de cristal, podés lanzar escudriñar (CD de salvación 17) desde él. Además, podés lanzar detectar pensamientos (CD de salvación 17) haciendo objetivo a las criaturas que puedas ver a 30 pies o menos del sensor del conjuro.\nNo tenés que concentrarte en este conjuro detectar pensamientos para mantenerlo mientras dura, pero acabará si escudriñar también lo hace.",
     "rarity": "legendary",
     "requiresAttunement": true,
-    "sourcePage": 243
+    "sourcePage": 243,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "bola-de-cristal-de-telepatia",
@@ -1002,7 +1230,10 @@
     "description": "Objeto maravilloso, legendario (requiere sintonización)\nMientras tocás este orbe de cristal, podés lanzar escudriñar (CD de salvación 17) desde él. Además, podés comunicarte telepáticamente con las criaturas que puedas ver a 30 pies o menos del sensor del conjuro. También podés lanzar sugestión (CD de salvación 17) sobre una de esas criaturas a través del sensor. No tenés que concentrarte en este conjuro sugestión para mantenerlo mientras dura, pero acabará si escudriñar también lo hace. No podrás volver a lanzar sugestión de esta forma hasta el siguiente amanecer.",
     "rarity": "legendary",
     "requiresAttunement": true,
-    "sourcePage": 243
+    "sourcePage": 243,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "bola-de-cristal-de-vision-veraz",
@@ -1014,7 +1245,10 @@
     "description": "Objeto maravilloso, legendario (requiere sintonización)\nMientras tocás este orbe de cristal, podés lanzar escudriñar (CD de salvación 17) desde él.\nAdemás, tenés visión verdadera en un radio de 120 pies centrado en el sensor del conjuro.",
     "rarity": "legendary",
     "requiresAttunement": true,
-    "sourcePage": 243
+    "sourcePage": 243,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "bolsa-de-contencion",
@@ -1026,7 +1260,10 @@
     "description": "Objeto maravilloso, infrecuente\nEsta bolsa posee un espacio interior considerablemente mayor que sus dimensiones exteriores: unos 2 pies de lado y 4 pies de profundidad en el interior.\nLa bolsa puede contener hasta 500 libras, con un volumen máximo de 64 pies cúbicos. La bolsa pesa 5 libras, independientemente de su contenido. Para sacar un objeto de la bolsa es necesaria una acción de utilizar.\nSi se sobrecarga, perfora o rasga la bolsa, esta se destruye y su contenido se dispersa por el Plano Astral. Si se pone la bolsa del revés, su contenido se vuelca sin sufrir daño, pero la bolsa debe volver a ponerse del derecho antes de usarla de nuevo.\nLa bolsa contiene aire suficiente para respirar durante 10 minutos, divididos entre el número de criaturas que necesiten respirar en su interior.\nMeter una bolsa de contención en el espacio extradimensional creado por un agujero portátil, un morral práctico o un objeto similar destruye instantáneamente ambos objetos y abre un portal al Plano Astral. El portal se crea en el sitio en el que un objeto se introdujo dentro del otro. El portal absorbe a todas las criaturas situadas en una esfera de 10 pies de radio centrada en él y las conduce a un lugar aleatorio del Plano Astral. Después, el portal se cierra. El portal funciona en un sentido y no puede volver a abrirse.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 243
+    "sourcePage": 243,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "bolsa-de-judias",
@@ -1038,7 +1275,10 @@
     "description": "Objeto maravilloso, raro\nDentro de esta pesada bolsa de tela hay 3d4 judías secas. La bolsa pesa media libra, independientemente de cuántas judías contenga, y se convierte en un objeto no mágico cuando no le queden judías.\nSi volcás la bolsa y dejás caer una o más judías, explotan en una esfera de 10 pies de radio centrada en ellas. Todas las judías que caigan quedan destruidas en la explosión, y todas las criaturas en la esfera, incluyéndote a vos, hacen una tirada de salvación de Destreza con CD 15; sufrirán 5d4 de daño de fuerza si la fallan o la mitad del daño si la superan.\nSi sacás una judía de la bolsa, la plantas en tierra o arena y la regás, la judía desaparecerá y producirá un efecto 1 minuto después en el suelo donde la hayas plantado. Tu GM puede escoger un efecto de la siguiente tabla o determinarlo al azar.\n1d100 Efecto\n01 Brotan 5d4 hongos venenosos. Si una criatura come un hongo, tirá un dado. Si el resultado es impar, la criatura deberá superar una tirada de salvación de Constitución con CD 15 o recibirá 5d6 de daño de veneno y tendrá el estado de envenenada durante 1 hora. Si el resultado es par, la criatura obtendrá 5d6 puntos de golpe temporales que durarán 1 hora.\n02–10 Un géiser emerge del suelo y expulsa a borbotones agua, cerveza, mayonesa, té, vinagre, vino o aceite (a elección de tu GM).\nEl chorro tiene una altura de 30 pies y dura 1d4 minutos.\n11–20 Un ent brota del suelo. Tirá cualquier dado.\nSi el resultado es impar, el ent es caótico malvado. Si el resultado es par, el ent es caótico bueno.\n21–30 Aparece una estatua de piedra animada e inmóvil con tu apariencia y te amenaza verbalmente. Si la abandonás y otros se acercan, la estatua te describirá como el más vil de los villanos y mandará a los recién llegados a buscarte y atacarte. Si estás en el mismo plano de existencia que la estatua, sabrá donde estás. La estatua se volverá inanimada al cabo de 24 horas.\n1d100 Efecto\n31–40 Surge una hoguera de llamas verdes que arderá durante 24 horas o hasta que la apaguen.\n41–50 Del suelo brotan tres hongos chillones.\n51–60 De entre la tierra surgen 1d4 + 4 sapos de color rosa intenso. Cuando se toque a uno, este se transforma en un monstruo Grande o más pequeño a elección de tu GM que actúa según su alineamiento y naturaleza.\nEl monstruo permanece durante 1 minuto y luego desaparece en una nube de humo rosa intenso.\n61–70 Un bulette hambriento sale excavando de la tierra y ataca.\n71–80 Crece un árbol frutal. Tiene 1d10 + 20 frutas, de las cuales 1d8 se comportan como pociones determinadas al azar. El árbol se desvanece tras 1 hora. La fruta recogida permanece y conserva la magia durante 30 días.\n81–90 Aparece un nido con 1d4 + 3 huevos de los colores del arcoíris. Cualquier criatura que se coma uno de estos huevos hace una tirada de salvación de Constitución con CD 20.\nSi la supera, aumentará su puntuación de característica más baja en 1 de forma permanente (se elegirá al azar la puntuación si hay varias puntuaciones que empatan como la más baja). Si la falla, la criatura recibirá 10d6 de daño de fuerza debido a una explosión interna.\n91–95 Una pirámide con una base cuadrada de\n60 pies de lado emerge del suelo. Dentro hay un mausoleo con una momia, un señor de las momias u otro muerto viviente a elección de tu GM. El sarcófago contiene tesoros a elección de tu GM.\n96–00 Brota un tallo de judías gigante que crece hasta la altura que decida tu GM, que también elige adónde conduce la parte superior.\nPor ejemplo, podría dar a un hermoso mirador, al castillo de un gigante de las nubes o a otro plano de existencia.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 243
+    "sourcePage": 243,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "bolsa-de-trucos",
@@ -1050,7 +1290,10 @@
     "description": "Objeto maravilloso, infrecuente\nEsta bolsa hecha de tela de color gris, rojizo o marrón parece vacía. No obstante, meter la mano en su interior revela la presencia de un objeto pequeño y peludo.\nPodés usar una acción de magia para sacar el objeto peludo de la bolsa y lanzarlo a 20 pies o menos de distancia. Cuando aterrice, se transformará en una criatura que determines al tirar en la tabla que corresponda al color de la bolsa. Consultá el capítulo “Monstruos” para conocer el perfil de la criatura. La criatura desaparecerá al siguiente amanecer o cuando sus puntos de golpe se reduzcan a 0.\nLa criatura es amistosa contigo y tus aliados y actúa inmediatamente después de vos en tu orden de iniciativa. Podés emplear una acción adicional para ordenarle cómo se mueve o qué acción realiza en su turno, como atacar a un enemigo. Si no recibe tales órdenes, se comportará conforme a su naturaleza.\nUna vez que se han extraído tres objetos peludos de la bolsa, no puede volver a utilizarse hasta el siguiente amanecer.\nBolsa de trucos gris\n1d8 Criatura 1d8 Criatura\n1 Comadreja 5 Pantera\n2 Rata gigante 6 Tejón gigante\n3 Tejón 7 Lobo terrible\n4 Jabalí 8 Alce gigante Bolsa de trucos rojiza\n1d8 Criatura 1d8 Criatura\n1 Rata 5 Cabra gigante\n2 Búho 6 Jabalí gigante\n3 Mastín 7 León\n4 Cabra 8 Oso pardo Bolsa de trucos marrón\n1d8 Criatura 1d8 Criatura\n1 Chacal 5 Oso negro\n2 Simio 6 Comadreja gigante\n3 Babuino 7 Hiena gigante\n4 Pico de hacha 8 Tigre",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 244
+    "sourcePage": 244,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "bolsa-devoradora",
@@ -1062,7 +1305,10 @@
     "description": "Objeto maravilloso, muy raro\nEsta bolsa se parece a una bolsa de contención, pero en realidad es el orificio de alimentación de una criatura extradimensional gigante. Poner la bolsa del revés cierra el orificio.\nLa criatura extradimensional vinculada a la bolsa puede sentir cualquier cosa que se meta en su interior y devora cualquier materia animal o vegetal que se introduzca por completo. Esta materia se pierde para siempre. Cuando se introduce parte de una criatura viva en la bolsa, como cuando alguien mete la mano, hay un 50 % de probabilidad de que toda la criatura se vea arrastrada al interior. Una criatura dentro de la bolsa puede emplear una acción para intentar escapar superando una prueba de Fuerza (Atletismo) con CD 15. Otra criatura puede utilizar una acción para meter la mano en la bolsa con el fin de sacar a una criatura, lo que logrará si supera una prueba de Fuerza (Atletismo) con CD 20, siempre y cuando no vaya a parar ella también al interior de la bolsa primero. Cualquier criatura que comience su turno en el interior de la bolsa será devorada y su cuerpo será destruido.\nSe pueden guardar objetos inanimados en la bolsa, que puede albergar 1 pie cúbico de dicho material.\nNo obstante, una vez al día, la bolsa se traga cualquier objeto que contenga y lo escupe en otro plano de existencia. El momento y el plano los determina tu GM.\nSi se perfora o se rasga la bolsa, se destruye y cualquier cosa que contenga se transporta a un lugar aleatorio del Plano Astral.",
     "rarity": "very-rare",
     "requiresAttunement": false,
-    "sourcePage": 244
+    "sourcePage": 244,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "botas-aladas",
@@ -1076,7 +1322,10 @@
     "requiresAttunement": true,
     "sourcePage": 245,
     "maxCharges": 4,
-    "rechargeAmount": "1d4"
+    "rechargeAmount": "1d4",
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "botas-de-las-tierras-invernales",
@@ -1094,7 +1343,10 @@
         "damageType": "cold"
       }
     ],
-    "sourcePage": 245
+    "sourcePage": 245,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "botas-de-levitacion",
@@ -1106,7 +1358,10 @@
     "description": "Objeto maravilloso, raro (requiere sintonización)\nMientras calces estas botas, podés lanzar levitar sobre vos.",
     "rarity": "rare",
     "requiresAttunement": true,
-    "sourcePage": 245
+    "sourcePage": 245,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "botas-de-velocidad",
@@ -1118,7 +1373,10 @@
     "description": "Objeto maravilloso, raro (requiere sintonización)\nMientras calces estas botas, podrás utilizar una acción adicional para entrechocar los talones. Si lo hacés, las botas duplicarán tu velocidad y cualquier criatura que realice un ataque de oportunidad contra vos tendrá desventaja en la tirada de ataque.\nSi volvés a entrechocar los talones, el efecto terminará.\nCuando hayas usado esta propiedad de las botas durante un total de 10 minutos, la magia dejará de funcionar para vos hasta que finalices un descanso largo.",
     "rarity": "rare",
     "requiresAttunement": true,
-    "sourcePage": 245
+    "sourcePage": 245,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "botas-de-zancadas-y-brincos",
@@ -1130,7 +1388,10 @@
     "description": "Objeto maravilloso, infrecuente (requiere sintonización)\nMientras calces estas botas, tu velocidad pasa a ser de 30 pies, salvo que normalmente sea superior, y no se reduce por superar tu capacidad de carga o por llevar puesta una armadura pesada.\nUna vez en cada uno de tus turnos, podés saltar hasta 30 pies usando solo 10 pies de movimiento.",
     "rarity": "uncommon",
     "requiresAttunement": true,
-    "sourcePage": 245
+    "sourcePage": 245,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "botas-elficas",
@@ -1142,7 +1403,10 @@
     "description": "Objeto maravilloso, infrecuente\nMientras calces estas botas, tus pasos no harán ruido, independientemente de la superficie que pises.\nTambién tendrás ventaja en las pruebas de Destreza (Sigilo).",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 245
+    "sourcePage": 245,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "botella-de-ifrit",
@@ -1154,7 +1418,10 @@
     "description": "Objeto maravilloso, muy raro\nCuando usás una acción de magia para quitar el tapón de esta botella de latón pintado, una nube de humo espeso sale de ella. Al final de tu turno, el humo desaparece con un fogonazo inofensivo y un ifrit se manifestará en un espacio sin ocupar a 30 pies o menos de vos.\nLa primera vez que se abra la botella, tu GM tira en la siguiente tabla para determinar qué pasa.\n1d10 Efecto\n1 El ifrit te ataca. Tras luchar durante 5 asaltos, el ifrit desaparecerá y la botella perderá su magia.\n2–9 El ifrit entiende tus idiomas y obedece tus órdenes durante 1 hora, tras lo cual volverá a la botella y un nuevo tapón le impedirá salir.\nEl tapón no se puede quitar durante 24 horas.\nLas dos siguientes veces que se abra la botella, ocurrirá el mismo efecto. Si la botella se abre una cuarta vez, el ifrit se escapará y desaparecerá, y la botella perderá su magia.\n10 El ifrit entiende tus idiomas y puede lanzar deseo una vez para vos. Desaparecerá cuando conceda el deseo o después de 1 hora y la botella perderá su magia.",
     "rarity": "very-rare",
     "requiresAttunement": false,
-    "sourcePage": 245
+    "sourcePage": 245,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "botella-siemprehumeante",
@@ -1166,7 +1433,10 @@
     "description": "Objeto maravilloso, infrecuente\nComo acción de magia, podés abrir o cerrar esta botella.\nAbrirla provoca que una nube de denso humo salga de ella y llene una emanación de 60 pies que se origina en la botella. El área se considera muy oscura.\nCada minuto que la botella permanezca abierta, el tamaño de la emanación aumenta en 10 pies, hasta que alcance su tamaño máximo de 120 pies.\nCerrar la botella hace que la nube se quede en su sitio hasta que se disipe tras 10 minutos. Un viento fuerte (como el que crea el conjuro ráfaga de viento) la disipará después de 1 minuto.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 246
+    "sourcePage": 246,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "bote-plegable",
@@ -1178,7 +1448,10 @@
     "description": "Objeto maravilloso, raro\nEste objeto parece una caja de madera que mide 1 pie de largo, 6 pulgadas de ancho y 6 pulgadas de profundidad. Pesa 4 libras y flota. Puede abrirse para guardar objetos en su interior. El objeto posee tres palabras de activación y cada una de ellas requiere una acción de magia para usarla:\nPrimera palabra de activación. La caja se despliega y forma un bote de remos.\nSegunda palabra de activación. La caja se despliega y forma una barcaza.\nTercera palabra de activación. El bote plegable se convierte de nuevo en una caja, siempre que no haya criaturas a bordo. Cualquier objeto que contenga la embarcación y no quepa en la caja permanecerá fuera de ella cuando se pliegue. Los que sí quepan en la caja permanecerán dentro.\nCuando la caja se convierte en una embarcación, adopta el peso de una embarcación de su tamaño y cualquier cosa que contuviera la caja permanece en su interior.\nLos parámetros del bote de remos y de la barcaza se muestran en el capítulo “Equipo”. Si los puntos de golpe de cualquier embarcación se reducen a 0, el bote plegable queda destruido.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 246
+    "sourcePage": 246,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "brasero-para-controlar-elementales-de-fuego",
@@ -1190,7 +1463,10 @@
     "description": "Objeto maravilloso, raro\nMientras estés a 5 pies o menos de este brasero, podés emplear una acción de magia para invocar un elemental de fuego. El elemental aparece en un espacio sin ocupar lo más cerca posible del brasero, entiende tus idiomas, obedece tus órdenes y juega su turno inmediatamente después de vos en tu orden de iniciativa. El elemental desaparecerá tras 1 hora, cuando muera o si lo desconvocás como acción adicional. El brasero no puede volver a emplearse de esta manera hasta el siguiente amanecer.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 246
+    "sourcePage": 246,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "brazales-de-arqueria",
@@ -1202,7 +1478,10 @@
     "description": "Objeto maravilloso, infrecuente (requiere sintonización)\nMientras lleves estos brazales, serás competente con arcos cortos y largos y obtendrás un bonificador de +2 a las tiradas de daño con estas armas.",
     "rarity": "uncommon",
     "requiresAttunement": true,
-    "sourcePage": 246
+    "sourcePage": 246,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "brazales-de-defensa",
@@ -1214,7 +1493,10 @@
     "description": "Objeto maravilloso, raro (requiere sintonización)\nMientras lleves estos brazales, obtendrás un bonificador de +2 a la clase de armadura si no vistes ninguna armadura ni embrazás ningún escudo.",
     "rarity": "rare",
     "requiresAttunement": true,
-    "sourcePage": 246
+    "sourcePage": 246,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "broche-escudo",
@@ -1232,7 +1514,10 @@
         "damageType": "force"
       }
     ],
-    "sourcePage": 246
+    "sourcePage": 246,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "canica-de-fuerza",
@@ -1244,7 +1529,10 @@
     "description": "Objeto maravilloso, raro\nEsta pequeña esfera negra mide 3/4 de pulgada de diámetro y pesa 1 onza. Normalmente, se encuentran 1d4 + 4 canicas de fuerza juntas.\nPodés utilizar una acción de magia para lanzar la canica a 60 pies o menos de distancia. La canica explota en una esfera de 10 pies de radio al impactar y se destruye. Cada criatura que se encuentre en la esfera deberá superar una tirada de salvación de Destreza con CD 15 o recibirá 5d4 de daño de fuerza. Después, el área quedará encerrada en una esfera de fuerza transparente durante 1 minuto.\nLas criaturas que hayan fallado la tirada de salvación y estén dentro del área por completo quedarán atrapadas en el interior de la esfera. A las criaturas que hayan superado la tirada o que estén dentro del área solo parcialmente se las empujará lejos del centro de la esfera hasta que dejen de estar en su interior. A través de la pared de la esfera solo puede pasar el aire respirable; ningún ataque o efecto puede atravesarla.\nUna criatura encerrada puede emplear una acción de utilizar para empujar la pared de la esfera y hacerla moverse a hasta la mitad de la velocidad de la criatura. La esfera se puede recoger y su magia hace que solo pese 1 libra, independientemente de lo que pesen las criaturas que contenga.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 246
+    "sourcePage": 246,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "capa-aracnida",
@@ -1256,7 +1544,10 @@
     "description": "Objeto maravilloso, muy raro (requiere sintonización)\nEsta delicada prenda se ha fabricado con seda negra y tiene finas hebras plateadas entretejidas. Mientras la lleves puesta, obtendrás los siguientes beneficios:\nCaminar cual arácnido. No podés quedar atrapado en ningún tipo de red o telaraña y podrás moverte por ellas como si fueran terreno difícil.\nResistencia al veneno. Tenés resistencia al daño de veneno.\nTelaraña. Podés lanzar telaraña (CD de salvación 13). La telaraña creada por este conjuro tiene el doble del tamaño normal. Una vez utilizada, esta propiedad no puede volver a usarse hasta el siguiente amanecer.\nTrepar cual arácnido. Tenés una velocidad trepando igual a tu velocidad y podés moverte hacia arriba, hacia abajo y de lado por superficies verticales y techos mientras mantenés las manos libres.",
     "rarity": "very-rare",
     "requiresAttunement": true,
-    "sourcePage": 246
+    "sourcePage": 246,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "capa-de-desplazamiento",
@@ -1268,7 +1559,10 @@
     "description": "Objeto maravilloso, raro (requiere sintonización)\nMientras lleves esta capa, proyectará mágicamente una ilusión que hace que parezcas estar en un lugar cerca de tu ubicación real, lo que provoca que todas las criaturas tengan desventaja en las tiradas de ataque contra vos. Si recibís daño, la propiedad dejará de funcionar hasta el principio de tu siguiente turno. Esta propiedad quedará suprimida mientras tu velocidad sea de 0.",
     "rarity": "rare",
     "requiresAttunement": true,
-    "sourcePage": 247
+    "sourcePage": 247,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "capa-de-invisibilidad",
@@ -1282,7 +1576,10 @@
     "requiresAttunement": true,
     "sourcePage": 247,
     "maxCharges": 3,
-    "rechargeAmount": "1d3"
+    "rechargeAmount": "1d3",
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "capa-de-la-mantarraya",
@@ -1294,7 +1591,10 @@
     "description": "Objeto maravilloso, infrecuente (requiere sintonización)\nMientras lleves esta capa, podrás respirar bajo el agua y tendrás una velocidad nadando de 60 pies.",
     "rarity": "uncommon",
     "requiresAttunement": true,
-    "sourcePage": 247
+    "sourcePage": 247,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "capa-de-murcielago",
@@ -1306,7 +1606,10 @@
     "description": "Objeto maravilloso, raro (requiere sintonización)\nMientras lleves esta capa, tendrás ventaja en las pruebas de Destreza (Sigilo). En una zona de luz tenue o de oscuridad, podés agarrar los extremos de la capa y usarla para obtener una velocidad volando de 40 pies. Si soltás los extremos de la capa mientras volás de esta forma o si ya no te encontrás bajo luz tenue u oscuridad, perderás esta velocidad volando.\nMientras lleves puesta la capa en una zona de luz tenue u oscuridad, podrás lanzar polimorfar sobre vos y adoptar la forma de un murciélago. Mientras tengas esa forma, conservás tus puntuaciones de Inteligencia, Sabiduría y Carisma. La capa no puede volver a emplearse de esta manera hasta el siguiente amanecer.",
     "rarity": "rare",
     "requiresAttunement": true,
-    "sourcePage": 247
+    "sourcePage": 247,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "capa-de-proteccion",
@@ -1328,7 +1631,10 @@
         "amount": 1
       }
     ],
-    "sourcePage": 247
+    "sourcePage": 247,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "capa-del-charlatan",
@@ -1340,7 +1646,10 @@
     "description": "Objeto maravilloso, raro\nEsta capa tiene un ligero aroma a azufre. Mientras la lleves puesta, podés usarla para lanzar puerta dimensional como acción de magia. Esta propiedad no podrá volver a usarse hasta el siguiente amanecer.\nSi te teletransportás con este conjuro, dejás tras de vos una nube de humo. El espacio que abandonás está ligeramente oscurecido por el humo hasta el final de tu siguiente turno.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 247
+    "sourcePage": 247,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "capa-elfica",
@@ -1352,7 +1661,10 @@
     "description": "Objeto maravilloso, infrecuente (requiere sintonización)\nMientras lleves esta capa, las pruebas de Sabiduría (Percepción) para percibirte se harán con desventaja y vos tendrás ventaja en las pruebas de Destreza (Sigilo).",
     "rarity": "uncommon",
     "requiresAttunement": true,
-    "sourcePage": 247
+    "sourcePage": 247,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "carillon-de-apertura",
@@ -1364,7 +1676,10 @@
     "description": "Objeto maravilloso, raro\nEste tubo de metal hueco mide alrededor de 1 pie de largo y pesa 1 libra. Como acción de magia, podés golpearlo para lanzar abrir. El sonido habitual del conjuro se sustituye por el tono prístino y resonante del carillón, que se puede oír a 300 pies de distancia.\nEl carillón puede usarse hasta 10 veces. Tras el décimo uso, se resquebraja y se vuelve inútil.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 247
+    "sourcePage": 247,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "cimitarra-de-velocidad",
@@ -1377,7 +1692,10 @@
     "rarity": "very-rare",
     "requiresAttunement": true,
     "baseItemKind": "weapon",
-    "sourcePage": 248
+    "sourcePage": 248,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "cinturon-de-fuerza-de-gigante",
@@ -1389,7 +1707,10 @@
     "description": "Objeto maravilloso, rareza variable (requiere sintonización)\nMientras lleves puesto este cinturón, tu Fuerza cambiará a una puntuación proporcionada por el cinturón. El tipo de gigante determina la puntuación (consultá la tabla más adelante). No tendrá ningún efecto si tu Fuerza sin el cinturón es igual o superior a la que proporciona.\nCinturón Fue Rareza Cinturón de fuerza de gigante (colinas)\n21 Raro Cinturón de fuerza de gigante (escarcha o piedra)\n23 Muy raro Cinturón de fuerza de gigante (fuego)\n25 Muy raro Cinturón Fue Rareza Cinturón de fuerza de gigante (nubes)\n27 Legendario Cinturón de fuerza de gigante (tormentas)\n29 Legendario",
     "rarity": "common",
     "requiresAttunement": true,
-    "sourcePage": 248
+    "sourcePage": 248,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": true
   },
   {
     "id": "cinturon-enano",
@@ -1401,7 +1722,10 @@
     "description": "Objeto maravilloso, raro (requiere sintonización)\nMientras lleves puesto este cinturón, obtenés los siguientes beneficios:\nAguante. Tu Constitución aumenta en 2, hasta un máximo de 20.\nAmistad con los enanos. Tenés ventaja en las pruebas de Carisma (Persuasión) en las que interactúes con enanos y duergars.\nIdioma. Conocés el idioma enano.\nAdemás, mientras tengas sintonización con el cinturón, tendrás un 50 % de probabilidad de que cada día al amanecer te crezca una barba completa, si podés tenerla. Si ya tenés una, se volverá más densa.\nSi no sos enano o duergar, obtendrás los siguientes beneficios adicionales mientras lleves puesto el cinturón:\nResistencia. Tenés resistencia al daño de veneno.\nTambién tenés ventaja en las tiradas de salvación para evitar o poner fin al estado de envenenado.\nVisión en la oscuridad. Tenés visión en la oscuridad hasta 60 pies.",
     "rarity": "rare",
     "requiresAttunement": true,
-    "sourcePage": 249
+    "sourcePage": 249,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "colgante-de-inmunidad-al-veneno",
@@ -1419,7 +1743,10 @@
         "damageType": "poison"
       }
     ],
-    "sourcePage": 249
+    "sourcePage": 249,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "collar-de-adaptacion",
@@ -1431,7 +1758,10 @@
     "description": "Objeto maravilloso, infrecuente (requiere sintonización)\nMientras lleves este collar, podés respirar con normalidad en cualquier entorno y tenés ventaja en las tiradas de salvación para evitar o poner fin al estado de envenenado.",
     "rarity": "uncommon",
     "requiresAttunement": true,
-    "sourcePage": 249
+    "sourcePage": 249,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "collar-de-bolas-de-fuego",
@@ -1443,7 +1773,10 @@
     "description": "Objeto maravilloso, raro\nDe este collar cuelgan 1d6 + 3 cuentas. Podés emplear una acción de magia para tirar una de estas cuentas a un punto a 60 pies o menos de distancia.\nCuando llegue al final de su trayectoria, la cuenta explotará como un conjuro bola de fuego de nivel 3 (CD de salvación 15).\nPodés arrojar varias cuentas o incluso todo el collar a la vez. Si lo hacés, aumenta el daño de la bola de fuego en 1d6 por cada cuenta lanzada tras la primera (máximo 12d6).",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 249
+    "sourcePage": 249,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "collar-de-plegarias",
@@ -1455,7 +1788,10 @@
     "description": "Objeto maravilloso, raro (requiere sintonización por parte de un clérigo, druida o paladín)\nEste collar tiene 1d4 + 2 cuentas mágicas hechas de aguamarina, perla negra o topacio. También posee muchas cuentas no mágicas hechas de piedras como ámbar, citrino, coral, cuarzo, jade, perla o sanguino.\nSi se retira una cuenta mágica del collar, esta pierde su magia.\nExisten seis tipos de cuentas mágicas. Tu GM decide el tipo de cada cuenta o lo determina al azar tirando en la tabla a continuación. Un collar puede tener más de una cuenta del mismo tipo.\nPara usar una, debés llevar puesto el collar. Cada cuenta alberga un conjuro que podés lanzar desde ella como acción adicional (usá tu CD de salvación de conjuros si fuera necesaria una tirada de salvación). Una vez que se lanza el conjuro de una cuenta mágica, esa cuenta no puede volver a usarse hasta el siguiente amanecer.\n1d20 Cuenta Conjuro\n1–2 Cuenta castigadora Castigo brillante\n3–8 Cuenta curativa Curar heridas (versión de nivel 2)\n9–14 Cuenta de bendición Bendición\n15 Cuenta de caminar vientos Viajar con el viento\n16–19 Cuenta de favor Restablecimiento mayor\n20 Cuenta invocadora Guardián de la fe",
     "rarity": "rare",
     "requiresAttunement": true,
-    "sourcePage": 249
+    "sourcePage": 249,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "cota-de-escamas-de-dragon",
@@ -1468,7 +1804,10 @@
     "rarity": "very-rare",
     "requiresAttunement": true,
     "baseItemKind": "armor",
-    "sourcePage": 249
+    "sourcePage": 249,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "cubo-de-fuerza",
@@ -1482,7 +1821,10 @@
     "requiresAttunement": true,
     "sourcePage": 250,
     "maxCharges": 10,
-    "rechargeAmount": "1d6"
+    "rechargeAmount": "1d6",
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "cuenco-para-controlar-elementales-de-agua",
@@ -1494,7 +1836,10 @@
     "description": "Objeto maravilloso, raro\nMientras este cuenco esté lleno de agua y estés a 5 pies o menos de él, podés emplear una acción de magia para invocar un elemental de agua. El elemental aparece en un espacio sin ocupar lo más cerca posible del cuenco, entiende tus idiomas, obedece tus órdenes y juega su turno inmediatamente después de vos en tu orden de iniciativa. El elemental desaparecerá tras 1 hora, cuando muera o si lo desconvocás como acción adicional. El cuenco no puede volver a emplearse de esta manera hasta el siguiente amanecer.\nEl cuenco tiene aproximadamente 1 pie de diámetro, la mitad de profundidad y puede contener unos 12 l de líquido.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 250
+    "sourcePage": 250,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "cuerda-de-escalada",
@@ -1506,7 +1851,10 @@
     "description": "Objeto maravilloso, infrecuente\nEsta cuerda de 60 pies puede soportar hasta 3000 libras de peso. Mientras sujetás un extremo de la cuerda, podés emplear una acción de magia para ordenarle al otro extremo que cobre vida y avance hacia un destino de tu elección situado a una distancia máxima de vos igual a la longitud de la cuerda. Ese extremo se moverá 10 pies en tu turno cuando le des la orden por primera vez y 10 pies al principio de cada uno de tus siguientes turnos hasta que llegue a su destino o hasta que le mandes parar. También podés ordenar a la cuerda que se ate de forma segura a un objeto, se desate, se anude o se desanude, o se enrolle para transportarla.\nSi le ordenás que se anude, se formarán unos nudos grandes en intervalos de 1 pie a lo largo de la cuerda. Mientras esté anudada, la cuerda reduce su longitud a 50 pies y otorga ventaja en las pruebas de característica que se realicen para escalarla.\nLa cuerda tiene una CA de 20, 20 pg e inmunidad al daño psíquico y de veneno. Recupera 1 punto de golpe cada 5 minutos mientras tenga al menos 1 punto de golpe. Si los puntos de golpe de la cuerda se reducen a 0, se destruye.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 250
+    "sourcePage": 250,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "cuerda-enredadora",
@@ -1518,7 +1866,10 @@
     "description": "Objeto maravilloso, raro\nEsta cuerda mide 30 pies de largo. Mientras sujetás uno de los extremos, podés emplear una acción de magia para ordenarle al otro que salga volando y enrede a una criatura que puedas ver a 20 pies o menos de vos. El objetivo deberá superar una tirada de salvación de Destreza con CD 15 o tendrá el estado de apresado. Podés liberar al objetivo soltando tu extremo de la cuerda, lo que hará que se enrolle en el espacio del objetivo, o usando una acción adicional para repetir la orden, lo que hará que la cuerda se enrolle en tu mano.\nUn objetivo apresado por la cuerda puede usar una acción para hacer una prueba de Fuerza (Atletismo) o de Destreza (Acrobacias) con CD 15, a su elección. Si la supera, el objetivo dejará de estar apresado por la cuerda. Si todavía sostenés la cuerda cuando un objetivo se zafe de ella, podrás emplear una reacción para ordenarle a la cuerda que se enrolle en tu mano. Si no lo hacés, se enrollará en el espacio del objetivo.\nLa cuerda tiene una CA de 20, 20 pg e inmunidad al daño psíquico y de veneno. Recupera 1 punto de golpe cada 5 minutos mientras tenga al menos 1 punto de golpe. Si los puntos de golpe de la cuerda se reducen a 0, se destruye.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 250
+    "sourcePage": 250,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "cuerno-de-estallido",
@@ -1530,7 +1881,10 @@
     "description": "Objeto maravilloso, raro\nPodés emplear una acción de magia para soplar este cuerno, que emitirá un estallido estruendoso en un cono de 30 pies audible a 600 pies de distancia.\nTodas las criaturas situadas en el cono harán una tirada de salvación de Constitución con CD 15.\nSi la fallan, sufrirán 5d8 de daño de trueno y tendrán el estado de ensordecidas durante 1 minuto.\nSi la superan, solo sufrirán la mitad de ese daño.\nLos objetos de cristal o de vidrio que nadie vista o lleve en el cono recibirán 10d8 de daño de trueno.\nCada uso de la magia del cuerno tiene un 20 % de probabilidad de hacerlo explotar. La explosión inflige 10d6 de daño de fuerza a quien lo utiliza y destruye el cuerno.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 251
+    "sourcePage": 251,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "cuerno-del-valhalla",
@@ -1542,7 +1896,10 @@
     "description": "Objeto maravilloso, raro (plata o latón), muy raro\n(bronce) o legendario (hierro)\nPodés emplear una acción de magia para soplar este cuerno. Acudiendo a tu llamada, varios espíritus guerreros del plano de Ysgard aparecerán en espacios sin ocupar a 60 pies o menos de vos. Todos emplean el perfil del berserker y vuelven a Ysgard después de 1 hora o cuando sus puntos de golpe se reduzcan a 0. Los espíritus parecen guerreros vivos de verdad y tienen inmunidad a los estados de asustados y hechizados. Una vez que utilices el cuerno, no podrás volver a usarlo hasta que hayan pasado 7 días.\nSe conoce la existencia de cuatro tipos de cuerno del Valhalla, cada uno hecho de un metal distinto.\nEl tipo de cuerno determina cuántos espíritus responden a su llamada, así como el requisito para utilizarlo. Tu GM elige el tipo de cuerno o lo determina al azar tirando en la tabla a continuación.\nSi soplás el cuerno sin cumplir su requisito, los espíritus invocados te atacarán. Si cumplís el requisito, serán amistosos contigo y tus aliados y seguirán tus órdenes.\n1d100 Tipo de cuerno Espíritus Requisito\n01–40 Plata 2 Ninguno\n41–75 Latón 3 Competencia con todas las armas sencillas\n76–90 Bronce 4 Entrenamiento con todas las armaduras medias\n91–00 Hierro 5 Competencia con todas las armas marciales",
     "rarity": "legendary",
     "requiresAttunement": false,
-    "sourcePage": 251
+    "sourcePage": 251,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "cuero-tachonado-encantado",
@@ -1555,7 +1912,10 @@
     "rarity": "rare",
     "requiresAttunement": false,
     "baseItemKind": "armor",
-    "sourcePage": 251
+    "sourcePage": 251,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "daga-de-la-ponzona",
@@ -1568,7 +1928,10 @@
     "rarity": "rare",
     "requiresAttunement": false,
     "baseItemKind": "weapon",
-    "sourcePage": 251
+    "sourcePage": 251,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "decantador-de-agua-interminable",
@@ -1580,7 +1943,10 @@
     "description": "Objeto maravilloso, infrecuente\nEste frasco con tapón suena cuando se agita, como si tuviera agua dentro. Pesa 2 libras.\nPodés utilizar una acción de magia para retirar el tapón y pronunciar una de las tres palabras de activación. A continuación, cierta cantidad de agua dulce o salada (a tu elección) saldrá del frasco.\nEl agua dejará de salir al principio de tu siguiente turno. Elegí una de las siguientes palabras de activación:\nSalpicadura. El decantador produce 4 l de agua.\nFuente. El decantador produce 20 l de agua.\nGéiser. El decantador produce 120 l de agua que salen disparados en una línea de 30 pies de largo y 1 pie de ancho. Si sostenés el decantador, podés apuntar el géiser en una dirección (no requiere acción). Una criatura de tu elección en esa línea deberá superar una tirada de salvación de Fuerza con CD 13 o sufrirá 1d4 de daño contundente y tendrá el estado de derribada. En vez de una criatura, podés apuntar a un objeto en esa línea que no lleve ni vista nadie y que no pese más de 200 libras. El géiser derribará ese objeto.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 251
+    "sourcePage": 251,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "defensora",
@@ -1593,7 +1959,10 @@
     "rarity": "legendary",
     "requiresAttunement": true,
     "baseItemKind": "weapon",
-    "sourcePage": 251
+    "sourcePage": 251,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "diadema-de-estallidos",
@@ -1605,7 +1974,10 @@
     "description": "Objeto maravilloso, infrecuente\nMientras lleves puesta esta diadema, podés lanzar rayo abrasador desde ella (+5 a acertar). La diadema no podrá volver a lanzar este conjuro hasta el siguiente amanecer.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 252
+    "sourcePage": 252,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "diadema-de-intelecto",
@@ -1624,7 +1996,10 @@
         "score": 19
       }
     ],
-    "sourcePage": 252
+    "sourcePage": 252,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "disolvente-universal",
@@ -1636,7 +2011,10 @@
     "description": "Objeto maravilloso, legendario\nEste tubo contiene un líquido lechoso con un fuerte olor a alcohol. En el momento de encontrar el tubo, contendrá 1 onza + 1d6 onzas.\nPodés emplear una acción de utilizar para verter 1 onza o más de disolvente en una superficie dentro del alcance. Con cada 1 onza se disolverán de manera instantánea hasta 0,1 m2 de adhesivo que toque, incluido el pegamento soberano.",
     "rarity": "legendary",
     "requiresAttunement": false,
-    "sourcePage": 252
+    "sourcePage": 252,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "elixir-de-salud",
@@ -1648,7 +2026,10 @@
     "description": "Poción, rara\nCuando bebés esta poción, te curás de cualquier enfermedad mágica. Además, dejarás de sufrir los estados de cegado, ensordecido, envenenado y paralizado.\nEl líquido rojo claro tiene pequeñas burbujas de luz.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 252
+    "sourcePage": 252,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "escarabajo-protector",
@@ -1661,7 +2042,10 @@
     "rarity": "legendary",
     "requiresAttunement": true,
     "sourcePage": 252,
-    "maxCharges": 12
+    "maxCharges": 12,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "escoba-voladora",
@@ -1673,7 +2057,10 @@
     "description": "Objeto maravilloso, infrecuente (requiere sintonización)\nEsta escoba de madera funcionará como una escoba normal hasta que te montes en ella y emplees una acción de magia para hacerla levitar. En ese momento, podrás utilizarla para viajar por el aire.\nTiene una velocidad volando de 50 pies. Puede transportar hasta 400 libras, pero su velocidad volando se reduce a 30 pies si transporta más de 200 libras. La escoba deja de levitar cuando aterrizás o cuando dejes de montar en ella.\nComo acción de magia, podés ordenarle que viaje por sí misma a un lugar que esté a 1 milla o menos de vos si nombrás el lugar y conocés el sitio en cuestión. Si sigue estando a 1 milla o menos de vos, la escoba volverá si empleás otra acción de magia y pronunciás una palabra de activación.",
     "rarity": "uncommon",
     "requiresAttunement": true,
-    "sourcePage": 252
+    "sourcePage": 252,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "escudo-1",
@@ -1687,7 +2074,10 @@
     "requiresAttunement": false,
     "magicBonus": 1,
     "baseItemKind": "shield",
-    "sourcePage": 252
+    "sourcePage": 252,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "escudo-2",
@@ -1701,7 +2091,10 @@
     "requiresAttunement": false,
     "magicBonus": 2,
     "baseItemKind": "shield",
-    "sourcePage": 252
+    "sourcePage": 252,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "escudo-3",
@@ -1715,7 +2108,10 @@
     "requiresAttunement": false,
     "magicBonus": 3,
     "baseItemKind": "shield",
-    "sourcePage": 252
+    "sourcePage": 252,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "escudo-animado",
@@ -1728,7 +2124,10 @@
     "rarity": "very-rare",
     "requiresAttunement": true,
     "baseItemKind": "shield",
-    "sourcePage": 252
+    "sourcePage": 252,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "escudo-atrapaflechas",
@@ -1741,7 +2140,10 @@
     "rarity": "rare",
     "requiresAttunement": true,
     "baseItemKind": "shield",
-    "sourcePage": 252
+    "sourcePage": 252,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "escudo-centinela",
@@ -1754,7 +2156,10 @@
     "rarity": "uncommon",
     "requiresAttunement": false,
     "baseItemKind": "shield",
-    "sourcePage": 253
+    "sourcePage": 253,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "escudo-de-atraer-proyectiles",
@@ -1767,7 +2172,10 @@
     "rarity": "rare",
     "requiresAttunement": true,
     "baseItemKind": "shield",
-    "sourcePage": 253
+    "sourcePage": 253,
+    "magicItemType": null,
+    "cursed": true,
+    "variableRarity": false
   },
   {
     "id": "escudo-de-caballero",
@@ -1780,7 +2188,10 @@
     "rarity": "very-rare",
     "requiresAttunement": true,
     "baseItemKind": "shield",
-    "sourcePage": 253
+    "sourcePage": 253,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "escudo-de-guarda-contra-conjuros",
@@ -1793,7 +2204,10 @@
     "rarity": "very-rare",
     "requiresAttunement": true,
     "baseItemKind": "shield",
-    "sourcePage": 253
+    "sourcePage": 253,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "esfera-de-aniquilacion",
@@ -1805,7 +2219,10 @@
     "description": "Objeto maravilloso, legendario\nEsta esfera negra de 2 pies de diámetro es un agujero en el multiverso que levita en el espacio y que permanece estabilizado gracias a un campo mágico que lo rodea.\nLa esfera aniquila toda la materia que atraviesa y que la atraviesa. La única excepción son los artefactos, que la atravesarán intactos salvo que sean susceptibles al daño de una esfera de aniquilación.\nCualquier otra cosa que toque la esfera sin ser completamente absorbida y aniquilada por ella sufrirá 8d10 de daño de fuerza.\nControlar la esfera. Una esfera de aniquilación permanece inmóvil hasta que alguien tome el control sobre ella. Si estás a 60 pies o menos de una esfera, podrás utilizar una acción de magia para realizar una prueba de Inteligencia ( Conocimiento arcano) con CD 25. Si la superás, controlarás la esfera hasta el principio de tu siguiente turno, y si estaba bajo el control de otra criatura, esa criatura dejará de controlarla. Si fallás la prueba, la esfera se moverá 10 pies hacia vos en línea recta.\nMientras controles la esfera, podés emplear una acción adicional para hacer que se mueva en la dirección que elijas hasta una cantidad de metros igual a 1,5 × tu modificador por Inteligencia (como mínimo 5 pies). Si la esfera entra en el espacio de una criatura, esta deberá superar una tirada de salvación de Destreza con CD 19 o la esfera la tocará y le infligirá 8d10 de daño de fuerza. Una criatura cuyos puntos de golpe se reduzcan a 0 por este daño será aniquilada, dejando atrás únicamente sus posesiones.\nInteracciones de la esfera. Si la esfera entra en contacto con un portal interplanar, como el que crea un conjuro portal, o un espacio extradimensional, como el que contiene un agujero portátil, tu GM determinará al azar lo que ocurrirá usando la siguiente tabla.\n1d100 Resultado\n01–50 La esfera se destruye.\n51–85 La esfera atraviesa el portal o entra en el espacio extradimensional.\n86–00 Una grieta en el espacio envía la esfera y a todas las criaturas y objetos que se encuentren a 180 pies o menos de ella a un plano de existencia aleatorio.",
     "rarity": "legendary",
     "requiresAttunement": false,
-    "sourcePage": 253
+    "sourcePage": 253,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "espada-danzarina",
@@ -1818,7 +2235,10 @@
     "rarity": "very-rare",
     "requiresAttunement": true,
     "baseItemKind": "weapon",
-    "sourcePage": 254
+    "sourcePage": 254,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "espada-de-hoja-afilada",
@@ -1831,7 +2251,10 @@
     "rarity": "very-rare",
     "requiresAttunement": true,
     "baseItemKind": "weapon",
-    "sourcePage": 254
+    "sourcePage": 254,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "espada-hiriente",
@@ -1844,7 +2267,10 @@
     "rarity": "rare",
     "requiresAttunement": true,
     "baseItemKind": "weapon",
-    "sourcePage": 254
+    "sourcePage": 254,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "espada-ladrona-de-vida",
@@ -1857,7 +2283,10 @@
     "rarity": "rare",
     "requiresAttunement": true,
     "baseItemKind": "weapon",
-    "sourcePage": 254
+    "sourcePage": 254,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "espada-solar",
@@ -1870,7 +2299,10 @@
     "rarity": "rare",
     "requiresAttunement": true,
     "baseItemKind": "weapon",
-    "sourcePage": 254
+    "sourcePage": 254,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "espada-vorpal",
@@ -1883,7 +2315,10 @@
     "rarity": "legendary",
     "requiresAttunement": true,
     "baseItemKind": "weapon",
-    "sourcePage": 254
+    "sourcePage": 254,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "espejo-atrapavidas",
@@ -1895,7 +2330,10 @@
     "description": "Objeto maravilloso, muy raro\nCuando se mira de forma indirecta este espejo de 4 pies de altura y 2 pies de ancho, su superficie muestra imágenes tenues de criaturas. El espejo pesa 50 libras y tiene una CA de 11, 10 pg, inmunidad al daño psíquico y de veneno y vulnerabilidad al daño contundente. Se hace pedazos y se destruye cuando sus puntos de golpe se reducen a 0.\nSi el espejo cuelga de una superficie vertical y estás a 5 pies o menos de él, podés emplear una acción de magia y usar una palabra de activación.\nPermanecerá activo hasta que emplees una acción de magia y repitas la palabra de activación para desactivarlo.\nSi una criatura distinta de vos ve su reflejo en el espejo activado a 30 pies o menos de él, deberá superar una tirada de salvación de Carisma con CD 15 o quedará atrapada, junto con todo lo que vista o lleve, en una de las doce celdas extradimensionales del espejo. Una criatura que conozca la naturaleza del espejo hará la tirada con ventaja y los autómatas la superarán automáticamente.\nUna celda extradimensional es una extensión infinita cubierta por una espesa niebla que impide ver a más de 10 pies de distancia. Las criaturas atrapadas en las celdas del espejo no envejecen y no necesitan ni comer ni beber ni dormir. Pueden escapar de la celda si utilizan magia que les permita viajar entre planos. De lo contrario, quedarán confinadas en la celda hasta que las liberen.\nSi el espejo atrapa a una criatura, pero sus doce celdas extradimensionales están ya ocupadas, liberará a una criatura atrapada al azar para alojar al nuevo prisionero. La criatura liberada aparecerá en un espacio sin ocupar a la vista del espejo, pero de espaldas a él. Si se destruye el espejo, todas las criaturas que contenga se liberarán y aparecerán en espacios sin ocupar cerca de él.\nMientras te encuentres a 5 pies o menos del espejo, podrás emplear una acción de magia nombrar a una criatura atrapada o el número de una celda concreta. La criatura mencionada o la que contenga la celda nombrada aparecerá como una imagen en la superficie del espejo. La criatura y vos se podrán comunicar.\nDe forma similar, podés emplear una acción de magia y usar una segunda palabra de activación para liberar a una criatura atrapada en el espejo.\nLa criatura liberada aparecerá junto a sus posesiones en el espacio sin ocupar más cercano al espejo, pero de espaldas a él.\nMeter el espejo en el espacio extradimensional creado por un agujero portátil, una bolsa de contención o un objeto similar destruye instantáneamente ambos objetos y abre un portal al Plano Astral.\nEl portal se crea en el sitio en el que un objeto se introdujo dentro del otro. El portal absorbe a todas las criaturas situadas a 10 pies o menos de él y que no estén tras cobertura completa, y las conduce a un lugar aleatorio del Plano Astral. Después, el portal se cierra. El portal solo funciona en un sentido y no puede volver a abrirse.",
     "rarity": "very-rare",
     "requiresAttunement": false,
-    "sourcePage": 255
+    "sourcePage": 255,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "estatuilla-de-poder-maravilloso",
@@ -1908,7 +2346,10 @@
     "rarity": "common",
     "requiresAttunement": false,
     "sourcePage": 255,
-    "maxCharges": 24
+    "maxCharges": 24,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": true
   },
   {
     "id": "ficha-de-pluma",
@@ -1920,7 +2361,10 @@
     "description": "Objeto maravilloso, rareza variable\nEste objeto parece una pluma. Existen diferentes tipos de fichas de pluma, cada uno con un efecto diferente de un solo uso. Tu GM elige el tipo de ficha o lo determina al azar tirando en la tabla “Fichas de pluma”. El tipo de ficha determina su rareza.\nAbanico (infrecuente). Si te encontrás en un bote o barco, podés emplear una acción de magia para tirar la ficha al aire hasta 10 pies de altura. La ficha desaparecerá y un abanico gigante en movimiento ocupará su lugar. El abanico flotará y creará un viento fuerte, que podrá henchir las velas de un barco y aumentar su velocidad en 5 millas por hora durante 8 horas. Podés desconvocar el abanico como acción de magia.\nAncla (infrecuente). Podés emplear una acción de magia para tocar un bote o barco con la ficha.\nDurante las próximas 24 horas, la embarcación no podrá moverse de ninguna manera. Volver a tocarla con la ficha pone fin al efecto. Cuando acabe el efecto, la ficha desaparece.\nÁrbol (infrecuente). Debés estar al aire libre para poder usar esta ficha. Podés emplear una acción de magia para tocar con la ficha un espacio sin ocupar del suelo. La ficha desaparecerá y un roble no mágico ocupará su lugar. El árbol mide 60 pies de alto, el diámetro de su tronco es de 5 pies y las ramas de su copa cubren un radio de 20 pies.\nBote cisne (rara). Podés emplear una acción de magia para tocar con la ficha una masa de agua de al menos 60 pies de diámetro. La ficha desaparecerá y un bote de 50 pies de largo y 20 pies de ancho con la forma de un cisne ocupará su lugar. El bote se autopropulsa y se desplaza por el agua a una velocidad de 6 millas por hora. Podés emplear una acción de magia mientras te encuentres en el bote para ordenarle moverse o girar hasta 90 grados. El bote permanece durante 24 horas y después desaparece. Podés desconvocar el bote como acción de magia.\nLátigo (rara). Podés emplear una acción de magia para tirar la ficha a 10 pies o menos de vos. La ficha desaparecerá y un látigo flotante ocupará su lugar.\nA continuación, podrás utilizar una acción adicional para realizar un ataque de conjuro cuerpo a cuerpo contra una criatura que esté a 10 pies o menos del látigo, con un bonificador de ataque de +9. Si acierta, el objetivo recibe 1d6 + 5 de daño de fuerza.\nComo acción adicional, podés mover el látigo hasta 20 pies y repetir el ataque contra una criatura que se encuentre a 10 pies o menos de él. El látigo desaparecerá tras 1 hora, cuando emplees una acción de magia para desconvocarlo, cuando mueras o cuando tengas el estado de incapacitado.\nPájaro (rara). Podés emplear una acción de magia para tirar la ficha al aire a 5 pies de altura.\nLa ficha desaparecerá y un enorme pájaro multicolor ocupará su lugar. El pájaro tiene el perfil de un roc, pero no puede atacar. Obedece tus órdenes sencillas y puede transportar hasta 500 libras mientras vuela a su velocidad máxima (16 millas por hora y, como máximo, 144 millas al día, con descansos de una hora cada 3 horas de vuelo) o 1000 libras a la mitad de esa velocidad. El ave desaparece tras volar su distancia máxima durante un día o si sus puntos de golpe se reducen a 0. Podés desconvocar al pájaro como acción de magia.\nFichas de pluma\n1d100 Símbolo Rareza\n01–15 Abanico Infrecuente\n16–35 Ancla Infrecuente\n36–60 Árbol Infrecuente\n61–75 Bote cisne Rara\n76–85 Látigo Rara\n86–00 Pájaro Rara",
     "rarity": "common",
     "requiresAttunement": false,
-    "sourcePage": 256
+    "sourcePage": 256,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": true
   },
   {
     "id": "filo-de-la-fortuna",
@@ -1934,7 +2378,10 @@
     "requiresAttunement": false,
     "baseItemKind": "weapon",
     "sourcePage": 257,
-    "maxCharges": 0
+    "maxCharges": 0,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "filtro-de-amor",
@@ -1946,7 +2393,10 @@
     "description": "Poción, infrecuente\nLa próxima vez que veas a una criatura en los 10 minutos posteriores a beber este filtro, quedarás embelesado por ella y tendrás el estado de hechizado durante 1 hora.\nEl líquido efervescente y de tonalidad rosa contiene una burbuja, fácil de pasar por alto, con forma de corazón.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 257
+    "sourcePage": 257,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "flauta-de-la-aparicion",
@@ -1960,7 +2410,10 @@
     "requiresAttunement": false,
     "sourcePage": 257,
     "maxCharges": 3,
-    "rechargeAmount": "1d3"
+    "rechargeAmount": "1d3",
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "flauta-de-las-cloacas",
@@ -1974,7 +2427,10 @@
     "requiresAttunement": true,
     "sourcePage": 257,
     "maxCharges": 3,
-    "rechargeAmount": "1d3"
+    "rechargeAmount": "1d3",
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "fortaleza-instantanea",
@@ -1986,7 +2442,10 @@
     "description": "Objeto maravilloso, raro (requiere sintonización)\nComo acción de magia, podés colocar esta estatuilla de adamantina de 1 pulgada en el suelo y pronunciar una palabra de activación para hacer que crezca rápidamente hasta convertirse en una torre cuadrada de adamantina. Si repetís la palabra de activación, la torre volverá a convertirse en estatuilla, lo cual solo funciona si está vacía. Todas las criaturas en la zona donde aparece la torre son empujadas a un espacio sin ocupar junto a la torre, fuera de ella. Los objetos dentro del área que no lleve o vista nadie también se verán empujados de esta forma.\nLa torre mide 20 pies de lado y 30 pies de altura, con aspilleras en todos los lados y almenas en la parte superior. Su interior se divide en dos plantas conectadas mediante unas escaleras, una escalera de mano o una rampa (a tu elección). Estas escaleras o rampa llevan hasta una trampilla que da al techo.\nCuando se crea, la torre tiene una sola puerta en la planta baja en el lado frente a vos. La puerta se abre solo bajo tus órdenes, que podés dar como acción adicional. Es inmune al conjuro abrir o efectos mágicos similares.\nLa magia impide que se derribe la torre. El techo, la puerta y los muros poseen cada uno una CA de 20, 100 pg, inmunidad al daño contundente, cortante y perforante salvo que se haga con equipo de asedio, y resistencia a todo el resto de daño. Devolver la torre a su forma de estatuilla no repara el daño que haya recibido. Solo un conjuro deseo puede reparar la torre (este uso cuenta como replicar un conjuro de nivel 8 o inferior). Cada vez que se lance deseo, la torre recupera todos sus puntos de golpe.",
     "rarity": "rare",
     "requiresAttunement": true,
-    "sourcePage": 258
+    "sourcePage": 258,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "frasco-de-hierro",
@@ -1998,7 +2457,10 @@
     "description": "Objeto maravilloso, legendario\nMientras sostengas este recipiente de hierro con tapón de latón, podés emplear una acción de magia para hacer objetivo a una criatura que puedas ver a 60 pies o menos de vos. Si el frasco está vacío y el objetivo pertenece a un plano de existencia distinto al actual, deberá superar una tirada de salvación de Sabiduría con CD 17 o quedará atrapado en el frasco. Si el objetivo ya ha estado encerrado antes en el frasco, tendrá ventaja en la tirada. Una vez atrapada, la criatura permanecerá en el frasco hasta que sea liberada. El frasco solo puede contener a una criatura a la vez. Una criatura atrapada en el frasco no necesita respirar ni comer ni beber, y no envejece.\nPodés emplear una acción de magia para quitar el tapón del frasco y liberar a la criatura contenida.\nEsta obedecerá tus órdenes durante 1 hora y las comprenderá aunque se las des en un idioma que no entienda. Si no le das ninguna orden o le das una orden que probablemente desemboque en su muerte o cautiverio, se defenderá, pero no realizará ninguna otra acción. Al final de la duración, la criatura actuará conforme a su carácter y alineamiento normales.\nUn conjuro identificar revela si el frasco contiene una criatura, pero la única forma de saber de qué criatura se trata es abrirlo. Un frasco de hierro recién descubierto podría contener una criatura a elección de tu GM.",
     "rarity": "legendary",
     "requiresAttunement": false,
-    "sourcePage": 258
+    "sourcePage": 258,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "garrote-grande-atronador",
@@ -2011,7 +2473,10 @@
     "rarity": "very-rare",
     "requiresAttunement": true,
     "baseItemKind": "weapon",
-    "sourcePage": 258
+    "sourcePage": 258,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "gema-del-resplandor",
@@ -2024,7 +2489,10 @@
     "rarity": "uncommon",
     "requiresAttunement": false,
     "sourcePage": 259,
-    "maxCharges": 50
+    "maxCharges": 50,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "gema-de-vision",
@@ -2038,7 +2506,10 @@
     "requiresAttunement": true,
     "sourcePage": 259,
     "maxCharges": 3,
-    "rechargeAmount": "1d3"
+    "rechargeAmount": "1d3",
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "gema-elemental",
@@ -2050,7 +2521,10 @@
     "description": "Objeto maravilloso, infrecuente\nEsta gema contiene vestigios de energía elemental.\nCuando emplees una acción de utilizar para romperla, invocarás un elemental (consultá su perfil en el capítulo “Monstruos”) y la gema dejará de ser mágica. El elemental aparece en un espacio sin ocupar lo más cerca posible de la gema rota, entiende tus idiomas, obedece tus órdenes y juega su turno inmediatamente después de vos en tu orden de iniciativa. El elemental desaparecerá tras 1 hora, cuando muera o si lo desconvocás como acción adicional.\nEl tipo de gema determina el elemental invocado, como se muestra en la siguiente tabla.\nGema Elemental invocado Corindón rojo Elemental de fuego Diamante amarillo Elemental de tierra Esmeralda Elemental de agua Zafiro azul Elemental de aire",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 259
+    "sourcePage": 259,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "grilletes-dimensionales",
@@ -2062,7 +2536,10 @@
     "description": "Objeto maravilloso, raro\nPodés emplear una acción de utilizar para poner estos grilletes a una criatura que tenga el estado de incapacitada. Se ajustan a criaturas de tamaños Pequeño a Grande. Los grilletes impiden que la criatura utilice cualquier método de movimiento extradimensional, incluidos la teletransportación o los viajes a otro plano de existencia. No impiden que la criatura atraviese un portal interdimensional.\nVos y cualquier criatura que designes al usar los grilletes pueden emplear una acción de utilizar para quitarlos. Una vez cada 30 días, la criatura esposada podrá realizar una prueba de Fuerza (Atletismo) con CD 30. Si la supera, se liberará y destruirá los grilletes.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 259
+    "sourcePage": 259,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "guanteletes-de-fuerza-de-ogro",
@@ -2081,7 +2558,10 @@
         "score": 19
       }
     ],
-    "sourcePage": 259
+    "sourcePage": 259,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "guantes-atrapaflechas",
@@ -2093,7 +2573,10 @@
     "description": "Objeto maravilloso, infrecuente (requiere sintonización)\nCuando te acierte una tirada de ataque realizada con un arma a distancia o arrojadiza mientras lleves puestos estos guantes, podrás emplear una reacción para reducir el daño en 1d10 más tu modificador por Destreza, siempre y cuando tengas una mano libre. Si reducís el daño a 0, podrás atrapar la unidad de munición o el arma si es lo bastante pequeña como para sujetarla con esa mano.",
     "rarity": "uncommon",
     "requiresAttunement": true,
-    "sourcePage": 260
+    "sourcePage": 260,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "guantes-de-ladron",
@@ -2105,7 +2588,10 @@
     "description": "Objeto maravilloso, infrecuente\nEstos guantes son imperceptibles mientras los lleves puestos. Si los vistes, ganás un bonificador de +5 a las pruebas de Destreza (Juego de manos).",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 260
+    "sourcePage": 260,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "guantes-de-natacion-y-escalada",
@@ -2117,7 +2603,10 @@
     "description": "Objeto maravilloso, infrecuente (requiere sintonización)\nMientras lleves estos guantes, tenés una velocidad nadando y una velocidad trepando iguales a tu velocidad. Además, obtenés un bonificador de +5 a las pruebas de Fuerza (Atletismo) para nadar o trepar.",
     "rarity": "uncommon",
     "requiresAttunement": true,
-    "sourcePage": 260
+    "sourcePage": 260,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "hacha-berserker",
@@ -2130,7 +2619,10 @@
     "rarity": "rare",
     "requiresAttunement": true,
     "baseItemKind": "weapon",
-    "sourcePage": 260
+    "sourcePage": 260,
+    "magicItemType": null,
+    "cursed": true,
+    "variableRarity": false
   },
   {
     "id": "herraduras-de-velocidad",
@@ -2142,7 +2634,10 @@
     "description": "Objeto maravilloso, raro\nEstas herraduras vienen de cuatro en cuatro. Como acción de magia, podés tocar el casco de un caballo o de una criatura similar con una de las herraduras para que se quede fijada en él. Quitar una herradura también requiere una acción de magia.\nMientras cuatro de ellas estén fijadas a la misma criatura, su velocidad aumenta en 30 pies.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 260
+    "sourcePage": 260,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "herraduras-del-cefiro",
@@ -2154,7 +2649,10 @@
     "description": "Objeto maravilloso, muy raro\nEstas herraduras vienen de cuatro en cuatro. Como acción de magia, podés tocar el casco de un caballo o de una criatura similar con una de las herraduras para que se quede fijada en él. Quitar una herradura también requiere una acción de magia.\nMientras cuatro de ellas estén fijadas a los cascos de un caballo o de una criatura similar, le permitirán moverse con normalidad mientras flota 4 pulgadas por encima de una superficie. Este efecto implica que la criatura puede cruzar o permanecer sobre superficies no sólidas o inestables, como agua y lava. Además, no deja huellas e ignora el terreno difícil. Por último, podrá viajar hasta 12 horas al día sin sumar niveles de cansancio por hacer viajes largos.",
     "rarity": "very-rare",
     "requiresAttunement": false,
-    "sourcePage": 260
+    "sourcePage": 260,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "hierro-de-escarcha",
@@ -2167,7 +2665,10 @@
     "rarity": "very-rare",
     "requiresAttunement": true,
     "baseItemKind": "weapon",
-    "sourcePage": 260
+    "sourcePage": 260,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "incensario-de-controlar-elementales-de-aire",
@@ -2179,7 +2680,10 @@
     "description": "Objeto maravilloso, raro\nPodés emplear una acción de magia mientras balanceás con suavidad este incensario para invocar un elemental de aire. El elemental aparece en un espacio sin ocupar lo más cerca posible del incensario, entiende tus idiomas, obedece tus órdenes y juega su turno inmediatamente después de vos en tu orden de iniciativa. El elemental desaparecerá tras 1 hora, cuando muera o si lo desconvocás como acción adicional. El incensario no puede volver a emplearse de esta manera hasta el siguiente amanecer.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 260
+    "sourcePage": 260,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "jabalina-del-relampago",
@@ -2192,7 +2696,10 @@
     "rarity": "uncommon",
     "requiresAttunement": false,
     "baseItemKind": "weapon",
-    "sourcePage": 261
+    "sourcePage": 261,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "ladrona-de-nueve-vidas",
@@ -2206,7 +2713,10 @@
     "requiresAttunement": true,
     "baseItemKind": "weapon",
     "sourcePage": 261,
-    "maxCharges": 0
+    "maxCharges": 0,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "lengua-de-fuego",
@@ -2219,7 +2729,10 @@
     "rarity": "rare",
     "requiresAttunement": true,
     "baseItemKind": "weapon",
-    "sourcePage": 261
+    "sourcePage": 261,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "linterna-de-revelacion",
@@ -2231,7 +2744,10 @@
     "description": "Objeto maravilloso, infrecuente\nMientras esté encendida, esta linterna sorda luce durante 6 horas con 0,5 l de aceite e ilumina un radio de 30 pies con luz brillante y otros 30 pies con luz tenue. Las criaturas y objetos invisibles serán visibles mientras permanezcan iluminados por la luz brillante de la linterna. Podés emplear una acción de utilizar para cubrir la abertura de la linterna con la tapa y hacer que solo emita luz tenue en un radio de 5 pies.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 261
+    "sourcePage": 261,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "malla-elfica",
@@ -2244,7 +2760,10 @@
     "rarity": "rare",
     "requiresAttunement": false,
     "baseItemKind": "armor",
-    "sourcePage": 261
+    "sourcePage": 261,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "manto-de-resistencia-a-conjuros",
@@ -2256,7 +2775,10 @@
     "description": "Objeto maravilloso, raro (requiere sintonización)\nMientras lleves esta capa, tendrás ventaja en las tiradas de salvación contra conjuros.",
     "rarity": "rare",
     "requiresAttunement": true,
-    "sourcePage": 261
+    "sourcePage": 261,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "manual-de-golems",
@@ -2268,7 +2790,10 @@
     "description": "Objeto maravilloso, muy raro\nEste tomo contiene la información y los ensalmos necesarios para crear un tipo concreto de gólem.\nTu GM elige el tipo o lo determina al azar tirando en la tabla a continuación. Para descifrar y usar el manual, debés ser un lanzador de conjuros con al menos dos espacios de conjuro de nivel 5. Si una criatura no puede usar un manual de gólems y trata de leerlo, sufrirá 6d6 de daño psíquico.\nPara crear un gólem, debés dedicar el tiempo mostrado en la tabla, trabajar sin interrupciones con el manual a mano y no descansar durante más de 8 horas al día. También debés pagar el precio especificado para comprar los suministros.\nEn cuanto hayas acabado de crear al gólem, el libro arderá en llamas sobrenaturales. El gólem cobrará vida cuando se esparzan sobre él las cenizas del manual. Consultá el capítulo “Monstruos” para conocer el perfil del gólem. Estará bajo tu control, entenderá tus órdenes y las obedecerá.\n1d20 Gólem Tiempo Precio\n1–5 Gólem de arcilla 30 días 65 000 po\n6–17 Gólem de carne 60 días 50 000 po\n18 Gólem de hierro 120 días 100 000 po\n19–20 Gólem de piedra 90 días 80 000 po",
     "rarity": "very-rare",
     "requiresAttunement": false,
-    "sourcePage": 261
+    "sourcePage": 261,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "manual-de-la-salud-corporal",
@@ -2280,7 +2805,10 @@
     "description": "Objeto maravilloso, muy raro\nEste libro contiene consejos de salud y nutrición, y sus palabras están impregnadas de magia. Si dedicás 48 horas durante un periodo de 6 días, como mucho, a estudiar el contenido del libro y poner en práctica sus indicaciones, tu Constitución aumentará en 2, hasta un máximo de 30. Después, el manual perderá su magia, pero la recuperará cuando pase un siglo.",
     "rarity": "very-rare",
     "requiresAttunement": false,
-    "sourcePage": 261
+    "sourcePage": 261,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "manual-de-rapidez-de-accion",
@@ -2292,7 +2820,10 @@
     "description": "Objeto maravilloso, muy raro\nEste libro contiene ejercicios de coordinación y equilibrio, y sus palabras están impregnadas de magia. Si dedicás 48 horas durante un periodo de 6 días, como mucho, a estudiar el contenido del libro y poner en práctica sus indicaciones, tu Destreza aumentará en 2, hasta un máximo de 30. Después, el manual perderá su magia, pero la recuperará cuando pase un siglo.",
     "rarity": "very-rare",
     "requiresAttunement": false,
-    "sourcePage": 262
+    "sourcePage": 262,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "manual-del-ejercicio-beneficioso",
@@ -2304,7 +2835,10 @@
     "description": "Objeto maravilloso, muy raro\nEste libro describe diferentes ejercicios para mantenerse en forma y sus palabras están impregnadas de magia. Si dedicás 48 horas durante un periodo de 6 días, como mucho, a estudiar el contenido del libro y poner en práctica sus indicaciones, tu Fuerza aumentará en 2, hasta un máximo de 30. Después, el manual perderá su magia, pero la recuperará cuando pase un siglo.",
     "rarity": "very-rare",
     "requiresAttunement": false,
-    "sourcePage": 262
+    "sourcePage": 262,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "martillo-arrojadizo-enano",
@@ -2317,7 +2851,10 @@
     "rarity": "very-rare",
     "requiresAttunement": true,
     "baseItemKind": "weapon",
-    "sourcePage": 262
+    "sourcePage": 262,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "martillo-de-rayos",
@@ -2332,7 +2869,10 @@
     "baseItemKind": "weapon",
     "sourcePage": 262,
     "maxCharges": 5,
-    "rechargeAmount": "1d4 + 1"
+    "rechargeAmount": "1d4 + 1",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "matadragones",
@@ -2345,7 +2885,10 @@
     "rarity": "rare",
     "requiresAttunement": false,
     "baseItemKind": "weapon",
-    "sourcePage": 262
+    "sourcePage": 262,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "matagigantes",
@@ -2358,7 +2901,10 @@
     "rarity": "rare",
     "requiresAttunement": false,
     "baseItemKind": "weapon",
-    "sourcePage": 262
+    "sourcePage": 262,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "maza-castigadora",
@@ -2371,7 +2917,10 @@
     "rarity": "rare",
     "requiresAttunement": false,
     "baseItemKind": "weapon",
-    "sourcePage": 262
+    "sourcePage": 262,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "maza-del-terror",
@@ -2386,7 +2935,10 @@
     "baseItemKind": "weapon",
     "sourcePage": 262,
     "maxCharges": 3,
-    "rechargeAmount": "1d3"
+    "rechargeAmount": "1d3",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "maza-disruptiva",
@@ -2399,7 +2951,10 @@
     "rarity": "rare",
     "requiresAttunement": true,
     "baseItemKind": "weapon",
-    "sourcePage": 263
+    "sourcePage": 263,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "medallon-de-los-pensamientos",
@@ -2413,7 +2968,10 @@
     "requiresAttunement": true,
     "sourcePage": 263,
     "maxCharges": 5,
-    "rechargeAmount": "1d4"
+    "rechargeAmount": "1d4",
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "morral-practico",
@@ -2425,7 +2983,10 @@
     "description": "Objeto maravilloso, raro\nEsta mochila posee un bolsillo central y dos laterales, cada uno de los cuales es un espacio extradimensional. Cada bolsillo lateral puede contener hasta 200 libras de materia sin exceder un volumen de 750 l. El bolsillo central puede contener hasta 500 libras de materia sin exceder un volumen de 1900 l.\nEl morral pesa siempre 5 libras, independientemente del contenido.\nSacar un objeto del morral requiere una acción de utilizar o una acción adicional, a tu elección. Cuando metés la mano para extraer un objeto concreto, la magia hará que siempre se encuentre arriba del todo.\nSi se sobrecarga, perfora o rasga algún bolsillo, el morral se romperá y quedará destruido. Si se destruye, su contenido se perderá para siempre, aunque los artefactos siempre volverán a aparecer en alguna parte. Si se pone el morral del revés, su contenido se vuelca sin sufrir daño y el morral debe volver a ponerse del derecho antes de usarlo de nuevo.\nCada bolsillo del morral contiene aire suficiente para respirar durante 10 minutos, divididos entre el número de criaturas que necesiten respirar en su interior.\nMeter el morral en el espacio extradimensional creado por un agujero portátil, una bolsa de contención o un objeto similar destruye instantáneamente ambos objetos y abre un portal al Plano Astral.\nEl portal se crea en el sitio en el que un objeto se introdujo dentro del otro. El portal absorbe a todas las criaturas situadas a 10 pies o menos de él y que no estén tras cobertura completa, y las conduce a un lugar aleatorio del Plano Astral. Después, el portal se cierra. El portal solo funciona en un sentido y no puede volver a abrirse.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 263
+    "sourcePage": 263,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "municion-1",
@@ -2439,7 +3000,10 @@
     "requiresAttunement": false,
     "magicBonus": 1,
     "baseItemKind": "weapon",
-    "sourcePage": 263
+    "sourcePage": 263,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "municion-2",
@@ -2453,7 +3017,10 @@
     "requiresAttunement": false,
     "magicBonus": 2,
     "baseItemKind": "weapon",
-    "sourcePage": 263
+    "sourcePage": 263,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "municion-3",
@@ -2467,7 +3034,10 @@
     "requiresAttunement": false,
     "magicBonus": 3,
     "baseItemKind": "weapon",
-    "sourcePage": 263
+    "sourcePage": 263,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "municion-asesina",
@@ -2480,7 +3050,10 @@
     "rarity": "very-rare",
     "requiresAttunement": false,
     "baseItemKind": "weapon",
-    "sourcePage": 263
+    "sourcePage": 263,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "orbe-dragontino",
@@ -2494,7 +3067,10 @@
     "requiresAttunement": true,
     "sourcePage": 263,
     "maxCharges": 7,
-    "rechargeAmount": "1d4 + 3"
+    "rechargeAmount": "1d4 + 3",
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "pegamento-soberano",
@@ -2506,7 +3082,10 @@
     "description": "Objeto maravilloso, legendario\nEsta sustancia viscosa y blanca como la leche puede crear un vínculo adhesivo permanente entre dos objetos cualesquiera. Debe almacenarse en un bote o frasco que se haya untado con aceite escurridizo.\nEn el momento de encontrar el recipiente, contendrá 1 onza + 1d6 onzas.\n1 onza de pegamento pueden cubrir una superficie cuadrada de 1 pie de lado. Para aplicar 1 onza de pegamento soberano es necesaria una acción de utilizar, y tarda 1 minuto en asentarse. En cuanto lo haga, el vínculo que crea solo se puede romper si se aplica un disolvente universal o un aceite de etereidad o con un conjuro deseo.",
     "rarity": "legendary",
     "requiresAttunement": false,
-    "sourcePage": 264
+    "sourcePage": 264,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "pergamino-de-conjuro",
@@ -2518,7 +3097,10 @@
     "description": "Pergamino, rareza variable\nUn pergamino de conjuro contiene las palabras de un solo conjuro, escritas en un código místico. Si el conjuro está en tu lista de conjuros, podés leer el pergamino y lanzar el conjuro sin componentes materiales. De lo contrario, el pergamino es ininteligible.\nSi lanzás el conjuro leyendo el pergamino, el tiempo de lanzamiento del conjuro será el habitual. Una vez lanzado, el pergamino se convierte en polvo. Si se interrumpe el lanzamiento, el pergamino no se pierde.\nSi el conjuro está en tu lista de conjuros pero es de un nivel superior que no podés lanzar de manera normal, harás una prueba de característica usando tu aptitud mágica para determinar si conseguís lanzarlo. La CD es de 10 más el nivel del conjuro. Si la fallás, el conjuro desaparecerá del pergamino y no surtirá efecto.\nEl nivel del conjuro del pergamino determina la CD de las tiradas de salvación y el bonificador de ataque del conjuro, además de la rareza del pergamino, como se indica en la siguiente tabla.\nNivel del conjuro Rareza CD de salvación Bonificador de ataque Truco Común 13 +5 1 Común 13 +5\n2 Infrecuente 13 +5\n3 Infrecuente 15 +7\n4 Raro 15 +7\n5 Raro 17 +9\n6 Muy raro 17 +9\n7 Muy raro 18 +10\n8 Muy raro 18 +10\n9 Legendario 19 +11 Copiar un pergamino en un libro de conjuros.\nUn conjuro de mago en un pergamino de conjuro puede copiarse en un libro de conjuros. Cuando un conjuro se copie de esta forma, el copista deberá superar una prueba de Inteligencia (Conocimiento arcano) con CD igual a 10 más el nivel del conjuro.\nSi la supera, copiará el conjuro. Supere o no la prueba, el pergamino de conjuro se destruirá.",
     "rarity": "common",
     "requiresAttunement": false,
-    "sourcePage": 264
+    "sourcePage": 264,
+    "magicItemType": "scroll",
+    "cursed": false,
+    "variableRarity": true
   },
   {
     "id": "perla-de-poder",
@@ -2530,7 +3112,10 @@
     "description": "Objeto maravilloso, infrecuente (requiere sintonización por parte de un lanzador de conjuros)\nMientras lleves esta perla contigo, podés emplear una acción de magia para recuperar un espacio de conjuro gastado de nivel 3 o inferior. Una vez que utilices la perla, no podrás volver a emplearla hasta el siguiente amanecer.",
     "rarity": "uncommon",
     "requiresAttunement": true,
-    "sourcePage": 265
+    "sourcePage": 265,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "piedra-de-controlar-elementales-de-tierra",
@@ -2542,7 +3127,10 @@
     "description": "Objeto maravilloso, raro\nSi esta piedra de 5 libras está tocando el suelo, podés emplear una acción de magia para invocar un elemental de tierra. Aparecerá en un espacio sin ocupar de tu elección a 30 pies o menos de vos, obedece tus órdenes y juega su turno inmediatamente después de vos en tu orden de iniciativa. El elemental desaparecerá tras 1 hora, cuando muera o si lo desconvocás como acción adicional. La piedra no puede volver a emplearse de esta manera hasta el siguiente amanecer.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 265
+    "sourcePage": 265,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "piedra-de-la-buena-fortuna-piedra-de-la-suerte",
@@ -2554,7 +3142,10 @@
     "description": "Objeto maravilloso, infrecuente (requiere sintonización)\nMientras lleves esta ágata pulida contigo, recibirás un bonificador de +1 a las pruebas de característica y las tiradas de salvación.",
     "rarity": "uncommon",
     "requiresAttunement": true,
-    "sourcePage": 265
+    "sourcePage": 265,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "piedra-ioun",
@@ -2566,7 +3157,10 @@
     "description": "Objeto maravilloso, rareza variable (requiere sintonización)\nLas piedras Ioun son aproximadamente del tamaño de una cuenta y se llaman así por Ioun, un dios del conocimiento y la profecía adorado en algunos mundos. Existen muchos tipos de piedras Ioun, cada uno de ellos con una combinación distinta de forma y color.\nSi empleás una acción de magia para lanzar una piedra Ioun al aire, orbitará alrededor de tu cabeza a una distancia de 1d3 pies y te proporcionará un beneficio. Podés tener hasta tres piedras Ioun orbitando activas a la vez.\nCada piedra Ioun que orbite a tu alrededor se considera un objeto que llevás puesto. Evitará el contacto con otras criaturas y objetos y modificará su órbita para prevenir colisiones y frustrar los intentos de otras criaturas de atacarlas o agarrarlas.\nComo acción de utilizar, podés tomar y guardar cualquier cantidad de piedras Ioun que orbiten alrededor de tu cabeza. Si tu sintonización con una de ellas termina mientras está orbitando, la piedra caerá como si la hubieras soltado.\nEl tipo de piedra determina su rareza y efectos.\nAbsorción (muy rara). Mientras este elipsoide de color lila claro gire alrededor de tu cabeza, podrás emplear una reacción para cancelar un conjuro de nivel 4 o inferior lanzado por una criatura que puedas ver. Un conjuro cancelado no tendrá efecto y se perderán los recursos empleados para lanzarlo.\nEn cuanto la piedra haya cancelado 20 niveles de conjuros, se volverá gris y perderá su magia.\nAbsorción mayor (legendaria). Mientras este elipsoide jaspeado en tonos lilas y verdes gire alrededor de tu cabeza, podrás emplear una reacción para cancelar un conjuro de nivel 8 o inferior lanzado por una criatura que puedas ver. Un conjuro cancelado no tendrá efecto y se perderán los recursos empleados para lanzarlo. En cuanto la piedra haya cancelado 20 niveles de conjuros, se volverá gris y perderá su magia.\nAgilidad (muy rara). Mientras esta esfera de color rojo intenso gire alrededor de tu cabeza, tu Destreza aumenta en 2, hasta un máximo de 20.\nConsciencia (rara). Mientras este romboide azul oscuro gire alrededor de tu cabeza, tenés ventaja en las tiradas de iniciativa y en las prueba de Sabiduría (Percepción).\nFortaleza (muy rara). Mientras este romboide rosa gire alrededor de tu cabeza, tu Constitución aumenta en 2, hasta un máximo de 20.\nFuerza (muy rara). Mientras este romboide azul pálido gire alrededor de tu cabeza, tu Fuerza aumenta en 2, hasta un máximo de 20.\nIntelecto (muy rara). Mientras esta esfera jaspeada en tonos rojos y azules gire alrededor de tu cabeza, tu Inteligencia aumenta en 2, hasta un máximo de 20.\nLiderazgo (muy rara). Mientras esta esfera jaspeada en tonos rosas y verdes gire alrededor de tu cabeza, tu Carisma aumenta en 2, hasta un máximo de 20.\nMaestría (legendaria). Mientras este prisma verde pálido gire alrededor de tu cabeza, tu bonificador por competencia aumenta en 1.\nPerspicacia (muy rara). Mientras esta esfera de color azul incandescente gire alrededor de tu cabeza, tu Sabiduría aumenta en 2, hasta un máximo de 20.\nProtección (rara). Mientras este prisma de color rosa polvoriento gire alrededor de tu cabeza, obtenés un bonificador de +1 a la clase de armadura.\nRegeneración (legendaria). Recuperás 15 puntos de golpe al final de cada hora que este huso de color blanco nacarado gire alrededor de tu cabeza si tenés al menos 1 punto de golpe.\nReserva (rara). Este prisma de color morado intenso almacena los conjuros que se lanzan sobre él hasta que quieras utilizarlos. La piedra puede guardar hasta 4 niveles de conjuros. Cuando la encuentres, contendrá 1d4 niveles de conjuros almacenados, a elección de tu GM.\nCualquier criatura puede lanzar un conjuro de niveles 1 a 4 sobre la piedra si la toca mientras lanza el conjuro. El único efecto que tendrá el conjuro es que quedará almacenado en la piedra. Si la piedra no puede albergarlo, el conjuro se gastará sin efecto. El nivel del espacio utilizado para lanzar el conjuro determina cuánto espacio utiliza.\nMientras esta piedra gire alrededor de tu cabeza, podrás lanzar cualquiera de los conjuros almacenados. El conjuro utiliza el nivel del espacio, la CD de salvación de conjuros, el bonificador de ataque de conjuros y la aptitud mágica del lanzador original, pero, por lo demás, funciona como si vos lo hubieses lanzado. El conjuro lanzado desde la piedra deja de estar almacenado en ella, por lo que deja espacio libre.\nSustento (rara). No necesitás comer ni beber mientras este huso transparente gire alrededor de tu cabeza.",
     "rarity": "common",
     "requiresAttunement": true,
-    "sourcePage": 265
+    "sourcePage": 265,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": true
   },
   {
     "id": "piedras-mensajeras",
@@ -2578,7 +3172,10 @@
     "description": "Objeto maravilloso, infrecuente\nLas piedras mensajeras vienen de dos en dos y cada una de ellas está tallada de forma que su pareja sea fácilmente identificable. Mientras tocás una piedra, podés lanzar recado desde ella. El objetivo es el portador de la otra piedra. Si no hay nadie portándola, lo sabrás en cuanto emplees la tuya y no llegarás a lanzar el conjuro.\nEn cuanto se lance recado desde una de las dos piedras, no podrán volver a usarse hasta el siguiente amanecer. Si se destruye una de las piedras de la pareja, la otra deja de ser mágica.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 266
+    "sourcePage": 266,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "pigmentos-maravillosos",
@@ -2590,7 +3187,10 @@
     "description": "Objeto maravilloso, muy raro\nEsta elegante caja de madera contiene 1d4 botecitos de pigmento y un pincel (peso total de 1 libra).\nSi usás un pincel y gastás 1 botecito de pigmento, podés pintar cualquier cantidad de objetos tridimensionales y elementos de terreno (como muros, puertas, árboles, flores, armas, telarañas o pozos), siempre y cuando quepan todos en un cubo de 20 pies de lado. Esta tarea requiere concentración, te llevará 10 minutos (independientemente de la cantidad de objetos que crees) y durante ese tiempo deberás permanecer dentro del cubo. Si perdés la concentración o sales del cubo antes de terminar, todos los elementos pintados se desvanecerán y el botecito de pigmento se desperdiciará.\nCuando termines de pintar, todos los objetos y elementos de terreno se volverán reales. Por tanto, si pintás una puerta en una pared, crearás una puerta real que pueda abrirse para acceder al otro lado.\nSi pintás un pozo, crearás un hoyo de verdad, cuya profundidad deberá caber en el cubo de 20 pies.\nNinguna creación de los pigmentos puede tener un valor superior a 25 po, y el valor total de todos los objetos que crea un botecito no puede superar las 500 po. Si pintás objetos de mayor valor, como un montón de oro, parecerán auténticos, pero una inspección detallada revela que están hechos de pasta, galleta u otro material sin valor.\nSi dibujás algún tipo de energía, como fuego o un relámpago, se esfumará inmediatamente al completar el dibujo, sin causar daños.",
     "rarity": "very-rare",
     "requiresAttunement": false,
-    "sourcePage": 266
+    "sourcePage": 266,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "pocion-de-amistad-animal",
@@ -2602,7 +3202,10 @@
     "description": "Poción, infrecuente\nCuando bebas esta poción, podrás lanzar la versión de nivel 3 del conjuro encantar animal (CD de salvación 13).\nSi agitás esta turbia poción, verás pequeños fragmentos: una escama de un pez, una pluma de colibrí, la garra de un gato o el pelo de una ardilla.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 266
+    "sourcePage": 266,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "pocion-de-clarividencia",
@@ -2614,7 +3217,10 @@
     "description": "Poción, rara\nCuando bebas esta poción, obtendrás el efecto del conjuro clarividencia (no requiere concentración).\nEn este líquido amarillento flota un globo ocular, pero desaparece en cuanto se abre la poción.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 266
+    "sourcePage": 266,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "pocion-de-crecimiento",
@@ -2626,7 +3232,10 @@
     "description": "Poción, infrecuente\nCuando bebas esta poción, obtendrás el efecto de “agrandar” del conjuro agrandar/reducir durante 10 minutos (no requiere concentración).\nEl color rojo del líquido de la poción se expande continuamente a partir de una gota diminuta para teñir el líquido transparente que la rodea. A continuación, se vuelve a contraer. Si agitás la botella, no se interrumpirá el proceso.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 266
+    "sourcePage": 266,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "pocion-de-encoger",
@@ -2638,7 +3247,10 @@
     "description": "Poción, rara\nCuando bebas esta poción, obtendrás el efecto de “reducir” del conjuro agrandar/reducir durante 1d4 horas (no requiere concentración).\nEl color rojo del líquido de la poción se contrae continuamente hasta quedar reducido a una gota diminuta y, a continuación, se expande para teñir el líquido transparente que la rodea. Si agitás la botella, no se interrumpirá el proceso.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 266
+    "sourcePage": 266,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "pocion-de-forma-gaseosa",
@@ -2650,7 +3262,10 @@
     "description": "Poción, rara\nCuando bebas esta poción, obtendrás el efecto del conjuro forma gaseosa durante 1 hora (no requiere concentración) o hasta que pongas fin al efecto como acción adicional.\nEl frasco de esta poción parece contener una niebla que se mueve y se derrama como si fuese agua.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 266
+    "sourcePage": 266,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "pocion-de-fuerza-de-gigante",
@@ -2662,7 +3277,10 @@
     "description": "Poción, rareza variable\nCuando bebas esta poción, tu puntuación de Fuerza cambiará durante 1 hora. El tipo de gigante determina la puntuación (consultá la tabla más adelante).\nLa poción no tendrá ningún efecto si tu Fuerza es igual o superior a esa puntuación.\nEn el líquido transparente de la poción flota un fragmento de luz que parece la uña de un gigante.\nPoción Fue Rareza Poción de fuerza de gigante (colinas)\n21 Infrecuente Poción de fuerza de gigante ( escarcha o piedra)\n23 Rara Poción de fuerza de gigante (fuego) 25 Rara Poción de fuerza de gigante (nubes) 27 Muy rara Poción de fuerza de gigante (tormentas)\n29 Legendaria",
     "rarity": "common",
     "requiresAttunement": false,
-    "sourcePage": 267
+    "sourcePage": 267,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": true
   },
   {
     "id": "pocion-de-heroismo",
@@ -2674,7 +3292,10 @@
     "description": "Poción, rara\nCuando bebas esta poción, obtendrás 10 puntos de golpe temporales que durarán 1 hora. Durante ese periodo, te encontrarás bajo el efecto del conjuro bendición (no requiere concentración).\nEl líquido azul de la poción borbotea y echa humo, como si estuviera hirviendo.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 267
+    "sourcePage": 267,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "pocion-de-invisibilidad",
@@ -2686,7 +3307,10 @@
     "description": "Poción, rara\nEl frasco de esta poción parece vacío, pero, al mismo tiempo, da la impresión de contener líquido.\nCuando bebas esta poción, obtendrás el estado de invisible durante 1 hora. El efecto termina antes de tiempo si hacés una tirada de ataque, causas daño o lanzás un conjuro.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 267
+    "sourcePage": 267,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "pocion-de-invulnerabilidad",
@@ -2698,7 +3322,10 @@
     "description": "Poción, rara\nDurante 1 minuto después de beber esta poción, tenés resistencia a todo el daño.\nEsta poción, espesa como el sirope, parece hierro líquido.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 267
+    "sourcePage": 267,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "pocion-de-leer-mentes",
@@ -2710,7 +3337,10 @@
     "description": "Poción, rara\nCuando bebas esta poción, obtendrás el efecto del conjuro detectar pensamientos (CD de salvación 13) durante 10 minutos (no requiere concentración).\nEn el líquido denso y morado de esta poción flota una nube rosa ovoide.",
     "rarity": "rare",
     "requiresAttunement": false,
-    "sourcePage": 267
+    "sourcePage": 267,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "pocion-de-longevidad",
@@ -2722,7 +3352,10 @@
     "description": "Poción, muy rara\nCuando bebas esta poción, tu edad física se reduce en 1d6 + 6 años, hasta un mínimo de 13 años. Cada vez que tomes una poción de longevidad después de la primera, existe una probabilidad acumulativa del 10 % de que envejezcas 1d6 + 6 años.\nSuspendido en el líquido ámbar hay un corazón diminuto que, contra todo pronóstico, todavía late.\nEste ingrediente desaparece cuando se abre la poción.",
     "rarity": "very-rare",
     "requiresAttunement": false,
-    "sourcePage": 267
+    "sourcePage": 267,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "pocion-de-resistencia",
@@ -2734,7 +3367,10 @@
     "description": "Poción, infrecuente\nCuando bebas esta poción, tendrás resistencia a un tipo de daño durante 1 hora. Tu GM elige el tipo o lo determina al azar tirando en la tabla a continuación.\n1d10 Tipo de daño 1d10 Tipo de daño\n1 Ácido 6 Psíquico\n2 Frío 7 Radiante\n3 Fuego 8 Relámpago\n4 Fuerza 9 Trueno\n5 Necrótico 10 Veneno",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 267
+    "sourcePage": 267,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "pocion-de-respirar-bajo-el-agua",
@@ -2746,7 +3382,10 @@
     "description": "Poción, infrecuente\nPodés respirar debajo del agua durante 24 horas tras beber esta poción.\nSu líquido verde turbio huele a mar y en él flota una burbuja con aspecto de medusa.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 267
+    "sourcePage": 267,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "pocion-de-trepar",
@@ -2758,7 +3397,10 @@
     "description": "Poción, común\nCuando bebas esta poción, obtendrás una velocidad trepando igual a tu velocidad durante 1 hora.\nDurante ese tiempo, tendrás ventaja en las pruebas de Fuerza (Atletismo) para trepar.\nEsta poción se separa en tres capas (marrón, plateada y gris) que parecen los estratos de una roca.\nSi agitás la botella, los colores no se mezclan.",
     "rarity": "common",
     "requiresAttunement": false,
-    "sourcePage": 267
+    "sourcePage": 267,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "pocion-de-velocidad",
@@ -2770,7 +3412,10 @@
     "description": "Poción, muy rara\nCuando bebas esta poción, obtendrás el efecto del conjuro acelerar durante 1 minuto (no requiere concentración) sin sufrir la ola de somnolencia que suele ocurrir cuando termina el efecto.\nEl líquido amarillo de este brebaje tiene vetas negras y forma remolinos.",
     "rarity": "very-rare",
     "requiresAttunement": false,
-    "sourcePage": 267
+    "sourcePage": 267,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "pocion-de-veneno",
@@ -2782,7 +3427,10 @@
     "description": "Poción, infrecuente\nEste mejunje parece, huele y sabe como una poción de curación u otra poción beneficiosa. Sin embargo, en realidad es un veneno enmascarado con magia de ilusionismo. Un conjuro identificar revelará su verdadera naturaleza.\nSi la bebés, sufrirás 4d6 de daño de veneno y deberás superar una tirada de salvación de Constitución con CD 13 o tendrás el estado de envenenado durante 1 hora.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 267
+    "sourcePage": 267,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "pocion-de-vitalidad",
@@ -2794,7 +3442,10 @@
     "description": "Poción, muy rara\nCuando bebas esta poción, eliminará todos los niveles de cansancio que tengas y el estado de envenenado sobre vos. Durante las siguientes 24 horas, recuperás la cantidad máxima de puntos de golpe de cualquier dado de puntos de golpe que utilices.\nEl líquido carmesí de este brebaje palpita regularmente con una luz apagada, recordando a un corazón.",
     "rarity": "very-rare",
     "requiresAttunement": false,
-    "sourcePage": 268
+    "sourcePage": 268,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "pocion-de-vuelo",
@@ -2806,7 +3457,10 @@
     "description": "Poción, muy rara\nCuando bebas esta poción, obtendrás una velocidad volando igual a tu velocidad durante 1 hora y podrás levitar. Si te encontrás en pleno vuelo cuando el efecto de la poción termine, te caerás salvo que cuentes con otros medios que te mantengan en el aire.\nEl líquido transparente de esta poción flota en la parte superior del frasco y tiene impurezas blancas con forma de nube.",
     "rarity": "very-rare",
     "requiresAttunement": false,
-    "sourcePage": 268
+    "sourcePage": 268,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "pociones-de-curacion",
@@ -2818,7 +3472,10 @@
     "description": "Poción, rareza variable\nCuando bebas esta poción, recuperarás puntos de golpe. La cantidad depende de la rareza de la poción, como se muestra en la tabla a continuación.\nIndependientemente de su potencia, el líquido rojo de la poción brilla al agitarse.\nPoción PG recuperados Rareza Poción de curación 2d4 + 2 Común Poción de curación (mayor)\n4d4 + 4 Infrecuente Poción de curación (superior)\n8d4 + 8 Rara Poción de curación (suprema)\n10d4 + 20 Muy rara",
     "rarity": "common",
     "requiresAttunement": false,
-    "sourcePage": 268
+    "sourcePage": 268,
+    "magicItemType": "potion",
+    "cursed": false,
+    "variableRarity": true
   },
   {
     "id": "polvo-de-desaparicion",
@@ -2830,7 +3487,10 @@
     "description": "Objeto maravilloso, infrecuente\nEste polvo parece arena muy fina y hay suficiente para un solo uso. Cuando empleás una acción de utilizar para esparcir el polvo en el aire, vos y cada criatura y objeto que se encuentre en una emanación de 10 pies o menos que se origina en vos tendrán el estado de invisibles durante 2d4 minutos. La duración es la misma para todos los afectados y el polvo se consume cuando la magia tiene efecto. Inmediatamente después de que una criatura afectada lleve a cabo una tirada de ataque, inflija daño o lance un conjuro, el estado de invisible terminará para ella.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 268
+    "sourcePage": 268,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "polvo-de-estornudar-y-atragantarse",
@@ -2842,7 +3502,10 @@
     "description": "Objeto maravilloso, infrecuente\nEste polvo, que se encuentra en un pequeño recipiente, parece ser polvo de desaparición, y un conjuro identificar lo reconocerá como tal. Hay suficiente para un solo uso.\nComo acción de utilizar, podés esparcir el polvo en el aire y obligar a todas las criaturas en una emanación de 30 pies originada en vos (la cual te incluye a vos) a hacer una tirada de salvación de Constitución con CD 15. Los autómatas, cienos, elementales, muertos vivientes y plantas superarán la tirada de salvación automáticamente.\nSi la falla, una criatura empezará a estornudar de forma incontrolada: tendrá el estado de incapacitada y sufrirá asfixia. La criatura repetirá la tirada de salvación al final de cada uno de sus turnos y, si tiene éxito, se librará del efecto. El conjuro restablecimiento menor también puede poner fin a este efecto sobre una criatura.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 268
+    "sourcePage": 268,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "polvo-de-sequedad",
@@ -2854,7 +3517,10 @@
     "description": "Objeto maravilloso, infrecuente\nEste pequeño paquete contiene 1d6 + 4 pizcas de polvo. Como acción de utilizar, podés echar una pizca sobre agua. El polvo convertirá un cubo de agua de 15 pies de lado en una bolita del tamaño de una canica, que quedará flotando o en reposo cerca de donde se esparció el polvo. El peso de la bolita es insignificante. Una criatura puede emplear una acción de utilizar para golpear la bolita contra una superficie dura, lo que hará añicos la bolita y liberará el agua que absorbió el polvo. Hacer esto acaba con la magia de la bolita.\nComo acción de utilizar, podés echar una pizca de polvo sobre un elemental compuesto principalmente de agua (como un elemental de agua) que esté a 5 pies o menos de vos. Esa criatura deberá realizar una tirada de salvación de Constitución con CD 13; sufrirá 10d6 de daño necrótico si la falla o la mitad del daño si la supera.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 268
+    "sourcePage": 268,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "portal-cubico",
@@ -2868,7 +3534,10 @@
     "requiresAttunement": false,
     "sourcePage": 268,
     "maxCharges": 3,
-    "rechargeAmount": "1d3"
+    "rechargeAmount": "1d3",
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "pozo-de-los-muchos-mundos",
@@ -2880,7 +3549,10 @@
     "description": "Objeto maravilloso, legendario\nEsta delicada tela negra, suave como la seda, está doblada para tener las dimensiones de un pañuelo.\nAl desdoblarla, se convierte en una sábana circular de 6 pies de diámetro.\nPodés emplear una acción de magia para extender el pozo de los muchos mundos y colocarlo sobre una superficie sólida, donde creará un portal de 6 pies de diámetro hacia otro plano de existencia que funciona en ambos sentidos. Cada vez que el objeto abra un portal, tu GM decidirá adónde conduce. El portal permanece abierto hasta que una criatura a 5 pies o menos de él use una acción de magia para cerrarlo agarrando los bordes de la tela y plegándola.\nEn cuanto el pozo de los muchos mundos haya abierto un portal, no podrá volver a hacerlo durante 1d8 horas.",
     "rarity": "legendary",
     "requiresAttunement": false,
-    "sourcePage": 269
+    "sourcePage": 269,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "sombrero-de-disfraz",
@@ -2892,7 +3564,10 @@
     "description": "Objeto maravilloso, infrecuente (requiere sintonización)\nMientras lleves este sombrero, podés lanzar el conjuro disfrazarse. El conjuro termina si te quitás el sombrero.",
     "rarity": "uncommon",
     "requiresAttunement": true,
-    "sourcePage": 269
+    "sourcePage": 269,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "sombrero-de-multiples-conjuros",
@@ -2904,7 +3579,10 @@
     "description": "Objeto maravilloso, muy raro (requiere sintonización por parte de un mago)\nEste sombrero puntiagudo tiene las siguientes propiedades.\nCanalizador mágico. Mientras sujetás el sombrero, podés usarlo como canalizador mágico para tus conjuros de mago. Cualquier conjuro que lances mediante el sombrero tendrá un componente somático especial: debés meter la mano en el sombrero y “sacar” el conjuro de él.\nConjuro desconocido. Mientras sujetás el sombrero, podés intentar lanzar un conjuro de nivel 1 o superior que no conocés. El conjuro debe estar en la lista de conjuros de mago, debe ser de un nivel que puedas lanzar y no puede tener componentes materiales que cuesten más de 1000 po. Cuando hayas decidido el conjuro, deberás gastar un espacio de conjuro del nivel correspondiente. A continuación, para determinar si lo lanzás, hacé una prueba de Inteligencia (Conocimiento arcano) (CD 10 más el nivel del conjuro). Si la superás, lanzarás el conjuro con su tiempo de lanzamiento normal y no podrás volver a utilizar esta propiedad hasta que finalices un descanso corto o largo. Si la fallás, el conjuro no se lanzará y en su lugar se producirá un efecto aleatorio. Tirá en la tabla a continuación para determinarlo.\nLos conjuros que lances desde el sombrero emplean tu CD de salvación de conjuros y tu bonificador de ataque de conjuros.\n1d100 Efecto\n01–50 Lanzás un conjuro aleatorio que determinás tirando 1d10: si el resultado es 1, agrandar/reducir (efecto de agrandar); si es 2, agrandar/reducir (efecto de reducir); si es 3, bola de fuego; si es 4, fuego feérico; si es 5, fuerza fantasmal; si es 6, invisibilidad (sobre vos); si es 7, nube apestosa; si es 8, polimorfar; si es 9, ráfaga de viento; si es 10, relámpago.\n51–55 Creerás que ha sucedido algo asombroso y tendrás el estado de aturdido hasta el final de tu siguiente turno.\n56–60 Un enjambre inofensivo de mariposas llena un cubo de 10 pies de lado a 30 pies o menos de vos.\nEl enjambre se dispersa pasado 1 minuto.\n61–65 Sacás un objeto no mágico del sombrero. Tirá 1d4 para determinar el objeto: si el resultado es 1, un vial de ácido; si es 2, una antorcha encendida; si es 3, un frasco de fuego de alquimista; si es 4, una palanqueta.\n66–70 Sufrís unas “náuseas mágicas” y tenés el estado de envenenado durante 1 hora.\n71–75 Tenés el estado de petrificado hasta el final de tu siguiente turno.\n76–80 Sacás un objeto no mágico del sombrero. Tirá 1d4 para determinar el objeto: si el resultado es 1, una bolsa de abrojos; si es 2, una cuerda con un garfio de escalada atado en un extremo; si es 3, una daga; si es 4, una gema valorada en 50 po.\n81–85 Una criatura aparece en un espacio sin ocupar lo más cerca posible de vos. El animal no se encuentra bajo tu control, actúa con normalidad y desaparece tras 1 hora o cuando sus puntos de golpe se reduzcan a 0. Tirá 1d4 para determinar la criatura: si el resultado es 1, un camello; si es 2, un elefante; si es 3, una mula; si es 4, una serpiente constrictora.\n1d100 Efecto\n86–90 Un enjambre de murciélagos hostil surge del sombrero, ocupa tu espacio y te ataca.\n91–95 Un portal bidireccional y vertical de 10 pies de diámetro que conduce a otro plano de existencia se abre en un espacio sin ocupar a 30 pies o menos de vos y permanece abierto hasta el final de tu siguiente turno. Tu GM establece adónde lleva.\n96–00 Sacás un objeto mágico del sombrero. Tirá 1d6 para determinar la rareza del objeto: si el resultado es 1–3, común; si es 4–5, infrecuente; si es 6, raro. Tu GM elige el objeto, que desaparecerá tras 1 hora si no se consume o destruye antes.",
     "rarity": "very-rare",
     "requiresAttunement": true,
-    "sourcePage": 269
+    "sourcePage": 269,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "talisman-de-cerrar-heridas",
@@ -2916,7 +3594,10 @@
     "description": "Objeto maravilloso, infrecuente (requiere sintonización)\nMientras lleves puesto este colgante, obtenés los siguientes beneficios:\nCuración natural mejorada. Cuando tires un dado de puntos de golpe para recuperar puntos de golpe, se duplicará la cantidad de puntos de golpe que recuperás.\nPreservar la vida. Cuando hagas una tirada de salvación contra muerte, podés cambiar un resultado fallido de 9 o menos por 10, lo que te permite superar la tirada.",
     "rarity": "uncommon",
     "requiresAttunement": true,
-    "sourcePage": 270
+    "sourcePage": 270,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "talisman-de-la-esfera",
@@ -2928,7 +3609,10 @@
     "description": "Objeto maravilloso, legendario (requiere sintonización)\nMientras sostengas o lleves puesto este talismán, tendrás ventaja en cualquier prueba de Inteligencia (Conocimiento arcano) para controlar una esfera de aniquilación. Además, siempre que comiences tu turno controlando una esfera de aniquilación, podés emplear una acción de magia para moverla 10 pies más una cantidad de metros adicionales igual a 3 × tu modificador por Inteligencia. Este movimiento no tiene por qué ser en línea recta.",
     "rarity": "legendary",
     "requiresAttunement": true,
-    "sourcePage": 270
+    "sourcePage": 270,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "talisman-de-salud",
@@ -2940,7 +3624,10 @@
     "description": "Objeto maravilloso, infrecuente (requiere sintonización)\nMientras lleves este colgante, podés emplear una acción de magia para recuperar 2d4 + 2 puntos de golpe. Una vez utilizada, esta propiedad no puede volver a usarse hasta el siguiente amanecer.\nAdemás, tenés ventaja en las tiradas de salvación para evitar o poner fin al estado de envenenado mientras lleves puesto el colgante.",
     "rarity": "uncommon",
     "requiresAttunement": true,
-    "sourcePage": 270
+    "sourcePage": 270,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "talisman-del-bien-puro",
@@ -2953,7 +3640,10 @@
     "rarity": "legendary",
     "requiresAttunement": true,
     "sourcePage": 270,
-    "maxCharges": 7
+    "maxCharges": 7,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "talisman-del-mal-definitivo",
@@ -2966,7 +3656,10 @@
     "rarity": "legendary",
     "requiresAttunement": true,
     "sourcePage": 270,
-    "maxCharges": 6
+    "maxCharges": 6,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "tomo-de-entendimiento",
@@ -2978,7 +3671,10 @@
     "description": "Objeto maravilloso, muy raro\nEste libro contiene ejercicios de intuición y perspicacia, y sus palabras están impregnadas de magia.\nSi dedicás 48 horas durante un periodo de 6 días, como mucho, a estudiar el contenido del libro y poner en práctica sus indicaciones, tu Sabiduría aumentará en 2, hasta un máximo de 30. Después, el manual perderá su magia, pero la recuperará cuando pase un siglo.",
     "rarity": "very-rare",
     "requiresAttunement": false,
-    "sourcePage": 271
+    "sourcePage": 271,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "tomo-de-liderazgo-e-influencia",
@@ -2990,7 +3686,10 @@
     "description": "Objeto maravilloso, muy raro\nEste libro contiene indicaciones para influir y embelesar a los demás, y sus palabras están impregnadas de magia. Si dedicás 48 horas durante un periodo de 6 días, como mucho, a estudiar el contenido del libro y poner en práctica sus indicaciones, tu Carisma aumentará en 2, hasta un máximo de 30. Después, el manual perderá su magia, pero la recuperará cuando pase un siglo.",
     "rarity": "very-rare",
     "requiresAttunement": false,
-    "sourcePage": 271
+    "sourcePage": 271,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "tomo-de-pensamiento-claro",
@@ -3002,7 +3701,10 @@
     "description": "Objeto maravilloso, muy raro\nEste libro contiene ejercicios de lógica y memoria, y sus palabras están impregnadas de magia. Si dedicás 48 horas durante un periodo de 6 días, como mucho, a estudiar el contenido del libro y poner en práctica sus indicaciones, tu Inteligencia aumentará en 2, hasta un máximo de 30. Después, el manual perderá su magia, pero la recuperará cuando pase un siglo.",
     "rarity": "very-rare",
     "requiresAttunement": false,
-    "sourcePage": 271
+    "sourcePage": 271,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "tridente-de-comandar-peces",
@@ -3017,7 +3719,10 @@
     "baseItemKind": "weapon",
     "sourcePage": 271,
     "maxCharges": 3,
-    "rechargeAmount": "1d3"
+    "rechargeAmount": "1d3",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "tunica-de-colores-hipnoticos",
@@ -3031,7 +3736,10 @@
     "requiresAttunement": true,
     "sourcePage": 271,
     "maxCharges": 3,
-    "rechargeAmount": "1d3"
+    "rechargeAmount": "1d3",
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "tunica-del-archimago",
@@ -3043,7 +3751,10 @@
     "description": "Objeto maravilloso, legendario (requiere sintonización por parte de un brujo, hechicero o mago)\nEsta elegante prenda está hecha de una tela exquisita y adornada con runas.\nMientras lleves puesta la túnica, obtendrás los siguientes beneficios.\nArmadura. Si no llevás armadura, tu clase de armadura base será de 15 más tu modificador por Destreza.\nMagia de guerra. Tu CD de salvación de conjuros y tu bonificador de ataque de conjuros aumentan en 2.\nResistencia mágica. Tenés ventaja en las tiradas de salvación contra conjuros y otros efectos mágicos.",
     "rarity": "legendary",
     "requiresAttunement": true,
-    "sourcePage": 271
+    "sourcePage": 271,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "tunica-de-las-estrellas",
@@ -3055,7 +3766,10 @@
     "description": "Objeto maravilloso, muy raro (requiere sintonización)\nEsta túnica negra o azul oscura lleva bordadas pequeñas estrellas blancas o plateadas. Mientras la lleves puesta, recibirás un bonificador de +1 a las tiradas de salvación.\nSeis de las estrellas, situadas en la parte superior delantera de la túnica, son especialmente grandes.\nMientras lleves puesta la túnica, podés emplear una acción de magia para arrancar una de las estrellas y gastarla para lanzar la versión de nivel 5 de proyectil mágico. Cada día al amanecer, 1d6 estrellas arrancadas reaparecerán en la túnica.\nMientras lleves puesta la túnica, podrás utilizar una acción de magia para entrar en el Plano Astral junto con todo lo que vistas o lleves. Permanecerás allí hasta que utilices una acción de magia para volver al plano en el que estabas. Reaparecerás en el último espacio que ocupabas o, si el espacio ya está ocupado, en el espacio sin ocupar más cercano.",
     "rarity": "very-rare",
     "requiresAttunement": true,
-    "sourcePage": 271
+    "sourcePage": 271,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "tunica-de-los-ojos",
@@ -3067,7 +3781,10 @@
     "description": "Objeto maravilloso, raro (requiere sintonización)\nEsta túnica está decorada con un estampado de ojos. Mientras la lleves puesta, obtendrás los siguientes beneficios:\nSentidos especiales. Tenés visión en la oscuridad y visión verdadera hasta 120 pies.\nVisión total. La túnica te otorga ventaja en las pruebas de Sabiduría (Percepción) que dependan de la vista.\nInconvenientes. Si se lanza un conjuro luz sobre la túnica o un conjuro luz del día a 5 pies o menos de ella, tendrás el estado de cegado durante 1 minuto.\nAl final de cada uno de tus turnos, harás una tirada de salvación de Constitución (con CD 11 para luz o CD 15 para luz del día) y, si la superás, pondrás fin al estado.",
     "rarity": "rare",
     "requiresAttunement": true,
-    "sourcePage": 271
+    "sourcePage": 271,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "tunica-de-objetos-utiles",
@@ -3079,7 +3796,10 @@
     "description": "Objeto maravilloso, infrecuente\nEsta túnica está cubierta de parches de tela de diversas formas y colores. Mientras la lleves puesta, podrás utilizar una acción de magia para quitar uno de los parches y hacer que se convierta en el objeto o criatura que representa. En cuanto hayas quitado el último parche, la túnica se volverá una prenda normal y corriente.\nLa túnica tiene dos de cada uno de los siguientes parches:\n• Cuerda (enrollada)\n• Daga\n• Espejo\n• Linterna de ojo de buey (llena y encendida)\n• Saco\n• Vara Además, la túnica tiene otros 4d4 parches. Tu GM los elige o los determina al azar tirando en la tabla a continuación.\n1d100 Parche\n01–08 Bolsa con 100 po\n09–15 Cofre de plata (1 pie de largo, 6 pulgadas de ancho y de alto) con un valor de 500 po\n16–22 Puerta de hierro (hasta 10 pies de ancho y 3 de alto, atrancada por el lado que elijas), que podés colocar en una abertura que esté a tu alcance; se adecuará al tamaño de la abertura y se instalará y afianzará ella sola\n23–30 10 gemas con un valor de 100 po cada una\n31–44 Escalera de madera (24 pies de largo)\n45–51 Caballo de monta ensillado\n52–59 Pozo abierto (cubo de 10 pies de lado), que podés colocar en el suelo a 10 pies o menos de vos\n60–68 4 pociones de curación\n69–75 Bote de remos (12 pies de largo)\n76–83 Pergamino de conjuro que contiene un conjuro de nivel 1, 2 o 3 (a tu elección)\n84–90 2 mastines\n91–96 Ventana (2 pies por 4 pies, con una profundidad de hasta 2 pies), que podés colocar en una superficie vertical que esté a tu alcance\n97–00 Ariete portátil",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 272
+    "sourcePage": 272,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "varita-de-atadura",
@@ -3093,7 +3813,10 @@
     "requiresAttunement": true,
     "sourcePage": 273,
     "maxCharges": 7,
-    "rechargeAmount": "1d6 + 1"
+    "rechargeAmount": "1d6 + 1",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "varita-de-bolas-de-fuego",
@@ -3107,7 +3830,10 @@
     "requiresAttunement": true,
     "sourcePage": 273,
     "maxCharges": 7,
-    "rechargeAmount": "1d6 + 1"
+    "rechargeAmount": "1d6 + 1",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "varita-de-deteccion-magica",
@@ -3121,7 +3847,10 @@
     "requiresAttunement": false,
     "sourcePage": 273,
     "maxCharges": 3,
-    "rechargeAmount": "1d3"
+    "rechargeAmount": "1d3",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "varita-de-detectar-enemigos",
@@ -3135,7 +3864,10 @@
     "requiresAttunement": true,
     "sourcePage": 273,
     "maxCharges": 7,
-    "rechargeAmount": "1d6 + 1"
+    "rechargeAmount": "1d6 + 1",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "varita-de-las-maravillas",
@@ -3149,7 +3881,10 @@
     "requiresAttunement": true,
     "sourcePage": 274,
     "maxCharges": 7,
-    "rechargeAmount": "1d6 + 1"
+    "rechargeAmount": "1d6 + 1",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "varita-de-paralisis",
@@ -3163,7 +3898,10 @@
     "requiresAttunement": true,
     "sourcePage": 275,
     "maxCharges": 7,
-    "rechargeAmount": "1d6 + 1"
+    "rechargeAmount": "1d6 + 1",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "varita-de-polimorfar",
@@ -3177,7 +3915,10 @@
     "requiresAttunement": true,
     "sourcePage": 275,
     "maxCharges": 7,
-    "rechargeAmount": "1d6 + 1"
+    "rechargeAmount": "1d6 + 1",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "varita-de-proyectiles-magicos",
@@ -3191,7 +3932,10 @@
     "requiresAttunement": false,
     "sourcePage": 275,
     "maxCharges": 7,
-    "rechargeAmount": "1d6 + 1"
+    "rechargeAmount": "1d6 + 1",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "varita-de-relampagos",
@@ -3205,7 +3949,10 @@
     "requiresAttunement": true,
     "sourcePage": 275,
     "maxCharges": 7,
-    "rechargeAmount": "1d6 + 1"
+    "rechargeAmount": "1d6 + 1",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "varita-de-secretos",
@@ -3219,7 +3966,10 @@
     "requiresAttunement": false,
     "sourcePage": 275,
     "maxCharges": 3,
-    "rechargeAmount": "1d3"
+    "rechargeAmount": "1d3",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "varita-de-telarana",
@@ -3233,7 +3983,10 @@
     "requiresAttunement": true,
     "sourcePage": 275,
     "maxCharges": 7,
-    "rechargeAmount": "1d6 + 1"
+    "rechargeAmount": "1d6 + 1",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "varita-del-mago-de-guerra-1",
@@ -3246,7 +3999,10 @@
     "rarity": "very-rare",
     "requiresAttunement": true,
     "magicBonus": 1,
-    "sourcePage": 275
+    "sourcePage": 275,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "varita-del-mago-de-guerra-2",
@@ -3259,7 +4015,10 @@
     "rarity": "very-rare",
     "requiresAttunement": true,
     "magicBonus": 2,
-    "sourcePage": 275
+    "sourcePage": 275,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "varita-del-mago-de-guerra-3",
@@ -3272,7 +4031,10 @@
     "rarity": "very-rare",
     "requiresAttunement": true,
     "magicBonus": 3,
-    "sourcePage": 275
+    "sourcePage": 275,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "varita-del-terror",
@@ -3286,7 +4048,10 @@
     "requiresAttunement": true,
     "sourcePage": 276,
     "maxCharges": 7,
-    "rechargeAmount": "1d6 + 1"
+    "rechargeAmount": "1d6 + 1",
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "vela-de-invocacion",
@@ -3298,7 +4063,10 @@
     "description": "Objeto maravilloso, muy raro (requiere sintonización)\nLa magia de esta vela se activa al encenderla, lo que requiere una acción de magia. Después de arder durante 4 horas, la vela se destruye. Podés apagarla antes de que pase ese tiempo para seguir usándola después. Resta el tiempo que ha ardido del total, en intervalos de 1 minuto.\nMientras permanezca encendida, la vela emitirá luz tenue en un radio de 30 pies. Mientras estés dentro de esa luz, tenés ventaja en las pruebas con d20.\nAdemás, un clérigo o druida dentro de la luz puede lanzar conjuros de nivel 1 que tenga preparados sin gastar espacios de conjuro.\nComo alternativa, la primera vez que enciendas la vela, podrás utilizarla para lanzar el conjuro portal. Hacer esto destruirá la vela. El portal que crea el conjuro estará unido a un Plano Exterior en concreto a elección de tu GM o determinado por una tirada en la siguiente tabla.\n1d100 Plano Exterior 1d100 Plano Exterior\n01–05 Abismo 52–56 Hades\n06–10 Aqueronte 57–61 Limbo\n11–17 Arbórea 62–69 Mechanus\n18–25 Arcadia 70–77 Monte Celestia\n26–33 Bitopía 78–82 Nueve Infiernos\n34–38 Carceri 83–87 Pandemónium\n39–46 Elíseo 88–95 Tierras de las Bestias\n47–51 Gehenna 96–00 Ysgard",
     "rarity": "very-rare",
     "requiresAttunement": true,
-    "sourcePage": 276
+    "sourcePage": 276,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "vengadora-sagrada",
@@ -3311,7 +4079,10 @@
     "rarity": "legendary",
     "requiresAttunement": true,
     "baseItemKind": "weapon",
-    "sourcePage": 276
+    "sourcePage": 276,
+    "magicItemType": null,
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "yelmo-de-entender-idiomas",
@@ -3323,7 +4094,10 @@
     "description": "Objeto maravilloso, infrecuente\nMientras lleves este yelmo, podés lanzar entender idiomas desde él.",
     "rarity": "uncommon",
     "requiresAttunement": false,
-    "sourcePage": 276
+    "sourcePage": 276,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "yelmo-de-fulgor",
@@ -3335,7 +4109,10 @@
     "description": "Objeto maravilloso, muy raro (requiere sintonización)\nEste yelmo tiene incrustados 1d10 diamantes, 2d10 rubíes, 3d10 ópalos de fuego y 4d10 ópalos.\nCualquier gema que se retire del yelmo se convierte en polvo. Si se retiran o se destruyen todas las gemas, el yelmo pierde su magia.\nMientras lo lleves puesto, obtenés los siguientes beneficios:\nConjuros. Podés lanzar uno de los siguientes conjuros (CD de salvación 18) utilizando una de las gemas del tipo especificado como componente: bola de fuego (ópalo de fuego), luz del día (ópalo), muro de fuego (rubí) o rociada prismática (diamante).\nLa gema se destruye cuando el conjuro se lanza, por lo que desaparecerá del yelmo.\nLlamas de ópalo de fuego. Mientras quede al menos un ópalo de fuego en el yelmo, podrás emplear una acción de magia para hacer que un arma que estés empuñando se envuelva en llamas. Las llamas emitirán luz brillante en un radio de 10 pies y luz tenue 10 pies más allá. Las llamas son inofensivas para vos y el arma. Cuando aciertes un ataque usando el arma llameante, el objetivo recibirá 1d6 de daño de fuego adicional. Las llamas permanecen hasta que emplees una acción adicional para extinguirlas o hasta que sueltes o guardes el arma.\nLuz de diamante. Mientras quede al menos un diamante, el yelmo emitirá una emanación de 30 pies.\nSi hay algún muerto viviente en esa zona, la emanación se llena de luz tenue. Cualquier muerto viviente que comience su turno en la zona sufrirá 1d6 de daño radiante.\nRecibir daño de fuego. Tirá 1d20 si llevás el yelmo puesto y sufrís daño de fuego por haber fallado una tirada de salvación contra un conjuro.\nSi sacás un 1, las gemas restantes emitirán rayos de luz y el yelmo se destruirá. Todas las criaturas dentro de una emanación de 60 pies que se origina en el yelmo deberán superar una tirada de salvación de Destreza con CD 17 o un rayo las alcanzará y sufrirán una cantidad de daño radiante igual al número de gemas del yelmo.\nResistencia de rubí. Mientras quede al menos un rubí en el yelmo, tendrás resistencia al daño de fuego.",
     "rarity": "very-rare",
     "requiresAttunement": true,
-    "sourcePage": 276
+    "sourcePage": 276,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "yelmo-de-telepatia",
@@ -3347,7 +4124,10 @@
     "description": "Objeto maravilloso, infrecuente (requiere sintonización)\nMientras lleves este yelmo, tenés telepatía hasta 30 pies y podés lanzar detectar pensamientos o sugestión (CD de salvación 13) desde él. Cuando lances cualquiera de estos conjuros desde el yelmo, no podrás volver a lanzar ese conjuro desde él hasta el siguiente amanecer.",
     "rarity": "uncommon",
     "requiresAttunement": true,
-    "sourcePage": 277
+    "sourcePage": 277,
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   },
   {
     "id": "yelmo-de-teletransporte",
@@ -3361,6 +4141,9 @@
     "requiresAttunement": true,
     "sourcePage": 277,
     "maxCharges": 3,
-    "rechargeAmount": "1d3"
+    "rechargeAmount": "1d3",
+    "magicItemType": "wondrous",
+    "cursed": false,
+    "variableRarity": false
   }
 ]

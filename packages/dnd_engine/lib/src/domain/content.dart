@@ -1138,6 +1138,17 @@ class Item {
   /// todo el catálogo mundano.
   final List<Effect> effects;
 
+  /// Qué clase de objeto mágico es, para los planos del Artífice:
+  /// `wondrous`, `potion`, `scroll` o null (arma, armadura, anillo…).
+  final String? magicItemType;
+
+  /// Maldito: el Artífice no lo replica.
+  final bool cursed;
+
+  /// El manual le da varias rarezas según la variante; [rarity] es solo la de
+  /// presentación, así que no cuenta como una rareza concreta.
+  final bool variableRarity;
+
   const Item({
     required this.id,
     required this.name,
@@ -1155,9 +1166,38 @@ class Item {
     this.baseItemKind,
     this.eligibleBaseItemIds = const [],
     this.effects = const [],
+    this.magicItemType,
+    this.cursed = false,
+    this.variableRarity = false,
   });
 
   bool get isMagic => rarity != null;
+
+  /// Lo que [magicItemType], [cursed] y [variableRarity] dicen, leído de una
+  /// descripción **en castellano** del manual («Objeto maravilloso, común»,
+  /// «… rareza variable», «maldición»).
+  ///
+  /// El catálogo oficial guarda los tres datos (los escribe
+  /// `tool/apply_magic_item_kinds.dart`) porque su descripción se traduce por
+  /// superposición y deducirlos del inglés cambiaría qué puede replicar el
+  /// Artífice. Esto queda para un objeto que no los trae —el homebrew—, que
+  /// se lee como siempre.
+  static ({String? type, bool cursed, bool variableRarity}) magicTraitsFrom(
+    String description,
+  ) {
+    final d = description.trimLeft().toLowerCase();
+    return (
+      type: d.startsWith('objeto maravilloso')
+          ? 'wondrous'
+          : d.startsWith('poción')
+              ? 'potion'
+              : d.startsWith('pergamino')
+                  ? 'scroll'
+                  : null,
+      cursed: d.contains('maldici') || d.contains('maldito'),
+      variableRarity: d.contains('rareza variable'),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -1178,28 +1218,44 @@ class Item {
           'eligibleBaseItemIds': eligibleBaseItemIds,
         if (effects.isNotEmpty)
           'effects': [for (final e in effects) e.toJson()],
+        if (magicItemType != null) 'magicItemType': magicItemType,
+        if (cursed) 'cursed': true,
+        if (variableRarity) 'variableRarity': true,
       };
 
-  factory Item.fromJson(Map<String, dynamic> j) => Item(
-        id: j['id'] as String,
-        name: j['name'] as String,
-        source: ContentSource.fromJson(j['source'] as String?),
-        category: j['category'] as String,
-        weight: (j['weight'] as num? ?? 0).toDouble(),
-        costCp: j['costCp'] as int? ?? 0,
-        bundleSize: (j['bundleSize'] as int? ?? 1).clamp(1, 1 << 30),
-        description: j['description'] as String? ?? '',
-        rarity: j['rarity'] as String?,
-        maxCharges: j['maxCharges'] as int?,
-        rechargeAmount: j['rechargeAmount'] as String?,
-        requiresAttunement: j['requiresAttunement'] as bool? ?? false,
-        magicBonus: j['magicBonus'] as int? ?? 0,
-        baseItemKind: j['baseItemKind'] as String?,
-        eligibleBaseItemIds: (j['eligibleBaseItemIds'] as List? ?? const [])
-            .whereType<String>()
-            .toList(),
-        effects: Effect.listFromJson(j['effects']),
-      );
+  factory Item.fromJson(Map<String, dynamic> j) {
+    final description = j['description'] as String? ?? '';
+    // Un objeto que no declara ninguno de los tres datos los toma de su
+    // descripción; uno que declara alguno, los declara todos.
+    final declared = j.containsKey('magicItemType') ||
+        j.containsKey('cursed') ||
+        j.containsKey('variableRarity');
+    final derived = declared ? null : magicTraitsFrom(description);
+    return Item(
+      id: j['id'] as String,
+      name: j['name'] as String,
+      source: ContentSource.fromJson(j['source'] as String?),
+      category: j['category'] as String,
+      weight: (j['weight'] as num? ?? 0).toDouble(),
+      costCp: j['costCp'] as int? ?? 0,
+      bundleSize: (j['bundleSize'] as int? ?? 1).clamp(1, 1 << 30),
+      description: description,
+      rarity: j['rarity'] as String?,
+      maxCharges: j['maxCharges'] as int?,
+      rechargeAmount: j['rechargeAmount'] as String?,
+      requiresAttunement: j['requiresAttunement'] as bool? ?? false,
+      magicBonus: j['magicBonus'] as int? ?? 0,
+      baseItemKind: j['baseItemKind'] as String?,
+      eligibleBaseItemIds: (j['eligibleBaseItemIds'] as List? ?? const [])
+          .whereType<String>()
+          .toList(),
+      effects: Effect.listFromJson(j['effects']),
+      magicItemType: derived?.type ?? j['magicItemType'] as String?,
+      cursed: derived?.cursed ?? j['cursed'] as bool? ?? false,
+      variableRarity:
+          derived?.variableRarity ?? j['variableRarity'] as bool? ?? false,
+    );
+  }
 }
 
 /// Denominaciones de moneda, de menor a mayor. Las claves son las que viajan

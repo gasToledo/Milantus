@@ -27,6 +27,14 @@ Set<String> _requiredFeatureHolders(ContentRepository repo, Feat f) {
 /// español [es] y el traducido [en], una por renglón con los dos valores.
 List<String> mechanicalDifferences(ContentRepository es, ContentRepository en) {
   final diferencias = <String>[];
+  // Lo que decide qué puede replicar el Artífice (ver `Item.magicTraitsFrom`).
+  for (final i in es.items.values) {
+    final otra = en.item(i.id);
+    if (otra == null) continue;
+    final a = '${i.magicItemType}/${i.cursed}/${i.variableRarity}';
+    final b = '${otra.magicItemType}/${otra.cursed}/${otra.variableRarity}';
+    if (a != b) diferencias.add('${i.id}: $a ≠ $b');
+  }
   for (final f in es.feats.values) {
     final otra = en.feat(f.id);
     if (otra == null) continue;
