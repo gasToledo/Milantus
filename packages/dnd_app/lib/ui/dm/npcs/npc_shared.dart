@@ -15,12 +15,17 @@ import '../../../l10n/l10n_context.dart';
 
 /// La línea que dice qué es un PNJ, bajo su nombre: «Sin estadísticas»,
 /// «Caballero · CA 18 · PG 52» o «Ficha de personaje · Mago 7».
+///
+/// Con [hurt] —los PG guardados de un herido, ver [npcStoredHp]— un bloque
+/// muestra «PG 51/81» en lugar del máximo y una ficha los suma al final:
+/// «PG 81 · PG 51/81» decía dos veces lo mismo.
 String npcTypeLine(
   Npc npc,
   Character? sheet,
   ContentRepository repo,
-  AppLocalizations l10n,
-) {
+  AppLocalizations l10n, {
+  ({int current, int max})? hurt,
+}) {
   switch (npc.sheetKind) {
     case NpcSheetKind.none:
       return NpcSheetKind.none.text(l10n);
@@ -28,7 +33,8 @@ String npcTypeLine(
       final block = npc.block;
       if (block == null) return NpcSheetKind.block.text(l10n);
       final base = npc.baseCreatureName ?? block.name;
-      return l10n.npcBlockLine(base, block.ac, block.hp);
+      final hp = hurt == null ? block.hp : '${hurt.current}/${hurt.max}';
+      return l10n.npcBlockLine(base, block.ac, hp);
     case NpcSheetKind.character:
       if (sheet == null) return NpcSheetKind.character.text(l10n);
       final classes = sheet.classHistory
@@ -38,7 +44,10 @@ String npcTypeLine(
                 '${repo.characterClass(id)?.name ?? id} ${sheet.classLevel(id)}',
           )
           .join(' · ');
-      return l10n.npcCharacterLine(classes);
+      final line = l10n.npcCharacterLine(classes);
+      return hurt == null
+          ? line
+          : '$line · ${l10n.dmHpShort(hurt.current, hurt.max)}';
   }
 }
 

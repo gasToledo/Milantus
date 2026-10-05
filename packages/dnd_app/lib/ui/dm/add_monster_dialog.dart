@@ -283,9 +283,13 @@ class _AddCombatantDialogState extends State<_AddCombatantDialog> {
       final dead = option.status == NpcStatus.dead;
       final subtitle = [
         if (dead) context.l10n.dmDeadHere,
-        npcTypeLine(option.npc, option.sheet, widget.repo, context.l10n),
-        if (option.hurt case (:final current, :final max))
-          context.l10n.dmHpShort(current, max),
+        npcTypeLine(
+          option.npc,
+          option.sheet,
+          widget.repo,
+          context.l10n,
+          hurt: option.hurt,
+        ),
         if (option.fromLibrary) context.l10n.dmAlsoJoinsCampaign,
       ].join(' · ');
       return ListTile(
@@ -396,20 +400,17 @@ class _AddCombatantDialogState extends State<_AddCombatantDialog> {
           ],
         ),
         Text(
-          npcTypeLine(option.npc, option.sheet, widget.repo, context.l10n),
+          // Con lo que va a entrar: el herido de un combate anterior no llega
+          // entero, y a 0 entra caído.
+          npcTypeLine(
+            option.npc,
+            option.sheet,
+            widget.repo,
+            context.l10n,
+            hurt: option.hurt,
+          ),
           style: TextStyle(color: pal.textMuted),
         ),
-        // Con lo que va a entrar: el herido de un combate anterior no llega
-        // entero, y a 0 entra caído.
-        if (option.hurt case (:final current, :final max))
-          Text(
-            context.l10n.dmHpShort(current, max),
-            style: TextStyle(
-              color: pal.crimson,
-              fontWeight: FontWeight.w700,
-              fontFeatures: const [FontFeature.tabularFigures()],
-            ),
-          ),
         if (option.status == NpcStatus.dead) ...[
           const SizedBox(height: 12),
           Container(

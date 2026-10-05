@@ -194,26 +194,19 @@ class _CampaignNpcsViewState extends State<CampaignNpcsView> {
                   ),
                 ),
                 Text(
-                  npcTypeLine(npc, entry.sheet, widget.repo, context.l10n),
+                  // Herido de un combate anterior: con esto el DM sabe con qué
+                  // va a entrar al próximo sin abrirlo.
+                  npcTypeLine(
+                    npc,
+                    entry.sheet,
+                    widget.repo,
+                    context.l10n,
+                    hurt: npcStoredHp(entry, widget.repo),
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontSize: 12, color: pal.textMuted),
                 ),
-                // Herido de un combate anterior: con esto el DM sabe con qué
-                // va a entrar al próximo sin abrirlo.
-                if (npcStoredHp(entry, widget.repo) case (
-                  :final current,
-                  :final max,
-                ))
-                  Text(
-                    context.l10n.dmHpShort(current, max),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: pal.crimson,
-                      fontWeight: FontWeight.w700,
-                      fontFeatures: const [FontFeature.tabularFigures()],
-                    ),
-                  ),
               ],
             ),
           ),

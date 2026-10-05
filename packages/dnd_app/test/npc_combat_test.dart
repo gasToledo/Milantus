@@ -636,6 +636,8 @@ void main() {
         await openAdd(tester);
         // El DM ve con qué va a entrar antes de elegirlo.
         expect(inDialog(find.textContaining('PG 3/$full')), findsOneWidget);
+        // En lugar del máximo, no al lado: «PG 11 · PG 3/11» lo repetía.
+        expect(inDialog(find.textContaining('PG $full ·')), findsNothing);
         await tester.tap(inDialog(find.widgetWithText(ListTile, 'Mirra')));
         await tester.pumpAndSettle();
         await tester.tap(inDialog(find.text('Aliado')));
