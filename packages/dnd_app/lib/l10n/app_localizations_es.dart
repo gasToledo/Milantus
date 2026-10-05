@@ -6332,7 +6332,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get encCloseExplain =>
-      'Se borra el orden de turnos en los dos casos. Si lo terminás queda un registro liviano de lo que pasó (sin PG ni daños: eso lo lleva cada jugador en su ficha). Si lo descartás no queda nada, como si nunca hubiera empezado.';
+      'Se borra el orden de turnos en los dos casos. Si lo terminás queda un registro liviano de lo que pasó, y los PNJ conservan sus PG para el próximo combate (los jugadores llevan los suyos en su ficha). Si lo descartás no queda nada, como si nunca hubiera empezado.';
 
   @override
   String get encAnyDied => '¿Alguno murió?';

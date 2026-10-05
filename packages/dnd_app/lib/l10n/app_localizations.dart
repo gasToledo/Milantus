@@ -10336,7 +10336,7 @@ abstract class AppLocalizations {
   /// No description provided for @encCloseExplain.
   ///
   /// In es, this message translates to:
-  /// **'Se borra el orden de turnos en los dos casos. Si lo terminás queda un registro liviano de lo que pasó (sin PG ni daños: eso lo lleva cada jugador en su ficha). Si lo descartás no queda nada, como si nunca hubiera empezado.'**
+  /// **'Se borra el orden de turnos en los dos casos. Si lo terminás queda un registro liviano de lo que pasó, y los PNJ conservan sus PG para el próximo combate (los jugadores llevan los suyos en su ficha). Si lo descartás no queda nada, como si nunca hubiera empezado.'**
   String get encCloseExplain;
 
   /// No description provided for @encAnyDied.

@@ -1705,7 +1705,7 @@
   "encAddAll": "Add everyone",
   "encAddToInitiative": "Add to the initiative",
   "encWhatTheyRolled": "What they rolled at the table",
-  "encCloseExplain": "The turn order is deleted in both cases. If you end it, a light record of what happened is kept (no HP or damage: each player tracks that on their own sheet). If you discard it, nothing is kept, as if it had never started.",
+  "encCloseExplain": "The turn order is deleted in both cases. If you end it, a light record of what happened is kept, and NPCs keep their HP for the next combat (players track theirs on their own sheet). If you discard it, nothing is kept, as if it had never started.",
   "encAnyDied": "Did any of them die?",
   "encFellNote": "They were left at 0 HP. Those you mark become dead in this campaign when you end and save.",
   "encDiscardNoSave": "Discard without saving",

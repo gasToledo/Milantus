@@ -6331,7 +6331,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get encCloseExplain =>
-      'The turn order is deleted in both cases. If you end it, a light record of what happened is kept (no HP or damage: each player tracks that on their own sheet). If you discard it, nothing is kept, as if it had never started.';
+      'The turn order is deleted in both cases. If you end it, a light record of what happened is kept, and NPCs keep their HP for the next combat (players track theirs on their own sheet). If you discard it, nothing is kept, as if it had never started.';
 
   @override
   String get encAnyDied => 'Did any of them die?';

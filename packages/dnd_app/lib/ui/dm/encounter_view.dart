@@ -38,6 +38,10 @@ const double _kTagsWidth = 160;
 const double _kActionsWidth = 168;
 const double _kColGap = 12;
 
+/// Lo mínimo que necesitan el nombre y la CA en la fila partida para que los
+/// controles sigan a su derecha. Con menos, los controles bajan de línea.
+const double _kStackedIdentityMinWidth = 140;
+
 /// El combate de una campaña: iniciativa, turnos y los PG de los monstruos.
 ///
 /// Los datos son todos del padre (`_CampaignDetailState`), que ya necesita
@@ -1555,38 +1559,54 @@ class _CombatantRow extends StatelessWidget {
   }
 
   /// Sin ancho para las columnas, la fila se parte: identidad arriba, PG y
-  /// efectos abajo. Los controles se quedan a la derecha, donde estaban.
+  /// efectos abajo. Los controles se quedan a la derecha, donde estaban,
+  /// salvo en un teléfono: ahí sus 168 px fijos le dejaban al nombre y la CA
+  /// 55 px a 375 de ancho y nada a 310, así que bajan a su propia línea.
   Widget _stackedLayout(BuildContext context, (int, int)? hp) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(width: _kIniWidth, child: _initiative(context)),
-        const SizedBox(width: _kColGap),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+    return LayoutBuilder(
+      builder: (context, box) {
+        final actionsBeside =
+            box.maxWidth - _kIniWidth - _kColGap * 2 - _kActionsWidth >=
+            _kStackedIdentityMinWidth;
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(width: _kIniWidth, child: _initiative(context)),
+            const SizedBox(width: _kColGap),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: _identity(context)),
-                  const SizedBox(width: 8),
-                  _acCell(context),
+                  Row(
+                    children: [
+                      Expanded(child: _identity(context)),
+                      const SizedBox(width: 8),
+                      _acCell(context),
+                    ],
+                  ),
+                  if (hp != null) ...[
+                    const SizedBox(height: 6),
+                    _hpCell(context, hp),
+                  ],
+                  if (combatant.tags.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    _tags(context),
+                  ],
+                  if (!actionsBeside)
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: _actions(context),
+                    ),
                 ],
               ),
-              if (hp != null) ...[
-                const SizedBox(height: 6),
-                _hpCell(context, hp),
-              ],
-              if (combatant.tags.isNotEmpty) ...[
-                const SizedBox(height: 6),
-                _tags(context),
-              ],
+            ),
+            if (actionsBeside) ...[
+              const SizedBox(width: _kColGap),
+              _actions(context),
             ],
-          ),
-        ),
-        const SizedBox(width: _kColGap),
-        _actions(context),
-      ],
+          ],
+        );
+      },
     );
   }
 

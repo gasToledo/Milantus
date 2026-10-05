@@ -4,6 +4,7 @@ import 'package:dnd_app/theme/app_widgets.dart';
 import 'package:dnd_app/ui/dm/dm_mode_screen.dart';
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'dialog_finders.dart';
@@ -154,6 +155,33 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(combatant(server, 'Lobo').side, CombatantSide.ally);
+      expect(tester.takeException(), isNull);
+    });
+
+    // A 375 px los cuatro controles fijos le dejaban al nombre 55 px: se
+    // cortaba en «Vess…». En un teléfono bajan de línea.
+    testWidgets('en ancho de teléfono el nombre entra entero', (tester) async {
+      const nombre = 'Mirra la Roja';
+      final vessa = blockNpc('vessa', nombre, 'Bandido');
+      await pumpCombate(tester, seed: (s) => addNpc(s, vessa));
+      await startEmpty(tester);
+      await openAdd(tester);
+      await tester.tap(inDialog(find.widgetWithText(ListTile, nombre)));
+      await tester.pumpAndSettle();
+      await tester.tap(inDialog(find.text('Aliado')));
+      await tester.pumpAndSettle();
+      await tester.tap(dialogAction('Sumar'));
+      await tester.pumpAndSettle();
+
+      tester.view.physicalSize = const Size(420, 900);
+      await tester.pumpAndSettle();
+
+      final name = tester.renderObject<RenderParagraph>(find.text(nombre));
+      expect(name.didExceedMaxLines, isFalse);
+      expect(
+        tester.getTopLeft(find.byTooltip('Dañar')).dy,
+        greaterThan(tester.getBottomLeft(find.text(nombre)).dy),
+      );
       expect(tester.takeException(), isNull);
     });
 
