@@ -6171,7 +6171,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get encEmptyOrder =>
-      'There is nobody in the order yet. Add players or a monster to get started.';
+      'There is nobody in the order yet. Add players, NPCs or monsters to get started.';
 
   @override
   String get encPreparing => 'Setting up the combat';

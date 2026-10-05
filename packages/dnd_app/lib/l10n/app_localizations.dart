@@ -10078,7 +10078,7 @@ abstract class AppLocalizations {
   /// No description provided for @encEmptyOrder.
   ///
   /// In es, this message translates to:
-  /// **'Todavía no hay nadie en el orden. Sumá jugadores o un monstruo para arrancar.'**
+  /// **'Todavía no hay nadie en el orden. Sumá jugadores, PNJ o monstruos para arrancar.'**
   String get encEmptyOrder;
 
   /// No description provided for @encPreparing.

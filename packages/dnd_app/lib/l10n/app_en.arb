@@ -1662,7 +1662,7 @@
   "encReadFail": "The combat could not be read.",
   "encLoading": "Loading the combat…",
   "encNone": "There is no combat in progress.",
-  "encEmptyOrder": "There is nobody in the order yet. Add players or a monster to get started.",
+  "encEmptyOrder": "There is nobody in the order yet. Add players, NPCs or monsters to get started.",
   "encPreparing": "Setting up the combat",
   "encPreparingNote": "Nobody has rolled initiative yet, and nothing shows up on the players’ sheets.",
   "encRound": "Round",

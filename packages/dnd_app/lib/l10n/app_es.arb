@@ -4836,7 +4836,7 @@
   "encReadFail": "No se pudo leer el combate.",
   "encLoading": "Cargando el combate…",
   "encNone": "No hay ningún combate en curso.",
-  "encEmptyOrder": "Todavía no hay nadie en el orden. Sumá jugadores o un monstruo para arrancar.",
+  "encEmptyOrder": "Todavía no hay nadie en el orden. Sumá jugadores, PNJ o monstruos para arrancar.",
   "encPreparing": "Armando el combate",
   "encPreparingNote": "Todavía nadie tiró iniciativa, y a los jugadores no les aparece nada en su ficha.",
   "encRound": "Ronda",

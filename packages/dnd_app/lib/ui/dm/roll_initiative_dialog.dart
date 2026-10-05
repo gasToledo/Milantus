@@ -118,20 +118,26 @@ class _RollInitiativeDialogState extends State<_RollInitiativeDialog> {
               // Los dos bandos lado a lado cuando entran, apilados cuando no.
               // El corte lo decide el ancho real del diálogo, no la ventana.
               final wide = box.maxWidth >= 520;
+              // Un bando vacío solo se muestra si el otro también lo está: en
+              // un combate solo de PNJ, media caja diciendo «Ningún jugador»
+              // ocupa lugar sin decirle nada nuevo al DM.
               final columns = [
-                _side(
-                  context,
-                  context.l10n.dmPlayers,
-                  players,
-                  vacio: context.l10n.dmNoPlayers,
-                ),
-                _side(
-                  context,
-                  context.l10n.dmMonstersAndNpcs,
-                  monsters,
-                  vacio: context.l10n.dmNoMonstersOrNpcs,
-                ),
+                if (players.isNotEmpty || monsters.isEmpty)
+                  _side(
+                    context,
+                    context.l10n.dmPlayers,
+                    players,
+                    vacio: context.l10n.dmNoPlayers,
+                  ),
+                if (monsters.isNotEmpty || players.isEmpty)
+                  _side(
+                    context,
+                    context.l10n.dmMonstersAndNpcs,
+                    monsters,
+                    vacio: context.l10n.dmNoMonstersOrNpcs,
+                  ),
               ];
+              if (columns.length == 1) return columns.single;
               return wide
                   ? Row(
                       crossAxisAlignment: CrossAxisAlignment.start,

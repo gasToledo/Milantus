@@ -6172,7 +6172,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get encEmptyOrder =>
-      'Todavía no hay nadie en el orden. Sumá jugadores o un monstruo para arrancar.';
+      'Todavía no hay nadie en el orden. Sumá jugadores, PNJ o monstruos para arrancar.';
 
   @override
   String get encPreparing => 'Armando el combate';
