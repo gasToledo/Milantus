@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/gasToledo/Proyecto-DnD/actions/workflows/ci.yml"><img src="https://github.com/gasToledo/Proyecto-DnD/actions/workflows/ci.yml/badge.svg?branch=main" alt="Estado de CI"></a>
+  <a href="https://github.com/gasToledo/Milantus/actions/workflows/ci.yml"><img src="https://github.com/gasToledo/Milantus/actions/workflows/ci.yml/badge.svg?branch=main" alt="Estado de CI"></a>
   &nbsp; · &nbsp; Flutter Web &nbsp; · &nbsp; En español &nbsp; · &nbsp; Autoalojado
 </p>
 

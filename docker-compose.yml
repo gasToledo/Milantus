@@ -17,6 +17,12 @@
 # credencial real vive en este archivo ni en las imágenes construidas (ver
 # requisito "Secretos fuera de las imágenes y del repositorio").
 
+# Nombre del proyecto fijo: sin esto Compose lo deriva de la carpeta, y la
+# carpeta del runner cambia con el nombre del repositorio (`_work/<repo>/<repo>`).
+# Al renombrar el repo a Milantus eso habría creado volúmenes nuevos y vacíos
+# junto a los de producción. `proyecto-dnd` es el nombre que ya tienen.
+name: proyecto-dnd
+
 # Configuración compartida por los tres contenedores de Zitadel (`zitadel-init`,
 # `zitadel-setup` y `zitadel`). Un solo bloque para que las tres no se
 # desincronicen: cada subcomando ignora lo que no le toca (`start` no lee

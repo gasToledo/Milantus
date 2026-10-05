@@ -184,7 +184,7 @@ aparte (ver design.md, D1): así el despliegue es `docker compose up -d
    reinicio).
 2. **Colocar los secretos reales en el directorio de trabajo del runner**
    (el que `actions/checkout` usa, normalmente
-   `_work/Proyecto-DnD/Proyecto-DnD` bajo la carpeta de instalación del
+   `_work/Milantus/Milantus` bajo la carpeta de instalación del
    runner): copiar ahí el `.env` completo y `cloudflared/config.yml` +
    `cloudflared/creds.json` ya configurados, igual que en un arranque manual
    (ver "Primer arranque" arriba). `cd.yml` usa `clean: false` en el
@@ -363,8 +363,8 @@ base (ver design.md, decisión D11, y el comentario en
 `postgres-init/init-zitadel-db.sh`) — es lo mismo que le permite a la
 aplicación llegar a la base de Zitadel pese al `REVOKE CONNECT` de esa base.
 
-El nombre del volumen (`proyecto-dnd_portraits-data` arriba) depende del
-nombre del proyecto de Compose (por defecto, el nombre de la carpeta):
+El nombre del volumen (`proyecto-dnd_portraits-data` arriba) sale del `name:`
+de `docker-compose.yml`, fijo para que no dependa de la carpeta:
 confirmar con `docker volume ls` antes de restaurar.
 
 ## Arranque desde cero (checklist manual)
