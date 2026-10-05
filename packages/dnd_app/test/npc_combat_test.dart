@@ -611,6 +611,42 @@ void main() {
         expect(tester.takeException(), isNull);
       });
 
+      testWidgets('el herido sigue herido en el próximo combate', (
+        tester,
+      ) async {
+        final mirra = blockNpc('mirra', 'Mirra', 'Bandido');
+        final full = maxHp(mirra.block!);
+        final server = await pumpCombate(
+          tester,
+          seed: (s) {
+            addNpc(s, mirra);
+            s.encounters['tumba'] = running([
+              npcCombatant('mirra', 'Mirra', side: CombatantSide.ally, hp: 3),
+              goblin(),
+            ]);
+          },
+        );
+        await tester.tap(find.text('Terminar combate').first);
+        await tester.pumpAndSettle();
+        await tester.tap(dialogAction('Terminar y guardar'));
+        await tester.pumpAndSettle();
+        expect(server.campaignNpcHp[(campaignId: 'tumba', npcId: 'mirra')], 3);
+
+        await startEmpty(tester);
+        await openAdd(tester);
+        await tester.tap(inDialog(find.widgetWithText(ListTile, 'Mirra')));
+        await tester.pumpAndSettle();
+        await tester.tap(inDialog(find.text('Aliado')));
+        await tester.pumpAndSettle();
+        await tester.tap(dialogAction('Sumar'));
+        await tester.pumpAndSettle();
+
+        final again = combatant(server, 'Mirra');
+        expect(again.currentHp, 3);
+        expect(again.maxHp, full);
+        expect(tester.takeException(), isNull);
+      });
+
       testWidgets('descartar no cambia ningún estado', (tester) async {
         final server = await pumpCombate(tester, seed: seedFallen);
         await tester.tap(find.text('Terminar combate').first);

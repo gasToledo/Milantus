@@ -157,6 +157,15 @@ class _CampaignNpcsViewState extends State<CampaignNpcsView> {
     );
   }
 
+  /// Los PG guardados, solo si está vivo y herido. Uno muerto no pelea, y
+  /// uno entero no tiene nada que avisar.
+  ({int current, int max})? _storedHp(CampaignNpcEntry entry) {
+    if (entry.status == NpcStatus.dead) return null;
+    final max = npcMaxHp(entry.npc, entry.sheet, widget.repo);
+    final current = entry.combatHp(max);
+    return current < max ? (current: current, max: max) : null;
+  }
+
   Widget _row(BuildContext context, CampaignNpcEntry entry) {
     final pal = context.palette;
     final npc = entry.npc;
@@ -199,6 +208,18 @@ class _CampaignNpcsViewState extends State<CampaignNpcsView> {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontSize: 12, color: pal.textMuted),
                 ),
+                // Herido de un combate anterior: con esto el DM sabe con qué
+                // va a entrar al próximo sin abrirlo.
+                if (_storedHp(entry) case (:final current, :final max))
+                  Text(
+                    context.l10n.dmHpShort(current, max),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: pal.crimson,
+                      fontWeight: FontWeight.w700,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                  ),
               ],
             ),
           ),

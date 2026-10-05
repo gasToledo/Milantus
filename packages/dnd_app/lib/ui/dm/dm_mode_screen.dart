@@ -1347,9 +1347,9 @@ class _CampaignDetailState extends State<_CampaignDetail> {
     );
   }
 
-  /// Suma un PNJ con sus PG máximos de siempre: el daño de un combate
-  /// anterior no quedó en ningún lado, a propósito — los PG del combate son
-  /// del combate.
+  /// Suma un PNJ con los PG con que terminó su último combate en esta
+  /// campaña: el compañero herido sigue herido. El que vuelve de la muerte, o
+  /// llega de la biblioteca, entra entero.
   ///
   /// Si venía de la biblioteca, o estaba muerto y el DM marcó que volvió,
   /// primero se escribe la campaña. Si eso falla, no entra: un PNJ en la mesa
@@ -1369,6 +1369,10 @@ class _CampaignDetailState extends State<_CampaignDetail> {
       if (mounted) unawaited(_loadNpcs());
     }
     final hp = npcMaxHp(choice.npc, choice.sheet, widget.repo);
+    final stored = choice.fromLibrary || choice.revive
+        ? null
+        : _npcs?.where((e) => e.npc.id == choice.npc.id).firstOrNull;
+    final currentHp = stored?.combatHp(hp) ?? hp;
     await _saveEncounter((current) {
       final encounter = current ?? Encounter(id: _newId('encounter'));
       // Una sola vez por combate, contra la mesa ya guardada: dos toques
@@ -1383,7 +1387,7 @@ class _CampaignDetailState extends State<_CampaignDetail> {
           name: choice.npc.name,
           initiative: initiative,
           npcId: choice.npc.id,
-          currentHp: hp,
+          currentHp: currentHp,
           maxHp: hp,
           side: choice.side,
         ),
@@ -1577,7 +1581,8 @@ class _CampaignDetailState extends State<_CampaignDetail> {
           discard: discard,
           deadNpcIds: deadNpcIds.toList(),
         );
-        if (deadNpcIds.isNotEmpty && mounted) unawaited(_loadNpcs());
+        // Archivar cambia los PG guardados de los PNJ, además de los muertos.
+        if (!discard && mounted) unawaited(_loadNpcs());
         if (!mounted) {
           // Igual que al guardar: lo que quede en la fila tiene que ver que el
           // combate ya no está, o volvería a crearlo.

@@ -435,6 +435,13 @@ Terminar y guardar un combate acepta `deadNpcIds`: el servidor marca muertos,
 en la misma transacción que cierra el combate, solo a los que además estaban
 en ese combate — un id de otro PNJ de la cuenta no se toca por esta vía.
 
+En la misma transacción se guardan los PG con que terminó cada PNJ que puede
+perderlos (`campaign_npcs.current_hp`, `NULL` es entero), y el próximo combate
+de **esa** campaña lo suma con ellos: el compañero herido sigue herido. Va en el
+vínculo y no en el PNJ por lo mismo que el estado — en otra mesa llega entero.
+Morir borra los PG guardados, y volver de la muerte (`dead` → `alive`) también:
+el que resucita vuelve entero. Descartar el combate no guarda nada.
+
 ### Por qué exportar es un archivo
 
 Pasarle un PNJ a otro DM **no** crea ninguna fila compartida: es un `.zip`

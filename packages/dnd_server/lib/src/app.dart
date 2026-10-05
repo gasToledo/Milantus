@@ -1674,11 +1674,19 @@ Future<Response> _endEncounterHandler(
       for (final id in npcIds)
         id: (await repositories.npcs.find(request.userId, id))?.npc,
     };
-    await repositories.npcs.markDead(
-      request.userId,
-      campaignId,
-      requestedDead.intersection(npcIds),
-    );
+    final dead = requestedDead.intersection(npcIds);
+    await repositories.npcs.markDead(request.userId, campaignId, dead);
+    // Los PG con que terminó cada PNJ que puede perderlos: el compañero
+    // herido sigue herido en el próximo combate de la campaña. Entero se
+    // guarda como `null` para que una subida de PG máximos no lo deje corto.
+    await repositories.npcs.saveHp(request.userId, campaignId, {
+      for (final c in encounter.combatants)
+        if (c.kind == CombatantKind.npc &&
+            c.npcId != null &&
+            c.maxHp > 0 &&
+            !dead.contains(c.npcId))
+          c.npcId!: c.currentHp >= c.maxHp ? null : max(0, c.currentHp),
+    });
     await repositories.encounters.close(
       request.userId,
       campaignId,

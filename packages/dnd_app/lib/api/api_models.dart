@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:dnd_engine/dnd_engine.dart';
 
 /// Metadatos de un proveedor de generación de retratos, tal como los publica
@@ -299,12 +301,27 @@ class CampaignNpcEntry {
   final NpcStatus status;
   final Character? sheet;
 
-  const CampaignNpcEntry({required this.npc, required this.status, this.sheet});
+  /// Los PG con que terminó su último combate en esta campaña. `null` es
+  /// entero.
+  final int? currentHp;
+
+  const CampaignNpcEntry({
+    required this.npc,
+    required this.status,
+    this.sheet,
+    this.currentHp,
+  });
+
+  /// Con cuántos PG entra a un combate cuyo máximo es [maxHp]. Se recorta
+  /// contra el máximo de hoy: si la ficha bajó de nivel, lo guardado no puede
+  /// pasarlo.
+  int combatHp(int maxHp) => min(currentHp ?? maxHp, maxHp);
 
   factory CampaignNpcEntry.fromJson(Map<String, dynamic> json) =>
       CampaignNpcEntry(
         npc: Npc.fromJson((json['npc'] as Map).cast<String, dynamic>()),
         status: NpcStatus.fromJson(json['status'] as String?),
+        currentHp: json['currentHp'] as int?,
         sheet: json['character'] is Map
             ? Character.fromJson(
                 (json['character'] as Map).cast<String, dynamic>(),

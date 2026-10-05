@@ -377,4 +377,15 @@ CREATE TABLE campaign_npcs (
 CREATE INDEX campaign_npcs_npc_idx ON campaign_npcs (dm_user_id, npc_id);
 ''',
   ),
+  Migration(
+    id: '0011_campaign_npcs_current_hp',
+    sql: '''
+-- Los PG con que un PNJ terminó su último combate **en esta campaña**. Van en
+-- el vínculo y no en el PNJ por lo mismo que el estado: el compañero herido en
+-- una mesa llega entero a otra. NULL es «entero» — así un PNJ que nunca
+-- peleó, o al que le suben los PG máximos, no queda clavado en un número viejo.
+ALTER TABLE campaign_npcs
+  ADD COLUMN current_hp INTEGER CHECK (current_hp >= 0);
+''',
+  ),
 ];

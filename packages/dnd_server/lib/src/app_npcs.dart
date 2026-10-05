@@ -237,6 +237,7 @@ Future<Response> _listCampaignNpcsHandler(
         {
           'npc': entry.npc.toJson(),
           'status': entry.status.toJson(),
+          if (entry.currentHp != null) 'currentHp': entry.currentHp,
           if (entry.sheet != null) 'character': entry.sheet!.toJson(),
         },
     ],

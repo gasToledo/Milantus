@@ -682,6 +682,74 @@ void main() {
       },
     );
 
+    test('terminar guarda los PG de cada PNJ en la campaña', () async {
+      final m = await mesa();
+      final current = Encounter.fromJson(
+        decode(
+              (await send(
+                'GET',
+                '/api/campaigns/mesa/encounter',
+                token: m.dm,
+              )).body,
+            )['encounter']
+            as Map<String, dynamic>,
+      );
+      final herida = current.withReplaced(
+        current.combatants
+            .firstWhere((c) => c.id == 'i')
+            .copyWith(currentHp: 4),
+      );
+      await send(
+        'PUT',
+        '/api/campaigns/mesa/encounter',
+        token: m.dm,
+        body: {'encounter': herida.toJson()},
+      );
+
+      await send('DELETE', '/api/campaigns/mesa/encounter', token: m.dm);
+
+      final dm = userIdOf('dm');
+      expect(npcs.hpOf(dm, 'mesa', m.ids['ilse']!), 4);
+      // Caído sin marcarlo muerto: queda inconsciente, no entero.
+      expect(npcs.hpOf(dm, 'mesa', m.ids['garrick']!), 0);
+      expect(npcs.hpOf(dm, 'mesa', m.ids['toblen']!), isNull);
+      final listed =
+          decode(
+                (await send(
+                  'GET',
+                  '/api/campaigns/mesa/npcs',
+                  token: m.dm,
+                )).body,
+              )['npcs']
+              as List;
+      final ilse = listed.firstWhere((e) => e['npc']['id'] == m.ids['ilse']);
+      expect(ilse['currentHp'], 4);
+    });
+
+    test('morir y volver deja al PNJ entero', () async {
+      final m = await mesa();
+      await send(
+        'DELETE',
+        '/api/campaigns/mesa/encounter',
+        token: m.dm,
+        body: {
+          'deadNpcIds': [m.ids['garrick']],
+        },
+      );
+      final dm = userIdOf('dm');
+      expect(npcs.hpOf(dm, 'mesa', m.ids['garrick']!), isNull);
+
+      await npcs.saveHp(dm, 'mesa', {m.ids['garrick']!: 3});
+      await send(
+        'PUT',
+        '/api/campaigns/mesa/npcs/${m.ids['garrick']}',
+        token: m.dm,
+        body: {'status': 'alive'},
+      );
+
+      expect(npcs.hpOf(dm, 'mesa', m.ids['garrick']!), isNull);
+    });
+
     test('descartar no cambia ningún estado', () async {
       final m = await mesa();
 

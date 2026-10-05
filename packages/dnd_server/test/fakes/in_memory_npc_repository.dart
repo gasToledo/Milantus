@@ -24,10 +24,12 @@ class InMemoryNpcRepository implements NpcRepository {
   final Map<String, Map<String, Npc>> _byDm = {};
   final Map<({String dmUserId, String campaignId, String npcId}), NpcStatus>
   _links = {};
+  final Map<({String dmUserId, String campaignId, String npcId}), int> _hp = {};
 
   Object snapshot() => (
     byDm: {for (final e in _byDm.entries) e.key: Map.of(e.value)},
     links: Map.of(_links),
+    hp: Map.of(_hp),
   );
 
   void restore(Object raw) {
@@ -40,6 +42,7 @@ class InMemoryNpcRepository implements NpcRepository {
                 NpcStatus
               >
               links,
+              Map<({String dmUserId, String campaignId, String npcId}), int> hp,
             });
     _byDm
       ..clear()
@@ -47,6 +50,9 @@ class InMemoryNpcRepository implements NpcRepository {
     _links
       ..clear()
       ..addAll(s.links);
+    _hp
+      ..clear()
+      ..addAll(s.hp);
   }
 
   Future<StoredNpc> _stored(String dmUserId, Npc npc) async {
@@ -132,7 +138,12 @@ class InMemoryNpcRepository implements NpcRepository {
       if (npc == null) continue;
       final stored = await _stored(dmUserId, npc);
       result.add(
-        CampaignNpc(npc: npc, status: entry.value, sheet: stored.sheet),
+        CampaignNpc(
+          npc: npc,
+          status: entry.value,
+          sheet: stored.sheet,
+          currentHp: _hp[entry.key],
+        ),
       );
     }
     result.sort((a, b) => a.npc.name.compareTo(b.npc.name));
@@ -149,6 +160,9 @@ class InMemoryNpcRepository implements NpcRepository {
     if (await _campaigns.find(dmUserId, campaignId) == null) return null;
     if (_byDm[dmUserId]?[npcId] == null) return null;
     final key = (dmUserId: dmUserId, campaignId: campaignId, npcId: npcId);
+    if (_links[key] == NpcStatus.dead && status == NpcStatus.alive) {
+      _hp.remove(key);
+    }
     final next = status ?? _links[key] ?? NpcStatus.alive;
     _links[key] = next;
     return next;
@@ -171,9 +185,33 @@ class InMemoryNpcRepository implements NpcRepository {
   ) async {
     for (final id in npcIds) {
       final key = (dmUserId: dmUserId, campaignId: campaignId, npcId: id);
-      if (_links.containsKey(key)) _links[key] = NpcStatus.dead;
+      if (_links.containsKey(key)) {
+        _links[key] = NpcStatus.dead;
+        _hp.remove(key);
+      }
     }
   }
+
+  @override
+  Future<void> saveHp(
+    String dmUserId,
+    String campaignId,
+    Map<String, int?> hpByNpc,
+  ) async {
+    for (final MapEntry(key: id, value: hp) in hpByNpc.entries) {
+      final key = (dmUserId: dmUserId, campaignId: campaignId, npcId: id);
+      if (!_links.containsKey(key)) continue;
+      if (hp == null) {
+        _hp.remove(key);
+      } else {
+        _hp[key] = hp;
+      }
+    }
+  }
+
+  /// Los PG guardados de un vínculo, para las pruebas.
+  int? hpOf(String dmUserId, String campaignId, String npcId) =>
+      _hp[(dmUserId: dmUserId, campaignId: campaignId, npcId: npcId)];
 
   /// El estado de un vínculo, para las pruebas.
   NpcStatus? statusOf(String dmUserId, String campaignId, String npcId) =>

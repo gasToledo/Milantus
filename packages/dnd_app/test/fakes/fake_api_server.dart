@@ -78,6 +78,10 @@ class FakeApiServer {
   /// En qué campañas está cada PNJ y cómo está en cada una.
   final Map<({String campaignId, String npcId}), NpcStatus> campaignNpcs = {};
 
+  /// PG guardados por vínculo, como `campaign_npcs.current_hp`: sin entrada
+  /// es entero.
+  final Map<({String campaignId, String npcId}), int> campaignNpcHp = {};
+
   /// Los PNJ que el DM marcó como muertos al terminar cada combate, tal como
   /// llegaron.
   final List<({String campaignId, List<String> deadNpcIds})> endedWithDead = [];
@@ -389,6 +393,7 @@ class FakeApiServer {
       campaigns.remove(id);
       campaignMembers.removeWhere((_, m) => m.campaignId == id);
       campaignNpcs.removeWhere((key, _) => key.campaignId == id);
+      campaignNpcHp.removeWhere((key, _) => key.campaignId == id);
       encounters.remove(id);
       chapters.remove(id);
       notes.remove(id);
@@ -707,6 +712,18 @@ class FakeApiServer {
           final key = (campaignId: id, npcId: npcId);
           if (inEncounter.contains(npcId) && campaignNpcs.containsKey(key)) {
             campaignNpcs[key] = NpcStatus.dead;
+            campaignNpcHp.remove(key);
+          }
+        }
+        for (final c in closing.combatants) {
+          if (c.kind != CombatantKind.npc || c.npcId == null) continue;
+          if (c.maxHp <= 0 || dead.contains(c.npcId)) continue;
+          final key = (campaignId: id, npcId: c.npcId!);
+          if (!campaignNpcs.containsKey(key)) continue;
+          if (c.currentHp >= c.maxHp) {
+            campaignNpcHp.remove(key);
+          } else {
+            campaignNpcHp[key] = c.currentHp < 0 ? 0 : c.currentHp;
           }
         }
         final monsters = <String, List<Combatant>>{};
@@ -916,6 +933,7 @@ class FakeApiServer {
       if (method == 'DELETE') {
         npcs.remove(id);
         campaignNpcs.removeWhere((key, _) => key.npcId == id);
+        campaignNpcHp.removeWhere((key, _) => key.npcId == id);
         if (npc.characterId case final sheetId?) {
           characters.remove(sheetId);
           npcSheets.remove(sheetId);
@@ -948,6 +966,8 @@ class FakeApiServer {
               {
                 'npc': l.npc.toJson(),
                 'status': l.status.toJson(),
+                'currentHp':
+                    ?campaignNpcHp[(campaignId: campaignId, npcId: l.npc.id)],
                 if (l.npc.characterId case final sheetId?)
                   if (characters[sheetId] case final sheet?)
                     'character': sheet.toJson(),
@@ -965,11 +985,16 @@ class FakeApiServer {
             ? null
             : NpcStatus.fromJson(body['status'] as String);
         final status = requested ?? campaignNpcs[key] ?? NpcStatus.alive;
+        // Como el servidor: el que vuelve de la muerte vuelve entero.
+        if (campaignNpcs[key] == NpcStatus.dead && status == NpcStatus.alive) {
+          campaignNpcHp.remove(key);
+        }
         campaignNpcs[key] = status;
         return _json({'status': status.toJson()});
       }
       if (npcId != null && method == 'DELETE') {
         campaignNpcs.remove((campaignId: campaignId, npcId: npcId));
+        campaignNpcHp.remove((campaignId: campaignId, npcId: npcId));
         return _json({'status': 'ok'});
       }
     }

@@ -38,7 +38,16 @@ class CampaignNpc {
   final NpcStatus status;
   final Character? sheet;
 
-  const CampaignNpc({required this.npc, required this.status, this.sheet});
+  /// Los PG con que terminó su último combate en esta campaña. `null` es
+  /// entero.
+  final int? currentHp;
+
+  const CampaignNpc({
+    required this.npc,
+    required this.status,
+    this.sheet,
+    this.currentHp,
+  });
 }
 
 /// Contrato de persistencia de la biblioteca de PNJ y de sus vínculos con
@@ -91,6 +100,15 @@ abstract class NpcRepository {
     String dmUserId,
     String campaignId,
     Iterable<String> npcIds,
+  );
+
+  /// Guarda los PG con que cada PNJ de [hpByNpc] terminó el combate en
+  /// [campaignId]; `null` lo deja entero. Los que no estén vinculados se
+  /// ignoran.
+  Future<void> saveHp(
+    String dmUserId,
+    String campaignId,
+    Map<String, int?> hpByNpc,
   );
 }
 
@@ -241,7 +259,7 @@ class PostgresNpcRepository implements NpcRepository {
   ) async {
     final result = await _session.execute(
       Sql.named('''
-        SELECT n.document, cn.status, sheet.document AS sheet
+        SELECT n.document, cn.status, cn.current_hp, sheet.document AS sheet
         FROM campaign_npcs cn
         JOIN npcs n ON n.dm_user_id = cn.dm_user_id AND n.id = cn.npc_id
         LEFT JOIN characters sheet
@@ -262,6 +280,7 @@ class PostgresNpcRepository implements NpcRepository {
           npc: Npc.fromJson(_object(columns['document'])!),
           status: NpcStatus.fromJson(columns['status'] as String?),
           sheet: _sheetOf(columns['sheet']),
+          currentHp: columns['current_hp'] as int?,
         ),
     ];
   }
@@ -286,7 +305,14 @@ class PostgresNpcRepository implements NpcRepository {
           AND c.id = @campaignId
           AND n.id = @npcId
         ON CONFLICT (dm_user_id, campaign_id, npc_id)
-        DO UPDATE SET status = COALESCE(@status, campaign_npcs.status)
+        DO UPDATE SET
+          status = COALESCE(@status, campaign_npcs.status),
+          -- El que vuelve de la muerte vuelve entero: los PG de su último
+          -- combate son los de antes de morir.
+          current_hp = CASE
+            WHEN campaign_npcs.status = 'dead' AND @status = 'alive' THEN NULL
+            ELSE campaign_npcs.current_hp
+          END
         RETURNING status
       '''),
       parameters: {
@@ -329,7 +355,7 @@ class PostgresNpcRepository implements NpcRepository {
     if (ids.isEmpty) return;
     await _session.execute(
       Sql.named('''
-        UPDATE campaign_npcs SET status = 'dead'
+        UPDATE campaign_npcs SET status = 'dead', current_hp = NULL
         WHERE dm_user_id = @dmUserId
           AND campaign_id = @campaignId
           AND npc_id = ANY(@npcIds)
@@ -340,6 +366,32 @@ class PostgresNpcRepository implements NpcRepository {
         'npcIds': TypedValue(Type.textArray, ids),
       },
     );
+  }
+
+  /// Una consulta por PNJ: en un combate pelean unos pocos, y así cada una
+  /// lleva su autorización en el `WHERE` sin armar arreglos paralelos.
+  @override
+  Future<void> saveHp(
+    String dmUserId,
+    String campaignId,
+    Map<String, int?> hpByNpc,
+  ) async {
+    for (final MapEntry(key: npcId, value: hp) in hpByNpc.entries) {
+      await _session.execute(
+        Sql.named('''
+          UPDATE campaign_npcs SET current_hp = @hp
+          WHERE dm_user_id = @dmUserId
+            AND campaign_id = @campaignId
+            AND npc_id = @npcId
+        '''),
+        parameters: {
+          'dmUserId': TypedValue(Type.uuid, dmUserId),
+          'campaignId': TypedValue(Type.text, campaignId),
+          'npcId': TypedValue(Type.text, npcId),
+          'hp': TypedValue(Type.integer, hp),
+        },
+      );
+    }
   }
 
   StoredNpc _storedOf(Map<String, dynamic> columns) => StoredNpc(
