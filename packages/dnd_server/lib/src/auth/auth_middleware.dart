@@ -35,7 +35,10 @@ Middleware requireSession(
       if (userId == null) {
         return Response(
           401,
-          body: jsonEncode({'error': 'No autenticado.'}),
+          body: jsonEncode({
+            'error': 'No autenticado.',
+            'code': 'unauthenticated',
+          }),
           headers: {'content-type': 'application/json'},
         );
       }

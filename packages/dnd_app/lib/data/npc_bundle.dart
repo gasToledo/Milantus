@@ -1,4 +1,4 @@
-// l10n-ignore-file: errores de validación de archivos que se muestran tal cual; la fase 2 los pasa a códigos de error traducibles.
+// l10n-ignore-file: errores sin contexto de interfaz, en los dos idiomas con `localized` (siguen a `ContentLanguage`, que `main.dart` fija con el idioma de la interfaz).
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -80,16 +80,31 @@ class NpcBundleCodec {
     try {
       archive = ZipDecoder().decodeBytes(bytes);
     } catch (_) {
-      throw const FormatException('El archivo no es un ZIP válido.');
+      throw FormatException(
+        localized(
+          'El archivo no es un ZIP válido.',
+          'The file isn’t a valid ZIP.',
+        ),
+      );
     }
     final manifestFile = archive.findFile(manifestName);
     final content = manifestFile?.readBytes();
     if (content == null) {
-      throw const FormatException('El archivo no es un PNJ exportado.');
+      throw FormatException(
+        localized(
+          'El archivo no es un PNJ exportado.',
+          'The file isn’t an exported NPC.',
+        ),
+      );
     }
     final manifest = jsonDecode(utf8.decode(content));
     if (manifest is! Map || manifest['type'] != type) {
-      throw const FormatException('El archivo no es un PNJ exportado.');
+      throw FormatException(
+        localized(
+          'El archivo no es un PNJ exportado.',
+          'The file isn’t an exported NPC.',
+        ),
+      );
     }
     final version = manifest['formatVersion'];
     if (version is int && version > formatVersion) {
@@ -160,9 +175,16 @@ class NpcBundleCodec {
     if (entries.length != 1) {
       throw FormatException(
         entries.isEmpty
-            ? 'El archivo no trae ningún personaje.'
-            : 'El respaldo trae ${entries.length} personajes: exportá desde '
-                  '«Mis personajes» solo el que quieras sumar como PNJ.',
+            ? localized(
+                'El archivo no trae ningún personaje.',
+                'The file has no character.',
+              )
+            : localized(
+                'El respaldo trae ${entries.length} personajes: exportá desde '
+                    '«Mis personajes» solo el que quieras sumar como PNJ.',
+                'The backup has ${entries.length} characters: from “My '
+                    'characters”, export only the one you want to add as an NPC.',
+              ),
       );
     }
     final entry = entries.single as Map;

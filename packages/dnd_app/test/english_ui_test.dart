@@ -13,6 +13,10 @@ import 'fakes/fake_api_server.dart';
 /// (`DndApp`) y no con una pantalla suelta: que el scope esté montado, que
 /// `MaterialApp` escuche el cambio y que la elección se recuerde.
 void main() {
+  // El arranque en inglés fija el idioma del contenido; la prueba siguiente
+  // arranca en español.
+  tearDown(() => ContentLanguage.current = ContentLanguage.es);
+
   late String? guardado;
   late List<String> documento;
 

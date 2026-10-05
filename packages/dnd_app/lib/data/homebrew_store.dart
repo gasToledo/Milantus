@@ -1,4 +1,4 @@
-// l10n-ignore-file: errores de validación de datos que se muestran tal cual; la fase 2 los pasa a códigos de error traducibles.
+// l10n-ignore-file: errores sin contexto de interfaz, en los dos idiomas con `localized` (siguen a `ContentLanguage`, que `main.dart` fija con el idioma de la interfaz).
 import 'package:dnd_engine/dnd_engine.dart';
 
 import '../api/api_client.dart';
@@ -56,10 +56,20 @@ class HomebrewStore {
       final issueId = rawId is String && rawId.isNotEmpty ? rawId : '(sin id)';
       try {
         if (rawId is! String || rawId.isEmpty) {
-          throw const FormatException('El id está ausente o vacío.');
+          throw FormatException(
+            localized(
+              'El id está ausente o vacío.',
+              'The id is missing or empty.',
+            ),
+          );
         }
         if (document['source'] != 'homebrew') {
-          throw const FormatException('El origen debe ser homebrew.');
+          throw FormatException(
+            localized(
+              'El origen debe ser homebrew.',
+              'The source must be homebrew.',
+            ),
+          );
         }
         target[rawId] = parse(document);
       } catch (error) {
@@ -145,14 +155,20 @@ class HomebrewStore {
       for (final json in entry.value) {
         final id = json['id'];
         if (id is! String || id.trim().isEmpty) {
-          throw const FormatException(
-            'Un arma, armadura u objeto del archivo no tiene un id válido.',
+          throw FormatException(
+            localized(
+              'Un arma, armadura u objeto del archivo no tiene un id válido.',
+              'A weapon, armor, or item in the file doesn’t have a valid id.',
+            ),
           );
         }
         final previousKind = incomingKinds[id];
         if (previousKind != null && previousKind != entry.key) {
           throw FormatException(
-            'El id "$id" aparece en $previousKind y ${entry.key}.',
+            localized(
+              'El id "$id" aparece en $previousKind y ${entry.key}.',
+              'The id "$id" appears in $previousKind and ${entry.key}.',
+            ),
           );
         }
         incomingKinds[id] = entry.key;
@@ -168,20 +184,31 @@ class HomebrewStore {
         if (matches.isEmpty) continue;
         if (matches.length > 1) {
           throw FormatException(
-            'El id "$id" ya está repetido entre los catálogos de inventario.',
+            localized(
+              'El id "$id" ya está repetido entre los catálogos de inventario.',
+              'The id "$id" is already repeated across the inventory catalogs.',
+            ),
           );
         }
         final existing = matches.single;
         if (existing.kind != entry.key) {
           throw FormatException(
-            'El id "$id" ya pertenece a ${existing.kind} y no puede usarse '
-            'en ${entry.key}.',
+            localized(
+              'El id "$id" ya pertenece a ${existing.kind} y no puede usarse '
+                  'en ${entry.key}.',
+              'The id "$id" already belongs to ${existing.kind} and can’t be '
+                  'used in ${entry.key}.',
+            ),
           );
         }
         if (existing.source != ContentSource.homebrew) {
           throw FormatException(
-            'El id "$id" pertenece al catálogo oficial y no puede '
-            'sobrescribirse.',
+            localized(
+              'El id "$id" pertenece al catálogo oficial y no puede '
+                  'sobrescribirse.',
+              'The id "$id" belongs to the official catalog and can’t be '
+                  'overwritten.',
+            ),
           );
         }
       }

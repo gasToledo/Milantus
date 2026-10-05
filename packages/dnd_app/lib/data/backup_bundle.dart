@@ -1,4 +1,4 @@
-// l10n-ignore-file: errores de validación de archivos que se muestran tal cual; la fase 2 los pasa a códigos de error traducibles.
+// l10n-ignore-file: errores sin contexto de interfaz, en los dos idiomas con `localized` (siguen a `ContentLanguage`, que `main.dart` fija con el idioma de la interfaz).
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -24,7 +24,12 @@ String requireSafePathSegment(String value, {String label = 'identificador'}) {
       value == '.' ||
       value == '..' ||
       !RegExp(r'^[A-Za-z0-9._-]+$').hasMatch(value)) {
-    throw FormatException('El $label contiene caracteres no permitidos.');
+    throw FormatException(
+      localized(
+        'El $label contiene caracteres no permitidos.',
+        'A name in the file contains characters that aren’t allowed.',
+      ),
+    );
   }
   return value;
 }
@@ -66,8 +71,11 @@ class BackupBundleCodec {
     for (final character in characters) {
       final id = requireSafePathSegment(character.id, label: 'id de personaje');
       if (!characterIds.add(id)) {
-        throw const FormatException(
-          'No se puede exportar dos veces el mismo personaje.',
+        throw FormatException(
+          localized(
+            'No se puede exportar dos veces el mismo personaje.',
+            'The same character can’t be exported twice.',
+          ),
         );
       }
       final characterPath = 'characters/$id.json';
@@ -77,8 +85,11 @@ class BackupBundleCodec {
         final bytes = await readPortrait(character.portraitPaths[i]);
         if (bytes == null) continue;
         if (bytes.length > maxEntryBytes) {
-          throw const FormatException(
-            'Un retrato supera el tamaño máximo permitido.',
+          throw FormatException(
+            localized(
+              'Un retrato supera el tamaño máximo permitido.',
+              'A portrait exceeds the maximum allowed size.',
+            ),
           );
         }
         final archivePath = 'portraits/$id/$i.png';
@@ -100,8 +111,11 @@ class BackupBundleCodec {
         final bytes = await readPortrait(imageKey);
         if (bytes == null) continue;
         if (bytes.length > maxEntryBytes) {
-          throw const FormatException(
-            'Una imagen del diario supera el tamaño máximo permitido.',
+          throw FormatException(
+            localized(
+              'Una imagen del diario supera el tamaño máximo permitido.',
+              'A journal image exceeds the maximum allowed size.',
+            ),
           );
         }
         final archivePath = 'portraits/$id/d${diaryEntries.length}.png';
@@ -165,7 +179,12 @@ class BackupBundleCodec {
 
     final encoded = ZipEncoder().encodeBytes(archive);
     if (encoded.length > maxArchiveBytes) {
-      throw const FormatException('El respaldo supera el tamaño máximo.');
+      throw FormatException(
+        localized(
+          'El respaldo supera el tamaño máximo.',
+          'The backup exceeds the maximum size.',
+        ),
+      );
     }
     return encoded;
   }

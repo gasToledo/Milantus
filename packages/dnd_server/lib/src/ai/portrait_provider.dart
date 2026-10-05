@@ -11,7 +11,10 @@ import '../config.dart';
 /// cuenta que pidió la generación; MUST NOT contener ninguna credencial.
 class ProviderException implements Exception {
   final String message;
-  ProviderException(this.message);
+
+  /// Código estable que el cliente traduce; el mensaje queda como detalle.
+  final String code;
+  ProviderException(this.message, [this.code = 'portrait_failed']);
   @override
   String toString() => message;
 }
@@ -83,6 +86,7 @@ class PollinationsProvider implements PortraitProvider {
             ? 'Pollinations está limitando las peticiones (429). Esperá unos '
                   'segundos y probá de nuevo.'
             : 'Pollinations respondió ${resp.statusCode}.',
+        resp.statusCode == 429 ? 'portrait_rate_limited' : 'portrait_failed',
       );
     }
   }
@@ -220,7 +224,8 @@ class AzureOpenAiProvider implements PortraitProvider {
       if (urls.isEmpty) {
         throw ProviderException(
           'La respuesta no incluyó ninguna imagen. Puede ser el filtro de '
-          'contenido: probá quitar el arma o suavizar los detalles.',
+              'contenido: probá quitar el arma o suavizar los detalles.',
+          'portrait_content_filtered',
         );
       }
       return [
@@ -323,8 +328,9 @@ class AzureProvider implements PortraitProvider {
         if (decoded['stop_reason'] == 'refusal') {
           throw ProviderException(
             'El modelo rechazó el prompt (filtro de contenido de Azure). '
-            'Suele dispararse con armas o violencia: probá quitar el arma o '
-            'suavizar los detalles.',
+                'Suele dispararse con armas o violencia: probá quitar el arma o '
+                'suavizar los detalles.',
+            'portrait_content_filtered',
           );
         }
         throw ProviderException('La respuesta no incluyó ninguna imagen.');

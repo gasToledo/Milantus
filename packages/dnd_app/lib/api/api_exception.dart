@@ -8,7 +8,11 @@ class ApiException implements Exception {
   final int? statusCode;
   final String message;
 
-  const ApiException(this.statusCode, this.message);
+  /// El código estable que manda el servidor junto al mensaje
+  /// (`campaign_not_found`, `invalid_data`, …), o null si no mandó ninguno.
+  final String? code;
+
+  const ApiException(this.statusCode, this.message, {this.code});
 
   /// La sesión no es válida: 401. La UI la trata distinto de un error de
   /// guardado común (ver capacidad `user-accounts`, sesión expirada durante

@@ -81,7 +81,7 @@ Future<Response> _listNpcsHandler(Request request, NpcRepository npcs) async {
 Future<Response> _getNpcHandler(Request request, NpcRepository npcs) async {
   final id = requireSafePathSegment(request.params['id']!, label: 'id de PNJ');
   final stored = await npcs.find(request.userId, id);
-  if (stored == null) return _notFound('PNJ no encontrado.');
+  if (stored == null) return _notFound('npc_not_found');
   return _jsonOk(_storedNpcJson(stored));
 }
 
@@ -135,7 +135,7 @@ Future<Response> _updateNpcHandler(Request request, NpcRepository npcs) async {
     throw const FormatException('El id del PNJ no coincide con la ruta.');
   }
   final existing = await npcs.find(request.userId, id);
-  if (existing == null) return _notFound('PNJ no encontrado.');
+  if (existing == null) return _notFound('npc_not_found');
   if (existing.npc.sheetKind != requested.sheetKind) {
     throw const FormatException('El tipo de un PNJ no se cambia.');
   }
@@ -195,7 +195,7 @@ Future<Response> _createNpcPortraitHandler(
   final id = requireSafePathSegment(request.params['id']!, label: 'id de PNJ');
   final stored = await npcs.find(request.userId, id);
   if (stored == null || stored.npc.sheetKind == NpcSheetKind.character) {
-    return _notFound('PNJ no encontrado.');
+    return _notFound('npc_not_found');
   }
   final body = await _readJsonBody(
     request,
@@ -228,7 +228,7 @@ Future<Response> _listCampaignNpcsHandler(
     label: 'id de campaña',
   );
   if (await campaigns.find(request.userId, campaignId) == null) {
-    return _notFound('Campaña no encontrada.');
+    return _notFound('campaign_not_found');
   }
   final all = await npcs.listForCampaign(request.userId, campaignId);
   return _jsonOk({
@@ -271,7 +271,7 @@ Future<Response> _linkCampaignNpcHandler(
     npcId,
     status: status,
   );
-  if (result == null) return _notFound('PNJ o campaña no encontrados.');
+  if (result == null) return _notFound('npc_or_campaign_not_found');
   return _jsonOk({'status': result.toJson()});
 }
 

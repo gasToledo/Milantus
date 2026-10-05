@@ -13,6 +13,10 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'fakes/fake_api_server.dart';
 
 void main() {
+  // El arranque en inglés fija el idioma del contenido; la prueba siguiente
+  // arranca en español.
+  tearDown(() => ContentLanguage.current = ContentLanguage.es);
+
   setUp(() {
     PackageInfo.setMockInitialValues(
       appName: 'dnd_app',
@@ -134,7 +138,9 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('en inglés el error no arrastra el motivo en castellano', (
+  // El motivo viene del código del servidor, traducido: ya no queda en
+  // castellano en medio de la interfaz en inglés.
+  testWidgets('en inglés el motivo del error también sale en inglés', (
     tester,
   ) async {
     final server = await mountApp(tester, feedbackEnabled: true, language: 'en')
@@ -154,7 +160,10 @@ void main() {
     await tester.tap(find.text('Send'));
     await tester.pumpAndSettle();
 
-    expect(find.text("Couldn't send the message."), findsOne);
+    expect(
+      find.text("Couldn't send the message: Could not send the message."),
+      findsOne,
+    );
     expect(tester.takeException(), isNull);
   });
 

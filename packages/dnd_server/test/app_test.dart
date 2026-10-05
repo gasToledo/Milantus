@@ -167,6 +167,7 @@ void main() {
       expect(response.statusCode, 500);
       final body = jsonDecode(await response.readAsString());
       expect(body['error'], isNot(contains('boom')));
+      expect(body['code'], 'internal_error');
     },
   );
 
@@ -181,6 +182,8 @@ void main() {
     expect(response.statusCode, 400);
     final body = jsonDecode(await response.readAsString());
     expect(body['error'], 'dato inválido');
+    // El código es el que el cliente traduce; el mensaje queda de detalle.
+    expect(body['code'], 'invalid_data');
   });
 
   group('autenticación', () {
@@ -662,6 +665,12 @@ void main() {
       );
 
       expect(response.statusCode, 404);
+      // El mismo código que un retrato que no existe: el cliente no puede
+      // distinguir lo ajeno de lo inexistente ni siquiera por el código.
+      expect(
+        jsonDecode(await response.readAsString())['code'],
+        'portrait_not_found',
+      );
       expect(
         await portraits.read(userId: ownerId, portraitKey: key),
         isNotNull,
@@ -680,6 +689,10 @@ void main() {
       );
 
       expect(response.statusCode, 404);
+      expect(
+        jsonDecode(await response.readAsString())['code'],
+        'portrait_not_found',
+      );
     });
   });
 
@@ -825,6 +838,7 @@ void main() {
         expect(response.statusCode, 502);
         final body = jsonDecode(await response.readAsString());
         expect(body['error'], 'el proveedor rechazó el pedido');
+        expect(body['code'], 'portrait_failed');
       },
     );
 

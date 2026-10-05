@@ -10,7 +10,13 @@ import 'portrait_provider.dart';
 /// credencial (ver capacidad `ai-portrait-generation`).
 class PortraitGenerationFailure implements Exception {
   final String message;
-  const PortraitGenerationFailure(this.message);
+
+  /// Código estable que el cliente traduce (ver `_errorBody` en `app.dart`).
+  final String code;
+  const PortraitGenerationFailure(
+    this.message, [
+    this.code = 'portrait_failed',
+  ]);
   @override
   String toString() => message;
 }
@@ -71,14 +77,16 @@ class PortraitGenerationService {
         count: count,
       );
     } on ProviderException catch (e) {
-      throw PortraitGenerationFailure(e.message);
+      throw PortraitGenerationFailure(e.message, e.code);
     } on TimeoutException {
       throw const PortraitGenerationFailure(
         'La generación tardó demasiado. Probá de nuevo en unos segundos.',
+        'portrait_timeout',
       );
     } on SocketException {
       throw const PortraitGenerationFailure(
         'El servidor no pudo contactar al proveedor de generación.',
+        'portrait_unreachable',
       );
     }
   }

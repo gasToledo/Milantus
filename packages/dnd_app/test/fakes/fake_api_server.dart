@@ -1016,8 +1016,39 @@ class FakeApiServer {
       Uri.decodeComponent(path.substring(prefix.length));
 
   http.Response _json(Object body, [int status = 200]) => http.Response(
-    jsonEncode(body),
+    jsonEncode(
+      body is Map && body['error'] is String && !body.containsKey('code')
+          ? {...body, 'code': _errorCode(body['error'] as String, status)}
+          : body,
+    ),
     status,
     headers: {'content-type': 'application/json'},
   );
+
+  /// El `code` que el servidor real pone junto al mensaje (ver `_errorBody` en
+  /// `dnd_server/lib/src/app.dart`), derivado del mismo mensaje para no
+  /// repetirlo en cada respuesta del doble. Un 400 es siempre `invalid_data`,
+  /// como en el servidor, que los saca de un `FormatException`.
+  static String _errorCode(String message, int status) =>
+      const {
+        'Campaña no encontrada.': 'campaign_not_found',
+        'Capítulo no encontrado.': 'chapter_not_found',
+        'Código inválido o vencido.': 'invalid_code',
+        'No hay ningún combate en curso.': 'no_active_combat',
+        'Nota no encontrada.': 'note_not_found',
+        'PNJ no encontrado.': 'npc_not_found',
+        'PNJ o campaña no encontrados.': 'npc_or_campaign_not_found',
+        'Personaje no encontrado.': 'character_not_found',
+        'Retrato no encontrado.': 'portrait_not_found',
+        'Vínculo no encontrado.': 'link_not_found',
+        'No autenticado.': 'unauthenticated',
+        'Este servidor no tiene configurado el envío de sugerencias.':
+            'feedback_not_configured',
+        'No se pudo enviar el mensaje.': 'feedback_send_failed',
+      }[message] ??
+      switch (status) {
+        400 => 'invalid_data',
+        404 => 'not_found',
+        _ => 'internal_error',
+      };
 }

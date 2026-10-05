@@ -1,4 +1,4 @@
-// l10n-ignore-file: mensajes de error de red sin contexto de interfaz; la fase 2 los reemplaza por códigos que la pantalla traduce.
+// l10n-ignore-file: errores sin contexto de interfaz, en los dos idiomas con `localized` (siguen a `ContentLanguage`, que `main.dart` fija con el idioma de la interfaz).
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
@@ -65,38 +65,98 @@ class ApiClient {
       })().timeout(requestTimeout);
 
       if (generation != _requestGeneration) {
-        throw const ApiException(null, 'La solicitud fue cancelada.');
+        throw ApiException(null, _cancelled);
       }
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return response;
       }
-      throw ApiException(response.statusCode, _errorMessageFrom(response));
+      final (message, code) = _errorFrom(response);
+      throw ApiException(response.statusCode, message, code: code);
     } on TimeoutException {
-      throw const ApiException(
+      throw ApiException(
         null,
-        'La conexión tardó demasiado en responder.',
+        localized(
+          'La conexión tardó demasiado en responder.',
+          'The connection took too long to respond.',
+        ),
       );
     } on ApiException {
       rethrow;
     } catch (_) {
       if (generation != _requestGeneration) {
-        throw const ApiException(null, 'La solicitud fue cancelada.');
+        throw ApiException(null, _cancelled);
       }
-      throw const ApiException(null, 'No se pudo conectar con el servidor.');
+      throw ApiException(
+        null,
+        localized(
+          'No se pudo conectar con el servidor.',
+          'Could not connect to the server.',
+        ),
+      );
     }
   }
 
-  String _errorMessageFrom(http.Response response) {
+  static String get _cancelled =>
+      localized('La solicitud fue cancelada.', 'The request was cancelled.');
+
+  /// El mensaje del error y su código. El servidor manda el mensaje en
+  /// castellano y un `code` estable: en español se muestra el mensaje tal
+  /// cual (dice más, por ejemplo qué dato falló), y en inglés el texto del
+  /// código. Un código que este cliente no conoce deja el mensaje del
+  /// servidor, que es mejor que nada.
+  (String, String?) _errorFrom(http.Response response) {
     try {
       final decoded = jsonDecode(response.body);
       if (decoded is Map && decoded['error'] is String) {
-        return decoded['error'] as String;
+        final message = decoded['error'] as String;
+        final code = decoded['code'] is String
+            ? decoded['code'] as String
+            : null;
+        return (localized(message, _englishErrors[code] ?? message), code);
       }
     } catch (_) {
       // Cuerpo no-JSON (p.ej. un proxy intermedio): se cae al mensaje genérico.
     }
-    return 'Error del servidor (${response.statusCode}).';
+    return (
+      localized(
+        'Error del servidor (${response.statusCode}).',
+        'Server error (${response.statusCode}).',
+      ),
+      null,
+    );
   }
+
+  /// El texto en inglés de cada código de error del servidor (ver
+  /// `_errorBody` en `dnd_server/lib/src/app.dart`).
+  static const _englishErrors = {
+    'campaign_not_found': 'Campaign not found.',
+    'chapter_not_found': 'Chapter not found.',
+    'invalid_code': 'Invalid or expired code.',
+    'no_active_combat': 'There’s no combat in progress.',
+    'note_not_found': 'Note not found.',
+    'npc_not_found': 'NPC not found.',
+    'npc_or_campaign_not_found': 'NPC or campaign not found.',
+    'character_not_found': 'Character not found.',
+    'portrait_not_found': 'Portrait not found.',
+    'link_not_found': 'Link not found.',
+    'unauthenticated': 'Not signed in.',
+    'login_failed': 'Could not sign in.',
+    'feedback_not_configured': 'This server isn’t set up to send feedback.',
+    'too_many_messages':
+        'You sent too many messages in a row. Try again in a while.',
+    'feedback_send_failed': 'Could not send the message.',
+    'invalid_data': 'The data sent isn’t valid.',
+    'unsupported_version': 'The file was made by a newer version of the app.',
+    'payload_too_large': 'It’s too large.',
+    'internal_error': 'Internal server error.',
+    'portrait_timeout': 'Generation took too long. Try again in a few seconds.',
+    'portrait_unreachable': 'The server couldn’t reach the image provider.',
+    'portrait_rate_limited':
+        'The image provider is limiting requests. Wait a few seconds and try again.',
+    'portrait_content_filtered':
+        'The provider returned no image, probably because of its content filter: try removing the weapon or toning down the details.',
+    'portrait_failed': 'The image provider returned an error.',
+  };
 
   Map<String, dynamic> _json(http.Response response) =>
       (jsonDecode(response.body) as Map).cast<String, dynamic>();

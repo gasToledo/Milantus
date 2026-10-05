@@ -452,7 +452,7 @@ Future<Response> _callbackHandler(
   } catch (error) {
     return Response(
       401,
-      body: jsonEncode({'error': 'No se pudo iniciar sesión.'}),
+      body: _errorBody('No se pudo iniciar sesión.', 'login_failed'),
       headers: {'content-type': 'application/json'},
     );
   }
@@ -537,9 +537,10 @@ Future<Response> _feedbackHandler(
   if (sendFeedback == null) {
     return Response(
       503,
-      body: jsonEncode({
-        'error': 'Este servidor no tiene configurado el envío de sugerencias.',
-      }),
+      body: _errorBody(
+        'Este servidor no tiene configurado el envío de sugerencias.',
+        'feedback_not_configured',
+      ),
       headers: {'content-type': 'application/json'},
     );
   }
@@ -572,10 +573,10 @@ Future<Response> _feedbackHandler(
   if (!limiter.allows(userId)) {
     return Response(
       429,
-      body: jsonEncode({
-        'error':
-            'Mandaste muchos mensajes seguidos. Probá de nuevo en un rato.',
-      }),
+      body: _errorBody(
+        'Mandaste muchos mensajes seguidos. Probá de nuevo en un rato.',
+        'too_many_messages',
+      ),
       headers: {'content-type': 'application/json'},
     );
   }
@@ -597,7 +598,7 @@ Future<Response> _feedbackHandler(
     print('No se pudo enviar el feedback: $error');
     return Response(
       502,
-      body: jsonEncode({'error': 'No se pudo enviar el mensaje.'}),
+      body: _errorBody('No se pudo enviar el mensaje.', 'feedback_send_failed'),
       headers: {'content-type': 'application/json'},
     );
   }
@@ -806,10 +807,31 @@ Future<Response> _deleteCharacterHandler(
 //    Distinguirlos convertiría estas rutas en una forma de averiguar qué
 //    personajes existen en otras cuentas.
 
-Response _notFound(String message) => Response.notFound(
-  jsonEncode({'error': message}),
+/// El mensaje de cada «no encontrado», por su código. El cliente traduce el
+/// código; el mensaje queda para quien lea la respuesta a mano.
+const _notFoundMessages = {
+  'campaign_not_found': 'Campaña no encontrada.',
+  'chapter_not_found': 'Capítulo no encontrado.',
+  'invalid_code': 'Código inválido o vencido.',
+  'no_active_combat': 'No hay ningún combate en curso.',
+  'note_not_found': 'Nota no encontrada.',
+  'npc_not_found': 'PNJ no encontrado.',
+  'npc_or_campaign_not_found': 'PNJ o campaña no encontrados.',
+  'character_not_found': 'Personaje no encontrado.',
+  'portrait_not_found': 'Retrato no encontrado.',
+  'link_not_found': 'Vínculo no encontrado.',
+};
+
+Response _notFound(String code) => Response.notFound(
+  _errorBody(_notFoundMessages[code]!, code),
   headers: {'content-type': 'application/json'},
 );
+
+/// Cuerpo de error: el mensaje en castellano, para quien lea la respuesta,
+/// y un `code` estable que el cliente traduce al idioma de la interfaz. Un
+/// cliente viejo ignora `code` y sigue mostrando el mensaje.
+String _errorBody(String message, String code) =>
+    jsonEncode({'error': message, 'code': code});
 
 Campaign _campaignFromRequestJson(Map<String, dynamic> json) {
   try {
@@ -866,7 +888,7 @@ Future<Response> _upsertCampaignHandler(
   // Editar solo lo propio: sin esta comprobación, el `upsert` crearía la
   // campaña ajena dentro de la cuenta que la pidió.
   if (await campaigns.find(request.userId, id) == null) {
-    return _notFound('Campaña no encontrada.');
+    return _notFound('campaign_not_found');
   }
   await campaigns.upsert(request.userId, campaign);
   return _jsonOk({'status': 'ok'});
@@ -897,7 +919,7 @@ Future<Response> _listCampaignMembersHandler(
     label: 'id de campaña',
   );
   if (await campaigns.find(request.userId, campaignId) == null) {
-    return _notFound('Campaña no encontrada.');
+    return _notFound('campaign_not_found');
   }
   final members = await campaigns.listMembers(request.userId, campaignId);
   return _jsonOk({
@@ -932,14 +954,14 @@ Future<Response> _redeemShareCodeHandler(
       request.userId,
       campaignId,
     );
-    if (campaign == null) return _notFound('Campaña no encontrada.');
+    if (campaign == null) return _notFound('campaign_not_found');
 
     final link = await repositories.campaigns.redeemShareCode(
       dmUserId: request.userId,
       campaignId: campaignId,
       code: code,
     );
-    if (link == null) return _notFound('Código inválido o vencido.');
+    if (link == null) return _notFound('invalid_code');
 
     final character = await repositories.characters.find(
       link.ownerUserId,
@@ -975,14 +997,14 @@ Future<Response> _memberPortraitHandler(
     label: 'id de campaña',
   );
   final memberId = request.params['memberId']!;
-  if (!isUuid(memberId)) return _notFound('Retrato no encontrado.');
+  if (!isUuid(memberId)) return _notFound('portrait_not_found');
 
   final link = await campaigns.findMemberLink(
     dmUserId: request.userId,
     campaignId: campaignId,
     memberId: memberId,
   );
-  if (link == null) return _notFound('Retrato no encontrado.');
+  if (link == null) return _notFound('portrait_not_found');
 
   final width = int.tryParse(request.url.queryParameters['w'] ?? '');
   final blob = await portraits.read(
@@ -990,7 +1012,7 @@ Future<Response> _memberPortraitHandler(
     portraitKey: '${link.characterId}/${request.params['fileName']}',
     width: width != null && width > 0 ? width : null,
   );
-  if (blob == null) return _notFound('Retrato no encontrado.');
+  if (blob == null) return _notFound('portrait_not_found');
 
   return Response.ok(
     blob.bytes,
@@ -1012,13 +1034,13 @@ Future<Response> _shareCharacterHandler(
     label: 'id de personaje',
   );
   if (!await characters.exists(request.userId, id)) {
-    return _notFound('Personaje no encontrado.');
+    return _notFound('character_not_found');
   }
   final code = await campaigns.createShareCode(
     ownerUserId: request.userId,
     characterId: id,
   );
-  if (code == null) return _notFound('Personaje no encontrado.');
+  if (code == null) return _notFound('character_not_found');
   return _jsonOk({
     'code': code,
     'expiresAt': DateTime.now()
@@ -1042,7 +1064,7 @@ Future<Response> _listCharacterSharesHandler(
     label: 'id de personaje',
   );
   if (!await characters.exists(request.userId, id)) {
-    return _notFound('Personaje no encontrado.');
+    return _notFound('character_not_found');
   }
   final shares = await campaigns.listSharesForCharacter(
     ownerUserId: request.userId,
@@ -1097,7 +1119,7 @@ Future<Response> _listPlayerCampaignsHandler(
     label: 'id de personaje',
   );
   final character = await characters.find(request.userId, id);
-  if (character == null) return _notFound('Personaje no encontrado.');
+  if (character == null) return _notFound('character_not_found');
 
   final projections = await campaigns.listPlayerCampaignProjection(
     ownerUserId: request.userId,
@@ -1135,13 +1157,13 @@ Future<Response> _deleteCampaignLinkHandler(
   RepositoryTransactionRunner transactions,
 ) async {
   final memberId = request.params['memberId']!;
-  if (!isUuid(memberId)) return _notFound('Vínculo no encontrado.');
+  if (!isUuid(memberId)) return _notFound('link_not_found');
   return transactions.run((repositories) async {
     final link = await repositories.campaigns.deleteMember(
       request.userId,
       memberId,
     );
-    if (link == null) return _notFound('Vínculo no encontrado.');
+    if (link == null) return _notFound('link_not_found');
 
     final character = await repositories.characters.find(
       link.ownerUserId,
@@ -1205,7 +1227,7 @@ Future<Response> _listNotebookHandler(
     label: 'id de campaña',
   );
   if (await campaigns.find(request.userId, campaignId) == null) {
-    return _notFound('Campaña no encontrada.');
+    return _notFound('campaign_not_found');
   }
   final all = await notes.listFor(request.userId, campaignId);
   final logs = await encounters.logsFor(request.userId, campaignId);
@@ -1250,7 +1272,7 @@ Future<Response> _createNoteHandler(
     label: 'id de campaña',
   );
   if (await campaigns.find(request.userId, campaignId) == null) {
-    return _notFound('Campaña no encontrada.');
+    return _notFound('campaign_not_found');
   }
   final note = await _validNoteFromBody(
     request,
@@ -1278,12 +1300,12 @@ Future<Response> _upsertNoteHandler(
     label: 'id de nota',
   );
   if (await campaigns.find(request.userId, campaignId) == null) {
-    return _notFound('Campaña no encontrada.');
+    return _notFound('campaign_not_found');
   }
   // Editar solo lo propio: sin esto el `upsert` crearía la nota ajena dentro
   // de esta cuenta, igual que ya cuida `_upsertChapterHandler`.
   if (await notes.find(request.userId, campaignId, noteId) == null) {
-    return _notFound('Nota no encontrada.');
+    return _notFound('note_not_found');
   }
   final note = await _validNoteFromBody(
     request,
@@ -1312,7 +1334,7 @@ Future<Response> _deleteNoteHandler(
     label: 'id de nota',
   );
   if (await campaigns.find(request.userId, campaignId) == null) {
-    return _notFound('Campaña no encontrada.');
+    return _notFound('campaign_not_found');
   }
   await notes.delete(request.userId, campaignId, noteId);
   return _jsonOk({'status': 'ok'});
@@ -1360,7 +1382,7 @@ Future<Response> _listChaptersHandler(
     label: 'id de campaña',
   );
   if (await campaigns.find(request.userId, campaignId) == null) {
-    return _notFound('Campaña no encontrada.');
+    return _notFound('campaign_not_found');
   }
   final all = await chapters.listFor(request.userId, campaignId);
   return _jsonOk({
@@ -1378,7 +1400,7 @@ Future<Response> _createChapterHandler(
     label: 'id de campaña',
   );
   if (await campaigns.find(request.userId, campaignId) == null) {
-    return _notFound('Campaña no encontrada.');
+    return _notFound('campaign_not_found');
   }
   final chapter = await _validChapterFromBody(
     request,
@@ -1405,12 +1427,12 @@ Future<Response> _upsertChapterHandler(
     label: 'id de capítulo',
   );
   if (await campaigns.find(request.userId, campaignId) == null) {
-    return _notFound('Campaña no encontrada.');
+    return _notFound('campaign_not_found');
   }
   // Editar solo lo propio: sin esto el `upsert` crearía el capítulo ajeno
   // dentro de esta cuenta, igual que ya cuida `_upsertCampaignHandler`.
   final existing = await chapters.find(request.userId, campaignId, chapterId);
-  if (existing == null) return _notFound('Capítulo no encontrado.');
+  if (existing == null) return _notFound('chapter_not_found');
 
   final chapter = await _validChapterFromBody(
     request,
@@ -1439,7 +1461,7 @@ Future<Response> _deleteChapterHandler(
     label: 'id de capítulo',
   );
   if (await campaigns.find(request.userId, campaignId) == null) {
-    return _notFound('Campaña no encontrada.');
+    return _notFound('campaign_not_found');
   }
   await chapters.delete(request.userId, campaignId, chapterId);
   return _jsonOk({'status': 'ok'});
@@ -1472,7 +1494,7 @@ Future<Response> _grantHeroicInspirationHandler(
   );
 
   final campaign = await campaigns.find(request.userId, campaignId);
-  if (campaign == null) return _notFound('Campaña no encontrada.');
+  if (campaign == null) return _notFound('campaign_not_found');
 
   // La autorización va en la consulta: `findMember` solo resuelve el vínculo
   // si la campaña es de quien pide. Lo ajeno y lo inexistente responden igual.
@@ -1481,7 +1503,7 @@ Future<Response> _grantHeroicInspirationHandler(
     campaignId: campaignId,
     memberId: memberId,
   );
-  if (member == null) return _notFound('Personaje no encontrado.');
+  if (member == null) return _notFound('character_not_found');
 
   await events.append(member.ownerUserId, 'heroic_inspiration_granted', {
     'characterName': member.character.name,
@@ -1521,14 +1543,14 @@ Future<Response> _closeChapterHandler(
       request.userId,
       campaignId,
     );
-    if (campaign == null) return _notFound('Campaña no encontrada.');
+    if (campaign == null) return _notFound('campaign_not_found');
 
     final chapter = await repositories.chapters.find(
       request.userId,
       campaignId,
       chapterId,
     );
-    if (chapter == null) return _notFound('Capítulo no encontrado.');
+    if (chapter == null) return _notFound('chapter_not_found');
     if (chapter.state == ChapterState.completed) {
       return _jsonOk({'status': 'ok'});
     }
@@ -1577,10 +1599,10 @@ Future<Response> _getEncounterHandler(
     label: 'id de campaña',
   );
   if (await campaigns.find(request.userId, campaignId) == null) {
-    return _notFound('Campaña no encontrada.');
+    return _notFound('campaign_not_found');
   }
   final encounter = await encounters.find(request.userId, campaignId);
-  if (encounter == null) return _notFound('No hay ningún combate en curso.');
+  if (encounter == null) return _notFound('no_active_combat');
   return _jsonOk({'encounter': encounter.toJson()});
 }
 
@@ -1596,7 +1618,7 @@ Future<Response> _saveEncounterHandler(
     label: 'id de campaña',
   );
   if (await campaigns.find(request.userId, campaignId) == null) {
-    return _notFound('Campaña no encontrada.');
+    return _notFound('campaign_not_found');
   }
   final body = await _readJsonBody(request);
   final requested = body['encounter'];
@@ -1639,7 +1661,7 @@ Future<Response> _endEncounterHandler(
     label: 'id de campaña',
   );
   if (await campaigns.find(request.userId, campaignId) == null) {
-    return _notFound('Campaña no encontrada.');
+    return _notFound('campaign_not_found');
   }
 
   if (request.url.queryParameters['discard'] == 'true') {
@@ -1766,7 +1788,7 @@ Future<Response> _turnHandler(
     label: 'id de personaje',
   );
   if (!await characters.exists(request.userId, id)) {
-    return _notFound('Personaje no encontrado.');
+    return _notFound('character_not_found');
   }
   final status = await encounters.turnFor(
     userId: request.userId,
@@ -1910,10 +1932,7 @@ Future<Response> _portraitHandler(
     width: width != null && width > 0 ? width : null,
   );
   if (blob == null) {
-    return Response.notFound(
-      jsonEncode({'error': 'Retrato no encontrado.'}),
-      headers: {'content-type': 'application/json'},
-    );
+    return _notFound('portrait_not_found');
   }
   return Response.ok(
     blob.bytes,
@@ -1949,10 +1968,7 @@ Future<Response> _deletePortraitHandler(
     portraitKey: key,
   );
   if (!deleted) {
-    return Response.notFound(
-      jsonEncode({'error': 'Retrato no encontrado.'}),
-      headers: {'content-type': 'application/json'},
-    );
+    return _notFound('portrait_not_found');
   }
   return _jsonOk({'status': 'ok'});
 }
@@ -2023,7 +2039,7 @@ Future<Response> _generatePortraitHandler(
   } on PortraitGenerationFailure catch (e) {
     return Response(
       502,
-      body: jsonEncode({'error': e.message}),
+      body: _errorBody(e.message, e.code),
       headers: {'content-type': 'application/json'},
     );
   }
@@ -2104,21 +2120,23 @@ Middleware get errorHandlingMiddleware => (Handler innerHandler) {
     try {
       return await innerHandler(request);
     } on FormatException catch (e) {
+      // Un solo código para los datos inválidos: el detalle en castellano
+      // dice qué falló, y lo que el cliente traduce es «no son válidos».
       return Response(
         400,
-        body: jsonEncode({'error': e.message}),
+        body: _errorBody(e.message, 'invalid_data'),
         headers: {'content-type': 'application/json'},
       );
     } on UnsupportedDataVersionException catch (e) {
       return Response(
         400,
-        body: jsonEncode({'error': e.toString()}),
+        body: _errorBody(e.toString(), 'unsupported_version'),
         headers: {'content-type': 'application/json'},
       );
     } on PayloadTooLargeException catch (e) {
       return Response(
         413,
-        body: jsonEncode({'error': e.message}),
+        body: _errorBody(e.message, 'payload_too_large'),
         headers: {'content-type': 'application/json'},
       );
     } catch (e, stackTrace) {
@@ -2128,7 +2146,7 @@ Middleware get errorHandlingMiddleware => (Handler innerHandler) {
         '$e\n$stackTrace',
       );
       return Response.internalServerError(
-        body: jsonEncode({'error': 'Error interno del servidor.'}),
+        body: _errorBody('Error interno del servidor.', 'internal_error'),
         headers: {'content-type': 'application/json'},
       );
     }

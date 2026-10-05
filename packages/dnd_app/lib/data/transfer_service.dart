@@ -1,4 +1,4 @@
-// l10n-ignore-file: errores de validación de archivos que se muestran tal cual; la fase 2 los pasa a códigos de error traducibles.
+// l10n-ignore-file: errores sin contexto de interfaz, en los dos idiomas con `localized` (siguen a `ContentLanguage`, que `main.dart` fija con el idioma de la interfaz).
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -76,8 +76,11 @@ class TransferService {
     if (data is Map<String, dynamic> && data['type'] == 'dnd_homebrew') {
       final version = data['formatVersion'];
       if (version is! int || version < 1) {
-        throw const FormatException(
-          'La versión de la exportación de homebrew debe ser un entero positivo.',
+        throw FormatException(
+          localized(
+            'La versión de la exportación de homebrew debe ser un entero positivo.',
+            'The homebrew export version must be a positive integer.',
+          ),
         );
       }
       if (version > formatVersion) {
@@ -104,8 +107,11 @@ class TransferService {
               .toList(),
       };
     }
-    throw const FormatException(
-      'El archivo no es una exportación de homebrew válida.',
+    throw FormatException(
+      localized(
+        'El archivo no es una exportación de homebrew válida.',
+        'The file isn’t a valid homebrew export.',
+      ),
     );
   }
 }

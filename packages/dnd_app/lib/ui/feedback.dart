@@ -150,12 +150,9 @@ class _FeedbackDialogState extends State<_FeedbackDialog> {
       if (mounted) {
         setState(() {
           _sending = false;
-          // El motivo lo escribe el servidor, y en castellano (los errores del
-          // servidor son la fase 2 de la traducción): en otro idioma se
-          // queda en la frase sola antes que mezclar dos idiomas.
-          _error = Localizations.localeOf(context).languageCode == 'es'
-              ? failureMessage(context.l10n.feedbackSendError, e)
-              : '${context.l10n.feedbackSendError}.';
+          // El motivo viene traducido del código del servidor (ver
+          // `ApiClient._errorFrom`), así que va en los dos idiomas.
+          _error = failureMessage(context.l10n.feedbackSendError, e);
         });
       }
     }
