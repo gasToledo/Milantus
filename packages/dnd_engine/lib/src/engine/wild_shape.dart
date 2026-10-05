@@ -66,7 +66,9 @@ ComputedSheet applyWildShape(ComputedSheet base, Creature beast) {
     abilityScores: scores,
     abilityModifiers: mods,
     armorClass: resolved.armorClass,
-    size: beast.creatureSize?.label ?? base.size,
+    // `labelEs` y no `label`: el tamaño de la ficha es el valor de vocabulario
+    // que guarda la especie (`Race.size`), y se traduce al mostrarlo.
+    size: beast.creatureSize?.labelEs ?? base.size,
     speed: beast.walkSpeed,
     // La bestia pone la Destreza; lo demás de la iniciativa (Alerta) es del
     // druida, que en 2024 conserva sus dotes transformado.

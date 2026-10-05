@@ -18,6 +18,8 @@
 /// el texto original, y así el inglés se puede completar de a poco.
 library;
 
+import '../domain/content_vocabulary.dart';
+
 /// Clave de la huella del español dentro de cada entrada de la superposición.
 const translationFingerprintKey = '_es';
 
@@ -131,8 +133,12 @@ List<String> translationProblems(
       continue;
     }
     final paths = translatedPaths(raw).toList();
+    final vocabulary = vocabularyFieldsByCatalog[catalog] ?? const {};
     for (final path in paths) {
-      if (raw[path] is! String) {
+      if (vocabulary.contains(path)) {
+        problems.add('$catalog/$id: «$path» es vocabulario cerrado y se '
+            'traduce al mostrarlo, no en la superposición.');
+      } else if (raw[path] is! String) {
         problems.add('$catalog/$id: «$path» no es un texto.');
       } else if (valueAtPath(entry, path) is! String) {
         problems.add('$catalog/$id: «$path» no existe en español.');

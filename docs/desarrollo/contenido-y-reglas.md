@@ -106,6 +106,13 @@ es la huella del español del que salió la traducción. Lo que no está
 traducido se muestra en español. El formato y su aplicación están en
 `packages/dnd_engine/lib/src/data/content_translation.dart`.
 
+La escuela, el tiempo de lanzamiento, la duración y el alcance de un conjuro,
+y el tamaño y el tipo de una especie **no** van en la superposición: son
+vocabulario cerrado, el homebrew los guarda igual y el motor lee algunos. Se
+traducen al mostrarlos, con la tabla de
+`packages/dnd_engine/lib/src/domain/content_vocabulary.dart`; un valor nuevo
+del catálogo se agrega ahí.
+
 Es la excepción a «no se edita a mano»: la superposición se completa con una
 herramienta y **se corrige a mano**, y la herramienta nunca pisa lo que ya
 está traducido.
@@ -115,7 +122,7 @@ cd packages/dnd_engine && dart run tool/translate_content.dart --fill <directori
 ```
 
 Agrega los nombres que encuentra en 5etools-src (cruce por id, que es su
-slug) y los alcances «N pies», y lista lo que queda para traducir a mano. El
+slug) y lista lo que queda para traducir a mano. El
 directorio se arma bajando, de la revisión pineada
 `e5f3e77b303a92df10487207857200245e71957c` de `5etools-mirror-3/5etools-src`,
 estos archivos de `data/`: `spells/spells-xphb.json`,

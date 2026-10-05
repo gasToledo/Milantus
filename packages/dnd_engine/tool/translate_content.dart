@@ -122,15 +122,6 @@ String? englishName(
   return null;
 }
 
-/// Campos cortos que se traducen solos por patrón, sin 5etools.
-String? _patternTranslation(String path, String spanish) {
-  if (path == 'range') {
-    final feet = RegExp(r'^(\d+) pies$').firstMatch(spanish);
-    if (feet != null) return '${feet[1]} feet';
-  }
-  return null;
-}
-
 /// Resultado de [fillOverlay]: la superposición nueva y lo que no se pudo
 /// completar o no se tocó.
 typedef FillResult = ({Map<String, dynamic> overlay, List<String> pending});
@@ -167,11 +158,6 @@ FillResult fillOverlay(
       } else {
         pending.add('$catalog/$id: sin nombre en 5etools (${entry['name']}).');
       }
-    }
-    for (final MapEntry(key: path, value: spanish) in entry.entries) {
-      if (spanish is! String || current.containsKey(path)) continue;
-      final translated = _patternTranslation(path, spanish);
-      if (translated != null) added[path] = translated;
     }
     if (current.isEmpty && added.isEmpty) continue;
     final texts = {

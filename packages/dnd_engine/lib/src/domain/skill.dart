@@ -1,39 +1,63 @@
 import 'ability.dart';
+import 'content_language.dart';
 import 'name_sort.dart';
 
-/// Las 18 habilidades de 5e (SRD 5.2), con su nombre en español y la
-/// característica que las gobierna.
+/// Las 18 habilidades de 5e (SRD 5.2), con su nombre en español y en inglés y
+/// la característica que las gobierna.
 ///
 /// El contenido (clases, especies, trasfondos) referencia habilidades por [id];
 /// este enum es la única fuente de la traducción y del vínculo con la
 /// característica, para que no se repartan por la UI.
 enum Skill {
-  acrobatics('acrobatics', 'Acrobacias', Ability.dexterity),
-  animalHandling('animal-handling', 'Trato con Animales', Ability.wisdom),
-  arcana('arcana', 'Arcanos', Ability.intelligence),
-  athletics('athletics', 'Atletismo', Ability.strength),
-  deception('deception', 'Engaño', Ability.charisma),
-  history('history', 'Historia', Ability.intelligence),
-  insight('insight', 'Perspicacia', Ability.wisdom),
-  intimidation('intimidation', 'Intimidación', Ability.charisma),
-  investigation('investigation', 'Investigación', Ability.intelligence),
-  medicine('medicine', 'Medicina', Ability.wisdom),
-  nature('nature', 'Naturaleza', Ability.intelligence),
-  perception('perception', 'Percepción', Ability.wisdom),
-  performance('performance', 'Interpretación', Ability.charisma),
-  persuasion('persuasion', 'Persuasión', Ability.charisma),
-  religion('religion', 'Religión', Ability.intelligence),
-  sleightOfHand('sleight-of-hand', 'Juego de Manos', Ability.dexterity),
-  stealth('stealth', 'Sigilo', Ability.dexterity),
-  survival('survival', 'Supervivencia', Ability.wisdom);
+  acrobatics('acrobatics', 'Acrobacias', 'Acrobatics', Ability.dexterity),
+  animalHandling(
+    'animal-handling',
+    'Trato con Animales',
+    'Animal Handling',
+    Ability.wisdom,
+  ),
+  arcana('arcana', 'Arcanos', 'Arcana', Ability.intelligence),
+  athletics('athletics', 'Atletismo', 'Athletics', Ability.strength),
+  deception('deception', 'Engaño', 'Deception', Ability.charisma),
+  history('history', 'Historia', 'History', Ability.intelligence),
+  insight('insight', 'Perspicacia', 'Insight', Ability.wisdom),
+  intimidation(
+    'intimidation',
+    'Intimidación',
+    'Intimidation',
+    Ability.charisma,
+  ),
+  investigation(
+    'investigation',
+    'Investigación',
+    'Investigation',
+    Ability.intelligence,
+  ),
+  medicine('medicine', 'Medicina', 'Medicine', Ability.wisdom),
+  nature('nature', 'Naturaleza', 'Nature', Ability.intelligence),
+  perception('perception', 'Percepción', 'Perception', Ability.wisdom),
+  performance('performance', 'Interpretación', 'Performance', Ability.charisma),
+  persuasion('persuasion', 'Persuasión', 'Persuasion', Ability.charisma),
+  religion('religion', 'Religión', 'Religion', Ability.intelligence),
+  sleightOfHand(
+    'sleight-of-hand',
+    'Juego de Manos',
+    'Sleight of Hand',
+    Ability.dexterity,
+  ),
+  stealth('stealth', 'Sigilo', 'Stealth', Ability.dexterity),
+  survival('survival', 'Supervivencia', 'Survival', Ability.wisdom);
 
-  const Skill(this.id, this.label, this.ability);
+  const Skill(this.id, this.labelEs, this.labelEn, this.ability);
 
   /// Id usado por el contenido JSON (p.ej. `sleight-of-hand`).
   final String id;
 
-  /// Nombre en español, para la UI.
-  final String label;
+  final String labelEs;
+  final String labelEn;
+
+  /// Nombre en el idioma activo, para la UI.
+  String get label => localized(labelEs, labelEn);
 
   /// Característica que gobierna la habilidad.
   final Ability ability;

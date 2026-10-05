@@ -1,3 +1,5 @@
+import 'content_language.dart';
+
 /// Las seis características de D&D 5e y utilidades derivadas.
 enum Ability {
   strength,
@@ -20,42 +22,72 @@ enum Ability {
         Ability.charisma => 'CHA',
       };
 
-  /// Abreviatura de 3 letras para la interfaz, la del SRD en castellano
-  /// (FUE, DES, ...).
-  String get abbr => switch (this) {
-        Ability.strength => 'FUE',
-        Ability.dexterity => 'DES',
-        Ability.constitution => 'CON',
-        Ability.intelligence => 'INT',
-        Ability.wisdom => 'SAB',
-        Ability.charisma => 'CAR',
-      };
+  /// Abreviatura de 3 letras para la interfaz en el idioma activo: la del SRD
+  /// en castellano (FUE, DES, ...) o en inglés (STR, DEX, ...). En inglés
+  /// coincide con [code], pero no es lo mismo: [code] es un dato y no cambia.
+  String get abbr => localized(
+        switch (this) {
+          Ability.strength => 'FUE',
+          Ability.dexterity => 'DES',
+          Ability.constitution => 'CON',
+          Ability.intelligence => 'INT',
+          Ability.wisdom => 'SAB',
+          Ability.charisma => 'CAR',
+        },
+        code,
+      );
 
-  /// Nombre en español de la característica (para la UI).
-  String get label => switch (this) {
-        Ability.strength => 'Fuerza',
-        Ability.dexterity => 'Destreza',
-        Ability.constitution => 'Constitución',
-        Ability.intelligence => 'Inteligencia',
-        Ability.wisdom => 'Sabiduría',
-        Ability.charisma => 'Carisma',
-      };
+  /// Nombre de la característica en el idioma activo (para la UI).
+  String get label => localized(
+        switch (this) {
+          Ability.strength => 'Fuerza',
+          Ability.dexterity => 'Destreza',
+          Ability.constitution => 'Constitución',
+          Ability.intelligence => 'Inteligencia',
+          Ability.wisdom => 'Sabiduría',
+          Ability.charisma => 'Carisma',
+        },
+        switch (this) {
+          Ability.strength => 'Strength',
+          Ability.dexterity => 'Dexterity',
+          Ability.constitution => 'Constitution',
+          Ability.intelligence => 'Intelligence',
+          Ability.wisdom => 'Wisdom',
+          Ability.charisma => 'Charisma',
+        },
+      );
 
   /// Descripción corta de qué mide la característica (para tooltips y ayuda).
-  String get description => switch (this) {
-        Ability.strength =>
-          'Potencia física. Pruebas de Atletismo, cargar peso y el daño de la mayoría de armas cuerpo a cuerpo.',
-        Ability.dexterity =>
-          'Agilidad y reflejos. CA sin armadura pesada, iniciativa, Sigilo y Acrobacias, y los ataques a distancia y con armas sutiles.',
-        Ability.constitution =>
-          'Salud y aguante. Determina tus puntos de golpe y las salvaciones para mantener la concentración.',
-        Ability.intelligence =>
-          'Razonamiento y memoria. Arcanos, Historia e Investigación; es la característica de lanzamiento del Mago.',
-        Ability.wisdom =>
-          'Percepción e intuición. Percepción, Perspicacia y Supervivencia; lanzamiento del Clérigo, el Druida y el Explorador.',
-        Ability.charisma =>
-          'Fuerza de personalidad. Persuasión, Engaño e Intimidación; lanzamiento del Bardo, el Hechicero, el Brujo y el Paladín.',
-      };
+  String get description => localized(
+        switch (this) {
+          Ability.strength =>
+            'Potencia física. Pruebas de Atletismo, cargar peso y el daño de la mayoría de armas cuerpo a cuerpo.',
+          Ability.dexterity =>
+            'Agilidad y reflejos. CA sin armadura pesada, iniciativa, Sigilo y Acrobacias, y los ataques a distancia y con armas sutiles.',
+          Ability.constitution =>
+            'Salud y aguante. Determina tus puntos de golpe y las salvaciones para mantener la concentración.',
+          Ability.intelligence =>
+            'Razonamiento y memoria. Arcanos, Historia e Investigación; es la característica de lanzamiento del Mago.',
+          Ability.wisdom =>
+            'Percepción e intuición. Percepción, Perspicacia y Supervivencia; lanzamiento del Clérigo, el Druida y el Explorador.',
+          Ability.charisma =>
+            'Fuerza de personalidad. Persuasión, Engaño e Intimidación; lanzamiento del Bardo, el Hechicero, el Brujo y el Paladín.',
+        },
+        switch (this) {
+          Ability.strength =>
+            'Physical might. Athletics checks, carrying weight, and the damage of most melee weapons.',
+          Ability.dexterity =>
+            'Agility and reflexes. AC without heavy armor, initiative, Stealth and Acrobatics, and ranged and finesse weapon attacks.',
+          Ability.constitution =>
+            'Health and stamina. Sets your hit points and the saving throws to keep concentration.',
+          Ability.intelligence =>
+            'Reasoning and memory. Arcana, History, and Investigation; the Wizard’s spellcasting ability.',
+          Ability.wisdom =>
+            'Perception and intuition. Perception, Insight, and Survival; spellcasting for the Cleric, Druid, and Ranger.',
+          Ability.charisma =>
+            'Force of personality. Persuasion, Deception, and Intimidation; spellcasting for the Bard, Sorcerer, Warlock, and Paladin.',
+        },
+      );
 
   /// Resuelve una característica desde su nombre de enum ("strength") o su
   /// código ("STR"), sin distinguir mayúsculas.

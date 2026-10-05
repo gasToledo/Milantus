@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:test/test.dart';
 
+import 'support/translation_equivalence.dart';
+
 /// Chequeos de integridad sobre el contenido real del SRD 2024. Atrapa datos
 /// mal referenciados (una dote inexistente, una maestría inválida) apenas se
 /// cargan, sin necesidad de recorrer la app.
@@ -1763,6 +1765,17 @@ void main() {
       // `apply_voseo.dart`), `dart run tool/translate_content.dart --refresh`
       // recalcula las huellas; si cambió el sentido, hay que retraducir.
       expect(problemas, isEmpty, reason: problemas.join('\n'));
+    });
+
+    test('el catálogo en inglés deduce las mismas reglas que en español',
+        () async {
+      // Del texto de una criatura salen su tipo, su tamaño, sus sentidos y si
+      // vuela; si una traducción a mano rompe el patrón, cambia una regla.
+      final en = await ContentRepository.loadFromDirectory(
+        'lib/assets/srd_2024',
+        translation: 'en',
+      );
+      expect(mechanicalDifferences(repo, en), isEmpty);
     });
   });
 }

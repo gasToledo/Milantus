@@ -54,16 +54,15 @@ void main() {
 
   group('fillOverlay', () {
     final pack = [
-      {'id': 'magic-missile', 'name': 'Proyectil Mágico', 'range': '120 pies'},
-      {'id': 'toque-raro', 'name': 'Toque Raro', 'range': 'Toque'},
+      {'id': 'magic-missile', 'name': 'Proyectil Mágico'},
+      {'id': 'toque-raro', 'name': 'Toque Raro'},
     ];
     String? nameFor(String id) => englishName(index, ['spell'], id);
 
-    test('completa nombres y alcances, y lista lo que falta', () {
+    test('completa los nombres y lista lo que falta', () {
       final r = fillOverlay('spells', pack, {}, nameFor);
       final misil = r.overlay['magic-missile'] as Map<String, dynamic>;
       expect(misil['name'], 'Magic Missile');
-      expect(misil['range'], '120 feet');
       expect(translationProblems('spells', pack, r.overlay), isEmpty);
       expect(r.pending, [contains('spells/toque-raro')]);
     });
@@ -84,7 +83,6 @@ void main() {
       final r = fillOverlay('spells', pack, aMano, nameFor).overlay;
       final misil = r['magic-missile'] as Map<String, dynamic>;
       expect(misil['name'], 'Magic Dart');
-      expect(misil['range'], '120 feet');
       expect(translationProblems('spells', pack, r), isEmpty);
     });
 

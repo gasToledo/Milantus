@@ -1,4 +1,5 @@
 import 'ability.dart';
+import 'content_language.dart';
 import 'content_source.dart';
 import 'skill.dart';
 
@@ -9,28 +10,31 @@ import 'skill.dart';
 /// neutral") y no se puede filtrar sin parsearlo. El campo estructurado manda
 /// cuando está; [fromKind] cubre a las entradas viejas que solo tienen `kind`.
 enum CreatureType {
-  aberration('aberration', 'Aberración'),
-  construct('construct', 'Constructo'),
-  beast('beast', 'Bestia'),
-  celestial('celestial', 'Celestial'),
-  ooze('ooze', 'Cieno'),
-  dragon('dragon', 'Dragón'),
-  elemental('elemental', 'Elemental'),
-  fey('fey', 'Feérico'),
-  fiend('fiend', 'Infernal'),
-  giant('giant', 'Gigante'),
-  humanoid('humanoid', 'Humanoide'),
-  monstrosity('monstrosity', 'Monstruosidad'),
-  plant('plant', 'Planta'),
-  undead('undead', 'Muerto viviente');
+  aberration('aberration', 'Aberración', 'Aberration'),
+  construct('construct', 'Constructo', 'Construct'),
+  beast('beast', 'Bestia', 'Beast'),
+  celestial('celestial', 'Celestial', 'Celestial'),
+  ooze('ooze', 'Cieno', 'Ooze'),
+  dragon('dragon', 'Dragón', 'Dragon'),
+  elemental('elemental', 'Elemental', 'Elemental'),
+  fey('fey', 'Feérico', 'Fey'),
+  fiend('fiend', 'Infernal', 'Fiend'),
+  giant('giant', 'Gigante', 'Giant'),
+  humanoid('humanoid', 'Humanoide', 'Humanoid'),
+  monstrosity('monstrosity', 'Monstruosidad', 'Monstrosity'),
+  plant('plant', 'Planta', 'Plant'),
+  undead('undead', 'Muerto viviente', 'Undead');
 
-  const CreatureType(this.id, this.label);
+  const CreatureType(this.id, this.labelEs, this.labelEn);
 
   /// Id usado por el contenido JSON.
   final String id;
 
-  /// Nombre en español, para la UI.
-  final String label;
+  final String labelEs;
+  final String labelEn;
+
+  /// Nombre en el idioma activo, para la UI.
+  String get label => localized(labelEs, labelEn);
 
   /// La etiqueta es femenina, y el tamaño que la acompaña tiene que concordar:
   /// «Bestia Mediana» pero «Gigante Grande». Solo hace falta para componer la
@@ -59,9 +63,23 @@ enum CreatureType {
   /// `undead` va primero porque su etiqueta son dos palabras y comparte la
   /// primera con nada más, pero el resto se compara por prefijo y un tipo cuya
   /// etiqueta fuera prefijo de otra se resolvería mal; hoy ninguna lo es.
+  ///
+  /// Reconoce también la línea en inglés del SRD, que va en otro orden
+  /// («Tiny Beast, Unaligned», «Medium Swarm of Tiny Beasts»): el catálogo en
+  /// inglés traduce `kind` por superposición, y el tipo tiene que salir igual
+  /// (lo verifica la equivalencia de `content_integrity_test`).
+  ///
+  /// Un enjambre («Enjambre Mediano de bestias Diminutas», «Medium Swarm of
+  /// Tiny Beasts») no tiene un tipo solo y da null en los dos idiomas: así lo
+  /// leía el español desde siempre, y darle tipo lo sumaría a las formas de
+  /// Forma Salvaje, que es una decisión de reglas y no de traducción.
   static CreatureType? fromKind(String kind) {
+    if (kind.startsWith('Enjambre') || kind.contains('Swarm of')) return null;
     for (final t in CreatureType.values) {
-      if (kind.startsWith(t.label)) return t;
+      if (kind.startsWith(t.labelEs)) return t;
+    }
+    for (final t in CreatureType.values) {
+      if (RegExp('\\b${t.labelEn}s?\\b').hasMatch(kind)) return t;
     }
     // El catálogo viejo traduce `construct` como «Autómata» en algunas
     // entradas, siguiendo el glosario del SRD en español.
@@ -76,18 +94,30 @@ enum CreatureType {
 /// [fromKind] reconoce además la femenina porque el perfil concuerda con el
 /// tipo ("Bestia Mediana" pero "Gigante Grande").
 enum CreatureSize {
-  tiny('tiny', 'Diminuto', 'Diminuta'),
-  small('small', 'Pequeño', 'Pequeña'),
-  medium('medium', 'Mediano', 'Mediana'),
-  large('large', 'Grande', 'Grande'),
-  huge('huge', 'Enorme', 'Enorme'),
-  gargantuan('gargantuan', 'Gargantuesco', 'Gargantuesca');
+  tiny('tiny', 'Diminuto', 'Diminuta', 'Tiny'),
+  small('small', 'Pequeño', 'Pequeña', 'Small'),
+  medium('medium', 'Mediano', 'Mediana', 'Medium'),
+  large('large', 'Grande', 'Grande', 'Large'),
+  huge('huge', 'Enorme', 'Enorme', 'Huge'),
+  gargantuan('gargantuan', 'Gargantuesco', 'Gargantuesca', 'Gargantuan');
 
-  const CreatureSize(this.id, this.label, this.feminineLabel);
+  const CreatureSize(
+    this.id,
+    this.labelEs,
+    this.feminineLabelEs,
+    this.labelEn,
+  );
 
   final String id;
-  final String label;
-  final String feminineLabel;
+  final String labelEs;
+  final String feminineLabelEs;
+  final String labelEn;
+
+  /// Nombre en el idioma activo, en masculino.
+  String get label => localized(labelEs, labelEn);
+
+  /// La forma femenina en el idioma activo; el inglés no concuerda.
+  String get feminineLabel => localized(feminineLabelEs, labelEn);
 
   String toJson() => id;
 
@@ -102,9 +132,25 @@ enum CreatureSize {
   /// Busca el tamaño en cualquier posición de un [Creature.kind]. No se toma la
   /// última palabra: eso funciona para "Bestia Mediana" pero no para "Gigante
   /// Grande, caótico malvado", donde el tamaño queda en el medio.
+  ///
+  /// En inglés el tamaño va primero («Medium Swarm of Tiny Beasts»), y se lee
+  /// de ahí por la misma razón que la última palabra no sirve en español.
+  ///
+  /// En español gana el tamaño que aparece **primero**: en «Enjambre Mediano
+  /// de bestias Diminutas» el tamaño del enjambre es Mediano, y recorrer el
+  /// enum en orden devolvía Diminuto.
   static CreatureSize? fromKind(String kind) {
+    CreatureSize? first;
+    var firstAt = kind.length;
     for (final s in CreatureSize.values) {
-      if (kind.contains(s.label) || kind.contains(s.feminineLabel)) return s;
+      for (final label in [s.labelEs, s.feminineLabelEs]) {
+        final at = kind.indexOf(label);
+        if (at >= 0 && at < firstAt) (first, firstAt) = (s, at);
+      }
+    }
+    if (first != null) return first;
+    for (final s in CreatureSize.values) {
+      if (kind.startsWith(s.labelEn)) return s;
     }
     return null;
   }
@@ -323,17 +369,20 @@ class CreatureTrait {
 /// parseo y el render. Un enum tampoco admite los estados imposibles que sí
 /// permitirían cuatro booleanos.
 enum CreatureActionKind {
-  action('action', 'Acción'),
-  bonus('bonus', 'Acción adicional'),
-  reaction('reaction', 'Reacción'),
-  legendary('legendary', 'Acción legendaria');
+  action('action', 'Acción', 'Action'),
+  bonus('bonus', 'Acción adicional', 'Bonus action'),
+  reaction('reaction', 'Reacción', 'Reaction'),
+  legendary('legendary', 'Acción legendaria', 'Legendary action');
 
-  const CreatureActionKind(this.id, this.label);
+  const CreatureActionKind(this.id, this.labelEs, this.labelEn);
 
   final String id;
 
-  /// Nombre en español, para la UI.
-  final String label;
+  final String labelEs;
+  final String labelEn;
+
+  /// Nombre en el idioma activo, para la UI.
+  String get label => localized(labelEs, labelEn);
 
   String toJson() => id;
 
@@ -691,10 +740,12 @@ class Creature {
   CreatureSize? get creatureSize => size ?? CreatureSize.fromKind(kind);
 
   /// Percepción pasiva, del campo propio o leída de [senses] ("Percepción
-  /// pasiva 16"), que es donde la escriben las entradas viejas.
+  /// pasiva 16", o en inglés "Passive Perception 16"), que es donde la
+  /// escriben las entradas viejas.
   int? get passivePerceptionValue {
     if (passivePerception != null) return passivePerception;
-    final m = RegExp(r'Percepción pasiva (\d+)').firstMatch(senses);
+    final m = RegExp(r'(?:Percepción pasiva|Passive Perception) (\d+)')
+        .firstMatch(senses);
     return m == null ? null : int.tryParse(m.group(1)!);
   }
 
@@ -707,7 +758,7 @@ class Creature {
   bool get isBeast => creatureType == CreatureType.beast;
 
   /// Tiene velocidad volando, que la Forma Salvaje prohíbe hasta nivel 8.
-  bool get canFly => speed.contains('volar');
+  bool get canFly => RegExp(r'volar|\b[Ff]ly\b').hasMatch(speed);
 
   /// Velocidad de caminar en pies, leída del principio de [speed]
   /// ("30 pies, trepar 30 pies" → 30), o 0 si no arranca con un número.
@@ -720,7 +771,8 @@ class Creature {
   /// Alcance de la visión en la oscuridad en pies, leído de [senses], o null si
   /// la criatura no la tiene.
   int? get darkvision {
-    final m = RegExp(r'visión en la oscuridad (\d+)').firstMatch(senses);
+    final m = RegExp(r'(?:visión en la oscuridad|[Dd]arkvision) (\d+)')
+        .firstMatch(senses);
     return m == null ? null : int.tryParse(m.group(1)!);
   }
 

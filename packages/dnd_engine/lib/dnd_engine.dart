@@ -4,6 +4,8 @@ library dnd_engine;
 
 export 'src/domain/ability.dart';
 export 'src/domain/alignment.dart';
+export 'src/domain/content_language.dart';
+export 'src/domain/content_vocabulary.dart';
 export 'src/domain/data_version.dart';
 export 'src/domain/damage_type.dart';
 export 'src/domain/language.dart';

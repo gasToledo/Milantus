@@ -168,18 +168,32 @@ el SRD dicen cosas distintas, gana el SRD.
 | en curso, en pausa, terminada | in progress, paused, finished | Estados de una campaña. |
 | pies | feet, ft | |
 | po, pp, pe, pc, pl | gp, sp, ep, cp, pp | Monedas: el SRD en inglés las nombra así. |
+| FUE, DES, CON, INT, SAB, CAR | STR, DEX, CON, INT, WIS, CHA | `Ability.abbr`. |
+| habilidad (Juego de Manos, Trato con Animales…) | skill (Sleight of Hand, Animal Handling…) | `Skill.labelEn`. |
+| tipos de daño (Contundente, Relámpago…) | Bludgeoning, Lightning… | `DamageType`. |
+| condiciones (Derribado, Apresado…) | Prone, Restrained… | |
+| entrenamiento con armadura, armas simples/marciales | armor training, Simple/Martial weapons | `proficiency_labels.dart`. |
+| herramientas (Herramientas de ladrón…) | tools (Thieves' Tools…) | Con mayúsculas, como el SRD. |
+| propiedades y maestrías de arma (Sutil, Derribar…) | weapon properties and masteries (Finesse, Topple…) | «A distancia» es «Range». |
+| idiomas (Jerga de ladrones…) | languages (Thieves' Cant…) | |
+| escuelas (Ilusionismo, Nigromancia…) | schools (Illusion, Necromancy…) | `content_vocabulary.dart`. |
+| Acción, Acción Adicional, Reacción | Action, Bonus Action, Reaction | Tiempo de lanzamiento. |
+| Personal, Toque | Self, Touch | Alcance de un conjuro. |
+| tipos de criatura (Feérico, Infernal, Muerto viviente…) | Fey, Fiend, Undead… | «Autómata» también es «Construct». |
+
+La fuente de cada término es su tabla en el motor; esta lista es para
+encontrarlos, no una segunda fuente. `vocabulary_language_test` exige que
+cada rótulo tenga su inglés.
 
 ### Qué sigue en español
 
-Por ahora **no** se traducen, y cada uno lo declara con `l10n-ignore` y su
-motivo:
+La fase 2 (change `add-english-content`) lleva al inglés el vocabulario del
+motor, el catálogo y los errores. Mientras se completa, lo que todavía no se
+traduce lo declara su `l10n-ignore` con el motivo «fase 2»: los errores
+técnicos de red y de archivos (`api_client.dart`, `lib/data/*`), el prompt
+del generador de retratos y el catálogo que aún no tiene su `X.en.json`.
 
-- El catálogo del reglamento (clases, dotes, conjuros, criaturas, condiciones,
-  nombres de habilidades y de tipos de daño): es contenido, no interfaz.
-- Los errores técnicos de red y de archivos que se muestran tal cual
-  (`api_client.dart`, `lib/data/*`).
-- El prompt del generador de retratos.
-
-Cuando una pantalla nueva muestre algo de esa lista, el marco (títulos,
-botones, avisos) va en los dos idiomas y solo el nombre del catálogo queda en
-español.
+El vocabulario del motor ya está en los dos idiomas: se lee con `label`
+(sigue a `ContentLanguage.current`) y nunca con un texto copiado en un widget.
+Lo que una persona escribe —homebrew, notas, nombres— se muestra tal como se
+escribió, en cualquier idioma.

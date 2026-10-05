@@ -1,6 +1,7 @@
+import 'content_language.dart';
 import 'name_sort.dart';
 
-/// Los idiomas del SRD 5.2.1, con su nombre en español.
+/// Los idiomas del SRD 5.2.1, con su nombre en español y en inglés.
 ///
 /// El contenido los referencia por [id] en inglés, que es la clave estable que
 /// viaja en JSON y en los personajes guardados; la traducción vive solo acá,
@@ -15,44 +16,48 @@ enum Language {
   //
   // Común va primero porque todo personaje lo sabe y no ocupa una de las dos
   // elecciones.
-  common('common', 'Común', standard: true),
-  draconic('draconic', 'Dracónico', standard: true),
-  dwarvish('dwarvish', 'Enano', standard: true),
-  elvish('elvish', 'Elfo', standard: true),
-  giant('giant', 'Gigante', standard: true),
-  gnomish('gnomish', 'Gnomo', standard: true),
-  goblin('goblin', 'Goblin', standard: true),
-  halfling('halfling', 'Mediano', standard: true),
-  orc('orc', 'Orco', standard: true),
+  common('common', 'Común', 'Common', standard: true),
+  draconic('draconic', 'Dracónico', 'Draconic', standard: true),
+  dwarvish('dwarvish', 'Enano', 'Dwarvish', standard: true),
+  elvish('elvish', 'Elfo', 'Elvish', standard: true),
+  giant('giant', 'Gigante', 'Giant', standard: true),
+  gnomish('gnomish', 'Gnomo', 'Gnomish', standard: true),
+  goblin('goblin', 'Goblin', 'Goblin', standard: true),
+  halfling('halfling', 'Mediano', 'Halfling', standard: true),
+  orc('orc', 'Orco', 'Orc', standard: true),
   commonSignLanguage(
     'common-sign-language',
     'Lengua de signos común',
+    'Common Sign Language',
     standard: true,
   ),
 
   // --- Inusuales: secretos o de otros planos. Solo por rasgo. ---
-  abyssal('abyssal', 'Abisal'),
-  celestial('celestial', 'Celestial'),
-  deepSpeech('deep-speech', 'Habla de las profundidades'),
-  druidic('druidic', 'Druídico'),
-  infernal('infernal', 'Infernal'),
+  abyssal('abyssal', 'Abisal', 'Abyssal'),
+  celestial('celestial', 'Celestial', 'Celestial'),
+  deepSpeech('deep-speech', 'Habla de las profundidades', 'Deep Speech'),
+  druidic('druidic', 'Druídico', 'Druidic'),
+  infernal('infernal', 'Infernal', 'Infernal'),
 
   /// Incluye los dialectos acuano, aurano, ígneo y terrano, que se entienden
   /// entre sí. Va como una sola entrada porque así lo presenta la tabla del
   /// SRD y porque mecánicamente son el mismo idioma.
-  primordial('primordial', 'Primordial'),
+  primordial('primordial', 'Primordial', 'Primordial'),
 
-  sylvan('sylvan', 'Silvano'),
-  thievesCant('thieves-cant', 'Jerga de ladrones'),
-  undercommon('undercommon', 'Infracomún');
+  sylvan('sylvan', 'Silvano', 'Sylvan'),
+  thievesCant('thieves-cant', 'Jerga de ladrones', "Thieves' Cant"),
+  undercommon('undercommon', 'Infracomún', 'Undercommon');
 
-  const Language(this.id, this.label, {this.standard = false});
+  const Language(this.id, this.labelEs, this.labelEn, {this.standard = false});
 
   /// Id usado por el contenido JSON y por los personajes guardados.
   final String id;
 
-  /// Nombre en español, para la UI.
-  final String label;
+  final String labelEs;
+  final String labelEn;
+
+  /// Nombre en el idioma activo, para la UI.
+  String get label => localized(labelEs, labelEn);
 
   /// Si figura en la tabla "Idiomas estándar" y por lo tanto se puede elegir
   /// al crear el personaje.

@@ -1,5 +1,5 @@
-/// Nombres en español de las competencias que la ficha muestra como texto:
-/// entrenamiento con armadura, categorías de arma y herramientas.
+/// Nombres de las competencias que la ficha muestra como texto: entrenamiento
+/// con armadura, categorías de arma y herramientas, en español y en inglés.
 ///
 /// Mismo criterio que [DamageType]: el contenido las referencia por su id en
 /// inglés —la clave estable que viaja en los JSON y en los personajes
@@ -9,6 +9,7 @@
 /// vez de fallar, porque el mismo camino procesa homebrew e importaciones.
 library;
 
+import 'content_language.dart';
 import 'damage_type.dart' show DamageType;
 import 'name_sort.dart';
 
@@ -18,6 +19,13 @@ const _armorLabels = <String, String>{
   'medium': 'Armadura media',
   'heavy': 'Armadura pesada',
   'shield': 'Escudos',
+};
+
+const _armorLabelsEn = <String, String>{
+  'light': 'Light armor',
+  'medium': 'Medium armor',
+  'heavy': 'Heavy armor',
+  'shield': 'Shields',
 };
 
 /// Categorías de arma. Las variantes `-ranged` y `-melee` existen porque hay
@@ -30,6 +38,15 @@ const _weaponLabels = <String, String>{
   'martial': 'Armas marciales',
   'martial-melee': 'Armas marciales cuerpo a cuerpo',
   'martial-ranged': 'Armas marciales a distancia',
+};
+
+const _weaponLabelsEn = <String, String>{
+  'simple': 'Simple weapons',
+  'simple-melee': 'Simple melee weapons',
+  'simple-ranged': 'Simple ranged weapons',
+  'martial': 'Martial weapons',
+  'martial-melee': 'Martial melee weapons',
+  'martial-ranged': 'Martial ranged weapons',
 };
 
 /// Herramientas del capítulo 6 del PHB 2024, con el nombre de la tabla
@@ -81,6 +98,51 @@ const _toolLabels = <String, String>{
   'thieves-tools': 'Herramientas de ladrón',
 };
 
+/// Los nombres en inglés del SRD 5.2.1. Las claves tienen que ser las mismas
+/// que en [_toolLabels]: lo verifica `vocabulary_language_test`.
+const _toolLabelsEn = <String, String>{
+  'artisans-tools': "Artisan's Tools",
+  'alchemists-supplies': "Alchemist's Supplies",
+  'brewers-supplies': "Brewer's Supplies",
+  'calligraphers-supplies': "Calligrapher's Supplies",
+  'carpenters-tools': "Carpenter's Tools",
+  'cartographers-tools': "Cartographer's Tools",
+  'cobblers-tools': "Cobbler's Tools",
+  'cooks-utensils': "Cook's Utensils",
+  'glassblowers-tools': "Glassblower's Tools",
+  'jewelers-tools': "Jeweler's Tools",
+  'leatherworkers-tools': "Leatherworker's Tools",
+  'masons-tools': "Mason's Tools",
+  'painters-supplies': "Painter's Supplies",
+  'potters-tools': "Potter's Tools",
+  'smiths-tools': "Smith's Tools",
+  'tinkers-tools': "Tinker's Tools",
+  'weavers-tools': "Weaver's Tools",
+  'woodcarvers-tools': "Woodcarver's Tools",
+  'disguise-kit': 'Disguise Kit',
+  'forgery-kit': 'Forgery Kit',
+  'gaming-set': 'Gaming Set',
+  'dice-set': 'Dice',
+  'dragonchess-set': 'Dragonchess',
+  'playing-card-set': 'Playing Cards',
+  'three-dragon-ante-set': 'Three-Dragon Ante',
+  'herbalism-kit': 'Herbalism Kit',
+  'musical-instrument': 'Musical Instrument',
+  'bagpipes': 'Bagpipes',
+  'drum': 'Drum',
+  'dulcimer': 'Dulcimer',
+  'flute': 'Flute',
+  'horn': 'Horn',
+  'lute': 'Lute',
+  'lyre': 'Lyre',
+  'pan-flute': 'Pan Flute',
+  'shawm': 'Shawm',
+  'viol': 'Viol',
+  'navigators-tools': "Navigator's Tools",
+  'poisoner-kit': "Poisoner's Kit",
+  'thieves-tools': "Thieves' Tools",
+};
+
 const artisanToolProficiencyIds = <String>[
   'alchemists-supplies',
   'brewers-supplies',
@@ -122,7 +184,8 @@ const musicalInstrumentProficiencyIds = <String>[
 ];
 
 /// Nombre del entrenamiento con armadura [id] ("light" → "Armadura ligera").
-String armorTrainingLabel(String id) => _armorLabels[id] ?? titleCaseId(id);
+String armorTrainingLabel(String id) =>
+    localized(_armorLabels, _armorLabelsEn)[id] ?? titleCaseId(id);
 
 /// Las categorías de armadura que se pueden conceder, para ofrecerlas en un
 /// selector. Existe por lo mismo que [toolProficiencyIds]: la tabla es privada
@@ -140,12 +203,16 @@ List<String> get weaponProficiencyIds => _weaponLabels.keys.toList();
 /// la competencia debe consultar primero al repositorio y usar esta función
 /// solo cuando no haya arma con ese id.
 String weaponProficiencyLabel(String id) =>
-    _weaponLabels[id] ?? titleCaseId(id);
+    localized(_weaponLabels, _weaponLabelsEn)[id] ?? titleCaseId(id);
 
 /// Nombre de la herramienta [id] ("thieves-tools" → "Herramientas de ladrón").
-String toolProficiencyLabel(String id) => _toolLabels[id] ?? titleCaseId(id);
+String toolProficiencyLabel(String id) =>
+    localized(_toolLabels, _toolLabelsEn)[id] ?? titleCaseId(id);
 
 /// El nombre español de una herramienta conocida, o null si el id no es una.
+///
+/// Siempre en español, sea cual sea [ContentLanguage.current]: es el nombre
+/// del catálogo, que es la fuente, y el inglés le llega por superposición.
 ///
 /// A diferencia de [toolProficiencyLabel], que siempre devuelve algo, esto
 /// distingue "no la conozco" de "se llama así". Lo usan el generador del
