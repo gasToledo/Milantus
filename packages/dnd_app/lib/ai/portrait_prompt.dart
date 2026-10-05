@@ -1,7 +1,12 @@
-// l10n-ignore-file: el prompt del generador de imágenes se redacta en español a propósito, y los estilos son valores guardados; traducirlos es una decisión de la fase 2.
+// l10n-ignore-file: el prompt del generador de imágenes se redacta en inglés a propósito, sea cual sea el idioma de la interfaz; no es texto que se muestre.
 import 'package:dnd_engine/dnd_engine.dart';
 
 /// Estilos predeterminados para la generación de retratos.
+///
+/// Son los valores que se guardan en los ajustes, en castellano desde antes
+/// de que hubiera inglés: no se cambian. Lo que se muestra sale de
+/// `_styleLabel` (pantalla de retratos) y lo que viaja en el prompt, de
+/// [_styleEnglish].
 const portraitStyles = <String>[
   'Arte digital de fantasía',
   'Óleo clásico',
@@ -12,9 +17,31 @@ const portraitStyles = <String>[
   'Boceto a lápiz',
 ];
 
+/// Cómo se le pide cada estilo predeterminado al generador.
+const _styleEnglish = <String, String>{
+  'Arte digital de fantasía': 'digital fantasy art',
+  'Óleo clásico': 'classic oil painting',
+  'Ilustración de cómic': 'comic book illustration',
+  'Realista cinematográfico': 'cinematic realism',
+  'Acuarela': 'watercolor',
+  'Pixel art': 'pixel art',
+  'Boceto a lápiz': 'pencil sketch',
+};
+
+/// El nombre en inglés de una entrada del catálogo para el prompt.
+///
+/// Sale del id, que es el slug inglés de la entrada («longsword», «half-orc»),
+/// y no del repositorio, que puede estar en castellano: el prompt va en
+/// inglés con la interfaz en cualquier idioma, porque los generadores de
+/// imágenes responden mejor así. Una entrada homebrew no tiene un id inglés,
+/// así que usa su nombre tal como se escribió.
+String _englishName(String id, ContentSource? source, String? name) =>
+    source == ContentSource.homebrew && name != null ? name : titleCaseId(id);
+
 /// Construye el prompt de retrato auto-completando datos ya conocidos de la
-/// ficha (raza, clase, armadura, arma) y sumando texto libre y estilo. Puro y
-/// testeable.
+/// ficha (especie, clase, armadura, arma) y sumando texto libre y estilo.
+/// Siempre en inglés (ver [_englishName]); el texto libre va tal como lo
+/// escribió la persona. Puro y testeable.
 String buildPortraitPrompt({
   required Character character,
   required ContentRepository repo,
@@ -22,30 +49,40 @@ String buildPortraitPrompt({
   required String extraText,
   bool includeWeapon = true,
 }) {
-  final race = repo.race(character.raceId)?.name ?? '';
+  final race = repo.race(character.raceId);
+  final raceName = race == null
+      ? ''
+      : _englishName(race.id, race.source, race.name);
   final classIds = <String>[];
   for (final id in character.classHistory) {
     if (!classIds.contains(id)) classIds.add(id);
   }
   final klass = classIds
-      .map(
-        (id) =>
-            '${repo.characterClass(id)?.name ?? id} ${character.classLevel(id)}',
-      )
+      .map((id) {
+        final c = repo.characterClass(id);
+        return '${_englishName(id, c?.source, c?.name)} '
+            '${character.classLevel(id)}';
+      })
       .join(' · ');
-  final armor = character.equippedArmorId == null
+  final armorId = character.equippedArmorId;
+  final armor = armorId == null ? null : repo.armorPiece(armorId);
+  final weaponId = !includeWeapon || character.equippedWeaponIds.isEmpty
       ? null
-      : repo.armorPiece(character.equippedArmorId!)?.name;
-  final weapon = !includeWeapon || character.equippedWeaponIds.isEmpty
-      ? null
-      : repo.weapon(character.equippedWeaponIds.first)?.name;
+      : character.equippedWeaponIds.first;
+  final weapon = weaponId == null ? null : repo.weapon(weaponId);
 
   final parts = <String>[
-    'Retrato de personaje de fantasía (D&D)',
-    [race, klass].where((s) => s.isNotEmpty).join(' '),
+    'Fantasy character portrait (D&D)',
+    [raceName, klass].where((s) => s.isNotEmpty).join(' '),
   ];
-  if (armor != null) parts.add('viste $armor');
-  if (weapon != null) parts.add('porta $weapon');
+  if (armor != null) {
+    parts.add('wearing ${_englishName(armor.id, armor.source, armor.name)}');
+  }
+  if (weapon != null) {
+    parts.add(
+      'wielding ${_englishName(weapon.id, weapon.source, weapon.name)}',
+    );
+  }
 
   return _assemble(parts, extraText, style);
 }
@@ -56,8 +93,11 @@ String _assemble(List<String> parts, String extraText, String style) {
     ...parts,
     if (extra.isNotEmpty) extra,
   ].where((s) => s.isNotEmpty).join(', ');
-  final styleClause = style.trim().isEmpty ? '' : ' Estilo: ${style.trim()}.';
-  return '$base. Encuadre tipo busto/retrato, fondo simple.$styleClause';
+  final chosen = style.trim();
+  // Un estilo escrito por la persona viaja tal cual, como el texto libre.
+  final styleText = _styleEnglish[chosen] ?? chosen;
+  final styleClause = styleText.isEmpty ? '' : ' Style: $styleText.';
+  return '$base. Bust/portrait framing, simple background.$styleClause';
 }
 
 /// El prompt de retrato de un PNJ, que se completa solo según su tipo de
@@ -87,14 +127,22 @@ String buildNpcPortraitPrompt({
     );
   }
   final block = npc.block;
-  final parts = <String>[
-    'Retrato de personaje de fantasía (D&D)',
-    if (npc.sheetKind == NpcSheetKind.block && block != null) ...[
-      npc.baseCreatureName ?? block.name,
-      // «Humanoide Mediano o Pequeño, neutral» → sin el alineamiento, que no
-      // se dibuja.
-      block.kind.split(',').first.trim(),
-    ],
-  ];
+  final parts = <String>['Fantasy character portrait (D&D)'];
+  if (npc.sheetKind == NpcSheetKind.block && block != null) {
+    final baseId = npc.baseCreatureId;
+    parts.add(
+      baseId != null && repo.creature(baseId) != null
+          ? _englishName(baseId, repo.creature(baseId)!.source, null)
+          : npc.baseCreatureName ?? block.name,
+    );
+    // El tamaño y el tipo, sin el alineamiento, que no se dibuja. Salen de
+    // los lectores del motor, que entienden la línea de perfil en los dos
+    // idiomas: el bloque del PNJ se copió en el idioma en que se creó.
+    final kind = [
+      block.creatureSize?.labelEn,
+      block.creatureType?.labelEn,
+    ].whereType<String>().join(' ');
+    if (kind.isNotEmpty) parts.add(kind);
+  }
   return _assemble(parts, extraText, style);
 }

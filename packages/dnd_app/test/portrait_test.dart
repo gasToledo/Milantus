@@ -22,18 +22,36 @@ void main() {
       );
     });
 
-    test('auto-completa raza, clase, armadura, arma y estilo', () {
+    // El prompt va en inglés con la interfaz en cualquier idioma: el
+    // repositorio de la prueba está en castellano y el texto libre también.
+    test(
+      'auto-completa especie, clase, armadura, arma y estilo, en inglés',
+      () {
+        final prompt = buildPortraitPrompt(
+          character: demoSagan(),
+          repo: repo,
+          style: 'Óleo clásico',
+          extraText: 'pelo rojo largo',
+        );
+        expect(prompt, startsWith('Fantasy character portrait (D&D)'));
+        expect(prompt, contains('Human Fighter'));
+        expect(prompt, contains('wearing Leather'));
+        expect(prompt, contains('wielding Longsword'));
+        // El texto libre va tal como lo escribió la persona.
+        expect(prompt, contains('pelo rojo largo'));
+        expect(prompt, contains('Style: classic oil painting.'));
+        expect(prompt, isNot(contains(repo.characterClass('fighter')!.name)));
+      },
+    );
+
+    test('un estilo propio viaja tal como se escribió', () {
       final prompt = buildPortraitPrompt(
         character: demoSagan(),
         repo: repo,
-        style: 'Óleo clásico',
-        extraText: 'pelo rojo largo',
+        style: 'grabado en madera',
+        extraText: '',
       );
-      expect(prompt, contains('Humano Guerrero'));
-      expect(prompt, contains('Armadura de cuero'));
-      expect(prompt, contains('Espada larga'));
-      expect(prompt, contains('pelo rojo largo'));
-      expect(prompt, contains('Estilo: Óleo clásico'));
+      expect(prompt, endsWith('Style: grabado en madera.'));
     });
 
     test(
@@ -46,8 +64,8 @@ void main() {
           extraText: '',
           includeWeapon: false,
         );
-        expect(prompt, contains('Armadura de cuero'));
-        expect(prompt, isNot(contains('Espada larga')));
+        expect(prompt, contains('wearing Leather'));
+        expect(prompt, isNot(contains('wielding')));
       },
     );
   });
@@ -85,8 +103,9 @@ void main() {
         style: 'Óleo clásico',
         extraText: npc.appearance,
       );
-      expect(prompt, contains(knight.name));
-      expect(prompt, contains(knight.kind.split(',').first.trim()));
+      expect(prompt, contains('Knight'));
+      expect(prompt, contains('Medium Humanoid'));
+      expect(prompt, isNot(contains(knight.kind)));
       expect(prompt, contains('cicatriz sobre la ceja'));
     });
 
@@ -99,8 +118,8 @@ void main() {
       );
       expect(
         prompt,
-        'Retrato de personaje de fantasía (D&D). '
-        'Encuadre tipo busto/retrato, fondo simple.',
+        'Fantasy character portrait (D&D). '
+        'Bust/portrait framing, simple background.',
       );
     });
 
