@@ -442,7 +442,7 @@ class _DmModeScreenState extends State<DmModeScreen> {
                       appNavItem(
                         context,
                         icon: Icons.groups_2_outlined,
-                        label: context.l10n.kindNpc,
+                        label: context.l10n.dmNpcsSection,
                         active: _section == _CampaignSection.pnj,
                         onTap: () => _selectSection(
                           _CampaignSection.pnj,
@@ -2071,7 +2071,7 @@ class _MemberCard extends StatelessWidget {
                   member.memberId,
                   portraitKey,
                 ),
-          fallback: character.name.characters.firstOrNull ?? '?',
+          name: character.name,
           size: 48,
         ),
         const SizedBox(width: 12),

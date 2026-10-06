@@ -69,7 +69,7 @@ class _SummaryStep extends StatelessWidget {
                   children: [
                     ClassMedallion(
                       klass: draft.klass,
-                      fallback: character.name.characters.first,
+                      name: character.name,
                       size: 82,
                     ),
                     const SizedBox(width: 20),

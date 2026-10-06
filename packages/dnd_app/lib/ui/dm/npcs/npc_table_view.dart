@@ -66,10 +66,7 @@ class _NpcTableViewScreenState extends State<NpcTableViewScreen> {
                   ),
                   child: key == null
                       ? Center(
-                          child: Medallion(
-                            fallback: widget.name.characters.first,
-                            size: width / 2,
-                          ),
+                          child: Medallion(name: widget.name, size: width / 2),
                         )
                       : PortraitImage(portraitKey: key),
                 ),

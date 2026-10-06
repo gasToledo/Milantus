@@ -1476,18 +1476,22 @@ class AbilityPlaque extends StatelessWidget {
 }
 
 /// Medallón de retrato: círculo con aro dorado. Muestra el retrato de
-/// [portraitKey] o, si no hay, [fallback].
+/// [portraitKey] o, si no hay, la inicial de [name].
 class Medallion extends StatelessWidget {
   /// Clave opaca del retrato (`Character.portraitPaths`), no una imagen ya
   /// resuelta: es este widget el que conoce el tamaño final en píxeles y por
   /// eso el único que puede pedir la miniatura del tamaño correcto (ver
   /// [PortraitImage.provider]).
   final String? portraitKey;
-  final String fallback;
+
+  /// Nombre completo de quien se retrata. Se recibe entero y no la inicial
+  /// porque también es la etiqueta del lector de pantalla: con la inicial,
+  /// el medallón se anunciaba «Retrato de E».
+  final String name;
   final double size;
 
   /// Emblema para cuando no hay retrato: un ícono sobre un degradado de
-  /// [emblemColor]. Si no se pasa, se cae a la inicial de [fallback].
+  /// [emblemColor]. Si no se pasa, se cae a la inicial de [name].
   final IconData? emblemIcon;
   final Color? emblemColor;
 
@@ -1498,7 +1502,7 @@ class Medallion extends StatelessWidget {
   const Medallion({
     super.key,
     this.portraitKey,
-    required this.fallback,
+    required this.name,
     this.size = 74,
     this.emblemIcon,
     this.emblemColor,
@@ -1549,11 +1553,14 @@ class Medallion extends StatelessWidget {
                 : PortraitImage.urlFor(key, width: width),
           );
 
+    // En la creación el nombre todavía puede estar vacío: «Emblema de » a
+    // secas no le dice nada al lector de pantalla.
+    final who = name.trim().isEmpty ? context.l10n.characterUnnamed : name;
     return Semantics(
       image: true,
       label: key == null
-          ? context.l10n.emblemLabel(fallback)
-          : context.l10n.portraitLabel(fallback),
+          ? context.l10n.emblemLabel(who)
+          : context.l10n.portraitLabel(who),
       child: Container(
         width: size,
         height: size,
@@ -1584,7 +1591,7 @@ class Medallion extends StatelessWidget {
             : hasEmblem
             ? Icon(emblemIcon, size: size * .48, color: accent)
             : Text(
-                fallback,
+                name.trim().characters.firstOrNull ?? '?',
                 style: TextStyle(
                   fontFamily: 'Georgia',
                   fontSize: size * .42,
@@ -3007,6 +3014,9 @@ Widget _profileAction(
       : DamageType.labelFor(a.damageType!);
   final damageText = a.damage ?? damageType ?? '';
   final damageDetail = a.damage == null ? null : damageType;
+  final reachLabel = a.isMeleeReach
+      ? context.l10n.creatureReach
+      : context.l10n.commonRange;
 
   Widget plaque(
     String label,
@@ -3122,7 +3132,7 @@ Widget _profileAction(
                     ],
                     if (a.reach.isNotEmpty) ...[
                       const SizedBox(width: 8),
-                      plaque(context.l10n.commonRange, a.reach, width: 86),
+                      plaque(reachLabel, a.reach, width: 86),
                     ],
                   ],
                 ),
@@ -3149,8 +3159,7 @@ Widget _profileAction(
                       damageText,
                       detail: damageDetail,
                     ),
-                  if (a.reach.isNotEmpty)
-                    plaque(context.l10n.commonRange, a.reach),
+                  if (a.reach.isNotEmpty) plaque(reachLabel, a.reach),
                 ],
               ),
             ],

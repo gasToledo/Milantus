@@ -350,7 +350,7 @@ class _NpcCard extends StatelessWidget {
                 children: [
                   Medallion(
                     portraitKey: npcPortraitKey(npc, entry.sheet),
-                    fallback: npc.name.characters.first,
+                    name: npc.name,
                     size: 44,
                   ),
                   const SizedBox(width: 12),

@@ -174,7 +174,7 @@ class _AddCombatantDialogState extends State<_AddCombatantDialog> {
             segments: [
               ButtonSegment(
                 value: _Tab.npcs,
-                label: Text(context.l10n.kindNpc),
+                label: Text(context.l10n.dmNpcsSection),
               ),
               ButtonSegment(
                 value: _Tab.bestiary,

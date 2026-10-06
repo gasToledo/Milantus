@@ -312,7 +312,7 @@ class _CharacterCardState extends State<_CharacterCard> {
     Widget medallion = ClassMedallion(
       klass: klassObj,
       portraitKey: portrait,
-      fallback: c.name.characters.first,
+      name: c.name,
       size: 76 * k,
     );
     if (fallen) {

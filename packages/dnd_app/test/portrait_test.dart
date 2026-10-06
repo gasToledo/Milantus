@@ -183,11 +183,7 @@ void main() {
         tester.pumpWidget(
           localizedApp(
             theme: AppTheme.dark,
-            home: Medallion(
-              portraitKey: 'sagan/x.png',
-              fallback: 'S',
-              size: size,
-            ),
+            home: Medallion(portraitKey: 'sagan/x.png', name: 'S', size: size),
           ),
         );
 

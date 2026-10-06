@@ -224,6 +224,12 @@ abstract class AppLocalizations {
   /// **'Alcance'**
   String get commonRange;
 
+  /// No description provided for @creatureReach.
+  ///
+  /// In es, this message translates to:
+  /// **'Alcance'**
+  String get creatureReach;
+
   /// No description provided for @themeLight.
   ///
   /// In es, this message translates to:
@@ -8742,6 +8748,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'PNJ'**
   String get kindNpc;
+
+  /// No description provided for @dmNpcsSection.
+  ///
+  /// In es, this message translates to:
+  /// **'PNJ'**
+  String get dmNpcsSection;
 
   /// No description provided for @npcKindNone.
   ///

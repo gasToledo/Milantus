@@ -200,7 +200,7 @@ class _MemberSheetScreenState extends State<MemberSheetScreen> {
                 klass: klass,
                 portraitKey: portraitKey,
                 portraitUrlBase: portraitUrlBase,
-                fallback: character.name.characters.firstOrNull ?? '?',
+                name: character.name,
                 size: 56,
               ),
               const SizedBox(height: 10),

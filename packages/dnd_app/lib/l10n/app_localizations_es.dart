@@ -77,6 +77,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get commonRange => 'Alcance';
 
   @override
+  String get creatureReach => 'Alcance';
+
+  @override
   String get themeLight => 'Tema claro';
 
   @override
@@ -5352,6 +5355,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get kindNpc => 'PNJ';
+
+  @override
+  String get dmNpcsSection => 'PNJ';
 
   @override
   String get npcKindNone => 'Sin estadísticas';

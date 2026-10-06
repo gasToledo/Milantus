@@ -77,6 +77,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonRange => 'Range';
 
   @override
+  String get creatureReach => 'Reach';
+
+  @override
   String get themeLight => 'Light theme';
 
   @override
@@ -676,7 +679,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String sheetClassSummary(String summary, Object level) {
-    return '$summary · level $level';
+    return '$summary · Level $level';
   }
 
   @override
@@ -1669,7 +1672,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get invCoinsEquals => 'Worth ';
 
   @override
-  String get invCoinsWeigh => ' gp · weigh ';
+  String get invCoinsWeigh => ' gp · weighs ';
 
   @override
   String invCoinLabel(String name, String abbr) {
@@ -4797,7 +4800,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get hbAllThree => 'The three of the increase';
+  String get hbAllThree => 'The three that get the increase';
 
   @override
   String get hbNoOriginFeat => 'No origin feat';
@@ -4941,7 +4944,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hbAvailableRule =>
-      'Today only the Wild Shape pool looks at it: a beast with a challenge rating can show up among the druid\'s forms. Turned off, the creature lives only in your combats.';
+      'For now only the Wild Shape pool uses it: a beast with a challenge rating can show up among the druid\'s forms. Turned off, the creature lives only in your combats.';
 
   @override
   String get hbAttackBonus => 'Attack bonus';
@@ -5352,6 +5355,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get kindNpc => 'NPC';
 
   @override
+  String get dmNpcsSection => 'NPCs';
+
+  @override
   String get npcKindNone => 'No stats';
 
   @override
@@ -5404,7 +5410,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get npcNewCharacterHint =>
-      'Goes through the character creator: species, class, levels and feats. A background’s villain.';
+      'Goes through the character creator: species, class, levels and feats. The villain behind the scenes.';
 
   @override
   String get npcStartFromCreature => 'Start from a creature (optional)';
@@ -5667,7 +5673,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dmNotebookNeedsChapter =>
-      'The notebook is organised by chapter, so you need to create one first. From Chapters.';
+      'The notebook is organized by chapter, so you need to create one first. From Chapters.';
 
   @override
   String get dmSearchNotebook => 'Search the notebook';
@@ -5938,7 +5944,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get npcExportNever =>
-      'Which campaigns it is in, and whether it lives or died in each, never travels. Whoever imports it gets their own copy: what changes later does not reach you.';
+      'Which campaigns it is in, and whether it is alive or dead in each, never goes in the file. Whoever imports it gets their own copy: later changes do not reach you.';
 
   @override
   String get npcDownloadZip => 'Download .zip';
@@ -6369,7 +6375,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String encPlayerMeta(String race, String klass, int level) {
-    return '$race · $klass · lv $level';
+    return '$race · $klass · Lv $level';
   }
 
   @override
@@ -6460,7 +6466,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dmOnb3Detail =>
-      'Organise chapters and keep the combat initiative.';
+      'Organize chapters and keep the combat initiative.';
 
   @override
   String get dmCreateCampaign => 'Create campaign';

@@ -96,7 +96,7 @@ extension _SheetNavigation on _SheetScreenState {
                   child: ClassMedallion(
                     klass: klassObj,
                     portraitKey: hasPortrait ? portrait : null,
-                    fallback: _c.name.characters.first,
+                    name: _c.name,
                     size: 42,
                   ),
                 ),

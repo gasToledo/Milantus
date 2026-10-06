@@ -549,7 +549,7 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
                 children: [
                   Medallion(
                     portraitKey: npcPortraitKey(npc, entry.sheet),
-                    fallback: npc.name.characters.first,
+                    name: npc.name,
                     size: 76,
                   ),
                   Positioned(

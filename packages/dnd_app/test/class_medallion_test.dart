@@ -27,7 +27,7 @@ void main() {
     tester,
   ) async {
     final wizard = repo.characterClass('wizard')!;
-    await pump(tester, ClassMedallion(klass: wizard, fallback: 'S'));
+    await pump(tester, ClassMedallion(klass: wizard, name: 'S'));
 
     expect(find.byIcon(classIcon(wizard)), findsOneWidget);
     expect(find.text('S'), findsNothing);
@@ -42,14 +42,26 @@ void main() {
   });
 
   testWidgets('sin clase conocida cae a la inicial', (tester) async {
-    await pump(tester, const ClassMedallion(klass: null, fallback: 'S'));
+    await pump(tester, const ClassMedallion(klass: null, name: 'S'));
     expect(find.text('S'), findsOneWidget);
   });
 
   testWidgets('Medallion sin emblema sigue mostrando la inicial', (
     tester,
   ) async {
-    await pump(tester, const Medallion(fallback: 'B', size: 40));
+    await pump(tester, const Medallion(name: 'B', size: 40));
     expect(find.text('B'), findsOneWidget);
+  });
+
+  testWidgets('el lector de pantalla oye el nombre entero, no la inicial', (
+    tester,
+  ) async {
+    await pump(tester, const Medallion(name: 'Bruna Piedrahonda', size: 40));
+    expect(find.text('B'), findsOneWidget);
+    expect(
+      find.bySemanticsLabel(RegExp('^Emblema de Bruna Piedrahonda')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
   });
 }

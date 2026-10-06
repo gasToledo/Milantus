@@ -34,13 +34,7 @@ class _DetailsStepState extends State<_DetailsStep> {
         const SizedBox(height: 12),
         Row(
           children: [
-            ClassMedallion(
-              klass: d.klass,
-              fallback: d.name.trim().isEmpty
-                  ? '?'
-                  : d.name.trim().characters.first,
-              size: 72,
-            ),
+            ClassMedallion(klass: d.klass, name: d.name, size: 72),
             const SizedBox(width: 16),
             Expanded(
               child: Column(

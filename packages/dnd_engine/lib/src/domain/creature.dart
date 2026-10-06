@@ -528,6 +528,9 @@ class CreatureAction {
 
   bool get isAttack => attackBonus != null;
 
+  /// Ver [_isMeleeReach].
+  bool get isMeleeReach => _isMeleeReach(reach);
+
   /// Compatibilidad con quien solo distingue reacción de lo demás.
   bool get reaction => kind == CreatureActionKind.reaction;
 
@@ -599,8 +602,25 @@ class ResolvedCreatureAction {
 
   bool get isAttack => attackBonus != null;
 
+  /// Ver [_isMeleeReach].
+  bool get isMeleeReach => _isMeleeReach(reach);
+
   /// Compatibilidad con quien solo distingue reacción de lo demás.
   bool get reaction => kind == CreatureActionKind.reaction;
+}
+
+/// Si [reach] es un alcance cuerpo a cuerpo («5 ft.») y no un rango a
+/// distancia («80/320 ft.», «120 ft.»). En español da igual —el SRD dice
+/// «alcance» para los dos—, pero en inglés son «Reach» y «Range».
+///
+// ponytail: se deduce del valor (sin «/» y a 15 pies o menos), así que
+// los cuatro tentáculos y látigos de 30 a 60 pies (Balor, Kraken, Lacero,
+// Tarasca) se rotulan «Range». La salida es que `generate_bestiary.dart`
+// guarde si la tirada es «cuerpo a cuerpo», que el PDF sí dice.
+bool _isMeleeReach(String reach) {
+  if (reach.contains('/')) return false;
+  final feet = RegExp(r'^(\d+) \S+$').firstMatch(reach.trim());
+  return feet != null && int.parse(feet[1]!) <= 15;
 }
 
 /// Perfil de una criatura invocable: cañón, defensor, familiar, corcel.

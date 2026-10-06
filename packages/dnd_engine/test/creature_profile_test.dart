@@ -280,4 +280,31 @@ void main() {
     expect(resolved.skills, {Skill.stealth: 6});
     expect(resolved.legendaryActionsPerRound, 3);
   });
+
+  group('Alcance o rango', () {
+    // En inglés el rótulo cambia («Reach» o «Range»); el valor es el mismo
+    // campo que el SRD en español llama «alcance» en los dos casos.
+    bool melee(String reach) => ResolvedCreatureAction(
+          name: 'Ataque',
+          description: '',
+          attackBonus: 5,
+          damage: null,
+          damageType: null,
+          reach: reach,
+        ).isMeleeReach;
+
+    test('cuerpo a cuerpo hasta 15 pies, en cualquier idioma', () {
+      expect(melee('5 ft.'), isTrue);
+      expect(melee('15 pies'), isTrue);
+    });
+
+    test('lo que lleva rango largo, una plantilla o más de 15 pies es rango',
+        () {
+      expect(melee('80/320 ft.'), isFalse);
+      expect(melee('5 ft. or range 20/60 ft.'), isFalse);
+      expect(melee('120 ft.'), isFalse);
+      expect(melee('15-foot Cone'), isFalse);
+      expect(melee(''), isFalse);
+    });
+  });
 }
