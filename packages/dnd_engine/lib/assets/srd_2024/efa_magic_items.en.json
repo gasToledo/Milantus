@@ -1,38 +1,47 @@
 {
   "boots-of-the-winding-path": {
-    "_es": "ffec35e0",
-    "name": "Boots of the Winding Path"
+    "_es": "476c86c2",
+    "name": "Boots of the Winding Path",
+    "description": "While wearing these boots, you can teleport as a Bonus Action up to 15 feet to an unoccupied space you can see that you occupied during the current turn."
   },
   "dazzling-weapon": {
-    "_es": "1a7b5461",
-    "name": "Dazzling Weapon"
+    "_es": "ab1c7e1c",
+    "name": "Dazzling Weapon",
+    "description": "The weapon grants +1 to its attack and damage rolls. It can shed Bright Light in a 30-foot radius and Dim Light for an additional 30 feet. It has 4 charges: as a Reaction after you are hit, you can expend 1 to force a DC 15 Constitution saving throw; on a failure, the attacker has the Blinded condition until the end of its next turn. It regains 1d4 charges at dawn."
   },
   "helm-of-awareness": {
-    "_es": "fc9cc7e6",
-    "name": "Helm of Awareness"
+    "_es": "8a5062ba",
+    "name": "Helm of Awareness",
+    "description": "While wearing this helm, you have Advantage on Initiative rolls."
   },
   "manifold-tool": {
-    "_es": "8752fd98",
-    "name": "Manifold Tool"
+    "_es": "700d91be",
+    "name": "Manifold Tool",
+    "description": "As a Magic action, the tool transforms into the Artisan's Tools of your choice. You have proficiency with the chosen form while you use it."
   },
   "mind-sharpener": {
-    "_es": "2f44a5ae",
-    "name": "Mind Sharpener"
+    "_es": "500e5af4",
+    "name": "Mind Sharpener",
+    "description": "It has 4 charges. When you fail a Constitution saving throw to maintain Concentration, you can take a Reaction and expend 1 charge to succeed instead. It regains 1d4 charges at dawn."
   },
   "repeating-shot": {
-    "_es": "2757930b",
-    "name": "Repeating Shot"
+    "_es": "c013dbd9",
+    "name": "Repeating Shot",
+    "description": "The weapon grants +1 to ranged attack and damage rolls, ignores the Loading property, and produces its own magic ammunition if it is empty."
   },
   "repulsion-shield": {
-    "_es": "4b7d4aba",
-    "name": "Repulsion Shield"
+    "_es": "40da9a0a",
+    "name": "Repulsion Shield",
+    "description": "It grants +1 to AC while you hold it. It has 4 charges: when a Large or smaller creature within 5 feet of you hits you with a melee attack, you can expend 1 charge as a Reaction to push it up to 15 feet away. It regains 1d4 charges at dawn."
   },
   "returning-weapon": {
-    "_es": "ad09c4a8",
-    "name": "Returning Weapon"
+    "_es": "302f1fb5",
+    "name": "Returning Weapon",
+    "description": "The weapon grants +1 to its attack and damage rolls and returns to your hand immediately after you use it to make a ranged attack. It applies only to a weapon with the Thrown property."
   },
   "spell-refueling-ring": {
-    "_es": "3b6fd0d0",
-    "name": "Spell-Refueling Ring"
+    "_es": "251f88a8",
+    "name": "Spell-Refueling Ring",
+    "description": "Requires Attunement by a spellcaster. As a Bonus Action, you recover one expended spell slot of level 3 or lower. It can't be used again until the next dawn."
   }
 }
