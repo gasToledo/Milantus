@@ -844,7 +844,7 @@
     "actions.2.description": "Con Saving Throw: DC 12, one creature the pseudodragon can see within 5 feet. Failure: 5 (2d4) Poison damage, and the target has the Poisoned condition for 1 hour. While Poisoned, the target also has the Unconscious condition, which ends early if the target takes damage or a creature within 5 feet of it takes an action to wake it."
   },
   "quasit": {
-    "_es": "b8bffbad",
+    "_es": "fed5c3f0",
     "name": "Quasit",
     "kind": "Tiny Fiend (Demon), Chaotic Evil",
     "senses": "Darkvision 120 ft.; Passive Perception 10",
@@ -853,16 +853,14 @@
     "traits.0.name": "Magic Resistance",
     "actions.0.name": "Rend",
     "actions.1.name": "Frighten (1/Day)",
-    "actions.2.name": "DC 10, one creature within 20 feet",
-    "actions.3.name": "Shape-Shift",
-    "actions.4.name": "Invisibility",
+    "actions.2.name": "Shape-Shift",
+    "actions.3.name": "Invisibility",
     "actions.0.reach": "5 ft.",
     "traits.0.description": "The quasit has Advantage on saving throws against spells and other magical effects.",
-    "actions.3.description": "The quasit shape-shifts to resemble a bat (Speed 10 ft., Fly 40 ft.), a centipede (40 ft., Climb 40 ft.), or a toad (40 ft., Swim 40 ft.), or it returns to its true form. Its game statistics are the same in each form, except for its Speed. Any equipment it is wearing or carrying isn't transformed.",
-    "actions.4.description": "The quasit casts Invisibility on itself, requiring no spell components and using Charisma as the spellcasting ability.\nAt Will: Invisibility",
-    "actions.1.description": "Wisdom Saving Throw:",
-    "actions.2.description": "Failure: The target has the Frightened condition. At the end of each of its turns, the target repeats the save, ending the effect on itself on a success. After 1 minute, it succeeds automatically.",
-    "defenses": "Resistances: Cold, Fire, Lightning; Immunities: Poison; Poisoned"
+    "actions.2.description": "The quasit shape-shifts to resemble a bat (Speed 10 ft., Fly 40 ft.), a centipede (40 ft., Climb 40 ft.), or a toad (40 ft., Swim 40 ft.), or it returns to its true form. Its game statistics are the same in each form, except for its Speed. Any equipment it is wearing or carrying isn't transformed.",
+    "actions.3.description": "The quasit casts Invisibility on itself, requiring no spell components and using Charisma as the spellcasting ability.\nAt Will: Invisibility",
+    "defenses": "Resistances: Cold, Fire, Lightning; Immunities: Poison; Poisoned",
+    "actions.1.description": "Wisdom Saving Throw: DC 10, one creature within 20 feet. Failure: The target has the Frightened condition. At the end of each of its turns, the target repeats the save, ending the effect on itself on a success. After 1 minute, it succeeds automatically."
   },
   "poisonous-snake": {
     "_es": "64f8cd2d",
@@ -1579,7 +1577,7 @@
     "actions.0.reach": "5 ft."
   },
   "aboleth": {
-    "_es": "1e83c3d3",
+    "_es": "a04aa6b4",
     "name": "Aboleth",
     "kind": "Large Aberration, Lawful Evil",
     "senses": "Darkvision 120 ft.; Passive Perception 20",
@@ -1588,7 +1586,7 @@
     "traits.0.name": "Amphibious",
     "traits.1.name": "Mucous Cloud",
     "traits.2.name": "Otherworldly Restoration",
-    "traits.3.name": "Probing Telepathy",
+    "traits.4.name": "Probing Telepathy",
     "actions.0.name": "Multiattack",
     "actions.1.name": "Tentacle",
     "actions.2.name": "Consume Memories",
@@ -1601,11 +1599,13 @@
     "actions.2.description": "Int Saving Throw: DC 16, one creature within 30 feet that is Charmed or Grappled by the aboleth. Failure: 10 (3d6) Psychic damage. Success: Half damage. Failure or Success: The aboleth gains the target's memories if the target is a Humanoid and is reduced to 0 Hit Points by this action.",
     "actions.3.description": "Wis Saving Throw: DC 16, one creature the aboleth can see within 30 feet. Failure: The target has the Charmed condition until the aboleth dies or is on a different plane of existence from the target. While Charmed, the target acts as an ally to the aboleth and is under its control while within 60 feet of it. In addition, the aboleth and the target can communicate telepathically with each other over any distance.\nThe target repeats the save whenever it takes damage as well as after every 24 hours it spends at least 1 mile away from the aboleth, ending the effect on itself on a success.",
     "traits.0.description": "The aboleth can breathe air and water.",
-    "traits.3.description": "If a creature the aboleth can see communicates telepathically with the aboleth, the aboleth learns the creature's greatest desires.",
+    "traits.4.description": "If a creature the aboleth can see communicates telepathically with the aboleth, the aboleth learns the creature's greatest desires.",
     "actions.4.description": "If the aboleth has at least one creature Charmed or Grappled, it uses Consume Memories and regains 5 (1d10) Hit Points.",
     "actions.5.description": "The aboleth makes one Tentacle attack.",
     "traits.1.description": "While underwater, the aboleth is surrounded by mucus. Constitution Saving Throw: DC 14, each creature in a 5-foot Emanation originating from the aboleth at the end of the aboleth's turn. Failure: The target is cursed. Until the curse ends, the target's skin becomes slimy, the target can breathe air and water, and it can't regain Hit Points unless it is underwater. While the cursed creature is outside a body of water, the creature takes 6 (1d12) Acid damage at the end of every 10 minutes unless moisture is applied to its skin before those 10 minutes have passed.",
-    "traits.2.description": "If destroyed, the aboleth gains a new body in 5d10 days, reviving with all its Hit Points in the Far Realm or another location chosen by the DM. Legendary Resistance (3/Day, or 4/Day in Lair). If the aboleth fails a saving throw, it can choose to succeed instead."
+    "traits.2.description": "If destroyed, the aboleth gains a new body in 5d10 days, reviving with all its Hit Points in the Far Realm or another location chosen by the DM.",
+    "traits.3.name": "Legendary Resistance (3/Day, or 4/Day in Lair)",
+    "traits.3.description": "If the aboleth fails a saving throw, it can choose to succeed instead."
   },
   "invisible-stalker": {
     "_es": "55626ec5",
@@ -1822,7 +1822,7 @@
     "actions.1.description": "The harpy sings a magical melody, which lasts until the harpy's Concentration ends on it. Wis Saving Throw: DC 11, each Humanoid and Giant in a 300-foot Emanation originating from the harpy when the song starts. Failure: The target has the Charmed condition until the song ends and repeats the save at the end of each of its turns. While Charmed, the target has the Incapacitated condition and ignores the Luring Song of other harpies. If the target is more than 5 feet from the harpy, the target moves on its turn toward the harpy by the most direct route, trying to get within 5 feet of the harpy. It doesn't avoid Opportunity Attacks; however, before moving into damaging terrain (such as lava or a pit) and whenever it takes damage from a source other than the harpy, the target repeats the save. Success: The target is immune to this harpy's Luring Song for 24 hours."
   },
   "assassin": {
-    "_es": "9c226c80",
+    "_es": "98da019e",
     "name": "Assassin",
     "kind": "Medium or Small Humanoid, Neutral",
     "senses": "Passive Perception 16",
@@ -1837,11 +1837,11 @@
     "actions.2.reach": "80/320 ft.",
     "traits.0.description": "If the assassin is subjected to an effect that allows it to make a Dexterity saving throw to take only half damage, the assassin instead takes no damage if it succeeds on the save and only half damage if it fails. It can't use this trait if it has the Incapacitated condition.",
     "actions.0.description": "The assassin makes three attacks, using Shortsword or Light Crossbow in any combination.",
-    "actions.3.description": "The assassin takes the Dash, Disengage, or Hide action.",
-    "defenses": "Resistances: Poison"
+    "defenses": "Resistances: Poison",
+    "actions.3.description": "The assassin takes the Dash, Disengage, or Hide action."
   },
   "balor": {
-    "_es": "f0e03a66",
+    "_es": "0217be56",
     "name": "Balor",
     "kind": "Huge Fiend (Demon), Chaotic Evil",
     "senses": "Truesight 120 ft.; Passive Perception 19",
@@ -1858,13 +1858,13 @@
     "actions.1.reach": "10 ft.",
     "actions.2.reach": "30 ft.",
     "actions.0.description": "The balor makes one Flame Whip attack and one Lightning Blade attack.",
-    "actions.3.description": "The balor teleports itself or a willing demon within 10 feet of itself up to 60 feet to an unoccupied space the balor can see.",
     "traits.0.description": "At the end of each of the balor's turns, each creature in a 5-foot Emanation originating from the balor takes 13 (3d8) Fire damage.",
     "traits.1.description": "If the balor fails a saving throw, it can choose to succeed instead.",
     "traits.2.description": "The balor has Advantage on saving throws against spells and other magical effects.",
     "traits.3.description": "The balor explodes when it dies. Dex Saving Throw: DC 20, each creature in a 30-foot Emanation originating from the balor. Failure: 31 (9d6) Fire damage plus 31 (9d6) Force damage. Success: Half damage. Failure or Success: If the balor dies outside the Abyss, it gains a new body instantly, reviving with all its Hit Points somewhere in the Abyss.",
     "actions.2.description": "If the target is a Huge or smaller creature, the balor pulls the target up to 25 feet straight toward itself, and the target has the Prone condition.",
-    "defenses": "Resistances: Cold, Lightning; Immunities: Fire, Poison; Frightened, Poisoned, Charmed"
+    "defenses": "Resistances: Cold, Lightning; Immunities: Fire, Poison; Frightened, Poisoned, Charmed",
+    "actions.3.description": "The balor teleports itself or a willing demon within 10 feet of itself up to 60 feet to an unoccupied space the balor can see."
   },
   "basilisk": {
     "_es": "b9c11403",
@@ -2005,7 +2005,7 @@
     "defenses": "Resistances: Necrotic, Radiant"
   },
   "knight": {
-    "_es": "ccb606a9",
+    "_es": "a8556ffe",
     "name": "Knight",
     "kind": "Medium or Small Humanoid, Neutral",
     "senses": "Passive Perception 10",
@@ -2018,8 +2018,8 @@
     "actions.1.reach": "5 ft.",
     "actions.2.reach": "100/400 ft.",
     "actions.0.description": "The knight makes two attacks, using Greatsword or Heavy Crossbow in any combination.",
-    "actions.3.description": "Trigger: The knight is hit by a melee attack roll while holding a weapon. Response: The knight adds 2 to its AC against that attack, possibly causing it to miss.",
-    "defenses": "Immunities: Frightened"
+    "defenses": "Immunities: Frightened",
+    "actions.3.description": "Trigger: The knight is hit by a melee attack roll while holding a weapon. Response: The knight adds 2 to its AC against that attack, possibly causing it to miss."
   },
   "warhorse-skeleton": {
     "_es": "aefc0f27",
@@ -2050,7 +2050,7 @@
     "actions.3.description": "Trigger: The bandit is hit by a melee attack roll while holding a weapon. Response: The bandit adds 2 to its AC against that attack, possibly causing it to miss."
   },
   "guard-captain": {
-    "_es": "a0797fba",
+    "_es": "b8083915",
     "name": "Guard Captain",
     "kind": "Medium or Small Humanoid, Neutral",
     "senses": "Passive Perception 14",
@@ -2061,7 +2061,6 @@
     "actions.2.name": "Javelin",
     "actions.1.reach": "5 ft.",
     "actions.0.description": "The guard makes two attacks, using Javelin or Longsword in any combination.",
-    "actions.2.description": "Warriors",
     "actions.2.reach": "5 ft. or range 30/120 ft."
   },
   "hobgoblin-captain": {
@@ -2286,7 +2285,7 @@
     "defenses": "Immunities: Fire"
   },
   "brass-dragon-wyrmling": {
-    "_es": "0ec13028",
+    "_es": "49ae012f",
     "name": "Brass Dragon Wyrmling",
     "kind": "Medium Dragon (Metallic), Chaotic Good",
     "senses": "Blindsight 10 ft., Darkvision 60 ft.; Passive Perception 14",
@@ -2295,12 +2294,10 @@
     "actions.0.name": "Rend",
     "actions.1.name": "Fire Breath (Recharge 5–6)",
     "actions.2.name": "Sleep Breath",
-    "actions.3.name": "DC 11, each creature in a 15-foot cone",
     "actions.0.reach": "5 ft.",
     "actions.1.description": "Dex Saving Throw: DC 11, each creature in a 20-foot-long, 5-foot-wide Line. Failure: 14 (4d6) Fire damage. Success: Half damage.",
-    "actions.2.description": "Con Saving Throw: DC 11, each creature in a 15-foot Cone. Failure: The target has the Incapacitated condition until the end of its next turn, at which point it repeats the save. Failure by 2 or More: The target has the Unconscious condition for 1 minute. This effect ends for the target if it takes damage or a creature within 5 feet of it takes an action to wake it.",
-    "actions.3.description": "Failure: The target has the Incapacitated condition until the end of its next turn, at which point it repeats the save. Second Failure: The target has the Unconscious condition for 1 minute. This effect ends if the target takes damage or a creature within 5 feet of it takes an action to wake it.",
-    "defenses": "Immunities: Fire"
+    "defenses": "Immunities: Fire",
+    "actions.2.description": "Con Saving Throw: DC 11, each creature in a 15-foot Cone. Failure: The target has the Incapacitated condition until the end of its next turn, at which point it repeats the save. Failure by 2 or More: The target has the Unconscious condition for 1 minute. This effect ends for the target if it takes damage or a creature within 5 feet of it takes an action to wake it."
   },
   "silver-dragon-wyrmling": {
     "_es": "06894b5f",
@@ -2369,7 +2366,7 @@
     "defenses": "Immunities: Poison; Poisoned"
   },
   "gelatinous-cube": {
-    "_es": "036c8040",
+    "_es": "36be5f7b",
     "name": "Gelatinous Cube",
     "kind": "Large Ooze, Unaligned",
     "senses": "Blindsight 60 ft.; Passive Perception 8",
@@ -2379,13 +2376,11 @@
     "traits.1.name": "Transparent",
     "actions.0.name": "Pseudopod",
     "actions.1.name": "Engulf",
-    "actions.2.name": "Ooze Cube)",
     "actions.0.reach": "5 ft.",
     "traits.0.description": "The cube fills its entire space and is transparent. Other creatures can enter that space, but a creature that does so is subjected to the cube's Engulf and has Disadvantage on the saving throw.\nCreatures inside the cube have Total Cover, and the cube can hold one Large creature or up to four Medium or Small creatures inside itself at a time.\nAs an action, a creature within 5 feet of the cube can pull a creature or an object out of the cube by succeeding on a DC 12 Strength (Athletics) check, and the puller takes 10 (3d6) Acid damage.",
     "traits.1.description": "Even when the cube is in plain sight, a creature must succeed on a DC 15 Wisdom (Perception) check to notice the cube if the creature hasn't witnessed the cube move or otherwise act.",
-    "actions.1.description": "The cube moves up to its Speed without provoking Opportunity Attacks. The cube can move through the spaces of Large or smaller creatures if it has room inside itself to contain them (see the Ooze Cube trait). Dex Saving Throw: DC 12, each creature whose space the cube enters for the first time during this move. Failure: 10 (3d6) Acid damage, and the target is engulfed. An engulfed target is suffocating, can't cast spells with a Verbal component, has the Restrained condition, and takes 10 (3d6) Acid damage at the start of each of the cube's turns. When the cube moves, the engulfed target moves with it. An engulfed target can try to escape by taking an action to make a DC 12 Strength (Athletics) check. On a successful check, the target escapes and enters the nearest unoccupied space. Success: Half damage, and the target moves to an unoccupied space within 5 feet of the cube. If there is no unoccupied space, the target fails the save instead.",
-    "actions.2.description": "Dexterity Saving Throw: DC 12, each creature whose space the cube enters for the first time during this move. Failure: 10 (3d6) Acid damage, and the target is engulfed. An engulfed target is suffocating, can't cast spells with a Verbal component, has the Restrained condition, and takes 10 (3d6) Acid damage at the start of each of the cube's turns. When the cube moves, the engulfed target moves with it. An engulfed target can try to escape by taking an action to make a DC 12 Strength (Athletics) check. On a successful check, the target escapes and enters the nearest unoccupied space. Success: Half damage, and the target moves to an unoccupied space within 5 feet of the cube. If there is no unoccupied space, the target fails the save instead.",
-    "defenses": "Immunities: Acid; Frightened, Exhaustion, Blinded, Prone, Deafened, Charmed"
+    "defenses": "Immunities: Acid; Frightened, Exhaustion, Blinded, Prone, Deafened, Charmed",
+    "actions.1.description": "The cube moves up to its Speed without provoking Opportunity Attacks. The cube can move through the spaces of Large or smaller creatures if it has room inside itself to contain them (see the Ooze Cube trait). Dex Saving Throw: DC 12, each creature whose space the cube enters for the first time during this move. Failure: 10 (3d6) Acid damage, and the target is engulfed. An engulfed target is suffocating, can't cast spells with a Verbal component, has the Restrained condition, and takes 10 (3d6) Acid damage at the start of each of the cube's turns. When the cube moves, the engulfed target moves with it. An engulfed target can try to escape by taking an action to make a DC 12 Strength (Athletics) check. On a successful check, the target escapes and enters the nearest unoccupied space. Success: Half damage, and the target moves to an unoccupied space within 5 feet of the cube. If there is no unoccupied space, the target fails the save instead."
   },
   "deva": {
     "_es": "03b3b3b9",
@@ -2593,7 +2588,7 @@
     "actions.4.spellcasting.groups.1.spells.0.note": "can create wine instead of water"
   },
   "doppelganger": {
-    "_es": "1a0f77be",
+    "_es": "657c17bb",
     "name": "Doppelganger",
     "kind": "Medium Monstrosity, Neutral",
     "senses": "Darkvision 60 ft.; Passive Perception 11",
@@ -2606,13 +2601,13 @@
     "actions.4.name": "Shape-Shift",
     "actions.1.reach": "5 ft.",
     "actions.0.description": "The doppelganger makes two Slam attacks and uses Unsettling Visage if available.",
-    "actions.4.description": "The doppelganger shape-shifts into a Medium or Small Humanoid, or it returns to its true form. Its game statistics, other than its size, are the same in each form. Any equipment it is wearing or carrying isn't transformed.",
     "actions.2.description": "The doppelganger casts Detect Thoughts, requiring no spell components and using Charisma as the spellcasting ability (spell save DC 12).\nAt Will: Detect Thoughts",
     "actions.3.description": "Wis Saving Throw: DC 12, each creature in a 15-foot Emanation originating from the doppelganger that can see the doppelganger. Failure: The target has the Frightened condition and repeats the save at the end of each of its turns, ending the effect on itself on a success. After 1 minute, it succeeds automatically.",
-    "defenses": "Immunities: Charmed"
+    "defenses": "Immunities: Charmed",
+    "actions.4.description": "The doppelganger shape-shifts into a Medium or Small Humanoid, or it returns to its true form. Its game statistics, other than its size, are the same in each form. Any equipment it is wearing or carrying isn't transformed."
   },
   "adult-blue-dragon": {
-    "_es": "98062a59",
+    "_es": "a74130ba",
     "name": "Adult Blue Dragon",
     "kind": "Huge Dragon (Chromatic), Lawful Evil",
     "senses": "Blindsight 60 ft., Darkvision 120 ft.; Passive Perception 22",
@@ -2633,10 +2628,12 @@
     "actions.5.description": "The dragon uses Spellcasting to cast Shatter. The dragon can't take this action again until the start of its next turn.",
     "actions.4.description": "The dragon makes one Rend attack.",
     "actions.6.description": "The dragon uses Spellcasting to cast Invisibility on itself, and it can fly up to half its Fly Speed. The dragon can't take this action again until the start of its next turn.",
-    "defenses": "Immunities: Lightning"
+    "defenses": "Immunities: Lightning",
+    "traits.0.name": "Legendary Resistance (3/Day, or 4/Day in Lair)",
+    "traits.0.description": "If the dragon fails a saving throw, it can choose to succeed instead."
   },
   "ancient-blue-dragon": {
-    "_es": "ac4d416e",
+    "_es": "fe5e2022",
     "name": "Ancient Blue Dragon",
     "kind": "Gargantuan Dragon (Chromatic), Lawful Evil",
     "senses": "Blindsight 60 ft., Darkvision 120 ft.; Passive Perception 27",
@@ -2656,8 +2653,10 @@
     "actions.3.description": "The dragon casts one of the following spells, requiring no Material components and using Charisma as the spellcasting ability (spell save DC 22):\nAt Will: Detect Magic, Invisibility, Mage Hand, Shatter (level 3 version)\n1/Day Each: Scrying, Sending",
     "actions.5.description": "The dragon uses Spellcasting to cast Shatter (level 3 version). The dragon can't take this action again until the start of its next turn.",
     "actions.4.description": "The dragon makes one Rend attack.",
+    "defenses": "Immunities: Lightning",
     "actions.6.description": "The dragon uses Spellcasting to cast Invisibility on itself, and it can fly up to half its Fly Speed. The dragon can't take this action again until the start of its next turn.",
-    "defenses": "Immunities: Lightning"
+    "traits.0.name": "Legendary Resistance (4/Day, or 5/Day in Lair)",
+    "traits.0.description": "If the dragon fails a saving throw, it can choose to succeed instead."
   },
   "young-blue-dragon": {
     "_es": "142e38d7",
@@ -2675,7 +2674,7 @@
     "defenses": "Immunities: Lightning"
   },
   "adult-white-dragon": {
-    "_es": "542407f7",
+    "_es": "d857fb74",
     "name": "Adult White Dragon",
     "kind": "Huge Dragon (Chromatic), Chaotic Evil",
     "senses": "Blindsight 60 ft., Darkvision 120 ft.; Passive Perception 21",
@@ -2692,13 +2691,15 @@
     "actions.0.description": "The dragon makes three Rend attacks.",
     "actions.2.description": "Con Saving Throw: DC 19, each creature in a 60-foot Cone. Failure: 54 (12d8) Cold damage. Success: Half damage.",
     "actions.5.description": "The dragon casts Fear, requiring no Material components and using Charisma as the spellcasting ability (spell save DC 14). The dragon can't take this action again until the start of its next turn.",
-    "traits.0.description": "The dragon can move across and climb icy surfaces without needing to make an ability check. Additionally, Difficult Terrain composed of ice or snow doesn't cost it extra movement. Legendary Resistance (3/Day, or 4/Day in Lair). If the adult white dragon fails a saving throw, it can choose to succeed instead.",
     "actions.3.description": "The dragon moves up to half its Speed, and it makes one Rend attack.",
     "actions.4.description": "Con Saving Throw: DC 14, each creature in a 30-foot-radius Sphere centered on a point the dragon can see within 120 feet. Failure: 7 (2d6) Cold damage, and the target's Speed is 0 until the end of the target's next turn. Failure or Success: The dragon can't take this action again until the start of its next turn.",
-    "defenses": "Immunities: Cold"
+    "defenses": "Immunities: Cold",
+    "traits.0.description": "The dragon can move across and climb icy surfaces without needing to make an ability check. Additionally, Difficult Terrain composed of ice or snow doesn't cost it extra movement.",
+    "traits.1.name": "Legendary Resistance (3/Day, or 4/Day in Lair)",
+    "traits.1.description": "If the dragon fails a saving throw, it can choose to succeed instead."
   },
   "ancient-white-dragon": {
-    "_es": "b519a8d5",
+    "_es": "3a19d595",
     "name": "Ancient White Dragon",
     "kind": "Gargantuan Dragon (Chromatic), Chaotic Evil",
     "senses": "Blindsight 60 ft., Darkvision 120 ft.; Passive Perception 23",
@@ -2714,11 +2715,13 @@
     "actions.1.reach": "15 ft.",
     "actions.0.description": "The dragon makes three Rend attacks.",
     "actions.2.description": "Con Saving Throw: DC 22, each creature in a 90-foot Cone. Failure: 63 (14d8) Cold damage. Success: Half damage.",
-    "actions.5.description": "The dragon casts Fear, requiring no Material components and using Charisma as the spellcasting ability (spell save DC 18). The dragon can't take this action again until the start of its next turn.",
-    "traits.0.description": "The dragon can move across and climb icy surfaces without needing to make an ability check. Additionally, Difficult Terrain composed of ice or snow doesn't cost it extra movement. Legendary Resistance (4/Day, or 5/Day in Lair). If the ancient white dragon fails a saving throw, it can choose to succeed instead.",
     "actions.3.description": "The dragon moves up to half its Speed, and it makes one Rend attack.",
     "actions.4.description": "Con Saving Throw: DC 20, each creature in a 30-foot-radius Sphere centered on a point the dragon can see within 120 feet. Failure: 14 (4d6) Cold damage, and the target's Speed is 0 until the end of the target's next turn. Failure or Success: The dragon can't take this action again until the start of its next turn.",
-    "defenses": "Immunities: Cold"
+    "defenses": "Immunities: Cold",
+    "traits.0.description": "The dragon can move across and climb icy surfaces without needing to make an ability check. Additionally, Difficult Terrain composed of ice or snow doesn't cost it extra movement.",
+    "actions.5.description": "The dragon casts Fear, requiring no Material components and using Charisma as the spellcasting ability (spell save DC 18). The dragon can't take this action again until the start of its next turn.",
+    "traits.1.name": "Legendary Resistance (4/Day, or 5/Day in Lair)",
+    "traits.1.description": "If the dragon fails a saving throw, it can choose to succeed instead."
   },
   "young-white-dragon": {
     "_es": "a8982993",
@@ -2738,7 +2741,7 @@
     "defenses": "Immunities: Cold"
   },
   "adult-bronze-dragon": {
-    "_es": "cd0f963e",
+    "_es": "b8a2e411",
     "name": "Adult Bronze Dragon",
     "kind": "Huge Dragon (Metallic), Lawful Good",
     "senses": "Blindsight 60 ft., Darkvision 120 ft.; Passive Perception 22",
@@ -2760,14 +2763,16 @@
     "actions.3.description": "Str Saving Throw: DC 19, each creature in a 30-foot Cone. Failure: The target is pushed up to 60 feet straight away from the dragon and has the Prone condition.",
     "actions.4.description": "The dragon casts one of the following spells, requiring no Material components and using Charisma as the spellcasting ability (spell save DC 17, +10 to hit with spell attacks):\nAt Will: Detect Magic, Guiding Bolt (level 2 version), Shapechange (Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell), Speak with Animals, Thaumaturgy\n1/Day Each: Detect Thoughts, Water Breathing",
     "actions.7.description": "Con Saving Throw: DC 17, each creature in a 20-foot-radius Sphere centered on a point the dragon can see within 90 feet. Failure: 10 (3d6) Thunder damage, and the target has the Deafened condition until the end of its next turn.",
-    "traits.0.description": "The dragon can breathe air and water. Legendary Resistance (3/Day, or 4/Day in Lair). If the adult bronze dragon fails a saving throw, it can choose to succeed instead.",
     "actions.5.description": "The dragon moves up to half its Speed, and it makes one Rend attack.",
     "actions.6.description": "The dragon uses Spellcasting to cast Guiding Bolt (level 2 version).",
     "defenses": "Immunities: Lightning",
-    "actions.4.spellcasting.groups.0.spells.0.note": "Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell"
+    "actions.4.spellcasting.groups.0.spells.0.note": "Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell",
+    "traits.0.description": "The dragon can breathe air and water.",
+    "traits.1.name": "Legendary Resistance (3/Day, or 4/Day in Lair)",
+    "traits.1.description": "If the dragon fails a saving throw, it can choose to succeed instead."
   },
   "ancient-bronze-dragon": {
-    "_es": "f1abf568",
+    "_es": "399cccf7",
     "name": "Ancient Bronze Dragon",
     "kind": "Gargantuan Dragon (Metallic), Lawful Good",
     "senses": "Blindsight 60 ft., Darkvision 120 ft.; Passive Perception 27",
@@ -2778,24 +2783,24 @@
     "actions.1.name": "Rend",
     "actions.2.name": "Lightning Breath (Recharge 5–6)",
     "actions.3.name": "Repulsion Breath",
-    "actions.4.name": "DC 23, each creature in a 30-foot cone",
-    "actions.5.name": "Spellcasting",
-    "actions.6.name": "Pounce",
-    "actions.7.name": "Guiding Light",
-    "actions.8.name": "Thunderclap",
+    "actions.4.name": "Spellcasting",
+    "actions.5.name": "Pounce",
+    "actions.6.name": "Guiding Light",
+    "actions.7.name": "Thunderclap",
     "actions.1.reach": "15 ft.",
-    "actions.5.spellcasting.componentRule": "No Material components required.",
-    "actions.8.description": "Con Saving Throw: DC 22, each creature in a 20-foot-radius Sphere centered on a point the dragon can see within 120 feet. Failure: 13 (3d8) Thunder damage, and the target has the Deafened condition until the end of its next turn.",
-    "traits.0.description": "The dragon can breathe air and water. Legendary Resistance (4/Day, or 5/Day in Lair). If the ancient bronze dragon fails a saving throw, it can choose to succeed instead.",
+    "actions.4.spellcasting.componentRule": "No Material components required.",
     "actions.0.description": "The dragon makes three Rend attacks. It can replace one attack with a use of (A) Repulsion Breath or (B) Spellcasting to cast Guiding Bolt (level 2 version).",
     "actions.2.description": "Dex Saving Throw: DC 23, each creature in a 120-foot-long, 10-foot-wide Line. Failure: 82 (15d10) Lightning damage. Success: Half damage.",
-    "actions.3.description": "Str Saving Throw: DC 23, each creature in a 30-foot Cone. Failure: The target is pushed up to 60 feet straight away from the dragon and has the Prone condition.",
-    "actions.5.description": "The dragon casts one of the following spells, requiring no Material components and using Charisma as the spellcasting ability (spell save DC 22, +14 to hit with spell attacks):\nAt Will: Detect Magic, Guiding Bolt (level 2 version), Shapechange (Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell), Speak with Animals, Thaumaturgy\n1/Day Each: Detect Thoughts, Control Water, Scrying, Water Breathing",
-    "actions.6.description": "The dragon moves up to half its Speed, and it makes one Rend attack.",
-    "actions.7.description": "The dragon uses Spellcasting to cast Guiding Bolt (level 2 version).",
-    "actions.4.description": "Failure: The target is pushed up to 60 feet straight away from the dragon and has the Prone condition.",
+    "actions.4.description": "The dragon casts one of the following spells, requiring no Material components and using Charisma as the spellcasting ability (spell save DC 22, +14 to hit with spell attacks):\nAt Will: Detect Magic, Guiding Bolt (level 2 version), Shapechange (Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell), Speak with Animals, Thaumaturgy\n1/Day Each: Detect Thoughts, Control Water, Scrying, Water Breathing",
+    "actions.5.description": "The dragon moves up to half its Speed, and it makes one Rend attack.",
+    "actions.6.description": "The dragon uses Spellcasting to cast Guiding Bolt (level 2 version).",
     "defenses": "Immunities: Lightning",
-    "actions.5.spellcasting.groups.0.spells.0.note": "Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell"
+    "actions.4.spellcasting.groups.0.spells.0.note": "Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell",
+    "traits.0.description": "The dragon can breathe air and water.",
+    "actions.3.description": "Str Saving Throw: DC 23, each creature in a 30-foot Cone. Failure: The target is pushed up to 60 feet straight away from the dragon and has the Prone condition.",
+    "actions.7.description": "Con Saving Throw: DC 22, each creature in a 20-foot-radius Sphere centered on a point the dragon can see within 120 feet. Failure: 13 (3d8) Thunder damage, and the target has the Deafened condition until the end of its next turn.",
+    "traits.1.name": "Legendary Resistance (4/Day, or 5/Day in Lair)",
+    "traits.1.description": "If the dragon fails a saving throw, it can choose to succeed instead."
   },
   "young-bronze-dragon": {
     "_es": "077852f3",
@@ -2817,7 +2822,7 @@
     "defenses": "Immunities: Lightning"
   },
   "adult-copper-dragon": {
-    "_es": "66d481f4",
+    "_es": "1ccba0e7",
     "name": "Adult Copper Dragon",
     "kind": "Huge Dragon (Metallic), Chaotic Good",
     "senses": "Blindsight 60 ft., Darkvision 120 ft.; Passive Perception 22",
@@ -2841,10 +2846,12 @@
     "actions.6.description": "Cha Saving Throw: DC 17, one creature the dragon can see within 90 feet. Failure: 24 (7d6) Psychic damage. Until the end of its next turn, the target rolls 1d6 whenever it makes an ability check or attack roll and subtracts the number rolled from the D20 Test. Failure or Success: The dragon can't take this action again until the start of its next turn.",
     "actions.7.description": "The dragon uses Spellcasting to cast Mind Spike (level 4 version). The dragon can't take this action again until the start of its next turn.",
     "defenses": "Immunities: Acid",
-    "actions.4.spellcasting.groups.0.spells.0.note": "Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell"
+    "actions.4.spellcasting.groups.0.spells.0.note": "Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell",
+    "traits.0.name": "Legendary Resistance (3/Day, or 4/Day in Lair)",
+    "traits.0.description": "If the dragon fails a saving throw, it can choose to succeed instead."
   },
   "ancient-copper-dragon": {
-    "_es": "a01108c8",
+    "_es": "ec5ae241",
     "name": "Ancient Copper Dragon",
     "kind": "Gargantuan Dragon (Metallic), Chaotic Good",
     "senses": "Blindsight 60 ft., Darkvision 120 ft.; Passive Perception 27",
@@ -2866,9 +2873,11 @@
     "actions.4.description": "The dragon casts one of the following spells, requiring no Material components and using Charisma as the spellcasting ability (spell save DC 21):\nAt Will: Detect Magic, Mind Spike (level 5 version), Minor Illusion, Shapechange (Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell)\n1/Day Each: Greater Restoration, Major Image, Project Image",
     "actions.5.description": "The dragon moves up to half its Speed, and it makes one Rend attack.",
     "actions.6.description": "Cha Saving Throw: DC 21, one creature the dragon can see within 120 feet. Failure: 31 (9d6) Psychic damage. Until the end of its next turn, the target rolls 1d8 whenever it makes an ability check or attack roll and subtracts the number rolled from the D20 Test. Failure or Success: The dragon can't take this action again until the start of its next turn.",
-    "actions.7.description": "The dragon uses Spellcasting to cast Mind Spike (level 5 version). The dragon can't take this action again until the start of its next turn.",
     "defenses": "Immunities: Acid",
-    "actions.4.spellcasting.groups.0.spells.0.note": "Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell"
+    "actions.4.spellcasting.groups.0.spells.0.note": "Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell",
+    "actions.7.description": "The dragon uses Spellcasting to cast Mind Spike (level 5 version). The dragon can't take this action again until the start of its next turn.",
+    "traits.0.name": "Legendary Resistance (4/Day, or 5/Day in Lair)",
+    "traits.0.description": "If the dragon fails a saving throw, it can choose to succeed instead."
   },
   "young-copper-dragon": {
     "_es": "12901e23",
@@ -2888,7 +2897,7 @@
     "defenses": "Immunities: Acid"
   },
   "adult-gold-dragon": {
-    "_es": "e490e396",
+    "_es": "ffdc6ef9",
     "name": "Adult Gold Dragon",
     "kind": "Huge Dragon (Metallic), Lawful Good",
     "senses": "Blindsight 60 ft., Darkvision 120 ft.; Passive Perception 24",
@@ -2909,15 +2918,17 @@
     "actions.2.description": "Dex Saving Throw: DC 21, each creature in a 60-foot Cone. Failure: 66 (12d10) Fire damage. Success: Half damage.",
     "actions.3.description": "Str Saving Throw: DC 21, each creature that isn't currently affected by this breath in a 60-foot Cone. Failure: The target has Disadvantage on Strength-based D20 Tests and subtracts 3 (1d6) from its damage rolls. It repeats the save at the end of each of its turns, ending the effect on itself on a success. After 1 minute, it succeeds automatically.",
     "actions.4.description": "The dragon casts one of the following spells, requiring no Material components and using Charisma as the spellcasting ability (spell save DC 21, +13 to hit with spell attacks):\nAt Will: Detect Magic, Guiding Bolt (level 2 version), Shapechange (Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell)\n1/Day Each: Flame Strike, Zone of Truth",
-    "traits.0.description": "The dragon can breathe air and water. Legendary Resistance (3/Day, or 4/Day in Lair). If the adult gold dragon fails a saving throw, it can choose to succeed instead.",
     "actions.5.description": "The dragon moves up to half its Speed, and it makes one Rend attack.",
     "actions.6.description": "Cha Saving Throw: DC 21, one creature the dragon can see within 120 feet. Failure: 10 (3d6) Force damage, and the target has the Incapacitated condition and is transported to a harmless demiplane until the start of the dragon's next turn, at which point it reappears in an unoccupied space of the dragon's choice within 120 feet of the dragon. Failure or Success: The dragon can't take this action again until the start of its next turn.",
     "actions.7.description": "The dragon uses Spellcasting to cast Guiding Bolt (level 2 version).",
     "defenses": "Immunities: Fire",
-    "actions.4.spellcasting.groups.0.spells.0.note": "Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell"
+    "actions.4.spellcasting.groups.0.spells.0.note": "Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell",
+    "traits.0.description": "The dragon can breathe air and water.",
+    "traits.1.name": "Legendary Resistance (3/Day, or 4/Day in Lair)",
+    "traits.1.description": "If the dragon fails a saving throw, it can choose to succeed instead."
   },
   "ancient-gold-dragon": {
-    "_es": "72e59831",
+    "_es": "3152bb59",
     "name": "Ancient Gold Dragon",
     "kind": "Gargantuan Dragon (Metallic), Lawful Good",
     "senses": "Blindsight 60 ft., Darkvision 120 ft.; Passive Perception 27",
@@ -2938,12 +2949,14 @@
     "actions.2.description": "Dex Saving Throw: DC 24, each creature in a 90-foot Cone. Failure: 71 (13d10) Fire damage. Success: Half damage.",
     "actions.3.description": "Str Saving Throw: DC 24, each creature that isn't currently affected by this breath in a 90-foot Cone. Failure: The target has Disadvantage on Strength-based D20 Tests and subtracts 5 (1d10) from its damage rolls. It repeats the save at the end of each of its turns, ending the effect on itself on a success. After 1 minute, it succeeds automatically.",
     "actions.4.description": "The dragon casts one of the following spells, requiring no Material components and using Charisma as the spellcasting ability (spell save DC 24, +16 to hit with spell attacks):\nAt Will: Detect Magic, Guiding Bolt (level 4 version), Shapechange (Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell)\n1/Day Each: Flame Strike (level 6 version), Word of Recall, Zone of Truth",
-    "traits.0.description": "The dragon can breathe air and water. Legendary Resistance (4/Day, or 5/Day in Lair). If the ancient gold dragon fails a saving throw, it can choose to succeed instead.",
     "actions.5.description": "The dragon moves up to half its Speed, and it makes one Rend attack.",
     "actions.6.description": "Cha Saving Throw: DC 24, one creature the dragon can see within 120 feet. Failure: 24 (7d6) Force damage, and the target has the Incapacitated condition and is transported to a harmless demiplane until the start of the dragon's next turn, at which point it reappears in an unoccupied space of the dragon's choice within 120 feet of the dragon. Failure or Success: The dragon can't take this action again until the start of its next turn.",
-    "actions.7.description": "The dragon uses Spellcasting to cast Guiding Bolt (level 4 version).",
     "defenses": "Immunities: Fire",
-    "actions.4.spellcasting.groups.0.spells.0.note": "Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell"
+    "actions.4.spellcasting.groups.0.spells.0.note": "Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell",
+    "traits.0.description": "The dragon can breathe air and water.",
+    "actions.7.description": "The dragon uses Spellcasting to cast Guiding Bolt (level 4 version).",
+    "traits.1.name": "Legendary Resistance (4/Day, or 5/Day in Lair)",
+    "traits.1.description": "If the dragon fails a saving throw, it can choose to succeed instead."
   },
   "young-gold-dragon": {
     "_es": "e199c137",
@@ -2965,7 +2978,7 @@
     "defenses": "Immunities: Fire"
   },
   "adult-brass-dragon": {
-    "_es": "9b7e90bb",
+    "_es": "27b9d72d",
     "name": "Adult Brass Dragon",
     "kind": "Huge Dragon (Metallic), Chaotic Good",
     "senses": "Blindsight 60 ft., Darkvision 120 ft.; Passive Perception 21",
@@ -2975,26 +2988,26 @@
     "actions.1.name": "Rend",
     "actions.2.name": "Fire Breath (Recharge 5–6)",
     "actions.3.name": "Sleep Breath",
-    "actions.4.name": "DC 18, each creature in a 60-foot cone",
-    "actions.5.name": "Spellcasting",
-    "actions.6.name": "Pounce",
-    "actions.7.name": "Scorching Sands",
-    "actions.8.name": "Blazing Light",
+    "actions.4.name": "Spellcasting",
+    "actions.5.name": "Pounce",
+    "actions.6.name": "Scorching Sands",
+    "actions.7.name": "Blazing Light",
     "actions.1.reach": "10 ft.",
-    "actions.5.spellcasting.componentRule": "No Material components required.",
+    "actions.4.spellcasting.componentRule": "No Material components required.",
     "actions.0.description": "The dragon makes three Rend attacks. It can replace one attack with a use of (A) Sleep Breath or (B) Spellcasting to cast Scorching Ray.",
     "actions.2.description": "Dex Saving Throw: DC 18, each creature in a 60-foot-long, 5-foot-wide Line. Failure: 45 (10d8) Fire damage. Success: Half damage.",
-    "actions.3.description": "Con Saving Throw: DC 18, each creature in a 60-foot Cone. Failure: The target has the Incapacitated condition until the end of its next turn, at which point it repeats the save. Failure by 2 or More: The target has the Unconscious condition for 10 minutes. This effect ends for the target if it takes damage or a creature within 5 feet of it takes an action to wake it.",
-    "actions.5.description": "The dragon casts one of the following spells, requiring no Material components and using Charisma as the spellcasting ability (spell save DC 16):\nAt Will: Detect Magic, Minor Illusion, Scorching Ray, Shapechange (Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell), Speak with Animals\n1/Day Each: Detect Thoughts, Control Weather",
-    "actions.6.description": "The dragon moves up to half its Speed, and it makes one Rend attack.",
-    "actions.7.description": "Dex Saving Throw: DC 16, one creature the dragon can see within 120 feet. Failure: 27 (6d8) Fire damage, and the target's Speed is halved until the end of its next turn. Failure or Success: The dragon can't take this action again until the start of its next turn.",
-    "actions.8.description": "The dragon uses Spellcasting to cast Scorching Ray.",
-    "actions.4.description": "Failure: The target has the Incapacitated condition until the end of its next turn, at which point it repeats the save. Second Failure: The target has the Unconscious condition for 10 minutes. This effect ends if the target takes damage or a creature within 5 feet of it takes an action to wake it.",
+    "actions.4.description": "The dragon casts one of the following spells, requiring no Material components and using Charisma as the spellcasting ability (spell save DC 16):\nAt Will: Detect Magic, Minor Illusion, Scorching Ray, Shapechange (Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell), Speak with Animals\n1/Day Each: Detect Thoughts, Control Weather",
+    "actions.5.description": "The dragon moves up to half its Speed, and it makes one Rend attack.",
+    "actions.6.description": "Dex Saving Throw: DC 16, one creature the dragon can see within 120 feet. Failure: 27 (6d8) Fire damage, and the target's Speed is halved until the end of its next turn. Failure or Success: The dragon can't take this action again until the start of its next turn.",
+    "actions.7.description": "The dragon uses Spellcasting to cast Scorching Ray.",
     "defenses": "Immunities: Fire",
-    "actions.5.spellcasting.groups.0.spells.0.note": "Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell"
+    "actions.4.spellcasting.groups.0.spells.0.note": "Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell",
+    "actions.3.description": "Con Saving Throw: DC 18, each creature in a 60-foot Cone. Failure: The target has the Incapacitated condition until the end of its next turn, at which point it repeats the save. Failure by 2 or More: The target has the Unconscious condition for 10 minutes. This effect ends for the target if it takes damage or a creature within 5 feet of it takes an action to wake it.",
+    "traits.0.name": "Legendary Resistance (3/Day, or 4/Day in Lair)",
+    "traits.0.description": "If the dragon fails a saving throw, it can choose to succeed instead."
   },
   "ancient-brass-dragon": {
-    "_es": "08ee7773",
+    "_es": "2e00f5a9",
     "name": "Ancient Brass Dragon",
     "kind": "Gargantuan Dragon (Metallic), Chaotic Good",
     "senses": "Blindsight 60 ft., Darkvision 120 ft.; Passive Perception 24",
@@ -3004,26 +3017,26 @@
     "actions.1.name": "Rend",
     "actions.2.name": "Fire Breath (Recharge 5–6)",
     "actions.3.name": "Sleep Breath",
-    "actions.4.name": "DC 21, each creature in a 90-foot cone",
-    "actions.5.name": "Spellcasting",
-    "actions.6.name": "Pounce",
-    "actions.7.name": "Scorching Sands",
-    "actions.8.name": "Blazing Light",
+    "actions.4.name": "Spellcasting",
+    "actions.5.name": "Pounce",
+    "actions.6.name": "Scorching Sands",
+    "actions.7.name": "Blazing Light",
     "actions.1.reach": "15 ft.",
-    "actions.5.spellcasting.componentRule": "No Material components required.",
+    "actions.4.spellcasting.componentRule": "No Material components required.",
     "actions.0.description": "The dragon makes three Rend attacks. It can replace one attack with a use of (A) Sleep Breath or (B) Spellcasting to cast Scorching Ray (level 3 version).",
     "actions.2.description": "Dex Saving Throw: DC 21, each creature in a 90-foot-long, 5-foot-wide Line. Failure: 58 (13d8) Fire damage. Success: Half damage.",
-    "actions.3.description": "Con Saving Throw: DC 21, each creature in a 90-foot Cone. Failure: The target has the Incapacitated condition until the end of its next turn, at which point it repeats the save. Failure by 2 or More: The target has the Unconscious condition for 10 minutes. This effect ends for the target if it takes damage or a creature within 5 feet of it takes an action to wake it.",
-    "actions.5.description": "The dragon casts one of the following spells, requiring no Material components and using Charisma as the spellcasting ability (spell save DC 20):\nAt Will: Detect Magic, Minor Illusion, Scorching Ray (level 3 version), Shapechange (Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell), Speak with Animals\n1/Day Each: Control Weather, Detect Thoughts",
-    "actions.6.description": "The dragon moves up to half its Speed, and it makes one Rend attack.",
-    "actions.7.description": "Dex Saving Throw: DC 20, one creature the dragon can see within 120 feet. Failure: 36 (8d8) Fire damage, and the target's Speed is halved until the end of its next turn. Failure or Success: The dragon can't take this action again until the start of its next turn.",
-    "actions.8.description": "The dragon uses Spellcasting to cast Scorching Ray (level 3 version).",
-    "actions.4.description": "Failure: The target has the Incapacitated condition until the end of its next turn, at which point it repeats the save. Second Failure: The target has the Unconscious condition for 10 minutes. This effect ends if the target takes damage or a creature within 5 feet of it takes an action to wake it.",
+    "actions.4.description": "The dragon casts one of the following spells, requiring no Material components and using Charisma as the spellcasting ability (spell save DC 20):\nAt Will: Detect Magic, Minor Illusion, Scorching Ray (level 3 version), Shapechange (Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell), Speak with Animals\n1/Day Each: Control Weather, Detect Thoughts",
+    "actions.5.description": "The dragon moves up to half its Speed, and it makes one Rend attack.",
+    "actions.6.description": "Dex Saving Throw: DC 20, one creature the dragon can see within 120 feet. Failure: 36 (8d8) Fire damage, and the target's Speed is halved until the end of its next turn. Failure or Success: The dragon can't take this action again until the start of its next turn.",
     "defenses": "Immunities: Fire",
-    "actions.5.spellcasting.groups.0.spells.0.note": "Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell"
+    "actions.4.spellcasting.groups.0.spells.0.note": "Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell",
+    "actions.3.description": "Con Saving Throw: DC 21, each creature in a 90-foot Cone. Failure: The target has the Incapacitated condition until the end of its next turn, at which point it repeats the save. Failure by 2 or More: The target has the Unconscious condition for 10 minutes. This effect ends for the target if it takes damage or a creature within 5 feet of it takes an action to wake it.",
+    "actions.7.description": "The dragon uses Spellcasting to cast Scorching Ray (level 3 version).",
+    "traits.0.name": "Legendary Resistance (4/Day, or 5/Day in Lair)",
+    "traits.0.description": "If the dragon fails a saving throw, it can choose to succeed instead."
   },
   "young-brass-dragon": {
-    "_es": "baf4f178",
+    "_es": "55648b51",
     "name": "Young Brass Dragon",
     "kind": "Large Dragon (Metallic), Chaotic Good",
     "senses": "Blindsight 30 ft., Darkvision 120 ft.; Passive Perception 16",
@@ -3033,16 +3046,14 @@
     "actions.1.name": "Rend",
     "actions.2.name": "Fire Breath (Recharge 5–6)",
     "actions.3.name": "Sleep Breath",
-    "actions.4.name": "DC 14, each creature in a 30-foot cone",
     "actions.1.reach": "10 ft.",
     "actions.0.description": "The dragon makes three Rend attacks. It can replace two attacks with a use of Sleep Breath.",
     "actions.2.description": "Dex Saving Throw: DC 14, each creature in a 40-foot-long, 5-foot-wide Line. Failure: 38 (11d6) Fire damage. Success: Half damage.",
-    "actions.3.description": "Con Saving Throw: DC 14, each creature in a 30-foot Cone. Failure: The target has the Incapacitated condition until the end of its next turn, at which point it repeats the save. Failure by 2 or More: The target has the Unconscious condition for 1 minute. This effect ends for the target if it takes damage or a creature within 5 feet of it takes an action to wake it.",
-    "actions.4.description": "Failure: The target has the Incapacitated condition until the end of its next turn, at which point it repeats the save. Second Failure: The target has the Unconscious condition for 1 minute. This effect ends if the target takes damage or a creature within 5 feet of it takes an action to wake it.",
-    "defenses": "Immunities: Fire"
+    "defenses": "Immunities: Fire",
+    "actions.3.description": "Con Saving Throw: DC 14, each creature in a 30-foot Cone. Failure: The target has the Incapacitated condition until the end of its next turn, at which point it repeats the save. Failure by 2 or More: The target has the Unconscious condition for 1 minute. This effect ends for the target if it takes damage or a creature within 5 feet of it takes an action to wake it."
   },
   "adult-silver-dragon": {
-    "_es": "4e4d030a",
+    "_es": "c47f3131",
     "name": "Adult Silver Dragon",
     "kind": "Huge Dragon (Metallic), Lawful Good",
     "senses": "Blindsight 60 ft., Darkvision 120 ft.; Passive Perception 21",
@@ -3066,10 +3077,12 @@
     "actions.6.description": "The dragon uses Spellcasting to cast Hold Monster. The dragon can't take this action again until the start of its next turn.",
     "actions.7.description": "Dex Saving Throw: DC 19, each creature in a 60-foot-long, 10-foot-wide Line. Failure: 14 (4d6) Cold damage, and the target is pushed up to 30 feet straight away from the dragon. Success: Half damage only. Failure or Success: The dragon can't take this action again until the start of its next turn.",
     "defenses": "Immunities: Cold",
-    "actions.4.spellcasting.groups.0.spells.0.note": "Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell"
+    "actions.4.spellcasting.groups.0.spells.0.note": "Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell",
+    "traits.0.name": "Legendary Resistance (3/Day, or 4/Day in Lair)",
+    "traits.0.description": "If the dragon fails a saving throw, it can choose to succeed instead."
   },
   "ancient-silver-dragon": {
-    "_es": "150778c8",
+    "_es": "9eba903e",
     "name": "Ancient Silver Dragon",
     "kind": "Gargantuan Dragon (Metallic), Lawful Good",
     "senses": "Blindsight 60 ft., Darkvision 120 ft.; Passive Perception 26",
@@ -3091,9 +3104,11 @@
     "actions.4.description": "The dragon casts one of the following spells, requiring no Material components and using Charisma as the spellcasting ability (spell save DC 23, +15 to hit with spell attacks):\nAt Will: Detect Magic, Hold Monster, Ice Knife (level 2 version), Shapechange (Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell)\n1/Day Each: Control Weather, Ice Storm (level 7 version), Teleport, Zone of Truth",
     "actions.5.description": "The dragon moves up to half its Speed, and it makes one Rend attack.",
     "actions.6.description": "The dragon uses Spellcasting to cast Hold Monster. The dragon can't take this action again until the start of its next turn.",
-    "actions.7.description": "Dex Saving Throw: DC 23, each creature in a 60-foot-long, 10-foot-wide Line. Failure: 14 (4d6) Cold damage, and the target is pushed up to 30 feet straight away from the dragon. Success: Half damage only. Failure or Success: The dragon can't take this action again until the start of its next turn.",
     "defenses": "Immunities: Cold",
-    "actions.4.spellcasting.groups.0.spells.0.note": "Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell"
+    "actions.4.spellcasting.groups.0.spells.0.note": "Beast or Humanoid form only, no Temporary Hit Points gained from the spell, and no Concentration or Temporary Hit Points required to maintain the spell",
+    "actions.7.description": "Dex Saving Throw: DC 23, each creature in a 60-foot-long, 10-foot-wide Line. Failure: 14 (4d6) Cold damage, and the target is pushed up to 30 feet straight away from the dragon. Success: Half damage only. Failure or Success: The dragon can't take this action again until the start of its next turn.",
+    "traits.0.name": "Legendary Resistance (4/Day, or 5/Day in Lair)",
+    "traits.0.description": "If the dragon fails a saving throw, it can choose to succeed instead."
   },
   "young-silver-dragon": {
     "_es": "0d0c5a32",
@@ -3113,7 +3128,7 @@
     "defenses": "Immunities: Cold"
   },
   "adult-black-dragon": {
-    "_es": "f567c8aa",
+    "_es": "d02e8de5",
     "name": "Adult Black Dragon",
     "kind": "Huge Dragon (Chromatic), Chaotic Evil",
     "senses": "Blindsight 60 ft., Darkvision 120 ft.; Passive Perception 21",
@@ -3132,14 +3147,16 @@
     "actions.0.description": "The dragon makes three Rend attacks. It can replace one attack with a use of Spellcasting to cast Melf's Acid Arrow (level 3 version).",
     "actions.2.description": "Dex Saving Throw: DC 18, each creature in a 60-foot-long, 5-foot-wide Line. Failure: 54 (12d8) Acid damage. Success: Half damage.",
     "actions.3.description": "The dragon casts one of the following spells, requiring no Material components and using Charisma as the spellcasting ability (spell save DC 17, +9 to hit with spell attacks):\nAt Will: Detect Magic, Fear, Melf's Acid Arrow (level 3 version)\n1/Day Each: Speak with Dead, Vitriolic Sphere",
-    "traits.0.description": "The dragon can breathe air and water. Legendary Resistance (3/Day, or 4/Day in Lair). If the adult black dragon fails a saving throw, it can choose to succeed instead.",
     "actions.4.description": "The dragon can move up to half its Speed, and it makes one Rend attack.",
     "actions.5.description": "Dex Saving Throw: DC 17, one creature the dragon can see within 120 feet. Failure: 22 (4d10) Poison damage, and the target has Disadvantage on saving throws to maintain Concentration until the end of its next turn. Failure or Success: The dragon can't take this action again until the start of its next turn.",
     "actions.6.description": "The dragon uses Spellcasting to cast Fear. The dragon can't take this action again until the start of its next turn.",
-    "defenses": "Immunities: Acid"
+    "defenses": "Immunities: Acid",
+    "traits.0.description": "The dragon can breathe air and water.",
+    "traits.1.name": "Legendary Resistance (3/Day, or 4/Day in Lair)",
+    "traits.1.description": "If the dragon fails a saving throw, it can choose to succeed instead."
   },
   "ancient-black-dragon": {
-    "_es": "cef3d1b3",
+    "_es": "4684a736",
     "name": "Ancient Black Dragon",
     "kind": "Gargantuan Dragon (Chromatic), Chaotic Evil",
     "senses": "Blindsight 60 ft., Darkvision 120 ft.; Passive Perception 26",
@@ -3158,11 +3175,13 @@
     "actions.0.description": "The dragon makes three Rend attacks. It can replace one attack with a use of Spellcasting to cast Melf's Acid Arrow (level 4 version).",
     "actions.2.description": "Dex Saving Throw: DC 22, each creature in a 90-foot-long, 10-foot-wide Line. Failure: 67 (15d8) Acid damage. Success: Half damage.",
     "actions.3.description": "The dragon casts one of the following spells, requiring no Material components and using Charisma as the spellcasting ability (spell save DC 21, +13 to hit with spell attacks):\nAt Will: Detect Magic, Fear, Melf's Acid Arrow (level 4 version)\n1/Day Each: Create Undead, Speak with Dead, Vitriolic Sphere (level 5 version)",
-    "traits.0.description": "The dragon can breathe air and water. Legendary Resistance (4/Day, or 5/Day in Lair). If the ancient black dragon fails a saving throw, it can choose to succeed instead.",
     "actions.4.description": "The dragon moves up to half its Speed, and it makes one Rend attack.",
     "actions.5.description": "Dex Saving Throw: DC 21, one creature the dragon can see within 120 feet. Failure: 33 (6d10) Poison damage, and the target has Disadvantage on saving throws to maintain Concentration until the end of its next turn. Failure or Success: The dragon can't take this action again until the start of its next turn.",
+    "defenses": "Immunities: Acid",
+    "traits.0.description": "The dragon can breathe air and water.",
     "actions.6.description": "The dragon uses Spellcasting to cast Fear. The dragon can't take this action again until the start of its next turn.",
-    "defenses": "Immunities: Acid"
+    "traits.1.name": "Legendary Resistance (4/Day, or 5/Day in Lair)",
+    "traits.1.description": "If the dragon fails a saving throw, it can choose to succeed instead."
   },
   "young-black-dragon": {
     "_es": "7e11a05c",
@@ -3182,7 +3201,7 @@
     "defenses": "Immunities: Acid"
   },
   "adult-red-dragon": {
-    "_es": "ffe0eda8",
+    "_es": "75e8ff6b",
     "name": "Adult Red Dragon",
     "kind": "Huge Dragon (Chromatic), Chaotic Evil",
     "senses": "Blindsight 60 ft., Darkvision 120 ft.; Passive Perception 23",
@@ -3203,10 +3222,12 @@
     "actions.4.description": "The dragon moves up to half its Speed, and it makes one Rend attack.",
     "actions.5.description": "The dragon uses Spellcasting to cast Command (level 2 version). The dragon can't take this action again until the start of its next turn.",
     "actions.6.description": "The dragon uses Spellcasting to cast Scorching Ray. The dragon can't take this action again until the start of its next turn.",
-    "defenses": "Immunities: Fire"
+    "defenses": "Immunities: Fire",
+    "traits.0.name": "Legendary Resistance (3/Day, or 4/Day in Lair)",
+    "traits.0.description": "If the dragon fails a saving throw, it can choose to succeed instead."
   },
   "ancient-red-dragon": {
-    "_es": "030ab178",
+    "_es": "bf8029b3",
     "name": "Ancient Red Dragon",
     "kind": "Gargantuan Dragon (Chromatic), Chaotic Evil",
     "senses": "Blindsight 60 ft., Darkvision 120 ft.; Passive Perception 26",
@@ -3226,8 +3247,10 @@
     "actions.3.description": "The dragon casts one of the following spells, requiring no Material components and using Charisma as the spellcasting ability (spell save DC 23, +15 to hit with spell attacks):\nAt Will: Command (level 2 version), Detect Magic, Scorching Ray (level 3 version)\n1/Day Each: Fireball (level 6 version), Scrying",
     "actions.4.description": "The dragon moves up to half its Speed, and it makes one Rend attack.",
     "actions.5.description": "The dragon uses Spellcasting to cast Command (level 2 version). The dragon can't take this action again until the start of its next turn.",
+    "defenses": "Immunities: Fire",
     "actions.6.description": "The dragon uses Spellcasting to cast Scorching Ray (level 3 version). The dragon can't take this action again until the start of its next turn.",
-    "defenses": "Immunities: Fire"
+    "traits.0.name": "Legendary Resistance (4/Day, or 5/Day in Lair)",
+    "traits.0.description": "If the dragon fails a saving throw, it can choose to succeed instead."
   },
   "young-red-dragon": {
     "_es": "00a98b63",
@@ -3266,7 +3289,7 @@
     "defenses": "Resistances: Fire"
   },
   "adult-green-dragon": {
-    "_es": "cacc71e0",
+    "_es": "657f5daf",
     "name": "Adult Green Dragon",
     "kind": "Huge Dragon (Chromatic), Lawful Evil",
     "senses": "Blindsight 60 ft., Darkvision 120 ft.; Passive Perception 22",
@@ -3285,14 +3308,16 @@
     "actions.0.description": "The dragon makes three Rend attacks. It can replace one attack with a use of Spellcasting to cast Mind Spike (level 3 version).",
     "actions.2.description": "Con Saving Throw: DC 18, each creature in a 60-foot Cone. Failure: 56 (16d6) Poison damage. Success: Half damage.",
     "actions.3.description": "The dragon casts one of the following spells, requiring no Material components and using Charisma as the spellcasting ability (spell save DC 17):\nAt Will: Detect Magic, Mind Spike (level 3 version)\n1/Day: Geas",
-    "traits.0.description": "The dragon can breathe air and water. Legendary Resistance (3/Day, or 4/Day in Lair). If the adult green dragon fails a saving throw, it can choose to succeed instead.",
     "actions.4.description": "The dragon moves up to half its Speed, and it makes one Rend attack.",
     "actions.5.description": "The dragon uses Spellcasting to cast Mind Spike (level 3 version).",
     "actions.6.description": "Con Saving Throw: DC 17, each creature in a 20-foot-radius Sphere centered on a point the dragon can see within 90 feet. Failure: 7 (2d6) Poison damage, and the target takes a -2 penalty to AC until the end of its next turn. Failure or Success: The dragon can't take this action again until the start of its next turn.",
-    "defenses": "Immunities: Poison; Poisoned"
+    "defenses": "Immunities: Poison; Poisoned",
+    "traits.0.description": "The dragon can breathe air and water.",
+    "traits.1.name": "Legendary Resistance (3/Day, or 4/Day in Lair)",
+    "traits.1.description": "If the dragon fails a saving throw, it can choose to succeed instead."
   },
   "ancient-green-dragon": {
-    "_es": "b0ba80c6",
+    "_es": "a5e71f41",
     "name": "Ancient Green Dragon",
     "kind": "Gargantuan Dragon (Chromatic), Lawful Evil",
     "senses": "Blindsight 60 ft., Darkvision 120 ft.; Passive Perception 27",
@@ -3311,11 +3336,13 @@
     "actions.0.description": "The dragon makes three Rend attacks. It can replace one attack with a use of Spellcasting to cast Mind Spike (level 5 version).",
     "actions.2.description": "Con Saving Throw: DC 22, each creature in a 90-foot Cone. Failure: 77 (22d6) Poison damage. Success: Half damage.",
     "actions.3.description": "The dragon casts one of the following spells, requiring no Material components and using Charisma as the spellcasting ability (spell save DC 21):\nAt Will: Detect Magic, Mind Spike (level 5 version)\n1/Day Each: Geas, Modify Memory",
-    "traits.0.description": "The dragon can breathe air and water. Legendary Resistance (4/Day, or 5/Day in Lair). If the ancient green dragon fails a saving throw, it can choose to succeed instead.",
     "actions.4.description": "The dragon moves up to half its Speed, and it makes one Rend attack.",
     "actions.5.description": "The dragon uses Spellcasting to cast Mind Spike (level 5 version).",
     "actions.6.description": "Con Saving Throw: DC 21, each creature in a 30-foot-radius Sphere centered on a point the dragon can see within 90 feet. Failure: 17 (5d6) Poison damage, and the target takes a -2 penalty to AC until the end of its next turn. Failure or Success: The dragon can't take this action again until the start of its next turn.",
-    "defenses": "Immunities: Poison; Poisoned"
+    "defenses": "Immunities: Poison; Poisoned",
+    "traits.0.description": "The dragon can breathe air and water.",
+    "traits.1.name": "Legendary Resistance (4/Day, or 5/Day in Lair)",
+    "traits.1.description": "If the dragon fails a saving throw, it can choose to succeed instead."
   },
   "young-green-dragon": {
     "_es": "57790cd3",
@@ -3650,7 +3677,7 @@
     "defenses": "Resistances: Bludgeoning, Piercing; Vulnerabilities: Fire"
   },
   "erinyes": {
-    "_es": "638759b2",
+    "_es": "84b186a1",
     "name": "Erinyes",
     "kind": "Medium Fiend (Devil), Lawful Evil",
     "senses": "Truesight 120 ft.; Passive Perception 16",
@@ -3661,15 +3688,16 @@
     "traits.2.name": "Magic Resistance",
     "actions.0.name": "Multiattack",
     "actions.1.name": "Withering Sword",
-    "actions.2.name": "Parry",
+    "actions.3.name": "Parry",
     "actions.1.reach": "5 ft.",
-    "actions.2.description": "Trigger: The erinyes is hit by a melee attack roll while holding a weapon. Response: The erinyes adds 4 to its AC against that attack, possibly causing it to miss.",
     "traits.0.description": "The erinyes has a magic rope. While bearing it, the erinyes can use the Entangling Rope action. The rope has AC 20, HP 90, and Immunity to Poison and Psychic damage. The rope turns to dust if reduced to 0 Hit Points, if it is 5+ feet away from the erinyes for 1 hour or more, or if the erinyes dies. If the rope is damaged or destroyed, the erinyes can fully restore it when finishing a Short or Long Rest.",
     "traits.1.description": "If the erinyes dies outside the Nine Hells, its body disappears in sulfurous smoke, and it gains a new body instantly, reviving with all its Hit Points somewhere in the Nine Hells.",
     "traits.2.description": "The erinyes has Advantage on saving throws against spells and other magical effects.",
     "actions.0.description": "The erinyes makes three Withering Sword attacks and can use Entangling Rope.",
-    "actions.1.description": "Entangling Rope (Requires Magic Rope). Strength Saving Throw: DC 16, one creature the erinyes can see within 120 feet. Failure: 14 (4d6) Force damage, and the target has the Restrained condition until the rope is destroyed, the erinyes uses a Bonus Action to release the target, or the erinyes uses Entangling Rope again.",
-    "defenses": "Resistances: Cold; Immunities: Fire, Poison; Poisoned"
+    "defenses": "Resistances: Cold; Immunities: Fire, Poison; Poisoned",
+    "actions.3.description": "Trigger: The erinyes is hit by a melee attack roll while holding a weapon. Response: The erinyes adds 4 to its AC against that attack, possibly causing it to miss.",
+    "actions.2.name": "Entangling Rope (Requires Magic Rope)",
+    "actions.2.description": "Strength Saving Throw: DC 16, one creature the erinyes can see within 120 feet. Failure: 14 (4d6) Force damage, and the target has the Restrained condition until the rope is destroyed, the erinyes uses a Bonus Action to release the target, or the erinyes uses Entangling Rope again."
   },
   "giant-scorpion": {
     "_es": "caa6667a",
@@ -3687,7 +3715,7 @@
     "actions.2.description": "If the target is a Large or smaller creature, it has the Grappled condition (escape DC 13) from one of two claws."
   },
   "sphinx-of-lore": {
-    "_es": "e272ca5c",
+    "_es": "03489ebd",
     "name": "Sphinx of Lore",
     "kind": "Large Celestial, Lawful Neutral",
     "senses": "Truesight 120 ft.; Passive Perception 18",
@@ -3705,13 +3733,15 @@
     "actions.0.description": "The sphinx makes three Claw attacks.",
     "actions.4.description": "The sphinx can teleport up to 30 feet to an unoccupied space it can see, and it makes one Claw attack.",
     "actions.5.description": "Con Saving Throw: DC 16, one creature the sphinx can see within 120 feet. Failure: The target gains 1 Exhaustion level. While the target has any Exhaustion levels, it appears 3d10 years older. Failure or Success: The sphinx can't take this action again until the start of its next turn.",
-    "traits.0.description": "No magic can observe the sphinx remotely or detect its thoughts without its permission. Wisdom (Insight) checks made to ascertain its intentions or sincerity are made with Disadvantage. Legendary Resistance (3/Day, or 4/Day in Lair). If the sphinx of lore fails a saving throw, it can choose to succeed instead.",
     "actions.2.description": "The sphinx casts one of the following spells, requiring no Material components and using Intelligence as the spellcasting ability (spell save DC 16):\nAt Will: Detect Magic, Identify, Mage Hand, Minor Illusion, Prestidigitation\n1/Day Each: Dispel Magic, Legend Lore, Locate Object, Plane Shift, Remove Curse, Tongues",
     "actions.3.description": "Wis Saving Throw: DC 16, each enemy in a 300-foot Emanation originating from the sphinx. Failure: 35 (10d6) Psychic damage, and the target has the Incapacitated condition until the start of the sphinx's next turn.",
-    "defenses": "Resistances: Necrotic, Radiant; Immunities: Psychic; Frightened, Charmed"
+    "defenses": "Resistances: Necrotic, Radiant; Immunities: Psychic; Frightened, Charmed",
+    "traits.0.description": "No magic can observe the sphinx remotely or detect its thoughts without its permission. Wisdom (Insight) checks made to ascertain its intentions or sincerity are made with Disadvantage.",
+    "traits.1.name": "Legendary Resistance (3/Day, or 4/Day in Lair)",
+    "traits.1.description": "If the sphinx fails a saving throw, it can choose to succeed instead."
   },
   "sphinx-of-valor": {
-    "_es": "7cae4256",
+    "_es": "02a86d6b",
     "name": "Sphinx of Valor",
     "kind": "Large Celestial, Lawful Neutral",
     "senses": "Truesight 120 ft.; Passive Perception 22",
@@ -3731,14 +3761,16 @@
     "actions.2.spellcasting.componentRule": "No Material components required.",
     "actions.7.description": "The sphinx can teleport up to 30 feet to an unoccupied space it can see, and it makes one Claw attack.",
     "actions.8.description": "Con Saving Throw: DC 16, one creature the sphinx can see within 120 feet. Failure: The target gains 1 Exhaustion level. While the target has any Exhaustion levels, it appears 3d10 years older. Failure or Success: The sphinx can't take this action again until the start of its next turn.",
-    "traits.0.description": "No magic can observe the sphinx remotely or detect its thoughts without its permission. Wisdom (Insight) checks made to ascertain its intentions or sincerity are made with Disadvantage. Legendary Resistance (3/Day, or 4/Day in Lair). If the sphinx of valor fails a saving throw, it can choose to succeed instead.",
     "actions.0.description": "The sphinx makes two Claw attacks and uses Roar.",
     "actions.2.description": "The sphinx casts one of the following spells, requiring no Material components and using Wisdom as the spellcasting ability (spell save DC 20):\nAt Will: Detect Evil and Good, Thaumaturgy\n1/Day Each: Detect Magic, Dispel Magic, Greater Restoration, Heroes' Feast, Zone of Truth",
     "actions.3.description": "The sphinx emits a magical roar. Whenever it roars, the roar has a different effect, as detailed below (the sequence resets when it takes a Long Rest):\nFirst Roar Wis Saving Throw: DC 20, each enemy in a 500-foot Emanation originating from the sphinx. Failure: The target has the Frightened condition for 1 minute.\nSecond Roar Wis Saving Throw: DC 20, each enemy in a 500-foot Emanation originating from the sphinx. Failure: The target has the Paralyzed condition, and it repeats the save at the end of each of its turns, ending the effect on itself on a success. After 1 minute, it succeeds automatically.\nThird Roar Con Saving Throw: DC 20, each enemy in a 500-foot Emanation originating from the sphinx. Failure: 44 (8d10) Thunder damage, and the target has the Prone condition. Success: Half damage only.",
     "actions.4.description": "Wisdom Saving Throw: DC 20, each enemy in a 500-foot Emanation originating from the sphinx. Failure: The target has the Frightened condition for 1 minute.",
     "actions.5.description": "Wisdom Saving Throw: DC 20, each enemy in a 500-foot Emanation originating from the sphinx. Failure: The target has the Paralyzed condition, and it repeats the save at the end of each of its turns, ending the effect on itself on a success. After 1 minute, it succeeds automatically.",
     "actions.6.description": "Constitution Saving Throw: DC 20, each enemy in a 500-foot Emanation originating from the sphinx. Failure: 44 (8d10) Thunder damage, and the target has the Prone condition. Success: Half damage only.",
-    "defenses": "Resistances: Necrotic, Radiant; Immunities: Psychic; Frightened, Charmed"
+    "defenses": "Resistances: Necrotic, Radiant; Immunities: Psychic; Frightened, Charmed",
+    "traits.0.description": "No magic can observe the sphinx remotely or detect its thoughts without its permission. Wisdom (Insight) checks made to ascertain its intentions or sincerity are made with Disadvantage.",
+    "traits.1.name": "Legendary Resistance (3/Day, or 4/Day in Lair)",
+    "traits.1.description": "If the sphinx fails a saving throw, it can choose to succeed instead."
   },
   "animated-flying-sword": {
     "_es": "372a3db9",
@@ -3768,7 +3800,7 @@
     "defenses": "Resistances: Acid, Bludgeoning, Slashing, Cold, Fire, Piercing, Lightning, Thunder; Immunities: Necrotic, Poison; Grappled, Restrained, Exhaustion, Prone, Poisoned, Charmed, Unconscious, Paralyzed, Petrified"
   },
   "spy": {
-    "_es": "437b662e",
+    "_es": "1a8b0abc",
     "name": "Spy",
     "kind": "Medium or Small Humanoid, Neutral",
     "senses": "Passive Perception 16",
@@ -4066,7 +4098,7 @@
     "defenses": "Resistances: Cold, Fire, Lightning; Immunities: Poison; Poisoned"
   },
   "gladiator": {
-    "_es": "fec5e609",
+    "_es": "eedbe49b",
     "name": "Gladiator",
     "kind": "Medium or Small Humanoid, Neutral",
     "senses": "Passive Perception 11",
@@ -4078,8 +4110,8 @@
     "actions.3.name": "Parry",
     "actions.0.description": "The gladiator makes three Spear attacks. It can replace one attack with a use of Shield Bash.",
     "actions.2.description": "Str Saving Throw: DC 15, one creature within 5 feet that the gladiator can see. Failure: 9 (2d4 + 4) Bludgeoning damage. If the target is a Medium or smaller creature, it has the Prone condition.",
-    "actions.3.description": "Trigger: The gladiator is hit by a melee attack roll while holding a weapon. Response: The gladiator adds 3 to its AC against that attack, possibly causing it to miss.",
-    "actions.1.reach": "5 ft. or range 20/60 ft."
+    "actions.1.reach": "5 ft. or range 20/60 ft.",
+    "actions.3.description": "Trigger: The gladiator is hit by a melee attack roll while holding a weapon. Response: The gladiator adds 3 to its AC against that attack, possibly causing it to miss."
   },
   "gorgon": {
     "_es": "9aeec54e",
@@ -4146,7 +4178,7 @@
     "actions.0.reach": "5 ft. or range 20/60 ft."
   },
   "shield-guardian": {
-    "_es": "f8e6658f",
+    "_es": "00d0401d",
     "name": "Shield Guardian",
     "kind": "Large Construct, Unaligned",
     "senses": "Blindsight 10 ft., Darkvision 60 ft.; Passive Perception 10",
@@ -4161,10 +4193,10 @@
     "actions.1.reach": "10 ft.",
     "traits.1.description": "The guardian regains 10 Hit Points at the start of each of its turns if it has at least 1 Hit Point.",
     "actions.0.description": "The guardian makes two Fist attacks.",
-    "actions.2.description": "Trigger: An attack roll hits the wearer of the guardian's amulet while the wearer is within 5 feet of the guardian. Response: The wearer gains a +5 bonus to AC, including against the triggering attack and possibly causing it to miss, until the start of the guardian's next turn.",
     "traits.0.description": "A spellcaster who wears the guardian's amulet can cause the guardian to store one spell of level 4 or lower. To do so, the wearer must cast the spell on the guardian while within 5 feet of it. The spell has no effect but is stored within the guardian. Any previously stored spell is lost when a new spell is stored. The guardian can cast the spell stored with any parameters set by the original caster, requiring no spell components and using the caster's spellcasting ability. The stored spell is then lost.",
     "traits.2.description": "The guardian is magically bound to an amulet. While the guardian and its amulet are on the same plane of existence, the amulet's wearer can telepathically call the guardian to travel to it, and the guardian knows the distance and direction to the amulet. If the guardian is within 60 feet of the amulet's wearer, half of any damage the wearer takes (round up) is transferred to the guardian.",
-    "defenses": "Immunities: Poison; Frightened, Exhaustion, Poisoned, Charmed, Paralyzed, Petrified"
+    "defenses": "Immunities: Poison; Frightened, Exhaustion, Poisoned, Charmed, Paralyzed, Petrified",
+    "actions.2.description": "Trigger: An attack roll hits the wearer of the guardian's amulet while the wearer is within 5 feet of the guardian. Response: The wearer gains a +5 bonus to AC, including against the triggering attack and possibly causing it to miss, until the start of the guardian's next turn."
   },
   "warrior-infantry": {
     "_es": "226726d0",
@@ -4179,7 +4211,7 @@
     "actions.0.reach": "5 ft. or range 20/60 ft."
   },
   "gnoll-warrior": {
-    "_es": "fc0ac212",
+    "_es": "79acf646",
     "name": "Gnoll Warrior",
     "kind": "Medium Fiend, Chaotic Evil",
     "senses": "Darkvision 60 ft.; Passive Perception 10",
@@ -4263,7 +4295,7 @@
     "actions.2.description": "If the target is a Large or smaller creature, it has the Grappled condition (escape DC 19), and it has the Restrained condition until the grapple ends."
   },
   "gargoyle": {
-    "_es": "2ed892c8",
+    "_es": "e8f9b880",
     "name": "Gargoyle",
     "kind": "Medium Elemental, Chaotic Evil",
     "senses": "Darkvision 60 ft.; Passive Perception 10",
@@ -4275,7 +4307,6 @@
     "actions.1.reach": "5 ft.",
     "traits.0.description": "The gargoyle doesn't provoke an Opportunity Attack when it flies out of an enemy's reach.",
     "actions.0.description": "The gargoyle makes two Claw attacks.",
-    "actions.1.description": "Crawling Claw",
     "defenses": "Immunities: Poison; Exhaustion, Poisoned, Petrified"
   },
   "clay-golem": {
@@ -4409,7 +4440,7 @@
     "defenses": "Immunities: Frightened, Stunned, Blinded, Deafened, Charmed, Unconscious"
   },
   "hippogriff": {
-    "_es": "c384a4fe",
+    "_es": "db5796b5",
     "name": "Hippogriff",
     "kind": "Large Monstrosity, Unaligned",
     "senses": "Passive Perception 15",
@@ -4420,8 +4451,7 @@
     "actions.1.name": "Rend",
     "actions.1.reach": "5 ft.",
     "traits.0.description": "The hippogriff doesn't provoke an Opportunity Attack when it flies out of an enemy's reach.",
-    "actions.0.description": "The hippogriff makes two Rend attacks.",
-    "actions.1.description": "Hobgoblins"
+    "actions.0.description": "The hippogriff makes two Rend attacks."
   },
   "hippopotamus": {
     "_es": "c0fe6e85",
@@ -4458,7 +4488,7 @@
     "actions.3.reach": "5 ft. or range 30/120 ft."
   },
   "werewolf": {
-    "_es": "7cb82963",
+    "_es": "d497ddf8",
     "name": "Werewolf",
     "kind": "Medium or Small Monstrosity (Lycanthrope), Chaotic Evil",
     "senses": "Darkvision 60 ft.; Passive Perception 14",
@@ -4468,16 +4498,18 @@
     "actions.0.name": "Multiattack",
     "actions.1.name": "Scratch",
     "actions.2.name": "Bite (Wolf or Hybrid Form Only)",
-    "actions.3.name": "Shape-Shift",
+    "actions.4.name": "Shape-Shift",
     "actions.1.reach": "5 ft.",
     "actions.2.reach": "5 ft.",
     "traits.0.description": "The werewolf has Advantage on an attack roll against a creature if at least one of the werewolf's allies is within 5 feet of the creature and the ally doesn't have the Incapacitated condition.",
-    "actions.3.description": "The werewolf shape-shifts into a Large wolf-humanoid hybrid or a Medium wolf, or it returns to its true humanoid form. Its game statistics, other than its size, are the same in each form. Any equipment it is wearing or carrying isn't transformed.",
+    "actions.4.description": "The werewolf shape-shifts into a Large wolf-humanoid hybrid or a Medium wolf, or it returns to its true humanoid form. Its game statistics, other than its size, are the same in each form. Any equipment it is wearing or carrying isn't transformed.",
     "actions.0.description": "The werewolf makes two attacks, using Scratch or Longbow in any combination. It can replace one attack with a Bite attack.",
-    "actions.2.description": "If the target is a Humanoid, it is subjected to the following effect. Con Saving Throw: DC 12. Failure: The target is cursed. If the cursed target drops to 0 Hit Points, it instead becomes a Werewolf under the DM's control and has 10 Hit Points. Success: The target is immune to this werewolf's curse for 24 hours."
+    "actions.3.reach": "150/600 ft.",
+    "actions.2.description": "If the target is a Humanoid, it is subjected to the following effect. Con Saving Throw: DC 12. Failure: The target is cursed. If the cursed target drops to 0 Hit Points, it instead becomes a Werewolf under the DM's control and has 10 Hit Points. Success: The target is immune to this werewolf's curse for 24 hours.",
+    "actions.3.name": "Longbow (Humanoid or Hybrid Form Only)"
   },
   "werebear": {
-    "_es": "484f1cb4",
+    "_es": "b8ca1a2f",
     "name": "Werebear",
     "kind": "Medium or Small Monstrosity (Lycanthrope), Neutral Good",
     "senses": "Darkvision 60 ft.; Passive Perception 17",
@@ -4485,14 +4517,15 @@
     "languages": "Common (can't speak in bear form)",
     "actions.0.name": "Multiattack",
     "actions.1.name": "Rend (Bear or Hybrid Form Only)",
-    "actions.2.name": "Bite (Bear or Hybrid Form Only)",
-    "actions.3.name": "Shape-Shift",
+    "actions.3.name": "Bite (Bear or Hybrid Form Only)",
+    "actions.4.name": "Shape-Shift",
     "actions.1.reach": "5 ft.",
-    "actions.2.reach": "5 ft.",
-    "actions.3.description": "The werebear shape-shifts into a Large bear-humanoid hybrid form or a Large bear, or it returns to its true humanoid form. Its game statistics, other than its size, are the same in each form. Any equipment it is wearing or carrying isn't transformed.",
+    "actions.3.reach": "5 ft.",
+    "actions.4.description": "The werebear shape-shifts into a Large bear-humanoid hybrid form or a Large bear, or it returns to its true humanoid form. Its game statistics, other than its size, are the same in each form. Any equipment it is wearing or carrying isn't transformed.",
     "actions.0.description": "The werebear makes two attacks, using Handaxe or Rend in any combination. It can replace one attack with a Bite attack.",
-    "actions.2.description": "If the target is a Humanoid, it is subjected to the following effect. Con Saving Throw: DC 14. Failure: The target is cursed. If the cursed target drops to 0 Hit Points, it instead becomes a Werebear under the DM's control and has 10 Hit Points. Success: The target is immune to this werebear's curse for 24 hours.",
-    "actions.1.description": "Handaxe (Humanoid or Hybrid Form Only). Melee or Ranged Attack Roll: +7, reach 5 ft. or range 20/60 ft. Hit: 14 (3d6 + 4)"
+    "actions.3.description": "If the target is a Humanoid, it is subjected to the following effect. Con Saving Throw: DC 14. Failure: The target is cursed. If the cursed target drops to 0 Hit Points, it instead becomes a Werebear under the DM's control and has 10 Hit Points. Success: The target is immune to this werebear's curse for 24 hours.",
+    "actions.2.name": "Handaxe (Humanoid or Hybrid Form Only)",
+    "actions.2.reach": "5 ft. or range 20/60 ft."
   },
   "wererat": {
     "_es": "c5a9d678",
@@ -4514,7 +4547,7 @@
     "actions.2.description": "If the target is a Humanoid, it is subjected to the following effect. Con Saving Throw: DC 11. Failure: The target is cursed. If the cursed target drops to 0 Hit Points, it instead becomes a Wererat under the DM's control and has 10 Hit Points. Success: The target is immune to this wererat's curse for 24 hours."
   },
   "weretiger": {
-    "_es": "2f881831",
+    "_es": "d7c7ee80",
     "name": "Weretiger",
     "kind": "Medium or Small Monstrosity (Lycanthrope), Neutral",
     "senses": "Darkvision 60 ft.; Passive Perception 15",
@@ -4523,14 +4556,16 @@
     "actions.0.name": "Multiattack",
     "actions.1.name": "Scratch",
     "actions.2.name": "Bite (Tiger or Hybrid Form Only)",
-    "actions.3.name": "Shape-Shift",
-    "actions.4.name": "Prowl (Tiger or Hybrid Form Only)",
+    "actions.4.name": "Shape-Shift",
+    "actions.5.name": "Prowl (Tiger or Hybrid Form Only)",
     "actions.1.reach": "5 ft.",
     "actions.2.reach": "5 ft.",
     "actions.0.description": "The weretiger makes two attacks, using Scratch or Longbow in any combination. It can replace one attack with a Bite attack.",
+    "actions.4.description": "The weretiger shape-shifts into a Large tiger-humanoid hybrid or a Large tiger, or it returns to its true humanoid form. Its game statistics, other than its size, are the same in each form. Any equipment it is wearing or carrying isn't transformed.",
+    "actions.5.description": "The weretiger moves up to its Speed without provoking Opportunity Attacks. At the end of this movement, the weretiger can take the Hide action.",
+    "actions.3.reach": "150/600 ft.",
     "actions.2.description": "If the target is a Humanoid, it is subjected to the following effect. Con Saving Throw: DC 13. Failure: The target is cursed. If the cursed target drops to 0 Hit Points, it instead becomes a Weretiger under the DM's control and has 10 Hit Points. Success: The target is immune to this weretiger's curse for 24 hours.",
-    "actions.3.description": "The weretiger shape-shifts into a Large tiger-humanoid hybrid or a Large tiger, or it returns to its true humanoid form. Its game statistics, other than its size, are the same in each form. Any equipment it is wearing or carrying isn't transformed.",
-    "actions.4.description": "The weretiger moves up to its Speed without provoking Opportunity Attacks. At the end of this movement, the weretiger can take the Hide action."
+    "actions.3.name": "Longbow (Humanoid or Hybrid Form Only)"
   },
   "homunculus": {
     "_es": "4a2700c3",
@@ -4652,7 +4687,7 @@
     "actions.1.description": "If the target is a Large or smaller creature, the tough pushes the target up to 10 feet straight away from itself."
   },
   "kraken": {
-    "_es": "c616e4d0",
+    "_es": "e021d07a",
     "name": "Kraken",
     "kind": "Gargantuan Monstrosity (Titan), Chaotic Evil",
     "senses": "Truesight 120 ft.; Passive Perception 21",
@@ -4667,19 +4702,19 @@
     "actions.4.name": "Lightning Strike",
     "actions.5.name": "Storm Strike",
     "actions.6.name": "Toxic Ink",
-    "actions.7.name": "The kraken then moves up to its Speed",
     "actions.1.reach": "30 ft.",
     "actions.0.description": "The kraken makes two Tentacle attacks and uses Fling, Lightning Strike, or Swallow.",
     "actions.1.description": "The target has the Grappled condition (escape DC 20) from one of ten tentacles, and it has the Restrained condition until the grapple ends.",
     "traits.0.description": "The kraken can breathe air and water.",
-    "traits.1.description": "The kraken deals double damage to objects and structures. Legendary Resistance (4/Day, or 5/Day in Lair). If the kraken fails a saving throw, it can choose to succeed instead.",
     "actions.2.description": "Dex Saving Throw: DC 25, one creature Grappled by the kraken (it can have up to four creatures swallowed at a time). Failure: 23 (3d8 + 10) Piercing damage. If the target is Large or smaller, it is swallowed and no longer Grappled. A swallowed creature has the Restrained condition, has Total Cover against attacks and other effects outside the kraken, and takes 24 (7d6) Acid damage at the start of each of its turns.\nIf the kraken takes 50 damage or more on a single turn from a creature inside it, the kraken must succeed on a DC 25 Constitution saving throw at the end of that turn or regurgitate all swallowed creatures, each of which falls in a space within 10 feet of the kraken with the Prone condition. If the kraken dies, any swallowed creature no longer has the Restrained condition and can escape from the corpse using 15 feet of movement, exiting Prone.",
     "actions.3.description": "The kraken throws a Large or smaller creature Grappled by it to a space it can see within 60 feet of itself that isn't in the air. Dex Saving Throw: DC 25, the creature thrown and each creature in the destination space. Failure: 18 (4d8) Bludgeoning damage, and the target has the Prone condition. Success: Half damage only.",
     "actions.4.description": "Dex Saving Throw: DC 23, one creature the kraken can see within 120 feet. Failure: 33 (6d10) Lightning damage. Success: Half damage.",
-    "actions.6.description": "Con Saving Throw: DC 23, each creature in a 15-foot Emanation originating from the kraken while it is underwater. Failure: The target has the Blinded and Poisoned conditions until the end of the kraken's next turn. The kraken then moves up to its Speed. Failure or Success: The kraken can't take this action again until the start of its next turn.",
     "actions.5.description": "The kraken uses Lightning Strike.",
-    "actions.7.description": "Failure or Success: The kraken can't take this action again until the start of its next turn.",
-    "defenses": "Immunities: Cold, Lightning; Grappled, Restrained, Frightened, Paralyzed"
+    "defenses": "Immunities: Cold, Lightning; Grappled, Restrained, Frightened, Paralyzed",
+    "traits.1.description": "The kraken deals double damage to objects and structures.",
+    "actions.6.description": "Con Saving Throw: DC 23, each creature in a 15-foot Emanation originating from the kraken while it is underwater. Failure: The target has the Blinded and Poisoned conditions until the end of the kraken's next turn. The kraken then moves up to its Speed. Failure or Success: The kraken can't take this action again until the start of its next turn.",
+    "traits.2.name": "Legendary Resistance (4/Day, or 5/Day in Lair)",
+    "traits.2.description": "If the kraken fails a saving throw, it can choose to succeed instead."
   },
   "roper": {
     "_es": "de6dfcfe",
@@ -4720,7 +4755,7 @@
     "actions.2.spellcasting.groups.0.spells.0.note": "can appear as a Large or Medium biped"
   },
   "lich": {
-    "_es": "15f1954d",
+    "_es": "16bb2e0a",
     "name": "Lich",
     "kind": "Medium Undead (Wizard), Neutral Evil",
     "senses": "Truesight 120 ft.; Passive Perception 19",
@@ -4741,10 +4776,12 @@
     "actions.4.description": "The lich casts Counterspell or Shield in response to the spell's trigger, using the same spellcasting ability as Spellcasting.\nAt Will: Counterspell, Shield",
     "actions.6.description": "Con Saving Throw: DC 20, each creature that isn't an Undead in a 20-foot Emanation originating from the lich. Failure: 31 (9d6) Necrotic damage. Success: Half damage. Failure or Success: The lich can't take this action again until the start of its next turn.",
     "actions.5.description": "The lich casts Fear, using the same spellcasting ability as Spellcasting. The lich can't take this action again until the start of its next turn.",
-    "traits.0.description": "If destroyed, the lich reforms in 1d10 days if it has a spirit jar, reviving with all its Hit Points. The new body appears in an unoccupied space within the lich's lair. Legendary Resistance (4/Day, or 5/Day in Lair). If the lich fails a saving throw, it can choose to succeed instead.",
     "actions.7.description": "The lich teleports up to 60 feet to an unoccupied space it can see, and each creature within 10 feet of the space it left takes 11 (2d10) Necrotic damage.",
     "actions.1.reach": "5 ft. or range 120 ft.",
-    "defenses": "Resistances: Cold, Lightning; Immunities: Necrotic, Poison; Frightened, Exhaustion, Poisoned, Charmed, Paralyzed"
+    "defenses": "Resistances: Cold, Lightning; Immunities: Necrotic, Poison; Frightened, Exhaustion, Poisoned, Charmed, Paralyzed",
+    "traits.0.description": "If destroyed, the lich reforms in 1d10 days if it has a spirit jar, reviving with all its Hit Points. The new body appears in an unoccupied space within the lich's lair.",
+    "traits.1.name": "Legendary Resistance (4/Day, or 5/Day in Lair)",
+    "traits.1.description": "If the lich fails a saving throw, it can choose to succeed instead."
   },
   "winter-wolf": {
     "_es": "8f92df18",
@@ -4776,7 +4813,7 @@
     "defenses": "Resistances: Cold; Immunities: Fire, Poison; Frightened, Poisoned, Charmed"
   },
   "magmin": {
-    "_es": "b270bf5a",
+    "_es": "49a8ea19",
     "name": "Magmin",
     "kind": "Small Elemental, Chaotic Neutral",
     "senses": "Darkvision 60 ft.; Passive Perception 10",
@@ -4788,8 +4825,8 @@
     "actions.0.reach": "5 ft.",
     "traits.0.description": "The magmin explodes when it dies. Dex Saving Throw: DC 11, each creature in a 10-foot Emanation originating from the magmin. Failure: 7 (2d6) Fire damage. Success: Half damage.",
     "actions.0.description": "If the target is a creature or a flammable object that isn't being worn or carried, it starts burning.",
-    "actions.1.description": "The magmin sets itself ablaze or extinguishes its flames. While ablaze, the magmin sheds Bright Light in a 10-foot radius and Dim Light for an additional 10 feet.",
-    "defenses": "Immunities: Fire"
+    "defenses": "Immunities: Fire",
+    "actions.1.description": "The magmin sets itself ablaze or extinguishes its flames. While ablaze, the magmin sheds Bright Light in a 10-foot radius and Dim Light for an additional 10 feet."
   },
   "mage": {
     "_es": "dba72124",
@@ -4826,7 +4863,7 @@
     "actions.2.description": "Dex Saving Throw: DC 18, one creature within 5 feet that has the Prone condition. Failure: 29 (4d10 + 7) Bludgeoning damage. Success: Half damage."
   },
   "cloaker": {
-    "_es": "7b333bb3",
+    "_es": "f3956187",
     "name": "Cloaker",
     "kind": "Large Aberration, Chaotic Neutral",
     "senses": "Darkvision 120 ft.; Passive Perception 12",
@@ -4836,14 +4873,16 @@
     "actions.0.name": "Multiattack",
     "actions.1.name": "Attach",
     "actions.2.name": "Tail",
-    "actions.3.name": "Moan",
+    "actions.4.name": "Moan",
     "actions.1.reach": "5 ft.",
     "actions.2.reach": "10 ft.",
     "traits.0.description": "While in Bright Light, the cloaker has Disadvantage on attack rolls.",
     "actions.0.description": "The cloaker makes one Attach attack and two Tail attacks.",
     "actions.1.description": "If the target is a Large or smaller creature, the cloaker attaches to it. While the cloaker is attached, the target has the Blinded condition, and the cloaker can't make Attach attacks against other targets. In addition, the cloaker halves the damage it takes (round down), and the target takes the same amount of damage.\nThe cloaker can detach itself by spending 5 feet of movement. The target or a creature within 5 feet of it can take an action to try to detach the cloaker, doing so by succeeding on a DC 14 Strength (Athletics) check.",
-    "actions.3.description": "Wis Saving Throw: DC 13, each creature in a 60-foot Emanation originating from the cloaker. Failure: The target has the Frightened condition until the end of the cloaker's next turn. Success: The target is immune to this cloaker's Moan for the next 24 hours.",
-    "defenses": "Immunities: Frightened"
+    "actions.4.description": "Wis Saving Throw: DC 13, each creature in a 60-foot Emanation originating from the cloaker. Failure: The target has the Frightened condition until the end of the cloaker's next turn. Success: The target is immune to this cloaker's Moan for the next 24 hours.",
+    "defenses": "Immunities: Frightened",
+    "actions.3.name": "Phantasms (Recharges after a Short or Long Rest)",
+    "actions.3.description": "The cloaker casts the Mirror Image spell, requiring no spell components and using Wisdom as the spellcasting ability. The spell ends early if the cloaker starts or ends its turn in Bright Light."
   },
   "darkmantle": {
     "_es": "a983006d",
@@ -4897,7 +4936,7 @@
     "defenses": "Resistances: Cold, Fire, Lightning; Immunities: Poison; Poisoned"
   },
   "medusa": {
-    "_es": "f230b077",
+    "_es": "7e6131d3",
     "name": "Medusa",
     "kind": "Medium Monstrosity, Lawful Evil",
     "senses": "Darkvision 150 ft.; Passive Perception 14",
@@ -5018,7 +5057,7 @@
     "defenses": "Immunities: Acid; Prone"
   },
   "minotaur-of-baphomet": {
-    "_es": "98faf898",
+    "_es": "42a385bc",
     "name": "Minotaur of Baphomet",
     "kind": "Large Monstrosity, Chaotic Evil",
     "senses": "Darkvision 60 ft.; Passive Perception 17",
@@ -5144,7 +5183,7 @@
     "defenses": "Resistances: Cold, Fire, Lightning; Immunities: Poison; Frightened, Poisoned"
   },
   "noble": {
-    "_es": "54dcf7b7",
+    "_es": "1dec0603",
     "name": "Noble",
     "kind": "Medium or Small Humanoid, Neutral",
     "senses": "Passive Perception 12",
@@ -5156,7 +5195,7 @@
     "actions.1.description": "Trigger: The noble is hit by a melee attack roll while holding a weapon. Response: The noble adds 2 to its AC against that attack, possibly causing it to miss."
   },
   "ogre-zombie": {
-    "_es": "27e36293",
+    "_es": "1e9c4c6c",
     "name": "Ogre Zombie",
     "kind": "Large Undead, Neutral Evil",
     "senses": "Darkvision 60 ft.; Passive Perception 8",
@@ -5166,11 +5205,10 @@
     "actions.0.name": "Slam",
     "actions.0.reach": "5 ft.",
     "traits.0.description": "If damage reduces the zombie to 0 Hit Points, it makes a Constitution saving throw (DC 5 plus the damage taken) unless the damage is Radiant or from a Critical Hit. On a successful save, the zombie drops to 1 Hit Point instead.",
-    "actions.0.description": "Animals",
     "defenses": "Immunities: Poison; Exhaustion, Poisoned"
   },
   "oni": {
-    "_es": "5e52ae24",
+    "_es": "1a10f0fb",
     "name": "Oni",
     "kind": "Large Fiend, Lawful Evil",
     "senses": "Darkvision 60 ft.; Passive Perception 14",
@@ -5190,8 +5228,8 @@
     "actions.0.description": "The oni makes two Claw or Nightmare Ray attacks. It can replace one attack with a use of Spellcasting.",
     "actions.3.description": "The oni shape-shifts into a Small or Medium Humanoid or a Large Giant, or it returns to its true form. Other than its size, its game statistics are the same in each form. Any equipment it is wearing or carrying isn't transformed.",
     "actions.4.description": "The oni casts one of the following spells, requiring no Material components and using Charisma as the spellcasting ability (spell save DC 13):\n1/Day Each: Charm Person (level 2 version), Darkness, Gaseous Form, Sleep",
-    "actions.5.description": "The oni casts Invisibility on itself, requiring no spell components and using the same spellcasting ability as Spellcasting.\nAt Will: Invisibility",
-    "defenses": "Resistances: Cold"
+    "defenses": "Resistances: Cold",
+    "actions.5.description": "The oni casts Invisibility on itself, requiring no spell components and using the same spellcasting ability as Spellcasting.\nAt Will: Invisibility"
   },
   "killer-whale": {
     "_es": "3e0873ac",
@@ -5248,15 +5286,14 @@
     "actions.3.description": "Con Saving Throw: DC 14, each creature Grappled by the otyugh. Failure: 16 (3d8 + 3) Bludgeoning damage, and the target has the Stunned condition until the start of the otyugh's next turn. Success: Half damage only."
   },
   "pegasus": {
-    "_es": "cd7c92f6",
+    "_es": "be471770",
     "name": "Pegasus",
     "kind": "Large Celestial, Chaotic Good",
     "senses": "Passive Perception 16",
     "speed": "60 ft., Fly 90 ft.",
     "languages": "Understands Celestial, Common, Elvish, and Sylvan but can't speak",
     "actions.0.name": "Hooves",
-    "actions.0.reach": "5 ft.",
-    "actions.0.description": "Toughs"
+    "actions.0.reach": "5 ft."
   },
   "tough": {
     "_es": "e3539894",
@@ -5316,15 +5353,14 @@
     "defenses": "Immunities: Fire"
   },
   "axe-beak": {
-    "_es": "27821dea",
+    "_es": "0fd0aa97",
     "name": "Axe Beak",
     "kind": "Large Monstrosity, Unaligned",
     "senses": "Passive Perception 10",
     "speed": "50 ft.",
     "languages": "None",
     "actions.0.name": "Beak",
-    "actions.0.reach": "5 ft.",
-    "actions.0.description": "Pirates"
+    "actions.0.reach": "5 ft."
   },
   "pirate": {
     "_es": "156cce2e",
@@ -5341,7 +5377,7 @@
     "actions.1.reach": "5 ft. or range 20/60 ft."
   },
   "planetar": {
-    "_es": "e07d3e4a",
+    "_es": "b307e6eb",
     "name": "Planetar",
     "kind": "Large Celestial (Angel), Lawful Good",
     "senses": "Truesight 120 ft.; Passive Perception 21",
@@ -5363,8 +5399,8 @@
     "actions.0.description": "The planetar makes three Radiant Sword attacks or uses Holy Burst twice.",
     "actions.2.description": "Dex Saving Throw: DC 20, each enemy in a 20-foot-radius Sphere centered on a point the planetar can see within 120 feet. Failure: 24 (7d6) Radiant damage. Success: Half damage.",
     "actions.3.description": "The planetar casts one of the following spells, requiring no Material components and using Charisma as spellcasting ability (spell save DC 20):\nAt Will: Detect Evil and Good\n1/Day Each: Commune, Control Weather, Dispel Evil and Good, Raise Dead",
-    "actions.4.description": "The planetar casts Cure Wounds, Invisibility, Lesser Restoration, or Remove Curse, using the same spellcasting ability as Spellcasting.\n2/Day: Cure Wounds, Invisibility, Lesser Restoration, Remove Curse",
-    "defenses": "Resistances: Radiant; Immunities: Frightened, Exhaustion, Charmed"
+    "defenses": "Resistances: Radiant; Immunities: Frightened, Exhaustion, Charmed",
+    "actions.4.description": "The planetar casts Cure Wounds, Invisibility, Lesser Restoration, or Remove Curse, using the same spellcasting ability as Spellcasting.\n2/Day: Cure Wounds, Invisibility, Lesser Restoration, Remove Curse"
   },
   "commoner": {
     "_es": "14b3a45c",
@@ -5497,7 +5533,7 @@
     "actions.1.description": "If the target is a Huge or smaller creature, it has the Grappled condition (escape DC 19) from both talons, and it has the Restrained condition until the grapple ends."
   },
   "hell-hound": {
-    "_es": "1b3d5553",
+    "_es": "6ba3ac10",
     "name": "Hell Hound",
     "kind": "Medium Fiend, Lawful Evil",
     "senses": "Darkvision 60 ft.; Passive Perception 15",
@@ -5510,8 +5546,8 @@
     "actions.1.reach": "5 ft.",
     "traits.0.description": "The hound has Advantage on an attack roll against a creature if at least one of the hound's allies is within 5 feet of the creature and the ally doesn't have the Incapacitated condition.",
     "actions.0.description": "The hound makes two Bite attacks.",
-    "actions.2.description": "Dex Saving Throw: DC 12, each creature in a 15-foot Cone. Failure: 17 (5d6) Fire damage. Success: Half damage.",
-    "defenses": "Immunities: Fire"
+    "defenses": "Immunities: Fire",
+    "actions.2.description": "Dex Saving Throw: DC 12, each creature in a 15-foot Cone. Failure: 17 (5d6) Fire damage. Success: Half damage."
   },
   "priest": {
     "_es": "762bc2d9",
@@ -5598,7 +5634,7 @@
     "actions.2.spellcasting.groups.1.spells.1.note": "self only"
   },
   "sea-hag": {
-    "_es": "85283918",
+    "_es": "9d242a92",
     "name": "Sea Hag",
     "kind": "Medium Fey, Chaotic Evil",
     "senses": "Darkvision 60 ft.; Passive Perception 11",
@@ -5648,7 +5684,7 @@
     "actions.0.reach": "5 ft. or range 20/60 ft."
   },
   "half-dragon": {
-    "_es": "8ce77068",
+    "_es": "47da87a1",
     "name": "Half-Dragon",
     "kind": "Medium Dragon, Neutral",
     "senses": "Blindsight 10 ft., Darkvision 60 ft.; Passive Perception 15",
@@ -5663,8 +5699,8 @@
     "traits.0.description": "The half-dragon is related to a type of dragon associated with one of the following damage types (DM's choice): Acid, Cold, Fire, Lightning, or Poison. This choice affects other aspects of the stat block.",
     "actions.0.description": "The half-dragon makes two Claw attacks.",
     "actions.2.description": "Dex Saving Throw: DC 14, each creature in a 30-foot Cone. Failure: 28 (8d6) damage of the type chosen for the Draconic Origin trait. Success: Half damage.",
-    "actions.3.description": "The half-dragon jumps up to 30 feet by spending 10 feet of movement.",
-    "defenses": "Resistances: damage type chosen for the Draconic Origin trait below"
+    "defenses": "Resistances: damage type chosen for the Draconic Origin trait below",
+    "actions.3.description": "The half-dragon jumps up to 30 feet by spending 10 feet of movement."
   },
   "giant-constrictor-snake": {
     "_es": "5226c232",
@@ -5693,14 +5729,14 @@
     "traits.0.description": "The snake doesn't provoke an Opportunity Attack when it flies out of an enemy's reach."
   },
   "mummy-lord": {
-    "_es": "878be178",
+    "_es": "87617f53",
     "name": "Mummy Lord",
     "kind": "Medium or Small Undead (Cleric), Lawful Evil",
     "senses": "Truesight 60 ft.; Passive Perception 19",
     "speed": "30 ft.",
     "languages": "Common plus three other languages",
     "traits.0.name": "Undead Restoration",
-    "traits.1.name": "Magic Resistance",
+    "traits.2.name": "Magic Resistance",
     "actions.0.name": "Multiattack",
     "actions.1.name": "Rotting Fist",
     "actions.2.name": "Channel Negative Energy",
@@ -5716,14 +5752,16 @@
     "actions.0.description": "The mummy makes one Rotting Fist or Channel Negative Energy attack, and it uses Dreadful Glare.",
     "actions.1.description": "If the target is a creature, it is cursed. While cursed, the target can't regain Hit Points, it gains no benefit from finishing a Long Rest, and its Hit Point maximum decreases by 10 (3d6) every 24 hours that elapse. A creature dies and turns to dust if reduced to 0 Hit Points by this attack.",
     "actions.5.description": "Trigger: The mummy is hit by an attack roll. Response: The mummy adds 2 to its AC against the attack, possibly causing the attack to miss, and the mummy teleports up to 60 feet to an unoccupied space it can see. Each creature of its choice that it can see within 5 feet of its destination space has the Blinded condition until the end of the mummy's next turn.",
-    "traits.0.description": "If destroyed, the mummy gains a new body in 24 hours if its heart is intact, reviving with all its Hit Points. The new body appears in an unoccupied space within the mummy's lair. The heart is a Tiny object that has AC 17, HP 10, and Immunity to all damage except Fire. Legendary Resistance (3/Day, or 4/Day in Lair). If the mummy lord fails a saving throw, it can choose to succeed instead.",
-    "traits.1.description": "The mummy has Advantage on saving throws against spells and other magical effects.",
+    "traits.2.description": "The mummy has Advantage on saving throws against spells and other magical effects.",
     "actions.3.description": "The mummy casts one of the following spells, requiring no Material components and using Wisdom as the spellcasting ability (spell save DC 17, +9 to hit with spell attacks):\nAt Will: Dispel Magic, Thaumaturgy\n1/Day Each: Animate Dead, Harm, Insect Plague (level 7 version)",
     "actions.4.description": "Wis Saving Throw: DC 17, one creature the mummy can see within 60 feet. Failure: 25 (6d6 + 4) Psychic damage, and the target has the Paralyzed condition until the end of the mummy's next turn.",
     "actions.6.description": "The mummy makes one Rotting Fist or Channel Negative Energy attack.",
     "actions.7.description": "The mummy uses Dreadful Glare. The mummy can't take this action again until the start of its next turn.",
     "actions.8.description": "The mummy casts Command (level 2 version), using the same spellcasting ability as Spellcasting. The mummy can't take this action again until the start of its next turn.",
-    "defenses": "Immunities: Necrotic, Poison; Frightened, Exhaustion, Poisoned, Charmed, Paralyzed; Vulnerabilities: Fire"
+    "defenses": "Immunities: Necrotic, Poison; Frightened, Exhaustion, Poisoned, Charmed, Paralyzed; Vulnerabilities: Fire",
+    "traits.0.description": "If destroyed, the mummy gains a new body in 24 hours if its heart is intact, reviving with all its Hit Points. The new body appears in an unoccupied space within the mummy's lair. The heart is a Tiny object that has AC 17, HP 10, and Immunity to all damage except Fire.",
+    "traits.1.name": "Legendary Resistance (3/Day, or 4/Day in Lair)",
+    "traits.1.description": "If the mummy fails a saving throw, it can choose to succeed instead."
   },
   "vampire-familiar": {
     "_es": "e5708869",
@@ -5793,7 +5831,7 @@
     "defenses": "Immunities: Poison, Radiant; Frightened, Exhaustion, Poisoned, Charmed"
   },
   "centaur-trooper": {
-    "_es": "4470c1d5",
+    "_es": "5ff7ffbc",
     "name": "Centaur Trooper",
     "kind": "Large Fey, Neutral Good",
     "senses": "Passive Perception 13",
@@ -5803,12 +5841,10 @@
     "actions.1.name": "Pike",
     "actions.2.name": "Longbow",
     "actions.3.name": "Trampling Charge (Recharge 5–6)",
-    "actions.4.name": "DC 14",
     "actions.1.reach": "10 ft.",
     "actions.2.reach": "150/600 ft.",
     "actions.0.description": "The centaur makes two attacks, using Pike or Longbow in any combination.",
-    "actions.3.description": "The centaur moves up to its Speed without provoking Opportunity Attacks and can move through the spaces of Medium or smaller creatures. Each creature whose space the centaur enters is targeted once by the following effect. Str Saving Throw: DC 14. Failure: 7 (1d6 + 4) Bludgeoning damage, and the target has the Prone condition.",
-    "actions.4.description": "Failure: 7 (1d6 + 4) Bludgeoning damage, and the target has the Prone condition."
+    "actions.3.description": "The centaur moves up to its Speed without provoking Opportunity Attacks and can move through the spaces of Medium or smaller creatures. Each creature whose space the centaur enters is targeted once by the following effect. Str Saving Throw: DC 14. Failure: 7 (1d6 + 4) Bludgeoning damage, and the target has the Prone condition."
   },
   "shadow": {
     "_es": "ad1e0399",
@@ -5828,7 +5864,7 @@
     "defenses": "Resistances: Acid, Cold, Fire, Lightning, Thunder; Immunities: Necrotic, Poison; Grappled, Restrained, Frightened, Exhaustion, Prone, Poisoned, Unconscious, Paralyzed, Petrified; Vulnerabilities: Radiant"
   },
   "satyr": {
-    "_es": "835e5c3a",
+    "_es": "61bf84b3",
     "name": "Satyr",
     "kind": "Medium Fey, Chaotic Neutral",
     "senses": "Passive Perception 12",
@@ -5987,7 +6023,7 @@
     "actions.2.description": "The troll moves up to half its Speed straight toward an enemy it can see."
   },
   "wight": {
-    "_es": "04df54a7",
+    "_es": "0034ebc6",
     "name": "Wight",
     "kind": "Medium Undead, Neutral Evil",
     "senses": "Darkvision 60 ft.; Passive Perception 13",
@@ -5998,17 +6034,15 @@
     "actions.1.name": "Necrotic Sword",
     "actions.2.name": "Necrotic Bow",
     "actions.3.name": "Life Drain",
-    "actions.4.name": "DC 13, one creature within 5 feet",
     "actions.1.reach": "5 ft.",
     "actions.2.reach": "150/600 ft.",
     "traits.0.description": "While in sunlight, the wight has Disadvantage on ability checks and attack rolls.",
     "actions.0.description": "The wight makes two attacks, using Necrotic Sword or Necrotic Bow in any combination. It can replace one attack with a use of Life Drain.",
-    "actions.3.description": "Con Saving Throw: DC 13, one creature within 5 feet. Failure: 6 (1d8 + 2) Necrotic damage, and the target's Hit Point maximum decreases by an amount equal to the damage taken.\nA Humanoid slain by this attack rises 24 hours later as a Zombie under the wight's control, unless the Humanoid is restored to life or its body is destroyed. The wight can have no more than twelve zombies under its control at a time.",
-    "actions.4.description": "Failure: 6 (1d8 + 2) Necrotic damage, and the target's Hit Point maximum decreases by an amount equal to the damage taken. A Humanoid slain by this attack rises 24 hours later as a Zombie under the wight's control, unless the Humanoid is restored to life or its body is destroyed. The wight can have no more than twelve zombies under its control at a time.",
-    "defenses": "Resistances: Necrotic; Immunities: Poison; Exhaustion, Poisoned"
+    "defenses": "Resistances: Necrotic; Immunities: Poison; Exhaustion, Poisoned",
+    "actions.3.description": "Con Saving Throw: DC 13, one creature within 5 feet. Failure: 6 (1d8 + 2) Necrotic damage, and the target's Hit Point maximum decreases by an amount equal to the damage taken.\nA Humanoid slain by this attack rises 24 hours later as a Zombie under the wight's control, unless the Humanoid is restored to life or its body is destroyed. The wight can have no more than twelve zombies under its control at a time."
   },
   "unicorn": {
-    "_es": "1e2a703e",
+    "_es": "192b223b",
     "name": "Unicorn",
     "kind": "Large Celestial, Lawful Good",
     "senses": "Darkvision 60 ft.; Passive Perception 13",
@@ -6032,11 +6066,11 @@
     "actions.3.description": "The unicorn casts one of the following spells, requiring no spell components and using Charisma as the spellcasting ability (spell save DC 14):\nAt Will: Detect Evil and Good, Druidcraft\n1/Day Each: Calm Emotions, Dispel Evil and Good, Entangle, Pass without Trace, Word of Recall",
     "actions.4.description": "The unicorn touches another creature with its horn and casts Cure Wounds or Lesser Restoration on that creature, using the same spellcasting ability as Spellcasting.\n3/Day: Cure Wounds, Lesser Restoration",
     "actions.5.description": "The unicorn moves up to half its Speed without provoking Opportunity Attacks, and it makes one Radiant Horn attack.",
-    "actions.6.description": "The unicorn targets itself or one creature it can see within 60 feet of itself. The target gains 10 (3d6) Temporary Hit Points, and its AC increases by 2 until the end of the unicorn's next turn. The unicorn can't take this action again until the start of its next turn.",
-    "defenses": "Immunities: Poison; Poisoned, Charmed, Paralyzed"
+    "defenses": "Immunities: Poison; Poisoned, Charmed, Paralyzed",
+    "actions.6.description": "The unicorn targets itself or one creature it can see within 60 feet of itself. The target gains 10 (3d6) Temporary Hit Points, and its AC increases by 2 until the end of the unicorn's next turn. The unicorn can't take this action again until the start of its next turn."
   },
   "vampire": {
-    "_es": "133b027e",
+    "_es": "187ec789",
     "name": "Vampire",
     "kind": "Medium or Small Undead, Lawful Evil",
     "senses": "Darkvision 120 ft.; Passive Perception 17",
@@ -6048,7 +6082,7 @@
     "traits.3.name": "Sunlight",
     "traits.4.name": "Forbiddance",
     "traits.5.name": "Misty Escape",
-    "traits.6.name": "Spider Climb",
+    "traits.7.name": "Spider Climb",
     "actions.0.name": "Multiattack (Vampire Form Only)",
     "actions.1.name": "Grave Strike (Vampire Form Only)",
     "actions.2.name": "Bite (Bat or Vampire Form Only)",
@@ -6063,15 +6097,17 @@
     "actions.3.description": "If the vampire isn't in sunlight or running water, it shape-shifts into a Tiny bat (Speed 5 ft., Fly Speed 30 ft.) or a Medium cloud of mist (Speed 5 ft., Fly Speed 20 ft. [hover]), or it returns to its vampire form. Anything it is wearing transforms with it.\nWhile in bat form, the vampire can't speak. Its game statistics, other than its size and Speed, are unchanged.\nWhile in mist form, the vampire can't take any actions, speak, or manipulate objects. It is weightless and can enter an enemy's space and stop there. If air can pass through a space, the mist can do so, but it can't pass through liquid. It has Resistance to all damage, except the damage it takes from sunlight.",
     "actions.4.description": "The vampire casts Charm Person, requiring no spell components and using Charisma as the spellcasting ability (spell save DC 17), and the duration is 24 hours. The Charmed target is a willing recipient of the vampire's Bite, the damage of which doesn't end the spell. When the spell ends, the target is unaware it was Charmed by the vampire.",
     "traits.0.description": "The vampire has these weaknesses:\nForbiddance The vampire can't enter a residence without an invitation from an occupant.\nRunning Water The vampire takes 20 Acid damage if it ends its turn in running water.\nStake to the Heart If a weapon that deals Piercing damage is driven into the vampire's heart while the vampire has the Incapacitated condition in its resting place, the vampire has the Paralyzed condition until the weapon is removed.\nSunlight The vampire takes 20 Radiant damage if it starts its turn in sunlight. While in sunlight, it has Disadvantage on attack rolls and ability checks.",
-    "traits.5.description": "If the vampire drops to 0 Hit Points outside its resting place, the vampire uses Shape-Shift to become mist (no action required). If it can't use Shape-Shift, it is destroyed.\nWhile it has 0 Hit Points in mist form, it can't return to its vampire form, and it must reach its resting place within 2 hours or be destroyed. Once in its resting place, it returns to its vampire form and has the Paralyzed condition until it regains any Hit Points, and it regains 1 Hit Point after spending 1 hour there. Legendary Resistance (3/Day, or 4/Day in Lair). If the vampire fails a saving throw, it can choose to succeed instead.",
-    "traits.6.description": "The vampire can climb difficult surfaces, including along ceilings, without needing to make an ability check.",
+    "traits.7.description": "The vampire can climb difficult surfaces, including along ceilings, without needing to make an ability check.",
     "actions.6.description": "The vampire moves up to half its Speed, and it makes one Grave Strike attack.",
     "traits.1.description": "The vampire takes 20 Acid damage if it ends its turn in running water.",
     "traits.3.description": "The vampire takes 20 Radiant damage if it starts its turn in sunlight. While in sunlight, it has Disadvantage on attack rolls and ability checks.",
     "traits.4.description": "The vampire can't enter a residence without an invitation from one of the occupants.",
     "traits.2.description": "If a weapon that deals Piercing damage is driven into the vampire's heart while the vampire has the Incapacitated condition in its resting place, the vampire has the Paralyzed condition until the weapon is removed.",
     "actions.5.description": "The vampire casts Command, requiring no spell components and using Charisma as the spellcasting ability (spell save DC 17). The vampire can't take this action again until the start of its next turn.",
-    "defenses": "Resistances: Necrotic"
+    "defenses": "Resistances: Necrotic",
+    "traits.5.description": "If the vampire drops to 0 Hit Points outside its resting place, the vampire uses Shape-Shift to become mist (no action required). If it can't use Shape-Shift, it is destroyed.\nWhile it has 0 Hit Points in mist form, it can't return to its vampire form, and it must reach its resting place within 2 hours or be destroyed. Once in its resting place, it returns to its vampire form and has the Paralyzed condition until it regains any Hit Points, and it regains 1 Hit Point after spending 1 hour there.",
+    "traits.6.name": "Legendary Resistance (3/Day, or 4/Day in Lair)",
+    "traits.6.description": "If the vampire fails a saving throw, it can choose to succeed instead."
   },
   "vrock": {
     "_es": "2360ecc5",
@@ -6095,7 +6131,7 @@
     "defenses": "Resistances: Cold, Fire, Lightning; Immunities: Poison; Poisoned"
   },
   "xorn": {
-    "_es": "02d705fc",
+    "_es": "1cabca9a",
     "name": "Xorn",
     "kind": "Medium Elemental, Neutral",
     "senses": "Tremorsense 60 ft., Darkvision 60 ft.; Passive Perception 16",
@@ -6112,8 +6148,8 @@
     "traits.0.description": "The xorn can burrow through nonmagical, unworked earth and stone. While doing so, the xorn doesn't disturb the material it moves through.",
     "traits.1.description": "The xorn can pinpoint the location of precious metals and stones within 60 feet of itself.",
     "actions.0.description": "The xorn makes one Bite attack and three Claw attacks.",
-    "actions.3.description": "The xorn moves up to its Speed or Burrow Speed straight toward an enemy it can sense.",
-    "defenses": "Immunities: Poison; Poisoned, Paralyzed, Petrified"
+    "defenses": "Immunities: Poison; Poisoned, Paralyzed, Petrified",
+    "actions.3.description": "The xorn moves up to its Speed or Burrow Speed straight toward an enemy it can sense."
   },
   "giant-eagle": {
     "_es": "912096b7",
@@ -6140,7 +6176,7 @@
     "defenses": "Resistances: Bludgeoning, Piercing; Vulnerabilities: Fire"
   },
   "incubus": {
-    "_es": "f738d149",
+    "_es": "eda752f8",
     "name": "Incubus",
     "kind": "Medium Fiend, Neutral Evil",
     "senses": "Darkvision 60 ft.; Passive Perception 15",
@@ -6156,7 +6192,7 @@
     "traits.0.description": "When the incubus finishes a Long Rest, it can shape-shift into a Succubus, using that stat block instead of this one. Any equipment it's wearing or carrying isn't transformed.",
     "actions.0.description": "The incubus makes two Restless Touch attacks.",
     "actions.2.description": "The incubus casts one of the following spells, requiring no Material components and using Charisma as the spellcasting ability (spell save DC 15):\nAt Will: Disguise Self, Etherealness\n1/Day Each: Dream, Hypnotic Pattern",
-    "actions.3.description": "Wis Saving Throw: DC 15, one creature the incubus can see within 60 feet. Failure: If the target has 20 Hit Points or fewer, it has the Unconscious condition for 1 hour, until it takes damage, or until a creature within 5 feet of it takes an action to wake it. Otherwise, the target takes 18 (4d8) Psychic damage.",
-    "defenses": "Resistances: Cold, Fire, Psychic, Poison"
+    "defenses": "Resistances: Cold, Fire, Psychic, Poison",
+    "actions.3.description": "Wis Saving Throw: DC 15, one creature the incubus can see within 60 feet. Failure: If the target has 20 Hit Points or fewer, it has the Unconscious condition for 1 hour, until it takes damage, or until a creature within 5 feet of it takes an action to wake it. Otherwise, the target takes 18 (4d8) Psychic damage."
   }
 }

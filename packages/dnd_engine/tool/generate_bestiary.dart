@@ -125,6 +125,34 @@ String feetify(String text) {
     RegExp(r'(\d+(?:,\d+)?)/(\d+(?:,\d+)?) m(?![\p{L}\p{N}_])', unicode: true),
     (m) => '${metersToFeet(m[1]!)}/${metersToFeet(m[2]!)} pies',
   );
+  // Con la misma escala del libro: 1,5 km es una milla, 30 cm un pie y 2,5 cm
+  // una pulgada (igual que `extract_magic_item_text.dart`). Antes se
+  // corregían a mano en el catálogo y regenerar las deshacía.
+  text = text.replaceAllMapped(
+    RegExp(r'(\d+(?:,\d+)?) km(?![\p{L}\p{N}_])', unicode: true),
+    (m) {
+      final miles = (double.parse(m[1]!.replaceAll(',', '.')) / 1.5).round();
+      return '$miles ${miles == 1 ? 'milla' : 'millas'}';
+    },
+  );
+  text = text.replaceAllMapped(
+    RegExp(r'(\d+(?:,\d+)?) cm(?![\p{L}\p{N}_])', unicode: true),
+    (m) {
+      final cm = double.parse(m[1]!.replaceAll(',', '.'));
+      if (cm % 30 == 0) {
+        final feet = cm ~/ 30;
+        return '$feet ${feet == 1 ? 'pie' : 'pies'}';
+      }
+      final inches = (cm / 2.5).round();
+      return '$inches ${inches == 1 ? 'pulgada' : 'pulgadas'}';
+    },
+  );
+  // El único volumen del bestiario (elemental de fuego): el libro en inglés
+  // dice «gallon» y el español lo redondeó a 4 litros.
+  text = text.replaceAll(
+    'por cada 4 litros de agua que se viertan',
+    'por cada galón de agua que se vierta',
+  );
   return text.replaceAllMapped(
     RegExp(r'(\d+(?:,\d+)?) m(?![\p{L}\p{N}_])', unicode: true),
     (m) => '${metersToFeet(m[1]!)} pies',
@@ -178,6 +206,16 @@ const _typeWords = [
 
 bool _startsType(String line) => _typeWords.any(line.startsWith);
 
+/// Un título de grupo: pocas palabras, mayúscula inicial, sin puntuación ni
+/// números. Una línea de prosa partida casi siempre trae una coma, un punto o
+/// una cifra, o arranca en minúscula.
+bool _isGroupHeading(String line) {
+  final t = line.trim();
+  return t.isNotEmpty &&
+      RegExp(r'^[A-ZÁÉÍÓÚÑ][\p{L} ]*$', unicode: true).hasMatch(t) &&
+      t.split(' ').length <= 3;
+}
+
 /// El nombre del perfil sale repetido: una vez como encabezado de página y otra
 /// como título del bloque. Se queda con uno.
 ///
@@ -219,6 +257,12 @@ List<RawBlock> cutBlocks(List<String> lines) {
         m--;
       }
       end = (m > start && lines[m - 1].trim() == lines[m].trim()) ? m - 1 : m;
+      // El libro agrupa perfiles bajo un título («Pendencieros», «Piratas»)
+      // que cae justo antes del nombre del primero, y quedaba pegado al final
+      // de la última acción del perfil anterior.
+      while (end - 1 > start && _isGroupHeading(lines[end - 1])) {
+        end--;
+      }
     }
 
     blocks.add(RawBlock(
@@ -319,6 +363,13 @@ num? parseCr(String text) {
 /// cierra con un punto y espacio en las primeras palabras.
 final _entryStart = RegExp(r'^([A-ZÁÉÍÓÚÑ][^.:]{0,55}?)\.\s+(.*)$');
 
+/// Un nombre con paréntesis que ocupa la línea entera y cierra con el punto:
+/// «Hacha de mano (solo en forma humanoide o híbrida).» o «Resistencia
+/// legendaria (3/día o 4/día en la guarida).». Sin esto la entrada se pegaba
+/// a la anterior. Exigir el paréntesis final lo separa de la prosa, cuyas
+/// líneas cortas terminan en una palabra y no en «).».
+final _bareEntryStart = RegExp(r'^([A-ZÁÉÍÓÚÑ][^.:]{0,70}\))\.$');
+
 /// Palabras con las que arranca una oración, nunca el nombre de una acción.
 ///
 /// Sin esto, una línea de continuación que empieza en mayúscula y trae un punto
@@ -342,7 +393,18 @@ const _prose = [
   'También',
   'Su ',
   'Sus ',
+  // «CD 10, una criatura a 6 m o menos. Fallo: …» es la segunda línea de una
+  // tirada de salvación partida, no una acción.
+  'CD ',
+  // «Después, el kraken se mueve hasta su velocidad.» cierra Tinta tóxica.
+  'Después',
 ];
+
+/// «Cubo de cieno). Tirada…» es el final de una referencia entre paréntesis
+/// que empezó en la línea anterior: un nombre de acción no cierra un
+/// paréntesis que no abrió.
+bool _closesForeignParen(String name) =>
+    ')'.allMatches(name).length > '('.allMatches(name).length;
 
 class ParsedEntry {
   final String name;
@@ -419,11 +481,14 @@ List<ParsedEntry> parseEntries(List<String> body) {
       );
       continue;
     }
-    final m = _entryStart.firstMatch(trimmed);
-    if (m != null && !_prose.any(m[1]!.startsWith)) {
+    final m =
+        _entryStart.firstMatch(trimmed) ?? _bareEntryStart.firstMatch(trimmed);
+    if (m != null &&
+        !_prose.any(m[1]!.startsWith) &&
+        !_closesForeignParen(m[1]!)) {
       flush();
       name = m[1]!.trim();
-      buffer.add(m[2]!);
+      buffer.add(m.groupCount >= 2 ? m[2]! : '');
     } else if (name != null) {
       buffer.add(trimmed);
     }

@@ -2682,11 +2682,7 @@
       },
       {
         "name": "Asustar (1/día)",
-        "description": "Tirada de salvación de Sabiduría:"
-      },
-      {
-        "name": "CD 10, una criatura a 20 pies o menos",
-        "description": "Fallo: el objetivo tendrá el estado de asustado. Al final de cada uno de sus turnos, el objetivo repetirá la tirada de salvación y, si tiene éxito, se librará del efecto. Tras 1 minuto,  tendrá éxito automáticamente."
+        "description": "Tirada de salvación de Sabiduría: CD 10, una criatura a 20 pies o menos. Fallo: el objetivo tendrá el estado de asustado. Al final de cada uno de sus turnos, el objetivo repetirá la tirada de salvación y, si tiene éxito, se librará del efecto. Tras 1 minuto,  tendrá éxito automáticamente."
       },
       {
         "name": "Cambio de forma",
@@ -4653,7 +4649,11 @@
       },
       {
         "name": "Recuperación sobrenatural",
-        "description": "Si es destruido, el aboleth obtiene un nuevo cuerpo tras 5d10 días y revive con todos sus puntos de golpe en el Reino Lejano o en otro lugar a elección de cada GM. Resistencia legendaria (3/día o 4/día en la guarida). El aboleth puede elegir tener éxito en una tirada de salvación que haya fallado."
+        "description": "Si es destruido, el aboleth obtiene un nuevo cuerpo tras 5d10 días y revive con todos sus puntos de golpe en el Reino Lejano o en otro lugar a elección de cada GM."
+      },
+      {
+        "name": "Resistencia legendaria (3/día o 4/día en la guarida)",
+        "description": "El aboleth puede elegir tener éxito en una tirada de salvación que haya fallado."
       },
       {
         "name": "Telepatía inquisitiva",
@@ -5436,7 +5436,7 @@
       },
       {
         "name": "Acción astuta",
-        "description": "El asesino realiza las acciones de correr, destrabarse o esconderse. Azer",
+        "description": "El asesino realiza las acciones de correr, destrabarse o esconderse.",
         "kind": "bonus"
       }
     ],
@@ -5510,7 +5510,7 @@
       },
       {
         "name": "Teletransporte",
-        "description": "El balor se teletransporta a sí mismo o a un demonio voluntario que esté a 10 pies o menos de él hasta 60 pies a un espacio sin ocupar que el balor pueda ver. Bandidos",
+        "description": "El balor se teletransporta a sí mismo o a un demonio voluntario que esté a 10 pies o menos de él hasta 60 pies a un espacio sin ocupar que el balor pueda ver.",
         "kind": "bonus"
       }
     ],
@@ -5984,7 +5984,7 @@
       },
       {
         "name": "Parada",
-        "description": "Detonante: una tirada de ataque cuerpo a cuerpo acierta al caballero mientras sostiene un arma. Respuesta: el caballero suma 2 a su CA contra ese ataque, lo que puede hacer que falle. Centauro",
+        "description": "Detonante: una tirada de ataque cuerpo a cuerpo acierta al caballero mientras sostiene un arma. Respuesta: el caballero suma 2 a su CA contra ese ataque, lo que puede hacer que falle.",
         "kind": "reaction"
       }
     ],
@@ -6118,8 +6118,7 @@
         "attackBonus": "6",
         "reach": "5 pies o 30/120 pies a distancia",
         "damage": "3d6+4",
-        "damageType": "piercing",
-        "description": "Guerreros"
+        "damageType": "piercing"
       }
     ],
     "hitDice": "10d8 + 30"
@@ -6867,11 +6866,7 @@
       },
       {
         "name": "Aliento somnífero",
-        "description": "Tirada de salvación de Constitución:"
-      },
-      {
-        "name": "CD 11, todas las criaturas en un cono de 15 pies",
-        "description": "Fallo: el objetivo tendrá el estado de incapacitado hasta el final de su siguiente turno, momento en el que repetirá la tirada de salvación. Segundo fallo: el objetivo tendrá el estado de inconsciente durante 1 minuto. Este efecto acabará si el objetivo sufre daño o si una criatura que se encuentre a 5 pies o menos de él lleva a cabo una acción para despertarlo."
+        "description": "Tirada de salvación de Constitución: CD 11, todas las criaturas en un cono de 15 pies. Fallo: el objetivo tendrá el estado de incapacitado hasta el final de su siguiente turno, momento en el que repetirá la tirada de salvación. Segundo fallo: el objetivo tendrá el estado de inconsciente durante 1 minuto. Este efecto acabará si el objetivo sufre daño o si una criatura que se encuentre a 5 pies o menos de él lleva a cabo una acción para despertarlo."
       }
     ],
     "hitDice": "4d8 + 4"
@@ -7124,11 +7119,7 @@
       },
       {
         "name": "Absorber",
-        "description": "El cubo se mueve hasta su velocidad sin provocar ataques de oportunidad. Puede atravesar los espacios de criaturas Grandes o más pequeñas si tiene sitio en su interior para albergarlas (consulta el atributo"
-      },
-      {
-        "name": "Cubo de cieno)",
-        "description": "Tirada de salvación de Destreza: CD 12, todas las criaturas en cuyo espacio entre el cubo por primera vez durante este movimiento. Fallo: 10 (3d6) de daño de ácido y el objetivo será absorbido. Un objetivo absorbido sufrirá asfixia, no podrá lanzar conjuros con un componente verbal, tendrá el estado de apresado y sufrirá 10 (3d6) de daño de ácido al principio de cada turno del cubo. Cuando el cubo se mueva, el objetivo absorbido se moverá con él. Un objetivo absorbido puede intentar escapar utilizando una acción para realizar una prueba de Fuerza (Atletismo) con CD 12. Si la supera, escapará y entrará en el espacio sin ocupar más cercano. Éxito: la mitad del daño y el objetivo se moverá a un espacio sin ocupar a 5 pies del cubo. Si no hay espacios sin ocupar, fallará la tirada de salvación."
+        "description": "El cubo se mueve hasta su velocidad sin provocar ataques de oportunidad. Puede atravesar los espacios de criaturas Grandes o más pequeñas si tiene sitio en su interior para albergarlas (consulta el atributo Cubo de cieno). Tirada de salvación de Destreza: CD 12, todas las criaturas en cuyo espacio entre el cubo por primera vez durante este movimiento. Fallo: 10 (3d6) de daño de ácido y el objetivo será absorbido. Un objetivo absorbido sufrirá asfixia, no podrá lanzar conjuros con un componente verbal, tendrá el estado de apresado y sufrirá 10 (3d6) de daño de ácido al principio de cada turno del cubo. Cuando el cubo se mueva, el objetivo absorbido se moverá con él. Un objetivo absorbido puede intentar escapar utilizando una acción para realizar una prueba de Fuerza (Atletismo) con CD 12. Si la supera, escapará y entrará en el espacio sin ocupar más cercano. Éxito: la mitad del daño y el objetivo se moverá a un espacio sin ocupar a 5 pies del cubo. Si no hay espacios sin ocupar, fallará la tirada de salvación."
       }
     ],
     "hitDice": "6d10 + 30"
@@ -7854,7 +7845,7 @@
       },
       {
         "name": "Cambio de forma",
-        "description": "El doppelganger adopta la forma de un humanoide Mediano o Pequeño, o recupera su verdadera forma. Su perfil, salvo por el tamaño, es el mismo en todas las formas. Cualquier equipo que vista o lleve no se transformará. Dragones azules",
+        "description": "El doppelganger adopta la forma de un humanoide Mediano o Pequeño, o recupera su verdadera forma. Su perfil, salvo por el tamaño, es el mismo en todas las formas. Cualquier equipo que vista o lleve no se transformará.",
         "kind": "bonus"
       }
     ],
@@ -7890,6 +7881,12 @@
     "languages": "común, dracónico",
     "defenses": "Inmunidades: relámpago",
     "legendaryActionsPerRound": 3,
+    "traits": [
+      {
+        "name": "Resistencia legendaria (3/día o 4/día en la guarida)",
+        "description": "El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
+      }
+    ],
     "actions": [
       {
         "name": "Ataque múltiple",
@@ -7992,6 +7989,12 @@
     "languages": "común, dracónico",
     "defenses": "Inmunidades: relámpago",
     "legendaryActionsPerRound": 3,
+    "traits": [
+      {
+        "name": "Resistencia legendaria (4/día o 5/día en la guarida)",
+        "description": "El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
+      }
+    ],
     "actions": [
       {
         "name": "Ataque múltiple",
@@ -8059,7 +8062,7 @@
       },
       {
         "name": "Vuelo encubierto",
-        "description": "El dragón utiliza su lanzamiento de conjuros para lanzarse invisibilidad a sí mismo y puede volar hasta la mitad de su velocidad volando. El dragón no puede volver a realizar esta acción hasta el principio de su siguiente turno. Dragones blancos",
+        "description": "El dragón utiliza su lanzamiento de conjuros para lanzarse invisibilidad a sí mismo y puede volar hasta la mitad de su velocidad volando. El dragón no puede volver a realizar esta acción hasta el principio de su siguiente turno.",
         "kind": "legendary"
       }
     ],
@@ -8146,7 +8149,11 @@
     "traits": [
       {
         "name": "Caminar por el hielo",
-        "description": "El dragón puede moverse y trepar por superficies heladas sin tener que hacer pruebas de característica. Además, desplazarse por terreno difícil compuesto de nieve o hielo no le cuesta movimiento adicional. Resistencia legendaria (3/día o 4/día en la guarida). El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
+        "description": "El dragón puede moverse y trepar por superficies heladas sin tener que hacer pruebas de característica. Además, desplazarse por terreno difícil compuesto de nieve o hielo no le cuesta movimiento adicional."
+      },
+      {
+        "name": "Resistencia legendaria (3/día o 4/día en la guarida)",
+        "description": "El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
       }
     ],
     "actions": [
@@ -8216,7 +8223,11 @@
     "traits": [
       {
         "name": "Caminar por el hielo",
-        "description": "El dragón puede moverse y trepar por superficies heladas sin tener que hacer pruebas de característica. Además, desplazarse por terreno difícil compuesto de nieve o hielo no le cuesta movimiento adicional. Resistencia legendaria (4/día o 5/día en la guarida). El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
+        "description": "El dragón puede moverse y trepar por superficies heladas sin tener que hacer pruebas de característica. Además, desplazarse por terreno difícil compuesto de nieve o hielo no le cuesta movimiento adicional."
+      },
+      {
+        "name": "Resistencia legendaria (4/día o 5/día en la guarida)",
+        "description": "El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
       }
     ],
     "actions": [
@@ -8247,7 +8258,7 @@
       },
       {
         "name": "Presencia aterradora",
-        "description": "El dragón lanza terror, que no requiere componentes materiales y utiliza el Carisma como aptitud mágica (CD de salvación de conjuros 18). El dragón no puede volver a realizar esta acción hasta el principio de su siguiente turno. Dragones de bronce",
+        "description": "El dragón lanza terror, que no requiere componentes materiales y utiliza el Carisma como aptitud mágica (CD de salvación de conjuros 18). El dragón no puede volver a realizar esta acción hasta el principio de su siguiente turno.",
         "kind": "legendary"
       }
     ],
@@ -8342,7 +8353,11 @@
     "traits": [
       {
         "name": "Anfibio",
-        "description": "El dragón puede respirar tanto dentro como fuera del agua. Resistencia legendaria (3/día o 4/día en la guarida). El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
+        "description": "El dragón puede respirar tanto dentro como fuera del agua."
+      },
+      {
+        "name": "Resistencia legendaria (3/día o 4/día en la guarida)",
+        "description": "El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
       }
     ],
     "actions": [
@@ -8461,7 +8476,11 @@
     "traits": [
       {
         "name": "Anfibio",
-        "description": "El dragón puede respirar tanto dentro como fuera del agua. Resistencia legendaria (4/día o 5/día en la guarida). El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
+        "description": "El dragón puede respirar tanto dentro como fuera del agua."
+      },
+      {
+        "name": "Resistencia legendaria (4/día o 5/día en la guarida)",
+        "description": "El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
       }
     ],
     "actions": [
@@ -8482,11 +8501,7 @@
       },
       {
         "name": "Aliento repulsor",
-        "description": "Tirada de salvación de Fuerza:"
-      },
-      {
-        "name": "CD 23, todas las criaturas en un cono de 30 pies",
-        "description": "Fallo: el objetivo es empujado hasta 60 pies respecto al dragón en línea recta y tiene el estado de derribado."
+        "description": "Tirada de salvación de Fuerza: CD 23, todas las criaturas en un cono de 30 pies. Fallo: el objetivo es empujado hasta 60 pies respecto al dragón en línea recta y tiene el estado de derribado."
       },
       {
         "name": "Lanzamiento de conjuros",
@@ -8550,7 +8565,7 @@
       },
       {
         "name": "Trueno",
-        "description": "Tirada de salvación de Constitución: CD 22, todas las criaturas en una esfera de 20 pies de radio centrada en un punto que el dragón pueda ver a 120 pies o menos. Fallo: 13 (3d8) de daño de trueno y el objetivo tendrá el estado de ensordecido hasta el final de su siguiente turno. Dragones de cobre",
+        "description": "Tirada de salvación de Constitución: CD 22, todas las criaturas en una esfera de 20 pies de radio centrada en un punto que el dragón pueda ver a 120 pies o menos. Fallo: 13 (3d8) de daño de trueno y el objetivo tendrá el estado de ensordecido hasta el final de su siguiente turno.",
         "kind": "legendary"
       }
     ],
@@ -8646,6 +8661,12 @@
     "languages": "común, dracónico",
     "defenses": "Inmunidades: ácido",
     "legendaryActionsPerRound": 3,
+    "traits": [
+      {
+        "name": "Resistencia legendaria (3/día o 4/día en la guarida)",
+        "description": "El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
+      }
+    ],
     "actions": [
       {
         "name": "Ataque múltiple",
@@ -8755,6 +8776,12 @@
     "languages": "común, dracónico",
     "defenses": "Inmunidades: ácido",
     "legendaryActionsPerRound": 3,
+    "traits": [
+      {
+        "name": "Resistencia legendaria (4/día o 5/día en la guarida)",
+        "description": "El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
+      }
+    ],
     "actions": [
       {
         "name": "Ataque múltiple",
@@ -8830,7 +8857,7 @@
       },
       {
         "name": "Sacudida mental",
-        "description": "El dragón utiliza su lanzamiento de conjuros para lanzar clavo mental (versión de nivel 5). El dragón no puede volver a realizar esta acción hasta el principio de su siguiente turno. Dragones de oro",
+        "description": "El dragón utiliza su lanzamiento de conjuros para lanzar clavo mental (versión de nivel 5). El dragón no puede volver a realizar esta acción hasta el principio de su siguiente turno.",
         "kind": "legendary"
       }
     ],
@@ -8924,7 +8951,11 @@
     "traits": [
       {
         "name": "Anfibio",
-        "description": "El dragón puede respirar tanto dentro como fuera del agua. Resistencia legendaria (3/día o 4/día en la guarida). El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
+        "description": "El dragón puede respirar tanto dentro como fuera del agua."
+      },
+      {
+        "name": "Resistencia legendaria (3/día o 4/día en la guarida)",
+        "description": "El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
       }
     ],
     "actions": [
@@ -9038,7 +9069,11 @@
     "traits": [
       {
         "name": "Anfibio",
-        "description": "El dragón puede respirar tanto dentro como fuera del agua. Resistencia legendaria (4/día o 5/día en la guarida). El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
+        "description": "El dragón puede respirar tanto dentro como fuera del agua."
+      },
+      {
+        "name": "Resistencia legendaria (4/día o 5/día en la guarida)",
+        "description": "El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
       }
     ],
     "actions": [
@@ -9115,7 +9150,7 @@
       },
       {
         "name": "Luz guía",
-        "description": "El dragón utiliza su lanzamiento de conjuros para lanzar saeta guía (versión de nivel 4). Dragones de oropel",
+        "description": "El dragón utiliza su lanzamiento de conjuros para lanzar saeta guía (versión de nivel 4).",
         "kind": "legendary"
       }
     ],
@@ -9213,6 +9248,12 @@
     "languages": "común, dracónico",
     "defenses": "Inmunidades: fuego",
     "legendaryActionsPerRound": 3,
+    "traits": [
+      {
+        "name": "Resistencia legendaria (3/día o 4/día en la guarida)",
+        "description": "El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
+      }
+    ],
     "actions": [
       {
         "name": "Ataque múltiple",
@@ -9231,11 +9272,7 @@
       },
       {
         "name": "Aliento somnífero",
-        "description": "Tirada de salvación de Constitución:"
-      },
-      {
-        "name": "CD 18, todas las criaturas en un cono de 60 pies",
-        "description": "Fallo: el objetivo tendrá el estado de incapacitado hasta el final de su siguiente turno, momento en el que repetirá la tirada de salvación. Segundo fallo: el objetivo tendrá el estado de inconsciente durante 10 minutos. Este efecto acabará si el objetivo sufre daño o si una criatura que se encuentre a 5 pies o menos de él lleva a cabo una acción para despertarlo."
+        "description": "Tirada de salvación de Constitución: CD 18, todas las criaturas en un cono de 60 pies. Fallo: el objetivo tendrá el estado de incapacitado hasta el final de su siguiente turno, momento en el que repetirá la tirada de salvación. Segundo fallo: el objetivo tendrá el estado de inconsciente durante 10 minutos. Este efecto acabará si el objetivo sufre daño o si una criatura que se encuentre a 5 pies o menos de él lleva a cabo una acción para despertarlo."
       },
       {
         "name": "Lanzamiento de conjuros",
@@ -9329,6 +9366,12 @@
     "languages": "común, dracónico",
     "defenses": "Inmunidades: fuego",
     "legendaryActionsPerRound": 3,
+    "traits": [
+      {
+        "name": "Resistencia legendaria (4/día o 5/día en la guarida)",
+        "description": "El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
+      }
+    ],
     "actions": [
       {
         "name": "Ataque múltiple",
@@ -9347,11 +9390,7 @@
       },
       {
         "name": "Aliento somnífero",
-        "description": "Tirada de salvación de Constitución:"
-      },
-      {
-        "name": "CD 21, todas las criaturas en un cono de 90 pies",
-        "description": "Fallo: el objetivo tendrá el estado de incapacitado hasta el final de su siguiente turno, momento en el que repetirá la tirada de salvación. Segundo fallo: el objetivo tendrá el estado de inconsciente durante 10 minutos. Este efecto acabará si el objetivo sufre daño o si una criatura que se encuentre a 5 pies o menos de él lleva a cabo una acción para despertarlo."
+        "description": "Tirada de salvación de Constitución: CD 21, todas las criaturas en un cono de 90 pies. Fallo: el objetivo tendrá el estado de incapacitado hasta el final de su siguiente turno, momento en el que repetirá la tirada de salvación. Segundo fallo: el objetivo tendrá el estado de inconsciente durante 10 minutos. Este efecto acabará si el objetivo sufre daño o si una criatura que se encuentre a 5 pies o menos de él lleva a cabo una acción para despertarlo."
       },
       {
         "name": "Lanzamiento de conjuros",
@@ -9408,7 +9447,7 @@
       },
       {
         "name": "Luz calcinadora",
-        "description": "El dragón utiliza su lanzamiento de conjuros para lanzar rayo abrasador (versión de nivel 3). Dragones de plata",
+        "description": "El dragón utiliza su lanzamiento de conjuros para lanzar rayo abrasador (versión de nivel 3).",
         "kind": "legendary"
       }
     ],
@@ -9462,11 +9501,7 @@
       },
       {
         "name": "Aliento somnífero",
-        "description": "Tirada de salvación de Constitución:"
-      },
-      {
-        "name": "CD 14, todas las criaturas en un cono de 30 pies",
-        "description": "Fallo: el objetivo tendrá el estado de incapacitado hasta el final de su siguiente turno, momento en el que repetirá la tirada de salvación. Segundo fallo: el objetivo tendrá el estado de inconsciente durante 1 minuto. Este efecto acabará si el objetivo sufre daño o si una criatura que se encuentre a 5 pies o menos de él lleva a cabo una acción para despertarlo."
+        "description": "Tirada de salvación de Constitución: CD 14, todas las criaturas en un cono de 30 pies. Fallo: el objetivo tendrá el estado de incapacitado hasta el final de su siguiente turno, momento en el que repetirá la tirada de salvación. Segundo fallo: el objetivo tendrá el estado de inconsciente durante 1 minuto. Este efecto acabará si el objetivo sufre daño o si una criatura que se encuentre a 5 pies o menos de él lleva a cabo una acción para despertarlo."
       }
     ],
     "hitDice": "13d10 + 39"
@@ -9502,6 +9537,12 @@
     "languages": "común, dracónico",
     "defenses": "Inmunidades: frío",
     "legendaryActionsPerRound": 3,
+    "traits": [
+      {
+        "name": "Resistencia legendaria (3/día o 4/día en la guarida)",
+        "description": "El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
+      }
+    ],
     "actions": [
       {
         "name": "Ataque múltiple",
@@ -9612,6 +9653,12 @@
     "languages": "común, dracónico",
     "defenses": "Inmunidades: frío",
     "legendaryActionsPerRound": 3,
+    "traits": [
+      {
+        "name": "Resistencia legendaria (4/día o 5/día en la guarida)",
+        "description": "El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
+      }
+    ],
     "actions": [
       {
         "name": "Ataque múltiple",
@@ -9692,7 +9739,7 @@
       },
       {
         "name": "Vendaval helado",
-        "description": "Tirada de salvación de Destreza: CD 23, todas las criaturas en una línea de 60 pies de largo y 10 pies de ancho. Fallo: 14 (4d6) de daño de frío y el objetivo es empujado hasta 30 pies respecto al dragón en línea recta. Éxito: solo la mitad del daño. Fallo o éxito: el dragón no puede volver a realizar esta  acción hasta el principio de su siguiente turno. Dragones negros",
+        "description": "Tirada de salvación de Destreza: CD 23, todas las criaturas en una línea de 60 pies de largo y 10 pies de ancho. Fallo: 14 (4d6) de daño de frío y el objetivo es empujado hasta 30 pies respecto al dragón en línea recta. Éxito: solo la mitad del daño. Fallo o éxito: el dragón no puede volver a realizar esta  acción hasta el principio de su siguiente turno.",
         "kind": "legendary"
       }
     ],
@@ -9784,7 +9831,11 @@
     "traits": [
       {
         "name": "Anfibio",
-        "description": "El dragón puede respirar tanto dentro como fuera del agua. Resistencia legendaria (3/día o 4/día en la guarida). El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
+        "description": "El dragón puede respirar tanto dentro como fuera del agua."
+      },
+      {
+        "name": "Resistencia legendaria (3/día o 4/día en la guarida)",
+        "description": "El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
       }
     ],
     "actions": [
@@ -9891,7 +9942,11 @@
     "traits": [
       {
         "name": "Anfibio",
-        "description": "El dragón puede respirar tanto dentro como fuera del agua. Resistencia legendaria (4/día o 5/día en la guarida). El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
+        "description": "El dragón puede respirar tanto dentro como fuera del agua."
+      },
+      {
+        "name": "Resistencia legendaria (4/día o 5/día en la guarida)",
+        "description": "El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
       }
     ],
     "actions": [
@@ -9963,7 +10018,7 @@
       },
       {
         "name": "Presencia aterradora",
-        "description": "El dragón utiliza su lanzamiento de conjuros para lanzar terror. El dragón no puede volver a realizar esta acción hasta el principio de su siguiente turno. Dragones rojos",
+        "description": "El dragón utiliza su lanzamiento de conjuros para lanzar terror. El dragón no puede volver a realizar esta acción hasta el principio de su siguiente turno.",
         "kind": "legendary"
       }
     ],
@@ -10053,6 +10108,12 @@
     "languages": "común, dracónico",
     "defenses": "Inmunidades: fuego",
     "legendaryActionsPerRound": 3,
+    "traits": [
+      {
+        "name": "Resistencia legendaria (3/día o 4/día en la guarida)",
+        "description": "El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
+      }
+    ],
     "actions": [
       {
         "name": "Ataque múltiple",
@@ -10151,6 +10212,12 @@
     "languages": "común, dracónico",
     "defenses": "Inmunidades: fuego",
     "legendaryActionsPerRound": 3,
+    "traits": [
+      {
+        "name": "Resistencia legendaria (4/día o 5/día en la guarida)",
+        "description": "El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
+      }
+    ],
     "actions": [
       {
         "name": "Ataque múltiple",
@@ -10218,7 +10285,7 @@
       },
       {
         "name": "Rayos ardientes",
-        "description": "El dragón utiliza su lanzamiento de conjuros para lanzar rayo abrasador (versión de nivel 3). El dragón no puede volver a realizar esta acción hasta el principio de su siguiente turno. Dragones verdes",
+        "description": "El dragón utiliza su lanzamiento de conjuros para lanzar rayo abrasador (versión de nivel 3). El dragón no puede volver a realizar esta acción hasta el principio de su siguiente turno.",
         "kind": "legendary"
       }
     ],
@@ -10366,7 +10433,11 @@
     "traits": [
       {
         "name": "Anfibio",
-        "description": "El dragón puede respirar tanto dentro como fuera del agua. Resistencia legendaria (3/día o 4/día en la guarida). El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
+        "description": "El dragón puede respirar tanto dentro como fuera del agua."
+      },
+      {
+        "name": "Resistencia legendaria (3/día o 4/día en la guarida)",
+        "description": "El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
       }
     ],
     "actions": [
@@ -10468,7 +10539,11 @@
     "traits": [
       {
         "name": "Anfibio",
-        "description": "El dragón puede respirar tanto dentro como fuera del agua. Resistencia legendaria (4/día o 5/día en la guarida). El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
+        "description": "El dragón puede respirar tanto dentro como fuera del agua."
+      },
+      {
+        "name": "Resistencia legendaria (4/día o 5/día en la guarida)",
+        "description": "El dragón puede elegir tener éxito en una tirada de salvación que haya fallado."
       }
     ],
     "actions": [
@@ -11584,12 +11659,15 @@
         "attackBonus": "8",
         "reach": "5 pies",
         "damage": "2d8+4",
-        "damageType": "slashing",
-        "description": "Cuerda enmarañadora (requiere la cuerda mágica). Tirada de salvación de Fuerza: CD 16, una criatura que la erinia pueda ver a 120 pies o menos. Fallo: 14 (4d6) de daño de fuerza y el objetivo tendrá el estado de apresado hasta que se destruya la cuerda, que la erinia use una acción adicional para soltarlo o que vuelva a usar la cuerda enmarañadora."
+        "damageType": "slashing"
+      },
+      {
+        "name": "Cuerda enmarañadora (requiere la cuerda mágica)",
+        "description": "Tirada de salvación de Fuerza: CD 16, una criatura que la erinia pueda ver a 120 pies o menos. Fallo: 14 (4d6) de daño de fuerza y el objetivo tendrá el estado de apresado hasta que se destruya la cuerda, que la erinia use una acción adicional para soltarlo o que vuelva a usar la cuerda enmarañadora."
       },
       {
         "name": "Parada",
-        "description": "Detonante: una tirada de ataque cuerpo a cuerpo acierta a la erinia mientras sostiene un arma. Respuesta: la erinia suma 4 a su CA contra ese ataque, lo que puede hacer que falle. Esfinges",
+        "description": "Detonante: una tirada de ataque cuerpo a cuerpo acierta a la erinia mientras sostiene un arma. Respuesta: la erinia suma 4 a su CA contra ese ataque, lo que puede hacer que falle.",
         "kind": "reaction"
       }
     ],
@@ -11668,7 +11746,11 @@
     "traits": [
       {
         "name": "Inescrutable",
-        "description": "La magia no puede observar desde lejos a la esfinge ni detectar sus pensamientos sin su permiso. Las pruebas de Sabiduría (Perspicacia) realizadas para determinar sus intenciones tienen desventaja. Resistencia legendaria (3/día o 4/día en la guarida). La esfinge puede elegir tener éxito en una tirada de salvación que haya fallado."
+        "description": "La magia no puede observar desde lejos a la esfinge ni detectar sus pensamientos sin su permiso. Las pruebas de Sabiduría (Perspicacia) realizadas para determinar sus intenciones tienen desventaja."
+      },
+      {
+        "name": "Resistencia legendaria (3/día o 4/día en la guarida)",
+        "description": "La esfinge puede elegir tener éxito en una tirada de salvación que haya fallado."
       }
     ],
     "actions": [
@@ -11789,7 +11871,11 @@
     "traits": [
       {
         "name": "Inescrutable",
-        "description": "La magia no puede observar desde lejos a la esfinge ni detectar sus pensamientos sin su permiso. Las pruebas de Sabiduría (Perspicacia) realizadas para determinar sus intenciones tienen desventaja. Resistencia legendaria (3/día o 4/día en la guarida). La esfinge puede elegir tener éxito en una tirada de salvación que haya fallado."
+        "description": "La magia no puede observar desde lejos a la esfinge ni detectar sus pensamientos sin su permiso. Las pruebas de Sabiduría (Perspicacia) realizadas para determinar sus intenciones tienen desventaja."
+      },
+      {
+        "name": "Resistencia legendaria (3/día o 4/día en la guarida)",
+        "description": "La esfinge puede elegir tener éxito en una tirada de salvación que haya fallado."
       }
     ],
     "actions": [
@@ -11996,7 +12082,7 @@
       },
       {
         "name": "Acción astuta",
-        "description": "El espía realiza las acciones de correr, destrabarse o esconderse. Esqueletos",
+        "description": "El espía realiza las acciones de correr, destrabarse o esconderse.",
         "kind": "bonus"
       }
     ],
@@ -13023,7 +13109,7 @@
       },
       {
         "name": "Parada",
-        "description": "Detonante: una tirada de ataque cuerpo a cuerpo acierta al gladiador mientras sostiene un arma. Respuesta: el gladiador suma 3 a su CA contra ese ataque, lo que puede hacer que falle. Gnoll",
+        "description": "Detonante: una tirada de ataque cuerpo a cuerpo acierta al gladiador mientras sostiene un arma. Respuesta: el gladiador suma 3 a su CA contra ese ataque, lo que puede hacer que falle.",
         "kind": "reaction"
       }
     ],
@@ -13272,7 +13358,7 @@
       },
       {
         "name": "Protección",
-        "description": "Detonante: una tirada de ataque acierta al portador del amuleto del guardián mientras está a 5 pies o menos de él. Respuesta: hasta el principio del siguiente turno del guardián, el portador obtiene un bonificador de +5 a la CA, incluido contra el ataque al que reacciona, lo que puede hacer que falle. Guardias",
+        "description": "Detonante: una tirada de ataque acierta al portador del amuleto del guardián mientras está a 5 pies o menos de él. Respuesta: hasta el principio del siguiente turno del guardián, el portador obtiene un bonificador de +5 a la CA, incluido contra el ataque al que reacciona, lo que puede hacer que falle.",
         "kind": "reaction"
       }
     ],
@@ -13350,7 +13436,7 @@
       },
       {
         "name": "Rabia (1/día)",
-        "description": "Inmediatamente después de hacer daño a una criatura que ya esté maltrecha, el gnoll se moverá hasta la mitad de su velocidad y realizará un ataque de desgarro. Goblins",
+        "description": "Inmediatamente después de hacer daño a una criatura que ya esté maltrecha, el gnoll se moverá hasta la mitad de su velocidad y realizará un ataque de desgarro.",
         "kind": "bonus"
       }
     ],
@@ -13606,8 +13692,7 @@
         "attackBonus": "4",
         "reach": "5 pies",
         "damage": "2d4+2",
-        "damageType": "slashing",
-        "description": "Garra reptante"
+        "damageType": "slashing"
       }
     ],
     "hitDice": "9d8 + 27"
@@ -13998,8 +14083,7 @@
         "attackBonus": "5",
         "reach": "5 pies",
         "damage": "1d8+3",
-        "damageType": "slashing",
-        "description": "Hobgoblins"
+        "damageType": "slashing"
       }
     ],
     "hitDice": "4d10 + 4"
@@ -14157,7 +14241,14 @@
         "reach": "5 pies",
         "damage": "2d8+3",
         "damageType": "piercing",
-        "description": "Si el objetivo es un humanoide, sufre el siguiente efecto. Tirada de salvación de Constitución: CD 12. Fallo: el objetivo estará maldito. Si los puntos de golpe del objetivo maldito se reducen a 0, en vez de ello, se convertirá en un hombre lobo controlado por el GM y tendrá 10 puntos de golpe. Éxito: el objetivo será inmune a la maldición de este hombre lobo durante 24 horas. Arco largo (solo en forma humanoide o híbrida). Tirada de ataque a distancia: +4, alcance 150/600 pies. Acierto: 11 (2d8 + 2)"
+        "description": "Si el objetivo es un humanoide, sufre el siguiente efecto. Tirada de salvación de Constitución: CD 12. Fallo: el objetivo estará maldito. Si los puntos de golpe del objetivo maldito se reducen a 0, en vez de ello, se convertirá en un hombre lobo controlado por el GM y tendrá 10 puntos de golpe. Éxito: el objetivo será inmune a la maldición de este hombre lobo durante 24 horas."
+      },
+      {
+        "name": "Arco largo (solo en forma humanoide o híbrida)",
+        "attackBonus": "4",
+        "reach": "150/600 pies",
+        "damage": "2d8+2",
+        "damageType": "piercing"
       },
       {
         "name": "Cambio de forma",
@@ -14200,8 +14291,14 @@
         "attackBonus": "7",
         "reach": "5 pies",
         "damage": "2d8+4",
-        "damageType": "slashing",
-        "description": "Hacha de mano (solo en forma humanoide o híbrida). Tirada de ataque cuerpo a cuerpo o a distancia: +7, alcance 5 pies o 20/60 pies a distancia. Acierto: 14 (3d6 + 4)"
+        "damageType": "slashing"
+      },
+      {
+        "name": "Hacha de mano (solo en forma humanoide o híbrida)",
+        "attackBonus": "7",
+        "reach": "5 pies o 20/60 pies a distancia",
+        "damage": "3d6+4",
+        "damageType": "slashing"
       },
       {
         "name": "Mordisco (solo en forma de oso o híbrida)",
@@ -14318,7 +14415,14 @@
         "reach": "5 pies",
         "damage": "2d8+3",
         "damageType": "piercing",
-        "description": "Si el objetivo es un humanoide, sufre el siguiente efecto. Tirada de salvación de Constitución: CD 13. Fallo: el objetivo estará maldito. Si los puntos de golpe del objetivo maldito se reducen a 0, en vez de ello, se convertirá en un hombre tigre controlado por el GM y tendrá 10 puntos de golpe. Éxito: el objetivo será inmune a la maldición de este hombre tigre durante 24 horas. Arco largo (solo en forma humanoide o híbrida). Tirada de ataque a distancia: +4, alcance 150/600 pies. Acierto: 11 (2d8 + 2)"
+        "description": "Si el objetivo es un humanoide, sufre el siguiente efecto. Tirada de salvación de Constitución: CD 13. Fallo: el objetivo estará maldito. Si los puntos de golpe del objetivo maldito se reducen a 0, en vez de ello, se convertirá en un hombre tigre controlado por el GM y tendrá 10 puntos de golpe. Éxito: el objetivo será inmune a la maldición de este hombre tigre durante 24 horas."
+      },
+      {
+        "name": "Arco largo (solo en forma humanoide o híbrida)",
+        "attackBonus": "4",
+        "reach": "150/600 pies",
+        "damage": "2d8+2",
+        "damageType": "piercing"
       },
       {
         "name": "Cambio de forma",
@@ -14762,7 +14866,11 @@
       },
       {
         "name": "Monstruo de asedio",
-        "description": "El kraken inflige el doble de daño a objetos y estructuras. Resistencia legendaria (4/día o 5/día en la guarida). El kraken puede elegir tener éxito en una tirada de salvación que haya fallado."
+        "description": "El kraken inflige el doble de daño a objetos y estructuras."
+      },
+      {
+        "name": "Resistencia legendaria (4/día o 5/día en la guarida)",
+        "description": "El kraken puede elegir tener éxito en una tirada de salvación que haya fallado."
       }
     ],
     "actions": [
@@ -14797,12 +14905,7 @@
       },
       {
         "name": "Tinta tóxica",
-        "description": "Tirada de salvación de Constitución: CD 23, todas las criaturas en una emanación de 15 pies que se origina en el kraken mientras esté bajo el agua. Fallo: el objetivo tendrá los estados de cegado y envenenado hasta el final del siguiente turno del kraken.",
-        "kind": "legendary"
-      },
-      {
-        "name": "Después, el kraken se mueve hasta su velocidad",
-        "description": "Fallo o éxito: el kraken no puede volver a realizar esta acción hasta el principio de su siguiente turno.",
+        "description": "Tirada de salvación de Constitución: CD 23, todas las criaturas en una emanación de 15 pies que se origina en el kraken mientras esté bajo el agua. Fallo: el objetivo tendrá los estados de cegado y envenenado hasta el final del siguiente turno del kraken. Después, el kraken se mueve hasta su velocidad. Fallo o éxito: el kraken no puede volver a realizar esta acción hasta el principio de su siguiente turno.",
         "kind": "legendary"
       }
     ],
@@ -14983,7 +15086,11 @@
     "traits": [
       {
         "name": "Recipiente espiritual",
-        "description": "Si lo destruyen, el liche se  recompondrá al cabo de 1d10 días si tiene un recipiente espiritual y revivirá con todos sus puntos de golpe. El nuevo cuerpo aparecerá en un espacio sin ocupar en la guarida del liche. Resistencia legendaria (4/día o 5/día en la guarida). El liche puede elegir tener éxito en una tirada de salvación que haya fallado."
+        "description": "Si lo destruyen, el liche se  recompondrá al cabo de 1d10 días si tiene un recipiente espiritual y revivirá con todos sus puntos de golpe. El nuevo cuerpo aparecerá en un espacio sin ocupar en la guarida del liche."
+      },
+      {
+        "name": "Resistencia legendaria (4/día o 5/día en la guarida)",
+        "description": "El liche puede elegir tener éxito en una tirada de salvación que haya fallado."
       }
     ],
     "actions": [
@@ -15219,7 +15326,7 @@
       },
       {
         "name": "Iluminación ardiente",
-        "description": "El magmin se prende fuego o extingue sus llamas. Mientras esté ardiendo, emitirá luz brillante en un radio de 10 pies y luz tenue 10 pies más allá. Magos",
+        "description": "El magmin se prende fuego o extingue sus llamas. Mientras esté ardiendo, emitirá luz brillante en un radio de 10 pies y luz tenue 10 pies más allá.",
         "kind": "bonus"
       }
     ],
@@ -15425,6 +15532,11 @@
         "reach": "10 pies",
         "damage": "1d10+3",
         "damageType": "slashing"
+      },
+      {
+        "name": "Fantasmas (se recarga tras un descanso corto o largo)",
+        "description": "El manto lanza el conjuro imagen múltiple, que no  requiere componentes y utiliza la Sabiduría como  aptitud mágica. El conjuro termina antes de tiempo si el manto comienza o termina su turno en una zona de luz brillante.",
+        "kind": "bonus"
       },
       {
         "name": "Gemido",
@@ -15642,7 +15754,7 @@
       },
       {
         "name": "Mirada petrificadora (recarga 5–6)",
-        "description": "Tirada de salvación de Constitución: CD 13, todas las criaturas en un cono de 30 pies. Si la medusa ve su reflejo en alguna parte del cono, deberá hacer esta tirada. Primer fallo: el objetivo tendrá el estado de apresado. Si al final de su siguiente turno sigue apresado, repetirá la tirada de salvación y se librará del efecto si la supera. Segundo fallo: el objetivo tendrá el estado de petrificado en vez del de apresado. Mephits",
+        "description": "Tirada de salvación de Constitución: CD 13, todas las criaturas en un cono de 30 pies. Si la medusa ve su reflejo en alguna parte del cono, deberá hacer esta tirada. Primer fallo: el objetivo tendrá el estado de apresado. Si al final de su siguiente turno sigue apresado, repetirá la tirada de salvación y se librará del efecto si la supera. Segundo fallo: el objetivo tendrá el estado de petrificado en vez del de apresado.",
         "kind": "bonus"
       }
     ],
@@ -15984,7 +16096,7 @@
         "reach": "5 pies",
         "damage": "4d6+4",
         "damageType": "piercing",
-        "description": "Si el objetivo es una criatura Grande o más pequeña y el minotauro recorre al menos 10 pies en línea recta hacia ella justo antes de acertarle, esta recibirá 10 (3d6) de daño perforante adicional y tendrá el estado de derribada. Momias"
+        "description": "Si el objetivo es una criatura Grande o más pequeña y el minotauro recorre al menos 10 pies en línea recta hacia ella justo antes de acertarle, esta recibirá 10 (3d6) de daño perforante adicional y tendrá el estado de derribada."
       }
     ],
     "hitDice": "10d10 + 30"
@@ -16421,7 +16533,7 @@
       },
       {
         "name": "Parada",
-        "description": "Detonante: una tirada de ataque cuerpo a cuerpo acierta al noble mientras sostiene un arma. Respuesta: el noble suma 2 a su CA contra ese ataque, lo que puede hacer que falle. Objetos animados",
+        "description": "Detonante: una tirada de ataque cuerpo a cuerpo acierta al noble mientras sostiene un arma. Respuesta: el noble suma 2 a su CA contra ese ataque, lo que puede hacer que falle.",
         "kind": "reaction"
       }
     ],
@@ -16462,8 +16574,7 @@
         "attackBonus": "6",
         "reach": "5 pies",
         "damage": "2d8+4",
-        "damageType": "bludgeoning",
-        "description": "Animales"
+        "damageType": "bludgeoning"
       }
     ],
     "hitDice": "9d10 + 36"
@@ -16559,7 +16670,7 @@
       },
       {
         "name": "Invisibilidad",
-        "description": "El oni lanza invisibilidad sobre sí mismo, que no requiere componentes y utiliza la misma aptitud mágica que para su lanzamiento de conjuros. Osgos",
+        "description": "El oni lanza invisibilidad sobre sí mismo, que no requiere componentes y utiliza la misma aptitud mágica que para su lanzamiento de conjuros.",
         "kind": "bonus"
       }
     ],
@@ -16764,8 +16875,7 @@
         "attackBonus": "6",
         "reach": "5 pies",
         "damage": "1d6+4",
-        "damageType": "bludgeoning",
-        "description": "Pendencieros"
+        "damageType": "bludgeoning"
       }
     ],
     "hitDice": "7d10 + 21"
@@ -16962,8 +17072,7 @@
         "attackBonus": "4",
         "reach": "5 pies",
         "damage": "1d8+2",
-        "damageType": "slashing",
-        "description": "Piratas"
+        "damageType": "slashing"
       }
     ],
     "hitDice": "3d10 + 3"
@@ -17108,7 +17217,7 @@
       },
       {
         "name": "Auxilio divino (2/día)",
-        "description": "El planetar lanza curar heridas, invisibilidad, levantar maldición o restablecimiento menor usando la misma aptitud mágica que para su lanzamiento de conjuros. Plantas despertadas",
+        "description": "El planetar lanza curar heridas, invisibilidad, levantar maldición o restablecimiento menor usando la misma aptitud mágica que para su lanzamiento de conjuros.",
         "kind": "bonus"
       }
     ],
@@ -17573,7 +17682,7 @@
       },
       {
         "name": "Aliento de fuego (recarga 5–6)",
-        "description": "Tirada de salvación de Destreza: CD 12, todas las criaturas en un cono de 15 pies. Fallo: 17 (5d6) de daño de fuego. Éxito: la mitad del daño. Sacerdotes"
+        "description": "Tirada de salvación de Destreza: CD 12, todas las criaturas en un cono de 15 pies. Fallo: 17 (5d6) de daño de fuego. Éxito: la mitad del daño."
       }
     ],
     "hitDice": "9d8 + 18"
@@ -17959,7 +18068,7 @@
       },
       {
         "name": "Mirada mortal (recarga 5–6)",
-        "description": "Tirada de salvación de Sabiduría: CD 11, una criatura asustada que la saga pueda ver a 30 pies o menos. Fallo: si el objetivo tiene 20 puntos de golpe o menos, estos se reducen a 0. De lo contrario, el objetivo recibe 13 (3d8) de daño psíquico. Sahuagin"
+        "description": "Tirada de salvación de Sabiduría: CD 11, una criatura asustada que la saga pueda ver a 30 pies o menos. Fallo: si el objetivo tiene 20 puntos de golpe o menos, estos se reducen a 0. De lo contrario, el objetivo recibe 13 (3d8) de daño psíquico."
       }
     ],
     "hitDice": "7d8 + 21"
@@ -18102,7 +18211,7 @@
       },
       {
         "name": "Salto",
-        "description": "El semidragón gasta 10 pies de movimiento para saltar hasta 30 pies. Sirénido",
+        "description": "El semidragón gasta 10 pies de movimiento para saltar hasta 30 pies.",
         "kind": "bonus"
       }
     ],
@@ -18219,7 +18328,11 @@
     "traits": [
       {
         "name": "Recuperación de muerto viviente",
-        "description": "Si la destruyen, la momia obtendrá un cuerpo nuevo al cabo de 24 horas si su corazón permanece intacto y revivirá con todos sus puntos de golpe. El nuevo cuerpo aparecerá en un espacio sin ocupar en la guarida de la momia. El corazón es un objeto Diminuto con una CA de 17, 10 pg e inmunidad a todo el daño excepto al de fuego. Resistencia legendaria (3/día o 4/día en la guarida). La momia puede elegir tener éxito en una tirada de salvación que haya fallado."
+        "description": "Si la destruyen, la momia obtendrá un cuerpo nuevo al cabo de 24 horas si su corazón permanece intacto y revivirá con todos sus puntos de golpe. El nuevo cuerpo aparecerá en un espacio sin ocupar en la guarida de la momia. El corazón es un objeto Diminuto con una CA de 17, 10 pg e inmunidad a todo el daño excepto al de fuego."
+      },
+      {
+        "name": "Resistencia legendaria (3/día o 4/día en la guarida)",
+        "description": "La momia puede elegir tener éxito en una tirada de salvación que haya fallado."
       },
       {
         "name": "Resistencia mágica",
@@ -18573,12 +18686,7 @@
       },
       {
         "name": "Carga pisoteadora (recarga 5–6)",
-        "description": "El centauro se mueve hasta su velocidad sin provocar ataques de oportunidad y puede atravesar los espacios de criaturas Medianas o más pequeñas. Todas las criaturas en cuyo espacio entre el centauro se convertirán una vez en objetivos del siguiente efecto. Tirada de salvación de Fuerza:",
-        "kind": "bonus"
-      },
-      {
-        "name": "CD 14",
-        "description": "Fallo: 7 (1d6 + 4) de daño contundente y el objetivo tiene el estado de derribado.",
+        "description": "El centauro se mueve hasta su velocidad sin provocar ataques de oportunidad y puede atravesar los espacios de criaturas Medianas o más pequeñas. Todas las criaturas en cuyo espacio entre el centauro se convertirán una vez en objetivos del siguiente efecto. Tirada de salvación de Fuerza: CD 14. Fallo: 7 (1d6 + 4) de daño contundente y el objetivo tiene el estado de derribado.",
         "kind": "bonus"
       }
     ],
@@ -18674,7 +18782,7 @@
       },
       {
         "name": "Burla",
-        "description": "Tirada de salvación de Sabiduría: CD 12, una criatura que el sátiro pueda ver a 90 pies o menos. Fallo: 5 (1d6 + 2) de daño psíquico. Sectarios"
+        "description": "Tirada de salvación de Sabiduría: CD 12, una criatura que el sátiro pueda ver a 90 pies o menos. Fallo: 5 (1d6 + 2) de daño psíquico."
       }
     ],
     "hitDice": "7d8"
@@ -19164,11 +19272,7 @@
       },
       {
         "name": "Consumir vida",
-        "description": "Tirada de salvación de Constitución:"
-      },
-      {
-        "name": "CD 13, una criatura a 5 pies o menos",
-        "description": "Fallo: 6 (1d8 + 2) de daño necrótico y los puntos de golpe máximos del objetivo se reducirán en una cantidad igual al daño sufrido. Un humanoide que muera por este ataque se alzará 24 horas después como un zombi bajo el control del tumulario, a menos que se le devuelva a la vida o su cuerpo sea destruido. El tumulario no puede tener más de doce zombis bajo su control a la vez."
+        "description": "Tirada de salvación de Constitución: CD 13, una criatura a 5 pies o menos. Fallo: 6 (1d8 + 2) de daño necrótico y los puntos de golpe máximos del objetivo se reducirán en una cantidad igual al daño sufrido. Un humanoide que muera por este ataque se alzará 24 horas después como un zombi bajo el control del tumulario, a menos que se le devuelva a la vida o su cuerpo sea destruido. El tumulario no puede tener más de doce zombis bajo su control a la vez."
       }
     ],
     "hitDice": "11d8 + 33"
@@ -19277,7 +19381,7 @@
       },
       {
         "name": "Escudo resplandeciente",
-        "description": "El unicornio se hace objetivo a sí mismo o hace objetivo a una criatura que pueda ver a 60 pies o menos de él. El objetivo obtiene 10 (3d6) puntos de golpe temporales y su CA aumenta en 2 hasta el final del siguiente turno del unicornio. El unicornio no puede volver a realizar esta acción hasta el principio de su siguiente turno. Vampiros",
+        "description": "El unicornio se hace objetivo a sí mismo o hace objetivo a una criatura que pueda ver a 60 pies o menos de él. El objetivo obtiene 10 (3d6) puntos de golpe temporales y su CA aumenta en 2 hasta el final del siguiente turno del unicornio. El unicornio no puede volver a realizar esta acción hasta el principio de su siguiente turno.",
         "kind": "legendary"
       }
     ],
@@ -19338,7 +19442,11 @@
       },
       {
         "name": "Escape brumoso",
-        "description": "Si los puntos de golpe del vampiro se reducen a 0 fuera de su lugar de descanso, utilizará su cambio de forma para convertirse en niebla (no requiere acción). Si no puede cambiar de forma, será destruido. Mientras esté en forma de niebla y sus puntos de golpe sean 0, no podrá volver a su forma de vampiro y deberá llegar a su lugar de descanso en 2 horas o será destruido. Una vez que esté en su lugar de descanso, recuperará la forma de vampiro y tendrá el estado de paralizado hasta que recupere algún punto de golpe; recuperará 1 punto de golpe tras pasar 1 hora allí. Resistencia legendaria (3/día o 4/día en la guarida). El vampiro puede elegir tener éxito en una tirada de salvación que haya fallado."
+        "description": "Si los puntos de golpe del vampiro se reducen a 0 fuera de su lugar de descanso, utilizará su cambio de forma para convertirse en niebla (no requiere acción). Si no puede cambiar de forma, será destruido. Mientras esté en forma de niebla y sus puntos de golpe sean 0, no podrá volver a su forma de vampiro y deberá llegar a su lugar de descanso en 2 horas o será destruido. Una vez que esté en su lugar de descanso, recuperará la forma de vampiro y tendrá el estado de paralizado hasta que recupere algún punto de golpe; recuperará 1 punto de golpe tras pasar 1 hora allí."
+      },
+      {
+        "name": "Resistencia legendaria (3/día o 4/día en la guarida)",
+        "description": "El vampiro puede elegir tener éxito en una tirada de salvación que haya fallado."
       },
       {
         "name": "Trepar cual arácnido",
@@ -19498,7 +19606,7 @@
       },
       {
         "name": "Carga",
-        "description": "El xorn se mueve hasta su velocidad o hasta su velocidad excavando en línea recta hacia un enemigo que pueda sentir. Zombis",
+        "description": "El xorn se mueve hasta su velocidad o hasta su velocidad excavando en línea recta hacia un enemigo que pueda sentir.",
         "kind": "bonus"
       }
     ],
@@ -19652,7 +19760,7 @@
       },
       {
         "name": "Pesadilla (recarga 6)",
-        "description": "Tirada de salvación de Sabiduría: CD 15, una criatura que el íncubo pueda ver a 60 pies o menos. Fallo: si el objetivo tiene 20 puntos de golpe o menos, tendrá el estado de inconsciente durante 1 hora, hasta que reciba daño o hasta que una criatura a 5 pies o menos lleve a cabo una acción para despertarlo. De lo contrario, el objetivo recibe 18 (4d8) de daño psíquico. Kobold",
+        "description": "Tirada de salvación de Sabiduría: CD 15, una criatura que el íncubo pueda ver a 60 pies o menos. Fallo: si el objetivo tiene 20 puntos de golpe o menos, tendrá el estado de inconsciente durante 1 hora, hasta que reciba daño o hasta que una criatura a 5 pies o menos lleve a cabo una acción para despertarlo. De lo contrario, el objetivo recibe 18 (4d8) de daño psíquico.",
         "kind": "bonus"
       }
     ],
