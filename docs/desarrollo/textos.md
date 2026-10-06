@@ -152,6 +152,11 @@ el SRD dicen cosas distintas, gana el SRD.
 | --- | --- | --- |
 | especie | species | No «race». |
 | PG, puntos de golpe | HP, Hit Points | |
+| dado de golpe, dados de golpe | Hit Point Die, Hit Point Dice | Como el SRD 2024 y el catálogo; no «Hit Die». |
+| mochila (los objetos que lleva) | pack | «Your pack is empty». |
+| bolsa (monedas, carga y sintonía) | bag | «Paid from your bag». |
+| paquete de equipo (Explorer's Pack…) | pack | El que se elige al crear. |
+| paquete de N (flechas, raciones…) | bundle of N | No «pack»: ya nombra la mochila y el paquete de equipo. |
 | CA | AC, Armor Class | |
 | maltrecho | Bloodied | |
 | conjuro, espacio de conjuro | spell, spell slot | |

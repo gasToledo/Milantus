@@ -864,11 +864,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shortRestNoRestore =>
-      'Short rest. It doesn\'t heal HP: spend Hit Dice to heal.';
+      'Short rest. It doesn\'t heal HP: spend Hit Point Dice to heal.';
 
   @override
   String shortRestRestored(String list) {
-    return 'Short rest: you regained $list. To heal, spend Hit Dice.';
+    return 'Short rest: you regained $list. To heal, spend Hit Point Dice.';
   }
 
   @override
@@ -903,7 +903,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get combatRestExplainer =>
-      'A short rest doesn\'t heal HP: it recharges short-rest resources. To heal, spend Hit Dice.';
+      'A short rest doesn\'t heal HP: it recharges short-rest resources. To heal, spend Hit Point Dice.';
 
   @override
   String get restShort => 'Short rest';
@@ -913,7 +913,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String combatHitDie(Object left, Object total) {
-    return 'Hit Die ($left/$total)';
+    return 'Hit Point Die ($left/$total)';
   }
 
   @override
@@ -1176,7 +1176,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String combatHitDieHealed(Object hp) {
-    return 'You recovered $hp HP (Hit Die)';
+    return 'You recovered $hp HP (Hit Point Die)';
   }
 
   @override
@@ -1522,7 +1522,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String catalogBundleOf(Object size) {
-    return 'pack of $size';
+    return 'bundle of $size';
   }
 
   @override
@@ -1559,7 +1559,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get tradeUnitBundle => 'pack';
+  String get tradeUnitBundle => 'bundle';
 
   @override
   String get tradeUnitItem => 'unit';
@@ -1569,8 +1569,8 @@ class AppLocalizationsEn extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count packs',
-      one: '1 pack',
+      other: '$count bundles',
+      one: '1 bundle',
     );
     return '$_temp0';
   }
@@ -1822,7 +1822,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String invBundlesOf(Object size) {
-    return 'Packs of $size';
+    return 'Bundles of $size';
   }
 
   @override
@@ -2602,7 +2602,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pickClassHint => 'Choose a class to see its details.';
 
   @override
-  String get factHitDie => 'Hit Die';
+  String get factHitDie => 'Hit Point Die';
 
   @override
   String classChooseCount(String name, Object count) {
@@ -2887,7 +2887,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get equipGoldExplainer =>
-      'What you don\'t get in your pack you buy with the starting gold, at the book price. Whatever is left stays in your bag.';
+      'What your equipment pack doesn\'t include you buy with the starting gold, at the book price. Whatever is left stays in your bag.';
 
   @override
   String get equipStartingGold => 'Starting gold';
@@ -3286,7 +3286,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String luClassLevelLine(Object level, String name, Object die) {
-    return 'Level $level $name · d$die Hit Die';
+    return 'Level $level $name · d$die Hit Point Die';
   }
 
   @override
@@ -3360,12 +3360,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String luMoreHpBody(Object die) {
-    return 'Choose the safe average or roll your d$die Hit Die. Constitution is added automatically.';
+    return 'Choose the safe average or roll your d$die Hit Point Die. Constitution is added automatically.';
   }
 
   @override
   String luHitDie(Object die) {
-    return 'Hit Die d$die';
+    return 'Hit Point Die d$die';
   }
 
   @override
@@ -3809,7 +3809,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get codexDisadvantage => 'Disadvantage';
 
   @override
-  String get codexPackOf => 'Pack of';
+  String get codexPackOf => 'Bundle of';
 
   @override
   String codexPrereqFeat(String category) {
@@ -4916,11 +4916,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hbSpellDoes => 'What the spell does';
 
   @override
-  String get hbHitDice => 'Hit Dice';
+  String get hbHitDice => 'Hit Point Dice';
 
   @override
   String get hbHitDiceRule =>
-      'With hit dice filled in, when you add it to a combat you can ask that each copy roll its own.';
+      'With Hit Point Dice filled in, when you add it to a combat you can ask that each copy roll its own.';
 
   @override
   String get hbChallenge => 'Challenge';
@@ -4974,7 +4974,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get hbHitDiceOptional => 'Hit Dice (optional)';
+  String get hbHitDiceOptional => 'Hit Point Dice (optional)';
 
   @override
   String get hbDiceExample => 'e.g. 2d6 + 2';
@@ -6645,7 +6645,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String equipCostPerBundle(String cost, Object size) {
-    return '$cost per pack of $size';
+    return '$cost per bundle of $size';
   }
 
   @override
