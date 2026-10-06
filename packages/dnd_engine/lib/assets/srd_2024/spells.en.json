@@ -1,1570 +1,1962 @@
 {
   "druidcraft": {
-    "_es": "a20322fc",
-    "name": "Druidcraft"
+    "_es": "dcfa0a2e",
+    "name": "Druidcraft",
+    "description": "Minor natural effect: predict the weather, make a plant bloom, snuff out or light a small fire."
   },
   "vicious-mockery": {
-    "_es": "b15782fc",
-    "name": "Vicious Mockery"
+    "_es": "4196c257",
+    "name": "Vicious Mockery",
+    "description": "WIS save or the target takes 1d6 Psychic damage and has Disadvantage on its next attack roll. Scales with level."
   },
   "shocking-grasp": {
-    "_es": "d6cc70ec",
-    "name": "Shocking Grasp"
+    "_es": "f7efdb2a",
+    "name": "Shocking Grasp",
+    "description": "Melee spell attack; 1d8 Lightning damage, and the target can't take Reactions until its next turn. Advantage if it wears metal."
   },
   "eldritch-blast": {
-    "_es": "906c5016",
-    "name": "Eldritch Blast"
+    "_es": "17e61a69",
+    "name": "Eldritch Blast",
+    "description": "Ranged spell attack; 1d10 Force damage. Extra beams at levels 5, 11, and 17."
   },
   "starry-wisp": {
-    "_es": "92391989",
-    "name": "Starry Wisp"
+    "_es": "6d86c024",
+    "name": "Starry Wisp",
+    "description": "Ranged spell attack for 1d8 Radiant damage; on a hit, the target sheds Dim Light and can't benefit from the Invisible condition."
   },
   "true-strike": {
-    "_es": "ba101ad1",
-    "name": "True Strike"
+    "_es": "bfd9da75",
+    "name": "True Strike",
+    "description": "You make an attack with a weapon imbued with radiant energy, using your spellcasting ability for the attack and damage rolls."
   },
   "guidance": {
-    "_es": "89b8e438",
-    "name": "Guidance"
+    "_es": "2b0f718c",
+    "name": "Guidance",
+    "description": "The target adds 1d4 to one ability check of its choice."
   },
   "minor-illusion": {
-    "_es": "1a1a8f6e",
-    "name": "Minor Illusion"
+    "_es": "c6e83a85",
+    "name": "Minor Illusion",
+    "description": "Creates a sound or an image of an object within range."
   },
   "sacred-flame": {
-    "_es": "5caf288c",
-    "name": "Sacred Flame"
+    "_es": "e815a951",
+    "name": "Sacred Flame",
+    "description": "The target makes a DEX save or takes 1d8 Radiant damage; ignores cover. Scales with level."
   },
   "dancing-lights": {
-    "_es": "46ef5e16",
-    "name": "Dancing Lights"
+    "_es": "4c0e1dbe",
+    "name": "Dancing Lights",
+    "description": "You create up to four floating lights that you can move with your movement. Concentration."
   },
   "light": {
-    "_es": "db1d9b3f",
-    "name": "Light"
+    "_es": "be3eada9",
+    "name": "Light",
+    "description": "An object sheds Bright Light in 20 feet and Dim Light for another 20. DEX save if cast on a creature."
   },
   "mage-hand": {
-    "_es": "1ed3fc06",
-    "name": "Mage Hand"
+    "_es": "0225c11e",
+    "name": "Mage Hand",
+    "description": "Creates a spectral hand that manipulates objects of up to 10 pounds at a distance."
   },
   "message": {
-    "_es": "dbd08cc9",
-    "name": "Message"
+    "_es": "b20bf208",
+    "name": "Message",
+    "description": "You whisper a message to a distant creature that only it hears, and it can reply in a whisper."
   },
   "spare-the-dying": {
-    "_es": "92215e6b",
-    "name": "Spare the Dying"
+    "_es": "fbd22424",
+    "name": "Spare the Dying",
+    "description": "You touch a creature with 0 HP and stabilize it. Also affects Undead, with a save."
   },
   "shillelagh": {
-    "_es": "1627eadd",
-    "name": "Shillelagh"
+    "_es": "522c86c8",
+    "name": "Shillelagh",
+    "description": "You imbue a club or quarterstaff: it uses your spellcasting ability to attack, and its damage becomes 1d8 Force."
   },
   "prestidigitation": {
-    "_es": "e245a256",
-    "name": "Prestidigitation"
+    "_es": "c17f9967",
+    "name": "Prestidigitation",
+    "description": "Small minor magical effects: sparks, cleaning or soiling, flavors, and so on."
   },
   "produce-flame": {
-    "_es": "da888720",
-    "name": "Produce Flame"
+    "_es": "60b063a9",
+    "name": "Produce Flame",
+    "description": "A flame in your hand sheds light and burns nothing. Until the spell ends, you can take a Magic action to hurl fire at a creature or object within 60 feet: ranged spell attack for 1d8 Fire damage. Scales with character level."
   },
   "ray-of-frost": {
-    "_es": "bfef46ae",
-    "name": "Ray of Frost"
+    "_es": "6e07a304",
+    "name": "Ray of Frost",
+    "description": "Ranged spell attack; 1d8 Cold damage, and the target's Speed is reduced by 10 feet."
   },
   "fire-bolt": {
-    "_es": "ef3fef8f",
-    "name": "Fire Bolt"
+    "_es": "0922bde2",
+    "name": "Fire Bolt",
+    "description": "Ranged spell attack; 1d10 Fire damage. Scales at levels 5, 11, and 17."
   },
   "mending": {
-    "_es": "f7d85c13",
-    "name": "Mending"
+    "_es": "b5264a3c",
+    "name": "Mending",
+    "description": "You repair a single break or tear in an object (a chain link, two halves of a key, a torn cloak)."
   },
   "resistance": {
-    "_es": "f093ef02",
-    "name": "Resistance"
+    "_es": "3b243685",
+    "name": "Resistance",
+    "description": "The target adds 1d4 to one saving throw of its choice within the minute. Concentration."
   },
   "poison-spray": {
-    "_es": "fd4d7d86",
-    "name": "Poison Spray"
+    "_es": "2f4de325",
+    "name": "Poison Spray",
+    "description": "You spray a toxic mist; the target makes a CON save or takes 1d12 Poison damage. Scales with level."
   },
   "acid-splash": {
-    "_es": "5a7e12e5",
-    "name": "Acid Splash"
+    "_es": "24721c79",
+    "name": "Acid Splash",
+    "description": "You hurl a bubble of acid; up to two nearby creatures make a DEX save or take 1d6 Acid damage. Scales with level."
   },
   "thaumaturgy": {
-    "_es": "7044c418",
-    "name": "Thaumaturgy"
+    "_es": "60e4c2ba",
+    "name": "Thaumaturgy",
+    "description": "You manifest a minor sign of supernatural power: a booming voice, flickering flames, harmless tremors, and so on."
   },
   "chill-touch": {
-    "_es": "c2be289b",
-    "name": "Chill Touch"
+    "_es": "6125bcac",
+    "name": "Chill Touch",
+    "description": "You channel the chill of the grave and make a melee spell attack against a target within reach. On a hit, it takes 1d10 Necrotic damage and can't regain Hit Points until the end of your next turn. The damage increases to 2d10 at level 5, 3d10 at level 11, and 4d10 at level 17."
   },
   "goodberry": {
-    "_es": "9dd8071c",
-    "name": "Goodberry"
+    "_es": "f9923499",
+    "name": "Goodberry",
+    "description": "You create 10 berries; each restores 1 HP and nourishes a creature for one day. They last 24 hours."
   },
   "bless": {
-    "_es": "7290a4e3",
-    "name": "Bless"
+    "_es": "12d5d9b9",
+    "name": "Bless",
+    "description": "Three creatures add 1d4 to attack rolls and saving throws (+1 target per higher slot)."
   },
   "feather-fall": {
-    "_es": "115012c8",
-    "name": "Feather Fall"
+    "_es": "60f9ba50",
+    "name": "Feather Fall",
+    "description": "Up to five falling creatures descend slowly and take no falling damage for 1 minute."
   },
   "comprehend-languages": {
-    "_es": "84ab6271",
-    "name": "Comprehend Languages"
+    "_es": "9d3d73c6",
+    "name": "Comprehend Languages",
+    "description": "You understand the literal meaning of any spoken language you hear or text you touch for 1 hour."
   },
   "cure-wounds": {
-    "_es": "373a31df",
-    "name": "Cure Wounds"
+    "_es": "7c183ba9",
+    "name": "Cure Wounds",
+    "description": "Restores 2d8 + spellcasting modifier HP (+2d8 per higher slot)."
   },
   "detect-magic": {
-    "_es": "f576fdd5",
-    "name": "Detect Magic"
+    "_es": "7986c9e2",
+    "name": "Detect Magic",
+    "description": "You sense the presence of magic within 30 feet and its school. Ritual."
   },
   "disguise-self": {
-    "_es": "57129e46",
-    "name": "Disguise Self"
+    "_es": "e7a04c8c",
+    "name": "Disguise Self",
+    "description": "You change your appearance (clothing, features, apparent height) for up to 1 hour. Physical contact or careful inspection reveals the ruse."
   },
   "charm-person": {
-    "_es": "c6d6e076",
-    "name": "Charm Person"
+    "_es": "341d153b",
+    "name": "Charm Person",
+    "description": "A Humanoid you can see makes a WIS save or has the Charmed condition by you, regarding you as a friendly acquaintance, for up to 1 hour."
   },
   "entangle": {
-    "_es": "fcef963a",
-    "name": "Entangle"
+    "_es": "92579ffc",
+    "name": "Entangle",
+    "description": "Vines sprout in 20 feet; creatures make a STR save or have the Restrained condition. Concentration."
   },
   "shield": {
-    "_es": "73512dc5",
-    "name": "Shield"
+    "_es": "cc1cc9cb",
+    "name": "Shield",
+    "description": "As a Reaction, +5 to AC until your next turn, and you negate Magic Missile."
   },
   "shield-of-faith": {
-    "_es": "0230cd2d",
-    "name": "Shield of Faith"
+    "_es": "2cbd3427",
+    "name": "Shield of Faith",
+    "description": "A field protects one creature, granting it +2 to AC for 10 minutes. Concentration."
   },
   "faerie-fire": {
-    "_es": "461c98f9",
-    "name": "Faerie Fire"
+    "_es": "4e3012f0",
+    "name": "Faerie Fire",
+    "description": "20-foot Cube; DEX save or the targets glow and grant Advantage to attacks against them."
   },
   "grease": {
-    "_es": "d3e04122",
-    "name": "Grease"
+    "_es": "41b6eddd",
+    "name": "Grease",
+    "description": "You cover a 10-foot square with slick grease; anyone in it or entering it makes a DEX save or falls Prone."
   },
   "identify": {
-    "_es": "4ae88ca8",
-    "name": "Identify"
+    "_es": "89ecde10",
+    "name": "Identify",
+    "description": "You learn the magical properties of an object you touch and whether it bears a known curse."
   },
   "inflict-wounds": {
-    "_es": "c5616832",
-    "name": "Inflict Wounds"
+    "_es": "2bfcea9a",
+    "name": "Inflict Wounds",
+    "description": "CON save; on a failure, 2d10 Necrotic damage. Scales with level."
   },
   "burning-hands": {
-    "_es": "fd033fcf",
-    "name": "Burning Hands"
+    "_es": "5eb5f678",
+    "name": "Burning Hands",
+    "description": "Cone of fire; DEX save for half. 3d6 damage (+1d6 per higher slot)."
   },
   "hunters-mark": {
-    "_es": "78f2db27",
-    "name": "Hunter's Mark"
+    "_es": "decd3934",
+    "name": "Hunter's Mark",
+    "description": "You magically mark a creature you can see within range as your quarry. Until the spell ends, you deal an extra 1d6 Force damage to it whenever you hit it with an attack roll, and you have Advantage on any Wisdom (Perception or Survival) check you make to find it. If its Hit Points drop to 0 before the spell ends, you can take a Bonus Action to move the mark to another creature you can see. With a level 3 or 4 slot, Concentration can last up to 8 hours, and with a level 5 or higher slot, up to 24 hours."
   },
   "fog-cloud": {
-    "_es": "6e0f2560",
-    "name": "Fog Cloud"
+    "_es": "f468884a",
+    "name": "Fog Cloud",
+    "description": "You create a 20-foot sphere of fog that blocks vision (Heavily Obscured). Concentration."
   },
   "thunderwave": {
-    "_es": "8015c84d",
-    "name": "Thunderwave"
+    "_es": "c180afaf",
+    "name": "Thunderwave",
+    "description": "A wave of force in a 15-foot Cube: 2d8 Thunder damage and a 10-foot push (CON save for half and no push). Scales."
   },
   "command": {
-    "_es": "1ef278e1",
-    "name": "Command"
+    "_es": "d888fced",
+    "name": "Command",
+    "description": "You speak a one-word command; the target makes a WIS save or obeys it on its next turn (approach, drop, flee, and so on)."
   },
   "healing-word": {
-    "_es": "e67c23d4",
-    "name": "Healing Word"
+    "_es": "5ca58bd5",
+    "name": "Healing Word",
+    "description": "Restores 2d4 + spellcasting modifier HP at range (+2d4 per higher slot)."
   },
   "protection-from-evil-and-good": {
-    "_es": "716d6e84",
-    "name": "Protection from Evil and Good"
+    "_es": "c4553a1b",
+    "name": "Protection from Evil and Good",
+    "description": "The target gains defenses against Aberrations, Celestials, Elementals, Fey, Fiends, and Undead. Concentration."
   },
   "magic-missile": {
-    "_es": "0d34df5d",
-    "name": "Magic Missile"
+    "_es": "f9dd6f10",
+    "name": "Magic Missile",
+    "description": "Three darts that hit automatically for 1d4 + 1 Force damage each. +1 dart per higher slot."
   },
   "guiding-bolt": {
-    "_es": "b38c8f7c",
-    "name": "Guiding Bolt"
+    "_es": "54415cdc",
+    "name": "Guiding Bolt",
+    "description": "Ranged spell attack for 4d6 Radiant damage; the next attack roll against the target has Advantage. Scales."
   },
   "expeditious-retreat": {
-    "_es": "d9cb2c4b",
-    "name": "Expeditious Retreat"
+    "_es": "c2fc5980",
+    "name": "Expeditious Retreat",
+    "description": "As a Bonus Action when you cast it and on later turns, you can Dash; you gain great mobility while you concentrate."
   },
   "sanctuary": {
-    "_es": "71f94a90",
-    "name": "Sanctuary"
+    "_es": "8669bade",
+    "name": "Sanctuary",
+    "description": "Protects a creature: anyone who wants to attack it must succeed on a WIS save or choose another target."
   },
   "sleep": {
-    "_es": "b3f96097",
-    "name": "Sleep"
+    "_es": "bc1a9f08",
+    "name": "Sleep",
+    "description": "Creatures in an area make a WIS save or become drowsy and Incapacitated; at 0 HP they fall Unconscious. Concentration."
   },
   "longstrider": {
-    "_es": "496173eb",
-    "name": "Longstrider"
+    "_es": "82ffdff7",
+    "name": "Longstrider",
+    "description": "The target's Speed increases by 10 feet for 1 hour."
   },
   "spiritual-weapon": {
-    "_es": "97224ffb",
-    "name": "Spiritual Weapon"
+    "_es": "ef858949",
+    "name": "Spiritual Weapon",
+    "description": "A spectral weapon that attacks for 1d8 + spellcasting modifier Force damage; you move it as a Bonus Action."
   },
   "aid": {
-    "_es": "3f106f4f",
-    "name": "Aid"
+    "_es": "c24aef3a",
+    "name": "Aid",
+    "description": "Up to three creatures increase their HP maximum and current HP by 5 for 8 hours. Scales with level."
   },
   "heat-metal": {
-    "_es": "ffa9065d",
-    "name": "Heat Metal"
+    "_es": "7eaa954b",
+    "name": "Heat Metal",
+    "description": "You make a metal object glow red-hot; whoever holds it takes 2d8 Fire damage and can drop it. Concentration. Scales."
   },
   "calm-emotions": {
-    "_es": "773f3e50",
-    "name": "Calm Emotions"
+    "_es": "a6307211",
+    "name": "Calm Emotions",
+    "description": "Creatures within 20 feet make a CHA save or lose their hostility, or have fear/charm suppressed. Concentration."
   },
   "blur": {
-    "_es": "001ffd3a",
-    "name": "Blur"
+    "_es": "f7141e85",
+    "name": "Blur",
+    "description": "Your body becomes blurred; attack rolls against you have Disadvantage (unless the attacker doesn't rely on sight). Concentration."
   },
   "flaming-sphere": {
-    "_es": "09aeef9f",
-    "name": "Flaming Sphere"
+    "_es": "8fa2da8e",
+    "name": "Flaming Sphere",
+    "description": "A sphere of fire you move each turn; it deals 2d6 Fire damage to whatever it touches. Concentration. Scales."
   },
   "hold-person": {
-    "_es": "d59e763c",
-    "name": "Hold Person"
+    "_es": "072ac00c",
+    "name": "Hold Person",
+    "description": "A Humanoid makes a WIS save or has the Paralyzed condition; it repeats the save at the end of each turn."
   },
   "invisibility": {
-    "_es": "2150a869",
-    "name": "Invisibility"
+    "_es": "52542a84",
+    "name": "Invisibility",
+    "description": "The target becomes Invisible until it attacks or casts a spell. +1 target per higher slot."
   },
   "levitate": {
-    "_es": "721cadd5",
-    "name": "Levitate"
+    "_es": "e16c921d",
+    "name": "Levitate",
+    "description": "A creature or object rises up to 20 feet and stays suspended. Concentration."
   },
   "darkness": {
-    "_es": "8c69de82",
-    "name": "Darkness"
+    "_es": "48c07520",
+    "name": "Darkness",
+    "description": "Magical Darkness fills a 15-foot sphere that not even Darkvision can penetrate. Concentration."
   },
   "pass-without-trace": {
-    "_es": "06fcc2ac",
-    "name": "Pass without Trace"
+    "_es": "a36cab3a",
+    "name": "Pass without Trace",
+    "description": "You and your nearby allies gain +10 to Stealth and leave no tracks. Concentration."
   },
   "misty-step": {
-    "_es": "0c52a3ee",
-    "name": "Misty Step"
+    "_es": "15e4a309",
+    "name": "Misty Step",
+    "description": "You teleport up to 30 feet to an unoccupied space you can see."
   },
   "prayer-of-healing": {
-    "_es": "88c334de",
-    "name": "Prayer of Healing"
+    "_es": "5ee8fbe4",
+    "name": "Prayer of Healing",
+    "description": "Up to six creatures regain 2d8 + your spellcasting ability modifier in HP. Scales."
   },
   "gust-of-wind": {
-    "_es": "9c13aeb8",
-    "name": "Gust of Wind"
+    "_es": "7070e8b2",
+    "name": "Gust of Wind",
+    "description": "A 60-foot line of wind pushes creatures and disperses gases. Concentration."
   },
   "scorching-ray": {
-    "_es": "c55006f8",
-    "name": "Scorching Ray"
+    "_es": "d1f4b04d",
+    "name": "Scorching Ray",
+    "description": "Three rays; a spell attack for each, 2d6 Fire damage. +1 ray per higher slot."
   },
   "moonbeam": {
-    "_es": "36e7e7e8",
-    "name": "Moonbeam"
+    "_es": "1c1beec2",
+    "name": "Moonbeam",
+    "description": "A 5-foot beam of silvery light you reposition each turn; 2d10 Radiant damage to anyone who enters it or starts inside. Concentration. Scales."
   },
   "enhance-ability": {
-    "_es": "f0c9139b",
-    "name": "Enhance Ability"
+    "_es": "933265e5",
+    "name": "Enhance Ability",
+    "description": "The target gains Advantage on checks with one ability (and extra benefits depending on which) for 1 hour. Concentration."
   },
   "lesser-restoration": {
-    "_es": "f91eae8f",
-    "name": "Lesser Restoration"
+    "_es": "8fe303ad",
+    "name": "Lesser Restoration",
+    "description": "Ends one disease or condition: Blinded, Deafened, Paralyzed, or Poisoned."
   },
   "silence": {
-    "_es": "53cb570e",
-    "name": "Silence"
+    "_es": "e5b9810d",
+    "name": "Silence",
+    "description": "A 20-foot sphere becomes completely silent: no sound enters or leaves it, preventing Verbal spells. Concentration."
   },
   "web": {
-    "_es": "0f6bb633",
-    "name": "Web"
+    "_es": "7fce0154",
+    "name": "Web",
+    "description": "Webs fill a 20-foot Cube (Difficult Terrain); anyone entering makes a DEX save or has the Restrained condition. Concentration."
   },
   "spider-climb": {
-    "_es": "a476316e",
-    "name": "Spider Climb"
+    "_es": "7e8c06f7",
+    "name": "Spider Climb",
+    "description": "The target can climb walls and ceilings with its hands free. Concentration."
   },
   "see-invisibility": {
-    "_es": "629a7ea6",
-    "name": "See Invisibility"
+    "_es": "64ed5680",
+    "name": "See Invisibility",
+    "description": "For 1 hour, you see Invisible creatures and objects and perceive the Ethereal Plane."
   },
   "darkvision": {
-    "_es": "ebd23144",
-    "name": "Darkvision"
+    "_es": "72f57c2e",
+    "name": "Darkvision",
+    "description": "The target has Darkvision out to 60 feet for 8 hours."
   },
   "animate-dead": {
-    "_es": "b0a03ffc",
-    "name": "Animate Dead"
+    "_es": "00d92327",
+    "name": "Animate Dead",
+    "description": "You animate a Skeleton or Zombie under your control; you can reassert and extend control every 24 hours."
   },
   "fireball": {
-    "_es": "f0c1a479",
-    "name": "Fireball"
+    "_es": "cd26414c",
+    "name": "Fireball",
+    "description": "20-foot sphere; DEX save for half. 8d6 Fire damage (+1d6 per higher slot)."
   },
   "counterspell": {
-    "_es": "b1aadeab",
-    "name": "Counterspell"
+    "_es": "0b5d3f70",
+    "name": "Counterspell",
+    "description": "As a Reaction, you interrupt another creature's casting of a spell (with a save if it is high level)."
   },
   "conjure-animals": {
-    "_es": "d32dde30",
-    "name": "Conjure Animals"
+    "_es": "eee63745",
+    "name": "Conjure Animals",
+    "description": "You conjure nature spirits that appear as a Large pack of spectral animals in an unoccupied space you can see within range. You have Advantage on Strength saving throws while within 5 feet of the pack, and when you move on your turn you can move the pack up to 30 feet to another unoccupied space. Whenever the pack moves within 10 feet of a creature you can see, or a creature ends its turn there, you can force it to make a Dexterity saving throw: on a failure, it takes 3d10 Slashing damage. A creature makes this save only once per turn. With a higher-level slot, the damage increases by 1d10 for each level above 3."
   },
   "dispel-magic": {
-    "_es": "d7a9accb",
-    "name": "Dispel Magic"
+    "_es": "81bbc4a1",
+    "name": "Dispel Magic",
+    "description": "Ends spells of level 3 or lower on a target; higher levels require an ability check."
   },
   "spirit-guardians": {
-    "_es": "4255cb61",
-    "name": "Spirit Guardians"
+    "_es": "71edc88a",
+    "name": "Spirit Guardians",
+    "description": "Protective spirits; enemies in the aura take 3d8 damage (WIS save for half) and have reduced Speed."
   },
   "major-image": {
-    "_es": "9f98be7d",
-    "name": "Major Image"
+    "_es": "93f240f4",
+    "name": "Major Image",
+    "description": "You create an illusion with image, sound, smell, and temperature that you can move and alter. Concentration."
   },
   "bestow-curse": {
-    "_es": "1f2fca6a",
-    "name": "Bestow Curse"
+    "_es": "28c8e05b",
+    "name": "Bestow Curse",
+    "description": "You curse a creature (WIS save) with a debilitating effect of your choice. Concentration."
   },
   "call-lightning": {
-    "_es": "cea4a1f0",
-    "name": "Call Lightning"
+    "_es": "125eb32d",
+    "name": "Call Lightning",
+    "description": "A storm cloud; as an action, you call down a bolt for 3d10 Lightning damage (DEX save for half). Concentration. Scales."
   },
   "tongues": {
-    "_es": "4c725577",
-    "name": "Tongues"
+    "_es": "915a1473",
+    "name": "Tongues",
+    "description": "The target understands any spoken language and is understood by anyone who knows a language. Lasts 1 hour."
   },
   "daylight": {
-    "_es": "3a6799e2",
-    "name": "Daylight"
+    "_es": "6171e6bc",
+    "name": "Daylight",
+    "description": "A 60-foot sphere of sunlight; it dispels magical Darkness of a lower level."
   },
   "fear": {
-    "_es": "47254a1c",
-    "name": "Fear"
+    "_es": "a753290a",
+    "name": "Fear",
+    "description": "Creatures in a 30-foot Cone make a WIS save or drop what they hold and flee Frightened. Concentration."
   },
   "stinking-cloud": {
-    "_es": "6e11d802",
-    "name": "Stinking Cloud"
+    "_es": "478270dd",
+    "name": "Stinking Cloud",
+    "description": "A nauseating gas in 20 feet; anyone who starts its turn inside makes a CON save or loses its action. Concentration."
   },
   "mass-healing-word": {
-    "_es": "6b95d4f1",
-    "name": "Mass Healing Word"
+    "_es": "5189e957",
+    "name": "Mass Healing Word",
+    "description": "Up to six creatures regain 2d4 + your spellcasting ability modifier in HP. Scales."
   },
   "hypnotic-pattern": {
-    "_es": "8d887ed7",
-    "name": "Hypnotic Pattern"
+    "_es": "0dbca623",
+    "name": "Hypnotic Pattern",
+    "description": "A pattern of colors in 30 feet; creatures make a WIS save or have the Charmed and Incapacitated conditions. Concentration."
   },
   "haste": {
-    "_es": "b6c00b2d",
-    "name": "Haste"
+    "_es": "3adc3a55",
+    "name": "Haste",
+    "description": "The target doubles its Speed, gains +2 AC, Advantage on DEX saves, and an extra limited action. Concentration."
   },
   "protection-from-energy": {
-    "_es": "f325de50",
-    "name": "Protection from Energy"
+    "_es": "74c1acd6",
+    "name": "Protection from Energy",
+    "description": "The target gains Resistance to one elemental damage type (Acid, Cold, Fire, Lightning, or Thunder). Concentration."
   },
   "remove-curse": {
-    "_es": "63a7d7b7",
-    "name": "Remove Curse"
+    "_es": "f416c95b",
+    "name": "Remove Curse",
+    "description": "You end all curses on a creature or object you touch."
   },
   "slow": {
-    "_es": "9f906752",
-    "name": "Slow"
+    "_es": "1589fa98",
+    "name": "Slow",
+    "description": "Up to six creatures (WIS save) have reduced Speed and AC and act more slowly. Concentration."
   },
   "lightning-bolt": {
-    "_es": "df3d5666",
-    "name": "Lightning Bolt"
+    "_es": "df3c921c",
+    "name": "Lightning Bolt",
+    "description": "A 100-foot line: 8d6 Lightning damage (DEX save for half). Scales with level."
   },
   "water-breathing": {
-    "_es": "951b4f69",
-    "name": "Water Breathing"
+    "_es": "d7f2542e",
+    "name": "Water Breathing",
+    "description": "Up to ten creatures can breathe underwater for 24 hours."
   },
   "revivify": {
-    "_es": "e888cd51",
-    "name": "Revivify"
+    "_es": "1886c75e",
+    "name": "Revivify",
+    "description": "Returns to life a creature that died within the last minute, with 1 HP. Requires diamonds worth 300 gp."
   },
   "vampiric-touch": {
-    "_es": "0d1ae7b0",
-    "name": "Vampiric Touch"
+    "_es": "111d3775",
+    "name": "Vampiric Touch",
+    "description": "Melee spell attack for 3d6 Necrotic damage; you regain half as HP. Concentration. Scales."
   },
   "sleet-storm": {
-    "_es": "9e7bdec6",
-    "name": "Sleet Storm"
+    "_es": "f67437ff",
+    "name": "Sleet Storm",
+    "description": "Ice and sleet cover a cylinder: Difficult Terrain, blocked vision, and saves to avoid falling. Concentration."
   },
   "fly": {
-    "_es": "824b75b8",
-    "name": "Fly"
+    "_es": "69871f95",
+    "name": "Fly",
+    "description": "The target gains a Fly Speed of 60 feet. +1 target per higher slot."
   },
   "phantasmal-killer": {
-    "_es": "ea4b87cb",
-    "name": "Phantasmal Killer"
+    "_es": "f402aa54",
+    "name": "Phantasmal Killer",
+    "description": "Wisdom saving throw: on a failure, the target takes 4d10 Psychic damage and has Disadvantage on ability checks and attack rolls for the duration; on a success, it takes half as much damage and the spell ends. For the duration, it repeats the save at the end of each of its turns: on a failure it takes the damage again, and on a success the spell ends. Concentration. Scales."
   },
   "confusion": {
-    "_es": "b78b5a6a",
-    "name": "Confusion"
+    "_es": "d56b6a09",
+    "name": "Confusion",
+    "description": "Creatures within 10 feet (WIS save) act randomly each turn. Concentration. The area scales."
   },
   "banishment": {
-    "_es": "584f38df",
-    "name": "Banishment"
+    "_es": "1c9cd68b",
+    "name": "Banishment",
+    "description": "The target (CHA save) is banished to a demiplane; if it is from another plane and the full minute passes, it doesn't return. Concentration."
   },
   "fire-shield": {
-    "_es": "a261a514",
-    "name": "Fire Shield"
+    "_es": "4a18ffee",
+    "name": "Fire Shield",
+    "description": "A fiery or chilly aura grants you Resistance (Fire or Cold) and damages anyone who hits you from close by. Lasts 10 minutes."
   },
   "greater-invisibility": {
-    "_es": "27ec7126",
-    "name": "Greater Invisibility"
+    "_es": "8f4c3d35",
+    "name": "Greater Invisibility",
+    "description": "The target is Invisible even if it attacks or casts spells. Concentration."
   },
   "freedom-of-movement": {
-    "_es": "f9f67d95",
-    "name": "Freedom of Movement"
+    "_es": "790b3091",
+    "name": "Freedom of Movement",
+    "description": "The target ignores Difficult Terrain and can't be Restrained or Paralyzed; it frees itself from restraints. Lasts 1 hour."
   },
   "blight": {
-    "_es": "585aa035",
-    "name": "Blight"
+    "_es": "9b5e3714",
+    "name": "Blight",
+    "description": "You drain a creature's vitality: 8d8 Necrotic damage (CON save for half); devastating against Plants. Scales."
   },
   "polymorph": {
-    "_es": "dd49dfe5",
-    "name": "Polymorph"
+    "_es": "d6d09bb4",
+    "name": "Polymorph",
+    "description": "You transform a creature into a Beast (WIS save if unwilling); it uses the Beast's statistics. Concentration."
   },
   "wall-of-fire": {
-    "_es": "fe586ce8",
-    "name": "Wall of Fire"
+    "_es": "91687185",
+    "name": "Wall of Fire",
+    "description": "You raise a wall of flames; 5d8 Fire damage to anyone who crosses it or ends near its burning side. Concentration. Scales."
   },
   "stoneskin": {
-    "_es": "4d56140d",
-    "name": "Stoneskin"
+    "_es": "73cd01be",
+    "name": "Stoneskin",
+    "description": "The target gains Resistance to nonmagical Bludgeoning, Piercing, and Slashing damage. Concentration."
   },
   "death-ward": {
-    "_es": "4dc17b8c",
-    "name": "Death Ward"
+    "_es": "d8e580ba",
+    "name": "Death Ward",
+    "description": "The first time the target would drop to 0 HP, it drops to 1 instead; it also negates one instant-death effect."
   },
   "dimension-door": {
-    "_es": "6ce689f8",
-    "name": "Dimension Door"
+    "_es": "db3ae397",
+    "name": "Dimension Door",
+    "description": "You teleport up to 500 feet to a place you picture, and you can bring one creature with you."
   },
   "ice-storm": {
-    "_es": "b6558152",
-    "name": "Ice Storm"
+    "_es": "acb5d1e6",
+    "name": "Ice Storm",
+    "description": "Hail pounds a 20-foot cylinder: Bludgeoning and Cold damage, and it leaves Difficult Terrain. Scales."
   },
   "animate-objects": {
-    "_es": "1c642d76",
-    "name": "Animate Objects"
+    "_es": "b412028c",
+    "name": "Animate Objects",
+    "description": "You bring up to ten objects to life that attack at your command. Concentration. Scales."
   },
   "flame-strike": {
-    "_es": "8f134ded",
-    "name": "Flame Strike"
+    "_es": "6658cf9f",
+    "name": "Flame Strike",
+    "description": "A column of fire in a 10-foot-radius, 40-foot-high cylinder: Dexterity saving throw against 5d6 Fire damage plus 5d6 Radiant damage, or half as much on a success. Scales."
   },
   "cone-of-cold": {
-    "_es": "6cd2f3fa",
-    "name": "Cone of Cold"
+    "_es": "6d0b5f5b",
+    "name": "Cone of Cold",
+    "description": "A 60-foot Cone: 8d8 Cold damage (CON save for half). Scales."
   },
   "mass-cure-wounds": {
-    "_es": "4854c612",
-    "name": "Mass Cure Wounds"
+    "_es": "bdf3812b",
+    "name": "Mass Cure Wounds",
+    "description": "Up to six creatures in a 30-foot-radius sphere regain 5d8 + your spellcasting ability modifier in HP. Scales."
   },
   "dominate-person": {
-    "_es": "a6e4b86e",
-    "name": "Dominate Person"
+    "_es": "0d172e69",
+    "name": "Dominate Person",
+    "description": "A Humanoid (WIS save) has the Charmed condition and is under your mental control. Concentration. Scales."
   },
   "scrying": {
-    "_es": "58df2d07",
-    "name": "Scrying"
+    "_es": "08f63b5f",
+    "name": "Scrying",
+    "description": "You see and hear a creature at any distance through an invisible sensor (WIS save). Concentration."
   },
   "hold-monster": {
-    "_es": "f18d496f",
-    "name": "Hold Monster"
+    "_es": "a536d576",
+    "name": "Hold Monster",
+    "description": "A creature (WIS save) has the Paralyzed condition; it repeats the save each turn. Concentration. Scales."
   },
   "raise-dead": {
-    "_es": "2c114770",
-    "name": "Raise Dead"
+    "_es": "da682d35",
+    "name": "Raise Dead",
+    "description": "You return to life a creature that has been dead no longer than 10 days, with temporary penalties that fade."
   },
   "geas": {
-    "_es": "8ac9724e",
-    "name": "Geas"
+    "_es": "f9102407",
+    "name": "Geas",
+    "description": "You lay a command on a creature for 30 days; if it disobeys, it takes Psychic damage. WIS save."
   },
   "wall-of-force": {
-    "_es": "b1998edf",
-    "name": "Wall of Force"
+    "_es": "d6ebdbdf",
+    "name": "Wall of Force",
+    "description": "An invisible, nearly indestructible wall of force that nothing physical can pass through. Concentration."
   },
   "wall-of-stone": {
-    "_es": "5d0ee12b",
-    "name": "Wall of Stone"
+    "_es": "608f0f52",
+    "name": "Wall of Stone",
+    "description": "You create a wall of stone that can seal passages or form bridges; it becomes permanent if you concentrate for 10 minutes."
   },
   "cloudkill": {
-    "_es": "61995756",
-    "name": "Cloudkill"
+    "_es": "d5710dff",
+    "name": "Cloudkill",
+    "description": "A drifting 20-foot fog of poison; 5d8 Poison damage (CON save for half). Concentration. Scales."
   },
   "insect-plague": {
-    "_es": "b6a6ecce",
-    "name": "Insect Plague"
+    "_es": "0610cf0f",
+    "name": "Insect Plague",
+    "description": "A 20-foot sphere of insects: Difficult Terrain, reduced visibility, and 4d10 Piercing damage. Concentration. Scales."
   },
   "greater-restoration": {
-    "_es": "f10db3d8",
-    "name": "Greater Restoration"
+    "_es": "b4d75c11",
+    "name": "Greater Restoration",
+    "description": "You remove one level of Exhaustion, or an effect that reduces an ability score or HP maximum, or you end a charm or petrification."
   },
   "telekinesis": {
-    "_es": "5bc08425",
-    "name": "Telekinesis"
+    "_es": "e400b22c",
+    "name": "Telekinesis",
+    "description": "You move creatures or objects with your mind (contested check); you manipulate things at a distance. Concentration."
   },
   "blade-barrier": {
-    "_es": "3f805f40",
-    "name": "Blade Barrier"
+    "_es": "4e3a7a30",
+    "name": "Blade Barrier",
+    "description": "A wall of whirling blades of magical energy: it provides Three-Quarters Cover and its space is Difficult Terrain. A creature in its space, entering it, or ending its turn there makes a Dexterity saving throw against 6d10 Force damage, or half as much on a success. Once per turn. Concentration."
   },
   "circle-of-death": {
-    "_es": "17f7c946",
-    "name": "Circle of Death"
+    "_es": "92a8b4e9",
+    "name": "Circle of Death",
+    "description": "A wave of negative energy in a 60-foot-radius sphere: Constitution saving throw against 8d8 Necrotic damage, or half as much on a success. Scales."
   },
   "harm": {
-    "_es": "dea73a71",
-    "name": "Harm"
+    "_es": "ed68cc6c",
+    "name": "Harm",
+    "description": "You deal 14d6 Necrotic damage (CON save for half); it reduces the target's HP maximum until it heals."
   },
   "disintegrate": {
-    "_es": "96250e98",
-    "name": "Disintegrate"
+    "_es": "67799716",
+    "name": "Disintegrate",
+    "description": "A green ray; 10d6 + 40 Force damage (DEX save). If it reduces a creature to 0 HP, the creature is reduced to dust. Scales."
   },
   "globe-of-invulnerability": {
-    "_es": "49817117",
-    "name": "Globe of Invulnerability"
+    "_es": "e5129e54",
+    "name": "Globe of Invulnerability",
+    "description": "A 10-foot barrier blocks spells of level 5 or lower cast from outside. Concentration."
   },
   "eyebite": {
-    "_es": "fe47e35f",
-    "name": "Eyebite"
+    "_es": "078417e0",
+    "name": "Eyebite",
+    "description": "Each turn you gaze at a creature (WIS save) and make it fall asleep, become Frightened, or become sickened. Concentration."
   },
   "sunbeam": {
-    "_es": "8f7b1fd6",
-    "name": "Sunbeam"
+    "_es": "68c55349",
+    "name": "Sunbeam",
+    "description": "A 60-foot beam of sunlight; 6d8 Radiant damage and Blinded (CON save). Reusable each turn. Concentration."
   },
   "chain-lightning": {
-    "_es": "95a8d99f",
-    "name": "Chain Lightning"
+    "_es": "9cb0956b",
+    "name": "Chain Lightning",
+    "description": "A bolt strikes one target and leaps to three others nearby: 10d8 Lightning damage (DEX save for half). Scales."
   },
   "heal": {
-    "_es": "d90965f9",
-    "name": "Heal"
+    "_es": "151b6eb3",
+    "name": "Heal",
+    "description": "You restore 70 HP to a creature and end blindness, deafness, and diseases. Scales."
   },
   "mass-suggestion": {
-    "_es": "08c8bc42",
-    "name": "Mass Suggestion"
+    "_es": "a7af553d",
+    "name": "Mass Suggestion",
+    "description": "Up to twelve creatures (WIS save) follow a reasonable suggestion for 24 hours."
   },
   "true-seeing": {
-    "_es": "91f8f4b4",
-    "name": "True Seeing"
+    "_es": "d32443af",
+    "name": "True Seeing",
+    "description": "The target sees in darkness, sees through illusions, and sees Invisible creatures and objects and their true form. Lasts 1 hour."
   },
   "delayed-blast-fireball": {
-    "_es": "546d172b",
-    "name": "Delayed Blast Fireball"
+    "_es": "7125ade7",
+    "name": "Delayed Blast Fireball",
+    "description": "A sphere that builds up fire each turn; when it detonates, it deals 12d6 or more Fire damage in 20 feet. Concentration. Scales."
   },
   "plane-shift": {
-    "_es": "f9c03c83",
-    "name": "Plane Shift"
+    "_es": "df752beb",
+    "name": "Plane Shift",
+    "description": "You transport a group (or banish an enemy) to another plane of existence."
   },
   "finger-of-death": {
-    "_es": "6194918c",
-    "name": "Finger of Death"
+    "_es": "fe319ac9",
+    "name": "Finger of Death",
+    "description": "7d8 + 30 Necrotic damage (CON save for half); if it kills a Humanoid, it rises as a Zombie under your control."
   },
   "etherealness": {
-    "_es": "ad2f8c5e",
-    "name": "Etherealness"
+    "_es": "e5f76aba",
+    "name": "Etherealness",
+    "description": "You step into the Border Ethereal and can move through matter. Scales to bring others."
   },
   "reverse-gravity": {
-    "_es": "7994edea",
-    "name": "Reverse Gravity"
+    "_es": "f01e7a3d",
+    "name": "Reverse Gravity",
+    "description": "In a cylinder, gravity reverses: anything not anchored falls upward. Concentration."
   },
   "forcecage": {
-    "_es": "7f60b915",
-    "name": "Forcecage"
+    "_es": "3ef6c352",
+    "name": "Forcecage",
+    "description": "A prison of force (cage or box) traps the creatures inside; escaping requires high-level teleportation."
   },
   "regenerate": {
-    "_es": "d42184f1",
-    "name": "Regenerate"
+    "_es": "6b99e511",
+    "name": "Regenerate",
+    "description": "The target regains HP immediately and every turn for 1 hour, and lost limbs grow back."
   },
   "resurrection": {
-    "_es": "a459b176",
-    "name": "Resurrection"
+    "_es": "85ed0306",
+    "name": "Resurrection",
+    "description": "You return to life a creature that has been dead no longer than a century, without death penalties."
   },
   "prismatic-spray": {
-    "_es": "34b4d0c2",
-    "name": "Prismatic Spray"
+    "_es": "5f2a9501",
+    "name": "Prismatic Spray",
+    "description": "Eight colored rays in a Cone; each creature suffers random effects (elemental damage, poison, petrification...)."
   },
   "teleport": {
-    "_es": "e806039a",
-    "name": "Teleport"
+    "_es": "212b90b5",
+    "name": "Teleport",
+    "description": "You transport yourself and allies to a known destination; accuracy depends on how familiar you are with the place."
   },
   "fire-storm": {
-    "_es": "d38a1479",
-    "name": "Fire Storm"
+    "_es": "a5011b09",
+    "name": "Fire Storm",
+    "description": "Roaring flames in an area of your choice: 7d10 Fire damage (DEX save for half)."
   },
   "antimagic-field": {
-    "_es": "c4790eb7",
-    "name": "Antimagic Field"
+    "_es": "e1c2fa6c",
+    "name": "Antimagic Field",
+    "description": "A 10-foot sphere where magic is suppressed: spells, magic items, and magical effects don't work. Concentration."
   },
   "dominate-monster": {
-    "_es": "5e6cd7d1",
-    "name": "Dominate Monster"
+    "_es": "bfefae96",
+    "name": "Dominate Monster",
+    "description": "Any creature (WIS save) has the Charmed condition and is under your control. Concentration. Scales."
   },
   "sunburst": {
-    "_es": "c196539c",
-    "name": "Sunburst"
+    "_es": "7add1c97",
+    "name": "Sunburst",
+    "description": "A flash of sunlight in 60 feet: 12d6 Radiant damage and blindness (CON save). Dispels magical Darkness."
   },
   "animal-shapes": {
-    "_es": "c6b71290",
-    "name": "Animal Shapes"
+    "_es": "9934540a",
+    "name": "Animal Shapes",
+    "description": "You transform several allies into large Beasts for 24 hours."
   },
   "befuddlement": {
-    "_es": "9446db56",
-    "name": "Befuddlement"
+    "_es": "2b3cde6d",
+    "name": "Befuddlement",
+    "description": "Intelligence saving throw: on a failure, 10d12 Psychic damage, and the target can't cast spells or take the Magic action; it repeats the save every 30 days. On a success, half damage."
   },
   "mind-blank": {
-    "_es": "ea896ae9",
-    "name": "Mind Blank"
+    "_es": "e438c2d3",
+    "name": "Mind Blank",
+    "description": "For 24 hours, the target is immune to Psychic damage, mind reading, divination, and the Charmed condition."
   },
   "incendiary-cloud": {
-    "_es": "4b0fa9dd",
-    "name": "Incendiary Cloud"
+    "_es": "ca42b485",
+    "name": "Incendiary Cloud",
+    "description": "A moving 20-foot cloud of smoke and embers: 10d8 Fire damage to anyone inside. Concentration."
   },
   "power-word-stun": {
-    "_es": "72e0abc1",
-    "name": "Power Word Stun"
+    "_es": "7a2bc3b3",
+    "name": "Power Word Stun",
+    "description": "If the target has 150 HP or fewer, it has the Stunned condition until it succeeds on a CON save."
   },
   "earthquake": {
-    "_es": "03fb5f03",
-    "name": "Earthquake"
+    "_es": "ef8c8c5b",
+    "name": "Earthquake",
+    "description": "You shake the ground in 100 feet: you knock creatures Prone, open fissures, and collapse structures. Concentration."
   },
   "wish": {
-    "_es": "24ea9e9a",
-    "name": "Wish"
+    "_es": "0ea29df0",
+    "name": "Wish",
+    "description": "The mightiest spell: it duplicates any spell of level 8 or lower, or alters reality at a risk."
   },
   "time-stop": {
-    "_es": "2e96357b",
-    "name": "Time Stop"
+    "_es": "febb642a",
+    "name": "Time Stop",
+    "description": "You stop time for everyone but you, gaining 1d4 + 1 turns of free action (it breaks if you affect others)."
   },
   "imprisonment": {
-    "_es": "34785b19",
-    "name": "Imprisonment"
+    "_es": "3e6299f5",
+    "name": "Imprisonment",
+    "description": "You imprison a creature (WIS save) almost permanently: buried, in stasis, chained, or another way."
   },
   "meteor-swarm": {
-    "_es": "132247e8",
-    "name": "Meteor Swarm"
+    "_es": "a6245607",
+    "name": "Meteor Swarm",
+    "description": "Meteors fall at four points: 20d6 Fire + 20d6 Bludgeoning damage at each (DEX save for half)."
   },
   "prismatic-wall": {
-    "_es": "33ece188",
-    "name": "Prismatic Wall"
+    "_es": "7a279bdb",
+    "name": "Prismatic Wall",
+    "description": "A wall of seven colored layers, each with a different deadly effect that must be overcome separately."
   },
   "power-word-kill": {
-    "_es": "d4a16381",
-    "name": "Power Word Kill"
+    "_es": "c5f32b80",
+    "name": "Power Word Kill",
+    "description": "You speak a word of power; if the target has 100 HP or fewer, it dies instantly."
   },
   "weird": {
-    "_es": "605b2755",
-    "name": "Weird"
+    "_es": "04e9c4a1",
+    "name": "Weird",
+    "description": "Each creature of your choice in a 30-foot-radius sphere makes a Wisdom saving throw: on a failure, it takes 10d10 Psychic damage and has the Frightened condition for the duration; on a success, it takes half as much damage and nothing else. A Frightened creature repeats the save at the end of each of its turns: on a failure it takes 5d10 Psychic damage, and on a success the spell ends for it. Concentration."
   },
   "gate": {
-    "_es": "bf141778",
-    "name": "Gate"
+    "_es": "224130b6",
+    "name": "Gate",
+    "description": "You open a portal to another plane and can draw or send a specific creature through it. Concentration."
   },
   "foresight": {
-    "_es": "a3218412",
-    "name": "Foresight"
+    "_es": "0354c671",
+    "name": "Foresight",
+    "description": "For 8 hours, the target can't be surprised, has Advantage on everything, and attacks against it have Disadvantage."
   },
   "astral-projection": {
-    "_es": "459d9c44",
-    "name": "Astral Projection"
+    "_es": "b51dcc4b",
+    "name": "Astral Projection",
+    "description": "You and your companions project your astral forms to travel the Outer Planes."
   },
   "true-resurrection": {
-    "_es": "ae28a092",
-    "name": "True Resurrection"
+    "_es": "14ba39ba",
+    "name": "True Resurrection",
+    "description": "You return to life a creature that has been dead no longer than 200 years, fully restoring its body."
   },
   "mass-heal": {
-    "_es": "a4a31e8c",
-    "name": "Mass Heal"
+    "_es": "e37badc9",
+    "name": "Mass Heal",
+    "description": "You distribute up to 700 HP of healing among creatures in sight and remove conditions from them."
   },
   "speak-with-animals": {
-    "_es": "12fde8da",
-    "name": "Speak with Animals"
+    "_es": "2354bbfe",
+    "name": "Speak with Animals",
+    "description": "You can comprehend and verbally communicate with Beasts for the duration."
   },
   "ray-of-sickness": {
-    "_es": "e6264baa",
-    "name": "Ray of Sickness"
+    "_es": "081b88b6",
+    "name": "Ray of Sickness",
+    "description": "Ranged spell attack for 2d8 Poison damage; on a hit, Constitution saving throw or the target has the Poisoned condition until the end of your next turn. Scales."
   },
   "false-life": {
-    "_es": "9496919f",
-    "name": "False Life"
+    "_es": "556ae63e",
+    "name": "False Life",
+    "description": "You gain 2d4 + 4 Temporary Hit Points. Scales."
   },
   "ray-of-enfeeblement": {
-    "_es": "35533230",
-    "name": "Ray of Enfeeblement"
+    "_es": "74967052",
+    "name": "Ray of Enfeeblement",
+    "description": "Ranged spell attack; on a hit, the target deals half damage with its Strength-based attacks. At the end of each turn, it makes a Constitution saving throw to end the effect. Concentration."
   },
   "hellish-rebuke": {
-    "_es": "fb5aa2a6",
-    "name": "Hellish Rebuke"
+    "_es": "36282810",
+    "name": "Hellish Rebuke",
+    "description": "You engulf in flames the creature that damaged you: 2d10 Fire damage, Dexterity saving throw for half. Scales."
   },
   "friends": {
-    "_es": "4893ec3f",
-    "name": "Friends"
+    "_es": "ab13fa29",
+    "name": "Friends",
+    "description": "Wisdom saving throw or the target has the Charmed condition; it works only on Humanoids and ends if you damage or attack it."
   },
   "elementalism": {
-    "_es": "77dc6975",
-    "name": "Elementalism"
+    "_es": "4b399763",
+    "name": "Elementalism",
+    "description": "Minor elemental effect: sculpt earth or fire, create water or a flame, raise dust, or snuff out small fires."
   },
   "sorcerous-burst": {
-    "_es": "bc741959",
-    "name": "Sorcerous Burst"
+    "_es": "51ffb377",
+    "name": "Sorcerous Burst",
+    "description": "Ranged spell attack: 1d8 damage of a type you choose among Acid, Cold, Fire, Psychic, Lightning, Thunder, or Poison. Each 8 lets you roll another d8, up to your spellcasting ability modifier."
   },
   "mind-sliver": {
-    "_es": "21f79a88",
-    "name": "Mind Sliver"
+    "_es": "5f1e2325",
+    "name": "Mind Sliver",
+    "description": "Intelligence saving throw or 1d6 Psychic damage, and the target subtracts 1d4 from its next saving throw before the end of your next turn."
   },
   "blade-ward": {
-    "_es": "706960de",
-    "name": "Blade Ward"
+    "_es": "2f10dc6d",
+    "name": "Blade Ward",
+    "description": "Anyone who attacks you subtracts 1d4 from the roll while the spell lasts."
   },
   "thorn-whip": {
-    "_es": "9a796ad4",
-    "name": "Thorn Whip"
+    "_es": "efcc4bcb",
+    "name": "Thorn Whip",
+    "description": "Melee spell attack: 1d6 Piercing damage and, if the target is Large or smaller, you pull it 10 feet toward you."
   },
   "word-of-radiance": {
-    "_es": "d31c01de",
-    "name": "Word of Radiance"
+    "_es": "6b7bd6e4",
+    "name": "Word of Radiance",
+    "description": "5-foot Emanation: creatures you choose make a Constitution saving throw or take 1d6 Radiant damage."
   },
   "thunderclap": {
-    "_es": "060dac7a",
-    "name": "Thunderclap"
+    "_es": "2a8b7e37",
+    "name": "Thunderclap",
+    "description": "5-foot Emanation: Constitution saving throw or 1d6 Thunder damage. The boom can be heard 100 feet away."
   },
   "alarm": {
-    "_es": "5e46f69e",
-    "name": "Alarm"
+    "_es": "07d39990",
+    "name": "Alarm",
+    "description": "You ward an area up to a 20-foot Cube; it alerts you mentally or audibly if anyone not exempted enters or touches it."
   },
   "armor-of-agathys": {
-    "_es": "6b7e6dd5",
-    "name": "Armor of Agathys"
+    "_es": "afc800f5",
+    "name": "Armor of Agathys",
+    "description": "5 Temporary Hit Points and 5 Cold damage to anyone who hits you with a melee attack. It ends if you lose the temporary HP."
   },
   "mage-armor": {
-    "_es": "5e7a66b0",
-    "name": "Mage Armor"
+    "_es": "2ff66c3b",
+    "name": "Mage Armor",
+    "description": "The base AC of a creature not wearing armor becomes 13 + its Dexterity modifier. It ends if the creature dons armor."
   },
   "arms-of-hadar": {
-    "_es": "c4d51050",
-    "name": "Arms of Hadar"
+    "_es": "9a09cd3d",
+    "name": "Arms of Hadar",
+    "description": "10-foot Emanation: Strength saving throw or 2d6 Necrotic damage and no Reactions until its next turn; half damage on a success."
   },
   "searing-smite": {
-    "_es": "ffd44963",
-    "name": "Searing Smite"
+    "_es": "2ff0d6c4",
+    "name": "Searing Smite",
+    "description": "After you hit: 1d6 extra Fire damage, and the target burns for 1d6 per turn until it succeeds on a Constitution saving throw."
   },
   "thunderous-smite": {
-    "_es": "4d5fdbe2",
-    "name": "Thunderous Smite"
+    "_es": "3b7c0369",
+    "name": "Thunderous Smite",
+    "description": "After you hit: 2d6 extra Thunder damage, and a Strength saving throw or you push it 10 feet and it has the Prone condition."
   },
   "divine-smite": {
-    "_es": "e2cae3b9",
-    "name": "Divine Smite"
+    "_es": "fe071bbc",
+    "name": "Divine Smite",
+    "description": "After you hit: 2d8 extra Radiant damage, plus 1d8 if the target is a Fiend or Undead."
   },
   "wrathful-smite": {
-    "_es": "471502af",
-    "name": "Wrathful Smite"
+    "_es": "10599af3",
+    "name": "Wrathful Smite",
+    "description": "After you hit: 1d6 extra Necrotic damage, and a Wisdom saving throw or it has the Frightened condition; it repeats the save at the end of each turn."
   },
   "create-or-destroy-water": {
-    "_es": "537a2c24",
-    "name": "Create or Destroy Water"
+    "_es": "b81362ad",
+    "name": "Create or Destroy Water",
+    "description": "You create or destroy up to 10 gallons of water, or make rain fall in a 30-foot Cube to put out flames."
   },
   "ice-knife": {
-    "_es": "39228d91",
-    "name": "Ice Knife"
+    "_es": "71facaa7",
+    "name": "Ice Knife",
+    "description": "Ranged spell attack for 1d10 Piercing damage; hit or miss, it explodes, and creatures within 5 feet make a Dexterity saving throw against 2d6 Cold damage."
   },
   "detect-evil-and-good": {
-    "_es": "16107b21",
-    "name": "Detect Evil and Good"
+    "_es": "ad7f8796",
+    "name": "Detect Evil and Good",
+    "description": "You sense Aberrations, Celestials, Elementals, Fey, Fiends, and Undead within 30 feet, and the Hallow spell."
   },
   "detect-poison-and-disease": {
-    "_es": "c703660c",
-    "name": "Detect Poison and Disease"
+    "_es": "630f5d29",
+    "name": "Detect Poison and Disease",
+    "description": "You sense and identify poisons, poisonous creatures, and magical diseases within 30 feet."
   },
   "tensers-floating-disk": {
-    "_es": "38d1dfcd",
-    "name": "Tenser's Floating Disk"
+    "_es": "93685260",
+    "name": "Tenser's Floating Disk",
+    "description": "A disk of force floats beside you and carries up to 500 pounds; it follows you if you stay within 20 feet."
   },
   "compelled-duel": {
-    "_es": "256c33de",
-    "name": "Compelled Duel"
+    "_es": "145061ad",
+    "name": "Compelled Duel",
+    "description": "Wisdom saving throw or the target has Disadvantage on attacks against others and can't move more than 30 feet away from you."
   },
   "animal-friendship": {
-    "_es": "bcd2f798",
-    "name": "Animal Friendship"
+    "_es": "315590d4",
+    "name": "Animal Friendship",
+    "description": "A Beast makes a Wisdom saving throw or has the Charmed condition. It ends if you or your allies damage it."
   },
   "find-familiar": {
-    "_es": "1d76dac7",
-    "name": "Find Familiar"
+    "_es": "6099248c",
+    "name": "Find Familiar",
+    "description": "You summon a familiar spirit in the form of a small animal; you can see through its senses and cast touch spells through it."
   },
   "divine-favor": {
-    "_es": "ed319d05",
-    "name": "Divine Favor"
+    "_es": "b5e604fe",
+    "name": "Divine Favor",
+    "description": "Your weapon attacks deal an extra 1d4 Radiant damage on a hit."
   },
   "ensnaring-strike": {
-    "_es": "9537df0e",
-    "name": "Ensnaring Strike"
+    "_es": "42da86f9",
+    "name": "Ensnaring Strike",
+    "description": "After you hit: Strength saving throw or the target has the Restrained condition from grasping vines and takes 1d6 Piercing damage each turn."
   },
   "heroism": {
-    "_es": "7697d99a",
-    "name": "Heroism"
+    "_es": "03842cf0",
+    "name": "Heroism",
+    "description": "The creature is immune to the Frightened condition and gains Temporary Hit Points equal to your spellcasting ability modifier at the start of each of its turns."
   },
   "silent-image": {
-    "_es": "d0b7f87f",
-    "name": "Silent Image"
+    "_es": "1b91a3ed",
+    "name": "Silent Image",
+    "description": "You create a visual illusion up to a 15-foot Cube, with no sound or smell, that you can move with a Magic action."
   },
   "hex": {
-    "_es": "5c99ccbd",
-    "name": "Hex"
+    "_es": "cb3160b5",
+    "name": "Hex",
+    "description": "You curse a creature: an extra 1d6 Necrotic damage when you hit it, and Disadvantage on checks with one ability of your choice."
   },
   "chromatic-orb": {
-    "_es": "bdbe1425",
-    "name": "Chromatic Orb"
+    "_es": "e2491077",
+    "name": "Chromatic Orb",
+    "description": "Ranged spell attack: 3d8 Acid, Cold, Fire, Lightning, Thunder, or Poison damage. If you roll the same number on two of the d8s, the orb leaps to another creature."
   },
   "bane": {
-    "_es": "10a8d061",
-    "name": "Bane"
+    "_es": "af82cd4d",
+    "name": "Bane",
+    "description": "Up to three creatures make a Charisma saving throw; those that fail subtract 1d4 from their attack rolls and saving throws."
   },
   "purify-food-and-drink": {
-    "_es": "6bcdb77e",
-    "name": "Purify Food and Drink"
+    "_es": "4446512d",
+    "name": "Purify Food and Drink",
+    "description": "You remove poison and rot from nonmagical food and drink in a 5-foot-radius sphere."
   },
   "witch-bolt": {
-    "_es": "ab747f95",
-    "name": "Witch Bolt"
+    "_es": "1debc459",
+    "name": "Witch Bolt",
+    "description": "Ranged spell attack for 2d12 Lightning damage; afterward, with a Bonus Action each turn, you deal 1d12 automatically again."
   },
   "tashas-hideous-laughter": {
-    "_es": "e6b46cf0",
-    "name": "Tasha's Hideous Laughter"
+    "_es": "f0dce3cf",
+    "name": "Tasha's Hideous Laughter",
+    "description": "Wisdom saving throw or the target has the Prone and Incapacitated conditions, laughing uncontrollably; it repeats the save at the end of each turn and when it takes damage."
   },
   "color-spray": {
-    "_es": "126fcc03",
-    "name": "Color Spray"
+    "_es": "5698f097",
+    "name": "Color Spray",
+    "description": "15-foot Cone: Constitution saving throw or the creatures have the Blinded condition until the end of your next turn."
   },
   "jump": {
-    "_es": "1d80e429",
-    "name": "Jump"
+    "_es": "72fb8263",
+    "name": "Jump",
+    "description": "The creature can jump up to 30 feet once per turn by spending 10 feet of movement."
   },
   "unseen-servant": {
-    "_es": "068306e2",
-    "name": "Unseen Servant"
+    "_es": "580b67c1",
+    "name": "Unseen Servant",
+    "description": "An invisible Medium force performs simple tasks you command. AC 10, 1 HP, and Strength 2; it can't attack."
   },
   "dissonant-whispers": {
-    "_es": "c834ba17",
-    "name": "Dissonant Whispers"
+    "_es": "34425999",
+    "name": "Dissonant Whispers",
+    "description": "Wisdom saving throw or 3d6 Psychic damage, and the target must use its Reaction to move away from you; half damage and no fleeing on a success."
   },
   "illusory-script": {
-    "_es": "2369b7ae",
-    "name": "Illusory Script"
+    "_es": "1b2b8d08",
+    "name": "Illusory Script",
+    "description": "You write a text that only the creatures you designate can read; to everyone else it looks like magical script or a different message."
   },
   "hail-of-thorns": {
-    "_es": "63d44fee",
-    "name": "Hail of Thorns"
+    "_es": "8c339241",
+    "name": "Hail of Thorns",
+    "description": "After you hit with a ranged weapon: the target and creatures within 5 feet of it make a Dexterity saving throw against 1d10 Piercing damage."
   },
   "rope-trick": {
-    "_es": "4a94b587",
-    "name": "Rope Trick"
+    "_es": "b7059e87",
+    "name": "Rope Trick",
+    "description": "A rope you touch stands up on its own and opens a portal to an extradimensional space at its upper end, which holds up to eight Medium creatures."
   },
   "knock": {
-    "_es": "394a08b2",
-    "name": "Knock"
+    "_es": "8ad0787e",
+    "name": "Knock",
+    "description": "Opens, unsticks, or unbars a closed target; an Arcane Lock is suppressed for 10 minutes. A loud knock can be heard 300 feet away."
   },
   "enlarge-reduce": {
-    "_es": "44949f03",
-    "name": "Enlarge/Reduce"
+    "_es": "2f56048f",
+    "name": "Enlarge/Reduce",
+    "description": "You increase or decrease a creature or object by one size category; Constitution saving throw if it is unwilling. Its attack damage changes by 1d4."
   },
   "dragons-breath": {
-    "_es": "29dc307a",
-    "name": "Dragon's Breath"
+    "_es": "f84ef653",
+    "name": "Dragon's Breath",
+    "description": "You touch a willing creature: it can exhale in a 15-foot Cone once per turn to deal 3d6 damage of the chosen type; Dexterity saving throw for half damage."
   },
   "alter-self": {
-    "_es": "87527506",
-    "name": "Alter Self"
+    "_es": "b394b444",
+    "name": "Alter Self",
+    "description": "You choose one option (aquatic adaptation, natural weapons, or change appearance) that lasts until the spell ends; you can switch it with a Magic action."
   },
   "magic-weapon": {
-    "_es": "8c59dead",
-    "name": "Magic Weapon"
+    "_es": "40e6b2ee",
+    "name": "Magic Weapon",
+    "description": "A nonmagical weapon you touch gains +1 to attack and damage rolls until the spell ends."
   },
   "augury": {
-    "_es": "cbb6e99e",
-    "name": "Augury"
+    "_es": "c5c25870",
+    "name": "Augury",
+    "description": "You ask for an omen about a course of action within the next 30 minutes: weal, woe, weal and woe, or indifference."
   },
   "nystuls-magic-aura": {
-    "_es": "7ca3f439",
-    "name": "Nystul's Magic Aura"
+    "_es": "33e5ba8f",
+    "name": "Nystul's Magic Aura",
+    "description": "You place an illusion on a willing creature or on an object that isn't being worn or carried: Mask (the creature counts as another type for spells and magical effects) or False Aura (the object is detected as magical, nonmagical, or of another school). It lasts 24 hours; if you cast it on the same target every day for 30 days, the illusion lasts until dispelled."
   },
   "magic-mouth": {
-    "_es": "a81e9f8f",
-    "name": "Magic Mouth"
+    "_es": "f879992d",
+    "name": "Magic Mouth",
+    "description": "You implant a message in an object that is spoken aloud when the trigger condition you choose is met."
   },
   "shining-smite": {
-    "_es": "528b5683",
-    "name": "Shining Smite"
+    "_es": "9b875801",
+    "name": "Shining Smite",
+    "description": "After you hit: an extra 2d6 Radiant damage, and the target sheds Bright Light in 5 feet and can't benefit from the Invisible condition while the spell lasts."
   },
   "arcane-lock": {
-    "_es": "a521b32d",
-    "name": "Arcane Lock"
+    "_es": "65a91cdd",
+    "name": "Arcane Lock",
+    "description": "A door or object you touch is magically locked until the spell ends; only you and those you designate can open it."
   },
   "mind-spike": {
-    "_es": "12972724",
-    "name": "Mind Spike"
+    "_es": "8bbd2b28",
+    "name": "Mind Spike",
+    "description": "Wisdom saving throw or 3d8 Psychic damage; on a failure, you know its location while the spell lasts."
   },
   "cordon-of-arrows": {
-    "_es": "51ef1058",
-    "name": "Cordon of Arrows"
+    "_es": "3606f13f",
+    "name": "Cordon of Arrows",
+    "description": "You plant up to four nonmagical arrows or bolts in the ground. When a creature other than you enters a space within 30 feet of them for the first time on a turn, or ends its turn there, one piece of ammunition flies at it: Dexterity saving throw or 2d4 Piercing damage. That piece is destroyed, and the spell ends when none is left planted."
   },
   "crown-of-madness": {
-    "_es": "b8d5f280",
-    "name": "Crown of Madness"
+    "_es": "9c136001",
+    "name": "Crown of Madness",
+    "description": "Wisdom saving throw or the target has the Charmed condition: each turn it must make a melee attack against a creature you choose, with Disadvantage if none is within its reach."
   },
   "spike-growth": {
-    "_es": "e784c8a4",
-    "name": "Spike Growth"
+    "_es": "d424c764",
+    "name": "Spike Growth",
+    "description": "A 20-foot sphere becomes Difficult Terrain with hidden thorns: 2d4 Piercing damage for every 5 feet traveled inside."
   },
   "detect-thoughts": {
-    "_es": "26e5cdb6",
-    "name": "Detect Thoughts"
+    "_es": "6d08bfef",
+    "name": "Detect Thoughts",
+    "description": "You sense nearby thoughts, read the mind of one target with a Wisdom saving throw, or locate thinking creatures you can't see."
   },
   "find-traps": {
-    "_es": "b679d28a",
-    "name": "Find Traps"
+    "_es": "2e3a701c",
+    "name": "Find Traps",
+    "description": "You detect any trap within range and within line of sight, magical or mechanical, but not natural hazards of the terrain."
   },
   "gentle-repose": {
-    "_es": "8290985b",
-    "name": "Gentle Repose"
+    "_es": "ef883263",
+    "name": "Gentle Repose",
+    "description": "A corpse you touch is protected from decay and can't become Undead; time spent under the effect doesn't count toward raising it."
   },
   "enthrall": {
-    "_es": "8904ab88",
-    "name": "Enthrall"
+    "_es": "ec51d795",
+    "name": "Enthrall",
+    "description": "Wisdom saving throw or the chosen creatures have −10 to Perception while you speak; those already fighting you succeed automatically."
   },
   "melfs-acid-arrow": {
-    "_es": "3900cd1a",
-    "name": "Melf's Acid Arrow"
+    "_es": "fd9d8cee",
+    "name": "Melf's Acid Arrow",
+    "description": "Ranged spell attack: 4d4 Acid damage and 2d4 more at the end of its next turn; half the initial damage on a miss."
   },
   "phantasmal-force": {
-    "_es": "fb02b04a",
-    "name": "Phantasmal Force"
+    "_es": "13b9b4d1",
+    "name": "Phantasmal Force",
+    "description": "Intelligence saving throw or you create an illusion up to a 10-foot Cube that only the target perceives; it can deal Psychic damage if the target acts as though it were real."
   },
   "shatter": {
-    "_es": "653f8e59",
-    "name": "Shatter"
+    "_es": "28b43e5e",
+    "name": "Shatter",
+    "description": "10-foot sphere: Constitution saving throw or 3d8 Thunder damage (Disadvantage for Constructs); half damage on a success. It also damages nonmagical objects."
   },
   "find-steed": {
-    "_es": "183bf422",
-    "name": "Find Steed"
+    "_es": "833ce3ed",
+    "name": "Find Steed",
+    "description": "You summon an otherworldly steed in the form of a Large animal of your choice in an unoccupied space within range."
   },
   "flame-blade": {
-    "_es": "e560a401",
-    "name": "Flame Blade"
+    "_es": "493d7ab0",
+    "name": "Flame Blade",
+    "description": "You evoke a blade of fire in your hand; melee spell attack for 3d6 plus your spellcasting ability modifier in Fire damage."
   },
   "mirror-image": {
-    "_es": "e6373a28",
-    "name": "Mirror Image"
+    "_es": "939eda68",
+    "name": "Mirror Image",
+    "description": "You create three illusory duplicates; each time an attack hits you, roll 1d6 for each remaining duplicate, and a 3 or higher diverts the hit to one of them."
   },
   "summon-beast": {
-    "_es": "b9810618",
-    "name": "Summon Beast"
+    "_es": "f3f28901",
+    "name": "Summon Beast",
+    "description": "You summon a bestial spirit of land, sea, or air in an unoccupied space; it uses the Bestial Spirit stat block and vanishes at 0 HP or when the spell ends."
   },
   "continual-flame": {
-    "_es": "a9e470c0",
-    "name": "Continual Flame"
+    "_es": "39512e26",
+    "name": "Continual Flame",
+    "description": "A flame with no heat or fuel springs from an object you touch, shedding Bright Light in 20 feet and Dim Light for 20 feet beyond; it can be covered but not quenched."
   },
   "locate-animals-or-plants": {
-    "_es": "36740b05",
-    "name": "Locate Animals or Plants"
+    "_es": "895b9d24",
+    "name": "Locate Animals or Plants",
+    "description": "You learn the direction and distance to the closest animal or plant of a kind you name, within 5 miles."
   },
   "locate-object": {
-    "_es": "491e62b2",
-    "name": "Locate Object"
+    "_es": "bdbddb08",
+    "name": "Locate Object",
+    "description": "You sense the direction of a familiar object or the closest object of a kind, up to 1,000 feet away; you know which way it is moving if it moves."
   },
   "animal-messenger": {
-    "_es": "2ab368fc",
-    "name": "Animal Messenger"
+    "_es": "b0290bee",
+    "name": "Animal Messenger",
+    "description": "A Tiny Beast carries a short message to a place and recipient you describe; Charisma saving throw to accept the task."
   },
   "cloud-of-daggers": {
-    "_es": "693020a3",
-    "name": "Cloud of Daggers"
+    "_es": "3df3cffe",
+    "name": "Cloud of Daggers",
+    "description": "5-foot Cube of spinning daggers: 4d4 Slashing damage to anyone who enters it, ends its turn in it, or is reached by the Cube; once per turn."
   },
   "barkskin": {
-    "_es": "2b5641d7",
-    "name": "Barkskin"
+    "_es": "df0454d2",
+    "name": "Barkskin",
+    "description": "A willing creature's skin becomes bark; its AC can't be lower than 17 while the spell lasts."
   },
   "protection-from-poison": {
-    "_es": "a61e18da",
-    "name": "Protection from Poison"
+    "_es": "a84f6288",
+    "name": "Protection from Poison",
+    "description": "Ends the Poisoned condition if the target has it; grants Advantage on saving throws against poison and Resistance to Poison damage."
   },
   "beast-sense": {
-    "_es": "d00d02c1",
-    "name": "Beast Sense"
+    "_es": "ec651273",
+    "name": "Beast Sense",
+    "description": "You perceive through the senses of a willing Beast you touch, including any special senses it has."
   },
   "blindness-deafness": {
-    "_es": "6255da6f",
-    "name": "Blindness/Deafness"
+    "_es": "326d7fbe",
+    "name": "Blindness/Deafness",
+    "description": "Constitution saving throw or the target has the Blinded or Deafened condition, your choice; it repeats the save at the end of each turn."
   },
   "suggestion": {
-    "_es": "d92517ef",
-    "name": "Suggestion"
+    "_es": "76d7580e",
+    "name": "Suggestion",
+    "description": "You suggest an achievable, non-harmful course of action of up to 25 words; Wisdom saving throw or the target follows it while the spell lasts."
   },
   "warding-bond": {
-    "_es": "c22647a0",
-    "name": "Warding Bond"
+    "_es": "01bc7b99",
+    "name": "Warding Bond",
+    "description": "A creature you touch gains +1 to AC and saving throws and Resistance to all damage while within 60 feet of you, but you take the same damage it takes."
   },
   "zone-of-truth": {
-    "_es": "6656fc5c",
-    "name": "Zone of Truth"
+    "_es": "07ac3594",
+    "name": "Zone of Truth",
+    "description": "15-foot sphere: anyone who enters makes a Charisma saving throw or can't deliberately lie while inside."
   },
   "arcane-vigor": {
-    "_es": "426bc8fd",
-    "name": "Arcane Vigor"
+    "_es": "328cd580",
+    "name": "Arcane Vigor",
+    "description": "You roll one or two unspent Hit Point Dice and regain HP equal to the total plus your spellcasting ability modifier; the dice are expended."
   },
   "elemental-weapon": {
-    "_es": "20dfd626",
-    "name": "Elemental Weapon"
+    "_es": "5426f415",
+    "name": "Elemental Weapon",
+    "description": "A nonmagical weapon you touch gains +1 to attack rolls and an extra 1d4 damage of the elemental type you choose while the spell lasts."
   },
   "aura-of-vitality": {
-    "_es": "f3706826",
-    "name": "Aura of Vitality"
+    "_es": "0c284041",
+    "name": "Aura of Vitality",
+    "description": "30-foot Emanation: when you create it and at the start of each turn, you can heal 2d6 HP to one creature inside."
   },
   "water-walk": {
-    "_es": "829431db",
-    "name": "Water Walk"
+    "_es": "3cbcc58a",
+    "name": "Water Walk",
+    "description": "Up to ten willing creatures can move across any liquid surface as if it were solid ground."
   },
   "blinding-smite": {
-    "_es": "8d5db8f5",
-    "name": "Blinding Smite"
+    "_es": "2c77a125",
+    "name": "Blinding Smite",
+    "description": "After you hit: an extra 3d8 Radiant damage, and the target has the Blinded condition until it succeeds on a Constitution saving throw at the end of each turn."
   },
   "magic-circle": {
-    "_es": "93962fb5",
-    "name": "Magic Circle"
+    "_es": "a47eba38",
+    "name": "Magic Circle",
+    "description": "A 10-foot-radius cylinder blocks, or traps, a chosen type of creature (Celestial, Elemental, Fey, Fiend, or Undead)."
   },
   "clairvoyance": {
-    "_es": "4a46b2aa",
-    "name": "Clairvoyance"
+    "_es": "83b0f29d",
+    "name": "Clairvoyance",
+    "description": "You create an invisible sensor in a familiar or obvious place; you can see or hear through it while the spell lasts."
   },
   "conjure-barrage": {
-    "_es": "4eb1a92a",
-    "name": "Conjure Barrage"
+    "_es": "14c6075f",
+    "name": "Conjure Barrage",
+    "description": "60-foot Cone of spectral copies of your weapon: Dexterity saving throw against 5d8 Force damage, half damage on a success."
   },
   "phantom-steed": {
-    "_es": "36c1d605",
-    "name": "Phantom Steed"
+    "_es": "a0480c08",
+    "name": "Phantom Steed",
+    "description": "You summon a Large, quasi-real, equipped horselike mount that only you or a creature you choose can ride; it vanishes if it is 30 feet from you."
   },
   "create-food-and-water": {
-    "_es": "491e05cd",
-    "name": "Create Food and Water"
+    "_es": "be141196",
+    "name": "Create Food and Water",
+    "description": "You create food and drinkable water enough for several people; the food spoils if it isn't eaten within 24 hours."
   },
   "plant-growth": {
-    "_es": "2ad51088",
-    "name": "Plant Growth"
+    "_es": "6f21d911",
+    "name": "Plant Growth",
+    "description": "Overgrowth: turns a 100-foot sphere into Difficult Terrain. Enrichment: enriches the plants in an area for a year."
   },
   "blink": {
-    "_es": "8e86ef14",
-    "name": "Blink"
+    "_es": "95b0ef57",
+    "name": "Blink",
+    "description": "At the end of each turn, roll 1d6; on a 4–6, you vanish to the Ethereal Plane until your next turn, where you can affect and interact only with what is also there."
   },
   "feign-death": {
-    "_es": "ea4ac5f5",
-    "name": "Feign Death"
+    "_es": "aa89362d",
+    "name": "Feign Death",
+    "description": "A willing creature you touch appears dead to any inspection: Blinded, Incapacitated, Speed 0, and Resistance to all damage except Psychic."
   },
   "lightning-arrow": {
-    "_es": "b290c69a",
-    "name": "Lightning Arrow"
+    "_es": "52151b23",
+    "name": "Lightning Arrow",
+    "description": "After a ranged weapon attack, the projectile becomes lightning: 4d8 damage (half on a miss) and 2d8 to creatures within 10 feet of the target."
   },
   "gaseous-form": {
-    "_es": "a76a459e",
-    "name": "Gaseous Form"
+    "_es": "8174f441",
+    "name": "Gaseous Form",
+    "description": "A willing creature you touch becomes mist: it flies at 10 feet, can slip through gaps, and has Resistance to nonmagical damage except Force."
   },
   "meld-into-stone": {
-    "_es": "788abdf0",
-    "name": "Meld into Stone"
+    "_es": "3d07b3bb",
+    "name": "Meld into Stone",
+    "description": "You and your gear merge into a stone surface until the spell ends; you leave no trace detectable without magic."
   },
   "glyph-of-warding": {
-    "_es": "8be6de37",
-    "name": "Glyph of Warding"
+    "_es": "3d184c93",
+    "name": "Glyph of Warding",
+    "description": "You inscribe a glyph that releases a spell of level 3 or lower, or 5d8 damage, when the trigger condition you choose is met."
   },
   "speak-with-plants": {
-    "_es": "fd525eab",
-    "name": "Speak with Plants"
+    "_es": "57e27b35",
+    "name": "Speak with Plants",
+    "description": "30-foot Emanation: plants gain limited sentience and can tell you what they saw in the last day."
   },
   "hunger-of-hadar": {
-    "_es": "ebfac9b4",
-    "name": "Hunger of Hadar"
+    "_es": "ea1a7efb",
+    "name": "Hunger of Hadar",
+    "description": "20-foot sphere of Darkness and Difficult Terrain: 2d6 Cold damage when a creature enters or starts its turn there, and another 2d6 Acid damage at the end of its turn."
   },
   "nondetection": {
-    "_es": "5671a1aa",
-    "name": "Nondetection"
+    "_es": "9900db28",
+    "name": "Nondetection",
+    "description": "A target you touch is hidden from divination spells and sensors while the spell lasts."
   },
   "summon-fey": {
-    "_es": "57627885",
-    "name": "Summon Fey"
+    "_es": "ba2691cd",
+    "name": "Summon Fey",
+    "description": "You summon a Fey spirit with a mirthful, tricksy, or fuming mood in an unoccupied space; it uses the Fey Spirit stat block."
   },
   "summon-undead": {
-    "_es": "1f0fbd40",
-    "name": "Summon Undead"
+    "_es": "cebceb0d",
+    "name": "Summon Undead",
+    "description": "You summon an Undead spirit with a skeletal, ghostly, or putrid form in an unoccupied space; it uses the Undead Spirit stat block."
   },
   "crusaders-mantle": {
-    "_es": "3550232a",
-    "name": "Crusader's Mantle"
+    "_es": "a89dd4b4",
+    "name": "Crusader's Mantle",
+    "description": "30-foot Emanation: you and your allies inside deal an extra 1d4 Radiant damage when hitting with a weapon or an Unarmed Strike."
   },
   "wind-wall": {
-    "_es": "8f91639b",
-    "name": "Wind Wall"
+    "_es": "0c577fc1",
+    "name": "Wind Wall",
+    "description": "A wall of wind up to 50 feet long blocks gases, fog, and small projectiles; it pushes back whatever tries to cross it."
   },
   "leomunds-tiny-hut": {
-    "_es": "b2ed4bd4",
-    "name": "Leomund's Tiny Hut"
+    "_es": "1d7a0fb1",
+    "name": "Leomund's Tiny Hut",
+    "description": "A 10-foot dome impenetrable to outside creatures and objects, with a pleasant temperature; it allows a safe rest."
   },
   "sending": {
-    "_es": "d59fc16e",
-    "name": "Sending"
+    "_es": "73331220",
+    "name": "Sending",
+    "description": "You send a message of up to 25 words to a familiar creature at any distance; it can reply at once."
   },
   "beacon-of-hope": {
-    "_es": "8a40a8d6",
-    "name": "Beacon of Hope"
+    "_es": "8577ea1f",
+    "name": "Beacon of Hope",
+    "description": "The chosen targets have Advantage on Wisdom saving throws and Death Saving Throws, and regain the maximum possible when healed."
   },
   "divination": {
-    "_es": "365b462d",
-    "name": "Divination"
+    "_es": "7324b59d",
+    "name": "Divination",
+    "description": "You contact a god or its servants to ask about an event within the next 7 days; the DM gives a truthful, perhaps cryptic, answer."
   },
   "aura-of-purity": {
-    "_es": "888d7ac5",
-    "name": "Aura of Purity"
+    "_es": "7a00a764",
+    "name": "Aura of Purity",
+    "description": "30-foot Emanation: you and your allies inside have Resistance to Poison damage and Advantage on saving throws against several harmful conditions."
   },
   "aura-of-life": {
-    "_es": "e42d7636",
-    "name": "Aura of Life"
+    "_es": "1412f90b",
+    "name": "Aura of Life",
+    "description": "30-foot Emanation: you and your allies inside have Resistance to Necrotic damage, and their HP maximums can't be reduced; it heals 1 HP to anyone who starts its turn there with 0 HP."
   },
   "staggering-smite": {
-    "_es": "71738769",
-    "name": "Staggering Smite"
+    "_es": "7b9afb3c",
+    "name": "Staggering Smite",
+    "description": "After you hit: an extra 4d6 Psychic damage, and a Wisdom saving throw or the target has the Stunned condition until the end of your next turn."
   },
   "leomunds-secret-chest": {
-    "_es": "8a31c51e",
-    "name": "Leomund's Secret Chest"
+    "_es": "a6414590",
+    "name": "Leomund's Secret Chest",
+    "description": "You hide a chest you touch on the Ethereal Plane; you can recall it with a Magic action using the miniature replica."
   },
   "compulsion": {
-    "_es": "d399beef",
-    "name": "Compulsion"
+    "_es": "a16c222a",
+    "name": "Compulsion",
+    "description": "Wisdom saving throw or the target has the Charmed condition and, with a Bonus Action of yours, must move in the direction you indicate each turn."
   },
   "conjure-minor-elementals": {
-    "_es": "40f4d070",
-    "name": "Conjure Minor Elementals"
+    "_es": "41bbf919",
+    "name": "Conjure Minor Elementals",
+    "description": "Elemental spirits surround you in 15 feet: your attacks deal an extra 2d8 damage of the elemental type you choose to anyone inside."
   },
   "conjure-woodland-beings": {
-    "_es": "f790644c",
-    "name": "Conjure Woodland Beings"
+    "_es": "828c2378",
+    "name": "Conjure Woodland Beings",
+    "description": "Nature spirits within 10 feet: Wisdom saving throw against 5d8 Force damage for anyone who enters the Emanation or ends its turn there."
   },
   "control-water": {
-    "_es": "bc574b1a",
-    "name": "Control Water"
+    "_es": "8c3c1708",
+    "name": "Control Water",
+    "description": "You control a chosen body of water: flood it, part it into a wall, redirect its flow, or create a whirlpool."
   },
   "dominate-beast": {
-    "_es": "14d1549a",
-    "name": "Dominate Beast"
+    "_es": "83d9ad7e",
+    "name": "Dominate Beast",
+    "description": "Wisdom saving throw or a Beast has the Charmed condition; you have a telepathic link and can give it orders or command it to attack."
   },
   "grasping-vine": {
-    "_es": "e89cf33f",
-    "name": "Grasping Vine"
+    "_es": "f1bdf54f",
+    "name": "Grasping Vine",
+    "description": "Melee spell attack: 4d8 Bludgeoning damage, and it pulls the target up to 30 feet toward the vine; it Restrains the target if it is Huge or smaller."
   },
   "otilukes-resilient-sphere": {
-    "_es": "e56cdc7a",
-    "name": "Otiluke's Resilient Sphere"
+    "_es": "b9b18f5a",
+    "name": "Otiluke's Resilient Sphere",
+    "description": "A sphere encloses a Large or smaller creature or object; Dexterity saving throw if unwilling. Nothing passes through it in either direction."
   },
   "vitriolic-sphere": {
-    "_es": "7444eaea",
-    "name": "Vitriolic Sphere"
+    "_es": "43a09306",
+    "name": "Vitriolic Sphere",
+    "description": "20-foot sphere of acid: Dexterity saving throw against 10d4 Acid damage and another 5d4 at the end of its next turn; half the initial damage on a success."
   },
   "fabricate": {
-    "_es": "c7d88f7c",
-    "name": "Fabricate"
+    "_es": "7246f37b",
+    "name": "Fabricate",
+    "description": "You convert raw materials in sight into a Large or smaller product of the same material, such as wood into a bridge or flax into clothes."
   },
   "fount-of-moonlight": {
-    "_es": "f1fb2213",
-    "name": "Fount of Moonlight"
+    "_es": "f741bcb3",
+    "name": "Fount of Moonlight",
+    "description": "Cool light wreathes you: Resistance to Radiant damage, and your melee attacks deal an extra 2d6 Radiant damage on a hit. You can blind a nearby creature that damages you with a Reaction."
   },
   "guardian-of-faith": {
-    "_es": "91bc5fe4",
-    "name": "Guardian of Faith"
+    "_es": "42e131a9",
+    "name": "Guardian of Faith",
+    "description": "A Large, invulnerable spectral guardian hovers in a space; Dexterity saving throw against 20 Radiant damage for anyone who comes near, up to 60 total damage dealt."
   },
   "charm-monster": {
-    "_es": "58ee7469",
-    "name": "Charm Monster"
+    "_es": "50a04653",
+    "name": "Charm Monster",
+    "description": "Wisdom saving throw (with Advantage if it is fighting you) or a creature has the Charmed condition and is friendly until the spell ends or it takes damage from you."
   },
   "giant-insect": {
-    "_es": "87d8e17a",
-    "name": "Giant Insect"
+    "_es": "3cc6cf8b",
+    "name": "Giant Insect",
+    "description": "You summon a giant spider, wasp, or centipede in an unoccupied space; it uses the stat block of the chosen giant insect."
   },
   "summon-aberration": {
-    "_es": "2144e7bc",
-    "name": "Summon Aberration"
+    "_es": "cbc65efd",
+    "name": "Summon Aberration",
+    "description": "You summon an aberrant spirit (mind flayer, beholderkin, or slaad) in an unoccupied space; it uses the Aberrant Spirit stat block."
   },
   "summon-construct": {
-    "_es": "c874c492",
-    "name": "Summon Construct"
+    "_es": "90c9d1a9",
+    "name": "Summon Construct",
+    "description": "You summon a construct spirit of clay, metal, or stone in an unoccupied space; it uses the Construct Spirit stat block."
   },
   "summon-elemental": {
-    "_es": "67c75deb",
-    "name": "Summon Elemental"
+    "_es": "4ecc93cb",
+    "name": "Summon Elemental",
+    "description": "You summon an elemental spirit of air, earth, fire, or water in an unoccupied space; it uses the Elemental Spirit stat block."
   },
   "locate-creature": {
-    "_es": "64aa83d2",
-    "name": "Locate Creature"
+    "_es": "daa4f4d4",
+    "name": "Locate Creature",
+    "description": "You sense the direction of a familiar creature or the closest one of a kind, up to 1,000 feet away; you know which way it is moving if it moves."
   },
   "mordenkainens-faithful-hound": {
-    "_es": "a50e555c",
-    "name": "Mordenkainen's Faithful Hound"
+    "_es": "03a1e56c",
+    "name": "Mordenkainen's Faithful Hound",
+    "description": "A phantom watchdog that only you can see, intangible and invulnerable, barks at anyone who comes within 30 feet without speaking the password. At the start of each of your turns, it bites an enemy within 5 feet: Dexterity saving throw or 4d8 Force damage."
   },
   "stone-shape": {
-    "_es": "be4b9bb8",
-    "name": "Stone Shape"
+    "_es": "c9324abd",
+    "name": "Stone Shape",
+    "description": "You shape a Medium or smaller stone object or section of stone into any form you like, with up to two hinges and a latch."
   },
   "arcane-eye": {
-    "_es": "1f297d20",
-    "name": "Arcane Eye"
+    "_es": "21e4e942",
+    "name": "Arcane Eye",
+    "description": "You create an invisible, levitating eye and scout through it with normal vision and Darkvision out to 30 feet."
   },
   "mordenkainens-private-sanctum": {
-    "_es": "1b8eb353",
-    "name": "Mordenkainen's Private Sanctum"
+    "_es": "20432efc",
+    "name": "Mordenkainen's Private Sanctum",
+    "description": "You make an area up to a 100-foot Cube magically secure: you can block sound, sight, teleportation, or scrying."
   },
   "evards-black-tentacles": {
-    "_es": "7bb877d3",
-    "name": "Evard's Black Tentacles"
+    "_es": "01676946",
+    "name": "Evard's Black Tentacles",
+    "description": "20-foot square of tentacles: Strength saving throw against 3d6 Bludgeoning damage and the Restrained condition; it takes the same damage each turn while it remains there."
   },
   "hallucinatory-terrain": {
-    "_es": "e518ccd1",
-    "name": "Hallucinatory Terrain"
+    "_es": "4fa99598",
+    "name": "Hallucinatory Terrain",
+    "description": "A 150-foot Cube of natural terrain looks, sounds, and smells like another kind of natural terrain for 24 hours."
   },
   "seeming": {
-    "_es": "06d30821",
-    "name": "Seeming"
+    "_es": "ef5e5be9",
+    "name": "Seeming",
+    "description": "You give the creatures you choose an illusory appearance; Charisma saving throw if unwilling. You can change height, build, and gear."
   },
   "planar-binding": {
-    "_es": "8e103110",
-    "name": "Planar Binding"
+    "_es": "e8cd082b",
+    "name": "Planar Binding",
+    "description": "You force a Celestial, Elemental, Fey, or Fiend to serve you: Charisma saving throw or it is bound to your service until the spell ends."
   },
   "antilife-shell": {
-    "_es": "df028f81",
-    "name": "Antilife Shell"
+    "_es": "224ebc23",
+    "name": "Antilife Shell",
+    "description": "A 10-foot aura keeps out living creatures other than Constructs and Undead; it ends if you force your way through it."
   },
   "swift-quiver": {
-    "_es": "58299c80",
-    "name": "Swift Quiver"
+    "_es": "81b18ab9",
+    "name": "Swift Quiver",
+    "description": "You can make two ranged attacks with a bow or crossbow as a Bonus Action; the spell creates the ammunition magically."
   },
   "banishing-smite": {
-    "_es": "2ab29bff",
-    "name": "Banishing Smite"
+    "_es": "a13efdd7",
+    "name": "Banishing Smite",
+    "description": "After you hit: an extra 5d10 Force damage, and if the target has 50 HP or fewer left, a Charisma saving throw or it is banished to a demiplane until the spell ends."
   },
   "circle-of-power": {
-    "_es": "c7315e0c",
-    "name": "Circle of Power"
+    "_es": "5069a641",
+    "name": "Circle of Power",
+    "description": "30-foot Emanation: you and your allies inside have Advantage on saving throws against magic, and take no damage when succeeding on one that halves damage."
   },
   "teleportation-circle": {
-    "_es": "a552dd07",
-    "name": "Teleportation Circle"
+    "_es": "b5e5a6ef",
+    "name": "Teleportation Circle",
+    "description": "You draw a circle that opens a portal to a known permanent teleportation circle, open until the end of your next turn."
   },
   "commune": {
-    "_es": "6b6d834a",
-    "name": "Commune"
+    "_es": "9c7e6286",
+    "name": "Commune",
+    "description": "You contact your deity and ask up to three yes-or-no questions; you receive a correct answer to each."
   },
   "commune-with-nature": {
-    "_es": "feba6bde",
-    "name": "Commune with Nature"
+    "_es": "6a80013d",
+    "name": "Commune with Nature",
+    "description": "You commune with nature and gain knowledge of the surrounding terrain within 3 miles outdoors, or 300 feet underground. You choose three facts about the area."
   },
   "conjure-elemental": {
-    "_es": "76b85deb",
-    "name": "Conjure Elemental"
+    "_es": "8aef2695",
+    "name": "Conjure Elemental",
+    "description": "You conjure a Large elemental spirit of air, earth, fire, or water that attacks according to the chosen element, with its own damage."
   },
   "conjure-volley": {
-    "_es": "f713624e",
-    "name": "Conjure Volley"
+    "_es": "081959f6",
+    "name": "Conjure Volley",
+    "description": "40-foot-radius cylinder: Dexterity saving throw against 8d8 Force damage, half damage on a success."
   },
   "legend-lore": {
-    "_es": "d69230de",
-    "name": "Legend Lore"
+    "_es": "9e0559ad",
+    "name": "Legend Lore",
+    "description": "You name something famous and receive a summary of the relevant lore the DM describes."
   },
   "hallow": {
-    "_es": "9b1b4450",
-    "name": "Hallow"
+    "_es": "28de3726",
+    "name": "Hallow",
+    "description": "You infuse an area up to 60 feet with holy or unholy power, with protective or harmful effects depending on the side you choose."
   },
   "contact-other-plane": {
-    "_es": "e93be8c9",
-    "name": "Contact Other Plane"
+    "_es": "916a8b7b",
+    "name": "Contact Other Plane",
+    "description": "You contact an entity from another plane; DC 15 Intelligence saving throw or you take psychic harm. On a success, you can ask up to five questions."
   },
   "contagion": {
-    "_es": "1f714e2a",
-    "name": "Contagion"
+    "_es": "e7f2a4ee",
+    "name": "Contagion",
+    "description": "Your touch inflicts a magical contagion: Constitution saving throw or 11d8 Necrotic damage and the Poisoned condition, with Disadvantage on saving throws of the chosen ability."
   },
   "creation": {
-    "_es": "6afde87c",
-    "name": "Creation"
+    "_es": "7d4905be",
+    "name": "Creation",
+    "description": "You create an object of vegetable or mineral matter from wisps of shadow; it lasts from one hour to permanently, depending on the material."
   },
   "awaken": {
-    "_es": "a54b62b8",
-    "name": "Awaken"
+    "_es": "86bce39f",
+    "name": "Awaken",
+    "description": "A Beast or Plant with an Intelligence of 3 or less gains an Intelligence of 10 and the ability to speak one language you know."
   },
   "dispel-evil-and-good": {
-    "_es": "9c5c1657",
-    "name": "Dispel Evil and Good"
+    "_es": "b88ed19d",
+    "name": "Dispel Evil and Good",
+    "description": "Celestials, Elementals, Fey, Fiends, and Undead have Disadvantage on attacks against you; you can dismiss them or free an ally who is charmed or possessed."
   },
   "mislead": {
-    "_es": "ad5a0101",
-    "name": "Mislead"
+    "_es": "4e5d99c8",
+    "name": "Mislead",
+    "description": "You become Invisible and create an illusory double in your place that you can move and make speak; you can see and hear through it."
   },
   "rarys-telepathic-bond": {
-    "_es": "f9c270ab",
-    "name": "Rary's Telepathic Bond"
+    "_es": "83a389ba",
+    "name": "Rary's Telepathic Bond",
+    "description": "Up to eight willing creatures are telepathically linked with each other while the spell lasts, regardless of language."
   },
   "dream": {
-    "_es": "382a6850",
-    "name": "Dream"
+    "_es": "3916cec2",
+    "name": "Dream",
+    "description": "A willing creature enters a trance and appears in the dreams of a known target to converse; it is Incapacitated and has Speed 0 while the spell lasts."
   },
   "synaptic-static": {
-    "_es": "17256c42",
-    "name": "Synaptic Static"
+    "_es": "dd6f8acc",
+    "name": "Synaptic Static",
+    "description": "20-foot sphere: Intelligence saving throw against 8d6 Psychic damage; on a failure, the target also subtracts 1d6 from attack rolls and ability checks for 1 minute."
   },
   "steel-wind-strike": {
-    "_es": "17b35f4e",
-    "name": "Steel Wind Strike"
+    "_es": "907fe593",
+    "name": "Steel Wind Strike",
+    "description": "Melee spell attack against up to five creatures: 6d10 Force damage each; then you teleport next to one target."
   },
   "summon-celestial": {
-    "_es": "fb607c7e",
-    "name": "Summon Celestial"
+    "_es": "ab2ceaf4",
+    "name": "Summon Celestial",
+    "description": "You summon a defender or avenger celestial spirit in an unoccupied space; it is your ally and acts right after your turn."
   },
   "summon-dragon": {
-    "_es": "a947b971",
-    "name": "Summon Dragon"
+    "_es": "5b451cf8",
+    "name": "Summon Dragon",
+    "description": "You summon a draconic spirit in an unoccupied space; it is your ally and acts right after your turn."
   },
   "bigbys-hand": {
-    "_es": "18b689b3",
-    "name": "Bigby's Hand"
+    "_es": "ec269054",
+    "name": "Bigby's Hand",
+    "description": "You create a Large hand of force that obeys your commands: it can push, grasp, interpose itself as a shield, or attack."
   },
   "destructive-wave": {
-    "_es": "87816bae",
-    "name": "Destructive Wave"
+    "_es": "f180197a",
+    "name": "Destructive Wave",
+    "description": "30-foot Emanation: Constitution saving throw against 5d6 Thunder damage and 5d6 Radiant or Necrotic damage (your choice), knocking the target Prone on a failure."
   },
   "passwall": {
-    "_es": "4b0a1d67",
-    "name": "Passwall"
+    "_es": "95f73cd0",
+    "name": "Passwall",
+    "description": "You open a passage through a wooden, plaster, or stone surface, up to 5 feet wide, 8 feet tall, and 20 feet deep, while the spell lasts."
   },
   "tree-stride": {
-    "_es": "47e57a13",
-    "name": "Tree Stride"
+    "_es": "0f97380c",
+    "name": "Tree Stride",
+    "description": "You can enter a tree and move to another tree of the same kind within 500 feet, spending 5 feet of movement per tree."
   },
   "yolandes-regal-presence": {
-    "_es": "f66a5c67",
-    "name": "Yolande's Regal Presence"
+    "_es": "b790b8ec",
+    "name": "Yolande's Regal Presence",
+    "description": "10-foot Emanation: Wisdom saving throw or 4d6 Psychic damage, Prone, and a 10-foot push for anyone who enters it or is touched by it."
   },
   "reincarnate": {
-    "_es": "8db67ea9",
-    "name": "Reincarnate"
+    "_es": "95606863",
+    "name": "Reincarnate",
+    "description": "You touch a Humanoid that died within the last 10 days: it forms a new body of a random species (or one chosen by the DM) and calls the soul back."
   },
   "jallarzis-storm-of-radiance": {
-    "_es": "8a5c9e16",
-    "name": "Jallarzi's Storm of Radiance"
+    "_es": "69e0568c",
+    "name": "Jallarzi's Storm of Radiance",
+    "description": "Storm cylinder: creatures have the Blinded and Deafened conditions and can't cast spells with a Verbal component; Constitution saving throw against Radiant and Thunder damage."
   },
   "planar-ally": {
-    "_es": "ca48ee1c",
-    "name": "Planar Ally"
+    "_es": "f25a8e00",
+    "name": "Planar Ally",
+    "description": "You beseech the aid of a known otherworldly entity, which sends a loyal Celestial, Elemental, or Fiend to help you in exchange for a service or payment."
   },
   "ottos-irresistible-dance": {
-    "_es": "65546b8b",
-    "name": "Otto's Irresistible Dance"
+    "_es": "69afb025",
+    "name": "Otto's Irresistible Dance",
+    "description": "Wisdom saving throw or the target has the Charmed condition and dances uncontrollably, using all its movement; it has Disadvantage on Dexterity saving throws and attack rolls while the spell lasts."
   },
   "tashas-bubbling-cauldron": {
-    "_es": "8f440b17",
-    "name": "Tasha's Bubbling Cauldron"
+    "_es": "3858c96d",
+    "name": "Tasha's Bubbling Cauldron",
+    "description": "A cauldron appears beside you with a liquid that duplicates the properties of a Common or Uncommon potion you choose; it yields up to six doses."
   },
   "conjure-fey": {
-    "_es": "66ab7885",
-    "name": "Conjure Fey"
+    "_es": "03da2493",
+    "name": "Conjure Fey",
+    "description": "You conjure a Medium spirit from the Feywild in the form of a Fey creature; when it appears, you can make a melee attack for 3d12 Psychic damage."
   },
   "contingency": {
-    "_es": "962fde3c",
-    "name": "Contingency"
+    "_es": "d71cad05",
+    "name": "Contingency",
+    "description": "You prepare a spell of level 5 or lower to take effect on its own when a condition you set is met, without spending your action at that moment."
   },
   "create-undead": {
-    "_es": "24895277",
-    "name": "Create Undead"
+    "_es": "45135f7c",
+    "name": "Create Undead",
+    "description": "At night only: up to three corpses become Ghouls under your control, which you can direct with a Bonus Action."
   },
   "flesh-to-stone": {
-    "_es": "a24bf406",
-    "name": "Flesh to Stone"
+    "_es": "4806afd6",
+    "name": "Flesh to Stone",
+    "description": "Constitution saving throw or the target has the Restrained condition and, after three accumulated failures, the Petrified condition; Constructs succeed automatically."
   },
   "find-the-path": {
-    "_es": "47f79920",
-    "name": "Find the Path"
+    "_es": "10c5e4df",
+    "name": "Find the Path",
+    "description": "You sense the shortest physical route to a familiar location on the same plane, and you know if you stray from it."
   },
   "otilukes-freezing-sphere": {
-    "_es": "94e0c274",
-    "name": "Otiluke's Freezing Sphere"
+    "_es": "7a4b39eb",
+    "name": "Otiluke's Freezing Sphere",
+    "description": "60-foot sphere: Constitution saving throw against 10d6 Cold damage, half damage on a success; it can freeze water in its path."
   },
   "heroes-feast": {
-    "_es": "3c710ec6",
-    "name": "Heroes' Feast"
+    "_es": "f8cc308f",
+    "name": "Heroes' Feast",
+    "description": "A feast for up to twelve creatures: it cures diseases and poison, and grants Resistance to Poison damage, immunity to the Frightened condition, and Advantage on Wisdom saving throws for 24 hours."
   },
   "guards-and-wards": {
-    "_es": "e7d535f8",
-    "name": "Guards and Wards"
+    "_es": "b1052665",
+    "name": "Guards and Wards",
+    "description": "You ward up to 2,500 square feet with combined effects: fog, darkness, false sounds, sealed doors, and a trap of your choice."
   },
   "programmed-illusion": {
-    "_es": "504b3a07",
-    "name": "Programmed Illusion"
+    "_es": "64ef7aec",
+    "name": "Programmed Illusion",
+    "description": "You create an imperceptible illusion that activates on a specific condition and acts as programmed for up to 5 minutes."
   },
   "drawmijs-instant-summons": {
-    "_es": "dc1c96ec",
-    "name": "Drawmij's Instant Summons"
+    "_es": "53a924e5",
+    "name": "Drawmij's Instant Summons",
+    "description": "You mark an object with a sapphire; later you can summon it to your hand from any distance with a Magic action."
   },
   "summon-fiend": {
-    "_es": "b8610b29",
-    "name": "Summon Fiend"
+    "_es": "065851bb",
+    "name": "Summon Fiend",
+    "description": "You summon a fiendish spirit (demon, devil, or yugoloth) in an unoccupied space; it uses the Fiendish Spirit stat block."
   },
   "move-earth": {
-    "_es": "175808c9",
-    "name": "Move Earth"
+    "_es": "a4d83f0c",
+    "name": "Move Earth",
+    "description": "You reshape dirt, sand, or clay in an area up to 40 feet on a side: raise it, dig it out, or form walls or pillars."
   },
   "wall-of-thorns": {
-    "_es": "b8e99833",
-    "name": "Wall of Thorns"
+    "_es": "103ff30c",
+    "name": "Wall of Thorns",
+    "description": "You create a wall of thorny brush. When it appears, each creature in its area makes a Dexterity saving throw against 7d8 Piercing damage, or half as much on a success. It can be crossed, but every foot of movement through it costs 4 feet; the first time a creature enters a space of the wall on a turn, or ends its turn there, it makes a Dexterity saving throw against 7d8 Slashing damage, or half as much on a success. It doesn't impose the Restrained condition. Concentration."
   },
   "wall-of-ice": {
-    "_es": "c80d0e93",
-    "name": "Wall of Ice"
+    "_es": "1de548e9",
+    "name": "Wall of Ice",
+    "description": "You create a wall of ice shaped as a dome or flat panels, 1 foot thick; Dexterity saving throw against Cold damage when it appears."
   },
   "word-of-recall": {
-    "_es": "e8fe8ce3",
-    "name": "Word of Recall"
+    "_es": "5c880b22",
+    "name": "Word of Recall",
+    "description": "You and up to five willing creatures teleport instantly to a previously prepared sanctuary."
   },
   "forbiddance": {
-    "_es": "7aa1aa4a",
-    "name": "Forbiddance"
+    "_es": "5617e9c2",
+    "name": "Forbiddance",
+    "description": "You ward an area of up to 40,000 square feet against teleportation and planar travel; you can deal extra damage to a chosen type of creature."
   },
   "arcane-gate": {
-    "_es": "5eb99daf",
-    "name": "Arcane Gate"
+    "_es": "73d1763e",
+    "name": "Arcane Gate",
+    "description": "You open two linked portals: one near you and another within range; anyone can pass through them in either direction."
   },
   "magic-jar": {
-    "_es": "cfea3ac2",
-    "name": "Magic Jar"
+    "_es": "d55da588",
+    "name": "Magic Jar",
+    "description": "Your soul leaves your body and enters a container; from there you can try to possess the body of a nearby Humanoid."
   },
   "wind-walk": {
-    "_es": "5d73085d",
-    "name": "Wind Walk"
+    "_es": "9b83857b",
+    "name": "Wind Walk",
+    "description": "You and up to ten willing creatures take a gaseous form: you fly at 300 feet, with immunity to the Prone condition and Resistance to physical damage."
   },
   "transport-via-plants": {
-    "_es": "372a618f",
-    "name": "Transport via Plants"
+    "_es": "1945271a",
+    "name": "Transport via Plants",
+    "description": "You magically link two Large plants; anyone can enter one and exit the other by spending 5 feet of movement."
   },
   "conjure-celestial": {
-    "_es": "0a517c7e",
-    "name": "Conjure Celestial"
+    "_es": "7b9282a4",
+    "name": "Conjure Celestial",
+    "description": "A pillar of light in a 10-foot-radius, 40-foot-high cylinder. For each creature you can see inside, you choose which light bathes it: Healing Light, which restores 4d12 + your spellcasting ability modifier in HP, or Searing Light, which forces a Dexterity saving throw against 6d12 Radiant damage, or half as much on a success. A creature can be affected only once per turn."
   },
   "mordenkainens-sword": {
-    "_es": "d80f9892",
-    "name": "Mordenkainen's Sword"
+    "_es": "9ff44698",
+    "name": "Mordenkainen's Sword",
+    "description": "You create a spectral sword that makes melee attacks for 4d12 Force damage plus your spellcasting ability modifier; you can reposition it and attack again each turn."
   },
   "mirage-arcane": {
-    "_es": "a1727481",
-    "name": "Mirage Arcane"
+    "_es": "0b00364f",
+    "name": "Mirage Arcane",
+    "description": "A square up to 1 mile on a side takes on the look, sound, smell, and feel of other terrain, even with illusory structures, for 10 days."
   },
   "mordenkainens-magnificent-mansion": {
-    "_es": "06361f8c",
-    "name": "Mordenkainen's Magnificent Mansion"
+    "_es": "f1176483",
+    "name": "Mordenkainen's Magnificent Mansion",
+    "description": "You open a door to a furnished extradimensional dwelling where you can take shelter with those you designate for 24 hours."
   },
   "power-word-fortify": {
-    "_es": "d3738157",
-    "name": "Power Word Fortify"
+    "_es": "11bdc6c7",
+    "name": "Power Word Fortify",
+    "description": "You distribute 120 Temporary Hit Points among up to six creatures you can see within range, with no roll involved."
   },
   "divine-word": {
-    "_es": "bad7bea0",
-    "name": "Divine Word"
+    "_es": "321f66ca",
+    "name": "Divine Word",
+    "description": "Charisma saving throw for the creatures you choose; those that fail and have 50 HP or fewer suffer an effect based on their current HP (Stunned, Blinded, Deafened, or killed)."
   },
   "project-image": {
-    "_es": "49bbaeb0",
-    "name": "Project Image"
+    "_es": "868feb8c",
+    "name": "Project Image",
+    "description": "You create an illusory copy of yourself in a familiar place within 500 miles; you can see and hear through it and speak through its voice."
   },
   "sequester": {
-    "_es": "98e09b38",
-    "name": "Sequester"
+    "_es": "36e9b3c3",
+    "name": "Sequester",
+    "description": "An object or willing creature you touch becomes Invisible and undetectable by divination, in suspended animation, until a condition you set is met."
   },
   "symbol": {
-    "_es": "c9fa9a51",
-    "name": "Symbol"
+    "_es": "3e55cf1b",
+    "name": "Symbol",
+    "description": "You inscribe a harmful glyph that triggers on a condition; the save depends on the chosen effect (stun, sleep, fear, and more)."
   },
   "simulacrum": {
-    "_es": "a079f3e9",
-    "name": "Simulacrum"
+    "_es": "bfbfb771",
+    "name": "Simulacrum",
+    "description": "You create a duplicate of a creature you know out of ice or snow, with half its HP maximum and loyal to you."
   },
   "antipathy-sympathy": {
-    "_es": "a7fe62d4",
-    "name": "Antipathy/Sympathy"
+    "_es": "ae282ff9",
+    "name": "Antipathy/Sympathy",
+    "description": "You choose a kind of creature and a target: those that come near make a Wisdom saving throw and, depending on antipathy or sympathy, flee or are drawn to it."
   },
   "holy-aura": {
-    "_es": "93883116",
-    "name": "Holy Aura"
+    "_es": "e9b7019f",
+    "name": "Holy Aura",
+    "description": "30-foot Emanation: the creatures you choose have Advantage on all saving throws, and melee attacks against them have Disadvantage; Fiends and Undead that hit them can be Blinded."
   },
   "clone": {
-    "_es": "74757438",
-    "name": "Clone"
+    "_es": "a01a1140",
+    "name": "Clone",
+    "description": "You create an inert duplicate of a creature from tissue you touch; if the original dies, its soul passes into the clone, which matures in 120 days."
   },
   "control-weather": {
-    "_es": "9368eb9f",
-    "name": "Control Weather"
+    "_es": "b7db27d1",
+    "name": "Control Weather",
+    "description": "You control the weather within 5 miles while the spell lasts: precipitation, temperature, and wind, changing gradually over 1d4 × 10 minutes."
   },
   "maze": {
-    "_es": "4e6987a4",
-    "name": "Maze"
+    "_es": "03a31d76",
+    "name": "Maze",
+    "description": "Banishes a creature into a labyrinthine demiplane; it can try to escape with a DC 20 Intelligence (Investigation) check."
   },
   "glibness": {
-    "_es": "b399a459",
-    "name": "Glibness"
+    "_es": "8d126ee9",
+    "name": "Glibness",
+    "description": "You can replace the result of any Charisma check with a 15, and magic that detects lies reveals you as truthful."
   },
   "demiplane": {
-    "_es": "3dca0a20",
-    "name": "Demiplane"
+    "_es": "20c04403",
+    "name": "Demiplane",
+    "description": "You create a shadowy door to an empty demiplane 30 feet on a side, made of wood or stone, your choice."
   },
   "telepathy": {
-    "_es": "947624db",
-    "name": "Telepathy"
+    "_es": "8f11cd1b",
+    "name": "Telepathy",
+    "description": "A telepathic link with no distance limit (same plane) with a willing creature you know: you share words, images, and sensations."
   },
   "tsunami": {
-    "_es": "405e7fc7",
-    "name": "Tsunami"
+    "_es": "783e1ee4",
+    "name": "Tsunami",
+    "description": "A wall of water up to 300 feet long and tall: Strength saving throw against 6d10 Bludgeoning damage, and it moves forward sweeping everything in its path while it lasts."
   },
   "shapechange": {
-    "_es": "45ba41dd",
-    "name": "Shapechange"
+    "_es": "2370c07f",
+    "name": "Shapechange",
+    "description": "You assume the form of another creature with a Challenge Rating equal to or lower than yours; you can change form again with a Magic action while the spell lasts."
   },
   "power-word-heal": {
-    "_es": "66126829",
-    "name": "Power Word Heal"
+    "_es": "5bdfd7c2",
+    "name": "Power Word Heal",
+    "description": "A creature you can see regains all its HP and is freed from the Charmed, Frightened, Paralyzed, Poisoned, or Stunned condition; if it is Prone, it can stand up with its Reaction."
   },
   "true-polymorph": {
-    "_es": "a0af74fb",
-    "name": "True Polymorph"
+    "_es": "73110372",
+    "name": "True Polymorph",
+    "description": "A creature or nonmagical object takes the form of another creature or object; if you maintain Concentration for 1 hour, the change becomes permanent."
   },
   "storm-of-vengeance": {
-    "_es": "8827aff4",
-    "name": "Storm of Vengeance"
+    "_es": "b6069727",
+    "name": "Storm of Vengeance",
+    "description": "A 300-foot-radius storm cloud: Constitution saving throw against 2d6 Thunder damage and the Deafened condition; each following turn it produces a different effect."
   },
   "modify-memory": {
-    "_es": "4efcfbf5",
-    "name": "Modify Memory"
+    "_es": "5c8bfe47",
+    "name": "Modify Memory",
+    "description": "A creature that fails a Wisdom saving throw has the Charmed and Incapacitated conditions while you alter its memory of an event of up to 10 minutes that happened within the last 24 hours. Higher slots let you modify older memories."
   },
   "speak-with-dead": {
-    "_es": "6370d7a1",
-    "name": "Speak with Dead"
+    "_es": "28d1ac45",
+    "name": "Speak with Dead",
+    "description": "You grant the semblance of life and intelligence to a corpse to ask it up to five questions. The spell fails if the corpse was Undead or has already been the target of this spell within the last 10 days."
   },
   "toll-the-dead": {
-    "_es": "1093ba08",
-    "name": "Toll the Dead"
+    "_es": "43132067",
+    "name": "Toll the Dead",
+    "description": "A creature that fails a Wisdom saving throw takes 1d8 Necrotic damage, or 1d12 if it is missing any HP. The damage increases at levels 5, 11, and 17."
   },
   "homunculus-servant": {
-    "_es": "008c2cc4",
-    "name": "Homunculus Servant"
+    "_es": "3e83eaf9",
+    "name": "Homunculus Servant",
+    "description": "You summon a homunculus (Tiny Construct, 5 + 5 per spell slot level HP, AC 13, Fly 30 feet) in an unoccupied space; it shares your Initiative and acts right after you. If you already had one from this spell, it is replaced."
   }
 }
