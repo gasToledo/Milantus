@@ -485,6 +485,33 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
+## [0.21.0+1] - 2026-10-06
+
+### Nuevo
+
+- Con la interfaz en inglés, el contenido del reglamento también está en
+  inglés: nombres y descripciones de clases, subclases, especies, linajes,
+  trasfondos, dotes, conjuros, criaturas, armas, armaduras y objetos, con los
+  términos del SRD 5.2 en inglés. Cambiar de idioma rehace el catálogo al
+  instante, con la ficha, el Códice o un combate abiertos.
+- Los perfiles de criaturas muestran en inglés tipo, tamaño, sentidos,
+  velocidad, idiomas, defensas, acciones y rasgos, y siguen sirviendo para
+  Forma Salvaje, combate y planos del Artífice igual que en español.
+
+### Modificado
+
+- Los avisos de validación de la ficha, las líneas nuevas del diario de
+  compras y ventas, las recompensas de capítulo y los errores (del servidor,
+  de red y de archivos) salen en el idioma elegido.
+- El prompt del generador de retratos va siempre en inglés, con cualquier
+  idioma de interfaz.
+- Los formularios homebrew y los filtros del Códice muestran escuela, tiempo
+  de lanzamiento, tamaño y tipo en el idioma elegido; lo guardado no cambia.
+
+### Eliminado
+
+- Sin cambios.
+
 ## [Unreleased]
 
 ### Nuevo

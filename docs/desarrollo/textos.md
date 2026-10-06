@@ -187,13 +187,20 @@ cada rótulo tenga su inglés.
 
 ### Qué sigue en español
 
-La fase 2 (change `add-english-content`) lleva al inglés el vocabulario del
-motor, el catálogo y los errores. Mientras se completa, lo que todavía no se
-traduce lo declara su `l10n-ignore` con el motivo «fase 2»: los errores
-técnicos de red y de archivos (`api_client.dart`, `lib/data/*`), el prompt
-del generador de retratos y el catálogo que aún no tiene su `X.en.json`.
+Nada de lo que muestra la app. El catálogo tiene su inglés en los
+`X.en.json` (ver [Contenido y reglas](contenido-y-reglas.md) §Traducción al
+inglés); los avisos de validación, el diario, las recompensas y los errores
+sin contexto de interfaz (`api_client.dart`, `lib/data/*`) se arman con
+`localized(es, en)` en el idioma activo; los errores del servidor traen un
+`code` que el cliente traduce. El prompt de retratos va siempre en inglés,
+con cualquier idioma de interfaz.
 
-El vocabulario del motor ya está en los dos idiomas: se lee con `label`
+Lo que se **guarda** sigue en español: los valores de vocabulario cerrado
+del homebrew (escuela, tamaño, tipo), las etiquetas de condición de un
+combate y las líneas del diario escritas antes del cambio. Se traducen al
+mostrarlos, o quedan como se escribieron.
+
+El vocabulario del motor está en los dos idiomas: se lee con `label`
 (sigue a `ContentLanguage.current`) y nunca con un texto copiado en un widget.
 Lo que una persona escribe —homebrew, notas, nombres— se muestra tal como se
 escribió, en cualquier idioma.
