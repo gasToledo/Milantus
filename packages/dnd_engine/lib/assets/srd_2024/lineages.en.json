@@ -1,175 +1,264 @@
 {
   "elf-drow": {
-    "_es": "fab5445c",
+    "_es": "97a34fc5",
     "name": "Drow",
     "features.0.name": "Drow Lineage",
     "features.1.name": "Drow Magic (level 3)",
-    "features.2.name": "Drow Magic (level 5)"
+    "features.2.name": "Drow Magic (level 5)",
+    "description": "Lineage of the depths. Superior Darkvision and shadow magic. You choose Intelligence, Wisdom, or Charisma as your spellcasting ability.",
+    "features.0.description": "Your Darkvision reaches 120 feet, and you know the Dancing Lights cantrip.",
+    "features.1.description": "You learn Faerie Fire, once per Long Rest without expending a slot.",
+    "features.2.description": "You learn Darkness, once per Long Rest without expending a slot."
   },
   "elf-high": {
-    "_es": "d1409d78",
+    "_es": "26b090f5",
     "name": "High Elf",
     "features.0.name": "High Elf Lineage",
     "features.1.name": "High Elf Magic (level 3)",
-    "features.2.name": "High Elf Magic (level 5)"
+    "features.2.name": "High Elf Magic (level 5)",
+    "description": "Lineage of arcane tradition. You know minor magic and can move in a blink. You choose Intelligence, Wisdom, or Charisma as your spellcasting ability.",
+    "features.0.description": "You know the Prestidigitation cantrip (you can replace it after a Long Rest).",
+    "features.1.description": "You learn Detect Magic, once per Long Rest without expending a slot.",
+    "features.2.description": "You learn Misty Step, once per Long Rest without expending a slot."
   },
   "elf-wood": {
-    "_es": "261cea1f",
+    "_es": "e8e03660",
     "name": "Wood Elf",
     "features.0.name": "Speedy",
     "features.1.name": "Wood Elf Magic (level 3)",
-    "features.2.name": "Wood Elf Magic (level 5)"
+    "features.2.name": "Wood Elf Magic (level 5)",
+    "description": "Lineage of the forests. Swifter, with druidic magic. You choose Intelligence, Wisdom, or Charisma as your spellcasting ability.",
+    "features.0.description": "Your Speed increases to 35 feet.",
+    "features.1.description": "You learn Longstrider, once per Long Rest without expending a slot.",
+    "features.2.description": "You learn Pass without Trace, once per Long Rest without expending a slot."
   },
   "gnome-forest": {
-    "_es": "471a9171",
+    "_es": "13172847",
     "name": "Forest Gnome",
-    "features.0.name": "Wood Elf Lineage"
+    "features.0.name": "Wood Elf Lineage",
+    "description": "Lineage of the deep woods. Illusions and a way with beasts. You choose Intelligence, Wisdom, or Charisma as your spellcasting ability.",
+    "features.0.description": "You know the Minor Illusion cantrip and can cast Speak with Animals without expending a slot."
   },
   "gnome-rock": {
-    "_es": "d49f90cd",
+    "_es": "be04e84b",
     "name": "Rock Gnome",
     "features.0.name": "Natural Artificer",
-    "features.0.effects.2.name": "Clockwork Device"
+    "features.0.effects.2.name": "Clockwork Device",
+    "description": "Lineage of born tinkerers. You repair and create small wonders. You choose Intelligence, Wisdom, or Charisma as your spellcasting ability.",
+    "features.0.description": "You know the Mending and Prestidigitation cantrips, and you can build a small clockwork device.",
+    "features.0.effects.2.description": "You can spend 10 minutes casting Prestidigitation to create a Tiny clockwork device (AC 5, 1 HP) that produces one of the spell's effects when you activate it with a touch as a Bonus Action. You can have up to three devices at a time; each falls apart 8 hours after you create it or when you dismantle it with a touch as a Utilize action."
   },
   "tiefling-abyssal": {
-    "_es": "cc95f201",
+    "_es": "4aca0603",
     "name": "Abyssal",
     "features.0.name": "Abyssal Legacy",
     "features.1.name": "Legacy Magic (level 3)",
-    "features.2.name": "Legacy Magic (level 5)"
+    "features.2.name": "Legacy Magic (level 5)",
+    "description": "Abyssal Legacy. Resistance to Poison and the magic of your lineage. You choose Intelligence, Wisdom, or Charisma as your spellcasting ability.",
+    "features.0.description": "You gain Resistance to Poison damage and know a cantrip from your legacy.",
+    "features.1.description": "You learn a spell, once per Long Rest without expending a slot.",
+    "features.2.description": "You learn a spell, once per Long Rest without expending a slot."
   },
   "tiefling-chthonic": {
-    "_es": "a08e059f",
+    "_es": "fb709502",
     "name": "Chthonic",
     "features.0.name": "Chthonic Legacy",
     "features.1.name": "Legacy Magic (level 3)",
-    "features.2.name": "Legacy Magic (level 5)"
+    "features.2.name": "Legacy Magic (level 5)",
+    "description": "Chthonic Legacy. Resistance to Necrotic damage and the magic of your lineage. You choose Intelligence, Wisdom, or Charisma as your spellcasting ability.",
+    "features.0.description": "You gain Resistance to Necrotic damage and know a cantrip from your legacy.",
+    "features.1.description": "You learn a spell, once per Long Rest without expending a slot.",
+    "features.2.description": "You learn a spell, once per Long Rest without expending a slot."
   },
   "tiefling-infernal": {
-    "_es": "2bc223c9",
+    "_es": "69f981cc",
     "name": "Infernal",
     "features.0.name": "Infernal Legacy",
     "features.1.name": "Legacy Magic (level 3)",
-    "features.2.name": "Legacy Magic (level 5)"
+    "features.2.name": "Legacy Magic (level 5)",
+    "description": "Infernal Legacy. Resistance to Fire and the magic of your lineage. You choose Intelligence, Wisdom, or Charisma as your spellcasting ability.",
+    "features.0.description": "You gain Resistance to Fire damage and know a cantrip from your legacy.",
+    "features.1.description": "You learn a spell, once per Long Rest without expending a slot.",
+    "features.2.description": "You learn a spell, once per Long Rest without expending a slot."
   },
   "goliath-cloud": {
-    "_es": "6a1ff7fb",
+    "_es": "8a959456",
     "name": "Cloud Giant",
     "features.0.name": "Cloud's Jaunt",
-    "features.0.effects.0.name": "Giant Ancestry"
+    "features.0.effects.0.name": "Giant Ancestry",
+    "description": "Cloud's Jaunt. You travel through the air for an instant, like cloud giants.",
+    "features.0.description": "As a Bonus Action, you magically teleport up to 30 feet to an unoccupied space you can see.",
+    "features.0.effects.0.description": "Cloud's Jaunt: as a Bonus Action, you teleport up to 30 feet to an unoccupied space you can see."
   },
   "goliath-fire": {
-    "_es": "d9fcdab0",
+    "_es": "b1aad770",
     "name": "Fire Giant",
     "features.0.name": "Fire's Burn",
-    "features.0.effects.0.name": "Giant Ancestry"
+    "features.0.effects.0.name": "Giant Ancestry",
+    "description": "Fire's Burn. Your blows burn like the forge of fire giants.",
+    "features.0.description": "When you hit a target with an attack roll and deal damage to it, you can also deal 1d10 Fire damage.",
+    "features.0.effects.0.description": "Fire's Burn: when you hit with an attack that deals damage, you also deal 1d10 Fire damage."
   },
   "goliath-frost": {
-    "_es": "3435ce42",
+    "_es": "3176459f",
     "name": "Frost Giant",
     "features.0.name": "Frost's Chill",
-    "features.0.effects.0.name": "Giant Ancestry"
+    "features.0.effects.0.name": "Giant Ancestry",
+    "description": "Frost's Chill. Your blows freeze and hinder, like frost giants.",
+    "features.0.description": "When you hit a target with an attack roll and deal damage to it, you can also deal 1d6 Cold damage and reduce the target's Speed by 10 feet until the start of your next turn.",
+    "features.0.effects.0.description": "Frost's Chill: when you hit with an attack that deals damage, you also deal 1d6 Cold damage and reduce the target's Speed by 10 feet until the start of your next turn."
   },
   "goliath-hill": {
-    "_es": "7dd85583",
+    "_es": "5ff94545",
     "name": "Hill Giant",
     "features.0.name": "Hill's Tumble",
-    "features.0.effects.0.name": "Giant Ancestry"
+    "features.0.effects.0.name": "Giant Ancestry",
+    "description": "Hill's Tumble. Your weight knocks foes down, like hill giants.",
+    "features.0.description": "When you hit a Large or smaller creature with an attack roll and deal damage to it, you can give that target the Prone condition.",
+    "features.0.effects.0.description": "Hill's Tumble: when you hit a Large or smaller creature with an attack that deals damage, you knock it Prone."
   },
   "goliath-stone": {
-    "_es": "73f802ae",
+    "_es": "00efca8c",
     "name": "Stone Giant",
     "features.0.name": "Stone's Endurance",
-    "features.0.effects.0.name": "Giant Ancestry"
+    "features.0.effects.0.name": "Giant Ancestry",
+    "description": "Stone's Endurance. You weather the blow like stone giants.",
+    "features.0.description": "When you take damage, you can take a Reaction to roll 1d12, add your Constitution modifier, and reduce the damage by that total.",
+    "features.0.effects.0.description": "Stone's Endurance: as a Reaction when you take damage, you roll 1d12 + your Constitution modifier and reduce the damage by that total."
   },
   "goliath-storm": {
-    "_es": "25706ef6",
+    "_es": "fae1215a",
     "name": "Storm Giant",
     "features.0.name": "Thunderbolt Strike",
-    "features.0.effects.0.name": "Giant Ancestry"
+    "features.0.effects.0.name": "Giant Ancestry",
+    "description": "Storm's Thunder. You strike back with a thunderclap, like storm giants.",
+    "features.0.description": "When a creature within 60 feet of you deals damage to you, you can take a Reaction to deal 1d8 Thunder damage to it.",
+    "features.0.effects.0.description": "Storm's Thunder: as a Reaction when a creature within 60 feet of you deals damage to you, you deal 1d8 Thunder damage to it."
   },
   "dragonborn-black": {
-    "_es": "7af92a07",
+    "_es": "45c26363",
     "name": "Black Dragon",
     "features.0.name": "Draconic Ancestry (Black)",
-    "features.0.effects.1.name": "Acid Breath"
+    "features.0.effects.1.name": "Acid Breath",
+    "description": "Your dragon ancestor was black. Your Breath Weapon deals Acid damage, and you have Resistance to that damage type.",
+    "features.0.description": "Your Breath Weapon deals Acid damage, and you have Resistance to Acid damage.",
+    "features.0.effects.1.description": "Your Breath Weapon deals Acid damage, determined by your draconic ancestry."
   },
   "dragonborn-copper": {
-    "_es": "6e11655f",
+    "_es": "3ac63e93",
     "name": "Copper Dragon",
     "features.0.name": "Draconic Ancestry (Copper)",
-    "features.0.effects.1.name": "Acid Breath"
+    "features.0.effects.1.name": "Acid Breath",
+    "description": "Your dragon ancestor was copper. Your Breath Weapon deals Acid damage, and you have Resistance to that damage type.",
+    "features.0.description": "Your Breath Weapon deals Acid damage, and you have Resistance to Acid damage.",
+    "features.0.effects.1.description": "Your Breath Weapon deals Acid damage, determined by your draconic ancestry."
   },
   "dragonborn-blue": {
-    "_es": "c6c29f49",
+    "_es": "8c2b7256",
     "name": "Blue Dragon",
     "features.0.name": "Draconic Ancestry (Blue)",
-    "features.0.effects.1.name": "Lightning Breath"
+    "features.0.effects.1.name": "Lightning Breath",
+    "description": "Your dragon ancestor was blue. Your Breath Weapon deals Lightning damage, and you have Resistance to that damage type.",
+    "features.0.description": "Your Breath Weapon deals Lightning damage, and you have Resistance to Lightning damage.",
+    "features.0.effects.1.description": "Your Breath Weapon deals Lightning damage, determined by your draconic ancestry."
   },
   "dragonborn-bronze": {
-    "_es": "3a46cca5",
+    "_es": "c9dc03a1",
     "name": "Bronze Dragon",
     "features.0.name": "Draconic Ancestry (Bronze)",
-    "features.0.effects.1.name": "Lightning Breath"
+    "features.0.effects.1.name": "Lightning Breath",
+    "description": "Your dragon ancestor was bronze. Your Breath Weapon deals Lightning damage, and you have Resistance to that damage type.",
+    "features.0.description": "Your Breath Weapon deals Lightning damage, and you have Resistance to Lightning damage.",
+    "features.0.effects.1.description": "Your Breath Weapon deals Lightning damage, determined by your draconic ancestry."
   },
   "dragonborn-white": {
-    "_es": "20fe6de7",
+    "_es": "6befba89",
     "name": "White Dragon",
     "features.0.name": "Draconic Ancestry (White)",
-    "features.0.effects.1.name": "Cold Breath"
+    "features.0.effects.1.name": "Cold Breath",
+    "description": "Your dragon ancestor was white. Your Breath Weapon deals Cold damage, and you have Resistance to that damage type.",
+    "features.0.description": "Your Breath Weapon deals Cold damage, and you have Resistance to Cold damage.",
+    "features.0.effects.1.description": "Your Breath Weapon deals Cold damage, determined by your draconic ancestry."
   },
   "dragonborn-silver": {
-    "_es": "aa3a6fed",
+    "_es": "2824e16e",
     "name": "Silver Dragon",
     "features.0.name": "Draconic Ancestry (Silver)",
-    "features.0.effects.1.name": "Cold Breath"
+    "features.0.effects.1.name": "Cold Breath",
+    "description": "Your dragon ancestor was silver. Your Breath Weapon deals Cold damage, and you have Resistance to that damage type.",
+    "features.0.description": "Your Breath Weapon deals Cold damage, and you have Resistance to Cold damage.",
+    "features.0.effects.1.description": "Your Breath Weapon deals Cold damage, determined by your draconic ancestry."
   },
   "dragonborn-green": {
-    "_es": "c39e9302",
+    "_es": "766370bf",
     "name": "Green Dragon",
     "features.0.name": "Draconic Ancestry (Green)",
-    "features.0.effects.1.name": "Poison Breath"
+    "features.0.effects.1.name": "Poison Breath",
+    "description": "Your dragon ancestor was green. Your Breath Weapon deals Poison damage, and you have Resistance to that damage type.",
+    "features.0.description": "Your Breath Weapon deals Poison damage, and you have Resistance to Poison damage.",
+    "features.0.effects.1.description": "Your Breath Weapon deals Poison damage, determined by your draconic ancestry."
   },
   "dragonborn-red": {
-    "_es": "c47a3703",
+    "_es": "c6612eee",
     "name": "Red Dragon",
     "features.0.name": "Draconic Ancestry (Red)",
-    "features.0.effects.1.name": "Fire Breath"
+    "features.0.effects.1.name": "Fire Breath",
+    "description": "Your dragon ancestor was red. Your Breath Weapon deals Fire damage, and you have Resistance to that damage type.",
+    "features.0.description": "Your Breath Weapon deals Fire damage, and you have Resistance to Fire damage.",
+    "features.0.effects.1.description": "Your Breath Weapon deals Fire damage, determined by your draconic ancestry."
   },
   "dragonborn-gold": {
-    "_es": "c8db5e05",
+    "_es": "1b06cc8a",
     "name": "Gold Dragon",
     "features.0.name": "Draconic Ancestry (Gold)",
-    "features.0.effects.1.name": "Fire Breath"
+    "features.0.effects.1.name": "Fire Breath",
+    "description": "Your dragon ancestor was gold. Your Breath Weapon deals Fire damage, and you have Resistance to that damage type.",
+    "features.0.description": "Your Breath Weapon deals Fire damage, and you have Resistance to Fire damage.",
+    "features.0.effects.1.description": "Your Breath Weapon deals Fire damage, determined by your draconic ancestry."
   },
   "dragonborn-brass": {
-    "_es": "94e2e357",
+    "_es": "800c47f9",
     "name": "Brass Dragon",
     "features.0.name": "Draconic Ancestry (Brass)",
-    "features.0.effects.1.name": "Fire Breath"
+    "features.0.effects.1.name": "Fire Breath",
+    "description": "Your dragon ancestor was brass. Your Breath Weapon deals Fire damage, and you have Resistance to that damage type.",
+    "features.0.description": "Your Breath Weapon deals Fire damage, and you have Resistance to Fire damage.",
+    "features.0.effects.1.description": "Your Breath Weapon deals Fire damage, determined by your draconic ancestry."
   },
   "shifter-beasthide": {
-    "_es": "f4aaf37e",
+    "_es": "04f804b4",
     "name": "Beasthide",
     "features.0.name": "Beasthide",
-    "features.0.effects.0.name": "Beasthide"
+    "features.0.effects.0.name": "Beasthide",
+    "description": "When you shift, you gain an extra 1d6 Temporary Hit Points and +1 to AC while the shift lasts.",
+    "features.0.description": "When you shift, you gain an extra 1d6 Temporary Hit Points and +1 to AC while the shift lasts.",
+    "features.0.effects.0.description": "When you shift, you gain an extra 1d6 Temporary Hit Points and +1 to AC while the shift lasts."
   },
   "shifter-longtooth": {
-    "_es": "996d60d4",
+    "_es": "691b2034",
     "name": "Longtooth",
     "features.0.name": "Longtooth",
-    "features.0.effects.0.name": "Longtooth"
+    "features.0.effects.0.name": "Longtooth",
+    "description": "While shifted, you can attack with your fangs and deal 1d6 Piercing damage plus your Strength modifier.",
+    "features.0.description": "When you shift, and as a Bonus Action on your later turns, you can make an Unarmed Strike with your fangs that deals 1d6 Piercing damage plus your Strength modifier.",
+    "features.0.effects.0.description": "When you shift, and as a Bonus Action on your later turns, you can make an Unarmed Strike with your fangs that deals 1d6 Piercing damage plus your Strength modifier."
   },
   "shifter-swiftstride": {
-    "_es": "74eecb77",
+    "_es": "6e4d873f",
     "name": "Swiftstride",
     "features.0.name": "Swiftstride",
-    "features.0.effects.0.name": "Swiftstride"
+    "features.0.effects.0.name": "Swiftstride",
+    "description": "While shifted, your Speed increases by 10 feet and you can move away as a Reaction without provoking Opportunity Attacks.",
+    "features.0.description": "While shifted, your Speed increases by 10 feet. In addition, when a creature ends its turn within 5 feet of you, you can move up to 10 feet as a Reaction without provoking Opportunity Attacks.",
+    "features.0.effects.0.description": "While shifted, your Speed increases by 10 feet. In addition, when a creature ends its turn within 5 feet of you, you can move up to 10 feet as a Reaction without provoking Opportunity Attacks."
   },
   "shifter-wildhunt": {
-    "_es": "9ae29864",
+    "_es": "10467a90",
     "name": "Wildhunt",
     "features.0.name": "Wild Hunt",
-    "features.0.effects.0.name": "Wild Hunt"
+    "features.0.effects.0.name": "Wild Hunt",
+    "description": "While shifted, you have Advantage on Wisdom checks and limit the Advantage of nearby attackers.",
+    "features.0.description": "While shifted, you have Advantage on Wisdom checks. No creature within 30 feet of you can have Advantage on attack rolls against you unless you have the Incapacitated condition.",
+    "features.0.effects.0.description": "While shifted, you have Advantage on Wisdom checks. No creature within 30 feet of you can have Advantage on attack rolls against you unless you have the Incapacitated condition."
   }
 }

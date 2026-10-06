@@ -1,104 +1,154 @@
 {
   "human": {
-    "_es": "6e14f531",
+    "_es": "609ded8c",
     "name": "Human",
     "tagline": "Ambitious and adaptable",
     "effects.0.name": "Skilled",
     "effects.1.name": "Resourceful",
-    "effects.3.name": "Versatile"
+    "effects.3.name": "Versatile",
+    "description": "Humans are found throughout the multiverse: they are as numerous as they are diverse and, though their lives are relatively short, they have achieved extraordinary things. Their ambition and adaptability inspire admiration, respect, and sometimes fear.\n\nTheir appearance spans the full diversity of humanity in our world, and they revere countless gods. Scholars debate where they first came from, but some hold that their earliest communities gathered in Sigil, from where they spread their cosmopolitan spirit and the Common tongue across the multiverse.",
+    "effects.0.description": "You gain proficiency in one skill of your choice.",
+    "effects.1.description": "You gain Heroic Inspiration whenever you finish a Long Rest.",
+    "effects.3.description": "You gain an Origin feat of your choice."
   },
   "dwarf": {
-    "_es": "6cf10f93",
+    "_es": "25d40942",
     "name": "Dwarf",
     "tagline": "Hardy as stone",
     "effects.2.name": "Dwarven Resilience",
     "effects.4.name": "Dwarven Toughness",
-    "effects.5.name": "Stonecunning"
+    "effects.5.name": "Stonecunning",
+    "description": "Dwarves were raised from the earth in the elder days by a deity of the forge, called Moradin on some worlds and Reorx on others. They still keep an affinity for stone, metal, and life underground. They are as hardy as the mountains they love and can live about 350 years.\n\nShort, stout, and often bearded, they carved cities and strongholds into the rock. Their legends celebrate battles against monsters of the peaks and the Underdark, and their songs keep the memory of valor alive. On some worlds, hill and mountain communities are told apart.",
+    "effects.2.description": "Advantage on saving throws to avoid or end the Poisoned condition.",
+    "effects.4.description": "Your Hit Point maximum increases by 1 for each character level.",
+    "effects.5.description": "As a Bonus Action, you gain Tremorsense with a range of 60 feet for 10 minutes. You must be on a stone surface or touching one. Uses equal to your Proficiency Bonus; you regain them after a Long Rest."
   },
   "halfling": {
-    "_es": "dcca6dec",
+    "_es": "82b889a6",
     "name": "Halfling",
     "tagline": "Small, friendly, and lucky",
     "effects.0.name": "Brave",
     "effects.1.name": "Halfling Nimbleness",
     "effects.2.name": "Luck",
-    "effects.3.name": "Naturally Stealthy"
+    "effects.3.name": "Naturally Stealthy",
+    "description": "Halflings were created by gods who cherished life, home, and the warmth of the hearth. They tend to live in close-knit, pastoral communities, yet they have the courage to venture out, explore, and discover. Their small size lets them slip through crowds and move through tight spaces.\n\nMany credit their remarkable luck to deities such as Yondalla, Brandobaris, or Charmalaine. They live around 150 years, and their communities take many forms: some are underground, others travel alongside human peoples, and not all of them live up to the ideal of a peaceful life.",
+    "effects.0.description": "Advantage on saving throws to avoid or end the Frightened condition.",
+    "effects.1.description": "You can move through the space of any creature that is a size larger than you, but you can't stop in the same space.",
+    "effects.2.description": "When you roll a 1 on the d20 of a D20 Test, you can reroll the die, and you must use the new roll.",
+    "effects.3.description": "You can take the Hide action even when you are obscured only by a creature that is at least one size larger than you."
   },
   "orc": {
-    "_es": "2780ab15",
+    "_es": "07b04b03",
     "name": "Orc",
     "tagline": "Relentless drive",
     "effects.1.name": "Adrenaline Rush",
-    "effects.2.name": "Relentless Endurance"
+    "effects.2.name": "Relentless Endurance",
+    "description": "Orcs trace their creation to Gruumsh, who roamed the wide expanses of the Material Plane. His gifts prepared them to cross plains, caverns, and seas, and to face the monsters along the way. Even if they worship other gods today, they keep the endurance, drive, and Darkvision tied to that ancient legacy.\n\nThey tend to be tall and broad, with gray skin, pointed ears, and prominent tusks. From a young age they hear stories of journeys and trials overcome; for some, that call inspires heroic deeds and worthy causes, while others prefer to leave their people's past behind.",
+    "effects.1.description": "You can take the Dash action as a Bonus Action and gain Temporary Hit Points equal to your Proficiency Bonus. Uses equal to your Proficiency Bonus; you regain them after a Short or Long Rest.",
+    "effects.2.description": "When you are reduced to 0 Hit Points but not killed outright, you can drop to 1 Hit Point instead. Once per Long Rest."
   },
   "elf": {
-    "_es": "a482fd83",
+    "_es": "e3fe6afa",
     "name": "Elf",
     "tagline": "Graceful and keen-sensed",
     "effects.1.name": "Fey Ancestry",
     "effects.2.name": "Keen Senses",
     "effects.3.name": "Trance",
-    "effects.4.name": "Elven Lineage"
+    "effects.4.name": "Elven Lineage",
+    "description": "The first elves were created by Corellon and could change their shape. After an ancient betrayal tied to Lolth, they lost that gift, and many withdrew to the Feywild. Curiosity eventually led them to explore other planes again.\n\nElves have pointed ears, lack facial and body hair, and can live about 750 years. Instead of sleeping, they enter a trance during which they remain aware of their surroundings. When a community dwells in one environment for centuries, the place can transform it and grant it a particular magic. From this come traditions such as the drow of the Underdark, the high elves tied to the Feywild, and the wood elves of primeval forests.",
+    "effects.1.description": "You have Advantage on saving throws to avoid or end the Charmed condition.",
+    "effects.2.description": "You gain proficiency in one skill of your choice among Insight, Perception, or Survival.",
+    "effects.3.description": "You don't need to sleep, and magic can't put you to sleep. You can finish a Long Rest in 4 hours of meditative trance.",
+    "effects.4.description": "You choose a lineage (High Elf, Wood Elf, or Drow) that grants a cantrip and benefits that improve at levels 3 and 5."
   },
   "dragonborn": {
-    "_es": "3ca3b656",
+    "_es": "f78d8956",
     "name": "Dragonborn",
     "tagline": "Draconic heritage",
     "effects.1.name": "Breath Weapon",
     "effects.2.name": "Breath Weapon",
-    "effects.3.name": "Draconic Flight (level 5)"
+    "effects.3.name": "Draconic Flight (level 5)",
+    "description": "The ancestors of dragonborn hatched from the eggs of chromatic and metallic dragons. Some stories say Bahamut and Tiamat blessed those eggs; others, that the dragons themselves created the first dragonborn without divine help. Over time they made their homes throughout the Material Plane.\n\nThey look like wingless bipedal dragons: they have scales, bright eyes, strong bones, and often horns. The color of their scales usually recalls that of their draconic ancestors.",
+    "effects.1.description": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line that is 5 feet wide (DEX saving throw, DC 8 + CON modifier + Proficiency Bonus). It deals 1d10 damage of your draconic ancestry's type on a failed save, or half as much on a success; it increases to 2d10 at level 5, 3d10 at 11, and 4d10 at 17.",
+    "effects.2.description": "Breath Weapon uses.",
+    "effects.3.description": "Starting at level 5, as a Bonus Action you gain a Fly Speed equal to your Speed for 10 minutes, until you retract the wings (no action required), or until you have the Incapacitated condition. Once per Long Rest."
   },
   "gnome": {
-    "_es": "aebff5c6",
+    "_es": "61f1180e",
     "name": "Gnome",
     "tagline": "Curious and clever",
     "effects.1.name": "Gnomish Cunning",
-    "effects.2.name": "Gnomish Lineage"
+    "effects.2.name": "Gnomish Lineage",
+    "description": "Gnomes are a magical people associated with gods of invention, illusion, and life underground. Their hidden communities lie concealed in forests and burrows, protected by clever tunnels, traps, and tricks. Their tales speak of deities such as Garl Glittergold, Baervan Wildwanderer, and Baravar Cloakshadow, and of the origins of the forest and rock lineages.\n\nThey are slight, with large eyes and pointed ears, and can live about 425 years. Many enjoy wearing something on their heads, even if it is just a flashy hat.",
+    "effects.1.description": "You have Advantage on Intelligence, Wisdom, and Charisma saving throws.",
+    "effects.2.description": "You choose a lineage (Forest Gnome or Rock Gnome) that grants a cantrip or additional proficiencies."
   },
   "tiefling": {
-    "_es": "b2cefc76",
+    "_es": "fa699094",
     "name": "Tiefling",
     "tagline": "Marked by an otherworldly legacy",
     "effects.2.name": "Otherworldly Presence",
-    "effects.3.name": "Fiendish Legacy"
+    "effects.3.name": "Fiendish Legacy",
+    "description": "Tieflings are born in the Lower Planes or carry in their blood the influence of a fiend, a demon, or another evil being. That legacy promises power but doesn't determine their morals: each tiefling decides whether to embrace it, lament it, or build something entirely their own.\n\nAbyssal legacies reflect the entropy of the Abyss, the chaos of Pandemonium, or the despair of Carceri, and can show as horns, fur, tusks, or strange odors. Chthonic ones are tied to Carceri, Gehenna, or Hades and can have a corpselike look or features of succubi, night hags, or yugoloths. Infernal ones evoke Gehenna, the Nine Hells, or Acheron through horns, spines, tails, golden eyes, and scents of sulfur or smoke.",
+    "effects.2.description": "You know the Thaumaturgy cantrip. Your fiendish legacy adds more spells at levels 3 and 5.",
+    "effects.3.description": "You choose a legacy (Abyssal, Chthonic, or Infernal) that determines your damage resistance and the spells you learn."
   },
   "goliath": {
-    "_es": "4d001c5a",
+    "_es": "62d7dd55",
     "name": "Goliath",
     "tagline": "Giant blood",
     "effects.0.name": "Powerful Build",
-    "effects.1.name": "Large Form (level 5)"
+    "effects.1.name": "Large Form (level 5)",
+    "description": "Goliaths are a towering people, distant descendants of giants. Their ancestors' influence shows in supernatural gifts and in the ability to grow for a short time.\n\nTheir physical features often recall a giant lineage, but goliaths have forged their own path, apart from their forebears' ancient feuds. Many are drawn to heights and make their homes in mountains, crags, and other high places.",
+    "effects.0.description": "You have Advantage on any ability check you make to end the Grappled condition. You also count as one size larger when determining your carrying capacity.",
+    "effects.1.description": "Starting at level 5, as a Bonus Action you can change your size to Large for 10 minutes if there is room. For the duration, you have Advantage on Strength checks and your Speed increases by 10 feet. Once per Long Rest."
   },
   "aasimar": {
-    "_es": "341722b4",
+    "_es": "60226c3c",
     "name": "Aasimar",
     "tagline": "Touched by celestial light",
     "effects.3.name": "Celestial Resistance",
     "effects.4.name": "Healing Hands",
     "effects.5.name": "Healing Hands",
     "effects.6.name": "Light Bearer",
-    "effects.8.name": "Celestial Revelation (level 3)"
+    "effects.8.name": "Celestial Revelation (level 3)",
+    "description": "Aasimar are mortals who carry a spark of the Upper Planes. They may descend from celestial beings, be born through divine intervention, or awaken that power after an extraordinary event.\n\nThey can arise among any people and usually resemble their parents, though they live up to about 160 years. Metallic freckles, luminous eyes, a faint halo, or unusual skin colors can reveal their nature. These signs are usually subtle, but they become unmistakable when an aasimar fully manifests its celestial power.",
+    "effects.3.description": "You have Resistance to Necrotic and Radiant damage.",
+    "effects.4.description": "As a Magic action, you touch a creature and roll a number of d4s equal to your Proficiency Bonus: it regains that many Hit Points. Once per Long Rest.",
+    "effects.5.description": "Healing Hands uses.",
+    "effects.6.description": "You know the Light cantrip. Charisma is your spellcasting ability for it.",
+    "effects.8.description": "Starting at level 3, as a Bonus Action you transform for 1 minute, choosing Heavenly Wings, Inner Radiance, or Necrotic Shroud each time. Once on each of your turns, you deal extra damage equal to your Proficiency Bonus: Radiant with Wings or Radiance, and Necrotic with Shroud. Wings grant flight; Radiance sheds light and damages nearby creatures; Shroud can frighten nearby creatures. Once per Long Rest."
   },
   "changeling": {
-    "_es": "4e94905f",
+    "_es": "af85b4e1",
     "name": "Changeling",
     "tagline": "Every face is a different life",
     "effects.0.name": "Fey",
     "effects.1.name": "Shifter Instincts",
-    "effects.2.name": "Shapechanger"
+    "effects.2.name": "Shapechanger",
+    "description": "Changelings have an ever-shifting appearance and live in many societies without being discovered. They can take on almost any humanoid face, and each new form can reveal a different side of their soul. The first ones arose in the Feywild, whose changing essence still lingers in them.\n\nTheir true form is pale, with barely defined features. They change appearance the way other people change clothes and often build complete identities, with their own history and convictions, to negotiate, investigate, or fight. Several changelings can even share the same identity and pass it down through generations along with its contacts and obligations.",
+    "effects.0.description": "You are a Fey creature. You choose Medium (4 to 7 feet) or Small (2 to 4 feet) size when you take this species.",
+    "effects.1.description": "You gain proficiency in two skills of your choice among Deception, Insight, Intimidation, Performance, and Persuasion.",
+    "effects.2.description": "As an action, you change your appearance and voice: coloration, hair length, sex, height, weight, and size between Medium and Small. You can appear to be a member of another playable species, but your game statistics don't change. You can't duplicate someone you have never seen or adopt a form with a different limb arrangement. Your clothing and equipment don't change. While transformed, you have Advantage on Charisma checks. You revert to your true form with another action."
   },
   "kalashtar": {
-    "_es": "040c514f",
+    "_es": "1bfd8847",
     "name": "Kalashtar",
     "tagline": "Two minds in one body",
     "effects.1.name": "Aberration",
     "effects.2.name": "Dual Mind",
     "effects.3.name": "Mental Discipline",
     "effects.4.name": "Mind Link",
-    "effects.5.name": "Dreamless"
+    "effects.5.name": "Dreamless",
+    "description": "Kalashtar were born from the union of humanity and renegade quori spirits from the plane of dreams. They look human, but that connection often gives them symmetrical or angular features, and their eyes can glow when they concentrate or feel strong emotions.\n\nA kalashtar doesn't converse directly with its quori spirit: it receives instincts, inspiration, and memories, especially while it sleeps. That bond also grants it psionic abilities and a particular protection against mental intrusion.",
+    "effects.1.description": "You are an Aberration, of Medium size (6 to 7 feet).",
+    "effects.2.description": "You have Advantage on Wisdom and Charisma saving throws.",
+    "effects.3.description": "You have Resistance to Psychic damage.",
+    "effects.4.description": "You have telepathy with a range in feet equal to 10 times your level. While speaking telepathically to a creature, you can take a Magic action to give it the ability to reply to you for 1 hour, or until you end it with another Magic action.",
+    "effects.5.description": "You can't be targeted by the Dream spell. In addition, when you finish a Long Rest, you gain proficiency in one skill of your choice until your next Long Rest."
   },
   "khoravar": {
-    "_es": "829a58af",
+    "_es": "276e8501",
     "name": "Khoravar",
     "tagline": "Children of Khorvaire, the bridge between",
     "effects.1.name": "Humanoid",
@@ -106,20 +156,32 @@
     "effects.3.name": "Fey Gift",
     "effects.5.name": "Sleep Resistance",
     "effects.6.name": "Skill Versatility",
-    "effects.7.name": "Skill Versatility"
+    "effects.7.name": "Skill Versatility",
+    "description": "For centuries, the descendants of humans and elves have formed their own communities and traditions in Khorvaire. Houses such as Lyrandar and Medani strengthened that shared identity. They call themselves khoravar, \"children of Khorvaire,\" and many reject the name half-elf.\n\nTheir philosophy casts them as a bridge between peoples, so bards, diplomats, mediators, and translators are common among them. Others see their fey heritage as a link between the material world and Thelanis, and follow the paths of druids or pacts with archfey.",
+    "effects.1.description": "You are a Humanoid. You choose Medium (4 to 6 feet) or Small (2 to 4 feet) size when you take this species.",
+    "effects.2.description": "You have Advantage on saving throws to avoid or end the Charmed condition.",
+    "effects.3.description": "You know the Friends cantrip. When you finish a Long Rest, you can replace it with another cantrip from the Cleric, Druid, or Wizard spell list. Your spellcasting ability for it is Intelligence, Wisdom, or Charisma (chosen when you take this species).",
+    "effects.5.description": "When you fail a saving throw to avoid or end the Unconscious condition, you can succeed instead. You can't use this again until you finish 1d4 Long Rests.",
+    "effects.7.description": "You gain proficiency in one skill or tool of your choice. When you finish a Long Rest, you can replace it with another."
   },
   "shifter": {
-    "_es": "deaa1eca",
+    "_es": "21bbcdea",
     "name": "Shifter",
     "tagline": "The beast within, just beneath the skin",
     "effects.1.name": "Humanoid",
     "effects.2.name": "Beast Instincts",
     "effects.3.name": "Transformation",
     "effects.4.name": "Transformation",
-    "effects.5.name": "Bestial Nature"
+    "effects.5.name": "Bestial Nature",
+    "description": "Shifters, also called the beast-touched, descend from people touched by full or partial lycanthropy. They keep a humanoid appearance and never take a fully animal form, but when they shift, their bestial features grow stronger for a while.\n\nThey have a height and build similar to humans, though they are often more agile. Their faces can show large eyes, pointed ears, prominent canines, and hair that resembles fur. Even while shifted, they remain clearly humanoid.",
+    "effects.1.description": "You are a Humanoid. You choose Medium (4 to 7 feet) or Small (2 to 4 feet) size when you take this species.",
+    "effects.2.description": "You gain proficiency in one skill of your choice among Acrobatics, Athletics, Intimidation, and Survival.",
+    "effects.3.description": "As a Bonus Action, you take on a more bestial appearance for 1 minute, or until you return to your normal form with another Bonus Action. When you shift, you gain Temporary Hit Points equal to twice your Proficiency Bonus. You can shift a number of times equal to your Proficiency Bonus, and you regain all uses when you finish a Long Rest.",
+    "effects.4.description": "Shifting uses.",
+    "effects.5.description": "When you take this species, you choose which benefit you gain when you shift: Beasthide, Longtooth, Swiftstride, or Wildhunt."
   },
   "warforged": {
-    "_es": "736bb432",
+    "_es": "5c59264b",
     "name": "Warforged",
     "tagline": "Made for war, alive by accident",
     "effects.2.name": "Construct",
@@ -128,6 +190,13 @@
     "effects.5.name": "Sentinel's Rest",
     "effects.6.name": "Specialized Design: tool",
     "effects.7.name": "Specialized Design",
-    "effects.8.name": "Tireless"
+    "effects.8.name": "Tireless",
+    "description": "Warforged are mechanical beings created as weapons for the Last War. The breakthrough that gave them life produced something unexpected: sentient creatures built of wood and metal, able to feel pain and emotion.\n\nThey combine organic and inorganic matter. Rootlike cords form alchemical muscles around a frame of steel, darkwood, or stone, protected by plating. Each warforged has individual modifications, and artificers can customize their face, limbs, and armor.",
+    "effects.2.description": "You are a Construct. You choose Medium (6 to 8 feet) or Small (3 to 4 feet) size when you take this species.",
+    "effects.3.description": "You have Resistance to Poison damage and Advantage on saving throws to avoid or end the Poisoned condition.",
+    "effects.4.description": "You gain +1 to AC. In addition, armor you have donned can't be removed against your will while you are alive.",
+    "effects.5.description": "You don't need to sleep, and magic can't put you to sleep. You can finish a Long Rest in 6 hours if you spend them inactive and motionless: you appear inert but remain conscious.",
+    "effects.7.description": "You gain proficiency in one skill and one tool of your choice.",
+    "effects.8.description": "You don't gain Exhaustion levels from dehydration, malnutrition, or suffocation."
   }
 }
