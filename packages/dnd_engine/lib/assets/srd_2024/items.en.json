@@ -88,8 +88,9 @@
     "name": "Sling Bullets"
   },
   "burglars-pack": {
-    "_es": "583cd90c",
-    "name": "Burglar's Pack"
+    "_es": "d7226bc0",
+    "name": "Burglar's Pack",
+    "description": "Contains: Backpack, Ball Bearings, Bell, 10 × Candle, Crowbar, Hooded Lantern, 7 × Oil, 5 × Rations, Rope, Tinderbox, Waterskin."
   },
   "calligraphers-supplies": {
     "_es": "2fb70221",
@@ -168,8 +169,9 @@
     "name": "Dice Set"
   },
   "diplomats-pack": {
-    "_es": "6b9b97f1",
-    "name": "Diplomat's Pack"
+    "_es": "6a74bb35",
+    "name": "Diplomat's Pack",
+    "description": "Contains: Chest, Fine Clothes, Ink, 5 × Ink Pen, Lamp, 2 × Map or Scroll Case, 4 × Oil, 5 × Paper, 5 × Parchment, Perfume, Tinderbox."
   },
   "disguise-kit": {
     "_es": "fd2374d7",
@@ -188,20 +190,23 @@
     "name": "Dulcimer"
   },
   "dungeoneers-pack": {
-    "_es": "aee5d70d",
-    "name": "Dungeoneer's Pack"
+    "_es": "c2b6ac54",
+    "name": "Dungeoneer's Pack",
+    "description": "Contains: Backpack, Caltrops, Crowbar, 2 × Oil, 10 × Rations, Rope, Tinderbox, 10 × Torch, Waterskin."
   },
   "emblem": {
     "_es": "c38a27f5",
     "name": "Emblem"
   },
   "entertainers-pack": {
-    "_es": "c3c6685e",
-    "name": "Entertainer's Pack"
+    "_es": "1b803720",
+    "name": "Entertainer's Pack",
+    "description": "Contains: Backpack, Bedroll, Bell, Bullseye Lantern, 3 × Costume, Mirror, 8 × Oil, 9 × Rations, Tinderbox, Waterskin."
   },
   "explorers-pack": {
-    "_es": "f6e5ae08",
-    "name": "Explorer's Pack"
+    "_es": "28726c82",
+    "name": "Explorer's Pack",
+    "description": "Contains: Backpack, Bedroll, 2 × Oil, 10 × Rations, Rope, Tinderbox, 10 × Torch, Waterskin."
   },
   "flask": {
     "_es": "54ed53b0",
@@ -384,8 +389,9 @@
     "name": "Pouch"
   },
   "priests-pack": {
-    "_es": "e22d78f8",
-    "name": "Priest's Pack"
+    "_es": "2676e07c",
+    "name": "Priest's Pack",
+    "description": "Contains: Backpack, Blanket, Holy Water, Lamp, 7 × Rations, Robe, Tinderbox."
   },
   "quiver": {
     "_es": "03221141",
@@ -420,8 +426,9 @@
     "name": "Sack"
   },
   "scholars-pack": {
-    "_es": "30759838",
-    "name": "Scholar's Pack"
+    "_es": "e4a96187",
+    "name": "Scholar's Pack",
+    "description": "Contains: Backpack, Book, Ink, Ink Pen, Lamp, 10 × Oil, 10 × Parchment, Tinderbox."
   },
   "shawm": {
     "_es": "e26a09fe",
