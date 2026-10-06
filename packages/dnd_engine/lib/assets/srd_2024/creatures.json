@@ -70,7 +70,8 @@
         "attackBonus": "4",
         "reach": "5 pies",
         "damage": "1",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 2 (1d4) de daño de veneno."
       }
     ],
     "hitDice": "1d4 - 1"
@@ -511,7 +512,8 @@
         "attackBonus": "2",
         "reach": "5 pies",
         "damage": "1",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 3 (1d6) de daño de veneno."
       }
     ],
     "hitDice": "1d4 - 1"
@@ -1661,7 +1663,8 @@
         "attackBonus": "6",
         "reach": "10 pies",
         "damage": "1d4+4",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 4 (1d8) de daño de veneno."
       }
     ],
     "hitDice": "2d8 + 2"
@@ -1701,7 +1704,8 @@
         "attackBonus": "5",
         "reach": "5 pies",
         "damage": "1d4+3",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 5 (2d4) de daño de veneno."
       }
     ],
     "hitDice": "2d8 + 2"
@@ -1771,7 +1775,8 @@
         "attackBonus": "4",
         "reach": "5 pies",
         "damage": "1d6+2",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 5 (2d4) de daño de veneno."
       }
     ],
     "hitDice": "5d8"
@@ -2095,7 +2100,8 @@
         "attackBonus": "5",
         "reach": "5 pies",
         "damage": "1d8+3",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 7 (2d6) de daño de veneno."
       },
       {
         "name": "Telaraña (recarga 5–6)",
@@ -2362,7 +2368,7 @@
         "reach": "5 pies",
         "damage": "1d6+2",
         "damageType": "piercing",
-        "description": "Si el objetivo es una criatura Mediana o más pequeña, tendrá el estado de agarrada (CD 12 para escapar)."
+        "description": "Más 5 (2d4) de daño de veneno. Si el objetivo es una criatura Mediana o más pequeña, tendrá el estado de agarrada (CD 12 para escapar)."
       },
       {
         "name": "Engullir",
@@ -2448,7 +2454,8 @@
         "attackBonus": "5",
         "reach": "5 pies",
         "damage": "1d6+3",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 7 (2d6) de daño de veneno."
       },
       {
         "name": "Cambio de forma",
@@ -2547,7 +2554,8 @@
         "attackBonus": "5",
         "reach": "5 pies",
         "damage": "1d4+3",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 7 (2d6) de daño radiante."
       },
       {
         "name": "Arranque de ingenio (2/día)",
@@ -2720,7 +2728,8 @@
         "attackBonus": "4",
         "reach": "5 pies",
         "damage": "1d4+2",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 3 (1d6) de daño de veneno."
       }
     ],
     "hitDice": "2d4"
@@ -4234,14 +4243,16 @@
         "attackBonus": "4",
         "reach": "5 pies",
         "damage": "1d6+2",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 2 (1d4) de daño cortante si la tirada de ataque tenía ventaja."
       },
       {
         "name": "Arco corto",
         "attackBonus": "4",
         "reach": "80/320 pies",
         "damage": "1d6+2",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 2 (1d4) de daño perforante si la tirada de ataque tenía ventaja."
       },
       {
         "name": "Huida veloz",
@@ -4400,7 +4411,8 @@
         "attackBonus": "3",
         "reach": "5 pies",
         "damage": "1d4+1",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 1 de daño necrótico."
       }
     ],
     "hitDice": "2d8"
@@ -4481,7 +4493,8 @@
         "attackBonus": "3",
         "reach": "150/600 pies",
         "damage": "1d8+1",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 7 (3d4) de daño de veneno."
       }
     ],
     "hitDice": "2d8 + 2"
@@ -4572,7 +4585,8 @@
         "attackBonus": "4",
         "reach": "5 pies",
         "damage": "1d6+2",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 3 (1d6) de daño necrótico."
       }
     ],
     "hitDice": "5d8"
@@ -4843,7 +4857,7 @@
         "reach": "10 pies",
         "damage": "2d6+4",
         "damageType": "bludgeoning",
-        "description": "Si el objetivo es una criatura Enorme o más pequeña y el alce recorre al menos 20 pies en línea recta hacia ella justo antes de acertarle, esta recibirá 5 (2d4) de daño contundente adicional y tendrá el estado de derribada."
+        "description": "Más 5 (2d4) de daño radiante. Si el objetivo es una criatura Enorme o más pequeña y el alce recorre al menos 20 pies en línea recta hacia ella justo antes de acertarle, esta recibirá 5 (2d4) de daño contundente adicional y tendrá el estado de derribada."
       }
     ],
     "hitDice": "5d12 + 10"
@@ -4954,7 +4968,7 @@
         "reach": "5 pies",
         "damage": "2d6+3",
         "damageType": "slashing",
-        "description": "Si el objetivo es una criatura Grande o más pequeña, tendrá el estado de agarrada (CD 13 para escapar)."
+        "description": "Más 3 (1d6) de daño de ácido. Si el objetivo es una criatura Grande o más pequeña, tendrá el estado de agarrada (CD 13 para escapar)."
       },
       {
         "name": "Chorro de ácido (recarga 6)",
@@ -5094,7 +5108,7 @@
         "reach": "5 pies",
         "damage": "1d10+3",
         "damageType": "piercing",
-        "description": "Si este daño reduce a 0 los puntos de golpe del objetivo, pasará a estar estable y tendrá el estado de envenenado durante 1 hora. Mientras esté envenenado, también tendrá el estado de paralizado."
+        "description": "Más 9 (2d8) de daño de veneno. Si este daño reduce a 0 los puntos de golpe del objetivo, pasará a estar estable y tendrá el estado de envenenado durante 1 hora. Mientras esté envenenado, también tendrá el estado de paralizado."
       },
       {
         "name": "Salto etéreo",
@@ -5425,14 +5439,16 @@
         "attackBonus": "7",
         "reach": "5 pies",
         "damage": "1d6+4",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 17 (5d6) de daño de veneno y el objetivo tendrá el estado de envenenado hasta el principio del siguiente turno del asesino."
       },
       {
         "name": "Ballesta ligera",
         "attackBonus": "7",
         "reach": "80/320 pies",
         "damage": "1d8+4",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 21 (6d6) de daño de veneno."
       },
       {
         "name": "Acción astuta",
@@ -5498,7 +5514,8 @@
         "attackBonus": "14",
         "reach": "10 pies",
         "damage": "3d8+8",
-        "damageType": "force"
+        "damageType": "force",
+        "description": "Más 22 (4d10) de daño de relámpago y el objetivo no puede llevar a cabo reacciones hasta el principio del siguiente turno del balor."
       },
       {
         "name": "Látigo de llamas",
@@ -5506,7 +5523,7 @@
         "reach": "30 pies",
         "damage": "3d6+8",
         "damageType": "force",
-        "description": "Si el objetivo es una criatura Enorme o más pequeña, el balor la atrae hasta 25 pies en línea recta hacia él y dicho objetivo tiene el estado de derribado."
+        "description": "Más 17 (5d6) de daño de fuego. Si el objetivo es una criatura Enorme o más pequeña, el balor la atrae hasta 25 pies en línea recta hacia él y dicho objetivo tiene el estado de derribado."
       },
       {
         "name": "Teletransporte",
@@ -5541,7 +5558,8 @@
         "attackBonus": "5",
         "reach": "5 pies",
         "damage": "2d6+3",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 7 (2d6) de daño de veneno."
       },
       {
         "name": "Mirada petrificadora (recarga 4–6)",
@@ -5632,7 +5650,8 @@
         "attackBonus": "10",
         "reach": "10 pies",
         "damage": "2d12+6",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 11 (2d10) de daño de relámpago."
       },
       {
         "name": "Aliento de relámpago (recarga 5–6)",
@@ -5772,7 +5791,7 @@
         "reach": "10 pies",
         "damage": "1d6+4",
         "damageType": "bludgeoning",
-        "description": "Si el objetivo es una criatura Mediana o más pequeña, la broza movediza atraerá al objetivo 5 pies en línea recta hacia ella."
+        "description": "Más 5 (2d4) de daño de relámpago. Si el objetivo es una criatura Mediana o más pequeña, la broza movediza atraerá al objetivo 5 pies en línea recta hacia ella."
       },
       {
         "name": "Absorber",
@@ -5973,14 +5992,16 @@
         "attackBonus": "5",
         "reach": "5 pies",
         "damage": "2d6+3",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 4 (1d8) de daño radiante."
       },
       {
         "name": "Ballesta pesada",
         "attackBonus": "2",
         "reach": "100/400 pies",
         "damage": "2d10",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 4 (1d8) de daño radiante."
       },
       {
         "name": "Parada",
@@ -6159,14 +6180,16 @@
         "attackBonus": "4",
         "reach": "5 pies",
         "damage": "2d6+2",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 3 (1d6) de daño de veneno."
       },
       {
         "name": "Arco largo",
         "attackBonus": "4",
         "reach": "150/600 pies",
         "damage": "1d8+2",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 5 (2d4) de daño de veneno."
       }
     ],
     "hitDice": "9d8 + 18"
@@ -6272,7 +6295,8 @@
         "attackBonus": "5",
         "reach": "5 pies",
         "damage": "1d10+3",
-        "damageType": "bludgeoning"
+        "damageType": "bludgeoning",
+        "description": "Más 3 (1d6) de daño de fuego."
       }
     ],
     "hitDice": "6d8 + 12"
@@ -6596,7 +6620,8 @@
         "attackBonus": "5",
         "reach": "5 pies",
         "damage": "1d10+3",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 3 (1d6) de daño de relámpago."
       },
       {
         "name": "Aliento de relámpago (recarga 5–6)",
@@ -6650,7 +6675,8 @@
         "attackBonus": "4",
         "reach": "5 pies",
         "damage": "1d8+2",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 2 (1d4) de daño de frío."
       },
       {
         "name": "Aliento gélido (recarga 5–6)",
@@ -6968,7 +6994,8 @@
         "attackBonus": "4",
         "reach": "5 pies",
         "damage": "1d6+2",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 2 (1d4) de daño de ácido."
       },
       {
         "name": "Aliento ácido (recarga 5–6)",
@@ -7016,7 +7043,8 @@
         "attackBonus": "6",
         "reach": "5 pies",
         "damage": "1d10+4",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 3 (1d6) de daño de fuego."
       },
       {
         "name": "Aliento de fuego (recarga 5–6)",
@@ -7070,7 +7098,8 @@
         "attackBonus": "4",
         "reach": "5 pies",
         "damage": "1d10+2",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 3 (1d6) de daño de veneno."
       },
       {
         "name": "Aliento venenoso (recarga 5–6)",
@@ -7172,7 +7201,8 @@
         "attackBonus": "8",
         "reach": "5 pies",
         "damage": "1d6+4",
-        "damageType": "bludgeoning"
+        "damageType": "bludgeoning",
+        "description": "Más 18 (4d8) de daño radiante."
       },
       {
         "name": "Lanzamiento de conjuros",
@@ -7262,7 +7292,8 @@
         "attackBonus": "10",
         "reach": "10 pies",
         "damage": "2d8+6",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 9 (2d8) de daño de fuego."
       },
       {
         "name": "Arrojar llama",
@@ -7397,7 +7428,8 @@
         "attackBonus": "14",
         "reach": "10 pies",
         "damage": "4d6+8",
-        "damageType": "force"
+        "damageType": "force",
+        "description": "Más 21 (6d6) de daño de fuego."
       },
       {
         "name": "Mordisco",
@@ -7522,7 +7554,8 @@
         "attackBonus": "10",
         "reach": "10 pies",
         "damage": "3d6+5",
-        "damageType": "bludgeoning"
+        "damageType": "bludgeoning",
+        "description": "Más 18 (4d8) de daño de frío."
       },
       {
         "name": "Lanza de hielo",
@@ -7530,7 +7563,7 @@
         "reach": "5 pies o 30/120 pies a distancia",
         "damage": "2d8+5",
         "damageType": "piercing",
-        "description": "Hasta el final de su siguiente turno, el objetivo no podrá usar una acción adicional ni llevar a cabo una reacción, su velocidad se reducirá en 10 pies y en su turno podrá moverse o realizar una acción, pero no ambas cosas. Acierto o fallo: la lanza regresa mágicamente a la mano del diablo inmediatamente después de un ataque a distancia."
+        "description": "Más 10 (3d6) de daño de frío. Hasta el final de su siguiente turno, el objetivo no podrá usar una acción adicional ni llevar a cabo una reacción, su velocidad se reducirá en 10 pies y en su turno podrá moverse o realizar una acción, pero no ambas cosas. Acierto o fallo: la lanza regresa mágicamente a la mano del diablo inmediatamente después de un ataque a distancia."
       },
       {
         "name": "Muro gélido (recarga 6)",
@@ -7666,7 +7699,8 @@
         "attackBonus": "8",
         "reach": "10 pies",
         "damage": "2d10+4",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 18 (4d8) de daño de veneno y el objetivo tendrá el estado de envenenado hasta el principio del siguiente turno del diablo. Mientras esté envenenado, el objetivo no podrá recuperar puntos de golpe."
       },
       {
         "name": "Garra",
@@ -7726,7 +7760,8 @@
         "attackBonus": "9",
         "reach": "5 pies",
         "damage": "2d6+5",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 7 (2d6) de daño de relámpago."
       },
       {
         "name": "Golpe de tormenta",
@@ -7897,7 +7932,8 @@
         "attackBonus": "12",
         "reach": "10 pies",
         "damage": "2d8+7",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 5 (1d10) de daño de relámpago."
       },
       {
         "name": "Aliento de relámpago (recarga 5–6)",
@@ -8005,7 +8041,8 @@
         "attackBonus": "16",
         "reach": "15 pies",
         "damage": "2d8+9",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 11 (2d10) de daño de relámpago."
       },
       {
         "name": "Aliento de relámpago (recarga 5–6)",
@@ -8107,7 +8144,8 @@
         "attackBonus": "9",
         "reach": "10 pies",
         "damage": "2d6+5",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 5 (1d10) de daño de relámpago."
       },
       {
         "name": "Aliento de relámpago (recarga 5–6)",
@@ -8166,7 +8204,8 @@
         "attackBonus": "11",
         "reach": "10 pies",
         "damage": "2d6+6",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 4 (1d8) de daño de frío."
       },
       {
         "name": "Aliento gélido (recarga 5–6)",
@@ -8240,7 +8279,8 @@
         "attackBonus": "14",
         "reach": "15 pies",
         "damage": "2d8+8",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 7 (2d6) de daño de frío."
       },
       {
         "name": "Aliento gélido (recarga 5–6)",
@@ -8310,7 +8350,8 @@
         "attackBonus": "7",
         "reach": "10 pies",
         "damage": "2d4+4",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 2 (1d4) de daño de frío."
       },
       {
         "name": "Aliento gélido (recarga 5–6)",
@@ -8370,7 +8411,8 @@
         "attackBonus": "12",
         "reach": "10 pies",
         "damage": "2d8+7",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 5 (1d10) de daño de relámpago."
       },
       {
         "name": "Aliento de relámpago (recarga 5–6)",
@@ -8493,7 +8535,8 @@
         "attackBonus": "16",
         "reach": "15 pies",
         "damage": "2d8+9",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 9 (2d8) de daño de relámpago."
       },
       {
         "name": "Aliento de relámpago (recarga 5–6)",
@@ -8677,7 +8720,8 @@
         "attackBonus": "11",
         "reach": "10 pies",
         "damage": "2d10+6",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 4 (1d8) de daño de ácido."
       },
       {
         "name": "Aliento ácido (recarga 5–6)",
@@ -8792,7 +8836,8 @@
         "attackBonus": "15",
         "reach": "15 pies",
         "damage": "2d10+8",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 9 (2d8) de daño de ácido."
       },
       {
         "name": "Aliento ácido (recarga 5–6)",
@@ -8968,7 +9013,8 @@
         "attackBonus": "14",
         "reach": "10 pies",
         "damage": "2d8+8",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 4 (1d8) de daño de fuego."
       },
       {
         "name": "Aliento de fuego (recarga 5–6)",
@@ -9086,7 +9132,8 @@
         "attackBonus": "17",
         "reach": "15 pies",
         "damage": "2d8+10",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 9 (2d8) de daño de fuego."
       },
       {
         "name": "Aliento de fuego (recarga 5–6)",
@@ -9264,7 +9311,8 @@
         "attackBonus": "11",
         "reach": "10 pies",
         "damage": "2d10+6",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 4 (1d8) de daño de fuego."
       },
       {
         "name": "Aliento de fuego (recarga 5–6)",
@@ -9382,7 +9430,8 @@
         "attackBonus": "14",
         "reach": "15 pies",
         "damage": "2d10+8",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 7 (2d6) de daño de fuego."
       },
       {
         "name": "Aliento de fuego (recarga 5–6)",
@@ -9553,7 +9602,8 @@
         "attackBonus": "13",
         "reach": "10 pies",
         "damage": "2d8+8",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 4 (1d8) de daño de frío."
       },
       {
         "name": "Aliento gélido (recarga 5–6)",
@@ -9669,7 +9719,8 @@
         "attackBonus": "17",
         "reach": "15 pies",
         "damage": "2d8+10",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 9 (2d8) de daño de frío."
       },
       {
         "name": "Aliento gélido (recarga 5–6)",
@@ -9848,7 +9899,8 @@
         "attackBonus": "11",
         "reach": "10 pies",
         "damage": "2d6+6",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 4 (1d8) de daño de ácido."
       },
       {
         "name": "Aliento ácido (recarga 5–6)",
@@ -9959,7 +10011,8 @@
         "attackBonus": "15",
         "reach": "15 pies",
         "damage": "2d8+8",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 9 (2d8) de daño de ácido."
       },
       {
         "name": "Aliento ácido (recarga 5–6)",
@@ -10069,7 +10122,8 @@
         "attackBonus": "7",
         "reach": "10 pies",
         "damage": "2d4+4",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 3 (1d6) de daño de ácido."
       },
       {
         "name": "Aliento ácido (recarga 5–6)",
@@ -10124,7 +10178,8 @@
         "attackBonus": "14",
         "reach": "10 pies",
         "damage": "1d10+8",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 5 (2d4) de daño de fuego."
       },
       {
         "name": "Aliento de fuego (recarga 5–6)",
@@ -10228,7 +10283,8 @@
         "attackBonus": "17",
         "reach": "15 pies",
         "damage": "2d8+10",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 10 (3d6) de daño de fuego."
       },
       {
         "name": "Aliento de fuego (recarga 5–6)",
@@ -10330,7 +10386,8 @@
         "attackBonus": "10",
         "reach": "10 pies",
         "damage": "2d6+6",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 3 (1d6) de daño de fuego."
       },
       {
         "name": "Aliento de fuego (recarga 5–6)",
@@ -10389,7 +10446,7 @@
         "reach": "15 pies",
         "damage": "3d10+7",
         "damageType": "piercing",
-        "description": "Estar bajo el agua no otorga resistencia a este daño de fuego."
+        "description": "Más 7 (2d6) de daño de fuego. Estar bajo el agua no otorga resistencia a este daño de fuego."
       },
       {
         "name": "Aliento de vapor (recarga 5–6)",
@@ -10450,7 +10507,8 @@
         "attackBonus": "11",
         "reach": "10 pies",
         "damage": "2d8+6",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 7 (2d6) de daño de veneno."
       },
       {
         "name": "Aliento venenoso (recarga 5–6)",
@@ -10556,7 +10614,8 @@
         "attackBonus": "15",
         "reach": "15 pies",
         "damage": "2d8+8",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 10 (3d6) de daño de veneno."
       },
       {
         "name": "Aliento venenoso (recarga 5–6)",
@@ -10659,7 +10718,8 @@
         "attackBonus": "7",
         "reach": "10 pies",
         "damage": "2d6+4",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 7 (2d6) de daño de veneno."
       },
       {
         "name": "Aliento venenoso (recarga 5–6)",
@@ -10801,7 +10861,8 @@
         "attackBonus": "5",
         "reach": "5 pies",
         "damage": "1d8+3",
-        "damageType": "bludgeoning"
+        "damageType": "bludgeoning",
+        "description": "Más 2 (1d4) de daño de veneno."
       },
       {
         "name": "Voluta verdeante",
@@ -11659,7 +11720,8 @@
         "attackBonus": "8",
         "reach": "5 pies",
         "damage": "2d8+4",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 11 (2d10) de daño necrótico."
       },
       {
         "name": "Cuerda enmarañadora (requiere la cuerda mágica)",
@@ -11702,7 +11764,8 @@
         "attackBonus": "5",
         "reach": "5 pies",
         "damage": "1d8+3",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 11 (2d10) de daño de veneno."
       },
       {
         "name": "Pinza",
@@ -12071,14 +12134,16 @@
         "attackBonus": "4",
         "reach": "5 pies",
         "damage": "1d6+2",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 7 (2d6) de daño de veneno."
       },
       {
         "name": "Ballesta de mano",
         "attackBonus": "4",
         "reach": "30/120 pies",
         "damage": "1d6+2",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 7 (2d6) de daño de veneno."
       },
       {
         "name": "Acción astuta",
@@ -12139,7 +12204,8 @@
         "attackBonus": "4",
         "reach": "5 pies",
         "damage": "1d6+2",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 2 (1d4) de daño de veneno y el objetivo tendrá el estado de envenenado hasta el principio del siguiente turno del ettercap."
       },
       {
         "name": "Hebra de telaraña (recarga 5–6)",
@@ -12231,7 +12297,7 @@
         "reach": "5 pies o 20/60 pies a distancia",
         "damage": "1d6",
         "damageType": "piercing",
-        "description": "Si el objetivo es una criatura, su velocidad se reducirá en 10 pies hasta el final de su siguiente turno. Acierto o fallo: la lanza regresa mágicamente a la mano del sirénido inmediatamente después de un ataque a distancia."
+        "description": "Más 2 (1d4) de daño de frío. Si el objetivo es una criatura, su velocidad se reducirá en 10 pies hasta el final de su siguiente turno. Acierto o fallo: la lanza regresa mágicamente a la mano del sirénido inmediatamente después de un ataque a distancia."
       }
     ],
     "hitDice": "2d8 + 2"
@@ -12366,7 +12432,8 @@
         "attackBonus": "4",
         "reach": "5 pies",
         "damage": "1d8+2",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 7 (2d6) de daño necrótico."
       },
       {
         "name": "Lanzamiento de conjuros",
@@ -12557,7 +12624,8 @@
         "attackBonus": "5",
         "reach": "5 pies",
         "damage": "1d8+3",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 9 (2d8) de daño necrótico."
       }
     ],
     "hitDice": "8d8"
@@ -12602,14 +12670,16 @@
         "attackBonus": "9",
         "reach": "10 pies",
         "damage": "2d12+6",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 9 (2d8) de daño de frío."
       },
       {
         "name": "Gran arco",
         "attackBonus": "9",
         "reach": "150/600 pies",
         "damage": "2d10+6",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 7 (2d6) de daño de frío y la velocidad del objetivo se reducirá en 10 pies hasta el final de su siguiente turno."
       },
       {
         "name": "Grito de guerra (recarga 5–6)",
@@ -12659,14 +12729,16 @@
         "attackBonus": "11",
         "reach": "10 pies",
         "damage": "4d6+7",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 10 (3d6) de daño de fuego."
       },
       {
         "name": "Lanzamiento de martillo",
         "attackBonus": "11",
         "reach": "60/240 pies",
         "damage": "3d10+7",
-        "damageType": "bludgeoning"
+        "damageType": "bludgeoning",
+        "description": "Más 4 (1d8) de daño de fuego y el objetivo será empujado hasta 15 pies respecto al gigante en línea recta y tendrá desventaja en la próxima tirada de ataque que haga antes del final de su siguiente turno."
       }
     ],
     "hitDice": "13d12 + 78"
@@ -12755,7 +12827,8 @@
         "attackBonus": "12",
         "reach": "10 pies",
         "damage": "3d8+8",
-        "damageType": "bludgeoning"
+        "damageType": "bludgeoning",
+        "description": "Más 7 (2d6) de daño de trueno."
       },
       {
         "name": "Nube de tormenta",
@@ -12859,7 +12932,8 @@
         "attackBonus": "14",
         "reach": "10 pies",
         "damage": "4d6+9",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 13 (3d8) de daño de relámpago."
       },
       {
         "name": "Rayo",
@@ -13272,7 +13346,8 @@
         "attackBonus": "5",
         "reach": "5 pies",
         "damage": "1d6+3",
-        "damageType": "bludgeoning"
+        "damageType": "bludgeoning",
+        "description": "Más 2 (1d4) de daño psíquico."
       }
     ],
     "hitDice": "2d8 + 2"
@@ -13354,7 +13429,8 @@
         "attackBonus": "7",
         "reach": "10 pies",
         "damage": "2d6+4",
-        "damageType": "bludgeoning"
+        "damageType": "bludgeoning",
+        "description": "Más 7 (2d6) de daño de fuerza."
       },
       {
         "name": "Protección",
@@ -13582,7 +13658,8 @@
         "attackBonus": "7",
         "reach": "10 pies",
         "damage": "2d6+4",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 24 (7d6) de daño de veneno y el objetivo tendrá el estado de envenenado hasta el principio del siguiente turno del guiverno."
       },
       {
         "name": "Mordisco",
@@ -13634,7 +13711,8 @@
         "attackBonus": "14",
         "reach": "10 pies",
         "damage": "2d6+9",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 35 (10d6) de daño de veneno."
       },
       {
         "name": "Mordisco",
@@ -13746,7 +13824,8 @@
         "attackBonus": "9",
         "reach": "5 pies",
         "damage": "1d10+5",
-        "damageType": "bludgeoning"
+        "damageType": "bludgeoning",
+        "description": "Más 6 (1d12) de daño de ácido y los puntos de golpe máximos del objetivo se reducen en una cantidad igual al daño de ácido sufrido."
       },
       {
         "name": "Prisa (recarga 5–6)",
@@ -13808,7 +13887,8 @@
         "attackBonus": "7",
         "reach": "5 pies",
         "damage": "2d8+4",
-        "damageType": "bludgeoning"
+        "damageType": "bludgeoning",
+        "description": "Más 4 (1d8) de daño de relámpago."
       }
     ],
     "hitDice": "15d8 + 60"
@@ -13858,7 +13938,8 @@
         "attackBonus": "12",
         "reach": "10 pies",
         "damage": "3d8+7",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 10 (3d6) de daño de fuego."
       },
       {
         "name": "Rayo ardiente",
@@ -13915,7 +13996,8 @@
         "attackBonus": "10",
         "reach": "5 pies",
         "damage": "2d8+6",
-        "damageType": "bludgeoning"
+        "damageType": "bludgeoning",
+        "description": "Más 9 (2d8) de daño de fuerza."
       },
       {
         "name": "Rayo de fuerza",
@@ -13982,7 +14064,8 @@
         "attackBonus": "7",
         "reach": "5 pies",
         "damage": "1d4+4",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 9 (2d8) de daño de veneno."
       },
       {
         "name": "Salto",
@@ -14623,7 +14706,8 @@
         "attackBonus": "10",
         "reach": "5 pies",
         "damage": "2d6+6",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 13 (2d12) de daño de fuego."
       },
       {
         "name": "Arrojar llama",
@@ -14752,14 +14836,16 @@
         "attackBonus": "4",
         "reach": "5 pies",
         "damage": "1d6+2",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 2 (1d4) de daño cortante si la tirada de ataque tenía ventaja."
       },
       {
         "name": "Arco corto",
         "attackBonus": "4",
         "reach": "80/320 pies",
         "damage": "1d6+2",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 2 (1d4) de daño perforante si la tirada de ataque tenía ventaja."
       },
       {
         "name": "Huida veloz",
@@ -14999,7 +15085,8 @@
         "attackBonus": "5",
         "reach": "5 pies",
         "damage": "1d8+3",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 7 (2d6) de daño psíquico."
       },
       {
         "name": "Lanzamiento de conjuros",
@@ -15679,7 +15766,8 @@
         "attackBonus": "10",
         "reach": "5 pies",
         "damage": "1d10+5",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 7 (2d6) de daño necrótico."
       },
       {
         "name": "Constreñir",
@@ -15743,7 +15831,8 @@
         "attackBonus": "6",
         "reach": "5 pies",
         "damage": "1d4+3",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 14 (4d6) de daño de veneno."
       },
       {
         "name": "Rayo venenoso",
@@ -15796,7 +15885,8 @@
         "attackBonus": "3",
         "reach": "5 pies",
         "damage": "1d4+1",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 2 (1d4) de daño de frío."
       },
       {
         "name": "Aliento de escarcha (recarga 6)",
@@ -15844,7 +15934,8 @@
         "attackBonus": "3",
         "reach": "5 pies",
         "damage": "1d4+1",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 3 (1d6) de daño de fuego."
       },
       {
         "name": "Aliento de fuego (recarga 6)",
@@ -15941,7 +16032,8 @@
         "attackBonus": "2",
         "reach": "5 pies",
         "damage": "1d4",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 2 (1d4) de daño de fuego."
       },
       {
         "name": "Aliento de vapor (recarga 6)",
@@ -16049,7 +16141,7 @@
         "reach": "5 pies",
         "damage": "1d8+3",
         "damageType": "bludgeoning",
-        "description": "Si el objetivo es una criatura Grande o más pequeña, tendrá el estado de agarrada (CD 13 para escapar). Las pruebas de característica para escapar de este agarre tienen desventaja."
+        "description": "Más 4 (1d8) de daño de ácido. Si el objetivo es una criatura Grande o más pequeña, tendrá el estado de agarrada (CD 13 para escapar). Las pruebas de característica para escapar de este agarre tienen desventaja."
       },
       {
         "name": "Cambio de forma",
@@ -16088,7 +16180,8 @@
         "attackBonus": "6",
         "reach": "10 pies",
         "damage": "1d12+4",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 10 (3d6) de daño necrótico."
       },
       {
         "name": "Cornada (recarga 5–6)",
@@ -16174,7 +16267,7 @@
         "reach": "5 pies",
         "damage": "1d10+3",
         "damageType": "bludgeoning",
-        "description": "Si el objetivo es una criatura, quedará maldita. Mientras el objetivo esté maldito, no podrá recuperar puntos de golpe, sus puntos de golpe máximos no volverán a la normalidad cuando termine un descanso largo y estos se reducirán en 10 (3d6) cada 24 horas. Una criatura morirá y se convertirá en polvo si este ataque reduce sus puntos de golpe a 0."
+        "description": "Más 10 (3d6) de daño necrótico. Si el objetivo es una criatura, quedará maldita. Mientras el objetivo esté maldito, no podrá recuperar puntos de golpe, sus puntos de golpe máximos no volverán a la normalidad cuando termine un descanso largo y estos se reducirán en 10 (3d6) cada 24 horas. Una criatura morirá y se convertirá en polvo si este ataque reduce sus puntos de golpe a 0."
       },
       {
         "name": "Mirada espantosa",
@@ -16278,7 +16371,8 @@
         "attackBonus": "7",
         "reach": "10 pies",
         "damage": "1d6+4",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 14 (4d6) de daño de veneno."
       },
       {
         "name": "Rayo necrótico",
@@ -16384,7 +16478,8 @@
         "attackBonus": "8",
         "reach": "10 pies",
         "damage": "2d12+4",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 22 (4d10) de daño de veneno."
       },
       {
         "name": "Lanzamiento de conjuros",
@@ -16480,7 +16575,8 @@
         "attackBonus": "10",
         "reach": "10 pies",
         "damage": "2d10+5",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 11 (2d10) de daño de fuerza."
       },
       {
         "name": "Teletransporte",
@@ -16626,7 +16722,8 @@
         "attackBonus": "7",
         "reach": "10 pies",
         "damage": "1d12+4",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 9 (2d8) de daño necrótico."
       },
       {
         "name": "Rayo de pesadilla",
@@ -16875,7 +16972,8 @@
         "attackBonus": "6",
         "reach": "5 pies",
         "damage": "1d6+4",
-        "damageType": "bludgeoning"
+        "damageType": "bludgeoning",
+        "description": "Más 5 (2d4) de daño radiante."
       }
     ],
     "hitDice": "7d10 + 21"
@@ -17038,7 +17136,8 @@
         "attackBonus": "6",
         "reach": "5 pies",
         "damage": "2d8+4",
-        "damageType": "bludgeoning"
+        "damageType": "bludgeoning",
+        "description": "Más 10 (3d6) de daño de fuego."
       },
       {
         "name": "Trote etéreo",
@@ -17174,7 +17273,8 @@
         "attackBonus": "12",
         "reach": "10 pies",
         "damage": "2d6+7",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 18 (4d8) de daño radiante."
       },
       {
         "name": "Estallido sagrado",
@@ -17453,7 +17553,7 @@
         "reach": "5 pies",
         "damage": "2d6+5",
         "damageType": "slashing",
-        "description": "Si el objetivo es una criatura, quedará maldita. Mientras esté maldita, la criatura no obtendrá beneficio alguno por finalizar un descanso corto o largo."
+        "description": "Más 19 (3d12) de daño necrótico. Si el objetivo es una criatura, quedará maldita. Mientras esté maldita, la criatura no obtendrá beneficio alguno por finalizar un descanso corto o largo."
       },
       {
         "name": "Lanzamiento de conjuros",
@@ -17543,7 +17643,7 @@
         "reach": "10 pies",
         "damage": "2d10+7",
         "damageType": "piercing",
-        "description": "Si el objetivo es una criatura Grande o más pequeña, tendrá el estado de agarrada (CD 17 para escapar) y el de apresada hasta que el agarre termine."
+        "description": "Más 14 (4d6) de daño de fuego. Si el objetivo es una criatura Grande o más pequeña, tendrá el estado de agarrada (CD 17 para escapar) y el de apresada hasta que el agarre termine."
       },
       {
         "name": "Engullir",
@@ -17678,7 +17778,8 @@
         "attackBonus": "5",
         "reach": "5 pies",
         "damage": "1d8+3",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 3 (1d6) de daño de fuego."
       },
       {
         "name": "Aliento de fuego (recarga 5–6)",
@@ -17721,7 +17822,8 @@
         "attackBonus": "5",
         "reach": "5 pies",
         "damage": "1d6+3",
-        "damageType": "bludgeoning"
+        "damageType": "bludgeoning",
+        "description": "Más 5 (2d4) de daño radiante."
       },
       {
         "name": "Llama radiante",
@@ -17795,7 +17897,8 @@
         "attackBonus": "4",
         "reach": "5 pies",
         "damage": "1d6+2",
-        "damageType": "bludgeoning"
+        "damageType": "bludgeoning",
+        "description": "Más 2 (1d4) de daño radiante."
       },
       {
         "name": "Llama radiante",
@@ -17880,7 +17983,8 @@
         "attackBonus": "6",
         "reach": "5 pies",
         "damage": "1d8+4",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 3 (1d6) de daño de veneno."
       },
       {
         "name": "Lanzamiento de conjuros",
@@ -18110,7 +18214,7 @@
         "reach": "5 pies o 20/60 pies a distancia",
         "damage": "2d8+4",
         "damageType": "piercing",
-        "description": "Acierto o fallo: la lanza regresa mágicamente a la mano de la salamandra inmediatamente después de un ataque a distancia."
+        "description": "Más 7 (2d6) de daño de fuego. Acierto o fallo: la lanza regresa mágicamente a la mano de la salamandra inmediatamente después de un ataque a distancia."
       },
       {
         "name": "Constreñir",
@@ -18203,7 +18307,8 @@
         "attackBonus": "7",
         "reach": "10 pies",
         "damage": "1d4+4",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 7 (2d6) de daño del tipo elegido para el atributo Origen dracónico."
       },
       {
         "name": "Aliento de dragón (recarga 5–6)",
@@ -18289,7 +18394,8 @@
         "attackBonus": "4",
         "reach": "5 pies",
         "damage": "1",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 5 (2d4) de daño de veneno."
       }
     ],
     "hitDice": "2d4"
@@ -18350,7 +18456,7 @@
         "reach": "5 pies",
         "damage": "2d10+4",
         "damageType": "bludgeoning",
-        "description": "Si el objetivo es una criatura, quedará maldita. Mientras el objetivo esté maldito, no podrá recuperar puntos de golpe, no obtendrá beneficio alguno por finalizar un descanso largo y sus puntos de golpe máximos se reducirán en 10 (3d6) cada 24 horas. Una criatura morirá y se convertirá en polvo si este ataque reduce sus puntos de golpe a 0."
+        "description": "Más 10 (3d6) de daño necrótico. Si el objetivo es una criatura, quedará maldita. Mientras el objetivo esté maldito, no podrá recuperar puntos de golpe, no obtendrá beneficio alguno por finalizar un descanso largo y sus puntos de golpe máximos se reducirán en 10 (3d6) cada 24 horas. Una criatura morirá y se convertirá en polvo si este ataque reduce sus puntos de golpe a 0."
       },
       {
         "name": "Canalizar energía negativa",
@@ -18470,7 +18576,7 @@
         "reach": "5 pies o 20/60 pies a distancia",
         "damage": "1d4+3",
         "damageType": "piercing",
-        "description": "Si este ataque reduce a 0 los puntos de golpe del objetivo, pasará a estar estable, pero tendrá el estado de envenenado durante 1 hora. Mientras tenga el estado de envenenado, tendrá también el  estado de paralizado."
+        "description": "Más 7 (3d4) de daño necrótico. Si este ataque reduce a 0 los puntos de golpe del objetivo, pasará a estar estable, pero tendrá el estado de envenenado durante 1 hora. Mientras tenga el estado de envenenado, tendrá también el  estado de paralizado."
       },
       {
         "name": "Agilidad de inmortal",
@@ -18583,7 +18689,7 @@
         "reach": "10 pies o 120 pies a distancia",
         "damage": "4d6+8",
         "damageType": "slashing",
-        "description": "Acierto o fallo: la espada regresa mágicamente a la mano del solar o levita a 5 pies o menos de él inmediatamente después de un ataque a distancia."
+        "description": "Más 36 (8d8) de daño radiante. Acierto o fallo: la espada regresa mágicamente a la mano del solar o levita a 5 pies o menos de él inmediatamente después de un ataque a distancia."
       },
       {
         "name": "Arco asesino",
@@ -19261,14 +19367,16 @@
         "attackBonus": "4",
         "reach": "5 pies",
         "damage": "1d8+2",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 4 (1d8) de daño necrótico."
       },
       {
         "name": "Arco necrótico",
         "attackBonus": "4",
         "reach": "150/600 pies",
         "damage": "1d8+2",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 4 (1d8) de daño necrótico."
       },
       {
         "name": "Consumir vida",
@@ -19464,7 +19572,7 @@
         "reach": "5 pies",
         "damage": "1d8+4",
         "damageType": "bludgeoning",
-        "description": "Si el objetivo es una criatura Grande o más pequeña, tendrá el estado de agarrada (CD 14 para escapar) por una de las manos."
+        "description": "Más 7 (2d6) de daño necrótico. Si el objetivo es una criatura Grande o más pequeña, tendrá el estado de agarrada (CD 14 para escapar) por una de las manos."
       },
       {
         "name": "Mordisco (solo en forma de murciélago o vampiro)",
@@ -19538,7 +19646,8 @@
         "attackBonus": "6",
         "reach": "5 pies",
         "damage": "2d6+3",
-        "damageType": "piercing"
+        "damageType": "piercing",
+        "description": "Más 10 (3d6) de daño de veneno."
       },
       {
         "name": "Chillido aturdidor (1/día)",
@@ -19645,7 +19754,8 @@
         "attackBonus": "5",
         "reach": "5 pies",
         "damage": "1d4+3",
-        "damageType": "slashing"
+        "damageType": "slashing",
+        "description": "Más 3 (1d6) de daño radiante."
       }
     ],
     "hitDice": "4d10 + 4"

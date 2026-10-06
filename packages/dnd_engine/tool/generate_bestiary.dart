@@ -646,8 +646,19 @@ Map<String, dynamic> actionJson(
     // Lo que sobra del texto del ataque (daño extra, estados) va a la
     // descripción: el modelo tiene un solo campo de daño y eso alcanza para
     // una pantalla de consulta.
-    final rest =
-        text.split(RegExp('de daño (?:de )?$word\\.\\s*')).skip(1).join(' ');
+    // El daño extra («… contundente más 5 (2d4) de daño radiante.») sigue
+    // pegado al principal; antes el corte por «de daño X.» se lo tragaba.
+    final extra = hit == null
+        ? null
+        : RegExp(r'^\s+(más .+?)(?:\.\s+(.*))?\.?$')
+            .firstMatch(text.substring(hit.end));
+    final rest = extra != null
+        ? [
+            '${extra[1]![0].toUpperCase()}${extra[1]!.substring(1)}.',
+            if (extra[2] != null)
+              '${extra[2]!.trim().replaceFirst(RegExp(r'\.$'), '')}.',
+          ].join(' ')
+        : text.split(RegExp('de daño (?:de )?$word\\.\\s*')).skip(1).join(' ');
     if (rest.trim().isNotEmpty) json['description'] = rest.trim();
   } else {
     json['description'] = text;
