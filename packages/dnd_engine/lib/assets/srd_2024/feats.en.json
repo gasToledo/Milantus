@@ -1,743 +1,884 @@
 {
   "armor-of-shadows": {
-    "_es": "c318813a",
+    "_es": "dc0bf1c3",
     "name": "Armor of Shadows",
-    "effects.1.name": "Armor of Shadows"
+    "effects.1.name": "Armor of Shadows",
+    "effects.1.description": "You can cast Mage Armor on yourself without expending a spell slot."
   },
   "eldritch-smite": {
-    "_es": "196d71ef",
+    "_es": "542cbd4f",
     "name": "Eldritch Smite",
-    "effects.0.name": "Eldritch Smite"
+    "effects.0.name": "Eldritch Smite",
+    "effects.0.description": "Once per turn, when you hit with your pact weapon, you can expend a Pact Magic spell slot to deal an extra 1d8 Force damage plus 1d8 per level of the slot. You can also knock the target Prone if it is Huge or smaller."
   },
   "agonizing-blast": {
-    "_es": "724c31ea",
+    "_es": "438e8ed1",
     "name": "Agonizing Blast",
     "effects.0.name": "Agonizing Blast: cantrip",
-    "effects.1.name": "Agonizing Blast"
+    "effects.1.name": "Agonizing Blast",
+    "effects.1.description": "Requires a Warlock cantrip that deals damage. Choose one, and add your Charisma modifier to its damage rolls. Repeatable: choose a different cantrip each time."
   },
   "repelling-blast": {
-    "_es": "0a63d0a7",
+    "_es": "906132a2",
     "name": "Repelling Blast",
-    "effects.0.name": "Repelling Blast"
+    "effects.0.name": "Repelling Blast",
+    "effects.0.description": "Requires a Warlock cantrip that deals damage through an attack roll. When you hit a Large or smaller creature, you can push it up to 10 feet straight away. Repeatable: choose a different cantrip each time."
   },
   "lifedrinker": {
-    "_es": "93067ce7",
+    "_es": "ad9d5b42",
     "name": "Lifedrinker",
-    "effects.0.name": "Lifedrinker"
+    "effects.0.name": "Lifedrinker",
+    "effects.0.description": "Once per turn, when you hit with your pact weapon, you deal an extra 1d6 Necrotic, Psychic, or Radiant damage, and you can expend one Hit Point Die to regain the roll plus your Constitution modifier (minimum of 1)."
   },
   "gift-of-the-depths": {
-    "_es": "a4d53892",
+    "_es": "77cb466c",
     "name": "Gift of the Depths",
-    "effects.1.name": "Gift of the Depths"
+    "effects.1.name": "Gift of the Depths",
+    "effects.1.description": "You can breathe underwater and have a Swim Speed equal to your Speed. You can also cast Water Breathing once per Long Rest without expending a slot."
   },
   "gift-of-the-protectors": {
-    "_es": "8f404b0b",
+    "_es": "a7e7706f",
     "name": "Gift of the Protectors",
-    "effects.0.name": "Gift of the Protectors"
+    "effects.0.name": "Gift of the Protectors",
+    "effects.0.description": "A new page appears in your Book of Shadows. With your permission, a creature can write its name on it (up to your Charisma modifier, minimum of one). When a named creature is reduced to 0 HP but not killed, it drops to 1 HP instead. Once triggered, it can't be used again until a Long Rest."
   },
   "thirsting-blade": {
-    "_es": "eca005a2",
+    "_es": "21418216",
     "name": "Thirsting Blade",
-    "effects.1.name": "Thirsting Blade"
+    "effects.1.name": "Thirsting Blade",
+    "effects.1.description": "You gain Extra Attack, but only with your pact weapon: you attack twice with it instead of once when you take the Attack action."
   },
   "devouring-blade": {
-    "_es": "3045632a",
+    "_es": "befd808e",
     "name": "Devouring Blade",
-    "effects.1.name": "Devouring Blade"
+    "effects.1.name": "Devouring Blade",
+    "effects.1.description": "Thirsting Blade's Extra Attack grants two extra attacks instead of one."
   },
   "investment-of-the-chain-master": {
-    "_es": "68131ae7",
+    "_es": "f8c174da",
     "name": "Investment of the Chain Master",
-    "effects.0.name": "Investment of the Chain Master"
+    "effects.0.name": "Investment of the Chain Master",
+    "effects.0.description": "Your familiar gains a Swim or Fly Speed of 40 feet; you can command it to attack as a Bonus Action; its Bludgeoning, Piercing, or Slashing damage can become Necrotic or Radiant; it uses your spell save DC; and as a Reaction you can give it Resistance to damage it takes."
   },
   "eldritch-spear": {
-    "_es": "7577d813",
+    "_es": "88e37398",
     "name": "Eldritch Spear",
-    "effects.0.name": "Eldritch Spear"
+    "effects.0.name": "Eldritch Spear",
+    "effects.0.description": "Requires a Warlock cantrip that deals damage and has a range of 10 feet or more. Its range increases by 30 feet times your Warlock level. Repeatable: choose a different cantrip each time."
   },
   "lessons-of-the-first-ones": {
-    "_es": "6147c92f",
+    "_es": "84ca0869",
     "name": "Lessons of the First Ones",
-    "effects.0.name": "Lessons of the First Ones"
+    "effects.0.name": "Lessons of the First Ones",
+    "effects.0.description": "You gain an Origin feat of your choice. Repeatable: choose a different Origin feat each time. Note which one you took: the catalog doesn't apply it on its own yet."
   },
   "master-of-myriad-forms": {
-    "_es": "bd904622",
+    "_es": "409b5a8c",
     "name": "Master of Myriad Forms",
-    "effects.1.name": "Master of Myriad Forms"
+    "effects.1.name": "Master of Myriad Forms",
+    "effects.1.description": "You can cast Alter Self without expending a spell slot."
   },
   "mask-of-many-faces": {
-    "_es": "a2841f3a",
+    "_es": "eea5484c",
     "name": "Mask of Many Faces",
-    "effects.1.name": "Mask of Many Faces"
+    "effects.1.name": "Mask of Many Faces",
+    "effects.1.description": "You can cast Disguise Self without expending a spell slot."
   },
   "eldritch-mind": {
-    "_es": "39450933",
+    "_es": "7ff3ee92",
     "name": "Eldritch Mind",
-    "effects.0.name": "Eldritch Mind"
+    "effects.0.name": "Eldritch Mind",
+    "effects.0.description": "You have Advantage on Constitution saving throws to maintain Concentration."
   },
   "gaze-of-two-minds": {
-    "_es": "62047bf7",
+    "_es": "4a783280",
     "name": "Gaze of Two Minds",
-    "effects.0.name": "Gaze of Two Minds"
+    "effects.0.name": "Gaze of Two Minds",
+    "effects.0.description": "As a Bonus Action, you touch a willing creature and perceive through its senses until the end of your next turn, which you can extend with another Bonus Action. You benefit from its special senses and can cast spells from its space if it is within 60 feet of you."
   },
   "ascendant-step": {
-    "_es": "67f4060e",
+    "_es": "d9778704",
     "name": "Ascendant Step",
-    "effects.1.name": "Ascendant Step"
+    "effects.1.name": "Ascendant Step",
+    "effects.1.description": "You can cast Levitate on yourself without expending a spell slot."
   },
   "otherworldly-leap": {
-    "_es": "ee3abc8a",
+    "_es": "da2f7f04",
     "name": "Otherworldly Leap",
-    "effects.1.name": "Otherworldly Leap"
+    "effects.1.name": "Otherworldly Leap",
+    "effects.1.description": "You can cast Jump on yourself without expending a spell slot."
   },
   "whispers-of-the-grave": {
-    "_es": "37a0dbb0",
+    "_es": "cddf35f3",
     "name": "Whispers of the Grave",
-    "effects.1.name": "Whispers of the Grave"
+    "effects.1.name": "Whispers of the Grave",
+    "effects.1.description": "You can cast Speak with Dead without expending a spell slot."
   },
   "one-with-shadows": {
-    "_es": "f9de9a32",
+    "_es": "ac30ec0b",
     "name": "One with Shadows",
-    "effects.1.name": "One with Shadows"
+    "effects.1.name": "One with Shadows",
+    "effects.1.description": "While you are in Dim Light or Darkness, you can cast Invisibility on yourself without expending a spell slot."
   },
   "fiendish-vigor": {
-    "_es": "76889bea",
+    "_es": "260d589a",
     "name": "Fiendish Vigor",
-    "effects.1.name": "Fiendish Vigor"
+    "effects.1.name": "Fiendish Vigor",
+    "effects.1.description": "You can cast False Life on yourself without expending a spell slot. When cast this way, you don't roll the Temporary Hit Points die: you get the highest number."
   },
   "witch-sight": {
-    "_es": "a321712b",
+    "_es": "d0584211",
     "name": "Witch Sight",
-    "effects.0.name": "Witch Sight"
+    "effects.0.name": "Witch Sight",
+    "effects.0.description": "You have Truesight with a range of 30 feet."
   },
   "misty-visions": {
-    "_es": "ab4509a0",
+    "_es": "1ab4c3ff",
     "name": "Misty Visions",
-    "effects.1.name": "Misty Visions"
+    "effects.1.name": "Misty Visions",
+    "effects.1.description": "You can cast Silent Image without expending a spell slot."
   },
   "visions-of-distant-realms": {
-    "_es": "a8215e66",
+    "_es": "d5411db8",
     "name": "Visions of Distant Realms",
-    "effects.1.name": "Visions of Distant Realms"
+    "effects.1.name": "Visions of Distant Realms",
+    "effects.1.description": "You can cast Arcane Eye without expending a spell slot."
   },
   "devils-sight": {
-    "_es": "2596aa7a",
+    "_es": "cfa22eba",
     "name": "Devil's Sight",
-    "effects.1.name": "Devil's Sight"
+    "effects.1.name": "Devil's Sight",
+    "effects.1.description": "You can see normally in Dim Light and Darkness, both magical and nonmagical, within 120 feet."
   },
   "pact-of-the-chain": {
-    "_es": "88b3b348",
+    "_es": "31a44978",
     "name": "Pact of the Chain",
     "effects.1.name": "Pact of the Chain",
-    "effects.2.name": "Pact Familiar"
+    "effects.2.name": "Pact Familiar",
+    "effects.1.description": "You learn Find Familiar and can cast it as a Magic action without expending a slot. When you cast it, you choose one of the normal forms or a special one: imp, sprite, sphinx of wonder, skeleton, pseudodragon, quasit, slaad tadpole, or venomous snake. In addition, when you take the Attack action, you can forgo one of your attacks to let your familiar attack with its Reaction."
   },
   "pact-of-the-blade": {
-    "_es": "017d55cf",
+    "_es": "94b82ae1",
     "name": "Pact of the Blade",
     "effects.0.name": "Pact Weapon",
-    "effects.2.name": "Pact of the Blade"
+    "effects.2.name": "Pact of the Blade",
+    "effects.2.description": "As a Bonus Action, you conjure a Simple or Martial melee pact weapon, or bond with a magic weapon you touch. While the bond lasts, you are proficient with it and can use it as a Spellcasting Focus. When you attack with it, you can use Charisma instead of Strength or Dexterity for the attack and damage rolls, and make it deal Necrotic, Psychic, or Radiant damage instead of its normal type."
   },
   "pact-of-the-tome": {
-    "_es": "5b9b3689",
+    "_es": "c77009c8",
     "name": "Pact of the Tome",
     "effects.0.name": "Book of Shadows: cantrips",
     "effects.1.name": "Book of Shadows: rituals",
-    "effects.2.name": "Pact of the Tome"
+    "effects.2.name": "Pact of the Tome",
+    "effects.2.description": "When you finish a rest, you conjure your Book of Shadows. Choose three cantrips and two level 1 spells with the Ritual tag, from any class's list, that you don't already have prepared: while you carry the book, you have them prepared and they count as Warlock spells. The book also serves as a Spellcasting Focus."
   },
   "savage-attacker": {
-    "_es": "7cb6ffa7",
+    "_es": "961a6062",
     "name": "Savage Attacker",
-    "effects.0.name": "Savage Attacker"
+    "effects.0.name": "Savage Attacker",
+    "effects.0.description": "Once per turn, when you hit with a weapon, you can reroll the damage and use the better result."
   },
   "tough": {
     "_es": "3a2ee6ba",
     "name": "Tough"
   },
   "skilled": {
-    "_es": "6f1084ee",
+    "_es": "86c51c9a",
     "name": "Skilled",
-    "effects.1.name": "Skillful"
+    "effects.1.name": "Skillful",
+    "effects.1.description": "You gain proficiency in any combination of three skills or tools of your choice."
   },
   "alert": {
-    "_es": "61f68452",
+    "_es": "83079f42",
     "name": "Alert",
-    "effects.1.name": "Alert"
+    "effects.1.name": "Alert",
+    "effects.1.description": "You add your Proficiency Bonus to your Initiative. You can swap your Initiative with that of a willing ally."
   },
   "lucky": {
-    "_es": "ea80f00f",
+    "_es": "d11c9a4d",
     "name": "Lucky",
-    "effects.0.name": "Lucky"
+    "effects.0.name": "Lucky",
+    "effects.0.description": "You have Luck Points equal to your Proficiency Bonus. You can spend them to gain Advantage on a d20 roll or to impose Disadvantage on an attack roll against you."
   },
   "crafter": {
-    "_es": "e9dbbc05",
+    "_es": "ce26bb72",
     "name": "Crafter",
     "effects.0.name": "Crafter: tools",
-    "effects.1.name": "Crafter"
+    "effects.1.name": "Crafter",
+    "effects.1.description": "You gain proficiency with three Artisan's Tools of your choice, get a 20% discount when buying nonmagical items, and can craft faster during a rest."
   },
   "healer": {
-    "_es": "0d1afc19",
+    "_es": "3c77d4a8",
     "name": "Healer",
-    "effects.0.name": "Healer"
+    "effects.0.name": "Healer",
+    "effects.0.description": "Battle Medic: with a Healer's Kit, you can expend one use and tend to a creature within 5 feet as a Utilize action. That creature expends one of its Hit Point Dice, and you roll that die: it regains Hit Points equal to the roll plus your Proficiency Bonus. Healing Rerolls: whenever you roll a die to determine the Hit Points you restore with a spell or with Battle Medic, you can reroll the die if it rolls a 1, and you must use the new roll."
   },
   "musician": {
-    "_es": "a62ecf07",
+    "_es": "ef82028b",
     "name": "Musician",
-    "effects.0.name": "Musician"
+    "effects.0.name": "Musician",
+    "effects.0.description": "You gain proficiency with three Musical Instruments. After a rest, you can play to give Heroic Inspiration to allies (up to your Proficiency Bonus)."
   },
   "fs-defense": {
-    "_es": "6c6e825b",
+    "_es": "33ae3dd2",
     "name": "Defense",
     "effects.1.name": "Defense",
-    "prerequisite.requiredClassFeature": "Fighting Style"
+    "prerequisite.requiredClassFeature": "Fighting Style",
+    "effects.1.description": "While you are wearing armor, you gain a +1 bonus to Armor Class."
   },
   "fs-dueling": {
-    "_es": "9c652449",
+    "_es": "1c1a5822",
     "name": "Dueling",
     "effects.1.name": "Dueling",
-    "prerequisite.requiredClassFeature": "Fighting Style"
+    "prerequisite.requiredClassFeature": "Fighting Style",
+    "effects.1.description": "+2 to damage with a one-handed melee weapon and no other weapon."
   },
   "fs-archery": {
-    "_es": "285e45b6",
+    "_es": "032a128a",
     "name": "Archery",
     "effects.1.name": "Archery",
-    "prerequisite.requiredClassFeature": "Fighting Style"
+    "prerequisite.requiredClassFeature": "Fighting Style",
+    "effects.1.description": "+2 to attack rolls with ranged weapons."
   },
   "fs-great-weapon": {
-    "_es": "a7cc9496",
+    "_es": "8f814887",
     "name": "Great Weapon Fighting",
     "effects.0.name": "Great Weapon",
-    "prerequisite.requiredClassFeature": "Fighting Style"
+    "prerequisite.requiredClassFeature": "Fighting Style",
+    "effects.0.description": "When you roll damage for a melee weapon you are holding with two hands, you can treat any 1 or 2 on the damage dice as a 3. The weapon must have the Two-Handed or Versatile property."
   },
   "great-weapon-master": {
-    "_es": "80a3bae2",
+    "_es": "a8bdbd48",
     "name": "Great Weapon Master",
-    "effects.1.name": "Great Weapon Master"
+    "effects.1.name": "Great Weapon Master",
+    "effects.1.description": "Heavy Weapon Mastery: when you hit a creature with a weapon that has the Heavy property as part of the Attack action on your turn, you can cause the weapon to deal extra damage equal to your Proficiency Bonus. Hew: immediately after you score a Critical Hit with a melee weapon, or reduce a creature to 0 Hit Points with one, you can make one attack with the same weapon as a Bonus Action. Hew triggers with any melee weapon, not only Heavy ones."
   },
   "sharpshooter": {
-    "_es": "a513ca7a",
+    "_es": "b776cea1",
     "name": "Sharpshooter",
-    "effects.1.name": "Sharpshooter"
+    "effects.1.name": "Sharpshooter",
+    "effects.1.description": "You ignore Half Cover and Three-Quarters Cover, you have no Disadvantage when shooting at long range, and you have no Disadvantage on ranged attacks when an enemy is adjacent to you."
   },
   "resilient-wisdom": {
-    "_es": "3fcf4ead",
+    "_es": "da4612a1",
     "name": "Resilient (Wisdom)",
-    "effects.2.name": "Resilient (Wisdom)"
+    "effects.2.name": "Resilient (Wisdom)",
+    "effects.2.description": "You gain proficiency in Wisdom saving throws."
   },
   "actor": {
-    "_es": "576db4da",
+    "_es": "7b8f19a3",
     "name": "Actor",
-    "effects.1.name": "Actor"
+    "effects.1.name": "Actor",
+    "effects.1.description": "Advantage on Deception and Performance checks when impersonating someone; you can mimic voices and sounds."
   },
   "athlete-strength": {
-    "_es": "88f7c3f8",
+    "_es": "ecebd6f8",
     "name": "Athlete (Strength)",
-    "effects.1.name": "Athlete"
+    "effects.1.name": "Athlete",
+    "effects.1.description": "You gain a Climb Speed equal to your Speed. Standing up from Prone costs only 5 feet of movement, and you can make a running Long or High Jump after moving only 5 feet."
   },
   "athlete-dexterity": {
-    "_es": "1866d9ff",
+    "_es": "8e90a4ff",
     "name": "Athlete (Dexterity)",
-    "effects.1.name": "Athlete"
+    "effects.1.name": "Athlete",
+    "effects.1.description": "You gain a Climb Speed equal to your Speed. Standing up from Prone costs only 5 feet of movement, and you can make a running Long or High Jump after moving only 5 feet."
   },
   "charger-strength": {
-    "_es": "956c1988",
+    "_es": "efd28241",
     "name": "Charger (Strength)",
-    "effects.1.name": "Charger"
+    "effects.1.name": "Charger",
+    "effects.1.description": "Improved Dash: when you take the Dash action, your Speed increases by 10 feet for that action. Charge Attack: if you move at least 10 feet in a straight line toward a target immediately before hitting it with a melee attack as part of the Attack action, choose one of these effects: a 1d8 bonus to the attack's damage roll, or push the target up to 10 feet if it is no more than one size larger than you. Only once on each of your turns. (+1 to STR or DEX)"
   },
   "charger-dexterity": {
-    "_es": "dabc366f",
+    "_es": "d7dc7976",
     "name": "Charger (Dexterity)",
-    "effects.1.name": "Charger"
+    "effects.1.name": "Charger",
+    "effects.1.description": "Improved Dash: when you take the Dash action, your Speed increases by 10 feet for that action. Charge Attack: if you move at least 10 feet in a straight line toward a target immediately before hitting it with a melee attack as part of the Attack action, choose one of these effects: a 1d8 bonus to the attack's damage roll, or push the target up to 10 feet if it is no more than one size larger than you. Only once on each of your turns. (+1 to STR or DEX)"
   },
   "chef-constitution": {
-    "_es": "ba38735e",
+    "_es": "cc0026c4",
     "name": "Chef (Constitution)",
-    "effects.2.name": "Chef"
+    "effects.2.name": "Chef",
+    "effects.2.description": "Cook's Utensils: you gain proficiency with Cook's Utensils if you don't already have it. Replenishing Meal: as part of a Short Rest, you can cook special food if you have ingredients and Cook's Utensils on hand, enough for 4 + your Proficiency Bonus creatures; at the end of the rest, any creature that eats it and spends at least one Hit Point Die regains an extra 1d8 Hit Points. Bolstering Treats: with 1 hour of work or when you finish a Long Rest, you can cook a number of treats equal to your Proficiency Bonus; they last 8 hours, and a creature can take a Bonus Action to eat one and gain Temporary Hit Points equal to your Proficiency Bonus."
   },
   "chef-wisdom": {
-    "_es": "f887fc4a",
+    "_es": "ee4aa5d4",
     "name": "Chef (Wisdom)",
-    "effects.2.name": "Chef"
+    "effects.2.name": "Chef",
+    "effects.2.description": "Cook's Utensils: you gain proficiency with Cook's Utensils if you don't already have it. Replenishing Meal: as part of a Short Rest, you can cook special food if you have ingredients and Cook's Utensils on hand, enough for 4 + your Proficiency Bonus creatures; at the end of the rest, any creature that eats it and spends at least one Hit Point Die regains an extra 1d8 Hit Points. Bolstering Treats: with 1 hour of work or when you finish a Long Rest, you can cook a number of treats equal to your Proficiency Bonus; they last 8 hours, and a creature can take a Bonus Action to eat one and gain Temporary Hit Points equal to your Proficiency Bonus."
   },
   "crusher-strength": {
-    "_es": "22a34404",
+    "_es": "0ed0e42e",
     "name": "Crusher (Strength)",
-    "effects.1.name": "Crusher"
+    "effects.1.name": "Crusher",
+    "effects.1.description": "When you deal Bludgeoning damage, you can push the target 5 feet; a Bludgeoning Critical Hit grants Advantage on attacks against the target."
   },
   "crusher-constitution": {
-    "_es": "07c0a923",
+    "_es": "fea8a435",
     "name": "Crusher (Constitution)",
-    "effects.1.name": "Crusher"
+    "effects.1.name": "Crusher",
+    "effects.1.description": "When you deal Bludgeoning damage, you can push the target 5 feet; a Bludgeoning Critical Hit grants Advantage on attacks against the target."
   },
   "crossbow-expert": {
-    "_es": "c5128d4a",
+    "_es": "c866cba5",
     "name": "Crossbow Expert",
-    "effects.1.name": "Crossbow Expert"
+    "effects.1.name": "Crossbow Expert",
+    "effects.1.description": "Ignore Loading: you ignore the Loading property of the Hand Crossbow, Heavy Crossbow, and Light Crossbow. If you are holding one, you can load ammunition into it even if you lack a free hand. Firing in Melee: being within 5 feet of an enemy doesn't impose Disadvantage on your attack rolls with crossbows. Dual Wielding: when you make the extra attack of the Light property, you can add your ability modifier to the damage of that attack if it is made with a crossbow that has the Light property and you aren't already adding it."
   },
   "defensive-duelist": {
-    "_es": "4bf4a1de",
+    "_es": "397910d9",
     "name": "Defensive Duelist",
-    "effects.1.name": "Defensive Duelist"
+    "effects.1.name": "Defensive Duelist",
+    "effects.1.description": "With a Finesse weapon, as a Reaction you add your Proficiency Bonus to your AC against a melee attack."
   },
   "dual-wielder-strength": {
-    "_es": "04368be8",
+    "_es": "33ba3876",
     "name": "Dual Wielder (Strength)",
-    "effects.1.name": "Dual Wielder"
+    "effects.1.name": "Dual Wielder",
+    "effects.1.description": "Enhanced Dual Wielding: when you attack with a Light weapon, the extra Bonus Action attack can be made with any melee weapon that lacks the Two-Handed property. Quick Draw: you can draw or stow two weapons without the Two-Handed property when you would normally be able to draw or stow only one."
   },
   "dual-wielder-dexterity": {
-    "_es": "828c69cf",
+    "_es": "9b2acc55",
     "name": "Dual Wielder (Dexterity)",
-    "effects.1.name": "Dual Wielder"
+    "effects.1.name": "Dual Wielder",
+    "effects.1.description": "Enhanced Dual Wielding: when you attack with a Light weapon, the extra Bonus Action attack can be made with any melee weapon that lacks the Two-Handed property. Quick Draw: you can draw or stow two weapons without the Two-Handed property when you would normally be able to draw or stow only one."
   },
   "durable": {
-    "_es": "70ea9322",
+    "_es": "4255ad7f",
     "name": "Durable",
-    "effects.1.name": "Tough"
+    "effects.1.name": "Tough",
+    "effects.1.description": "Defy Death: Advantage on Death Saving Throws. Speedy Recovery: as a Bonus Action, you expend one Hit Point Die and regain the roll."
   },
   "elemental-adept-intelligence": {
-    "_es": "10562479",
+    "_es": "e800b0de",
     "name": "Elemental Adept (Intelligence)",
-    "effects.1.name": "Elemental Attunement"
+    "effects.1.name": "Elemental Attunement",
+    "effects.1.description": "Choose a damage type (Acid, Cold, Fire, Lightning, or Thunder): your spells ignore Resistance to it and treat 1s on the dice as 2s."
   },
   "elemental-adept-wisdom": {
-    "_es": "d8fc4699",
+    "_es": "5b69163c",
     "name": "Elemental Adept (Wisdom)",
-    "effects.1.name": "Elemental Attunement"
+    "effects.1.name": "Elemental Attunement",
+    "effects.1.description": "Choose a damage type (Acid, Cold, Fire, Lightning, or Thunder): your spells ignore Resistance to it and treat 1s on the dice as 2s."
   },
   "elemental-adept-charisma": {
-    "_es": "fbe3440b",
+    "_es": "ed2c5bea",
     "name": "Elemental Adept (Charisma)",
-    "effects.1.name": "Elemental Attunement"
+    "effects.1.name": "Elemental Attunement",
+    "effects.1.description": "Choose a damage type (Acid, Cold, Fire, Lightning, or Thunder): your spells ignore Resistance to it and treat 1s on the dice as 2s."
   },
   "fey-touched-intelligence": {
-    "_es": "3ad78fb1",
+    "_es": "21976bd8",
     "name": "Fey-Touched (Intelligence)",
-    "effects.1.name": "Fey-Touched"
+    "effects.1.name": "Fey-Touched",
+    "effects.1.description": "You learn Misty Step and one level 1 Divination or Enchantment spell, each castable for free once per Long Rest."
   },
   "fey-touched-wisdom": {
-    "_es": "19be1e21",
+    "_es": "a8917b4e",
     "name": "Fey-Touched (Wisdom)",
-    "effects.1.name": "Fey-Touched"
+    "effects.1.name": "Fey-Touched",
+    "effects.1.description": "You learn Misty Step and one level 1 Divination or Enchantment spell, each castable for free once per Long Rest."
   },
   "fey-touched-charisma": {
-    "_es": "a3eda453",
+    "_es": "7ad629b4",
     "name": "Fey-Touched (Charisma)",
-    "effects.1.name": "Fey-Touched"
+    "effects.1.name": "Fey-Touched",
+    "effects.1.description": "You learn Misty Step and one level 1 Divination or Enchantment spell, each castable for free once per Long Rest."
   },
   "grappler-strength": {
-    "_es": "a87701cc",
+    "_es": "8b0a030c",
     "name": "Grappler (Strength)",
-    "effects.1.name": "Grappler"
+    "effects.1.name": "Grappler",
+    "effects.1.description": "When you hit with an Unarmed Strike as part of the Attack action, you can use both the Damage and Grapple options at once (once per turn). You have Advantage on attacks against a creature you are grappling, and you spend no extra movement to drag it if it is your size or smaller. (+1 to STR or DEX)"
   },
   "grappler-dexterity": {
-    "_es": "a5b22fcb",
+    "_es": "1fbc4f0b",
     "name": "Grappler (Dexterity)",
-    "effects.1.name": "Grappler"
+    "effects.1.name": "Grappler",
+    "effects.1.description": "When you hit with an Unarmed Strike as part of the Attack action, you can use both the Damage and Grapple options at once (once per turn). You have Advantage on attacks against a creature you are grappling, and you spend no extra movement to drag it if it is your size or smaller. (+1 to STR or DEX)"
   },
   "heavily-armored-constitution": {
-    "_es": "4fb3f466",
+    "_es": "cb277006",
     "name": "Heavily Armored (Constitution)",
-    "effects.2.name": "Heavily Armored"
+    "effects.2.name": "Heavily Armored",
+    "effects.2.description": "You gain Heavy armor training."
   },
   "heavily-armored-strength": {
-    "_es": "86a8c655",
+    "_es": "e23b2875",
     "name": "Heavily Armored (Strength)",
-    "effects.2.name": "Heavily Armored"
+    "effects.2.name": "Heavily Armored",
+    "effects.2.description": "You gain Heavy armor training."
   },
   "heavy-armor-master-constitution": {
-    "_es": "d9858757",
+    "_es": "10d8c848",
     "name": "Heavy Armor Master (Constitution)",
-    "effects.1.name": "Heavy Armor Master"
+    "effects.1.name": "Heavy Armor Master",
+    "effects.1.description": "Damage Reduction: when you are hit by an attack while wearing Heavy armor, any Bludgeoning, Piercing, and Slashing damage dealt by that attack is reduced by an amount equal to your Proficiency Bonus. The 2024 rule doesn't care whether the attack is magical. (+1 to STR or CON)"
   },
   "heavy-armor-master-strength": {
-    "_es": "d3ec3650",
+    "_es": "cc90ac1f",
     "name": "Heavy Armor Master (Strength)",
-    "effects.1.name": "Heavy Armor Master"
+    "effects.1.name": "Heavy Armor Master",
+    "effects.1.description": "Damage Reduction: when you are hit by an attack while wearing Heavy armor, any Bludgeoning, Piercing, and Slashing damage dealt by that attack is reduced by an amount equal to your Proficiency Bonus. The 2024 rule doesn't care whether the attack is magical. (+1 to STR or CON)"
   },
   "inspiring-leader-wisdom": {
-    "_es": "c7089369",
+    "_es": "fb39639e",
     "name": "Inspiring Leader (Wisdom)",
-    "effects.1.name": "Inspiring Leader"
+    "effects.1.name": "Inspiring Leader",
+    "effects.1.description": "After a rest, a rousing speech gives Temporary Hit Points to you and nearby allies. (+1 to WIS or CHA)"
   },
   "inspiring-leader-charisma": {
-    "_es": "c1d0593b",
+    "_es": "d9f58424",
     "name": "Inspiring Leader (Charisma)",
-    "effects.1.name": "Inspiring Leader"
+    "effects.1.name": "Inspiring Leader",
+    "effects.1.description": "After a rest, a rousing speech gives Temporary Hit Points to you and nearby allies. (+1 to WIS or CHA)"
   },
   "keen-mind": {
-    "_es": "d0bcf761",
+    "_es": "417a0651",
     "name": "Keen Mind",
-    "effects.2.name": "Keen Mind"
+    "effects.2.name": "Keen Mind",
+    "effects.2.description": "Lore Knowledge: you gain proficiency in Arcana, History, Investigation, Nature, or Religion, or Expertise if you were already proficient. Quick Study: you can take the Study action as a Bonus Action."
   },
   "lightly-armored-strength": {
-    "_es": "7381603a",
+    "_es": "353b5436",
     "name": "Lightly Armored (Strength)",
-    "effects.3.name": "Lightly Armored"
+    "effects.3.name": "Lightly Armored",
+    "effects.3.description": "You gain Light armor and Shield training."
   },
   "lightly-armored-dexterity": {
-    "_es": "242fe991",
+    "_es": "b8bc7f15",
     "name": "Lightly Armored (Dexterity)",
-    "effects.3.name": "Lightly Armored"
+    "effects.3.name": "Lightly Armored",
+    "effects.3.description": "You gain Light armor and Shield training."
   },
   "mage-slayer-strength": {
-    "_es": "b327600c",
+    "_es": "5078294e",
     "name": "Mage Slayer (Strength)",
-    "effects.1.name": "Mage Slayer"
+    "effects.1.name": "Mage Slayer",
+    "effects.1.description": "Concentration Breaker: when you damage a creature that is concentrating, it has Disadvantage on the saving throw to maintain Concentration. Guarded Mind: you can turn a failed Intelligence, Wisdom, or Charisma saving throw into a success, once per Short or Long Rest."
   },
   "mage-slayer-dexterity": {
-    "_es": "4c19740b",
+    "_es": "f84ed84d",
     "name": "Mage Slayer (Dexterity)",
-    "effects.1.name": "Mage Slayer"
+    "effects.1.name": "Mage Slayer",
+    "effects.1.description": "Concentration Breaker: when you damage a creature that is concentrating, it has Disadvantage on the saving throw to maintain Concentration. Guarded Mind: you can turn a failed Intelligence, Wisdom, or Charisma saving throw into a success, once per Short or Long Rest."
   },
   "magic-initiate-wizard": {
-    "_es": "4be846e8",
+    "_es": "73795f74",
     "name": "Magic Initiate (Wizard)",
     "effects.0.name": "Magic Initiate: cantrips",
     "effects.1.name": "Magic Initiate: level 1 spell",
-    "effects.2.name": "Magic Initiate (Wizard)"
+    "effects.2.name": "Magic Initiate (Wizard)",
+    "effects.2.description": "You learn two cantrips and one level 1 spell from the Wizard spell list. Your spellcasting ability is Intelligence, Wisdom, or Charisma, your choice. The spell is always prepared, and you can cast it without a slot once per Long Rest, or by expending slots. When you gain a new level, you can replace one of the chosen spells with another from the same list. You can take this feat more than once, but with a different list each time."
   },
   "magic-initiate-druid": {
-    "_es": "8b67d2ba",
+    "_es": "d26a9e65",
     "name": "Magic Initiate (Druid)",
     "effects.0.name": "Magic Initiate: cantrips",
     "effects.1.name": "Magic Initiate: level 1 spell",
-    "effects.2.name": "Magic Initiate (Druid)"
+    "effects.2.name": "Magic Initiate (Druid)",
+    "effects.2.description": "You learn two cantrips and one level 1 spell from the Druid spell list. Your spellcasting ability is Intelligence, Wisdom, or Charisma, your choice. The spell is always prepared, and you can cast it without a slot once per Long Rest, or by expending slots. When you gain a new level, you can replace one of the chosen spells with another from the same list. You can take this feat more than once, but with a different list each time."
   },
   "tavern-brawler": {
-    "_es": "3b5b1443",
+    "_es": "be3691fd",
     "name": "Tavern Brawler",
-    "effects.0.name": "Tavern Brawler"
+    "effects.0.name": "Tavern Brawler",
+    "effects.0.description": "Your Unarmed Strike deals 1d4 plus your Strength modifier in Bludgeoning damage, and you can reroll a 1 on the damage die. Proficiency with improvised weapons. When you hit with an Unarmed Strike on your turn, you can push the target 5 feet, once per turn."
   },
   "magic-initiate-cleric": {
-    "_es": "4de22b26",
+    "_es": "1f56a48b",
     "name": "Magic Initiate (Cleric)",
     "effects.0.name": "Magic Initiate: cantrips",
     "effects.1.name": "Magic Initiate: level 1 spell",
-    "effects.2.name": "Magic Initiate (Cleric)"
+    "effects.2.name": "Magic Initiate (Cleric)",
+    "effects.2.description": "You learn two cantrips and one level 1 spell from the Cleric spell list. Your spellcasting ability is Intelligence, Wisdom, or Charisma, your choice. The spell is always prepared, and you can cast it without a slot once per Long Rest, or by expending slots. When you gain a new level, you can replace one of the chosen spells with another from the same list. You can take this feat more than once, but with a different list each time."
   },
   "medium-armor-master-strength": {
-    "_es": "61573f4c",
+    "_es": "d46009dc",
     "name": "Medium Armor Master (Strength)",
-    "effects.1.name": "Medium Armor Master"
+    "effects.1.name": "Medium Armor Master",
+    "effects.1.description": "In Medium armor you have no Disadvantage on Stealth and add up to +3 of DEX to your AC. (+1 to STR or DEX)"
   },
   "medium-armor-master-dexterity": {
-    "_es": "d1fa694b",
+    "_es": "f7e8067b",
     "name": "Medium Armor Master (Dexterity)",
-    "effects.1.name": "Medium Armor Master"
+    "effects.1.name": "Medium Armor Master",
+    "effects.1.description": "In Medium armor you have no Disadvantage on Stealth and add up to +3 of DEX to your AC. (+1 to STR or DEX)"
   },
   "moderately-armored-strength": {
-    "_es": "06c813eb",
+    "_es": "c3066885",
     "name": "Moderately Armored (Strength)",
-    "effects.2.name": "Moderately Armored"
+    "effects.2.name": "Moderately Armored",
+    "effects.2.description": "You gain Medium armor training."
   },
   "moderately-armored-dexterity": {
-    "_es": "a929ff08",
+    "_es": "48fee352",
     "name": "Moderately Armored (Dexterity)",
-    "effects.2.name": "Moderately Armored"
+    "effects.2.name": "Moderately Armored",
+    "effects.2.description": "You gain Medium armor training."
   },
   "mounted-combatant-strength": {
-    "_es": "17c077a8",
+    "_es": "a445bf97",
     "name": "Mounted Combatant (Strength)",
-    "effects.1.name": "Mounted Combatant"
+    "effects.1.name": "Mounted Combatant",
+    "effects.1.description": "Advantage on attacks against creatures smaller than your mount; you can redirect attacks to yourself and protect your mount. (+1 to STR, DEX, or WIS)"
   },
   "mounted-combatant-dexterity": {
-    "_es": "8773958f",
+    "_es": "b34e71bc",
     "name": "Mounted Combatant (Dexterity)",
-    "effects.1.name": "Mounted Combatant"
+    "effects.1.name": "Mounted Combatant",
+    "effects.1.description": "Advantage on attacks against creatures smaller than your mount; you can redirect attacks to yourself and protect your mount. (+1 to STR, DEX, or WIS)"
   },
   "mounted-combatant-wisdom": {
-    "_es": "c273e181",
+    "_es": "a99cfcd0",
     "name": "Mounted Combatant (Wisdom)",
-    "effects.1.name": "Mounted Combatant"
+    "effects.1.name": "Mounted Combatant",
+    "effects.1.description": "Advantage on attacks against creatures smaller than your mount; you can redirect attacks to yourself and protect your mount. (+1 to STR, DEX, or WIS)"
   },
   "observant-intelligence": {
-    "_es": "eeefa61c",
+    "_es": "173a4f49",
     "name": "Observant (Intelligence)",
     "effects.0.name": "Observant: skill",
-    "effects.2.name": "Observant"
+    "effects.2.name": "Observant",
+    "effects.2.description": "Keen Observer: choose Insight, Investigation, or Perception; if you aren't proficient in the chosen skill, you gain proficiency, and if you already were, you gain Expertise. Quick Search: you can take the Search action as a Bonus Action."
   },
   "observant-wisdom": {
-    "_es": "14c57d4a",
+    "_es": "99bbca49",
     "name": "Observant (Wisdom)",
     "effects.0.name": "Observant: skill",
-    "effects.2.name": "Observant"
+    "effects.2.name": "Observant",
+    "effects.2.description": "Keen Observer: choose Insight, Investigation, or Perception; if you aren't proficient in the chosen skill, you gain proficiency, and if you already were, you gain Expertise. Quick Search: you can take the Search action as a Bonus Action."
   },
   "piercer-strength": {
-    "_es": "600d0e80",
+    "_es": "6660542e",
     "name": "Piercer (Strength)",
-    "effects.1.name": "Piercer"
+    "effects.1.name": "Piercer",
+    "effects.1.description": "Once per turn, you can reroll one Piercing damage die; on a Piercing Critical Hit, you add one extra die."
   },
   "piercer-dexterity": {
-    "_es": "d646ec47",
+    "_es": "f32a502d",
     "name": "Piercer (Dexterity)",
-    "effects.1.name": "Piercer"
+    "effects.1.name": "Piercer",
+    "effects.1.description": "Once per turn, you can reroll one Piercing damage die; on a Piercing Critical Hit, you add one extra die."
   },
   "poisoner-dexterity": {
-    "_es": "6d142d36",
+    "_es": "89029cb2",
     "name": "Poisoner (Dexterity)",
-    "effects.2.name": "Poisoner"
+    "effects.2.name": "Poisoner",
+    "effects.2.description": "Potent Poison: when you make a damage roll that deals Poison damage, it ignores Resistance to Poison damage. Brew Poison: you gain proficiency with the Poisoner's Kit. With 1 hour of work using that kit and expending 50 gp of materials, you create a number of poison doses equal to your Proficiency Bonus. As a Bonus Action, you can apply a dose to a weapon or piece of ammunition; the poison retains its potency for 1 minute or until you deal damage with the poisoned item. When a creature takes damage from that item, it must succeed on a Constitution saving throw (DC 8 + the modifier of the ability increased by this feat + your Proficiency Bonus) or take 2d8 Poison damage and have the Poisoned condition until the end of your next turn."
   },
   "poisoner-intelligence": {
-    "_es": "bbb0c520",
+    "_es": "b2fc7a84",
     "name": "Poisoner (Intelligence)",
-    "effects.2.name": "Poisoner"
+    "effects.2.name": "Poisoner",
+    "effects.2.description": "Potent Poison: when you make a damage roll that deals Poison damage, it ignores Resistance to Poison damage. Brew Poison: you gain proficiency with the Poisoner's Kit. With 1 hour of work using that kit and expending 50 gp of materials, you create a number of poison doses equal to your Proficiency Bonus. As a Bonus Action, you can apply a dose to a weapon or piece of ammunition; the poison retains its potency for 1 minute or until you deal damage with the poisoned item. When a creature takes damage from that item, it must succeed on a Constitution saving throw (DC 8 + the modifier of the ability increased by this feat + your Proficiency Bonus) or take 2d8 Poison damage and have the Poisoned condition until the end of your next turn."
   },
   "polearm-master-dexterity": {
-    "_es": "86b8e157",
+    "_es": "cb88e4e8",
     "name": "Polearm Master (Dexterity)",
-    "effects.1.name": "Polearm Master"
+    "effects.1.name": "Polearm Master",
+    "effects.1.description": "With a polearm, you gain an extra attack with the blunt end, and enemies provoke Opportunity Attacks when they enter your reach."
   },
   "polearm-master-strength": {
-    "_es": "d9845bb0",
+    "_es": "d978014b",
     "name": "Polearm Master (Strength)",
-    "effects.1.name": "Polearm Master"
+    "effects.1.name": "Polearm Master",
+    "effects.1.description": "With a polearm, you gain an extra attack with the blunt end, and enemies provoke Opportunity Attacks when they enter your reach."
   },
   "resilient-constitution": {
-    "_es": "216fe1e5",
+    "_es": "6ac2df3b",
     "name": "Resilient (Constitution)",
-    "effects.2.name": "Resilient (Constitution)"
+    "effects.2.name": "Resilient (Constitution)",
+    "effects.2.description": "You gain proficiency in Constitution saving throws (key for maintaining Concentration)."
   },
   "resilient-dexterity": {
-    "_es": "9a6f6a55",
+    "_es": "44618ab9",
     "name": "Resilient (Dexterity)",
-    "effects.2.name": "Resilient (Dexterity)"
+    "effects.2.name": "Resilient (Dexterity)",
+    "effects.2.description": "You gain proficiency in Dexterity saving throws."
   },
   "ritual-caster-intelligence": {
-    "_es": "2139fb23",
+    "_es": "79a789c5",
     "name": "Ritual Caster (Intelligence)",
     "effects.0.name": "Ritual Caster: ritual spells",
-    "effects.2.name": "Ritual Caster"
+    "effects.2.name": "Ritual Caster",
+    "effects.2.description": "Ritual Spells: choose a number of level 1 spells with the Ritual tag equal to your Proficiency Bonus. You always have them prepared and can cast them with any spell slots you have; their spellcasting ability is the one increased by this feat. Whenever your Proficiency Bonus increases, you add another level 1 spell with the Ritual tag. Quick Ritual: you can cast a Ritual spell you have prepared using its regular casting time rather than the extended time for a Ritual, without expending a spell slot; once you do so, you can't do it again until you finish a Long Rest."
   },
   "ritual-caster-wisdom": {
-    "_es": "6e916d1b",
+    "_es": "75e594bd",
     "name": "Ritual Caster (Wisdom)",
     "effects.0.name": "Ritual Caster: ritual spells",
-    "effects.2.name": "Ritual Caster"
+    "effects.2.name": "Ritual Caster",
+    "effects.2.description": "Ritual Spells: choose a number of level 1 spells with the Ritual tag equal to your Proficiency Bonus. You always have them prepared and can cast them with any spell slots you have; their spellcasting ability is the one increased by this feat. Whenever your Proficiency Bonus increases, you add another level 1 spell with the Ritual tag. Quick Ritual: you can cast a Ritual spell you have prepared using its regular casting time rather than the extended time for a Ritual, without expending a spell slot; once you do so, you can't do it again until you finish a Long Rest."
   },
   "ritual-caster-charisma": {
-    "_es": "42322abd",
+    "_es": "30a5dc9f",
     "name": "Ritual Caster (Charisma)",
     "effects.0.name": "Ritual Caster: ritual spells",
-    "effects.2.name": "Ritual Caster"
+    "effects.2.name": "Ritual Caster",
+    "effects.2.description": "Ritual Spells: choose a number of level 1 spells with the Ritual tag equal to your Proficiency Bonus. You always have them prepared and can cast them with any spell slots you have; their spellcasting ability is the one increased by this feat. Whenever your Proficiency Bonus increases, you add another level 1 spell with the Ritual tag. Quick Ritual: you can cast a Ritual spell you have prepared using its regular casting time rather than the extended time for a Ritual, without expending a spell slot; once you do so, you can't do it again until you finish a Long Rest."
   },
   "sentinel-strength": {
-    "_es": "fa6e2a10",
+    "_es": "caef1ba8",
     "name": "Sentinel (Strength)",
-    "effects.1.name": "Sentinel"
+    "effects.1.name": "Sentinel",
+    "effects.1.description": "Guardian: you can make an Opportunity Attack against a creature within 5 feet that takes the Disengage action or hits a target other than you. Halt: when you hit with an Opportunity Attack, the target's Speed becomes 0 for the rest of the turn."
   },
   "sentinel-dexterity": {
-    "_es": "b38ac7b7",
+    "_es": "87bcd98f",
     "name": "Sentinel (Dexterity)",
-    "effects.1.name": "Sentinel"
+    "effects.1.name": "Sentinel",
+    "effects.1.description": "Guardian: you can make an Opportunity Attack against a creature within 5 feet that takes the Disengage action or hits a target other than you. Halt: when you hit with an Opportunity Attack, the target's Speed becomes 0 for the rest of the turn."
   },
   "shadow-touched-intelligence": {
-    "_es": "df44f398",
+    "_es": "e1bc902e",
     "name": "Shadow-Touched (Intelligence)",
-    "effects.1.name": "Shadow-Touched"
+    "effects.1.name": "Shadow-Touched",
+    "effects.1.description": "You learn Invisibility and one level 1 Illusion or Necromancy spell, each castable for free once per Long Rest."
   },
   "shadow-touched-wisdom": {
-    "_es": "b859f50e",
+    "_es": "56a0f6ac",
     "name": "Shadow-Touched (Wisdom)",
-    "effects.1.name": "Shadow-Touched"
+    "effects.1.name": "Shadow-Touched",
+    "effects.1.description": "You learn Invisibility and one level 1 Illusion or Necromancy spell, each castable for free once per Long Rest."
   },
   "shadow-touched-charisma": {
-    "_es": "17684174",
+    "_es": "258d923a",
     "name": "Shadow-Touched (Charisma)",
-    "effects.1.name": "Shadow-Touched"
+    "effects.1.name": "Shadow-Touched",
+    "effects.1.description": "You learn Invisibility and one level 1 Illusion or Necromancy spell, each castable for free once per Long Rest."
   },
   "shield-master": {
-    "_es": "ee3310b2",
+    "_es": "bfa585e2",
     "name": "Shield Master",
-    "effects.1.name": "Shield Master"
+    "effects.1.name": "Shield Master",
+    "effects.1.description": "Shield Bash: if you attack a creature within 5 feet of you as part of the Attack action and hit with a melee weapon, you can immediately bash the target with your Shield if you have it equipped. The target makes a Strength saving throw (DC 8 + your Strength modifier + your Proficiency Bonus) and, on a failure, you either push it 5 feet or give it the Prone condition, your choice. Only once on each of your turns. Interpose Shield: if you are subjected to an effect that allows you to make a Dexterity saving throw to take only half damage, you can take a Reaction to take no damage if you succeed on the save and are holding a Shield."
   },
   "skill-expert-strength": {
-    "_es": "e4c0d200",
+    "_es": "f6ad0153",
     "name": "Skill Expert (Strength)",
-    "effects.1.name": "Skill Expert"
+    "effects.1.name": "Skill Expert",
+    "effects.1.description": "You gain proficiency in one skill and Expertise (double bonus) in another skill you are already proficient in."
   },
   "skill-expert-dexterity": {
-    "_es": "762d1bc7",
+    "_es": "cc65fcb0",
     "name": "Skill Expert (Dexterity)",
-    "effects.1.name": "Skill Expert"
+    "effects.1.name": "Skill Expert",
+    "effects.1.description": "You gain proficiency in one skill and Expertise (double bonus) in another skill you are already proficient in."
   },
   "skill-expert-constitution": {
-    "_es": "9776d147",
+    "_es": "1a06dba4",
     "name": "Skill Expert (Constitution)",
-    "effects.1.name": "Skill Expert"
+    "effects.1.name": "Skill Expert",
+    "effects.1.description": "You gain proficiency in one skill and Expertise (double bonus) in another skill you are already proficient in."
   },
   "skill-expert-intelligence": {
-    "_es": "0075fbf9",
+    "_es": "efbfda26",
     "name": "Skill Expert (Intelligence)",
-    "effects.1.name": "Skill Expert"
+    "effects.1.name": "Skill Expert",
+    "effects.1.description": "You gain proficiency in one skill and Expertise (double bonus) in another skill you are already proficient in."
   },
   "skill-expert-wisdom": {
-    "_es": "807e8c19",
+    "_es": "4d566c34",
     "name": "Skill Expert (Wisdom)",
-    "effects.1.name": "Skill Expert"
+    "effects.1.name": "Skill Expert",
+    "effects.1.description": "You gain proficiency in one skill and Expertise (double bonus) in another skill you are already proficient in."
   },
   "skill-expert-charisma": {
-    "_es": "adee168b",
+    "_es": "5f764042",
     "name": "Skill Expert (Charisma)",
-    "effects.1.name": "Skill Expert"
+    "effects.1.name": "Skill Expert",
+    "effects.1.description": "You gain proficiency in one skill and Expertise (double bonus) in another skill you are already proficient in."
   },
   "skulker": {
-    "_es": "67be1bdc",
+    "_es": "ba848ec1",
     "name": "Skulker",
-    "effects.1.name": "Skulker"
+    "effects.1.name": "Skulker",
+    "effects.1.description": "Blindsight out to 10 feet. Fog of War: Advantage on Dexterity (Stealth) checks you make as part of the Hide action in combat. Sniper: a missed attack from hiding doesn't reveal your position."
   },
   "slasher-strength": {
-    "_es": "7318052d",
+    "_es": "1bf77285",
     "name": "Slasher (Strength)",
-    "effects.1.name": "Slasher"
+    "effects.1.name": "Slasher",
+    "effects.1.description": "When you deal Slashing damage, you reduce the target's Speed; on a Slashing Critical Hit, you impose Disadvantage on its attacks."
   },
   "slasher-dexterity": {
-    "_es": "5bf4433a",
+    "_es": "b69ffd52",
     "name": "Slasher (Dexterity)",
-    "effects.1.name": "Slasher"
+    "effects.1.name": "Slasher",
+    "effects.1.description": "When you deal Slashing damage, you reduce the target's Speed; on a Slashing Critical Hit, you impose Disadvantage on its attacks."
   },
   "speedy-dexterity": {
-    "_es": "77189a34",
+    "_es": "7fda5203",
     "name": "Speedy (Dexterity)",
-    "effects.2.name": "Speedy"
+    "effects.2.name": "Speedy",
+    "effects.2.description": "Speed Increase: your Speed increases by 10 feet. Dash over Difficult Terrain: when you take the Dash action on your turn, Difficult Terrain doesn't cost you extra movement for the rest of that turn. Agile Movement: Opportunity Attacks have Disadvantage against you. (+1 to DEX or CON)"
   },
   "speedy-constitution": {
-    "_es": "ea41e2f8",
+    "_es": "4a4f5783",
     "name": "Speedy (Constitution)",
-    "effects.2.name": "Speedy"
+    "effects.2.name": "Speedy",
+    "effects.2.description": "Speed Increase: your Speed increases by 10 feet. Dash over Difficult Terrain: when you take the Dash action on your turn, Difficult Terrain doesn't cost you extra movement for the rest of that turn. Agile Movement: Opportunity Attacks have Disadvantage against you. (+1 to DEX or CON)"
   },
   "spell-sniper-intelligence": {
-    "_es": "99fec855",
+    "_es": "51c93102",
     "name": "Spell Sniper (Intelligence)",
-    "effects.1.name": "Spell Sniper"
+    "effects.1.name": "Spell Sniper",
+    "effects.1.description": "Bypass Cover: your spell attack rolls ignore Half Cover and Three-Quarters Cover. Casting in Melee: being within 5 feet of an enemy doesn't impose Disadvantage on your spell attack rolls. Increased Range: when you cast a spell that has a range of at least 10 feet and requires an attack roll, you can increase its range by 60 feet; it doesn't double."
   },
   "spell-sniper-wisdom": {
-    "_es": "85abcded",
+    "_es": "ffe4ef88",
     "name": "Spell Sniper (Wisdom)",
-    "effects.1.name": "Spell Sniper"
+    "effects.1.name": "Spell Sniper",
+    "effects.1.description": "Bypass Cover: your spell attack rolls ignore Half Cover and Three-Quarters Cover. Casting in Melee: being within 5 feet of an enemy doesn't impose Disadvantage on your spell attack rolls. Increased Range: when you cast a spell that has a range of at least 10 feet and requires an attack roll, you can increase its range by 60 feet; it doesn't double."
   },
   "spell-sniper-charisma": {
-    "_es": "66a27faf",
+    "_es": "797350d6",
     "name": "Spell Sniper (Charisma)",
-    "effects.1.name": "Spell Sniper"
+    "effects.1.name": "Spell Sniper",
+    "effects.1.description": "Bypass Cover: your spell attack rolls ignore Half Cover and Three-Quarters Cover. Casting in Melee: being within 5 feet of an enemy doesn't impose Disadvantage on your spell attack rolls. Increased Range: when you cast a spell that has a range of at least 10 feet and requires an attack roll, you can increase its range by 60 feet; it doesn't double."
   },
   "telekinetic-intelligence": {
-    "_es": "1f6bb5b1",
+    "_es": "0951c4f8",
     "name": "Telekinetic (Intelligence)",
-    "effects.1.name": "Telekinetic"
+    "effects.1.name": "Telekinetic",
+    "effects.1.description": "You learn Mage Hand (invisible) and can shove creatures 5 feet with your mind as a Bonus Action. (+1 to INT, WIS, or CHA)"
   },
   "telekinetic-wisdom": {
-    "_es": "b13cd021",
+    "_es": "834e1bee",
     "name": "Telekinetic (Wisdom)",
-    "effects.1.name": "Telekinetic"
+    "effects.1.name": "Telekinetic",
+    "effects.1.description": "You learn Mage Hand (invisible) and can shove creatures 5 feet with your mind as a Bonus Action. (+1 to INT, WIS, or CHA)"
   },
   "telekinetic-charisma": {
-    "_es": "162c8653",
+    "_es": "ccc93054",
     "name": "Telekinetic (Charisma)",
-    "effects.1.name": "Telekinetic"
+    "effects.1.name": "Telekinetic",
+    "effects.1.description": "You learn Mage Hand (invisible) and can shove creatures 5 feet with your mind as a Bonus Action. (+1 to INT, WIS, or CHA)"
   },
   "telepathic-intelligence": {
-    "_es": "4cd3bc11",
+    "_es": "35fb34ec",
     "name": "Telepathic (Intelligence)",
-    "effects.1.name": "Telepathic"
+    "effects.1.name": "Telepathic",
+    "effects.1.description": "You gain short-range telepathy and can cast Detect Thoughts without expending slots. (+1 to INT, WIS, or CHA)"
   },
   "telepathic-wisdom": {
-    "_es": "c928ca81",
+    "_es": "c85b6dba",
     "name": "Telepathic (Wisdom)",
-    "effects.1.name": "Telepathic"
+    "effects.1.name": "Telepathic",
+    "effects.1.description": "You gain short-range telepathy and can cast Detect Thoughts without expending slots. (+1 to INT, WIS, or CHA)"
   },
   "telepathic-charisma": {
-    "_es": "53f74133",
+    "_es": "66d95560",
     "name": "Telepathic (Charisma)",
-    "effects.1.name": "Telepathic"
+    "effects.1.name": "Telepathic",
+    "effects.1.description": "You gain short-range telepathy and can cast Detect Thoughts without expending slots. (+1 to INT, WIS, or CHA)"
   },
   "war-caster-intelligence": {
-    "_es": "6e3f6a1d",
+    "_es": "220bbf73",
     "name": "War Caster (Intelligence)",
-    "effects.1.name": "War Caster"
+    "effects.1.name": "War Caster",
+    "effects.1.description": "Advantage on Concentration saving throws; you cast spells with your hands full and can cast one as an Opportunity Attack."
   },
   "war-caster-wisdom": {
-    "_es": "d18b9445",
+    "_es": "e35679cb",
     "name": "War Caster (Wisdom)",
-    "effects.1.name": "War Caster"
+    "effects.1.name": "War Caster",
+    "effects.1.description": "Advantage on Concentration saving throws; you cast spells with your hands full and can cast one as an Opportunity Attack."
   },
   "war-caster-charisma": {
-    "_es": "b139c8c7",
+    "_es": "2afb188d",
     "name": "War Caster (Charisma)",
-    "effects.1.name": "War Caster"
+    "effects.1.name": "War Caster",
+    "effects.1.description": "Advantage on Concentration saving throws; you cast spells with your hands full and can cast one as an Opportunity Attack."
   },
   "ability-score-improvement": {
-    "_es": "75db8beb",
+    "_es": "fa495751",
     "name": "Ability Score Improvement",
-    "effects.0.name": "Ability Score Improvement"
+    "effects.0.name": "Ability Score Improvement",
+    "effects.0.description": "Increase one ability score by 2, or two ability scores by 1 each, to a maximum of 20. The level-up screen records this choice through the Improve abilities option."
   },
   "martial-weapon-training-strength": {
-    "_es": "358476ab",
+    "_es": "00fb9b9e",
     "name": "Martial Weapon Training (Strength)",
-    "effects.2.name": "Martial Weapon Training"
+    "effects.2.name": "Martial Weapon Training",
+    "effects.2.description": "You gain proficiency with Martial weapons."
   },
   "martial-weapon-training-dexterity": {
-    "_es": "f7b47cc8",
+    "_es": "0e2c22fd",
     "name": "Martial Weapon Training (Dexterity)",
-    "effects.2.name": "Martial Weapon Training"
+    "effects.2.name": "Martial Weapon Training",
+    "effects.2.description": "You gain proficiency with Martial weapons."
   },
   "weapon-master-strength": {
-    "_es": "25edd8f3",
+    "_es": "02da51e4",
     "name": "Weapon Master (Strength)",
-    "effects.1.name": "Mastery Property"
+    "effects.1.name": "Mastery Property",
+    "effects.1.description": "You can use the mastery property of one kind of Simple or Martial weapon you are proficient with. You can change the kind of weapon after a Long Rest."
   },
   "weapon-master-dexterity": {
-    "_es": "2e3bd3d0",
+    "_es": "77011a83",
     "name": "Weapon Master (Dexterity)",
-    "effects.1.name": "Mastery Property"
+    "effects.1.name": "Mastery Property",
+    "effects.1.description": "You can use the mastery property of one kind of Simple or Martial weapon you are proficient with. You can change the kind of weapon after a Long Rest."
   },
   "fs-blind-fighting": {
-    "_es": "2ac32280",
+    "_es": "c176028f",
     "name": "Blind Fighting",
     "effects.0.name": "Blind Fighting",
-    "prerequisite.requiredClassFeature": "Fighting Style"
+    "prerequisite.requiredClassFeature": "Fighting Style",
+    "effects.0.description": "You have Blindsight with a range of 10 feet."
   },
   "fs-interception": {
-    "_es": "30221ec8",
+    "_es": "d17a2be9",
     "name": "Interception",
     "effects.0.name": "Interception",
-    "prerequisite.requiredClassFeature": "Fighting Style"
+    "prerequisite.requiredClassFeature": "Fighting Style",
+    "effects.0.description": "As a Reaction, when a creature you can see hits another creature within 5 feet of you, you reduce the damage by 1d10 plus your Proficiency Bonus. You must be holding a Shield or a Simple or Martial weapon."
   },
   "fs-protection": {
-    "_es": "5c111ae4",
+    "_es": "3e089d73",
     "name": "Protection",
     "effects.0.name": "Protection",
-    "prerequisite.requiredClassFeature": "Fighting Style"
+    "prerequisite.requiredClassFeature": "Fighting Style",
+    "effects.0.description": "With a Shield, you can take a Reaction to impose Disadvantage on an attack against another creature within 5 feet of you, and on the other attacks against it until your next turn while it stays beside you."
   },
   "fs-thrown-weapon-fighting": {
-    "_es": "04473de8",
+    "_es": "8490bc5c",
     "name": "Thrown Weapon Fighting",
     "effects.0.name": "Thrown Weapon Fighting",
-    "prerequisite.requiredClassFeature": "Fighting Style"
+    "prerequisite.requiredClassFeature": "Fighting Style",
+    "effects.0.description": "When you hit with a ranged attack using a Thrown weapon, you gain a +2 bonus to the damage roll."
   },
   "fs-two-weapon-fighting": {
-    "_es": "f49cc789",
+    "_es": "8b2ac6dc",
     "name": "Two-Weapon Fighting",
     "effects.1.name": "Two-Weapon Fighting",
-    "prerequisite.requiredClassFeature": "Fighting Style"
+    "prerequisite.requiredClassFeature": "Fighting Style",
+    "effects.1.description": "When you make the extra attack of the Light property, you can add your ability modifier to the damage if you aren't already adding it."
   },
   "fs-unarmed-fighting": {
-    "_es": "d17fcaa8",
+    "_es": "d30fe10a",
     "name": "Unarmed Fighting",
     "effects.0.name": "Unarmed Fighting",
-    "prerequisite.requiredClassFeature": "Fighting Style"
+    "prerequisite.requiredClassFeature": "Fighting Style",
+    "effects.0.description": "Your Unarmed Strikes deal 1d6 plus Strength, or 1d8 if you aren't holding weapons or a Shield. At the start of your turn, you can deal 1d4 Bludgeoning damage to a creature you are grappling."
   },
   "fs-blessed-warrior": {
-    "_es": "ca7093da",
+    "_es": "0e25f54a",
     "name": "Blessed Warrior",
     "effects.0.name": "Blessed Warrior: Cleric cantrips",
     "effects.1.name": "Blessed Warrior",
-    "prerequisite.requiredClassFeature": "Fighting Style"
+    "prerequisite.requiredClassFeature": "Fighting Style",
+    "effects.1.description": "You learn two cantrips of your choice from the Cleric spell list. Charisma is your spellcasting ability for them. Whenever you gain a Paladin level, you can replace one of those cantrips with another Cleric cantrip. A Paladin can take this option instead of a Fighting Style feat."
   },
   "fs-druidic-warrior": {
-    "_es": "f652f1bc",
+    "_es": "0d161fb8",
     "name": "Druidic Warrior",
     "effects.0.name": "Druidic Warrior: Druid cantrips",
     "effects.1.name": "Druidic Warrior",
-    "prerequisite.requiredClassFeature": "Fighting Style"
+    "prerequisite.requiredClassFeature": "Fighting Style",
+    "effects.1.description": "You learn two cantrips of your choice from the Druid spell list. Wisdom is your spellcasting ability for them. Whenever you gain a Ranger level, you can replace one of those cantrips with another Druid cantrip. A Ranger can take this option instead of a Fighting Style feat."
   },
   "resilient-strength": {
     "_es": "7ee321e6",
@@ -752,270 +893,358 @@
     "name": "Resilient (Charisma)"
   },
   "boon-of-fortitude": {
-    "_es": "8a4b3595",
+    "_es": "5b2b66fb",
     "name": "Boon of Fortitude",
-    "effects.2.name": "Boon of Fortitude"
+    "effects.2.name": "Boon of Fortitude",
+    "effects.2.description": "Increase one ability score by 1, to a maximum of 30. Your Hit Point maximum increases by 40. Once per turn, when you regain Hit Points, you also regain your Constitution modifier."
   },
   "boon-of-skill": {
-    "_es": "954e4007",
+    "_es": "880a1c76",
     "name": "Boon of Skill",
     "effects.18.name": "Boon of Skill: Expertise",
-    "effects.20.name": "Boon of Skill"
+    "effects.20.name": "Boon of Skill",
+    "effects.20.description": "Increase one ability score by 1, to a maximum of 30. You gain proficiency in all skills and Expertise in one skill in which you don't already have it."
   },
   "boon-of-combat-prowess": {
-    "_es": "8763c116",
+    "_es": "ebc7e778",
     "name": "Boon of Combat Prowess",
-    "effects.1.name": "Unerring Accuracy"
+    "effects.1.name": "Unerring Accuracy",
+    "effects.1.description": "Increase one ability score by 1, to a maximum of 30. When you miss with an attack roll, you can hit instead; you can do so again at the start of your next turn."
   },
   "boon-of-recovery": {
-    "_es": "1ede10ba",
+    "_es": "26729ce2",
     "name": "Boon of Recovery",
-    "effects.1.name": "Boon of Recovery"
+    "effects.1.name": "Boon of Recovery",
+    "effects.1.description": "Increase one ability score by 1, to a maximum of 30. Once per Long Rest, when you drop to 0 HP, you drop to 1 instead and regain half your HP maximum. You also have a daily pool of 10d10 that you can spend as a Bonus Action to heal yourself."
   },
   "boon-of-energy-resistance": {
-    "_es": "c369db96",
+    "_es": "1a4fb1bd",
     "name": "Boon of Energy Resistance",
-    "effects.1.name": "Energy Resistances"
+    "effects.1.name": "Energy Resistances",
+    "effects.1.description": "Increase one ability score by 1, to a maximum of 30. Choose two Resistances among Acid, Cold, Fire, Necrotic, Psychic, Radiant, Lightning, Thunder, and Poison; you can change them after a Long Rest. When you take one of those damage types, you can redirect energy with your Reaction."
   },
   "boon-of-speed": {
-    "_es": "a8bc1bdb",
+    "_es": "83f4ffef",
     "name": "Boon of Speed",
-    "effects.2.name": "Boon of Speed"
+    "effects.2.name": "Boon of Speed",
+    "effects.2.description": "Increase one ability score by 1, to a maximum of 30. Your Speed increases by 30 feet and, as a Bonus Action, you can take the Disengage action and end the Grappled condition on yourself."
   },
   "boon-of-truesight": {
-    "_es": "6f312ac5",
+    "_es": "c4d5c355",
     "name": "Boon of Truesight",
-    "effects.1.name": "True Sight"
+    "effects.1.name": "True Sight",
+    "effects.1.description": "Increase one ability score by 1, to a maximum of 30. You have Truesight with a range of 60 feet."
   },
   "boon-of-irresistible-offense": {
-    "_es": "9ad7ce2a",
+    "_es": "b561f930",
     "name": "Boon of Irresistible Offense",
-    "effects.1.name": "Unstoppable Attack"
+    "effects.1.name": "Unstoppable Attack",
+    "effects.1.description": "Increase Strength or Dexterity by 1, to a maximum of 30. Your Bludgeoning, Piercing, and Slashing damage ignores Resistance. When you roll a 20 on an attack roll, you deal extra damage equal to the increased score."
   },
   "boon-of-fate": {
-    "_es": "f05e5b79",
+    "_es": "99e85205",
     "name": "Boon of Fate",
-    "effects.1.name": "Improve Fate"
+    "effects.1.name": "Improve Fate",
+    "effects.1.description": "Increase one ability score by 1, to a maximum of 30. After a creature within 60 feet succeeds or fails on a D20 Test, you can add or subtract 2d4. You regain the use when you roll Initiative or finish a Short or Long Rest."
   },
   "boon-of-the-night-spirit": {
-    "_es": "8cff038a",
+    "_es": "e1c495fa",
     "name": "Boon of the Night Spirit",
-    "effects.1.name": "Night Spirit"
+    "effects.1.name": "Night Spirit",
+    "effects.1.description": "Increase one ability score by 1, to a maximum of 30. In Dim Light or Darkness, you can become Invisible as a Bonus Action until you act, and you have Resistance to all damage except Psychic and Radiant."
   },
   "boon-of-spell-recall": {
-    "_es": "1d3955ce",
+    "_es": "50157267",
     "name": "Boon of Spell Recall",
-    "effects.1.name": "Free Casting"
+    "effects.1.name": "Free Casting",
+    "effects.1.description": "Increase Intelligence, Wisdom, or Charisma by 1, to a maximum of 30. When you cast a spell with a level 1–4 slot, roll 1d4; if it matches the slot's level, the slot isn't expended."
   },
   "boon-of-dimensional-travel": {
-    "_es": "16e0dde5",
+    "_es": "4ef7252a",
     "name": "Boon of Dimensional Travel",
-    "effects.1.name": "Beguiling Steps"
+    "effects.1.name": "Beguiling Steps",
+    "effects.1.description": "Increase one ability score by 1, to a maximum of 30. Immediately after you take the Attack or Magic action, you can teleport up to 30 feet to an unoccupied space you can see."
   },
   "aberrant-dragonmark": {
-    "_es": "8eb830a1",
+    "_es": "7bfb2052",
     "name": "Aberrant Dragonmark",
     "effects.0.name": "Aberrant Magic: cantrip",
     "effects.1.name": "Aberrant Magic: level 1 spell",
     "effects.2.name": "Aberrant Fortitude",
     "effects.3.name": "Aberrant Magic",
-    "effects.4.name": "Aberrant Surge"
+    "effects.4.name": "Aberrant Surge",
+    "effects.2.description": "When you fail a Constitution saving throw, you can take a Reaction to roll 1d4 and add it to the save, possibly turning it into a success. Once per Long Rest.",
+    "effects.3.description": "You know one cantrip of your choice from the Sorcerer spell list. You also choose one level 1 spell from that list: you always have it prepared, can cast it for free once per Short or Long Rest, and can also cast it with slots. Constitution is your spellcasting ability for that spell.",
+    "effects.4.description": "When you cast this feat's level 1 spell, you can expend one Hit Point Die and roll it. On an even number, you gain that many Temporary Hit Points; on an odd number, one creature within 30 feet (not you) takes that much Force damage. If no other creature is in range, you take the damage."
   },
   "mark-of-detection": {
-    "_es": "a5ec13b4",
+    "_es": "01bf9e04",
     "name": "Mark of Detection",
     "effects.3.name": "Deductive Intuition",
     "effects.4.name": "Magic Detection",
-    "effects.5.name": "Mark Spells"
+    "effects.5.name": "Mark Spells",
+    "effects.3.description": "When you make an Intelligence (Investigation) or Wisdom (Insight) check, you can roll 1d4 and add it to the check.",
+    "effects.4.description": "You always have Detect Magic and Detect Poison and Disease prepared. You can cast each for free once per Long Rest, and also with slots of the appropriate level. Your spellcasting ability is Intelligence, Wisdom, or Charisma (chosen when you take the feat). At level 3, you add See Invisibility on the same terms.",
+    "effects.5.description": "If you have the Spellcasting or Pact Magic feature, these spells are added to that feature's list. Level 1: Detect Evil and Good, Identify; Level 2: Detect Thoughts, Find Traps; Level 3: Clairvoyance, Nondetection; Level 4: Arcane Eye, Divination; Level 5: Legend Lore."
   },
   "mark-of-finding": {
-    "_es": "16f6f824",
+    "_es": "c587b238",
     "name": "Mark of Finding",
     "effects.2.name": "Hunter's Intuition",
     "effects.3.name": "Finder's Magic",
-    "effects.4.name": "Mark Spells"
+    "effects.4.name": "Mark Spells",
+    "effects.2.description": "When you make a Wisdom (Perception or Survival) check, you can roll 1d4 and add it to the check.",
+    "effects.3.description": "You always have Hunter's Mark prepared. You can cast it for free once per Long Rest, and also with slots of the appropriate level. Your spellcasting ability is Intelligence, Wisdom, or Charisma (chosen when you take the feat). At level 3, you add Locate Object on the same terms.",
+    "effects.4.description": "If you have the Spellcasting or Pact Magic feature, these spells are added to that feature's list. Level 1: Faerie Fire, Longstrider; Level 2: Locate Animals or Plants, Mind Spike; Level 3: Clairvoyance, Speak with Plants; Level 4: Divination, Locate Creature; Level 5: Commune with Nature."
   },
   "mark-of-handling": {
-    "_es": "2d0f5a45",
+    "_es": "cf09540a",
     "name": "Mark of Handling",
     "effects.2.name": "Wild Intuition",
     "effects.3.name": "Primal Connection",
     "effects.4.name": "Monstrous Bonds",
-    "effects.5.name": "Mark Spells"
+    "effects.5.name": "Mark Spells",
+    "effects.2.description": "When you make an Intelligence (Nature) or Wisdom (Animal Handling) check, you can roll 1d4 and add it to the check.",
+    "effects.3.description": "You always have Animal Friendship and Speak with Animals prepared. You can cast each for free once per Long Rest, and also with slots. Your spellcasting ability is Intelligence, Wisdom, or Charisma (chosen when you take the feat).",
+    "effects.4.description": "At level 3, you can target a Monstrosity with Animal Friendship or Speak with Animals if its Intelligence is 3 or lower.",
+    "effects.5.description": "If you have the Spellcasting or Pact Magic feature, these spells are added to that feature's list. Level 1: Command, Find Familiar; Level 2: Beast Sense, Calm Emotions; Level 3: Beacon of Hope, Conjure Animals; Level 4: Aura of Life, Dominate Beast; Level 5: Awaken."
   },
   "mark-of-healing": {
-    "_es": "ef72539d",
+    "_es": "31706d0d",
     "name": "Mark of Healing",
     "effects.2.name": "Medical Intuition",
     "effects.3.name": "Healing Touch",
-    "effects.4.name": "Mark Spells"
+    "effects.4.name": "Mark Spells",
+    "effects.2.description": "When you make a Wisdom (Medicine) check or a check with an Herbalism Kit, you can roll 1d4 and add it to the check.",
+    "effects.3.description": "You always have Cure Wounds prepared. You can cast it for free once per Long Rest, and also with slots of the appropriate level. Your spellcasting ability is Intelligence, Wisdom, or Charisma (chosen when you take the feat). At level 3, you add Lesser Restoration on the same terms.",
+    "effects.4.description": "If you have the Spellcasting or Pact Magic feature, these spells are added to that feature's list. Level 1: False Life, Healing Word; Level 2: Arcane Vigor, Prayer of Healing; Level 3: Aura of Vitality, Mass Healing Word; Level 4: Aura of Life, Aura of Purity; Level 5: Greater Restoration."
   },
   "mark-of-hospitality": {
-    "_es": "2cdf2832",
+    "_es": "1bb253ab",
     "name": "Mark of Hospitality",
     "effects.3.name": "Ever Hospitable",
     "effects.4.name": "Innkeeper's Magic",
-    "effects.5.name": "Mark Spells"
+    "effects.5.name": "Mark Spells",
+    "effects.3.description": "When you make a Charisma (Persuasion) check or a check with Brewer's Supplies or Cook's Utensils, you can roll 1d4 and add it to the check.",
+    "effects.4.description": "You always have Purify Food and Drink and Unseen Servant prepared. You can cast each for free once per Long Rest, and also with slots of the appropriate level. Your spellcasting ability is Intelligence, Wisdom, or Charisma (chosen when you take the feat). At level 3, you add Calm Emotions on the same terms.",
+    "effects.5.description": "If you have the Spellcasting or Pact Magic feature, these spells are added to that feature's list. Level 1: Goodberry, Sleep; Level 2: Aid, Enhance Ability; Level 3: Create Food and Water, Leomund's Tiny Hut; Level 4: Aura of Purity, Mordenkainen's Private Sanctum; Level 5: Hallow."
   },
   "mark-of-making": {
-    "_es": "e00ee6d3",
+    "_es": "709721b0",
     "name": "Mark of Making",
     "effects.2.name": "Artisan's Intuition",
     "effects.3.name": "Spellsmith",
-    "effects.4.name": "Mark Spells"
+    "effects.4.name": "Mark Spells",
+    "effects.2.description": "When you make an Intelligence (Arcana) check or a check with Artisan's Tools, you can roll 1d4 and add it to the check.",
+    "effects.3.description": "You know the Mending cantrip. You also always have Magic Weapon prepared: you can cast it for free once per Long Rest, and also with slots. Your spellcasting ability is Intelligence, Wisdom, or Charisma (chosen when you take the feat).",
+    "effects.4.description": "If you have the Spellcasting or Pact Magic feature, these spells are added to that feature's list. Level 1: Identify, Tenser's Floating Disk; Level 2: Continual Flame, Spiritual Weapon; Level 3: Conjure Barrage, Elemental Weapon; Level 4: Fabricate, Stone Shape; Level 5: Creation."
   },
   "mark-of-passage": {
-    "_es": "73f60117",
+    "_es": "70c4f758",
     "name": "Mark of Passage",
     "effects.1.name": "Intuitive Movement",
     "effects.2.name": "Magical Passage",
     "effects.3.name": "Courier's Speed",
-    "effects.5.name": "Mark Spells"
+    "effects.5.name": "Mark Spells",
+    "effects.1.description": "When you make a Strength (Athletics) or Dexterity (Acrobatics) check, you can roll 1d4 and add it to the check.",
+    "effects.2.description": "You always have Misty Step prepared. You can cast it for free once per Long Rest, and also with slots. Your spellcasting ability is Intelligence, Wisdom, or Charisma (chosen when you take the feat).",
+    "effects.3.description": "Your Speed increases by 5 feet.",
+    "effects.5.description": "If you have the Spellcasting or Pact Magic feature, these spells are added to that feature's list. Level 1: Expeditious Retreat, Jump; Level 2: Find Steed, Pass without Trace; Level 3: Blink, Phantom Steed; Level 4: Dimension Door, Freedom of Movement; Level 5: Teleportation Circle."
   },
   "mark-of-scribing": {
-    "_es": "659859cb",
+    "_es": "d4ef3785",
     "name": "Mark of Scribing",
     "effects.3.name": "Gifted Scribe",
     "effects.4.name": "Scribe's Insight",
-    "effects.5.name": "Mark Spells"
+    "effects.5.name": "Mark Spells",
+    "effects.3.description": "When you make an Intelligence (History) check or a check with Calligrapher's Supplies, you can roll 1d4 and add it to the check.",
+    "effects.4.description": "You know the Message cantrip. You also always have Comprehend Languages prepared: you can cast it for free once per Long Rest, and also with slots of the appropriate level. Your spellcasting ability is Intelligence, Wisdom, or Charisma (chosen when you take the feat). At level 3, you add Magic Mouth on the same terms.",
+    "effects.5.description": "If you have the Spellcasting or Pact Magic feature, these spells are added to that feature's list. Level 1: Command, Illusory Script; Level 2: Animal Messenger, Silence; Level 3: Sending, Tongues; Level 4: Arcane Eye, Confusion; Level 5: Dream."
   },
   "mark-of-sentinel": {
-    "_es": "953a412e",
+    "_es": "529cc21c",
     "name": "Mark of Sentinel",
     "effects.1.name": "Sentinel's Intuition",
     "effects.2.name": "Guardian Shield",
     "effects.3.name": "Vigilant Guardian",
-    "effects.4.name": "Mark Spells"
+    "effects.4.name": "Mark Spells",
+    "effects.1.description": "When you make a Wisdom (Insight or Perception) check, you can roll 1d4 and add it to the check.",
+    "effects.2.description": "You always have Shield prepared. You can cast it for free once per Long Rest, and also with slots. Your spellcasting ability is Intelligence, Wisdom, or Charisma (chosen when you take the feat).",
+    "effects.3.description": "When a creature you can see within 5 feet of you is hit by an attack, you can take a Reaction to swap places with it and become the target of the attack instead. A number of times equal to your Proficiency Bonus, regained when you finish a Long Rest.",
+    "effects.4.description": "If you have the Spellcasting or Pact Magic feature, these spells are added to that feature's list. Level 1: Compelled Duel, Shield of Faith; Level 2: Warding Bond, Zone of Truth; Level 3: Counterspell, Protection from Energy; Level 4: Death Ward, Guardian of Faith; Level 5: Bigby's Hand."
   },
   "mark-of-shadow": {
-    "_es": "61f74b1f",
+    "_es": "f02b47a2",
     "name": "Mark of Shadow",
     "effects.2.name": "Cunning Insight",
     "effects.3.name": "Shadow Shaping",
-    "effects.4.name": "Mark Spells"
+    "effects.4.name": "Mark Spells",
+    "effects.2.description": "When you make a Dexterity (Stealth) or Charisma (Performance) check, you can roll 1d4 and add it to the check.",
+    "effects.3.description": "You know the Minor Illusion cantrip. You also always have Invisibility prepared: you can cast it for free once per Long Rest, and also with slots of the appropriate level. Your spellcasting ability is Intelligence, Wisdom, or Charisma (chosen when you take the feat).",
+    "effects.4.description": "If you have the Spellcasting or Pact Magic feature, these spells are added to that feature's list. Level 1: Disguise Self, Silent Image; Level 2: Darkness, Pass without Trace; Level 3: Clairvoyance, Major Image; Level 4: Greater Invisibility, Hallucinatory Terrain; Level 5: Mislead."
   },
   "mark-of-storm": {
-    "_es": "87fc01db",
+    "_es": "5337b7fa",
     "name": "Mark of Storm",
     "effects.2.name": "Wayfinder's Intuition",
     "effects.3.name": "Storm Magic",
     "effects.4.name": "Gift of the Storm",
-    "effects.6.name": "Mark Spells"
+    "effects.6.name": "Mark Spells",
+    "effects.2.description": "When you make a Dexterity (Acrobatics) check or a check with Navigator's Tools, you can roll 1d4 and add it to the check.",
+    "effects.3.description": "You know the Thunderclap cantrip. At level 3, you also always have Gust of Wind prepared: you can cast it for free once per Long Rest, and also with slots of the appropriate level. Your spellcasting ability is Intelligence, Wisdom, or Charisma (chosen when you take the feat).",
+    "effects.4.description": "You have Resistance to Lightning damage.",
+    "effects.6.description": "If you have the Spellcasting or Pact Magic feature, these spells are added to that feature's list. Level 1: Feather Fall, Fog Cloud; Level 2: Levitate, Shatter; Level 3: Sleet Storm, Wind Wall; Level 4: Conjure Minor Elementals, Control Water; Level 5: Conjure Elemental."
   },
   "mark-of-warding": {
-    "_es": "e8056493",
+    "_es": "e12cfe48",
     "name": "Mark of Warding",
     "effects.3.name": "Warder's Intuition",
     "effects.4.name": "Wards and Seals",
-    "effects.5.name": "Mark Spells"
+    "effects.5.name": "Mark Spells",
+    "effects.3.description": "When you make an Intelligence (Investigation) check or a check with Thieves' Tools, you can roll 1d4 and add it to the check.",
+    "effects.4.description": "You always have Alarm and Mage Armor prepared. You can cast each for free once per Long Rest, and also with slots of the appropriate level. Your spellcasting ability is Intelligence, Wisdom, or Charisma (chosen when you take the feat). At level 3, you add Arcane Lock on the same terms.",
+    "effects.5.description": "If you have the Spellcasting or Pact Magic feature, these spells are added to that feature's list. Level 1: Armor of Agathys, Sanctuary; Level 2: Knock, Nystul's Magic Aura; Level 3: Glyph of Warding, Magic Circle; Level 4: Leomund's Secret Chest, Mordenkainen's Faithful Hound; Level 5: Antilife Shell."
   },
   "greater-aberrant-mark": {
-    "_es": "7fea6e34",
+    "_es": "c211dd15",
     "name": "Greater Aberrant Mark",
     "effects.1.name": "Improved Fortitude",
-    "effects.2.name": "Mark of Inspiration"
+    "effects.2.name": "Mark of Inspiration",
+    "effects.1.description": "When you use Aberrant Fortitude, you can roll 1d6 instead of 1d4, and you regain it when you finish a Short or Long Rest.",
+    "effects.2.description": "When you cast a cantrip, you can roll one or two of your unspent Hit Point Dice. You gain Temporary Hit Points equal to the roll plus your Constitution modifier, and one creature of your choice within 30 feet (not you) takes that much Force damage. Those dice are expended. A number of times equal to your Proficiency Bonus, regained when you finish a Long Rest."
   },
   "greater-mark-of-detection": {
-    "_es": "ebff50e7",
+    "_es": "2b978c48",
     "name": "Greater Mark of Detection",
     "effects.1.name": "Improved Intuition",
-    "effects.2.name": "Shared Detection"
+    "effects.2.name": "Shared Detection",
+    "effects.1.description": "When you use Deductive Intuition from your base feat, you can roll 1d6 instead of 1d4.",
+    "effects.2.description": "When you use Magic Detection to cast See Invisibility without a slot, you can choose one creature you can see within 30 feet: it also gains the spell's effects for the duration."
   },
   "greater-mark-of-finding": {
-    "_es": "0c69d146",
+    "_es": "adc25c02",
     "name": "Greater Mark of Finding",
     "effects.1.name": "Improved Intuition",
-    "effects.2.name": "Improved Tracking"
+    "effects.2.name": "Improved Tracking",
+    "effects.1.description": "When you use Hunter's Intuition from your base feat, you can roll 1d6 instead of 1d4.",
+    "effects.2.description": "When you use Finder's Magic to cast Hunter's Mark without a slot, the spell's range doubles, and you can modify it so the target can't benefit from the Invisible condition for the duration."
   },
   "greater-mark-of-handling": {
-    "_es": "70e0e17a",
+    "_es": "93102a29",
     "name": "Greater Mark of Handling",
     "effects.1.name": "Improved Intuition",
-    "effects.2.name": "Improved Handling"
+    "effects.2.name": "Improved Handling",
+    "effects.1.description": "When you use Wild Intuition from your base feat, you can roll 1d6 instead of 1d4.",
+    "effects.2.description": "While mounted, as soon as you hit a target within 5 feet of your mount with a melee attack, the mount can take its Reaction to move up to its Speed or make one attack (your choice). In addition, as a Magic action, a Beast or Monstrosity you can see within 30 feet must succeed on a Wisdom saving throw (DC 8 + your Wisdom modifier + your Proficiency Bonus) or have the Frightened condition until the start of your next turn; a number of times equal to your Proficiency Bonus per Long Rest."
   },
   "greater-mark-of-healing": {
-    "_es": "6c7a4a9c",
+    "_es": "4910cd5d",
     "name": "Greater Mark of Healing",
     "effects.1.name": "Improved Intuition",
-    "effects.2.name": "Improved Healing"
+    "effects.2.name": "Improved Healing",
+    "effects.1.description": "When you use Medical Intuition from your base feat, you can roll 1d6 instead of 1d4.",
+    "effects.2.description": "You can use Healing Touch to cast Cure Wounds without a slot a number of times equal to your Proficiency Bonus, regained when you finish a Long Rest. In addition, when you roll Cure Wounds' healing dice, each 1 or 2 counts as a 3."
   },
   "greater-mark-of-hospitality": {
-    "_es": "746ca734",
+    "_es": "23364971",
     "name": "Greater Mark of Hospitality",
     "effects.1.name": "Improved Intuition",
-    "effects.2.name": "Inspired Hospitality"
+    "effects.2.name": "Inspired Hospitality",
+    "effects.1.description": "When you use Ever Hospitable from your base feat, you can roll 1d6 instead of 1d4.",
+    "effects.2.description": "When you cast Purify Food and Drink, you can modify it so that, instead of its normal effect, each creature of your choice within 30 feet is refreshed: its Exhaustion level decreases by 1, and it gains Temporary Hit Points equal to your Proficiency Bonus plus your Intelligence, Wisdom, or Charisma modifier (chosen when you take the feat). Once per Long Rest."
   },
   "greater-mark-of-making": {
-    "_es": "31dfafe4",
+    "_es": "96d7ab2f",
     "name": "Greater Mark of Making",
     "effects.1.name": "Improved Intuition",
-    "effects.2.name": "Improved Creation"
+    "effects.2.name": "Improved Creation",
+    "effects.1.description": "When you use Artisan's Intuition from your base feat, you can roll 1d6 instead of 1d4.",
+    "effects.2.description": "When you use Spellsmith to cast Magic Weapon without a slot, you cast it as if it were level 3."
   },
   "greater-mark-of-passage": {
-    "_es": "cefe4a0a",
+    "_es": "eb3a079b",
     "name": "Greater Mark of Passage",
     "effects.1.name": "Improved Intuition",
-    "effects.2.name": "Inspired Passage"
+    "effects.2.name": "Inspired Passage",
+    "effects.1.description": "When you use Intuitive Movement from your base feat, you can roll 1d6 instead of 1d4.",
+    "effects.2.description": "When you use Magical Passage to cast Misty Step without a slot, before you teleport you can choose up to two willing creatures you can see within 30 feet. Each can take its Reaction to teleport up to 30 feet to an unoccupied space it can see."
   },
   "greater-mark-of-scribing": {
-    "_es": "bd54f26a",
+    "_es": "617ef163",
     "name": "Greater Mark of Scribing",
     "effects.1.name": "Improved Intuition",
-    "effects.2.name": "Inspired Writing"
+    "effects.2.name": "Inspired Writing",
+    "effects.1.description": "When you use Gifted Scribe from your base feat, you can roll 1d6 instead of 1d4.",
+    "effects.2.description": "When you cast Comprehend Languages, you can modify it to include up to three willing creatures you can see within 30 feet: they also gain its effects for the duration. In addition, for the spell's duration, you and they can communicate telepathically while within 1 mile of each other. Once per Long Rest."
   },
   "greater-mark-of-sentinel": {
-    "_es": "75ea1dce",
+    "_es": "397cd753",
     "name": "Greater Mark of Sentinel",
     "effects.1.name": "Improved Intuition",
-    "effects.2.name": "Improved Sentinel"
+    "effects.2.name": "Improved Sentinel",
+    "effects.1.description": "When you use Sentinel's Intuition from your base feat, you can roll 1d6 instead of 1d4.",
+    "effects.2.description": "When you use Vigilant Guardian, you can also make one attack with a weapon or an Unarmed Strike as part of that same Reaction."
   },
   "greater-mark-of-shadow": {
-    "_es": "a2bac000",
+    "_es": "d88c7c75",
     "name": "Greater Mark of Shadow",
     "effects.1.name": "Improved Intuition",
-    "effects.2.name": "Improved Shadow"
+    "effects.2.name": "Improved Shadow",
+    "effects.1.description": "When you use Cunning Insight from your base feat, you can roll 1d6 instead of 1d4.",
+    "effects.2.description": "When you use Shadow Shaping to cast Invisibility without a slot, you cast it as if it were level 3."
   },
   "greater-mark-of-storm": {
-    "_es": "5a9280b8",
+    "_es": "1ddf7b52",
     "name": "Greater Mark of Storm",
     "effects.1.name": "Improved Intuition",
-    "effects.2.name": "Improved Storm"
+    "effects.2.name": "Improved Storm",
+    "effects.1.description": "When you use Wayfinder's Intuition from your base feat, you can roll 1d6 instead of 1d4.",
+    "effects.2.description": "When you use Storm Magic to cast Gust of Wind without a slot, you also gain a Fly Speed of 60 feet for the spell's duration."
   },
   "greater-mark-of-warding": {
-    "_es": "2669f774",
+    "_es": "4f0c71f0",
     "name": "Greater Mark of Warding",
     "effects.1.name": "Improved Intuition",
-    "effects.2.name": "Improved Ward"
+    "effects.2.name": "Improved Ward",
+    "effects.1.description": "When you use Warder's Intuition from your base feat, you can roll 1d6 instead of 1d4.",
+    "effects.2.description": "When a creature makes an attack roll against you or against someone you can see within 30 feet, you can take a Reaction to impose Disadvantage on it. A number of times equal to your Proficiency Bonus, regained when you finish a Long Rest."
   },
   "potent-dragonmark": {
-    "_es": "ac8f448e",
+    "_es": "ee4cd5e2",
     "name": "Potent Dragonmark",
     "effects.2.name": "Mark Preparation",
-    "effects.3.name": "Mark Spellcasting"
+    "effects.3.name": "Mark Spellcasting",
+    "effects.2.description": "You always have the spells of your Mark Spells list prepared, if you have it.",
+    "effects.3.description": "One extra spell slot for the spells your mark feat grants. Its level is half your level rounded up, to a maximum of level 5. It can be used only for spells prepared by your mark feat or by Mark Preparation."
   },
   "boon-of-siberys": {
-    "_es": "6de440f6",
+    "_es": "766994a6",
     "name": "Boon of Siberys",
-    "effects.1.name": "Blessing of Siberys"
+    "effects.1.name": "Blessing of Siberys",
+    "effects.1.description": "You increase one ability score of your choice by 1, to a maximum of 30. Choose one spell of level 8 or lower from the Sorcerer spell list, or one from the Siberys mark spells table: Animal Shapes, Control Weather, Demiplane, Heroes' Feast, Maze, Mind Blank, Plane Shift, Project Image, Regenerate, Symbol, Teleport, True Seeing. You always have it prepared, can cast it for free and without components once per Short or Long Rest, and also with slots of the appropriate level. Your spellcasting ability is Intelligence, Wisdom, or Charisma (chosen when you take the feat)."
   },
   "druid-land-arid": {
-    "_es": "73679929",
+    "_es": "8a3544c7",
     "name": "Arid Land",
-    "effects.0.name": "Arid Land"
+    "effects.0.name": "Arid Land",
+    "effects.0.description": "Your circle is tied to the desert and the wastelands: you gain its Circle spells, always prepared, and at level 10, Resistance to Fire damage."
   },
   "druid-land-polar": {
-    "_es": "59a25327",
+    "_es": "703df133",
     "name": "Polar Land",
-    "effects.0.name": "Polar Land"
+    "effects.0.name": "Polar Land",
+    "effects.0.description": "Your circle is tied to the tundra and the ice: you gain its Circle spells, always prepared, and at level 10, Resistance to Cold damage."
   },
   "druid-land-temperate": {
-    "_es": "8399798b",
+    "_es": "d943d744",
     "name": "Temperate Land",
-    "effects.0.name": "Temperate Land"
+    "effects.0.name": "Temperate Land",
+    "effects.0.description": "Your circle is tied to the forests and grasslands: you gain its Circle spells, always prepared, and at level 10, Resistance to Lightning damage."
   },
   "druid-land-tropical": {
-    "_es": "2d6081e3",
+    "_es": "f32cfe99",
     "name": "Tropical Land",
-    "effects.0.name": "Tropical Land"
+    "effects.0.name": "Tropical Land",
+    "effects.0.description": "Your circle is tied to the jungle and the swamp: you gain its Circle spells, always prepared, and at level 10, Resistance to Poison damage."
   }
 }
