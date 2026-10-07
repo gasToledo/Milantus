@@ -3710,7 +3710,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String codexLevelN(Object level) {
-    return 'nivel $level';
+    return 'Nivel $level';
   }
 
   @override

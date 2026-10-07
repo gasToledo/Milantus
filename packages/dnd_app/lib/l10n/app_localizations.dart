@@ -5932,7 +5932,7 @@ abstract class AppLocalizations {
   /// No description provided for @codexLevelN.
   ///
   /// In es, this message translates to:
-  /// **'nivel {level}'**
+  /// **'Nivel {level}'**
   String codexLevelN(Object level);
 
   /// No description provided for @codexPickAny.

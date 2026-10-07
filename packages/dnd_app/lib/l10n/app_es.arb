@@ -3283,7 +3283,7 @@
       }
     }
   },
-  "codexLevelN": "nivel {level}",
+  "codexLevelN": "Nivel {level}",
   "@codexLevelN": {
     "placeholders": {
       "level": {

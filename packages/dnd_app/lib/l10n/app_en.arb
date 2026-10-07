@@ -971,7 +971,7 @@
   "codexClearFilters": "Clear filters",
   "codexBackToList": "Back to the list",
   "codexLineageOf": "{race} lineage",
-  "codexLevelN": "level {level}",
+  "codexLevelN": "Level {level}",
   "codexPickAny": "choose {count}, any",
   "codexPickFrom": "choose {count} from {list}",
   "codexSubclassOf": "{klass} subclass",
