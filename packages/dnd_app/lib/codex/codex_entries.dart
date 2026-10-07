@@ -250,8 +250,35 @@ CodexEntry _feat(Feat f, ContentRepository repo, AppLocalizations l10n) {
         if (f.repeatable)
           (context.l10n.codexRepeatable, context.l10n.commonYes),
       ]),
+      _effectPills(context, f.effects, repo),
       _prose(context, featSummary(context.l10n, f, repo)),
     ],
+  );
+}
+
+/// Lo que la dote hace en la ficha, una pill dorada por efecto («+1 CAR»,
+/// «Conjuro: Detectar pensamientos…»).
+///
+/// La prosa cuenta el rasgo pero no el aumento: en las dotes partidas por
+/// característica, «Líder Inspirador (Carisma)» no decía en ningún lado que
+/// suma +1 a Carisma. Los rasgos pasivos quedan afuera porque ya son la prosa.
+Widget _effectPills(
+  BuildContext context,
+  List<Effect> effects,
+  ContentRepository repo,
+) {
+  final lines = [
+    for (final e in effects)
+      if (e is! PassiveTraitEffect) ?describeEffect(context.l10n, e, repo),
+  ];
+  if (lines.isEmpty) return const SizedBox.shrink();
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 12),
+    child: Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      children: [for (final line in lines) GoldPill(line)],
+    ),
   );
 }
 

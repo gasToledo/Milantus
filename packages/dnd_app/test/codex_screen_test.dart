@@ -99,6 +99,27 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  // La dote partida por característica dice en su nombre cuál sube, pero no
+  // cuánto: el +1 sale de su efecto, como pill dorada.
+  testWidgets('una dote muestra sus efectos como pills', (tester) async {
+    await pumpCodex(tester);
+    final lider = repo.feat('inspiring-leader-charisma')!;
+    final aumento = lider.effects.whereType<AbilityScoreBonusEffect>().single;
+
+    await tester.tap(find.text('Dotes').first);
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).last, lider.name);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(ValueKey('codex-feats-${lider.id}')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('+${aumento.amount} ${aumento.ability.abbr}'),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('el filtro por nivel deja solo los conjuros de ese nivel', (
     tester,
   ) async {

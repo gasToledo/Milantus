@@ -116,7 +116,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('Concede:'), findsOneWidget);
-    expect(find.textContaining('SAB +1'), findsWidgets);
+    expect(find.textContaining('+1 SAB'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
 

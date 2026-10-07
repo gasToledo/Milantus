@@ -1889,8 +1889,10 @@ String? describeEffect(
   Effect e,
   ContentRepository repo,
 ) => switch (e) {
+  // El signo adelante («+1 CAR») se lee como un aumento; «CAR +1» parecía
+  // una cuenta a medio escribir.
   AbilityScoreBonusEffect(:final ability, :final amount) =>
-    '${ability.abbr} ${amount >= 0 ? '+$amount' : '$amount'}',
+    '${amount >= 0 ? '+$amount' : '$amount'} ${ability.abbr}',
   SetAbilityScoreEffect(:final ability, :final score) =>
     '${ability.abbr} = $score',
   SkillProficiencyEffect(:final skill) => l10n.effectProficiency(
