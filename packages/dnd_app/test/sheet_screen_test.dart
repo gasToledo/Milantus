@@ -42,6 +42,7 @@ void main() {
     // Solo lo pasa la pestaña Campaña, que es lo único de la ficha que lee del
     // servidor además del turno. El resto se conforma con un doble vacío.
     FakeApiServer? server,
+    Locale locale = const Locale('es'),
   }) async {
     // Alto de sobra a propósito. Con 700 la pestaña Personaje —que desde los
     // idiomas tiene cuatro tarjetas— dispara un fallo dentro de Flutter, en
@@ -58,6 +59,7 @@ void main() {
     await tester.pumpWidget(
       localizedApp(
         theme: AppTheme.dark,
+        locale: locale,
         home: SheetScreen(
           character: character,
           repo: repo,
@@ -2917,6 +2919,38 @@ void main() {
       expect(find.textContaining('editada'), findsNothing);
       expect(tester.takeException(), isNull);
     });
+
+    // Día y mes en el orden de cada idioma: «28/09» armado a mano se leía
+    // como el mes 28 en inglés.
+    for (final (locale, tab, esperado) in [
+      (const Locale('es'), 'Diario', '28/9'),
+      (const Locale('en'), 'Journal', '9/28'),
+    ]) {
+      testWidgets(
+        'la fecha de la entrada sigue al idioma (${locale.languageCode})',
+        (tester) async {
+          await pumpSheet(
+            tester,
+            diarista(
+              diary: [
+                DiaryEntry(
+                  entryId: 'e1',
+                  title: 'Manías',
+                  body: 'Cuenta los pasos.',
+                  createdAt: DateTime(2026, 9, 28),
+                ),
+              ],
+            ),
+            locale: locale,
+          );
+          await tester.tap(find.text(tab));
+          await tester.pumpAndSettle();
+
+          expect(find.textContaining(esperado), findsOneWidget);
+          expect(tester.takeException(), isNull);
+        },
+      );
+    }
 
     /// Abre la entrada [titulo] desde la grilla.
     Future<void> abrirEntrada(WidgetTester tester, String titulo) async {

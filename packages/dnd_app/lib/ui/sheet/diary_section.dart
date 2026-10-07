@@ -484,7 +484,7 @@ extension _SheetDiarySection on _SheetScreenState {
     DiaryEntryKind.link => (Icons.link, context.l10n.diaryKindLink),
   };
 
-  /// «12/03», o «12/03 · editada 02/04» cuando se tocó después. Sin fecha —la
+  /// «12/3», o «12/3 · editada 2/4» cuando se tocó después. Sin fecha —la
   /// entrada que vino de las notas viejas— no se inventa ninguna.
   String _entryDates(DiaryEntry e) {
     final creada = e.createdAt;
@@ -495,11 +495,10 @@ extension _SheetDiarySection on _SheetScreenState {
     return context.l10n.diaryEditedOn(base, _shortDate(tocada));
   }
 
-  String _shortDate(DateTime d) {
-    final dia = d.day.toString().padLeft(2, '0');
-    final mes = d.month.toString().padLeft(2, '0');
-    return '$dia/$mes';
-  }
+  // Día y mes en el orden del idioma: «28/9» en español, «9/28» en inglés.
+  // Armado a mano salía «28/09» también en inglés, donde se lee al revés.
+  String _shortDate(DateTime d) =>
+      DateFormat.Md(Localizations.localeOf(context).toString()).format(d);
 
   void _moveEntry(String fromId, String toId) {
     if (fromId == toId) return;
