@@ -2416,6 +2416,10 @@ String _actionSectionLabel(
 /// antes sólo una lo declaraba.
 const double _profileWideWidth = 520;
 
+/// Ancho de tramo desde el que la banda de cifras rotula entero: lo que piden
+/// «CHALLENGE RATING» o «VALOR DE DESAFÍO» más el relleno.
+const double _profileLongLabelCell = 150;
+
 /// Medida de lectura de la prosa del perfil.
 ///
 /// El panel del Bestiario mide unos 855 px, y sin tope la descripción de un
@@ -2509,7 +2513,13 @@ List<Widget> creatureProfileBody(
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _profileNumbers(context, c, dense: dense, wide: wide),
+            _profileNumbers(
+              context,
+              c,
+              dense: dense,
+              wide: wide,
+              width: box.maxWidth,
+            ),
             const SizedBox(height: 18),
             _profileAbilities(context, c, wide: wide),
             const SizedBox(height: 18),
@@ -2533,8 +2543,18 @@ Widget _profileNumbers(
   Creature c, {
   required bool dense,
   required bool wide,
+  required double width,
 }) {
   final pal = context.palette;
+  // Que la banda vaya acostada no alcanza para los rótulos largos: con las
+  // cinco cifras, a 586 px cada tramo mide unos 105 y «CHALLENGE RATING» o
+  // «HIT POINTS 20d10+30» se cortaban. Van enteros solo si cada tramo tiene
+  // lugar; si no, la abreviatura, como en la banda envuelta.
+  final count =
+      (dense ? 0 : 3) +
+      (c.cr == null ? 0 : 1) +
+      (c.passivePerceptionValue == null ? 0 : 1);
+  final long = wide && count > 0 && width / count >= _profileLongLabelCell;
   // `semantics` solo donde el rótulo va abreviado por ancho: dicho en voz alta
   // «CA» no se entiende. Los demás ya se rotulan enteros y componen solos.
   final cells =
@@ -2561,11 +2581,11 @@ Widget _profileNumbers(
           // Suelta, cada celda mide 118 px y la forma larga se cortaba en
           // «PUNTOS DE GO…»: ahí va la abreviatura, como dice el glosario.
           (
-            label: wide ? context.l10n.hitPoints : context.l10n.hitPointsShort,
+            label: long ? context.l10n.hitPoints : context.l10n.hitPointsShort,
             value: c.hp,
-            suffix: wide ? c.hitDice : null,
+            suffix: long ? c.hitDice : null,
             color: pal.crimson,
-            semantics: wide ? null : context.l10n.hitPointsLabel(c.hp),
+            semantics: long ? null : context.l10n.hitPointsLabel(c.hp),
           ),
         // Tampoco la iniciativa: ahí ya está la tirada de esta mesa, que es la
         // que manda sobre el modificador impreso.
@@ -2579,13 +2599,13 @@ Widget _profileNumbers(
           ),
         if (c.cr != null)
           (
-            label: wide
+            label: long
                 ? context.l10n.challengeRating
                 : context.l10n.challengeRatingShort,
             value: challengeRatingLabel(c.cr!),
             suffix: null,
             color: pal.gold,
-            semantics: wide
+            semantics: long
                 ? null
                 : context.l10n.challengeRatingSemantics(
                     challengeRatingLabel(c.cr!),
