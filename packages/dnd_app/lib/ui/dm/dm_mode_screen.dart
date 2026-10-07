@@ -1761,6 +1761,7 @@ class _CampaignDetailState extends State<_CampaignDetail> {
             _CampaignSection.cuaderno => NotebookView(
               chapters: _chapters ?? const [],
               notebook: _notebook,
+              repo: widget.repo,
               initialChapterId: widget.notebookChapterId,
               loading: _notebookLoading || _chaptersLoading,
               error: _notebookError ?? _chaptersError,

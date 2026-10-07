@@ -10,12 +10,18 @@ void main() {
     rounds: 3,
     players: ['Miera'],
     monsters: [
-      EncounterLogMonsters(name: 'Guerrero goblin', count: 2, defeated: 2),
+      EncounterLogMonsters(
+        name: 'Guerrero goblin',
+        count: 2,
+        defeated: 2,
+        creatureId: 'goblin-warrior',
+      ),
       EncounterLogMonsters(
         name: 'Garrick el Tuerto',
         defeated: 1,
         npc: true,
         publicName: 'Bandido',
+        creatureId: 'bandit',
       ),
       EncounterLogMonsters(
         name: 'Maerith Sombravela',
@@ -27,6 +33,7 @@ void main() {
         side: CombatantSide.ally,
         npc: true,
         publicName: 'Caballero',
+        creatureId: 'knight',
       ),
       EncounterLogMonsters(
         name: 'Toblen',
@@ -49,6 +56,16 @@ void main() {
       expect(r.allies.single.npc, isTrue);
       expect(r.allies.single.publicName, 'Caballero');
       expect(r.neutrals.single.side, CombatantSide.neutral);
+      expect(r.allies.single.creatureId, 'knight');
+    });
+
+    // Lo guardado no cambia: el nombre traducido es solo para mostrar.
+    test('renamed nombra para mostrar sin tocar el resto', () {
+      final r = log.renamed((m) => m.name.toUpperCase());
+      expect(r.enemies.first.name, 'GUERRERO GOBLIN');
+      expect(r.enemies.first.creatureId, 'goblin-warrior');
+      expect(r.totalDefeated, log.totalDefeated);
+      expect(log.enemies.first.name, 'Guerrero goblin');
     });
   });
 
@@ -73,6 +90,16 @@ void main() {
       expect(names, containsAll(['Guerrero goblin', 'Bandido', '']));
       expect(view.monsters.every((m) => !m.npc), isTrue);
       expect(view.monsters.every((m) => m.publicName == null), isTrue);
+    });
+
+    // Con el id, la pantalla del jugador nombra la criatura en su idioma. El
+    // del PNJ es el de su criatura de base; el de la aliada no viaja.
+    test('cada grupo lleva el id de su criatura, y el PNJ el de su base', () {
+      final ids = {for (final m in view.monsters) m.name: m.creatureId};
+      expect(ids['Guerrero goblin'], 'goblin-warrior');
+      expect(ids['Bandido'], 'bandit');
+      expect(ids[''], isNull);
+      expect(body, isNot(contains('knight')));
     });
 
     test('aliados y neutrales no aparecen y los caídos son de enemigos', () {

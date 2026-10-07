@@ -23,6 +23,16 @@ class EncounterLogMonsters {
   /// cerrar el combate, así que borrar el PNJ después no cambia el pasado.
   final String? publicName;
 
+  /// La criatura del catálogo detrás del grupo: la del bestiario para un
+  /// monstruo, la de la que partió el bloque para un PNJ. Null si no hay
+  /// ninguna (PNJ sin bloque o armado de cero).
+  ///
+  /// [name] y [publicName] quedan en el idioma en que se cerró el combate;
+  /// con el id, la pantalla nombra la criatura en el idioma de la interfaz y
+  /// cae a lo guardado si el catálogo ya no la tiene. Es opcional y aditivo:
+  /// los registros anteriores no lo traen y se leen igual.
+  final String? creatureId;
+
   const EncounterLogMonsters({
     required this.name,
     this.count = 1,
@@ -30,6 +40,7 @@ class EncounterLogMonsters {
     this.side = CombatantSide.enemy,
     this.npc = false,
     this.publicName,
+    this.creatureId,
   });
 
   Map<String, dynamic> toJson() => {
@@ -39,6 +50,7 @@ class EncounterLogMonsters {
         'side': side.toJson(),
         if (npc) 'npc': true,
         if (publicName != null) 'publicName': publicName,
+        if (creatureId != null) 'creatureId': creatureId,
       };
 
   factory EncounterLogMonsters.fromJson(Map<String, dynamic> j) =>
@@ -50,6 +62,7 @@ class EncounterLogMonsters {
             CombatantSide.fromJson(j['side'] as String?) ?? CombatantSide.enemy,
         npc: j['npc'] as bool? ?? false,
         publicName: j['publicName'] as String?,
+        creatureId: j['creatureId'] as String?,
       );
 }
 
@@ -133,13 +146,16 @@ class EncounterLog {
   /// cliente pode exactamente igual: un doble más permisivo dejaría pasar una
   /// pantalla que muestra lo que no debe.
   EncounterLog playerView() {
-    final groups = <String, ({int count, int defeated})>{};
+    final groups = <String, ({int count, int defeated, String? creatureId})>{};
     for (final m in enemies) {
       final visible = m.npc ? (m.publicName ?? '') : m.name;
-      final previous = groups[visible] ?? (count: 0, defeated: 0);
+      final previous = groups[visible];
       groups[visible] = (
-        count: previous.count + m.count,
-        defeated: previous.defeated + m.defeated,
+        count: (previous?.count ?? 0) + m.count,
+        defeated: (previous?.defeated ?? 0) + m.defeated,
+        // El id viaja con el nombre visible: el del PNJ es el de su
+        // criatura de base, nunca algo que lo identifique a él.
+        creatureId: previous?.creatureId ?? m.creatureId,
       );
     }
     return EncounterLog(
@@ -153,11 +169,36 @@ class EncounterLog {
             name: e.key,
             count: e.value.count,
             defeated: e.value.defeated,
+            creatureId: e.value.creatureId,
           ),
       ],
       endedAt: endedAt,
     );
   }
+
+  /// El mismo registro con cada grupo nombrado por [nameOf]. Es para mostrar:
+  /// la pantalla resuelve [EncounterLogMonsters.creatureId] en el idioma de
+  /// la interfaz, y lo guardado no se toca.
+  EncounterLog renamed(String Function(EncounterLogMonsters m) nameOf) =>
+      EncounterLog(
+        id: id,
+        chapterId: chapterId,
+        rounds: rounds,
+        players: players,
+        monsters: [
+          for (final m in monsters)
+            EncounterLogMonsters(
+              name: nameOf(m),
+              count: m.count,
+              defeated: m.defeated,
+              side: m.side,
+              npc: m.npc,
+              publicName: m.publicName,
+              creatureId: m.creatureId,
+            ),
+        ],
+        endedAt: endedAt,
+      );
 
   Map<String, dynamic> toJson() => {
         'schemaVersion': currentSchemaVersion,

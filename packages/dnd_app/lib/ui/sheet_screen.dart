@@ -18,6 +18,7 @@ import '../theme/app_widgets.dart';
 import '../theme/class_visuals.dart';
 import '../web/browser.dart' as browser;
 import 'conditions.dart';
+import 'dm/npcs/npc_shared.dart';
 import 'dm/share_character_dialog.dart';
 import 'item_catalog.dart';
 import 'portrait_image.dart';

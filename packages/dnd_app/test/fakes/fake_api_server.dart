@@ -754,6 +754,7 @@ class FakeApiServer {
                       count: group.length,
                       defeated: group.where((c) => c.currentHp <= 0).length,
                       side: group.first.side,
+                      creatureId: group.first.creatureId,
                     ),
                   for (final c in closing.combatants)
                     if (c.kind == CombatantKind.npc)
@@ -765,6 +766,11 @@ class FakeApiServer {
                         publicName: switch (npcs[c.npcId]) {
                           final npc? when npc.sheetKind == NpcSheetKind.block =>
                             npc.baseCreatureName,
+                          _ => null,
+                        },
+                        creatureId: switch (npcs[c.npcId]) {
+                          final npc? when npc.sheetKind == NpcSheetKind.block =>
+                            npc.baseCreatureId,
                           _ => null,
                         },
                       ),

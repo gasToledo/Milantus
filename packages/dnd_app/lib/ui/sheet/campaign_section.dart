@@ -233,8 +233,8 @@ extension _CampaignSection on _SheetScreenState {
               switch ((m.name.isEmpty, m.count == 1)) {
                 (true, true) => context.l10n.enemyOne,
                 (true, false) => context.l10n.enemiesCount(m.count),
-                (false, true) => m.name,
-                (false, false) => '${m.count} ${m.name}',
+                (false, true) => logGroupName(m, widget.repo),
+                (false, false) => '${m.count} ${logGroupName(m, widget.repo)}',
               },
           ]),
         );

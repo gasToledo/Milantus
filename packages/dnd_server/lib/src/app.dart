@@ -1748,6 +1748,11 @@ Map<String, dynamic> _buildEncounterLog(
     return npc?.sheetKind == NpcSheetKind.block ? npc!.baseCreatureName : null;
   }
 
+  String? publicCreatureIdOf(Combatant c) {
+    final npc = npcs[c.npcId];
+    return npc?.sheetKind == NpcSheetKind.block ? npc!.baseCreatureId : null;
+  }
+
   return EncounterLog(
     rounds: encounter.round,
     players: players,
@@ -1760,6 +1765,7 @@ Map<String, dynamic> _buildEncounterLog(
           count: group.length,
           defeated: group.where((c) => c.currentHp <= 0).length,
           side: group.first.side,
+          creatureId: group.first.creatureId,
         ),
       for (final c in encounter.combatants)
         if (c.kind == CombatantKind.npc)
@@ -1769,6 +1775,7 @@ Map<String, dynamic> _buildEncounterLog(
             side: c.side,
             npc: true,
             publicName: publicNameOf(c),
+            creatureId: publicCreatureIdOf(c),
           ),
     ],
   ).toJson();

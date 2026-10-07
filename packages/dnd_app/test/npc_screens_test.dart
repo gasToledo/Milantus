@@ -951,6 +951,51 @@ void main() {
       },
     );
 
+    // El registro de combate guarda los nombres en el idioma en que se cerró;
+    // el Cuaderno y la pestaña Campaña los nombran con el catálogo cargado.
+    test('el registro de combate nombra en el idioma del catálogo', () async {
+      final ingles = await ContentRepository.loadFromDirectory(
+        '../dnd_engine/lib/assets/srd_2024',
+        translation: 'en',
+      );
+      final goblin = repo.creature('goblin-warrior')!;
+      final enIngles = ingles.creature(goblin.id)!.name;
+
+      // Un monstruo, y el PNJ ya pasado por `playerView` (nombre de su base).
+      expect(
+        logGroupName(
+          EncounterLogMonsters(name: goblin.name, creatureId: goblin.id),
+          ingles,
+        ),
+        enIngles,
+      );
+      // El nombre propio del PNJ en el Cuaderno del DM no es del catálogo.
+      expect(
+        logGroupName(
+          EncounterLogMonsters(name: 'Snik', npc: true, creatureId: goblin.id),
+          ingles,
+        ),
+        'Snik',
+      );
+      // Vacío es el PNJ anónimo que el jugador lee «un enemigo».
+      expect(logGroupName(const EncounterLogMonsters(name: ''), ingles), '');
+      // Un registro viejo, sin id, o una criatura que ya no está.
+      expect(
+        logGroupName(EncounterLogMonsters(name: goblin.name), ingles),
+        goblin.name,
+      );
+      expect(
+        logGroupName(
+          const EncounterLogMonsters(
+            name: 'Guardián del osario',
+            creatureId: 'homebrew-ajeno',
+          ),
+          ingles,
+        ),
+        'Guardián del osario',
+      );
+    });
+
     test('sin la criatura en el catálogo queda el nombre guardado', () {
       final npc = Npc(
         id: 'x',

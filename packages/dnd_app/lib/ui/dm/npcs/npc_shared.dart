@@ -68,6 +68,21 @@ String? npcBaseName(Npc npc, ContentRepository repo) {
   return (id == null ? null : repo.creature(id)?.name) ?? npc.baseCreatureName;
 }
 
+/// Cómo se nombra un grupo de un registro de combate, en el idioma de la
+/// interfaz.
+///
+/// Lo guardado quedó en el idioma en que se cerró el combate («La mesa contra
+/// Guerrero goblin»). Con [EncounterLogMonsters.creatureId] se busca la
+/// criatura en el catálogo; si ya no está —un homebrew borrado, o el de otra
+/// cuenta en la vista del jugador— queda lo guardado. El nombre propio de un
+/// PNJ no se toca: no es una criatura del catálogo. Y un nombre vacío sigue
+/// vacío, porque es el PNJ sin criatura que el jugador lee «un enemigo».
+String logGroupName(EncounterLogMonsters m, ContentRepository repo) {
+  if (m.npc || m.name.isEmpty) return m.name;
+  final id = m.creatureId;
+  return (id == null ? null : repo.creature(id)?.name) ?? m.name;
+}
+
 /// PG máximos con los que el PNJ entra a un combate, o 0 si no tiene con qué
 /// pelear. Un bloque recién creado y todavía vacío cuenta como sin PG: entra
 /// neutral hasta que el DM lo complete.

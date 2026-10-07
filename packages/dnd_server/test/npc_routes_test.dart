@@ -777,6 +777,12 @@ void main() {
       final garrick = log.enemies.firstWhere((e) => e.npc);
       expect(garrick.name, 'Garrick el Tuerto');
       expect(garrick.publicName, 'Bandido');
+      // Con el id, cada pantalla nombra la criatura en su idioma.
+      expect(garrick.creatureId, bandit.id);
+      expect(
+        log.enemies.firstWhere((e) => !e.npc).creatureId,
+        'goblin-warrior',
+      );
       expect(garrick.defeated, 1);
       expect(log.allies.single.name, 'Capitana Ilse Varn');
       expect(log.neutrals.single.name, 'Toblen');

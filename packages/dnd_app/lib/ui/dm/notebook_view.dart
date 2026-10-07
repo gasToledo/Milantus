@@ -5,6 +5,7 @@ import '../../api/api_models.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/app_widgets.dart';
 import '../../l10n/l10n_context.dart';
+import 'npcs/npc_shared.dart';
 
 /// El Cuaderno de campaña: qué pasó en cada capítulo.
 ///
@@ -28,6 +29,9 @@ import '../../l10n/l10n_context.dart';
 class NotebookView extends StatefulWidget {
   final List<Chapter> chapters;
   final Notebook? notebook;
+
+  /// Para nombrar las criaturas de los combates en el idioma de la interfaz.
+  final ContentRepository repo;
   final String? initialChapterId;
   final bool loading;
   final Object? error;
@@ -40,6 +44,7 @@ class NotebookView extends StatefulWidget {
     super.key,
     required this.chapters,
     required this.notebook,
+    required this.repo,
     this.initialChapterId,
     required this.loading,
     required this.error,
@@ -91,7 +96,12 @@ class _NotebookViewState extends State<NotebookView> {
         if (note.chapterId == chapterId &&
             (_matches(note.title) || _matches(note.body)))
           (at: note.updatedAt, note: note, log: null),
-      for (final log in notebook.encounterLogs)
+      // Se nombra una sola vez acá, en el idioma de la interfaz: el título,
+      // el cuerpo y la búsqueda leen todos el mismo registro ya traducido.
+      for (final log in [
+        for (final raw in notebook.encounterLogs)
+          raw.renamed((m) => logGroupName(m, widget.repo)),
+      ])
         if (log.chapterId == chapterId &&
             _matches(_logTitle(log, context.l10n)))
           (at: log.endedAt, note: null, log: log),
