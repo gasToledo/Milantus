@@ -284,16 +284,16 @@
     "effects.1.description": "You gain a Climb Speed equal to your Speed. Standing up from Prone costs only 5 feet of movement, and you can make a running Long or High Jump after moving only 5 feet."
   },
   "charger-strength": {
-    "_es": "efd28241",
+    "_es": "3d9ee7d6",
     "name": "Charger (Strength)",
     "effects.1.name": "Charger",
-    "effects.1.description": "Improved Dash: when you take the Dash action, your Speed increases by 10 feet for that action. Charge Attack: if you move at least 10 feet in a straight line toward a target immediately before hitting it with a melee attack as part of the Attack action, choose one of these effects: a 1d8 bonus to the attack's damage roll, or push the target up to 10 feet if it is no more than one size larger than you. Only once on each of your turns. (+1 to STR or DEX)"
+    "effects.1.description": "Improved Dash: when you take the Dash action, your Speed increases by 10 feet for that action. Charge Attack: if you move at least 10 feet in a straight line toward a target immediately before hitting it with a melee attack as part of the Attack action, choose one of these effects: a 1d8 bonus to the attack's damage roll, or push the target up to 10 feet if it is no more than one size larger than you. Only once on each of your turns."
   },
   "charger-dexterity": {
-    "_es": "d7dc7976",
+    "_es": "31db86b5",
     "name": "Charger (Dexterity)",
     "effects.1.name": "Charger",
-    "effects.1.description": "Improved Dash: when you take the Dash action, your Speed increases by 10 feet for that action. Charge Attack: if you move at least 10 feet in a straight line toward a target immediately before hitting it with a melee attack as part of the Attack action, choose one of these effects: a 1d8 bonus to the attack's damage roll, or push the target up to 10 feet if it is no more than one size larger than you. Only once on each of your turns. (+1 to STR or DEX)"
+    "effects.1.description": "Improved Dash: when you take the Dash action, your Speed increases by 10 feet for that action. Charge Attack: if you move at least 10 feet in a straight line toward a target immediately before hitting it with a melee attack as part of the Attack action, choose one of these effects: a 1d8 bonus to the attack's damage roll, or push the target up to 10 feet if it is no more than one size larger than you. Only once on each of your turns."
   },
   "chef-constitution": {
     "_es": "cc0026c4",
@@ -386,16 +386,16 @@
     "effects.1.description": "You learn Misty Step and one level 1 Divination or Enchantment spell, each castable for free once per Long Rest."
   },
   "grappler-strength": {
-    "_es": "8b0a030c",
+    "_es": "a1035c45",
     "name": "Grappler (Strength)",
     "effects.1.name": "Grappler",
-    "effects.1.description": "When you hit with an Unarmed Strike as part of the Attack action, you can use both the Damage and Grapple options at once (once per turn). You have Advantage on attacks against a creature you are grappling, and you spend no extra movement to drag it if it is your size or smaller. (+1 to STR or DEX)"
+    "effects.1.description": "When you hit with an Unarmed Strike as part of the Attack action, you can use both the Damage and Grapple options at once (once per turn). You have Advantage on attacks against a creature you are grappling, and you spend no extra movement to drag it if it is your size or smaller."
   },
   "grappler-dexterity": {
-    "_es": "1fbc4f0b",
+    "_es": "996b7412",
     "name": "Grappler (Dexterity)",
     "effects.1.name": "Grappler",
-    "effects.1.description": "When you hit with an Unarmed Strike as part of the Attack action, you can use both the Damage and Grapple options at once (once per turn). You have Advantage on attacks against a creature you are grappling, and you spend no extra movement to drag it if it is your size or smaller. (+1 to STR or DEX)"
+    "effects.1.description": "When you hit with an Unarmed Strike as part of the Attack action, you can use both the Damage and Grapple options at once (once per turn). You have Advantage on attacks against a creature you are grappling, and you spend no extra movement to drag it if it is your size or smaller."
   },
   "heavily-armored-constitution": {
     "_es": "cb277006",
@@ -410,28 +410,28 @@
     "effects.2.description": "You gain Heavy armor training."
   },
   "heavy-armor-master-constitution": {
-    "_es": "10d8c848",
+    "_es": "03b91a6f",
     "name": "Heavy Armor Master (Constitution)",
     "effects.1.name": "Heavy Armor Master",
-    "effects.1.description": "Damage Reduction: when you are hit by an attack while wearing Heavy armor, any Bludgeoning, Piercing, and Slashing damage dealt by that attack is reduced by an amount equal to your Proficiency Bonus. The 2024 rule doesn't care whether the attack is magical. (+1 to STR or CON)"
+    "effects.1.description": "Damage Reduction: when you are hit by an attack while wearing Heavy armor, any Bludgeoning, Piercing, and Slashing damage dealt by that attack is reduced by an amount equal to your Proficiency Bonus. The 2024 rule doesn't care whether the attack is magical."
   },
   "heavy-armor-master-strength": {
-    "_es": "cc90ac1f",
+    "_es": "706feae8",
     "name": "Heavy Armor Master (Strength)",
     "effects.1.name": "Heavy Armor Master",
-    "effects.1.description": "Damage Reduction: when you are hit by an attack while wearing Heavy armor, any Bludgeoning, Piercing, and Slashing damage dealt by that attack is reduced by an amount equal to your Proficiency Bonus. The 2024 rule doesn't care whether the attack is magical. (+1 to STR or CON)"
+    "effects.1.description": "Damage Reduction: when you are hit by an attack while wearing Heavy armor, any Bludgeoning, Piercing, and Slashing damage dealt by that attack is reduced by an amount equal to your Proficiency Bonus. The 2024 rule doesn't care whether the attack is magical."
   },
   "inspiring-leader-wisdom": {
-    "_es": "fb39639e",
+    "_es": "c23ae557",
     "name": "Inspiring Leader (Wisdom)",
     "effects.1.name": "Inspiring Leader",
-    "effects.1.description": "After a rest, a rousing speech gives Temporary Hit Points to you and nearby allies. (+1 to WIS or CHA)"
+    "effects.1.description": "After a rest, a rousing speech gives Temporary Hit Points to you and nearby allies."
   },
   "inspiring-leader-charisma": {
-    "_es": "d9f58424",
+    "_es": "25b13b79",
     "name": "Inspiring Leader (Charisma)",
     "effects.1.name": "Inspiring Leader",
-    "effects.1.description": "After a rest, a rousing speech gives Temporary Hit Points to you and nearby allies. (+1 to WIS or CHA)"
+    "effects.1.description": "After a rest, a rousing speech gives Temporary Hit Points to you and nearby allies."
   },
   "keen-mind": {
     "_es": "417a0651",
@@ -494,16 +494,16 @@
     "effects.2.description": "You learn two cantrips and one level 1 spell from the Cleric spell list. Your spellcasting ability is Intelligence, Wisdom, or Charisma, your choice. The spell is always prepared, and you can cast it without a slot once per Long Rest, or by expending slots. When you gain a new level, you can replace one of the chosen spells with another from the same list. You can take this feat more than once, but with a different list each time."
   },
   "medium-armor-master-strength": {
-    "_es": "d46009dc",
+    "_es": "9a670af5",
     "name": "Medium Armor Master (Strength)",
     "effects.1.name": "Medium Armor Master",
-    "effects.1.description": "In Medium armor you have no Disadvantage on Stealth and add up to +3 of DEX to your AC. (+1 to STR or DEX)"
+    "effects.1.description": "In Medium armor you have no Disadvantage on Stealth and add up to +3 of DEX to your AC."
   },
   "medium-armor-master-dexterity": {
-    "_es": "f7e8067b",
+    "_es": "c6366c22",
     "name": "Medium Armor Master (Dexterity)",
     "effects.1.name": "Medium Armor Master",
-    "effects.1.description": "In Medium armor you have no Disadvantage on Stealth and add up to +3 of DEX to your AC. (+1 to STR or DEX)"
+    "effects.1.description": "In Medium armor you have no Disadvantage on Stealth and add up to +3 of DEX to your AC."
   },
   "moderately-armored-strength": {
     "_es": "c3066885",
@@ -518,22 +518,22 @@
     "effects.2.description": "You gain Medium armor training."
   },
   "mounted-combatant-strength": {
-    "_es": "a445bf97",
+    "_es": "5693b602",
     "name": "Mounted Combatant (Strength)",
     "effects.1.name": "Mounted Combatant",
-    "effects.1.description": "Advantage on attacks against creatures smaller than your mount; you can redirect attacks to yourself and protect your mount. (+1 to STR, DEX, or WIS)"
+    "effects.1.description": "Advantage on attacks against creatures smaller than your mount; you can redirect attacks to yourself and protect your mount."
   },
   "mounted-combatant-dexterity": {
-    "_es": "b34e71bc",
+    "_es": "e7b149b9",
     "name": "Mounted Combatant (Dexterity)",
     "effects.1.name": "Mounted Combatant",
-    "effects.1.description": "Advantage on attacks against creatures smaller than your mount; you can redirect attacks to yourself and protect your mount. (+1 to STR, DEX, or WIS)"
+    "effects.1.description": "Advantage on attacks against creatures smaller than your mount; you can redirect attacks to yourself and protect your mount."
   },
   "mounted-combatant-wisdom": {
-    "_es": "a99cfcd0",
+    "_es": "debbe0b7",
     "name": "Mounted Combatant (Wisdom)",
     "effects.1.name": "Mounted Combatant",
-    "effects.1.description": "Advantage on attacks against creatures smaller than your mount; you can redirect attacks to yourself and protect your mount. (+1 to STR, DEX, or WIS)"
+    "effects.1.description": "Advantage on attacks against creatures smaller than your mount; you can redirect attacks to yourself and protect your mount."
   },
   "observant-intelligence": {
     "_es": "173a4f49",
@@ -709,16 +709,16 @@
     "effects.1.description": "When you deal Slashing damage, you reduce the target's Speed; on a Slashing Critical Hit, you impose Disadvantage on its attacks."
   },
   "speedy-dexterity": {
-    "_es": "7fda5203",
+    "_es": "eb3d2924",
     "name": "Speedy (Dexterity)",
     "effects.2.name": "Speedy",
-    "effects.2.description": "Speed Increase: your Speed increases by 10 feet. Dash over Difficult Terrain: when you take the Dash action on your turn, Difficult Terrain doesn't cost you extra movement for the rest of that turn. Agile Movement: Opportunity Attacks have Disadvantage against you. (+1 to DEX or CON)"
+    "effects.2.description": "Speed Increase: your Speed increases by 10 feet. Dash over Difficult Terrain: when you take the Dash action on your turn, Difficult Terrain doesn't cost you extra movement for the rest of that turn. Agile Movement: Opportunity Attacks have Disadvantage against you."
   },
   "speedy-constitution": {
-    "_es": "4a4f5783",
+    "_es": "6ba45b88",
     "name": "Speedy (Constitution)",
     "effects.2.name": "Speedy",
-    "effects.2.description": "Speed Increase: your Speed increases by 10 feet. Dash over Difficult Terrain: when you take the Dash action on your turn, Difficult Terrain doesn't cost you extra movement for the rest of that turn. Agile Movement: Opportunity Attacks have Disadvantage against you. (+1 to DEX or CON)"
+    "effects.2.description": "Speed Increase: your Speed increases by 10 feet. Dash over Difficult Terrain: when you take the Dash action on your turn, Difficult Terrain doesn't cost you extra movement for the rest of that turn. Agile Movement: Opportunity Attacks have Disadvantage against you."
   },
   "spell-sniper-intelligence": {
     "_es": "51c93102",
@@ -739,40 +739,40 @@
     "effects.1.description": "Bypass Cover: your spell attack rolls ignore Half Cover and Three-Quarters Cover. Casting in Melee: being within 5 feet of an enemy doesn't impose Disadvantage on your spell attack rolls. Increased Range: when you cast a spell that has a range of at least 10 feet and requires an attack roll, you can increase its range by 60 feet; it doesn't double."
   },
   "telekinetic-intelligence": {
-    "_es": "0951c4f8",
+    "_es": "c122cb9e",
     "name": "Telekinetic (Intelligence)",
     "effects.1.name": "Telekinetic",
-    "effects.1.description": "You learn Mage Hand (invisible) and can shove creatures 5 feet with your mind as a Bonus Action. (+1 to INT, WIS, or CHA)"
+    "effects.1.description": "You learn Mage Hand (invisible) and can shove creatures 5 feet with your mind as a Bonus Action."
   },
   "telekinetic-wisdom": {
-    "_es": "834e1bee",
+    "_es": "47baa7fc",
     "name": "Telekinetic (Wisdom)",
     "effects.1.name": "Telekinetic",
-    "effects.1.description": "You learn Mage Hand (invisible) and can shove creatures 5 feet with your mind as a Bonus Action. (+1 to INT, WIS, or CHA)"
+    "effects.1.description": "You learn Mage Hand (invisible) and can shove creatures 5 feet with your mind as a Bonus Action."
   },
   "telekinetic-charisma": {
-    "_es": "ccc93054",
+    "_es": "bd030aaa",
     "name": "Telekinetic (Charisma)",
     "effects.1.name": "Telekinetic",
-    "effects.1.description": "You learn Mage Hand (invisible) and can shove creatures 5 feet with your mind as a Bonus Action. (+1 to INT, WIS, or CHA)"
+    "effects.1.description": "You learn Mage Hand (invisible) and can shove creatures 5 feet with your mind as a Bonus Action."
   },
   "telepathic-intelligence": {
-    "_es": "35fb34ec",
+    "_es": "deb63372",
     "name": "Telepathic (Intelligence)",
     "effects.1.name": "Telepathic",
-    "effects.1.description": "You gain short-range telepathy and can cast Detect Thoughts without expending slots. (+1 to INT, WIS, or CHA)"
+    "effects.1.description": "You gain short-range telepathy and can cast Detect Thoughts without expending slots."
   },
   "telepathic-wisdom": {
-    "_es": "c85b6dba",
+    "_es": "b7a24c98",
     "name": "Telepathic (Wisdom)",
     "effects.1.name": "Telepathic",
-    "effects.1.description": "You gain short-range telepathy and can cast Detect Thoughts without expending slots. (+1 to INT, WIS, or CHA)"
+    "effects.1.description": "You gain short-range telepathy and can cast Detect Thoughts without expending slots."
   },
   "telepathic-charisma": {
-    "_es": "66d95560",
+    "_es": "3e13a386",
     "name": "Telepathic (Charisma)",
     "effects.1.name": "Telepathic",
-    "effects.1.description": "You gain short-range telepathy and can cast Detect Thoughts without expending slots. (+1 to INT, WIS, or CHA)"
+    "effects.1.description": "You gain short-range telepathy and can cast Detect Thoughts without expending slots."
   },
   "war-caster-intelligence": {
     "_es": "220bbf73",

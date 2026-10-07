@@ -677,7 +677,7 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "strength", "amount": 1 },
-      { "type": "passiveTrait", "name": "Atacante a la Carga", "description": "Correr Mejorado: cuando lleves a cabo la acción de correr, tu velocidad aumenta 10 pies para esa acción. Ataque a la Carga: si te movés al menos 10 pies en línea recta hacia un objetivo inmediatamente antes de acertarle con un ataque cuerpo a cuerpo como parte de la acción de Atacar, elegís uno de estos efectos: un bonificador de 1d8 a la tirada de daño del ataque, o empujar al objetivo hasta 10 pies si no es más de una categoría de tamaño mayor que vos. Solo una vez en cada uno de tus turnos. (+1 a FUE o DES)" }
+      { "type": "passiveTrait", "name": "Atacante a la Carga", "description": "Correr Mejorado: cuando lleves a cabo la acción de correr, tu velocidad aumenta 10 pies para esa acción. Ataque a la Carga: si te movés al menos 10 pies en línea recta hacia un objetivo inmediatamente antes de acertarle con un ataque cuerpo a cuerpo como parte de la acción de Atacar, elegís uno de estos efectos: un bonificador de 1d8 a la tirada de daño del ataque, o empujar al objetivo hasta 10 pies si no es más de una categoría de tamaño mayor que vos. Solo una vez en cada uno de tus turnos." }
     ],
     "prerequisite": { "minLevel": 4, "anyAbilityScores": { "strength": 13, "dexterity": 13 } }
   },
@@ -690,7 +690,7 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "dexterity", "amount": 1 },
-      { "type": "passiveTrait", "name": "Atacante a la Carga", "description": "Correr Mejorado: cuando lleves a cabo la acción de correr, tu velocidad aumenta 10 pies para esa acción. Ataque a la Carga: si te movés al menos 10 pies en línea recta hacia un objetivo inmediatamente antes de acertarle con un ataque cuerpo a cuerpo como parte de la acción de Atacar, elegís uno de estos efectos: un bonificador de 1d8 a la tirada de daño del ataque, o empujar al objetivo hasta 10 pies si no es más de una categoría de tamaño mayor que vos. Solo una vez en cada uno de tus turnos. (+1 a FUE o DES)" }
+      { "type": "passiveTrait", "name": "Atacante a la Carga", "description": "Correr Mejorado: cuando lleves a cabo la acción de correr, tu velocidad aumenta 10 pies para esa acción. Ataque a la Carga: si te movés al menos 10 pies en línea recta hacia un objetivo inmediatamente antes de acertarle con un ataque cuerpo a cuerpo como parte de la acción de Atacar, elegís uno de estos efectos: un bonificador de 1d8 a la tirada de daño del ataque, o empujar al objetivo hasta 10 pies si no es más de una categoría de tamaño mayor que vos. Solo una vez en cada uno de tus turnos." }
     ],
     "prerequisite": { "minLevel": 4, "anyAbilityScores": { "strength": 13, "dexterity": 13 } }
   },
@@ -996,7 +996,7 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "strength", "amount": 1 },
-      { "type": "passiveTrait", "name": "Apresador", "description": "Al acertar con un ataque sin armas durante la acción de Atacar podés usar a la vez las opciones de daño y agarre (una vez por turno). Tenés ventaja al atacar a una criatura que estés agarrando y no gastás movimiento extra por arrastrarla si es de tu tamaño o menor. (+1 a FUE o DES)" }
+      { "type": "passiveTrait", "name": "Apresador", "description": "Al acertar con un ataque sin armas durante la acción de Atacar podés usar a la vez las opciones de daño y agarre (una vez por turno). Tenés ventaja al atacar a una criatura que estés agarrando y no gastás movimiento extra por arrastrarla si es de tu tamaño o menor." }
     ],
     "prerequisite": { "minLevel": 4, "anyAbilityScores": { "strength": 13, "dexterity": 13 } }
   },
@@ -1009,7 +1009,7 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "dexterity", "amount": 1 },
-      { "type": "passiveTrait", "name": "Apresador", "description": "Al acertar con un ataque sin armas durante la acción de Atacar podés usar a la vez las opciones de daño y agarre (una vez por turno). Tenés ventaja al atacar a una criatura que estés agarrando y no gastás movimiento extra por arrastrarla si es de tu tamaño o menor. (+1 a FUE o DES)" }
+      { "type": "passiveTrait", "name": "Apresador", "description": "Al acertar con un ataque sin armas durante la acción de Atacar podés usar a la vez las opciones de daño y agarre (una vez por turno). Tenés ventaja al atacar a una criatura que estés agarrando y no gastás movimiento extra por arrastrarla si es de tu tamaño o menor." }
     ],
     "prerequisite": { "minLevel": 4, "anyAbilityScores": { "strength": 13, "dexterity": 13 } }
   },
@@ -1050,7 +1050,7 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "constitution", "amount": 1 },
-      { "type": "passiveTrait", "name": "Maestro en Armaduras Pesadas", "description": "Reducción de Daño: cuando te acierten con un ataque mientras llevás armadura pesada, todo el daño contundente, perforante y cortante de ese ataque se reduce en una cantidad igual a tu bonificador por competencia. La regla 2024 no distingue si el ataque es mágico. (+1 a FUE o CON)" }
+      { "type": "passiveTrait", "name": "Maestro en Armaduras Pesadas", "description": "Reducción de Daño: cuando te acierten con un ataque mientras llevás armadura pesada, todo el daño contundente, perforante y cortante de ese ataque se reduce en una cantidad igual a tu bonificador por competencia. La regla 2024 no distingue si el ataque es mágico." }
     ],
     "prerequisite": { "minLevel": 4, "requiredProficiency": "heavy" }
   },
@@ -1063,7 +1063,7 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "strength", "amount": 1 },
-      { "type": "passiveTrait", "name": "Maestro en Armaduras Pesadas", "description": "Reducción de Daño: cuando te acierten con un ataque mientras llevás armadura pesada, todo el daño contundente, perforante y cortante de ese ataque se reduce en una cantidad igual a tu bonificador por competencia. La regla 2024 no distingue si el ataque es mágico. (+1 a FUE o CON)" }
+      { "type": "passiveTrait", "name": "Maestro en Armaduras Pesadas", "description": "Reducción de Daño: cuando te acierten con un ataque mientras llevás armadura pesada, todo el daño contundente, perforante y cortante de ese ataque se reduce en una cantidad igual a tu bonificador por competencia. La regla 2024 no distingue si el ataque es mágico." }
     ],
     "prerequisite": { "minLevel": 4, "requiredProficiency": "heavy" }
   },
@@ -1076,7 +1076,7 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "wisdom", "amount": 1 },
-      { "type": "passiveTrait", "name": "Líder Inspirador", "description": "Tras un descanso, una arenga da PG temporales a vos y a aliados cercanos. (+1 a SAB o CAR)" }
+      { "type": "passiveTrait", "name": "Líder Inspirador", "description": "Tras un descanso, una arenga da PG temporales a vos y a aliados cercanos." }
     ],
     "prerequisite": { "minLevel": 4, "anyAbilityScores": { "wisdom": 13, "charisma": 13 } }
   },
@@ -1089,7 +1089,7 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "charisma", "amount": 1 },
-      { "type": "passiveTrait", "name": "Líder Inspirador", "description": "Tras un descanso, una arenga da PG temporales a vos y a aliados cercanos. (+1 a SAB o CAR)" }
+      { "type": "passiveTrait", "name": "Líder Inspirador", "description": "Tras un descanso, una arenga da PG temporales a vos y a aliados cercanos." }
     ],
     "prerequisite": { "minLevel": 4, "anyAbilityScores": { "wisdom": 13, "charisma": 13 } }
   },
@@ -1254,7 +1254,7 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "strength", "amount": 1 },
-      { "type": "passiveTrait", "name": "Maestro en Armaduras Medias", "description": "Con armadura media no tenés desventaja en Sigilo y sumás hasta +3 de DES a la CA. (+1 a FUE o DES)" }
+      { "type": "passiveTrait", "name": "Maestro en Armaduras Medias", "description": "Con armadura media no tenés desventaja en Sigilo y sumás hasta +3 de DES a la CA." }
     ],
     "prerequisite": { "minLevel": 4, "requiredProficiency": "medium" }
   },
@@ -1267,7 +1267,7 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "dexterity", "amount": 1 },
-      { "type": "passiveTrait", "name": "Maestro en Armaduras Medias", "description": "Con armadura media no tenés desventaja en Sigilo y sumás hasta +3 de DES a la CA. (+1 a FUE o DES)" }
+      { "type": "passiveTrait", "name": "Maestro en Armaduras Medias", "description": "Con armadura media no tenés desventaja en Sigilo y sumás hasta +3 de DES a la CA." }
     ],
     "prerequisite": { "minLevel": 4, "requiredProficiency": "medium" }
   },
@@ -1308,7 +1308,7 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "strength", "amount": 1 },
-      { "type": "passiveTrait", "name": "Combatiente Montado", "description": "Ventaja al atacar a criaturas menores que tu montura; podés desviar ataques hacia vos y proteger a tu montura. (+1 a FUE, DES o SAB)" }
+      { "type": "passiveTrait", "name": "Combatiente Montado", "description": "Ventaja al atacar a criaturas menores que tu montura; podés desviar ataques hacia vos y proteger a tu montura." }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -1321,7 +1321,7 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "dexterity", "amount": 1 },
-      { "type": "passiveTrait", "name": "Combatiente Montado", "description": "Ventaja al atacar a criaturas menores que tu montura; podés desviar ataques hacia vos y proteger a tu montura. (+1 a FUE, DES o SAB)" }
+      { "type": "passiveTrait", "name": "Combatiente Montado", "description": "Ventaja al atacar a criaturas menores que tu montura; podés desviar ataques hacia vos y proteger a tu montura." }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -1334,7 +1334,7 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "wisdom", "amount": 1 },
-      { "type": "passiveTrait", "name": "Combatiente Montado", "description": "Ventaja al atacar a criaturas menores que tu montura; podés desviar ataques hacia vos y proteger a tu montura. (+1 a FUE, DES o SAB)" }
+      { "type": "passiveTrait", "name": "Combatiente Montado", "description": "Ventaja al atacar a criaturas menores que tu montura; podés desviar ataques hacia vos y proteger a tu montura." }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -1832,7 +1832,7 @@
     "effects": [
       { "type": "abilityScoreBonus", "ability": "dexterity", "amount": 1 },
       { "type": "speedBonus", "feet": 10 },
-      { "type": "passiveTrait", "name": "Veloz", "description": "Aumento de Velocidad: tu velocidad aumenta 10 pies. Correr sobre Terreno Difícil: cuando lleves a cabo la acción de correr en tu turno, el terreno difícil no te cuesta movimiento adicional durante el resto de ese turno. Movimiento Ágil: los ataques de oportunidad tienen desventaja contra vos. (+1 a DES o CON)" }
+      { "type": "passiveTrait", "name": "Veloz", "description": "Aumento de Velocidad: tu velocidad aumenta 10 pies. Correr sobre Terreno Difícil: cuando lleves a cabo la acción de correr en tu turno, el terreno difícil no te cuesta movimiento adicional durante el resto de ese turno. Movimiento Ágil: los ataques de oportunidad tienen desventaja contra vos." }
     ],
     "prerequisite": { "minLevel": 4, "anyAbilityScores": { "dexterity": 13, "constitution": 13 } }
   },
@@ -1846,7 +1846,7 @@
     "effects": [
       { "type": "abilityScoreBonus", "ability": "constitution", "amount": 1 },
       { "type": "speedBonus", "feet": 10 },
-      { "type": "passiveTrait", "name": "Veloz", "description": "Aumento de Velocidad: tu velocidad aumenta 10 pies. Correr sobre Terreno Difícil: cuando lleves a cabo la acción de correr en tu turno, el terreno difícil no te cuesta movimiento adicional durante el resto de ese turno. Movimiento Ágil: los ataques de oportunidad tienen desventaja contra vos. (+1 a DES o CON)" }
+      { "type": "passiveTrait", "name": "Veloz", "description": "Aumento de Velocidad: tu velocidad aumenta 10 pies. Correr sobre Terreno Difícil: cuando lleves a cabo la acción de correr en tu turno, el terreno difícil no te cuesta movimiento adicional durante el resto de ese turno. Movimiento Ágil: los ataques de oportunidad tienen desventaja contra vos." }
     ],
     "prerequisite": { "minLevel": 4, "anyAbilityScores": { "dexterity": 13, "constitution": 13 } }
   },
@@ -1898,7 +1898,7 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "intelligence", "amount": 1 },
-      { "type": "passiveTrait", "name": "Telequinético", "description": "Aprendés Mano de Mago (invisible) y podés empujar a criaturas 5 pies con la mente como acción adicional. (+1 a INT, SAB o CAR)" }
+      { "type": "passiveTrait", "name": "Telequinético", "description": "Aprendés Mano de Mago (invisible) y podés empujar a criaturas 5 pies con la mente como acción adicional." }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -1911,7 +1911,7 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "wisdom", "amount": 1 },
-      { "type": "passiveTrait", "name": "Telequinético", "description": "Aprendés Mano de Mago (invisible) y podés empujar a criaturas 5 pies con la mente como acción adicional. (+1 a INT, SAB o CAR)" }
+      { "type": "passiveTrait", "name": "Telequinético", "description": "Aprendés Mano de Mago (invisible) y podés empujar a criaturas 5 pies con la mente como acción adicional." }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -1924,7 +1924,7 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "charisma", "amount": 1 },
-      { "type": "passiveTrait", "name": "Telequinético", "description": "Aprendés Mano de Mago (invisible) y podés empujar a criaturas 5 pies con la mente como acción adicional. (+1 a INT, SAB o CAR)" }
+      { "type": "passiveTrait", "name": "Telequinético", "description": "Aprendés Mano de Mago (invisible) y podés empujar a criaturas 5 pies con la mente como acción adicional." }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -1937,7 +1937,7 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "intelligence", "amount": 1 },
-      { "type": "passiveTrait", "name": "Telepático", "description": "Ganás telepatía a corta distancia y podés lanzar Detectar Pensamientos sin gastar espacios. (+1 a INT, SAB o CAR)" }
+      { "type": "passiveTrait", "name": "Telepático", "description": "Ganás telepatía a corta distancia y podés lanzar Detectar Pensamientos sin gastar espacios." }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -1950,7 +1950,7 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "wisdom", "amount": 1 },
-      { "type": "passiveTrait", "name": "Telepático", "description": "Ganás telepatía a corta distancia y podés lanzar Detectar Pensamientos sin gastar espacios. (+1 a INT, SAB o CAR)" }
+      { "type": "passiveTrait", "name": "Telepático", "description": "Ganás telepatía a corta distancia y podés lanzar Detectar Pensamientos sin gastar espacios." }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -1963,7 +1963,7 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "charisma", "amount": 1 },
-      { "type": "passiveTrait", "name": "Telepático", "description": "Ganás telepatía a corta distancia y podés lanzar Detectar Pensamientos sin gastar espacios. (+1 a INT, SAB o CAR)" }
+      { "type": "passiveTrait", "name": "Telepático", "description": "Ganás telepatía a corta distancia y podés lanzar Detectar Pensamientos sin gastar espacios." }
     ],
     "prerequisite": { "minLevel": 4 }
   },
