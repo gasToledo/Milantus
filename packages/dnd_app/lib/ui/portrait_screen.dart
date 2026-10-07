@@ -13,6 +13,7 @@ import '../data/settings_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_widgets.dart';
 import '../theme/class_visuals.dart';
+import 'dm/npcs/npc_shared.dart';
 import 'portrait_image.dart';
 import '../l10n/l10n_context.dart';
 
@@ -743,7 +744,7 @@ class _PortraitScreenState extends State<PortraitScreen> {
       final npc = widget.npc!;
       subtitle = [
         context.l10n.kindNpc,
-        npc.baseCreatureName ??
+        npcBaseName(npc, widget.repo) ??
             npc.block?.name ??
             npc.sheetKind.text(context.l10n),
       ];

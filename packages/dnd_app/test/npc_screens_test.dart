@@ -11,6 +11,7 @@ import 'package:dnd_app/theme/app_theme.dart';
 import 'package:dnd_app/theme/app_widgets.dart';
 import 'package:dnd_app/ui/dm/dm_mode_screen.dart';
 import 'package:dnd_app/ui/dm/npcs/npc_detail_screen.dart';
+import 'package:dnd_app/ui/dm/npcs/npc_shared.dart';
 import 'package:dnd_app/ui/dm/npcs/npc_transfer.dart';
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:flutter/material.dart';
@@ -922,6 +923,43 @@ void main() {
       expect(repo.weapon(arma.id)?.name, arma.name);
       expect(store.weapons.keys, contains(arma.id));
       expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('Criatura base', () {
+    // El nombre guardado queda en el idioma en que se creó el PNJ; en pantalla
+    // manda el catálogo cargado, que sigue al idioma de la interfaz.
+    test(
+      'se nombra en el idioma del catálogo, no en el que se guardó',
+      () async {
+        final ingles = await ContentRepository.loadFromDirectory(
+          '../dnd_engine/lib/assets/srd_2024',
+          translation: 'en',
+        );
+        final base = repo.creature('goblin-warrior')!;
+        final npc = Npc(
+          id: 'snik',
+          name: 'Snik',
+          sheetKind: NpcSheetKind.block,
+          block: base,
+          baseCreatureId: base.id,
+          baseCreatureName: base.name,
+        );
+
+        expect(npcBaseName(npc, ingles), ingles.creature(base.id)!.name);
+        expect(npcBaseName(npc, ingles), isNot(base.name));
+      },
+    );
+
+    test('sin la criatura en el catálogo queda el nombre guardado', () {
+      final npc = Npc(
+        id: 'x',
+        name: 'X',
+        sheetKind: NpcSheetKind.block,
+        baseCreatureId: 'homebrew-borrado',
+        baseCreatureName: 'Guardián del osario',
+      );
+      expect(npcBaseName(npc, repo), 'Guardián del osario');
     });
   });
 }

@@ -768,13 +768,14 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
         );
       case NpcSheetKind.block:
         final block = npc.block ?? emptyNpcBlock(npc.name);
+        final baseName = npcBaseName(npc, widget.repo);
         return _card(
           context,
           title: context.l10n.npcBlockTitle,
-          trailing: npc.baseCreatureName == null
+          trailing: baseName == null
               ? null
               : Text(
-                  context.l10n.npcBasedOn(npc.baseCreatureName!),
+                  context.l10n.npcBasedOn(baseName),
                   style: TextStyle(fontSize: 12, color: pal.textMuted),
                 ),
           child: Column(

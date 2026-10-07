@@ -32,7 +32,7 @@ String npcTypeLine(
     case NpcSheetKind.block:
       final block = npc.block;
       if (block == null) return NpcSheetKind.block.text(l10n);
-      final base = npc.baseCreatureName ?? block.name;
+      final base = npcBaseName(npc, repo) ?? block.name;
       final hp = hurt == null ? block.hp : '${hurt.current}/${hurt.max}';
       return l10n.npcBlockLine(base, block.ac, hp);
     case NpcSheetKind.character:
@@ -56,6 +56,17 @@ String? npcPortraitKey(Npc npc, Character? sheet) =>
     npc.sheetKind == NpcSheetKind.character
     ? sheet?.portraitPaths.firstOrNull
     : npc.portraitPaths.firstOrNull;
+
+/// La criatura de la que partió el bloque, en el idioma de la interfaz.
+///
+/// Se busca por id en el catálogo, que ya viene traducido: el nombre guardado
+/// quedó en el idioma en que se creó el PNJ («Guerrero goblin» en la
+/// interfaz en inglés). Ese nombre queda de respaldo para cuando la criatura
+/// ya no está, como un homebrew borrado.
+String? npcBaseName(Npc npc, ContentRepository repo) {
+  final id = npc.baseCreatureId;
+  return (id == null ? null : repo.creature(id)?.name) ?? npc.baseCreatureName;
+}
 
 /// PG máximos con los que el PNJ entra a un combate, o 0 si no tiene con qué
 /// pelear. Un bloque recién creado y todavía vacío cuenta como sin PG: entra
