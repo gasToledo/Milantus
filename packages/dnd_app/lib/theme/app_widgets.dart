@@ -26,7 +26,10 @@ String failureMessage(String what, Object error) {
     UnsupportedDataVersionException() => '$error',
     _ => '',
   };
-  return reason.isEmpty ? '$what.' : '$what: $reason';
+  // Hay motivos del servidor que dicen lo mismo que el título («No se pudo
+  // enviar el mensaje: No se pudo enviar el mensaje.»): repetido no informa.
+  final same = reason.replaceFirst(RegExp(r'\.$'), '') == what;
+  return reason.isEmpty || same ? '$what.' : '$what: $reason';
 }
 
 /// [onUndo] agrega el botón «Deshacer» y le da más tiempo al cartel: el que

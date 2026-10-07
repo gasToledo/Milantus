@@ -20,10 +20,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageSelectorTooltip => 'Change language';
 
   @override
-  String get settingsLoadError => 'Couldn\'t load the settings';
+  String get settingsLoadError => 'Could not load the settings';
 
   @override
-  String get settingsSaveError => 'Couldn\'t save the settings';
+  String get settingsSaveError => 'Could not save the settings';
 
   @override
   String get settingsTitle => 'Settings · Image generation';
@@ -444,13 +444,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exportingCharacter => 'Exporting character…';
 
   @override
-  String get exportCharacterError => 'Couldn\'t export the character';
+  String get exportCharacterError => 'Could not export the character';
 
   @override
   String get creatingBackup => 'Creating backup…';
 
   @override
-  String get backupError => 'Couldn\'t create the backup';
+  String get backupError => 'Could not create the backup';
 
   @override
   String get importPickTitle => 'Choose a backup (.zip)';
@@ -460,7 +460,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String importBackupBody(String fileName) {
-    return 'This will add the characters (and the homebrew and preferences, if the backup includes them) from \"$fileName\" to this account. Existing characters are left untouched; a repeated ID is saved as a new copy.';
+    return 'This will add the characters (and the homebrew and preferences, if the backup includes them) from “$fileName” to this account. Existing characters are left untouched; a repeated ID is saved as a new copy.';
   }
 
   @override
@@ -484,7 +484,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get importError => 'Couldn\'t import';
+  String get importError => 'Could not import';
 
   @override
   String get operationBusy => 'An operation is already in progress.';
@@ -501,7 +501,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String rosterNoMatch(String query) {
-    return 'No character matches \"$query\".\nSearch looks at name, class and species.';
+    return 'No character matches “$query”.\nSearch looks at name, class and species.';
   }
 
   @override
@@ -554,21 +554,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sortClass => 'Class';
 
   @override
-  String get sortSaveError => 'Couldn\'t save the order of your characters';
+  String get sortSaveError => 'Could not save the order of your characters';
 
   @override
   String get sortManualHint =>
-      'Manual order: use \"Move earlier\" and \"Move later\" in each card\'s menu, or drag it onto another one.';
+      'Manual order: use “Move earlier” and “Move later” in each card\'s menu, or drag it onto another one.';
 
   @override
-  String get saveLatestError => 'Couldn\'t save your latest changes';
+  String get saveLatestError => 'Could not save your latest changes';
 
   @override
   String get sessionExpiredTitle => 'Your session has ended';
 
   @override
   String get sessionExpiredBody =>
-      'The changes that couldn\'t be saved yet are still on screen. Sign in again to keep editing.';
+      'The changes that could not be saved yet are still on screen. Sign in again to keep editing.';
 
   @override
   String get sessionSignIn => 'Sign in';
@@ -589,7 +589,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountSignOut => 'Sign out';
 
   @override
-  String get signOutError => 'Couldn\'t sign out';
+  String get signOutError => 'Could not sign out';
 
   @override
   String get characterFallenBadge => 'DOWN';
@@ -710,7 +710,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get campaignStateFinished => 'Finished';
 
   @override
-  String get campaignsLoadError => 'Couldn\'t read your campaigns.';
+  String get campaignsLoadError => 'Could not read your campaigns.';
 
   @override
   String get campaignsLoading => 'Loading your campaigns…';
@@ -1639,7 +1639,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String tradeShort(String amount) {
-    return 'You are short $amount. If the DM gives it to you or lets you have it on credit, close this and use \"Add\".';
+    return 'You are short $amount. If the DM gives it to you or lets you have it on credit, close this and use “Add”.';
   }
 
   @override
@@ -1998,7 +1998,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diaryPickMd => 'Choose a .md file';
 
   @override
-  String get diaryOpenError => 'Couldn\'t open the file';
+  String get diaryOpenError => 'Could not open the file';
 
   @override
   String get diaryReplaceTitle => 'Replace the background';
@@ -2038,17 +2038,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String diaryDeleted(String title) {
-    return 'You deleted \"$title\".';
+    return 'You deleted “$title”.';
   }
 
   @override
   String diaryDeleteBody(String title) {
-    return '\"$title\" is leaving the journal.';
+    return '“$title” is leaving the journal.';
   }
 
   @override
   String diaryDeleteBodyImage(String title) {
-    return '\"$title\" is leaving the journal, and the image you uploaded is deleted with it. There is no way to recover it.';
+    return '“$title” is leaving the journal, and the image you uploaded is deleted with it. There is no way to recover it.';
   }
 
   @override
@@ -2090,7 +2090,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diaryPickImage => 'Choose an image';
 
   @override
-  String get diaryUploadError => 'Couldn\'t upload the image';
+  String get diaryUploadError => 'Could not upload the image';
 
   @override
   String get diaryNewEntry => 'New entry';
@@ -2535,7 +2535,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get detailsTraitHint =>
-      'A line that defines them. E.g. \"Never leaves a debt unpaid.\"';
+      'A line that defines them. E.g. “Never leaves a debt unpaid.”';
 
   @override
   String get weaponSimple => 'Simple';
@@ -2762,7 +2762,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String scoresAllStartAt(Object min) {
-    return 'All start at $min: raise the ones you care about with \"+\".';
+    return 'All start at $min: raise the ones you care about with “+”.';
   }
 
   @override
@@ -3620,7 +3620,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String luNoFeatMatch(String query) {
-    return 'No feat matches \"$query\".';
+    return 'No feat matches “$query”.';
   }
 
   @override
@@ -3677,7 +3677,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String codexNoMatch(String query) {
-    return 'Nothing in the Codex matches \"$query\".';
+    return 'Nothing in the Codex matches “$query”.';
   }
 
   @override
@@ -3850,7 +3850,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get portraitDefaultError =>
-      'Couldn\'t set it as the default, but it works for this session.';
+      'Could not set it as the default, but it works for this session.';
 
   @override
   String get portraitOffline =>
@@ -3858,26 +3858,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String portraitGenerateError(String message) {
-    return 'Couldn\'t generate: $message';
+    return 'Could not generate: $message';
   }
 
   @override
-  String get portraitGenerateFailed => 'Couldn\'t generate';
+  String get portraitGenerateFailed => 'Could not generate';
 
   @override
   String get portraitPickReference => 'Choose a reference image';
 
   @override
-  String get portraitReferenceError => 'Couldn\'t choose the reference image';
+  String get portraitReferenceError => 'Could not choose the reference image';
 
   @override
   String get portraitPickImage => 'Choose a portrait image';
 
   @override
-  String get portraitImportError => 'Couldn\'t import the image';
+  String get portraitImportError => 'Could not import the image';
 
   @override
-  String get portraitSaveError => 'Couldn\'t save the portrait';
+  String get portraitSaveError => 'Could not save the portrait';
 
   @override
   String get portraitSaved => 'Portrait saved.';
@@ -3893,7 +3893,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'The portrait is deleted forever and cannot be recovered.';
 
   @override
-  String get portraitDeleteError => 'Couldn\'t delete the portrait';
+  String get portraitDeleteError => 'Could not delete the portrait';
 
   @override
   String get portraitDeleted => 'Portrait deleted.';
@@ -4108,14 +4108,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String hbSaved(String name) {
-    return '\"$name\" was saved.';
+    return '“$name” was saved.';
   }
 
   @override
   String get hbNoChanges => 'No changes were saved.';
 
   @override
-  String get hbSaveError => 'Couldn\'t save the homebrew content';
+  String get hbSaveError => 'Could not save the homebrew content';
 
   @override
   String get hbNothingToExport => 'There is no homebrew content to export.';
@@ -4163,7 +4163,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get hbImportError => 'Couldn\'t import the homebrew';
+  String get hbImportError => 'Could not import the homebrew';
 
   @override
   String hbLoadIssues(int count) {
@@ -4218,7 +4218,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String hbNoMatch(String query) {
-    return 'Nothing in your content matches \"$query\".';
+    return 'Nothing in your content matches “$query”.';
   }
 
   @override
@@ -4234,7 +4234,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String hbFor(String query) {
-    return 'for \"$query\"';
+    return 'for “$query”';
   }
 
   @override
@@ -4323,7 +4323,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String hbDeleteTitle(String kind, String name) {
-    return 'Delete $kind \"$name\"?';
+    return 'Delete $kind “$name”?';
   }
 
   @override
@@ -4366,7 +4366,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String hbCatalogNoMatch(String query) {
-    return 'Nothing in the catalog matches \"$query\".';
+    return 'Nothing in the catalog matches “$query”.';
   }
 
   @override
@@ -4374,7 +4374,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String hbLeaveBody(String title) {
-    return 'What you wrote in \"$title\" will be lost.';
+    return 'What you wrote in “$title” will be lost.';
   }
 
   @override
@@ -4970,7 +4970,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String hbWillRead(String kind) {
-    return 'It will read \"$kind\".';
+    return 'It will read “$kind”.';
   }
 
   @override
@@ -6741,7 +6741,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get feedbackSend => 'Send';
 
   @override
-  String get feedbackSendError => 'Couldn\'t send the message';
+  String get feedbackSendError => 'Could not send the message';
 
   @override
   String get feedbackSent => 'Thanks! We got your message.';

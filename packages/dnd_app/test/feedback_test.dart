@@ -130,10 +130,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(server.feedback, isEmpty);
-    expect(
-      find.text('No se pudo enviar el mensaje: No se pudo enviar el mensaje.'),
-      findsOne,
-    );
+    expect(find.text('No se pudo enviar el mensaje.'), findsOne);
     expect(find.text('Que se pueda ordenar el inventario'), findsOne);
     expect(tester.takeException(), isNull);
   });
@@ -160,10 +157,7 @@ void main() {
     await tester.tap(find.text('Send'));
     await tester.pumpAndSettle();
 
-    expect(
-      find.text("Couldn't send the message: Could not send the message."),
-      findsOne,
-    );
+    expect(find.text('Could not send the message.'), findsOne);
     expect(tester.takeException(), isNull);
   });
 
