@@ -41,8 +41,8 @@
   },
   "aljaba-eficiente": {
     "_es": "69970b40",
-    "name": "Efficient Quiver",
-    "description": "Wondrous Item, Uncommon\nEach of the quiver's three compartments connects to an extradimensional space that allows the quiver to hold numerous items while never weighing more than 2 pounds. The shortest compartment can hold up to 60 Arrows, Bolts, or similar objects. The midsize compartment holds up to 18 Javelins or similar objects. The longest compartment holds up to 6 long objects, such as bows, Quarterstaff's, or Spears.\nYou can draw any item the quiver contains as if doing so from a regular quiver or scabbard."
+    "name": "Quiver of Ehlonna",
+    "description": "Wondrous Item, Uncommon\nEach of the quiver's three compartments connects to an extradimensional space that allows the quiver to hold numerous items while never weighing more than 2 pounds. The shortest compartment can hold up to 60 Arrows, Bolts, or similar objects. The midsize compartment holds up to 18 Javelins or similar objects. The longest compartment holds up to 6 long objects, such as bows, quarterstaffs, or spears.\nYou can draw any item the quiver contains as if doing so from a regular quiver or scabbard."
   },
   "amuleto-a-prueba-de-deteccion-y-localizacion": {
     "_es": "14aad68c",
@@ -191,7 +191,7 @@
   },
   "aparato-del-crustaceo": {
     "_es": "ff1df881",
-    "name": "Apparatus of the Crab",
+    "name": "Apparatus of Kwalish",
     "description": "Wondrous Item, Legendary\nThis item first appears to be a sealed iron barrel weighing 500 pounds. The barrel has a hidden catch, which can be found with a successful DC 20 Intelligence (Investigation) check. Releasing the catch unlocks a hatch at one end of the barrel, allowing two Medium or smaller creatures to crawl inside. Ten levers are set in a row at the far end, each in a neutral position, able to move up or down. When certain levers are used, the apparatus transforms to resemble a giant lobster.\nThe Apparatus of Kwalish is a Large object with the following statistics: AC 20; HP 200; Speed 30 ft., Swim 30 ft. (or 0 ft. for both if the legs aren't extended); Immunity to Poison and Psychic damage.\nTo be used as a vehicle, the apparatus requires one pilot. While the apparatus's hatch is closed, the compartment is airtight and watertight. The compartment holds enough air for 10 hours of breathing, divided by the number of breathing creatures inside.\nThe apparatus floats on water. It can also go underwater to a depth of 900 feet. Below that, the vehicle takes 2d6 Bludgeoning damage each minute from pressure.\nA creature in the compartment can take a Utilize action to move as many as two of the apparatus's levers up or down. After each use, a lever goes back to its neutral position. Each lever, from left to right, functions as shown in the Apparatus of Kwalish Levers table.\nApparatus of Kwalish Levers\n1 — Legs extend, allowing the apparatus to walk and swim. — Legs retract, reducing the apparatus's Speed and Swim Speed to 0 and making it unable to benefit from bonuses to speed.\n2 — Forward window shutter opens. — Forward window shutter closes.\n3 — Side window shutters open (two per side). — Side window shutters close (two per side).\n4 — Two claws extend from the front side of the apparatus. — The claws retract.\n5 — Each extended claw makes the following melee attack: +8 to hit, reach 5 ft. Hit: 7 (2d6) Bludgeoning damage. — Each extended claw makes the following melee attack: +8 to hit, reach 5 ft. Hit: The target has the Grappled condition (escape DC 15).\n6 — The apparatus walks or swims forward provided its legs are extended. — The apparatus walks or swims backward provided its legs are extended.\n7 — The apparatus turns 90 degrees counterclockwise provided its legs are extended. — The apparatus turns 90 degrees clockwise provided its legs are extended.\n8 — Eyelike fixtures emit Bright Light in a 30-foot radius and Dim Light for an additional 30 feet. — The light turns off.\n9 — The apparatus sinks up to 20 feet if it's in liquid. — The apparatus rises up to 20 feet if it's in liquid.\n10 — The rear hatch unseals and opens. — The rear hatch closes and seals."
   },
   "arco-de-energia": {
@@ -291,7 +291,7 @@
   },
   "bandas-de-hierro": {
     "_es": "1a1792ee",
-    "name": "Iron Bands",
+    "name": "Iron Bands of Bilarro",
     "description": "Wondrous Item, Rare\nThis rusty iron sphere measures 3 inches in diameter and weighs 1 pound. You can take a Magic action to throw the sphere at a Huge or smaller creature you can see within 60 feet of yourself. As the sphere moves through the air, it opens into a tangle of metal bands.\nMake a ranged attack roll with an attack bonus equal to your Dexterity modifier plus your Proficiency Bonus. On a hit, the target has the Restrained condition until you take a Bonus Action to issue a command that releases it. Doing so or missing with the attack causes the bands to contract and become a sphere once more.\nA creature that can touch the bands, including the one Restrained, can take an action to make a DC 20 Strength (Athletics) check to break the iron bands. On a successful check, the item is destroyed, and the Restrained creature is freed. On a failed check, any further attempts made by that creature automatically fail until 24 hours have elapsed.\nOnce the bands are used, they can't be used again until the next dawn."
   },
   "baraja-de-ilusiones": {
@@ -761,7 +761,7 @@
   },
   "fortaleza-instantanea": {
     "_es": "2d74a9b9",
-    "name": "Instant Fortress",
+    "name": "Daern's Instant Fortress",
     "description": "Wondrous Item, Rare (Requires Attunement)\nAs a Magic action, you can place this 1-inch adamantine statuette on the ground and, using a command word, cause it to grow rapidly into a square adamantine tower. Repeating the command word causes the tower to revert to statuette form, which works only if the tower is empty. Each creature in the area where the tower appears is pushed to an unoccupied space outside but next to the tower. Objects in the area that aren't being worn or carried are also pushed clear of the tower.\nThe tower is 20 feet on a side and 30 feet high, with arrow slits on all sides and a battlement atop it. Its interior is divided into two floors, with a ladder, staircase, or ramp (your choice) connecting them. This ladder, staircase, or ramp ends at a trapdoor leading to the roof. When created, the tower has a single door at ground level on the side facing you. The door opens only at your command, which you can issue as a Bonus Action. It is immune to the Knock spell and similar magic.\nMagic prevents the tower from being tipped over. The roof, the door, and the walls each have AC 20; HP 100; Immunity to Bludgeoning, Piercing, and Slashing damage except that which is dealt by siege equipment; and Resistance to all other damage. Shrinking the tower back down to statuette form doesn't repair damage to the tower. Only a Wish spell can repair the tower (this use of the spell counts as replicating a spell of level 8 or lower). Each casting of Wish causes the tower to regain all its Hit Points."
   },
   "frasco-de-hierro": {
@@ -931,7 +931,7 @@
   },
   "morral-practico": {
     "_es": "44af9b7a",
-    "name": "Handy Haversack",
+    "name": "Heward's Handy Haversack",
     "description": "Wondrous Item, Rare\nThis backpack has a central pouch and two side pouches, each of which is an extradimensional space. Each side pouch can hold up to 200 pounds of material, not exceeding a volume of 25 cubic feet. The central pouch can hold up to 500 pounds of material, not exceeding a volume of 64 cubic feet. The haversack always weighs 5 pounds, regardless of its contents.\nRetrieving an item from the haversack requires a Utilize action or a Bonus Action (your choice). When you reach into the haversack for a specific item, the item is always magically on top.\nIf any of its pouches is overloaded, pierced, or torn, the haversack ruptures and is destroyed. If the haversack is destroyed, its contents are lost forever, although an Artifact always turns up again somewhere. If the haversack is turned inside out, its contents spill forth unharmed, and the haversack must be put right before it can be used again.\nEach pouch of the haversack holds enough air for 10 minutes of breathing, divided by the number of breathing creatures inside.\nPlacing the haversack inside an extradimensional space created by a Bag of Holding, Portable Hole, or similar item instantly destroys both items and opens a gate to the Astral Plane. The gate originates where the one item was placed inside the other. Any creature within 10 feet of the gate and not behind Total Cover is sucked through it and deposited in a random location on the Astral Plane. The gate then closes. The gate is one-way only and can't be reopened."
   },
   "municion-1": {
@@ -956,7 +956,7 @@
   },
   "orbe-dragontino": {
     "_es": "e468d30b",
-    "name": "Dragon Orb",
+    "name": "Orb of Dragonkind",
     "description": "Wondrous Item, Artifact (Requires Attunement)\nAn orb is an etched crystal globe about 10 inches in diameter. When used, it grows to about 20 inches in diameter, and mist swirls inside it.\nWhile attuned to an orb, you can take a Magic action to peer into the orb's depths. You must then make a DC 15 Charisma saving throw. On a successful save, you control the orb for as long as you remain attuned to it. On a failed save, the orb imposes the Charmed condition on you for as long as you remain attuned to it.\nWhile you are Charmed by the orb, you can't voluntarily end your Attunement to it, and the orb casts Suggestion on you at will (save DC 18), urging you to work toward the evil ends it desires. The dragon essence within the orb might want many things: the annihilation of a particular society or organization, freedom from the orb, to spread suffering in the world, to advance the worship of Tiamat, or something else the DM decides.\nSpells. The orb has 7 charges and regains 1d4 + 3 expended charges daily at dawn. If you control the orb, you can cast one of the spells on the following table from it. The table indicates how many charges you must expend to cast the spell.\nCure Wounds (level 9 version) — 4\nDaylight — 1\nDeath Ward — 2\nDetect Magic — 0\nScrying (save DC 18) — 3\nCall Dragons. While you control the orb, you can take a Magic action to cause the orb to issue a telepathic call that extends in all directions for 40 miles. Chromatic dragons in range feel compelled to come to the orb as soon as possible by the most direct route. Dragon deities such as Tiamat are unaffected by this call. Chromatic dragons drawn to the orb might be Hostile toward you for compelling them against their will. Once you have used this property, it can't be used again for 1 hour.\nDestroying an Orb. An Orb of Dragonkind has AC 20 and is destroyed if it takes damage from a +3 Weapon or a Disintegrate spell. Nothing else can harm it."
   },
   "pegamento-soberano": {
@@ -996,7 +996,7 @@
   },
   "pigmentos-maravillosos": {
     "_es": "68806a70",
-    "name": "Marvelous Pigments",
+    "name": "Nolzur's Marvelous Pigments",
     "description": "Wondrous Item, Very Rare\nThis fine wooden box contains 1d4 pots of pigment and a brush (weighing 1 pound in total). Using the brush and expending 1 pot of pigment, you can paint any number of three-dimensional objects and terrain features (such as walls, doors, trees, flowers, weapons, webs, and pits), provided these elements are all confined to a 20-foot Cube. The effort takes 10 minutes (regardless of the number of elements you create), during which time you must remain in the Cube, and requires Concentration. If your Concentration is broken or you leave the Cube before the work is done, all the painted elements vanish, and the pot of pigment is wasted.\nWhen the work is done, all the painted objects and terrain features become real. Thus, painting a door on a wall creates an actual door, which can be opened to whatever is beyond. Painting a pit creates a real pit, the entire depth of which must lie within the 20-foot Cube.\nNo object created by a pot of pigment can have a value greater than 25 GP, and the total value of all objects created by a pot of pigment can't exceed 500 GP. If you paint objects of greater value (such as a large pile of gold), they look authentic, but close inspection reveals they're made from paste, cookies, or some other worthless material.\nIf you paint a form of energy such as fire or lightning, the energy dissipates as soon as you complete the painting, doing no harm."
   },
   "pocion-de-amistad-animal": {
@@ -1091,7 +1091,7 @@
   },
   "pociones-de-curacion": {
     "_es": "036d751c",
-    "name": "Potions of Healing",
+    "name": "Potion of Healing",
     "description": "Potion, Rarity Varies\nYou regain Hit Points when you drink this potion. The number of Hit Points depends on the potion's rarity, as shown in the following table.\nWhatever its potency, the potion's red liquid glimmers when agitated.\nPotion — HP Regained — Rarity\nPotion of Healing — 2d4 + 2 — Common\nPotion of Healing (Greater) — 4d4 + 4 — Uncommon\nPotion of Healing (Superior) — 8d4 + 8 — Rare\nPotion of Healing (Supreme) — 10d4 + 20 — Very Rare"
   },
   "polvo-de-desaparicion": {
