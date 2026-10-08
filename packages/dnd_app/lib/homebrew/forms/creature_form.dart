@@ -305,7 +305,7 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _previewName(context, creature.name, size: 20),
-            Text(creature.kind, style: TextStyle(color: muted)),
+            Text(creature.displayKind, style: TextStyle(color: muted)),
             const SizedBox(height: 12),
             ...creatureProfileBody(context, widget.repo, creature),
           ],

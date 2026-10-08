@@ -5756,7 +5756,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get dmTheTable => 'The table';
+  String get dmTheTable => 'The party';
 
   @override
   String dmLogAllies(String names) {

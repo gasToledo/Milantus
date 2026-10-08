@@ -715,7 +715,11 @@ extension _SheetCombatSection on _SheetScreenState {
               children: [
                 Text(form.name),
                 Text(
-                  context.l10n.creatureLine3(form.kind, form.ac, form.speed),
+                  context.l10n.creatureLine3(
+                    form.displayKind,
+                    form.ac,
+                    form.speed,
+                  ),
                   style: TextStyle(fontSize: 12.5, color: muted),
                 ),
               ],
@@ -781,7 +785,7 @@ extension _SheetCombatSection on _SheetScreenState {
                           }),
                     title: Text(beast.name),
                     subtitle: Text(
-                      context.l10n.creatureLine2(beast.kind, beast.ac),
+                      context.l10n.creatureLine2(beast.displayKind, beast.ac),
                     ),
                   ),
               ],
@@ -957,7 +961,7 @@ extension _SheetCombatSection on _SheetScreenState {
         title: context.l10n.companionPickForm,
         options: option.forms,
         label: (c) => c.name,
-        subtitle: (c) => c.kind,
+        subtitle: (c) => c.displayKind,
       );
       if (chosen == null || !mounted) return;
       form = chosen;

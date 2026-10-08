@@ -757,7 +757,7 @@ extension _HomebrewSections on _HomebrewViewState {
         _tile(
           c.name,
           pills: [
-            c.kind,
+            c.displayKind,
             if (c.availableToCharacters) context.l10n.hbAvailableToCharacters,
           ],
           stats: [

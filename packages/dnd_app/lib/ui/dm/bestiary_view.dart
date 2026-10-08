@@ -85,7 +85,8 @@ List<Creature> filterCreatures(
       if ((typeId == null || c.creatureType?.id == typeId) &&
           (needle.isEmpty ||
               foldForSearch(c.name).contains(needle) ||
-              foldForSearch(c.kind).contains(needle)) &&
+              foldForSearch(c.kind).contains(needle) ||
+              foldForSearch(c.displayKind).contains(needle)) &&
           inRange(c.cr))
         c,
   ];
@@ -409,7 +410,7 @@ class _BestiaryViewState extends State<BestiaryView> {
                         overflow: TextOverflow.ellipsis,
                       ),
                       subtitle: Text(
-                        c.kind,
+                        c.displayKind,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -456,7 +457,10 @@ class _BestiaryViewState extends State<BestiaryView> {
           ],
         ),
         const SizedBox(height: 6),
-        Text(c.kind, style: TextStyle(fontSize: 13, color: pal.textMuted)),
+        Text(
+          c.displayKind,
+          style: TextStyle(fontSize: 13, color: pal.textMuted),
+        ),
         const SizedBox(height: 8),
         // La campaña va escrita en el botón: el combate es de una campaña y el
         // Bestiario no, así que decir a cuál se suma es lo que evita sumar a

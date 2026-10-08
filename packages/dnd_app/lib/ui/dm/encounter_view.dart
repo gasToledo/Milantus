@@ -838,7 +838,7 @@ class _EncounterViewState extends State<EncounterView> {
         ? (npc == null
               ? context.l10n.kindNpc
               : npcTypeLine(npc.npc, npc.sheet, widget.repo, context.l10n))
-        : creature!.kind;
+        : creature!.displayKind;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

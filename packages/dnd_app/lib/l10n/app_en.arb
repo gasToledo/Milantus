@@ -1548,7 +1548,7 @@
   "dmToday": "today",
   "dmYesterday": "yesterday",
   "dmDaysAgo": "{days} days ago",
-  "dmTheTable": "The table",
+  "dmTheTable": "The party",
   "dmLogAllies": "Allies: {names}.",
   "dmLogNeutrals": "Neutrals: {names}.",
   "dmLogNoEnemies": "{who} fought with no enemies loaded.",
