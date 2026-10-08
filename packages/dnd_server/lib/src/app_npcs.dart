@@ -275,34 +275,6 @@ Future<Response> _linkCampaignNpcHandler(
   return _jsonOk({'status': result.toJson()});
 }
 
-/// JSON con las claves ordenadas, para comparar dos documentos por contenido
-/// sin que el orden en que se escribieron los campos los haga distintos.
-String _canonicalJson(Object? value) {
-  Object? sorted(Object? v) => switch (v) {
-    Map() => {
-      for (final key in (v.keys.map((k) => '$k').toList()..sort()))
-        key: sorted(v[key]),
-    },
-    List() => [for (final item in v) sorted(item)],
-    _ => v,
-  };
-  return jsonEncode(sorted(value));
-}
-
-/// Los homebrew del paquete cuyo id ya existe en la cuenta **con otro
-/// contenido**. Uno idéntico no choca: se reusa.
-List<String> _homebrewConflicts(
-  Map<String, List<Map<String, dynamic>>> existing,
-  Map<String, List<Map<String, dynamic>>> incoming,
-) => [
-  for (final category in incoming.entries)
-    for (final document in category.value)
-      for (final current in existing[category.key] ?? const [])
-        if (current['id'] == document['id'] &&
-            _canonicalJson(current) != _canonicalJson(document))
-          '${document['name'] ?? document['id']} (${category.key})',
-];
-
 /// Remapea una lista de claves de retrato y sus prompts con [keys]; lo que no
 /// esté en el mapa (un retrato que no viajó) se descarta.
 ({List<String> paths, Map<String, String> prompts}) _remapPortraits(
@@ -357,14 +329,14 @@ Future<Response> _importNpcHandler(
   // Todo lo que puede rechazar la importación se mira antes de guardar un
   // solo retrato: los blobs no entran en la transacción.
   final taken = await transactions.run((repositories) async {
-    final conflicts = _homebrewConflicts(
+    final conflicts = homebrewConflicts(
       await repositories.homebrew.listForUser(userId),
       bundle.homebrew,
     );
     if (conflicts.isNotEmpty) {
-      throw FormatException(
+      throw HomebrewConflictException(
         'El PNJ trae homebrew que en tu cuenta ya existe con otro contenido: '
-        '${conflicts.join(', ')}.',
+        '${conflicts.join(', ')}. No se importó nada.',
       );
     }
     if (campaignId != null &&
@@ -408,11 +380,11 @@ Future<Response> _importNpcHandler(
     // Se vuelve a mirar adentro de la transacción: entre la primera lectura y
     // esta pudo aparecer un homebrew con ese id.
     final existing = await repositories.homebrew.listForUser(userId);
-    final conflicts = _homebrewConflicts(existing, bundle.homebrew);
+    final conflicts = homebrewConflicts(existing, bundle.homebrew);
     if (conflicts.isNotEmpty) {
-      throw FormatException(
+      throw HomebrewConflictException(
         'El PNJ trae homebrew que en tu cuenta ya existe con otro contenido: '
-        '${conflicts.join(', ')}.',
+        '${conflicts.join(', ')}. No se importó nada.',
       );
     }
     for (final category in bundle.homebrew.entries) {

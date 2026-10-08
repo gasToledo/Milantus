@@ -68,6 +68,41 @@ void main() {
       );
     });
 
+    test('un personaje puede traer el homebrew que usa su ficha', () {
+      final zip = _buildZip(
+        manifest: {
+          'type': 'dnd_bundle',
+          'formatVersion': 2,
+          'scope': 'character',
+          'characters': [
+            {'id': 'sagan', 'file': 'characters/sagan.json', 'portraits': []},
+          ],
+          'homebrewFile': 'homebrew/content.json',
+        },
+        characterFiles: {'characters/sagan.json': _characterJson('sagan')},
+        extraBinaryEntries: {
+          'homebrew/content.json': utf8.encode(
+            jsonEncode({
+              'creatures': [
+                {
+                  'id': 'hb-wolf',
+                  'name': 'Lobo de humo',
+                  'source': 'homebrew',
+                  'ac': '13',
+                  'hp': '11',
+                },
+              ],
+            }),
+          ),
+        },
+      );
+
+      final bundle = BackupBundleCodec.decode(zip);
+
+      expect(bundle.scope, BackupScope.character);
+      expect(bundle.homebrew!['creatures'], hasLength(1));
+    });
+
     test('decodifica y valida criaturas homebrew en un respaldo completo', () {
       final zip = _buildZip(
         manifest: {

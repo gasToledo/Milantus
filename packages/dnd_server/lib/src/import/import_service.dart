@@ -7,6 +7,7 @@ import '../repositories/homebrew_repository.dart';
 import '../repositories/id_allocation.dart';
 import '../repositories/settings_repository.dart';
 import 'backup_bundle.dart';
+import 'homebrew_content.dart';
 
 class ImportResult {
   final int charactersImported;
@@ -153,6 +154,21 @@ Future<ImportResult> importBackup({
   required String userId,
   required BackupBundle bundle,
 }) async {
+  // Un personaje suma su homebrew, pero no reescribe el de la cuenta: si un id
+  // ya existe con otro contenido, se rechaza el respaldo entero. Se mira antes
+  // de guardar un solo retrato, porque los blobs no entran en la transacción.
+  // El respaldo completo no pasa por acá: restaurar reemplaza el homebrew a
+  // propósito.
+  final characterHomebrew = bundle.scope == BackupScope.character
+      ? bundle.homebrew
+      : null;
+  if (characterHomebrew != null) {
+    final existing = await pool.run(
+      (session) => PostgresHomebrewRepository(session).listForUser(userId),
+    );
+    _rejectHomebrewConflicts(homebrewConflicts(existing, characterHomebrew));
+  }
+
   final existingIds = await pool.run(
     (session) => PostgresCharacterRepository(session).existingIds(userId),
   );
@@ -164,6 +180,16 @@ Future<ImportResult> importBackup({
   );
 
   await pool.runTx((session) async {
+    final homebrewRepo = PostgresHomebrewRepository(session);
+    // Se vuelve a mirar adentro de la transacción: entre la primera lectura y
+    // esta pudo aparecer un homebrew con ese id.
+    final existing = characterHomebrew == null
+        ? const <String, List<Map<String, dynamic>>>{}
+        : await homebrewRepo.listForUser(userId);
+    if (characterHomebrew != null) {
+      _rejectHomebrewConflicts(homebrewConflicts(existing, characterHomebrew));
+    }
+
     final characterRepo = PostgresCharacterRepository(session);
     for (final character in prepared.characters) {
       await characterRepo.upsert(userId, character);
@@ -171,15 +197,17 @@ Future<ImportResult> importBackup({
 
     final homebrew = bundle.homebrew;
     if (homebrew != null) {
-      final homebrewRepo = PostgresHomebrewRepository(session);
       for (final category in homebrew.entries) {
         for (final document in category.value) {
-          await homebrewRepo.upsert(
-            userId,
-            category.key,
-            document['id'] as String,
-            document,
+          final id = document['id'] as String;
+          // Lo que la cuenta ya tiene con el mismo contenido no se vuelve a
+          // escribir: lo distinto ya se rechazó arriba.
+          final already = (existing[category.key] ?? const []).any(
+            (current) => current['id'] == id,
           );
+          if (!already) {
+            await homebrewRepo.upsert(userId, category.key, id, document);
+          }
         }
       }
     }
@@ -195,5 +223,13 @@ Future<ImportResult> importBackup({
   return ImportResult(
     charactersImported: prepared.characters.length,
     portraitsImported: prepared.portraitsImported,
+  );
+}
+
+void _rejectHomebrewConflicts(List<String> conflicts) {
+  if (conflicts.isEmpty) return;
+  throw HomebrewConflictException(
+    'El personaje trae homebrew que en tu cuenta ya existe con otro contenido: '
+    '${conflicts.join(', ')}. No se importó nada.',
   );
 }

@@ -2140,6 +2140,13 @@ Middleware get errorHandlingMiddleware => (Handler innerHandler) {
         body: _errorBody(e.toString(), 'unsupported_version'),
         headers: {'content-type': 'application/json'},
       );
+    } on HomebrewConflictException catch (e) {
+      // 409: el archivo está bien; choca con lo que ya tiene la cuenta.
+      return Response(
+        409,
+        body: _errorBody(e.message, 'homebrew_conflict'),
+        headers: {'content-type': 'application/json'},
+      );
     } on PayloadTooLargeException catch (e) {
       return Response(
         413,

@@ -281,8 +281,8 @@ class BackupBundleCodec {
     Map<String, List<Map<String, dynamic>>>? homebrew;
     final homebrewPath = manifest['homebrewFile'] as String?;
     if (homebrewPath != null) {
-      if (scope != BackupScope.full ||
-          homebrewPath != 'homebrew/content.json') {
+      // Un personaje también puede traer el homebrew que usa su ficha.
+      if (homebrewPath != 'homebrew/content.json') {
         throw const FormatException('Ruta de homebrew inválida.');
       }
       homebrew = parseHomebrewContent(_readJsonMap(files, homebrewPath));

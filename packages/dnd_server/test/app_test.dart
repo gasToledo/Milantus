@@ -10,6 +10,7 @@ import 'package:test/test.dart';
 
 import 'package:dnd_server/src/ai/portrait_generation_service.dart';
 import 'package:dnd_server/src/ai/portrait_provider.dart';
+import 'package:dnd_server/src/import/homebrew_content.dart';
 import 'package:dnd_server/src/import/import_service.dart';
 
 import 'fakes/fake_auth_dependencies.dart';
@@ -184,6 +185,22 @@ void main() {
     expect(body['error'], 'dato inválido');
     // El código es el que el cliente traduce; el mensaje queda de detalle.
     expect(body['code'], 'invalid_data');
+  });
+
+  test('un choque de homebrew se convierte en 409 con su código', () async {
+    final failing = const Pipeline()
+        .addMiddleware(errorHandlingMiddleware)
+        .addHandler(
+          (request) => throw const HomebrewConflictException('Choca.'),
+        );
+    final response = await failing(
+      Request('GET', Uri.parse('http://localhost/x')),
+    );
+
+    expect(response.statusCode, 409);
+    final body = jsonDecode(await response.readAsString());
+    expect(body['error'], 'Choca.');
+    expect(body['code'], 'homebrew_conflict');
   });
 
   group('autenticación', () {

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dnd_engine/dnd_engine.dart';
 
 import '../util/safe_path.dart';
@@ -91,4 +93,45 @@ Map<String, dynamic> validateHomebrewDocument(
     throw FormatException('Entrada homebrew "$id" inválida: $error');
   }
   return document;
+}
+
+/// JSON con las claves ordenadas, para comparar dos documentos por contenido
+/// sin que el orden en que se escribieron los campos los haga distintos.
+String canonicalJson(Object? value) {
+  Object? sorted(Object? v) => switch (v) {
+    Map() => {
+      for (final key in (v.keys.map((k) => '$k').toList()..sort()))
+        key: sorted(v[key]),
+    },
+    List() => [for (final item in v) sorted(item)],
+    _ => v,
+  };
+  return jsonEncode(sorted(value));
+}
+
+/// Los homebrew del paquete cuyo id ya existe en la cuenta **con otro
+/// contenido**. Uno idéntico no choca: se reusa.
+List<String> homebrewConflicts(
+  Map<String, List<Map<String, dynamic>>> existing,
+  Map<String, List<Map<String, dynamic>>> incoming,
+) => [
+  for (final category in incoming.entries)
+    for (final document in category.value)
+      for (final current in existing[category.key] ?? const [])
+        if (current['id'] == document['id'] &&
+            canonicalJson(current) != canonicalJson(document))
+          '${document['name'] ?? document['id']} (${category.key})',
+];
+
+/// Un choque de homebrew rechaza la importación entera: no queda escrito ni un
+/// personaje, un PNJ ni un homebrew. [message] es el texto en castellano que ve
+/// el jugador; el cliente lo cambia por su versión en inglés según el código
+/// `homebrew_conflict` (ver `_errorBody` en `app.dart`).
+class HomebrewConflictException implements Exception {
+  final String message;
+
+  const HomebrewConflictException(this.message);
+
+  @override
+  String toString() => message;
 }

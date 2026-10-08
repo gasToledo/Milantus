@@ -964,7 +964,10 @@ void main() {
         },
       );
 
-      expect(response.status, 400);
+      // 409 y no 400: el archivo está bien, lo que choca es lo que ya tiene la
+      // cuenta. El código es el que el cliente traduce al inglés.
+      expect(response.status, 409);
+      expect(response.body, contains('homebrew_conflict'));
       expect(response.body, contains('Otro rayo'));
       expect(
         decode((await send('GET', '/api/npcs', token: token)).body)['npcs'],
