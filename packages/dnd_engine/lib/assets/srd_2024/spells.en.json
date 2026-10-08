@@ -70,9 +70,9 @@
     "description": "You touch a creature with 0 HP and stabilize it. Also affects Undead, with a save."
   },
   "shillelagh": {
-    "_es": "522c86c8",
+    "_es": "52005838",
     "name": "Shillelagh",
-    "description": "You imbue a club or quarterstaff: it uses your spellcasting ability to attack, and its damage becomes 1d8 Force."
+    "description": "You imbue a club or quarterstaff: use your spellcasting ability instead of Strength for its attack and damage rolls, and its damage die becomes a d8. The damage can be Force or the weapon's normal type, your choice."
   },
   "prestidigitation": {
     "_es": "c17f9967",
@@ -105,9 +105,9 @@
     "description": "The target adds 1d4 to one saving throw of its choice within the minute. Concentration."
   },
   "poison-spray": {
-    "_es": "2f4de325",
+    "_es": "44467052",
     "name": "Poison Spray",
-    "description": "You spray a toxic mist; the target makes a CON save or takes 1d12 Poison damage. Scales with level."
+    "description": "You spray a toxic mist: make a ranged spell attack against the target. On a hit, it takes 1d12 Poison damage. Scales with level."
   },
   "acid-splash": {
     "_es": "24721c79",
@@ -195,9 +195,9 @@
     "description": "You learn the magical properties of an object you touch and whether it bears a known curse."
   },
   "inflict-wounds": {
-    "_es": "2bfcea9a",
+    "_es": "160a2e3b",
     "name": "Inflict Wounds",
-    "description": "CON save; on a failure, 2d10 Necrotic damage. Scales with level."
+    "description": "You touch a creature, which makes a CON save: on a failure it takes 2d10 Necrotic damage, or half as much on a success. Scales with level."
   },
   "burning-hands": {
     "_es": "5eb5f678",
@@ -865,9 +865,9 @@
     "description": "You can comprehend and verbally communicate with Beasts for the duration."
   },
   "ray-of-sickness": {
-    "_es": "081b88b6",
+    "_es": "ebdac89d",
     "name": "Ray of Sickness",
-    "description": "Ranged spell attack for 2d8 Poison damage; on a hit, Constitution saving throw or the target has the Poisoned condition until the end of your next turn. Scales."
+    "description": "You shoot a greenish ray: make a ranged spell attack against the target. On a hit, it takes 2d8 Poison damage and has the Poisoned condition until the end of your next turn. Scales with level."
   },
   "false-life": {
     "_es": "556ae63e",

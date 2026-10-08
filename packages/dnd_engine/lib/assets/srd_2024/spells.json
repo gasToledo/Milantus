@@ -265,7 +265,7 @@
     "duration": "1 minuto",
     "concentration": false,
     "ritual": false,
-    "description": "Imbuís un bastón o maza: usa tu característica de conjuro para atacar y su daño pasa a 1d8 de fuerza.",
+    "description": "Imbuís un bastón o una maza: usás tu característica de conjuro en lugar de Fuerza para atacar con ella, y su dado de daño pasa a ser un d8. El daño puede ser de fuerza o del tipo normal del arma, a tu elección.",
     "classes": [
       "druid"
     ]
@@ -392,7 +392,7 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Lanzás un vaho tóxico; el objetivo hace salvación de CON o recibe 1d12 de veneno. Escala por nivel.",
+    "description": "Lanzás un vaho tóxico; hacés un ataque de conjuro a distancia contra el objetivo. Si acierta, recibe 1d12 de daño de veneno. Escala por nivel.",
     "classes": [
       "wizard",
       "sorcerer",
@@ -737,7 +737,7 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Salvación de CON; en fallo, 2d10 de daño necrótico. Escala por nivel.",
+    "description": "Tocás a una criatura, que hace una salvación de CON: si la falla, recibe 2d10 de daño necrótico; si la supera, recibe la mitad del daño. Escala por nivel.",
     "classes": [
       "cleric"
     ]
@@ -3286,7 +3286,7 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Ataque de conjuro a distancia por 2d8 de veneno; si impacta, salvación de Constitución o queda envenenado hasta el final de tu próximo turno. Escala.",
+    "description": "Disparás un rayo verduzco; hacés un ataque de conjuro a distancia contra el objetivo. Si acierta, recibe 2d8 de daño de veneno y queda envenenado hasta el final de tu próximo turno. Escala por nivel.",
     "classes": [
       "wizard",
       "sorcerer"
