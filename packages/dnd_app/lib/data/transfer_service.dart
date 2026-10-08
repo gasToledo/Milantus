@@ -26,10 +26,16 @@ class TransferService {
       DateTime.now().toIso8601String().replaceAll(':', '-').split('.').first;
 
   /// Exporta un personaje. Los retratos se piden al servidor por su clave
-  /// (autenticado por la sesión de la cuenta), no se leen de disco.
-  Future<Uint8List> exportCharacter(Character c) => BackupBundleCodec.encode(
+  /// (autenticado por la sesión de la cuenta), no se leen de disco. [homebrew]
+  /// es el que usa la ficha (ver `homebrewUsedBy`): sin él, la copia llega a
+  /// otra cuenta con objetos y especies que no existen allá.
+  Future<Uint8List> exportCharacter(
+    Character c, {
+    Map<String, List<Map<String, dynamic>>>? homebrew,
+  }) => BackupBundleCodec.encode(
     scope: BackupScope.character,
     characters: [c],
+    homebrew: homebrew,
     readPortrait: api.fetchPortraitBytes,
   );
 

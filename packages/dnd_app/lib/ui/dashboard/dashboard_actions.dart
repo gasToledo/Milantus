@@ -177,7 +177,9 @@ extension _DashboardActions on _DashboardScreenState {
     if (!_startOperation(context.l10n.exportingCharacter)) return;
     try {
       final transfer = TransferService(controller.api);
-      final bytes = await transfer.exportCharacter(c);
+      // El mismo criterio que el PNJ: solo el homebrew que la ficha usa.
+      final used = homebrewUsedBy(c, await controller.api.listHomebrew());
+      final bytes = await transfer.exportCharacter(c, homebrew: used);
       browser.downloadBytes(
         bytes,
         fileName: transfer.characterExportFileName(c),

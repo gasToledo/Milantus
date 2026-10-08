@@ -54,6 +54,25 @@ void main() {
     },
   );
 
+  test(
+    'en inglés, un choque de homebrew se lee en inglés sin el castellano',
+    () async {
+      ContentLanguage.current = ContentLanguage.en;
+      final e = await _error(
+        _respondiendo({
+          'error':
+              'El personaje trae homebrew que en tu cuenta ya existe con otro contenido: Lanza (weapons). No se importó nada.',
+          'code': 'homebrew_conflict',
+        }, 409),
+      );
+      expect(e.code, 'homebrew_conflict');
+      expect(
+        e.message,
+        'The file brings homebrew that already exists in your account with different content. Nothing was imported.',
+      );
+    },
+  );
+
   test('en español se muestra el mensaje del servidor tal cual', () async {
     final e = await _error(
       _respondiendo({

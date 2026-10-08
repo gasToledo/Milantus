@@ -146,6 +146,8 @@ class ApiClient {
         'You sent too many messages in a row. Try again in a while.',
     'feedback_send_failed': 'Could not send the message.',
     'invalid_data': 'The data sent isn’t valid.',
+    'homebrew_conflict':
+        'The file brings homebrew that already exists in your account with different content. Nothing was imported.',
     'unsupported_version': 'The file was made by a newer version of the app.',
     'payload_too_large': 'It’s too large.',
     'internal_error': 'Internal server error.',

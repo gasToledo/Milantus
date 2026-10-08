@@ -97,11 +97,13 @@ void main() {
   });
 
   test(
-    'un alcance de personaje no incluye archivos de homebrew ni ajustes',
+    'un alcance de personaje sin homebrew que usar no incluye homebrew ni ajustes',
     () async {
       final bytes = await BackupBundleCodec.encode(
         scope: BackupScope.character,
         characters: [demoSagan()],
+        homebrew: const {'weapons': []},
+        preferences: const {'theme': 'dark'},
         readPortrait: (_) async => null,
       );
 
@@ -113,6 +115,34 @@ void main() {
       expect(archive.findFile('settings/preferences.json'), isNull);
     },
   );
+
+  test('un personaje lleva el homebrew que se le pasa, y solo ese', () async {
+    final bytes = await BackupBundleCodec.encode(
+      scope: BackupScope.character,
+      characters: [demoSagan()],
+      homebrew: const {
+        'weapons': [
+          {'id': 'hb-lanza', 'name': 'Lanza', 'source': 'homebrew'},
+        ],
+      },
+      readPortrait: (_) async => null,
+    );
+
+    final manifest = manifestOf(bytes);
+    expect(manifest['homebrewFile'], 'homebrew/content.json');
+    final archive = ZipDecoder().decodeBytes(bytes);
+    final homebrewJson =
+        jsonDecode(
+              utf8.decode(
+                archive.findFile('homebrew/content.json')!.content as List<int>,
+              ),
+            )
+            as Map<String, dynamic>;
+    expect(homebrewJson['weapons'], [
+      {'id': 'hb-lanza', 'name': 'Lanza', 'source': 'homebrew'},
+    ]);
+    expect(manifest['preferencesFile'], isNull);
+  });
 
   test('una clave de retrato que ya no resuelve a nada se omite sin fallar '
       'el respaldo entero', () async {

@@ -139,8 +139,14 @@ class BackupBundleCodec {
       });
     }
 
+    // Un personaje lleva solo el homebrew que su ficha usa (quien exporta lo
+    // elige); un respaldo completo lleva todo lo que se le pase, aunque esté
+    // vacío.
+    final carriesHomebrew =
+        scope == BackupScope.full ||
+        (homebrew?.values.any((docs) => docs.isNotEmpty) ?? false);
     String? homebrewPath;
-    if (scope == BackupScope.full && homebrew != null) {
+    if (homebrew != null && carriesHomebrew) {
       homebrewPath = 'homebrew/content.json';
       archive.add(
         ArchiveFile.string(
