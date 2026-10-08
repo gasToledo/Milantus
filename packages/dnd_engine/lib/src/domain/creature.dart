@@ -777,6 +777,21 @@ class Creature {
   /// Es una bestia, y por lo tanto forma legal de Forma Salvaje.
   bool get isBeast => creatureType == CreatureType.beast;
 
+  /// La línea de tipo y tamaño para mostrar. Las del catálogo ya vienen
+  /// traducidas por la superposición de idioma. El homebrew no tiene
+  /// superposición y guarda [kind] en español, porque el motor la lee para
+  /// deducir el tipo; con la interfaz en inglés se arma de [type] y [size]
+  /// cuando están, con el tamaño primero como en el inglés del libro.
+  String get displayKind {
+    final t = type;
+    final s = size;
+    if (source != ContentSource.homebrew || t == null || s == null) return kind;
+    return localized(
+      '${t.labelEs} ${t.feminine ? s.feminineLabelEs : s.labelEs}',
+      '${s.labelEn} ${t.labelEn}',
+    );
+  }
+
   /// Tiene velocidad volando, que la Forma Salvaje prohíbe hasta nivel 8.
   bool get canFly => RegExp(r'volar|\b[Ff]ly\b').hasMatch(speed);
 
@@ -883,7 +898,7 @@ class Creature {
   ResolvedCreature resolve(CreatureVars vars) => ResolvedCreature(
         id: id,
         name: name,
-        kind: kind,
+        kind: displayKind,
         armorClass: resolveCreatureInt(ac, vars),
         maxHp: resolveCreatureInt(hp, vars),
         speed: resolveCreatureFormula(speed, vars),
