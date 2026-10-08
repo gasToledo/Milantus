@@ -57,6 +57,9 @@ class SaveStatusIndicator extends StatelessWidget {
 
     return Semantics(
       label: context.l10n.saveStateLabel(label),
+      // El texto visible ya es el hijo: sin excludeSemantics el lector lo
+      // anuncia otra vez («Guardado» dos veces).
+      excludeSemantics: true,
       child: Tooltip(
         // En compacto el ícono queda solo, y tres íconos parecidos no se
         // distinguen de memoria.

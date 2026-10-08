@@ -250,6 +250,19 @@ void main() {
   // La ficha guarda sola, sin botón. El cartel estaba solo en la barra del
   // roster, así que justo donde más se escribe no se veía nada: hay que poder
   // saber si lo tipeado llegó sin abrir ningún menú.
+  // El cartel pone una etiqueta sobre su propio texto visible. Sin
+  // excludeSemantics, el lector anunciaba «Guardado» dos veces.
+  testWidgets('el cartel del guardado se anuncia una sola vez', (tester) async {
+    final semantics = tester.ensureSemantics();
+    await pumpSheet(tester, demoSagan());
+
+    expect(
+      tester.getSemantics(find.byType(SaveStatusIndicator)).label,
+      l10nEs.saveStateLabel(l10nEs.saveStateSaved),
+    );
+    semantics.dispose();
+  });
+
   testWidgets('el estado del guardado se ve en la ficha, en los dos anchos', (
     tester,
   ) async {
