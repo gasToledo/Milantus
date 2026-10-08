@@ -75,6 +75,9 @@ String itemKindText(AppLocalizations l10n, String kind) => switch (kind) {
   'Contenedor' => l10n.kindContainer,
   'Paquete' => l10n.kindPack,
   'Equipo' => l10n.kindGear,
+  // El objeto del id huérfano lleva esta familia (inventory_section.dart).
+  'No está en el catálogo' => // l10n-ignore: identificador
+  l10n.catalogNotInCatalog,
   _ => kind,
 };
 
