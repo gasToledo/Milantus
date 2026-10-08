@@ -125,4 +125,25 @@ void main() {
     expect(find.text('PHB 2024'), findsNWidgets(3));
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('la insignia de procedencia se anuncia una sola vez', (
+    tester,
+  ) async {
+    // La insignia pone una etiqueta sobre su texto visible. Sin excludeSemantics
+    // el lector repetía el texto: «Procedencia: PHB 2024 PHB 2024».
+    final semantics = tester.ensureSemantics();
+
+    await tester.pumpWidget(
+      localizedApp(
+        theme: AppTheme.dark,
+        home: const Scaffold(body: SourceBadge(ContentSource.phb2024)),
+      ),
+    );
+
+    expect(
+      tester.getSemantics(find.byType(SourceBadge)).label,
+      l10nEs.sourceBadgeLabel('PHB 2024'),
+    );
+    semantics.dispose();
+  });
 }

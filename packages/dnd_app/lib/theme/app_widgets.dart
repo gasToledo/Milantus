@@ -3317,6 +3317,9 @@ class SourceBadge extends StatelessWidget {
     final label = sourceLabel(source, context.l10n);
     return Semantics(
       label: context.l10n.sourceBadgeLabel(label),
+      // El texto visible ya es el hijo: sin excludeSemantics el lector lo
+      // anuncia otra vez («Source: PHB 2024 PHB 2024»).
+      excludeSemantics: true,
       child: GoldPill(label, highlighted: source == ContentSource.srd2024),
     );
   }
