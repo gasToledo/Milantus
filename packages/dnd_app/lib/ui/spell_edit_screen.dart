@@ -164,7 +164,8 @@ class _SpellEditScreenState extends State<SpellEditScreen> {
           const SizedBox(height: 6),
           CappedChipSelect(
             options: {
-              for (final s in leveled) s.id: '${s.name} (Nv ${s.level})',
+              for (final s in leveled)
+                s.id: context.l10n.equipLevelShort(s.name, s.level),
             },
             selected: _spells,
             max: _prepared ? _sc.preparedCount : 9999,

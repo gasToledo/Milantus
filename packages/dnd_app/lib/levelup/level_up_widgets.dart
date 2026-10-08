@@ -890,7 +890,9 @@ class _SpellChoiceGroup extends StatelessWidget {
       options: {
         for (final id in slot.options)
           if (repo.spell(id) case final s?)
-            id: s.isCantrip ? '${s.name} (truco)' : '${s.name} (Nv ${s.level})',
+            id: s.isCantrip
+                ? context.l10n.equipCantripSuffix(s.name)
+                : context.l10n.equipLevelShort(s.name, s.level),
       },
       selected: selected,
       max: slot.count,
