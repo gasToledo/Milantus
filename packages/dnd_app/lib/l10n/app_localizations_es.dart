@@ -1299,9 +1299,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get identityBackground => 'Trasfondo';
 
   @override
-  String get identityTrait => 'Rasgo';
-
-  @override
   String get identityTitle => 'Identidad';
 
   @override

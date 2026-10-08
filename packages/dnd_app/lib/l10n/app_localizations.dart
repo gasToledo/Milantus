@@ -2132,12 +2132,6 @@ abstract class AppLocalizations {
   /// **'Trasfondo'**
   String get identityBackground;
 
-  /// No description provided for @identityTrait.
-  ///
-  /// In es, this message translates to:
-  /// **'Rasgo'**
-  String get identityTrait;
-
   /// No description provided for @identityTitle.
   ///
   /// In es, this message translates to:

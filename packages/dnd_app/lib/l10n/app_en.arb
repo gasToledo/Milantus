@@ -339,7 +339,6 @@
   "identityCreatureType": "Creature type",
   "identitySize": "Size",
   "identityBackground": "Background",
-  "identityTrait": "Trait",
   "identityTitle": "Identity",
   "abilitiesTitle": "Abilities",
   "abilitiesHintLead": "The big number is the modifier. ",

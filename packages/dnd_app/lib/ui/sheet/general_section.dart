@@ -808,7 +808,9 @@ extension _SheetGeneralSection on _SheetScreenState {
       ),
       (context.l10n.identityBackground, bg),
       if (_c.personalityTrait.isNotEmpty)
-        (context.l10n.identityTrait, _c.personalityTrait),
+        // El mismo rótulo que en la creación: «Trait» a secas se confundía con
+        // los rasgos de reglas de la ficha.
+        (context.l10n.detailsTrait, _c.personalityTrait),
     ];
     return sheetCard(
       icon: Icons.badge,

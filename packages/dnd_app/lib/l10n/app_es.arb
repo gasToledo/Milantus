@@ -1187,7 +1187,6 @@
   "identityCreatureType": "Tipo de criatura",
   "identitySize": "Tamaño",
   "identityBackground": "Trasfondo",
-  "identityTrait": "Rasgo",
   "identityTitle": "Identidad",
   "abilitiesTitle": "Características",
   "abilitiesHintLead": "La cifra grande es el modificador. ",
