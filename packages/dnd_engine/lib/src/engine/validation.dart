@@ -935,24 +935,28 @@ class CharacterValidator {
   /// desequipar un arma no debería ensuciar la ficha con advertencias.
   void _validateOffHand(
       Character c, ContentRepository repo, List<ValidationWarning> w) {
-    final offHandIds = c.equippedWeaponIds
-        .where((id) => c.weaponOffHand[id] ?? false)
-        .toList();
-    if (offHandIds.isEmpty) return;
+    // Lo empuñado sale del inventario, igual que en el compilador: la lista
+    // vieja de armas equipadas ya no se llena al equipar, y validar sobre ella
+    // callaba todo en una ficha nueva.
+    final wielded = InventoryOps.wielded(c, repo);
+    final offHand = [
+      for (final unit in wielded)
+        if (unit.offHand) unit.weapon
+    ];
+    if (offHand.isEmpty) return;
 
-    if (offHandIds.length > 1) {
+    if (offHand.length > 1) {
       w.add(ValidationWarning(
         'too_many_off_hands',
         localized(
-          'Marcaste ${offHandIds.length} armas en la mano secundaria: solo se empuña una.',
-          'You marked ${offHandIds.length} weapons in the off hand: only one can be wielded.',
+          'Marcaste ${offHand.length} armas en la mano secundaria: solo se empuña una.',
+          'You marked ${offHand.length} weapons in the off hand: only one can be wielded.',
         ),
       ));
     }
 
-    for (final id in offHandIds) {
-      final weapon = repo.weapon(id);
-      if (weapon != null && !weapon.isLight) {
+    for (final weapon in offHand) {
+      if (!weapon.isLight) {
         w.add(ValidationWarning(
           'off_hand_not_light',
           localized(
@@ -965,8 +969,8 @@ class CharacterValidator {
 
     // El ataque extra sale de empuñar **dos** armas Ligeras: con una sola no hay
     // nada que hacer en la mano secundaria.
-    final hasLightMainHand = c.equippedWeaponIds.any((id) =>
-        !(c.weaponOffHand[id] ?? false) && (repo.weapon(id)?.isLight ?? false));
+    final hasLightMainHand =
+        wielded.any((unit) => !unit.offHand && unit.weapon.isLight);
     if (!hasLightMainHand) {
       w.add(ValidationWarning(
         'off_hand_without_pair',

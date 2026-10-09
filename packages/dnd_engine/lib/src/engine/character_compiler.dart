@@ -639,46 +639,32 @@ class CharacterCompiler {
     final attacksPerAction = 1 + builder.maxExtraAttack;
     final targetChoices = _resolveTargetChoices(c, builder);
 
-    // Cuántas armas se empuñan: «ninguna otra arma» de Duelo. Un montón
-    // equipado es un arma en la mano y el resto a mano, no todas empuñadas:
-    // contando por unidad, un montón de jabalinas solo ya eran «otras armas»
-    // para la jabalina que se lanza. La excepción son las ligeras, que se
-    // llevan de a dos (dos dagas), y más de dos no entran en las manos.
-    int inHand(Weapon w, InventoryEntry entry) =>
-        w.properties.contains('light') ? min(entry.quantity, 2) : 1;
-    var wieldedWeapons = 0;
-    for (final entry in c.inventory.where((e) => e.equipped)) {
-      final w = InventoryOps.resolve(entry, repo).weapon;
-      if (w != null) wieldedWeapons += inHand(w, entry);
-    }
-
-    final attacks = <Attack>[];
-    for (final entry in c.inventory.where((e) => e.equipped)) {
-      final resolved = InventoryOps.resolve(entry, repo);
-      final w = resolved.weapon;
-      if (w == null) continue;
-      // Una fila por arma en la mano y no por unidad: ocho jabalinas eran
-      // ocho filas idénticas. Dos dagas siguen dando dos, una por mano.
-      for (var unit = 0; unit < inHand(w, entry); unit++) {
-        attacks.add(_attack(
+    // Una fila por arma en la mano y no por unidad: ocho jabalinas eran ocho
+    // filas idénticas. Dos dagas siguen dando dos, una por mano. Cuántas son
+    // es también el «ninguna otra arma» de Duelo: contando por unidad, un
+    // montón de jabalinas solo ya eran «otras armas» para la que se lanza.
+    final wielded = InventoryOps.wielded(c, repo);
+    final attacks = <Attack>[
+      for (final (:resolved, weapon: w, :offHand) in wielded)
+        _attack(
           c,
           w,
           mods,
           profBonus,
           builder,
           magicBonus: resolved.magicBonus,
-          weaponId: resolved.item == null ? w.id : entry.entryId,
-          sourceEntryId: entry.entryId,
+          weaponId: resolved.item == null ? w.id : resolved.entry.entryId,
+          sourceEntryId: resolved.entry.entryId,
           name: resolved.name,
           isMagic: resolved.item?.isMagic == true || w.magicBonus != 0,
-          wieldedAlone: wieldedWeapons == 1,
+          wieldedAlone: wielded.length == 1,
+          offHand: offHand,
           activeTargetGroups: {
             for (final target in targetChoices.entryIdsByGroup.entries)
-              if (target.value.contains(entry.entryId)) target.key,
+              if (target.value.contains(resolved.entry.entryId)) target.key,
           },
-        ));
-      }
-    }
+        ),
+    ];
 
     final spellcastingBlocks = _spellcastingBlocks(
       builder,
@@ -1571,7 +1557,8 @@ class CharacterCompiler {
       String? name,
       bool isMagic = false,
       Set<String> activeTargetGroups = const {},
-      bool wieldedAlone = false}) {
+      bool wieldedAlone = false,
+      bool offHand = false}) {
     final normalAbilities = <Ability>[];
     if (w.isRanged) {
       normalAbilities.add(Ability.dexterity);
@@ -1627,8 +1614,6 @@ class CharacterCompiler {
         b.weaponMasterySlots > 0 &&
         c.weaponMasteryChoices.contains(w.id) &&
         proficient;
-
-    final offHand = c.weaponOffHand[w.id] ?? false;
 
     // 2024: el ataque de mano secundaria no suma el modificador al daño, pero
     // solo cuando es **positivo**; un modificador negativo se sigue restando.

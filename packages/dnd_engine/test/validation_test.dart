@@ -556,6 +556,23 @@ void main() {
         expect(codes, isNot(contains('too_many_off_hands')));
       });
 
+      test('dos dagas con la daga marcada forman el par', () {
+        // Una va a la principal y la otra a la secundaria: ni «sin par» ni
+        // «dos en la secundaria».
+        final codes = codesFor(duelist(equipped: const []).copyWith(
+          inventory: const [
+            InventoryEntry(
+              entryId: 'dagas',
+              itemId: 'dagger',
+              quantity: 2,
+              equipped: true,
+            ),
+          ],
+        ));
+        expect(codes, isNot(contains('off_hand_without_pair')));
+        expect(codes, isNot(contains('too_many_off_hands')));
+      });
+
       test('un arma no Ligera en la secundaria advierte', () {
         // La espada larga es marcial y no es Ligera.
         final codes = codesFor(duelist(

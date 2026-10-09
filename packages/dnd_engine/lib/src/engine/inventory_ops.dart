@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import '../data/content_repository.dart';
 import 'dice.dart';
 import '../domain/character.dart';
@@ -52,6 +54,13 @@ class ResolvedInventoryEntry {
   }
 }
 
+/// Una unidad de arma en la mano. Ver [InventoryOps.wielded].
+typedef WieldedWeapon = ({
+  ResolvedInventoryEntry resolved,
+  Weapon weapon,
+  bool offHand,
+});
+
 class InventoryOps {
   static String _effectTargetOrigin(String groupId) => 'effect-target:$groupId';
 
@@ -74,6 +83,37 @@ class InventoryOps {
     ContentRepository repo,
   ) {
     return entry.equipped;
+  }
+
+  /// Las armas en la mano, una por unidad empuñada y en el orden del
+  /// inventario. Un montón equipado es un arma en la mano y el resto a mano;
+  /// la excepción son las Ligeras, que se llevan de a dos (dos dagas), y más de
+  /// dos no entran en las manos.
+  ///
+  /// [Character.weaponOffHand] marca un **arma** y no una unidad, así que acá
+  /// se resuelve a cuál: solo la última unidad de esa arma va a la secundaria.
+  /// Si marcara todas, dos dagas eran dos dagas en la secundaria y ninguna en
+  /// la principal — el combate con dos armas más común no se podía armar.
+  static List<WieldedWeapon> wielded(Character c, ContentRepository repo) {
+    final units = <(ResolvedInventoryEntry, Weapon)>[];
+    for (final entry in c.inventory.where((e) => e.equipped)) {
+      final resolved = resolve(entry, repo);
+      final w = resolved.weapon;
+      if (w == null) continue;
+      final inHand = w.isLight ? min(entry.quantity, 2) : 1;
+      for (var i = 0; i < inHand; i++) {
+        units.add((resolved, w));
+      }
+    }
+    return [
+      for (final (i, (resolved, weapon)) in units.indexed)
+        (
+          resolved: resolved,
+          weapon: weapon,
+          offHand: (c.weaponOffHand[weapon.id] ?? false) &&
+              !units.skip(i + 1).any((later) => later.$2.id == weapon.id),
+        ),
+    ];
   }
 
   static ResolvedInventoryEntry resolve(

@@ -544,13 +544,43 @@ void main() {
     Attack attackFor(ComputedSheet s, String weaponId) =>
         s.attacks.firstWhere((a) => a.weaponId == weaponId);
 
+    // `singleWhere`: con dos armas iguales, una sola puede ir a la secundaria.
+    Attack offHandAttack(ComputedSheet s) =>
+        s.attacks.singleWhere((a) => a.offHand);
+
+    test('dos dagas: una en la principal y otra en la secundaria', () {
+      // La marca es por arma y no por unidad. Marcar «daga» mandaba las dos a
+      // la secundaria y dejaba la principal vacía.
+      // Por el inventario, como lo guarda la app: la lista vieja de equipadas
+      // deduplica ids y dos dagas ahí eran una.
+      final s = compiler.compile(
+        dualWielder(mainHand: 'dagger', offHand: 'dagger').copyWith(
+          inventory: const [
+            InventoryEntry(
+              entryId: 'dagas',
+              itemId: 'dagger',
+              quantity: 2,
+              equipped: true,
+            ),
+          ],
+        ),
+      );
+      final dagger = repo.weapon('dagger')!;
+      final daggers = s.attacks.where((a) => a.baseWeaponId == dagger.id);
+      expect(daggers, hasLength(2));
+      final main = daggers.singleWhere((a) => !a.offHand);
+      expect(main.action, AttackAction.action);
+      expect(main.damage, '${dagger.damageDice} + 3',
+          reason: 'la principal suma el mod. (FUE 16, sutil)');
+      expect(offHandAttack(s).damage, dagger.damageDice);
+    });
+
     test('la mano secundaria no suma el modificador al daño', () {
       // Hacha de mano: Ligera, FUE 16 (+3). El ataque sí suma el mod; el daño no.
       final s = compiler.compile(
         dualWielder(mainHand: 'handaxe', offHand: 'handaxe'),
       );
-      final off = attackFor(s, 'handaxe');
-      expect(off.offHand, isTrue);
+      final off = offHandAttack(s);
       expect(off.damage, '1d6', reason: 'el +3 de Fuerza no va al daño');
       expect(off.attackBonus, 5, reason: 'el ataque sí lo suma: 3 + 2');
     });
@@ -561,7 +591,7 @@ void main() {
         offHand: 'handaxe',
         fightingStyleId: 'fs-two-weapon-fighting',
       ));
-      expect(attackFor(s, 'handaxe').damage, '1d6 + 3');
+      expect(offHandAttack(s).damage, '1d6 + 3');
     });
 
     test('un modificador negativo sí se resta, aunque no haya estilo', () {
@@ -573,7 +603,7 @@ void main() {
         dexterity: 8,
         strength: 8,
       ));
-      expect(attackFor(s, 'dagger').damage, '1d4 - 1');
+      expect(offHandAttack(s).damage, '1d4 - 1');
     });
 
     test('el arma sin marcar es de mano principal y usa la acción de Atacar',
@@ -591,7 +621,7 @@ void main() {
       final s = compiler.compile(
         dualWielder(mainHand: 'handaxe', offHand: 'handaxe'),
       );
-      expect(attackFor(s, 'handaxe').action, AttackAction.bonusAction);
+      expect(offHandAttack(s).action, AttackAction.bonusAction);
     });
   });
 }

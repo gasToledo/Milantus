@@ -1018,13 +1018,13 @@ extension _SheetInventorySection on _SheetScreenState {
         if (weapon != null && weapon.isLight)
           CheckedPopupMenuItem(
             value: 'off-hand',
-            checked: _c.weaponOffHand[e.itemId] ?? false,
+            checked: _c.weaponOffHand[weapon.id] ?? false,
             child: Text(context.l10n.combatOffHand),
           ),
         if (weapon?.versatileDice != null)
           CheckedPopupMenuItem(
             value: 'two-handed',
-            checked: _c.weaponTwoHanded[e.itemId] ?? false,
+            checked: _c.weaponTwoHanded[weapon!.id] ?? false,
             child: Text(context.l10n.invTwoHanded),
           ),
         if (info.replica)
@@ -1070,14 +1070,19 @@ extension _SheetInventorySection on _SheetScreenState {
           e.entryId,
           (entry) => entry.copyWith(attuned: !entry.attuned),
         );
+      // Las marcas van por el arma de base y no por el objeto: es lo que lee el
+      // motor, y con el id del objeto una daga +1 se marcaba sin efecto.
       case 'off-hand':
         // Solo se empuña un arma en la secundaria: marcar una desmarca la otra.
-        final on = _c.weaponOffHand[e.itemId] ?? false;
-        _replace(_c.copyWith(weaponOffHand: on ? const {} : {e.itemId: true}));
+        // Con dos dagas, el motor manda a la secundaria solo una.
+        final id = InventoryOps.resolve(e, repo).weapon!.id;
+        final on = _c.weaponOffHand[id] ?? false;
+        _replace(_c.copyWith(weaponOffHand: on ? const {} : {id: true}));
       case 'two-handed':
-        final on = _c.weaponTwoHanded[e.itemId] ?? false;
+        final id = InventoryOps.resolve(e, repo).weapon!.id;
+        final on = _c.weaponTwoHanded[id] ?? false;
         _replace(
-          _c.copyWith(weaponTwoHanded: {..._c.weaponTwoHanded, e.itemId: !on}),
+          _c.copyWith(weaponTwoHanded: {..._c.weaponTwoHanded, id: !on}),
         );
       case 'transmute':
         await _transmuteReplica(e);
