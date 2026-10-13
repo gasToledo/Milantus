@@ -799,6 +799,22 @@ void main() {
     expect(find.text('Te falta una elección para continuar.'), findsNothing);
     expect(find.textContaining('Paso 3 de $total'), findsWidgets);
 
+    // Lo elegido en esta subida se puede cambiar: el grupo no es revisable,
+    // y con el primer toque quedaba trabado hasta salir del asistente.
+    final otro = repo
+        .featsByCategory('fighting-style')
+        .firstWhere((f) => f.id != defensa.id);
+    final otroChip = find.widgetWithText(InkWell, otro.name);
+    await tester.ensureVisible(otroChip);
+    await tester.pumpAndSettle();
+    await tester.tap(otroChip);
+    await tester.pumpAndSettle();
+    expect(find.text('Te falta una elección para continuar.'), findsNothing);
+    await tester.ensureVisible(chip);
+    await tester.pumpAndSettle();
+    await tester.tap(chip);
+    await tester.pumpAndSettle();
+
     // El paso de conjuros dice cuántos hay preparados y avisa el cupo libre.
     var sawPrepared = false;
 

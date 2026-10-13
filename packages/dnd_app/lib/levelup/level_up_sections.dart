@@ -475,6 +475,7 @@ extension _LevelUpSections on _LevelUpScreenState {
           _FeatureChoiceGroup(
             slot: slot,
             chosen: _choicesFor(slot.groupId),
+            original: _originalChoicesFor(slot.groupId),
             repo: widget.repo,
             options: widget.repo
                 .featureChoiceOptions(slot)

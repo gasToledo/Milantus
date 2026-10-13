@@ -648,6 +648,9 @@ class _SlotBadge extends StatelessWidget {
 class _FeatureChoiceGroup extends StatelessWidget {
   final FeatureChoiceSlot slot;
   final List<String> chosen;
+
+  /// Lo que el personaje ya traía elegido antes de esta subida.
+  final List<String> original;
   final List<Feat> options;
   final ContentRepository repo;
   final ValueChanged<List<String>> onChanged;
@@ -655,6 +658,7 @@ class _FeatureChoiceGroup extends StatelessWidget {
   const _FeatureChoiceGroup({
     required this.slot,
     required this.chosen,
+    required this.original,
     required this.options,
     required this.repo,
     required this.onChanged,
@@ -673,7 +677,15 @@ class _FeatureChoiceGroup extends StatelessWidget {
     // Las copias de una repetible cuentan, así que `length` sigue siendo el
     // total gastado del grupo.
     final full = chosen.length >= slot.count;
-    final canDrop = slot.replaceable || !full;
+    // «No revisable» traba lo que la ficha ya traía, no lo que se eligió en
+    // esta misma subida: un Estilo de Combate tocado por error quedaba fijo
+    // hasta salir del asistente y empezar de nuevo.
+    int copies(List<String> ids, String id) => ids.where((c) => c == id).length;
+    bool canDrop(String id) =>
+        slot.replaceable || !full || copies(chosen, id) > copies(original, id);
+    // Con un solo lugar, tocar otra opción la cambia: nadie espera tener que
+    // desmarcar primero.
+    final swappable = slot.count == 1 && chosen.every(canDrop);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -702,7 +714,7 @@ class _FeatureChoiceGroup extends StatelessWidget {
                   enabled: !full,
                   accent: pal.gold,
                   onTap: () => onChanged([...chosen, feat.id]),
-                  onRemove: chosen.contains(feat.id) && canDrop
+                  onRemove: chosen.contains(feat.id) && canDrop(feat.id)
                       ? () =>
                             onChanged(List<String>.of(chosen)..remove(feat.id))
                       : null,
@@ -714,11 +726,16 @@ class _FeatureChoiceGroup extends StatelessWidget {
                   count: chosen.contains(feat.id) ? 1 : 0,
                   // Con el grupo lleno solo se puede soltar lo ya elegido; un
                   // grupo no revisable ni siquiera eso.
-                  enabled: chosen.contains(feat.id) ? canDrop : !full,
+                  enabled: chosen.contains(feat.id)
+                      ? canDrop(feat.id)
+                      : !full || swappable,
                   accent: pal.gold,
                   onTap: () {
                     final next = List<String>.of(chosen);
-                    if (!next.remove(feat.id)) next.add(feat.id);
+                    if (!next.remove(feat.id)) {
+                      if (full) next.clear();
+                      next.add(feat.id);
+                    }
                     onChanged(next);
                   },
                 ),

@@ -196,16 +196,29 @@ class _LevelUpScreenState extends State<LevelUpScreen> {
   Map<String, Map<String, List<String>>> get _effectiveClassFeatureChoices =>
       _newClassFeatureChoices ?? widget.character.classFeatureChoices;
 
-  List<String> _choicesFor(String groupId) {
+  List<String> _choicesFor(String groupId) =>
+      _choicesIn(groupId, _effectiveChoices, _effectiveClassFeatureChoices);
+
+  /// Lo elegido para [groupId] en el personaje **antes** de la subida. Un
+  /// grupo no revisable traba eso, y no lo que se acaba de tocar acá.
+  List<String> _originalChoicesFor(String groupId) => _choicesIn(
+    groupId,
+    widget.character.featureChoices,
+    widget.character.classFeatureChoices,
+  );
+
+  static List<String> _choicesIn(
+    String groupId,
+    Map<String, List<String>> flat,
+    Map<String, Map<String, List<String>>> byClass,
+  ) {
     final separator = groupId.indexOf(':');
     if (separator > 0) {
       final classId = groupId.substring(0, separator);
       final rawGroup = groupId.substring(separator + 1);
-      return _effectiveClassFeatureChoices[classId]?[rawGroup] ??
-          _effectiveChoices[groupId] ??
-          const [];
+      return byClass[classId]?[rawGroup] ?? flat[groupId] ?? const [];
     }
-    return _effectiveChoices[groupId] ?? const [];
+    return flat[groupId] ?? const [];
   }
 
   void _setChoices(String groupId, List<String> ids) {
