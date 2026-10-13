@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
 import '../theme/app_widgets.dart';
+import '../ui/app_sidebar.dart';
 import '../l10n/l10n_context.dart';
 
 part 'codex_category_view.dart';
@@ -148,33 +149,37 @@ class _CodexScreenState extends State<CodexScreen> {
       builder: (context, box) {
         final wide = box.maxWidth >= _wideBreakpoint;
         return Scaffold(
-          appBar: AppBar(
-            // Dice dónde se está: angosto, el panel con la categoría marcada
-            // queda plegado y la lista sola no lo dice. Mismo criterio que la
-            // barra de Homebrew.
-            title: Text(switch ((_needle.isNotEmpty, _section)) {
-              (true, _) => context.l10n.codexSearchTitle,
-              (false, final section?) => context.l10n.codexSectionTitle(
-                section.label(context.l10n),
-              ),
-              (false, null) => context.l10n.navCodex,
-            }),
-            // Angosto, el Drawer de categorías se quedaba con el lugar de la
-            // flecha de volver y no había forma de salir del Códice. La
-            // flecha queda a la izquierda, y las categorías pasan a un botón
-            // a la derecha que dice qué abre.
-            leading: const BackButton(),
-            actions: [
-              if (!wide)
-                Builder(
-                  builder: (context) => IconButton(
-                    tooltip: context.l10n.codexCategoriesTooltip,
-                    icon: const Icon(Icons.menu),
-                    onPressed: () => Scaffold.of(context).openDrawer(),
-                  ),
+          // Ancho, la salida está en el panel y la categoría marcada dice dónde
+          // se está: la barra de arriba solo repetía las dos cosas.
+          appBar: wide
+              ? null
+              : AppBar(
+                  // Dice dónde se está: angosto, el panel con la categoría marcada
+                  // queda plegado y la lista sola no lo dice. Mismo criterio que la
+                  // barra de Homebrew.
+                  title: Text(switch ((_needle.isNotEmpty, _section)) {
+                    (true, _) => context.l10n.codexSearchTitle,
+                    (false, final section?) => context.l10n.codexSectionTitle(
+                      section.label(context.l10n),
+                    ),
+                    (false, null) => context.l10n.navCodex,
+                  }),
+                  // Angosto, el Drawer de categorías se quedaba con el lugar de la
+                  // flecha de volver y no había forma de salir del Códice. La
+                  // flecha queda a la izquierda, y las categorías pasan a un botón
+                  // a la derecha que dice qué abre.
+                  leading: const BackButton(),
+                  actions: [
+                    if (!wide)
+                      Builder(
+                        builder: (context) => IconButton(
+                          tooltip: context.l10n.codexCategoriesTooltip,
+                          icon: const Icon(Icons.menu),
+                          onPressed: () => Scaffold.of(context).openDrawer(),
+                        ),
+                      ),
+                  ],
                 ),
-            ],
-          ),
           drawer: wide
               ? null
               : Drawer(child: SafeArea(child: _rail(context, inDrawer: true))),
@@ -205,15 +210,27 @@ class _CodexScreenState extends State<CodexScreen> {
         color: Theme.of(context).colorScheme.surface,
         border: Border(right: BorderSide(color: pal.hairline)),
       ),
-      padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
+      padding: const EdgeInsets.fromLTRB(14, 20, 14, 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // El mismo arranque que el menú principal: la marca y la salida.
+          const SidebarBrand(),
+          SidebarBackButton(
+            label: context.l10n.rosterTitle,
+            onPressed: () => run(() => Navigator.of(context).pop()),
+          ),
+          const SizedBox(height: 12),
           TextField(
             key: const ValueKey('codex-search'),
             controller: _searchController,
             decoration: InputDecoration(
               isDense: true,
+              // Pill, como el resto de los controles del panel.
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(20),
+                borderSide: BorderSide(color: pal.hairline),
+              ),
               labelText: context.l10n.codexSearchAll,
               prefixIcon: const Icon(Icons.search, size: 20),
               suffixIcon: searching
@@ -263,6 +280,7 @@ class _CodexScreenState extends State<CodexScreen> {
               ],
             ),
           ),
+          const SidebarLightFooter(),
         ],
       ),
     );

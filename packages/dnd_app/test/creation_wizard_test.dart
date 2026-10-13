@@ -319,6 +319,19 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  testWidgets('el panel arranca como el menú principal: marca y salida', (
+    tester,
+  ) async {
+    await pumpAt(tester, const Size(1500, 1400));
+
+    expect(find.textContaining('Milantus'), findsOneWidget);
+    expect(
+      find.widgetWithText(OutlinedButton, 'Mis personajes'),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   const emptyHint = 'Elegí una especie para ver su detalle.';
 
   testWidgets('la especie se parte en dos columnas o se apila según el ancho', (

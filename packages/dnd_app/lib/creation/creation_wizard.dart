@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_widgets.dart';
 import '../theme/class_visuals.dart';
+import '../ui/app_sidebar.dart';
 import '../ui/item_catalog.dart';
 import 'creation_draft.dart';
 import '../l10n/l10n_context.dart';
@@ -257,51 +258,12 @@ class _CreationWizardState extends State<CreationWizard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(8, 2, 8, 20),
-            child: Row(
-              children: [
-                Transform.rotate(
-                  angle: 0.785398,
-                  child: Container(
-                    width: 26,
-                    height: 26,
-                    decoration: BoxDecoration(
-                      color: pal.gold,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text.rich(
-                    TextSpan(
-                      children: [
-                        const TextSpan(text: '$appName\n'),
-                        // El subtítulo va más chico a propósito: a 17 no
-                        // entra en los 236 de ancho del panel y parte la
-                        // palabra, mientras que el nombre sí tiene que
-                        // leerse como el título.
-                        TextSpan(
-                          text: context.l10n.appTagline,
-                          style: TextStyle(
-                            color: pal.gold,
-                            fontSize: 11,
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                      ],
-                    ),
-                    style: TextStyle(
-                      fontFamily: 'Georgia',
-                      fontSize: 18,
-                      height: 1.25,
-                      color: scheme.onSurface,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          // El mismo arranque que el menú principal. Salir pasa por la
+          // confirmación de siempre: hay un borrador que se puede perder.
+          const SidebarBrand(),
+          SidebarBackButton(
+            label: context.l10n.rosterTitle,
+            onPressed: _requestClose,
           ),
           const Spacer(),
           Container(
@@ -333,6 +295,7 @@ class _CreationWizardState extends State<CreationWizard> {
               ],
             ),
           ),
+          const SidebarLightFooter(),
         ],
       ),
     );

@@ -23,6 +23,7 @@ import 'dm/share_character_dialog.dart';
 import 'item_catalog.dart';
 import 'portrait_image.dart';
 import 'portrait_screen.dart';
+import 'app_sidebar.dart';
 import 'save_status_indicator.dart';
 import 'spell_edit_screen.dart';
 import '../l10n/l10n_context.dart';

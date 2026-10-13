@@ -72,6 +72,25 @@ void main() {
     return controller;
   }
 
+  // El panel de la ficha arranca como el menú principal y no repite lo que
+  // vive en Ajustes: con ocho ítems propios, el tema y el idioma encima lo
+  // sacaban de una ventana de laptop.
+  testWidgets(
+    'el panel tiene la marca y la salida, y no el tema ni el idioma',
+    (tester) async {
+      await pumpSheet(tester, demoSagan(), size: const Size(1300, 1400));
+
+      expect(find.textContaining('Milantus'), findsOneWidget);
+      expect(
+        find.widgetWithText(OutlinedButton, 'Mis personajes'),
+        findsOneWidget,
+      );
+      expect(find.byType(ThemeModeSelector), findsNothing);
+      expect(find.byType(LanguageSelector), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   /// Abre el menú contextual de una fila del inventario.
   Future<void> openItemMenu(WidgetTester tester, String itemId) async {
     final menu = find.byWidgetPredicate(

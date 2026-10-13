@@ -597,6 +597,28 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   interruptor de arriba.
 - El diálogo de Ajustes con «Cancelar» y «Guardar»: lo reemplaza la sección.
 
+## [0.24.0+1] - 2026-10-13
+
+### Nuevo
+
+- Sin cambios.
+
+### Modificado
+
+- Los paneles de la ficha, el Códice y la creación de personaje arrancan como
+  el menú principal: la marca arriba y, en el lugar del interruptor de modo,
+  un «← Mis personajes» para volver. Al pie muestran la versión.
+- En la ficha, el cartel de guardado pasa al pie del panel, junto a la
+  versión.
+- El buscador del Códice toma la forma de pill del resto del panel.
+
+### Eliminado
+
+- El tema y el idioma del panel de la ficha: se cambian desde Ajustes, en el
+  menú principal.
+- La barra superior del Códice en pantalla ancha: la salida está en el panel.
+  En pantalla angosta sigue estando.
+
 ## [Unreleased]
 
 ### Nuevo

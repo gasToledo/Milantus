@@ -286,7 +286,8 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  // El pie del panel lateral mide 208 (236 menos 14 de padding a cada lado):
+  // El idioma y el tema viven en Ajustes. En un teléfono angosto la fila les
+  // deja unos 208 px:
   // los tres segmentos y el idioma tienen que entrar ahí sin desbordar, y cada
   // segmento tiene que ser un objetivo táctil de 48 px.
   group('preferencias de presentación', () {
@@ -302,7 +303,14 @@ void main() {
             body: Center(
               child: SizedBox(
                 width: contentWidth,
-                child: DisplayPreferences(controller: controller),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const LanguageSelector(),
+                    const SizedBox(height: 8),
+                    ThemeModeSelector(controller: controller),
+                  ],
+                ),
               ),
             ),
           ),

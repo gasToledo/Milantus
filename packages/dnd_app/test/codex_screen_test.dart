@@ -33,6 +33,27 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  // El panel del Códice arranca como el menú principal: la marca y la salida
+  // en el mismo lugar. Ancho, eso deja de sobra a la barra de arriba; angosto
+  // el panel está plegado y la barra sigue siendo la forma de salir.
+  testWidgets('ancho, la salida está en el panel y no hay barra superior', (
+    tester,
+  ) async {
+    await pumpCodex(tester);
+
+    expect(find.byType(AppBar), findsNothing);
+    expect(find.textContaining('Milantus'), findsOneWidget);
+    expect(
+      find.widgetWithText(OutlinedButton, 'Mis personajes'),
+      findsOneWidget,
+    );
+
+    await pumpCodex(tester, size: const Size(500, 900));
+    expect(find.byType(AppBar), findsOneWidget);
+    expect(find.byType(BackButton), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('la portada cuenta lo que hay en cada categoría', (tester) async {
     await pumpCodex(tester);
 

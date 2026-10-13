@@ -150,26 +150,6 @@ Widget appNavItem(
   );
 }
 
-/// Preferencias de presentación del pie del panel lateral: idioma y tema.
-///
-/// Van juntas porque son lo mismo —cómo se ve y en qué se lee la aplicación—
-/// y porque separadas cada una parecería un ajuste suelto entre las secciones
-/// de navegación.
-class DisplayPreferences extends StatelessWidget {
-  final AppThemeController controller;
-  const DisplayPreferences({super.key, required this.controller});
-
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      const LanguageSelector(),
-      const SizedBox(height: 8),
-      ThemeModeSelector(controller: controller),
-    ],
-  );
-}
-
 /// Selector de idioma.
 ///
 /// Con un [AppLocaleScope] arriba es un menú con los idiomas disponibles, cada

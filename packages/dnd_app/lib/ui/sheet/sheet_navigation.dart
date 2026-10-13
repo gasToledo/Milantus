@@ -69,15 +69,16 @@ extension _SheetNavigation on _SheetScreenState {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        appNavItem(
-          context,
-          icon: Icons.arrow_back,
+        // El mismo arranque que el menú principal: la marca y, donde aquel
+        // tiene el interruptor de modo, la salida.
+        const SidebarBrand(),
+        SidebarBackButton(
           label: widget.npcMode
               ? context.l10n.navBackToNpc
               : context.l10n.rosterTitle,
-          onTap: () => run(() => Navigator.of(context).pop()),
+          onPressed: () => run(() => Navigator.of(context).pop()),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -174,9 +175,9 @@ extension _SheetNavigation on _SheetScreenState {
         const SizedBox(height: 8),
         // La ficha guarda sola, sin botón: sin este cartel no hay forma de
         // saber si lo que se acaba de tipear llegó al servidor.
-        SaveStatusIndicator(controller: ctrl),
-        const SizedBox(height: 8),
-        DisplayPreferences(controller: widget.theme),
+        // El tema y el idioma ya no van acá: viven en Ajustes, en el menú
+        // principal.
+        SidebarLightFooter(leading: SaveStatusIndicator(controller: ctrl)),
       ],
     );
   }

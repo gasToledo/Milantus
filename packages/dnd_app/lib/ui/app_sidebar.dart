@@ -64,52 +64,7 @@ class AppSidebar extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(8, 2, 8, 16),
-            child: Row(
-              children: [
-                Transform.rotate(
-                  angle: 0.785398,
-                  child: Container(
-                    width: 26,
-                    height: 26,
-                    decoration: BoxDecoration(
-                      color: pal.gold,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text.rich(
-                    TextSpan(
-                      children: [
-                        const TextSpan(text: '$appName\n'),
-                        // El subtítulo va más chico a propósito: a 17 no
-                        // entra en los 236 de ancho del panel y parte la
-                        // palabra, mientras que el nombre sí tiene que
-                        // leerse como el título.
-                        TextSpan(
-                          text: l10n.appTagline,
-                          style: TextStyle(
-                            color: pal.gold,
-                            fontSize: 11,
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                      ],
-                    ),
-                    style: TextStyle(
-                      fontFamily: 'Georgia',
-                      fontSize: 18,
-                      height: 1.25,
-                      color: scheme.onSurface,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          const SidebarBrand(),
           // Arriba y a la vista, no un botón al pie: son dos modos de la misma
           // cuenta y ninguno es «la pantalla de adentro» del otro. Las claves
           // van en los rótulos porque `ButtonSegment` no acepta una.
@@ -260,5 +215,138 @@ class AppSidebar extends StatelessWidget {
         );
       }
     }
+  }
+}
+
+/// La marca en lo alto de todo panel lateral: el rombo, el nombre y el
+/// subtítulo. Es la misma en el menú principal y en las pantallas de adentro
+/// (ficha, Códice, creación), para que el panel se reconozca como uno solo.
+class SidebarBrand extends StatelessWidget {
+  const SidebarBrand({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.palette;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 2, 8, 16),
+      child: Row(
+        children: [
+          Transform.rotate(
+            angle: 0.785398,
+            child: Container(
+              width: 26,
+              height: 26,
+              decoration: BoxDecoration(
+                color: pal.gold,
+                borderRadius: BorderRadius.circular(5),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  const TextSpan(text: '$appName\n'),
+                  // El subtítulo va más chico a propósito: a 17 no entra en
+                  // los 236 de ancho del panel y parte la palabra, mientras
+                  // que el nombre sí tiene que leerse como el título.
+                  TextSpan(
+                    text: context.l10n.appTagline,
+                    style: TextStyle(
+                      color: pal.gold,
+                      fontSize: 11,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ],
+              ),
+              style: TextStyle(
+                fontFamily: 'Georgia',
+                fontSize: 18,
+                height: 1.25,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// El «volver» de una pantalla de adentro.
+///
+/// Ocupa el lugar que en el menú principal tiene el interruptor de modo, con
+/// la misma forma: así la salida está siempre en el mismo sitio del panel, se
+/// esté donde se esté.
+class SidebarBackButton extends StatelessWidget {
+  final String label;
+  final VoidCallback onPressed;
+
+  const SidebarBackButton({
+    super.key,
+    required this.label,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.palette;
+    return OutlinedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(Icons.arrow_back, size: 16, color: pal.gold),
+      label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+      style: OutlinedButton.styleFrom(
+        backgroundColor: pal.plaque,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
+        side: BorderSide(color: pal.hairline),
+        minimumSize: const Size.fromHeight(40),
+        textStyle: const TextStyle(fontSize: 13),
+      ),
+    );
+  }
+}
+
+/// El pie liviano de una pantalla de adentro: la versión y, si la pantalla
+/// tiene algo que decir de sí (la ficha, su cartel de guardado), [leading].
+///
+/// No repite el pie del menú principal —Ajustes, la cuenta, «Cerrar
+/// sesión»— a propósito: la ficha ya tiene ocho ítems propios, y con ese pie
+/// encima no entra en una ventana de laptop. Todo eso queda a un «volver».
+///
+/// La versión sale del canal de sugerencias, que el arranque ya deja a mano
+/// para todas las rutas; en un test suelto no hay canal y no se muestra.
+class SidebarLightFooter extends StatelessWidget {
+  final Widget? leading;
+
+  const SidebarLightFooter({super.key, this.leading});
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.palette;
+    final version = FeedbackScope.of(context)?.appVersion;
+    if (leading == null && version == null) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Divider(height: 17, color: pal.hairline),
+        Row(
+          children: [
+            Expanded(child: leading ?? const SizedBox.shrink()),
+            if (version != null)
+              Text(
+                'v$version',
+                style: TextStyle(
+                  fontSize: 11,
+                  letterSpacing: 0.3,
+                  color: pal.gold,
+                ),
+              ),
+          ],
+        ),
+      ],
+    );
   }
 }
