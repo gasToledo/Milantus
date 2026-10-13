@@ -566,7 +566,9 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Nuevo
 
-- Sin cambios.
+- Ajustes suma «Mostrar la dificultad del encuentro»: apagado, el Modo DM no
+  muestra la banda de dificultad ni los PX de cada fila. Es una preferencia
+  de la cuenta y viene prendida.
 
 ### Modificado
 
@@ -575,6 +577,8 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   antes quedaba fuera de la cuenta con el aviso «Sin VD».
 - En un teléfono, los PX de la banda de dificultad quedan alineados al borde
   derecho.
+- El diálogo de Ajustes se llama «Ajustes» a secas y se puede guardar aunque
+  el servidor no tenga proveedores de retratos.
 
 ### Eliminado
 

@@ -619,6 +619,11 @@ class _DmModeScreenState extends State<DmModeScreen> {
           onEdit: () => _editCampaign(campaign),
           onDelete: () => _deleteCampaign(campaign),
           onOpenNotebook: _openNotebook,
+          // Se lee al construir y no se escucha: los Ajustes se abren desde
+          // el dashboard, así que al volver acá ya cambió.
+          showDifficulty:
+              widget.settingsController?.settings.showEncounterDifficulty ??
+              true,
           onOpenNpc: _openNpc,
         );
       },
@@ -783,6 +788,9 @@ class _CampaignDetail extends StatefulWidget {
   final void Function(String chapterId) onOpenNotebook;
   final Future<void> Function(String npcId) onOpenNpc;
 
+  /// La preferencia de la cuenta: ver la dificultad del encuentro.
+  final bool showDifficulty;
+
   const _CampaignDetail({
     super.key,
     required this.campaign,
@@ -794,6 +802,7 @@ class _CampaignDetail extends StatefulWidget {
     required this.onDelete,
     required this.onOpenNotebook,
     required this.onOpenNpc,
+    required this.showDifficulty,
   });
 
   @override
@@ -1801,6 +1810,7 @@ class _CampaignDetailState extends State<_CampaignDetail> {
               members: _members ?? const [],
               npcs: _npcs ?? const [],
               loadNpcLibrary: widget.api.listNpcs,
+              showDifficulty: widget.showDifficulty,
               onRetry: _loadEncounter,
               onAddPlayer: _addPlayerToEncounter,
               onAddMonster: _addMonsters,

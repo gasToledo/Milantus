@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import '../api/api_client.dart';
 import '../api/api_models.dart';
 import '../data/settings_service.dart';
+import '../theme/app_theme.dart';
 import '../theme/app_widgets.dart';
 import '../l10n/l10n_context.dart';
 
-/// Selecciona el proveedor de retratos entre los ofrecidos por
-/// `GET /api/portraits/providers`. Las credenciales quedan en el servidor.
+/// Los ajustes de la cuenta: el proveedor de retratos, entre los ofrecidos por
+/// `GET /api/portraits/providers` (las credenciales quedan en el servidor), y
+/// si el Modo DM muestra la dificultad del encuentro.
 class SettingsDialog extends StatefulWidget {
   final ApiClient api;
   final SettingsController? settingsController;
@@ -25,6 +27,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
 
   List<PortraitProviderInfo> _providers = [];
   String? _providerId;
+  bool _showDifficulty = true;
 
   bool _loaded = false;
   bool _saving = false;
@@ -52,6 +55,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
         _providerId = providers.any((p) => p.id == settings.imageProvider)
             ? settings.imageProvider
             : providers.firstOrNull?.id;
+        _showDifficulty = settings.showEncounterDifficulty;
         _loaded = true;
       });
     } catch (error) {
@@ -64,11 +68,14 @@ class _SettingsDialogState extends State<SettingsDialog> {
   }
 
   Future<void> _save() async {
-    if (_saving || _providerId == null) return;
+    if (_saving) return;
     setState(() => _saving = true);
     try {
       await _settingsController.update((settings) {
-        settings.imageProvider = _providerId!;
+        // Sin proveedores en el servidor no hay nada que elegir, pero el
+        // resto de los ajustes se guarda igual.
+        if (_providerId case final id?) settings.imageProvider = id;
+        settings.showEncounterDifficulty = _showDifficulty;
       });
       if (!mounted) return;
       Navigator.of(context).pop(true);
@@ -109,7 +116,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
         DialogAction(
           _saving ? context.l10n.commonSaving : context.l10n.commonSave,
           primary: true,
-          onPressed: _loaded && !_saving && _providerId != null ? _save : null,
+          onPressed: _loaded && !_saving ? _save : null,
         ),
       ],
     );
@@ -133,41 +140,62 @@ class _SettingsDialogState extends State<SettingsDialog> {
   );
 
   Widget _formContent() {
-    if (_providers.isEmpty) {
-      return Text(context.l10n.settingsNoProviders);
-    }
+    final pal = context.palette;
     return SingleChildScrollView(
       child: FocusTraversalGroup(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(context.l10n.settingsProviderLabel),
-            const SizedBox(height: 8),
-            DropdownButtonFormField<String>(
-              initialValue: _providerId,
-              isExpanded: true,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                isDense: true,
+            ..._providerFields(),
+            const SizedBox(height: 16),
+            Divider(height: 1, color: pal.hairline),
+            // Un interruptor y no una pestaña propia del Modo DM: es la única
+            // preferencia del DM. Cuando haya varias, se mudan juntas.
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              value: _showDifficulty,
+              onChanged: (v) => setState(() => _showDifficulty = v),
+              title: Text(context.l10n.settingsShowDifficulty),
+              subtitle: Text(
+                context.l10n.settingsShowDifficultyHint,
+                style: TextStyle(fontSize: 12, color: pal.textMuted),
               ),
-              items: _providers
-                  .map(
-                    (p) => DropdownMenuItem(
-                      value: p.id,
-                      child: Text(
-                        p.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  )
-                  .toList(),
-              onChanged: (v) => setState(() => _providerId = v ?? _providerId),
             ),
           ],
         ),
       ),
     );
+  }
+
+  List<Widget> _providerFields() {
+    if (_providers.isEmpty) {
+      return [Text(context.l10n.settingsNoProviders)];
+    }
+    return [
+      Text(context.l10n.settingsProviderLabel),
+      const SizedBox(height: 8),
+      DropdownButtonFormField<String>(
+        initialValue: _providerId,
+        isExpanded: true,
+        decoration: const InputDecoration(
+          border: OutlineInputBorder(),
+          isDense: true,
+        ),
+        items: _providers
+            .map(
+              (p) => DropdownMenuItem(
+                value: p.id,
+                child: Text(
+                  p.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            )
+            .toList(),
+        onChanged: (v) => setState(() => _providerId = v ?? _providerId),
+      ),
+    ];
   }
 }

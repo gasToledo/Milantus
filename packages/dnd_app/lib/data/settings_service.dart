@@ -31,12 +31,18 @@ class AppSettings {
   /// valor desconocido cae a oscuro (ver `AppThemeController.parse`).
   String themeMode;
 
+  /// Si el Modo DM muestra la dificultad del encuentro mientras se arma un
+  /// combate. Prendido por defecto; hay DM que prefieren no saberla, y
+  /// apagado no queda ni la banda ni los PX de las filas.
+  bool showEncounterDifficulty;
+
   AppSettings({
     this.imageProvider = 'pollinations',
     this.favoriteCharacterId,
     List<String>? characterOrder,
     this.sortMode = 'name',
     this.themeMode = 'dark',
+    this.showEncounterDifficulty = true,
   }) : characterOrder = characterOrder ?? [];
 
   Map<String, dynamic> toJson() => {
@@ -45,6 +51,7 @@ class AppSettings {
     'characterOrder': characterOrder,
     'sortMode': sortMode,
     'themeMode': themeMode,
+    'showEncounterDifficulty': showEncounterDifficulty,
   };
 
   factory AppSettings.fromJson(Map<String, dynamic>? json) => AppSettings(
@@ -56,6 +63,7 @@ class AppSettings {
     ],
     sortMode: json?['sortMode'] as String? ?? 'name',
     themeMode: json?['themeMode'] as String? ?? 'dark',
+    showEncounterDifficulty: json?['showEncounterDifficulty'] as bool? ?? true,
   );
 }
 

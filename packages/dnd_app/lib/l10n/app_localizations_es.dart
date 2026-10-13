@@ -26,7 +26,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsSaveError => 'No se pudieron guardar los ajustes';
 
   @override
-  String get settingsTitle => 'Ajustes · Generación de imágenes';
+  String get settingsTitle => 'Ajustes';
 
   @override
   String get settingsLoading => 'Cargando ajustes…';
@@ -37,6 +37,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settingsProviderLabel => 'Proveedor de retratos:';
+
+  @override
+  String get settingsShowDifficulty => 'Mostrar la dificultad del encuentro';
+
+  @override
+  String get settingsShowDifficultyHint =>
+      'En el Modo DM, mientras armás un combate: la dificultad, los PX y los avisos. Apagalo si preferís no saberla.';
 
   @override
   String get commonCancel => 'Cancelar';

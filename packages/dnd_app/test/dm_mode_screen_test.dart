@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dnd_app/api/api_client.dart';
+import 'package:dnd_app/data/settings_service.dart';
 import 'package:dnd_app/theme/app_theme.dart';
 import 'package:dnd_app/theme/app_widgets.dart';
 import 'package:dnd_app/ui/dm/dm_mode_screen.dart';
@@ -27,6 +28,7 @@ void main() {
     WidgetTester tester, {
     Size size = const Size(1400, 1000),
     void Function(FakeApiServer)? seed,
+    AppSettings? settings,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1.0;
@@ -34,12 +36,16 @@ void main() {
 
     final server = FakeApiServer();
     seed?.call(server);
+    final api = ApiClient(client: server.client);
     await tester.pumpWidget(
       localizedApp(
         theme: AppTheme.dark,
         home: DmModeScreen(
-          api: ApiClient(client: server.client),
+          api: api,
           repo: repo,
+          settingsController: settings == null
+              ? null
+              : SettingsController(api, settings),
         ),
       ),
     );
@@ -1299,6 +1305,35 @@ void main() {
         await tirarIniciativa(tester, initiatives: {'Sagan': 12});
         expect(find.text('DIFICULTAD'), findsNothing);
         expect(find.textContaining(px), findsNothing);
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    // Hay DM que prefieren no saberla. Apagada no queda nada que la delate:
+    // ni la banda ni los PX de las filas.
+    testWidgets(
+      'con la dificultad apagada en Ajustes no aparece nada de ella',
+      (tester) async {
+        await pumpDmMode(
+          tester,
+          seed: seedTable,
+          settings: AppSettings(showEncounterDifficulty: false),
+        );
+        await enterCode(tester, 'CODE-0001');
+        await openCombate(tester);
+        await tester.tap(find.text('Armar combate'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Sumar'));
+        await tester.pumpAndSettle();
+        await addMonsters(tester, 'goblin', 'Guerrero goblin', count: 3);
+
+        expect(find.text('Armando el combate'), findsOneWidget);
+        expect(find.text('DIFICULTAD'), findsNothing);
+        expect(find.textContaining(' PX'), findsNothing);
+        expect(
+          find.textContaining('Muchas criaturas.', findRichText: true),
+          findsNothing,
+        );
         expect(tester.takeException(), isNull);
       },
     );

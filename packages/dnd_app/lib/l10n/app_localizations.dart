@@ -131,7 +131,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsTitle.
   ///
   /// In es, this message translates to:
-  /// **'Ajustes · Generación de imágenes'**
+  /// **'Ajustes'**
   String get settingsTitle;
 
   /// No description provided for @settingsLoading.
@@ -151,6 +151,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Proveedor de retratos:'**
   String get settingsProviderLabel;
+
+  /// No description provided for @settingsShowDifficulty.
+  ///
+  /// In es, this message translates to:
+  /// **'Mostrar la dificultad del encuentro'**
+  String get settingsShowDifficulty;
+
+  /// No description provided for @settingsShowDifficultyHint.
+  ///
+  /// In es, this message translates to:
+  /// **'En el Modo DM, mientras armás un combate: la dificultad, los PX y los avisos. Apagalo si preferís no saberla.'**
+  String get settingsShowDifficultyHint;
 
   /// No description provided for @commonCancel.
   ///

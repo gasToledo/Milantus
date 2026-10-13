@@ -26,7 +26,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSaveError => 'Could not save the settings';
 
   @override
-  String get settingsTitle => 'Settings · Image generation';
+  String get settingsTitle => 'Settings';
 
   @override
   String get settingsLoading => 'Loading settings…';
@@ -37,6 +37,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsProviderLabel => 'Portrait provider:';
+
+  @override
+  String get settingsShowDifficulty => 'Show encounter difficulty';
+
+  @override
+  String get settingsShowDifficultyHint =>
+      'In DM Mode, while you set up a combat: the difficulty, the XP and the warnings. Turn it off if you would rather not know.';
 
   @override
   String get commonCancel => 'Cancel';

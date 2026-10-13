@@ -368,6 +368,13 @@ cuántas acciones tiene cada bando.
 No hay ruta nueva ni dato guardado: todo sale de lo que el cliente ya tiene
 del combate, de la mesa y del catálogo.
 
+Se puede apagar: `AppSettings.showEncounterDifficulty` es una preferencia de
+la cuenta, prendida por defecto, que se cambia en el diálogo de Ajustes.
+Apagada no queda nada que delate la dificultad —ni la banda ni los PX de las
+filas—, porque hay DM que prefieren no saberla. Es por cuenta y no por
+campaña a propósito: por campaña pediría un campo en `Campaign` con su
+migración, y no apareció el caso de quererla en una mesa y no en otra.
+
 ## La vuelta del vínculo: la campaña vista por el jugador
 
 Hasta acá el vínculo era de una sola vía. El jugador compartía su ficha, el DM

@@ -71,6 +71,10 @@ class EncounterView extends StatefulWidget {
   /// es lo único que la necesita.
   final Future<List<NpcEntry>> Function() loadNpcLibrary;
 
+  /// Si se muestra la dificultad del encuentro: la banda y los PX de cada
+  /// fila. Es una preferencia de la cuenta (ver `AppSettings`).
+  final bool showDifficulty;
+
   final VoidCallback onRetry;
   final void Function(String memberId, String name, int initiative) onAddPlayer;
   final void Function(
@@ -113,6 +117,7 @@ class EncounterView extends StatefulWidget {
     required this.members,
     required this.npcs,
     required this.loadNpcLibrary,
+    this.showDifficulty = true,
     required this.onRetry,
     required this.onAddPlayer,
     required this.onAddMonster,
@@ -234,7 +239,9 @@ class _EncounterViewState extends State<EncounterView> {
       _controlBar(context, current),
       // Solo mientras se arma: es la pregunta de ese momento («¿me pasé?»).
       // Con el combate andando ya no hay nada que decidir con ese número.
-      if (current.isPreparing && current.combatants.isNotEmpty) ...[
+      if (widget.showDifficulty &&
+          current.isPreparing &&
+          current.combatants.isNotEmpty) ...[
         const SizedBox(height: 12),
         EncounterDifficultyBand(
           difficulty: encounterDifficultyOf(
@@ -610,6 +617,7 @@ class _EncounterViewState extends State<EncounterView> {
               npc: _npcEntry(combatant),
               repo: widget.repo,
               preparing: current.isPreparing,
+              showXp: widget.showDifficulty,
               columns: columns,
               amount: () => _amount,
               onAdjustHp: (delta) => widget.onAdjustHp(combatant.id, delta),
@@ -1451,6 +1459,9 @@ class _CombatantRow extends StatelessWidget {
   final CampaignNpcEntry? npc;
   final ContentRepository repo;
 
+  /// Si la fila dice sus PX mientras se arma (ver `EncounterView.showDifficulty`).
+  final bool showXp;
+
   /// Mientras se arma la mesa no hay iniciativa que mostrar.
   final bool preparing;
 
@@ -1477,6 +1488,7 @@ class _CombatantRow extends StatelessWidget {
     required this.npc,
     required this.repo,
     required this.preparing,
+    required this.showXp,
     required this.columns,
     required this.amount,
     required this.onAdjustHp,
@@ -1836,7 +1848,9 @@ class _CombatantRow extends StatelessWidget {
   /// Null para quien no entra en la cuenta de PX: un jugador, un neutral o
   /// alguien sin VD.
   String? _xpLabel(BuildContext context) {
-    if (!preparing || combatant.side == CombatantSide.neutral) return null;
+    if (!showXp || !preparing || combatant.side == CombatantSide.neutral) {
+      return null;
+    }
     final cr = combatantChallengeRating(combatant, npc, repo);
     if (cr == null) return null;
     final xp = formatXp(context, xpForChallengeRating(cr));
