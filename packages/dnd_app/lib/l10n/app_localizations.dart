@@ -149,8 +149,80 @@ abstract class AppLocalizations {
   /// No description provided for @settingsProviderLabel.
   ///
   /// In es, this message translates to:
-  /// **'Proveedor de retratos:'**
+  /// **'Proveedor de retratos'**
   String get settingsProviderLabel;
+
+  /// No description provided for @settingsProviderHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Con qué servicio se generan los retratos de tus personajes y PNJ.'**
+  String get settingsProviderHint;
+
+  /// No description provided for @settingsSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Son de tu cuenta: valen en cualquier dispositivo donde entres.'**
+  String get settingsSubtitle;
+
+  /// No description provided for @settingsGeneral.
+  ///
+  /// In es, this message translates to:
+  /// **'General'**
+  String get settingsGeneral;
+
+  /// No description provided for @settingsStartMode.
+  ///
+  /// In es, this message translates to:
+  /// **'Al abrir Milantus'**
+  String get settingsStartMode;
+
+  /// No description provided for @settingsStartModeHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Es solo dónde arranca: podés pasar de un modo al otro cuando quieras.'**
+  String get settingsStartModeHint;
+
+  /// No description provided for @settingsTheme.
+  ///
+  /// In es, this message translates to:
+  /// **'Tema'**
+  String get settingsTheme;
+
+  /// No description provided for @settingsLanguage.
+  ///
+  /// In es, this message translates to:
+  /// **'Idioma'**
+  String get settingsLanguage;
+
+  /// No description provided for @settingsPortraits.
+  ///
+  /// In es, this message translates to:
+  /// **'Retratos'**
+  String get settingsPortraits;
+
+  /// No description provided for @settingsSaved.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardado'**
+  String get settingsSaved;
+
+  /// No description provided for @modeSwitchLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Modo'**
+  String get modeSwitchLabel;
+
+  /// No description provided for @modePlayer.
+  ///
+  /// In es, this message translates to:
+  /// **'Jugador'**
+  String get modePlayer;
+
+  /// No description provided for @modeDm.
+  ///
+  /// In es, this message translates to:
+  /// **'DM'**
+  String get modeDm;
 
   /// No description provided for @settingsShowDifficulty.
   ///
@@ -161,7 +233,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsShowDifficultyHint.
   ///
   /// In es, this message translates to:
-  /// **'En el Modo DM, mientras armás un combate: la dificultad, los PX y los avisos. Apagalo si preferís no saberla.'**
+  /// **'Mientras armás un combate: la dificultad, los PX y los avisos. Apagalo si preferís no saberla.'**
   String get settingsShowDifficultyHint;
 
   /// No description provided for @commonCancel.

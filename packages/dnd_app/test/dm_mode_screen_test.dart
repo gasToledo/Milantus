@@ -4,6 +4,7 @@ import 'package:dnd_app/api/api_client.dart';
 import 'package:dnd_app/data/settings_service.dart';
 import 'package:dnd_app/theme/app_theme.dart';
 import 'package:dnd_app/theme/app_widgets.dart';
+import 'package:dnd_app/ui/app_sidebar.dart';
 import 'package:dnd_app/ui/dm/dm_mode_screen.dart';
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:flutter/material.dart';
@@ -223,28 +224,31 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets(
-    'las secciones viven en el lateral y el regreso dice Modo Jugador',
-    (tester) async {
-      await pumpDmMode(tester, seed: seedTable);
+  testWidgets('las secciones viven en el lateral y el regreso dice Jugador', (
+    tester,
+  ) async {
+    await pumpDmMode(tester, seed: seedTable);
 
-      expect(find.text('CAMPAÑA ACTUAL'), findsOneWidget);
-      expect(find.text('Mesa'), findsOneWidget);
-      expect(find.text('Capítulos'), findsOneWidget);
-      expect(find.text('Combate'), findsOneWidget);
-      expect(find.text('Cuaderno'), findsOneWidget);
-      // El Bestiario va afuera del grupo de campaña: es de la app, no de la
-      // mesa.
-      expect(find.text('Bestiario'), findsOneWidget);
-      expect(
-        find.byWidgetPredicate((widget) => widget is SegmentedButton),
-        findsNothing,
-      );
-      expect(find.text('Modo Jugador'), findsOneWidget);
-      expect(find.text('Volver a mis personajes'), findsNothing);
-      expect(tester.takeException(), isNull);
-    },
-  );
+    expect(find.text('CAMPAÑA ACTUAL'), findsOneWidget);
+    expect(find.text('Mesa'), findsOneWidget);
+    expect(find.text('Capítulos'), findsOneWidget);
+    expect(find.text('Combate'), findsOneWidget);
+    expect(find.text('Cuaderno'), findsOneWidget);
+    // El Bestiario va afuera del grupo de campaña: es de la app, no de la
+    // mesa.
+    expect(find.text('Bestiario'), findsOneWidget);
+    expect(
+      // El único grupo segmentado del panel es el interruptor de modo.
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is SegmentedButton && widget is! SegmentedButton<AppMode>,
+      ),
+      findsNothing,
+    );
+    expect(find.text('Jugador'), findsOneWidget);
+    expect(find.text('Volver a mis personajes'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
 
   // Regresión: las campañas salían del panel recién después de tocar algo.
   //
@@ -413,7 +417,7 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.menu));
     await tester.pumpAndSettle();
-    expect(find.text('Modo Jugador'), findsOneWidget);
+    expect(find.text('Jugador'), findsOneWidget);
 
     await tester.tap(find.text('Capítulos'));
     await tester.pumpAndSettle();
@@ -701,7 +705,24 @@ void main() {
 
   group('Combate', () {
     Future<void> openCombate(WidgetTester tester) async {
-      await tester.tap(find.text('Combate'));
+      // Con el pie de la cuenta en el panel, en una ventana baja «Combate»
+      // queda bajo el pliegue de la lista: se llega desplazándola.
+      final combate = find.text('Combate');
+      // Dos pasos: primero se desplaza hasta que la lista la construya, y
+      // después se la trae entera a la vista, que con asomar no alcanza.
+      await tester.scrollUntilVisible(
+        combate,
+        120,
+        scrollable: find
+            .descendant(
+              of: find.byType(AppSidebar),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      await tester.ensureVisible(combate);
+      await tester.pumpAndSettle();
+      await tester.tap(combate);
       await tester.pumpAndSettle();
     }
 

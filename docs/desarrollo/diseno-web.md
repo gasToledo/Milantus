@@ -349,17 +349,28 @@ Padding de referencia por componente: tarjeta de personaje `16`, cabecera de
 │  236 px      │  │ Barra de acciones (buscar, orden, +) │  │
 │              │  ├──────────────────────────────────────┤  │
 │  · marca     │  │                                      │  │
-│  · nav       │  │   Grilla de tarjetas / cuerpo        │  │
-│  · (spacer)  │  │   de la ficha                        │  │
-│  · cuenta    │  │                                      │  │
-│  · tema      │  └──────────────────────────────────────┘  │
+│  · modo      │  │   Grilla de tarjetas / cuerpo        │  │
+│  · nav       │  │   de la ficha                        │  │
+│  · ajustes   │  │                                      │  │
+│  · cuenta    │  └──────────────────────────────────────┘  │
 │  · versión   │                                            │
 └──────────────┴────────────────────────────────────────────┘
 ```
 
-El **panel lateral mide 236 px fijos** en las tres pantallas con shell
-(dashboard, ficha, wizard de creación). No es flexible: los textos que no
-entran se recortan con `ellipsis`.
+El **panel lateral mide 236 px fijos** en las pantallas con shell
+(dashboard, Modo DM, ficha, wizard de creación). No es flexible: los textos
+que no entran se recortan con `ellipsis`.
+
+El dashboard y el Modo DM comparten **el mismo marco** (`AppSidebar`): marca,
+interruptor de modo, y al pie Ajustes, sugerencias, la cuenta con «Cerrar
+sesión» y la versión. Lo único propio de cada modo es la navegación del
+medio. El pie no se rediseña por modo: quien solo dirige tiene que poder
+salir de su cuenta sin pasar por una pantalla que no usa.
+
+El costo es de alto: la navegación del DM (herramientas, campañas y las cinco
+secciones de la campaña) ya no entra entera por debajo de unos 890 px de
+ventana, y se desplaza. Si eso molesta, el camino es compactar el pie de la
+cuenta en una fila con menú, no volver a separar los paneles.
 
 ### 7.2 Breakpoints
 
@@ -419,7 +430,9 @@ compartida: **antes de crear un widget visual nuevo, buscar acá**.
 | `sheetCard(…)` | Tarjeta plegable con cabecera (ícono dorado 18 px + título Georgia 16 + acción) | `icon`, `title`, `trailing`, `child`, y `collapseKey` cuando el título se repite en la misma pantalla (dos campañas apiladas tienen dos tarjetas «Batallas») |
 | `responsiveColumns(…)` | Columnas lado a lado ≥ 640, apiladas debajo | `List<List<Widget>>` |
 | `appNavItem(…)` | Ítem del panel lateral | `icon`, `label`, `active`, `onTap`, y `count` para la cifra al final de la fila (en cifras tabulares: los ítems se apilan y la columna de números tiene que leerse como columna) |
-| `DisplayPreferences` | Pie del panel lateral: idioma + tema, juntos porque son lo mismo | Envuelve `LanguageSelector` y `ThemeModeSelector` |
+| `DisplayPreferences` | Idioma + tema, juntos porque son lo mismo. Hoy solo en el panel de la ficha; en el dashboard y el Modo DM esos dos controles viven en Ajustes | Envuelve `LanguageSelector` y `ThemeModeSelector` |
+| `AppSidebar` | El marco del panel lateral que comparten el Modo Jugador y el Modo DM: marca, interruptor de modo, la navegación propia y el pie de la cuenta | `mode`, `onModeChanged`, `navigation` (si puede no entrar, trae su propio scroll), `account`, `appVersion`, `settingsActive`, `onOpenSettings`, `inDrawer` |
+| `SettingsView` | Los ajustes de la cuenta como sección del área de contenido: grupos con rótulo, filas de rótulo + control que se apilan por debajo de 520 px | Sin botón de guardar: cada cambio se guarda al tocarlo y el cartel de arriba dice si llegó |
 
 ### Datos de personaje
 

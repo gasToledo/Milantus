@@ -4,7 +4,8 @@ import 'package:dnd_app/api/api_client.dart';
 import 'package:dnd_app/api/api_exception.dart';
 import 'package:dnd_app/theme/app_theme.dart';
 import 'package:dnd_app/theme/app_widgets.dart';
-import 'package:dnd_app/ui/settings_dialog.dart';
+import 'package:dnd_app/data/settings_service.dart';
+import 'package:dnd_app/ui/settings_view.dart';
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -201,19 +202,23 @@ void main() {
           'supportsReference': false,
         },
       ];
+    final api = ApiClient(client: server.client);
 
     await tester.pumpWidget(
       localizedApp(
         theme: AppTheme.dark,
         home: Scaffold(
-          body: SettingsDialog(api: ApiClient(client: server.client)),
+          body: SettingsView(
+            api: api,
+            settingsController: SettingsController(api, AppSettings()),
+            theme: AppThemeController(),
+          ),
         ),
       ),
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Proveedor de retratos:'), findsOneWidget);
-    expect(find.text('Guardar'), findsOneWidget);
+    expect(find.text('Proveedor de retratos'), findsOneWidget);
     await tester.sendKeyEvent(LogicalKeyboardKey.tab);
     expect(FocusManager.instance.primaryFocus, isNotNull);
     expect(tester.takeException(), isNull);

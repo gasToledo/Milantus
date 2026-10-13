@@ -562,23 +562,50 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
-## [Unreleased]
+## [0.23.0+1] - 2026-10-13
 
 ### Nuevo
 
-- Ajustes suma «Mostrar la dificultad del encuentro»: apagado, el Modo DM no
-  muestra la banda de dificultad ni los PX de cada fila. Es una preferencia
-  de la cuenta y viene prendida.
+- Ajustes es una sección propia, que se abre desde el panel lateral en el
+  Modo Jugador y en el Modo DM. Cada cambio se guarda al tocarlo.
+- «Al abrir Milantus»: se puede elegir que la aplicación arranque en el Modo
+  DM en lugar del roster de personajes.
+- «Mostrar la dificultad del encuentro»: apagado, el Modo DM no muestra la
+  banda de dificultad ni los PX de cada fila. Viene prendido.
+- Un interruptor «Jugador | DM» en lo alto del panel lateral cambia de modo
+  desde cualquiera de los dos.
 
 ### Modificado
 
+- El panel lateral es el mismo en los dos modos. El del Modo DM recupera la
+  marca, «Sugerencias y errores», la cuenta con «Cerrar sesión» y la versión,
+  que antes solo estaban en el Modo Jugador.
+- El tema y el idioma pasan del pie del panel a Ajustes. En la ficha siguen
+  donde estaban.
+- En el Modo DM, «Nueva campaña» pasa a ser una fila al pie de la lista de
+  campañas. En una ventana baja la navegación del DM se desplaza para llegar
+  a las secciones de la campaña.
 - Dificultad del encuentro: un PNJ enemigo con ficha de personaje ya cuenta.
   Descuenta su nivel del presupuesto, igual que un aliado con ficha lo suma;
   antes quedaba fuera de la cuenta con el aviso «Sin VD».
 - En un teléfono, los PX de la banda de dificultad quedan alineados al borde
   derecho.
-- El diálogo de Ajustes se llama «Ajustes» a secas y se puede guardar aunque
-  el servidor no tenga proveedores de retratos.
+
+### Eliminado
+
+- Los botones «Modo DM» y «Modo Jugador» del pie del panel: los reemplaza el
+  interruptor de arriba.
+- El diálogo de Ajustes con «Cancelar» y «Guardar»: lo reemplaza la sección.
+
+## [Unreleased]
+
+### Nuevo
+
+- Sin cambios.
+
+### Modificado
+
+- Sin cambios.
 
 ### Eliminado
 

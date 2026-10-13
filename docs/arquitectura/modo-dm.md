@@ -369,7 +369,7 @@ No hay ruta nueva ni dato guardado: todo sale de lo que el cliente ya tiene
 del combate, de la mesa y del catálogo.
 
 Se puede apagar: `AppSettings.showEncounterDifficulty` es una preferencia de
-la cuenta, prendida por defecto, que se cambia en el diálogo de Ajustes.
+la cuenta, prendida por defecto, que se cambia en la sección Ajustes.
 Apagada no queda nada que delate la dificultad —ni la banda ni los PX de las
 filas—, porque hay DM que prefieren no saberla. Es por cuenta y no por
 campaña a propósito: por campaña pediría un campo en `Campaign` con su

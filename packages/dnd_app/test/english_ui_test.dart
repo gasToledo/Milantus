@@ -80,20 +80,25 @@ void main() {
     expect(find.text('My characters'), findsNothing);
   });
 
-  testWidgets('elegir el idioma en el panel cambia toda la interfaz y se '
+  testWidgets('elegir el idioma en Ajustes cambia toda la interfaz y se '
       'recuerda', (tester) async {
     final locale = idioma();
     addTearDown(locale.dispose);
     await abrir(tester, locale);
     expect(find.text('Mis personajes'), findsWidgets);
 
+    await tester.tap(find.text('Ajustes'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Español'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('English'));
     await tester.pumpAndSettle();
 
-    expect(find.text('My characters'), findsWidgets);
-    expect(find.text('Mis personajes'), findsNothing);
+    // El roster quedó detrás de Ajustes: se mira lo que sí está a la vista.
+    expect(find.text('Language'), findsOneWidget);
+    expect(find.text('Characters'), findsOneWidget);
+    expect(find.text('Idioma'), findsNothing);
+    expect(find.text('Personajes'), findsNothing);
     expect(guardado, 'en');
     expect(documento.last, 'en');
 
@@ -103,7 +108,8 @@ void main() {
     await tester.tap(find.text('Español').last);
     await tester.pumpAndSettle();
 
-    expect(find.text('Mis personajes'), findsWidgets);
+    expect(find.text('Idioma'), findsOneWidget);
+    expect(find.text('Personajes'), findsOneWidget);
     expect(guardado, 'es');
     expect(tester.takeException(), isNull);
   });

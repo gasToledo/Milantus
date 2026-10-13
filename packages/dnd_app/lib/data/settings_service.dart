@@ -31,6 +31,10 @@ class AppSettings {
   /// valor desconocido cae a oscuro (ver `AppThemeController.parse`).
   String themeMode;
 
+  /// Si la aplicación abre en el Modo DM en lugar del roster. Es solo dónde
+  /// arranca: hay quien nunca juega y solo dirige, y al revés.
+  bool startsInDmMode;
+
   /// Si el Modo DM muestra la dificultad del encuentro mientras se arma un
   /// combate. Prendido por defecto; hay DM que prefieren no saberla, y
   /// apagado no queda ni la banda ni los PX de las filas.
@@ -42,6 +46,7 @@ class AppSettings {
     List<String>? characterOrder,
     this.sortMode = 'name',
     this.themeMode = 'dark',
+    this.startsInDmMode = false,
     this.showEncounterDifficulty = true,
   }) : characterOrder = characterOrder ?? [];
 
@@ -51,6 +56,7 @@ class AppSettings {
     'characterOrder': characterOrder,
     'sortMode': sortMode,
     'themeMode': themeMode,
+    'startsInDmMode': startsInDmMode,
     'showEncounterDifficulty': showEncounterDifficulty,
   };
 
@@ -63,6 +69,7 @@ class AppSettings {
     ],
     sortMode: json?['sortMode'] as String? ?? 'name',
     themeMode: json?['themeMode'] as String? ?? 'dark',
+    startsInDmMode: json?['startsInDmMode'] as bool? ?? false,
     showEncounterDifficulty: json?['showEncounterDifficulty'] as bool? ?? true,
   );
 }

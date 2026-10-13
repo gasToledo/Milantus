@@ -36,14 +36,53 @@ class AppLocalizationsEn extends AppLocalizations {
       'This server has no image generation provider set up. You can still upload your own portrait from the character sheet.';
 
   @override
-  String get settingsProviderLabel => 'Portrait provider:';
+  String get settingsProviderLabel => 'Portrait provider';
+
+  @override
+  String get settingsProviderHint =>
+      'The service that generates the portraits of your characters and NPCs.';
+
+  @override
+  String get settingsSubtitle =>
+      'They belong to your account: they apply on any device you sign in from.';
+
+  @override
+  String get settingsGeneral => 'General';
+
+  @override
+  String get settingsStartMode => 'When Milantus opens';
+
+  @override
+  String get settingsStartModeHint =>
+      'It is only where you start: you can switch modes whenever you like.';
+
+  @override
+  String get settingsTheme => 'Theme';
+
+  @override
+  String get settingsLanguage => 'Language';
+
+  @override
+  String get settingsPortraits => 'Portraits';
+
+  @override
+  String get settingsSaved => 'Saved';
+
+  @override
+  String get modeSwitchLabel => 'Mode';
+
+  @override
+  String get modePlayer => 'Player';
+
+  @override
+  String get modeDm => 'DM';
 
   @override
   String get settingsShowDifficulty => 'Show encounter difficulty';
 
   @override
   String get settingsShowDifficultyHint =>
-      'In DM Mode, while you set up a combat: the difficulty, the XP and the warnings. Turn it off if you would rather not know.';
+      'While you set up a combat: the difficulty, the XP and the warnings. Turn it off if you would rather not know.';
 
   @override
   String get commonCancel => 'Cancel';

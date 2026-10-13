@@ -15,10 +15,12 @@ import '../theme/app_theme.dart';
 import '../theme/app_widgets.dart';
 import '../theme/class_visuals.dart';
 import '../web/browser.dart' as browser;
+
+import 'app_sidebar.dart';
 import 'dm/dm_mode_screen.dart';
-import 'feedback.dart';
 import 'pending_events_gate.dart';
 import 'save_status_indicator.dart';
+import 'settings_view.dart';
 import 'sheet_screen.dart';
 import '../l10n/l10n_context.dart';
 
@@ -120,6 +122,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Object? _shownSaveError;
   String? _activeOperation;
 
+  /// Si el área de contenido muestra los Ajustes en lugar del roster.
+  bool _showSettings = false;
+
   late final SettingsController _settingsController;
   late final AppSettings _settings;
   bool get _persistsSettings =>
@@ -139,6 +144,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _settings = _settingsController.settings;
     _sort = _SortMode.parse(_settings.sortMode);
     widget.controller.addListener(_handleControllerState);
+    // Quien eligió arrancar en el Modo DM entra directo, sin la animación de
+    // una pantalla que no pidió ver. El roster queda debajo: «Jugador» vuelve
+    // acá como siempre.
+    if (_settings.startsInDmMode) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _openDmMode(instant: true);
+      });
+    }
   }
 
   /// Guarda los ajustes sin bloquear la interacción: reordenar o marcar un

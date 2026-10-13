@@ -74,21 +74,31 @@ extension _DashboardActions on _DashboardScreenState {
   /// (ver `main.dart`) pasa una sola vez: si la pestaña ya estaba abierta y un
   /// jugador dejó de compartir mientras tanto, sin esto el DM no se entera
   /// hasta recargar la página entera.
-  Future<void> _openDmMode() async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => PendingEventsGate(
-          api: controller.api,
-          child: DmModeScreen(
-            api: controller.api,
-            repo: repo,
-            theme: widget.theme,
-            settingsController: _settingsController,
-            homebrew: widget.homebrew,
-            characters: controller.characters,
-          ),
-        ),
+  ///
+  /// Con [instant] entra sin transición: es el arranque de quien eligió abrir
+  /// la aplicación en este modo, que no pidió ver pasar el roster.
+  Future<void> _openDmMode({bool instant = false}) async {
+    Widget screen(BuildContext _) => PendingEventsGate(
+      api: controller.api,
+      child: DmModeScreen(
+        api: controller.api,
+        repo: repo,
+        theme: widget.theme,
+        settingsController: _settingsController,
+        homebrew: widget.homebrew,
+        characters: controller.characters,
+        account: widget.account,
+        appVersion: widget.appVersion,
       ),
+    );
+    await Navigator.of(context).push(
+      instant
+          ? PageRouteBuilder<void>(
+              pageBuilder: (context, _, _) => screen(context),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            )
+          : MaterialPageRoute<void>(builder: screen),
     );
     // Desde el Modo DM se edita el homebrew, que cambia el contenido debajo
     // de personajes que siguen siendo los mismos objetos: sin descartar las

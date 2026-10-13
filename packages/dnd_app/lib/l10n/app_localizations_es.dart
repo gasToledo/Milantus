@@ -36,14 +36,53 @@ class AppLocalizationsEs extends AppLocalizations {
       'Este servidor no tiene ningún proveedor de generación configurado. Igual podés subir tu propio retrato desde la ficha.';
 
   @override
-  String get settingsProviderLabel => 'Proveedor de retratos:';
+  String get settingsProviderLabel => 'Proveedor de retratos';
+
+  @override
+  String get settingsProviderHint =>
+      'Con qué servicio se generan los retratos de tus personajes y PNJ.';
+
+  @override
+  String get settingsSubtitle =>
+      'Son de tu cuenta: valen en cualquier dispositivo donde entres.';
+
+  @override
+  String get settingsGeneral => 'General';
+
+  @override
+  String get settingsStartMode => 'Al abrir Milantus';
+
+  @override
+  String get settingsStartModeHint =>
+      'Es solo dónde arranca: podés pasar de un modo al otro cuando quieras.';
+
+  @override
+  String get settingsTheme => 'Tema';
+
+  @override
+  String get settingsLanguage => 'Idioma';
+
+  @override
+  String get settingsPortraits => 'Retratos';
+
+  @override
+  String get settingsSaved => 'Guardado';
+
+  @override
+  String get modeSwitchLabel => 'Modo';
+
+  @override
+  String get modePlayer => 'Jugador';
+
+  @override
+  String get modeDm => 'DM';
 
   @override
   String get settingsShowDifficulty => 'Mostrar la dificultad del encuentro';
 
   @override
   String get settingsShowDifficultyHint =>
-      'En el Modo DM, mientras armás un combate: la dificultad, los PX y los avisos. Apagalo si preferís no saberla.';
+      'Mientras armás un combate: la dificultad, los PX y los avisos. Apagalo si preferís no saberla.';
 
   @override
   String get commonCancel => 'Cancelar';

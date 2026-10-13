@@ -10,6 +10,7 @@ import 'package:dnd_app/theme/app_theme.dart';
 import 'package:dnd_app/theme/class_visuals.dart';
 import 'package:dnd_app/ui/dashboard_screen.dart';
 import 'package:dnd_app/ui/dm/dm_mode_screen.dart';
+import 'package:dnd_app/ui/settings_view.dart';
 import 'package:dnd_app/ui/sheet_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -84,12 +85,10 @@ void main() {
     expect(version, findsOneWidget);
     expect(tester.widget<Text>(version).data, 'v1.2.3');
     expect(tester.widget<Text>(version).style?.color, AppPalette.dark.gold);
-    // Va debajo de las preferencias de presentación, no encima.
+    // Va al pie de todo, debajo de la entrada a Ajustes.
     expect(
       tester.getTopLeft(version).dy,
-      greaterThan(
-        tester.getTopLeft(find.byType(SegmentedButton<ThemeMode>)).dy,
-      ),
+      greaterThan(tester.getTopLeft(find.text('Ajustes')).dy),
     );
     expect(tester.takeException(), isNull);
   });
@@ -435,8 +434,11 @@ void main() {
       await tester.pumpAndSettle();
       await tester.pump(const Duration(milliseconds: 500));
 
-      // Las tres opciones están a la vista sin abrir nada, y el idioma se
+      // El tema y el idioma viven en Ajustes: las tres opciones están a la
+      // vista sin abrir ningún menú, y el idioma se
       // muestra aunque todavía no se pueda cambiar.
+      await tester.tap(find.text('Ajustes'));
+      await tester.pumpAndSettle();
       expect(find.byTooltip('Tema claro'), findsOneWidget);
       expect(find.byTooltip('Seguir el tema del sistema'), findsOneWidget);
       expect(find.byTooltip('Tema oscuro'), findsOneWidget);
@@ -571,6 +573,96 @@ void main() {
   // cada aviso del controlador. Homebrew, en cambio, edita el contenido debajo
   // de personajes que no cambian: al volver del Modo DM, desde donde se abre,
   // la tarjeta tiene que recalcularse.
+  // Hay quien solo dirige. El panel del Modo DM había perdido la marca, la
+  // cuenta y la salida, y para cerrar sesión había que volver a una pantalla
+  // que esa persona no usa.
+  testWidgets(
+    'el Modo DM conserva la marca, la cuenta, la salida y la versión',
+    (tester) async {
+      tester.view.physicalSize = const Size(1400, 1000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      final server = FakeApiServer();
+      final ctrl = CharactersController(ApiClient(client: server.client))
+        ..add(demoSagan());
+      await tester.pumpWidget(
+        harness(
+          ctrl,
+          server,
+          appVersion: '1.2.3',
+          account: const AccountInfo(
+            userId: 'u1',
+            name: 'Ada Lovelace',
+            email: 'ada@example.org',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      await tester.tap(find.byKey(const ValueKey('dm-mode-button')));
+      await tester.pumpAndSettle();
+      expect(find.byType(DmModeScreen), findsOneWidget);
+
+      expect(find.textContaining('Milantus'), findsOneWidget);
+      expect(find.text('Ada Lovelace'), findsOneWidget);
+      expect(find.text('ada@example.org'), findsOneWidget);
+      expect(find.byKey(const ValueKey('logout-button')), findsOneWidget);
+      expect(find.text('v1.2.3'), findsOneWidget);
+      expect(find.text('Ajustes'), findsOneWidget);
+      expect(find.text('Sugerencias y errores'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('con la preferencia de abrir en Modo DM se entra directo, y '
+      '«Jugador» vuelve al roster', (tester) async {
+    tester.view.physicalSize = const Size(1400, 1000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    final server = FakeApiServer();
+    final ctrl = CharactersController(ApiClient(client: server.client))
+      ..add(demoSagan());
+    await tester.pumpWidget(
+      harness(ctrl, server, settings: AppSettings(startsInDmMode: true)),
+    );
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(find.byType(DmModeScreen), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('exit-dm-mode')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(DmModeScreen), findsNothing);
+    expect(find.text('Mis personajes'), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Ajustes es una sección del contenido en los dos modos', (
+    tester,
+  ) async {
+    await pumpDashboard(tester, const Size(1400, 1000));
+
+    await tester.tap(find.text('Ajustes'));
+    await tester.pumpAndSettle();
+    expect(find.byType(SettingsView), findsOneWidget);
+    expect(find.text('Al abrir Milantus'), findsOneWidget);
+
+    // Y se vuelve al roster desde el mismo panel.
+    await tester.tap(find.text('Personajes'));
+    await tester.pumpAndSettle();
+    expect(find.byType(SettingsView), findsNothing);
+
+    await tester.tap(find.byKey(const ValueKey('dm-mode-button')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Ajustes'));
+    await tester.pumpAndSettle();
+    expect(find.byType(SettingsView), findsOneWidget);
+    expect(find.text('Mostrar la dificultad del encuentro'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('al volver del Modo DM la tarjeta refleja el homebrew editado', (
     tester,
   ) async {
