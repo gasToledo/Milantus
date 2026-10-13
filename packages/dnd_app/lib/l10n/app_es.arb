@@ -4878,6 +4878,136 @@
     }
   },
   "encAmountExplain": "Es el número que aplican los botones de dañar y curar de cualquier fila. Vale para todo el combate.",
+  "encDifficulty": "Dificultad",
+  "encDifficultyLow": "Baja",
+  "encDifficultyModerate": "Moderada",
+  "encDifficultyHigh": "Alta",
+  "encDifficultyExtreme": "Extrema",
+  "encDifficultyEnemyXp": "PX de enemigos",
+  "encDifficultyNetXp": "PX netos",
+  "encDifficultyPartySame": "{count, plural, =1{1 personaje de nivel {level}} other{{count} personajes de nivel {level}}}",
+  "@encDifficultyPartySame": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "encDifficultyPartyMixed": "{count} personajes, de nivel {lowest} a {highest}",
+  "@encDifficultyPartyMixed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "lowest": {
+        "type": "int"
+      },
+      "highest": {
+        "type": "int"
+      }
+    }
+  },
+  "encDifficultyLeft": "quedan {xp} dentro de {tier}",
+  "@encDifficultyLeft": {
+    "placeholders": {
+      "xp": {
+        "type": "String"
+      },
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
+  "encDifficultyOver": "{xp} por encima de Alta",
+  "@encDifficultyOver": {
+    "placeholders": {
+      "xp": {
+        "type": "String"
+      }
+    }
+  },
+  "encDifficultyBreakdown": "{enemies} de enemigos − {allies} de aliados",
+  "@encDifficultyBreakdown": {
+    "placeholders": {
+      "enemies": {
+        "type": "String"
+      },
+      "allies": {
+        "type": "String"
+      }
+    }
+  },
+  "encDifficultyNoParty": "Sumá a los jugadores para calcularla: el presupuesto sale del nivel de cada personaje que entra al combate.",
+  "encDifficultyNoEnemies": "Sumá enemigos para calcularla.",
+  "encDifficultyTrack": "{xp} PX. Baja hasta {low}, Moderada hasta {moderate}, Alta hasta {high}.",
+  "@encDifficultyTrack": {
+    "placeholders": {
+      "xp": {
+        "type": "String"
+      },
+      "low": {
+        "type": "String"
+      },
+      "moderate": {
+        "type": "String"
+      },
+      "high": {
+        "type": "String"
+      }
+    }
+  },
+  "encDifficultyManyTitle": "Muchas criaturas.",
+  "encDifficultyManyBody": "{enemies} enemigos contra {characters, plural, =1{1 personaje} other{{characters} personajes}}, más de dos por personaje: conviene que haya criaturas frágiles.",
+  "@encDifficultyManyBody": {
+    "placeholders": {
+      "enemies": {
+        "type": "int"
+      },
+      "characters": {
+        "type": "int"
+      }
+    }
+  },
+  "encDifficultyPowerfulTitle": "Criatura poderosa.",
+  "encDifficultyPowerfulBody": "Hay un enemigo de VD {cr}, por encima del nivel más bajo de la mesa ({level}): una sola acción suya puede dejar a alguien fuera de combate.",
+  "@encDifficultyPowerfulBody": {
+    "placeholders": {
+      "cr": {
+        "type": "String"
+      },
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "encDifficultyUncountedTitle": "Sin VD.",
+  "encDifficultyUncountedBody": "{count, plural, =1{1 enemigo no tiene valor de desafío y queda fuera de la cuenta.} other{{count} enemigos no tienen valor de desafío y quedan fuera de la cuenta.}}",
+  "@encDifficultyUncountedBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "encXpValue": "{xp} PX",
+  "@encXpValue": {
+    "placeholders": {
+      "xp": {
+        "type": "String"
+      }
+    }
+  },
+  "encAllyXpValue": "−{xp} PX",
+  "@encAllyXpValue": {
+    "placeholders": {
+      "xp": {
+        "type": "String"
+      }
+    }
+  },
   "encDamageOrHeal": "Daño o curación",
   "encSetAmount": "Poner {n}",
   "@encSetAmount": {

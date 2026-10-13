@@ -6222,6 +6222,122 @@ class AppLocalizationsEs extends AppLocalizations {
       'Es el número que aplican los botones de dañar y curar de cualquier fila. Vale para todo el combate.';
 
   @override
+  String get encDifficulty => 'Dificultad';
+
+  @override
+  String get encDifficultyLow => 'Baja';
+
+  @override
+  String get encDifficultyModerate => 'Moderada';
+
+  @override
+  String get encDifficultyHigh => 'Alta';
+
+  @override
+  String get encDifficultyExtreme => 'Extrema';
+
+  @override
+  String get encDifficultyEnemyXp => 'PX de enemigos';
+
+  @override
+  String get encDifficultyNetXp => 'PX netos';
+
+  @override
+  String encDifficultyPartySame(int count, int level) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count personajes de nivel $level',
+      one: '1 personaje de nivel $level',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String encDifficultyPartyMixed(int count, int lowest, int highest) {
+    return '$count personajes, de nivel $lowest a $highest';
+  }
+
+  @override
+  String encDifficultyLeft(String xp, String tier) {
+    return 'quedan $xp dentro de $tier';
+  }
+
+  @override
+  String encDifficultyOver(String xp) {
+    return '$xp por encima de Alta';
+  }
+
+  @override
+  String encDifficultyBreakdown(String enemies, String allies) {
+    return '$enemies de enemigos − $allies de aliados';
+  }
+
+  @override
+  String get encDifficultyNoParty =>
+      'Sumá a los jugadores para calcularla: el presupuesto sale del nivel de cada personaje que entra al combate.';
+
+  @override
+  String get encDifficultyNoEnemies => 'Sumá enemigos para calcularla.';
+
+  @override
+  String encDifficultyTrack(
+    String xp,
+    String low,
+    String moderate,
+    String high,
+  ) {
+    return '$xp PX. Baja hasta $low, Moderada hasta $moderate, Alta hasta $high.';
+  }
+
+  @override
+  String get encDifficultyManyTitle => 'Muchas criaturas.';
+
+  @override
+  String encDifficultyManyBody(int enemies, int characters) {
+    String _temp0 = intl.Intl.pluralLogic(
+      characters,
+      locale: localeName,
+      other: '$characters personajes',
+      one: '1 personaje',
+    );
+    return '$enemies enemigos contra $_temp0, más de dos por personaje: conviene que haya criaturas frágiles.';
+  }
+
+  @override
+  String get encDifficultyPowerfulTitle => 'Criatura poderosa.';
+
+  @override
+  String encDifficultyPowerfulBody(String cr, int level) {
+    return 'Hay un enemigo de VD $cr, por encima del nivel más bajo de la mesa ($level): una sola acción suya puede dejar a alguien fuera de combate.';
+  }
+
+  @override
+  String get encDifficultyUncountedTitle => 'Sin VD.';
+
+  @override
+  String encDifficultyUncountedBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count enemigos no tienen valor de desafío y quedan fuera de la cuenta.',
+      one: '1 enemigo no tiene valor de desafío y queda fuera de la cuenta.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String encXpValue(String xp) {
+    return '$xp PX';
+  }
+
+  @override
+  String encAllyXpValue(String xp) {
+    return '−$xp PX';
+  }
+
+  @override
   String get encDamageOrHeal => 'Daño o curación';
 
   @override

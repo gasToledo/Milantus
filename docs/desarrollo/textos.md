@@ -34,6 +34,8 @@ cosas distintas, gana el catálogo.
 | salvación | tirada de salvación, TS | «SALV» solo como abreviatura en plaquetas. |
 | PG | HP | «Puntos de golpe» cuando hay lugar para la forma larga. |
 | CA | AC | |
+| PX | XP, EXP | «Puntos de experiencia» cuando hay lugar para la forma larga. |
+| VD | CR | «Valor de desafío» cuando hay lugar para la forma larga. |
 | maltrecho | bloodied, ensangrentado | Con la mitad de los PG o menos, como lo define el glosario del SRD. |
 | conjuro | hechizo | |
 | espacio de conjuro | ranura | |
@@ -158,6 +160,9 @@ el SRD dicen cosas distintas, gana el SRD.
 | paquete de equipo (Explorer's Pack…) | pack | El que se elige al crear. |
 | paquete de N (flechas, raciones…) | bundle of N | No «pack»: ya nombra la mochila y el paquete de equipo. |
 | CA | AC, Armor Class | |
+| PX, puntos de experiencia | XP, Experience Points | |
+| VD, valor de desafío | CR, Challenge Rating | |
+| dificultad Baja, Moderada, Alta | Low, Moderate, High | La de un encuentro. «Extrema» / «Extreme» es de la app: el SRD no nombra lo que pasa de la alta. |
 | maltrecho | Bloodied | |
 | conjuro, espacio de conjuro | spell, spell slot | |
 | bonificador por competencia | Proficiency Bonus | |

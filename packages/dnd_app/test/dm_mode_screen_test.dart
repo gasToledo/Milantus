@@ -1265,6 +1265,44 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    // La dificultad es la pregunta de mientras se arma: con el combate
+    // andando la banda se va, y con ella los PX de las filas.
+    testWidgets(
+      'mientras se arma dice la dificultad y los PX de cada enemigo',
+      (tester) async {
+        final server = await pumpDmMode(tester, seed: seedTable);
+        await enterCode(tester, 'CODE-0001');
+        await openCombate(tester);
+        await tester.tap(find.text('Armar combate'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Sumar'));
+        await tester.pumpAndSettle();
+        await addMonsters(tester, 'goblin', 'Guerrero goblin', count: 3);
+
+        final goblin = repo.creature('goblin-warrior')!;
+        final esperada = encounterDifficulty(
+          partyLevels: [server.characters['sagan']!.totalLevel],
+          enemyCrs: List.filled(3, goblin.cr),
+        );
+        // Tres goblins contra uno de nivel 1 se pasan del presupuesto alto.
+        expect(esperada.tier, EncounterTier.extreme);
+        expect(find.text('DIFICULTAD'), findsOneWidget);
+        expect(find.text('Extrema'), findsOneWidget);
+        expect(find.text('${esperada.enemyXp}'), findsOneWidget);
+        expect(
+          find.textContaining('Muchas criaturas.', findRichText: true),
+          findsOneWidget,
+        );
+        final px = '${xpForChallengeRating(goblin.cr!)} PX · ';
+        expect(find.textContaining(px), findsNWidgets(3));
+
+        await tirarIniciativa(tester, initiatives: {'Sagan': 12});
+        expect(find.text('DIFICULTAD'), findsNothing);
+        expect(find.textContaining(px), findsNothing);
+        expect(tester.takeException(), isNull);
+      },
+    );
+
     testWidgets('cancelar la tirada deja el combate armándose', (tester) async {
       final server = await pumpDmMode(tester, seed: seedTable);
       await openCombate(tester);

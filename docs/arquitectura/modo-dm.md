@@ -328,6 +328,36 @@ El buscador de criaturas también es uno solo (`filterCreatures`, en
 `bestiary_view.dart`): sin acentos ni mayúsculas en los dos lugares, y con el
 rango de VD y el orden solo en el Bestiario.
 
+### La dificultad del encuentro
+
+Mientras el combate se arma, una banda dice qué tan difícil es. La cuenta es
+de `encounterDifficulty` (`dnd_engine`), y es la del SRD 5.2.1 («Dificultad de
+los encuentros de combate»): cada personaje aporta un presupuesto de PX por su
+nivel, y cada enemigo gasta los PX de su VD.
+
+**El presupuesto es un techo.** El encuentro es de la dificultad más baja en
+cuyo presupuesto entra: el libro dice «sin excederlo» y llama moderado a un
+encuentro de 1100 PX contra un presupuesto moderado de 1125.
+
+Tres cosas no están en el libro y son criterio de la app:
+
+- **Los aliados.** Un PNJ aliado con ficha es un personaje más y suma su
+  nivel al presupuesto. Una criatura aliada —monstruo o PNJ con bloque—
+  resta sus PX de los enemigos, y el neto no baja de cero. Los neutrales no
+  cuentan.
+- **«Extrema»**, el nombre de lo que se pasa del presupuesto alto.
+- **Un enemigo sin VD** (el villano con ficha de personaje) no suma PX, y la
+  banda lo dice en vez de callarlo.
+
+Cuenta a quienes **entraron al combate**, no a la mesa entera: si alguien
+faltó, el presupuesto es el de los que vinieron. Los dos avisos que acompañan
+al número —más de dos enemigos por personaje, y un VD por encima del nivel
+más bajo— son los de «Solución de problemas» del mismo capítulo: los PX no ven
+cuántas acciones tiene cada bando.
+
+No hay ruta nueva ni dato guardado: todo sale de lo que el cliente ya tiene
+del combate, de la mesa y del catálogo.
+
 ## La vuelta del vínculo: la campaña vista por el jugador
 
 Hasta acá el vínculo era de una sola vía. El jugador compartía su ficha, el DM

@@ -512,6 +512,56 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
+## [0.22.0+1] - 2026-10-13
+
+### Nuevo
+
+- Dificultad del encuentro en el Modo DM: mientras se arma un combate, una
+  banda dice si es de dificultad baja, moderada, alta o extrema según el
+  presupuesto de PX del SRD 5.2.1, con el nivel de los personajes que
+  entraron y el VD de cada enemigo. Cada fila muestra los PX que suma.
+- Los aliados cuentan: un PNJ aliado con ficha suma su nivel al presupuesto,
+  y una criatura aliada resta sus PX de los enemigos.
+- Dos avisos del SRD acompañan al número: más de dos enemigos por personaje,
+  y un enemigo cuyo VD supera el nivel más bajo de la mesa.
+- Exportar un personaje incluye el homebrew que usa su ficha, y al
+  importarlo ese homebrew entra con él. Si un id ya existe en la cuenta con
+  otro contenido, no se importa nada y se explica por qué.
+- El Códice muestra los efectos de cada dote («+1 CAR», el conjuro que
+  concede) junto a su descripción.
+- Las criaturas homebrew muestran su tipo y tamaño en el idioma de la
+  interfaz.
+
+### Modificado
+
+- Dos armas iguales se reparten entre la mano principal y la secundaria; el
+  aviso de combate con dos armas vuelve a funcionar, y las marcas de mano
+  secundaria y a dos manos valen también para armas mágicas.
+- Bestiario: los ataques conservan su daño extra («más 5 (2d4) de daño
+  radiante»), los perfiles ya no arrastran títulos de grupo ni acciones de
+  otra criatura, y las salvaciones en inglés nombran la característica
+  entera.
+- Rociada venenosa, Rayo nauseabundo, Shillelagh e Infligir heridas dicen lo
+  que dice el SRD 5.2.1.
+- Las dotes separadas por característica ya no repiten «(+1 a X o Y)».
+- Con la interfaz en inglés, el Cuaderno, las batallas de la pestaña Campaña
+  y la criatura de base de un PNJ nombran las criaturas en inglés; la fecha
+  del diario sigue el orden de cada idioma.
+- Revisión de los textos en inglés: «Hit Point Die», «bundle of N», errores
+  que empiezan con «Could not», «Reach» y «Range» separados en el bestiario,
+  y ocho nombres de objetos mágicos como los escribe el libro.
+- La banda de cifras del bestiario ya no corta sus rótulos en pantallas
+  angostas.
+- El lector de pantalla anuncia una sola vez la insignia de procedencia y el
+  cartel de guardado, y nombra el retrato con el nombre entero.
+- La importación de un PNJ cuyo homebrew choca con el de la cuenta responde
+  409 `homebrew_conflict` en lugar de 400 (`dnd_server`).
+- `dnd_engine`: `encounterDifficulty` y `xpForChallengeRating`.
+
+### Eliminado
+
+- Sin cambios.
+
 ## [Unreleased]
 
 ### Nuevo

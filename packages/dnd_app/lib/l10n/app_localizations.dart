@@ -10147,6 +10147,149 @@ abstract class AppLocalizations {
   /// **'Es el número que aplican los botones de dañar y curar de cualquier fila. Vale para todo el combate.'**
   String get encAmountExplain;
 
+  /// No description provided for @encDifficulty.
+  ///
+  /// In es, this message translates to:
+  /// **'Dificultad'**
+  String get encDifficulty;
+
+  /// No description provided for @encDifficultyLow.
+  ///
+  /// In es, this message translates to:
+  /// **'Baja'**
+  String get encDifficultyLow;
+
+  /// No description provided for @encDifficultyModerate.
+  ///
+  /// In es, this message translates to:
+  /// **'Moderada'**
+  String get encDifficultyModerate;
+
+  /// No description provided for @encDifficultyHigh.
+  ///
+  /// In es, this message translates to:
+  /// **'Alta'**
+  String get encDifficultyHigh;
+
+  /// No description provided for @encDifficultyExtreme.
+  ///
+  /// In es, this message translates to:
+  /// **'Extrema'**
+  String get encDifficultyExtreme;
+
+  /// No description provided for @encDifficultyEnemyXp.
+  ///
+  /// In es, this message translates to:
+  /// **'PX de enemigos'**
+  String get encDifficultyEnemyXp;
+
+  /// No description provided for @encDifficultyNetXp.
+  ///
+  /// In es, this message translates to:
+  /// **'PX netos'**
+  String get encDifficultyNetXp;
+
+  /// No description provided for @encDifficultyPartySame.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 personaje de nivel {level}} other{{count} personajes de nivel {level}}}'**
+  String encDifficultyPartySame(int count, int level);
+
+  /// No description provided for @encDifficultyPartyMixed.
+  ///
+  /// In es, this message translates to:
+  /// **'{count} personajes, de nivel {lowest} a {highest}'**
+  String encDifficultyPartyMixed(int count, int lowest, int highest);
+
+  /// No description provided for @encDifficultyLeft.
+  ///
+  /// In es, this message translates to:
+  /// **'quedan {xp} dentro de {tier}'**
+  String encDifficultyLeft(String xp, String tier);
+
+  /// No description provided for @encDifficultyOver.
+  ///
+  /// In es, this message translates to:
+  /// **'{xp} por encima de Alta'**
+  String encDifficultyOver(String xp);
+
+  /// No description provided for @encDifficultyBreakdown.
+  ///
+  /// In es, this message translates to:
+  /// **'{enemies} de enemigos − {allies} de aliados'**
+  String encDifficultyBreakdown(String enemies, String allies);
+
+  /// No description provided for @encDifficultyNoParty.
+  ///
+  /// In es, this message translates to:
+  /// **'Sumá a los jugadores para calcularla: el presupuesto sale del nivel de cada personaje que entra al combate.'**
+  String get encDifficultyNoParty;
+
+  /// No description provided for @encDifficultyNoEnemies.
+  ///
+  /// In es, this message translates to:
+  /// **'Sumá enemigos para calcularla.'**
+  String get encDifficultyNoEnemies;
+
+  /// No description provided for @encDifficultyTrack.
+  ///
+  /// In es, this message translates to:
+  /// **'{xp} PX. Baja hasta {low}, Moderada hasta {moderate}, Alta hasta {high}.'**
+  String encDifficultyTrack(
+    String xp,
+    String low,
+    String moderate,
+    String high,
+  );
+
+  /// No description provided for @encDifficultyManyTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Muchas criaturas.'**
+  String get encDifficultyManyTitle;
+
+  /// No description provided for @encDifficultyManyBody.
+  ///
+  /// In es, this message translates to:
+  /// **'{enemies} enemigos contra {characters, plural, =1{1 personaje} other{{characters} personajes}}, más de dos por personaje: conviene que haya criaturas frágiles.'**
+  String encDifficultyManyBody(int enemies, int characters);
+
+  /// No description provided for @encDifficultyPowerfulTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Criatura poderosa.'**
+  String get encDifficultyPowerfulTitle;
+
+  /// No description provided for @encDifficultyPowerfulBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Hay un enemigo de VD {cr}, por encima del nivel más bajo de la mesa ({level}): una sola acción suya puede dejar a alguien fuera de combate.'**
+  String encDifficultyPowerfulBody(String cr, int level);
+
+  /// No description provided for @encDifficultyUncountedTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin VD.'**
+  String get encDifficultyUncountedTitle;
+
+  /// No description provided for @encDifficultyUncountedBody.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 enemigo no tiene valor de desafío y queda fuera de la cuenta.} other{{count} enemigos no tienen valor de desafío y quedan fuera de la cuenta.}}'**
+  String encDifficultyUncountedBody(int count);
+
+  /// No description provided for @encXpValue.
+  ///
+  /// In es, this message translates to:
+  /// **'{xp} PX'**
+  String encXpValue(String xp);
+
+  /// No description provided for @encAllyXpValue.
+  ///
+  /// In es, this message translates to:
+  /// **'−{xp} PX'**
+  String encAllyXpValue(String xp);
+
   /// No description provided for @encDamageOrHeal.
   ///
   /// In es, this message translates to:

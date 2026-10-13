@@ -7,6 +7,7 @@ import '../../theme/app_widgets.dart';
 import 'add_monster_dialog.dart';
 import '../conditions.dart';
 import 'combatant_tags_dialog.dart';
+import 'encounter_difficulty_band.dart';
 import 'npcs/npc_shared.dart';
 import '../../l10n/l10n_context.dart';
 
@@ -231,6 +232,19 @@ class _EncounterViewState extends State<EncounterView> {
 
     return [
       _controlBar(context, current),
+      // Solo mientras se arma: es la pregunta de ese momento («¿me pasé?»).
+      // Con el combate andando ya no hay nada que decidir con ese número.
+      if (current.isPreparing && current.combatants.isNotEmpty) ...[
+        const SizedBox(height: 12),
+        EncounterDifficultyBand(
+          difficulty: encounterDifficultyOf(
+            current,
+            members: widget.members,
+            npcs: widget.npcs,
+            repo: widget.repo,
+          ),
+        ),
+      ],
       if (_sideWipedBanner(context, current) case final banner?) ...[
         const SizedBox(height: 12),
         banner,
@@ -1676,13 +1690,17 @@ class _CombatantRow extends StatelessWidget {
         ? null
         : repo.creature(combatant.creatureId!);
     final npcEntry = npc;
-    final meta = combatant.isDown
+    final detail = combatant.isDown
         ? context.l10n.encDownMeta
         : _isPlayer
         ? _playerMeta(context.l10n)
         : npcEntry != null
         ? npcTypeLine(npcEntry.npc, npcEntry.sheet, repo, context.l10n)
         : _monsterMeta(creature);
+    // Los PX van adelante: la línea se recorta por el final, y mientras se
+    // arma el combate son el dato que explica el número de la banda.
+    final xp = _xpLabel(context);
+    final meta = [?xp, if (detail.isNotEmpty) detail].join(' · ');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1812,6 +1830,19 @@ class _CombatantRow extends StatelessWidget {
         )
         .join(' · ');
     return l10n.encPlayerMeta(race, klass, c.totalLevel);
+  }
+
+  /// Lo que esta fila le suma o le resta a la dificultad, mientras se arma.
+  /// Null para quien no entra en la cuenta de PX: un jugador, un neutral o
+  /// alguien sin VD.
+  String? _xpLabel(BuildContext context) {
+    if (!preparing || combatant.side == CombatantSide.neutral) return null;
+    final cr = combatantChallengeRating(combatant, npc, repo);
+    if (cr == null) return null;
+    final xp = formatXp(context, xpForChallengeRating(cr));
+    return combatant.side == CombatantSide.ally
+        ? context.l10n.encAllyXpValue(xp)
+        : context.l10n.encXpValue(xp);
   }
 
   /// Lo que el DM necesita de un monstruo sin abrir nada: con qué pega.
