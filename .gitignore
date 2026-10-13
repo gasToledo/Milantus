@@ -33,6 +33,7 @@ Thumbs.db
 # se versiona como cualquier otro doc. Lo que sigue ignorado es la
 # configuración por máquina, que sí es personal.
 .claude/
+.agents/
 .codex/
 openspec/
 
