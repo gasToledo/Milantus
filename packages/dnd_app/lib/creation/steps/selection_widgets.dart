@@ -146,7 +146,8 @@ class _WeaponChecklistState extends State<_WeaponChecklist> {
         .toList();
     final simple = matches.where((w) => w.category == 'simple').toList();
     final martial = matches.where((w) => w.category == 'martial').toList();
-    final full = widget.selected.length >= widget.max;
+    // Con un solo lugar, tocar otra la cambia (ver `CappedChipSelect`).
+    final full = widget.selected.length >= widget.max && widget.max != 1;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -184,6 +185,9 @@ class _WeaponChecklistState extends State<_WeaponChecklist> {
                             ? (v) {
                                 if (v == true) {
                                   if (!widget.selected.contains(w.id)) {
+                                    if (widget.max == 1) {
+                                      widget.selected.clear();
+                                    }
                                     widget.selected.add(w.id);
                                   }
                                 } else {

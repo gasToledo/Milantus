@@ -928,7 +928,8 @@ class _SpellChips extends StatelessWidget {
   Widget build(BuildContext context) {
     final pal = context.palette;
     final scheme = Theme.of(context).colorScheme;
-    final full = selected.length >= max;
+    // Con un solo lugar, tocar otro lo cambia (ver `CappedChipSelect`).
+    final full = selected.length >= max && max != 1;
     return Wrap(
       spacing: 9,
       runSpacing: 9,
@@ -944,7 +945,10 @@ class _SpellChips extends StatelessWidget {
                 child: InkWell(
                   onTap: enabled
                       ? () {
-                          if (!selected.remove(s.id)) selected.add(s.id);
+                          if (!selected.remove(s.id)) {
+                            if (max == 1) selected.clear();
+                            selected.add(s.id);
+                          }
                           onChanged();
                         }
                       : null,

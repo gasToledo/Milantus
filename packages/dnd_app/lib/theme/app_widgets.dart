@@ -1647,8 +1647,13 @@ class CappedChipSelect extends StatelessWidget {
       runSpacing: 8,
       children: options.entries.map((e) {
         final isSel = selected.contains(e.key);
+        // Con un solo lugar, tocar otra opción la cambia en vez de bloquearse:
+        // nadie espera tener que desmarcar primero, y las demás apagadas se
+        // leían como una elección sin vuelta atrás.
+        final swaps = max == 1;
         final blocked =
-            (disabled.contains(e.key) || selected.length >= max) && !isSel;
+            (disabled.contains(e.key) || (selected.length >= max && !swaps)) &&
+            !isSel;
         final info = onInfo;
         final chip = FilterChip(
           label: Text(e.value),
@@ -1657,6 +1662,7 @@ class CappedChipSelect extends StatelessWidget {
               ? null
               : (v) {
                   if (v) {
+                    if (swaps) selected.clear();
                     if (selected.length >= max) return;
                     selected.add(e.key);
                   } else {

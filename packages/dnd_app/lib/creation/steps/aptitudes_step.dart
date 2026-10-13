@@ -136,7 +136,8 @@ class _SkillPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final full = selected.length >= max;
+    // Con un solo lugar, tocar otra la cambia (ver `CappedChipSelect`).
+    final full = selected.length >= max && max != 1;
     return LayoutBuilder(
       builder: (context, box) {
         final cols = (box.maxWidth / 172).floor().clamp(1, 6);
@@ -155,7 +156,10 @@ class _SkillPicker extends StatelessWidget {
                   onTap: locked.contains(id) || (full && !selected.contains(id))
                       ? null
                       : () {
-                          if (!selected.remove(id)) selected.add(id);
+                          if (!selected.remove(id)) {
+                            if (max == 1) selected.clear();
+                            selected.add(id);
+                          }
                           onChanged();
                         },
                 ),
@@ -186,7 +190,8 @@ class _ProficiencyChoicePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final full = chosen.length >= max;
+    // Con un solo lugar, tocar otra la cambia (ver `CappedChipSelect`).
+    final full = chosen.length >= max && max != 1;
     return LayoutBuilder(
       builder: (context, box) {
         final cols = (box.maxWidth / 172).floor().clamp(1, 6);
@@ -210,7 +215,10 @@ class _ProficiencyChoicePicker extends StatelessWidget {
                           (full && !chosen.contains(id))
                       ? null
                       : () {
-                          if (!chosen.remove(id)) chosen.add(id);
+                          if (!chosen.remove(id)) {
+                            if (max == 1) chosen.clear();
+                            chosen.add(id);
+                          }
                           onChanged();
                         },
                 ),
