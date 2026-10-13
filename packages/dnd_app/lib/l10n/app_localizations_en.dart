@@ -29,20 +29,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsTitle => 'Settings';
 
   @override
-  String get settingsLoading => 'Loading settings…';
-
-  @override
-  String get settingsNoProviders =>
-      'This server has no image generation provider set up. You can still upload your own portrait from the character sheet.';
-
-  @override
-  String get settingsProviderLabel => 'Portrait provider';
-
-  @override
-  String get settingsProviderHint =>
-      'The service that generates the portraits of your characters and NPCs.';
-
-  @override
   String get settingsSubtitle =>
       'They belong to your account: they apply on any device you sign in from.';
 
@@ -61,9 +47,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsLanguage => 'Language';
-
-  @override
-  String get settingsPortraits => 'Portraits';
 
   @override
   String get settingsSaved => 'Saved';

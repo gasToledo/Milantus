@@ -26,7 +26,6 @@ void main() {
         theme: AppTheme.dark,
         home: Scaffold(
           body: SettingsView(
-            api: api,
             settingsController: controller,
             theme: theme ?? AppThemeController(),
           ),
@@ -37,19 +36,10 @@ void main() {
     return controller;
   }
 
-  FakeApiServer withProvider() => FakeApiServer()
-    ..providers = [
-      {
-        'id': 'pollinations',
-        'name': 'Pollinations',
-        'supportsReference': false,
-      },
-    ];
-
   testWidgets('elegir el Modo DM para abrir se guarda al tocarlo', (
     tester,
   ) async {
-    final server = withProvider();
+    final server = FakeApiServer();
     final controller = await pumpSettings(tester, server);
 
     expect(controller.settings.startsInDmMode, isFalse);
@@ -68,7 +58,7 @@ void main() {
   testWidgets('la dificultad del encuentro viene prendida y se puede apagar', (
     tester,
   ) async {
-    final server = withProvider();
+    final server = FakeApiServer();
     final controller = await pumpSettings(tester, server);
 
     final interruptor = find.widgetWithText(
@@ -89,7 +79,7 @@ void main() {
     tester,
   ) async {
     final theme = AppThemeController();
-    await pumpSettings(tester, withProvider(), theme: theme);
+    await pumpSettings(tester, FakeApiServer(), theme: theme);
 
     expect(theme.value, ThemeMode.dark);
     await tester.tap(find.byIcon(Icons.light_mode_outlined));
@@ -100,20 +90,21 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  // El resto de los ajustes no depende de que el servidor tenga con qué
-  // generar retratos.
-  testWidgets('sin proveedores de retratos lo dice y lo demás sigue andando', (
+  // El proveedor de retratos se elige en la pantalla de retratos, que es
+  // donde se usa. Acá no aparece, y tocar otro ajuste no lo pisa.
+  testWidgets('no hay apartado de retratos, y guardar no toca el proveedor', (
     tester,
   ) async {
     final server = FakeApiServer();
     final controller = await pumpSettings(tester, server);
+    controller.settings.imageProvider = 'otro';
 
-    expect(find.textContaining('ningún proveedor'), findsOneWidget);
+    expect(find.textContaining('etrato'), findsNothing);
     await tester.tap(find.byType(SwitchListTile));
     await tester.pumpAndSettle();
 
     expect(controller.settings.showEncounterDifficulty, isFalse);
-    expect(controller.settings.imageProvider, AppSettings().imageProvider);
+    expect(server.settings!['imageProvider'], 'otro');
     expect(tester.takeException(), isNull);
   });
 
@@ -122,14 +113,13 @@ void main() {
       tester.view.physicalSize = const Size(340, 800);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
-      final api = ApiClient(client: withProvider().client);
+      final api = ApiClient(client: FakeApiServer().client);
       await tester.pumpWidget(
         localizedApp(
           theme: AppTheme.dark,
           locale: locale,
           home: Scaffold(
             body: SettingsView(
-              api: api,
               settingsController: SettingsController(api, AppSettings()),
               theme: AppThemeController(),
             ),

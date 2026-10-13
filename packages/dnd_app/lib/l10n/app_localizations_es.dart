@@ -29,20 +29,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsTitle => 'Ajustes';
 
   @override
-  String get settingsLoading => 'Cargando ajustes…';
-
-  @override
-  String get settingsNoProviders =>
-      'Este servidor no tiene ningún proveedor de generación configurado. Igual podés subir tu propio retrato desde la ficha.';
-
-  @override
-  String get settingsProviderLabel => 'Proveedor de retratos';
-
-  @override
-  String get settingsProviderHint =>
-      'Con qué servicio se generan los retratos de tus personajes y PNJ.';
-
-  @override
   String get settingsSubtitle =>
       'Son de tu cuenta: valen en cualquier dispositivo donde entres.';
 
@@ -61,9 +47,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settingsLanguage => 'Idioma';
-
-  @override
-  String get settingsPortraits => 'Retratos';
 
   @override
   String get settingsSaved => 'Guardado';

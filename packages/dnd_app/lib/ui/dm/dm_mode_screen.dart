@@ -513,11 +513,7 @@ class _DmModeScreenState extends State<DmModeScreen> {
     // el estado de bienvenida) y cuando el servidor no contestó.
     final section = _section;
     if (section == null && _tool == _GlobalTool.settings) {
-      return SettingsView(
-        api: widget.api,
-        settingsController: _settings,
-        theme: _theme,
-      );
+      return SettingsView(settingsController: _settings, theme: _theme);
     }
     if (section == null && _tool == _GlobalTool.homebrew) {
       if (widget.homebrew case final store?) {

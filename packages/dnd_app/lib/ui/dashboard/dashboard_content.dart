@@ -8,7 +8,6 @@ extension _DashboardContent on _DashboardScreenState {
   Widget _content(BuildContext context) {
     if (_showSettings) {
       return SettingsView(
-        api: controller.api,
         settingsController: _settingsController,
         theme: widget.theme,
       );

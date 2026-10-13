@@ -631,4 +631,5 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Eliminado
 
-- Sin cambios.
+- El apartado «Retratos» de Ajustes: el proveedor se elige en la pantalla de
+  retratos, que es donde se usa.

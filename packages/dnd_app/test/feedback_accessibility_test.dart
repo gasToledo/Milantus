@@ -209,7 +209,6 @@ void main() {
         theme: AppTheme.dark,
         home: Scaffold(
           body: SettingsView(
-            api: api,
             settingsController: SettingsController(api, AppSettings()),
             theme: AppThemeController(),
           ),
@@ -218,7 +217,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Proveedor de retratos'), findsOneWidget);
+    expect(find.text('Idioma'), findsOneWidget);
     await tester.sendKeyEvent(LogicalKeyboardKey.tab);
     expect(FocusManager.instance.primaryFocus, isNotNull);
     expect(tester.takeException(), isNull);

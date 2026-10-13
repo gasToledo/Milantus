@@ -134,30 +134,6 @@ abstract class AppLocalizations {
   /// **'Ajustes'**
   String get settingsTitle;
 
-  /// No description provided for @settingsLoading.
-  ///
-  /// In es, this message translates to:
-  /// **'Cargando ajustes…'**
-  String get settingsLoading;
-
-  /// No description provided for @settingsNoProviders.
-  ///
-  /// In es, this message translates to:
-  /// **'Este servidor no tiene ningún proveedor de generación configurado. Igual podés subir tu propio retrato desde la ficha.'**
-  String get settingsNoProviders;
-
-  /// No description provided for @settingsProviderLabel.
-  ///
-  /// In es, this message translates to:
-  /// **'Proveedor de retratos'**
-  String get settingsProviderLabel;
-
-  /// No description provided for @settingsProviderHint.
-  ///
-  /// In es, this message translates to:
-  /// **'Con qué servicio se generan los retratos de tus personajes y PNJ.'**
-  String get settingsProviderHint;
-
   /// No description provided for @settingsSubtitle.
   ///
   /// In es, this message translates to:
@@ -193,12 +169,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Idioma'**
   String get settingsLanguage;
-
-  /// No description provided for @settingsPortraits.
-  ///
-  /// In es, this message translates to:
-  /// **'Retratos'**
-  String get settingsPortraits;
 
   /// No description provided for @settingsSaved.
   ///

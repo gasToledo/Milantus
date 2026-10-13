@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../api/api_client.dart';
-import '../api/api_models.dart';
 import '../data/settings_service.dart';
 import '../l10n/l10n_context.dart';
 import '../theme/app_theme.dart';
@@ -13,18 +11,18 @@ const double _kRowBesideWidth = 520;
 
 /// Los ajustes de la cuenta, como una sección más del área de contenido.
 ///
-/// Se abre igual desde el Modo Jugador y desde el Modo DM. No tiene botón de
-/// guardar: cada cambio se guarda al tocarlo, como en la ficha, y el cartel de
-/// arriba dice si llegó. Con un «Guardar» al pie, cambiar de sección sin
-/// tocarlo perdía lo elegido sin avisar.
+/// Se abre igual desde el Modo Jugador y desde el Modo DM. El proveedor de
+/// retratos no está acá: se elige en la pantalla de retratos, donde se usa.
+///
+/// No tiene botón de guardar: cada cambio se guarda al tocarlo, como en la
+/// ficha, y el cartel de arriba dice si llegó. Con un «Guardar» al pie,
+/// cambiar de sección sin tocarlo perdía lo elegido sin avisar.
 class SettingsView extends StatefulWidget {
-  final ApiClient api;
   final SettingsController settingsController;
   final AppThemeController theme;
 
   const SettingsView({
     super.key,
-    required this.api,
     required this.settingsController,
     required this.theme,
   });
@@ -38,29 +36,7 @@ enum _SaveState { idle, saving, saved }
 class _SettingsViewState extends State<SettingsView> {
   AppSettings get _settings => widget.settingsController.settings;
 
-  /// Null mientras cargan; el error, si falló.
-  List<PortraitProviderInfo>? _providers;
-  Object? _providersError;
   _SaveState _save = _SaveState.idle;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadProviders();
-  }
-
-  Future<void> _loadProviders() async {
-    setState(() {
-      _providers = null;
-      _providersError = null;
-    });
-    try {
-      final providers = await widget.api.listPortraitProviders();
-      if (mounted) setState(() => _providers = providers);
-    } catch (error) {
-      if (mounted) setState(() => _providersError = error);
-    }
-  }
 
   /// Aplica [mutate] en pantalla y lo guarda. Si el guardado falla se dice:
   /// lo elegido queda a la vista hasta la próxima carga, nunca se pierde en
@@ -186,10 +162,6 @@ class _SettingsViewState extends State<SettingsView> {
                     ),
                   ),
                 ]),
-                const SizedBox(height: 20),
-                _group(context, l10n.settingsPortraits, [
-                  _providerRow(context),
-                ]),
               ],
             ),
           ),
@@ -296,70 +268,6 @@ class _SettingsViewState extends State<SettingsView> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [text, const SizedBox(height: 10), control],
               ),
-      ),
-    );
-  }
-
-  Widget _providerRow(BuildContext context) {
-    final l10n = context.l10n;
-    final providers = _providers;
-    if (_providersError case final error?) {
-      return Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              failureMessage(l10n.settingsLoadError, error),
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-            const SizedBox(height: 10),
-            OutlinedButton.icon(
-              onPressed: _loadProviders,
-              icon: const Icon(Icons.refresh),
-              label: Text(l10n.commonRetry),
-            ),
-          ],
-        ),
-      );
-    }
-    if (providers == null) {
-      return Padding(
-        padding: const EdgeInsets.all(18),
-        child: AppBusyLabel(l10n.settingsLoading),
-      );
-    }
-    if (providers.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.all(18),
-        child: Text(l10n.settingsNoProviders),
-      );
-    }
-    // El guardado puede nombrar un proveedor que el servidor ya no ofrece.
-    final current = providers.any((p) => p.id == _settings.imageProvider)
-        ? _settings.imageProvider
-        : null;
-    return _row(
-      context,
-      title: l10n.settingsProviderLabel,
-      hint: l10n.settingsProviderHint,
-      control: DropdownButtonFormField<String>(
-        initialValue: current,
-        isExpanded: true,
-        decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-          isDense: true,
-        ),
-        items: [
-          for (final p in providers)
-            DropdownMenuItem(
-              value: p.id,
-              child: Text(p.name, maxLines: 1, overflow: TextOverflow.ellipsis),
-            ),
-        ],
-        onChanged: (id) {
-          if (id != null) _update((s) => s.imageProvider = id);
-        },
       ),
     );
   }
