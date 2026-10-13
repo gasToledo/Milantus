@@ -116,6 +116,60 @@ void main() {
     expect(sobran.tier, EncounterTier.low);
   });
 
+  test(
+      'un enemigo con ficha descuenta su nivel del presupuesto, y se cancela '
+      'con un aliado del mismo nivel', () {
+    final base = encounterDifficulty(
+      partyLevels: [3, 8],
+      enemyCrs: [1],
+    );
+    final conVillano = encounterDifficulty(
+      partyLevels: [3, 8],
+      enemyCrs: [1],
+      enemyLevels: [3],
+    );
+    expect(conVillano.lowBudget, base.lowBudget - 150);
+    expect(conVillano.moderateBudget, base.moderateBudget - 225);
+    expect(conVillano.highBudget, base.highBudget - 400);
+    expect(conVillano.enemies, 2);
+    expect(conVillano.enemyCharacters, 1);
+    expect(conVillano.uncountedEnemies, 0);
+    // No tiene PX: lo que mueve es el techo.
+    expect(conVillano.enemyXp, base.enemyXp);
+
+    final cancelados = encounterDifficulty(
+      partyLevels: [3, 8, 3],
+      enemyCrs: [1],
+      enemyLevels: [3],
+    );
+    expect(
+      (cancelados.lowBudget, cancelados.moderateBudget, cancelados.highBudget),
+      (base.lowBudget, base.moderateBudget, base.highBudget),
+    );
+  });
+
+  test(
+      'si los enemigos con ficha igualan a la mesa no queda presupuesto: es '
+      'extrema aunque no haya PX enfrente', () {
+    final espejo = encounterDifficulty(
+      partyLevels: [3, 3, 3, 3],
+      enemyCrs: [],
+      enemyLevels: [3, 3, 3, 3],
+    );
+    expect(espejo.highBudget, 0);
+    expect(espejo.netXp, 0);
+    expect(espejo.tier, EncounterTier.extreme);
+
+    // Y de más nivel que la mesa no lo vuelve negativo.
+    final jefe = encounterDifficulty(
+      partyLevels: [3, 3],
+      enemyCrs: [],
+      enemyLevels: [20],
+    );
+    expect(jefe.lowBudget, 0);
+    expect(jefe.tier, EncounterTier.extreme);
+  });
+
   test('sin personajes o sin enemigos no hay dificultad que decir', () {
     expect(
       encounterDifficulty(partyLevels: [], enemyCrs: [1]).tier,

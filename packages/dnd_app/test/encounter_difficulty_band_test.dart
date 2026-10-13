@@ -99,8 +99,8 @@ void main() {
     expect(d.allyXp, xp('wolf'));
   });
 
-  test('un PNJ aliado con ficha suma su nivel al presupuesto; como enemigo '
-      'queda fuera de la cuenta', () {
+  test('un PNJ con ficha cuenta por su nivel: de aliado lo suma al presupuesto '
+      'y de enemigo lo descuenta', () {
     final villano = CampaignNpcEntry(
       npc: Npc(
         id: 'v',
@@ -125,14 +125,45 @@ void main() {
     expect(aliado.highestLevel, 20);
     expect(aliado.lowBudget, greaterThan(solos.lowBudget));
 
-    final enemigo = of(
-      [...players, npcCombatant('v', CombatantSide.enemy)],
-      npcs: [villano],
+    // De enemigo es la misma cuenta con el signo cambiado: no tiene PX, le
+    // saca a la mesa el presupuesto de un personaje de su nivel.
+    final bardo = CampaignNpcEntry(
+      npc: Npc(
+        id: 'm',
+        name: 'Mérito',
+        sheetKind: NpcSheetKind.character,
+        characterId: 'm',
+      ),
+      status: NpcStatus.alive,
+      sheet: character('m', 3),
     );
+    final enemigo = of(
+      [
+        ...players,
+        monster('g', 'goblin-warrior'),
+        npcCombatant('m', CombatantSide.enemy),
+      ],
+      npcs: [bardo],
+    );
+    final tres = encounterDifficulty(partyLevels: [3, 3, 3], enemyCrs: []);
     expect(enemigo.characters, 4);
-    expect(enemigo.enemies, 1);
-    expect(enemigo.uncountedEnemies, 1);
-    expect(enemigo.enemyXp, 0);
+    expect(enemigo.enemies, 2);
+    expect(enemigo.enemyCharacters, 1);
+    expect(enemigo.uncountedEnemies, 0);
+    expect(enemigo.enemyXp, solos.enemyXp);
+    expect(enemigo.highBudget, tres.highBudget);
+
+    // Y neutral no hace nada.
+    final neutral = of(
+      [
+        ...players,
+        monster('g', 'goblin-warrior'),
+        npcCombatant('m', CombatantSide.neutral),
+      ],
+      npcs: [bardo],
+    );
+    expect(neutral.highBudget, solos.highBudget);
+    expect(neutral.enemies, 1);
   });
 
   test('el VD de un PNJ sale de su bloque, no de la criatura de la que se '
@@ -226,6 +257,31 @@ void main() {
       );
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets(
+      'un enemigo con ficha explica por qué el presupuesto es menor',
+      (tester) async {
+        final d = encounterDifficulty(
+          partyLevels: [3, 8],
+          enemyCrs: [1],
+          enemyLevels: [3],
+        );
+        await pumpBand(tester, d);
+
+        expect(
+          find.textContaining(
+            '1 enemigo con ficha de personaje descuenta su nivel',
+            findRichText: true,
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.textContaining('Sin VD.', findRichText: true),
+          findsNothing,
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
 
     testWidgets('sin jugadores pide sumarlos y no inventa un veredicto', (
       tester,

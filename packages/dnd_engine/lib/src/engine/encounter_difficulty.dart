@@ -86,7 +86,8 @@ int xpForChallengeRating(num cr) => _xpByCr[cr] ?? 0;
 /// viajan dos de ellas ([manyCreatures] y [powerfulCr]) al lado del número.
 class EncounterDifficulty {
   /// Los tres presupuestos de la mesa: la suma, personaje por personaje, de
-  /// lo que le toca a cada uno por su nivel.
+  /// lo que le toca a cada uno por su nivel, menos lo que les toca a los
+  /// enemigos con ficha de personaje ([enemyCharacters]). Nunca negativos.
   final int lowBudget;
   final int moderateBudget;
   final int highBudget;
@@ -104,11 +105,16 @@ class EncounterDifficulty {
   final int lowestLevel;
   final int highestLevel;
 
-  /// Cuántos enemigos hay, tengan VD o no.
+  /// Cuántos enemigos hay: criaturas, tengan VD o no, y personajes.
   final int enemies;
 
-  /// Enemigos sin VD: no suman PX y la cuenta lo tiene que decir, porque el
-  /// caso típico es el villano con ficha de personaje.
+  /// Enemigos con ficha de personaje. No tienen VD ni PX: cuentan como un
+  /// personaje del otro lado, así que **descuentan** su nivel del presupuesto
+  /// igual que un aliado con ficha lo suma. Uno de cada lado y del mismo
+  /// nivel se cancelan.
+  final int enemyCharacters;
+
+  /// Criaturas enemigas sin VD: no suman PX y la cuenta lo tiene que decir.
   final int uncountedEnemies;
 
   /// El VD más alto entre los enemigos cuando supera a [lowestLevel]
@@ -128,6 +134,7 @@ class EncounterDifficulty {
     required this.lowestLevel,
     required this.highestLevel,
     required this.enemies,
+    required this.enemyCharacters,
     required this.uncountedEnemies,
     required this.powerfulCr,
   });
@@ -143,11 +150,16 @@ class EncounterDifficulty {
   /// baja en cuyo presupuesto entra. El SRD dice «gastá todo lo que puedas,
   /// pero sin excederlo», y su ejemplo llama moderado a 1100 PX contra un
   /// presupuesto moderado de 1125.
+  ///
+  /// Un presupuesto en cero no admite nada: es el que se comieron los
+  /// enemigos con ficha. Si igualan o superan a la mesa no queda ninguno, y
+  /// el encuentro es extremo aunque no haya un solo PX enfrente.
   EncounterTier? get tier {
     if (characters == 0 || enemies == 0) return null;
-    if (netXp <= lowBudget) return EncounterTier.low;
-    if (netXp <= moderateBudget) return EncounterTier.moderate;
-    if (netXp <= highBudget) return EncounterTier.high;
+    bool fits(int budget) => budget > 0 && netXp <= budget;
+    if (fits(lowBudget)) return EncounterTier.low;
+    if (fits(moderateBudget)) return EncounterTier.moderate;
+    if (fits(highBudget)) return EncounterTier.high;
     return EncounterTier.extreme;
   }
 
@@ -172,21 +184,29 @@ class EncounterDifficulty {
 ///
 /// [enemyCrs] y [allyCrs] llevan un valor por criatura; `null` es una que no
 /// tiene VD. Los neutrales no entran en ninguna de las dos listas.
+///
+/// [enemyLevels] son los enemigos con ficha de personaje: la misma cuenta que
+/// [partyLevels], con el signo cambiado.
 EncounterDifficulty encounterDifficulty({
   required List<int> partyLevels,
   required List<num?> enemyCrs,
   List<num?> allyCrs = const [],
+  List<int> enemyLevels = const [],
 }) {
-  final levels = [
-    for (final l in partyLevels)
-      if (l >= 1 && l <= _budgetByLevel.length) l,
-  ];
+  List<int> valid(List<int> all) => [
+        for (final l in all)
+          if (l >= 1 && l <= _budgetByLevel.length) l,
+      ];
+  final levels = valid(partyLevels);
+  final against = valid(enemyLevels);
   var low = 0, moderate = 0, high = 0;
-  for (final l in levels) {
-    final (a, b, c) = _budgetByLevel[l - 1];
-    low += a;
-    moderate += b;
-    high += c;
+  for (final (sign, side) in [(1, levels), (-1, against)]) {
+    for (final l in side) {
+      final (a, b, c) = _budgetByLevel[l - 1];
+      low += sign * a;
+      moderate += sign * b;
+      high += sign * c;
+    }
   }
   final lowest = levels.isEmpty ? 0 : levels.reduce(min);
 
@@ -197,15 +217,16 @@ EncounterDifficulty encounterDifficulty({
   final top = known.isEmpty ? null : known.reduce(max);
 
   return EncounterDifficulty(
-    lowBudget: low,
-    moderateBudget: moderate,
-    highBudget: high,
+    lowBudget: max(0, low),
+    moderateBudget: max(0, moderate),
+    highBudget: max(0, high),
     enemyXp: xp(enemyCrs),
     allyXp: xp(allyCrs),
     characters: levels.length,
     lowestLevel: lowest,
     highestLevel: levels.isEmpty ? 0 : levels.reduce(max),
-    enemies: enemyCrs.length,
+    enemies: enemyCrs.length + against.length,
+    enemyCharacters: against.length,
     uncountedEnemies: enemyCrs.length - known.length,
     powerfulCr: top != null && levels.isNotEmpty && top > lowest ? top : null,
   );

@@ -6312,6 +6312,22 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get encDifficultyEnemySheetsTitle => 'Enemies with a sheet.';
+
+  @override
+  String encDifficultyEnemySheetsBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count enemies with a character sheet take their level off the budget, the way an ally adds it.',
+      one:
+          '1 enemy with a character sheet takes their level off the budget, the way an ally adds it.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get encDifficultyUncountedTitle => 'No CR.';
 
   @override

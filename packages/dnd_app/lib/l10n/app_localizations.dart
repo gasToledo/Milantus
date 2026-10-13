@@ -10266,6 +10266,18 @@ abstract class AppLocalizations {
   /// **'Hay un enemigo de VD {cr}, por encima del nivel más bajo de la mesa ({level}): una sola acción suya puede dejar a alguien fuera de combate.'**
   String encDifficultyPowerfulBody(String cr, int level);
 
+  /// No description provided for @encDifficultyEnemySheetsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Enemigos con ficha.'**
+  String get encDifficultyEnemySheetsTitle;
+
+  /// No description provided for @encDifficultyEnemySheetsBody.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 enemigo con ficha de personaje descuenta su nivel del presupuesto, como un aliado lo suma.} other{{count} enemigos con ficha de personaje descuentan su nivel del presupuesto, como un aliado lo suma.}}'**
+  String encDifficultyEnemySheetsBody(int count);
+
   /// No description provided for @encDifficultyUncountedTitle.
   ///
   /// In es, this message translates to:

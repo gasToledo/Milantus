@@ -570,7 +570,11 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
-- Sin cambios.
+- Dificultad del encuentro: un PNJ enemigo con ficha de personaje ya cuenta.
+  Descuenta su nivel del presupuesto, igual que un aliado con ficha lo suma;
+  antes quedaba fuera de la cuenta con el aviso «Sin VD».
+- En un teléfono, los PX de la banda de dificultad quedan alineados al borde
+  derecho.
 
 ### Eliminado
 

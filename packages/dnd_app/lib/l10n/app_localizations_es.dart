@@ -6313,6 +6313,22 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get encDifficultyEnemySheetsTitle => 'Enemigos con ficha.';
+
+  @override
+  String encDifficultyEnemySheetsBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count enemigos con ficha de personaje descuentan su nivel del presupuesto, como un aliado lo suma.',
+      one:
+          '1 enemigo con ficha de personaje descuenta su nivel del presupuesto, como un aliado lo suma.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get encDifficultyUncountedTitle => 'Sin VD.';
 
   @override

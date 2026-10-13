@@ -4983,6 +4983,15 @@
       }
     }
   },
+  "encDifficultyEnemySheetsTitle": "Enemigos con ficha.",
+  "encDifficultyEnemySheetsBody": "{count, plural, =1{1 enemigo con ficha de personaje descuenta su nivel del presupuesto, como un aliado lo suma.} other{{count} enemigos con ficha de personaje descuentan su nivel del presupuesto, como un aliado lo suma.}}",
+  "@encDifficultyEnemySheetsBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "encDifficultyUncountedTitle": "Sin VD.",
   "encDifficultyUncountedBody": "{count, plural, =1{1 enemigo no tiene valor de desafío y queda fuera de la cuenta.} other{{count} enemigos no tienen valor de desafío y quedan fuera de la cuenta.}}",
   "@encDifficultyUncountedBody": {

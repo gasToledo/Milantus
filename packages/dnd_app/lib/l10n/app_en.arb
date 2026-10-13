@@ -1693,6 +1693,8 @@
   "encDifficultyManyBody": "{enemies} enemies against {characters, plural, =1{1 character} other{{characters} characters}}, more than two per character: include fragile creatures.",
   "encDifficultyPowerfulTitle": "Powerful creature.",
   "encDifficultyPowerfulBody": "There is a CR {cr} enemy, above your table’s lowest level ({level}): a single action of theirs could take someone out.",
+  "encDifficultyEnemySheetsTitle": "Enemies with a sheet.",
+  "encDifficultyEnemySheetsBody": "{count, plural, =1{1 enemy with a character sheet takes their level off the budget, the way an ally adds it.} other{{count} enemies with a character sheet take their level off the budget, the way an ally adds it.}}",
   "encDifficultyUncountedTitle": "No CR.",
   "encDifficultyUncountedBody": "{count, plural, =1{1 enemy has no Challenge Rating and is left out of the count.} other{{count} enemies have no Challenge Rating and are left out of the count.}}",
   "encXpValue": "{xp} XP",

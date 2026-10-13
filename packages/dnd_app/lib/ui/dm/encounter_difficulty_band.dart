@@ -49,6 +49,7 @@ EncounterDifficulty encounterDifficultyOf(
   final party = <int>[];
   final enemies = <num?>[];
   final allies = <num?>[];
+  final enemyLevels = <int>[];
   for (final c in encounter.combatants) {
     if (c.side == CombatantSide.neutral) continue;
     if (c.kind == CombatantKind.player) {
@@ -60,11 +61,12 @@ EncounterDifficulty encounterDifficultyOf(
         ? null
         : npcs.where((e) => e.npc.id == c.npcId).firstOrNull;
     final sheet = npc?.sheet;
-    // Un PNJ aliado con ficha es un personaje más del lado de la mesa. Como
-    // enemigo no tiene VD que sumar: queda en la lista sin valor, y la banda
-    // avisa que está fuera de la cuenta.
-    if (sheet != null && c.side == CombatantSide.ally) {
-      party.add(sheet.totalLevel);
+    // Un PNJ con ficha es un personaje más: de aliado suma su nivel al
+    // presupuesto de la mesa y de enemigo lo descuenta. No tiene VD ni PX.
+    if (sheet != null) {
+      (c.side == CombatantSide.ally ? party : enemyLevels).add(
+        sheet.totalLevel,
+      );
       continue;
     }
     (c.side == CombatantSide.ally ? allies : enemies).add(
@@ -75,6 +77,7 @@ EncounterDifficulty encounterDifficultyOf(
     partyLevels: party,
     enemyCrs: enemies,
     allyCrs: allies,
+    enemyLevels: enemyLevels,
   );
 }
 
@@ -104,19 +107,30 @@ class EncounterDifficultyBand extends StatelessWidget {
     final notices = [
       if (d.manyCreatures)
         (
+          true,
           l10n.encDifficultyManyTitle,
           l10n.encDifficultyManyBody(d.enemies, d.characters),
         ),
       if (d.powerfulCr case final cr?)
         (
+          true,
           l10n.encDifficultyPowerfulTitle,
           l10n.encDifficultyPowerfulBody(
             challengeRatingLabel(cr),
             d.lowestLevel,
           ),
         ),
+      // No es una advertencia: explica por qué el presupuesto es más chico
+      // que el de la mesa sola.
+      if (d.enemyCharacters > 0)
+        (
+          false,
+          l10n.encDifficultyEnemySheetsTitle,
+          l10n.encDifficultyEnemySheetsBody(d.enemyCharacters),
+        ),
       if (d.uncountedEnemies > 0)
         (
+          true,
           l10n.encDifficultyUncountedTitle,
           l10n.encDifficultyUncountedBody(d.uncountedEnemies),
         ),
@@ -168,7 +182,12 @@ class EncounterDifficultyBand extends StatelessWidget {
                       Expanded(child: verdict),
                       if (xp != null) ...[
                         const SizedBox(width: 12),
-                        Flexible(child: xp),
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.topRight,
+                            child: xp,
+                          ),
+                        ),
                       ],
                     ],
                   ),
@@ -178,11 +197,11 @@ class EncounterDifficultyBand extends StatelessWidget {
               );
             },
           ),
-          for (final (title, body) in notices) ...[
+          for (final (warning, title, body) in notices) ...[
             const SizedBox(height: 10),
             Divider(height: 1, color: pal.hairline),
             const SizedBox(height: 10),
-            _notice(context, title, body),
+            _notice(context, title, body, warning: warning),
           ],
         ],
       ),
@@ -290,14 +309,23 @@ class EncounterDifficultyBand extends StatelessWidget {
     );
   }
 
-  Widget _notice(BuildContext context, String title, String body) {
+  Widget _notice(
+    BuildContext context,
+    String title,
+    String body, {
+    required bool warning,
+  }) {
     final pal = context.palette;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 1),
-          child: Icon(Icons.warning_amber_rounded, size: 16, color: pal.gold),
+          child: Icon(
+            warning ? Icons.warning_amber_rounded : Icons.info_outline,
+            size: 16,
+            color: warning ? pal.gold : pal.textMuted,
+          ),
         ),
         const SizedBox(width: 8),
         Expanded(

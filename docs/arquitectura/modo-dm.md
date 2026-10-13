@@ -345,9 +345,19 @@ Tres cosas no están en el libro y son criterio de la app:
   nivel al presupuesto. Una criatura aliada —monstruo o PNJ con bloque—
   resta sus PX de los enemigos, y el neto no baja de cero. Los neutrales no
   cuentan.
+- **Un enemigo con ficha de personaje** no tiene VD ni PX: es la cuenta de
+  un personaje con el signo cambiado, y **descuenta** su nivel de los tres
+  presupuestos. Un aliado y un enemigo del mismo nivel se cancelan. Si los
+  enemigos con ficha igualan o superan a la mesa no queda presupuesto, y el
+  encuentro es extremo aunque no haya PX enfrente.
 - **«Extrema»**, el nombre de lo que se pasa del presupuesto alto.
-- **Un enemigo sin VD** (el villano con ficha de personaje) no suma PX, y la
-  banda lo dice en vez de callarlo.
+- **Una criatura enemiga sin VD** (un homebrew que no lo cargó) no suma PX,
+  y la banda lo dice en vez de callarlo.
+
+La resta de niveles tiene un techo conocido: mide bien al villano con ficha
+rodeado de criaturas, que es el caso habitual, y mal a un bando hecho casi
+entero de personajes. Cuatro de nivel 3 contra tres de nivel 3 dejan el
+presupuesto de un solo personaje y cero PX, y eso se lee «Baja».
 
 Cuenta a quienes **entraron al combate**, no a la mesa entera: si alguien
 faltó, el presupuesto es el de los que vinieron. Los dos avisos que acompañan
