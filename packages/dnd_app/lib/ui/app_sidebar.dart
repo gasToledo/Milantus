@@ -350,3 +350,27 @@ class SidebarLightFooter extends StatelessWidget {
     );
   }
 }
+
+/// El título de la barra de arriba en ventana angosta, donde el panel lateral
+/// vive en el cajón y su [SidebarBrand] no está a la vista. Es el mismo en el
+/// Modo Jugador y en el Modo DM: la barra es del menú principal, no del modo.
+class AppBarBrandTitle extends StatelessWidget {
+  const AppBarBrandTitle({super.key});
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      const Text(appName),
+      Text(
+        context.l10n.appTagline,
+        style: TextStyle(
+          fontSize: 11,
+          letterSpacing: 0.3,
+          color: context.palette.gold,
+        ),
+      ),
+    ],
+  );
+}

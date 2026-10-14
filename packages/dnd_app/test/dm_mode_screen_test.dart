@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:dnd_app/api/api_client.dart';
 import 'package:dnd_app/data/settings_service.dart';
+import 'package:dnd_app/l10n/l10n_context.dart' show appName;
 import 'package:dnd_app/theme/app_theme.dart';
 import 'package:dnd_app/theme/app_widgets.dart';
 import 'package:dnd_app/ui/app_sidebar.dart';
@@ -408,7 +409,10 @@ void main() {
   ) async {
     await pumpDmMode(tester, size: const Size(480, 800), seed: seedTable);
 
-    expect(find.text('Modo DM'), findsWidgets);
+    // La barra es la del menú principal, igual que en el Modo Jugador: la
+    // marca y sin «Nueva campaña», que vive en el cajón.
+    expect(find.text(appName), findsOneWidget);
+    expect(find.byTooltip('Nueva campaña'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 

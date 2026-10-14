@@ -264,16 +264,9 @@ class _DmModeScreenState extends State<DmModeScreen> {
           );
         }
         return Scaffold(
-          appBar: AppBar(
-            title: Text(context.l10n.dmModeButton),
-            actions: [
-              IconButton(
-                tooltip: context.l10n.dmNewCampaign,
-                onPressed: _createCampaign,
-                icon: const Icon(Icons.add),
-              ),
-            ],
-          ),
+          // Sin «Nueva campaña»: ya está al pie de la lista de campañas, en el
+          // cajón, y es algo que se hace pocas veces.
+          appBar: AppBar(title: const AppBarBrandTitle()),
           drawer: Drawer(
             child: SafeArea(child: _sidebar(context, inDrawer: true)),
           ),

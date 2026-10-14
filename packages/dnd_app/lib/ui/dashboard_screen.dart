@@ -392,25 +392,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           );
         }
         return Scaffold(
-          appBar: AppBar(
-            // Mismo par título/subtítulo que la cabecera del panel lateral,
-            // que en este ancho no está a la vista.
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(appName),
-                Text(
-                  context.l10n.appTagline,
-                  style: TextStyle(
-                    fontSize: 11,
-                    letterSpacing: 0.3,
-                    color: context.palette.gold,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          appBar: AppBar(title: const AppBarBrandTitle()),
           drawer: Drawer(
             child: SafeArea(
               child: Builder(builder: (ctx) => _sidebar(ctx, inDrawer: true)),

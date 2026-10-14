@@ -632,6 +632,9 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 - Menos subtítulos en toda la app: Ajustes, la subida de nivel, el Códice,
   Homebrew, los formularios de homebrew y varios diálogos del Modo DM. Los
   que quedan explican algo que el rótulo no dice, y varios se acortaron.
+- En el teléfono, la barra de arriba del Modo DM es la misma que la del Modo
+  Jugador: la marca, sin «Modo DM» ni el botón de nueva campaña, que sigue en
+  el menú lateral.
 
 ### Eliminado
 
