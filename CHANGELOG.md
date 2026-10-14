@@ -619,7 +619,7 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 - La barra superior del Códice en pantalla ancha: la salida está en el panel.
   En pantalla angosta sigue estando.
 
-## [Unreleased]
+## [0.25.0+1] - 2026-10-14
 
 ### Nuevo
 
@@ -635,8 +635,25 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 - En el teléfono, la barra de arriba del Modo DM es la misma que la del Modo
   Jugador: la marca, sin «Modo DM» ni el botón de nueva campaña, que sigue en
   el menú lateral.
+- En la subida de nivel, lo elegido se puede cambiar antes de confirmar.
+- En un cupo de una sola opción, tocar otra opción reemplaza la elegida en vez
+  de pedir que se desmarque primero.
 
 ### Eliminado
 
 - El apartado «Retratos» de Ajustes: el proveedor se elige en la pantalla de
   retratos, que es donde se usa.
+
+## [Unreleased]
+
+### Nuevo
+
+- Sin cambios.
+
+### Modificado
+
+- Sin cambios.
+
+### Eliminado
+
+- Sin cambios.
