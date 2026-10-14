@@ -17,6 +17,7 @@ import '../app_sidebar.dart';
 import '../pending_events_gate.dart';
 import '../portrait_image.dart';
 import '../settings_view.dart';
+import '../../web/screen_awake.dart';
 import 'add_monster_dialog.dart';
 import 'bestiary_view.dart';
 import 'campaign_editor_dialog.dart';
@@ -139,10 +140,14 @@ class _DmModeScreenState extends State<DmModeScreen> {
   void initState() {
     super.initState();
     _load();
+    // El DM pasa el combate entero mirando el tracker: con la preferencia de
+    // Ajustes prendida, el teléfono no se apaga mientras esté en este modo.
+    screenAwake.hold();
   }
 
   @override
   void dispose() {
+    screenAwake.release();
     _campaigns.dispose();
     super.dispose();
   }

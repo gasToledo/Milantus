@@ -623,11 +623,14 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Nuevo
 
-- Sin cambios.
+- «Pantalla encendida» en Ajustes: con una ficha o el Modo DM abiertos, el
+  dispositivo no apaga la pantalla. Se recuerda en cada dispositivo por
+  separado y se ofrece donde el navegador lo permite.
 
 ### Modificado
 
-- Sin cambios.
+- Ajustes sin subtítulos: los rótulos alcanzan solos. Solo «Pantalla
+  encendida» conserva una explicación corta.
 
 ### Eliminado
 

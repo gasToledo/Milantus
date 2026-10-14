@@ -194,6 +194,9 @@ Lo que más se olvida:
 - Para medir el ancho disponible, `LayoutBuilder` y **nunca `MediaQuery.size`**:
   el panel lateral de 236 px es invisible para `MediaQuery`.
 - Todo `IconButton` lleva `tooltip`.
+- **Subtítulos y explicaciones, los mínimos**: solo cuando sin ellos no se
+  entiende qué hace la acción. El rótulo tiene que alcanzar solo. Ver
+  `docs/desarrollo/textos.md` §Subtítulos y explicaciones.
 - **Todo texto visible sale de `context.l10n`** (`lib/l10n/app_es.arb` y
   `app_en.arb`, las dos claves en el mismo commit): la interfaz se ofrece en
   español e inglés. Nunca un literal suelto en un widget:

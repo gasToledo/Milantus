@@ -17,6 +17,7 @@ import '../theme/app_theme.dart';
 import '../theme/app_widgets.dart';
 import '../theme/class_visuals.dart';
 import '../web/browser.dart' as browser;
+import '../web/screen_awake.dart';
 import 'conditions.dart';
 import 'dm/npcs/npc_shared.dart';
 import 'dm/share_character_dialog.dart';
@@ -215,6 +216,9 @@ class _SheetScreenState extends State<SheetScreen> {
         widget.settingsController ??
         SettingsController(widget.controller.api, AppSettings());
     if (!widget.npcMode) _pollTurn();
+    // La ficha es pantalla de juego: con la preferencia de Ajustes prendida,
+    // el teléfono no se apaga mientras esté abierta.
+    screenAwake.hold();
   }
 
   /// Las pestañas que se ofrecen. Un PNJ no tiene campañas «de jugador», y su
@@ -229,6 +233,7 @@ class _SheetScreenState extends State<SheetScreen> {
 
   @override
   void dispose() {
+    screenAwake.release();
     _turnTimer?.cancel();
     _amountCtrl.dispose();
     _companionAmountCtrl.dispose();

@@ -5,7 +5,9 @@
 // para las demás plataformas: no es el caso, es el lado `_web.dart` de una
 // importación condicional (ver `browser.dart`/`browser_stub.dart`), así que
 // nunca entra al build de Windows.
+import 'dart:async';
 import 'dart:html' as html;
+import 'dart:js_interop';
 import 'dart:typed_data';
 
 /// Único punto de contacto con el navegador para lo que no tiene equivalente
@@ -73,4 +75,87 @@ String? browserLanguage() => html.window.navigator.language;
 /// la voz y los navegadores para ofrecer traducir la página.
 void setDocumentLanguage(String code) {
   html.document.documentElement?.setAttribute('lang', code);
+}
+
+// ------------------------------------------------------- Pantalla encendida
+//
+// `dart:html` no trae la Wake Lock API, así que va por `dart:js_interop`, que
+// ya viene con el SDK: no hace falta `package:web` para dos llamadas.
+
+@JS('navigator.wakeLock')
+external _WakeLock? get _wakeLock;
+
+extension type _WakeLock._(JSObject _) implements JSObject {
+  external JSPromise<_WakeLockSentinel> request(String type);
+}
+
+extension type _WakeLockSentinel._(JSObject _) implements JSObject {
+  external JSPromise<JSAny?> release();
+}
+
+_WakeLockSentinel? _sentinel;
+bool _wantScreenAwake = false;
+StreamSubscription<html.Event>? _visibilitySub;
+
+/// Si el navegador sabe mantener la pantalla encendida. Safari lo trae
+/// recién desde iOS 16.4: donde no está, la ficha no ofrece el interruptor en
+/// vez de mostrar uno que no hace nada.
+bool get screenWakeLockSupported => _wakeLock != null;
+
+/// Pide (o suelta) que la pantalla no se apague mientras la ficha está
+/// abierta. **Lanza** si el navegador lo rechaza (ahorro de batería, por
+/// ejemplo); quien llama vuelve el interruptor a apagado.
+Future<void> keepScreenAwake(bool on) async {
+  _wantScreenAwake = on;
+  if (!on) {
+    await _visibilitySub?.cancel();
+    _visibilitySub = null;
+    final s = _sentinel;
+    _sentinel = null;
+    await s?.release().toDart;
+    return;
+  }
+  // El navegador suelta el bloqueo solo cada vez que la pestaña se esconde
+  // (cambiar de app, bloquear el teléfono). Sin volver a pedirlo al regresar,
+  // el interruptor quedaría prendido sin hacer nada desde el primer mensaje
+  // de WhatsApp.
+  _visibilitySub ??= html.document.onVisibilityChange.listen((_) {
+    if (_wantScreenAwake && html.document.visibilityState == 'visible') {
+      _acquire().catchError((_) {});
+    }
+  });
+  try {
+    await _acquire();
+  } catch (_) {
+    await keepScreenAwake(false);
+    rethrow;
+  }
+}
+
+Future<void> _acquire() async {
+  final s = await _wakeLock!.request('screen').toDart;
+  // Si lo apagaron mientras la promesa estaba en vuelo, el bloqueo recién
+  // llegado no tiene dueño: se suelta ya o la pantalla quedaría prendida.
+  if (!_wantScreenAwake) {
+    await s.release().toDart;
+    return;
+  }
+  _sentinel = s;
+}
+
+/// Preferencia de pantalla encendida. Va en el navegador y no en la cuenta
+/// por el mismo motivo que el idioma: es de este dispositivo. Prenderla en el
+/// teléfono no tiene por qué prenderla en la PC. **Puede lanzar** si el
+/// navegador bloquea el almacenamiento.
+const _screenAwakeKey = 'milantus.screenAwake';
+
+bool? readStoredScreenAwake() =>
+    switch (html.window.localStorage[_screenAwakeKey]) {
+      'true' => true,
+      'false' => false,
+      _ => null,
+    };
+
+void writeStoredScreenAwake(bool on) {
+  html.window.localStorage[_screenAwakeKey] = '$on';
 }

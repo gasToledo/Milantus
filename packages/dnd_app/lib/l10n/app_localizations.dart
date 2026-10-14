@@ -134,12 +134,6 @@ abstract class AppLocalizations {
   /// **'Ajustes'**
   String get settingsTitle;
 
-  /// No description provided for @settingsSubtitle.
-  ///
-  /// In es, this message translates to:
-  /// **'Son de tu cuenta: valen en cualquier dispositivo donde entres.'**
-  String get settingsSubtitle;
-
   /// No description provided for @settingsGeneral.
   ///
   /// In es, this message translates to:
@@ -151,12 +145,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Al abrir Milantus'**
   String get settingsStartMode;
-
-  /// No description provided for @settingsStartModeHint.
-  ///
-  /// In es, this message translates to:
-  /// **'Es solo dónde arranca: podés pasar de un modo al otro cuando quieras.'**
-  String get settingsStartModeHint;
 
   /// No description provided for @settingsTheme.
   ///
@@ -200,11 +188,17 @@ abstract class AppLocalizations {
   /// **'Mostrar la dificultad del encuentro'**
   String get settingsShowDifficulty;
 
-  /// No description provided for @settingsShowDifficultyHint.
+  /// No description provided for @settingsScreenAwake.
   ///
   /// In es, this message translates to:
-  /// **'Mientras armás un combate: la dificultad, los PX y los avisos. Apagalo si preferís no saberla.'**
-  String get settingsShowDifficultyHint;
+  /// **'Pantalla encendida'**
+  String get settingsScreenAwake;
+
+  /// No description provided for @settingsScreenAwakeHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Con una ficha o el Modo DM abiertos. Solo en este dispositivo.'**
+  String get settingsScreenAwakeHint;
 
   /// No description provided for @commonCancel.
   ///

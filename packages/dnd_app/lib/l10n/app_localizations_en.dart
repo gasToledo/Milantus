@@ -29,18 +29,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsTitle => 'Settings';
 
   @override
-  String get settingsSubtitle =>
-      'They belong to your account: they apply on any device you sign in from.';
-
-  @override
   String get settingsGeneral => 'General';
 
   @override
   String get settingsStartMode => 'When Milantus opens';
-
-  @override
-  String get settingsStartModeHint =>
-      'It is only where you start: you can switch modes whenever you like.';
 
   @override
   String get settingsTheme => 'Theme';
@@ -64,8 +56,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsShowDifficulty => 'Show encounter difficulty';
 
   @override
-  String get settingsShowDifficultyHint =>
-      'While you set up a combat: the difficulty, the XP and the warnings. Turn it off if you would rather not know.';
+  String get settingsScreenAwake => 'Keep screen on';
+
+  @override
+  String get settingsScreenAwakeHint =>
+      'While a sheet or DM Mode is open. This device only.';
 
   @override
   String get commonCancel => 'Cancel';

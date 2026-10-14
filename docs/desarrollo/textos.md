@@ -21,6 +21,23 @@ servidor.
 - Una advertencia importante nunca vive solo en un tooltip, que en pantallas
   táctiles no se ve.
 
+## Subtítulos y explicaciones
+
+Un rótulo tiene que alcanzar solo. El texto chico debajo de un título, de una
+fila de ajuste o de un interruptor es la excepción, no el formato por defecto.
+
+- **Se agrega solo si es realmente importante**: cuando sin él la persona
+  no puede adivinar qué hace la acción o dónde vale. Ejemplo: «Pantalla
+  encendida» en Ajustes, que no actúa en el menú principal y es solo de ese
+  dispositivo.
+- **No se agrega para repetir el rótulo con otras palabras**, para
+  tranquilizar («podés cambiarlo cuando quieras») ni para describir la
+  pantalla («Acá están tus ajustes»).
+- **Si hace falta, una frase corta.** Si no entra en una, va a un «Más
+  información» (ver arriba).
+- Ante la duda, sin subtítulo. Es más fácil sumarlo cuando aparece la
+  confusión que sacarlo después.
+
 ## Glosario
 
 El término de referencia es el del catálogo SRD en español

@@ -33,3 +33,12 @@ void writeStoredLocale(String code) {}
 String? browserLanguage() => null;
 
 void setDocumentLanguage(String code) {}
+
+/// Sin navegador no hay Wake Lock: el interruptor de la ficha no se ofrece.
+bool get screenWakeLockSupported => false;
+
+Future<void> keepScreenAwake(bool on) async {}
+
+bool? readStoredScreenAwake() => null;
+
+void writeStoredScreenAwake(bool on) {}
