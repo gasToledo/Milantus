@@ -303,7 +303,6 @@ class _CodexScreenState extends State<CodexScreen> {
   }
 
   Widget _portada() {
-    final pal = context.palette;
     final scheme = Theme.of(context).colorScheme;
     return PageBody(
       maxWidth: 900,
@@ -315,11 +314,6 @@ class _CodexScreenState extends State<CodexScreen> {
             fontSize: 24,
             color: scheme.onSurface,
           ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          context.l10n.codexIntro,
-          style: TextStyle(fontSize: 13, color: pal.textMuted),
         ),
         for (final group in [_personaje, _magia]) ...[
           const SizedBox(height: 20),

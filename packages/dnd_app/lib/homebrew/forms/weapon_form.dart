@@ -188,7 +188,6 @@ class _WeaponFormState extends State<WeaponForm> with _GuidedForm {
           pills: _weaponPills(context.l10n, weapon),
           stats: _weaponStats(context.l10n, weapon),
         ),
-        hint: context.l10n.hbWeaponHint,
       ),
       children: [
         _text(

@@ -112,7 +112,6 @@ class _NoteEditorDialogState extends State<_NoteEditorDialog> {
               labelText: context.l10n.diaryTitleLabel,
               // El título es campo aparte y no la primera línea del texto
               // porque es lo que se ve con la nota plegada y al buscar.
-              helperText: context.l10n.dmNoteTitleHelper,
               errorText: _titleError,
             ),
             onChanged: (_) {

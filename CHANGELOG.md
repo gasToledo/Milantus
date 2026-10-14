@@ -629,8 +629,9 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
-- Ajustes sin subtítulos: los rótulos alcanzan solos. Solo «Pantalla
-  encendida» conserva una explicación corta.
+- Menos subtítulos en toda la app: Ajustes, la subida de nivel, el Códice,
+  Homebrew, los formularios de homebrew y varios diálogos del Modo DM. Los
+  que quedan explican algo que el rótulo no dice, y varios se acortaron.
 
 ### Eliminado
 

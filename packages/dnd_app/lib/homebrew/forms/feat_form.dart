@@ -106,7 +106,6 @@ class _FeatFormState extends State<FeatForm> with _GuidedForm {
             ],
           ],
         ),
-        hint: context.l10n.hbFeatHint,
       ),
       children: [
         _text(

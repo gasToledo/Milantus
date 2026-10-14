@@ -10,7 +10,6 @@ extension _LevelUpSections on _LevelUpScreenState {
         _LevelUpIntro(
           eyebrow: context.l10n.luChooseEyebrow,
           title: context.l10n.luSubclassIntroTitle,
-          body: context.l10n.luSubclassIntroBody,
         ),
         const SizedBox(height: 22),
         _buildSubclassSection(),
@@ -22,7 +21,6 @@ extension _LevelUpSections on _LevelUpScreenState {
         _LevelUpIntro(
           eyebrow: context.l10n.luChooseEyebrow,
           title: context.l10n.luAsiIntroTitle,
-          body: context.l10n.luAsiIntroBody,
         ),
         const SizedBox(height: 22),
         _buildAsi(),
@@ -34,7 +32,6 @@ extension _LevelUpSections on _LevelUpScreenState {
         _LevelUpIntro(
           eyebrow: context.l10n.luChooseEyebrow,
           title: context.l10n.luChoicesIntroTitle,
-          body: context.l10n.luChoicesIntroBody,
         ),
         const SizedBox(height: 22),
         _buildFeatureChoicesSection(),
@@ -75,7 +72,6 @@ extension _LevelUpSections on _LevelUpScreenState {
         _LevelUpIntro(
           eyebrow: context.l10n.luMagicEyebrow,
           title: context.l10n.luYourSpellsAt(_newLevel),
-          body: context.l10n.luMagicBody,
         ),
         const SizedBox(height: 18),
         _buildSpellSection(),
@@ -101,10 +97,7 @@ extension _LevelUpSections on _LevelUpScreenState {
         DropdownButtonFormField<String>(
           key: ValueKey(_levelUpClassId),
           initialValue: _levelUpClassId,
-          decoration: InputDecoration(
-            labelText: context.l10n.luWhichClass,
-            helperText: context.l10n.luClassHelper,
-          ),
+          decoration: InputDecoration(labelText: context.l10n.luWhichClass),
           items: [
             for (final klass in _classOptions)
               DropdownMenuItem(value: klass.id, child: Text(klass.name)),
@@ -160,9 +153,7 @@ extension _LevelUpSections on _LevelUpScreenState {
           title: open.length == 1
               ? open.single.name
               : context.l10n.luFeatureChoicesTitle,
-          body: open.length == 1
-              ? context.l10n.luFeatureChoicesBody
-              : open.map((s) => s.name).join(' · '),
+          body: open.length == 1 ? '' : open.map((s) => s.name).join(' · '),
           // Igual que la tarjeta de conjuros: si todo está elegido y solo
           // queda revisar, no es una decisión obligatoria.
           tag: _pendingChoices > 0
@@ -173,21 +164,18 @@ extension _LevelUpSections on _LevelUpScreenState {
         _LevelUpCard(
           icon: Icons.shield,
           title: context.l10n.luChooseSubclass,
-          body: context.l10n.luChooseSubclassBody,
           tag: context.l10n.luTagYouChoose,
         ),
       if (_isAsi)
         _LevelUpCard(
           icon: Icons.trending_up,
           title: context.l10n.luStepAsi,
-          body: context.l10n.luAsiCardBody,
           tag: context.l10n.luTagYouChoose,
         ),
       if (_hasSpellcasting)
         _LevelUpCard(
           icon: Icons.auto_stories,
           title: context.l10n.luReviewSpells,
-          body: context.l10n.luReviewSpellsBody,
           // Decía «OPCIONAL» aunque el nivel trajera un truco o un conjuro
           // nuevo, y el paso que sigue ahora no deja confirmar sin elegirlos.
           tag: _classSpellsComplete
@@ -264,23 +252,13 @@ extension _LevelUpSections on _LevelUpScreenState {
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontFamily: 'Georgia', fontSize: 28),
               ),
-              const SizedBox(height: 7),
-              Text(
-                context.l10n.luOverviewIntro,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  height: 1.5,
-                ),
-              ),
             ],
           ),
         ),
         const SizedBox(height: 22),
         // Los dos encabezados de abajo ya separan lo automático de lo que se
-        // elige. Lo que no dice ninguna pantalla es por qué la lista de pasos
-        // cambia de personaje a personaje, ni que hasta el final no se tocó
-        // nada: sin eso, salir del wizard da miedo. La única escritura es
+        // elige. Lo que no dice ninguna pantalla es que hasta el final no se
+        // tocó nada: sin eso, salir del wizard da miedo. La única escritura es
         // `onDone`, y la hace `_confirm`.
         AppHelpCallout(message: context.l10n.luOverviewHelp),
         const SizedBox(height: 28),
@@ -588,7 +566,6 @@ extension _LevelUpSections on _LevelUpScreenState {
         _LevelUpIntro(
           eyebrow: context.l10n.luAutoEyebrow,
           title: context.l10n.luFeaturesAt(_newLevel),
-          body: context.l10n.luFeaturesBody,
         ),
         const SizedBox(height: 20),
         DenseRows(
@@ -694,7 +671,6 @@ extension _LevelUpSections on _LevelUpScreenState {
         _ReviewRow(
           icon: Icons.verified,
           label: context.l10n.luReviewProfBonus,
-          note: context.l10n.luReviewProfBonusNote,
           before: '+${diff.proficiencyBonusFrom}',
           after: '+${diff.proficiencyBonusTo}',
         ),
@@ -703,7 +679,6 @@ extension _LevelUpSections on _LevelUpScreenState {
         _ReviewRow(
           icon: Icons.diamond_outlined,
           label: context.l10n.spellsSlots,
-          note: context.l10n.luReviewSlotsNote,
           before: beforeSlots,
           after: afterSlots,
         ),
@@ -711,7 +686,6 @@ extension _LevelUpSections on _LevelUpScreenState {
         _ReviewRow(
           icon: Icons.menu_book,
           label: context.l10n.spellsPreparedTitle,
-          note: context.l10n.luReviewPreparedNote,
           before: '${beforeSpells?.preparedCount ?? 0}',
           after: '${afterSpells?.preparedCount ?? 0}',
         ),
@@ -719,7 +693,6 @@ extension _LevelUpSections on _LevelUpScreenState {
         _ReviewRow(
           icon: Icons.flare,
           label: context.l10n.spellsCantripsTitle,
-          note: context.l10n.luReviewCantripsNote,
           before: '${beforeSpells?.cantripsKnown ?? 0}',
           after: '${afterSpells?.cantripsKnown ?? 0}',
         ),
@@ -735,7 +708,6 @@ extension _LevelUpSections on _LevelUpScreenState {
         _ReviewRow(
           icon: Icons.gavel,
           label: context.l10n.luReviewMasteries,
-          note: context.l10n.luReviewMasteriesNote,
           before: '${before.weaponMasterySlots}',
           after: '${after.weaponMasterySlots}',
         ),
@@ -743,7 +715,6 @@ extension _LevelUpSections on _LevelUpScreenState {
         _ReviewRow(
           icon: Icons.shield,
           label: context.l10n.luStepSubclass,
-          note: context.l10n.luReviewSubclassNote,
           before: '—',
           after: widget.repo.subclass(_subclassId!)?.name ?? _subclassId!,
         ),
@@ -755,9 +726,6 @@ extension _LevelUpSections on _LevelUpScreenState {
           label: _asiKind == _AsiKind.feat
               ? context.l10n.luFeat
               : context.l10n.abilitiesTitle,
-          note: _asiKind == _AsiKind.feat
-              ? context.l10n.luReviewFeatNote
-              : context.l10n.luReviewImproveNote,
           before: '—',
           after: _asiReviewLabel(),
         ),
@@ -767,7 +735,6 @@ extension _LevelUpSections on _LevelUpScreenState {
         _ReviewRow(
           icon: Icons.auto_stories,
           label: context.l10n.luReviewChosenSpells,
-          note: context.l10n.luReviewChosenNote,
           before:
               '${widget.character.cantripIdsFor(_levelUpClassId).length + widget.character.spellIdsFor(_levelUpClassId).length}',
           after:
@@ -781,7 +748,6 @@ extension _LevelUpSections on _LevelUpScreenState {
         _LevelUpIntro(
           eyebrow: context.l10n.luFinalEyebrow,
           title: context.l10n.luFinalTitle(widget.character.name),
-          body: context.l10n.luFinalBody,
         ),
         const SizedBox(height: 20),
         DenseRows(children: rows),
@@ -1336,7 +1302,6 @@ extension _LevelUpSections on _LevelUpScreenState {
                 : _LevelUpCard(
                     icon: Icons.touch_app,
                     title: context.l10n.luPickFeatTitle,
-                    body: context.l10n.luPickFeatBody,
                   );
             if (!wide) {
               return Column(

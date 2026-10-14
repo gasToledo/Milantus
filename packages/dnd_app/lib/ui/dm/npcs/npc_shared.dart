@@ -406,7 +406,6 @@ class _NewNpcDialogState extends State<_NewNpcDialog> {
                     dense: true,
                     selected: _base == null,
                     title: Text(context.l10n.npcEmptyBlock),
-                    subtitle: Text(context.l10n.npcFillLater),
                     onTap: () => setState(() => _base = null),
                   ),
                   for (final creature

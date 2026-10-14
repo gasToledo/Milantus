@@ -1289,11 +1289,6 @@ class _PortraitScreenState extends State<PortraitScreen> {
           ),
         ),
       ),
-      const SizedBox(height: 12),
-      Text(
-        context.l10n.portraitImportNote,
-        style: Theme.of(context).textTheme.bodySmall,
-      ),
     ];
   }
 

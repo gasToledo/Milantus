@@ -122,7 +122,6 @@ class _ChapterEditorDialogState extends State<_ChapterEditorDialog> {
             decoration: InputDecoration(
               labelText: context.l10n.dmChapterGoal,
               hintText: context.l10n.dmChapterGoalHint,
-              helperText: context.l10n.dmChapterGoalHelper,
               alignLabelWithHint: true,
               border: OutlineInputBorder(),
             ),

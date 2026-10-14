@@ -230,7 +230,6 @@ class _SpellFormState extends State<SpellForm> with _GuidedForm {
             ),
           ],
         ),
-        hint: context.l10n.hbSpellHint,
       ),
       children: [
         _text(

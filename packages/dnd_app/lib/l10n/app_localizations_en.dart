@@ -582,7 +582,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sortManualHint =>
-      'Manual order: use “Move earlier” and “Move later” in each card\'s menu, or drag it onto another one.';
+      'Drag a card, or use “Move earlier” and “Move later” in its menu.';
 
   @override
   String get saveLatestError => 'Could not save your latest changes';
@@ -1248,7 +1248,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pickProficienciesHint =>
-      'Options you already have from another source are locked. Expertise slots work the other way around: only skills you are already proficient in are offered, and you double the bonus in them.';
+      'What you already have is locked; Expertise only offers skills you\'re proficient in.';
 
   @override
   String get pickSizeTitle => 'Choose size';
@@ -1259,10 +1259,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pickLineageTitle => 'Choose lineage';
-
-  @override
-  String get pickLineageHint =>
-      'The lineage decides which traits the species gives.';
 
   @override
   String get pickSpellAbilityTitle => 'Choose spellcasting ability';
@@ -1726,8 +1722,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get invAttunementUpper => 'ATTUNEMENT';
 
   @override
-  String get invAttunementHint =>
-      'You attune from each item\'s menu; here you can see how many slots are left and what they\'re taken by.';
+  String get invAttunementHint => 'You attune from each item\'s menu.';
 
   @override
   String get invAttuneSlotFree => 'Free attunement slot';
@@ -3251,22 +3246,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get luSubclassIntroTitle => 'Your path within the class';
 
   @override
-  String get luSubclassIntroBody =>
-      'The subclass defines new features and decisions for the coming levels. Review each option before continuing.';
-
-  @override
   String get luAsiIntroTitle => 'Improve your character';
 
   @override
-  String get luAsiIntroBody =>
-      'Raise your ability scores or choose a feat. The decision is previewed before it changes the sheet.';
-
-  @override
   String get luChoicesIntroTitle => 'Your choices this level';
-
-  @override
-  String get luChoicesIntroBody =>
-      'Some features let you choose among several options. You can review them here before confirming the level up.';
 
   @override
   String get luProfBodyExpertise =>
@@ -3274,7 +3257,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get luProfBody =>
-      'What you already have from another source is locked, so you don\'t spend the slot on something you already can do. Expertise slots work the other way around: only skills you are already proficient in are offered.';
+      'What you already have is locked; Expertise only offers skills you\'re proficient in.';
 
   @override
   String get luAlwaysPreparedTitle => 'Spells that are always prepared';
@@ -3292,15 +3275,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get luMagicBody =>
-      'Review your slots and the number of prepared spells. You can update your selection without leaving the level up.';
-
-  @override
   String get luClassOfLevel => 'Class for this level';
-
-  @override
-  String get luClassHelper =>
-      'You can continue with your current class or start a new one.';
 
   @override
   String get luWhichClass => 'Which class do you advance in?';
@@ -3333,26 +3308,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get luFeatureChoicesTitle => 'Feature choices';
 
   @override
-  String get luFeatureChoicesBody =>
-      'A feature from this level lets you choose among several options.';
-
-  @override
   String get luChooseSubclass => 'Choose subclass';
 
   @override
-  String get luChooseSubclassBody =>
-      'Defines the character\'s specialization and future features.';
-
-  @override
-  String get luAsiCardBody =>
-      'Distribute an ability score improvement or take a feat.';
-
-  @override
   String get luReviewSpells => 'Review spells';
-
-  @override
-  String get luReviewSpellsBody =>
-      'Check your slots and update your prepared spells.';
 
   @override
   String get luLevelUpper => 'LEVEL';
@@ -3363,12 +3322,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get luOverviewIntro =>
-      'First we\'ll review what changes automatically and then settle your decisions.';
-
-  @override
   String get luOverviewHelp =>
-      'Only the steps that apply to this character at this level appear, so the list is different each time. Nothing is saved to the sheet until you confirm the level up, so you can redo any choice before finishing.';
+      'Nothing is saved to the sheet until you confirm.';
 
   @override
   String get luAutoChanges => 'Automatic changes';
@@ -3456,10 +3411,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get luFeaturesBody =>
-      'These features come from your class and subclass. They will apply automatically when you confirm the level up.';
-
-  @override
   String get luResource => 'Resource';
 
   @override
@@ -3477,18 +3428,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get luReviewProfBonus => 'Proficiency bonus';
 
   @override
-  String get luReviewProfBonusNote => 'Applies to all relevant proficiencies';
-
-  @override
-  String get luReviewSlotsNote => 'Per spell level';
-
-  @override
-  String get luReviewPreparedNote => 'Repertoire capacity';
-
-  @override
-  String get luReviewCantripsNote => 'Cast without spending slots';
-
-  @override
   String get luReviewAttacks => 'Attacks per action';
 
   @override
@@ -3498,25 +3437,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get luReviewMasteries => 'Weapon Masteries';
 
   @override
-  String get luReviewMasteriesNote => 'Available options';
-
-  @override
-  String get luReviewSubclassNote => 'New specialization';
-
-  @override
   String get luFeat => 'Feat';
 
   @override
-  String get luReviewFeatNote => 'New capability';
-
-  @override
-  String get luReviewImproveNote => 'Permanent improvement';
-
-  @override
   String get luReviewChosenSpells => 'Chosen cantrips and spells';
-
-  @override
-  String get luReviewChosenNote => 'Updated selection';
 
   @override
   String get luFinalEyebrow => 'Final review';
@@ -3525,10 +3449,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String luFinalTitle(String name) {
     return 'This is how $name ends up';
   }
-
-  @override
-  String get luFinalBody =>
-      'Review the changes before writing them to the sheet. You can go back to any available step from the top bar.';
 
   @override
   String get luIncorporated => 'Features added';
@@ -3648,10 +3568,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get luPickFeatTitle => 'Choose a feat';
 
   @override
-  String get luPickFeatBody =>
-      'Each feat changes how the character plays. Select one to review its full effect.';
-
-  @override
   String get catRaces => 'Species';
 
   @override
@@ -3691,10 +3607,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get codexHome => 'Home';
-
-  @override
-  String get codexIntro =>
-      'All the game content to read, without creating a character or editing anything. Your homebrew shows up mixed in with the rest, with its source badge.';
 
   @override
   String codexNoMatch(String query) {
@@ -3998,8 +3910,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get portraitGenerateAgain => 'Generate again';
 
   @override
-  String get portraitFreeNote =>
-      'The free service can take up to ~1 min and generates 2 variants one at a time. If a rate-limit error (429) appears, wait a few seconds and try again.';
+  String get portraitFreeNote => 'The free service can take up to a minute.';
 
   @override
   String get portraitImporting => 'Importing…';
@@ -4009,10 +3920,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get portraitImportHint => 'Tap to choose it. PNG, JPG or WEBP.';
-
-  @override
-  String get portraitImportNote =>
-      'The image becomes the character portrait. You can generate with AI again whenever you like.';
 
   @override
   String get portraitAcceptsReference => 'Accepts a reference';
@@ -4269,7 +4176,7 @@ class AppLocalizationsEn extends AppLocalizations {
       other: '$count entries of your own',
       one: '1 entry of your own',
     );
-    return '$_temp0. Everything you create here is added to the catalog: it shows up in character creation and on the sheets, just like the official content.';
+    return '$_temp0';
   }
 
   @override
@@ -4483,10 +4390,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hbPreviewTitle => 'How it looks in your list';
 
   @override
-  String get hbWeaponHint =>
-      'Tap the category, the damage type, a property or the mastery to see what it does.';
-
-  @override
   String get hbReqWeaponName => 'Enter the weapon name.';
 
   @override
@@ -4591,10 +4494,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get hbArmorHint =>
-      'Tap the category, the AC or how Dexterity is added to see what changes.';
-
-  @override
   String get hbReqArmorName => 'Enter the armor name.';
 
   @override
@@ -4659,10 +4558,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hbItem => 'Item';
 
   @override
-  String get hbItemHint =>
-      'Tap the category, the rarity or an effect to see what the item does on the sheet.';
-
-  @override
   String get hbReqItemName => 'Enter the item name.';
 
   @override
@@ -4719,9 +4614,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get hbFeatNoDescription =>
       'Without a description the player only sees what it grants. A line saying what makes it different helps to choose it.';
-
-  @override
-  String get hbFeatHint => 'Tap the category to see who can take the feat.';
 
   @override
   String get hbReqFeatName => 'Enter the feat name.';
@@ -4788,10 +4680,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hbRacePreview => 'How it will look when creating a character';
 
   @override
-  String get hbRaceHint =>
-      'Tap the type, size, speed or skills to see what they imply.';
-
-  @override
   String get hbReqRaceName => 'Enter the species name.';
 
   @override
@@ -4831,10 +4719,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hbIncrease => 'Increase';
-
-  @override
-  String get hbBgHint =>
-      'Tap the abilities or the origin feat to see what they give the character.';
 
   @override
   String get hbReqBgName => 'Enter the background name.';
@@ -4909,10 +4793,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hbSpellPreview => 'How it will look on the sheet';
 
   @override
-  String get hbSpellHint =>
-      'Tap the level, school, casting time or a component to see what it implies.';
-
-  @override
   String get hbReqSpellName => 'Enter the spell name.';
 
   @override
@@ -4978,10 +4858,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hbCreaturePreview => 'How it will look in the Bestiary';
-
-  @override
-  String get hbCreatureHint =>
-      'Tap the type, the size or an action to see what changes at the table.';
 
   @override
   String get hbReqCreatureName => 'Enter the creature name.';
@@ -5213,10 +5089,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dmChapter => 'Chapter';
 
   @override
-  String get dmNoteTitleHelper =>
-      'This is what shows in the list and in search.';
-
-  @override
   String get dmChapterNameRequired => 'Enter a name to save it.';
 
   @override
@@ -5227,10 +5099,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dmChapterGoalHint => 'What the table should achieve or discover…';
-
-  @override
-  String get dmChapterGoalHelper =>
-      'A short guide; the story goes in the Notebook.';
 
   @override
   String get dmOnCloseCarry => 'On closing, they take';
@@ -5438,9 +5306,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get npcEmptyBlock => 'Empty block';
-
-  @override
-  String get npcFillLater => 'You fill it in later.';
 
   @override
   String npcAcHp(String ac, String hp) {

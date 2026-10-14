@@ -282,13 +282,12 @@ class _LevelUpFooter extends StatelessWidget {
 class _LevelUpIntro extends StatelessWidget {
   final String eyebrow;
   final String title;
-  final String body;
 
-  const _LevelUpIntro({
-    required this.eyebrow,
-    required this.title,
-    required this.body,
-  });
+  /// Solo cuando explica algo que el título no dice (ver
+  /// `docs/desarrollo/textos.md`, «Subtítulos y explicaciones»).
+  final String? body;
+
+  const _LevelUpIntro({required this.eyebrow, required this.title, this.body});
 
   @override
   Widget build(BuildContext context) {
@@ -315,18 +314,20 @@ class _LevelUpIntro extends StatelessWidget {
             color: scheme.onSurface,
           ),
         ),
-        const SizedBox(height: 7),
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 680),
-          child: Text(
-            body,
-            style: TextStyle(
-              height: 1.55,
-              fontSize: 13.5,
-              color: scheme.onSurfaceVariant,
+        if (body case final body?) ...[
+          const SizedBox(height: 7),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 680),
+            child: Text(
+              body,
+              style: TextStyle(
+                height: 1.55,
+                fontSize: 13.5,
+                color: scheme.onSurfaceVariant,
+              ),
             ),
           ),
-        ),
+        ],
       ],
     );
   }
@@ -344,7 +345,7 @@ class _LevelUpCard extends StatelessWidget {
   const _LevelUpCard({
     required this.icon,
     required this.title,
-    required this.body,
+    this.body = '',
     this.tag,
     this.selected = false,
     this.onTap,
@@ -437,7 +438,7 @@ class _ReviewRow extends StatelessWidget {
   const _ReviewRow({
     required this.icon,
     required this.label,
-    required this.note,
+    this.note = '',
     required this.before,
     required this.after,
   });

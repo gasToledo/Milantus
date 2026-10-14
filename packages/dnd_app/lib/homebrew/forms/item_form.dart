@@ -194,7 +194,6 @@ class _ItemFormState extends State<ItemForm> with _GuidedForm {
           pills: _itemPills(context.l10n, item),
           stats: _itemStats(context.l10n, item),
         ),
-        hint: context.l10n.hbItemHint,
       ),
       children: [
         _text(

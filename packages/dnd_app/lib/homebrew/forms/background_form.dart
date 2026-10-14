@@ -154,7 +154,6 @@ class _BackgroundFormState extends State<BackgroundForm> with _GuidedForm {
             ),
           ],
         ),
-        hint: context.l10n.hbBgHint,
       ),
       children: [
         _text(

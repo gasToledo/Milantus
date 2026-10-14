@@ -582,7 +582,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get sortManualHint =>
-      'Orden manual: usá «Mover antes» y «Mover después» en el menú de cada tarjeta, o arrastrala sobre otra.';
+      'Arrastrá una tarjeta o usá «Mover antes» y «Mover después» en su menú.';
 
   @override
   String get saveLatestError => 'No se pudieron guardar los últimos cambios';
@@ -1249,7 +1249,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get pickProficienciesHint =>
-      'Las opciones que ya tenés por otra vía quedan bloqueadas. En los cupos de Pericia es al revés: solo se ofrecen las habilidades en las que ya sos competente, y duplicás el bonificador en ellas.';
+      'Lo que ya tenés queda bloqueado; Pericia solo ofrece habilidades en las que sos competente.';
 
   @override
   String get pickSizeTitle => 'Elegir tamaño';
@@ -1260,10 +1260,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get pickLineageTitle => 'Elegir linaje';
-
-  @override
-  String get pickLineageHint =>
-      'El linaje decide los rasgos que aporta la especie.';
 
   @override
   String get pickSpellAbilityTitle => 'Elegir aptitud mágica';
@@ -1727,8 +1723,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get invAttunementUpper => 'SINTONIZACIÓN';
 
   @override
-  String get invAttunementHint =>
-      'Se sintoniza desde el menú de cada objeto; acá se ve cuántos cupos quedan y con qué están ocupados.';
+  String get invAttunementHint => 'Se sintoniza desde el menú de cada objeto.';
 
   @override
   String get invAttuneSlotFree => 'Cupo de sintonización libre';
@@ -3251,22 +3246,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get luSubclassIntroTitle => 'Tu camino dentro de la clase';
 
   @override
-  String get luSubclassIntroBody =>
-      'La subclase define nuevos rasgos y decisiones para los próximos niveles. Revisá cada opción antes de continuar.';
-
-  @override
   String get luAsiIntroTitle => 'Mejora tu personaje';
 
   @override
-  String get luAsiIntroBody =>
-      'Aumentá tus características o elegí una dote. La decisión se previsualiza antes de modificar la ficha.';
-
-  @override
   String get luChoicesIntroTitle => 'Tus elecciones de este nivel';
-
-  @override
-  String get luChoicesIntroBody =>
-      'Algunos rasgos te dejan elegir entre varias opciones. Podés revisarlas acá antes de confirmar la subida.';
 
   @override
   String get luProfBodyExpertise =>
@@ -3274,7 +3257,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get luProfBody =>
-      'Lo que ya tenés por otra vía queda bloqueado, para no gastar el cupo en algo que ya sabés hacer. En los cupos de Pericia es al revés: solo se ofrecen las habilidades en las que ya sos competente.';
+      'Lo que ya tenés queda bloqueado; Pericia solo ofrece habilidades en las que sos competente.';
 
   @override
   String get luAlwaysPreparedTitle => 'Conjuros que quedan siempre preparados';
@@ -3292,15 +3275,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get luMagicBody =>
-      'Revisá los espacios y la cantidad de conjuros preparados. Podés actualizar tu selección sin salir de la subida de nivel.';
-
-  @override
   String get luClassOfLevel => 'Clase del nivel';
-
-  @override
-  String get luClassHelper =>
-      'Podés continuar con tu clase actual o comenzar una nueva.';
 
   @override
   String get luWhichClass => '¿En qué clase avanzás?';
@@ -3333,26 +3308,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get luFeatureChoicesTitle => 'Elecciones de rasgos';
 
   @override
-  String get luFeatureChoicesBody =>
-      'Un rasgo de este nivel te deja elegir entre varias opciones.';
-
-  @override
   String get luChooseSubclass => 'Elegir subclase';
 
   @override
-  String get luChooseSubclassBody =>
-      'Define la especialización del personaje y sus rasgos futuros.';
-
-  @override
-  String get luAsiCardBody =>
-      'Repartí una mejora de características o incorporá una dote.';
-
-  @override
   String get luReviewSpells => 'Revisar conjuros';
-
-  @override
-  String get luReviewSpellsBody =>
-      'Comprobá tus espacios y actualizá los conjuros preparados.';
 
   @override
   String get luLevelUpper => 'NIVEL';
@@ -3363,12 +3322,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get luOverviewIntro =>
-      'Primero revisaremos qué cambia automáticamente y después resolveremos tus decisiones.';
-
-  @override
   String get luOverviewHelp =>
-      'Solo aparecen los pasos que le tocan a este personaje en este nivel, así que la lista es distinta cada vez. Nada se guarda en la ficha hasta que confirmes la subida, así que podés rehacer cualquier elección antes de terminar.';
+      'Nada se guarda en la ficha hasta que confirmes.';
 
   @override
   String get luAutoChanges => 'Cambios automáticos';
@@ -3455,10 +3410,6 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get luFeaturesBody =>
-      'Estos rasgos provienen de tu clase y subclase. Se aplicarán automáticamente cuando confirmes la subida.';
-
-  @override
   String get luResource => 'Recurso';
 
   @override
@@ -3476,19 +3427,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get luReviewProfBonus => 'Bonificador por competencia';
 
   @override
-  String get luReviewProfBonusNote =>
-      'Se aplica a todas las competencias relevantes';
-
-  @override
-  String get luReviewSlotsNote => 'Por nivel de conjuro';
-
-  @override
-  String get luReviewPreparedNote => 'Capacidad del repertorio';
-
-  @override
-  String get luReviewCantripsNote => 'Se lanzan sin gastar espacios';
-
-  @override
   String get luReviewAttacks => 'Ataques por acción';
 
   @override
@@ -3498,25 +3436,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get luReviewMasteries => 'Maestrías de armas';
 
   @override
-  String get luReviewMasteriesNote => 'Opciones disponibles';
-
-  @override
-  String get luReviewSubclassNote => 'Nueva especialización';
-
-  @override
   String get luFeat => 'Dote';
 
   @override
-  String get luReviewFeatNote => 'Nueva capacidad';
-
-  @override
-  String get luReviewImproveNote => 'Mejora permanente';
-
-  @override
   String get luReviewChosenSpells => 'Trucos y conjuros elegidos';
-
-  @override
-  String get luReviewChosenNote => 'Selección actualizada';
 
   @override
   String get luFinalEyebrow => 'Revisión final';
@@ -3525,10 +3448,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String luFinalTitle(String name) {
     return 'Así queda $name';
   }
-
-  @override
-  String get luFinalBody =>
-      'Revisá los cambios antes de escribirlos en la ficha. Podés volver a cualquier paso disponible desde la barra superior.';
 
   @override
   String get luIncorporated => 'Rasgos incorporados';
@@ -3649,10 +3568,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get luPickFeatTitle => 'Elegí una dote';
 
   @override
-  String get luPickFeatBody =>
-      'Cada dote cambia cómo se juega el personaje. Seleccioná una para revisar su efecto completo.';
-
-  @override
   String get catRaces => 'Especies';
 
   @override
@@ -3692,10 +3607,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get codexHome => 'Portada';
-
-  @override
-  String get codexIntro =>
-      'Todo el contenido del juego para leer, sin crear un personaje ni editar nada. Tu homebrew aparece mezclado con el resto, con su marca de procedencia.';
 
   @override
   String codexNoMatch(String query) {
@@ -4001,7 +3912,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get portraitFreeNote =>
-      'El servicio gratuito puede tardar hasta ~1 min y genera 2 variantes de a una. Si aparece un error de límite (429), esperá unos segundos y reintentá.';
+      'El servicio gratuito puede tardar hasta un minuto.';
 
   @override
   String get portraitImporting => 'Importando…';
@@ -4011,10 +3922,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get portraitImportHint => 'Tocá para elegirla. PNG, JPG o WEBP.';
-
-  @override
-  String get portraitImportNote =>
-      'La imagen pasa a ser el retrato del personaje. Podés volver a generar con IA cuando quieras.';
 
   @override
   String get portraitAcceptsReference => 'Acepta referencia';
@@ -4271,7 +4178,7 @@ class AppLocalizationsEs extends AppLocalizations {
       other: '$count entradas propias',
       one: '1 entrada propia',
     );
-    return '$_temp0. Todo lo que crees acá se suma al catálogo: aparece en la creación de personajes y en las fichas, igual que el contenido oficial.';
+    return '$_temp0';
   }
 
   @override
@@ -4485,10 +4392,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get hbPreviewTitle => 'Así queda en tu lista';
 
   @override
-  String get hbWeaponHint =>
-      'Tocá la categoría, el tipo de daño, una propiedad o la maestría para ver qué hace.';
-
-  @override
   String get hbReqWeaponName => 'Escribí el nombre del arma.';
 
   @override
@@ -4593,10 +4496,6 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get hbArmorHint =>
-      'Tocá la categoría, la CA o cómo suma la Destreza para ver qué cambia.';
-
-  @override
   String get hbReqArmorName => 'Escribí el nombre de la armadura.';
 
   @override
@@ -4661,10 +4560,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get hbItem => 'Objeto';
 
   @override
-  String get hbItemHint =>
-      'Tocá la categoría, la rareza o un efecto para ver qué hace el objeto en la ficha.';
-
-  @override
   String get hbReqItemName => 'Escribí el nombre del objeto.';
 
   @override
@@ -4722,10 +4617,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get hbFeatNoDescription =>
       'Sin descripción, el jugador solo ve lo que concede. Una línea que diga qué la hace distinta ayuda a elegirla.';
-
-  @override
-  String get hbFeatHint =>
-      'Tocá la categoría para ver quién puede tomar la dote.';
 
   @override
   String get hbReqFeatName => 'Escribí el nombre de la dote.';
@@ -4792,10 +4683,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get hbRacePreview => 'Cómo se va a ver al crear un personaje';
 
   @override
-  String get hbRaceHint =>
-      'Tocá el tipo, el tamaño, la velocidad o las habilidades para ver qué implican.';
-
-  @override
   String get hbReqRaceName => 'Escribí el nombre de la especie.';
 
   @override
@@ -4835,10 +4722,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get hbIncrease => 'Aumento';
-
-  @override
-  String get hbBgHint =>
-      'Tocá las características o la dote de origen para ver qué le dan al personaje.';
 
   @override
   String get hbReqBgName => 'Escribí el nombre del trasfondo.';
@@ -4913,10 +4796,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get hbSpellPreview => 'Cómo se va a ver en la ficha';
 
   @override
-  String get hbSpellHint =>
-      'Tocá el nivel, la escuela, el tiempo de lanzamiento o un componente para ver qué implica.';
-
-  @override
   String get hbReqSpellName => 'Escribí el nombre del conjuro.';
 
   @override
@@ -4982,10 +4861,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get hbCreaturePreview => 'Cómo se va a ver en el Bestiario';
-
-  @override
-  String get hbCreatureHint =>
-      'Tocá el tipo, el tamaño o una acción para ver qué cambia en la mesa.';
 
   @override
   String get hbReqCreatureName => 'Escribí el nombre de la criatura.';
@@ -5216,9 +5091,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dmChapter => 'Capítulo';
 
   @override
-  String get dmNoteTitleHelper => 'Es lo que se ve en el listado y al buscar.';
-
-  @override
   String get dmChapterNameRequired => 'Poné un nombre para guardarlo.';
 
   @override
@@ -5229,10 +5101,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get dmChapterGoalHint => 'Qué debería lograr o descubrir la mesa…';
-
-  @override
-  String get dmChapterGoalHelper =>
-      'Una guía breve; el relato va en el Cuaderno.';
 
   @override
   String get dmOnCloseCarry => 'Al cerrarlo se llevan';
@@ -5440,9 +5308,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get npcEmptyBlock => 'Bloque vacío';
-
-  @override
-  String get npcFillLater => 'Lo completás después.';
 
   @override
   String npcAcHp(String ac, String hp) {

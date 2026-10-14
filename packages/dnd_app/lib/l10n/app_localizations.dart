@@ -989,7 +989,7 @@ abstract class AppLocalizations {
   /// No description provided for @sortManualHint.
   ///
   /// In es, this message translates to:
-  /// **'Orden manual: usá «Mover antes» y «Mover después» en el menú de cada tarjeta, o arrastrala sobre otra.'**
+  /// **'Arrastrá una tarjeta o usá «Mover antes» y «Mover después» en su menú.'**
   String get sortManualHint;
 
   /// No description provided for @saveLatestError.
@@ -2057,7 +2057,7 @@ abstract class AppLocalizations {
   /// No description provided for @pickProficienciesHint.
   ///
   /// In es, this message translates to:
-  /// **'Las opciones que ya tenés por otra vía quedan bloqueadas. En los cupos de Pericia es al revés: solo se ofrecen las habilidades en las que ya sos competente, y duplicás el bonificador en ellas.'**
+  /// **'Lo que ya tenés queda bloqueado; Pericia solo ofrece habilidades en las que sos competente.'**
   String get pickProficienciesHint;
 
   /// No description provided for @pickSizeTitle.
@@ -2077,12 +2077,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Elegir linaje'**
   String get pickLineageTitle;
-
-  /// No description provided for @pickLineageHint.
-  ///
-  /// In es, this message translates to:
-  /// **'El linaje decide los rasgos que aporta la especie.'**
-  String get pickLineageHint;
 
   /// No description provided for @pickSpellAbilityTitle.
   ///
@@ -2843,7 +2837,7 @@ abstract class AppLocalizations {
   /// No description provided for @invAttunementHint.
   ///
   /// In es, this message translates to:
-  /// **'Se sintoniza desde el menú de cada objeto; acá se ve cuántos cupos quedan y con qué están ocupados.'**
+  /// **'Se sintoniza desde el menú de cada objeto.'**
   String get invAttunementHint;
 
   /// No description provided for @invAttuneSlotFree.
@@ -5215,35 +5209,17 @@ abstract class AppLocalizations {
   /// **'Tu camino dentro de la clase'**
   String get luSubclassIntroTitle;
 
-  /// No description provided for @luSubclassIntroBody.
-  ///
-  /// In es, this message translates to:
-  /// **'La subclase define nuevos rasgos y decisiones para los próximos niveles. Revisá cada opción antes de continuar.'**
-  String get luSubclassIntroBody;
-
   /// No description provided for @luAsiIntroTitle.
   ///
   /// In es, this message translates to:
   /// **'Mejora tu personaje'**
   String get luAsiIntroTitle;
 
-  /// No description provided for @luAsiIntroBody.
-  ///
-  /// In es, this message translates to:
-  /// **'Aumentá tus características o elegí una dote. La decisión se previsualiza antes de modificar la ficha.'**
-  String get luAsiIntroBody;
-
   /// No description provided for @luChoicesIntroTitle.
   ///
   /// In es, this message translates to:
   /// **'Tus elecciones de este nivel'**
   String get luChoicesIntroTitle;
-
-  /// No description provided for @luChoicesIntroBody.
-  ///
-  /// In es, this message translates to:
-  /// **'Algunos rasgos te dejan elegir entre varias opciones. Podés revisarlas acá antes de confirmar la subida.'**
-  String get luChoicesIntroBody;
 
   /// No description provided for @luProfBodyExpertise.
   ///
@@ -5254,7 +5230,7 @@ abstract class AppLocalizations {
   /// No description provided for @luProfBody.
   ///
   /// In es, this message translates to:
-  /// **'Lo que ya tenés por otra vía queda bloqueado, para no gastar el cupo en algo que ya sabés hacer. En los cupos de Pericia es al revés: solo se ofrecen las habilidades en las que ya sos competente.'**
+  /// **'Lo que ya tenés queda bloqueado; Pericia solo ofrece habilidades en las que sos competente.'**
   String get luProfBody;
 
   /// No description provided for @luAlwaysPreparedTitle.
@@ -5281,23 +5257,11 @@ abstract class AppLocalizations {
   /// **'Tus conjuros a nivel {level}'**
   String luYourSpellsAt(Object level);
 
-  /// No description provided for @luMagicBody.
-  ///
-  /// In es, this message translates to:
-  /// **'Revisá los espacios y la cantidad de conjuros preparados. Podés actualizar tu selección sin salir de la subida de nivel.'**
-  String get luMagicBody;
-
   /// No description provided for @luClassOfLevel.
   ///
   /// In es, this message translates to:
   /// **'Clase del nivel'**
   String get luClassOfLevel;
-
-  /// No description provided for @luClassHelper.
-  ///
-  /// In es, this message translates to:
-  /// **'Podés continuar con tu clase actual o comenzar una nueva.'**
-  String get luClassHelper;
 
   /// No description provided for @luWhichClass.
   ///
@@ -5347,41 +5311,17 @@ abstract class AppLocalizations {
   /// **'Elecciones de rasgos'**
   String get luFeatureChoicesTitle;
 
-  /// No description provided for @luFeatureChoicesBody.
-  ///
-  /// In es, this message translates to:
-  /// **'Un rasgo de este nivel te deja elegir entre varias opciones.'**
-  String get luFeatureChoicesBody;
-
   /// No description provided for @luChooseSubclass.
   ///
   /// In es, this message translates to:
   /// **'Elegir subclase'**
   String get luChooseSubclass;
 
-  /// No description provided for @luChooseSubclassBody.
-  ///
-  /// In es, this message translates to:
-  /// **'Define la especialización del personaje y sus rasgos futuros.'**
-  String get luChooseSubclassBody;
-
-  /// No description provided for @luAsiCardBody.
-  ///
-  /// In es, this message translates to:
-  /// **'Repartí una mejora de características o incorporá una dote.'**
-  String get luAsiCardBody;
-
   /// No description provided for @luReviewSpells.
   ///
   /// In es, this message translates to:
   /// **'Revisar conjuros'**
   String get luReviewSpells;
-
-  /// No description provided for @luReviewSpellsBody.
-  ///
-  /// In es, this message translates to:
-  /// **'Comprobá tus espacios y actualizá los conjuros preparados.'**
-  String get luReviewSpellsBody;
 
   /// No description provided for @luLevelUpper.
   ///
@@ -5395,16 +5335,10 @@ abstract class AppLocalizations {
   /// **'{name} sube a nivel {level}'**
   String luCharacterLevels(String name, Object level);
 
-  /// No description provided for @luOverviewIntro.
-  ///
-  /// In es, this message translates to:
-  /// **'Primero revisaremos qué cambia automáticamente y después resolveremos tus decisiones.'**
-  String get luOverviewIntro;
-
   /// No description provided for @luOverviewHelp.
   ///
   /// In es, this message translates to:
-  /// **'Solo aparecen los pasos que le tocan a este personaje en este nivel, así que la lista es distinta cada vez. Nada se guarda en la ficha hasta que confirmes la subida, así que podés rehacer cualquier elección antes de terminar.'**
+  /// **'Nada se guarda en la ficha hasta que confirmes.'**
   String get luOverviewHelp;
 
   /// No description provided for @luAutoChanges.
@@ -5539,12 +5473,6 @@ abstract class AppLocalizations {
   /// **'Rasgos ganados a nivel {level}'**
   String luFeaturesAt(Object level);
 
-  /// No description provided for @luFeaturesBody.
-  ///
-  /// In es, this message translates to:
-  /// **'Estos rasgos provienen de tu clase y subclase. Se aplicarán automáticamente cuando confirmes la subida.'**
-  String get luFeaturesBody;
-
   /// No description provided for @luResource.
   ///
   /// In es, this message translates to:
@@ -5575,30 +5503,6 @@ abstract class AppLocalizations {
   /// **'Bonificador por competencia'**
   String get luReviewProfBonus;
 
-  /// No description provided for @luReviewProfBonusNote.
-  ///
-  /// In es, this message translates to:
-  /// **'Se aplica a todas las competencias relevantes'**
-  String get luReviewProfBonusNote;
-
-  /// No description provided for @luReviewSlotsNote.
-  ///
-  /// In es, this message translates to:
-  /// **'Por nivel de conjuro'**
-  String get luReviewSlotsNote;
-
-  /// No description provided for @luReviewPreparedNote.
-  ///
-  /// In es, this message translates to:
-  /// **'Capacidad del repertorio'**
-  String get luReviewPreparedNote;
-
-  /// No description provided for @luReviewCantripsNote.
-  ///
-  /// In es, this message translates to:
-  /// **'Se lanzan sin gastar espacios'**
-  String get luReviewCantripsNote;
-
   /// No description provided for @luReviewAttacks.
   ///
   /// In es, this message translates to:
@@ -5617,47 +5521,17 @@ abstract class AppLocalizations {
   /// **'Maestrías de armas'**
   String get luReviewMasteries;
 
-  /// No description provided for @luReviewMasteriesNote.
-  ///
-  /// In es, this message translates to:
-  /// **'Opciones disponibles'**
-  String get luReviewMasteriesNote;
-
-  /// No description provided for @luReviewSubclassNote.
-  ///
-  /// In es, this message translates to:
-  /// **'Nueva especialización'**
-  String get luReviewSubclassNote;
-
   /// No description provided for @luFeat.
   ///
   /// In es, this message translates to:
   /// **'Dote'**
   String get luFeat;
 
-  /// No description provided for @luReviewFeatNote.
-  ///
-  /// In es, this message translates to:
-  /// **'Nueva capacidad'**
-  String get luReviewFeatNote;
-
-  /// No description provided for @luReviewImproveNote.
-  ///
-  /// In es, this message translates to:
-  /// **'Mejora permanente'**
-  String get luReviewImproveNote;
-
   /// No description provided for @luReviewChosenSpells.
   ///
   /// In es, this message translates to:
   /// **'Trucos y conjuros elegidos'**
   String get luReviewChosenSpells;
-
-  /// No description provided for @luReviewChosenNote.
-  ///
-  /// In es, this message translates to:
-  /// **'Selección actualizada'**
-  String get luReviewChosenNote;
 
   /// No description provided for @luFinalEyebrow.
   ///
@@ -5670,12 +5544,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Así queda {name}'**
   String luFinalTitle(String name);
-
-  /// No description provided for @luFinalBody.
-  ///
-  /// In es, this message translates to:
-  /// **'Revisá los cambios antes de escribirlos en la ficha. Podés volver a cualquier paso disponible desde la barra superior.'**
-  String get luFinalBody;
 
   /// No description provided for @luIncorporated.
   ///
@@ -5833,12 +5701,6 @@ abstract class AppLocalizations {
   /// **'Elegí una dote'**
   String get luPickFeatTitle;
 
-  /// No description provided for @luPickFeatBody.
-  ///
-  /// In es, this message translates to:
-  /// **'Cada dote cambia cómo se juega el personaje. Seleccioná una para revisar su efecto completo.'**
-  String get luPickFeatBody;
-
   /// No description provided for @catRaces.
   ///
   /// In es, this message translates to:
@@ -5916,12 +5778,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Portada'**
   String get codexHome;
-
-  /// No description provided for @codexIntro.
-  ///
-  /// In es, this message translates to:
-  /// **'Todo el contenido del juego para leer, sin crear un personaje ni editar nada. Tu homebrew aparece mezclado con el resto, con su marca de procedencia.'**
-  String get codexIntro;
 
   /// No description provided for @codexNoMatch.
   ///
@@ -6448,7 +6304,7 @@ abstract class AppLocalizations {
   /// No description provided for @portraitFreeNote.
   ///
   /// In es, this message translates to:
-  /// **'El servicio gratuito puede tardar hasta ~1 min y genera 2 variantes de a una. Si aparece un error de límite (429), esperá unos segundos y reintentá.'**
+  /// **'El servicio gratuito puede tardar hasta un minuto.'**
   String get portraitFreeNote;
 
   /// No description provided for @portraitImporting.
@@ -6468,12 +6324,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Tocá para elegirla. PNG, JPG o WEBP.'**
   String get portraitImportHint;
-
-  /// No description provided for @portraitImportNote.
-  ///
-  /// In es, this message translates to:
-  /// **'La imagen pasa a ser el retrato del personaje. Podés volver a generar con IA cuando quieras.'**
-  String get portraitImportNote;
 
   /// No description provided for @portraitAcceptsReference.
   ///
@@ -6838,7 +6688,7 @@ abstract class AppLocalizations {
   /// No description provided for @hbWorkshopIntro.
   ///
   /// In es, this message translates to:
-  /// **'{count, plural, =1{1 entrada propia} other{{count} entradas propias}}. Todo lo que crees acá se suma al catálogo: aparece en la creación de personajes y en las fichas, igual que el contenido oficial.'**
+  /// **'{count, plural, =1{1 entrada propia} other{{count} entradas propias}}'**
   String hbWorkshopIntro(int count);
 
   /// No description provided for @hbCategories.
@@ -7177,12 +7027,6 @@ abstract class AppLocalizations {
   /// **'Así queda en tu lista'**
   String get hbPreviewTitle;
 
-  /// No description provided for @hbWeaponHint.
-  ///
-  /// In es, this message translates to:
-  /// **'Tocá la categoría, el tipo de daño, una propiedad o la maestría para ver qué hace.'**
-  String get hbWeaponHint;
-
   /// No description provided for @hbReqWeaponName.
   ///
   /// In es, this message translates to:
@@ -7375,12 +7219,6 @@ abstract class AppLocalizations {
   /// **'CA con DES +{dex}'**
   String hbAcWithDex(Object dex);
 
-  /// No description provided for @hbArmorHint.
-  ///
-  /// In es, this message translates to:
-  /// **'Tocá la categoría, la CA o cómo suma la Destreza para ver qué cambia.'**
-  String get hbArmorHint;
-
   /// No description provided for @hbReqArmorName.
   ///
   /// In es, this message translates to:
@@ -7488,12 +7326,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Objeto'**
   String get hbItem;
-
-  /// No description provided for @hbItemHint.
-  ///
-  /// In es, this message translates to:
-  /// **'Tocá la categoría, la rareza o un efecto para ver qué hace el objeto en la ficha.'**
-  String get hbItemHint;
 
   /// No description provided for @hbReqItemName.
   ///
@@ -7609,12 +7441,6 @@ abstract class AppLocalizations {
   /// **'Sin descripción, el jugador solo ve lo que concede. Una línea que diga qué la hace distinta ayuda a elegirla.'**
   String get hbFeatNoDescription;
 
-  /// No description provided for @hbFeatHint.
-  ///
-  /// In es, this message translates to:
-  /// **'Tocá la categoría para ver quién puede tomar la dote.'**
-  String get hbFeatHint;
-
   /// No description provided for @hbReqFeatName.
   ///
   /// In es, this message translates to:
@@ -7717,12 +7543,6 @@ abstract class AppLocalizations {
   /// **'Cómo se va a ver al crear un personaje'**
   String get hbRacePreview;
 
-  /// No description provided for @hbRaceHint.
-  ///
-  /// In es, this message translates to:
-  /// **'Tocá el tipo, el tamaño, la velocidad o las habilidades para ver qué implican.'**
-  String get hbRaceHint;
-
   /// No description provided for @hbReqRaceName.
   ///
   /// In es, this message translates to:
@@ -7800,12 +7620,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Aumento'**
   String get hbIncrease;
-
-  /// No description provided for @hbBgHint.
-  ///
-  /// In es, this message translates to:
-  /// **'Tocá las características o la dote de origen para ver qué le dan al personaje.'**
-  String get hbBgHint;
 
   /// No description provided for @hbReqBgName.
   ///
@@ -7951,12 +7765,6 @@ abstract class AppLocalizations {
   /// **'Cómo se va a ver en la ficha'**
   String get hbSpellPreview;
 
-  /// No description provided for @hbSpellHint.
-  ///
-  /// In es, this message translates to:
-  /// **'Tocá el nivel, la escuela, el tiempo de lanzamiento o un componente para ver qué implica.'**
-  String get hbSpellHint;
-
   /// No description provided for @hbReqSpellName.
   ///
   /// In es, this message translates to:
@@ -8082,12 +7890,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Cómo se va a ver en el Bestiario'**
   String get hbCreaturePreview;
-
-  /// No description provided for @hbCreatureHint.
-  ///
-  /// In es, this message translates to:
-  /// **'Tocá el tipo, el tamaño o una acción para ver qué cambia en la mesa.'**
-  String get hbCreatureHint;
 
   /// No description provided for @hbReqCreatureName.
   ///
@@ -8515,12 +8317,6 @@ abstract class AppLocalizations {
   /// **'Capítulo'**
   String get dmChapter;
 
-  /// No description provided for @dmNoteTitleHelper.
-  ///
-  /// In es, this message translates to:
-  /// **'Es lo que se ve en el listado y al buscar.'**
-  String get dmNoteTitleHelper;
-
   /// No description provided for @dmChapterNameRequired.
   ///
   /// In es, this message translates to:
@@ -8544,12 +8340,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Qué debería lograr o descubrir la mesa…'**
   String get dmChapterGoalHint;
-
-  /// No description provided for @dmChapterGoalHelper.
-  ///
-  /// In es, this message translates to:
-  /// **'Una guía breve; el relato va en el Cuaderno.'**
-  String get dmChapterGoalHelper;
 
   /// No description provided for @dmOnCloseCarry.
   ///
@@ -8904,12 +8694,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Bloque vacío'**
   String get npcEmptyBlock;
-
-  /// No description provided for @npcFillLater.
-  ///
-  /// In es, this message translates to:
-  /// **'Lo completás después.'**
-  String get npcFillLater;
 
   /// No description provided for @npcAcHp.
   ///

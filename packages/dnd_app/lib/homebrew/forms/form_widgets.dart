@@ -545,32 +545,25 @@ mixin _GuidedForm<T extends StatefulWidget> on State<T> {
   }
 
   /// El panel lateral: [preview] bajo [previewTitle], lo que se está tocando
-  /// (o [hint] mientras no se tocó nada) y lo que ya se eligió.
-  Widget guidePanel({
-    required String previewTitle,
-    required Widget preview,
-    required String hint,
-  }) {
+  /// y lo que ya se eligió. Sin texto de ayuda mientras no se tocó nada: los
+  /// chips se ofrecen solos (ver `docs/desarrollo/textos.md`).
+
+  Widget guidePanel({required String previewTitle, required Widget preview}) {
     final key = focus;
     final explained = key == null ? null : explain(key);
     final chosen = [
       for (final k in chosenKeys)
         if (k != key) ?explain(k),
     ];
-    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Eyebrow(previewTitle),
         preview,
-        const SizedBox(height: 16),
-        if (explained != null)
-          _Explanation(explained)
-        else
-          Text(
-            hint,
-            style: TextStyle(fontSize: 13, height: 1.45, color: muted),
-          ),
+        if (explained != null) ...[
+          const SizedBox(height: 16),
+          _Explanation(explained),
+        ],
         if (chosen.isNotEmpty) ...[
           const SizedBox(height: 18),
           _ChosenList(chosen),

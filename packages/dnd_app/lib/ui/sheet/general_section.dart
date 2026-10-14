@@ -335,7 +335,7 @@ extension _SheetGeneralSection on _SheetScreenState {
   /// confirma: con una sola decisión, un botón "Guardar" sobra.
   Future<T?> _pickOne<T>({
     required String title,
-    required String hint,
+    String? hint,
     required List<T> options,
     required String Function(T) label,
     required T? current,
@@ -347,8 +347,7 @@ extension _SheetGeneralSection on _SheetScreenState {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(hint),
-          const SizedBox(height: 16),
+          if (hint != null) ...[Text(hint), const SizedBox(height: 16)],
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -393,7 +392,6 @@ extension _SheetGeneralSection on _SheetScreenState {
     final current = options.where((l) => l.id == _c.lineageId).firstOrNull;
     final picked = await _pickOne<Lineage>(
       title: context.l10n.pickLineageTitle,
-      hint: context.l10n.pickLineageHint,
       options: options,
       label: (lineage) => lineage.name,
       current: current,

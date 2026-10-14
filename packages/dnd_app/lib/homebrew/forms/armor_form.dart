@@ -182,7 +182,6 @@ class _ArmorFormState extends State<ArmorForm> with _GuidedForm {
             ],
           ],
         ),
-        hint: context.l10n.hbArmorHint,
       ),
       children: [
         _text(

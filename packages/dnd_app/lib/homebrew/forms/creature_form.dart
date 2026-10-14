@@ -310,7 +310,6 @@ class _CreatureFormState extends State<CreatureForm> with _GuidedForm {
             ...creatureProfileBody(context, widget.repo, creature),
           ],
         ),
-        hint: context.l10n.hbCreatureHint,
       ),
       children: [
         _text(

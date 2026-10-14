@@ -175,7 +175,6 @@ class _RaceFormState extends State<RaceForm> with _GuidedForm {
             ),
           ],
         ),
-        hint: context.l10n.hbRaceHint,
       ),
       children: [
         _text(

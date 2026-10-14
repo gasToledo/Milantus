@@ -528,7 +528,7 @@
   "sortLevel": "Nivel",
   "sortClass": "Clase",
   "sortSaveError": "No se pudo guardar el orden de tus personajes",
-  "sortManualHint": "Orden manual: usá «Mover antes» y «Mover después» en el menú de cada tarjeta, o arrastrala sobre otra.",
+  "sortManualHint": "Arrastrá una tarjeta o usá «Mover antes» y «Mover después» en su menú.",
   "saveLatestError": "No se pudieron guardar los últimos cambios",
   "sessionExpiredTitle": "La sesión terminó",
   "sessionExpiredBody": "Los cambios que todavía no se pudieron guardar siguen en pantalla. Iniciá sesión de nuevo para seguir editando.",
@@ -1150,11 +1150,10 @@
   "sheetChange": "Cambiar",
   "pickExpertiseTitle": "Elegir Pericia",
   "pickProficienciesTitle": "Elegir competencias",
-  "pickProficienciesHint": "Las opciones que ya tenés por otra vía quedan bloqueadas. En los cupos de Pericia es al revés: solo se ofrecen las habilidades en las que ya sos competente, y duplicás el bonificador en ellas.",
+  "pickProficienciesHint": "Lo que ya tenés queda bloqueado; Pericia solo ofrece habilidades en las que sos competente.",
   "pickSizeTitle": "Elegir tamaño",
   "pickSizeHint": "Esta especie abarca cuerpos de tamaños distintos: elegí el de tu personaje.",
   "pickLineageTitle": "Elegir linaje",
-  "pickLineageHint": "El linaje decide los rasgos que aporta la especie.",
   "pickSpellAbilityTitle": "Elegir aptitud mágica",
   "pickLineageSpellAbilityHint": "Se usa para la CD y los ataques de los conjuros del linaje.",
   "pickFeatSpellAbilityTitle": "Aptitud mágica de {name}",
@@ -1512,7 +1511,7 @@
   },
   "invOverCapacity": "Pasás tu capacidad de carga. En 2024 no hay penalización de reglas: es un aviso, no un bloqueo.",
   "invAttunementUpper": "SINTONIZACIÓN",
-  "invAttunementHint": "Se sintoniza desde el menú de cada objeto; acá se ve cuántos cupos quedan y con qué están ocupados.",
+  "invAttunementHint": "Se sintoniza desde el menú de cada objeto.",
   "invAttuneSlotFree": "Cupo de sintonización libre",
   "invAttunedName": "{name} — sintonizado",
   "@invAttunedName": {
@@ -2902,13 +2901,10 @@
   "luNoProficiencies": "No quedan competencias disponibles para este rasgo.",
   "luChooseEyebrow": "Elegís vos",
   "luSubclassIntroTitle": "Tu camino dentro de la clase",
-  "luSubclassIntroBody": "La subclase define nuevos rasgos y decisiones para los próximos niveles. Revisá cada opción antes de continuar.",
   "luAsiIntroTitle": "Mejora tu personaje",
-  "luAsiIntroBody": "Aumentá tus características o elegí una dote. La decisión se previsualiza antes de modificar la ficha.",
   "luChoicesIntroTitle": "Tus elecciones de este nivel",
-  "luChoicesIntroBody": "Algunos rasgos te dejan elegir entre varias opciones. Podés revisarlas acá antes de confirmar la subida.",
   "luProfBodyExpertise": "Duplicás tu bonificador por competencia en las habilidades que elijas. Solo se ofrecen las habilidades en las que ya sos competente.",
-  "luProfBody": "Lo que ya tenés por otra vía queda bloqueado, para no gastar el cupo en algo que ya sabés hacer. En los cupos de Pericia es al revés: solo se ofrecen las habilidades en las que ya sos competente.",
+  "luProfBody": "Lo que ya tenés queda bloqueado; Pericia solo ofrece habilidades en las que sos competente.",
   "luAlwaysPreparedTitle": "Conjuros que quedan siempre preparados",
   "luAlwaysPreparedBody": "Estos conjuros no ocupan cupo de preparados y no se pueden desmarcar desde el editor. El pozo ya viene filtrado por lo que el rasgo permite.",
   "luMagicEyebrow": "Magia",
@@ -2920,9 +2916,7 @@
       }
     }
   },
-  "luMagicBody": "Revisá los espacios y la cantidad de conjuros preparados. Podés actualizar tu selección sin salir de la subida de nivel.",
   "luClassOfLevel": "Clase del nivel",
-  "luClassHelper": "Podés continuar con tu clase actual o comenzar una nueva.",
   "luWhichClass": "¿En qué clase avanzás?",
   "luClassLevelLine": "{level}° nivel de {name} · dado d{die}",
   "@luClassLevelLine": {
@@ -2958,12 +2952,8 @@
   "luTagOptional": "OPCIONAL",
   "luTagAuto": "AUTOMÁTICO",
   "luFeatureChoicesTitle": "Elecciones de rasgos",
-  "luFeatureChoicesBody": "Un rasgo de este nivel te deja elegir entre varias opciones.",
   "luChooseSubclass": "Elegir subclase",
-  "luChooseSubclassBody": "Define la especialización del personaje y sus rasgos futuros.",
-  "luAsiCardBody": "Repartí una mejora de características o incorporá una dote.",
   "luReviewSpells": "Revisar conjuros",
-  "luReviewSpellsBody": "Comprobá tus espacios y actualizá los conjuros preparados.",
   "luLevelUpper": "NIVEL",
   "luCharacterLevels": "{name} sube a nivel {level}",
   "@luCharacterLevels": {
@@ -2976,8 +2966,7 @@
       }
     }
   },
-  "luOverviewIntro": "Primero revisaremos qué cambia automáticamente y después resolveremos tus decisiones.",
-  "luOverviewHelp": "Solo aparecen los pasos que le tocan a este personaje en este nivel, así que la lista es distinta cada vez. Nada se guarda en la ficha hasta que confirmes la subida, así que podés rehacer cualquier elección antes de terminar.",
+  "luOverviewHelp": "Nada se guarda en la ficha hasta que confirmes.",
   "luAutoChanges": "Cambios automáticos",
   "luDecisions": "Decisiones de esta subida",
   "luMoreHpTitle": "Más puntos de golpe",
@@ -3066,7 +3055,6 @@
       }
     }
   },
-  "luFeaturesBody": "Estos rasgos provienen de tu clase y subclase. Se aplicarán automáticamente cuando confirmes la subida.",
   "luResource": "Recurso",
   "luClassResource": "Recurso de clase",
   "luReviewMaxHp": "Puntos de golpe máximos",
@@ -3079,20 +3067,11 @@
     }
   },
   "luReviewProfBonus": "Bonificador por competencia",
-  "luReviewProfBonusNote": "Se aplica a todas las competencias relevantes",
-  "luReviewSlotsNote": "Por nivel de conjuro",
-  "luReviewPreparedNote": "Capacidad del repertorio",
-  "luReviewCantripsNote": "Se lanzan sin gastar espacios",
   "luReviewAttacks": "Ataques por acción",
   "luReviewExtraAttack": "Ataque Adicional",
   "luReviewMasteries": "Maestrías de armas",
-  "luReviewMasteriesNote": "Opciones disponibles",
-  "luReviewSubclassNote": "Nueva especialización",
   "luFeat": "Dote",
-  "luReviewFeatNote": "Nueva capacidad",
-  "luReviewImproveNote": "Mejora permanente",
   "luReviewChosenSpells": "Trucos y conjuros elegidos",
-  "luReviewChosenNote": "Selección actualizada",
   "luFinalEyebrow": "Revisión final",
   "luFinalTitle": "Así queda {name}",
   "@luFinalTitle": {
@@ -3102,7 +3081,6 @@
       }
     }
   },
-  "luFinalBody": "Revisá los cambios antes de escribirlos en la ficha. Podés volver a cualquier paso disponible desde la barra superior.",
   "luIncorporated": "Rasgos incorporados",
   "luSlotLine": "Nv{level} ×{count}",
   "@luSlotLine": {
@@ -3229,7 +3207,6 @@
     }
   },
   "luPickFeatTitle": "Elegí una dote",
-  "luPickFeatBody": "Cada dote cambia cómo se juega el personaje. Seleccioná una para revisar su efecto completo.",
   "catRaces": "Especies",
   "catLineages": "Linajes",
   "catClasses": "Clases",
@@ -3250,7 +3227,6 @@
   "codexCategoriesTooltip": "Categorías del Códice",
   "codexSearchAll": "Buscar en todo el Códice",
   "codexHome": "Portada",
-  "codexIntro": "Todo el contenido del juego para leer, sin crear un personaje ni editar nada. Tu homebrew aparece mezclado con el resto, con su marca de procedencia.",
   "codexNoMatch": "Nada del Códice coincide con «{query}».",
   "@codexNoMatch": {
     "placeholders": {
@@ -3476,11 +3452,10 @@
   "portraitGenerating": "Generando…",
   "portraitGenerate": "Generar",
   "portraitGenerateAgain": "Generar otra vez",
-  "portraitFreeNote": "El servicio gratuito puede tardar hasta ~1 min y genera 2 variantes de a una. Si aparece un error de límite (429), esperá unos segundos y reintentá.",
+  "portraitFreeNote": "El servicio gratuito puede tardar hasta un minuto.",
   "portraitImporting": "Importando…",
   "portraitImportTitle": "Importar imagen desde archivo",
   "portraitImportHint": "Tocá para elegirla. PNG, JPG o WEBP.",
-  "portraitImportNote": "La imagen pasa a ser el retrato del personaje. Podés volver a generar con IA cuando quieras.",
   "portraitAcceptsReference": "Acepta referencia",
   "portraitTextOnly": "Solo texto",
   "portraitPickStyle": "Elegir estilo",
@@ -3652,7 +3627,7 @@
     }
   },
   "hbWorkshop": "Tu taller",
-  "hbWorkshopIntro": "{count, plural, =1{1 entrada propia} other{{count} entradas propias}}. Todo lo que crees acá se suma al catálogo: aparece en la creación de personajes y en las fichas, igual que el contenido oficial.",
+  "hbWorkshopIntro": "{count, plural, =1{1 entrada propia} other{{count} entradas propias}}",
   "@hbWorkshopIntro": {
     "placeholders": {
       "count": {
@@ -3816,7 +3791,6 @@
   "hbNone": "ninguna",
   "hbNoMasteryLower": "sin maestría",
   "hbPreviewTitle": "Así queda en tu lista",
-  "hbWeaponHint": "Tocá la categoría, el tipo de daño, una propiedad o la maestría para ver qué hace.",
   "hbReqWeaponName": "Escribí el nombre del arma.",
   "hbDamageDie": "Dado de daño",
   "hbVersatile": "Dado versátil (p.ej. 1d10)",
@@ -3877,7 +3851,6 @@
       }
     }
   },
-  "hbArmorHint": "Tocá la categoría, la CA o cómo suma la Destreza para ver qué cambia.",
   "hbReqArmorName": "Escribí el nombre de la armadura.",
   "hbShieldAc": "CA que suma",
   "hbHowDex": "Cómo suma la Destreza",
@@ -3910,7 +3883,6 @@
   },
   "hbNoneM": "ninguno",
   "hbItem": "Objeto",
-  "hbItemHint": "Tocá la categoría, la rareza o un efecto para ver qué hace el objeto en la ficha.",
   "hbReqItemName": "Escribí el nombre del objeto.",
   "hbWeightShort": "Peso (lb)",
   "hbPriceCp": "Precio (pc)",
@@ -3930,7 +3902,6 @@
   "hbOnce": "Una sola vez",
   "hbFeatPreview": "Así la ve el jugador",
   "hbFeatNoDescription": "Sin descripción, el jugador solo ve lo que concede. Una línea que diga qué la hace distinta ayuda a elegirla.",
-  "hbFeatHint": "Tocá la categoría para ver quién puede tomar la dote.",
   "hbReqFeatName": "Escribí el nombre de la dote.",
   "hbFeatDistinct": "Qué la hace distinta",
   "hbGrants": "Qué concede",
@@ -3972,7 +3943,6 @@
     }
   },
   "hbRacePreview": "Cómo se va a ver al crear un personaje",
-  "hbRaceHint": "Tocá el tipo, el tamaño, la velocidad o las habilidades para ver qué implican.",
   "hbReqRaceName": "Escribí el nombre de la especie.",
   "hbSpeedFeet": "Velocidad (pies)",
   "hbPresentation": "Presentación",
@@ -3993,7 +3963,6 @@
   "hbNoOriginFeat": "Sin dote de origen",
   "hbNoneF": "Ninguna",
   "hbIncrease": "Aumento",
-  "hbBgHint": "Tocá las características o la dote de origen para ver qué le dan al personaje.",
   "hbReqBgName": "Escribí el nombre del trasfondo.",
   "hbThreeAbilities": "Elegí exactamente tres características.",
   "hbPick3": "Características · elegí 3",
@@ -4018,7 +3987,6 @@
   "hbComponent": "Componente",
   "hbSpell": "Conjuro",
   "hbSpellPreview": "Cómo se va a ver en la ficha",
-  "hbSpellHint": "Tocá el nivel, la escuela, el tiempo de lanzamiento o un componente para ver qué implica.",
   "hbReqSpellName": "Escribí el nombre del conjuro.",
   "hbNoSchool": "Sin escuela",
   "hbRangeExample": "Alcance (p.ej. 60 pies)",
@@ -4047,7 +4015,6 @@
   "hbWhenUsed": "Cuándo se usa",
   "hbCreature": "Criatura",
   "hbCreaturePreview": "Cómo se va a ver en el Bestiario",
-  "hbCreatureHint": "Tocá el tipo, el tamaño o una acción para ver qué cambia en la mesa.",
   "hbReqCreatureName": "Escribí el nombre de la criatura.",
   "hbSpeedHint": "p.ej. 30 pies, volar 60 pies",
   "hbWillRead": "Se va a leer «{kind}».",
@@ -4143,12 +4110,10 @@
   "dmPremiseHint": "El conflicto que pone esta historia en marcha…",
   "dmNoteTitleRequired": "Poné un título para guardarla.",
   "dmChapter": "Capítulo",
-  "dmNoteTitleHelper": "Es lo que se ve en el listado y al buscar.",
   "dmChapterNameRequired": "Poné un nombre para guardarlo.",
   "dmChapterName": "Nombre del capítulo",
   "dmChapterGoal": "Objetivo del capítulo",
   "dmChapterGoalHint": "Qué debería lograr o descubrir la mesa…",
-  "dmChapterGoalHelper": "Una guía breve; el relato va en el Cuaderno.",
   "dmOnCloseCarry": "Al cerrarlo se llevan",
   "dmOneLevel": "Un nivel",
   "dmLevelUpNote": "La subida la hace cada jugador en su ficha.",
@@ -4326,7 +4291,6 @@
   "npcNewCharacterHint": "Pasa por el creador de personajes: especie, clase, niveles y dotes. El villano de un trasfondo.",
   "npcStartFromCreature": "Partir de una criatura (opcional)",
   "npcEmptyBlock": "Bloque vacío",
-  "npcFillLater": "Lo completás después.",
   "npcAcHp": "CA {ac} · PG {hp}",
   "@npcAcHp": {
     "placeholders": {
