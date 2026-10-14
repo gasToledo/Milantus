@@ -385,22 +385,27 @@ class Encounter {
     final position = _nextStandingPosition(currentIndex + 1);
     if (position == null) return this;
     final wrapped = position >= combatants.length;
-    final index = position % combatants.length;
     return Encounter(
       id: id,
       round: wrapped ? round + 1 : round,
-      turnIndex: index,
-      // Regla 2024: la criatura recupera las acciones legendarias gastadas al
-      // empezar su turno. Es lo que más se olvida en la mesa, por eso lo hace
-      // el turno y no el DM.
-      combatants: [
-        for (final (i, c) in combatants.indexed)
-          i == index && c.legendaryActionsSpent != 0
-              ? c.copyWith(legendaryActionsSpent: 0)
-              : c,
-      ],
+      turnIndex: position % combatants.length,
+      combatants: combatants,
       stage: stage,
-    );
+    )._turnStarted();
+  }
+
+  /// Lo que pasa cuando empieza el turno de [current]: por la regla 2024, la
+  /// criatura recupera las acciones legendarias gastadas. Es lo que más se
+  /// olvida en la mesa, por eso lo hace el turno y no el DM.
+  ///
+  /// Un solo paso para todo lo que le pasa el turno a alguien —[next] y
+  /// [withoutCombatant] cuando se va el del turno—: con la cuenta repetida en
+  /// cada uno, el segundo se olvidó del reinicio y el dragón arrancaba su
+  /// turno con las acciones tachadas.
+  Encounter _turnStarted() {
+    final starting = current;
+    if (starting == null || starting.legendaryActionsSpent == 0) return this;
+    return withReplaced(starting.copyWith(legendaryActionsSpent: 0));
   }
 
   /// Suma o reemplaza un combatiente (mismo [Combatant.id] = reemplazo) y
@@ -509,7 +514,7 @@ class Encounter {
         turnIndex: wraps ? 0 : removedIndex,
         combatants: next,
         stage: stage,
-      );
+      )._turnStarted();
     }
     final newIndex = currentId == null
         ? turnIndex % next.length

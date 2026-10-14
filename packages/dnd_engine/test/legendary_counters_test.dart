@@ -88,5 +88,14 @@ void main() {
       expect(deVuelta.combatants.first.legendaryActionsSpent, 0);
       expect(deVuelta.combatants.first.legendaryResistancesSpent, 2);
     });
+
+    // Visto en producción: el turno le llegaba al dragón con las acciones
+    // tachadas porque solo `next()` las reiniciaba.
+    test('también vuelven si el turno le llega porque se fue el del turno', () {
+      final enAria = mesa().next().withLegendarySpent('dragon', actions: 2);
+      final sinAria = enAria.withoutCombatant('aria');
+      expect(sinAria.current!.id, 'dragon');
+      expect(sinAria.current!.legendaryActionsSpent, 0);
+    });
   });
 }

@@ -1526,6 +1526,13 @@ class _CombatantRow extends StatelessWidget {
     CombatantKind.player => null,
   };
 
+  bool get _hasLegendary {
+    final block = _block;
+    return block != null &&
+        ((block.legendaryActionsPerRound ?? 0) > 0 ||
+            (block.legendaryResistancesPerDay ?? 0) > 0);
+  }
+
   /// Fichas compiladas de los jugadores, por identidad de personaje.
   ///
   /// Cada fila compilaba la ficha entera tres veces por build (PG, nivel y
@@ -1589,7 +1596,11 @@ class _CombatantRow extends StatelessWidget {
       active: active,
       child: AnimatedOpacity(
         duration: switchDuration,
-        opacity: acted ? .62 : 1,
+        // Una criatura con contadores legendarios no se atenúa: sus acciones
+        // se gastan justo en los turnos ajenos, después de que actuó, y
+        // atenuadas las marcas tachadas casi no se veían. «ACTUÓ» bajo la
+        // iniciativa sigue diciendo que ya jugó.
+        opacity: acted && !_hasLegendary ? .62 : 1,
         child: row,
       ),
     );
@@ -1809,11 +1820,13 @@ class _CombatantRow extends StatelessWidget {
   ///
   /// Mientras se arma no hay nada que gastar.
   Widget? _legendary(BuildContext context) {
-    final block = _block;
-    if (preparing || block == null) return null;
+    if (preparing || !_hasLegendary) return null;
+    final block = _block!;
     final actions = block.legendaryActionsPerRound ?? 0;
     final resistances = block.legendaryResistancesPerDay ?? 0;
-    if (actions == 0 && resistances == 0) return null;
+    // En la fila partida hay alto de sobra, y es la del teléfono: ahí las
+    // marcas de 28 px quedaban pegadas y se tachaba la de al lado.
+    final size = columns ? 28.0 : 40.0;
     final l10n = context.l10n;
     return Padding(
       padding: const EdgeInsets.only(top: 2),
@@ -1826,6 +1839,7 @@ class _CombatantRow extends StatelessWidget {
               max: actions,
               spent: combatant.legendaryActionsSpent,
               diamond: false,
+              size: size,
               onChanged: (v) => onSetLegendary(actions: v),
             ),
           if (resistances > 0)
@@ -1834,6 +1848,7 @@ class _CombatantRow extends StatelessWidget {
               max: resistances,
               spent: combatant.legendaryResistancesSpent,
               diamond: true,
+              size: size,
               onChanged: (v) => onSetLegendary(resistances: v),
             ),
         ],
@@ -2145,6 +2160,9 @@ class _LegendaryPips extends StatelessWidget {
   /// Rombos para las resistencias, círculos para las acciones: se distinguen
   /// sin leer el rótulo, que en la planilla no entra.
   final bool diamond;
+
+  /// El lado del área tocable de cada marca; la marca dibujada no cambia.
+  final double size;
   final ValueChanged<int> onChanged;
 
   const _LegendaryPips({
@@ -2152,6 +2170,7 @@ class _LegendaryPips extends StatelessWidget {
     required this.max,
     required this.spent,
     required this.diamond,
+    required this.size,
     required this.onChanged,
   });
 
@@ -2169,10 +2188,10 @@ class _LegendaryPips extends StatelessWidget {
               checked: i < spent,
               child: InkResponse(
                 onTap: () => onChanged(i < spent ? i : i + 1),
-                radius: 16,
+                radius: size / 2 + 2,
                 child: SizedBox(
-                  width: 28,
-                  height: 28,
+                  width: size,
+                  height: size,
                   child: Center(
                     child: Transform.rotate(
                       angle: diamond ? math.pi / 4 : 0,
