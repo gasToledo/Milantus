@@ -46,6 +46,7 @@ class _ShareCharacterDialogState extends State<_ShareCharacterDialog> {
   ShareCode? _code;
   List<CharacterShare>? _shares;
   bool _generating = false;
+  bool _copied = false;
   String? _error;
 
   @override
@@ -204,13 +205,24 @@ class _ShareCharacterDialogState extends State<_ShareCharacterDialog> {
             ),
             TextButton.icon(
               onPressed: () async {
-                await Clipboard.setData(ClipboardData(text: code.code));
-                if (context.mounted) {
-                  showAppMessage(context, context.l10n.shareCopied);
+                // El aviso va en el propio botón y no en un SnackBar: ese queda
+                // en el Scaffold de abajo, tapado por el diálogo, y el usuario
+                // no se enteraba de si había copiado. Y el navegador puede
+                // negar el portapapeles (Safari en iOS, por ejemplo): sin el
+                // catch, el botón fallaba en silencio.
+                try {
+                  await Clipboard.setData(ClipboardData(text: code.code));
+                  if (mounted) setState(() => _copied = true);
+                } catch (_) {
+                  if (mounted) {
+                    setState(() => _error = context.l10n.shareCopyFailed);
+                  }
                 }
               },
-              icon: const Icon(Icons.copy, size: 16),
-              label: Text(context.l10n.commonCopy),
+              icon: Icon(_copied ? Icons.check : Icons.copy, size: 16),
+              label: Text(
+                _copied ? context.l10n.shareCopied : context.l10n.commonCopy,
+              ),
             ),
           ],
         ),

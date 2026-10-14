@@ -3397,6 +3397,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get luRollAgain => 'Roll again';
 
   @override
+  String get luRolledByHand => 'Already rolled? Pick what you got:';
+
+  @override
   String get luChosenEarlier => 'Chosen at earlier levels';
 
   @override
@@ -5358,6 +5361,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shareCopied => 'Code copied.';
+
+  @override
+  String get shareCopyFailed =>
+      'Your browser blocked copying. Press and hold the code to copy it.';
 
   @override
   String get commonCopy => 'Copy';

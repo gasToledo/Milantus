@@ -321,6 +321,37 @@ void main() {
     expect(button.onPressed, isNotNull);
   });
 
+  // Quien ya tiró con dados de verdad no tiene que repetir hasta coincidir.
+  testWidgets('una tirada hecha en la mesa se anota eligiendo el número', (
+    tester,
+  ) async {
+    final caras = repo.characterClass('fighter')!.hitDie;
+    await tester.pumpWidget(
+      localizedApp(
+        theme: AppTheme.dark,
+        home: LevelUpScreen(character: fighterL3(), repo: repo, onDone: (_) {}),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Continuar'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Tirar'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ChoiceChip), findsNWidgets(caras));
+    await tester.ensureVisible(find.widgetWithText(ChoiceChip, '$caras'));
+    await tester.tap(find.widgetWithText(ChoiceChip, '$caras'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('+$caras del dado'), findsOneWidget);
+    final button = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, 'Continuar'),
+    );
+    expect(button.onPressed, isNotNull);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('la revisión confirma recién al final y abre la celebración', (
     tester,
   ) async {

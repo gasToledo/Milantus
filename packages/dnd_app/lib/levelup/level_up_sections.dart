@@ -422,6 +422,29 @@ extension _LevelUpSections on _LevelUpScreenState {
                       ),
                     ),
                   ),
+                  // Quien ya tiró en la mesa, con dados de verdad, anota el
+                  // resultado en vez de repetir hasta que la app coincida.
+                  const SizedBox(height: 12),
+                  Text(
+                    context.l10n.luRolledByHand,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: context.palette.textMuted,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: [
+                      for (var v = 1; v <= _hitDie; v++)
+                        ChoiceChip(
+                          label: Text('$v'),
+                          selected: _rolledHp == v,
+                          onSelected: (_) => _updateState(() => _rolledHp = v),
+                        ),
+                    ],
+                  ),
                 ],
               ],
             );

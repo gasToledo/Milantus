@@ -3396,6 +3396,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get luRollAgain => 'Volver a tirar';
 
   @override
+  String get luRolledByHand => '¿Ya tiraste? Elegí lo que sacaste:';
+
+  @override
   String get luChosenEarlier => 'Elegidos en niveles anteriores';
 
   @override
@@ -5360,6 +5363,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get shareCopied => 'Código copiado.';
+
+  @override
+  String get shareCopyFailed =>
+      'El navegador no dejó copiar. Mantené apretado el código para copiarlo.';
 
   @override
   String get commonCopy => 'Copiar';

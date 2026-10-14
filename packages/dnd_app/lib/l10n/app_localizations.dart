@@ -5449,6 +5449,12 @@ abstract class AppLocalizations {
   /// **'Volver a tirar'**
   String get luRollAgain;
 
+  /// No description provided for @luRolledByHand.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Ya tiraste? Elegí lo que sacaste:'**
+  String get luRolledByHand;
+
   /// No description provided for @luChosenEarlier.
   ///
   /// In es, this message translates to:
@@ -8778,6 +8784,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Código copiado.'**
   String get shareCopied;
+
+  /// No description provided for @shareCopyFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'El navegador no dejó copiar. Mantené apretado el código para copiarlo.'**
+  String get shareCopyFailed;
 
   /// No description provided for @commonCopy.
   ///

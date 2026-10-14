@@ -2447,6 +2447,56 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    // Regresión: el aviso de «copiado» caía en un SnackBar tapado por el
+    // diálogo, y si el navegador negaba el portapapeles no se decía nada.
+    testWidgets('copiar el código avisa en el botón, y si falla lo dice', (
+      tester,
+    ) async {
+      final sagan = demoSagan();
+      final server = FakeApiServer();
+      server.characters[sagan.id] = sagan;
+      String? copiado;
+      var falla = false;
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        (call) async {
+          if (call.method != 'Clipboard.setData') return null;
+          if (falla) throw PlatformException(code: 'negado');
+          copiado = (call.arguments as Map)['text'] as String;
+          return null;
+        },
+      );
+      addTearDown(
+        () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          SystemChannels.platform,
+          null,
+        ),
+      );
+      await pumpSheet(tester, sagan, server: server);
+      await openCampana(tester);
+      await tester.tap(find.widgetWithText(OutlinedButton, 'Compartir'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Generar código'));
+      await tester.pumpAndSettle();
+
+      final codigo = tester
+          .widget<SelectableText>(find.byKey(const ValueKey('share-code')))
+          .data;
+      await tester.tap(find.text('Copiar'));
+      await tester.pumpAndSettle();
+      expect(copiado, codigo);
+      expect(find.text('Código copiado.'), findsOneWidget);
+
+      falla = true;
+      await tester.tap(find.text('Código copiado.'));
+      await tester.pumpAndSettle();
+      expect(
+        find.textContaining('El navegador no dejó copiar'),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+    });
+
     // Regresión: `sheetCard` plegaba por título, así que dos campañas apiladas
     // tenían dos tarjetas «Batallas» que se plegaban juntas.
     testWidgets('dos campañas se apilan y se pliegan por separado', (
