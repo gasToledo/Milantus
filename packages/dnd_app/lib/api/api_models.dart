@@ -149,15 +149,60 @@ class UserEvent {
 /// El Cuaderno de campaña tal como lo devuelve el servidor: las dos mitades
 /// juntas.
 ///
-/// [notes] las escribe el DM y se editan; [encounterLogs] las escribe la app al
-/// cerrar un combate y no se tocan. La pantalla las intercala por capítulo.
+/// [notes] las escribe el DM y se editan; [encounterLogs] y [levelUps] las
+/// escribe el servidor y no se tocan. La pantalla las intercala por capítulo.
 class Notebook {
   final List<Note> notes;
   final List<EncounterLog> encounterLogs;
+  final List<LevelUpEntry> levelUps;
 
-  const Notebook({this.notes = const [], this.encounterLogs = const []});
+  const Notebook({
+    this.notes = const [],
+    this.encounterLogs = const [],
+    this.levelUps = const [],
+  });
 
-  bool get isEmpty => notes.isEmpty && encounterLogs.isEmpty;
+  bool get isEmpty =>
+      notes.isEmpty && encounterLogs.isEmpty && levelUps.isEmpty;
+}
+
+/// Un nivel que ganó un personaje vinculado, anotado por el servidor cuando el
+/// jugador guardó la ficha. Una fila por nivel: subir dos de golpe deja dos.
+///
+/// Sin `schemaVersion`: no es un documento de nadie que haya que migrar, es
+/// una fila de transporte como [UserEvent].
+class LevelUpEntry {
+  final String id;
+
+  /// El capítulo en marcha cuando se guardó, o null si no había ninguno.
+  final String? chapterId;
+  final String characterName;
+  final int level;
+  final String classId;
+
+  /// Nivel en [classId] después de subir: «Pícaro 3» en un personaje de nivel 5.
+  final int classLevel;
+  final DateTime? at;
+
+  const LevelUpEntry({
+    required this.id,
+    this.chapterId,
+    required this.characterName,
+    required this.level,
+    required this.classId,
+    required this.classLevel,
+    this.at,
+  });
+
+  factory LevelUpEntry.fromJson(Map<String, dynamic> json) => LevelUpEntry(
+    id: '${json['id']}',
+    chapterId: json['chapterId'] as String?,
+    characterName: json['characterName'] as String? ?? '',
+    level: (json['level'] as num?)?.toInt() ?? 0,
+    classId: json['classId'] as String? ?? '',
+    classLevel: (json['classLevel'] as num?)?.toInt() ?? 0,
+    at: DateTime.tryParse(json['at'] as String? ?? ''),
+  );
 }
 
 /// Una campaña vista desde la ficha del jugador, tal como la devuelve

@@ -19,6 +19,7 @@ import 'fakes/in_memory_character_repository.dart';
 import 'fakes/in_memory_encounter_repository.dart';
 import 'fakes/in_memory_event_repository.dart';
 import 'fakes/in_memory_homebrew_repository.dart';
+import 'fakes/in_memory_level_up_repository.dart';
 import 'fakes/in_memory_note_repository.dart';
 import 'fakes/in_memory_npc_repository.dart';
 import 'fakes/in_memory_portrait_blob_store.dart';
@@ -52,6 +53,7 @@ void main() {
     final events = InMemoryEventRepository();
     npcs = InMemoryNpcRepository(campaigns, characters);
     homebrew = InMemoryHomebrewRepository();
+    final levelUps = InMemoryLevelUpRepository(campaigns);
     handler = buildHandler(
       auth: fakeAuth.dependencies,
       portraits: portraits,
@@ -76,8 +78,10 @@ void main() {
         npcs: npcs,
         encounters: encounters,
         homebrew: homebrew,
+        levelUps: levelUps,
       ),
       homebrew: homebrew,
+      levelUps: levelUps,
       settings: InMemorySettingsRepository(),
     );
   });

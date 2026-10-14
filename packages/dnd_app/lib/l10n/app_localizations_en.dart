@@ -5568,7 +5568,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dmNoChapter => 'No chapter';
 
   @override
-  String get dmLooseFights => 'Combats played with no chapter underway.';
+  String get dmLooseFights => 'What happened with no chapter underway.';
 
   @override
   String get dmDeleteNote => 'Delete note';
@@ -5617,6 +5617,22 @@ class AppLocalizationsEn extends AppLocalizations {
       one: '1 combat',
     );
     return '$_temp0';
+  }
+
+  @override
+  String dmLevelUpsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count level ups',
+      one: '1 level up',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dmLevelUpTitle(String name, int level) {
+    return '$name reached level $level';
   }
 
   @override

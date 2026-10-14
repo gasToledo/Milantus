@@ -539,8 +539,8 @@ class ApiClient {
             '${Uri.encodeComponent(memberId)}/heroic-inspiration',
       );
 
-  /// El Cuaderno de campaña entero: las notas del DM y los combates ya
-  /// cerrados.
+  /// El Cuaderno de campaña entero: las notas del DM, los combates ya
+  /// cerrados y las subidas de nivel de los personajes vinculados.
   ///
   /// Viene en un solo viaje porque la pantalla los intercala dentro de cada
   /// capítulo: pedirlos por separado la obligaría a esperar dos respuestas para
@@ -559,6 +559,12 @@ class ApiClient {
       encounterLogs: [
         for (final json in body['encounterLogs'] as List)
           EncounterLog.fromJson((json as Map).cast<String, dynamic>()),
+      ],
+      // Un servidor anterior a las subidas de nivel no manda la clave: se lee
+      // como que no hubo ninguna, no como un error.
+      levelUps: [
+        for (final json in body['levelUps'] as List? ?? const [])
+          LevelUpEntry.fromJson((json as Map).cast<String, dynamic>()),
       ],
     );
   }

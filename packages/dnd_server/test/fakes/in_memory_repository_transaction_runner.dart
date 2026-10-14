@@ -6,6 +6,7 @@ import 'in_memory_character_repository.dart';
 import 'in_memory_encounter_repository.dart';
 import 'in_memory_event_repository.dart';
 import 'in_memory_homebrew_repository.dart';
+import 'in_memory_level_up_repository.dart';
 import 'in_memory_npc_repository.dart';
 
 class InMemoryRepositoryTransactionRunner
@@ -17,6 +18,7 @@ class InMemoryRepositoryTransactionRunner
   final InMemoryNpcRepository npcs;
   final InMemoryEncounterRepository encounters;
   final InMemoryHomebrewRepository homebrew;
+  final InMemoryLevelUpRepository levelUps;
   int runCount = 0;
 
   InMemoryRepositoryTransactionRunner({
@@ -27,6 +29,7 @@ class InMemoryRepositoryTransactionRunner
     required this.npcs,
     required this.encounters,
     required this.homebrew,
+    required this.levelUps,
   });
 
   @override
@@ -41,6 +44,7 @@ class InMemoryRepositoryTransactionRunner
     final npcSnapshot = npcs.snapshot();
     final encounterSnapshot = encounters.snapshot();
     final homebrewSnapshot = homebrew.snapshot();
+    final levelUpSnapshot = levelUps.snapshot();
     try {
       return await operation(
         TransactionRepositories(
@@ -51,6 +55,7 @@ class InMemoryRepositoryTransactionRunner
           npcs: npcs,
           encounters: encounters,
           homebrew: homebrew,
+          levelUps: levelUps,
         ),
       );
     } catch (_) {
@@ -61,6 +66,7 @@ class InMemoryRepositoryTransactionRunner
       npcs.restore(npcSnapshot);
       encounters.restore(encounterSnapshot);
       homebrew.restore(homebrewSnapshot);
+      levelUps.restore(levelUpSnapshot);
       rethrow;
     }
   }

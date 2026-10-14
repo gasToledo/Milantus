@@ -648,7 +648,8 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Nuevo
 
-- Sin cambios.
+- El Cuaderno de campaña muestra cuándo un personaje vinculado subió de nivel:
+  quién, a qué nivel y en qué clase, dentro del capítulo en marcha.
 
 ### Modificado
 

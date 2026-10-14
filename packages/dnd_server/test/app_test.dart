@@ -23,6 +23,7 @@ import 'fakes/in_memory_character_repository.dart';
 import 'fakes/in_memory_encounter_repository.dart';
 import 'fakes/in_memory_event_repository.dart';
 import 'fakes/in_memory_homebrew_repository.dart';
+import 'fakes/in_memory_level_up_repository.dart';
 import 'fakes/in_memory_portrait_blob_store.dart';
 import 'fakes/in_memory_repository_transaction_runner.dart';
 import 'fakes/in_memory_settings_repository.dart';
@@ -69,6 +70,7 @@ void main() {
   late InMemoryNpcRepository npcs;
   late InMemoryRepositoryTransactionRunner transactions;
   late InMemoryHomebrewRepository homebrewRepo;
+  late InMemoryLevelUpRepository levelUps;
   late InMemorySettingsRepository settingsRepo;
   late Handler handler;
 
@@ -91,6 +93,7 @@ void main() {
     events = InMemoryEventRepository();
     npcs = InMemoryNpcRepository(campaigns, characters);
     homebrewRepo = InMemoryHomebrewRepository();
+    levelUps = InMemoryLevelUpRepository(campaigns);
     transactions = InMemoryRepositoryTransactionRunner(
       characters: characters,
       campaigns: campaigns,
@@ -99,6 +102,7 @@ void main() {
       npcs: npcs,
       encounters: encounters,
       homebrew: homebrewRepo,
+      levelUps: levelUps,
     );
     importHomebrew = ({required userId, required content}) async {
       var count = 0;
@@ -131,6 +135,7 @@ void main() {
       npcs: npcs,
       transactions: transactions,
       homebrew: homebrewRepo,
+      levelUps: levelUps,
       settings: settingsRepo,
     );
   });
@@ -839,6 +844,7 @@ void main() {
           npcs: npcs,
           transactions: transactions,
           homebrew: homebrewRepo,
+          levelUps: levelUps,
           settings: settingsRepo,
         );
         final token = await _login('subject-gen-3');
@@ -891,6 +897,7 @@ void main() {
           npcs: npcs,
           transactions: transactions,
           homebrew: homebrewRepo,
+          levelUps: levelUps,
           settings: settingsRepo,
         );
         final token = await _login('subject-gen-count');
@@ -973,6 +980,7 @@ void main() {
         npcs: npcs,
         transactions: transactions,
         homebrew: homebrewRepo,
+        levelUps: levelUps,
         settings: settingsRepo,
       );
       fakeAuth.nextVerifiedSubject = 'subject-upload-no-providers';
@@ -1043,6 +1051,7 @@ void main() {
         npcs: npcs,
         transactions: transactions,
         homebrew: homebrewRepo,
+        levelUps: levelUps,
         settings: settingsRepo,
       );
 
@@ -1113,6 +1122,7 @@ void main() {
         npcs: npcs,
         transactions: transactions,
         homebrew: homebrewRepo,
+        levelUps: levelUps,
         settings: settingsRepo,
       );
 
@@ -1867,6 +1877,7 @@ void main() {
         npcs: npcs,
         transactions: transactions,
         homebrew: homebrewRepo,
+        levelUps: levelUps,
         settings: settingsRepo,
         webStaticHandler: (request) =>
             Response.ok('build web', headers: {'x-fuente': 'estatico'}),
@@ -1896,6 +1907,7 @@ void main() {
         npcs: npcs,
         transactions: transactions,
         homebrew: homebrewRepo,
+        levelUps: levelUps,
         settings: settingsRepo,
         webStaticHandler: (request) =>
             Response.ok('build web', headers: {'x-fuente': 'estatico'}),
@@ -1927,6 +1939,7 @@ void main() {
         npcs: npcs,
         transactions: transactions,
         homebrew: homebrewRepo,
+        levelUps: levelUps,
         settings: settingsRepo,
         webStaticHandler: (request) =>
             Response.ok('build web', headers: {'x-fuente': 'estatico'}),
@@ -3568,6 +3581,163 @@ void main() {
         );
 
         expect((await notebook(token, 'tumba'))['encounterLogs'], isEmpty);
+      });
+
+      // La subida se registra cuando el jugador la anota en su ficha, no
+      // cuando el DM la otorga: es lo único que dice que efectivamente pasó.
+      group('subidas de nivel', () {
+        /// Sagan (guerrero 1) vinculado a «tumba». Con [chapterState], la
+        /// campaña tiene además el capítulo «cripta» en ese estado.
+        Future<({String owner, String dm})> linkedTable(
+          String suffix, {
+          String? chapterState,
+        }) async {
+          final owner = await login('nivel-jugador-$suffix');
+          final code = await shareCharacter(owner, 'sagan');
+          final dm = await login('nivel-dm-$suffix');
+          await createCampaign(dm, 'tumba');
+          await send(
+            'POST',
+            '/api/campaigns/tumba/members',
+            token: dm,
+            body: {'code': code},
+          );
+          if (chapterState != null) {
+            await send(
+              'POST',
+              '/api/campaigns/tumba/chapters',
+              token: dm,
+              body: {
+                'chapter': {
+                  'schemaVersion': 1,
+                  'id': 'cripta',
+                  'name': 'La Cripta',
+                  'summary': '',
+                  'state': chapterState,
+                  'grantsLevel': false,
+                },
+              },
+            );
+          }
+          return (owner: owner, dm: dm);
+        }
+
+        Future<Map<String, dynamic>> saveSheet(
+          String owner,
+          List<String> classHistory,
+        ) => send(
+          'PUT',
+          '/api/characters/sagan',
+          token: owner,
+          body: {
+            'character': {
+              ...characterJson('sagan'),
+              'classHistory': classHistory,
+            },
+          },
+        );
+
+        Future<List<dynamic>> levelUpsOf(String dm) async =>
+            (await notebook(dm, 'tumba'))['levelUps'] as List;
+
+        test('subir un nivel lo anota en el capítulo en marcha', () async {
+          final t = await linkedTable('uno', chapterState: 'active');
+
+          expect(
+            (await saveSheet(t.owner, ['fighter', 'fighter']))['status'],
+            200,
+          );
+
+          final entry = (await levelUpsOf(t.dm)).single as Map;
+          expect(entry['id'], isA<String>());
+          expect(entry['chapterId'], 'cripta');
+          expect(entry['characterName'], 'Sagan');
+          expect(entry['level'], 2);
+          expect(entry['classId'], 'fighter');
+          expect(entry['classLevel'], 2);
+          expect(DateTime.parse(entry['at'] as String).isUtc, isTrue);
+
+          // Borrar el capítulo no deshace la subida: ya pasó.
+          await send(
+            'DELETE',
+            '/api/campaigns/tumba/chapters/cripta',
+            token: t.dm,
+          );
+          expect(await levelUpsOf(t.dm), hasLength(1));
+        });
+
+        test(
+          'subir dos niveles en un guardado deja una entrada por nivel',
+          () async {
+            final t = await linkedTable('dos', chapterState: 'active');
+
+            await saveSheet(t.owner, ['fighter', 'fighter', 'rogue']);
+
+            // De la más nueva a la más vieja, y cada una con la clase que
+            // ganó ese nivel: la multiclase no se aplana en la clase inicial.
+            final entries = await levelUpsOf(t.dm);
+            expect([for (final e in entries) e['level']], [3, 2]);
+            expect(
+              [for (final e in entries) e['classId']],
+              ['rogue', 'fighter'],
+            );
+            expect([for (final e in entries) e['classLevel']], [1, 2]);
+          },
+        );
+
+        test('guardar sin subir de nivel no anota nada', () async {
+          final t = await linkedTable('igual', chapterState: 'active');
+
+          await saveSheet(t.owner, ['fighter']);
+          expect(await levelUpsOf(t.dm), isEmpty);
+
+          await saveSheet(t.owner, ['fighter', 'fighter']);
+          await saveSheet(t.owner, ['fighter', 'fighter']);
+          // Bajar tampoco anota, ni borra lo que ya estaba.
+          await saveSheet(t.owner, ['fighter']);
+          expect(await levelUpsOf(t.dm), hasLength(1));
+        });
+
+        test('sin capítulo en marcha la entrada no lleva capítulo', () async {
+          final t = await linkedTable('sin-cap', chapterState: 'planned');
+
+          await saveSheet(t.owner, ['fighter', 'fighter']);
+
+          final entry = (await levelUpsOf(t.dm)).single as Map;
+          expect(entry.containsKey('chapterId'), isFalse);
+          expect(entry['level'], 2);
+        });
+
+        test('un personaje sin vincular no anota en ninguna campaña', () async {
+          final owner = await login('nivel-suelto-jugador');
+          await shareCharacter(owner, 'sagan');
+          final dm = await login('nivel-suelto-dm');
+          await createCampaign(dm, 'tumba');
+
+          await saveSheet(owner, ['fighter', 'fighter']);
+
+          expect(await levelUpsOf(dm), isEmpty);
+        });
+
+        // Lo ajeno y lo inexistente responden igual; y el «tumba» de otra
+        // cuenta es otra campaña, con su propio cuaderno vacío.
+        test('otro DM no ve las subidas de esta campaña', () async {
+          final t = await linkedTable('ajeno', chapterState: 'active');
+          await saveSheet(t.owner, ['fighter', 'fighter']);
+          final other = await login('nivel-otro-dm');
+
+          expect(
+            (await send(
+              'GET',
+              '/api/campaigns/tumba/notebook',
+              token: other,
+            ))['status'],
+            404,
+          );
+          await createCampaign(other, 'tumba');
+          expect(await levelUpsOf(other), isEmpty);
+          expect(await levelUpsOf(t.dm), hasLength(1));
+        });
       });
     });
 

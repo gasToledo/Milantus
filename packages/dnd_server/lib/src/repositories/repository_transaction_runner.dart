@@ -6,6 +6,7 @@ import 'character_repository.dart';
 import 'encounter_repository.dart';
 import 'event_repository.dart';
 import 'homebrew_repository.dart';
+import 'level_up_repository.dart';
 import 'npc_repository.dart';
 
 class TransactionRepositories {
@@ -27,6 +28,11 @@ class TransactionRepositories {
   /// su ficha, y un PNJ importado sin ese contenido no abriría.
   final HomebrewRepository homebrew;
 
+  /// Las subidas de nivel entran porque se registran al guardar la ficha: una
+  /// ficha guardada sin su registro dejaría el cuaderno sin esa subida para
+  /// siempre, porque el próximo guardado ya no ve diferencia de nivel.
+  final LevelUpRepository levelUps;
+
   const TransactionRepositories({
     required this.characters,
     required this.campaigns,
@@ -35,6 +41,7 @@ class TransactionRepositories {
     required this.npcs,
     required this.encounters,
     required this.homebrew,
+    required this.levelUps,
   });
 }
 
@@ -63,6 +70,7 @@ class PostgresRepositoryTransactionRunner
         npcs: PostgresNpcRepository(session),
         encounters: PostgresEncounterRepository(session),
         homebrew: PostgresHomebrewRepository(session),
+        levelUps: PostgresLevelUpRepository(session),
       ),
     ),
   );

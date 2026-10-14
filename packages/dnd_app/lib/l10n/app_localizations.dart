@@ -9136,7 +9136,7 @@ abstract class AppLocalizations {
   /// No description provided for @dmLooseFights.
   ///
   /// In es, this message translates to:
-  /// **'Combates que se jugaron sin ningún capítulo en marcha.'**
+  /// **'Lo que pasó sin ningún capítulo en marcha.'**
   String get dmLooseFights;
 
   /// No description provided for @dmDeleteNote.
@@ -9192,6 +9192,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'{count, plural, =1{1 combate} other{{count} combates}}'**
   String dmFightsCount(int count);
+
+  /// No description provided for @dmLevelUpsCount.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 subida de nivel} other{{count} subidas de nivel}}'**
+  String dmLevelUpsCount(int count);
+
+  /// No description provided for @dmLevelUpTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'{name} subió a nivel {level}'**
+  String dmLevelUpTitle(String name, int level);
 
   /// No description provided for @dmNoteActions.
   ///

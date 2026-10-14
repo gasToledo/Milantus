@@ -2138,6 +2138,51 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    // La subida de nivel la anota el servidor cuando el jugador guarda la
+    // ficha: el DM no escribe nada y tampoco la puede corregir.
+    testWidgets('una subida de nivel del jugador aparece como entrada', (
+      tester,
+    ) async {
+      final server = await pumpDmMode(
+        tester,
+        seed: (s) {
+          seedChapter(s);
+          s.campaignMembers['m1'] = (campaignId: 'tumba', characterId: 'sagan');
+          final before = s.characters['sagan']!;
+          // Dos niveles de un saque, el segundo en otra clase: una fila por
+          // nivel, cada una con el nivel en su clase. Se guarda por la API,
+          // como lo haría la ficha del jugador; la respuesta llega antes que
+          // la carga del cuaderno porque se pidió antes.
+          unawaited(
+            ApiClient(client: s.client).upsertCharacter(
+              Character(
+                id: before.id,
+                name: before.name,
+                raceId: before.raceId,
+                classId: 'fighter',
+                backgroundId: before.backgroundId,
+                classHistory: const ['fighter', 'fighter', 'rogue'],
+                assignedScores: before.assignedScores,
+              ),
+            ),
+          );
+        },
+      );
+      expect(server.levelUps['tumba'], hasLength(2));
+      await openCuaderno(tester);
+
+      final fighter = repo.characterClass('fighter')!.name;
+      final rogue = repo.characterClass('rogue')!.name;
+      expect(find.text('Sagan subió a nivel 2'), findsOneWidget);
+      expect(find.text('$fighter 2'), findsOneWidget);
+      expect(find.text('Sagan subió a nivel 3'), findsOneWidget);
+      expect(find.text('$rogue 1'), findsOneWidget);
+      expect(find.text('2 subidas de nivel'), findsOneWidget);
+      // No se corrige: ninguna entrada lleva el menú de editar.
+      expect(find.byTooltip('Acciones de la nota'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
     // El cuaderno es el primer lector de los combates archivados: hasta ahora
     // se grababan y no los mostraba nadie.
     testWidgets('un combate cerrado aparece como entrada', (tester) async {

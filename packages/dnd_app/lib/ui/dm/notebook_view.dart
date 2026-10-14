@@ -18,7 +18,8 @@ import 'npcs/npc_shared.dart';
 /// Adentro conviven dos clases de entrada, y la diferencia se ve sin ningún
 /// cartel que la explique:
 ///
-/// - Lo que **escribió la app** (combates cerrados) va sobre `plaque`, que en
+/// - Lo que **escribió la app** (combates cerrados y subidas de nivel de los
+///   personajes vinculados) va sobre `plaque`, que en
 ///   este sistema siempre se hunde: es el registro y no se corrige.
 /// - Lo que **escribió el DM** (las notas) va sobre `surface`, con su menú de
 ///   editar y borrar.
@@ -59,7 +60,12 @@ class NotebookView extends StatefulWidget {
 
 /// Una entrada del cuaderno, sea de la app o del DM. Existe para poder
 /// ordenarlas juntas por fecha dentro de un capítulo.
-typedef _Entry = ({DateTime? at, Note? note, EncounterLog? log});
+typedef _Entry = ({
+  DateTime? at,
+  Note? note,
+  EncounterLog? log,
+  LevelUpEntry? levelUp,
+});
 
 class _NotebookViewState extends State<NotebookView> {
   final _searchController = TextEditingController();
@@ -95,7 +101,7 @@ class _NotebookViewState extends State<NotebookView> {
       for (final note in notebook.notes)
         if (note.chapterId == chapterId &&
             (_matches(note.title) || _matches(note.body)))
-          (at: note.updatedAt, note: note, log: null),
+          (at: note.updatedAt, note: note, log: null, levelUp: null),
       // Se nombra una sola vez acá, en el idioma de la interfaz: el título,
       // el cuerpo y la búsqueda leen todos el mismo registro ya traducido.
       for (final log in [
@@ -104,7 +110,12 @@ class _NotebookViewState extends State<NotebookView> {
       ])
         if (log.chapterId == chapterId &&
             _matches(_logTitle(log, context.l10n)))
-          (at: log.endedAt, note: null, log: log),
+          (at: log.endedAt, note: null, log: log, levelUp: null),
+      for (final up in notebook.levelUps)
+        if (up.chapterId == chapterId &&
+            (_matches(up.characterName) ||
+                _matches(_levelUpTitle(up, context.l10n))))
+          (at: up.at, note: null, log: null, levelUp: up),
     ];
     entries.sort((a, b) {
       if (a.at == null || b.at == null) return a.at == null ? -1 : 1;
@@ -135,9 +146,9 @@ class _NotebookViewState extends State<NotebookView> {
     }
 
     final notebook = widget.notebook ?? const Notebook();
-    // Los combates archivados antes de que existiera el cuaderno, y los que se
-    // jugaron sin ningún capítulo en marcha, no tienen dónde colgarse. Se
-    // muestran aparte en vez de inventarles un capítulo.
+    // Los combates archivados antes de que existiera el cuaderno, y los
+    // combates y subidas de nivel sin ningún capítulo en marcha, no tienen
+    // dónde colgarse. Se muestran aparte en vez de inventarles un capítulo.
     final loose = _entriesOf(null, notebook);
 
     return ListView(
@@ -176,6 +187,7 @@ class _NotebookViewState extends State<NotebookView> {
                 key: ValueKey('notebook-chapter-${chapter.id}'),
                 chapter: chapter,
                 entries: entries,
+                repo: widget.repo,
                 expanded: _open.contains(chapter.id),
                 searching: _query.trim().isNotEmpty,
                 onToggle: () => setState(() {
@@ -201,6 +213,7 @@ class _NotebookViewState extends State<NotebookView> {
               padding: const EdgeInsets.only(bottom: 10),
               child: _EntryTile(
                 entry: entry,
+                repo: widget.repo,
                 onEdit: widget.onEditNote,
                 onDelete: (note) => _confirmDelete(context, note),
               ),
@@ -242,6 +255,14 @@ String _logTitle(EncounterLog log, AppLocalizations l10n) => log.enemies.isEmpty
     ? l10n.dmCombat
     : l10n.dmCombatAgainst(log.enemies.map((m) => m.name).join(', '));
 
+String _levelUpTitle(LevelUpEntry up, AppLocalizations l10n) =>
+    l10n.dmLevelUpTitle(up.characterName, up.level);
+
+/// «Pícaro 3»: la clase en el idioma de la interfaz. Si ya no está en el
+/// catálogo (un homebrew borrado) queda el id, que es mejor que un hueco.
+String _levelUpDetail(LevelUpEntry up, ContentRepository repo) =>
+    '${repo.characterClass(up.classId)?.name ?? up.classId} ${up.classLevel}';
+
 /// La cantidad va detrás, «Esqueleto ×2», como en el equipo. «2 Esqueleto»
 /// pedía un plural, y el nombre sale del catálogo o del homebrew: «Lobo
 /// terrible», «Guerrero goblin», «Tiranosaurio rex». Pluralizar eso con reglas
@@ -255,6 +276,7 @@ String _logNames(List<EncounterLogMonsters> group, String joiner) => [
 class _ChapterCard extends StatelessWidget {
   final Chapter chapter;
   final List<_Entry> entries;
+  final ContentRepository repo;
   final bool expanded;
 
   /// Con una búsqueda activa el capítulo se abre solo: plegado escondería
@@ -269,6 +291,7 @@ class _ChapterCard extends StatelessWidget {
     super.key,
     required this.chapter,
     required this.entries,
+    required this.repo,
     required this.expanded,
     required this.searching,
     required this.onToggle,
@@ -382,6 +405,7 @@ class _ChapterCard extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 10),
                   child: _EntryTile(
                     entry: entry,
+                    repo: repo,
                     onEdit: onEditNote,
                     onDelete: onDeleteNote,
                   ),
@@ -395,22 +419,26 @@ class _ChapterCard extends StatelessWidget {
   String _summary(AppLocalizations l10n) {
     final notes = entries.where((e) => e.note != null).length;
     final fights = entries.where((e) => e.log != null).length;
-    if (notes == 0 && fights == 0) return l10n.dmNoEntries;
+    final ups = entries.where((e) => e.levelUp != null).length;
+    if (entries.isEmpty) return l10n.dmNoEntries;
     return [
       if (notes > 0) l10n.dmNotesCount(notes),
       if (fights > 0) l10n.dmFightsCount(fights),
+      if (ups > 0) l10n.dmLevelUpsCount(ups),
     ].join(' · ');
   }
 }
 
-/// Una entrada suelta: nota del DM o combate cerrado.
+/// Una entrada suelta: nota del DM, combate cerrado o subida de nivel.
 class _EntryTile extends StatelessWidget {
   final _Entry entry;
+  final ContentRepository repo;
   final void Function(Note note) onEdit;
   final void Function(Note note) onDelete;
 
   const _EntryTile({
     required this.entry,
+    required this.repo,
     required this.onEdit,
     required this.onDelete,
   });
@@ -420,6 +448,7 @@ class _EntryTile extends StatelessWidget {
     final pal = context.palette;
     final note = entry.note;
     final log = entry.log;
+    final up = entry.levelUp;
 
     return Container(
       decoration: BoxDecoration(
@@ -439,9 +468,15 @@ class _EntryTile extends StatelessWidget {
             child: Icon(
               note != null
                   ? Icons.edit_outlined
+                  : up != null
+                  ? Icons.arrow_circle_up_outlined
                   : Icons.local_fire_department_outlined,
               size: 16,
-              color: note != null ? pal.gold : pal.crimson,
+              color: note != null
+                  ? pal.gold
+                  : up != null
+                  ? pal.verdant
+                  : pal.crimson,
             ),
           ),
           Expanded(
@@ -453,7 +488,10 @@ class _EntryTile extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        note?.title ?? _logTitle(log!, context.l10n),
+                        note?.title ??
+                            (up != null
+                                ? _levelUpTitle(up, context.l10n)
+                                : _logTitle(log!, context.l10n)),
                         style: const TextStyle(fontWeight: FontWeight.w500),
                       ),
                     ),
@@ -466,8 +504,8 @@ class _EntryTile extends StatelessWidget {
                         fontFeatures: const [FontFeature.tabularFigures()],
                       ),
                     ),
-                    // Solo lo que escribió el DM se edita. Un combate pasó y no
-                    // se corrige: no lleva menú.
+                    // Solo lo que escribió el DM se edita. Un combate o una
+                    // subida de nivel pasó y no se corrige: no lleva menú.
                     if (note != null)
                       PopupMenuButton<_NoteAction>(
                         tooltip: context.l10n.dmNoteActions,
@@ -506,7 +544,10 @@ class _EntryTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  note?.body ?? _logBody(log!, context.l10n),
+                  note?.body ??
+                      (up != null
+                          ? _levelUpDetail(up, repo)
+                          : _logBody(log!, context.l10n)),
                   style: TextStyle(
                     fontSize: 13,
                     height: 1.5,

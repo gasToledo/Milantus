@@ -24,6 +24,7 @@ import 'repositories/encounter_repository.dart';
 import 'repositories/event_repository.dart';
 import 'repositories/homebrew_repository.dart';
 import 'repositories/id_allocation.dart';
+import 'repositories/level_up_repository.dart';
 import 'repositories/note_repository.dart';
 import 'repositories/npc_repository.dart';
 import 'repositories/repository_transaction_runner.dart';
@@ -103,6 +104,7 @@ Handler buildHandler({
   required NpcRepository npcs,
   required RepositoryTransactionRunner transactions,
   required HomebrewRepository homebrew,
+  required LevelUpRepository levelUps,
   required SettingsRepository settings,
 
   /// Sirve el build web (`flutter build web`) para todo lo que el enrutado de
@@ -139,7 +141,9 @@ Handler buildHandler({
     )
     ..put(
       '/api/characters/<id>',
-      authenticated((request) => _upsertCharacterHandler(request, characters)),
+      authenticated(
+        (request) => _upsertCharacterHandler(request, transactions),
+      ),
     )
     ..delete(
       '/api/characters/<id>',
@@ -244,8 +248,13 @@ Handler buildHandler({
     ..get(
       '/api/campaigns/<id>/notebook',
       authenticated(
-        (request) =>
-            _listNotebookHandler(request, campaigns, notes, encounters),
+        (request) => _listNotebookHandler(
+          request,
+          campaigns,
+          notes,
+          encounters,
+          levelUps,
+        ),
       ),
     )
     ..post(
@@ -723,9 +732,13 @@ Future<Response> _createCharacterHandler(
 /// diferencia de la creación, no reasigna id ante colisión porque acá la
 /// colisión es justamente "es el mismo documento" (ver
 /// `CharacterRepository.upsert`).
+///
+/// Es también donde el Cuaderno de campaña se entera de que un personaje
+/// subió de nivel: acá y no al cerrar un capítulo que lo otorga, porque
+/// otorgar es un aviso y lo que cuenta es cuándo el jugador lo anotó.
 Future<Response> _upsertCharacterHandler(
   Request request,
-  CharacterRepository characters,
+  RepositoryTransactionRunner transactions,
 ) async {
   final id = requireSafePathSegment(
     request.params['id']!,
@@ -740,7 +753,49 @@ Future<Response> _upsertCharacterHandler(
   if (character.id != id) {
     throw const FormatException('El id del personaje no coincide con la ruta.');
   }
-  await characters.upsert(request.userId, character);
+  await transactions.run<void>((repositories) async {
+    // `find` solo ve fichas de jugador: la de un PNJ también se guarda por
+    // esta ruta, pero llega acá como `null` y no registra nada — igual que
+    // el primer guardado de un personaje, que no subió desde ningún lado.
+    final previous = await repositories.characters.find(request.userId, id);
+    await repositories.characters.upsert(request.userId, character);
+    if (previous == null || character.totalLevel <= previous.totalLevel) {
+      return;
+    }
+
+    // ponytail: dos guardados simultáneos de la misma subida la registrarían
+    // dos veces (`find` no bloquea la fila). Hace falta el mismo jugador
+    // guardando a la vez desde dos pestañas; si pasa, `SELECT … FOR UPDATE`.
+    final shares = await repositories.campaigns.listSharesForCharacter(
+      ownerUserId: request.userId,
+      characterId: id,
+    );
+    for (final share in shares) {
+      // El `dmUserId` no es de quien pide: sale de una fila de
+      // `campaign_members` que la consulta de arriba ya filtró por el dueño
+      // del personaje. Nunca de la petición.
+      final active = (await repositories.chapters.listFor(
+        share.dmUserId,
+        share.campaignId,
+      )).where((c) => c.state == ChapterState.active).firstOrNull;
+      for (
+        var level = previous.totalLevel + 1;
+        level <= character.totalLevel;
+        level++
+      ) {
+        final gained = character.classHistory.take(level);
+        await repositories.levelUps.append(
+          share.dmUserId,
+          share.campaignId,
+          chapterId: active?.id,
+          characterName: character.name,
+          level: level,
+          classId: gained.last,
+          classLevel: gained.where((c) => c == gained.last).length,
+        );
+      }
+    }
+  });
   return _jsonOk({'status': 'ok'});
 }
 
@@ -1211,7 +1266,8 @@ Chapter _chapterFromRequestJson(Map<String, dynamic> json) {
 /// avisos a otras cuentas, y por esta ruta un reguardado idempotente los
 /// volvería a disparar. La segunda: **un solo capítulo en marcha por campaña**,
 /// comprobado contra los que ya están guardados.
-/// Las notas del Cuaderno y los combates ya cerrados de una campaña.
+/// Las notas del Cuaderno, los combates ya cerrados y las subidas de nivel de
+/// una campaña.
 ///
 /// Van juntos en una respuesta y no en dos rutas porque el Cuaderno los
 /// intercala: pedirlos por separado obligaría a la pantalla a esperar dos
@@ -1221,6 +1277,7 @@ Future<Response> _listNotebookHandler(
   CampaignRepository campaigns,
   NoteRepository notes,
   EncounterRepository encounters,
+  LevelUpRepository levelUps,
 ) async {
   final campaignId = requireSafePathSegment(
     request.params['id']!,
@@ -1231,9 +1288,11 @@ Future<Response> _listNotebookHandler(
   }
   final all = await notes.listFor(request.userId, campaignId);
   final logs = await encounters.logsFor(request.userId, campaignId);
+  final ups = await levelUps.listFor(request.userId, campaignId);
   return _jsonOk({
     'notes': [for (final n in all) n.toJson()],
     'encounterLogs': [for (final l in logs) l.toJson()],
+    'levelUps': [for (final u in ups) u.toJson()],
   });
 }
 

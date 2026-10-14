@@ -152,6 +152,20 @@ void main() {
 
     expect(client.requests, 1);
   });
+
+  // Un servidor anterior a las subidas de nivel no manda la clave: el cuaderno
+  // tiene que abrir igual, no romper.
+  test('un cuaderno sin levelUps se lee como ninguna subida', () async {
+    final api = ApiClient(
+      client: _ControlledClient(
+        (_) async => _jsonResponse({'notes': [], 'encounterLogs': []}),
+      ),
+    );
+
+    final notebook = await api.loadNotebook('tumba');
+
+    expect(notebook.levelUps, isEmpty);
+  });
 }
 
 class _ControlledClient extends http.BaseClient {

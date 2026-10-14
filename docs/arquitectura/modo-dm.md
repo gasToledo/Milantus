@@ -190,6 +190,14 @@ capítulo entero — no hay nada que un DM pueda arreglar leyendo ese error.
 
 Cerrar dos veces responde 200 y no vuelve a avisar.
 
+### Las subidas de nivel en el Cuaderno
+
+Lo que el DM sí ve es la subida ya hecha: cuando el jugador guarda la ficha con
+un nivel mayor que el guardado, el servidor anota una fila por nivel ganado en
+cada campaña donde está vinculado, colgada del capítulo en marcha (o de ninguno),
+y el Cuaderno la muestra como entrada de la app, sin menú. Es un registro de lo
+que pasó: si después el nivel baja, las filas no se borran.
+
 ## El combate y el turno
 
 El combat tracker (Fase 2 de Modo DM) agrega la **segunda** consulta del
@@ -199,7 +207,7 @@ tablas nuevas (migración `0007_encounters`):
 | Tabla | Para qué |
 |---|---|
 | `encounters` | El combate abierto de una campaña. Clave `(dm_user_id, campaign_id)`: no hay forma de tener dos combates abiertos a la vez en la misma mesa. |
-| `encounter_logs` | Lo que queda al cerrar uno. Se graba, no se muestra todavía — falta el Cuaderno de campaña. |
+| `encounter_logs` | Lo que queda al cerrar uno. Lo lee el Cuaderno de campaña. |
 
 Terminar un combate tiene dos salidas, y son intenciones distintas:
 `DELETE .../encounter` lo archiva en `encounter_logs`, y

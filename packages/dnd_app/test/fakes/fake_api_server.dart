@@ -65,6 +65,42 @@ class FakeApiServer {
   /// es como los devuelve el servidor real.
   final Map<String, List<EncounterLog>> encounterLogs = {};
 
+  /// Las subidas de nivel de cada campaña, por id de campaña y de la más nueva
+  /// a la más vieja, ya con la forma JSON que devuelve el servidor.
+  final Map<String, List<Map<String, dynamic>>> levelUps = {};
+  int _levelUpCounter = 0;
+
+  /// Como el servidor al guardar una ficha: una fila por nivel ganado en cada
+  /// campaña donde está vinculado, colgada del capítulo en marcha. El primer
+  /// guardado no cuenta (no hay nivel anterior) y bajar de nivel no borra nada.
+  void _recordLevelUps(String id, Character? before, Character after) {
+    if (before == null || after.totalLevel <= before.totalLevel) return;
+    for (final member in campaignMembers.values) {
+      if (member.characterId != id) continue;
+      final active = (chapters[member.campaignId] ?? const <Chapter>[])
+          .where((c) => c.state == ChapterState.active)
+          .firstOrNull;
+      final list = levelUps.putIfAbsent(member.campaignId, () => []);
+      for (
+        var level = before.totalLevel + 1;
+        level <= after.totalLevel;
+        level++
+      ) {
+        final history = after.classHistory.take(level);
+        final classId = after.classHistory[level - 1];
+        list.insert(0, {
+          'id': '${_levelUpCounter++}',
+          if (active != null) 'chapterId': active.id,
+          'characterName': after.name,
+          'level': level,
+          'classId': classId,
+          'classLevel': history.where((c) => c == classId).length,
+          'at': DateTime.now().toUtc().toIso8601String(),
+        });
+      }
+    }
+  }
+
   /// Códigos emitidos y todavía sin canjear, por el id del personaje.
   final Map<String, String> shareCodes = {};
 
@@ -213,6 +249,7 @@ class FakeApiServer {
       upsertCharacterCalls++;
       final id = _segment(path, '/api/characters/');
       final character = _characterFrom(_body(request)['character']);
+      _recordLevelUps(id, characters[id], character);
       characters[id] = character;
       _stampCreated(id);
       return _json({'status': 'ok'});
@@ -556,6 +593,7 @@ class FakeApiServer {
             for (final l in encounterLogs[campaignId] ?? const <EncounterLog>[])
               l.toJson(),
           ],
+          'levelUps': levelUps[campaignId] ?? const [],
         });
       }
 

@@ -388,4 +388,40 @@ ALTER TABLE campaign_npcs
   ADD COLUMN current_hp INTEGER CHECK (current_hp >= 0);
 ''',
   ),
+  Migration(
+    id: '0012_level_up_logs',
+    sql: '''
+-- Cuándo un personaje vinculado **efectivamente** subió de nivel: lo graba el
+-- servidor al guardar la ficha del jugador, no el DM al cerrar un capítulo que
+-- lo otorga — otorgar es un aviso, y el jugador puede tardar o no subir nunca.
+-- Una fila por nivel ganado y por campaña del personaje.
+--
+-- Mismas foráneas que `encounter_logs`, y por el mismo motivo: borrar la
+-- campaña se lleva el registro, pero borrar un capítulo no, porque la subida
+-- ya pasó. Por eso `chapter_id` es nullable y sin clave foránea.
+--
+-- Columnas y no un documento: no hay nada que migrar en lo que pasó, y el
+-- nombre se copia ahora para que renombrar al personaje después no reescriba
+-- lo que dice el cuaderno.
+--
+-- El id es una secuencia y no un UUID porque también desempata el orden: dos
+-- niveles ganados en un mismo guardado comparten `created_at`.
+CREATE TABLE level_up_logs (
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  dm_user_id UUID NOT NULL,
+  campaign_id TEXT NOT NULL,
+  chapter_id TEXT,
+  character_name TEXT NOT NULL,
+  level INTEGER NOT NULL,
+  class_id TEXT NOT NULL,
+  class_level INTEGER NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  FOREIGN KEY (dm_user_id, campaign_id)
+    REFERENCES campaigns (dm_user_id, id) ON DELETE CASCADE
+);
+
+CREATE INDEX level_up_logs_campaign_idx
+  ON level_up_logs (dm_user_id, campaign_id, created_at DESC);
+''',
+  ),
 ];

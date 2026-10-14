@@ -4488,7 +4488,7 @@
   "dmNotebookNeedsChapter": "El cuaderno se ordena por capítulo, así que primero hay que crear uno. Desde Capítulos.",
   "dmSearchNotebook": "Buscar en el cuaderno",
   "dmNoChapter": "Sin capítulo",
-  "dmLooseFights": "Combates que se jugaron sin ningún capítulo en marcha.",
+  "dmLooseFights": "Lo que pasó sin ningún capítulo en marcha.",
   "dmDeleteNote": "Borrar nota",
   "dmDeleteNoteBody": "Se borra «{title}» y no se puede deshacer.",
   "@dmDeleteNoteBody": {
@@ -4529,6 +4529,25 @@
   "@dmFightsCount": {
     "placeholders": {
       "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dmLevelUpsCount": "{count, plural, =1{1 subida de nivel} other{{count} subidas de nivel}}",
+  "@dmLevelUpsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dmLevelUpTitle": "{name} subió a nivel {level}",
+  "@dmLevelUpTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "level": {
         "type": "int"
       }
     }
