@@ -1504,6 +1504,18 @@ class _CampaignDetailState extends State<_CampaignDetail> {
   void _setCombatantTags(String combatantId, List<String> tags) =>
       _saveEncounter((current) => current?.withTags(combatantId, tags));
 
+  void _setCombatantLegendary(
+    String combatantId, {
+    int? actions,
+    int? resistances,
+  }) => _saveEncounter(
+    (current) => current?.withLegendarySpent(
+      combatantId,
+      actions: actions,
+      resistances: resistances,
+    ),
+  );
+
   /// `withCombatant` con el mismo id reemplaza y reordena, y el turno sigue en
   /// quien lo tenía.
   ///
@@ -1790,6 +1802,7 @@ class _CampaignDetailState extends State<_CampaignDetail> {
               onAdjustHp: _adjustCombatantHp,
               onRemoveCombatant: _removeCombatant,
               onSetTags: _setCombatantTags,
+              onSetLegendary: _setCombatantLegendary,
               onSetInitiative: _setCombatantInitiative,
               onCloseEncounter: _closeEncounter,
             ),

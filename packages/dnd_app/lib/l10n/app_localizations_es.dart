@@ -6328,6 +6328,17 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get encLegendaryActions => 'Acciones legendarias';
+
+  @override
+  String get encLegendaryResistances => 'Resistencias legendarias';
+
+  @override
+  String encLegendaryPip(String label, int n, int max) {
+    return '$label: $n de $max';
+  }
+
+  @override
   String get encNobodyStanding => 'No queda nadie en pie.';
 
   @override

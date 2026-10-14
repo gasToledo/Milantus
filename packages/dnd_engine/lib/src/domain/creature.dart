@@ -769,6 +769,28 @@ class Creature {
     return m == null ? null : int.tryParse(m.group(1)!);
   }
 
+  /// Cuántas resistencias legendarias tiene por día, o null si no tiene.
+  ///
+  /// Se lee del nombre del rasgo —«Resistencia legendaria (3/día…)», o
+  /// «Legendary Resistance (3/Day…)» con el catálogo en inglés— y no de un
+  /// campo propio, igual que [passivePerceptionValue]: así vale también para
+  /// un homebrew que nombre el rasgo como el libro.
+  ///
+  /// ponytail: la variante de guarida («o 4/día en la guarida») se ignora,
+  /// como en las acciones legendarias: la app no lleva guaridas. Si las
+  /// lleva, el segundo número sale de la misma regex.
+  int? get legendaryResistancesPerDay {
+    final pattern = RegExp(
+      r'^(?:Resistencia legendaria|Legendary Resistance) \((\d+)/',
+      caseSensitive: false,
+    );
+    for (final t in traits) {
+      final m = pattern.firstMatch(t.name);
+      if (m != null) return int.parse(m.group(1)!);
+    }
+    return null;
+  }
+
   /// Modificador de iniciativa: el impreso en el perfil si lo trae, y si no el
   /// de Destreza, que es lo que vale para cualquier criatura sin competencia.
   int get initiativeModifier =>

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'data_version.dart';
 
 /// Quién es este combatiente: un jugador vinculado, un monstruo que sumó el DM
@@ -92,6 +94,15 @@ class Combatant {
   /// pasa a su personaje porque se lo dijeron en la mesa.
   final List<String> tags;
 
+  /// Acciones legendarias gastadas en esta ronda de la criatura. El máximo
+  /// no se guarda: es `Creature.legendaryActionsPerRound`, del catálogo o del
+  /// bloque del PNJ. Vuelven a 0 al empezar su turno (ver [Encounter.next]).
+  final int legendaryActionsSpent;
+
+  /// Resistencias legendarias gastadas en el combate. Son por día, así que
+  /// nada las devuelve solo; el máximo es `Creature.legendaryResistancesPerDay`.
+  final int legendaryResistancesSpent;
+
   /// Sin [side] explícito, un jugador es aliado y cualquier otro enemigo.
   ///
   /// Dos bandos no se eligen, se pida lo que se pida: un jugador es aliado
@@ -109,6 +120,8 @@ class Combatant {
     this.currentHp = 0,
     this.maxHp = 0,
     this.tags = const [],
+    this.legendaryActionsSpent = 0,
+    this.legendaryResistancesSpent = 0,
     CombatantSide? side,
   }) : side = kind == CombatantKind.player
             ? CombatantSide.ally
@@ -139,6 +152,8 @@ class Combatant {
     CombatantKind? kind,
     String? name,
     String? npcId,
+    int? legendaryActionsSpent,
+    int? legendaryResistancesSpent,
   }) =>
       Combatant(
         id: id,
@@ -152,6 +167,10 @@ class Combatant {
         maxHp: maxHp,
         tags: tags ?? this.tags,
         side: side ?? this.side,
+        legendaryActionsSpent:
+            legendaryActionsSpent ?? this.legendaryActionsSpent,
+        legendaryResistancesSpent:
+            legendaryResistancesSpent ?? this.legendaryResistancesSpent,
       );
 
   Map<String, dynamic> toJson() => {
@@ -166,6 +185,10 @@ class Combatant {
         if (maxHp != 0) 'currentHp': currentHp,
         if (maxHp != 0) 'maxHp': maxHp,
         if (tags.isNotEmpty) 'tags': tags,
+        if (legendaryActionsSpent != 0)
+          'legendaryActionsSpent': legendaryActionsSpent,
+        if (legendaryResistancesSpent != 0)
+          'legendaryResistancesSpent': legendaryResistancesSpent,
       };
 
   factory Combatant.fromJson(Map<String, dynamic> j) => Combatant(
@@ -186,6 +209,11 @@ class Combatant {
           for (final t in (j['tags'] as List? ?? const []))
             if (t is String && t.trim().isNotEmpty) t.trim(),
         ],
+        // Sin subir la versión del esquema, igual que los tags: un cliente
+        // viejo que guarde de vuelta pierde solo lo tachado, que el DM vuelve
+        // a tachar, y rechazar el combate entero por eso sería peor.
+        legendaryActionsSpent: j['legendaryActionsSpent'] as int? ?? 0,
+        legendaryResistancesSpent: j['legendaryResistancesSpent'] as int? ?? 0,
       );
 }
 
@@ -357,11 +385,20 @@ class Encounter {
     final position = _nextStandingPosition(currentIndex + 1);
     if (position == null) return this;
     final wrapped = position >= combatants.length;
+    final index = position % combatants.length;
     return Encounter(
       id: id,
       round: wrapped ? round + 1 : round,
-      turnIndex: position % combatants.length,
-      combatants: combatants,
+      turnIndex: index,
+      // Regla 2024: la criatura recupera las acciones legendarias gastadas al
+      // empezar su turno. Es lo que más se olvida en la mesa, por eso lo hace
+      // el turno y no el DM.
+      combatants: [
+        for (final (i, c) in combatants.indexed)
+          i == index && c.legendaryActionsSpent != 0
+              ? c.copyWith(legendaryActionsSpent: 0)
+              : c,
+      ],
       stage: stage,
     );
   }
@@ -528,6 +565,35 @@ class Encounter {
                 for (final t in tags)
                   if (t.trim().isNotEmpty) t.trim(),
               }.toList())
+            else
+              c,
+        ],
+        stage: stage,
+      );
+
+  /// Fija cuántas acciones y resistencias legendarias lleva gastadas un
+  /// combatiente. Se pasa el número y no «gastar una» por lo mismo que
+  /// [withTags]: el combate viaja entero en cada guardado.
+  ///
+  /// Solo se acota abajo, en 0: el techo es del perfil de la criatura, que el
+  /// encuentro no conoce, y la pantalla no ofrece pasarse.
+  Encounter withLegendarySpent(
+    String combatantId, {
+    int? actions,
+    int? resistances,
+  }) =>
+      Encounter(
+        id: id,
+        round: round,
+        turnIndex: turnIndex,
+        combatants: [
+          for (final c in combatants)
+            if (c.id == combatantId)
+              c.copyWith(
+                legendaryActionsSpent: actions == null ? null : max(0, actions),
+                legendaryResistancesSpent:
+                    resistances == null ? null : max(0, resistances),
+              )
             else
               c,
         ],

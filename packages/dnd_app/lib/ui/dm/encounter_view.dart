@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:flutter/material.dart';
 
@@ -101,6 +103,10 @@ class EncounterView extends StatefulWidget {
   /// Reemplaza los efectos anotados de un combatiente.
   final void Function(String combatantId, List<String> tags) onSetTags;
 
+  /// Fija las acciones y resistencias legendarias gastadas de un combatiente.
+  final void Function(String combatantId, {int? actions, int? resistances})
+  onSetLegendary;
+
   /// Corrige la iniciativa de alguien que ya está en el orden.
   final void Function(String combatantId, int initiative) onSetInitiative;
 
@@ -127,6 +133,7 @@ class EncounterView extends StatefulWidget {
     required this.onAdjustHp,
     required this.onRemoveCombatant,
     required this.onSetTags,
+    required this.onSetLegendary,
     required this.onSetInitiative,
     required this.onCloseEncounter,
   });
@@ -623,6 +630,11 @@ class _EncounterViewState extends State<EncounterView> {
               onAdjustHp: (delta) => widget.onAdjustHp(combatant.id, delta),
               onRemove: () => widget.onRemoveCombatant(combatant.id),
               onSetTags: (tags) => widget.onSetTags(combatant.id, tags),
+              onSetLegendary: ({actions, resistances}) => widget.onSetLegendary(
+                combatant.id,
+                actions: actions,
+                resistances: resistances,
+              ),
               onSetSide: (side) => widget.onSetSide(combatant.id, side),
               onConvertToNpc: () => _convertToNpc(context, combatant),
               onEditInitiative: () => _editInitiative(context, combatant),
@@ -1475,6 +1487,7 @@ class _CombatantRow extends StatelessWidget {
   final void Function(int delta) onAdjustHp;
   final VoidCallback onRemove;
   final void Function(List<String> tags) onSetTags;
+  final void Function({int? actions, int? resistances}) onSetLegendary;
   final ValueChanged<CombatantSide> onSetSide;
   final VoidCallback onConvertToNpc;
   final VoidCallback onEditInitiative;
@@ -1494,12 +1507,24 @@ class _CombatantRow extends StatelessWidget {
     required this.onAdjustHp,
     required this.onRemove,
     required this.onSetTags,
+    required this.onSetLegendary,
     required this.onSetSide,
     required this.onConvertToNpc,
     required this.onEditInitiative,
   });
 
   bool get _isPlayer => combatant.kind == CombatantKind.player;
+
+  /// El perfil de la fila: el del catálogo para un monstruo, el bloque propio
+  /// para un PNJ. De ahí salen los máximos de los contadores legendarios.
+  Creature? get _block => switch (combatant.kind) {
+    CombatantKind.monster => switch (combatant.creatureId) {
+      final id? => repo.creature(id),
+      null => null,
+    },
+    CombatantKind.npc => npc?.npc.block,
+    CombatantKind.player => null,
+  };
 
   /// Fichas compiladas de los jugadores, por identidad de personaje.
   ///
@@ -1772,7 +1797,47 @@ class _CombatantRow extends StatelessWidget {
             ],
           ),
         ],
+        ?_legendary(context),
       ],
+    );
+  }
+
+  /// Las acciones legendarias (círculos) y las resistencias (rombos), para
+  /// tacharlas tocándolas. Van bajo el nombre y no en una columna propia: solo
+  /// las tiene un puñado de criaturas, y una columna vacía en todas las demás
+  /// filas le comería ancho a la planilla.
+  ///
+  /// Mientras se arma no hay nada que gastar.
+  Widget? _legendary(BuildContext context) {
+    final block = _block;
+    if (preparing || block == null) return null;
+    final actions = block.legendaryActionsPerRound ?? 0;
+    final resistances = block.legendaryResistancesPerDay ?? 0;
+    if (actions == 0 && resistances == 0) return null;
+    final l10n = context.l10n;
+    return Padding(
+      padding: const EdgeInsets.only(top: 2),
+      child: Wrap(
+        spacing: 10,
+        children: [
+          if (actions > 0)
+            _LegendaryPips(
+              label: l10n.encLegendaryActions,
+              max: actions,
+              spent: combatant.legendaryActionsSpent,
+              diamond: false,
+              onChanged: (v) => onSetLegendary(actions: v),
+            ),
+          if (resistances > 0)
+            _LegendaryPips(
+              label: l10n.encLegendaryResistances,
+              max: resistances,
+              spent: combatant.legendaryResistancesSpent,
+              diamond: true,
+              onChanged: (v) => onSetLegendary(resistances: v),
+            ),
+        ],
+      ),
     );
   }
 
@@ -2063,6 +2128,73 @@ class _CombatantRow extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Un contador legendario: [max] marcas, las [spent] primeras tachadas.
+///
+/// Tocar una disponible la gasta junto con las anteriores, y tocar una
+/// gastada la devuelve junto con las que le siguen: así se corrige un toque
+/// de más sin un botón aparte.
+class _LegendaryPips extends StatelessWidget {
+  final String label;
+  final int max;
+  final int spent;
+
+  /// Rombos para las resistencias, círculos para las acciones: se distinguen
+  /// sin leer el rótulo, que en la planilla no entra.
+  final bool diamond;
+  final ValueChanged<int> onChanged;
+
+  const _LegendaryPips({
+    required this.label,
+    required this.max,
+    required this.spent,
+    required this.diamond,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.palette;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var i = 0; i < max; i++)
+          Tooltip(
+            message: context.l10n.encLegendaryPip(label, i + 1, max),
+            child: Semantics(
+              button: true,
+              checked: i < spent,
+              child: InkResponse(
+                onTap: () => onChanged(i < spent ? i : i + 1),
+                radius: 16,
+                child: SizedBox(
+                  width: 28,
+                  height: 28,
+                  child: Center(
+                    child: Transform.rotate(
+                      angle: diamond ? math.pi / 4 : 0,
+                      child: Container(
+                        width: diamond ? 10 : 12,
+                        height: diamond ? 10 : 12,
+                        decoration: BoxDecoration(
+                          color: i < spent ? null : pal.gold,
+                          border: Border.all(
+                            color: i < spent ? pal.textMuted : pal.gold,
+                            width: 1.5,
+                          ),
+                          shape: diamond ? BoxShape.rectangle : BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

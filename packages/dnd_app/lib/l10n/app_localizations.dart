@@ -10272,6 +10272,24 @@ abstract class AppLocalizations {
   /// **'Sacar «{tag}» de {name}'**
   String encRemoveEffect(String tag, String name);
 
+  /// No description provided for @encLegendaryActions.
+  ///
+  /// In es, this message translates to:
+  /// **'Acciones legendarias'**
+  String get encLegendaryActions;
+
+  /// No description provided for @encLegendaryResistances.
+  ///
+  /// In es, this message translates to:
+  /// **'Resistencias legendarias'**
+  String get encLegendaryResistances;
+
+  /// No description provided for @encLegendaryPip.
+  ///
+  /// In es, this message translates to:
+  /// **'{label}: {n} de {max}'**
+  String encLegendaryPip(String label, int n, int max);
+
   /// No description provided for @encNobodyStanding.
   ///
   /// In es, this message translates to:

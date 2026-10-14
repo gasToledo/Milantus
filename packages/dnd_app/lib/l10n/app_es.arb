@@ -5064,6 +5064,22 @@
       }
     }
   },
+  "encLegendaryActions": "Acciones legendarias",
+  "encLegendaryResistances": "Resistencias legendarias",
+  "encLegendaryPip": "{label}: {n} de {max}",
+  "@encLegendaryPip": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
   "encNobodyStanding": "No queda nadie en pie.",
   "encNoEnemyStanding": "No queda ningún enemigo en pie.",
   "encNoAllyStanding": "No queda ningún aliado en pie.",
