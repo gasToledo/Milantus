@@ -19,23 +19,33 @@
 # de patch aunque el SDK local sí lo tenga: acá nunca va a haber una imagen
 # que la cumpla.
 
+# El pub-cache vive en un caché de BuildKit (`--mount=type=cache`) y no en una
+# capa: el `COPY` del código invalida todo lo que viene después en cada
+# despliegue, y sin esto cada deploy volvía a bajar todas las dependencias.
+# El caché persiste en el runner entre builds. Se monta también en el paso que
+# compila, porque `package_config.json` apunta a esos archivos y el montaje
+# solo existe durante el `RUN` que lo declara. Un id por etapa: las dos
+# corren en paralelo y no comparten SDK.
+
 # ---- Etapa 1: build del cliente web (Flutter) ----
 FROM ghcr.io/cirruslabs/flutter:stable AS web-build
+ENV PUB_CACHE=/pub-cache
 WORKDIR /workspace
 COPY packages/dnd_engine ./packages/dnd_engine
 COPY packages/dnd_app ./packages/dnd_app
 WORKDIR /workspace/packages/dnd_app
-RUN flutter pub get
-RUN flutter build web --release
+RUN --mount=type=cache,id=pub-flutter,target=/pub-cache flutter pub get
+RUN --mount=type=cache,id=pub-flutter,target=/pub-cache flutter build web --release
 
 # ---- Etapa 2: compilación del servidor (Dart) ----
 FROM dart:stable AS server-build
+ENV PUB_CACHE=/pub-cache
 WORKDIR /workspace
 COPY packages/dnd_engine ./packages/dnd_engine
 COPY packages/dnd_server ./packages/dnd_server
 WORKDIR /workspace/packages/dnd_server
-RUN dart pub get
-RUN dart compile exe bin/server.dart -o /workspace/dnd_server_bin
+RUN --mount=type=cache,id=pub-dart,target=/pub-cache dart pub get
+RUN --mount=type=cache,id=pub-dart,target=/pub-cache dart compile exe bin/server.dart -o /workspace/dnd_server_bin
 
 # ---- Etapa 3: runtime mínimo ----
 # `dart compile exe` produce un binario nativo: no hace falta el SDK de Dart
