@@ -265,6 +265,20 @@ void main() {
       expect(note.text, 'Le debe plata al herrero.');
       expect(find.text('Le debe plata al herrero.'), findsOneWidget);
 
+      // Corregirla no la vuelve una nota nueva: conserva id y fecha.
+      await tester.tap(find.byTooltip('Editar nota'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        inDialog(find.byType(TextField)),
+        'Le debe plata a la herrera.',
+      );
+      await tester.tap(dialogAction('Guardar'));
+      await tester.pumpAndSettle();
+      final edited = server.npcs['mirra']!.notes.single;
+      expect(edited.text, 'Le debe plata a la herrera.');
+      expect((edited.id, edited.date), (note.id, note.date));
+      expect(find.text('Le debe plata a la herrera.'), findsOneWidget);
+
       // Sugiere los tags que ya usa la biblioteca y no los que ya tiene.
       await tester.tap(find.widgetWithText(TextButton, 'Tag'));
       await tester.pumpAndSettle();

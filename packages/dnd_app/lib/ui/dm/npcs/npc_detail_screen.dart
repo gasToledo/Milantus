@@ -211,6 +211,28 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
     );
   }
 
+  /// Conserva id y fecha: la fecha dice cuándo se supo el dato, y corregir la
+  /// redacción no lo vuelve más nuevo.
+  Future<void> _editNote(Npc npc, NpcNote note) async {
+    final text = await showTextPromptDialog(
+      context,
+      title: context.l10n.dmEditNote,
+      label: context.l10n.invNoteTitle,
+      current: note.text,
+      maxLines: 5,
+      textCapitalization: TextCapitalization.sentences,
+    );
+    if (text == null || text == note.text || !mounted) return;
+    await _save(
+      npc.copyWith(
+        notes: [
+          for (final n in npc.notes)
+            n.id == note.id ? NpcNote(id: n.id, date: n.date, text: text) : n,
+        ],
+      ),
+    );
+  }
+
   Future<void> _editBlock(Npc npc) async {
     final edited = await Navigator.of(context).push<Creature>(
       MaterialPageRoute(
@@ -735,6 +757,11 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
                               Text(note.text),
                             ],
                           ),
+                        ),
+                        IconButton(
+                          tooltip: context.l10n.dmEditNote,
+                          icon: const Icon(Icons.edit_outlined, size: 16),
+                          onPressed: () => _editNote(npc, note),
                         ),
                         IconButton(
                           tooltip: context.l10n.dmDeleteNote,
