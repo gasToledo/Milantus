@@ -9520,7 +9520,7 @@ abstract class AppLocalizations {
   /// No description provided for @npcExportAlways.
   ///
   /// In es, this message translates to:
-  /// **'Nombre, retrato, apariencia y «cómo habla»'**
+  /// **'Nombre, retrato, apariencia y voz'**
   String get npcExportAlways;
 
   /// No description provided for @npcExportNone.
@@ -9766,7 +9766,7 @@ abstract class AppLocalizations {
   /// No description provided for @npcSpeech.
   ///
   /// In es, this message translates to:
-  /// **'Cómo habla'**
+  /// **'Voz'**
   String get npcSpeech;
 
   /// No description provided for @npcSpeechHint.
@@ -9778,7 +9778,7 @@ abstract class AppLocalizations {
   /// No description provided for @npcSpeechEmpty.
   ///
   /// In es, this message translates to:
-  /// **'Todavía no dice cómo habla.'**
+  /// **'Sin voz.'**
   String get npcSpeechEmpty;
 
   /// No description provided for @npcNoBackground.
@@ -9883,16 +9883,10 @@ abstract class AppLocalizations {
   /// **'Abrir ficha completa'**
   String get npcOpenFullSheet;
 
-  /// No description provided for @npcFullSheetNote.
-  ///
-  /// In es, this message translates to:
-  /// **'Nombre, retrato, trasfondo y notas se editan acá; la ficha completa es para estadísticas, equipo y niveles.'**
-  String get npcFullSheetNote;
-
   /// No description provided for @npcInCampaigns.
   ///
   /// In es, this message translates to:
-  /// **'En tus campañas'**
+  /// **'Campañas'**
   String get npcInCampaigns;
 
   /// No description provided for @npcNoCampaignsYet.
@@ -9910,7 +9904,7 @@ abstract class AppLocalizations {
   /// No description provided for @npcAddToAnother.
   ///
   /// In es, this message translates to:
-  /// **'Sumar a otra campaña'**
+  /// **'Sumar'**
   String get npcAddToAnother;
 
   /// No description provided for @npcAddTag.

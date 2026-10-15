@@ -5829,8 +5829,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get npcExportWhatTravels => 'What goes in the file';
 
   @override
-  String get npcExportAlways =>
-      'Name, portrait, appearance and “how they speak”';
+  String get npcExportAlways => 'Name, portrait, appearance and voice';
 
   @override
   String get npcExportNone => 'Its type: no stats';
@@ -5987,13 +5986,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get npcGone => 'This NPC no longer exists.';
 
   @override
-  String get npcSpeech => 'How they speak';
+  String get npcSpeech => 'Voice';
 
   @override
   String get npcSpeechHint => 'One or two lines to play them';
 
   @override
-  String get npcSpeechEmpty => 'How they speak is not written down yet.';
+  String get npcSpeechEmpty => 'No voice.';
 
   @override
   String get npcNoBackground => 'No background.';
@@ -6055,11 +6054,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get npcOpenFullSheet => 'Open full sheet';
 
   @override
-  String get npcFullSheetNote =>
-      'Name, portrait, background and notes are edited here; the full sheet is for stats, equipment and levels.';
-
-  @override
-  String get npcInCampaigns => 'In your campaigns';
+  String get npcInCampaigns => 'Campaigns';
 
   @override
   String get npcNoCampaignsYet => 'It is not in any campaign yet.';
@@ -6070,7 +6065,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get npcAddToAnother => 'Add to another campaign';
+  String get npcAddToAnother => 'Add';
 
   @override
   String get npcAddTag => 'Add tag';

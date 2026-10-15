@@ -5830,7 +5830,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get npcExportWhatTravels => 'Qué viaja en el archivo';
 
   @override
-  String get npcExportAlways => 'Nombre, retrato, apariencia y «cómo habla»';
+  String get npcExportAlways => 'Nombre, retrato, apariencia y voz';
 
   @override
   String get npcExportNone => 'Su tipo: sin estadísticas';
@@ -5987,13 +5987,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get npcGone => 'Este PNJ ya no existe.';
 
   @override
-  String get npcSpeech => 'Cómo habla';
+  String get npcSpeech => 'Voz';
 
   @override
   String get npcSpeechHint => 'Una o dos líneas para interpretarlo';
 
   @override
-  String get npcSpeechEmpty => 'Todavía no dice cómo habla.';
+  String get npcSpeechEmpty => 'Sin voz.';
 
   @override
   String get npcNoBackground => 'Sin trasfondo.';
@@ -6055,11 +6055,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get npcOpenFullSheet => 'Abrir ficha completa';
 
   @override
-  String get npcFullSheetNote =>
-      'Nombre, retrato, trasfondo y notas se editan acá; la ficha completa es para estadísticas, equipo y niveles.';
-
-  @override
-  String get npcInCampaigns => 'En tus campañas';
+  String get npcInCampaigns => 'Campañas';
 
   @override
   String get npcNoCampaignsYet => 'Todavía no está en ninguna campaña.';
@@ -6070,7 +6066,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get npcAddToAnother => 'Sumar a otra campaña';
+  String get npcAddToAnother => 'Sumar';
 
   @override
   String get npcAddTag => 'Agregar tag';

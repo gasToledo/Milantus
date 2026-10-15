@@ -497,19 +497,6 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
       builder: (context, box) {
         final wide = box.maxWidth >= 900;
         final left = [
-          _identity(context, entry),
-          _card(
-            context,
-            title: context.l10n.npcSpeech,
-            onEdit: () => _editText(
-              title: context.l10n.npcSpeech,
-              label: context.l10n.npcSpeechHint,
-              current: npc.speech,
-              maxLines: 3,
-              apply: (v) => npc.copyWith(speech: v),
-            ),
-            child: _prose(context, npc.speech, context.l10n.npcSpeechEmpty),
-          ),
           _card(
             context,
             title: context.l10n.stepBackground,
@@ -532,6 +519,10 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
         return ListView(
           padding: const EdgeInsets.fromLTRB(24, 18, 24, 32),
           children: [
+            // A todo el ancho y no dentro de la columna izquierda: así la
+            // columna derecha arranca a la altura del Trasfondo y no del
+            // retrato, que la dejaba corrida hacia arriba.
+            _identity(context, entry),
             if (wide)
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -555,9 +546,9 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
     final pal = context.palette;
     final npc = entry.npc;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(bottom: 18),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // La única puerta al retrato, también para un PNJ con ficha: la
           // ficha completa ya no ofrece la suya. El ícono sobre el aro es lo
@@ -654,11 +645,65 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 10),
+                _voice(context, npc),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  /// La voz va bajo el nombre y no en una tarjeta propia: es lo primero que
+  /// el DM necesita para interpretarlo, y como cita no precisa rótulo.
+  Widget _voice(BuildContext context, Npc npc) {
+    final pal = context.palette;
+    final empty = npc.speech.isEmpty;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ExcludeSemantics(
+          child: Text(
+            '“',
+            style: TextStyle(
+              fontFamily: 'Georgia',
+              fontSize: 34,
+              height: 0.9,
+              color: pal.gold,
+            ),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Flexible(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(
+              empty ? context.l10n.npcSpeechEmpty : npc.speech,
+              style: TextStyle(
+                fontFamily: 'Georgia',
+                fontStyle: FontStyle.italic,
+                fontSize: 16,
+                height: 1.5,
+                color: empty ? pal.textMuted : null,
+              ),
+            ),
+          ),
+        ),
+        IconButton(
+          tooltip: context.l10n.npcEditTitle(
+            context.l10n.npcSpeech.toLowerCase(),
+          ),
+          icon: const Icon(Icons.edit_outlined, size: 16),
+          onPressed: () => _editText(
+            title: context.l10n.npcSpeech,
+            label: context.l10n.npcSpeechHint,
+            current: npc.speech,
+            maxLines: 3,
+            apply: (v) => npc.copyWith(speech: v),
+          ),
+        ),
+      ],
     );
   }
 
@@ -729,14 +774,19 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
           ? _prose(context, '', context.l10n.npcNoNotes)
           : Column(
               children: [
-                for (final note in npc.notes)
+                // Filas separadas por una línea y no placas hundidas: dentro
+                // de la tarjeta, una placa por nota era un tercer fondo que
+                // competía con el texto.
+                for (final (i, note) in npc.notes.indexed)
                   Container(
-                    margin: const EdgeInsets.only(top: 8),
-                    padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
-                    decoration: BoxDecoration(
-                      color: pal.plaque,
-                      borderRadius: BorderRadius.circular(9),
-                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: i == 0
+                        ? null
+                        : BoxDecoration(
+                            border: Border(
+                              top: BorderSide(color: pal.hairline),
+                            ),
+                          ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -745,16 +795,22 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
+                                note.text,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  height: 1.5,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
                                 MaterialLocalizations.of(
                                   context,
                                 ).formatMediumDate(note.date.toLocal()),
                                 style: TextStyle(
-                                  fontSize: 11,
+                                  fontSize: 11.5,
                                   color: pal.textMuted,
                                 ),
                               ),
-                              const SizedBox(height: 3),
-                              Text(note.text),
                             ],
                           ),
                         ),
@@ -875,36 +931,117 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
         );
       case NpcSheetKind.character:
         final sheet = entry.sheet;
-        return _card(
-          context,
-          title: context.l10n.npcSheetTitle,
-          child: sheet == null
-              ? _prose(context, '', context.l10n.npcSheetReadFail)
-              // Especie, clase y nivel ya están en la pill bajo el nombre; acá
-              // solo va lo que se hace con la ficha.
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+        if (sheet == null) {
+          return _card(
+            context,
+            title: context.l10n.npcSheetTitle,
+            child: _prose(context, '', context.l10n.npcSheetReadFail),
+          );
+        }
+        return _sheetSummary(context, sheet);
+    }
+  }
+
+  /// La ficha como tarjeta que se toca entera: un botón solo no decía nada
+  /// del personaje, y los cuatro números que se piden en la mesa ahorran
+  /// abrirla para consultarlos.
+  ///
+  /// Especie, clase y nivel no se repiten: están en la pill bajo el nombre.
+  Widget _sheetSummary(BuildContext context, Character character) {
+    final pal = context.palette;
+    final sheet = CharacterCompiler(widget.repo).compile(character);
+    final init = sheet.initiative >= 0
+        ? '+${sheet.initiative}'
+        : '${sheet.initiative}';
+    Widget plaque(String label, String value, String semantics) => Expanded(
+      child: StatPlaque(
+        label: label,
+        value: value,
+        dense: true,
+        semantics: semantics,
+      ),
+    );
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Material(
+        color: Theme.of(context).colorScheme.surface,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: pal.hairline),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => _openSheet(character),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  context.l10n.npcSheetTitle,
+                  style: const TextStyle(fontFamily: 'Georgia', fontSize: 17),
+                ),
+                const SizedBox(height: 12),
+                Row(
                   children: [
-                    FilledButton.icon(
-                      onPressed: () => _openSheet(sheet),
-                      icon: const Icon(Icons.open_in_new),
-                      label: Text(context.l10n.npcOpenFullSheet),
+                    plaque(
+                      context.l10n.creatureAcShort,
+                      '${sheet.armorClass}',
+                      context.l10n.armorClassLabel(sheet.armorClass),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      context.l10n.npcFullSheetNote,
-                      style: TextStyle(fontSize: 11.5, color: pal.textMuted),
+                    const SizedBox(width: 6),
+                    plaque(
+                      context.l10n.dmAbbrHp,
+                      '${sheet.maxHp}',
+                      '${context.l10n.hitPoints}: ${sheet.maxHp}',
+                    ),
+                    const SizedBox(width: 6),
+                    plaque(
+                      context.l10n.dmAbbrInit,
+                      init,
+                      context.l10n.statInitiativeLabel(init),
+                    ),
+                    const SizedBox(width: 6),
+                    plaque(
+                      context.l10n.dmAbbrPerception,
+                      '${sheet.passivePerception}',
+                      context.l10n.passivePerceptionLabel(
+                        sheet.passivePerception,
+                      ),
                     ),
                   ],
                 ),
-        );
-    }
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        context.l10n.npcOpenFullSheet,
+                        style: TextStyle(color: pal.gold, fontSize: 14),
+                      ),
+                    ),
+                    Icon(Icons.arrow_forward, size: 18, color: pal.gold),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _campaigns(BuildContext context, NpcEntry entry) {
     return _card(
       context,
       title: context.l10n.npcInCampaigns,
+      // Al costado del título, como «Agregar nota»: el botón suelto al pie
+      // quedaba desalineado del resto de la columna.
+      trailing: TextButton.icon(
+        onPressed: () => _linkToCampaign(entry),
+        icon: const Icon(Icons.add, size: 16),
+        label: Text(context.l10n.npcAddToAnother),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -926,11 +1063,6 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
                 ],
               ),
             ),
-          OutlinedButton.icon(
-            onPressed: () => _linkToCampaign(entry),
-            icon: const Icon(Icons.add),
-            label: Text(context.l10n.npcAddToAnother),
-          ),
         ],
       ),
     );

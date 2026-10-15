@@ -243,7 +243,7 @@ void main() {
     ) async {
       final server = await pumpDetail(tester, 'mirra', seedLibrary);
 
-      await tester.tap(find.byTooltip('Editar cómo habla'));
+      await tester.tap(find.byTooltip('Editar voz'));
       await tester.pumpAndSettle();
       await tester.enterText(
         inDialog(find.byType(TextField)),
@@ -445,6 +445,16 @@ void main() {
         ),
         findsOneWidget,
       );
+
+      // La tarjeta de la ficha adelanta los números de la mesa, los del motor.
+      final computed = CharacterCompiler(repo).compile(sheet);
+      for (final value in [
+        '${computed.armorClass}',
+        '${computed.maxHp}',
+        '${computed.passivePerception}',
+      ]) {
+        expect(find.widgetWithText(StatPlaque, value), findsWidgets);
+      }
 
       await tester.tap(find.byTooltip('Editar nombre'));
       await tester.pumpAndSettle();
