@@ -4274,9 +4274,12 @@
       }
     }
   },
-  "npcCharacterLine": "Ficha de personaje · {classes}",
+  "npcCharacterLine": "{species} · {classes}",
   "@npcCharacterLine": {
     "placeholders": {
+      "species": {
+        "type": "String"
+      },
       "classes": {
         "type": "String"
       }

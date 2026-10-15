@@ -5275,8 +5275,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String npcCharacterLine(String classes) {
-    return 'Ficha de personaje · $classes';
+  String npcCharacterLine(String species, String classes) {
+    return '$species · $classes';
   }
 
   @override

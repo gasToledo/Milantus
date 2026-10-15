@@ -14,7 +14,10 @@ import '../../../l10n/l10n_context.dart';
 /// creación.
 
 /// La línea que dice qué es un PNJ, bajo su nombre: «Sin estadísticas»,
-/// «Caballero · CA 18 · PG 52» o «Ficha de personaje · Mago 7».
+/// «Caballero · CA 18 · PG 52» o «Elfo · Mago 7».
+///
+/// Una ficha dice su especie y no «Ficha de personaje», igual que un bloque
+/// dice de qué criatura sale: el tipo ya se lee en la forma de la línea.
 ///
 /// Con [hurt] —los PG guardados de un herido, ver [npcStoredHp]— un bloque
 /// muestra «PG 51/81» en lugar del máximo y una ficha los suma al final:
@@ -44,7 +47,10 @@ String npcTypeLine(
                 '${repo.characterClass(id)?.name ?? id} ${sheet.classLevel(id)}',
           )
           .join(' · ');
-      final line = l10n.npcCharacterLine(classes);
+      final species = repo.race(sheet.raceId)?.name ?? sheet.raceId;
+      final line = classes.isEmpty
+          ? species
+          : l10n.npcCharacterLine(species, classes);
       return hurt == null
           ? line
           : '$line · ${l10n.dmHpShort(hurt.current, hurt.max)}';

@@ -8638,8 +8638,8 @@ abstract class AppLocalizations {
   /// No description provided for @npcCharacterLine.
   ///
   /// In es, this message translates to:
-  /// **'Ficha de personaje · {classes}'**
-  String npcCharacterLine(String classes);
+  /// **'{species} · {classes}'**
+  String npcCharacterLine(String species, String classes);
 
   /// No description provided for @npcNew.
   ///

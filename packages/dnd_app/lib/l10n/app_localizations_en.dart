@@ -5273,8 +5273,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String npcCharacterLine(String classes) {
-    return 'Character sheet · $classes';
+  String npcCharacterLine(String species, String classes) {
+    return '$species · $classes';
   }
 
   @override

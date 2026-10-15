@@ -435,6 +435,17 @@ void main() {
     ) async {
       final server = await pumpDetail(tester, 'vadrik', seedCharacterNpc);
 
+      // Bajo el nombre va la especie, no «Ficha de personaje».
+      final sheet = server.characters['ficha-vadrik']!;
+      final classId = sheet.classHistory.first;
+      expect(
+        find.text(
+          '${repo.race(sheet.raceId)!.name} · '
+          '${repo.characterClass(classId)!.name} 1',
+        ),
+        findsOneWidget,
+      );
+
       await tester.tap(find.byTooltip('Editar nombre'));
       await tester.pumpAndSettle();
       await tester.enterText(

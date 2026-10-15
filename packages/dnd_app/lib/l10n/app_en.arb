@@ -1422,7 +1422,7 @@
   "npcDead": "Dead",
   "npcUnknown": "Unknown",
   "npcBlockLine": "{base} · AC {ac} · HP {hp}",
-  "npcCharacterLine": "Character sheet · {classes}",
+  "npcCharacterLine": "{species} · {classes}",
   "npcNew": "New NPC",
   "npcWhichSheet": "Which sheet does it use?",
   "npcNewNone": "NPC without stats",
