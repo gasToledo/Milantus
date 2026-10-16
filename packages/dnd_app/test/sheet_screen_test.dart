@@ -2411,7 +2411,7 @@ void main() {
         find.text('Una maldición despierta bajo la ciudad.'),
         findsOneWidget,
       );
-      expect(find.text('Contra 2 Esqueleto'), findsOneWidget);
+      expect(find.text('Contra Esqueleto ×2'), findsOneWidget);
       expect(find.textContaining('Con Mirna'), findsOneWidget);
       expect(find.textContaining('cayeron todos'), findsOneWidget);
       expect(find.text('La cripta sellada'), findsOneWidget);
@@ -2555,7 +2555,7 @@ void main() {
       await openCampana(tester);
 
       expect(find.text('SIN CAPÍTULO'), findsOneWidget);
-      expect(find.text('Contra 4 Bandido'), findsOneWidget);
+      expect(find.text('Contra Bandido ×4'), findsOneWidget);
       expect(find.textContaining('Solo'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });

@@ -1739,17 +1739,19 @@ class _CampaignDetailState extends State<_CampaignDetail> {
         Expanded(
           child: switch (widget.section) {
             _CampaignSection.mesa => _roster(context),
-            _CampaignSection.capitulos => ChaptersView(
-              chapters: _chapters,
-              loading: _chaptersLoading,
-              error: _chaptersError,
-              onRetry: _loadChapters,
-              onCreate: _createChapter,
-              onEdit: _editChapter,
-              onStart: _startChapter,
-              onClose: _closeChapter,
-              onDelete: _deleteChapter,
-              onOpenNotebook: (chapter) => widget.onOpenNotebook(chapter.id),
+            _CampaignSection.capitulos => _listWidth(
+              ChaptersView(
+                chapters: _chapters,
+                loading: _chaptersLoading,
+                error: _chaptersError,
+                onRetry: _loadChapters,
+                onCreate: _createChapter,
+                onEdit: _editChapter,
+                onStart: _startChapter,
+                onClose: _closeChapter,
+                onDelete: _deleteChapter,
+                onOpenNotebook: (chapter) => widget.onOpenNotebook(chapter.id),
+              ),
             ),
             _CampaignSection.cuaderno => NotebookView(
               chapters: _chapters ?? const [],
@@ -1765,26 +1767,28 @@ class _CampaignDetailState extends State<_CampaignDetail> {
               onEditNote: _editNote,
               onDeleteNote: _deleteNote,
             ),
-            _CampaignSection.pnj => CampaignNpcsView(
-              npcs: _npcs,
-              error: _npcsError,
-              repo: widget.repo,
-              onRetry: _loadNpcs,
-              onBringFromLibrary: _bringNpcsFromLibrary,
-              onStatus: (entry, status) => _npcAction(
-                () => widget.api.linkCampaignNpc(
-                  widget.campaign.id,
-                  entry.npc.id,
-                  status: status,
+            _CampaignSection.pnj => _listWidth(
+              CampaignNpcsView(
+                npcs: _npcs,
+                error: _npcsError,
+                repo: widget.repo,
+                onRetry: _loadNpcs,
+                onBringFromLibrary: _bringNpcsFromLibrary,
+                onStatus: (entry, status) => _npcAction(
+                  () => widget.api.linkCampaignNpc(
+                    widget.campaign.id,
+                    entry.npc.id,
+                    status: status,
+                  ),
                 ),
-              ),
-              onUnlink: (entry) => _npcAction(
-                () => widget.api.unlinkCampaignNpc(
-                  widget.campaign.id,
-                  entry.npc.id,
+                onUnlink: (entry) => _npcAction(
+                  () => widget.api.unlinkCampaignNpc(
+                    widget.campaign.id,
+                    entry.npc.id,
+                  ),
                 ),
+                onOpen: (entry) => _openNpc(entry.npc.id),
               ),
-              onOpen: (entry) => _openNpc(entry.npc.id),
             ),
             _CampaignSection.combate => EncounterView(
               repo: widget.repo,
@@ -1814,6 +1818,18 @@ class _CampaignDetailState extends State<_CampaignDetail> {
       ],
     );
   }
+
+  /// Tope de ancho para las listas de filas (Capítulos, PNJ). En escritorio
+  /// cada fila medía más de 1100 px con dos renglones cortos y el resto vacío;
+  /// alineada a la izquierda sigue al encabezado. Combate y Mesa no lo llevan:
+  /// usan el ancho para el panel lateral y la grilla de tarjetas.
+  Widget _listWidth(Widget child) => Align(
+    alignment: Alignment.topLeft,
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 880),
+      child: child,
+    ),
+  );
 
   Chapter? get _activeChapter => _chapters
       ?.where((chapter) => chapter.state == ChapterState.active)

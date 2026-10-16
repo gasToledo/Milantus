@@ -2413,13 +2413,14 @@ const double _profileLongLabelCell = 150;
 ///
 /// El panel del Bestiario mide unos 855 px, y sin tope la descripción de un
 /// rasgo ocupaba la línea entera: más del doble de lo que se lee cómodo.
-const double _profileProseWidth = 620;
+const double kReadingWidth = 620;
 
-/// Acota la prosa a [_profileProseWidth] sin centrarla.
-Widget _prose(Widget child) => Align(
+/// Acota la prosa a [kReadingWidth] sin centrarla. Lo usan el perfil y
+/// cualquier texto largo que viva en una columna ancha (el Diario).
+Widget readingWidth(Widget child) => Align(
   alignment: Alignment.centerLeft,
   child: ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: _profileProseWidth),
+    constraints: const BoxConstraints(maxWidth: kReadingWidth),
     child: child,
   ),
 );
@@ -2927,7 +2928,7 @@ Widget _profileLines(BuildContext context, Creature c, {required bool wide}) {
                       ),
                     ),
                     const SizedBox(width: 16),
-                    Expanded(child: _prose(rows[i].value)),
+                    Expanded(child: readingWidth(rows[i].value)),
                   ],
                 )
               : Column(
@@ -2957,7 +2958,7 @@ List<Widget> _profileTraits(BuildContext context, Creature c) {
     for (final trait in c.traits)
       Padding(
         padding: const EdgeInsets.only(top: 4),
-        child: _prose(
+        child: readingWidth(
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -3113,12 +3114,12 @@ Widget _profileAction(
       ),
     ),
     child: !hasNumbers
-        ? _prose(body)
+        ? readingWidth(body)
         : wide
         ? Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(child: _prose(body)),
+              Expanded(child: readingWidth(body)),
               const SizedBox(width: 16),
               // Las tres placas a la misma altura aunque solo la de daño
               // lleve segunda línea. `IntrinsicHeight` solo acá: alrededor de

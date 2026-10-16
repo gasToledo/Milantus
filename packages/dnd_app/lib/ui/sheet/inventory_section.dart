@@ -796,13 +796,19 @@ extension _SheetInventorySection on _SheetScreenState {
           context.l10n.invRemoveOne(info.name),
           e.quantity > 1 ? () => set(e.quantity - 1) : null,
         ),
+        // 20 para que − 99 + entre justo en la columna de 92 px de la tabla
+        // ancha, ahora que los botones miden 36.
+        // Con tres cifras (100 monedas, flechas) se achica en vez de partirse.
         SizedBox(
-          width: 28,
-          child: Text(
-            '${e.quantity}',
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontFeatures: [FontFeature.tabularFigures()],
+          width: 20,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              '${e.quantity}',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontFeatures: [FontFeature.tabularFigures()],
+              ),
             ),
           ),
         ),
@@ -817,10 +823,12 @@ extension _SheetInventorySection on _SheetScreenState {
 
   Widget _stepButton(IconData icon, String tooltip, VoidCallback? onPressed) {
     final pal = context.palette;
+    // 36 y no 28: en el teléfono es el blanco que más se toca de la fila, y a
+    // 28 se erraba con el dedo.
     return Tooltip(
       message: tooltip,
       child: SizedBox.square(
-        dimension: 28,
+        dimension: 36,
         child: OutlinedButton(
           onPressed: onPressed,
           style: OutlinedButton.styleFrom(
@@ -831,7 +839,7 @@ extension _SheetInventorySection on _SheetScreenState {
               borderRadius: BorderRadius.circular(7),
             ),
           ),
-          child: Icon(icon, size: 15, semanticLabel: tooltip),
+          child: Icon(icon, size: 18, semanticLabel: tooltip),
         ),
       ),
     );
@@ -922,18 +930,23 @@ extension _SheetInventorySection on _SheetScreenState {
                     InkWell(
                       onTap: () => _showInfoDialog(info.name, info.description),
                       borderRadius: BorderRadius.circular(6),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(child: Text(info.name)),
-                          const SizedBox(width: 5),
-                          Icon(
-                            Icons.info_outline,
-                            size: 14,
-                            semanticLabel: context.l10n.invSeeWhatItDoes,
-                            color: context.palette.textMuted,
-                          ),
-                        ],
+                      // El renglón solo medía 20 px de alto: con el relleno el
+                      // toque sobre el nombre no se pierde en el teléfono.
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(child: Text(info.name)),
+                            const SizedBox(width: 5),
+                            Icon(
+                              Icons.info_outline,
+                              size: 14,
+                              semanticLabel: context.l10n.invSeeWhatItDoes,
+                              color: context.palette.textMuted,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   if (e.attuned && info.attunable)

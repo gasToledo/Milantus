@@ -47,14 +47,22 @@ extension _CampaignSection on _SheetScreenState {
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        for (var i = 0; i < campaigns.length; i++) ...[
-          if (i > 0) const SizedBox(height: 24),
-          ..._campaignBlock(campaigns[i]),
-        ],
-      ],
+    // Tope de ancho: en escritorio las filas de capítulos y batallas medían más
+    // de 1100 px con un renglón corto y el resto vacío.
+    return Align(
+      alignment: Alignment.topLeft,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 880),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var i = 0; i < campaigns.length; i++) ...[
+              if (i > 0) const SizedBox(height: 24),
+              ..._campaignBlock(campaigns[i]),
+            ],
+          ],
+        ),
+      ),
     );
   }
 
@@ -234,7 +242,9 @@ extension _CampaignSection on _SheetScreenState {
                 (true, true) => context.l10n.enemyOne,
                 (true, false) => context.l10n.enemiesCount(m.count),
                 (false, true) => logGroupName(m, widget.repo),
-                (false, false) => '${m.count} ${logGroupName(m, widget.repo)}',
+                // «Esqueleto ×2» y no «2 Esqueleto»: el nombre del catálogo no
+                // se puede pluralizar a mano, y el Cuaderno ya lo escribe así.
+                (false, false) => '${logGroupName(m, widget.repo)} ×${m.count}',
               },
           ]),
         );

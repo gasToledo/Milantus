@@ -593,9 +593,15 @@ extension _SheetDiarySection on _SheetScreenState {
         if (link == null) {
           // No se finge que es un enlace lo que no se va a poder abrir: queda
           // como texto, y seleccionable para poder copiarlo a mano.
-          return SelectableText(
-            e.body,
-            style: TextStyle(fontSize: 14, height: 1.55, color: pal.textMuted),
+          return readingWidth(
+            SelectableText(
+              e.body,
+              style: TextStyle(
+                fontSize: 14,
+                height: 1.55,
+                color: pal.textMuted,
+              ),
+            ),
           );
         }
         return Align(
@@ -627,13 +633,17 @@ extension _SheetDiarySection on _SheetScreenState {
             ),
           ),
         );
+      // A medida de lectura: en escritorio la entrada ocupaba 1100 px por
+      // renglón, el doble de lo que se lee cómodo.
       case DiaryEntryKind.text:
-        return SelectableText(
-          e.body,
-          style: TextStyle(
-            fontSize: 14,
-            height: 1.55,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
+        return readingWidth(
+          SelectableText(
+            e.body,
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.55,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         );
     }
