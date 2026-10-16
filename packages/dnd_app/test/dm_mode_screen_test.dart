@@ -221,10 +221,7 @@ void main() {
 
     await tester.tap(find.text('Combate'));
     await tester.pumpAndSettle();
-    expect(
-      find.widgetWithText(FilledButton, 'Armar combate'),
-      findsNWidgets(2),
-    );
+    expect(find.widgetWithText(FilledButton, 'Armar combate'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -786,7 +783,7 @@ void main() {
       await openCombate(tester);
 
       expect(find.text('No hay ningún combate en curso.'), findsOneWidget);
-      expect(find.text('Armar combate'), findsNWidgets(2));
+      expect(find.text('Armar combate'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -1191,7 +1188,7 @@ void main() {
     ) async {
       await pumpDmMode(tester, seed: seedTable);
       await openCombate(tester);
-      expect(find.text('Armar combate'), findsNWidgets(2));
+      expect(find.text('Armar combate'), findsOneWidget);
 
       await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
@@ -1681,10 +1678,8 @@ void main() {
       await openCombate(tester);
 
       expect(find.text('No se pudo leer el combate.'), findsOneWidget);
-      final armar = find.widgetWithText(FilledButton, 'Armar combate');
-      expect(tester.widget<FilledButton>(armar).onPressed, isNull);
-      await tester.tap(armar);
-      await tester.pumpAndSettle();
+      // Sin poder leerlo no se ofrece armar otro: lo pisaría entero.
+      expect(find.text('Armar combate'), findsNothing);
       expect(server.encounters['tumba'], same(combate));
 
       server.beforeHandle = null;

@@ -1720,8 +1720,10 @@ class _CampaignDetailState extends State<_CampaignDetail> {
                         ],
                         icon: const Icon(Icons.more_horiz),
                       ),
-                      const SizedBox(width: 8),
-                      _primaryAction(),
+                      if (_primaryAction() case final action?) ...[
+                        const SizedBox(width: 8),
+                        action,
+                      ],
                     ],
                   ),
                 ],
@@ -1817,7 +1819,7 @@ class _CampaignDetailState extends State<_CampaignDetail> {
       ?.where((chapter) => chapter.state == ChapterState.active)
       .firstOrNull;
 
-  Widget _primaryAction() {
+  Widget? _primaryAction() {
     return switch (widget.section) {
       _CampaignSection.mesa => FilledButton.icon(
         onPressed: _busy ? null : _addMember,
@@ -1843,15 +1845,11 @@ class _CampaignDetailState extends State<_CampaignDetail> {
         icon: const Icon(Icons.add),
         label: Text(context.l10n.npcNew),
       ),
-      _CampaignSection.combate when _encounter == null => FilledButton.icon(
-        // Sin haber podido leer el combate no se sabe si hay uno en curso, y
-        // armar otro lo reemplazaría: el guardado pisa el combate entero.
-        onPressed: _encounterLoading || _encounterError != null
-            ? null
-            : _startEncounter,
-        icon: const Icon(Icons.local_fire_department_outlined),
-        label: Text(context.l10n.dmSetUpCombat),
-      ),
+      // Sin combate, «Armar combate» vive en el estado vacío del centro: dos
+      // botones iguales en la misma pantalla se leían como acciones distintas.
+      // Mientras carga o si falló la lectura tampoco va: no se sabe si hay uno
+      // en curso, y armar otro lo pisaría entero.
+      _CampaignSection.combate when _encounter == null => null,
       // Mientras se arma la mesa, la acción principal es tirar iniciativa: es
       // lo que la pone a jugar. Recién ahí aparece «Siguiente turno».
       _CampaignSection.combate when _encounter!.isPreparing =>
