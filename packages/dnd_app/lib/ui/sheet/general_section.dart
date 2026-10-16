@@ -813,24 +813,53 @@ extension _SheetGeneralSection on _SheetScreenState {
     return sheetCard(
       icon: Icons.badge,
       title: context.l10n.identityTitle,
-      child: DenseRows(
-        children: [
-          for (final (label, value) in rows)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(label, style: TextStyle(color: pal.textMuted)),
+      // En una columna angosta (la ficha a tres columnas) el tercio del rótulo
+      // no llegaba ni para «Alineamiento» y lo partía a mitad de palabra: ahí
+      // el rótulo va arriba del valor en vez de al costado.
+      child: LayoutBuilder(
+        builder: (context, box) {
+          final stacked = box.maxWidth < 360;
+          return DenseRows(
+            children: [
+              for (final (label, value) in rows)
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
                   ),
-                  Flexible(
-                    flex: 2,
-                    child: Text(value, textAlign: TextAlign.end),
-                  ),
-                ],
-              ),
-            ),
-        ],
+                  child: stacked
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              label,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: pal.textMuted,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(value),
+                          ],
+                        )
+                      : Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                label,
+                                style: TextStyle(color: pal.textMuted),
+                              ),
+                            ),
+                            Flexible(
+                              flex: 2,
+                              child: Text(value, textAlign: TextAlign.end),
+                            ),
+                          ],
+                        ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }
