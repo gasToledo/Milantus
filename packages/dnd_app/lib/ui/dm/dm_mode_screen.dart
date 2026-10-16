@@ -7,6 +7,7 @@ import '../../api/api_client.dart';
 import '../../api/api_exception.dart';
 import '../../api/api_models.dart';
 import '../../data/campaigns_controller.dart';
+import '../../data/characters_controller.dart';
 import '../../data/homebrew_store.dart';
 import '../../data/settings_service.dart';
 import '../../homebrew/homebrew_screen.dart';
@@ -17,6 +18,7 @@ import '../app_sidebar.dart';
 import '../pending_events_gate.dart';
 import '../portrait_image.dart';
 import '../settings_view.dart';
+import '../sheet_screen.dart';
 import '../../web/screen_awake.dart';
 import 'add_monster_dialog.dart';
 import 'bestiary_view.dart';
@@ -126,6 +128,30 @@ class _DmModeScreenState extends State<DmModeScreen> {
       ),
     ),
   );
+
+  /// La ficha de un PNJ con ficha de personaje, encima del combate y en su
+  /// solapa Combate. Es la misma pantalla que abre la Biblioteca (ver
+  /// `NpcDetailScreen._openSheet`): el DM puede gastar ahí un espacio de
+  /// conjuro o un uso de un rasgo, porque la ficha es suya, y se guarda por la
+  /// ruta de personajes igual que desde allá.
+  Future<void> _openNpcSheet(Character sheet) async {
+    final controller = CharactersController(widget.api)..characters.add(sheet);
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => SheetScreen(
+          character: sheet,
+          repo: widget.repo,
+          controller: controller,
+          settingsController: _settings,
+          theme: _theme,
+          npcMode: true,
+          openOnCombat: true,
+        ),
+      ),
+    );
+    await controller.flush();
+    controller.dispose();
+  }
 
   Campaign? get _effectiveSelection =>
       _campaigns.campaigns
@@ -595,6 +621,7 @@ class _DmModeScreenState extends State<DmModeScreen> {
           // este mismo panel, y volver a la campaña reconstruye esto.
           showDifficulty: _settings.settings.showEncounterDifficulty,
           onOpenNpc: _openNpc,
+          onOpenNpcSheet: _openNpcSheet,
         );
       },
     );
@@ -757,6 +784,7 @@ class _CampaignDetail extends StatefulWidget {
   final VoidCallback onDelete;
   final void Function(String chapterId) onOpenNotebook;
   final Future<void> Function(String npcId) onOpenNpc;
+  final Future<void> Function(Character sheet) onOpenNpcSheet;
 
   /// La preferencia de la cuenta: ver la dificultad del encuentro.
   final bool showDifficulty;
@@ -772,6 +800,7 @@ class _CampaignDetail extends StatefulWidget {
     required this.onDelete,
     required this.onOpenNotebook,
     required this.onOpenNpc,
+    required this.onOpenNpcSheet,
     required this.showDifficulty,
   });
 
@@ -867,6 +896,13 @@ class _CampaignDetailState extends State<_CampaignDetail> {
 
   Future<void> _openNpc(String npcId) async {
     await widget.onOpenNpc(npcId);
+    if (mounted) await _loadNpcs();
+  }
+
+  /// Al volver se relee la lista: la CA y la línea de tipo del combate salen
+  /// de la ficha, y el DM pudo haberle cambiado la armadura ahí adentro.
+  Future<void> _openNpcSheet(Character sheet) async {
+    await widget.onOpenNpcSheet(sheet);
     if (mounted) await _loadNpcs();
   }
 
@@ -1805,6 +1841,7 @@ class _CampaignDetailState extends State<_CampaignDetail> {
               onAddNpc: _addNpc,
               onSetSide: _setCombatantSide,
               onConvertToNpc: _convertToNpc,
+              onOpenNpcSheet: _openNpcSheet,
               onAdjustHp: _adjustCombatantHp,
               onRemoveCombatant: _removeCombatant,
               onSetTags: _setCombatantTags,

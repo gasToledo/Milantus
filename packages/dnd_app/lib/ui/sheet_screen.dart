@@ -72,6 +72,11 @@ class SheetScreen extends StatefulWidget {
   /// campañas del jugador, ni el aviso de turno. El servidor ya las rechaza
   /// para una ficha de PNJ; acá ni se ofrecen.
   final bool npcMode;
+
+  /// Abre directo en la solapa Combate. La usa el turno de un PNJ en la mesa
+  /// del DM: lo que se busca ahí son sus ataques y conjuros, y caer en
+  /// Personaje obligaba a un toque más con la iniciativa corriendo.
+  final bool openOnCombat;
   const SheetScreen({
     super.key,
     required this.character,
@@ -80,6 +85,7 @@ class SheetScreen extends StatefulWidget {
     this.settingsController,
     required this.theme,
     this.npcMode = false,
+    this.openOnCombat = false,
   });
 
   @override
@@ -89,7 +95,9 @@ class SheetScreen extends StatefulWidget {
 class _SheetScreenState extends State<SheetScreen> {
   late Character _c = widget.character;
   late final SettingsController _settingsController;
-  _SheetTab _tab = _SheetTab.personaje;
+  late _SheetTab _tab = widget.openOnCombat
+      ? _SheetTab.combate
+      : _SheetTab.personaje;
 
   ContentRepository get repo => widget.repo;
   CharactersController get ctrl => widget.controller;

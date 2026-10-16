@@ -1692,6 +1692,7 @@
   "encNeutralNoStats": "Neutral · no stats",
   "encBackgroundOf": "Background of {name}",
   "encConvertToNpc": "Convert to NPC",
+  "encOpenSheet": "Open sheet",
   "encNoEffects": "Nobody has effects noted. They are noted from each combatant’s row.",
   "encRemoveEffect": "Remove “{tag}” from {name}",
   "encLegendaryActions": "Legendary actions",

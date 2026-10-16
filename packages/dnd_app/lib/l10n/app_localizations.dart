@@ -10260,6 +10260,12 @@ abstract class AppLocalizations {
   /// **'Convertir en PNJ'**
   String get encConvertToNpc;
 
+  /// No description provided for @encOpenSheet.
+  ///
+  /// In es, this message translates to:
+  /// **'Abrir ficha'**
+  String get encOpenSheet;
+
   /// No description provided for @encNoEffects.
   ///
   /// In es, this message translates to:

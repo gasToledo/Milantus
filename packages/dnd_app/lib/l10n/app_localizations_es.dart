@@ -6330,6 +6330,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get encConvertToNpc => 'Convertir en PNJ';
 
   @override
+  String get encOpenSheet => 'Abrir ficha';
+
+  @override
   String get encNoEffects =>
       'Nadie tiene efectos anotados. Se anotan desde la fila de cada combatiente.';
 

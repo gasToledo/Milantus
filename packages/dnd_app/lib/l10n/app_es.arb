@@ -5079,6 +5079,7 @@
     }
   },
   "encConvertToNpc": "Convertir en PNJ",
+  "encOpenSheet": "Abrir ficha",
   "encNoEffects": "Nadie tiene efectos anotados. Se anotan desde la fila de cada combatiente.",
   "encRemoveEffect": "Sacar «{tag}» de {name}",
   "@encRemoveEffect": {

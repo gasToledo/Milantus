@@ -2,6 +2,7 @@ import 'package:dnd_app/api/api_client.dart';
 import 'package:dnd_app/theme/app_theme.dart';
 import 'package:dnd_app/theme/app_widgets.dart';
 import 'package:dnd_app/ui/dm/dm_mode_screen.dart';
+import 'package:dnd_app/ui/sheet_screen.dart';
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -487,6 +488,61 @@ void main() {
         inDialog(find.text('Hija del prestamista de Phandalin.')),
         findsOneWidget,
       );
+      // Su bloque ya está en la columna: no hay otra ficha que abrir.
+      expect(find.byKey(const ValueKey('combate-abrir-ficha')), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    // Un PNJ con ficha de personaje no tiene bloque que mostrar en la columna:
+    // sin este atajo, ver qué puede hacer en su turno era salir del combate.
+    testWidgets('el turno de un PNJ con ficha abre su ficha en Combate', (
+      tester,
+    ) async {
+      final sheet = Character(
+        id: 'sheet-v',
+        name: 'Vadrik',
+        raceId: 'human',
+        classId: 'rogue',
+        backgroundId: 'criminal',
+        assignedScores: const {Ability.dexterity: 16},
+      );
+      await pumpCombate(
+        tester,
+        seed: (s) {
+          s.characters[sheet.id] = sheet;
+          s.npcSheets.add(sheet.id);
+          addNpc(
+            s,
+            Npc(
+              id: 'vadrik',
+              name: 'Vadrik',
+              sheetKind: NpcSheetKind.character,
+              characterId: sheet.id,
+            ),
+          );
+          s.encounters['tumba'] = running([
+            npcCombatant('vadrik', 'Vadrik', side: CombatantSide.enemy),
+            goblin(),
+          ]);
+        },
+      );
+
+      await tester.tap(find.byKey(const ValueKey('combate-abrir-ficha')));
+      await tester.pumpAndSettle();
+
+      final screen = find.byType(SheetScreen);
+      expect(screen, findsOneWidget);
+      expect(
+        find.descendant(of: screen, matching: find.text('Salvaciones')),
+        findsOneWidget,
+      );
+
+      // En escritorio la ficha vuelve desde su panel lateral y no desde una
+      // AppBar, así que `pageBack` no encuentra botón: se cierra la ruta.
+      Navigator.of(tester.element(screen)).pop();
+      await tester.pumpAndSettle();
+      expect(find.byType(SheetScreen), findsNothing);
+      expect(find.byKey(const ValueKey('combate-panel')), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 

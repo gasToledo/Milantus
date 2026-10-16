@@ -6329,6 +6329,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get encConvertToNpc => 'Convert to NPC';
 
   @override
+  String get encOpenSheet => 'Open sheet';
+
+  @override
   String get encNoEffects =>
       'Nobody has effects noted. They are noted from each combatant’s row.';
 

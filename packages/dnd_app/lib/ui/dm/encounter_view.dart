@@ -95,6 +95,11 @@ class EncounterView extends StatefulWidget {
   /// Convierte a un monstruo de la mesa en un PNJ llamado [name].
   final void Function(String combatantId, String name) onConvertToNpc;
 
+  /// Abre la ficha completa de un PNJ con ficha de personaje. Su turno no
+  /// tiene bloque que mostrar en la columna, así que sin esto el DM tenía que
+  /// salir del combate y buscarlo en la Biblioteca para ver qué puede hacer.
+  final Future<void> Function(Character sheet) onOpenNpcSheet;
+
   /// [delta] es lo que cambia: negativo es daño, positivo es cura. El
   /// clampeo a `0..maxHp` lo hace `Encounter.withHp`, no esta pantalla.
   final void Function(String combatantId, int delta) onAdjustHp;
@@ -134,6 +139,7 @@ class EncounterView extends StatefulWidget {
     required this.onAddNpc,
     required this.onSetSide,
     required this.onConvertToNpc,
+    required this.onOpenNpcSheet,
     required this.onAdjustHp,
     required this.onRemoveCombatant,
     required this.onSetTags,
@@ -910,6 +916,16 @@ class _EncounterViewState extends State<EncounterView> {
               style: const TextStyle(fontFamily: 'Georgia', fontSize: 19),
             ),
             if (!isNpc) SourceBadge(creature!.source),
+            // Al lado del nombre y no al pie: el turno de un PNJ con ficha no
+            // tiene bloque abajo, y lo que se viene a buscar —qué ataques y
+            // conjuros tiene— está del otro lado de este botón.
+            if (npc?.sheet case final sheet?)
+              OutlinedButton.icon(
+                key: const ValueKey('combate-abrir-ficha'),
+                onPressed: () => widget.onOpenNpcSheet(sheet),
+                icon: const Icon(Icons.open_in_new, size: 16),
+                label: Text(context.l10n.encOpenSheet),
+              ),
           ],
         ),
         const SizedBox(height: 5),
