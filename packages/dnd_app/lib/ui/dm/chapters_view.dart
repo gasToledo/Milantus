@@ -159,6 +159,8 @@ class ChaptersView extends StatelessWidget {
   }
 }
 
+enum _ChapterMenuAction { edit, delete }
+
 class _ChapterCard extends StatelessWidget {
   final Chapter chapter;
   final VoidCallback onEdit;
@@ -214,6 +216,37 @@ class _ChapterCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 GoldPill(context.l10n.dmLevelsUp),
               ],
+              PopupMenuButton<_ChapterMenuAction>(
+                tooltip: context.l10n.dmChapterActions,
+                // Compacto para que no agrande la fila del título.
+                padding: EdgeInsets.zero,
+                onSelected: (action) => switch (action) {
+                  _ChapterMenuAction.edit => onEdit(),
+                  _ChapterMenuAction.delete => onDelete(),
+                },
+                itemBuilder: (context) => [
+                  if (!isDone)
+                    PopupMenuItem(
+                      value: _ChapterMenuAction.edit,
+                      child: ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const Icon(Icons.edit_outlined),
+                        title: Text(context.l10n.commonEdit),
+                      ),
+                    ),
+                  PopupMenuItem(
+                    value: _ChapterMenuAction.delete,
+                    child: ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(Icons.delete_outline, color: pal.crimson),
+                      title: Text(
+                        context.l10n.commonDelete,
+                        style: TextStyle(color: pal.crimson),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
           if (chapter.summary.isNotEmpty) ...[
@@ -252,16 +285,13 @@ class _ChapterCard extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 12),
+          // Un solo primario según el estado, y al lado la salida al
+          // Cuaderno; editar y borrar viven en el menú «⋯» del título.
           Wrap(
             spacing: 8,
             runSpacing: 8,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              TextButton.icon(
-                onPressed: onOpenNotebook,
-                icon: const Icon(Icons.menu_book_outlined),
-                label: Text(context.l10n.dmViewInNotebook),
-              ),
               if (chapter.state == ChapterState.planned)
                 FilledButton.icon(
                   onPressed: onStart,
@@ -274,17 +304,10 @@ class _ChapterCard extends StatelessWidget {
                   icon: const Icon(Icons.done_all),
                   label: Text(context.l10n.dmCloseChapter),
                 ),
-              if (!isDone)
-                OutlinedButton.icon(
-                  onPressed: onEdit,
-                  icon: const Icon(Icons.edit_outlined),
-                  label: Text(context.l10n.commonEdit),
-                ),
               TextButton.icon(
-                onPressed: onDelete,
-                icon: const Icon(Icons.delete_outline),
-                label: Text(context.l10n.commonDelete),
-                style: TextButton.styleFrom(foregroundColor: pal.crimson),
+                onPressed: onOpenNotebook,
+                icon: const Icon(Icons.menu_book_outlined),
+                label: Text(context.l10n.dmViewInNotebook),
               ),
             ],
           ),

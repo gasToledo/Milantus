@@ -114,8 +114,12 @@ class EncounterView extends StatefulWidget {
   /// [_confirmClose]. [deadNpcIds] son los PNJ que el DM marcó muertos.
   final void Function({bool discard, Set<String> deadNpcIds}) onCloseEncounter;
 
+  /// Arma el combate desde el estado vacío; sin él, el vacío no ofrece acción.
+  final VoidCallback? onSetUp;
+
   const EncounterView({
     super.key,
+    this.onSetUp,
     required this.repo,
     required this.encounter,
     required this.loading,
@@ -177,7 +181,14 @@ class _EncounterViewState extends State<EncounterView> {
       return AppEmptyState(
         icon: Icons.local_fire_department_outlined,
         message: context.l10n.encNone,
-        actions: const [],
+        actions: [
+          if (widget.onSetUp != null)
+            FilledButton.icon(
+              onPressed: widget.onSetUp,
+              icon: const Icon(Icons.local_fire_department_outlined),
+              label: Text(context.l10n.dmSetUpCombat),
+            ),
+        ],
       );
     }
 

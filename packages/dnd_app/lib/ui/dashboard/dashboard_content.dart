@@ -12,69 +12,77 @@ extension _DashboardContent on _DashboardScreenState {
         theme: widget.theme,
       );
     }
-    return ListenableBuilder(
-      listenable: controller,
-      builder: (context, _) {
-        final all = controller.characters;
-        final list = _visible(all);
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _header(context, all),
-            Expanded(
-              child: all.isEmpty
-                  // "Todavía no creaste ninguno" y "ninguno coincide con lo
-                  // que buscaste" son situaciones distintas y piden acciones
-                  // distintas: la primera, empezar; la segunda, corregir la
-                  // búsqueda.
-                  ? AppEmptyState(
-                      icon: Icons.shield_outlined,
-                      message: context.l10n.rosterEmpty,
-                      actions: [
-                        FilledButton.icon(
-                          onPressed: _openWizard,
-                          icon: const Icon(Icons.add, size: 20),
-                          label: Text(context.l10n.rosterCreate),
-                        ),
-                        OutlinedButton.icon(
-                          onPressed: _import,
-                          icon: const Icon(Icons.download, size: 20),
-                          label: Text(context.l10n.importBackupTitle),
-                        ),
-                        TextButton.icon(
-                          onPressed: _tryExample,
-                          icon: const Icon(Icons.visibility_outlined, size: 20),
-                          label: Text(context.l10n.rosterTryExample),
-                        ),
-                      ],
-                    )
-                  : list.isEmpty
-                  ? AppEmptyState(
-                      icon: Icons.search_off,
-                      message: context.l10n.rosterNoMatch(_query),
-                      actions: [
-                        OutlinedButton.icon(
-                          onPressed: () {
-                            _searchCtrl.clear();
-                            _updateState(() => _query = '');
-                          },
-                          icon: const Icon(Icons.close, size: 20),
-                          label: Text(context.l10n.rosterClearSearch),
-                        ),
-                      ],
-                    )
-                  : _grid(list),
-            ),
-          ],
+    return LayoutBuilder(
+      builder: (context, box) {
+        final margin = _rosterMargin(box.maxWidth);
+        return ListenableBuilder(
+          listenable: controller,
+          builder: (context, _) {
+            final all = controller.characters;
+            final list = _visible(all);
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _header(context, all, margin),
+                Expanded(
+                  child: all.isEmpty
+                      // "Todavía no creaste ninguno" y "ninguno coincide con lo
+                      // que buscaste" son situaciones distintas y piden acciones
+                      // distintas: la primera, empezar; la segunda, corregir la
+                      // búsqueda.
+                      ? AppEmptyState(
+                          icon: Icons.shield_outlined,
+                          message: context.l10n.rosterEmpty,
+                          actions: [
+                            FilledButton.icon(
+                              onPressed: _openWizard,
+                              icon: const Icon(Icons.add, size: 20),
+                              label: Text(context.l10n.rosterCreate),
+                            ),
+                            OutlinedButton.icon(
+                              onPressed: _import,
+                              icon: const Icon(Icons.download, size: 20),
+                              label: Text(context.l10n.importBackupTitle),
+                            ),
+                            TextButton.icon(
+                              onPressed: _tryExample,
+                              icon: const Icon(
+                                Icons.visibility_outlined,
+                                size: 20,
+                              ),
+                              label: Text(context.l10n.rosterTryExample),
+                            ),
+                          ],
+                        )
+                      : list.isEmpty
+                      ? AppEmptyState(
+                          icon: Icons.search_off,
+                          message: context.l10n.rosterNoMatch(_query),
+                          actions: [
+                            OutlinedButton.icon(
+                              onPressed: () {
+                                _searchCtrl.clear();
+                                _updateState(() => _query = '');
+                              },
+                              icon: const Icon(Icons.close, size: 20),
+                              label: Text(context.l10n.rosterClearSearch),
+                            ),
+                          ],
+                        )
+                      : _grid(list, margin),
+                ),
+              ],
+            );
+          },
         );
       },
     );
   }
 
-  Widget _header(BuildContext context, List<Character> all) {
+  Widget _header(BuildContext context, List<Character> all, double margin) {
     final scheme = Theme.of(context).colorScheme;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(32, 26, 32, 0),
+      padding: EdgeInsets.fromLTRB(margin, 26, margin, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -266,66 +274,95 @@ extension _DashboardContent on _DashboardScreenState {
     );
   }
 
-  Widget _grid(List<Character> list) {
+  /// Margen lateral de todo el roster (encabezado, buscador y grilla).
+  ///
+  /// Una sola cuenta para las tres piezas: antes el título iba a 32 y la
+  /// grilla a 16 en teléfono, y las tarjetas sobresalían del panel de
+  /// búsqueda. Se decide por el ancho que le queda al contenido (con el panel
+  /// lateral ya descontado), no por la ventana.
+  double _rosterMargin(double width) => width < 560 ? 16.0 : 32.0;
+
+  Widget _grid(List<Character> list, double horizontalPadding) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isCompact = constraints.maxWidth < 560;
-        final horizontalPadding = isCompact ? 16.0 : 32.0;
-
-        // El delegado reparte el ancho en columnas de a lo sumo
-        // `_kCardMaxExtent`, así que el ancho real de una tarjeta no se sabe
-        // sin repetir esa cuenta acá: subir el máximo no la ensancha si
-        // igual entra una columna más. Con el ancho ya resuelto, la tarjeta
-        // se escala en proporción y el alto de la celda la acompaña.
+        // Misma cuenta de columnas que hacía el delegado de la grilla, ahora
+        // explícita: el ancho real de una tarjeta no se sabe sin repetirla, y
+        // con el ancho ya resuelto la tarjeta se escala en proporción.
         final available = constraints.maxWidth - horizontalPadding * 2;
         final columns = (available / _kCardMaxExtent).ceil().clamp(1, 99);
         final cardWidth = (available - _kCardSpacing * (columns - 1)) / columns;
         final scale = (cardWidth / _kCardBaseWidth).clamp(1.0, 1.3);
+        final rows = (list.length / columns).ceil();
 
-        return GridView.builder(
+        // Filas con alto intrínseco y no `mainAxisExtent`: un alto fijo se
+        // calibraba para un contenido que cambia con el ancho (las pastillas de
+        // nivel y trasfondo envuelven, el texto escala), así que sobraban
+        // decenas de píxeles bajo la fila CA/VEL/INIC. Cada fila mide a su
+        // tarjeta más alta y las demás se estiran a ese alto.
+        return ListView.builder(
           padding: EdgeInsets.fromLTRB(
             horizontalPadding,
             14,
             horizontalPadding,
             32,
           ),
-          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: _kCardMaxExtent,
-            mainAxisExtent: _kCardBaseHeight * scale,
-            crossAxisSpacing: _kCardSpacing,
-            mainAxisSpacing: _kCardSpacing,
-          ),
-          itemCount: list.length,
-          itemBuilder: (context, i) {
-            final c = list[i];
-            final card = _CharacterCard(
-              character: c,
-              sheet: _sheetOf(c),
-              repo: repo,
-              scale: scale,
-              isFavorite: _isFavorite(c),
-              onTap: () => _openSheet(c),
-              onToggleFavorite: () => _toggleFavorite(c),
-              // En los extremos no hay a dónde mover: la opción queda
-              // deshabilitada, no escondida, para que la lista de acciones no
-              // cambie de forma según dónde esté la tarjeta.
-              onMoveBefore: i == 0 ? null : () => _moveBy(c, -1, list),
-              onMoveAfter: i == list.length - 1
-                  ? null
-                  : () => _moveBy(c, 1, list),
-              onRename: () => _renameCharacter(c),
-              onExport: () => _exportCharacter(c),
-              onDelete: () => _confirmDelete(c),
-            );
-            return _ReorderableCard(
-              id: c.id,
-              onDropped: (draggedId) => _reorder(draggedId, c.id, list),
-              cardWidth: cardWidth,
-              child: card,
+          itemCount: rows,
+          itemBuilder: (context, row) {
+            return Padding(
+              padding: EdgeInsets.only(top: row == 0 ? 0 : _kCardSpacing),
+              child: IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (var col = 0; col < columns; col++) ...[
+                      if (col > 0) const SizedBox(width: _kCardSpacing),
+                      Expanded(
+                        // La última fila incompleta deja huecos del mismo
+                        // ancho para que las tarjetas no se ensanchen.
+                        child: row * columns + col < list.length
+                            ? _cardAt(
+                                list,
+                                row * columns + col,
+                                cardWidth,
+                                scale,
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
             );
           },
         );
       },
+    );
+  }
+
+  Widget _cardAt(List<Character> list, int i, double cardWidth, double scale) {
+    final c = list[i];
+    final card = _CharacterCard(
+      character: c,
+      sheet: _sheetOf(c),
+      repo: repo,
+      scale: scale,
+      isFavorite: _isFavorite(c),
+      onTap: () => _openSheet(c),
+      onToggleFavorite: () => _toggleFavorite(c),
+      // En los extremos no hay a dónde mover: la opción queda deshabilitada,
+      // no escondida, para que la lista de acciones no cambie de forma según
+      // dónde esté la tarjeta.
+      onMoveBefore: i == 0 ? null : () => _moveBy(c, -1, list),
+      onMoveAfter: i == list.length - 1 ? null : () => _moveBy(c, 1, list),
+      onRename: () => _renameCharacter(c),
+      onExport: () => _exportCharacter(c),
+      onDelete: () => _confirmDelete(c),
+    );
+    return _ReorderableCard(
+      id: c.id,
+      onDropped: (draggedId) => _reorder(draggedId, c.id, list),
+      cardWidth: cardWidth,
+      child: card,
     );
   }
 }

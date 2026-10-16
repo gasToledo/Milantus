@@ -5247,6 +5247,7 @@
     }
   },
   "dmCampaignActions": "Acciones de campaña",
+  "dmChapterActions": "Acciones del capítulo",
   "dmAddingMember": "Sumando personaje…",
   "dmSetUpCombat": "Armar combate",
   "dmNextTurn": "Siguiente turno",

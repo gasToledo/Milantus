@@ -163,8 +163,10 @@ class NpcStatusSelector extends StatelessWidget {
         style: SegmentedButton.styleFrom(
           visualDensity: VisualDensity.compact,
           textStyle: const TextStyle(fontSize: 12),
-          selectedForegroundColor: npcStatusColor(status, pal),
-          selectedBackgroundColor: pal.goldSoft,
+          // El relleno lleva el color del estado elegido; el texto, el
+          // inverso del tema (contraste calculado contra cada acento).
+          selectedForegroundColor: Theme.of(context).colorScheme.onPrimary,
+          selectedBackgroundColor: npcStatusColor(status, pal),
         ),
         segments: [
           for (final s in NpcStatus.values)
@@ -210,10 +212,10 @@ class SideSelector extends StatelessWidget {
         style: SegmentedButton.styleFrom(
           visualDensity: VisualDensity.compact,
           textStyle: const TextStyle(fontSize: 12),
-          selectedForegroundColor: side == null
+          selectedForegroundColor: Theme.of(context).colorScheme.onPrimary,
+          selectedBackgroundColor: side == null
               ? null
               : combatantSideColor(side!, pal),
-          selectedBackgroundColor: pal.goldSoft,
         ),
         segments: [
           for (final s in CombatantSide.values)

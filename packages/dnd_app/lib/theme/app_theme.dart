@@ -49,6 +49,15 @@ class AppPalette extends ThemeExtension<AppPalette> {
     textMuted: Color(0xFF6E6047), // 5.7:1 sobre surface, 4.7:1 sobre plaque
   );
 
+  /// Color de los PG según cuánto queda: verde con más de la mitad, dorado
+  /// entre la mitad y un cuarto, carmesí en un cuarto o menos (el mismo umbral
+  /// que el rótulo «crítico» de la tarjeta).
+  Color hpColor(double ratio) => ratio > 0.5
+      ? verdant
+      : ratio > 0.25
+      ? gold
+      : crimson;
+
   @override
   AppPalette copyWith({
     Color? gold,
@@ -300,6 +309,16 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(color: palette.hairline),
+        ),
+      ),
+      // El segmento elegido va relleno del acento y con el texto invertido: con
+      // el `secondaryContainer` por defecto (oro suave sobre fondo casi negro)
+      // no se distinguía cuál estaba activo. El resto queda transparente.
+      segmentedButtonTheme: SegmentedButtonThemeData(
+        style: SegmentedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          selectedBackgroundColor: palette.gold,
+          selectedForegroundColor: onAccent,
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(

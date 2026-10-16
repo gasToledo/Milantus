@@ -10722,6 +10722,12 @@ abstract class AppLocalizations {
   /// **'Acciones de campaña'**
   String get dmCampaignActions;
 
+  /// No description provided for @dmChapterActions.
+  ///
+  /// In es, this message translates to:
+  /// **'Acciones del capítulo'**
+  String get dmChapterActions;
+
   /// No description provided for @dmAddingMember.
   ///
   /// In es, this message translates to:

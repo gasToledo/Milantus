@@ -66,17 +66,16 @@ class _SettingsViewState extends State<SettingsView> {
   }
 
   @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, box) => _page(context, box.maxWidth < 600 ? 12 : 24),
-  );
+  Widget build(BuildContext context) => _page(context);
 
-  Widget _page(BuildContext context, double side) {
+  Widget _page(BuildContext context) {
     final pal = context.palette;
     final l10n = context.l10n;
     return ListView(
-      // En un teléfono el margen se achica: el interruptor de modo, con sus
-      // dos rótulos, no entra en el ancho que dejan 24 de cada lado.
-      padding: EdgeInsets.fromLTRB(side, 24, side, 32),
+      // 24 a los costados en cualquier ancho, como Capítulos, Cuaderno y PNJ:
+      // con 12 en pantallas angostas el título quedaba más pegado al borde
+      // que el de las demás secciones.
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
       children: [
         Align(
           alignment: Alignment.topLeft,

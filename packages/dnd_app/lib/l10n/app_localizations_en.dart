@@ -6588,6 +6588,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dmCampaignActions => 'Campaign actions';
 
   @override
+  String get dmChapterActions => 'Chapter actions';
+
+  @override
   String get dmAddingMember => 'Adding character…';
 
   @override

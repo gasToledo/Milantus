@@ -100,7 +100,7 @@ void main() {
   }
 
   Future<void> startEmpty(WidgetTester tester) async {
-    await tester.tap(find.text('Armar combate'));
+    await tester.tap(find.text('Armar combate').first);
     await tester.pumpAndSettle();
   }
 

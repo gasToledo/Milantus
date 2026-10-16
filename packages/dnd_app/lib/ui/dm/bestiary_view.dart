@@ -105,6 +105,86 @@ List<Creature> filterCreatures(
   return results;
 }
 
+/// Un ícono por tipo de criatura: con 338 filas, la forma se lee antes que el
+/// texto. `switch` exhaustivo para que un tipo nuevo del engine no compile sin
+/// ícono; el tipo ausente (criatura homebrew sin tipo) cae al genérico.
+IconData _typeIcon(CreatureType? t) => switch (t) {
+  CreatureType.aberration => Icons.visibility_outlined,
+  CreatureType.beast => Icons.pets_outlined,
+  CreatureType.celestial => Icons.wb_sunny_outlined,
+  CreatureType.construct => Icons.precision_manufacturing_outlined,
+  CreatureType.dragon => Icons.local_fire_department_outlined,
+  CreatureType.elemental => Icons.water_drop_outlined,
+  CreatureType.fey => Icons.auto_awesome_outlined,
+  CreatureType.fiend => Icons.whatshot_outlined,
+  CreatureType.giant => Icons.landscape_outlined,
+  CreatureType.humanoid => Icons.person_outline,
+  CreatureType.monstrosity => Icons.cruelty_free_outlined,
+  CreatureType.ooze => Icons.bubble_chart_outlined,
+  CreatureType.plant => Icons.eco_outlined,
+  CreatureType.undead => Icons.sentiment_very_dissatisfied_outlined,
+  null => Icons.help_outline,
+};
+
+/// Ícono decorativo (sin semántica: el tipo ya está escrito en la línea de
+/// abajo) sobre una placa hundida.
+class _TypeIcon extends StatelessWidget {
+  final CreatureType? type;
+  const _TypeIcon(this.type);
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.palette;
+    return ExcludeSemantics(
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: pal.plaque,
+          borderRadius: BorderRadius.circular(9),
+        ),
+        child: Icon(_typeIcon(type), size: 20, color: pal.textMuted),
+      ),
+    );
+  }
+}
+
+/// El VD como pastilla. Ancho mínimo fijo para que queden en columna; cifras
+/// tabulares porque se comparan de una fila a la otra. La semántica es el
+/// propio texto «VD 10»: nada más lo repite.
+class _CrPill extends StatelessWidget {
+  final num cr;
+  const _CrPill(this.cr);
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.palette;
+    return Container(
+      constraints: const BoxConstraints(minWidth: 56),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      // `alignment` haría que el Container ocupe todo el ancho que le den, y
+      // el ListTile no admite un trailing sin ancho propio.
+      decoration: BoxDecoration(
+        color: pal.goldSoft,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Center(
+        widthFactor: 1,
+        heightFactor: 1,
+        child: Text(
+          context.l10n.hbCrValue(challengeRatingLabel(cr)),
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: pal.gold,
+            fontFeatures: const [FontFeature.tabularFigures()],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _BestiaryViewState extends State<BestiaryView> {
   final _searchController = TextEditingController();
   String _query = '';
@@ -414,13 +494,8 @@ class _BestiaryViewState extends State<BestiaryView> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      trailing: c.cr == null
-                          ? null
-                          : Text(
-                              context.l10n.hbCrValue(
-                                challengeRatingLabel(c.cr!),
-                              ),
-                            ),
+                      leading: _TypeIcon(c.creatureType),
+                      trailing: c.cr == null ? null : _CrPill(c.cr!),
                       onTap: () => setState(() => _selected = c),
                     );
                   },

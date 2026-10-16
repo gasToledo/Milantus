@@ -1805,6 +1805,7 @@ class _CampaignDetailState extends State<_CampaignDetail> {
               onSetLegendary: _setCombatantLegendary,
               onSetInitiative: _setCombatantInitiative,
               onCloseEncounter: _closeEncounter,
+              onSetUp: _startEncounter,
             ),
           },
         ),
@@ -2016,19 +2017,36 @@ class _MemberCard extends StatelessWidget {
         color: Theme.of(context).colorScheme.surface,
         child: InkWell(
           onTap: onOpenSheet,
-          child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: _memberCardBody(
-              context,
-              character,
-              sheet,
-              race,
-              klass,
-              currentHp,
-              maxHp,
-              portraitKey,
-              pal,
-            ),
+          child: Stack(
+            children: [
+              // Mismo filete de clase que la tarjeta del jugador; gris si el
+              // personaje está caído. Posicionado para no depender del alto.
+              PositionedDirectional(
+                start: 0,
+                top: 0,
+                bottom: 0,
+                width: 3,
+                child: ColoredBox(
+                  color: currentHp <= 0
+                      ? pal.hairline
+                      : classAccent(klass, pal.gold),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(14),
+                child: _memberCardBody(
+                  context,
+                  character,
+                  sheet,
+                  race,
+                  klass,
+                  currentHp,
+                  maxHp,
+                  portraitKey,
+                  pal,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -2051,6 +2069,9 @@ class _MemberCard extends StatelessWidget {
       return '$className ${character.classLevel(id)}';
     }).toList();
     if (classNames.isEmpty && klass != null) classNames.add(klass.name);
+    // maxHp 0 no divide: la barra queda vacía y en el tramo crítico.
+    final hpRatio = maxHp == 0 ? 0.0 : currentHp / maxHp;
+    final hpColor = pal.hpColor(hpRatio);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2121,17 +2142,18 @@ class _MemberCard extends StatelessWidget {
                               const SizedBox(width: 5),
                               Text(
                                 context.l10n.dmHpShort(currentHp, maxHp),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
+                                  color: hpColor,
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 6),
                           ThinBar(
-                            ratio: maxHp == 0 ? 0 : currentHp / maxHp,
-                            color: pal.crimson,
+                            ratio: hpRatio,
+                            color: hpColor,
                             track: pal.plaque,
                           ),
                         ],

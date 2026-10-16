@@ -907,7 +907,8 @@ void main() {
       await tester.tap(find.text('Inventario'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Munición · paquete de 20'), findsOneWidget);
+      // «Munición» ya lo dice el encabezado del grupo: la fila no lo repite.
+      expect(find.text('paquete de 20'), findsOneWidget);
       await tapItemAction(tester, 'arrows', 'Cantidad exacta…');
       expect(find.widgetWithText(TextField, 'Paquetes de 20'), findsOneWidget);
     });

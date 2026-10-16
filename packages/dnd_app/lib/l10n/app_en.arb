@@ -1769,6 +1769,7 @@
   "dmCombatPreparing": "Combat being set up",
   "dmCombatRound": "Combat · round {round}",
   "dmCampaignActions": "Campaign actions",
+  "dmChapterActions": "Chapter actions",
   "dmAddingMember": "Adding character…",
   "dmSetUpCombat": "Set up combat",
   "dmNextTurn": "Next turn",

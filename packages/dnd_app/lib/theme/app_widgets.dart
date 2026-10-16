@@ -266,13 +266,11 @@ class ThemeModeSelector extends StatelessWidget {
         selected: {mode},
         onSelectionChanged: (selection) => controller.choose(selection.first),
         // El tilde de seleccionado desplazaría el ícono que identifica cada
-        // segmento; el fondo dorado ya marca cuál está activo.
+        // segmento; el relleno dorado (segmentedButtonTheme) ya marca cuál
+        // está activo.
         showSelectedIcon: false,
         style: SegmentedButton.styleFrom(
-          backgroundColor: Colors.transparent,
           foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
-          selectedBackgroundColor: pal.goldSoft,
-          selectedForegroundColor: pal.gold,
           side: BorderSide(color: pal.hairline),
           visualDensity: VisualDensity.compact,
         ),

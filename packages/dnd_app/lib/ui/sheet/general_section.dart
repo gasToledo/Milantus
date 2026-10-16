@@ -1252,76 +1252,104 @@ extension _SheetGeneralSection on _SheetScreenState {
     final pal = context.palette;
     final c = _c.combat;
     final ratio = s.maxHp == 0 ? 0.0 : c.currentHp / s.maxHp;
-    // 152 es el ancho al que «COMPETENCIA» entra en un renglón; menos que eso
-    // partía el rótulo en dos. PG pide más porque lleva el par actual/máximo.
-    Widget box(Widget child, {double width = 152}) =>
-        SizedBox(width: width, child: child);
-    return Wrap(
-      spacing: 12,
-      runSpacing: 12,
-      children: [
-        box(
-          StatTile(
-            icon: Icons.shield,
-            label: context.l10n.statArmor,
-            value: '${s.armorClass}',
-          ),
-        ),
-        box(
-          StatTile(
-            label: context.l10n.hitPoints,
-            labelTrailing: '${(ratio * 100).round()}%',
-            value: '${c.currentHp}',
-            suffix: ' / ${s.maxHp}',
-            valueColor: pal.crimson,
-            footer: ThinBar(
-              ratio: ratio,
-              color: pal.crimson,
-              track: Theme.of(context).colorScheme.surface,
-            ),
-          ),
-          width: 208,
-        ),
-        // Se toca, como las plaquetas de característica: con Alerta el número
-        // ya no es la Destreza y hay que poder explicarlo en la mesa.
-        box(
-          InkWell(
-            onTap: () => _showInitiativeBreakdown(s),
-            borderRadius: BorderRadius.circular(12),
-            child: StatTile(
-              icon: Icons.bolt,
-              label: context.l10n.initiative,
-              value: _signed(s.initiative),
-            ),
-          ),
-        ),
-        box(
-          StatTile(
-            icon: Icons.keyboard_double_arrow_right,
-            label: context.l10n.creatureSpeed,
-            // Al pie y no en `labelTrailing`, que es para un dato corto tipo
-            // «85%»: con este texto la placa desborda en un teléfono.
-            footer: _c.combat.exhaustion > 0
-                ? Text(
-                    context.l10n.exhaustionSpeed(5 * _c.combat.exhaustion),
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: context.palette.crimson,
-                    ),
-                  )
-                : null,
-            value: '${s.speed}',
-            suffix: context.l10n.unitFeetSuffix,
-          ),
-        ),
-        box(
-          StatTile(
-            icon: Icons.military_tech,
-            label: context.l10n.statProficiency,
-            value: '+${s.proficiencyBonus}',
-          ),
-        ),
-      ],
+    final armor = StatTile(
+      icon: Icons.shield,
+      label: context.l10n.statArmor,
+      value: '${s.armorClass}',
+    );
+    final hp = StatTile(
+      label: context.l10n.hitPoints,
+      labelTrailing: '${(ratio * 100).round()}%',
+      value: '${c.currentHp}',
+      suffix: ' / ${s.maxHp}',
+      // El color sigue al tramo de vida y no es siempre carmesí: un rojo fijo
+      // no distingue «lleno» de «a punto de caer».
+      valueColor: pal.hpColor(ratio),
+      footer: ThinBar(
+        ratio: ratio,
+        color: pal.hpColor(ratio),
+        track: Theme.of(context).colorScheme.surface,
+      ),
+    );
+    // Se toca, como las plaquetas de característica: con Alerta el número
+    // ya no es la Destreza y hay que poder explicarlo en la mesa.
+    final initiative = InkWell(
+      onTap: () => _showInitiativeBreakdown(s),
+      borderRadius: BorderRadius.circular(12),
+      child: StatTile(
+        icon: Icons.bolt,
+        label: context.l10n.initiative,
+        value: _signed(s.initiative),
+      ),
+    );
+    final speed = StatTile(
+      icon: Icons.keyboard_double_arrow_right,
+      label: context.l10n.creatureSpeed,
+      // Al pie y no en `labelTrailing`, que es para un dato corto tipo
+      // «85%»: con este texto la placa desborda en un teléfono.
+      footer: _c.combat.exhaustion > 0
+          ? Text(
+              context.l10n.exhaustionSpeed(5 * _c.combat.exhaustion),
+              style: TextStyle(fontSize: 11, color: context.palette.crimson),
+            )
+          : null,
+      value: '${s.speed}',
+      suffix: context.l10n.unitFeetSuffix,
+    );
+    final proficiency = StatTile(
+      icon: Icons.military_tech,
+      label: context.l10n.statProficiency,
+      value: '+${s.proficiencyBonus}',
+    );
+
+    // Filas de celdas de igual ancho y alto: un Wrap con anchos fijos dejaba
+    // «Competencia» sola en una fila al ancho de un teléfono.
+    Widget row(List<Widget> cells) => IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < cells.length; i++) ...[
+            if (i > 0) const SizedBox(width: 12),
+            Expanded(child: cells[i]),
+          ],
+        ],
+      ),
+    );
+
+    return LayoutBuilder(
+      builder: (context, box) {
+        final w = box.maxWidth;
+        // 152 es el ancho al que «COMPETENCIA» entra en un renglón; menos que
+        // eso partía el rótulo en dos. Las cinco en una fila solo si cada una
+        // llega a ese mínimo.
+        final List<List<Widget>> rows;
+        if (w >= 5 * 152 + 4 * 12) {
+          rows = [
+            [armor, hp, initiative, speed, proficiency],
+          ];
+        } else if (w >= 520) {
+          // 3 + 2: nunca una celda sola en la última fila.
+          rows = [
+            [armor, hp, initiative],
+            [speed, proficiency],
+          ];
+        } else {
+          // PG pide más porque lleva el par actual/máximo: fila completa.
+          rows = [
+            [hp],
+            [armor, initiative],
+            [speed, proficiency],
+          ];
+        }
+        return Column(
+          children: [
+            for (var i = 0; i < rows.length; i++) ...[
+              if (i > 0) const SizedBox(height: 12),
+              row(rows[i]),
+            ],
+          ],
+        );
+      },
     );
   }
 

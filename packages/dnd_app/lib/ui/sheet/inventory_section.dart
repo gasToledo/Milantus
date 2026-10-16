@@ -883,8 +883,13 @@ extension _SheetInventorySection on _SheetScreenState {
     );
     // El nombre solo no alcanza cuando el SRD repite uno (Vara es a la vez
     // equipo y canalizador arcano), así que la categoría va debajo siempre.
+    // Salvo cuando el encabezado de grupo ya lo dice: bajo «EQUIPO», cada fila
+    // repetía «Equipo». Se compara el texto visible de los dos porque el grupo
+    // usa el plural («Armas») y la fila el singular, y solo coinciden en los
+    // que no tienen plural distinto.
+    final kind = itemKindText(context.l10n, info.kindLabel);
     final detail = <String>[
-      itemKindText(context.l10n, info.kindLabel),
+      if (kind != itemGroupTitle(context.l10n, info.kindLabel)) kind,
       if (info.bundleSize > 1) context.l10n.catalogBundleOf(info.bundleSize),
       if (info.rangeHint != null) context.l10n.invRangeHint(info.rangeHint!),
       if (info.twoHandedHint != null) info.twoHandedHint!,
@@ -940,7 +945,9 @@ extension _SheetInventorySection on _SheetScreenState {
                       GoldPill(slot.name, highlighted: false),
                 ],
               ),
-              Text(detail, style: muted),
+              // Vacío no se dibuja: una línea en blanco abría un hueco bajo el
+              // nombre.
+              if (detail.isNotEmpty) Text(detail, style: muted),
               if (info.maxCharges != null) _chargesRow(e, info),
               if (e.note.isNotEmpty)
                 Padding(

@@ -570,7 +570,7 @@ class _CharacterCardState extends State<_CharacterCard> {
                                 fontFamily: 'Georgia',
                                 fontSize: 13 * k,
                                 height: 1,
-                                color: pal.crimson,
+                                color: pal.hpColor(ratio),
                                 fontFeatures: const [
                                   FontFeature.tabularFigures(),
                                 ],
@@ -610,7 +610,7 @@ class _CharacterCardState extends State<_CharacterCard> {
                               ? null
                               : ThinBar(
                                   ratio: ratio,
-                                  color: pal.crimson,
+                                  color: pal.hpColor(ratio),
                                   track: pal.plaque,
                                 ),
                         ),

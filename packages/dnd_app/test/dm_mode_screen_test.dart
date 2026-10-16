@@ -221,7 +221,10 @@ void main() {
 
     await tester.tap(find.text('Combate'));
     await tester.pumpAndSettle();
-    expect(find.widgetWithText(FilledButton, 'Armar combate'), findsOneWidget);
+    expect(
+      find.widgetWithText(FilledButton, 'Armar combate'),
+      findsNWidgets(2),
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -691,13 +694,18 @@ void main() {
       await openCapitulos(tester);
       await newChapter(tester, 'La Cripta');
 
-      await tester.tap(find.widgetWithText(TextButton, 'Borrar'));
+      // «Borrar» vive en el menú «⋯» de la tarjeta.
+      await tester.tap(find.byTooltip('Acciones del capítulo'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Borrar'));
       await tester.pumpAndSettle();
       await tester.tap(dialogAction('Cancelar'));
       await tester.pumpAndSettle();
       expect(server.chapters['tumba']!, hasLength(1));
 
-      await tester.tap(find.widgetWithText(TextButton, 'Borrar'));
+      await tester.tap(find.byTooltip('Acciones del capítulo'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Borrar'));
       await tester.pumpAndSettle();
       await tester.tap(dialogAction('Borrar capítulo'));
       await tester.pumpAndSettle();
@@ -778,7 +786,7 @@ void main() {
       await openCombate(tester);
 
       expect(find.text('No hay ningún combate en curso.'), findsOneWidget);
-      expect(find.text('Armar combate'), findsOneWidget);
+      expect(find.text('Armar combate'), findsNWidgets(2));
       expect(tester.takeException(), isNull);
     });
 
@@ -789,7 +797,7 @@ void main() {
       await enterCode(tester, 'CODE-0001');
       await openCombate(tester);
 
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
 
       expect(find.text('Armando el combate'), findsOneWidget);
@@ -823,7 +831,7 @@ void main() {
       await enterCode(tester, 'CODE-0001');
       await enterCode(tester, 'CODE-0002');
       await openCombate(tester);
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Sumar a todos'));
@@ -844,7 +852,7 @@ void main() {
       final server = await pumpDmMode(tester, seed: seedTable);
       await enterCode(tester, 'CODE-0001');
       await openCombate(tester);
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Sumar'));
@@ -868,7 +876,7 @@ void main() {
     ) async {
       final server = await pumpDmMode(tester, seed: seedTable);
       await openCombate(tester);
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Sumar al combate'));
@@ -904,7 +912,7 @@ void main() {
     ) async {
       await pumpDmMode(tester, seed: seedTable);
       await openCombate(tester);
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Sumar al combate'));
@@ -959,7 +967,7 @@ void main() {
     ) async {
       final server = await pumpDmMode(tester, seed: seedTable);
       await openCombate(tester);
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
 
       await addMonsters(
@@ -993,7 +1001,7 @@ void main() {
     ) async {
       final server = await pumpDmMode(tester, seed: seedTable);
       await openCombate(tester);
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
 
       await addMonsters(tester, 'goblin', 'Guerrero goblin', count: 4);
@@ -1010,7 +1018,7 @@ void main() {
     ) async {
       await pumpDmMode(tester, seed: seedTable);
       await openCombate(tester);
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Sumar al combate'));
@@ -1028,7 +1036,7 @@ void main() {
     Future<FakeApiServer> withGoblin(WidgetTester tester) async {
       final server = await pumpDmMode(tester, seed: seedTable);
       await openCombate(tester);
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
       await addMonsters(tester, 'goblin', 'Guerrero goblin');
       return server;
@@ -1183,9 +1191,9 @@ void main() {
     ) async {
       await pumpDmMode(tester, seed: seedTable);
       await openCombate(tester);
-      expect(find.text('Armar combate'), findsOneWidget);
+      expect(find.text('Armar combate'), findsNWidgets(2));
 
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
       expect(find.text('Tirar iniciativa'), findsOneWidget);
       expect(find.text('Siguiente turno'), findsNothing);
@@ -1208,7 +1216,7 @@ void main() {
     ) async {
       await pumpDmMode(tester, seed: seedTable);
       await openCombate(tester);
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
 
       final boton = tester.widget<FilledButton>(
@@ -1226,7 +1234,7 @@ void main() {
       final server = await pumpDmMode(tester, seed: seedTable);
       await enterCode(tester, 'CODE-0001');
       await openCombate(tester);
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
       await tester.tap(find.text('Sumar'));
       await tester.pumpAndSettle();
@@ -1276,7 +1284,7 @@ void main() {
       await pumpDmMode(tester, seed: seedTable);
       await enterCode(tester, 'CODE-0001');
       await openCombate(tester);
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
       await tester.tap(find.text('Sumar'));
       await tester.pumpAndSettle();
@@ -1304,7 +1312,7 @@ void main() {
         final server = await pumpDmMode(tester, seed: seedTable);
         await enterCode(tester, 'CODE-0001');
         await openCombate(tester);
-        await tester.tap(find.text('Armar combate'));
+        await tester.tap(find.text('Armar combate').first);
         await tester.pumpAndSettle();
         await tester.tap(find.text('Sumar'));
         await tester.pumpAndSettle();
@@ -1346,7 +1354,7 @@ void main() {
         );
         await enterCode(tester, 'CODE-0001');
         await openCombate(tester);
-        await tester.tap(find.text('Armar combate'));
+        await tester.tap(find.text('Armar combate').first);
         await tester.pumpAndSettle();
         await tester.tap(find.text('Sumar'));
         await tester.pumpAndSettle();
@@ -1366,7 +1374,7 @@ void main() {
     testWidgets('cancelar la tirada deja el combate armándose', (tester) async {
       final server = await pumpDmMode(tester, seed: seedTable);
       await openCombate(tester);
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
       await addMonsters(tester, 'goblin', 'Guerrero goblin');
 
@@ -1385,7 +1393,7 @@ void main() {
     ) async {
       final server = await pumpDmMode(tester, seed: seedTable);
       await openCombate(tester);
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
       await tester.tap(find.text('Sumar al combate'));
       await tester.pumpAndSettle();
@@ -1418,7 +1426,7 @@ void main() {
     testWidgets('descartar el combate lo cierra sin guardarlo', (tester) async {
       final server = await pumpDmMode(tester, seed: seedTable);
       await openCombate(tester);
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
 
       expect(find.text('Terminar combate'), findsNothing);
@@ -1441,7 +1449,7 @@ void main() {
     testWidgets('cancelar el diálogo no termina el combate', (tester) async {
       final server = await pumpDmMode(tester, seed: seedTable);
       await openCombate(tester);
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
 
       await tester.tap(
@@ -1462,7 +1470,7 @@ void main() {
         final server = await pumpDmMode(tester, seed: seedTable);
         await enterCode(tester, 'CODE-0001');
         await openCombate(tester);
-        await tester.tap(find.text('Armar combate'));
+        await tester.tap(find.text('Armar combate').first);
         await tester.pumpAndSettle();
 
         await tester.tap(find.text('Sumar'));
@@ -1509,7 +1517,7 @@ void main() {
     ) async {
       await pumpDmMode(tester, seed: seedTable);
       await openCombate(tester);
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
       await tester.tap(find.text('Sumar al combate'));
       await tester.pumpAndSettle();
@@ -1706,7 +1714,7 @@ void main() {
       );
       await enterCode(tester, 'CODE-0001');
       await openCombate(tester);
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
       await tester.tap(find.text('Sumar'));
       await tester.pumpAndSettle();
@@ -1761,7 +1769,7 @@ void main() {
         await tester.tap(find.text('Combate'));
         await tester.pumpAndSettle();
 
-        await tester.tap(find.text('Armar combate'));
+        await tester.tap(find.text('Armar combate').first);
         await tester.pumpAndSettle();
         await addMonsters(tester, 'goblin', 'Guerrero goblin', count: 3);
         await tirarIniciativa(tester);
@@ -1813,7 +1821,7 @@ void main() {
     ) async {
       await pumpDmMode(tester, seed: seedTable);
       await openCombate(tester);
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
       await addMonsters(tester, 'mago', 'Mago');
       await tirarIniciativa(tester);
@@ -1841,7 +1849,7 @@ void main() {
       await pumpDmMode(tester, seed: seedTable);
       await enterCode(tester, 'CODE-0001');
       await openCombate(tester);
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
       await tester.tap(find.text('Sumar'));
       await tester.pumpAndSettle();
@@ -1903,7 +1911,7 @@ void main() {
       final server = await pumpDmMode(tester, seed: seedTable);
       await enterCode(tester, 'CODE-0001');
       await openCombate(tester);
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
 
       // El jugador entra primero a propósito: es el orden que antes le daba
@@ -1939,7 +1947,7 @@ void main() {
       final server = await pumpDmMode(tester, seed: seedTable);
       await enterCode(tester, 'CODE-0001');
       await openCombate(tester);
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
       await tester.tap(find.text('Sumar'));
       await tester.pumpAndSettle();
@@ -1978,7 +1986,7 @@ void main() {
       final server = await pumpDmMode(tester, seed: seedTable);
       await enterCode(tester, 'CODE-0001');
       await openCombate(tester);
-      await tester.tap(find.text('Armar combate'));
+      await tester.tap(find.text('Armar combate').first);
       await tester.pumpAndSettle();
       await tester.tap(find.text('Sumar'));
       await tester.pumpAndSettle();

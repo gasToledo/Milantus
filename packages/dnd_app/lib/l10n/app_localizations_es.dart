@@ -6587,6 +6587,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dmCampaignActions => 'Acciones de campaña';
 
   @override
+  String get dmChapterActions => 'Acciones del capítulo';
+
+  @override
   String get dmAddingMember => 'Sumando personaje…';
 
   @override
