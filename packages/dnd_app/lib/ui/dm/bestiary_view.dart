@@ -305,11 +305,27 @@ class _BestiaryViewState extends State<BestiaryView> {
         }
         final list = _list(context, results);
         if (!wide) return list;
+        // La lista va sobre `surface` con filete a la derecha, igual que el
+        // panel de Homebrew: sin fondo propio heredaba el del scaffold, el
+        // más oscuro de los tres, y se leía como un hueco negro al lado del
+        // perfil. En angosto ocupa la pantalla entera y queda en el scaffold.
+        //
+        // `Material` y no un `Container` con color: las filas son `ListTile`,
+        // que pintan la selección y el toque en el Material más cercano, y un
+        // fondo decorado en el medio los tapaba.
         return Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(width: 300, child: list),
-            VerticalDivider(width: 1, color: context.palette.hairline),
+            SizedBox(
+              width: 301,
+              child: Material(
+                color: Theme.of(context).colorScheme.surface,
+                shape: Border(
+                  right: BorderSide(color: context.palette.hairline),
+                ),
+                child: list,
+              ),
+            ),
             Expanded(
               child: _selected == null
                   ? AppEmptyState(
