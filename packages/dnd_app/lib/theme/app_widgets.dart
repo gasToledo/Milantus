@@ -1125,6 +1125,9 @@ class StatTile extends StatelessWidget {
                     ),
                   ),
                 ),
+                // Sin hueco, en una placa justa el porcentaje quedaba pegado al
+                // rótulo y se leía «GOLPE100%».
+                if (labelTrailing != null) const SizedBox(width: 8),
                 if (labelTrailing != null)
                   Text(
                     labelTrailing!,

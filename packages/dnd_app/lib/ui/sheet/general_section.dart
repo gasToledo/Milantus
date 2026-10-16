@@ -1310,7 +1310,12 @@ extension _SheetGeneralSection on _SheetScreenState {
         children: [
           for (var i = 0; i < cells.length; i++) ...[
             if (i > 0) const SizedBox(width: 12),
-            Expanded(child: cells[i]),
+            // PG lleva rótulo largo, porcentaje y el par actual/máximo: junto a
+            // otras placas pide más ancho, como los 208 px de antes frente a 152.
+            Expanded(
+              flex: identical(cells[i], hp) && cells.length > 1 ? 3 : 2,
+              child: cells[i],
+            ),
           ],
         ],
       ),
@@ -1321,9 +1326,10 @@ extension _SheetGeneralSection on _SheetScreenState {
         final w = box.maxWidth;
         // 152 es el ancho al que «COMPETENCIA» entra en un renglón; menos que
         // eso partía el rótulo en dos. Las cinco en una fila solo si cada una
-        // llega a ese mínimo.
+        // llega a ese mínimo: con PG a 3 partes y las otras a 2, son 11 partes
+        // y cuatro huecos.
         final List<List<Widget>> rows;
-        if (w >= 5 * 152 + 4 * 12) {
+        if (w >= 152 * 11 / 2 + 4 * 12) {
           rows = [
             [armor, hp, initiative, speed, proficiency],
           ];

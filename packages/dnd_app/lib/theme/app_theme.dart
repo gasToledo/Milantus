@@ -313,10 +313,13 @@ class AppTheme {
       ),
       // El segmento elegido va relleno del acento y con el texto invertido: con
       // el `secondaryContainer` por defecto (oro suave sobre fondo casi negro)
-      // no se distinguía cuál estaba activo. El resto queda transparente.
+      // no se distinguía cuál estaba activo. El resto queda transparente y con
+      // el texto común: sin `foregroundColor` caía al dorado del primario y
+      // los no elegidos también parecían activos.
       segmentedButtonTheme: SegmentedButtonThemeData(
         style: SegmentedButton.styleFrom(
           backgroundColor: Colors.transparent,
+          foregroundColor: scheme.onSurface,
           selectedBackgroundColor: palette.gold,
           selectedForegroundColor: onAccent,
         ),
