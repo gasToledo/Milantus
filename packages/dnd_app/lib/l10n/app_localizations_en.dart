@@ -2059,12 +2059,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String diaryDeleteBody(String title) {
-    return '“$title” is leaving the journal.';
+    return '“$title” will be deleted.';
   }
 
   @override
   String diaryDeleteBodyImage(String title) {
-    return '“$title” is leaving the journal, and the image you uploaded is deleted with it. There is no way to recover it.';
+    return '“$title” will be deleted, along with the image you uploaded. There is no way to recover it.';
   }
 
   @override
@@ -5848,6 +5848,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get npcNotesWord => 'Notes';
 
   @override
+  String npcNotesEmpty(String name) {
+    return 'You haven\'t written anything about $name yet.';
+  }
+
+  @override
   String get npcNotesNote => 'They belong to your tables.';
 
   @override
@@ -5926,9 +5931,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get npcNameLabel => 'NPC name';
 
   @override
-  String get npcNewNote => 'New note';
-
-  @override
   String get npcAddToCampaign => 'Add to a campaign';
 
   @override
@@ -5995,9 +5997,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get npcSpeechEmpty => 'No voice.';
 
   @override
-  String get npcNoBackground => 'No background.';
-
-  @override
   String get npcPortrait => 'Portrait';
 
   @override
@@ -6012,12 +6011,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String npcEditTitle(String title) {
     return 'Edit $title';
   }
-
-  @override
-  String get npcAddNote => 'Add note';
-
-  @override
-  String get npcNoNotes => 'No notes.';
 
   @override
   String get npcStats => 'Stats';

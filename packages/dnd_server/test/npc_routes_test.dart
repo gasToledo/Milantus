@@ -157,6 +157,9 @@ void main() {
     baseCreatureId: block?.id,
     baseCreatureName: block?.name,
     background: 'TRASFONDO-SECRETO',
+    notes: const [
+      DiaryEntry(entryId: 'nota', title: 'NOTA-SECRETA', body: 'texto'),
+    ],
   ).toJson();
 
   Future<Map<String, dynamic>> createNpc(
@@ -529,6 +532,95 @@ void main() {
       );
     });
 
+    // Las notas del PNJ son tarjetas del Diario: sus imágenes se guardan por
+    // esta misma ruta pero **no** están en `portraitPaths`. Lo que las protege
+    // es lo mismo que protege a un retrato —el almacén partido por cuenta— y
+    // el borrado del PNJ, que no mira el documento sino la carpeta.
+    test('la imagen de una nota se lee, se borra y se va con el PNJ', () async {
+      final token = await login('dm');
+      final id = (await createNpc(token, 'Toblen'))['npc']['id'] as String;
+      final key =
+          decode(
+                (await send(
+                  'POST',
+                  '/api/npcs/$id/portraits',
+                  token: token,
+                  body: {'bytes': base64Encode(png())},
+                )).body,
+              )['key']
+              as String;
+      final stored = (await npcs.find(userIdOf('dm'), id))!.npc;
+      final saved = await send(
+        'PUT',
+        '/api/npcs/$id',
+        token: token,
+        body: {
+          'npc': stored
+              .copyWith(
+                notes: [
+                  DiaryEntry(
+                    entryId: 'n1',
+                    kind: DiaryEntryKind.image,
+                    title: 'Mapa',
+                    imageKey: key,
+                  ),
+                ],
+              )
+              .toJson(),
+        },
+      );
+      expect(saved.status, 200, reason: saved.body);
+      expect((await npcs.find(userIdOf('dm'), id))!.npc.portraitPaths, isEmpty);
+
+      // Las rutas genéricas de imagen sirven la clave tal cual.
+      expect(
+        (await send('GET', '/api/portraits/$key', token: token)).status,
+        200,
+      );
+
+      // Otra cuenta no la lee ni la borra, y el 404 es el mismo que el de una
+      // clave que no existe.
+      final otro = await login('otro');
+      expect(
+        (await send('DELETE', '/api/portraits/$key', token: otro)).status,
+        404,
+      );
+      expect(
+        (await send('GET', '/api/portraits/$key', token: token)).status,
+        200,
+      );
+
+      // Borrar el PNJ se lleva el blob aunque ningún `portraitPaths` lo nombre.
+      await send('DELETE', '/api/npcs/$id', token: token);
+      expect(
+        (await send('GET', '/api/portraits/$key', token: token)).status,
+        404,
+      );
+    });
+
+    test('borrar la imagen de una nota con la ruta genérica la saca', () async {
+      final token = await login('dm');
+      final id = (await createNpc(token, 'Toblen'))['npc']['id'] as String;
+      final key =
+          decode(
+                (await send(
+                  'POST',
+                  '/api/npcs/$id/portraits',
+                  token: token,
+                  body: {'bytes': base64Encode(png())},
+                )).body,
+              )['key']
+              as String;
+
+      final deleted = await send('DELETE', '/api/portraits/$key', token: token);
+
+      expect(deleted.status, 200);
+      expect(
+        (await send('GET', '/api/portraits/$key', token: token)).status,
+        404,
+      );
+    });
+
     test('un PNJ con ficha los guarda por la ruta de su ficha', () async {
       final token = await login('dm');
       final id =
@@ -810,6 +902,7 @@ void main() {
         'Ilse',
         'Toblen',
         'TRASFONDO-SECRETO',
+        'NOTA-SECRETA',
       ]) {
         expect(response.body, isNot(contains(secreto)), reason: secreto);
       }
@@ -910,6 +1003,78 @@ void main() {
         hasLength(2),
       );
     });
+
+    // Las imágenes de las notas viajan como los retratos y se reubican con
+    // claves nuevas. Una clave de nota que el archivo no trajo —o una inventada
+    // apuntando a otra carpeta de la cuenta— queda sin imagen: nunca se cuela.
+    test(
+      'las imágenes de las notas se reubican y las ajenas se sueltan',
+      () async {
+        final npc = Npc(
+          id: 'npc-origen',
+          name: 'Garrick el Tuerto',
+          sheetKind: NpcSheetKind.none,
+          notes: const [
+            DiaryEntry(
+              entryId: 'a',
+              kind: DiaryEntryKind.image,
+              title: 'Viajó',
+              imageKey: 'npc-origen/1.png',
+            ),
+            DiaryEntry(
+              entryId: 'b',
+              kind: DiaryEntryKind.image,
+              title: 'No viajó',
+              imageKey: 'otra-carpeta/9.png',
+            ),
+            DiaryEntry(entryId: 'c', title: 'Texto', body: 'Cuerpo'),
+          ],
+        );
+        final archive = Archive()
+          ..addFile(
+            ArchiveFile.bytes(
+              NpcBundleCodec.manifestName,
+              utf8.encode(
+                jsonEncode({
+                  'type': NpcBundleCodec.type,
+                  'formatVersion': 1,
+                  'npc': npc.toJson(),
+                  'portraits': [
+                    {
+                      'file': 'portraits/0.png',
+                      'owner': 'npc',
+                      'key': 'npc-origen/1.png',
+                    },
+                  ],
+                }),
+              ),
+            ),
+          )
+          ..addFile(ArchiveFile.bytes('portraits/0.png', png()));
+        final token = await login('dm');
+
+        final response = await send(
+          'POST',
+          '/api/npcs/import',
+          token: token,
+          body: {'bytes': base64Encode(ZipEncoder().encode(archive))},
+        );
+
+        expect(response.status, 200, reason: response.body);
+        final imported = Npc.fromJson(decode(response.body)['npc']);
+        expect(imported.notes.map((n) => n.entryId), ['a', 'b', 'c']);
+        final viajo = imported.notes[0].imageKey!;
+        expect(viajo, startsWith('${imported.id}/'));
+        expect(viajo, isNot('npc-origen/1.png'));
+        expect(
+          (await send('GET', '/api/portraits/$viajo', token: token)).status,
+          200,
+        );
+        expect(imported.notes[1].imageKey, isNull);
+        expect(imported.notes[2].body, 'Cuerpo');
+        expect(imported.portraitPaths, isEmpty);
+      },
+    );
 
     test('homebrew nuevo se crea e idéntico se reusa', () async {
       final token = await login('dm');

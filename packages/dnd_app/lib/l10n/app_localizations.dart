@@ -3377,13 +3377,13 @@ abstract class AppLocalizations {
   /// No description provided for @diaryDeleteBody.
   ///
   /// In es, this message translates to:
-  /// **'«{title}» se va del diario.'**
+  /// **'«{title}» se borra.'**
   String diaryDeleteBody(String title);
 
   /// No description provided for @diaryDeleteBodyImage.
   ///
   /// In es, this message translates to:
-  /// **'«{title}» se va del diario, y la imagen que subiste se borra con ella. No hay forma de recuperarla.'**
+  /// **'«{title}» se borra, y la imagen que subiste también. No hay forma de recuperarla.'**
   String diaryDeleteBodyImage(String title);
 
   /// No description provided for @diaryUntitled.
@@ -9553,6 +9553,12 @@ abstract class AppLocalizations {
   /// **'Notas'**
   String get npcNotesWord;
 
+  /// No description provided for @npcNotesEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no anotaste nada sobre {name}.'**
+  String npcNotesEmpty(String name);
+
   /// No description provided for @npcNotesNote.
   ///
   /// In es, this message translates to:
@@ -9660,12 +9666,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Nombre del PNJ'**
   String get npcNameLabel;
-
-  /// No description provided for @npcNewNote.
-  ///
-  /// In es, this message translates to:
-  /// **'Nueva nota'**
-  String get npcNewNote;
 
   /// No description provided for @npcAddToCampaign.
   ///
@@ -9781,12 +9781,6 @@ abstract class AppLocalizations {
   /// **'Sin voz.'**
   String get npcSpeechEmpty;
 
-  /// No description provided for @npcNoBackground.
-  ///
-  /// In es, this message translates to:
-  /// **'Sin trasfondo.'**
-  String get npcNoBackground;
-
   /// No description provided for @npcPortrait.
   ///
   /// In es, this message translates to:
@@ -9810,18 +9804,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Editar {title}'**
   String npcEditTitle(String title);
-
-  /// No description provided for @npcAddNote.
-  ///
-  /// In es, this message translates to:
-  /// **'Agregar nota'**
-  String get npcAddNote;
-
-  /// No description provided for @npcNoNotes.
-  ///
-  /// In es, this message translates to:
-  /// **'Sin notas.'**
-  String get npcNoNotes;
 
   /// No description provided for @npcStats.
   ///

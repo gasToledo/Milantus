@@ -145,8 +145,9 @@ class NpcBundleCodec {
   /// nunca se traspasa a un jugador.
   ///
   /// El trasfondo y las entradas del Diario pasan al PNJ, porque la ficha de
-  /// un PNJ no muestra el Diario. Las imágenes del Diario no viajan: una nota
-  /// de PNJ es solo texto.
+  /// un PNJ no muestra el Diario. Las imágenes del Diario no viajan por esta
+  /// vía (el respaldo las guarda aparte de los retratos); sí viajan las de las
+  /// notas de un PNJ exportado como PNJ (ver `exportNpcFlow`).
   static Uint8List adoptCharacterExport(Uint8List bytes) {
     final Archive archive;
     try {
@@ -227,18 +228,14 @@ class NpcBundleCodec {
       name: original.name,
       sheetKind: NpcSheetKind.character,
       background: original.background,
+      // Las entradas del Diario son del mismo tipo que las notas del PNJ, así
+      // que pasan tal cual (texto y enlaces). Las de imagen no: su archivo vive
+      // en el respaldo aparte de los retratos y acá no hay a dónde mandarlo.
       notes: [
         for (final e in original.diary)
           if (e.kind != DiaryEntryKind.image &&
               [e.title, e.body].any((t) => t.trim().isNotEmpty))
-            NpcNote(
-              id: 'nota-${e.entryId}',
-              date: e.createdAt ?? DateTime.now(),
-              text: [
-                e.title,
-                e.body,
-              ].where((t) => t.trim().isNotEmpty).join('\n'),
-            ),
+            e,
       ],
     );
     // Vaciados en la ficha para que no quede una copia que nadie ve.

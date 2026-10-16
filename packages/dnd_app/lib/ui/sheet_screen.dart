@@ -1,14 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:dnd_engine/dnd_engine.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart' show mapEquals;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:intl/intl.dart' show DateFormat;
 
-import '../api/api_client.dart';
 import '../api/api_models.dart';
 import '../data/characters_controller.dart';
 import '../data/settings_service.dart';
@@ -16,14 +11,14 @@ import '../levelup/level_up_screen.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_widgets.dart';
 import '../theme/class_visuals.dart';
-import '../web/browser.dart' as browser;
 import '../web/screen_awake.dart';
 import 'conditions.dart';
+import 'diary_cards.dart';
 import 'dm/npcs/npc_shared.dart';
 import 'dm/share_character_dialog.dart';
 import 'item_catalog.dart';
-import 'portrait_image.dart';
 import 'portrait_screen.dart';
+import 'portrait_viewer.dart';
 import 'app_sidebar.dart';
 import 'save_status_indicator.dart';
 import 'spell_edit_screen.dart';
@@ -161,15 +156,6 @@ class _SheetScreenState extends State<SheetScreen> {
   /// del propio daño sigue escrito arriba, y compartir el campo obligaría a
   /// borrarlo cada vez.
   final _companionAmountCtrl = TextEditingController();
-  // Controlador propio del trasfondo: sobrevive los cambios de tab y evita el
-  // footgun de TextFormField(initialValue:), que ignora cambios posteriores.
-  late final _backgroundCtrl = TextEditingController(
-    text: widget.character.background,
-  );
-
-  /// Si el trasfondo está en modo edición. Arranca en lectura: el Diario se
-  /// abre para leerlo, y el lápiz es el que pide escribir.
-  bool _editingBackground = false;
 
   /// Un controlador por denominación de moneda, por el mismo motivo que las
   /// notas. Se crean acá y no en la tarjeta: la pestaña se reconstruye en cada
@@ -237,7 +223,6 @@ class _SheetScreenState extends State<SheetScreen> {
     _turnTimer?.cancel();
     _amountCtrl.dispose();
     _companionAmountCtrl.dispose();
-    _backgroundCtrl.dispose();
     _invSearchCtrl.dispose();
     for (final c in _coinCtrls.values) {
       c.dispose();
@@ -294,25 +279,6 @@ class _SheetScreenState extends State<SheetScreen> {
     if (!_collapsedCards.remove(title)) _collapsedCards.add(title);
   });
 
-  /// Entra y sale del modo edición del trasfondo.
-  ///
-  /// Vive acá y no en la extensión del Diario porque `setState` es
-  /// `@protected`: solo la clase que lo hereda puede llamarlo. Es el mismo
-  /// motivo por el que `_mutateCombat` y `_replace` están en el State.
-  void _setEditingBackground(bool editing) =>
-      setState(() => _editingBackground = editing);
-
-  /// Adopta un trasfondo importado: lo escribe en la ficha, lo pone en el
-  /// campo y vuelve a modo lectura para que se vea ya renderizado.
-  void _adoptBackground(String text) {
-    setState(() {
-      _c.background = text;
-      _backgroundCtrl.text = text;
-      _editingBackground = false;
-    });
-    ctrl.touch(_c);
-  }
-
   void _searchInventory(String query) => setState(() => _invQuery = query);
 
   void _filterInventory(String filter) => setState(() => _invFilter = filter);
@@ -346,17 +312,8 @@ class _SheetScreenState extends State<SheetScreen> {
     );
   }
 
-  void _openPortraitViewer(String portraitKey) {
-    Navigator.of(context).push(
-      PageRouteBuilder(
-        opaque: false,
-        barrierColor: Colors.black87,
-        pageBuilder: (_, _, _) => _PortraitViewer(portraitKey: portraitKey),
-        transitionsBuilder: (_, anim, _, child) =>
-            FadeTransition(opacity: anim, child: child),
-      ),
-    );
-  }
+  void _openPortraitViewer(String portraitKey) =>
+      showPortraitViewer(context, portraitKey);
 
   void _openPortrait() {
     Navigator.of(context).push(

@@ -1,3 +1,4 @@
+import 'character.dart' show DiaryEntry;
 import 'creature.dart';
 import 'data_version.dart';
 
@@ -56,30 +57,6 @@ enum NpcStatus {
   }
 }
 
-/// Una nota del DM sobre un PNJ. Es **global**: se ve igual desde cualquier
-/// campaña donde esté el PNJ, decisión del usuario — lo anotado sobre alguien
-/// sirve en todas las mesas.
-class NpcNote {
-  final String id;
-  final DateTime date;
-  final String text;
-
-  const NpcNote({required this.id, required this.date, required this.text});
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'date': date.toIso8601String(),
-        'text': text,
-      };
-
-  factory NpcNote.fromJson(Map<String, dynamic> j) => NpcNote(
-        id: j['id'] as String? ?? '',
-        date: DateTime.tryParse(j['date'] as String? ?? '') ??
-            DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
-        text: j['text'] as String? ?? '',
-      );
-}
-
 /// Un personaje no jugador de la biblioteca del DM.
 ///
 /// Es un **documento de usuario** y no contenido de catálogo, aunque su bloque
@@ -92,7 +69,10 @@ class NpcNote {
 class Npc {
   /// Versión del formato de este documento. Mismo contrato que
   /// `Note.currentSchemaVersion`.
-  static const int currentSchemaVersion = 1;
+  ///
+  /// - 2: las notas pasan de `{id, date, text}` a [DiaryEntry], las mismas
+  ///   tarjetas del Diario del personaje (imagen, enlace y texto).
+  static const int currentSchemaVersion = 2;
 
   final String id;
   final String name;
@@ -127,7 +107,14 @@ class Npc {
   /// Tags libres, ya normalizados por [normalizeTags].
   final List<String> tags;
 
-  final List<NpcNote> notes;
+  /// Notas del DM sobre el PNJ. Son **globales**: se ven igual desde cualquier
+  /// campaña donde esté el PNJ, decisión del usuario — lo anotado sobre alguien
+  /// sirve en todas las mesas.
+  ///
+  /// Son [DiaryEntry] y no un tipo propio para que el DM use las mismas
+  /// tarjetas que el Diario (imagen, enlace, texto): un segundo tipo obligaba a
+  /// un segundo editor. El jugador nunca las ve: no hay ruta que las exponga.
+  final List<DiaryEntry> notes;
 
   /// Retratos propios, para [NpcSheetKind.none] y [NpcSheetKind.block]. Un PNJ
   /// con ficha de personaje usa los de su ficha.
@@ -180,7 +167,7 @@ class Npc {
     String? appearance,
     String? background,
     List<String>? tags,
-    List<NpcNote>? notes,
+    List<DiaryEntry>? notes,
     List<String>? portraitPaths,
     Map<String, String>? portraitPrompts,
   }) =>
@@ -242,7 +229,7 @@ class Npc {
       ],
       notes: [
         for (final n in (j['notes'] as List? ?? const []))
-          if (n is Map) NpcNote.fromJson(n.cast<String, dynamic>()),
+          if (n is Map) DiaryEntry.fromJson(n.cast<String, dynamic>()),
       ],
       portraitPaths: [
         for (final p in (j['portraitPaths'] as List? ?? const []))
@@ -278,6 +265,29 @@ class Npc {
         supported: currentSchemaVersion,
       );
     }
-    return Map<String, dynamic>.from(source);
+    final migrated = Map<String, dynamic>.from(source);
+    if (version < 2) {
+      // v1 → v2: la nota `{id, date, text}` pasa a ser una entrada de texto sin
+      // título. El texto viejo queda **entero en el cuerpo**: partirlo para
+      // inventar un título perdería el orden de las líneas, y el DM puede
+      // titularla al editarla. La fecha de la nota es la de creación, que es lo
+      // que decía.
+      migrated['notes'] = [
+        for (final (i, raw) in (source['notes'] as List? ?? const []).indexed)
+          if (raw is Map)
+            {
+              'entryId': (raw['id'] as String?)?.isNotEmpty == true
+                  ? raw['id']
+                  : 'nota-$i',
+              'kind': 'text',
+              'title': '',
+              if ((raw['text'] as String?)?.isNotEmpty == true)
+                'body': raw['text'],
+              if (raw['date'] != null) 'createdAt': raw['date'],
+            },
+      ];
+    }
+    migrated['schemaVersion'] = currentSchemaVersion;
+    return migrated;
   }
 }

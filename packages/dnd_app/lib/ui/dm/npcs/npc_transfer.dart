@@ -54,6 +54,19 @@ Future<void> exportNpcFlow(
 
     await collect('npc', entry.npc.portraitPaths);
     if (sheet != null) await collect('character', sheet.portraitPaths);
+    // Las imágenes de las notas viajan como los retratos, y solo si viajan las
+    // notas. Un PNJ con ficha las guarda en la carpeta de la ficha (ver
+    // `_uploadNoteImage`), y el servidor las reubica según el dueño.
+    if (options.notes) {
+      for (final note in entry.npc.notes) {
+        final key = note.imageKey;
+        if (key == null) continue;
+        await collect(
+          sheet != null && key.startsWith('${sheet.id}/') ? 'character' : 'npc',
+          [key],
+        );
+      }
+    }
     final bytes = NpcBundleCodec.encode(
       npc: npcForExport(entry.npc, options),
       sheet: sheet,

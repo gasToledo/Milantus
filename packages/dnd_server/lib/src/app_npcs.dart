@@ -374,6 +374,16 @@ Future<Response> _importNpcHandler(
     ...bundle.npc.toJson(),
     'portraitPaths': npcPortraits.paths,
     'portraitPrompts': npcPortraits.prompts,
+    // Las imágenes de las notas viajan como los retratos y se reubican igual.
+    // Se mapea cada clave **solo** por lo que se acaba de guardar: una clave
+    // que el archivo traiga y no viajó (o una inventada apuntando a otra
+    // carpeta de la cuenta) queda sin imagen en vez de colarse en el documento.
+    'notes': [
+      for (final note in bundle.npc.notes)
+        note.imageKey == null
+            ? note.toJson()
+            : note.copyWith(imageKey: newKeys[note.imageKey]).toJson(),
+    ],
   });
 
   final stored = await transactions.run((repositories) async {

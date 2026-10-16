@@ -14,6 +14,7 @@ import 'package:dnd_app/ui/dm/npcs/npc_detail_screen.dart';
 import 'package:dnd_app/ui/dm/npcs/npc_shared.dart';
 import 'package:dnd_app/ui/dm/npcs/npc_transfer.dart';
 import 'package:dnd_engine/dnd_engine.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -253,30 +254,42 @@ void main() {
       await tester.pumpAndSettle();
       expect(server.npcs['mirra']!.speech, 'Arrastra las erres.');
 
-      await tester.tap(find.text('Agregar nota'));
+      // Las notas son las tarjetas del Diario: título, tipo y cuerpo.
+      await tester.tap(find.byTooltip('Agregar una entrada'));
       await tester.pumpAndSettle();
       await tester.enterText(
-        inDialog(find.byType(TextField)),
+        inDialog(find.widgetWithText(TextField, 'Título')),
+        'Deudas',
+      );
+      await tester.enterText(
+        inDialog(find.widgetWithText(TextField, 'Texto')),
         'Le debe plata al herrero.',
       );
       await tester.tap(dialogAction('Guardar'));
       await tester.pumpAndSettle();
       final note = server.npcs['mirra']!.notes.single;
-      expect(note.text, 'Le debe plata al herrero.');
+      expect(note.kind, DiaryEntryKind.text);
+      expect((note.title, note.body), ('Deudas', 'Le debe plata al herrero.'));
+      expect(find.text('Deudas'), findsOneWidget);
       expect(find.text('Le debe plata al herrero.'), findsOneWidget);
 
-      // Corregirla no la vuelve una nota nueva: conserva id y fecha.
-      await tester.tap(find.byTooltip('Editar nota'));
+      // Corregirla no la vuelve una nota nueva: conserva id y fecha de alta.
+      await tester.tap(find.text('Deudas'));
+      await tester.pumpAndSettle();
+      await tester.tap(dialogAction('Editar'));
       await tester.pumpAndSettle();
       await tester.enterText(
-        inDialog(find.byType(TextField)),
+        inDialog(find.widgetWithText(TextField, 'Texto')),
         'Le debe plata a la herrera.',
       );
       await tester.tap(dialogAction('Guardar'));
       await tester.pumpAndSettle();
       final edited = server.npcs['mirra']!.notes.single;
-      expect(edited.text, 'Le debe plata a la herrera.');
-      expect((edited.id, edited.date), (note.id, note.date));
+      expect(edited.body, 'Le debe plata a la herrera.');
+      expect(
+        (edited.entryId, edited.createdAt),
+        (note.entryId, note.createdAt),
+      );
       expect(find.text('Le debe plata a la herrera.'), findsOneWidget);
 
       // Sugiere los tags que ya usa la biblioteca y no los que ya tiene.
@@ -290,6 +303,238 @@ void main() {
       await tester.tap(inDialog(find.widgetWithText(ActionChip, 'Enemigos')));
       await tester.pumpAndSettle();
       expect(server.npcs['mirra']!.tags, ['Phandalin', 'Enemigos']);
+      expect(tester.takeException(), isNull);
+    });
+
+    Character fighterSheet(String id) => Character(
+      id: id,
+      name: 'Vadrik',
+      raceId: 'human',
+      classId: 'fighter',
+      backgroundId: 'soldier',
+      assignedScores: {
+        Ability.strength: 16,
+        Ability.dexterity: 14,
+        Ability.constitution: 14,
+        Ability.intelligence: 10,
+        Ability.wisdom: 12,
+        Ability.charisma: 8,
+      },
+      hpPerLevel: const [10],
+      featureChoices: const {
+        'fighting-style': ['fs-defense'],
+      },
+    );
+
+    void seedCharacterNpc(FakeApiServer s) {
+      s.campaigns['tumba'] = tumba;
+      s.characters['ficha-vadrik'] = fighterSheet('ficha-vadrik');
+      s.npcSheets.add('ficha-vadrik');
+      s.npcs['vadrik'] = Npc(
+        id: 'vadrik',
+        name: 'Vadrik',
+        sheetKind: NpcSheetKind.character,
+        characterId: 'ficha-vadrik',
+      );
+    }
+
+    // Una nota guardada antes de que las notas fueran tarjetas del Diario
+    // (`{id, date, text}`, v1) se sigue viendo: migra a una entrada de texto
+    // sin título con el texto entero.
+    testWidgets('una nota v1 migrada se muestra como tarjeta', (tester) async {
+      const texto = 'Debe plata al herrero.';
+      await pumpDetail(tester, 'bruno', (s) {
+        seedLibrary(s);
+        s.npcs['bruno'] = Npc.fromJson({
+          'schemaVersion': 1,
+          'id': 'bruno',
+          'name': 'Bruno',
+          'sheetKind': 'none',
+          'notes': [
+            {'id': 'n1', 'date': '2026-09-01T10:00:00.000Z', 'text': texto},
+          ],
+        });
+      });
+
+      expect(find.text('Sin título'), findsOneWidget);
+      expect(find.text(texto), findsOneWidget);
+      expect(find.text('Sin notas.'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('sin notas, la tarjeta invita a sumar la primera', (
+      tester,
+    ) async {
+      await pumpDetail(tester, 'bruno', seedLibrary);
+
+      // El estado vacío lleva el nombre del dueño: la misma tarjeta del Diario.
+      expect(find.text('Todavía no anotaste nada sobre Bruno.'), findsOne);
+      expect(find.text('Agregar entrada'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    Future<void> elegirArchivo(
+      WidgetTester tester,
+      String nombre,
+      List<int> bytes,
+    ) async {
+      FilePicker.platform = _FakeFilePicker(
+        FilePickerResult([
+          PlatformFile(
+            name: nombre,
+            size: bytes.length,
+            bytes: Uint8List.fromList(bytes),
+          ),
+        ]),
+      );
+      addTearDown(() => FilePicker.platform = _FakeFilePicker(null));
+    }
+
+    // Las imágenes de las notas van al almacén de retratos, bajo el id del PNJ:
+    // así borrar al PNJ se las lleva sin una cascada nueva.
+    testWidgets('una nota con imagen la sube bajo el PNJ y se borra con ella', (
+      tester,
+    ) async {
+      final server = await pumpDetail(tester, 'mirra', seedLibrary);
+      await elegirArchivo(tester, 'mapa.png', [0x89, 0x50, 0x4E, 0x47, 1]);
+
+      await tester.tap(find.byTooltip('Agregar una entrada'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        inDialog(find.widgetWithText(TextField, 'Título')),
+        'El mapa de la cripta',
+      );
+      await tester.tap(inDialog(find.text('Imagen')));
+      await tester.pumpAndSettle();
+      await tester.tap(inDialog(find.text('Elegir imagen')));
+      await tester.pumpAndSettle();
+      await tester.tap(dialogAction('Guardar'));
+      await tester.pumpAndSettle();
+
+      final nota = server.npcs['mirra']!.notes.single;
+      expect(nota.kind, DiaryEntryKind.image);
+      expect(nota.imageKey, startsWith('mirra/'));
+      expect(server.portraits.keys, [nota.imageKey]);
+      // No es un retrato: el selector de retratos del PNJ no la ve.
+      expect(server.npcs['mirra']!.portraitPaths, isEmpty);
+
+      // Borrar la nota se lleva su imagen del almacén.
+      await tester.tap(find.text('El mapa de la cripta'));
+      await tester.pumpAndSettle();
+      await tester.tap(dialogAction('Editar'));
+      await tester.pumpAndSettle();
+      await tester.tap(dialogAction('Borrar'));
+      await tester.pumpAndSettle();
+      await tester.tap(dialogAction('Borrar'));
+      await tester.pumpAndSettle();
+
+      expect(server.npcs['mirra']!.notes, isEmpty);
+      expect(server.portraits, isEmpty);
+      expect(tester.takeException(), isNull);
+    });
+
+    // El servidor reserva la ruta de retratos del PNJ a los que no tienen
+    // ficha: con ficha, la imagen sube por la ficha y borrar al PNJ se lleva
+    // las dos carpetas.
+    testWidgets('en un PNJ con ficha la imagen sube por la ficha', (
+      tester,
+    ) async {
+      final server = await pumpDetail(tester, 'vadrik', seedCharacterNpc);
+      await elegirArchivo(tester, 'cara.png', [0x89, 0x50, 0x4E, 0x47, 2]);
+
+      await tester.tap(find.byTooltip('Agregar una entrada'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        inDialog(find.widgetWithText(TextField, 'Título')),
+        'Su cara de joven',
+      );
+      await tester.tap(inDialog(find.text('Imagen')));
+      await tester.pumpAndSettle();
+      await tester.tap(inDialog(find.text('Elegir imagen')));
+      await tester.pumpAndSettle();
+      await tester.tap(dialogAction('Guardar'));
+      await tester.pumpAndSettle();
+
+      expect(
+        server.npcs['vadrik']!.notes.single.imageKey,
+        startsWith('ficha-vadrik/'),
+      );
+      expect(server.portraits, hasLength(1));
+
+      await tester.tap(find.byTooltip('Más acciones'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Borrar PNJ'));
+      await tester.pumpAndSettle();
+      await tester.tap(dialogAction('Borrar PNJ'));
+      await tester.pumpAndSettle();
+
+      expect(server.portraits, isEmpty);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('el trasfondo importa un .md y se lee renderizado', (
+      tester,
+    ) async {
+      final server = await pumpDetail(tester, 'mirra', seedLibrary);
+      const md = '# Espía de los Zhentarim\n\nLlegó **antes** que el aviso.';
+      await elegirArchivo(tester, 'mirra.md', utf8.encode(md));
+
+      await tester.tap(find.text('Importar .md'));
+      await tester.pumpAndSettle();
+      // El guardado espera a que se deje de escribir.
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle();
+
+      expect(server.npcs['mirra']!.background, md);
+      expect(find.text('Espía de los Zhentarim'), findsOneWidget);
+      expect(find.textContaining('**'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('reemplazar un trasfondo escrito por un .md pregunta antes', (
+      tester,
+    ) async {
+      final server = await pumpDetail(tester, 'mirra', (s) {
+        seedLibrary(s);
+        s.npcs['mirra'] = s.npcs['mirra']!.copyWith(background: 'El de antes.');
+      });
+      await elegirArchivo(tester, 'nuevo.md', utf8.encode('El de ahora.'));
+
+      await tester.tap(find.byTooltip('Importar un .md'));
+      await tester.pumpAndSettle();
+      expect(find.text('Reemplazar el trasfondo'), findsOneWidget);
+      await tester.tap(dialogAction('Cancelar'));
+      await tester.pumpAndSettle();
+      expect(server.npcs['mirra']!.background, 'El de antes.');
+
+      await tester.tap(find.byTooltip('Importar un .md'));
+      await tester.pumpAndSettle();
+      await tester.tap(dialogAction('Reemplazar'));
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle();
+
+      expect(server.npcs['mirra']!.background, 'El de ahora.');
+      expect(tester.takeException(), isNull);
+    });
+
+    // Escribir no manda un PUT del PNJ entero por cada tecla; y salir de la
+    // pantalla con lo último sin guardar no lo pierde.
+    testWidgets('escribir el trasfondo guarda al salir de la pantalla', (
+      tester,
+    ) async {
+      final server = await pumpDetail(tester, 'mirra', seedLibrary);
+
+      await tester.tap(find.byTooltip('Editar el trasfondo'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'Nació en el puerto.');
+      await tester.pump();
+      // Todavía no pasó el tiempo de espera: no se guardó.
+      expect(server.npcs['mirra']!.background, isEmpty);
+
+      await tester.pumpWidget(const SizedBox());
+      await tester.pumpAndSettle();
+
+      expect(server.npcs['mirra']!.background, 'Nació en el puerto.');
       expect(tester.takeException(), isNull);
     });
 
@@ -395,38 +640,6 @@ void main() {
       expect(find.text('Mirra'), findsNothing);
       expect(tester.takeException(), isNull);
     });
-
-    Character fighterSheet(String id) => Character(
-      id: id,
-      name: 'Vadrik',
-      raceId: 'human',
-      classId: 'fighter',
-      backgroundId: 'soldier',
-      assignedScores: {
-        Ability.strength: 16,
-        Ability.dexterity: 14,
-        Ability.constitution: 14,
-        Ability.intelligence: 10,
-        Ability.wisdom: 12,
-        Ability.charisma: 8,
-      },
-      hpPerLevel: const [10],
-      featureChoices: const {
-        'fighting-style': ['fs-defense'],
-      },
-    );
-
-    void seedCharacterNpc(FakeApiServer s) {
-      s.campaigns['tumba'] = tumba;
-      s.characters['ficha-vadrik'] = fighterSheet('ficha-vadrik');
-      s.npcSheets.add('ficha-vadrik');
-      s.npcs['vadrik'] = Npc(
-        id: 'vadrik',
-        name: 'Vadrik',
-        sheetKind: NpcSheetKind.character,
-        characterId: 'ficha-vadrik',
-      );
-    }
 
     // Si el nombre del PNJ y el de su ficha se editaran por separado, la
     // biblioteca mostraría uno y la ficha otro.
@@ -621,7 +834,12 @@ void main() {
       background: 'Espía.',
       tags: const ['Phandalin'],
       notes: [
-        NpcNote(id: 'n1', date: DateTime.utc(2026, 9, 1), text: 'Debe plata.'),
+        DiaryEntry(
+          entryId: 'n1',
+          title: 'Deudas',
+          body: 'Debe plata.',
+          createdAt: DateTime.utc(2026, 9, 1),
+        ),
       ],
     );
 
@@ -803,7 +1021,11 @@ void main() {
       expect(preview.npc.name, 'Vadrik');
       expect(preview.npc.sheetKind, NpcSheetKind.character);
       expect(preview.npc.background, 'Desertor del ejército.');
-      expect(preview.npc.notes.map((n) => n.text), ['Deudas\nAl herrero.']);
+      // Las entradas del Diario son del mismo tipo que las notas: pasan tal
+      // cual, y la de imagen se queda afuera (su archivo no viaja por acá).
+      expect(preview.npc.notes.map((n) => (n.title, n.body)), [
+        ('Deudas', 'Al herrero.'),
+      ]);
       expect(preview.sheet!.background, isEmpty);
       expect(preview.sheet!.diary, isEmpty);
       final portraits = manifestOf(bytes)['portraits'] as List;
@@ -1042,4 +1264,28 @@ void main() {
       expect(npcBaseName(npc, repo), 'Guardián del osario');
     });
   });
+}
+
+/// El selector de archivos del sistema, reemplazado por un resultado fijo.
+/// `null` es «el usuario canceló».
+class _FakeFilePicker extends FilePicker {
+  _FakeFilePicker(this._result);
+
+  final FilePickerResult? _result;
+
+  @override
+  Future<FilePickerResult?> pickFiles({
+    String? dialogTitle,
+    String? initialDirectory,
+    FileType type = FileType.any,
+    List<String>? allowedExtensions,
+    Function(FilePickerStatus)? onFileLoading,
+    bool allowCompression = true,
+    int compressionQuality = 30,
+    bool allowMultiple = false,
+    bool withData = false,
+    bool withReadStream = false,
+    bool lockParentWindow = false,
+    bool readSequential = false,
+  }) async => _result;
 }

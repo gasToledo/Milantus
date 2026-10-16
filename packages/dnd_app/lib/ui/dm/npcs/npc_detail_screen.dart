@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:typed_data';
+
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:flutter/material.dart';
 
@@ -9,6 +12,7 @@ import '../../../data/settings_service.dart';
 import '../../../homebrew/homebrew_screen.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_widgets.dart';
+import '../../diary_cards.dart';
 import '../../portrait_screen.dart';
 import '../../sheet_screen.dart';
 import 'npc_shared.dart';
@@ -55,10 +59,31 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
   Object? _error;
   bool _loading = true;
 
+  /// El trasfondo se escribe tecla a tecla, pero el PNJ se guarda entero: sin
+  /// espaciar, cada letra sería un PUT del documento completo. Mientras
+  /// [_backgroundDirty] esté prendido hay texto sin guardar.
+  Timer? _backgroundTimer;
+  bool _backgroundDirty = false;
+
+  static const _backgroundSaveDelay = Duration(milliseconds: 800);
+
   @override
   void initState() {
     super.initState();
     _load();
+  }
+
+  @override
+  void dispose() {
+    _backgroundTimer?.cancel();
+    // Salir de la pantalla con el último renglón sin guardar no lo pierde.
+    final pending = _entry;
+    if (_backgroundDirty && pending != null) {
+      unawaited(
+        widget.api.updateNpc(pending.npc).then((_) {}, onError: (_) {}),
+      );
+    }
+    super.dispose();
   }
 
   Future<void> _load() async {
@@ -97,6 +122,10 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
   Future<void> _save(Npc updated) async {
     final entry = _entry;
     if (entry == null) return;
+    // Este guardado ya lleva el trasfondo que se estaba escribiendo (sale de
+    // `_entry`): el del temporizador llegaría después con datos más viejos.
+    _backgroundTimer?.cancel();
+    _backgroundDirty = false;
     setState(
       () => _entry = NpcEntry(
         npc: updated,
@@ -110,6 +139,47 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
       _report(error);
       await _load();
     }
+  }
+
+  /// Cada tecla del trasfondo: se refleja ya en el documento en memoria y se
+  /// guarda recién cuando se deja de escribir.
+  void _onBackgroundChanged(String value) {
+    final entry = _entry;
+    if (entry == null) return;
+    setState(
+      () => _entry = NpcEntry(
+        npc: entry.npc.copyWith(background: value),
+        campaigns: entry.campaigns,
+        sheet: entry.sheet,
+      ),
+    );
+    _backgroundDirty = true;
+    _backgroundTimer?.cancel();
+    _backgroundTimer = Timer(_backgroundSaveDelay, _flushBackground);
+  }
+
+  Future<void> _flushBackground() async {
+    final entry = _entry;
+    if (!_backgroundDirty || entry == null) return;
+    _backgroundDirty = false;
+    try {
+      await widget.api.updateNpc(entry.npc);
+    } catch (error) {
+      _report(error);
+      await _load();
+    }
+  }
+
+  /// Las imágenes de las notas van al almacén de retratos, bajo el id del PNJ.
+  /// Un PNJ con ficha de personaje no puede usar la ruta de retratos del PNJ
+  /// (el servidor la reserva a los que no tienen ficha), así que sube por la
+  /// de su ficha: la clave queda en la carpeta de la ficha, y borrar el PNJ se
+  /// lleva las dos carpetas.
+  Future<String> _uploadNoteImage(Npc npc, Uint8List bytes) {
+    final sheetId = npc.characterId;
+    return npc.sheetKind == NpcSheetKind.character && sheetId != null
+        ? widget.api.savePortrait(characterId: sheetId, bytes: bytes)
+        : widget.api.saveNpcPortrait(npcId: npc.id, bytes: bytes);
   }
 
   Future<void> _editText({
@@ -186,51 +256,6 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
     );
     if (tag == null || tag.trim().isEmpty || !mounted) return;
     await _save(npc.copyWith(tags: [...npc.tags, tag.trim()]));
-  }
-
-  Future<void> _addNote(Npc npc) async {
-    final text = await showTextPromptDialog(
-      context,
-      title: context.l10n.npcNewNote,
-      label: context.l10n.invNoteTitle,
-      maxLines: 5,
-      textCapitalization: TextCapitalization.sentences,
-    );
-    if (text == null || text.trim().isEmpty || !mounted) return;
-    await _save(
-      npc.copyWith(
-        notes: [
-          NpcNote(
-            id: 'nota-${DateTime.now().microsecondsSinceEpoch}',
-            date: DateTime.now(),
-            text: text.trim(),
-          ),
-          ...npc.notes,
-        ],
-      ),
-    );
-  }
-
-  /// Conserva id y fecha: la fecha dice cuándo se supo el dato, y corregir la
-  /// redacción no lo vuelve más nuevo.
-  Future<void> _editNote(Npc npc, NpcNote note) async {
-    final text = await showTextPromptDialog(
-      context,
-      title: context.l10n.dmEditNote,
-      label: context.l10n.invNoteTitle,
-      current: note.text,
-      maxLines: 5,
-      textCapitalization: TextCapitalization.sentences,
-    );
-    if (text == null || text == note.text || !mounted) return;
-    await _save(
-      npc.copyWith(
-        notes: [
-          for (final n in npc.notes)
-            n.id == note.id ? NpcNote(id: n.id, date: n.date, text: text) : n,
-        ],
-      ),
-    );
   }
 
   Future<void> _editBlock(Npc npc) async {
@@ -496,24 +521,27 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
     return LayoutBuilder(
       builder: (context, box) {
         final wide = box.maxWidth >= 900;
+        // Las mismas tarjetas del Diario del personaje: el DM carga imagen,
+        // enlace y texto con markdown en las notas, e importa un .md como
+        // trasfondo. Van separadas de las demás por el margen de `_card`.
+        const gap = SizedBox(height: 14);
         final left = [
-          _card(
-            context,
-            title: context.l10n.stepBackground,
-            onEdit: () => _editText(
-              title: context.l10n.stepBackground,
-              label: context.l10n.stepBackground,
-              current: npc.background,
-              maxLines: 10,
-              apply: (v) => npc.copyWith(background: v),
-            ),
-            child: _prose(
-              context,
-              npc.background,
-              context.l10n.npcNoBackground,
-            ),
+          DiaryBackgroundCard(
+            value: npc.background,
+            ownerName: npc.name,
+            onChanged: _onBackgroundChanged,
           ),
-          _notes(context, npc),
+          gap,
+          DiaryEntriesCard(
+            entries: npc.notes,
+            ownerName: npc.name,
+            emptyMessage: context.l10n.npcNotesEmpty(npc.name),
+            title: context.l10n.npcNotesWord,
+            onChanged: (lista) => _save(npc.copyWith(notes: lista)),
+            uploadImage: (bytes) => _uploadNoteImage(npc, bytes),
+            deleteImage: widget.api.deletePortrait,
+          ),
+          gap,
         ];
         final right = [_stats(context, entry), _campaigns(context, entry)];
         return ListView(
@@ -757,85 +785,6 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
           child,
         ],
       ),
-    );
-  }
-
-  Widget _notes(BuildContext context, Npc npc) {
-    final pal = context.palette;
-    return _card(
-      context,
-      title: context.l10n.npcNotesWord,
-      trailing: TextButton.icon(
-        onPressed: () => _addNote(npc),
-        icon: const Icon(Icons.add, size: 16),
-        label: Text(context.l10n.npcAddNote),
-      ),
-      child: npc.notes.isEmpty
-          ? _prose(context, '', context.l10n.npcNoNotes)
-          : Column(
-              children: [
-                // Filas separadas por una línea y no placas hundidas: dentro
-                // de la tarjeta, una placa por nota era un tercer fondo que
-                // competía con el texto.
-                for (final (i, note) in npc.notes.indexed)
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: i == 0
-                        ? null
-                        : BoxDecoration(
-                            border: Border(
-                              top: BorderSide(color: pal.hairline),
-                            ),
-                          ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                note.text,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  height: 1.5,
-                                ),
-                              ),
-                              const SizedBox(height: 3),
-                              Text(
-                                MaterialLocalizations.of(
-                                  context,
-                                ).formatMediumDate(note.date.toLocal()),
-                                style: TextStyle(
-                                  fontSize: 11.5,
-                                  color: pal.textMuted,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          tooltip: context.l10n.dmEditNote,
-                          icon: const Icon(Icons.edit_outlined, size: 16),
-                          onPressed: () => _editNote(npc, note),
-                        ),
-                        IconButton(
-                          tooltip: context.l10n.dmDeleteNote,
-                          icon: const Icon(Icons.close, size: 16),
-                          onPressed: () => _save(
-                            npc.copyWith(
-                              notes: [
-                                for (final n in npc.notes)
-                                  if (n.id != note.id) n,
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-              ],
-            ),
     );
   }
 

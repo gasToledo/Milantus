@@ -978,11 +978,18 @@ class FakeApiServer {
         npcs.remove(id);
         campaignNpcs.removeWhere((key, _) => key.npcId == id);
         campaignNpcHp.removeWhere((key, _) => key.npcId == id);
+        // Como el servidor: se van las carpetas del PNJ y de su ficha, y con
+        // ellas las imágenes de sus notas, que no están en `portraitPaths`.
+        portraits.removeWhere(
+          (key, _) =>
+              key.startsWith('$id/') ||
+              (npc.characterId != null &&
+                  key.startsWith('${npc.characterId}/')),
+        );
         if (npc.characterId case final sheetId?) {
           characters.remove(sheetId);
           npcSheets.remove(sheetId);
         }
-        portraits.removeWhere((key, _) => key.startsWith('$id/'));
         return _json({'status': 'ok'});
       }
     }

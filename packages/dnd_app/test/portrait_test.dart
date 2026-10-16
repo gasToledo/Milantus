@@ -89,7 +89,7 @@ void main() {
       baseCreatureId: block?.id,
       baseCreatureName: block?.name,
       background: secretos[0],
-      notes: [NpcNote(id: 'n', date: DateTime.utc(2026), text: secretos[1])],
+      notes: [DiaryEntry(entryId: 'n', body: secretos[1])],
       speech: secretos[2],
       appearance: 'cicatriz sobre la ceja',
     );

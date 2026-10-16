@@ -1793,7 +1793,7 @@
       }
     }
   },
-  "diaryDeleteBody": "«{title}» se va del diario.",
+  "diaryDeleteBody": "«{title}» se borra.",
   "@diaryDeleteBody": {
     "placeholders": {
       "title": {
@@ -1801,7 +1801,7 @@
       }
     }
   },
-  "diaryDeleteBodyImage": "«{title}» se va del diario, y la imagen que subiste se borra con ella. No hay forma de recuperarla.",
+  "diaryDeleteBodyImage": "«{title}» se borra, y la imagen que subiste también. No hay forma de recuperarla.",
   "@diaryDeleteBodyImage": {
     "placeholders": {
       "title": {
@@ -4692,6 +4692,14 @@
   "npcExportCharacter": "Su ficha de personaje y el homebrew que usa",
   "npcTagsWord": "Tags",
   "npcNotesWord": "Notas",
+  "npcNotesEmpty": "Todavía no anotaste nada sobre {name}.",
+  "@npcNotesEmpty": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "npcNotesNote": "Son de tus mesas.",
   "npcExportNever": "Nunca viaja en qué campañas está ni si vive o murió en cada una. Quien lo importe recibe su propia copia: lo que cambie después no te llega.",
   "npcDownloadZip": "Descargar .zip",
@@ -4738,7 +4746,6 @@
   "npcSaveFailed": "No se pudo guardar el cambio",
   "npcEditName": "Editar nombre",
   "npcNameLabel": "Nombre del PNJ",
-  "npcNewNote": "Nueva nota",
   "npcAddToCampaign": "Sumar a una campaña",
   "npcInAllCampaigns": "Ya está en todas tus campañas.",
   "npcDeleteBodyLibrary": "Se borra de tu biblioteca, con su ficha, su trasfondo, sus notas y sus retratos. No se puede deshacer.",
@@ -4779,7 +4786,6 @@
   "npcSpeech": "Voz",
   "npcSpeechHint": "Una o dos líneas para interpretarlo",
   "npcSpeechEmpty": "Sin voz.",
-  "npcNoBackground": "Sin trasfondo.",
   "npcPortrait": "Retrato",
   "npcRemoveTag": "Quitar «{tag}»",
   "@npcRemoveTag": {
@@ -4798,8 +4804,6 @@
       }
     }
   },
-  "npcAddNote": "Agregar nota",
-  "npcNoNotes": "Sin notas.",
   "npcStats": "Estadísticas",
   "npcNoStatsNote": "Sin estadísticas. En combate entra como neutral, con turno y sin PG.",
   "npcBlockTitle": "Bloque",
