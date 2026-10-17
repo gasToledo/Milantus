@@ -82,18 +82,20 @@ class ChaptersView extends StatelessWidget {
             const SizedBox(height: 12),
             Eyebrow(group.state.localized(context)),
             const SizedBox(height: 8),
-            for (final chapter in group.items)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: _ChapterCard(
-                  chapter: chapter,
-                  onEdit: () => onEdit(chapter),
-                  onStart: () => onStart(chapter),
-                  onClose: () => _confirmClose(context, chapter),
-                  onDelete: () => _confirmDelete(context, chapter),
-                  onOpenNotebook: () => onOpenNotebook(chapter),
-                ),
-              ),
+            CardGrid(
+              children: [
+                for (final chapter in group.items)
+                  _ChapterCard(
+                    chapter: chapter,
+                    onEdit: () => onEdit(chapter),
+                    onStart: () => onStart(chapter),
+                    onClose: () => _confirmClose(context, chapter),
+                    onDelete: () => _confirmDelete(context, chapter),
+                    onOpenNotebook: () => onOpenNotebook(chapter),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
           ],
       ],
     );
@@ -284,6 +286,9 @@ class _ChapterCard extends StatelessWidget {
               ],
             ),
           ],
+          // En la grilla la fila se iguala a la tarjeta más alta: los botones
+          // van al pie para quedar alineados con los de al lado.
+          const Spacer(),
           const SizedBox(height: 12),
           // Un solo primario según el estado, y al lado la salida al
           // Cuaderno; editar y borrar viven en el menú «⋯» del título.

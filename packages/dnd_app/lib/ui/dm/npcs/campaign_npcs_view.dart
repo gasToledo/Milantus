@@ -138,33 +138,24 @@ class _CampaignNpcsViewState extends State<CampaignNpcsView> {
             ),
           )
         else
-          Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              border: Border.all(color: pal.hairline),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              children: [
-                for (final (i, entry) in visible.indexed) ...[
-                  if (i > 0) Divider(height: 1, color: pal.hairline),
-                  _row(context, entry),
-                ],
-              ],
-            ),
+          CardGrid(
+            children: [for (final entry in visible) _card(context, entry)],
           ),
       ],
     );
   }
 
-  Widget _row(BuildContext context, CampaignNpcEntry entry) {
+  /// Un PNJ como tarjeta de la grilla, con la forma que antes tenía solo en
+  /// el teléfono: identidad y menú arriba, etiquetas, y el estado al pie. La
+  /// fila acostada medía más de 1100 px con el medio vacío.
+  Widget _card(BuildContext context, CampaignNpcEntry entry) {
     final pal = context.palette;
     final npc = entry.npc;
     final dead = entry.status == NpcStatus.dead;
-    // Se toca la identidad y no la fila entera: en la fila también están el
-    // selector de estado y el menú, cada uno con su toque. Antes solo se
-    // abría por ⋯ → «Abrir ficha», mientras que en la biblioteca alcanza con
-    // tocar la tarjeta.
+    // Se toca la identidad y no la tarjeta entera: en la tarjeta también
+    // están el selector de estado y el menú, cada uno con su toque. Antes
+    // solo se abría por ⋯ → «Abrir ficha», mientras que en la biblioteca
+    // alcanza con tocar la tarjeta.
     final identity = InkWell(
       onTap: () => widget.onOpen(entry),
       borderRadius: BorderRadius.circular(8),
@@ -243,39 +234,32 @@ class _CampaignNpcsViewState extends State<CampaignNpcsView> {
 
     return Opacity(
       opacity: dead ? .7 : 1,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 10, 6, 10),
-        child: LayoutBuilder(
-          builder: (context, box) {
-            if (box.maxWidth >= 760) {
-              return Row(
-                children: [
-                  SizedBox(width: 280, child: identity),
-                  const SizedBox(width: 12),
-                  Expanded(child: npcTagPills(npc)),
-                  status,
-                  menu,
-                ],
-              );
-            }
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(14, 12, 6, 14),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          border: Border.all(color: pal.hairline),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
-                    Expanded(child: identity),
-                    menu,
-                  ],
-                ),
-                if (npc.tags.isNotEmpty) ...[
-                  const SizedBox(height: 6),
-                  npcTagPills(npc),
-                ],
-                const SizedBox(height: 8),
-                status,
+                Expanded(child: identity),
+                menu,
               ],
-            );
-          },
+            ),
+            if (npc.tags.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              npcTagPills(npc),
+            ],
+            // Al pie, para que en una fila de la grilla los estados queden
+            // alineados aunque una tarjeta tenga etiquetas y otra no.
+            const Spacer(),
+            const SizedBox(height: 12),
+            status,
+          ],
         ),
       ),
     );

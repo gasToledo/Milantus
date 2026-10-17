@@ -1587,6 +1587,77 @@ class Medallion extends StatelessWidget {
   }
 }
 
+/// Tarjetas de alto variable en columnas iguales que llenan el ancho.
+///
+/// La usan Capítulos y PNJ de una campaña. Como filas a lo ancho, en
+/// escritorio cada una medía más de 1100 px con dos renglones cortos; topeadas
+/// en 880, dejaban media pantalla vacía. En columnas usan el ancho sin
+/// estirar ninguna tarjeta.
+///
+/// No es un `GridView` como la Mesa porque la Mesa fija el alto de la celda,
+/// y un capítulo con objetivo y recompensas mide el doble que uno sin nada.
+/// Las tarjetas de una misma fila se igualan a la más alta: con alturas
+/// sueltas, la grilla se lee como un error de alineación.
+///
+/// No hace scroll: va adentro de la lista de su pantalla, junto a los
+/// rótulos de grupo.
+class CardGrid extends StatelessWidget {
+  final List<Widget> children;
+
+  /// Ancho mínimo de cada tarjeta. Las columnas son tantas como entren con
+  /// ese mínimo, hasta [maxColumns].
+  final double minCardWidth;
+  final int maxColumns;
+  final double spacing;
+
+  const CardGrid({
+    super.key,
+    required this.children,
+    this.minCardWidth = 360,
+    this.maxColumns = 3,
+    this.spacing = 12,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, box) {
+        final columns = ((box.maxWidth + spacing) / (minCardWidth + spacing))
+            .floor()
+            .clamp(1, maxColumns);
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var start = 0; start < children.length; start += columns) ...[
+              if (start > 0) SizedBox(height: spacing),
+              // `IntrinsicHeight` para igualar la fila a la tarjeta más alta;
+              // `stretch` a secas pediría alto infinito adentro de la lista.
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (var col = 0; col < columns; col++) ...[
+                      if (col > 0) SizedBox(width: spacing),
+                      // La fila incompleta deja su hueco vacío en vez de
+                      // ensanchar las que quedan: una tarjeta sola al final
+                      // a todo el ancho sería la fila larga que se evitaba.
+                      Expanded(
+                        child: start + col < children.length
+                            ? children[start + col]
+                            : const SizedBox.shrink(),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ],
+        );
+      },
+    );
+  }
+}
+
 /// Contenedor de filas densas con separadores (en vez de tarjetas sueltas).
 class DenseRows extends StatelessWidget {
   final List<Widget> children;

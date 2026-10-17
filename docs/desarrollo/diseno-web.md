@@ -430,6 +430,7 @@ compartida: **antes de crear un widget visual nuevo, buscar acá**.
 | --- | --- | --- |
 | `PageBody` | Cuerpo centrado con ancho máximo (760 por defecto) para que el contenido no se estire de borde a borde | `children`, `maxWidth`, `padding` |
 | `DenseRows` | Contenedor de filas densas con divisores internos, en vez de tarjetas sueltas | `children` |
+| `CardGrid` | Tarjetas de **alto variable** en columnas iguales que llenan el ancho (tantas como entren con `minCardWidth`, hasta `maxColumns`); cada fila se iguala a su tarjeta más alta, y la fila incompleta deja su hueco. No hace scroll: va adentro de la lista de la pantalla. La usan Capítulos y PNJ de una campaña. Para alto fijo, como la Mesa, `GridView` | `children`, `minCardWidth` (360), `maxColumns` (3), `spacing` (12) |
 | `SectionRule` | Regla ornamental: línea `hairline` con rombo dorado de 7 px al centro, 18 px de margen vertical | — |
 | `Eyebrow` | Rótulo de sección en mayúsculas espaciadas | `text` |
 | `sheetCard(…)` | Tarjeta plegable con cabecera (ícono dorado 18 px + título Georgia 16 + acción) | `icon`, `title`, `trailing`, `child`, y `collapseKey` cuando el título se repite en la misma pantalla (dos campañas apiladas tienen dos tarjetas «Batallas») |
