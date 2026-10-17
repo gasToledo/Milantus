@@ -7,14 +7,12 @@ import 'package:flutter/material.dart';
 import '../../../api/api_client.dart';
 import '../../../api/api_exception.dart';
 import '../../../api/api_models.dart';
-import '../../../data/characters_controller.dart';
 import '../../../data/settings_service.dart';
 import '../../../homebrew/homebrew_screen.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_widgets.dart';
 import '../../diary_cards.dart';
 import '../../portrait_screen.dart';
-import '../../sheet_screen.dart';
 import 'npc_shared.dart';
 import 'npc_table_view.dart';
 import 'npc_transfer.dart';
@@ -143,15 +141,18 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
 
   /// Cada tecla del trasfondo: se refleja ya en el documento en memoria y se
   /// guarda recién cuando se deja de escribir.
+  ///
+  /// Sin `setState`: la tarjeta lleva su propio controlador y se redibuja
+  /// sola. Reconstruir la pantalla por tecla recompilaría la ficha del PNJ
+  /// (`_sheetSummary`) con cada letra; la próxima reconstrucción ya toma el
+  /// texto nuevo de `_entry`.
   void _onBackgroundChanged(String value) {
     final entry = _entry;
     if (entry == null) return;
-    setState(
-      () => _entry = NpcEntry(
-        npc: entry.npc.copyWith(background: value),
-        campaigns: entry.campaigns,
-        sheet: entry.sheet,
-      ),
+    _entry = NpcEntry(
+      npc: entry.npc.copyWith(background: value),
+      campaigns: entry.campaigns,
+      sheet: entry.sheet,
     );
     _backgroundDirty = true;
     _backgroundTimer?.cancel();
@@ -272,21 +273,14 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
   /// que un jugador. Guarda por la ruta de personajes, que no le cambia el
   /// tipo a la fila: sigue siendo la ficha de un PNJ.
   Future<void> _openSheet(Character sheet) async {
-    final controller = CharactersController(widget.api)..characters.add(sheet);
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => SheetScreen(
-          character: sheet,
-          repo: widget.repo,
-          controller: controller,
-          settingsController: widget.settingsController,
-          theme: widget.theme ?? AppThemeController(),
-          npcMode: true,
-        ),
-      ),
+    await openNpcSheet(
+      context,
+      api: widget.api,
+      repo: widget.repo,
+      sheet: sheet,
+      settingsController: widget.settingsController,
+      theme: widget.theme ?? AppThemeController(),
     );
-    await controller.flush();
-    controller.dispose();
     if (mounted) await _load();
   }
 
@@ -534,7 +528,6 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
           gap,
           DiaryEntriesCard(
             entries: npc.notes,
-            ownerName: npc.name,
             emptyMessage: context.l10n.npcNotesEmpty(npc.name),
             title: context.l10n.npcNotesWord,
             onChanged: (lista) => _save(npc.copyWith(notes: lista)),

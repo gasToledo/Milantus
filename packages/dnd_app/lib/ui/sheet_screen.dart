@@ -320,9 +320,6 @@ class _SheetScreenState extends State<SheetScreen> {
     );
   }
 
-  void _openPortraitViewer(String portraitKey) =>
-      showPortraitViewer(context, portraitKey);
-
   void _openPortrait() {
     Navigator.of(context).push(
       MaterialPageRoute(

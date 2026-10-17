@@ -49,12 +49,17 @@ class AppPalette extends ThemeExtension<AppPalette> {
     textMuted: Color(0xFF6E6047), // 5.7:1 sobre surface, 4.7:1 sobre plaque
   );
 
+  /// De este cociente de PG para abajo el personaje está «crítico»: la barra
+  /// se pone carmesí y la tarjeta lo dice con todas las letras. Una sola
+  /// constante para que el color y el rótulo no se desfasen.
+  static const hpCriticalRatio = 0.25;
+
   /// Color de los PG según cuánto queda: verde con más de la mitad, dorado
   /// entre la mitad y un cuarto, carmesí en un cuarto o menos (el mismo umbral
-  /// que el rótulo «crítico» de la tarjeta).
+  /// que el rótulo «crítico» de la tarjeta, ver [hpCriticalRatio]).
   Color hpColor(double ratio) => ratio > 0.5
       ? verdant
-      : ratio > 0.25
+      : ratio > hpCriticalRatio
       ? gold
       : crimson;
 

@@ -304,7 +304,7 @@ class _CharacterCardState extends State<_CharacterCard> {
     // Un cuarto de los PG: a partir de ahí el rótulo lo dice con todas las
     // letras, en vez de dejarlo librado a lo corta que se ve la barra. Sin
     // parpadeo: es información, no una alarma.
-    final critical = !fallen && ratio <= 0.25;
+    final critical = !fallen && ratio <= AppPalette.hpCriticalRatio;
     final (hpLabel, hpIcon) = switch ((fallen, critical)) {
       (true, _) => (context.l10n.hpLabelFallen, Icons.heart_broken),
       (_, true) => (context.l10n.hpLabelCritical, Icons.warning_amber_rounded),

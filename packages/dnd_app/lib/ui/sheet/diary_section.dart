@@ -32,7 +32,7 @@ extension _SheetDiarySection on _SheetScreenState {
       const SizedBox(height: 16),
       DiaryEntriesCard(
         entries: _c.diary,
-        ownerName: _c.name,
+        emptyMessage: context.l10n.diaryEmpty(_c.name),
         title: context.l10n.diaryEntries,
         shell: sheetCard,
         onChanged: (lista) => _replace(_c.copyWith(diary: lista)),

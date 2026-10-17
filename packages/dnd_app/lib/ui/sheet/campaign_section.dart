@@ -241,10 +241,10 @@ extension _CampaignSection on _SheetScreenState {
               switch ((m.name.isEmpty, m.count == 1)) {
                 (true, true) => context.l10n.enemyOne,
                 (true, false) => context.l10n.enemiesCount(m.count),
-                (false, true) => logGroupName(m, widget.repo),
-                // «Esqueleto ×2» y no «2 Esqueleto»: el nombre del catálogo no
-                // se puede pluralizar a mano, y el Cuaderno ya lo escribe así.
-                (false, false) => '${logGroupName(m, widget.repo)} ×${m.count}',
+                (false, _) => countedName(
+                  logGroupName(m, widget.repo),
+                  m.count,
+                ),
               },
           ]),
         );

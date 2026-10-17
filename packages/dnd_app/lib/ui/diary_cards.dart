@@ -397,12 +397,9 @@ class DiaryEntriesCard extends StatefulWidget {
   /// «deshacer» de un borrado).
   final ValueChanged<List<DiaryEntry>> onChanged;
 
-  /// De quién es el diario, para el texto del estado vacío.
-  final String ownerName;
-
-  /// Texto del estado vacío. Null usa el del Diario de la ficha, que habla de
-  /// «este personaje» y en las notas de un PNJ sonaba ajeno.
-  final String? emptyMessage;
+  /// Texto del estado vacío. Lo pone quien usa la tarjeta: el del Diario de la
+  /// ficha habla de «este personaje», y en las notas de un PNJ sonaba ajeno.
+  final String emptyMessage;
 
   final String title;
 
@@ -420,8 +417,7 @@ class DiaryEntriesCard extends StatefulWidget {
     super.key,
     required this.entries,
     required this.onChanged,
-    required this.ownerName,
-    this.emptyMessage,
+    required this.emptyMessage,
     required this.title,
     required this.uploadImage,
     required this.deleteImage,
@@ -462,9 +458,7 @@ class _DiaryEntriesCardState extends State<DiaryEntriesCard> {
       child: entradas.isEmpty
           ? AppEmptyState(
               icon: Icons.photo_library_outlined,
-              message:
-                  widget.emptyMessage ??
-                  context.l10n.diaryEmpty(widget.ownerName),
+              message: widget.emptyMessage,
               actions: [
                 OutlinedButton.icon(
                   onPressed: () => _editEntry(null),
@@ -653,12 +647,6 @@ class _DiaryEntriesCardState extends State<DiaryEntriesCard> {
         );
     }
   }
-
-  IconData _entryIcon(DiaryEntryKind kind) => switch (kind) {
-    DiaryEntryKind.text => Icons.notes,
-    DiaryEntryKind.image => Icons.image_outlined,
-    DiaryEntryKind.link => Icons.link,
-  };
 
   /// «12/3», o «12/3 · editada 2/4» cuando se tocó después. Sin fecha —la
   /// entrada que vino de las notas viejas— no se inventa ninguna.
@@ -1110,11 +1098,7 @@ class _DiaryEntryDialogState extends State<_DiaryEntryDialog> {
                     DiaryEntryKind.image => context.l10n.diaryKindImage,
                     DiaryEntryKind.link => context.l10n.diaryKindLink,
                   }),
-                  avatar: Icon(switch (kind) {
-                    DiaryEntryKind.text => Icons.notes,
-                    DiaryEntryKind.image => Icons.image_outlined,
-                    DiaryEntryKind.link => Icons.link,
-                  }, size: 16),
+                  avatar: Icon(_entryIcon(kind), size: 16),
                   selected: _kind == kind,
                   onSelected: (_) => setState(() => _kind = kind),
                 ),
@@ -1349,3 +1333,11 @@ class _MarkdownText extends StatelessWidget {
     return TextSpan(children: hijos);
   }
 }
+
+/// El ícono de cada tipo de entrada, igual en la tarjeta y en el selector del
+/// editor: un tipo nuevo se suma en un solo lugar.
+IconData _entryIcon(DiaryEntryKind kind) => switch (kind) {
+  DiaryEntryKind.text => Icons.notes,
+  DiaryEntryKind.image => Icons.image_outlined,
+  DiaryEntryKind.link => Icons.link,
+};

@@ -397,15 +397,17 @@ son decisiones locales de contenido y se resuelven con `LayoutBuilder`, no con
 
 ```dart
 const _kCardBaseWidth  = 420.0;  // diseño de referencia
-const _kCardBaseHeight = 212.0;
 const _kCardMaxExtent  = 560.0;  // ancho máximo por columna
 const _kCardSpacing    =  16.0;
 ```
 
-`SliverGridDelegateWithMaxCrossAxisExtent` reparte el ancho en columnas de a lo
-sumo 560 px. La tarjeta **se escala en proporción** (`scale` entre 1.0 y 1.3)
-según el ancho real que le tocó, y el alto de la celda acompaña. Por eso todas
-las medidas internas de la tarjeta llevan `× k`.
+`_grid` reparte el ancho en columnas de a lo sumo 560 px. La tarjeta **se
+escala en proporción** (`scale` entre 1.0 y 1.3) según el ancho real que le
+tocó; por eso todas las medidas internas de la tarjeta llevan `× k`. El alto
+no es fijo: cada fila es una `CardGridRow` (la fila de `CardGrid`) armada de
+a una en un `ListView.builder`, y se iguala a su tarjeta más alta. Un alto
+de celda fijo se calibraba para un contenido que cambia con el ancho y
+dejaba aire bajo la fila CA/VEL/INIC.
 
 Consecuencia: **subir `_kCardMaxExtent` no ensancha la tarjeta** si con ese
 valor entra una columna más. Los dos parámetros están acoplados.
@@ -430,7 +432,7 @@ compartida: **antes de crear un widget visual nuevo, buscar acá**.
 | --- | --- | --- |
 | `PageBody` | Cuerpo centrado con ancho máximo (760 por defecto) para que el contenido no se estire de borde a borde | `children`, `maxWidth`, `padding` |
 | `DenseRows` | Contenedor de filas densas con divisores internos, en vez de tarjetas sueltas | `children` |
-| `CardGrid` | Tarjetas de **alto variable** en columnas iguales que llenan el ancho (tantas como entren con `minCardWidth`, hasta `maxColumns`); cada fila se iguala a su tarjeta más alta, y la fila incompleta deja su hueco. No hace scroll: va adentro de la lista de la pantalla. La usan Capítulos y PNJ de una campaña. Para alto fijo, como la Mesa, `GridView` | `children`, `minCardWidth` (360), `maxColumns` (3), `spacing` (12) |
+| `CardGrid` | Tarjetas de **alto variable** en columnas iguales que llenan el ancho (tantas como entren con `minCardWidth`, hasta `maxColumns`); cada fila se iguala a su tarjeta más alta, y la fila incompleta deja su hueco. No hace scroll: va adentro de la lista de la pantalla. La usan Capítulos y PNJ de una campaña. Su fila suelta es `CardGridRow`, que la Mesa arma de a una adentro de un `ListView.builder` para seguir siendo perezosa | `children`, `minCardWidth` (360), `maxColumns` (3), `spacing` (12); `CardGridRow`: `children`, `columns`, `spacing` |
 | `SectionRule` | Regla ornamental: línea `hairline` con rombo dorado de 7 px al centro, 18 px de margen vertical | — |
 | `Eyebrow` | Rótulo de sección en mayúsculas espaciadas | `text` |
 | `sheetCard(…)` | Tarjeta plegable con cabecera (ícono dorado 18 px + título Georgia 16 + acción) | `icon`, `title`, `trailing`, `child`, y `collapseKey` cuando el título se repite en la misma pantalla (dos campañas apiladas tienen dos tarjetas «Batallas») |
@@ -460,7 +462,7 @@ compartida: **antes de crear un widget visual nuevo, buscar acá**.
 | `SourceBadge` | `GoldPill` con la procedencia del contenido | Solo el SRD 5.2.1 va resaltado |
 | `ActionTypeIcon` / `ActionTypeLegend` | Ícono del tipo de acción (acción, adicional, reacción) y su leyenda | La leyenda va una sola vez por pantalla, no por fila |
 | `CreatureActionRow` | Una acción de criatura: nombre, bonificador con signo en Georgia dorado, daño con su tipo, alcance y descripción | Toma **primitivos** y no un `CreatureAction`. Hoy la usa **solo la ficha** para los compañeros invocados (vía `ResolvedCreatureAction`): el perfil del Bestiario dejó de usarla cuando el daño pasó a placas rotuladas |
-| `creatureProfileBody(…)` | El perfil de una criatura del bloque de cifras para abajo: banda de cifras (CA, PG con sus dados, iniciativa, desafío, percepción pasiva), banda de las seis características con la salvación adentro, líneas como lista de definición con las defensas en chips, rasgos y acciones agrupadas por tipo, con acierto/daño/alcance en placas rotuladas | Devuelve `List<Widget>`, no un `Column`: cada llamador lo mete en su propio `ListView` con su encabezado (el nombre y el tipo **no** van adentro). Lo leen la columna «Del turno» de Combate y la vista previa del formulario de criaturas de Homebrew. **El Bestiario no lo usa de corrido**: arma el perfil en tarjetas de superficie con las mismas piezas, expuestas aparte — `creatureProfileNumbers` (cifras sin el desafío, que ahí va como pastilla junto al tipo, y sin placa cuando van acostadas), `creatureProfileStats` (características y líneas) y `creatureProfileActions` (rasgos y acciones) —, en un encabezado y dos columnas desde 760 px. **Dos ejes distintos, y conviene no confundirlos**: `dense: true` decide *contenido* —saca CA, PG e iniciativa, que en Combate los lleva el encuentro y no el catálogo— mientras que la *forma* la decide un `LayoutBuilder` con el ancho medido (`_profileWideWidth`, 520): por debajo se apila todo, que es lo que necesitan la columna «Del turno» de 300 px y el Bestiario en un teléfono. La prosa va topeada a `_profileProseWidth` (620) porque el panel del Bestiario mide unos 855 px |
+| `creatureProfileBody(…)` | El perfil de una criatura del bloque de cifras para abajo: banda de cifras (CA, PG con sus dados, iniciativa, desafío, percepción pasiva), banda de las seis características con la salvación adentro, líneas como lista de definición con las defensas en chips, rasgos y acciones agrupadas por tipo, con acierto/daño/alcance en placas rotuladas | Devuelve `List<Widget>`, no un `Column`: cada llamador lo mete en su propio `ListView` con su encabezado (el nombre y el tipo **no** van adentro). Lo leen la columna «Del turno» de Combate y la vista previa del formulario de criaturas de Homebrew. **El Bestiario no lo usa de corrido**: arma el perfil en tarjetas de superficie con las mismas piezas, expuestas aparte — `creatureProfileNumbers` (cifras sin el desafío, que ahí va como pastilla junto al tipo, y sin placa cuando van acostadas), `creatureProfileStats` (características y líneas) y `creatureProfileActions` (rasgos y acciones) —, en un encabezado y dos columnas desde 760 px. **Dos ejes distintos, y conviene no confundirlos**: `dense: true` decide *contenido* —saca CA, PG e iniciativa, que en Combate los lleva el encuentro y no el catálogo— mientras que la *forma* la decide un `LayoutBuilder` con el ancho medido (`_profileWideWidth`, 520): por debajo se apila todo, que es lo que necesitan la columna «Del turno» de 300 px y el Bestiario en un teléfono. La prosa va topeada a `kReadingWidth` (620, con `readingWidth(child)`, que también usa el Diario) porque el panel del Bestiario mide unos 855 px |
 | `EncounterDifficultyBand` | La dificultad del combate que se está armando: el veredicto en Georgia (Baja, Moderada, Alta o Extrema), la regla del presupuesto con sus tres techos, los PX de enfrente y, debajo, los avisos del SRD que apliquen | Sobre `plaque`, como la barra de Combate: es un dato calculado, no editable. **Solo «Extrema» va en `crimson`**; las otras tres son dificultades que el DM elige a propósito y quedan en `gold`. Dos umbrales medidos con `LayoutBuilder`: desde 620 px todo va en una línea, y desde 360 px de regla los techos se rotulan bajo su marca (con menos pasan a una leyenda, porque a nivel 1 «Moderada» y «Alta» quedan a un 20 % de la regla y se pisan). Recibe un `EncounterDifficulty` ya calculado: los números son del motor |
 
 ### Selección
@@ -777,7 +779,7 @@ exactamente con los del código Dart.
     "pageMaxWidth": 760,
     "shellBreakpoint": 900,
     "sheetColumnsBreakpoint": 640,
-    "grid": { "cardBaseWidth": 420, "cardBaseHeight": 212, "cardMaxExtent": 560, "spacing": 16, "maxScale": 1.3 }
+    "grid": { "cardBaseWidth": 420, "cardMaxExtent": 560, "spacing": 16, "maxScale": 1.3 }
   },
   "motion": { "hover": 120, "stateSwitch": 180 },
   "elevation": {

@@ -5,9 +5,12 @@ import '../../../api/api_client.dart';
 import '../../../api/api_exception.dart';
 import '../../../api/api_models.dart';
 import '../../../creation/creation_wizard.dart';
+import '../../../data/characters_controller.dart';
+import '../../../data/settings_service.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_widgets.dart';
 import '../../../l10n/l10n_context.dart';
+import '../../sheet_screen.dart';
 
 /// Piezas que comparten las pantallas de PNJ: cómo se nombra el tipo de un
 /// PNJ, qué retrato lo representa, sus números de combate y el flujo de
@@ -164,8 +167,7 @@ class NpcStatusSelector extends StatelessWidget {
           visualDensity: VisualDensity.compact,
           textStyle: const TextStyle(fontSize: 12),
           // El relleno lleva el color del estado elegido; el texto, el
-          // inverso del tema (contraste calculado contra cada acento).
-          selectedForegroundColor: Theme.of(context).colorScheme.onPrimary,
+          // inverso, ya lo pone `segmentedButtonTheme`.
           selectedBackgroundColor: npcStatusColor(status, pal),
         ),
         segments: [
@@ -212,7 +214,6 @@ class SideSelector extends StatelessWidget {
         style: SegmentedButton.styleFrom(
           visualDensity: VisualDensity.compact,
           textStyle: const TextStyle(fontSize: 12),
-          selectedForegroundColor: Theme.of(context).colorScheme.onPrimary,
           selectedBackgroundColor: side == null
               ? null
               : combatantSideColor(side!, pal),
@@ -460,4 +461,38 @@ class _NewNpcDialogState extends State<_NewNpcDialog> {
       ],
     );
   }
+}
+
+/// La ficha completa de un PNJ con ficha de personaje, con la misma pantalla
+/// que un jugador. La abren la Biblioteca y el turno del PNJ en Combate; vive
+/// acá para que el ciclo del controlador efímero (sumar la ficha, guardar lo
+/// pendiente al volver, liberarlo) sea uno solo.
+///
+/// Guarda por la ruta de personajes, que no le cambia el tipo a la fila: sigue
+/// siendo la ficha de un PNJ.
+Future<void> openNpcSheet(
+  BuildContext context, {
+  required ApiClient api,
+  required ContentRepository repo,
+  required Character sheet,
+  required SettingsController? settingsController,
+  required AppThemeController theme,
+  bool openOnCombat = false,
+}) async {
+  final controller = CharactersController(api)..characters.add(sheet);
+  await Navigator.of(context).push(
+    MaterialPageRoute<void>(
+      builder: (_) => SheetScreen(
+        character: sheet,
+        repo: repo,
+        controller: controller,
+        settingsController: settingsController,
+        theme: theme,
+        npcMode: true,
+        openOnCombat: openOnCombat,
+      ),
+    ),
+  );
+  await controller.flush();
+  controller.dispose();
 }

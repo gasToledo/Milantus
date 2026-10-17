@@ -42,31 +42,33 @@ Future<void> exportNpcFlow(
     final homebrew = sheet == null
         ? const <String, List<Map<String, dynamic>>>{}
         : homebrewUsedBy(sheet, await api.listHomebrew());
-    final portraits = <NpcBundlePortrait>[];
-    Future<void> collect(String owner, List<String> keys) async {
-      for (final key in keys) {
-        final bytes = await api.fetchPortraitBytes(key);
-        if (bytes != null) {
-          portraits.add((owner: owner, key: key, bytes: bytes));
-        }
-      }
-    }
-
-    await collect('npc', entry.npc.portraitPaths);
-    if (sheet != null) await collect('character', sheet.portraitPaths);
-    // Las imágenes de las notas viajan como los retratos, y solo si viajan las
-    // notas. Un PNJ con ficha las guarda en la carpeta de la ficha (ver
-    // `_uploadNoteImage`), y el servidor las reubica según el dueño.
-    if (options.notes) {
-      for (final note in entry.npc.notes) {
-        final key = note.imageKey;
-        if (key == null) continue;
-        await collect(
-          sheet != null && key.startsWith('${sheet.id}/') ? 'character' : 'npc',
-          [key],
-        );
-      }
-    }
+    final wanted = <({String owner, String key})>[
+      for (final key in entry.npc.portraitPaths) (owner: 'npc', key: key),
+      if (sheet != null)
+        for (final key in sheet.portraitPaths) (owner: 'character', key: key),
+      // Las imágenes de las notas viajan como los retratos, y solo si viajan
+      // las notas. Un PNJ con ficha las guarda en la carpeta de la ficha (ver
+      // `_uploadNoteImage`), y el servidor las reubica según el dueño.
+      if (options.notes)
+        for (final note in entry.npc.notes)
+          if (note.imageKey case final key?)
+            (
+              owner: sheet != null && key.startsWith('${sheet.id}/')
+                  ? 'character'
+                  : 'npc',
+              key: key,
+            ),
+    ];
+    // Todas a la vez: una por una, exportar tardaba la suma de los viajes, y
+    // con imágenes en las notas son muchos. `Future.wait` conserva el orden.
+    final fetched = await Future.wait(
+      wanted.map((w) => api.fetchPortraitBytes(w.key)),
+    );
+    final portraits = <NpcBundlePortrait>[
+      for (var i = 0; i < wanted.length; i++)
+        if (fetched[i] case final bytes?)
+          (owner: wanted[i].owner, key: wanted[i].key, bytes: bytes),
+    ];
     final bytes = NpcBundleCodec.encode(
       npc: npcForExport(entry.npc, options),
       sheet: sheet,

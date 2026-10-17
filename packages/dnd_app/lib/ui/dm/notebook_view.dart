@@ -263,13 +263,9 @@ String _levelUpTitle(LevelUpEntry up, AppLocalizations l10n) =>
 String _levelUpDetail(LevelUpEntry up, ContentRepository repo) =>
     '${repo.characterClass(up.classId)?.name ?? up.classId} ${up.classLevel}';
 
-/// La cantidad va detrás, «Esqueleto ×2», como en el equipo. «2 Esqueleto»
-/// pedía un plural, y el nombre sale del catálogo o del homebrew: «Lobo
-/// terrible», «Guerrero goblin», «Tiranosaurio rex». Pluralizar eso con reglas
-/// se equivoca justo en los nombres compuestos, que son la mitad del bestiario.
-String _logNames(List<EncounterLogMonsters> group, String joiner) => [
-  for (final m in group) m.count == 1 ? m.name : '${m.name} ×${m.count}',
-].join(joiner);
+/// «Esqueleto ×2», con la cantidad detrás: ver [countedName].
+String _logNames(List<EncounterLogMonsters> group, String joiner) =>
+    [for (final m in group) countedName(m.name, m.count)].join(joiner);
 
 /// Un capítulo del cuaderno: plegado muestra un resumen, abierto muestra sus
 /// entradas.

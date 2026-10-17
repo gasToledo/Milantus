@@ -7,7 +7,6 @@ import '../../api/api_client.dart';
 import '../../api/api_exception.dart';
 import '../../api/api_models.dart';
 import '../../data/campaigns_controller.dart';
-import '../../data/characters_controller.dart';
 import '../../data/homebrew_store.dart';
 import '../../data/settings_service.dart';
 import '../../homebrew/homebrew_screen.dart';
@@ -18,7 +17,6 @@ import '../app_sidebar.dart';
 import '../pending_events_gate.dart';
 import '../portrait_image.dart';
 import '../settings_view.dart';
-import '../sheet_screen.dart';
 import '../../web/screen_awake.dart';
 import 'add_monster_dialog.dart';
 import 'bestiary_view.dart';
@@ -131,27 +129,18 @@ class _DmModeScreenState extends State<DmModeScreen> {
 
   /// La ficha de un PNJ con ficha de personaje, encima del combate y en su
   /// solapa Combate. Es la misma pantalla que abre la Biblioteca (ver
-  /// `NpcDetailScreen._openSheet`): el DM puede gastar ahí un espacio de
-  /// conjuro o un uso de un rasgo, porque la ficha es suya, y se guarda por la
-  /// ruta de personajes igual que desde allá.
-  Future<void> _openNpcSheet(Character sheet) async {
-    final controller = CharactersController(widget.api)..characters.add(sheet);
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => SheetScreen(
-          character: sheet,
-          repo: widget.repo,
-          controller: controller,
-          settingsController: _settings,
-          theme: _theme,
-          npcMode: true,
-          openOnCombat: true,
-        ),
-      ),
-    );
-    await controller.flush();
-    controller.dispose();
-  }
+  /// [openNpcSheet]): el DM puede gastar ahí un espacio de conjuro o un uso de
+  /// un rasgo, porque la ficha es suya, y se guarda por la ruta de personajes
+  /// igual que desde allá.
+  Future<void> _openNpcSheet(Character sheet) => openNpcSheet(
+    context,
+    api: widget.api,
+    repo: widget.repo,
+    sheet: sheet,
+    settingsController: _settings,
+    theme: _theme,
+    openOnCombat: true,
+  );
 
   Campaign? get _effectiveSelection =>
       _campaigns.campaigns

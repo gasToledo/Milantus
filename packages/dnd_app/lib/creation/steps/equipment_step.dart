@@ -116,7 +116,7 @@ class _StartingEquipmentSection extends StatelessWidget {
           [
             ...draft.grantedItems.map((e) {
               final name = draft.repo.catalogEntry(e.itemId)?.name ?? e.itemId;
-              return e.quantity == 1 ? name : '$name ×${e.quantity}';
+              return countedName(name, e.quantity);
             }),
             ...draft.grantedCoins.entries.map(
               (e) => '${e.value} ${coinAbbr(context.l10n, e.key)}',
@@ -191,9 +191,7 @@ class _StartingEquipmentSection extends StatelessWidget {
   ) => [
     for (final grant in option.grants) ...[
       if (grant.itemId case final id?)
-        grant.quantity == 1
-            ? _itemName(id)
-            : '${_itemName(id)} ×${grant.quantity}',
+        countedName(_itemName(id), grant.quantity),
       if (grant.isChoice)
         grant.chooseFromItemIds.length <= 3
             ? grant.chooseFromItemIds

@@ -1630,30 +1630,59 @@ class CardGrid extends StatelessWidget {
           children: [
             for (var start = 0; start < children.length; start += columns) ...[
               if (start > 0) SizedBox(height: spacing),
-              // `IntrinsicHeight` para igualar la fila a la tarjeta más alta;
-              // `stretch` a secas pediría alto infinito adentro de la lista.
-              IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    for (var col = 0; col < columns; col++) ...[
-                      if (col > 0) SizedBox(width: spacing),
-                      // La fila incompleta deja su hueco vacío en vez de
-                      // ensanchar las que quedan: una tarjeta sola al final
-                      // a todo el ancho sería la fila larga que se evitaba.
-                      Expanded(
-                        child: start + col < children.length
-                            ? children[start + col]
-                            : const SizedBox.shrink(),
-                      ),
-                    ],
-                  ],
+              CardGridRow(
+                columns: columns,
+                spacing: spacing,
+                children: children.sublist(
+                  start,
+                  (start + columns).clamp(0, children.length),
                 ),
               ),
             ],
           ],
         );
       },
+    );
+  }
+}
+
+/// Una fila de [CardGrid]: [columns] celdas de igual ancho, todas al alto de
+/// la tarjeta más alta. Pública para la Mesa, que arma sus filas de a una
+/// adentro de un `ListView.builder` (perezoso) en vez de en una columna.
+class CardGridRow extends StatelessWidget {
+  /// Las tarjetas de esta fila: [columns] o menos, si es la última.
+  final List<Widget> children;
+  final int columns;
+  final double spacing;
+
+  const CardGridRow({
+    super.key,
+    required this.children,
+    required this.columns,
+    this.spacing = 12,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // `IntrinsicHeight` para igualar la fila a la tarjeta más alta; `stretch`
+    // a secas pediría alto infinito adentro de la lista.
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var col = 0; col < columns; col++) ...[
+            if (col > 0) SizedBox(width: spacing),
+            // La fila incompleta deja su hueco vacío en vez de ensanchar las
+            // que quedan: una tarjeta sola al final a todo el ancho sería la
+            // fila larga que se evitaba.
+            Expanded(
+              child: col < children.length
+                  ? children[col]
+                  : const SizedBox.shrink(),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }
@@ -2435,6 +2464,13 @@ class CreatureActionRow extends StatelessWidget {
   }
 }
 
+/// Un nombre con su cantidad detrás: «Esqueleto», «Esqueleto ×2». Detrás y no
+/// delante porque el nombre sale del catálogo o del homebrew («Lobo
+/// terrible», «Guerrero goblin») y pluralizarlo con reglas se equivoca justo
+/// en los compuestos. Lo usan el equipo, el Cuaderno y las batallas.
+String countedName(String name, int count) =>
+    count == 1 ? name : '$name ×$count';
+
 /// El valor de desafío se guarda como número para poder compararlo, pero se
 /// imprime como lo escribe el libro: los fraccionarios con barra y el resto
 /// como entero.
@@ -2606,8 +2642,7 @@ Widget creatureProfileNumbers(BuildContext context, Creature c) =>
         dense: false,
         wide: box.maxWidth >= _profileWideWidth,
         width: box.maxWidth,
-        withCr: false,
-        bare: true,
+        header: true,
       ),
     );
 
@@ -2672,19 +2707,18 @@ List<Widget> creatureProfileActions(
 /// se miran en cada ronda, la percepción pasiva casi nunca. Acá la jerarquía la
 /// dan el color —los PG en carmesí, el desafío en oro— y el orden.
 ///
-/// [withCr] en false saca el desafío, y [bare] deja la banda acostada sin su
-/// placa: los dos los usa el encabezado del Bestiario.
+/// [header] es la variante del encabezado del Bestiario: sin el desafío, que
+/// ahí va como pastilla, y la banda acostada sin su placa. Van siempre juntos.
 Widget _profileNumbers(
   BuildContext context,
   Creature c, {
   required bool dense,
   required bool wide,
   required double width,
-  bool withCr = true,
-  bool bare = false,
+  bool header = false,
 }) {
   final pal = context.palette;
-  final showCr = withCr && c.cr != null;
+  final showCr = !header && c.cr != null;
   // Que la banda vaya acostada no alcanza para los rótulos largos: con las
   // cinco cifras, a 586 px cada tramo mide unos 105 y «CHALLENGE RATING» o
   // «HIT POINTS 20d10+30» se cortaban. Van enteros solo si cada tramo tiene
@@ -2842,7 +2876,7 @@ Widget _profileNumbers(
   }
 
   return Container(
-    decoration: bare
+    decoration: header
         ? null
         : BoxDecoration(
             color: pal.plaque,
@@ -2863,7 +2897,7 @@ Widget _profileNumbers(
                 // Sin placa, el primer tramo se alinea con el resto de la
                 // tarjeta en vez de quedar corrido hacia adentro.
                 padding: EdgeInsets.fromLTRB(
-                  bare && i == 0 ? 0 : 14,
+                  header && i == 0 ? 0 : 14,
                   11,
                   14,
                   12,

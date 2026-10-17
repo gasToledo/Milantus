@@ -69,7 +69,7 @@ extension _DashboardContent on _DashboardScreenState {
                             ),
                           ],
                         )
-                      : _grid(list, margin),
+                      : _grid(list, box.maxWidth, margin),
                 ),
               ],
             );
@@ -282,58 +282,44 @@ extension _DashboardContent on _DashboardScreenState {
   /// lateral ya descontado), no por la ventana.
   double _rosterMargin(double width) => width < 560 ? 16.0 : 32.0;
 
-  Widget _grid(List<Character> list, double horizontalPadding) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Misma cuenta de columnas que hacía el delegado de la grilla, ahora
-        // explícita: el ancho real de una tarjeta no se sabe sin repetirla, y
-        // con el ancho ya resuelto la tarjeta se escala en proporción.
-        final available = constraints.maxWidth - horizontalPadding * 2;
-        final columns = (available / _kCardMaxExtent).ceil().clamp(1, 99);
-        final cardWidth = (available - _kCardSpacing * (columns - 1)) / columns;
-        final scale = (cardWidth / _kCardBaseWidth).clamp(1.0, 1.3);
-        final rows = (list.length / columns).ceil();
+  /// [width] es el del `LayoutBuilder` de [_content], el mismo que decide el
+  /// margen: la grilla no abre otro para medir lo mismo.
+  Widget _grid(List<Character> list, double width, double horizontalPadding) {
+    // Misma cuenta de columnas que hacía el delegado de la grilla, ahora
+    // explícita: el ancho real de una tarjeta no se sabe sin repetirla, y con
+    // el ancho ya resuelto la tarjeta se escala en proporción.
+    final available = width - horizontalPadding * 2;
+    final columns = (available / _kCardMaxExtent).ceil().clamp(1, 99);
+    final cardWidth = (available - _kCardSpacing * (columns - 1)) / columns;
+    final scale = (cardWidth / _kCardBaseWidth).clamp(1.0, 1.3);
+    final rows = (list.length / columns).ceil();
 
-        // Filas con alto intrínseco y no `mainAxisExtent`: un alto fijo se
-        // calibraba para un contenido que cambia con el ancho (las pastillas de
-        // nivel y trasfondo envuelven, el texto escala), así que sobraban
-        // decenas de píxeles bajo la fila CA/VEL/INIC. Cada fila mide a su
-        // tarjeta más alta y las demás se estiran a ese alto.
-        return ListView.builder(
-          padding: EdgeInsets.fromLTRB(
-            horizontalPadding,
-            14,
-            horizontalPadding,
-            32,
+    // Filas con alto intrínseco y no `mainAxisExtent`: un alto fijo se
+    // calibraba para un contenido que cambia con el ancho (las pastillas de
+    // nivel y trasfondo envuelven, el texto escala), así que sobraban decenas
+    // de píxeles bajo la fila CA/VEL/INIC. Son las filas de `CardGrid`, pero
+    // armadas de a una para que la lista siga siendo perezosa.
+    return ListView.builder(
+      padding: EdgeInsets.fromLTRB(
+        horizontalPadding,
+        14,
+        horizontalPadding,
+        32,
+      ),
+      itemCount: rows,
+      itemBuilder: (context, row) {
+        final start = row * columns;
+        final end = (start + columns).clamp(0, list.length);
+        return Padding(
+          padding: EdgeInsets.only(top: row == 0 ? 0 : _kCardSpacing),
+          child: CardGridRow(
+            columns: columns,
+            spacing: _kCardSpacing,
+            children: [
+              for (var i = start; i < end; i++)
+                _cardAt(list, i, cardWidth, scale),
+            ],
           ),
-          itemCount: rows,
-          itemBuilder: (context, row) {
-            return Padding(
-              padding: EdgeInsets.only(top: row == 0 ? 0 : _kCardSpacing),
-              child: IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    for (var col = 0; col < columns; col++) ...[
-                      if (col > 0) const SizedBox(width: _kCardSpacing),
-                      Expanded(
-                        // La última fila incompleta deja huecos del mismo
-                        // ancho para que las tarjetas no se ensanchen.
-                        child: row * columns + col < list.length
-                            ? _cardAt(
-                                list,
-                                row * columns + col,
-                                cardWidth,
-                                scale,
-                              )
-                            : const SizedBox.shrink(),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            );
-          },
         );
       },
     );

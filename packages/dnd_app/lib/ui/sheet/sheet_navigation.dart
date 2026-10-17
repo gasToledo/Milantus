@@ -89,7 +89,9 @@ extension _SheetNavigation on _SheetScreenState {
           child: Row(
             children: [
               GestureDetector(
-                onTap: hasPortrait ? () => _openPortraitViewer(portrait) : null,
+                onTap: hasPortrait
+                    ? () => showPortraitViewer(context, portrait)
+                    : null,
                 child: MouseRegion(
                   cursor: hasPortrait
                       ? SystemMouseCursors.click
