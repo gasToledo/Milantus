@@ -521,63 +521,195 @@ class _BestiaryViewState extends State<BestiaryView> {
     );
   }
 
+  /// El perfil en tarjetas sobre el fondo, como el resto de las pantallas:
+  /// directo sobre el scaffold, con sus placas todavía más hundidas, todo se
+  /// leía como un hueco oscuro.
+  ///
+  /// Arriba, un encabezado con quién es y las cifras de cada ronda; abajo,
+  /// en escritorio, dos columnas: lo que se consulta (características y
+  /// datos) a la izquierda y lo que se juega (rasgos y acciones) a la
+  /// derecha, que antes quedaba al fondo de una sola columna.
   Widget _detail(BuildContext context, Creature c, {VoidCallback? onBack}) {
-    final pal = context.palette;
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-      children: [
-        if (onBack != null)
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              onPressed: onBack,
-              icon: const Icon(Icons.arrow_back, size: 18),
-              label: Text(context.l10n.codexBackToList),
-            ),
+    final actions = creatureProfileActions(context, widget.repo, c);
+    return LayoutBuilder(
+      builder: (context, box) {
+        final columns = box.maxWidth >= _profileColumnsWidth;
+        final stats = _card(context, creatureProfileStats(context, c));
+        final play = actions.isEmpty
+            ? null
+            : _card(
+                context,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: actions,
+                ),
+              );
+        // `SingleChildScrollView` y no `ListView`: son tres tarjetas, y la
+        // lista perezosa no armaba la de acciones hasta acercarse a ella, así
+        // que desde afuera no se podía ir a un conjuro que todavía no existía.
+        return SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (onBack != null)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton.icon(
+                    onPressed: onBack,
+                    icon: const Icon(Icons.arrow_back, size: 18),
+                    label: Text(context.l10n.codexBackToList),
+                  ),
+                ),
+              _header(context, c),
+              const SizedBox(height: 14),
+              if (columns && play != null)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(width: _profileStatsWidth, child: stats),
+                    const SizedBox(width: 14),
+                    Expanded(child: play),
+                  ],
+                )
+              else ...[
+                stats,
+                if (play != null) ...[const SizedBox(height: 14), play],
+              ],
+            ],
           ),
-        Wrap(
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 10,
-          runSpacing: 8,
-          children: [
-            Text(
-              c.name,
-              style: const TextStyle(fontFamily: 'Georgia', fontSize: 24),
-            ),
-            SourceBadge(c.source),
-          ],
-        ),
-        const SizedBox(height: 6),
-        Text(
-          c.displayKind,
-          style: TextStyle(fontSize: 13, color: pal.textMuted),
-        ),
-        const SizedBox(height: 8),
-        // La campaña va escrita en el botón: el combate es de una campaña y el
-        // Bestiario no, así que decir a cuál se suma es lo que evita sumar a
-        // la equivocada.
-        if (widget.campaign case final campaign?)
-          Align(
-            alignment: Alignment.centerLeft,
-            child: FilledButton.icon(
-              onPressed: () => _addToCombat(c),
-              icon: const Icon(Icons.add, size: 18),
-              label: Text(
-                context.l10n.dmAddToCombatOf(campaign.name),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          )
-        else
-          Text(
-            context.l10n.dmCreateCampaignFirst,
-            style: TextStyle(fontSize: 12.5, color: pal.textMuted),
-          ),
-        const SizedBox(height: 16),
-
-        ...creatureProfileBody(context, widget.repo, c),
-      ],
+        );
+      },
     );
   }
+
+  /// Quién es, a qué combate se suma y las cifras que se miran en cada ronda.
+  /// El desafío va como pastilla junto al tipo, igual que en la lista: es lo
+  /// que se busca al elegir, no un número de la mesa.
+  Widget _header(BuildContext context, Creature c) {
+    final pal = context.palette;
+    // La campaña va escrita en el botón: el combate es de una campaña y el
+    // Bestiario no, así que decir a cuál se suma es lo que evita sumar a la
+    // equivocada.
+    final Widget action = switch (widget.campaign) {
+      final campaign? => FilledButton.icon(
+        onPressed: () => _addToCombat(c),
+        icon: const Icon(Icons.add, size: 18),
+        label: Text(
+          context.l10n.dmAddToCombatOf(campaign.name),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+      null => Text(
+        context.l10n.dmCreateCampaignFirst,
+        style: TextStyle(fontSize: 12.5, color: pal.textMuted),
+      ),
+    };
+    final identity = Row(
+      children: [
+        ExcludeSemantics(
+          child: Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: pal.plaque,
+              border: Border.all(color: pal.hairline),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(_typeIcon(c.creatureType), size: 28, color: pal.gold),
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 10,
+                runSpacing: 6,
+                children: [
+                  Text(
+                    c.name,
+                    style: const TextStyle(fontFamily: 'Georgia', fontSize: 26),
+                  ),
+                  SourceBadge(c.source),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 8,
+                runSpacing: 6,
+                children: [
+                  if (c.cr case final cr?) _CrPill(cr),
+                  Text(
+                    c.displayKind,
+                    style: TextStyle(fontSize: 13, color: pal.textMuted),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+    return _card(
+      context,
+      LayoutBuilder(
+        builder: (context, box) {
+          // El botón a la derecha solo si le queda lugar al nombre: en el
+          // teléfono va abajo, a lo ancho de la tarjeta.
+          final inline = box.maxWidth >= 620;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (inline)
+                Row(
+                  children: [
+                    Expanded(child: identity),
+                    const SizedBox(width: 16),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 320),
+                      child: action,
+                    ),
+                  ],
+                )
+              else ...[
+                identity,
+                const SizedBox(height: 12),
+                Align(alignment: Alignment.centerLeft, child: action),
+              ],
+              const SizedBox(height: 16),
+              Divider(height: 1, color: pal.hairline),
+              // Acostadas, las cifras traen su propio aire arriba; envueltas
+              // en placas, quedaban pegadas al filete.
+              SizedBox(height: inline ? 4 : 12),
+              creatureProfileNumbers(context, c),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  /// Tarjeta de superficie, el segundo de los tres niveles de fondo.
+  Widget _card(BuildContext context, Widget child) => Container(
+    padding: const EdgeInsets.all(18),
+    decoration: BoxDecoration(
+      color: Theme.of(context).colorScheme.surface,
+      border: Border.all(color: context.palette.hairline),
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: child,
+  );
 }
+
+/// Desde qué ancho el perfil se parte en dos columnas. Por debajo, la columna
+/// de acciones quedaba en menos de 380 px y sus placas se envolvían.
+const double _profileColumnsWidth = 760;
+
+/// La columna de características y datos: tres y tres características
+/// entran cómodas, y el resto del ancho es para las acciones.
+const double _profileStatsWidth = 340;

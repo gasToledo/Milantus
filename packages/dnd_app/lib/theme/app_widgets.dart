@@ -2523,26 +2523,104 @@ List<Widget> creatureProfileBody(
   ];
 }
 
+/// Las cifras del perfil para el encabezado del Bestiario: CA, PG, iniciativa
+/// y percepción pasiva, **sin** el desafío, que ahí va como pastilla al lado
+/// del tipo. Acostada, va sin placa: el encabezado ya es una tarjeta, y una
+/// placa adentro de otra a todo el ancho era un marco de más.
+Widget creatureProfileNumbers(BuildContext context, Creature c) =>
+    LayoutBuilder(
+      builder: (context, box) => _profileNumbers(
+        context,
+        c,
+        dense: false,
+        wide: box.maxWidth >= _profileWideWidth,
+        width: box.maxWidth,
+        withCr: false,
+        bare: true,
+      ),
+    );
+
+/// La columna de consulta del perfil del Bestiario: características y datos
+/// de línea. Ver [creatureProfileActions], que va al lado.
+///
+/// El Bestiario parte el perfil en dos tarjetas en vez de usar
+/// [creatureProfileBody] de corrido: en escritorio el perfil entero en una
+/// columna dejaba media pantalla vacía y las acciones —lo que se lee en la
+/// mesa— al fondo. Las piezas son las mismas, así que las dos vistas no se
+/// desincronizan.
+Widget creatureProfileStats(BuildContext context, Creature c) => LayoutBuilder(
+  builder: (context, box) {
+    final wide = box.maxWidth >= _profileWideWidth;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _profileAbilities(context, c, wide: wide),
+        const SizedBox(height: 14),
+        _profileLines(context, c, wide: wide),
+      ],
+    );
+  },
+);
+
+/// Rasgos y acciones del perfil del Bestiario, la otra columna de
+/// [creatureProfileStats]. Vacío si la criatura no tiene ninguno.
+List<Widget> creatureProfileActions(
+  BuildContext context,
+  ContentRepository repo,
+  Creature c,
+) {
+  if (c.traits.isEmpty && c.actions.isEmpty) return const [];
+  return [
+    LayoutBuilder(
+      builder: (context, box) {
+        final children = [
+          ..._profileTraits(context, c),
+          ..._profileActions(
+            context,
+            repo,
+            c,
+            wide: box.maxWidth >= _profileWideWidth,
+          ),
+        ];
+        // Cada grupo trae su separación de arriba, pensada para ir debajo de
+        // los datos de línea. Acá el primero abre la tarjeta y la tarjeta ya
+        // tiene su relleno.
+        if (children.firstOrNull is SizedBox) children.removeAt(0);
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: children,
+        );
+      },
+    ),
+  ];
+}
+
 /// La banda de cifras: una sola placa partida en tramos, no una caja por dato.
 ///
 /// Seis cajas sueltas pesaban lo mismo cada una, y no lo valen: la CA y los PG
 /// se miran en cada ronda, la percepción pasiva casi nunca. Acá la jerarquía la
 /// dan el color —los PG en carmesí, el desafío en oro— y el orden.
+///
+/// [withCr] en false saca el desafío, y [bare] deja la banda acostada sin su
+/// placa: los dos los usa el encabezado del Bestiario.
 Widget _profileNumbers(
   BuildContext context,
   Creature c, {
   required bool dense,
   required bool wide,
   required double width,
+  bool withCr = true,
+  bool bare = false,
 }) {
   final pal = context.palette;
+  final showCr = withCr && c.cr != null;
   // Que la banda vaya acostada no alcanza para los rótulos largos: con las
   // cinco cifras, a 586 px cada tramo mide unos 105 y «CHALLENGE RATING» o
   // «HIT POINTS 20d10+30» se cortaban. Van enteros solo si cada tramo tiene
   // lugar; si no, la abreviatura, como en la banda envuelta.
   final count =
       (dense ? 0 : 3) +
-      (c.cr == null ? 0 : 1) +
+      (showCr ? 1 : 0) +
       (c.passivePerceptionValue == null ? 0 : 1);
   final long = wide && count > 0 && width / count >= _profileLongLabelCell;
   // `semantics` solo donde el rótulo va abreviado por ancho: dicho en voz alta
@@ -2587,7 +2665,7 @@ Widget _profileNumbers(
             color: null,
             semantics: null,
           ),
-        if (c.cr != null)
+        if (showCr)
           (
             label: long
                 ? context.l10n.challengeRating
@@ -2693,11 +2771,13 @@ Widget _profileNumbers(
   }
 
   return Container(
-    decoration: BoxDecoration(
-      color: pal.plaque,
-      borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: pal.hairline),
-    ),
+    decoration: bare
+        ? null
+        : BoxDecoration(
+            color: pal.plaque,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: pal.hairline),
+          ),
     // `IntrinsicHeight` y no `stretch` a secas: la banda vive adentro de una
     // lista que crece, y estirar al alto disponible pide alto infinito y rompe
     // la pasada de layout. Igualar al tramo más alto es lo que se quería, y es
@@ -2709,7 +2789,14 @@ Widget _profileNumbers(
           for (var i = 0; i < cells.length; i++)
             Expanded(
               child: Container(
-                padding: const EdgeInsets.fromLTRB(14, 11, 14, 12),
+                // Sin placa, el primer tramo se alinea con el resto de la
+                // tarjeta en vez de quedar corrido hacia adentro.
+                padding: EdgeInsets.fromLTRB(
+                  bare && i == 0 ? 0 : 14,
+                  11,
+                  14,
+                  12,
+                ),
                 decoration: BoxDecoration(
                   border: Border(
                     left: i == 0
