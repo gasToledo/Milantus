@@ -735,6 +735,18 @@ void main() {
       await tester.pumpAndSettle();
     }
 
+    // Editar o borrar la campaña no tiene nada que ver con el combate, y el
+    // menú quedaba a mano del botón de turno.
+    testWidgets('en Combate no está el menú de la campaña', (tester) async {
+      await pumpDmMode(tester, seed: seedTable);
+      expect(find.byTooltip('Acciones de campaña'), findsOneWidget);
+
+      await openCombate(tester);
+
+      expect(find.byTooltip('Acciones de campaña'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
     /// Pasa de armar la mesa a jugarla, aceptando la iniciativa propuesta.
     ///
     /// A los monstruos el diálogo se las trae ya tiradas; a los jugadores hay

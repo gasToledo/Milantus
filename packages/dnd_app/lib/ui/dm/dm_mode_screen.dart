@@ -1720,42 +1720,49 @@ class _CampaignDetailState extends State<_CampaignDetail> {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      PopupMenuButton<_CampaignMenuAction>(
-                        tooltip: context.l10n.dmCampaignActions,
-                        onSelected: (action) {
-                          switch (action) {
-                            case _CampaignMenuAction.edit:
-                              widget.onEdit();
-                            case _CampaignMenuAction.delete:
-                              widget.onDelete();
-                          }
-                        },
-                        itemBuilder: (context) => [
-                          PopupMenuItem(
-                            value: _CampaignMenuAction.edit,
-                            child: ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              leading: const Icon(Icons.edit_outlined),
-                              title: Text(context.l10n.dmEditCampaign),
-                            ),
-                          ),
-                          PopupMenuItem(
-                            value: _CampaignMenuAction.delete,
-                            child: ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              leading: Icon(
-                                Icons.delete_outline,
-                                color: pal.crimson,
-                              ),
-                              title: Text(
-                                context.l10n.dmDeleteCampaign,
-                                style: TextStyle(color: pal.crimson),
+                      // Editar o borrar la campaña no tiene que ver con un
+                      // combate ni con los PNJ: al lado de «Siguiente turno»
+                      // era un toque de más a mano del botón que importa.
+                      if (widget.section
+                          case _CampaignSection.mesa ||
+                              _CampaignSection.capitulos ||
+                              _CampaignSection.cuaderno)
+                        PopupMenuButton<_CampaignMenuAction>(
+                          tooltip: context.l10n.dmCampaignActions,
+                          onSelected: (action) {
+                            switch (action) {
+                              case _CampaignMenuAction.edit:
+                                widget.onEdit();
+                              case _CampaignMenuAction.delete:
+                                widget.onDelete();
+                            }
+                          },
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              value: _CampaignMenuAction.edit,
+                              child: ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                leading: const Icon(Icons.edit_outlined),
+                                title: Text(context.l10n.dmEditCampaign),
                               ),
                             ),
-                          ),
-                        ],
-                        icon: const Icon(Icons.more_horiz),
-                      ),
+                            PopupMenuItem(
+                              value: _CampaignMenuAction.delete,
+                              child: ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                leading: Icon(
+                                  Icons.delete_outline,
+                                  color: pal.crimson,
+                                ),
+                                title: Text(
+                                  context.l10n.dmDeleteCampaign,
+                                  style: TextStyle(color: pal.crimson),
+                                ),
+                              ),
+                            ),
+                          ],
+                          icon: const Icon(Icons.more_horiz),
+                        ),
                       if (_primaryAction() case final action?) ...[
                         const SizedBox(width: 8),
                         action,
