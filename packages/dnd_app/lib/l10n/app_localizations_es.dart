@@ -6292,9 +6292,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get encEffects => 'Efectos';
 
   @override
-  String get encDamageHeal => 'Daño o cura';
-
-  @override
   String get encOfTurn => 'Del turno';
 
   @override

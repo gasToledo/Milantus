@@ -1,7 +1,9 @@
 import 'dart:math' as math;
 
 import 'package:dnd_engine/dnd_engine.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../api/api_models.dart';
 import '../../theme/app_theme.dart';
@@ -31,7 +33,7 @@ const double _kPanelBesideWidth = 1040;
 /// Ancho de planilla a partir del cual las filas mantienen sus columnas. Por
 /// debajo cada fila se parte en dos líneas: preferimos eso a un scroll
 /// horizontal, que en una mesa se pierde justo cuando hay apuro.
-const double _kColumnsWidth = 780;
+const double _kColumnsWidth = 812;
 
 // Las columnas de la planilla, en un solo lugar: el encabezado y las filas se
 // miden con las mismas constantes o dejan de alinear a la primera edición.
@@ -39,7 +41,10 @@ const double _kIniWidth = 46;
 const double _kHpWidth = 128;
 const double _kAcWidth = 40;
 const double _kTagsWidth = 160;
-const double _kActionsWidth = 168;
+// Los −/+ dicen la cifra («−8»), así que son pills y no íconos: 32 px más que
+// cuando eran cuatro `IconButton`. El umbral de columnas subió lo mismo para
+// que el nombre no los pague.
+const double _kActionsWidth = 200;
 const double _kColGap = 12;
 
 /// Lo mínimo que necesitan el nombre y la CA en la fila partida para que los
@@ -157,7 +162,12 @@ class _EncounterViewState extends State<EncounterView> {
   ///
   /// Antes había un campito por fila y era el mismo número tipeado muchas
   /// veces: un ataque hace el mismo daño al goblin que le pega que al que
-  /// tiene al lado. Se escribe una vez arriba y se reparte donde haga falta.
+  /// tiene al lado. Se escribe una vez y se reparte donde haga falta.
+  ///
+  /// Vive en el encabezado de la planilla, justo encima de los botones que lo
+  /// gastan, y cada botón dice la cifra («−8»). Antes estaba en la barra del
+  /// combate: en la primera prueba con un grupo nadie lo encontró y el DM
+  /// apretaba «−» veinte veces.
   final _amountController = TextEditingController(text: '1');
 
   _PanelTab _tab = _PanelTab.turno;
@@ -167,8 +177,6 @@ class _EncounterViewState extends State<EncounterView> {
     _amountController.dispose();
     super.dispose();
   }
-
-  int get _amount => int.tryParse(_amountController.text.trim()) ?? 0;
 
   @override
   Widget build(BuildContext context) {
@@ -380,8 +388,6 @@ class _EncounterViewState extends State<EncounterView> {
           ),
           _divider(context),
           _standingCounts(context, standing),
-          _divider(context),
-          _quickAmount(context),
           _encounterActions(context),
         ],
       ),
@@ -452,7 +458,7 @@ class _EncounterViewState extends State<EncounterView> {
   }
 
   /// El número con el que pegan los −/+ de todas las filas, escrito una sola
-  /// vez. También es un `Wrap`: el rótulo baja solo cuando la barra se angosta.
+  /// vez. Es un `Wrap`: en un teléfono los atajos bajan solos de línea.
   ///
   /// Se llamaba «Golpe rápido», que decía la mitad: el mismo número lo usa el
   /// botón de curar. Y un rótulo de dos palabras en cuerpo 10 no alcanza para
@@ -461,6 +467,7 @@ class _EncounterViewState extends State<EncounterView> {
   Widget _quickAmount(BuildContext context) {
     final explicacion = context.l10n.encAmountExplain;
     return Wrap(
+      alignment: WrapAlignment.end,
       crossAxisAlignment: WrapCrossAlignment.center,
       spacing: 10,
       runSpacing: 6,
@@ -476,6 +483,12 @@ class _EncounterViewState extends State<EncounterView> {
               child: TextField(
                 controller: _amountController,
                 keyboardType: TextInputType.number,
+                // Tres cifras alcanzan para cualquier golpe, y con más los
+                // botones «−8» de las filas dejan de entrar en su columna.
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(3),
+                ],
                 textAlign: TextAlign.center,
                 decoration: const InputDecoration(isDense: true),
               ),
@@ -489,9 +502,7 @@ class _EncounterViewState extends State<EncounterView> {
             label: Text('$n'),
             tooltip: context.l10n.encSetAmount(n),
             visualDensity: VisualDensity.compact,
-            onPressed: () => setState(() {
-              _amountController.text = '$n';
-            }),
+            onPressed: () => _amountController.text = '$n',
           ),
       ],
     );
@@ -616,8 +627,20 @@ class _EncounterViewState extends State<EncounterView> {
       ),
       child: Column(
         children: [
+          // Mientras se arma no hay a quién pegarle: la cifra recién aparece
+          // con el combate andando, como cuando vivía en la barra de arriba.
           if (columns) ...[
-            _ledgerHeader(context),
+            _ledgerHeader(context, amount: !current.isPreparing),
+            Divider(height: 1, color: pal.hairline),
+          ] else if (!current.isPreparing) ...[
+            // Sin columnas no hay encabezado, pero la cifra igual va arriba de
+            // las filas que la usan y no en la barra del combate.
+            Container(
+              color: pal.plaque,
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(14, 9, 14, 9),
+              child: _quickAmount(context),
+            ),
             Divider(height: 1, color: pal.hairline),
           ],
           for (final (i, combatant) in current.combatants.indexed) ...[
@@ -643,7 +666,7 @@ class _EncounterViewState extends State<EncounterView> {
               preparing: current.isPreparing,
               showXp: widget.showDifficulty,
               columns: columns,
-              amount: () => _amount,
+              amount: _amountController,
               onAdjustHp: (delta) => widget.onAdjustHp(combatant.id, delta),
               onRemove: () => widget.onRemoveCombatant(combatant.id),
               onSetTags: (tags) => widget.onSetTags(combatant.id, tags),
@@ -662,7 +685,7 @@ class _EncounterViewState extends State<EncounterView> {
     );
   }
 
-  Widget _ledgerHeader(BuildContext context) {
+  Widget _ledgerHeader(BuildContext context, {required bool amount}) {
     final pal = context.palette;
     Widget cell(String text, double? width, {TextAlign? align}) {
       final label = Text(
@@ -699,13 +722,18 @@ class _EncounterViewState extends State<EncounterView> {
             align: TextAlign.center,
           ),
           const SizedBox(width: _kColGap),
-          cell(context.l10n.encEffects, _kTagsWidth),
-          const SizedBox(width: _kColGap),
-          cell(
-            context.l10n.encDamageHeal,
-            _kActionsWidth,
-            align: TextAlign.right,
-          ),
+          // La cifra ocupa el lugar del rótulo «Efectos»: necesita más que el
+          // ancho de los botones, y las condiciones de esa columna se
+          // reconocen sin título.
+          if (amount)
+            SizedBox(
+              width: _kTagsWidth + _kColGap + _kActionsWidth,
+              child: _quickAmount(context),
+            )
+          else ...[
+            cell(context.l10n.encEffects, _kTagsWidth),
+            const SizedBox(width: _kColGap + _kActionsWidth),
+          ],
         ],
       ),
     );
@@ -1507,9 +1535,9 @@ class _CombatantRow extends StatelessWidget {
   /// Con las columnas de la planilla, o partida en dos líneas.
   final bool columns;
 
-  /// El número del golpe rápido, leído al tocar y no al construir: el DM lo
-  /// cambia arriba sin que las filas se reconstruyan.
-  final int Function() amount;
+  /// La cifra del encabezado. Se escucha y no se lee una vez: los botones la
+  /// llevan escrita («−8») y tienen que cambiar mientras el DM la tipea.
+  final ValueListenable<TextEditingValue> amount;
 
   final void Function(int delta) onAdjustHp;
   final VoidCallback onRemove;
@@ -2101,12 +2129,41 @@ class _CombatantRow extends StatelessWidget {
     );
   }
 
+  static int _amountOf(TextEditingValue value) => int.tryParse(value.text) ?? 0;
+
+  /// Un −/+ con la cifra escrita. El nombre de la acción va en el tooltip,
+  /// que es también lo que lee un lector de pantalla junto con «−8».
+  Widget _hpButton(
+    BuildContext context,
+    String label,
+    String tooltip,
+    Color color,
+    VoidCallback onPressed,
+  ) => Tooltip(
+    message: tooltip,
+    child: OutlinedButton(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        foregroundColor: color,
+        side: BorderSide(color: color, width: 1.5),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        minimumSize: const Size(48, 36),
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        visualDensity: VisualDensity.compact,
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontFeatures: [FontFeature.tabularFigures()],
+        ),
+      ),
+    ),
+  );
+
   /// Los controles de la fila, en un ancho fijo para las dos disposiciones:
-  /// cuatro `IconButton` no entran en cualquier sobrante, y con la caja fija
-  /// el encabezado de la planilla puede alinear con ellos.
-  /// Los controles de la fila, en un ancho fijo para las dos disposiciones:
-  /// cuatro `IconButton` no entran en cualquier sobrante, y con la caja fija
-  /// el encabezado de la planilla puede alinear con ellos.
+  /// no entran en cualquier sobrante, y con la caja fija el encabezado de la
+  /// planilla puede alinear con ellos.
   ///
   /// Van compactos (40 px y no los 48 de Material) porque son cuatro en una
   /// fila de planilla: al tamaño de siempre no entran, y agrandar la columna
@@ -2132,20 +2189,43 @@ class _CombatantRow extends StatelessWidget {
             )
           // Sin PG no hay nada que bajar ni subir: el tabernero tiene turno,
           // pero no barra de vida.
-          else if (!combatant.isStatless) ...[
-            IconButton(
-              tooltip: context.l10n.encHurt,
-              visualDensity: VisualDensity.compact,
-              onPressed: () => onAdjustHp(-amount()),
-              icon: Icon(Icons.remove_circle_outline, color: pal.crimson),
+          else if (!combatant.isStatless)
+            // Con tres cifras («−999») los dos botones no entran en la
+            // columna: se achican un poco antes que empujar a los demás.
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: ValueListenableBuilder(
+                  valueListenable: amount,
+                  builder: (context, value, _) {
+                    final n = _amountOf(value);
+                    // Al tocar se vuelve a leer la cifra: el rótulo es de la última
+                    // construcción, y un toque justo después de tipear no puede
+                    // aplicar el número viejo.
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _hpButton(
+                          context,
+                          '−$n',
+                          context.l10n.encHurt,
+                          pal.crimson,
+                          () => onAdjustHp(-_amountOf(amount.value)),
+                        ),
+                        const SizedBox(width: 4),
+                        _hpButton(
+                          context,
+                          '+$n',
+                          context.l10n.encHeal,
+                          pal.verdant,
+                          () => onAdjustHp(_amountOf(amount.value)),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
             ),
-            IconButton(
-              tooltip: context.l10n.encHeal,
-              visualDensity: VisualDensity.compact,
-              onPressed: () => onAdjustHp(amount()),
-              icon: Icon(Icons.add_circle_outline, color: pal.verdant),
-            ),
-          ],
           IconButton(
             tooltip: context.l10n.encEffects,
             visualDensity: VisualDensity.compact,

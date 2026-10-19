@@ -10200,12 +10200,6 @@ abstract class AppLocalizations {
   /// **'Efectos'**
   String get encEffects;
 
-  /// No description provided for @encDamageHeal.
-  ///
-  /// In es, this message translates to:
-  /// **'Daño o cura'**
-  String get encDamageHeal;
-
   /// No description provided for @encOfTurn.
   ///
   /// In es, this message translates to:

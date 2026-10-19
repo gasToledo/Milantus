@@ -1079,6 +1079,28 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    // En la primera prueba con un grupo nadie encontró la cifra y el DM
+    // apretaba «−» veinte veces: ahora cada botón dice cuánto aplica.
+    testWidgets('los botones de la fila dicen la cifra que aplican', (
+      tester,
+    ) async {
+      final server = await withGoblin(tester);
+      await tirarIniciativa(tester);
+      expect(find.text('−1'), findsOneWidget);
+      expect(find.text('+1'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('Poner 5'));
+      await tester.pump();
+      expect(find.text('−5'), findsOneWidget);
+      expect(find.text('+5'), findsOneWidget);
+
+      final max = server.encounters['tumba']!.combatants.single.maxHp;
+      await tester.tap(find.text('−5'));
+      await tester.pumpAndSettle();
+      expect(server.encounters['tumba']!.combatants.single.currentHp, max - 5);
+      expect(tester.takeException(), isNull);
+    });
+
     // Lo que se olvida en la mesa no siempre es una condición del libro: hay
     // que poder escribir cualquier cosa.
     testWidgets('anotar un efecto a mano lo deja en la fila', (tester) async {

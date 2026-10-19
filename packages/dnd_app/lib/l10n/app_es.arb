@@ -5041,7 +5041,6 @@
   "encWhatTheyGot": "Lo que sacó",
   "encCombatant": "Combatiente",
   "encEffects": "Efectos",
-  "encDamageHeal": "Daño o cura",
   "encOfTurn": "Del turno",
   "encNobodyTurn": "Todavía no le toca a nadie.",
   "encPlayerTurn": "Le toca a {name}, y su ficha la lleva quien lo juega.",

@@ -1682,7 +1682,6 @@
   "encWhatTheyGot": "What they got",
   "encCombatant": "Combatant",
   "encEffects": "Effects",
-  "encDamageHeal": "Damage or heal",
   "encOfTurn": "This turn",
   "encNobodyTurn": "It is nobody’s turn yet.",
   "encPlayerTurn": "It is {name}’s turn, and their sheet is kept by whoever plays them.",
