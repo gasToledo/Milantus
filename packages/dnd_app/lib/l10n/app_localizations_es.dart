@@ -1440,6 +1440,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get commonBuy => 'Comprar';
 
   @override
+  String get catalogAddFree => 'Gratis';
+
+  @override
   String get commonSell => 'Vender';
 
   @override

@@ -1439,6 +1439,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonBuy => 'Buy';
 
   @override
+  String get catalogAddFree => 'Free';
+
+  @override
   String get commonSell => 'Sell';
 
   @override

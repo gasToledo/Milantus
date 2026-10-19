@@ -2390,6 +2390,12 @@ abstract class AppLocalizations {
   /// **'Comprar'**
   String get commonBuy;
 
+  /// No description provided for @catalogAddFree.
+  ///
+  /// In es, this message translates to:
+  /// **'Gratis'**
+  String get catalogAddFree;
+
   /// No description provided for @commonSell.
   ///
   /// In es, this message translates to:

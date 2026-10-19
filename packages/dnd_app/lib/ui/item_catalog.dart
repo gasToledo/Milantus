@@ -278,7 +278,12 @@ class _ItemCatalogDialogState extends State<ItemCatalogDialog> {
               onAdd(e.id);
               setState(() => _added++);
             },
-            child: Text(context.l10n.commonAdd),
+            // «Agregar» a secas, al lado de «Comprar», se leía como otra forma
+            // de comprar: en la primera prueba con un grupo lo usaron sin
+            // fondos y se sorprendieron de que no descontara nada. Una palabra y
+            // no «Agregar gratis»: el ancho de los botones se lo come el nombre
+            // del objeto.
+            child: Text(context.l10n.catalogAddFree),
           ),
           const SizedBox(width: 4),
         ],

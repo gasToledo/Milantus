@@ -382,6 +382,7 @@
   "breakdownFooter": "Proficiency +{bonus} at level {level}, already included above. Only skills you are proficient in are listed: the rest roll with the ability check ({check}).",
   "commonAdd": "Add",
   "commonBuy": "Buy",
+  "catalogAddFree": "Free",
   "commonSell": "Sell",
   "commonBag": "Bag",
   "kindWeapon": "Weapon",
