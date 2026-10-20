@@ -250,6 +250,12 @@ layout y estilo (anchos, desbordes, colores, animaciones: eso lo mira una
 persona) ni tests de las herramientas de `tool/`, cuya salida ya valida
 `content_integrity_test`.
 
+**Evitá rigurosamente crear tests innecesarios o temporales.** Antes de sumar
+uno, fijate si ya hay otro que cubra la misma regla, y no escribas tests para
+verificar un arreglo puntual, explorar un comportamiento o dejar constancia de
+un dato: eso se comprueba una vez y no se commitea. Cada test que entra se
+paga en cada corrida de CI y en cada despliegue.
+
 Los tests de widget montan el árbol real contra `FakeApiServer`
 (`packages/dnd_app/test/fakes/fake_api_server.dart`), un doble en memoria que
 reproduce el **contrato observable** de cada endpoint. Cuando agregues una ruta
