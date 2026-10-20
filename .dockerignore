@@ -16,3 +16,8 @@ docs/
 .env
 .env.*
 !*.env.example
+# Las pruebas y las herramientas no entran a la imagen: dejarlas en el
+# contexto invalidaba la caché de BuildKit, y un commit que solo tocaba
+# tests reconstruía el build web y el binario enteros.
+packages/*/test/
+packages/*/tool/

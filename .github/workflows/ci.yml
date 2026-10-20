@@ -37,6 +37,9 @@ jobs:
       - run: dart analyze
       - run: dart test
 
+  # La app es el camino largo de CI, y CD lo espera entero. Por eso las
+  # pruebas van en dos mitades y el build web en paralelo con ellas: el tiempo
+  # pasa a ser el de la mitad más lenta y no la suma de todo.
   dnd_app:
     name: dnd_app
     runs-on: ubuntu-latest
@@ -57,8 +60,25 @@ jobs:
       - run: flutter pub get
       - run: dart format --output=none --set-exit-if-changed lib test
       - run: flutter analyze
-      - run: flutter test
       - run: flutter build web --release
+
+  dnd_app_test:
+    name: dnd_app test (${{ matrix.shard }}/2)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        shard: [0, 1]
+    defaults:
+      run:
+        working-directory: packages/dnd_app
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter test --total-shards=2 --shard-index=${{ matrix.shard }}
 
   dnd_server:
     name: dnd_server

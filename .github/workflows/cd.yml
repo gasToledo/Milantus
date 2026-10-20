@@ -61,8 +61,12 @@ jobs:
           if [ -z "$base" ] || ! git cat-file -e "$base^{commit}" 2>/dev/null; then
             echo "deploy=true" >> "$GITHUB_OUTPUT"; exit 0
           fi
+          # test/ y tool/ no entran a la imagen (ver .dockerignore): un commit
+          # que solo los toca no cambia nada en producción.
           if git diff --quiet "$base" HEAD -- \
               packages/dnd_server packages/dnd_app packages/dnd_engine \
+              ':(exclude,glob)packages/*/test/**' \
+              ':(exclude,glob)packages/*/tool/**' \
               docker-compose.yml postgres-init .github/workflows/cd.yml; then
             echo "Nada desplegable cambió desde $base"
             echo "deploy=false" >> "$GITHUB_OUTPUT"
