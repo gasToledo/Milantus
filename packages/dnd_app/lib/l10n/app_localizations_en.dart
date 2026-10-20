@@ -465,6 +465,18 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String rebuildCharacterTitle(String name) {
+    return 'Rebuild $name from level 1?';
+  }
+
+  @override
+  String get rebuildCharacterBody =>
+      'You will choose species, class, background, scores and equipment again. The name, portraits, journal and campaigns are kept.';
+
+  @override
+  String get rebuildCharacterConfirm => 'Rebuild';
+
+  @override
   String get exportingCharacter => 'Exporting character…';
 
   @override
@@ -649,6 +661,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cardExport => 'Export';
+
+  @override
+  String get cardRebuild => 'Rebuild from level 1';
 
   @override
   String get statSpeedShort => 'SPD';
@@ -2470,6 +2485,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get wizardCreateNpc => 'Create NPC';
+
+  @override
+  String get wizardRebuild => 'Rebuild character';
 
   @override
   String get wizardDiscardNpc => 'Discard this NPC?';
@@ -5197,6 +5215,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String evtDeletedByOwner(String character, String campaign) {
     return '$character is no longer available in $campaign.';
+  }
+
+  @override
+  String evtRebuiltByOwner(String character, String campaign) {
+    return '$character was rebuilt from level 1 in $campaign.';
   }
 
   @override

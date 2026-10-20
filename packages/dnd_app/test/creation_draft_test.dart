@@ -1,6 +1,7 @@
 import 'fakes/localized_app.dart';
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:dnd_app/creation/creation_draft.dart';
+import 'package:dnd_app/demo/demo_characters.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Verifica que el wizard (capa de estado `CreationDraft`) reproduce el caso
@@ -55,6 +56,33 @@ void main() {
     expect(sheet.attacks.single.attackBonus, 5);
     expect(sheet.attacks.single.mastery, 'sap');
     expect(character.name, 'Sagan "The Red"');
+  });
+
+  // Rehacer cambia las reglas pero no el personaje: del id cuelgan las
+  // campañas y los retratos, y lo escrito por el jugador no vuelve a pedirse.
+  test('rehacer conserva la identidad y arranca de nivel 1', () {
+    final old = demoSagan().copyWith(
+      level: 5,
+      portraitPaths: ['retrato-1'],
+      portraitPrompts: {'retrato-1': 'acuarela'},
+      background: 'Nació en la frontera.',
+      coins: {'gp': 900},
+    );
+    final d = CreationDraft(repo)
+      ..classId = 'wizard'
+      ..raceId = 'elf'
+      ..backgroundId = 'sage'
+      ..name = old.name;
+
+    final rebuilt = d.build(replacing: old);
+
+    expect(rebuilt.id, old.id);
+    expect(rebuilt.portraitPaths, old.portraitPaths);
+    expect(rebuilt.portraitPrompts, old.portraitPrompts);
+    expect(rebuilt.background, old.background);
+    expect(rebuilt.classId, 'wizard');
+    expect(rebuilt.totalLevel, 1);
+    expect(rebuilt.coins, isNot(old.coins));
   });
 
   group('Pericia en creación', () {

@@ -356,6 +356,7 @@ extension _DashboardContent on _DashboardScreenState {
       onMoveAfter: i == list.length - 1 ? null : () => _moveBy(c, 1, list),
       onRename: () => _renameCharacter(c),
       onExport: () => _exportCharacter(c),
+      onRebuild: () => _confirmRebuild(c),
       onDelete: () => _confirmDelete(c),
     );
     return _ReorderableCard(

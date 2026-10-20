@@ -249,6 +249,7 @@ class _CharacterCard extends StatefulWidget {
   final VoidCallback? onMoveAfter;
   final VoidCallback onRename;
   final VoidCallback onExport;
+  final VoidCallback onRebuild;
   final VoidCallback onDelete;
   const _CharacterCard({
     required this.character,
@@ -262,6 +263,7 @@ class _CharacterCard extends StatefulWidget {
     this.onMoveAfter,
     required this.onRename,
     required this.onExport,
+    required this.onRebuild,
     required this.onDelete,
   });
 
@@ -493,6 +495,7 @@ class _CharacterCardState extends State<_CharacterCard> {
                                   }
                                   if (v == 'rename') widget.onRename();
                                   if (v == 'export') widget.onExport();
+                                  if (v == 'rebuild') widget.onRebuild();
                                   if (v == 'delete') widget.onDelete();
                                 },
                                 itemBuilder: (_) => [
@@ -525,6 +528,10 @@ class _CharacterCardState extends State<_CharacterCard> {
                                   PopupMenuItem(
                                     value: 'export',
                                     child: Text(context.l10n.cardExport),
+                                  ),
+                                  PopupMenuItem(
+                                    value: 'rebuild',
+                                    child: Text(context.l10n.cardRebuild),
                                   ),
                                   PopupMenuItem(
                                     value: 'delete',

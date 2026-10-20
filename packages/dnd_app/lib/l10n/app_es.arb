@@ -462,6 +462,16 @@
       }
     }
   },
+  "rebuildCharacterTitle": "¿Rehacer a {name} desde nivel 1?",
+  "@rebuildCharacterTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "rebuildCharacterBody": "Vas a elegir de nuevo especie, clase, trasfondo, puntuaciones y equipo. Se conservan el nombre, los retratos, el diario y las campañas.",
+  "rebuildCharacterConfirm": "Rehacer",
   "exportingCharacter": "Exportando personaje…",
   "exportCharacterError": "No se pudo exportar el personaje",
   "creatingBackup": "Creando respaldo…",
@@ -557,6 +567,7 @@
   "cardMoveAfter": "Mover después",
   "cardRename": "Renombrar",
   "cardExport": "Exportar",
+  "cardRebuild": "Rehacer desde nivel 1",
   "statSpeedShort": "VEL",
   "unitFeetSuffix": " pies",
   "statSpeedLabel": "Velocidad: {speed} pies",
@@ -2230,6 +2241,7 @@
   },
   "characterUnnamed": "Sin nombre",
   "wizardCreateNpc": "Crear PNJ",
+  "wizardRebuild": "Rehacer personaje",
   "wizardDiscardNpc": "¿Descartar este PNJ?",
   "wizardDiscardCharacter": "¿Descartar este personaje?",
   "wizardDiscardBody": "Las elecciones realizadas en el asistente se perderán.",
@@ -4194,6 +4206,17 @@
   },
   "evtDeletedByOwner": "{character} ya no está disponible en {campaign}.",
   "@evtDeletedByOwner": {
+    "placeholders": {
+      "character": {
+        "type": "String"
+      },
+      "campaign": {
+        "type": "String"
+      }
+    }
+  },
+  "evtRebuiltByOwner": "{character} se rehízo desde nivel 1 en {campaign}.",
+  "@evtRebuiltByOwner": {
     "placeholders": {
       "character": {
         "type": "String"

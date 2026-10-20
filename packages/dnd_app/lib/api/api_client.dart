@@ -230,11 +230,17 @@ class ApiClient {
     );
   }
 
-  Future<void> upsertCharacter(Character character) => _send(
-    'PUT',
-    '/api/characters/${Uri.encodeComponent(character.id)}',
-    jsonBody: {'character': character.toJson()},
-  );
+  /// Con [rebuilt] el servidor les avisa a los DM que tienen al personaje en su
+  /// mesa que el jugador lo rehízo desde nivel 1.
+  Future<void> upsertCharacter(Character character, {bool rebuilt = false}) =>
+      _send(
+        'PUT',
+        '/api/characters/${Uri.encodeComponent(character.id)}',
+        jsonBody: {
+          'character': character.toJson(),
+          if (rebuilt) 'rebuilt': true,
+        },
+      );
 
   Future<void> deleteCharacter(String id) =>
       _send('DELETE', '/api/characters/${Uri.encodeComponent(id)}');

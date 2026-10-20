@@ -25,6 +25,7 @@ void main() {
         'character_unlinked_by_dm',
         'character_unlinked_by_owner',
         'character_deleted_by_owner',
+        'character_rebuilt',
       ]) {
         final message = _message(event(kind));
 

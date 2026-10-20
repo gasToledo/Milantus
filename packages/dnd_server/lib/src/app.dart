@@ -759,9 +759,28 @@ Future<Response> _upsertCharacterHandler(
     // el primer guardado de un personaje, que no subió desde ningún lado.
     final previous = await repositories.characters.find(request.userId, id);
     await repositories.characters.upsert(request.userId, character);
-    if (previous == null || character.totalLevel <= previous.totalLevel) {
+    if (previous == null) return;
+
+    // Rehacerlo desde nivel 1 lo marca el cliente y no se deduce: bajar de
+    // nivel no lo distingue (un nivel 1 rehecho sigue en 1) y cambiar de
+    // clase tampoco (también se hace subiendo). Que el dueño lo marque de
+    // más solo le manda un aviso de su propio personaje a sus propios DM.
+    if (body['rebuilt'] == true) {
+      final shares = await repositories.campaigns.listSharesForCharacter(
+        ownerUserId: request.userId,
+        characterId: id,
+      );
+      for (final share in shares) {
+        // Mismo origen del `dmUserId` que abajo: una fila de
+        // `campaign_members` ya filtrada por el dueño del personaje.
+        await repositories.events.append(share.dmUserId, 'character_rebuilt', {
+          'characterName': character.name,
+          'campaignName': share.campaignName,
+        });
+      }
       return;
     }
+    if (character.totalLevel <= previous.totalLevel) return;
 
     // ponytail: dos guardados simultáneos de la misma subida la registrarían
     // dos veces (`find` no bloquea la fila). Hace falta el mismo jugador

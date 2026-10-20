@@ -139,6 +139,23 @@ void main() {
     expect(server.characters['sagan']!.name, 'Editado antes de guardar');
   });
 
+  // La marca va solo en el guardado del rehecho: si viajara en cada guardado
+  // posterior, el DM recibiría un aviso por cada PG que el jugador toque.
+  test('rebuild marca un solo guardado como rehecho', () async {
+    final server = FakeApiServer()..characters['sagan'] = demoSagan();
+    final ctrl = CharactersController(ApiClient(client: server.client));
+    await ctrl.load();
+
+    ctrl.rebuild(demoSagan().copyWith(name: 'Sagan rehecho'));
+    await ctrl.flush();
+    ctrl.touch(ctrl.characters.single);
+    await ctrl.flush();
+
+    expect(server.upsertCharacterCalls, 2);
+    expect(server.rebuiltCharacterIds, ['sagan']);
+    expect(server.characters['sagan']!.name, 'Sagan rehecho');
+  });
+
   test('flush no reescribe personajes sin cambios pendientes', () async {
     final server = FakeApiServer()..characters['sagan'] = demoSagan();
     final ctrl = CharactersController(ApiClient(client: server.client));

@@ -1219,10 +1219,22 @@ class CreationDraft {
       Ability.values.every(assignedScores.containsKey);
 
   /// Construye el personaje final. Los PG actuales se fijan luego compilando.
-  Character build({String unnamed = _defaultUnnamed}) {
+  ///
+  /// Con [replacing] es «rehacer»: las reglas salen del wizard, pero el
+  /// personaje sigue siendo el mismo. Conserva el id porque de él cuelgan el
+  /// vínculo con las campañas y los retratos guardados en el servidor; y
+  /// conserva lo que el jugador escribió o subió (retratos, trasfondo, diario),
+  /// que no es una regla y ningún paso del wizard lo vuelve a pedir.
+  Character build({String unnamed = _defaultUnnamed, Character? replacing}) {
     return Character(
-      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      id: replacing?.id ?? DateTime.now().microsecondsSinceEpoch.toString(),
       name: name.trim().isEmpty ? unnamed : name.trim(),
+      status: replacing?.status ?? CharacterStatus.active,
+      portraitPaths: List.of(replacing?.portraitPaths ?? const []),
+      portraitPrompts: Map.of(replacing?.portraitPrompts ?? const {}),
+      background: replacing?.background ?? '',
+      diary: List.of(replacing?.diary ?? const []),
+      tableConfig: replacing?.tableConfig ?? const TableConfig(),
       raceId: raceId ?? '',
       lineageId: lineage?.id,
       speciesSpellcastingAbility: speciesSpellcastingAbility,

@@ -157,6 +157,46 @@ extension _DashboardActions on _DashboardScreenState {
     controller.replace(c.copyWith(name: newName));
   }
 
+  /// Rehace al personaje desde nivel 1 con el wizard de siempre. Se confirma
+  /// antes de abrirlo porque al terminar no hay vuelta atrás; cerrar el wizard
+  /// a mitad de camino, en cambio, deja la ficha vieja intacta.
+  Future<void> _confirmRebuild(Character c) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AppDialog(
+        title: context.l10n.rebuildCharacterTitle(c.name),
+        content: Text(context.l10n.rebuildCharacterBody),
+        actions: [
+          DialogAction(
+            context.l10n.commonCancel,
+            keyHint: 'Esc',
+            onPressed: () => Navigator.pop(ctx, false),
+          ),
+          DialogAction(
+            context.l10n.rebuildCharacterConfirm,
+            primary: true,
+            onPressed: () => Navigator.pop(ctx, true),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    Character? rebuilt;
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => CreationWizard(
+          repo: repo,
+          replacing: c,
+          onCreate: (n) {
+            controller.rebuild(n);
+            rebuilt = n;
+          },
+        ),
+      ),
+    );
+    if (rebuilt case final n? when mounted) _openSheet(n);
+  }
+
   Future<void> _confirmDelete(Character c) async {
     final ok = await showDialog<bool>(
       context: context,

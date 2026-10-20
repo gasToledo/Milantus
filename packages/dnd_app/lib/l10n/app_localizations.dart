@@ -824,6 +824,24 @@ abstract class AppLocalizations {
   /// **'¿Borrar a {name}?'**
   String deleteCharacterTitle(String name);
 
+  /// No description provided for @rebuildCharacterTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Rehacer a {name} desde nivel 1?'**
+  String rebuildCharacterTitle(String name);
+
+  /// No description provided for @rebuildCharacterBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Vas a elegir de nuevo especie, clase, trasfondo, puntuaciones y equipo. Se conservan el nombre, los retratos, el diario y las campañas.'**
+  String get rebuildCharacterBody;
+
+  /// No description provided for @rebuildCharacterConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Rehacer'**
+  String get rebuildCharacterConfirm;
+
   /// No description provided for @exportingCharacter.
   ///
   /// In es, this message translates to:
@@ -1117,6 +1135,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Exportar'**
   String get cardExport;
+
+  /// No description provided for @cardRebuild.
+  ///
+  /// In es, this message translates to:
+  /// **'Rehacer desde nivel 1'**
+  String get cardRebuild;
 
   /// No description provided for @statSpeedShort.
   ///
@@ -4020,6 +4044,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Crear PNJ'**
   String get wizardCreateNpc;
+
+  /// No description provided for @wizardRebuild.
+  ///
+  /// In es, this message translates to:
+  /// **'Rehacer personaje'**
+  String get wizardRebuild;
 
   /// No description provided for @wizardDiscardNpc.
   ///
@@ -8508,6 +8538,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'{character} ya no está disponible en {campaign}.'**
   String evtDeletedByOwner(String character, String campaign);
+
+  /// No description provided for @evtRebuiltByOwner.
+  ///
+  /// In es, this message translates to:
+  /// **'{character} se rehízo desde nivel 1 en {campaign}.'**
+  String evtRebuiltByOwner(String character, String campaign);
 
   /// No description provided for @evtInspiration.
   ///

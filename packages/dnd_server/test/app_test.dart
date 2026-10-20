@@ -2623,6 +2623,46 @@ void main() {
         expect(forDm[0]['payload']['characterName'], 'Sagan');
       });
 
+      // Sigue en la mesa pero con otra ficha: el DM tiene que enterarse antes
+      // de la próxima sesión. Un guardado cualquiera, en cambio, no avisa.
+      test('rehacer el personaje avisa al DM que lo tenía', () async {
+        final tokenA = await login('ev-rebuild-a');
+        final code = await shareCharacter(tokenA, 'sagan');
+
+        final tokenB = await login('ev-rebuild-b');
+        await createCampaign(tokenB, 'tumba');
+        await send(
+          'POST',
+          '/api/campaigns/tumba/members',
+          token: tokenB,
+          body: {'code': code},
+        );
+
+        await send(
+          'PUT',
+          '/api/characters/sagan',
+          token: tokenA,
+          body: {'character': characterJson('sagan', name: 'Sagan')},
+        );
+        expect(await pending(tokenB), isEmpty);
+
+        await send(
+          'PUT',
+          '/api/characters/sagan',
+          token: tokenA,
+          body: {
+            'character': characterJson('sagan', name: 'Sagan'),
+            'rebuilt': true,
+          },
+        );
+
+        final forDm = await pending(tokenB);
+        expect(forDm, hasLength(1));
+        expect(forDm[0]['kind'], 'character_rebuilt');
+        expect(forDm[0]['payload']['characterName'], 'Sagan');
+        expect(forDm[0]['payload']['campaignName'], 'La Tumba');
+      });
+
       test('un aviso se entrega una sola vez', () async {
         final tokenA = await login('ev-once-a');
         final code = await shareCharacter(tokenA, 'sagan');

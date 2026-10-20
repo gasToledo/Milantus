@@ -18,6 +18,9 @@ class CharactersController extends ChangeNotifier {
   final Set<String> _pendingCreateIds = {};
   final Map<String, String> _reassignedIds = {};
 
+  /// Personajes rehechos cuyo guardado todavía no llegó al servidor.
+  final Set<String> _rebuiltIds = {};
+
   /// Fecha de alta por id, tal como la informa el servidor. Vive acá y no en
   /// [Character] porque no es parte de la ficha: el documento lo escribe este
   /// cliente y no puede declarar cuándo entró a la cuenta.
@@ -116,6 +119,15 @@ class CharactersController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Reemplaza [c] por su versión rehecha desde nivel 1 (mismo id). El aviso a
+  /// los DM viaja con el próximo guardado, que va por la misma cola que el
+  /// resto: un guardado de la ficha vieja que todavía estaba pendiente no
+  /// puede pisar al rehecho.
+  void rebuild(Character c) {
+    _rebuiltIds.add(_effectiveId(c.id));
+    replace(c);
+  }
+
   Future<void> remove(Character c) async {
     final requestedId = c.id;
     final effectiveBeforeWait = _effectiveId(requestedId);
@@ -207,7 +219,11 @@ class CharactersController extends ChangeNotifier {
             _pendingCreateIds.remove(queueId);
             if (stored.id != queueId) _acceptReassignedId(queueId, stored);
           } else {
-            await api.upsertCharacter(latest);
+            final rebuilt = _rebuiltIds.contains(effectiveId);
+            await api.upsertCharacter(latest, rebuilt: rebuilt);
+            // Recién con el guardado confirmado: si falla, el reintento
+            // tiene que volver a llevar el aviso.
+            if (rebuilt) _rebuiltIds.remove(effectiveId);
           }
           _lastSaveError = null;
         })

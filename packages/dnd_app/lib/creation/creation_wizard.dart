@@ -51,12 +51,18 @@ class CreationWizard extends StatefulWidget {
   /// decían «Crear personaje» aunque el DM viniera de «Nuevo PNJ».
   final bool npc;
 
+  /// El personaje que se rehace desde nivel 1. El wizard arranca con su nombre
+  /// y su sabor ya cargados, y al terminar entrega uno nuevo con su mismo id
+  /// (ver [CreationDraft.build]).
+  final Character? replacing;
+
   const CreationWizard({
     super.key,
     required this.repo,
     required this.onCreate,
     this.initialName = '',
     this.npc = false,
+    this.replacing,
   });
 
   @override
@@ -72,13 +78,20 @@ class _CreationWizardState extends State<CreationWizard> {
 
   static const _steps = CreationStep.values;
   bool get _isLast => _step == _steps.last;
-  String get _createLabel =>
-      widget.npc ? context.l10n.wizardCreateNpc : context.l10n.rosterCreate;
+  String get _createLabel => widget.npc
+      ? context.l10n.wizardCreateNpc
+      : widget.replacing != null
+      ? context.l10n.wizardRebuild
+      : context.l10n.rosterCreate;
 
   @override
   void initState() {
     super.initState();
-    d = CreationDraft(widget.repo)..name = widget.initialName;
+    final old = widget.replacing;
+    d = CreationDraft(widget.repo)
+      ..name = old?.name ?? widget.initialName
+      ..alignment = old?.alignment
+      ..personalityTrait = old?.personalityTrait ?? '';
   }
 
   void _next() {
@@ -117,7 +130,10 @@ class _CreationWizardState extends State<CreationWizard> {
   }
 
   Future<void> _finish() async {
-    final character = d.build(unnamed: context.l10n.characterUnnamed);
+    final character = d.build(
+      unnamed: context.l10n.characterUnnamed,
+      replacing: widget.replacing,
+    );
     // PG actuales al máximo al crear.
     final sheet = CharacterCompiler(widget.repo).compile(character);
     character.combat.currentHp = sheet.maxHp;

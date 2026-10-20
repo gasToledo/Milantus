@@ -32,6 +32,11 @@ class FakeApiServer {
   int _generatedIdCounter = 0;
   int createCharacterCalls = 0;
   int upsertCharacterCalls = 0;
+
+  /// Ids guardados con la marca de «rehecho desde nivel 1». El aviso le llega
+  /// a otra cuenta (el DM), que este doble no modela: alcanza con ver que la
+  /// marca viajó.
+  final List<String> rebuiltCharacterIds = [];
   int deleteCharacterCalls = 0;
 
   /// Campañas que dirige la cuenta, y los vínculos con personajes.
@@ -248,7 +253,9 @@ class FakeApiServer {
     if (method == 'PUT' && path.startsWith('/api/characters/')) {
       upsertCharacterCalls++;
       final id = _segment(path, '/api/characters/');
-      final character = _characterFrom(_body(request)['character']);
+      final body = _body(request);
+      final character = _characterFrom(body['character']);
+      if (body['rebuilt'] == true) rebuiltCharacterIds.add(id);
       _recordLevelUps(id, characters[id], character);
       characters[id] = character;
       _stampCreated(id);

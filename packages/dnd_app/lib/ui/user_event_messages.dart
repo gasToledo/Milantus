@@ -46,6 +46,12 @@ UserEventMessage? messageForEvent(UserEvent event, AppLocalizations l10n) {
       l10n.evtDeletedByOwner(character, campaign),
       AppMessageTone.info,
     ),
+    // Informativo y no de alerta: el personaje sigue en la mesa, solo que con
+    // otra ficha. Al DM le sirve saberlo antes de la próxima sesión.
+    'character_rebuilt' => UserEventMessage(
+      l10n.evtRebuiltByOwner(character, campaign),
+      AppMessageTone.info,
+    ),
     // El DM no le marcó nada en la ficha: el mensaje tiene que decirlo, o el
     // jugador espera encontrar la estrella ya prendida.
     'heroic_inspiration_granted' => UserEventMessage(
@@ -53,7 +59,7 @@ UserEventMessage? messageForEvent(UserEvent event, AppLocalizations l10n) {
       AppMessageTone.success,
     ),
     // Los datos propios de este aviso se leen acá adentro y no arriba: los
-    // otros cinco `kind` no los traen.
+    // otros seis `kind` no los traen.
     'chapter_completed' => _chapterCompleted(event, character, campaign, l10n),
     _ => null,
   };
