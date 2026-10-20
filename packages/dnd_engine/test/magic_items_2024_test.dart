@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:test/test.dart';
 
@@ -28,21 +25,6 @@ void main() {
 
   setUpAll(() async {
     repo = await ContentRepository.loadFromDirectory('lib/assets/srd_2024');
-  });
-
-  test('catálogo SRD coincide con la lista esperada y EFA tiene nueve', () {
-    final expected = (jsonDecode(
-      File('lib/assets/srd_2024/expected_magic_item_ids.json')
-          .readAsStringSync(),
-    ) as List)
-        .cast<String>();
-    expect(expected, hasLength(261));
-    expect(expected.toSet(), hasLength(expected.length));
-    expect(expected.where(repo.items.containsKey), hasLength(expected.length));
-    expect(
-      repo.items.values.where((e) => e.source == ContentSource.foa2025),
-      hasLength(9),
-    );
   });
 
   test('todas las plantillas con base resuelven un tipo existente', () {

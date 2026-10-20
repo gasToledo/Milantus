@@ -38,37 +38,7 @@ void main() {
         ),
       );
 
-  group('Catálogo', () {
-    test('el Artífice suma la 13ª clase y sus 5 subclases', () {
-      expect(repo.classes, hasLength(13));
-      expect(repo.characterClass('artificer'), isNotNull);
-      expect(repo.subclasses, hasLength(53));
-      expect(repo.subclassesForClass('artificer'), hasLength(5));
-    });
-
-    test('la clase y sus 5 subclases están etiquetadas foa_2025', () {
-      expect(repo.characterClass('artificer')!.source, ContentSource.foa2025);
-      for (final s in repo.subclassesForClass('artificer')) {
-        expect(s.source, ContentSource.foa2025, reason: s.id);
-      }
-    });
-
-    test('llega al nivel 20 sin dejar huecos', () {
-      final ultimo = repo
-          .characterClass('artificer')!
-          .features
-          .map((f) => f.level)
-          .reduce((a, b) => a > b ? a : b);
-      expect(ultimo, 20);
-    });
-
-    test('su lista de conjuros tiene los 80 conjuros del capítulo, y solo esos',
-        () {
-      final lista = repo.spellsForList('artificer');
-      expect(lista, hasLength(80));
-      expect(lista.map((s) => s.id), contains('homunculus-servant'));
-    });
-  });
+  group('Catálogo', () {});
 
   group('Espacios y conjuros preparados (semi-lanzador)', () {
     test('espacios de conjuro coinciden con la tabla del capítulo', () {

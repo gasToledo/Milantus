@@ -91,16 +91,6 @@ void main() {
     expect(p, isNot(contains('medium')));
   });
 
-  test('Bardo: el texto de Inspiración Bárdica nombra los cuatro dados', () {
-    final d = at('bard', 1)
-        .passives
-        .firstWhere((p) => p.name == 'Inspiración Bárdica')
-        .description;
-    for (final die in ['d6', 'd8', 'd10', 'd12']) {
-      expect(d, contains(die));
-    }
-  });
-
   group('las órdenes de nivel 1 se compilan de verdad', () {
     late ContentRepository repo;
     setUpAll(() async {

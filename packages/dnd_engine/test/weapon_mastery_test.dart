@@ -12,51 +12,6 @@ void main() {
     repo = await ContentRepository.loadFromDirectory('lib/assets/srd_2024');
   });
 
-  test('están las ocho propiedades del capítulo 6', () {
-    expect(weaponMasteries.keys.toSet(), {
-      'cleave',
-      'graze',
-      'nick',
-      'push',
-      'sap',
-      'slow',
-      'topple',
-      'vex',
-    });
-  });
-
-  test('cada entrada tiene nombre en español y regla', () {
-    for (final m in weaponMasteries.values) {
-      expect(m.name, isNotEmpty, reason: m.id);
-      expect(m.name, isNot(equalsIgnoringCase(m.id)),
-          reason: '${m.id}: el nombre no puede ser el identificador en inglés');
-      expect(m.description.length, greaterThan(40), reason: m.id);
-    }
-  });
-
-  test('las distancias están en pies, como el resto del catálogo', () {
-    // El texto viene del SRD en español, que mide en metros: la ficha mostraba
-    // «a 1,5 m» al lado de alcances en pies.
-    for (final m in weaponMasteries.values) {
-      // Sin `\b`, que en Dart solo conoce letras ASCII.
-      final metros = RegExp(r'\d+(,\d+)? m(?![\p{L}\p{N}_])', unicode: true);
-      expect(m.description, isNot(matches(metros)), reason: m.id);
-    }
-  });
-
-  test('los nombres son los oficiales del PHB, no una traducción propia', () {
-    // El manual usa Debilitar, Hender, Molestar, Ralentizar y Rozar, que no son
-    // las traducciones literales que uno supondría de sap/cleave/vex/slow/graze.
-    expect(weaponMasteryName('sap'), 'Debilitar');
-    expect(weaponMasteryName('cleave'), 'Hender');
-    expect(weaponMasteryName('vex'), 'Molestar');
-    expect(weaponMasteryName('slow'), 'Ralentizar');
-    expect(weaponMasteryName('graze'), 'Rozar');
-    expect(weaponMasteryName('nick'), 'Mellar');
-    expect(weaponMasteryName('push'), 'Empujar');
-    expect(weaponMasteryName('topple'), 'Derribar');
-  });
-
   test('ningún arma del catálogo usa una maestría fuera del glosario', () {
     for (final w in repo.weapons.values) {
       final m = w.mastery;

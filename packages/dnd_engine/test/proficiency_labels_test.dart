@@ -13,24 +13,6 @@ void main() {
   });
 
   group('Traducciones', () {
-    test('las categorías de armadura y arma tienen nombre en español', () {
-      expect(armorTrainingLabel('light'), 'Armadura ligera');
-      expect(armorTrainingLabel('shield'), 'Escudos');
-      expect(weaponProficiencyLabel('simple'), 'Armas simples');
-      expect(weaponProficiencyLabel('martial-ranged'),
-          'Armas marciales a distancia');
-    });
-
-    test('las herramientas usan el nombre del capítulo 6 del PHB', () {
-      // Tres que el catálogo escribía con nombre inventado antes de esta tanda.
-      expect(toolProficiencyLabel('alchemists-supplies'),
-          'Suministros de alquimista');
-      expect(toolProficiencyLabel('woodcarvers-tools'),
-          'Herramientas de ebanista');
-      expect(toolProficiencyLabel('herbalism-kit'), 'Útiles de herborista');
-      expect(toolProficiencyLabel('thieves-tools'), 'Herramientas de ladrón');
-    });
-
     test('un id desconocido degrada al id capitalizado, no falla', () {
       // El mismo camino procesa homebrew e importaciones no confiables.
       expect(

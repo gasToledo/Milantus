@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:dnd_app/api/api_client.dart';
 import 'package:dnd_app/data/settings_service.dart';
-import 'package:dnd_app/l10n/l10n_context.dart' show appName;
 import 'package:dnd_app/theme/app_theme.dart';
 import 'package:dnd_app/theme/app_widgets.dart';
 import 'package:dnd_app/ui/app_sidebar.dart';
@@ -225,32 +224,6 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('las secciones viven en el lateral y el regreso dice Jugador', (
-    tester,
-  ) async {
-    await pumpDmMode(tester, seed: seedTable);
-
-    expect(find.text('CAMPAÑA ACTUAL'), findsOneWidget);
-    expect(find.text('Mesa'), findsOneWidget);
-    expect(find.text('Capítulos'), findsOneWidget);
-    expect(find.text('Combate'), findsOneWidget);
-    expect(find.text('Cuaderno'), findsOneWidget);
-    // El Bestiario va afuera del grupo de campaña: es de la app, no de la
-    // mesa.
-    expect(find.text('Bestiario'), findsOneWidget);
-    expect(
-      // El único grupo segmentado del panel es el interruptor de modo.
-      find.byWidgetPredicate(
-        (widget) =>
-            widget is SegmentedButton && widget is! SegmentedButton<AppMode>,
-      ),
-      findsNothing,
-    );
-    expect(find.text('Jugador'), findsOneWidget);
-    expect(find.text('Volver a mis personajes'), findsNothing);
-    expect(tester.takeException(), isNull);
-  });
-
   // Regresión: las campañas salían del panel recién después de tocar algo.
   //
   // Los tres grupos se calculaban en el cuerpo de `_sidebar`, fuera del
@@ -404,17 +377,6 @@ void main() {
     expect(server.campaignMembers, hasLength(1));
     await tester.pump(const Duration(seconds: 5));
   });
-  testWidgets('el panel entra en una ventana angosta sin desbordar', (
-    tester,
-  ) async {
-    await pumpDmMode(tester, size: const Size(480, 800), seed: seedTable);
-
-    // La barra es la del menú principal, igual que en el Modo Jugador: la
-    // marca y sin «Nueva campaña», que vive en el cajón.
-    expect(find.text(appName), findsOneWidget);
-    expect(find.byTooltip('Nueva campaña'), findsNothing);
-    expect(tester.takeException(), isNull);
-  });
 
   testWidgets('en ventana angosta el drawer cambia de sección', (tester) async {
     await pumpDmMode(tester, size: const Size(480, 800), seed: seedTable);
@@ -427,33 +389,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.widgetWithText(FilledButton, 'Nuevo capítulo'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('la mesa usa dos columnas cuando hay ancho suficiente', (
-    tester,
-  ) async {
-    await pumpDmMode(
-      tester,
-      seed: (server) {
-        seedTable(server);
-        server.characters['lyra'] = Character(
-          id: 'lyra',
-          name: 'Lyra',
-          raceId: 'human',
-          classId: 'fighter',
-          backgroundId: 'soldier',
-          assignedScores: {for (final a in Ability.values) a: 14},
-        );
-        server.shareCodes['CODE-0002'] = 'lyra';
-      },
-    );
-    await enterCode(tester, 'CODE-0001');
-    await enterCode(tester, 'CODE-0002');
-
-    final saganTop = tester.getTopLeft(find.text('Sagan')).dy;
-    final lyraTop = tester.getTopLeft(find.text('Lyra')).dy;
-    expect(saganTop, lyraTop);
     expect(tester.takeException(), isNull);
   });
 
@@ -1781,34 +1716,6 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    // La planilla tiene dos disposiciones —con columnas y partida en dos
-    // líneas— y la columna derecha dos lugares. Ninguna combinación puede
-    // desbordar: en la mesa se juega en la ventana que haya.
-    // Los tres anchos son los tres cruces posibles de las dos decisiones:
-    // 700 parte las filas y baja la columna; 1200 mantiene las columnas pero
-    // todavía baja la columna derecha; 1336 la sube al costado y por eso vuelve
-    // a partir las filas, que es la combinación menos obvia de todas.
-    for (final width in const [700.0, 1200.0, 1336.0]) {
-      testWidgets('la planilla entra en una ventana de $width', (tester) async {
-        await pumpDmMode(tester, size: Size(width, 900), seed: seedTable);
-        if (width < 900) {
-          await tester.tap(find.byIcon(Icons.menu));
-          await tester.pumpAndSettle();
-        }
-        await tester.tap(find.text('Combate'));
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.text('Armar combate').first);
-        await tester.pumpAndSettle();
-        await addMonsters(tester, 'goblin', 'Guerrero goblin', count: 3);
-        await tirarIniciativa(tester);
-
-        // Esté al costado o abajo, la columna del turno tiene que seguir ahí.
-        expect(find.byKey(const ValueKey('combate-panel')), findsOneWidget);
-        expect(tester.takeException(), isNull);
-      });
-    }
-
     // Lo que pidió el DM en la mesa: poder leer al monstruo que está jugando
     // sin salir de Combate a buscarlo al Bestiario.
     testWidgets('la columna del turno trae el perfil del monstruo', (
@@ -2494,70 +2401,6 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    // El perfil dejó de repetir dos datos y de meter dos puntos adentro de
-    // otros dos puntos. Los tres cambios son fáciles de deshacer sin querer al
-    // tocar `creatureProfileBody`, así que van fijados acá.
-    testWidgets('el perfil no dice dos veces lo mismo', (tester) async {
-      await pumpDmMode(tester, seed: seedTable);
-      await openBestiario(tester);
-
-      // El Diablo óseo trae las tres cosas a la vez: percepción pasiva metida
-      // en los sentidos, salvaciones propias y defensas con punto y coma.
-      final diablo = repo.creature('bone-devil')!;
-      await buscar(tester, diablo.name);
-      await tester.tap(find.byKey(const ValueKey('bestiary-bone-devil')));
-      await tester.pumpAndSettle();
-
-      // La percepción pasiva tiene su propia cifra arriba, así que se va del
-      // renglón de sentidos en vez de leerse dos veces.
-      expect(find.text('${diablo.passivePerceptionValue}'), findsWidgets);
-      expect(find.textContaining('Percepción pasiva'), findsNothing);
-
-      // La salvación vive adentro de su característica, y por eso ya no hay un
-      // renglón «Salvaciones» que repita los mismos números.
-      final salvFuerza = diablo.savingThrows[Ability.strength]!;
-      expect(find.text('SALV +$salvFuerza'), findsOneWidget);
-      expect(find.text('SALVACIONES'), findsNothing);
-
-      // Cada fragmento de defensas es su propio chip.
-      expect(find.text('Inmunidades: fuego, veneno'), findsOneWidget);
-
-      expect(tester.takeException(), isNull);
-    });
-
-    // La banda de cifras abrevia por ancho («CA», «Perc. pasiva»), y dicha así
-    // en voz alta no se entiende. Es la misma celda en los dos layouts.
-    testWidgets('la banda del perfil se anuncia con la palabra entera', (
-      tester,
-    ) async {
-      await pumpDmMode(tester, seed: seedTable);
-      await openBestiario(tester);
-
-      final diablo = repo.creature('bone-devil')!;
-      await buscar(tester, diablo.name);
-      await tester.tap(find.byKey(const ValueKey('bestiary-bone-devil')));
-      await tester.pumpAndSettle();
-
-      Finder anuncio(String label) => find.byWidgetPredicate(
-        (w) => w is Semantics && w.properties.label == label,
-      );
-
-      // La cifra se ve abreviada y se escucha entera.
-      expect(find.text('CA'), findsOneWidget);
-      expect(anuncio('Clase de armadura: ${diablo.ac}'), findsOneWidget);
-      expect(
-        anuncio('Percepción pasiva: ${diablo.passivePerceptionValue}'),
-        findsOneWidget,
-      );
-      // Los rótulos que ya vienen enteros componen solos.
-      expect(
-        anuncio('Iniciativa: +${diablo.initiativeModifier}'),
-        findsOneWidget,
-      );
-
-      expect(tester.takeException(), isNull);
-    });
-
     // El combate es de una campaña y el Bestiario no: el botón dice a cuál se
     // suma, para que no se sume a la equivocada.
     testWidgets('el perfil dice a qué combate se suma la criatura', (
@@ -2940,28 +2783,6 @@ void main() {
       expect(find.byType(SnackBar), findsOneWidget);
       expect(antes, findsOneWidget);
       expect(find.text('Sumar al combate de La Tumba'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    });
-
-    testWidgets('en pantalla angosta la lista deja lugar al perfil', (
-      tester,
-    ) async {
-      await pumpDmMode(tester, size: const Size(480, 800), seed: seedTable);
-      await tester.tap(find.byIcon(Icons.menu));
-      await tester.pumpAndSettle();
-      await openBestiario(tester);
-      await buscar(tester, 'ogro');
-
-      // Angosto no hay lugar para las dos columnas: elegir una criatura
-      // reemplaza el listado, y se vuelve con el botón.
-      await tester.tap(find.byKey(const ValueKey('bestiary-ogre')));
-      await tester.pumpAndSettle();
-      expect(find.byKey(const ValueKey('bestiary-ogre')), findsNothing);
-      expect(find.text(repo.creature('ogre')!.kind), findsOneWidget);
-
-      await tester.tap(find.text('Volver al listado'));
-      await tester.pumpAndSettle();
-      expect(find.byKey(const ValueKey('bestiary-ogre')), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });

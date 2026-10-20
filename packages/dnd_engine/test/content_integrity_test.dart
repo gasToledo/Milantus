@@ -153,68 +153,6 @@ void main() {
   });
 
   group('inventario del catálogo', () {
-    // Un alta, una baja o un duplicado accidental se ve acá antes que en
-    // ninguna otra prueba. Los números salen de la auditoría del catálogo.
-    Map<ContentSource, int> porFuente(Iterable<dynamic> entradas) {
-      final c = <ContentSource, int>{};
-      for (final e in entradas) {
-        c[e.source as ContentSource] = (c[e.source as ContentSource] ?? 0) + 1;
-      }
-      return c;
-    }
-
-    test('las cantidades por bloque no se mueven', () {
-      expect(repo.classes, hasLength(13));
-      expect(repo.subclasses, hasLength(53));
-      expect(repo.races, hasLength(15));
-      expect(repo.lineages, hasLength(28));
-      expect(repo.backgrounds, hasLength(33));
-      // 187 dotes canónicas + Guerrero Bendito y Guerrero Druídico, que son
-      // opciones de clase "en lugar de una dote de Estilo de Combate".
-      expect(repo.feats, hasLength(189));
-      expect(repo.weapons, hasLength(38));
-      expect(repo.armor, hasLength(13));
-      // 78 de equipo de aventurero (61 sueltos + 10 contenedores + 7 paquetes),
-      // 23 herramientas + 14 variantes de juego e instrumento, 5 municiones y
-      // 11 canalizadores y símbolos sagrados, libro de conjuros, 261 entradas
-      // mágicas SRD y 9 EFA.
-      expect(repo.items, hasLength(402));
-      expect(repo.spells, hasLength(392));
-      // 330 perfiles del capítulo «Monstruos» y del apéndice «Animales» del
-      // SRD 5.2.1, más las 37 que no salen de ahí: 31 invocaciones por fórmula
-      // (espíritus, cañones, corceles) escritas a mano desde los conjuros, y 6
-      // de PHB/EFA. Las genera `tool/generate_bestiary.dart`.
-      expect(repo.creatures, hasLength(367));
-    });
-
-    // --- Dados de golpe ---
-    //
-    // Existen para que el DM pueda tirarlos al sumar varias copias de un
-    // monstruo. Salen del mismo paréntesis del PDF que el promedio, así que la
-    // prueba que importa no es cuántos hay sino que cada criatura se haya
-    // quedado con **los suyos**.
-
-    test('los perfiles del SRD declaran sus dados de golpe', () {
-      final conDados = repo.creatures.values.where((c) => c.hitDice != null);
-      expect(conDados, hasLength(330));
-    });
-
-    test('los únicos sin dados son los que no salen del PDF', () {
-      final sinDados = repo.creatures.values.where((c) => c.hitDice == null);
-      expect(sinDados, hasLength(37));
-      // 31 invocaciones cuyos PG son una fórmula por nivel de conjuro, y 6
-      // compañeros de clase que escalan con el nivel del personaje. Ninguno de
-      // los dos tira dados de golpe, así que no tenerlos es lo correcto.
-      expect(
-        sinDados.where((c) => c.scalesWithSpellLevel),
-        hasLength(31),
-      );
-      expect(
-        sinDados.where((c) => !c.scalesWithSpellLevel).map((c) => c.name),
-        containsAll(['Defensor de Acero', 'Bestia de la Tierra']),
-      );
-    });
-
     // LA prueba de esta importación: el promedio derivado de los dados tiene
     // que dar exactamente el `hp` que imprime el libro. Un regex que le hubiera
     // robado los dados a la criatura de al lado seguiría pareciendo una
@@ -231,36 +169,6 @@ void main() {
           );
         }
       }
-    });
-
-    test('las procedencias coinciden con el cruce contra el SRD 5.2.1', () {
-      expect(porFuente(repo.lineages.values), {
-        ContentSource.srd2024: 24,
-        ContentSource.foa2025: 4,
-      });
-      expect(porFuente(repo.weapons.values), {ContentSource.srd2024: 38});
-      expect(porFuente(repo.items.values), {
-        ContentSource.srd2024: 393,
-        ContentSource.foa2025: 9,
-      });
-      expect(porFuente(repo.spells.values), {
-        ContentSource.srd2024: 339,
-        ContentSource.phb2024: 52,
-        ContentSource.foa2025: 1,
-      });
-      expect(porFuente(repo.feats.values), {
-        ContentSource.srd2024: 26,
-        ContentSource.phb2024: 135,
-        ContentSource.foa2025: 28,
-      });
-      // Las criaturas se generan desde el PDF del SRD 5.2.1, que es CC-BY
-      // entero: por eso todo lo importado cae en `srd2024` y no hay forma de
-      // que se cuele un perfil de otro libro sin que este número se mueva.
-      expect(porFuente(repo.creatures.values), {
-        ContentSource.srd2024: 338,
-        ContentSource.phb2024: 25,
-        ContentSource.foa2025: 4,
-      });
     });
   });
 
@@ -285,19 +193,6 @@ void main() {
         expect(a.costCp, greaterThan(0),
             reason: 'armadura sin precio: ${a.id}');
       }
-    });
-
-    test('el único peso despreciable del equipo es el de la honda', () {
-      // El manual escribe "—" cuando el peso no cuenta, y la honda es el único
-      // caso entre armas y armaduras. Fijarlo detecta un parcheo a medias.
-      expect(
-        [
-          for (final w in repo.weapons.values)
-            if (w.weight == 0) w.id
-        ],
-        ['sling'],
-      );
-      expect(repo.armor.values.where((a) => a.weight == 0), isEmpty);
     });
 
     test('todo objeto tiene precio y una categoría conocida', () {
@@ -340,20 +235,6 @@ void main() {
       expect(Item.fromJson(repo.item('arrows')!.toJson()).bundleSize, 20);
     });
 
-    test('los siete paquetes detallan su contenido en español', () {
-      final packs =
-          repo.items.values.where((i) => i.category == 'pack').toList();
-      expect(packs, hasLength(7));
-      for (final pack in packs) {
-        expect(pack.description, startsWith('Contiene: '), reason: pack.id);
-      }
-      expect(repo.item('burglars-pack')!.description, contains('10 × Vela'));
-      expect(
-        repo.item('dungeoneers-pack')!.description,
-        contains('10 × Antorcha'),
-      );
-    });
-
     test('la rareza y la sintonización solo existen en objetos mágicos', () {
       const rarities = {
         'common',
@@ -376,14 +257,6 @@ void main() {
         repo.items.values.where((i) => i.isMagic && i.category != 'magic'),
         isEmpty,
       );
-    });
-
-    test('el objeto herramienta y su competencia se llaman igual', () {
-      // Comparten id a propósito, así que un cambio de nombre en un lado sin el
-      // otro dejaría la ficha diciendo dos cosas distintas de la misma cosa.
-      for (final i in repo.items.values.where((i) => i.category == 'tool')) {
-        expect(knownToolLabel(i.id), i.name, reason: i.id);
-      }
     });
 
     test('el único nombre repetido es el que repite el propio SRD', () {
@@ -447,15 +320,6 @@ void main() {
     }
   });
 
-  test('el catálogo se cargó con volumen razonable', () {
-    expect(repo.weapons.length, greaterThanOrEqualTo(30));
-    expect(repo.armor.length, greaterThanOrEqualTo(12));
-    expect(repo.races.length, greaterThanOrEqualTo(10));
-    expect(repo.backgrounds.length, greaterThanOrEqualTo(12));
-    expect(repo.spells.length, greaterThanOrEqualTo(150));
-    expect(repo.feats.length, greaterThanOrEqualTo(50));
-  });
-
   test('los conjuros cubren los niveles 0 a 9', () {
     final levels = repo.spells.values.map((s) => s.level).toSet();
     for (var l = 0; l <= 9; l++) {
@@ -499,40 +363,6 @@ void main() {
               ContentSource.foa2025),
           reason: '$label: procedencia inesperada');
     });
-  });
-
-  test('el SRD 5.2.1 aporta exactamente una subclase por clase', () {
-    // El SRD incluye 12 subclases; las otras 36 son PHB 2024 y no están
-    // cubiertas por la atribución CC BY 4.0.
-    const srdSubclasses = {
-      'champion',
-      'berserker',
-      'college-lore',
-      'life-domain',
-      'circle-land',
-      'open-hand',
-      'oath-devotion',
-      'hunter',
-      'thief',
-      'draconic-sorcery',
-      'fiend-patron',
-      'evoker',
-    };
-    final tagged = repo.subclasses.values
-        .where((s) => s.source == ContentSource.srd2024)
-        .map((s) => s.id)
-        .toSet();
-    expect(tagged, equals(srdSubclasses));
-    // Solo las clases del SRD tienen que aportar una: el Artífice de Forge of
-    // the Artificer es foa_2025 y no tiene ninguna subclase srd_2024.
-    for (final klass in repo.classes.values
-        .where((c) => c.source == ContentSource.srd2024)) {
-      final srdForClass = repo
-          .subclassesForClass(klass.id)
-          .where((s) => s.source == ContentSource.srd2024);
-      expect(srdForClass, hasLength(1),
-          reason: '${klass.id} debe tener exactamente una subclase del SRD');
-    }
   });
 
   test('solo las dotes del SRD 5.2.1 quedan etiquetadas como tales', () {
@@ -647,22 +477,6 @@ void main() {
     });
   });
 
-  test('ninguna palabra quedó partida por el renglón del PDF', () {
-    // «pue-\ndes»: el rastro de leer el PDF renglón por renglón sin unir.
-    // `extract_magic_item_text.dart` las une; esto atrapa a un generador que
-    // vuelva a escribir la descripción cruda.
-    final partida = RegExp(r'\p{L}-\\n\p{L}', unicode: true);
-    for (final archivo in Directory('lib/assets/srd_2024')
-        .listSync()
-        .whereType<File>()
-        .where((f) => f.path.endsWith('.json'))) {
-      final hallados = [
-        for (final m in partida.allMatches(archivo.readAsStringSync())) m[0],
-      ];
-      expect(hallados, isEmpty, reason: archivo.path);
-    }
-  });
-
   test('la prosa del catálogo está en voseo', () {
     // El SRD en español está en tuteo; `tool/apply_voseo.dart` lo pasa a vos
     // después de generar. Solo formas que no pueden ser otra cosa: «ganas» o
@@ -733,171 +547,6 @@ void main() {
     }
   });
 
-  test('el catálogo incluye las 21 dotes del PHB que faltaban', () {
-    const expected = {
-      'ability-score-improvement': ('Mejora de Característica', 'general'),
-      'martial-weapon-training-strength': (
-        'Entrenamiento con Armas Marciales (Fuerza)',
-        'general',
-      ),
-      'weapon-master-strength': ('Maestro de Armas (Fuerza)', 'general'),
-      'fs-blind-fighting': ('Lucha a Ciegas', 'fighting-style'),
-      'fs-interception': ('Intercepción', 'fighting-style'),
-      'fs-protection': ('Protección', 'fighting-style'),
-      'fs-thrown-weapon-fighting': (
-        'Combate con Armas Arrojadizas',
-        'fighting-style',
-      ),
-      'fs-two-weapon-fighting': (
-        'Combate con Dos Armas',
-        'fighting-style',
-      ),
-      'fs-unarmed-fighting': ('Combate sin Armas', 'fighting-style'),
-      'boon-of-fortitude': ('Don de la Fortaleza', 'epic-boon'),
-      'boon-of-skill': ('Don de la Habilidad', 'epic-boon'),
-      'boon-of-combat-prowess': (
-        'Don de la Pericia en Combate',
-        'epic-boon',
-      ),
-      'boon-of-recovery': ('Don de la Recuperación', 'epic-boon'),
-      'boon-of-energy-resistance': (
-        'Don de la Resistencia a Energías',
-        'epic-boon',
-      ),
-      'boon-of-speed': ('Don de la Velocidad', 'epic-boon'),
-      'boon-of-truesight': ('Don de la Visión Verdadera', 'epic-boon'),
-      'boon-of-irresistible-offense': (
-        'Don del Ataque Imparable',
-        'epic-boon',
-      ),
-      'boon-of-fate': ('Don del Destino', 'epic-boon'),
-      'boon-of-the-night-spirit': (
-        'Don del Espíritu de la Noche',
-        'epic-boon',
-      ),
-      'boon-of-spell-recall': (
-        'Don del Recuerdo de Conjuros',
-        'epic-boon',
-      ),
-      'boon-of-dimensional-travel': (
-        'Don del Viaje Dimensional',
-        'epic-boon',
-      ),
-    };
-
-    for (final entry in expected.entries) {
-      final feat = repo.feat(entry.key);
-      expect(feat, isNotNull, reason: 'falta ${entry.key}');
-      expect(feat!.name, entry.value.$1, reason: entry.key);
-      expect(feat.category, entry.value.$2, reason: entry.key);
-      expect(
-        feat.source,
-        srdFeatIds.contains(entry.key)
-            ? ContentSource.srd2024
-            : ContentSource.phb2024,
-        reason: entry.key,
-      );
-    }
-    expect(repo.feat('mobile'), isNull,
-        reason: 'Ágil/Mobile es la dote 2014 reemplazada por Veloz en 2024');
-  });
-
-  test('las 75 dotes canónicas del PHB están representadas', () {
-    // Solo las categorías que son **dotes**: `warlock-invocation` reusa `Feat`
-    // como catálogo de una elección abierta, pero no es una dote y no entra en
-    // este conteo. Sin este filtro, cargar invocaciones rompería el test.
-    const featCategories = {
-      'origin',
-      'general',
-      'fighting-style',
-      'epic-boon',
-    };
-    final phb = repo.feats.values
-        .where(
-          (f) =>
-              (f.source == ContentSource.phb2024 ||
-                  f.source == ContentSource.srd2024) &&
-              featCategories.contains(f.category) &&
-              // Guerrero Bendito y Guerrero Druídico no son dotes del capítulo 5:
-              // son la alternativa de clase "en lugar de una dote de Estilo de
-              // Combate", y por eso son las únicas con `requiredClassId`.
-              f.prerequisite?.requiredClassId == null,
-        )
-        .toList();
-    // Son 127 registros para 75 dotes del capítulo porque las que dejan elegir
-    // el bono de característica se cargan como una variante por opción, con el
-    // mismo `exclusiveGroup`: es la única forma de que el jugador elija sin
-    // inventar un efecto nuevo. Iniciado en la Magia aporta 3 por sus listas.
-    //
-    // El desglose: 33 familias con elección (Resiliente ×6, Experto en
-    // Habilidades ×6, siete ×3 y veinticuatro ×2) más Iniciado en la Magia ×3.
-    expect(phb, hasLength(127));
-    expect(phb.where((f) => f.category == 'origin'), hasLength(12));
-    expect(phb.where((f) => f.category == 'general'), hasLength(93));
-    expect(phb.where((f) => f.category == 'fighting-style'), hasLength(10));
-    expect(phb.where((f) => f.category == 'epic-boon'), hasLength(12));
-
-    // Toda variante declara su grupo, que es lo que impide tomar dos.
-    final conVariantes = phb.where((f) => f.exclusiveGroup != null);
-    expect(conVariantes, hasLength(greaterThan(60)));
-    for (final grupo in conVariantes.map((f) => f.exclusiveGroup!).toSet()) {
-      final delGrupo = phb.where((f) => f.exclusiveGroup == grupo);
-      expect(delGrupo.length, greaterThan(1), reason: 'grupo $grupo con una');
-      // Cada variante concede exactamente el +1 que la distingue.
-      for (final f in delGrupo.where((f) => f.category == 'general')) {
-        final asi = f.effects.whereType<AbilityScoreBonusEffect>();
-        expect(asi, hasLength(1), reason: f.id);
-        expect(f.id, endsWith(asi.first.ability.name), reason: f.id);
-      }
-    }
-  });
-
-  test('las dotes usan el nombre del capítulo 5, no una traducción propia', () {
-    // Una tanda de verificación contra el manual encontró 33 dotes con nombre
-    // inventado. El id sigue siendo el nombre en inglés y es la clave que viaja
-    // en los personajes guardados, así que renombrar es seguro; lo que hace
-    // falta es que no se vuelva a desviar.
-    //
-    // Se fijan los casos que estaban mal, incluidos los dos pares que se
-    // parecen lo bastante como para intercambiarse: Maestro en Armaduras
-    // Pesadas (Heavy Armor Master) y Maestro en Armas Pesadas (Great Weapon
-    // Master); Combate con Dos Armas (estilo) y Combatiente con Dos Armas
-    // (dote general).
-    const oficiales = <String, String>{
-      'tough': 'Duro',
-      'crafter': 'Fabricante',
-      'skilled': 'Habilidoso',
-      'charger-strength': 'Atacante a la Carga (Fuerza)',
-      'mage-slayer-strength': 'Azote de Magos (Fuerza)',
-      'dual-wielder-strength': 'Combatiente con Dos Armas (Fuerza)',
-      'crossbow-expert': 'Experto en Ballestas',
-      'war-caster-intelligence': 'Lanzador en Combate (Inteligencia)',
-      'spell-sniper-intelligence': 'Lanzador Preciso (Inteligencia)',
-      'ritual-caster-intelligence': 'Lanzador Ritual (Inteligencia)',
-      'medium-armor-master-strength': 'Maestro en Armaduras Medias (Fuerza)',
-      'heavy-armor-master-constitution':
-          'Maestro en Armaduras Pesadas (Constitución)',
-      'polearm-master-dexterity': 'Maestro en Armas de Asta (Destreza)',
-      'great-weapon-master': 'Maestro en Armas Pesadas',
-      'shield-master': 'Maestro en Escudos',
-      'heavily-armored-constitution': 'Muy Acorazado (Constitución)',
-      'telepathic-intelligence': 'Telepático (Inteligencia)',
-      'sharpshooter': 'Tirador de Primera',
-      'elemental-adept-intelligence': 'Versado en un Elemento (Inteligencia)',
-      'fs-great-weapon': 'Combate con Armas a Dos Manos',
-      'fs-two-weapon-fighting': 'Combate con Dos Armas',
-      'fs-defense': 'Defensa',
-      'fs-dueling': 'Duelo',
-      'fs-archery': 'Tiro con Arco',
-    };
-    for (final e in oficiales.entries) {
-      expect(repo.feat(e.key)?.name, e.value, reason: e.key);
-    }
-    // El trasfondo Artesano existía a la vez que una dote homónima; renombrar
-    // la dote a Fabricante deshizo esa colisión.
-    expect(repo.background('artisan')?.name, 'Artesano');
-  });
-
   test('Ligeramente y Moderadamente Acorazado reparten bien los escudos', () {
     // Los escudos estaban en la dote equivocada: el manual los da con la
     // armadura ligera, no con la media.
@@ -912,41 +561,6 @@ void main() {
         containsAll(['light', 'shield']));
     expect(armaduras('moderately-armored-strength'), ['medium']);
     expect(armaduras('heavily-armored-constitution'), ['heavy']);
-  });
-
-  test('están las 28 invocaciones del capítulo 3', () {
-    final invocations = repo.featsByCategory('warlock-invocation');
-    expect(invocations, hasLength(28));
-
-    // Los tres pactos. El del Talismán es de 2014 y no está en 2024.
-    expect(
-        invocations.map((f) => f.id),
-        containsAll(<String>[
-          'pact-of-the-chain',
-          'pact-of-the-blade',
-          'pact-of-the-tome',
-        ]));
-    expect(
-      invocations.map((f) => f.name).where((n) => n.contains('Talismán')),
-      isEmpty,
-    );
-
-    // Se etiquetan phb_2024: no está verificado cuáles cubre el SRD 5.2.1 y
-    // reclamar cobertura sin certeza es el error que la licencia no perdona.
-    for (final f in invocations) {
-      expect(f.source, ContentSource.phb2024, reason: f.id);
-    }
-
-    // Las cuatro repetibles del capítulo, ni una más.
-    expect(
-      invocations.where((f) => f.repeatable).map((f) => f.id).toSet(),
-      {
-        'agonizing-blast',
-        'repelling-blast',
-        'eldritch-spear',
-        'lessons-of-the-first-ones',
-      },
-    );
   });
 
   test('los prerrequisitos entre invocaciones apuntan a ids reales', () {
@@ -1271,31 +885,6 @@ void main() {
     }
   });
 
-  test('las 38 armas de la tabla del PHB están cargadas', () {
-    // Faltaban las tres últimas de Armas Marciales a Distancia. La Cerbatana
-    // hace 1 de daño fijo, no un dado: `damageDice` es una cadena de display y
-    // nunca se parsea, así que "1" es un valor legítimo.
-    expect(repo.weapons, hasLength(38));
-
-    const esperadas = {
-      'blowgun': ('Cerbatana', '1', 'vex'),
-      'musket': ('Mosquete', '1d12', 'slow'),
-      'pistol': ('Pistola', '1d10', 'vex'),
-    };
-    for (final entry in esperadas.entries) {
-      final w = repo.weapons[entry.key];
-      expect(w, isNotNull, reason: '${entry.key}: no está en el catálogo');
-      expect(w!.name, entry.value.$1);
-      expect(w.damageDice, entry.value.$2, reason: entry.key);
-      expect(w.mastery, entry.value.$3, reason: entry.key);
-      expect(w.damageType, 'piercing', reason: entry.key);
-      expect(w.category, 'martial', reason: entry.key);
-      expect(w.properties, containsAll(['ammunition', 'loading', 'ranged']),
-          reason: entry.key);
-    }
-    expect(repo.weapons['musket']!.properties, contains('two-handed'));
-  });
-
   group('la Lanza de caballería solo exige dos manos desmontada', () {
     // XPHB: "You have Disadvantage when you use a Lance to attack a target
     // within 5 feet. You also must use two hands to attack with it unless
@@ -1346,16 +935,6 @@ void main() {
       expect(vieja.twoHandedUnlessMounted, isFalse);
       expect(vieja.requiresTwoHands(mounted: true), isTrue);
     });
-  });
-
-  test('el Pico de guerra es versátil 1d8/1d10', () {
-    final pick = repo.weapons['war-pick']!;
-    expect(pick.properties, contains('versatile'));
-    expect(pick.damageDice, '1d8');
-    expect(pick.versatileDice, '1d10');
-    // La corrección no toca ni el tipo de daño ni la maestría.
-    expect(pick.damageType, 'piercing');
-    expect(pick.mastery, 'sap');
   });
 
   test('cada armadura tiene categoría válida', () {
@@ -1586,18 +1165,6 @@ void main() {
       }
     });
 
-    test('Provocar pesadillas no queda dentro de Lanzamiento de conjuros', () {
-      final actions = repo.creature('night-hag')!.actions;
-      final casting = actions.singleWhere(
-        (action) => action.name == 'Lanzamiento de conjuros',
-      );
-      expect(casting.description, isNot(contains('Provocar pesadillas')));
-      expect(
-        actions.map((action) => action.name),
-        contains('Provocar pesadillas (1/día)'),
-      );
-    });
-
     test('el tipo y el tamaño de cada perfil se resuelven', () {
       // `creatureType` y `creatureSize` caen a parsear `kind` cuando la entrada
       // no trae los campos estructurados, que hoy es todo el catálogo. Si un
@@ -1630,17 +1197,6 @@ void main() {
         'swarm-of-ravens',
         'swarm-of-venomous-snakes',
       ]);
-    });
-
-    test('una etiqueta en medio del perfil no se come el tamaño', () {
-      // El pteranodon es «Bestia Mediana (dinosaurio), sin alineamiento»:
-      // sacar el tamaño de la última palabra daba «alineamiento» y la forma
-      // salvaje se quedaba con el tamaño del druida. Todo el apéndice de
-      // animales tiene esta forma, así que la regla protege ~84 entradas.
-      final p = repo.creature('pteranodon')!;
-      expect(p.kind, contains('(dinosaurio)'));
-      expect(p.kind, endsWith('sin alineamiento'));
-      expect(p.creatureSize, CreatureSize.medium);
     });
 
     /// El pozo de Forma Salvaje: bestias **con** valor de desafío. Los

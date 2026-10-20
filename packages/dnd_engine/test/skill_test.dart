@@ -2,12 +2,6 @@ import 'package:dnd_engine/dnd_engine.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('son 18, con id y etiqueta únicos', () {
-    expect(Skill.values, hasLength(18));
-    expect(Skill.allIds.toSet(), hasLength(18));
-    expect(Skill.values.map((s) => s.label).toSet(), hasLength(18));
-  });
-
   test('fromId y labelFor', () {
     expect(Skill.fromId('sleight-of-hand'), Skill.sleightOfHand);
     expect(Skill.labelFor('animal-handling'), 'Trato con Animales');

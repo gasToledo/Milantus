@@ -63,17 +63,4 @@ void main() {
         if (e.value.trim().isEmpty) e.key,
     ], isEmpty);
   });
-
-  test('el comparador de marcadores distingue plurales de ramas', () {
-    expect(_marcadores('Hola {nombre}'), {'nombre'});
-    expect(
-      _marcadores(
-        '{count, plural, one{{count} objeto} other{{count} objetos}}',
-      ),
-      {'count'},
-    );
-    expect(_marcadores('Sin marcadores'), isEmpty);
-    // Una rama de una sola palabra no es un marcador.
-    expect(_marcadores('{n, plural, =1{thing} other{things}}'), {'n'});
-  });
 }

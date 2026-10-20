@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:test/test.dart';
 
@@ -8,17 +5,6 @@ void main() {
   late ContentRepository repo;
   setUpAll(() async {
     repo = await ContentRepository.loadFromDirectory('lib/assets/srd_2024');
-  });
-
-  test('las listas esperadas cubren 13 clases y 33 trasfondos', () {
-    List<String> ids(String file) =>
-        (jsonDecode(File(file).readAsStringSync()) as List).cast<String>();
-    final classes = ids('lib/assets/srd_2024/expected_class_ids.json');
-    final backgrounds = ids('lib/assets/srd_2024/expected_background_ids.json');
-    expect(classes, hasLength(13));
-    expect(backgrounds, hasLength(33));
-    expect(classes.toSet(), repo.classes.keys.toSet());
-    expect(backgrounds.toSet(), repo.backgrounds.keys.toSet());
   });
 
   test('toda clase y trasfondo tiene opciones y referencias resolubles', () {

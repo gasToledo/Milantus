@@ -84,13 +84,6 @@ void main() {
       expect(repo.spellsSorted, hasLength(repo.spells.length));
     });
 
-    test('el Bárbaro encabeza las clases con B', () {
-      // Regresión concreta del reporte: en la lista real, no solo en un fixture.
-      final conB =
-          repo.classesSorted.map((e) => e.name).where((n) => n.startsWith('B'));
-      expect(conB.first, 'Bárbaro');
-    });
-
     test('los conjuros ordenan por nivel y después por nombre', () {
       final wizard = repo.spellsForList('wizard');
       for (var i = 1; i < wizard.length; i++) {

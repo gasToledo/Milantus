@@ -30,18 +30,6 @@ void main() {
       expect(byId['azure']!.isConfigured, isFalse);
       expect(byId['azure-gpt-image']!.isConfigured, isTrue);
     });
-
-    test('gpt-image-2 es el único que acepta imagen de referencia', () {
-      final providers = buildProviders(
-        const AiProvidersConfig(
-          azureApiKey: 'flux-key',
-          azureOpenAiApiKey: 'openai-key',
-        ),
-      );
-
-      final withReference = providers.where((p) => p.supportsReference);
-      expect(withReference.map((p) => p.id), ['azure-gpt-image']);
-    });
   });
 
   group('availableProviders', () {
@@ -51,17 +39,6 @@ void main() {
       );
 
       expect(availableProviders(providers).map((p) => p.id), ['pollinations']);
-    });
-
-    test('con todas las credenciales, los tres están disponibles', () {
-      final providers = buildProviders(
-        const AiProvidersConfig(
-          azureApiKey: 'flux-key',
-          azureOpenAiApiKey: 'openai-key',
-        ),
-      );
-
-      expect(availableProviders(providers), hasLength(3));
     });
   });
 

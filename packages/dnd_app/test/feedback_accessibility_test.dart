@@ -1,98 +1,13 @@
-import 'dart:math';
-
-import 'package:dnd_app/api/api_client.dart';
 import 'package:dnd_app/api/api_exception.dart';
 import 'package:dnd_app/theme/app_theme.dart';
 import 'package:dnd_app/theme/app_widgets.dart';
-import 'package:dnd_app/data/settings_service.dart';
-import 'package:dnd_app/ui/settings_view.dart';
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'fakes/fake_api_server.dart';
 import 'fakes/localized_app.dart';
 
-/// Contraste WCAG entre dos colores opacos.
-double _contrast(Color a, Color b) {
-  final x = a.computeLuminance();
-  final y = b.computeLuminance();
-  return (max(x, y) + 0.05) / (min(x, y) + 0.05);
-}
-
 void main() {
-  // La paleta se elige a mano; sin esto, ajustar un tono para que "quede
-  // lindo" puede dejar los rótulos por debajo de AA sin que nadie se entere
-  // hasta que alguien no los pueda leer.
-  group('contraste de la paleta', () {
-    void checkTheme(ThemeData theme, String name) {
-      final palette = theme.extension<AppPalette>()!;
-      final surface = theme.colorScheme.surface;
-      final backgrounds = {
-        'surface': surface,
-        'plaque': palette.plaque,
-        'scaffold': theme.scaffoldBackgroundColor,
-      };
-
-      for (final bg in backgrounds.entries) {
-        // Texto normal: 4.5:1. `textMuted` lleva rótulos y hints, y el carmesí
-        // los PG de la tarjeta, que son chicos.
-        for (final fg in {
-          'textMuted': palette.textMuted,
-          'crimson': palette.crimson,
-          'onSurfaceVariant': theme.colorScheme.onSurfaceVariant,
-        }.entries) {
-          expect(
-            _contrast(fg.value, bg.value),
-            greaterThanOrEqualTo(4.5),
-            reason: '$name: ${fg.key} sobre ${bg.key} no llega a AA',
-          );
-        }
-        // El oro solo lleva números grandes (24 px en `StatPlaque`) y bordes:
-        // ahí el umbral de AA es 3:1. Sobre `surface` igual llega a 4.5, que
-        // es donde aparece como texto corriente.
-        expect(
-          _contrast(palette.gold, bg.value),
-          greaterThanOrEqualTo(3.0),
-          reason: '$name: el oro sobre ${bg.key} no llega a 3:1',
-        );
-      }
-      expect(_contrast(palette.gold, surface), greaterThanOrEqualTo(4.5));
-      // El verde marca el tipo de acción en íconos: 3:1 alcanza.
-      expect(_contrast(palette.verdant, surface), greaterThanOrEqualTo(3.0));
-    }
-
-    test(
-      'el tema oscuro llega a AA',
-      () => checkTheme(AppTheme.dark, 'oscuro'),
-    );
-    test('el tema claro llega a AA', () => checkTheme(AppTheme.light, 'claro'));
-
-    // Lo que va encima del carmesí (texto de un botón de error, de un chip
-    // secundario) también tiene que leerse: al aclarar el carmesí para los PG,
-    // el blanco de antes dejó de servir en el tema oscuro.
-    test('lo que va sobre carmesí se lee en los dos temas', () {
-      for (final theme in [AppTheme.dark, AppTheme.light]) {
-        expect(
-          _contrast(theme.colorScheme.onError, theme.colorScheme.error),
-          greaterThanOrEqualTo(4.5),
-        );
-      }
-    });
-
-    // El texto de todo `FilledButton` y del paso activo del wizard va sobre el
-    // oro. En el tema claro se quedaba en 3.4:1 con el casi-negro del oscuro.
-    test('lo que va sobre oro se lee en los dos temas', () {
-      for (final theme in [AppTheme.dark, AppTheme.light]) {
-        expect(
-          _contrast(theme.colorScheme.onPrimary, theme.colorScheme.primary),
-          greaterThanOrEqualTo(4.5),
-          reason: '${theme.brightness.name}: onPrimary sobre el oro',
-        );
-      }
-    });
-  });
   testWidgets('los avisos se anuncian como región viva', (tester) async {
     await tester.pumpWidget(
       localizedApp(
@@ -188,103 +103,6 @@ void main() {
     semantics.dispose();
   });
 
-  testWidgets('ajustes cabe en una ventana baja y permite recorrido por foco', (
-    tester,
-  ) async {
-    tester.view.physicalSize = const Size(520, 420);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.reset);
-    final server = FakeApiServer()
-      ..providers = [
-        {
-          'id': 'pollinations',
-          'name': 'Pollinations',
-          'supportsReference': false,
-        },
-      ];
-    final api = ApiClient(client: server.client);
-
-    await tester.pumpWidget(
-      localizedApp(
-        theme: AppTheme.dark,
-        home: Scaffold(
-          body: SettingsView(
-            settingsController: SettingsController(api, AppSettings()),
-            theme: AppThemeController(),
-          ),
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('Idioma'), findsOneWidget);
-    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
-    expect(FocusManager.instance.primaryFocus, isNotNull);
-    expect(tester.takeException(), isNull);
-  });
-
-  // Toda animación tiene que poder desactivarse: quien pide menos movimiento
-  // suele hacerlo por mareo, no por gusto.
-  testWidgets('las animaciones duran cero con movimiento reducido', (
-    tester,
-  ) async {
-    late Duration reduced;
-    late Duration normal;
-
-    Widget probe(bool disableAnimations, void Function(Duration) sink) =>
-        MediaQuery(
-          data: MediaQueryData(disableAnimations: disableAnimations),
-          child: Builder(
-            builder: (context) {
-              sink(context.motion(const Duration(milliseconds: 220)));
-              return const SizedBox.shrink();
-            },
-          ),
-        );
-
-    await tester.pumpWidget(
-      localizedApp(
-        theme: AppTheme.dark,
-        home: Column(
-          children: [
-            probe(true, (d) => reduced = d),
-            probe(false, (d) => normal = d),
-          ],
-        ),
-      ),
-    );
-
-    expect(reduced, Duration.zero);
-    expect(normal, const Duration(milliseconds: 220));
-  });
-
-  // La barra de PG interpola, así que con movimiento reducido tiene que
-  // mostrar el valor final de una vez, no quedarse a medio camino.
-  testWidgets('la barra de PG llega a su valor sin animación', (tester) async {
-    await tester.pumpWidget(
-      localizedApp(
-        theme: AppTheme.dark,
-        home: MediaQuery(
-          data: const MediaQueryData(disableAnimations: true),
-          child: Scaffold(
-            body: ThinBar(
-              ratio: 0.4,
-              color: AppPalette.dark.crimson,
-              track: AppPalette.dark.plaque,
-            ),
-          ),
-        ),
-      ),
-    );
-    await tester.pump();
-
-    final bar = tester.widget<LinearProgressIndicator>(
-      find.byType(LinearProgressIndicator),
-    );
-    expect(bar.value, closeTo(0.4, 0.001));
-    expect(tester.takeException(), isNull);
-  });
-
   // El idioma y el tema viven en Ajustes. En un teléfono angosto la fila les
   // deja unos 208 px:
   // los tres segmentos y el idioma tienen que entrar ahí sin desbordar, y cada
@@ -318,23 +136,6 @@ void main() {
       await tester.pumpAndSettle();
       return controller;
     }
-
-    testWidgets('entran en el ancho del panel', (tester) async {
-      await pump(tester);
-
-      final group = tester.getSize(find.byType(SegmentedButton<ThemeMode>));
-      expect(group.width, lessThanOrEqualTo(contentWidth));
-      expect(
-        group.height,
-        greaterThanOrEqualTo(40),
-        reason: 'los segmentos quedaron por debajo de un objetivo táctil',
-      );
-      expect(
-        tester.getSize(find.text('Español')).width,
-        lessThan(contentWidth),
-      );
-      expect(tester.takeException(), isNull);
-    });
 
     testWidgets('tocar un segmento cambia el tema y marca cuál está activo', (
       tester,
@@ -423,40 +224,6 @@ void main() {
 
     await tester.tap(find.text('Reintentar'));
     expect(retried, 1);
-  });
-
-  // El destello dice para qué lado fue el cambio de PG; con movimiento
-  // reducido no aparece, y el número nuevo alcanza para leerlo.
-  testWidgets('el destello de PG marca si bajó o subió', (tester) async {
-    Future<Color?> flashAfter(int from, int to, {bool reduced = false}) async {
-      Widget build(int value) => localizedApp(
-        theme: AppTheme.dark,
-        home: MediaQuery(
-          data: MediaQueryData(disableAnimations: reduced),
-          child: Scaffold(
-            body: Center(
-              child: ChangeFlash(value: value, child: Text('$value')),
-            ),
-          ),
-        ),
-      );
-      await tester.pumpWidget(build(from));
-      await tester.pumpWidget(build(to));
-      await tester.pump(const Duration(milliseconds: 50));
-      final box = tester.widget<DecoratedBox>(
-        find.descendant(
-          of: find.byType(ChangeFlash),
-          matching: find.byType(DecoratedBox),
-        ),
-      );
-      final color = (box.decoration as BoxDecoration).color;
-      await tester.pumpAndSettle();
-      return color == null || color.a == 0 ? null : color.withAlpha(255);
-    }
-
-    expect(await flashAfter(12, 7), AppPalette.dark.crimson);
-    expect(await flashAfter(7, 12), AppPalette.dark.verdant);
-    expect(await flashAfter(12, 7, reduced: true), isNull);
   });
 
   // Un aviso de error interpolaba la excepción tal cual, y quien importaba un

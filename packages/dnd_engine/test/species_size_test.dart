@@ -23,23 +23,6 @@ void main() {
       );
 
   group('catálogo', () {
-    test('exactamente siete especies ofrecen la elección', () {
-      final choosers = repo.races.values
-          .where((r) => r.sizeOptions.isNotEmpty)
-          .map((r) => r.id)
-          .toList()
-        ..sort();
-      expect(choosers, [
-        'aasimar',
-        'changeling',
-        'human',
-        'khoravar',
-        'shifter',
-        'tiefling',
-        'warforged',
-      ]);
-    });
-
     test('las siete ofrecen Mediano o Pequeño', () {
       for (final id in [
         'human',
@@ -60,14 +43,6 @@ void main() {
       for (final race
           in repo.races.values.where((r) => r.sizeOptions.isNotEmpty)) {
         expect(race.sizeOptions, contains(race.size), reason: race.id);
-      }
-    });
-
-    test('el resto del catálogo no pregunta nada', () {
-      final fixed = repo.races.values.where((r) => r.sizeOptions.isEmpty);
-      expect(fixed, isNotEmpty);
-      for (final race in fixed) {
-        expect(race.size, isNotEmpty, reason: race.id);
       }
     });
   });

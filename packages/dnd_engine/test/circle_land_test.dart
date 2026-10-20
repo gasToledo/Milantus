@@ -73,13 +73,6 @@ void main() {
   };
 
   group('El catálogo de terrenos', () {
-    test('son exactamente cuatro dotes', () {
-      expect(
-        repo.featsByCategory('druid-land').map((f) => f.id).toSet(),
-        tablas.keys.toSet(),
-      );
-    });
-
     test('ninguna declara exclusiveGroup', () {
       for (final f in repo.featsByCategory('druid-land')) {
         expect(f.exclusiveGroup, isNull, reason: f.id);

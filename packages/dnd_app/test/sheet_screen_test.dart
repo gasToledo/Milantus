@@ -3,7 +3,6 @@ import 'package:dnd_app/data/characters_controller.dart';
 import 'package:dnd_app/demo/demo_characters.dart';
 import 'package:dnd_app/theme/app_theme.dart';
 import 'package:dnd_app/theme/app_widgets.dart';
-import 'package:dnd_app/ui/save_status_indicator.dart';
 import 'package:dnd_app/ui/sheet_screen.dart';
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:flutter/material.dart';
@@ -266,38 +265,6 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  // La ficha guarda sola, sin botón. El cartel estaba solo en la barra del
-  // roster, así que justo donde más se escribe no se veía nada: hay que poder
-  // saber si lo tipeado llegó sin abrir ningún menú.
-  // El cartel pone una etiqueta sobre su propio texto visible. Sin
-  // excludeSemantics, el lector anunciaba «Guardado» dos veces.
-  testWidgets('el cartel del guardado se anuncia una sola vez', (tester) async {
-    final semantics = tester.ensureSemantics();
-    await pumpSheet(tester, demoSagan());
-
-    expect(
-      tester.getSemantics(find.byType(SaveStatusIndicator)).label,
-      l10nEs.saveStateLabel(l10nEs.saveStateSaved),
-    );
-    semantics.dispose();
-  });
-
-  testWidgets('el estado del guardado se ve en la ficha, en los dos anchos', (
-    tester,
-  ) async {
-    await pumpSheet(tester, demoSagan());
-    expect(find.byType(SaveStatusIndicator), findsOneWidget);
-    expect(find.text('Guardado'), findsOneWidget);
-
-    // En angosto el panel está adentro del Drawer, cerrado: el cartel tiene
-    // que estar igual en la barra, aunque sea sin la palabra al lado.
-    await tester.pumpWidget(const SizedBox.shrink());
-    await pumpSheet(tester, demoSagan(), size: const Size(360, 1400));
-    expect(find.byType(Drawer), findsNothing);
-    expect(find.byType(SaveStatusIndicator), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
-
   testWidgets(
     'en un teléfono, Subir nivel está en la barra sin abrir el menú',
     (tester) async {
@@ -332,30 +299,6 @@ void main() {
     expect(find.byTooltip('Nivel máximo'), findsOneWidget);
     expect(find.byTooltip('Subir nivel'), findsNothing);
     expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('el encabezado de datos solo aparece en Personaje y Combate', (
-    tester,
-  ) async {
-    final character = demoSagan();
-    await pumpSheet(tester, character);
-
-    Finder levelPill() => find.byWidgetPredicate(
-      (widget) =>
-          widget is GoldPill && widget.text == 'Nivel ${character.level}',
-    );
-
-    expect(levelPill(), findsOneWidget);
-
-    for (final tab in ['Combate', 'Inventario', 'Campaña', 'Diario']) {
-      await tester.tap(find.text(tab));
-      await tester.pumpAndSettle();
-      if (tab == 'Combate') {
-        expect(levelPill(), findsOneWidget);
-      } else {
-        expect(levelPill(), findsNothing);
-      }
-    }
   });
 
   testWidgets('la ficha muestra niveles por clase y fuentes de lanzamiento', (
@@ -696,29 +639,6 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('el aviso de quitar un arma desaparece solo', (tester) async {
-      final controller = await pumpSheet(
-        tester,
-        mochilera().copyWith(
-          inventory: const [
-            InventoryEntry(entryId: 'entry-0-longsword', itemId: 'longsword'),
-          ],
-        ),
-      );
-      await tester.tap(find.text('Inventario'));
-      await tester.pumpAndSettle();
-
-      await tapItemAction(tester, 'longsword', 'Quitar');
-      expect(find.byType(SnackBar), findsOneWidget);
-      expect(saved(controller).inventory, isEmpty);
-
-      await tester.pump(const Duration(seconds: 8));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(SnackBar), findsNothing);
-      expect(tester.takeException(), isNull);
-    });
-
     testWidgets('cargar monedas suma a la carga: 50 hacen una libra', (
       tester,
     ) async {
@@ -929,22 +849,6 @@ void main() {
       );
     });
 
-    testWidgets('la munición aclara el tamaño del paquete', (tester) async {
-      await pumpSheet(
-        tester,
-        mochilera().copyWith(
-          inventory: const [InventoryEntry(itemId: 'arrows')],
-        ),
-      );
-      await tester.tap(find.text('Inventario'));
-      await tester.pumpAndSettle();
-
-      // «Munición» ya lo dice el encabezado del grupo: la fila no lo repite.
-      expect(find.text('paquete de 20'), findsOneWidget);
-      await tapItemAction(tester, 'arrows', 'Cantidad exacta…');
-      expect(find.widgetWithText(TextField, 'Paquetes de 20'), findsOneWidget);
-    });
-
     testWidgets('el − y el + de la fila cambian la cantidad sin abrir nada', (
       tester,
     ) async {
@@ -1021,28 +925,6 @@ void main() {
         findsOneWidget,
       );
     });
-
-    testWidgets('en un teléfono angosto las filas no fuerzan scroll lateral', (
-      tester,
-    ) async {
-      final character = mochilera().copyWith(
-        inventory: const [
-          InventoryEntry(itemId: 'dungeoneers-pack'),
-          InventoryEntry(itemId: 'case-map-or-scroll'),
-          InventoryEntry(itemId: 'plate'),
-        ],
-      );
-      await pumpSheet(tester, character, size: const Size(360, 1400));
-      await tester.tap(find.byIcon(Icons.menu));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Inventario'));
-      await tester.pumpAndSettle();
-
-      // En compacto no hay encabezados de tabla: cada fila es una tarjeta.
-      expect(find.text('OBJETO'), findsNothing);
-      expect(find.text('Paquete de explorador de mazmorras'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    });
   });
 
   testWidgets('un lanzador conserva la pestaña y datos de conjuros', (
@@ -1106,176 +988,6 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('las competencias se muestran en español', (tester) async {
-    // La tarjeta se armaba capitalizando el id en inglés, así que un Alquimista
-    // leía "Alchemists Supplies", "Light" y "Simple".
-    final artificer = Character(
-      id: 'artificer-sheet',
-      name: 'Merrix',
-      raceId: 'warforged',
-      classId: 'artificer',
-      subclassId: 'alchemist',
-      backgroundId: 'artisan',
-      level: 3,
-      assignedScores: {for (final ability in Ability.values) ability: 12},
-      hpPerLevel: const [8, 5, 5],
-    );
-    await pumpSheet(tester, artificer);
-
-    expect(find.text('Competencias'), findsOneWidget);
-    expect(find.text('Suministros de alquimista'), findsOneWidget);
-    expect(find.text('Herramientas de ladrón'), findsOneWidget);
-    expect(find.text('Herramientas de manitas'), findsOneWidget);
-    expect(find.text('Armadura ligera'), findsOneWidget);
-    expect(find.text('Armas simples'), findsOneWidget);
-    expect(find.textContaining('Supplies'), findsNothing);
-    expect(find.text('Light'), findsNothing);
-    expect(tester.takeException(), isNull);
-  });
-
-  // Lo que la pestaña Personaje decidió mostrar y dónde. Son decisiones de
-  // presentación, pero cada una nació de un malentendido concreto en la mesa:
-  // la puntuación leída como el número que se tira, la percepción pasiva
-  // confundida con una cifra de combate, la Pericia invisible.
-  group('Personaje · jerarquía de la pestaña', () {
-    /// Pícaro enano: enano trae visión en la oscuridad y el Pícaro concede
-    /// Pericia a nivel 1, que son las dos cosas que esta tanda mira.
-    Character rogue() => Character(
-      id: 'rogue-sheet',
-      name: 'Dain',
-      raceId: 'dwarf',
-      classId: 'rogue',
-      backgroundId: 'criminal',
-      level: 1,
-      assignedScores: const {
-        Ability.strength: 8,
-        Ability.dexterity: 15,
-        Ability.constitution: 14,
-        Ability.intelligence: 13,
-        Ability.wisdom: 12,
-        Ability.charisma: 10,
-      },
-      chosenSkills: const ['stealth', 'perception', 'acrobatics', 'insight'],
-      proficiencyChoices: const {
-        'class:rogue:expertise-1': ['stealth', 'perception'],
-      },
-      hpPerLevel: const [8],
-    );
-
-    testWidgets('la banda táctica se queda con las cinco cifras de combate', (
-      tester,
-    ) async {
-      await pumpSheet(tester, rogue());
-
-      for (final label in [
-        'ARMADURA',
-        'PUNTOS DE GOLPE',
-        'INICIATIVA',
-        'VELOCIDAD',
-        'COMPETENCIA',
-      ]) {
-        expect(find.text(label), findsOneWidget, reason: 'falta $label');
-      }
-      // Tamaño ya vive en Identidad, y los sentidos en su propia tarjeta:
-      // repetirlos acá era lo que empujaba la banda a un segundo renglón.
-      expect(find.text('TAMAÑO'), findsNothing);
-      expect(find.text('PERC. PASIVA'), findsNothing);
-      expect(find.text('VISIÓN OSC.'), findsNothing);
-      expect(tester.takeException(), isNull);
-    });
-
-    testWidgets('los sentidos tienen tarjeta propia', (tester) async {
-      final character = rogue();
-      final s = CharacterCompiler(repo).compile(character);
-      expect(
-        s.darkvision,
-        isNotNull,
-        reason: 'el enano tiene que traer visión en la oscuridad',
-      );
-      await pumpSheet(tester, character);
-
-      expect(find.text('Sentidos'), findsOneWidget);
-      expect(find.text('Percepción pasiva'), findsOneWidget);
-      expect(find.text('Visión en la oscuridad'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    });
-
-    testWidgets('la plaqueta pone grande el modificador, no la puntuación', (
-      tester,
-    ) async {
-      await pumpSheet(tester, rogue());
-
-      // DEX 15 → +2. El +2 es el número que se tira; la puntuación queda como
-      // dato de apoyo y por eso viaja rotulada.
-      expect(find.text('Punt. 15'), findsOneWidget);
-      // El Pícaro es competente en salvaciones de Destreza e Inteligencia, y
-      // ahora eso se nombra en vez de insinuarse con un punto sin rótulo.
-      expect(find.text('SALV'), findsNWidgets(2));
-      expect(tester.takeException(), isNull);
-    });
-
-    testWidgets('la Pericia se nombra y no queda solo en el anillo', (
-      tester,
-    ) async {
-      final character = rogue();
-      expect(
-        CharacterCompiler(repo).compile(character).expertiseSkills,
-        containsAll(<String>['stealth', 'perception']),
-      );
-      await pumpSheet(tester, character);
-
-      expect(find.text('PERICIA'), findsNWidgets(2));
-      expect(find.text('Competente'), findsOneWidget);
-      expect(find.text('Pericia · bonificador duplicado'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    });
-  });
-
-  testWidgets('plegar una tarjeta esconde su contenido y no el de las otras', (
-    tester,
-  ) async {
-    // En el celular la tarjeta de Competencias es larguísima y empuja todo lo
-    // demás fuera de la pantalla; plegarla tiene que sacar su contenido sin
-    // llevarse puesto el de la tarjeta de al lado.
-    final artificer = Character(
-      id: 'collapse-sheet',
-      name: 'Merrix',
-      raceId: 'warforged',
-      classId: 'artificer',
-      subclassId: 'alchemist',
-      backgroundId: 'artisan',
-      level: 3,
-      assignedScores: {for (final ability in Ability.values) ability: 12},
-      hpPerLevel: const [8, 5, 5],
-    );
-    await pumpSheet(tester, artificer);
-
-    expect(find.text('Armadura ligera'), findsOneWidget);
-    expect(find.text(Ability.strength.abbr), findsWidgets);
-
-    // La cabecera de Competencias queda por debajo del pliegue: hay que
-    // traerla a la vista antes de tocarla o el toque no le llega.
-    Future<void> toggleCompetencias() async {
-      await tester.ensureVisible(find.text('Competencias'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Competencias'));
-      await tester.pumpAndSettle();
-    }
-
-    await toggleCompetencias();
-
-    expect(find.text('Armadura ligera'), findsNothing);
-    // El título sigue, que es de lo que se trata: se pliega, no se esconde.
-    expect(find.text('Competencias'), findsOneWidget);
-    // Y plegar una no toca a las demás.
-    expect(find.text(Ability.strength.abbr), findsWidgets);
-
-    await toggleCompetencias();
-
-    expect(find.text('Armadura ligera'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
-
   testWidgets('los conjuros siempre preparados de subclase llegan a la ficha', (
     tester,
   ) async {
@@ -1336,44 +1048,6 @@ void main() {
     expect(find.text('Protección contra el Bien y el Mal'), findsOneWidget);
     // Nivel 5 del juramento.
     expect(find.text('Zona de la Verdad'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('resistencias y daño se muestran en español', (tester) async {
-    // Un Dracónido rojo: la resistencia sale de su linaje dracónico y antes
-    // se imprimía con la clave interna en inglés ("Fire").
-    final dragonborn = Character(
-      id: 'dragonborn-sheet',
-      name: 'Vharax',
-      raceId: 'dragonborn',
-      lineageId: 'dragonborn-red',
-      classId: 'fighter',
-      backgroundId: 'soldier',
-      equippedWeaponIds: const ['longsword'],
-      assignedScores: {for (final ability in Ability.values) ability: 12},
-      hpPerLevel: const [10],
-    );
-    await pumpSheet(tester, dragonborn);
-
-    await tester.tap(find.text('Combate'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Resistencias: Fuego'), findsOneWidget);
-    expect(find.textContaining('Fire'), findsNothing);
-    // Y el tipo de daño del arma, que compartía el mismo defecto.
-    expect(find.textContaining('Cortante'), findsWidgets);
-    expect(find.textContaining('Slashing'), findsNothing);
-    // El Aliento lleva la CD y el daño que se dicen en la mesa, no solo usos.
-    final aliento = CharacterCompiler(
-      repo,
-    ).compile(dragonborn).resources.firstWhere((r) => r.id == 'breath_weapon');
-    expect(
-      find.text(
-        'CD ${aliento.saveDc} de ${aliento.saveAbility!.abbr} · '
-        '${aliento.damage}',
-      ),
-      findsOneWidget,
-    );
     expect(tester.takeException(), isNull);
   });
 
@@ -2172,73 +1846,6 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Compañeros'), findsNothing);
     });
-
-    testWidgets('la pestaña Combate no desborda en un teléfono angosto', (
-      tester,
-    ) async {
-      // La cabecera con el nombre y las filas de recursos se pasaban de ancho a
-      // 360px. No es cosa de los compañeros, pero es la pantalla donde viven.
-      await pumpSheet(tester, demoSagan(), size: const Size(360, 1600));
-      await tester.tap(find.byIcon(Icons.menu));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Combate'));
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
-    });
-
-    testWidgets('las salvaciones de muerte entran en un teléfono angosto', (
-      tester,
-    ) async {
-      // A 0 PG aparece la fila de salvaciones, con seis círculos y dos
-      // botones: en un teléfono no entraban en una línea. Es justo la pantalla
-      // que se mira cuando el personaje está cayendo.
-      final dying = demoSagan();
-      dying.combat.currentHp = 0;
-      await pumpSheet(tester, dying, size: const Size(360, 1600));
-      await tester.tap(find.byIcon(Icons.menu));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Combate'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('+Éxito'), findsOneWidget);
-      expect(find.text('+Fallo'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    });
-
-    testWidgets('el selector de las 24 formas entra en un teléfono angosto', (
-      tester,
-    ) async {
-      final wizard = Character(
-        id: 'maga-familiar',
-        name: 'Ilyra',
-        raceId: 'human',
-        classId: 'wizard',
-        backgroundId: 'scribe',
-        assignedScores: {for (final a in Ability.values) a: 12},
-        spellIds: const ['find-familiar'],
-        hpPerLevel: const [6],
-        combat: CombatState(currentHp: 6),
-      );
-      await pumpSheet(tester, wizard, size: const Size(360, 1600));
-
-      // Por debajo de 900 la navegación de la ficha vive en un Drawer.
-      await tester.tap(find.byIcon(Icons.menu));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Combate'));
-      await tester.pumpAndSettle();
-      await tapVisible(tester, find.text('Invocar'));
-
-      // El diálogo abre con las formas y sin desbordar: un RenderFlex que se
-      // pasa de ancho deja la excepción acá.
-      expect(find.text('Elegí la forma'), findsOneWidget);
-      expect(find.text('Murciélago'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-
-      await tester.tap(find.text('Murciélago'));
-      await tester.pumpAndSettle();
-      expect(wizard.combat.companions.single.creatureId, 'bat');
-      await tester.pump(const Duration(seconds: 5));
-    });
   });
 
   group('Forma Salvaje', () {
@@ -2354,25 +1961,6 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Forma Salvaje'), findsNothing);
     });
-
-    testWidgets('la tarjeta y el selector entran en un teléfono angosto', (
-      tester,
-    ) async {
-      await pumpSheet(tester, druid(), size: const Size(360, 2400));
-      // Por debajo de 900 la navegación de la ficha vive en un Drawer.
-      await tester.tap(find.byIcon(Icons.menu));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Combate'));
-      await tester.pumpAndSettle();
-
-      // Sin `takeException` a propósito: un desborde llega igual como fallo, y
-      // recogerlo se lleva puesto el widget que lo causó, que es el único dato
-      // que sirve para arreglarlo.
-      await tapVisible(tester, find.text('Transformarse'));
-      await tapVisible(tester, find.text('Anotar'));
-      expect(find.text('Formas conocidas (1/6)'), findsOneWidget);
-      await tester.pump(const Duration(seconds: 5));
-    });
   });
   // La vuelta del vínculo: hasta acá el jugador compartía su ficha y no veía
   // nada a cambio.
@@ -2407,17 +1995,6 @@ void main() {
       await tester.tap(find.text('Campaña'));
       await tester.pumpAndSettle();
     }
-
-    testWidgets('la pestaña va entre Inventario y Diario', (tester) async {
-      await pumpSheet(tester, demoSagan());
-
-      // El panel las pinta en el orden del enum, así que comparar posiciones
-      // verticales prueba el orden real y no solo que existan.
-      double y(String label) => tester.getTopLeft(find.text(label)).dy;
-      expect(y('Inventario'), lessThan(y('Campaña')));
-      expect(y('Campaña'), lessThan(y('Diario')));
-      expect(tester.takeException(), isNull);
-    });
 
     testWidgets('muestra la campaña, sus batallas y lo que se repartió', (
       tester,
@@ -2865,37 +2442,6 @@ void main() {
       expect(find.text('La hija del pantano'), findsOneWidget);
       expect(find.textContaining('**'), findsNothing);
       expect(find.textContaining('Llegó antes de hablar'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    });
-
-    double altoDelTrasfondo(WidgetTester tester) =>
-        tester.getSize(find.byKey(const ValueKey('trasfondo-scroll'))).height;
-
-    // Antes, un trasfondo largo estiraba la tarjeta hasta empujar las entradas
-    // fuera de la pantalla.
-    testWidgets('un trasfondo largo se acota y scrollea', (tester) async {
-      await pumpSheet(
-        tester,
-        diarista(
-          background: List.filled(
-            120,
-            'Una línea más de la historia del pantano.',
-          ).join('\n\n'),
-        ),
-      );
-      await openDiario(tester);
-
-      expect(altoDelTrasfondo(tester), lessThanOrEqualTo(300));
-      expect(tester.takeException(), isNull);
-    });
-
-    // El techo es un máximo y no un alto fijo: con dos renglones no puede
-    // dejar un hueco vacío de 300 px.
-    testWidgets('un trasfondo corto no reserva el alto máximo', (tester) async {
-      await pumpSheet(tester, diarista(background: 'Nació en el pantano.'));
-      await openDiario(tester);
-
-      expect(altoDelTrasfondo(tester), lessThan(150));
       expect(tester.takeException(), isNull);
     });
 

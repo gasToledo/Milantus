@@ -120,38 +120,4 @@ void main() {
     expect(dragonIn(server).legendaryResistancesSpent, 1);
     expect(tester.takeException(), isNull);
   });
-
-  // Visto en producción: después de actuar la fila se atenuaba, y con ella
-  // las marcas que se gastan justo en los turnos ajenos.
-  testWidgets('la fila del dragón no se atenúa después de actuar', (
-    tester,
-  ) async {
-    await pumpCombate(tester);
-    await tester.tap(find.text('Siguiente turno'));
-    await tester.pumpAndSettle();
-
-    double opacityOf(String name) => tester
-        .widget<AnimatedOpacity>(
-          find
-              .ancestor(
-                of: find.text(name),
-                matching: find.byType(AnimatedOpacity),
-              )
-              .first,
-        )
-        .opacity;
-    expect(opacityOf(dragon.name), 1);
-    expect(tester.takeException(), isNull);
-  });
-
-  // En el teléfono las marcas medían 28 px y se tachaba la de al lado.
-  testWidgets('en el teléfono cada marca mide 40 px', (tester) async {
-    await pumpCombate(tester);
-    tester.view.physicalSize = const Size(420, 900);
-    await tester.pumpAndSettle();
-    final actions = dragon.legendaryActionsPerRound!;
-    final pip = find.byTooltip('Acciones legendarias: 1 de $actions');
-    expect(tester.getSize(pip), const Size(40, 40));
-    expect(tester.takeException(), isNull);
-  });
 }

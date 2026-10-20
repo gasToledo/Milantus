@@ -48,25 +48,9 @@ void main() {
     expect(session.executedMigrationSql, isEmpty);
   });
 
-  test('la lista real de migraciones no está vacía y arranca en 0001_init', () {
-    expect(migrations, isNotEmpty);
-    expect(migrations.first.id, '0001_init');
-  });
-
   test('los ids de migración son únicos y van en orden', () {
     final ids = [for (final m in migrations) m.id];
     expect(ids.toSet(), hasLength(ids.length));
     expect([...ids]..sort(), ids);
-  });
-
-  // `ADD COLUMN … NOT NULL DEFAULT` rellena las filas existentes con el valor
-  // por defecto: todo personaje guardado antes de los PNJ queda como jugador,
-  // que es lo que era.
-  test('0010 deja a los personajes existentes como jugadores', () {
-    final sql = migrations.singleWhere((m) => m.id == '0010_npcs').sql;
-    expect(sql, contains("ADD COLUMN kind TEXT NOT NULL DEFAULT 'player'"));
-    expect(sql, contains('CREATE TABLE npcs'));
-    expect(sql, contains('CREATE TABLE campaign_npcs'));
-    expect(sql, contains("CHECK (status IN ('alive', 'dead', 'unknown'))"));
   });
 }

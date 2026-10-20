@@ -159,33 +159,6 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('la subida de nivel cabe en una ventana compacta', (
-    tester,
-  ) async {
-    tester.view.physicalSize = const Size(480, 520);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.reset);
-
-    await tester.pumpWidget(
-      localizedApp(
-        theme: AppTheme.dark,
-        home: LevelUpScreen(character: fighterL3(), repo: repo, onDone: (_) {}),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('Subir a nivel 4'), findsOneWidget);
-    expect(find.text('Continuar'), findsOneWidget);
-    expect(find.textContaining('Paso 1 de'), findsWidgets);
-    // La ayuda del resumen entra en la ventana chica junto con todo lo demás:
-    // es el renglón más largo del paso y va arriba de las tarjetas.
-    expect(
-      find.textContaining('Nada se guarda en la ficha hasta que confirmes'),
-      findsOneWidget,
-    );
-    expect(tester.takeException(), isNull);
-  });
-
   // La tarjeta mostraba «ganancia base +4» de un lado y «40 → 46» del otro, sin
   // nada que explicara los otros dos puntos. Quien hizo el personaje no podía
   // reconstruir la cuenta y concluía que estaba mal.

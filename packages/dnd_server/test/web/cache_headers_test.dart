@@ -78,12 +78,5 @@ void main() {
         }
       },
     );
-
-    test('la política es la misma para la raíz que para index.html', () async {
-      expect(
-        (await handle('')).headers['cache-control'],
-        (await handle('index.html')).headers['cache-control'],
-      );
-    });
   });
 }

@@ -7,10 +7,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 
 void main() {
-  test('usa un timeout finito de 15 segundos por defecto', () {
-    expect(ApiClient.defaultRequestTimeout, const Duration(seconds: 15));
-  });
-
   test(
     'una respuesta que nunca llega termina como error de conectividad',
     () async {

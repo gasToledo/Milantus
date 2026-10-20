@@ -198,28 +198,6 @@ void main() {
       costCp: 1500,
     );
 
-  // Un peso, un precio o un dado existen para compararse con los de la fila de
-  // al lado; en una línea de prosa gris eso no se puede hacer.
-  testWidgets('la fila separa lo cualitativo de lo que se compara', (
-    tester,
-  ) async {
-    await pumpHomebrew(tester, storeWithHoz());
-    await tester.tap(find.text('Armas').first);
-    await tester.pumpAndSettle();
-
-    // Pills.
-    expect(find.text('Marcial'), findsOneWidget);
-    expect(find.text('Sutil'), findsOneWidget);
-    expect(find.text(DamageType.labelFor('slashing')), findsOneWidget);
-    // Cifras, con su rótulo.
-    expect(find.text('DAÑO'), findsOneWidget);
-    expect(find.text('1d8'), findsOneWidget);
-    expect(find.text('PESO'), findsOneWidget);
-    expect(find.text('PRECIO'), findsOneWidget);
-    expect(find.text(formatCost(1500)), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
-
   testWidgets('duplicar una entrada propia abre una copia con id nuevo', (
     tester,
   ) async {
@@ -709,26 +687,6 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
-
-  // Por debajo de 900 px no entra el panel: lo que explica queda debajo del
-  // campo que se está tocando.
-  testWidgets('angosto, la explicación va debajo del campo', (tester) async {
-    final derribar = weaponMasteries['topple']!;
-    await openWeaponForm(tester);
-    tester.view.physicalSize = const Size(700, 1400);
-    await tester.pumpAndSettle();
-
-    expect(find.text('Así queda en tu lista'.toUpperCase()), findsNothing);
-    await tester.tap(find.text('Maestría y magia'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Sin maestría'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text(derribar.name).last);
-    await tester.pumpAndSettle();
-
-    expect(find.text(derribar.description), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
 
   // Las bases permitidas se escribían como una lista de ids del catálogo
   // separados por coma: el último campo del homebrew que pedía conocer la

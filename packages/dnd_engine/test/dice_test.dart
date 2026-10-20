@@ -4,10 +4,6 @@ import 'package:dnd_engine/dnd_engine.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('array estándar es el oficial', () {
-    expect(standardArray, [15, 14, 13, 12, 10, 8]);
-  });
-
   test('promedio de dado de golpe (redondeo hacia arriba)', () {
     expect(averageHitDie(6), 4);
     expect(averageHitDie(8), 5);
@@ -37,14 +33,6 @@ void main() {
   });
 
   group('compra de puntos', () {
-    test('la tabla de costes es la del capítulo 2', () {
-      expect(pointBuyBudget, 27);
-      expect(pointBuyMin, 8);
-      expect(pointBuyMax, 15);
-      expect(pointBuyCosts,
-          {8: 0, 9: 1, 10: 2, 11: 3, 12: 4, 13: 5, 14: 7, 15: 9});
-    });
-
     test('los dos últimos escalones cuestan doble', () {
       // Lo que hace no lineal a la tabla: de 12 a 13 cuesta 1, de 13 a 14
       // cuesta 2. Es la regla que desalienta concentrar todo en una sola.

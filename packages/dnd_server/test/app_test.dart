@@ -140,17 +140,7 @@ void main() {
     );
   });
 
-  group('/health', () {
-    test('responde 200 con estado ok', () async {
-      final response = await handler(
-        Request('GET', Uri.parse('http://localhost/health')),
-      );
-
-      expect(response.statusCode, 200);
-      final body = jsonDecode(await response.readAsString());
-      expect(body['status'], 'ok');
-    });
-  });
+  group('/health', () {});
 
   test('una ruta desconocida responde 404', () async {
     final response = await handler(

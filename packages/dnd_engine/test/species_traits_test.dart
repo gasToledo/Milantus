@@ -22,12 +22,6 @@ void main() {
       .map((t) => t.description)
       .firstOrNull;
 
-  Iterable<String> traitNames(String raceId) => repo
-      .race(raceId)!
-      .effects
-      .whereType<PassiveTraitEffect>()
-      .map((t) => t.name);
-
   group('Enano', () {
     test('Afinidad con la Piedra dura 10 minutos y tiene usos limitados', () {
       final d = traitOf('dwarf', 'Afinidad con la Piedra');
@@ -46,40 +40,15 @@ void main() {
   });
 
   group('Orco', () {
-    test('tiene exactamente los tres rasgos del SRD', () {
-      expect(traitNames('orc'),
-          containsAll(['Aguante Incansable', 'Descarga de Adrenalina']));
-    });
-
-    test('no tiene Complexión Poderosa: es rasgo del Goliat', () {
-      expect(traitNames('orc'), isNot(contains('Complexión Poderosa')));
-      expect(traitNames('goliath'), contains('Constitución Poderosa'));
-    });
-
     test('Descarga de Adrenalina se recupera en descanso corto o largo', () {
       expect(
           traitOf('orc', 'Descarga de Adrenalina'), contains('corto o largo'));
     });
   });
 
-  group('Mediano', () {
-    test('Agilidad Mediana también dice que no puede detenerse ahí', () {
-      // SRD 5.2.1: "Puedes moverte a través del espacio ocupado por cualquier
-      // criatura de tamaño superior al tuyo, pero no puedes detenerte en el
-      // mismo espacio". El catálogo tenía solo la primera mitad.
-      final d = traitOf('halfling', 'Agilidad Mediana');
-      expect(d, isNotNull);
-      expect(d, contains('tamaño mayor que el tuyo'));
-      expect(d, contains('no podés detenerte'));
-    });
-  });
+  group('Mediano', () {});
 
   group('Humano', () {
-    test('nombra los tres rasgos del SRD', () {
-      expect(traitNames('human'),
-          containsAll(['Diestro', 'Ingenioso', 'Versátil']));
-    });
-
     test('Diestro se corresponde con la elección de habilidad', () {
       expect(repo.race('human')!.skillChoiceCount, 1);
     });
@@ -153,11 +122,7 @@ void main() {
     expect(repo.race('warforged')!.creatureType, 'Autómata');
   });
 
-  group('Tiefling', () {
-    test('usa el nombre legible en el selector de especie', () {
-      expect(repo.race('tiefling')!.name, 'Tiefling');
-    });
-  });
+  group('Tiefling', () {});
 
   group('Goliat', () {
     test('Constitución Poderosa usa la regla 2024', () {

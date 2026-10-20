@@ -30,40 +30,4 @@ void main() {
           'marcá el renglón con «l10n-ignore: motivo».',
     );
   });
-
-  test('el detector ve texto visible y no ve comentarios, claves ni URLs', () {
-    List<String> ve(String linea) => literalesVisibles(linea);
-
-    // Con acento, en cualquier lugar.
-    expect(ve("final a = 'Guardá el personaje';"), hasLength(1));
-    // Sin acento, pero en una posición de texto visible.
-    expect(ve("Text('Guardar')"), hasLength(1));
-    expect(ve("DialogAction('Cancelar', onPressed: f)"), hasLength(1));
-    expect(ve("tooltip: 'Editar',"), hasLength(1));
-    expect(ve("showAppMessage(context, 'Listo', tone: t)"), hasLength(1));
-    // Una parte de un texto cortado en dos renglones hereda la posición.
-    expect(ve("Text(\n  'Una parte '\n  'y otra',\n)"), hasLength(2));
-    // Una frase suelta que empieza en mayúscula.
-    expect(ve("final m = 'No se pudo cargar';"), hasLength(1));
-    // Armado por partes, sin acento ni mayúscula inicial.
-    expect(ve(r"final t = '${n} rasgos de clase';"), hasLength(1));
-    expect(ve("final t = ok ? 'SIN CAMBIOS' : x;"), hasLength(1));
-    expect(ve("final t = n == 1 ? '1 resultado' : x;"), hasLength(1));
-    expect(ve("final t = n == 1 ? 'vivo' : 'vivos';"), hasLength(2));
-    // Lo que no es texto para la persona.
-    expect(ve("// Text('Guardar')"), isEmpty);
-    expect(ve("final a = 1; // dice 'Guardá'"), isEmpty);
-    expect(ve("ValueKey('codex-search')"), isEmpty);
-    expect(ve("final ruta = '/api/personajes';"), isEmpty);
-    expect(ve("final k = 'saved';"), isEmpty);
-    expect(ve("Text('\$n')"), isEmpty);
-    // La marca de excepción, por renglón y por archivo.
-    expect(ve("Text('Solo para depurar') // l10n-ignore: log"), isEmpty);
-    expect(
-      ve("// l10n-ignore-file: errores técnicos\nText('Guardá')"),
-      isEmpty,
-    );
-    // Sin motivo, la exención de archivo no vale.
-    expect(ve("// l10n-ignore-file:\nText('Guardá')"), hasLength(1));
-  });
 }

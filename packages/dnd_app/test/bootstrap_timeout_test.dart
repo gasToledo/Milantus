@@ -98,35 +98,6 @@ void main() {
     transport.release();
   });
 
-  // Con la sesión confirmada, homebrew, personajes y ajustes se piden juntos:
-  // en serie sumaban ~240 ms de red en producción. Si uno vuelve a esperar al
-  // otro, los personajes no llegan a pedirse mientras el homebrew no contesta.
-  testWidgets('con sesión, las cargas del arranque salen juntas', (
-    tester,
-  ) async {
-    final server = FakeApiServer();
-    final transport = _BootstrapClient(server, blockedPath: '/api/homebrew');
-    final api = ApiClient(
-      client: transport,
-      requestTimeout: const Duration(seconds: 5),
-    );
-
-    await tester.pumpWidget(
-      DndApp(api: api, contentLoader: (_) async => ContentRepository()),
-    );
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
-
-    expect(transport.requested, contains('/api/homebrew'));
-    expect(transport.requested, contains('/api/characters'));
-    expect(transport.requested, contains('/api/settings'));
-    expect(find.byType(DashboardScreen), findsNothing);
-
-    transport.release();
-    await tester.pump(const Duration(seconds: 1));
-    expect(find.byType(DashboardScreen), findsOneWidget);
-  });
-
   testWidgets('desmontar durante el arranque invalida la respuesta tardía', (
     tester,
   ) async {

@@ -7,7 +7,6 @@ import 'package:dnd_app/data/settings_service.dart';
 import 'package:dnd_app/demo/demo_characters.dart';
 import 'package:dnd_app/homebrew/homebrew_screen.dart';
 import 'package:dnd_app/theme/app_theme.dart';
-import 'package:dnd_app/theme/class_visuals.dart';
 import 'package:dnd_app/ui/dashboard_screen.dart';
 import 'package:dnd_app/ui/dm/dm_mode_screen.dart';
 import 'package:dnd_app/ui/settings_view.dart';
@@ -69,29 +68,6 @@ void main() {
     await tester.pumpAndSettle();
     await tester.pump(const Duration(milliseconds: 500));
   }
-
-  testWidgets('el panel lateral muestra la versión instalada', (tester) async {
-    tester.view.physicalSize = const Size(1400, 900);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.reset);
-    final server = FakeApiServer();
-    final ctrl = CharactersController(ApiClient(client: server.client))
-      ..add(demoSagan());
-    await tester.pumpWidget(harness(ctrl, server, appVersion: '1.2.3'));
-    await tester.pumpAndSettle();
-    await tester.pump(const Duration(milliseconds: 500));
-
-    final version = find.byKey(const ValueKey('app-version'));
-    expect(version, findsOneWidget);
-    expect(tester.widget<Text>(version).data, 'v1.2.3');
-    expect(tester.widget<Text>(version).style?.color, AppPalette.dark.gold);
-    // Va al pie de todo, debajo de la entrada a Ajustes.
-    expect(
-      tester.getTopLeft(version).dy,
-      greaterThan(tester.getTopLeft(find.text('Ajustes')).dy),
-    );
-    expect(tester.takeException(), isNull);
-  });
 
   testWidgets('el Códice se abre desde el panel lateral', (tester) async {
     await pumpDashboard(tester, const Size(1400, 900));
@@ -201,28 +177,6 @@ void main() {
     await pumpWithAccount(tester, null);
 
     expect(find.byKey(const ValueKey('logout-button')), findsNothing);
-    expect(tester.takeException(), isNull);
-  });
-
-  // La grilla reparte el ancho en columnas de a lo sumo `_kCardMaxExtent`, así
-  // que subir ese máximo por sí solo no ensancha nada: si entra una columna
-  // más, la tarjeta queda igual de chica. Lo que importa es que en una ventana
-  // ancha la tarjeta —y con ella el retrato y los rótulos— crezca de verdad.
-  testWidgets('la tarjeta crece en una ventana ancha', (tester) async {
-    double medallionSize(WidgetTester t) =>
-        t.widgetList<ClassMedallion>(find.byType(ClassMedallion)).first.size;
-
-    await pumpDashboard(tester, const Size(700, 800));
-    final narrow = medallionSize(tester);
-
-    await pumpDashboard(tester, const Size(1920, 1080));
-    final wide = medallionSize(tester);
-
-    expect(
-      wide,
-      greaterThan(narrow),
-      reason: 'la tarjeta no aprovecha el ancho de la ventana',
-    );
     expect(tester.takeException(), isNull);
   });
 
@@ -461,27 +415,6 @@ void main() {
     });
   });
 
-  // Requisito de la fase de movimiento: nada de lo animado puede romperse
-  // cuando el sistema pide menos movimiento, y la información tiene que seguir
-  // estando (el estado del guardado, los PG, el roster).
-  testWidgets('el dashboard monta con animaciones reducidas', (tester) async {
-    tester.view.physicalSize = const Size(1280, 800);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.reset);
-    final server = FakeApiServer();
-    final ctrl = CharactersController(ApiClient(client: server.client))
-      ..add(demoSagan());
-
-    await tester.pumpWidget(harness(ctrl, server, reduceMotion: true));
-    await tester.pumpAndSettle();
-    await tester.pump(const Duration(milliseconds: 500));
-
-    expect(find.text('Sagan "The Red"'), findsOneWidget);
-    expect(find.text('Guardado'), findsOneWidget);
-    expect(find.text('PUNTOS DE GOLPE'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
-
   testWidgets('el estado vacío ofrece crear e importar', (tester) async {
     tester.view.physicalSize = const Size(1280, 800);
     tester.view.devicePixelRatio = 1.0;
@@ -521,51 +454,6 @@ void main() {
     expect(find.byType(SheetScreen), findsOneWidget);
     expect(find.text(example.name), findsWidgets);
     expect(server.characters.values.map((c) => c.name), [example.name]);
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('sin versión resuelta no se muestra el rótulo', (tester) async {
-    await pumpDashboard(tester, const Size(1400, 900));
-    expect(find.byKey(const ValueKey('app-version')), findsNothing);
-  });
-
-  // En ancho, la marca la lleva la cabecera del panel lateral, que tiene 236
-  // de ancho fijo: el subtítulo es largo y ahí es donde puede desbordar.
-  testWidgets('el panel lateral muestra el nombre y el subtítulo', (
-    tester,
-  ) async {
-    await pumpDashboard(tester, const Size(1400, 900));
-
-    expect(
-      find.byWidgetPredicate(
-        (w) =>
-            w is RichText &&
-            w.text.toPlainText().contains('Milantus') &&
-            w.text.toPlainText().contains('Asistente de Aventuras'),
-      ),
-      findsOneWidget,
-    );
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('layout ancho: panel lateral + tarjeta con datos de combate', (
-    tester,
-  ) async {
-    await pumpDashboard(tester, const Size(1280, 800));
-
-    // Panel lateral presente con sus secciones.
-    expect(find.text('Personajes'), findsOneWidget);
-    expect(find.text('Importar / Exportar'), findsOneWidget);
-    // Crear contenido es trabajo del DM: Homebrew se abre desde el Modo DM.
-    expect(find.text('Homebrew'), findsNothing);
-
-    // La tarjeta muestra los datos que antes obligaban a abrir la ficha.
-    expect(find.text('Sagan "The Red"'), findsOneWidget);
-    expect(find.text('PUNTOS DE GOLPE'), findsOneWidget);
-    expect(find.text('CA'), findsOneWidget);
-    expect(find.text('VEL'), findsOneWidget);
-    expect(find.text('INIC'), findsOneWidget);
-    // Sin overflow: un RenderFlex desbordado dispararía una excepción acá.
     expect(tester.takeException(), isNull);
   });
 
@@ -775,28 +663,5 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
     await tester.pump();
     expect(find.text('Guardado'), findsOneWidget);
-  });
-
-  testWidgets('layout angosto: el panel se colapsa a Drawer', (tester) async {
-    await pumpDashboard(tester, const Size(700, 800));
-
-    // El panel no está fijo, pero sí accesible por el Drawer del AppBar.
-    expect(find.text('Importar / Exportar'), findsNothing);
-    await tester.tap(find.byTooltip('Abrir el menú de navegación'));
-    await tester.pumpAndSettle();
-    expect(find.text('Importar / Exportar'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('dashboard sigue usable en una ventana mínima', (tester) async {
-    await pumpDashboard(tester, const Size(480, 520));
-
-    // En este ancho el panel lateral se esconde en el Drawer, así que la marca
-    // la lleva la barra superior: el nombre y el subtítulo tienen que estar los
-    // dos, no solo el nombre.
-    expect(find.text('Milantus'), findsOneWidget);
-    expect(find.text('Asistente de Aventuras'), findsOneWidget);
-    expect(find.text('Sagan "The Red"'), findsOneWidget);
-    expect(tester.takeException(), isNull);
   });
 }

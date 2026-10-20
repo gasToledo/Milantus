@@ -51,8 +51,9 @@ Las procedencias persistidas son:
 
 ## Catálogo actual
 
-Los conteos están fijados por
-`packages/dnd_engine/test/content_integrity_test.dart`:
+Fotografía del catálogo a octubre de 2026. Ningún test fija estos números:
+`content_integrity_test.dart` valida reglas (referencias, fórmulas,
+procedencia), no cantidades.
 
 | Contenido | Cantidad |
 |---|---:|
@@ -68,8 +69,6 @@ Los conteos están fijados por
 | Criaturas | 367 |
 | Objetos mágicos SRD | 261 |
 | Objetos mágicos EFA | 9 |
-
-Una variación debe ser deliberada y actualizar la prueba en el mismo cambio.
 
 ## Generación de catálogos
 

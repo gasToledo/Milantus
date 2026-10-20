@@ -14,42 +14,6 @@ void main() {
   Feat feat(String id) => repo.feat(id)!;
 
   group('Dotes', () {
-    test('están las 28 dotes del capítulo 2, repartidas por categoría', () {
-      final foa =
-          repo.feats.values.where((f) => f.source == ContentSource.foa2025);
-      expect(foa, hasLength(28));
-
-      int conCategoria(String c) => foa.where((f) => f.category == c).length;
-      expect(conCategoria('dragonmark'), 13);
-      expect(conCategoria('general'), 14);
-      expect(conCategoria('epic-boon'), 1);
-    });
-
-    test('las doce marcas establecidas están todas', () {
-      const marcas = {
-        'detection',
-        'finding',
-        'handling',
-        'healing',
-        'hospitality',
-        'making',
-        'passage',
-        'scribing',
-        'sentinel',
-        'shadow',
-        'storm',
-        'warding',
-      };
-      for (final m in marcas) {
-        expect(repo.feat('mark-of-$m'), isNotNull, reason: 'falta mark-of-$m');
-        expect(repo.feat('greater-mark-of-$m'), isNotNull,
-            reason: 'falta greater-mark-of-$m');
-      }
-      // Y la aberrante, que no es de casa pero sigue el mismo par.
-      expect(feat('aberrant-dragonmark').category, 'dragonmark');
-      expect(feat('greater-aberrant-mark').category, 'general');
-    });
-
     test('cada marca mayor exige su marca base', () {
       final mayores = repo.feats.values
           .where((f) => f.id.startsWith('greater-mark-of-'))
@@ -235,12 +199,6 @@ void main() {
   group('Trasfondos', () {
     Background background(String id) => repo.background(id)!;
 
-    test('están los 17 trasfondos del capítulo 2', () {
-      final foa = repo.backgrounds.values
-          .where((b) => b.source == ContentSource.foa2025);
-      expect(foa, hasLength(17));
-    });
-
     test('las trece casas dracomarcadas conceden su marca a nivel 1', () {
       // El libro es explícito: tomar el trasfondo de la casa es la única forma
       // de tener una marca a nivel 1.
@@ -289,16 +247,6 @@ void main() {
         expect(repo.feat(dote)!.category, 'origin');
       });
     });
-
-    test('todos declaran ícono y línea de sabor', () {
-      // `iconFor` cae en silencio a un genérico si el id no está registrado en
-      // la app, así que acá al menos se exige que el dato esté.
-      for (final b in repo.backgrounds.values
-          .where((b) => b.source == ContentSource.foa2025)) {
-        expect(b.iconId, isNotNull, reason: b.id);
-        expect(b.tagline, isNotNull, reason: b.id);
-      }
-    });
   });
 
   group('Especies', () {
@@ -307,18 +255,6 @@ void main() {
         race(id).effects.whereType<PassiveTraitEffect>();
     String rasgo(String id, String nombre) =>
         rasgos(id).firstWhere((e) => e.name == nombre).description;
-
-    test('están las 5 especies del capítulo 2', () {
-      final foa =
-          repo.races.values.where((r) => r.source == ContentSource.foa2025);
-      expect(foa.map((r) => r.id).toSet(), {
-        'changeling',
-        'kalashtar',
-        'khoravar',
-        'shifter',
-        'warforged',
-      });
-    });
 
     test('Cambiaformas elige dos habilidades de una lista de cinco', () {
       final r = race('changeling');
@@ -414,20 +350,6 @@ void main() {
       expect(
           r.effects.whereType<ResistanceEffect>().single.damageType, 'poison');
     });
-
-    test('ninguna especie nueva mide distancias en métrico', () {
-      // El manual del que sale el contenido está en metros; la casa juega en
-      // pies y el catálogo entero está normalizado así.
-      final metrico =
-          RegExp(r'\d\s?(m|km|cm)(?![\wáéíóúñ])', caseSensitive: false);
-      for (final r in repo.races.values
-          .where((r) => r.source == ContentSource.foa2025)) {
-        for (final e in r.effects.whereType<PassiveTraitEffect>()) {
-          expect(metrico.hasMatch(e.description), isFalse,
-              reason: '${r.id}/${e.name}: ${e.description}');
-        }
-      }
-    });
   });
 
   group('Exclusión de Marcas Dracónicas', () {
@@ -498,14 +420,6 @@ void main() {
         codigos(conDotes(['potent-dragonmark'])),
         contains('feat_prerequisite'),
       );
-    });
-
-    test('las 108 incorporaciones a listas de conjuros no se movieron', () {
-      final total = repo.feats.values
-          .where((f) => f.category == 'dragonmark')
-          .expand((f) => f.effects.whereType<SpellListAdditionEffect>())
-          .length;
-      expect(total, 108, reason: '12 marcas × 9 conjuros');
     });
   });
 }

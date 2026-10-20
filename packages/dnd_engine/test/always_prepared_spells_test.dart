@@ -40,28 +40,6 @@ void main() {
     }
   }
 
-  test('las 24 subclases con tabla la tienen cargada', () {
-    final conTabla = tablas().map((t) => t.sub.id).toSet();
-    // 19 del PHB 2024 más las 5 del Artífice. El Círculo de la Tierra queda
-    // fuera a propósito y **sigue quedando fuera**: sus cuatro tablas dependen
-    // del terreno elegido, así que viven en las dotes `druid-land` y no en los
-    // rasgos de la subclase (ver `circle_land_test.dart`). La aserción se
-    // conserva como guarda: si alguien vuelve a meter la tabla acá, se rompe.
-    expect(conTabla, hasLength(24));
-    expect(conTabla, isNot(contains('circle-land')));
-    // Las que el manual deja sin *tabla* siguen sin tabla. Ojo: no tener tabla
-    // no es lo mismo que no conceder ningún conjuro siempre preparado. El
-    // Círculo de las Estrellas (Guía y Saeta Guía) y el Abjurador
-    // (Contrahechizo y Disipar Magia) conceden un par fijo desde un rasgo
-    // suelto, que no es una tabla por tramos y por eso `tablas()` no lo ve.
-    expect(conTabla, isNot(contains('circle-stars')));
-    expect(conTabla, isNot(contains('wild-magic-sorcery')));
-    expect(conTabla, isNot(contains('hunter')));
-    for (final id in ['abjurer', 'diviner', 'evoker', 'illusionist']) {
-      expect(conTabla, isNot(contains(id)), reason: 'el Mago no tiene tabla');
-    }
-  });
-
   test('los conjuros sueltos, fuera de tabla, también se conceden', () {
     // Contraparte del test de arriba: estos rasgos declaran un par fijo de
     // conjuros junto a un passiveTrait, así que no son "tabla" pero el jugador

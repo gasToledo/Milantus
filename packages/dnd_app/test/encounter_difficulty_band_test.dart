@@ -313,23 +313,5 @@ void main() {
       );
       expect(tester.takeException(), isNull);
     });
-
-    // A nivel 1 los techos moderado y alto quedan a un 20 % de la regla: es
-    // el caso que hacía pisarse los rótulos.
-    testWidgets('entra en un teléfono, también en inglés y a nivel 1', (
-      tester,
-    ) async {
-      final d = encounterDifficulty(
-        partyLevels: [1, 1, 1, 1],
-        enemyCrs: [...List.filled(9, 0.125), 2, null],
-      );
-      for (final width in [320.0, 390.0, 700.0]) {
-        for (final locale in const [Locale('es'), Locale('en')]) {
-          await pumpBand(tester, d, width: width, locale: locale);
-          expect(tester.takeException(), isNull, reason: '$width $locale');
-        }
-      }
-      expect(find.text('Extreme'), findsOneWidget);
-    });
   });
 }

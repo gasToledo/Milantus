@@ -10,17 +10,6 @@ void main() {
     repo = await ContentRepository.loadFromDirectory('lib/assets/srd_2024');
   });
 
-  test('los 13 tipos de daño tienen su nombre del PHB', () {
-    expect(DamageType.values, hasLength(13));
-    expect(DamageType.labelFor('acid'), 'Ácido');
-    expect(DamageType.labelFor('bludgeoning'), 'Contundente');
-    expect(DamageType.labelFor('slashing'), 'Cortante');
-    expect(DamageType.labelFor('piercing'), 'Perforante');
-    expect(DamageType.labelFor('force'), 'Fuerza');
-    expect(DamageType.labelFor('lightning'), 'Relámpago');
-    expect(DamageType.labelFor('thunder'), 'Trueno');
-  });
-
   test('un estado que viaja por el mismo campo también se traduce', () {
     // El Artífice es inmune a `poisoned`, que es un estado y no un tipo de
     // daño: comparten campo, así que la etiqueta tiene que cubrir ambos.

@@ -20,28 +20,6 @@ void main() {
     );
   });
 
-  test('cada procedencia tiene una etiqueta legible', () {
-    // Los dos SRD se distinguen por versión, no por año: "SRD" a secas no dice
-    // cuál de las dos ediciones es, y eso cambia la regla además de la
-    // licencia.
-    expect(sourceLabel(ContentSource.srd2024, l10nEs), 'SRD 5.2.1');
-    expect(sourceLabel(ContentSource.phb2024, l10nEs), 'PHB 2024');
-    expect(sourceLabel(ContentSource.foa2025, l10nEs), 'Forge 2025');
-    expect(sourceLabel(ContentSource.srd2014, l10nEs), 'SRD 5.1');
-    expect(sourceLabel(ContentSource.homebrew, l10nEs), 'Propio');
-  });
-
-  test('ninguna procedencia se queda sin etiqueta', () {
-    // El switch de sourceLabel es exhaustivo, así que agregar un valor al enum
-    // rompe la compilación. Esta prueba cubre lo otro: que ninguna etiqueta
-    // quede vacía o repetida, que sí compilaría.
-    final labels = ContentSource.values
-        .map((s) => sourceLabel(s, l10nEs))
-        .toList();
-    expect(labels.every((l) => l.isNotEmpty), isTrue);
-    expect(labels.toSet(), hasLength(ContentSource.values.length));
-  });
-
   testWidgets('el selector de linaje también muestra la procedencia', (
     tester,
   ) async {

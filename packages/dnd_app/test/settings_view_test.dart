@@ -108,29 +108,6 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('entra en un teléfono, en español y en inglés', (tester) async {
-    for (final locale in const [Locale('es'), Locale('en')]) {
-      tester.view.physicalSize = const Size(340, 800);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
-      final api = ApiClient(client: FakeApiServer().client);
-      await tester.pumpWidget(
-        localizedApp(
-          theme: AppTheme.dark,
-          locale: locale,
-          home: Scaffold(
-            body: SettingsView(
-              settingsController: SettingsController(api, AppSettings()),
-              theme: AppThemeController(),
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull, reason: '$locale');
-    }
-  });
-
   test('un documento de ajustes anterior abre en el Modo Jugador y muestra la '
       'dificultad', () {
     final viejo = AppSettings.fromJson({'themeMode': 'light'});

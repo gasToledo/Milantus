@@ -147,13 +147,14 @@ comparan el documento del personaje antes y después.
 Lo único que el DM escribe son los PG de sus monstruos, que son suyos y
 efímeros.
 
-### Los conteos del catálogo son aserciones
+### El catálogo se prueba por reglas, no por conteos
 
-`packages/dnd_engine/test/content_integrity_test.dart` fija cuántas clases,
-dotes, conjuros y criaturas hay. Tocar el contenido rompe esos tests **a
-propósito**: actualizalos con el número nuevo, y si la aserción que se rompe es
-una regla y no un conteo (por ejemplo el techo de VD del pozo de Forma Salvaje),
-tratala como un aviso y no como un test molesto.
+`packages/dnd_engine/test/content_integrity_test.dart` no fija cuántas clases,
+dotes o conjuros hay: un conteo solo falla cuando se agrega contenido a
+propósito. Lo que fija son reglas — que toda referencia apunte a un id real,
+que las fórmulas evalúen, el techo de VD del pozo de Forma Salvaje, la
+procedencia SRD que decide la atribución CC BY. Si una se rompe, es un aviso y
+no un test molesto.
 
 Los catálogos grandes se generan con herramientas commiteadas en
 `packages/dnd_engine/tool/`. No edites `creatures.json` a mano: corré
@@ -222,6 +223,13 @@ Convenciones del repositorio: nombres de test en español, contenido SRD real
 cargado en `setUpAll` con `ContentRepository.loadFromDirectory`, valores
 esperados **derivados del catálogo** (`repo.creature('...')!`) y no literales, y
 `expect(tester.takeException(), isNull)` al cierre.
+
+Un test entra si su falla significa que una regla o una funcionalidad está
+rota. No entran: conteos del catálogo, nombres o prosa transcriptos del
+manual, correcciones de OCR ya aplicadas, constantes comparadas consigo mismas,
+layout y estilo (anchos, desbordes, colores, animaciones: eso lo mira una
+persona) ni tests de las herramientas de `tool/`, cuya salida ya valida
+`content_integrity_test`.
 
 ## Deuda marcada
 
