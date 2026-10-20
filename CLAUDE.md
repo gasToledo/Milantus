@@ -21,7 +21,7 @@ cd packages/dnd_engine && dart pub get && dart analyze && dart test
 ```
 
 ```bash
-cd packages/dnd_app && flutter pub get && dart analyze && flutter test
+cd packages/dnd_app && flutter pub get && flutter analyze && flutter test
 ```
 
 ```bash
@@ -49,20 +49,40 @@ cd packages/dnd_app && flutter build web --release
 ```
 
 CI verifica el formato **antes que nada**, así que un commit sin formatear falla
-sin llegar a decir nada útil sobre el código. Conviene instalar el hook:
+sin llegar a decir nada útil sobre el código. Conviene instalar el hook, que
+formatea lo preparado antes de cada commit:
 
 ```bash
 git config core.hooksPath .githooks
 ```
 
-`main` es el único tronco activo: se valida local, se commitea y se pushea
-directo. El push dispara CI siempre; CD arranca cuando CI termina en verde
-sobre `main`, y despliega solo si cambió `packages/**`, `docker-compose.yml`
-o `postgres-init/**`. CI en rojo no llega a producción.
-
 El stack completo (Postgres + Zitadel + servidor + cloudflared) se levanta con
 `docker compose up -d --build`; el runbook está en
 `docs/operaciones/despliegue.md`.
+
+## Commits, versión y despliegue
+
+`main` es el único tronco activo: se valida local, se commitea y se pushea
+directo. Los mensajes siguen `tipo(paquete): resumen` en español
+(`feat(dnd_app): los descansos se pueden deshacer`, `fix`, `test`, `ci`, `build`;
+sin paquete cuando cruza varios).
+
+Cambiar `version` en un `pubspec.yaml` exige actualizar `CHANGELOG.md` en el
+mismo commit, y un cambio grande (capacidad visible, esquema persistido, o que
+cruza engine, cliente y servidor) sube la versión. El criterio y el formato
+están en `docs/desarrollo/versionado-y-changelog.md`.
+
+El push dispara CI (`.github/workflows/ci.yml`): formato, análisis y pruebas de
+los tres paquetes, con las pruebas de la app en dos mitades en paralelo con el
+build web. CD (`cd.yml`) arranca recién cuando CI termina en verde sobre
+`main`: **CI en rojo no llega a producción**. Su job `gate` despliega solo si
+cambió algo desplegable desde el último CD exitoso — `packages/**`,
+`docker-compose.yml` o `postgres-init/**`, sin contar `packages/*/test/` ni
+`packages/*/tool/`, que tampoco entran a la imagen (`.dockerignore`).
+
+Lo que solo se ve con el stack real (migraciones, túnel, caché del navegador) se
+prueba a mano en producción y se anota en
+`docs/operaciones/pruebas-en-produccion.md`.
 
 ## Los tres paquetes
 
@@ -98,10 +118,12 @@ cálculo que no está ahí, el cálculo va al engine con su test, no al widget.
 
 ### `schemaVersion` es solo para documentos de usuario
 
-`Character`, `Campaign`, `Chapter`, `Note`, `Encounter`, `EncounterLog` y `Npc` llevan
-`currentSchemaVersion` + `migrateJson`: se guardan en la base y hay que poder
-migrarlos. El contrato es siempre el mismo — no mutar la entrada, y **rechazar
-una versión futura** en vez de guardarla de vuelta perdiendo campos.
+`Character`, `Campaign`, `Chapter`, `Note`, `Encounter`, `EncounterLog` y `Npc`
+llevan `currentSchemaVersion` + `migrateJson`: se guardan en la base y hay que
+poder migrarlos. El contrato es siempre el mismo — no mutar la entrada, y
+**rechazar una versión futura** en vez de guardarla de vuelta perdiendo campos.
+Cada tipo tiene su propio `schemaVersionOf`, así que cada uno lleva sus tests
+de versión.
 
 `Creature` (y el resto del catálogo) **no lo lleva, y está bien**: es contenido,
 no un documento de nadie. Que una criatura pueda ser homebrew y vivir en la
@@ -126,9 +148,8 @@ convertiría la API en una forma de averiguar qué hay en otras cuentas.
 
 `campaign_members` es **la única puerta** por la que una cuenta alcanza datos de
 otra, y esa fila solo existe si el dueño del personaje emitió un código y
-alguien lo canjeó. Todo esto está explicado en
-`docs/arquitectura/modo-dm.md`, que es
-lectura obligatoria antes de tocar rutas de campaña.
+alguien lo canjeó. Todo esto está explicado en `docs/arquitectura/modo-dm.md`,
+que es lectura obligatoria antes de tocar rutas de campaña.
 
 Hay una excepción al supuesto, y hay que conocerla: cuando un handler necesita
 leer o avisarle a la otra cuenta (canje de código, corte del vínculo, retrato de
@@ -137,15 +158,22 @@ un miembro, aviso al DM cuando se borra un personaje), le pasa al repositorio un
 fila de `campaign_members` que una consulta anterior ya autorizó; nunca de la
 petición.
 
+**Ojo:** los tests del servidor corren contra repositorios en memoria
+(`test/fakes/in_memory_*`), que reimplementan ese `WHERE` en Dart. El SQL de
+`lib/src/repositories/` no lo ejecuta ningún test: un `WHERE` mal escrito pasa
+la suite entera. Al tocar una consulta de autorización, revisala a mano y
+probala contra el stack real.
+
 ### El DM no escribe la ficha de otra cuenta
 
 Es la frontera de diseño del Modo DM, y se sostuvo incluso donde parecía natural
-cruzarla: subir de nivel, repartir oro y entregar objetos son **avisos**, no
-escrituras. El jugador los anota en su propia ficha. Hay pruebas negativas que
-comparan el documento del personaje antes y después.
+cruzarla: subir de nivel, repartir oro, entregar objetos y conceder Inspiración
+Heroica son **avisos**, no escrituras. El jugador los anota en su propia ficha.
+Hay pruebas negativas que comparan el documento del personaje antes y después.
 
-Lo único que el DM escribe son los PG de sus monstruos, que son suyos y
-efímeros.
+El DM escribe solo lo suyo: campañas, capítulos, cuaderno, combates, sus
+monstruos y sus PNJ (con sus PG y su estado por campaña). Los PG de los
+jugadores en combate salen del encuentro, no de la ficha.
 
 ### El catálogo se prueba por reglas, no por conteos
 
@@ -161,14 +189,16 @@ Los catálogos grandes se generan con herramientas commiteadas en
 `generate_bestiary.dart`. Ojo que el PDF del SRD en español está **en metros** y
 el catálogo en pies.
 
-Cinco de esas herramientas **parchean** en vez de generar, y hay que correrlas
+Varias de esas herramientas **parchean** en vez de generar, y hay que correrlas
 después: `generate_items.dart` le pone peso y precio a `weapons.json` y
-`armor.json`; después de `generate_magic_items.py` van, en este orden,
+`armor.json`; `apply_structured_content.py` aplica equipo inicial y planos;
+después de `generate_magic_items.py` van, en este orden,
 `extract_magic_item_text.dart` (la descripción, leída con `pdftotext`),
 `apply_magic_item_charges.dart` (las cargas), `apply_magic_item_kinds.dart`
 (qué clase de objeto es, para los planos del Artífice) y `apply_voseo.dart`
 (el SRD en español está en tuteo). Si alguien regenera y se olvida de un paso,
-`content_integrity_test` lo dice.
+`content_integrity_test` lo dice. El detalle está en
+`docs/desarrollo/contenido-y-reglas.md`.
 
 El inglés del catálogo vive aparte, en `X.en.json` junto a cada `X.json`, y
 se **corrige a mano**: es la excepción a no editar lo generado. Regenerar el
@@ -178,9 +208,8 @@ cuándo correr `translate_content.dart --refresh` está en
 
 ## Frontend
 
-La guía completa es
-`docs/desarrollo/diseno-web.md`, y su §8 es el
-catálogo de componentes: **antes de crear un widget visual nuevo, buscá ahí**.
+La guía completa es `docs/desarrollo/diseno-web.md`, y su §8 es el catálogo de
+componentes: **antes de crear un widget visual nuevo, buscá ahí**.
 
 Lo que más se olvida:
 
@@ -196,6 +225,7 @@ Lo que más se olvida:
 - Para medir el ancho disponible, `LayoutBuilder` y **nunca `MediaQuery.size`**:
   el panel lateral de 236 px es invisible para `MediaQuery`.
 - Todo `IconButton` lleva `tooltip`.
+- Los diálogos usan `AppDialog`, no `AlertDialog` ni `SimpleDialog`.
 - **Subtítulos y explicaciones, los mínimos**: solo cuando sin ellos no se
   entiende qué hace la acción. El rótulo tiene que alcanzar solo. Ver
   `docs/desarrollo/textos.md` §Subtítulos y explicaciones.
@@ -213,6 +243,13 @@ situaciones distintas y piden acciones distintas.
 
 ## Tests
 
+Un test entra si su falla significa que una regla o una funcionalidad está
+rota. No entran: conteos del catálogo, nombres o prosa transcriptos del
+manual, correcciones de OCR ya aplicadas, constantes comparadas consigo mismas,
+layout y estilo (anchos, desbordes, colores, animaciones: eso lo mira una
+persona) ni tests de las herramientas de `tool/`, cuya salida ya valida
+`content_integrity_test`.
+
 Los tests de widget montan el árbol real contra `FakeApiServer`
 (`packages/dnd_app/test/fakes/fake_api_server.dart`), un doble en memoria que
 reproduce el **contrato observable** de cada endpoint. Cuando agregues una ruta
@@ -224,13 +261,6 @@ cargado en `setUpAll` con `ContentRepository.loadFromDirectory`, valores
 esperados **derivados del catálogo** (`repo.creature('...')!`) y no literales, y
 `expect(tester.takeException(), isNull)` al cierre.
 
-Un test entra si su falla significa que una regla o una funcionalidad está
-rota. No entran: conteos del catálogo, nombres o prosa transcriptos del
-manual, correcciones de OCR ya aplicadas, constantes comparadas consigo mismas,
-layout y estilo (anchos, desbordes, colores, animaciones: eso lo mira una
-persona) ni tests de las herramientas de `tool/`, cuya salida ya valida
-`content_integrity_test`.
-
 ## Deuda marcada
 
 Buscá `ponytail:` en el código: son simplificaciones deliberadas, cada una con
@@ -241,10 +271,19 @@ leela — puede ser una decisión y no un olvido.
 
 El mapa y la convención de mantenimiento están en `docs/README.md`. No copies
 acá contenido de esas guías: enlazalo para que exista una sola fuente vigente.
+Si el código y una guía discrepan, manda el código y la guía se corrige en el
+mismo cambio.
 
 - `docs/arquitectura/modo-dm.md` — seguridad y contratos del Modo DM.
+- `docs/arquitectura/multiclase.md` — modelo de la multiclase y su compatibilidad.
 - `docs/desarrollo/contenido-y-reglas.md` — fuentes, catálogo y validación.
 - `docs/desarrollo/diseno-web.md` — sistema visual y componentes.
 - `docs/desarrollo/textos.md` — glosario y convenciones de los textos visibles,
   en español e inglés.
-- `docs/operaciones/despliegue.md` — runbook del stack.
+- `docs/desarrollo/versionado-y-changelog.md` — versión visible y `CHANGELOG.md`.
+- `docs/operaciones/despliegue.md` — runbook del stack y CI/CD.
+- `docs/operaciones/pruebas-en-produccion.md` — registro de pruebas manuales.
+
+Los cambios planificados con OpenSpec viven en `openspec/`, que Git ignora: es
+local de cada máquina (`specs/` vigentes, `changes/archive/` hechos) y su
+`config.yaml` resume estas mismas reglas. No lo enlaces como requisito.
