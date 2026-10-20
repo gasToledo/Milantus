@@ -236,6 +236,7 @@ extension _SheetCombatSection on _SheetScreenState {
         .where((r) => r.recharge == RechargeOn.shortRest)
         .map((r) => r.name)
         .toList();
+    final antes = _beforeRest();
     _mutateCombat(
       () => CombatOps.shortRest(
         _c.combat,
@@ -246,8 +247,18 @@ extension _SheetCombatSection on _SheetScreenState {
     final msg = restored.isEmpty
         ? context.l10n.shortRestNoRestore
         : context.l10n.shortRestRestored(restored.join(", "));
-    _snack(msg);
+    showAppMessage(context, msg, onUndo: () => _replace(antes));
   }
+
+  /// La ficha tal como estaba antes de un descanso, para «Deshacer». Un toque
+  /// de más en plena sesión devuelve PG, espacios y recursos ya gastados, y
+  /// volver a marcarlos a mano es justo lo que nadie recuerda bien.
+  ///
+  /// El estado de combate se copia entero porque los descansos lo modifican
+  /// en el lugar, y `copyWith` lo pasaría por referencia: la «copia» cambiaría
+  /// junto con la ficha.
+  Character _beforeRest() =>
+      _c.copyWith(combat: CombatState.fromJson(_c.combat.toJson()));
 
   void _longRest(ComputedSheet s) {
     // Se leen antes para poder contar en el aviso lo que efectivamente cambió:
@@ -255,6 +266,7 @@ extension _SheetCombatSection on _SheetScreenState {
     // comparar.
     final cansancioPrevio = _c.combat.exhaustion;
     final teniaInspiracion = _c.combat.heroicInspiration;
+    final antes = _beforeRest();
 
     _mutateCombat(
       () => CombatOps.longRest(
@@ -290,7 +302,13 @@ extension _SheetCombatSection on _SheetScreenState {
     if (objetosRecargados > 0) {
       partes.add(context.l10n.longRestItemsRecharged(objetosRecargados));
     }
-    _snack(context.l10n.longRestSummary(partes.join('; ')));
+    // Deshacer también devuelve las cargas de los objetos: `antes` es la ficha
+    // entera, con la mochila de antes del amanecer.
+    showAppMessage(
+      context,
+      context.l10n.longRestSummary(partes.join('; ')),
+      onUndo: () => _replace(antes),
+    );
   }
 
   /// PG máximos de un compañero invocado, o null si su forma ya no está en el

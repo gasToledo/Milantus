@@ -837,6 +837,38 @@ void main() {
       );
     });
 
+    // Un toque de más en plena sesión no puede costar volver a marcar a mano
+    // los PG y las cargas que ya se habían gastado.
+    testWidgets('deshacer el descanso largo devuelve PG y cargas', (
+      tester,
+    ) async {
+      final herida = mochilera().copyWith(
+        inventory: const [
+          InventoryEntry(
+            entryId: 'v1',
+            itemId: 'varita-de-bolas-de-fuego',
+            charges: 0,
+          ),
+        ],
+      );
+      herida.combat.currentHp = 1;
+      final controller = await pumpSheet(tester, herida);
+      await tester.tap(find.text('Combate'));
+      await tester.pumpAndSettle();
+      final descanso = find.text('Descanso largo');
+      await tester.ensureVisible(descanso);
+      await tester.tap(descanso);
+      await tester.pumpAndSettle();
+      expect(saved(controller).combat.currentHp, greaterThan(1));
+
+      await tester.tap(find.text('Deshacer'));
+      await tester.pumpAndSettle();
+
+      expect(saved(controller).combat.currentHp, 1);
+      expect(saved(controller).inventory.single.charges, 0);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets(
       'un arma a distancia dice su alcance y una cuerpo a cuerpo no',
       (tester) async {
