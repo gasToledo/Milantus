@@ -56,8 +56,9 @@ git config core.hooksPath .githooks
 ```
 
 `main` es el único tronco activo: se valida local, se commitea y se pushea
-directo. El push dispara CI siempre, y CD cuando toca `packages/**`,
-`docker-compose.yml` o `postgres-init/**`.
+directo. El push dispara CI siempre; CD arranca cuando CI termina en verde
+sobre `main`, y despliega solo si cambió `packages/**`, `docker-compose.yml`
+o `postgres-init/**`. CI en rojo no llega a producción.
 
 El stack completo (Postgres + Zitadel + servidor + cloudflared) se levanta con
 `docker compose up -d --build`; el runbook está en

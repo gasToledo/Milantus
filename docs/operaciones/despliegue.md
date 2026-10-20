@@ -167,8 +167,10 @@ Dos workflows en `.github/workflows/`:
   alojados por GitHub, en cada push y cada pull request. No necesita
   configuración en el host.
 - `cd.yml`: reconstruye y levanta el stack (`docker compose up -d --build`)
-  en el **runner autoalojado**, disparado solo por `push` a `main` que toque
-  una ruta relevante. Necesita el runner de esta sección.
+  en el **runner autoalojado**. Lo dispara `workflow_run` cuando CI termina
+  sobre un push a `main`: si CI falló no despliega, y si no cambió ninguna
+  ruta desplegable desde el último CD exitoso tampoco (lo decide el job
+  `gate`, en un runner de GitHub). Necesita el runner de esta sección.
 
 ### Registrar el runner autoalojado
 
@@ -205,13 +207,16 @@ Configurar en *Settings → Branches* para `main`:
 - Sin *force-push* ni borrado de la rama.
 - Restringir el push a quienes deban poder disparar un despliegue: es el control
   de acceso sobre `cd.yml` (ver design.md, D5).
-- No exigir pull request. Los checks de CI se siguen después del push junto con
-  CD; si alguno falla, el cambio no se considera cerrado.
+- No exigir pull request. CI corre después del push y CD espera su resultado:
+  un commit con CI en rojo queda en `main` pero no llega a producción hasta
+  que un commit posterior lo arregle.
 
 ### Verificar el pipeline
 
+- Un push a `main` con CI en rojo crea una corrida de CD con los dos jobs
+  salteados.
 - Un push a `main` que solo toque `docs/**` u otra ruta fuera de la
-  lista de `cd.yml` no debe disparar ningún job de despliegue.
+  lista del job `gate` corre `gate` y saltea `Deploy`.
 - Un push a `main` que toque `packages/dnd_server/**` (por ejemplo)
   debe reconstruir el stack y terminar en éxito una vez que `server` quede
   `healthy`.

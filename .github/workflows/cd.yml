@@ -1,20 +1,19 @@
 name: CD
 
-# Único workflow que corre en el runner autoalojado. Dispara SOLO por push a
-# main, nunca por pull_request: es lo que permite tener un runner autoalojado
-# en un repositorio público sin exponerlo a código de un fork. No agregar aquí
-# ningún trigger de pull_request ni pull_request_target.
+# Único workflow que corre en el runner autoalojado. Dispara cuando CI termina
+# sobre un push a main, nunca por pull_request: es lo que permite tener un
+# runner autoalojado en un repositorio público sin exponerlo a código de un
+# fork. No agregar aquí ningún trigger de pull_request ni pull_request_target.
+#
+# Antes disparaba directo por push, en paralelo con CI: un commit con las
+# pruebas en rojo llegaba igual a producción. `workflow_run` además corre
+# siempre la versión de este archivo que está en main, nunca la del commit que
+# lo disparó.
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "packages/dnd_server/**"
-      - "packages/dnd_app/**"
-      - "packages/dnd_engine/**"
-      - "docker-compose.yml"
-      - "postgres-init/**"
-      - ".github/workflows/cd.yml"
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
   workflow_dispatch: # Enables manual triggering
 
 # No cancela un despliegue en curso ante un push nuevo: dejar que termine
@@ -24,13 +23,65 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # `workflow_run` no acepta `paths`, así que el filtro de rutas vive acá: se
+  # despliega si el commit cambió algo desplegable desde el último CD exitoso.
+  # Un CD exitoso que no desplegó igual sirve de base, porque significa que lo
+  # desplegable de su commit ya era lo de producción.
+  #
+  # Corre en un runner de GitHub y no en el autoalojado: no necesita nada del
+  # host, y así el runner de producción solo arranca cuando hay qué desplegar.
+  gate:
+    name: ¿Hay qué desplegar?
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push')
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      deploy: ${{ steps.diff.outputs.deploy }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 0
+      - id: diff
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${{ github.event_name }}" = workflow_dispatch ]; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          base="$(gh run list --workflow cd.yml --branch main --status success \
+            --limit 1 --json headSha --jq '.[0].headSha // empty')"
+          # Sin base conocida (primer despliegue, historia reescrita) se
+          # despliega: equivocarse para ese lado solo cuesta un rebuild.
+          if [ -z "$base" ] || ! git cat-file -e "$base^{commit}" 2>/dev/null; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          if git diff --quiet "$base" HEAD -- \
+              packages/dnd_server packages/dnd_app packages/dnd_engine \
+              docker-compose.yml postgres-init .github/workflows/cd.yml; then
+            echo "Nada desplegable cambió desde $base"
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          fi
+
   deploy:
     name: Deploy
+    needs: gate
+    if: needs.gate.outputs.deploy == 'true'
     runs-on: [self-hosted]
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
+          # El commit que CI validó, no la punta de main: si entró otro push
+          # mientras tanto, su propio CI dispara su propio despliegue.
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
           # No limpiar el workspace del runner: `.env`, `cloudflared/config.yml`
           # y `cloudflared/creds.json` no están versionados (ver
           # docs/despliegue.md) y viven a propósito dentro de este mismo
