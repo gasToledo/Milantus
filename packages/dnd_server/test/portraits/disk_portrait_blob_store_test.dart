@@ -15,6 +15,7 @@ void main() {
     0x52, 0x49, 0x46, 0x46, 0, 0, 0, 0, 0x57, 0x45, 0x42, 0x50, //
     1, 2, 3,
   ];
+  const gifBytes = [0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 1, 2, 3];
 
   setUp(() {
     tempDir = Directory.systemTemp.createTempSync('dnd_portraits_test_');
@@ -46,7 +47,7 @@ void main() {
       expect(blob.bytes, pngBytes);
     });
 
-    test('reconoce JPEG y WEBP por su cabecera de bytes', () async {
+    test('reconoce JPEG, WEBP y GIF por su cabecera de bytes', () async {
       final store = DiskPortraitBlobStore(
         root: tempDir.path,
         maxBytes: 1024 * 1024,
@@ -62,7 +63,16 @@ void main() {
         characterId: 'sagan',
         bytes: Uint8List.fromList(webpBytes),
       );
+      final gifKey = await store.save(
+        userId: 'user-a',
+        characterId: 'sagan',
+        bytes: Uint8List.fromList(gifBytes),
+      );
 
+      expect(
+        (await store.read(userId: 'user-a', portraitKey: gifKey))!.contentType,
+        'image/gif',
+      );
       expect(
         (await store.read(userId: 'user-a', portraitKey: jpegKey))!.contentType,
         'image/jpeg',
@@ -467,6 +477,40 @@ void main() {
         64,
         reason: 'agrandar en el servidor no agrega nitidez, solo bytes',
       );
+    });
+
+    test('un retrato animado da una miniatura estática', () async {
+      // La animación se ve en el retrato grande; los medallones quedan
+      // quietos. Vale también cuando no hace falta achicar: servir el
+      // original ahí sería servir la animación.
+      img.Image animated(int size) {
+        final first = img.Image(width: size, height: size);
+        first.addFrame(img.Image(width: size, height: size));
+        return first;
+      }
+
+      final store = storeAt(tempDir);
+      for (final (size, width, expectedWidth) in [
+        (512, 128, 128),
+        (64, 256, 64),
+      ]) {
+        final key = await store.save(
+          userId: 'user-a',
+          characterId: 'sagan',
+          bytes: img.encodeGif(animated(size)),
+        );
+
+        final blob = await store.read(
+          userId: 'user-a',
+          portraitKey: key,
+          width: width,
+        );
+
+        expect(blob!.contentType, 'image/png');
+        final thumbnail = img.decodePng(blob.bytes)!;
+        expect(thumbnail.width, expectedWidth);
+        expect(thumbnail.numFrames, 1);
+      }
     });
 
     test('un archivo que no se puede decodificar se sirve tal cual', () async {

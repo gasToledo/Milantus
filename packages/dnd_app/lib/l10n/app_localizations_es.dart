@@ -2153,7 +2153,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get diaryImageFormats =>
-      'PNG, JPEG o WEBP. Mismo límite de tamaño que los retratos.';
+      'PNG, JPEG, WEBP o GIF. Mismo límite de tamaño que los retratos.';
 
   @override
   String get spellsTitle => 'Conjuros';
@@ -3945,7 +3945,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get portraitImportTitle => 'Importar imagen desde archivo';
 
   @override
-  String get portraitImportHint => 'Tocá para elegirla. PNG, JPG o WEBP.';
+  String get portraitImportHint => 'Tocá para elegirla. PNG, JPG, WEBP o GIF.';
 
   @override
   String get portraitAcceptsReference => 'Acepta referencia';

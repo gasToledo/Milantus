@@ -3545,7 +3545,7 @@ abstract class AppLocalizations {
   /// No description provided for @diaryImageFormats.
   ///
   /// In es, this message translates to:
-  /// **'PNG, JPEG o WEBP. Mismo límite de tamaño que los retratos.'**
+  /// **'PNG, JPEG, WEBP o GIF. Mismo límite de tamaño que los retratos.'**
   String get diaryImageFormats;
 
   /// No description provided for @spellsTitle.
@@ -6364,7 +6364,7 @@ abstract class AppLocalizations {
   /// No description provided for @portraitImportHint.
   ///
   /// In es, this message translates to:
-  /// **'Tocá para elegirla. PNG, JPG o WEBP.'**
+  /// **'Tocá para elegirla. PNG, JPG, WEBP o GIF.'**
   String get portraitImportHint;
 
   /// No description provided for @portraitAcceptsReference.

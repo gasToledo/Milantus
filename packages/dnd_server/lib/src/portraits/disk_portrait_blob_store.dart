@@ -36,7 +36,7 @@ class DiskPortraitBlobStore implements PortraitBlobStore {
     final type = sniffPortraitImageType(bytes);
     if (type == null) {
       throw const FormatException(
-        'El archivo no es una imagen admitida (PNG, JPEG o WEBP).',
+        'El archivo no es una imagen admitida (PNG, JPEG, WEBP o GIF).',
       );
     }
 

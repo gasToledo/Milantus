@@ -30,8 +30,9 @@ const List<int> portraitThumbnailWidths = [
 ///
 /// Devuelve `null` cuando la miniatura no aporta nada y hay que servir el
 /// original: si [width] no es uno de los [portraitThumbnailWidths], si el
-/// original ya es igual o más chico que [width] —agrandar acá solo gastaría
-/// bytes, la nitidez no se inventa— o si los bytes no se pueden decodificar.
+/// original es estático y ya es igual o más chico que [width] —agrandar acá
+/// solo gastaría bytes, la nitidez no se inventa— o si los bytes no se pueden
+/// decodificar.
 ///
 /// Ese último caso es el que obliga a atrapar todo lo que tire el
 /// decodificador, y no solo su `null`: los retratos se validan **por cabecera**
@@ -44,13 +45,26 @@ const List<int> portraitThumbnailWidths = [
 /// filtro cúbico muestrea unos pocos píxeles de origen por píxel de destino y
 /// descarta el resto, que es exactamente el dentado que se quería sacar. El
 /// promedio de área mira todos los píxeles que caen en el destino.
+///
+/// Un retrato animado (GIF, o WEBP o PNG con varios cuadros) da una miniatura
+/// **estática**, hecha con su primer cuadro, y la da aunque no haga falta
+/// achicarlo. Es una decisión de diseño: la animación se ve en el retrato
+/// grande, y una lista de medallones animados a la vez sería ruido en la
+/// pantalla y CPU en el navegador. Por eso se decodifica un solo cuadro
+/// (`frame: 0`): sin eso, `copyResize` reduce todos los cuadros y `encodePng`
+/// los guarda como un PNG animado, que el navegador también anima.
 Uint8List? encodePortraitThumbnail(Uint8List original, int width) {
   if (!portraitThumbnailWidths.contains(width)) return null;
 
   try {
-    final decoded = img.decodeImage(original);
+    final decoder = img.findDecoderForData(original);
+    final info = decoder?.startDecode(original);
+    if (decoder == null || info == null) return null;
+    final decoded = decoder.decode(original, frame: 0);
     if (decoded == null) return null;
-    if (decoded.width <= width) return null;
+    if (decoded.width <= width) {
+      return info.numFrames > 1 ? img.encodePng(decoded) : null;
+    }
 
     final resized = img.copyResize(
       decoded,

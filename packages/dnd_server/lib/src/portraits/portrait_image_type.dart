@@ -5,7 +5,8 @@ import 'dart:typed_data';
 enum PortraitImageType {
   png('png', 'image/png'),
   jpeg('jpg', 'image/jpeg'),
-  webp('webp', 'image/webp');
+  webp('webp', 'image/webp'),
+  gif('gif', 'image/gif');
 
   final String extension;
   final String contentType;
@@ -45,11 +46,21 @@ PortraitImageType? sniffPortraitImageType(Uint8List bytes) {
       bytes[11] == 0x50) {
     return PortraitImageType.webp;
   }
+  // `GIF87a` o `GIF89a`: las dos versiones del formato.
+  if (bytes.length >= 6 &&
+      bytes[0] == 0x47 &&
+      bytes[1] == 0x49 &&
+      bytes[2] == 0x46 &&
+      bytes[3] == 0x38 &&
+      (bytes[4] == 0x37 || bytes[4] == 0x39) &&
+      bytes[5] == 0x61) {
+    return PortraitImageType.gif;
+  }
   return null;
 }
 
 /// Tipo esperado a partir de la extensión con la que se guardó el blob
-/// (`.png`, `.jpg`, `.webp`, con o sin punto inicial). Se usa al servir un
+/// (`.png`, `.jpg`, `.webp`, `.gif`, con o sin punto inicial). Se usa al servir un
 /// retrato ya guardado, cuyo tipo fue validado al escribirlo.
 PortraitImageType? portraitImageTypeForExtension(String extension) {
   final normalized = extension.startsWith('.')

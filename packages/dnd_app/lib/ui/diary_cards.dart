@@ -993,7 +993,9 @@ class _DiaryEntryDialogState extends State<_DiaryEntryDialog> {
   bool _subiendo = false;
   String? _error;
 
-  static const _extensiones = ['png', 'jpg', 'jpeg', 'webp'];
+  /// Como en los retratos, un GIF se anima en la entrada abierta y queda
+  /// quieto en la grilla, que pide la miniatura estática del servidor.
+  static const _extensiones = ['png', 'jpg', 'jpeg', 'webp', 'gif'];
 
   bool get _puedeGuardar =>
       !_subiendo &&

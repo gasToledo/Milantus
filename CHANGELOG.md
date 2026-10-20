@@ -644,12 +644,29 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 - El apartado «Retratos» de Ajustes: el proveedor se elige en la pantalla de
   retratos, que es donde se usa.
 
-## [Unreleased]
+## [0.26.0+1] - 2026-10-20
 
 ### Nuevo
 
 - El Cuaderno de campaña muestra cuándo un personaje vinculado subió de nivel:
   quién, a qué nivel y en qué clase, dentro del capítulo en marcha.
+- Un retrato propio o una imagen del Diario pueden ser un GIF animado. Se
+  anima en el retrato grande y en la entrada abierta; en los medallones, las
+  listas y la grilla del Diario se ve quieto, con su primer cuadro.
+
+### Modificado
+
+- Sin cambios.
+
+### Eliminado
+
+- Sin cambios.
+
+## [Unreleased]
+
+### Nuevo
+
+- Sin cambios.
 
 ### Modificado
 

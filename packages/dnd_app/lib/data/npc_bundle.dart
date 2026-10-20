@@ -261,6 +261,13 @@ class NpcBundleCodec {
         bytes[11] == 0x50) {
       return 'webp';
     }
+    if (bytes.length > 5 &&
+        bytes[0] == 0x47 &&
+        bytes[1] == 0x49 &&
+        bytes[2] == 0x46 &&
+        bytes[3] == 0x38) {
+      return 'gif';
+    }
     return 'png';
   }
 }

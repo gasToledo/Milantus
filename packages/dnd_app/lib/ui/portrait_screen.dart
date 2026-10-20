@@ -213,7 +213,13 @@ class _PortraitScreenState extends State<PortraitScreen> {
   /// imagen.
   String? _resultsPrompt;
 
-  static const _importExtensions = ['png', 'jpg', 'jpeg', 'webp'];
+  /// Un retrato propio puede ser un GIF animado: se anima en el retrato
+  /// grande, y los medallones reciben del servidor una miniatura estática.
+  static const _importExtensions = ['png', 'jpg', 'jpeg', 'webp', 'gif'];
+
+  /// La referencia no admite GIF: se le manda al proveedor de IA, que espera
+  /// una imagen fija.
+  static const _referenceExtensions = ['png', 'jpg', 'jpeg', 'webp'];
 
   PortraitProviderInfo? get _provider =>
       _providers.where((p) => p.id == _providerId).firstOrNull;
@@ -344,7 +350,7 @@ class _PortraitScreenState extends State<PortraitScreen> {
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: _importExtensions,
+        allowedExtensions: _referenceExtensions,
         withData: true,
         dialogTitle: context.l10n.portraitPickReference,
       );
