@@ -662,6 +662,22 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
+## [0.27.0+1] - 2026-10-22
+
+### Nuevo
+
+- La ficha se puede imprimir o guardar como PDF desde «Imprimir ficha», en el
+  panel: tres hojas en blanco y negro para jugar con lápiz, con los PG, los
+  espacios y los usos en blanco para marcar, y los conjuros sin su texto.
+
+### Modificado
+
+- Sin cambios.
+
+### Eliminado
+
+- Sin cambios.
+
 ## [Unreleased]
 
 ### Nuevo

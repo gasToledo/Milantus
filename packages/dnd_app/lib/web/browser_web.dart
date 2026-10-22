@@ -8,6 +8,7 @@
 import 'dart:async';
 import 'dart:html' as html;
 import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
 import 'dart:typed_data';
 
 /// Único punto de contacto con el navegador para lo que no tiene equivalente
@@ -53,6 +54,34 @@ void downloadBytes(
 /// solo llamador.
 void openInNewTab(String url) {
   html.window.open(url, '_blank', 'noopener,noreferrer');
+}
+
+/// Abre el diálogo de impresión con [document], un HTML completo, sin sacar
+/// a la persona de la app.
+///
+/// Va en un iframe invisible y no en una pestaña nueva: `window.open` fuera
+/// del mismo gesto lo bloquea Safari, y una pestaña en blanco que queda
+/// abierta después de imprimir es un estorbo. El iframe anterior se borra
+/// recién al imprimir otra vez, porque algunos navegadores siguen leyéndolo
+/// mientras el diálogo está abierto.
+///
+/// Por `dart:js_interop` y no `dart:html`: `IFrameElement.contentWindow` es
+/// un `WindowBase`, que no expone `print`.
+void printHtml(String document) {
+  const id = 'milantus-print';
+  final doc = globalContext['document'] as JSObject;
+  doc
+      .callMethod<JSObject?>('getElementById'.toJS, id.toJS)
+      ?.callMethod<JSAny?>('remove'.toJS);
+  final frame = doc.callMethod<JSObject>('createElement'.toJS, 'iframe'.toJS);
+  frame['id'] = id.toJS;
+  (frame['style'] as JSObject)['cssText'] =
+      'position:fixed;right:0;bottom:0;width:0;height:0;border:0'.toJS;
+  frame['onload'] = ((JSAny? _) {
+    (frame['contentWindow'] as JSObject).callMethod<JSAny?>('print'.toJS);
+  }).toJS;
+  frame['srcdoc'] = document.toJS;
+  (doc['body'] as JSObject).callMethod<JSAny?>('appendChild'.toJS, frame);
 }
 
 /// Clave bajo la que se recuerda el idioma elegido. Una sola, y sin datos de

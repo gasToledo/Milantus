@@ -174,6 +174,14 @@ extension _SheetNavigation on _SheetScreenState {
             label: context.l10n.navShare,
             onTap: () => run(_shareCharacter),
           ),
+        // También para un PNJ: el DM que lleva la mesa en papel lo quiere a
+        // mano igual que el jugador.
+        appNavItem(
+          context,
+          icon: Icons.print_outlined,
+          label: context.l10n.navPrint,
+          onTap: () => run(_printSheet),
+        ),
         const SizedBox(height: 8),
         // La ficha guarda sola, sin botón: sin este cartel no hay forma de
         // saber si lo que se acaba de tipear llegó al servidor.

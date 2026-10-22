@@ -728,6 +728,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navShare => 'Share';
 
   @override
+  String get navPrint => 'Print sheet';
+
+  @override
+  String get printCurrentHp => 'current / max';
+
+  @override
+  String get printHitDice => 'Hit dice';
+
+  @override
+  String get printHeadBonus => 'Bonus';
+
+  @override
+  String get printHeadDamage => 'Damage';
+
+  @override
+  String get printHeadUses => 'Uses';
+
+  @override
+  String get printHeadRecharge => 'Recharge';
+
+  @override
   String get turnNext => 'Get ready, you\'re up next.';
 
   @override

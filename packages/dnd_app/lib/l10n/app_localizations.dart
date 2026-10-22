@@ -1250,6 +1250,48 @@ abstract class AppLocalizations {
   /// **'Compartir'**
   String get navShare;
 
+  /// No description provided for @navPrint.
+  ///
+  /// In es, this message translates to:
+  /// **'Imprimir ficha'**
+  String get navPrint;
+
+  /// No description provided for @printCurrentHp.
+  ///
+  /// In es, this message translates to:
+  /// **'actuales / máx.'**
+  String get printCurrentHp;
+
+  /// No description provided for @printHitDice.
+  ///
+  /// In es, this message translates to:
+  /// **'Dados de golpe'**
+  String get printHitDice;
+
+  /// No description provided for @printHeadBonus.
+  ///
+  /// In es, this message translates to:
+  /// **'Bonif.'**
+  String get printHeadBonus;
+
+  /// No description provided for @printHeadDamage.
+  ///
+  /// In es, this message translates to:
+  /// **'Daño'**
+  String get printHeadDamage;
+
+  /// No description provided for @printHeadUses.
+  ///
+  /// In es, this message translates to:
+  /// **'Usos'**
+  String get printHeadUses;
+
+  /// No description provided for @printHeadRecharge.
+  ///
+  /// In es, this message translates to:
+  /// **'Recarga'**
+  String get printHeadRecharge;
+
   /// No description provided for @turnNext.
   ///
   /// In es, this message translates to:

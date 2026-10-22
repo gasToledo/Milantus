@@ -42,3 +42,7 @@ Future<void> keepScreenAwake(bool on) async {}
 bool? readStoredScreenAwake() => null;
 
 void writeStoredScreenAwake(bool on) {}
+
+void printHtml(String document) {
+  throw UnsupportedError('printHtml solo está disponible en el build web.');
+}

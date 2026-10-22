@@ -728,6 +728,27 @@ class AppLocalizationsEs extends AppLocalizations {
   String get navShare => 'Compartir';
 
   @override
+  String get navPrint => 'Imprimir ficha';
+
+  @override
+  String get printCurrentHp => 'actuales / máx.';
+
+  @override
+  String get printHitDice => 'Dados de golpe';
+
+  @override
+  String get printHeadBonus => 'Bonif.';
+
+  @override
+  String get printHeadDamage => 'Daño';
+
+  @override
+  String get printHeadUses => 'Usos';
+
+  @override
+  String get printHeadRecharge => 'Recarga';
+
+  @override
   String get turnNext => 'Preparate, seguís vos.';
 
   @override

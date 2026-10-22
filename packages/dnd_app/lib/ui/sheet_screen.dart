@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert' show HtmlEscape, HtmlEscapeMode;
 
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:flutter/foundation.dart' show mapEquals;
@@ -11,6 +12,7 @@ import '../levelup/level_up_screen.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_widgets.dart';
 import '../theme/class_visuals.dart';
+import '../web/browser.dart' as browser;
 import '../web/screen_awake.dart';
 import 'conditions.dart';
 import 'diary_cards.dart';
@@ -29,6 +31,7 @@ part 'sheet/combat_section.dart';
 part 'sheet/diary_section.dart';
 part 'sheet/general_section.dart';
 part 'sheet/inventory_section.dart';
+part 'sheet/print_sheet.dart';
 part 'sheet/sheet_navigation.dart';
 part 'sheet/sheet_widgets.dart';
 part 'sheet/spells_section.dart';
