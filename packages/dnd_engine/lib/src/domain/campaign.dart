@@ -1,4 +1,5 @@
 import 'data_version.dart';
+import 'music.dart';
 
 /// En qué momento de su vida está una campaña.
 ///
@@ -40,7 +41,10 @@ class Campaign {
   /// Versión del formato de este documento. Se incrementa cuando un cambio
   /// obliga a reescribir campañas ya guardadas, con el mismo contrato que
   /// `Character.currentSchemaVersion`.
-  static const int currentSchemaVersion = 1;
+  ///
+  /// 2: suma [musicScenes]. Aunque el campo es opcional, sube la versión para
+  /// que un servidor viejo rechace la campaña en vez de guardarla sin escenas.
+  static const int currentSchemaVersion = 2;
 
   final String id;
   final String name;
@@ -52,19 +56,30 @@ class Campaign {
 
   final CampaignState state;
 
+  /// Las escenas de música del DM, en el orden en que las acomodó. Son solo
+  /// suyas: [playerView] no las incluye.
+  final List<MusicScene> musicScenes;
+
   const Campaign({
     required this.id,
     required this.name,
     this.premise = '',
     this.state = CampaignState.active,
+    this.musicScenes = const [],
   });
 
-  Campaign copyWith({String? name, String? premise, CampaignState? state}) =>
+  Campaign copyWith({
+    String? name,
+    String? premise,
+    CampaignState? state,
+    List<MusicScene>? musicScenes,
+  }) =>
       Campaign(
         id: id,
         name: name ?? this.name,
         premise: premise ?? this.premise,
         state: state ?? this.state,
+        musicScenes: musicScenes ?? this.musicScenes,
       );
 
   Map<String, dynamic> toJson() => {
@@ -73,7 +88,14 @@ class Campaign {
         'name': name,
         'premise': premise,
         'state': state.toJson(),
+        'musicScenes': [for (final s in musicScenes) s.toJson()],
       };
+
+  /// Lo que un jugador vinculado puede leer de la campaña: sin los ids, que
+  /// son internos, ni las escenas de música, que son del DM.
+  Map<String, dynamic> playerView() => toJson()
+    ..remove('id')
+    ..remove('musicScenes');
 
   factory Campaign.fromJson(Map<String, dynamic> source) {
     final j = migrateJson(source);
@@ -82,6 +104,10 @@ class Campaign {
       name: j['name'] as String? ?? '',
       premise: j['premise'] as String? ?? '',
       state: CampaignState.fromJson(j['state'] as String?),
+      musicScenes: [
+        for (final s in j['musicScenes'] as List? ?? const [])
+          MusicScene.fromJson((s as Map).cast<String, dynamic>()),
+      ],
     );
   }
 
@@ -98,11 +124,9 @@ class Campaign {
   /// Lleva una campaña histórica al esquema actual **sin modificar el mapa de
   /// entrada**, igual que `Character.migrateJson`.
   ///
-  /// Hoy no hay ningún paso que aplicar porque el formato va por su primera
-  /// versión. Lo que sí hace desde el día uno es rechazar una versión futura:
-  /// un servidor viejo que abriera una campaña escrita por uno nuevo la
-  /// guardaría de vuelta perdiendo los campos que no entiende, y eso es
-  /// justamente lo que esta puerta impide.
+  /// Rechaza una versión futura: un servidor viejo que abriera una campaña
+  /// escrita por uno nuevo la guardaría de vuelta perdiendo los campos que no
+  /// entiende, y eso es justamente lo que esta puerta impide.
   static Map<String, dynamic> migrateJson(Map<String, dynamic> source) {
     final version = schemaVersionOf(source);
     if (version > currentSchemaVersion) {
@@ -112,6 +136,10 @@ class Campaign {
         supported: currentSchemaVersion,
       );
     }
-    return Map<String, dynamic>.from(source);
+    final j = Map<String, dynamic>.from(source);
+    // 1 → 2: las campañas anteriores a la música no tienen escenas.
+    if (version < 2) j['musicScenes'] = const <Object>[];
+    j['schemaVersion'] = currentSchemaVersion;
+    return j;
   }
 }

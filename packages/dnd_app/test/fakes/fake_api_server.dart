@@ -558,7 +558,8 @@ class FakeApiServer {
               if (campaigns[entry.value.campaignId] case final campaign?)
                 {
                   'memberId': entry.key,
-                  'campaign': campaign.toJson()..remove('id'),
+                  // La misma poda que el servidor: las escenas de música son del DM.
+                  'campaign': campaign.playerView(),
                   'party': [
                     for (final other in campaignMembers.values)
                       if (other.campaignId == entry.value.campaignId &&

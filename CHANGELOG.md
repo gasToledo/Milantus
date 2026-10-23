@@ -678,11 +678,14 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
-## [Unreleased]
+## [0.28.0+1] - 2026-10-23
 
 ### Nuevo
 
-- Sin cambios.
+- Música en el Modo DM: cada campaña guarda escenas enlazadas desde YouTube
+  o Spotify, que suenan desde un reproductor que acompaña todas las secciones
+  y se minimiza. Al armar un combate pregunta si poner la música de combate.
+  Los jugadores no ven nada de esto.
 
 ### Modificado
 
@@ -695,6 +698,22 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 - En ventanas de poco alto, como las de una notebook, el panel lateral del
   Modo DM deja fijas al pie las secciones de la campaña en curso, y los
   paneles que scrollean (Modo DM, Códice, Homebrew) muestran su barra.
+- Las campañas pasan a la versión 2 de su documento, que suma las escenas de
+  música; las guardadas antes se leen sin escenas.
+
+### Eliminado
+
+- Sin cambios.
+
+## [Unreleased]
+
+### Nuevo
+
+- Sin cambios.
+
+### Modificado
+
+- Sin cambios.
 
 ### Eliminado
 

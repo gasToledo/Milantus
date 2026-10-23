@@ -99,6 +99,51 @@ void main() {
       );
     });
 
+    test('una campaña de la versión 1 se lee sin escenas de música', () {
+      final r = Campaign.fromJson({'schemaVersion': 1, 'id': 'x', 'name': 'Y'});
+
+      expect(r.musicScenes, isEmpty);
+      expect(r.toJson()['schemaVersion'], 2);
+    });
+
+    test('las escenas de música hacen el round-trip en orden', () {
+      const c = Campaign(
+        id: 'x',
+        name: 'Y',
+        musicScenes: [
+          MusicScene(
+              id: 'a', name: 'Taberna', url: 'https://youtu.be/dQw4w9WgXcQ'),
+          MusicScene(
+            id: 'b',
+            name: 'Combate',
+            url: 'https://open.spotify.com/playlist/37i9dQZF1DX8Uebhn9wzrS',
+            offerOnCombat: true,
+          ),
+        ],
+      );
+
+      final r = Campaign.fromJson(c.toJson());
+
+      expect([for (final s in r.musicScenes) s.name], ['Taberna', 'Combate']);
+      expect(r.musicScenes.last.offerOnCombat, isTrue);
+      expect(r.musicScenes.last.url, c.musicScenes.last.url);
+    });
+
+    // Lo que recibe un jugador vinculado: las escenas son del DM.
+    test('la vista del jugador no incluye ids ni escenas de música', () {
+      const c = Campaign(
+        id: 'x',
+        name: 'Y',
+        musicScenes: [MusicScene(id: 'a', name: 'Taberna', url: 'u')],
+      );
+
+      final view = c.playerView();
+
+      expect(view.containsKey('id'), isFalse);
+      expect(view.containsKey('musicScenes'), isFalse);
+      expect(view['name'], 'Y');
+    });
+
     test('migrar no modifica el mapa de entrada', () {
       final source = <String, dynamic>{'id': 'x', 'name': 'Y'};
 

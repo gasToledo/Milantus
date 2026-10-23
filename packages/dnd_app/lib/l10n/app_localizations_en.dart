@@ -6852,4 +6852,106 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorReport => 'Report this error';
+
+  @override
+  String get dmMusic => 'Music';
+
+  @override
+  String get dmMusicScenes => 'Campaign scenes';
+
+  @override
+  String get dmMusicNewScene => 'New scene';
+
+  @override
+  String get dmMusicEditScene => 'Edit scene';
+
+  @override
+  String get dmMusicSceneName => 'Name';
+
+  @override
+  String get dmMusicSceneNameRequired => 'Give the scene a name.';
+
+  @override
+  String get dmMusicSceneUrl => 'YouTube or Spotify link';
+
+  @override
+  String get dmMusicUnsupportedUrl =>
+      'The link must be from YouTube or Spotify.';
+
+  @override
+  String get dmMusicKindYoutubeVideo => 'YouTube video';
+
+  @override
+  String get dmMusicKindYoutubePlaylist => 'YouTube playlist';
+
+  @override
+  String get dmMusicKindSpotifyTrack => 'Spotify track';
+
+  @override
+  String get dmMusicKindSpotifyAlbum => 'Spotify album';
+
+  @override
+  String get dmMusicKindSpotifyPlaylist => 'Spotify playlist';
+
+  @override
+  String get dmMusicKindSpotifyEpisode => 'Spotify episode';
+
+  @override
+  String get dmMusicOfferOnCombat => 'Offer it when combat starts';
+
+  @override
+  String get dmMusicOnCombatTag => 'When combat starts';
+
+  @override
+  String get dmMusicMoveUp => 'Move up';
+
+  @override
+  String dmMusicOpenIn(String site) {
+    return 'Open in $site';
+  }
+
+  @override
+  String dmMusicDeleted(String name) {
+    return '“$name” was deleted.';
+  }
+
+  @override
+  String get dmMusicCombatStarted => 'Combat started';
+
+  @override
+  String dmMusicOfferOne(String name) {
+    return 'Play “$name”?';
+  }
+
+  @override
+  String get dmMusicOfferMany => 'Play combat music?';
+
+  @override
+  String get dmMusicPlay => 'Play';
+
+  @override
+  String get dmMusicNotNow => 'Not now';
+
+  @override
+  String get dmMusicEmpty => 'This campaign has no scenes yet.';
+
+  @override
+  String get dmMusicPausedTag => 'paused';
+
+  @override
+  String get dmMusicPause => 'Pause';
+
+  @override
+  String get dmMusicResume => 'Play';
+
+  @override
+  String get dmMusicMinimize => 'Minimize';
+
+  @override
+  String dmMusicUnembeddable(String site) {
+    return 'This link can\'t be played outside $site.';
+  }
+
+  @override
+  String get dmMusicChangeLink => 'Change link';
 }

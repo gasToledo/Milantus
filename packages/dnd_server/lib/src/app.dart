@@ -1204,7 +1204,9 @@ Future<Response> _listPlayerCampaignsHandler(
     for (final projection in projections)
       {
         'memberId': projection.memberId,
-        'campaign': projection.campaign.toJson()..remove('id'),
+        // `playerView` y no `toJson`: las escenas de música son del DM. La
+        // consulta ya las poda; esto cubre un cambio futuro en ella.
+        'campaign': projection.campaign.playerView(),
         'party': projection.party,
         'chapters': [
           for (final chapter in projection.chapters)

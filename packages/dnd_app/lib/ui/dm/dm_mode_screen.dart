@@ -25,6 +25,7 @@ import 'chapter_editor_dialog.dart';
 import 'chapters_view.dart';
 import 'encounter_view.dart';
 import 'member_sheet_screen.dart';
+import 'music/dm_music_player.dart';
 import 'note_editor_dialog.dart';
 import 'notebook_view.dart';
 import 'npcs/campaign_npcs_view.dart';
@@ -92,6 +93,10 @@ class _DmModeScreenState extends State<DmModeScreen> {
       widget.settingsController ??
       SettingsController(widget.api, AppSettings());
   late final AppThemeController _theme = widget.theme ?? AppThemeController();
+
+  /// La música vive acá y no en la sección: así cambiar de sección no la
+  /// corta, y salir del Modo DM la detiene.
+  final _music = DmMusicController();
   Campaign? _selected;
 
   /// Sección abierta, o **null para el Bestiario**.
@@ -163,6 +168,7 @@ class _DmModeScreenState extends State<DmModeScreen> {
   @override
   void dispose() {
     screenAwake.release();
+    _music.dispose();
     _campaigns.dispose();
     super.dispose();
   }
@@ -263,6 +269,56 @@ class _DmModeScreenState extends State<DmModeScreen> {
     }
   }
 
+  /// Guarda en la campaña [campaignId] lo que devuelve [change] aplicado a
+  /// sus escenas tal como están ahora (ver [DmMusicPlayer.updateScenes]). Va
+  /// por id y no por la elegida: un «Deshacer» que llega después de cambiar
+  /// de campaña no puede caer en otra.
+  Future<void> _updateScenes(
+    String campaignId,
+    List<MusicScene> Function(List<MusicScene> current) change,
+  ) async {
+    final campaign = _campaigns.campaigns
+        .where((c) => c.id == campaignId)
+        .firstOrNull;
+    if (campaign == null) return;
+    final scenes = change(campaign.musicScenes);
+    try {
+      await _campaigns.update(campaign.copyWith(musicScenes: scenes));
+      _music.syncScenes(scenes);
+    } on ApiException catch (e) {
+      if (mounted) {
+        showAppMessage(context, e.message, tone: AppMessageTone.error);
+      }
+    }
+  }
+
+  /// El cuerpo con el reproductor encima. En ventana angosta la barra ocupa el
+  /// pie, y el cuerpo le deja ese lugar para que no tape lo último.
+  Widget _withMusic(Widget content, {required bool narrow}) =>
+      ListenableBuilder(
+        listenable: _campaigns,
+        builder: (context, _) {
+          final campaign = _effectiveSelection;
+          if (campaign == null) return content;
+          return Stack(
+            children: [
+              Positioned.fill(
+                bottom: narrow ? DmMusicPlayer.narrowBarReserve : 0,
+                child: content,
+              ),
+              Positioned.fill(
+                child: DmMusicPlayer(
+                  controller: _music,
+                  campaign: campaign,
+                  narrow: narrow,
+                  updateScenes: (change) => _updateScenes(campaign.id, change),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -273,7 +329,7 @@ class _DmModeScreenState extends State<DmModeScreen> {
             body: Row(
               children: [
                 _sidebar(context),
-                Expanded(child: _content(context)),
+                Expanded(child: _withMusic(_content(context), narrow: false)),
               ],
             ),
           );
@@ -285,7 +341,7 @@ class _DmModeScreenState extends State<DmModeScreen> {
           drawer: Drawer(
             child: SafeArea(child: _sidebar(context, inDrawer: true)),
           ),
-          body: _content(context),
+          body: _withMusic(_content(context), narrow: true),
         );
       },
     );
@@ -629,6 +685,14 @@ class _DmModeScreenState extends State<DmModeScreen> {
           showDifficulty: _settings.settings.showEncounterDifficulty,
           onOpenNpc: _openNpc,
           onOpenNpcSheet: _openNpcSheet,
+          // Por id: las escenas de este momento, no las del último build.
+          onCombatStarted: () => _music.offerCombat(
+            _campaigns.campaigns
+                    .where((c) => c.id == campaign.id)
+                    .firstOrNull
+                    ?.musicScenes ??
+                const [],
+          ),
         );
       },
     );
@@ -793,6 +857,10 @@ class _CampaignDetail extends StatefulWidget {
   final Future<void> Function(String npcId) onOpenNpc;
   final Future<void> Function(Character sheet) onOpenNpcSheet;
 
+  /// Se llama al empezar un combate, para que la música ofrezca la escena de
+  /// combate.
+  final VoidCallback onCombatStarted;
+
   /// La preferencia de la cuenta: ver la dificultad del encuentro.
   final bool showDifficulty;
 
@@ -809,6 +877,7 @@ class _CampaignDetail extends StatefulWidget {
     required this.onOpenNpc,
     required this.onOpenNpcSheet,
     required this.showDifficulty,
+    required this.onCombatStarted,
   });
 
   @override
@@ -1328,9 +1397,16 @@ class _CampaignDetailState extends State<_CampaignDetail> {
   String _newId(String prefix) =>
       '$prefix-${DateTime.now().microsecondsSinceEpoch}-${_idCounter++}';
 
-  void _startEncounter() => _saveEncounter(
-    (current) => current == null ? Encounter(id: _newId('encounter')) : null,
-  );
+  void _startEncounter() {
+    final starting = _encounter == null;
+    _saveEncounter(
+      (current) => current == null ? Encounter(id: _newId('encounter')) : null,
+    ).then((_) {
+      // Recién guardado: si el servidor lo rechazó, no hay combate que
+      // musicalizar.
+      if (starting && _encounter != null) widget.onCombatStarted();
+    });
+  }
 
   void _addPlayerToEncounter(String memberId, String name, int initiative) {
     _saveEncounter(

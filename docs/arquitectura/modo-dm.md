@@ -513,6 +513,27 @@ importación, así que el servidor no suma una segunda puerta. Es el mismo
 criterio que el resto: el jugador entrega un archivo, nadie lee su cuenta. Al
 revés no hay camino — un PNJ nunca se traspasa a un jugador.
 
+## Música
+
+Las escenas de música viven **dentro del documento de la campaña**
+(`Campaign.musicScenes`, esquema 2), no en una tabla: son pocas, se reordenan
+juntas y solo las toca el DM, así que se guardan con el mismo
+`PUT /api/campaigns/<id>` y su `WHERE`. No hay ruta nueva.
+
+El costo es que la campaña ya no es entera del jugador. La proyección de
+`GET /api/characters/<id>/campaigns` las poda dos veces: la consulta lee
+`c.document - 'musicScenes'` y el handler serializa con `Campaign.playerView()`.
+La prueba «las escenas de música no viajan» lo fija, y `FakeApiServer` usa la
+misma función.
+
+Milantus no guarda audio: cada escena es un enlace de YouTube o Spotify, y
+suena el reproductor embebido del propio sitio (`lib/web/music_embed*.dart`).
+El reproductor vive en la pantalla del Modo DM, no en una sección: cambiar de
+sección no lo desmonta y salir del Modo DM lo descarta, que es lo que corta la
+música. YouTube exige su reproductor a la vista, así que minimizarlo lo pausa;
+Spotify sigue sonando. Al armar un combate pregunta por las escenas marcadas;
+nunca cambia la música solo.
+
 ## Qué probar al tocar esto
 
 Las pruebas negativas de `packages/dnd_server/test/app_test.dart`, grupo

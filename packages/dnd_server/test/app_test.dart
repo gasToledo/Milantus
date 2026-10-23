@@ -3922,6 +3922,42 @@ void main() {
         expect(jsonEncode(raw['body']), isNot(contains('sellos')));
       });
 
+      test('las escenas de música no viajan', () async {
+        final (player, dm) = await table('sin-musica');
+        await send(
+          'PUT',
+          '/api/campaigns/tumba',
+          token: dm,
+          body: {
+            'campaign': {
+              ...campaignJson('tumba'),
+              'schemaVersion': 2,
+              'musicScenes': [
+                {
+                  'id': 's1',
+                  'name': 'Lamento del dragón',
+                  'url': 'https://youtu.be/dQw4w9WgXcQ',
+                  'offerOnCombat': true,
+                },
+              ],
+            },
+          },
+        );
+        // Que las escenas se hayan guardado de verdad, o la prueba de abajo
+        // pasaría igual sin probar nada.
+        final delDm = await send('GET', '/api/campaigns', token: dm);
+        expect(jsonEncode(delDm['body']), contains('Lamento'));
+
+        final raw = await send(
+          'GET',
+          '/api/characters/sagan/campaigns',
+          token: player,
+        );
+        expect(jsonEncode(raw['body']), isNot(contains('Lamento')));
+        expect(jsonEncode(raw['body']), isNot(contains('youtu')));
+        expect(jsonEncode(raw['body']), isNot(contains('musicScenes')));
+      });
+
       test('las batallas cerradas viajan con la mesa', () async {
         final (player, dm) = await table('batallas');
         await send(

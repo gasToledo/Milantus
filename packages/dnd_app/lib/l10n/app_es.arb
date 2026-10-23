@@ -5474,5 +5474,64 @@
   "feedbackSend": "Enviar",
   "feedbackSendError": "No se pudo enviar el mensaje",
   "feedbackSent": "¡Gracias! Recibimos tu mensaje.",
-  "errorReport": "Reportar este error"
+  "errorReport": "Reportar este error",
+  "dmMusic": "Música",
+  "dmMusicScenes": "Escenas de la campaña",
+  "dmMusicNewScene": "Nueva escena",
+  "dmMusicEditScene": "Editar escena",
+  "dmMusicSceneName": "Nombre",
+  "dmMusicSceneNameRequired": "Ponele un nombre a la escena.",
+  "dmMusicSceneUrl": "Enlace de YouTube o Spotify",
+  "dmMusicUnsupportedUrl": "El enlace tiene que ser de YouTube o Spotify.",
+  "dmMusicKindYoutubeVideo": "Video de YouTube",
+  "dmMusicKindYoutubePlaylist": "Lista de YouTube",
+  "dmMusicKindSpotifyTrack": "Canción de Spotify",
+  "dmMusicKindSpotifyAlbum": "Álbum de Spotify",
+  "dmMusicKindSpotifyPlaylist": "Lista de Spotify",
+  "dmMusicKindSpotifyEpisode": "Episodio de Spotify",
+  "dmMusicOfferOnCombat": "Ofrecerla al iniciar un combate",
+  "dmMusicOnCombatTag": "Al iniciar un combate",
+  "dmMusicMoveUp": "Subir",
+  "dmMusicOpenIn": "Abrir en {site}",
+  "@dmMusicOpenIn": {
+    "placeholders": {
+      "site": {
+        "type": "String"
+      }
+    }
+  },
+  "dmMusicDeleted": "Se eliminó «{name}».",
+  "@dmMusicDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dmMusicCombatStarted": "Empezó el combate",
+  "dmMusicOfferOne": "¿Poner «{name}»?",
+  "@dmMusicOfferOne": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dmMusicOfferMany": "¿Poner música de combate?",
+  "dmMusicPlay": "Poner",
+  "dmMusicNotNow": "Ahora no",
+  "dmMusicEmpty": "Todavía no hay escenas en esta campaña.",
+  "dmMusicPausedTag": "en pausa",
+  "dmMusicPause": "Pausar",
+  "dmMusicResume": "Reproducir",
+  "dmMusicMinimize": "Minimizar",
+  "dmMusicUnembeddable": "Este enlace no permite reproducirse fuera de {site}.",
+  "@dmMusicUnembeddable": {
+    "placeholders": {
+      "site": {
+        "type": "String"
+      }
+    }
+  },
+  "dmMusicChangeLink": "Cambiar enlace"
 }

@@ -22,6 +22,7 @@ export 'src/domain/content.dart';
 export 'src/domain/creature.dart';
 export 'src/domain/character.dart';
 export 'src/domain/campaign.dart';
+export 'src/domain/music.dart';
 export 'src/domain/chapter.dart';
 export 'src/domain/note.dart';
 export 'src/domain/npc.dart';

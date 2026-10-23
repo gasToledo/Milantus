@@ -487,7 +487,7 @@ class PostgresCampaignRepository implements CampaignRepository {
                  m.dm_user_id,
                  m.campaign_id,
                  c.name AS campaign_name,
-                 c.document AS campaign_document
+                 c.document - 'musicScenes' AS campaign_document
           FROM campaign_members m
           JOIN campaigns c
             ON c.dm_user_id = m.dm_user_id AND c.id = m.campaign_id

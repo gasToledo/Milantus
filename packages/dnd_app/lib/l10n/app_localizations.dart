@@ -11093,6 +11093,192 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Reportar este error'**
   String get errorReport;
+
+  /// No description provided for @dmMusic.
+  ///
+  /// In es, this message translates to:
+  /// **'Música'**
+  String get dmMusic;
+
+  /// No description provided for @dmMusicScenes.
+  ///
+  /// In es, this message translates to:
+  /// **'Escenas de la campaña'**
+  String get dmMusicScenes;
+
+  /// No description provided for @dmMusicNewScene.
+  ///
+  /// In es, this message translates to:
+  /// **'Nueva escena'**
+  String get dmMusicNewScene;
+
+  /// No description provided for @dmMusicEditScene.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar escena'**
+  String get dmMusicEditScene;
+
+  /// No description provided for @dmMusicSceneName.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre'**
+  String get dmMusicSceneName;
+
+  /// No description provided for @dmMusicSceneNameRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Ponele un nombre a la escena.'**
+  String get dmMusicSceneNameRequired;
+
+  /// No description provided for @dmMusicSceneUrl.
+  ///
+  /// In es, this message translates to:
+  /// **'Enlace de YouTube o Spotify'**
+  String get dmMusicSceneUrl;
+
+  /// No description provided for @dmMusicUnsupportedUrl.
+  ///
+  /// In es, this message translates to:
+  /// **'El enlace tiene que ser de YouTube o Spotify.'**
+  String get dmMusicUnsupportedUrl;
+
+  /// No description provided for @dmMusicKindYoutubeVideo.
+  ///
+  /// In es, this message translates to:
+  /// **'Video de YouTube'**
+  String get dmMusicKindYoutubeVideo;
+
+  /// No description provided for @dmMusicKindYoutubePlaylist.
+  ///
+  /// In es, this message translates to:
+  /// **'Lista de YouTube'**
+  String get dmMusicKindYoutubePlaylist;
+
+  /// No description provided for @dmMusicKindSpotifyTrack.
+  ///
+  /// In es, this message translates to:
+  /// **'Canción de Spotify'**
+  String get dmMusicKindSpotifyTrack;
+
+  /// No description provided for @dmMusicKindSpotifyAlbum.
+  ///
+  /// In es, this message translates to:
+  /// **'Álbum de Spotify'**
+  String get dmMusicKindSpotifyAlbum;
+
+  /// No description provided for @dmMusicKindSpotifyPlaylist.
+  ///
+  /// In es, this message translates to:
+  /// **'Lista de Spotify'**
+  String get dmMusicKindSpotifyPlaylist;
+
+  /// No description provided for @dmMusicKindSpotifyEpisode.
+  ///
+  /// In es, this message translates to:
+  /// **'Episodio de Spotify'**
+  String get dmMusicKindSpotifyEpisode;
+
+  /// No description provided for @dmMusicOfferOnCombat.
+  ///
+  /// In es, this message translates to:
+  /// **'Ofrecerla al iniciar un combate'**
+  String get dmMusicOfferOnCombat;
+
+  /// No description provided for @dmMusicOnCombatTag.
+  ///
+  /// In es, this message translates to:
+  /// **'Al iniciar un combate'**
+  String get dmMusicOnCombatTag;
+
+  /// No description provided for @dmMusicMoveUp.
+  ///
+  /// In es, this message translates to:
+  /// **'Subir'**
+  String get dmMusicMoveUp;
+
+  /// No description provided for @dmMusicOpenIn.
+  ///
+  /// In es, this message translates to:
+  /// **'Abrir en {site}'**
+  String dmMusicOpenIn(String site);
+
+  /// No description provided for @dmMusicDeleted.
+  ///
+  /// In es, this message translates to:
+  /// **'Se eliminó «{name}».'**
+  String dmMusicDeleted(String name);
+
+  /// No description provided for @dmMusicCombatStarted.
+  ///
+  /// In es, this message translates to:
+  /// **'Empezó el combate'**
+  String get dmMusicCombatStarted;
+
+  /// No description provided for @dmMusicOfferOne.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Poner «{name}»?'**
+  String dmMusicOfferOne(String name);
+
+  /// No description provided for @dmMusicOfferMany.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Poner música de combate?'**
+  String get dmMusicOfferMany;
+
+  /// No description provided for @dmMusicPlay.
+  ///
+  /// In es, this message translates to:
+  /// **'Poner'**
+  String get dmMusicPlay;
+
+  /// No description provided for @dmMusicNotNow.
+  ///
+  /// In es, this message translates to:
+  /// **'Ahora no'**
+  String get dmMusicNotNow;
+
+  /// No description provided for @dmMusicEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no hay escenas en esta campaña.'**
+  String get dmMusicEmpty;
+
+  /// No description provided for @dmMusicPausedTag.
+  ///
+  /// In es, this message translates to:
+  /// **'en pausa'**
+  String get dmMusicPausedTag;
+
+  /// No description provided for @dmMusicPause.
+  ///
+  /// In es, this message translates to:
+  /// **'Pausar'**
+  String get dmMusicPause;
+
+  /// No description provided for @dmMusicResume.
+  ///
+  /// In es, this message translates to:
+  /// **'Reproducir'**
+  String get dmMusicResume;
+
+  /// No description provided for @dmMusicMinimize.
+  ///
+  /// In es, this message translates to:
+  /// **'Minimizar'**
+  String get dmMusicMinimize;
+
+  /// No description provided for @dmMusicUnembeddable.
+  ///
+  /// In es, this message translates to:
+  /// **'Este enlace no permite reproducirse fuera de {site}.'**
+  String dmMusicUnembeddable(String site);
+
+  /// No description provided for @dmMusicChangeLink.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar enlace'**
+  String get dmMusicChangeLink;
 }
 
 class _AppLocalizationsDelegate

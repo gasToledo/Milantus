@@ -2786,4 +2786,105 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   });
+
+  group('Música', () {
+    testWidgets('una escena se crea, se borra y vuelve con deshacer', (
+      tester,
+    ) async {
+      final server = await pumpDmMode(tester, seed: seedTable);
+      await tester.tap(find.byKey(const ValueKey('music-open')));
+      await tester.pumpAndSettle();
+      expect(
+        find.text('Todavía no hay escenas en esta campaña.'),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.byKey(const ValueKey('music-new-scene')));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const ValueKey('music-scene-name')),
+        'Taberna',
+      );
+      final url = find.byKey(const ValueKey('music-scene-url'));
+      // Un enlace de otro sitio no se guarda: fallaría recién en la mesa.
+      await tester.enterText(url, 'https://soundcloud.com/artista/tema');
+      await tester.tap(find.text('Guardar'));
+      await tester.pumpAndSettle();
+      expect(
+        find.text('El enlace tiene que ser de YouTube o Spotify.'),
+        findsOneWidget,
+      );
+      expect(server.campaigns['tumba']!.musicScenes, isEmpty);
+
+      await tester.enterText(url, 'https://youtu.be/dQw4w9WgXcQ');
+      await tester.pump();
+      expect(find.text('Video de YouTube'), findsOneWidget);
+      await tester.tap(find.text('Guardar'));
+      await tester.pumpAndSettle();
+
+      final scene = server.campaigns['tumba']!.musicScenes.single;
+      expect(scene.name, 'Taberna');
+      expect(find.text('Taberna'), findsOneWidget);
+
+      await tester.tap(find.byKey(ValueKey('music-menu-${scene.id}')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(ValueKey('music-delete-${scene.id}')));
+      await tester.pumpAndSettle();
+      expect(server.campaigns['tumba']!.musicScenes, isEmpty);
+
+      await tester.tap(find.text('Deshacer'));
+      await tester.pumpAndSettle();
+      expect(server.campaigns['tumba']!.musicScenes.single.url, scene.url);
+
+      // El aviso vence solo: se deja correr para no dejar el timer colgado.
+      await tester.pump(const Duration(seconds: 10));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('al armar un combate pregunta por la música de combate', (
+      tester,
+    ) async {
+      await pumpDmMode(
+        tester,
+        seed: (server) {
+          seedTable(server);
+          server.campaigns['tumba'] = const Campaign(
+            id: 'tumba',
+            name: 'La Tumba',
+            musicScenes: [
+              MusicScene(
+                id: 'calma',
+                name: 'Calma',
+                url: 'https://youtu.be/dQw4w9WgXcQ',
+              ),
+              MusicScene(
+                id: 'dragon',
+                name: 'Lamento del dragón',
+                url: 'https://open.spotify.com/playlist/abc123',
+                offerOnCombat: true,
+              ),
+            ],
+          );
+        },
+      );
+      expect(find.byKey(const ValueKey('music-offer')), findsNothing);
+
+      await tester.ensureVisible(find.text('Combate'));
+      await tester.tap(find.text('Combate'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Armar combate').first);
+      await tester.pumpAndSettle();
+
+      // Solo la marcada, y como pregunta: la música no cambia sola.
+      expect(find.byKey(const ValueKey('music-offer')), findsOneWidget);
+      expect(find.text('¿Poner «Lamento del dragón»?'), findsOneWidget);
+      expect(find.byKey(const ValueKey('music-bar')), findsNothing);
+
+      await tester.tap(find.byKey(const ValueKey('music-offer-dismiss')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('music-offer')), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  });
 }
