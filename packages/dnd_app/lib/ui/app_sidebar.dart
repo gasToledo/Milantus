@@ -275,6 +275,45 @@ class SidebarBrand extends StatelessWidget {
   }
 }
 
+/// La parte que scrollea de un panel lateral.
+///
+/// La barra queda a la vista siempre que haya más de lo que entra: en una
+/// notebook el último ítem salía cortado al pie y se leía como el final de la
+/// lista, no como algo que sigue. Sin barra a la vista, la rueda era la única
+/// pista.
+class SidebarList extends StatefulWidget {
+  final List<Widget> children;
+
+  const SidebarList({super.key, required this.children});
+
+  @override
+  State<SidebarList> createState() => _SidebarListState();
+}
+
+class _SidebarListState extends State<SidebarList> {
+  // Propio y no el primario: en web de escritorio un `ListView` no toma el
+  // `PrimaryScrollController`, y una barra sin controlador no tiene qué medir.
+  final _scroll = ScrollController();
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Scrollbar(
+    controller: _scroll,
+    thumbVisibility: true,
+    child: ListView(
+      controller: _scroll,
+      // El margen es para la barra: encima del ítem tapaba los contadores.
+      padding: const EdgeInsets.only(right: 10),
+      children: widget.children,
+    ),
+  );
+}
+
 /// El «volver» de una pantalla de adentro.
 ///
 /// Ocupa el lugar que en el menú principal tiene el interruptor de modo, con

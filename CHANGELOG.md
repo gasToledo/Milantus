@@ -692,6 +692,9 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   y espacio para condiciones y notas. Las habilidades van en orden alfabético
   del idioma, el modificador de cada característica se lee primero y cada
   hoja lleva al pie el nombre y su número.
+- En ventanas de poco alto, como las de una notebook, el panel lateral del
+  Modo DM deja fijas al pie las secciones de la campaña en curso, y los
+  paneles que scrollean (Modo DM, Códice, Homebrew) muestran su barra.
 
 ### Eliminado
 

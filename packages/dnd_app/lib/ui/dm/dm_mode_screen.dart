@@ -330,149 +330,167 @@ class _DmModeScreenState extends State<DmModeScreen> {
           final finished = _campaigns.campaigns
               .where((campaign) => campaign.state == CampaignState.finished)
               .toList();
-          return ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              // Arriba de todo y fuera de los grupos de campaña: es una
-              // herramienta de la app, no de una mesa. Puesto pegado al
-              // divisor de «Campaña actual» se leería como parte de ese
-              // grupo, que es justo lo que no es.
-              appNavItem(
-                context,
-                icon: Icons.pets_outlined,
-                label: context.l10n.dmBestiary,
-                active: _section == null && _tool == _GlobalTool.bestiario,
-                onTap: () => _selectSection(null, inDrawer: inDrawer),
+          final list = <Widget>[
+            // Arriba de todo y fuera de los grupos de campaña: es una
+            // herramienta de la app, no de una mesa. Puesto pegado al
+            // divisor de «Campaña actual» se leería como parte de ese
+            // grupo, que es justo lo que no es.
+            appNavItem(
+              context,
+              icon: Icons.pets_outlined,
+              label: context.l10n.dmBestiary,
+              active: _section == null && _tool == _GlobalTool.bestiario,
+              onTap: () => _selectSection(null, inDrawer: inDrawer),
+            ),
+            // Pegado al Bestiario y por lo mismo: un PNJ es de la
+            // cuenta, no de una mesa, y puede estar en varias. Se
+            // llamaba «PNJ», igual que la sección de la campaña y con
+            // el mismo ícono: dos entradas idénticas en el mismo cajón.
+            appNavItem(
+              context,
+              icon: Icons.contacts_outlined,
+              label: context.l10n.dmNpcLibrary,
+              active: _section == null && _tool == _GlobalTool.pnj,
+              onTap: () => _selectSection(
+                null,
+                inDrawer: inDrawer,
+                tool: _GlobalTool.pnj,
               ),
-              // Pegado al Bestiario y por lo mismo: un PNJ es de la
-              // cuenta, no de una mesa, y puede estar en varias. Se
-              // llamaba «PNJ», igual que la sección de la campaña y con
-              // el mismo ícono: dos entradas idénticas en el mismo cajón.
+            ),
+            // Una sección más y no una pantalla encima: abierta con
+            // push, en una ventana angosta su propio menú tapaba la
+            // flecha de volver y no había forma de salir.
+            if (widget.homebrew != null)
               appNavItem(
                 context,
-                icon: Icons.contacts_outlined,
-                label: context.l10n.dmNpcLibrary,
-                active: _section == null && _tool == _GlobalTool.pnj,
+                icon: Icons.auto_fix_high,
+                label: context.l10n.dmHomebrew,
+                active: _section == null && _tool == _GlobalTool.homebrew,
                 onTap: () => _selectSection(
                   null,
                   inDrawer: inDrawer,
-                  tool: _GlobalTool.pnj,
+                  tool: _GlobalTool.homebrew,
                 ),
               ),
-              // Una sección más y no una pantalla encima: abierta con
-              // push, en una ventana angosta su propio menú tapaba la
-              // flecha de volver y no había forma de salir.
-              if (widget.homebrew != null)
-                appNavItem(
-                  context,
-                  icon: Icons.auto_fix_high,
-                  label: context.l10n.dmHomebrew,
-                  active: _section == null && _tool == _GlobalTool.homebrew,
-                  onTap: () => _selectSection(
-                    null,
-                    inDrawer: inDrawer,
-                    tool: _GlobalTool.homebrew,
-                  ),
-                ),
+            const SizedBox(height: 12),
+            if (active.isNotEmpty) ...[
+              _CampaignGroupLabel(context.l10n.campaignStateActive),
+              for (final campaign in active)
+                _campaignNavItem(context, campaign, inDrawer: inDrawer),
+            ],
+            if (paused.isNotEmpty) ...[
               const SizedBox(height: 12),
-              if (active.isNotEmpty) ...[
-                _CampaignGroupLabel(context.l10n.campaignStateActive),
-                for (final campaign in active)
-                  _campaignNavItem(context, campaign, inDrawer: inDrawer),
-              ],
-              if (paused.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                _CampaignGroupLabel(context.l10n.campaignStatePaused),
-                for (final campaign in paused)
-                  _campaignNavItem(context, campaign, inDrawer: inDrawer),
-              ],
-              if (finished.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                Theme(
-                  data: Theme.of(
-                    context,
-                  ).copyWith(dividerColor: Colors.transparent),
-                  child: ExpansionTile(
-                    key: ValueKey(
-                      'finished-${_effectiveSelection?.state == CampaignState.finished ? _effectiveSelection?.id : 'none'}',
-                    ),
-                    tilePadding: const EdgeInsets.symmetric(horizontal: 8),
-                    childrenPadding: EdgeInsets.zero,
-                    initiallyExpanded: finished.any(
-                      (campaign) => campaign.id == _effectiveSelection?.id,
-                    ),
-                    title: _CampaignGroupLabel(context.l10n.dmFinishedGroup),
-                    children: [
-                      for (final campaign in finished)
-                        _campaignNavItem(context, campaign, inDrawer: inDrawer),
-                    ],
+              _CampaignGroupLabel(context.l10n.campaignStatePaused),
+              for (final campaign in paused)
+                _campaignNavItem(context, campaign, inDrawer: inDrawer),
+            ],
+            if (finished.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Theme(
+                data: Theme.of(
+                  context,
+                ).copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  key: ValueKey(
+                    'finished-${_effectiveSelection?.state == CampaignState.finished ? _effectiveSelection?.id : 'none'}',
                   ),
+                  tilePadding: const EdgeInsets.symmetric(horizontal: 8),
+                  childrenPadding: EdgeInsets.zero,
+                  initiallyExpanded: finished.any(
+                    (campaign) => campaign.id == _effectiveSelection?.id,
+                  ),
+                  title: _CampaignGroupLabel(context.l10n.dmFinishedGroup),
+                  children: [
+                    for (final campaign in finished)
+                      _campaignNavItem(context, campaign, inDrawer: inDrawer),
+                  ],
                 ),
-              ],
-              // Al pie de la lista de campañas y no como botón fijo: el
-              // pie del panel es de la cuenta, igual en los dos modos.
+              ),
+            ],
+            // Al pie de la lista de campañas y no como botón fijo: el
+            // pie del panel es de la cuenta, igual en los dos modos.
+            appNavItem(
+              context,
+              icon: Icons.add,
+              label: context.l10n.dmNewCampaign,
+              onTap: () {
+                if (inDrawer) Navigator.of(context).pop();
+                _createCampaign();
+              },
+            ),
+          ];
+          final current = <Widget>[
+            if (_effectiveSelection != null) ...[
+              const SizedBox(height: 16),
+              Divider(color: pal.hairline, height: 1),
+              const SizedBox(height: 14),
+              _CampaignGroupLabel(context.l10n.dmCurrentCampaign),
               appNavItem(
                 context,
-                icon: Icons.add,
-                label: context.l10n.dmNewCampaign,
-                onTap: () {
-                  if (inDrawer) Navigator.of(context).pop();
-                  _createCampaign();
-                },
+                icon: Icons.groups_outlined,
+                label: context.l10n.dmTable,
+                active: _section == _CampaignSection.mesa,
+                onTap: () =>
+                    _selectSection(_CampaignSection.mesa, inDrawer: inDrawer),
               ),
-              if (_effectiveSelection != null) ...[
-                const SizedBox(height: 16),
-                Divider(color: pal.hairline, height: 1),
-                const SizedBox(height: 14),
-                _CampaignGroupLabel(context.l10n.dmCurrentCampaign),
-                appNavItem(
-                  context,
-                  icon: Icons.groups_outlined,
-                  label: context.l10n.dmTable,
-                  active: _section == _CampaignSection.mesa,
-                  onTap: () =>
-                      _selectSection(_CampaignSection.mesa, inDrawer: inDrawer),
+              appNavItem(
+                context,
+                icon: Icons.auto_stories_outlined,
+                label: context.l10n.dmChapters,
+                active: _section == _CampaignSection.capitulos,
+                onTap: () => _selectSection(
+                  _CampaignSection.capitulos,
+                  inDrawer: inDrawer,
                 ),
-                appNavItem(
-                  context,
-                  icon: Icons.auto_stories_outlined,
-                  label: context.l10n.dmChapters,
-                  active: _section == _CampaignSection.capitulos,
-                  onTap: () => _selectSection(
-                    _CampaignSection.capitulos,
-                    inDrawer: inDrawer,
-                  ),
+              ),
+              appNavItem(
+                context,
+                icon: Icons.menu_book_outlined,
+                label: context.l10n.dmNotebook,
+                active: _section == _CampaignSection.cuaderno,
+                onTap: () => _selectSection(
+                  _CampaignSection.cuaderno,
+                  inDrawer: inDrawer,
                 ),
-                appNavItem(
-                  context,
-                  icon: Icons.menu_book_outlined,
-                  label: context.l10n.dmNotebook,
-                  active: _section == _CampaignSection.cuaderno,
-                  onTap: () => _selectSection(
-                    _CampaignSection.cuaderno,
-                    inDrawer: inDrawer,
-                  ),
+              ),
+              appNavItem(
+                context,
+                icon: Icons.groups_2_outlined,
+                label: context.l10n.dmNpcsSection,
+                active: _section == _CampaignSection.pnj,
+                onTap: () =>
+                    _selectSection(_CampaignSection.pnj, inDrawer: inDrawer),
+              ),
+              appNavItem(
+                context,
+                icon: Icons.local_fire_department_outlined,
+                label: context.l10n.dmCombat,
+                active: _section == _CampaignSection.combate,
+                onTap: () => _selectSection(
+                  _CampaignSection.combate,
+                  inDrawer: inDrawer,
                 ),
-                appNavItem(
-                  context,
-                  icon: Icons.groups_2_outlined,
-                  label: context.l10n.dmNpcsSection,
-                  active: _section == _CampaignSection.pnj,
-                  onTap: () =>
-                      _selectSection(_CampaignSection.pnj, inDrawer: inDrawer),
-                ),
-                appNavItem(
-                  context,
-                  icon: Icons.local_fire_department_outlined,
-                  label: context.l10n.dmCombat,
-                  active: _section == _CampaignSection.combate,
-                  onTap: () => _selectSection(
-                    _CampaignSection.combate,
-                    inDrawer: inDrawer,
-                  ),
-                ),
-              ],
+              ),
             ],
+          ];
+          return LayoutBuilder(
+            builder: (context, box) {
+              // Las secciones de la campaña en curso quedan fijas al pie y
+              // scrollea solo lo de arriba: son lo que se toca durante la
+              // partida, y al fondo de la lista una notebook las cortaba.
+              // Con muy poco alto no hay lugar para fijarlas sin desbordar,
+              // y vuelve a scrollear todo junto.
+              if (current.isEmpty || box.maxHeight < 360) {
+                return SidebarList(children: [...list, ...current]);
+              }
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(child: SidebarList(children: list)),
+                  ...current,
+                ],
+              );
+            },
           );
         },
       ),

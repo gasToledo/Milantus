@@ -8,6 +8,7 @@ import '../data/homebrew_store.dart';
 import '../data/transfer_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_widgets.dart';
+import '../ui/app_sidebar.dart';
 import '../web/browser.dart' as browser;
 import '../l10n/l10n_context.dart';
 

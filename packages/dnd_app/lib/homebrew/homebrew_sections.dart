@@ -63,8 +63,7 @@ extension _HomebrewSections on _HomebrewViewState {
             ),
           ),
           Expanded(
-            child: ListView(
-              padding: EdgeInsets.zero,
+            child: SidebarList(
               children: [
                 for (final category in _Category.values)
                   appNavItem(

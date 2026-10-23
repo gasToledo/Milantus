@@ -255,8 +255,7 @@ class _CodexScreenState extends State<CodexScreen> {
             onTap: () => run(() => _open(null)),
           ),
           Expanded(
-            child: ListView(
-              padding: EdgeInsets.zero,
+            child: SidebarList(
               children: [
                 for (final c in CodexCategory.values) ...[
                   if (c == CodexCategory.values.first ||
