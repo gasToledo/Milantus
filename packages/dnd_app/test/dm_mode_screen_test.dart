@@ -2811,7 +2811,7 @@ void main() {
       await tester.tap(find.text('Guardar'));
       await tester.pumpAndSettle();
       expect(
-        find.text('El enlace tiene que ser de YouTube o Spotify.'),
+        find.text('El enlace tiene que ser de YouTube o YouTube Music.'),
         findsOneWidget,
       );
       expect(server.campaigns['tumba']!.musicScenes, isEmpty);
@@ -2861,7 +2861,7 @@ void main() {
               MusicScene(
                 id: 'dragon',
                 name: 'Lamento del dragón',
-                url: 'https://open.spotify.com/playlist/abc123',
+                url: 'https://music.youtube.com/playlist?list=PL123',
                 offerOnCombat: true,
               ),
             ],

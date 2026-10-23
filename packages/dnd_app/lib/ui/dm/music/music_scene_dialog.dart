@@ -5,24 +5,16 @@ import '../../../l10n/l10n_context.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/app_widgets.dart';
 
-/// El nombre del sitio, igual en los dos idiomas.
-String musicSiteName(MusicSite site) => switch (site) {
-  MusicSite.youtube => 'YouTube', // l10n-ignore: nombre de marca
-  MusicSite.spotify => 'Spotify', // l10n-ignore: nombre de marca
-};
+/// El nombre del sitio, igual en los dos idiomas. Va aparte de los textos
+/// porque los mensajes lo reciben como parámetro.
+const musicSiteName = 'YouTube'; // l10n-ignore: nombre de marca
 
-/// «Video de YouTube», «Lista de Spotify»: lo que el DM pegó, en palabras.
-String musicKindLabel(AppLocalizations l10n, MusicSource source) => switch ((
-  source.site,
-  source.kind,
-)) {
-  (MusicSite.youtube, MusicKind.playlist) => l10n.dmMusicKindYoutubePlaylist,
-  (MusicSite.youtube, _) => l10n.dmMusicKindYoutubeVideo,
-  (MusicSite.spotify, MusicKind.album) => l10n.dmMusicKindSpotifyAlbum,
-  (MusicSite.spotify, MusicKind.playlist) => l10n.dmMusicKindSpotifyPlaylist,
-  (MusicSite.spotify, MusicKind.episode) => l10n.dmMusicKindSpotifyEpisode,
-  (MusicSite.spotify, _) => l10n.dmMusicKindSpotifyTrack,
-};
+/// «Video de YouTube», «Lista de YouTube»: lo que el DM pegó, en palabras.
+String musicKindLabel(AppLocalizations l10n, MusicSource source) =>
+    switch (source.kind) {
+      MusicKind.playlist => l10n.dmMusicKindYoutubePlaylist,
+      MusicKind.video => l10n.dmMusicKindYoutubeVideo,
+    };
 
 /// Crea una escena nueva o edita [current]. Devuelve `null` si se cancela.
 Future<MusicScene?> showMusicSceneDialog(

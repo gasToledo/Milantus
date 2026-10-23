@@ -1,7 +1,11 @@
-/// Música del Modo DM: escenas que el DM enlaza desde YouTube o Spotify.
+/// Música del Modo DM: escenas que el DM enlaza desde YouTube o YouTube Music.
 ///
 /// Milantus no guarda audio: solo el enlace que pegó el DM. Así no aloja
-/// música ajena y el reproductor es el del propio sitio, embebido.
+/// música ajena y el reproductor es el de YouTube, embebido.
+///
+/// Spotify estuvo y se sacó: su reproductor embebido pasa solo vistas previas
+/// aunque el DM tenga la sesión iniciada, y sonar completo pide su API, con
+/// Premium y un tope de cinco cuentas cargadas a mano.
 library;
 
 /// Una escena de música de una campaña: «Taberna», «Combate — el dragón».
@@ -49,32 +53,23 @@ class MusicScene {
       );
 }
 
-enum MusicSite { youtube, spotify }
+/// Qué es lo enlazado.
+enum MusicKind { video, playlist }
 
-/// Qué es lo enlazado. `playlist` vale para los dos sitios.
-enum MusicKind { video, playlist, track, album, episode }
-
-/// Un enlace de música reconocido: de qué sitio es, qué es y su id.
+/// Un enlace de YouTube reconocido: qué es y su id.
 class MusicSource {
-  final MusicSite site;
   final MusicKind kind;
   final String id;
 
-  const MusicSource(this.site, this.kind, this.id);
+  const MusicSource(this.kind, this.id);
 
-  /// Reconoce un enlace de YouTube o Spotify, o devuelve `null`.
+  /// Reconoce un enlace de YouTube o YouTube Music, o devuelve `null`.
   ///
-  /// Solo los sitios cuyo reproductor se puede embeber sin cuenta ni clave:
-  /// cualquier otro enlace se rechaza al guardar, en vez de fallar en la mesa.
+  /// Cualquier otro enlace se rechaza al guardar, en vez de fallar en la
+  /// mesa. Una escena de Spotify guardada antes de sacarlo queda sin
+  /// reproducir, para editarla o borrarla.
   static MusicSource? parse(String raw) {
     final text = raw.trim();
-    // `spotify:track:<id>`, lo que copia la aplicación de escritorio.
-    final uri = RegExp(r'^spotify:(track|album|playlist|episode):(\w+)$')
-        .firstMatch(text);
-    if (uri != null) {
-      return MusicSource(MusicSite.spotify, _spotifyKinds[uri[1]]!, uri[2]!);
-    }
-
     final url = Uri.tryParse(text.contains('://') ? text : 'https://$text');
     if (url == null || url.host.isEmpty) return null;
     final host = url.host.toLowerCase().replaceFirst(RegExp(r'^(www|m)\.'), '');
@@ -96,60 +91,35 @@ class MusicSource {
       }
       final list = url.queryParameters['list'];
       if (list != null && _youtubeList.hasMatch(list)) {
-        return MusicSource(MusicSite.youtube, MusicKind.playlist, list);
+        return MusicSource(MusicKind.playlist, list);
       }
-      return null;
-    }
-
-    if (host == 'open.spotify.com') {
-      // `intl-es/` y `embed/` son prefijos de la misma página.
-      final rest =
-          path.skipWhile((s) => s.startsWith('intl-') || s == 'embed').toList();
-      if (rest.length < 2) return null;
-      final kind = _spotifyKinds[rest[0]];
-      if (kind == null || !_spotifyId.hasMatch(rest[1])) return null;
-      return MusicSource(MusicSite.spotify, kind, rest[1]);
     }
     return null;
   }
 
   /// La dirección del reproductor embebido.
   ///
-  /// YouTube va por `youtube-nocookie.com`, que no deja cookies hasta que se
+  /// Va por `youtube-nocookie.com`, que no deja cookies hasta que se
   /// reproduce, y con `enablejsapi=1` para pausarlo y enterarse de sus errores
   /// por `postMessage`.
-  String get embedUrl => switch ((site, kind)) {
-        (MusicSite.youtube, MusicKind.playlist) =>
+  String get embedUrl => switch (kind) {
+        MusicKind.playlist =>
           'https://www.youtube-nocookie.com/embed/videoseries?list=$id&enablejsapi=1',
-        (MusicSite.youtube, _) =>
+        MusicKind.video =>
           'https://www.youtube-nocookie.com/embed/$id?enablejsapi=1',
-        // Los nombres de [MusicKind] de Spotify son los segmentos de su URL.
-        (MusicSite.spotify, _) =>
-          'https://open.spotify.com/embed/${kind.name}/$id',
       };
 
-  /// La página del sitio, para «Abrir en YouTube/Spotify». Se arma con el id
-  /// y no se abre el texto que pegó el DM: así lo que se abre es siempre una
-  /// página del sitio, aunque haya pegado `spotify:…` o un enlace sin esquema.
-  String get pageUrl => switch ((site, kind)) {
-        (MusicSite.youtube, MusicKind.playlist) =>
-          'https://www.youtube.com/playlist?list=$id',
-        (MusicSite.youtube, _) => 'https://www.youtube.com/watch?v=$id',
-        (MusicSite.spotify, _) => 'https://open.spotify.com/${kind.name}/$id',
+  /// La página de YouTube, para «Abrir en YouTube». Se arma con el id y no se
+  /// abre el texto que pegó el DM: así lo que se abre es siempre una página
+  /// de YouTube, aunque haya pegado un enlace sin esquema.
+  String get pageUrl => switch (kind) {
+        MusicKind.playlist => 'https://www.youtube.com/playlist?list=$id',
+        MusicKind.video => 'https://www.youtube.com/watch?v=$id',
       };
 
-  static MusicSource? _video(String id) => _youtubeId.hasMatch(id)
-      ? MusicSource(MusicSite.youtube, MusicKind.video, id)
-      : null;
+  static MusicSource? _video(String id) =>
+      _youtubeId.hasMatch(id) ? MusicSource(MusicKind.video, id) : null;
 
   static final _youtubeId = RegExp(r'^[\w-]{11}$');
   static final _youtubeList = RegExp(r'^[\w-]+$');
-  static final _spotifyId = RegExp(r'^[A-Za-z0-9]+$');
-
-  static const _spotifyKinds = {
-    'track': MusicKind.track,
-    'album': MusicKind.album,
-    'playlist': MusicKind.playlist,
-    'episode': MusicKind.episode,
-  };
 }

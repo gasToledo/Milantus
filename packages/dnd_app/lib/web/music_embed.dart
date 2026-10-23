@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-// El reproductor embebido de YouTube o Spotify de una escena. La vista real
+// El reproductor embebido de YouTube de una escena. La vista real
 // (`music_embed_web.dart`) solo existe al compilar para web; en la VM de
 // `flutter test` se usa el stub, que no dibuja nada (mismo patrón que
 // `browser.dart`).

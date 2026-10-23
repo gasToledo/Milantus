@@ -66,10 +66,9 @@ class DmMusicController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// YouTube exige su reproductor a la vista: minimizado, se pausa. Spotify
-  /// no, y sigue sonando.
+  /// YouTube exige su reproductor a la vista: minimizado, se pausa.
   void minimize() {
-    if (_source?.site == MusicSite.youtube) _embed?.pause();
+    _embed?.pause();
     _expanded = false;
     notifyListeners();
   }
@@ -176,9 +175,7 @@ class DmMusicPlayer extends StatelessWidget {
         final embedWidth = narrow
             ? box.maxWidth - 2 * 16
             : _cardWidth - 2 * _pad - 2;
-        final embedHeight = source?.site == MusicSite.spotify
-            ? 80.0
-            : math.max(200.0, embedWidth * 9 / 16);
+        final embedHeight = math.max(200.0, embedWidth * 9 / 16);
         final chrome = _chrome(context, embedVisible ? embedHeight : 0);
         // Un menú o un diálogo es una ruta encima de esta: mientras esté
         // abierta, el iframe no toma clics, o se queda con los que caen sobre
@@ -206,7 +203,7 @@ class DmMusicPlayer extends StatelessWidget {
                     ? (narrow ? 16 : _margin + 1 + _pad)
                     : (narrow ? 12 : _margin),
                 // Fuera de la vista no se desmonta: queda en un punto, para
-                // que Spotify siga sonando y YouTube conserve su pausa.
+                // que YouTube conserve su pausa y retome donde estaba.
                 width: embedVisible ? embedWidth : 1,
                 height: embedVisible ? embedHeight : 1,
                 child: IgnorePointer(
@@ -292,8 +289,8 @@ class DmMusicPlayer extends StatelessWidget {
                 ),
                 Text(
                   playing
-                      ? musicSiteName(source.site)
-                      : '${musicSiteName(source.site)} · ${l10n.dmMusicPausedTag}',
+                      ? musicSiteName
+                      : '$musicSiteName · ${l10n.dmMusicPausedTag}',
                   style: TextStyle(fontSize: 12, color: pal.textMuted),
                 ),
               ],
@@ -385,7 +382,7 @@ class DmMusicPlayer extends StatelessWidget {
           if (unembeddable && source != null && scene != null) ...[
             const SizedBox(height: 8),
             Text(
-              l10n.dmMusicUnembeddable(musicSiteName(source.site)),
+              l10n.dmMusicUnembeddable(musicSiteName),
               style: TextStyle(color: pal.crimson),
             ),
             const SizedBox(height: 10),
@@ -396,7 +393,7 @@ class DmMusicPlayer extends StatelessWidget {
                 OutlinedButton.icon(
                   onPressed: () => browser.openInNewTab(source.pageUrl),
                   icon: const Icon(Icons.open_in_new, size: 16),
-                  label: Text(l10n.dmMusicOpenIn(musicSiteName(source.site))),
+                  label: Text(l10n.dmMusicOpenIn(musicSiteName)),
                 ),
                 OutlinedButton(
                   onPressed: () => _edit(context, scene),
@@ -556,7 +553,7 @@ class DmMusicPlayer extends StatelessWidget {
               if (source != null)
                 PopupMenuItem(
                   value: _SceneAction.open,
-                  child: Text(l10n.dmMusicOpenIn(musicSiteName(source.site))),
+                  child: Text(l10n.dmMusicOpenIn(musicSiteName)),
                 ),
               const PopupMenuDivider(),
               PopupMenuItem(

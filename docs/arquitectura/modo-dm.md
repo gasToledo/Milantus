@@ -526,12 +526,14 @@ El costo es que la campaña ya no es entera del jugador. La proyección de
 La prueba «las escenas de música no viajan» lo fija, y `FakeApiServer` usa la
 misma función.
 
-Milantus no guarda audio: cada escena es un enlace de YouTube o Spotify, y
-suena el reproductor embebido del propio sitio (`lib/web/music_embed*.dart`).
+Milantus no guarda audio: cada escena es un enlace de YouTube o YouTube Music,
+y suena el reproductor embebido de YouTube (`lib/web/music_embed*.dart`).
 El reproductor vive en la pantalla del Modo DM, no en una sección: cambiar de
 sección no lo desmonta y salir del Modo DM lo descarta, que es lo que corta la
-música. YouTube exige su reproductor a la vista, así que minimizarlo lo pausa;
-Spotify sigue sonando. Al armar un combate pregunta por las escenas marcadas;
+música. YouTube exige su reproductor a la vista, así que minimizarlo lo pausa.
+Spotify se probó y se sacó en 0.29.0: su reproductor embebido pasa solo
+vistas previas aunque el DM tenga la sesión iniciada, y sonar completo exige
+su API, con Premium y un tope de cinco cuentas cargadas a mano. Al armar un combate pregunta por las escenas marcadas;
 nunca cambia la música solo.
 
 ## Qué probar al tocar esto

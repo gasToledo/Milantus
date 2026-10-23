@@ -11133,13 +11133,13 @@ abstract class AppLocalizations {
   /// No description provided for @dmMusicSceneUrl.
   ///
   /// In es, this message translates to:
-  /// **'Enlace de YouTube o Spotify'**
+  /// **'Enlace de YouTube o YouTube Music'**
   String get dmMusicSceneUrl;
 
   /// No description provided for @dmMusicUnsupportedUrl.
   ///
   /// In es, this message translates to:
-  /// **'El enlace tiene que ser de YouTube o Spotify.'**
+  /// **'El enlace tiene que ser de YouTube o YouTube Music.'**
   String get dmMusicUnsupportedUrl;
 
   /// No description provided for @dmMusicKindYoutubeVideo.
@@ -11153,30 +11153,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Lista de YouTube'**
   String get dmMusicKindYoutubePlaylist;
-
-  /// No description provided for @dmMusicKindSpotifyTrack.
-  ///
-  /// In es, this message translates to:
-  /// **'Canción de Spotify'**
-  String get dmMusicKindSpotifyTrack;
-
-  /// No description provided for @dmMusicKindSpotifyAlbum.
-  ///
-  /// In es, this message translates to:
-  /// **'Álbum de Spotify'**
-  String get dmMusicKindSpotifyAlbum;
-
-  /// No description provided for @dmMusicKindSpotifyPlaylist.
-  ///
-  /// In es, this message translates to:
-  /// **'Lista de Spotify'**
-  String get dmMusicKindSpotifyPlaylist;
-
-  /// No description provided for @dmMusicKindSpotifyEpisode.
-  ///
-  /// In es, this message translates to:
-  /// **'Episodio de Spotify'**
-  String get dmMusicKindSpotifyEpisode;
 
   /// No description provided for @dmMusicOfferOnCombat.
   ///

@@ -6889,29 +6889,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dmMusicSceneNameRequired => 'Ponele un nombre a la escena.';
 
   @override
-  String get dmMusicSceneUrl => 'Enlace de YouTube o Spotify';
+  String get dmMusicSceneUrl => 'Enlace de YouTube o YouTube Music';
 
   @override
   String get dmMusicUnsupportedUrl =>
-      'El enlace tiene que ser de YouTube o Spotify.';
+      'El enlace tiene que ser de YouTube o YouTube Music.';
 
   @override
   String get dmMusicKindYoutubeVideo => 'Video de YouTube';
 
   @override
   String get dmMusicKindYoutubePlaylist => 'Lista de YouTube';
-
-  @override
-  String get dmMusicKindSpotifyTrack => 'Canción de Spotify';
-
-  @override
-  String get dmMusicKindSpotifyAlbum => 'Álbum de Spotify';
-
-  @override
-  String get dmMusicKindSpotifyPlaylist => 'Lista de Spotify';
-
-  @override
-  String get dmMusicKindSpotifyEpisode => 'Episodio de Spotify';
 
   @override
   String get dmMusicOfferOnCombat => 'Ofrecerla al iniciar un combate';

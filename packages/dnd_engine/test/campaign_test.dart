@@ -116,7 +116,7 @@ void main() {
           MusicScene(
             id: 'b',
             name: 'Combate',
-            url: 'https://open.spotify.com/playlist/37i9dQZF1DX8Uebhn9wzrS',
+            url: 'https://music.youtube.com/playlist?list=PL123',
             offerOnCombat: true,
           ),
         ],

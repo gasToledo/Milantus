@@ -705,6 +705,25 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
+## [0.29.0+1] - 2026-10-23
+
+### Nuevo
+
+- Sin cambios.
+
+### Modificado
+
+- Las escenas de música aceptan enlaces de YouTube Music, además de los de
+  YouTube.
+
+### Eliminado
+
+- Las escenas de Spotify. Su reproductor embebido pasa solo vistas previas de
+  30 segundos aunque el DM tenga la sesión iniciada, y sonar completo exige
+  conectar la cuenta con Premium y un tope de cinco cuentas. Una escena de
+  Spotify ya guardada queda sin reproducir, para cambiarle el enlace o
+  borrarla.
+
 ## [Unreleased]
 
 ### Nuevo
