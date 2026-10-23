@@ -180,6 +180,11 @@ class DmMusicPlayer extends StatelessWidget {
             ? 80.0
             : math.max(200.0, embedWidth * 9 / 16);
         final chrome = _chrome(context, embedVisible ? embedHeight : 0);
+        // Un menú o un diálogo es una ruta encima de esta: mientras esté
+        // abierta, el iframe no toma clics, o se queda con los que caen sobre
+        // el video. Es idempotente, así que puede ir en el build.
+        final covered = !(ModalRoute.isCurrentOf(context) ?? true);
+        controller.embed?.setInteractive(embedVisible && !covered);
         return Stack(
           children: [
             if (narrow)
@@ -524,10 +529,24 @@ class DmMusicPlayer extends StatelessWidget {
                 value: _SceneAction.edit,
                 child: Text(l10n.commonEdit),
               ),
-              CheckedPopupMenuItem(
+              // Una fila con su casilla y no `CheckedPopupMenuItem`: ese
+              // centra el texto y, sin marcar, deja el hueco del tilde vacío.
+              PopupMenuItem(
                 value: _SceneAction.offer,
-                checked: scene.offerOnCombat,
-                child: Text(l10n.dmMusicOfferOnCombat),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      scene.offerOnCombat
+                          ? Icons.check_box
+                          : Icons.check_box_outline_blank,
+                      size: 20,
+                      color: scene.offerOnCombat ? pal.gold : null,
+                    ),
+                    const SizedBox(width: 12),
+                    Flexible(child: Text(l10n.dmMusicOfferOnCombat)),
+                  ],
+                ),
               ),
               PopupMenuItem(
                 value: _SceneAction.up,

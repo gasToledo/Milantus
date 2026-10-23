@@ -11,6 +11,12 @@ import 'package:flutter/widgets.dart';
 
 import 'music_embed.dart';
 
+/// `pointer-events` del elemento: el único modo de que el iframe deje pasar
+/// los clics a lo que Flutter dibuja encima.
+void Function(bool) _pointerEventsOf(JSObject element) =>
+    (interactive) => (element['style'] as JSObject)['pointerEvents'] =
+        (interactive ? 'auto' : 'none').toJS;
+
 Widget musicEmbedView(MusicSource source, MusicEmbedController controller) =>
     HtmlElementView.fromTagName(
       // Una vista por enlace: otra escena es otro iframe, no el mismo con
@@ -93,6 +99,7 @@ void _youtube(JSObject frame, MusicSource source, MusicEmbedController c) {
       'message'.toJS,
       listener,
     ),
+    setInteractive: _pointerEventsOf(frame),
   );
 }
 
@@ -188,6 +195,7 @@ Future<void> _spotify(
         play: () => call('resume'),
         pause: () => call('pause'),
         detach: () => call('destroy'),
+        setInteractive: _pointerEventsOf(host),
       );
     }).toJS,
   );

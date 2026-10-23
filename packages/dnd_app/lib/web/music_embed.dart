@@ -18,6 +18,8 @@ class MusicEmbedController extends ChangeNotifier {
   VoidCallback? _play;
   VoidCallback? _pause;
   VoidCallback? _detach;
+  void Function(bool)? _setInteractive;
+  bool _interactive = true;
 
   /// Lo último que avisó el sitio. Arranca en falso: hasta que el embebido
   /// cargue no hay nada sonando.
@@ -26,6 +28,15 @@ class MusicEmbedController extends ChangeNotifier {
   /// El sitio se negó a reproducir el enlace dentro de otra página.
   bool get unembeddable => _unembeddable;
 
+  /// Si el embebido recibe los clics. Con un menú o un diálogo encima, el
+  /// iframe se los robaba aunque Flutter lo dibujara tapado: la opción del
+  /// menú que caía sobre el video no se podía tocar.
+  void setInteractive(bool value) {
+    if (value == _interactive) return;
+    _interactive = value;
+    _setInteractive?.call(value);
+  }
+
   void play() => _play?.call();
   void pause() => _pause?.call();
 
@@ -33,10 +44,14 @@ class MusicEmbedController extends ChangeNotifier {
     required VoidCallback play,
     required VoidCallback pause,
     VoidCallback? detach,
+    void Function(bool interactive)? setInteractive,
   }) {
     _play = play;
     _pause = pause;
     _detach = detach;
+    _setInteractive = setInteractive;
+    // Si ya había un menú abierto cuando terminó de cargar.
+    if (!_interactive) setInteractive?.call(false);
   }
 
   void report({bool? playing, bool? unembeddable}) {
