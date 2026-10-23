@@ -48,6 +48,10 @@ dart format .
 cd packages/dnd_app && flutter build web --release
 ```
 
+El build no es un trámite: lo que vive en `packages/dnd_app/lib/web/*_web.dart`
+(iframes, `postMessage`, la pantalla encendida) se exporta condicionalmente, y
+`flutter test` corre con el `*_stub.dart`. Ese código solo se compila acá.
+
 CI verifica el formato **antes que nada**, así que un commit sin formatear falla
 sin llegar a decir nada útil sobre el código. Conviene instalar el hook, que
 formatea lo preparado antes de cada commit:
@@ -82,7 +86,8 @@ cambió algo desplegable desde el último CD exitoso — `packages/**`,
 
 Lo que solo se ve con el stack real (migraciones, túnel, caché del navegador) se
 prueba a mano en producción y se anota en
-`docs/operaciones/pruebas-en-produccion.md`.
+`docs/operaciones/pruebas-en-produccion.md`, un registro privado que Git ignora:
+puede no existir en otra máquina.
 
 ## Los tres paquetes
 
@@ -172,8 +177,13 @@ Heroica son **avisos**, no escrituras. El jugador los anota en su propia ficha.
 Hay pruebas negativas que comparan el documento del personaje antes y después.
 
 El DM escribe solo lo suyo: campañas, capítulos, cuaderno, combates, sus
-monstruos y sus PNJ (con sus PG y su estado por campaña). Los PG de los
-jugadores en combate salen del encuentro, no de la ficha.
+monstruos, sus PNJ (con sus PG y su estado por campaña) y las escenas de
+música. Los PG de los jugadores en combate salen del encuentro, no de la ficha.
+
+Lo que el DM guarda dentro de la campaña (las escenas de música) no viaja a la
+campaña que recibe el jugador: se poda en la consulta y en
+`Campaign.playerView()`. Un campo nuevo del DM en `Campaign` pide la misma
+doble poda y su prueba.
 
 ### El catálogo se prueba por reglas, no por conteos
 
@@ -281,14 +291,17 @@ Si el código y una guía discrepan, manda el código y la guía se corrige en e
 mismo cambio.
 
 - `docs/arquitectura/modo-dm.md` — seguridad y contratos del Modo DM.
-- `docs/arquitectura/multiclase.md` — modelo de la multiclase y su compatibilidad.
 - `docs/desarrollo/contenido-y-reglas.md` — fuentes, catálogo y validación.
 - `docs/desarrollo/diseno-web.md` — sistema visual y componentes.
 - `docs/desarrollo/textos.md` — glosario y convenciones de los textos visibles,
   en español e inglés.
 - `docs/desarrollo/versionado-y-changelog.md` — versión visible y `CHANGELOG.md`.
 - `docs/operaciones/despliegue.md` — runbook del stack y CI/CD.
-- `docs/operaciones/pruebas-en-produccion.md` — registro de pruebas manuales.
+
+Fuera de Git, y solo en las máquinas que los tengan:
+`docs/arquitectura/multiclase.md` (borrador del modelo de la multiclase) y
+`docs/operaciones/pruebas-en-produccion.md` (registro de pruebas manuales). Se
+consultan si están, pero no se citan como requisito.
 
 Los cambios planificados con OpenSpec viven en `openspec/`, que Git ignora: es
 local de cada máquina (`specs/` vigentes, `changes/archive/` hechos) y su
