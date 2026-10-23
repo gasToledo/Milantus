@@ -749,6 +749,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get printHeadRecharge => 'Recharge';
 
   @override
+  String get printHeadModifier => 'Mod.';
+
+  @override
+  String get printHeadScore => 'Score';
+
+  @override
+  String get printNotes => 'Notes';
+
+  @override
+  String printPageOf(String page, String total) {
+    return 'Page $page of $total';
+  }
+
+  @override
   String get turnNext => 'Get ready, you\'re up next.';
 
   @override

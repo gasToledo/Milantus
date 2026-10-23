@@ -627,6 +627,20 @@
   "printHeadDamage": "Daño",
   "printHeadUses": "Usos",
   "printHeadRecharge": "Recarga",
+  "printHeadModifier": "Mod.",
+  "printHeadScore": "Punt.",
+  "printNotes": "Notas",
+  "printPageOf": "Hoja {page} de {total}",
+  "@printPageOf": {
+    "placeholders": {
+      "page": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
   "turnNext": "Preparate, seguís vos.",
   "turnActive": "Es tu turno.",
   "commonExpand": "Desplegar",

@@ -28,7 +28,7 @@ extension _SheetPrint on _SheetScreenState {
     final out = StringBuffer()
       ..write('<!doctype html><html lang="${l10n.localeName}"><head>')
       ..write('<meta charset="utf-8"><title>${_e(_c.name)}</title>')
-      ..write('<style>$_printCss</style></head><body>')
+      ..write('<style>$_printCss${_pageFooter()}</style></head><body>')
       ..write('<header><h1>${_e(_c.name)}</h1><p>')
       ..write(
         _e(
@@ -46,15 +46,16 @@ extension _SheetPrint on _SheetScreenState {
       ..sort((a, b) => b.key.compareTo(a.key));
     out
       ..write('<section class="stats">')
-      ..write(_stat(l10n.statArmor, '${s.armorClass}'))
       ..write(
         _stat(
           l10n.hitPoints,
           '<i class="blank"></i> / ${s.maxHp}',
           raw: true,
           note: l10n.printCurrentHp,
+          wide: true,
         ),
       )
+      ..write(_stat(l10n.statArmor, '${s.armorClass}'))
       ..write(_stat(l10n.combatTempHp, '<i class="blank"></i>', raw: true))
       ..write(_stat(l10n.initiative, _signed(s.initiative)))
       ..write(_stat(l10n.creatureSpeed, '${s.speed}${l10n.unitFeetSuffix}'))
@@ -64,20 +65,26 @@ extension _SheetPrint on _SheetScreenState {
 
     out.write('<div class="cols"><div>');
     // Características y salvaciones en una tabla: es lo que más se compara,
-    // y una cifra al lado de la otra se lee mejor que seis recuadros.
+    // y una cifra al lado de la otra se lee mejor que seis recuadros. El
+    // modificador va grande porque es lo que se suma a cada tirada; la
+    // puntuación casi no se consulta en la mesa.
     out
-      ..write('<h2>${_e(l10n.abilitiesTitle)}</h2><table>')
+      ..write('<h2>${_e(l10n.abilitiesTitle)}</h2><table class="abilities">')
       ..write(
-        '<tr><th></th><th></th><th></th>'
-        '<th>${_e(l10n.savesTitle)}</th></tr>',
+        '<tr><th></th><th class="num">${_e(l10n.printHeadModifier)}</th>'
+        '<th class="num">${_e(l10n.printHeadScore)}</th><th></th>'
+        '<th class="num">${_e(l10n.savesTitle)}</th></tr>',
       );
     for (final a in Ability.values) {
+      // La marca de competencia en su propia columna: delante del número
+      // corría la cifra y la columna de salvaciones dejaba de alinear.
       final prof = s.savingThrowProficiencies.contains(a);
       out.write(
-        '<tr><td>${_e(a.label)}</td><td class="num">${s.abilityScores[a]}</td>'
-        '<td class="num strong">${_signed(s.abilityModifiers[a]!)}</td>'
-        '<td class="num">${prof ? '● ' : ''}${_signed(s.savingThrow(a))}</td>'
-        '</tr>',
+        '<tr><td>${_e(a.label)}</td>'
+        '<td class="num mod">${_signed(s.abilityModifiers[a]!)}</td>'
+        '<td class="num muted">${s.abilityScores[a]}</td>'
+        '<td>${prof ? '●' : ''}</td>'
+        '<td class="num">${_signed(s.savingThrow(a))}</td></tr>',
       );
     }
     out.write('</table>');
@@ -115,7 +122,11 @@ extension _SheetPrint on _SheetScreenState {
     // ○ sin competencia, ● competente, ◉ pericia: los mismos tres estados
     // que el punto de la ficha, en algo que se ve igual en blanco y negro.
     out.write('<h2>${_e(l10n.creatureSkills)}</h2><table>');
-    for (final skill in Skill.values) {
+    // Por el nombre traducido: `Skill.values` sigue el alfabeto inglés, y en
+    // papel se busca con el dedo.
+    final skills = [...Skill.values]
+      ..sort((a, b) => compareContentNames(a.label, b.label));
+    for (final skill in skills) {
       final mark = s.expertiseSkills.contains(skill.id)
           ? '◉'
           : s.skillProficiencies.contains(skill.id)
@@ -144,7 +155,7 @@ extension _SheetPrint on _SheetScreenState {
           '<td>${_e(repo.weapon(a.baseWeaponId)?.rangeLabel ?? '')}</td></tr>',
         );
       }
-      out.write('</table>');
+      out.write('${_emptyRows(4, 1)}</table>');
     }
 
     final profs = <String>[
@@ -158,12 +169,26 @@ extension _SheetPrint on _SheetScreenState {
         if (id != Language.universal.id) Language.labelFor(id),
     ]..sort(compareContentNames);
     out
+      ..write('<div class="cols"><div>')
       ..write('<h2>${_e(l10n.proficienciesTitle)}</h2>')
-      ..write('<p>${_e(profs.join(', '))}</p>')
+      ..write('<p>${_e(profs.join(', '))}</p></div><div>')
       ..write('<h2>${_e(l10n.creatureLanguages)}</h2>')
       ..write(
         '<p>${_e([Language.labelFor(Language.universal.id), ...languages].join(', '))}</p>',
-      );
+      )
+      ..write('</div></div>');
+
+    // Lo que la ficha en pantalla marca con un toque y en papel no tiene
+    // dónde: la Inspiración, el Cansancio, las condiciones y lo que se anota.
+    out
+      ..write('<div class="cols"><div>')
+      ..write('<h2>${_e(l10n.combatState)}</h2>')
+      ..write(
+        '<p class="marks">${_e(l10n.heroicInspiration)} ${_boxes(1)}&emsp;'
+        '${_e(l10n.exhaustion)} ${_boxes(6)}</p>',
+      )
+      ..write('<p>${_e(l10n.conditionsTitle)}</p>${_lines(1)}</div><div>')
+      ..write('<h2>${_e(l10n.printNotes)}</h2>${_lines(3)}</div></div>');
 
     // ---------------------------------------------------------- Hoja 2
     out.write('<div class="page">');
@@ -195,34 +220,35 @@ extension _SheetPrint on _SheetScreenState {
         ..write('</ul>');
     }
 
-    out.write('<h2>${_e(l10n.invTitle)}</h2>');
-    if (_c.inventory.isNotEmpty) {
-      out.write(
+    // La tabla sale aunque no haya nada: los renglones vacíos son para lo que
+    // se consiga jugando.
+    out
+      ..write('<h2>${_e(l10n.invTitle)}</h2>')
+      ..write(
         '<table class="wide"><tr><th>${_e(l10n.invHeadQty)}</th>'
         '<th>${_e(l10n.invHeadItem)}</th>'
         '<th>${_e(l10n.invHeadEquipped)}</th>'
-        '<th>${_e(l10n.invHeadWeight)}</th></tr>',
+        '<th class="num">${_e(l10n.invHeadWeight)}</th></tr>',
       );
-      for (final e in _c.inventory) {
-        final item = InventoryOps.resolve(e, repo);
-        final weight = item.weight * e.quantity;
-        out.write(
-          '<tr><td class="num">${e.quantity}</td><td>${_e(item.name)}</td>'
-          '<td>${InventoryOps.isEquipped(_c, e, repo) ? '●' : ''}</td>'
-          '<td class="num">${weight == 0 ? '' : '${formatPounds(weight)} lb'}</td></tr>',
-        );
-      }
-      out.write('</table>');
+    for (final e in _c.inventory) {
+      final item = InventoryOps.resolve(e, repo);
+      final weight = item.weight * e.quantity;
+      out.write(
+        '<tr><td class="num">${e.quantity}</td><td>${_e(item.name)}</td>'
+        '<td>${InventoryOps.isEquipped(_c, e, repo) ? '●' : ''}</td>'
+        '<td class="num">${weight == 0 ? '' : '${formatPounds(weight)} lb'}</td></tr>',
+      );
     }
-    // Solo las denominaciones que hay: cinco ceros seguidos no dicen nada.
-    final coins = [
-      for (final k in coinDenominations)
-        if ((_c.coins[k] ?? 0) > 0) '${_c.coins[k]} ${coinAbbr(l10n, k)}',
-    ];
+    out.write('${_emptyRows(4, 6)}</table>');
+    // Las monedas y la carga cambian en cada sesión: van en blanco, como los
+    // PG, y no con lo que había el día que se imprimió.
     out
-      ..write('<p>')
-      ..write(coins.isEmpty ? '' : '${_e(coins.join(' · '))} — ')
-      ..write('${_e(l10n.invLoad)} ${formatPounds(s.carriedWeight)} / ')
+      ..write('<p class="coins">')
+      ..writeAll([
+        for (final k in coinDenominations)
+          '<span>${_e(coinAbbr(l10n, k))} <i class="blank"></i></span>',
+      ])
+      ..write('</p><p>${_e(l10n.invLoad)} <i class="blank"></i> / ')
       ..write('${s.carryingCapacity} lb</p>')
       ..write('</div>');
 
@@ -292,15 +318,17 @@ extension _SheetPrint on _SheetScreenState {
           l10n.spellsAlwaysPrepared,
           spellsOf(s.alwaysPreparedSpellIds),
         );
+        // Quien prepara cambia la lista entre descansos: una casilla por
+        // conjuro para marcar los de hoy sin reimprimir.
+        final prepares = sc.preparation == SpellPreparation.prepared;
         _spellTable(
           out,
-          sc.preparation == SpellPreparation.prepared
-              ? l10n.spellsPreparedTitle
-              : l10n.spellsKnownTitle,
+          prepares ? l10n.spellsPreparedTitle : l10n.spellsKnownTitle,
           spellsOf({
             ..._c.spellIds,
             for (final ids in _c.classSpellIds.values) ...ids,
           }),
+          checkable: prepares,
         );
       }
       if (s.innateSpells.isNotEmpty) {
@@ -323,13 +351,19 @@ extension _SheetPrint on _SheetScreenState {
     return out.toString();
   }
 
-  void _spellTable(StringBuffer out, String title, List<Spell> spells) {
+  void _spellTable(
+    StringBuffer out,
+    String title,
+    List<Spell> spells, {
+    bool checkable = false,
+  }) {
     if (spells.isEmpty) return;
     final l10n = context.l10n;
+    final check = checkable ? '<th></th>' : '';
     out
       ..write('<h3>${_e(title)}</h3><table class="wide spells">')
       ..write(
-        '<tr><th></th><th></th><th>${_e(l10n.spellCastingTime)}</th>'
+        '<tr>$check<th></th><th></th><th>${_e(l10n.spellCastingTime)}</th>'
         '<th>${_e(l10n.commonRange)}</th><th>${_e(l10n.spellComponents)}</th>'
         '<th>${_e(l10n.spellDuration)}</th></tr>',
       );
@@ -341,7 +375,8 @@ extension _SheetPrint on _SheetScreenState {
         if (sp.ritual) ' (R)',
       ].join();
       out.write(
-        '<tr><td>${_e(sp.name)}$flags</td>'
+        '<tr>${checkable ? '<td class="check">${_boxes(1)}</td>' : ''}'
+        '<td class="name">${_e(sp.name)}$flags</td>'
         '<td>${_e(sp.isCantrip ? l10n.spellCantrip : l10n.spellLevel(sp.level))}</td>'
         '<td>${_e(vocabularyLabel(VocabularyField.castingTime, sp.castingTime))}</td>'
         '<td>${_e(vocabularyLabel(VocabularyField.range, sp.range))}</td>'
@@ -368,11 +403,37 @@ extension _SheetPrint on _SheetScreenState {
     RechargeOn.none => '',
   };
 
-  String _stat(String label, String value, {bool raw = false, String? note}) =>
-      '<div class="stat"><span>${_e(label)}</span>'
+  String _stat(
+    String label,
+    String value, {
+    bool raw = false,
+    String? note,
+    bool wide = false,
+  }) =>
+      '<div class="stat${wide ? ' wide' : ''}"><span>${_e(label)}</span>'
       '<b>${raw ? value : _e(value)}</b>'
       '${note == null ? '' : '<small>${_e(note)}</small>'}</div>';
+
+  /// Nombre y «Hoja N de M» al pie de cada hoja, en el margen que dibuja el
+  /// navegador (Chrome 131+; el que no lo soporta imprime sin pie). Las hojas
+  /// salen de la paginación del navegador y no se pueden contar acá.
+  String _pageFooter() {
+    final page = context.l10n.printPageOf('\u0000', '\u0001');
+    final counters = _cssString(page)
+        .replaceFirst('\u0000', '" counter(page) "')
+        .replaceFirst('\u0001', '" counter(pages) "');
+    return '@page { @bottom-left { content: "${_cssString(_c.name)}"; } '
+        '@bottom-right { content: "$counters"; } }';
+  }
 }
+
+/// Cadena CSS entre comillas dobles. `<` se escapa porque la regla va dentro
+/// de un `<style>`, y un nombre con `</style>` cerraría el bloque.
+String _cssString(String v) => v
+    .replaceAll(r'\', r'\\')
+    .replaceAll('"', r'\"')
+    .replaceAll('<', r'\3C ')
+    .replaceAll('\n', r'\A ');
 
 /// Modo `element`: todo lo que se escapa va como texto de un elemento, y el
 /// modo por defecto convertía cada «/» de «actuales / máx.» en `&#47;`.
@@ -382,15 +443,21 @@ String _boxes(int n) => '<i class="box"></i>' * n;
 
 String _dots(int n) => '<i class="dot"></i>' * n;
 
+String _lines(int n) => '<div class="lines">${'<i></i>' * n}</div>';
+
+String _emptyRows(int cols, int n) =>
+    '<tr class="empty">${'<td></td>' * cols}</tr>' * n;
+
 /// Blanco y negro a propósito: casi nadie imprime en color, y la paleta de la
 /// app pensada para pantalla sale gris sobre gris en una láser.
 const _printCss = '''
-@page { margin: 14mm; }
+@page { margin: 20mm 14mm; }
+@page { @bottom-left, @bottom-right { font: 8pt system-ui, sans-serif; color: #555; } }
 * { box-sizing: border-box; }
 body { font: 10pt/1.35 system-ui, sans-serif; color: #000; margin: 0; }
 h1, h2, h3 { font-family: Georgia, serif; font-weight: normal; margin: 0; }
 h1 { font-size: 20pt; }
-h2 { font-size: 12pt; border-bottom: 1px solid #000; margin: 12px 0 4px; }
+h2 { font-size: 12pt; border-bottom: 1px solid #000; margin: 9px 0 3px; }
 h3 { font-size: 10.5pt; margin: 10px 0 3px; }
 header p { margin: 2px 0 8px; }
 p { margin: 3px 0; }
@@ -400,18 +467,29 @@ th { font-size: 8pt; text-transform: uppercase; font-weight: 600; }
 tr { break-inside: avoid; }
 table.wide tr + tr td { border-top: 1px solid #ccc; }
 .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.strong { font-weight: 700; }
 .muted { font-size: 8pt; color: #555; }
-.stats { display: flex; flex-wrap: wrap; gap: 6px; }
-.stat { border: 1px solid #000; border-radius: 6px; padding: 4px 8px; min-width: 22mm; text-align: center; }
-.stat span, .stat small { display: block; font-size: 7.5pt; text-transform: uppercase; }
+.abilities td { vertical-align: middle; }
+.mod { font: 15pt Georgia, serif; }
+/* Columnas fijas para que las cajas no queden de anchos distintos; los PG
+   ocupan dos porque son lo que más se reescribe. */
+.stats { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; }
+.stat { border: 1px solid #000; border-radius: 6px; padding: 4px 5px; text-align: center; }
+.stat.wide { grid-column: span 2; }
+.stat span, .stat small { display: block; font-size: 8pt; line-height: 1.2; }
 .stat b { display: block; font-size: 15pt; font-family: Georgia, serif; font-weight: normal; }
+.stat .blank { width: 13mm; }
+.stat.wide .blank { width: 24mm; }
 .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
 .marks { white-space: nowrap; }
 .box, .dot { display: inline-block; width: 10px; height: 10px; border: 1px solid #000; margin-right: 3px; vertical-align: -1px; }
 .dot { border-radius: 50%; }
-.blank { display: inline-block; width: 12mm; border-bottom: 1px solid #000; height: 1em; }
+/* 20 mm: lo justo para un número tachado y el nuevo al lado. */
+.blank { display: inline-block; width: 20mm; border-bottom: 1px solid #000; height: 1em; }
+tr.empty td { height: 15pt; }
+.lines i { display: block; height: 16pt; border-bottom: 1px solid #888; }
+.coins { display: flex; flex-wrap: wrap; gap: 4px 16px; }
 .list { columns: 2; margin: 0; padding-left: 16px; }
 .page { break-before: page; }
-.spells td:first-child { font-weight: 600; }
+.spells td.name { font-weight: 600; }
+.spells td.check { width: 14px; padding-right: 0; }
 ''';

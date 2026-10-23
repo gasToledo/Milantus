@@ -686,7 +686,12 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
-- Sin cambios.
+- La ficha impresa deja más lugar para el lápiz: margen vertical más amplio,
+  huecos más anchos, renglones vacíos en ataques e inventario, monedas y carga
+  en blanco, casillas de Inspiración Heroica, Cansancio y conjuros preparados,
+  y espacio para condiciones y notas. Las habilidades van en orden alfabético
+  del idioma, el modificador de cada característica se lee primero y cada
+  hoja lleva al pie el nombre y su número.
 
 ### Eliminado
 

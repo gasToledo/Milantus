@@ -1292,6 +1292,30 @@ abstract class AppLocalizations {
   /// **'Recarga'**
   String get printHeadRecharge;
 
+  /// No description provided for @printHeadModifier.
+  ///
+  /// In es, this message translates to:
+  /// **'Mod.'**
+  String get printHeadModifier;
+
+  /// No description provided for @printHeadScore.
+  ///
+  /// In es, this message translates to:
+  /// **'Punt.'**
+  String get printHeadScore;
+
+  /// No description provided for @printNotes.
+  ///
+  /// In es, this message translates to:
+  /// **'Notas'**
+  String get printNotes;
+
+  /// No description provided for @printPageOf.
+  ///
+  /// In es, this message translates to:
+  /// **'Hoja {page} de {total}'**
+  String printPageOf(String page, String total);
+
   /// No description provided for @turnNext.
   ///
   /// In es, this message translates to:
