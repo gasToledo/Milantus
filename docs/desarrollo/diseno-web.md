@@ -79,7 +79,8 @@ hace.
 ### Dependencias que afectan la interfaz
 
 `file_picker` (importar retrato), `archive` (respaldo ZIP),
-`package_info_plus` (versión en el pie del panel). Nada más. **Sumar un plugin
+`package_info_plus` (versión en el pie del panel), `font_awesome_flutter` (los
+tres íconos de tipo de acción, ver [Iconografía](#9-iconografía)). Nada más. **Sumar un plugin
 nativo es una decisión de arquitectura, no de diseño**: obliga a que toda
 máquina que compile tenga el Modo Desarrollador de Windows activo.
 
@@ -201,7 +202,7 @@ sistema.
 | Favorito | Borde `gold` de **2 px** + estrella dorada junto al nombre |
 | Deshabilitado | Comportamiento por defecto de Material (`onSelected: null`) |
 | Error | `colorScheme.error` (= `crimson`) + `Icons.error_outline` |
-| Éxito | `Colors.green` + `Icons.check_circle_outline` — **única excepción** a la paleta, y solo en `SnackBar` |
+| Éxito | `verdant` + `Icons.check_circle_outline` — el verde de «la salida esperada», que cambia con el tema como el resto |
 | Info | `colorScheme.primary` + `Icons.info_outline` |
 
 **El color nunca es el único portador de significado.** El favorito lleva borde
@@ -547,7 +548,12 @@ se repiten a propósito entre la pantalla y el diálogo.
 
 ## 9. Iconografía
 
-**Material Icons exclusivamente.** No hay set propio ni SVG sueltos.
+**Material Icons**, con una sola excepción: los tres íconos de tipo de acción
+(`actionTypeBadge` en `app_widgets.dart`: acción, acción adicional, reacción)
+salen de Font Awesome (`font_awesome_flutter`). Material no tiene con qué
+representar «acción principal», y mezclar familias en tres íconos que se leen
+juntos se nota. Fuera de ese trío, nada de Font Awesome. No hay set propio ni
+SVG sueltos.
 
 El contenido declara su ícono con un **id de texto** (`iconId` en el JSON) que
 `class_visuals.dart` mapea a un `IconData` **const**. Nunca se construye un
