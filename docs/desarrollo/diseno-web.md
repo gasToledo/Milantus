@@ -122,6 +122,13 @@ inventar equivalentes:
   Armadura, y solo la CA.
 - **El medallón**: círculo con aro dorado de 2 px para retratos y emblemas.
 
+Fuera de la app, el favicon y los íconos de la PWA (`web/favicon.png`,
+`web/icons/`) son **el sello**: un disco de oro con una M angulosa en
+`plaque`. Es la versión chica del logo en desarrollo; la cabecera del panel
+sigue con el rombo hasta que el sello completo esté cerrado. La M va rellena y
+no calada porque, calada, en una pestaña clara quedaría blanca sobre oro y no
+se leería.
+
 ---
 
 ## 3. Color
