@@ -218,7 +218,7 @@ class AppSidebar extends StatelessWidget {
   }
 }
 
-/// La marca en lo alto de todo panel lateral: el rombo, el nombre y el
+/// La marca en lo alto de todo panel lateral: el sello, el nombre y el
 /// subtítulo. Es la misma en el menú principal y en las pantallas de adentro
 /// (ficha, Códice, creación), para que el panel se reconozca como uno solo.
 class SidebarBrand extends StatelessWidget {
@@ -231,15 +231,13 @@ class SidebarBrand extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(8, 2, 8, 16),
       child: Row(
         children: [
-          Transform.rotate(
-            angle: 0.785398,
-            child: Container(
-              width: 26,
-              height: 26,
-              decoration: BoxDecoration(
-                color: pal.gold,
-                borderRadius: BorderRadius.circular(5),
-              ),
+          // 38 ocupa lo mismo que ocupaba el rombo de 26 girado (su
+          // diagonal), así el nombre no se corre de lugar.
+          CustomPaint(
+            size: const Size.square(38),
+            painter: _SealPainter(
+              gold: pal.gold,
+              background: Theme.of(context).colorScheme.surface,
             ),
           ),
           const SizedBox(width: 12),
@@ -273,6 +271,76 @@ class SidebarBrand extends StatelessWidget {
       ),
     );
   }
+}
+
+/// El sello de Milantus: doble aro con un rombo en cada punto cardinal y la M
+/// angulosa. Es el mismo dibujo que el favicon y los íconos de la PWA en su
+/// versión de cabecera, y se pinta a mano en vez de ser una imagen para que
+/// siga al oro de cada tema.
+///
+/// Las coordenadas son las del boceto, sobre un lienzo de 120. A este tamaño
+/// el rombo que el sello grande lleva bajo la M no se vería y se omite.
+class _SealPainter extends CustomPainter {
+  final Color gold;
+
+  /// El color del panel: los rombos llevan un filete de este color para que
+  /// corten el aro en vez de apoyarse encima.
+  final Color background;
+
+  const _SealPainter({required this.gold, required this.background});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.scale(size.width / 120);
+    final stroke = Paint()
+      ..color = gold
+      ..style = PaintingStyle.stroke
+      ..isAntiAlias = true;
+
+    canvas.drawCircle(const Offset(60, 60), 53, stroke..strokeWidth = 5);
+
+    final cut = Paint()
+      ..color = background
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3;
+    final fill = Paint()..color = gold;
+    for (final (x, y) in const [
+      (60.0, 7.0),
+      (113.0, 60.0),
+      (60.0, 113.0),
+      (7.0, 60.0),
+    ]) {
+      final rombo = Path()
+        ..moveTo(x, y - 7)
+        ..lineTo(x + 7, y)
+        ..lineTo(x, y + 7)
+        ..lineTo(x - 7, y)
+        ..close();
+      canvas
+        ..drawPath(rombo, cut)
+        ..drawPath(rombo, fill);
+    }
+
+    // Esquinas vivas y remate cuadrado: es lo que la separa de una M de
+    // fuente, y lo que la hace del sello y no de cualquier monograma.
+    final m = Path()
+      ..moveTo(37, 82)
+      ..lineTo(37, 38)
+      ..lineTo(60, 62)
+      ..lineTo(83, 38)
+      ..lineTo(83, 82);
+    canvas.drawPath(
+      m,
+      stroke
+        ..strokeWidth = 9
+        ..strokeJoin = StrokeJoin.miter
+        ..strokeCap = StrokeCap.square,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_SealPainter old) =>
+      old.gold != gold || old.background != background;
 }
 
 /// La parte que scrollea de un panel lateral.
@@ -397,17 +465,34 @@ class AppBarBrandTitle extends StatelessWidget {
   const AppBarBrandTitle({super.key});
 
   @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
+  Widget build(BuildContext context) => Row(
     mainAxisSize: MainAxisSize.min,
     children: [
-      const Text(appName),
-      Text(
-        context.l10n.appTagline,
-        style: TextStyle(
-          fontSize: 11,
-          letterSpacing: 0.3,
-          color: context.palette.gold,
+      // Sin el sello, en el celular el logo solo aparecía al abrir el cajón.
+      // 30 es lo que entra junto a las dos líneas sin agrandar la barra.
+      CustomPaint(
+        size: const Size.square(30),
+        painter: _SealPainter(
+          gold: context.palette.gold,
+          background: Theme.of(context).colorScheme.surface,
+        ),
+      ),
+      const SizedBox(width: 10),
+      Flexible(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(appName),
+            Text(
+              context.l10n.appTagline,
+              style: TextStyle(
+                fontSize: 11,
+                letterSpacing: 0.3,
+                color: context.palette.gold,
+              ),
+            ),
+          ],
         ),
       ),
     ],

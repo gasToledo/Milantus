@@ -43,7 +43,7 @@
     (`scaffold` y `gold`), así que la pantalla de carga y la aplicación no se
     ven como dos productos distintos.
 
-    El rombo es el mismo emblema del panel lateral: un cuadrado girado 45°,
+    El sello es el mismo del panel lateral (`_SealPainter`), en SVG en línea:
     sin imágenes que pedir ni fuentes que esperar. Late despacio para que se
     note que algo está pasando, y se queda quieto si el sistema pide menos
     movimiento.
@@ -54,21 +54,30 @@
       position: fixed; inset: 0; display: flex; align-items: center;
       justify-content: center; background-color: #151210;
     }
-    #splash div {
-      width: 34px; height: 34px; background-color: #C9A24B; border-radius: 6px;
-      transform: rotate(45deg); animation: splash-pulse 1.4s ease-in-out infinite;
+    #splash svg {
+      width: 56px; height: 56px; animation: splash-pulse 1.4s ease-in-out infinite;
     }
     @keyframes splash-pulse {
       0%, 100% { opacity: .35; }
       50%      { opacity: 1; }
     }
     @media (prefers-reduced-motion: reduce) {
-      #splash div { animation: none; opacity: .8; }
+      #splash svg { animation: none; opacity: .8; }
     }
   </style>
 </head>
 <body>
-  <div id="splash" aria-label="Cargando Milantus" role="status"><div></div></div>
+  <div id="splash" aria-label="Cargando Milantus" role="status">
+    <svg viewBox="0 0 120 120" aria-hidden="true">
+      <circle cx="60" cy="60" r="53" fill="none" stroke="#C9A24B" stroke-width="5"/>
+      <g fill="#C9A24B" stroke="#151210" stroke-width="3">
+        <path d="M60 0l7 7-7 7-7-7z"/><path d="M113 53l7 7-7 7-7-7z"/>
+        <path d="M60 106l7 7-7 7-7-7z"/><path d="M7 53l7 7-7 7-7-7z"/>
+      </g>
+      <path d="M37 82V38l23 24 23-24v44" fill="none" stroke="#C9A24B"
+        stroke-width="9" stroke-linejoin="miter" stroke-linecap="square"/>
+    </svg>
+  </div>
 
   <!--
     You can customize the "flutter_bootstrap.js" script.

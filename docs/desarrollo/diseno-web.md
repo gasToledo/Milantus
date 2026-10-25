@@ -113,21 +113,21 @@ Los cuatro compromisos que definen el estilo:
 
 ### Vocabulario visual propietario
 
-Tres formas son marca registrada del producto y hay que reusarlas en vez de
+Cuatro formas son marca registrada del producto y hay que reusarlas en vez de
 inventar equivalentes:
 
-- **El rombo** (cuadrado rotado 45°, `angle: 0.785398`): logotipo en la cabecera
-  del panel y centro de `SectionRule`.
+- **El sello**: el logotipo. Doble aro con un rombo en cada punto cardinal y
+  una M angulosa de esquinas vivas, pintado por `_SealPainter` en la cabecera
+  del panel (`SidebarBrand`). Fuera de la app, el favicon y los íconos de la
+  PWA (`web/favicon.png`, `web/icons/`) usan su versión chica: un disco de oro
+  con la M en `plaque`. La M va rellena y no calada porque, calada, en una
+  pestaña clara quedaría blanca sobre oro y no se leería.
+- **El rombo** (cuadrado rotado 45°, `angle: 0.785398`): centro de
+  `SectionRule` y los cuatro puntos cardinales del sello.
 - **El escudo**: silueta recortada con `_ShieldClipper` que contiene la Clase de
   Armadura, y solo la CA.
-- **El medallón**: círculo con aro dorado de 2 px para retratos y emblemas.
-
-Fuera de la app, el favicon y los íconos de la PWA (`web/favicon.png`,
-`web/icons/`) son **el sello**: un disco de oro con una M angulosa en
-`plaque`. Es la versión chica del logo en desarrollo; la cabecera del panel
-sigue con el rombo hasta que el sello completo esté cerrado. La M va rellena y
-no calada porque, calada, en una pestaña clara quedaría blanca sobre oro y no
-se leería.
+- **El medallón**: círculo con aro dorado de 2 px para retratos y emblemas. El
+  sello no es un medallón: los rombos del aro son lo que los distingue.
 
 ---
 
@@ -290,7 +290,7 @@ su caja, que es el caso de las tiras cortas dentro de una tarjeta.
 
 | Radio | Aplicación |
 | --- | --- |
-| `5` | Marca romboidal de la cabecera |
+| `5` | Tecla dibujada junto a un rótulo (`_KeyCap`) |
 | `8` | Campos de texto (`inputDecorationTheme`) |
 | `9` | Ítems de navegación, indicador de guardado, `StatPlaque` densa |
 | `12` | **Tarjetas** (`cardTheme`), placas, `DenseRows` |
@@ -447,7 +447,7 @@ compartida: **antes de crear un widget visual nuevo, buscar acá**.
 | `responsiveColumns(…)` | Columnas lado a lado ≥ 640, apiladas debajo | `List<List<Widget>>` |
 | `appNavItem(…)` | Ítem del panel lateral | `icon`, `label`, `active`, `onTap`, y `count` para la cifra al final de la fila (en cifras tabulares: los ítems se apilan y la columna de números tiene que leerse como columna) |
 | `LanguageSelector`, `ThemeModeSelector` | El idioma (pill con menú) y el tema (grupo de tres). Viven solo en Ajustes: ningún panel lateral los repite | El tema recibe su `AppThemeController`; el idioma lee el `AppLocaleScope` |
-| `SidebarBrand` | La marca en lo alto de todo panel: rombo, nombre y subtítulo | — |
+| `SidebarBrand` | La marca en lo alto de todo panel: sello, nombre y subtítulo | — |
 | `SidebarBackButton` | El «volver» de una pantalla de adentro (ficha, Códice, creación). Ocupa el lugar que en el menú principal tiene el interruptor de modo, con la misma forma, para que la salida esté siempre en el mismo sitio | `label`, `onPressed` |
 | `SidebarLightFooter` | El pie de una pantalla de adentro: la versión y, si hace falta, algo propio a la izquierda (la ficha pone su cartel de guardado). **No repite el pie del menú principal**: con Ajustes, la cuenta y «Cerrar sesión» encima, la ficha no entra en una ventana de laptop | `leading` |
 | `AppSidebar` | El marco del panel lateral que comparten el Modo Jugador y el Modo DM: marca, interruptor de modo, la navegación propia y el pie de la cuenta | `mode`, `onModeChanged`, `navigation` (si puede no entrar, trae su propio scroll), `account`, `appVersion`, `settingsActive`, `onOpenSettings`, `inDrawer` |
