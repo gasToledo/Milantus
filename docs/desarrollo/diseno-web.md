@@ -14,7 +14,7 @@ comportamiento tal como están **implementados hoy** en
 ## Cómo usar esta guía
 
 **Si sos una persona diseñando o revisando pantallas**: leé
-[Dirección de arte](#2-dirección-de-arte), [Color](#3-color),
+[Dirección de arte](#2-dirección-de-arte) (con [la marca](#la-marca-el-sello)), [Color](#3-color),
 [Tipografía](#4-tipografía) y el
 [Catálogo de componentes](#8-catálogo-de-componentes). El resto es referencia.
 
@@ -116,18 +116,82 @@ Los cuatro compromisos que definen el estilo:
 Cuatro formas son marca registrada del producto y hay que reusarlas en vez de
 inventar equivalentes:
 
-- **El sello**: el logotipo. Doble aro con un rombo en cada punto cardinal y
-  una M angulosa de esquinas vivas, pintado por `_SealPainter` en la cabecera
-  del panel (`SidebarBrand`). Fuera de la app, el favicon y los íconos de la
-  PWA (`web/favicon.png`, `web/icons/`) usan su versión chica: un disco de oro
-  con la M en `plaque`. La M va rellena y no calada porque, calada, en una
-  pestaña clara quedaría blanca sobre oro y no se leería.
+- **El sello**: el logotipo. Tiene su propia sección,
+  [La marca](#la-marca-el-sello), justo abajo.
 - **El rombo** (cuadrado rotado 45°, `angle: 0.785398`): centro de
   `SectionRule` y los cuatro puntos cardinales del sello.
 - **El escudo**: silueta recortada con `_ShieldClipper` que contiene la Clase de
   Armadura, y solo la CA.
 - **El medallón**: círculo con aro dorado de 2 px para retratos y emblemas. El
   sello no es un medallón: los rombos del aro son lo que los distingue.
+
+### La marca: el sello
+
+El logotipo de Milantus es **el sello**: un doble aro de oro con un rombo en
+cada punto cardinal y una M de esquinas vivas adentro. Junto al nombre y al
+subtítulo forma el logotipo completo de la cabecera del panel.
+
+**Por qué esta forma.** Salió de relevar las marcas de las herramientas de
+D&D (D&D Beyond, Roll20, Foundry, Nivel20, World Anvil, LegendKeeper y otras).
+Casi todas se apoyan en un d20, en el rojo, o en los dos; el rojo además es el
+de D&D, y acercarse a él es acercarse a una marca ajena. Las que no, se reparten
+entre la estética de software con colores eléctricos y la fantasía recargada de
+pergamino. La heráldica sobria en oro sobre carbón, que es la dirección de arte
+de esta guía, estaba libre. El sello la ocupa sin inventar nada: está hecho
+del rombo y del aro que la app ya usaba.
+
+#### Anatomía
+
+Las coordenadas son sobre un lienzo de 120 × 120, el mismo en el código, el
+SVG y el generador de íconos.
+
+| Parte | Geometría | Por qué |
+| --- | --- | --- |
+| Aro | Círculo de radio 53, trazo 5 | El doble aro de los bocetos se redujo a uno: a 30 px el interior se pegaba al exterior |
+| Rombos cardinales | Centro en (60, 7), (113, 60), (60, 113), (7, 60); semidiagonal 7 | Lo que distingue al sello del medallón de retrato |
+| Filete de los rombos | Trazo 3 **del color del fondo** | Corta el aro en vez de apoyarse encima: el rombo se lee como pieza, no como bulto |
+| M | Polilínea (37, 82) → (37, 38) → (60, 62) → (83, 38) → (83, 82), trazo 9 | Esquinas en inglete y remate cuadrado: una M dibujada, no la de una fuente |
+
+#### Las dos versiones
+
+| Versión | Dónde | Tamaño | Implementación |
+| --- | --- | --- | --- |
+| **Sello de línea** | Cabecera del panel (`SidebarBrand`) | 38 px | `_SealPainter` en `ui/app_sidebar.dart` |
+| | Barra de arriba en ventana angosta (`AppBarBrandTitle`) | 30 px | ídem |
+| | Pantalla de carga | 56 px, late en opacidad | SVG en línea en `web/index.html` |
+| **Disco** | Favicon | 32 px, disco a sangre, M de trazo 16 | `web/favicon.png` |
+| | Íconos de la PWA | 192 y 512, disco al 94 % sobre transparente | `web/icons/Icon-*.png` |
+| | Íconos *maskable* | 192 y 512, disco al 72 % sobre `scaffold` | `web/icons/Icon-maskable-*.png` |
+
+El disco es oro macizo con la M en `plaque`. La M va **rellena y no calada**:
+calada, en una pestaña de tema claro quedaría blanca sobre oro, que no
+contrasta. El disco de los *maskable* va al 72 % porque la zona segura es un
+círculo del 80 %, y así sobrevive a cualquier recorte que aplique el sistema.
+
+Los PNG no se editan a mano: salen de
+`packages/dnd_app/tool/generate_seal_icons.dart`, que es Dart puro y
+determinista.
+
+```bash
+cd packages/dnd_app && dart run tool/generate_seal_icons.dart
+```
+
+#### Reglas de uso
+
+- **El color es siempre `gold` de la paleta**, así que el sello de la app
+  cambia con el tema. Los PNG y la pantalla de carga usan el oro del tema
+  oscuro porque viven fuera de la app y no tienen tema.
+- **El filete de los rombos es el color del fondo** sobre el que se dibuja
+  (`colorScheme.surface` en la cabecera y la barra, `scaffold` en la pantalla
+  de carga). Si el sello va sobre otro fondo, el filete se cambia con él.
+- **Por debajo de 24 px se usa el disco.** El sello de línea a ese tamaño
+  pierde los rombos y el aro se vuelve una mancha.
+- **El logotipo completo** es el sello, el nombre en Georgia 18 y el subtítulo
+  en sans 11 dorada, separados 12 px en el panel y 10 px en la barra.
+- No lleva texto alrededor del aro, ni sombra, ni degradado, ni rotación. Esas
+  son las formas en que se parecería a cualquier otro sello.
+- No se usa como medallón de personaje ni el medallón como logo: son dos
+  piezas con significados distintos.
 
 ---
 
@@ -701,6 +765,9 @@ Prohibiciones duras. Las primeras cuatro rompen pruebas o el build.
 | `elevation` > 0 en `Card` | `elevation: 0` + borde | Material 3 tiñe de oro las superficies elevadas |
 | Sumar un plugin nativo por comodidad | Verificar si se puede sin él | Obliga al Modo Desarrollador en toda máquina que compile |
 | Texto largo sin `maxLines` en el panel | `maxLines: 1` + `TextOverflow.ellipsis` | El panel mide 236 px fijos |
+| Un logo propio en una pantalla nueva, o el rombo como logo | `SidebarBrand` / `AppBarBrandTitle` | El sello es uno solo; un segundo emblema parte la marca |
+| Rojo o un d20 en una pieza de marca | El sello en `gold` | Es lo que usa toda la competencia, y el rojo es el de D&D |
+| Editar a mano los PNG de `web/` | `tool/generate_seal_icons.dart` | Un retoque a mano se pierde en la próxima regeneración |
 
 ---
 
@@ -713,6 +780,13 @@ Cosas ciertas hoy, documentadas para que no se re-descubran:
    licencia y de peso; la alternativa sería una serif libre servida como asset.
 2. **La escala de espaciado no es sistemática.** Conviven 2, 3, 5, 6, 7, 11 y
    13 con la escala canónica.
+3. **El nombre del logotipo no tiene letra propia.** «Milantus» va en Georgia,
+   que no es exclusiva y es la misma deuda del punto 1. El camino es un
+   lettering en versalitas sobre una serif libre empaquetada (no Cinzel: es la
+   de casi todo el contenido de fans de D&D).
+4. **El login no lleva la marca.** La pantalla de Zitadel es la genérica. Se
+   configura en la consola de Zitadel (logo, ícono y colores), no en este
+   repositorio.
 
 Tres deudas que esta lista traía y **ya están saldadas**, anotadas para que no
 se vuelvan a abrir: la marca vieja "Fichas / D&D 5e" del wizard de creación (hoy
@@ -733,7 +807,15 @@ exactamente con los del código Dart.
   "brand": {
     "name": "Milantus",
     "subtitle": "Asistente de Aventuras",
-    "defaultTheme": "dark"
+    "defaultTheme": "dark",
+    "seal": {
+      "canvas": 120,
+      "ring": { "radius": 53, "stroke": 5 },
+      "diamonds": { "centers": [[60, 7], [113, 60], [60, 113], [7, 60]], "halfDiagonal": 7, "cutStroke": 3 },
+      "m": { "points": [[37, 82], [37, 38], [60, 62], [83, 38], [83, 82]], "stroke": 9, "join": "miter", "cap": "square" },
+      "color": "gold",
+      "minLineSize": 24
+    }
   },
   "color": {
     "dark": {
@@ -858,6 +940,7 @@ producto.
 | Wizard de creación | `packages/dnd_app/lib/creation/` |
 | Subida de nivel | `packages/dnd_app/lib/levelup/` |
 | Shell HTML y PWA | `packages/dnd_app/web/index.html`, `web/manifest.json` |
+| El sello | `packages/dnd_app/lib/ui/app_sidebar.dart` (`_SealPainter`), `tool/generate_seal_icons.dart` |
 | Colores de clase | `packages/dnd_engine/lib/assets/srd_2024/classes.json` |
 
 Arquitectura general, comandos y criterios de contribución: `CLAUDE.md`.
