@@ -915,6 +915,21 @@
             "type": "passiveTrait",
             "name": "Ataque Furtivo",
             "description": "Una vez por turno, al impactar con un arma con propiedad Sutileza o a distancia teniendo ventaja (o un aliado del objetivo adyacente a él), sumás daño extra. Dados = redondeo hacia arriba de (nivel de Pícaro ÷ 2) d6."
+          },
+          {
+            "type": "scalingDice",
+            "byLevel": {
+              "1": "1d6",
+              "3": "2d6",
+              "5": "3d6",
+              "7": "4d6",
+              "9": "5d6",
+              "11": "6d6",
+              "13": "7d6",
+              "15": "8d6",
+              "17": "9d6",
+              "19": "10d6"
+            }
           }
         ]
       },

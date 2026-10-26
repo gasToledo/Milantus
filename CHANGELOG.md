@@ -774,7 +774,7 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
-## [Unreleased]
+## [0.32.0+1] - 2026-10-26
 
 ### Nuevo
 
@@ -790,6 +790,9 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   exceso usan el tope del personaje.
 - Los ataques del Campeón muestran su rango de crítico: 19–20 con Crítico
   Mejorado y 18–20 con Crítico Superior, con armas y sin armas.
+- Los dados que crecen con el nivel se ven en la ficha: el Ataque Furtivo
+  (1d6 a 10d6) en la tarjeta de ataques, y el dado de superioridad del
+  Maestro de Batalla y los dados psiónicos debajo de sus usos.
 
 ### Modificado
 
@@ -798,6 +801,23 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   objetivo del ataque.
 - El golpe sin armas se muestra con las manos vacías o cuando un rasgo lo
   mejora; al lado de un arma común ya no aparece.
+- Los dados de un recurso de clase (Inspiración Bárdica, superioridad,
+  psiónicos) crecen con el nivel de esa clase y no con el total del
+  personaje, que en un multiclase daba de más.
+
+### Eliminado
+
+- Sin cambios.
+
+## [Unreleased]
+
+### Nuevo
+
+- Sin cambios.
+
+### Modificado
+
+- Sin cambios.
 
 ### Eliminado
 

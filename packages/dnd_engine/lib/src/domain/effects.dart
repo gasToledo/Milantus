@@ -145,6 +145,10 @@ sealed class Effect {
               int.parse(e.key as String): e.value as String,
           },
         ),
+      'scalingDice' => ScalingDiceEffect({
+          for (final e in (json['byLevel'] as Map).entries)
+            int.parse(e.key as String): e.value as String,
+        }),
       'companion' => CompanionEffect(
           id: json['id'] as String,
           name: json['name'] as String,
@@ -1409,6 +1413,23 @@ class AttunementSlotsEffect extends Effect {
   const AttunementSlotsEffect(this.count);
   @override
   Map<String, dynamic> toJson() => {'type': 'attunementSlots', 'count': count};
+}
+
+/// Dados de un rasgo que crecen con el nivel y no son un recurso: el Ataque
+/// Furtivo (1d6 a 10d6). Lo que sí es un recurso lleva sus dados en
+/// [ResourceEffect.damageByLevel].
+///
+/// Los tramos son del nivel **de la fuente**: el de Pícaro para el Ataque
+/// Furtivo, no el del personaje, que en un multiclase daría de más. La ficha
+/// lo muestra con el nombre del rasgo, así que el efecto no lleva texto.
+class ScalingDiceEffect extends Effect {
+  final Map<int, String> byLevel;
+  const ScalingDiceEffect(this.byLevel);
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'scalingDice',
+        'byLevel': {for (final e in byLevel.entries) '${e.key}': e.value},
+      };
 }
 
 /// Ataques adicionales por acción de Ataque (Guerrero nivel 5+).

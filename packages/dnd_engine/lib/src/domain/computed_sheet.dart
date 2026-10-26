@@ -799,6 +799,14 @@ class InitiativeBonus {
   const InitiativeBonus({required this.amount, required this.source});
 }
 
+/// Los dados de un rasgo al nivel actual: «Ataque Furtivo: 3d6». Ver
+/// [ScalingDiceEffect].
+class ScalingDice {
+  final String name;
+  final String dice;
+  const ScalingDice({required this.name, required this.dice});
+}
+
 /// Una ventaja permanente ya resuelta, con el rasgo que la da. Ver
 /// [AdvantageEffect].
 class Advantage {
@@ -926,6 +934,9 @@ class ComputedSheet {
   /// [saveAdvantages], [skillAdvantages], [initiativeAdvantages] y
   /// [conditionalAdvantages].
   final List<Advantage> advantages;
+
+  /// Dados de rasgos que no son recurso, al nivel actual (Ataque Furtivo).
+  final List<ScalingDice> scalingDice;
   final int? darkvision;
 
   final Set<String> resistances;
@@ -1056,6 +1067,7 @@ class ComputedSheet {
     required this.initiative,
     this.initiativeBonuses = const [],
     this.advantages = const [],
+    this.scalingDice = const [],
     required this.darkvision,
     required this.resistances,
     required this.immunities,
@@ -1127,6 +1139,7 @@ class ComputedSheet {
     int? initiative,
     List<InitiativeBonus>? initiativeBonuses,
     List<Advantage>? advantages,
+    List<ScalingDice>? scalingDice,
     Object? darkvision = _unset,
     Set<String>? resistances,
     Set<String>? immunities,
@@ -1193,6 +1206,7 @@ class ComputedSheet {
         initiative: initiative ?? this.initiative,
         initiativeBonuses: initiativeBonuses ?? this.initiativeBonuses,
         advantages: advantages ?? this.advantages,
+        scalingDice: scalingDice ?? this.scalingDice,
         darkvision: identical(darkvision, _unset)
             ? this.darkvision
             : darkvision as int?,

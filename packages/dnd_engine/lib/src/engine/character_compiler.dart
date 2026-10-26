@@ -825,6 +825,7 @@ class CharacterCompiler {
           dexMod + initiativeBonuses.fold<int>(0, (s, b) => s + b.amount),
       initiativeBonuses: List.unmodifiable(initiativeBonuses),
       advantages: List.unmodifiable(builder.advantages),
+      scalingDice: List.unmodifiable(builder.scalingDice),
       darkvision: builder.darkvision,
       resistances: builder.resistances,
       immunities: builder.immunities,

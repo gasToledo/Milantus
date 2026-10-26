@@ -53,6 +53,37 @@ void main() {
     expect(l2.initiative, l1.initiative);
   });
 
+  test('Pícaro y Maestro de Batalla: los dados crecen con el nivel de clase',
+      () {
+    ComputedSheet ficha(String classId, int level, {String? subclassId}) =>
+        CharacterCompiler(repo).compile(Character(
+          id: 'dados',
+          name: 'Prueba',
+          raceId: 'human',
+          classId: classId,
+          subclassId: subclassId,
+          backgroundId: 'soldier',
+          level: level,
+          assignedScores: {for (final a in Ability.values) a: 10},
+          hpPerLevel: List.filled(level, 6),
+        ));
+    // La tabla del Pícaro: 1d6 a nivel 1 y uno más en cada nivel impar.
+    expect(ficha('rogue', 1).scalingDice.single.dice, '1d6');
+    final l5 = ficha('rogue', 5).scalingDice.single;
+    expect(l5.name, 'Ataque Furtivo');
+    expect(l5.dice, '3d6');
+    expect(ficha('rogue', 20).scalingDice.single.dice, '10d6');
+
+    String dadoDeSuperioridad(int level) =>
+        ficha('fighter', level, subclassId: 'battle-master')
+            .resources
+            .singleWhere((r) => r.id == 'superiority_dice')
+            .damage!;
+    expect(dadoDeSuperioridad(3), 'd8');
+    expect(dadoDeSuperioridad(10), 'd10');
+    expect(dadoDeSuperioridad(18), 'd12');
+  });
+
   test('Pícaro: Talentos Fiables se obtiene a nivel 7, no a nivel 8', () {
     expect(levelOf('rogue', 'Talentos Fiables'), 7);
     expect(featureNames('rogue'), isNot(contains('Talento Fiable')));

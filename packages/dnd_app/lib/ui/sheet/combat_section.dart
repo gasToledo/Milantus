@@ -539,7 +539,38 @@ extension _SheetCombatSection on _SheetScreenState {
     return sheetCard(
       icon: Icons.gps_fixed,
       title: context.l10n.combatAttacks,
-      child: DenseRows(children: [for (final a in s.attacks) _attackRow(a)]),
+      child: DenseRows(
+        children: [
+          for (final a in s.attacks) _attackRow(a),
+          // Los dados de un rasgo que se suma al pegar (Ataque Furtivo) van con
+          // los ataques porque es ahí donde se tiran, no en Rasgos.
+          for (final d in s.scalingDice) _scalingDiceRow(d),
+        ],
+      ),
+    );
+  }
+
+  Widget _scalingDiceRow(ScalingDice d) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              d.name,
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
+          ),
+          Text(
+            d.dice,
+            style: TextStyle(
+              fontFamily: 'Georgia',
+              fontSize: 20,
+              color: context.palette.gold,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

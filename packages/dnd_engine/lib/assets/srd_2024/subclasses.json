@@ -76,7 +76,7 @@
         "name": "Superioridad en Combate",
         "description": "Aprendés maniobras alimentadas por dados de superioridad (d8). Empezás con 4 dados que recuperás en un descanso corto o largo.",
         "effects": [
-          { "type": "resource", "id": "superiority_dice", "name": "Dados de Superioridad", "max": 4, "recharge": "short", "description": "Gastás un dado de superioridad (d8) para ejecutar una maniobra: Ataque de Finta, Barrido, Desarmar, Maniobra Defensiva, etc." },
+          { "type": "resource", "id": "superiority_dice", "name": "Dados de Superioridad", "max": 4, "recharge": "short", "damageByLevel": { "3": "d8", "10": "d10", "18": "d12" }, "description": "Gastás un dado de superioridad (d8) para ejecutar una maniobra: Ataque de Finta, Barrido, Desarmar, Maniobra Defensiva, etc." },
           { "type": "passiveTrait", "name": "Maniobras", "description": "Conocés 3 maniobras a elección (Ataque de Precisión, Empujón, Provocar, etc.)." }
         ]
       },
@@ -95,7 +95,7 @@
         "name": "Conoce a tu Enemigo",
         "description": "Como acción adicional descubrís las inmunidades, resistencias y vulnerabilidades de una criatura. Pasás a tener 5 dados de superioridad.",
         "effects": [
-          { "type": "resource", "id": "superiority_dice", "name": "Dados de Superioridad", "max": 5, "recharge": "short", "description": "Gastás un dado de superioridad (d8) para ejecutar una maniobra: Ataque de Finta, Barrido, Desarmar, Maniobra Defensiva, etc." },
+          { "type": "resource", "id": "superiority_dice", "name": "Dados de Superioridad", "max": 5, "recharge": "short", "damageByLevel": { "3": "d8", "10": "d10", "18": "d12" }, "description": "Gastás un dado de superioridad (d8) para ejecutar una maniobra: Ataque de Finta, Barrido, Desarmar, Maniobra Defensiva, etc." },
           { "type": "passiveTrait", "name": "Conoce a tu Enemigo", "description": "Como acción adicional, discernís las fortalezas y debilidades de una criatura que veas a 30 pies o menos: sabés si tiene inmunidades, resistencias o vulnerabilidades y, si las tiene, cuáles son. Una vez usado, no podés volver a hacerlo hasta terminar un descanso largo; también podés recuperar el uso gastando un dado de superioridad (no requiere acción)." }
         ]
       },
@@ -112,7 +112,7 @@
         "name": "Implacable",
         "description": "Si tirás iniciativa sin dados de superioridad, recuperás uno. Pasás a tener 6 dados de superioridad.",
         "effects": [
-          { "type": "resource", "id": "superiority_dice", "name": "Dados de Superioridad", "max": 6, "recharge": "short", "description": "Gastás un dado de superioridad (d8) para ejecutar una maniobra: Ataque de Finta, Barrido, Desarmar, Maniobra Defensiva, etc." },
+          { "type": "resource", "id": "superiority_dice", "name": "Dados de Superioridad", "max": 6, "recharge": "short", "damageByLevel": { "3": "d8", "10": "d10", "18": "d12" }, "description": "Gastás un dado de superioridad (d8) para ejecutar una maniobra: Ataque de Finta, Barrido, Desarmar, Maniobra Defensiva, etc." },
           { "type": "passiveTrait", "name": "Implacable", "description": "Al entrar en combate sin dados de superioridad, recuperás uno." }
         ]
       },
@@ -195,7 +195,7 @@
         "name": "Poder Psiónico",
         "description": "Ganás dados psiónicos (d6) que alimentan Golpe Telequinético, Movimiento Telequinético y Escudo Protector.",
         "effects": [
-          { "type": "resource", "id": "psionic_energy", "name": "Energía Psiónica", "max": 0, "maxFromProficiency": true, "proficiencyMultiplier": 2, "recharge": "long", "shortRestRecovery": 1, "description": "Dados de energía psiónica (d6) para Golpe Telequinético (daño de fuerza), mover objetos/criaturas o reducir daño a un aliado; tenés dos veces tu bonif. por competencia." }
+          { "type": "resource", "id": "psionic_energy", "name": "Energía Psiónica", "max": 0, "maxFromProficiency": true, "proficiencyMultiplier": 2, "recharge": "long", "shortRestRecovery": 1, "damageByLevel": { "3": "d6", "5": "d8", "11": "d10", "17": "d12" }, "description": "Dados de energía psiónica (d6) para Golpe Telequinético (daño de fuerza), mover objetos/criaturas o reducir daño a un aliado; tenés dos veces tu bonif. por competencia." }
         ]
       },
       {
@@ -2108,7 +2108,7 @@
         "name": "Poder Psiónico / Hojas Psíquicas",
         "description": "Manifestás hojas de energía mental como armas y ganás dados psiónicos para potenciar tus habilidades.",
         "effects": [
-          { "type": "resource", "id": "psionic_energy", "name": "Energía Psiónica", "max": 0, "maxFromProficiency": true, "proficiencyMultiplier": 2, "recharge": "long", "shortRestRecovery": 1, "description": "Dados psiónicos (d6) para sumar a pruebas (Impulso Psíquico) o teletransportarte (Salto de Sombra); tenés dos veces tu bonif. por competencia." },
+          { "type": "resource", "id": "psionic_energy", "name": "Energía Psiónica", "max": 0, "maxFromProficiency": true, "proficiencyMultiplier": 2, "recharge": "long", "shortRestRecovery": 1, "damageByLevel": { "3": "d6", "5": "d8", "11": "d10", "17": "d12" }, "description": "Dados psiónicos (d6) para sumar a pruebas (Impulso Psíquico) o teletransportarte (Salto de Sombra); tenés dos veces tu bonif. por competencia." },
           { "type": "passiveTrait", "name": "Hojas Psíquicas", "description": "Manifestás hojas psíquicas (finura, arrojadizas) que infligen daño psíquico." }
         ]
       },

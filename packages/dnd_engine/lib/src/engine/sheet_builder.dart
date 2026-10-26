@@ -181,6 +181,7 @@ class SheetBuilder {
       initiativeEffects = [];
 
   final List<Advantage> advantages = [];
+  final List<ScalingDice> scalingDice = [];
 
   SheetBuilder({required this.baseScores, this.level = 1});
 
@@ -212,9 +213,11 @@ class SheetBuilder {
             ? null
             : 8 + proficiencyBonusForLevel(level) + mods[e.saveDcAbility]!,
         saveAbility: e.saveAbility,
-        // Tramos por nivel de personaje, no de la fuente: el Aliento escala
-        // con el nivel total, como los trucos.
-        damage: _tierFor(e.damageByLevel, level),
+        // Tramos por nivel de la fuente: el de la clase para los dados de
+        // superioridad o la Inspiración Bárdica, que en un multiclase no
+        // crecen con los niveles de otra clase. Una especie no trae nivel
+        // propio y cae en el total, que es como escala el Aliento.
+        damage: _tierFor(e.damageByLevel, sourceLevel),
         pool: e.pool,
       );
     }).toList();
@@ -453,6 +456,11 @@ class SheetBuilder {
         acBonus += amount;
       case InitiativeBonusEffect():
         initiativeEffects.add((effect: e, source: sourceName));
+      case ScalingDiceEffect(:final byLevel):
+        final dice = _tierFor(byLevel, sourceLevel ?? level);
+        if (dice != null) {
+          scalingDice.add(ScalingDice(name: sourceName, dice: dice));
+        }
       case AdvantageEffect():
         advantages.add(Advantage(
           roll: e.roll,
