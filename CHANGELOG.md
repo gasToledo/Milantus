@@ -809,6 +809,30 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
+## [0.33.0+1] - 2026-10-26
+
+### Nuevo
+
+- La Furia del Bárbaro se prende desde la banda táctica de la ficha, en
+  cualquier pestaña: una placa con los usos que quedan, que gasta uno al
+  activarla y se pone en dorado mientras dura. Con armadura pesada o sin usos
+  no se puede activar.
+- En Furia, la ficha la aplica entera (resistencia a contundente, perforante
+  y cortante, ventaja en pruebas y salvaciones de FUE y +2/+3/+4 al daño con
+  Fuerza) y lo dice: un cartel arriba con lo que cambia y «Terminar», «FURIA
+  +2» en cada ataque afectado y la Furia al lado de sus resistencias.
+- La Furia termina sola al caer a 0 PG y al descansar.
+
+### Modificado
+
+- El golpe sin armas no aparece al lado de un arma por un bono fijo al daño o
+  al crítico: solo cuando un rasgo le cambia el dado, la característica o le
+  suma dados propios.
+
+### Eliminado
+
+- Sin cambios.
+
 ## [Unreleased]
 
 ### Nuevo

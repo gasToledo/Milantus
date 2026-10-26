@@ -189,7 +189,19 @@ extension _SheetCombatSection on _SheetScreenState {
       armor?.name ?? context.l10n.combatNoArmor,
       if (_c.shieldEquipped) context.l10n.combatShield,
     ].join(' + ');
-    final resistances = [...s.resistances].map(DamageType.labelFor).toList()
+    // Las que trae un estado activo llevan su nombre al lado: la Furia
+    // termina y se van, y eso tiene que poder leerse.
+    String resistanceLabel(String type) {
+      final label = DamageType.labelFor(type);
+      final mode = s.activeModes
+          .where((m) => m.resistances.contains(type))
+          .firstOrNull;
+      return mode == null
+          ? label
+          : context.l10n.combatResistanceFrom(label, mode.name);
+    }
+
+    final resistances = [...s.resistances].map(resistanceLabel).toList()
       ..sort();
     final immunities = [...s.immunities].map(DamageType.labelFor).toList()
       ..sort();
@@ -623,6 +635,15 @@ extension _SheetCombatSection on _SheetScreenState {
                     if (a.mastery != null) _masteryPill(a.mastery!),
                     // Mano y acción salen calculadas del motor: derivarlas acá
                     // sería reimplementar la regla de dos armas en la ficha.
+                    // Lo que pone cada estado activo, ya sumado en el daño de
+                    // al lado: sin esto el +2 de la Furia aparece sin causa.
+                    for (final b in a.modeBonuses)
+                      OutlinedTag(
+                        context.l10n.combatModeBonus(
+                          b.name.toUpperCase(),
+                          b.amount,
+                        ),
+                      ),
                     if (a.critRange < 20)
                       GoldPill(context.l10n.combatCritRange(a.critRange)),
                     if (a.offHand) GoldPill(context.l10n.combatOffHand),
@@ -682,6 +703,56 @@ extension _SheetCombatSection on _SheetScreenState {
             onPressed: () =>
                 _mutateCombat(() => CombatOps.leaveWildShape(_c.combat)),
             child: Text(context.l10n.commonBack),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// El cartel de un estado activo (la Furia), arriba de la banda y en todas
+  /// las pestañas, con el mismo formato que el de la Forma Salvaje: es otra
+  /// forma de que los números de la ficha cambien, y tiene que decir por qué.
+  Widget _activeModeBanner(ActiveMode m) {
+    final pal = context.palette;
+    final summary = _activeModeSummary(context, m);
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
+      decoration: BoxDecoration(
+        border: Border.all(color: pal.gold),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.local_fire_department, size: 18, color: pal.gold),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  m.name,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: pal.gold,
+                  ),
+                ),
+                if (summary.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    summary,
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: () =>
+                _mutateCombat(() => CombatOps.deactivateMode(_c.combat, m.id)),
+            child: Text(context.l10n.modeEnd),
           ),
         ],
       ),

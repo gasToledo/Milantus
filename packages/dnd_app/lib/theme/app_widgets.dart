@@ -1078,6 +1078,11 @@ class StatTile extends StatelessWidget {
   /// Lo que lee el lector de pantalla, cuando [label] es una abreviatura.
   final String? semantics;
 
+  /// Placa de un estado encendido (la Furia en curso): relleno `goldSoft` y
+  /// borde `gold` de 2 px. Es la única placa de la banda que cambia de fondo,
+  /// y por eso se lee de un vistazo desde cualquier pestaña.
+  final bool highlighted;
+
   const StatTile({
     super.key,
     required this.label,
@@ -1088,6 +1093,7 @@ class StatTile extends StatelessWidget {
     this.valueColor,
     this.footer,
     this.semantics,
+    this.highlighted = false,
   });
 
   @override
@@ -1097,11 +1103,17 @@ class StatTile extends StatelessWidget {
       label: semantics ?? '$label: $value${suffix ?? ''}',
       excludeSemantics: true,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        // Un píxel menos de relleno con el borde de 2 para que la placa no
+        // cambie de tamaño al prenderse.
+        padding: highlighted
+            ? const EdgeInsets.fromLTRB(13, 11, 13, 11)
+            : const EdgeInsets.fromLTRB(14, 12, 14, 12),
         decoration: BoxDecoration(
-          color: p.plaque,
+          color: highlighted ? p.goldSoft : p.plaque,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: p.hairline),
+          border: highlighted
+              ? Border.all(color: p.gold, width: 2)
+              : Border.all(color: p.hairline),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

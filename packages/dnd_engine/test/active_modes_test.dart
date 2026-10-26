@@ -61,8 +61,16 @@ void main() {
         containsAll(['bludgeoning', 'piercing', 'slashing']));
     expect(furia.saveAdvantages(Ability.strength), isNotEmpty);
     expect(furia.skillAdvantages('athletics'), isNotEmpty);
-    // Hacha a dos manos 1d12 + FUE 3, más 2 de Furia.
+    // Hacha a dos manos 1d12 + FUE 3, más 2 de Furia, y la ficha dice qué
+    // parte es de la Furia para poder mostrarlo.
     expect(furia.weaponAttacks.single.damage, '1d12 + 5');
+    expect(furia.weaponAttacks.single.modeBonuses.single.amount, 2);
+    final vista = furia.activeModes.single;
+    expect(vista.resistances,
+        containsAll(['bludgeoning', 'piercing', 'slashing']));
+    expect(vista.damageBonus, 2);
+    expect(vista.damageAbility, Ability.strength);
+    expect(vista.noSpellcasting, isTrue);
 
     // Furia ya prendida: volver a activarla no gasta otro uso.
     expect(CombatOps.activateMode(c.combat, furia, 'rage'), isTrue);

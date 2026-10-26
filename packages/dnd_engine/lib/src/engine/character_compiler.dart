@@ -450,7 +450,19 @@ class CharacterCompiler {
     final wearingHeavyArmor = c.inventory
         .where((e) => InventoryOps.isEquipped(c, e, repo))
         .any((e) => InventoryOps.resolve(e, repo).armor?.category == 'heavy');
-    final activeModeViews = <ActiveMode>[];
+    // Qué aportó cada estado activo, para que la ficha lo pueda decir
+    // («FURIA +2», «Contundente · Furia») sin deducirlo: se anota qué reglas
+    // de arma, resistencias y ventajas entraron al aplicarlo.
+    final ruleModes = <int, ActiveModeEffect>{};
+    final modeData = <({
+      ActiveModeEffect mode,
+      String? classId,
+      bool available,
+      bool on,
+      String? variant,
+      List<String> resistances,
+      List<Advantage> advantages,
+    })>[];
     for (final (effect: mode, :level, :classId)
         in builder.activeModes.values.toList()) {
       // La armadura pesada no impide tener el rasgo: impide estar en Furia.
@@ -461,6 +473,9 @@ class CharacterCompiler {
       final on = available && c.combat.activeModes.containsKey(mode.id);
       final variantId = on ? c.combat.activeModes[mode.id] : null;
       final variant = mode.variants.where((v) => v.id == variantId).firstOrNull;
+      final rulesBefore = builder.weaponRules.length;
+      final resistancesBefore = {...builder.resistances};
+      final advantagesBefore = builder.advantages.length;
       if (on) {
         applySource(
           'mode:${mode.id}',
@@ -470,19 +485,20 @@ class CharacterCompiler {
           sourceLevel: level,
         );
       }
-      final resourceId = mode.resourceId;
-      activeModeViews.add(ActiveMode(
-        id: mode.id,
-        name: mode.name,
-        resourceKey: resourceId == null
-            ? null
-            : classId == null
-                ? resourceId
-                : '$classId:$resourceId',
-        variants: mode.variants,
+      for (var i = rulesBefore; i < builder.weaponRules.length; i++) {
+        ruleModes[i] = mode;
+      }
+      modeData.add((
+        mode: mode,
+        classId: classId,
         available: available,
-        active: on,
-        activeVariant: variant?.id,
+        on: on,
+        variant: variant?.id,
+        resistances: [
+          for (final r in builder.resistances)
+            if (!resistancesBefore.contains(r)) r,
+        ],
+        advantages: builder.advantages.sublist(advantagesBefore),
       ));
     }
 
@@ -718,6 +734,7 @@ class CharacterCompiler {
           wieldedAlone: wielded.length == 1,
           offHand: offHand,
           conditionsMet: conditionsMet,
+          ruleModes: ruleModes,
           activeTargetGroups: {
             for (final target in targetChoices.entryIdsByGroup.entries)
               if (target.value.contains(resolved.entry.entryId)) target.key,
@@ -728,19 +745,21 @@ class CharacterCompiler {
       // nadie lo elige. Se muestra con las manos vacías, que es lo único que
       // queda, o cuando un rasgo lo mejora (Monje, Matón de Taberna, Golpes
       // Radiantes), que es cuando pasa a ser una opción real.
-      // Un rango de crítico solo no alcanza: el «1 + FUE» del Campeón sigue
-      // siendo la fila que nadie elige, aunque critique con 19.
+      // Un retoque fijo no alcanza: el «1 + FUE» del Campeón sigue siendo la
+      // fila que nadie elige aunque critique con 19, y el de la Furia aunque
+      // sume 2. Lo que sí la vuelve una opción es cambiarle el dado, la
+      // característica o sumarle dados propios (Golpes Radiantes).
       if (wielded.isEmpty ||
           builder.weaponRules.any((r) =>
-              r.filter.unarmed &&
-              conditionsMet(r) &&
-              !_onlyChangesCritRange(r)))
+              r.filter.unarmed && conditionsMet(r) && !_onlyFlatTweaks(r)))
         _attack(c, unarmedStrike, mods, profBonus, builder,
-            conditionsMet: conditionsMet),
+            conditionsMet: conditionsMet, ruleModes: ruleModes),
       if (builder.weaponRules.any(
           (r) => r.bonusActionAttack && r.filter.unarmed && conditionsMet(r)))
         _attack(c, unarmedStrike, mods, profBonus, builder,
-            conditionsMet: conditionsMet, asBonusAction: true),
+            conditionsMet: conditionsMet,
+            asBonusAction: true,
+            ruleModes: ruleModes),
     ];
 
     final spellcastingBlocks = _spellcastingBlocks(
@@ -875,7 +894,16 @@ class CharacterCompiler {
       immunities: builder.immunities,
       weaponMasterySlots: builder.weaponMasterySlots,
       attunementSlots: builder.attunementSlotCount,
-      activeModes: List.unmodifiable(activeModeViews),
+      activeModes: List.unmodifiable([
+        for (final d in modeData)
+          _activeModeView(d.mode, d.classId,
+              available: d.available,
+              on: d.on,
+              variant: d.variant,
+              resistances: d.resistances,
+              advantages: d.advantages,
+              attacks: attacks),
+      ]),
       attacksPerAction: attacksPerAction,
       attacks: attacks,
       passives: builder.passives,
@@ -1642,6 +1670,7 @@ class CharacterCompiler {
       bool wieldedAlone = false,
       bool offHand = false,
       bool Function(WeaponRuleEffect)? conditionsMet,
+      Map<int, ActiveModeEffect> ruleModes = const {},
       bool asBonusAction = false}) {
     final unarmed = w.id == unarmedStrikeId;
     final normalAbilities = <Ability>[];
@@ -1664,8 +1693,20 @@ class CharacterCompiler {
     // Una mano: ni empuñada a dos manos ni un arma que las exige.
     final aloneInOneHand =
         wieldedAlone && !twoHanded && !w.properties.contains('two-handed');
-    final byAbility = <WeaponRuleEffect>[];
-    for (final rule in b.weaponRules) {
+    final byAbility = <int>[];
+    void apply(int i) {
+      final rule = b.weaponRules[i];
+      context.apply(rule);
+      final mode = ruleModes[i];
+      if (mode != null && rule.damageBonus != 0) {
+        context.modeNames[mode.id] = mode.name;
+        context.modeDamage[mode.id] =
+            (context.modeDamage[mode.id] ?? 0) + rule.damageBonus;
+      }
+    }
+
+    for (var i = 0; i < b.weaponRules.length; i++) {
+      final rule = b.weaponRules[i];
       final targetGroupId = rule.targetGroupId;
       if (targetGroupId != null &&
           !activeTargetGroups.contains(targetGroupId)) {
@@ -1675,10 +1716,10 @@ class CharacterCompiler {
       if (rule.aloneInOneHand && !aloneInOneHand) continue;
       if (conditionsMet != null && !conditionsMet(rule)) continue;
       if (rule.whenAbility != null) {
-        byAbility.add(rule);
+        byAbility.add(i);
         continue;
       }
-      context.apply(rule);
+      apply(i);
     }
 
     var abilityUsed = context.abilityOptions.first;
@@ -1688,8 +1729,8 @@ class CharacterCompiler {
     // Recién ahora se sabe con qué se ataca: el daño de Furia es para el
     // ataque que usa Fuerza, y un estoque que termina usando Destreza no lo
     // lleva aunque pudiera usar Fuerza.
-    for (final rule in byAbility) {
-      if (rule.whenAbility == abilityUsed) context.apply(rule);
+    for (final i in byAbility) {
+      if (b.weaponRules[i].whenAbility == abilityUsed) apply(i);
     }
     final abilityMod = mods[abilityUsed]!;
     final proficient = context.proficient;
@@ -1751,22 +1792,71 @@ class CharacterCompiler {
       // la acción de Atacar, no la adicional.
       attacksPerAction: asBonusAction ? 1 : 1 + context.extraAttacks,
       critRange: context.critRange,
+      modeBonuses: [
+        for (final e in context.modeDamage.entries)
+          ModeDamageBonus(
+            modeId: e.key,
+            name: context.modeNames[e.key]!,
+            amount: e.value,
+          ),
+      ],
       mastery: hasMastery ? w.mastery : null,
       offHand: offHand,
       action: action,
     );
   }
 
-  /// La regla no toca nada del ataque salvo el rango de crítico.
-  bool _onlyChangesCritRange(WeaponRuleEffect r) =>
-      r.critRange != null &&
+  ActiveMode _activeModeView(
+    ActiveModeEffect mode,
+    String? classId, {
+    required bool available,
+    required bool on,
+    required String? variant,
+    required List<String> resistances,
+    required List<Advantage> advantages,
+    required List<Attack> attacks,
+  }) {
+    final resourceId = mode.resourceId;
+    // El mayor que puso en algún ataque, no la suma: el arma y el puño llevan
+    // la misma regla dos veces y el cartel dice «+2», no «+4».
+    var damage = 0;
+    for (final a in attacks) {
+      for (final b in a.modeBonuses) {
+        if (b.modeId == mode.id && b.amount > damage) damage = b.amount;
+      }
+    }
+    final rulesAbility = [
+      for (final e in mode.effects)
+        if (e is WeaponRuleEffect && e.whenAbility != null) e.whenAbility!,
+    ].firstOrNull;
+    return ActiveMode(
+      id: mode.id,
+      name: mode.name,
+      resourceKey: resourceId == null
+          ? null
+          : classId == null
+              ? resourceId
+              : '$classId:$resourceId',
+      variants: mode.variants,
+      available: available,
+      active: on,
+      activeVariant: variant,
+      resistances: List.unmodifiable(resistances),
+      advantages: List.unmodifiable(advantages),
+      damageBonus: damage,
+      damageAbility: damage > 0 ? rulesAbility : null,
+      noSpellcasting: mode.noSpellcasting,
+    );
+  }
+
+  /// La regla solo retoca números fijos del ataque: el rango de crítico o un
+  /// bono plano al ataque o al daño.
+  bool _onlyFlatTweaks(WeaponRuleEffect r) =>
       !r.grantsProficiency &&
       r.abilityOptions.isEmpty &&
       r.damageTypeOptions.isEmpty &&
       !r.spellcastingFocus &&
       r.extraAttacks == 0 &&
-      r.attackBonus == 0 &&
-      r.damageBonus == 0 &&
       r.extraDamageDice == null &&
       r.damageDie == null &&
       !r.bonusActionAttack;
@@ -1821,6 +1911,8 @@ class _WeaponAttackContext {
   int damageBonus = 0;
   String? damageDie;
   int critRange = 20;
+  final Map<String, int> modeDamage = {};
+  final Map<String, String> modeNames = {};
   final List<WeaponExtraDamage> extraDamage = [];
 
   _WeaponAttackContext({

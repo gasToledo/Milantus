@@ -227,6 +227,60 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('la Furia se prende desde la banda y la ficha dice qué cambió', (
+    tester,
+  ) async {
+    final barbaro = Character(
+      id: 'barbaro',
+      name: 'Korra',
+      raceId: 'human',
+      classId: 'barbarian',
+      backgroundId: 'soldier',
+      level: 3,
+      assignedScores: {
+        Ability.strength: 16,
+        Ability.dexterity: 14,
+        Ability.constitution: 14,
+        Ability.intelligence: 8,
+        Ability.wisdom: 10,
+        Ability.charisma: 10,
+      },
+      hpPerLevel: const [12, 7, 7],
+      inventory: const [
+        InventoryEntry(entryId: 'hacha', itemId: 'greataxe', equipped: true),
+      ],
+      combat: CombatState(currentHp: 31),
+    );
+    await pumpSheet(tester, barbaro, size: const Size(900, 6000));
+
+    final furia = repo
+        .characterClass('barbarian')!
+        .features
+        .expand((f) => f.effects)
+        .whereType<ActiveModeEffect>()
+        .single;
+    await tester.tap(find.text('Activar'));
+    await tester.pumpAndSettle();
+    expect(barbaro.combat.activeModes, contains(furia.id));
+    expect(barbaro.combat.resourceUsage[furia.resourceId], 1);
+    // El cartel nombra el estado y lo que cambia; la placa dice que sigue.
+    expect(find.textContaining('+2 al daño con FUE'), findsOneWidget);
+    expect(find.text('En curso'), findsOneWidget);
+
+    await tester.tap(find.text('Combate'));
+    await tester.pumpAndSettle();
+    expect(find.text('${furia.name.toUpperCase()} +2'), findsOneWidget);
+    expect(find.textContaining('(${furia.name})'), findsWidgets);
+
+    await tester.tap(find.text('Terminar').first);
+    await tester.pumpAndSettle();
+    expect(barbaro.combat.activeModes, isEmpty);
+    expect(find.textContaining('+2 al daño con FUE'), findsNothing);
+    // Deja salir el guardado diferido de la ficha.
+    await tester.pump(const Duration(seconds: 1));
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('una reserva se gasta en cantidades y no de a un uso', (
     tester,
   ) async {

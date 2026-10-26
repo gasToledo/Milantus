@@ -766,6 +766,72 @@
       }
     }
   },
+  "modeActivate": "Activar",
+  "modeEnd": "Terminar",
+  "modeOn": "En curso",
+  "modeNoUses": "Sin usos",
+  "modeHeavyArmor": "Con armadura pesada",
+  "modeSemantics": "{name}: {state}",
+  "@modeSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      },
+      "state": {
+        "type": "Object"
+      }
+    }
+  },
+  "modeResistance": "Resistencia a {types}",
+  "@modeResistance": {
+    "placeholders": {
+      "types": {
+        "type": "Object"
+      }
+    }
+  },
+  "modeDamage": "+{amount} al daño con {ability}",
+  "@modeDamage": {
+    "placeholders": {
+      "amount": {
+        "type": "Object"
+      },
+      "ability": {
+        "type": "Object"
+      }
+    }
+  },
+  "modeAdvantage": "Ventaja en {abilities}",
+  "@modeAdvantage": {
+    "placeholders": {
+      "abilities": {
+        "type": "Object"
+      }
+    }
+  },
+  "modeNoSpells": "Sin conjuros ni concentración",
+  "combatModeBonus": "{name} +{amount}",
+  "@combatModeBonus": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      },
+      "amount": {
+        "type": "Object"
+      }
+    }
+  },
+  "combatResistanceFrom": "{type} ({source})",
+  "@combatResistanceFrom": {
+    "placeholders": {
+      "type": {
+        "type": "Object"
+      },
+      "source": {
+        "type": "Object"
+      }
+    }
+  },
   "combatImmunities": "Inmunidades: {list}",
   "@combatImmunities": {
     "placeholders": {

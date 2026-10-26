@@ -557,6 +557,9 @@ class Attack {
   /// (Crítico Mejorado del Campeón, 19).
   final int critRange;
 
+  /// La parte del daño que pone cada estado activo, ya incluida en [damage].
+  final List<ModeDamageBonus> modeBonuses;
+
   const Attack({
     required this.weaponId,
     String? baseWeaponId,
@@ -575,6 +578,7 @@ class Attack {
     this.offHand = false,
     this.action = AttackAction.action,
     this.critRange = 20,
+    this.modeBonuses = const [],
   })  : baseWeaponId = baseWeaponId ?? weaponId,
         damageTypeOptions = damageTypeOptions ?? const [];
 
@@ -612,6 +616,7 @@ class Attack {
     bool? offHand,
     AttackAction? action,
     int? critRange,
+    List<ModeDamageBonus>? modeBonuses,
   }) =>
       Attack(
         weaponId: weaponId ?? this.weaponId,
@@ -633,6 +638,7 @@ class Attack {
         offHand: offHand ?? this.offHand,
         action: action ?? this.action,
         critRange: critRange ?? this.critRange,
+        modeBonuses: modeBonuses ?? this.modeBonuses,
       );
 
   Map<String, dynamic> toJson() => {
@@ -819,6 +825,16 @@ class ActiveMode {
   /// Variante elegida al activarlo, o null.
   final String? activeVariant;
 
+  /// Lo que el estado le suma a la ficha mientras está activo, para decirlo
+  /// sin que la pantalla lo deduzca: las resistencias que trajo (no las que
+  /// ya había), sus ventajas y el mayor bonificador al daño que dio a un
+  /// ataque, con la característica que lo exige. Vacíos si está apagado.
+  final List<String> resistances;
+  final List<Advantage> advantages;
+  final int damageBonus;
+  final Ability? damageAbility;
+  final bool noSpellcasting;
+
   const ActiveMode({
     required this.id,
     required this.name,
@@ -827,6 +843,23 @@ class ActiveMode {
     this.available = true,
     this.active = false,
     this.activeVariant,
+    this.resistances = const [],
+    this.advantages = const [],
+    this.damageBonus = 0,
+    this.damageAbility,
+    this.noSpellcasting = false,
+  });
+}
+
+/// Cuánto le suma un estado activo al daño de un ataque: «FURIA +2».
+class ModeDamageBonus {
+  final String modeId;
+  final String name;
+  final int amount;
+  const ModeDamageBonus({
+    required this.modeId,
+    required this.name,
+    required this.amount,
   });
 }
 

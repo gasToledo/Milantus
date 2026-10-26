@@ -469,6 +469,7 @@
             "name": "Furia",
             "resourceId": "rage",
             "endsInHeavyArmor": true,
+            "noSpellcasting": true,
             "effects": [
               {
                 "type": "resistance",

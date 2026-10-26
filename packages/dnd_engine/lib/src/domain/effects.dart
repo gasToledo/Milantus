@@ -150,6 +150,7 @@ sealed class Effect {
           name: json['name'] as String,
           resourceId: json['resourceId'] as String?,
           endsInHeavyArmor: json['endsInHeavyArmor'] as bool? ?? false,
+          noSpellcasting: json['noSpellcasting'] as bool? ?? false,
           effects: Effect.listFromJson(json['effects']),
           variants: [
             for (final v in json['variants'] as List? ?? const [])
@@ -1462,6 +1463,10 @@ class ActiveModeEffect extends Effect {
   /// (la Furia).
   final bool endsInHeavyArmor;
 
+  /// Mientras está activo no se lanzan conjuros ni se mantiene la
+  /// concentración (la Furia). Hoy la ficha solo lo dice; no bloquea nada.
+  final bool noSpellcasting;
+
   final List<Effect> effects;
 
   /// Opciones que se eligen **cada vez** que se activa (Oso, Águila o Lobo
@@ -1473,6 +1478,7 @@ class ActiveModeEffect extends Effect {
     required this.name,
     this.resourceId,
     this.endsInHeavyArmor = false,
+    this.noSpellcasting = false,
     this.effects = const [],
     this.variants = const [],
   });
@@ -1484,6 +1490,7 @@ class ActiveModeEffect extends Effect {
         'name': name,
         if (resourceId != null) 'resourceId': resourceId,
         if (endsInHeavyArmor) 'endsInHeavyArmor': true,
+        if (noSpellcasting) 'noSpellcasting': true,
         'effects': [for (final e in effects) e.toJson()],
         if (variants.isNotEmpty)
           'variants': [for (final v in variants) v.toJson()],

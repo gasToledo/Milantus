@@ -277,6 +277,12 @@ extension _SheetNavigation on _SheetScreenState {
           _wildShapeBanner(beast),
           const SizedBox(height: 16),
         ],
+        // Igual que la Forma Salvaje y por lo mismo: un estado activo cambia
+        // números de todas las pestañas, y el cartel dice cuál y por qué.
+        for (final mode in s.activeModes.where((m) => m.active)) ...[
+          _activeModeBanner(mode),
+          const SizedBox(height: 16),
+        ],
         if (_showSheetHeader) ...[_tacticalBand(s), const SectionRule()],
         _tabContent(_tab),
       ],

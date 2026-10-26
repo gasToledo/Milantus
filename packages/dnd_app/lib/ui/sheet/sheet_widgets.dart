@@ -27,6 +27,28 @@ Widget _advantageTag(BuildContext context, List<Advantage> advantages) =>
       child: OutlinedTag(context.l10n.advantageTag),
     );
 
+/// Lo que cambia un estado activo, en una línea: «Resistencia a contundente,
+/// perforante, cortante · +2 al daño con FUE · Ventaja en FUE · Sin
+/// conjuros ni concentración». Todo sale de la ficha (`ActiveMode`): la
+/// pantalla solo lo pone en palabras.
+String _activeModeSummary(BuildContext context, ActiveMode m) {
+  final l10n = context.l10n;
+  final types = m.resistances
+      .map(DamageType.labelFor)
+      .map((label) => localized(label.toLowerCase(), label))
+      .toList();
+  final abilities = {
+    for (final v in m.advantages) ...v.abilities,
+  }.map((a) => a.abbr).toList();
+  return [
+    if (types.isNotEmpty) l10n.modeResistance(types.join(', ')),
+    if (m.damageAbility case final ability? when m.damageBonus > 0)
+      l10n.modeDamage(m.damageBonus, ability.abbr),
+    if (abilities.isNotEmpty) l10n.modeAdvantage(abilities.join(', ')),
+    if (m.noSpellcasting) l10n.modeNoSpells,
+  ].join(' · ');
+}
+
 /// Una ventaja que no cabe en una fila —contra un estado, contra conjuros, en
 /// las salvaciones de muerte— dicha en una frase. Los estados salen del
 /// glosario del motor, que ya está en los dos idiomas.

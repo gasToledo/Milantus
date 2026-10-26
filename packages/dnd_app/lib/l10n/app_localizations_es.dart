@@ -932,6 +932,54 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get modeActivate => 'Activar';
+
+  @override
+  String get modeEnd => 'Terminar';
+
+  @override
+  String get modeOn => 'En curso';
+
+  @override
+  String get modeNoUses => 'Sin usos';
+
+  @override
+  String get modeHeavyArmor => 'Con armadura pesada';
+
+  @override
+  String modeSemantics(Object name, Object state) {
+    return '$name: $state';
+  }
+
+  @override
+  String modeResistance(Object types) {
+    return 'Resistencia a $types';
+  }
+
+  @override
+  String modeDamage(Object amount, Object ability) {
+    return '+$amount al daño con $ability';
+  }
+
+  @override
+  String modeAdvantage(Object abilities) {
+    return 'Ventaja en $abilities';
+  }
+
+  @override
+  String get modeNoSpells => 'Sin conjuros ni concentración';
+
+  @override
+  String combatModeBonus(Object name, Object amount) {
+    return '$name +$amount';
+  }
+
+  @override
+  String combatResistanceFrom(Object type, Object source) {
+    return '$type ($source)';
+  }
+
+  @override
   String combatImmunities(String list) {
     return 'Inmunidades: $list';
   }

@@ -1586,6 +1586,78 @@ abstract class AppLocalizations {
   /// **'Resistencias: {list}'**
   String combatResistances(String list);
 
+  /// No description provided for @modeActivate.
+  ///
+  /// In es, this message translates to:
+  /// **'Activar'**
+  String get modeActivate;
+
+  /// No description provided for @modeEnd.
+  ///
+  /// In es, this message translates to:
+  /// **'Terminar'**
+  String get modeEnd;
+
+  /// No description provided for @modeOn.
+  ///
+  /// In es, this message translates to:
+  /// **'En curso'**
+  String get modeOn;
+
+  /// No description provided for @modeNoUses.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin usos'**
+  String get modeNoUses;
+
+  /// No description provided for @modeHeavyArmor.
+  ///
+  /// In es, this message translates to:
+  /// **'Con armadura pesada'**
+  String get modeHeavyArmor;
+
+  /// No description provided for @modeSemantics.
+  ///
+  /// In es, this message translates to:
+  /// **'{name}: {state}'**
+  String modeSemantics(Object name, Object state);
+
+  /// No description provided for @modeResistance.
+  ///
+  /// In es, this message translates to:
+  /// **'Resistencia a {types}'**
+  String modeResistance(Object types);
+
+  /// No description provided for @modeDamage.
+  ///
+  /// In es, this message translates to:
+  /// **'+{amount} al daño con {ability}'**
+  String modeDamage(Object amount, Object ability);
+
+  /// No description provided for @modeAdvantage.
+  ///
+  /// In es, this message translates to:
+  /// **'Ventaja en {abilities}'**
+  String modeAdvantage(Object abilities);
+
+  /// No description provided for @modeNoSpells.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin conjuros ni concentración'**
+  String get modeNoSpells;
+
+  /// No description provided for @combatModeBonus.
+  ///
+  /// In es, this message translates to:
+  /// **'{name} +{amount}'**
+  String combatModeBonus(Object name, Object amount);
+
+  /// No description provided for @combatResistanceFrom.
+  ///
+  /// In es, this message translates to:
+  /// **'{type} ({source})'**
+  String combatResistanceFrom(Object type, Object source);
+
   /// No description provided for @combatImmunities.
   ///
   /// In es, this message translates to:

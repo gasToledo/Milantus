@@ -521,7 +521,7 @@ compartida: **antes de crear un widget visual nuevo, buscar acá**.
 
 | Componente | Qué es | Notas |
 | --- | --- | --- |
-| `StatTile` | Placa de la **banda táctica** de la ficha: rótulo con ícono arriba y cifra grande en sans negrita, todo alineado a la izquierda | `icon`, `labelTrailing`, `suffix` (unidad atenuada), `valueColor`, `footer` |
+| `StatTile` | Placa de la **banda táctica** de la ficha: rótulo con ícono arriba y cifra grande en sans negrita, todo alineado a la izquierda | `icon`, `labelTrailing`, `suffix` (unidad atenuada), `valueColor`, `footer`, `highlighted` (estado encendido, como la Furia: relleno `goldSoft` y borde `gold` de 2 px; es la única placa de la banda que cambia de fondo) |
 | `StatPlaque` | Rótulo en mayúsculas + valor grande en Georgia sobre `plaque`, centrado | Variante `dense` para tarjetas apretadas. `valueColor` cae a `gold`. Es la de las **tiras cortas dentro de una tarjeta** (carga, sintonizados, CD de salvación) |
 | `AbilityPlaque` | Característica con el **modificador como cifra principal**, la puntuación rotulada debajo (`Punt. 20`) y la salvación competente nombrada (`SALV` con escudo) | Reserva el alto de la marca aunque no haya salvación, para que las seis alineen. Es **de la ficha**: marca *si* hay competencia, porque el número lo calcula el motor y se lee en Salvaciones. El perfil de criatura no la usa — una criatura trae la salvación ya impresa y ahí se muestra el valor (ver `creatureProfileBody`) |
 | `ShieldBadge` | La CA dentro de la silueta de escudo, borde dorado de 1.5 px | Escala con `height / 52`; **solo para CA**, y solo donde la CA es el tema (Defensa, Inventario) |

@@ -1346,30 +1346,37 @@ extension _SheetGeneralSection on _SheetScreenState {
       ),
     );
 
+    // Los estados activables (Furia) van en la banda y no en una tarjeta de
+    // Combate: se prenden en el turno, desde cualquier pestaña, y su placa
+    // es la que avisa que la ficha cambió.
+    final modes = [for (final m in s.activeModes) _activeModeTile(s, m)];
+
     return LayoutBuilder(
       builder: (context, box) {
         final w = box.maxWidth;
         // 152 es el ancho al que «COMPETENCIA» entra en un renglón; menos que
-        // eso partía el rótulo en dos. Las cinco en una fila solo si cada una
+        // eso partía el rótulo en dos. Todas en una fila solo si cada una
         // llega a ese mínimo: con PG a 3 partes y las otras a 2, son 11 partes
-        // y cuatro huecos.
+        // y cuatro huecos, más dos partes y un hueco por cada estado.
         final List<List<Widget>> rows;
-        if (w >= 152 * 11 / 2 + 4 * 12) {
+        if (w >= 152 * (11 + 2 * modes.length) / 2 + (4 + modes.length) * 12) {
           rows = [
-            [armor, hp, initiative, speed, proficiency],
+            [armor, hp, initiative, speed, proficiency, ...modes],
           ];
         } else if (w >= 520) {
-          // 3 + 2: nunca una celda sola en la última fila.
+          // 3 + 2 (o 3 + 3 con un estado): nunca una celda sola al final.
           rows = [
             [armor, hp, initiative],
-            [speed, proficiency],
+            [speed, proficiency, ...modes],
           ];
         } else {
-          // PG pide más porque lleva el par actual/máximo: fila completa.
+          // PG pide más porque lleva el par actual/máximo: fila completa. Los
+          // estados van en su fila, que es donde se tocan con el pulgar.
           rows = [
             [hp],
             [armor, initiative],
             [speed, proficiency],
+            if (modes.isNotEmpty) modes,
           ];
         }
         return Column(
@@ -1381,6 +1388,56 @@ extension _SheetGeneralSection on _SheetScreenState {
           ],
         );
       },
+    );
+  }
+
+  /// La placa de un estado activable: los usos que quedan y «Activar», o
+  /// «En curso» y «Terminar». Tocarla lo prende o lo apaga; la regla (gastar
+  /// el uso, la armadura pesada) es de `CombatOps`.
+  ///
+  /// ponytail: un estado con variantes (Corazón Salvaje) se prendería sin
+  /// elegirla. Ninguno del catálogo las declara todavía; el diálogo para
+  /// elegir llega con el primero que las use.
+  Widget _activeModeTile(ComputedSheet s, ActiveMode m) {
+    final pal = context.palette;
+    final l10n = context.l10n;
+    final resource = m.resourceKey == null
+        ? null
+        : s.resources.where((r) => r.key == m.resourceKey).firstOrNull;
+    final left = resource == null ? null : _resourceLeft(resource);
+    final noUses = !m.active && left == 0;
+    final (footer, footerColor) = m.active
+        ? (l10n.modeEnd, Theme.of(context).colorScheme.onSurface)
+        : !m.available
+        ? (l10n.modeHeavyArmor, pal.textMuted)
+        : noUses
+        ? (l10n.modeNoUses, pal.textMuted)
+        : (l10n.modeActivate, pal.gold);
+    final enabled = m.active || (m.available && !noUses);
+    return InkWell(
+      onTap: enabled
+          ? () => _mutateCombat(() {
+              if (m.active) {
+                CombatOps.deactivateMode(_c.combat, m.id);
+              } else {
+                CombatOps.activateMode(_c.combat, s, m.id);
+              }
+            })
+          : null,
+      borderRadius: BorderRadius.circular(12),
+      child: StatTile(
+        icon: Icons.local_fire_department,
+        label: m.name,
+        value: m.active ? l10n.modeOn : '${left ?? ''}',
+        suffix: m.active || resource == null ? null : ' / ${resource.max}',
+        valueColor: m.active ? pal.gold : null,
+        highlighted: m.active,
+        semantics: l10n.modeSemantics(m.name, m.active ? l10n.modeOn : footer),
+        footer: Text(
+          footer,
+          style: TextStyle(fontSize: 11, color: footerColor),
+        ),
+      ),
     );
   }
 
