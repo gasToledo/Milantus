@@ -442,6 +442,50 @@ class CharacterCompiler {
       applySource('item:${item.id}', item.name, item.effects);
     }
 
+    // Estados activables (Furia). Van después de todas las fuentes porque
+    // recién ahí se sabe cuáles declaró el personaje, y antes de cerrar
+    // puntuaciones, CA y ataques porque sus efectos los cambian. El estado
+    // de combate dice cuáles están prendidos; uno que el contenido ya no
+    // declara simplemente no está en el mapa y se ignora.
+    final wearingHeavyArmor = c.inventory
+        .where((e) => InventoryOps.isEquipped(c, e, repo))
+        .any((e) => InventoryOps.resolve(e, repo).armor?.category == 'heavy');
+    final activeModeViews = <ActiveMode>[];
+    for (final (effect: mode, :level, :classId)
+        in builder.activeModes.values.toList()) {
+      // La armadura pesada no impide tener el rasgo: impide estar en Furia.
+      // Con ella puesta el estado figura apagado aunque se haya guardado
+      // prendido, que es lo que dice la regla («termina si te ponés una
+      // armadura pesada»).
+      final available = !(mode.endsInHeavyArmor && wearingHeavyArmor);
+      final on = available && c.combat.activeModes.containsKey(mode.id);
+      final variantId = on ? c.combat.activeModes[mode.id] : null;
+      final variant = mode.variants.where((v) => v.id == variantId).firstOrNull;
+      if (on) {
+        applySource(
+          'mode:${mode.id}',
+          variant == null ? mode.name : '${mode.name}: ${variant.name}',
+          [...mode.effects, ...?variant?.effects],
+          sourceClassId: classId,
+          sourceLevel: level,
+        );
+      }
+      final resourceId = mode.resourceId;
+      activeModeViews.add(ActiveMode(
+        id: mode.id,
+        name: mode.name,
+        resourceKey: resourceId == null
+            ? null
+            : classId == null
+                ? resourceId
+                : '$classId:$resourceId',
+        variants: mode.variants,
+        available: available,
+        active: on,
+        activeVariant: variant?.id,
+      ));
+    }
+
     // Habilidades elegidas en el wizard (raza/clase/trasfondo).
     builder.skillProficiencies.addAll(c.chosenSkills);
 
@@ -831,6 +875,7 @@ class CharacterCompiler {
       immunities: builder.immunities,
       weaponMasterySlots: builder.weaponMasterySlots,
       attunementSlots: builder.attunementSlotCount,
+      activeModes: List.unmodifiable(activeModeViews),
       attacksPerAction: attacksPerAction,
       attacks: attacks,
       passives: builder.passives,
@@ -1619,6 +1664,7 @@ class CharacterCompiler {
     // Una mano: ni empuñada a dos manos ni un arma que las exige.
     final aloneInOneHand =
         wieldedAlone && !twoHanded && !w.properties.contains('two-handed');
+    final byAbility = <WeaponRuleEffect>[];
     for (final rule in b.weaponRules) {
       final targetGroupId = rule.targetGroupId;
       if (targetGroupId != null &&
@@ -1628,12 +1674,22 @@ class CharacterCompiler {
       if (!_weaponMatches(rule.filter, w, isMagic: isMagic)) continue;
       if (rule.aloneInOneHand && !aloneInOneHand) continue;
       if (conditionsMet != null && !conditionsMet(rule)) continue;
+      if (rule.whenAbility != null) {
+        byAbility.add(rule);
+        continue;
+      }
       context.apply(rule);
     }
 
     var abilityUsed = context.abilityOptions.first;
     for (final candidate in context.abilityOptions.skip(1)) {
       if (mods[candidate]! > mods[abilityUsed]!) abilityUsed = candidate;
+    }
+    // Recién ahora se sabe con qué se ataca: el daño de Furia es para el
+    // ataque que usa Fuerza, y un estoque que termina usando Destreza no lo
+    // lleva aunque pudiera usar Fuerza.
+    for (final rule in byAbility) {
+      if (rule.whenAbility == abilityUsed) context.apply(rule);
     }
     final abilityMod = mods[abilityUsed]!;
     final proficient = context.proficient;

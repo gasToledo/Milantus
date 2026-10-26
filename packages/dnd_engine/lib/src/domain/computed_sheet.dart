@@ -799,6 +799,37 @@ class InitiativeBonus {
   const InitiativeBonus({required this.amount, required this.source});
 }
 
+/// Un estado activable que el personaje tiene, y si está activo. Ver
+/// [ActiveModeEffect].
+class ActiveMode {
+  final String id;
+  final String name;
+
+  /// Clave del recurso que gasta en `CombatState.resourceUsage`, o null.
+  final String? resourceKey;
+
+  final List<ActiveModeVariant> variants;
+
+  /// Se puede activar ahora: falso con armadura pesada puesta si el estado lo
+  /// prohíbe.
+  final bool available;
+
+  final bool active;
+
+  /// Variante elegida al activarlo, o null.
+  final String? activeVariant;
+
+  const ActiveMode({
+    required this.id,
+    required this.name,
+    this.resourceKey,
+    this.variants = const [],
+    this.available = true,
+    this.active = false,
+    this.activeVariant,
+  });
+}
+
 /// Los dados de un rasgo al nivel actual: «Ataque Furtivo: 3d6». Ver
 /// [ScalingDiceEffect].
 class ScalingDice {
@@ -937,6 +968,10 @@ class ComputedSheet {
 
   /// Dados de rasgos que no son recurso, al nivel actual (Ataque Furtivo).
   final List<ScalingDice> scalingDice;
+
+  /// Estados activables (Furia), activos o no. Los números de la ficha ya
+  /// incluyen los efectos de los activos.
+  final List<ActiveMode> activeModes;
   final int? darkvision;
 
   final Set<String> resistances;
@@ -1068,6 +1103,7 @@ class ComputedSheet {
     this.initiativeBonuses = const [],
     this.advantages = const [],
     this.scalingDice = const [],
+    this.activeModes = const [],
     required this.darkvision,
     required this.resistances,
     required this.immunities,
@@ -1140,6 +1176,7 @@ class ComputedSheet {
     List<InitiativeBonus>? initiativeBonuses,
     List<Advantage>? advantages,
     List<ScalingDice>? scalingDice,
+    List<ActiveMode>? activeModes,
     Object? darkvision = _unset,
     Set<String>? resistances,
     Set<String>? immunities,
@@ -1207,6 +1244,7 @@ class ComputedSheet {
         initiativeBonuses: initiativeBonuses ?? this.initiativeBonuses,
         advantages: advantages ?? this.advantages,
         scalingDice: scalingDice ?? this.scalingDice,
+        activeModes: activeModes ?? this.activeModes,
         darkvision: identical(darkvision, _unset)
             ? this.darkvision
             : darkvision as int?,

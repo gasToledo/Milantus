@@ -462,6 +462,92 @@
             "type": "passiveTrait",
             "name": "Daño por Furia",
             "description": "Cuando llevás a cabo un ataque que use la Fuerza —con arma o sin armas— y causás daño al objetivo, obtenés un bonificador al daño: +2, que sube a +3 a nivel 9 y a +4 a nivel 16. La regla no exige que el ataque sea cuerpo a cuerpo, solo que use Fuerza."
+          },
+          {
+            "type": "activeMode",
+            "id": "rage",
+            "name": "Furia",
+            "resourceId": "rage",
+            "endsInHeavyArmor": true,
+            "effects": [
+              {
+                "type": "resistance",
+                "damageType": "bludgeoning"
+              },
+              {
+                "type": "resistance",
+                "damageType": "piercing"
+              },
+              {
+                "type": "resistance",
+                "damageType": "slashing"
+              },
+              {
+                "type": "advantage",
+                "roll": "check",
+                "abilities": [
+                  "strength"
+                ]
+              },
+              {
+                "type": "advantage",
+                "roll": "save",
+                "abilities": [
+                  "strength"
+                ]
+              },
+              {
+                "type": "weaponRule",
+                "whenAbility": "strength",
+                "damageBonus": 2
+              },
+              {
+                "type": "weaponRule",
+                "filter": {
+                  "unarmed": true
+                },
+                "whenAbility": "strength",
+                "damageBonus": 2
+              },
+              {
+                "type": "leveled",
+                "minLevel": 9,
+                "effects": [
+                  {
+                    "type": "weaponRule",
+                    "whenAbility": "strength",
+                    "damageBonus": 1
+                  },
+                  {
+                    "type": "weaponRule",
+                    "filter": {
+                      "unarmed": true
+                    },
+                    "whenAbility": "strength",
+                    "damageBonus": 1
+                  }
+                ]
+              },
+              {
+                "type": "leveled",
+                "minLevel": 16,
+                "effects": [
+                  {
+                    "type": "weaponRule",
+                    "whenAbility": "strength",
+                    "damageBonus": 1
+                  },
+                  {
+                    "type": "weaponRule",
+                    "filter": {
+                      "unarmed": true
+                    },
+                    "whenAbility": "strength",
+                    "damageBonus": 1
+                  }
+                ]
+              }
+            ]
           }
         ]
       },

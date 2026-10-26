@@ -36,10 +36,13 @@ class CombatOps {
     final next = _absorbDamage(c.currentHp, c.tempHp, amount);
     c.currentHp = next.hp;
     c.tempHp = next.tempHp;
-    // A 0 PG quedás Incapacitado, y eso termina la Forma Salvaje. Va acá y no
-    // en la pantalla porque el daño entra por varios lados y una revisión por
-    // cada uno es una revisión que alguno se olvida.
-    if (c.currentHp <= 0) c.wildShapeCreatureId = null;
+    // A 0 PG quedás Incapacitado, y eso termina la Forma Salvaje y la Furia.
+    // Va acá y no en la pantalla porque el daño entra por varios lados y una
+    // revisión por cada uno es una revisión que alguno se olvida.
+    if (c.currentHp <= 0) {
+      c.wildShapeCreatureId = null;
+      c.activeModes.clear();
+    }
   }
 
   /// Cura PG hasta el máximo. Curar desde 0 o menos estabiliza y limpia las
@@ -78,6 +81,9 @@ class CombatOps {
     if (spellcasting?.progression == CasterProgression.pact) {
       c.pactSlotsUsed.clear();
     }
+    // Un descanso corto dura una hora y ningún estado activable pasa de diez
+    // minutos: si seguía prendido, ya terminó.
+    c.activeModes.clear();
   }
 
   /// Descanso largo: PG al máximo, se limpian PG temporales y salvaciones de
@@ -116,6 +122,7 @@ class CombatOps {
     c.spellSlotsUsed.clear();
     c.pactSlotsUsed.clear();
     c.wildShapeCreatureId = null;
+    c.activeModes.clear();
     // Por la misma vía que el botón de terminar: el descanso corta la
     // concentración, y con ella se van los espíritus invocados.
     endConcentration(c);
@@ -336,6 +343,43 @@ class CombatOps {
     setTempHp(c, sheet.level);
     return true;
   }
+
+  /// Prende el estado activable [modeId] (la Furia), con la [variant] elegida
+  /// si tiene. Gasta un uso de su recurso; devuelve false sin tocar nada si
+  /// no quedan usos, si el estado no está disponible (armadura pesada) o si
+  /// el personaje no lo tiene.
+  ///
+  /// Prenderlo de nuevo estando prendido no gasta otro uso: solo cambia la
+  /// variante, que es lo que haría alguien que se equivocó de animal.
+  static bool activateMode(
+    CombatState c,
+    ComputedSheet sheet,
+    String modeId, {
+    String? variant,
+  }) {
+    final mode = sheet.activeModes.where((m) => m.id == modeId).firstOrNull;
+    if (mode == null || !mode.available) return false;
+    if (variant != null && !mode.variants.any((v) => v.id == variant)) {
+      return false;
+    }
+    if (!c.activeModes.containsKey(modeId)) {
+      final key = mode.resourceKey;
+      if (key != null) {
+        final resource = sheet.resources.where((r) => r.key == key).firstOrNull;
+        if (resource == null) return false;
+        final used = c.resourceUsage[key] ?? 0;
+        if (used >= resource.max) return false;
+        c.resourceUsage[key] = used + 1;
+      }
+    }
+    c.activeModes[modeId] = variant;
+    return true;
+  }
+
+  /// Apaga el estado. No devuelve el uso: la Furia terminada antes de tiempo
+  /// sigue gastada.
+  static void deactivateMode(CombatState c, String modeId) =>
+      c.activeModes.remove(modeId);
 
   /// Vuelve a la forma propia. Los PG temporales no se quitan: son PG
   /// temporales normales y duran hasta que se gastan o hasta el descanso largo.

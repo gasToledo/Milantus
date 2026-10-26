@@ -113,12 +113,25 @@ class _SheetScreenState extends State<SheetScreen> {
   // `ContentRepository.revision`): la ficha trae nombres del catálogo.
   Character? _sheetFor;
   int? _sheetRevision;
+  String? _sheetModes;
   ComputedSheet? _sheetCache;
   ComputedSheet get sheet {
-    if (!identical(_sheetFor, _c) || _sheetRevision != repo.revision) {
+    // Los estados activables (Furia) sí pasan por el compilador —sus efectos
+    // son fuentes como cualquier rasgo—, pero prenderlos muta el estado de
+    // combate in situ, como la Forma Salvaje, y no produce un _c nuevo. Por
+    // eso entran en la clave de la caché.
+    final modes =
+        (_c.combat.activeModes.entries.toList()
+              ..sort((a, b) => a.key.compareTo(b.key)))
+            .map((e) => '${e.key}=${e.value}')
+            .join(',');
+    if (!identical(_sheetFor, _c) ||
+        _sheetRevision != repo.revision ||
+        _sheetModes != modes) {
       _sheetCache = CharacterCompiler(repo).compile(_c);
       _sheetFor = _c;
       _sheetRevision = repo.revision;
+      _sheetModes = modes;
     }
     // La Forma Salvaje se aplica encima y no se cachea: la caché va por
     // identidad de _c, y transformarse muta el estado de combate in situ sin

@@ -74,7 +74,7 @@
     "features.12.effects.3.effects.0.description": "Indomitable uses."
   },
   "barbarian": {
-    "_es": "0388b50f",
+    "_es": "34e9b2a6",
     "name": "Barbarian",
     "features.0.name": "Rage",
     "features.0.effects.0.name": "Rage",
@@ -166,7 +166,8 @@
     "features.22.description": "You gain an Epic Boon feat; Boon of Irresistible Offense is recommended.",
     "features.22.effects.0.description": "You gain an Epic Boon feat or another feat for which you qualify.",
     "features.23.description": "Your Strength and Constitution scores increase by 4, to a maximum of 25.",
-    "features.23.effects.2.description": "You embody primal power: your Strength and Constitution scores increase by 4, to a maximum of 25."
+    "features.23.effects.2.description": "You embody primal power: your Strength and Constitution scores increase by 4, to a maximum of 25.",
+    "features.0.effects.2.name": "Rage"
   },
   "rogue": {
     "_es": "01201da5",

@@ -145,6 +145,17 @@ sealed class Effect {
               int.parse(e.key as String): e.value as String,
           },
         ),
+      'activeMode' => ActiveModeEffect(
+          id: json['id'] as String,
+          name: json['name'] as String,
+          resourceId: json['resourceId'] as String?,
+          endsInHeavyArmor: json['endsInHeavyArmor'] as bool? ?? false,
+          effects: Effect.listFromJson(json['effects']),
+          variants: [
+            for (final v in json['variants'] as List? ?? const [])
+              ActiveModeVariant.fromJson((v as Map).cast<String, dynamic>()),
+          ],
+        ),
       'scalingDice' => ScalingDiceEffect({
           for (final e in (json['byLevel'] as Map).entries)
             int.parse(e.key as String): e.value as String,
@@ -211,6 +222,9 @@ sealed class Effect {
           ],
           bonusActionAttack: json['bonusActionAttack'] as bool? ?? false,
           critRange: json['critRange'] as int?,
+          whenAbility: json['whenAbility'] == null
+              ? null
+              : Ability.fromKey(json['whenAbility'] as String),
         ),
       'featureChoice' => FeatureChoiceEffect(
           groupId: json['groupId'] as String,
@@ -1349,6 +1363,12 @@ class WeaponRuleEffect extends Effect {
   /// 19 con Crítico Mejorado, 18 con Crítico Superior. Gana el menor.
   final int? critRange;
 
+  /// La regla vale solo si el ataque termina usando esta característica: el
+  /// daño de Furia es para «un ataque que use la Fuerza», con arma o sin
+  /// armas, y no para un tipo de arma. Se mira **después** de elegir la
+  /// característica, así que no sirve para ofrecer una opción nueva.
+  final Ability? whenAbility;
+
   const WeaponRuleEffect({
     this.targetGroupId,
     this.filter = const WeaponFilter(),
@@ -1367,6 +1387,7 @@ class WeaponRuleEffect extends Effect {
     this.onlyWielding = const [],
     this.bonusActionAttack = false,
     this.critRange,
+    this.whenAbility,
   });
 
   @override
@@ -1392,6 +1413,7 @@ class WeaponRuleEffect extends Effect {
           'onlyWielding': [for (final f in onlyWielding) f.toJson()],
         if (bonusActionAttack) 'bonusActionAttack': true,
         if (critRange != null) 'critRange': critRange,
+        if (whenAbility != null) 'whenAbility': whenAbility!.name,
       };
 }
 
@@ -1413,6 +1435,85 @@ class AttunementSlotsEffect extends Effect {
   const AttunementSlotsEffect(this.count);
   @override
   Map<String, dynamic> toJson() => {'type': 'attunementSlots', 'count': count};
+}
+
+/// Un estado que el personaje prende y apaga en la mesa: la Furia, la
+/// Transformación del Cambiante, la Revelación Celestial.
+///
+/// Mientras está activo, el compilador aplica [effects] —y los de la
+/// [variants] elegida al activarlo— como una fuente más. No hay una función
+/// aparte que «transforme» la ficha como `applyWildShape`: una resistencia,
+/// una ventaja o una regla de arma pasan por la misma maquinaria que las de
+/// cualquier rasgo, y la vista del DM, que compila la ficha del jugador, ve
+/// la Furia sin enterarse de que existe.
+///
+/// Si declara [resourceId], activarlo gasta un uso de ese recurso. La
+/// duración no se modela: se termina a mano, al llegar a 0 PG o al descansar
+/// (ver `CombatOps`).
+///
+/// Los [effects] heredan el nivel de la fuente que declara el estado, así
+/// que los tramos van con `leveled` como en cualquier rasgo de clase.
+class ActiveModeEffect extends Effect {
+  final String id;
+  final String name;
+  final String? resourceId;
+
+  /// No se puede activar con armadura pesada puesta, y ponérsela lo apaga
+  /// (la Furia).
+  final bool endsInHeavyArmor;
+
+  final List<Effect> effects;
+
+  /// Opciones que se eligen **cada vez** que se activa (Oso, Águila o Lobo
+  /// del Corazón Salvaje). Vacío: el estado no tiene variantes.
+  final List<ActiveModeVariant> variants;
+
+  const ActiveModeEffect({
+    required this.id,
+    required this.name,
+    this.resourceId,
+    this.endsInHeavyArmor = false,
+    this.effects = const [],
+    this.variants = const [],
+  });
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'activeMode',
+        'id': id,
+        'name': name,
+        if (resourceId != null) 'resourceId': resourceId,
+        if (endsInHeavyArmor) 'endsInHeavyArmor': true,
+        'effects': [for (final e in effects) e.toJson()],
+        if (variants.isNotEmpty)
+          'variants': [for (final v in variants) v.toJson()],
+      };
+}
+
+/// Una de las opciones de un [ActiveModeEffect].
+class ActiveModeVariant {
+  final String id;
+  final String name;
+  final List<Effect> effects;
+
+  const ActiveModeVariant({
+    required this.id,
+    required this.name,
+    this.effects = const [],
+  });
+
+  factory ActiveModeVariant.fromJson(Map<String, dynamic> j) =>
+      ActiveModeVariant(
+        id: j['id'] as String,
+        name: j['name'] as String,
+        effects: Effect.listFromJson(j['effects']),
+      );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'effects': [for (final e in effects) e.toJson()],
+      };
 }
 
 /// Dados de un rasgo que crecen con el nivel y no son un recurso: el Ataque

@@ -215,6 +215,13 @@ class CombatState {
   /// números que el contenido puede corregir.
   String? wildShapeCreatureId;
 
+  /// Estados activables encendidos ahora (id → variante elegida, o null si no
+  /// tiene): la Furia, la Transformación del Cambiante. Ver `ActiveModeEffect`.
+  ///
+  /// Solo los ids: lo que hace cada estado sale del contenido, y un id que el
+  /// contenido ya no declara se ignora al compilar.
+  final Map<String, String?> activeModes;
+
   CombatState({
     this.currentHp = 0,
     this.tempHp = 0,
@@ -230,7 +237,9 @@ class CombatState {
     this.concentratingOn,
     List<CompanionInstance>? companions,
     this.wildShapeCreatureId,
+    Map<String, String?>? activeModes,
   })  : hitDiceUsed = _hitDiceMap(hitDiceUsed),
+        activeModes = activeModes ?? {},
         conditions = conditions ?? {},
         resourceUsage = resourceUsage ?? {},
         spellSlotsUsed = spellSlotsUsed ?? {},
@@ -258,6 +267,7 @@ class CombatState {
         'concentratingOn': concentratingOn,
         'companions': [for (final c in companions) c.toJson()],
         'wildShapeCreatureId': wildShapeCreatureId,
+        'activeModes': activeModes,
       };
 
   factory CombatState.fromJson(Map<String, dynamic> j) => CombatState(
@@ -293,6 +303,15 @@ class CombatState {
             CompanionInstance.fromJson((c as Map).cast<String, dynamic>()),
         ],
         wildShapeCreatureId: j['wildShapeCreatureId'] as String?,
+        // Sin migración, por el mismo motivo que `heroicInspiration`: vacío
+        // es lo correcto para un documento viejo, y subir el esquema haría
+        // que una pestaña vieja se niegue a abrir el personaje entero. Lo
+        // único que pierde un cliente viejo que regrabe es una Furia en curso.
+        activeModes: {
+          for (final e in (j['activeModes'] as Map? ?? const {}).entries)
+            if (e.key is String && (e.value == null || e.value is String))
+              e.key as String: e.value as String?,
+        },
       );
 }
 

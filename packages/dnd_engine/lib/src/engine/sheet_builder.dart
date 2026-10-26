@@ -183,6 +183,12 @@ class SheetBuilder {
   final List<Advantage> advantages = [];
   final List<ScalingDice> scalingDice = [];
 
+  /// Estados activables declarados, por id, con el nivel de su fuente: sus
+  /// efectos se aplican con ese nivel cuando están activos. Gana la
+  /// declaración de mayor nivel, como con los recursos.
+  final Map<String, ({ActiveModeEffect effect, int level, String? classId})>
+      activeModes = {};
+
   SheetBuilder({required this.baseScores, this.level = 1});
 
   /// Resuelve las plantillas de recurso acumuladas a su [CharacterResource]
@@ -456,6 +462,14 @@ class SheetBuilder {
         acBonus += amount;
       case InitiativeBonusEffect():
         initiativeEffects.add((effect: e, source: sourceName));
+      case ActiveModeEffect(:final id):
+        // Solo se anota: aplicar sus efectos depende de si está activo, y eso
+        // lo decide el compilador con el estado de combate en la mano.
+        activeModes[id] = (
+          effect: e,
+          level: sourceLevel ?? level,
+          classId: sourceClassId,
+        );
       case ScalingDiceEffect(:final byLevel):
         final dice = _tierFor(byLevel, sourceLevel ?? level);
         if (dice != null) {

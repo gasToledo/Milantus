@@ -1044,7 +1044,8 @@ void main() {
     );
   });
 
-  group('Cansancio e Inspiración Heroica no piden migración', () {
+  group('Cansancio, Inspiración Heroica y estados activos no piden migración',
+      () {
     /// Los dos se resuelven al leer, sin paso en `migrateJson`. La versión del
     /// esquema **no sube**: `false` es el valor correcto para un documento
     /// viejo —nadie tenía Inspiración Heroica antes— y subirla tendría un costo
@@ -1075,6 +1076,21 @@ void main() {
         Character.fromJson(c.toJson()).combat.heroicInspiration,
         isTrue,
       );
+    });
+
+    test('los estados activos viajan y sin la clave no hay ninguno', () {
+      expect(
+        Character.fromJson(alDia(combat: {'currentHp': 10})).combat.activeModes,
+        isEmpty,
+      );
+      final c = Character.fromJson(
+        alDia(combat: {
+          'currentHp': 10,
+          'activeModes': {'rage': null, 'shifting': 'wildhunt'},
+        }),
+      );
+      final back = Character.fromJson(c.toJson()).combat.activeModes;
+      expect(back, {'rage': null, 'shifting': 'wildhunt'});
     });
 
     test('un cansancio imposible se normaliza al leer', () {
