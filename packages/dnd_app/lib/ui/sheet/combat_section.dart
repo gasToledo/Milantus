@@ -730,7 +730,15 @@ extension _SheetCombatSection on _SheetScreenState {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  m.name,
+                  // Con la variante al lado: «Furia · Oso» dice de dónde salen
+                  // las resistencias de la línea de abajo.
+                  [
+                    m.name,
+                    ?m.variants
+                        .where((v) => v.id == m.activeVariant)
+                        .firstOrNull
+                        ?.name,
+                  ].join(' · '),
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     color: pal.gold,

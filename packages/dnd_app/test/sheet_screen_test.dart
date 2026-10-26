@@ -320,6 +320,39 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('una Furia con variantes pregunta cuál antes de prenderse', (
+    tester,
+  ) async {
+    final corazon = Character(
+      id: 'corazon',
+      name: 'Asha',
+      raceId: 'human',
+      classId: 'barbarian',
+      subclassId: 'wild-heart',
+      backgroundId: 'soldier',
+      level: 3,
+      assignedScores: {for (final a in Ability.values) a: 14},
+      hpPerLevel: const [12, 7, 7],
+      combat: CombatState(currentHp: 30),
+    );
+    await pumpSheet(tester, corazon, size: const Size(900, 6000));
+    final furia = CharacterCompiler(repo).compile(corazon).activeModes.single;
+    final oso = furia.variants.first;
+
+    await tester.tap(find.text('Activar'));
+    await tester.pumpAndSettle();
+    for (final v in furia.variants) {
+      expect(find.text(v.name), findsOneWidget);
+    }
+    await tester.tap(find.text(oso.name));
+    await tester.pumpAndSettle();
+
+    expect(corazon.combat.activeModes[furia.id], oso.id);
+    expect(find.text('${furia.name} · ${oso.name}'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 1));
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('una reserva se gasta en cantidades y no de a un uso', (
     tester,
   ) async {

@@ -401,6 +401,10 @@ class CombatOps {
       return false;
     }
     if (!c.activeModes.containsKey(modeId)) {
+      // Lo que pasa al activarlo, solo la primera vez: cambiar de variante
+      // con el estado ya prendido no da PG temporales de nuevo.
+      setTempHp(c, mode.tempHpOnActivate);
+      c.conditions.removeAll(mode.endsConditions);
       final key = mode.resourceKey;
       if (key != null) {
         final resource = sheet.resources.where((r) => r.key == key).firstOrNull;

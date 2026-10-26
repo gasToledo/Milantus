@@ -461,6 +461,9 @@ class CharacterCompiler {
       ActiveModeBlock? blockedBy,
       bool on,
       String? variant,
+      List<ActiveModeVariant> variants,
+      int tempHp,
+      List<String> endsConditions,
       List<String> resistances,
       List<Advantage> advantages,
     })>[];
@@ -476,19 +479,41 @@ class CharacterCompiler {
               ? ActiveModeBlock.incapacitated
               : null;
       final on = blockedBy == null && c.combat.activeModes.containsKey(mode.id);
+      // Lo que le agregan otras fuentes (la subclase): sus variantes se suman
+      // a las del estado, y cada una se aplica con el nivel de quien la trae.
+      final extensions = builder.modeExtensions[mode.id] ?? const [];
+      final variants = [
+        for (final v in mode.variants) (variant: v, level: level),
+        for (final x in extensions)
+          for (final v in x.effect.variants) (variant: v, level: x.level),
+      ];
       final variantId = on ? c.combat.activeModes[mode.id] : null;
-      final variant = mode.variants.where((v) => v.id == variantId).firstOrNull;
+      final chosen =
+          variants.where((v) => v.variant.id == variantId).firstOrNull;
       final rulesBefore = builder.weaponRules.length;
       final resistancesBefore = {...builder.resistances};
       final advantagesBefore = builder.advantages.length;
       if (on) {
         applySource(
           'mode:${mode.id}',
-          variant == null ? mode.name : '${mode.name}: ${variant.name}',
-          [...mode.effects, ...?variant?.effects],
+          chosen == null ? mode.name : '${mode.name}: ${chosen.variant.name}',
+          mode.effects,
           sourceClassId: classId,
           sourceLevel: level,
         );
+        for (final x in extensions) {
+          applySource('mode:${mode.id}:${x.name}', mode.name, x.effect.effects,
+              sourceClassId: x.classId, sourceLevel: x.level);
+        }
+        if (chosen != null) {
+          applySource(
+            'mode:${mode.id}:${chosen.variant.id}',
+            '${mode.name}: ${chosen.variant.name}',
+            chosen.variant.effects,
+            sourceClassId: classId,
+            sourceLevel: chosen.level,
+          );
+        }
       }
       for (var i = rulesBefore; i < builder.weaponRules.length; i++) {
         ruleModes[i] = mode;
@@ -498,7 +523,13 @@ class CharacterCompiler {
         classId: classId,
         blockedBy: blockedBy,
         on: on,
-        variant: variant?.id,
+        variant: chosen?.variant.id,
+        variants: [for (final v in variants) v.variant],
+        tempHp: extensions.fold(
+            0, (sum, x) => sum + x.effect.tempHpPerLevel * x.level),
+        endsConditions: [
+          for (final x in extensions) ...x.effect.endsConditions,
+        ],
         resistances: [
           for (final r in builder.resistances)
             if (!resistancesBefore.contains(r)) r,
@@ -907,6 +938,9 @@ class CharacterCompiler {
               blockedBy: d.blockedBy,
               on: d.on,
               variant: d.variant,
+              variants: d.variants,
+              tempHp: d.tempHp,
+              endsConditions: d.endsConditions,
               resistances: d.resistances,
               advantages: d.advantages,
               attacks: attacks),
@@ -1830,6 +1864,9 @@ class CharacterCompiler {
     required ActiveModeBlock? blockedBy,
     required bool on,
     required String? variant,
+    required List<ActiveModeVariant> variants,
+    required int tempHp,
+    required List<String> endsConditions,
     required List<String> resistances,
     required List<Advantage> advantages,
     required List<Attack> attacks,
@@ -1855,7 +1892,9 @@ class CharacterCompiler {
           : classId == null
               ? resourceId
               : '$classId:$resourceId',
-      variants: mode.variants,
+      variants: List.unmodifiable(variants),
+      tempHpOnActivate: tempHp,
+      endsConditions: List.unmodifiable(endsConditions),
       blockedBy: blockedBy,
       active: on,
       activeVariant: variant,

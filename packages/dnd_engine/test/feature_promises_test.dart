@@ -193,7 +193,8 @@ void main() {
     // contador (Inspiración Bárdica, Indómito, Recuperación Arcana, los usos
     // de especie...). Los de especie que llegan con el nivel van envueltos en
     // `leveled` y este recorrido no los ve.
-    expect(recursos, hasLength(80));
+    // 81 con la reserva de Guerrero de los Dioses del Fanático.
+    expect(recursos, hasLength(81));
 
     var porCaracteristica = 0;
     var porNivel = 0;
@@ -258,16 +259,17 @@ void main() {
     // modelar todavía, bajá el número a mano y explicá por qué en el commit:
     // el historial de este número es el registro de deuda, y sale más barato
     // que marcar 311 entradas con un motivo que nadie va a leer.
-    // Hoy son exactamente 224: los «N veces por descanso» de clases,
+    // Hoy son exactamente 220: los «N veces por descanso» de clases,
     // subclases y especies pasaron a ser recursos, Competencias Adicionales,
     // Estilo de Combate Adicional, Arcanum Místico y Aspecto de lo Salvaje
     // declaran su elección, y las ventajas permanentes (Sentir el Peligro,
     // Instinto Salvaje, Atleta Sobresaliente...) y las sintonizaciones del
     // Artífice y del Ladrón, el rango de crítico del Campeón y los dados del
     // Ataque Furtivo llegan a la ficha como efecto, y también las velocidades
-    // y sentidos de Errante, Sentidos Salvajes y el Ladrón. Va como cota y no como igualdad para
+    // y sentidos de Errante, Sentidos Salvajes y el Ladrón, y lo que las
+    // subclases del Bárbaro le agregan a la Furia. Va como cota y no como igualdad para
     // que pagar deuda no haga fallar el test: lo que tiene que doler es *sumar*.
-    expect(soloTexto, hasLength(lessThanOrEqualTo(224)),
+    expect(soloTexto, hasLength(lessThanOrEqualTo(220)),
         reason: 'hay más rasgos que solo son texto que antes:\n'
             '${soloTexto.join('\n')}');
   });

@@ -142,7 +142,7 @@
     "features.3.effects.0.description": "As a Bonus Action, each creature of your choice in a 30-foot Emanation originating from you must make a Wisdom saving throw (DC 8 + your Strength modifier + your Proficiency Bonus). On a failure, it has the Frightened condition for 1 minute, repeating the save at the end of each of its turns. Once used, you can't do so again until you finish a Long Rest, unless you expend a use of your Rage (no action required) to restore it."
   },
   "wild-heart": {
-    "_es": "0dbae7aa",
+    "_es": "91526a36",
     "name": "Path of the Wild Heart",
     "features.0.name": "Animal Speaker / Rage of the Wilds",
     "features.0.effects.0.name": "Rage of the Wilds",
@@ -171,7 +171,13 @@
     "features.1.effects.1.options.2.name": "Salmon",
     "features.1.effects.1.options.2.description": "A Swim Speed equal to your Speed.",
     "features.1.effects.1.options.2.effects.0.name": "Aspect of the Wilds: Salmon",
-    "features.1.effects.1.options.2.effects.0.description": "A Swim Speed equal to your Speed."
+    "features.1.effects.1.options.2.effects.0.description": "A Swim Speed equal to your Speed.",
+    "features.0.effects.1.variants.0.name": "Bear",
+    "features.0.effects.1.variants.0.description": "Resistance to every damage type except Force, Necrotic, Psychic, and Radiant.",
+    "features.0.effects.1.variants.1.name": "Eagle",
+    "features.0.effects.1.variants.1.description": "When you enter your Rage, you can take the Disengage and Dash actions as part of that Bonus Action, and while it lasts you can take both with a Bonus Action.",
+    "features.0.effects.1.variants.2.name": "Wolf",
+    "features.0.effects.1.variants.2.description": "Your allies have Advantage on attack rolls against any enemy of yours within 5 feet of you."
   },
   "world-tree": {
     "_es": "034b9a11",
@@ -197,7 +203,7 @@
     "features.3.effects.0.description": "Teleport up to 60 feet, bringing nearby allies."
   },
   "zealot": {
-    "_es": "940f0d45",
+    "_es": "94ad53ed",
     "name": "Path of the Zealot",
     "features.0.name": "Divine Fury / Warrior of the Gods",
     "features.0.effects.0.name": "Divine Fury",
@@ -215,7 +221,15 @@
     "features.2.description": "As a Bonus Action, you inspire nearby allies, giving them Advantage on attack rolls and saving throws for a short time.",
     "features.2.effects.0.description": "Nearby allies gain Advantage on attack rolls and saving throws briefly.",
     "features.3.description": "While raging, you can unleash divine power that grants you Resistance and the ability to revive fallen allies.",
-    "features.3.effects.0.description": "Resistance to all damage, and you briefly revive allies at 0 HP."
+    "features.3.effects.0.description": "Resistance to all damage, and you briefly revive allies at 0 HP.",
+    "features.0.effects.2.name": "Warrior of the Gods",
+    "features.0.effects.2.description": "Healing dice (d12) you spend as a Bonus Action to regain Hit Points.",
+    "features.0.effects.3.effects.0.name": "Warrior of the Gods",
+    "features.0.effects.3.effects.0.description": "Healing dice (d12) you spend as a Bonus Action to regain Hit Points.",
+    "features.0.effects.4.effects.0.name": "Warrior of the Gods",
+    "features.0.effects.4.effects.0.description": "Healing dice (d12) you spend as a Bonus Action to regain Hit Points.",
+    "features.0.effects.5.effects.0.name": "Warrior of the Gods",
+    "features.0.effects.5.effects.0.description": "Healing dice (d12) you spend as a Bonus Action to regain Hit Points."
   },
   "college-dance": {
     "_es": "38d587cb",

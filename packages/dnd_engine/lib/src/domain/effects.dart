@@ -170,6 +170,18 @@ sealed class Effect {
               ActiveModeVariant.fromJson((v as Map).cast<String, dynamic>()),
           ],
         ),
+      'modeExtension' => ModeExtensionEffect(
+          modeId: json['modeId'] as String,
+          effects: Effect.listFromJson(json['effects']),
+          variants: [
+            for (final v in json['variants'] as List? ?? const [])
+              ActiveModeVariant.fromJson((v as Map).cast<String, dynamic>()),
+          ],
+          tempHpPerLevel: json['tempHpPerLevel'] as int? ?? 0,
+          endsConditions: (json['endsConditions'] as List? ?? const [])
+              .whereType<String>()
+              .toList(),
+        ),
       'scalingDice' => ScalingDiceEffect({
           for (final e in (json['byLevel'] as Map).entries)
             int.parse(e.key as String): e.value as String,
@@ -236,6 +248,7 @@ sealed class Effect {
           ],
           bonusActionAttack: json['bonusActionAttack'] as bool? ?? false,
           critRange: json['critRange'] as int?,
+          extraDamageLevelDivisor: json['extraDamageLevelDivisor'] as int?,
           whenAbility: json['whenAbility'] == null
               ? null
               : Ability.fromKey(json['whenAbility'] as String),
@@ -1428,7 +1441,15 @@ class WeaponRuleEffect extends Effect {
   /// [damageBonus] porque no se suman al número del arma sino que se tiran
   /// al lado, y la resistencia del objetivo se mira por tipo.
   final String? extraDamageDice;
+
+  /// Tipo de [extraDamageDice]. Con `|` son opciones que el jugador elige al
+  /// pegar: la Furia Divina del Fanático es `necrotic|radiant`.
   final String? extraDamageType;
+
+  /// Suma a [extraDamageDice] el nivel de la fuente dividido por esto
+  /// (redondeando hacia abajo): «1d6 más la mitad de tu nivel de Bárbaro» es
+  /// `2`. Lo resuelve el builder, que es quien sabe el nivel.
+  final int? extraDamageLevelDivisor;
 
   /// Dado que reemplaza al del arma **si es mayor**: el de Artes Marciales
   /// (1d6 → 1d12) o el 1d4 del Matón de Taberna. Si varias reglas lo dan, gana
@@ -1479,7 +1500,31 @@ class WeaponRuleEffect extends Effect {
     this.bonusActionAttack = false,
     this.critRange,
     this.whenAbility,
+    this.extraDamageLevelDivisor,
   });
+
+  /// La misma regla con [extraDamageDice] reemplazado: el builder la usa para
+  /// dejar resuelto el «más la mitad de tu nivel».
+  WeaponRuleEffect withExtraDamageDice(String dice) => WeaponRuleEffect(
+        targetGroupId: targetGroupId,
+        filter: filter,
+        grantsProficiency: grantsProficiency,
+        abilityOptions: abilityOptions,
+        damageTypeOptions: damageTypeOptions,
+        spellcastingFocus: spellcastingFocus,
+        extraAttacks: extraAttacks,
+        attackBonus: attackBonus,
+        damageBonus: damageBonus,
+        aloneInOneHand: aloneInOneHand,
+        extraDamageDice: dice,
+        extraDamageType: extraDamageType,
+        damageDie: damageDie,
+        requiresNoArmor: requiresNoArmor,
+        onlyWielding: onlyWielding,
+        bonusActionAttack: bonusActionAttack,
+        critRange: critRange,
+        whenAbility: whenAbility,
+      );
 
   @override
   Map<String, dynamic> toJson() => {
@@ -1505,6 +1550,8 @@ class WeaponRuleEffect extends Effect {
         if (bonusActionAttack) 'bonusActionAttack': true,
         if (critRange != null) 'critRange': critRange,
         if (whenAbility != null) 'whenAbility': whenAbility!.name,
+        if (extraDamageLevelDivisor != null)
+          'extraDamageLevelDivisor': extraDamageLevelDivisor,
       };
 }
 
@@ -1591,11 +1638,17 @@ class ActiveModeEffect extends Effect {
 class ActiveModeVariant {
   final String id;
   final String name;
+
+  /// Qué hace, para el diálogo en que se elige. Hace falta aunque la variante
+  /// tenga efectos: el Águila y el Lobo no cambian ningún número de la ficha
+  /// y su regla vive solo acá.
+  final String description;
   final List<Effect> effects;
 
   const ActiveModeVariant({
     required this.id,
     required this.name,
+    this.description = '',
     this.effects = const [],
   });
 
@@ -1603,13 +1656,60 @@ class ActiveModeVariant {
       ActiveModeVariant(
         id: j['id'] as String,
         name: j['name'] as String,
+        description: j['description'] as String? ?? '',
         effects: Effect.listFromJson(j['effects']),
       );
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'name': name,
+        if (description.isNotEmpty) 'description': description,
         'effects': [for (final e in effects) e.toJson()],
+      };
+}
+
+/// Le agrega algo a un estado activable que declaró **otra** fuente: la
+/// subclase que cambia la Furia de la clase (Corazón Salvaje, Fanático,
+/// Árbol del Mundo, Berserker).
+///
+/// Es un efecto aparte y no una segunda declaración de [ActiveModeEffect] con
+/// el mismo id porque esa reemplazaría a la primera —gana la de mayor
+/// nivel—, y la Furia del Fanático tiene que seguir siendo la Furia: mismas
+/// resistencias, mismo daño, más lo suyo.
+///
+/// Los [effects] se aplican con el nivel de la fuente que extiende, así que
+/// sus tramos van con `leveled` como en cualquier rasgo.
+class ModeExtensionEffect extends Effect {
+  final String modeId;
+  final List<Effect> effects;
+  final List<ActiveModeVariant> variants;
+
+  /// PG temporales al activar, por nivel de la fuente: la Vitalidad del Árbol
+  /// da tantos como el nivel de Bárbaro.
+  final int tempHpPerLevel;
+
+  /// Estados que terminan al activarlo: la Furia Irracional del Berserker
+  /// termina asustado y hechizado.
+  final List<String> endsConditions;
+
+  const ModeExtensionEffect({
+    required this.modeId,
+    this.effects = const [],
+    this.variants = const [],
+    this.tempHpPerLevel = 0,
+    this.endsConditions = const [],
+  });
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'modeExtension',
+        'modeId': modeId,
+        if (effects.isNotEmpty)
+          'effects': [for (final e in effects) e.toJson()],
+        if (variants.isNotEmpty)
+          'variants': [for (final v in variants) v.toJson()],
+        if (tempHpPerLevel != 0) 'tempHpPerLevel': tempHpPerLevel,
+        if (endsConditions.isNotEmpty) 'endsConditions': endsConditions,
       };
 }
 

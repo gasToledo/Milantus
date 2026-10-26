@@ -20,12 +20,14 @@ void main() {
     int level, {
     int dexterity = 14,
     List<InventoryEntry> inventory = const [],
+    String? subclassId,
   }) =>
       Character(
         id: 'furia',
         name: 'Prueba',
         raceId: 'human',
         classId: 'barbarian',
+        subclassId: subclassId,
         backgroundId: 'soldier',
         level: level,
         assignedScores: {
@@ -155,5 +157,55 @@ void main() {
     CombatOps.activateMode(c.combat, sheet, 'rage');
     CombatOps.shortRest(c.combat, sheet.resources);
     expect(c.combat.activeModes, isEmpty);
+  });
+
+  group('Las subclases le agregan a la Furia', () {
+    test('Corazón Salvaje: la variante se elige al activarla', () {
+      final c = barbaro(3, subclassId: 'wild-heart');
+      final calma = compiler.compile(c);
+      expect(calma.activeModes.single.variants.map((v) => v.id),
+          containsAll(['bear', 'eagle', 'wolf']));
+
+      CombatOps.activateMode(c.combat, calma, 'rage', variant: 'bear');
+      final oso = compiler.compile(c);
+      // El Oso resiste todo salvo fuerza, necrótico, psíquico y radiante.
+      expect(oso.resistances, containsAll(['fire', 'cold', 'acid']));
+      expect(oso.resistances, isNot(contains('psychic')));
+
+      // Cambiar de animal con la Furia prendida no gasta otro uso.
+      CombatOps.activateMode(c.combat, oso, 'rage', variant: 'eagle');
+      expect(c.combat.resourceUsage['rage'], 1);
+      expect(compiler.compile(c).resistances, isNot(contains('fire')));
+    });
+
+    test('Árbol del Mundo: PG temporales iguales al nivel al entrar', () {
+      final c = barbaro(5, subclassId: 'world-tree');
+      c.combat.currentHp = 30;
+      final sheet = compiler.compile(c);
+      expect(sheet.activeModes.single.tempHpOnActivate, 5);
+      CombatOps.activateMode(c.combat, sheet, 'rage');
+      expect(c.combat.tempHp, 5);
+    });
+
+    test('Berserker 6: entrar en Furia termina asustado y lo vuelve inmune',
+        () {
+      final c = barbaro(6, subclassId: 'berserker');
+      c.combat.conditions.add('frightened');
+      CombatOps.activateMode(c.combat, compiler.compile(c), 'rage');
+      expect(c.combat.conditions, isNot(contains('frightened')));
+      expect(compiler.compile(c).immunities,
+          containsAll(['charmed', 'frightened']));
+    });
+
+    test('Fanático: 1d6 más la mitad del nivel, necrótico o radiante', () {
+      final c = barbaro(5, subclassId: 'zealot', inventory: const [hacha]);
+      c.combat.activeModes['rage'] = null;
+      final extra = compiler.compile(c).weaponAttacks.single.extraDamage.single;
+      expect(extra.dice, '1d6 + ${5 ~/ 2}');
+      expect(extra.type, 'necrotic|radiant');
+      // Fuera de la Furia no está.
+      c.combat.activeModes.clear();
+      expect(compiler.compile(c).weaponAttacks.single.extraDamage, isEmpty);
+    });
   });
 }

@@ -1421,11 +1421,8 @@ extension _SheetGeneralSection on _SheetScreenState {
 
   /// La placa de un estado activable: los usos que quedan y «Activar», o
   /// «En curso» y «Terminar». Tocarla lo prende o lo apaga; la regla (gastar
-  /// el uso, la armadura pesada) es de `CombatOps`.
-  ///
-  /// ponytail: un estado con variantes (Corazón Salvaje) se prendería sin
-  /// elegirla. Ninguno del catálogo las declara todavía; el diálogo para
-  /// elegir llega con el primero que las use.
+  /// el uso, la armadura pesada) es de `CombatOps`. Un estado con variantes
+  /// (Oso, Águila o Lobo) pregunta cuál antes de prenderse.
   Widget _activeModeTile(ComputedSheet s, ActiveMode m) {
     final pal = context.palette;
     final l10n = context.l10n;
@@ -1445,15 +1442,11 @@ extension _SheetGeneralSection on _SheetScreenState {
         : (l10n.modeActivate, pal.gold);
     final enabled = m.active || (m.available && !noUses);
     return InkWell(
-      onTap: enabled
-          ? () => _mutateCombat(() {
-              if (m.active) {
-                CombatOps.deactivateMode(_c.combat, m.id);
-              } else {
-                CombatOps.activateMode(_c.combat, s, m.id);
-              }
-            })
-          : null,
+      onTap: !enabled
+          ? null
+          : m.active
+          ? () => _mutateCombat(() => CombatOps.deactivateMode(_c.combat, m.id))
+          : () => _activateMode(s, m),
       borderRadius: BorderRadius.circular(12),
       child: StatTile(
         icon: Icons.local_fire_department,
@@ -1468,6 +1461,48 @@ extension _SheetGeneralSection on _SheetScreenState {
           style: TextStyle(fontSize: 11, color: footerColor),
         ),
       ),
+    );
+  }
+
+  /// Prende [m]. Si tiene variantes, primero pregunta cuál: la regla dice
+  /// «cada vez que activás tu Furia, elegís una», así que no se recuerda la
+  /// de la vez anterior.
+  Future<void> _activateMode(ComputedSheet s, ActiveMode m) async {
+    String? variant;
+    if (m.variants.isNotEmpty) {
+      variant = await showDialog<String>(
+        context: context,
+        builder: (dialogContext) => AppDialog(
+          title: m.name,
+          icon: Icons.local_fire_department,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (final v in m.variants)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(
+                    v.name,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: v.description.isEmpty ? null : Text(v.description),
+                  onTap: () => Navigator.pop(dialogContext, v.id),
+                ),
+            ],
+          ),
+          actions: [
+            DialogAction(
+              context.l10n.commonCancel,
+              keyHint: 'Esc',
+              onPressed: () => Navigator.pop(dialogContext),
+            ),
+          ],
+        ),
+      );
+      if (variant == null || !mounted) return;
+    }
+    _mutateCombat(
+      () => CombatOps.activateMode(_c.combat, s, m.id, variant: variant),
     );
   }
 

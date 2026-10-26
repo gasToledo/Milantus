@@ -859,11 +859,20 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
-## [Unreleased]
+## [0.35.0+1] - 2026-10-26
 
 ### Nuevo
 
-- Sin cambios.
+- Las subclases del Bárbaro cambian la Furia:
+  - Corazón Salvaje: al entrar en Furia se elige Oso (resistencia a todo
+    salvo fuerza, necrótico, psíquico y radiante), Águila o Lobo, y el cartel
+    dice cuál.
+  - Árbol del Mundo: PG temporales iguales al nivel de Bárbaro al entrar en
+    Furia.
+  - Berserker: en Furia, inmune a asustado y hechizado, y entrar en Furia los
+    termina.
+  - Fanático: 1d6 + la mitad del nivel de daño necrótico o radiante en los
+    ataques mientras dura, y la reserva de dados de Guerrero de los Dioses.
 
 ### Modificado
 
@@ -873,6 +882,20 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   recargar la ficha.
 - Quedar incapacitado o caer a 0 PG corta la concentración, y con ella se van
   los compañeros invocados que la sostenían.
+
+### Eliminado
+
+- Sin cambios.
+
+## [Unreleased]
+
+### Nuevo
+
+- Sin cambios.
+
+### Modificado
+
+- Sin cambios.
 
 ### Eliminado
 

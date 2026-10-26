@@ -211,6 +211,17 @@ class SheetBuilder {
   final Map<String, ({ActiveModeEffect effect, int level, String? classId})>
       activeModes = {};
 
+  /// Lo que otras fuentes le agregan a cada estado, por id de estado.
+  final Map<
+      String,
+      List<
+          ({
+            ModeExtensionEffect effect,
+            int level,
+            String? classId,
+            String name,
+          })>> modeExtensions = {};
+
   SheetBuilder({required this.baseScores, this.level = 1});
 
   /// Resuelve las plantillas de recurso acumuladas a su [CharacterResource]
@@ -455,8 +466,26 @@ class SheetBuilder {
         halfProficiencyUnskilled = true;
       case OffHandAbilityDamageEffect():
         offHandAbilityDamage = true;
+      case WeaponRuleEffect(
+          :final extraDamageLevelDivisor?,
+          :final extraDamageDice?
+        ):
+        // «1d6 más la mitad de tu nivel»: se resuelve acá con el nivel de la
+        // fuente, y la regla que queda es una regla común.
+        final flat = (sourceLevel ?? level) ~/ extraDamageLevelDivisor;
+        weaponRules.add(e.withExtraDamageDice(
+            flat == 0 ? extraDamageDice : '$extraDamageDice + $flat'));
       case WeaponRuleEffect():
         weaponRules.add(e);
+      case ModeExtensionEffect(:final modeId):
+        // Como el estado mismo, solo se anota: sus efectos se aplican si el
+        // estado está activo, con el nivel de esta fuente.
+        (modeExtensions[modeId] ??= []).add((
+          effect: e,
+          level: sourceLevel ?? level,
+          classId: sourceClassId,
+          name: sourceName,
+        ));
       case TargetChoiceEffect(:final groupId, :final count):
         final scopedId =
             sourceClassId == null ? groupId : '$sourceClassId:$groupId';

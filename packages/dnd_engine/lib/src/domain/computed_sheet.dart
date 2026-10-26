@@ -1,5 +1,6 @@
 import 'ability.dart';
 import 'content.dart';
+import 'content_language.dart';
 import 'creature.dart';
 import 'damage_type.dart';
 import 'effects.dart';
@@ -590,7 +591,7 @@ class Attack {
   String get damageText => [
         '$damage ${DamageType.labelFor(damageType)}'.trim(),
         for (final extra in extraDamage)
-          '${extra.dice} ${DamageType.labelFor(extra.type)}',
+          '${extra.dice} ${extra.type.split('|').map(DamageType.labelFor).join(localized(' o ', ' or '))}',
       ].join(' + ');
 
   /// Copia con los campos indicados reemplazados.
@@ -814,7 +815,15 @@ class ActiveMode {
   /// Clave del recurso que gasta en `CombatState.resourceUsage`, o null.
   final String? resourceKey;
 
+  /// Las del estado y las que le agregan otras fuentes (Oso, Águila, Lobo).
   final List<ActiveModeVariant> variants;
+
+  /// PG temporales que da al activarlo (la Vitalidad del Árbol), ya
+  /// resueltos con el nivel. `CombatOps.activateMode` los aplica.
+  final int tempHpOnActivate;
+
+  /// Estados que termina al activarlo (la Furia Irracional).
+  final List<String> endsConditions;
 
   /// Por qué no se puede activar ahora, o null si se puede.
   final ActiveModeBlock? blockedBy;
@@ -841,6 +850,8 @@ class ActiveMode {
     required this.name,
     this.resourceKey,
     this.variants = const [],
+    this.tempHpOnActivate = 0,
+    this.endsConditions = const [],
     this.blockedBy,
     this.active = false,
     this.activeVariant,

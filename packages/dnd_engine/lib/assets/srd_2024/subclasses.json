@@ -257,7 +257,8 @@
         "name": "Furia Irracional",
         "description": "No podés ser hechizado ni asustado mientras estés en Furia; si lo estabas, el efecto se suspende.",
         "effects": [
-          { "type": "passiveTrait", "name": "Furia Irracional", "description": "En Furia no podés ser hechizado ni asustado." }
+          { "type": "passiveTrait", "name": "Furia Irracional", "description": "En Furia no podés ser hechizado ni asustado." },
+          { "type": "modeExtension", "modeId": "rage", "effects": [{ "type": "immunity", "damageType": "charmed" }, { "type": "immunity", "damageType": "frightened" }], "endsConditions": ["charmed", "frightened"] }
         ]
       },
       {
@@ -290,7 +291,8 @@
         "name": "Portavoz de los Animales / Furia de lo Salvaje",
         "description": "Podés comunicarte con bestias y, al entrar en Furia, invocás el poder de un espíritu animal (Oso, Águila o Lobo).",
         "effects": [
-          { "type": "passiveTrait", "name": "Furia de lo Salvaje", "description": "En Furia elegís un espíritu: Oso (resistencias amplias), Águila (Destrabarse/Correr bonus) o Lobo (aliados con ventaja al atacar cerca tuyo)." }
+          { "type": "passiveTrait", "name": "Furia de lo Salvaje", "description": "En Furia elegís un espíritu: Oso (resistencias amplias), Águila (Destrabarse/Correr bonus) o Lobo (aliados con ventaja al atacar cerca tuyo)." },
+          { "type": "modeExtension", "modeId": "rage", "variants": [{ "id": "bear", "name": "Oso", "description": "Resistencia a todo tipo de daño salvo fuerza, necrótico, psíquico y radiante.", "effects": [{ "type": "resistance", "damageType": "acid" }, { "type": "resistance", "damageType": "bludgeoning" }, { "type": "resistance", "damageType": "cold" }, { "type": "resistance", "damageType": "fire" }, { "type": "resistance", "damageType": "lightning" }, { "type": "resistance", "damageType": "piercing" }, { "type": "resistance", "damageType": "poison" }, { "type": "resistance", "damageType": "slashing" }, { "type": "resistance", "damageType": "thunder" }] }, { "id": "eagle", "name": "Águila", "description": "Al entrar en Furia podés Destrabarte y Correr como parte de esa acción adicional, y mientras dure podés hacer las dos con una acción adicional.", "effects": [] }, { "id": "wolf", "name": "Lobo", "description": "Tus aliados tienen ventaja en las tiradas de ataque contra cualquier enemigo tuyo que esté a 5 pies de vos.", "effects": [] }] }
         ]
       },
       {
@@ -335,7 +337,8 @@
         "description": "Al entrar en Furia ganás PG temporales, y en cada turno podés darle PG temporales a un aliado cercano.",
         "effects": [
           { "type": "passiveTrait", "name": "Vitalidad del Árbol: Oleada Vital", "description": "Cuando activás tu Furia, obtenés una cantidad de puntos de golpe temporales igual a tu nivel de Bárbaro." },
-          { "type": "passiveTrait", "name": "Vitalidad del Árbol: Fuerza Vivificante", "description": "Al comienzo de cada uno de tus turnos con la Furia activa, podés elegir otra criatura a 10 pies o menos para que obtenga puntos de golpe temporales: tirás una cantidad de d6 igual a tu bonificación de daño por Furia y sumás los resultados. Si quedan puntos temporales cuando la Furia termina, desaparecen." }
+          { "type": "passiveTrait", "name": "Vitalidad del Árbol: Fuerza Vivificante", "description": "Al comienzo de cada uno de tus turnos con la Furia activa, podés elegir otra criatura a 10 pies o menos para que obtenga puntos de golpe temporales: tirás una cantidad de d6 igual a tu bonificación de daño por Furia y sumás los resultados. Si quedan puntos temporales cuando la Furia termina, desaparecen." },
+          { "type": "modeExtension", "modeId": "rage", "tempHpPerLevel": 1 }
         ]
       },
       {
@@ -376,7 +379,12 @@
         "name": "Furia Divina / Guerrero de los Dioses",
         "description": "En Furia, tus ataques infligen daño necrótico o radiante extra; si morís, es más fácil devolverte a la vida.",
         "effects": [
-          { "type": "passiveTrait", "name": "Furia Divina", "description": "Daño necrótico o radiante extra al impactar durante la Furia; conjuros de resurrección más fáciles sobre vos." }
+          { "type": "passiveTrait", "name": "Furia Divina", "description": "Daño necrótico o radiante extra al impactar durante la Furia; conjuros de resurrección más fáciles sobre vos." },
+          { "type": "modeExtension", "modeId": "rage", "effects": [{ "type": "weaponRule", "extraDamageDice": "1d6", "extraDamageType": "necrotic|radiant", "extraDamageLevelDivisor": 2 }, { "type": "weaponRule", "filter": { "unarmed": true }, "extraDamageDice": "1d6", "extraDamageType": "necrotic|radiant", "extraDamageLevelDivisor": 2 }] },
+          { "type": "resource", "id": "warrior_of_the_gods", "name": "Guerrero de los Dioses", "max": 4, "recharge": "long", "pool": true, "damageByLevel": { "3": "d12" }, "description": "Dados de curación (d12) que gastás como acción adicional para recuperar PG." },
+          { "type": "leveled", "minLevel": 6, "effects": [{ "type": "resource", "id": "warrior_of_the_gods", "name": "Guerrero de los Dioses", "max": 5, "recharge": "long", "pool": true, "damageByLevel": { "3": "d12" }, "description": "Dados de curación (d12) que gastás como acción adicional para recuperar PG." }] },
+          { "type": "leveled", "minLevel": 12, "effects": [{ "type": "resource", "id": "warrior_of_the_gods", "name": "Guerrero de los Dioses", "max": 6, "recharge": "long", "pool": true, "damageByLevel": { "3": "d12" }, "description": "Dados de curación (d12) que gastás como acción adicional para recuperar PG." }] },
+          { "type": "leveled", "minLevel": 17, "effects": [{ "type": "resource", "id": "warrior_of_the_gods", "name": "Guerrero de los Dioses", "max": 7, "recharge": "long", "pool": true, "damageByLevel": { "3": "d12" }, "description": "Dados de curación (d12) que gastás como acción adicional para recuperar PG." }] }
         ]
       },
       {
