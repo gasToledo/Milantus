@@ -1,6 +1,6 @@
 {
   "fighter": {
-    "_es": "c0f07896",
+    "_es": "5a8da48c",
     "name": "Fighter",
     "features.0.name": "Fighting Style",
     "features.0.effects.0.name": "Fighting Style",
@@ -65,7 +65,13 @@
     "features.16.effects.0.description": "On your turn, you can take one more action, except the Magic action. Two uses per rest, but only one per turn.",
     "features.17.description": "You gain an Epic Boon feat; Boon of Combat Prowess is recommended.",
     "features.17.effects.0.description": "You gain an Epic Boon feat or another feat for which you qualify.",
-    "features.18.description": "When you take the Attack action, you make four attacks instead of one."
+    "features.18.description": "When you take the Attack action, you make four attacks instead of one.",
+    "features.12.effects.1.name": "Indomitable",
+    "features.12.effects.1.description": "Indomitable uses.",
+    "features.12.effects.2.effects.0.name": "Indomitable",
+    "features.12.effects.2.effects.0.description": "Indomitable uses.",
+    "features.12.effects.3.effects.0.name": "Indomitable",
+    "features.12.effects.3.effects.0.description": "Indomitable uses."
   },
   "barbarian": {
     "_es": "0388b50f",
@@ -163,7 +169,7 @@
     "features.23.effects.2.description": "You embody primal power: your Strength and Constitution scores increase by 4, to a maximum of 25."
   },
   "rogue": {
-    "_es": "d1703a4c",
+    "_es": "01201da5",
     "name": "Rogue",
     "features.0.name": "Expertise",
     "features.0.effects.0.name": "Expertise (level 1)",
@@ -235,7 +241,9 @@
     "features.15.description": "You gain an Epic Boon feat; Boon of the Night Spirit is recommended.",
     "features.15.effects.0.description": "You gain an Epic Boon feat or another feat for which you qualify.",
     "features.16.description": "You turn a failed D20 Test into a 20, once per rest.",
-    "features.16.effects.0.description": "If you fail a D20 Test, you can turn the roll into a 20. You regain the use after a Short or Long Rest."
+    "features.16.effects.0.description": "If you fail a D20 Test, you can turn the roll into a 20. You regain the use after a Short or Long Rest.",
+    "features.16.effects.1.name": "Stroke of Luck",
+    "features.16.effects.1.description": "Stroke of Luck use."
   },
   "monk": {
     "_es": "a0910e97",
@@ -328,7 +336,7 @@
     "features.23.effects.2.description": "You have taken your body and mind to another level: your Dexterity and Wisdom scores increase by 4, to a maximum of 25."
   },
   "wizard": {
-    "_es": "68dc2fa8",
+    "_es": "8fa81e6b",
     "name": "Wizard",
     "features.0.name": "Spellcasting",
     "features.0.effects.1.name": "Familiar",
@@ -378,10 +386,12 @@
     "features.7.description": "You gain an Epic Boon feat; Boon of Spell Recall is recommended.",
     "features.7.effects.0.description": "You gain an Epic Boon feat or another feat for which you qualify.",
     "features.8.description": "Two level 3 spells always prepared, with one free casting each.",
-    "features.8.effects.1.description": "Choose two level 3 spells in your spellbook. You always have them prepared and can cast each one once at level 3 without expending a slot. The free casting returns after a Short or Long Rest."
+    "features.8.effects.1.description": "Choose two level 3 spells in your spellbook. You always have them prepared and can cast each one once at level 3 without expending a slot. The free casting returns after a Short or Long Rest.",
+    "features.2.effects.1.name": "Arcane Recovery",
+    "features.2.effects.1.description": "Arcane Recovery use."
   },
   "cleric": {
-    "_es": "ae2bb764",
+    "_es": "6be6093a",
     "name": "Cleric",
     "features.0.name": "Spellcasting",
     "features.0.effects.1.name": "Celestial Spirit",
@@ -419,13 +429,13 @@
     "features.1.effects.0.options.1.description": "You know one extra cantrip from the Cleric spell list. In addition, your mystical connection to the divine gives you a bonus equal to your Wisdom modifier (minimum of +1) to your Intelligence (Arcana) and Intelligence (Religion) checks.",
     "features.1.effects.0.options.1.effects.3.description": "One extra Cleric cantrip and a bonus equal to your Wisdom modifier (minimum of +1) to Intelligence (Arcana) and Intelligence (Religion) checks.",
     "features.2.description": "You channel divine energy for effects such as Turn Undead.",
-    "features.2.effects.0.description": "Channel Divinity uses (for example, Turn Undead or Divine Spark). You regain uses after a Short or Long Rest.",
+    "features.2.effects.0.description": "Channel Divinity uses (e.g. Turn Undead or Divine Spark). You regain one use on a Short Rest and all of them on a Long Rest.",
     "features.3.description": "When you use Turn Undead, those that fail the save also take Radiant damage.",
     "features.3.effects.0.description": "When you use Turn Undead, you can roll a number of d8s equal to your Wisdom modifier (minimum of 1d8): Undead that fail the save take that total as Radiant damage. The damage doesn't end the turn effect.",
     "features.4.description": "Your Channel Divinity uses increase to 3.",
-    "features.4.effects.0.description": "Channel Divinity uses (for example, Turn Undead or Divine Spark). You regain uses after a Short or Long Rest.",
+    "features.4.effects.0.description": "Channel Divinity uses (e.g. Turn Undead or Divine Spark). You regain one use on a Short Rest and all of them on a Long Rest.",
     "features.5.description": "Your Channel Divinity uses increase to 4.",
-    "features.5.effects.0.description": "Channel Divinity uses (for example, Turn Undead or Divine Spark). You regain uses after a Short or Long Rest.",
+    "features.5.effects.0.description": "Channel Divinity uses (e.g. Turn Undead or Divine Spark). You regain one use on a Short Rest and all of them on a Long Rest.",
     "features.6.description": "You choose Divine Strike (an extra 1d8 Necrotic or Radiant damage) or Potent Spellcasting (Wisdom to cantrip damage).",
     "features.6.effects.0.description": "You choose one option. Divine Strike: once per turn, when you hit with a weapon, the target takes an extra 1d8 Necrotic or Radiant damage. Potent Spellcasting: you add your Wisdom modifier to the damage of any Cleric cantrip.",
     "features.7.description": "As a Magic action, you cast a Cleric spell of level 5 or lower without expending a slot.",
@@ -438,7 +448,7 @@
     "features.10.effects.0.description": "When you use Divine Intervention, you can choose the Wish spell. If you do, you can't use Divine Intervention again until you finish 2d4 Long Rests."
   },
   "druid": {
-    "_es": "8fdec557",
+    "_es": "5af24883",
     "name": "Druid",
     "features.0.name": "Spellcasting",
     "features.0.effects.1.name": "Bestial Spirit",
@@ -488,15 +498,15 @@
     "features.2.effects.0.options.1.description": "Trained for battle, you gain proficiency with Martial weapons and training with Medium armor.",
     "features.2.effects.0.options.1.effects.2.description": "Proficiency with Martial weapons and training with Medium armor.",
     "features.3.description": "As a Bonus Action, you take the shape of a Beast form you know.",
-    "features.3.effects.0.description": "As a Bonus Action, you shape-shift into a Beast. Uses regained after a Short or Long Rest.",
+    "features.3.effects.0.description": "As a Bonus Action, you shape-shift into a Beast. You regain one use on a Short Rest and all of them on a Long Rest.",
     "features.4.description": "You know 6 forms and can adopt Beasts of up to CR 1/2.",
     "features.5.description": "You know 8 forms and can adopt Beasts of up to CR 1, including ones with a Fly Speed.",
     "features.6.description": "As a Magic action, you expend a spell slot or a use of Wild Shape to cast Find Familiar.",
     "features.6.effects.0.description": "As a Magic action, you can expend a spell slot **or** a use of Wild Shape to cast Find Familiar without Material components. A familiar summoned this way is Fey and disappears when you finish your next Long Rest.",
     "features.7.description": "Your Wild Shape uses increase to 3.",
-    "features.7.effects.0.description": "As a Bonus Action, you shape-shift into a Beast. Uses regained after a Short or Long Rest.",
+    "features.7.effects.0.description": "As a Bonus Action, you shape-shift into a Beast. You regain one use on a Short Rest and all of them on a Long Rest.",
     "features.8.description": "Your Wild Shape uses increase to 4.",
-    "features.8.effects.0.description": "As a Bonus Action, you shape-shift into a Beast. Uses regained after a Short or Long Rest.",
+    "features.8.effects.0.description": "As a Bonus Action, you shape-shift into a Beast. You regain one use on a Short Rest and all of them on a Long Rest.",
     "features.9.description": "You can convert spell slots into Wild Shape uses and vice versa.",
     "features.9.effects.0.description": "Once per turn, if you have no Wild Shape uses left, you can regain one by expending a spell slot. In addition, you can expend a use of Wild Shape to gain a level 1 spell slot, once per Long Rest.",
     "features.10.description": "You choose Primal Strike (an extra 1d8 elemental damage) or Potent Spellcasting (Wisdom to cantrip damage).",
@@ -511,7 +521,7 @@
     "features.14.effects.0.description": "Evergreen Wild Shape: when you roll Initiative with no Wild Shape uses left, you regain one. Nature Magician: you convert unexpended Wild Shape uses into a spell slot, at 2 levels per use, once per Long Rest. Longevity: primal magic slows your aging."
   },
   "bard": {
-    "_es": "3922dbd9",
+    "_es": "388f105c",
     "name": "Bard",
     "features.0.name": "Spellcasting",
     "features.0.effects.1.name": "Animated Objects",
@@ -559,10 +569,14 @@
     "features.9.description": "You gain an Epic Boon feat; Boon of Spell Recall is recommended.",
     "features.9.effects.0.description": "You gain an Epic Boon feat or another feat for which you qualify.",
     "features.10.description": "You always have Power Word Heal and Power Word Kill prepared, and they can reach two creatures.",
-    "features.10.effects.2.description": "You have mastered the words of life and death: you always have Power Word Heal and Power Word Kill prepared. When you cast either one, you can target a second creature within 10 feet of the first."
+    "features.10.effects.2.description": "You have mastered the words of life and death: you always have Power Word Heal and Power Word Kill prepared. When you cast either one, you can target a second creature within 10 feet of the first.",
+    "features.1.effects.1.name": "Bardic Inspiration",
+    "features.1.effects.1.description": "Bardic Inspiration dice you can give; uses = Charisma modifier (minimum of once).",
+    "features.4.effects.1.name": "Bardic Inspiration",
+    "features.4.effects.1.description": "Bardic Inspiration dice you can give; uses = Charisma modifier (minimum of once). You regain all of them on a Short or Long Rest."
   },
   "sorcerer": {
-    "_es": "5038c393",
+    "_es": "84b7a64c",
     "name": "Sorcerer",
     "features.0.name": "Spellcasting",
     "features.0.effects.1.name": "Animated Objects",
@@ -604,10 +618,12 @@
     "features.8.description": "You gain an Epic Boon feat; Boon of Dimensional Travel is recommended.",
     "features.8.effects.0.description": "You gain an Epic Boon feat or another feat for which you qualify.",
     "features.9.description": "With Innate Sorcery active, one Metamagic option per turn is free.",
-    "features.9.effects.0.description": "While your Innate Sorcery is active, you can use one Metamagic option on each of your turns without spending Sorcery Points."
+    "features.9.effects.0.description": "While your Innate Sorcery is active, you can use one Metamagic option on each of your turns without spending Sorcery Points.",
+    "features.4.effects.1.name": "Sorcerous Restoration",
+    "features.4.effects.1.description": "Sorcerous Restoration use."
   },
   "warlock": {
-    "_es": "7469bfd2",
+    "_es": "fe8b5881",
     "name": "Warlock",
     "features.0.name": "Pact Magic",
     "features.0.effects.1.name": "Fey Spirit",
@@ -674,10 +690,16 @@
     "features.15.description": "You gain an Epic Boon feat; Boon of Fate is recommended.",
     "features.15.effects.0.description": "You gain an Epic Boon feat or another feat for which you qualify.",
     "features.16.description": "Magical Cunning now restores all your Pact Magic spell slots.",
-    "features.16.effects.0.description": "When you use Magical Cunning, you regain all expended Pact Magic spell slots instead of half."
+    "features.16.effects.0.description": "When you use Magical Cunning, you regain all expended Pact Magic spell slots instead of half.",
+    "features.9.effects.1.name": "Magical Cunning",
+    "features.9.effects.1.description": "Magical Cunning use.",
+    "features.11.effects.1.name": "Mystic Arcanum (level 6)",
+    "features.12.effects.1.name": "Mystic Arcanum (level 7)",
+    "features.13.effects.1.name": "Mystic Arcanum (level 8)",
+    "features.14.effects.1.name": "Mystic Arcanum (level 9)"
   },
   "paladin": {
-    "_es": "79258ad0",
+    "_es": "7dca2cc6",
     "name": "Paladin",
     "features.0.name": "Spellcasting",
     "features.0.effects.1.name": "Celestial Spirit",
@@ -722,9 +744,9 @@
     "features.4.description": "You always have Divine Smite prepared and can cast it for free once per Long Rest.",
     "features.4.effects.2.description": "You always have the Divine Smite spell prepared. In addition, you can cast it **without expending a spell slot**, and you must finish a Long Rest before you can cast it this way again; once the free use is spent, the spell remains available with normal slots. In 2024 it is a spell: after you hit with a weapon attack, you cast it as a Bonus Action to deal 2d8 Radiant damage (+1d8 per higher slot level, and +1d8 against Undead and Fiends).",
     "features.5.description": "You channel divine power for your oath's effects.",
-    "features.5.effects.0.description": "Channel Divinity uses based on your oath. You regain them after a Short or Long Rest.",
+    "features.5.effects.0.description": "Channel Divinity uses for your oath. You regain one use on a Short Rest and all of them on a Long Rest.",
     "features.6.description": "Your Channel Divinity uses increase to 3.",
-    "features.6.effects.0.description": "Channel Divinity uses based on your oath. You regain them after a Short or Long Rest.",
+    "features.6.effects.0.description": "Channel Divinity uses for your oath. You regain one use on a Short Rest and all of them on a Long Rest.",
     "features.7.description": "You can attack twice when you take the Attack action.",
     "features.8.description": "You always have Find Steed prepared and cast it for free once per Long Rest.",
     "features.8.effects.2.description": "You always have Find Steed prepared. In addition, you can cast it once without expending a spell slot, and you regain that ability after a Long Rest.",
@@ -809,7 +831,7 @@
     "features.14.effects.0.description": "Your Hunter's Mark damage die is a d10 instead of a d6."
   },
   "artificer": {
-    "_es": "3f47bd63",
+    "_es": "0e5a3601",
     "name": "Artificer",
     "features.0.name": "Spellcasting",
     "features.0.effects.1.name": "Homunculus Servant",
@@ -861,6 +883,8 @@
     "features.10.description": "You gain an Epic Boon feat; Boon of Energy Resistance is recommended.",
     "features.10.effects.0.description": "You gain an Epic Boon feat or another feat for which you qualify.",
     "features.11.description": "If you drop to 0 HP but aren't killed outright, you can disintegrate Uncommon or Rare magic items created with Replicate Magic Item to have 20 HP for each one disintegrated instead. In addition, when you finish a Short Rest, you regain all uses of Flash of Genius if you are attuned to at least one magic item.",
-    "features.11.effects.0.description": "Disintegrating Uncommon or Rare items from Replicate Magic Item turns your 0 HP into 20 per item. You regain all uses of Flash of Genius after a Short Rest if you are attuned to at least one magic item."
+    "features.11.effects.0.description": "Disintegrating Uncommon or Rare items from Replicate Magic Item turns your 0 HP into 20 per item. You regain all uses of Flash of Genius after a Short Rest if you are attuned to at least one magic item.",
+    "features.8.effects.1.name": "Flash of Genius",
+    "features.8.effects.1.description": "Reactions to add your Intelligence modifier to a failed ability check or saving throw, yours or another creature's. You regain one use on a Short Rest and all of them on a Long Rest."
   }
 }

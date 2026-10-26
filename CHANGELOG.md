@@ -724,6 +724,33 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   Spotify ya guardada queda sin reproducir, para cambiarle el enlace o
   borrarla.
 
+## [0.30.0+1] - 2026-10-26
+
+### Nuevo
+
+- La ficha cuenta los usos de rasgos que antes eran solo texto: Inspiración
+  Bárdica (con su dado, que sube con el nivel), Indómito, Golpe de Suerte,
+  Recuperación Arcana, Recuperación Mágica, Astucia Mágica, veintiún rasgos de
+  subclase con usos por descanso y los de especie (Afinidad con la Piedra,
+  Descarga de Adrenalina, Aguante Incansable, Vuelo Dracónico, Forma Grande,
+  Revelación Celestial y Resistencia al Letargo).
+- Se eligen el segundo Estilo de Combate del Campeón, las tres Competencias
+  Adicionales del Colegio del Saber, los conjuros del Arcanum Místico, la
+  habilidad de Ajeno a los Sueños del Kalashtar y el Aspecto de lo Salvaje del
+  Corazón Salvaje.
+
+### Modificado
+
+- Furia, Canalizar Divinidad, Forma Salvaje y Energía Psiónica recuperan un
+  uso tras un descanso corto y todos tras uno largo, como dice la regla; antes
+  el descanso corto los devolvía todos. Sacerdote Guerrero se recupera también
+  con el descanso corto.
+- El Colegio de la Danza calcula su Defensa sin Armadura con Carisma.
+
+### Eliminado
+
+- Sin cambios.
+
 ## [Unreleased]
 
 ### Nuevo

@@ -214,6 +214,42 @@
             "type": "passiveTrait",
             "name": "Indómito",
             "description": "Si fallás una tirada de salvación podés repetirla con un bonificador igual a tu nivel de Guerrero. Tenés que quedarte con el nuevo resultado. Un uso por descanso largo; dos desde nivel 13 y tres desde nivel 17."
+          },
+          {
+            "type": "resource",
+            "id": "indomitable",
+            "name": "Indómito",
+            "max": 1,
+            "recharge": "long",
+            "description": "Usos de Indómito."
+          },
+          {
+            "type": "leveled",
+            "minLevel": 13,
+            "effects": [
+              {
+                "type": "resource",
+                "id": "indomitable",
+                "name": "Indómito",
+                "max": 2,
+                "recharge": "long",
+                "description": "Usos de Indómito."
+              }
+            ]
+          },
+          {
+            "type": "leveled",
+            "minLevel": 17,
+            "effects": [
+              {
+                "type": "resource",
+                "id": "indomitable",
+                "name": "Indómito",
+                "max": 3,
+                "recharge": "long",
+                "description": "Usos de Indómito."
+              }
+            ]
           }
         ]
       },
@@ -419,6 +455,7 @@
             "name": "Furia",
             "max": 2,
             "recharge": "long",
+            "shortRestRecovery": 1,
             "description": "Usos de Furia. Recuperás al menos uno tras un descanso corto y todos tras un descanso largo."
           },
           {
@@ -508,6 +545,7 @@
             "name": "Furia",
             "max": 3,
             "recharge": "long",
+            "shortRestRecovery": 1,
             "description": "Usos de Furia."
           }
         ]
@@ -578,6 +616,7 @@
             "name": "Furia",
             "max": 4,
             "recharge": "long",
+            "shortRestRecovery": 1,
             "description": "Usos de Furia."
           }
         ]
@@ -593,6 +632,7 @@
             "name": "Furia",
             "max": 5,
             "recharge": "long",
+            "shortRestRecovery": 1,
             "description": "Usos de Furia."
           }
         ]
@@ -608,6 +648,7 @@
             "name": "Furia",
             "max": 6,
             "recharge": "long",
+            "shortRestRecovery": 1,
             "description": "Usos de Furia."
           }
         ]
@@ -1067,6 +1108,14 @@
             "type": "passiveTrait",
             "name": "Golpe de Suerte",
             "description": "Si fallás una prueba con d20, podés convertir el resultado de la tirada en un 20. Recuperás el uso tras un descanso corto o largo."
+          },
+          {
+            "type": "resource",
+            "id": "stroke_of_luck",
+            "name": "Golpe de Suerte",
+            "max": 1,
+            "recharge": "short",
+            "description": "Uso de Golpe de Suerte."
           }
         ]
       }
@@ -1744,6 +1793,14 @@
             "type": "passiveTrait",
             "name": "Recuperación Arcana",
             "description": "Tras un descanso corto, una vez por descanso largo, recuperás espacios de conjuro cuyo total de niveles no supere la mitad de tu nivel de Mago (redondeando hacia arriba), ninguno de nivel 6+."
+          },
+          {
+            "type": "resource",
+            "id": "arcane_recovery",
+            "name": "Recuperación Arcana",
+            "max": 1,
+            "recharge": "long",
+            "description": "Uso de Recuperación Arcana."
           }
         ]
       },
@@ -2069,8 +2126,9 @@
             "id": "channel_divinity",
             "name": "Canalizar Divinidad",
             "max": 2,
-            "recharge": "short",
-            "description": "Usos de Canalizar Divinidad (p.ej. Expulsar Muertos Vivientes o Chispa Divina). Recuperás usos tras un descanso corto o largo."
+            "recharge": "long",
+            "shortRestRecovery": 1,
+            "description": "Usos de Canalizar Divinidad (p.ej. Expulsar Muertos Vivientes o Chispa Divina). Recuperás uno tras un descanso corto y todos tras un descanso largo."
           }
         ]
       },
@@ -2096,8 +2154,9 @@
             "id": "channel_divinity",
             "name": "Canalizar Divinidad",
             "max": 3,
-            "recharge": "short",
-            "description": "Usos de Canalizar Divinidad (p.ej. Expulsar Muertos Vivientes o Chispa Divina). Recuperás usos tras un descanso corto o largo."
+            "recharge": "long",
+            "shortRestRecovery": 1,
+            "description": "Usos de Canalizar Divinidad (p.ej. Expulsar Muertos Vivientes o Chispa Divina). Recuperás uno tras un descanso corto y todos tras un descanso largo."
           }
         ]
       },
@@ -2111,8 +2170,9 @@
             "id": "channel_divinity",
             "name": "Canalizar Divinidad",
             "max": 4,
-            "recharge": "short",
-            "description": "Usos de Canalizar Divinidad (p.ej. Expulsar Muertos Vivientes o Chispa Divina). Recuperás usos tras un descanso corto o largo."
+            "recharge": "long",
+            "shortRestRecovery": 1,
+            "description": "Usos de Canalizar Divinidad (p.ej. Expulsar Muertos Vivientes o Chispa Divina). Recuperás uno tras un descanso corto y todos tras un descanso largo."
           }
         ]
       },
@@ -2425,8 +2485,9 @@
             "id": "wild_shape",
             "name": "Forma Salvaje",
             "max": 2,
-            "recharge": "short",
-            "description": "Como acción adicional te transformás en una bestia. Usos que se recuperan tras un descanso corto o largo."
+            "recharge": "long",
+            "shortRestRecovery": 1,
+            "description": "Como acción adicional te transformás en una bestia. Recuperás un uso tras un descanso corto y todos tras un descanso largo."
           },
           {
             "type": "wildShapeForms",
@@ -2515,8 +2576,9 @@
             "id": "wild_shape",
             "name": "Forma Salvaje",
             "max": 3,
-            "recharge": "short",
-            "description": "Como acción adicional te transformás en una bestia. Usos que se recuperan tras un descanso corto o largo."
+            "recharge": "long",
+            "shortRestRecovery": 1,
+            "description": "Como acción adicional te transformás en una bestia. Recuperás un uso tras un descanso corto y todos tras un descanso largo."
           }
         ]
       },
@@ -2530,8 +2592,9 @@
             "id": "wild_shape",
             "name": "Forma Salvaje",
             "max": 4,
-            "recharge": "short",
-            "description": "Como acción adicional te transformás en una bestia. Usos que se recuperan tras un descanso corto o largo."
+            "recharge": "long",
+            "shortRestRecovery": 1,
+            "description": "Como acción adicional te transformás en una bestia. Recuperás un uso tras un descanso corto y todos tras un descanso largo."
           }
         ]
       },
@@ -2730,6 +2793,21 @@
             "type": "passiveTrait",
             "name": "Inspiración Bárdica",
             "description": "Como acción adicional otorgás un dado de Inspiración Bárdica: d6 desde nivel 1, d8 desde nivel 5, d10 desde nivel 10 y d12 desde nivel 15. Usos iguales a tu mod. de Carisma (mínimo 1), recuperados tras un descanso largo (o corto desde nivel 5)."
+          },
+          {
+            "type": "resource",
+            "id": "bardic_inspiration",
+            "name": "Inspiración Bárdica",
+            "max": 1,
+            "maxFromAbility": "charisma",
+            "recharge": "long",
+            "damageByLevel": {
+              "1": "d6",
+              "5": "d8",
+              "10": "d10",
+              "15": "d12"
+            },
+            "description": "Dados de Inspiración Bárdica que podés conceder; usos = mod. de Carisma (mínimo uno)."
           }
         ]
       },
@@ -2773,6 +2851,21 @@
             "type": "passiveTrait",
             "name": "Fuente de Inspiración",
             "description": "Recuperás todos los usos de Inspiración Bárdica tras un descanso corto o largo. Además, podés gastar un espacio de conjuro, sin que requiera acción, para recuperar un uso gastado."
+          },
+          {
+            "type": "resource",
+            "id": "bardic_inspiration",
+            "name": "Inspiración Bárdica",
+            "max": 1,
+            "maxFromAbility": "charisma",
+            "recharge": "short",
+            "damageByLevel": {
+              "1": "d6",
+              "5": "d8",
+              "10": "d10",
+              "15": "d12"
+            },
+            "description": "Dados de Inspiración Bárdica que podés conceder; usos = mod. de Carisma (mínimo uno). Los recuperás todos tras un descanso corto o largo."
           }
         ]
       },
@@ -3028,6 +3121,14 @@
             "type": "passiveTrait",
             "name": "Recuperación Mágica",
             "description": "Tras finalizar un descanso corto, recuperás una cantidad de Puntos de Hechicería igual o inferior a la mitad de tu nivel de Hechicero (redondeando hacia abajo). Una vez usado, hay que esperar a un descanso largo."
+          },
+          {
+            "type": "resource",
+            "id": "sorcerous_restoration",
+            "name": "Recuperación Mágica",
+            "max": 1,
+            "recharge": "long",
+            "description": "Uso de Recuperación Mágica."
           }
         ]
       },
@@ -3355,6 +3456,14 @@
             "type": "passiveTrait",
             "name": "Astucia Mágica",
             "description": "Un rito esotérico de 1 minuto te devuelve una cantidad de espacios de Magia de Pacto gastados igual o inferior a la mitad de tu máximo (redondeando hacia arriba). Una vez usado, hay que esperar a un descanso largo."
+          },
+          {
+            "type": "resource",
+            "id": "magical_cunning",
+            "name": "Astucia Mágica",
+            "max": 1,
+            "recharge": "long",
+            "description": "Uso de Astucia Mágica."
           }
         ]
       },
@@ -3383,6 +3492,19 @@
             "type": "passiveTrait",
             "name": "Arcanum Místico (conjuro de nivel 6)",
             "description": "Escogé un conjuro de Brujo de nivel 6 como arcanum. Podés lanzarlo una vez sin gastar espacio de conjuro y recuperás el uso tras un descanso largo. Al subir de nivel podés cambiarlo por otro del mismo nivel."
+          },
+          {
+            "type": "spellChoice",
+            "groupId": "class:warlock:mystic-arcanum-6",
+            "name": "Arcanum Místico (nivel 6)",
+            "count": 1,
+            "minLevel": 6,
+            "maxLevel": 6,
+            "fromClasses": [
+              "warlock"
+            ],
+            "freeCast": "oncePerLongRest",
+            "replaceable": true
           }
         ]
       },
@@ -3395,6 +3517,19 @@
             "type": "passiveTrait",
             "name": "Arcanum Místico (conjuro de nivel 7)",
             "description": "Escogé un conjuro de Brujo de nivel 7 como arcanum, con un uso gratuito que recuperás tras un descanso largo."
+          },
+          {
+            "type": "spellChoice",
+            "groupId": "class:warlock:mystic-arcanum-7",
+            "name": "Arcanum Místico (nivel 7)",
+            "count": 1,
+            "minLevel": 7,
+            "maxLevel": 7,
+            "fromClasses": [
+              "warlock"
+            ],
+            "freeCast": "oncePerLongRest",
+            "replaceable": true
           }
         ]
       },
@@ -3407,6 +3542,19 @@
             "type": "passiveTrait",
             "name": "Arcanum Místico (conjuro de nivel 8)",
             "description": "Escogé un conjuro de Brujo de nivel 8 como arcanum, con un uso gratuito que recuperás tras un descanso largo."
+          },
+          {
+            "type": "spellChoice",
+            "groupId": "class:warlock:mystic-arcanum-8",
+            "name": "Arcanum Místico (nivel 8)",
+            "count": 1,
+            "minLevel": 8,
+            "maxLevel": 8,
+            "fromClasses": [
+              "warlock"
+            ],
+            "freeCast": "oncePerLongRest",
+            "replaceable": true
           }
         ]
       },
@@ -3419,6 +3567,19 @@
             "type": "passiveTrait",
             "name": "Arcanum Místico (conjuro de nivel 9)",
             "description": "Escogé un conjuro de Brujo de nivel 9 como arcanum, con un uso gratuito que recuperás tras un descanso largo."
+          },
+          {
+            "type": "spellChoice",
+            "groupId": "class:warlock:mystic-arcanum-9",
+            "name": "Arcanum Místico (nivel 9)",
+            "count": 1,
+            "minLevel": 9,
+            "maxLevel": 9,
+            "fromClasses": [
+              "warlock"
+            ],
+            "freeCast": "oncePerLongRest",
+            "replaceable": true
           }
         ]
       },
@@ -3640,8 +3801,9 @@
             "id": "channel_divinity",
             "name": "Canalizar Divinidad",
             "max": 2,
-            "recharge": "short",
-            "description": "Usos de Canalizar Divinidad según tu juramento. Se recuperan tras un descanso corto o largo."
+            "recharge": "long",
+            "shortRestRecovery": 1,
+            "description": "Usos de Canalizar Divinidad según tu juramento. Recuperás uno tras un descanso corto y todos tras un descanso largo."
           }
         ]
       },
@@ -3655,8 +3817,9 @@
             "id": "channel_divinity",
             "name": "Canalizar Divinidad",
             "max": 3,
-            "recharge": "short",
-            "description": "Usos de Canalizar Divinidad según tu juramento. Se recuperan tras un descanso corto o largo."
+            "recharge": "long",
+            "shortRestRecovery": 1,
+            "description": "Usos de Canalizar Divinidad según tu juramento. Recuperás uno tras un descanso corto y todos tras un descanso largo."
           }
         ]
       },
@@ -4607,6 +4770,16 @@
             "type": "passiveTrait",
             "name": "Artificio Avanzado",
             "description": "Sintonía con hasta cinco objetos mágicos simultáneos; recuperás un uso de Chispa de Genialidad tras un descanso corto."
+          },
+          {
+            "type": "resource",
+            "id": "flash_of_genius",
+            "name": "Chispa de Genialidad",
+            "max": 1,
+            "maxFromAbility": "intelligence",
+            "recharge": "long",
+            "shortRestRecovery": 1,
+            "description": "Reacciones para sumar tu mod. de Inteligencia a una prueba de característica o salvación fallida propia o ajena. Recuperás uno tras un descanso corto y todos tras un descanso largo."
           }
         ]
       },

@@ -1033,8 +1033,9 @@ void main() {
           Ability.charisma: 8,
         },
         hpPerLevel: List.filled(18, 6),
+        // Dos estilos: el Campeón suma el segundo a nivel 7.
         featureChoices: const {
-          'fighting-style': ['fs-defense'],
+          'fighting-style': ['fs-defense', 'fs-dueling'],
         },
       ),
       onDone: (c) => saved = c,

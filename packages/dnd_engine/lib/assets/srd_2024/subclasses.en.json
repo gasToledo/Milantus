@@ -1,6 +1,6 @@
 {
   "champion": {
-    "_es": "ad27142c",
+    "_es": "6cbd59bb",
     "name": "Champion",
     "features.0.name": "Improved Critical",
     "features.0.effects.0.name": "Improved Critical",
@@ -26,7 +26,8 @@
     "features.4.description": "Your attack rolls with weapons and Unarmed Strikes score a Critical Hit on a roll of 18–20.",
     "features.4.effects.0.description": "Your attack rolls with weapons and Unarmed Strikes score a Critical Hit on an 18, 19, or 20 on the d20.",
     "features.5.description": "At the start of each of your turns, you regain Hit Points if you have less than half left, and you have Advantage on Death Saving Throws.",
-    "features.5.effects.0.description": "You regain HP at the start of your turn if you are below half; Advantage on Death Saving Throws."
+    "features.5.effects.0.description": "You regain HP at the start of your turn if you are below half; Advantage on Death Saving Throws.",
+    "features.2.effects.1.name": "Fighting Style"
   },
   "battle-master": {
     "_es": "e9af13de",
@@ -141,7 +142,7 @@
     "features.3.effects.0.description": "As a Bonus Action, each creature of your choice in a 30-foot Emanation originating from you must make a Wisdom saving throw (DC 8 + your Strength modifier + your Proficiency Bonus). On a failure, it has the Frightened condition for 1 minute, repeating the save at the end of each of its turns. Once used, you can't do so again until you finish a Long Rest, unless you expend a use of your Rage (no action required) to restore it."
   },
   "wild-heart": {
-    "_es": "5845b84c",
+    "_es": "0dbae7aa",
     "name": "Path of the Wild Heart",
     "features.0.name": "Animal Speaker / Rage of the Wilds",
     "features.0.effects.0.name": "Rage of the Wilds",
@@ -159,7 +160,18 @@
     "features.2.description": "You can cast Commune with Nature, but only as a Ritual.",
     "features.2.effects.0.description": "You can cast the Commune with Nature spell, but only as a Ritual. Wisdom is your spellcasting ability for it.",
     "features.3.description": "The animal spirits of your Rage grow stronger with improved effects.",
-    "features.3.effects.0.description": "Improved versions of the Bear, Eagle, and Wolf spirits."
+    "features.3.effects.0.description": "Improved versions of the Bear, Eagle, and Wolf spirits.",
+    "features.1.effects.1.name": "Aspect of the Wilds",
+    "features.1.effects.1.options.0.name": "Owl",
+    "features.1.effects.1.options.0.description": "Darkvision with a range of 60 feet; if you already have it, its range increases by 60 feet.",
+    "features.1.effects.1.options.1.name": "Panther",
+    "features.1.effects.1.options.1.description": "A Climb Speed equal to your Speed.",
+    "features.1.effects.1.options.1.effects.0.name": "Aspect of the Wilds: Panther",
+    "features.1.effects.1.options.1.effects.0.description": "A Climb Speed equal to your Speed.",
+    "features.1.effects.1.options.2.name": "Salmon",
+    "features.1.effects.1.options.2.description": "A Swim Speed equal to your Speed.",
+    "features.1.effects.1.options.2.effects.0.name": "Aspect of the Wilds: Salmon",
+    "features.1.effects.1.options.2.effects.0.description": "A Swim Speed equal to your Speed."
   },
   "world-tree": {
     "_es": "034b9a11",
@@ -254,7 +266,7 @@
     "features.3.effects.0.description": "Enemies that fail a Charisma saving throw can't attack you that turn."
   },
   "college-lore": {
-    "_es": "630e635d",
+    "_es": "93cdefd7",
     "name": "College of Lore",
     "features.0.name": "Bonus Proficiencies",
     "features.0.effects.0.name": "Bonus Proficiencies",
@@ -273,7 +285,8 @@
     "features.2.description": "You learn two spells from the Cleric, Druid, or Wizard lists that you always have prepared.",
     "features.2.effects.1.description": "Choose two spells from the Cleric, Druid, or Wizard lists, or any combination of them. They must be cantrips or spells for which you have slots. You always have them prepared and can replace one whenever you gain a Bard level.",
     "features.3.description": "When you fail an ability check, you can expend Bardic Inspiration to add the die.",
-    "features.3.effects.0.description": "Expends Bardic Inspiration to add the die to your own checks."
+    "features.3.effects.0.description": "Expends Bardic Inspiration to add the die to your own checks.",
+    "features.0.effects.1.name": "Bonus Proficiencies"
   },
   "college-valor": {
     "_es": "7c2c92b6",
@@ -324,7 +337,7 @@
     "features.7.effects.0.description": "Your healing spells restore the maximum possible without rolling dice."
   },
   "light-domain": {
-    "_es": "73f3735a",
+    "_es": "a222d871",
     "name": "Light Domain",
     "features.0.name": "Warding Flare",
     "features.0.effects.0.name": "Warding Flare",
@@ -350,7 +363,11 @@
     "features.6.description": "You can use Warding Flare to protect other nearby creatures as well.",
     "features.6.effects.0.description": "You use Warding Flare when a creature within 30 feet of you is attacked.",
     "features.7.description": "As a Magic action, you emit an aura of sunlight for 1 minute; enemies in the Bright Light have Disadvantage on certain saving throws.",
-    "features.7.effects.0.description": "As a Magic action, you emit an aura of sunlight that lasts for 1 minute or until you dismiss it (no action required): Bright Light in a 60-foot radius and Dim Light for an additional 30 feet. Your enemies in the Bright Light have Disadvantage on saving throws against your Radiance of the Dawn and against any spell of yours that deals Fire or Radiant damage. You can use it a number of times equal to your Wisdom modifier (minimum of once), and you regain all uses when you finish a Long Rest."
+    "features.7.effects.0.description": "As a Magic action, you emit an aura of sunlight that lasts for 1 minute or until you dismiss it (no action required): Bright Light in a 60-foot radius and Dim Light for an additional 30 feet. Your enemies in the Bright Light have Disadvantage on saving throws against your Radiance of the Dawn and against any spell of yours that deals Fire or Radiant damage. You can use it a number of times equal to your Wisdom modifier (minimum of once), and you regain all uses when you finish a Long Rest.",
+    "features.0.effects.1.name": "Warding Flare",
+    "features.0.effects.1.description": "Warding Flare uses.",
+    "features.6.effects.1.name": "Warding Flare",
+    "features.6.effects.1.description": "Warding Flare uses. You regain all of them on a Short or Long Rest."
   },
   "trickery-domain": {
     "_es": "faa6667a",
@@ -384,7 +401,7 @@
     "features.7.effects.1.description": "When the illusion ends, you or a creature of your choice within 5 feet of it regains a number of Hit Points equal to your Cleric level."
   },
   "war-domain": {
-    "_es": "59b1b25a",
+    "_es": "45a52c6e",
     "name": "War Domain",
     "features.0.name": "War Priest",
     "features.0.effects.0.name": "War Priest",
@@ -400,7 +417,7 @@
     "features.7.effects.3.name": "Avatar of Battle",
     "description": "Martial priests of gods of battle, who fight in the vanguard with weapon and divine blessing.",
     "features.0.description": "When you take the Attack action, you can make one extra weapon attack as a Bonus Action a number of times per rest.",
-    "features.0.effects.0.description": "An extra weapon attack as a Bonus Action; uses = Wisdom modifier, regained on a Long Rest.",
+    "features.0.effects.0.description": "An extra weapon attack as a Bonus Action; uses = Wisdom modifier, regained on a Short or Long Rest.",
     "features.1.description": "You expend Channel Divinity to add +10 to one of your attack rolls.",
     "features.1.effects.0.description": "+10 to one attack roll by expending Channel Divinity.",
     "features.2.description": "You always have Spiritual Weapon, Magic Weapon, Shield of Faith, and Guiding Bolt prepared. They don't count against the number of spells you can prepare.",
@@ -413,7 +430,7 @@
     "features.7.effects.3.description": "You have Resistance to Bludgeoning, Piercing, and Slashing damage."
   },
   "circle-land": {
-    "_es": "67f34c23",
+    "_es": "21e1d06a",
     "name": "Circle of the Land",
     "features.0.name": "Circle Spells",
     "features.0.effects.0.name": "Circle of the Land",
@@ -434,7 +451,9 @@
     "features.3.description": "You are immune to the Poisoned condition and gain Resistance to a damage type based on your terrain.",
     "features.3.effects.1.description": "You are immune to the Poisoned condition and have Resistance to the damage type tied to the terrain you chose for Circle Spells: Fire (arid), Cold (polar), Lightning (temperate), or Poison (tropical).",
     "features.4.description": "As a Magic action, you expend Wild Shape to create a spectral 15-foot Cube that grants cover and your Nature's Ward Resistance.",
-    "features.4.effects.0.description": "As a Magic action, you can expend a use of Wild Shape to make spectral trees and vines appear in a 15-foot Cube on the ground within 120 feet of you. They last for 1 minute or until you have the Incapacitated condition or die. You and your allies have Half Cover while in that area, and your allies gain the current Resistance of your Nature's Ward. As a Bonus Action, you can move the Cube up to 60 feet to ground within 120 feet of you."
+    "features.4.effects.0.description": "As a Magic action, you can expend a use of Wild Shape to make spectral trees and vines appear in a 15-foot Cube on the ground within 120 feet of you. They last for 1 minute or until you have the Incapacitated condition or die. You and your allies have Half Cover while in that area, and your allies gain the current Resistance of your Nature's Ward. As a Bonus Action, you can move the Cube up to 60 feet to ground within 120 feet of you.",
+    "features.2.effects.1.name": "Natural Recovery",
+    "features.2.effects.1.description": "Natural Recovery use."
   },
   "circle-moon": {
     "_es": "a2850c37",
@@ -499,7 +518,7 @@
     "features.7.effects.0.description": "Instead of manifesting the Wrath of the Sea Emanation around yourself, you can manifest it around one willing creature within 60 feet of you. That creature gains all the Emanation's benefits and uses your spell save DC and Wisdom modifier for it. In addition, you can manifest it around that creature and yourself at once if you expend two uses of Wild Shape instead of one."
   },
   "circle-stars": {
-    "_es": "aacfec98",
+    "_es": "7c0f2bd4",
     "name": "Circle of the Stars",
     "features.0.name": "Star Map / Starry Form",
     "features.0.effects.2.name": "Starry Form",
@@ -517,10 +536,12 @@
     "features.2.description": "Your Starry Forms grow stronger with improved effects.",
     "features.2.effects.0.description": "Improved versions of Archer, Chalice, and Dragon.",
     "features.3.description": "In Starry Form, you become partly incorporeal: Resistance to Bludgeoning, Piercing, and Slashing damage.",
-    "features.3.effects.0.description": "While in your Starry Form, you become partly incorporeal, giving you Resistance to Bludgeoning, Piercing, and Slashing damage. Hovering doesn't come from here: it comes from the Dragon form of Twinkling Constellations."
+    "features.3.effects.0.description": "While in your Starry Form, you become partly incorporeal, giving you Resistance to Bludgeoning, Piercing, and Slashing damage. Hovering doesn't come from here: it comes from the Dragon form of Twinkling Constellations.",
+    "features.1.effects.1.name": "Cosmic Omen",
+    "features.1.effects.1.description": "Uses of the Cosmic Omen reaction."
   },
   "open-hand": {
-    "_es": "ff4e2a3d",
+    "_es": "bd446ae1",
     "name": "Warrior of the Open Hand",
     "features.0.name": "Open Hand Technique",
     "features.0.effects.0.name": "Open Hand Technique",
@@ -538,7 +559,9 @@
     "features.2.description": "You can use Step of the Wind immediately after any other Bonus Action.",
     "features.2.effects.0.description": "When you take a Bonus Action other than Step of the Wind, you can also use Step of the Wind immediately after that Bonus Action.",
     "features.3.description": "For 4 Focus Points, you implant vibrations that, when you trigger them, deal 10d12 Force damage (or half).",
-    "features.3.effects.0.description": "When you hit a creature with an Unarmed Strike, you can spend 4 Focus Points to start imperceptible vibrations that last for a number of days equal to your Monk level. They are harmless until you take an action to end them; you can also forgo one of the attacks of your Attack action to do so. You and the target must be on the same plane. When you end them, the target makes a Constitution saving throw, taking 10d12 Force damage on a failure or half as much on a success. You can have only one creature affected at a time, and you can end the vibrations harmlessly (no action required)."
+    "features.3.effects.0.description": "When you hit a creature with an Unarmed Strike, you can spend 4 Focus Points to start imperceptible vibrations that last for a number of days equal to your Monk level. They are harmless until you take an action to end them; you can also forgo one of the attacks of your Attack action to do so. You and the target must be on the same plane. When you end them, the target makes a Constitution saving throw, taking 10d12 Force damage on a failure or half as much on a success. You can have only one creature affected at a time, and you can end the vibrations harmlessly (no action required).",
+    "features.1.effects.1.name": "Wholeness of Body",
+    "features.1.effects.1.description": "Wholeness of Body uses."
   },
   "warrior-elements": {
     "_es": "751ac87c",
@@ -562,7 +585,7 @@
     "features.3.effects.0.description": "Elemental Resistance, extra Speed, and extra damage on a hit."
   },
   "warrior-mercy": {
-    "_es": "86c4164a",
+    "_es": "a8506de9",
     "name": "Warrior of Mercy",
     "features.0.name": "Hand of Healing / Hand of Harm",
     "features.0.effects.0.name": "Hands of Mercy",
@@ -580,7 +603,9 @@
     "features.2.description": "When you use Flurry of Blows, you can apply Hand of Healing or Hand of Harm for free.",
     "features.2.effects.0.description": "You apply Hand of Healing or Hand of Harm at no cost when you use Flurry of Blows.",
     "features.3.description": "Once per Long Rest, you can bring a recently deceased creature back to life.",
-    "features.3.effects.0.description": "You revive a recently dead creature by spending Focus Points."
+    "features.3.effects.0.description": "You revive a recently dead creature by spending Focus Points.",
+    "features.3.effects.1.name": "Hand of Ultimate Mercy",
+    "features.3.effects.1.description": "Hand of Ultimate Mercy use."
   },
   "warrior-shadow": {
     "_es": "78009c45",
@@ -604,7 +629,7 @@
     "features.3.effects.0.description": "You become Invisible while you remain in Dim Light or Darkness."
   },
   "oath-devotion": {
-    "_es": "137303fd",
+    "_es": "4bbbfad0",
     "name": "Oath of Devotion",
     "features.0.name": "Channel Divinity: Sacred Weapon",
     "features.0.effects.0.name": "Sacred Weapon",
@@ -632,10 +657,12 @@
     "features.7.description": "When you cast Divine Smite, you and your allies have Half Cover while in your Aura of Protection.",
     "features.7.effects.0.description": "Your magical smite radiates protective energy. Whenever you cast Divine Smite, you and your allies have Half Cover while in your Aura of Protection. The aura keeps this benefit until the start of your next turn.",
     "features.8.description": "As a Bonus Action, you imbue your Aura of Protection with holy power for 10 minutes.",
-    "features.8.effects.0.description": "As a Bonus Action, you imbue your Aura of Protection with holy power for 10 minutes or until you end it (no action required). Once used, you can't do so again until you finish a Long Rest, unless you expend a level 5 spell slot (no action required). Holy Ward: you have Advantage on any saving throw that a Fiend or an Undead forces you to make. Radiant Damage: whenever an enemy starts its turn in the aura, it takes Radiant damage equal to your Charisma modifier plus your Proficiency Bonus. Sunlight: the aura is filled with Bright Light that is sunlight."
+    "features.8.effects.0.description": "As a Bonus Action, you imbue your Aura of Protection with holy power for 10 minutes or until you end it (no action required). Once used, you can't do so again until you finish a Long Rest, unless you expend a level 5 spell slot (no action required). Holy Ward: you have Advantage on any saving throw that a Fiend or an Undead forces you to make. Radiant Damage: whenever an enemy starts its turn in the aura, it takes Radiant damage equal to your Charisma modifier plus your Proficiency Bonus. Sunlight: the aura is filled with Bright Light that is sunlight.",
+    "features.8.effects.1.name": "Holy Nimbus",
+    "features.8.effects.1.description": "Holy Nimbus use; a level 5 spell slot restores it."
   },
   "oath-ancients": {
-    "_es": "a156a5e1",
+    "_es": "4895d881",
     "name": "Oath of the Ancients",
     "features.0.name": "Channel Divinity: Nature's Wrath",
     "features.0.effects.0.name": "Nature's Wrath",
@@ -663,10 +690,14 @@
     "features.7.description": "When you are reduced to 0 HP but not killed, you drop to 1 HP instead.",
     "features.7.effects.0.description": "When you drop to 0 HP, you stay at 1 (once per Long Rest).",
     "features.8.description": "You take on a radiant form that regenerates HP and empowers your spells and smites.",
-    "features.8.effects.0.description": "You regenerate each turn, and your enemies have Disadvantage against your spells and smites."
+    "features.8.effects.0.description": "You regenerate each turn, and your enemies have Disadvantage against your spells and smites.",
+    "features.7.effects.1.name": "Undying Sentinel",
+    "features.7.effects.1.description": "Undying Sentinel use.",
+    "features.8.effects.1.name": "Elder Champion",
+    "features.8.effects.1.description": "Elder Champion use; a level 5 spell slot restores it."
   },
   "oath-glory": {
-    "_es": "caaae3ba",
+    "_es": "9af99bc3",
     "name": "Oath of Glory",
     "features.0.name": "Channel Divinity: Peerless Athlete / Inspiring Smite",
     "features.0.effects.0.name": "Champion's Glory",
@@ -694,10 +725,12 @@
     "features.7.description": "As a Reaction, you can increase a creature's AC against an attack and counterattack if it misses.",
     "features.7.effects.0.description": "Reaction: an AC bonus for an attacked ally and a counterattack if the attack misses.",
     "features.8.description": "You become an icon of inspiration: you gain superhuman charisma, reroll failed attacks, and dodge blows.",
-    "features.8.effects.0.description": "Advantage on Charisma, you reroll one missed attack per turn, and you negate an attack as a Reaction."
+    "features.8.effects.0.description": "Advantage on Charisma, you reroll one missed attack per turn, and you negate an attack as a Reaction.",
+    "features.8.effects.1.name": "Living Legend",
+    "features.8.effects.1.description": "Living Legend use; a level 5 spell slot restores it."
   },
   "oath-vengeance": {
-    "_es": "86ddd407",
+    "_es": "337c8110",
     "name": "Oath of Vengeance",
     "features.0.name": "Channel Divinity: Vow of Enmity",
     "features.0.effects.0.name": "Vow of Enmity",
@@ -725,7 +758,9 @@
     "features.7.description": "A Reaction to make a melee attack against your sworn enemy when it hits or misses with an attack roll.",
     "features.7.effects.0.description": "Immediately after a creature under the effect of your Vow of Enmity hits **or misses** with an attack roll, you can take a Reaction to make a melee attack against it if it is within your reach.",
     "features.8.description": "You take on a terrifying winged form with a Fly Speed and an aura of fear.",
-    "features.8.effects.0.description": "A Fly Speed and an aura that frightens nearby enemies."
+    "features.8.effects.0.description": "A Fly Speed and an aura that frightens nearby enemies.",
+    "features.8.effects.1.name": "Avenging Angel",
+    "features.8.effects.1.description": "Avenging Angel use; a level 5 spell slot restores it."
   },
   "hunter": {
     "_es": "fabeb3b3",
@@ -775,7 +810,7 @@
     "features.3.effects.0.description": "Your single-target spells can extend to your nearby companion."
   },
   "fey-wanderer": {
-    "_es": "f6927622",
+    "_es": "0ee92da6",
     "name": "Fey Wanderer",
     "features.0.name": "Dreadful Strikes / Otherworldly Glamour",
     "features.0.effects.0.name": "Fey Wanderer",
@@ -803,7 +838,11 @@
     "features.7.description": "You can cast Summon Fey without Concentration once per Long Rest.",
     "features.7.effects.0.description": "You summon a Fey spirit without Concentration once per Long Rest.",
     "features.8.description": "You can teleport a short distance as a Bonus Action several times per rest.",
-    "features.8.effects.0.description": "A 30-foot teleport as a Bonus Action; uses = Wisdom modifier."
+    "features.8.effects.0.description": "A 30-foot teleport as a Bonus Action; uses = Wisdom modifier.",
+    "features.7.effects.1.name": "Fey Reinforcements",
+    "features.7.effects.1.description": "Free casting of Summon Fey.",
+    "features.8.effects.1.name": "Misty Wanderer",
+    "features.8.effects.1.description": "Free castings of Misty Step."
   },
   "gloom-stalker": {
     "_es": "26ccf0db",
@@ -939,7 +978,7 @@
     "features.3.effects.0.description": "Expends Psionic Energy Dice to stun a target hit by your blade."
   },
   "draconic-sorcery": {
-    "_es": "5f4374e1",
+    "_es": "6bb1e533",
     "name": "Draconic Sorcery",
     "features.0.name": "Draconic Resilience",
     "features.0.effects.2.name": "Draconic Resilience (AC)",
@@ -965,7 +1004,9 @@
     "features.6.description": "As a Bonus Action, you sprout wings: a Fly Speed of 60 feet for 1 hour, one use per Long Rest.",
     "features.6.effects.0.description": "As a Bonus Action, you cause draconic wings to appear on your back. They last for 1 hour or until you dismiss them (no action required), and meanwhile you have a Fly Speed of 60 feet. Once used, you can't do so again until you finish a Long Rest, unless you spend 3 Sorcery Points (no action required) to restore the use.",
     "features.7.description": "You cast Summon Dragon without a Material component and for free once per Long Rest.",
-    "features.7.effects.1.description": "You can cast Summon Dragon without a Material component. You can also cast it once without a spell slot, and you regain the ability to cast it this way when you finish a Long Rest. In addition, whenever you start casting it, you can modify it so that it doesn't require Concentration; if you do, that casting's duration becomes 1 minute."
+    "features.7.effects.1.description": "You can cast Summon Dragon without a Material component. You can also cast it once without a spell slot, and you regain the ability to cast it this way when you finish a Long Rest. In addition, whenever you start casting it, you can modify it so that it doesn't require Concentration; if you do, that casting's duration becomes 1 minute.",
+    "features.6.effects.1.name": "Dragon Wings",
+    "features.6.effects.1.description": "Dragon Wings use; 3 Sorcery Points restore it."
   },
   "aberrant-sorcery": {
     "_es": "39b10e7f",
@@ -997,7 +1038,7 @@
     "features.7.effects.0.description": "A teleport with a wave of Force damage that drags enemies along."
   },
   "clockwork-sorcery": {
-    "_es": "b6de5eb4",
+    "_es": "dffb1d14",
     "name": "Clockwork Sorcery",
     "features.0.name": "Restore Balance",
     "features.0.effects.0.name": "Restore Balance",
@@ -1023,10 +1064,14 @@
     "features.6.description": "As a Bonus Action, you enter a trance for 1 minute: attack rolls against you can't have Advantage, and your d20 rolls of 9 or lower count as a 10.",
     "features.6.effects.0.description": "As a Bonus Action, you enter this state for 1 minute. For the duration, attack rolls against you can't benefit from Advantage, and whenever you make a D20 Test, you can treat a roll of 9 or lower on the die as a 10. It isn't \"no Disadvantage\": what is canceled is the attacker's Advantage. Once used, you can't do so again until you finish a Long Rest, unless you spend 5 Sorcery Points (no action required).",
     "features.7.description": "You summon clockwork spirits that repair allies and dismantle spells in an area.",
-    "features.7.effects.0.description": "An area that heals allies and dispels low-level magical effects."
+    "features.7.effects.0.description": "An area that heals allies and dispels low-level magical effects.",
+    "features.0.effects.1.name": "Restore Balance",
+    "features.0.effects.1.description": "Restore Balance uses.",
+    "features.6.effects.1.name": "Trance of Order",
+    "features.6.effects.1.description": "Trance of Order use; 5 Sorcery Points restore it."
   },
   "wild-magic-sorcery": {
-    "_es": "6a5ee3b4",
+    "_es": "5e9fef52",
     "name": "Wild Magic Sorcery",
     "features.0.name": "Wild Magic Surge / Tides of Chaos",
     "features.0.effects.0.name": "Wild Magic",
@@ -1044,10 +1089,12 @@
     "features.2.description": "When you trigger a Wild Magic Surge, you can roll twice and choose the result.",
     "features.2.effects.0.description": "You roll twice on the Wild Magic table and choose the effect.",
     "features.3.description": "You can deliberately cause a Wild Magic Surge effect of your choice.",
-    "features.3.effects.0.description": "You choose the result of a Wild Magic Surge instead of rolling it."
+    "features.3.effects.0.description": "You choose the result of a Wild Magic Surge instead of rolling it.",
+    "features.0.effects.1.name": "Tides of Chaos",
+    "features.0.effects.1.description": "Tides of Chaos use; you also regain it when you cast a Sorcerer spell with a spell slot."
   },
   "fiend-patron": {
-    "_es": "7ab56ede",
+    "_es": "8615dc53",
     "name": "Fiend Patron",
     "features.0.name": "Dark One's Blessing",
     "features.0.effects.0.name": "Dark One's Blessing",
@@ -1075,7 +1122,9 @@
     "features.6.description": "You choose a damage Resistance that you change after each rest.",
     "features.6.effects.0.description": "Resistance to one nonmagical damage type of your choice, which you can choose again after a rest.",
     "features.7.description": "When you hit a creature, you can briefly banish it to the Lower Planes, dealing Psychic damage to it.",
-    "features.7.effects.0.description": "You hurl a target you hit through the Lower Planes: heavy Psychic damage when it returns."
+    "features.7.effects.0.description": "You hurl a target you hit through the Lower Planes: heavy Psychic damage when it returns.",
+    "features.7.effects.1.name": "Hurl Through Hell",
+    "features.7.effects.1.description": "Hurl Through Hell use; a Pact Magic spell slot restores it."
   },
   "archfey-patron": {
     "_es": "eaa02371",
@@ -1107,7 +1156,7 @@
     "features.7.effects.0.description": "Immediately after you cast an Enchantment or Illusion spell using an action and a spell slot, you can cast Misty Step as part of that same action and without expending a spell slot."
   },
   "celestial-patron": {
-    "_es": "1bdb6be3",
+    "_es": "14c361ae",
     "name": "Celestial Patron",
     "features.0.name": "Healing Light",
     "features.0.effects.0.name": "Healing Light",
@@ -1135,7 +1184,9 @@
     "features.6.description": "You gain Temporary Hit Points after each rest that you also share among allies.",
     "features.6.effects.0.description": "Temporary Hit Points for you and several allies after a rest.",
     "features.7.description": "When you drop to 0 HP, you can instead come back to life and burn nearby enemies.",
-    "features.7.effects.0.description": "When you drop to 0 HP, you revive with some HP and deal Radiant damage to nearby enemies."
+    "features.7.effects.0.description": "When you drop to 0 HP, you revive with some HP and deal Radiant damage to nearby enemies.",
+    "features.7.effects.1.name": "Searing Vengeance",
+    "features.7.effects.1.description": "Searing Vengeance use."
   },
   "great-old-one-patron": {
     "_es": "4d7ae034",
@@ -1221,7 +1272,7 @@
     "features.4.effects.0.description": "Advantage on saving throws against spells and Resistance to their damage."
   },
   "diviner": {
-    "_es": "868d250d",
+    "_es": "49b192ed",
     "name": "Diviner",
     "features.0.name": "Portent",
     "features.0.effects.0.name": "Portent",
@@ -1243,7 +1294,11 @@
     "features.3.description": "As a Bonus Action, you choose a benefit: Darkvision out to 120 feet, reading any language, or See Invisibility for free.",
     "features.3.effects.0.description": "As a Bonus Action, you choose one of these benefits, which lasts until you start a Short or Long Rest; you can't use the feature again until you finish a Short or Long Rest. Darkvision: you gain Darkvision with a range of 120 feet. Greater Comprehension: you can read any language. See Invisibility: you can cast See Invisibility without expending a spell slot.",
     "features.4.description": "Your Portent gives you three d20s instead of two.",
-    "features.4.effects.0.description": "You roll three Portent d20s after each Long Rest."
+    "features.4.effects.0.description": "You roll three Portent d20s after each Long Rest.",
+    "features.0.effects.1.name": "Portent",
+    "features.0.effects.1.description": "Portent rolls recorded after a Long Rest.",
+    "features.4.effects.1.name": "Portent",
+    "features.4.effects.1.description": "Portent rolls recorded after a Long Rest."
   },
   "illusionist": {
     "_es": "a5c64eda",

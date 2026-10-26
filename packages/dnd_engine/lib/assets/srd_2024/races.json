@@ -74,6 +74,15 @@
         "type": "passiveTrait",
         "name": "Afinidad con la Piedra",
         "description": "Como acción adicional, ganás sentido del temblor con alcance de 60 pies durante 10 minutos. Debés estar sobre una superficie de piedra o en contacto con ella. Usos iguales a tu bonif. de competencia; se recuperan tras un descanso largo."
+      },
+      {
+        "type": "resource",
+        "id": "stonecunning",
+        "name": "Afinidad con la Piedra",
+        "max": 0,
+        "maxFromProficiency": true,
+        "recharge": "long",
+        "description": "Usos de Afinidad con la Piedra."
       }
     ]
   },
@@ -134,6 +143,23 @@
         "type": "passiveTrait",
         "name": "Aguante Incansable",
         "description": "Cuando tus PG se reducen a 0 pero no morís inmediatamente, podés recuperar 1 PG. Una vez por descanso largo."
+      },
+      {
+        "type": "resource",
+        "id": "adrenaline_rush",
+        "name": "Descarga de Adrenalina",
+        "max": 0,
+        "maxFromProficiency": true,
+        "recharge": "short",
+        "description": "Usos de Descarga de Adrenalina."
+      },
+      {
+        "type": "resource",
+        "id": "relentless_endurance",
+        "name": "Aguante Incansable",
+        "max": 1,
+        "recharge": "long",
+        "description": "Uso de Aguante Incansable."
       }
     ]
   },
@@ -216,6 +242,20 @@
         "type": "passiveTrait",
         "name": "Vuelo Dracónico (nivel 5)",
         "description": "A partir del nivel 5, como acción adicional obtenés velocidad de vuelo igual a tu velocidad terrestre durante 10 minutos, hasta que retraés las alas sin usar una acción o quedás incapacitado. Una vez por descanso largo."
+      },
+      {
+        "type": "leveled",
+        "minLevel": 5,
+        "effects": [
+          {
+            "type": "resource",
+            "id": "draconic_flight",
+            "name": "Vuelo Dracónico",
+            "max": 1,
+            "recharge": "long",
+            "description": "Uso de Vuelo Dracónico."
+          }
+        ]
       }
     ]
   },
@@ -300,6 +340,20 @@
         "type": "passiveTrait",
         "name": "Forma Grande (nivel 5)",
         "description": "A partir del nivel 5, como acción adicional podés cambiar a tamaño Grande durante 10 minutos si hay espacio. Mientras dure, tenés ventaja en las pruebas de Fuerza y tu velocidad aumenta 10 pies. Una vez por descanso largo."
+      },
+      {
+        "type": "leveled",
+        "minLevel": 5,
+        "effects": [
+          {
+            "type": "resource",
+            "id": "large_form",
+            "name": "Forma Grande",
+            "max": 1,
+            "recharge": "long",
+            "description": "Uso de Forma Grande."
+          }
+        ]
       }
     ]
   },
@@ -360,6 +414,20 @@
         "type": "passiveTrait",
         "name": "Revelación Celestial (nivel 3)",
         "description": "A partir del nivel 3, como acción adicional te transformás durante 1 minuto y elegís cada vez Alas Celestiales, Resplandor Interior o Sudario Necrótico. Una vez por turno causás daño adicional igual a tu bonif. por competencia: radiante con Alas o Resplandor, y necrótico con Sudario. Alas concede vuelo; Resplandor emite luz y daña a criaturas cercanas; Sudario puede asustar a criaturas cercanas. Una vez por descanso largo."
+      },
+      {
+        "type": "leveled",
+        "minLevel": 3,
+        "effects": [
+          {
+            "type": "resource",
+            "id": "celestial_revelation",
+            "name": "Revelación Celestial",
+            "max": 1,
+            "recharge": "long",
+            "description": "Uso de Revelación Celestial."
+          }
+        ]
       }
     ]
   },
@@ -439,6 +507,13 @@
         "type": "passiveTrait",
         "name": "Ajeno a los Sueños",
         "description": "No podés ser objetivo del conjuro Sueño. Además, al terminar un descanso largo ganás competencia en una habilidad a tu elección, hasta el próximo descanso largo."
+      },
+      {
+        "type": "proficiencyChoice",
+        "groupId": "race:kalashtar:dreamless-mind",
+        "name": "Ajeno a los Sueños",
+        "count": 1,
+        "replaceable": true
       }
     ]
   },
@@ -499,6 +574,14 @@
         "type": "passiveTrait",
         "name": "Versatilidad de Habilidad",
         "description": "Ganás competencia en una habilidad o una herramienta a tu elección. Al terminar un descanso largo podés cambiarla por otra."
+      },
+      {
+        "type": "resource",
+        "id": "lethargy_resilience",
+        "name": "Resistencia al Letargo",
+        "max": 1,
+        "recharge": "long",
+        "description": "Uso de Resistencia al Letargo; vuelve tras 1d4 descansos largos."
       }
     ]
   },

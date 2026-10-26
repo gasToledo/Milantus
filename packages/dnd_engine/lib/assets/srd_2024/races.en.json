@@ -12,7 +12,7 @@
     "effects.3.description": "You gain an Origin feat of your choice."
   },
   "dwarf": {
-    "_es": "25d40942",
+    "_es": "bcab7ac2",
     "name": "Dwarf",
     "tagline": "Hardy as stone",
     "effects.2.name": "Dwarven Resilience",
@@ -21,7 +21,9 @@
     "description": "Dwarves were raised from the earth in the elder days by a deity of the forge, called Moradin on some worlds and Reorx on others. They still keep an affinity for stone, metal, and life underground. They are as hardy as the mountains they love and can live about 350 years.\n\nShort, stout, and often bearded, they carved cities and strongholds into the rock. Their legends celebrate battles against monsters of the peaks and the Underdark, and their songs keep the memory of valor alive. On some worlds, hill and mountain communities are told apart.",
     "effects.2.description": "Advantage on saving throws to avoid or end the Poisoned condition.",
     "effects.4.description": "Your Hit Point maximum increases by 1 for each character level.",
-    "effects.5.description": "As a Bonus Action, you gain Tremorsense with a range of 60 feet for 10 minutes. You must be on a stone surface or touching one. Uses equal to your Proficiency Bonus; you regain them after a Long Rest."
+    "effects.5.description": "As a Bonus Action, you gain Tremorsense with a range of 60 feet for 10 minutes. You must be on a stone surface or touching one. Uses equal to your Proficiency Bonus; you regain them after a Long Rest.",
+    "effects.6.name": "Stonecunning",
+    "effects.6.description": "Stonecunning uses."
   },
   "halfling": {
     "_es": "82b889a6",
@@ -38,14 +40,18 @@
     "effects.3.description": "You can take the Hide action even when you are obscured only by a creature that is at least one size larger than you."
   },
   "orc": {
-    "_es": "07b04b03",
+    "_es": "2c4f8ec4",
     "name": "Orc",
     "tagline": "Relentless drive",
     "effects.1.name": "Adrenaline Rush",
     "effects.2.name": "Relentless Endurance",
     "description": "Orcs trace their creation to Gruumsh, who roamed the wide expanses of the Material Plane. His gifts prepared them to cross plains, caverns, and seas, and to face the monsters along the way. Even if they worship other gods today, they keep the endurance, drive, and Darkvision tied to that ancient legacy.\n\nThey tend to be tall and broad, with gray skin, pointed ears, and prominent tusks. From a young age they hear stories of journeys and trials overcome; for some, that call inspires heroic deeds and worthy causes, while others prefer to leave their people's past behind.",
     "effects.1.description": "You can take the Dash action as a Bonus Action and gain Temporary Hit Points equal to your Proficiency Bonus. Uses equal to your Proficiency Bonus; you regain them after a Short or Long Rest.",
-    "effects.2.description": "When you are reduced to 0 Hit Points but not killed outright, you can drop to 1 Hit Point instead. Once per Long Rest."
+    "effects.2.description": "When you are reduced to 0 Hit Points but not killed outright, you can drop to 1 Hit Point instead. Once per Long Rest.",
+    "effects.3.name": "Adrenaline Rush",
+    "effects.3.description": "Adrenaline Rush uses.",
+    "effects.4.name": "Relentless Endurance",
+    "effects.4.description": "Relentless Endurance use."
   },
   "elf": {
     "_es": "e3fe6afa",
@@ -62,7 +68,7 @@
     "effects.4.description": "You choose a lineage (High Elf, Wood Elf, or Drow) that grants a cantrip and benefits that improve at levels 3 and 5."
   },
   "dragonborn": {
-    "_es": "f78d8956",
+    "_es": "7ffae201",
     "name": "Dragonborn",
     "tagline": "Draconic heritage",
     "effects.1.name": "Breath Weapon",
@@ -71,7 +77,9 @@
     "description": "The ancestors of dragonborn hatched from the eggs of chromatic and metallic dragons. Some stories say Bahamut and Tiamat blessed those eggs; others, that the dragons themselves created the first dragonborn without divine help. Over time they made their homes throughout the Material Plane.\n\nThey look like wingless bipedal dragons: they have scales, bright eyes, strong bones, and often horns. The color of their scales usually recalls that of their draconic ancestors.",
     "effects.1.description": "When you take the Attack action, you can replace one attack with an exhalation in a 15-foot Cone or a 30-foot Line that is 5 feet wide (DEX saving throw, DC 8 + CON modifier + Proficiency Bonus). It deals 1d10 damage of your draconic ancestry's type on a failed save, or half as much on a success; it increases to 2d10 at level 5, 3d10 at 11, and 4d10 at 17.",
     "effects.2.description": "Breath Weapon uses.",
-    "effects.3.description": "Starting at level 5, as a Bonus Action you gain a Fly Speed equal to your Speed for 10 minutes, until you retract the wings (no action required), or until you have the Incapacitated condition. Once per Long Rest."
+    "effects.3.description": "Starting at level 5, as a Bonus Action you gain a Fly Speed equal to your Speed for 10 minutes, until you retract the wings (no action required), or until you have the Incapacitated condition. Once per Long Rest.",
+    "effects.4.effects.0.name": "Draconic Flight",
+    "effects.4.effects.0.description": "Draconic Flight use."
   },
   "gnome": {
     "_es": "61f1180e",
@@ -94,17 +102,19 @@
     "effects.3.description": "You choose a legacy (Abyssal, Chthonic, or Infernal) that determines your damage resistance and the spells you learn."
   },
   "goliath": {
-    "_es": "62d7dd55",
+    "_es": "fdb49d26",
     "name": "Goliath",
     "tagline": "Giant blood",
     "effects.0.name": "Powerful Build",
     "effects.1.name": "Large Form (level 5)",
     "description": "Goliaths are a towering people, distant descendants of giants. Their ancestors' influence shows in supernatural gifts and in the ability to grow for a short time.\n\nTheir physical features often recall a giant lineage, but goliaths have forged their own path, apart from their forebears' ancient feuds. Many are drawn to heights and make their homes in mountains, crags, and other high places.",
     "effects.0.description": "You have Advantage on any ability check you make to end the Grappled condition. You also count as one size larger when determining your carrying capacity.",
-    "effects.1.description": "Starting at level 5, as a Bonus Action you can change your size to Large for 10 minutes if there is room. For the duration, you have Advantage on Strength checks and your Speed increases by 10 feet. Once per Long Rest."
+    "effects.1.description": "Starting at level 5, as a Bonus Action you can change your size to Large for 10 minutes if there is room. For the duration, you have Advantage on Strength checks and your Speed increases by 10 feet. Once per Long Rest.",
+    "effects.2.effects.0.name": "Large Form",
+    "effects.2.effects.0.description": "Large Form use."
   },
   "aasimar": {
-    "_es": "60226c3c",
+    "_es": "24cc36db",
     "name": "Aasimar",
     "tagline": "Touched by celestial light",
     "effects.3.name": "Celestial Resistance",
@@ -117,7 +127,9 @@
     "effects.4.description": "As a Magic action, you touch a creature and roll a number of d4s equal to your Proficiency Bonus: it regains that many Hit Points. Once per Long Rest.",
     "effects.5.description": "Healing Hands uses.",
     "effects.6.description": "You know the Light cantrip. Charisma is your spellcasting ability for it.",
-    "effects.8.description": "Starting at level 3, as a Bonus Action you transform for 1 minute, choosing Heavenly Wings, Inner Radiance, or Necrotic Shroud each time. Once on each of your turns, you deal extra damage equal to your Proficiency Bonus: Radiant with Wings or Radiance, and Necrotic with Shroud. Wings grant flight; Radiance sheds light and damages nearby creatures; Shroud can frighten nearby creatures. Once per Long Rest."
+    "effects.8.description": "Starting at level 3, as a Bonus Action you transform for 1 minute, choosing Heavenly Wings, Inner Radiance, or Necrotic Shroud each time. Once on each of your turns, you deal extra damage equal to your Proficiency Bonus: Radiant with Wings or Radiance, and Necrotic with Shroud. Wings grant flight; Radiance sheds light and damages nearby creatures; Shroud can frighten nearby creatures. Once per Long Rest.",
+    "effects.9.effects.0.name": "Celestial Revelation",
+    "effects.9.effects.0.description": "Celestial Revelation use."
   },
   "changeling": {
     "_es": "af85b4e1",
@@ -132,7 +144,7 @@
     "effects.2.description": "As an action, you change your appearance and voice: coloration, hair length, sex, height, weight, and size between Medium and Small. You can appear to be a member of another playable species, but your game statistics don't change. You can't duplicate someone you have never seen or adopt a form with a different limb arrangement. Your clothing and equipment don't change. While transformed, you have Advantage on Charisma checks. You revert to your true form with another action."
   },
   "kalashtar": {
-    "_es": "1bfd8847",
+    "_es": "39a3a5a4",
     "name": "Kalashtar",
     "tagline": "Two minds in one body",
     "effects.1.name": "Aberration",
@@ -145,10 +157,11 @@
     "effects.2.description": "You have Advantage on Wisdom and Charisma saving throws.",
     "effects.3.description": "You have Resistance to Psychic damage.",
     "effects.4.description": "You have telepathy with a range in feet equal to 10 times your level. While speaking telepathically to a creature, you can take a Magic action to give it the ability to reply to you for 1 hour, or until you end it with another Magic action.",
-    "effects.5.description": "You can't be targeted by the Dream spell. In addition, when you finish a Long Rest, you gain proficiency in one skill of your choice until your next Long Rest."
+    "effects.5.description": "You can't be targeted by the Dream spell. In addition, when you finish a Long Rest, you gain proficiency in one skill of your choice until your next Long Rest.",
+    "effects.6.name": "Dreamless Mind"
   },
   "khoravar": {
-    "_es": "276e8501",
+    "_es": "8fc6abbe",
     "name": "Khoravar",
     "tagline": "Children of Khorvaire, the bridge between",
     "effects.1.name": "Humanoid",
@@ -162,7 +175,9 @@
     "effects.2.description": "You have Advantage on saving throws to avoid or end the Charmed condition.",
     "effects.3.description": "You know the Friends cantrip. When you finish a Long Rest, you can replace it with another cantrip from the Cleric, Druid, or Wizard spell list. Your spellcasting ability for it is Intelligence, Wisdom, or Charisma (chosen when you take this species).",
     "effects.5.description": "When you fail a saving throw to avoid or end the Unconscious condition, you can succeed instead. You can't use this again until you finish 1d4 Long Rests.",
-    "effects.7.description": "You gain proficiency in one skill or tool of your choice. When you finish a Long Rest, you can replace it with another."
+    "effects.7.description": "You gain proficiency in one skill or tool of your choice. When you finish a Long Rest, you can replace it with another.",
+    "effects.8.name": "Lethargy Resilience",
+    "effects.8.description": "Lethargy Resilience use; it returns after 1d4 Long Rests."
   },
   "shifter": {
     "_es": "21bbcdea",

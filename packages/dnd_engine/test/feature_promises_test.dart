@@ -189,7 +189,11 @@ void main() {
     // recurso del catálogo que representa un espacio de conjuro y no un pozo
     // de usos, porque el motor no sabe modelar un espacio fuera de la tabla.
     // 47 con la reserva de Imponer las Manos, que antes era solo prosa.
-    expect(recursos, hasLength(47));
+    // 80 desde que los «N veces por descanso» que solo eran texto tienen
+    // contador (Inspiración Bárdica, Indómito, Recuperación Arcana, los usos
+    // de especie...). Los de especie que llegan con el nivel van envueltos en
+    // `leveled` y este recorrido no los ve.
+    expect(recursos, hasLength(80));
 
     var porCaracteristica = 0;
     var porNivel = 0;
@@ -232,8 +236,9 @@ void main() {
       }
     }
 
-    expect(porCaracteristica, 2,
-        reason: 'Chispa de Genialidad, Sacerdote Guerrero');
+    expect(porCaracteristica, 5,
+        reason: 'Chispa de Genialidad (n7 y n14), Sacerdote Guerrero, '
+            'Inspiración Bárdica (n1 y n5)');
     expect(porNivel, 3,
         reason: 'Puntos de Enfoque, Puntos de Hechicería, Luz Sanadora');
     expect(porDobleCompetencia, 2, reason: 'los dos Energía Psiónica');
@@ -253,12 +258,12 @@ void main() {
     // modelar todavía, bajá el número a mano y explicá por qué en el commit:
     // el historial de este número es el registro de deuda, y sale más barato
     // que marcar 311 entradas con un motivo que nadie va a leer.
-    // Hoy son exactamente 295: Conocimiento Primigenio declara su elección
-    // de habilidad, y del Paladín dejaron de ser solo prosa el Aura de
-    // Protección, los Golpes Radiantes, Imponer las Manos y las Auras de
-    // Entrega y de Coraje. Va como cota y no como igualdad para
+    // Hoy son exactamente 243: los «N veces por descanso» de clases,
+    // subclases y especies pasaron a ser recursos, y Competencias Adicionales,
+    // Estilo de Combate Adicional, Arcanum Místico y Aspecto de lo Salvaje
+    // declaran su elección. Va como cota y no como igualdad para
     // que pagar deuda no haga fallar el test: lo que tiene que doler es *sumar*.
-    expect(soloTexto, hasLength(lessThanOrEqualTo(295)),
+    expect(soloTexto, hasLength(lessThanOrEqualTo(243)),
         reason: 'hay más rasgos que solo son texto que antes:\n'
             '${soloTexto.join('\n')}');
   });

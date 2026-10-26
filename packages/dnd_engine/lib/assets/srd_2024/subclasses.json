@@ -27,7 +27,8 @@
         "name": "Estilo de Combate Adicional",
         "description": "Adoptás un segundo Estilo de Combate como dote.",
         "effects": [
-          { "type": "passiveTrait", "name": "Estilo de Combate Adicional", "description": "Ganás una segunda dote de Estilo de Combate." }
+          { "type": "passiveTrait", "name": "Estilo de Combate Adicional", "description": "Ganás una segunda dote de Estilo de Combate." },
+          { "type": "featureChoice", "groupId": "fighting-style", "name": "Estilo de Combate", "count": 2 }
         ]
       },
       {
@@ -187,7 +188,7 @@
         "name": "Poder Psiónico",
         "description": "Ganás dados psiónicos (d6) que alimentan Golpe Telequinético, Movimiento Telequinético y Escudo Protector.",
         "effects": [
-          { "type": "resource", "id": "psionic_energy", "name": "Energía Psiónica", "max": 0, "maxFromProficiency": true, "proficiencyMultiplier": 2, "recharge": "short", "description": "Dados de energía psiónica (d6) para Golpe Telequinético (daño de fuerza), mover objetos/criaturas o reducir daño a un aliado; tenés dos veces tu bonif. por competencia." }
+          { "type": "resource", "id": "psionic_energy", "name": "Energía Psiónica", "max": 0, "maxFromProficiency": true, "proficiencyMultiplier": 2, "recharge": "long", "shortRestRecovery": 1, "description": "Dados de energía psiónica (d6) para Golpe Telequinético (daño de fuerza), mover objetos/criaturas o reducir daño a un aliado; tenés dos veces tu bonif. por competencia." }
         ]
       },
       {
@@ -290,7 +291,8 @@
         "name": "Aspecto de lo Salvaje",
         "description": "Ganás un beneficio de un animal a elección: Búho (visión en la oscuridad), Pantera (trepar) o Salmón (nadar).",
         "effects": [
-          { "type": "passiveTrait", "name": "Aspecto de lo Salvaje", "description": "Elegís una de estas opciones y podés cambiarla al terminar un descanso largo. Búho: tenés visión en la oscuridad hasta 60 pies; si ya la tenías, su alcance aumenta 60 pies. Pantera: tenés velocidad de trepar igual a tu velocidad. Salmón: tenés velocidad de nado igual a tu velocidad." }
+          { "type": "passiveTrait", "name": "Aspecto de lo Salvaje", "description": "Elegís una de estas opciones y podés cambiarla al terminar un descanso largo. Búho: tenés visión en la oscuridad hasta 60 pies; si ya la tenías, su alcance aumenta 60 pies. Pantera: tenés velocidad de trepar igual a tu velocidad. Salmón: tenés velocidad de nado igual a tu velocidad." },
+          { "type": "featureChoice", "groupId": "subclass:wild-heart:aspect-of-the-wilds", "name": "Aspecto de lo Salvaje", "count": 1, "replaceable": true, "options": [{ "id": "aspect-of-the-wilds-owl", "name": "Búho", "source": "phb_2024", "description": "Visión en la oscuridad de 60 pies; si ya la tenías, su alcance aumenta 60 pies.", "effects": [{ "type": "darkvision", "range": 60 }] }, { "id": "aspect-of-the-wilds-panther", "name": "Pantera", "source": "phb_2024", "description": "Velocidad trepando igual a tu velocidad.", "effects": [{ "type": "passiveTrait", "name": "Aspecto de lo Salvaje: Pantera", "description": "Velocidad trepando igual a tu velocidad." }] }, { "id": "aspect-of-the-wilds-salmon", "name": "Salmón", "source": "phb_2024", "description": "Velocidad nadando igual a tu velocidad.", "effects": [{ "type": "passiveTrait", "name": "Aspecto de lo Salvaje: Salmón", "description": "Velocidad nadando igual a tu velocidad." }] }] }
         ]
       },
       {
@@ -410,7 +412,8 @@
           { "type": "passiveTrait", "name": "Juego de Pies Deslumbrante: Virtuoso de la Danza", "description": "Tenés ventaja en cualquier prueba de Carisma (Interpretación) que hagas y que implique bailar." },
           { "type": "passiveTrait", "name": "Juego de Pies Deslumbrante: Defensa sin Armadura", "description": "Tu Clase de Armadura base es 10 + tu modificador de Destreza + tu modificador de Carisma." },
           { "type": "passiveTrait", "name": "Juego de Pies Deslumbrante: Golpes Ágiles", "description": "Cuando gastás un uso de tu Inspiración Bárdica como parte de una acción, una acción adicional o una reacción, podés hacer un ataque sin armas como parte de esa misma acción, acción adicional o reacción." },
-          { "type": "passiveTrait", "name": "Juego de Pies Deslumbrante: Daño Bárdico", "description": "Podés usar Destreza en vez de Fuerza para las tiradas de ataque de tus ataques sin armas. Cuando causás daño con un ataque sin armas, podés infligir daño contundente igual a una tirada de tu dado de Inspiración Bárdica más tu modificador de Destreza, en vez del daño normal del golpe. Esa tirada no gasta el dado." }
+          { "type": "passiveTrait", "name": "Juego de Pies Deslumbrante: Daño Bárdico", "description": "Podés usar Destreza en vez de Fuerza para las tiradas de ataque de tus ataques sin armas. Cuando causás daño con un ataque sin armas, podés infligir daño contundente igual a una tirada de tu dado de Inspiración Bárdica más tu modificador de Destreza, en vez del daño normal del golpe. Esa tirada no gasta el dado." },
+          { "type": "unarmoredDefense", "ability": "charisma", "allowShield": false }
         ]
       },
       {
@@ -494,7 +497,8 @@
         "name": "Competencias Adicionales",
         "description": "Ganás competencia con tres habilidades a tu elección.",
         "effects": [
-          { "type": "passiveTrait", "name": "Competencias Adicionales", "description": "Competencia con tres habilidades a tu elección." }
+          { "type": "passiveTrait", "name": "Competencias Adicionales", "description": "Competencia con tres habilidades a tu elección." },
+          { "type": "proficiencyChoice", "groupId": "subclass:college-lore:bonus-proficiencies", "name": "Competencias Adicionales", "count": 3 }
         ]
       },
       {
@@ -660,7 +664,8 @@
         "name": "Fulgor Protector",
         "description": "Conocés el truco Luz y, como reacción, imponés desventaja a un atacante iluminándolo con un destello.",
         "effects": [
-          { "type": "passiveTrait", "name": "Fulgor Protector", "description": "Reacción: imponés desventaja al ataque de una criatura que puedas ver. Usos = mod. de Sabiduría." }
+          { "type": "passiveTrait", "name": "Fulgor Protector", "description": "Reacción: imponés desventaja al ataque de una criatura que puedas ver. Usos = mod. de Sabiduría." },
+          { "type": "resource", "id": "warding_flare", "name": "Fulgor Protector", "max": 1, "maxFromAbility": "wisdom", "recharge": "long", "description": "Usos de Fulgor Protector." }
         ]
       },
       {
@@ -714,7 +719,8 @@
         "name": "Fulgor Protector Mejorado",
         "description": "Podés usar Destello Protector para proteger también a otras criaturas cercanas.",
         "effects": [
-          { "type": "passiveTrait", "name": "Fulgor Protector Mejorado", "description": "Usás Destello Protector cuando atacan a una criatura a 30 pies de vos." }
+          { "type": "passiveTrait", "name": "Fulgor Protector Mejorado", "description": "Usás Destello Protector cuando atacan a una criatura a 30 pies de vos." },
+          { "type": "resource", "id": "warding_flare", "name": "Fulgor Protector", "max": 1, "maxFromAbility": "wisdom", "recharge": "short", "description": "Usos de Fulgor Protector. Los recuperás todos tras un descanso corto o largo." }
         ]
       },
       {
@@ -819,7 +825,7 @@
         "name": "Sacerdote Guerrero",
         "description": "Cuando realizás la acción de Ataque podés hacer un ataque con arma adicional como acción adicional un número de veces por descanso.",
         "effects": [
-          { "type": "resource", "id": "war_priest", "name": "Sacerdote Guerrero", "max": 1, "maxFromAbility": "wisdom", "recharge": "long", "description": "Ataque con arma adicional como acción adicional; usos = mod. de Sabiduría, recuperados en descanso largo." }
+          { "type": "resource", "id": "war_priest", "name": "Sacerdote Guerrero", "max": 1, "maxFromAbility": "wisdom", "recharge": "short", "description": "Ataque con arma adicional como acción adicional; usos = mod. de Sabiduría, recuperados en descanso corto o largo." }
         ]
       },
       {
@@ -918,7 +924,8 @@
         "name": "Recuperación Natural",
         "description": "Lanzás gratis un conjuro de círculo por descanso largo, y recuperás espacios en un descanso corto.",
         "effects": [
-          { "type": "passiveTrait", "name": "Recuperación Natural", "description": "Lanzás sin gastar espacio uno de los conjuros de nivel 1 o superior que tengas preparados por Conjuros de Círculo; para repetirlo hay que terminar un descanso largo. Además, tras un descanso corto recuperás espacios de conjuro cuyo total de niveles no supere la mitad de tu nivel de Druida (redondeando hacia arriba), ninguno de nivel 6+, una vez por descanso largo." }
+          { "type": "passiveTrait", "name": "Recuperación Natural", "description": "Lanzás sin gastar espacio uno de los conjuros de nivel 1 o superior que tengas preparados por Conjuros de Círculo; para repetirlo hay que terminar un descanso largo. Además, tras un descanso corto recuperás espacios de conjuro cuyo total de niveles no supere la mitad de tu nivel de Druida (redondeando hacia arriba), ninguno de nivel 6+, una vez por descanso largo." },
+          { "type": "resource", "id": "natural_recovery", "name": "Recuperación Natural", "max": 1, "recharge": "long", "description": "Uso de Recuperación Natural." }
         ]
       },
       {
@@ -1119,7 +1126,8 @@
         "name": "Presagio Cósmico",
         "description": "Tras un descanso largo tirás un dado que te da una reacción beneficiosa (maldición o bendición) reutilizable.",
         "effects": [
-          { "type": "passiveTrait", "name": "Presagio Cósmico", "description": "Reacción según un dado diario: reducís daño recibido o aumentás daño infligido." }
+          { "type": "passiveTrait", "name": "Presagio Cósmico", "description": "Reacción según un dado diario: reducís daño recibido o aumentás daño infligido." },
+          { "type": "resource", "id": "cosmic_omen", "name": "Presagio Cósmico", "max": 1, "maxFromAbility": "wisdom", "recharge": "long", "description": "Usos de la reacción de Presagio Cósmico." }
         ]
       },
       {
@@ -1161,7 +1169,8 @@
         "name": "Plenitud de Cuerpo",
         "description": "Como acción adicional gastás Puntos de Enfoque para curarte una cantidad considerable de PG.",
         "effects": [
-          { "type": "passiveTrait", "name": "Plenitud de Cuerpo", "description": "Gasta Enfoque para curarte (dados según tu nivel de Monje) como acción adicional." }
+          { "type": "passiveTrait", "name": "Plenitud de Cuerpo", "description": "Gasta Enfoque para curarte (dados según tu nivel de Monje) como acción adicional." },
+          { "type": "resource", "id": "wholeness_of_body", "name": "Plenitud de Cuerpo", "max": 1, "maxFromAbility": "wisdom", "recharge": "long", "description": "Usos de Plenitud de Cuerpo." }
         ]
       },
       {
@@ -1259,7 +1268,8 @@
         "name": "Mano de Misericordia Suprema",
         "description": "Una vez por descanso largo podés devolver la vida a una criatura recién fallecida.",
         "effects": [
-          { "type": "passiveTrait", "name": "Misericordia Suprema", "description": "Revivís a una criatura muerta hace poco gastando Puntos de Enfoque." }
+          { "type": "passiveTrait", "name": "Misericordia Suprema", "description": "Revivís a una criatura muerta hace poco gastando Puntos de Enfoque." },
+          { "type": "resource", "id": "hand_of_ultimate_mercy", "name": "Mano de Misericordia Suprema", "max": 1, "recharge": "long", "description": "Uso de Mano de Misericordia Suprema." }
         ]
       }
     ]
@@ -1389,7 +1399,8 @@
         "name": "Halo Sagrado",
         "description": "Como acción adicional imbuís tu Aura de Protección de poder sagrado durante 10 minutos.",
         "effects": [
-          { "type": "passiveTrait", "name": "Halo Sagrado", "description": "Como acción adicional imbuís tu Aura de Protección de poder sagrado durante 10 minutos o hasta que lo termines (no requiere acción). Una vez usado, no podés repetirlo hasta terminar un descanso largo, salvo que gastes un espacio de conjuro de nivel 5 (no requiere acción). Amparo Sagrado: tenés ventaja en cualquier salvación a la que te obligue un infernal o un muerto viviente. Daño Radiante: siempre que un enemigo empiece su turno en el aura, recibe daño radiante igual a tu modificador de Carisma más tu bonificador por competencia. Luz Solar: el aura se llena de Luz Brillante que es luz solar." }
+          { "type": "passiveTrait", "name": "Halo Sagrado", "description": "Como acción adicional imbuís tu Aura de Protección de poder sagrado durante 10 minutos o hasta que lo termines (no requiere acción). Una vez usado, no podés repetirlo hasta terminar un descanso largo, salvo que gastes un espacio de conjuro de nivel 5 (no requiere acción). Amparo Sagrado: tenés ventaja en cualquier salvación a la que te obligue un infernal o un muerto viviente. Daño Radiante: siempre que un enemigo empiece su turno en el aura, recibe daño radiante igual a tu modificador de Carisma más tu bonificador por competencia. Luz Solar: el aura se llena de Luz Brillante que es luz solar." },
+          { "type": "resource", "id": "holy_nimbus", "name": "Halo Sagrado", "max": 1, "recharge": "long", "description": "Uso de Halo Sagrado; un espacio de nivel 5 lo restaura." }
         ]
       }
     ]
@@ -1470,7 +1481,8 @@
         "name": "Centinela Imperecedero",
         "description": "Cuando bajás a 0 PG sin morir, caés a 1 PG en su lugar.",
         "effects": [
-          { "type": "passiveTrait", "name": "Centinela Imperecedero", "description": "Al bajar a 0 PG quedás en 1 (una vez por descanso largo)." }
+          { "type": "passiveTrait", "name": "Centinela Imperecedero", "description": "Al bajar a 0 PG quedás en 1 (una vez por descanso largo)." },
+          { "type": "resource", "id": "undying_sentinel", "name": "Centinela Imperecedero", "max": 1, "recharge": "long", "description": "Uso de Centinela Imperecedero." }
         ]
       },
       {
@@ -1478,7 +1490,8 @@
         "name": "Campeón Ancestral",
         "description": "Adoptás una forma radiante que regenera PG y potencia tus conjuros y castigos.",
         "effects": [
-          { "type": "passiveTrait", "name": "Campeón Ancestral", "description": "Te regenerás cada turno y tus enemigos tienen desventaja contra tus conjuros y castigos." }
+          { "type": "passiveTrait", "name": "Campeón Ancestral", "description": "Te regenerás cada turno y tus enemigos tienen desventaja contra tus conjuros y castigos." },
+          { "type": "resource", "id": "elder_champion", "name": "Campeón Ancestral", "max": 1, "recharge": "long", "description": "Uso de Campeón Ancestral; un espacio de nivel 5 lo restaura." }
         ]
       }
     ]
@@ -1564,7 +1577,8 @@
         "name": "Leyenda Viviente",
         "description": "Te volvés un ícono de inspiración: ganás carisma sobrehumano, repetís ataques fallidos y esquivás golpes.",
         "effects": [
-          { "type": "passiveTrait", "name": "Leyenda Viviente", "description": "Ventaja en Carisma, repetís un ataque fallido por turno y negás un ataque como reacción." }
+          { "type": "passiveTrait", "name": "Leyenda Viviente", "description": "Ventaja en Carisma, repetís un ataque fallido por turno y negás un ataque como reacción." },
+          { "type": "resource", "id": "living_legend", "name": "Leyenda Viviente", "max": 1, "recharge": "long", "description": "Uso de Leyenda Viviente; un espacio de nivel 5 lo restaura." }
         ]
       }
     ]
@@ -1650,7 +1664,8 @@
         "name": "Ángel Vengador",
         "description": "Adoptás una forma alada aterradora con velocidad de vuelo y aura de miedo.",
         "effects": [
-          { "type": "passiveTrait", "name": "Ángel Vengador", "description": "Velocidad de vuelo y aura que asusta a los enemigos cercanos." }
+          { "type": "passiveTrait", "name": "Ángel Vengador", "description": "Velocidad de vuelo y aura que asusta a los enemigos cercanos." },
+          { "type": "resource", "id": "avenging_angel", "name": "Ángel Vengador", "max": 1, "recharge": "long", "description": "Uso de Ángel Vengador; un espacio de nivel 5 lo restaura." }
         ]
       }
     ]
@@ -1815,7 +1830,8 @@
         "name": "Refuerzos Feéricos",
         "description": "Podés lanzar Invocar Feérico sin concentración una vez por descanso largo.",
         "effects": [
-          { "type": "passiveTrait", "name": "Refuerzos Feéricos", "description": "Invocás un espíritu feérico sin concentración una vez por descanso largo." }
+          { "type": "passiveTrait", "name": "Refuerzos Feéricos", "description": "Invocás un espíritu feérico sin concentración una vez por descanso largo." },
+          { "type": "resource", "id": "fey_reinforcements", "name": "Refuerzos Feéricos", "max": 1, "recharge": "long", "description": "Lanzamiento gratuito de Invocar Feérico." }
         ]
       },
       {
@@ -1823,7 +1839,8 @@
         "name": "Errante Brumoso",
         "description": "Podés teletransportarte una corta distancia como acción adicional varias veces por descanso.",
         "effects": [
-          { "type": "passiveTrait", "name": "Errante Brumoso", "description": "Teletransporte de 30 pies como acción adicional; usos = mod. de Sabiduría." }
+          { "type": "passiveTrait", "name": "Errante Brumoso", "description": "Teletransporte de 30 pies como acción adicional; usos = mod. de Sabiduría." },
+          { "type": "resource", "id": "misty_wanderer", "name": "Errante Brumoso", "max": 1, "maxFromAbility": "wisdom", "recharge": "long", "description": "Lanzamientos gratuitos de Paso Brumoso." }
         ]
       }
     ]
@@ -2077,7 +2094,7 @@
         "name": "Poder Psiónico / Hojas Psíquicas",
         "description": "Manifestás hojas de energía mental como armas y ganás dados psiónicos para potenciar tus habilidades.",
         "effects": [
-          { "type": "resource", "id": "psionic_energy", "name": "Energía Psiónica", "max": 0, "maxFromProficiency": true, "proficiencyMultiplier": 2, "recharge": "short", "description": "Dados psiónicos (d6) para sumar a pruebas (Impulso Psíquico) o teletransportarte (Salto de Sombra); tenés dos veces tu bonif. por competencia." },
+          { "type": "resource", "id": "psionic_energy", "name": "Energía Psiónica", "max": 0, "maxFromProficiency": true, "proficiencyMultiplier": 2, "recharge": "long", "shortRestRecovery": 1, "description": "Dados psiónicos (d6) para sumar a pruebas (Impulso Psíquico) o teletransportarte (Salto de Sombra); tenés dos veces tu bonif. por competencia." },
           { "type": "passiveTrait", "name": "Hojas Psíquicas", "description": "Manifestás hojas psíquicas (finura, arrojadizas) que infligen daño psíquico." }
         ]
       },
@@ -2176,7 +2193,8 @@
         "name": "Alas de Dragón",
         "description": "Como acción adicional te crecen alas: velocidad de vuelo de 60 pies durante 1 hora, un uso por descanso largo.",
         "effects": [
-          { "type": "passiveTrait", "name": "Alas de Dragón", "description": "Como acción adicional hacés aparecer alas dracónicas en tu espalda. Duran 1 hora o hasta que las disipés (no requiere acción), y mientras tanto tenés una velocidad de vuelo de 60 pies. Una vez usado, no podés repetirlo hasta terminar un descanso largo, salvo que gastes 3 puntos de hechicería (no requiere acción) para restablecer el uso." }
+          { "type": "passiveTrait", "name": "Alas de Dragón", "description": "Como acción adicional hacés aparecer alas dracónicas en tu espalda. Duran 1 hora o hasta que las disipés (no requiere acción), y mientras tanto tenés una velocidad de vuelo de 60 pies. Una vez usado, no podés repetirlo hasta terminar un descanso largo, salvo que gastes 3 puntos de hechicería (no requiere acción) para restablecer el uso." },
+          { "type": "resource", "id": "dragon_wings", "name": "Alas de Dragón", "max": 1, "recharge": "long", "description": "Uso de Alas de Dragón; 3 Puntos de Hechicería lo restauran." }
         ]
       },
       {
@@ -2283,7 +2301,8 @@
         "name": "Restablecer Equilibrio",
         "description": "Como reacción, cuando una criatura a 60 pies vaya a tirar con ventaja o desventaja, podés anular esa ventaja o desventaja. Podés hacerlo un número de veces igual a tu bonificador por competencia, y recuperás los usos tras un descanso largo.",
         "effects": [
-          { "type": "passiveTrait", "name": "Restablecer Equilibrio", "description": "Reacción: cancelás ventaja o desventaja en una tirada de una criatura cercana." }
+          { "type": "passiveTrait", "name": "Restablecer Equilibrio", "description": "Reacción: cancelás ventaja o desventaja en una tirada de una criatura cercana." },
+          { "type": "resource", "id": "restore_balance", "name": "Restablecer Equilibrio", "max": 1, "maxFromAbility": "charisma", "recharge": "long", "description": "Usos de Restablecer Equilibrio." }
         ]
       },
       {
@@ -2337,7 +2356,8 @@
         "name": "Trance de Orden",
         "description": "Como acción adicional entrás en trance 1 minuto: los ataques contra vos no pueden tener ventaja y tus d20 de 9 o menos cuentan como 10.",
         "effects": [
-          { "type": "passiveTrait", "name": "Trance de Orden", "description": "Como acción adicional entrás en este estado durante 1 minuto. Mientras dure, las tiradas de ataque contra vos no pueden beneficiarse de ventaja y, siempre que hagas una prueba con d20, podés tratar un resultado de 9 o menos en el dado como si fuera un 10. No es «sin desventaja»: lo que se anula es la ventaja del atacante. Una vez usado, no podés repetirlo hasta terminar un descanso largo, salvo que gastes 5 puntos de hechicería (no requiere acción)." }
+          { "type": "passiveTrait", "name": "Trance de Orden", "description": "Como acción adicional entrás en este estado durante 1 minuto. Mientras dure, las tiradas de ataque contra vos no pueden beneficiarse de ventaja y, siempre que hagas una prueba con d20, podés tratar un resultado de 9 o menos en el dado como si fuera un 10. No es «sin desventaja»: lo que se anula es la ventaja del atacante. Una vez usado, no podés repetirlo hasta terminar un descanso largo, salvo que gastes 5 puntos de hechicería (no requiere acción)." },
+          { "type": "resource", "id": "trance_of_order", "name": "Trance de Orden", "max": 1, "recharge": "long", "description": "Uso de Trance de Orden; 5 Puntos de Hechicería lo restauran." }
         ]
       },
       {
@@ -2362,7 +2382,8 @@
         "name": "Sobrecarga de Magia Salvaje / Mareas del Caos",
         "description": "Tus conjuros pueden desencadenar efectos aleatorios; podés ganar ventaja a cambio de provocar el caos.",
         "effects": [
-          { "type": "passiveTrait", "name": "Magia Salvaje", "description": "Al lanzar conjuros podés tirar en la tabla de Oleada de Magia Salvaje; Marea del Caos te da ventaja una vez por descanso." }
+          { "type": "passiveTrait", "name": "Magia Salvaje", "description": "Al lanzar conjuros podés tirar en la tabla de Oleada de Magia Salvaje; Marea del Caos te da ventaja una vez por descanso." },
+          { "type": "resource", "id": "tides_of_chaos", "name": "Mareas del Caos", "max": 1, "recharge": "long", "description": "Uso de Mareas del Caos; también lo recuperás al lanzar un conjuro de Hechicero con espacio." }
         ]
       },
       {
@@ -2467,7 +2488,8 @@
         "name": "Arrastrar por el Infierno",
         "description": "Cuando impactás a una criatura podés desterrarla brevemente a los Planos Inferiores, infligiéndole daño psíquico.",
         "effects": [
-          { "type": "passiveTrait", "name": "Arrastrar por el Infierno", "description": "Enviás a un objetivo golpeado por los Planos Inferiores: gran daño psíquico al volver." }
+          { "type": "passiveTrait", "name": "Arrastrar por el Infierno", "description": "Enviás a un objetivo golpeado por los Planos Inferiores: gran daño psíquico al volver." },
+          { "type": "resource", "id": "hurl_through_hell", "name": "Arrastrar por el Infierno", "max": 1, "recharge": "long", "description": "Uso de Arrastrar por el Infierno; un espacio de Magia de Pacto lo restaura." }
         ]
       }
     ]
@@ -2631,7 +2653,8 @@
         "name": "Venganza Ardiente",
         "description": "Cuando bajás a 0 PG podés en su lugar volver con vida y quemar a los enemigos cercanos.",
         "effects": [
-          { "type": "passiveTrait", "name": "Venganza Ardiente", "description": "Al caer a 0 PG, revivís con algunos PG e infligís daño radiante a los enemigos cercanos." }
+          { "type": "passiveTrait", "name": "Venganza Ardiente", "description": "Al caer a 0 PG, revivís con algunos PG e infligís daño radiante a los enemigos cercanos." },
+          { "type": "resource", "id": "searing_vengeance", "name": "Venganza Ardiente", "max": 1, "recharge": "long", "description": "Uso de Venganza Ardiente." }
         ]
       }
     ]
@@ -2838,7 +2861,8 @@
         "name": "Presagio",
         "description": "Tras un descanso largo tirás dos d20 y guardás los resultados para reemplazar tiradas propias o ajenas.",
         "effects": [
-          { "type": "passiveTrait", "name": "Presagio", "description": "Reemplazás una tirada (tuya o de otro) por uno de dos d20 tirados al descansar." }
+          { "type": "passiveTrait", "name": "Presagio", "description": "Reemplazás una tirada (tuya o de otro) por uno de dos d20 tirados al descansar." },
+          { "type": "resource", "id": "portent", "name": "Presagio", "max": 2, "recharge": "long", "description": "Tiradas de Presagio guardadas tras el descanso largo." }
         ]
       },
       {
@@ -2870,7 +2894,8 @@
         "name": "Presagio Mayor",
         "description": "Tu Presagio te da tres d20 en lugar de dos.",
         "effects": [
-          { "type": "passiveTrait", "name": "Presagio Mayor", "description": "Tirás tres d20 de Presagio tras cada descanso largo." }
+          { "type": "passiveTrait", "name": "Presagio Mayor", "description": "Tirás tres d20 de Presagio tras cada descanso largo." },
+          { "type": "resource", "id": "portent", "name": "Presagio", "max": 3, "recharge": "long", "description": "Tiradas de Presagio guardadas tras el descanso largo." }
         ]
       }
     ]
