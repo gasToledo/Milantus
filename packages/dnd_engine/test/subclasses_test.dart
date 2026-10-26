@@ -250,15 +250,6 @@ void main() {
       expect(l10.spellcasting!.cantripsKnown, 4); // base 3 + 1 a nivel 10
     });
 
-    test('el Acechador de la Penumbra otorga visión en la oscuridad 90', () {
-      final s = compiler.compile(_char(
-          classId: 'ranger',
-          level: 3,
-          hp: [10, 6, 6],
-          subclassId: 'gloom-stalker'));
-      expect(s.darkvision, 90);
-    });
-
     test('el Colegio del Valor da armadura media y Ataque Adicional a nivel 6',
         () {
       final l3 = compiler.compile(_char(

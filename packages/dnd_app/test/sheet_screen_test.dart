@@ -281,6 +281,34 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('las otras velocidades van al pie de Velocidad y los sentidos '
+      'en su tarjeta', (tester) async {
+    // Explorador 18: Errante da trepar y nado iguales a la velocidad, y
+    // Sentidos Salvajes, visión ciega.
+    final explorador = Character(
+      id: 'explorador',
+      name: 'Vela',
+      raceId: 'human',
+      classId: 'ranger',
+      backgroundId: 'soldier',
+      level: 18,
+      assignedScores: {for (final a in Ability.values) a: 12},
+      hpPerLevel: List.filled(18, 6),
+      combat: CombatState(currentHp: 100),
+    );
+    await pumpSheet(tester, explorador, size: const Size(900, 6000));
+    final s = CharacterCompiler(repo).compile(explorador);
+    expect(
+      find.text(
+        'Nadar ${s.speeds[MovementMode.swim]} · '
+        'Trepar ${s.speeds[MovementMode.climb]}',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Visión ciega'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('una reserva se gasta en cantidades y no de a un uso', (
     tester,
   ) async {

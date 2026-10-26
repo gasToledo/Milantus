@@ -299,7 +299,9 @@
         "description": "Ganás un beneficio de un animal a elección: Búho (visión en la oscuridad), Pantera (trepar) o Salmón (nadar).",
         "effects": [
           { "type": "passiveTrait", "name": "Aspecto de lo Salvaje", "description": "Elegís una de estas opciones y podés cambiarla al terminar un descanso largo. Búho: tenés visión en la oscuridad hasta 60 pies; si ya la tenías, su alcance aumenta 60 pies. Pantera: tenés velocidad de trepar igual a tu velocidad. Salmón: tenés velocidad de nado igual a tu velocidad." },
-          { "type": "featureChoice", "groupId": "subclass:wild-heart:aspect-of-the-wilds", "name": "Aspecto de lo Salvaje", "count": 1, "replaceable": true, "options": [{ "id": "aspect-of-the-wilds-owl", "name": "Búho", "source": "phb_2024", "description": "Visión en la oscuridad de 60 pies; si ya la tenías, su alcance aumenta 60 pies.", "effects": [{ "type": "darkvision", "range": 60 }] }, { "id": "aspect-of-the-wilds-panther", "name": "Pantera", "source": "phb_2024", "description": "Velocidad trepando igual a tu velocidad.", "effects": [{ "type": "passiveTrait", "name": "Aspecto de lo Salvaje: Pantera", "description": "Velocidad trepando igual a tu velocidad." }] }, { "id": "aspect-of-the-wilds-salmon", "name": "Salmón", "source": "phb_2024", "description": "Velocidad nadando igual a tu velocidad.", "effects": [{ "type": "passiveTrait", "name": "Aspecto de lo Salvaje: Salmón", "description": "Velocidad nadando igual a tu velocidad." }] }] }
+          { "type": "featureChoice", "groupId": "subclass:wild-heart:aspect-of-the-wilds", "name": "Aspecto de lo Salvaje", "count": 1, "replaceable": true, "options": [{ "id": "aspect-of-the-wilds-owl", "name": "Búho", "source": "phb_2024", "description": "Visión en la oscuridad de 60 pies; si ya la tenías, su alcance aumenta 60 pies.", "effects": [{ "type": "darkvision", "range": 60, "stacking": true }] }, { "id": "aspect-of-the-wilds-panther", "name": "Pantera", "source": "phb_2024", "description": "Velocidad trepando igual a tu velocidad.", "effects": [{ "type": "passiveTrait", "name": "Aspecto de lo Salvaje: Pantera", "description": "Velocidad trepando igual a tu velocidad." },
+          { "type": "movementSpeed", "mode": "climb", "equalToWalk": true }] }, { "id": "aspect-of-the-wilds-salmon", "name": "Salmón", "source": "phb_2024", "description": "Velocidad nadando igual a tu velocidad.", "effects": [{ "type": "passiveTrait", "name": "Aspecto de lo Salvaje: Salmón", "description": "Velocidad nadando igual a tu velocidad." },
+          { "type": "movementSpeed", "mode": "swim", "equalToWalk": true }] }] }
         ]
       },
       {
@@ -1094,7 +1096,8 @@
         "name": "Afinidad Acuática",
         "description": "La emanación de tu Ira de los Mares crece a 10 pies y ganás velocidad de nado.",
         "effects": [
-          { "type": "passiveTrait", "name": "Afinidad Acuática", "description": "El tamaño de la emanación creada por tu Ira de los Mares aumenta a 10 pies. Además, obtenés una velocidad de nado igual a tu velocidad." }
+          { "type": "passiveTrait", "name": "Afinidad Acuática", "description": "El tamaño de la emanación creada por tu Ira de los Mares aumenta a 10 pies. Además, obtenés una velocidad de nado igual a tu velocidad." },
+          { "type": "movementSpeed", "mode": "swim", "equalToWalk": true }
         ]
       },
       {
@@ -1297,7 +1300,7 @@
         "name": "Artes Sombrías",
         "description": "Ganás visión en la oscuridad y el truco Ilusión Menor; podés gastar Enfoque para crear zonas de oscuridad y otros efectos.",
         "effects": [
-          { "type": "darkvision", "range": 60 },
+          { "type": "darkvision", "range": 60, "stacking": true },
           { "type": "passiveTrait", "name": "Artes Sombrías", "description": "Conocés Ilusión Menor; gastás Enfoque para lanzar Oscuridad, Oscurovisión, Silencio o Pasos sin Rastro." }
         ]
       },
@@ -1869,7 +1872,7 @@
         "name": "Emboscador Temible / Vista Umbral",
         "description": "Velocidad extra en el primer turno, Sabiduría a la iniciativa y +2d6 psíquico una vez por turno; además ves en la penumbra.",
         "effects": [
-          { "type": "darkvision", "range": 90 },
+          { "type": "darkvision", "range": 60, "stacking": true },
           { "type": "passiveTrait", "name": "Emboscador Temible: Salto del Emboscador", "description": "Al comienzo de tu primer turno de cada combate, tu velocidad aumenta 10 pies hasta el final de ese turno." },
           { "type": "passiveTrait", "name": "Emboscador Temible: Golpe Temible", "description": "Cuando ataques a una criatura y la aciertes con un arma, podés infligir 2d6 de daño psíquico adicional. Solo una vez por turno, y podés usarlo una cantidad de veces igual a tu modificador de Sabiduría (mínimo una); recuperás todos los usos al terminar un descanso largo." },
           { "type": "initiativeBonus", "fromAbility": "wisdom" },
@@ -1964,7 +1967,8 @@
         "name": "Trabajo en las Alturas",
         "description": "Obtenés velocidad de trepar igual a tu velocidad y calculás tus saltos con Destreza.",
         "effects": [
-          { "type": "passiveTrait", "name": "Trabajo en las Alturas", "description": "Te entrenaste para llegar a lugares especialmente difíciles de alcanzar. Escalador: obtenés una velocidad de trepar igual a tu velocidad. Saltador: podés determinar tu distancia de salto empleando tu Destreza en lugar de tu Fuerza." }
+          { "type": "passiveTrait", "name": "Trabajo en las Alturas", "description": "Te entrenaste para llegar a lugares especialmente difíciles de alcanzar. Escalador: obtenés una velocidad de trepar igual a tu velocidad. Saltador: podés determinar tu distancia de salto empleando tu Destreza en lugar de tu Fuerza." },
+          { "type": "movementSpeed", "mode": "climb", "equalToWalk": true }
         ]
       },
       {

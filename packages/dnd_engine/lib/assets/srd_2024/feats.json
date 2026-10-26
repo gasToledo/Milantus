@@ -63,7 +63,8 @@
     "repeatable": false,
     "effects": [
       { "type": "grantSpell", "spellId": "water-breathing", "ability": "charisma", "use": "oncePerLongRest" },
-      { "type": "passiveTrait", "name": "Don de las Profundidades", "description": "Podés respirar bajo el agua y tenés velocidad nadando igual a tu velocidad. Además podés lanzar Respirar bajo el Agua una vez por descanso largo sin gastar espacio." }
+      { "type": "passiveTrait", "name": "Don de las Profundidades", "description": "Podés respirar bajo el agua y tenés velocidad nadando igual a tu velocidad. Además podés lanzar Respirar bajo el Agua una vez por descanso largo sin gastar espacio." },
+      { "type": "movementSpeed", "mode": "swim", "equalToWalk": true }
     ],
     "prerequisite": { "minLevel": 5 }
   },
@@ -247,7 +248,8 @@
     "category": "warlock-invocation",
     "repeatable": false,
     "effects": [
-      { "type": "passiveTrait", "name": "Visión Bruja", "description": "Tenés visión verdadera hasta 30 pies." }
+      { "type": "passiveTrait", "name": "Visión Bruja", "description": "Tenés visión verdadera hasta 30 pies." },
+      { "type": "sense", "sense": "truesight", "range": 30 }
     ],
     "prerequisite": { "minLevel": 15 }
   },
@@ -651,7 +653,8 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "strength", "amount": 1 },
-      { "type": "passiveTrait", "name": "Atleta", "description": "Ganás velocidad trepando igual a tu velocidad. Levantarte del estado derribado cuesta solo 5 pies de movimiento, y saltás de longitud o de altura con carrerilla tras moverte solo 5 pies." }
+      { "type": "passiveTrait", "name": "Atleta", "description": "Ganás velocidad trepando igual a tu velocidad. Levantarte del estado derribado cuesta solo 5 pies de movimiento, y saltás de longitud o de altura con carrerilla tras moverte solo 5 pies." },
+      { "type": "movementSpeed", "mode": "climb", "equalToWalk": true }
     ],
     "prerequisite": { "minLevel": 4, "anyAbilityScores": { "strength": 13, "dexterity": 13 } }
   },
@@ -664,7 +667,8 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "dexterity", "amount": 1 },
-      { "type": "passiveTrait", "name": "Atleta", "description": "Ganás velocidad trepando igual a tu velocidad. Levantarte del estado derribado cuesta solo 5 pies de movimiento, y saltás de longitud o de altura con carrerilla tras moverte solo 5 pies." }
+      { "type": "passiveTrait", "name": "Atleta", "description": "Ganás velocidad trepando igual a tu velocidad. Levantarte del estado derribado cuesta solo 5 pies de movimiento, y saltás de longitud o de altura con carrerilla tras moverte solo 5 pies." },
+      { "type": "movementSpeed", "mode": "climb", "equalToWalk": true }
     ],
     "prerequisite": { "minLevel": 4, "anyAbilityScores": { "strength": 13, "dexterity": 13 } }
   },
@@ -1776,6 +1780,11 @@
         "type": "passiveTrait",
         "name": "Acechador",
         "description": "Visión Ciega hasta 10 pies. Niebla de Guerra: ventaja en las pruebas de Destreza (Sigilo) que hagas como parte de la acción de esconderte en combate. En la Sombra: un ataque fallado desde el escondite no revela tu posición."
+      },
+      {
+        "type": "sense",
+        "sense": "blindsight",
+        "range": 10
       }
     ],
     "prerequisite": {
@@ -1944,7 +1953,8 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "intelligence", "amount": 1 },
-      { "type": "passiveTrait", "name": "Telepático", "description": "Ganás telepatía a corta distancia y podés lanzar Detectar Pensamientos sin gastar espacios." }
+      { "type": "passiveTrait", "name": "Telepático", "description": "Ganás telepatía a corta distancia y podés lanzar Detectar Pensamientos sin gastar espacios." },
+      { "type": "sense", "sense": "telepathy", "range": 60 }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -1957,7 +1967,8 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "wisdom", "amount": 1 },
-      { "type": "passiveTrait", "name": "Telepático", "description": "Ganás telepatía a corta distancia y podés lanzar Detectar Pensamientos sin gastar espacios." }
+      { "type": "passiveTrait", "name": "Telepático", "description": "Ganás telepatía a corta distancia y podés lanzar Detectar Pensamientos sin gastar espacios." },
+      { "type": "sense", "sense": "telepathy", "range": 60 }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -1970,7 +1981,8 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "charisma", "amount": 1 },
-      { "type": "passiveTrait", "name": "Telepático", "description": "Ganás telepatía a corta distancia y podés lanzar Detectar Pensamientos sin gastar espacios." }
+      { "type": "passiveTrait", "name": "Telepático", "description": "Ganás telepatía a corta distancia y podés lanzar Detectar Pensamientos sin gastar espacios." },
+      { "type": "sense", "sense": "telepathy", "range": 60 }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -2095,6 +2107,11 @@
         "type": "passiveTrait",
         "name": "Lucha a Ciegas",
         "description": "Tenés visión ciega hasta 10 pies."
+      },
+      {
+        "type": "sense",
+        "sense": "blindsight",
+        "range": 10
       }
     ],
     "prerequisite": {
@@ -2465,6 +2482,11 @@
         "type": "passiveTrait",
         "name": "Visión Verdadera",
         "description": "Aumenta una característica en 1, hasta un máximo de 30. Tenés visión verdadera hasta 60 pies."
+      },
+      {
+        "type": "sense",
+        "sense": "truesight",
+        "range": 60
       }
     ],
     "prerequisite": {

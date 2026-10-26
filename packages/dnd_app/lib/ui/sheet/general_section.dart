@@ -1010,6 +1010,9 @@ extension _SheetGeneralSection on _SheetScreenState {
           '${s.darkvision}',
           context.l10n.unitFeetSuffix,
         ),
+      for (final sense in Sense.values)
+        if (s.senses[sense] case final range?)
+          (_senseLabel(sense), '$range', context.l10n.unitFeetSuffix),
     ];
     return sheetCard(
       icon: Icons.visibility,
@@ -1307,15 +1310,40 @@ extension _SheetGeneralSection on _SheetScreenState {
               ),
       ),
     );
+    // Las otras velocidades (trepar, nadar, volar) van al pie: es donde se
+    // mira en el turno, y la placa está en todas las pestañas.
+    final otherSpeeds = [
+      for (final mode in MovementMode.values)
+        if (s.speeds[mode] case final feet?)
+          context.l10n.speedOther(_movementLabel(mode), feet),
+    ];
     final speed = StatTile(
       icon: Icons.keyboard_double_arrow_right,
       label: context.l10n.creatureSpeed,
       // Al pie y no en `labelTrailing`, que es para un dato corto tipo
       // «85%»: con este texto la placa desborda en un teléfono.
-      footer: _c.combat.exhaustion > 0
-          ? Text(
-              context.l10n.exhaustionSpeed(5 * _c.combat.exhaustion),
-              style: TextStyle(fontSize: 11, color: context.palette.crimson),
+      footer: _c.combat.exhaustion > 0 || otherSpeeds.isNotEmpty
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (otherSpeeds.isNotEmpty)
+                  Text(
+                    otherSpeeds.join(' · '),
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: context.palette.textMuted,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                if (_c.combat.exhaustion > 0)
+                  Text(
+                    context.l10n.exhaustionSpeed(5 * _c.combat.exhaustion),
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: context.palette.crimson,
+                    ),
+                  ),
+              ],
             )
           : null,
       value: '${s.speed}',

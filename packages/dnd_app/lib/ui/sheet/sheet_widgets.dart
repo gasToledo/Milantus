@@ -70,3 +70,19 @@ String _conditionalAdvantageText(BuildContext context, Advantage v) {
   };
   return '$text · ${_advantageSources(context, [v])}';
 }
+
+extension _MovementAndSenseLabels on _SheetScreenState {
+  String _movementLabel(MovementMode mode) => switch (mode) {
+    MovementMode.fly => context.l10n.movementFly,
+    MovementMode.swim => context.l10n.movementSwim,
+    MovementMode.climb => context.l10n.movementClimb,
+    MovementMode.burrow => context.l10n.movementBurrow,
+  };
+
+  String _senseLabel(Sense sense) => switch (sense) {
+    Sense.blindsight => context.l10n.senseBlindsight,
+    Sense.tremorsense => context.l10n.senseTremorsense,
+    Sense.truesight => context.l10n.senseTruesight,
+    Sense.telepathy => context.l10n.senseTelepathy,
+  };
+}

@@ -889,7 +889,9 @@ class CharacterCompiler {
       initiativeBonuses: List.unmodifiable(initiativeBonuses),
       advantages: List.unmodifiable(builder.advantages),
       scalingDice: List.unmodifiable(builder.scalingDice),
-      darkvision: builder.darkvision,
+      darkvision: builder.resolveDarkvision(),
+      speeds: Map.unmodifiable(_movementSpeeds(builder, speed)),
+      senses: Map.unmodifiable(builder.senses),
       resistances: builder.resistances,
       immunities: builder.immunities,
       weaponMasterySlots: builder.weaponMasterySlots,
@@ -1515,6 +1517,17 @@ class CharacterCompiler {
   /// Velocidad final: base + bonos incondicionales (raza) + Movimiento sin
   /// Armadura, este último solo si no se lleva armadura (para el Monje, tampoco
   /// escudo; para el Bárbaro, solo lo anula la armadura pesada).
+  /// Las velocidades distintas de caminar, con «igual a tu velocidad» ya
+  /// resuelto contra [walk], la velocidad final. Gana la mayor por tipo.
+  Map<MovementMode, int> _movementSpeeds(SheetBuilder b, int walk) {
+    final out = <MovementMode, int>{};
+    for (final e in b.movementSpeeds) {
+      final feet = e.equalToWalk ? walk : e.feet;
+      if (feet > (out[e.mode] ?? 0)) out[e.mode] = feet;
+    }
+    return out;
+  }
+
   int _speed(Character c, SheetBuilder b) {
     var speed = b.speed;
     if (b.unarmoredMovementBonus != 0) {

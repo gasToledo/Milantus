@@ -1,6 +1,7 @@
 import 'ability.dart';
 import 'content_language.dart';
 import 'content_source.dart';
+import 'effects.dart';
 import 'skill.dart';
 
 /// Tipo de criatura del SRD 5.2.1.
@@ -825,6 +826,25 @@ class Creature {
   int get walkSpeed =>
       int.tryParse(RegExp(r'^\s*(\d+)').firstMatch(speed)?.group(1) ?? '') ?? 0;
 
+  /// Las velocidades distintas de caminar, leídas de [speed] en español o en
+  /// inglés («trepar 30 pies», «Fly 60 ft.»). Las usa la Forma Salvaje, que
+  /// toma las de la bestia.
+  Map<MovementMode, int> get otherSpeeds => {
+        for (final m in RegExp(
+          r'\b(trepar|nadar|volar|excavar|[Cc]limb|[Ss]wim|[Ff]ly|[Bb]urrow) (\d+)',
+        ).allMatches(speed))
+          _movementWords[m.group(1)!.toLowerCase()]!: int.parse(m.group(2)!),
+      };
+
+  /// Los sentidos además de la visión en la oscuridad, leídos de [senses].
+  Map<Sense, int> get otherSenses => {
+        for (final MapEntry(key: sense, value: pattern) in _senseWords.entries)
+          if (RegExp('(?:$pattern) (\\d+)', caseSensitive: false)
+                  .firstMatch(senses)
+              case final m?)
+            sense: int.parse(m.group(1)!),
+      };
+
   /// Alcance de la visión en la oscuridad en pies, leído de [senses], o null si
   /// la criatura no la tiene.
   int? get darkvision {
@@ -975,3 +995,23 @@ class ResolvedCreature {
 
   int abilityModifierFor(Ability a) => abilityModifier(abilityScores[a] ?? 10);
 }
+
+const _movementWords = <String, MovementMode>{
+  'trepar': MovementMode.climb,
+  'climb': MovementMode.climb,
+  'nadar': MovementMode.swim,
+  'swim': MovementMode.swim,
+  'volar': MovementMode.fly,
+  'fly': MovementMode.fly,
+  'excavar': MovementMode.burrow,
+  'burrow': MovementMode.burrow,
+};
+
+/// Cómo nombra cada sentido el catálogo, en español (el del SRD: «sentir
+/// vibraciones») y en inglés.
+const _senseWords = <Sense, String>{
+  Sense.blindsight: 'visión ciega|blindsight',
+  Sense.tremorsense: 'sentir vibraciones|tremorsense',
+  Sense.truesight: 'visión verdadera|truesight',
+  Sense.telepathy: 'telepatía|telepathy',
+};

@@ -4724,6 +4724,16 @@
             "type": "passiveTrait",
             "name": "Errante",
             "description": "Si no llevás armadura pesada, tu velocidad aumenta en 10 pies. Además tenés velocidad nadando y trepando iguales a tu velocidad."
+          },
+          {
+            "type": "movementSpeed",
+            "mode": "climb",
+            "equalToWalk": true
+          },
+          {
+            "type": "movementSpeed",
+            "mode": "swim",
+            "equalToWalk": true
           }
         ]
       },
@@ -4803,6 +4813,11 @@
             "type": "passiveTrait",
             "name": "Sentidos Salvajes",
             "description": "Tu conexión con la naturaleza te otorga visión ciega hasta 30 pies."
+          },
+          {
+            "type": "sense",
+            "sense": "blindsight",
+            "range": 30
           }
         ]
       },

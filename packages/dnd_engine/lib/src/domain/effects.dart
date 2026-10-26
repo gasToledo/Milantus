@@ -57,7 +57,20 @@ sealed class Effect {
         ),
       'speedBonus' => SpeedBonusEffect(json['feet'] as int),
       'setSpeed' => SetSpeedEffect(json['feet'] as int),
-      'darkvision' => DarkvisionEffect(json['range'] as int),
+      'darkvision' => DarkvisionEffect(
+          json['range'] as int,
+          stacking: json['stacking'] as bool? ?? false,
+        ),
+      'movementSpeed' => MovementSpeedEffect(
+          MovementMode.fromKey(json['mode'] as String),
+          feet: json['feet'] as int? ?? 0,
+          equalToWalk: json['equalToWalk'] as bool? ?? false,
+        ),
+      'sense' => SenseEffect(
+          Sense.fromKey(json['sense'] as String),
+          range: json['range'] as int? ?? 0,
+          rangePerLevel: json['rangePerLevel'] as int? ?? 0,
+        ),
       'skillProficiency' => SkillProficiencyEffect(json['skill'] as String),
       'savingThrowProficiency' => SavingThrowProficiencyEffect(
           Ability.fromKey(json['ability'] as String),
@@ -505,11 +518,88 @@ class SetSpeedEffect extends Effect {
 }
 
 /// Visión en la oscuridad, en pies. Se queda con el mayor alcance concedido.
+///
+/// Con [stacking] es la regla «la ganás con 60 pies; si ya la tenías, su
+/// alcance aumenta 60 pies» (Vista Umbral, el Búho del Corazón Salvaje): a un
+/// Enano con 120 lo deja en 180 en vez de no sumarle nada.
 class DarkvisionEffect extends Effect {
   final int range;
-  const DarkvisionEffect(this.range);
+  final bool stacking;
+  const DarkvisionEffect(this.range, {this.stacking = false});
   @override
-  Map<String, dynamic> toJson() => {'type': 'darkvision', 'range': range};
+  Map<String, dynamic> toJson() => {
+        'type': 'darkvision',
+        'range': range,
+        if (stacking) 'stacking': true,
+      };
+}
+
+/// Tipos de velocidad además de la de caminar.
+enum MovementMode {
+  fly,
+  swim,
+  climb,
+  burrow;
+
+  static MovementMode fromKey(String key) =>
+      values.firstWhere((m) => m.name == key);
+}
+
+/// Una velocidad que no es la de caminar: «velocidad trepando igual a tu
+/// velocidad» (Errante, Atleta) o un número fijo.
+///
+/// [equalToWalk] se resuelve con la velocidad **final**, después del
+/// Movimiento sin Armadura y de los bonos de Errante: por eso es una marca y
+/// no un número copiado del contenido. Si dos fuentes dan la misma, gana la
+/// mayor.
+class MovementSpeedEffect extends Effect {
+  final MovementMode mode;
+  final int feet;
+  final bool equalToWalk;
+
+  const MovementSpeedEffect(
+    this.mode, {
+    this.feet = 0,
+    this.equalToWalk = false,
+  });
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'movementSpeed',
+        'mode': mode.name,
+        if (feet != 0) 'feet': feet,
+        if (equalToWalk) 'equalToWalk': true,
+      };
+}
+
+/// Sentidos además de la visión en la oscuridad, que tiene su efecto propio
+/// desde antes y lo leen la Forma Salvaje y la vista del DM.
+enum Sense {
+  blindsight,
+  tremorsense,
+  truesight,
+  telepathy;
+
+  static Sense fromKey(String key) => values.firstWhere((s) => s.name == key);
+}
+
+/// Un sentido con su alcance en pies: fijo ([range]) o que crece con el nivel
+/// ([rangePerLevel], la telepatía del Kalashtar es 10 × nivel). Si dos
+/// fuentes dan el mismo, gana el mayor.
+class SenseEffect extends Effect {
+  final Sense sense;
+  final int range;
+  final int rangePerLevel;
+
+  const SenseEffect(this.sense, {this.range = 0, this.rangePerLevel = 0});
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'sense',
+        'sense': sense.name,
+        if (range != 0) 'range': range,
+        if (rangePerLevel != 0) 'rangePerLevel': rangePerLevel,
+      };
 }
 
 class SkillProficiencyEffect extends Effect {

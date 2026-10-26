@@ -559,6 +559,11 @@
           "wisdom",
           "charisma"
         ]
+      },
+      {
+        "type": "sense",
+        "sense": "telepathy",
+        "rangePerLevel": 10
       }
     ]
   },

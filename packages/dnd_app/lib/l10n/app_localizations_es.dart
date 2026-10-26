@@ -1453,6 +1453,35 @@ class AppLocalizationsEs extends AppLocalizations {
   String get darkvision => 'Visión en la oscuridad';
 
   @override
+  String get movementFly => 'Volar';
+
+  @override
+  String get movementSwim => 'Nadar';
+
+  @override
+  String get movementClimb => 'Trepar';
+
+  @override
+  String get movementBurrow => 'Excavar';
+
+  @override
+  String speedOther(Object mode, Object feet) {
+    return '$mode $feet';
+  }
+
+  @override
+  String get senseBlindsight => 'Visión ciega';
+
+  @override
+  String get senseTremorsense => 'Sentir vibraciones';
+
+  @override
+  String get senseTruesight => 'Visión verdadera';
+
+  @override
+  String get senseTelepathy => 'Telepatía';
+
+  @override
   String get skillsLegendProficient => 'Competente';
 
   @override

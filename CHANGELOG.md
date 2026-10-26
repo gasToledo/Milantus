@@ -833,6 +833,32 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
+## [0.34.0+1] - 2026-10-26
+
+### Nuevo
+
+- La placa de Velocidad dice al pie las otras velocidades: trepar, nadar,
+  volar o excavar. Errante del Explorador, el Ladrón, Afinidad Acuática del
+  Círculo del Mar, Pantera y Salmón del Corazón Salvaje, Atleta y Don de las
+  Profundidades las dan.
+- La tarjeta Sentidos suma visión ciega, sentir vibraciones, visión
+  verdadera y telepatía: Sentidos Salvajes, Acechador, Lucha a Ciegas,
+  Visión Bruja, Don de la Visión Verdadera, Telepático y la telepatía del
+  Kalashtar (10 × nivel).
+- En Forma Salvaje, la ficha toma las velocidades y los sentidos de la
+  bestia.
+
+### Modificado
+
+- La visión en la oscuridad que se gana «o aumenta 60 si ya la tenías»
+  (Vista Umbral, Artes Sombrías, el Búho) ahora suma sobre la de la especie.
+  Vista Umbral daba 90 pies, que era la regla de 2014.
+- El Cansancio resta también a trepar, nadar y volar, no solo a caminar.
+
+### Eliminado
+
+- Sin cambios.
+
 ## [Unreleased]
 
 ### Nuevo

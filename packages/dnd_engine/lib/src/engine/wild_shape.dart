@@ -79,6 +79,10 @@ ComputedSheet applyWildShape(ComputedSheet base, Creature beast) {
     // tiene que **borrar** la del druida, no heredarla. Para eso está el
     // centinela de `copyWith`.
     darkvision: beast.darkvision,
+    // Lo mismo con el resto: la bestia trae sus velocidades y sus sentidos, y
+    // el trepar de Errante no sobrevive a convertirse en lobo.
+    speeds: beast.otherSpeeds,
+    senses: beast.otherSenses,
     attacks: [
       for (final a in resolved.actions)
         if (a.isAttack)

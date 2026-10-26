@@ -39,6 +39,28 @@ class SheetBuilder {
   int speed = 30;
   int? darkvision;
 
+  /// Alcances de visión en la oscuridad que se suman si ya había una. Se
+  /// guardan aparte porque el resultado no puede depender del orden en que
+  /// llegan las fuentes; ver [resolveDarkvision].
+  final List<int> darkvisionStacking = [];
+
+  /// Velocidades distintas de caminar, sin resolver: «igual a tu velocidad»
+  /// necesita la velocidad final, que se conoce recién al compilar.
+  final List<MovementSpeedEffect> movementSpeeds = [];
+
+  final Map<Sense, int> senses = {};
+
+  /// La visión en la oscuridad final: la mayor de las fijas y, encima, cada
+  /// una de las que se suman. Sin ninguna fija, la primera que se suma pone
+  /// la base (se gana con 60) y el resto suma.
+  int? resolveDarkvision() {
+    var out = darkvision;
+    for (final range in darkvisionStacking) {
+      out = out == null ? range : out + range;
+    }
+    return out;
+  }
+
   /// Característica que suma a la CA por Defensa sin Armadura (null = ninguna).
   Ability? unarmoredDefenseAbility;
 
@@ -331,9 +353,16 @@ class SheetBuilder {
         speed = feet;
       case SpeedBonusEffect(:final feet):
         speed += feet;
-      case DarkvisionEffect(:final range):
+      case DarkvisionEffect(:final range, stacking: false):
         darkvision =
             (darkvision == null || range > darkvision!) ? range : darkvision;
+      case DarkvisionEffect(:final range, stacking: true):
+        darkvisionStacking.add(range);
+      case MovementSpeedEffect():
+        movementSpeeds.add(e);
+      case SenseEffect(:final sense, :final range, :final rangePerLevel):
+        final value = range + rangePerLevel * (sourceLevel ?? level);
+        if (value > (senses[sense] ?? 0)) senses[sense] = value;
       case SkillProficiencyEffect(:final skill):
         skillProficiencies.add(skill);
       case SkillBonusEffect():

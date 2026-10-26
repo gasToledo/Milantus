@@ -1007,6 +1007,12 @@ class ComputedSheet {
   final List<ActiveMode> activeModes;
   final int? darkvision;
 
+  /// Velocidades además de [speed], en pies (trepar 30, nadar 30).
+  final Map<MovementMode, int> speeds;
+
+  /// Sentidos además de [darkvision], con su alcance en pies.
+  final Map<Sense, int> senses;
+
   final Set<String> resistances;
   final Set<String> immunities;
 
@@ -1138,6 +1144,8 @@ class ComputedSheet {
     this.scalingDice = const [],
     this.activeModes = const [],
     required this.darkvision,
+    this.speeds = const {},
+    this.senses = const {},
     required this.resistances,
     required this.immunities,
     required this.weaponMasterySlots,
@@ -1211,6 +1219,8 @@ class ComputedSheet {
     List<ScalingDice>? scalingDice,
     List<ActiveMode>? activeModes,
     Object? darkvision = _unset,
+    Map<MovementMode, int>? speeds,
+    Map<Sense, int>? senses,
     Set<String>? resistances,
     Set<String>? immunities,
     int? weaponMasterySlots,
@@ -1281,6 +1291,8 @@ class ComputedSheet {
         darkvision: identical(darkvision, _unset)
             ? this.darkvision
             : darkvision as int?,
+        speeds: speeds ?? this.speeds,
+        senses: senses ?? this.senses,
         resistances: resistances ?? this.resistances,
         immunities: immunities ?? this.immunities,
         weaponMasterySlots: weaponMasterySlots ?? this.weaponMasterySlots,

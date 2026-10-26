@@ -1310,6 +1310,25 @@
   "armorUpper": "ARMADURA",
   "passivePerception": "Percepción pasiva",
   "darkvision": "Visión en la oscuridad",
+  "movementFly": "Volar",
+  "movementSwim": "Nadar",
+  "movementClimb": "Trepar",
+  "movementBurrow": "Excavar",
+  "speedOther": "{mode} {feet}",
+  "@speedOther": {
+    "placeholders": {
+      "mode": {
+        "type": "Object"
+      },
+      "feet": {
+        "type": "Object"
+      }
+    }
+  },
+  "senseBlindsight": "Visión ciega",
+  "senseTremorsense": "Sentir vibraciones",
+  "senseTruesight": "Visión verdadera",
+  "senseTelepathy": "Telepatía",
   "skillsLegendProficient": "Competente",
   "skillsLegendExpertise": "Pericia · bonificador duplicado",
   "skillExpertiseBadge": "PERICIA",

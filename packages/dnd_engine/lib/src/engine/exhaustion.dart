@@ -42,6 +42,12 @@ ComputedSheet applyExhaustion(ComputedSheet base, int level) {
     d20Modifier: base.d20Modifier - d20,
     // Con piso en 0: la regla resta velocidad, no empuja a caminar para atrás.
     speed: max(0, base.speed - _piesPorNivel * n),
+    // El SRD dice «tu velocidad» sin distinguir: trepar o nadar a la par de
+    // la velocidad completa mientras se camina más lento no tendría sentido.
+    speeds: {
+      for (final e in base.speeds.entries)
+        e.key: max(0, e.value - _piesPorNivel * n),
+    },
     initiative: base.initiative - d20,
     attacks: [
       for (final a in base.attacks)

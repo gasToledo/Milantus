@@ -2402,6 +2402,60 @@ abstract class AppLocalizations {
   /// **'Visión en la oscuridad'**
   String get darkvision;
 
+  /// No description provided for @movementFly.
+  ///
+  /// In es, this message translates to:
+  /// **'Volar'**
+  String get movementFly;
+
+  /// No description provided for @movementSwim.
+  ///
+  /// In es, this message translates to:
+  /// **'Nadar'**
+  String get movementSwim;
+
+  /// No description provided for @movementClimb.
+  ///
+  /// In es, this message translates to:
+  /// **'Trepar'**
+  String get movementClimb;
+
+  /// No description provided for @movementBurrow.
+  ///
+  /// In es, this message translates to:
+  /// **'Excavar'**
+  String get movementBurrow;
+
+  /// No description provided for @speedOther.
+  ///
+  /// In es, this message translates to:
+  /// **'{mode} {feet}'**
+  String speedOther(Object mode, Object feet);
+
+  /// No description provided for @senseBlindsight.
+  ///
+  /// In es, this message translates to:
+  /// **'Visión ciega'**
+  String get senseBlindsight;
+
+  /// No description provided for @senseTremorsense.
+  ///
+  /// In es, this message translates to:
+  /// **'Sentir vibraciones'**
+  String get senseTremorsense;
+
+  /// No description provided for @senseTruesight.
+  ///
+  /// In es, this message translates to:
+  /// **'Visión verdadera'**
+  String get senseTruesight;
+
+  /// No description provided for @senseTelepathy.
+  ///
+  /// In es, this message translates to:
+  /// **'Telepatía'**
+  String get senseTelepathy;
+
   /// No description provided for @skillsLegendProficient.
   ///
   /// In es, this message translates to:
