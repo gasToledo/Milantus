@@ -553,6 +553,10 @@ class Attack {
   /// de la acción de Atacar.
   final AttackAction action;
 
+  /// Resultado mínimo del d20 que es crítico: 20 salvo que un rasgo lo baje
+  /// (Crítico Mejorado del Campeón, 19).
+  final int critRange;
+
   const Attack({
     required this.weaponId,
     String? baseWeaponId,
@@ -570,6 +574,7 @@ class Attack {
     this.mastery,
     this.offHand = false,
     this.action = AttackAction.action,
+    this.critRange = 20,
   })  : baseWeaponId = baseWeaponId ?? weaponId,
         damageTypeOptions = damageTypeOptions ?? const [];
 
@@ -606,6 +611,7 @@ class Attack {
     Object? mastery = _unset,
     bool? offHand,
     AttackAction? action,
+    int? critRange,
   }) =>
       Attack(
         weaponId: weaponId ?? this.weaponId,
@@ -626,6 +632,7 @@ class Attack {
         mastery: identical(mastery, _unset) ? this.mastery : mastery as String?,
         offHand: offHand ?? this.offHand,
         action: action ?? this.action,
+        critRange: critRange ?? this.critRange,
       );
 
   Map<String, dynamic> toJson() => {

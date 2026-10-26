@@ -80,6 +80,26 @@ void main() {
     });
   });
 
+  test('el Campeón critica con 19 y desde nivel 15 con 18, también sin armas',
+      () {
+    ComputedSheet guerrero(int level, {String? subclassId, List<String>? w}) =>
+        compiler.compile(_char(
+            classId: 'fighter',
+            subclassId: subclassId,
+            level: level,
+            hp: List.filled(level, 6),
+            weapons: w ?? const []));
+    expect(guerrero(3).attacks.single.critRange, 20);
+    expect(guerrero(3, subclassId: 'champion').attacks.single.critRange, 19);
+    final l15 = guerrero(15, subclassId: 'champion');
+    expect(l15.attacks.single.critRange, 18); // el golpe sin armas
+    final conEspada = guerrero(15, subclassId: 'champion', w: ['longsword']);
+    expect(conEspada.weaponAttacks.single.critRange, 18);
+    // Con la espada en la mano el puño no aparece: criticar con 18 no lo
+    // vuelve una opción si sigue pegando 1 + FUE.
+    expect(conEspada.attacks, hasLength(1));
+  });
+
   test('Atleta Sobresaliente: ventaja en iniciativa y solo en Atletismo', () {
     final campeon = compiler.compile(_char(
         classId: 'fighter', subclassId: 'champion', level: 3, hp: [10, 6, 6]));

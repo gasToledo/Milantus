@@ -885,6 +885,14 @@
     }
   },
   "combatOffHand": "Mano secundaria",
+  "combatCritRange": "Crítico {from}–20",
+  "@combatCritRange": {
+    "placeholders": {
+      "from": {
+        "type": "Object"
+      }
+    }
+  },
   "wildShapeAs": "Transformado en {name}",
   "@wildShapeAs": {
     "placeholders": {

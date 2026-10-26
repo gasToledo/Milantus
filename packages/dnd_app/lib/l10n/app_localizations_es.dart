@@ -1033,6 +1033,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get combatOffHand => 'Mano secundaria';
 
   @override
+  String combatCritRange(Object from) {
+    return 'Crítico $from–20';
+  }
+
+  @override
   String wildShapeAs(String name) {
     return 'Transformado en $name';
   }

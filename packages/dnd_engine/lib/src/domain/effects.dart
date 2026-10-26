@@ -206,6 +206,7 @@ sealed class Effect {
               WeaponFilter.fromJson((f as Map).cast<String, dynamic>()),
           ],
           bonusActionAttack: json['bonusActionAttack'] as bool? ?? false,
+          critRange: json['critRange'] as int?,
         ),
       'featureChoice' => FeatureChoiceEffect(
           groupId: json['groupId'] as String,
@@ -1340,6 +1341,10 @@ class WeaponRuleEffect extends Effect {
   /// `filter.unarmed`, que es lo único que no depende de qué hay en la mano.
   final bool bonusActionAttack;
 
+  /// Resultado mínimo del d20 que es crítico con las armas que coinciden:
+  /// 19 con Crítico Mejorado, 18 con Crítico Superior. Gana el menor.
+  final int? critRange;
+
   const WeaponRuleEffect({
     this.targetGroupId,
     this.filter = const WeaponFilter(),
@@ -1357,6 +1362,7 @@ class WeaponRuleEffect extends Effect {
     this.requiresNoArmor = false,
     this.onlyWielding = const [],
     this.bonusActionAttack = false,
+    this.critRange,
   });
 
   @override
@@ -1381,6 +1387,7 @@ class WeaponRuleEffect extends Effect {
         if (onlyWielding.isNotEmpty)
           'onlyWielding': [for (final f in onlyWielding) f.toJson()],
         if (bonusActionAttack) 'bonusActionAttack': true,
+        if (critRange != null) 'critRange': critRange,
       };
 }
 

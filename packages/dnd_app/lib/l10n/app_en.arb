@@ -271,6 +271,7 @@
   "combatMastery": "Mastery: {name}",
   "combatRangeValue": "Range {range}",
   "combatOffHand": "Off hand",
+  "combatCritRange": "Critical {from}–20",
   "wildShapeAs": "Transformed into {name}",
   "wildShapeTitle": "Wild Shape",
   "wildShapeAddForms": "Add forms",

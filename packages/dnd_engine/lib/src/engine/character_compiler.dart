@@ -684,8 +684,13 @@ class CharacterCompiler {
       // nadie lo elige. Se muestra con las manos vacías, que es lo único que
       // queda, o cuando un rasgo lo mejora (Monje, Matón de Taberna, Golpes
       // Radiantes), que es cuando pasa a ser una opción real.
+      // Un rango de crítico solo no alcanza: el «1 + FUE» del Campeón sigue
+      // siendo la fila que nadie elige, aunque critique con 19.
       if (wielded.isEmpty ||
-          builder.weaponRules.any((r) => r.filter.unarmed && conditionsMet(r)))
+          builder.weaponRules.any((r) =>
+              r.filter.unarmed &&
+              conditionsMet(r) &&
+              !_onlyChangesCritRange(r)))
         _attack(c, unarmedStrike, mods, profBonus, builder,
             conditionsMet: conditionsMet),
       if (builder.weaponRules.any(
@@ -1688,11 +1693,26 @@ class CharacterCompiler {
       // El golpe de acción adicional es uno solo: Ataque Adicional multiplica
       // la acción de Atacar, no la adicional.
       attacksPerAction: asBonusAction ? 1 : 1 + context.extraAttacks,
+      critRange: context.critRange,
       mastery: hasMastery ? w.mastery : null,
       offHand: offHand,
       action: action,
     );
   }
+
+  /// La regla no toca nada del ataque salvo el rango de crítico.
+  bool _onlyChangesCritRange(WeaponRuleEffect r) =>
+      r.critRange != null &&
+      !r.grantsProficiency &&
+      r.abilityOptions.isEmpty &&
+      r.damageTypeOptions.isEmpty &&
+      !r.spellcastingFocus &&
+      r.extraAttacks == 0 &&
+      r.attackBonus == 0 &&
+      r.damageBonus == 0 &&
+      r.extraDamageDice == null &&
+      r.damageDie == null &&
+      !r.bonusActionAttack;
 
   bool _weaponMatches(WeaponFilter filter, Weapon weapon,
       {required bool isMagic}) {
@@ -1743,6 +1763,7 @@ class _WeaponAttackContext {
   int attackBonus = 0;
   int damageBonus = 0;
   String? damageDie;
+  int critRange = 20;
   final List<WeaponExtraDamage> extraDamage = [];
 
   _WeaponAttackContext({
@@ -1767,6 +1788,7 @@ class _WeaponAttackContext {
     damageBonus += rule.damageBonus;
     // Los tramos de Artes Marciales llegan como reglas sueltas por nivel: se
     // queda la que da el dado mayor.
+    critRange = min(critRange, rule.critRange ?? 20);
     final die = rule.damageDie;
     if (die != null &&
         (damageDie == null || _diceMax(die) > _diceMax(damageDie!))) {

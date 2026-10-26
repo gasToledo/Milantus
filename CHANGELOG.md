@@ -788,6 +788,8 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 - El tope de objetos sintonizados sube con los rasgos que lo dicen: el
   Artífice llega a 4, 5 y 6 y el Ladrón a 4. El inventario y el aviso de
   exceso usan el tope del personaje.
+- Los ataques del Campeón muestran su rango de crítico: 19–20 con Crítico
+  Mejorado y 18–20 con Crítico Superior, con armas y sin armas.
 
 ### Modificado
 

@@ -258,14 +258,15 @@ void main() {
     // modelar todavía, bajá el número a mano y explicá por qué en el commit:
     // el historial de este número es el registro de deuda, y sale más barato
     // que marcar 311 entradas con un motivo que nadie va a leer.
-    // Hoy son exactamente 230: los «N veces por descanso» de clases,
+    // Hoy son exactamente 228: los «N veces por descanso» de clases,
     // subclases y especies pasaron a ser recursos, Competencias Adicionales,
     // Estilo de Combate Adicional, Arcanum Místico y Aspecto de lo Salvaje
     // declaran su elección, y las ventajas permanentes (Sentir el Peligro,
     // Instinto Salvaje, Atleta Sobresaliente...) y las sintonizaciones del
-    // Artífice y del Ladrón llegan a la ficha como efecto. Va como cota y no como igualdad para
+    // Artífice y del Ladrón y el rango de crítico del Campeón llegan a la
+    // ficha como efecto. Va como cota y no como igualdad para
     // que pagar deuda no haga fallar el test: lo que tiene que doler es *sumar*.
-    expect(soloTexto, hasLength(lessThanOrEqualTo(230)),
+    expect(soloTexto, hasLength(lessThanOrEqualTo(228)),
         reason: 'hay más rasgos que solo son texto que antes:\n'
             '${soloTexto.join('\n')}');
   });

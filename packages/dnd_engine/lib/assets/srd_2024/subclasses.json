@@ -11,7 +11,9 @@
         "name": "Crítico Mejorado",
         "description": "Tus ataques con armas y ataques sin armas causan un crítico con una tirada de 19 o 20.",
         "effects": [
-          { "type": "passiveTrait", "name": "Crítico Mejorado", "description": "Tus ataques con armas y ataques sin armas causan un crítico al sacar 19 o 20 en el d20." }
+          { "type": "passiveTrait", "name": "Crítico Mejorado", "description": "Tus ataques con armas y ataques sin armas causan un crítico al sacar 19 o 20 en el d20." },
+          { "type": "weaponRule", "critRange": 19 },
+          { "type": "weaponRule", "filter": { "unarmed": true }, "critRange": 19 }
         ]
       },
       {
@@ -46,7 +48,9 @@
         "name": "Crítico Superior",
         "description": "Tus ataques con armas y ataques sin armas causan un crítico con una tirada de 18 a 20.",
         "effects": [
-          { "type": "passiveTrait", "name": "Crítico Superior", "description": "Tus ataques con armas y ataques sin armas causan un crítico al sacar 18, 19 o 20 en el d20." }
+          { "type": "passiveTrait", "name": "Crítico Superior", "description": "Tus ataques con armas y ataques sin armas causan un crítico al sacar 18, 19 o 20 en el d20." },
+          { "type": "weaponRule", "critRange": 18 },
+          { "type": "weaponRule", "filter": { "unarmed": true }, "critRange": 18 }
         ]
       },
       {

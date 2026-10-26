@@ -592,6 +592,8 @@ extension _SheetCombatSection on _SheetScreenState {
                     if (a.mastery != null) _masteryPill(a.mastery!),
                     // Mano y acción salen calculadas del motor: derivarlas acá
                     // sería reimplementar la regla de dos armas en la ficha.
+                    if (a.critRange < 20)
+                      GoldPill(context.l10n.combatCritRange(a.critRange)),
                     if (a.offHand) GoldPill(context.l10n.combatOffHand),
                     if (a.action == AttackAction.bonusAction)
                       GoldPill(context.l10n.spellActionBonus),

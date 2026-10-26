@@ -1724,6 +1724,12 @@ abstract class AppLocalizations {
   /// **'Mano secundaria'**
   String get combatOffHand;
 
+  /// No description provided for @combatCritRange.
+  ///
+  /// In es, this message translates to:
+  /// **'Crítico {from}–20'**
+  String combatCritRange(Object from);
+
   /// No description provided for @wildShapeAs.
   ///
   /// In es, this message translates to:
