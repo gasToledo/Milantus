@@ -77,6 +77,12 @@ extension _DashboardActions on _DashboardScreenState {
   ///
   /// Con [instant] entra sin transición: es el arranque de quien eligió abrir
   /// la aplicación en este modo, que no pidió ver pasar el roster.
+  ///
+  /// Sin [instant], un fundido corto y no la transición de Material: en web
+  /// esa es el zoom de pantalla completa, que agrandaba también el panel
+  /// lateral, idéntico en los dos modos, y el cambio se sentía como saltar a
+  /// otra aplicación. Con el fundido, lo que no cambia queda quieto y solo se
+  /// ve cambiar el contenido. La salida usa el mismo fundido al revés.
   Future<void> _openDmMode({bool instant = false}) async {
     Widget screen(BuildContext _) => PendingEventsGate(
       api: controller.api,
@@ -91,14 +97,19 @@ extension _DashboardActions on _DashboardScreenState {
         appVersion: widget.appVersion,
       ),
     );
+    final duration = instant
+        ? Duration.zero
+        : const Duration(milliseconds: 200);
     await Navigator.of(context).push(
-      instant
-          ? PageRouteBuilder<void>(
-              pageBuilder: (context, _, _) => screen(context),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            )
-          : MaterialPageRoute<void>(builder: screen),
+      PageRouteBuilder<void>(
+        pageBuilder: (context, _, _) => screen(context),
+        transitionsBuilder: (_, animation, _, child) => FadeTransition(
+          opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
+          child: child,
+        ),
+        transitionDuration: duration,
+        reverseTransitionDuration: duration,
+      ),
     );
     // Desde el Modo DM se edita el homebrew, que cambia el contenido debajo
     // de personajes que siguen siendo los mismos objetos: sin descartar las
