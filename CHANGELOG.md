@@ -751,6 +751,29 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
+## [0.31.0+1] - 2026-10-26
+
+### Nuevo
+
+- Todo personaje tiene el golpe sin armas en sus ataques: 1 + Fuerza
+  contundente, con competencia.
+- Artes Marciales: el Monje sin armadura ni escudo, desarmado o con solo armas
+  de monje, usa Destreza y el dado de Artes Marciales (1d6 a 1d12 según el
+  nivel) para el golpe sin armas y sus armas de monje, y suma el golpe sin
+  armas como acción adicional. Golpes Potenciados ofrece el daño de fuerza.
+- El golpe sin armas también aprovecha el Daño Bárdico del Colegio de la Danza,
+  el 1d4 del Matón de Taberna, el 1d6 de Combate sin Armas y el 1d8 radiante de
+  los Golpes Radiantes del Paladín.
+
+### Modificado
+
+- El aviso «No hay arma equipada» mira si hay alguna arma en la mano, ya que la
+  lista de ataques siempre tiene el golpe sin armas.
+
+### Eliminado
+
+- Sin cambios.
+
 ## [Unreleased]
 
 ### Nuevo

@@ -413,7 +413,11 @@
           { "type": "passiveTrait", "name": "Juego de Pies Deslumbrante: Defensa sin Armadura", "description": "Tu Clase de Armadura base es 10 + tu modificador de Destreza + tu modificador de Carisma." },
           { "type": "passiveTrait", "name": "Juego de Pies Deslumbrante: Golpes Ágiles", "description": "Cuando gastás un uso de tu Inspiración Bárdica como parte de una acción, una acción adicional o una reacción, podés hacer un ataque sin armas como parte de esa misma acción, acción adicional o reacción." },
           { "type": "passiveTrait", "name": "Juego de Pies Deslumbrante: Daño Bárdico", "description": "Podés usar Destreza en vez de Fuerza para las tiradas de ataque de tus ataques sin armas. Cuando causás daño con un ataque sin armas, podés infligir daño contundente igual a una tirada de tu dado de Inspiración Bárdica más tu modificador de Destreza, en vez del daño normal del golpe. Esa tirada no gasta el dado." },
-          { "type": "unarmoredDefense", "ability": "charisma", "allowShield": false }
+          { "type": "unarmoredDefense", "ability": "charisma", "allowShield": false },
+          { "type": "weaponRule", "filter": { "unarmed": true }, "abilityOptions": ["dexterity"], "damageDie": "1d6", "requiresNoArmor": true },
+          { "type": "leveled", "minLevel": 5, "effects": [{ "type": "weaponRule", "filter": { "unarmed": true }, "abilityOptions": ["dexterity"], "damageDie": "1d8", "requiresNoArmor": true }] },
+          { "type": "leveled", "minLevel": 10, "effects": [{ "type": "weaponRule", "filter": { "unarmed": true }, "abilityOptions": ["dexterity"], "damageDie": "1d10", "requiresNoArmor": true }] },
+          { "type": "leveled", "minLevel": 15, "effects": [{ "type": "weaponRule", "filter": { "unarmed": true }, "abilityOptions": ["dexterity"], "damageDie": "1d12", "requiresNoArmor": true }] }
         ]
       },
       {

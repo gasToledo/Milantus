@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:test/test.dart';
 
+import 'support/weapon_attacks.dart';
+
 /// Personaje mínimo sobre el catálogo real: lo que se prueba acá es la mochila,
 /// así que la clase y la especie solo tienen que existir.
 Character _guerrera({
@@ -129,11 +131,11 @@ void main() {
 
       final normal = CharacterCompiler(repo)
           .compile(_guerrera(strength: 16, weapons: const ['longsword']))
-          .attacks
+          .weaponAttacks
           .single;
       final conBono = CharacterCompiler(repo)
           .compile(_guerrera(strength: 16, weapons: const ['espada-larga-1']))
-          .attacks
+          .weaponAttacks
           .single;
 
       expect(conBono.attackBonus, normal.attackBonus + 1);

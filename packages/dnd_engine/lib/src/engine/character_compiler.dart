@@ -644,6 +644,20 @@ class CharacterCompiler {
     // es también el «ninguna otra arma» de Duelo: contando por unidad, un
     // montón de jabalinas solo ya eran «otras armas» para la que se lanza.
     final wielded = InventoryOps.wielded(c, repo);
+    final armored = c.inventory
+        .where((e) => e.equipped)
+        .any((e) => InventoryOps.resolve(e, repo).armor != null);
+    // Las condiciones que dependen de lo que lleva puesto el personaje y no del
+    // arma que ataca: valen igual para la fila de cada arma y la del puño.
+    bool conditionsMet(WeaponRuleEffect r) {
+      if (r.requiresNoArmor && armored) return false;
+      if (r.onlyWielding.isEmpty) return true;
+      return wielded.every((h) => r.onlyWielding.any((f) => _weaponMatches(
+          f, h.weapon,
+          isMagic:
+              h.resolved.item?.isMagic == true || h.weapon.magicBonus != 0)));
+    }
+
     final attacks = <Attack>[
       for (final (:resolved, weapon: w, :offHand) in wielded)
         _attack(
@@ -659,11 +673,20 @@ class CharacterCompiler {
           isMagic: resolved.item?.isMagic == true || w.magicBonus != 0,
           wieldedAlone: wielded.length == 1,
           offHand: offHand,
+          conditionsMet: conditionsMet,
           activeTargetGroups: {
             for (final target in targetChoices.entryIdsByGroup.entries)
               if (target.value.contains(resolved.entry.entryId)) target.key,
           },
         ),
+      // Va siempre, tenga o no armas en la mano: es una opción de la acción de
+      // Atacar para cualquiera, y para el Monje es la principal.
+      _attack(c, unarmedStrike, mods, profBonus, builder,
+          conditionsMet: conditionsMet),
+      if (builder.weaponRules.any(
+          (r) => r.bonusActionAttack && r.filter.unarmed && conditionsMet(r)))
+        _attack(c, unarmedStrike, mods, profBonus, builder,
+            conditionsMet: conditionsMet, asBonusAction: true),
     ];
 
     final spellcastingBlocks = _spellcastingBlocks(
@@ -1558,7 +1581,10 @@ class CharacterCompiler {
       bool isMagic = false,
       Set<String> activeTargetGroups = const {},
       bool wieldedAlone = false,
-      bool offHand = false}) {
+      bool offHand = false,
+      bool Function(WeaponRuleEffect)? conditionsMet,
+      bool asBonusAction = false}) {
+    final unarmed = w.id == unarmedStrikeId;
     final normalAbilities = <Ability>[];
     if (w.isRanged) {
       normalAbilities.add(Ability.dexterity);
@@ -1569,7 +1595,8 @@ class CharacterCompiler {
     }
 
     final context = _WeaponAttackContext(
-      proficient: w.isProficientWith(b.weaponProficiencies),
+      // Todos somos competentes con el golpe sin armas (2024).
+      proficient: unarmed || w.isProficientWith(b.weaponProficiencies),
       abilityOptions: normalAbilities,
       damageTypeOptions: [w.damageType],
       extraAttacks: b.maxExtraAttack,
@@ -1586,6 +1613,7 @@ class CharacterCompiler {
       }
       if (!_weaponMatches(rule.filter, w, isMagic: isMagic)) continue;
       if (rule.aloneInOneHand && !aloneInOneHand) continue;
+      if (conditionsMet != null && !conditionsMet(rule)) continue;
       context.apply(rule);
     }
 
@@ -1603,9 +1631,15 @@ class CharacterCompiler {
         magicBonus +
         context.attackBonus;
 
-    final dice = (twoHanded && w.versatileDice != null)
+    final weaponDice = (twoHanded && w.versatileDice != null)
         ? w.versatileDice!
         : w.damageDice;
+    // «Podés tirar el dado de Artes Marciales en lugar del daño normal»: es
+    // una opción, así que se queda el mayor y nunca empeora el arma.
+    final ruleDie = context.damageDie;
+    final dice = ruleDie != null && _diceMax(ruleDie) > _diceMax(weaponDice)
+        ? ruleDie
+        : weaponDice;
 
     // 2024: la propiedad de Maestría solo se aplica con armas con las que sos
     // competente. `proficient` sale de la ficha compilada, así que una subclase
@@ -1625,8 +1659,9 @@ class CharacterCompiler {
     // Mellar (Nick) no cambia el daño: cambia la economía de acciones, porque
     // permite hacer el ataque extra dentro de la acción de Atacar.
     final nick = hasMastery && w.mastery == 'nick';
-    final action =
-        (offHand && !nick) ? AttackAction.bonusAction : AttackAction.action;
+    final action = asBonusAction || (offHand && !nick)
+        ? AttackAction.bonusAction
+        : AttackAction.action;
 
     return Attack(
       weaponId: weaponId ?? w.id,
@@ -1642,7 +1677,9 @@ class CharacterCompiler {
       damageTypeOptions: List.unmodifiable(context.damageTypeOptions),
       extraDamage: List.unmodifiable(context.extraDamage),
       spellcastingFocus: context.spellcastingFocus,
-      attacksPerAction: 1 + context.extraAttacks,
+      // El golpe de acción adicional es uno solo: Ataque Adicional multiplica
+      // la acción de Atacar, no la adicional.
+      attacksPerAction: asBonusAction ? 1 : 1 + context.extraAttacks,
       mastery: hasMastery ? w.mastery : null,
       offHand: offHand,
       action: action,
@@ -1651,6 +1688,11 @@ class CharacterCompiler {
 
   bool _weaponMatches(WeaponFilter filter, Weapon weapon,
       {required bool isMagic}) {
+    // Va primero: el golpe sin armas solo lo alcanza un filtro que lo pida, y
+    // ese filtro no alcanza ninguna arma.
+    if (filter.unarmed || weapon.id == unarmedStrikeId) {
+      return filter.unarmed && weapon.id == unarmedStrikeId;
+    }
     if (filter.magic != null && filter.magic != isMagic) return false;
     if (filter.melee != null && filter.melee != !weapon.isRanged) return false;
     if (filter.categories.isNotEmpty &&
@@ -1664,6 +1706,14 @@ class CharacterCompiler {
     if (mod == 0) return dice;
     return mod > 0 ? '$dice + $mod' : '$dice - ${mod.abs()}';
   }
+}
+
+/// Máximo de una tirada «NdM» (o de un número fijo, como el «1» del golpe
+/// sin armas). Alcanza para elegir el mayor de dos dados de un solo término.
+int _diceMax(String dice) {
+  final m = RegExp(r'^(\d+)d(\d+)$').firstMatch(dice.trim());
+  if (m == null) return int.tryParse(dice.trim()) ?? 0;
+  return int.parse(m[1]!) * int.parse(m[2]!);
 }
 
 class _TargetChoiceResolution {
@@ -1684,6 +1734,7 @@ class _WeaponAttackContext {
   int extraAttacks;
   int attackBonus = 0;
   int damageBonus = 0;
+  String? damageDie;
   final List<WeaponExtraDamage> extraDamage = [];
 
   _WeaponAttackContext({
@@ -1706,6 +1757,13 @@ class _WeaponAttackContext {
     extraAttacks = max(extraAttacks, rule.extraAttacks);
     attackBonus += rule.attackBonus;
     damageBonus += rule.damageBonus;
+    // Los tramos de Artes Marciales llegan como reglas sueltas por nivel: se
+    // queda la que da el dado mayor.
+    final die = rule.damageDie;
+    if (die != null &&
+        (damageDie == null || _diceMax(die) > _diceMax(damageDie!))) {
+      damageDie = die;
+    }
     final dice = rule.extraDamageDice;
     final type = rule.extraDamageType;
     if (dice != null && type != null) {

@@ -1220,6 +1220,397 @@
             "type": "passiveTrait",
             "name": "Artes Marciales",
             "description": "Usás Destreza para ataque y daño con armas de monje y golpes sin armas. El dado de Artes Marciales es 1d6 (1d8 a nivel 5, 1d10 a 11, 1d12 a 17). Podés hacer un golpe sin armas como acción adicional tras la acción de Ataque."
+          },
+          {
+            "type": "weaponRule",
+            "filter": {
+              "unarmed": true
+            },
+            "abilityOptions": [
+              "dexterity"
+            ],
+            "damageDie": "1d6",
+            "requiresNoArmor": true,
+            "onlyWielding": [
+              {
+                "melee": true,
+                "categories": [
+                  "simple"
+                ]
+              },
+              {
+                "melee": true,
+                "categories": [
+                  "martial"
+                ],
+                "properties": [
+                  "light"
+                ]
+              }
+            ],
+            "bonusActionAttack": true
+          },
+          {
+            "type": "weaponRule",
+            "filter": {
+              "melee": true,
+              "categories": [
+                "simple"
+              ]
+            },
+            "abilityOptions": [
+              "dexterity"
+            ],
+            "damageDie": "1d6",
+            "requiresNoArmor": true,
+            "onlyWielding": [
+              {
+                "melee": true,
+                "categories": [
+                  "simple"
+                ]
+              },
+              {
+                "melee": true,
+                "categories": [
+                  "martial"
+                ],
+                "properties": [
+                  "light"
+                ]
+              }
+            ]
+          },
+          {
+            "type": "weaponRule",
+            "filter": {
+              "melee": true,
+              "categories": [
+                "martial"
+              ],
+              "properties": [
+                "light"
+              ]
+            },
+            "abilityOptions": [
+              "dexterity"
+            ],
+            "damageDie": "1d6",
+            "requiresNoArmor": true,
+            "onlyWielding": [
+              {
+                "melee": true,
+                "categories": [
+                  "simple"
+                ]
+              },
+              {
+                "melee": true,
+                "categories": [
+                  "martial"
+                ],
+                "properties": [
+                  "light"
+                ]
+              }
+            ]
+          },
+          {
+            "type": "leveled",
+            "minLevel": 5,
+            "effects": [
+              {
+                "type": "weaponRule",
+                "filter": {
+                  "unarmed": true
+                },
+                "abilityOptions": [
+                  "dexterity"
+                ],
+                "damageDie": "1d8",
+                "requiresNoArmor": true,
+                "onlyWielding": [
+                  {
+                    "melee": true,
+                    "categories": [
+                      "simple"
+                    ]
+                  },
+                  {
+                    "melee": true,
+                    "categories": [
+                      "martial"
+                    ],
+                    "properties": [
+                      "light"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "weaponRule",
+                "filter": {
+                  "melee": true,
+                  "categories": [
+                    "simple"
+                  ]
+                },
+                "abilityOptions": [
+                  "dexterity"
+                ],
+                "damageDie": "1d8",
+                "requiresNoArmor": true,
+                "onlyWielding": [
+                  {
+                    "melee": true,
+                    "categories": [
+                      "simple"
+                    ]
+                  },
+                  {
+                    "melee": true,
+                    "categories": [
+                      "martial"
+                    ],
+                    "properties": [
+                      "light"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "weaponRule",
+                "filter": {
+                  "melee": true,
+                  "categories": [
+                    "martial"
+                  ],
+                  "properties": [
+                    "light"
+                  ]
+                },
+                "abilityOptions": [
+                  "dexterity"
+                ],
+                "damageDie": "1d8",
+                "requiresNoArmor": true,
+                "onlyWielding": [
+                  {
+                    "melee": true,
+                    "categories": [
+                      "simple"
+                    ]
+                  },
+                  {
+                    "melee": true,
+                    "categories": [
+                      "martial"
+                    ],
+                    "properties": [
+                      "light"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "leveled",
+            "minLevel": 11,
+            "effects": [
+              {
+                "type": "weaponRule",
+                "filter": {
+                  "unarmed": true
+                },
+                "abilityOptions": [
+                  "dexterity"
+                ],
+                "damageDie": "1d10",
+                "requiresNoArmor": true,
+                "onlyWielding": [
+                  {
+                    "melee": true,
+                    "categories": [
+                      "simple"
+                    ]
+                  },
+                  {
+                    "melee": true,
+                    "categories": [
+                      "martial"
+                    ],
+                    "properties": [
+                      "light"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "weaponRule",
+                "filter": {
+                  "melee": true,
+                  "categories": [
+                    "simple"
+                  ]
+                },
+                "abilityOptions": [
+                  "dexterity"
+                ],
+                "damageDie": "1d10",
+                "requiresNoArmor": true,
+                "onlyWielding": [
+                  {
+                    "melee": true,
+                    "categories": [
+                      "simple"
+                    ]
+                  },
+                  {
+                    "melee": true,
+                    "categories": [
+                      "martial"
+                    ],
+                    "properties": [
+                      "light"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "weaponRule",
+                "filter": {
+                  "melee": true,
+                  "categories": [
+                    "martial"
+                  ],
+                  "properties": [
+                    "light"
+                  ]
+                },
+                "abilityOptions": [
+                  "dexterity"
+                ],
+                "damageDie": "1d10",
+                "requiresNoArmor": true,
+                "onlyWielding": [
+                  {
+                    "melee": true,
+                    "categories": [
+                      "simple"
+                    ]
+                  },
+                  {
+                    "melee": true,
+                    "categories": [
+                      "martial"
+                    ],
+                    "properties": [
+                      "light"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "leveled",
+            "minLevel": 17,
+            "effects": [
+              {
+                "type": "weaponRule",
+                "filter": {
+                  "unarmed": true
+                },
+                "abilityOptions": [
+                  "dexterity"
+                ],
+                "damageDie": "1d12",
+                "requiresNoArmor": true,
+                "onlyWielding": [
+                  {
+                    "melee": true,
+                    "categories": [
+                      "simple"
+                    ]
+                  },
+                  {
+                    "melee": true,
+                    "categories": [
+                      "martial"
+                    ],
+                    "properties": [
+                      "light"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "weaponRule",
+                "filter": {
+                  "melee": true,
+                  "categories": [
+                    "simple"
+                  ]
+                },
+                "abilityOptions": [
+                  "dexterity"
+                ],
+                "damageDie": "1d12",
+                "requiresNoArmor": true,
+                "onlyWielding": [
+                  {
+                    "melee": true,
+                    "categories": [
+                      "simple"
+                    ]
+                  },
+                  {
+                    "melee": true,
+                    "categories": [
+                      "martial"
+                    ],
+                    "properties": [
+                      "light"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "weaponRule",
+                "filter": {
+                  "melee": true,
+                  "categories": [
+                    "martial"
+                  ],
+                  "properties": [
+                    "light"
+                  ]
+                },
+                "abilityOptions": [
+                  "dexterity"
+                ],
+                "damageDie": "1d12",
+                "requiresNoArmor": true,
+                "onlyWielding": [
+                  {
+                    "melee": true,
+                    "categories": [
+                      "simple"
+                    ]
+                  },
+                  {
+                    "melee": true,
+                    "categories": [
+                      "martial"
+                    ],
+                    "properties": [
+                      "light"
+                    ]
+                  }
+                ]
+              }
+            ]
           }
         ]
       },
@@ -1345,6 +1736,15 @@
             "type": "passiveTrait",
             "name": "Golpes Potenciados",
             "description": "Siempre que inflijas daño con un ataque sin armas, podés elegir entre causar daño de fuerza o su tipo de daño normal."
+          },
+          {
+            "type": "weaponRule",
+            "filter": {
+              "unarmed": true
+            },
+            "damageTypeOptions": [
+              "force"
+            ]
           }
         ]
       },
@@ -3925,6 +4325,14 @@
             "type": "weaponRule",
             "filter": {
               "melee": true
+            },
+            "extraDamageDice": "1d8",
+            "extraDamageType": "radiant"
+          },
+          {
+            "type": "weaponRule",
+            "filter": {
+              "unarmed": true
             },
             "extraDamageDice": "1d8",
             "extraDamageType": "radiant"

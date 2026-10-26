@@ -185,6 +185,13 @@ sealed class Effect {
           aloneInOneHand: json['aloneInOneHand'] as bool? ?? false,
           extraDamageDice: json['extraDamageDice'] as String?,
           extraDamageType: json['extraDamageType'] as String?,
+          damageDie: json['damageDie'] as String?,
+          requiresNoArmor: json['requiresNoArmor'] as bool? ?? false,
+          onlyWielding: [
+            for (final f in json['onlyWielding'] as List? ?? const [])
+              WeaponFilter.fromJson((f as Map).cast<String, dynamic>()),
+          ],
+          bonusActionAttack: json['bonusActionAttack'] as bool? ?? false,
         ),
       'featureChoice' => FeatureChoiceEffect(
           groupId: json['groupId'] as String,
@@ -1166,33 +1173,46 @@ class HeroicInspirationOnLongRestEffect extends Effect {
 /// [CharacterCompiler] lo cruza con cada arma equipada. Los campos nulos o las
 /// listas vacías significan "sin restricción", de modo que el mismo mecanismo
 /// sirve tanto para todas las armas mágicas como para una familia concreta.
+///
+/// El golpe sin armas **no es un arma** y ningún filtro lo alcanza salvo que
+/// lo pida con [unarmed]. Es la regla 2024 y es también lo seguro: Duelo o
+/// Tiro con Arco no pueden empezar a sumarle al puño solo porque el filtro
+/// dice «cuerpo a cuerpo».
 class WeaponFilter {
   final bool? magic;
   final bool? melee;
   final List<String> categories;
   final List<String> properties;
 
+  /// `true` apunta **solo** al golpe sin armas; lo demás del filtro se ignora.
+  /// Para «armas cuerpo a cuerpo y golpes sin armas» se declaran dos reglas.
+  final bool unarmed;
+
   const WeaponFilter({
     this.magic,
     this.melee,
     this.categories = const [],
     this.properties = const [],
+    this.unarmed = false,
   });
 
   bool get isEmpty =>
       magic == null &&
       melee == null &&
       categories.isEmpty &&
-      properties.isEmpty;
+      properties.isEmpty &&
+      !unarmed;
 
   Map<String, dynamic> toJson() => {
         if (magic != null) 'magic': magic,
         if (melee != null) 'melee': melee,
         if (categories.isNotEmpty) 'categories': categories,
         if (properties.isNotEmpty) 'properties': properties,
+        if (unarmed) 'unarmed': true,
       };
 
   factory WeaponFilter.fromJson(Map<String, dynamic>? json) => WeaponFilter(
+        unarmed: json?['unarmed'] as bool? ?? false,
         magic: json?['magic'] as bool?,
         melee: json?['melee'] as bool?,
         categories: (json?['categories'] as List? ?? const [])
@@ -1273,6 +1293,26 @@ class WeaponRuleEffect extends Effect {
   final String? extraDamageDice;
   final String? extraDamageType;
 
+  /// Dado que reemplaza al del arma **si es mayor**: el de Artes Marciales
+  /// (1d6 → 1d12) o el 1d4 del Matón de Taberna. Si varias reglas lo dan, gana
+  /// el mayor; los tramos por nivel se declaran con `leveled`.
+  final String? damageDie;
+
+  /// La regla se apaga con armadura puesta o escudo empuñado: Artes Marciales
+  /// y el Daño Bárdico de la Danza.
+  final bool requiresNoArmor;
+
+  /// La regla solo vale si **cada** arma en la mano coincide con alguno de
+  /// estos filtros; con las manos vacías vale siempre. Es el «desarmado o
+  /// empuñando únicamente armas de monje» de Artes Marciales: con una espada
+  /// larga en la mano, ni el puño recibe el dado. Vacío = sin condición.
+  final List<WeaponFilter> onlyWielding;
+
+  /// Suma una fila aparte para atacar como acción adicional: el golpe sin
+  /// armas extra de Artes Marciales. Solo tiene sentido con
+  /// `filter.unarmed`, que es lo único que no depende de qué hay en la mano.
+  final bool bonusActionAttack;
+
   const WeaponRuleEffect({
     this.targetGroupId,
     this.filter = const WeaponFilter(),
@@ -1286,6 +1326,10 @@ class WeaponRuleEffect extends Effect {
     this.aloneInOneHand = false,
     this.extraDamageDice,
     this.extraDamageType,
+    this.damageDie,
+    this.requiresNoArmor = false,
+    this.onlyWielding = const [],
+    this.bonusActionAttack = false,
   });
 
   @override
@@ -1305,6 +1349,11 @@ class WeaponRuleEffect extends Effect {
         if (aloneInOneHand) 'aloneInOneHand': true,
         if (extraDamageDice != null) 'extraDamageDice': extraDamageDice,
         if (extraDamageType != null) 'extraDamageType': extraDamageType,
+        if (damageDie != null) 'damageDie': damageDie,
+        if (requiresNoArmor) 'requiresNoArmor': true,
+        if (onlyWielding.isNotEmpty)
+          'onlyWielding': [for (final f in onlyWielding) f.toJson()],
+        if (bonusActionAttack) 'bonusActionAttack': true,
       };
 }
 

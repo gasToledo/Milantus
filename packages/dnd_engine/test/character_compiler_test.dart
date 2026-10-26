@@ -1,6 +1,8 @@
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:test/test.dart';
 
+import 'support/weapon_attacks.dart';
+
 /// Personaje de referencia: Sagan "The Red" — Humano, Guerrero, Soldado.
 /// Baseline de reglas 2024 (trasfondo da +característica y dote de origen;
 /// Guerrero da Maestría de Armas).
@@ -305,8 +307,8 @@ void main() {
     });
 
     test('ataque con espada larga (maestría Sap)', () {
-      expect(s.attacks, hasLength(1));
-      final a = s.attacks.single;
+      expect(s.weaponAttacks, hasLength(1));
+      final a = s.weaponAttacks.single;
       expect(a.name, 'Espada larga');
       expect(a.attackBonus, 5); // STR(3) + competencia(2)
       expect(a.damage, '1d8 + 3');
@@ -366,7 +368,7 @@ void main() {
     });
 
     test('ataque con competencia 3 + Fuerza 4', () {
-      expect(s.attacks.single.attackBonus, 7);
+      expect(s.weaponAttacks.single.attackBonus, 7);
     });
   });
 
@@ -380,7 +382,7 @@ void main() {
       expect(b.armorClass, a.armorClass);
       expect(
           b.abilityScores[Ability.strength], a.abilityScores[Ability.strength]);
-      expect(b.attacks.single.mastery, a.attacks.single.mastery);
+      expect(b.weaponAttacks.single.mastery, a.weaponAttacks.single.mastery);
     });
   });
 
@@ -472,7 +474,7 @@ void main() {
         );
 
     test('Sagan conserva la maestría: es competente con marciales', () {
-      final a = compiler.compile(sagan()).attacks.single;
+      final a = compiler.compile(sagan()).weaponAttacks.single;
       expect(a.mastery, 'sap');
     });
 
@@ -480,7 +482,7 @@ void main() {
       // La espada larga es marcial y no figura en la lista del Pícaro.
       final s = compiler.compile(rogue('longsword'));
       expect(s.weaponProficiencies, isNot(contains('martial')));
-      expect(s.attacks.single.mastery, isNull);
+      expect(s.weaponAttacks.single.mastery, isNull);
     });
 
     test('advierte cuando la maestría elegida no se aplica', () {
@@ -492,7 +494,7 @@ void main() {
       // El estoque es marcial pero está listado por id en el Pícaro: el chequeo
       // mira la ficha compilada, no solo la categoría.
       final s = compiler.compile(rogue('rapier'));
-      expect(s.attacks.single.mastery, 'vex');
+      expect(s.weaponAttacks.single.mastery, 'vex');
       final warnings = CharacterValidator(repo).validate(rogue('rapier'));
       expect(warnings.map((w) => w.code),
           isNot(contains('mastery_not_proficient')));
@@ -546,7 +548,7 @@ void main() {
 
     // `singleWhere`: con dos armas iguales, una sola puede ir a la secundaria.
     Attack offHandAttack(ComputedSheet s) =>
-        s.attacks.singleWhere((a) => a.offHand);
+        s.weaponAttacks.singleWhere((a) => a.offHand);
 
     test('dos dagas: una en la principal y otra en la secundaria', () {
       // La marca es por arma y no por unidad. Marcar «daga» mandaba las dos a

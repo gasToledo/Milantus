@@ -1,6 +1,8 @@
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:test/test.dart';
 
+import 'support/weapon_attacks.dart';
+
 Character _character({
   String classId = 'fighter',
   int level = 1,
@@ -110,7 +112,7 @@ void main() {
       level: 2,
       plans: const ['returning-weapon', 'repeating-shot'],
     );
-    expect(CharacterCompiler(repo).compile(c).attacks, isEmpty);
+    expect(CharacterCompiler(repo).compile(c).weaponAttacks, isEmpty);
     c = InventoryOps.replicateMagicItem(
       c,
       'returning-weapon',

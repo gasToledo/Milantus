@@ -329,7 +329,8 @@ class CharacterValidator {
       }
     }
 
-    if (sheet.attacks.isEmpty) {
+    // El golpe sin armas está siempre, así que se mira si hay algún arma.
+    if (sheet.attacks.every((a) => a.baseWeaponId == unarmedStrikeId)) {
       w.add(ValidationWarning(
           'no_weapon',
           localized(

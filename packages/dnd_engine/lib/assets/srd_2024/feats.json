@@ -1225,6 +1225,13 @@
         "type": "passiveTrait",
         "name": "Matón de Taberna",
         "description": "Tu ataque sin armas causa 1d4 más tu modificador por Fuerza en daño contundente, y podés repetir un 1 en el dado de daño. Competencia con armas improvisadas. Al acertar con un ataque sin armas en tu turno podés empujar al objetivo 5 pies, una vez por turno."
+      },
+      {
+        "type": "weaponRule",
+        "filter": {
+          "unarmed": true
+        },
+        "damageDie": "1d4"
       }
     ]
   },
@@ -2176,6 +2183,13 @@
         "type": "passiveTrait",
         "name": "Combate sin Armas",
         "description": "Tus ataques sin armas causan 1d6 más Fuerza, o 1d8 si no empuñás armas ni llevás escudo. Al inicio de tu turno podés causar 1d4 de daño contundente a una criatura agarrada por vos."
+      },
+      {
+        "type": "weaponRule",
+        "filter": {
+          "unarmed": true
+        },
+        "damageDie": "1d6"
       }
     ],
     "prerequisite": {

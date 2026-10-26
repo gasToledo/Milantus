@@ -1,6 +1,8 @@
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:test/test.dart';
 
+import 'support/weapon_attacks.dart';
+
 /// Personaje de prueba parametrizable para las clases marciales nuevas.
 Character _char({
   required String classId,
@@ -178,9 +180,9 @@ void main() {
       final conGreatsword = compiler.compile(
           _char(classId: 'rogue', level: 1, hp: [8], weapons: ['greatsword']));
       // Estoque: finesse → mayor de FUE(+3)/DES(+2) = +3. Competente → +2 comp = 5.
-      expect(conRapier.attacks.single.attackBonus, 5);
+      expect(conRapier.weaponAttacks.single.attackBonus, 5);
       // Mandoble: FUE(+3), sin competencia → sin bono de competencia = 3.
-      expect(conGreatsword.attacks.single.attackBonus, 3);
+      expect(conGreatsword.weaponAttacks.single.attackBonus, 3);
     });
 
     test('sin Ataque Adicional a nivel 5', () {
@@ -298,6 +300,90 @@ void main() {
           classId: 'monk', level: 2, hp: [8, 5], scores: scores, shield: true));
       // Anulada por el escudo: 10 + DES(3) + escudo(2), sin SAB.
       expect(conEscudo.armorClass, 15);
+    });
+
+    group('Artes Marciales', () {
+      // DES 16 (+3) supera a FUE 10 (+0): si el Monje no pudiera usar
+      // Destreza, el ataque saldría con +0.
+      final agil = {
+        Ability.strength: 10,
+        Ability.dexterity: 16,
+        Ability.constitution: 12,
+        Ability.intelligence: 10,
+        Ability.wisdom: 14,
+        Ability.charisma: 10,
+      };
+      Attack golpe(ComputedSheet s, AttackAction action) =>
+          s.attacks.singleWhere(
+              (a) => a.baseWeaponId == unarmedStrikeId && a.action == action);
+
+      test('cualquiera tiene el golpe sin armas: 1 + Fuerza, con competencia',
+          () {
+        final s =
+            compiler.compile(_char(classId: 'fighter', level: 1, hp: [10]));
+        final g = golpe(s, AttackAction.action);
+        expect(g.damage, '1 + 3'); // FUE 16
+        expect(g.attackBonus, 3 + s.proficiencyBonus);
+        // Sin Artes Marciales no hay golpe de acción adicional.
+        expect(s.attacks.where((a) => a.action == AttackAction.bonusAction),
+            isEmpty);
+      });
+
+      test('usa Destreza y el dado del nivel, y suma el golpe adicional', () {
+        final l1 = compiler
+            .compile(_char(classId: 'monk', level: 1, hp: [8], scores: agil));
+        expect(golpe(l1, AttackAction.action).damage, '1d6 + 3');
+        expect(golpe(l1, AttackAction.action).abilityUsed, Ability.dexterity);
+        expect(golpe(l1, AttackAction.bonusAction).damage, '1d6 + 3');
+
+        final l5 = compiler.compile(_char(
+            classId: 'monk', level: 5, hp: [8, 5, 5, 5, 5], scores: agil));
+        expect(golpe(l5, AttackAction.action).damage, '1d8 + 3');
+        expect(golpe(l5, AttackAction.action).attacksPerAction, 2);
+        // Ataque Adicional multiplica la acción de Atacar, no la adicional.
+        expect(golpe(l5, AttackAction.bonusAction).attacksPerAction, 1);
+      });
+
+      test('las armas de monje también usan Destreza y el dado si es mayor',
+          () {
+        final s = compiler.compile(_char(
+            classId: 'monk',
+            level: 5,
+            hp: [8, 5, 5, 5, 5],
+            scores: agil,
+            weapons: ['spear']));
+        final lanza = s.weaponAttacks.single;
+        expect(lanza.abilityUsed, Ability.dexterity);
+        expect(lanza.damage, '1d8 + 3'); // la lanza es 1d6
+      });
+
+      test('con armadura se apaga', () {
+        final s = compiler.compile(_char(
+            classId: 'monk',
+            level: 5,
+            hp: [8, 5, 5, 5, 5],
+            scores: agil,
+            armorId: 'leather',
+            weapons: ['spear']));
+        expect(golpe(s, AttackAction.action).damage, '1');
+        expect(s.weaponAttacks.single.abilityUsed, Ability.strength);
+        expect(s.attacks.where((a) => a.action == AttackAction.bonusAction),
+            isEmpty);
+      });
+
+      test('con un arma que no es de monje en la mano se apaga', () {
+        // La espada larga es marcial y no ligera: «empuñar únicamente armas
+        // de monje» deja de cumplirse y el rasgo se apaga también para el puño.
+        final s = compiler.compile(_char(
+            classId: 'monk',
+            level: 5,
+            hp: [8, 5, 5, 5, 5],
+            scores: agil,
+            weapons: ['longsword']));
+        expect(golpe(s, AttackAction.action).damage, '1');
+        expect(s.attacks.where((a) => a.action == AttackAction.bonusAction),
+            isEmpty);
+      });
     });
   });
 

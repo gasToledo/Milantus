@@ -53,8 +53,11 @@ void main() {
     expect(sheet.armorClass, 13); // cuero 11 + DEX 1 + Defensa 1
     expect(sheet.weaponMasterySlots, 3);
     expect(sheet.passivePerception, 13);
-    expect(sheet.attacks.single.attackBonus, 5);
-    expect(sheet.attacks.single.mastery, 'sap');
+    final espada = sheet.attacks.firstWhere(
+      (a) => a.baseWeaponId != unarmedStrikeId,
+    );
+    expect(espada.attackBonus, 5);
+    expect(espada.mastery, 'sap');
     expect(character.name, 'Sagan "The Red"');
   });
 
@@ -525,11 +528,11 @@ void main() {
       }
       // Dos dagas: el pícaro las lleva en ambas manos.
       final sheet = CharacterCompiler(repo).compile(d.build());
-      expect(sheet.attacks, hasLength(2));
-      expect(
-        sheet.attacks.every((a) => a.name.toLowerCase().contains('daga')),
-        isTrue,
+      final armas = sheet.attacks.where(
+        (a) => a.baseWeaponId != unarmedStrikeId,
       );
+      expect(armas, hasLength(2));
+      expect(armas.every((a) => a.name.toLowerCase().contains('daga')), isTrue);
     });
 
     test('un borrador con el formato viejo de un arma se sigue leyendo', () {

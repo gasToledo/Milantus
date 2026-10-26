@@ -1291,6 +1291,25 @@ const coinsPerPound = 50;
 /// Espacios de sintonización de un personaje (capítulo 6, "Sintonización").
 const attunementSlots = 3;
 
+/// `Attack.baseWeaponId` del golpe sin armas, que todo personaje tiene.
+///
+/// No vive en el catálogo de armas porque no es un arma: si estuviera ahí se
+/// podría comprar, equipar y elegir para la maestría. El compilador lo arma con
+/// [unarmedStrike].
+const unarmedStrikeId = 'unarmed-strike';
+
+/// El golpe sin armas 2024: 1 + mod. de Fuerza contundente. El «1» es un dado
+/// sin caras a propósito: así una regla con `damageDie` (Artes Marciales) lo
+/// reemplaza por la misma comparación que usa con cualquier arma.
+Weapon get unarmedStrike => Weapon(
+      id: unarmedStrikeId,
+      name: localized('Golpe sin armas', 'Unarmed Strike'),
+      source: ContentSource.srd2024,
+      category: 'simple',
+      damageDice: '1',
+      damageType: 'bludgeoning',
+    );
+
 /// Peso legible en libras, conservando centésimas (las monedas pesan de a
 /// 1/50 lb y el dardo pesa 1/4 lb) pero sin ceros finales.
 String formatPounds(double value) =>

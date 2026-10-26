@@ -1,6 +1,8 @@
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:test/test.dart';
 
+import 'support/weapon_attacks.dart';
+
 void main() {
   late ContentRepository repo;
   late CharacterCompiler compiler;
@@ -148,7 +150,7 @@ void main() {
       );
 
   test('sin reglas nuevas conserva el cálculo normal del arma', () {
-    final attack = compiler.compile(wizard()).attacks.single;
+    final attack = compiler.compile(wizard()).weaponAttacks.single;
     expect(attack.abilityUsed, Ability.strength);
     expect(attack.proficient, isFalse);
     expect(attack.attackBonus, 0, reason: 'FUE -1 + arma mágica +1');
@@ -159,7 +161,8 @@ void main() {
   });
 
   test('una regla estática se aplica por filtro, no por clase', () {
-    final attack = compiler.compile(wizard(withRule: true)).attacks.single;
+    final attack =
+        compiler.compile(wizard(withRule: true)).weaponAttacks.single;
     expect(attack.abilityUsed, Ability.intelligence);
     expect(attack.proficient, isTrue);
     expect(attack.attackBonus, 7, reason: 'INT +4 + competencia +2 + magia +1');
@@ -169,8 +172,10 @@ void main() {
   });
 
   test('el filtro mágico no se derrama sobre un arma mundana', () {
-    final attack =
-        compiler.compile(wizard(withRule: true, magic: false)).attacks.single;
+    final attack = compiler
+        .compile(wizard(withRule: true, magic: false))
+        .weaponAttacks
+        .single;
     expect(attack.abilityUsed, Ability.strength);
     expect(attack.proficient, isFalse);
     expect(attack.attackBonus, -1);
@@ -214,9 +219,9 @@ void main() {
   test('una regla dirigida solo modifica el ejemplar elegido', () {
     final sheet = compiler.compile(targetedWizard(targets: ['sword-b']));
     final first =
-        sheet.attacks.singleWhere((a) => a.sourceEntryId == 'sword-a');
+        sheet.weaponAttacks.singleWhere((a) => a.sourceEntryId == 'sword-a');
     final selected =
-        sheet.attacks.singleWhere((a) => a.sourceEntryId == 'sword-b');
+        sheet.weaponAttacks.singleWhere((a) => a.sourceEntryId == 'sword-b');
 
     expect(first.abilityUsed, Ability.strength);
     expect(first.proficient, isFalse);
@@ -236,9 +241,9 @@ void main() {
   test('un objetivo huérfano se ignora sin derramar la regla', () {
     final sheet = compiler.compile(targetedWizard(targets: ['no-existe']));
 
-    expect(sheet.attacks.every((a) => !a.proficient), isTrue);
-    expect(
-        sheet.attacks.every((a) => a.abilityUsed == Ability.strength), isTrue);
+    expect(sheet.weaponAttacks.every((a) => !a.proficient), isTrue);
+    expect(sheet.weaponAttacks.every((a) => a.abilityUsed == Ability.strength),
+        isTrue);
     expect(sheet.targetChoiceSlots.single.chosenEntryIds, isEmpty);
     expect(sheet.targetChoiceSlots.single.pending, 1);
   });
@@ -320,7 +325,7 @@ void main() {
         'rapier',
         repo,
       );
-      final attack = compiler.compile(linked).attacks.single;
+      final attack = compiler.compile(linked).weaponAttacks.single;
 
       expect(attack.baseWeaponId, 'rapier');
       expect(attack.proficient, isTrue);
@@ -337,7 +342,7 @@ void main() {
       final withoutPact = linked.copyWith(
         featureChoices: const {},
       );
-      final ordinaryAttack = compiler.compile(withoutPact).attacks.single;
+      final ordinaryAttack = compiler.compile(withoutPact).weaponAttacks.single;
       expect(ordinaryAttack.proficient, isFalse);
       expect(ordinaryAttack.abilityUsed, Ability.dexterity);
       expect(ordinaryAttack.attackBonus, 2);
@@ -358,7 +363,7 @@ void main() {
         'pact-of-the-blade',
         'thirsting-blade',
       ]));
-      expect(thirsty.attacks.single.attacksPerAction, 2);
+      expect(thirsty.weaponAttacks.single.attacksPerAction, 2);
       expect(thirsty.attacksPerAction, 1);
 
       final devouring = compiler.compile(linkedAt(12, const [
@@ -366,7 +371,7 @@ void main() {
         'thirsting-blade',
         'devouring-blade',
       ]));
-      expect(devouring.attacks.single.attacksPerAction, 3);
+      expect(devouring.weaponAttacks.single.attacksPerAction, 3);
       expect(devouring.attacksPerAction, 1);
     });
   });

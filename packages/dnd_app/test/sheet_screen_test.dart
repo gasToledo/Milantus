@@ -434,7 +434,10 @@ void main() {
       expect(find.text('Arma de pacto (1/1)'), findsOneWidget);
       expect(find.text('Arma de pacto'), findsOneWidget);
 
-      final attack = CharacterCompiler(repo).compile(stored).attacks.single;
+      final attack = CharacterCompiler(repo)
+          .compile(stored)
+          .attacks
+          .singleWhere((a) => a.baseWeaponId != unarmedStrikeId);
       expect(attack.proficient, isTrue);
       expect(attack.abilityUsed, Ability.charisma);
     });
