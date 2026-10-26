@@ -123,9 +123,12 @@ void main() {
     final c = barbaro(1, inventory: const [hacha]);
     c.combat.currentHp = 10;
     CombatOps.activateMode(c.combat, compiler.compile(c), 'rage');
-    // Aturdido incluye Incapacitado (SRD 5.2.1).
+    CombatOps.startConcentration(c.combat, 'Bendición');
+    // Aturdido incluye Incapacitado (SRD 5.2.1): termina la Furia y se pierde
+    // la concentración.
     CombatOps.setCondition(c.combat, 'stunned', true);
     expect(c.combat.activeModes, isEmpty);
+    expect(c.combat.concentratingOn, isNull);
 
     final sheet = compiler.compile(c);
     expect(sheet.activeModes.single.blockedBy, ActiveModeBlock.incapacitated);
@@ -135,14 +138,18 @@ void main() {
     expect(compiler.compile(c).activeModes.single.available, isTrue);
   });
 
-  test('termina sola al caer a 0 PG y al descansar', () {
+  test(
+      'termina sola al caer a 0 PG, que además corta la concentración, y al descansar',
+      () {
     final c = barbaro(1, inventory: const [hacha]);
     c.combat.currentHp = 5;
     final sheet = compiler.compile(c);
 
     CombatOps.activateMode(c.combat, sheet, 'rage');
+    CombatOps.startConcentration(c.combat, 'Bendición');
     CombatOps.applyDamage(c.combat, 10);
     expect(c.combat.activeModes, isEmpty);
+    expect(c.combat.concentratingOn, isNull);
 
     c.combat.currentHp = 5;
     CombatOps.activateMode(c.combat, sheet, 'rage');

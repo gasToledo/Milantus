@@ -276,6 +276,17 @@ void main() {
     await tester.pumpAndSettle();
     expect(barbaro.combat.activeModes, isEmpty);
     expect(find.textContaining('+2 al daño con FUE'), findsNothing);
+
+    // Aturdido incapacita: la placa lo dice y no se puede prender. Al
+    // quitarlo vuelve a «Activar» sin recargar la ficha.
+    await tester.tap(find.text('Aturdido'));
+    await tester.pumpAndSettle();
+    expect(find.text('Incapacitado'), findsWidgets);
+    expect(find.text('Activar'), findsNothing);
+    await tester.tap(find.text('Aturdido'));
+    await tester.pumpAndSettle();
+    expect(find.text('Activar'), findsOneWidget);
+
     // Deja salir el guardado diferido de la ficha.
     await tester.pump(const Duration(seconds: 1));
     expect(tester.takeException(), isNull);

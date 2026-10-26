@@ -113,25 +113,29 @@ class _SheetScreenState extends State<SheetScreen> {
   // `ContentRepository.revision`): la ficha trae nombres del catálogo.
   Character? _sheetFor;
   int? _sheetRevision;
-  String? _sheetModes;
+  String? _sheetCombatKey;
   ComputedSheet? _sheetCache;
   ComputedSheet get sheet {
-    // Los estados activables (Furia) sí pasan por el compilador —sus efectos
-    // son fuentes como cualquier rasgo—, pero prenderlos muta el estado de
-    // combate in situ, como la Forma Salvaje, y no produce un _c nuevo. Por
-    // eso entran en la clave de la caché.
-    final modes =
-        (_c.combat.activeModes.entries.toList()
-              ..sort((a, b) => a.key.compareTo(b.key)))
-            .map((e) => '${e.key}=${e.value}')
-            .join(',');
+    // Dos cosas del estado de combate sí pasan por el compilador y lo mutan
+    // in situ, sin producir un _c nuevo: los estados activables (la Furia es
+    // una fuente como cualquier rasgo) y las condiciones (incapacitado
+    // bloquea prenderla). Las dos entran en la clave de la caché; sin las
+    // condiciones, quitar Incapacitado dejaba la placa bloqueada hasta
+    // recargar.
+    final combatKey = [
+      ...(_c.combat.activeModes.entries.toList()
+            ..sort((a, b) => a.key.compareTo(b.key)))
+          .map((e) => '${e.key}=${e.value}'),
+      '|',
+      ...(_c.combat.conditions.toList()..sort()),
+    ].join(',');
     if (!identical(_sheetFor, _c) ||
         _sheetRevision != repo.revision ||
-        _sheetModes != modes) {
+        _sheetCombatKey != combatKey) {
       _sheetCache = CharacterCompiler(repo).compile(_c);
       _sheetFor = _c;
       _sheetRevision = repo.revision;
-      _sheetModes = modes;
+      _sheetCombatKey = combatKey;
     }
     // La Forma Salvaje se aplica encima y no se cachea: la caché va por
     // identidad de _c, y transformarse muta el estado de combate in situ sin

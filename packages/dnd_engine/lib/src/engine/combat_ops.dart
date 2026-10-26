@@ -36,13 +36,10 @@ class CombatOps {
     final next = _absorbDamage(c.currentHp, c.tempHp, amount);
     c.currentHp = next.hp;
     c.tempHp = next.tempHp;
-    // A 0 PG quedás Incapacitado, y eso termina la Forma Salvaje y la Furia.
-    // Va acá y no en la pantalla porque el daño entra por varios lados y una
-    // revisión por cada uno es una revisión que alguno se olvida.
-    if (c.currentHp <= 0) {
-      c.wildShapeCreatureId = null;
-      c.activeModes.clear();
-    }
+    // A 0 PG quedás Inconsciente, que incluye Incapacitado. Va acá y no en
+    // la pantalla porque el daño entra por varios lados y una revisión por
+    // cada uno es una revisión que alguno se olvida.
+    if (c.currentHp <= 0) _incapacitate(c);
   }
 
   /// Cura PG hasta el máximo. Curar desde 0 o menos estabiliza y limpia las
@@ -358,9 +355,8 @@ class CombatOps {
   static bool isIncapacitated(CombatState c) =>
       c.conditions.any(incapacitatingConditions.contains);
 
-  /// Marca o quita un estado del personaje. Uno que incapacita termina la
-  /// Forma Salvaje y los estados activables (la Furia dice «termina si
-  /// recibes el estado de incapacitado»), igual que caer a 0 PG.
+  /// Marca o quita un estado del personaje. Uno que incapacita hace lo mismo
+  /// que caer a 0 PG: ver [_incapacitate].
   ///
   /// Va acá y no en los chips de la ficha por lo mismo que el daño: el estado
   /// puede entrar por más de un lado, y la regla tiene que valer en todos.
@@ -370,10 +366,20 @@ class CombatOps {
       return;
     }
     c.conditions.add(id);
-    if (incapacitatingConditions.contains(id)) {
-      c.wildShapeCreatureId = null;
-      c.activeModes.clear();
-    }
+    if (incapacitatingConditions.contains(id)) _incapacitate(c);
+  }
+
+  /// Lo que termina al quedar incapacitado (SRD 5.2.1): la Forma Salvaje, los
+  /// estados activables («la Furia termina si recibes el estado de
+  /// incapacitado») y la concentración («pierdes la concentración»), que se
+  /// lleva a los compañeros que la sostenían.
+  ///
+  /// Quitar el estado después no devuelve nada: el conjuro terminó, como en
+  /// la mesa.
+  static void _incapacitate(CombatState c) {
+    c.wildShapeCreatureId = null;
+    c.activeModes.clear();
+    endConcentration(c);
   }
 
   /// Prende el estado activable [modeId] (la Furia), con la [variant] elegida

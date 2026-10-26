@@ -869,7 +869,10 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Marcar Incapacitado, o un estado que lo incluye (Paralizado, Petrificado,
   Aturdido, Inconsciente), termina la Furia y la Forma Salvaje, y la Furia no
-  se puede volver a prender mientras dure.
+  se puede volver a prender mientras dure. Quitarlo vuelve a habilitarla sin
+  recargar la ficha.
+- Quedar incapacitado o caer a 0 PG corta la concentración, y con ella se van
+  los compañeros invocados que la sostenían.
 
 ### Eliminado
 
