@@ -785,6 +785,9 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   Instinto Salvaje, Atleta Sobresaliente y otras).
 - Aprendiz de Mucho: el Bardo suma la mitad de su bonificador por competencia
   a las habilidades en las que no es competente, Percepción pasiva incluida.
+- El tope de objetos sintonizados sube con los rasgos que lo dicen: el
+  Artífice llega a 4, 5 y 6 y el Ladrón a 4. El inventario y el aviso de
+  exceso usan el tope del personaje.
 
 ### Modificado
 

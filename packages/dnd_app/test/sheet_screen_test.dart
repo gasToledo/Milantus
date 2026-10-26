@@ -285,7 +285,7 @@ void main() {
     expect(find.text('CARGA'), findsOneWidget);
     expect(find.text('SINTONIZACIÓN'), findsOneWidget);
     // Los cupos libres se ven vacíos, no contados: «0 / 3» no decía con qué.
-    expect(find.text('Cupo libre'), findsNWidgets(attunementSlots));
+    expect(find.text('Cupo libre'), findsNWidgets(baseAttunementSlots));
     // La ficha de demostración se arma en código y no toca `inventory`, así
     // que su arma y su armadura equipadas llegan a la lista por derivación.
     final sword = character.inventory.firstWhere(

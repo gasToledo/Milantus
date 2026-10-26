@@ -919,13 +919,13 @@ class CharacterValidator {
     }
 
     final attuned = InventoryOps.attunedCount(c, repo);
-    if (attuned > attunementSlots) {
+    final slots = sheet.attunementSlots;
+    if (attuned > slots) {
       w.add(ValidationWarning(
         'attunement_over_limit',
         localized(
-          'Tenés $attuned objetos sintonizados y solo podés mantener '
-              '$attunementSlots.',
-          'You have $attuned attuned items and can only keep $attunementSlots.',
+          'Tenés $attuned objetos sintonizados y solo podés mantener $slots.',
+          'You have $attuned attuned items and can only keep $slots.',
         ),
       ));
     }

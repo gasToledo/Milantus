@@ -1976,7 +1976,8 @@
         "name": "Usar Dispositivo Mágico",
         "description": "Cuatro sintonizaciones, cargas que a veces no se gastan y uso fiable de pergaminos.",
         "effects": [
-          { "type": "passiveTrait", "name": "Usar Dispositivo Mágico", "description": "Sintonización: podés sintonizarte con hasta cuatro objetos mágicos a la vez. Cargas: siempre que uses una propiedad de objeto mágico que gaste cargas, tirás 1d6 y con un 6 usás la propiedad sin gastarlas. Pergaminos: podés usar cualquier pergamino de conjuro empleando Inteligencia como aptitud mágica; si el conjuro es un truco o de nivel 1 lo lanzás de forma fiable, y si es de mayor nivel primero tenés que superar una prueba de Inteligencia (Arcanos) con CD 10 más el nivel del conjuro, o el pergamino se desintegra." }
+          { "type": "passiveTrait", "name": "Usar Dispositivo Mágico", "description": "Sintonización: podés sintonizarte con hasta cuatro objetos mágicos a la vez. Cargas: siempre que uses una propiedad de objeto mágico que gaste cargas, tirás 1d6 y con un 6 usás la propiedad sin gastarlas. Pergaminos: podés usar cualquier pergamino de conjuro empleando Inteligencia como aptitud mágica; si el conjuro es un truco o de nivel 1 lo lanzás de forma fiable, y si es de mayor nivel primero tenés que superar una prueba de Inteligencia (Arcanos) con CD 10 más el nivel del conjuro, o el pergamino se desintegra." },
+          { "type": "attunementSlots", "count": 4 }
         ]
       },
       {

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import '../domain/ability.dart';
 import '../domain/computed_sheet.dart';
+import '../domain/content.dart';
 import '../domain/effects.dart';
 
 /// Acumulador mutable que los [Effect] van poblando. El [CharacterCompiler]
@@ -157,6 +158,7 @@ class SheetBuilder {
   final List<WeaponRuleEffect> weaponRules = [];
 
   int weaponMasterySlots = 0;
+  int attunementSlotCount = baseAttunementSlots;
   int maxExtraAttack = 0;
 
   /// El ataque de mano secundaria conserva el modificador de característica al
@@ -439,6 +441,8 @@ class SheetBuilder {
         );
       case WeaponMasterySlotsEffect(:final count):
         if (count > weaponMasterySlots) weaponMasterySlots = count;
+      case AttunementSlotsEffect(:final count):
+        if (count > attunementSlotCount) attunementSlotCount = count;
       case ExtraAttackEffect(:final extra):
         if (extra > maxExtraAttack) maxExtraAttack = extra;
       case BonusMaxHpFlatEffect(:final amount):

@@ -338,7 +338,8 @@ extension _SheetInventorySection on _SheetScreenState {
         if (e.attuned && repo.item(e.itemId)?.requiresAttunement == true)
           InventoryOps.resolve(e, repo).name,
     ];
-    final over = attuned.length > attunementSlots;
+    final slots = sheet.attunementSlots;
+    final over = attuned.length > slots;
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
       decoration: BoxDecoration(
@@ -363,7 +364,7 @@ extension _SheetInventorySection on _SheetScreenState {
                 ),
               ),
               Text(
-                '${attuned.length} / $attunementSlots',
+                '${attuned.length} / $slots',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -376,7 +377,7 @@ extension _SheetInventorySection on _SheetScreenState {
           const SizedBox(height: 9),
           Row(
             children: [
-              for (var i = 0; i < attunementSlots; i++) ...[
+              for (var i = 0; i < slots; i++) ...[
                 if (i > 0) const SizedBox(width: 7),
                 Expanded(
                   child: _attunementPip(i < attuned.length ? attuned[i] : null),

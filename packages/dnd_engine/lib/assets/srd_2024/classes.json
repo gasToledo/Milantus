@@ -5168,6 +5168,10 @@
             "type": "passiveTrait",
             "name": "Adepto en Objetos Mágicos",
             "description": "Sintonía con hasta cuatro objetos mágicos simultáneos."
+          },
+          {
+            "type": "attunementSlots",
+            "count": 4
           }
         ]
       },
@@ -5202,6 +5206,10 @@
             "recharge": "long",
             "shortRestRecovery": 1,
             "description": "Reacciones para sumar tu mod. de Inteligencia a una prueba de característica o salvación fallida propia o ajena. Recuperás uno tras un descanso corto y todos tras un descanso largo."
+          },
+          {
+            "type": "attunementSlots",
+            "count": 5
           }
         ]
       },
@@ -5214,6 +5222,10 @@
             "type": "passiveTrait",
             "name": "Maestro de Objetos Mágicos",
             "description": "Sintonía con hasta seis objetos mágicos simultáneos."
+          },
+          {
+            "type": "attunementSlots",
+            "count": 6
           }
         ]
       },

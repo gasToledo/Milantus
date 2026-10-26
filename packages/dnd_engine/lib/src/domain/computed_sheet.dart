@@ -1,4 +1,5 @@
 import 'ability.dart';
+import 'content.dart';
 import 'creature.dart';
 import 'damage_type.dart';
 import 'effects.dart';
@@ -924,6 +925,10 @@ class ComputedSheet {
   final Set<String> immunities;
 
   final int weaponMasterySlots;
+
+  /// Objetos mágicos que puede tener sintonizados: los 3 de la regla general
+  /// o más, si un rasgo lo sube. Ver [AttunementSlotsEffect].
+  final int attunementSlots;
   final int attacksPerAction;
 
   final List<Attack> attacks;
@@ -1048,6 +1053,7 @@ class ComputedSheet {
     required this.resistances,
     required this.immunities,
     required this.weaponMasterySlots,
+    this.attunementSlots = baseAttunementSlots,
     required this.attacksPerAction,
     required this.attacks,
     required this.passives,
@@ -1118,6 +1124,7 @@ class ComputedSheet {
     Set<String>? resistances,
     Set<String>? immunities,
     int? weaponMasterySlots,
+    int? attunementSlots,
     int? attacksPerAction,
     List<Attack>? attacks,
     List<PassiveTrait>? passives,
@@ -1185,6 +1192,7 @@ class ComputedSheet {
         resistances: resistances ?? this.resistances,
         immunities: immunities ?? this.immunities,
         weaponMasterySlots: weaponMasterySlots ?? this.weaponMasterySlots,
+        attunementSlots: attunementSlots ?? this.attunementSlots,
         attacksPerAction: attacksPerAction ?? this.attacksPerAction,
         attacks: attacks ?? this.attacks,
         passives: passives ?? this.passives,

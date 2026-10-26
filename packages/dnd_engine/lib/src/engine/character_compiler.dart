@@ -824,6 +824,7 @@ class CharacterCompiler {
       resistances: builder.resistances,
       immunities: builder.immunities,
       weaponMasterySlots: builder.weaponMasterySlots,
+      attunementSlots: builder.attunementSlotCount,
       attacksPerAction: attacksPerAction,
       attacks: attacks,
       passives: builder.passives,

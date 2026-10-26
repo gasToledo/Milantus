@@ -256,6 +256,32 @@ void main() {
       expect(avisos.where((a) => a.code == 'attunement_over_limit'), isEmpty);
     });
 
+    test('un rasgo que sube el tope cambia el límite del aviso', () {
+      // Ladrón 13, Usar Dispositivo Mágico: cuatro. Los mismos cuatro
+      // anillos que a la guerrera le sobran, a él no.
+      final ladron = Character(
+        id: 'ladron',
+        name: 'Ladrón',
+        raceId: 'human',
+        classId: 'rogue',
+        subclassId: 'thief',
+        backgroundId: 'soldier',
+        level: 13,
+        assignedScores: {for (final a in Ability.values) a: 10},
+        hpPerLevel: List.filled(13, 6),
+        inventory: [
+          for (final id in ids) InventoryEntry(itemId: id, attuned: true),
+        ],
+      );
+      expect(CharacterCompiler(repo).compile(ladron).attunementSlots, 4);
+      expect(
+        CharacterValidator(repo)
+            .validate(ladron)
+            .where((a) => a.code == 'attunement_over_limit'),
+        isEmpty,
+      );
+    });
+
     test('un flag viejo sobre un objeto mundano no ocupa espacio', () {
       final c = _guerrera(
         inventory: const [InventoryEntry(itemId: 'orb', attuned: true)],

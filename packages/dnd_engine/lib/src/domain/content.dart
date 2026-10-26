@@ -1288,8 +1288,10 @@ const coinLabelsEn = <String, String>{
 /// Cincuenta monedas pesan una libra, sin importar el metal (capítulo 6).
 const coinsPerPound = 50;
 
-/// Espacios de sintonización de un personaje (capítulo 6, "Sintonización").
-const attunementSlots = 3;
+/// Espacios de sintonización de la regla general (capítulo 6,
+/// "Sintonización"). El tope de cada personaje es `ComputedSheet
+/// .attunementSlots`, que un rasgo puede subir (Artífice, Ladrón).
+const baseAttunementSlots = 3;
 
 /// `Attack.baseWeaponId` del golpe sin armas, que todo personaje tiene.
 ///

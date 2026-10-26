@@ -74,6 +74,7 @@ sealed class Effect {
         ),
       'grantFeat' => GrantFeatEffect(featId: json['featId'] as String?),
       'weaponMasterySlots' => WeaponMasterySlotsEffect(json['count'] as int),
+      'attunementSlots' => AttunementSlotsEffect(json['count'] as int),
       'extraAttack' => ExtraAttackEffect(json['extra'] as int),
       'bonusMaxHpFlat' => BonusMaxHpFlatEffect(json['amount'] as int),
       'bonusMaxHpPerLevel' => BonusMaxHpPerLevelEffect(json['perLevel'] as int),
@@ -1390,6 +1391,17 @@ class WeaponMasterySlotsEffect extends Effect {
   @override
   Map<String, dynamic> toJson() =>
       {'type': 'weaponMasterySlots', 'count': count};
+}
+
+/// Cuántos objetos mágicos puede tener sintonizados el personaje: el Artífice
+/// llega a 4, 5 y 6 y el Ladrón a 4. Gana el mayor, como con las maestrías,
+/// así cada tramo declara el total y no el incremento. Sin efecto vale la
+/// regla general, `baseAttunementSlots`.
+class AttunementSlotsEffect extends Effect {
+  final int count;
+  const AttunementSlotsEffect(this.count);
+  @override
+  Map<String, dynamic> toJson() => {'type': 'attunementSlots', 'count': count};
 }
 
 /// Ataques adicionales por acción de Ataque (Guerrero nivel 5+).
