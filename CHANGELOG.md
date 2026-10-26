@@ -783,6 +783,8 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   Salvaciones las que valen contra un estado, contra conjuros o en las
   salvaciones de muerte (Astucia Gnoma, Resistencia Enana, Sentir el Peligro,
   Instinto Salvaje, Atleta Sobresaliente y otras).
+- Aprendiz de Mucho: el Bardo suma la mitad de su bonificador por competencia
+  a las habilidades en las que no es competente, Percepción pasiva incluida.
 
 ### Modificado
 

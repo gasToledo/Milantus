@@ -162,6 +162,7 @@ sealed class Effect {
       'offHandAbilityDamage' => const OffHandAbilityDamageEffect(),
       'heroicInspirationOnLongRest' =>
         const HeroicInspirationOnLongRestEffect(),
+      'halfProficiencyUnskilled' => const HalfProficiencyUnskilledEffect(),
       'targetChoice' => TargetChoiceEffect(
           groupId: json['groupId'] as String,
           name: json['name'] as String? ?? '',
@@ -1177,6 +1178,19 @@ class HeroicInspirationOnLongRestEffect extends Effect {
   const HeroicInspirationOnLongRestEffect();
   @override
   Map<String, dynamic> toJson() => {'type': 'heroicInspirationOnLongRest'};
+}
+
+/// Suma la mitad del bonificador por competencia, redondeada hacia abajo, a
+/// las pruebas de habilidades en las que el personaje no es competente
+/// (Aprendiz de Mucho del Bardo).
+///
+/// Solo habilidades: el SRD 2024 lo acota a «una prueba de característica que
+/// utilice una habilidad en la que no seas competente», así que la iniciativa
+/// y las pruebas sin habilidad no lo llevan, aunque en 2014 sí.
+class HalfProficiencyUnskilledEffect extends Effect {
+  const HalfProficiencyUnskilledEffect();
+  @override
+  Map<String, dynamic> toJson() => {'type': 'halfProficiencyUnskilled'};
 }
 
 /// Filtro serializable para reglas que modifican ataques con armas.

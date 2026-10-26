@@ -27,6 +27,32 @@ void main() {
     expect(levelOf('bard', 'Pericia'), 2);
   });
 
+  test('Bardo: Aprendiz de Mucho suma la mitad de la competencia sin ella', () {
+    ComputedSheet bardo(int level) => CharacterCompiler(repo).compile(
+          Character(
+            id: 'bardo',
+            name: 'Prueba',
+            raceId: 'human',
+            classId: 'bard',
+            backgroundId: 'soldier',
+            level: level,
+            assignedScores: {for (final a in Ability.values) a: 10},
+            hpPerLevel: List.filled(level, 5),
+            chosenSkills: const ['performance', 'persuasion', 'deception'],
+          ),
+        );
+    final l1 = bardo(1);
+    final l2 = bardo(2);
+    // Mod. 0 en todo: lo que se ve es puro bonificador. A nivel 1 no tiene
+    // el rasgo; a nivel 2, sin competencia en Arcanos, suma 2 ~/ 2 = 1.
+    expect(l1.skillModifier('arcana'), 0);
+    expect(l2.skillModifier('arcana'), l2.proficiencyBonus ~/ 2);
+    // Con competencia no se suma encima: ya usa el bonificador entero.
+    expect(l2.skillModifier('performance'), l2.proficiencyBonus);
+    // Solo habilidades (2024): la iniciativa no lo lleva.
+    expect(l2.initiative, l1.initiative);
+  });
+
   test('Pícaro: Talentos Fiables se obtiene a nivel 7, no a nivel 8', () {
     expect(levelOf('rogue', 'Talentos Fiables'), 7);
     expect(featureNames('rogue'), isNot(contains('Talento Fiable')));

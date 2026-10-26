@@ -865,6 +865,10 @@ class ComputedSheet {
   /// personaje puede tenerla si el DM se la concede.
   final bool heroicInspirationOnLongRest;
 
+  /// Aprendiz de Mucho: [skillModifier] suma la mitad del bonificador por
+  /// competencia en las habilidades sin competencia.
+  final bool halfProficiencyUnskilled;
+
   final Set<Ability> savingThrowProficiencies;
   final int savingThrowBonus;
   final Set<String> skillProficiencies;
@@ -1020,6 +1024,7 @@ class ComputedSheet {
     this.abilityBonuses = const [],
     this.d20Modifier = 0,
     this.heroicInspirationOnLongRest = false,
+    this.halfProficiencyUnskilled = false,
     required this.savingThrowProficiencies,
     this.savingThrowBonus = 0,
     required this.skillProficiencies,
@@ -1089,6 +1094,7 @@ class ComputedSheet {
     List<AbilityBonus>? abilityBonuses,
     int? d20Modifier,
     bool? heroicInspirationOnLongRest,
+    bool? halfProficiencyUnskilled,
     Set<Ability>? savingThrowProficiencies,
     int? savingThrowBonus,
     Set<String>? skillProficiencies,
@@ -1147,6 +1153,8 @@ class ComputedSheet {
         d20Modifier: d20Modifier ?? this.d20Modifier,
         heroicInspirationOnLongRest:
             heroicInspirationOnLongRest ?? this.heroicInspirationOnLongRest,
+        halfProficiencyUnskilled:
+            halfProficiencyUnskilled ?? this.halfProficiencyUnskilled,
         savingThrowProficiencies:
             savingThrowProficiencies ?? this.savingThrowProficiencies,
         savingThrowBonus: savingThrowBonus ?? this.savingThrowBonus,
@@ -1260,7 +1268,9 @@ class ComputedSheet {
             ? proficiencyBonus * 2
             : skillProficiencies.contains(skillId)
                 ? proficiencyBonus
-                : 0) +
+                : halfProficiencyUnskilled
+                    ? proficiencyBonus ~/ 2
+                    : 0) +
         (skillBonuses[skillId] ?? const <SkillBonus>[])
             .fold(0, (sum, b) => sum + b.amount);
   }

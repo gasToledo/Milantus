@@ -167,6 +167,7 @@ class SheetBuilder {
   /// (rasgo Ingenioso del Humano). La ficha lo expone y `CombatOps.longRest`
   /// lo recibe como parámetro: el motor de descansos no conoce la ficha.
   bool heroicInspirationOnLongRest = false;
+  bool halfProficiencyUnskilled = false;
   int bonusMaxHpFlat = 0;
   int bonusMaxHpPerLevel = 0;
   int acBonus = 0;
@@ -410,6 +411,8 @@ class SheetBuilder {
         }
       case HeroicInspirationOnLongRestEffect():
         heroicInspirationOnLongRest = true;
+      case HalfProficiencyUnskilledEffect():
+        halfProficiencyUnskilled = true;
       case OffHandAbilityDamageEffect():
         offHandAbilityDamage = true;
       case WeaponRuleEffect():

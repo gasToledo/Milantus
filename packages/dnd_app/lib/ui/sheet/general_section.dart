@@ -1521,17 +1521,15 @@ extension _SheetGeneralSection on _SheetScreenState {
     final sc = s.spellcasting;
     final line = _breakdownLine;
 
-    // Solo las habilidades en las que sos competente. Las demás tiran con el
-    // modificador pelado, que ya está arriba: listarlas todas eran seis líneas
-    // repitiendo el mismo número en una pantalla de celular.
-    // Un aporte de Orden Divina o Primordial también hace que la habilidad
-    // deje de tirar con el modificador pelado, aunque no haya competencia.
+    // Solo las habilidades que no tiran con el modificador pelado, que ya está
+    // arriba: listarlas todas eran seis líneas repitiendo el mismo número en
+    // una pantalla de celular. Se compara contra la ficha en vez de enumerar
+    // los motivos (competencia, Pericia, Orden Divina, Aprendiz de Mucho):
+    // cada motivo nuevo que el motor sume aparece acá sin tocar la pantalla.
     final skills = [
       for (final sk in Skill.values)
         if (sk.ability == ability &&
-            (s.skillProficiencies.contains(sk.id) ||
-                s.expertiseSkills.contains(sk.id) ||
-                s.skillBonuses.containsKey(sk.id)))
+            s.skillModifier(sk.id) != s.abilityCheck(ability))
           sk,
     ];
 

@@ -3231,6 +3231,9 @@
             "type": "passiveTrait",
             "name": "Aprendiz de Mucho",
             "description": "Sumás la mitad de tu bonif. de competencia (redondeando hacia abajo) a cualquier prueba de característica que use una habilidad en la que no seas competente y que no incluya ya tu bonif. de competencia."
+          },
+          {
+            "type": "halfProficiencyUnskilled"
           }
         ]
       },

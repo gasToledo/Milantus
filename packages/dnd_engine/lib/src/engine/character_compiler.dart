@@ -801,6 +801,7 @@ class CharacterCompiler {
       savingThrowProficiencies: builder.saveProficiencies,
       savingThrowBonus: builder.resolveSavingThrowBonus(mods),
       heroicInspirationOnLongRest: builder.heroicInspirationOnLongRest,
+      halfProficiencyUnskilled: builder.halfProficiencyUnskilled,
       skillProficiencies: builder.skillProficiencies,
       expertiseSkills: builder.expertiseSkills,
       skillBonuses: builder.resolveSkillBonuses(mods),
