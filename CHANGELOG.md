@@ -782,7 +782,9 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
-- Sin cambios.
+- Fulgor Protector y Fulgor Protector Mejorado (Dominio de la Luz) describen
+  la regla 2024: ya no conceden el truco Luz y la mejora da PG temporales al
+  objetivo del ataque.
 
 ### Eliminado
 

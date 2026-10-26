@@ -666,9 +666,9 @@
       {
         "level": 3,
         "name": "Fulgor Protector",
-        "description": "Conocés el truco Luz y, como reacción, imponés desventaja a un atacante iluminándolo con un destello.",
+        "description": "Como reacción, imponés desventaja a la tirada de ataque de una criatura que ves a 30 pies o menos con un destello de luz.",
         "effects": [
-          { "type": "passiveTrait", "name": "Fulgor Protector", "description": "Reacción: imponés desventaja al ataque de una criatura que puedas ver. Usos = mod. de Sabiduría." },
+          { "type": "passiveTrait", "name": "Fulgor Protector", "description": "Reacción: imponés desventaja a la tirada de ataque de una criatura que ves a 30 pies o menos. Usos = mod. de Sabiduría (mínimo uno), recuperados en descanso largo." },
           { "type": "resource", "id": "warding_flare", "name": "Fulgor Protector", "max": 1, "maxFromAbility": "wisdom", "recharge": "long", "description": "Usos de Fulgor Protector." }
         ]
       },
@@ -721,9 +721,9 @@
       {
         "level": 6,
         "name": "Fulgor Protector Mejorado",
-        "description": "Podés usar Destello Protector para proteger también a otras criaturas cercanas.",
+        "description": "Fulgor Protector se recupera también con el descanso corto, y su destello le da PG temporales al objetivo del ataque.",
         "effects": [
-          { "type": "passiveTrait", "name": "Fulgor Protector Mejorado", "description": "Usás Destello Protector cuando atacan a una criatura a 30 pies de vos." },
+          { "type": "passiveTrait", "name": "Fulgor Protector Mejorado", "description": "Recuperás todos los usos de Fulgor Protector tras un descanso corto o largo. Cuando lo usás, el objetivo del ataque gana PG temporales iguales a 2d6 + tu mod. de Sabiduría." },
           { "type": "resource", "id": "warding_flare", "name": "Fulgor Protector", "max": 1, "maxFromAbility": "wisdom", "recharge": "short", "description": "Usos de Fulgor Protector. Los recuperás todos tras un descanso corto o largo." }
         ]
       },
