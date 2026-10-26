@@ -679,10 +679,15 @@ class CharacterCompiler {
               if (target.value.contains(resolved.entry.entryId)) target.key,
           },
         ),
-      // Va siempre, tenga o no armas en la mano: es una opción de la acción de
-      // Atacar para cualquiera, y para el Monje es la principal.
-      _attack(c, unarmedStrike, mods, profBonus, builder,
-          conditionsMet: conditionsMet),
+      // Cualquiera puede dar un golpe sin armas aunque tenga una espada en la
+      // mano, pero mostrarlo siempre es ruido: el «1 + FUE» al lado del arma
+      // nadie lo elige. Se muestra con las manos vacías, que es lo único que
+      // queda, o cuando un rasgo lo mejora (Monje, Matón de Taberna, Golpes
+      // Radiantes), que es cuando pasa a ser una opción real.
+      if (wielded.isEmpty ||
+          builder.weaponRules.any((r) => r.filter.unarmed && conditionsMet(r)))
+        _attack(c, unarmedStrike, mods, profBonus, builder,
+            conditionsMet: conditionsMet),
       if (builder.weaponRules.any(
           (r) => r.bonusActionAttack && r.filter.unarmed && conditionsMet(r)))
         _attack(c, unarmedStrike, mods, profBonus, builder,

@@ -329,6 +329,26 @@ void main() {
             isEmpty);
       });
 
+      test('con un arma en la mano solo aparece si un rasgo lo mejora', () {
+        bool tieneGolpe(ComputedSheet s) =>
+            s.attacks.any((a) => a.baseWeaponId == unarmedStrikeId);
+        // Al lado de la espada, el «1 + FUE» no lo elige nadie.
+        expect(
+            tieneGolpe(compiler.compile(_char(
+                classId: 'fighter',
+                level: 1,
+                hp: [10],
+                weapons: ['longsword']))),
+            isFalse);
+        // Golpes Radiantes le suma 1d8 al puño: ahí sí es una opción.
+        final paladin = compiler.compile(_char(
+            classId: 'paladin',
+            level: 11,
+            hp: List.filled(11, 6),
+            weapons: ['longsword']));
+        expect(tieneGolpe(paladin), isTrue);
+      });
+
       test('usa Destreza y el dado del nivel, y suma el golpe adicional', () {
         final l1 = compiler
             .compile(_char(classId: 'monk', level: 1, hp: [8], scores: agil));
@@ -365,10 +385,9 @@ void main() {
             scores: agil,
             armorId: 'leather',
             weapons: ['spear']));
-        expect(golpe(s, AttackAction.action).damage, '1');
         expect(s.weaponAttacks.single.abilityUsed, Ability.strength);
-        expect(s.attacks.where((a) => a.action == AttackAction.bonusAction),
-            isEmpty);
+        expect(
+            s.attacks.where((a) => a.baseWeaponId == unarmedStrikeId), isEmpty);
       });
 
       test('con un arma que no es de monje en la mano se apaga', () {
@@ -380,9 +399,9 @@ void main() {
             hp: [8, 5, 5, 5, 5],
             scores: agil,
             weapons: ['longsword']));
-        expect(golpe(s, AttackAction.action).damage, '1');
-        expect(s.attacks.where((a) => a.action == AttackAction.bonusAction),
-            isEmpty);
+        // Sin Artes Marciales, con un arma en la mano el puño ni se muestra.
+        expect(
+            s.attacks.where((a) => a.baseWeaponId == unarmedStrikeId), isEmpty);
       });
     });
   });

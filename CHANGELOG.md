@@ -785,6 +785,8 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 - Fulgor Protector y Fulgor Protector Mejorado (Dominio de la Luz) describen
   la regla 2024: ya no conceden el truco Luz y la mejora da PG temporales al
   objetivo del ataque.
+- El golpe sin armas se muestra con las manos vacías o cuando un rasgo lo
+  mejora; al lado de un arma común ya no aparece.
 
 ### Eliminado
 
