@@ -78,6 +78,18 @@ sealed class Effect {
       'bonusMaxHpFlat' => BonusMaxHpFlatEffect(json['amount'] as int),
       'bonusMaxHpPerLevel' => BonusMaxHpPerLevelEffect(json['perLevel'] as int),
       'armorClassBonus' => ArmorClassBonusEffect(json['amount'] as int),
+      'advantage' => AdvantageEffect(
+          roll: AdvantageRoll.fromKey(json['roll'] as String),
+          abilities: [
+            for (final key in json['abilities'] as List? ?? const [])
+              Ability.fromKey(key as String),
+          ],
+          skill: json['skill'] as String?,
+          conditions: (json['conditions'] as List? ?? const [])
+              .whereType<String>()
+              .toList(),
+          vsSpells: json['vsSpells'] as bool? ?? false,
+        ),
       'initiativeBonus' => InitiativeBonusEffect(
           amount: json['amount'] as int? ?? 0,
           addProficiency: json['addProficiency'] as bool? ?? false,
@@ -1393,6 +1405,64 @@ class BonusMaxHpPerLevelEffect extends Effect {
 /// Bonus plano a la Clase de Armadura (p.ej. estilo de combate Defensa).
 /// (El condicionamiento "solo con armadura" es un refinamiento futuro; por
 /// ahora se aplica de forma plana.)
+/// A qué tirada se aplica una [AdvantageEffect].
+enum AdvantageRoll {
+  savingThrow('save'),
+  abilityCheck('check'),
+  initiative('initiative'),
+  deathSave('deathSave');
+
+  final String key;
+  const AdvantageRoll(this.key);
+
+  static AdvantageRoll fromKey(String key) =>
+      values.firstWhere((r) => r.key == key);
+}
+
+/// Ventaja permanente en un tipo de tirada: la Astucia Gnoma, Sentir el
+/// Peligro, Instinto Salvaje.
+///
+/// La ficha **solo la muestra**: los dados se tiran en la mesa y el número de
+/// la salvación no cambia. Existe para que la ventaja aparezca al lado de la
+/// tirada a la que se aplica, en vez de perdida en la prosa de un rasgo.
+///
+/// Lo que la acota es estructurado y no prosa, así no hay texto que traducir y
+/// la ficha puede decidir dónde mostrarla:
+/// - [abilities] y [skill] dicen qué salvación o prueba; vacío y null es
+///   «todas».
+/// - [conditions] son ids de estado: la ventaja vale para evitarlos o
+///   terminarlos (la Resistencia Enana contra `poisoned`).
+/// - [vsSpells] la limita a las salvaciones contra conjuros (Abjurador).
+///
+/// Las que dependen de un estado activable (Furia, Forma Grande) no van acá:
+/// esperan a que ese estado exista en la ficha.
+class AdvantageEffect extends Effect {
+  final AdvantageRoll roll;
+  final List<Ability> abilities;
+  final String? skill;
+  final List<String> conditions;
+  final bool vsSpells;
+
+  const AdvantageEffect({
+    required this.roll,
+    this.abilities = const [],
+    this.skill,
+    this.conditions = const [],
+    this.vsSpells = false,
+  });
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'advantage',
+        'roll': roll.key,
+        if (abilities.isNotEmpty)
+          'abilities': abilities.map((a) => a.name).toList(),
+        if (skill != null) 'skill': skill,
+        if (conditions.isNotEmpty) 'conditions': conditions,
+        if (vsSpells) 'vsSpells': true,
+      };
+}
+
 class ArmorClassBonusEffect extends Effect {
   final int amount;
   const ArmorClassBonusEffect(this.amount);

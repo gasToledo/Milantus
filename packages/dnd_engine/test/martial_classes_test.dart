@@ -80,6 +80,15 @@ void main() {
     });
   });
 
+  test('Atleta Sobresaliente: ventaja en iniciativa y solo en Atletismo', () {
+    final campeon = compiler.compile(_char(
+        classId: 'fighter', subclassId: 'champion', level: 3, hp: [10, 6, 6]));
+    expect(campeon.initiativeAdvantages, isNotEmpty);
+    expect(campeon.skillAdvantages('athletics'), isNotEmpty);
+    // Es una prueba de Fuerza (Atletismo), no toda prueba física.
+    expect(campeon.skillAdvantages('acrobatics'), isEmpty);
+  });
+
   group('Bárbaro', () {
     test('nivel 1: dado de golpe d12 y PG con CON', () {
       final s =

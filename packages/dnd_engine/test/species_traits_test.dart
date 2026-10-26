@@ -138,4 +138,49 @@ void main() {
       expect(d, contains('velocidad aumenta 10 pies'));
     });
   });
+
+  group('Ventajas permanentes', () {
+    ComputedSheet fichaDe(String raceId, {String classId = 'fighter'}) =>
+        CharacterCompiler(repo).compile(Character(
+          id: 'ventaja-$raceId',
+          name: 'Prueba',
+          raceId: raceId,
+          classId: classId,
+          backgroundId: 'soldier',
+          level: 1,
+          assignedScores: const {
+            Ability.strength: 15,
+            Ability.dexterity: 12,
+            Ability.constitution: 14,
+            Ability.intelligence: 10,
+            Ability.wisdom: 12,
+            Ability.charisma: 8,
+          },
+          hpPerLevel: const [10],
+        ));
+
+    test('la Astucia Gnoma llega a sus tres salvaciones y a ninguna otra', () {
+      final gnomo = fichaDe('gnome');
+      for (final a in [
+        Ability.intelligence,
+        Ability.wisdom,
+        Ability.charisma,
+      ]) {
+        expect(gnomo.saveAdvantages(a), isNotEmpty, reason: a.name);
+      }
+      expect(gnomo.saveAdvantages(Ability.strength), isEmpty);
+    });
+
+    test('una ventaja contra un estado no se muestra como si valiera siempre',
+        () {
+      final enano = fichaDe('dwarf');
+      // La Resistencia Enana es contra envenenado, no contra toda salvación
+      // de Constitución.
+      expect(enano.saveAdvantages(Ability.constitution), isEmpty);
+      expect(
+        enano.conditionalAdvantages.expand((v) => v.conditions),
+        contains('poisoned'),
+      );
+    });
+  });
 }

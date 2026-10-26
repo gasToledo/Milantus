@@ -19,7 +19,9 @@
         "name": "Atleta Sobresaliente",
         "description": "Tenés ventaja en las tiradas de iniciativa y las pruebas de Fuerza (Atletismo). Justo después de causar un crítico, podés moverte hasta la mitad de tu velocidad sin provocar ataques de oportunidad.",
         "effects": [
-          { "type": "passiveTrait", "name": "Atleta Sobresaliente", "description": "Ventaja en iniciativa y pruebas de Fuerza (Atletismo). Justo después de causar un crítico, podés moverte hasta la mitad de tu velocidad sin provocar ataques de oportunidad." }
+          { "type": "passiveTrait", "name": "Atleta Sobresaliente", "description": "Ventaja en iniciativa y pruebas de Fuerza (Atletismo). Justo después de causar un crítico, podés moverte hasta la mitad de tu velocidad sin provocar ataques de oportunidad." },
+          { "type": "advantage", "roll": "initiative" },
+          { "type": "advantage", "roll": "check", "skill": "athletics" }
         ]
       },
       {
@@ -52,7 +54,8 @@
         "name": "Superviviente",
         "description": "Al inicio de cada uno de tus turnos recuperás puntos de golpe si te queda menos de la mitad, y tenés ventaja en salvaciones de muerte.",
         "effects": [
-          { "type": "passiveTrait", "name": "Superviviente", "description": "Regenerás PG al empezar tu turno si estás por debajo de la mitad; ventaja en salvaciones de muerte." }
+          { "type": "passiveTrait", "name": "Superviviente", "description": "Regenerás PG al empezar tu turno si estás por debajo de la mitad; ventaja en salvaciones de muerte." },
+          { "type": "advantage", "roll": "deathSave" }
         ]
       }
     ]
@@ -1826,7 +1829,8 @@
         "name": "Giro Cautivador",
         "description": "Ventaja para evitar Hechizado y Asustado; cuando vos o alguien a 120 pies supera esa salvación, reaccionás afectando a otra criatura.",
         "effects": [
-          { "type": "passiveTrait", "name": "Giro Cautivador", "description": "La magia del Feywild protege tu mente: tenés ventaja en las salvaciones para evitar o terminar los estados de hechizado y asustado. Además, siempre que vos —o una criatura que puedas ver a 120 pies o menos— superen una salvación para evitar o terminar esos estados, podés llevar a cabo una reacción para obligar a otra criatura que veas a 120 pies o menos a hacer una salvación de Sabiduría contra tu CD de conjuros. Si la falla, queda hechizada o asustada (a tu elección) durante 1 minuto, repitiendo la salvación al final de cada uno de sus turnos." }
+          { "type": "passiveTrait", "name": "Giro Cautivador", "description": "La magia del Feywild protege tu mente: tenés ventaja en las salvaciones para evitar o terminar los estados de hechizado y asustado. Además, siempre que vos —o una criatura que puedas ver a 120 pies o menos— superen una salvación para evitar o terminar esos estados, podés llevar a cabo una reacción para obligar a otra criatura que veas a 120 pies o menos a hacer una salvación de Sabiduría contra tu CD de conjuros. Si la falla, queda hechizada o asustada (a tu elección) durante 1 minuto, repitiendo la salvación al final de cada uno de sus turnos." },
+          { "type": "advantage", "roll": "save", "conditions": ["charmed", "frightened"] }
         ]
       },
       {
@@ -2056,7 +2060,8 @@
         "description": "Ventaja en iniciativa y, en el primer asalto, ventaja contra quien no actuó y daño extra igual a tu nivel de Pícaro.",
         "effects": [
           { "type": "passiveTrait", "name": "Asesinar: Iniciativa", "description": "Tenés ventaja en las tiradas de iniciativa." },
-          { "type": "passiveTrait", "name": "Asesinar: Golpes Sorpresivos", "description": "Durante el primer asalto de cada combate tenés ventaja en las tiradas de ataque contra cualquier criatura que todavía no haya tenido su turno. Si tu Ataque Furtivo acierta a algún objetivo durante ese asalto, el objetivo recibe daño adicional del tipo del arma igual a tu nivel de Pícaro." }
+          { "type": "passiveTrait", "name": "Asesinar: Golpes Sorpresivos", "description": "Durante el primer asalto de cada combate tenés ventaja en las tiradas de ataque contra cualquier criatura que todavía no haya tenido su turno. Si tu Ataque Furtivo acierta a algún objetivo durante ese asalto, el objetivo recibe daño adicional del tipo del arma igual a tu nivel de Pícaro." },
+          { "type": "advantage", "roll": "initiative" }
         ]
       },
       {
@@ -2848,7 +2853,8 @@
         "name": "Resistencia a Conjuros",
         "description": "Tenés ventaja en las salvaciones contra conjuros y resistencia al daño de conjuros.",
         "effects": [
-          { "type": "passiveTrait", "name": "Resistencia a Conjuros", "description": "Ventaja en salvaciones contra conjuros y resistencia a su daño." }
+          { "type": "passiveTrait", "name": "Resistencia a Conjuros", "description": "Ventaja en salvaciones contra conjuros y resistencia a su daño." },
+          { "type": "advantage", "roll": "save", "vsSpells": true }
         ]
       }
     ]

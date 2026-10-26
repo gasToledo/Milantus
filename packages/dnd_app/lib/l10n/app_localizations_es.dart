@@ -1409,6 +1409,33 @@ class AppLocalizationsEs extends AppLocalizations {
   String get skillExpertiseBadge => 'PERICIA';
 
   @override
+  String get advantageTag => 'VENTAJA';
+
+  @override
+  String advantageFrom(Object sources) {
+    return 'Ventaja por $sources';
+  }
+
+  @override
+  String get advantageWith => 'Con ventaja';
+
+  @override
+  String advantageSavesAgainst(Object conditions) {
+    return 'Ventaja en salvaciones contra $conditions';
+  }
+
+  @override
+  String advantageChecksToEnd(Object conditions) {
+    return 'Ventaja en pruebas para terminar $conditions';
+  }
+
+  @override
+  String get advantageSavesVsSpells => 'Ventaja en salvaciones contra conjuros';
+
+  @override
+  String get advantageDeathSaves => 'Ventaja en salvaciones de muerte';
+
+  @override
   String get traitsAndFeatsTitle => 'Rasgos y dotes';
 
   @override

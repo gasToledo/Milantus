@@ -531,6 +531,7 @@ compartida: **antes de crear un widget visual nuevo, buscar acá**.
 | `ChangeFlash` | Fondo que destella detrás de un número al cambiar: carmesí si bajó, verde si subió | Para PG; se dibuja por fuera del hijo y no lo mueve |
 | `UsagePips` | Tira de íconos para usos restantes: llenos en `gold`, gastados en `textMuted` | Recursos de clase, espacios de conjuro |
 | `GoldPill` | Cápsula dorada suave; `highlighted: false` la vuelve neutra | Radio 20 |
+| `OutlinedTag` | Rótulo chico en mayúsculas con borde dorado, sin fondo, al lado de un nombre en una fila densa: «PERICIA» en una habilidad, «VENTAJA» en una salvación | Más liviano que `GoldPill` para no competir con el número de la fila. Si explica algo, va dentro de un `Tooltip` |
 | `SourceBadge` | `GoldPill` con la procedencia del contenido | Solo el SRD 5.2.1 va resaltado |
 | `ActionTypeIcon` / `ActionTypeLegend` | Ícono del tipo de acción (acción, adicional, reacción) y su leyenda | La leyenda va una sola vez por pantalla, no por fila |
 | `CreatureActionRow` | Una acción de criatura: nombre, bonificador con signo en Georgia dorado, daño con su tipo, alcance y descripción | Toma **primitivos** y no un `CreatureAction`. Hoy la usa **solo la ficha** para los compañeros invocados (vía `ResolvedCreatureAction`): el perfil del Bestiario dejó de usarla cuando el daño pasó a placas rotuladas |

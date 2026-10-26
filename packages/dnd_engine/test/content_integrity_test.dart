@@ -983,41 +983,55 @@ void main() {
     }
   });
 
-  group('Criaturas invocables', () {
-    /// Recorre todos los efectos del catálogo, incluidos los envueltos en un
-    /// [LeveledEffect]: un compañero declarado por nivel no debe escaparse del
-    /// chequeo solo por estar anidado.
-    Iterable<Effect> allEffects() sync* {
-      Iterable<Effect> flat(List<Effect> effects) sync* {
-        for (final e in effects) {
-          yield e;
-          if (e is LeveledEffect) yield* flat(e.effects);
-        }
-      }
-
-      for (final k in repo.classes.values) {
-        for (final f in k.features) {
-          yield* flat(f.effects);
-        }
-      }
-      for (final s in repo.subclasses.values) {
-        for (final f in s.features) {
-          yield* flat(f.effects);
-        }
-      }
-      for (final f in repo.feats.values) {
-        yield* flat(f.effects);
-      }
-      for (final r in repo.races.values) {
-        yield* flat(r.effects);
-      }
-      for (final l in repo.lineages.values) {
-        for (final f in l.features) {
-          yield* flat(f.effects);
-        }
+  /// Recorre todos los efectos del catálogo, incluidos los envueltos en un
+  /// [LeveledEffect]: un compañero declarado por nivel no debe escaparse del
+  /// chequeo solo por estar anidado.
+  Iterable<Effect> allEffects() sync* {
+    Iterable<Effect> flat(List<Effect> effects) sync* {
+      for (final e in effects) {
+        yield e;
+        if (e is LeveledEffect) yield* flat(e.effects);
       }
     }
 
+    for (final k in repo.classes.values) {
+      for (final f in k.features) {
+        yield* flat(f.effects);
+      }
+    }
+    for (final s in repo.subclasses.values) {
+      for (final f in s.features) {
+        yield* flat(f.effects);
+      }
+    }
+    for (final f in repo.feats.values) {
+      yield* flat(f.effects);
+    }
+    for (final r in repo.races.values) {
+      yield* flat(r.effects);
+    }
+    for (final l in repo.lineages.values) {
+      for (final f in l.features) {
+        yield* flat(f.effects);
+      }
+    }
+  }
+
+  test('toda ventaja nombra estados y habilidades que existen', () {
+    // Un id mal escrito («posioned») no rompe la carga: la ventaja
+    // simplemente no aparece en ningún lado de la ficha.
+    for (final e in allEffects().whereType<AdvantageEffect>()) {
+      for (final id in e.conditions) {
+        expect(conditionIds, contains(id), reason: 'estado "$id"');
+      }
+      if (e.skill != null) {
+        expect(Skill.allIds, contains(e.skill),
+            reason: 'habilidad "${e.skill}"');
+      }
+    }
+  });
+
+  group('Criaturas invocables', () {
     test('el catálogo trae las formas de familiar y los compañeros de clase',
         () {
       expect(repo.creatures.length, greaterThanOrEqualTo(30));

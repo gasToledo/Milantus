@@ -519,6 +519,13 @@
             "type": "passiveTrait",
             "name": "Sentir el Peligro",
             "description": "Tenés ventaja en las tiradas de salvación de Destreza, salvo que tengas el estado de incapacitado."
+          },
+          {
+            "type": "advantage",
+            "roll": "save",
+            "abilities": [
+              "dexterity"
+            ]
           }
         ]
       },
@@ -662,6 +669,10 @@
             "type": "passiveTrait",
             "name": "Instinto Salvaje",
             "description": "Tenés ventaja en las tiradas de Iniciativa."
+          },
+          {
+            "type": "advantage",
+            "roll": "initiative"
           }
         ]
       },

@@ -778,7 +778,11 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Nuevo
 
-- Sin cambios.
+- La ficha marca las ventajas permanentes: «VENTAJA» en la salvación, la
+  habilidad o la iniciativa que la tiene, con el rasgo que la da, y al pie de
+  Salvaciones las que valen contra un estado, contra conjuros o en las
+  salvaciones de muerte (Astucia Gnoma, Resistencia Enana, Sentir el Peligro,
+  Instinto Salvaje, Atleta Sobresaliente y otras).
 
 ### Modificado
 

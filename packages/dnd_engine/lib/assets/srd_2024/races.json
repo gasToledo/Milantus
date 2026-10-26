@@ -83,6 +83,13 @@
         "maxFromProficiency": true,
         "recharge": "long",
         "description": "Usos de Afinidad con la Piedra."
+      },
+      {
+        "type": "advantage",
+        "roll": "save",
+        "conditions": [
+          "poisoned"
+        ]
       }
     ]
   },
@@ -116,6 +123,13 @@
         "type": "passiveTrait",
         "name": "Sigiloso por Naturaleza",
         "description": "Podés intentar esconderte incluso cuando solo te cubre una criatura al menos un tamaño mayor que vos."
+      },
+      {
+        "type": "advantage",
+        "roll": "save",
+        "conditions": [
+          "frightened"
+        ]
       }
     ]
   },
@@ -203,6 +217,13 @@
         "type": "passiveTrait",
         "name": "Linaje Élfico",
         "description": "Elegís un linaje (Alto Elfo, Elfo del Bosque o Elfo Oscuro) que otorga un truco y beneficios que mejoran a niveles 3 y 5."
+      },
+      {
+        "type": "advantage",
+        "roll": "save",
+        "conditions": [
+          "charmed"
+        ]
       }
     ]
   },
@@ -283,6 +304,15 @@
         "type": "passiveTrait",
         "name": "Linaje Gnomo",
         "description": "Elegís un linaje (Gnomo del Bosque o Gnomo de las Rocas) que otorga un truco o competencias adicionales."
+      },
+      {
+        "type": "advantage",
+        "roll": "save",
+        "abilities": [
+          "intelligence",
+          "wisdom",
+          "charisma"
+        ]
       }
     ]
   },
@@ -353,6 +383,13 @@
             "recharge": "long",
             "description": "Uso de Forma Grande."
           }
+        ]
+      },
+      {
+        "type": "advantage",
+        "roll": "check",
+        "conditions": [
+          "grappled"
         ]
       }
     ]
@@ -514,6 +551,14 @@
         "name": "Ajeno a los Sueños",
         "count": 1,
         "replaceable": true
+      },
+      {
+        "type": "advantage",
+        "roll": "save",
+        "abilities": [
+          "wisdom",
+          "charisma"
+        ]
       }
     ]
   },
@@ -582,6 +627,13 @@
         "max": 1,
         "recharge": "long",
         "description": "Uso de Resistencia al Letargo; vuelve tras 1d4 descansos largos."
+      },
+      {
+        "type": "advantage",
+        "roll": "save",
+        "conditions": [
+          "charmed"
+        ]
       }
     ]
   },
@@ -698,6 +750,13 @@
         "type": "passiveTrait",
         "name": "Incansable",
         "description": "No ganás niveles de agotamiento por deshidratación, desnutrición ni asfixia."
+      },
+      {
+        "type": "advantage",
+        "roll": "save",
+        "conditions": [
+          "poisoned"
+        ]
       }
     ]
   }

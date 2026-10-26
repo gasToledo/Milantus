@@ -791,6 +791,31 @@ class InitiativeBonus {
   const InitiativeBonus({required this.amount, required this.source});
 }
 
+/// Una ventaja permanente ya resuelta, con el rasgo que la da. Ver
+/// [AdvantageEffect].
+class Advantage {
+  final AdvantageRoll roll;
+  final List<Ability> abilities;
+  final String? skill;
+  final List<String> conditions;
+  final bool vsSpells;
+  final String source;
+
+  const Advantage({
+    required this.roll,
+    this.abilities = const [],
+    this.skill,
+    this.conditions = const [],
+    this.vsSpells = false,
+    required this.source,
+  });
+
+  /// Solo vale en algunas tiradas de su tipo: contra un estado o contra
+  /// conjuros. La ficha la muestra aparte y no en la fila de la salvación,
+  /// para que no parezca que vale siempre.
+  bool get conditional => conditions.isNotEmpty || vsSpells;
+}
+
 /// Centinela para distinguir "no se pasó el argumento" de "se pasó null" en
 /// los `copyWith` de este archivo.
 ///
@@ -884,6 +909,11 @@ class ComputedSheet {
 
   /// Lo que se suma a la iniciativa además de la Destreza, con su fuente.
   final List<InitiativeBonus> initiativeBonuses;
+
+  /// Ventajas permanentes, con su fuente. Para leerlas por tirada están
+  /// [saveAdvantages], [skillAdvantages], [initiativeAdvantages] y
+  /// [conditionalAdvantages].
+  final List<Advantage> advantages;
   final int? darkvision;
 
   final Set<String> resistances;
@@ -1008,6 +1038,7 @@ class ComputedSheet {
     required this.speed,
     required this.initiative,
     this.initiativeBonuses = const [],
+    this.advantages = const [],
     required this.darkvision,
     required this.resistances,
     required this.immunities,
@@ -1076,6 +1107,7 @@ class ComputedSheet {
     int? speed,
     int? initiative,
     List<InitiativeBonus>? initiativeBonuses,
+    List<Advantage>? advantages,
     Object? darkvision = _unset,
     Set<String>? resistances,
     Set<String>? immunities,
@@ -1138,6 +1170,7 @@ class ComputedSheet {
         speed: speed ?? this.speed,
         initiative: initiative ?? this.initiative,
         initiativeBonuses: initiativeBonuses ?? this.initiativeBonuses,
+        advantages: advantages ?? this.advantages,
         darkvision: identical(darkvision, _unset)
             ? this.darkvision
             : darkvision as int?,
@@ -1234,4 +1267,40 @@ class ComputedSheet {
 
   /// Percepción pasiva: 10 + el modificador de Percepción, Pericia incluida.
   int get passivePerception => 10 + skillModifier('perception');
+
+  /// Ventajas que valen en **toda** salvación de [a].
+  List<Advantage> saveAdvantages(Ability a) => [
+        for (final v in advantages)
+          if (v.roll == AdvantageRoll.savingThrow &&
+              !v.conditional &&
+              (v.abilities.isEmpty || v.abilities.contains(a)))
+            v,
+      ];
+
+  /// Ventajas que valen en toda prueba de la habilidad [skillId]: las que la
+  /// nombran y las de su característica (Atletismo es una prueba de Fuerza).
+  List<Advantage> skillAdvantages(String skillId) {
+    final ability = Skill.fromId(skillId)?.ability;
+    return [
+      for (final v in advantages)
+        if (v.roll == AdvantageRoll.abilityCheck &&
+            !v.conditional &&
+            (v.skill == null
+                ? v.abilities.isEmpty || v.abilities.contains(ability)
+                : v.skill == skillId))
+          v,
+    ];
+  }
+
+  List<Advantage> get initiativeAdvantages => [
+        for (final v in advantages)
+          if (v.roll == AdvantageRoll.initiative) v,
+      ];
+
+  /// Las que no caben en una fila: contra estados, contra conjuros y en las
+  /// salvaciones contra muerte. La ficha las lista aparte.
+  List<Advantage> get conditionalAdvantages => [
+        for (final v in advantages)
+          if (v.conditional || v.roll == AdvantageRoll.deathSave) v,
+      ];
 }

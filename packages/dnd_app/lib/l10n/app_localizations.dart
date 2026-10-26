@@ -2342,6 +2342,48 @@ abstract class AppLocalizations {
   /// **'PERICIA'**
   String get skillExpertiseBadge;
 
+  /// No description provided for @advantageTag.
+  ///
+  /// In es, this message translates to:
+  /// **'VENTAJA'**
+  String get advantageTag;
+
+  /// No description provided for @advantageFrom.
+  ///
+  /// In es, this message translates to:
+  /// **'Ventaja por {sources}'**
+  String advantageFrom(Object sources);
+
+  /// No description provided for @advantageWith.
+  ///
+  /// In es, this message translates to:
+  /// **'Con ventaja'**
+  String get advantageWith;
+
+  /// No description provided for @advantageSavesAgainst.
+  ///
+  /// In es, this message translates to:
+  /// **'Ventaja en salvaciones contra {conditions}'**
+  String advantageSavesAgainst(Object conditions);
+
+  /// No description provided for @advantageChecksToEnd.
+  ///
+  /// In es, this message translates to:
+  /// **'Ventaja en pruebas para terminar {conditions}'**
+  String advantageChecksToEnd(Object conditions);
+
+  /// No description provided for @advantageSavesVsSpells.
+  ///
+  /// In es, this message translates to:
+  /// **'Ventaja en salvaciones contra conjuros'**
+  String get advantageSavesVsSpells;
+
+  /// No description provided for @advantageDeathSaves.
+  ///
+  /// In es, this message translates to:
+  /// **'Ventaja en salvaciones de muerte'**
+  String get advantageDeathSaves;
+
   /// No description provided for @traitsAndFeatsTitle.
   ///
   /// In es, this message translates to:

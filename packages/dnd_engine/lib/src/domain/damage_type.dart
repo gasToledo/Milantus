@@ -127,6 +127,10 @@ String get damageTypeRule => localized(
           'vulnerable ones take double.',
     );
 
+/// Ids de los estados del glosario: `poisoned`, `charmed`... Las ventajas
+/// contra un estado los nombran por id y el catálogo se valida contra esto.
+Iterable<String> get conditionIds => _conditionLabels.keys;
+
 /// Estados que hoy viajan por el mismo campo que los tipos de daño. Separarlos
 /// en un efecto propio exigiría migrar contenido y personajes; mientras tanto,
 /// al menos se muestran en el idioma de la interfaz.

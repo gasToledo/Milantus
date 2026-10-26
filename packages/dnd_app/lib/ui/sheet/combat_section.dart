@@ -1338,18 +1338,50 @@ extension _SheetCombatSection on _SheetScreenState {
   );
 
   Widget _savesCard(ComputedSheet s) {
+    final conditional = s.conditionalAdvantages;
+    final rows = DenseRows(
+      children: [for (final a in Ability.values) _saveRow(s, a)],
+    );
     return sheetCard(
       icon: Icons.security,
       title: context.l10n.savesTitle,
-      child: DenseRows(
-        children: [for (final a in Ability.values) _saveRow(s, a)],
-      ),
+      // Las ventajas contra un estado o contra conjuros van al pie y no en la
+      // fila de su característica: marcarlas ahí diría que valen en toda
+      // salvación de Constitución, y la del enano vale solo contra veneno.
+      child: conditional.isEmpty
+          ? rows
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                rows,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (final v in conditional)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Text(
+                            _conditionalAdvantageText(context, v),
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              color: context.palette.textMuted,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
     );
   }
 
   Widget _saveRow(ComputedSheet s, Ability a) {
     final pal = context.palette;
     final proficient = s.savingThrowProficiencies.contains(a);
+    final advantages = s.saveAdvantages(a);
     final color = proficient ? pal.gold : null;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
@@ -1365,7 +1397,17 @@ extension _SheetCombatSection on _SheetScreenState {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(a.label, style: TextStyle(color: color)),
+            child: Row(
+              children: [
+                Flexible(
+                  child: Text(a.label, style: TextStyle(color: color)),
+                ),
+                if (advantages.isNotEmpty) ...[
+                  const SizedBox(width: 7),
+                  _advantageTag(context, advantages),
+                ],
+              ],
+            ),
           ),
           Text(
             _signed(s.savingThrow(a)),

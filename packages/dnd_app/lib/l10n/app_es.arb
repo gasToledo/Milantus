@@ -1239,6 +1239,34 @@
   "skillsLegendProficient": "Competente",
   "skillsLegendExpertise": "Pericia · bonificador duplicado",
   "skillExpertiseBadge": "PERICIA",
+  "advantageTag": "VENTAJA",
+  "advantageFrom": "Ventaja por {sources}",
+  "@advantageFrom": {
+    "placeholders": {
+      "sources": {
+        "type": "Object"
+      }
+    }
+  },
+  "advantageWith": "Con ventaja",
+  "advantageSavesAgainst": "Ventaja en salvaciones contra {conditions}",
+  "@advantageSavesAgainst": {
+    "placeholders": {
+      "conditions": {
+        "type": "Object"
+      }
+    }
+  },
+  "advantageChecksToEnd": "Ventaja en pruebas para terminar {conditions}",
+  "@advantageChecksToEnd": {
+    "placeholders": {
+      "conditions": {
+        "type": "Object"
+      }
+    }
+  },
+  "advantageSavesVsSpells": "Ventaja en salvaciones contra conjuros",
+  "advantageDeathSaves": "Ventaja en salvaciones de muerte",
   "traitsAndFeatsTitle": "Rasgos y dotes",
   "statArmor": "Armadura",
   "exhaustionSpeed": "Cansancio −{feet} pies",

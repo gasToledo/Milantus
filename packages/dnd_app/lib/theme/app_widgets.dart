@@ -1878,6 +1878,32 @@ class SpendRecoverButtons extends StatelessWidget {
 }
 
 /// Pill dorada suave.
+/// Rótulo chico en mayúsculas con borde dorado, al lado de un nombre en una
+/// fila densa: «PERICIA» en una habilidad, «VENTAJA» en una salvación.
+///
+/// Más liviano que [GoldPill] a propósito: va dentro de filas de 9 px de
+/// padding, y una cápsula con fondo competiría con el número de la fila.
+class OutlinedTag extends StatelessWidget {
+  final String text;
+  const OutlinedTag(this.text, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.palette;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+      decoration: BoxDecoration(
+        border: Border.all(color: pal.gold.withAlpha(128)),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(fontSize: 9.5, letterSpacing: 0.6, color: pal.gold),
+      ),
+    );
+  }
+}
+
 class GoldPill extends StatelessWidget {
   final String text;
 

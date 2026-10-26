@@ -177,6 +177,8 @@ class SheetBuilder {
   final List<({InitiativeBonusEffect effect, String source})>
       initiativeEffects = [];
 
+  final List<Advantage> advantages = [];
+
   SheetBuilder({required this.baseScores, this.level = 1});
 
   /// Resuelve las plantillas de recurso acumuladas a su [CharacterResource]
@@ -444,6 +446,15 @@ class SheetBuilder {
         acBonus += amount;
       case InitiativeBonusEffect():
         initiativeEffects.add((effect: e, source: sourceName));
+      case AdvantageEffect():
+        advantages.add(Advantage(
+          roll: e.roll,
+          abilities: e.abilities,
+          skill: e.skill,
+          conditions: e.conditions,
+          vsSpells: e.vsSpells,
+          source: sourceName,
+        ));
       case UnarmoredDefenseEffect(:final ability, :final allowShield):
         unarmoredDefenseOptions.add(
           (classId: sourceClassId, ability: ability, allowShield: allowShield),

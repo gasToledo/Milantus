@@ -1408,6 +1408,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get skillExpertiseBadge => 'EXPERTISE';
 
   @override
+  String get advantageTag => 'ADVANTAGE';
+
+  @override
+  String advantageFrom(Object sources) {
+    return 'Advantage from $sources';
+  }
+
+  @override
+  String get advantageWith => 'With Advantage';
+
+  @override
+  String advantageSavesAgainst(Object conditions) {
+    return 'Advantage on saves against $conditions';
+  }
+
+  @override
+  String advantageChecksToEnd(Object conditions) {
+    return 'Advantage on checks to end $conditions';
+  }
+
+  @override
+  String get advantageSavesVsSpells => 'Advantage on saves against spells';
+
+  @override
+  String get advantageDeathSaves => 'Advantage on death saves';
+
+  @override
   String get traitsAndFeatsTitle => 'Features and feats';
 
   @override

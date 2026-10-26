@@ -189,6 +189,44 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('las ventajas van en su salvación o al pie, según a qué valen', (
+    tester,
+  ) async {
+    // Enano Bárbaro 2: Sentir el Peligro vale en toda salvación de Destreza y
+    // va en la fila; la Resistencia Enana vale solo contra envenenado y va al
+    // pie, porque en la fila de Constitución diría que vale siempre.
+    final enano = Character(
+      id: 'enano',
+      name: 'Durga',
+      raceId: 'dwarf',
+      classId: 'barbarian',
+      backgroundId: 'soldier',
+      level: 2,
+      assignedScores: {for (final a in Ability.values) a: 14},
+      hpPerLevel: const [12, 7],
+    );
+    await pumpSheet(tester, enano, size: const Size(900, 6000));
+    await tester.tap(find.text('Combate'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('VENTAJA'), findsOneWidget);
+    final fila = find.ancestor(
+      of: find.text('VENTAJA'),
+      matching: find.byType(Row),
+    );
+    expect(
+      find.descendant(of: fila.first, matching: find.text('Destreza')),
+      findsOneWidget,
+    );
+    expect(
+      find.text(
+        'Ventaja en salvaciones contra envenenado · ${repo.race('dwarf')!.name}',
+      ),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('una reserva se gasta en cantidades y no de a un uso', (
     tester,
   ) async {

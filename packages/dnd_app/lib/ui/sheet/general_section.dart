@@ -1151,6 +1151,7 @@ extension _SheetGeneralSection on _SheetScreenState {
     // La cuenta vive en la ficha, no acá: es el mismo método que usa la
     // Percepción pasiva, así que la Pericia no puede llegar a una y no a otra.
     final mod = s.skillModifier(skill.id);
+    final advantages = s.skillAdvantages(skill.id);
     final color = proficient ? pal.gold : null;
     return Container(
       // Las competentes llevan además un fondo tonal: son las filas que se
@@ -1180,24 +1181,11 @@ extension _SheetGeneralSection on _SheetScreenState {
                 // solo la distingue si ya sabés que existe.
                 if (expertise) ...[
                   const SizedBox(width: 7),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 1,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: pal.gold.withAlpha(128)),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      context.l10n.skillExpertiseBadge,
-                      style: TextStyle(
-                        fontSize: 9.5,
-                        letterSpacing: 0.6,
-                        color: pal.gold,
-                      ),
-                    ),
-                  ),
+                  OutlinedTag(context.l10n.skillExpertiseBadge),
+                ],
+                if (advantages.isNotEmpty) ...[
+                  const SizedBox(width: 7),
+                  _advantageTag(context, advantages),
                 ],
               ],
             ),
@@ -1309,6 +1297,14 @@ extension _SheetGeneralSection on _SheetScreenState {
         icon: Icons.bolt,
         label: context.l10n.initiative,
         value: _signed(s.initiative),
+        // Al pie, como el cansancio en la velocidad: es lo que cambia cómo se
+        // tira, y en la mesa es lo primero que se pregunta.
+        footer: s.initiativeAdvantages.isEmpty
+            ? null
+            : Text(
+                context.l10n.advantageWith,
+                style: TextStyle(fontSize: 11, color: context.palette.gold),
+              ),
       ),
     );
     final speed = StatTile(
@@ -1507,6 +1503,11 @@ extension _SheetGeneralSection on _SheetScreenState {
             ),
           const Divider(height: 16),
           line(context.l10n.initiative, _signed(s.initiative), strong: true),
+          if (s.initiativeAdvantages.isNotEmpty)
+            line(
+              _advantageSources(context, s.initiativeAdvantages),
+              context.l10n.advantageWith,
+            ),
         ],
       ),
     );
