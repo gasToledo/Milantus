@@ -119,6 +119,22 @@ void main() {
     expect(CombatOps.activateMode(c.combat, sheet, 'rage'), isFalse);
   });
 
+  test('un estado que incapacita la termina y no deja volver a prenderla', () {
+    final c = barbaro(1, inventory: const [hacha]);
+    c.combat.currentHp = 10;
+    CombatOps.activateMode(c.combat, compiler.compile(c), 'rage');
+    // Aturdido incluye Incapacitado (SRD 5.2.1).
+    CombatOps.setCondition(c.combat, 'stunned', true);
+    expect(c.combat.activeModes, isEmpty);
+
+    final sheet = compiler.compile(c);
+    expect(sheet.activeModes.single.blockedBy, ActiveModeBlock.incapacitated);
+    expect(CombatOps.activateMode(c.combat, sheet, 'rage'), isFalse);
+
+    CombatOps.setCondition(c.combat, 'stunned', false);
+    expect(compiler.compile(c).activeModes.single.available, isTrue);
+  });
+
   test('termina sola al caer a 0 PG y al descansar', () {
     final c = barbaro(1, inventory: const [hacha]);
     c.combat.currentHp = 5;

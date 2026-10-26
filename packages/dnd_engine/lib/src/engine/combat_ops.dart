@@ -344,6 +344,38 @@ class CombatOps {
     return true;
   }
 
+  /// Estados que incluyen Incapacitado (SRD 5.2.1, glosario): Paralizado,
+  /// Petrificado, Aturdido e Inconsciente dicen «tienes el estado de
+  /// incapacitado».
+  static const incapacitatingConditions = {
+    'incapacitated',
+    'paralyzed',
+    'petrified',
+    'stunned',
+    'unconscious',
+  };
+
+  static bool isIncapacitated(CombatState c) =>
+      c.conditions.any(incapacitatingConditions.contains);
+
+  /// Marca o quita un estado del personaje. Uno que incapacita termina la
+  /// Forma Salvaje y los estados activables (la Furia dice «termina si
+  /// recibes el estado de incapacitado»), igual que caer a 0 PG.
+  ///
+  /// Va acá y no en los chips de la ficha por lo mismo que el daño: el estado
+  /// puede entrar por más de un lado, y la regla tiene que valer en todos.
+  static void setCondition(CombatState c, String id, bool on) {
+    if (!on) {
+      c.conditions.remove(id);
+      return;
+    }
+    c.conditions.add(id);
+    if (incapacitatingConditions.contains(id)) {
+      c.wildShapeCreatureId = null;
+      c.activeModes.clear();
+    }
+  }
+
   /// Prende el estado activable [modeId] (la Furia), con la [variant] elegida
   /// si tiene. Gasta un uso de su recurso; devuelve false sin tocar nada si
   /// no quedan usos, si el estado no está disponible (armadura pesada) o si

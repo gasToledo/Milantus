@@ -13,6 +13,7 @@ import '../domain/name_sort.dart';
 import '../domain/proficiency_labels.dart';
 import '../domain/skill.dart';
 import '../domain/spell_slots.dart';
+import 'combat_ops.dart';
 import 'inventory_ops.dart';
 import 'sheet_builder.dart';
 
@@ -457,7 +458,7 @@ class CharacterCompiler {
     final modeData = <({
       ActiveModeEffect mode,
       String? classId,
-      bool available,
+      ActiveModeBlock? blockedBy,
       bool on,
       String? variant,
       List<String> resistances,
@@ -469,8 +470,12 @@ class CharacterCompiler {
       // Con ella puesta el estado figura apagado aunque se haya guardado
       // prendido, que es lo que dice la regla («termina si te ponés una
       // armadura pesada»).
-      final available = !(mode.endsInHeavyArmor && wearingHeavyArmor);
-      final on = available && c.combat.activeModes.containsKey(mode.id);
+      final blockedBy = mode.endsInHeavyArmor && wearingHeavyArmor
+          ? ActiveModeBlock.heavyArmor
+          : CombatOps.isIncapacitated(c.combat)
+              ? ActiveModeBlock.incapacitated
+              : null;
+      final on = blockedBy == null && c.combat.activeModes.containsKey(mode.id);
       final variantId = on ? c.combat.activeModes[mode.id] : null;
       final variant = mode.variants.where((v) => v.id == variantId).firstOrNull;
       final rulesBefore = builder.weaponRules.length;
@@ -491,7 +496,7 @@ class CharacterCompiler {
       modeData.add((
         mode: mode,
         classId: classId,
-        available: available,
+        blockedBy: blockedBy,
         on: on,
         variant: variant?.id,
         resistances: [
@@ -899,7 +904,7 @@ class CharacterCompiler {
       activeModes: List.unmodifiable([
         for (final d in modeData)
           _activeModeView(d.mode, d.classId,
-              available: d.available,
+              blockedBy: d.blockedBy,
               on: d.on,
               variant: d.variant,
               resistances: d.resistances,
@@ -1822,7 +1827,7 @@ class CharacterCompiler {
   ActiveMode _activeModeView(
     ActiveModeEffect mode,
     String? classId, {
-    required bool available,
+    required ActiveModeBlock? blockedBy,
     required bool on,
     required String? variant,
     required List<String> resistances,
@@ -1851,7 +1856,7 @@ class CharacterCompiler {
               ? resourceId
               : '$classId:$resourceId',
       variants: mode.variants,
-      available: available,
+      blockedBy: blockedBy,
       active: on,
       activeVariant: variant,
       resistances: List.unmodifiable(resistances),

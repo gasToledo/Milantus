@@ -1436,8 +1436,10 @@ extension _SheetGeneralSection on _SheetScreenState {
     final noUses = !m.active && left == 0;
     final (footer, footerColor) = m.active
         ? (l10n.modeEnd, Theme.of(context).colorScheme.onSurface)
-        : !m.available
+        : m.blockedBy == ActiveModeBlock.heavyArmor
         ? (l10n.modeHeavyArmor, pal.textMuted)
+        : m.blockedBy == ActiveModeBlock.incapacitated
+        ? (DamageType.labelFor('incapacitated'), pal.textMuted)
         : noUses
         ? (l10n.modeNoUses, pal.textMuted)
         : (l10n.modeActivate, pal.gold);

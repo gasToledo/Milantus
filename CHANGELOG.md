@@ -867,7 +867,9 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
-- Sin cambios.
+- Marcar Incapacitado, o un estado que lo incluye (Paralizado, Petrificado,
+  Aturdido, Inconsciente), termina la Furia y la Forma Salvaje, y la Furia no
+  se puede volver a prender mientras dure.
 
 ### Eliminado
 

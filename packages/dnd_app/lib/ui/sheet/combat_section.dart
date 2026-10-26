@@ -1810,7 +1810,12 @@ extension _SheetCombatSection on _SheetScreenState {
             label: Text(e.value.label),
             selected: active,
             onSelected: (v) => _mutateCombat(() {
-              if (v) {
+              // Los del personaje pasan por la regla: incapacitarlo termina la
+              // Furia y la Forma Salvaje. Los de un compañero no tienen nada
+              // que terminar.
+              if (identical(target, _c.combat.conditions)) {
+                CombatOps.setCondition(_c.combat, e.key, v);
+              } else if (v) {
                 target.add(e.key);
               } else {
                 target.remove(e.key);

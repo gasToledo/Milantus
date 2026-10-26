@@ -816,9 +816,10 @@ class ActiveMode {
 
   final List<ActiveModeVariant> variants;
 
-  /// Se puede activar ahora: falso con armadura pesada puesta si el estado lo
-  /// prohíbe.
-  final bool available;
+  /// Por qué no se puede activar ahora, o null si se puede.
+  final ActiveModeBlock? blockedBy;
+
+  bool get available => blockedBy == null;
 
   final bool active;
 
@@ -840,7 +841,7 @@ class ActiveMode {
     required this.name,
     this.resourceKey,
     this.variants = const [],
-    this.available = true,
+    this.blockedBy,
     this.active = false,
     this.activeVariant,
     this.resistances = const [],
@@ -849,6 +850,15 @@ class ActiveMode {
     this.damageAbility,
     this.noSpellcasting = false,
   });
+}
+
+/// Por qué un estado activable no se puede prender ahora.
+enum ActiveModeBlock {
+  /// La Furia no se toma con armadura pesada puesta.
+  heavyArmor,
+
+  /// Incapacitado (o un estado que lo incluye): no se pueden tomar acciones.
+  incapacitated,
 }
 
 /// Cuánto le suma un estado activo al daño de un ataque: «FURIA +2».
