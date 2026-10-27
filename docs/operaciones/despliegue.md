@@ -28,7 +28,8 @@ Runbook operativo del stack de contenedores.
 1. **Variables de entorno.** Copiar `.env.example` a `.env` y completar todo
    salvo `OIDC_CLIENT_ID` / `OIDC_CLIENT_SECRET` (paso 4). Generar
    contraseñas y `ZITADEL_MASTERKEY` (exactamente 32 caracteres) con
-   `openssl rand -base64 32 | head -c 32`.
+   `openssl rand -base64 32 | head -c 32`, y
+   `ZITADEL_SESSION_COOKIE_SECRET` (32 o más) con `openssl rand -base64 32`.
 
 2. **Túnel de Cloudflare.**
 
@@ -212,7 +213,7 @@ claude mcp add --transport http milantus https://app.milantus.com.ar/mcp --clien
 
 Hay un error reportado en algunas versiones de Claude Code
 ([anthropics/claude-code#68853](https://github.com/anthropics/claude-code/issues/68853)):
-ignora el `--client-id` e intenta el registro dinámico, que Zitadel no ofrece.
+ignora el `--client-id` e intenta el registro dinámico, que tenemos cerrado.
 Si pasa, actualizar Claude Code.
 
 Cada llamada queda en `mcp_audit_log` (cuenta, herramienta, resultado; sin
@@ -291,6 +292,25 @@ no deja el stack a medias: `docker compose up -d` ya levantó todo lo demás,
 incluido `cloudflared`, así que la consola de Zitadel queda accesible para
 hacer el registro. Después de completarlo, volver a disparar el workflow (o
 `docker compose up -d server` en el host) lo pone en verde.
+
+## Actualizar Zitadel
+
+`zitadel` y `zitadel-login` usan la misma `ZITADEL_VERSION`, y `zitadel-setup`
+migra la base en cada arranque. Las migraciones solo van hacia adelante y
+Zitadel no documenta cómo volver atrás, así que antes de subir la versión:
+
+1. Leer las notas de cada versión intermedia
+   ([releases](https://github.com/zitadel/zitadel/releases)), sobre todo
+   las «Upgrade notes». Hay versiones para saltear: la v4.18.0 rompe `setup`.
+2. Respaldar la base (ver «Respaldo y restauración»).
+3. Agregar al `.env` del host las variables nuevas que pida el
+   `docker-compose.yml` **antes** de pushear: el CD levanta el stack con ese
+   `.env`.
+4. Cambiar `ZITADEL_VERSION` en el `.env` y `docker compose up -d`.
+
+De v4.16 a v4.20 la única variable nueva es `ZITADEL_SESSION_COOKIE_SECRET`.
+Al activarla, el login de Zitadel pide entrar de nuevo una vez; las sesiones
+de Milantus no se pierden.
 
 ## Recuperar Zitadel de un arranque a medias
 
