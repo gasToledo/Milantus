@@ -7,6 +7,7 @@ import 'package:dnd_app/theme/app_theme.dart';
 import 'package:dnd_app/theme/app_widgets.dart';
 import 'package:dnd_app/ui/app_sidebar.dart';
 import 'package:dnd_app/ui/dm/dm_mode_screen.dart';
+import 'package:dnd_app/ui/dm/member_sheet_screen.dart';
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -1807,6 +1808,37 @@ void main() {
       expect(
         find.descendant(of: panel, matching: find.text('Guerrero goblin')),
         findsNothing,
+      );
+      expect(tester.takeException(), isNull);
+    });
+
+    // En su turno el DM mira la ficha del jugador sin salir del combate: la
+    // misma de solo lectura que abre la Mesa, por el mismo vínculo.
+    testWidgets('desde el combate se abre la ficha de un jugador', (
+      tester,
+    ) async {
+      await pumpDmMode(tester, seed: seedTable);
+      await enterCode(tester, 'CODE-0001');
+      await openCombate(tester);
+      await tester.tap(find.text('Armar combate').first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Sumar'));
+      await tester.pumpAndSettle();
+      await addMonsters(tester, 'goblin', 'Guerrero goblin');
+      await tirarIniciativa(tester, initiatives: {'Sagan': 40});
+
+      // Uno en la fila y otro en la columna del turno.
+      expect(find.text('Abrir ficha'), findsNWidgets(2));
+      await tester.tap(find.text('Abrir ficha').first);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(MemberSheetScreen), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(MemberSheetScreen),
+          matching: find.text('Sagan'),
+        ),
+        findsWidgets,
       );
       expect(tester.takeException(), isNull);
     });

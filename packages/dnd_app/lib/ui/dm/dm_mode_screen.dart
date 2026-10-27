@@ -983,6 +983,21 @@ class _CampaignDetailState extends State<_CampaignDetail> {
     if (mounted) await _loadNpcs();
   }
 
+  /// La misma ficha de solo lectura que se abre desde la Mesa, sin salir del
+  /// combate.
+  void _openMemberSheet(String memberId, String name) =>
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => MemberSheetScreen(
+            campaignId: widget.campaign.id,
+            memberId: memberId,
+            characterName: name,
+            repo: widget.repo,
+            api: widget.api,
+          ),
+        ),
+      );
+
   /// Suma a esta campaña PNJ que ya están en la biblioteca.
   Future<void> _bringNpcsFromLibrary() async {
     final List<NpcEntry> library;
@@ -1931,6 +1946,7 @@ class _CampaignDetailState extends State<_CampaignDetail> {
               onSetSide: _setCombatantSide,
               onConvertToNpc: _convertToNpc,
               onOpenNpcSheet: _openNpcSheet,
+              onOpenPlayerSheet: _openMemberSheet,
               onAdjustHp: _adjustCombatantHp,
               onRemoveCombatant: _removeCombatant,
               onSetTags: _setCombatantTags,

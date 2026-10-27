@@ -105,6 +105,10 @@ class EncounterView extends StatefulWidget {
   /// salir del combate y buscarlo en la Biblioteca para ver qué puede hacer.
   final Future<void> Function(Character sheet) onOpenNpcSheet;
 
+  /// Abre la ficha de solo lectura de un jugador. Sus PG y sus recursos viven
+  /// ahí y no en el combate, así que es adonde el DM va a mirar en su turno.
+  final void Function(String memberId, String name) onOpenPlayerSheet;
+
   /// [delta] es lo que cambia: negativo es daño, positivo es cura. El
   /// clampeo a `0..maxHp` lo hace `Encounter.withHp`, no esta pantalla.
   final void Function(String combatantId, int delta) onAdjustHp;
@@ -137,6 +141,7 @@ class EncounterView extends StatefulWidget {
     required this.members,
     required this.npcs,
     required this.loadNpcLibrary,
+    required this.onOpenPlayerSheet,
     this.showDifficulty = true,
     required this.onRetry,
     required this.onAddPlayer,
@@ -603,6 +608,21 @@ class _EncounterViewState extends State<EncounterView> {
     }
   }
 
+  CampaignMember? _member(Combatant combatant) => combatant.memberId == null
+      ? null
+      : widget.members
+            .where((m) => m.memberId == combatant.memberId)
+            .firstOrNull;
+
+  /// Abrir la ficha de [combatant], o null si no es un jugador que sigue en
+  /// la mesa: el vínculo cortado ya no deja leer su ficha.
+  VoidCallback? _openSheetOf(Combatant combatant) {
+    final member = _member(combatant);
+    if (member == null) return null;
+    return () =>
+        widget.onOpenPlayerSheet(member.memberId, member.character.name);
+  }
+
   CampaignNpcEntry? _npcEntry(Combatant combatant) {
     final id = combatant.npcId;
     if (id == null) return null;
@@ -656,11 +676,7 @@ class _EncounterViewState extends State<EncounterView> {
               // tocables (a un goblin que ya actuó se le pega igual), pero
               // dejan de competir por la mirada con los que faltan.
               acted: !current.isPreparing && turnIndex >= 0 && i < turnIndex,
-              member: combatant.memberId == null
-                  ? null
-                  : widget.members
-                        .where((m) => m.memberId == combatant.memberId)
-                        .firstOrNull,
+              member: _member(combatant),
               npc: _npcEntry(combatant),
               repo: widget.repo,
               preparing: current.isPreparing,
@@ -678,6 +694,7 @@ class _EncounterViewState extends State<EncounterView> {
               onSetSide: (side) => widget.onSetSide(combatant.id, side),
               onConvertToNpc: () => _convertToNpc(context, combatant),
               onEditInitiative: () => _editInitiative(context, combatant),
+              onOpenSheet: _openSheetOf(combatant),
             ),
           ],
         ],
@@ -901,12 +918,20 @@ class _EncounterViewState extends State<EncounterView> {
     final isNpc = combatant.kind == CombatantKind.npc;
     if (combatant.kind == CombatantKind.player ||
         (!isNpc && creature == null)) {
+      final openSheet = _openSheetOf(combatant);
       return AppEmptyState(
         icon: Icons.person_outline,
         message: combatant.kind == CombatantKind.player
             ? context.l10n.encPlayerTurn(combatant.name)
             : context.l10n.encNoProfile(combatant.name),
-        actions: const [],
+        actions: [
+          if (openSheet != null)
+            OutlinedButton.icon(
+              onPressed: openSheet,
+              icon: const Icon(Icons.description_outlined, size: 18),
+              label: Text(context.l10n.dmOpenSheet),
+            ),
+        ],
       );
     }
 
@@ -1547,6 +1572,9 @@ class _CombatantRow extends StatelessWidget {
   final VoidCallback onConvertToNpc;
   final VoidCallback onEditInitiative;
 
+  /// Null salvo para un jugador que sigue en la mesa.
+  final VoidCallback? onOpenSheet;
+
   const _CombatantRow({
     super.key,
     required this.combatant,
@@ -1566,6 +1594,7 @@ class _CombatantRow extends StatelessWidget {
     required this.onSetSide,
     required this.onConvertToNpc,
     required this.onEditInitiative,
+    required this.onOpenSheet,
   });
 
   bool get _isPlayer => combatant.kind == CombatantKind.player;
@@ -2175,9 +2204,23 @@ class _CombatantRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          if (_isPlayer)
+          if (onOpenSheet case final open?)
             // El DM no escribe la ficha de otra cuenta: donde iría el control
-            // de PG va el motivo por el que no está.
+            // de PG va el camino a la ficha, que es donde viven sus PG.
+            Flexible(
+              child: TextButton.icon(
+                onPressed: open,
+                icon: const Icon(Icons.description_outlined, size: 18),
+                label: Text(
+                  context.l10n.dmOpenSheet,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            )
+          else if (_isPlayer)
+            // Un jugador que ya no está en la mesa no tiene ficha que abrir:
+            // queda el motivo por el que no hay control de PG.
             Expanded(
               child: Text(
                 context.l10n.encOnTheirSheet,
