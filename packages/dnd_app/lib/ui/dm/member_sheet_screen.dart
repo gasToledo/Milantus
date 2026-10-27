@@ -330,6 +330,40 @@ class _MemberSheetScreenState extends State<MemberSheetScreen> {
               ),
             ],
           ),
+          // Igual que la tarjeta de Defensa del jugador: la resistencia que
+          // trae un estado activo lleva su nombre, porque se va cuando termina.
+          if (sheet.resistances.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              context.l10n.combatResistances(
+                ([
+                  for (final type in sheet.resistances)
+                    switch (sheet.activeModes
+                        .where((m) => m.resistances.contains(type))
+                        .firstOrNull) {
+                      final mode? => context.l10n.combatResistanceFrom(
+                        DamageType.labelFor(type),
+                        mode.name,
+                      ),
+                      null => DamageType.labelFor(type),
+                    },
+                ]..sort()).join(', '),
+              ),
+              style: TextStyle(fontSize: 12.5, color: pal.textMuted),
+            ),
+          ],
+          if (sheet.immunities.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              context.l10n.combatImmunities(
+                ([
+                  for (final type in sheet.immunities)
+                    DamageType.labelFor(type),
+                ]..sort()).join(', '),
+              ),
+              style: TextStyle(fontSize: 12.5, color: pal.textMuted),
+            ),
+          ],
           const SizedBox(height: 18),
           Eyebrow(context.l10n.savesTitle),
           DenseRows(

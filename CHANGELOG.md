@@ -975,7 +975,8 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Nuevo
 
-- Sin cambios.
+- La ficha del miembro que ve el DM muestra las resistencias e inmunidades
+  del personaje, con el nombre del estado activo que da cada una.
 
 ### Modificado
 
