@@ -3521,5 +3521,305 @@
       { "type": "leveled", "minLevel": 9, "effects": [{ "type": "alwaysPreparedSpell", "spellId": "insect-plague" }] },
       { "type": "leveled", "minLevel": 10, "effects": [{ "type": "resistance", "damageType": "poison" }] }
     ]
+  },
+  {
+    "id": "quickened-spell",
+    "name": "Conjuro Acelerado",
+    "source": "srd_2024",
+    "category": "metamagic",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Conjuro Acelerado", "description": "Coste: 2 puntos de hechicería. Cuando lanzás un conjuro con un tiempo de lanzamiento de una acción, podés hacer que sea de una acción adicional. No podés hacerlo si ya lanzaste un conjuro de nivel 1 o superior en este turno, ni lanzar uno de nivel 1 o superior en este turno después de hacerlo." }
+    ]
+  },
+  {
+    "id": "seeking-spell",
+    "name": "Conjuro Buscador",
+    "source": "srd_2024",
+    "category": "metamagic",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Conjuro Buscador", "description": "Coste: 1 punto de hechicería. Si hacés una tirada de ataque para un conjuro y fallás, podés volver a tirar el d20 y tenés que usar el nuevo resultado. Se puede usar aunque ya hayas aplicado otra opción de Metamagia al conjuro." }
+    ]
+  },
+  {
+    "id": "careful-spell",
+    "name": "Conjuro Cuidadoso",
+    "source": "srd_2024",
+    "category": "metamagic",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Conjuro Cuidadoso", "description": "Coste: 1 punto de hechicería. Cuando lanzás un conjuro que obliga a otras criaturas a hacer una tirada de salvación, elegís hasta tantas de ellas como tu mod. de Carisma (mínimo una): tienen éxito automáticamente y no reciben daño si normalmente recibirían la mitad al superarla." }
+    ]
+  },
+  {
+    "id": "distant-spell",
+    "name": "Conjuro Distante",
+    "source": "srd_2024",
+    "category": "metamagic",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Conjuro Distante", "description": "Coste: 1 punto de hechicería. Cuando lanzás un conjuro con un alcance de al menos 5 pies, duplicás su alcance; si el alcance es de toque, pasa a ser de 30 pies." }
+    ]
+  },
+  {
+    "id": "extended-spell",
+    "name": "Conjuro Extendido",
+    "source": "srd_2024",
+    "category": "metamagic",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Conjuro Extendido", "description": "Coste: 1 punto de hechicería. Cuando lanzás un conjuro con una duración de al menos 1 minuto, duplicás su duración, hasta un máximo de 24 horas. Si requiere concentración, tenés ventaja en las salvaciones para mantenerla." }
+    ]
+  },
+  {
+    "id": "twinned-spell",
+    "name": "Conjuro Gemelo",
+    "source": "srd_2024",
+    "category": "metamagic",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Conjuro Gemelo", "description": "Coste: 1 punto de hechicería. Cuando lanzás un conjuro que con un espacio de nivel superior puede afectar a una criatura más (como Hechizar Persona), aumentás en 1 su nivel efectivo." }
+    ]
+  },
+  {
+    "id": "heightened-spell",
+    "name": "Conjuro Intensificado",
+    "source": "srd_2024",
+    "category": "metamagic",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Conjuro Intensificado", "description": "Coste: 2 puntos de hechicería. Cuando lanzás un conjuro que obliga a al menos una criatura a hacer una tirada de salvación, uno de los objetivos tiene desventaja en las salvaciones contra ese conjuro." }
+    ]
+  },
+  {
+    "id": "empowered-spell",
+    "name": "Conjuro Potenciado",
+    "source": "srd_2024",
+    "category": "metamagic",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Conjuro Potenciado", "description": "Coste: 1 punto de hechicería. Cuando tirás el daño de un conjuro, repetís hasta tantos dados de daño como tu mod. de Carisma (mínimo uno) y usás los nuevos resultados. Se puede usar aunque ya hayas aplicado otra opción de Metamagia al conjuro." }
+    ]
+  },
+  {
+    "id": "subtle-spell",
+    "name": "Conjuro Sutil",
+    "source": "srd_2024",
+    "category": "metamagic",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Conjuro Sutil", "description": "Coste: 1 punto de hechicería. Lanzás un conjuro sin componentes verbales, somáticos ni materiales, salvo los materiales que el conjuro consume o que tienen un coste indicado." }
+    ]
+  },
+  {
+    "id": "transmuted-spell",
+    "name": "Conjuro Transmutado",
+    "source": "srd_2024",
+    "category": "metamagic",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Conjuro Transmutado", "description": "Coste: 1 punto de hechicería. Cuando lanzás un conjuro que causa daño de ácido, frío, fuego, relámpago, trueno o veneno, cambiás ese tipo por otro de la misma lista." }
+    ]
+  },
+  {
+    "id": "ambush",
+    "name": "Emboscada",
+    "source": "phb_2024",
+    "category": "maneuver",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Emboscada", "description": "Cuando hacés una prueba de Destreza (Sigilo) o una tirada de iniciativa, podés gastar un dado de superioridad y sumarlo a la tirada, salvo que estés incapacitado." }
+    ]
+  },
+  {
+    "id": "bait-and-switch",
+    "name": "Cambio de Lugar",
+    "source": "phb_2024",
+    "category": "maneuver",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Cambio de Lugar", "description": "Cuando estás a 5 pies o menos de una criatura en tu turno, podés gastar un dado de superioridad e intercambiar lugares con ella, si gastás al menos 5 pies de movimiento y la criatura está dispuesta y no está incapacitada. Este movimiento no provoca ataques de oportunidad. Tirá el dado: hasta el comienzo de tu siguiente turno, vos o la otra criatura (a tu elección) suma ese resultado a la CA." }
+    ]
+  },
+  {
+    "id": "commanders-strike",
+    "name": "Golpe del Comandante",
+    "source": "phb_2024",
+    "category": "maneuver",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Golpe del Comandante", "description": "Cuando llevás a cabo la acción de Atacar en tu turno, podés reemplazar uno de tus ataques para que un aliado dispuesto que pueda verte u oírte use su reacción para hacer un ataque con un arma o un golpe sin armas. Gastás un dado de superioridad y, si acierta, se suma al daño." }
+    ]
+  },
+  {
+    "id": "commanding-presence",
+    "name": "Presencia de Mando",
+    "source": "phb_2024",
+    "category": "maneuver",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Presencia de Mando", "description": "Cuando hacés una prueba de Carisma (Intimidación, Interpretación o Persuasión), podés gastar un dado de superioridad y sumarlo a la tirada." }
+    ]
+  },
+  {
+    "id": "disarming-attack",
+    "name": "Ataque Desarmante",
+    "source": "phb_2024",
+    "category": "maneuver",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Ataque Desarmante", "description": "Cuando acertás a una criatura con una tirada de ataque, podés gastar un dado de superioridad y sumarlo al daño. El objetivo hace una salvación de Fuerza o suelta un objeto que sostenga, a tu elección, que cae en su espacio." }
+    ]
+  },
+  {
+    "id": "distracting-strike",
+    "name": "Golpe de Distracción",
+    "source": "phb_2024",
+    "category": "maneuver",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Golpe de Distracción", "description": "Cuando acertás a una criatura con una tirada de ataque, podés gastar un dado de superioridad y sumarlo al daño. La próxima tirada de ataque contra el objetivo de alguien que no seas vos tiene ventaja, si se hace antes del comienzo de tu siguiente turno." }
+    ]
+  },
+  {
+    "id": "evasive-footwork",
+    "name": "Juego de Pies Evasivo",
+    "source": "phb_2024",
+    "category": "maneuver",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Juego de Pies Evasivo", "description": "Como acción adicional, podés gastar un dado de superioridad y Destrabarte. Tirás el dado y sumás el resultado a tu CA hasta el comienzo de tu siguiente turno." }
+    ]
+  },
+  {
+    "id": "feinting-attack",
+    "name": "Ataque Fintado",
+    "source": "phb_2024",
+    "category": "maneuver",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Ataque Fintado", "description": "Como acción adicional, podés gastar un dado de superioridad para fintar contra una criatura a 5 pies o menos: tenés ventaja en tu próxima tirada de ataque contra ella en este turno y, si acierta, sumás el dado al daño." }
+    ]
+  },
+  {
+    "id": "goading-attack",
+    "name": "Ataque Provocador",
+    "source": "phb_2024",
+    "category": "maneuver",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Ataque Provocador", "description": "Cuando acertás a una criatura con una tirada de ataque, podés gastar un dado de superioridad y sumarlo al daño. El objetivo hace una salvación de Sabiduría o tiene desventaja en las tiradas de ataque contra objetivos que no seas vos hasta el final de tu siguiente turno." }
+    ]
+  },
+  {
+    "id": "lunging-attack",
+    "name": "Ataque en Estocada",
+    "source": "phb_2024",
+    "category": "maneuver",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Ataque en Estocada", "description": "Como acción adicional, podés gastar un dado de superioridad y Correr. Si te movés al menos 5 pies en línea recta justo antes de acertar con un ataque cuerpo a cuerpo como parte de la acción de Atacar en ese turno, sumás el dado al daño." }
+    ]
+  },
+  {
+    "id": "maneuvering-attack",
+    "name": "Ataque de Maniobra",
+    "source": "phb_2024",
+    "category": "maneuver",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Ataque de Maniobra", "description": "Cuando acertás a una criatura con una tirada de ataque, podés gastar un dado de superioridad y sumarlo al daño. Un aliado dispuesto que pueda verte u oírte puede usar su reacción para moverse hasta la mitad de su velocidad sin provocar ataques de oportunidad del objetivo." }
+    ]
+  },
+  {
+    "id": "menacing-attack",
+    "name": "Ataque Amenazador",
+    "source": "phb_2024",
+    "category": "maneuver",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Ataque Amenazador", "description": "Cuando acertás a una criatura con una tirada de ataque, podés gastar un dado de superioridad y sumarlo al daño. El objetivo hace una salvación de Sabiduría o queda asustado hasta el final de tu siguiente turno." }
+    ]
+  },
+  {
+    "id": "parry",
+    "name": "Parada",
+    "source": "phb_2024",
+    "category": "maneuver",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Parada", "description": "Cuando otra criatura te daña con una tirada de ataque cuerpo a cuerpo, podés usar tu reacción y gastar un dado de superioridad para reducir el daño en el resultado del dado más tu mod. de Fuerza o de Destreza (a tu elección)." }
+    ]
+  },
+  {
+    "id": "precision-attack",
+    "name": "Ataque Preciso",
+    "source": "phb_2024",
+    "category": "maneuver",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Ataque Preciso", "description": "Cuando fallás una tirada de ataque, podés gastar un dado de superioridad, tirarlo y sumarlo a la tirada, lo que puede convertirla en un acierto." }
+    ]
+  },
+  {
+    "id": "pushing-attack",
+    "name": "Ataque de Empuje",
+    "source": "phb_2024",
+    "category": "maneuver",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Ataque de Empuje", "description": "Cuando acertás a una criatura con una tirada de ataque con un arma o un golpe sin armas, podés gastar un dado de superioridad y sumarlo al daño. Si el objetivo es Grande o menor, hace una salvación de Fuerza o es empujado hasta 15 pies en línea recta lejos de vos." }
+    ]
+  },
+  {
+    "id": "rally",
+    "name": "Arenga",
+    "source": "phb_2024",
+    "category": "maneuver",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Arenga", "description": "Como acción adicional, podés gastar un dado de superioridad para dar ánimo a un aliado a 30 pies o menos que pueda verte u oírte: gana PG temporales iguales al resultado del dado más la mitad de tu nivel de Guerrero (redondeando hacia abajo)." }
+    ]
+  },
+  {
+    "id": "riposte",
+    "name": "Contraataque",
+    "source": "phb_2024",
+    "category": "maneuver",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Contraataque", "description": "Cuando una criatura falla una tirada de ataque cuerpo a cuerpo contra vos, podés usar tu reacción y gastar un dado de superioridad para hacer un ataque cuerpo a cuerpo con un arma o un golpe sin armas contra ella. Si acertás, sumás el dado al daño." }
+    ]
+  },
+  {
+    "id": "sweeping-attack",
+    "name": "Ataque de Barrido",
+    "source": "phb_2024",
+    "category": "maneuver",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Ataque de Barrido", "description": "Cuando acertás a una criatura con una tirada de ataque cuerpo a cuerpo con un arma o un golpe sin armas, podés gastar un dado de superioridad para dañar a otra criatura a 5 pies o menos del objetivo original y a tu alcance. Si la tirada original acertaría a la segunda criatura, recibe daño igual al resultado del dado, del mismo tipo que el ataque original." }
+    ]
+  },
+  {
+    "id": "tactical-assessment",
+    "name": "Evaluación Táctica",
+    "source": "phb_2024",
+    "category": "maneuver",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Evaluación Táctica", "description": "Cuando hacés una prueba de Inteligencia (Historia o Investigación) o de Sabiduría (Perspicacia), podés gastar un dado de superioridad y sumarlo a la prueba." }
+    ]
+  },
+  {
+    "id": "trip-attack",
+    "name": "Ataque Derribador",
+    "source": "phb_2024",
+    "category": "maneuver",
+    "repeatable": false,
+    "effects": [
+      { "type": "passiveTrait", "name": "Ataque Derribador", "description": "Cuando acertás a una criatura con una tirada de ataque con un arma o un golpe sin armas, podés gastar un dado de superioridad y sumarlo al daño. Si el objetivo es Grande o menor, hace una salvación de Fuerza o queda derribado." }
+    ]
   }
 ]

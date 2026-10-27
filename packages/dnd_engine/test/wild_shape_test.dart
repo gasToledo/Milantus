@@ -18,6 +18,7 @@ void main() {
     int level, {
     List<String> forms = const [],
     ContentRepository? using,
+    String? subclassId,
   }) =>
       CharacterCompiler(using ?? repo).compile(
         Character(
@@ -25,6 +26,7 @@ void main() {
           name: 'Prueba',
           raceId: 'human',
           classId: 'druid',
+          subclassId: subclassId,
           backgroundId: 'sage',
           level: level,
           wildShapeForms: forms,
@@ -329,6 +331,33 @@ void main() {
 
       final shaped = applyWildShape(base, base.wildShape!.chosen.single);
       expect(shaped.carriedWeight, base.carriedWeight);
+    });
+  });
+
+  group('Círculo de la Luna', () {
+    test('el VD máximo es el nivel de Druida entre 3', () {
+      final comun = druid(6).wildShape!;
+      final luna = druid(6, subclassId: 'circle-moon').wildShape!;
+      expect(luna.options.map((b) => b.cr), everyElement(lessThanOrEqualTo(2)));
+      expect(luna.options.where((b) => b.cr == 2), isNotEmpty);
+      expect(comun.options.where((b) => b.cr! > 1), isEmpty);
+    });
+
+    test('en forma: CA 13 + SAB, PG temporales triples, radiante y SAB a CON',
+        () {
+      final base = druid(6, subclassId: 'circle-moon');
+      final lobo = repo.creature('wolf')!;
+      final sab = base.abilityModifiers[Ability.wisdom]!;
+      expect(base.wildShape!.tempHpOnEnter, 3 * 6);
+
+      final forma = applyWildShape(base, lobo);
+      // El lobo tiene menos que 13 + SAB: gana la del Círculo.
+      expect(forma.armorClass, 13 + sab);
+      expect(forma.attacks.first.damageTypeOptions, contains('radiant'));
+      expect(
+          forma.savingThrow(Ability.constitution),
+          applyWildShape(druid(6), lobo).savingThrow(Ability.constitution) +
+              sab);
     });
   });
 }

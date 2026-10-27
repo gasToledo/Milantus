@@ -375,15 +375,31 @@ extension _SheetInventorySection on _SheetScreenState {
             ],
           ),
           const SizedBox(height: 9),
-          Row(
-            children: [
-              for (var i = 0; i < slots; i++) ...[
-                if (i > 0) const SizedBox(width: 7),
-                Expanded(
-                  child: _attunementPip(i < attuned.length ? attuned[i] : null),
-                ),
-              ],
-            ],
+          // El Artífice llega a seis cupos: en una sola fila del celular cada
+          // casilla quedaba en unos 40 px y el nombre se cortaba a dos
+          // letras. Se parte en filas para que cada una tenga al menos 96.
+          LayoutBuilder(
+            builder: (context, box) {
+              const gap = 7.0;
+              final perRow = ((box.maxWidth + gap) ~/ (96 + gap)).clamp(
+                1,
+                slots < 1 ? 1 : slots,
+              );
+              final width = (box.maxWidth - gap * (perRow - 1)) / perRow;
+              return Wrap(
+                spacing: gap,
+                runSpacing: gap,
+                children: [
+                  for (var i = 0; i < slots; i++)
+                    SizedBox(
+                      width: width,
+                      child: _attunementPip(
+                        i < attuned.length ? attuned[i] : null,
+                      ),
+                    ),
+                ],
+              );
+            },
           ),
           const SizedBox(height: 8),
           Text(

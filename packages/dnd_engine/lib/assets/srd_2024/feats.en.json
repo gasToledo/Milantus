@@ -1246,5 +1246,185 @@
     "name": "Tropical Land",
     "effects.0.name": "Tropical Land",
     "effects.0.description": "Your circle is tied to the jungle and the swamp: you gain its Circle spells, always prepared, and at level 10, Resistance to Poison damage."
+  },
+  "quickened-spell": {
+    "_es": "b045d0c8",
+    "name": "Quickened Spell",
+    "effects.0.name": "Quickened Spell",
+    "effects.0.description": "Cost: 2 Sorcery Points. When you cast a spell that has a casting time of an action, you can spend 2 Sorcery Points to change the casting time to a Bonus Action for this casting. You can't modify a spell in this way if you've already cast a level 1+ spell on the current turn, nor can you cast a level 1+ spell on this turn after modifying a spell in this way."
+  },
+  "seeking-spell": {
+    "_es": "7be957c8",
+    "name": "Seeking Spell",
+    "effects.0.name": "Seeking Spell",
+    "effects.0.description": "Cost: 1 Sorcery Point. If you make an attack roll for a spell and miss, you can spend 1 Sorcery Point to reroll the d20, and you must use the new roll. You can use Seeking Spell even if you've already used a different Metamagic option during the casting of the spell."
+  },
+  "careful-spell": {
+    "_es": "6d4b4ece",
+    "name": "Careful Spell",
+    "effects.0.name": "Careful Spell",
+    "effects.0.description": "Cost: 1 Sorcery Point. When you cast a spell that forces other creatures to make a saving throw, you can protect some of those creatures from the spell's full force. To do so, spend 1 Sorcery Point and choose a number of those creatures up to your Charisma modifier (minimum of one creature). A chosen creature automatically succeeds on its saving throw against the spell, and it takes no damage if it would normally take half damage on a successful save."
+  },
+  "distant-spell": {
+    "_es": "35d3eed3",
+    "name": "Distant Spell",
+    "effects.0.name": "Distant Spell",
+    "effects.0.description": "Cost: 1 Sorcery Point. When you cast a spell that has a range of at least 5 feet, you can spend 1 Sorcery Point to double the spell's range. Or when you cast a spell that has a range of Touch, you can spend 1 Sorcery Point to make the spell's range 30 feet."
+  },
+  "extended-spell": {
+    "_es": "8ec8bca7",
+    "name": "Extended Spell",
+    "effects.0.name": "Extended Spell",
+    "effects.0.description": "Cost: 1 Sorcery Point. When you cast a spell that has a duration of 1 minute or longer, you can spend 1 Sorcery Point to double its duration to a maximum duration of 24 hours. If the affected spell requires Concentration, you have Advantage on any saving throw you make to maintain that Concentration."
+  },
+  "twinned-spell": {
+    "_es": "67ca9abe",
+    "name": "Twinned Spell",
+    "effects.0.name": "Twinned Spell",
+    "effects.0.description": "Cost: 1 Sorcery Point. When you cast a spell, such as Charm Person, that can be cast with a higher-level spell slot to target an additional creature, you can spend 1 Sorcery Point to increase the spell's effective level by 1."
+  },
+  "heightened-spell": {
+    "_es": "6340392b",
+    "name": "Heightened Spell",
+    "effects.0.name": "Heightened Spell",
+    "effects.0.description": "Cost: 2 Sorcery Points. When you cast a spell that forces a creature to make a saving throw, you can spend 2 Sorcery Points to give one target of the spell Disadvantage on saves against the spell."
+  },
+  "empowered-spell": {
+    "_es": "80980f1f",
+    "name": "Empowered Spell",
+    "effects.0.name": "Empowered Spell",
+    "effects.0.description": "Cost: 1 Sorcery Point. When you roll damage for a spell, you can spend 1 Sorcery Point to reroll a number of the damage dice up to your Charisma modifier (minimum of one), and you must use the new rolls. You can use Empowered Spell even if you've already used a different Metamagic option during the casting of the spell."
+  },
+  "subtle-spell": {
+    "_es": "13b1d70a",
+    "name": "Subtle Spell",
+    "effects.0.name": "Subtle Spell",
+    "effects.0.description": "Cost: 1 Sorcery Point. When you cast a spell, you can spend 1 Sorcery Point to cast it without any Verbal, Somatic, or Material components, except Material components that are consumed by the spell or that have a cost specified in the spell."
+  },
+  "transmuted-spell": {
+    "_es": "6fd7dc43",
+    "name": "Transmuted Spell",
+    "effects.0.name": "Transmuted Spell",
+    "effects.0.description": "Cost: 1 Sorcery Point. When you cast a spell that deals a type of damage from the following list, you can spend 1 Sorcery Point to change that damage type to one of the other listed types: Acid, Cold, Fire, Lightning, Poison, Thunder."
+  },
+  "ambush": {
+    "_es": "8bb0843c",
+    "name": "Ambush",
+    "effects.0.name": "Ambush",
+    "effects.0.description": "When you make a Dexterity (Stealth) check or an Initiative roll, you can expend a Superiority Die and add it to the roll, unless you have the Incapacitated condition."
+  },
+  "bait-and-switch": {
+    "_es": "dfafc044",
+    "name": "Bait and Switch",
+    "effects.0.name": "Bait and Switch",
+    "effects.0.description": "When you are within 5 feet of a creature on your turn, you can expend a Superiority Die and swap places with it, if you spend at least 5 feet of movement and the creature is willing and not Incapacitated. This movement doesn't provoke Opportunity Attacks. Roll the die: until the start of your next turn, you or the other creature (your choice) adds the result to AC."
+  },
+  "commanders-strike": {
+    "_es": "d75656e3",
+    "name": "Commander's Strike",
+    "effects.0.name": "Commander's Strike",
+    "effects.0.description": "When you take the Attack action on your turn, you can replace one of your attacks so that a willing ally who can see or hear you uses its Reaction to make one attack with a weapon or an Unarmed Strike. You expend a Superiority Die and, on a hit, add it to the damage."
+  },
+  "commanding-presence": {
+    "_es": "33a3926e",
+    "name": "Commanding Presence",
+    "effects.0.name": "Commanding Presence",
+    "effects.0.description": "When you make a Charisma (Intimidation, Performance, or Persuasion) check, you can expend a Superiority Die and add it to the roll."
+  },
+  "disarming-attack": {
+    "_es": "944bb536",
+    "name": "Disarming Attack",
+    "effects.0.name": "Disarming Attack",
+    "effects.0.description": "When you hit a creature with an attack roll, you can expend a Superiority Die and add it to the damage. The target makes a Strength saving throw or drops one object of your choice that it is holding, which lands in its space."
+  },
+  "distracting-strike": {
+    "_es": "00ba2bb7",
+    "name": "Distracting Strike",
+    "effects.0.name": "Distracting Strike",
+    "effects.0.description": "When you hit a creature with an attack roll, you can expend a Superiority Die and add it to the damage. The next attack roll against the target by someone other than you has Advantage if made before the start of your next turn."
+  },
+  "evasive-footwork": {
+    "_es": "fd780091",
+    "name": "Evasive Footwork",
+    "effects.0.name": "Evasive Footwork",
+    "effects.0.description": "As a Bonus Action, you can expend a Superiority Die and take the Disengage action. You roll the die and add the result to your AC until the start of your next turn."
+  },
+  "feinting-attack": {
+    "_es": "1eb2727c",
+    "name": "Feinting Attack",
+    "effects.0.name": "Feinting Attack",
+    "effects.0.description": "As a Bonus Action, you can expend a Superiority Die to feint against a creature within 5 feet: you have Advantage on your next attack roll against it this turn and, if that attack hits, add the die to the damage."
+  },
+  "goading-attack": {
+    "_es": "c873c5a9",
+    "name": "Goading Attack",
+    "effects.0.name": "Goading Attack",
+    "effects.0.description": "When you hit a creature with an attack roll, you can expend a Superiority Die and add it to the damage. The target makes a Wisdom saving throw or has Disadvantage on attack rolls against targets other than you until the end of your next turn."
+  },
+  "lunging-attack": {
+    "_es": "bacd52df",
+    "name": "Lunging Attack",
+    "effects.0.name": "Lunging Attack",
+    "effects.0.description": "As a Bonus Action, you can expend a Superiority Die and take the Dash action. If you move at least 5 feet in a straight line right before hitting with a melee attack as part of the Attack action this turn, add the die to the damage."
+  },
+  "maneuvering-attack": {
+    "_es": "5ba0a6b7",
+    "name": "Maneuvering Attack",
+    "effects.0.name": "Maneuvering Attack",
+    "effects.0.description": "When you hit a creature with an attack roll, you can expend a Superiority Die and add it to the damage. A willing ally who can see or hear you can use its Reaction to move up to half its Speed without provoking Opportunity Attacks from the target."
+  },
+  "menacing-attack": {
+    "_es": "2a3b3f50",
+    "name": "Menacing Attack",
+    "effects.0.name": "Menacing Attack",
+    "effects.0.description": "When you hit a creature with an attack roll, you can expend a Superiority Die and add it to the damage. The target makes a Wisdom saving throw or has the Frightened condition until the end of your next turn."
+  },
+  "parry": {
+    "_es": "58e46ed8",
+    "name": "Parry",
+    "effects.0.name": "Parry",
+    "effects.0.description": "When another creature damages you with a melee attack roll, you can take a Reaction and expend a Superiority Die to reduce the damage by the die roll plus your Strength or Dexterity modifier (your choice)."
+  },
+  "precision-attack": {
+    "_es": "8127cdb4",
+    "name": "Precision Attack",
+    "effects.0.name": "Precision Attack",
+    "effects.0.description": "When you miss with an attack roll, you can expend a Superiority Die, roll it, and add it to the roll, possibly turning it into a hit."
+  },
+  "pushing-attack": {
+    "_es": "223e4b26",
+    "name": "Pushing Attack",
+    "effects.0.name": "Pushing Attack",
+    "effects.0.description": "When you hit a creature with an attack roll using a weapon or an Unarmed Strike, you can expend a Superiority Die and add it to the damage. If the target is Large or smaller, it makes a Strength saving throw or is pushed up to 15 feet straight away from you."
+  },
+  "rally": {
+    "_es": "c3ff78d4",
+    "name": "Rally",
+    "effects.0.name": "Rally",
+    "effects.0.description": "As a Bonus Action, you can expend a Superiority Die to bolster an ally within 30 feet who can see or hear you: it gains Temporary Hit Points equal to the die roll plus half your Fighter level (round down)."
+  },
+  "riposte": {
+    "_es": "ab282049",
+    "name": "Riposte",
+    "effects.0.name": "Riposte",
+    "effects.0.description": "When a creature misses you with a melee attack roll, you can take a Reaction and expend a Superiority Die to make a melee attack with a weapon or an Unarmed Strike against it. On a hit, add the die to the damage."
+  },
+  "sweeping-attack": {
+    "_es": "51fd6309",
+    "name": "Sweeping Attack",
+    "effects.0.name": "Sweeping Attack",
+    "effects.0.description": "When you hit a creature with a melee attack roll using a weapon or an Unarmed Strike, you can expend a Superiority Die to harm another creature within 5 feet of the original target and within your reach. If the original roll would hit the second creature, it takes damage equal to the die roll, of the same type as the original attack."
+  },
+  "tactical-assessment": {
+    "_es": "424bc419",
+    "name": "Tactical Assessment",
+    "effects.0.name": "Tactical Assessment",
+    "effects.0.description": "When you make an Intelligence (History or Investigation) or Wisdom (Insight) check, you can expend a Superiority Die and add it to the check."
+  },
+  "trip-attack": {
+    "_es": "4bb1b5d8",
+    "name": "Trip Attack",
+    "effects.0.name": "Trip Attack",
+    "effects.0.description": "When you hit a creature with an attack roll using a weapon or an Unarmed Strike, you can expend a Superiority Die and add it to the damage. If the target is Large or smaller, it makes a Strength saving throw or has the Prone condition."
   }
 }

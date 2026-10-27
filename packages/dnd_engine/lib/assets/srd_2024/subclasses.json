@@ -76,8 +76,9 @@
         "name": "Superioridad en Combate",
         "description": "Aprendés maniobras alimentadas por dados de superioridad (d8). Empezás con 4 dados que recuperás en un descanso corto o largo.",
         "effects": [
-          { "type": "resource", "id": "superiority_dice", "name": "Dados de Superioridad", "max": 4, "recharge": "short", "damageByLevel": { "3": "d8", "10": "d10", "18": "d12" }, "description": "Gastás un dado de superioridad (d8) para ejecutar una maniobra: Ataque de Finta, Barrido, Desarmar, Maniobra Defensiva, etc." },
-          { "type": "passiveTrait", "name": "Maniobras", "description": "Conocés 3 maniobras a elección (Ataque de Precisión, Empujón, Provocar, etc.)." }
+          { "type": "resource", "id": "superiority_dice", "name": "Dados de Superioridad", "max": 4, "recharge": "short", "damageByLevel": { "3": "d8", "10": "d10", "18": "d12" }, "description": "Gastás un dado de superioridad para ejecutar una de tus maniobras. Se recuperan todos con un descanso corto o largo." },
+          { "type": "passiveTrait", "name": "Maniobras", "description": "Conocés 3 maniobras a elección (Ataque de Precisión, Empujón, Provocar, etc.)." },
+          { "type": "featureChoice", "groupId": "maneuver", "name": "Maniobras", "count": 3, "replaceable": true }
         ]
       },
       {
@@ -95,8 +96,9 @@
         "name": "Conoce a tu Enemigo",
         "description": "Como acción adicional descubrís las inmunidades, resistencias y vulnerabilidades de una criatura. Pasás a tener 5 dados de superioridad.",
         "effects": [
-          { "type": "resource", "id": "superiority_dice", "name": "Dados de Superioridad", "max": 5, "recharge": "short", "damageByLevel": { "3": "d8", "10": "d10", "18": "d12" }, "description": "Gastás un dado de superioridad (d8) para ejecutar una maniobra: Ataque de Finta, Barrido, Desarmar, Maniobra Defensiva, etc." },
-          { "type": "passiveTrait", "name": "Conoce a tu Enemigo", "description": "Como acción adicional, discernís las fortalezas y debilidades de una criatura que veas a 30 pies o menos: sabés si tiene inmunidades, resistencias o vulnerabilidades y, si las tiene, cuáles son. Una vez usado, no podés volver a hacerlo hasta terminar un descanso largo; también podés recuperar el uso gastando un dado de superioridad (no requiere acción)." }
+          { "type": "resource", "id": "superiority_dice", "name": "Dados de Superioridad", "max": 5, "recharge": "short", "damageByLevel": { "3": "d8", "10": "d10", "18": "d12" }, "description": "Gastás un dado de superioridad para ejecutar una de tus maniobras. Se recuperan todos con un descanso corto o largo." },
+          { "type": "passiveTrait", "name": "Conoce a tu Enemigo", "description": "Como acción adicional, discernís las fortalezas y debilidades de una criatura que veas a 30 pies o menos: sabés si tiene inmunidades, resistencias o vulnerabilidades y, si las tiene, cuáles son. Una vez usado, no podés volver a hacerlo hasta terminar un descanso largo; también podés recuperar el uso gastando un dado de superioridad (no requiere acción)." },
+          { "type": "featureChoice", "groupId": "maneuver", "name": "Maniobras", "count": 5, "replaceable": true }
         ]
       },
       {
@@ -104,7 +106,8 @@
         "name": "Superioridad en Combate Mejorada",
         "description": "Tus dados de superioridad se convierten en d10.",
         "effects": [
-          { "type": "passiveTrait", "name": "Superioridad Mejorada (d10)", "description": "Tus dados de superioridad ahora son d10." }
+          { "type": "passiveTrait", "name": "Superioridad Mejorada (d10)", "description": "Tus dados de superioridad ahora son d10." },
+          { "type": "featureChoice", "groupId": "maneuver", "name": "Maniobras", "count": 7, "replaceable": true }
         ]
       },
       {
@@ -112,8 +115,9 @@
         "name": "Implacable",
         "description": "Si tirás iniciativa sin dados de superioridad, recuperás uno. Pasás a tener 6 dados de superioridad.",
         "effects": [
-          { "type": "resource", "id": "superiority_dice", "name": "Dados de Superioridad", "max": 6, "recharge": "short", "damageByLevel": { "3": "d8", "10": "d10", "18": "d12" }, "description": "Gastás un dado de superioridad (d8) para ejecutar una maniobra: Ataque de Finta, Barrido, Desarmar, Maniobra Defensiva, etc." },
-          { "type": "passiveTrait", "name": "Implacable", "description": "Al entrar en combate sin dados de superioridad, recuperás uno." }
+          { "type": "resource", "id": "superiority_dice", "name": "Dados de Superioridad", "max": 6, "recharge": "short", "damageByLevel": { "3": "d8", "10": "d10", "18": "d12" }, "description": "Gastás un dado de superioridad para ejecutar una de tus maniobras. Se recuperan todos con un descanso corto o largo." },
+          { "type": "passiveTrait", "name": "Implacable", "description": "Al entrar en combate sin dados de superioridad, recuperás uno." },
+          { "type": "featureChoice", "groupId": "maneuver", "name": "Maniobras", "count": 9, "replaceable": true }
         ]
       },
       {
@@ -980,7 +984,8 @@
         "name": "Formas de Círculo",
         "description": "Tu Forma Salvaje admite VD hasta nivel de Druida entre 3, CA 13 + Sabiduría y PG temporales iguales al triple de tu nivel.",
         "effects": [
-          { "type": "passiveTrait", "name": "Formas de Círculo", "description": "Al adoptar una forma de Forma Salvaje canalizás magia lunar. Valor de Desafío: el máximo de la forma es tu nivel de Druida dividido por 3 (redondeando hacia abajo). Clase de Armadura: mientras estés en la forma, tu CA es 13 + tu modificador de Sabiduría si ese total supera la CA de la bestia. Puntos de golpe temporales: obtenés una cantidad igual al triple de tu nivel de Druida." }
+          { "type": "passiveTrait", "name": "Formas de Círculo", "description": "Al adoptar una forma de Forma Salvaje canalizás magia lunar. Valor de Desafío: el máximo de la forma es tu nivel de Druida dividido por 3 (redondeando hacia abajo). Clase de Armadura: mientras estés en la forma, tu CA es 13 + tu modificador de Sabiduría si ese total supera la CA de la bestia. Puntos de golpe temporales: obtenés una cantidad igual al triple de tu nivel de Druida." },
+          { "type": "wildShapeBoost", "maxCrLevelDivisor": 3, "armorClassBase": 13, "armorClassAbility": "wisdom", "tempHpPerLevel": 3 }
         ]
       },
       {
@@ -1023,15 +1028,17 @@
         "description": "En Forma Salvaje elegís daño normal o radiante y sumás Sabiduría a las salvaciones de Constitución.",
         "effects": [
           { "type": "passiveTrait", "name": "Formas de Círculo Mejoradas: Resplandor Lunar", "description": "Cada uno de tus ataques en una forma de Forma Salvaje puede causar su tipo de daño normal o daño radiante. Elegís cada vez que impactás con esos ataques." },
-          { "type": "passiveTrait", "name": "Formas de Círculo Mejoradas: Dureza Acrecentada", "description": "Podés sumar tu modificador de Sabiduría a tus tiradas de salvación de Constitución." }
+          { "type": "passiveTrait", "name": "Formas de Círculo Mejoradas: Dureza Acrecentada", "description": "Podés sumar tu modificador de Sabiduría a tus tiradas de salvación de Constitución." },
+          { "type": "wildShapeBoost", "damageTypeOptions": ["radiant"], "savingThrowBonuses": { "constitution": "wisdom" } }
         ]
       },
       {
         "level": 10,
         "name": "Paso de Luz Lunar",
-        "description": "En Forma Salvaje podés teletransportarte una corta distancia como acción adicional.",
+        "description": "Te teletransportás 30 pies como acción adicional y atacás con ventaja.",
         "effects": [
-          { "type": "passiveTrait", "name": "Paso de Luz Lunar", "description": "Teletransporte de 30 pies como acción adicional en forma de bestia." }
+          { "type": "passiveTrait", "name": "Paso de Luz Lunar", "description": "Como acción adicional te teletransportás hasta 30 pies a un espacio desocupado que puedas ver, y tenés ventaja en la próxima tirada de ataque que hagas antes del final de ese turno. Usos iguales a tu mod. de Sabiduría (mínimo uno); se recuperan tras un descanso largo, y gastar un espacio de nivel 2 o superior restablece un uso." },
+          { "type": "resource", "id": "moonlight_step", "name": "Paso de Luz Lunar", "max": 1, "maxFromAbility": "wisdom", "recharge": "long", "description": "Usos de Paso de Luz Lunar; un espacio de nivel 2 o superior restablece uno." }
         ]
       },
       {

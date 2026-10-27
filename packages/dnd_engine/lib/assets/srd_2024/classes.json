@@ -3625,6 +3625,13 @@
             "type": "passiveTrait",
             "name": "Metamagia",
             "description": "Aprendés dos opciones de Metamagia (p.ej. Conjuro Acelerado, Conjuro Gemelo) que aplicás gastando Puntos de Hechicería. Solo podés aplicar una por conjuro, salvo que la opción diga otra cosa, y al subir de nivel podés cambiar una por otra."
+          },
+          {
+            "type": "featureChoice",
+            "groupId": "metamagic",
+            "name": "Metamagia",
+            "count": 2,
+            "replaceable": true
           }
         ]
       },
@@ -3669,6 +3676,13 @@
             "type": "passiveTrait",
             "name": "Metamagia (dos opciones más)",
             "description": "Aprendés dos opciones de Metamagia adicionales de tu elección."
+          },
+          {
+            "type": "featureChoice",
+            "groupId": "metamagic",
+            "name": "Metamagia",
+            "count": 4,
+            "replaceable": true
           }
         ]
       },
@@ -3681,6 +3695,13 @@
             "type": "passiveTrait",
             "name": "Metamagia (dos opciones más)",
             "description": "Aprendés dos opciones de Metamagia adicionales de tu elección."
+          },
+          {
+            "type": "featureChoice",
+            "groupId": "metamagic",
+            "name": "Metamagia",
+            "count": 6,
+            "replaceable": true
           }
         ]
       },

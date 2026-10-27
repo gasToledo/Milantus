@@ -1373,6 +1373,8 @@ Map<String, String> get featCategoryLabels => localized(
         'dragonmark': 'Marca dracónica',
         'warlock-invocation': 'Invocación sobrenatural',
         'druid-land': 'Terreno del Círculo de la Tierra',
+        'metamagic': 'Metamagia',
+        'maneuver': 'Maniobra',
       },
       const {
         'origin': 'Origin',
@@ -1382,6 +1384,8 @@ Map<String, String> get featCategoryLabels => localized(
         'dragonmark': 'Dragonmark',
         'warlock-invocation': 'Eldritch Invocation',
         'druid-land': 'Circle of the Land terrain',
+        'metamagic': 'Metamagic',
+        'maneuver': 'Maneuver',
       },
     );
 

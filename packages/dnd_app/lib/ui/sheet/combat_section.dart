@@ -875,7 +875,10 @@ extension _SheetCombatSection on _SheetScreenState {
     });
     _snack(
       ok
-          ? context.l10n.wildShapeDone(form.name, s.level)
+          ? context.l10n.wildShapeDone(
+              form.name,
+              s.wildShape?.tempHpOnEnter ?? s.level,
+            )
           : context.l10n.wildShapeNoUses,
     );
   }

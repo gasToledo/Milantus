@@ -483,11 +483,30 @@ class WildShapeSlot {
   /// contenido: acá no hay ningún número de nivel escrito.
   final bool canCast;
 
+  /// PG temporales al transformarse, o null para los de la regla base (el
+  /// nivel). Formas de Círculo da el triple del nivel de Druida.
+  final int? tempHpOnEnter;
+
+  /// CA mínima en forma, ya resuelta (13 + SAB de Formas de Círculo), o null.
+  final int? armorClassFloor;
+
+  /// Tipos de daño que los ataques de la bestia pueden elegir además del
+  /// suyo (Resplandor Lunar).
+  final List<String> damageTypeOptions;
+
+  /// Bonos a salvaciones mientras dura la forma, ya resueltos (Dureza
+  /// Acrecentada: SAB a CON).
+  final Map<Ability, int> savingThrowBonuses;
+
   const WildShapeSlot({
     required this.count,
     required this.options,
     this.chosen = const [],
     this.canCast = false,
+    this.tempHpOnEnter,
+    this.armorClassFloor,
+    this.damageTypeOptions = const [],
+    this.savingThrowBonuses = const {},
   });
 
   int get pending => (count - chosen.length).clamp(0, count);
@@ -978,6 +997,10 @@ class ComputedSheet {
 
   final Set<Ability> savingThrowProficiencies;
   final int savingThrowBonus;
+
+  /// Bonos a una salvación sola, además de [savingThrowBonus]. Hoy los pone
+  /// solo la Forma Salvaje del Círculo de la Luna (SAB a CON).
+  final Map<Ability, int> savingThrowBonusByAbility;
   final Set<String> skillProficiencies;
 
   /// Habilidades con **Pericia**: el bonificador por competencia cuenta doble.
@@ -1151,6 +1174,7 @@ class ComputedSheet {
     this.halfProficiencyUnskilled = false,
     required this.savingThrowProficiencies,
     this.savingThrowBonus = 0,
+    this.savingThrowBonusByAbility = const {},
     required this.skillProficiencies,
     this.expertiseSkills = const {},
     this.skillBonuses = const {},
@@ -1226,6 +1250,7 @@ class ComputedSheet {
     bool? halfProficiencyUnskilled,
     Set<Ability>? savingThrowProficiencies,
     int? savingThrowBonus,
+    Map<Ability, int>? savingThrowBonusByAbility,
     Set<String>? skillProficiencies,
     Set<String>? expertiseSkills,
     Map<String, List<SkillBonus>>? skillBonuses,
@@ -1292,6 +1317,8 @@ class ComputedSheet {
         savingThrowProficiencies:
             savingThrowProficiencies ?? this.savingThrowProficiencies,
         savingThrowBonus: savingThrowBonus ?? this.savingThrowBonus,
+        savingThrowBonusByAbility:
+            savingThrowBonusByAbility ?? this.savingThrowBonusByAbility,
         skillProficiencies: skillProficiencies ?? this.skillProficiencies,
         expertiseSkills: expertiseSkills ?? this.expertiseSkills,
         skillBonuses: skillBonuses ?? this.skillBonuses,
@@ -1391,7 +1418,8 @@ class ComputedSheet {
   int savingThrow(Ability a) =>
       abilityCheck(a) +
       (savingThrowProficiencies.contains(a) ? proficiencyBonus : 0) +
-      savingThrowBonus;
+      savingThrowBonus +
+      (savingThrowBonusByAbility[a] ?? 0);
 
   /// Modificador total de una habilidad: **único lugar donde vive esta suma**.
   /// Antes la hacían a mano la Percepción pasiva y la ficha, cada una por su

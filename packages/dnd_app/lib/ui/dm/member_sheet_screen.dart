@@ -110,7 +110,15 @@ class _MemberSheetScreenState extends State<MemberSheetScreen> {
 
   Widget _sheet(CampaignMember member) {
     final character = member.character;
-    final sheet = CharacterCompiler(widget.repo).compile(character);
+    // La misma pila que la ficha del jugador: la Forma Salvaje encima y el
+    // Cansancio último. El DM tiene que ver la CA del oso, no la del druida.
+    final beastId = character.combat.wildShapeCreatureId;
+    final beast = beastId == null ? null : widget.repo.creature(beastId);
+    final compiled = CharacterCompiler(widget.repo).compile(character);
+    final sheet = applyExhaustion(
+      beast == null ? compiled : applyWildShape(compiled, beast),
+      character.combat.exhaustion,
+    );
     final klass = widget.repo.characterClass(character.classId);
     final race = widget.repo.race(character.raceId);
     final portraitKey = character.portraitPaths.firstOrNull;
@@ -184,6 +192,8 @@ class _MemberSheetScreenState extends State<MemberSheetScreen> {
     final pal = context.palette;
     final maxHp = sheet.maxHp;
     final currentHp = character.combat.currentHp;
+    final beastId = character.combat.wildShapeCreatureId;
+    final beast = beastId == null ? null : widget.repo.creature(beastId);
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -232,6 +242,24 @@ class _MemberSheetScreenState extends State<MemberSheetScreen> {
               if (character.combat.heroicInspiration) ...[
                 const SizedBox(height: 8),
                 GoldPill(context.l10n.heroicInspiration),
+              ],
+              // Lo que cambia los números de abajo: sin esto el DM ve una CA
+              // o unas resistencias que no sabe de dónde salen.
+              if (beast != null) ...[
+                const SizedBox(height: 8),
+                GoldPill(context.l10n.wildShapeAs(beast.name)),
+              ],
+              for (final m in sheet.activeModes.where((m) => m.active)) ...[
+                const SizedBox(height: 8),
+                GoldPill(
+                  [
+                    m.name,
+                    ?m.variants
+                        .where((v) => v.id == m.activeVariant)
+                        .firstOrNull
+                        ?.name,
+                  ].join(' · '),
+                ),
               ],
             ],
           ),
@@ -330,6 +358,11 @@ class _MemberSheetScreenState extends State<MemberSheetScreen> {
               ),
             ),
           ),
+          if (sheet.saveAdvantages(a) case final advantages
+              when advantages.isNotEmpty) ...[
+            _advantageTag(context, advantages),
+            const SizedBox(width: 6),
+          ],
           Text(
             _signed(sheet.savingThrow(a)),
             style: TextStyle(
@@ -462,6 +495,22 @@ class _MemberSheetScreenState extends State<MemberSheetScreen> {
         : Tooltip(message: info.description, child: pill);
   }
 
+  /// «VENTAJA» con sus fuentes en el tooltip, como en la ficha del jugador.
+  Widget _advantageTag(BuildContext context, List<Advantage> advantages) =>
+      Tooltip(
+        message: context.l10n.advantageFrom(
+          advantages
+              .map(
+                (v) => v.source.isEmpty
+                    ? context.l10n.breakdownOtherTrait
+                    : v.source,
+              )
+              .toSet()
+              .join(', '),
+        ),
+        child: OutlinedTag(context.l10n.advantageTag),
+      );
+
   Widget _skillChip(BuildContext context, ComputedSheet sheet, Skill skill) {
     final pal = context.palette;
     return Container(
@@ -484,6 +533,14 @@ class _MemberSheetScreenState extends State<MemberSheetScreen> {
                 fontFeatures: const [FontFeature.tabularFigures()],
               ),
             ),
+            if (sheet.skillAdvantages(skill.id) case final advantages
+                when advantages.isNotEmpty) ...[
+              const TextSpan(text: ' '),
+              WidgetSpan(
+                alignment: PlaceholderAlignment.middle,
+                child: _advantageTag(context, advantages),
+              ),
+            ],
           ],
         ),
       ),

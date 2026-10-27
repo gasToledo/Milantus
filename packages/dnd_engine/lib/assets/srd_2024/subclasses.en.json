@@ -30,7 +30,7 @@
     "features.2.effects.1.name": "Fighting Style"
   },
   "battle-master": {
-    "_es": "e9af13de",
+    "_es": "31c0edef",
     "name": "Battle Master",
     "features.0.name": "Combat Superiority",
     "features.0.effects.0.name": "Superiority Dice",
@@ -51,20 +51,24 @@
     "features.5.effects.0.name": "Ultimate Superiority (d12)",
     "description": "A warrior who studies combat as a martial art, using tactical maneuvers to dominate the battlefield.",
     "features.0.description": "You learn maneuvers fueled by Superiority Dice (d8). You start with 4 dice, which you regain on a Short or Long Rest.",
-    "features.0.effects.0.description": "You expend a Superiority Die (d8) to perform a maneuver: Feinting Attack, Sweeping Attack, Disarming Attack, Evasive Footwork, and so on.",
+    "features.0.effects.0.description": "You expend a Superiority Die to use one of your maneuvers. You regain all of them when you finish a Short or Long Rest.",
     "features.0.effects.1.description": "You know 3 maneuvers of your choice (Precision Attack, Pushing Attack, Goading Attack, and so on).",
     "features.1.description": "You gain proficiency with one kind of Artisan's Tools and one skill of your choice.",
     "features.1.effects.2.description": "Proficiency with one set of Artisan's Tools and one skill of your choice.",
     "features.2.description": "As a Bonus Action, you discover a creature's Immunities, Resistances, and Vulnerabilities. You now have 5 Superiority Dice.",
-    "features.2.effects.0.description": "You expend a Superiority Die (d8) to perform a maneuver: Feinting Attack, Sweeping Attack, Disarming Attack, Evasive Footwork, and so on.",
+    "features.2.effects.0.description": "You expend a Superiority Die to use one of your maneuvers. You regain all of them when you finish a Short or Long Rest.",
     "features.2.effects.1.description": "As a Bonus Action, you discern the strengths and weaknesses of a creature you can see within 30 feet: you learn whether it has any Immunities, Resistances, or Vulnerabilities and, if so, what they are. Once used, you can't do so again until you finish a Long Rest; you can also restore the use by expending a Superiority Die (no action required).",
     "features.3.description": "Your Superiority Dice become d10s.",
     "features.3.effects.0.description": "Your Superiority Dice are now d10s.",
     "features.4.description": "If you roll Initiative with no Superiority Dice, you regain one. You now have 6 Superiority Dice.",
-    "features.4.effects.0.description": "You expend a Superiority Die (d8) to perform a maneuver: Feinting Attack, Sweeping Attack, Disarming Attack, Evasive Footwork, and so on.",
+    "features.4.effects.0.description": "You expend a Superiority Die to use one of your maneuvers. You regain all of them when you finish a Short or Long Rest.",
     "features.4.effects.1.description": "When you enter combat with no Superiority Dice, you regain one.",
     "features.5.description": "Your Superiority Dice become d12s.",
-    "features.5.effects.0.description": "Your Superiority Dice are now d12s."
+    "features.5.effects.0.description": "Your Superiority Dice are now d12s.",
+    "features.0.effects.2.name": "Maneuvers",
+    "features.2.effects.2.name": "Maneuvers",
+    "features.3.effects.1.name": "Maneuvers",
+    "features.4.effects.2.name": "Maneuvers"
   },
   "eldritch-knight": {
     "_es": "624a9c50",
@@ -470,7 +474,7 @@
     "features.2.effects.1.description": "Natural Recovery use."
   },
   "circle-moon": {
-    "_es": "a2850c37",
+    "_es": "f15ac1ff",
     "name": "Circle of the Moon",
     "features.0.name": "Circle Forms",
     "features.0.effects.0.name": "Circle Forms",
@@ -496,11 +500,13 @@
     "features.5.description": "In Wild Shape, you choose normal or Radiant damage and add Wisdom to Constitution saving throws.",
     "features.5.effects.0.description": "Each of your attacks in a Wild Shape form can deal its normal damage type or Radiant damage. You choose each time you hit with those attacks.",
     "features.5.effects.1.description": "You can add your Wisdom modifier to your Constitution saving throws.",
-    "features.6.description": "In Wild Shape, you can teleport a short distance as a Bonus Action.",
-    "features.6.effects.0.description": "A 30-foot teleport as a Bonus Action in Beast form.",
+    "features.6.description": "You teleport 30 feet as a Bonus Action and attack with Advantage.",
+    "features.6.effects.0.description": "As a Bonus Action, you teleport up to 30 feet to an unoccupied space you can see, and you have Advantage on the next attack roll you make before the end of this turn. Uses equal to your Wisdom modifier (minimum of once); you regain them when you finish a Long Rest, and expending a level 2+ spell slot restores one use.",
     "features.7.description": "Once per turn you add 2d10 Radiant damage, and Moonlight Step can teleport an ally too.",
     "features.7.effects.0.description": "Once per turn, you can deal an extra 2d10 Radiant damage to a target you hit with a Wild Shape form's attack.",
-    "features.7.effects.1.description": "Whenever you use Moonlight Step, you can also teleport one willing creature. That creature must be within 10 feet of you, and you teleport it to an unoccupied space you can see within 10 feet of your destination space."
+    "features.7.effects.1.description": "Whenever you use Moonlight Step, you can also teleport one willing creature. That creature must be within 10 feet of you, and you teleport it to an unoccupied space you can see within 10 feet of your destination space.",
+    "features.6.effects.1.name": "Moonlight Step",
+    "features.6.effects.1.description": "Uses of Moonlight Step; a level 2+ spell slot restores one."
   },
   "circle-sea": {
     "_es": "e251e0b3",

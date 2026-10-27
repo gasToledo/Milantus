@@ -163,6 +163,16 @@ class SheetBuilder {
   /// Puede lanzar conjuros transformado (Conjurar como Bestia, nivel 18).
   bool castWhileWildShaped = false;
 
+  /// Lo que suman las Formas de Círculo, ya resuelto con el nivel de la
+  /// fuente: VD máximo, PG temporales al entrar, tipos de daño. La CA y las
+  /// salvaciones dependen de modificadores finales y se resuelven al armar el
+  /// cupo.
+  num? wildShapeMaxCr;
+  int? wildShapeTempHp;
+  final List<String> wildShapeDamageTypes = [];
+  ({int base, Ability ability})? wildShapeArmorClass;
+  final Map<Ability, Ability> wildShapeSaveBonuses = {};
+
   /// Elecciones abiertas declaradas por el contenido, por grupo. Gana la de
   /// mayor [FeatureChoiceEffect.count], porque el contenido declara el
   /// acumulado a cada nivel y no el incremento.
@@ -577,6 +587,26 @@ class SheetBuilder {
         wildShapeForms = e;
       case CastWhileWildShapedEffect():
         castWhileWildShaped = true;
+      case WildShapeBoostEffect():
+        final sourceLvl = sourceLevel ?? level;
+        if (e.maxCrLevelDivisor case final d?) {
+          final cr = sourceLvl ~/ d;
+          if (cr > (wildShapeMaxCr ?? 0)) wildShapeMaxCr = cr;
+        }
+        if (e.tempHpPerLevel > 0) {
+          final hp = e.tempHpPerLevel * sourceLvl;
+          if (hp > (wildShapeTempHp ?? 0)) wildShapeTempHp = hp;
+        }
+        if (e.armorClassBase case final base?) {
+          wildShapeArmorClass = (
+            base: base,
+            ability: e.armorClassAbility ?? Ability.wisdom,
+          );
+        }
+        for (final t in e.damageTypeOptions) {
+          if (!wildShapeDamageTypes.contains(t)) wildShapeDamageTypes.add(t);
+        }
+        wildShapeSaveBonuses.addAll(e.savingThrowBonuses);
     }
   }
 

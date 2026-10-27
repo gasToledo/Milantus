@@ -193,8 +193,8 @@ void main() {
     // contador (Inspiración Bárdica, Indómito, Recuperación Arcana, los usos
     // de especie...). Los de especie que llegan con el nivel van envueltos en
     // `leveled` y este recorrido no los ve.
-    // 82 con el uso de El Tercer Ojo del Adivino.
-    expect(recursos, hasLength(82));
+    // 83 con Paso de Luz Lunar del Círculo de la Luna.
+    expect(recursos, hasLength(83));
 
     var porCaracteristica = 0;
     var porNivel = 0;

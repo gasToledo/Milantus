@@ -577,7 +577,7 @@
     "features.4.effects.1.description": "Bardic Inspiration dice you can give; uses = Charisma modifier (minimum of once). You regain all of them on a Short or Long Rest."
   },
   "sorcerer": {
-    "_es": "84b7a64c",
+    "_es": "6e1eb529",
     "name": "Sorcerer",
     "features.0.name": "Spellcasting",
     "features.0.effects.1.name": "Animated Objects",
@@ -621,7 +621,10 @@
     "features.9.description": "With Innate Sorcery active, one Metamagic option per turn is free.",
     "features.9.effects.0.description": "While your Innate Sorcery is active, you can use one Metamagic option on each of your turns without spending Sorcery Points.",
     "features.4.effects.1.name": "Sorcerous Restoration",
-    "features.4.effects.1.description": "Sorcerous Restoration use."
+    "features.4.effects.1.description": "Sorcerous Restoration use.",
+    "features.3.effects.1.name": "Metamagic",
+    "features.6.effects.1.name": "Metamagic",
+    "features.7.effects.1.name": "Metamagic"
   },
   "warlock": {
     "_es": "fe8b5881",

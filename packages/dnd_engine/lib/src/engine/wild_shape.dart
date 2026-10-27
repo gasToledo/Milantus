@@ -62,10 +62,17 @@ ComputedSheet applyWildShape(ComputedSheet base, Creature beast) {
   // bono de Orden Primordial y con la mochila en cero—, y el compilador no
   // avisa porque son parámetros opcionales. Acá se nombra solo lo que la
   // bestia efectivamente reemplaza.
+  // Lo que suma el Círculo de la Luna, ya resuelto con la SAB del druida.
+  final circle = base.wildShape;
+  final floor = circle?.armorClassFloor;
+  final extraTypes = circle?.damageTypeOptions ?? const <String>[];
   return base.copyWith(
     abilityScores: scores,
     abilityModifiers: mods,
-    armorClass: resolved.armorClass,
+    armorClass: floor != null && floor > resolved.armorClass
+        ? floor
+        : resolved.armorClass,
+    savingThrowBonusByAbility: circle?.savingThrowBonuses,
     // `labelEs` y no `label`: el tamaño de la ficha es el valor de vocabulario
     // que guarda la especie (`Race.size`), y se traduce al mostrarlo.
     size: beast.creatureSize?.labelEs ?? base.size,
@@ -94,6 +101,9 @@ ComputedSheet applyWildShape(ComputedSheet base, Creature beast) {
             attackBonus: a.attackBonus!,
             damage: a.damage ?? '',
             damageType: a.damageType ?? '',
+            damageTypeOptions: extraTypes.isEmpty
+                ? null
+                : [if (a.damageType != null) a.damageType!, ...extraTypes],
           ),
     ],
   );

@@ -40,6 +40,17 @@ const srdFeatIds = {
   'boon-of-the-night-spirit',
   'boon-of-spell-recall',
   'boon-of-dimensional-travel',
+  // Las diez opciones de Metamagia: el SRD trae el capítulo entero.
+  'quickened-spell',
+  'seeking-spell',
+  'careful-spell',
+  'distant-spell',
+  'extended-spell',
+  'twinned-spell',
+  'heightened-spell',
+  'empowered-spell',
+  'subtle-spell',
+  'transmuted-spell',
 };
 
 void main() {
@@ -540,6 +551,10 @@ void main() {
       // nombre de rasgo salvo que sea *solo* tabla de conjuros, y estos además
       // conceden resistencia.
       'druid-land',
+      // Ídem: las opciones de Metamagia del Hechicero y las maniobras del
+      // Maestro de Batalla.
+      'metamagic',
+      'maneuver',
     };
     for (final f in repo.feats.values) {
       expect(validCategories, contains(f.category),

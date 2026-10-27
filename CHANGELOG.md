@@ -941,6 +941,36 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
+## [0.38.0+1] - 2026-10-27
+
+### Nuevo
+
+- Las Formas del Círculo de la Luna cambian la Forma Salvaje: el valor de
+  desafío máximo es el nivel de Druida entre 3, la CA es 13 + SAB si le gana
+  a la de la bestia y transformarse da PG temporales iguales al triple del
+  nivel. Desde el nivel 6, los ataques de la bestia pueden hacer daño
+  radiante y la SAB se suma a las salvaciones de CON.
+- Paso de Luz Lunar lleva la cuenta de sus usos (tantos como el mod. de SAB).
+- El Hechicero elige sus opciones de Metamagia (2, 4 y 6 en los niveles 2, 10
+  y 17) y el Maestro de Batalla sus maniobras (3, 5, 7 y 9 en los niveles 3,
+  7, 10 y 15), con el texto de cada una en la ficha. Se pueden cambiar al
+  subir de nivel.
+- La ficha del miembro que ve el DM muestra la Forma Salvaje y los estados
+  activos (con sus números ya aplicados) y marca las ventajas en salvaciones
+  y habilidades.
+
+### Modificado
+
+- Corregido a las reglas 2024 el texto de Paso de Luz Lunar, y los Dados de
+  Superioridad ya no nombran maniobras de 2014.
+- El aviso al transformarse dice los PG temporales que de verdad se ganaron.
+- Con muchos cupos de sintonización (el Artífice llega a seis), en el celular
+  las casillas se reparten en filas y el nombre del objeto ya no se corta.
+
+### Eliminado
+
+- Sin cambios.
+
 ## [Unreleased]
 
 ### Nuevo

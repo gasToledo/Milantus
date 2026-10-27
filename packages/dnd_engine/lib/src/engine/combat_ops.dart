@@ -322,7 +322,8 @@ class CombatOps {
   static const String wildShapeResourceId = 'wild_shape';
 
   /// Se transforma en [beast] gastando un uso de Forma Salvaje y sumando PG
-  /// temporales iguales al nivel de druida. Devuelve false si no quedan usos.
+  /// temporales iguales al nivel de druida, o los de Formas de Círculo.
+  /// Devuelve false si no quedan usos.
   ///
   /// Solo cambia el estado: los números de la ficha los reemplaza
   /// `applyWildShape`, que es una función pura sobre la ficha ya compilada.
@@ -338,7 +339,7 @@ class CombatOps {
     if (used >= resource.max) return false;
     c.resourceUsage[wildShapeResourceId] = used + 1;
     c.wildShapeCreatureId = beast.id;
-    setTempHp(c, sheet.level);
+    setTempHp(c, sheet.wildShape?.tempHpOnEnter ?? sheet.level);
     return true;
   }
 

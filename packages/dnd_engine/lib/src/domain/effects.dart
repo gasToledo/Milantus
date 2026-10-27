@@ -203,6 +203,23 @@ sealed class Effect {
           allowFly: json['allowFly'] as bool? ?? false,
         ),
       'castWhileWildShaped' => const CastWhileWildShapedEffect(),
+      'wildShapeBoost' => WildShapeBoostEffect(
+          maxCrLevelDivisor: json['maxCrLevelDivisor'] as int?,
+          armorClassBase: json['armorClassBase'] as int?,
+          armorClassAbility: json['armorClassAbility'] == null
+              ? null
+              : Ability.fromKey(json['armorClassAbility'] as String),
+          tempHpPerLevel: json['tempHpPerLevel'] as int? ?? 0,
+          damageTypeOptions: (json['damageTypeOptions'] as List? ?? const [])
+              .whereType<String>()
+              .toList(),
+          savingThrowBonuses: {
+            for (final e
+                in (json['savingThrowBonuses'] as Map? ?? const {}).entries)
+              Ability.fromKey(e.key as String):
+                  Ability.fromKey(e.value as String),
+          },
+        ),
       'offHandAbilityDamage' => const OffHandAbilityDamageEffect(),
       'heroicInspirationOnLongRest' =>
         const HeroicInspirationOnLongRestEffect(),
@@ -2162,6 +2179,63 @@ class WildShapeFormsEffect extends Effect {
         'count': count,
         'maxCr': maxCr,
         'allowFly': allowFly,
+      };
+}
+
+/// Lo que el Círculo de la Luna le agrega a la Forma Salvaje (Formas de
+/// Círculo, nivel 3, y Formas de Círculo Mejoradas, nivel 6).
+///
+/// No es un estado activable: la forma ya es el estado, y estas reglas valen
+/// mientras dure. Los números que dependen del nivel o de un modificador se
+/// resuelven con el nivel de la fuente (el de Druida) al compilar, y
+/// `applyWildShape` los aplica sobre la ficha de la bestia.
+class WildShapeBoostEffect extends Effect {
+  /// El VD máximo pasa a ser el nivel de la fuente dividido por esto
+  /// (redondeando hacia abajo), si le gana al de la tabla.
+  final int? maxCrLevelDivisor;
+
+  /// La CA en forma es [armorClassBase] + el modificador de
+  /// [armorClassAbility] si supera la de la bestia.
+  final int? armorClassBase;
+  final Ability? armorClassAbility;
+
+  /// PG temporales al transformarse, por nivel de la fuente. Reemplaza al
+  /// «tu nivel de Druida» de la regla base; no se suman (los PG temporales
+  /// nunca se acumulan).
+  final int tempHpPerLevel;
+
+  /// Tipos de daño que pueden elegir los ataques de la bestia (Resplandor
+  /// Lunar: radiante).
+  final List<String> damageTypeOptions;
+
+  /// Salvación → característica cuyo modificador se le suma (Dureza
+  /// Acrecentada: SAB a las de CON).
+  final Map<Ability, Ability> savingThrowBonuses;
+
+  const WildShapeBoostEffect({
+    this.maxCrLevelDivisor,
+    this.armorClassBase,
+    this.armorClassAbility,
+    this.tempHpPerLevel = 0,
+    this.damageTypeOptions = const [],
+    this.savingThrowBonuses = const {},
+  });
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'wildShapeBoost',
+        if (maxCrLevelDivisor != null) 'maxCrLevelDivisor': maxCrLevelDivisor,
+        if (armorClassBase != null) 'armorClassBase': armorClassBase,
+        if (armorClassAbility != null)
+          'armorClassAbility': armorClassAbility!.name,
+        if (tempHpPerLevel != 0) 'tempHpPerLevel': tempHpPerLevel,
+        if (damageTypeOptions.isNotEmpty)
+          'damageTypeOptions': damageTypeOptions,
+        if (savingThrowBonuses.isNotEmpty)
+          'savingThrowBonuses': {
+            for (final e in savingThrowBonuses.entries)
+              e.key.name: e.value.name,
+          },
       };
 }
 

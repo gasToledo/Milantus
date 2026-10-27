@@ -994,7 +994,7 @@ class CharacterCompiler {
       expertiseChoiceSlots: expertiseSlots,
       spellChoiceSlots: spellChoiceSlots,
       spellDamageBonuses: damageBonuses.bonuses,
-      wildShape: _resolveWildShape(c, builder),
+      wildShape: _resolveWildShape(c, builder, mods),
       languages: knownLanguages,
       languageChoiceSlots: languageChoiceSlots,
       spellcasting: spellcasting,
@@ -1068,9 +1068,13 @@ class CharacterCompiler {
   /// igual que en [_resolveSpellChoices]: un druida que baja de nivel pierde el
   /// oso de VD 1 de la lista sin que haya que tocar la ficha guardada, y lo
   /// recupera si vuelve a subir.
-  WildShapeSlot? _resolveWildShape(Character c, SheetBuilder builder) {
+  WildShapeSlot? _resolveWildShape(
+      Character c, SheetBuilder builder, Map<Ability, int> mods) {
     final e = builder.wildShapeForms;
     if (e == null) return null;
+    // Formas de Círculo: el VD sale del nivel si le gana a la tabla.
+    final maxCr = max(e.maxCr, builder.wildShapeMaxCr ?? 0);
+    final ac = builder.wildShapeArmorClass;
 
     // Una bestia sin valor de desafío declarado no entra: los espíritus
     // invocables también son de tipo Bestia, y el libro les pone «Desafío:
@@ -1080,7 +1084,7 @@ class CharacterCompiler {
         if (beast.availableToCharacters &&
             beast.isBeast &&
             beast.cr != null &&
-            beast.cr! <= e.maxCr &&
+            beast.cr! <= maxCr &&
             (e.allowFly || !beast.canFly))
           beast,
     ]..sort((a, b) => a.name.compareTo(b.name));
@@ -1098,6 +1102,13 @@ class CharacterCompiler {
       options: options,
       chosen: chosen,
       canCast: builder.castWhileWildShaped,
+      tempHpOnEnter: builder.wildShapeTempHp,
+      armorClassFloor: ac == null ? null : ac.base + mods[ac.ability]!,
+      damageTypeOptions: List.unmodifiable(builder.wildShapeDamageTypes),
+      savingThrowBonuses: {
+        for (final e in builder.wildShapeSaveBonuses.entries)
+          e.key: mods[e.value]!,
+      },
     );
   }
 
