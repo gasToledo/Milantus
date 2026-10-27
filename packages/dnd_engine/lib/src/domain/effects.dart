@@ -238,6 +238,9 @@ sealed class Effect {
           spellcastingFocus: json['spellcastingFocus'] as bool? ?? false,
           extraAttacks: json['extraAttacks'] as int? ?? 0,
           attackBonus: json['attackBonus'] as int? ?? 0,
+          attackBonusAbility: json['attackBonusAbility'] == null
+              ? null
+              : Ability.fromKey(json['attackBonusAbility'] as String),
           damageBonus: json['damageBonus'] as int? ?? 0,
           aloneInOneHand: json['aloneInOneHand'] as bool? ?? false,
           extraDamageDice: json['extraDamageDice'] as String?,
@@ -1434,6 +1437,11 @@ class WeaponRuleEffect extends Effect {
   final int attackBonus;
   final int damageBonus;
 
+  /// Suma el modificador de esta característica al ataque, mínimo +1: el Arma
+  /// Sagrada suma Carisma. Se resuelve al armar el ataque, que es cuando se
+  /// conocen los modificadores finales.
+  final Ability? attackBonusAbility;
+
   /// Solo cuando el arma se empuña en una mano y no hay otra arma equipada,
   /// que es la condición de Duelo. El escudo no es un arma y no cuenta.
   final bool aloneInOneHand;
@@ -1492,6 +1500,7 @@ class WeaponRuleEffect extends Effect {
     this.spellcastingFocus = false,
     this.extraAttacks = 0,
     this.attackBonus = 0,
+    this.attackBonusAbility,
     this.damageBonus = 0,
     this.aloneInOneHand = false,
     this.extraDamageDice,
@@ -1516,6 +1525,7 @@ class WeaponRuleEffect extends Effect {
         spellcastingFocus: spellcastingFocus,
         extraAttacks: extraAttacks,
         attackBonus: attackBonus,
+        attackBonusAbility: attackBonusAbility,
         damageBonus: damageBonus,
         aloneInOneHand: aloneInOneHand,
         extraDamageDice: dice,
@@ -1541,6 +1551,8 @@ class WeaponRuleEffect extends Effect {
         if (spellcastingFocus) 'spellcastingFocus': true,
         if (extraAttacks != 0) 'extraAttacks': extraAttacks,
         if (attackBonus != 0) 'attackBonus': attackBonus,
+        if (attackBonusAbility != null)
+          'attackBonusAbility': attackBonusAbility!.name,
         if (damageBonus != 0) 'damageBonus': damageBonus,
         if (aloneInOneHand) 'aloneInOneHand': true,
         if (extraDamageDice != null) 'extraDamageDice': extraDamageDice,

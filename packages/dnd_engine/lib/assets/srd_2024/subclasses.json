@@ -1055,9 +1055,10 @@
       {
         "level": 3,
         "name": "Ira de los Mares",
-        "description": "Gastás Forma Salvaje para invocar un aura tormentosa que empuja y daña a los enemigos que la tocan.",
+        "description": "Gastás Forma Salvaje para rodearte de espuma marina que congela y empuja a las criaturas que elegís.",
         "effects": [
-          { "type": "passiveTrait", "name": "Ira de los Mares", "description": "Aura de tormenta: daño frío/relámpago y empuje a enemigos cercanos." }
+          { "type": "passiveTrait", "name": "Ira de los Mares", "description": "Como acción adicional gastás un uso de Forma Salvaje para rodearte de una emanación de 5 pies de espuma marina durante 10 minutos; termina antes si la disipás (no requiere acción), la volvés a manifestar o quedás incapacitado. Al manifestarla, y como acción adicional en tus turnos siguientes, elegís otra criatura que veas en la emanación: hace una salvación de Constitución contra tu CD de conjuros o recibe daño de frío (tantos d6 como tu mod. de Sabiduría, mínimo uno) y, si es Grande o menor, es empujada hasta 15 pies." },
+          { "type": "activeMode", "id": "wrath_of_the_sea", "name": "Ira de los Mares", "resourceId": "wild_shape", "effects": [] }
         ]
       },
       {
@@ -1113,7 +1114,8 @@
         "name": "Nacido de la Tempestad",
         "description": "Con la Ira de los Mares activa ganás velocidad de vuelo y resistencia a frío, relámpago y trueno.",
         "effects": [
-          { "type": "passiveTrait", "name": "Nacido de la Tempestad", "description": "Mientras tu Ira de los Mares esté activa obtenés dos beneficios más. Vuelo: una velocidad de vuelo igual a tu velocidad. Resistencia: resistencia al daño de frío, de relámpago y de trueno." }
+          { "type": "passiveTrait", "name": "Nacido de la Tempestad", "description": "Mientras tu Ira de los Mares esté activa obtenés dos beneficios más. Vuelo: una velocidad de vuelo igual a tu velocidad. Resistencia: resistencia al daño de frío, de relámpago y de trueno." },
+          { "type": "modeExtension", "modeId": "wrath_of_the_sea", "effects": [{ "type": "movementSpeed", "mode": "fly", "equalToWalk": true }, { "type": "resistance", "damageType": "cold" }, { "type": "resistance", "damageType": "lightning" }, { "type": "resistance", "damageType": "thunder" }] }
         ]
       },
       {
@@ -1140,7 +1142,8 @@
         "effects": [
           { "type": "alwaysPreparedSpell", "spellId": "guidance" },
           { "type": "alwaysPreparedSpell", "spellId": "guiding-bolt" },
-          { "type": "passiveTrait", "name": "Forma Estelar", "description": "Adoptás una constelación: Arquero (ataque radiante), Cáliz (curación) o Dragón (concentración y salvaciones)." }
+          { "type": "passiveTrait", "name": "Forma Estelar", "description": "Como acción adicional gastás un uso de Forma Salvaje para adoptar una forma estelar en vez de transformarte. Dura 10 minutos y termina antes si la disipás (no requiere acción), quedás incapacitado o volvés a usar el rasgo. Emite luz brillante en 10 pies y tenue en 10 más. Cada vez elegís qué constelación brilla: Arquero, Cáliz o Dragón." },
+          { "type": "activeMode", "id": "starry_form", "name": "Forma Estelar", "resourceId": "wild_shape", "variants": [{ "id": "archer", "name": "Arquero", "description": "Al activarla, y como acción adicional en tus turnos siguientes, hacés un ataque de conjuro a distancia contra una criatura a 60 pies o menos: 1d8 + tu mod. de Sabiduría de daño radiante.", "effects": [] }, { "id": "chalice", "name": "Cáliz", "description": "Cuando lanzás un conjuro con un espacio que restaura PG, vos u otra criatura a 30 pies o menos recupera 1d8 + tu mod. de Sabiduría PG.", "effects": [] }, { "id": "dragon", "name": "Dragón", "description": "En las pruebas de Inteligencia o Sabiduría y en las salvaciones de Constitución para mantener la concentración, un 9 o menos en el d20 cuenta como 10.", "effects": [] }], "effects": [] }
         ]
       },
       {
@@ -1155,9 +1158,10 @@
       {
         "level": 10,
         "name": "Constelaciones Centelleantes",
-        "description": "Tus Formas Estelares se potencian con efectos mejorados.",
+        "description": "El Arquero y el Cáliz pasan a 2d8, el Dragón da vuelo y podés cambiar de constelación en cada turno.",
         "effects": [
-          { "type": "passiveTrait", "name": "Constelaciones Centelleantes", "description": "Versiones mejoradas de Arquero, Cáliz y Dragón." }
+          { "type": "passiveTrait", "name": "Constelaciones Centelleantes", "description": "El 1d8 del Arquero y del Cáliz pasa a 2d8, y con el Dragón tenés velocidad de vuelo de 20 pies y podés flotar. Además, al comienzo de cada uno de tus turnos en Forma Estelar podés cambiar de constelación." },
+          { "type": "activeMode", "id": "starry_form", "name": "Forma Estelar", "resourceId": "wild_shape", "variants": [{ "id": "archer", "name": "Arquero", "description": "Al activarla, y como acción adicional en tus turnos siguientes, hacés un ataque de conjuro a distancia contra una criatura a 60 pies o menos: 2d8 + tu mod. de Sabiduría de daño radiante.", "effects": [] }, { "id": "chalice", "name": "Cáliz", "description": "Cuando lanzás un conjuro con un espacio que restaura PG, vos u otra criatura a 30 pies o menos recupera 2d8 + tu mod. de Sabiduría PG.", "effects": [] }, { "id": "dragon", "name": "Dragón", "description": "En las pruebas de Inteligencia o Sabiduría y en las salvaciones de Constitución para mantener la concentración, un 9 o menos en el d20 cuenta como 10. Además tenés velocidad de vuelo de 20 pies y podés flotar.", "effects": [{ "type": "movementSpeed", "mode": "fly", "feet": 20 }] }], "effects": [] }
         ]
       },
       {
@@ -1165,7 +1169,8 @@
         "name": "Colmado de Luz Estelar",
         "description": "En Forma Estelar te volvés parcialmente incorpóreo: resistencia a contundente, perforante y cortante.",
         "effects": [
-          { "type": "passiveTrait", "name": "Colmado de Luz Estelar", "description": "Mientras estés en tu Forma Estelar te volvés parcialmente incorpóreo, lo que te da resistencia al daño contundente, perforante y cortante. La flotación no sale de acá: es de la forma Dragón de Constelaciones Centelleantes." }
+          { "type": "passiveTrait", "name": "Colmado de Luz Estelar", "description": "Mientras estés en tu Forma Estelar te volvés parcialmente incorpóreo, lo que te da resistencia al daño contundente, perforante y cortante. La flotación no sale de acá: es de la forma Dragón de Constelaciones Centelleantes." },
+          { "type": "modeExtension", "modeId": "starry_form", "effects": [{ "type": "resistance", "damageType": "bludgeoning" }, { "type": "resistance", "damageType": "piercing" }, { "type": "resistance", "damageType": "slashing" }] }
         ]
       }
     ]
@@ -1351,7 +1356,8 @@
         "name": "Canalizar Divinidad: Arma Sagrada",
         "description": "Imbuís un arma con energía sagrada: durante 10 minutos sumás tu Carisma a las tiradas de ataque con ella y emite luz.",
         "effects": [
-          { "type": "passiveTrait", "name": "Arma Sagrada", "description": "Suma tu mod. de Carisma al ataque con un arma imbuida durante 10 minutos." }
+          { "type": "passiveTrait", "name": "Arma Sagrada", "description": "Al llevar a cabo la acción de Atacar podés gastar un uso de Canalizar Divinidad para imbuir de energía positiva un arma cuerpo a cuerpo que sostengas. Durante 10 minutos, o hasta que vuelvas a usar este rasgo, sumás tu mod. de Carisma a las tiradas de ataque con ella (mínimo +1) y cada impacto hace su tipo de daño normal o radiante. El arma emite luz brillante en 20 pies y tenue en 20 más. Termina antes si lo decidís (no requiere acción) o si dejás de llevar el arma." },
+          { "type": "activeMode", "id": "sacred_weapon", "name": "Arma Sagrada", "resourceId": "channel_divinity", "endsWhenIncapacitated": false, "effects": [{ "type": "weaponRule", "filter": { "melee": true }, "attackBonusAbility": "charisma", "damageTypeOptions": ["radiant"] }] }
         ]
       },
       {
@@ -1422,7 +1428,8 @@
         "description": "Como acción adicional imbuís tu Aura de Protección de poder sagrado durante 10 minutos.",
         "effects": [
           { "type": "passiveTrait", "name": "Halo Sagrado", "description": "Como acción adicional imbuís tu Aura de Protección de poder sagrado durante 10 minutos o hasta que lo termines (no requiere acción). Una vez usado, no podés repetirlo hasta terminar un descanso largo, salvo que gastes un espacio de conjuro de nivel 5 (no requiere acción). Amparo Sagrado: tenés ventaja en cualquier salvación a la que te obligue un infernal o un muerto viviente. Daño Radiante: siempre que un enemigo empiece su turno en el aura, recibe daño radiante igual a tu modificador de Carisma más tu bonificador por competencia. Luz Solar: el aura se llena de Luz Brillante que es luz solar." },
-          { "type": "resource", "id": "holy_nimbus", "name": "Halo Sagrado", "max": 1, "recharge": "long", "description": "Uso de Halo Sagrado; un espacio de nivel 5 lo restaura." }
+          { "type": "resource", "id": "holy_nimbus", "name": "Halo Sagrado", "max": 1, "recharge": "long", "description": "Uso de Halo Sagrado; un espacio de nivel 5 lo restaura." },
+          { "type": "activeMode", "id": "holy_nimbus", "name": "Halo Sagrado", "resourceId": "holy_nimbus", "endsWhenIncapacitated": false, "effects": [] }
         ]
       }
     ]
@@ -1510,10 +1517,11 @@
       {
         "level": 20,
         "name": "Campeón Ancestral",
-        "description": "Adoptás una forma radiante que regenera PG y potencia tus conjuros y castigos.",
+        "description": "Tu aura se llena de poder primigenio: regenerás PG, los enemigos resisten peor tus conjuros y lanzás más rápido.",
         "effects": [
-          { "type": "passiveTrait", "name": "Campeón Ancestral", "description": "Te regenerás cada turno y tus enemigos tienen desventaja contra tus conjuros y castigos." },
-          { "type": "resource", "id": "elder_champion", "name": "Campeón Ancestral", "max": 1, "recharge": "long", "description": "Uso de Campeón Ancestral; un espacio de nivel 5 lo restaura." }
+          { "type": "passiveTrait", "name": "Campeón Ancestral", "description": "Como acción adicional imbuís tu Aura de Protección de poder primigenio durante 1 minuto o hasta que lo terminés (no requiere acción). Disminuir el Desafío: los enemigos en el aura tienen desventaja en las salvaciones contra tus conjuros y tus opciones de Canalizar Divinidad. Regeneración: al comienzo de cada uno de tus turnos recuperás 10 PG. Conjuros Veloces: un conjuro con tiempo de lanzamiento de una acción lo podés lanzar como acción adicional. Una vez por descanso largo; gastar un espacio de nivel 5 restablece el uso." },
+          { "type": "resource", "id": "elder_champion", "name": "Campeón Ancestral", "max": 1, "recharge": "long", "description": "Uso de Campeón Ancestral; un espacio de nivel 5 lo restaura." },
+          { "type": "activeMode", "id": "elder_champion", "name": "Campeón Ancestral", "resourceId": "elder_champion", "endsWhenIncapacitated": false, "effects": [] }
         ]
       }
     ]
@@ -1597,10 +1605,11 @@
       {
         "level": 20,
         "name": "Leyenda Viviente",
-        "description": "Te volvés un ícono de inspiración: ganás carisma sobrehumano, repetís ataques fallidos y esquivás golpes.",
+        "description": "Durante 10 minutos tenés ventaja en Carisma, repetís salvaciones falladas y convertís un ataque fallado por turno en acierto.",
         "effects": [
-          { "type": "passiveTrait", "name": "Leyenda Viviente", "description": "Ventaja en Carisma, repetís un ataque fallido por turno y negás un ataque como reacción." },
-          { "type": "resource", "id": "living_legend", "name": "Leyenda Viviente", "max": 1, "recharge": "long", "description": "Uso de Leyenda Viviente; un espacio de nivel 5 lo restaura." }
+          { "type": "passiveTrait", "name": "Leyenda Viviente", "description": "Como acción adicional, durante 10 minutos: Carismático: ventaja en todas las pruebas de Carisma. Repetir Salvación: si fallás una tirada de salvación, podés usar tu reacción para repetirla y quedarte con el nuevo resultado. Golpe Infalible: una vez en cada uno de tus turnos, si fallás una tirada de ataque con un arma, podés hacer que acierte. Una vez por descanso largo; gastar un espacio de nivel 5 restablece el uso." },
+          { "type": "resource", "id": "living_legend", "name": "Leyenda Viviente", "max": 1, "recharge": "long", "description": "Uso de Leyenda Viviente; un espacio de nivel 5 lo restaura." },
+          { "type": "activeMode", "id": "living_legend", "name": "Leyenda Viviente", "resourceId": "living_legend", "endsWhenIncapacitated": false, "effects": [{ "type": "advantage", "roll": "check", "abilities": ["charisma"] }] }
         ]
       }
     ]
@@ -1686,8 +1695,9 @@
         "name": "Ángel Vengador",
         "description": "Adoptás una forma alada aterradora con velocidad de vuelo y aura de miedo.",
         "effects": [
-          { "type": "passiveTrait", "name": "Ángel Vengador", "description": "Velocidad de vuelo y aura que asusta a los enemigos cercanos." },
-          { "type": "resource", "id": "avenging_angel", "name": "Ángel Vengador", "max": 1, "recharge": "long", "description": "Uso de Ángel Vengador; un espacio de nivel 5 lo restaura." }
+          { "type": "passiveTrait", "name": "Ángel Vengador", "description": "Como acción adicional, durante 10 minutos o hasta que lo terminés (no requiere acción): Vuelo: te brotan alas espectrales, tenés velocidad de vuelo de 60 pies y podés flotar. Aura Aterradora: cuando un enemigo empieza su turno en tu Aura de Protección, hace una salvación de Sabiduría o queda asustado durante 1 minuto o hasta que reciba daño; las tiradas de ataque contra esa criatura tienen ventaja. Una vez por descanso largo; gastar un espacio de nivel 5 restablece el uso." },
+          { "type": "resource", "id": "avenging_angel", "name": "Ángel Vengador", "max": 1, "recharge": "long", "description": "Uso de Ángel Vengador; un espacio de nivel 5 lo restaura." },
+          { "type": "activeMode", "id": "avenging_angel", "name": "Ángel Vengador", "resourceId": "avenging_angel", "endsWhenIncapacitated": false, "effects": [{ "type": "movementSpeed", "mode": "fly", "feet": 60 }] }
         ]
       }
     ]
@@ -2220,7 +2230,8 @@
         "description": "Como acción adicional te crecen alas: velocidad de vuelo de 60 pies durante 1 hora, un uso por descanso largo.",
         "effects": [
           { "type": "passiveTrait", "name": "Alas de Dragón", "description": "Como acción adicional hacés aparecer alas dracónicas en tu espalda. Duran 1 hora o hasta que las disipés (no requiere acción), y mientras tanto tenés una velocidad de vuelo de 60 pies. Una vez usado, no podés repetirlo hasta terminar un descanso largo, salvo que gastes 3 puntos de hechicería (no requiere acción) para restablecer el uso." },
-          { "type": "resource", "id": "dragon_wings", "name": "Alas de Dragón", "max": 1, "recharge": "long", "description": "Uso de Alas de Dragón; 3 Puntos de Hechicería lo restauran." }
+          { "type": "resource", "id": "dragon_wings", "name": "Alas de Dragón", "max": 1, "recharge": "long", "description": "Uso de Alas de Dragón; 3 Puntos de Hechicería lo restauran." },
+          { "type": "activeMode", "id": "dragon_wings", "name": "Alas de Dragón", "resourceId": "dragon_wings", "endsWhenIncapacitated": false, "effects": [{ "type": "movementSpeed", "mode": "fly", "feet": 60 }] }
         ]
       },
       {
@@ -2383,7 +2394,8 @@
         "description": "Como acción adicional entrás en trance 1 minuto: los ataques contra vos no pueden tener ventaja y tus d20 de 9 o menos cuentan como 10.",
         "effects": [
           { "type": "passiveTrait", "name": "Trance de Orden", "description": "Como acción adicional entrás en este estado durante 1 minuto. Mientras dure, las tiradas de ataque contra vos no pueden beneficiarse de ventaja y, siempre que hagas una prueba con d20, podés tratar un resultado de 9 o menos en el dado como si fuera un 10. No es «sin desventaja»: lo que se anula es la ventaja del atacante. Una vez usado, no podés repetirlo hasta terminar un descanso largo, salvo que gastes 5 puntos de hechicería (no requiere acción)." },
-          { "type": "resource", "id": "trance_of_order", "name": "Trance de Orden", "max": 1, "recharge": "long", "description": "Uso de Trance de Orden; 5 Puntos de Hechicería lo restauran." }
+          { "type": "resource", "id": "trance_of_order", "name": "Trance de Orden", "max": 1, "recharge": "long", "description": "Uso de Trance de Orden; 5 Puntos de Hechicería lo restauran." },
+          { "type": "activeMode", "id": "trance_of_order", "name": "Trance de Orden", "resourceId": "trance_of_order", "endsWhenIncapacitated": false, "effects": [] }
         ]
       },
       {
@@ -2913,7 +2925,9 @@
         "name": "El Tercer Ojo",
         "description": "Como acción adicional elegís un beneficio: visión en la oscuridad de 120 pies, leer cualquier idioma o Ver Invisibilidad gratis.",
         "effects": [
-          { "type": "passiveTrait", "name": "El Tercer Ojo", "description": "Como acción adicional elegís uno de estos beneficios, que dura hasta que empieces un descanso corto o largo; no podés volver a usar el rasgo hasta terminar un descanso corto o largo. Visión en la Oscuridad: obtenés visión en la oscuridad hasta 120 pies. Comprensión Superior: podés leer cualquier idioma. Ver Invisibilidad: podés lanzar Ver Invisibilidad sin gastar espacio de conjuro." }
+          { "type": "passiveTrait", "name": "El Tercer Ojo", "description": "Como acción adicional elegís uno de estos beneficios, que dura hasta que empieces un descanso corto o largo; no podés volver a usar el rasgo hasta terminar un descanso corto o largo. Visión en la Oscuridad: obtenés visión en la oscuridad hasta 120 pies. Comprensión Superior: podés leer cualquier idioma. Ver Invisibilidad: podés lanzar Ver Invisibilidad sin gastar espacio de conjuro." },
+          { "type": "resource", "id": "third_eye", "name": "El Tercer Ojo", "max": 1, "recharge": "short", "description": "Uso de El Tercer Ojo." },
+          { "type": "activeMode", "id": "third_eye", "name": "El Tercer Ojo", "resourceId": "third_eye", "endsWhenIncapacitated": false, "variants": [{ "id": "darkvision", "name": "Visión en la Oscuridad", "description": "Visión en la oscuridad hasta 120 pies.", "effects": [{ "type": "darkvision", "range": 120 }] }, { "id": "greater_comprehension", "name": "Comprensión Superior", "description": "Podés leer cualquier idioma.", "effects": [] }, { "id": "see_invisibility", "name": "Ver Invisibilidad", "description": "Podés lanzar Ver Invisibilidad sin gastar un espacio de conjuro.", "effects": [] }], "effects": [] }
         ]
       },
       {

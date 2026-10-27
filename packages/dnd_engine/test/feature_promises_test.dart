@@ -193,8 +193,8 @@ void main() {
     // contador (Inspiración Bárdica, Indómito, Recuperación Arcana, los usos
     // de especie...). Los de especie que llegan con el nivel van envueltos en
     // `leveled` y este recorrido no los ve.
-    // 81 con la reserva de Guerrero de los Dioses del Fanático.
-    expect(recursos, hasLength(81));
+    // 82 con el uso de El Tercer Ojo del Adivino.
+    expect(recursos, hasLength(82));
 
     var porCaracteristica = 0;
     var porNivel = 0;

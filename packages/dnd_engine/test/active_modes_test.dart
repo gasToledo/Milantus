@@ -254,4 +254,66 @@ void main() {
       expect(alas.speeds[MovementMode.fly], alas.speed);
     });
   });
+
+  group('Las transformaciones de clase', () {
+    Character pj(String classId, String subclassId, int level,
+            {int charisma = 10, List<InventoryEntry> inventory = const []}) =>
+        Character(
+          id: 'clase',
+          name: 'Prueba',
+          raceId: 'human',
+          classId: classId,
+          subclassId: subclassId,
+          backgroundId: 'soldier',
+          level: level,
+          assignedScores: {
+            for (final a in Ability.values)
+              a: a == Ability.charisma ? charisma : 14,
+          },
+          hpPerLevel: List.filled(level, 7),
+          inventory: inventory,
+        );
+
+    const espada =
+        InventoryEntry(entryId: 'espada', itemId: 'longsword', equipped: true);
+
+    test('Arma Sagrada suma Carisma, mínimo +1, al arma cuerpo a cuerpo', () {
+      for (final charisma in [16, 8]) {
+        final c = pj('paladin', 'oath-devotion', 3,
+            charisma: charisma, inventory: const [espada]);
+        final normal = compiler.compile(c);
+        expect(
+            CombatOps.activateMode(c.combat, normal, 'sacred_weapon'), isTrue);
+        final sagrada = compiler.compile(c);
+        final cha = normal.abilityModifiers[Ability.charisma]!;
+        expect(sagrada.weaponAttacks.single.attackBonus,
+            normal.weaponAttacks.single.attackBonus + (cha < 1 ? 1 : cha));
+        expect(sagrada.weaponAttacks.single.damageTypeOptions,
+            contains('radiant'));
+      }
+    });
+
+    test('Forma Estelar gasta Forma Salvaje y crece con el nivel', () {
+      final c = pj('druid', 'circle-stars', 14);
+      final normal = compiler.compile(c);
+      final usos = normal.resources
+          .firstWhere((r) => r.key == normal.activeModes.single.resourceKey);
+      CombatOps.activateMode(c.combat, normal, 'starry_form',
+          variant: 'dragon');
+      expect(c.combat.resourceUsage[usos.key], 1);
+      final estelar = compiler.compile(c);
+      // Nivel 10: el Dragón vuela; nivel 14: resistencias físicas.
+      expect(estelar.speeds[MovementMode.fly], 20);
+      expect(estelar.resistances,
+          containsAll(['bludgeoning', 'piercing', 'slashing']));
+    });
+
+    test('El Tercer Ojo da visión en la oscuridad de 120 pies', () {
+      final c = pj('wizard', 'diviner', 10);
+      final normal = compiler.compile(c);
+      CombatOps.activateMode(c.combat, normal, 'third_eye',
+          variant: 'darkvision');
+      expect(compiler.compile(c).darkvision, 120);
+    });
+  });
 }

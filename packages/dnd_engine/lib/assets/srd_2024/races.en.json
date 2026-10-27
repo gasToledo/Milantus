@@ -12,7 +12,7 @@
     "effects.3.description": "You gain an Origin feat of your choice."
   },
   "dwarf": {
-    "_es": "bcab7ac2",
+    "_es": "f8a97c73",
     "name": "Dwarf",
     "tagline": "Hardy as stone",
     "effects.2.name": "Dwarven Resilience",
@@ -23,7 +23,8 @@
     "effects.4.description": "Your Hit Point maximum increases by 1 for each character level.",
     "effects.5.description": "As a Bonus Action, you gain Tremorsense with a range of 60 feet for 10 minutes. You must be on a stone surface or touching one. Uses equal to your Proficiency Bonus; you regain them after a Long Rest.",
     "effects.6.name": "Stonecunning",
-    "effects.6.description": "Stonecunning uses."
+    "effects.6.description": "Stonecunning uses.",
+    "effects.8.name": "Stonecunning"
   },
   "halfling": {
     "_es": "82b889a6",

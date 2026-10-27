@@ -90,6 +90,20 @@
         "conditions": [
           "poisoned"
         ]
+      },
+      {
+        "type": "activeMode",
+        "id": "stonecunning",
+        "name": "Afinidad con la Piedra",
+        "resourceId": "stonecunning",
+        "endsWhenIncapacitated": false,
+        "effects": [
+          {
+            "type": "sense",
+            "sense": "tremorsense",
+            "range": 60
+          }
+        ]
       }
     ]
   },

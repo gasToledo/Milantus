@@ -1755,7 +1755,7 @@ class CharacterCompiler {
     final byAbility = <int>[];
     void apply(int i) {
       final rule = b.weaponRules[i];
-      context.apply(rule);
+      context.apply(rule, mods);
       final mode = ruleModes[i];
       if (mode != null && rule.damageBonus != 0) {
         context.modeNames[mode.id] = mode.name;
@@ -1988,7 +1988,7 @@ class _WeaponAttackContext {
   })  : abilityOptions = abilityOptions.toSet().toList(),
         damageTypeOptions = damageTypeOptions.toSet().toList();
 
-  void apply(WeaponRuleEffect rule) {
+  void apply(WeaponRuleEffect rule, Map<Ability, int> mods) {
     proficient = proficient || rule.grantsProficiency;
     for (final ability in rule.abilityOptions) {
       if (!abilityOptions.contains(ability)) abilityOptions.add(ability);
@@ -1999,6 +1999,7 @@ class _WeaponAttackContext {
     spellcastingFocus = spellcastingFocus || rule.spellcastingFocus;
     extraAttacks = max(extraAttacks, rule.extraAttacks);
     attackBonus += rule.attackBonus;
+    if (rule.attackBonusAbility case final a?) attackBonus += max(1, mods[a]!);
     damageBonus += rule.damageBonus;
     // Los tramos de Artes Marciales llegan como reglas sueltas por nivel: se
     // queda la que da el dado mayor.

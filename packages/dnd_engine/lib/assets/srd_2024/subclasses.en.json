@@ -503,7 +503,7 @@
     "features.7.effects.1.description": "Whenever you use Moonlight Step, you can also teleport one willing creature. That creature must be within 10 feet of you, and you teleport it to an unoccupied space you can see within 10 feet of your destination space."
   },
   "circle-sea": {
-    "_es": "795f75b7",
+    "_es": "e251e0b3",
     "name": "Circle of the Sea",
     "features.0.name": "Wrath of the Sea",
     "features.0.effects.0.name": "Wrath of the Sea",
@@ -518,8 +518,8 @@
     "features.7.name": "Oceanic Gift",
     "features.7.effects.0.name": "Oceanic Gift",
     "description": "Druids bound to oceans and storms, who unleash the power of the sea upon their foes.",
-    "features.0.description": "You expend Wild Shape to call forth a stormy aura that pushes and damages enemies that touch it.",
-    "features.0.effects.0.description": "Storm aura: Cold/Lightning damage and a push to nearby enemies.",
+    "features.0.description": "You expend Wild Shape to surround yourself with ocean spray that chills and pushes creatures you choose.",
+    "features.0.effects.0.description": "As a Bonus Action, you expend a use of Wild Shape to manifest a 5-foot Emanation of ocean spray around you for 10 minutes; it ends early if you dismiss it (no action required), manifest it again, or have the Incapacitated condition. When you manifest it and as a Bonus Action on your later turns, you choose another creature you can see in the Emanation: it makes a Constitution saving throw against your spell save DC or takes Cold damage (a number of d6s equal to your Wisdom modifier, minimum one) and, if it is Large or smaller, is pushed up to 15 feet away.",
     "features.1.description": "You always have Shatter, Fog Cloud, Thunderwave, Gust of Wind, and Ray of Frost prepared. They don't count against the number of spells you can prepare.",
     "features.2.description": "You always have Lightning Bolt and Water Breathing prepared. They don't count against the number of spells you can prepare.",
     "features.3.description": "You always have Control Water and Ice Storm prepared. They don't count against the number of spells you can prepare.",
@@ -529,10 +529,11 @@
     "features.6.description": "With Wrath of the Sea active, you gain a Fly Speed and Resistance to Cold, Lightning, and Thunder damage.",
     "features.6.effects.0.description": "While your Wrath of the Sea is active, you gain two more benefits. Flight: a Fly Speed equal to your Speed. Resistance: Resistance to Cold, Lightning, and Thunder damage.",
     "features.7.description": "You can manifest the Wrath of the Sea Emanation around another creature, or around both of you by expending two uses.",
-    "features.7.effects.0.description": "Instead of manifesting the Wrath of the Sea Emanation around yourself, you can manifest it around one willing creature within 60 feet of you. That creature gains all the Emanation's benefits and uses your spell save DC and Wisdom modifier for it. In addition, you can manifest it around that creature and yourself at once if you expend two uses of Wild Shape instead of one."
+    "features.7.effects.0.description": "Instead of manifesting the Wrath of the Sea Emanation around yourself, you can manifest it around one willing creature within 60 feet of you. That creature gains all the Emanation's benefits and uses your spell save DC and Wisdom modifier for it. In addition, you can manifest it around that creature and yourself at once if you expend two uses of Wild Shape instead of one.",
+    "features.0.effects.1.name": "Wrath of the Sea"
   },
   "circle-stars": {
-    "_es": "7c0f2bd4",
+    "_es": "f489ddf9",
     "name": "Circle of the Stars",
     "features.0.name": "Star Map / Starry Form",
     "features.0.effects.2.name": "Starry Form",
@@ -544,15 +545,29 @@
     "features.3.effects.0.name": "Full of Stars",
     "description": "Druids who have studied the wisdom of the constellations and channel their power into a Starry Form.",
     "features.0.description": "You carry a star map that gives you Guidance and Guiding Bolt always prepared, and you can expend Wild Shape to take a Starry Form (Archer, Chalice, or Dragon).",
-    "features.0.effects.2.description": "You take on a constellation: Archer (radiant attack), Chalice (healing), or Dragon (Concentration and saving throws).",
+    "features.0.effects.2.description": "As a Bonus Action, you expend a use of Wild Shape to take on a starry form rather than shape-shifting. It lasts 10 minutes and ends early if you dismiss it (no action required), have the Incapacitated condition, or use this feature again. It sheds Bright Light in a 10-foot radius and Dim Light for 10 more feet. Each time, you choose which constellation glimmers: Archer, Chalice, or Dragon.",
     "features.1.description": "After a Long Rest, you roll a die that gives you a beneficial, reusable Reaction (weal or woe).",
     "features.1.effects.0.description": "A Reaction based on a daily die: you reduce damage taken or increase damage dealt.",
-    "features.2.description": "Your Starry Forms grow stronger with improved effects.",
-    "features.2.effects.0.description": "Improved versions of Archer, Chalice, and Dragon.",
+    "features.2.description": "The Archer and the Chalice become 2d8, the Dragon grants flight, and you can change constellation each turn.",
+    "features.2.effects.0.description": "The 1d8 of the Archer and the Chalice becomes 2d8, and while the Dragon is active you have a Fly Speed of 20 feet and can hover. Moreover, at the start of each of your turns in your Starry Form, you can change which constellation glimmers.",
     "features.3.description": "In Starry Form, you become partly incorporeal: Resistance to Bludgeoning, Piercing, and Slashing damage.",
     "features.3.effects.0.description": "While in your Starry Form, you become partly incorporeal, giving you Resistance to Bludgeoning, Piercing, and Slashing damage. Hovering doesn't come from here: it comes from the Dragon form of Twinkling Constellations.",
     "features.1.effects.1.name": "Cosmic Omen",
-    "features.1.effects.1.description": "Uses of the Cosmic Omen reaction."
+    "features.1.effects.1.description": "Uses of the Cosmic Omen reaction.",
+    "features.0.effects.3.name": "Starry Form",
+    "features.0.effects.3.variants.0.name": "Archer",
+    "features.0.effects.3.variants.0.description": "When you activate this form and as a Bonus Action on your later turns, you make a ranged spell attack against one creature within 60 feet: 1d8 plus your Wisdom modifier Radiant damage.",
+    "features.0.effects.3.variants.1.name": "Chalice",
+    "features.0.effects.3.variants.1.description": "Whenever you cast a spell using a spell slot that restores Hit Points, you or another creature within 30 feet regains 1d8 plus your Wisdom modifier Hit Points.",
+    "features.0.effects.3.variants.2.name": "Dragon",
+    "features.0.effects.3.variants.2.description": "On Intelligence or Wisdom checks and on Constitution saving throws to maintain Concentration, you can treat a roll of 9 or lower on the d20 as a 10.",
+    "features.2.effects.1.name": "Starry Form",
+    "features.2.effects.1.variants.0.name": "Archer",
+    "features.2.effects.1.variants.0.description": "When you activate this form and as a Bonus Action on your later turns, you make a ranged spell attack against one creature within 60 feet: 2d8 plus your Wisdom modifier Radiant damage.",
+    "features.2.effects.1.variants.1.name": "Chalice",
+    "features.2.effects.1.variants.1.description": "Whenever you cast a spell using a spell slot that restores Hit Points, you or another creature within 30 feet regains 2d8 plus your Wisdom modifier Hit Points.",
+    "features.2.effects.1.variants.2.name": "Dragon",
+    "features.2.effects.1.variants.2.description": "On Intelligence or Wisdom checks and on Constitution saving throws to maintain Concentration, you can treat a roll of 9 or lower on the d20 as a 10. You also have a Fly Speed of 20 feet and can hover."
   },
   "open-hand": {
     "_es": "bd446ae1",
@@ -643,7 +658,7 @@
     "features.3.effects.0.description": "You become Invisible while you remain in Dim Light or Darkness."
   },
   "oath-devotion": {
-    "_es": "4bbbfad0",
+    "_es": "41750237",
     "name": "Oath of Devotion",
     "features.0.name": "Channel Divinity: Sacred Weapon",
     "features.0.effects.0.name": "Sacred Weapon",
@@ -660,7 +675,7 @@
     "features.8.effects.0.name": "Holy Nimbus",
     "description": "The ideal paladin, bound to the loftiest ideals of justice, virtue, and order.",
     "features.0.description": "You imbue a weapon with holy energy: for 10 minutes, you add your Charisma to attack rolls with it, and it sheds light.",
-    "features.0.effects.0.description": "Adds your Charisma modifier to attacks with an imbued weapon for 10 minutes.",
+    "features.0.effects.0.description": "When you take the Attack action, you can expend one use of your Channel Divinity to imbue one Melee weapon you are holding with positive energy. For 10 minutes or until you use this feature again, you add your Charisma modifier to attack rolls with that weapon (minimum bonus of +1), and each hit deals its normal damage type or Radiant damage. The weapon emits Bright Light in a 20-foot radius and Dim Light 20 feet beyond that. It ends early if you choose (no action required) or if you aren't carrying the weapon.",
     "features.1.description": "You always have Shield of Faith and Protection from Evil and Good prepared. They don't count against the number of spells you can prepare.",
     "features.2.description": "You always have Aid and Zone of Truth prepared. They don't count against the number of spells you can prepare.",
     "features.3.description": "You always have Dispel Magic and Beacon of Hope prepared. They don't count against the number of spells you can prepare.",
@@ -673,10 +688,12 @@
     "features.8.description": "As a Bonus Action, you imbue your Aura of Protection with holy power for 10 minutes.",
     "features.8.effects.0.description": "As a Bonus Action, you imbue your Aura of Protection with holy power for 10 minutes or until you end it (no action required). Once used, you can't do so again until you finish a Long Rest, unless you expend a level 5 spell slot (no action required). Holy Ward: you have Advantage on any saving throw that a Fiend or an Undead forces you to make. Radiant Damage: whenever an enemy starts its turn in the aura, it takes Radiant damage equal to your Charisma modifier plus your Proficiency Bonus. Sunlight: the aura is filled with Bright Light that is sunlight.",
     "features.8.effects.1.name": "Holy Nimbus",
-    "features.8.effects.1.description": "Holy Nimbus use; a level 5 spell slot restores it."
+    "features.8.effects.1.description": "Holy Nimbus use; a level 5 spell slot restores it.",
+    "features.0.effects.1.name": "Sacred Weapon",
+    "features.8.effects.2.name": "Holy Nimbus"
   },
   "oath-ancients": {
-    "_es": "4895d881",
+    "_es": "abdb26a0",
     "name": "Oath of the Ancients",
     "features.0.name": "Channel Divinity: Nature's Wrath",
     "features.0.effects.0.name": "Nature's Wrath",
@@ -703,15 +720,16 @@
     "features.6.effects.3.description": "Ancient magic lies so heavily upon you that it forms an eldritch ward: you and your allies have Resistance to Necrotic, Psychic, and Radiant damage while in your Aura of Protection.",
     "features.7.description": "When you are reduced to 0 HP but not killed, you drop to 1 HP instead.",
     "features.7.effects.0.description": "When you drop to 0 HP, you stay at 1 (once per Long Rest).",
-    "features.8.description": "You take on a radiant form that regenerates HP and empowers your spells and smites.",
-    "features.8.effects.0.description": "You regenerate each turn, and your enemies have Disadvantage against your spells and smites.",
+    "features.8.description": "Your aura fills with primal power: you regain Hit Points, enemies resist your spells less well, and you cast faster.",
+    "features.8.effects.0.description": "As a Bonus Action, you imbue your Aura of Protection with primal power for 1 minute or until you end it (no action required). Diminish Defiance: enemies in the aura have Disadvantage on saving throws against your spells and Channel Divinity options. Regeneration: at the start of each of your turns, you regain 10 Hit Points. Swift Spells: a spell with a casting time of an action can be cast as a Bonus Action instead. Once per Long Rest; expending a level 5 spell slot restores the use.",
     "features.7.effects.1.name": "Undying Sentinel",
     "features.7.effects.1.description": "Undying Sentinel use.",
     "features.8.effects.1.name": "Elder Champion",
-    "features.8.effects.1.description": "Elder Champion use; a level 5 spell slot restores it."
+    "features.8.effects.1.description": "Elder Champion use; a level 5 spell slot restores it.",
+    "features.8.effects.2.name": "Elder Champion"
   },
   "oath-glory": {
-    "_es": "9af99bc3",
+    "_es": "4fed47b6",
     "name": "Oath of Glory",
     "features.0.name": "Channel Divinity: Peerless Athlete / Inspiring Smite",
     "features.0.effects.0.name": "Champion's Glory",
@@ -738,13 +756,14 @@
     "features.6.effects.0.description": "+10 feet of Speed for you and allies in your aura.",
     "features.7.description": "As a Reaction, you can increase a creature's AC against an attack and counterattack if it misses.",
     "features.7.effects.0.description": "Reaction: an AC bonus for an attacked ally and a counterattack if the attack misses.",
-    "features.8.description": "You become an icon of inspiration: you gain superhuman charisma, reroll failed attacks, and dodge blows.",
-    "features.8.effects.0.description": "Advantage on Charisma, you reroll one missed attack per turn, and you negate an attack as a Reaction.",
+    "features.8.description": "For 10 minutes you have Advantage on Charisma checks, reroll failed saving throws, and turn one missed attack per turn into a hit.",
+    "features.8.effects.0.description": "As a Bonus Action, for 10 minutes: Charismatic: Advantage on all Charisma checks. Saving Throw Reroll: if you fail a saving throw, you can take a Reaction to reroll it and must use the new roll. Unerring Strike: once on each of your turns when you miss with a weapon attack roll, you can cause that attack to hit instead. Once per Long Rest; expending a level 5 spell slot restores the use.",
     "features.8.effects.1.name": "Living Legend",
-    "features.8.effects.1.description": "Living Legend use; a level 5 spell slot restores it."
+    "features.8.effects.1.description": "Living Legend use; a level 5 spell slot restores it.",
+    "features.8.effects.2.name": "Living Legend"
   },
   "oath-vengeance": {
-    "_es": "337c8110",
+    "_es": "3f92bfa6",
     "name": "Oath of Vengeance",
     "features.0.name": "Channel Divinity: Vow of Enmity",
     "features.0.effects.0.name": "Vow of Enmity",
@@ -772,9 +791,10 @@
     "features.7.description": "A Reaction to make a melee attack against your sworn enemy when it hits or misses with an attack roll.",
     "features.7.effects.0.description": "Immediately after a creature under the effect of your Vow of Enmity hits **or misses** with an attack roll, you can take a Reaction to make a melee attack against it if it is within your reach.",
     "features.8.description": "You take on a terrifying winged form with a Fly Speed and an aura of fear.",
-    "features.8.effects.0.description": "A Fly Speed and an aura that frightens nearby enemies.",
+    "features.8.effects.0.description": "As a Bonus Action, for 10 minutes or until you end it (no action required): Flight: you sprout spectral wings, have a Fly Speed of 60 feet, and can hover. Frightful Aura: whenever an enemy starts its turn in your Aura of Protection, it makes a Wisdom saving throw or has the Frightened condition for 1 minute or until it takes any damage; attack rolls against that creature have Advantage. Once per Long Rest; expending a level 5 spell slot restores the use.",
     "features.8.effects.1.name": "Avenging Angel",
-    "features.8.effects.1.description": "Avenging Angel use; a level 5 spell slot restores it."
+    "features.8.effects.1.description": "Avenging Angel use; a level 5 spell slot restores it.",
+    "features.8.effects.2.name": "Avenging Angel"
   },
   "hunter": {
     "_es": "fabeb3b3",
@@ -992,7 +1012,7 @@
     "features.3.effects.0.description": "Expends Psionic Energy Dice to stun a target hit by your blade."
   },
   "draconic-sorcery": {
-    "_es": "6bb1e533",
+    "_es": "351ab9a6",
     "name": "Draconic Sorcery",
     "features.0.name": "Draconic Resilience",
     "features.0.effects.2.name": "Draconic Resilience (AC)",
@@ -1020,7 +1040,8 @@
     "features.7.description": "You cast Summon Dragon without a Material component and for free once per Long Rest.",
     "features.7.effects.1.description": "You can cast Summon Dragon without a Material component. You can also cast it once without a spell slot, and you regain the ability to cast it this way when you finish a Long Rest. In addition, whenever you start casting it, you can modify it so that it doesn't require Concentration; if you do, that casting's duration becomes 1 minute.",
     "features.6.effects.1.name": "Dragon Wings",
-    "features.6.effects.1.description": "Dragon Wings use; 3 Sorcery Points restore it."
+    "features.6.effects.1.description": "Dragon Wings use; 3 Sorcery Points restore it.",
+    "features.6.effects.2.name": "Dragon Wings"
   },
   "aberrant-sorcery": {
     "_es": "39b10e7f",
@@ -1052,7 +1073,7 @@
     "features.7.effects.0.description": "A teleport with a wave of Force damage that drags enemies along."
   },
   "clockwork-sorcery": {
-    "_es": "dffb1d14",
+    "_es": "24d52290",
     "name": "Clockwork Sorcery",
     "features.0.name": "Restore Balance",
     "features.0.effects.0.name": "Restore Balance",
@@ -1082,7 +1103,8 @@
     "features.0.effects.1.name": "Restore Balance",
     "features.0.effects.1.description": "Restore Balance uses.",
     "features.6.effects.1.name": "Trance of Order",
-    "features.6.effects.1.description": "Trance of Order use; 5 Sorcery Points restore it."
+    "features.6.effects.1.description": "Trance of Order use; 5 Sorcery Points restore it.",
+    "features.6.effects.2.name": "Trance of Order"
   },
   "wild-magic-sorcery": {
     "_es": "5e9fef52",
@@ -1286,7 +1308,7 @@
     "features.4.effects.0.description": "Advantage on saving throws against spells and Resistance to their damage."
   },
   "diviner": {
-    "_es": "49b192ed",
+    "_es": "1d9da5e3",
     "name": "Diviner",
     "features.0.name": "Portent",
     "features.0.effects.0.name": "Portent",
@@ -1312,7 +1334,16 @@
     "features.0.effects.1.name": "Portent",
     "features.0.effects.1.description": "Portent rolls recorded after a Long Rest.",
     "features.4.effects.1.name": "Portent",
-    "features.4.effects.1.description": "Portent rolls recorded after a Long Rest."
+    "features.4.effects.1.description": "Portent rolls recorded after a Long Rest.",
+    "features.3.effects.1.name": "The Third Eye",
+    "features.3.effects.1.description": "Use of The Third Eye.",
+    "features.3.effects.2.name": "The Third Eye",
+    "features.3.effects.2.variants.0.name": "Darkvision",
+    "features.3.effects.2.variants.0.description": "Darkvision with a range of 120 feet.",
+    "features.3.effects.2.variants.1.name": "Greater Comprehension",
+    "features.3.effects.2.variants.1.description": "You can read any language.",
+    "features.3.effects.2.variants.2.name": "See Invisibility",
+    "features.3.effects.2.variants.2.description": "You can cast See Invisibility without expending a spell slot."
   },
   "illusionist": {
     "_es": "a5c64eda",

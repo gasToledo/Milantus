@@ -912,6 +912,35 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
+## [0.37.0+1] - 2026-10-27
+
+### Nuevo
+
+- Más transformaciones se prenden desde la ficha:
+  - Hechicería Dracónica: Alas de Dragón dan 60 pies de vuelo.
+  - Círculo de las Estrellas: Forma Estelar gasta un uso de Forma Salvaje y
+    pregunta Arquero, Cáliz o Dragón; en nivel 10 el Dragón vuela y en nivel
+    14 la forma da resistencia a contundente, perforante y cortante.
+  - Círculo del Mar: Ira de los Mares gasta Forma Salvaje; en nivel 10 da
+    vuelo y resistencia a frío, relámpago y trueno.
+  - Juramento de Entrega: Arma Sagrada suma el Carisma (mínimo +1) al ataque
+    cuerpo a cuerpo y deja elegir daño radiante.
+  - Las formas de nivel 20 del Paladín: Halo Sagrado, Campeón Ancestral,
+    Leyenda Viviente (ventaja en Carisma) y Ángel Vengador (60 pies de
+    vuelo).
+  - Trance de Orden, El Tercer Ojo (con visión en la oscuridad de 120 pies)
+    y Afinidad con la Piedra del Enano (sentido del temblor de 60 pies).
+
+### Modificado
+
+- Corregidos a las reglas 2024 los textos de Ira de los Mares, Forma
+  Estelar, Constelaciones Centelleantes, Arma Sagrada, Campeón Ancestral,
+  Leyenda Viviente y Ángel Vengador.
+
+### Eliminado
+
+- Sin cambios.
+
 ## [Unreleased]
 
 ### Nuevo
