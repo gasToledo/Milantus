@@ -5,6 +5,7 @@ import '../../api/api_models.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/app_widgets.dart';
 import '../../l10n/l10n_context.dart';
+import '../diary_cards.dart' show MarkdownText;
 import 'npcs/npc_shared.dart';
 
 /// El Cuaderno de campaña: qué pasó en cada capítulo.
@@ -539,17 +540,21 @@ class _EntryTile extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  note?.body ??
-                      (up != null
-                          ? _levelUpDetail(up, repo)
-                          : _logBody(log!, context.l10n)),
-                  style: TextStyle(
-                    fontSize: 13,
-                    height: 1.5,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                // La nota la escribe el DM y acepta Markdown, igual que el
+                // trasfondo; lo que redacta la app es texto llano.
+                if (note != null)
+                  MarkdownText(note.body)
+                else
+                  Text(
+                    up != null
+                        ? _levelUpDetail(up, repo)
+                        : _logBody(log!, context.l10n),
+                    style: TextStyle(
+                      fontSize: 13,
+                      height: 1.5,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
-                ),
               ],
             ),
           ),

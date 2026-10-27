@@ -1525,7 +1525,7 @@
   "dmAllStartWith": "All start with {hp}, the book average.",
   "dmAddToCombatOf": "Add to the combat of {campaign}",
   "dmEditCopy": "Edit a copy",
-  "chapterStatePlanned": "Coming up",
+  "chapterStatePlanned": "Planned",
   "chapterStateActive": "Underway",
   "chapterStateCompleted": "Completed",
   "dmAddedToCombat": "You added {what} to the combat of {campaign}.",

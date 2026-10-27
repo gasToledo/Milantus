@@ -9256,7 +9256,7 @@ abstract class AppLocalizations {
   /// No description provided for @chapterStatePlanned.
   ///
   /// In es, this message translates to:
-  /// **'Próximamente'**
+  /// **'Planificado'**
   String get chapterStatePlanned;
 
   /// No description provided for @chapterStateActive.

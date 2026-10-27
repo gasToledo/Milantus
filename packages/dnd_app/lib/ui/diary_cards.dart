@@ -218,7 +218,7 @@ class _DiaryBackgroundCardState extends State<DiaryBackgroundCard> {
                 ? _editor()
                 : vacio
                 ? _empty()
-                : _MarkdownText(_ctrl.text),
+                : MarkdownText(_ctrl.text),
           ),
         ),
       ),
@@ -1193,7 +1193,8 @@ class _DiaryEntryDialogState extends State<_DiaryEntryDialog> {
   }
 }
 
-/// Markdown del trasfondo, con lo que un trasfondo usa y nada más.
+/// Markdown del trasfondo y de las notas del cuaderno, con lo que un texto
+/// de mesa usa y nada más.
 ///
 /// ponytail: subconjunto a mano en vez de una dependencia. Entiende títulos
 /// (`#`, `##`, `###`), viñetas (`-`, `*`), párrafos separados por una línea en
@@ -1203,10 +1204,10 @@ class _DiaryEntryDialogState extends State<_DiaryEntryDialog> {
 ///
 /// `flutter_markdown` está discontinuado, así que sumarlo hoy sería estrenar
 /// deuda en vez de evitarla.
-class _MarkdownText extends StatelessWidget {
+class MarkdownText extends StatelessWidget {
   final String source;
 
-  const _MarkdownText(this.source);
+  const MarkdownText(this.source, {super.key});
 
   @override
   Widget build(BuildContext context) {

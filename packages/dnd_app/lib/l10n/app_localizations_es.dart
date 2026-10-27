@@ -5643,7 +5643,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dmEditCopy => 'Editar una copia';
 
   @override
-  String get chapterStatePlanned => 'Próximamente';
+  String get chapterStatePlanned => 'Planificado';
 
   @override
   String get chapterStateActive => 'En marcha';

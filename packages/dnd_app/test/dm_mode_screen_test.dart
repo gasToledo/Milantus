@@ -459,7 +459,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('crear un capítulo lo deja en Próximamente', (tester) async {
+    testWidgets('crear un capítulo lo deja planificado', (tester) async {
       final server = await pumpDmMode(tester, seed: seedTable);
       await openCapitulos(tester);
 
@@ -468,7 +468,7 @@ void main() {
       expect(find.text('La Cripta'), findsOneWidget);
       // `Eyebrow` pasa su texto a mayúsculas, así que el encabezado del grupo
       // no se busca por la etiqueta tal cual.
-      expect(find.text('PRÓXIMAMENTE'), findsOneWidget);
+      expect(find.text('PLANIFICADO'), findsOneWidget);
       final chapter = server.chapters['tumba']!.single;
       expect(chapter.name, 'La Cripta');
       expect(chapter.state, ChapterState.planned);

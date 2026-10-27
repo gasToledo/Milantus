@@ -127,6 +127,8 @@ class _NoteEditorDialogState extends State<_NoteEditorDialog> {
             decoration: InputDecoration(
               labelText: context.l10n.invNoteTitle,
               alignLabelWithHint: true,
+              helperText: context.l10n.diaryMarkdownHint,
+              helperMaxLines: 2,
             ),
           ),
         ],

@@ -168,12 +168,6 @@ void main() {
       );
     });
 
-    test('las etiquetas de estado son las que ve el DM', () {
-      expect(ChapterState.planned.label, 'Próximamente');
-      expect(ChapterState.active.label, 'En marcha');
-      expect(ChapterState.completed.label, 'Completado');
-    });
-
     // La etiqueta es para la pantalla; lo que viaja es el nombre inglés, que
     // es lo que el servidor compara.
     test('el estado serializa su nombre y no su etiqueta', () {

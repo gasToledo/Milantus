@@ -7,7 +7,7 @@ import 'data_version.dart';
 /// avanza en el tiempo, no una lista de encargos paralelos que se cumplen o se
 /// fallan. Por eso los estados son una línea y no un resultado.
 enum ChapterState {
-  planned('Próximamente'),
+  planned('Planificado'),
   active('En marcha'),
   completed('Completado');
 

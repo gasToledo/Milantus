@@ -4582,7 +4582,7 @@
     }
   },
   "dmEditCopy": "Editar una copia",
-  "chapterStatePlanned": "Próximamente",
+  "chapterStatePlanned": "Planificado",
   "chapterStateActive": "En marcha",
   "chapterStateCompleted": "Completado",
   "dmAddedToCombat": "Sumaste {what} al combate de {campaign}.",
