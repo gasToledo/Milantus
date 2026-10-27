@@ -1227,6 +1227,9 @@ class MarkdownText extends StatelessWidget {
   Widget build(BuildContext context) {
     final pal = context.palette;
     final cuerpo = Theme.of(context).colorScheme.onSurfaceVariant;
+    // Títulos y negrita van en el color pleno: con el apagado del cuerpo y
+    // apenas más tamaño o peso, en el tema oscuro casi no se distinguían.
+    final fuerte = Theme.of(context).colorScheme.onSurface;
     final bloques = <Widget>[];
 
     void separar() {
@@ -1239,7 +1242,7 @@ class MarkdownText extends StatelessWidget {
       separar();
       bloques.add(
         Text.rich(
-          _inline(parrafo.join(' '), cuerpo),
+          _inline(parrafo.join(' '), fuerte),
           style: TextStyle(fontSize: 14, height: 1.65, color: cuerpo),
         ),
       );
@@ -1270,11 +1273,12 @@ class MarkdownText extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'Georgia',
               fontSize: switch (nivel) {
-                1 => 17,
-                2 => 15.5,
-                _ => 14.5,
+                1 => 20,
+                2 => 17,
+                _ => 15,
               },
-              color: Theme.of(context).colorScheme.onSurface,
+              fontWeight: nivel == 3 ? FontWeight.w600 : FontWeight.w700,
+              color: fuerte,
             ),
           ),
         );
@@ -1302,7 +1306,7 @@ class MarkdownText extends StatelessWidget {
                 ),
                 Expanded(
                   child: Text.rich(
-                    _inline(limpia.substring(2).trim(), cuerpo),
+                    _inline(limpia.substring(2).trim(), fuerte),
                     style: TextStyle(fontSize: 14, height: 1.55, color: cuerpo),
                   ),
                 ),
@@ -1338,7 +1342,7 @@ class MarkdownText extends StatelessWidget {
         _conMenciones(
           negrita ?? m.group(2)!,
           negrita != null
-              ? const TextStyle(fontWeight: FontWeight.w600)
+              ? TextStyle(fontWeight: FontWeight.w700, color: color)
               : const TextStyle(fontStyle: FontStyle.italic),
         ),
       );
@@ -1355,22 +1359,32 @@ class MarkdownText extends StatelessWidget {
   /// Sin delimitador de cierre: se toma el nombre **más largo** que siga a la
   /// `@`, así «@Mirra la Tabernera» no se queda en «Mirra» si existen las
   /// dos. Una `@` que no coincide con nadie queda como texto.
+  ///
+  /// Sin distinguir mayúsculas ni tildes, como el buscador: «@Ines» es Inés.
+  /// Plegar no cambia el largo, así que el corte se hace sobre el original.
   List<InlineSpan> _conMenciones(String texto, TextStyle? style) {
     final builder = mentionBuilder;
     if (builder == null || mentions.isEmpty || !texto.contains('@')) {
       return [TextSpan(text: texto, style: style)];
     }
-    final nombres = [...mentions]..sort((a, b) => b.length - a.length);
+    // El nombre guardado con un espacio de más al final no coincidiría nunca
+    // con «@Nombre,»: se compara recortado y se le pasa al builder el
+    // original, que es por el que lo busca quien lo usa.
+    final nombres = [
+      for (final n in mentions)
+        if (n.trim().isNotEmpty) (original: n, clave: foldForSearch(n.trim())),
+    ]..sort((a, b) => b.clave.length - a.clave.length);
     final letra = RegExp(r'[\p{L}\p{N}]', unicode: true);
     final hijos = <InlineSpan>[];
     var suelto = 0;
     var arroba = texto.indexOf('@');
     while (arroba >= 0) {
-      final resto = texto.substring(arroba + 1);
+      final resto = foldForSearch(texto.substring(arroba + 1));
       final nombre = nombres.where((n) {
-        if (!resto.toLowerCase().startsWith(n.toLowerCase())) return false;
+        if (!resto.startsWith(n.clave)) return false;
         // Que el nombre termine ahí: «@Mirraela» no es Mirra.
-        return resto.length == n.length || !letra.hasMatch(resto[n.length]);
+        return resto.length == n.clave.length ||
+            !letra.hasMatch(resto[n.clave.length]);
       }).firstOrNull;
       if (nombre == null) {
         arroba = texto.indexOf('@', arroba + 1);
@@ -1385,10 +1399,10 @@ class MarkdownText extends StatelessWidget {
         WidgetSpan(
           alignment: PlaceholderAlignment.baseline,
           baseline: TextBaseline.alphabetic,
-          child: builder(nombre),
+          child: builder(nombre.original),
         ),
       );
-      suelto = arroba + 1 + nombre.length;
+      suelto = arroba + 1 + nombre.clave.length;
       arroba = texto.indexOf('@', suelto);
     }
     if (suelto < texto.length) {

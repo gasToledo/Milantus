@@ -55,16 +55,12 @@ class AddNpcChoice extends AddCombatantChoice {
 /// DM lo elige. Un monstruo sí arranca en enemigo, que es lo esperable. Un PNJ
 /// sin estadísticas entra fijo como neutral: sin PG no puede contar para
 /// ningún bando.
-///
-/// [initialNpcId] abre con ese PNJ de la campaña ya elegido (la mención del
-/// cuaderno): falta solo el bando, que sigue siendo decisión del DM.
 Future<AddCombatantChoice?> showAddCombatantDialog(
   BuildContext context, {
   required ContentRepository repo,
   required List<CampaignNpcEntry> campaignNpcs,
   required Set<String> npcIdsInEncounter,
   required Future<List<NpcEntry>> Function() loadLibrary,
-  String? initialNpcId,
 }) {
   return showDialog<AddCombatantChoice>(
     context: context,
@@ -73,64 +69,8 @@ Future<AddCombatantChoice?> showAddCombatantDialog(
       campaignNpcs: campaignNpcs,
       npcIdsInEncounter: npcIdsInEncounter,
       loadLibrary: loadLibrary,
-      initialNpcId: initialNpcId,
     ),
   );
-}
-
-/// El diálogo más lo que pasa después: con el combate andando, la iniciativa
-/// del PNJ se pide a mano. Lo usan el botón de Combate y las menciones del
-/// cuaderno, para que sumar desde una nota no se salte ese paso.
-///
-/// Sin [encounter] se suma igual: quien recibe [onAddNpc] / [onAddMonster]
-/// arma el combate, y lo arma en preparación, así que no hay iniciativa que
-/// pedir. Devuelve lo que se sumó, o `null` si se canceló.
-Future<AddCombatantChoice?> addCombatantFlow(
-  BuildContext context, {
-  required Encounter? encounter,
-  required ContentRepository repo,
-  required List<CampaignNpcEntry> campaignNpcs,
-  required Future<List<NpcEntry>> Function() loadLibrary,
-  required void Function(
-    Creature creature,
-    int count, {
-    bool rollHp,
-    CombatantSide side,
-  })
-  onAddMonster,
-  required void Function(AddNpcChoice choice, int initiative) onAddNpc,
-  String? initialNpcId,
-}) async {
-  final picked = await showAddCombatantDialog(
-    context,
-    repo: repo,
-    campaignNpcs: campaignNpcs,
-    npcIdsInEncounter: {...?encounter?.combatants.map((c) => c.npcId).nonNulls},
-    loadLibrary: loadLibrary,
-    initialNpcId: initialNpcId,
-  );
-  if (picked == null || !context.mounted) return null;
-  switch (picked) {
-    case AddMonsterChoice(:final creature, :final count, :final rollHp):
-      onAddMonster(creature, count, rollHp: rollHp, side: picked.side);
-    case AddNpcChoice():
-      // Con el combate andando, la iniciativa del PNJ se dice en voz alta
-      // como la de un jugador: la tirada automática es solo del bestiario.
-      var initiative = 0;
-      if (encounter != null && !encounter.isPreparing) {
-        final value = await showTextPromptDialog(
-          context,
-          title: context.l10n.encInitiativeOf(picked.npc.name),
-          label: context.l10n.encWhatTheyGot,
-          keyboardType: TextInputType.number,
-        );
-        final parsed = value == null ? null : int.tryParse(value.trim());
-        if (parsed == null) return null;
-        initiative = parsed;
-      }
-      onAddNpc(picked, initiative);
-  }
-  return picked;
 }
 
 enum _Tab { npcs, bestiary }
@@ -149,14 +89,12 @@ class _AddCombatantDialog extends StatefulWidget {
   final List<CampaignNpcEntry> campaignNpcs;
   final Set<String> npcIdsInEncounter;
   final Future<List<NpcEntry>> Function() loadLibrary;
-  final String? initialNpcId;
 
   const _AddCombatantDialog({
     required this.repo,
     required this.campaignNpcs,
     required this.npcIdsInEncounter,
     required this.loadLibrary,
-    required this.initialNpcId,
   });
 
   @override
@@ -184,26 +122,7 @@ class _AddCombatantDialogState extends State<_AddCombatantDialog> {
 
   // --- PNJ
   late final Future<List<NpcEntry>> _library = widget.loadLibrary();
-
-  /// El que ya está en la mesa no se preselecciona: el diálogo abre con la
-  /// lista, donde figura como «ya en el combate», en vez de ofrecer sumarlo
-  /// dos veces.
-  late _NpcOption? _npc = switch (widget.campaignNpcs
-      .where(
-        (e) =>
-            e.npc.id == widget.initialNpcId &&
-            !widget.npcIdsInEncounter.contains(e.npc.id),
-      )
-      .firstOrNull) {
-    final entry? => (
-      npc: entry.npc,
-      sheet: entry.sheet,
-      status: entry.status,
-      fromLibrary: false,
-      hurt: npcStoredHp(entry, widget.repo),
-    ),
-    null => null,
-  };
+  _NpcOption? _npc;
   CombatantSide? _npcSide;
   bool _revive = false;
 

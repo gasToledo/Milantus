@@ -5825,12 +5825,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dmNoteMarkdownHint =>
-      'Markdown is supported: # for headings, **bold**, *italic*, - for bullets and @Name to mention a campaign NPC.';
-
-  @override
-  String dmNpcMentionActions(String name) {
-    return '$name actions';
-  }
+      'Markdown is supported: # for headings, **bold**, *italic*, - for bullets and @Name to mention a campaign character or NPC.';
 
   @override
   String get dmViewNpc => 'View NPC';

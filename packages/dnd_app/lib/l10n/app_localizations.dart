@@ -9520,14 +9520,8 @@ abstract class AppLocalizations {
   /// No description provided for @dmNoteMarkdownHint.
   ///
   /// In es, this message translates to:
-  /// **'Acepta Markdown: # para títulos, **negrita**, *itálica*, - para viñetas y @Nombre para mencionar a un PNJ de la campaña.'**
+  /// **'Acepta Markdown: # para títulos, **negrita**, *itálica*, - para viñetas y @Nombre para mencionar a un personaje o PNJ de la campaña.'**
   String get dmNoteMarkdownHint;
-
-  /// No description provided for @dmNpcMentionActions.
-  ///
-  /// In es, this message translates to:
-  /// **'Acciones de {name}'**
-  String dmNpcMentionActions(String name);
 
   /// No description provided for @dmViewNpc.
   ///

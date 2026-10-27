@@ -2,6 +2,7 @@ import 'package:dnd_app/api/api_client.dart';
 import 'package:dnd_app/theme/app_theme.dart';
 import 'package:dnd_app/theme/app_widgets.dart';
 import 'package:dnd_app/ui/dm/dm_mode_screen.dart';
+import 'package:dnd_app/ui/dm/npcs/npc_detail_screen.dart';
 import 'package:dnd_app/ui/sheet_screen.dart';
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:flutter/material.dart';
@@ -784,11 +785,11 @@ void main() {
   });
 
   // Se toma el nombre más largo: con «Mirra» y «Mirra la Tabernera» en la
-  // campaña, la mención es de la segunda, y es la que entra al combate.
-  testWidgets('una mención en una nota suma a ese PNJ al combate', (
+  // campaña, la mención es de la segunda, y es su ficha la que se abre.
+  testWidgets('una mención en una nota abre la ficha de ese PNJ', (
     tester,
   ) async {
-    final server = await pumpCombate(
+    await pumpCombate(
       tester,
       seed: (s) {
         addNpc(s, blockNpc('mirra', 'Mirra', 'Bandido'));
@@ -815,16 +816,62 @@ void main() {
 
     await tester.tap(find.text('Mirra la Tabernera'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Sumar al combate'));
-    await tester.pumpAndSettle();
-    await tester.tap(inDialog(find.text('Aliado')));
-    await tester.pumpAndSettle();
-    await tester.tap(dialogAction('Sumar'));
+
+    expect(
+      tester.widget<NpcDetailScreen>(find.byType(NpcDetailScreen)).npcId,
+      'tabernera',
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  // El registro lo escribe la app: no hay `@`, enlaza sola a quien sigue en
+  // la campaña. El que ya no está queda como texto.
+  testWidgets('un PNJ del registro de combate abre su ficha', (tester) async {
+    await pumpCombate(
+      tester,
+      seed: (s) {
+        addNpc(s, blockNpc('mirra', 'Mirra', 'Bandido'));
+        s.chapters['tumba'] = [
+          const Chapter(
+            id: 'cripta',
+            name: 'La cripta',
+            state: ChapterState.active,
+          ),
+        ];
+        s.encounterLogs['tumba'] = [
+          const EncounterLog(
+            id: 'log-0',
+            chapterId: 'cripta',
+            rounds: 2,
+            players: ['Sagan'],
+            monsters: [
+              EncounterLogMonsters(name: 'Bandido', count: 2, defeated: 2),
+              EncounterLogMonsters(
+                name: 'Mirra',
+                side: CombatantSide.ally,
+                npc: true,
+              ),
+              EncounterLogMonsters(
+                name: 'Bruno',
+                side: CombatantSide.neutral,
+                npc: true,
+              ),
+            ],
+          ),
+        ];
+      },
+    );
+    await tester.tap(find.text('Cuaderno'));
     await tester.pumpAndSettle();
 
-    final added = combatant(server, 'Mirra la Tabernera');
-    expect(added.npcId, 'tabernera');
-    expect(added.side, CombatantSide.ally);
+    expect(find.textContaining('Neutrales: Bruno.'), findsOneWidget);
+    await tester.tap(find.text('Mirra'));
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.widget<NpcDetailScreen>(find.byType(NpcDetailScreen)).npcId,
+      'mirra',
+    );
     expect(tester.takeException(), isNull);
   });
 }

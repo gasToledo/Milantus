@@ -42,11 +42,13 @@ class NotebookView extends StatefulWidget {
   final void Function(Note note) onEditNote;
   final void Function(Note note) onDeleteNote;
 
-  /// Los PNJ de la campaña, que una nota menciona con `@Nombre`. Tocar la
-  /// mención ofrece abrirlo o sumarlo al combate sin salir del cuaderno.
+  /// Los personajes de la mesa y los PNJ de la campaña. Una nota los
+  /// menciona con `@Nombre` y los registros de combate enlazan solos a
+  /// quienes pelearon; tocar el nombre abre su ficha.
+  final List<CampaignMember> members;
+  final void Function(String memberId, String name) onOpenPlayer;
   final List<CampaignNpcEntry> npcs;
   final void Function(String npcId) onOpenNpc;
-  final void Function(String npcId) onAddNpcToCombat;
 
   const NotebookView({
     super.key,
@@ -59,9 +61,10 @@ class NotebookView extends StatefulWidget {
     required this.onRetry,
     required this.onEditNote,
     required this.onDeleteNote,
+    this.members = const [],
+    required this.onOpenPlayer,
     this.npcs = const [],
     required this.onOpenNpc,
-    required this.onAddNpcToCombat,
   });
 
   @override
@@ -99,19 +102,41 @@ class _NotebookViewState extends State<NotebookView> {
     };
   }
 
-  Widget _noteBody(String body) => MarkdownText(
-    body,
-    mentions: [for (final e in widget.npcs) e.npc.name],
+  List<String> get _mentionable => [
+    for (final m in widget.members) m.character.name,
+    for (final e in widget.npcs) e.npc.name,
+  ];
+
+  Widget _richText(String text) => MarkdownText(
+    text,
+    mentions: _mentionable,
     mentionBuilder: (name) {
-      // Dos PNJ con el mismo nombre: gana el primero, igual que en la lista.
+      // Un jugador y un PNJ con el mismo nombre: gana el jugador, que es de
+      // la mesa. Entre dos del mismo tipo, el primero, igual que en la lista.
+      final member = widget.members
+          .where((m) => m.character.name == name)
+          .firstOrNull;
+      if (member != null) {
+        return _Mention(
+          name: name,
+          tooltip: context.l10n.dmOpenSheet,
+          onOpen: () => widget.onOpenPlayer(member.memberId, name),
+        );
+      }
       final npc = widget.npcs.firstWhere((e) => e.npc.name == name).npc;
-      return _NpcMention(
+      return _Mention(
         name: name,
+        tooltip: context.l10n.dmViewNpc,
         onOpen: () => widget.onOpenNpc(npc.id),
-        onAddToCombat: () => widget.onAddNpcToCombat(npc.id),
       );
     },
   );
+
+  /// Un nombre de un registro de combate, listo para [_richText]: con `@` si
+  /// es de alguien que todavía está en la campaña. El que se fue (un jugador
+  /// que cortó el vínculo, un PNJ desvinculado) queda como texto, sin una `@`
+  /// suelta que no lleva a ningún lado.
+  String _mark(String name) => _mentionable.contains(name) ? '@$name' : name;
 
   bool _matches(String text) =>
       _query.trim().isEmpty ||
@@ -221,7 +246,8 @@ class _NotebookViewState extends State<NotebookView> {
                 }),
                 onEditNote: widget.onEditNote,
                 onDeleteNote: (note) => _confirmDelete(context, note),
-                noteBody: _noteBody,
+                richText: _richText,
+                mark: _mark,
               ),
             ),
         if (loose.isNotEmpty) ...[
@@ -241,7 +267,8 @@ class _NotebookViewState extends State<NotebookView> {
                 repo: widget.repo,
                 onEdit: widget.onEditNote,
                 onDelete: (note) => _confirmDelete(context, note),
-                noteBody: _noteBody,
+                richText: _richText,
+                mark: _mark,
               ),
             ),
         ],
@@ -290,8 +317,16 @@ String _levelUpDetail(LevelUpEntry up, ContentRepository repo) =>
     '${repo.characterClass(up.classId)?.name ?? up.classId} ${up.classLevel}';
 
 /// «Esqueleto ×2», con la cantidad detrás: ver [countedName].
-String _logNames(List<EncounterLogMonsters> group, String joiner) =>
-    [for (final m in group) countedName(m.name, m.count)].join(joiner);
+///
+/// [mark] le pone la `@` al nombre propio de un PNJ; un monstruo del bestiario
+/// no es nadie a quien abrirle la ficha.
+String _logNames(
+  List<EncounterLogMonsters> group,
+  String joiner,
+  String Function(String name) mark,
+) => [
+  for (final m in group) m.npc ? mark(m.name) : countedName(m.name, m.count),
+].join(joiner);
 
 /// Un capítulo del cuaderno: plegado muestra un resumen, abierto muestra sus
 /// entradas.
@@ -308,7 +343,8 @@ class _ChapterCard extends StatelessWidget {
   final VoidCallback onToggle;
   final void Function(Note note) onEditNote;
   final void Function(Note note) onDeleteNote;
-  final Widget Function(String body) noteBody;
+  final Widget Function(String text) richText;
+  final String Function(String name) mark;
 
   const _ChapterCard({
     super.key,
@@ -320,7 +356,8 @@ class _ChapterCard extends StatelessWidget {
     required this.onToggle,
     required this.onEditNote,
     required this.onDeleteNote,
-    required this.noteBody,
+    required this.richText,
+    required this.mark,
   });
 
   @override
@@ -432,7 +469,8 @@ class _ChapterCard extends StatelessWidget {
                     repo: repo,
                     onEdit: onEditNote,
                     onDelete: onDeleteNote,
-                    noteBody: noteBody,
+                    richText: richText,
+                    mark: mark,
                   ),
                 ),
           ],
@@ -460,14 +498,16 @@ class _EntryTile extends StatelessWidget {
   final ContentRepository repo;
   final void Function(Note note) onEdit;
   final void Function(Note note) onDelete;
-  final Widget Function(String body) noteBody;
+  final Widget Function(String text) richText;
+  final String Function(String name) mark;
 
   const _EntryTile({
     required this.entry,
     required this.repo,
     required this.onEdit,
     required this.onDelete,
-    required this.noteBody,
+    required this.richText,
+    required this.mark,
   });
 
   @override
@@ -571,14 +611,15 @@ class _EntryTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 // La nota la escribe el DM y acepta Markdown, igual que el
-                // trasfondo; lo que redacta la app es texto llano.
+                // trasfondo. Del combate, la app escribe el texto y enlaza a
+                // quienes pelearon; la subida de nivel es texto llano.
                 if (note != null)
-                  noteBody(note.body)
+                  richText(note.body)
+                else if (log != null)
+                  richText(_logBody(log, context.l10n, mark: mark))
                 else
                   Text(
-                    up != null
-                        ? _levelUpDetail(up, repo)
-                        : _logBody(log!, context.l10n),
+                    _levelUpDetail(up!, repo),
                     style: TextStyle(
                       fontSize: 13,
                       height: 1.5,
@@ -612,52 +653,39 @@ class _EntryTile extends StatelessWidget {
 
 enum _NoteAction { edit, delete }
 
-/// Un PNJ mencionado en una nota. Menú y no un toque directo porque las dos
-/// cosas que se quieren de él en plena sesión son distintas: leer su hoja o
-/// meterlo en la pelea que está por empezar.
-class _NpcMention extends StatelessWidget {
+/// Un personaje o PNJ mencionado en una nota o en un registro de combate:
+/// tocarlo abre su ficha.
+class _Mention extends StatelessWidget {
   final String name;
+  final String tooltip;
   final VoidCallback onOpen;
-  final VoidCallback onAddToCombat;
 
-  const _NpcMention({
+  const _Mention({
     required this.name,
+    required this.tooltip,
     required this.onOpen,
-    required this.onAddToCombat,
   });
 
   @override
   Widget build(BuildContext context) {
     final pal = context.palette;
-    return PopupMenuButton<bool>(
-      tooltip: context.l10n.dmNpcMentionActions(name),
-      onSelected: (combat) => combat ? onAddToCombat() : onOpen(),
-      itemBuilder: (context) => [
-        PopupMenuItem(
-          value: false,
-          child: ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.person_outline),
-            title: Text(context.l10n.dmViewNpc),
+    return Tooltip(
+      message: tooltip,
+      child: Semantics(
+        link: true,
+        child: InkWell(
+          onTap: onOpen,
+          borderRadius: BorderRadius.circular(4),
+          child: Text(
+            name,
+            style: TextStyle(
+              fontSize: 14,
+              color: pal.gold,
+              fontWeight: FontWeight.w600,
+              decoration: TextDecoration.underline,
+              decorationColor: pal.gold,
+            ),
           ),
-        ),
-        PopupMenuItem(
-          value: true,
-          child: ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.local_fire_department_outlined),
-            title: Text(context.l10n.dmAddToCombat),
-          ),
-        ),
-      ],
-      child: Text(
-        name,
-        style: TextStyle(
-          fontSize: 14,
-          color: pal.gold,
-          fontWeight: FontWeight.w600,
-          decoration: TextDecoration.underline,
-          decorationColor: pal.gold,
         ),
       ),
     );
@@ -670,17 +698,27 @@ class _NpcMention extends StatelessWidget {
 /// Aliados y neutrales van en líneas propias, después de la pelea: es el
 /// cuaderno del DM y le sirve saber que Mirra estuvo del lado de la mesa, pero
 /// no cuentan en «cayeron N de M», que es de los enemigos.
-String _logBody(EncounterLog log, AppLocalizations l10n) {
-  final who = log.players.isEmpty ? l10n.dmTheTable : log.players.join(', ');
+///
+/// Sale en Markdown, para [MarkdownText]: cada línea es un párrafo (de ahí la
+/// línea en blanco entre ellas) y [mark] enlaza a jugadores y PNJ.
+String _logBody(
+  EncounterLog log,
+  AppLocalizations l10n, {
+  required String Function(String name) mark,
+}) {
+  final who = log.players.isEmpty
+      ? l10n.dmTheTable
+      : log.players.map(mark).join(', ');
   final extra = [
-    if (log.allies.isNotEmpty) l10n.dmLogAllies(_logNames(log.allies, ', ')),
+    if (log.allies.isNotEmpty)
+      l10n.dmLogAllies(_logNames(log.allies, ', ', mark)),
     if (log.neutrals.isNotEmpty)
-      l10n.dmLogNeutrals(_logNames(log.neutrals, ', ')),
+      l10n.dmLogNeutrals(_logNames(log.neutrals, ', ', mark)),
   ];
   if (log.enemies.isEmpty) {
-    return [l10n.dmLogNoEnemies(who), ...extra].join('\n');
+    return [l10n.dmLogNoEnemies(who), ...extra].join('\n\n');
   }
-  final against = _logNames(log.enemies, ' ${l10n.wordAnd} ');
+  final against = _logNames(log.enemies, ' ${l10n.wordAnd} ', mark);
   // El sujeto va siempre explícito: "cayeron todos" a secas, al lado de
   // "Sagan, Lyra contra Goblin ×3", se puede leer como que cayó el grupo.
   final fell = log.totalDefeated == 0
@@ -688,5 +726,5 @@ String _logBody(EncounterLog log, AppLocalizations l10n) {
       : log.totalDefeated == log.totalMonsters
       ? l10n.dmLogAllFell
       : l10n.dmLogSomeFell(log.totalDefeated, log.totalMonsters);
-  return [l10n.dmLogAgainst(who, against, fell), ...extra].join('\n');
+  return [l10n.dmLogAgainst(who, against, fell), ...extra].join('\n\n');
 }

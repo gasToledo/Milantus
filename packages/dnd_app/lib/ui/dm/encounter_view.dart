@@ -578,15 +578,34 @@ class _EncounterViewState extends State<EncounterView> {
   Future<void> _add(BuildContext context) async {
     final encounter = widget.encounter;
     if (encounter == null) return;
-    await addCombatantFlow(
+    final picked = await showAddCombatantDialog(
       context,
-      encounter: encounter,
       repo: widget.repo,
       campaignNpcs: widget.npcs,
+      npcIdsInEncounter: {for (final c in encounter.combatants) ?c.npcId},
       loadLibrary: widget.loadNpcLibrary,
-      onAddMonster: widget.onAddMonster,
-      onAddNpc: widget.onAddNpc,
     );
+    if (picked == null || !context.mounted) return;
+    switch (picked) {
+      case AddMonsterChoice(:final creature, :final count, :final rollHp):
+        widget.onAddMonster(creature, count, rollHp: rollHp, side: picked.side);
+      case AddNpcChoice():
+        // Con el combate andando, la iniciativa del PNJ se dice en voz alta
+        // como la de un jugador: la tirada automática es solo del bestiario.
+        var initiative = 0;
+        if (!encounter.isPreparing) {
+          final value = await showTextPromptDialog(
+            context,
+            title: context.l10n.encInitiativeOf(picked.npc.name),
+            label: context.l10n.encWhatTheyGot,
+            keyboardType: TextInputType.number,
+          );
+          final parsed = value == null ? null : int.tryParse(value.trim());
+          if (parsed == null) return;
+          initiative = parsed;
+        }
+        widget.onAddNpc(picked, initiative);
+    }
   }
 
   CampaignMember? _member(Combatant combatant) => combatant.memberId == null

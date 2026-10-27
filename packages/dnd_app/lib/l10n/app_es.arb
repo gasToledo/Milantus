@@ -4733,15 +4733,7 @@
     }
   },
   "dmNoteActions": "Acciones de la nota",
-  "dmNoteMarkdownHint": "Acepta Markdown: # para títulos, **negrita**, *itálica*, - para viñetas y @Nombre para mencionar a un PNJ de la campaña.",
-  "dmNpcMentionActions": "Acciones de {name}",
-  "@dmNpcMentionActions": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
+  "dmNoteMarkdownHint": "Acepta Markdown: # para títulos, **negrita**, *itálica*, - para viñetas y @Nombre para mencionar a un personaje o PNJ de la campaña.",
   "dmViewNpc": "Ver PNJ",
   "dmRounds": "{count, plural, =1{1 ronda} other{{count} rondas}}",
   "@dmRounds": {

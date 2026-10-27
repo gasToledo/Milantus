@@ -2117,6 +2117,36 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('una mención a un jugador abre su ficha', (tester) async {
+      await pumpDmMode(
+        tester,
+        seed: (s) {
+          seedChapter(s);
+          s.campaignMembers['m1'] = (campaignId: 'tumba', characterId: 'sagan');
+          s.notes['tumba'] = [
+            const Note(
+              id: 'n1',
+              chapterId: 'cripta',
+              title: 'La puerta',
+              body: '@Sagan tiene la llave del tercer sello.',
+            ),
+          ];
+        },
+      );
+      await openCuaderno(tester);
+
+      await tester.tap(find.widgetWithText(InkWell, 'Sagan'));
+      await tester.pumpAndSettle();
+
+      expect(
+        tester
+            .widget<MemberSheetScreen>(find.byType(MemberSheetScreen))
+            .memberId,
+        'm1',
+      );
+      expect(tester.takeException(), isNull);
+    });
+
     // La subida de nivel la anota el servidor cuando el jugador guarda la
     // ficha: el DM no escribe nada y tampoco la puede corregir.
     testWidgets('una subida de nivel del jugador aparece como entrada', (

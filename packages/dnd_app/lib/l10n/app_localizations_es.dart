@@ -5826,12 +5826,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get dmNoteMarkdownHint =>
-      'Acepta Markdown: # para títulos, **negrita**, *itálica*, - para viñetas y @Nombre para mencionar a un PNJ de la campaña.';
-
-  @override
-  String dmNpcMentionActions(String name) {
-    return 'Acciones de $name';
-  }
+      'Acepta Markdown: # para títulos, **negrita**, *itálica*, - para viñetas y @Nombre para mencionar a un personaje o PNJ de la campaña.';
 
   @override
   String get dmViewNpc => 'Ver PNJ';
