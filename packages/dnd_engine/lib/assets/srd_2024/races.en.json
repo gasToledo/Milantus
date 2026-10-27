@@ -68,7 +68,7 @@
     "effects.4.description": "You choose a lineage (High Elf, Wood Elf, or Drow) that grants a cantrip and benefits that improve at levels 3 and 5."
   },
   "dragonborn": {
-    "_es": "7ffae201",
+    "_es": "e15e6a00",
     "name": "Dragonborn",
     "tagline": "Draconic heritage",
     "effects.1.name": "Breath Weapon",
@@ -79,7 +79,8 @@
     "effects.2.description": "Breath Weapon uses.",
     "effects.3.description": "Starting at level 5, as a Bonus Action you gain a Fly Speed equal to your Speed for 10 minutes, until you retract the wings (no action required), or until you have the Incapacitated condition. Once per Long Rest.",
     "effects.4.effects.0.name": "Draconic Flight",
-    "effects.4.effects.0.description": "Draconic Flight use."
+    "effects.4.effects.0.description": "Draconic Flight use.",
+    "effects.4.effects.1.name": "Draconic Flight"
   },
   "gnome": {
     "_es": "61f1180e",
@@ -102,7 +103,7 @@
     "effects.3.description": "You choose a legacy (Abyssal, Chthonic, or Infernal) that determines your damage resistance and the spells you learn."
   },
   "goliath": {
-    "_es": "fdb49d26",
+    "_es": "c04697dc",
     "name": "Goliath",
     "tagline": "Giant blood",
     "effects.0.name": "Powerful Build",
@@ -111,10 +112,11 @@
     "effects.0.description": "You have Advantage on any ability check you make to end the Grappled condition. You also count as one size larger when determining your carrying capacity.",
     "effects.1.description": "Starting at level 5, as a Bonus Action you can change your size to Large for 10 minutes if there is room. For the duration, you have Advantage on Strength checks and your Speed increases by 10 feet. Once per Long Rest.",
     "effects.2.effects.0.name": "Large Form",
-    "effects.2.effects.0.description": "Large Form use."
+    "effects.2.effects.0.description": "Large Form use.",
+    "effects.2.effects.1.name": "Large Form"
   },
   "aasimar": {
-    "_es": "24cc36db",
+    "_es": "109d5595",
     "name": "Aasimar",
     "tagline": "Touched by celestial light",
     "effects.3.name": "Celestial Resistance",
@@ -129,7 +131,14 @@
     "effects.6.description": "You know the Light cantrip. Charisma is your spellcasting ability for it.",
     "effects.8.description": "Starting at level 3, as a Bonus Action you transform for 1 minute, choosing Heavenly Wings, Inner Radiance, or Necrotic Shroud each time. Once on each of your turns, you deal extra damage equal to your Proficiency Bonus: Radiant with Wings or Radiance, and Necrotic with Shroud. Wings grant flight; Radiance sheds light and damages nearby creatures; Shroud can frighten nearby creatures. Once per Long Rest.",
     "effects.9.effects.0.name": "Celestial Revelation",
-    "effects.9.effects.0.description": "Celestial Revelation use."
+    "effects.9.effects.0.description": "Celestial Revelation use.",
+    "effects.9.effects.1.name": "Celestial Revelation",
+    "effects.9.effects.1.variants.0.name": "Heavenly Wings",
+    "effects.9.effects.1.variants.0.description": "Fly Speed equal to your Speed. Once per turn, extra Radiant damage to one target equal to your Proficiency Bonus.",
+    "effects.9.effects.1.variants.1.name": "Inner Radiance",
+    "effects.9.effects.1.variants.1.description": "Bright Light in a 10-foot radius and Dim Light for 10 more feet. At the end of each of your turns, each creature within 10 feet takes Radiant damage equal to your Proficiency Bonus. Once per turn, extra Radiant damage to one target equal to your Proficiency Bonus.",
+    "effects.9.effects.1.variants.2.name": "Necrotic Shroud",
+    "effects.9.effects.1.variants.2.description": "Creatures other than your allies within 10 feet make a Charisma saving throw (DC 8 + your CHA modifier + Proficiency Bonus) or have the Frightened condition until the end of your next turn. Once per turn, extra Necrotic damage to one target equal to your Proficiency Bonus."
   },
   "changeling": {
     "_es": "af85b4e1",
@@ -180,7 +189,7 @@
     "effects.8.description": "Lethargy Resilience use; it returns after 1d4 Long Rests."
   },
   "shifter": {
-    "_es": "21bbcdea",
+    "_es": "f910eaab",
     "name": "Shifter",
     "tagline": "The beast within, just beneath the skin",
     "effects.1.name": "Humanoid",
@@ -193,7 +202,8 @@
     "effects.2.description": "You gain proficiency in one skill of your choice among Acrobatics, Athletics, Intimidation, and Survival.",
     "effects.3.description": "As a Bonus Action, you take on a more bestial appearance for 1 minute, or until you return to your normal form with another Bonus Action. When you shift, you gain Temporary Hit Points equal to twice your Proficiency Bonus. You can shift a number of times equal to your Proficiency Bonus, and you regain all uses when you finish a Long Rest.",
     "effects.4.description": "Shifting uses.",
-    "effects.5.description": "When you take this species, you choose which benefit you gain when you shift: Beasthide, Longtooth, Swiftstride, or Wildhunt."
+    "effects.5.description": "When you take this species, you choose which benefit you gain when you shift: Beasthide, Longtooth, Swiftstride, or Wildhunt.",
+    "effects.6.name": "Shifting"
   },
   "warforged": {
     "_es": "5c59264b",

@@ -164,6 +164,8 @@ sealed class Effect {
           resourceId: json['resourceId'] as String?,
           endsInHeavyArmor: json['endsInHeavyArmor'] as bool? ?? false,
           noSpellcasting: json['noSpellcasting'] as bool? ?? false,
+          endsWhenIncapacitated: json['endsWhenIncapacitated'] as bool? ?? true,
+          tempHpPerProficiency: json['tempHpPerProficiency'] as int? ?? 0,
           effects: Effect.listFromJson(json['effects']),
           variants: [
             for (final v in json['variants'] as List? ?? const [])
@@ -1604,6 +1606,15 @@ class ActiveModeEffect extends Effect {
   /// concentración (la Furia). Hoy la ficha solo lo dice; no bloquea nada.
   final bool noSpellcasting;
 
+  /// Quedar incapacitado lo termina. La Furia y el Vuelo Dracónico sí; la
+  /// Forma Grande, la Revelación Celestial y la Transformación del
+  /// Cambiaformas duran lo suyo aunque el personaje caiga.
+  final bool endsWhenIncapacitated;
+
+  /// PG temporales al activarlo, por bonificador por competencia: la
+  /// Transformación del Cambiaformas da el doble.
+  final int tempHpPerProficiency;
+
   final List<Effect> effects;
 
   /// Opciones que se eligen **cada vez** que se activa (Oso, Águila o Lobo
@@ -1616,6 +1627,8 @@ class ActiveModeEffect extends Effect {
     this.resourceId,
     this.endsInHeavyArmor = false,
     this.noSpellcasting = false,
+    this.endsWhenIncapacitated = true,
+    this.tempHpPerProficiency = 0,
     this.effects = const [],
     this.variants = const [],
   });
@@ -1628,6 +1641,9 @@ class ActiveModeEffect extends Effect {
         if (resourceId != null) 'resourceId': resourceId,
         if (endsInHeavyArmor) 'endsInHeavyArmor': true,
         if (noSpellcasting) 'noSpellcasting': true,
+        if (!endsWhenIncapacitated) 'endsWhenIncapacitated': false,
+        if (tempHpPerProficiency != 0)
+          'tempHpPerProficiency': tempHpPerProficiency,
         'effects': [for (final e in effects) e.toJson()],
         if (variants.isNotEmpty)
           'variants': [for (final v in variants) v.toJson()],

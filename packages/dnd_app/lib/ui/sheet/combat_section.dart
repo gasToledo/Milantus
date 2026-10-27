@@ -22,7 +22,7 @@ extension _SheetCombatSection on _SheetScreenState {
         if (s.companions.isNotEmpty) _companionsCard(s),
         if (hasSpells) _spellsCard(s),
       ],
-      [_savesCard(s), _conditionsCard()],
+      [_savesCard(s), _conditionsCard(s)],
     ]);
   }
 
@@ -119,7 +119,7 @@ extension _SheetCombatSection on _SheetScreenState {
             foregroundColor: Colors.white,
           ),
           onPressed: () => _mutateCombat(() {
-            CombatOps.applyDamage(_c.combat, _amount);
+            CombatOps.applyDamage(_c.combat, _amount, sheet: s);
             _amountCtrl.clear();
           }),
           icon: const Icon(Icons.remove, size: 18),
@@ -1791,21 +1791,22 @@ extension _SheetCombatSection on _SheetScreenState {
     );
   }
 
-  Widget _conditionsCard() {
+  Widget _conditionsCard(ComputedSheet s) {
     return sheetCard(
       icon: Icons.emergency,
       title: context.l10n.conditionsTitle,
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: _conditionChips(_c.combat.conditions),
+        child: _conditionChips(_c.combat.conditions, sheet: s),
       ),
     );
   }
 
   /// Los chips operan sobre el conjunto que se les pasa, no sobre el del
   /// personaje: los compañeros invocados llevan condiciones propias y la lista
-  /// de estados es la misma para todos.
-  Widget _conditionChips(Set<String> target) {
+  /// de estados es la misma para todos. La [sheet] es la del personaje, para
+  /// saber qué estados activos sobreviven a incapacitarlo.
+  Widget _conditionChips(Set<String> target, {ComputedSheet? sheet}) {
     return Wrap(
       spacing: 6,
       runSpacing: 6,
@@ -1822,7 +1823,7 @@ extension _SheetCombatSection on _SheetScreenState {
               // Furia y la Forma Salvaje. Los de un compañero no tienen nada
               // que terminar.
               if (identical(target, _c.combat.conditions)) {
-                CombatOps.setCondition(_c.combat, e.key, v);
+                CombatOps.setCondition(_c.combat, e.key, v, sheet: sheet);
               } else if (v) {
                 target.add(e.key);
               } else {

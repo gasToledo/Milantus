@@ -825,7 +825,12 @@ class ActiveMode {
   /// Estados que termina al activarlo (la Furia Irracional).
   final List<String> endsConditions;
 
-  /// Por qué no se puede activar ahora, o null si se puede.
+  /// Quedar incapacitado lo termina (ver `ActiveModeEffect`).
+  final bool endsWhenIncapacitated;
+
+  /// Por qué no se puede activar ahora, o null si se puede. Uno que no
+  /// termina al quedar incapacitado puede estar activo y bloqueado a la vez:
+  /// sigue, pero no se vuelve a prender sin acciones.
   final ActiveModeBlock? blockedBy;
 
   bool get available => blockedBy == null;
@@ -852,6 +857,7 @@ class ActiveMode {
     this.variants = const [],
     this.tempHpOnActivate = 0,
     this.endsConditions = const [],
+    this.endsWhenIncapacitated = true,
     this.blockedBy,
     this.active = false,
     this.activeVariant,

@@ -785,6 +785,16 @@
             "type": "passiveTrait",
             "name": "Piel Robusta",
             "description": "Al transformarte ganás 1d6 PG temporales adicionales y +1 a la CA mientras dure la transformación."
+          },
+          {
+            "type": "modeExtension",
+            "modeId": "shifting",
+            "effects": [
+              {
+                "type": "armorClassBonus",
+                "amount": 1
+              }
+            ]
           }
         ]
       }
@@ -806,6 +816,23 @@
             "type": "passiveTrait",
             "name": "Colmillo Largo",
             "description": "Al transformarte, y como acción adicional en tus turnos siguientes, podés hacer un ataque sin armas con tus colmillos que causa 1d6 de daño perforante más tu modificador por Fuerza."
+          },
+          {
+            "type": "modeExtension",
+            "modeId": "shifting",
+            "effects": [
+              {
+                "type": "weaponRule",
+                "filter": {
+                  "unarmed": true
+                },
+                "damageDie": "1d6",
+                "damageTypeOptions": [
+                  "piercing"
+                ],
+                "bonusActionAttack": true
+              }
+            ]
           }
         ]
       }
@@ -827,6 +854,16 @@
             "type": "passiveTrait",
             "name": "Paso Veloz",
             "description": "Mientras estás transformado tu velocidad aumenta 10 pies. Además, cuando una criatura termina su turno a 5 pies o menos, podés moverte hasta 10 pies como reacción sin provocar ataques de oportunidad."
+          },
+          {
+            "type": "modeExtension",
+            "modeId": "shifting",
+            "effects": [
+              {
+                "type": "speedBonus",
+                "feet": 10
+              }
+            ]
           }
         ]
       }
@@ -848,6 +885,19 @@
             "type": "passiveTrait",
             "name": "Cacería Salvaje",
             "description": "Mientras estás transformado tenés ventaja en las pruebas de Sabiduría. Ninguna criatura a 30 pies o menos puede tener ventaja para atacarte, salvo que estés incapacitado."
+          },
+          {
+            "type": "modeExtension",
+            "modeId": "shifting",
+            "effects": [
+              {
+                "type": "advantage",
+                "roll": "check",
+                "abilities": [
+                  "wisdom"
+                ]
+              }
+            ]
           }
         ]
       }

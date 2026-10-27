@@ -473,12 +473,17 @@ class CharacterCompiler {
       // Con ella puesta el estado figura apagado aunque se haya guardado
       // prendido, que es lo que dice la regla («termina si te ponés una
       // armadura pesada»).
+      final incapacitated = CombatOps.isIncapacitated(c.combat);
       final blockedBy = mode.endsInHeavyArmor && wearingHeavyArmor
           ? ActiveModeBlock.heavyArmor
-          : CombatOps.isIncapacitated(c.combat)
+          : incapacitated
               ? ActiveModeBlock.incapacitated
               : null;
-      final on = blockedBy == null && c.combat.activeModes.containsKey(mode.id);
+      // Incapacitado nadie prende nada, pero la Forma Grande que ya estaba
+      // sigue: solo se cae lo que la regla dice que termina.
+      final on = c.combat.activeModes.containsKey(mode.id) &&
+          blockedBy != ActiveModeBlock.heavyArmor &&
+          !(incapacitated && mode.endsWhenIncapacitated);
       // Lo que le agregan otras fuentes (la subclase): sus variantes se suman
       // a las del estado, y cada una se aplica con el nivel de quien la trae.
       final extensions = builder.modeExtensions[mode.id] ?? const [];
@@ -525,8 +530,10 @@ class CharacterCompiler {
         on: on,
         variant: chosen?.variant.id,
         variants: [for (final v in variants) v.variant],
-        tempHp: extensions.fold(
-            0, (sum, x) => sum + x.effect.tempHpPerLevel * x.level),
+        tempHp:
+            mode.tempHpPerProficiency * proficiencyBonusForLevel(c.totalLevel) +
+                extensions.fold(
+                    0, (sum, x) => sum + x.effect.tempHpPerLevel * x.level),
         endsConditions: [
           for (final x in extensions) ...x.effect.endsConditions,
         ],
@@ -1895,6 +1902,7 @@ class CharacterCompiler {
       variants: List.unmodifiable(variants),
       tempHpOnActivate: tempHp,
       endsConditions: List.unmodifiable(endsConditions),
+      endsWhenIncapacitated: mode.endsWhenIncapacitated,
       blockedBy: blockedBy,
       active: on,
       activeVariant: variant,

@@ -887,6 +887,31 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
+## [0.36.0+1] - 2026-10-27
+
+### Nuevo
+
+- Las transformaciones de especie se prenden desde la ficha, como la Furia:
+  - Draconato: Vuelo Dracónico da velocidad volando igual a la de caminar.
+  - Goliat: Forma Grande suma 10 pies de velocidad y ventaja en las pruebas
+    de Fuerza.
+  - Aasimar: Revelación Celestial pregunta Alas Celestiales, Resplandor
+    Interior o Sudario Necrótico; las Alas dan velocidad volando.
+  - Cambiante: la Transformación da PG temporales iguales al doble del
+    bonificador por competencia, más lo de su naturaleza bestial (+1 a la CA,
+    mordisco de 1d6 perforante como acción adicional, 10 pies de velocidad o
+    ventaja en las pruebas de Sabiduría).
+
+### Modificado
+
+- Quedar incapacitado ya no termina todo estado activo: la Forma Grande, la
+  Revelación Celestial y la Transformación siguen; la Furia y el Vuelo
+  Dracónico terminan.
+
+### Eliminado
+
+- Sin cambios.
+
 ## [Unreleased]
 
 ### Nuevo

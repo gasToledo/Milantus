@@ -21,11 +21,14 @@ void main() {
     int dexterity = 14,
     List<InventoryEntry> inventory = const [],
     String? subclassId,
+    String raceId = 'human',
+    String? lineageId,
   }) =>
       Character(
         id: 'furia',
         name: 'Prueba',
-        raceId: 'human',
+        raceId: raceId,
+        lineageId: lineageId,
         classId: 'barbarian',
         subclassId: subclassId,
         backgroundId: 'soldier',
@@ -206,6 +209,49 @@ void main() {
       // Fuera de la Furia no está.
       c.combat.activeModes.clear();
       expect(compiler.compile(c).weaponAttacks.single.extraDamage, isEmpty);
+    });
+  });
+
+  group('Las transformaciones de especie', () {
+    test('Forma Grande sigue al quedar incapacitado y la Furia no', () {
+      final c = barbaro(5, raceId: 'goliath');
+      final calma = compiler.compile(c);
+      CombatOps.activateMode(c.combat, calma, 'rage');
+      CombatOps.activateMode(c.combat, calma, 'large_form');
+      final grande = compiler.compile(c);
+      expect(grande.speed, calma.speed + 10);
+      expect(grande.skillAdvantages('athletics'), isNotEmpty);
+
+      CombatOps.setCondition(c.combat, 'stunned', true, sheet: grande);
+      expect(c.combat.activeModes.keys, ['large_form']);
+      final aturdido = compiler.compile(c);
+      expect(aturdido.speed, calma.speed + 10);
+      // Sigue prendida, pero no se puede volver a activar sin acciones.
+      final forma =
+          aturdido.activeModes.firstWhere((m) => m.id == 'large_form');
+      expect(forma.active, isTrue);
+      expect(forma.available, isFalse);
+    });
+
+    test('Cambiante Piel Robusta: PG temporales y +1 a la CA al transformarse',
+        () {
+      final c = barbaro(5, raceId: 'shifter', lineageId: 'shifter-beasthide');
+      final normal = compiler.compile(c);
+      final shifting = normal.activeModes.firstWhere((m) => m.id == 'shifting');
+      expect(shifting.tempHpOnActivate, 2 * normal.proficiencyBonus);
+      CombatOps.activateMode(c.combat, normal, 'shifting');
+      expect(c.combat.tempHp, 2 * normal.proficiencyBonus);
+      expect(compiler.compile(c).armorClass, normal.armorClass + 1);
+    });
+
+    test('Revelación Celestial con Alas: vuela a su velocidad', () {
+      final c = barbaro(3, raceId: 'aasimar');
+      final normal = compiler.compile(c);
+      expect(normal.speeds[MovementMode.fly], isNull);
+      CombatOps.activateMode(c.combat, normal, 'celestial_revelation',
+          variant: 'heavenly_wings');
+      final alas = compiler.compile(c);
+      expect(alas.speeds[MovementMode.fly], alas.speed);
     });
   });
 }

@@ -275,6 +275,19 @@
             "max": 1,
             "recharge": "long",
             "description": "Uso de Vuelo Dracónico."
+          },
+          {
+            "type": "activeMode",
+            "id": "draconic_flight",
+            "name": "Vuelo Dracónico",
+            "resourceId": "draconic_flight",
+            "effects": [
+              {
+                "type": "movementSpeed",
+                "mode": "fly",
+                "equalToWalk": true
+              }
+            ]
           }
         ]
       }
@@ -382,6 +395,26 @@
             "max": 1,
             "recharge": "long",
             "description": "Uso de Forma Grande."
+          },
+          {
+            "type": "activeMode",
+            "id": "large_form",
+            "name": "Forma Grande",
+            "resourceId": "large_form",
+            "endsWhenIncapacitated": false,
+            "effects": [
+              {
+                "type": "speedBonus",
+                "feet": 10
+              },
+              {
+                "type": "advantage",
+                "roll": "check",
+                "abilities": [
+                  "strength"
+                ]
+              }
+            ]
           }
         ]
       },
@@ -463,6 +496,40 @@
             "max": 1,
             "recharge": "long",
             "description": "Uso de Revelación Celestial."
+          },
+          {
+            "type": "activeMode",
+            "id": "celestial_revelation",
+            "name": "Revelación Celestial",
+            "resourceId": "celestial_revelation",
+            "endsWhenIncapacitated": false,
+            "variants": [
+              {
+                "id": "heavenly_wings",
+                "name": "Alas Celestiales",
+                "description": "Velocidad volando igual a tu velocidad. Una vez por turno, daño radiante adicional igual a tu bonif. por competencia contra un objetivo.",
+                "effects": [
+                  {
+                    "type": "movementSpeed",
+                    "mode": "fly",
+                    "equalToWalk": true
+                  }
+                ]
+              },
+              {
+                "id": "inner_radiance",
+                "name": "Resplandor Interior",
+                "description": "Luz brillante en 10 pies y tenue en 10 más. Al final de cada uno de tus turnos, las criaturas a 10 pies reciben daño radiante igual a tu bonif. por competencia. Una vez por turno, daño radiante adicional igual a tu bonif. por competencia contra un objetivo.",
+                "effects": []
+              },
+              {
+                "id": "necrotic_shroud",
+                "name": "Sudario Necrótico",
+                "description": "Las criaturas que no sean aliadas a 10 pies hacen una salvación de Carisma (CD 8 + mod. CAR + bonif. por competencia) o quedan asustadas hasta el final de tu siguiente turno. Una vez por turno, daño necrótico adicional igual a tu bonif. por competencia contra un objetivo.",
+                "effects": []
+              }
+            ],
+            "effects": []
           }
         ]
       }
@@ -693,6 +760,15 @@
         "type": "passiveTrait",
         "name": "Naturaleza Bestial",
         "description": "Elegís al tomar la especie qué beneficio ganás al transformarte: Piel Robusta, Colmillo Largo, Paso Veloz o Cacería Salvaje."
+      },
+      {
+        "type": "activeMode",
+        "id": "shifting",
+        "name": "Transformación",
+        "resourceId": "shifting",
+        "endsWhenIncapacitated": false,
+        "tempHpPerProficiency": 2,
+        "effects": []
       }
     ]
   },

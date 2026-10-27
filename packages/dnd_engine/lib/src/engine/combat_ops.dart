@@ -32,14 +32,15 @@ class CombatOps {
 
   /// Aplica daño: primero consume PG temporales, luego PG. No baja de 0
   /// (a 0 PG el personaje queda inconsciente y entran las salvaciones de muerte).
-  static void applyDamage(CombatState c, int amount) {
+  /// La [sheet] dice qué estados activos sobreviven a quedar incapacitado.
+  static void applyDamage(CombatState c, int amount, {ComputedSheet? sheet}) {
     final next = _absorbDamage(c.currentHp, c.tempHp, amount);
     c.currentHp = next.hp;
     c.tempHp = next.tempHp;
     // A 0 PG quedás Inconsciente, que incluye Incapacitado. Va acá y no en
     // la pantalla porque el daño entra por varios lados y una revisión por
     // cada uno es una revisión que alguno se olvida.
-    if (c.currentHp <= 0) _incapacitate(c);
+    if (c.currentHp <= 0) _incapacitate(c, sheet);
   }
 
   /// Cura PG hasta el máximo. Curar desde 0 o menos estabiliza y limpia las
@@ -360,13 +361,18 @@ class CombatOps {
   ///
   /// Va acá y no en los chips de la ficha por lo mismo que el daño: el estado
   /// puede entrar por más de un lado, y la regla tiene que valer en todos.
-  static void setCondition(CombatState c, String id, bool on) {
+  static void setCondition(
+    CombatState c,
+    String id,
+    bool on, {
+    ComputedSheet? sheet,
+  }) {
     if (!on) {
       c.conditions.remove(id);
       return;
     }
     c.conditions.add(id);
-    if (incapacitatingConditions.contains(id)) _incapacitate(c);
+    if (incapacitatingConditions.contains(id)) _incapacitate(c, sheet);
   }
 
   /// Lo que termina al quedar incapacitado (SRD 5.2.1): la Forma Salvaje, los
@@ -376,9 +382,17 @@ class CombatOps {
   ///
   /// Quitar el estado después no devuelve nada: el conjuro terminó, como en
   /// la mesa.
-  static void _incapacitate(CombatState c) {
+  ///
+  /// Los estados que no terminan así (la Forma Grande) siguen. Saber cuáles
+  /// pide la [sheet]; sin ella se apagan todos, que es lo que pasa con la
+  /// Furia y nunca deja un estado prendido de más.
+  static void _incapacitate(CombatState c, ComputedSheet? sheet) {
     c.wildShapeCreatureId = null;
-    c.activeModes.clear();
+    final survive = {
+      for (final m in sheet?.activeModes ?? const <ActiveMode>[])
+        if (!m.endsWhenIncapacitated) m.id,
+    };
+    c.activeModes.removeWhere((id, _) => !survive.contains(id));
     endConcentration(c);
   }
 
