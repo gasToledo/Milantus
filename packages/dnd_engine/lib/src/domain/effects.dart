@@ -380,6 +380,13 @@ sealed class Effect {
               .map((e) => e as String)
               .toList(),
         ),
+      'schoolSpellDamageBonus' => SchoolSpellDamageBonusEffect(
+          school: json['school'] as String,
+          ability: Ability.fromKey(json['ability'] as String),
+          fromClasses: (json['fromClasses'] as List? ?? const [])
+              .map((e) => e as String)
+              .toList(),
+        ),
       'leveled' => LeveledEffect(
           minLevel: json['minLevel'] as int,
           effects: Effect.listFromJson(json['effects']),
@@ -1256,6 +1263,35 @@ class SpellDamageBonusEffect extends Effect {
         'type': 'spellDamageBonus',
         'groupId': groupId,
         if (name.isNotEmpty) 'name': name,
+        'ability': ability.name,
+        'fromClasses': fromClasses,
+      };
+}
+
+/// Suma el modificador de [ability] al daño de **todos** los conjuros de una
+/// escuela: la Evocación Potenciada del Evocador (INT a los de evocación).
+///
+/// A diferencia de [SpellDamageBonusEffect] no hay nada que elegir, así que no
+/// abre cupo: el bono aparece solo en cada conjuro que califica.
+class SchoolSpellDamageBonusEffect extends Effect {
+  /// Escuela tal como la guarda `Spell.school` («Evocación»).
+  final String school;
+  final Ability ability;
+
+  /// Listas de clase de las que tiene que ser el conjuro (vacío = todas): la
+  /// regla dice «conjuro de mago».
+  final List<String> fromClasses;
+
+  const SchoolSpellDamageBonusEffect({
+    required this.school,
+    required this.ability,
+    this.fromClasses = const [],
+  });
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'schoolSpellDamageBonus',
+        'school': school,
         'ability': ability.name,
         'fromClasses': fromClasses,
       };

@@ -1832,7 +1832,11 @@ class _CombatantRow extends StatelessWidget {
     // Los PX van adelante: la línea se recorta por el final, y mientras se
     // arma el combate son el dato que explica el número de la banda.
     final xp = _xpLabel(context);
-    final meta = [?xp, if (detail.isNotEmpty) detail].join(' · ');
+    final meta = [
+      ?xp,
+      ..._playerStates(context.l10n),
+      if (detail.isNotEmpty) detail,
+    ].join(' · ');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1991,6 +1995,25 @@ class _CombatantRow extends StatelessWidget {
   /// «Especie · Clase nv N», igual que la tarjeta del roster. Sale del
   /// catálogo y no del `ComputedSheet` por la misma razón que allá: son
   /// nombres de contenido, no reglas calculadas.
+  /// Lo que el jugador tiene prendido: la Forma Salvaje y los estados activos
+  /// («Furia: Oso»). Va antes que la especie y la clase porque la línea se
+  /// recorta por el final, y en combate es lo que cambia sus números.
+  List<String> _playerStates(AppLocalizations l10n) {
+    final c = member?.character;
+    if (c == null || combatant.isDown) return const [];
+    final beastId = c.combat.wildShapeCreatureId;
+    final beast = beastId == null ? null : repo.creature(beastId);
+    return [
+      if (beast != null) l10n.wildShapeAs(beast.name),
+      for (final m in _playerSheet?.activeModes ?? const <ActiveMode>[])
+        if (m.active)
+          [
+            m.name,
+            ?m.variants.where((v) => v.id == m.activeVariant).firstOrNull?.name,
+          ].join(': '),
+    ];
+  }
+
   String _playerMeta(AppLocalizations l10n) {
     final m = member;
     if (m == null) return '';

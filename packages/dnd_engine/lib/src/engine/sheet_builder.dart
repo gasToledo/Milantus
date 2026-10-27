@@ -453,6 +453,7 @@ class SheetBuilder {
         // saber hasta qué nivel llega.
         break;
       case SpellDamageBonusEffect():
+      case SchoolSpellDamageBonusEffect():
         // Marcador: el cupo se cuenta por fuente y el pozo sale de los trucos
         // conocidos, dos cosas que acá todavía no se saben.
         break;

@@ -1325,7 +1325,34 @@ class CharacterCompiler {
         );
       }
     }
-    if (byGroup.isEmpty) return (slots: const [], bonuses: const {});
+    final bonuses = <String, List<SpellDamageBonus>>{};
+
+    // Los de escuela no tienen cupo: van a todo conjuro de la escuela.
+    //
+    // ponytail: los conjuros no tienen el daño estructurado, así que «causa
+    // daño» se lee de la prosa: que traiga una tirada de dados. Luz o Enviar
+    // quedan afuera; un conjuro de evocación con dados que no sean de daño se
+    // llevaría el bono de más. Se cambia cuando `Spell` tenga daño propio.
+    final dice = RegExp(r'\d+d\d+');
+    for (final source in sources) {
+      for (final effect
+          in source.effects.whereType<SchoolSpellDamageBonusEffect>()) {
+        final bonus = mods[effect.ability] ?? 0;
+        for (final s in repo.spells.values) {
+          if (s.school != effect.school || !dice.hasMatch(s.description)) {
+            continue;
+          }
+          if (effect.fromClasses.isNotEmpty &&
+              !effect.fromClasses.any(s.classes.contains)) {
+            continue;
+          }
+          bonuses
+              .putIfAbsent(s.id, () => [])
+              .add(SpellDamageBonus(bonus: bonus, source: source.name));
+        }
+      }
+    }
+    if (byGroup.isEmpty) return (slots: const [], bonuses: bonuses);
 
     // Trucos conocidos por cualquier vía: de clase, elegidos por un rasgo
     // (quedan en los siempre preparados) o concedidos a voluntad.
@@ -1336,7 +1363,6 @@ class CharacterCompiler {
     };
 
     final slots = <SpellChoiceSlot>[];
-    final bonuses = <String, List<SpellDamageBonus>>{};
     for (final MapEntry(key: groupId, value: group) in byGroup.entries) {
       final effect = group.effect;
       final pool = [

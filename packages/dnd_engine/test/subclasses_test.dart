@@ -181,6 +181,19 @@ void main() {
       expect(s.passives.where((p) => p.name == 'Crítico Mejorado'), isEmpty);
     });
 
+    test('Evocación Potenciada suma INT a los conjuros de evocación con daño',
+        () {
+      final s = compiler.compile(_char(
+          classId: 'wizard',
+          level: 10,
+          hp: List.filled(10, 4),
+          subclassId: 'evoker'));
+      final inteligencia = s.abilityModifiers[Ability.intelligence]!;
+      expect(s.spellDamageBonuses['fireball']!.single.bonus, inteligencia);
+      // Luz es de evocación pero no causa daño.
+      expect(s.spellDamageBonuses['light'], isNull);
+    });
+
     test('Resistencia Dracónica suma 1 PG por nivel de Hechicero', () {
       final base = compiler
           .compile(_char(classId: 'sorcerer', level: 4, hp: [6, 4, 4, 4]));

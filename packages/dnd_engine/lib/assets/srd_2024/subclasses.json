@@ -2834,7 +2834,8 @@
         "name": "Evocación Potenciada",
         "description": "Sumás tu modificador de Inteligencia al daño de cualquier conjuro de evocación.",
         "effects": [
-          { "type": "passiveTrait", "name": "Evocación Potenciada", "description": "Sumás tu mod. de Inteligencia a una tirada de daño de tus conjuros de evocación." }
+          { "type": "passiveTrait", "name": "Evocación Potenciada", "description": "Sumás tu mod. de Inteligencia a una tirada de daño de tus conjuros de evocación." },
+          { "type": "schoolSpellDamageBonus", "school": "Evocación", "ability": "intelligence", "fromClasses": ["wizard"] }
         ]
       },
       {

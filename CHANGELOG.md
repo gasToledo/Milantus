@@ -982,6 +982,10 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   fuego, relámpago o trueno en los golpes sin armas; en nivel 11 da vuelo y
   nado, y en nivel 17 pregunta a qué elemento resistir. También da el truco
   Elementalismo, que faltaba.
+- Evocación Potenciada: los conjuros de evocación de mago que causan daño
+  muestran el bono de INT del Evocador de nivel 10.
+- En el encuentro, la fila de cada jugador dice si está en Forma Salvaje o
+  con un estado activo («Furia: Oso»), y se actualiza sola.
 
 ### Modificado
 
