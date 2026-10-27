@@ -5659,45 +5659,5 @@
       }
     }
   },
-  "dmMusicChangeLink": "Cambiar enlace",
-  "settingsMcpGroup": "Claude Code",
-  "mcpTokenCreate": "Crear token",
-  "mcpTokenNameTitle": "Nuevo token",
-  "mcpTokenNameLabel": "Nombre (por ejemplo, la máquina donde lo usás)",
-  "mcpTokenCreatedTitle": "Token creado",
-  "mcpTokenCreatedNote": "Se muestra una sola vez. Corré este comando en tu terminal para conectar Claude Code al Modo DM.",
-  "mcpCommandCopied": "Comando copiado.",
-  "mcpCopyFailed": "El navegador no dejó copiar. Seleccioná el comando y copialo a mano.",
-  "mcpTokensEmpty": "Sin tokens.",
-  "mcpTokensLoadError": "No se pudieron cargar los tokens.",
-  "mcpTokenCreateError": "No se pudo crear el token.",
-  "mcpTokenRevokeError": "No se pudo revocar el token.",
-  "mcpTokenRevoke": "Revocar {name}",
-  "@mcpTokenRevoke": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "mcpTokenUsed": "Último uso: {used} · Vence: {expires}",
-  "@mcpTokenUsed": {
-    "placeholders": {
-      "used": {
-        "type": "String"
-      },
-      "expires": {
-        "type": "String"
-      }
-    }
-  },
-  "mcpTokenUnused": "Sin usar · Vence: {expires}",
-  "@mcpTokenUnused": {
-    "placeholders": {
-      "expires": {
-        "type": "String"
-      }
-    }
-  },
-  "mcpTokensLoading": "Cargando los tokens…"
+  "dmMusicChangeLink": "Cambiar enlace"
 }

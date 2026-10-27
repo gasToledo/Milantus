@@ -6,7 +6,6 @@ import '../theme/app_theme.dart';
 import '../theme/app_widgets.dart';
 import '../web/screen_awake.dart';
 import 'app_sidebar.dart';
-import 'mcp_tokens_section.dart';
 
 /// Ancho a partir del cual el control de una fila va al lado de su rótulo.
 const double _kRowBesideWidth = 520;
@@ -172,10 +171,6 @@ class _SettingsViewState extends State<SettingsView> {
                       style: const TextStyle(fontSize: 14),
                     ),
                   ),
-                ]),
-                const SizedBox(height: 20),
-                _group(context, l10n.settingsMcpGroup, [
-                  McpTokensSection(api: widget.settingsController.api),
                 ]),
               ],
             ),

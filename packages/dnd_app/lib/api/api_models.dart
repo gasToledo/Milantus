@@ -374,31 +374,3 @@ class CampaignNpcEntry {
             : null,
       );
 }
-
-/// Un token personal para conectar Claude Code al Modo DM. El token en claro
-/// no está acá: se ve una sola vez, al crearlo.
-class ApiTokenInfo {
-  final String id;
-  final String name;
-  final DateTime createdAt;
-  final DateTime? lastUsedAt;
-  final DateTime expiresAt;
-
-  const ApiTokenInfo({
-    required this.id,
-    required this.name,
-    required this.createdAt,
-    this.lastUsedAt,
-    required this.expiresAt,
-  });
-
-  factory ApiTokenInfo.fromJson(Map<String, dynamic> json) => ApiTokenInfo(
-    id: json['id'] as String,
-    name: json['name'] as String,
-    createdAt: DateTime.parse(json['createdAt'] as String),
-    lastUsedAt: json['lastUsedAt'] == null
-        ? null
-        : DateTime.parse(json['lastUsedAt'] as String),
-    expiresAt: DateTime.parse(json['expiresAt'] as String),
-  );
-}

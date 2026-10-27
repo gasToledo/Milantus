@@ -1,14 +1,17 @@
 import 'dart:convert';
 
+import 'package:dnd_engine/dnd_engine.dart';
 import 'package:dnd_server/src/ai/portrait_generation_service.dart';
 import 'package:dnd_server/src/app.dart';
+import 'package:dnd_server/src/auth/mcp_token.dart';
 import 'package:dnd_server/src/import/import_service.dart';
+import 'package:dnd_server/src/repositories/mcp_audit_repository.dart';
+import 'package:jose/jose.dart';
 import 'package:shelf/shelf.dart';
 import 'package:test/test.dart';
 
 import 'fakes/fake_auth_dependencies.dart';
 import 'fakes/fake_portrait_provider.dart';
-import 'fakes/in_memory_api_token_repository.dart';
 import 'fakes/in_memory_campaign_repository.dart';
 import 'fakes/in_memory_chapter_repository.dart';
 import 'fakes/in_memory_character_repository.dart';
@@ -22,20 +25,39 @@ import 'fakes/in_memory_portrait_blob_store.dart';
 import 'fakes/in_memory_repository_transaction_runner.dart';
 import 'fakes/in_memory_settings_repository.dart';
 
-/// Tokens personales y el MCP: que el token solo abra `/mcp`, que deje de
-/// servir al revocarlo o vencer, y que por el MCP lo ajeno siga siendo
-/// inexistente.
+class _Audit implements McpAuditRepository {
+  final rows = <(String, String, String)>[];
+  @override
+  Future<void> record(String userId, String tool, String outcome) async =>
+      rows.add((userId, tool, outcome));
+}
+
+/// El MCP con OAuth: que solo entre un access token de Zitadel válido para
+/// Milantus, que el scope de lectura no escriba, y que por el MCP lo ajeno
+/// siga sin existir.
 void main() {
-  late FakeAuthDependencies fakeAuth;
-  late InMemoryApiTokenRepository apiTokens;
+  final issuer = Uri.parse('https://auth.example');
+  final base = Uri.parse('https://app.example');
+  const projectId = 'proyecto-milantus';
+  final key = JsonWebKey.generate('RS256');
+  late ContentRepository content;
+
+  late InMemoryCharacterRepository characters;
+  late InMemoryCampaignRepository campaigns;
+  late InMemoryChapterRepository chapters;
+  late _Audit audit;
   late Handler handler;
 
+  setUpAll(() async {
+    content = await ContentRepository.loadFromDirectory(
+      '../dnd_engine/lib/assets/srd_2024',
+    );
+  });
+
   setUp(() {
-    fakeAuth = FakeAuthDependencies();
-    apiTokens = InMemoryApiTokenRepository();
-    final characters = InMemoryCharacterRepository();
-    final campaigns = InMemoryCampaignRepository(characters);
-    final chapters = InMemoryChapterRepository(campaigns);
+    characters = InMemoryCharacterRepository();
+    campaigns = InMemoryCampaignRepository(characters);
+    chapters = InMemoryChapterRepository(campaigns);
     final notes = InMemoryNoteRepository(campaigns, chapters);
     final encounters = InMemoryEncounterRepository(campaigns);
     campaigns
@@ -45,8 +67,9 @@ void main() {
     final npcs = InMemoryNpcRepository(campaigns, characters);
     final homebrew = InMemoryHomebrewRepository();
     final levelUps = InMemoryLevelUpRepository(campaigns);
+    audit = _Audit();
     handler = buildHandler(
-      auth: fakeAuth.dependencies,
+      auth: FakeAuthDependencies().dependencies,
       portraits: InMemoryPortraitBlobStore(),
       generation: PortraitGenerationService([
         FakePortraitProvider(id: 'pollinations', name: 'Pollinations'),
@@ -74,219 +97,249 @@ void main() {
       homebrew: homebrew,
       levelUps: levelUps,
       settings: InMemorySettingsRepository(),
-      apiTokens: apiTokens,
+      mcp: McpDependencies(
+        verifier: McpTokenVerifier(
+          issuer: issuer,
+          audience: projectId,
+          loadKeys: () async => JsonWebKeySet.fromKeys([key]),
+        ),
+        // El `sub` es la cuenta, para que las pruebas las nombren directo.
+        resolveAccount: (subject) async => subject,
+        audit: audit,
+        content: content,
+        publicBaseUrl: base,
+        issuer: issuer,
+        projectId: projectId,
+      ),
     );
   });
 
-  Future<String> login(String subject) async {
-    fakeAuth.nextVerifiedSubject = subject;
-    final callback = await handler(
-      Request(
-        'GET',
-        Uri.parse('http://localhost/auth/callback?code=c&state=x'),
-      ),
-    );
-    return RegExp(
-      r'dnd_session=([^;]+)',
-    ).firstMatch(callback.headers['set-cookie']!)!.group(1)!;
-  }
-
-  Future<({int status, dynamic json})> api(
-    String method,
-    String path, {
-    String? cookie,
-    String? bearer,
-    Object? body,
-  }) async {
-    final response = await handler(
-      Request(
-        method,
-        Uri.parse('http://localhost$path'),
-        headers: {
-          if (cookie != null) 'cookie': 'dnd_session=$cookie',
-          if (bearer != null) 'authorization': 'Bearer $bearer',
-        },
-        body: body == null ? null : jsonEncode(body),
-      ),
-    );
-    final text = await response.readAsString();
-    return (
-      status: response.statusCode,
-      json: text.isEmpty ? null : jsonDecode(text),
-    );
-  }
-
-  Future<String> newToken(String cookie) async {
-    final out = await api(
-      'POST',
-      '/api/tokens',
-      cookie: cookie,
-      body: {'name': 'Claude Code'},
-    );
-    expect(out.status, 200);
-    return out.json['secret'] as String;
+  /// Un access token como los que emite Zitadel, firmado con la clave de la
+  /// prueba. Los permisos van como roles del proyecto.
+  String token(
+    String subject, {
+    List<McpScope> scopes = McpScope.values,
+    String audience = projectId,
+    Duration ttl = const Duration(minutes: 5),
+  }) {
+    final now = DateTime.now();
+    return (JsonWebSignatureBuilder()
+          ..jsonContent = {
+            'iss': '$issuer',
+            'sub': subject,
+            'aud': [audience, 'client-claude'],
+            'iat': now.millisecondsSinceEpoch ~/ 1000,
+            'exp': now.add(ttl).millisecondsSinceEpoch ~/ 1000,
+            'urn:zitadel:iam:org:project:roles': {
+              for (final s in scopes) s.role: {'org': 'milantus'},
+            },
+          }
+          ..addRecipient(key, algorithm: 'RS256'))
+        .build()
+        .toCompactSerialization();
   }
 
   var rpcId = 0;
-  Future<({int status, dynamic json})> rpc(
-    String token,
-    String method, [
-    Map<String, dynamic>? params,
-  ]) => api(
-    'POST',
-    '/mcp',
-    bearer: token,
-    body: {
-      'jsonrpc': '2.0',
-      'id': rpcId++,
-      'method': method,
-      'params': ?params,
-    },
+  Future<Response> post(
+    Object? body, {
+    String? bearer,
+    Map<String, String> headers = const {},
+  }) async => handler(
+    Request(
+      'POST',
+      base.resolve('/mcp'),
+      headers: {
+        if (bearer != null) 'authorization': 'Bearer $bearer',
+        ...headers,
+      },
+      body: jsonEncode(body),
+    ),
   );
 
-  /// Llama a una herramienta y devuelve su texto y si fue error.
-  Future<({String text, bool isError})> tool(
-    String token,
+  Map<String, dynamic> call(String name, [Map<String, dynamic>? args]) => {
+    'jsonrpc': '2.0',
+    'id': rpcId++,
+    'method': 'tools/call',
+    'params': {'name': name, 'arguments': args ?? <String, dynamic>{}},
+  };
+
+  /// El resultado de una herramienta: su dato estructurado o su error.
+  Future<({Map<String, dynamic>? data, String? error})> tool(
+    String bearer,
     String name, [
-    Map<String, dynamic> arguments = const {},
+    Map<String, dynamic>? args,
   ]) async {
-    final out = await rpc(token, 'tools/call', {
-      'name': name,
-      'arguments': arguments,
-    });
-    final result = out.json['result'] as Map<String, dynamic>;
-    return (
-      text: (result['content'] as List).first['text'] as String,
-      isError: result['isError'] as bool,
-    );
+    final response = await post(call(name, args), bearer: bearer);
+    expect(response.statusCode, 200, reason: name);
+    final result =
+        jsonDecode(await response.readAsString())['result']
+            as Map<String, dynamic>;
+    return result['isError'] == true
+        ? (data: null, error: result['content'][0]['text'] as String)
+        : (
+            data: result['structuredContent'] as Map<String, dynamic>,
+            error: null,
+          );
   }
 
-  test(
-    'sin token, con uno vencido o con uno revocado, /mcp responde 401',
-    () async {
-      final cookie = await login('dm');
-      final token = await newToken(cookie);
-      expect((await rpc('mlt_inventado', 'ping')).status, 401);
-      expect((await api('POST', '/mcp', body: {})).status, 401);
-
-      expect((await rpc(token, 'ping')).status, 200);
-      final id =
-          (await api(
-                'GET',
-                '/api/tokens',
-                cookie: cookie,
-              )).json['tokens'][0]['id']
-              as String;
-      apiTokens.expire(id);
-      expect((await rpc(token, 'ping')).status, 401);
-
-      final otro = await newToken(cookie);
-      final otroId =
-          (await api(
-                'GET',
-                '/api/tokens',
-                cookie: cookie,
-              )).json['tokens'][0]['id']
-              as String;
-      expect(
-        (await api('DELETE', '/api/tokens/$otroId', cookie: cookie)).status,
-        200,
+  Future<Character> addCharacter(String account, String id) =>
+      characters.create(
+        account,
+        Character.fromJson({
+          'id': id,
+          'name': 'Sagan',
+          'raceId': 'human',
+          'classId': 'fighter',
+          'backgroundId': 'soldier',
+          'assignedScores': <String, dynamic>{},
+        }),
       );
-      expect((await rpc(otro, 'ping')).status, 401);
-    },
-  );
 
-  test('el token abre solo /mcp: /api sigue pidiendo la cookie', () async {
-    final token = await newToken(await login('dm'));
-    expect((await api('GET', '/api/campaigns', bearer: token)).status, 401);
-  });
-
-  test('un token ajeno no se lista ni se revoca', () async {
-    final dm = await login('dm');
-    await newToken(dm);
-    final id =
-        (await api('GET', '/api/tokens', cookie: dm)).json['tokens'][0]['id']
-            as String;
-    final intruso = await login('intruso');
-
-    expect(
-      (await api('GET', '/api/tokens', cookie: intruso)).json['tokens'],
-      isEmpty,
-    );
-    expect(
-      (await api('DELETE', '/api/tokens/$id', cookie: intruso)).status,
-      404,
-    );
-    expect(
-      (await api('GET', '/api/tokens', cookie: dm)).json['tokens'],
-      hasLength(1),
-    );
-  });
-
-  test('por el MCP se arma una campaña con capítulo, nota y PNJ', () async {
-    final token = await newToken(await login('dm'));
-    final init = await rpc(token, 'initialize', {
-      'protocolVersion': '2025-06-18',
-      'capabilities': <String, dynamic>{},
-      'clientInfo': {'name': 'test', 'version': '0'},
-    });
-    expect(init.json['result']['capabilities'], contains('tools'));
-
-    final campaign = jsonDecode(
-      (await tool(token, 'create_campaign', {'name': 'La Costa'})).text,
-    )['id'];
-    final chapter = jsonDecode(
-      (await tool(token, 'create_chapter', {
-        'campaignId': campaign,
-        'name': 'El naufragio',
-      })).text,
-    )['id'];
-    final note = await tool(token, 'create_note', {
-      'campaignId': campaign,
-      'chapterId': chapter,
-      'title': 'Ganchos',
-      'body': 'El faro está apagado.',
-    });
-    expect(note.isError, isFalse);
-    await tool(token, 'create_npc', {'name': 'Marla', 'campaignId': campaign});
-    await tool(token, 'update_campaign', {
-      'campaignId': campaign,
-      'premise': 'Contrabandistas.',
+  group('autorización', () {
+    test('sin token, vencido o con otra audiencia responde 401 con la '
+        'metadata', () async {
+      for (final bearer in [
+        null,
+        'no-es-un-jwt',
+        token('ana', ttl: const Duration(minutes: -1)),
+        token('ana', audience: 'otro-proyecto'),
+      ]) {
+        final response = await post(call('listar_personajes'), bearer: bearer);
+        expect(response.statusCode, 401);
+        expect(
+          response.headers['www-authenticate'],
+          contains(
+            'resource_metadata="$base/.well-known/oauth-protected-resource/mcp"',
+          ),
+        );
+      }
     });
 
-    final view = jsonDecode(
-      (await tool(token, 'get_campaign', {'campaignId': campaign})).text,
+    test(
+      'la metadata apunta a Zitadel y pide la audiencia del proyecto',
+      () async {
+        final response = await handler(
+          Request(
+            'GET',
+            base.resolve('/.well-known/oauth-protected-resource/mcp'),
+          ),
+        );
+        final metadata = jsonDecode(await response.readAsString());
+        expect(metadata['resource'], '$base/mcp');
+        expect(metadata['authorization_servers'], ['$issuer']);
+        expect(
+          metadata['scopes_supported'],
+          contains('urn:zitadel:iam:org:project:id:$projectId:aud'),
+        );
+      },
     );
-    expect(view['premise'], 'Contrabandistas.');
-    expect(view['name'], 'La Costa');
-    expect([for (final c in view['chapters']) c['name']], ['El naufragio']);
-    expect(
-      [for (final n in view['notes']) n['body']],
-      ['El faro está apagado.'],
+
+    test(
+      'con solo lectura, escribir responde 403 insufficient_scope',
+      () async {
+        await addCharacter('ana', 'sagan');
+        final lectura = token('ana', scopes: [McpScope.lectura]);
+
+        expect((await tool(lectura, 'listar_personajes')).error, isNull);
+        final response = await post(
+          call('descanso', {'personajeId': 'sagan', 'tipo': 'largo'}),
+          bearer: lectura,
+        );
+        expect(response.statusCode, 403);
+        expect(
+          response.headers['www-authenticate'],
+          contains('error="insufficient_scope"'),
+        );
+        expect(audit.rows.last, ('ana', 'descanso', 'sin_permiso'));
+      },
     );
-    expect([for (final n in view['npcs']) n['name']], ['Marla']);
+
+    test('un Origin ajeno responde 403', () async {
+      final response = await post(
+        call('listar_personajes'),
+        bearer: token('ana'),
+        headers: {'origin': 'https://otro.example'},
+      );
+      expect(response.statusCode, 403);
+    });
+
+    test('la cookie no abre /mcp ni el token abre /api', () async {
+      final api = await handler(
+        Request(
+          'GET',
+          base.resolve('/api/characters'),
+          headers: {'authorization': 'Bearer ${token('ana')}'},
+        ),
+      );
+      expect(api.statusCode, 401);
+    });
   });
 
-  test('por el MCP, la campaña de otra cuenta no existe', () async {
-    final dm = await newToken(await login('dm'));
-    final campaign = jsonDecode(
-      (await tool(dm, 'create_campaign', {'name': 'Propia'})).text,
-    )['id'];
-    final intruso = await newToken(await login('intruso'));
+  group('lo ajeno no existe', () {
+    test(
+      'ni la ficha ni la campaña de otra cuenta se ven ni se tocan',
+      () async {
+        await addCharacter('ana', 'sagan');
+        await campaigns.create(
+          'ana',
+          const Campaign(id: 'costa', name: 'Costa'),
+        );
+        await chapters.create(
+          'ana',
+          'costa',
+          const Chapter(id: 'uno', name: 'Uno'),
+        );
+        final before = (await characters.find('ana', 'sagan'))!.toJson();
+        final intruso = token('beto');
 
-    for (final (name, args) in [
-      ('get_campaign', {'campaignId': campaign}),
-      ('update_campaign', {'campaignId': campaign, 'name': 'Robada'}),
-      ('create_chapter', {'campaignId': campaign, 'name': 'Infiltrado'}),
-    ]) {
-      final out = await tool(intruso, name, args);
-      expect(out.isError, isTrue, reason: name);
-    }
-    expect(
-      jsonDecode(
-        (await tool(dm, 'get_campaign', {'campaignId': campaign})).text,
-      )['name'],
-      'Propia',
+        for (final (name, args) in [
+          ('ver_personaje', {'personajeId': 'sagan'}),
+          (
+            'aplicar_dano_o_curacion',
+            {'personajeId': 'sagan', 'tipo': 'dano', 'cantidad': 5},
+          ),
+          ('descanso', {'personajeId': 'sagan', 'tipo': 'corto'}),
+          ('ver_campana', {'campanaId': 'costa'}),
+          (
+            'crear_nota',
+            {'campanaId': 'costa', 'capituloId': 'uno', 'titulo': 'Robada'},
+          ),
+        ]) {
+          final out = await tool(intruso, name, args);
+          expect(out.error, contains('no encontrad'), reason: name);
+        }
+        expect((await characters.find('ana', 'sagan'))!.toJson(), before);
+      },
     );
+  });
+
+  group('herramientas', () {
+    test('el daño sale de CombatOps y se guarda en la ficha propia', () async {
+      final sagan = await addCharacter('ana', 'sagan');
+      final sheet = CharacterCompiler(content).compile(sagan);
+      final ana = token('ana');
+
+      final ficha = await tool(ana, 'ver_personaje', {'personajeId': 'sagan'});
+      expect(ficha.data!['ca'], sheet.armorClass);
+      expect(ficha.data!['pgMaximos'], sheet.maxHp);
+
+      final golpe = await tool(ana, 'aplicar_dano_o_curacion', {
+        'personajeId': 'sagan',
+        'tipo': 'dano',
+        'cantidad': 3,
+      });
+      final expected = Character.fromJson(sagan.toJson());
+      CombatOps.applyDamage(expected.combat, 3, sheet: sheet);
+      expect(golpe.data!['pgActuales'], expected.combat.currentHp);
+      expect(
+        (await characters.find('ana', 'sagan'))!.combat.currentHp,
+        expected.combat.currentHp,
+      );
+    });
+
+    test('un argumento que el esquema no declara es un error', () async {
+      final out = await tool(token('ana'), 'listar_personajes', {'otro': 1});
+      expect(out.error, contains('otro'));
+    });
   });
 }

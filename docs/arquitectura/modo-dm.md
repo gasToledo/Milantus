@@ -536,11 +536,11 @@ vistas previas aunque el DM tenga la sesión iniciada, y sonar completo exige
 su API, con Premium y un tope de cinco cuentas cargadas a mano. Al armar un combate pregunta por las escenas marcadas;
 nunca cambia la música solo.
 
-## Claude Code
+## Claude
 
-El Modo DM también se maneja desde Claude Code, con un token personal y el
-endpoint `/mcp`, que entra por las mismas rutas y el mismo `WHERE`. El detalle
-está en [MCP del Modo DM](mcp.md).
+Claude también opera el Modo DM, como conector MCP autorizado con Zitadel. Sus
+herramientas llaman a los mismos repositorios con la cuenta del token, así que
+la autorización es este mismo `WHERE`. El detalle está en [MCP](mcp.md).
 
 ## Qué probar al tocar esto
 

@@ -443,4 +443,24 @@ CREATE TABLE api_tokens (
 CREATE INDEX api_tokens_user_idx ON api_tokens (user_id, created_at DESC);
 ''',
   ),
+  Migration(
+    id: '0014_mcp_oauth',
+    sql: '''
+-- Los tokens personales de 0013 se reemplazaron por OAuth con Zitadel: el
+-- MCP valida los access tokens del proveedor y no guarda ninguno propio.
+DROP TABLE api_tokens;
+
+-- Qué hizo el MCP, por cuenta. Sin argumentos ni resultados, a propósito:
+-- ver `McpAuditRepository`. Se barre a los 90 días.
+CREATE TABLE mcp_audit_log (
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES accounts (id) ON DELETE CASCADE,
+  tool TEXT NOT NULL,
+  outcome TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX mcp_audit_log_created_idx ON mcp_audit_log (created_at);
+''',
+  ),
 ];

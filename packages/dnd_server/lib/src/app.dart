@@ -8,6 +8,7 @@ import 'package:shelf_router/shelf_router.dart';
 
 import 'ai/portrait_generation_service.dart';
 import 'auth/auth_middleware.dart';
+import 'auth/mcp_token.dart';
 import 'auth/oidc_service.dart';
 import 'auth/session_cookie.dart';
 import 'auth/session_store.dart';
@@ -18,7 +19,6 @@ import 'import/import_service.dart';
 import 'import/npc_bundle.dart';
 import 'mcp/mcp_handler.dart';
 import 'portraits/portrait_blob_store.dart';
-import 'repositories/api_token_repository.dart';
 import 'repositories/campaign_repository.dart';
 import 'repositories/chapter_repository.dart';
 import 'repositories/character_repository.dart';
@@ -27,12 +27,14 @@ import 'repositories/event_repository.dart';
 import 'repositories/homebrew_repository.dart';
 import 'repositories/id_allocation.dart';
 import 'repositories/level_up_repository.dart';
+import 'repositories/mcp_audit_repository.dart';
 import 'repositories/note_repository.dart';
 import 'repositories/npc_repository.dart';
 import 'repositories/repository_transaction_runner.dart';
 import 'repositories/settings_repository.dart';
 import 'util/safe_path.dart';
 
+part 'app_mcp.dart';
 part 'app_npcs.dart';
 
 /// Ejecuta la importación ya decodificada para [userId]. Se recibe como
@@ -120,9 +122,10 @@ Handler buildHandler({
   /// esconde el botón.
   SendFeedbackFn? sendFeedback,
 
-  /// Tokens personales para el MCP. `null` deja afuera `/mcp` y
-  /// `/api/tokens`: las pruebas que no los miran no tienen que armarlos.
-  ApiTokenRepository? apiTokens,
+  /// El conector MCP para Claude. `null` deja afuera `/mcp` y su metadata:
+  /// las pruebas que no lo miran no tienen que armarlo, y un despliegue sin
+  /// proyecto en Zitadel arranca igual.
+  McpDependencies? mcp,
 }) {
   final authenticated = requireSession(auth.resolveUserId);
   final feedbackLimiter = FeedbackRateLimiter();
@@ -417,29 +420,49 @@ Handler buildHandler({
             _feedbackHandler(request, auth, sendFeedback, feedbackLimiter),
       ),
     );
-  if (apiTokens != null) {
+  if (mcp != null) {
+    final metadataUrl = mcpResourceMetadataUrl(mcp.publicBaseUrl);
+    Response metadata(Request _) => _jsonOk(
+      mcpResourceMetadata(
+        publicBaseUrl: mcp.publicBaseUrl,
+        issuer: mcp.issuer,
+        projectId: mcp.projectId,
+      ),
+    );
+    final mcpPipeline = const Pipeline()
+        .addMiddleware(
+          requireMcpToken(
+            verifier: mcp.verifier,
+            resolveAccount: mcp.resolveAccount,
+            resourceMetadataUrl: metadataUrl,
+          ),
+        )
+        .addHandler(
+          mcpHandler(
+            tools: _mcpTools(
+              mcp: mcp,
+              characters: characters,
+              campaigns: campaigns,
+              chapters: chapters,
+              notes: notes,
+              encounters: encounters,
+              events: events,
+              npcs: npcs,
+              transactions: transactions,
+              homebrew: homebrew,
+            ),
+            allowedOrigin: mcp.publicBaseUrl.origin,
+            resourceMetadataUrl: '$metadataUrl',
+            audit: mcp.audit,
+          ),
+        );
+    // RFC 9728 pide la metadata en la ruta del recurso; la raíz queda como
+    // respaldo para clientes que solo prueban esa.
     router
-      ..get(
-        '/api/tokens',
-        authenticated((request) => _listApiTokensHandler(request, apiTokens)),
-      )
-      ..post(
-        '/api/tokens',
-        authenticated((request) => _createApiTokenHandler(request, apiTokens)),
-      )
-      ..delete(
-        '/api/tokens/<id>',
-        authenticated((request) => _revokeApiTokenHandler(request, apiTokens)),
-      )
-      // El Bearer se acepta solo acá: `/api` sigue siendo de la cookie, y el
-      // MCP entra a las mismas rutas por adentro, con la cuenta del token.
-      ..all(
-        '/mcp',
-        mcpHandler(
-          resolveToken: apiTokens.userIdForToken,
-          api: errorHandlingMiddleware(router.call),
-        ),
-      );
+      ..get('/.well-known/oauth-protected-resource/mcp', metadata)
+      ..get('/.well-known/oauth-protected-resource', metadata)
+      // El Bearer se acepta solo acá: `/api` sigue siendo de la cookie.
+      ..all('/mcp', mcpPipeline);
   }
 
   // El router va primero y solo cae al build web estático ante un 404. Pero
@@ -456,6 +479,7 @@ Handler buildHandler({
       final path = request.url.path;
       return path.startsWith('api/') ||
               path.startsWith('auth/') ||
+              path.startsWith('.well-known/oauth-protected-resource') ||
               path == 'mcp'
           ? router.call(request)
           : withStatic(request);
@@ -466,47 +490,6 @@ Handler buildHandler({
       .addMiddleware(logRequests())
       .addMiddleware(errorHandlingMiddleware)
       .addHandler(rootHandler);
-}
-
-Future<Response> _listApiTokensHandler(
-  Request request,
-  ApiTokenRepository apiTokens,
-) async {
-  final all = await apiTokens.listFor(request.userId);
-  return _jsonOk({
-    'tokens': [for (final t in all) t.toJson()],
-  });
-}
-
-/// El token en claro viaja solo en esta respuesta: después ni el servidor lo
-/// tiene.
-Future<Response> _createApiTokenHandler(
-  Request request,
-  ApiTokenRepository apiTokens,
-) async {
-  final body = await _readJsonBody(request);
-  final name = (body['name'] as String? ?? '').trim();
-  if (name.isEmpty || name.length > 60) {
-    throw const FormatException(
-      'El token necesita un nombre de hasta 60 letras.',
-    );
-  }
-  final (token, secret) = await apiTokens.create(request.userId, name);
-  return _jsonOk({'token': token.toJson(), 'secret': secret});
-}
-
-Future<Response> _revokeApiTokenHandler(
-  Request request,
-  ApiTokenRepository apiTokens,
-) async {
-  final id = requireSafePathSegment(
-    request.params['id']!,
-    label: 'id de token',
-  );
-  if (!await apiTokens.revoke(request.userId, id)) {
-    return _notFound('token_not_found');
-  }
-  return _jsonOk({'status': 'ok'});
 }
 
 Response _healthHandler(Request request) => Response.ok(
@@ -967,7 +950,6 @@ const _notFoundMessages = {
   'character_not_found': 'Personaje no encontrado.',
   'portrait_not_found': 'Retrato no encontrado.',
   'link_not_found': 'Vínculo no encontrado.',
-  'token_not_found': 'Token no encontrado.',
 };
 
 Response _notFound(String code) => Response.notFound(
@@ -1405,7 +1387,16 @@ Future<Note> _validNoteFromBody(
   if (requested is! Map<String, dynamic>) {
     throw const FormatException('Falta "note".');
   }
-  final note = Note.fromJson(requested);
+  return _validateNote(Note.fromJson(requested), chapters, userId, campaignId);
+}
+
+/// Lo que se exige de una nota venga de la app o del MCP.
+Future<Note> _validateNote(
+  Note note,
+  ChapterRepository chapters,
+  String userId,
+  String campaignId,
+) async {
   if (note.title.trim().isEmpty) {
     throw const FormatException('La nota necesita un título.');
   }

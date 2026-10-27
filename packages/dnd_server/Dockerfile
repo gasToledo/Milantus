@@ -60,8 +60,12 @@ RUN apt-get update \
 WORKDIR /app
 COPY --from=server-build /workspace/dnd_server_bin ./dnd_server
 COPY --from=web-build /workspace/packages/dnd_app/build/web ./web
+# El catálogo SRD, para las fichas calculadas y la búsqueda del MCP: el
+# binario no lleva los assets del engine adentro.
+COPY packages/dnd_engine/lib/assets/srd_2024 ./content
 
 ENV DND_WEB_ROOT=/app/web
+ENV DND_CONTENT_DIR=/app/content
 EXPOSE 8080
 
 ENTRYPOINT ["/app/dnd_server"]

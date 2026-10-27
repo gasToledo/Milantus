@@ -177,6 +177,41 @@ class WebConfig {
   }
 }
 
+/// El MCP: lo que hace falta para validar los access tokens que Zitadel le
+/// emite a Claude. Sin [projectId], `/mcp` no se monta y el resto del
+/// servidor arranca igual.
+class McpConfig {
+  /// Id del proyecto de Milantus en Zitadel. Es la audiencia que tiene que
+  /// traer el token: uno emitido para otra aplicación no entra.
+  final String projectId;
+
+  /// Client ID fijo de la app «Claude» en Zitadel. Solo se informa: quien
+  /// conecta lo pega en la configuración avanzada del conector.
+  final String clientId;
+
+  /// Carpeta del catálogo SRD. En la imagen la copia el Dockerfile; en
+  /// desarrollo, la del engine dentro del monorepo.
+  final String contentDir;
+
+  const McpConfig({
+    required this.projectId,
+    required this.clientId,
+    required this.contentDir,
+  });
+
+  bool get enabled => projectId.isNotEmpty;
+
+  factory McpConfig.fromEnvironment(Map<String, String> env) => McpConfig(
+    projectId: envOr(env, 'DND_MCP_PROJECT_ID', ''),
+    clientId: envOr(env, 'DND_MCP_CLIENT_ID', ''),
+    contentDir: envOr(
+      env,
+      'DND_CONTENT_DIR',
+      '../dnd_engine/lib/assets/srd_2024',
+    ),
+  );
+}
+
 /// Configuración de arranque del servidor. Cada sección de la migración que
 /// agregue una dependencia con secretos (proveedores de IA) suma sus propios
 /// campos acá, siempre vía [requireEnv].
@@ -189,6 +224,7 @@ class ServerConfig {
   final AiProvidersConfig aiProviders;
   final FeedbackConfig feedback;
   final WebConfig web;
+  final McpConfig mcp;
 
   const ServerConfig({
     required this.host,
@@ -199,6 +235,7 @@ class ServerConfig {
     required this.aiProviders,
     required this.feedback,
     required this.web,
+    required this.mcp,
   });
 
   factory ServerConfig.fromEnvironment(Map<String, String> env) {
@@ -211,6 +248,7 @@ class ServerConfig {
       aiProviders: AiProvidersConfig.fromEnvironment(env),
       feedback: FeedbackConfig.fromEnvironment(env),
       web: WebConfig.fromEnvironment(env),
+      mcp: McpConfig.fromEnvironment(env),
     );
   }
 }

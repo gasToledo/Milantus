@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:dnd_engine/dnd_engine.dart';
 import 'package:dnd_server/src/ai/portrait_generation_service.dart';
 import 'package:dnd_server/src/ai/portrait_provider.dart';
 import 'package:dnd_server/src/app.dart';
+import 'package:dnd_server/src/auth/mcp_token.dart';
 import 'package:dnd_server/src/auth/oidc_service.dart';
 import 'package:dnd_server/src/auth/session_store.dart';
 import 'package:dnd_server/src/config.dart';
@@ -11,7 +13,6 @@ import 'package:dnd_server/src/db/migration_runner.dart';
 import 'package:dnd_server/src/feedback/feedback_mail.dart';
 import 'package:dnd_server/src/import/import_service.dart' as import_service;
 import 'package:dnd_server/src/portraits/disk_portrait_blob_store.dart';
-import 'package:dnd_server/src/repositories/api_token_repository.dart';
 import 'package:dnd_server/src/repositories/account_repository.dart';
 import 'package:dnd_server/src/repositories/campaign_repository.dart';
 import 'package:dnd_server/src/repositories/chapter_repository.dart';
@@ -21,6 +22,7 @@ import 'package:dnd_server/src/repositories/encounter_repository.dart';
 import 'package:dnd_server/src/repositories/event_repository.dart';
 import 'package:dnd_server/src/repositories/homebrew_repository.dart';
 import 'package:dnd_server/src/repositories/level_up_repository.dart';
+import 'package:dnd_server/src/repositories/mcp_audit_repository.dart';
 import 'package:dnd_server/src/repositories/npc_repository.dart';
 import 'package:dnd_server/src/repositories/repository_transaction_runner.dart';
 import 'package:dnd_server/src/repositories/settings_repository.dart';
@@ -52,6 +54,26 @@ Future<void> main() async {
     invalidateSession: (token) =>
         pool.run((session) => PostgresSessionStore(session).invalidate(token)),
   );
+
+  final mcp = config.mcp.enabled
+      ? McpDependencies(
+          verifier: McpTokenVerifier(
+            issuer: config.oidc.issuerUrl,
+            audience: config.mcp.projectId,
+            loadKeys: McpTokenVerifier.jwksFrom(config.oidc.issuerUrl),
+          ),
+          resolveAccount: (subject) =>
+              pool.runTx((session) => findOrCreateAccount(session, subject)),
+          audit: PostgresMcpAuditRepository(pool),
+          // Una vez al arrancar: el catálogo no cambia sin un despliegue.
+          content: await ContentRepository.loadFromDirectory(
+            config.mcp.contentDir,
+          ),
+          publicBaseUrl: config.oidc.publicBaseUrl,
+          issuer: config.oidc.issuerUrl,
+          projectId: config.mcp.projectId,
+        )
+      : null;
 
   final portraits = DiskPortraitBlobStore(
     root: config.portraits.root,
@@ -92,8 +114,8 @@ Future<void> main() async {
       homebrew: PostgresHomebrewRepository(pool),
       levelUps: PostgresLevelUpRepository(pool),
       settings: PostgresSettingsRepository(pool),
-      apiTokens: PostgresApiTokenRepository(pool),
       webStaticHandler: webStaticHandler,
+      mcp: mcp,
       sendFeedback: config.feedback.enabled
           ? workerFeedbackSender(
               url: Uri.parse(config.feedback.workerUrl),

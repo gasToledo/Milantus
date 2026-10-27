@@ -159,6 +159,66 @@ una verificada, así que el Worker no sirve para eso: necesitan un envío que
 llegue a cualquier destinatario (el SMTP de Cloudflare con el plan Workers
 Paid, u otro proveedor).
 
+## Conector MCP para Claude
+
+Claude (claude.ai, Desktop, Cowork y Claude Code) se conecta a Milantus como
+**conector personalizado**: `https://app.milantus.com.ar/mcp`. Autoriza con
+OAuth contra Zitadel, así que cada persona entra con su propia cuenta. Es
+**opcional**: sin `MCP_PROJECT_ID`, `/mcp` no existe y el resto arranca igual.
+El diseño está en [MCP del Modo DM](../arquitectura/mcp.md).
+
+Zitadel no ofrece todavía la identidad publicada de Claude (CIMD), y abrir su
+registro dinámico dejaría que cualquiera cree clientes en el proveedor. Por
+eso Claude usa un **client ID fijo**, que cada persona pega al agregar el
+conector.
+
+1. En la consola de Zitadel, en el proyecto de Milantus, anotar el **ID del
+   proyecto** (es la audiencia de los tokens).
+2. Crear los **roles** `milantus_lectura` y `milantus_escritura` en el
+   proyecto, y otorgárselos a cada cuenta que vaya a usar el conector
+   (**Autorizaciones**). Escritura incluye lectura.
+3. Crear una aplicación nueva en el proyecto:
+   - Tipo **User Agent** (pública, sin secreto), autenticación **PKCE**.
+   - Redirect URIs: `https://claude.ai/api/mcp/auth_callback` y, para Claude
+     Code, `http://localhost:3118/callback` (puerto fijo: Claude Code usa uno
+     al azar salvo que se le pase `--callback-port`). Activar **Development
+     Mode** si Zitadel rechaza el `http`.
+   - En **Token Settings**, **Token Type: JWT**. Con tokens opacos el servidor
+     responde 401: valida la firma, no consulta a Zitadel por cada pedido.
+   - Marcar **Assert roles on authentication** en el proyecto, para que los
+     roles viajen en el token.
+4. Completar en `.env` `MCP_PROJECT_ID` (paso 1) y `MCP_CLIENT_ID` (el client
+   ID de la app del paso 3), y recrear el contenedor:
+   `docker compose up -d server`.
+5. Verificar que la metadata responda:
+   `curl https://app.milantus.com.ar/.well-known/oauth-protected-resource/mcp`.
+
+Si el WAF de Cloudflare filtra bots, dejar pasar el rango de salida de Claude,
+`160.79.104.0/21`, hacia los dos hostnames: Claude descubre y canjea tokens
+contra Zitadel desde ahí.
+
+### Agregar el conector en Claude
+
+En Claude: **Configuración → Conectores → Agregar conector personalizado**.
+URL `https://app.milantus.com.ar/mcp`; en **Configuración avanzada**, el client
+ID de Zitadel (sin secreto). Al conectar abre el login de Milantus y pide
+permiso.
+
+En Claude Code:
+
+```sh
+claude mcp add --transport http milantus https://app.milantus.com.ar/mcp --client-id <MCP_CLIENT_ID> --callback-port 3118
+```
+
+Hay un error reportado en algunas versiones de Claude Code
+([anthropics/claude-code#68853](https://github.com/anthropics/claude-code/issues/68853)):
+ignora el `--client-id` e intenta el registro dinámico, que Zitadel no ofrece.
+Si pasa, actualizar Claude Code.
+
+Cada llamada queda en `mcp_audit_log` (cuenta, herramienta, resultado; sin
+argumentos) durante 90 días, y hay un tope de 60 llamadas por minuto y por
+cuenta.
+
 ## Integración y despliegue continuo
 
 Dos workflows en `.github/workflows/`:

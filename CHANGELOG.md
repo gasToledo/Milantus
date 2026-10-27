@@ -1031,6 +1031,24 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
+## [0.41.0+1] - 2026-10-27
+
+### Nuevo
+
+- Milantus se agrega a Claude como conector personalizado: autoriza con la
+  cuenta de Milantus y permite leer las fichas calculadas, las campañas, los
+  combates, el catálogo y el homebrew, y aplicar daño, condiciones y descansos
+  a personajes propios, crear notas y PNJ y cargar homebrew.
+
+### Modificado
+
+- La conexión con Claude Code ya no usa tokens personales: pasa por el mismo
+  login de Milantus.
+
+### Eliminado
+
+- Los tokens personales de Ajustes.
+
 ## [Unreleased]
 
 ### Nuevo

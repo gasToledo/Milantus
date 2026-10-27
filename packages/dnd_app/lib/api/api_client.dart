@@ -139,7 +139,6 @@ class ApiClient {
     'character_not_found': 'Character not found.',
     'portrait_not_found': 'Portrait not found.',
     'link_not_found': 'Link not found.',
-    'token_not_found': 'Token not found.',
     'unauthenticated': 'Not signed in.',
     'login_failed': 'Could not sign in.',
     'feedback_not_configured': 'This server isn’t set up to send feedback.',
@@ -292,33 +291,6 @@ class ApiClient {
 
   Future<void> saveSettingsDocument(Map<String, dynamic> document) =>
       _send('PUT', '/api/settings', jsonBody: document);
-
-  // --- Tokens del MCP --------------------------------------------------
-
-  Future<List<ApiTokenInfo>> listApiTokens() async {
-    final response = await _send('GET', '/api/tokens');
-    return [
-      for (final json in _json(response)['tokens'] as List)
-        ApiTokenInfo.fromJson((json as Map).cast<String, dynamic>()),
-    ];
-  }
-
-  /// Devuelve el token creado y su valor en claro, que no se vuelve a ver.
-  Future<(ApiTokenInfo, String)> createApiToken(String name) async {
-    final response = await _send(
-      'POST',
-      '/api/tokens',
-      jsonBody: {'name': name},
-    );
-    final json = _json(response);
-    return (
-      ApiTokenInfo.fromJson((json['token'] as Map).cast<String, dynamic>()),
-      json['secret'] as String,
-    );
-  }
-
-  Future<void> revokeApiToken(String id) =>
-      _send('DELETE', '/api/tokens/${Uri.encodeComponent(id)}');
 
   // --- Retratos -------------------------------------------------------
 

@@ -102,28 +102,40 @@ Future<Response> _createNpcHandler(
   final sheet = wantsSheet
       ? _characterFromRequestJson(rawSheet as Map<String, dynamic>)
       : null;
-
-  final stored = await transactions.run((repositories) async {
-    final taken = {
-      ...await repositories.characters.existingIds(request.userId),
-      ...await repositories.npcs.existingIds(request.userId),
-    };
-    final id = _newStorageId('npc-', taken);
-    Character? storedSheet;
-    if (sheet != null) {
-      storedSheet = await repositories.characters.createNpcSheet(
-        request.userId,
-        Character.fromJson(
-          sheet.toJson()..['id'] = _newStorageId('npc-ficha-', {...taken, id}),
-        ),
-      );
-    }
-    final npc = _normalizedNpc(requested, id: id, characterId: storedSheet?.id);
-    await repositories.npcs.insert(request.userId, npc);
-    return StoredNpc(npc: npc, sheet: storedSheet);
-  });
+  final stored = await _insertNpc(
+    transactions,
+    request.userId,
+    requested,
+    sheet,
+  );
   return _jsonOk(_storedNpcJson(stored));
 }
+
+/// Lo que hace crear un PNJ, venga de la app o del MCP.
+Future<StoredNpc> _insertNpc(
+  RepositoryTransactionRunner transactions,
+  String userId,
+  Npc requested,
+  Character? sheet,
+) => transactions.run((repositories) async {
+  final taken = {
+    ...await repositories.characters.existingIds(userId),
+    ...await repositories.npcs.existingIds(userId),
+  };
+  final id = _newStorageId('npc-', taken);
+  Character? storedSheet;
+  if (sheet != null) {
+    storedSheet = await repositories.characters.createNpcSheet(
+      userId,
+      Character.fromJson(
+        sheet.toJson()..['id'] = _newStorageId('npc-ficha-', {...taken, id}),
+      ),
+    );
+  }
+  final npc = _normalizedNpc(requested, id: id, characterId: storedSheet?.id);
+  await repositories.npcs.insert(userId, npc);
+  return StoredNpc(npc: npc, sheet: storedSheet);
+});
 
 /// Edita el documento de un PNJ propio. El tipo no se cambia: cada uno se
 /// edita con otro constructor y pasar de uno a otro perdería datos.
@@ -134,18 +146,30 @@ Future<Response> _updateNpcHandler(Request request, NpcRepository npcs) async {
   if (requested.id != id) {
     throw const FormatException('El id del PNJ no coincide con la ruta.');
   }
-  final existing = await npcs.find(request.userId, id);
-  if (existing == null) return _notFound('npc_not_found');
+  final npc = await _updateNpc(npcs, request.userId, requested);
+  if (npc == null) return _notFound('npc_not_found');
+  return _jsonOk({'npc': npc.toJson()});
+}
+
+/// Lo que hace editar un PNJ, venga de la app o del MCP. `null` si no existe
+/// en la cuenta, que es lo mismo que si fuera de otra.
+Future<Npc?> _updateNpc(
+  NpcRepository npcs,
+  String userId,
+  Npc requested,
+) async {
+  final existing = await npcs.find(userId, requested.id);
+  if (existing == null) return null;
   if (existing.npc.sheetKind != requested.sheetKind) {
     throw const FormatException('El tipo de un PNJ no se cambia.');
   }
   final npc = _normalizedNpc(
     requested,
-    id: id,
+    id: requested.id,
     characterId: existing.npc.characterId,
   );
-  await npcs.update(request.userId, npc);
-  return _jsonOk({'npc': npc.toJson()});
+  await npcs.update(userId, npc);
+  return npc;
 }
 
 /// Borra un PNJ de la biblioteca y de todas sus campañas, con su ficha si la

@@ -259,6 +259,8 @@ services:
       DND_AZURE_OPENAI_API_KEY: ${AZURE_OPENAI_API_KEY:-}
       DND_FEEDBACK_WORKER_URL: ${FEEDBACK_WORKER_URL:-}
       DND_FEEDBACK_WORKER_SECRET: ${FEEDBACK_WORKER_SECRET:-}
+      DND_MCP_PROJECT_ID: ${MCP_PROJECT_ID:-}
+      DND_MCP_CLIENT_ID: ${MCP_CLIENT_ID:-}
     volumes:
       - portraits-data:/app/data/portraits
     depends_on:

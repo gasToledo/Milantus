@@ -1,70 +1,89 @@
-# MCP del Modo DM
+# MCP de Milantus
 
-Claude Code (o cualquier cliente MCP) se conecta a una cuenta y trabaja sobre
-su Modo DM: lee y escribe campañas, capítulos, notas del cuaderno y PNJ. Vive
-dentro del servidor, en `POST /mcp`; no hay nada que instalar.
+Claude se conecta a Milantus como conector personalizado y trabaja sobre la
+cuenta de quien lo conectó: sus personajes, las campañas que dirige o en las
+que juega, su homebrew y el catálogo SRD. Vive en el mismo servidor, en
+`POST /mcp`. Cómo configurarlo está en
+[Despliegue](../operaciones/despliegue.md#conector-mcp-para-claude).
 
-## Cómo se conecta
+## Autorización
 
-En **Ajustes → Claude Code** se crea un token con nombre. La app lo muestra
-una sola vez, ya armado dentro del comando:
+OAuth 2.1 con PKCE contra **Zitadel**, que es el servidor de autorización.
+Milantus no emite tokens: los valida.
 
-```bash
-claude mcp add --transport http milantus https://<dominio>/mcp --header "Authorization: Bearer mlt_…"
-```
+- `/.well-known/oauth-protected-resource/mcp` (RFC 9728) dice que el recurso
+  es `…/mcp`, que el emisor es Zitadel y qué scopes pedir. Un 401 de `/mcp`
+  lleva `WWW-Authenticate: Bearer resource_metadata="…"`, que es por donde
+  Claude lo descubre.
+- `requireMcpToken` (`lib/src/auth/mcp_token.dart`) valida el access token
+  como **JWT con JWKS**: firma contra `/oauth/v2/keys`, emisor, vigencia y que
+  la audiencia incluya el proyecto de Milantus. Sin llamada de red por pedido;
+  las claves se recargan ante un `kid` desconocido, a lo sumo una vez por
+  minuto. Por eso la app de Zitadel emite *Token Type: JWT*.
+- Zitadel no soporta el parámetro `resource` (RFC 8707): la audiencia se pide
+  como scope (`urn:zitadel:iam:org:project:id:{proyecto}:aud`), que la
+  metadata publica y Claude pide solo.
+- El `sub` se resuelve con `findOrCreateAccount`, la misma cuenta del login
+  web. `requireSession` y la cookie no cambian, y el Bearer no abre `/api`.
+- **Cliente:** un client ID fijo, público, registrado a mano en Zitadel. Zitadel
+  no tiene CIMD todavía, y su registro dinámico habría que abrirlo a
+  cualquiera. Cuando publique CIMD, Claude puede usar su identidad publicada
+  sin tocar el servidor.
 
-## El token
+### Lectura y escritura
 
-- Tabla `api_tokens` (migración `0013_api_tokens`). Como las sesiones, se
-  guarda solo el hash SHA-256: un volcado de la base no alcanza para usarlo.
-- Prefijo `mlt_`, para reconocerlo si aparece pegado donde no debe.
-- Vence a los 90 días (`apiTokenTtl`). Revocar es borrar la fila. Cada uso
-  anota `last_used_at` en la misma sentencia que lo valida.
-- Se administra con `GET`, `POST` y `DELETE /api/tokens`, que piden la cookie
-  como el resto de `/api`. Revocar uno ajeno responde 404, igual que uno que
-  no existe.
+`milantus:lectura` y `milantus:escritura` (escritura incluye lectura). Zitadel
+no documenta scopes propios en el token, así que el verificador acepta los dos
+caminos: el claim `scope` o los roles del proyecto `milantus_lectura` /
+`milantus_escritura`. La metadata pide hoy los roles; si Zitadel copiara los
+scopes propios, se cambia `mcpRequestedScopes` y nada más. Una herramienta sin
+el permiso responde 403 con `error="insufficient_scope"`, y Claude vuelve a
+autorizarse pidiéndolo.
 
-## La frontera
+## Las herramientas
 
-El Bearer se acepta **solo en `/mcp`**. Todo `/api` sigue autenticando con la
-cookie: un token filtrado no abre la API que usa el navegador, y una página
-ajena no puede usar el token por el usuario, porque el navegador no lo manda
-solo.
+`lib/src/app_mcp.dart`. Llaman a los repositorios con la cuenta del token: la
+autorización es la del `WHERE`, y lo ajeno responde igual que lo inexistente.
+Las validaciones que antes vivían solo en un handler (la nota en un capítulo
+propio, crear y editar un PNJ) son funciones que usan los dos caminos.
 
-Las herramientas no tocan los repositorios. Llaman al mismo enrutado de la
-API por adentro, con la cuenta del token puesta en el contexto de shelf
-(`requireSession` la acepta: una petición HTTP no puede escribir ese
-contexto). Así la validación y la autorización del `WHERE` existen una sola
-vez, y lo ajeno le responde a Claude lo mismo que a la app: que no existe.
+| Lectura | Escritura |
+|---|---|
+| `listar_personajes`, `ver_personaje` | `aplicar_dano_o_curacion` |
+| `listar_campanas`, `ver_campana` | `gestionar_condicion`, `descanso` |
+| `ver_encuentro`, `buscar_catalogo` | `crear_nota` |
+| `listar_homebrew`, `listar_pnj`, `ver_eventos` | `crear_pnj`, `actualizar_pnj`, `crear_homebrew` |
 
-## Protocolo
+- **La ficha** sale de `CharacterCompiler` con la Forma Salvaje y el Cansancio
+  encima, como en la app. El servidor carga el catálogo SRD al arrancar
+  (`DND_CONTENT_DIR`, que el Dockerfile copia a la imagen) y le suma el
+  homebrew de la cuenta en cada llamada.
+- **Daño, condiciones y descansos** usan `CombatOps` sobre un personaje
+  propio. El DM no escribe fichas ajenas tampoco por acá.
+- **Campañas:** la vista del DM si la dirige; si juega, `playerView()` con la
+  misma poda que `/api/characters/<id>/campaigns`.
+- Esquemas con `additionalProperties: false`, anotaciones `readOnlyHint` /
+  `destructiveHint`, salida en `structuredContent` más un resumen, y listados
+  paginados con `cursor`.
 
-HTTP «Streamable» en su forma mínima (`lib/src/mcp/mcp_handler.dart`): cada
-`POST` trae un mensaje JSON-RPC y se contesta con JSON, sin SSE ni sesión.
-`initialize`, `ping`, `tools/list` y `tools/call`; un `GET` responde 405.
-Ninguna herramienta avisa nada por su cuenta, así que el túnel no sostiene
-conexiones abiertas.
+Afuera: borrar, importar respaldos, generar retratos, canjear códigos y
+`/api/feedback`.
 
-Las herramientas reciben argumentos simples y el servidor arma los documentos
-con los modelos del engine: Claude no maneja `schemaVersion` ni genera ids.
-Editar aplica solo los campos que llegan sobre el documento guardado, así no
-pisa lo que la app guardó y Claude no conoce (escenas de música, objetos).
+## Protocolo y operación
 
-## Lo que queda afuera
-
-- **Borrar.** Con un agente, borrar sigue siendo una acción de la persona,
-  desde la app.
-- **Cerrar capítulos.** Reparte avisos a los jugadores; es una decisión de
-  mesa.
-- **Combate y música.** Son de la sesión en vivo.
-- **Fichas de los jugadores.** El DM no escribe fichas ajenas; el MCP muestra
-  solo nombre y nivel.
-- **PNJ con estadísticas.** El servidor no carga el bestiario; por el MCP se
-  crean PNJ narrativos y el bloque se elige en la app.
+- HTTP «Streamable» en su forma mínima (`lib/src/mcp/mcp_handler.dart`): un
+  POST por mensaje, respuesta JSON, sin SSE ni sesión. Escrito a mano: `dart_mcp`
+  no trae Streamable HTTP y `mcp_dart` es una dependencia grande para cuatro
+  métodos.
+- Un `Origin` que no sea la propia app responde 403.
+- Tope de 60 llamadas por minuto y por cuenta (429).
+- `mcp_audit_log`: cuenta, herramienta y resultado, sin argumentos, 90 días.
 
 ## Qué probar al tocar esto
 
-`packages/dnd_server/test/mcp_test.dart` cubre el token (sin token, vencido,
-revocado, ajeno) y que lo ajeno no exista por el MCP. Corre contra el doble en
-memoria: el SQL de `api_token_repository.dart` se revisa a mano y se prueba
-con el stack real.
+`packages/dnd_server/test/mcp_test.dart`, con tokens firmados por una clave del
+propio test: sin token, vencido y con otra audiencia (401 con la metadata);
+solo lectura intentando escribir (403); `Origin` ajeno; y que la ficha y la
+campaña de otra cuenta no se vean ni se toquen, comparando el documento antes y
+después. Corre contra los dobles en memoria: el SQL de `mcp_audit_repository`
+y la conexión con Zitadel se prueban con el stack real.

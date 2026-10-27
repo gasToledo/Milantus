@@ -123,33 +123,4 @@ void main() {
     expect(guardado.startsInDmMode, isTrue);
     expect(guardado.showEncounterDifficulty, isFalse);
   });
-
-  testWidgets(
-    'un token para Claude Code se crea, muestra su comando y se revoca',
-    (tester) async {
-      final server = FakeApiServer();
-      await pumpSettings(tester, server);
-
-      await tester.tap(find.text('Crear token'));
-      await tester.pumpAndSettle();
-      await tester.enterText(find.byType(TextField).last, 'Notebook');
-      await tester.testTextInput.receiveAction(TextInputAction.done);
-      await tester.pumpAndSettle();
-
-      final command = tester.widget<SelectableText>(
-        find.byKey(const ValueKey('mcp-command')),
-      );
-      expect(command.data, contains('Bearer mlt_secreto-token-0'));
-      expect(command.data, contains('/mcp'));
-      await tester.tap(find.text('Cerrar'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Notebook'), findsOneWidget);
-      await tester.tap(find.byTooltip('Revocar Notebook'));
-      await tester.pumpAndSettle();
-      expect(server.apiTokens, isEmpty);
-      expect(find.text('Notebook'), findsNothing);
-      expect(tester.takeException(), isNull);
-    },
-  );
 }

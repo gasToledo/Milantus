@@ -8,8 +8,8 @@ trabajar en el repositorio. Los detalles viven acá, una sola vez.
 
 - [Modo DM](arquitectura/modo-dm.md): vínculo entre cuentas, autorización,
   campañas, capítulos, combate y PNJ.
-- [MCP del Modo DM](arquitectura/mcp.md): tokens personales y el endpoint con
-  que Claude Code trabaja sobre las campañas.
+- [MCP](arquitectura/mcp.md): el conector de Claude, su autorización con
+  Zitadel y sus herramientas.
 - [dnd_engine](../packages/dnd_engine/README.md): motor de reglas, modelos y
   catálogo dirigido por datos.
 
