@@ -1198,7 +1198,8 @@ class _DiaryEntryDialogState extends State<_DiaryEntryDialog> {
 ///
 /// ponytail: subconjunto a mano en vez de una dependencia. Entiende títulos
 /// (`#`, `##`, `###`), viñetas (`-`, `*`), párrafos separados por una línea en
-/// blanco, y **negrita** e *itálica* dentro de la línea. No entiende enlaces,
+/// blanco, **negrita** e *itálica* dentro de la línea, y `@Nombre` cuando
+/// quien lo usa pasa [mentions]. No entiende enlaces,
 /// código, citas, tablas ni listas anidadas: el día que haga falta alguna de
 /// esas, la salida es `flutter_markdown_plus` y tirar esta clase.
 ///
@@ -1207,7 +1208,20 @@ class _DiaryEntryDialogState extends State<_DiaryEntryDialog> {
 class MarkdownText extends StatelessWidget {
   final String source;
 
-  const MarkdownText(this.source, {super.key});
+  /// Nombres que se enlazan cuando van después de una `@`. Los usa el
+  /// cuaderno para los PNJ de la campaña; el trasfondo no menciona a nadie.
+  final List<String> mentions;
+
+  /// Lo que se dibuja en lugar de cada mención, con el nombre tal como está
+  /// en [mentions].
+  final Widget Function(String name)? mentionBuilder;
+
+  const MarkdownText(
+    this.source, {
+    super.key,
+    this.mentions = const [],
+    this.mentionBuilder,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1311,19 +1325,19 @@ class MarkdownText extends StatelessWidget {
   /// `**negrita**` e `*itálica*`. Un asterisco suelto se deja tal cual: en un
   /// trasfondo es más probable que sea puntuación que un énfasis a medio
   /// escribir.
-  static TextSpan _inline(String texto, Color color) {
-    final hijos = <TextSpan>[];
+  TextSpan _inline(String texto, Color color) {
+    final hijos = <InlineSpan>[];
     final patron = RegExp(r'\*\*(.+?)\*\*|\*(.+?)\*');
     var cursor = 0;
     for (final m in patron.allMatches(texto)) {
       if (m.start > cursor) {
-        hijos.add(TextSpan(text: texto.substring(cursor, m.start)));
+        hijos.addAll(_conMenciones(texto.substring(cursor, m.start), null));
       }
       final negrita = m.group(1);
-      hijos.add(
-        TextSpan(
-          text: negrita ?? m.group(2),
-          style: negrita != null
+      hijos.addAll(
+        _conMenciones(
+          negrita ?? m.group(2)!,
+          negrita != null
               ? const TextStyle(fontWeight: FontWeight.w600)
               : const TextStyle(fontStyle: FontStyle.italic),
         ),
@@ -1331,9 +1345,56 @@ class MarkdownText extends StatelessWidget {
       cursor = m.end;
     }
     if (cursor < texto.length) {
-      hijos.add(TextSpan(text: texto.substring(cursor)));
+      hijos.addAll(_conMenciones(texto.substring(cursor), null));
     }
     return TextSpan(children: hijos);
+  }
+
+  /// Corta [texto] en cada `@` seguida de uno de [mentions].
+  ///
+  /// Sin delimitador de cierre: se toma el nombre **más largo** que siga a la
+  /// `@`, así «@Mirra la Tabernera» no se queda en «Mirra» si existen las
+  /// dos. Una `@` que no coincide con nadie queda como texto.
+  List<InlineSpan> _conMenciones(String texto, TextStyle? style) {
+    final builder = mentionBuilder;
+    if (builder == null || mentions.isEmpty || !texto.contains('@')) {
+      return [TextSpan(text: texto, style: style)];
+    }
+    final nombres = [...mentions]..sort((a, b) => b.length - a.length);
+    final letra = RegExp(r'[\p{L}\p{N}]', unicode: true);
+    final hijos = <InlineSpan>[];
+    var suelto = 0;
+    var arroba = texto.indexOf('@');
+    while (arroba >= 0) {
+      final resto = texto.substring(arroba + 1);
+      final nombre = nombres.where((n) {
+        if (!resto.toLowerCase().startsWith(n.toLowerCase())) return false;
+        // Que el nombre termine ahí: «@Mirraela» no es Mirra.
+        return resto.length == n.length || !letra.hasMatch(resto[n.length]);
+      }).firstOrNull;
+      if (nombre == null) {
+        arroba = texto.indexOf('@', arroba + 1);
+        continue;
+      }
+      if (arroba > suelto) {
+        hijos.add(
+          TextSpan(text: texto.substring(suelto, arroba), style: style),
+        );
+      }
+      hijos.add(
+        WidgetSpan(
+          alignment: PlaceholderAlignment.baseline,
+          baseline: TextBaseline.alphabetic,
+          child: builder(nombre),
+        ),
+      );
+      suelto = arroba + 1 + nombre.length;
+      arroba = texto.indexOf('@', suelto);
+    }
+    if (suelto < texto.length) {
+      hijos.add(TextSpan(text: texto.substring(suelto), style: style));
+    }
+    return hijos;
   }
 }
 

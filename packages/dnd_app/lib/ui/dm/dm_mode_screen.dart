@@ -1509,6 +1509,32 @@ class _CampaignDetailState extends State<_CampaignDetail> {
     });
   }
 
+  /// La mención de un PNJ en el cuaderno: el mismo «Sumar al combate» de
+  /// Combate, con el PNJ ya elegido. Desde el cuaderno el combate no está a
+  /// la vista, así que lo que entró se confirma con un aviso.
+  Future<void> _addNpcFromNote(String npcId) async {
+    Future<void>? saving;
+    final picked = await addCombatantFlow(
+      context,
+      encounter: _encounter,
+      repo: widget.repo,
+      campaignNpcs: _npcs ?? const [],
+      loadLibrary: widget.api.listNpcs,
+      onAddMonster: _addMonsters,
+      onAddNpc: (choice, initiative) => saving = _addNpc(choice, initiative),
+      initialNpcId: npcId,
+    );
+    await saving;
+    if (!mounted || picked is! AddNpcChoice) return;
+    // Si el guardado falló ya lo dijo `_reportEncounterError`.
+    if (_encounter?.combatants.any((c) => c.npcId == picked.npc.id) ?? false) {
+      showAppMessage(
+        context,
+        context.l10n.dmAddedToCombat(picked.npc.name, widget.campaign.name),
+      );
+    }
+  }
+
   void _setCombatantSide(String combatantId, CombatantSide side) =>
       _saveEncounter((current) => current?.withSide(combatantId, side));
 
@@ -1908,6 +1934,9 @@ class _CampaignDetailState extends State<_CampaignDetail> {
               },
               onEditNote: _editNote,
               onDeleteNote: _deleteNote,
+              npcs: _npcs ?? const [],
+              onOpenNpc: _openNpc,
+              onAddNpcToCombat: _addNpcFromNote,
             ),
             _CampaignSection.pnj => CampaignNpcsView(
               npcs: _npcs,

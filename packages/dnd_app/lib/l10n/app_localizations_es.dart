@@ -5825,6 +5825,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dmNoteActions => 'Acciones de la nota';
 
   @override
+  String get dmNoteMarkdownHint =>
+      'Acepta Markdown: # para títulos, **negrita**, *itálica*, - para viñetas y @Nombre para mencionar a un PNJ de la campaña.';
+
+  @override
+  String dmNpcMentionActions(String name) {
+    return 'Acciones de $name';
+  }
+
+  @override
+  String get dmViewNpc => 'Ver PNJ';
+
+  @override
   String dmRounds(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

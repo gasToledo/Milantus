@@ -42,6 +42,12 @@ class NotebookView extends StatefulWidget {
   final void Function(Note note) onEditNote;
   final void Function(Note note) onDeleteNote;
 
+  /// Los PNJ de la campaña, que una nota menciona con `@Nombre`. Tocar la
+  /// mención ofrece abrirlo o sumarlo al combate sin salir del cuaderno.
+  final List<CampaignNpcEntry> npcs;
+  final void Function(String npcId) onOpenNpc;
+  final void Function(String npcId) onAddNpcToCombat;
+
   const NotebookView({
     super.key,
     required this.chapters,
@@ -53,6 +59,9 @@ class NotebookView extends StatefulWidget {
     required this.onRetry,
     required this.onEditNote,
     required this.onDeleteNote,
+    this.npcs = const [],
+    required this.onOpenNpc,
+    required this.onAddNpcToCombat,
   });
 
   @override
@@ -89,6 +98,20 @@ class _NotebookViewState extends State<NotebookView> {
           c.id,
     };
   }
+
+  Widget _noteBody(String body) => MarkdownText(
+    body,
+    mentions: [for (final e in widget.npcs) e.npc.name],
+    mentionBuilder: (name) {
+      // Dos PNJ con el mismo nombre: gana el primero, igual que en la lista.
+      final npc = widget.npcs.firstWhere((e) => e.npc.name == name).npc;
+      return _NpcMention(
+        name: name,
+        onOpen: () => widget.onOpenNpc(npc.id),
+        onAddToCombat: () => widget.onAddNpcToCombat(npc.id),
+      );
+    },
+  );
 
   bool _matches(String text) =>
       _query.trim().isEmpty ||
@@ -198,6 +221,7 @@ class _NotebookViewState extends State<NotebookView> {
                 }),
                 onEditNote: widget.onEditNote,
                 onDeleteNote: (note) => _confirmDelete(context, note),
+                noteBody: _noteBody,
               ),
             ),
         if (loose.isNotEmpty) ...[
@@ -217,6 +241,7 @@ class _NotebookViewState extends State<NotebookView> {
                 repo: widget.repo,
                 onEdit: widget.onEditNote,
                 onDelete: (note) => _confirmDelete(context, note),
+                noteBody: _noteBody,
               ),
             ),
         ],
@@ -283,6 +308,7 @@ class _ChapterCard extends StatelessWidget {
   final VoidCallback onToggle;
   final void Function(Note note) onEditNote;
   final void Function(Note note) onDeleteNote;
+  final Widget Function(String body) noteBody;
 
   const _ChapterCard({
     super.key,
@@ -294,6 +320,7 @@ class _ChapterCard extends StatelessWidget {
     required this.onToggle,
     required this.onEditNote,
     required this.onDeleteNote,
+    required this.noteBody,
   });
 
   @override
@@ -405,6 +432,7 @@ class _ChapterCard extends StatelessWidget {
                     repo: repo,
                     onEdit: onEditNote,
                     onDelete: onDeleteNote,
+                    noteBody: noteBody,
                   ),
                 ),
           ],
@@ -432,12 +460,14 @@ class _EntryTile extends StatelessWidget {
   final ContentRepository repo;
   final void Function(Note note) onEdit;
   final void Function(Note note) onDelete;
+  final Widget Function(String body) noteBody;
 
   const _EntryTile({
     required this.entry,
     required this.repo,
     required this.onEdit,
     required this.onDelete,
+    required this.noteBody,
   });
 
   @override
@@ -543,7 +573,7 @@ class _EntryTile extends StatelessWidget {
                 // La nota la escribe el DM y acepta Markdown, igual que el
                 // trasfondo; lo que redacta la app es texto llano.
                 if (note != null)
-                  MarkdownText(note.body)
+                  noteBody(note.body)
                 else
                   Text(
                     up != null
@@ -581,6 +611,58 @@ class _EntryTile extends StatelessWidget {
 }
 
 enum _NoteAction { edit, delete }
+
+/// Un PNJ mencionado en una nota. Menú y no un toque directo porque las dos
+/// cosas que se quieren de él en plena sesión son distintas: leer su hoja o
+/// meterlo en la pelea que está por empezar.
+class _NpcMention extends StatelessWidget {
+  final String name;
+  final VoidCallback onOpen;
+  final VoidCallback onAddToCombat;
+
+  const _NpcMention({
+    required this.name,
+    required this.onOpen,
+    required this.onAddToCombat,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final pal = context.palette;
+    return PopupMenuButton<bool>(
+      tooltip: context.l10n.dmNpcMentionActions(name),
+      onSelected: (combat) => combat ? onAddToCombat() : onOpen(),
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          value: false,
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.person_outline),
+            title: Text(context.l10n.dmViewNpc),
+          ),
+        ),
+        PopupMenuItem(
+          value: true,
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.local_fire_department_outlined),
+            title: Text(context.l10n.dmAddToCombat),
+          ),
+        ),
+      ],
+      child: Text(
+        name,
+        style: TextStyle(
+          fontSize: 14,
+          color: pal.gold,
+          fontWeight: FontWeight.w600,
+          decoration: TextDecoration.underline,
+          decorationColor: pal.gold,
+        ),
+      ),
+    );
+  }
+}
 
 /// Qué dice un combate cerrado. Deliberadamente grueso: el servidor nunca sabe
 /// quién hizo cuánto daño, porque cada jugador anota sus propios PG.

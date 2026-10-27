@@ -782,4 +782,49 @@ void main() {
     expect(find.textContaining('Neutrales: Bruno.'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  // Se toma el nombre más largo: con «Mirra» y «Mirra la Tabernera» en la
+  // campaña, la mención es de la segunda, y es la que entra al combate.
+  testWidgets('una mención en una nota suma a ese PNJ al combate', (
+    tester,
+  ) async {
+    final server = await pumpCombate(
+      tester,
+      seed: (s) {
+        addNpc(s, blockNpc('mirra', 'Mirra', 'Bandido'));
+        addNpc(s, blockNpc('tabernera', 'Mirra la Tabernera', 'Bandido'));
+        s.chapters['tumba'] = [
+          const Chapter(
+            id: 'cripta',
+            name: 'La cripta',
+            state: ChapterState.active,
+          ),
+        ];
+        s.notes['tumba'] = [
+          const Note(
+            id: 'n1',
+            chapterId: 'cripta',
+            title: 'La posada',
+            body: 'Los espera @Mirra la Tabernera con la llave.',
+          ),
+        ];
+      },
+    );
+    await tester.tap(find.text('Cuaderno'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Mirra la Tabernera'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Sumar al combate'));
+    await tester.pumpAndSettle();
+    await tester.tap(inDialog(find.text('Aliado')));
+    await tester.pumpAndSettle();
+    await tester.tap(dialogAction('Sumar'));
+    await tester.pumpAndSettle();
+
+    final added = combatant(server, 'Mirra la Tabernera');
+    expect(added.npcId, 'tabernera');
+    expect(added.side, CombatantSide.ally);
+    expect(tester.takeException(), isNull);
+  });
 }
