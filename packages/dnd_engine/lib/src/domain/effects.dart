@@ -224,6 +224,23 @@ sealed class Effect {
           },
         ),
       'offHandAbilityDamage' => const OffHandAbilityDamageEffect(),
+      'whileArmored' =>
+        WhileArmoredEffect(Effect.listFromJson(json['effects'])),
+      'grantedWeapon' => GrantedWeaponEffect(
+          id: json['id'] as String,
+          name: json['name'] as String,
+          damageDice: json['damageDice'] as String,
+          damageType: json['damageType'] as String,
+          properties: (json['properties'] as List? ?? const [])
+              .whereType<String>()
+              .toList(),
+          abilityOptions: [
+            for (final a in json['abilityOptions'] as List? ?? const [])
+              Ability.fromKey(a as String),
+          ],
+          bonus: json['bonus'] as int? ?? 0,
+        ),
+      'noArmorStrengthRequirement' => const NoArmorStrengthRequirementEffect(),
       'heroicInspirationOnLongRest' =>
         const HeroicInspirationOnLongRestEffect(),
       'halfProficiencyUnskilled' => const HalfProficiencyUnskilledEffect(),
@@ -1359,6 +1376,77 @@ class OffHandAbilityDamageEffect extends Effect {
 /// solo y el descanso ya lo recargaría, pero un recurso declarado por el
 /// Humano dejaría al elfo sin poder tenerla nunca — y la Inspiración Heroica
 /// se la concede el DM a quien quiera. Por eso el estado vive en
+/// Efectos que rigen **solo con armadura puesta** (el escudo no cuenta): lo
+/// que da la Armadura Arcana del Armero según su modelo.
+///
+/// Lo desenvuelve el compilador antes de repartir, igual que [LeveledEffect],
+/// y por el mismo motivo: así las pasadas que filtran por tipo ven lo mismo
+/// que el builder.
+class WhileArmoredEffect extends Effect {
+  final List<Effect> effects;
+  const WhileArmoredEffect(this.effects);
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'whileArmored',
+        'effects': [for (final e in effects) e.toJson()],
+      };
+}
+
+/// Un arma que da un rasgo y no la mochila: el arma especial de cada modelo
+/// de la Armadura Arcana. Aparece como un ataque más y pasa por las mismas
+/// reglas de arma (Ataque Adicional, maestrías no tiene).
+///
+/// Un mismo [id] declarado de nuevo reemplaza al anterior, así que el dado o
+/// el bono que suben con el nivel se escriben como `leveled` con el arma
+/// entera.
+class GrantedWeaponEffect extends Effect {
+  final String id;
+  final String name;
+  final String damageDice;
+  final String damageType;
+
+  /// Las de un arma del catálogo: `reach`, `ranged`… Cuenta como arma simple.
+  final List<String> properties;
+
+  /// Características que puede usar además de las normales (el Armero ataca
+  /// con INT).
+  final List<Ability> abilityOptions;
+
+  /// Bono al ataque y al daño (Armero Mejorado: +1).
+  final int bonus;
+
+  const GrantedWeaponEffect({
+    required this.id,
+    required this.name,
+    required this.damageDice,
+    required this.damageType,
+    this.properties = const [],
+    this.abilityOptions = const [],
+    this.bonus = 0,
+  });
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'grantedWeapon',
+        'id': id,
+        'name': name,
+        'damageDice': damageDice,
+        'damageType': damageType,
+        if (properties.isNotEmpty) 'properties': properties,
+        if (abilityOptions.isNotEmpty)
+          'abilityOptions': [for (final a in abilityOptions) a.name],
+        if (bonus != 0) 'bonus': bonus,
+      };
+}
+
+/// La armadura no le exige Fuerza (Armadura Arcana): la advertencia de «tu
+/// velocidad baja 10 pies» no aplica.
+class NoArmorStrengthRequirementEffect extends Effect {
+  const NoArmorStrengthRequirementEffect();
+  @override
+  Map<String, dynamic> toJson() => {'type': 'noArmorStrengthRequirement'};
+}
+
 /// `CombatState.heroicInspiration` y esto solo declara *quién la gana solo*.
 ///
 /// ponytail: el Guerrero Heroico del Campeón la gana al empezar su turno y la

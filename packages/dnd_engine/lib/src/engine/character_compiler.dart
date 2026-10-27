@@ -6,6 +6,7 @@ import '../domain/ability.dart';
 import '../domain/character.dart';
 import '../domain/computed_sheet.dart';
 import '../domain/content.dart';
+import '../domain/content_source.dart';
 import '../domain/creature.dart';
 import '../domain/effects.dart';
 import '../domain/language.dart';
@@ -111,10 +112,22 @@ class CharacterCompiler {
     // Pericia y elección de conjuros, que hacen `whereType<...>()`. Con el
     // envoltorio puesto, una de esas elecciones escalonada por nivel sería
     // invisible para ellas y el defecto entraría en verde.
+    // Con armadura puesta (el escudo no cuenta): lo que la Armadura Arcana da
+    // solo mientras se la lleva se desenvuelve acá, con los escalonados.
+    final wearingArmor = c.inventory.any((e) =>
+        InventoryOps.isEquipped(c, e, repo) &&
+        switch (InventoryOps.resolve(e, repo).armor) {
+          final a? => a.category != 'shield',
+          null => false,
+        });
     List<Effect> flatten(List<Effect> effects, int sourceLevel) => [
           for (final e in effects)
             if (e is LeveledEffect)
               ...(sourceLevel >= e.minLevel
+                  ? flatten(e.effects, sourceLevel)
+                  : const <Effect>[])
+            else if (e is WhileArmoredEffect)
+              ...(wearingArmor
                   ? flatten(e.effects, sourceLevel)
                   : const <Effect>[])
             else
@@ -820,6 +833,28 @@ class CharacterCompiler {
             conditionsMet: conditionsMet,
             asBonusAction: true,
             ruleModes: ruleModes),
+      // Las armas que dan los rasgos (el arma del modelo de Armadura Arcana)
+      // van siempre: no ocupan las manos.
+      for (final g in builder.grantedWeapons.values)
+        _attack(
+          c,
+          Weapon(
+            id: g.id,
+            name: g.name,
+            source: ContentSource.foa2025,
+            category: 'simple',
+            damageDice: g.damageDice,
+            damageType: g.damageType,
+            properties: g.properties,
+          ),
+          mods,
+          profBonus,
+          builder,
+          magicBonus: g.bonus,
+          extraAbilities: g.abilityOptions,
+          conditionsMet: conditionsMet,
+          ruleModes: ruleModes,
+        ),
     ];
 
     final spellcastingBlocks = _spellcastingBlocks(
@@ -929,6 +964,7 @@ class CharacterCompiler {
       savingThrowProficiencies: builder.saveProficiencies,
       savingThrowBonus: builder.resolveSavingThrowBonus(mods),
       heroicInspirationOnLongRest: builder.heroicInspirationOnLongRest,
+      ignoresArmorStrength: builder.ignoresArmorStrength,
       halfProficiencyUnskilled: builder.halfProficiencyUnskilled,
       skillProficiencies: builder.skillProficiencies,
       expertiseSkills: builder.expertiseSkills,
@@ -1784,7 +1820,8 @@ class CharacterCompiler {
       bool offHand = false,
       bool Function(WeaponRuleEffect)? conditionsMet,
       Map<int, ActiveModeEffect> ruleModes = const {},
-      bool asBonusAction = false}) {
+      bool asBonusAction = false,
+      List<Ability> extraAbilities = const []}) {
     final unarmed = w.id == unarmedStrikeId;
     final normalAbilities = <Ability>[];
     if (w.isRanged) {
@@ -1794,6 +1831,7 @@ class CharacterCompiler {
     } else {
       normalAbilities.add(Ability.strength);
     }
+    normalAbilities.addAll(extraAbilities);
 
     final context = _WeaponAttackContext(
       // Todos somos competentes con el golpe sin armas (2024).

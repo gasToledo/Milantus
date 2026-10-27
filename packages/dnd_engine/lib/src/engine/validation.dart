@@ -317,7 +317,9 @@ class CharacterValidator {
         ));
       }
       final strReq = armor?.strengthRequirement;
-      if (strReq != null && sheet.abilityScores[Ability.strength]! < strReq) {
+      if (strReq != null &&
+          !sheet.ignoresArmorStrength &&
+          sheet.abilityScores[Ability.strength]! < strReq) {
         w.add(ValidationWarning(
           'armor_strength',
           localized(

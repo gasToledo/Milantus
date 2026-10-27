@@ -201,6 +201,12 @@ class SheetBuilder {
   /// (rasgo Ingenioso del Humano). La ficha lo expone y `CombatOps.longRest`
   /// lo recibe como parámetro: el motor de descansos no conoce la ficha.
   bool heroicInspirationOnLongRest = false;
+
+  /// Armas que dan los rasgos, por id: la última declaración gana (la de
+  /// mayor nivel, que es la que llega después).
+  final Map<String, GrantedWeaponEffect> grantedWeapons = {};
+
+  bool ignoresArmorStrength = false;
   bool halfProficiencyUnskilled = false;
   int bonusMaxHpFlat = 0;
   int bonusMaxHpPerLevel = 0;
@@ -473,6 +479,13 @@ class SheetBuilder {
         }
       case HeroicInspirationOnLongRestEffect():
         heroicInspirationOnLongRest = true;
+      case GrantedWeaponEffect(:final id):
+        grantedWeapons[id] = e;
+      case NoArmorStrengthRequirementEffect():
+        ignoresArmorStrength = true;
+      case WhileArmoredEffect():
+        // Lo desenvuelve el compilador; por acá no llega.
+        break;
       case HalfProficiencyUnskilledEffect():
         halfProficiencyUnskilled = true;
       case OffHandAbilityDamageEffect():

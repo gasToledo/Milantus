@@ -971,7 +971,7 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
-## [Unreleased]
+## [0.39.0+1] - 2026-10-27
 
 ### Nuevo
 
@@ -992,6 +992,12 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 - Hechicería Aberrante 14: la Revelación en Carne deja marcar varios
   beneficios y gasta un punto de hechicería por cada uno; la Adaptación
   Acuática da nado al doble de la velocidad y el Vuelo Reluciente, vuelo.
+- Armero: el modelo de la Armadura Arcana (Acorazado, Guardián o Infiltrado)
+  se elige en la ficha y se puede cambiar. Con la armadura puesta aparece el
+  arma del modelo como un ataque más, con INT, +1 desde el nivel 9 y dado
+  mayor en el 15; el Acorazado prende la Estatura Gigante desde la ficha, y
+  el Infiltrado suma 5 pies de velocidad y ventaja en Sigilo. La armadura
+  pesada ya no avisa que le falta Fuerza.
 
 ### Modificado
 
@@ -999,6 +1005,22 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   alcance de la Armonía es de 10 pies más, no 5).
 - Corregidos a las reglas 2024 los textos del Poder de lo Salvaje y de la
   Revelación en Carne.
+- Corregido el texto de la Armadura Arcana según Eberron: Forge of the
+  Artificer.
+
+### Eliminado
+
+- Sin cambios.
+
+## [Unreleased]
+
+### Nuevo
+
+- Sin cambios.
+
+### Modificado
+
+- Sin cambios.
 
 ### Eliminado
 

@@ -161,4 +161,72 @@ void main() {
       expect(max('flash_of_genius', level: 7, intelligence: 18), 4);
     });
   });
+
+  group('Armadura Arcana del Armero', () {
+    Character armero(int level, String model, {bool armor = true}) => Character(
+          id: 'probe-armorer',
+          name: 'Prueba',
+          raceId: 'human',
+          classId: 'artificer',
+          subclassId: 'armorer',
+          backgroundId: 'hermit',
+          level: level,
+          assignedScores: {
+            for (final a in Ability.values)
+              a: a == Ability.intelligence ? 16 : 10,
+          },
+          hpPerLevel: List.filled(level, 5),
+          featureChoices: {
+            'armor-model': ['armor-model-$model'],
+          },
+          inventory: [
+            if (armor)
+              const InventoryEntry(
+                  entryId: 'placas', itemId: 'plate', equipped: true),
+          ],
+        );
+
+    Attack? arma(ComputedSheet s, String id) =>
+        s.attacks.where((a) => a.weaponId == id).firstOrNull;
+
+    test('el arma del modelo ataca con INT y solo con la armadura puesta', () {
+      final s = compiler.compile(armero(3, 'dreadnaught'));
+      final demoledor = arma(s, 'force-demolisher')!;
+      expect(demoledor.abilityUsed, Ability.intelligence);
+      expect(demoledor.damageType, 'force');
+      expect(
+          arma(compiler.compile(armero(3, 'dreadnaught', armor: false)),
+              'force-demolisher'),
+          isNull);
+    });
+
+    test('Armero Mejorado suma 1 y Armadura Perfeccionada sube el dado', () {
+      final tres =
+          arma(compiler.compile(armero(3, 'guardian')), 'thunder-pulse')!;
+      final nueve = compiler.compile(armero(9, 'guardian'));
+      final pulso = arma(nueve, 'thunder-pulse')!;
+      final inteligencia = nueve.abilityModifiers[Ability.intelligence]!;
+      expect(pulso.attackBonus, inteligencia + nueve.proficiencyBonus + 1);
+      expect(tres.damage.startsWith('1d8'), isTrue);
+      expect(
+          arma(compiler.compile(armero(15, 'guardian')), 'thunder-pulse')!
+              .damage
+              .startsWith('1d10'),
+          isTrue);
+    });
+
+    test('el Infiltrado corre más y tiene ventaja en Sigilo con la armadura',
+        () {
+      final con = compiler.compile(armero(3, 'infiltrator'));
+      final sin = compiler.compile(armero(3, 'infiltrator', armor: false));
+      expect(con.speed, sin.speed + 5);
+      expect(con.skillAdvantages('stealth'), isNotEmpty);
+      expect(sin.skillAdvantages('stealth'), isEmpty);
+    });
+
+    test('la Armadura Arcana no exige Fuerza', () {
+      final warnings = CharacterValidator(repo).validate(armero(3, 'guardian'));
+      expect(warnings.map((w) => w.code), isNot(contains('armor_strength')));
+    });
+  });
 }

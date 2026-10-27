@@ -1010,6 +1010,9 @@ class ComputedSheet {
   /// personaje puede tenerla si el DM se la concede.
   final bool heroicInspirationOnLongRest;
 
+  /// La armadura no le exige Fuerza (Armadura Arcana del Armero).
+  final bool ignoresArmorStrength;
+
   /// Aprendiz de Mucho: [skillModifier] suma la mitad del bonificador por
   /// competencia en las habilidades sin competencia.
   final bool halfProficiencyUnskilled;
@@ -1190,6 +1193,7 @@ class ComputedSheet {
     this.abilityBonuses = const [],
     this.d20Modifier = 0,
     this.heroicInspirationOnLongRest = false,
+    this.ignoresArmorStrength = false,
     this.halfProficiencyUnskilled = false,
     required this.savingThrowProficiencies,
     this.savingThrowBonus = 0,
@@ -1266,6 +1270,7 @@ class ComputedSheet {
     List<AbilityBonus>? abilityBonuses,
     int? d20Modifier,
     bool? heroicInspirationOnLongRest,
+    bool? ignoresArmorStrength,
     bool? halfProficiencyUnskilled,
     Set<Ability>? savingThrowProficiencies,
     int? savingThrowBonus,
@@ -1331,6 +1336,7 @@ class ComputedSheet {
         d20Modifier: d20Modifier ?? this.d20Modifier,
         heroicInspirationOnLongRest:
             heroicInspirationOnLongRest ?? this.heroicInspirationOnLongRest,
+        ignoresArmorStrength: ignoresArmorStrength ?? this.ignoresArmorStrength,
         halfProficiencyUnskilled:
             halfProficiencyUnskilled ?? this.halfProficiencyUnskilled,
         savingThrowProficiencies:
