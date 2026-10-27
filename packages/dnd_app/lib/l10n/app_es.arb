@@ -771,6 +771,14 @@
   "modeOn": "En curso",
   "modeNoUses": "Sin usos",
   "modeHeavyArmor": "Con armadura pesada",
+  "modeRequires": "Requiere {mode}",
+  "@modeRequires": {
+    "placeholders": {
+      "mode": {
+        "type": "String"
+      }
+    }
+  },
   "modeSemantics": "{name}: {state}",
   "@modeSemantics": {
     "placeholders": {

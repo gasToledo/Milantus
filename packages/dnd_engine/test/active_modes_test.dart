@@ -212,6 +212,33 @@ void main() {
     });
   });
 
+  test(
+      'Poder de lo Salvaje: pide la Furia, se apaga con ella y el Halcón no '
+      'vuela con armadura', () {
+    final c = barbaro(14, subclassId: 'wild-heart');
+    var sheet = compiler.compile(c);
+    // Sin Furia no se puede prender.
+    expect(
+        CombatOps.activateMode(c.combat, sheet, 'power_of_the_wilds',
+            variant: 'falcon'),
+        isFalse);
+    CombatOps.activateMode(c.combat, sheet, 'rage', variant: 'bear');
+    sheet = compiler.compile(c);
+    expect(
+        CombatOps.activateMode(c.combat, sheet, 'power_of_the_wilds',
+            variant: 'falcon'),
+        isTrue);
+    expect(compiler.compile(c).speeds[MovementMode.fly], isNotNull);
+
+    final conCuero = c.copyWith(inventory: const [
+      InventoryEntry(entryId: 'cuero', itemId: 'leather', equipped: true),
+    ]);
+    expect(compiler.compile(conCuero).speeds[MovementMode.fly], isNull);
+
+    CombatOps.deactivateMode(c.combat, 'rage', sheet: compiler.compile(c));
+    expect(c.combat.activeModes, isEmpty);
+  });
+
   group('Las transformaciones de especie', () {
     test('Forma Grande sigue al quedar incapacitado y la Furia no', () {
       final c = barbaro(5, raceId: 'goliath');
@@ -324,6 +351,21 @@ void main() {
       expect(armonia.speeds[MovementMode.fly], armonia.speed);
       expect(armonia.speeds[MovementMode.swim], armonia.speed);
       expect(armonia.resistances, contains('fire'));
+    });
+
+    test('Revelación en Carne: un punto de hechicería por beneficio', () {
+      final c = pj('sorcerer', 'aberrant-sorcery', 14);
+      final normal = compiler.compile(c);
+      final mode =
+          normal.activeModes.firstWhere((m) => m.id == 'revelation_in_flesh');
+      expect(
+          CombatOps.activateMode(c.combat, normal, mode.id,
+              variants: ['aquatic_adaptation', 'glistening_flight']),
+          isTrue);
+      expect(c.combat.resourceUsage[mode.resourceKey], 2);
+      final revelada = compiler.compile(c);
+      expect(revelada.speeds[MovementMode.swim], 2 * revelada.speed);
+      expect(revelada.speeds[MovementMode.fly], revelada.speed);
     });
 
     test('El Tercer Ojo da visión en la oscuridad de 120 pies', () {

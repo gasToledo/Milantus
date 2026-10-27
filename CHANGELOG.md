@@ -986,11 +986,19 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   muestran el bono de INT del Evocador de nivel 10.
 - En el encuentro, la fila de cada jugador dice si está en Forma Salvaje o
   con un estado activo («Furia: Oso»), y se actualiza sola.
+- Corazón Salvaje 14: el Poder de lo Salvaje se prende con la Furia activa
+  (Halcón, León o Carnero) y se apaga con ella; el Halcón da vuelo si no
+  llevás armadura.
+- Hechicería Aberrante 14: la Revelación en Carne deja marcar varios
+  beneficios y gasta un punto de hechicería por cada uno; la Adaptación
+  Acuática da nado al doble de la velocidad y el Vuelo Reluciente, vuelo.
 
 ### Modificado
 
 - Corregidos a las reglas 2024 los textos del Guerrero de los Elementos (el
   alcance de la Armonía es de 10 pies más, no 5).
+- Corregidos a las reglas 2024 los textos del Poder de lo Salvaje y de la
+  Revelación en Carne.
 
 ### Eliminado
 

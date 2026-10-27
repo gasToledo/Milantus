@@ -448,9 +448,14 @@ class CharacterCompiler {
     // puntuaciones, CA y ataques porque sus efectos los cambian. El estado
     // de combate dice cuáles están prendidos; uno que el contenido ya no
     // declara simplemente no está en el mapa y se ignora.
-    final wearingHeavyArmor = c.inventory
-        .where((e) => InventoryOps.isEquipped(c, e, repo))
-        .any((e) => InventoryOps.resolve(e, repo).armor?.category == 'heavy');
+    final wornArmor = [
+      for (final e in c.inventory)
+        if (InventoryOps.isEquipped(c, e, repo))
+          if (InventoryOps.resolve(e, repo).armor case final a?
+              when a.category != 'shield')
+            a,
+    ];
+    final wearingHeavyArmor = wornArmor.any((a) => a.category == 'heavy');
     // Qué aportó cada estado activo, para que la ficha lo pueda decir
     // («FURIA +2», «Contundente · Furia») sin deducirlo: se anota qué reglas
     // de arma, resistencias y ventajas entraron al aplicarlo.
@@ -474,15 +479,19 @@ class CharacterCompiler {
       // prendido, que es lo que dice la regla («termina si te ponés una
       // armadura pesada»).
       final incapacitated = CombatOps.isIncapacitated(c.combat);
+      final needs = mode.requiresMode;
       final blockedBy = mode.endsInHeavyArmor && wearingHeavyArmor
           ? ActiveModeBlock.heavyArmor
-          : incapacitated
-              ? ActiveModeBlock.incapacitated
-              : null;
+          : needs != null && !c.combat.activeModes.containsKey(needs)
+              ? ActiveModeBlock.needsMode
+              : incapacitated
+                  ? ActiveModeBlock.incapacitated
+                  : null;
       // Incapacitado nadie prende nada, pero la Forma Grande que ya estaba
       // sigue: solo se cae lo que la regla dice que termina.
       final on = c.combat.activeModes.containsKey(mode.id) &&
           blockedBy != ActiveModeBlock.heavyArmor &&
+          blockedBy != ActiveModeBlock.needsMode &&
           !(incapacitated && mode.endsWhenIncapacitated);
       // Lo que le agregan otras fuentes (la subclase): sus variantes se suman
       // a las del estado, y cada una se aplica con el nivel de quien la trae.
@@ -493,8 +502,12 @@ class CharacterCompiler {
           for (final v in x.effect.variants) (variant: v, level: x.level),
       ];
       final variantId = on ? c.combat.activeModes[mode.id] : null;
-      final chosen =
-          variants.where((v) => v.variant.id == variantId).firstOrNull;
+      final chosenIds = variantId?.split(',') ?? const <String>[];
+      final chosenAll = [
+        for (final v in variants)
+          if (chosenIds.contains(v.variant.id)) v,
+      ];
+      final chosen = chosenAll.firstOrNull;
       final rulesBefore = builder.weaponRules.length;
       final resistancesBefore = {...builder.resistances};
       final advantagesBefore = builder.advantages.length;
@@ -510,13 +523,15 @@ class CharacterCompiler {
           applySource('mode:${mode.id}:${x.name}', mode.name, x.effect.effects,
               sourceClassId: x.classId, sourceLevel: x.level);
         }
-        if (chosen != null) {
+        for (final v in chosenAll) {
+          // El Halcón sigue elegido con armadura, pero no vuela.
+          if (v.variant.requiresNoArmor && wornArmor.isNotEmpty) continue;
           applySource(
-            'mode:${mode.id}:${chosen.variant.id}',
-            '${mode.name}: ${chosen.variant.name}',
-            chosen.variant.effects,
+            'mode:${mode.id}:${v.variant.id}',
+            '${mode.name}: ${v.variant.name}',
+            v.variant.effects,
             sourceClassId: classId,
-            sourceLevel: chosen.level,
+            sourceLevel: v.level,
           );
         }
       }
@@ -528,7 +543,9 @@ class CharacterCompiler {
         classId: classId,
         blockedBy: blockedBy,
         on: on,
-        variant: chosen?.variant.id,
+        variant: chosenAll.isEmpty
+            ? null
+            : chosenAll.map((v) => v.variant.id).join(','),
         variants: [for (final v in variants) v.variant],
         tempHp:
             mode.tempHpPerProficiency * proficiencyBonusForLevel(c.totalLevel) +
@@ -1605,7 +1622,7 @@ class CharacterCompiler {
   Map<MovementMode, int> _movementSpeeds(SheetBuilder b, int walk) {
     final out = <MovementMode, int>{};
     for (final e in b.movementSpeeds) {
-      final feet = e.equalToWalk ? walk : e.feet;
+      final feet = e.equalToWalk ? walk * e.walkMultiplier : e.feet;
       if (feet > (out[e.mode] ?? 0)) out[e.mode] = feet;
     }
     return out;
@@ -1940,6 +1957,8 @@ class CharacterCompiler {
       tempHpOnActivate: tempHp,
       endsConditions: List.unmodifiable(endsConditions),
       endsWhenIncapacitated: mode.endsWhenIncapacitated,
+      requiresMode: mode.requiresMode,
+      multiSelect: mode.multiSelect,
       blockedBy: blockedBy,
       active: on,
       activeVariant: variant,

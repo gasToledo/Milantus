@@ -253,6 +253,7 @@
   "modeOn": "Active",
   "modeNoUses": "No uses left",
   "modeHeavyArmor": "In heavy armor",
+  "modeRequires": "Needs {mode}",
   "modeSemantics": "{name}: {state}",
   "modeResistance": "Resistance to {types}",
   "modeDamage": "+{amount} damage with {ability}",

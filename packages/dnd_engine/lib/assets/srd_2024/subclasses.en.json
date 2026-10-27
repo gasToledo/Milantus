@@ -146,7 +146,7 @@
     "features.3.effects.0.description": "As a Bonus Action, each creature of your choice in a 30-foot Emanation originating from you must make a Wisdom saving throw (DC 8 + your Strength modifier + your Proficiency Bonus). On a failure, it has the Frightened condition for 1 minute, repeating the save at the end of each of its turns. Once used, you can't do so again until you finish a Long Rest, unless you expend a use of your Rage (no action required) to restore it."
   },
   "wild-heart": {
-    "_es": "91526a36",
+    "_es": "177c510c",
     "name": "Path of the Wild Heart",
     "features.0.name": "Animal Speaker / Rage of the Wilds",
     "features.0.effects.0.name": "Rage of the Wilds",
@@ -163,8 +163,8 @@
     "features.1.effects.0.description": "You choose one of these options and can change it when you finish a Long Rest. Owl: you have Darkvision with a range of 60 feet; if you already had it, its range increases by 60 feet. Panther: you have a Climb Speed equal to your Speed. Salmon: you have a Swim Speed equal to your Speed.",
     "features.2.description": "You can cast Commune with Nature, but only as a Ritual.",
     "features.2.effects.0.description": "You can cast the Commune with Nature spell, but only as a Ritual. Wisdom is your spellcasting ability for it.",
-    "features.3.description": "The animal spirits of your Rage grow stronger with improved effects.",
-    "features.3.effects.0.description": "Improved versions of the Bear, Eagle, and Wolf spirits.",
+    "features.3.description": "Whenever you enter your Rage, you also choose Falcon, Lion, or Ram.",
+    "features.3.effects.0.description": "Whenever you activate your Rage, you gain one of these options of your choice. Falcon: while your Rage is active, you have a Fly Speed equal to your Speed if you aren't wearing any armor. Lion: while your Rage is active, your enemies within 5 feet of you have Disadvantage on attack rolls against targets other than you or another Barbarian who has this option active. Ram: while your Rage is active, when you hit a Large or smaller creature with a melee attack, you can give it the Prone condition.",
     "features.1.effects.1.name": "Aspect of the Wilds",
     "features.1.effects.1.options.0.name": "Owl",
     "features.1.effects.1.options.0.description": "Darkvision with a range of 60 feet; if you already have it, its range increases by 60 feet.",
@@ -181,7 +181,14 @@
     "features.0.effects.1.variants.1.name": "Eagle",
     "features.0.effects.1.variants.1.description": "When you enter your Rage, you can take the Disengage and Dash actions as part of that Bonus Action, and while it lasts you can take both with a Bonus Action.",
     "features.0.effects.1.variants.2.name": "Wolf",
-    "features.0.effects.1.variants.2.description": "Your allies have Advantage on attack rolls against any enemy of yours within 5 feet of you."
+    "features.0.effects.1.variants.2.description": "Your allies have Advantage on attack rolls against any enemy of yours within 5 feet of you.",
+    "features.3.effects.1.name": "Power of the Wilds",
+    "features.3.effects.1.variants.0.name": "Falcon",
+    "features.3.effects.1.variants.0.description": "While your Rage is active, you have a Fly Speed equal to your Speed if you aren't wearing any armor.",
+    "features.3.effects.1.variants.1.name": "Lion",
+    "features.3.effects.1.variants.1.description": "While your Rage is active, your enemies within 5 feet of you have Disadvantage on attack rolls against targets other than you or another Barbarian who has this option active.",
+    "features.3.effects.1.variants.2.name": "Ram",
+    "features.3.effects.1.variants.2.description": "While your Rage is active, when you hit a Large or smaller creature with a melee attack, you can give it the Prone condition."
   },
   "world-tree": {
     "_es": "034b9a11",
@@ -1061,7 +1068,7 @@
     "features.6.effects.2.name": "Dragon Wings"
   },
   "aberrant-sorcery": {
-    "_es": "39b10e7f",
+    "_es": "26e5da8c",
     "name": "Aberrant Sorcery",
     "features.0.name": "Telepathic Speech",
     "features.0.effects.0.name": "Telepathic Speech",
@@ -1084,10 +1091,19 @@
     "features.4.description": "You always have Rary's Telepathic Bond and Telekinesis prepared. They don't count against the number of spells you can prepare.",
     "features.5.description": "You cast your psionic spells without components and gain Resistance to Psychic damage and protection against charms.",
     "features.5.effects.1.description": "Advantage against being Charmed or Frightened; you cast psionic spells subtly.",
-    "features.6.description": "You spend Sorcery Points to mutate your body, gaining supernatural flight, sight, or swimming.",
-    "features.6.effects.0.description": "Temporary mutations: flight, Darkvision, water breathing, or a malleable body.",
+    "features.6.description": "You spend Sorcery Points to alter your body: one benefit per point.",
+    "features.6.effects.0.description": "As a Bonus Action, you spend 1 or more Sorcery Points to alter your body for 10 minutes. For each point, you choose one benefit. Aquatic Adaptation: swim Speed equal to twice your Speed, and you can breathe underwater. Glistening Flight: fly Speed equal to your Speed, and you can hover. See the Invisible: you see Invisible creatures within 60 feet of yourself that aren't behind Cover. Wormlike Movement: your body and gear become slimy and pliable: you can move through spaces as narrow as 1 inch, and you can spend 5 feet of movement to escape nonmagical restraints or the Grappled condition.",
     "features.7.description": "As an action, you unleash a telekinetic wave that pulls in and damages nearby creatures.",
-    "features.7.effects.0.description": "A teleport with a wave of Force damage that drags enemies along."
+    "features.7.effects.0.description": "A teleport with a wave of Force damage that drags enemies along.",
+    "features.6.effects.1.name": "Revelation in Flesh",
+    "features.6.effects.1.variants.0.name": "Aquatic Adaptation",
+    "features.6.effects.1.variants.0.description": "Swim Speed equal to twice your Speed, and you can breathe underwater.",
+    "features.6.effects.1.variants.1.name": "Glistening Flight",
+    "features.6.effects.1.variants.1.description": "Fly Speed equal to your Speed, and you can hover.",
+    "features.6.effects.1.variants.2.name": "See the Invisible",
+    "features.6.effects.1.variants.2.description": "You see Invisible creatures within 60 feet of yourself that aren't behind Cover.",
+    "features.6.effects.1.variants.3.name": "Wormlike Movement",
+    "features.6.effects.1.variants.3.description": "Your body and gear become slimy and pliable: you can move through spaces as narrow as 1 inch, and you can spend 5 feet of movement to escape nonmagical restraints or the Grappled condition."
   },
   "clockwork-sorcery": {
     "_es": "24d52290",

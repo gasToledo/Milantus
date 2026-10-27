@@ -732,13 +732,7 @@ extension _SheetCombatSection on _SheetScreenState {
                 Text(
                   // Con la variante al lado: «Furia · Oso» dice de dónde salen
                   // las resistencias de la línea de abajo.
-                  [
-                    m.name,
-                    ?m.variants
-                        .where((v) => v.id == m.activeVariant)
-                        .firstOrNull
-                        ?.name,
-                  ].join(' · '),
+                  [m.name, ...m.chosenVariants.map((v) => v.name)].join(' · '),
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     color: pal.gold,
@@ -758,8 +752,9 @@ extension _SheetCombatSection on _SheetScreenState {
             ),
           ),
           TextButton(
-            onPressed: () =>
-                _mutateCombat(() => CombatOps.deactivateMode(_c.combat, m.id)),
+            onPressed: () => _mutateCombat(
+              () => CombatOps.deactivateMode(_c.combat, m.id, sheet: sheet),
+            ),
             child: Text(context.l10n.modeEnd),
           ),
         ],

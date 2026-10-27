@@ -947,6 +947,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get modeHeavyArmor => 'In heavy armor';
 
   @override
+  String modeRequires(String mode) {
+    return 'Needs $mode';
+  }
+
+  @override
   String modeSemantics(Object name, Object state) {
     return '$name: $state';
   }

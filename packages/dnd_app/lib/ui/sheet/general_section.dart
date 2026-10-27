@@ -1437,6 +1437,17 @@ extension _SheetGeneralSection on _SheetScreenState {
         ? (l10n.modeHeavyArmor, pal.textMuted)
         : m.blockedBy == ActiveModeBlock.incapacitated
         ? (DamageType.labelFor('incapacitated'), pal.textMuted)
+        : m.blockedBy == ActiveModeBlock.needsMode
+        ? (
+            l10n.modeRequires(
+              s.activeModes
+                      .where((o) => o.id == m.requiresMode)
+                      .firstOrNull
+                      ?.name ??
+                  '',
+            ),
+            pal.textMuted,
+          )
         : noUses
         ? (l10n.modeNoUses, pal.textMuted)
         : (l10n.modeActivate, pal.gold);
@@ -1445,13 +1456,16 @@ extension _SheetGeneralSection on _SheetScreenState {
       onTap: !enabled
           ? null
           : m.active
-          ? () => _mutateCombat(() => CombatOps.deactivateMode(_c.combat, m.id))
+          ? () => _mutateCombat(
+              () => CombatOps.deactivateMode(_c.combat, m.id, sheet: s),
+            )
           : () => _activateMode(s, m),
       borderRadius: BorderRadius.circular(12),
       child: StatTile(
         icon: Icons.local_fire_department,
         label: m.name,
-        value: m.active ? l10n.modeOn : '${left ?? ''}',
+        // Sin recurso (el Poder de lo Salvaje) no hay usos que contar.
+        value: m.active ? l10n.modeOn : '${left ?? '—'}',
         suffix: m.active || resource == null ? null : ' / ${resource.max}',
         valueColor: m.active ? pal.gold : null,
         highlighted: m.active,
@@ -1468,6 +1482,14 @@ extension _SheetGeneralSection on _SheetScreenState {
   /// «cada vez que activás tu Furia, elegís una», así que no se recuerda la
   /// de la vez anterior.
   Future<void> _activateMode(ComputedSheet s, ActiveMode m) async {
+    if (m.multiSelect) {
+      final chosen = await _chooseVariants(m);
+      if (chosen == null || chosen.isEmpty || !mounted) return;
+      _mutateCombat(
+        () => CombatOps.activateMode(_c.combat, s, m.id, variants: chosen),
+      );
+      return;
+    }
     String? variant;
     if (m.variants.isNotEmpty) {
       variant = await showDialog<String>(
@@ -1503,6 +1525,53 @@ extension _SheetGeneralSection on _SheetScreenState {
     }
     _mutateCombat(
       () => CombatOps.activateMode(_c.combat, s, m.id, variant: variant),
+    );
+  }
+
+  /// Las variantes de un estado que admite varias (Revelación en Carne): se
+  /// marcan las que se quieren y cada una gasta un uso al confirmar.
+  Future<List<String>?> _chooseVariants(ActiveMode m) {
+    final chosen = <String>{};
+    return showDialog<List<String>>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AppDialog(
+          title: m.name,
+          icon: Icons.local_fire_department,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (final v in m.variants)
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  value: chosen.contains(v.id),
+                  onChanged: (on) => setDialogState(
+                    () => on == true ? chosen.add(v.id) : chosen.remove(v.id),
+                  ),
+                  title: Text(
+                    v.name,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: v.description.isEmpty ? null : Text(v.description),
+                ),
+            ],
+          ),
+          actions: [
+            DialogAction(
+              context.l10n.commonCancel,
+              keyHint: 'Esc',
+              onPressed: () => Navigator.pop(dialogContext),
+            ),
+            DialogAction(
+              context.l10n.modeActivate,
+              primary: true,
+              onPressed: chosen.isEmpty
+                  ? null
+                  : () => Navigator.pop(dialogContext, chosen.toList()),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

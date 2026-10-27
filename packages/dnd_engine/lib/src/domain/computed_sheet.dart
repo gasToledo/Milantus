@@ -856,8 +856,22 @@ class ActiveMode {
 
   final bool active;
 
-  /// Variante elegida al activarlo, o null.
+  /// Variante elegida al activarlo, o null. Si el estado admite varias
+  /// ([multiSelect]), sus ids separados por coma.
   final String? activeVariant;
+
+  /// Las variantes elegidas, ya resueltas: una, ninguna o varias.
+  List<ActiveModeVariant> get chosenVariants {
+    final ids = activeVariant?.split(',') ?? const <String>[];
+    return [
+      for (final v in variants)
+        if (ids.contains(v.id)) v,
+    ];
+  }
+
+  /// Ver `ActiveModeEffect.requiresMode` y `ActiveModeEffect.multiSelect`.
+  final String? requiresMode;
+  final bool multiSelect;
 
   /// Lo que el estado le suma a la ficha mientras está activo, para decirlo
   /// sin que la pantalla lo deduzca: las resistencias que trajo (no las que
@@ -877,6 +891,8 @@ class ActiveMode {
     this.tempHpOnActivate = 0,
     this.endsConditions = const [],
     this.endsWhenIncapacitated = true,
+    this.requiresMode,
+    this.multiSelect = false,
     this.blockedBy,
     this.active = false,
     this.activeVariant,
@@ -895,6 +911,9 @@ enum ActiveModeBlock {
 
   /// Incapacitado (o un estado que lo incluye): no se pueden tomar acciones.
   incapacitated,
+
+  /// Pide otro estado activo que no está (el Poder de lo Salvaje, la Furia).
+  needsMode,
 }
 
 /// Cuánto le suma un estado activo al daño de un ataque: «FURIA +2».

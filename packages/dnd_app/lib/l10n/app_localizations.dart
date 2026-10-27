@@ -1616,6 +1616,12 @@ abstract class AppLocalizations {
   /// **'Con armadura pesada'**
   String get modeHeavyArmor;
 
+  /// No description provided for @modeRequires.
+  ///
+  /// In es, this message translates to:
+  /// **'Requiere {mode}'**
+  String modeRequires(String mode);
+
   /// No description provided for @modeSemantics.
   ///
   /// In es, this message translates to:

@@ -252,13 +252,7 @@ class _MemberSheetScreenState extends State<MemberSheetScreen> {
               for (final m in sheet.activeModes.where((m) => m.active)) ...[
                 const SizedBox(height: 8),
                 GoldPill(
-                  [
-                    m.name,
-                    ?m.variants
-                        .where((v) => v.id == m.activeVariant)
-                        .firstOrNull
-                        ?.name,
-                  ].join(' · '),
+                  [m.name, ...m.chosenVariants.map((v) => v.name)].join(' · '),
                 ),
               ],
             ],

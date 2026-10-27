@@ -321,9 +321,10 @@
       {
         "level": 14,
         "name": "Poder de lo Salvaje",
-        "description": "Los espíritus animales de tu Furia se potencian con efectos mejorados.",
+        "description": "Cada vez que entrás en Furia elegís además Halcón, León o Carnero.",
         "effects": [
-          { "type": "passiveTrait", "name": "Poder de lo Salvaje", "description": "Versiones mejoradas de los espíritus Oso, Águila y Lobo." }
+          { "type": "passiveTrait", "name": "Poder de lo Salvaje", "description": "Cada vez que activás tu Furia, ganás una de estas opciones a elección. Halcón: mientras dure tu Furia, tenés velocidad de vuelo igual a tu velocidad si no llevás armadura. León: mientras dure tu Furia, tus enemigos a 5 pies o menos de vos tienen desventaja en las tiradas de ataque contra objetivos que no seas vos u otro Bárbaro con esta opción activa. Carnero: mientras dure tu Furia, cuando acertás a una criatura Grande o menor con un ataque cuerpo a cuerpo, podés dejarla derribada." },
+          { "type": "activeMode", "id": "power_of_the_wilds", "name": "Poder de lo Salvaje", "requiresMode": "rage", "variants": [{ "id": "falcon", "name": "Halcón", "description": "Mientras dure tu Furia, tenés velocidad de vuelo igual a tu velocidad si no llevás armadura.", "requiresNoArmor": true, "effects": [{ "type": "movementSpeed", "mode": "fly", "equalToWalk": true }] }, { "id": "lion", "name": "León", "description": "Mientras dure tu Furia, tus enemigos a 5 pies o menos de vos tienen desventaja en las tiradas de ataque contra objetivos que no seas vos u otro Bárbaro con esta opción activa.", "effects": [] }, { "id": "ram", "name": "Carnero", "description": "Mientras dure tu Furia, cuando acertás a una criatura Grande o menor con un ataque cuerpo a cuerpo, podés dejarla derribada.", "effects": [] }], "effects": [] }
         ]
       }
     ]
@@ -2322,9 +2323,10 @@
       {
         "level": 14,
         "name": "Revelación en Carne",
-        "description": "Gastás Puntos de Hechicería para mutar tu cuerpo, ganando vuelo, visión o nado sobrenaturales.",
+        "description": "Gastás Puntos de Hechicería para mutar tu cuerpo: un beneficio por punto.",
         "effects": [
-          { "type": "passiveTrait", "name": "Revelación en Carne", "description": "Mutaciones temporales: vuelo, visión en la oscuridad, respiración acuática o cuerpo maleable." }
+          { "type": "passiveTrait", "name": "Revelación en Carne", "description": "Como acción adicional gastás 1 o más puntos de hechicería para alterar tu cuerpo durante 10 minutos. Por cada punto elegís un beneficio. Adaptación Acuática: velocidad de nado igual al doble de tu velocidad, y podés respirar bajo el agua. Vuelo Reluciente: velocidad de vuelo igual a tu velocidad, y podés flotar. Ver lo Invisible: ves a las criaturas invisibles a 60 pies o menos que no estén detrás de cobertura. Movimiento Vermiforme: tu cuerpo y tu equipo se vuelven viscosos y flexibles: pasás por espacios de hasta 1 pulgada, y con 5 pies de movimiento escapás de ataduras no mágicas o del estado agarrado." },
+          { "type": "activeMode", "id": "revelation_in_flesh", "name": "Revelación en Carne", "resourceId": "sorcery_points", "endsWhenIncapacitated": false, "multiSelect": true, "variants": [{ "id": "aquatic_adaptation", "name": "Adaptación Acuática", "description": "Velocidad de nado igual al doble de tu velocidad, y podés respirar bajo el agua.", "effects": [{ "type": "movementSpeed", "mode": "swim", "equalToWalk": true, "walkMultiplier": 2 }] }, { "id": "glistening_flight", "name": "Vuelo Reluciente", "description": "Velocidad de vuelo igual a tu velocidad, y podés flotar.", "effects": [{ "type": "movementSpeed", "mode": "fly", "equalToWalk": true }] }, { "id": "see_the_invisible", "name": "Ver lo Invisible", "description": "Ves a las criaturas invisibles a 60 pies o menos que no estén detrás de cobertura.", "effects": [] }, { "id": "wormlike_movement", "name": "Movimiento Vermiforme", "description": "Tu cuerpo y tu equipo se vuelven viscosos y flexibles: pasás por espacios de hasta 1 pulgada, y con 5 pies de movimiento escapás de ataduras no mágicas o del estado agarrado.", "effects": [] }], "effects": [] }
         ]
       },
       {

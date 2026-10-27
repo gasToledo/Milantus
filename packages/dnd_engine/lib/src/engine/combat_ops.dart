@@ -404,17 +404,29 @@ class CombatOps {
   ///
   /// Prenderlo de nuevo estando prendido no gasta otro uso: solo cambia la
   /// variante, que es lo que haría alguien que se equivocó de animal.
+  ///
+  /// Un estado de varias variantes ([ActiveMode.multiSelect]) las recibe en
+  /// [variants], gasta un uso por cada una y no se cambia una vez prendido:
+  /// la Revelación en Carne se elige al transformarse.
   static bool activateMode(
     CombatState c,
     ComputedSheet sheet,
     String modeId, {
     String? variant,
+    List<String> variants = const [],
   }) {
     final mode = sheet.activeModes.where((m) => m.id == modeId).firstOrNull;
     if (mode == null || !mode.available) return false;
-    if (variant != null && !mode.variants.any((v) => v.id == variant)) {
+    final chosen = {if (variant != null) variant, ...variants}.toList();
+    if (chosen.any((id) => !mode.variants.any((v) => v.id == id))) {
       return false;
     }
+    if (mode.multiSelect) {
+      if (chosen.isEmpty || c.activeModes.containsKey(modeId)) return false;
+    } else if (chosen.length > 1) {
+      return false;
+    }
+    final cost = mode.multiSelect ? chosen.length : 1;
     if (!c.activeModes.containsKey(modeId)) {
       // Lo que pasa al activarlo, solo la primera vez: cambiar de variante
       // con el estado ya prendido no da PG temporales de nuevo.
@@ -425,18 +437,28 @@ class CombatOps {
         final resource = sheet.resources.where((r) => r.key == key).firstOrNull;
         if (resource == null) return false;
         final used = c.resourceUsage[key] ?? 0;
-        if (used >= resource.max) return false;
-        c.resourceUsage[key] = used + 1;
+        if (used + cost > resource.max) return false;
+        c.resourceUsage[key] = used + cost;
       }
     }
-    c.activeModes[modeId] = variant;
+    c.activeModes[modeId] = chosen.isEmpty ? null : chosen.join(',');
     return true;
   }
 
   /// Apaga el estado. No devuelve el uso: la Furia terminada antes de tiempo
-  /// sigue gastada.
-  static void deactivateMode(CombatState c, String modeId) =>
-      c.activeModes.remove(modeId);
+  /// sigue gastada. Con la [sheet] apaga también los que dependen de él (el
+  /// Poder de lo Salvaje termina con la Furia); sin ella esos quedan
+  /// guardados pero la ficha los muestra apagados.
+  static void deactivateMode(
+    CombatState c,
+    String modeId, {
+    ComputedSheet? sheet,
+  }) {
+    c.activeModes.remove(modeId);
+    for (final m in sheet?.activeModes ?? const <ActiveMode>[]) {
+      if (m.requiresMode == modeId) c.activeModes.remove(m.id);
+    }
+  }
 
   /// Vuelve a la forma propia. Los PG temporales no se quitan: son PG
   /// temporales normales y duran hasta que se gastan o hasta el descanso largo.

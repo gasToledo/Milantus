@@ -65,6 +65,7 @@ sealed class Effect {
           MovementMode.fromKey(json['mode'] as String),
           feet: json['feet'] as int? ?? 0,
           equalToWalk: json['equalToWalk'] as bool? ?? false,
+          walkMultiplier: json['walkMultiplier'] as int? ?? 1,
         ),
       'sense' => SenseEffect(
           Sense.fromKey(json['sense'] as String),
@@ -166,6 +167,8 @@ sealed class Effect {
           noSpellcasting: json['noSpellcasting'] as bool? ?? false,
           endsWhenIncapacitated: json['endsWhenIncapacitated'] as bool? ?? true,
           tempHpPerProficiency: json['tempHpPerProficiency'] as int? ?? 0,
+          requiresMode: json['requiresMode'] as String?,
+          multiSelect: json['multiSelect'] as bool? ?? false,
           effects: Effect.listFromJson(json['effects']),
           variants: [
             for (final v in json['variants'] as List? ?? const [])
@@ -599,10 +602,15 @@ class MovementSpeedEffect extends Effect {
   final int feet;
   final bool equalToWalk;
 
+  /// Con [equalToWalk], cuántas veces la de caminar: la Adaptación Acuática
+  /// de la Revelación en Carne nada al doble.
+  final int walkMultiplier;
+
   const MovementSpeedEffect(
     this.mode, {
     this.feet = 0,
     this.equalToWalk = false,
+    this.walkMultiplier = 1,
   });
 
   @override
@@ -611,6 +619,7 @@ class MovementSpeedEffect extends Effect {
         'mode': mode.name,
         if (feet != 0) 'feet': feet,
         if (equalToWalk) 'equalToWalk': true,
+        if (walkMultiplier != 1) 'walkMultiplier': walkMultiplier,
       };
 }
 
@@ -1680,6 +1689,14 @@ class ActiveModeEffect extends Effect {
   /// Transformación del Cambiaformas da el doble.
   final int tempHpPerProficiency;
 
+  /// Solo se puede prender con este otro estado activo, y se apaga con él: el
+  /// Poder de lo Salvaje se elige al entrar en Furia.
+  final String? requiresMode;
+
+  /// Se eligen **varias** variantes a la vez y cada una gasta un uso del
+  /// recurso: la Revelación en Carne da un beneficio por punto de hechicería.
+  final bool multiSelect;
+
   final List<Effect> effects;
 
   /// Opciones que se eligen **cada vez** que se activa (Oso, Águila o Lobo
@@ -1694,6 +1711,8 @@ class ActiveModeEffect extends Effect {
     this.noSpellcasting = false,
     this.endsWhenIncapacitated = true,
     this.tempHpPerProficiency = 0,
+    this.requiresMode,
+    this.multiSelect = false,
     this.effects = const [],
     this.variants = const [],
   });
@@ -1709,6 +1728,8 @@ class ActiveModeEffect extends Effect {
         if (!endsWhenIncapacitated) 'endsWhenIncapacitated': false,
         if (tempHpPerProficiency != 0)
           'tempHpPerProficiency': tempHpPerProficiency,
+        if (requiresMode != null) 'requiresMode': requiresMode,
+        if (multiSelect) 'multiSelect': true,
         'effects': [for (final e in effects) e.toJson()],
         if (variants.isNotEmpty)
           'variants': [for (final v in variants) v.toJson()],
@@ -1726,11 +1747,16 @@ class ActiveModeVariant {
   final String description;
   final List<Effect> effects;
 
+  /// Sus efectos no rigen con armadura puesta (el escudo no cuenta): el
+  /// Halcón vuela «si no llevás armadura». La variante sigue elegida.
+  final bool requiresNoArmor;
+
   const ActiveModeVariant({
     required this.id,
     required this.name,
     this.description = '',
     this.effects = const [],
+    this.requiresNoArmor = false,
   });
 
   factory ActiveModeVariant.fromJson(Map<String, dynamic> j) =>
@@ -1739,12 +1765,14 @@ class ActiveModeVariant {
         name: j['name'] as String,
         description: j['description'] as String? ?? '',
         effects: Effect.listFromJson(j['effects']),
+        requiresNoArmor: j['requiresNoArmor'] as bool? ?? false,
       );
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'name': name,
         if (description.isNotEmpty) 'description': description,
+        if (requiresNoArmor) 'requiresNoArmor': true,
         'effects': [for (final e in effects) e.toJson()],
       };
 }

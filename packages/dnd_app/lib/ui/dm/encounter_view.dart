@@ -2009,7 +2009,8 @@ class _CombatantRow extends StatelessWidget {
         if (m.active)
           [
             m.name,
-            ?m.variants.where((v) => v.id == m.activeVariant).firstOrNull?.name,
+            if (m.chosenVariants.isNotEmpty)
+              m.chosenVariants.map((v) => v.name).join(', '),
           ].join(': '),
     ];
   }
