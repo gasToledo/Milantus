@@ -7076,4 +7076,61 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get dmMusicChangeLink => 'Cambiar enlace';
+
+  @override
+  String get settingsMcpGroup => 'Claude Code';
+
+  @override
+  String get mcpTokenCreate => 'Crear token';
+
+  @override
+  String get mcpTokenNameTitle => 'Nuevo token';
+
+  @override
+  String get mcpTokenNameLabel =>
+      'Nombre (por ejemplo, la máquina donde lo usás)';
+
+  @override
+  String get mcpTokenCreatedTitle => 'Token creado';
+
+  @override
+  String get mcpTokenCreatedNote =>
+      'Se muestra una sola vez. Corré este comando en tu terminal para conectar Claude Code al Modo DM.';
+
+  @override
+  String get mcpCommandCopied => 'Comando copiado.';
+
+  @override
+  String get mcpCopyFailed =>
+      'El navegador no dejó copiar. Seleccioná el comando y copialo a mano.';
+
+  @override
+  String get mcpTokensEmpty => 'Sin tokens.';
+
+  @override
+  String get mcpTokensLoadError => 'No se pudieron cargar los tokens.';
+
+  @override
+  String get mcpTokenCreateError => 'No se pudo crear el token.';
+
+  @override
+  String get mcpTokenRevokeError => 'No se pudo revocar el token.';
+
+  @override
+  String mcpTokenRevoke(String name) {
+    return 'Revocar $name';
+  }
+
+  @override
+  String mcpTokenUsed(String used, String expires) {
+    return 'Último uso: $used · Vence: $expires';
+  }
+
+  @override
+  String mcpTokenUnused(String expires) {
+    return 'Sin usar · Vence: $expires';
+  }
+
+  @override
+  String get mcpTokensLoading => 'Cargando los tokens…';
 }

@@ -30,6 +30,12 @@ Middleware requireSession(
 ) {
   return (Handler innerHandler) {
     return (Request request) async {
+      // El MCP ya autenticó con su token y llama a las mismas rutas por
+      // adentro. El contexto de shelf solo lo escribe el servidor: una
+      // petición HTTP no tiene forma de traerlo puesto.
+      if (request.context[userIdContextKey] is String) {
+        return innerHandler(request);
+      }
       final token = readSessionToken(request.headers['cookie']);
       final userId = token == null ? null : await resolveUserId(token);
       if (userId == null) {

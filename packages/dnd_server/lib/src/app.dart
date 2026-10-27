@@ -16,7 +16,9 @@ import 'import/backup_bundle.dart';
 import 'import/homebrew_content.dart';
 import 'import/import_service.dart';
 import 'import/npc_bundle.dart';
+import 'mcp/mcp_handler.dart';
 import 'portraits/portrait_blob_store.dart';
+import 'repositories/api_token_repository.dart';
 import 'repositories/campaign_repository.dart';
 import 'repositories/chapter_repository.dart';
 import 'repositories/character_repository.dart';
@@ -117,6 +119,10 @@ Handler buildHandler({
   /// tiene proveedor de correo configurado: `/api/me` lo avisa y la app
   /// esconde el botón.
   SendFeedbackFn? sendFeedback,
+
+  /// Tokens personales para el MCP. `null` deja afuera `/mcp` y
+  /// `/api/tokens`: las pruebas que no los miran no tienen que armarlos.
+  ApiTokenRepository? apiTokens,
 }) {
   final authenticated = requireSession(auth.resolveUserId);
   final feedbackLimiter = FeedbackRateLimiter();
@@ -411,6 +417,30 @@ Handler buildHandler({
             _feedbackHandler(request, auth, sendFeedback, feedbackLimiter),
       ),
     );
+  if (apiTokens != null) {
+    router
+      ..get(
+        '/api/tokens',
+        authenticated((request) => _listApiTokensHandler(request, apiTokens)),
+      )
+      ..post(
+        '/api/tokens',
+        authenticated((request) => _createApiTokenHandler(request, apiTokens)),
+      )
+      ..delete(
+        '/api/tokens/<id>',
+        authenticated((request) => _revokeApiTokenHandler(request, apiTokens)),
+      )
+      // El Bearer se acepta solo acá: `/api` sigue siendo de la cookie, y el
+      // MCP entra a las mismas rutas por adentro, con la cuenta del token.
+      ..all(
+        '/mcp',
+        mcpHandler(
+          resolveToken: apiTokens.userIdForToken,
+          api: errorHandlingMiddleware(router.call),
+        ),
+      );
+  }
 
   // El router va primero y solo cae al build web estático ante un 404. Pero
   // `/api/*` y `/auth/*` no pasan nunca por la cascada: la Cascade no
@@ -424,7 +454,9 @@ Handler buildHandler({
     final withStatic = Cascade().add(router.call).add(webStaticHandler).handler;
     rootHandler = (request) {
       final path = request.url.path;
-      return path.startsWith('api/') || path.startsWith('auth/')
+      return path.startsWith('api/') ||
+              path.startsWith('auth/') ||
+              path == 'mcp'
           ? router.call(request)
           : withStatic(request);
     };
@@ -434,6 +466,47 @@ Handler buildHandler({
       .addMiddleware(logRequests())
       .addMiddleware(errorHandlingMiddleware)
       .addHandler(rootHandler);
+}
+
+Future<Response> _listApiTokensHandler(
+  Request request,
+  ApiTokenRepository apiTokens,
+) async {
+  final all = await apiTokens.listFor(request.userId);
+  return _jsonOk({
+    'tokens': [for (final t in all) t.toJson()],
+  });
+}
+
+/// El token en claro viaja solo en esta respuesta: después ni el servidor lo
+/// tiene.
+Future<Response> _createApiTokenHandler(
+  Request request,
+  ApiTokenRepository apiTokens,
+) async {
+  final body = await _readJsonBody(request);
+  final name = (body['name'] as String? ?? '').trim();
+  if (name.isEmpty || name.length > 60) {
+    throw const FormatException(
+      'El token necesita un nombre de hasta 60 letras.',
+    );
+  }
+  final (token, secret) = await apiTokens.create(request.userId, name);
+  return _jsonOk({'token': token.toJson(), 'secret': secret});
+}
+
+Future<Response> _revokeApiTokenHandler(
+  Request request,
+  ApiTokenRepository apiTokens,
+) async {
+  final id = requireSafePathSegment(
+    request.params['id']!,
+    label: 'id de token',
+  );
+  if (!await apiTokens.revoke(request.userId, id)) {
+    return _notFound('token_not_found');
+  }
+  return _jsonOk({'status': 'ok'});
 }
 
 Response _healthHandler(Request request) => Response.ok(
@@ -894,6 +967,7 @@ const _notFoundMessages = {
   'character_not_found': 'Personaje no encontrado.',
   'portrait_not_found': 'Retrato no encontrado.',
   'link_not_found': 'Vínculo no encontrado.',
+  'token_not_found': 'Token no encontrado.',
 };
 
 Response _notFound(String code) => Response.notFound(

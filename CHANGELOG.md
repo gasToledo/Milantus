@@ -1012,12 +1012,30 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
+## [0.40.0+1] - 2026-10-27
+
+### Nuevo
+
+- Claude Code se conecta al Modo DM: en Ajustes se crea un token personal y
+  la app muestra el comando para conectarlo. Con él, Claude lista, crea y
+  edita campañas, capítulos, notas del cuaderno y PNJ narrativos. Borrar,
+  cerrar capítulos, combatir y tocar fichas sigue siendo desde la app.
+- El Lanzarrayos del Infiltrado muestra su alcance (90/300 pies) y su 1d6 de
+  relámpago adicional en la fila de ataque.
+
+### Modificado
+
+- Sin cambios.
+
+### Eliminado
+
+- Sin cambios.
+
 ## [Unreleased]
 
 ### Nuevo
 
-- El Lanzarrayos del Infiltrado muestra su alcance (90/300 pies) y su 1d6 de
-  relámpago adicional en la fila de ataque.
+- Sin cambios.
 
 ### Modificado
 

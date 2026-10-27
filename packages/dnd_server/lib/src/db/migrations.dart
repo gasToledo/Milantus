@@ -424,4 +424,23 @@ CREATE INDEX level_up_logs_campaign_idx
   ON level_up_logs (dm_user_id, campaign_id, created_at DESC);
 ''',
   ),
+  Migration(
+    id: '0013_api_tokens',
+    sql: '''
+-- Tokens personales para conectar Claude Code (u otro cliente MCP) a la
+-- cuenta. Como las sesiones, se guarda solo el hash: un volcado de la base no
+-- alcanza para usarlos. Vencen solos; revocar es borrar la fila.
+CREATE TABLE api_tokens (
+  id TEXT PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES accounts (id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  token_hash TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  last_used_at TIMESTAMPTZ,
+  expires_at TIMESTAMPTZ NOT NULL
+);
+
+CREATE INDEX api_tokens_user_idx ON api_tokens (user_id, created_at DESC);
+''',
+  ),
 ];

@@ -27,6 +27,11 @@ class FakeApiServer {
   );
   final Map<String, Map<String, Map<String, dynamic>>> homebrew = {};
   Map<String, dynamic>? settings;
+
+  /// Tokens personales del MCP de esta única cuenta, por id. El servidor no
+  /// devuelve nunca el token en claro salvo al crearlo, y acá tampoco.
+  final Map<String, Map<String, dynamic>> apiTokens = {};
+  int _apiTokenCounter = 0;
   final Map<String, Uint8List> portraits = {};
   List<Map<String, dynamic>> providers = [];
   int _generatedIdCounter = 0;
@@ -312,6 +317,31 @@ class FakeApiServer {
     }
     if (method == 'PUT' && path == '/api/settings') {
       settings = _body(request);
+      return _json({'status': 'ok'});
+    }
+
+    if (method == 'GET' && path == '/api/tokens') {
+      return _json({'tokens': apiTokens.values.toList().reversed.toList()});
+    }
+    if (method == 'POST' && path == '/api/tokens') {
+      final name = (_body(request)['name'] as String? ?? '').trim();
+      if (name.isEmpty) return _json({'error': 'Falta el nombre.'}, 400);
+      final id = 'token-${_apiTokenCounter++}';
+      final now = DateTime.now().toUtc();
+      final token = {
+        'id': id,
+        'name': name,
+        'createdAt': now.toIso8601String(),
+        'expiresAt': now.add(const Duration(days: 90)).toIso8601String(),
+      };
+      apiTokens[id] = token;
+      return _json({'token': token, 'secret': 'mlt_secreto-$id'});
+    }
+    if (method == 'DELETE' && path.startsWith('/api/tokens/')) {
+      final id = path.substring('/api/tokens/'.length);
+      if (apiTokens.remove(id) == null) {
+        return _json({'error': 'Token no encontrado.'}, 404);
+      }
       return _json({'status': 'ok'});
     }
 

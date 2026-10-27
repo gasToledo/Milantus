@@ -11441,6 +11441,102 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Cambiar enlace'**
   String get dmMusicChangeLink;
+
+  /// No description provided for @settingsMcpGroup.
+  ///
+  /// In es, this message translates to:
+  /// **'Claude Code'**
+  String get settingsMcpGroup;
+
+  /// No description provided for @mcpTokenCreate.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear token'**
+  String get mcpTokenCreate;
+
+  /// No description provided for @mcpTokenNameTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Nuevo token'**
+  String get mcpTokenNameTitle;
+
+  /// No description provided for @mcpTokenNameLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre (por ejemplo, la máquina donde lo usás)'**
+  String get mcpTokenNameLabel;
+
+  /// No description provided for @mcpTokenCreatedTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Token creado'**
+  String get mcpTokenCreatedTitle;
+
+  /// No description provided for @mcpTokenCreatedNote.
+  ///
+  /// In es, this message translates to:
+  /// **'Se muestra una sola vez. Corré este comando en tu terminal para conectar Claude Code al Modo DM.'**
+  String get mcpTokenCreatedNote;
+
+  /// No description provided for @mcpCommandCopied.
+  ///
+  /// In es, this message translates to:
+  /// **'Comando copiado.'**
+  String get mcpCommandCopied;
+
+  /// No description provided for @mcpCopyFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'El navegador no dejó copiar. Seleccioná el comando y copialo a mano.'**
+  String get mcpCopyFailed;
+
+  /// No description provided for @mcpTokensEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin tokens.'**
+  String get mcpTokensEmpty;
+
+  /// No description provided for @mcpTokensLoadError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudieron cargar los tokens.'**
+  String get mcpTokensLoadError;
+
+  /// No description provided for @mcpTokenCreateError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo crear el token.'**
+  String get mcpTokenCreateError;
+
+  /// No description provided for @mcpTokenRevokeError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo revocar el token.'**
+  String get mcpTokenRevokeError;
+
+  /// No description provided for @mcpTokenRevoke.
+  ///
+  /// In es, this message translates to:
+  /// **'Revocar {name}'**
+  String mcpTokenRevoke(String name);
+
+  /// No description provided for @mcpTokenUsed.
+  ///
+  /// In es, this message translates to:
+  /// **'Último uso: {used} · Vence: {expires}'**
+  String mcpTokenUsed(String used, String expires);
+
+  /// No description provided for @mcpTokenUnused.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin usar · Vence: {expires}'**
+  String mcpTokenUnused(String expires);
+
+  /// No description provided for @mcpTokensLoading.
+  ///
+  /// In es, this message translates to:
+  /// **'Cargando los tokens…'**
+  String get mcpTokensLoading;
 }
 
 class _AppLocalizationsDelegate

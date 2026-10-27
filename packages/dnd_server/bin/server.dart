@@ -11,6 +11,7 @@ import 'package:dnd_server/src/db/migration_runner.dart';
 import 'package:dnd_server/src/feedback/feedback_mail.dart';
 import 'package:dnd_server/src/import/import_service.dart' as import_service;
 import 'package:dnd_server/src/portraits/disk_portrait_blob_store.dart';
+import 'package:dnd_server/src/repositories/api_token_repository.dart';
 import 'package:dnd_server/src/repositories/account_repository.dart';
 import 'package:dnd_server/src/repositories/campaign_repository.dart';
 import 'package:dnd_server/src/repositories/chapter_repository.dart';
@@ -91,6 +92,7 @@ Future<void> main() async {
       homebrew: PostgresHomebrewRepository(pool),
       levelUps: PostgresLevelUpRepository(pool),
       settings: PostgresSettingsRepository(pool),
+      apiTokens: PostgresApiTokenRepository(pool),
       webStaticHandler: webStaticHandler,
       sendFeedback: config.feedback.enabled
           ? workerFeedbackSender(

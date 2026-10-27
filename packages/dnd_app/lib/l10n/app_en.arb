@@ -1888,5 +1888,21 @@
   "dmMusicResume": "Play",
   "dmMusicMinimize": "Minimize",
   "dmMusicUnembeddable": "This link can't be played outside {site}.",
-  "dmMusicChangeLink": "Change link"
+  "dmMusicChangeLink": "Change link",
+  "settingsMcpGroup": "Claude Code",
+  "mcpTokenCreate": "Create token",
+  "mcpTokenNameTitle": "New token",
+  "mcpTokenNameLabel": "Name (for example, the machine you use it on)",
+  "mcpTokenCreatedTitle": "Token created",
+  "mcpTokenCreatedNote": "It is shown only once. Run this command in your terminal to connect Claude Code to DM Mode.",
+  "mcpCommandCopied": "Command copied.",
+  "mcpCopyFailed": "The browser did not allow copying. Select the command and copy it by hand.",
+  "mcpTokensEmpty": "No tokens.",
+  "mcpTokensLoadError": "Could not load the tokens.",
+  "mcpTokenCreateError": "Could not create the token.",
+  "mcpTokenRevokeError": "Could not revoke the token.",
+  "mcpTokenRevoke": "Revoke {name}",
+  "mcpTokenUsed": "Last used: {used} · Expires: {expires}",
+  "mcpTokenUnused": "Never used · Expires: {expires}",
+  "mcpTokensLoading": "Loading the tokens…"
 }
