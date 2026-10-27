@@ -977,10 +977,16 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - La ficha del miembro que ve el DM muestra las resistencias e inmunidades
   del personaje, con el nombre del estado activo que da cada una.
+- Guerrero de los Elementos: la Armonía con los Elementos se prende desde la
+  ficha gastando 1 punto de concentración y deja elegir daño de ácido, frío,
+  fuego, relámpago o trueno en los golpes sin armas; en nivel 11 da vuelo y
+  nado, y en nivel 17 pregunta a qué elemento resistir. También da el truco
+  Elementalismo, que faltaba.
 
 ### Modificado
 
-- Sin cambios.
+- Corregidos a las reglas 2024 los textos del Guerrero de los Elementos (el
+  alcance de la Armonía es de 10 pies más, no 5).
 
 ### Eliminado
 

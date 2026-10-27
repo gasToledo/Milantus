@@ -308,6 +308,24 @@ void main() {
           containsAll(['bludgeoning', 'piercing', 'slashing']));
     });
 
+    test('Armonía con los Elementos: puño elemental, vuelo y resistencia', () {
+      final c = pj('monk', 'warrior-elements', 17);
+      final normal = compiler.compile(c);
+      final usos = normal.resources
+          .firstWhere((r) => r.key == normal.activeModes.single.resourceKey);
+      CombatOps.activateMode(c.combat, normal, 'elemental_attunement',
+          variant: 'fire');
+      // Gasta un punto de concentración, no el pozo entero.
+      expect(c.combat.resourceUsage[usos.key], 1);
+      final armonia = compiler.compile(c);
+      final puno =
+          armonia.attacks.firstWhere((a) => a.baseWeaponId == unarmedStrikeId);
+      expect(puno.damageTypeOptions, containsAll(['acid', 'thunder']));
+      expect(armonia.speeds[MovementMode.fly], armonia.speed);
+      expect(armonia.speeds[MovementMode.swim], armonia.speed);
+      expect(armonia.resistances, contains('fire'));
+    });
+
     test('El Tercer Ojo da visión en la oscuridad de 120 pies', () {
       final c = pj('wizard', 'diviner', 10);
       final normal = compiler.compile(c);

@@ -1235,33 +1235,37 @@
       {
         "level": 3,
         "name": "Armonía con los Elementos",
-        "description": "Gastás Puntos de Enfoque para infundir tus golpes con un elemento, ganando alcance y daño elemental.",
+        "description": "Gastás 1 punto de concentración para que tus golpes sin armas ganen alcance y daño elemental.",
         "effects": [
-          { "type": "passiveTrait", "name": "Armonía con los Elementos", "description": "Tus Golpes Sin Arma ganan +5 pies de alcance y pueden infligir daño elemental; podés empujar o tirar de objetivos." }
+          { "type": "passiveTrait", "name": "Armonía con los Elementos", "description": "Al comienzo de tu turno podés gastar 1 punto de concentración para imbuirte de energía elemental durante 10 minutos o hasta que quedes incapacitado. Alcance: tus golpes sin armas tienen 10 pies más de alcance. Golpes Elementales: cuando acertás con un golpe sin armas, podés hacer que cause daño de ácido, frío, fuego, relámpago o trueno en vez del normal; si lo hacés, podés obligar al objetivo a una salvación de Fuerza y, si falla, moverlo hasta 10 pies hacia vos o lejos de vos. Además conocés el truco Elementalismo, con Sabiduría como aptitud mágica." },
+          { "type": "grantSpell", "spellId": "elementalism", "ability": "wisdom", "use": "atWill" },
+          { "type": "activeMode", "id": "elemental_attunement", "name": "Armonía con los Elementos", "resourceId": "focus_points", "effects": [{ "type": "weaponRule", "filter": { "unarmed": true }, "damageTypeOptions": ["acid", "cold", "fire", "lightning", "thunder"] }] }
         ]
       },
       {
         "level": 6,
         "name": "Explosión Elemental",
-        "description": "Gastás Puntos de Enfoque para lanzar una explosión elemental a distancia contra varios enemigos.",
+        "description": "Gastás 2 puntos de concentración para una explosión elemental en área a distancia.",
         "effects": [
-          { "type": "passiveTrait", "name": "Explosión Elemental", "description": "Estallido elemental a 20 pies: daño de área (salvación de Destreza)." }
+          { "type": "passiveTrait", "name": "Explosión Elemental", "description": "Como acción Mágica gastás 2 puntos de concentración para que estalle energía elemental en una esfera de 20 pies de radio centrada en un punto a 120 pies o menos. Elegís ácido, frío, fuego, relámpago o trueno: cada criatura en la esfera hace una salvación de Destreza y recibe tres tiradas de tu dado de Artes Marciales de ese daño si falla, o la mitad si la supera." }
         ]
       },
       {
         "level": 11,
         "name": "Paso de los Elementos",
-        "description": "Ganás velocidad de vuelo y de nado mientras canalizás tu sintonía elemental.",
+        "description": "Con la Armonía con los Elementos activa volás y nadás a tu velocidad.",
         "effects": [
-          { "type": "passiveTrait", "name": "Paso de los Elementos", "description": "Velocidad de vuelo y de nado con tu sintonía activa." }
+          { "type": "passiveTrait", "name": "Paso de los Elementos", "description": "Mientras tu Armonía con los Elementos esté activa, también tenés velocidad de vuelo y de nado iguales a tu velocidad." },
+          { "type": "modeExtension", "modeId": "elemental_attunement", "effects": [{ "type": "movementSpeed", "mode": "fly", "equalToWalk": true }, { "type": "movementSpeed", "mode": "swim", "equalToWalk": true }] }
         ]
       },
       {
         "level": 17,
         "name": "Paradigma Elemental",
-        "description": "Ganás resistencia a un tipo de daño elemental, más velocidad y daño elemental reforzado.",
+        "description": "Con la Armonía activa resistís un elemento, tu Paso del Viento daña y tus golpes pegan más.",
         "effects": [
-          { "type": "passiveTrait", "name": "Paradigma Elemental", "description": "Resistencia elemental, velocidad extra y daño adicional al impactar." }
+          { "type": "passiveTrait", "name": "Paradigma Elemental", "description": "Mientras tu Armonía con los Elementos esté activa, ganás también: Resistencia: a ácido, frío, fuego, relámpago o trueno, a elección; al comienzo de cada uno de tus turnos podés cambiarla. Zancada Destructiva: al usar Paso del Viento tu velocidad aumenta 20 pies hasta el final del turno, y cada criatura que elijas recibe una tirada de tu dado de Artes Marciales de daño de ácido, frío, fuego, relámpago o trueno cuando entrás a 5 pies o menos de ella (una vez por turno por criatura). Golpes Potenciados: una vez en cada uno de tus turnos, al acertar con un golpe sin armas, causás una tirada más de tu dado de Artes Marciales del mismo tipo de daño." },
+          { "type": "modeExtension", "modeId": "elemental_attunement", "variants": [{ "id": "acid", "name": "Ácido", "description": "Resistencia al daño de ácido.", "effects": [{ "type": "resistance", "damageType": "acid" }] }, { "id": "cold", "name": "Frío", "description": "Resistencia al daño de frío.", "effects": [{ "type": "resistance", "damageType": "cold" }] }, { "id": "fire", "name": "Fuego", "description": "Resistencia al daño de fuego.", "effects": [{ "type": "resistance", "damageType": "fire" }] }, { "id": "lightning", "name": "Relámpago", "description": "Resistencia al daño de relámpago.", "effects": [{ "type": "resistance", "damageType": "lightning" }] }, { "id": "thunder", "name": "Trueno", "description": "Resistencia al daño de trueno.", "effects": [{ "type": "resistance", "damageType": "thunder" }] }] }
         ]
       }
     ]
