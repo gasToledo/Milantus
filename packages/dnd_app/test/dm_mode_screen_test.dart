@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dnd_app/api/api_client.dart';
+import 'package:dnd_app/data/homebrew_store.dart';
 import 'package:dnd_app/data/settings_service.dart';
 import 'package:dnd_app/theme/app_theme.dart';
 import 'package:dnd_app/theme/app_widgets.dart';
@@ -30,6 +31,7 @@ void main() {
     Size size = const Size(1400, 1000),
     void Function(FakeApiServer)? seed,
     AppSettings? settings,
+    HomebrewStore? Function(ApiClient)? homebrew,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1.0;
@@ -44,6 +46,7 @@ void main() {
         home: DmModeScreen(
           api: api,
           repo: repo,
+          homebrew: homebrew?.call(api),
           settingsController: settings == null
               ? null
               : SettingsController(api, settings),
@@ -2415,6 +2418,38 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Sumar al combate de La Tumba'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    // El DM baja un monstruo de nivel sin tocar el del manual: la copia queda
+    // en su homebrew y elegida en el perfil, lista para sumar al combate.
+    testWidgets('editar una copia guarda una criatura propia y deja el '
+        'original igual', (tester) async {
+      final diablo = repo.creature('bone-devil')!;
+      final antes = diablo.toJson();
+      late HomebrewStore store;
+      await pumpDmMode(
+        tester,
+        seed: seedTable,
+        homebrew: (api) => store = HomebrewStore(api),
+      );
+      await openBestiario(tester);
+      await buscar(tester, diablo.name);
+      await tester.tap(find.byKey(const ValueKey('bestiary-bone-devil')));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Editar una copia'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Guardar'));
+      await tester.pumpAndSettle();
+
+      final copia = store.creatures.values.single;
+      addTearDown(() => repo.creatures.remove(copia.id));
+      expect(copia.name, '${diablo.name} (copia)');
+      expect(copia.source, ContentSource.homebrew);
+      expect(copia.hp, diablo.hp);
+      expect(repo.creature('bone-devil')!.toJson(), antes);
+      expect(find.text(copia.name), findsWidgets);
       expect(tester.takeException(), isNull);
     });
 

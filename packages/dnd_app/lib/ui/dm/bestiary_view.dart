@@ -2,6 +2,8 @@ import 'package:dnd_engine/dnd_engine.dart';
 import 'package:flutter/material.dart';
 
 import '../../api/api_client.dart';
+import '../../data/homebrew_store.dart';
+import '../../homebrew/homebrew_screen.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/app_widgets.dart';
 import 'add_monster_dialog.dart';
@@ -30,11 +32,16 @@ class BestiaryView extends StatefulWidget {
   /// La campaña a cuyo combate se suma, o null si el DM no tiene ninguna.
   final Campaign? campaign;
 
+  /// Donde se guarda la copia de «Editar una copia». Null en los tests que no
+  /// lo usan, y entonces el botón no aparece.
+  final HomebrewStore? homebrew;
+
   const BestiaryView({
     super.key,
     required this.repo,
     required this.api,
     required this.campaign,
+    this.homebrew,
   });
 
   @override
@@ -243,6 +250,46 @@ class _BestiaryViewState extends State<BestiaryView> {
         );
       }
     });
+  }
+
+  /// Abre el formulario de criatura con una copia propia y la guarda en el
+  /// homebrew. El original no se toca: el catálogo no se edita, se copia.
+  ///
+  /// Al guardar queda elegida la copia, que es lo que el DM va a sumar al
+  /// combate; quedarse en el original lo haría buscarla de nuevo.
+  Future<void> _editCopy(Creature original, HomebrewStore store) async {
+    final copy = await Navigator.of(context).push<Creature>(
+      MaterialPageRoute(
+        builder: (_) => CreatureForm(
+          repo: widget.repo,
+          initial: Creature.fromJson(homebrewCopy(original.toJson())),
+        ),
+      ),
+    );
+    if (!mounted) return;
+    if (copy == null) {
+      showAppMessage(context, context.l10n.hbNoChanges);
+      return;
+    }
+    try {
+      await store.saveCreature(copy);
+    } catch (error) {
+      if (!mounted) return;
+      showAppMessage(
+        context,
+        failureMessage(context.l10n.hbSaveError, error),
+        tone: AppMessageTone.error,
+      );
+      return;
+    }
+    widget.repo.creatures[copy.id] = copy;
+    if (!mounted) return;
+    setState(() => _selected = copy);
+    showAppMessage(
+      context,
+      context.l10n.hbSaved(copy.name),
+      tone: AppMessageTone.success,
+    );
   }
 
   @override
@@ -606,6 +653,16 @@ class _BestiaryViewState extends State<BestiaryView> {
         style: TextStyle(fontSize: 12.5, color: pal.textMuted),
       ),
     };
+    // Contorneado y no relleno: sumar al combate sigue siendo la acción del
+    // turno, y dos botones del mismo peso obligarían a leer los dos.
+    final store = widget.homebrew;
+    final copy = store == null
+        ? null
+        : OutlinedButton.icon(
+            onPressed: () => _editCopy(c, store),
+            icon: const Icon(Icons.content_copy, size: 18),
+            label: Text(context.l10n.dmEditCopy),
+          );
     final identity = Row(
       children: [
         ExcludeSemantics(
@@ -660,8 +717,9 @@ class _BestiaryViewState extends State<BestiaryView> {
       LayoutBuilder(
         builder: (context, box) {
           // El botón a la derecha solo si le queda lugar al nombre: en el
-          // teléfono va abajo, a lo ancho de la tarjeta.
-          final inline = box.maxWidth >= 620;
+          // teléfono va abajo, a lo ancho de la tarjeta. Con «Editar una
+          // copia» al lado hacen falta unos 170 px más para lo mismo.
+          final inline = box.maxWidth >= (copy == null ? 620 : 790);
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -670,6 +728,7 @@ class _BestiaryViewState extends State<BestiaryView> {
                   children: [
                     Expanded(child: identity),
                     const SizedBox(width: 16),
+                    if (copy != null) ...[copy, const SizedBox(width: 8)],
                     ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 320),
                       child: action,
@@ -679,7 +738,12 @@ class _BestiaryViewState extends State<BestiaryView> {
               else ...[
                 identity,
                 const SizedBox(height: 12),
-                Align(alignment: Alignment.centerLeft, child: action),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [action, ?copy],
+                ),
               ],
               const SizedBox(height: 16),
               Divider(height: 1, color: pal.hairline),

@@ -9241,6 +9241,12 @@ abstract class AppLocalizations {
   /// **'Sumar al combate de {campaign}'**
   String dmAddToCombatOf(String campaign);
 
+  /// No description provided for @dmEditCopy.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar una copia'**
+  String get dmEditCopy;
+
   /// No description provided for @chapterStatePlanned.
   ///
   /// In es, this message translates to:

@@ -338,6 +338,22 @@ bool _mentions(Object? node, String id) => switch (node) {
   _ => false,
 };
 
+/// Una copia propia de [json], con id y nombre nuevos y origen homebrew.
+///
+/// Viaja por JSON porque es el mismo ida y vuelta que ya hacen el guardado y
+/// la importación: lo que el formulario no edita llega igual al documento
+/// nuevo. La usan el botón de duplicar de Homebrew y el «Editar una copia» del
+/// Bestiario.
+Map<String, dynamic> homebrewCopy(Map<String, dynamic> json) {
+  final name = '${json['name']} (copia)';
+  return {
+    ...json,
+    'id': homebrewId(name),
+    'name': name,
+    'source': ContentSource.homebrew.toJson(),
+  };
+}
+
 /// Genera un id a partir de un nombre (slug + sufijo para evitar colisiones).
 String homebrewId(String name) {
   final slug = name

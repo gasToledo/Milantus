@@ -5634,6 +5634,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get dmEditCopy => 'Edit a copy';
+
+  @override
   String get chapterStatePlanned => 'Coming up';
 
   @override

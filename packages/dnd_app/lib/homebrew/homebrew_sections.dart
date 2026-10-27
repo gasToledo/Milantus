@@ -784,17 +784,8 @@ extension _HomebrewSections on _HomebrewViewState {
   ///
   /// Duplicar es el atajo que más cambia el uso diario: casi ningún homebrew
   /// nace de cero, nace de una espada larga a la que se le cambian dos campos.
-  /// La copia viaja por JSON porque es el mismo ida y vuelta que ya hacen el
-  /// guardado y la importación: lo que el formulario no edita llega igual al
-  /// documento nuevo.
   void _openCopy(_Category category, Map<String, dynamic> json) {
-    final name = '${json['name']} (copia)';
-    final copy = {
-      ...json,
-      'id': homebrewId(name),
-      'name': name,
-      'source': ContentSource.homebrew.toJson(),
-    };
+    final copy = homebrewCopy(json);
     switch (category) {
       case _Category.weapons:
         _editWeapon(Weapon.fromJson(copy));

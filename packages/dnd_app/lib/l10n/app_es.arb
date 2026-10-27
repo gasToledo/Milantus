@@ -4573,6 +4573,7 @@
       }
     }
   },
+  "dmEditCopy": "Editar una copia",
   "chapterStatePlanned": "Próximamente",
   "chapterStateActive": "En marcha",
   "chapterStateCompleted": "Completado",

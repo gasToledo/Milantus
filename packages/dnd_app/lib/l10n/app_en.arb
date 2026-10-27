@@ -1523,6 +1523,7 @@
   "dmEachRolls": "Each copy rolls {formula} on its own.",
   "dmAllStartWith": "All start with {hp}, the book average.",
   "dmAddToCombatOf": "Add to the combat of {campaign}",
+  "dmEditCopy": "Edit a copy",
   "chapterStatePlanned": "Coming up",
   "chapterStateActive": "Underway",
   "chapterStateCompleted": "Completed",

@@ -638,6 +638,7 @@ class _DmModeScreenState extends State<DmModeScreen> {
           repo: widget.repo,
           api: widget.api,
           campaign: _effectiveSelection,
+          homebrew: widget.homebrew,
         ),
       );
     }
