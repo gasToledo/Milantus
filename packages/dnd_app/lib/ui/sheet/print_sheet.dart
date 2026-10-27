@@ -152,7 +152,7 @@ extension _SheetPrint on _SheetScreenState {
         out.write(
           '<tr><td>${_e(a.name)}</td><td class="num">${_signed(a.attackBonus)}</td>'
           '<td>${_e(a.damageText)}</td>'
-          '<td>${_e(repo.weapon(a.baseWeaponId)?.rangeLabel ?? '')}</td></tr>',
+          '<td>${_e(a.rangeLabel ?? '')}</td></tr>',
         );
       }
       out.write('${_emptyRows(4, 1)}</table>');

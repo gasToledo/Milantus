@@ -239,6 +239,10 @@ sealed class Effect {
               Ability.fromKey(a as String),
           ],
           bonus: json['bonus'] as int? ?? 0,
+          rangeNormal: json['rangeNormal'] as int? ?? 0,
+          rangeLong: json['rangeLong'] as int? ?? 0,
+          extraDamageDice: json['extraDamageDice'] as String?,
+          extraDamageType: json['extraDamageType'] as String?,
         ),
       'noArmorStrengthRequirement' => const NoArmorStrengthRequirementEffect(),
       'heroicInspirationOnLongRest' =>
@@ -1415,6 +1419,16 @@ class GrantedWeaponEffect extends Effect {
   /// Bono al ataque y al daño (Armero Mejorado: +1).
   final int bonus;
 
+  /// Alcance en pies, como en `Weapon`; 0 si no tiene.
+  final int rangeNormal;
+  final int rangeLong;
+
+  /// Dado que se tira aparte al acertar, como
+  /// [WeaponRuleEffect.extraDamageDice]: el 1d6 de relámpago del Lanzarrayos.
+  /// El «una vez por turno» queda en el texto, igual que en la Furia Divina.
+  final String? extraDamageDice;
+  final String? extraDamageType;
+
   const GrantedWeaponEffect({
     required this.id,
     required this.name,
@@ -1423,6 +1437,10 @@ class GrantedWeaponEffect extends Effect {
     this.properties = const [],
     this.abilityOptions = const [],
     this.bonus = 0,
+    this.rangeNormal = 0,
+    this.rangeLong = 0,
+    this.extraDamageDice,
+    this.extraDamageType,
   });
 
   @override
@@ -1436,6 +1454,10 @@ class GrantedWeaponEffect extends Effect {
         if (abilityOptions.isNotEmpty)
           'abilityOptions': [for (final a in abilityOptions) a.name],
         if (bonus != 0) 'bonus': bonus,
+        if (rangeNormal != 0) 'rangeNormal': rangeNormal,
+        if (rangeLong != 0) 'rangeLong': rangeLong,
+        if (extraDamageDice != null) 'extraDamageDice': extraDamageDice,
+        if (extraDamageType != null) 'extraDamageType': extraDamageType,
       };
 }
 

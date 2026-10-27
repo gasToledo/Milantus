@@ -580,6 +580,11 @@ class Attack {
   /// La parte del daño que pone cada estado activo, ya incluida en [damage].
   final List<ModeDamageBonus> modeBonuses;
 
+  /// Alcance normal y largo en pies, o null. Va en el ataque y no se busca en
+  /// el catálogo porque hay armas que no están ahí: las de la Armadura
+  /// Arcana.
+  final (int, int)? range;
+
   const Attack({
     required this.weaponId,
     String? baseWeaponId,
@@ -599,6 +604,7 @@ class Attack {
     this.action = AttackAction.action,
     this.critRange = 20,
     this.modeBonuses = const [],
+    this.range,
   })  : baseWeaponId = baseWeaponId ?? weaponId,
         damageTypeOptions = damageTypeOptions ?? const [];
 
@@ -607,6 +613,13 @@ class Attack {
   /// La ficha y la vista del DM armaban cada una «daño + tipo» a mano; con
   /// el daño extra, la que se olvidara de sumarlo mostraba menos de lo que
   /// el personaje pega.
+  /// "90/300 pies" para mostrar, o null si el ataque no tiene alcance.
+  String? get rangeLabel => switch (range) {
+        (final normal, final long) =>
+          '$normal/$long ${localized('pies', 'feet')}',
+        null => null,
+      };
+
   String get damageText => [
         '$damage ${DamageType.labelFor(damageType)}'.trim(),
         for (final extra in extraDamage)
@@ -637,6 +650,7 @@ class Attack {
     AttackAction? action,
     int? critRange,
     List<ModeDamageBonus>? modeBonuses,
+    Object? range = _unset,
   }) =>
       Attack(
         weaponId: weaponId ?? this.weaponId,
@@ -659,6 +673,7 @@ class Attack {
         action: action ?? this.action,
         critRange: critRange ?? this.critRange,
         modeBonuses: modeBonuses ?? this.modeBonuses,
+        range: identical(range, _unset) ? this.range : range as (int, int)?,
       );
 
   Map<String, dynamic> toJson() => {

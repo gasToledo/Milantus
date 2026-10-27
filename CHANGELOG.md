@@ -1016,7 +1016,8 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Nuevo
 
-- Sin cambios.
+- El Lanzarrayos del Infiltrado muestra su alcance (90/300 pies) y su 1d6 de
+  relámpago adicional en la fila de ataque.
 
 ### Modificado
 

@@ -836,25 +836,29 @@ class CharacterCompiler {
       // Las armas que dan los rasgos (el arma del modelo de Armadura Arcana)
       // van siempre: no ocupan las manos.
       for (final g in builder.grantedWeapons.values)
-        _attack(
-          c,
-          Weapon(
-            id: g.id,
-            name: g.name,
-            source: ContentSource.foa2025,
-            category: 'simple',
-            damageDice: g.damageDice,
-            damageType: g.damageType,
-            properties: g.properties,
-          ),
-          mods,
-          profBonus,
-          builder,
-          magicBonus: g.bonus,
-          extraAbilities: g.abilityOptions,
-          conditionsMet: conditionsMet,
-          ruleModes: ruleModes,
-        ),
+        _grantedAttack(
+            g,
+            _attack(
+              c,
+              Weapon(
+                id: g.id,
+                name: g.name,
+                source: ContentSource.foa2025,
+                category: 'simple',
+                damageDice: g.damageDice,
+                damageType: g.damageType,
+                properties: g.properties,
+                rangeNormal: g.rangeNormal,
+                rangeLong: g.rangeLong,
+              ),
+              mods,
+              profBonus,
+              builder,
+              magicBonus: g.bonus,
+              extraAbilities: g.abilityOptions,
+              conditionsMet: conditionsMet,
+              ruleModes: ruleModes,
+            )),
     ];
 
     final spellcastingBlocks = _spellcastingBlocks(
@@ -1954,8 +1958,19 @@ class CharacterCompiler {
       mastery: hasMastery ? w.mastery : null,
       offHand: offHand,
       action: action,
+      range: w.rangeNormal == 0 ? null : (w.rangeNormal, w.rangeLong),
     );
   }
+
+  /// Suma al ataque el dado extra propio del arma del rasgo.
+  Attack _grantedAttack(GrantedWeaponEffect g, Attack a) =>
+      switch ((g.extraDamageDice, g.extraDamageType)) {
+        (final dice?, final type?) => a.copyWith(extraDamage: [
+            ...a.extraDamage,
+            WeaponExtraDamage(dice: dice, type: type),
+          ]),
+        _ => a,
+      };
 
   ActiveMode _activeModeView(
     ActiveModeEffect mode,

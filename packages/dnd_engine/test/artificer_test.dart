@@ -224,6 +224,14 @@ void main() {
       expect(sin.skillAdvantages('stealth'), isEmpty);
     });
 
+    test('el Lanzarrayos tiene alcance y su 1d6 de relámpago aparte', () {
+      final lanzarrayos = arma(
+          compiler.compile(armero(3, 'infiltrator')), 'lightning-launcher')!;
+      expect(lanzarrayos.range, (90, 300));
+      expect(lanzarrayos.extraDamage.map((e) => (e.dice, e.type)),
+          contains(('1d6', 'lightning')));
+    });
+
     test('la Armadura Arcana no exige Fuerza', () {
       final warnings = CharacterValidator(repo).validate(armero(3, 'guardian'));
       expect(warnings.map((w) => w.code), isNot(contains('armor_strength')));
