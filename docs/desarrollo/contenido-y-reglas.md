@@ -44,7 +44,7 @@ Las procedencias persistidas son:
 - Toda elección, competencia, conjuro concedido o recurso persistente debe
   modelarse y sobrevivir guardado, recarga, exportación e importación.
 - Los documentos de usuario (`Character`, `Campaign`, `Chapter`, `Note`,
-  `Encounter` y `EncounterLog`) usan esquema y migraciones. El catálogo no.
+  `Encounter`, `EncounterLog` y `Npc`) usan esquema y migraciones. El catálogo no.
 - No debilitar validaciones ni conteos para hacer pasar una modificación.
 - Los cambios de contenido oficial deben preservar el fallback textual para
   homebrew antiguo cuando corresponda.
@@ -164,7 +164,7 @@ modificación transversal:
 
 ```powershell
 cd packages/dnd_engine
-dart format --output=none --set-exit-if-changed lib test tool
+dart format --output=none --set-exit-if-changed .
 dart analyze
 dart test
 
