@@ -178,32 +178,39 @@ class _CodexCategoryViewState extends State<_CodexCategoryView> {
                     ),
                   ],
                 )
-              : ListView.separated(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  itemCount: results.length,
-                  separatorBuilder: (_, _) =>
-                      Divider(height: 1, color: pal.hairline),
-                  itemBuilder: (context, i) {
-                    final e = results[i];
-                    return ListTile(
-                      key: ValueKey('codex-${widget.category.name}-${e.id}'),
-                      selected: e.id == _selected?.id,
-                      selectedTileColor: pal.goldSoft,
-                      title: Text(
-                        e.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      subtitle: e.subtitle.isEmpty
-                          ? null
-                          : Text(
-                              e.subtitle,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                      onTap: () => setState(() => _selected = e),
-                    );
-                  },
+              // El fondo de la fila elegida lo pinta el `Material` de más
+              // arriba, que el scroll no recorta: sin uno propio, al bajar se
+              // dibujaba encima del buscador y los filtros.
+              : Material(
+                  type: MaterialType.transparency,
+                  clipBehavior: Clip.hardEdge,
+                  child: ListView.separated(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    itemCount: results.length,
+                    separatorBuilder: (_, _) =>
+                        Divider(height: 1, color: pal.hairline),
+                    itemBuilder: (context, i) {
+                      final e = results[i];
+                      return ListTile(
+                        key: ValueKey('codex-${widget.category.name}-${e.id}'),
+                        selected: e.id == _selected?.id,
+                        selectedTileColor: pal.goldSoft,
+                        title: Text(
+                          e.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle: e.subtitle.isEmpty
+                            ? null
+                            : Text(
+                                e.subtitle,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                        onTap: () => setState(() => _selected = e),
+                      );
+                    },
+                  ),
                 ),
         ),
       ],

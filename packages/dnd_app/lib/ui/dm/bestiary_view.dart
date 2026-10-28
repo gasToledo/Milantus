@@ -536,32 +536,39 @@ class _BestiaryViewState extends State<BestiaryView> {
                     ),
                   ],
                 )
-              : ListView.separated(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  itemCount: results.length,
-                  separatorBuilder: (_, _) =>
-                      Divider(height: 1, color: pal.hairline),
-                  itemBuilder: (context, i) {
-                    final c = results[i];
-                    return ListTile(
-                      key: ValueKey('bestiary-${c.id}'),
-                      selected: c.id == _selected?.id,
-                      selectedTileColor: pal.goldSoft,
-                      title: Text(
-                        c.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      subtitle: Text(
-                        c.displayKind,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      leading: _TypeIcon(c.creatureType),
-                      trailing: c.cr == null ? null : _CrPill(c.cr!),
-                      onTap: () => setState(() => _selected = c),
-                    );
-                  },
+              // El fondo de la fila elegida lo pinta el `Material` de más
+              // arriba, que el scroll no recorta: sin uno propio, al bajar se
+              // dibujaba encima del buscador y los filtros.
+              : Material(
+                  type: MaterialType.transparency,
+                  clipBehavior: Clip.hardEdge,
+                  child: ListView.separated(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    itemCount: results.length,
+                    separatorBuilder: (_, _) =>
+                        Divider(height: 1, color: pal.hairline),
+                    itemBuilder: (context, i) {
+                      final c = results[i];
+                      return ListTile(
+                        key: ValueKey('bestiary-${c.id}'),
+                        selected: c.id == _selected?.id,
+                        selectedTileColor: pal.goldSoft,
+                        title: Text(
+                          c.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle: Text(
+                          c.displayKind,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        leading: _TypeIcon(c.creatureType),
+                        trailing: c.cr == null ? null : _CrPill(c.cr!),
+                        onTap: () => setState(() => _selected = c),
+                      );
+                    },
+                  ),
                 ),
         ),
       ],
