@@ -7083,4 +7083,86 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get dmMusicChangeLink => 'Cambiar enlace';
+
+  @override
+  String get tutSkipAll => 'Saltar todos';
+
+  @override
+  String get tutSkip => 'Saltar';
+
+  @override
+  String get tutNext => 'Siguiente';
+
+  @override
+  String get tutDone => 'Entendido';
+
+  @override
+  String get tutWelcomeTitle => 'Te damos la bienvenida';
+
+  @override
+  String get tutWelcomeBody =>
+      'Milantus tiene dos modos: Jugador, para tus personajes, y DM, para dirigir campañas. Pasás de uno a otro con el selector «Modo» del panel lateral.';
+
+  @override
+  String get tutPlayerTitle => 'Modo Jugador';
+
+  @override
+  String get tutPlayerBody =>
+      'Creá un personaje paso a paso y la ficha calcula sola los números. Desde la ficha llevás los PG, el inventario y los conjuros, descansás y subís de nivel. En el Códice consultás reglas, conjuros y objetos.';
+
+  @override
+  String get tutDmTitle => 'Modo DM';
+
+  @override
+  String get tutDmBody =>
+      'Armá campañas y sumá a tus jugadores con el código que te pasan desde su ficha. Organizá capítulos, notas y PNJ, y llevá los combates con la iniciativa y los monstruos del Bestiario.';
+
+  @override
+  String get tutSheetTitle => 'Tu ficha';
+
+  @override
+  String get tutSheetBody =>
+      'El panel lateral separa Personaje, Combate, Inventario, Campaña y Diario. En Combate están los PG, los ataques, los conjuros y los descansos. Para que tu DM vea la ficha, tocá «Compartir» y pasale el código.';
+
+  @override
+  String get tutDmTableBody =>
+      'Acá están los personajes de la mesa. Para sumar uno, pedile al jugador el código de «Compartir» de su ficha y cargalo en «Sumar personaje». Desde el menú de cada uno le concedés Inspiración Heroica.';
+
+  @override
+  String get tutDmChaptersBody =>
+      'Dividí la historia en capítulos, cada uno con su objetivo. Iniciá el que se está jugando y cerralo al terminar: a los jugadores les llega el aviso.';
+
+  @override
+  String get tutDmNotebookBody =>
+      'Las notas se ordenan por capítulo. Aceptan Markdown, y con @Nombre mencionás a un personaje o PNJ de la campaña: la mención abre su ficha.';
+
+  @override
+  String get tutDmNpcsBody =>
+      'Los PNJ de esta campaña, con sus PG y su estado. Traelos de tu biblioteca o creá uno nuevo: solo un nombre con notas, un bloque como los del Bestiario o una ficha completa.';
+
+  @override
+  String get tutDmCombatBody =>
+      'Sumá monstruos del Bestiario y PNJ, tirá iniciativa y avanzá turno a turno llevando PG y condiciones. Si la campaña tiene música para combate, te ofrece ponerla al empezar. Al cerrarlo queda un registro.';
+
+  @override
+  String get tutBestiaryBody =>
+      'Las criaturas del SRD y las tuyas de homebrew. Buscá la que necesites y sumala al combate de la campaña elegida.';
+
+  @override
+  String get tutNpcLibraryBody =>
+      'Tus PNJ son de la cuenta y no de una mesa: uno mismo puede estar en varias campañas. Acá los creás, los editás y los importás.';
+
+  @override
+  String get tutHomebrewBody =>
+      'Cargá tu propio contenido: especies, trasfondos, dotes, conjuros, armas, armaduras, objetos y criaturas. Se usa igual que el del manual, en la creación de personajes y en el Bestiario.';
+
+  @override
+  String get settingsTutorials => 'Tutoriales';
+
+  @override
+  String get settingsTutorialsReset => 'Volver a verlos';
+
+  @override
+  String get settingsTutorialsResetDone =>
+      'Los tutoriales van a volver a salir en cada sección.';
 }

@@ -24,6 +24,7 @@ import 'portrait_viewer.dart';
 import 'app_sidebar.dart';
 import 'save_status_indicator.dart';
 import 'spell_edit_screen.dart';
+import 'tutorials.dart';
 import '../l10n/l10n_context.dart';
 
 part 'sheet/campaign_section.dart';
@@ -229,7 +230,14 @@ class _SheetScreenState extends State<SheetScreen> {
     _settingsController =
         widget.settingsController ??
         SettingsController(widget.controller.api, AppSettings());
-    if (!widget.npcMode) _pollTurn();
+    if (!widget.npcMode) {
+      _pollTurn();
+      // El de la ficha es del jugador: la de un PNJ la abre el DM, que ya
+      // tiene el suyo en la sección de PNJ.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) showTutorialIfPending(context, Tutorial.sheet);
+      });
+    }
     // La ficha es pantalla de juego: con la preferencia de Ajustes prendida,
     // el teléfono no se apaga mientras esté abierta.
     screenAwake.hold();

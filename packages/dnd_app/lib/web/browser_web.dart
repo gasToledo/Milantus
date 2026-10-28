@@ -188,3 +188,13 @@ bool? readStoredScreenAwake() =>
 void writeStoredScreenAwake(bool on) {
   html.window.localStorage[_screenAwakeKey] = '$on';
 }
+
+/// Tutoriales ya vistos (ver `Tutorials`). En el navegador por lo mismo que el
+/// idioma. **Puede lanzar** si el navegador bloquea el almacenamiento.
+const _tutorialsKey = 'milantus.tutorials';
+
+String? readStoredTutorials() => html.window.localStorage[_tutorialsKey];
+
+void writeStoredTutorials(String value) {
+  html.window.localStorage[_tutorialsKey] = value;
+}

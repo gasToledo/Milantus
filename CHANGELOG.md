@@ -1062,3 +1062,11 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 ### Eliminado
 
 - Sin cambios.
+
+## [0.42.0+1] - 2026-10-28
+
+### Nuevo
+
+- Tutoriales de una sola vez: una bienvenida que explica los modos Jugador y
+  DM, y uno al entrar por primera vez a la ficha y a cada sección del Modo DM.
+  Se pueden saltar de a uno o todos juntos, y Ajustes los vuelve a mostrar.

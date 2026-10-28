@@ -7066,4 +7066,86 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dmMusicChangeLink => 'Change link';
+
+  @override
+  String get tutSkipAll => 'Skip all';
+
+  @override
+  String get tutSkip => 'Skip';
+
+  @override
+  String get tutNext => 'Next';
+
+  @override
+  String get tutDone => 'Got it';
+
+  @override
+  String get tutWelcomeTitle => 'Welcome';
+
+  @override
+  String get tutWelcomeBody =>
+      'Milantus has two modes: Player, for your characters, and DM, for running campaigns. Switch between them with the «Mode» selector in the side panel.';
+
+  @override
+  String get tutPlayerTitle => 'Player mode';
+
+  @override
+  String get tutPlayerBody =>
+      'Build a character step by step and the sheet works out the numbers for you. From the sheet you track HP, inventory and spells, take rests and level up. The Codex has the rules, spells and items.';
+
+  @override
+  String get tutDmTitle => 'DM mode';
+
+  @override
+  String get tutDmBody =>
+      'Create campaigns and add your players with the code they send you from their sheet. Organize chapters, notes and NPCs, and run combat with initiative and monsters from the Bestiary.';
+
+  @override
+  String get tutSheetTitle => 'Your sheet';
+
+  @override
+  String get tutSheetBody =>
+      'The side panel splits Character, Combat, Inventory, Campaign and Journal. Combat holds HP, attacks, spells and rests. To let your DM see the sheet, tap «Share» and send them the code.';
+
+  @override
+  String get tutDmTableBody =>
+      'These are the characters at your table. To add one, ask the player for the code from «Share» on their sheet and enter it in «Add character». Each character\'s menu lets you grant Heroic Inspiration.';
+
+  @override
+  String get tutDmChaptersBody =>
+      'Split the story into chapters, each with its goal. Start the one being played and close it when it ends: your players get notified.';
+
+  @override
+  String get tutDmNotebookBody =>
+      'Notes are grouped by chapter. They accept Markdown, and @Name mentions a character or NPC from the campaign: the mention opens their sheet.';
+
+  @override
+  String get tutDmNpcsBody =>
+      'This campaign\'s NPCs, with their HP and status. Bring them from your library or create a new one: just a name with notes, a stat block like the Bestiary\'s, or a full character sheet.';
+
+  @override
+  String get tutDmCombatBody =>
+      'Add monsters from the Bestiary and NPCs, roll initiative and go turn by turn tracking HP and conditions. If the campaign has combat music, you\'re offered to play it when combat starts. Closing it leaves a log.';
+
+  @override
+  String get tutBestiaryBody =>
+      'The SRD creatures plus your homebrew ones. Find the one you need and add it to the selected campaign\'s combat.';
+
+  @override
+  String get tutNpcLibraryBody =>
+      'Your NPCs belong to your account, not to a table: the same one can appear in several campaigns. Create, edit and import them here.';
+
+  @override
+  String get tutHomebrewBody =>
+      'Add your own content: species, backgrounds, feats, spells, weapons, armor, items and creatures. It works just like the book\'s, in character creation and in the Bestiary.';
+
+  @override
+  String get settingsTutorials => 'Tutorials';
+
+  @override
+  String get settingsTutorialsReset => 'Show them again';
+
+  @override
+  String get settingsTutorialsResetDone =>
+      'Tutorials will show up again in each section.';
 }

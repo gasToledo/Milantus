@@ -11453,6 +11453,144 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Cambiar enlace'**
   String get dmMusicChangeLink;
+
+  /// No description provided for @tutSkipAll.
+  ///
+  /// In es, this message translates to:
+  /// **'Saltar todos'**
+  String get tutSkipAll;
+
+  /// No description provided for @tutSkip.
+  ///
+  /// In es, this message translates to:
+  /// **'Saltar'**
+  String get tutSkip;
+
+  /// No description provided for @tutNext.
+  ///
+  /// In es, this message translates to:
+  /// **'Siguiente'**
+  String get tutNext;
+
+  /// No description provided for @tutDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Entendido'**
+  String get tutDone;
+
+  /// No description provided for @tutWelcomeTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Te damos la bienvenida'**
+  String get tutWelcomeTitle;
+
+  /// No description provided for @tutWelcomeBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Milantus tiene dos modos: Jugador, para tus personajes, y DM, para dirigir campañas. Pasás de uno a otro con el selector «Modo» del panel lateral.'**
+  String get tutWelcomeBody;
+
+  /// No description provided for @tutPlayerTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Modo Jugador'**
+  String get tutPlayerTitle;
+
+  /// No description provided for @tutPlayerBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Creá un personaje paso a paso y la ficha calcula sola los números. Desde la ficha llevás los PG, el inventario y los conjuros, descansás y subís de nivel. En el Códice consultás reglas, conjuros y objetos.'**
+  String get tutPlayerBody;
+
+  /// No description provided for @tutDmTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Modo DM'**
+  String get tutDmTitle;
+
+  /// No description provided for @tutDmBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Armá campañas y sumá a tus jugadores con el código que te pasan desde su ficha. Organizá capítulos, notas y PNJ, y llevá los combates con la iniciativa y los monstruos del Bestiario.'**
+  String get tutDmBody;
+
+  /// No description provided for @tutSheetTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu ficha'**
+  String get tutSheetTitle;
+
+  /// No description provided for @tutSheetBody.
+  ///
+  /// In es, this message translates to:
+  /// **'El panel lateral separa Personaje, Combate, Inventario, Campaña y Diario. En Combate están los PG, los ataques, los conjuros y los descansos. Para que tu DM vea la ficha, tocá «Compartir» y pasale el código.'**
+  String get tutSheetBody;
+
+  /// No description provided for @tutDmTableBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Acá están los personajes de la mesa. Para sumar uno, pedile al jugador el código de «Compartir» de su ficha y cargalo en «Sumar personaje». Desde el menú de cada uno le concedés Inspiración Heroica.'**
+  String get tutDmTableBody;
+
+  /// No description provided for @tutDmChaptersBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Dividí la historia en capítulos, cada uno con su objetivo. Iniciá el que se está jugando y cerralo al terminar: a los jugadores les llega el aviso.'**
+  String get tutDmChaptersBody;
+
+  /// No description provided for @tutDmNotebookBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Las notas se ordenan por capítulo. Aceptan Markdown, y con @Nombre mencionás a un personaje o PNJ de la campaña: la mención abre su ficha.'**
+  String get tutDmNotebookBody;
+
+  /// No description provided for @tutDmNpcsBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Los PNJ de esta campaña, con sus PG y su estado. Traelos de tu biblioteca o creá uno nuevo: solo un nombre con notas, un bloque como los del Bestiario o una ficha completa.'**
+  String get tutDmNpcsBody;
+
+  /// No description provided for @tutDmCombatBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Sumá monstruos del Bestiario y PNJ, tirá iniciativa y avanzá turno a turno llevando PG y condiciones. Si la campaña tiene música para combate, te ofrece ponerla al empezar. Al cerrarlo queda un registro.'**
+  String get tutDmCombatBody;
+
+  /// No description provided for @tutBestiaryBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Las criaturas del SRD y las tuyas de homebrew. Buscá la que necesites y sumala al combate de la campaña elegida.'**
+  String get tutBestiaryBody;
+
+  /// No description provided for @tutNpcLibraryBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Tus PNJ son de la cuenta y no de una mesa: uno mismo puede estar en varias campañas. Acá los creás, los editás y los importás.'**
+  String get tutNpcLibraryBody;
+
+  /// No description provided for @tutHomebrewBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Cargá tu propio contenido: especies, trasfondos, dotes, conjuros, armas, armaduras, objetos y criaturas. Se usa igual que el del manual, en la creación de personajes y en el Bestiario.'**
+  String get tutHomebrewBody;
+
+  /// No description provided for @settingsTutorials.
+  ///
+  /// In es, this message translates to:
+  /// **'Tutoriales'**
+  String get settingsTutorials;
+
+  /// No description provided for @settingsTutorialsReset.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver a verlos'**
+  String get settingsTutorialsReset;
+
+  /// No description provided for @settingsTutorialsResetDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Los tutoriales van a volver a salir en cada sección.'**
+  String get settingsTutorialsResetDone;
 }
 
 class _AppLocalizationsDelegate

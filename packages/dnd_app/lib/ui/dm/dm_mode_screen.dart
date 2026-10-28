@@ -34,6 +34,7 @@ import 'npcs/npc_library_view.dart';
 import 'npcs/npc_shared.dart';
 import 'npcs/npc_transfer.dart';
 import 'roll_initiative_dialog.dart';
+import '../tutorials.dart';
 import '../../l10n/l10n_context.dart';
 
 /// El otro sombrero de la misma cuenta.
@@ -604,27 +605,33 @@ class _DmModeScreenState extends State<DmModeScreen> {
     }
     if (section == null && _tool == _GlobalTool.homebrew) {
       if (widget.homebrew case final store?) {
-        return HomebrewView(
-          repo: widget.repo,
-          store: store,
-          characters: widget.characters,
+        return _gate(
+          Tutorial.homebrew,
+          HomebrewView(
+            repo: widget.repo,
+            store: store,
+            characters: widget.characters,
+          ),
         );
       }
     }
     if (section == null && _tool == _GlobalTool.pnj) {
-      return ListenableBuilder(
-        listenable: _campaigns,
-        builder: (context, _) => NpcLibraryView(
-          api: widget.api,
-          repo: widget.repo,
-          campaigns: _campaigns.campaigns,
-          onOpen: (entry) => _openNpc(entry.npc.id),
-          onImport: () => importNpcFlow(
-            context,
+      return _gate(
+        Tutorial.npcLibrary,
+        ListenableBuilder(
+          listenable: _campaigns,
+          builder: (context, _) => NpcLibraryView(
             api: widget.api,
             repo: widget.repo,
             campaigns: _campaigns.campaigns,
-            homebrew: widget.homebrew,
+            onOpen: (entry) => _openNpc(entry.npc.id),
+            onImport: () => importNpcFlow(
+              context,
+              api: widget.api,
+              repo: widget.repo,
+              campaigns: _campaigns.campaigns,
+              homebrew: widget.homebrew,
+            ),
           ),
         ),
       );
@@ -632,13 +639,16 @@ class _DmModeScreenState extends State<DmModeScreen> {
     // Escucha las campañas para que el botón de sumar aparezca cuando terminan
     // de cargar, o cambie de nombre si el DM elige otra.
     if (section == null) {
-      return ListenableBuilder(
-        listenable: _campaigns,
-        builder: (context, _) => BestiaryView(
-          repo: widget.repo,
-          api: widget.api,
-          campaign: _effectiveSelection,
-          homebrew: widget.homebrew,
+      return _gate(
+        Tutorial.bestiary,
+        ListenableBuilder(
+          listenable: _campaigns,
+          builder: (context, _) => BestiaryView(
+            repo: widget.repo,
+            api: widget.api,
+            campaign: _effectiveSelection,
+            homebrew: widget.homebrew,
+          ),
         ),
       );
     }
@@ -671,33 +681,43 @@ class _DmModeScreenState extends State<DmModeScreen> {
         // un panel vacío que obligue a un clic sin decisión detrás.
         final campaign = _effectiveSelection!;
 
-        return _CampaignDetail(
-          key: ValueKey(campaign.id),
-          campaign: campaign,
-          section: section,
-          notebookChapterId: _notebookChapterId,
-          api: widget.api,
-          repo: widget.repo,
-          onEdit: () => _editCampaign(campaign),
-          onDelete: () => _deleteCampaign(campaign),
-          onOpenNotebook: _openNotebook,
-          // Se lee al construir y no se escucha: Ajustes es otra sección de
-          // este mismo panel, y volver a la campaña reconstruye esto.
-          showDifficulty: _settings.settings.showEncounterDifficulty,
-          onOpenNpc: _openNpc,
-          onOpenNpcSheet: _openNpcSheet,
-          // Por id: las escenas de este momento, no las del último build.
-          onCombatStarted: () => _music.offerCombat(
-            _campaigns.campaigns
-                    .where((c) => c.id == campaign.id)
-                    .firstOrNull
-                    ?.musicScenes ??
-                const [],
+        // El tutorial de la sección recién cuando hay campaña: sin ninguna,
+        // la bienvenida del Modo DM ya explica por dónde empezar.
+        return _gate(
+          section.tutorial,
+          _CampaignDetail(
+            key: ValueKey(campaign.id),
+            campaign: campaign,
+            section: section,
+            notebookChapterId: _notebookChapterId,
+            api: widget.api,
+            repo: widget.repo,
+            onEdit: () => _editCampaign(campaign),
+            onDelete: () => _deleteCampaign(campaign),
+            onOpenNotebook: _openNotebook,
+            // Se lee al construir y no se escucha: Ajustes es otra sección de
+            // este mismo panel, y volver a la campaña reconstruye esto.
+            showDifficulty: _settings.settings.showEncounterDifficulty,
+            onOpenNpc: _openNpc,
+            onOpenNpcSheet: _openNpcSheet,
+            // Por id: las escenas de este momento, no las del último build.
+            onCombatStarted: () => _music.offerCombat(
+              _campaigns.campaigns
+                      .where((c) => c.id == campaign.id)
+                      .firstOrNull
+                      ?.musicScenes ??
+                  const [],
+            ),
           ),
         );
       },
     );
   }
+
+  /// Con `key` por tutorial: pasar de una sección a otra crea otra compuerta
+  /// en vez de reusar la anterior, que ya miró al montarse.
+  Widget _gate(Tutorial tutorial, Widget child) =>
+      TutorialGate(key: ValueKey(tutorial), tutorial: tutorial, child: child);
 }
 
 class _CampaignGroupLabel extends StatelessWidget {
@@ -885,7 +905,21 @@ class _CampaignDetail extends StatefulWidget {
   State<_CampaignDetail> createState() => _CampaignDetailState();
 }
 
-enum _CampaignSection { mesa, capitulos, cuaderno, pnj, combate }
+enum _CampaignSection {
+  mesa,
+  capitulos,
+  cuaderno,
+  pnj,
+  combate;
+
+  Tutorial get tutorial => switch (this) {
+    _CampaignSection.mesa => Tutorial.dmTable,
+    _CampaignSection.capitulos => Tutorial.dmChapters,
+    _CampaignSection.cuaderno => Tutorial.dmNotebook,
+    _CampaignSection.pnj => Tutorial.dmNpcs,
+    _CampaignSection.combate => Tutorial.dmCombat,
+  };
+}
 
 /// Las secciones de la cuenta, que se abren con [_CampaignSection] en null.
 enum _GlobalTool { bestiario, pnj, homebrew, settings }

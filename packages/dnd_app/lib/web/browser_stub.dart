@@ -46,3 +46,9 @@ void writeStoredScreenAwake(bool on) {}
 void printHtml(String document) {
   throw UnsupportedError('printHtml solo está disponible en el build web.');
 }
+
+/// Sin navegador no hay a quién guiar: todos cuentan como vistos. Es también
+/// lo que deja a los tests de widget sin un diálogo encima de cada pantalla.
+String? readStoredTutorials() => '*';
+
+void writeStoredTutorials(String value) {}

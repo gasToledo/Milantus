@@ -22,6 +22,7 @@ import 'pending_events_gate.dart';
 import 'save_status_indicator.dart';
 import 'settings_view.dart';
 import 'sheet_screen.dart';
+import 'tutorials.dart';
 import '../l10n/l10n_context.dart';
 
 part 'dashboard/dashboard_actions.dart';
@@ -149,6 +150,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (_settings.startsInDmMode) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _openDmMode(instant: true);
+      });
+    } else {
+      // Quien arranca en el Modo DM ya lo eligió en Ajustes: no es su primera
+      // vez y la bienvenida no tiene nada que contarle.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) showTutorialIfPending(context, Tutorial.welcome);
       });
     }
   }

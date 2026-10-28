@@ -6,6 +6,7 @@ import '../theme/app_theme.dart';
 import '../theme/app_widgets.dart';
 import '../web/screen_awake.dart';
 import 'app_sidebar.dart';
+import 'tutorials.dart';
 
 /// Ancho a partir del cual el control de una fila va al lado de su rótulo.
 const double _kRowBesideWidth = 520;
@@ -158,6 +159,23 @@ class _SettingsViewState extends State<SettingsView> {
                         style: TextStyle(fontSize: 12, color: pal.textMuted),
                       ),
                     ),
+                  // Del navegador, como la pantalla encendida. No los abre
+                  // acá: cada uno vuelve a salir en su sección, que es donde
+                  // se entiende lo que explica.
+                  _row(
+                    context,
+                    title: l10n.settingsTutorials,
+                    control: TextButton(
+                      onPressed: () {
+                        tutorials.reset();
+                        showAppMessage(
+                          context,
+                          l10n.settingsTutorialsResetDone,
+                        );
+                      },
+                      child: Text(l10n.settingsTutorialsReset),
+                    ),
+                  ),
                 ]),
                 const SizedBox(height: 20),
                 _group(context, l10n.dmModeButton, [
