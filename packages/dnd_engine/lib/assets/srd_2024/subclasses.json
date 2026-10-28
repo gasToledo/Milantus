@@ -3080,7 +3080,7 @@
         "name": "Experto Alquímico",
         "description": "Al lanzar un conjuro usando tus Suministros de Alquimista como foco, sumás tu mod. de Inteligencia (mínimo +1) a una tirada de curación o de daño de ácido, fuego o veneno del conjuro.",
         "effects": [
-          { "type": "passiveTrait", "name": "Experto Alquímico", "description": "Suma tu mod. de Inteligencia (mínimo +1) a una tirada de curación o de daño de ácido, fuego o veneno de un conjuro lanzado con tus Suministros de Alquimista." }
+          { "type": "passiveTrait", "name": "Experto Alquímico", "description": "Sumá tu mod. de Inteligencia (mínimo +1) a una tirada de curación o de daño de ácido, fuego o veneno de un conjuro lanzado con tus Suministros de Alquimista." }
         ]
       },
       {
@@ -3488,7 +3488,7 @@
         "name": "Precisión Guiada",
         "description": "Una vez por turno, al lanzar un conjuro de tu lista de Cartógrafo o al acertar con un ataque a una criatura afectada por tu Fuego Feérico, sumás tu mod. de Inteligencia a una tirada de daño. Además, recibir daño ya no puede quitarte la concentración en Fuego Feérico.",
         "effects": [
-          { "type": "passiveTrait", "name": "Precisión Guiada", "description": "Suma tu mod. de Inteligencia a una tirada de daño (una vez por turno); Fuego Feérico ya no pierde concentración por daño recibido." }
+          { "type": "passiveTrait", "name": "Precisión Guiada", "description": "Sumá tu mod. de Inteligencia a una tirada de daño (una vez por turno); Fuego Feérico ya no pierde concentración por daño recibido." }
         ]
       },
       {

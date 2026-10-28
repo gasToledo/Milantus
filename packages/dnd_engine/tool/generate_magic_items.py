@@ -139,6 +139,20 @@ def rarity(metadata: str) -> str:
     return "common"
 
 
+def rarity_for_bonus(metadata: str, bonus: int) -> str | None:
+    """Rareza de la variante +N cuando el manual lista una por bonificador.
+
+    «infrecuente (+1), rara (+2) o muy rara (+3)»: `rarity` mira el bloque
+    entero y dejaría a las tres variantes con la misma, y con ella el mismo
+    precio de referencia. Devuelve None si el bloque no las separa.
+    """
+    match = re.search(
+        rf"(infrecuente|muy rara|rara|legendaria)\s*\(\+{bonus}\)",
+        metadata.lower(),
+    )
+    return rarity(match[1]) if match else None
+
+
 def base_kind(metadata: str) -> str | None:
     value = metadata.lower()
     if value.startswith("arma ") or value.startswith("arma("):
@@ -241,7 +255,9 @@ def expand(block):
     result = []
     for name in names:
         match = re.search(r"\+([123])\b", name)
-        item_rarity = rarity(block["metadata"])
+        item_rarity = (
+            match and rarity_for_bonus(block["metadata"], int(match.group(1)))
+        ) or rarity(block["metadata"])
         result.append(
             {
                 "id": slug(name),
