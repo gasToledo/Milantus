@@ -1015,7 +1015,7 @@
     "effects.2.name": "Medical Intuition",
     "effects.3.name": "Healing Touch",
     "effects.4.name": "Mark Spells",
-    "effects.2.description": "When you make a Wisdom (Medicine) check or a check with an Herbalism Kit, you can roll 1d4 and add it to the check.",
+    "effects.2.description": "When you make a Wisdom (Medicine) check or a check with a Herbalism Kit, you can roll 1d4 and add it to the check.",
     "effects.3.description": "You always have Cure Wounds prepared. You can cast it for free once per Long Rest, and also with slots of the appropriate level. Your spellcasting ability is Intelligence, Wisdom, or Charisma (chosen when you take the feat). At level 3, you add Lesser Restoration on the same terms.",
     "effects.4.description": "If you have the Spellcasting or Pact Magic feature, these spells are added to that feature's list. Level 1: False Life, Healing Word; Level 2: Arcane Vigor, Prayer of Healing; Level 3: Aura of Vitality, Mass Healing Word; Level 4: Aura of Life, Aura of Purity; Level 5: Greater Restoration."
   },
