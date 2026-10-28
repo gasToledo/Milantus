@@ -60,29 +60,52 @@ formatea lo preparado antes de cada commit:
 git config core.hooksPath .githooks
 ```
 
+El hook solo toca los `.dart` preparados, y a los preparados a medias no los
+formatea: los revisa y corta el commit. CI mira `lib test` en la app, `lib bin
+test` en el servidor y todo el paquete en el engine (incluido `tool/`).
+
 El stack completo (Postgres + Zitadel + servidor + cloudflared) se levanta con
 `docker compose up -d --build`; el runbook está en
 `docs/operaciones/despliegue.md`.
+
+### Lo que ningún comando de arriba corre
+
+- `feedback-worker/` (Worker de Cloudflare, solo Node) tiene su `npm test` y
+  **CI no lo ejecuta**.
+- `lib/l10n/app_localizations*.dart` **está versionado**: al tocar un `.arb`,
+  `flutter pub get` (o cualquier build) lo regenera y los tres archivos van en
+  el mismo commit.
+- El esquema de Postgres vive en `packages/dnd_server/lib/src/db/migrations.dart`:
+  solo se **agregan** migraciones al final, nunca se edita una publicada, y
+  corren solas en cada arranque del servidor.
 
 ## Commits, versión y despliegue
 
 `main` es el único tronco activo: se valida local, se commitea y se pushea
 directo. Los mensajes siguen `tipo(paquete): resumen` en español
-(`feat(dnd_app): los descansos se pueden deshacer`, `fix`, `test`, `ci`, `build`;
-sin paquete cuando cruza varios).
+(`feat(dnd_app): los descansos se pueden deshacer`, `fix`, `test`, `ci`, `build`,
+`docs`; sin paquete cuando cruza varios).
 
 Cambiar `version` en un `pubspec.yaml` exige actualizar `CHANGELOG.md` en el
 mismo commit, y un cambio grande (capacidad visible, esquema persistido, o que
 cruza engine, cliente y servidor) sube la versión. El criterio y el formato
 están en `docs/desarrollo/versionado-y-changelog.md`.
 
-El push dispara CI (`.github/workflows/ci.yml`): formato, análisis y pruebas de
-los tres paquetes, con las pruebas de la app en dos mitades en paralelo con el
-build web. CD (`cd.yml`) arranca recién cuando CI termina en verde sobre
-`main`: **CI en rojo no llega a producción**. Su job `gate` despliega solo si
-cambió algo desplegable desde el último CD exitoso — `packages/**`,
-`docker-compose.yml` o `postgres-init/**`, sin contar `packages/*/test/` ni
-`packages/*/tool/`, que tampoco entran a la imagen (`.dockerignore`).
+El push dispara CI (`.github/workflows/ci.yml`, en cualquier rama y en los pull
+requests): formato, análisis y pruebas de los tres paquetes, con las pruebas de
+la app en dos mitades en paralelo con el build web. CD (`cd.yml`) arranca recién
+cuando CI termina en verde sobre `main`: **CI en rojo no llega a producción**
+(el commit queda en `main` y se arregla con otro). Su job `gate` despliega solo
+si cambió algo desplegable desde el último CD exitoso — `packages/**`,
+`docker-compose.yml`, `postgres-init/**` o el propio `cd.yml`, sin contar
+`packages/*/test/` ni `packages/*/tool/`, que tampoco entran a la imagen
+(`.dockerignore`). Un commit de solo docs no despliega.
+
+Dos cosas que muerden en el despliegue: la imagen base de Flutter solo publica
+*minor* (`3.44.0`, nunca `3.44.8`), así que `environment.sdk` de `dnd_app` no
+puede llevar una cota de patch; y `cd.yml` usa `clean: false` porque el `.env`
+y las credenciales de cloudflared viven sin versionar en el directorio del
+runner. Ambas razones están escritas en el `Dockerfile` y en `cd.yml`.
 
 Lo que solo se ve con el stack real (migraciones, túnel, caché del navegador) se
 prueba a mano en producción y se anota en
@@ -163,11 +186,16 @@ un miembro, aviso al DM cuando se borra un personaje), le pasa al repositorio un
 fila de `campaign_members` que una consulta anterior ya autorizó; nunca de la
 petición.
 
+El conector MCP (`POST /mcp`, `lib/src/app_mcp.dart`) es una segunda entrada al
+mismo servidor con la misma regla: llama a los repositorios con la cuenta del
+token, y sus herramientas de escritura tampoco tocan fichas ajenas. Autorización
+y herramientas: `docs/arquitectura/mcp.md`.
+
 **Ojo:** los tests del servidor corren contra repositorios en memoria
 (`test/fakes/in_memory_*`), que reimplementan ese `WHERE` en Dart. El SQL de
 `lib/src/repositories/` no lo ejecuta ningún test: un `WHERE` mal escrito pasa
 la suite entera. Al tocar una consulta de autorización, revisala a mano y
-probala contra el stack real.
+probala contra el stack real. Un repositorio nuevo trae su doble en memoria.
 
 ### El DM no escribe la ficha de otra cuenta
 
@@ -195,26 +223,19 @@ procedencia SRD que decide la atribución CC BY. Si una se rompe, es un aviso y
 no un test molesto.
 
 Los catálogos grandes se generan con herramientas commiteadas en
-`packages/dnd_engine/tool/`. No edites `creatures.json` a mano: corré
-`generate_bestiary.dart`. Ojo que el PDF del SRD en español está **en metros** y
-el catálogo en pies.
-
-Varias de esas herramientas **parchean** en vez de generar, y hay que correrlas
-después: `generate_items.dart` le pone peso y precio a `weapons.json` y
-`armor.json`; `apply_structured_content.py` aplica equipo inicial y planos;
-después de `generate_magic_items.py` van, en este orden,
-`extract_magic_item_text.dart` (la descripción, leída con `pdftotext`),
-`apply_magic_item_charges.dart` (las cargas), `apply_magic_item_kinds.dart`
-(qué clase de objeto es, para los planos del Artífice) y `apply_voseo.dart`
-(el SRD en español está en tuteo). Si alguien regenera y se olvida de un paso,
-`content_integrity_test` lo dice. El detalle está en
-`docs/desarrollo/contenido-y-reglas.md`.
+`packages/dnd_engine/tool/`, y varias **parchean** en vez de generar: hay un
+orden y un paso final (`apply_voseo.dart`, porque el SRD en español está en
+tuteo) que quien regenera suele olvidar; `content_integrity_test` lo avisa. No
+edites `creatures.json` a mano: corré `generate_bestiary.dart`. Ojo que el PDF
+del SRD en español está **en metros** y el catálogo en pies. Orden, fuentes y
+precedencia: `docs/desarrollo/contenido-y-reglas.md`.
 
 El inglés del catálogo vive aparte, en `X.en.json` junto a cada `X.json`, y
 se **corrige a mano**: es la excepción a no editar lo generado. Regenerar el
 español deja huellas desfasadas que el test señala; cómo completarlo y
 cuándo correr `translate_content.dart --refresh` está en
-`docs/desarrollo/contenido-y-reglas.md` §Traducción al inglés.
+`docs/desarrollo/contenido-y-reglas.md` §Traducción al inglés. Un catálogo
+nuevo se registra además en los assets de `packages/dnd_app/pubspec.yaml`.
 
 ## Frontend
 
@@ -231,7 +252,8 @@ Lo que más se olvida:
 - Georgia solo para títulos y valores de plaqueta. Un número pensado para
   comparar contra el de al lado va en sans negrita con
   `FontFeature.tabularFigures()`.
-- Radio 12 para tarjetas, 20 para pills, 9 para el panel lateral.
+- Radio 12 por defecto (tarjetas, placas) y 20 para pills; el resto de la
+  escala está en `diseno-web.md` §5.1.
 - Para medir el ancho disponible, `LayoutBuilder` y **nunca `MediaQuery.size`**:
   el panel lateral de 236 px es invisible para `MediaQuery`.
 - Todo `IconButton` lleva `tooltip`.
@@ -245,6 +267,8 @@ Lo que más se olvida:
   `test/l10n_no_literals_test.dart` falla, y `l10n_parity_test.dart` si falta
   una clave en un idioma. Cómo agregar un texto y el glosario en inglés:
   `docs/desarrollo/textos.md`.
+- Los rótulos del motor (`label`) siguen a `ContentLanguage.current`, un estado
+  global: un test que lo cambia lo restaura en `tearDown`.
 
 Los widgets de estado ya existen y se usan siempre los mismos: `AppErrorView`
 (con `onRetry`), `AppBusyLabel` (el texto es obligatorio) y `AppEmptyState`,
@@ -281,7 +305,15 @@ esperados **derivados del catálogo** (`repo.creature('...')!`) y no literales, 
 
 Buscá `ponytail:` en el código: son simplificaciones deliberadas, cada una con
 su techo y su camino de salida escritos al lado. Antes de "arreglar" una,
-leela — puede ser una decisión y no un olvido.
+leela — puede ser una decisión y no un olvido. Las que más se tropiezan:
+
+- Los formularios de homebrew (`lib/homebrew/forms/`) **no editan** todos los
+  campos —prerrequisito de una dote, cargas de un objeto, salvaciones de una
+  criatura, equipo de un trasfondo—: los conservan del original. Un campo nuevo
+  en esos modelos no aparece en el formulario por sí solo.
+- `tool/l10n_literals.dart` es una heurística sobre el texto fuente: no ve
+  cadenas multilínea ni texto armado por partes, así que un `flutter test` en
+  verde no prueba que no haya texto suelto. Si sobra, `// l10n-ignore: motivo`.
 
 ## Documentación
 
@@ -291,6 +323,7 @@ Si el código y una guía discrepan, manda el código y la guía se corrige en e
 mismo cambio.
 
 - `docs/arquitectura/modo-dm.md` — seguridad y contratos del Modo DM.
+- `docs/arquitectura/mcp.md` — el conector de Claude: autorización y herramientas.
 - `docs/desarrollo/contenido-y-reglas.md` — fuentes, catálogo y validación.
 - `docs/desarrollo/diseno-web.md` — sistema visual y componentes.
 - `docs/desarrollo/textos.md` — glosario y convenciones de los textos visibles,
