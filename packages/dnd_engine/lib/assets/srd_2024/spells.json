@@ -5971,7 +5971,7 @@
     "castingTime": "1 minuto",
     "range": "Personal",
     "components": "V, S",
-    "duration": "Instantánea",
+    "duration": "1 minuto",
     "concentration": false,
     "ritual": true,
     "description": "Comulgás con la naturaleza y obtenés información del terreno circundante en un radio de 3 millas al aire libre, o de 300 pies bajo tierra. Elegís tres datos del área.",

@@ -13783,7 +13783,7 @@
     "cr": 9,
     "ac": "14",
     "hp": "123",
-    "speed": "30 pies",
+    "speed": "20 pies",
     "abilityScores": {
       "str": 20,
       "dex": 9,
@@ -17170,7 +17170,7 @@
         "name": "Pico",
         "attackBonus": "4",
         "reach": "5 pies",
-        "damage": "1d8+2",
+        "damage": "1d6+2",
         "damageType": "slashing"
       }
     ],
@@ -19785,7 +19785,7 @@
         "name": "Golpe",
         "attackBonus": "6",
         "reach": "10 pies",
-        "damage": "3d6+4",
+        "damage": "2d8+4",
         "damageType": "bludgeoning"
       }
     ],

@@ -197,6 +197,18 @@ String _reflow(List<String> lines) {
   return out.toString();
 }
 
+/// Medidas escritas con la palabra «metros» y un factor, sin unidad pegada al
+/// número: la regla general no las ve. Van con los valores del manual en
+/// inglés (5 × modificador de Inteligencia, y 10 × en el Talismán), y después
+/// de la conversión general, que no las toca.
+const _metrosEnPalabras = <(String, String)>[
+  ('una cantidad de metros igual a 1,5 ×', 'una cantidad de pies igual a 5 ×'),
+  (
+    'una cantidad de metros adicionales igual a 3 ×',
+    'una cantidad de pies adicionales igual a 10 ×'
+  ),
+];
+
 String _unidades(String text) {
   for (final (antes, despues) in _medidasEspeciales) {
     text = text.replaceAll(antes, despues);
@@ -221,13 +233,17 @@ String _unidades(String text) {
     RegExp(r'(\d+(?:,\d+)?)/(\d+(?:,\d+)?) m(?![\p{L}\p{N}_])', unicode: true),
     (m) => '${metersToFeet(m[1]!)}/${metersToFeet(m[2]!)} pies',
   );
-  return text.replaceAllMapped(
+  text = text.replaceAllMapped(
     RegExp(r'(\d+(?:,\d+)?) m(?![\p{L}\p{N}_])', unicode: true),
     (m) {
       final feet = metersToFeet(m[1]!);
       return '$feet ${feet == 1 ? 'pie' : 'pies'}';
     },
   );
+  for (final (antes, despues) in _metrosEnPalabras) {
+    text = text.replaceAll(antes, despues);
+  }
+  return text;
 }
 
 /// Título con que el PDF imprime un objeto del catálogo: las variantes +1, +2 y

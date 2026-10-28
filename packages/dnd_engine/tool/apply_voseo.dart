@@ -54,7 +54,7 @@ const _palabras = <String, String>{
   'consagras': 'consagrás', 'conservas': 'conservás',
   'consigues': 'conseguís', 'conviertes': 'convertís',
   'convocas': 'convocás', 'corres': 'corrés', 'creas': 'creás',
-  'cubres': 'cubrís', 'cumples': 'cumplís', 'curas': 'curás',
+  'cubres': 'cubrís', 'crees': 'creés', 'cumples': 'cumplís', 'curas': 'curás',
   'dañas': 'dañás', 'debes': 'debés', 'decides': 'decidís',
   'dedicas': 'dedicás', 'dejas': 'dejás', 'derribas': 'derribás',
   'desapareces': 'desaparecés', 'desatas': 'desatás',
@@ -111,6 +111,10 @@ const _mayusculas = <String, String>{
   'Tira': 'Tirá',
   'Consulta': 'Consultá',
   'Aplica': 'Aplicá',
+  'Utiliza': 'Utilizá',
+  'Realiza': 'Realizá',
+  'Resta': 'Restá',
+  'Suma': 'Sumá',
 };
 
 /// Frases exactas: cambian el pronombre junto con el verbo, o desambiguan un
@@ -199,7 +203,13 @@ void main() {
     final name = file.uri.pathSegments.last;
     // El bestiario habla de las criaturas en tercera persona, y lo escribe su
     // propio generador.
-    if (!name.endsWith('.json') || name == 'creatures.json') continue;
+    // Las superposiciones `X.en.json` están en inglés: «reduces» pasaría a
+    // «reducís» y la traducción quedaría con español adentro.
+    if (!name.endsWith('.json') ||
+        name.endsWith('.en.json') ||
+        name == 'creatures.json') {
+      continue;
+    }
     final before = file.readAsStringSync();
     final after = voseo(before);
     if (after != before) {

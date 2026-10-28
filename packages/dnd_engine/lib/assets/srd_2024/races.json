@@ -654,7 +654,7 @@
     "source": "foa_2025",
     "creatureType": "Humanoide",
     "iconId": "handshake",
-    "tagline": "Hijos de Khorvaire, el puente entre",
+    "tagline": "Hijos de Khorvaire, el puente entre humanos y elfos",
     "description": "Durante siglos, los descendientes de humanos y elfos formaron sus propias comunidades y tradiciones en Khorvaire. Casas como Lyrandar y Medani reforzaron esa identidad compartida. Se llaman a sí mismos khoravar, \"hijos de Khorvaire\", y muchos rechazan el nombre de medio elfo.\n\nSu filosofía los presenta como un puente entre pueblos, por lo que abundan entre ellos bardos, diplomáticos, mediadores y traductores. Otros interpretan su herencia feérica como un vínculo entre el mundo material y Thelanis, y siguen caminos de druida o pactos con archiféricos.",
     "size": "Mediano",
     "sizeOptions": ["Mediano", "Pequeño"],
