@@ -894,7 +894,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get deathSaves => 'Death saves';
+  String get deathSaves => 'Death Saving Throws';
 
   @override
   String get combatAmount => 'Amount';
@@ -1251,7 +1251,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String exhaustionRules(Object max) {
-    return 'Each level subtracts 2 from ability checks, saving throws, attack rolls and initiative, and 5 feet from speed. At level $max the character dies.\n\nThe sheet already applies the penalty to all of its numbers: do not subtract it again. It also affects death saves, even though those carry no number.\n\nA long rest lowers it by one level.';
+    return 'Each level subtracts 2 from ability checks, saving throws, attack rolls and initiative, and 5 feet from speed. At level $max the character dies.\n\nThe sheet already applies the penalty to all of its numbers: do not subtract it again. It also affects Death Saving Throws, even though those carry no number.\n\nA long rest lowers it by one level.';
   }
 
   @override
@@ -1519,7 +1519,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get advantageSavesVsSpells => 'Advantage on saves against spells';
 
   @override
-  String get advantageDeathSaves => 'Advantage on death saves';
+  String get advantageDeathSaves => 'Advantage on Death Saving Throws';
 
   @override
   String get traitsAndFeatsTitle => 'Features and feats';
