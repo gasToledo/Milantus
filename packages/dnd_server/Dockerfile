@@ -47,7 +47,21 @@ WORKDIR /workspace/packages/dnd_server
 RUN --mount=type=cache,id=pub-dart,target=/pub-cache dart pub get
 RUN --mount=type=cache,id=pub-dart,target=/pub-cache dart compile exe bin/server.dart -o /workspace/dnd_server_bin
 
-# ---- Etapa 3: runtime mínimo ----
+# ---- Etapa 3: build del cliente React (Node), servido bajo /v2 ----
+# Versión de Node fijada a propósito (a diferencia de las otras etapas): el
+# `package-lock.json` ya fija las dependencias y acá solo falta que el runtime
+# que las instala no se mueva solo. El caché de npm sigue la misma lógica que
+# el pub-cache de arriba: vive en BuildKit y no en una capa, así el `COPY` del
+# código no obliga a bajar todo de nuevo. `package*.json` se copia antes que
+# el resto para que `npm ci` solo se repita cuando cambian las dependencias.
+FROM node:22-alpine AS web-v2-build
+WORKDIR /workspace/packages/dnd_web
+COPY packages/dnd_web/package.json packages/dnd_web/package-lock.json ./
+RUN --mount=type=cache,id=npm-web-v2,target=/root/.npm npm ci
+COPY packages/dnd_web ./
+RUN npm run build
+
+# ---- Etapa 4: runtime mínimo ----
 # `dart compile exe` produce un binario nativo: no hace falta el SDK de Dart
 # ni el de Flutter en la imagen final, así que ninguna clave ni credencial de
 # build llega a la imagen publicada (no hay ninguna en primer lugar: la
@@ -60,11 +74,13 @@ RUN apt-get update \
 WORKDIR /app
 COPY --from=server-build /workspace/dnd_server_bin ./dnd_server
 COPY --from=web-build /workspace/packages/dnd_app/build/web ./web
+COPY --from=web-v2-build /workspace/packages/dnd_web/dist ./web-v2
 # El catálogo SRD, para las fichas calculadas y la búsqueda del MCP: el
 # binario no lleva los assets del engine adentro.
 COPY packages/dnd_engine/lib/assets/srd_2024 ./content
 
 ENV DND_WEB_ROOT=/app/web
+ENV DND_WEB_V2_ROOT=/app/web-v2
 ENV DND_CONTENT_DIR=/app/content
 EXPOSE 8080
 
