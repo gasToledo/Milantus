@@ -1,5 +1,5 @@
 # Construye la imagen única del stack: el mismo contenedor sirve la API y el
-# build web (ver design.md, decisión D5 y capacidad `self-hosted-deployment`)
+# build web (ver capacidad `self-hosted-deployment`)
 # porque el cliente llama a `/api` con rutas relativas al mismo origen que lo
 # sirvió, sin `baseUrl` propio (`lib/api/api_client.dart`).
 #

@@ -1,5 +1,5 @@
 # Composición del stack autoalojado completo (ver capacidad
-# `self-hosted-deployment` y design.md). Un único `docker compose up -d`
+# `self-hosted-deployment`). Un único `docker compose up -d`
 # levanta todo lo que hace falta: API + cliente web (misma imagen, ver
 # `packages/dnd_server/Dockerfile`), la base de la aplicación, Zitadel con su
 # propia base (API + UI de login, que Zitadel v4 separa en dos contenedores,
@@ -30,7 +30,7 @@ name: proyecto-dnd
 x-zitadel-env: &zitadel-env
   ZITADEL_PORT: "8080"
   # MUST coincidir exactamente con el hostname del túnel para Zitadel
-  # (ver cloudflared/config.example.yml y design.md, decisión D5): si
+  # (ver cloudflared/config.example.yml): si
   # difiere, el descubrimiento OIDC falla.
   ZITADEL_EXTERNALDOMAIN: ${ZITADEL_EXTERNAL_DOMAIN}
   ZITADEL_EXTERNALPORT: "443"
@@ -57,7 +57,7 @@ x-zitadel-env: &zitadel-env
 
 services:
   # Instancia única de PostgreSQL para la base de la aplicación y la de
-  # Zitadel (ver design.md, decisión D11): dos motores de la misma versión no
+  # Zitadel: dos motores de la misma versión no
   # aportaban aislamiento real en un host único y duplicaban volumen,
   # respaldo y comprobación de salud. `postgres-init/` crea el rol y la base
   # de Zitadel al inicializar el volumen (solo corre la primera vez, con el

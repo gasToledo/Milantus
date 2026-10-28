@@ -1,6 +1,6 @@
 #!/bin/sh
 # Crea el rol y la base de Zitadel dentro de la misma instancia de
-# PostgreSQL que la base de la aplicación (ver design.md, decisión D11).
+# PostgreSQL que la base de la aplicación.
 #
 # Corre una sola vez: la imagen oficial de postgres solo ejecuta los
 # scripts de `/docker-entrypoint-initdb.d/` cuando el volumen de datos está
@@ -18,7 +18,7 @@
 # incluido, así que este REVOKE no le cierra el paso a la base de Zitadel: la
 # aplicación ya podía llegar a cualquier base de esta instancia antes de que
 # hubiera una segunda. El aislamiento que agrega esta migración es en un solo
-# sentido (ver design.md, decisión D11, Risks/Trade-offs).
+# sentido.
 set -eu
 
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
