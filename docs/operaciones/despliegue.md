@@ -73,7 +73,7 @@ Runbook operativo del stack de contenedores.
 
    Si el que se cuelga es `zitadel` o `zitadel-login`, revisar `docker compose
    logs zitadel-setup` y `docker compose logs zitadel`, en ese orden. `db`
-   sirve las dos bases (aplicación y Zitadel, ver design.md, decisión D11); si
+   sirve las dos bases (aplicación y Zitadel); si
    `zitadel` no arranca, revisar también `docker compose logs db` para
    confirmar que `postgres-init/init-zitadel-db.sh` corrió sin error.
 
@@ -236,7 +236,7 @@ Dos workflows en `.github/workflows/`:
 ### Registrar el runner autoalojado
 
 El runner corre en el mismo host que `docker compose`, nunca en una máquina
-aparte (ver design.md, D1): así el despliegue es `docker compose up -d
+aparte: así el despliegue es `docker compose up -d
 --build` local, sin SSH ni socket Docker expuesto hacia afuera.
 
 1. En GitHub: *Settings → Actions → Runners → New self-hosted runner*, a
@@ -267,7 +267,7 @@ Configurar en *Settings → Branches* para `main`:
 
 - Sin *force-push* ni borrado de la rama.
 - Restringir el push a quienes deban poder disparar un despliegue: es el control
-  de acceso sobre `cd.yml` (ver design.md, D5).
+  de acceso sobre `cd.yml`.
 - No exigir pull request. CI corre después del push y CD espera su resultado:
   un commit con CI en rojo queda en `main` pero no llega a producción hasta
   que un commit posterior lo arregle.
@@ -345,7 +345,7 @@ esa falla **antes** de ese arreglo, sigue haciendo falta el reset. La otra causa
 es el arranque interrumpido a mano o por reinicio del host.
 
 Reset de la base de Zitadel **sin tocar la de la aplicación** (las dos comparten
-instancia de PostgreSQL, ver design.md, decisión D11, y
+instancia de PostgreSQL) y
 `postgres-init/init-zitadel-db.sh` solo corre con el volumen vacío, así que
 recrear el contenedor no alcanza):
 
@@ -422,8 +422,7 @@ docker history --no-trunc dnd-server:check | grep -i -E 'password|secret|key' ||
 Todo el estado persistente vive en dos volúmenes con nombre (más
 `zitadel-bootstrap`, que es recreable y no hace falta respaldar: es solo el
 token de servicio entre `zitadel` y `zitadel-login`). Las dos bases —
-aplicación y Zitadel— comparten una sola instancia de PostgreSQL (ver
-design.md, decisión D11), así que un solo `pg_dump` con `--create` alcanza
+aplicación y Zitadel— comparten una sola instancia de PostgreSQL, así que un solo `pg_dump` con `--create` alcanza
 para las dos.
 
 ```sh
@@ -444,7 +443,7 @@ docker compose restart server
 `pg_dumpall` requiere un rol con permiso para leer roles y todas las bases.
 `$APP_DB_USER` alcanza: la imagen oficial de postgres crea a `POSTGRES_USER`
 como **superusuario de la instancia**, no como un rol acotado a su propia
-base (ver design.md, decisión D11, y el comentario en
+base (ver el comentario en
 `postgres-init/init-zitadel-db.sh`) — es lo mismo que le permite a la
 aplicación llegar a la base de Zitadel pese al `REVOKE CONNECT` de esa base.
 
@@ -475,12 +474,12 @@ ejecutado:
    personaje y la sesión de cuenta siguen ahí (los datos sobreviven al
    reinicio; la sesión de navegador expira a las 12 h, ver
    `session_cookie.dart`, así que puede pedir volver a iniciar sesión).
-6. Verificar la unificación de bases (tarea 10.12, D11):
+6. Verificar la unificación de bases (tarea 10.12):
    - `docker compose exec -T db psql -U zitadel -d "$APP_DB_NAME" -c '\q'`
      MUST fallar (`FATAL: permission denied for database`).
    - `docker compose exec -T db psql -U "$APP_DB_USER" -d zitadel -c '\q'`
-     SHALL funcionar: es el lado asimétrico documentado en design.md,
-     decisión D11 — la aplicación llega a la base de Zitadel porque
+     SHALL funcionar: es el lado asimétrico documentado en
+     `postgres-init/init-zitadel-db.sh` — la aplicación llega a la base de Zitadel porque
      `$APP_DB_USER` es superusuario de la instancia, no una excepción a
      corregir acá.
 

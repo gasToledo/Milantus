@@ -13,7 +13,7 @@
 # Los dos nombres públicos MUST ser distintos (ver requisito "Nombres
 # públicos requeridos"): uno para la aplicación, otro para el emisor OIDC. El
 # de Zitadel MUST coincidir exactamente con `ZITADEL_EXTERNAL_DOMAIN` en
-# `.env`, o el descubrimiento OIDC falla (ver design.md, decisión D5).
+# `.env`, o el descubrimiento OIDC falla.
 
 tunnel: <TUNNEL_ID>
 credentials-file: /etc/cloudflared/creds.json
