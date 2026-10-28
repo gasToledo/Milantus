@@ -72,8 +72,6 @@ services:
       POSTGRES_PASSWORD: ${APP_DB_PASSWORD}
       # Solo la lee `postgres-init/init-zitadel-db.sh`; Postgres no la usa.
       ZITADEL_DB_PASSWORD: ${ZITADEL_DB_PASSWORD}
-    ports:
-      - "5432:5432"
     volumes:
       - app-db-data:/var/lib/postgresql
       - ./postgres-init:/docker-entrypoint-initdb.d:ro
@@ -107,7 +105,7 @@ services:
   # base nunca sale sola. Separado, la migración corre en un contenedor de una
   # sola vez con `restart: "no"`: si falla, falla ruidosamente y se queda
   # quieto, y el contenedor de servicio —que solo hace `start`— no puede volver
-  # a disparar una migración por reiniciarse. Ver docs/despliegue.md,
+  # a disparar una migración por reiniciarse. Ver docs/operaciones/despliegue.md,
   # "Recuperar Zitadel de un arranque a medias", para el reset cuando ya pasó.
   #
   # En despliegues posteriores los dos contenedores de una sola vez vuelven a
@@ -183,7 +181,7 @@ services:
           echo "No existe $$pat. Pasa cuando el volumen zitadel-bootstrap se" >&2
           echo "borró sin resetear también la base de Zitadel: 'setup' ve la" >&2
           echo "instancia ya creada, no vuelve a emitir el PAT y el login queda" >&2
-          echo "sin token. Ver docs/despliegue.md, 'Recuperar Zitadel de un" >&2
+          echo "sin token. Ver docs/operaciones/despliegue.md, 'Recuperar Zitadel de un" >&2
           echo "arranque a medias': hay que resetear los dos juntos." >&2
           exit 1
         fi
@@ -307,7 +305,7 @@ services:
     #
     # Sin esa arista, el túnel abre igual y la consola de Zitadel queda
     # accesible para hacer el paso 4 de "Primer arranque"
-    # (docs/despliegue.md), que es lo que desbloquea a `server`.
+    # (docs/operaciones/despliegue.md), que es lo que desbloquea a `server`.
     depends_on:
       zitadel-login:
         condition: service_healthy

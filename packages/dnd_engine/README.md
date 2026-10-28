@@ -27,9 +27,11 @@ JSON, no programar**.
   asset de Flutter vía `packages/dnd_engine/assets/srd_2024/...`. Su
   `manifest.json` declara el formato y el reglamento antes de cargar los datos.
 - `test/` — reglas, serialización, migraciones e integridad del catálogo;
-  `content_integrity_test.dart` fija los conteos y contratos del contenido.
+  `content_integrity_test.dart` fija reglas del contenido (referencias,
+  fórmulas, procedencia), no cantidades.
 - `tool/` — generación y parches del catálogo; el orden y las fuentes están
-  descritos en [CLAUDE.md](../../CLAUDE.md#los-conteos-del-catálogo-son-aserciones).
+  descritos en
+  [Contenido y reglas](../../docs/desarrollo/contenido-y-reglas.md).
 
 Los modelos y las reglas no dependen de Flutter ni de `dart:io`. El cargador
 de directorios usa una importación condicional para aislar `dart:io`; el

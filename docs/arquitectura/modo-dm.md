@@ -118,6 +118,12 @@ así que corregir una redacción es cambiar una línea y no migrar la base. Un
 `kind` que el cliente no conozca se ignora en silencio: el servidor puede ser
 más nuevo que la pestaña abierta.
 
+La Inspiración Heroica sigue el mismo molde: `POST
+/api/campaigns/<id>/members/<memberId>/heroic-inspiration` solo deja un
+`heroic_inspiration_granted` en la bandeja del dueño del personaje, resuelto a
+través de `findMember` (que exige que la campaña sea de quien pide). Quien la
+anota en su ficha es el jugador.
+
 `_deleteCharacterHandler` arma los avisos **antes** de borrar, porque la cascada
 se lleva los vínculos y después ya no hay a quién avisarle.
 
@@ -136,8 +142,8 @@ Lo que sí cambió: el jugador ahora ve el **nombre** y las recompensas de los
 capítulos ya cerrados de su campaña, desde la pestaña Campaña de su ficha (ver
 «La vuelta del vínculo» más abajo). `ChapterRepository` sigue sin cruzar cuentas
 —filtra por `dm_user_id` como cualquier tabla de un solo dueño—; el cruce lo
-hace el handler, que consigue ese `dm_user_id` de una fila de `campaign_members`
-ya autorizada.
+hace la consulta de `listPlayerCampaignProjection`, que parte de una fila de
+`campaign_members` del propio jugador.
 
 ### Dos reglas que no puede garantizar el documento
 
@@ -162,10 +168,11 @@ Las dos son 400 y no 409 porque en este proyecto "pedido inválido" se escribe
 `POST .../close` marca el capítulo como completado y le deja un `user_event` de
 tipo `chapter_completed` **al dueño** de cada personaje vinculado (nunca al DM,
 que ya vio la respuesta). El `payload` lleva `characterName`, `campaignName`,
-`chapterName` y `grantsLevel`; el texto lo redacta el cliente, como todos los
-avisos.
+`chapterName`, `grantsLevel`, `grantsGold` y `grantsItems`; el texto lo
+redacta el cliente, como todos los avisos.
 
-`grantsLevel` es **solo un aviso**, y no por timidez: `Character.level` y
+`grantsLevel` es **solo un aviso**, igual que el oro y los objetos, y no por
+timidez: `Character.level` y
 `hpPerLevel` son dos listas que el asistente de subida mantiene en sincronía, y
 subir el nivel sin agregar su entrada de PG dejaría al personaje con los PG de un
 nivel menos. La subida tiene que pasar por ese asistente, que es del jugador.
@@ -197,6 +204,35 @@ un nivel mayor que el guardado, el servidor anota una fila por nivel ganado en
 cada campaña donde está vinculado, colgada del capítulo en marcha (o de ninguno),
 y el Cuaderno la muestra como entrada de la app, sin menú. Es un registro de lo
 que pasó: si después el nivel baja, las filas no se borran.
+
+## El Cuaderno
+
+`GET /api/campaigns/<id>/notebook` devuelve en una sola respuesta las notas, los
+registros de combate cerrados y las subidas de nivel (`notes`,
+`encounterLogs`, `levelUps`): el Cuaderno los intercala por capítulo, y pedirlos
+por separado obligaría a esperar tres viajes para pintar uno. Las notas se
+escriben con `POST/PUT/DELETE /api/campaigns/<id>/notes[/<noteId>]`; el servidor
+solo exige un título y que el capítulo exista en esa campaña (`_validateNote`,
+que comparte con el conector MCP).
+
+Todo lo que hace «rica» a una nota vive en el cliente y **no toca el servidor**:
+`Note.body` es texto plano que viaja y se guarda tal cual.
+
+- **Markdown.** `MarkdownText` (`packages/dnd_app/lib/ui/diary_cards.dart`) es
+  un subconjunto escrito a mano —títulos, viñetas, párrafos, negrita e
+  itálica— y nada más; sus límites y la salida si hace falta más están en su
+  `ponytail:`. Lo comparte con el trasfondo del Diario.
+- **Menciones.** `@Nombre` enlaza al personaje de la mesa o al PNJ de la
+  campaña con ese nombre, y tocarlo abre su ficha (`_Mention`, en
+  `ui/dm/notebook_view.dart`). Se resuelve por nombre exacto en el cliente; si
+  un jugador y un PNJ se llaman igual, gana el jugador.
+- **Registros de combate.** Los nombres de quienes pelearon se escriben con
+  `@` solos cuando siguen en la campaña (`_mark`), así que enlazan igual que
+  una mención. Quien se fue —un jugador que cortó el vínculo, un PNJ
+  desvinculado— queda como texto, sin una `@` que no lleve a ningún lado.
+
+El Cuaderno es del DM: lo lee solo él, y nada de esto llega al jugador (ver el
+final de «La vuelta del vínculo»).
 
 ## El combate y el turno
 
@@ -395,27 +431,30 @@ resto, por la misma razón que `/shares` y `/turn`: es el jugador quien pregunta
 y el único nombre que tiene derecho a decir es el de su propio personaje. Una
 ruta que le aceptara un id de campaña sería una forma de tantear cuáles existen.
 
-**La autorización nace de `listSharesForCharacter`**, que ya filtra por
-`owner_user_id = quien pide`. Cada fila que devuelve *es* la prueba de que este
-jugador está vinculado a esa campaña; recién con el `dmUserId` que sale de ahí
-se llaman `campaigns.find`, `campaigns.listMembers`, `chapters.listFor` y
-`encounters.logsFor`. Cero SQL nueva.
+**La autorización es un `WHERE`**: el handler comprueba que el personaje sea de
+quien pide (`characters.find`) y llama a una sola consulta,
+`CampaignRepository.listPlayerCampaignProjection`, cuyo CTE `linked` parte de
+`m.owner_user_id = quien pide AND m.character_id = el personaje`. De ahí cuelgan
+los otros bloques (compañeros de mesa, capítulos cerrados, batallas), así que
+cada fila devuelta *es* la prueba de que este jugador está vinculado a esa
+campaña. El handler **no** le entrega a ningún repositorio un `dmUserId`: ese
+id vive y muere dentro del SQL, y el DTO (`PlayerCampaignProjection`) ni lo
+lleva.
 
-Y acá va la advertencia que hay que leer antes de tocar ese handler: **es el
-único lugar del servidor donde a un repositorio se le entrega un `dmUserId` que
-no es de quien hace la petición.** Está bien porque salió de una fila ya
-autorizada, pero invierte el supuesto del contrato de esos repositorios. Si
-alguna vez ese handler deja de arrancar por `listSharesForCharacter`, deja de
-estar bien.
+Ojo con lo que eso implica al probar: es SQL que ningún test ejecuta (los dobles
+en memoria lo reimplementan), así que un cambio en esa consulta se revisa a
+mano y contra el stack real.
 
 Lo que la respuesta **no** lleva, y no por olvido:
 
 - **El objetivo de los capítulos.** `Chapter.summary` es lo que el DM escribe
   adentro del capítulo, y su propia documentación dice que no lo ve ningún
-  jugador ni siquiera con el capítulo cerrado. Se poda en `_playerChapterJson`,
-  y hay una prueba que busca el texto en el cuerpo entero de la respuesta — no
+  jugador ni siquiera con el capítulo cerrado. Se poda dos veces:
+  la consulta devuelve `document - 'summary'` y `_playerChapterJson` lo vuelve a
+  quitar. Hay una prueba que busca el texto en el cuerpo entero de la respuesta — no
   en un campo, para que también agarre el día que alguien lo anide en otro lado.
-- **Los capítulos que todavía no se cerraron**, el que está en marcha incluido.
+- **Los capítulos que todavía no se cerraron**, el que está en marcha incluido
+  (la consulta filtra `state = 'completed'` y el handler lo repite).
   De lo que están jugando ahora el jugador se entera en la mesa.
 - **Las notas del cuaderno.** Ese repositorio ni se toca en el handler.
 - **El id de la campaña y el del DM.** La clave de cada bloque es el `memberId`,
@@ -578,6 +617,12 @@ El subgrupo `campaña vista por el jugador` agrega:
 - no viaja el id de la campaña ni el del DM;
 - un personaje sin vínculos devuelve la lista vacía, no un error;
 - preguntar por un personaje ajeno responde 404.
+
+El subgrupo `cuaderno` (con `subidas de nivel`) agrega que el cuaderno de una
+campaña ajena no se ve ni se toca, que una nota exige título y un capítulo
+existente, y que el combate cerrado aparece pero el descartado no deja entrada.
+`Conceder Inspiración Heroica` fija que el aviso le llega al dueño, que no toca
+la ficha y que un DM ajeno recibe 404.
 
 El subgrupo `combate`, dentro del mismo archivo, agrega:
 

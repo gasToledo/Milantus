@@ -1049,11 +1049,13 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Los tokens personales de Ajustes.
 
-## [Unreleased]
+## [0.42.0+1] - 2026-10-28
 
 ### Nuevo
 
-- Sin cambios.
+- Tutoriales de una sola vez: una bienvenida que explica los modos Jugador y
+  DM, y uno al entrar por primera vez a la ficha y a cada sección del Modo DM.
+  Se pueden saltar de a uno o todos juntos, y Ajustes los vuelve a mostrar.
 
 ### Modificado
 
@@ -1062,14 +1064,6 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 ### Eliminado
 
 - Sin cambios.
-
-## [0.42.0+1] - 2026-10-28
-
-### Nuevo
-
-- Tutoriales de una sola vez: una bienvenida que explica los modos Jugador y
-  DM, y uno al entrar por primera vez a la ficha y a cada sección del Modo DM.
-  Se pueden saltar de a uno o todos juntos, y Ajustes los vuelve a mostrar.
 
 ## [0.43.0+1] - 2026-10-28
 
@@ -1085,3 +1079,21 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 - Los tutoriales hablan pensando en quien recién empieza: cada uno pasa a dos
   o tres páginas, explica los términos de juego y la bienvenida suma una
   página para quien nunca jugó.
+
+### Eliminado
+
+- Sin cambios.
+
+## [Unreleased]
+
+### Nuevo
+
+- Sin cambios.
+
+### Modificado
+
+- Sin cambios.
+
+### Eliminado
+
+- Sin cambios.

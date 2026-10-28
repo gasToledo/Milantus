@@ -80,7 +80,9 @@ hace.
 
 `file_picker` (importar retrato), `archive` (respaldo ZIP),
 `package_info_plus` (versión en el pie del panel), `font_awesome_flutter` (los
-tres íconos de tipo de acción, ver [Iconografía](#9-iconografía)). Nada más. **Sumar un plugin
+tres íconos de tipo de acción, ver [Iconografía](#9-iconografía)), y `intl` con
+`flutter_localizations` (los textos en español e inglés, ver
+[Textos](textos.md)). Nada más. **Sumar un plugin
 nativo es una decisión de arquitectura, no de diseño**: obliga a que toda
 máquina que compile tenga el Modo Desarrollador de Windows activo.
 
@@ -99,8 +101,8 @@ góticas.
 Los cuatro compromisos que definen el estilo:
 
 1. **El oscuro es el tema prioritario y el que arranca.** El claro existe y es
-   completo, pero es la variante. `ThemeMode.dark` es el estado inicial en
-   `main.dart`.
+   completo, pero es la variante. `AppThemeController` arranca en
+   `ThemeMode.dark` (`theme/app_theme.dart`).
 2. **Superficies planas, jerarquía por borde.** `Card` tiene `elevation: 0`. La
    profundidad se comunica con una línea de 1 px (`hairline`) y con un fondo
    más hundido (`plaque`), no con sombras. La única sombra del sistema es la de
@@ -313,7 +315,7 @@ su caja, que es el caso de las tiras cortas dentro de una tarjeta.
 | Uso | Familia | Tamaño | Otros | Dónde |
 | --- | --- | --- | --- | --- |
 | Título de `AppBar` | Georgia | 20 | — | `appBarTheme` |
-| Marca del panel | Georgia | 18 | `height: 1.25` | `dashboard_navigation.dart` |
+| Marca del panel | Georgia | 18 | `height: 1.25` | `app_sidebar.dart` |
 | Subtítulo de marca | sans | 11 | `letterSpacing: 0.3`, `gold` | ídem |
 | Nombre en tarjeta | Georgia | 18 × escala | — | `dashboard_widgets.dart` |
 | Título de `sheetCard` | Georgia | 16 | — | `sheet_navigation.dart` |
@@ -495,7 +497,8 @@ terminar moviendo personajes.
 
 ## 8. Catálogo de componentes
 
-Todos en `lib/theme/app_widgets.dart` salvo indicación. Son la biblioteca
+Todos en `lib/theme/app_widgets.dart` salvo indicación (los del panel lateral, en
+`ui/app_sidebar.dart`). Son la biblioteca
 compartida: **antes de crear un widget visual nuevo, buscar acá**.
 
 ### Estructura
@@ -507,15 +510,15 @@ compartida: **antes de crear un widget visual nuevo, buscar acá**.
 | `CardGrid` | Tarjetas de **alto variable** en columnas iguales que llenan el ancho (tantas como entren con `minCardWidth`, hasta `maxColumns`); cada fila se iguala a su tarjeta más alta, y la fila incompleta deja su hueco. No hace scroll: va adentro de la lista de la pantalla. La usan Capítulos y PNJ de una campaña. Su fila suelta es `CardGridRow`, que la Mesa arma de a una adentro de un `ListView.builder` para seguir siendo perezosa | `children`, `minCardWidth` (360), `maxColumns` (3), `spacing` (12); `CardGridRow`: `children`, `columns`, `spacing` |
 | `SectionRule` | Regla ornamental: línea `hairline` con rombo dorado de 7 px al centro, 18 px de margen vertical | — |
 | `Eyebrow` | Rótulo de sección en mayúsculas espaciadas | `text` |
-| `sheetCard(…)` | Tarjeta plegable con cabecera (ícono dorado 18 px + título Georgia 16 + acción) | `icon`, `title`, `trailing`, `child`, y `collapseKey` cuando el título se repite en la misma pantalla (dos campañas apiladas tienen dos tarjetas «Batallas») |
-| `responsiveColumns(…)` | Columnas lado a lado ≥ 640, apiladas debajo | `List<List<Widget>>` |
+| `sheetCard(…)` (`ui/sheet/sheet_navigation.dart`) | Tarjeta plegable con cabecera (ícono dorado 18 px + título Georgia 16 + acción) | `icon`, `title`, `trailing`, `child`, y `collapseKey` cuando el título se repite en la misma pantalla (dos campañas apiladas tienen dos tarjetas «Batallas») |
+| `responsiveColumns(…)` (`ui/sheet/sheet_navigation.dart`) | Columnas lado a lado ≥ 640, apiladas debajo | `List<List<Widget>>` |
 | `appNavItem(…)` | Ítem del panel lateral | `icon`, `label`, `active`, `onTap`, y `count` para la cifra al final de la fila (en cifras tabulares: los ítems se apilan y la columna de números tiene que leerse como columna) |
 | `LanguageSelector`, `ThemeModeSelector` | El idioma (pill con menú) y el tema (grupo de tres). Viven solo en Ajustes: ningún panel lateral los repite | El tema recibe su `AppThemeController`; el idioma lee el `AppLocaleScope` |
 | `SidebarBrand` | La marca en lo alto de todo panel: sello, nombre y subtítulo | — |
 | `SidebarBackButton` | El «volver» de una pantalla de adentro (ficha, Códice, creación). Ocupa el lugar que en el menú principal tiene el interruptor de modo, con la misma forma, para que la salida esté siempre en el mismo sitio | `label`, `onPressed` |
 | `SidebarLightFooter` | El pie de una pantalla de adentro: la versión y, si hace falta, algo propio a la izquierda (la ficha pone su cartel de guardado). **No repite el pie del menú principal**: con Ajustes, la cuenta y «Cerrar sesión» encima, la ficha no entra en una ventana de laptop | `leading` |
-| `AppSidebar` | El marco del panel lateral que comparten el Modo Jugador y el Modo DM: marca, interruptor de modo, la navegación propia y el pie de la cuenta | `mode`, `onModeChanged`, `navigation` (si puede no entrar, trae su propio scroll), `account`, `appVersion`, `settingsActive`, `onOpenSettings`, `inDrawer` |
-| `SettingsView` | Los ajustes de la cuenta como sección del área de contenido: grupos con rótulo, filas de rótulo + control que se apilan por debajo de 520 px | Sin botón de guardar: cada cambio se guarda al tocarlo y el cartel de arriba dice si llegó |
+| `AppSidebar` | El marco del panel lateral que comparten el Modo Jugador y el Modo DM: marca, interruptor de modo, la navegación propia y el pie de la cuenta | `mode`, `onModeChanged`, `navigation` (si puede no entrar, trae su propio scroll), `api`, `account`, `appVersion`, `settingsActive`, `onOpenSettings`, `inDrawer` |
+| `SettingsView` (`ui/settings_view.dart`) | Los ajustes de la cuenta como sección del área de contenido: grupos con rótulo, filas de rótulo + control que se apilan por debajo de 520 px | Sin botón de guardar: cada cambio se guarda al tocarlo y el cartel de arriba dice si llegó |
 
 ### Datos de personaje
 
@@ -532,11 +535,12 @@ compartida: **antes de crear un widget visual nuevo, buscar acá**.
 | `UsagePips` | Tira de íconos para usos restantes: llenos en `gold`, gastados en `textMuted` | Recursos de clase, espacios de conjuro |
 | `GoldPill` | Cápsula dorada suave; `highlighted: false` la vuelve neutra | Radio 20 |
 | `OutlinedTag` | Rótulo chico en mayúsculas con borde dorado, sin fondo, al lado de un nombre en una fila densa: «PERICIA» en una habilidad, «VENTAJA» en una salvación | Más liviano que `GoldPill` para no competir con el número de la fila. Si explica algo, va dentro de un `Tooltip` |
+| `MarkdownText` (`ui/diary_cards.dart`) | Texto con el Markdown que usa una mesa: títulos, viñetas, **negrita**, *itálica* y, si se le pasan `mentions`, `@Nombre` como enlace (`mentionBuilder`) | Subconjunto a mano, sin enlaces, código ni tablas (ver su `ponytail:`). Lo usan el trasfondo del Diario y las notas del Cuaderno |
 | `SourceBadge` | `GoldPill` con la procedencia del contenido | Solo el SRD 5.2.1 va resaltado |
 | `ActionTypeIcon` / `ActionTypeLegend` | Ícono del tipo de acción (acción, adicional, reacción) y su leyenda | La leyenda va una sola vez por pantalla, no por fila |
 | `CreatureActionRow` | Una acción de criatura: nombre, bonificador con signo en Georgia dorado, daño con su tipo, alcance y descripción | Toma **primitivos** y no un `CreatureAction`. Hoy la usa **solo la ficha** para los compañeros invocados (vía `ResolvedCreatureAction`): el perfil del Bestiario dejó de usarla cuando el daño pasó a placas rotuladas |
 | `creatureProfileBody(…)` | El perfil de una criatura del bloque de cifras para abajo: banda de cifras (CA, PG con sus dados, iniciativa, desafío, percepción pasiva), banda de las seis características con la salvación adentro, líneas como lista de definición con las defensas en chips, rasgos y acciones agrupadas por tipo, con acierto/daño/alcance en placas rotuladas | Devuelve `List<Widget>`, no un `Column`: cada llamador lo mete en su propio `ListView` con su encabezado (el nombre y el tipo **no** van adentro). Lo leen la columna «Del turno» de Combate y la vista previa del formulario de criaturas de Homebrew. **El Bestiario no lo usa de corrido**: arma el perfil en tarjetas de superficie con las mismas piezas, expuestas aparte — `creatureProfileNumbers` (cifras sin el desafío, que ahí va como pastilla junto al tipo, y sin placa cuando van acostadas), `creatureProfileStats` (características y líneas) y `creatureProfileActions` (rasgos y acciones) —, en un encabezado y dos columnas desde 760 px. **Dos ejes distintos, y conviene no confundirlos**: `dense: true` decide *contenido* —saca CA, PG e iniciativa, que en Combate los lleva el encuentro y no el catálogo— mientras que la *forma* la decide un `LayoutBuilder` con el ancho medido (`_profileWideWidth`, 520): por debajo se apila todo, que es lo que necesitan la columna «Del turno» de 300 px y el Bestiario en un teléfono. La prosa va topeada a `kReadingWidth` (620, con `readingWidth(child)`, que también usa el Diario) porque el panel del Bestiario mide unos 855 px |
-| `EncounterDifficultyBand` | La dificultad del combate que se está armando: el veredicto en Georgia (Baja, Moderada, Alta o Extrema), la regla del presupuesto con sus tres techos, los PX de enfrente y, debajo, los avisos del SRD que apliquen | Sobre `plaque`, como la barra de Combate: es un dato calculado, no editable. **Solo «Extrema» va en `crimson`**; las otras tres son dificultades que el DM elige a propósito y quedan en `gold`. Dos umbrales medidos con `LayoutBuilder`: desde 620 px todo va en una línea, y desde 360 px de regla los techos se rotulan bajo su marca (con menos pasan a una leyenda, porque a nivel 1 «Moderada» y «Alta» quedan a un 20 % de la regla y se pisan). Recibe un `EncounterDifficulty` ya calculado: los números son del motor |
+| `EncounterDifficultyBand` (`ui/dm/encounter_difficulty_band.dart`) | La dificultad del combate que se está armando: el veredicto en Georgia (Baja, Moderada, Alta o Extrema), la regla del presupuesto con sus tres techos, los PX de enfrente y, debajo, los avisos del SRD que apliquen | Sobre `plaque`, como la barra de Combate: es un dato calculado, no editable. **Solo «Extrema» va en `crimson`**; las otras tres son dificultades que el DM elige a propósito y quedan en `gold`. Dos umbrales medidos con `LayoutBuilder`: desde 620 px todo va en una línea, y desde 360 px de regla los techos se rotulan bajo su marca (con menos pasan a una leyenda, porque a nivel 1 «Moderada» y «Alta» quedan a un 20 % de la regla y se pisan). Recibe un `EncounterDifficulty` ya calculado: los números son del motor |
 
 ### Selección
 
@@ -567,10 +571,11 @@ En `lib/homebrew/forms/form_widgets.dart`, para los ocho formularios de contenid
 | --- | --- | --- |
 | `showAppMessage(…)` | `SnackBar` con tono `info` / `success` / `error`, y «Deshacer» opcional con `onUndo` | El error dura **6 s**, con `onUndo` **8 s**, el resto 3 s. `onUndo` solo si se restaura entero con lo que hay en memoria. Siempre `Semantics(liveRegion: true)` |
 | `AppBusyLabel` | Spinner de 18 px + texto, como región viva | El texto es obligatorio: un spinner solo no dice qué está pasando |
-| `_SaveStatusIndicator` | Píldora de estado del guardado con `AnimatedSwitcher` de 180 ms | Ícono + texto + color, los tres |
+| `SaveStatusIndicator` (`ui/save_status_indicator.dart`) | Píldora de estado del guardado con `AnimatedSwitcher` de 180 ms | Ícono + texto + color, los tres |
+| `AppHelpCallout` | Ayuda breve del ancho de su contenedor, donde hay que decidir algo: ícono, título opcional y mensaje, en `surface` con filete | Informa y nada más: sin botón, sin cierre, sin «Más información». No es un error ni pide una acción |
 | `AppEmptyState` | Ícono 40 px `onSurfaceVariant` + mensaje centrado + acciones opcionales | El mensaje es región viva. Distinguir **«no hay nada»** de **«nada coincide con la búsqueda»**: son situaciones distintas y piden acciones distintas |
 | `AppErrorView` | Ícono de error + mensaje + `SelectableText` del detalle + botón "Reintentar" | El detalle técnico se puede copiar. `onRetry` es lo que lo separa de un cartel muerto. Con un `FeedbackScope` con canal suma «Reportar este error», que manda el mensaje y el detalle |
-| `showFeedbackDialog(…)` (`ui/feedback.dart`) | Diálogo «Sugerencias y errores»: idea o error, el mensaje y «Enviar» | Se abre desde el último ítem de navegación del dashboard y desde «Reportar este error». Necesita el canal de `FeedbackScope`, que el arranque abre al cargar la cuenta |
+| `showFeedbackDialog(…)` (`ui/feedback.dart`) | Diálogo «Sugerencias y errores»: idea o error, el mensaje y «Enviar» | Se abre desde el último ítem de navegación del panel lateral (`AppSidebar`) y desde «Reportar este error». Necesita el canal de `FeedbackScope`, que el arranque abre al cargar la cuenta |
 | `TutorialGate` / `showTutorialIfPending(…)` (`ui/tutorials.dart`) | Tutorial de una vez: `AppDialog` con páginas y «Saltar todos», «Saltar», «Siguiente» / «Entendido» | Uno por sección (`Tutorial`), sale al entrar por primera vez y se recuerda en el navegador. `TutorialGate` va con `key` por tutorial. Ajustes los restituye |
 | `showTextPromptDialog(…)` / `showRenameDialog(…)` | Diálogo de un solo campo de texto | Para más de un campo, diálogo propio (ver `chapter_editor_dialog.dart`) |
 | `AppDialog` | **El molde de diálogo**: placa del sistema con la barra de acciones a lo ancho | `title`, `icon`, `iconColor`, `titleTrailing`, `content`, `actions`, `width` (480), `scrollable` |
@@ -711,14 +716,14 @@ Ratios calculados sobre los tokens reales. **Verde** = AA para texto normal
 | `crimson` sobre `plaque` | 5.29 | ✅ |
 | `textMuted` sobre `surface` | 5.25 | ✅ |
 | `crimson` sobre `surface` | 4.85 | ✅ |
-| `onCrimson` sobre `crimson` | 4.81 | ✅ |
+| `onError` sobre `crimson` | 4.81 | ✅ |
 
 **Tema claro**
 
 | Combinación | Ratio | |
 | --- | --- | --- |
 | `onSurface` sobre `surface` | 14.76 | ✅ |
-| `onCrimson` sobre `crimson` | 6.47 | ✅ |
+| `onError` sobre `crimson` | 6.47 | ✅ |
 | `onPrimary` sobre `gold` | 5.05 | ✅ |
 | `crimson` sobre `surface` | 6.04 | ✅ |
 | `onSurfaceVariant` sobre `surface` | 5.78 | ✅ |
@@ -744,21 +749,20 @@ está en los comentarios de `AppPalette`.
    `FilledButton` quedaba en 3.42 en el claro. `onPrimary`, `onSecondary` y
    `onError` salen del mismo valor en `AppTheme`, y la prueba de contraste
    cubre los dos acentos en los dos temas.
-4. Los objetivos táctiles siguen los mínimos de Material (48 px); los
+3. Los objetivos táctiles siguen los mínimos de Material (48 px); los
    `IconButton` no se achican por debajo de eso.
 
 ---
 
 ## 12. Anti-patrones
 
-Prohibiciones duras. Las primeras cuatro rompen pruebas o el build.
+Prohibiciones duras. Las primeras tres rompen pruebas o el build.
 
 | ❌ No hacer | ✅ En su lugar | Por qué |
 | --- | --- | --- |
 | Calcular una regla de D&D en un widget | Leerla de `ComputedSheet` | El motor es la fuente de verdad; la UI que recalcula se desincroniza |
 | Recorrer `klass.features` desde la UI | Preguntar a `ComputedSheet.featureChoiceSlots` | Contrato explícito entre motor y app |
 | `IconData` desde un codepoint variable | Mapa `const` en `class_visuals.dart` | Rompe el tree-shaking de íconos |
-| Concatenar rutas con `/` | `p.join` de `package:path` | Portabilidad |
 | Color hexadecimal literal en un widget | `context.palette` o `colorScheme` | El tema claro deja de funcionar |
 | `Colors.red` / `Colors.grey` | `colorScheme.error` / `onSurfaceVariant` | La paleta es el contrato |
 | Sombra para separar superficies | Borde `hairline` de 1 px | El sistema es plano por decisión |
