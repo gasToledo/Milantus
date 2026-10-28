@@ -437,7 +437,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get commonCannotUndo => 'This can\'t be undone.';
+  String get commonCannotUndo => 'This can’t be undone.';
 
   @override
   String get commonDelete => 'Delete';
@@ -734,7 +734,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get printCurrentHp => 'current / max';
 
   @override
-  String get printHitDice => 'Hit dice';
+  String get printHitDice => 'Hit Point Dice';
 
   @override
   String get printHeadBonus => 'Bonus';
@@ -763,10 +763,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get turnNext => 'Get ready, you\'re up next.';
+  String get turnNext => 'Get ready, you’re up next.';
 
   @override
-  String get turnActive => 'It\'s your turn.';
+  String get turnActive => 'It’s your turn.';
 
   @override
   String get commonExpand => 'Expand';
@@ -791,7 +791,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get campaignEmpty =>
-      'This character isn\'t in any campaign yet.\nShare it with your DM and what you play will show up here.';
+      'This character isn’t in any campaign yet.\nShare it with your DM and what you play will show up here.';
 
   @override
   String campaignPartyAlso(int count, String names) {
@@ -822,7 +822,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get campaignNoBattles => 'They haven\'t fought any yet.';
+  String get campaignNoBattles => 'They haven’t fought any yet.';
 
   @override
   String get battleAlone => 'Alone';
@@ -870,7 +870,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get campaignNoClosedChapters =>
-      'They haven\'t closed any yet. When they do, what was handed out will be noted here.';
+      'They haven’t closed any yet. When they do, what was handed out will be noted here.';
 
   @override
   String get campaignNoRewards => 'No rewards';
@@ -991,7 +991,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shortRestNoRestore =>
-      'Short rest. It doesn\'t heal HP: spend Hit Point Dice to heal.';
+      'Short rest. It doesn’t heal HP: spend Hit Point Dice to heal.';
 
   @override
   String shortRestRestored(String list) {
@@ -1030,7 +1030,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get combatRestExplainer =>
-      'A short rest doesn\'t heal HP: it recharges short-rest resources. To heal, spend Hit Point Dice.';
+      'A short rest doesn’t heal HP: it recharges short-rest resources. To heal, spend Hit Point Dice.';
 
   @override
   String get restShort => 'Short rest';
@@ -1102,7 +1102,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get wildShapeAddForms => 'Add forms';
 
   @override
-  String get wildShapeNoForms => 'You haven\'t added any forms yet.';
+  String get wildShapeNoForms => 'You haven’t added any forms yet.';
 
   @override
   String creatureLine3(String kind, Object ac, String speed) {
@@ -1152,7 +1152,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get companionLimitOneTitle => 'You already have one in play';
 
   @override
-  String get companionLimitMaxTitle => 'You\'ve reached the maximum';
+  String get companionLimitMaxTitle => 'You’ve reached the maximum';
 
   @override
   String companionLimitOneBody(String going) {
@@ -1202,7 +1202,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get companionNoteBroke => 'you lost your previous concentration';
 
   @override
-  String get companionNoteConcentrating => 'you\'re now concentrating on it';
+  String get companionNoteConcentrating => 'you’re now concentrating on it';
 
   @override
   String companionSummoned(String name) {
@@ -1275,7 +1275,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String exhaustionNote(Object max) {
-    return 'Level $max: your character dies. The sheet doesn\'t apply it or touch your HP — that decision is up to the table.';
+    return 'Level $max: your character dies. The sheet doesn’t apply it or touch your HP — that decision is up to the table.';
   }
 
   @override
@@ -1356,14 +1356,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pickProficienciesHint =>
-      'What you already have is locked; Expertise only offers skills you\'re proficient in.';
+      'What you already have is locked; Expertise only offers skills you’re proficient in.';
 
   @override
   String get pickSizeTitle => 'Choose size';
 
   @override
   String get pickSizeHint =>
-      'This species covers bodies of different sizes: choose your character\'s.';
+      'This species covers bodies of different sizes: choose your character’s.';
 
   @override
   String get pickLineageTitle => 'Choose lineage';
@@ -1373,7 +1373,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pickLineageSpellAbilityHint =>
-      'It\'s used for the save DC and attack rolls of the lineage\'s spells.';
+      'It’s used for the save DC and attack rolls of the lineage’s spells.';
 
   @override
   String pickFeatSpellAbilityTitle(String name) {
@@ -1382,7 +1382,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pickFeatSpellAbilityHint =>
-      'It\'s used for the save DC and attack rolls of this feat\'s spells.';
+      'It’s used for the save DC and attack rolls of this feat’s spells.';
 
   @override
   String get pickFeaturesTitle => 'Choose features';
@@ -1395,7 +1395,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pickKnownSpellHint =>
-      'Choose one you already know: it isn\'t added to your spells, it adds the bonus to its damage.';
+      'Choose one you already know: it isn’t added to your spells, it adds the bonus to its damage.';
 
   @override
   String get pickNoSpells => 'No spells available for this feature.';
@@ -1883,13 +1883,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invOverCapacity =>
-      'You\'re over your carrying capacity. In 2024 there\'s no rules penalty: it\'s a warning, not a block.';
+      'You’re over your carrying capacity. In 2024 there’s no rules penalty: it’s a warning, not a block.';
 
   @override
   String get invAttunementUpper => 'ATTUNEMENT';
 
   @override
-  String get invAttunementHint => 'You attune from each item\'s menu.';
+  String get invAttunementHint => 'You attune from each item’s menu.';
 
   @override
   String get invAttuneSlotFree => 'Free attunement slot';
@@ -1910,7 +1910,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String invPlansButton(Object chosen, Object total) {
-    return 'Blueprints and replicas ($chosen/$total)';
+    return 'Plans and replicas ($chosen/$total)';
   }
 
   @override
@@ -1974,7 +1974,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get invReplica => 'Replica';
 
   @override
-  String get invNotEquippable => 'Can\'t be equipped';
+  String get invNotEquippable => 'Can’t be equipped';
 
   @override
   String get invEquipped => 'Equipped';
@@ -1986,7 +1986,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get invNote => 'Note…';
 
   @override
-  String get invUnattune => 'Remove attunement';
+  String get invUnattune => 'End attunement';
 
   @override
   String get invAttune => 'Attune';
@@ -2084,7 +2084,7 @@ class AppLocalizationsEn extends AppLocalizations {
       other: '$active active replicas',
       one: '1 active replica',
     );
-    return 'You choose $count blueprints. Then you decide which one to replicate: you can have $_temp0 at a time.';
+    return 'You choose $count plans. Then you decide which one to replicate: you can have $_temp0 at a time.';
   }
 
   @override
@@ -2096,7 +2096,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get invPickBlueprint => 'Choose a blueprint so you can replicate it.';
+  String get invPickBlueprint => 'Choose a plan so you can replicate it.';
 
   @override
   String invReplicaSlotsLeft(int count) {
@@ -2188,13 +2188,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diaryReplaceBody =>
-      'What\'s written now is lost and replaced by the file\'s content. There\'s no way to recover it.';
+      'What’s written now is lost and replaced by the file’s content. There’s no way to recover it.';
 
   @override
   String get diaryReplace => 'Replace';
 
   @override
-  String get diaryNotUtf8 => 'The file doesn\'t look like UTF-8 text.';
+  String get diaryNotUtf8 => 'The file doesn’t look like UTF-8 text.';
 
   @override
   String get diaryImported => 'Background imported.';
@@ -2213,7 +2213,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String diaryEmpty(String name) {
-    return '$name\'s journal is still blank.\nAdd art, a short story, a quirk — whatever you like about this character.';
+    return '$name’s journal is still blank.\nAdd art, a short story, a quirk — whatever you like about this character.';
   }
 
   @override
@@ -2258,7 +2258,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get diaryEntryNoImage => 'This entry doesn\'t have an image.';
+  String get diaryEntryNoImage => 'This entry doesn’t have an image.';
 
   @override
   String get diarySeeFullImage => 'See the full image';
@@ -2361,7 +2361,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String spellsWildShapeBlock(String name) {
-    return 'You can\'t cast spells in $name form.';
+    return 'You can’t cast spells in $name form.';
   }
 
   @override
@@ -2396,7 +2396,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get spellsNoneChosen =>
-      'You haven\'t chosen any spells yet. Edit when you level up or create the character.';
+      'You haven’t chosen any spells yet. Edit when you level up or create the character.';
 
   @override
   String get spellsUseLongRest => '1/long rest';
@@ -2440,7 +2440,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String spellsSwitched(String spell, String previous) {
-    return 'You\'re now concentrating on $spell: you dropped $previous.';
+    return 'You’re now concentrating on $spell: you dropped $previous.';
   }
 
   @override
@@ -2456,7 +2456,7 @@ class AppLocalizationsEn extends AppLocalizations {
       other: 'go',
       one: 'goes',
     );
-    return 'You\'re now concentrating on $spell: you dropped $previous, and $names $_temp0 with it.';
+    return 'You’re now concentrating on $spell: you dropped $previous, and $names $_temp0 with it.';
   }
 
   @override
@@ -2470,7 +2470,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get spellsSwapOriginal => 'The feature\'s own';
+  String get spellsSwapOriginal => 'The feature’s own';
 
   @override
   String spellsListOf(String name) {
@@ -2816,7 +2816,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bgFeatAbilityHint =>
-      'It\'s used for the save DC and attack rolls of the feat\'s spells.';
+      'It’s used for the save DC and attack rolls of the feat’s spells.';
 
   @override
   String get bgAbilityIncrease => 'Ability increase';
@@ -2887,7 +2887,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scoresHelpBody =>
-      'All four generate the six ability scores of the character, with different amounts of luck. The standard array hands out fixed, balanced values: it is the short path. Rolling 4d6 draws them at random. Point buy lets you build them with a budget. Writing them in works if you have already decided them.';
+      'All four generate the six ability scores of the character, with different amounts of luck. The standard array hands out fixed, balanced values: it is the short path. Rolling 4d6 draws them at random. Point cost lets you build them with a budget. Writing them in works if you have already decided them.';
 
   @override
   String get scoresStandardArray => 'Standard array';
@@ -2896,7 +2896,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scoresRoll4d6 => 'Roll 4d6';
 
   @override
-  String get scoresPointBuy => 'Point buy';
+  String get scoresPointBuy => 'Point cost';
 
   @override
   String get scoresManual => 'Enter manually';
@@ -3054,7 +3054,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get equipShopHint =>
-      'Each tap adds one to your purchases. You adjust the quantity in the step\'s list.';
+      'Each tap adds one to your purchases. You adjust the quantity in the step’s list.';
 
   @override
   String get equipPurchases => 'Purchases';
@@ -3069,11 +3069,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get equipNoGold => 'The options you chose don\'t bring gold to spend.';
+  String get equipNoGold => 'The options you chose don’t bring gold to spend.';
 
   @override
   String get equipGoldExplainer =>
-      'What your equipment pack doesn\'t include you buy with the starting gold, at the book price. Whatever is left stays in your bag.';
+      'What your equipment pack doesn’t include you buy with the starting gold, at the book price. Whatever is left stays in your bag.';
 
   @override
   String get equipStartingGold => 'Starting gold';
@@ -3121,20 +3121,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get equipOffHandNote =>
-      'The off-hand attack is a Bonus Action and doesn\'t add your modifier to damage, except with the Two-Weapon Fighting style.';
+      'The off-hand attack is a Bonus Action and doesn’t add your modifier to damage, except with the Two-Weapon Fighting style.';
 
   @override
   String get equipOffHandShort => 'Off hand';
 
   @override
-  String get equipNoSpellsTitle => 'Your class doesn\'t cast spells';
+  String get equipNoSpellsTitle => 'Your class doesn’t cast spells';
 
   @override
   String get equipNoSpellsBody =>
       'You trust steel and cunning. Move on to the next step.';
 
   @override
-  String get equipNoPreparedSlot => 'They don\'t take a prepared slot.';
+  String get equipNoPreparedSlot => 'They don’t take a prepared slot.';
 
   @override
   String equipCantripSuffix(String name) {
@@ -3222,7 +3222,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get luPendingFeatAbility =>
-      'Choose which ability the feat\'s +1 goes to.';
+      'Choose which ability the feat’s +1 goes to.';
 
   @override
   String luPendingChoices(int count) {
@@ -3427,14 +3427,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get luProfBody =>
-      'What you already have is locked; Expertise only offers skills you\'re proficient in.';
+      'What you already have is locked; Expertise only offers skills you’re proficient in.';
 
   @override
   String get luAlwaysPreparedTitle => 'Spells that are always prepared';
 
   @override
   String get luAlwaysPreparedBody =>
-      'These spells take no prepared slot and can\'t be unchecked from the editor. The pool is already filtered by what the feature allows.';
+      'These spells take no prepared slot and can’t be unchecked from the editor. The pool is already filtered by what the feature allows.';
 
   @override
   String get luMagicEyebrow => 'Magic';
@@ -3457,7 +3457,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String luMulticlassReq(String requirement) {
-    return 'You don\'t meet the multiclass requirement: $requirement. The table can allow it.';
+    return 'You don’t meet the multiclass requirement: $requirement. The table can allow it.';
   }
 
   @override
@@ -4118,7 +4118,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get spellEditGrantedCantrips =>
-      'The cantrips you already have from another feature don\'t show up here: they take no class cantrip slot.';
+      'The cantrips you already have from another feature don’t show up here: they take no class cantrip slot.';
 
   @override
   String spellEditPrepared(Object count, Object max) {
@@ -4376,7 +4376,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String hbNothingIn(String category) {
-    return 'You haven\'t added anything to $category yet.';
+    return 'You haven’t added anything to $category yet.';
   }
 
   @override
@@ -4525,7 +4525,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hbNumberInvalid => 'It has to be a number.';
 
   @override
-  String get hbNegative => 'It can\'t be negative.';
+  String get hbNegative => 'It can’t be negative.';
 
   @override
   String get hbDamageType => 'Damage type';
@@ -4536,7 +4536,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get hbRangeLongMin => 'It can\'t be less than the normal range.';
+  String get hbRangeLongMin => 'It can’t be less than the normal range.';
 
   @override
   String get hbNoMasteryRule =>
@@ -4584,7 +4584,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hbMagicBonus => 'Magic bonus (+0 to +3)';
 
   @override
-  String get hbLegendWeapon => 'Description (the weapon\'s legend)';
+  String get hbLegendWeapon => 'Description (the weapon’s legend)';
 
   @override
   String get hbEconomy => 'Economy';
@@ -4691,7 +4691,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hbStealthLabel => 'Disadvantage on Stealth';
 
   @override
-  String get hbLegendArmor => 'Description (the armor\'s legend)';
+  String get hbLegendArmor => 'Description (the armor’s legend)';
 
   @override
   String get hbNoneCap => 'None';
@@ -5018,7 +5018,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hbAvailableRule =>
-      'For now only the Wild Shape pool uses it: a beast with a challenge rating can show up among the druid\'s forms. Turned off, the creature lives only in your combats.';
+      'For now only the Wild Shape pool uses it: a beast with a challenge rating can show up among the druid’s forms. Turned off, the creature lives only in your combats.';
 
   @override
   String get hbAttackBonus => 'Attack bonus';
@@ -5230,7 +5230,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get effCastAbility => 'Ability to cast it';
 
   @override
-  String get effPlayerChoice => 'Player\'s choice';
+  String get effPlayerChoice => 'Player’s choice';
 
   @override
   String get effTraitName => 'Trait name';
@@ -5853,7 +5853,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get dmTheTable => 'The party';
+  String get dmTheTable => 'The table';
 
   @override
   String dmLogAllies(String names) {
@@ -6034,7 +6034,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String npcNotesEmpty(String name) {
-    return 'You haven\'t written anything about $name yet.';
+    return 'You haven’t written anything about $name yet.';
   }
 
   @override
@@ -6962,7 +6962,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String feedbackReplyTo(String email) {
-    return 'We\'ll reply to $email.';
+    return 'We’ll reply to $email.';
   }
 
   @override
@@ -7061,7 +7061,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String dmMusicUnembeddable(String site) {
-    return 'This link can\'t be played outside $site.';
+    return 'This link can’t be played outside $site.';
   }
 
   @override
@@ -7084,17 +7084,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tutWelcomeBody =>
-      'Milantus has two modes: Player, for your characters, and DM, for running campaigns. Switch between them with the «Mode» selector in the side panel.';
+      'Milantus has two modes: Player, for your characters, and DM, for running campaigns. Switch between them with the “Mode” selector in the side panel.';
 
   @override
-  String get tutPlayerTitle => 'Player mode';
+  String get tutPlayerTitle => 'Player Mode';
 
   @override
   String get tutPlayerBody =>
       'Build a character step by step and the sheet works out the numbers for you. From the sheet you track HP, inventory and spells, take rests and level up. The Codex has the rules, spells and items.';
 
   @override
-  String get tutDmTitle => 'DM mode';
+  String get tutDmTitle => 'DM Mode';
 
   @override
   String get tutDmBody =>
@@ -7105,11 +7105,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tutSheetBody =>
-      'The side panel splits Character, Combat, Inventory, Campaign and Journal. Combat holds HP, attacks, spells and rests. To let your DM see the sheet, tap «Share» and send them the code.';
+      'The side panel splits Character, Combat, Inventory, Campaign and Journal. Combat holds HP, attacks, spells and rests. To let your DM see the sheet, tap “Share” and send them the code.';
 
   @override
   String get tutDmTableBody =>
-      'These are the characters at your table. To add one, ask the player for the code from «Share» on their sheet and enter it in «Add character». Each character\'s menu lets you grant Heroic Inspiration.';
+      'These are the characters at your table. To add one, ask the player for the code from “Share” on their sheet and enter it in “Add character”. Each character’s menu lets you grant Heroic Inspiration.';
 
   @override
   String get tutDmChaptersBody =>
@@ -7121,15 +7121,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tutDmNpcsBody =>
-      'This campaign\'s NPCs, with their HP and status. Bring them from your library or create a new one: just a name with notes, a stat block like the Bestiary\'s, or a full character sheet.';
+      'This campaign’s NPCs, with their HP and status. Bring them from your library or create a new one: just a name with notes, a stat block like the Bestiary’s, or a full character sheet.';
 
   @override
   String get tutDmCombatBody =>
-      'Add monsters from the Bestiary and NPCs, roll initiative and go turn by turn tracking HP and conditions. If the campaign has combat music, you\'re offered to play it when combat starts. Closing it leaves a log.';
+      'Add monsters from the Bestiary and NPCs, roll initiative and go turn by turn tracking HP and conditions. If the campaign has combat music, you’re offered to play it when combat starts. Closing it leaves a log.';
 
   @override
   String get tutBestiaryBody =>
-      'The SRD creatures plus your homebrew ones. Find the one you need and add it to the selected campaign\'s combat.';
+      'The SRD creatures plus your homebrew ones. Find the one you need and add it to the selected campaign’s combat.';
 
   @override
   String get tutNpcLibraryBody =>
@@ -7137,7 +7137,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tutHomebrewBody =>
-      'Add your own content: species, backgrounds, feats, spells, weapons, armor, items and creatures. It works just like the book\'s, in character creation and in the Bestiary.';
+      'Add your own content: species, backgrounds, feats, spells, weapons, armor, items and creatures. It works just like the book’s, in character creation and in the Bestiary.';
 
   @override
   String get settingsTutorials => 'Tutorials';
