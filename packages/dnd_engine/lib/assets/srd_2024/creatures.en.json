@@ -4388,11 +4388,11 @@
     "defenses": "Immunities: Poison; Exhaustion, Poisoned, Petrified"
   },
   "clay-golem": {
-    "_es": "e970ca01",
+    "_es": "6607bd34",
     "name": "Clay Golem",
     "kind": "Large Construct, Unaligned",
     "senses": "Darkvision 60 ft.; Passive Perception 9",
-    "speed": "30 ft.",
+    "speed": "20 ft.",
     "languages": "Common plus one other language",
     "traits.0.name": "Acid Absorption",
     "traits.1.name": "Berserk",
