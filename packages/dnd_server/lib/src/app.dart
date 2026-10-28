@@ -117,6 +117,11 @@ Handler buildHandler({
   /// hay nada detrás para el resto de las peticiones.
   Handler? webStaticHandler,
 
+  /// Sirve el cliente React bajo `/v2` (ver `buildWebV2Handler`). `null`: `/v2`
+  /// responde 404, también cuando [webStaticHandler] existe, para que Flutter
+  /// no conteste algo en una ruta que todavía no es de nadie.
+  Handler? webV2Handler,
+
   /// Manda las sugerencias y reportes de error. `null` cuando el servidor no
   /// tiene proveedor de correo configurado: `/api/me` lo avisa y la app
   /// esconde el botón.
@@ -470,21 +475,24 @@ Handler buildHandler({
   // distingue una ruta desconocida de un 404 a propósito («Código inválido o
   // vencido.»), y el build web lo reemplazaba por un «Not Found» en texto
   // plano que el cliente no puede mostrar.
-  final Handler rootHandler;
-  if (webStaticHandler == null) {
-    rootHandler = router.call;
-  } else {
-    final withStatic = Cascade().add(router.call).add(webStaticHandler).handler;
-    rootHandler = (request) {
-      final path = request.url.path;
-      return path.startsWith('api/') ||
-              path.startsWith('auth/') ||
-              path.startsWith('.well-known/oauth-protected-resource') ||
-              path == 'mcp'
-          ? router.call(request)
-          : withStatic(request);
-    };
-  }
+  final withStatic = webStaticHandler == null
+      ? null
+      : Cascade().add(router.call).add(webStaticHandler).handler;
+  Response notFound() => Response.notFound('Not Found');
+  final Handler rootHandler = (request) {
+    final path = request.url.path;
+    if (path == 'v2' || path.startsWith('v2/')) {
+      return webV2Handler?.call(request) ?? notFound();
+    }
+    final isApi =
+        path.startsWith('api/') ||
+        path.startsWith('auth/') ||
+        path.startsWith('.well-known/oauth-protected-resource') ||
+        path == 'mcp';
+    return isApi || withStatic == null
+        ? router.call(request)
+        : withStatic(request);
+  };
 
   return const Pipeline()
       .addMiddleware(logRequests())

@@ -168,12 +168,23 @@ class FeedbackConfig {
 class WebConfig {
   final String root;
 
-  const WebConfig({required this.root});
+  /// Build del cliente React (`packages/dnd_web`), servido bajo `/v2`. Vacío
+  /// lo deshabilita: `/v2` responde 404 y nada más cambia. Es independiente
+  /// de [root] a propósito, para migrar pantalla por pantalla sin tocar el
+  /// cliente de Flutter.
+  final String v2Root;
+
+  const WebConfig({required this.root, this.v2Root = ''});
 
   bool get enabled => root.isNotEmpty;
 
+  bool get v2Enabled => v2Root.isNotEmpty;
+
   factory WebConfig.fromEnvironment(Map<String, String> env) {
-    return WebConfig(root: envOr(env, 'DND_WEB_ROOT', ''));
+    return WebConfig(
+      root: envOr(env, 'DND_WEB_ROOT', ''),
+      v2Root: envOr(env, 'DND_WEB_V2_ROOT', ''),
+    );
   }
 }
 

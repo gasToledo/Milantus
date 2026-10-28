@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:dnd_server/src/app.dart';
 import 'package:dnd_server/src/auth/oidc_service.dart';
+import 'package:dnd_server/src/web/web_v2.dart';
 import 'package:image/image.dart' as img;
 import 'package:shelf/shelf.dart';
 import 'package:test/test.dart';
@@ -1942,6 +1944,93 @@ void main() {
         expect(response.statusCode, 404, reason: path);
         expect(response.headers['x-fuente'], isNull, reason: path);
       }
+    });
+  });
+
+  group('/v2 (cliente React)', () {
+    late Directory dist;
+
+    setUp(() {
+      dist = Directory.systemTemp.createTempSync('dnd_web_v2_');
+      File('${dist.path}/index.html').writeAsStringSync('<html>spa</html>');
+      Directory('${dist.path}/assets').createSync();
+      File('${dist.path}/assets/index-abc123.js').writeAsStringSync('js');
+    });
+
+    tearDown(() => dist.deleteSync(recursive: true));
+
+    Handler build({Handler? v2, Handler? flutter}) => buildHandler(
+      auth: fakeAuth.dependencies,
+      portraits: portraits,
+      generation: generation,
+      importBackup: importBackup,
+      importHomebrew: importHomebrew,
+      characters: characters,
+      campaigns: campaigns,
+      chapters: chapters,
+      notes: notes,
+      encounters: encounters,
+      events: events,
+      npcs: npcs,
+      transactions: transactions,
+      homebrew: homebrewRepo,
+      levelUps: levelUps,
+      settings: settingsRepo,
+      webStaticHandler: flutter,
+      webV2Handler: v2,
+    );
+
+    Future<Response> get(Handler h, String path) =>
+        Future.value(h(Request('GET', Uri.parse('http://localhost$path'))));
+
+    test(
+      'sin DND_WEB_V2_ROOT responde 404, haya o no build de Flutter',
+      () async {
+        final flutter = (Request r) => Response.ok('flutter');
+        for (final h in [build(), build(flutter: flutter)]) {
+          expect((await get(h, '/v2/')).statusCode, 404);
+          expect((await get(h, '/v2')).statusCode, 404);
+          expect((await get(h, '/v2/personajes')).statusCode, 404);
+        }
+        // Lo que no empieza con el segmento `v2` sigue siendo de Flutter.
+        expect(
+          await (await get(build(flutter: flutter), '/v22')).readAsString(),
+          'flutter',
+        );
+      },
+    );
+
+    test('una ruta de cliente cae a index.html y no se cachea', () async {
+      final h = build(v2: buildWebV2Handler(dist.path));
+      for (final path in ['/v2/', '/v2/index.html', '/v2/personajes/3']) {
+        final response = await get(h, path);
+        expect(response.statusCode, 200, reason: path);
+        expect(await response.readAsString(), '<html>spa</html>', reason: path);
+        expect(response.headers['cache-control'], 'private, no-cache');
+      }
+    });
+
+    test(
+      'los archivos con hash de assets/ son immutable; uno que falta es 404',
+      () async {
+        final h = build(v2: buildWebV2Handler(dist.path));
+        final hit = await get(h, '/v2/assets/index-abc123.js');
+        expect(hit.statusCode, 200);
+        expect(
+          hit.headers['cache-control'],
+          'public, max-age=31536000, immutable',
+        );
+        final miss = await get(h, '/v2/assets/viejo-zzz.js');
+        expect(miss.statusCode, 404);
+        expect(miss.headers['cache-control'], isNot(contains('immutable')));
+      },
+    );
+
+    test('/api no se toca aunque /v2 esté montado', () async {
+      final h = build(v2: buildWebV2Handler(dist.path));
+      final response = await get(h, '/api/me');
+      expect(response.headers['cache-control'], isNull);
+      expect(await response.readAsString(), isNot(contains('spa')));
     });
   });
 
