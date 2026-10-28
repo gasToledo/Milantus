@@ -756,14 +756,13 @@ está en los comentarios de `AppPalette`.
 
 ## 12. Anti-patrones
 
-Prohibiciones duras. Las primeras cuatro rompen pruebas o el build.
+Prohibiciones duras. Las primeras tres rompen pruebas o el build.
 
 | ❌ No hacer | ✅ En su lugar | Por qué |
 | --- | --- | --- |
 | Calcular una regla de D&D en un widget | Leerla de `ComputedSheet` | El motor es la fuente de verdad; la UI que recalcula se desincroniza |
 | Recorrer `klass.features` desde la UI | Preguntar a `ComputedSheet.featureChoiceSlots` | Contrato explícito entre motor y app |
 | `IconData` desde un codepoint variable | Mapa `const` en `class_visuals.dart` | Rompe el tree-shaking de íconos |
-| Concatenar rutas con `/` | `p.join` de `package:path` | Portabilidad |
 | Color hexadecimal literal en un widget | `context.palette` o `colorScheme` | El tema claro deja de funcionar |
 | `Colors.red` / `Colors.grey` | `colorScheme.error` / `onSurfaceVariant` | La paleta es el contrato |
 | Sombra para separar superficies | Borde `hairline` de 1 px | El sistema es plano por decisión |

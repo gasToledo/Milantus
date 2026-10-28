@@ -88,7 +88,7 @@ jobs:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
           # No limpiar el workspace del runner: `.env`, `cloudflared/config.yml`
           # y `cloudflared/creds.json` no están versionados (ver
-          # docs/despliegue.md) y viven a propósito dentro de este mismo
+          # docs/operaciones/despliegue.md) y viven a propósito dentro de este mismo
           # directorio de trabajo, colocados una vez por quien aprovisiona el
           # runner. `clean: true` (el default) correría `git clean -ffdx` y
           # los borraría antes de cada despliegue.

@@ -81,7 +81,7 @@ class OidcConfig {
       publicBaseUrl.replace(path: '${publicBaseUrl.path}/auth/callback');
 
   /// A dónde vuelve el navegador después de cerrar sesión en el proveedor.
-  /// También se registra en Zitadel (ver `docs/despliegue.md`): si no coincide
+  /// También se registra en Zitadel (ver `docs/operaciones/despliegue.md`): si no coincide
   /// exactamente, el proveedor cierra la sesión pero no redirige de vuelta.
   Uri get postLogoutRedirectUri =>
       publicBaseUrl.replace(path: '${publicBaseUrl.path}/');

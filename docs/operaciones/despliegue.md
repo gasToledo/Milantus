@@ -101,7 +101,7 @@ Runbook operativo del stack de contenedores.
 
 5. **Verificar.** Entrar a `https://fichas.tu-dominio.com`, confirmar que
    redirige a `/auth/login` → Zitadel → vuelve autenticado, y crear un
-   personaje de prueba (ver requisito "Arranque desde cero" — sección más
+   personaje de prueba (ver «Arranque desde cero», más
    abajo).
 
 ## Sugerencias y reportes de error por correo
@@ -393,7 +393,7 @@ Si ya hay datos de jugadores en juego, respaldar antes (ver "Respaldo y
 restauración") y planificar la reasignación; en una instalación que todavía no
 se usó, no hay nada que reasignar.
 
-## Aislamiento de red (requisito "Publicación sin puertos entrantes")
+## Aislamiento de red
 
 Ningún servicio de `docker-compose.yml` declara `ports:`. Verificar en cada
 arranque real:
@@ -408,7 +408,7 @@ puerto escuchando). `db` (que sirve las dos bases, aplicación y Zitadel) y
 `portraits-data` solo son alcanzables desde dentro de la red interna de
 Docker que arma `docker compose` para este proyecto.
 
-## Sin credenciales en la imagen (requisito "Secretos fuera de las imágenes")
+## Sin credenciales en la imagen
 
 `packages/dnd_server/Dockerfile` no recibe secretos como `ARG` ni los
 `COPY`: la configuración se lee de variables de entorno recién al arrancar
