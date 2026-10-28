@@ -12,7 +12,10 @@ class CodexEntry {
 
   /// La línea de debajo del nombre, en la lista y en el detalle.
   final String subtitle;
-  final ContentSource source;
+
+  /// De dónde sale, para la insignia del detalle. Null en lo que escribimos
+  /// nosotros (el glosario y las guías): no es de ningún libro.
+  final ContentSource? source;
 
   /// El valor por el que se filtra la categoría (nivel de conjuro, rareza,
   /// categoría de dote), o null si esa categoría no tiene filtro.
@@ -30,7 +33,7 @@ class CodexEntry {
     required this.id,
     required this.name,
     required this.subtitle,
-    required this.source,
+    this.source,
     required this.body,
     this.facet,
     this.facetRank = 0,
@@ -43,6 +46,21 @@ List<CodexEntry> codexEntries(
   ContentRepository repo,
   AppLocalizations l10n,
 ) => switch (category) {
+  CodexCategory.glossary => _glossary(l10n),
+  CodexCategory.guides => [
+    for (final (id, name, text) in [
+      ('session', l10n.guideSessionTitle, l10n.guideSessionBody),
+      ('creation', l10n.guideCreationTitle, l10n.guideCreationBody),
+      ('first-combat', l10n.guideFirstCombatTitle, l10n.guideFirstCombatBody),
+      ('sheet', l10n.guideSheetTitle, l10n.guideSheetBody),
+    ])
+      CodexEntry(
+        id: id,
+        name: name,
+        subtitle: '',
+        body: (context) => [MarkdownText(text)],
+      ),
+  ],
   CodexCategory.races => [for (final r in repo.racesSorted) _race(r, repo)],
   CodexCategory.lineages => [
     for (final l in sortedByName(repo.lineages.values, (e) => e.name))
@@ -76,6 +94,167 @@ List<CodexEntry> codexEntries(
       if (!i.isMagic) _gear(i),
   ],
 };
+
+// ------------------------------------------------------------ Primeros pasos
+
+/// El glosario para quien empieza: qué significa cada cosa que la app da por
+/// sabida (PG, CA, VD, «2d6+3»). Es texto propio y no del manual, por eso vive
+/// en el catálogo de mensajes y no en el JSON del contenido.
+///
+/// El orden es el de lectura —de los dados al DM— y no el alfabético: quien
+/// empieza lo recorre de arriba abajo, y cada entrada se apoya en las de antes.
+List<CodexEntry> _glossary(AppLocalizations l10n) {
+  final groups = [
+    (
+      l10n.glGroupDice,
+      [
+        ('dice', l10n.glDiceTitle, l10n.glDiceBody),
+        ('notation', l10n.glNotationTitle, l10n.glNotationBody),
+        ('d20-test', l10n.glD20TestTitle, l10n.glD20TestBody),
+        ('advantage', l10n.glAdvantageTitle, l10n.glAdvantageBody),
+        ('dc', l10n.glDcTitle, l10n.glDcBody),
+      ],
+    ),
+    (
+      l10n.glGroupCharacter,
+      [
+        ('abilities', l10n.glAbilitiesTitle, l10n.glAbilitiesBody),
+        ('proficiency', l10n.glProficiencyTitle, l10n.glProficiencyBody),
+        ('skills', l10n.glSkillsTitle, l10n.glSkillsBody),
+        ('saves', l10n.glSavesTitle, l10n.glSavesBody),
+        ('hit-points', l10n.glHitPointsTitle, l10n.glHitPointsBody),
+        ('armor-class', l10n.glArmorClassTitle, l10n.glArmorClassBody),
+        ('level', l10n.glLevelTitle, l10n.glLevelBody),
+      ],
+    ),
+    (
+      l10n.glGroupCombat,
+      [
+        ('initiative', l10n.glInitiativeTitle, l10n.glInitiativeBody),
+        ('turn', l10n.glTurnTitle, l10n.glTurnBody),
+        ('attack', l10n.glAttackTitle, l10n.glAttackBody),
+        ('critical', l10n.glCriticalTitle, l10n.glCriticalBody),
+        ('zero-hp', l10n.glZeroHpTitle, l10n.glZeroHpBody),
+        ('conditions', l10n.glConditionsTitle, l10n.glConditionsBody),
+      ],
+    ),
+    (
+      l10n.glGroupMagic,
+      [
+        ('spells', l10n.glSpellsTitle, l10n.glSpellsBody),
+        ('slots', l10n.glSlotsTitle, l10n.glSlotsBody),
+        ('concentration', l10n.glConcentrationTitle, l10n.glConcentrationBody),
+        ('rests', l10n.glRestsTitle, l10n.glRestsBody),
+        ('inspiration', l10n.glInspirationTitle, l10n.glInspirationBody),
+      ],
+    ),
+    (
+      l10n.glGroupDm,
+      [
+        ('challenge', l10n.glChallengeTitle, l10n.glChallengeBody),
+        ('npcs', l10n.glNpcsTitle, l10n.glNpcsBody),
+        ('difficulty', l10n.glDifficultyTitle, l10n.glDifficultyBody),
+      ],
+    ),
+  ];
+  return [
+    for (final (rank, (group, entries)) in groups.indexed)
+      for (final (id, name, text) in entries)
+        CodexEntry(
+          id: id,
+          name: name,
+          subtitle: group,
+          facet: group,
+          facetRank: rank,
+          body: (context) => [
+            MarkdownText(text),
+            // Dos entradas llevan algo que el Markdown no dibuja.
+            if (id == 'abilities') _modifierTable(context),
+            if (id == 'conditions') _conditionList(context),
+          ],
+        ),
+  ];
+}
+
+/// Puntuación → modificador, de 8 a 20. Una tabla y no la fórmula: el patrón
+/// se ve de un vistazo, y la cuenta ya la hace la ficha.
+Widget _modifierTable(BuildContext context) {
+  final pal = context.palette;
+  const scores = [8, 10, 12, 14, 16, 18, 20];
+  const numbers = TextStyle(
+    fontWeight: FontWeight.w700,
+    fontFeatures: [FontFeature.tabularFigures()],
+  );
+  Widget cell(String text, {TextStyle? style}) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+    child: Text(text, textAlign: TextAlign.center, style: style),
+  );
+  Widget label(String text) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+    child: Text(
+      text.toUpperCase(),
+      style: TextStyle(fontSize: 10, letterSpacing: 1.2, color: pal.textMuted),
+    ),
+  );
+  return Padding(
+    padding: const EdgeInsets.only(top: 14),
+    // Angosto, la tabla se corre de costado en vez de apretar las cifras.
+    child: SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Container(
+        decoration: BoxDecoration(
+          color: pal.plaque,
+          border: Border.all(color: pal.hairline),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Table(
+          defaultColumnWidth: const IntrinsicColumnWidth(),
+          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+          border: TableBorder.symmetric(
+            inside: BorderSide(color: pal.hairline),
+          ),
+          children: [
+            TableRow(
+              children: [
+                label(context.l10n.glScoreLabel),
+                for (final s in scores) cell('$s', style: numbers),
+              ],
+            ),
+            TableRow(
+              children: [
+                label(context.l10n.glModifierLabel),
+                for (final s in scores)
+                  cell(
+                    _signedModifier(s),
+                    style: numbers.copyWith(color: pal.gold),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+/// El modificador de una puntuación, del motor y firmado como en la ficha.
+String _signedModifier(int score) {
+  final mod = abilityModifier(score);
+  return mod >= 0 ? '+$mod' : '$mod';
+}
+
+/// Los estados con lo que hace cada uno, del mismo texto que usan la ficha y
+/// el combate: si se corrige ahí, se corrige acá.
+Widget _conditionList(BuildContext context) {
+  final sorted = conditions.values.toList()
+    ..sort((a, b) => a.label.compareTo(b.label));
+  return Padding(
+    padding: const EdgeInsets.only(top: 14),
+    child: _traits(context, null, [
+      for (final c in sorted) (name: c.label, description: c.description),
+    ]),
+  );
+}
 
 // ------------------------------------------------------------ Por tipo
 
@@ -558,11 +737,11 @@ Widget _section(BuildContext context, String title, List<Widget> children) =>
 /// Rasgos con nombre en negrita y su texto, uno por párrafo.
 Widget _traits(
   BuildContext context,
-  String title,
+  String? title,
   List<({String name, String description})> traits,
 ) {
   if (traits.isEmpty) return const SizedBox.shrink();
-  return _section(context, title, [
+  final items = [
     for (final t in traits)
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
@@ -579,7 +758,15 @@ Widget _traits(
           style: const TextStyle(fontSize: 14, height: 1.5),
         ),
       ),
-  ]);
+  ];
+  // Sin título cuando el encabezado ya lo dice (los estados del glosario).
+  if (title == null) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: items,
+    );
+  }
+  return _section(context, title, items);
 }
 
 /// Rasgos de clase, subclase o linaje, agrupados por el nivel en que se

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_widgets.dart';
 import '../ui/app_sidebar.dart';
+import '../ui/conditions.dart';
+import '../ui/diary_cards.dart' show MarkdownText;
 import '../l10n/l10n_context.dart';
 
 part 'codex_category_view.dart';
@@ -16,6 +18,8 @@ part 'codex_entries.dart';
 /// contenido salen de acá, y sumar una categoría es sumar un valor y su `case`
 /// en [codexEntries].
 enum CodexCategory {
+  glossary(Icons.lightbulb_outline, _inicio),
+  guides(Icons.map_outlined, _inicio),
   races(Icons.diversity_3, _personaje),
   lineages(Icons.account_tree_outlined, _personaje),
   classes(Icons.shield_outlined, _personaje),
@@ -30,6 +34,8 @@ enum CodexCategory {
 
   /// El nombre de la categoría en el idioma activo.
   String label(AppLocalizations l10n) => switch (this) {
+    CodexCategory.glossary => l10n.catGlossary,
+    CodexCategory.guides => l10n.catGuides,
     CodexCategory.races => l10n.catRaces,
     CodexCategory.lineages => l10n.catLineages,
     CodexCategory.classes => l10n.catClasses,
@@ -49,12 +55,16 @@ enum CodexCategory {
 }
 
 // Identificadores de grupo; el título sale de [codexGroupTitle].
+const _inicio = 'inicio';
 const _personaje = 'personaje';
 const _magia = 'magia';
 
 /// El título de un grupo de categorías de la portada.
-String codexGroupTitle(AppLocalizations l10n, String group) =>
-    group == _personaje ? l10n.codexGroupCharacter : l10n.codexGroupGear;
+String codexGroupTitle(AppLocalizations l10n, String group) => switch (group) {
+  _inicio => l10n.codexGroupStart,
+  _personaje => l10n.codexGroupCharacter,
+  _ => l10n.codexGroupGear,
+};
 
 /// Cuántas coincidencias de cada categoría muestra la búsqueda general antes
 /// de ofrecer «Ver las N». Con una letra sola, «a» encuentra casi todo el
@@ -314,7 +324,9 @@ class _CodexScreenState extends State<CodexScreen> {
             color: scheme.onSurface,
           ),
         ),
-        for (final group in [_personaje, _magia]) ...[
+        // Primeros pasos arriba: es lo que busca quien todavía no sabe qué
+        // buscar en el resto.
+        for (final group in [_inicio, _personaje, _magia]) ...[
           const SizedBox(height: 20),
           Eyebrow(codexGroupTitle(context.l10n, group)),
           LayoutBuilder(

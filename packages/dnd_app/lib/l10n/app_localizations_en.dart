@@ -7101,7 +7101,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tutNewToDndBody =>
-      'Dungeons & Dragons is a roleplaying game: each player runs a character, and one person, the DM (Dungeon Master), tells the story and brings the world to life. You don\'t need to know the rules: the app guides you along, and the Codex has everything to look up whenever you like.';
+      'Dungeons & Dragons is a roleplaying game: each player runs a character, and one person, the DM (Dungeon Master), tells the story and brings the world to life. You don\'t need to know the rules: the app guides you along, and in the Codex, «Getting started» explains the basics.';
 
   @override
   String get tutPlayerTitle => 'Player mode';
@@ -7256,4 +7256,244 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tutHomebrew2Body =>
       'What you create works just like the book\'s content: it shows up in character creation, in the Bestiary and in your combats. To share it with your group, export it to a file and have each of them import it into their account.';
+
+  @override
+  String get codexGroupStart => 'Getting started';
+
+  @override
+  String get catGlossary => 'Glossary';
+
+  @override
+  String get catGuides => 'Guides';
+
+  @override
+  String get glGroupDice => 'Dice and rolls';
+
+  @override
+  String get glGroupCharacter => 'Your character';
+
+  @override
+  String get glGroupCombat => 'Combat';
+
+  @override
+  String get glGroupMagic => 'Magic and rest';
+
+  @override
+  String get glGroupDm => 'For the DM';
+
+  @override
+  String get glDiceTitle => 'The dice';
+
+  @override
+  String get glDiceBody =>
+      'D&D uses seven different dice, each named with a «d» and its number of sides: d4, d6, d8, d10, d12 and d20. The seventh, the d100, is made with two d10s, one for the tens and one for the ones. The d20 is the star, because it decides whether what you try works out; the others are used mostly for damage and healing.';
+
+  @override
+  String get glNotationTitle => 'How to read «2d6+3»';
+
+  @override
+  String get glNotationBody =>
+      'The number before the «d» is how many dice you roll, the one after is how many sides they have, and whatever follows the sign is added to the total. «2d6+3» means: roll two six-sided dice, add them up and add 3.\n\n*Example: you roll a 4 and a 5, so the result is 4 + 5 + 3 = 12.*';
+
+  @override
+  String get glD20TestTitle => 'The d20 Test';
+
+  @override
+  String get glD20TestBody =>
+      'Whenever your character tries something that could go wrong, you roll a d20 and add the right modifier. If the total equals or beats the number you needed, you succeed. There are three kinds: ability checks, saving throws and attack rolls.\n\n*Example: you want to climb a wall with DC 12. You roll a 9, add your +3 Athletics and reach 12: you make it.*';
+
+  @override
+  String get glAdvantageTitle => 'Advantage and Disadvantage';
+
+  @override
+  String get glAdvantageBody =>
+      'When circumstances favor you, you have Advantage: roll two d20s and keep the higher. When they work against you, you have Disadvantage and keep the lower. If you have both at once they cancel out and you roll just one, and having several Advantages doesn\'t stack: it\'s still two dice.';
+
+  @override
+  String get glDcTitle => 'Difficulty Class (DC)';
+
+  @override
+  String get glDcBody =>
+      'It\'s the number you need to reach on an ability check or a saving throw. The DM sets it based on how hard the task is, or a rule gives it, like a spell\'s save DC. As a guide: 5 is very easy, 10 easy, 15 medium, 20 hard, 25 very hard and 30 nearly impossible.';
+
+  @override
+  String get glAbilitiesTitle => 'Abilities and modifiers';
+
+  @override
+  String get glAbilitiesBody =>
+      'Every character has six abilities that describe what they\'re like: Strength (STR), Dexterity (DEX), Constitution (CON), Intelligence (INT), Wisdom (WIS) and Charisma (CHA). Each has a score and, next to it, a modifier, which is what you actually add to your rolls. You don\'t need to work it out: the sheet shows it for you. What matters is that 10 is normal for an ordinary person: above it you add, below it you subtract.';
+
+  @override
+  String get glScoreLabel => 'Score';
+
+  @override
+  String get glModifierLabel => 'Modifier';
+
+  @override
+  String get glProficiencyTitle => 'Proficiency Bonus';
+
+  @override
+  String get glProficiencyBody =>
+      'It\'s what you gain for being trained in something. It\'s added to rolls for what your character is good at: the weapons they\'ve mastered, their proficient skills and saves, and their spells. It starts at +2 and grows with level up to +6, and it\'s never added twice to the same roll.';
+
+  @override
+  String get glSkillsTitle => 'Skills';
+
+  @override
+  String get glSkillsBody =>
+      'They\'re the specific things your character can try, like Athletics, Stealth, Perception or Persuasion, and each one depends on an ability. If you\'re proficient in one, you add that ability\'s modifier plus your Proficiency Bonus. Some characters have Expertise in certain skills, and then the bonus is added twice.\n\n*Example: Stealth depends on Dexterity. With +2 DEX and proficiency (+2) you roll at +4.*';
+
+  @override
+  String get glSavesTitle => 'Saving throws';
+
+  @override
+  String get glSavesBody =>
+      'When something threatens you (a poison, an explosion, a spell trying to control you), you make a save to resist it or suffer less. It\'s a d20 Test with the modifier of the matching ability, plus your proficiency if you have it. Each class gives you proficiency in two saves.';
+
+  @override
+  String get glHitPointsTitle => 'Hit Points (HP)';
+
+  @override
+  String get glHitPointsBody =>
+      'They\'re your character\'s life: how much damage they can take before going down. Damage subtracts them and healing brings them back, never above your maximum, which depends on your class, your level and your Constitution. Temporary HP are an extra cushion that goes first, and they\'re lost when you finish a Long Rest.';
+
+  @override
+  String get glArmorClassTitle => 'Armor Class (AC)';
+
+  @override
+  String get glArmorClassBody =>
+      'It shows how hard your character is to hit. To strike you, an enemy has to equal or beat your AC with their attack roll. Without armor it\'s 10 plus your Dexterity modifier; armor, a shield and some features raise it.';
+
+  @override
+  String get glLevelTitle => 'Level and experience';
+
+  @override
+  String get glLevelBody =>
+      'Characters start at level 1 and can reach level 20. They go up by earning experience points (XP) or when the DM decides they\'ve reached a goal in the story. Each level brings more HP and new class features; in Milantus you do it from «Level up» on your sheet.';
+
+  @override
+  String get glInitiativeTitle => 'Initiative';
+
+  @override
+  String get glInitiativeBody =>
+      'When a fight starts, everyone rolls initiative: a d20 plus their Dexterity modifier. The result sets the turn order, highest to lowest, and it holds for the whole fight. In Milantus the DM enters the rolls and the app sorts the order.';
+
+  @override
+  String get glTurnTitle => 'Your turn';
+
+  @override
+  String get glTurnBody =>
+      'On your turn you can move up to your speed and take one action, like attacking, casting a spell, dashing or dodging. Some features and spells also give you a Bonus Action, something quick and extra. And once per round, even outside your turn, you have a Reaction to respond to something that happens, like attacking an enemy trying to slip away from you.\n\n*Example: you move 4 squares, attack with your sword and step back 2 more: movement can be split before and after your action.*';
+
+  @override
+  String get glAttackTitle => 'Attack and damage';
+
+  @override
+  String get glAttackBody =>
+      'To attack you roll a d20 and add your attack bonus, which the sheet already shows worked out. If you equal or beat the enemy\'s AC, you hit and roll your weapon\'s or spell\'s damage. That damage comes off their hit points.\n\n*Example: with +5 to hit you roll 11, total 16, against AC 15: you hit. Your sword deals 1d8+3, you roll a 6, and the enemy loses 9 HP.*';
+
+  @override
+  String get glCriticalTitle => 'Critical Hit';
+
+  @override
+  String get glCriticalBody =>
+      'If the d20 shows a 20 on an attack roll, you always hit, no matter the AC, and it\'s a Critical Hit: you roll twice the damage dice. Flat bonuses are added only once. On the flip side, a natural 1 always misses.\n\n*Example: your 1d8+3 becomes 2d8+3.*';
+
+  @override
+  String get glZeroHpTitle => 'Dropping to 0 HP';
+
+  @override
+  String get glZeroHpBody =>
+      'When your character drops to 0 HP they fall unconscious, but they don\'t die right away. At the start of each of their turns they make a Death Saving Throw: a d20 with no modifiers, where 10 or more is a success. Three successes and they\'re stable; three failures and they die. A natural 20 brings them back with 1 HP, a 1 counts as two failures, and any healing wakes them up.';
+
+  @override
+  String get glConditionsTitle => 'Conditions';
+
+  @override
+  String get glConditionsBody =>
+      'Poisoned, prone, frightened, blinded: they\'re effects that change what your character can do while they last. Some give Disadvantage on your rolls, others keep you from moving or acting. Below is each one with what it does.';
+
+  @override
+  String get glSpellsTitle => 'Spells and cantrips';
+
+  @override
+  String get glSpellsBody =>
+      'Spells are the magical effects some classes can cast, like the wizard, the cleric or the bard. Your class decides which ones you can prepare, and the sheet shows them with their range, duration and what they do. Cantrips are minor spells you can cast as often as you like; the rest go from level 1 to 9 and spend a spell slot each time.';
+
+  @override
+  String get glSlotsTitle => 'Spell slots';
+
+  @override
+  String get glSlotsBody =>
+      'They\'re your character\'s magical energy. To cast a spell of level 1 or higher you spend a slot of that level or above, and some spells get stronger if you use a higher slot. They come back when you finish a Long Rest; the warlock\'s Pact Magic also comes back on each Short Rest.\n\n*Example: with two level 1 slots you can cast Magic Missile twice before resting.*';
+
+  @override
+  String get glConcentrationTitle => 'Concentration';
+
+  @override
+  String get glConcentrationBody =>
+      'Some spells last as long as you keep your Concentration, and you can only concentrate on one at a time: if you cast another that needs it, the first one ends. When you take damage you make a Constitution save to keep it, DC 10 or half the damage, whichever is higher. You also lose it if you fall unconscious.';
+
+  @override
+  String get glRestsTitle => 'Short and Long Rest';
+
+  @override
+  String get glRestsBody =>
+      'A Short Rest lasts at least an hour: you can spend Hit Dice to heal, rolling them and adding your Constitution modifier, and some features recharge. A Long Rest lasts about eight hours, sleep included: you recover all your HP, your Hit Dice and your spell slots. In Milantus both are in Combat, and if you make a mistake they can be undone.';
+
+  @override
+  String get glInspirationTitle => 'Heroic Inspiration';
+
+  @override
+  String get glInspirationBody =>
+      'It\'s a small reward the DM gives you when your character shines, though some features grant it too. When you spend it, you reroll a die you just rolled and keep the new result. You can only have one at a time, so it\'s worth using it before you get another.';
+
+  @override
+  String get glChallengeTitle => 'Challenge Rating (CR)';
+
+  @override
+  String get glChallengeBody =>
+      'It shows how dangerous a creature is. It goes from 0 to 30: a wolf is CR 1/4 and a minor threat, while an ancient red dragon, at CR 24, tests very high-level groups. It helps you pick enemies that fit your table, and it also sets how much XP each creature gives when defeated.';
+
+  @override
+  String get glNpcsTitle => 'NPCs';
+
+  @override
+  String get glNpcsBody =>
+      'Non-player characters are everyone who lives in the world and isn\'t run by a player: the innkeeper, the guard, the villain, the ally traveling with the group. You, the DM, play them and give them a voice, goals and, when needed, stats to fight. In Milantus you keep them in your library and add them to each campaign.';
+
+  @override
+  String get glDifficultyTitle => 'Encounter difficulty';
+
+  @override
+  String get glDifficultyBody =>
+      'Before a fight it helps to know whether it\'ll be a walk in the park or a massacre. Each character brings an XP budget based on their level, and enemies use it up based on their CR. Depending on how much they use, the fight is Low, Moderate or High, and beyond High, Extreme. Milantus does the math for you while you set up combat, and warns you if a creature is too strong for your group or there are too many creatures per character. If you\'d rather build fights your own way, turn it off in Settings with «Show encounter difficulty».';
+
+  @override
+  String get guideSessionTitle => 'What a game is like';
+
+  @override
+  String get guideSessionBody =>
+      'A game of D&D is a conversation with dice. The group gets together, in person or online, for a few hours, and the DM describes where they are and what\'s happening around them. Each player says what their character does, and the DM decides what happens next.\n\nWhen the outcome of something is uncertain, that\'s where the dice come in: the DM asks you for a roll and the number decides. A game mixes three things: exploring places, talking with the people of the world and fighting. Some sessions are almost all talk and others almost all combat.\n\nThere are no winners or losers: the story is built together. A campaign follows the same characters over many sessions, across weeks or even years. There are also one-shots: short adventures that start and end in a single session, great for trying the game or playing with new people.';
+
+  @override
+  String get guideCreationTitle => 'Before you create your character';
+
+  @override
+  String get guideCreationBody =>
+      'Before looking at numbers, think about who you want to be: a battle-hardened warrior, a curious sorceress, a thief with a heart of gold. The app takes care of the math; the idea is yours.\n\nThree choices define your character. Their **class** is what they do: fight, cast spells, heal, move through the shadows. Their **species** is where they come from: human, elf, dwarf and other peoples. Their **background** is what they did before the adventure, and it gives them some skills and their starting gear.\n\nIf it\'s your first time, the fighter and the rogue are easy to play, because they have few options per turn. If you want magic, the cleric combines spells with good toughness. There are no bad choices: you play to have fun, not to win.';
+
+  @override
+  String get guideFirstCombatTitle => 'Your first combat';
+
+  @override
+  String get guideFirstCombatBody =>
+      '**1 · Initiative.** The DM announces the fight and asks for initiative: roll a d20, add the number shown on your sheet and tell them the total.\n\n**2 · Wait for your turn.** While the others play, think about what you\'ll do. Milantus lets you know on your sheet when it\'s your turn and when you\'re up next.\n\n**3 · Your turn.** Move and take an action, usually attacking or casting a spell. In Combat you have your attacks with the bonus already added: roll the d20, say the total, and if the DM says you hit, roll the damage.\n\n**4 · When you get hit.** Write the damage down on your HP, in Combat. If you reach 0, don\'t panic: you fall unconscious and your companions can still save you.\n\n**5 · After the fight.** If the group can, it rests to recover. Resting is also in Combat.\n\nOne tip: ask about anything you don\'t know. No DM gets upset with someone who\'s learning.';
+
+  @override
+  String get guideSheetTitle => 'How to read your sheet';
+
+  @override
+  String get guideSheetBody =>
+      '**Character** is who your character is: their six abilities with their modifiers, the skills they\'re good at, their proficiencies and the features and feats their class, species and background give them.\n\n**Combat** is what you\'ll look at most during a game. At the top are your HP, your AC and your rests; further down, your attacks with the bonus and damage already worked out, your spells if you have any, your saves and the conditions affecting you.\n\n**Inventory** holds your gear and your money, and it\'s where you buy and sell. **Campaign** connects you with your DM\'s table, and **Journal** is your notebook for writing down what happens in the story.';
 }

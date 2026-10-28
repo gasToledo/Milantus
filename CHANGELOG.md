@@ -1070,3 +1070,18 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 - Tutoriales de una sola vez: una bienvenida que explica los modos Jugador y
   DM, y uno al entrar por primera vez a la ficha y a cada sección del Modo DM.
   Se pueden saltar de a uno o todos juntos, y Ajustes los vuelve a mostrar.
+
+## [0.43.0+1] - 2026-10-28
+
+### Nuevo
+
+- «Primeros pasos» en el Códice, para quien no conoce D&D: un glosario que
+  explica los dados, el personaje, el combate, la magia y lo básico del DM, y
+  cuatro guías (cómo es una partida, antes de crear tu personaje, tu primer
+  combate y cómo leer tu ficha). Se encuentran también desde la búsqueda.
+
+### Modificado
+
+- Los tutoriales hablan pensando en quien recién empieza: cada uno pasa a dos
+  o tres páginas, explica los términos de juego y la bienvenida suma una
+  página para quien nunca jugó.

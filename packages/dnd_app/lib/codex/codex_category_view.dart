@@ -234,7 +234,7 @@ class _CodexCategoryViewState extends State<_CodexCategoryView> {
               e.name,
               style: const TextStyle(fontFamily: 'Georgia', fontSize: 24),
             ),
-            SourceBadge(e.source),
+            if (e.source case final source?) SourceBadge(source),
           ],
         ),
         if (e.subtitle.isNotEmpty) ...[

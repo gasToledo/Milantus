@@ -11517,7 +11517,7 @@ abstract class AppLocalizations {
   /// No description provided for @tutNewToDndBody.
   ///
   /// In es, this message translates to:
-  /// **'Dungeons & Dragons es un juego de rol: cada jugador lleva un personaje, y una persona, el DM (Dungeon Master), narra la historia y da vida al mundo. No hace falta saberse las reglas: la app te va guiando y el Códice tiene todo para consultar cuando quieras.'**
+  /// **'Dungeons & Dragons es un juego de rol: cada jugador lleva un personaje, y una persona, el DM (Dungeon Master), narra la historia y da vida al mundo. No hace falta saberse las reglas: la app te va guiando, y en el Códice, «Primeros pasos» te explica lo básico.'**
   String get tutNewToDndBody;
 
   /// No description provided for @tutPlayerTitle.
@@ -11783,6 +11783,426 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Lo que creás se usa igual que el contenido del manual: aparece al crear personajes, en el Bestiario y en tus combates. Para compartirlo con tu grupo, exportalo a un archivo y que cada uno lo importe en su cuenta.'**
   String get tutHomebrew2Body;
+
+  /// No description provided for @codexGroupStart.
+  ///
+  /// In es, this message translates to:
+  /// **'Primeros pasos'**
+  String get codexGroupStart;
+
+  /// No description provided for @catGlossary.
+  ///
+  /// In es, this message translates to:
+  /// **'Glosario'**
+  String get catGlossary;
+
+  /// No description provided for @catGuides.
+  ///
+  /// In es, this message translates to:
+  /// **'Guías'**
+  String get catGuides;
+
+  /// No description provided for @glGroupDice.
+  ///
+  /// In es, this message translates to:
+  /// **'Dados y tiradas'**
+  String get glGroupDice;
+
+  /// No description provided for @glGroupCharacter.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu personaje'**
+  String get glGroupCharacter;
+
+  /// No description provided for @glGroupCombat.
+  ///
+  /// In es, this message translates to:
+  /// **'Combate'**
+  String get glGroupCombat;
+
+  /// No description provided for @glGroupMagic.
+  ///
+  /// In es, this message translates to:
+  /// **'Magia y descanso'**
+  String get glGroupMagic;
+
+  /// No description provided for @glGroupDm.
+  ///
+  /// In es, this message translates to:
+  /// **'Para el DM'**
+  String get glGroupDm;
+
+  /// No description provided for @glDiceTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Los dados'**
+  String get glDiceTitle;
+
+  /// No description provided for @glDiceBody.
+  ///
+  /// In es, this message translates to:
+  /// **'D&D usa siete dados distintos, y cada uno se nombra con una «d» y su cantidad de caras: d4, d6, d8, d10, d12 y d20. El séptimo, el d100, se arma con dos d10, uno para las decenas y otro para las unidades. El d20 es el protagonista, porque decide si lo que intentás sale bien; los demás se usan sobre todo para el daño y la curación.'**
+  String get glDiceBody;
+
+  /// No description provided for @glNotationTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Cómo se lee «2d6+3»'**
+  String get glNotationTitle;
+
+  /// No description provided for @glNotationBody.
+  ///
+  /// In es, this message translates to:
+  /// **'El número antes de la «d» es cuántos dados tirás, el de después es de cuántas caras son, y lo que sigue al signo se suma al total. «2d6+3» quiere decir: tirá dos dados de seis caras, sumalos y agregale 3.\n\n*Ejemplo: salen un 4 y un 5, así que el resultado es 4 + 5 + 3 = 12.*'**
+  String get glNotationBody;
+
+  /// No description provided for @glD20TestTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'La prueba de d20'**
+  String get glD20TestTitle;
+
+  /// No description provided for @glD20TestBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Cada vez que tu personaje intenta algo que puede salir mal, tirás un d20 y le sumás el modificador que corresponde. Si el total iguala o supera el número que había que alcanzar, te sale. Hay tres tipos: pruebas de característica, tiradas de salvación y tiradas de ataque.\n\n*Ejemplo: querés trepar un muro con CD 12. Tirás un 9, sumás tu +3 de Atletismo y llegás a 12: lo lográs.*'**
+  String get glD20TestBody;
+
+  /// No description provided for @glAdvantageTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Ventaja y desventaja'**
+  String get glAdvantageTitle;
+
+  /// No description provided for @glAdvantageBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuando las circunstancias te favorecen tenés ventaja: tirás dos d20 y te quedás con el más alto. Cuando te juegan en contra tenés desventaja y te quedás con el más bajo. Si tenés las dos a la vez, se anulan y tirás uno solo, y tener varias ventajas no suma: siguen siendo dos dados.'**
+  String get glAdvantageBody;
+
+  /// No description provided for @glDcTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Clase de dificultad (CD)'**
+  String get glDcTitle;
+
+  /// No description provided for @glDcBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Es el número que tenés que alcanzar en una prueba de característica o en una tirada de salvación. Lo fija el DM según lo difícil que sea la tarea, o lo indica la regla, como la CD de salvación de un conjuro. Como guía: 5 es muy fácil, 10 fácil, 15 normal, 20 difícil, 25 muy difícil y 30 casi imposible.'**
+  String get glDcBody;
+
+  /// No description provided for @glAbilitiesTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Características y modificadores'**
+  String get glAbilitiesTitle;
+
+  /// No description provided for @glAbilitiesBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Todo personaje tiene seis características que describen cómo es: Fuerza (FUE), Destreza (DES), Constitución (CON), Inteligencia (INT), Sabiduría (SAB) y Carisma (CAR). Cada una tiene una puntuación y, al lado, un modificador, que es lo que realmente sumás a tus tiradas. No hace falta calcularlo: la ficha lo muestra solo. Lo importante es que 10 es lo normal para una persona común: por encima sumás, por debajo restás.'**
+  String get glAbilitiesBody;
+
+  /// No description provided for @glScoreLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Puntuación'**
+  String get glScoreLabel;
+
+  /// No description provided for @glModifierLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Modificador'**
+  String get glModifierLabel;
+
+  /// No description provided for @glProficiencyTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Bonificador por competencia'**
+  String get glProficiencyTitle;
+
+  /// No description provided for @glProficiencyBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Es lo que ganás por estar entrenado en algo. Se suma a las tiradas de lo que tu personaje sabe hacer bien: las armas que domina, sus habilidades y salvaciones con competencia, y sus conjuros. Empieza en +2 y crece con el nivel hasta +6, y nunca se suma dos veces a la misma tirada.'**
+  String get glProficiencyBody;
+
+  /// No description provided for @glSkillsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Habilidades'**
+  String get glSkillsTitle;
+
+  /// No description provided for @glSkillsBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Son las cosas concretas que tu personaje puede intentar, como Atletismo, Sigilo, Percepción o Persuasión, y cada una depende de una característica. Si tenés competencia en una, sumás el modificador de esa característica más tu bonificador por competencia. Algunos personajes tienen pericia en ciertas habilidades, y ahí el bonificador se suma doble.\n\n*Ejemplo: Sigilo depende de la Destreza. Con +2 de DES y competencia (+2) tirás con +4.*'**
+  String get glSkillsBody;
+
+  /// No description provided for @glSavesTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tiradas de salvación'**
+  String get glSavesTitle;
+
+  /// No description provided for @glSavesBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuando algo te amenaza (un veneno, una explosión, un hechizo que intenta controlarte), tirás una salvación para resistirlo o sufrir menos. Es una prueba de d20 con el modificador de la característica que corresponda, más tu competencia si la tenés. Cada clase te da competencia en dos salvaciones.'**
+  String get glSavesBody;
+
+  /// No description provided for @glHitPointsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Puntos de golpe (PG)'**
+  String get glHitPointsTitle;
+
+  /// No description provided for @glHitPointsBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Son la vida de tu personaje: cuánto daño aguanta antes de caer. El daño los resta y la curación los devuelve, sin pasar nunca de tu máximo, que depende de tu clase, tu nivel y tu Constitución. Los PG temporales son un colchón extra que se pierde primero, y se pierden al terminar un descanso largo.'**
+  String get glHitPointsBody;
+
+  /// No description provided for @glArmorClassTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Clase de armadura (CA)'**
+  String get glArmorClassTitle;
+
+  /// No description provided for @glArmorClassBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Indica qué tan difícil es acertarle a tu personaje. Para golpearte, el enemigo tiene que igualar o superar tu CA con su tirada de ataque. Sin armadura es 10 más tu modificador de Destreza; la armadura, el escudo y algunos rasgos la suben.'**
+  String get glArmorClassBody;
+
+  /// No description provided for @glLevelTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Nivel y experiencia'**
+  String get glLevelTitle;
+
+  /// No description provided for @glLevelBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Los personajes empiezan en nivel 1 y pueden llegar hasta el 20. Suben al juntar puntos de experiencia (PX) o cuando el DM decide que cumplieron una meta de la historia. Cada nivel trae más PG y rasgos nuevos de tu clase; en Milantus lo hacés desde «Subir nivel» en tu ficha.'**
+  String get glLevelBody;
+
+  /// No description provided for @glInitiativeTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Iniciativa'**
+  String get glInitiativeTitle;
+
+  /// No description provided for @glInitiativeBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuando empieza una pelea, todos tiran iniciativa: un d20 más su modificador de Destreza. El resultado decide el orden de los turnos, de mayor a menor, y se mantiene toda la pelea. En Milantus el DM carga las tiradas y la app arma el orden sola.'**
+  String get glInitiativeBody;
+
+  /// No description provided for @glTurnTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu turno'**
+  String get glTurnTitle;
+
+  /// No description provided for @glTurnBody.
+  ///
+  /// In es, this message translates to:
+  /// **'En tu turno podés moverte hasta tu velocidad y hacer una acción, como atacar, lanzar un conjuro, correr o esquivar. Algunos rasgos y conjuros te dan además una acción adicional, que es algo rápido y extra. Y una vez por ronda, incluso fuera de tu turno, tenés una reacción para responder a algo que pasa, como atacar a un enemigo que intenta escaparse de tu lado.\n\n*Ejemplo: avanzás 4 casillas, atacás con tu espada y te alejás 2 más: el movimiento se puede partir antes y después de la acción.*'**
+  String get glTurnBody;
+
+  /// No description provided for @glAttackTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Ataque y daño'**
+  String get glAttackTitle;
+
+  /// No description provided for @glAttackBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Para atacar tirás un d20 y le sumás tu bonificador de ataque, que la ficha ya muestra calculado. Si igualás o superás la CA del enemigo, le pegás y tirás el daño de tu arma o conjuro. Ese daño se resta de sus puntos de golpe.\n\n*Ejemplo: con +5 de ataque sacás 11, total 16, contra CA 15: acertás. Tu espada hace 1d8+3, sale un 6, y el enemigo pierde 9 PG.*'**
+  String get glAttackBody;
+
+  /// No description provided for @glCriticalTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Golpe crítico'**
+  String get glCriticalTitle;
+
+  /// No description provided for @glCriticalBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Si en una tirada de ataque el d20 muestra un 20, acertás siempre, sin importar la CA, y es un golpe crítico: tirás el doble de dados de daño. Los bonificadores fijos se suman una sola vez. Al revés, un 1 natural falla siempre.\n\n*Ejemplo: tu 1d8+3 se vuelve 2d8+3.*'**
+  String get glCriticalBody;
+
+  /// No description provided for @glZeroHpTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Llegar a 0 PG'**
+  String get glZeroHpTitle;
+
+  /// No description provided for @glZeroHpBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuando tu personaje llega a 0 PG cae inconsciente, pero no muere enseguida. Al empezar cada uno de sus turnos tira una salvación contra muerte: un d20 sin modificadores, donde 10 o más es un éxito. Con tres éxitos queda estable; con tres fallos, muere. Un 20 natural lo levanta con 1 PG, un 1 cuenta como dos fallos, y cualquier curación lo despierta.'**
+  String get glZeroHpBody;
+
+  /// No description provided for @glConditionsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Estados'**
+  String get glConditionsTitle;
+
+  /// No description provided for @glConditionsBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Envenenado, derribado, asustado, cegado: son efectos que cambian lo que tu personaje puede hacer mientras duran. Algunos dan desventaja en tus tiradas, otros te impiden moverte o actuar. Abajo tenés cada uno con lo que hace.'**
+  String get glConditionsBody;
+
+  /// No description provided for @glSpellsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Conjuros y trucos'**
+  String get glSpellsTitle;
+
+  /// No description provided for @glSpellsBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Los conjuros son los efectos mágicos que pueden lanzar algunas clases, como el mago, el clérigo o el bardo. Tu clase decide cuáles podés preparar, y la ficha te los muestra con su alcance, su duración y lo que hacen. Los trucos son conjuros menores que lanzás cuantas veces quieras; el resto van del nivel 1 al 9 y gastan un espacio de conjuro cada vez.'**
+  String get glSpellsBody;
+
+  /// No description provided for @glSlotsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Espacios de conjuro'**
+  String get glSlotsTitle;
+
+  /// No description provided for @glSlotsBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Son la energía mágica de tu personaje. Para lanzar un conjuro de nivel 1 o más gastás un espacio de ese nivel o de uno mayor, y algunos conjuros se vuelven más fuertes si usás un espacio más alto. Se recuperan al terminar un descanso largo; la magia de pacto del brujo, además, en cada descanso corto.\n\n*Ejemplo: con dos espacios de nivel 1 podés lanzar Proyectil Mágico dos veces antes de descansar.*'**
+  String get glSlotsBody;
+
+  /// No description provided for @glConcentrationTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Concentración'**
+  String get glConcentrationTitle;
+
+  /// No description provided for @glConcentrationBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Algunos conjuros duran mientras mantengas la concentración, y solo podés concentrarte en uno a la vez: si lanzás otro que la pida, el primero termina. Cuando recibís daño tirás una salvación de Constitución para no perderla, con CD 10 o la mitad del daño, la que sea mayor. También la perdés si caés inconsciente.'**
+  String get glConcentrationBody;
+
+  /// No description provided for @glRestsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Descanso corto y largo'**
+  String get glRestsTitle;
+
+  /// No description provided for @glRestsBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Un descanso corto dura al menos una hora: podés gastar dados de golpe para curarte, tirándolos y sumando tu modificador de Constitución, y algunos rasgos se recargan. Un descanso largo dura unas ocho horas, con sueño incluido: recuperás todos tus PG, tus dados de golpe y tus espacios de conjuro. En Milantus los dos están en Combate, y si te equivocás se pueden deshacer.'**
+  String get glRestsBody;
+
+  /// No description provided for @glInspirationTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Inspiración Heroica'**
+  String get glInspirationTitle;
+
+  /// No description provided for @glInspirationBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Es un pequeño premio que te da el DM cuando tu personaje se luce, aunque algunos rasgos también la otorgan. Cuando la gastás, volvés a tirar un dado que acabás de tirar y te quedás con el resultado nuevo. Solo podés tener una a la vez, así que conviene usarla antes de que te den otra.'**
+  String get glInspirationBody;
+
+  /// No description provided for @glChallengeTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Valor de desafío (VD)'**
+  String get glChallengeTitle;
+
+  /// No description provided for @glChallengeBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Indica qué tan peligrosa es una criatura. Va de 0 a 30: un lobo tiene VD 1/4 y es una amenaza menor, mientras que un dragón rojo anciano, con VD 24, pone a prueba a grupos de nivel muy alto. Sirve para elegir enemigos acordes a tu mesa, y también decide cuántos PX da cada criatura al ser derrotada.'**
+  String get glChallengeBody;
+
+  /// No description provided for @glNpcsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'PNJ'**
+  String get glNpcsTitle;
+
+  /// No description provided for @glNpcsBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Los personajes no jugadores son todos los que habitan el mundo y no lleva ningún jugador: el tabernero, el guardia, el villano, el aliado que acompaña al grupo. Los manejás vos, el DM, y les das voz, intenciones y, si hace falta, estadísticas para pelear. En Milantus los guardás en tu biblioteca y los sumás a cada campaña.'**
+  String get glNpcsBody;
+
+  /// No description provided for @glDifficultyTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Dificultad de un encuentro'**
+  String get glDifficultyTitle;
+
+  /// No description provided for @glDifficultyBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Antes de una pelea conviene saber si va a ser un trámite o una masacre. Cada personaje aporta un presupuesto de PX según su nivel, y los enemigos lo consumen según su VD. Según cuánto usen, la pelea es Baja, Moderada o Alta, y por encima de Alta, Extrema. Milantus hace la cuenta sola mientras armás el combate, y te avisa si hay una criatura demasiado fuerte para tu grupo o demasiadas criaturas por personaje. Si preferís armar las peleas a tu criterio, lo apagás en Ajustes, con «Mostrar la dificultad del encuentro».'**
+  String get glDifficultyBody;
+
+  /// No description provided for @guideSessionTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Cómo es una partida'**
+  String get guideSessionTitle;
+
+  /// No description provided for @guideSessionBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Una partida de D&D es una conversación con dados. El grupo se junta, en persona o por internet, durante unas horas, y el DM describe dónde están y qué pasa a su alrededor. Cada jugador cuenta qué hace su personaje, y el DM decide qué pasa después.\n\nCuando el resultado de algo es incierto, ahí entran los dados: el DM te pide una tirada y el número decide. Una partida mezcla tres cosas: explorar lugares, hablar con los personajes del mundo y pelear. Algunas sesiones son casi todo charla y otras, casi todo combate.\n\nNo hay ganadores ni perdedores: la historia se construye entre todos. Una campaña sigue a los mismos personajes durante muchas sesiones, a lo largo de semanas o incluso años. También existen los one-shots: aventuras cortas que empiezan y terminan en una sola sesión, ideales para probar el juego o jugar con gente nueva.'**
+  String get guideSessionBody;
+
+  /// No description provided for @guideCreationTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Antes de crear tu personaje'**
+  String get guideCreationTitle;
+
+  /// No description provided for @guideCreationBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Antes de mirar números, pensá en quién querés ser: un guerrero curtido, una hechicera curiosa, un ladrón con buen corazón. La app se encarga de las cuentas; la idea es tuya.\n\nTres elecciones definen a tu personaje. La **clase** es lo que hace: pelear, lanzar conjuros, curar, moverse en las sombras. La **especie** es de dónde viene: humano, elfo, enano y otros pueblos. El **trasfondo** es lo que hacía antes de la aventura, y le da algunas habilidades y su primer equipo.\n\nSi es tu primera vez, el guerrero y el pícaro son fáciles de llevar, porque tienen pocas opciones por turno. Si querés magia, el clérigo combina hechizos con buena resistencia. No hay elecciones malas: se juega para divertirse, no para ganar.'**
+  String get guideCreationBody;
+
+  /// No description provided for @guideFirstCombatTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu primer combate'**
+  String get guideFirstCombatTitle;
+
+  /// No description provided for @guideFirstCombatBody.
+  ///
+  /// In es, this message translates to:
+  /// **'**1 · Iniciativa.** El DM avisa que empieza la pelea y te pide iniciativa: tirás un d20, le sumás el número que muestra tu ficha y le decís el total.\n\n**2 · Esperá tu turno.** Mientras juegan los demás, pensá qué vas a hacer. Milantus te avisa en la ficha cuando te toca y cuando seguís vos.\n\n**3 · Tu turno.** Moverte y hacer una acción, casi siempre atacar o lanzar un conjuro. En Combate tenés tus ataques con el bonificador ya sumado: tirás el d20, decís el total, y si el DM te dice que acertaste, tirás el daño.\n\n**4 · Cuando te pegan.** Anotás el daño en tus PG, en Combate. Si llegás a 0 no te desesperes: caés inconsciente y tus compañeros todavía pueden salvarte.\n\n**5 · Después de la pelea.** Si el grupo puede, descansa para recuperarse. El descanso también está en Combate.\n\nUn consejo: preguntá todo lo que no sepas. Ningún DM se enoja con alguien que está aprendiendo.'**
+  String get guideFirstCombatBody;
+
+  /// No description provided for @guideSheetTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Cómo leer tu ficha'**
+  String get guideSheetTitle;
+
+  /// No description provided for @guideSheetBody.
+  ///
+  /// In es, this message translates to:
+  /// **'**Personaje** es quién es tu personaje: sus seis características con sus modificadores, las habilidades en las que se destaca, sus competencias y los rasgos y dotes que le dan su clase, su especie y su trasfondo.\n\n**Combate** es lo que más vas a mirar durante una partida. Arriba están tus PG, tu CA y tus descansos; más abajo, tus ataques con el bonificador y el daño ya calculados, tus conjuros si los tenés, tus salvaciones y los estados que te afectan.\n\n**Inventario** guarda tu equipo y tu dinero, y desde ahí comprás y vendés. **Campaña** te conecta con la mesa de tu DM, y **Diario** es tu cuaderno para anotar lo que va pasando en la historia.'**
+  String get guideSheetBody;
 }
 
 class _AppLocalizationsDelegate

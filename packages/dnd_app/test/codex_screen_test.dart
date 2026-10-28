@@ -1,5 +1,6 @@
 import 'package:dnd_app/codex/codex_screen.dart';
 import 'package:dnd_app/theme/app_theme.dart';
+import 'package:dnd_app/ui/conditions.dart';
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -150,6 +151,29 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text(bola.description), findsOneWidget);
     expect(find.text(bola.range), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  // Quien empieza busca la sigla que no entiende; el glosario tiene que
+  // aparecer en la búsqueda general como el resto del catálogo.
+  testWidgets('la búsqueda general encuentra el glosario de Primeros pasos', (
+    tester,
+  ) async {
+    await pumpCodex(tester);
+
+    await search(tester, l10nEs.glConditionsTitle);
+    await tester.tap(
+      find.byKey(const ValueKey('codex-result-glossary-conditions')),
+    );
+    await tester.pumpAndSettle();
+    // Los estados salen del mismo texto que la ficha, no de una copia.
+    expect(
+      find.textContaining(
+        conditions['blinded']!.description,
+        findRichText: true,
+      ),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 
