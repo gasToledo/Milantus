@@ -3654,7 +3654,7 @@
     "name": "Swarm of Insects",
     "kind": "Medium Swarm of Tiny Beasts, Unaligned",
     "senses": "Blindsight 30 ft.; Passive Perception 8",
-    "speed": "20 ft., Climb or Fly 20 ft. (GM's choice)",
+    "speed": "20 ft., Climb or Fly 20 ft. (DM's choice)",
     "languages": "None",
     "traits.0.name": "Swarm",
     "traits.1.name": "Spider Climb",
