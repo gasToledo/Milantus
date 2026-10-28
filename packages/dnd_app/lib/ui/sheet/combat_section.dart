@@ -116,7 +116,7 @@ extension _SheetCombatSection on _SheetScreenState {
         FilledButton.icon(
           style: FilledButton.styleFrom(
             backgroundColor: context.palette.crimson,
-            foregroundColor: Colors.white,
+            foregroundColor: Theme.of(context).colorScheme.onError,
           ),
           onPressed: () => _mutateCombat(() {
             CombatOps.applyDamage(_c.combat, _amount, sheet: s);
@@ -1354,7 +1354,7 @@ extension _SheetCombatSection on _SheetScreenState {
               FilledButton.icon(
                 style: FilledButton.styleFrom(
                   backgroundColor: pal.crimson,
-                  foregroundColor: Colors.white,
+                  foregroundColor: Theme.of(context).colorScheme.onError,
                 ),
                 onPressed: () {
                   final destroyed = CombatOps.damageCompanion(
