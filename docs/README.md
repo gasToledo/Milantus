@@ -28,7 +28,8 @@ trabajar en el repositorio. Los detalles viven acá, una sola vez.
 ## Operaciones
 
 - [Despliegue autoalojado](operaciones/despliegue.md): instalación, CI/CD,
-  recuperación, seguridad y respaldos.
+  recuperación, seguridad y respaldos; también cómo se sirve el cliente React
+  nuevo (`packages/dnd_web`) bajo `/v2`.
 
 ## Auditorías
 
