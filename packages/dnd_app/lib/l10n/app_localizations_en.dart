@@ -7068,6 +7068,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dmMusicChangeLink => 'Change link';
 
   @override
+  String get settingsTutorials => 'Tutorials';
+
+  @override
+  String get settingsTutorialsReset => 'Show them again';
+
+  @override
+  String get settingsTutorialsResetDone =>
+      'Tutorials will show up again in each section.';
+
+  @override
   String get tutSkipAll => 'Skip all';
 
   @override
@@ -7080,72 +7090,170 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tutDone => 'Got it';
 
   @override
-  String get tutWelcomeTitle => 'Welcome';
+  String get tutWelcomeTitle => 'Welcome aboard';
 
   @override
   String get tutWelcomeBody =>
-      'Milantus has two modes: Player, for your characters, and DM, for running campaigns. Switch between them with the “Mode” selector in the side panel.';
+      'We\'re so glad you\'re here! Milantus keeps you company in your D&D games: it stores your characters and does the math for you, so you can focus on the fun part, which is playing. Here\'s the basics in a minute.';
 
   @override
-  String get tutPlayerTitle => 'Player Mode';
+  String get tutNewToDndTitle => 'New to D&D?';
+
+  @override
+  String get tutNewToDndBody =>
+      'Dungeons & Dragons is a roleplaying game: each player runs a character, and one person, the DM (Dungeon Master), tells the story and brings the world to life. You don\'t need to know the rules: the app guides you along, and the Codex has everything to look up whenever you like.';
+
+  @override
+  String get tutPlayerTitle => 'Player mode';
 
   @override
   String get tutPlayerBody =>
-      'Build a character step by step and the sheet works out the numbers for you. From the sheet you track HP, inventory and spells, take rests and level up. The Codex has the rules, spells and items.';
+      'If you\'re going to play, start here. You build your character by answering a few questions, and the sheet works out everything else. During the game you track the damage you take, what you carry and your spells right there.';
 
   @override
-  String get tutDmTitle => 'DM Mode';
+  String get tutDmTitle => 'DM mode';
 
   @override
   String get tutDmBody =>
-      'Create campaigns and add your players with the code they send you from their sheet. Organize chapters, notes and NPCs, and run combat with initiative and monsters from the Bestiary.';
+      'If you\'re running the game, this mode is for you. You set up your campaign, add your group\'s characters and keep your notes, your NPCs (the characters you play) and your combats at hand. Switch modes anytime with the «Mode» selector in the side panel.';
 
   @override
-  String get tutSheetTitle => 'Your sheet';
+  String get tutSheet1Title => 'Your sheet';
 
   @override
-  String get tutSheetBody =>
-      'The side panel splits Character, Combat, Inventory, Campaign and Journal. Combat holds HP, attacks, spells and rests. To let your DM see the sheet, tap “Share” and send them the code.';
+  String get tutSheet1Body =>
+      'This is your character\'s sheet, and Milantus keeps it up to date for you. The side panel splits it into parts: Character (who they are and what they can do), Combat, Inventory, Campaign and Journal, where you can write down what happens.';
 
   @override
-  String get tutDmTableBody =>
-      'These are the characters at your table. To add one, ask the player for the code from “Share” on their sheet and enter it in “Add character”. Each character’s menu lets you grant Heroic Inspiration.';
+  String get tutSheet2Title => 'During the game';
 
   @override
-  String get tutDmChaptersBody =>
-      'Split the story into chapters, each with its goal. Start the one being played and close it when it ends: your players get notified.';
+  String get tutSheet2Body =>
+      'Most of the action happens in Combat. That\'s where you track the damage you take, see your attacks and spells, and rest to recover hit points, which are your character\'s life. Made a mistake? No worries: it\'s fixed in a tap.';
 
   @override
-  String get tutDmNotebookBody =>
-      'Notes are grouped by chapter. They accept Markdown, and @Name mentions a character or NPC from the campaign: the mention opens their sheet.';
+  String get tutSheet3Title => 'Playing with your group';
 
   @override
-  String get tutDmNpcsBody =>
-      'This campaign’s NPCs, with their HP and status. Bring them from your library or create a new one: just a name with notes, a stat block like the Bestiary’s, or a full character sheet.';
+  String get tutSheet3Body =>
+      'For your DM to add you to their campaign, tap «Share» and send them the code that shows up. From then on you\'ll get their notices, like when it\'s time to level up.';
 
   @override
-  String get tutDmCombatBody =>
-      'Add monsters from the Bestiary and NPCs, roll initiative and go turn by turn tracking HP and conditions. If the campaign has combat music, you’re offered to play it when combat starts. Closing it leaves a log.';
+  String get tutDmTable1Title => 'Your table';
 
   @override
-  String get tutBestiaryBody =>
-      'The SRD creatures plus your homebrew ones. Find the one you need and add it to the selected campaign’s combat.';
+  String get tutDmTable1Body =>
+      'This is where your group gathers. Each player builds their character from their own account and, to join, sends you a code they find on their sheet, under «Share». Enter it in «Add character» and you\'re set.';
 
   @override
-  String get tutNpcLibraryBody =>
-      'Your NPCs belong to your account, not to a table: the same one can appear in several campaigns. Create, edit and import them here.';
+  String get tutDmTable2Title => 'Keeping up with your players';
 
   @override
-  String get tutHomebrewBody =>
-      'Add your own content: species, backgrounds, feats, spells, weapons, armor, items and creatures. It works just like the book’s, in character creation and in the Bestiary.';
+  String get tutDmTable2Body =>
+      'Tap a character to see their full sheet, always up to date. Each player keeps their own sheet: you can see it, but not change it. If someone shines in a scene, their menu lets you grant Heroic Inspiration, which lets them reroll a die.';
 
   @override
-  String get settingsTutorials => 'Tutorials';
+  String get tutDmChapters1Title => 'Your story, in chapters';
 
   @override
-  String get settingsTutorialsReset => 'Show them again';
+  String get tutDmChapters1Body =>
+      'A campaign usually runs for many sessions, so it helps to split it into chapters, like a book. Give each one a name and a goal, what the group should achieve or uncover, and start it when they begin playing it.';
 
   @override
-  String get settingsTutorialsResetDone =>
-      'Tutorials will show up again in each section.';
+  String get tutDmChapters2Title => 'Closing a chapter';
+
+  @override
+  String get tutDmChapters2Body =>
+      'When the group finishes a chapter, close it and every player gets a notice. If you gave it rewards when you created it (a level up, gold or items), they come in that same notice, and each player writes them on their sheet.';
+
+  @override
+  String get tutDmNotebook1Title => 'Your DM notebook';
+
+  @override
+  String get tutDmNotebook1Body =>
+      'Everything you don\'t want to forget goes here: ideas, names, clues and what happened each session. Notes are grouped by chapter, so you need at least one created.';
+
+  @override
+  String get tutDmNotebook2Title => 'Notes that connect';
+
+  @override
+  String get tutDmNotebook2Body =>
+      'Type @ and a character\'s or NPC\'s name to mention them, and tap the mention to open their sheet. You can also format your notes: # at the start for a heading, **like this** for bold and a dash to make a list.';
+
+  @override
+  String get tutDmNpcs1Title => 'The people of your world';
+
+  @override
+  String get tutDmNpcs1Body =>
+      'NPCs (non-player characters) are everyone you play: the innkeeper, the villain, the ally who travels with the group. Here are this campaign\'s, and for each one whether they\'re still alive, dead, or nobody knows what became of them.';
+
+  @override
+  String get tutDmNpcs2Title => 'As simple or detailed as you like';
+
+  @override
+  String get tutDmNpcs2Body =>
+      'Create a new one or bring one from your library. You choose how much detail it has: just a name with notes, a stat block like a monster\'s so it can fight, or a full character sheet.';
+
+  @override
+  String get tutDmCombat1Title => 'Setting up a fight';
+
+  @override
+  String get tutDmCombat1Body =>
+      'When a fight breaks out, tap «Set up combat». The characters at your table are already in; you add the enemies, which can be monsters from the Bestiary or your NPCs.';
+
+  @override
+  String get tutDmCombat2Title => 'Turn by turn';
+
+  @override
+  String get tutDmCombat2Body =>
+      'To start, everyone rolls initiative, a die that decides the order they act in, and Milantus sorts them. Then you go turn by turn tracking damage and conditions like poisoned or prone. Your players see on their sheet when it\'s their turn.';
+
+  @override
+  String get tutDmCombat3Title => 'Music and wrap-up';
+
+  @override
+  String get tutDmCombat3Body =>
+      'If you added combat music to the campaign, Milantus offers to play it when the fight starts. When it\'s over, you close the combat and a log of what happened is kept to look back on later.';
+
+  @override
+  String get tutBestiary1Title => 'Monsters and creatures';
+
+  @override
+  String get tutBestiary1Body =>
+      'Here are the game\'s creatures, each with its stats ready to use. Search them by name, or filter them by type and by CR (challenge rating), which tells you how dangerous each one is for your group.';
+
+  @override
+  String get tutBestiary2Title => 'Into the fight, or made your own';
+
+  @override
+  String get tutBestiary2Body =>
+      'Once you find the one you want, add it to your campaign\'s combat with a tap. Want it different? Edit a copy: it\'s saved as yours in Homebrew, and the original stays untouched.';
+
+  @override
+  String get tutNpcLibrary1Title => 'All your NPCs, in one place';
+
+  @override
+  String get tutNpcLibrary1Body =>
+      'All your NPCs live here, whatever campaign they show up in. The same one can be in several, and in each it keeps its own hit points and status. Find them by name, or filter them by campaign and by tags.';
+
+  @override
+  String get tutNpcLibrary2Title => 'Share them with other DMs';
+
+  @override
+  String get tutNpcLibrary2Body =>
+      'Made an NPC you love? Export it to a file and send it to another DM, or import the ones others share with you. Whoever gets it keeps their own copy.';
+
+  @override
+  String get tutHomebrew1Title => 'Your own content';
+
+  @override
+  String get tutHomebrew1Body =>
+      'Homebrew is anything you make up: a new species, your own spell, your campaign\'s legendary weapon or a monster that\'s in no book. You add it here by filling in a form, no coding needed.';
+
+  @override
+  String get tutHomebrew2Title => 'Plays just like the official';
+
+  @override
+  String get tutHomebrew2Body =>
+      'What you create works just like the book\'s content: it shows up in character creation, in the Bestiary and in your combats. To share it with your group, export it to a file and have each of them import it into their account.';
 }

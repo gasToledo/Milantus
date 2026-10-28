@@ -7085,6 +7085,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dmMusicChangeLink => 'Cambiar enlace';
 
   @override
+  String get settingsTutorials => 'Tutoriales';
+
+  @override
+  String get settingsTutorialsReset => 'Volver a verlos';
+
+  @override
+  String get settingsTutorialsResetDone =>
+      'Los tutoriales van a volver a salir en cada sección.';
+
+  @override
   String get tutSkipAll => 'Saltar todos';
 
   @override
@@ -7101,68 +7111,166 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get tutWelcomeBody =>
-      'Milantus tiene dos modos: Jugador, para tus personajes, y DM, para dirigir campañas. Pasás de uno a otro con el selector «Modo» del panel lateral.';
+      '¡Qué bueno que estés acá! Milantus te acompaña en tus partidas de D&D: guarda tus personajes y hace las cuentas por vos, así te ocupás de lo divertido, que es jugar. Te mostramos lo básico en un minuto.';
+
+  @override
+  String get tutNewToDndTitle => '¿Primera vez con D&D?';
+
+  @override
+  String get tutNewToDndBody =>
+      'Dungeons & Dragons es un juego de rol: cada jugador lleva un personaje, y una persona, el DM (Dungeon Master), narra la historia y da vida al mundo. No hace falta saberse las reglas: la app te va guiando y el Códice tiene todo para consultar cuando quieras.';
 
   @override
   String get tutPlayerTitle => 'Modo Jugador';
 
   @override
   String get tutPlayerBody =>
-      'Creá un personaje paso a paso y la ficha calcula sola los números. Desde la ficha llevás los PG, el inventario y los conjuros, descansás y subís de nivel. En el Códice consultás reglas, conjuros y objetos.';
+      'Si vas a jugar, empezá por acá. Creás tu personaje respondiendo unas pocas preguntas, y la ficha calcula sola todo lo demás. Durante la partida anotás ahí el daño que recibís, lo que llevás encima y tus conjuros.';
 
   @override
   String get tutDmTitle => 'Modo DM';
 
   @override
   String get tutDmBody =>
-      'Armá campañas y sumá a tus jugadores con el código que te pasan desde su ficha. Organizá capítulos, notas y PNJ, y llevá los combates con la iniciativa y los monstruos del Bestiario.';
+      'Si te toca dirigir la partida, este modo es para vos. Armás tu campaña, sumás los personajes de tu grupo y tenés a mano tus notas, los PNJ (los personajes que manejás vos) y los combates. Cambiás de modo cuando quieras desde el selector «Modo» del panel lateral.';
 
   @override
-  String get tutSheetTitle => 'Tu ficha';
+  String get tutSheet1Title => 'Tu ficha';
 
   @override
-  String get tutSheetBody =>
-      'El panel lateral separa Personaje, Combate, Inventario, Campaña y Diario. En Combate están los PG, los ataques, los conjuros y los descansos. Para que tu DM vea la ficha, tocá «Compartir» y pasale el código.';
+  String get tutSheet1Body =>
+      'Esta es la hoja de tu personaje, y Milantus la mantiene al día por vos. En el panel lateral la tenés dividida en partes: Personaje (quién es y qué sabe hacer), Combate, Inventario, Campaña y Diario, donde podés escribir lo que va pasando.';
 
   @override
-  String get tutDmTableBody =>
-      'Acá están los personajes de la mesa. Para sumar uno, pedile al jugador el código de «Compartir» de su ficha y cargalo en «Sumar personaje». Desde el menú de cada uno le concedés Inspiración Heroica.';
+  String get tutSheet2Title => 'Durante la partida';
 
   @override
-  String get tutDmChaptersBody =>
-      'Dividí la historia en capítulos, cada uno con su objetivo. Iniciá el que se está jugando y cerralo al terminar: a los jugadores les llega el aviso.';
+  String get tutSheet2Body =>
+      'Casi todo pasa en Combate. Ahí anotás el daño que recibís, ves tus ataques y tus conjuros, y descansás para recuperar puntos de golpe, que son la vida de tu personaje. Si te equivocás, no pasa nada: se corrige en un toque.';
 
   @override
-  String get tutDmNotebookBody =>
-      'Las notas se ordenan por capítulo. Aceptan Markdown, y con @Nombre mencionás a un personaje o PNJ de la campaña: la mención abre su ficha.';
+  String get tutSheet3Title => 'Jugar con tu grupo';
 
   @override
-  String get tutDmNpcsBody =>
-      'Los PNJ de esta campaña, con sus PG y su estado. Traelos de tu biblioteca o creá uno nuevo: solo un nombre con notas, un bloque como los del Bestiario o una ficha completa.';
+  String get tutSheet3Body =>
+      'Para que tu DM te sume a su campaña, tocá «Compartir» y pasale el código que aparece. Desde ahí te van a llegar sus avisos, por ejemplo cuando te toca subir de nivel.';
 
   @override
-  String get tutDmCombatBody =>
-      'Sumá monstruos del Bestiario y PNJ, tirá iniciativa y avanzá turno a turno llevando PG y condiciones. Si la campaña tiene música para combate, te ofrece ponerla al empezar. Al cerrarlo queda un registro.';
+  String get tutDmTable1Title => 'Tu mesa';
 
   @override
-  String get tutBestiaryBody =>
-      'Las criaturas del SRD y las tuyas de homebrew. Buscá la que necesites y sumala al combate de la campaña elegida.';
+  String get tutDmTable1Body =>
+      'Acá se reúne tu grupo. Cada jugador crea su personaje desde su propia cuenta y, para sumarse, te pasa un código que encuentra en su ficha, en «Compartir». Vos lo cargás en «Sumar personaje», y listo.';
 
   @override
-  String get tutNpcLibraryBody =>
-      'Tus PNJ son de la cuenta y no de una mesa: uno mismo puede estar en varias campañas. Acá los creás, los editás y los importás.';
+  String get tutDmTable2Title => 'Seguir a tus jugadores';
 
   @override
-  String get tutHomebrewBody =>
-      'Cargá tu propio contenido: especies, trasfondos, dotes, conjuros, armas, armaduras, objetos y criaturas. Se usa igual que el del manual, en la creación de personajes y en el Bestiario.';
+  String get tutDmTable2Body =>
+      'Tocá un personaje para ver su ficha completa, siempre al día. La ficha la lleva cada jugador: vos la ves, pero no la cambiás. Si alguien se luce en una escena, desde su menú le podés conceder Inspiración Heroica, que le permite volver a tirar un dado.';
 
   @override
-  String get settingsTutorials => 'Tutoriales';
+  String get tutDmChapters1Title => 'Tu historia, en capítulos';
 
   @override
-  String get settingsTutorialsReset => 'Volver a verlos';
+  String get tutDmChapters1Body =>
+      'Una campaña suele durar muchas sesiones, así que ayuda partirla en capítulos, como un libro. A cada uno le ponés un nombre y un objetivo, lo que el grupo debería lograr o descubrir, y lo iniciás cuando empiezan a jugarlo.';
 
   @override
-  String get settingsTutorialsResetDone =>
-      'Los tutoriales van a volver a salir en cada sección.';
+  String get tutDmChapters2Title => 'Cerrar un capítulo';
+
+  @override
+  String get tutDmChapters2Body =>
+      'Cuando el grupo termina un capítulo, cerralo y a cada jugador le llega un aviso. Si al crearlo le pusiste recompensas (subir de nivel, oro u objetos), van en ese mismo aviso, y cada uno las anota en su ficha.';
+
+  @override
+  String get tutDmNotebook1Title => 'Tu cuaderno de DM';
+
+  @override
+  String get tutDmNotebook1Body =>
+      'Acá va todo lo que no querés olvidarte: ideas, nombres, pistas y lo que pasó en cada sesión. Las notas se ordenan por capítulo, así que necesitás tener al menos uno creado.';
+
+  @override
+  String get tutDmNotebook2Title => 'Notas que se conectan';
+
+  @override
+  String get tutDmNotebook2Body =>
+      'Escribí @ y el nombre de un personaje o PNJ para mencionarlo, y con un toque en la mención abrís su ficha. También podés darle formato: # al principio para un título, **así** para negrita y un guion para hacer una lista.';
+
+  @override
+  String get tutDmNpcs1Title => 'Los personajes de tu mundo';
+
+  @override
+  String get tutDmNpcs1Body =>
+      'Los PNJ (personajes no jugadores) son todos los que manejás vos: el tabernero, el villano, el aliado que acompaña al grupo. Acá tenés los de esta campaña y, de cada uno, si sigue vivo, si murió o si nadie sabe qué fue de él.';
+
+  @override
+  String get tutDmNpcs2Title => 'Tan simple o completo como quieras';
+
+  @override
+  String get tutDmNpcs2Body =>
+      'Creá uno nuevo o traelo de tu biblioteca. Elegís cuánto detalle lleva: solo un nombre con notas, un bloque de estadísticas como el de los monstruos para que pueda pelear, o una ficha de personaje completa.';
+
+  @override
+  String get tutDmCombat1Title => 'Armar una pelea';
+
+  @override
+  String get tutDmCombat1Body =>
+      'Cuando empieza una pelea, tocá «Armar combate». Los personajes de tu mesa ya están adentro; vos sumás a los enemigos, que pueden ser monstruos del Bestiario o tus PNJ.';
+
+  @override
+  String get tutDmCombat2Title => 'Turno a turno';
+
+  @override
+  String get tutDmCombat2Body =>
+      'Al empezar, cada uno tira iniciativa, un dado que decide en qué orden actúan, y Milantus los ordena. Después avanzás turno a turno y anotás el daño y estados como envenenado o derribado. Tus jugadores ven en su ficha cuándo les toca.';
+
+  @override
+  String get tutDmCombat3Title => 'Música y cierre';
+
+  @override
+  String get tutDmCombat3Body =>
+      'Si le cargaste música de combate a la campaña, Milantus te ofrece ponerla al empezar. Cuando termina la pelea, cerrás el combate y queda un registro de lo que pasó para consultarlo después.';
+
+  @override
+  String get tutBestiary1Title => 'Monstruos y criaturas';
+
+  @override
+  String get tutBestiary1Body =>
+      'Acá están las criaturas del juego, cada una con sus estadísticas listas para usar. Buscalas por nombre, o filtralas por tipo y por VD (valor de desafío), que indica qué tan peligrosa es cada una para tu grupo.';
+
+  @override
+  String get tutBestiary2Title => 'A la pelea, o a tu medida';
+
+  @override
+  String get tutBestiary2Body =>
+      'Cuando encontrás la que buscás, la sumás al combate de tu campaña con un toque. Si la querés distinta, editá una copia: queda guardada como tuya en Homebrew, y la original no se toca.';
+
+  @override
+  String get tutNpcLibrary1Title => 'Todos tus PNJ, en un lugar';
+
+  @override
+  String get tutNpcLibrary1Body =>
+      'Acá viven todos tus PNJ, aparezcan en la campaña que aparezcan. Uno mismo puede estar en varias, y en cada una lleva sus propios puntos de golpe y su estado. Los encontrás por nombre, o filtrándolos por campaña y por etiquetas.';
+
+  @override
+  String get tutNpcLibrary2Title => 'Compartilos con otros DM';
+
+  @override
+  String get tutNpcLibrary2Body =>
+      '¿Armaste un PNJ que te encanta? Exportalo a un archivo y pasáselo a otro DM, o importá los que te compartan a vos. Quien lo recibe se queda con su propia copia.';
+
+  @override
+  String get tutHomebrew1Title => 'Tu propio contenido';
+
+  @override
+  String get tutHomebrew1Body =>
+      'Homebrew es todo lo que inventás vos: una especie nueva, un conjuro propio, el arma legendaria de tu campaña o un monstruo que no está en ningún libro. Acá lo cargás llenando un formulario, sin programar nada.';
+
+  @override
+  String get tutHomebrew2Title => 'Se juega como el oficial';
+
+  @override
+  String get tutHomebrew2Body =>
+      'Lo que creás se usa igual que el contenido del manual: aparece al crear personajes, en el Bestiario y en tus combates. Para compartirlo con tu grupo, exportalo a un archivo y que cada uno lo importe en su cuenta.';
 }

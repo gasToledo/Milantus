@@ -72,7 +72,7 @@ void main() {
     final store = almacen.abrir();
 
     await _mostrar(tester, store, Tutorial.dmCombat);
-    await tester.tap(find.text(l10nEs.tutDone));
+    await tester.tap(find.text(l10nEs.tutSkip));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('abrir'));

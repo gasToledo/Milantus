@@ -27,40 +27,72 @@ enum Tutorial {
 
   List<TutorialPage> pages(AppLocalizations l10n) => switch (this) {
     Tutorial.welcome => [
-      (Icons.swap_horiz, l10n.tutWelcomeTitle, l10n.tutWelcomeBody),
+      (Icons.waving_hand_outlined, l10n.tutWelcomeTitle, l10n.tutWelcomeBody),
+      (Icons.casino_outlined, l10n.tutNewToDndTitle, l10n.tutNewToDndBody),
       (Icons.person_outline, l10n.tutPlayerTitle, l10n.tutPlayerBody),
       (Icons.shield_moon_outlined, l10n.tutDmTitle, l10n.tutDmBody),
     ],
     Tutorial.sheet => [
-      (Icons.badge_outlined, l10n.tutSheetTitle, l10n.tutSheetBody),
+      (Icons.badge_outlined, l10n.tutSheet1Title, l10n.tutSheet1Body),
+      (Icons.sports_martial_arts, l10n.tutSheet2Title, l10n.tutSheet2Body),
+      (Icons.ios_share, l10n.tutSheet3Title, l10n.tutSheet3Body),
     ],
     Tutorial.dmTable => [
-      (Icons.groups_outlined, l10n.dmTable, l10n.tutDmTableBody),
+      (Icons.groups_outlined, l10n.tutDmTable1Title, l10n.tutDmTable1Body),
+      (Icons.visibility_outlined, l10n.tutDmTable2Title, l10n.tutDmTable2Body),
     ],
     Tutorial.dmChapters => [
-      (Icons.auto_stories_outlined, l10n.dmChapters, l10n.tutDmChaptersBody),
+      (
+        Icons.auto_stories_outlined,
+        l10n.tutDmChapters1Title,
+        l10n.tutDmChapters1Body,
+      ),
+      (Icons.flag_outlined, l10n.tutDmChapters2Title, l10n.tutDmChapters2Body),
     ],
     Tutorial.dmNotebook => [
-      (Icons.menu_book_outlined, l10n.dmNotebook, l10n.tutDmNotebookBody),
+      (
+        Icons.menu_book_outlined,
+        l10n.tutDmNotebook1Title,
+        l10n.tutDmNotebook1Body,
+      ),
+      (
+        Icons.alternate_email,
+        l10n.tutDmNotebook2Title,
+        l10n.tutDmNotebook2Body,
+      ),
     ],
     Tutorial.dmNpcs => [
-      (Icons.groups_2_outlined, l10n.dmNpcsSection, l10n.tutDmNpcsBody),
+      (Icons.groups_2_outlined, l10n.tutDmNpcs1Title, l10n.tutDmNpcs1Body),
+      (Icons.tune, l10n.tutDmNpcs2Title, l10n.tutDmNpcs2Body),
     ],
     Tutorial.dmCombat => [
       (
         Icons.local_fire_department_outlined,
-        l10n.dmCombat,
-        l10n.tutDmCombatBody,
+        l10n.tutDmCombat1Title,
+        l10n.tutDmCombat1Body,
+      ),
+      (Icons.repeat, l10n.tutDmCombat2Title, l10n.tutDmCombat2Body),
+      (
+        Icons.music_note_outlined,
+        l10n.tutDmCombat3Title,
+        l10n.tutDmCombat3Body,
       ),
     ],
     Tutorial.bestiary => [
-      (Icons.pets_outlined, l10n.dmBestiary, l10n.tutBestiaryBody),
+      (Icons.pets_outlined, l10n.tutBestiary1Title, l10n.tutBestiary1Body),
+      (Icons.edit_outlined, l10n.tutBestiary2Title, l10n.tutBestiary2Body),
     ],
     Tutorial.npcLibrary => [
-      (Icons.contacts_outlined, l10n.dmNpcLibrary, l10n.tutNpcLibraryBody),
+      (
+        Icons.contacts_outlined,
+        l10n.tutNpcLibrary1Title,
+        l10n.tutNpcLibrary1Body,
+      ),
+      (Icons.swap_horiz, l10n.tutNpcLibrary2Title, l10n.tutNpcLibrary2Body),
     ],
     Tutorial.homebrew => [
-      (Icons.auto_fix_high, l10n.dmHomebrew, l10n.tutHomebrewBody),
+      (Icons.auto_fix_high, l10n.tutHomebrew1Title, l10n.tutHomebrew1Body),
+      (Icons.ios_share, l10n.tutHomebrew2Title, l10n.tutHomebrew2Body),
     ],
   };
 }
