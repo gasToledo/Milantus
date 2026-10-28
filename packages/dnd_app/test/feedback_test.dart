@@ -147,7 +147,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Ideas & bug reports'), findsWidgets);
     expect(find.text('An idea'), findsOne);
-    expect(find.text("We'll reply to ${server.accountEmail}."), findsOne);
+    expect(find.text("We’ll reply to ${server.accountEmail}."), findsOne);
 
     await tester.enterText(
       find.byKey(const ValueKey('feedback-message')),
