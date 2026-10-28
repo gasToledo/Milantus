@@ -43,10 +43,10 @@ preparar una versión:
 
 ### Cambios grandes
 
-Una change se considera grande cuando agrega una capacidad visible, modifica un
+Un cambio se considera grande cuando agrega una capacidad visible, modifica un
 contrato o esquema persistido, cruza engine, cliente o servidor, cambia varios
 flujos de usuario, o corrige un problema con impacto transversal. Estos cambios
-MUST aumentar la versión antes del commit y mover sus notas desde `[Unreleased]`
+deben aumentar la versión antes del commit y mover sus notas desde `[Unreleased]`
 al encabezado fechado de la nueva versión en el mismo commit. Si el tamaño no es
 claro, se trata como grande; las correcciones acotadas pueden permanecer en
 `[Unreleased]`.

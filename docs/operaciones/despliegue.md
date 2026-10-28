@@ -56,8 +56,7 @@ Runbook operativo del stack de contenedores.
    ```
 
    Esperar a que `db`, `zitadel`, `zitadel-login` y `cloudflared` queden
-   `healthy` (ver sección "Comprobación de salud" en cada servicio del
-   `docker-compose.yml`). `zitadel-init`, `zitadel-bootstrap-perms`,
+   `healthy` (cada uno declara su `healthcheck` en el `docker-compose.yml`). `zitadel-init`, `zitadel-bootstrap-perms`,
    `zitadel-setup` y `zitadel-bootstrap-share` son contenedores de una sola
    vez: lo correcto es que aparezcan como `exited (0)`, no como `healthy` (ver
    el comentario sobre el arranque partido en `docker-compose.yml`).
@@ -77,7 +76,7 @@ Runbook operativo del stack de contenedores.
    `zitadel` no arranca, revisar también `docker compose logs db` para
    confirmar que `postgres-init/init-zitadel-db.sh` corrió sin error.
 
-4. **Registrar la aplicación cliente en Zitadel** (tarea 5.1, manual: Zitadel
+4. **Registrar la aplicación cliente en Zitadel** (manual: Zitadel
    no tiene forma de declarar esto por configuración de arranque). Entrar a
    `https://auth.tu-dominio.com`, iniciar sesión con
    `ZITADEL_ADMIN_USERNAME` / `ZITADEL_ADMIN_PASSWORD`, crear un proyecto y
@@ -166,7 +165,7 @@ Claude (claude.ai, Desktop, Cowork y Claude Code) se conecta a Milantus como
 **conector personalizado**: `https://app.milantus.com.ar/mcp`. Autoriza con
 OAuth contra Zitadel, así que cada persona entra con su propia cuenta. Es
 **opcional**: sin `MCP_PROJECT_ID`, `/mcp` no existe y el resto arranca igual.
-El diseño está en [MCP del Modo DM](../arquitectura/mcp.md).
+El diseño está en [MCP de Milantus](../arquitectura/mcp.md).
 
 Zitadel no ofrece todavía la identidad publicada de Claude (CIMD), y abrir su
 registro dinámico dejaría que cualquiera cree clientes en el proveedor. Por
@@ -225,10 +224,14 @@ cuenta.
 Dos workflows en `.github/workflows/`:
 
 - `ci.yml`: formato, análisis y pruebas de los tres paquetes en runners
-  alojados por GitHub, en cada push y cada pull request. No necesita
-  configuración en el host.
-- `cd.yml`: reconstruye y levanta el stack (`docker compose up -d --build`)
-  en el **runner autoalojado**. Lo dispara `workflow_run` cuando CI termina
+  alojados por GitHub, en cada push y cada pull request (y a mano, con
+  `workflow_dispatch`). Las pruebas de la app van en dos mitades en paralelo con
+  el build web, para que CD, que espera a CI entero, no cargue con la suma. No
+  necesita configuración en el host.
+- `cd.yml`: reconstruye y levanta el stack (`docker compose build --pull` y
+  después `docker compose up -d`; el `--pull` fuerza a repreguntar el registro por
+  las imágenes base, que si no se reutilizan aunque queden viejas) en el
+  **runner autoalojado**. Lo dispara `workflow_run` cuando CI termina
   sobre un push a `main`: si CI falló no despliega, y si no cambió ninguna
   ruta desplegable desde el último CD exitoso tampoco (lo decide el job
   `gate`, en un runner de GitHub). Necesita el runner de esta sección.
@@ -422,7 +425,7 @@ docker history --no-trunc dnd-server:check | grep -i -E 'password|secret|key' ||
 Todo el estado persistente vive en dos volúmenes con nombre (más
 `zitadel-bootstrap`, que es recreable y no hace falta respaldar: es solo el
 token de servicio entre `zitadel` y `zitadel-login`). Las dos bases —
-aplicación y Zitadel— comparten una sola instancia de PostgreSQL, así que un solo `pg_dump` con `--create` alcanza
+aplicación y Zitadel— comparten una sola instancia de PostgreSQL, así que un solo `pg_dumpall` alcanza
 para las dos.
 
 ```sh
@@ -474,7 +477,7 @@ ejecutado:
    personaje y la sesión de cuenta siguen ahí (los datos sobreviven al
    reinicio; la sesión de navegador expira a las 12 h, ver
    `session_cookie.dart`, así que puede pedir volver a iniciar sesión).
-6. Verificar la unificación de bases (tarea 10.12):
+6. Verificar la unificación de bases:
    - `docker compose exec -T db psql -U zitadel -d "$APP_DB_NAME" -c '\q'`
      MUST fallar (`FATAL: permission denied for database`).
    - `docker compose exec -T db psql -U "$APP_DB_USER" -d zitadel -c '\q'`

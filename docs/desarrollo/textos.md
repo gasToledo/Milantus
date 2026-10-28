@@ -112,7 +112,7 @@ acción: ver `AppEmptyState` en [Diseño web](diseno-web.md).
 
 La interfaz se ofrece en dos idiomas. El **español rioplatense es el idioma de
 origen**: todo lo de arriba describe su voz, y el inglés se escribe a partir de
-él. Qué idioma se usa lo decide la persona con el selector del panel lateral
+él. Qué idioma se usa lo decide la persona en Ajustes, con `LanguageSelector`
 (se recuerda en el navegador); sin elección se usa el del navegador y, si no es
 uno de los dos, el español.
 

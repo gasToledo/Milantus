@@ -62,7 +62,7 @@ procedencia), no cantidades.
 | Especies | 15 |
 | Linajes | 28 |
 | Trasfondos | 33 |
-| Dotes y opciones equivalentes | 189 |
+| Dotes y opciones equivalentes | 219 |
 | Armas | 38 |
 | Armaduras | 13 |
 | Conjuros | 392 |
@@ -77,6 +77,9 @@ Las herramientas viven en `packages/dnd_engine/tool/`:
 - `generate_bestiary.dart` genera `creatures.json` desde el PDF español y
   admite `--check` para comprobar reproducibilidad.
 - `generate_items.dart` completa peso y precio de armas y armaduras.
+- `apply_structured_content.py` aplica el equipo inicial de los trasfondos y los
+  planos del Artífice desde una revisión estructurada fijada (5e.tools); se
+  corre con los archivos de origen como argumentos, ver su cabecera.
 - `generate_magic_items.py` genera el catálogo base de objetos mágicos.
 - `extract_magic_item_text.dart` reescribe sus descripciones desde
   `pdftotext -raw`: la lectura por columnas del generador mezclaba texto de
@@ -89,6 +92,9 @@ Las herramientas viven en `packages/dnd_engine/tool/`:
 - `apply_voseo.dart` pasa a voseo la prosa de todos los catálogos salvo el
   bestiario. Se corre después de cualquier generador: el SRD en español está
   en tuteo.
+
+`tool/data/` guarda las tablas que alimentan a los generadores
+(`bestiario_ids.json`, `nombres_es.json`).
 
 No se edita a mano un archivo generado. Si una extracción necesita una
 excepción, se documenta en el generador y se cubre con una prueba.
