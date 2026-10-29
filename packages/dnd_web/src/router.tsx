@@ -50,6 +50,10 @@ export type DmSection = (typeof DM_SECTIONS)[number];
  *  como `MemberSheetScreen` de Flutter. Inventario, campañas y diario son del
  *  jugador. */
 export const MEMBER_SHEET_TABS = ['personaje', 'combate'] as const satisfies readonly SheetTab[];
+
+/** Las de un PNJ con ficha, como `SheetScreen` en `npcMode`: sin campañas «de
+ *  jugador» ni Diario, porque su trasfondo y sus notas son de la ficha del PNJ. */
+export const NPC_SHEET_TABS = ['personaje', 'combate', 'inventario'] as const satisfies readonly SheetTab[];
 /** `undefined` es «no es una pestaña de esa ficha»; `null`, la ruta sin sufijo. */
 const sheetTabIn = (tabs: readonly SheetTab[], segment: string | undefined): SheetTab | null | undefined =>
   segment === undefined ? null : tabs.find((t) => t === segment);
@@ -67,6 +71,8 @@ export type DmView =
   // no por el id del personaje: es la fila de `campaign_members` la que le da
   // al DM el permiso de leerla. `tab: null` redirige a la primera.
   | { kind: 'member'; id: string; memberId: string; tab: SheetTab | null }
+  // La ficha completa de un PNJ con ficha de personaje.
+  | { kind: 'npcSheet'; npcId: string; tab: SheetTab | null }
   // El Bestiario del DM es una herramienta de la cuenta, no de una campaña.
   | { kind: 'bestiary'; entryId: string | null }
   // La Biblioteca de PNJ también: sin PNJ es la lista.
@@ -109,6 +115,16 @@ export function matchRoute(pathname: string): Route {
     if (id === 'bestiario' && rest.length === 0) {
       try {
         return { name: 'dm', view: { kind: 'bestiary', entryId: tab === undefined ? null : decodeURIComponent(tab) } };
+      } catch {
+        return { name: 'unknown' };
+      }
+    }
+    // `/dm/pnj/:pnj/ficha[/:pestaña]`.
+    if (id === 'pnj' && tab !== undefined && rest[0] === 'ficha' && rest.length <= 2) {
+      const sheetTab = sheetTabIn(NPC_SHEET_TABS, rest[1]);
+      if (sheetTab === undefined) return { name: 'unknown' };
+      try {
+        return { name: 'dm', view: { kind: 'npcSheet', npcId: decodeURIComponent(tab), tab: sheetTab } };
       } catch {
         return { name: 'unknown' };
       }
@@ -215,6 +231,10 @@ export const dmCampaignHref =(id: string, section: DmSection = 'mesa'): string =
 /** La ficha completa de un miembro de la Mesa, en una de sus pestañas. */
 export const dmMemberHref = (campaignId: string, memberId: string, tab: SheetTab = 'personaje'): string =>
   `${dmCampaignHref(campaignId)}/${encodeURIComponent(memberId)}/${tab}`;
+
+/** La ficha completa de un PNJ con ficha, en una de sus pestañas. */
+export const dmNpcSheetHref = (npcId: string, tab: SheetTab = 'personaje'): string =>
+  `${dmNpcsHref(npcId)}/ficha/${tab}`;
 /**
  * Los ajustes son de la cuenta y los comparten los dos modos. `desdeDm` deja
  * dicho de cuál se vino (`?modo=dm`) para que el panel y el «atrás» sigan en

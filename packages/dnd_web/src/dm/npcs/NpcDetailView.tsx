@@ -4,7 +4,7 @@ import { ApiError } from '../../api/client';
 import { useNpc, useSheetCatalog } from '../../api/queries';
 import { npcViews, type NpcView } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
-import { dmNpcsHref, Link } from '../../router';
+import { dmNpcSheetHref, dmNpcsHref, Link } from '../../router';
 import { signed } from '../../sheet/format';
 import { DiaryEntries } from '../../sheet/DiaryTab';
 import { Card } from '../../ui/Card';
@@ -201,8 +201,22 @@ function Stats({ view }: { view: NpcView }) {
   }
   const sheet = view.sheet;
   return (
-    <section className="card px-4 pt-3 pb-4" data-card="stats">
-      <h2 className="font-display text-[17px] text-on-surface">{t.npcSheetTitle}</h2>
+    <section className={cx('card px-4 pt-3 pb-4', sheet && 'relative hover:border-gold')} data-card="stats">
+      <h2 className="font-display text-[17px] text-on-surface">
+        {/* Como en Flutter, la tarjeta entera abre la ficha completa. Una que
+            el motor no pudo leer no lleva a ningún lado. */}
+        {sheet ? (
+          <Link
+            href={dmNpcSheetHref(view.npc.id)}
+            aria-label={t.npcOpenSheet(view.npc.name)}
+            className="after:absolute after:inset-0 after:rounded-[var(--radius-card)] after:content-['']"
+          >
+            {t.npcSheetTitle}
+          </Link>
+        ) : (
+          t.npcSheetTitle
+        )}
+      </h2>
       {sheet ? (
         <dl className="mt-3 grid grid-cols-4 gap-1.5">
           <StatPlaque id="ac" dense label={<Abbr short={t.acShort} full={t.acFull} />} value={sheet.armorClass} />

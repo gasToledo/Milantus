@@ -213,12 +213,12 @@ repiten acá.
   secciones, una por PR; hoy existen la **Mesa**, **Capítulos**, el **Cuaderno**,
   los **PNJ de la mesa**, el **Combate**, el **Bestiario**, la **Biblioteca de
   PNJ** y el **Homebrew**: todas las secciones del panel, más la **ficha
-  completa de un miembro**. De lectura faltan todavía la de un PNJ con ficha y
+  completa** de un miembro y la de un PNJ con ficha. De lectura falta todavía
   la música (ver «Lo que todavía no existe»). Rutas:
   `/v2/dm` (redirige a la primera campaña en curso, o a la primera que haya),
   `/v2/dm/campanas/:id/mesa|capitulos|cuaderno|pnj|combate`,
   `/v2/dm/campanas/:id/mesa/:miembro/personaje|combate`, `/v2/dm/bestiario[/:criatura]`,
-  `/v2/dm/pnj[/:pnj]` y `/v2/dm/homebrew[/:categoria[/:entrada]]`. El panel
+  `/v2/dm/pnj[/:pnj]`, `/v2/dm/pnj/:pnj/ficha/personaje|combate|inventario` y `/v2/dm/homebrew[/:categoria[/:entrada]]`. El panel
   (`DmPanel`) sigue al de Flutter: el
   interruptor con «DM» activo, las herramientas (Bestiario, Biblioteca de PNJ y
   Homebrew), las campañas
@@ -281,8 +281,13 @@ repiten acá.
   `NpcStats` del engine): el PNJ migrado, los PG de un bloque (su fórmula
   resuelta) o de la ficha compilada, la CA, si viene herido en una campaña, el
   nombre de la criatura de base en el idioma activo y la especie y las clases de
-  su ficha. Un PNJ ajeno y uno inexistente dan la misma pantalla «No se
-  encontró el PNJ»: el servidor los responde igual (404). Crear, importar,
+  su ficha. La tarjeta de la ficha compilada lleva a la **ficha completa del
+  PNJ** (`NpcSheetView`; Flutter abre `SheetScreen` en `npcMode`): la misma
+  `SheetTabs` de un jugador con Personaje, Combate e Inventario, sin Campaña ni
+  Diario porque en un PNJ son su trasfondo y sus notas, y de solo lectura (en
+  Flutter se edita). Sale del mismo `GET /api/npcs/:id`. Un PNJ ajeno y uno
+  inexistente dan la misma pantalla «No se encontró el PNJ» —también en su
+  ficha, igual que un PNJ sin ficha—: el servidor los responde igual (404). Crear, importar,
   editar, retratos, el estado por campaña, exportar y borrar siguen en Flutter,
   y el retrato todavía no se muestra (el medallón lleva la inicial, como en el
   resto de `/v2`).
@@ -352,10 +357,8 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    bestiario *(existe)* y catálogos *(el Códice existe)*.
    **Lectura del Modo DM** (se sumó a este paso): Mesa, Capítulos, Cuaderno,
    Bestiario, Biblioteca de PNJ, PNJ de la mesa, Homebrew y Combate *(existen)*.
-   La ficha completa de un miembro *(existe)*.
+   La ficha completa de un miembro y la de un PNJ con ficha *(existen)*.
    **Faltan para cerrar el paso**, todas de lectura:
-   - la ficha completa de un PNJ con ficha (Flutter abre `SheetScreen`; acá la
-     ficha del PNJ muestra solo el resumen compilado);
    - la música: escuchar las escenas de la campaña (`dm/music/` de Flutter),
      que no escribe nada; crearlas y editarlas es del paso 6;
    - los retratos (personaje, miembro y PNJ: hoy el medallón lleva la inicial)
@@ -423,12 +426,13 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    (`e2e/dm.spec.ts`); que la Biblioteca de PNJ liste los tres PNJ sembrados
    (bloque, ficha y sin estadísticas) con la línea que arma el motor, filtre por
    campaña, tag y nombre, abra la ficha con la voz, el trasfondo, las notas, el
-   bloque o la ficha compilada y el estado por campaña, sin escribir nada, y que
+   bloque o la ficha compilada y el estado por campaña, y de ahí la ficha
+   completa con Personaje, Combate e Inventario, sin escribir nada, y que
    los PNJ de la mesa muestren su estado y los PG con que volvió el herido, sin
    escribir, y que
    otra cuenta tenga la biblioteca vacía, reciba por un PNJ ajeno o por los PNJ
    de una mesa ajena el mismo 404 que por lo inexistente (en la API y en la
-   pantalla) y no encuentre nada de eso en la vista del jugador (`e2e/pnj.spec.ts`); que el Homebrew cuente lo
+   pantalla, también en la ficha completa del PNJ) y no encuentre nada de eso en la vista del jugador (`e2e/pnj.spec.ts`); que el Homebrew cuente lo
    propio por categoría (un arma, una dote y una criatura sembradas), abra la
    ficha del Códice bajo `/v2/dm/homebrew`, busque en todo y lleve la criatura al
    Bestiario, sin escribir, y que otra cuenta no reciba nada ni lo abra por URL
@@ -479,7 +483,7 @@ propio.
 Para que nadie lo dé por hecho:
 
 - Las lecturas que faltan del paso 3 (la lista está en «Orden previsto de
-  pantallas»): la ficha completa de un PNJ con ficha, la música, los retratos, las menciones `@Nombre` como enlaces e imprimir.
+  pantallas»): la música, los retratos, las menciones `@Nombre` como enlaces e imprimir.
 - Cualquier escritura desde React: todo el cliente hoy es solo lectura, así que
   los pasos 4 a 7 están enteros por hacer. Entre ellos, reordenar, marcar
   favorito, crear, renombrar o borrar personajes, y escribir en `/api/settings`

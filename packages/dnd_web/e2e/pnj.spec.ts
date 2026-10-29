@@ -99,6 +99,23 @@ test('la ficha de un PNJ muestra su voz, trasfondo, notas, cómo pelea y su esta
   await expect(hoja.locator('[data-stat="passive"] [data-field="value"]')).toHaveText(String(ficha.passivePerception));
   await expect(page.locator('[data-campaign="marca-del-cuervo"] [data-status]')).toHaveText('Desconocido');
 
+  // La tarjeta abre la ficha completa, la misma de un jugador y sin Campaña ni
+  // Diario, que en un PNJ son su trasfondo y sus notas.
+  await hoja.getByRole('link', { name: t.npcOpenSheet(vesna.npc.name) }).click();
+  await expect(page).toHaveURL(`${BIBLIOTECA}/vesna/ficha/personaje`);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(vesna.character!.name as string);
+  await expect(page.locator(`section[aria-label="${t.tacticalBand}"] [data-stat="ac"] [data-field="value"]`)).toHaveText(
+    String(ficha.armorClass),
+  );
+  await expect(page.getByRole('tablist', { name: t.sheetTabsLabel }).getByRole('tab')).toHaveText([
+    t.tabCharacter,
+    t.tabCombat,
+    t.navInventory,
+  ]);
+  // Un PNJ sin ficha no tiene una que abrir.
+  await page.goto(`${BIBLIOTECA}/garrick/ficha/personaje`);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(t.npcNotFound);
+
   // Un PNJ sin estadísticas lo dice en vez de mostrar placas vacías.
   await page.goto(`${BIBLIOTECA}/odile`);
   await expect(page.locator('[data-card="stats"]')).toContainText(t.npcNoStatsNote);
@@ -175,6 +192,11 @@ test('los PNJ del DM no llegan a otra cuenta: lo ajeno responde igual que lo ine
   await context.addCookies([{ name: 'dnd_session', value: TOKEN, url: baseURL! }]);
   for (const id of ['garrick', 'no-existe']) {
     await page.goto(`${BIBLIOTECA}/${id}`);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(t.npcNotFound);
+  }
+  // Tampoco la ficha completa del PNJ con ficha.
+  for (const id of ['vesna', 'no-existe']) {
+    await page.goto(`${BIBLIOTECA}/${id}/ficha/personaje`);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(t.npcNotFound);
   }
   await page.goto('/v2/dm/campanas/marca-del-cuervo/pnj');
