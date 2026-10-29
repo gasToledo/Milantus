@@ -41,7 +41,7 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
     );
     // El motor da el orden y la línea de tipo; lo propio lo dice el catálogo.
     const mine = new Set(cat.creatures.filter((c) => c.source === 'homebrew').map((c) => c.id));
-    const names = new Map(cat.creatures.map((c) => [c.id, typeof c.name === 'string' ? c.name : c.id] as const));
+    const names = new Map(cat.creatures.map((c) => [c.id, typeof c.name === 'string' ? c.name : String(c.id)] as const));
     const creatures: Own[] = bestiary(cat)
       .filter((r) => mine.has(r.id))
       .map((r) => ({ id: r.id, name: names.get(r.id) ?? r.id, subtitle: r.kind }));
