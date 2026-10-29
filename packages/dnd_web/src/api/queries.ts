@@ -13,6 +13,7 @@ import {
   ApiError,
   fetchAccount,
   fetchAppVersion,
+  fetchCampaignChapters,
   fetchCampaignMembers,
   fetchDmCampaigns,
   fetchPlayerCampaigns,
@@ -51,6 +52,7 @@ export const queryKeys = {
   appVersion: ['app-version'] as const,
   dmCampaigns: ['dm', 'campaigns'] as const,
   campaignMembers: (campaignId: string) => ['dm', 'campaigns', campaignId, 'members'] as const,
+  campaignChapters: (campaignId: string) => ['dm', 'campaigns', campaignId, 'chapters'] as const,
 };
 
 /** `null` = sin sesión (un 401 no es un error, ver `fetchAccount`). */
@@ -120,6 +122,13 @@ export const useCampaignMembers = (campaignId: string) =>
   useQuery({
     queryKey: queryKeys.campaignMembers(campaignId),
     queryFn: ({ signal }) => fetchCampaignMembers(campaignId, signal),
+  });
+
+/** Los capítulos de la campaña, con el objetivo que solo ve su DM. */
+export const useCampaignChapters = (campaignId: string) =>
+  useQuery({
+    queryKey: queryKeys.campaignChapters(campaignId),
+    queryFn: ({ signal }) => fetchCampaignChapters(campaignId, signal),
   });
 
 export const useHomebrew = () =>

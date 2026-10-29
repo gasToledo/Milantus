@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { computeSheet } from '../src/engine';
+import { chapterGrants, computeSheet, type JsonObject } from '../src/engine';
 import { signed } from '../src/sheet/format';
 import { api, catalogo, TOKEN, TOKEN_DM, TOKEN_SIN_V2, vigilarEscrituras, type PersonajeApi } from './helpers';
 
@@ -34,7 +34,8 @@ test('la Mesa del DM lista a los jugadores vinculados con los números del motor
   await page.getByRole('group', { name: 'Modo' }).getByRole('link', { name: 'DM' }).click();
   await expect(page).toHaveURL(MESA);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('La Marca del Cuervo');
-  await expect(page.getByText('En curso · 2 personajes en la mesa')).toBeVisible();
+  await expect(page.getByText('En curso · El Valle Hueco')).toBeVisible();
+  await expect(page.getByRole('list', { name: '2 personajes en la mesa' })).toBeVisible();
   // El modo actual es DM: el interruptor lo marca y «Jugador» pasa a ser el enlace.
   await expect(page.getByRole('group', { name: 'Modo' }).locator('[aria-current="true"]')).toHaveText('DM');
 
@@ -69,6 +70,51 @@ test('la Mesa del DM lista a los jugadores vinculados con los números del motor
 
   // Ni la Mesa ni nada de lo que se vio escribió en la API.
   expect(escrituras).toEqual([]);
+});
+
+test('Capítulos muestra estado, objetivo y recompensas de cada capítulo, y solo el DM lee el objetivo', async ({
+  context,
+  page,
+  baseURL,
+}) => {
+  await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);
+  const escrituras = vigilarEscrituras(page);
+  const { chapters } = await api<{ chapters: (JsonObject & { id: string })[] }>(
+    page.request,
+    `/api/campaigns/${CAMPANA}/chapters`,
+    TOKEN_DM,
+  );
+
+  await page.goto(MESA);
+  await page.getByRole('navigation', { name: 'Secciones de la campaña' }).getByRole('link', { name: 'Capítulos' }).click();
+  await expect(page).toHaveURL(`/v2/dm/campanas/${CAMPANA}/capitulos`);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Capítulos');
+  await expect(page.getByText('En curso · 3 capítulos')).toBeVisible();
+
+  const estado = { 'paso-de-varn': 'closed', 'capitulo-en-marcha': 'open', 'concilio-de-brasas': 'pending' };
+  const rotulo = { closed: 'Cerrado', open: 'Abierto', pending: 'Pendiente' };
+  for (const c of chapters) {
+    const tarjeta = page.locator(`[data-chapter="${c.id}"]`);
+    const e = estado[c.id as keyof typeof estado] as keyof typeof rotulo;
+    await expect(tarjeta).toHaveAttribute('data-status', e);
+    await expect(tarjeta).toContainText(rotulo[e]);
+    // Lo que reparte lo nombra el motor, igual que en la vista del jugador.
+    if (chapterGrants(c)) await expect(tarjeta).toContainText(`Reparte ${chapterGrants(c)}`);
+  }
+  // El objetivo es del DM: acá se lee; el sin definir lo dice.
+  await expect(page.locator('[data-chapter="capitulo-en-marcha"]')).toContainText('Resumen reservado del DM');
+  await expect(page.locator('[data-chapter="concilio-de-brasas"]')).toContainText('Sin definir todavía.');
+  await expect(page.locator('[data-chapter="paso-de-varn"] [data-stat="gold"]')).toContainText('25');
+  // El abierto se destaca con el borde oro.
+  await expect(page.locator('[data-chapter="capitulo-en-marcha"]')).toHaveClass(/border-gold/);
+  expect(escrituras).toEqual([]);
+
+  // El jugador vinculado nunca recibe el objetivo ni los capítulos sin cerrar.
+  const jugador = await api<unknown>(page.request, '/api/characters/elsbeth-de-humo/campaigns', TOKEN);
+  const crudo = JSON.stringify(jugador);
+  for (const secreto of ['Resumen reservado del DM', 'El Concilio de Brasas', 'El Valle Hueco']) {
+    expect(crudo, `la API del jugador manda «${secreto}»`).not.toContain(secreto);
+  }
 });
 
 test('el DM no escribe la ficha del jugador: leerla no la cambia', async ({ request }) => {

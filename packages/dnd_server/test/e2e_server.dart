@@ -305,6 +305,13 @@ Future<void> main() async {
       state: ChapterState.active,
     ),
   );
+  // Uno que todavía no empezó, sin objetivo: la lista del DM lo muestra
+  // pendiente y el jugador no lo recibe (`e2e/dm.spec.ts`).
+  await chapters.create(
+    _smokeDmId,
+    _smokeCampaignId,
+    const Chapter(id: 'concilio-de-brasas', name: 'El Concilio de Brasas'),
+  );
   await notes.create(
     _smokeDmId,
     _smokeCampaignId,

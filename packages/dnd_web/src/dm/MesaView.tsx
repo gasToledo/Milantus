@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useCampaignMembers, useSheetCatalog } from '../api/queries';
+import { useCampaignChapters, useCampaignMembers, useSheetCatalog } from '../api/queries';
 import type { DmCampaign } from '../api/client';
 import { toRosterEntry } from '../dashboard/roster';
 import { useLang, useTexts } from '../i18n/context';
@@ -20,6 +20,8 @@ export function MesaView({ campaign }: { campaign: DmCampaign }) {
   const lang = useLang();
   const members = useCampaignMembers(campaign.id);
   const catalog = useSheetCatalog(lang);
+  // Solo para decir en qué capítulo va la mesa: si falla, la cabecera calla.
+  const chapters = useCampaignChapters(campaign.id);
 
   const entries = useMemo(() => {
     if (!members.data || !catalog.data) return null;
@@ -30,7 +32,9 @@ export function MesaView({ campaign }: { campaign: DmCampaign }) {
 
   const failed = [members, ...catalog.queries].filter((q) => q.isError);
   const state = stateLabel(t, stateOf(campaign));
-  const kicker = entries ? `${state} · ${t.dmTableCount(entries.length)}` : state;
+  const running = chapters.data?.find((c) => c.state === 'active');
+  // «En curso · El Valle Hueco»: la campaña y el capítulo en que va.
+  const kicker = running ? `${state} · ${running.name}` : state;
 
   let body;
   if (failed.length > 0) {
@@ -45,7 +49,7 @@ export function MesaView({ campaign }: { campaign: DmCampaign }) {
     body = (
       <>
         <ul
-          aria-label={t.dmSectionTable}
+          aria-label={t.dmTableCount(entries.length)}
           className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr))]"
         >
           {entries.map(({ memberId, entry }) => (

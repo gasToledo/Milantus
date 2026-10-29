@@ -11,6 +11,7 @@ import { AppBusyLabel, AppEmptyState, AppErrorView, Notice } from '../ui/status'
 import { defaultCampaign } from './campaigns';
 import { DmHeader } from './DmHeader';
 import { DmPanel } from './DmPanel';
+import { ChaptersView } from './ChaptersView';
 import { MesaView } from './MesaView';
 
 /**
@@ -75,7 +76,8 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
   } else if (!current) {
     body = <Notice title={t.dmCampaignNotFound} body={t.dmCampaignNotFoundBody} />;
   } else {
-    body = <MesaView key={current.campaign.id} campaign={current.campaign} />;
+    const Section = current.section === 'mesa' ? MesaView : ChaptersView;
+    body = <Section key={current.campaign.id} campaign={current.campaign} />;
   }
 
   return (
