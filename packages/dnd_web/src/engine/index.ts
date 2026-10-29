@@ -1,0 +1,53 @@
+import type { Catalog, CharacterJson, ComputedSheet } from './types';
+// Lo genera `npm run build:engine` (o la etapa `engine-js` del Dockerfile) y
+// no se versiona. Es un script de dart2js, no un módulo: al cargarse deja
+// `globalThis.dndEngine`, y de ahí lo toma este archivo.
+import './dnd_engine.generated.js';
+
+export type * from './types';
+
+interface DartEngine {
+  compute(characterJson: string, catalogJson: string): string;
+  migrateCharacter(characterJson: string): string;
+}
+
+function engine(): DartEngine {
+  const e = (globalThis as { dndEngine?: DartEngine }).dndEngine;
+  if (!e) throw new Error('El motor (dart2js) no se inicializó.');
+  return e;
+}
+
+// El motor guarda el último catálogo que vio y lo reconoce por su texto; si
+// cada llamada volviera a serializar el objeto, armar ese texto costaría más
+// que calcular la ficha. Se serializa una vez por objeto de catálogo.
+const catalogJsonCache = new WeakMap<Catalog, string>();
+
+function catalogJson(catalog: Catalog): string {
+  let json = catalogJsonCache.get(catalog);
+  if (json === undefined) {
+    json = JSON.stringify(catalog);
+    catalogJsonCache.set(catalog, json);
+  }
+  return json;
+}
+
+/**
+ * Calcula la ficha con el mismo motor que el servidor y Flutter, compilado a
+ * JS: ninguna regla se reimplementa en TypeScript. Migra la ficha si viene de
+ * un esquema viejo; una versión futura lanza en vez de calcular a medias.
+ */
+export function computeSheet(
+  character: CharacterJson,
+  catalog: Catalog,
+): ComputedSheet {
+  return JSON.parse(
+    engine().compute(JSON.stringify(character), catalogJson(catalog)),
+  ) as ComputedSheet;
+}
+
+/** Lleva una ficha al esquema actual sin modificar la de entrada. */
+export function migrateCharacter(character: CharacterJson): CharacterJson {
+  return JSON.parse(
+    engine().migrateCharacter(JSON.stringify(character)),
+  ) as CharacterJson;
+}
