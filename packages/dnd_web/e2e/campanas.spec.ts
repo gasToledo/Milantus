@@ -54,7 +54,8 @@ test('Campañas lista las mesas del jugador con la vista podada, sin escribir na
     expect(texto, `la pantalla muestra «${secreto}»`).not.toContain(secreto);
   }
   expect(escrituras).toEqual([]);
-  await expect(page.getByRole('link', { name: 'Campañas' }).first()).toHaveAttribute('aria-current', 'page');
+  // Es del Modo DM: el menú de Jugador no la enlaza.
+  await expect(page.getByRole('link', { name: 'Campañas', exact: true })).toHaveCount(0);
 });
 
 test('lo ajeno y lo inexistente responden igual: 404, y la cuenta sin v2 no ve campañas', async ({

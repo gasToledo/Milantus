@@ -107,13 +107,13 @@ function Enabled({ account }: { account: Account }) {
       );
     case 'bestiary':
       return (
-        <Shell panel={<RosterPanel current="bestiary" />} footer={<RosterFooter account={account} />}>
+        <Shell panel={<RosterPanel />} footer={<RosterFooter account={account} />}>
           <BestiaryPage entryId={route.entryId} />
         </Shell>
       );
     case 'campaigns':
       return (
-        <Shell panel={<RosterPanel current="campaigns" />} footer={<RosterFooter account={account} />}>
+        <Shell panel={<RosterPanel />} footer={<RosterFooter account={account} />}>
           <CampaignsPage />
         </Shell>
       );
