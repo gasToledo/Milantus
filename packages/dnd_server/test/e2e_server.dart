@@ -39,7 +39,7 @@ import 'fakes/in_memory_repository_transaction_runner.dart';
 import 'fakes/in_memory_settings_repository.dart';
 
 /// Cookie que el test de Playwright instala en el navegador, y el nombre que
-/// la sesión falsa muestra. Si cambian, cambian en `e2e/ficha.spec.ts`.
+/// la sesión falsa muestra. Si cambian, cambian en `e2e/helpers.ts`.
 const smokeSessionToken = 'sesion-de-humo=';
 const smokeAccountName = 'Ada de Humo';
 
@@ -51,6 +51,16 @@ const smokeCharacterId = 'guerrero-de-humo';
 
 /// La favorita de los ajustes sembrados, y el orden que esos ajustes piden.
 const smokeFavoriteId = 'zelda-de-humo';
+
+/// Un arma homebrew de la cuenta, que Aldric lleva equipada: la ficha de /v2
+/// tiene que fusionar `/api/homebrew` con el catálogo oficial para que su
+/// ataque aparezca (`e2e/ficha.spec.ts`).
+const smokeHomebrewWeaponId = 'hacha-de-humo';
+
+/// Una segunda sesión, de una cuenta que **no** está en `v2Users`: /v2 le
+/// responde «No disponible» sin pedir nada más a la API.
+const smokeNoV2Token = 'sesion-sin-v2=';
+const smokeNoV2UserId = 'cuenta-sin-v2';
 
 Future<void> main() async {
   final root = Platform.environment['DND_WEB_V2_ROOT'] ?? '';
@@ -68,6 +78,11 @@ Future<void> main() async {
   auth.profilesByToken[smokeSessionToken] = const SessionProfile(
     name: smokeAccountName,
     email: 'humo@example.org',
+  );
+  auth.sessionsByToken[smokeNoV2Token] = smokeNoV2UserId;
+  auth.profilesByToken[smokeNoV2Token] = const SessionProfile(
+    name: 'Sin Humo',
+    email: 'sin-v2@example.org',
   );
 
   final characters = InMemoryCharacterRepository();
@@ -100,6 +115,7 @@ Future<void> main() async {
       name: 'Aldric de Humo',
       hpPerLevel: const [10, 6],
       currentHp: 16,
+      weapons: const ['longsword', smokeHomebrewWeaponId],
     ),
   );
   final settings = InMemorySettingsRepository();
@@ -118,6 +134,20 @@ Future<void> main() async {
   final events = InMemoryEventRepository();
   final npcs = InMemoryNpcRepository(campaigns, characters);
   final homebrew = InMemoryHomebrewRepository();
+  await homebrew.upsert(
+    smokeUserId,
+    'weapons',
+    smokeHomebrewWeaponId,
+    const Weapon(
+      id: smokeHomebrewWeaponId,
+      name: 'Hacha de Humo',
+      source: ContentSource.homebrew,
+      category: 'martial',
+      damageDice: '1d10',
+      damageType: 'slashing',
+      properties: ['heavy'],
+    ).toJson(),
+  );
   final levelUps = InMemoryLevelUpRepository(campaigns);
 
   final handler = buildHandler(
@@ -170,6 +200,7 @@ Character _smokeFighter({
   required String name,
   required List<int> hpPerLevel,
   required int currentHp,
+  List<String> weapons = const ['longsword'],
 }) => Character(
   id: id,
   name: name,
@@ -197,6 +228,6 @@ Character _smokeFighter({
   hpPerLevel: hpPerLevel,
   equippedArmorId: 'chain-mail',
   shieldEquipped: true,
-  equippedWeaponIds: const ['longsword'],
+  equippedWeaponIds: weapons,
   combat: CombatState(currentHp: currentHp),
 );

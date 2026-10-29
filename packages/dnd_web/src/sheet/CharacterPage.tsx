@@ -1,39 +1,69 @@
-import { useMemo } from 'react';
-import { ScrollText } from 'lucide-react';
-import { useAppVersion, useCatalog, useRoster } from '../api/queries';
-import { computeSheet, type CharacterFields } from '../engine';
+import { useEffect, useMemo } from 'react';
+import { useAppVersion, useRoster, useSheetCatalog } from '../api/queries';
+import { computeSheet, migrateCharacter, type CharacterFields, type ComputedSheet } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
-import { rosterHref } from '../router';
-import { NavGroup, NavItem, Shell, SidebarBack, ThemeMenu, VersionLabel } from '../ui/Shell';
+import { characterHref, navigate, rosterHref, type SheetTab } from '../router';
+import { LinkTabs, TabPanel } from '../ui/disclosure';
+import { Shell, SidebarBack } from '../ui/Shell';
 import { AppBusyLabel, AppErrorView, Notice } from '../ui/status';
-import { CharacterSheet } from './CharacterSheet';
+import { CharacterTab } from './CharacterTab';
+import { CombatTab } from './CombatTab';
+import { SheetHeader } from './SheetHeader';
+import { SheetFooter, SheetPanel, TAB_ICONS } from './SheetPanel';
+import type { SheetModel } from './model';
+
+type Computed =
+  | { ok: true; model: SheetModel }
+  | { ok: false; detail: string };
 
 /**
- * La ficha de [id]. La API no tiene `GET` por id (el cliente de Flutter
- * tampoco: carga la lista), así que se busca en `/api/characters`; con la
- * caché, si se viene del dashboard, ni siquiera se vuelve a pedir. Lo ajeno y
- * lo inexistente son lo mismo para la API; acá también.
+ * La ficha de [id], de solo lectura, en la pestaña [tab]. La API no tiene
+ * `GET` por id (el cliente de Flutter tampoco: carga la lista), así que se
+ * busca en `/api/characters`; con la caché, si se viene del dashboard ni
+ * siquiera se vuelve a pedir. Lo ajeno y lo inexistente son lo mismo para la
+ * API; acá también.
  */
-export function CharacterPage({ id }: { id: string }) {
+export function CharacterPage({ id, tab }: { id: string; tab: SheetTab | null }) {
   const t = useTexts();
   const lang = useLang();
   const roster = useRoster();
-  const catalog = useCatalog(lang);
+  const catalog = useSheetCatalog(lang);
   const version = useAppVersion(true);
 
+  // La ruta sin pestaña es la primera: se reemplaza en el historial para que
+  // «atrás» no vuelva a una URL que solo redirige.
+  useEffect(() => {
+    if (tab === null) navigate(characterHref(id), { replace: true });
+  }, [id, tab]);
+
   const raw = roster.data?.find((c) => c.character.id === id)?.character ?? null;
-  // La ficha se calcula con el motor de Dart compilado a JS: el mismo que usan
-  // el servidor y Flutter. Acá no se recalcula ninguna regla.
-  const computed = useMemo(() => {
+  const computed = useMemo((): Computed | null => {
     if (!raw || !catalog.data) return null;
     try {
-      return { ok: true as const, sheet: computeSheet(raw, catalog.data) };
+      // Se migra una vez y se usa lo migrado para todo: el motor calcula sobre
+      // la forma actual y la pantalla lee los mismos campos (el PG actual, los
+      // espacios gastados) sin conocer esquemas viejos.
+      const migrated = migrateCharacter(raw);
+      // El motor de Dart compilado a JS, el mismo que usan el servidor y
+      // Flutter: acá no se recalcula ninguna regla.
+      const sheet: ComputedSheet = computeSheet(migrated, catalog.data);
+      return {
+        ok: true,
+        // `CharacterFields` es el subconjunto que esta pantalla lee de un
+        // `Character.toJson` que el servidor ya validó al guardarlo.
+        model: { character: migrated as unknown as CharacterFields, sheet, catalog: catalog.data },
+      };
     } catch (e) {
-      return { ok: false as const, detail: String(e) };
+      // Un esquema más nuevo que este cliente, o una ficha que el motor no
+      // entiende: se dice, en vez de mostrar números a medias.
+      return { ok: false, detail: String(e) };
     }
   }, [raw, catalog.data]);
 
-  const failed = [roster, catalog].filter((q) => q.isError);
+  const failed = [roster, ...catalog.queries].filter((q) => q.isError);
+  const activeTab: SheetTab = tab ?? 'personaje';
+  const model = computed?.ok ? computed.model : null;
+
   let body;
   if (failed.length > 0) {
     body = (
@@ -44,41 +74,43 @@ export function CharacterPage({ id }: { id: string }) {
   } else if (!computed) {
     body = <AppBusyLabel label={t.loading} />;
   } else if (!computed.ok) {
-    // Un esquema más nuevo que este cliente, o una ficha que el motor no
-    // entiende: se dice, en vez de mostrar números a medias.
     body = <AppErrorView as="h1" title={t.computeErrorTitle} message={t.computeErrorBody} detail={computed.detail} />;
   } else {
+    const m = computed.model;
     body = (
-      <CharacterSheet
-        // `raw` es un `Character.toJson` que el servidor ya validó al guardarlo;
-        // `CharacterFields` es el subconjunto que esta pantalla lee.
-        character={raw as unknown as CharacterFields}
-        sheet={computed.sheet}
-        catalog={catalog.data!}
-      />
+      <div className="flex flex-col gap-4">
+        <SheetHeader model={m} />
+        {/* Debajo de 900 px el panel es un cajón: la tira de pestañas va
+            arriba del contenido, para cambiar sin abrirlo. Desde 900 las
+            pestañas viven en el panel y la tira se oculta; el panel de la
+            pestaña es el mismo en los dos casos (se monta una sola vez). */}
+        <LinkTabs
+          label={t.sheetTabsLabel}
+          value={activeTab}
+          listClassName="shell:hidden"
+          tabs={[
+            { value: 'personaje', label: t.tabCharacter, href: characterHref(id, 'personaje'), icon: TAB_ICONS.personaje },
+            { value: 'combate', label: t.tabCombat, href: characterHref(id, 'combate'), icon: TAB_ICONS.combate },
+          ]}
+        >
+          <TabPanel value={activeTab} className="pt-4 shell:pt-0">
+            <TabBody tab={activeTab} model={m} />
+          </TabPanel>
+        </LinkTabs>
+      </div>
     );
   }
 
   return (
     <Shell
-      panel={
-        <>
-          <SidebarBack href={rosterHref()} label={t.backToCharacters} />
-          <NavGroup label={t.sheetNavLabel}>
-            <li>
-              <NavItem href="#contenido" icon={ScrollText} label={t.navSheet} active />
-            </li>
-          </NavGroup>
-        </>
-      }
-      footer={
-        <div className="flex items-center justify-between gap-2">
-          <ThemeMenu />
-          <VersionLabel version={version.data} />
-        </div>
-      }
+      panel={model ? <SheetPanel model={model} tab={activeTab} /> : <SidebarBack href={rosterHref()} label={t.backToCharacters} />}
+      footer={<SheetFooter version={version.data} />}
     >
       {body}
     </Shell>
   );
+}
+
+function TabBody({ tab, model }: { tab: SheetTab; model: SheetModel }) {
+  return tab === 'personaje' ? <CharacterTab model={model} /> : <CombatTab model={model} />;
 }

@@ -4,9 +4,11 @@
 // catálogo y la lista de personajes que bajó el dashboard sirven tal cual
 // para la ficha. El contrato de la API no cambia: las funciones de
 // `client.ts` siguen siendo las que piden.
-import { QueryClient, useQuery } from '@tanstack/react-query';
+import { QueryClient, useQuery, type UseQueryResult } from '@tanstack/react-query';
+import type { Catalog } from '../engine';
 import type { Lang } from '../i18n/texts';
 import { loadCatalog } from './catalog';
+import { fetchHomebrew, mergeHomebrew, type HomebrewContent } from './homebrew';
 import {
   ApiError,
   fetchAccount,
@@ -41,6 +43,7 @@ export const queryKeys = {
   rosterSettings: ['settings', 'roster'] as const,
   roster: ['characters'] as const,
   catalog: (lang: Lang) => ['catalog', lang] as const,
+  homebrew: ['homebrew'] as const,
   appVersion: ['app-version'] as const,
 };
 
@@ -82,3 +85,34 @@ export const useAppVersion = (enabled: boolean) =>
     staleTime: Infinity,
     retry: false,
   });
+
+export const useHomebrew = () =>
+  useQuery({ queryKey: queryKeys.homebrew, queryFn: ({ signal }) => fetchHomebrew(signal) });
+
+/**
+ * El catálogo con el que se calcula una ficha: el SRD en [lang] con el
+ * homebrew de la cuenta encima, como en Flutter. Toda pantalla que llame a
+ * `computeSheet` usa este y no `useCatalog`: con el oficial solo, un
+ * personaje con un arma propia pierde ese ataque. La fusión se hace una vez
+ * por par de datos (ver `merged`).
+ */
+// La última fusión, compartida entre pantallas: el motor reconoce el catálogo
+// por identidad del objeto (`catalogJson` en `engine/index.ts`), y fusionar de
+// nuevo al pasar del dashboard a la ficha le haría serializar 1,5 MB otra vez.
+let lastMerge: { catalog: Catalog; homebrew: HomebrewContent; merged: Catalog } | null = null;
+function merged(catalog: Catalog, homebrew: HomebrewContent): Catalog {
+  if (lastMerge?.catalog !== catalog || lastMerge.homebrew !== homebrew) {
+    lastMerge = { catalog, homebrew, merged: mergeHomebrew(catalog, homebrew) };
+  }
+  return lastMerge.merged;
+}
+
+export function useSheetCatalog(lang: Lang): {
+  data: Catalog | undefined;
+  queries: UseQueryResult<unknown>[];
+} {
+  const catalog = useCatalog(lang);
+  const homebrew = useHomebrew();
+  const data = catalog.data && homebrew.data ? merged(catalog.data, homebrew.data) : undefined;
+  return { data, queries: [catalog, homebrew] };
+}

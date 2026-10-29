@@ -81,7 +81,8 @@ export interface Attack {
 export interface Spellcasting {
   ability: AbilityId;
   progression: string;
-  preparation: string;
+  /** `prepared` (se preparan cada día) o `known` (se aprenden). */
+  preparation: 'prepared' | 'known';
   spellList: string;
   saveDc: number;
   attackBonus: number;
@@ -138,13 +139,38 @@ export interface CharacterResource {
   id: string;
   name: string;
   max: number;
-  recharge: string;
+  /** `RechargeOn` en Dart: `short`, `long` o `none`. */
+  recharge: 'short' | 'long' | 'none';
   shortRestRecovery: number;
   description: string;
   saveDc?: number;
   saveAbility?: AbilityId;
   damage?: string;
   pool?: true;
+}
+
+/** `InnateSpell.use` en Dart: cuántas veces se lanza sin espacio. */
+export type InnateSpellUse =
+  | 'atWill'
+  | 'oncePerLongRest'
+  | 'oncePerShortRest'
+  | 'proficiencyBonusPerLongRest'
+  | 'abilityModifierPerLongRest';
+
+/** Conjuro que concede un rasgo (especie, dote, invocación), con su CD y su
+ *  ataque ya calculados. */
+export interface InnateSpell {
+  spellId: string;
+  name: string;
+  level: number;
+  ability: AbilityId;
+  use: InnateSpellUse;
+  saveDc: number;
+  attackBonus: number;
+  source: string;
+  grantedSpellId: string;
+  replaceableFrom: string[];
+  freeUses: number;
 }
 
 export interface ComputedSheet {
@@ -197,7 +223,7 @@ export interface ComputedSheet {
   passives: { name: string; description: string }[];
   resources: CharacterResource[];
   companions: JsonObject[];
-  innateSpells: JsonObject[];
+  innateSpells: InnateSpell[];
   alwaysPreparedSpellIds: string[];
   alwaysPreparedSpellIdsByClass: Record<string, string[]>;
   spellListAdditionIds: string[];
@@ -250,8 +276,11 @@ export type CharacterJson = JsonObject;
 
 /**
  * Los campos del personaje que una pantalla lee **tal cual**, sin pasar por el
- * motor: identidad y estado de la mesa (PG actuales, usos gastados), que no
- * son un resultado de reglas. Todo número derivado sale de [ComputedSheet].
+ * motor: identidad, lo que eligió el jugador y el estado de la mesa (PG
+ * actuales, usos y espacios gastados, condiciones), que no son un resultado de
+ * reglas. Todo número derivado sale de [ComputedSheet]. Se lee del personaje
+ * **ya migrado** (`migrateCharacter`), así los campos tienen la forma actual
+ * aunque la ficha venga de un esquema viejo.
  */
 export interface CharacterFields {
   id: string;
@@ -260,10 +289,32 @@ export interface CharacterFields {
   classId: string;
   backgroundId: string;
   subclassId?: string | null;
+  /** Clase → subclase elegida en ella. */
+  subclassIds?: Record<string, string>;
+  /** `CharacterAlignment.name` (`lawfulGood`…), o ausente. */
+  alignment?: string | null;
+  personalityTrait?: string;
+  /** Id del catálogo de armaduras, no de una entrada del inventario. */
+  equippedArmorId?: string | null;
+  shieldEquipped?: boolean;
+  cantripIds?: string[];
+  spellIds?: string[];
+  /** Clase → trucos y conjuros elegidos con ella. */
+  classCantripIds?: Record<string, string[]>;
+  classSpellIds?: Record<string, string[]>;
   combat?: {
     currentHp?: number;
     tempHp?: number;
     /** Clave del recurso (`CharacterResource.key`) → usos gastados. */
     resourceUsage?: Record<string, number>;
+    /** Nivel (como texto) → espacios gastados. */
+    spellSlotsUsed?: Record<string, number>;
+    pactSlotsUsed?: Record<string, number>;
+    /** Tamaño del dado (como texto) → dados gastados. */
+    hitDiceUsed?: Record<string, number>;
+    conditions?: string[];
+    exhaustion?: number;
+    heroicInspiration?: boolean;
+    concentratingOn?: string | null;
   };
 }
