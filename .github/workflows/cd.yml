@@ -62,9 +62,11 @@ jobs:
             echo "deploy=true" >> "$GITHUB_OUTPUT"; exit 0
           fi
           # test/ y tool/ no entran a la imagen (ver .dockerignore): un commit
-          # que solo los toca no cambia nada en producción.
+          # que solo los toca no cambia nada en producción. dnd_web sí entra
+          # (etapa `web-v2-build` del Dockerfile): sin listarlo, un cambio solo
+          # de React pasaba CI y nunca llegaba a /v2.
           if git diff --quiet "$base" HEAD -- \
-              packages/dnd_server packages/dnd_app packages/dnd_engine \
+              packages/dnd_server packages/dnd_app packages/dnd_engine packages/dnd_web \
               ':(exclude,glob)packages/*/test/**' \
               ':(exclude,glob)packages/*/tool/**' \
               docker-compose.yml postgres-init .github/workflows/cd.yml; then

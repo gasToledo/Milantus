@@ -127,11 +127,9 @@ la app en dos mitades en paralelo con el build web. CD (`cd.yml`) arranca recié
 cuando CI termina en verde sobre `main`: **CI en rojo no llega a producción**
 (el commit queda en `main` y se arregla con otro). Su job `gate` despliega solo
 si cambió algo desplegable desde el último CD exitoso — `packages/dnd_server`,
-`packages/dnd_app` o `packages/dnd_engine`, `docker-compose.yml`,
+`packages/dnd_app`, `packages/dnd_engine` o `packages/dnd_web`, `docker-compose.yml`,
 `postgres-init/**` o el propio `cd.yml`, sin contar `packages/*/test/` ni
-`packages/*/tool/`, que tampoco entran a la imagen (`.dockerignore`).
-**`packages/dnd_web` no está en esa lista:** un commit que solo toca React no
-despliega (ver `docs/arquitectura/migracion-react.md`). Un commit de solo docs no despliega.
+`packages/*/tool/`, que tampoco entran a la imagen (`.dockerignore`). Un commit de solo docs no despliega.
 
 Dos cosas que muerden en el despliegue: la imagen base de Flutter solo publica
 *minor* (`3.44.0`, nunca `3.44.8`), así que `environment.sdk` de `dnd_app` no

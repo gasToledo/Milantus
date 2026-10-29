@@ -152,7 +152,8 @@ para ellos), ni un chequeo automático de literales sueltos como el
 
 ## Cómo se vuelve atrás
 
-Cada nivel se deshace sin tocar el código de Flutter:
+Un cambio en `packages/dnd_web` despliega igual que los de los otros paquetes
+(el `gate` de `cd.yml` lo incluye), también el revert. Cada nivel se deshace sin tocar el código de Flutter:
 
 - **Una cuenta**: sacar su id de `V2_USERS` y `docker compose up -d`. Deja de
   ver `/v2` y nunca perdió nada: la ficha de solo lectura no escribe.
@@ -161,8 +162,7 @@ Cada nivel se deshace sin tocar el código de Flutter:
 - **Apagar `/v2`**: sacar `DND_WEB_V2_ROOT` (la imagen lo fija; habría que
   sobrescribirlo o apuntar a un directorio inexistente). `/v2` responde 404 y
   el resto del servidor arranca igual.
-- **Un cambio malo**: un commit de revert en `main`, como cualquier otro. Ojo
-  con el hueco de abajo sobre CD.
+- **Un cambio malo**: un commit de revert en `main`, como cualquier otro.
 
 Cuando existan pantallas que **escriban**, el criterio tendrá que ser otro:
 volver atrás ya no alcanza si una escritura dejó datos en un formato que
@@ -175,12 +175,6 @@ propio.
 
 Para que nadie lo dé por hecho:
 
-- **CD no despliega cambios que solo toquen `packages/dnd_web`.** El job `gate`
-  de `cd.yml` compara `packages/dnd_server`, `packages/dnd_app` y
-  `packages/dnd_engine` (más `docker-compose.yml`, `postgres-init` y el propio
-  `cd.yml`), no `dnd_web`. Un commit únicamente de React pasa CI y no llega a
-  producción hasta el siguiente cambio desplegable o un `workflow_dispatch`
-  manual. No se corrigió en esta tarea.
 - Más de una pantalla, navegación entre pantallas y lista de personajes.
 - Cualquier escritura desde React: todo el cliente hoy es solo lectura.
 - Enlaces desde Flutter hacia `/v2` o redirección automática por `webV2`.
@@ -200,7 +194,8 @@ propuestos, no medidos todavía:
    por defecto) durante un período sin regresiones reportadas.
 3. La paridad del motor sigue en verde en CI y existe un respaldo automático
    de la paridad de las pantallas con escritura (hoy no existe).
-4. El despliegue de `dnd_web` es primera clase: el `gate` de CD lo incluye.
+4. El despliegue de `dnd_web` es primera clase *(ya cumplido: el `gate` de
+   `cd.yml` incluye `packages/dnd_web`)*.
 5. Texto, accesibilidad y responsividad cumplen la misma guía de diseño
    ([Diseño web](../desarrollo/diseno-web.md)) que Flutter.
 6. Hay una ventana en la que Flutter sigue sirviéndose en una ruta de reserva
