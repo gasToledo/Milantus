@@ -14,7 +14,7 @@ seguí ese registro y sumale el tuyo cuando tomes una decisión no obvia.
 
 ## Comandos
 
-Los tres paquetes se prueban por separado. No hay comando raíz.
+Los cuatro paquetes se prueban por separado. No hay comando raíz.
 
 ```bash
 cd packages/dnd_engine && dart pub get && dart analyze && dart test
@@ -64,6 +64,36 @@ El hook solo toca los `.dart` preparados, y a los preparados a medias no los
 formatea: los revisa y corta el commit. CI mira `lib test` en la app, `lib bin
 test` en el servidor y todo el paquete en el engine (incluido `tool/`).
 
+`dnd_web` (cliente React en migración, ver `docs/arquitectura/migracion-react.md`)
+necesita Node 22 y, para el motor, el SDK de Dart en el `PATH`. Es el orden
+exacto de CI:
+
+```bash
+cd packages/dnd_web && npm ci && npm run build:engine && npx tsc --noEmit && npm run build
+```
+
+Playwright (la prueba de humo contra el servidor real; requiere el `dist` del
+build y el SDK de Dart, porque levanta `dnd_server`) y la paridad Dart↔JS:
+
+```bash
+cd packages/dnd_web && npx playwright install chromium && npm run test:e2e
+```
+
+```bash
+cd packages/dnd_engine && dart run tool/generate_js_parity_fixtures.dart /tmp/parity
+cd ../dnd_web && npm run test:parity -- /tmp/parity
+```
+
+`npm run build:engine` genera `src/engine/dnd_engine.generated.js`, que no se
+versiona y que `tsc` y Vite importan: sin él nada compila. Un cambio en
+`dnd_web` que toque el `Dockerfile` (etapas `engine-js` y `web-v2-build`) o
+`.dockerignore` se valida además con `docker build -f packages/dnd_server/Dockerfile .`
+desde la raíz: ni `tsc` ni Vite ven esa etapa.
+
+**Trampa de entorno:** en algunas máquinas Windows con antivirus corporativo
+`npm ci` deja sin binarios nativos a TypeScript 7, rolldown y compañía. Si
+pasa, `dnd_web` se valida en CI y no se pierde tiempo reinstalando.
+
 El stack completo (Postgres + Zitadel + servidor + cloudflared) se levanta con
 `docker compose up -d --build`; el runbook está en
 `docs/operaciones/despliegue.md`.
@@ -96,10 +126,12 @@ requests): formato, análisis y pruebas de los tres paquetes, con las pruebas de
 la app en dos mitades en paralelo con el build web. CD (`cd.yml`) arranca recién
 cuando CI termina en verde sobre `main`: **CI en rojo no llega a producción**
 (el commit queda en `main` y se arregla con otro). Su job `gate` despliega solo
-si cambió algo desplegable desde el último CD exitoso — `packages/**`,
-`docker-compose.yml`, `postgres-init/**` o el propio `cd.yml`, sin contar
-`packages/*/test/` ni `packages/*/tool/`, que tampoco entran a la imagen
-(`.dockerignore`). Un commit de solo docs no despliega.
+si cambió algo desplegable desde el último CD exitoso — `packages/dnd_server`,
+`packages/dnd_app` o `packages/dnd_engine`, `docker-compose.yml`,
+`postgres-init/**` o el propio `cd.yml`, sin contar `packages/*/test/` ni
+`packages/*/tool/`, que tampoco entran a la imagen (`.dockerignore`).
+**`packages/dnd_web` no está en esa lista:** un commit que solo toca React no
+despliega (ver `docs/arquitectura/migracion-react.md`). Un commit de solo docs no despliega.
 
 Dos cosas que muerden en el despliegue: la imagen base de Flutter solo publica
 *minor* (`3.44.0`, nunca `3.44.8`), así que `environment.sdk` de `dnd_app` no
@@ -112,15 +144,21 @@ prueba a mano en producción y se anota en
 `docs/operaciones/pruebas-en-produccion.md`, un registro privado que Git ignora:
 puede no existir en otra máquina.
 
-## Los tres paquetes
+## Los cuatro paquetes
 
 ```
 packages/dnd_engine   Dart puro. Cero dependencias de runtime, cero Flutter.
 packages/dnd_app      Flutter web. Depende del engine.
 packages/dnd_server   shelf + Postgres. Depende del engine.
+packages/dnd_web      React + Vite + TypeScript + Tailwind, servido en /v2.
 ```
 
 La dirección es estricta: **el engine no depende del cliente ni del servidor**.
+`dnd_web` tampoco importa Dart: usa el motor **compilado a JS**
+(`packages/dnd_engine/js/entrypoint.dart`, vía `src/engine/index.ts`) y nunca
+tiene reglas propias. Una regla que falte se agrega al engine con su test, no
+en TypeScript. Convive con Flutter y se habilita por cuenta; el porqué y el
+estado real están en `docs/arquitectura/migracion-react.md`.
 Los modelos y las reglas no usan Flutter ni `dart:io`. La única excepción de
 entrada/salida es `lib/src/data/content_pack_loader_io.dart`: carga catálogos
 desde un directorio y se importa condicionalmente. En web, el cliente carga
@@ -269,6 +307,22 @@ Lo que más se olvida:
   `docs/desarrollo/textos.md`.
 - Los rótulos del motor (`label`) siguen a `ContentLanguage.current`, un estado
   global: un test que lo cambia lo restaura en `tearDown`.
+
+### Frontend React (`packages/dnd_web`)
+
+Las reglas de arriba valen igual, traducidas. Los tokens de
+`diseno-web.md` (Apéndice B) viven en `src/index.css`.
+
+- Colores, radios y fuentes **solo como variables CSS** (`var(--gold)`) o sus
+  utilidades de Tailwind (`bg-surface`): nunca un hex suelto ni un color de
+  la paleta por defecto de Tailwind. Mismos tres fondos y sin sombras.
+- La UI no recalcula reglas: todo número sale de `computeSheet`
+  (`src/engine/index.ts`). Del personaje crudo solo se lee lo que no es un
+  resultado de reglas (PG actuales, usos gastados).
+- Todo texto visible sale de `useTexts()` (`src/i18n/texts.ts`, es y en del
+  mismo tipo: `tsc` falla si falta una clave). Nunca un literal en un
+  componente. **No hay test que cace literales sueltos** como en Flutter:
+  lo cuida la revisión.
 
 Los widgets de estado ya existen y se usan siempre los mismos: `AppErrorView`
 (con `onRetry`), `AppBusyLabel` (el texto es obligatorio) y `AppEmptyState`,
