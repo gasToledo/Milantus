@@ -7,7 +7,7 @@
 // de Node no tiene Dart: si cambian las banderas, cambian en los dos lados.
 import { spawnSync } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 // `fileURLToPath` y no `URL.pathname`: en Windows ese último devuelve
@@ -32,5 +32,8 @@ function dart(args) {
 
 mkdirSync(dirname(salida), { recursive: true });
 dart(['pub', 'get']);
-dart(['compile', 'js', '-O2', '--no-source-maps', '-o', salida, 'js/entrypoint.dart']);
+// Relativa a `engineDir` y no absoluta: con `shell` los argumentos llegan sin
+// comillas, y una ruta con espacios (`Proyecto DnD`) se parte en dos.
+const salidaRelativa = relative(engineDir, salida);
+dart(['compile', 'js', '-O2', '--no-source-maps', '-o', salidaRelativa, 'js/entrypoint.dart']);
 console.log(`Motor compilado en ${salida}`);
