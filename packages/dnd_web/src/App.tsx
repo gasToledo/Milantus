@@ -1,20 +1,19 @@
-import { useCallback, useEffect, useState } from 'react';
-import { fetchAccount, fetchThemeMode, type Account } from './api/client';
+import { useEffect, useState } from 'react';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { createQueryClient, useAccount, useThemeMode } from './api/queries';
+import type { Account } from './api/client';
 import { setEngineLanguage } from './engine';
 import { LangProvider, useTexts } from './i18n/context';
 import { resolveLang, type Lang } from './i18n/texts';
 import { DashboardPage } from './dashboard/DashboardPage';
-import { matchRoute } from './router';
+import { RosterFooter, RosterPanel } from './dashboard/RosterPanel';
+import { useRoute } from './router';
 import { CharacterPage } from './sheet/CharacterPage';
-import { ActionButton, ActionLink, Notice, Shell } from './ui/Shell';
-
-/** `loading` y `error` son estados aparte de `anonymous`: no poder comprobar
- *  la sesión no es lo mismo que no tenerla. */
-type Session =
-  | { kind: 'loading' }
-  | { kind: 'anonymous' }
-  | { kind: 'signed-in'; account: Account }
-  | { kind: 'error' };
+import { ThemeProvider, useTheme } from './theme/theme';
+import { ButtonLink } from './ui/Button';
+import { TooltipProvider } from './ui/primitives';
+import { Shell } from './ui/Shell';
+import { AppBusyLabel, AppErrorView, Notice } from './ui/status';
 
 // El idioma se resuelve una vez, al cargar, y también el del motor: sus
 // rótulos («Mediano») son estado global que hay que fijar antes de calcular.
@@ -22,111 +21,93 @@ const LANG: Lang = resolveLang();
 document.documentElement.lang = LANG;
 setEngineLanguage(LANG);
 
-/** Aplica el tema de los ajustes de la cuenta: `dark` (el que arranca),
- *  `light` o `system`, como `AppThemeController` de Flutter. */
-function applyTheme(mode: string) {
-  const dark =
-    mode === 'system'
-      ? !window.matchMedia('(prefers-color-scheme: light)').matches
-      : mode !== 'light';
-  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-}
-
 export function App() {
+  // Un cliente por montaje (no un módulo global): así una prueba o un
+  // remontaje empiezan con la caché vacía.
+  const [queryClient] = useState(createQueryClient);
   return (
-    <LangProvider lang={LANG}>
-      <Screen />
-    </LangProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <LangProvider lang={LANG}>
+          <TooltipProvider delayDuration={400}>
+            <Screen />
+          </TooltipProvider>
+        </LangProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 
+/**
+ * La sesión decide el marco. `loading` y `error` son estados aparte de «sin
+ * sesión»: no poder comprobarla no es lo mismo que no tenerla.
+ */
 function Screen() {
   const t = useTexts();
-  const [session, setSession] = useState<Session>({ kind: 'loading' });
-  const [attempt, setAttempt] = useState(0);
-  const retry = useCallback(() => {
-    setSession({ kind: 'loading' });
-    setAttempt((n) => n + 1);
-  }, []);
+  const account = useAccount();
 
+  if (account.isPending) {
+    return (
+      <Shell>
+        <AppBusyLabel label={t.loadingSession} />
+      </Shell>
+    );
+  }
+  if (account.isError) {
+    return (
+      <Shell>
+        <AppErrorView as="h1" title={t.sessionErrorTitle} message={t.errorBody} onRetry={() => account.refetch()} />
+      </Shell>
+    );
+  }
+  if (account.data === null) {
+    return (
+      <Shell>
+        <Notice
+          title={t.signedOutTitle}
+          body={t.signedOutBody}
+          action={<ButtonLink href="/auth/login">{t.signIn}</ButtonLink>}
+        />
+      </Shell>
+    );
+  }
+  // Sin `webV2` la ruta no existe: no hay pista de que haya algo detrás. Es
+  // la misma pantalla para cualquier ruta, conocida o no, y no pide nada más
+  // a la API (ni ajustes, ni personajes).
+  if (account.data.webV2 !== true) {
+    return (
+      <Shell>
+        <Notice title={t.unavailableTitle} body={t.unavailableBody} />
+      </Shell>
+    );
+  }
+  return <Enabled account={account.data} />;
+}
+
+/** Solo para cuentas con `webV2`: el tema de la cuenta y las rutas. */
+function Enabled({ account }: { account: Account }) {
+  const t = useTexts();
+  const { route } = useRoute();
+  const themeMode = useThemeMode(true);
+  const { adoptAccountMode } = useTheme();
   useEffect(() => {
-    const controller = new AbortController();
-    fetchAccount(controller.signal)
-      .then(async (account): Promise<Session> => {
-        if (account === null) return { kind: 'anonymous' };
-        if (account.webV2 === true) {
-          applyTheme(await fetchThemeMode(controller.signal));
-        }
-        return { kind: 'signed-in', account };
-      })
-      .then(setSession)
-      .catch(() => {
-        if (!controller.signal.aborted) setSession({ kind: 'error' });
-      });
-    return () => controller.abort();
-  }, [attempt]);
+    if (themeMode.data) adoptAccountMode(themeMode.data);
+  }, [themeMode.data, adoptAccountMode]);
 
-  // Cada estado arma su marco: solo con sesión y `webV2` el panel lleva
-  // navegación y cuenta.
-  switch (session.kind) {
-    case 'loading':
+  switch (route.name) {
+    case 'roster':
       return (
-        <Shell>
-          <Notice title={t.loadingSession} />
+        <Shell panel={<RosterPanel current="roster" />} footer={<RosterFooter account={account} />}>
+          <DashboardPage />
         </Shell>
       );
-    case 'error':
+    case 'character':
+      return <CharacterPage id={route.id} />;
+    case 'unknown':
       return (
-        <Shell>
-          <Notice
-            title={t.errorTitle}
-            body={t.errorBody}
-            action={<ActionButton onClick={retry}>{t.retry}</ActionButton>}
-          />
+        <Shell panel={<RosterPanel />} footer={<RosterFooter account={account} />}>
+          <Notice title={t.notFoundTitleRoute} />
         </Shell>
       );
-    case 'anonymous':
-      return (
-        <Shell>
-          <Notice
-            title={t.signedOutTitle}
-            body={t.signedOutBody}
-            action={<ActionLink href="/auth/login">{t.signIn}</ActionLink>}
-          />
-        </Shell>
-      );
-    case 'signed-in': {
-      // Sin `webV2` la ruta no existe: no hay pista de que haya algo detrás.
-      // Es la misma pantalla para cualquier ruta, conocida o no.
-      if (session.account.webV2 !== true) {
-        return (
-          <Shell>
-            <Notice title={t.unavailableTitle} body={t.unavailableBody} />
-          </Shell>
-        );
-      }
-      const { account } = session;
-      const route = matchRoute(window.location.pathname);
-      switch (route.name) {
-        case 'roster':
-          return (
-            <Shell account={account} current="roster">
-              <DashboardPage />
-            </Shell>
-          );
-        case 'character':
-          return (
-            <Shell account={account} current="sheet">
-              <CharacterPage id={route.id} />
-            </Shell>
-          );
-        case 'unknown':
-          return (
-            <Shell account={account}>
-              <Notice title={t.notFoundTitleRoute} />
-            </Shell>
-          );
-      }
-    }
   }
 }

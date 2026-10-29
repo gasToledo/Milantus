@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Footprints, Heart, Shield, Sparkles, Swords, Zap, Eye, Medal, Gem, ScrollText } from 'lucide-react';
 import { useTexts } from '../i18n/context';
 import { labelOf } from '../i18n/texts';
 import type {
@@ -8,6 +9,8 @@ import type {
   ComputedSheet,
 } from '../engine';
 import { accentOf, nameOf } from '../api/catalog';
+import { Card } from '../ui/Card';
+import { Pill, Pips, StatTile } from '../ui/data';
 import { Medallion } from '../ui/Medallion';
 import { signed } from './format';
 
@@ -67,9 +70,9 @@ export function CharacterSheet({
           {pills.length > 0 && (
             <ul className="mt-2 flex flex-wrap gap-2">
               {pills.map((p) => (
-                <li key={p} className="pill">
+                <Pill as="li" key={p}>
                   {p}
-                </li>
+                </Pill>
               ))}
             </ul>
           )}
@@ -78,34 +81,22 @@ export function CharacterSheet({
 
       <section aria-label={t.tacticalBand}>
         <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          <StatTile id="hp" label={t.hp} valueClass="text-crimson">
-            {currentHp}
-            <span className="text-[16px] font-normal text-on-surface-variant">
-              {' / '}
-              {sheet.maxHp}
-            </span>
-            {tempHp > 0 && (
-              <span className="block text-[11px] font-normal text-on-surface-variant">
-                {t.tempHp(tempHp)}
-              </span>
-            )}
-          </StatTile>
-          <StatTile id="ac" label={t.ac} valueClass="text-gold">
-            {sheet.armorClass}
-          </StatTile>
-          <StatTile id="initiative" label={t.initiative}>
-            {signed(sheet.initiative)}
-          </StatTile>
-          <StatTile id="speed" label={t.speed}>
-            {sheet.speed}
-            <span className="text-[14px] font-normal text-on-surface-variant"> {t.feet}</span>
-          </StatTile>
-          <StatTile id="proficiency" label={t.proficiency}>
-            {signed(sheet.proficiencyBonus)}
-          </StatTile>
-          <StatTile id="passive-perception" label={t.passivePerception}>
-            {sheet.passivePerception}
-          </StatTile>
+          <StatTile
+            id="hp"
+            icon={Heart}
+            label={t.hp}
+            valueClassName="text-crimson"
+            value={currentHp}
+            suffix={`/ ${sheet.maxHp}`}
+            footer={
+              tempHp > 0 && <span className="text-[11px] text-on-surface-variant">{t.tempHp(tempHp)}</span>
+            }
+          />
+          <StatTile id="ac" icon={Shield} label={t.ac} valueClassName="text-gold" value={sheet.armorClass} />
+          <StatTile id="initiative" icon={Zap} label={t.initiative} value={signed(sheet.initiative)} />
+          <StatTile id="speed" icon={Footprints} label={t.speed} value={sheet.speed} suffix={t.feet} />
+          <StatTile id="proficiency" icon={Medal} label={t.proficiency} value={signed(sheet.proficiencyBonus)} />
+          <StatTile id="passive-perception" icon={Eye} label={t.passivePerception} value={sheet.passivePerception} />
         </dl>
       </section>
 
@@ -141,7 +132,7 @@ export function CharacterSheet({
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className="flex min-w-0 flex-col gap-4">
-          <Card title={t.attacksHeading} id="attacks">
+          <Card title={t.attacksHeading} id="attacks" icon={Swords}>
             {sheet.attacks.length === 0 ? (
               <Empty>{t.noAttacks}</Empty>
             ) : (
@@ -166,7 +157,7 @@ export function CharacterSheet({
             )}
           </Card>
 
-          <Card title={t.resourcesHeading} id="resources">
+          <Card title={t.resourcesHeading} id="resources" icon={Gem}>
             {sheet.resources.length === 0 ? (
               <Empty>{t.noResources}</Empty>
             ) : (
@@ -191,7 +182,7 @@ export function CharacterSheet({
             )}
           </Card>
 
-          <Card title={t.featuresHeading} id="features">
+          <Card title={t.featuresHeading} id="features" icon={Sparkles} collapsible>
             {sheet.passives.length === 0 ? (
               <Empty>{t.noFeatures}</Empty>
             ) : (
@@ -212,7 +203,7 @@ export function CharacterSheet({
         </div>
 
         <div className="flex min-w-0 flex-col gap-4">
-          <Card title={t.savesHeading} id="saves">
+          <Card title={t.savesHeading} id="saves" icon={Shield}>
             <ul>
               {ABILITIES.map((ability) => (
                 <ProficiencyRow
@@ -228,7 +219,7 @@ export function CharacterSheet({
             </ul>
           </Card>
 
-          <Card title={t.skillsHeading} id="skills">
+          <Card title={t.skillsHeading} id="skills" icon={ScrollText}>
             <ul>
               {Object.entries(sheet.skillModifiers).map(([skill, modifier]) => (
                 <ProficiencyRow
@@ -249,53 +240,8 @@ export function CharacterSheet({
   );
 }
 
-function StatTile({
-  id,
-  label,
-  valueClass = 'text-on-surface',
-  children,
-}: {
-  id: string;
-  label: string;
-  valueClass?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="plaque p-3" data-stat={id}>
-      <dt className="eyebrow">{label}</dt>
-      <dd className={`num stat-tile-value mt-1 ${valueClass}`}>{children}</dd>
-    </div>
-  );
-}
-
-function Card({ title, id, children }: { title: string; id: string; children: ReactNode }) {
-  return (
-    <section className="card p-4" aria-labelledby={`h-${id}`}>
-      <h2 id={`h-${id}`} className="font-display mb-2 text-[16px] text-on-surface">
-        {title}
-      </h2>
-      {children}
-    </section>
-  );
-}
-
 function Empty({ children }: { children: ReactNode }) {
   return <p className="text-[13px] text-text-muted">{children}</p>;
-}
-
-/** Usos restantes: llenos en oro, gastados en `text-muted` (`UsagePips`). El
- *  texto de `aria-label` dice la cuenta, porque el color solo no alcanza. */
-function Pips({ max, left, label }: { max: number; left: number; label: string }) {
-  return (
-    <span role="img" aria-label={label} className="flex flex-wrap justify-end gap-1">
-      {Array.from({ length: max }, (_, i) => (
-        <span
-          key={i}
-          className={`h-3 w-3 rounded-full ${i < left ? 'bg-gold' : 'bg-text-muted opacity-50'}`}
-        />
-      ))}
-    </span>
-  );
 }
 
 function ProficiencyRow({

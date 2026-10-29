@@ -89,19 +89,6 @@ export async function fetchAppVersion(signal: AbortSignal): Promise<string | nul
   }
 }
 
-/**
- * El personaje [id] de la cuenta, o `null`. La API no tiene `GET` por id (el
- * cliente de Flutter tampoco: carga la lista, `listCharacters`), y lo ajeno y
- * lo inexistente son lo mismo para ella; acá también.
- */
-export async function fetchCharacter(
-  id: string,
-  signal: AbortSignal,
-): Promise<CharacterJson | null> {
-  const characters = await fetchRoster(signal);
-  return characters.find((c) => c.character.id === id)?.character ?? null;
-}
-
 /** Tema elegido en los ajustes de la cuenta (`themeMode` de `AppSettings`).
  *  Es un adorno: si falla, se queda el oscuro, que es el que arranca. */
 export async function fetchThemeMode(signal: AbortSignal): Promise<string> {

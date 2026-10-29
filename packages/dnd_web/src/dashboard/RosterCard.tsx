@@ -1,14 +1,11 @@
 import type { ReactNode } from 'react';
+import { Star } from 'lucide-react';
 import { useTexts } from '../i18n/context';
-import { characterHref } from '../router';
+import { characterHref, Link } from '../router';
 import { signed } from '../sheet/format';
+import { HP_CRITICAL_RATIO, hpTone, ThinBar } from '../ui/data';
 import { Medallion } from '../ui/Medallion';
 import { isFallen, type RosterEntry } from './roster';
-
-// Un cuarto de los PG: a partir de ahí el rótulo lo dice con todas las letras
-// en vez de dejarlo librado a lo corta que se ve la barra
-// (`AppPalette.hpCriticalRatio` en Flutter).
-const CRITICAL_HP_RATIO = 0.25;
 
 /**
  * Tarjeta de personaje: identidad arriba y datos de combate abajo, para no
@@ -27,7 +24,9 @@ export function RosterCard({ entry, favorite }: { entry: RosterEntry; favorite: 
   const hp = character.combat?.currentHp ?? 0;
   const maxHp = sheet?.maxHp ?? 0;
   const ratio = maxHp === 0 ? 0 : Math.min(1, Math.max(0, hp / maxHp));
-  const critical = !fallen && ratio <= CRITICAL_HP_RATIO;
+  // Un cuarto de los PG: a partir de ahí el rótulo lo dice con todas las
+  // letras en vez de dejarlo librado a lo corta que se ve la barra.
+  const critical = !fallen && ratio <= HP_CRITICAL_RATIO;
   const hpLabel = fallen ? t.hpLabelFallen : critical ? t.hpLabelCritical : t.hpLabelNormal;
 
   const classes = entry.classes
@@ -45,25 +44,18 @@ export function RosterCard({ entry, favorite }: { entry: RosterEntry; favorite: 
         <div className="min-w-0 flex-1">
           <h2 className="flex items-center gap-1.5 font-display text-[18px] leading-tight">
             {favorite && (
-              <svg
-                role="img"
-                aria-label={t.favorite}
-                viewBox="0 0 24 24"
-                width="15"
-                height="15"
-                className="shrink-0 fill-gold"
-              >
-                <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z" />
-              </svg>
+              <span role="img" aria-label={t.favorite} className="flex shrink-0">
+                <Star size={15} aria-hidden="true" className="fill-gold text-gold" />
+              </span>
             )}
-            <a
+            <Link
               href={characterHref(character.id)}
               className={`truncate after:absolute after:inset-0 after:rounded-[var(--radius-card)] after:content-[''] ${
                 fallen ? 'text-on-surface-variant' : 'text-on-surface'
               }`}
             >
               {character.name}
-            </a>
+            </Link>
             {fallen && (
               <span className="shrink-0 rounded-[var(--radius-pill)] border border-crimson px-[7px] font-body text-[9.5px] font-semibold tracking-[0.6px] text-crimson">
                 {t.fallenBadge}
@@ -100,19 +92,17 @@ export function RosterCard({ entry, favorite }: { entry: RosterEntry; favorite: 
               <span className="text-text-muted"> / {maxHp}</span>
             </p>
           </div>
-          {/* La barra es redundante con la cifra de al lado: va oculta al lector. */}
-          <div
-            aria-hidden="true"
-            className={`mt-1.5 h-[9px] rounded-[var(--radius-pill)] border bg-plaque p-px ${
-              fallen || critical ? 'border-crimson' : 'border-hairline'
-            }`}
-          >
-            {!fallen && (
-              <div
-                className="h-full rounded-[var(--radius-pill)] bg-crimson"
-                style={{ width: `${ratio * 100}%` }}
-              />
-            )}
+          {/* Recorre el tramo y cambia de color como en Flutter (verde, oro,
+              carmesí); su `aria-label` dice lo mismo que la cifra de arriba. */}
+          <div className="mt-1.5">
+            <ThinBar
+              value={fallen ? 0 : hp}
+              max={maxHp}
+              label={t.hp}
+              valueText={`${hp} / ${maxHp}`}
+              colorClassName={hpTone(ratio).bar}
+              height={6}
+            />
           </div>
 
           <dl className="plaque mt-3 grid grid-cols-3 divide-x divide-hairline">

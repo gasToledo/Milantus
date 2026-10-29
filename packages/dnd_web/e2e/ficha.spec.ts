@@ -51,8 +51,9 @@ test('la ficha muestra los números que da el motor para el personaje sembrado',
   await page.goto(`/v2/personajes/${PERSONAJE}`);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Brunilda de Humo');
 
-  const cifra = (id: string) => page.locator(`[data-stat="${id}"] dd`);
-  await expect(cifra('hp')).toHaveText(`${personaje.combat.currentHp} / ${ficha.maxHp}`);
+  const cifra = (id: string) => page.locator(`[data-stat="${id}"] [data-field="value"]`);
+  await expect(cifra('hp')).toHaveText(String(personaje.combat.currentHp));
+  await expect(page.locator('[data-stat="hp"] dd')).toContainText(`/ ${ficha.maxHp}`);
   await expect(cifra('ac')).toHaveText(String(ficha.armorClass));
   await expect(cifra('initiative')).toHaveText(signed(ficha.initiative));
   await expect(cifra('proficiency')).toHaveText(signed(ficha.proficiencyBonus));

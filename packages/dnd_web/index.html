@@ -1,9 +1,20 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Milantus</title>
+    <script>
+      // El tema elegido en este navegador, antes del primer cuadro: sin esto
+      // una cuenta en tema claro ve un destello oscuro en cada recarga. La
+      // clave es la de `src/theme/theme.tsx`; React lo vuelve a aplicar
+      // después con la misma regla.
+      try {
+        var m = localStorage.getItem('milantus.v2.theme');
+        if (m === 'system') m = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        if (m === 'light' || m === 'dark') document.documentElement.dataset.theme = m;
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>
