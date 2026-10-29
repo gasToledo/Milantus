@@ -12,28 +12,38 @@ import {
 // rutas sería más peso que este archivo; si un día hacen falta rutas anidadas
 // de verdad, se cambia sin tocar a quien usa `useRoute` y `Link`.
 
+/** Las pestañas de la ficha. Son parte de la URL (`/personajes/:id/combate`):
+ *  se comparten, se recargan y «atrás» vuelve a la anterior. El segmento va
+ *  en español porque es lo que se lee en la barra de direcciones. */
+export const SHEET_TABS = ['personaje', 'combate'] as const;
+export type SheetTab = (typeof SHEET_TABS)[number];
+
 export type Route =
   | { name: 'roster' }
-  | { name: 'character'; id: string }
+  // `tab: null` es la ruta sin sufijo, que redirige a la primera pestaña.
+  | { name: 'character'; id: string; tab: SheetTab | null }
   | { name: 'unknown' };
 
 /** Adónde mandan los enlaces a lo que todavía vive solo en Flutter (crear,
  *  Códice, Ajustes, el Modo DM…): su raíz, que sirve el cliente de `/`. */
 export const FLUTTER_HOME = '/';
 
-/** `/v2/` (la lista) y `/v2/personajes/:id`, con o sin barra final. El prefijo
- *  lo pone Vite (`base`), y es el mismo con el que el servidor monta el build. */
+/** `/v2/` (la lista) y `/v2/personajes/:id[/pestaña]`, con o sin barra final.
+ *  El prefijo lo pone Vite (`base`), y es el mismo con el que el servidor
+ *  monta el build. */
 export function matchRoute(pathname: string): Route {
   const base = import.meta.env.BASE_URL; // `/v2/`
   // `/v2` sin barra es la misma lista: nadie escribe la barra a mano.
   if (pathname === base.slice(0, -1)) return { name: 'roster' };
   if (!pathname.startsWith(base)) return { name: 'unknown' };
   const parts = pathname.slice(base.length).split('/').filter(Boolean);
-  const [section, id, ...rest] = parts;
+  const [section, id, tab, ...rest] = parts;
   if (parts.length === 0) return { name: 'roster' };
   if (section === 'personajes' && id && rest.length === 0) {
+    const sheetTab = tab === undefined ? null : SHEET_TABS.find((t) => t === tab);
+    if (sheetTab === undefined) return { name: 'unknown' };
     try {
-      return { name: 'character', id: decodeURIComponent(id) };
+      return { name: 'character', id: decodeURIComponent(id), tab: sheetTab };
     } catch {
       return { name: 'unknown' };
     }
@@ -43,8 +53,8 @@ export function matchRoute(pathname: string): Route {
 
 export const rosterHref = (): string => import.meta.env.BASE_URL;
 
-export const characterHref = (id: string): string =>
-  `${import.meta.env.BASE_URL}personajes/${encodeURIComponent(id)}`;
+export const characterHref = (id: string, tab: SheetTab = 'personaje'): string =>
+  `${import.meta.env.BASE_URL}personajes/${encodeURIComponent(id)}/${tab}`;
 
 // `pushState` no dispara ningún evento: se avisa a mano a quien escucha.
 const listeners = new Set<() => void>();

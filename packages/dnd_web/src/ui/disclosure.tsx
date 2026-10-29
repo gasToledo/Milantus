@@ -18,10 +18,14 @@ export function LinkTabs({
   label,
   value,
   tabs,
+  listClassName,
   children,
 }: {
   label: string;
   value: string;
+  /** Para ocultar la tira donde otra navegación ya hace de pestañas (el panel
+   *  lateral de la ficha desde 900 px). */
+  listClassName?: string;
   tabs: { value: string; label: string; href: string; icon?: LucideIcon }[];
   children: ReactNode;
 }) {
@@ -34,7 +38,10 @@ export function LinkTabs({
         if (tab) navigate(tab.href);
       }}
     >
-      <TabsPrimitive.List aria-label={label} className="flex gap-1 overflow-x-auto border-b border-hairline">
+      <TabsPrimitive.List
+        aria-label={label}
+        className={`flex gap-1 overflow-x-auto border-b border-hairline ${listClassName ?? ''}`}
+      >
         {tabs.map(({ value: v, label: l, href, icon: Icon }) => (
           <TabsPrimitive.Trigger key={v} value={v} asChild>
             <Link
@@ -52,9 +59,17 @@ export function LinkTabs({
   );
 }
 
-export function TabPanel({ value, children }: { value: string; children: ReactNode }) {
+export function TabPanel({
+  value,
+  className = 'pt-4',
+  children,
+}: {
+  value: string;
+  className?: string;
+  children: ReactNode;
+}) {
   return (
-    <TabsPrimitive.Content value={value} className="pt-4 focus-visible:outline-offset-4">
+    <TabsPrimitive.Content value={value} className={`focus-visible:outline-offset-4 ${className}`}>
       {children}
     </TabsPrimitive.Content>
   );

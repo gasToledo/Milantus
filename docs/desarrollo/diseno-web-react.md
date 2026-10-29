@@ -100,6 +100,23 @@ que ir del dashboard a la ficha no vuelva a pedir nada.
 
 `src/router.tsx`: `useRoute()` y `Link` (un `<a href>` de verdad que, con
 clic simple, navega sin recargar). Los enlaces a Flutter son `<a>` comunes.
+Una pestaña que el usuario querría compartir o recargar es una ruta
+(`/personajes/:id/combate`), no estado de React.
+
+## La ficha (`src/sheet/`)
+
+La pantalla de referencia de cómo se arma una vista con la biblioteca:
+
+- `SheetModel` (`model.ts`): el personaje **migrado**, la ficha del motor y el
+  catálogo con homebrew. Todo componente de la ficha recibe solo eso.
+- Desde 900 px las pestañas viven en el panel (`NavItem` con `aria-current`);
+  debajo, como `LinkTabs` arriba del contenido, para no tener que abrir el
+  cajón. El panel de la pestaña se monta una sola vez.
+- Columnas: `COLUMNS` (`CharacterTab.tsx`), tantas de 300 px como entren y una
+  en un teléfono, con `items-start`.
+- Rótulos que necesitan vocabulario del motor (la característica de cada
+  habilidad, si un conjuro es una reacción) salen de `vocabulary.ts`, que
+  copia el enum del motor y lo dice; ningún número sale de ahí.
 
 ## Reglas que más se olvidan
 

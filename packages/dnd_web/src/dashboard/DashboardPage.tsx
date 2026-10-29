@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { accentOf, nameOf } from '../api/catalog';
-import { useCatalog, useRoster, useRosterSettings } from '../api/queries';
+import { useRoster, useRosterSettings, useSheetCatalog } from '../api/queries';
 import { computeSheet, type CharacterFields, type ComputedSheet } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import { FLUTTER_HOME } from '../router';
@@ -21,7 +21,9 @@ export function DashboardPage() {
   const lang = useLang();
   const roster = useRoster();
   const settings = useRosterSettings();
-  const catalog = useCatalog(lang);
+  // Con el homebrew encima, como la ficha: si no, una tarjeta mostraría otra
+  // CA que la ficha del mismo personaje.
+  const catalog = useSheetCatalog(lang);
   const [query, setQuery] = useState('');
 
   // Cada ficha se calcula una vez por lista y catálogo, no en cada tecla del
@@ -60,7 +62,7 @@ export function DashboardPage() {
     [entries, settings.data, query, sort],
   );
 
-  const failed = [roster, settings, catalog].filter((q) => q.isError);
+  const failed = [roster, settings, ...catalog.queries].filter((q) => q.isError);
   let body;
   if (failed.length > 0) {
     body = (
