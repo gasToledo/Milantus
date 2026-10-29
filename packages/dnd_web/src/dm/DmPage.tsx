@@ -87,7 +87,7 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
   }
 
   return (
-    <Shell panel={<DmPanel campaigns={list} current={current} tool={view.kind === 'bestiary' ? 'bestiary' : undefined} />} footer={<RosterFooter account={account} />}>
+    <Shell panel={<DmPanel campaigns={list} current={current} tool={view.kind === 'bestiary' ? 'bestiary' : undefined} />} footer={<RosterFooter account={account} dm />}>
       {body}
     </Shell>
   );

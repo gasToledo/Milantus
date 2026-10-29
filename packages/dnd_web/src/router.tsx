@@ -149,7 +149,13 @@ export const dmBestiaryHref = (entryId?: string): string =>
 export const dmCampaignHref = (id: string, section: DmSection = 'mesa'): string =>
   `${import.meta.env.BASE_URL}dm/campanas/${encodeURIComponent(id)}/${section}`;
 
-export const settingsHref = (): string => `${import.meta.env.BASE_URL}ajustes`;
+/**
+ * Los ajustes son de la cuenta y los comparten los dos modos. `desdeDm` deja
+ * dicho de cuál se vino (`?modo=dm`) para que el panel y el «atrás» sigan en
+ * el Modo DM en vez de caer en el de Jugador.
+ */
+export const settingsHref = (desdeDm = false): string =>
+  `${import.meta.env.BASE_URL}ajustes${desdeDm ? '?modo=dm' : ''}`;
 
 /** La portada del Códice, una categoría o una entrada abierta. */
 export const codexHref = (category?: CodexCategory, entryId?: string): string =>

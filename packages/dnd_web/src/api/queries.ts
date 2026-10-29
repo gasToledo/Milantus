@@ -116,8 +116,8 @@ export const usePlayerCampaignsOf = (characterIds: string[]) =>
 
 /** Las campañas que dirige la cuenta: el panel del Modo DM y su contenido. Solo
  *  se piden dentro del Modo DM: el Modo Jugador no las necesita. */
-export const useDmCampaigns = () =>
-  useQuery({ queryKey: queryKeys.dmCampaigns, queryFn: ({ signal }) => fetchDmCampaigns(signal) });
+export const useDmCampaigns = ({ enabled = true }: { enabled?: boolean } = {}) =>
+  useQuery({ queryKey: queryKeys.dmCampaigns, queryFn: ({ signal }) => fetchDmCampaigns(signal), enabled });
 
 /** La Mesa: las fichas vinculadas a [campaignId], leídas en vivo del jugador. */
 export const useCampaignMembers = (campaignId: string) =>

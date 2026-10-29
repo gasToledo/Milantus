@@ -56,7 +56,6 @@ export function MesaView({ campaign }: { campaign: DmCampaign }) {
             <MemberCard key={memberId} entry={entry} />
           ))}
         </ul>
-        <p className="text-[13px] text-text-muted">{t.dmTableNote}</p>
       </>
     );
   }

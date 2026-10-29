@@ -7,7 +7,7 @@ export type Lang = 'es' | 'en';
 
 const es = {
   appName: 'Milantus',
-  appTagline: 'Compendio de aventuras',
+  appTagline: 'Asistente de aventuras',
   navLabel: 'Navegación principal',
   navSheet: 'Ficha',
   skipToContent: 'Saltar al contenido',
@@ -334,7 +334,6 @@ const es = {
   dmTableCount: (n: number) => (n === 1 ? '1 personaje en la mesa' : `${n} personajes en la mesa`),
   dmTableEmpty: 'Todavía no hay personajes en la mesa.',
   dmTableEmptyHint: 'Cada jugador te comparte su ficha con un código, que canjeás en la aplicación principal.',
-  dmTableNote: 'Lo que ves es la ficha del jugador tal como está ahora. El DM la lee; el jugador es quien la cambia.',
   dmMemberLevel: (n: number) => `Nivel ${n}`,
   dmHpAria: (current: number, max: number) => `Puntos de golpe: ${current} de ${max}`,
   dmPassiveShort: 'Pasiva',
@@ -708,7 +707,7 @@ type Texts = typeof es;
 
 const en: Texts = {
   appName: 'Milantus',
-  appTagline: 'Adventure compendium',
+  appTagline: 'Adventure assistant',
   navLabel: 'Main navigation',
   navSheet: 'Sheet',
   skipToContent: 'Skip to content',
@@ -1028,7 +1027,6 @@ const en: Texts = {
   dmTableCount: (n: number) => (n === 1 ? '1 character at the table' : `${n} characters at the table`),
   dmTableEmpty: 'There are no characters at the table yet.',
   dmTableEmptyHint: 'Each player shares their sheet with a code, which you redeem in the main app.',
-  dmTableNote: 'What you see is the player’s sheet as it is right now. The DM reads it; the player is the one who changes it.',
   dmMemberLevel: (n: number) => `Level ${n}`,
   dmHpAria: (current: number, max: number) => `Hit points: ${current} of ${max}`,
   dmPassiveShort: 'Passive',

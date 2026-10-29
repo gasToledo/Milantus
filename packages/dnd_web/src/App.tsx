@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { createQueryClient, useAccount, useThemeMode } from './api/queries';
+import { createQueryClient, useAccount, useDmCampaigns, useThemeMode } from './api/queries';
 import type { Account } from './api/client';
 import { setEngineLanguage } from './engine';
 import { LangProvider, useTexts } from './i18n/context';
 import { resolveLang, type Lang } from './i18n/texts';
 import { DashboardPage } from './dashboard/DashboardPage';
 import { RosterFooter, RosterPanel } from './dashboard/RosterPanel';
+import { DmPanel } from './dm/DmPanel';
 import { useRoute } from './router';
 import { DmPage } from './dm/DmPage';
 import { CodexPage } from './codex/CodexPage';
@@ -122,9 +123,7 @@ function Enabled({ account }: { account: Account }) {
       );
     case 'settings':
       return (
-        <Shell panel={<RosterPanel />} footer={<RosterFooter account={account} current="settings" />}>
-          <SettingsPage />
-        </Shell>
+        <SettingsShell account={account} />
       );
     case 'character':
       return <CharacterPage id={route.id} tab={route.tab} />;
@@ -137,4 +136,21 @@ function Enabled({ account }: { account: Account }) {
         </Shell>
       );
   }
+}
+
+/**
+ * Los ajustes con el panel del modo del que se vino (`?modo=dm`): son de la
+ * cuenta, pero salir de ellos con «atrás» no puede cambiarte de modo.
+ */
+function SettingsShell({ account }: { account: Account }) {
+  const fromDm = new URLSearchParams(window.location.search).get('modo') === 'dm';
+  const campaigns = useDmCampaigns({ enabled: fromDm });
+  return (
+    <Shell
+      panel={fromDm ? <DmPanel campaigns={campaigns.data} /> : <RosterPanel />}
+      footer={<RosterFooter account={account} current="settings" dm={fromDm} />}
+    >
+      <SettingsPage />
+    </Shell>
+  );
 }

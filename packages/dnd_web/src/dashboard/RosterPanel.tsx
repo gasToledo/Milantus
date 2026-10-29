@@ -1,4 +1,4 @@
-import { BookOpen, FlaskConical, LogOut, MessageSquare, Settings, Users } from 'lucide-react';
+import { BookOpen, LogOut, MessageSquare, Settings, Users } from 'lucide-react';
 import { useAppVersion } from '../api/queries';
 import type { Account } from '../api/client';
 import { useTexts } from '../i18n/context';
@@ -7,7 +7,7 @@ import { ModeSwitch, NavGroup, NavItem, ThemeMenu, VersionLabel } from '../ui/Sh
 
 /**
  * El menú principal del Modo Jugador (`AppSidebar`): interruptor de modo y la
- * navegación. Lo que React todavía no tiene (Homebrew) sigue en Flutter.
+ * navegación. El Homebrew es herramienta del Modo DM y no está acá.
  */
 export function RosterPanel({ current }: { current?: 'roster' }) {
   const t = useTexts();
@@ -21,9 +21,6 @@ export function RosterPanel({ current }: { current?: 'roster' }) {
         <li>
           <NavItem href={codexHref()} icon={BookOpen} label={t.navCodex} internal />
         </li>
-        <li>
-          <NavItem href={FLUTTER_HOME} icon={FlaskConical} label={t.navHomebrew} external />
-        </li>
       </NavGroup>
     </>
   );
@@ -34,14 +31,14 @@ export function RosterPanel({ current }: { current?: 'roster' }) {
  * sesión», el tema y la versión. No se rediseña por pantalla: quien entra
  * tiene que poder salir de su cuenta sin buscar.
  */
-export function RosterFooter({ account, current }: { account: Account; current?: 'settings' }) {
+export function RosterFooter({ account, current, dm = false }: { account: Account; current?: 'settings'; dm?: boolean }) {
   const t = useTexts();
   const version = useAppVersion(true);
   return (
     <div className="flex flex-col gap-1">
       <ul className="flex flex-col gap-0.5">
         <li>
-          <NavItem href={settingsHref()} icon={Settings} label={t.settings} active={current === 'settings'} internal />
+          <NavItem href={settingsHref(dm)} icon={Settings} label={t.settings} active={current === 'settings'} internal />
         </li>
         <li>
           <NavItem href={FLUTTER_HOME} icon={MessageSquare} label={t.feedback} external />
