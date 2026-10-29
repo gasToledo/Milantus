@@ -11,6 +11,7 @@ import { AppBusyLabel, AppEmptyState, AppErrorView, Notice } from '../ui/status'
 import { defaultCampaign } from './campaigns';
 import { DmHeader } from './DmHeader';
 import { DmPanel } from './DmPanel';
+import { BestiaryPage } from '../bestiary/BestiaryPage';
 import { ChaptersView } from './ChaptersView';
 import { MesaView } from './MesaView';
 import { NotebookView } from './NotebookView';
@@ -43,7 +44,11 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
       : undefined;
 
   let body;
-  if (campaigns.isError) {
+  if (view.kind === 'bestiary') {
+    // El Bestiario no depende de las campañas: se abre también sin ninguna y
+    // cuando la lista no cargó (el panel lo dice solo).
+    body = <BestiaryPage entryId={view.entryId} dm />;
+  } else if (campaigns.isError) {
     body = (
       <>
         <DmHeader title={t.dmCampaignsLabel} />
@@ -82,7 +87,7 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
   }
 
   return (
-    <Shell panel={<DmPanel campaigns={list} current={current} />} footer={<RosterFooter account={account} />}>
+    <Shell panel={<DmPanel campaigns={list} current={current} tool={view.kind === 'bestiary' ? 'bestiary' : undefined} />} footer={<RosterFooter account={account} />}>
       {body}
     </Shell>
   );
