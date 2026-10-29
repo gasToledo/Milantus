@@ -44,11 +44,12 @@ test('el dashboard lista los personajes en el orden de los ajustes, marca el fav
   for (const [id, { character, ficha }] of porId) {
     const tarjeta = page.locator(`[data-character="${id}"]`);
     const cifra = (stat: string) => tarjeta.locator(`[data-stat="${stat}"]`);
+    const placa = (stat: string) => cifra(stat).locator('[data-field="value"]');
     await expect(cifra('level')).toHaveText(String(ficha.level));
     await expect(cifra('hp')).toHaveText(`${character.combat.currentHp} / ${ficha.maxHp}`);
-    await expect(cifra('ac')).toHaveText(String(ficha.armorClass));
-    await expect(cifra('speed')).toHaveText(`${ficha.speed} pies`);
-    await expect(cifra('initiative')).toHaveText(signed(ficha.initiative));
+    await expect(placa('ac')).toHaveText(String(ficha.armorClass));
+    await expect(placa('speed')).toHaveText(`${ficha.speed} pies`);
+    await expect(placa('initiative')).toHaveText(signed(ficha.initiative));
     await expect(tarjeta.getByRole('link')).toHaveAttribute('href', `/v2/personajes/${id}/personaje`);
   }
 

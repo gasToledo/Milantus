@@ -70,7 +70,9 @@ export function StatPlaque({
   valueClassName = 'text-gold',
 }: {
   id?: string;
-  label: string;
+  /** Texto, o un nodo cuando el rótulo visible es una abreviatura y el lector
+   *  necesita la palabra completa. */
+  label: ReactNode;
   value: ReactNode;
   dense?: boolean;
   valueClassName?: string;

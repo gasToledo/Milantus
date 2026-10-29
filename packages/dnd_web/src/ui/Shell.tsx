@@ -216,12 +216,12 @@ export function ModeSwitch({ dmHref }: { dmHref: string }) {
     <div
       role="group"
       aria-label={t.modeSwitchLabel}
-      className="plaque grid grid-cols-2 gap-1 rounded-[var(--radius-nav)] p-1 text-center text-[13px]"
+      className="grid grid-cols-2 gap-1 rounded-[var(--radius-pill)] border border-hairline bg-plaque p-[3px] text-center text-[12px]"
     >
-      <span aria-current="true" className="rounded-[var(--radius-nav)] bg-gold-soft py-1.5 font-semibold text-gold">
+      <span aria-current="true" className="rounded-[var(--radius-pill)] bg-gold-soft py-1.5 font-medium text-gold">
         {t.modePlayer}
       </span>
-      <a href={dmHref} className="rounded-[var(--radius-nav)] py-1.5 text-on-surface-variant hover:bg-surface hover:text-on-surface">
+      <a href={dmHref} className="rounded-[var(--radius-pill)] py-1.5 text-on-surface-variant hover:bg-surface hover:text-on-surface">
         {t.modeDm}
       </a>
     </div>
