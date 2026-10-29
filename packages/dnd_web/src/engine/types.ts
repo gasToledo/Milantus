@@ -419,3 +419,36 @@ export interface NpcJson extends JsonObject {
   tags?: string[];
   notes?: DiaryEntry[];
 }
+
+/** Un combatiente tal como lo guarda el encuentro (`Combatant.toJson`). Los
+ *  PG de un jugador **no** están: viven en su ficha. */
+export interface CombatantJson extends JsonObject {
+  id: string;
+  /** `player`, `monster` o `npc`. */
+  kind: string;
+  name: string;
+  initiative: number;
+  /** `ally`, `enemy` o `neutral`. */
+  side: string;
+  memberId?: string;
+  creatureId?: string;
+  npcId?: string;
+  currentHp?: number;
+  maxHp?: number;
+  tags?: string[];
+}
+
+/** Lo que el motor deriva del combate abierto (`encounter` de
+ *  `js/entrypoint.dart`). */
+export interface EncounterView {
+  /** El `Encounter` migrado al esquema actual. */
+  encounter: { id: string; round: number; turnIndex: number; stage: string; combatants: CombatantJson[] };
+  /** Mientras se arma no hay ronda ni turno. */
+  preparing: boolean;
+  /** De quién es el turno (salta a los caídos), o `null`. */
+  currentId: string | null;
+  currentIndex: number;
+  standing: { allies: number; alliesUp: number; enemies: number; enemiesUp: number; neutrals: number };
+  /** Una por combatiente, en el mismo orden. */
+  rows: { id: string; down: boolean; bloodied: boolean; hp: { current: number; max: number } | null }[];
+}

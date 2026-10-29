@@ -14,6 +14,7 @@ import {
   fetchAccount,
   fetchAppVersion,
   fetchCampaignChapters,
+  fetchCampaignEncounter,
   fetchCampaignMembers,
   fetchCampaignNotebook,
   fetchCampaignNpcs,
@@ -58,6 +59,7 @@ export const queryKeys = {
   campaignMembers: (campaignId: string) => ['dm', 'campaigns', campaignId, 'members'] as const,
   campaignNotebook: (campaignId: string) => ['dm', 'campaigns', campaignId, 'notebook'] as const,
   campaignChapters: (campaignId: string) => ['dm', 'campaigns', campaignId, 'chapters'] as const,
+  campaignEncounter: (campaignId: string) => ['dm', 'campaigns', campaignId, 'encounter'] as const,
   campaignNpcs: (campaignId: string) => ['dm', 'campaigns', campaignId, 'npcs'] as const,
   npcs: ['dm', 'npcs'] as const,
   npc: (id: string) => ['dm', 'npcs', id] as const,
@@ -144,6 +146,18 @@ export const useCampaignNotebook = (campaignId: string) =>
   useQuery({
     queryKey: queryKeys.campaignNotebook(campaignId),
     queryFn: ({ signal }) => fetchCampaignNotebook(campaignId, signal),
+  });
+
+/**
+ * El combate abierto de la campaña (`null` si no hay). ponytail: se lee al
+ * entrar y no se sondea como en Flutter (cada 5 s con combate abierto): acá
+ * solo se mira y «Reintentar» o volver a la sección lo trae de nuevo. Si el DM
+ * lo usa en la mesa, un `refetchInterval` aquí y en los miembros alcanza.
+ */
+export const useCampaignEncounter = (campaignId: string) =>
+  useQuery({
+    queryKey: queryKeys.campaignEncounter(campaignId),
+    queryFn: ({ signal }) => fetchCampaignEncounter(campaignId, signal),
   });
 
 /** Los PNJ de la campaña, con su estado y sus PG en ella. */

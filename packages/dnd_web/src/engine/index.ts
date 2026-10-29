@@ -1,4 +1,4 @@
-import type { BestiaryRow, Catalog, CharacterJson, ComputedSheet, InventoryLine, JsonObject, NpcView } from './types';
+import type { BestiaryRow, Catalog, CharacterJson, ComputedSheet, EncounterView, InventoryLine, JsonObject, NpcView } from './types';
 // Lo genera `npm run build:engine` (o la etapa `engine-js` del Dockerfile) y
 // no se versiona. Es un script de dart2js, no un módulo: al cargarse deja
 // `globalThis.dndEngine`, y de ahí lo toma este archivo.
@@ -20,6 +20,7 @@ interface DartEngine {
   abilityModifier(score: number): number;
   bestiary(catalogJson: string): string;
   npcs(entriesJson: string, catalogJson: string): string;
+  encounter(encounterJson: string, playersHpJson: string): string;
 }
 
 function engine(): DartEngine {
@@ -163,4 +164,15 @@ export interface NpcEntryJson {
  *  del motor): los PG de un bloque, la ficha compilada, si viene herido. */
 export function npcViews(entries: readonly NpcEntryJson[], catalog: Catalog): NpcView[] {
   return JSON.parse(engine().npcs(JSON.stringify(entries), catalogJson(catalog))) as NpcView[];
+}
+
+/** El combate abierto, migrado y con lo que deriva el motor (`encounter`): de
+ *  quién es el turno, cuántos quedan en pie y, por fila, si está caído o
+ *  maltrecho y sus PG. Los de un jugador entran en [playersHp] (`memberId` →
+ *  actuales de su ficha y máximo de `computeSheet`): el encuentro no los lleva. */
+export function encounterView(
+  encounter: JsonObject,
+  playersHp: Record<string, { current: number; max: number }>,
+): EncounterView {
+  return JSON.parse(engine().encounter(JSON.stringify(encounter), JSON.stringify(playersHp))) as EncounterView;
 }

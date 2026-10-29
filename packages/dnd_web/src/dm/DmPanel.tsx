@@ -1,7 +1,7 @@
 import { BookMarked, BookOpen, NotebookText, FlaskConical, PawPrint, Users, UsersRound, Flame, Contact } from 'lucide-react';
 import type { DmCampaign } from '../api/client';
 import { useTexts } from '../i18n/context';
-import { dmBestiaryHref, dmCampaignHref, dmHomebrewHref, dmNpcsHref, FLUTTER_HOME, rosterHref, dmHref, type DmSection } from '../router';
+import { dmBestiaryHref, dmCampaignHref, dmHomebrewHref, dmNpcsHref, rosterHref, dmHref, type DmSection } from '../router';
 import { NavCollapsible } from '../ui/disclosure';
 import { ModeSwitch, NavGroup, NavItem } from '../ui/Shell';
 import { groupCampaigns, stateOf } from './campaigns';
@@ -9,8 +9,8 @@ import { groupCampaigns, stateOf } from './campaigns';
 /**
  * El panel del Modo DM (`_sidebar` de `dm_mode_screen.dart`): el interruptor
  * con «DM» activo, las herramientas de la cuenta, las campañas agrupadas por
- * estado y, de la campaña elegida, sus secciones. Lo que React todavía no
- * porta (Combate) enlaza a Flutter con el ícono de enlace externo.
+ * estado y, de la campaña elegida, sus secciones. Todo es de lectura: lo que
+ * escribe sigue en Flutter, desde cada pantalla.
  */
 export function DmPanel({
   campaigns,
@@ -121,7 +121,13 @@ export function DmPanel({
               />
             </li>
             <li>
-              <NavItem href={FLUTTER_HOME} icon={Flame} label={t.dmSectionCombat} external />
+              <NavItem
+                href={dmCampaignHref(current.campaign.id, 'combate')}
+                icon={Flame}
+                label={t.dmSectionCombat}
+                active={current.section === 'combate'}
+                internal
+              />
             </li>
           </NavGroup>
         </>

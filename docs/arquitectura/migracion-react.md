@@ -50,7 +50,7 @@ Un solo servidor, un solo origen, dos clientes:
   `migrateCharacter`, `setEngineLanguage`, `applyTranslation`,
   `vocabularyLabel`, `inventoryOf`, `chapterGrants`, `catalogLabel`,
   `catalogLabelOrder`, `formatCost`, `abilityModifier`, `bestiary`,
-  `npcViews`); la
+  `npcViews`, `encounterView`); la
   comunicación es JSON como texto de ida y vuelta. Los tipos de
   `src/engine/types.ts` están escritos a mano: los cuida la paridad (abajo).
 
@@ -211,17 +211,16 @@ repiten acá.
   interruptor. **Ninguna escritura**: ni crear o editar campañas, ni cerrar
   capítulos, ni música, ni notas; todo eso sigue en Flutter. Se porta por
   secciones, una por PR; hoy existen la **Mesa**, **Capítulos**, el **Cuaderno**,
-  los **PNJ de la mesa**, el **Bestiario**, la **Biblioteca de PNJ** y el
-  **Homebrew**. Rutas:
+  los **PNJ de la mesa**, el **Combate**, el **Bestiario**, la **Biblioteca de
+  PNJ** y el **Homebrew**: toda la lectura del Modo DM. Rutas:
   `/v2/dm` (redirige a la primera campaña en curso, o a la primera que haya),
-  `/v2/dm/campanas/:id/mesa|capitulos|cuaderno|pnj`, `/v2/dm/bestiario[/:criatura]`,
+  `/v2/dm/campanas/:id/mesa|capitulos|cuaderno|pnj|combate`, `/v2/dm/bestiario[/:criatura]`,
   `/v2/dm/pnj[/:pnj]` y `/v2/dm/homebrew[/:categoria[/:entrada]]`. El panel
   (`DmPanel`) sigue al de Flutter: el
   interruptor con «DM» activo, las herramientas (Bestiario, Biblioteca de PNJ y
   Homebrew), las campañas
   agrupadas En curso / En pausa / Terminadas (plegable, abierta si la elegida
-  es una de ellas) y, de la campaña elegida, sus secciones; Combate enlaza
-  a Flutter porque todavía no se porta. La **Mesa** lista a los jugadores
+  es una de ellas) y, de la campaña elegida, sus secciones. La **Mesa** lista a los jugadores
   vinculados (`GET /api/campaigns/:id/members`, que lee la ficha **real** del
   jugador, no una copia): retrato inicial, nombre, especie y clase, nivel, barra
   de PG, placas CA / Inic / CD / Pasiva y los estados como pills carmesí. Las
@@ -297,6 +296,29 @@ repiten acá.
   dos lugares; una criatura propia abre su perfil en el Bestiario del DM. Lo de
   otra cuenta no llega (la API es por cuenta) y su URL muestra la categoría
   vacía. Crear, editar, importar, exportar y borrar siguen en Flutter.
+  **Combate** (`GET /api/campaigns/:id/encounter`, más los miembros, los PNJ de
+  la mesa y el Cuaderno): el combate abierto, de solo lectura. Arriba, una placa
+  con la ronda, «Turno N de M» y cuántos quedan en pie por bando (o «Armando el
+  combate» mientras nadie tiró iniciativa); debajo, la planilla de Flutter
+  —iniciativa con TURNO / ACTUÓ / SALTA, nombre con el bando y su línea, PG con
+  barra y MALTRECHO, CA y efectos— y a su lado «Del turno», con el perfil del
+  Bestiario del monstruo que juega, las acciones del bloque de un PNJ o, si le
+  toca a un jugador, que su ficha la lleva quien lo juega. Al pie, los combates
+  cerrados redactados como en el Cuaderno. **Los PG salen de dos fuentes**,
+  como en Flutter: los de un monstruo o un PNJ, del encuentro; los de un
+  jugador, de **su ficha real** (actuales de la ficha cruda, máximo de
+  `computeSheet`), que el DM no escribe: la fila dice «En su ficha». Sin combate
+  abierto, el vacío lo dice y siguen los pasados. **Lo que deriva el motor**
+  llega por `encounterView` (`encounter` de `js/entrypoint.dart`): el encuentro
+  migrado, de quién es el turno (salta a los caídos), quién está caído o
+  maltrecho y cuántos quedan en pie (`Encounter.standing`, que se movió al
+  engine desde la pantalla de Flutter y Flutter ahora usa). El combate de otra
+  cuenta responde el mismo 404 que una campaña inexistente, y el jugador nunca
+  recibe el documento: solo su estado de turno (`GET /api/characters/:id/turn`).
+  No se sondea cada 5 s como en Flutter (ver el `ponytail:` de
+  `useCampaignEncounter`). Tirar iniciativa, dañar o curar, pasar el turno,
+  sumar o sacar combatientes, anotar efectos, las acciones legendarias, la
+  dificultad y cerrar siguen en Flutter.
 - **Homebrew**: la ficha y el dashboard calculan con el catálogo oficial más
   el contenido homebrew de la cuenta (`GET /api/homebrew`, fusionado por id en
   `src/api/homebrew.ts`), como `HomebrewStore` + `ContentRepository.addAll` en
@@ -319,9 +341,8 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    campañas del jugador en modo lectura *(existen; el cuaderno es del DM)*,
    bestiario *(existe)* y catálogos *(el Códice existe)*.
    **Lectura del Modo DM** (se sumó a este paso): Mesa, Capítulos, Cuaderno,
-   Bestiario, Biblioteca de PNJ, PNJ de la mesa y Homebrew *(existen)*; **falta**
-   el Combate en solo lectura (hoy enlaza a Flutter).
-   Hasta que existan, la lectura no está cerrada.
+   Bestiario, Biblioteca de PNJ, PNJ de la mesa, Homebrew y Combate *(existen)*:
+   con ellos la lectura del Modo DM está completa.
 4. Escrituras de bajo riesgo: PG y usos de recursos en la ficha, descansos.
 5. Edición completa: creador de personajes, subida de nivel, inventario.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
@@ -389,7 +410,11 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    propio por categoría (un arma, una dote y una criatura sembradas), abra la
    ficha del Códice bajo `/v2/dm/homebrew`, busque en todo y lleve la criatura al
    Bestiario, sin escribir, y que otra cuenta no reciba nada ni lo abra por URL
-   (`e2e/homebrew.spec.ts`); y que una cuenta sin `webV2` vea
+   (`e2e/homebrew.spec.ts`); que el Combate muestre el orden sembrado con el
+   turno, ACTUÓ y SALTA, los PG de cada fuente (los del jugador, de su ficha), la
+   CA de cada una, el perfil del que juega y los combates cerrados, sin escribir,
+   y que otra cuenta reciba el mismo 404 que ante una campaña inexistente y el
+   jugador vinculado solo su estado de turno (`e2e/combate.spec.ts`); y que una cuenta sin `webV2` vea
    «No disponible» sin pedir sus datos (`e2e/acceso.spec.ts`). Lo esperado se
    calcula con el mismo motor y la misma fusión (`e2e/helpers.ts`). Sin
    reintentos: no hay «a veces anda».
@@ -433,7 +458,7 @@ Para que nadie lo dé por hecho:
 
 - Reordenar, marcar favorito, crear, renombrar o borrar personajes desde React.
 - Cualquier escritura desde React: todo el cliente hoy es solo lectura.
-- Del Modo DM: Combate, la música y la ficha
+- Del Modo DM: la música y la ficha
   completa de un miembro o de un PNJ con ficha (en curso, por secciones).
 - Enlaces desde Flutter hacia `/v2` o redirección automática por `webV2`.
 - Tests de componentes y chequeo de literales sueltos en `dnd_web`.

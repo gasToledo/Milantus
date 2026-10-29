@@ -313,6 +313,58 @@ Map<String, dynamic> _npcView(
   };
 }
 
+/// El combate abierto de una campaña, para leerlo sin repetir una regla.
+/// Entra el documento de `GET /api/campaigns/<id>/encounter` y los PG de los
+/// jugadores de la mesa (`{memberId: {current, max}}`: los actuales de su
+/// ficha real y el máximo que la compila, porque el encuentro no los lleva).
+/// Sale el encuentro **migrado** (`Encounter.fromJson`, que rechaza una
+/// versión futura), de quién es el turno —que salta a los caídos y no existe
+/// mientras se arma—, cuántos quedan en pie por bando y, por fila, si está
+/// caído, si está maltrecho y sus PG de la fuente que corresponde.
+String encounter(String encounterJson, String playersHpJson) {
+  final e = Encounter.fromJson(
+      (jsonDecode(encounterJson) as Map).cast<String, dynamic>());
+  final players = {
+    for (final MapEntry(:key, :value)
+        in (jsonDecode(playersHpJson) as Map).cast<String, Map>().entries)
+      key: (current: value['current'] as int, max: value['max'] as int),
+  };
+  final current = e.current;
+  final standing =
+      e.standing({for (final p in players.entries) p.key: p.value.current});
+  ({int current, int max})? hpOf(Combatant c) => c.kind == CombatantKind.player
+      ? players[c.memberId]
+      : c.maxHp > 0
+          ? (current: c.currentHp, max: c.maxHp)
+          : null;
+  return jsonEncode({
+    'encounter': e.toJson(),
+    'preparing': e.isPreparing,
+    'currentId': current?.id,
+    'currentIndex': current == null
+        ? -1
+        : e.combatants.indexWhere((c) => c.id == current.id),
+    'standing': {
+      'allies': standing.allies,
+      'alliesUp': standing.alliesUp,
+      'enemies': standing.enemies,
+      'enemiesUp': standing.enemiesUp,
+      'neutrals': standing.neutrals,
+    },
+    'rows': [
+      for (final c in e.combatants)
+        if (hpOf(c) case final hp)
+          {
+            'id': c.id,
+            'down': c.isDown,
+            'bloodied':
+                hp != null && hp.current > 0 && isBloodied(hp.current, hp.max),
+            'hp': hp == null ? null : {'current': hp.current, 'max': hp.max},
+          },
+    ],
+  });
+}
+
 void main() {
   final motor = JSObject();
   motor['compute'] = compute.toJS;
@@ -328,5 +380,6 @@ void main() {
   motor['abilityModifier'] = abilityModifierOf.toJS;
   motor['bestiary'] = bestiary.toJS;
   motor['npcs'] = npcs.toJS;
+  motor['encounter'] = encounter.toJS;
   globalContext['dndEngine'] = motor;
 }

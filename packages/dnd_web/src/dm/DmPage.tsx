@@ -13,6 +13,7 @@ import { DmHeader } from './DmHeader';
 import { DmPanel } from './DmPanel';
 import { BestiaryPage } from '../bestiary/BestiaryPage';
 import { ChaptersView } from './ChaptersView';
+import { CombatView } from './CombatView';
 import { HomebrewView } from './HomebrewView';
 import { MesaView } from './MesaView';
 import { NotebookView } from './NotebookView';
@@ -93,7 +94,13 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
   } else if (!current) {
     body = <Notice title={t.dmCampaignNotFound} body={t.dmCampaignNotFoundBody} />;
   } else {
-    const Section = { mesa: MesaView, capitulos: ChaptersView, cuaderno: NotebookView, pnj: CampaignNpcsView }[current.section];
+    const Section = {
+      mesa: MesaView,
+      capitulos: ChaptersView,
+      cuaderno: NotebookView,
+      pnj: CampaignNpcsView,
+      combate: CombatView,
+    }[current.section];
     body = <Section key={current.campaign.id} campaign={current.campaign} />;
   }
 

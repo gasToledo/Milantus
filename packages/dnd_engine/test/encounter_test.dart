@@ -773,6 +773,64 @@ void main() {
       expect(converted.combatants.first.currentHp, 4);
       expect(converted.combatants.first.side, CombatantSide.enemy);
     });
+
+    test(
+        'standing cuenta por bando con los PG de cada fuente, y no da por '
+        'caído a un jugador sin ficha', () {
+      const lobo = Combatant(
+        id: 'l',
+        kind: CombatantKind.monster,
+        name: 'Lobo',
+        initiative: 12,
+        currentHp: 0,
+        maxHp: 11,
+      );
+      const loboAliado = Combatant(
+        id: 'la',
+        kind: CombatantKind.monster,
+        name: 'Lobo aliado',
+        initiative: 11,
+        currentHp: 5,
+        maxHp: 11,
+        side: CombatantSide.ally,
+      );
+      const caido = Combatant(
+        id: 'p1',
+        kind: CombatantKind.player,
+        name: 'Elsbeth',
+        initiative: 15,
+        memberId: 'm1',
+      );
+      const sinFicha = Combatant(
+        id: 'p2',
+        kind: CombatantKind.player,
+        name: 'Sagan',
+        initiative: 9,
+        memberId: 'm2',
+      );
+      final e = Encounter(
+        id: 'x',
+        combatants: [
+          caido,
+          ilse.copyWith(side: CombatantSide.enemy),
+          lobo,
+          loboAliado,
+          toblen,
+          sinFicha
+        ],
+        stage: EncounterStage.running,
+      );
+
+      final s = e.standing({'m1': 0});
+
+      // Aliados: Elsbeth (a 0 en su ficha), el lobo aliado y Sagan.
+      expect(s.allies, 3);
+      expect(s.alliesUp, 2);
+      // Enemigos: Ilse, que traicionó, y el lobo caído.
+      expect(s.enemies, 2);
+      expect(s.enemiesUp, 1);
+      expect(s.neutrals, 1);
+    });
   });
 
   group('isBloodied', () {

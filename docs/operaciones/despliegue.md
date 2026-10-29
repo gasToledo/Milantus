@@ -240,7 +240,7 @@ Dos workflows en `.github/workflows/`:
 
 `packages/dnd_web` (Vite + React + TypeScript) es el cliente que va a
 reemplazar al de Flutter pantalla por pantalla. Por ahora tiene pantallas de
-solo lectura (el dashboard, la ficha en cinco pestañas, Campañas, el Bestiario, el Códice, Ajustes y el Modo DM en `/v2/dm`, con la Biblioteca de PNJ en `/v2/dm/pnj` los PNJ de cada mesa en `/v2/dm/campanas/<id>/pnj` y el Homebrew en `/v2/dm/homebrew`), sin
+solo lectura (el dashboard, la ficha en cinco pestañas, Campañas, el Bestiario, el Códice, Ajustes y el Modo DM en `/v2/dm`, con la Biblioteca de PNJ en `/v2/dm/pnj` los PNJ y el combate de cada mesa en `/v2/dm/campanas/<id>/pnj|combate` y el Homebrew en `/v2/dm/homebrew`), sin
 enlaces desde el cliente actual; el estado completo está en
 [Migración a React](../arquitectura/migracion-react.md). Se sirve en el mismo origen que Flutter (`/`) y la API, así que
 comparte la cookie de sesión.

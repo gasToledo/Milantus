@@ -224,6 +224,24 @@ class Combatant {
 bool isBloodied(int currentHp, int maxHp) =>
     maxHp > 0 && currentHp * 2 <= maxHp;
 
+/// Cuántos combatientes hay y cuántos siguen en pie de cada bando (ver
+/// [Encounter.standing]).
+class EncounterStanding {
+  final int allies;
+  final int alliesUp;
+  final int enemies;
+  final int enemiesUp;
+  final int neutrals;
+
+  const EncounterStanding({
+    required this.allies,
+    required this.alliesUp,
+    required this.enemies,
+    required this.enemiesUp,
+    required this.neutrals,
+  });
+}
+
 /// El turno de un jugador, visto desde su propia ficha.
 ///
 /// Deliberadamente los cuatro únicos valores que un jugador puede llegar a
@@ -640,6 +658,39 @@ class Encounter {
         ],
         stage: stage,
       );
+
+  /// Cuántos quedan en pie de cada lado, cruzando las dos fuentes de PG: los
+  /// de los monstruos y PNJ, que están acá, y los de los jugadores, que viven
+  /// en su ficha real y llegan en [playerHp] (`memberId` → PG actuales).
+  ///
+  /// Los bandos mandan, no el tipo: un lobo aliado cuenta con la mesa y un
+  /// PNJ que traiciona pasa a contar con los enemigos. Los neutrales se
+  /// cuentan aparte y no entran a ningún «en pie». Un jugador cuya ficha no
+  /// llegó no se da por caído: mejor no avisar que avisar de una derrota que
+  /// no pasó.
+  EncounterStanding standing(Map<String, int> playerHp) {
+    bool down(Combatant c) {
+      if (c.kind != CombatantKind.player) return c.isDown;
+      final hp = c.memberId == null ? null : playerHp[c.memberId];
+      return hp != null && hp <= 0;
+    }
+
+    final allies = [
+      for (final c in combatants)
+        if (c.side == CombatantSide.ally) c
+    ];
+    final enemies = [
+      for (final c in combatants)
+        if (c.side == CombatantSide.enemy) c
+    ];
+    return EncounterStanding(
+      allies: allies.length,
+      alliesUp: allies.where((c) => !down(c)).length,
+      enemies: enemies.length,
+      enemiesUp: enemies.where((c) => !down(c)).length,
+      neutrals: combatants.where((c) => c.side == CombatantSide.neutral).length,
+    );
+  }
 
   /// El turno de un jugador puntual, identificado por su [memberId] en esta
   /// campaña. Es la proyección que el servidor le sirve al jugador — nunca

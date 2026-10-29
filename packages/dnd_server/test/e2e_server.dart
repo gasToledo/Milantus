@@ -258,7 +258,7 @@ Future<void> main() async {
       ],
     ),
   );
-  await campaigns.redeemShareCode(
+  final elsbethLink = await campaigns.redeemShareCode(
     dmUserId: _smokeDmId,
     campaignId: _smokeCampaignId,
     code: code!,
@@ -282,7 +282,7 @@ Future<void> main() async {
     ownerUserId: _smokeSecondPlayerId,
     characterId: 'sagan-de-humo',
   );
-  await campaigns.redeemShareCode(
+  final saganLink = await campaigns.redeemShareCode(
     dmUserId: _smokeDmId,
     campaignId: _smokeCampaignId,
     code: fighterCode!,
@@ -360,6 +360,65 @@ Future<void> main() async {
       ],
     ).toJson(),
   ));
+  // El combate abierto de la mesa (`e2e/combate.spec.ts`), en la ronda 3 y
+  // con el turno en el primer lobo: un jugador ya actuó, Garrick (PNJ aliado)
+  // volvió herido y el segundo lobo está caído, así que el turno lo salta. Su
+  // efecto es un texto que el jugador no debe recibir: el documento del
+  // combate nunca le llega, solo su estado de turno.
+  await encounters.save(
+    _smokeDmId,
+    _smokeCampaignId,
+    Encounter(
+      id: 'emboscada-del-valle',
+      round: 3,
+      turnIndex: 1,
+      stage: EncounterStage.running,
+      combatants: [
+        Combatant(
+          id: 'c-elsbeth',
+          kind: CombatantKind.player,
+          name: 'Elsbeth de Humo',
+          initiative: 19,
+          memberId: elsbethLink!.memberId,
+        ),
+        const Combatant(
+          id: 'c-lobo-1',
+          kind: CombatantKind.monster,
+          name: 'Lobo 1',
+          initiative: 16,
+          creatureId: 'wolf',
+          currentHp: 5,
+          maxHp: 11,
+          tags: ['Marca reservada del DM'],
+        ),
+        const Combatant(
+          id: 'c-garrick',
+          kind: CombatantKind.npc,
+          name: 'Garrick el Tabernero',
+          initiative: 14,
+          npcId: 'garrick',
+          currentHp: 7,
+          maxHp: 11,
+          side: CombatantSide.ally,
+        ),
+        Combatant(
+          id: 'c-sagan',
+          kind: CombatantKind.player,
+          name: 'Sagan de Humo',
+          initiative: 12,
+          memberId: saganLink!.memberId,
+        ),
+        const Combatant(
+          id: 'c-lobo-2',
+          kind: CombatantKind.monster,
+          name: 'Lobo 2',
+          initiative: 9,
+          creatureId: 'wolf',
+          maxHp: 11,
+        ),
+      ],
+    ),
+  );
   final events = InMemoryEventRepository();
   final npcs = InMemoryNpcRepository(campaigns, characters);
   await _seedNpcs(npcs, characters);

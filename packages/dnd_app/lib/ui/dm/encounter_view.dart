@@ -404,7 +404,7 @@ class _EncounterViewState extends State<EncounterView> {
   /// Es el mismo dato que dispara [_sideWipedBanner], pero a la vista todo el
   /// tiempo: enterarse de cómo va la pelea recién cuando termina llegaba
   /// tarde.
-  Widget _standingCounts(BuildContext context, _Standing standing) {
+  Widget _standingCounts(BuildContext context, EncounterStanding standing) {
     final pal = context.palette;
     Widget side(IconData icon, Color color, int up, int total, String what) {
       return Semantics(
@@ -1163,42 +1163,13 @@ class _EncounterViewState extends State<EncounterView> {
 
   // --- Carteles y diálogos --------------------------------------------------
 
-  /// Cuántos quedan en pie de cada lado, cruzando las dos fuentes de PG.
-  ///
-  /// Vive acá y no en [Encounter] porque hace falta cruzar dos: los PG de los
-  /// monstruos, que sí están en el encuentro, y los de los jugadores, que
-  /// viven en su ficha real y llegan por [EncounterView.members].
-  ///
-  /// Los bandos mandan, no el tipo: un lobo aliado cuenta con la mesa y un
-  /// PNJ que traiciona pasa a contar con los enemigos. Los neutrales se
-  /// cuentan aparte y no entran a ningún «en pie».
-  _Standing _standing(Encounter current) {
-    bool isDown(Combatant combatant) {
-      if (combatant.kind != CombatantKind.player) return combatant.isDown;
-      final member = widget.members
-          .where((m) => m.memberId == combatant.memberId)
-          .firstOrNull;
-      // Sin la ficha a la vista no se asume nada: mejor no avisar que avisar
-      // de una derrota que no pasó.
-      if (member == null) return false;
-      return member.character.combat.currentHp <= 0;
-    }
-
-    List<Combatant> of(CombatantSide side) => [
-      for (final c in current.combatants)
-        if (c.side == side) c,
-    ];
-    final allies = of(CombatantSide.ally);
-    final enemies = of(CombatantSide.enemy);
-
-    return _Standing(
-      allies: allies.length,
-      alliesUp: allies.where((c) => !isDown(c)).length,
-      enemies: enemies.length,
-      enemiesUp: enemies.where((c) => !isDown(c)).length,
-      neutrals: of(CombatantSide.neutral).length,
-    );
-  }
+  /// Cuántos quedan en pie de cada lado, cruzando las dos fuentes de PG: la
+  /// cuenta es del motor (`Encounter.standing`, la misma que lee el cliente
+  /// React) y acá solo se le pasan los PG de los jugadores, que viven en su
+  /// ficha real y llegan por [EncounterView.members].
+  EncounterStanding _standing(Encounter current) => current.standing({
+    for (final m in widget.members) m.memberId: m.character.combat.currentHp,
+  });
 
   /// Aviso de que un bando se quedó sin nadie en pie, con la salida a mano.
   ///
@@ -1477,23 +1448,6 @@ class _EncounterViewState extends State<EncounterView> {
 
   Widget _divider(BuildContext context) =>
       Container(width: 1, height: 26, color: context.palette.hairline);
-}
-
-/// Cuántos quedan en pie de cada lado. Ver `_EncounterViewState._standing`.
-class _Standing {
-  final int allies;
-  final int alliesUp;
-  final int enemies;
-  final int enemiesUp;
-  final int neutrals;
-
-  const _Standing({
-    required this.allies,
-    required this.alliesUp,
-    required this.enemies,
-    required this.enemiesUp,
-    required this.neutrals,
-  });
 }
 
 /// Una fila de la planilla: un jugador (solo lectura, PG en vivo) o un

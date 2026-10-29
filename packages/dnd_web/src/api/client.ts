@@ -278,6 +278,25 @@ export async function fetchNpcs(signal: AbortSignal): Promise<StoredNpc[]> {
   return npcs;
 }
 
+/**
+ * El combate abierto de la campaña (`GET /api/campaigns/:id/encounter`), crudo:
+ * lo migra el motor (`encounterView`). `null` si no hay ninguno: el servidor
+ * responde 404 tanto por eso como por una campaña ajena, y esta pantalla solo
+ * pregunta por una campaña que ya está en la lista del DM.
+ */
+export async function fetchCampaignEncounter(campaignId: string, signal: AbortSignal): Promise<JsonObject | null> {
+  try {
+    const { encounter } = await getJson<{ encounter: JsonObject }>(
+      `/api/campaigns/${encodeURIComponent(campaignId)}/encounter`,
+      signal,
+    );
+    return encounter;
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 404) return null;
+    throw e;
+  }
+}
+
 /** Un PNJ de una campaña (`GET /api/campaigns/:id/npcs`): el documento, su
  *  estado **en esa** campaña, los PG con que volvió del último combate (sin
  *  `currentHp` está entero) y su ficha si la tiene. */

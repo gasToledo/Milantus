@@ -173,7 +173,7 @@ del motor, nunca se calcula acá.
 
 ## El Modo DM (`src/dm/`)
 
-Cada sección es una ruta bajo `/v2/dm/campanas/:id/` (el Bestiario y la Biblioteca de PNJ, herramientas de la cuenta, bajo `/v2/dm/bestiario` y `/v2/dm/pnj`) y comparte tres piezas:
+Cada sección es una ruta bajo `/v2/dm/campanas/:id/` (el Bestiario, la Biblioteca de PNJ y el Homebrew, herramientas de la cuenta, bajo `/v2/dm/bestiario`, `/v2/dm/pnj` y `/v2/dm/homebrew`) y comparte tres piezas:
 `DmPanel` (el panel: interruptor, herramientas, campañas, secciones),
 `DmHeader` (título Georgia 30, pill con el estado y la regla ornamental; el
 `h1` es el título) y `DmPage`, que resuelve la campaña por id y es la única que
@@ -223,6 +223,15 @@ control que escriba, y el e2e comprueba que no sale ningún pedido que no sea
   props: `header` (la cabecera del Modo DM en lugar del `h1` del Códice) y
   `hrefOf` (las URL de cada entrada). No hay una segunda ficha: una entrada nueva
   del catálogo se ve igual en los dos.
+- **Combate** (`CombatView`): una placa (`plaque`) con ronda, turno y en pie, y
+  debajo la planilla en `card` con cinco columnas fijas (`LEDGER`), que con poco
+  ancho se desplaza dentro de su caja en vez de partirse. El turno es una barra
+  verde al filo izquierdo de la fila sobre `goldSoft` (no un borde alrededor) y
+  la palabra bajo la iniciativa; lo ya jugado se atenúa y un caído se tacha.
+  Los PG van en carmesí con `ThinBar`, y el bando en una pill con la palabra
+  (verde, carmesí, apagado). «Del turno» va a la derecha: una `card` con tres
+  placas (Inic, PG, CA) y, debajo, el `CreatureProfile` del Bestiario como su
+  propia tarjeta, para no anidar una dentro de otra.
 
 ## Reglas que más se olvidan
 
