@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
   Axe,
   BookMarked,
@@ -36,7 +36,7 @@ import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { CATEGORY_GROUPS, codexEntries, fold, type CodexEntry } from './entries';
 
 /** Ícono por categoría (los de `CodexCategory` en Flutter, en lucide). */
-const ICONS: Record<CodexCategory, LucideIcon> = {
+export const ICONS: Record<CodexCategory, LucideIcon> = {
   glossary: Lightbulb,
   guides: MapIcon,
   races: Users,
@@ -235,14 +235,28 @@ function Home({ entries }: { entries: Map<CodexCategory, CodexEntry[]> }) {
   );
 }
 
-function CategoryView({
+/** Adónde lleva una entrada de la lista: el Códice, o el Homebrew del Modo DM
+ *  (que monta esta misma vista con sus URL). */
+type HrefOf = (category: CodexCategory, entryId?: string) => string;
+
+/**
+ * Una categoría: buscador, facetas, lista y entrada abierta. La exporta el
+ * Homebrew del Modo DM, que la monta con lo propio de la cuenta, su cabecera
+ * ([header], que reemplaza al `h1` del Códice) y sus URL ([hrefOf]): una ficha
+ * del Códice y una del Homebrew no pueden quedar distintas.
+ */
+export function CategoryView({
   category,
   entries,
   entryId,
+  hrefOf = codexHref,
+  header,
 }: {
   category: CodexCategory;
   entries: CodexEntry[];
   entryId: string | null;
+  hrefOf?: HrefOf;
+  header?: ReactNode;
 }) {
   const t = useTexts();
   // «Ver las N» de la búsqueda general llega con `?q=`: la lista arranca
@@ -276,16 +290,18 @@ function CategoryView({
 
   return (
     <div className="flex flex-col gap-4">
-      <header className="flex flex-wrap items-baseline gap-x-3.5 gap-y-1">
-        <h1 className="font-display text-[30px] leading-tight text-on-surface">{label}</h1>
-        <span className="text-text-muted tabular-nums">
-          {category === 'glossary'
-            ? t.codexTerms(entries.length)
-            : category === 'guides'
-              ? t.codexGuidesIntro
-              : t.codexEntries(entries.length)}
-        </span>
-      </header>
+      {header ?? (
+        <header className="flex flex-wrap items-baseline gap-x-3.5 gap-y-1">
+          <h1 className="font-display text-[30px] leading-tight text-on-surface">{label}</h1>
+          <span className="text-text-muted tabular-nums">
+            {category === 'glossary'
+              ? t.codexTerms(entries.length)
+              : category === 'guides'
+                ? t.codexGuidesIntro
+                : t.codexEntries(entries.length)}
+          </span>
+        </header>
+      )}
 
       {/* Cuatro guías no piden buscador. */}
       {category !== 'guides' && (
@@ -349,7 +365,7 @@ function CategoryView({
                 />
               </div>
             ) : (
-              <EntryList category={category} entries={visible} all={reading ? entries : null} openId={open?.id ?? null} />
+              <EntryList category={category} entries={visible} all={reading ? entries : null} openId={open?.id ?? null} hrefOf={hrefOf} />
             )}
           </section>
 
@@ -357,7 +373,7 @@ function CategoryView({
             {open ? (
               <>
                 <Link
-                  href={codexHref(category)}
+                  href={hrefOf(category)}
                   className="codex-back mb-3 inline-flex items-center gap-1.5 text-[13px] text-on-surface-variant hover:text-gold"
                 >
                   <ArrowLeft size={16} aria-hidden="true" className="text-gold" />
@@ -385,11 +401,13 @@ function EntryList({
   entries,
   all,
   openId,
+  hrefOf,
 }: {
   category: CodexCategory;
   entries: CodexEntry[];
   all: CodexEntry[] | null;
   openId: string | null;
+  hrefOf: HrefOf;
 }) {
   const item = (e: CodexEntry) => {
     const on = e.id === openId;
@@ -397,7 +415,7 @@ function EntryList({
     return (
       <li key={e.id}>
         <Link
-          href={codexHref(category, e.id)}
+          href={hrefOf(category, e.id)}
           aria-current={on ? 'true' : undefined}
           className={cx(
             'block rounded-[var(--radius-nav)] px-3 py-2',

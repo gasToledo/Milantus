@@ -44,6 +44,13 @@ export type CodexCategory = keyof typeof CODEX_CATEGORIES;
 export const DM_SECTIONS = ['mesa', 'capitulos', 'cuaderno', 'pnj'] as const;
 export type DmSection = (typeof DM_SECTIONS)[number];
 
+/** Las categorías del Códice que pueden tener homebrew, en el orden del
+ *  Homebrew de Flutter (los objetos se parten en mágicos y equipo, como en el
+ *  Códice). Las criaturas no son del Códice: van aparte (`creatures`). */
+export const HOMEBREW_CATEGORIES = ['weapons', 'armor', 'magicItems', 'gear', 'feats', 'races', 'backgrounds', 'spells'] as const satisfies readonly CodexCategory[];
+export type HomebrewCategory = (typeof HOMEBREW_CATEGORIES)[number] | 'creatures';
+const homebrewSegment = (c: HomebrewCategory): string => (c === 'creatures' ? 'criaturas' : CODEX_CATEGORIES[c]);
+
 /** Qué muestra el Modo DM. `home` es `/v2/dm` a secas: no muestra nada, redirige
  *  a la primera campaña en curso (o a donde haya algo que ver). */
 export type DmView =
@@ -52,7 +59,10 @@ export type DmView =
   // El Bestiario del DM es una herramienta de la cuenta, no de una campaña.
   | { kind: 'bestiary'; entryId: string | null }
   // La Biblioteca de PNJ también: sin PNJ es la lista.
-  | { kind: 'npcs'; npcId: string | null };
+  | { kind: 'npcs'; npcId: string | null }
+  // El Homebrew también. Sin categoría es la portada; las criaturas no tienen
+  // entrada propia acá: su perfil es el del Bestiario.
+  | { kind: 'homebrew'; category: HomebrewCategory | null; entryId: string | null };
 
 export type Route =
   | { name: 'roster' }
@@ -95,6 +105,16 @@ export function matchRoute(pathname: string): Route {
     if (id === 'pnj' && rest.length === 0) {
       try {
         return { name: 'dm', view: { kind: 'npcs', npcId: tab === undefined ? null : decodeURIComponent(tab) } };
+      } catch {
+        return { name: 'unknown' };
+      }
+    }
+    if (id === 'homebrew' && rest.length <= 1) {
+      if (tab === undefined) return { name: 'dm', view: { kind: 'homebrew', category: null, entryId: null } };
+      const category = (['creatures', ...HOMEBREW_CATEGORIES] as const).find((c) => homebrewSegment(c) === tab);
+      if (!category || (category === 'creatures' && rest.length > 0)) return { name: 'unknown' };
+      try {
+        return { name: 'dm', view: { kind: 'homebrew', category, entryId: rest[0] === undefined ? null : decodeURIComponent(rest[0]) } };
       } catch {
         return { name: 'unknown' };
       }
@@ -159,7 +179,13 @@ export const dmBestiaryHref = (entryId?: string): string =>
 export const dmNpcsHref = (npcId?: string): string =>
   `${import.meta.env.BASE_URL}dm/pnj` + (npcId ? `/${encodeURIComponent(npcId)}` : '');
 
-export const dmCampaignHref = (id: string, section: DmSection = 'mesa'): string =>
+/** El Homebrew del Modo DM: la portada, una categoría o una entrada abierta. */
+export const dmHomebrewHref = (category?: HomebrewCategory, entryId?: string): string =>
+  `${import.meta.env.BASE_URL}dm/homebrew` +
+  (category ? `/${homebrewSegment(category)}` : '') +
+  (category && entryId ? `/${encodeURIComponent(entryId)}` : '');
+
+export const dmCampaignHref =(id: string, section: DmSection = 'mesa'): string =>
   `${import.meta.env.BASE_URL}dm/campanas/${encodeURIComponent(id)}/${section}`;
 
 /**

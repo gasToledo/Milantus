@@ -60,9 +60,15 @@ test('la Mesa del DM lista a los jugadores vinculados con los números del motor
   await expect(sagan.getByRole('listitem').filter({ hasText: 'Agotamiento 2' })).toBeVisible();
   await expect(page.locator('[data-member="elsbeth-de-humo"]').getByRole('listitem')).toHaveCount(0);
 
-  // El panel: lo que todavía vive en Flutter (Homebrew) lleva su aviso.
+  // El panel: las tres herramientas de la cuenta ya son de /v2.
   const herramientas = page.getByRole('navigation', { name: 'Herramientas del DM' });
-  await expect(herramientas.getByRole('link', { name: /Homebrew/ })).toContainText('se abre en la aplicación principal');
+  for (const [name, href] of [
+    ['Bestiario', '/v2/dm/bestiario'],
+    ['Biblioteca de PNJ', '/v2/dm/pnj'],
+    ['Homebrew', '/v2/dm/homebrew'],
+  ] as const) {
+    await expect(herramientas.getByRole('link', { name })).toHaveAttribute('href', href);
+  }
   await expect(page.getByRole('navigation', { name: 'Campañas' }).getByRole('link', { name: 'La Marca del Cuervo' })).toHaveAttribute(
     'aria-current',
     'page',

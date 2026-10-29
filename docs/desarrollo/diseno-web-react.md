@@ -216,6 +216,13 @@ control que escriba, y el e2e comprueba que no sale ningún pedido que no sea
   enlace entero: lo es la identidad (medallón de 36 y nombre), porque así es en
   Flutter, donde el resto de la tarjeta lleva controles. El estado va al pie con
   `STATUS_TONE`, y un muerto se tacha y atenúa además del color.
+- **Homebrew** (`HomebrewView`): la portada repite las tarjetas de la portada del
+  Códice (ícono, nombre, cifra y muestra), atenuadas cuando la categoría está
+  vacía, con un buscador en pill que reemplaza la grilla por una lista de
+  resultados. Una categoría monta `CategoryView` del Códice, exportada con dos
+  props: `header` (la cabecera del Modo DM en lugar del `h1` del Códice) y
+  `hrefOf` (las URL de cada entrada). No hay una segunda ficha: una entrada nueva
+  del catálogo se ve igual en los dos.
 
 ## Reglas que más se olvidan
 

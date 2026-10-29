@@ -75,6 +75,9 @@ const smokeHomebrewWeaponId = 'hacha-de-humo';
 /// +3) para distinguir lo que deriva el motor de una cuenta hecha en el cliente.
 const smokeHomebrewCreatureId = 'sombra-de-humo';
 
+/// Una dote homebrew de la cuenta (`e2e/homebrew.spec.ts`).
+const smokeHomebrewFeatId = 'paso-de-humo';
+
 /// Una segunda sesión, de una cuenta que **no** está en `v2Users`: /v2 le
 /// responde «No disponible» sin pedir nada más a la API.
 const smokeNoV2Token = 'sesion-sin-v2=';
@@ -412,6 +415,19 @@ Future<void> main() async {
           reach: '5 pies',
         ),
       ],
+    ).toJson(),
+  );
+  // Una dote propia, para que el Homebrew del Modo DM (`e2e/homebrew.spec.ts`)
+  // tenga lo propio en más de una categoría del Códice.
+  await homebrew.upsert(
+    smokeUserId,
+    'feats',
+    smokeHomebrewFeatId,
+    const Feat(
+      id: smokeHomebrewFeatId,
+      name: 'Paso de Humo',
+      source: ContentSource.homebrew,
+      description: 'Te movés entre la niebla sin que nadie te oiga.',
     ).toJson(),
   );
   final levelUps = InMemoryLevelUpRepository(campaigns);

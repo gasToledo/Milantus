@@ -13,6 +13,7 @@ import { DmHeader } from './DmHeader';
 import { DmPanel } from './DmPanel';
 import { BestiaryPage } from '../bestiary/BestiaryPage';
 import { ChaptersView } from './ChaptersView';
+import { HomebrewView } from './HomebrewView';
 import { MesaView } from './MesaView';
 import { NotebookView } from './NotebookView';
 import { CampaignNpcsView } from './npcs/CampaignNpcsView';
@@ -55,6 +56,9 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
     // La Biblioteca tampoco depende de las campañas: sin la lista, los filtros
     // por campaña salen de los vínculos de cada PNJ.
     body = view.npcId === null ? <NpcLibraryView campaigns={list} /> : <NpcDetailView key={view.npcId} npcId={view.npcId} />;
+  } else if (view.kind === 'homebrew') {
+    // Lo propio es de la cuenta, no de una campaña.
+    body = <HomebrewView category={view.category} entryId={view.entryId} />;
   } else if (campaigns.isError) {
     body = (
       <>
@@ -94,7 +98,7 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
   }
 
   return (
-    <Shell panel={<DmPanel campaigns={list} current={current} tool={view.kind === 'bestiary' || view.kind === 'npcs' ? view.kind : undefined} />} footer={<RosterFooter account={account} dm />}>
+    <Shell panel={<DmPanel campaigns={list} current={current} tool={view.kind === 'bestiary' || view.kind === 'npcs' || view.kind === 'homebrew' ? view.kind : undefined} />} footer={<RosterFooter account={account} dm />}>
       {body}
     </Shell>
   );

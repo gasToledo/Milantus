@@ -211,13 +211,14 @@ repiten acá.
   interruptor. **Ninguna escritura**: ni crear o editar campañas, ni cerrar
   capítulos, ni música, ni notas; todo eso sigue en Flutter. Se porta por
   secciones, una por PR; hoy existen la **Mesa**, **Capítulos**, el **Cuaderno**,
-  los **PNJ de la mesa**, el **Bestiario** y la **Biblioteca de PNJ**. Rutas:
+  los **PNJ de la mesa**, el **Bestiario**, la **Biblioteca de PNJ** y el
+  **Homebrew**. Rutas:
   `/v2/dm` (redirige a la primera campaña en curso, o a la primera que haya),
-  `/v2/dm/campanas/:id/mesa|capitulos|cuaderno|pnj`, `/v2/dm/bestiario[/:criatura]`
-  y `/v2/dm/pnj[/:pnj]`. El panel (`DmPanel`) sigue al de Flutter: el
+  `/v2/dm/campanas/:id/mesa|capitulos|cuaderno|pnj`, `/v2/dm/bestiario[/:criatura]`,
+  `/v2/dm/pnj[/:pnj]` y `/v2/dm/homebrew[/:categoria[/:entrada]]`. El panel
+  (`DmPanel`) sigue al de Flutter: el
   interruptor con «DM» activo, las herramientas (Bestiario, Biblioteca de PNJ y
-  Homebrew; los dos primeros son internos y Homebrew enlaza a Flutter con el ícono
-  de enlace externo), las campañas
+  Homebrew), las campañas
   agrupadas En curso / En pausa / Terminadas (plegable, abierta si la elegida
   es una de ellas) y, de la campaña elegida, sus secciones; Combate enlaza
   a Flutter porque todavía no se porta. La **Mesa** lista a los jugadores
@@ -285,6 +286,17 @@ repiten acá.
   atenuado. Los PG del herido los resuelve el motor (`npcViews` con `currentHp`
   y `status` de cada entrada), igual que en la Biblioteca. Cambiar el estado,
   traer de la biblioteca y quitar de la campaña siguen en Flutter.
+  **Homebrew** (`GET /api/homebrew`, el mismo pedido que fusiona el catálogo):
+  es de la cuenta, no de una campaña. La portada tiene una tarjeta por
+  categoría con cuánto propio hay y una muestra (Armas, Armaduras, Objetos
+  mágicos, Equipo, Dotes, Especies, Trasfondos, Conjuros y Criaturas: los
+  objetos se parten como en el Códice y no en una sola «Objetos» como en
+  Flutter) y un buscador que mira todas a la vez. Una categoría es **la misma
+  vista del Códice** (`CategoryView`) con solo lo que el catálogo fusionado marca
+  `homebrew` y las URL del Modo DM, así una ficha no puede quedar distinta en los
+  dos lugares; una criatura propia abre su perfil en el Bestiario del DM. Lo de
+  otra cuenta no llega (la API es por cuenta) y su URL muestra la categoría
+  vacía. Crear, editar, importar, exportar y borrar siguen en Flutter.
 - **Homebrew**: la ficha y el dashboard calculan con el catálogo oficial más
   el contenido homebrew de la cuenta (`GET /api/homebrew`, fusionado por id en
   `src/api/homebrew.ts`), como `HomebrewStore` + `ContentRepository.addAll` en
@@ -307,8 +319,8 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    campañas del jugador en modo lectura *(existen; el cuaderno es del DM)*,
    bestiario *(existe)* y catálogos *(el Códice existe)*.
    **Lectura del Modo DM** (se sumó a este paso): Mesa, Capítulos, Cuaderno,
-   Bestiario, Biblioteca de PNJ y PNJ de la mesa *(existen)*; **faltan** el
-   Homebrew de la cuenta y el Combate en solo lectura (hoy enlazan a Flutter).
+   Bestiario, Biblioteca de PNJ, PNJ de la mesa y Homebrew *(existen)*; **falta**
+   el Combate en solo lectura (hoy enlaza a Flutter).
    Hasta que existan, la lectura no está cerrada.
 4. Escrituras de bajo riesgo: PG y usos de recursos en la ficha, descansos.
 5. Edición completa: creador de personajes, subida de nivel, inventario.
@@ -373,7 +385,11 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    escribir, y que
    otra cuenta tenga la biblioteca vacía, reciba por un PNJ ajeno o por los PNJ
    de una mesa ajena el mismo 404 que por lo inexistente (en la API y en la
-   pantalla) y no encuentre nada de eso en la vista del jugador (`e2e/pnj.spec.ts`); y que una cuenta sin `webV2` vea
+   pantalla) y no encuentre nada de eso en la vista del jugador (`e2e/pnj.spec.ts`); que el Homebrew cuente lo
+   propio por categoría (un arma, una dote y una criatura sembradas), abra la
+   ficha del Códice bajo `/v2/dm/homebrew`, busque en todo y lleve la criatura al
+   Bestiario, sin escribir, y que otra cuenta no reciba nada ni lo abra por URL
+   (`e2e/homebrew.spec.ts`); y que una cuenta sin `webV2` vea
    «No disponible» sin pedir sus datos (`e2e/acceso.spec.ts`). Lo esperado se
    calcula con el mismo motor y la misma fusión (`e2e/helpers.ts`). Sin
    reintentos: no hay «a veces anda».
@@ -417,7 +433,7 @@ Para que nadie lo dé por hecho:
 
 - Reordenar, marcar favorito, crear, renombrar o borrar personajes desde React.
 - Cualquier escritura desde React: todo el cliente hoy es solo lectura.
-- Del Modo DM: Combate, Homebrew, la música y la ficha
+- Del Modo DM: Combate, la música y la ficha
   completa de un miembro o de un PNJ con ficha (en curso, por secciones).
 - Enlaces desde Flutter hacia `/v2` o redirección automática por `webV2`.
 - Tests de componentes y chequeo de literales sueltos en `dnd_web`.
