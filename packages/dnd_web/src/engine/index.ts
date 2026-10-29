@@ -11,6 +11,7 @@ interface DartEngine {
   migrateCharacter(characterJson: string): string;
   setLanguage(code: string): void;
   applyTranslation(packJson: string, overlayJson: string): string;
+  vocabularyLabel(field: string, value: string): string;
 }
 
 function engine(): DartEngine {
@@ -66,4 +67,15 @@ export function setEngineLanguage(code: 'es' | 'en'): void {
  *  texto JSON: es el `applyContentTranslation` de Dart, no una copia. */
 export function applyTranslation(packJson: string, overlayJson: string): string {
   return engine().applyTranslation(packJson, overlayJson);
+}
+
+/** Campos del catálogo con vocabulario cerrado, guardados en español. */
+export type VocabularyField = 'school' | 'castingTime' | 'duration' | 'range' | 'size' | 'creatureType';
+
+/** [value] en el idioma fijado con `setEngineLanguage`: la escuela o el
+ *  alcance de un conjuro, el tamaño de una especie. Es el `vocabularyLabel`
+ *  del motor (con sus patrones), no una tabla acá; un valor que no conoce
+ *  (homebrew con texto propio) vuelve tal cual. */
+export function vocabularyLabel(field: VocabularyField, value: string): string {
+  return engine().vocabularyLabel(field, value);
 }

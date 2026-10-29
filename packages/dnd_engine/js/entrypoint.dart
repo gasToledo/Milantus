@@ -1,7 +1,6 @@
 /// Puente del motor hacia JavaScript: `dart compile js -O2 js/entrypoint.dart`.
 ///
-/// Expone `globalThis.dndEngine` con dos funciones, ambas **de cadena a
-/// cadena**. Pasar JSON como texto y no como objetos JS es a propósito: el
+/// Expone `globalThis.dndEngine` con funciones **de cadena a cadena**. Pasar JSON como texto y no como objetos JS es a propósito: el
 /// motor trabaja con mapas de Dart y la conversión de objetos cruza la
 /// frontera con reglas propias (enteros contra dobles, `undefined` contra
 /// `null`) que no hacen falta para nada; con texto el contrato es el mismo
@@ -88,11 +87,26 @@ String applyTranslation(String packJson, String overlayJson) => jsonEncode(
       ),
     );
 
+/// [value] de un campo de vocabulario cerrado (`school`, `castingTime`,
+/// `duration`, `range`, `size`, `creatureType`) en el idioma fijado con
+/// [setLanguage]. Es el `vocabularyLabel` que usa Flutter al mostrarlos: esos
+/// campos viajan en español también en el catálogo inglés, y la traducción
+/// tiene patrones («Concentración, hasta 1 minuto», «Personal (cono de 15
+/// pies)») que no tienen por qué copiarse en TypeScript. Un campo que no
+/// existe devuelve el valor tal cual, como un valor desconocido.
+String vocabularyLabelFor(String field, String value) {
+  for (final f in VocabularyField.values) {
+    if (f.name == field) return vocabularyLabel(f, value);
+  }
+  return value;
+}
+
 void main() {
   final motor = JSObject();
   motor['compute'] = compute.toJS;
   motor['migrateCharacter'] = migrateCharacter.toJS;
   motor['setLanguage'] = setLanguage.toJS;
   motor['applyTranslation'] = applyTranslation.toJS;
+  motor['vocabularyLabel'] = vocabularyLabelFor.toJS;
   globalContext['dndEngine'] = motor;
 }

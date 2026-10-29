@@ -8,6 +8,7 @@ import { Card } from '../ui/Card';
 import { Eyebrow, hpTone, Pill, Pips, ShieldBadge, StatPlaque, ThinBar } from '../ui/data';
 import { COLUMNS } from './CharacterTab';
 import { signed } from './format';
+import { SpellList } from './SpellList';
 import { resourceLeft, type SheetModel } from './model';
 import { ProficiencyRow } from './rows';
 import { ABILITIES, isReactionSpell } from './vocabulary';
@@ -244,6 +245,18 @@ function SpellsCard({ model }: { model: SheetModel }) {
         })}
 
         {slotRows.length > 0 && <ul className="flex flex-col gap-2">{slotRows}</ul>}
+
+        <div className="border-t border-hairline pt-3">
+          <SpellList
+            cantripIds={[...(character.cantripIds ?? []), ...Object.values(character.classCantripIds ?? {}).flat()]}
+            spellIds={[...(character.spellIds ?? []), ...Object.values(character.classSpellIds ?? {}).flat()]}
+            alwaysPreparedIds={sheet.alwaysPreparedSpellIds}
+            innate={sheet.innateSpells}
+            preparation={sheet.spellcasting?.preparation ?? null}
+            catalog={catalog.spells}
+            innateNote={(s) => innateNote(s, t)}
+          />
+        </div>
 
         {(innateReactions.length > 0 || classReactions.length > 0) && (
           <div className="border-t border-hairline pt-3">

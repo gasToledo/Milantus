@@ -166,6 +166,14 @@ const es = {
   slotsLabel: (left: number, max: number, level: string) =>
     `${left} de ${max} espacios de nivel ${level}`,
   reactionsHeading: 'Reacciones',
+  spellsCantripsTitle: 'Trucos',
+  spellsAlwaysPrepared: 'Siempre preparados',
+  spellsPreparedTitle: 'Conjuros preparados',
+  spellsKnownTitle: 'Conjuros conocidos',
+  spellsFromFeatures: 'Conjuros de rasgos',
+  spellsNoneChosen: 'Todavía no elegiste conjuros.',
+  concentration: 'Concentración',
+  ritual: 'Ritual',
   cantrip: 'Truco',
   spellLevelShort: (n: number) => `Nivel ${n}`,
   innateUses: {
@@ -195,14 +203,6 @@ const es = {
     lawfulEvil: 'Legal Malvado',
     neutralEvil: 'Neutral Malvado',
     chaoticEvil: 'Caótico Malvado',
-  },
-  // `creatureType` del catálogo de especies viene en español (la traducción
-  // no lo toca): la clave es ese rótulo, como en `sizes`.
-  creatureTypes: {
-    Humanoide: 'Humanoide',
-    Feérico: 'Feérico',
-    Aberración: 'Aberración',
-    Autómata: 'Autómata',
   },
   conditions: {
     blinded: 'Cegado',
@@ -255,17 +255,6 @@ const es = {
     'sleight-of-hand': 'Juego de Manos',
     stealth: 'Sigilo',
     survival: 'Supervivencia',
-  },
-  // `ComputedSheet.size` viene en español (vocabulario cerrado del catálogo,
-  // que Flutter traduce al mostrarlo con `vocabularyLabel`): la clave es ese
-  // rótulo.
-  sizes: {
-    Diminuto: 'Diminuto',
-    Pequeño: 'Pequeño',
-    Mediano: 'Mediano',
-    Grande: 'Grande',
-    Enorme: 'Enorme',
-    Gargantuesco: 'Gargantuesco',
   },
   damageTypes: {
     acid: 'Ácido',
@@ -442,6 +431,14 @@ const en: Texts = {
   slotsLabel: (left: number, max: number, level: string) =>
     `${left} of ${max} level ${level} spell slots`,
   reactionsHeading: 'Reactions',
+  spellsCantripsTitle: 'Cantrips',
+  spellsAlwaysPrepared: 'Always prepared',
+  spellsPreparedTitle: 'Prepared spells',
+  spellsKnownTitle: 'Known spells',
+  spellsFromFeatures: 'Spells from features',
+  spellsNoneChosen: 'You haven’t chosen any spells yet.',
+  concentration: 'Concentration',
+  ritual: 'Ritual',
   cantrip: 'Cantrip',
   spellLevelShort: (n: number) => `Level ${n}`,
   innateUses: {
@@ -471,12 +468,6 @@ const en: Texts = {
     lawfulEvil: 'Lawful Evil',
     neutralEvil: 'Neutral Evil',
     chaoticEvil: 'Chaotic Evil',
-  },
-  creatureTypes: {
-    Humanoide: 'Humanoid',
-    Feérico: 'Fey',
-    Aberración: 'Aberration',
-    Autómata: 'Construct',
   },
   conditions: {
     blinded: 'Blinded',
@@ -529,14 +520,6 @@ const en: Texts = {
     'sleight-of-hand': 'Sleight of Hand',
     stealth: 'Stealth',
     survival: 'Survival',
-  },
-  sizes: {
-    Diminuto: 'Tiny',
-    Pequeño: 'Small',
-    Mediano: 'Medium',
-    Grande: 'Large',
-    Enorme: 'Huge',
-    Gargantuesco: 'Gargantuan',
   },
   damageTypes: {
     acid: 'Acid',

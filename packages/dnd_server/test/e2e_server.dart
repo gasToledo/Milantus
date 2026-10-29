@@ -52,6 +52,9 @@ const smokeCharacterId = 'guerrero-de-humo';
 /// La favorita de los ajustes sembrados, y el orden que esos ajustes piden.
 const smokeFavoriteId = 'zelda-de-humo';
 
+/// El clérigo sembrado, con trucos y conjuros preparados.
+const smokeClericId = 'elsbeth-de-humo';
+
 /// Un arma homebrew de la cuenta, que Aldric lleva equipada: la ficha de /v2
 /// tiene que fusionar `/api/homebrew` con el catálogo oficial para que su
 /// ataque aparezca (`e2e/ficha.spec.ts`).
@@ -116,6 +119,38 @@ Future<void> main() async {
       hpPerLevel: const [10, 6],
       currentHp: 16,
       weapons: const ['longsword', smokeHomebrewWeaponId],
+    ),
+  );
+  // Un lanzador, para que la ficha muestre la tarjeta de Conjuros
+  // (`e2e/ficha.spec.ts`). Nivel 3: en el dashboard queda entre Brunilda (5)
+  // y Aldric (2) con el orden «nivel».
+  await characters.create(
+    smokeUserId,
+    Character(
+      id: smokeClericId,
+      name: 'Elsbeth de Humo',
+      raceId: 'human',
+      classId: 'cleric',
+      subclassId: 'life-domain',
+      backgroundId: 'sage',
+      level: 3,
+      assignedScores: const {
+        Ability.strength: 14,
+        Ability.dexterity: 8,
+        Ability.constitution: 13,
+        Ability.intelligence: 11,
+        Ability.wisdom: 15,
+        Ability.charisma: 12,
+      },
+      backgroundAbilityBonuses: const {
+        Ability.wisdom: 2,
+        Ability.intelligence: 1,
+      },
+      chosenSkills: const ['medicine', 'religion'],
+      hpPerLevel: const [8, 5, 5],
+      cantripIds: const ['guidance', 'sacred-flame', 'light'],
+      spellIds: const ['bless', 'cure-wounds', 'shield-of-faith'],
+      combat: CombatState(currentHp: 18),
     ),
   );
   final settings = InMemorySettingsRepository();

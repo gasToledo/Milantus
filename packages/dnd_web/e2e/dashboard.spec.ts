@@ -30,15 +30,16 @@ test('el dashboard lista los personajes en el orden de los ajustes, marca el fav
 
   // Los ajustes sembrados piden orden «nivel» y a Zelda de favorita: la
   // favorita encabeza aunque tenga menos nivel que Brunilda, y el resto va de
-  // más a menos nivel (el alfabético sería Aldric, Brunilda, Zelda).
-  await expect(tarjetas).toHaveCount(3);
-  expect(await ids()).toEqual(['zelda-de-humo', 'guerrero-de-humo', 'aldric-de-humo']);
+  // más a menos nivel (el alfabético sería Aldric, Brunilda, Elsbeth, Zelda).
+  await expect(tarjetas).toHaveCount(4);
+  expect(await ids()).toEqual(['zelda-de-humo', 'guerrero-de-humo', 'elsbeth-de-humo', 'aldric-de-humo']);
   await expect(page.locator('[data-field="sort"]')).toHaveText('Nivel');
 
   await expect(tarjetas.nth(0)).toHaveAttribute('data-favorite', 'true');
   await expect(tarjetas.nth(0).getByRole('img', { name: 'Favorito' })).toBeVisible();
   await expect(tarjetas.nth(1)).toHaveAttribute('data-favorite', 'false');
   await expect(tarjetas.nth(2)).toHaveAttribute('data-favorite', 'false');
+  await expect(tarjetas.nth(3)).toHaveAttribute('data-favorite', 'false');
 
   // Los números de cada tarjeta son los del motor.
   for (const [id, { character, ficha }] of porId) {
@@ -62,5 +63,5 @@ test('el dashboard lista los personajes en el orden de los ajustes, marca el fav
   await expect(page.locator('[data-empty="no-match"]')).toBeVisible();
   await expect(page.locator('[data-empty="empty"]')).toHaveCount(0);
   await page.getByRole('button', { name: 'Limpiar búsqueda' }).first().click();
-  await expect(tarjetas).toHaveCount(3);
+  await expect(tarjetas).toHaveCount(4);
 });
