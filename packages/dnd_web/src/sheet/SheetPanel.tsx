@@ -15,6 +15,7 @@ import { useTexts } from '../i18n/context';
 import { characterHref, FLUTTER_HOME, rosterHref, SHEET_TABS, type SheetTab } from '../router';
 import type { Texts } from '../i18n/texts';
 import { Medallion } from '../ui/Medallion';
+import { PrintSheet, usePrintSheet } from './PrintSheet';
 import { ownPortrait } from '../ui/portrait';
 import { NavGroup, NavItem, SidebarBack, ThemeMenu, VersionLabel } from '../ui/Shell';
 import { accentFor, classesOf, type SheetModel } from './model';
@@ -30,9 +31,9 @@ export const TAB_ICONS: Record<SheetTab, LucideIcon> = {
 /**
  * El panel de una pantalla de adentro (`SidebarBackButton` + navegación de la
  * ficha): «volver», la tarjeta del personaje, las secciones y las acciones.
- * Las cinco secciones son pestañas de `/v2`; las cuatro acciones (retrato,
- * subir de nivel, compartir, imprimir) escriben o generan algo y todavía viven
- * en Flutter, así que enlazan allá.
+ * Las cinco secciones son pestañas de `/v2`. Imprimir es de acá (`PrintSheet`);
+ * las otras tres acciones (retrato, subir de nivel, compartir) escriben o
+ * generan algo y todavía viven en Flutter, así que enlazan allá.
  */
 export function SheetPanel({ model, tab }: { model: SheetModel; tab: SheetTab }) {
   const t = useTexts();
@@ -41,6 +42,7 @@ export function SheetPanel({ model, tab }: { model: SheetModel; tab: SheetTab })
     .map((c) => t.classLevel(c.name, c.level))
     .join(' / ');
   const id = character.id;
+  const printing = usePrintSheet();
 
   return (
     <>
@@ -80,9 +82,10 @@ export function SheetPanel({ model, tab }: { model: SheetModel; tab: SheetTab })
           <NavItem href={FLUTTER_HOME} icon={Share2} label={t.actionShare} external />
         </li>
         <li>
-          <NavItem href={FLUTTER_HOME} icon={Printer} label={t.actionPrint} external />
+          <NavItem onSelect={printing.print} icon={Printer} label={t.actionPrint} />
         </li>
       </NavGroup>
+      {printing.printing && <PrintSheet model={model} onDone={printing.done} />}
     </>
   );
 }

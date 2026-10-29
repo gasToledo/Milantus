@@ -138,9 +138,20 @@ repiten acá.
   el mismo contrato que Flutter, y lo repartido lo nombra el motor). **Diario**:
   el trasfondo con el Markdown chico de Flutter y las entradas, que se abren en
   un diálogo. Nada se gasta, equipa ni edita. El panel es el de una pantalla de
-  adentro: «volver», la tarjeta del personaje, las cinco pestañas, y Retrato,
-  Subir nivel, Compartir e Imprimir, que enlazan a Flutter; al pie, «Solo
-  lectura», el tema y la versión. La API no tiene `GET` por id, así que usa la
+  adentro: «volver», la tarjeta del personaje, las cinco pestañas, Retrato,
+  Subir nivel y Compartir, que enlazan a Flutter, e **Imprimir**; al pie, «Solo
+  lectura», el tema y la versión. **Imprimir** (`PrintSheet`, el
+  `print_sheet.dart` de Flutter) monta una hoja propia al pie de `body` y abre
+  el diálogo del navegador (que ofrece también «Guardar como PDF»); la hoja de
+  estilos de impresión (`index.css`) la deja sola en papel y en pantalla no se
+  ve nunca. Es la misma hoja de Flutter, en blanco y negro (`--print-*`) y para
+  jugar con lápiz: lo que cambia en la mesa (PG actuales y temporales, usos,
+  monedas, carga) sale en blanco con el máximo al lado y casillas, y conjuros y
+  rasgos van sin su texto. Tres hojas: cifras, características y salvaciones,
+  habilidades, ataques, competencias e idiomas, estado y notas; recursos,
+  rasgos e inventario; y conjuros (espacios y las listas de la pestaña Combate)
+  si lanza alguno. Todo número es de `computeSheet` y la mochila de
+  `inventoryOf`. La API no tiene `GET` por id, así que usa la
   lista de `/api/characters` (la misma consulta en caché que el dashboard) y
   busca, como Flutter; lo ajeno y lo inexistente son lo mismo. El personaje se
   migra con el motor (`migrateCharacter`) antes de leerlo y calcularlo.
@@ -387,16 +398,13 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
 
 1. Ficha de personaje, solo lectura *(existe)*.
 2. Lista de personajes y navegación entre pantallas *(existe)*.
-3. Lo de lectura más simple: ajustes de visualización *(existe)*,
-   campañas del jugador en modo lectura *(existen; el cuaderno es del DM)*,
-   bestiario *(existe)* y catálogos *(el Códice existe)*.
-   **Lectura del Modo DM** (se sumó a este paso): Mesa, Capítulos, Cuaderno,
-   Bestiario, Biblioteca de PNJ, PNJ de la mesa, Homebrew y Combate *(existen)*.
-   La ficha completa de un miembro y la de un PNJ con ficha, y la música (solo
-   escuchar), los retratos con su visor y las menciones `@Nombre` del Cuaderno
-   como enlaces *(existen)*.
-   **Faltan para cerrar el paso**, todas de lectura:
-   - imprimir la ficha (`print_sheet.dart`).
+3. Todo lo de lectura *(existe)*: ajustes de visualización, campañas del
+   jugador en modo lectura (el cuaderno es del DM), bestiario y catálogos (el
+   Códice). **Lectura del Modo DM** (se sumó a este paso): Mesa, Capítulos,
+   Cuaderno, Bestiario, Biblioteca de PNJ, PNJ de la mesa, Homebrew y Combate;
+   la ficha completa de un miembro y la de un PNJ con ficha; la música (solo
+   escuchar); los retratos con su visor; las menciones `@Nombre` del Cuaderno
+   como enlaces, e imprimir la ficha.
 4. Escrituras de bajo riesgo: PG y usos de recursos en la ficha, descansos.
 5. Edición completa: creador de personajes, subida de nivel, inventario.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
@@ -426,7 +434,9 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    orden de los ajustes, el favorito y el buscador); que las pestañas de la
    ficha sean rutas propias con historial; que el ataque del arma homebrew
    aparezca (y que sin la fusión no estaría); que un lanzador liste sus
-   trucos y conjuros, con los siempre preparados en su grupo; que el
+   trucos y conjuros, con los siempre preparados en su grupo; que imprimir arme
+   la hoja con los números del motor, que solo se vea en papel y se vaya al
+   cerrar el diálogo; que el
    inventario, la campaña y el diario muestren lo que resuelve el motor y lo
    que manda la API (con una mesa sembrada: otra cuenta como DM, un capítulo
    cerrado y una batalla); que el Códice cuente y abra el homebrew de la
@@ -517,8 +527,6 @@ propio.
 
 Para que nadie lo dé por hecho:
 
-- Las lecturas que faltan del paso 3 (la lista está en «Orden previsto de
-  pantallas»): imprimir.
 - Cualquier escritura desde React: todo el cliente hoy es solo lectura, así que
   los pasos 4 a 7 están enteros por hacer. Entre ellos, reordenar, marcar
   favorito, crear, renombrar o borrar personajes, y escribir en `/api/settings`

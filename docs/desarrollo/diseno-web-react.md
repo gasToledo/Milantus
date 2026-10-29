@@ -56,7 +56,7 @@ una regla: reciben el número ya resuelto por `computeSheet`.
 | Componente | Qué hace | Cuándo |
 | --- | --- | --- |
 | `Shell` | El marco: panel de 236 px fijo desde 900 px, barra con cajón debajo; el contenido ocupa todo el ancho (sin máximo). `panel` y `footer` son de cada pantalla | Toda pantalla. Sin `panel` ni `footer`, solo la marca (sin sesión, no disponible) |
-| `NavGroup`, `NavItem` | Grupo con nombre (`nav`) e ítem del panel: ícono, rótulo, activo en oro sobre `goldSoft` con `aria-current` | `internal` navega sin recargar; `external` avisa al lector que abre Flutter y muestra el ícono de enlace externo; `count` lleva la cifra tabular a la derecha (oro si está activo) y `muted` atenúa la categoría sin coincidencias en el Códice |
+| `NavGroup`, `NavItem` | Grupo con nombre (`nav`) e ítem del panel: ícono, rótulo, activo en oro sobre `goldSoft` con `aria-current` | `internal` navega sin recargar; `external` avisa al lector que abre Flutter y muestra el ícono de enlace externo; `count` lleva la cifra tabular a la derecha (oro si está activo), `muted` atenúa la categoría sin coincidencias en el Códice y `onSelect` en vez de `href` lo vuelve un botón para una acción de la pantalla (Imprimir) |
 | `SidebarBack` | El «volver» de una pantalla de adentro, con la forma del interruptor de modo | Ficha |
 | `ModeSwitch` | «Jugador / DM»: el modo actual es un `span` con `aria-current` y el otro un enlace interno (`mode`, `playerHref`, `dmHref`) | Panel de cada modo |
 | `NavCollapsible` (`ui/disclosure.tsx`) | Grupo del panel que se pliega: el rótulo es el botón | Campañas terminadas del Modo DM |

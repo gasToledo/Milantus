@@ -140,9 +140,11 @@ function SidebarBrand() {
  * Un ítem del panel (`appNavItem`): ícono, rótulo y, si hace falta, una cifra
  * al final. Activo: oro sobre `goldSoft` y `aria-current="page"`. Con
  * `internal` navega dentro de `/v2`; sin él es un enlace común (a Flutter).
+ * Con `onSelect` en vez de `href` es una acción de esta pantalla (imprimir):
+ * un botón, porque no lleva a ningún lado.
  */
 export function NavItem({
-  href,
+  href = '',
   icon: Icon,
   label,
   active = false,
@@ -150,8 +152,9 @@ export function NavItem({
   external = false,
   count,
   muted = false,
+  onSelect,
 }: {
-  href: string;
+  href?: string;
   icon: LucideIcon;
   label: string;
   active?: boolean;
@@ -161,6 +164,7 @@ export function NavItem({
   count?: number;
   /** Atenuado: una categoría sin coincidencias mientras se busca. */
   muted?: boolean;
+  onSelect?: () => void;
   /** Lleva a Flutter: se marca para que no sorprenda el cambio de cliente. */
   external?: boolean;
 }) {
@@ -185,6 +189,13 @@ export function NavItem({
       )}
     </>
   );
+  if (onSelect) {
+    return (
+      <button type="button" onClick={onSelect} className={cx(className, 'w-full text-left')}>
+        {body}
+      </button>
+    );
+  }
   return internal ? (
     <Link href={href} aria-current={active ? 'page' : undefined} className={className}>
       {body}

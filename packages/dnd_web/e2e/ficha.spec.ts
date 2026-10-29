@@ -127,6 +127,42 @@ test('la ficha de un lanzador lista sus trucos y conjuros, con la CD del motor',
   }
 });
 
+test('imprimir arma la hoja con los números del motor, que solo se ve en papel y se va al cerrar el diálogo', async ({
+  page,
+  request,
+}) => {
+  const personaje = (await personajes(request)).find((c) => c.id === ELSBETH)! as PersonajeApi & { cantripIds: string[] };
+  const catalog = catalogo();
+  const ficha = computeSheet(personaje, catalog);
+  // El diálogo del navegador no se abre en la prueba: se cuenta la llamada.
+  await page.addInitScript(() => {
+    const w = window as unknown as { impresiones: number };
+    w.impresiones = 0;
+    window.print = () => void w.impresiones++;
+  });
+
+  await page.goto(`/v2/personajes/${ELSBETH}/personaje`);
+  await page.getByRole('button', { name: 'Imprimir ficha' }).click();
+  expect(await page.evaluate(() => (window as unknown as { impresiones: number }).impresiones)).toBe(1);
+  const hoja = page.locator('.print-sheet');
+  // En pantalla no se ve; en papel se ve ella sola.
+  await expect(hoja).toBeHidden();
+  await page.emulateMedia({ media: 'print' });
+  await expect(hoja).toBeVisible();
+  await expect(page.locator('#root')).toBeHidden();
+  await expect(hoja.getByRole('heading', { level: 1 })).toHaveText(personaje.name);
+  // Los PG actuales van en blanco, con el máximo del motor al lado.
+  await expect(hoja.locator('[data-stat="hp"] b')).toHaveText(`/ ${ficha.maxHp}`);
+  await expect(hoja.locator('[data-stat="ac"] b')).toHaveText(String(ficha.armorClass));
+  await expect(hoja.locator('[data-stat="passive"] b')).toHaveText(String(ficha.passivePerception));
+  for (const id of personaje.cantripIds) {
+    await expect(hoja).toContainText(catalog.spells.find((s) => s.id === id)!.name as string);
+  }
+
+  await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
+  await expect(hoja).toHaveCount(0);
+});
+
 test('el inventario muestra la mochila que resuelve el motor, con la carga de la ficha', async ({
   page,
   request,

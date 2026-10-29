@@ -39,6 +39,14 @@
   /* La única sombra del sistema: el hover de la tarjeta de personaje
      (`diseno-web.md` §3.4 y Apéndice B, `cardHover`). */
   --shadow-card-hover: 0 10px 26px #00000046;
+  /* La hoja impresa (`PrintSheet`): blanco y negro a propósito, igual con el
+     tema claro o el oscuro. Casi nadie imprime en color, y la paleta pensada
+     para pantalla sale gris sobre gris en una láser. */
+  --print-paper: #ffffff;
+  --print-ink: #000000;
+  --print-muted: #555555;
+  --print-line: #888888;
+  --print-rule: #cccccc;
 
   color-scheme: dark;
 }
@@ -272,5 +280,189 @@ body {
   .roster-card:hover,
   .roster-card:focus-within {
     transform: none;
+  }
+}
+
+/* ── La hoja impresa ───────────────────────────────────────────────────────
+   `PrintSheet` la monta al pie de `body` solo mientras se imprime. En papel
+   se ve ella sola; en pantalla, nunca. Es la `_printCss` de Flutter. */
+.print-sheet {
+  display: none;
+}
+@media print {
+  @page {
+    margin: 20mm 14mm;
+    @bottom-left {
+      font: 8pt system-ui, sans-serif;
+      color: var(--print-muted);
+    }
+    @bottom-right {
+      font: 8pt system-ui, sans-serif;
+      color: var(--print-muted);
+    }
+  }
+  html,
+  body {
+    background: var(--print-paper) !important;
+  }
+  body > :not(.print-sheet) {
+    display: none !important;
+  }
+  .print-sheet {
+    display: block;
+    font: 10pt/1.35 system-ui, sans-serif;
+    color: var(--print-ink);
+  }
+  .print-sheet h1,
+  .print-sheet h2,
+  .print-sheet h3 {
+    font-family: var(--font-display);
+    font-weight: normal;
+    margin: 0;
+  }
+  .print-sheet h1 {
+    font-size: 20pt;
+  }
+  .print-sheet h2 {
+    font-size: 12pt;
+    border-bottom: 1px solid var(--print-ink);
+    margin: 9px 0 3px;
+  }
+  .print-sheet h3 {
+    font-size: 10.5pt;
+    margin: 10px 0 3px;
+  }
+  .print-sheet header p {
+    margin: 2px 0 8px;
+  }
+  .print-sheet p {
+    margin: 3px 0;
+  }
+  .print-sheet table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  .print-sheet td,
+  .print-sheet th {
+    padding: 2px 4px;
+    text-align: left;
+    vertical-align: top;
+  }
+  .print-sheet th {
+    font-size: 8pt;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .print-sheet tr {
+    break-inside: avoid;
+  }
+  .print-sheet table.wide tbody tr + tr td,
+  .print-sheet table.wide thead + tbody tr:first-child td {
+    border-top: 1px solid var(--print-rule);
+  }
+  .print-sheet .num {
+    /* La `.num` de pantalla va en negrita; en papel, el peso del texto. */
+    font-weight: normal;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .print-sheet .muted {
+    font-size: 8pt;
+    color: var(--print-muted);
+  }
+  .print-sheet .abilities td {
+    vertical-align: middle;
+  }
+  .print-sheet .mod {
+    font: 15pt var(--font-display);
+  }
+  /* Columnas fijas para que las cajas no queden de anchos distintos; los PG
+     ocupan dos porque son lo que más se reescribe. */
+  .print-sheet .stats {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .print-sheet .stat {
+    border: 1px solid var(--print-ink);
+    border-radius: 6px;
+    padding: 4px 5px;
+    text-align: center;
+  }
+  .print-sheet .stat.wide {
+    grid-column: span 2;
+  }
+  .print-sheet .stat span,
+  .print-sheet .stat small {
+    display: block;
+    font-size: 8pt;
+    line-height: 1.2;
+  }
+  .print-sheet .stat b {
+    display: block;
+    font: 15pt var(--font-display);
+  }
+  .print-sheet .stat .blank {
+    width: 13mm;
+  }
+  .print-sheet .stat.wide .blank {
+    width: 24mm;
+  }
+  .print-sheet .cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 16px;
+  }
+  .print-sheet .marks {
+    white-space: nowrap;
+  }
+  .print-sheet .box,
+  .print-sheet .dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--print-ink);
+    margin-right: 3px;
+    vertical-align: -1px;
+  }
+  .print-sheet .dot {
+    border-radius: 50%;
+  }
+  /* 20 mm: lo justo para un número tachado y el nuevo al lado. */
+  .print-sheet .blank {
+    display: inline-block;
+    width: 20mm;
+    border-bottom: 1px solid var(--print-ink);
+    height: 1em;
+  }
+  .print-sheet tr.empty td {
+    height: 15pt;
+  }
+  .print-sheet .lines i {
+    display: block;
+    height: 16pt;
+    border-bottom: 1px solid var(--print-line);
+  }
+  .print-sheet .coins {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+  }
+  .print-sheet .list {
+    columns: 2;
+    margin: 0;
+    padding-left: 16px;
+    list-style: disc;
+  }
+  .print-sheet .page {
+    break-before: page;
+  }
+  .print-sheet .spells td.name {
+    font-weight: 600;
+  }
+  .print-sheet .spells td.check {
+    width: 14px;
+    padding-right: 0;
   }
 }
