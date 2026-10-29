@@ -186,11 +186,33 @@ export function Switch({
 // ── ScrollArea ─────────────────────────────────────────────────────────────
 
 /** Zona con scroll propio y barra fina del sistema (la del navegador, en
- *  tema oscuro, es un bloque gris que rompe el panel). */
-export function ScrollArea({ children, className }: { children: ReactNode; className?: string }) {
+ *  tema oscuro, es un bloque gris que rompe el panel).
+ *
+ *  Sin alto fijo del contenedor (un trasfondo que crece hasta un tope), el
+ *  tope va en [viewportClassName]: es el viewport el que scrollea. Con [label]
+ *  la zona se puede enfocar con el teclado para scrollearla, y tiene nombre. */
+export function ScrollArea({
+  children,
+  className,
+  viewportClassName,
+  label,
+  type = 'hover',
+}: {
+  children: ReactNode;
+  className?: string;
+  viewportClassName?: string;
+  label?: string;
+  /** `auto`: la barra se ve siempre que haya algo más que leer. */
+  type?: 'hover' | 'auto';
+}) {
   return (
-    <ScrollAreaPrimitive.Root type="hover" className={cx('min-h-0 overflow-hidden', className)}>
-      <ScrollAreaPrimitive.Viewport className="h-full w-full [&>div]:!block">{children}</ScrollAreaPrimitive.Viewport>
+    <ScrollAreaPrimitive.Root type={type} className={cx('min-h-0 overflow-hidden', className)}>
+      <ScrollAreaPrimitive.Viewport
+        className={cx('h-full w-full [&>div]:!block', viewportClassName, label && 'focus-visible:outline-2 focus-visible:outline-gold')}
+        {...(label ? { tabIndex: 0, role: 'region', 'aria-label': label } : {})}
+      >
+        {children}
+      </ScrollAreaPrimitive.Viewport>
       <ScrollAreaPrimitive.Scrollbar orientation="vertical" className="flex w-1.5 touch-none p-px select-none">
         <ScrollAreaPrimitive.Thumb className="relative flex-1 rounded-full bg-hairline" />
       </ScrollAreaPrimitive.Scrollbar>

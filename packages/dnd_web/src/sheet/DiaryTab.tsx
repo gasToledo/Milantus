@@ -5,6 +5,7 @@ import { useLang, useTexts } from '../i18n/context';
 import { AppDialog } from '../ui/AppDialog';
 import { Card } from '../ui/Card';
 import { MarkdownText } from '../ui/MarkdownText';
+import { ScrollArea } from '../ui/primitives';
 import { portraitUrl } from '../ui/portrait';
 import { AppEmptyState } from '../ui/status';
 import type { SheetModel } from './model';
@@ -190,19 +191,17 @@ function EntryBody({ entry }: { entry: DiaryEntry }) {
  * empuja todo lo demás fuera de la pantalla: scrollea adentro de su tarjeta.
  * Lo comparten la ficha (Diario) y la ficha del PNJ.
  *
- * La caja es enfocable y lleva nombre: quien usa el teclado tiene que poder
- * llegar a ella para scrollearla.
+ * La zona que scrollea ocupa toda la tarjeta, así la barra va contra su borde
+ * y no flota al lado del texto; la medida de lectura es del texto, adentro. Es
+ * el `ScrollArea` del sistema (la barra del navegador es un bloque gris en el
+ * tema oscuro), enfocable y con nombre para quien usa el teclado.
  */
 export function BackgroundText({ text, label }: { text: string; label: string }) {
   return (
-    <div
-      tabIndex={0}
-      role="region"
-      aria-label={label}
-      className="max-h-[min(420px,60vh)] max-w-[620px] overflow-y-auto pr-2 focus-visible:outline-2 focus-visible:outline-gold"
-      data-field="background"
-    >
-      <MarkdownText text={text} className="text-[15px] leading-[1.65] text-on-surface" />
-    </div>
+    <ScrollArea type="auto" label={label} viewportClassName="max-h-[min(420px,60vh)]">
+      <div className="max-w-[620px] pr-3" data-field="background">
+        <MarkdownText text={text} className="text-[15px] leading-[1.65] text-on-surface" />
+      </div>
+    </ScrollArea>
   );
 }
