@@ -1,4 +1,4 @@
-import type { Catalog, CharacterJson, ComputedSheet } from './types';
+import type { Catalog, CharacterJson, ComputedSheet, InventoryLine, JsonObject } from './types';
 // Lo genera `npm run build:engine` (o la etapa `engine-js` del Dockerfile) y
 // no se versiona. Es un script de dart2js, no un módulo: al cargarse deja
 // `globalThis.dndEngine`, y de ahí lo toma este archivo.
@@ -12,6 +12,8 @@ interface DartEngine {
   setLanguage(code: string): void;
   applyTranslation(packJson: string, overlayJson: string): string;
   vocabularyLabel(field: string, value: string): string;
+  inventory(characterJson: string, catalogJson: string): string;
+  chapterGrants(chapterJson: string): string;
 }
 
 function engine(): DartEngine {
@@ -78,4 +80,21 @@ export type VocabularyField = 'school' | 'castingTime' | 'duration' | 'range' | 
  *  (homebrew con texto propio) vuelve tal cual. */
 export function vocabularyLabel(field: VocabularyField, value: string): string {
   return engine().vocabularyLabel(field, value);
+}
+
+/**
+ * La mochila con cada entrada resuelta por el motor (`InventoryOps`): nombre,
+ * peso por unidad, si cuenta como equipada, si es mágica, sus cargas. Así
+ * ninguna de esas decisiones se repite en TypeScript.
+ */
+export function inventoryOf(character: CharacterJson, catalog: Catalog): InventoryLine[] {
+  return JSON.parse(
+    engine().inventory(JSON.stringify(character), catalogJson(catalog)),
+  ) as InventoryLine[];
+}
+
+/** Lo que repartió un capítulo, en una línea y en el idioma del motor, o
+ *  vacío (`Chapter.grantsLabel`). */
+export function chapterGrants(chapter: JsonObject): string {
+  return engine().chapterGrants(JSON.stringify(chapter));
 }

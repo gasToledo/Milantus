@@ -12,10 +12,14 @@ export function Eyebrow({ children, className }: { children: ReactNode; classNam
 }
 
 /**
- * Placa de la **banda táctica**: ícono y rótulo arriba, cifra grande en sans
- * negrita con cifras tabulares (se compara con la de al lado), todo a la
- * izquierda. `suffix` es la unidad atenuada («pies»), `footer` lo que va debajo
- * (la barra de PG). Es un par `dt`/`dd`: va adentro de un `<dl>`.
+ * Placa de la **banda táctica**: ícono y rótulo arriba, la cifra grande en
+ * sans negrita con cifras tabulares (se compara con la de al lado), y todo
+ * **centrado**. A la izquierda, como `StatTile` de Flutter, una placa ancha con
+ * «−1» quedaba casi vacía (se ajustó en el lienzo de diseño). `suffix` es la
+ * unidad atenuada («pies», «/ 24»), en la misma línea y sobre la misma base
+ * que la cifra; `footer` va abajo a todo el ancho (la barra de PG) y
+ * `caption`, debajo de él (el porcentaje). Es un par `dt`/`dd`: va adentro de
+ * un `<dl>`, que arma la grilla (`.tactical-band` en `index.css`).
  */
 export function StatTile({
   id,
@@ -24,7 +28,7 @@ export function StatTile({
   value,
   suffix,
   valueClassName = 'text-on-surface',
-  labelTrailing,
+  caption,
   footer,
 }: {
   id: string;
@@ -33,25 +37,26 @@ export function StatTile({
   value: ReactNode;
   suffix?: ReactNode;
   valueClassName?: string;
-  /** Un dato chico a la derecha del rótulo (el porcentaje de PG). */
-  labelTrailing?: ReactNode;
+  caption?: ReactNode;
   footer?: ReactNode;
 }) {
   return (
-    <div className="plaque flex min-w-0 flex-col px-3.5 py-3" data-stat={id}>
-      <dt className="flex items-center gap-1.5 text-[11px] tracking-[1.1px] text-text-muted uppercase">
+    <div className="plaque flex min-h-[96px] min-w-0 flex-col items-center px-4 py-3.5 text-center" data-stat={id}>
+      <dt className="flex max-w-full items-center justify-center gap-1.5 text-[11px] tracking-[1.1px] text-text-muted uppercase">
         {Icon && <Icon size={14} aria-hidden="true" className="shrink-0 text-gold" />}
-        <span className="min-w-0 flex-1 truncate">{label}</span>
-        {labelTrailing && <span className="shrink-0 tracking-normal normal-case tabular-nums">{labelTrailing}</span>}
+        <span className="truncate">{label}</span>
       </dt>
-      <dd className="mt-1.5 flex min-w-0 flex-col">
-        <span className="flex items-baseline gap-1">
-          <span className={cx('num text-[28px] leading-[1.05]', valueClassName)} data-field="value">
-            {value}
+      <dd className="flex w-full min-w-0 flex-1 flex-col">
+        <span className="flex flex-1 items-center justify-center pt-2">
+          <span className="leading-none whitespace-nowrap">
+            <span className={cx('num text-[30px]', valueClassName)} data-field="value">
+              {value}
+            </span>
+            {suffix && <span className="text-[14px] text-text-muted"> {suffix}</span>}
           </span>
-          {suffix && <span className="text-[13px] text-on-surface-variant">{suffix}</span>}
         </span>
-        {footer && <div className="mt-2">{footer}</div>}
+        {footer && <div className="w-full pt-2.5">{footer}</div>}
+        {caption && <span className="mt-1 text-[11px] text-text-muted tabular-nums">{caption}</span>}
       </dd>
     </div>
   );

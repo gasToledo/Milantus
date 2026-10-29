@@ -48,7 +48,7 @@ Un solo servidor, un solo origen, dos clientes:
   `dart compile js` sobre `packages/dnd_engine/js/entrypoint.dart`. **No se
   versiona.** `src/engine/index.ts` es la única puerta (`computeSheet`,
   `migrateCharacter`, `setEngineLanguage`, `applyTranslation`,
-  `vocabularyLabel`); la
+  `vocabularyLabel`, `inventoryOf`, `chapterGrants`); la
   comunicación es JSON como texto de ida y vuelta. Los tipos de
   `src/engine/types.ts` están escritos a mano: los cuida la paridad (abajo).
 
@@ -117,24 +117,31 @@ repiten acá.
   con barra de PG en verde/oro/carmesí y CA/VEL/INIC en placas. El panel
   lateral es el menú principal (`src/dashboard/RosterPanel.tsx`), con el
   interruptor «Jugador / DM»: «DM» lleva al Modo DM de Flutter.
-- **La ficha de solo lectura** en `/v2/personajes/:id/personaje` y
-  `/v2/personajes/:id/combate` (`src/sheet/`); la ruta sin sufijo redirige a
-  `personaje` y una pestaña desconocida es «Página no encontrada». Cabecera
-  con nombre, especie y trasfondo, pills de nivel y de cada clase con su
-  subclase, y una banda táctica de cinco placas (Armadura, Puntos de golpe con
-  barra y porcentaje, Iniciativa, Velocidad, Competencia: la percepción pasiva
-  va con las habilidades). **Personaje**: identidad, características,
-  habilidades y rasgos y dotes. **Combate**: PG y dados de golpe, defensa,
-  ataques, conjuros (CD, ataque, aptitud, preparados y trucos, espacios que
-  quedan, reacciones, y la lista: trucos, siempre preparados, preparados o
-  conocidos y los de rasgos, cada uno desplegable con su ficha), salvaciones, condiciones y recursos. Nada se gasta ni
-  se edita. El panel es el de una pantalla de adentro: «volver», la tarjeta del
-  personaje, las dos pestañas, y Inventario, Campaña, Diario, Retrato, Subir
-  nivel, Compartir e Imprimir, que enlazan a Flutter; al pie, «Solo lectura»,
-  el tema y la versión. La API no tiene `GET` por id, así que usa la lista de
-  `/api/characters` (la misma consulta en caché que el dashboard) y busca, como
-  Flutter; lo ajeno y lo inexistente son lo mismo. El personaje se migra con
-  el motor (`migrateCharacter`) antes de leerlo y calcularlo.
+- **La ficha de solo lectura**, con cinco pestañas que son rutas:
+  `/v2/personajes/:id/personaje`, `/combate`, `/inventario`, `/campana` y
+  `/diario` (`src/sheet/`); la ruta sin sufijo redirige a `personaje` y una
+  pestaña desconocida es «Página no encontrada». Cabecera con nombre, especie y
+  trasfondo, pills de nivel y de cada clase con su subclase, y una banda
+  táctica de cinco placas centradas (Armadura, Puntos de golpe con barra y
+  porcentaje, Iniciativa, Velocidad, Competencia: la percepción pasiva va con
+  las habilidades). **Personaje**: identidad, características, habilidades y
+  rasgos y dotes. **Combate**: PG y dados de golpe, defensa, ataques, conjuros
+  (CD, ataque, aptitud, preparados y trucos, espacios que quedan, reacciones,
+  y la lista: trucos, siempre preparados, preparados o conocidos y los de
+  rasgos, cada uno desplegable con su ficha), salvaciones, condiciones y
+  recursos. **Inventario**: monedas, carga y sintonización, y la mochila
+  agrupada por familia con buscador y filtro; cada entrada la resuelve el
+  motor (`inventoryOf`). **Campaña**: cada mesa con sus batallas y los
+  capítulos cerrados con lo que repartieron (`GET /api/characters/:id/campaigns`,
+  el mismo contrato que Flutter, y lo repartido lo nombra el motor). **Diario**:
+  el trasfondo con el Markdown chico de Flutter y las entradas, que se abren en
+  un diálogo. Nada se gasta, equipa ni edita. El panel es el de una pantalla de
+  adentro: «volver», la tarjeta del personaje, las cinco pestañas, y Retrato,
+  Subir nivel, Compartir e Imprimir, que enlazan a Flutter; al pie, «Solo
+  lectura», el tema y la versión. La API no tiene `GET` por id, así que usa la
+  lista de `/api/characters` (la misma consulta en caché que el dashboard) y
+  busca, como Flutter; lo ajeno y lo inexistente son lo mismo. El personaje se
+  migra con el motor (`migrateCharacter`) antes de leerlo y calcularlo.
 - **Homebrew**: la ficha y el dashboard calculan con el catálogo oficial más
   el contenido homebrew de la cuenta (`GET /api/homebrew`, fusionado por id en
   `src/api/homebrew.ts`), como `HomebrewStore` + `ContentRepository.addAll` en
@@ -184,7 +191,10 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    orden de los ajustes, el favorito y el buscador); que las pestañas de la
    ficha sean rutas propias con historial; que el ataque del arma homebrew
    aparezca (y que sin la fusión no estaría); que un lanzador liste sus
-   trucos y conjuros, con los siempre preparados en su grupo; y que una cuenta sin `webV2` vea
+   trucos y conjuros, con los siempre preparados en su grupo; que el
+   inventario, la campaña y el diario muestren lo que resuelve el motor y lo
+   que manda la API (con una mesa sembrada: otra cuenta como DM, un capítulo
+   cerrado y una batalla); y que una cuenta sin `webV2` vea
    «No disponible» sin pedir sus datos (`e2e/acceso.spec.ts`). Lo esperado se
    calcula con el mismo motor y la misma fusión (`e2e/helpers.ts`). Sin
    reintentos: no hay «a veces anda».

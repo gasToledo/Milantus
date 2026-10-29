@@ -1,6 +1,6 @@
 // Mismo origen y rutas relativas a `/api`, como `api_client.dart`: la cookie
 // `httpOnly` viaja sola y no hay `baseUrl`.
-import type { CharacterJson } from '../engine';
+import type { CharacterJson, JsonObject } from '../engine';
 
 /** Lo que `GET /api/me` devuelve. `webV2` lo decide el servidor por cuenta. */
 export interface Account {
@@ -101,4 +101,39 @@ export async function fetchThemeMode(signal: AbortSignal): Promise<string> {
   } catch {
     return 'dark';
   }
+}
+
+/** Lo que `GET /api/characters/:id/campaigns` devuelve por cada campaña en la
+ *  que está el personaje. El servidor ya podó lo que el jugador no ve: sin id
+ *  de campaña, solo capítulos cerrados y sin su descripción, y las batallas
+ *  con la vista del jugador (`EncounterLog.playerView`). */
+export interface PlayerCampaign {
+  memberId: string;
+  campaign: { name?: string; premise?: string; state?: string };
+  /** Los otros personajes de la mesa, sin este. */
+  party?: string[];
+  /** Capítulos cerrados, en el orden de la campaña. */
+  chapters?: (JsonObject & { id: string; name?: string })[];
+  /** Combates cerrados, del más nuevo al más viejo. */
+  battles?: PlayerBattle[];
+}
+
+export interface PlayerBattle {
+  id?: string;
+  chapterId?: string | null;
+  rounds?: number;
+  players?: string[];
+  /** Solo enemigos, agrupados por nombre visible; un PNJ sin criatura de base
+   *  llega con el nombre vacío. */
+  monsters?: { name?: string; count?: number; defeated?: number; creatureId?: string | null }[];
+}
+
+/** Las campañas del personaje [characterId] de esta cuenta. Cuelga de
+ *  `/api/characters` porque es el jugador quien pregunta por su ficha. */
+export async function fetchPlayerCampaigns(characterId: string, signal: AbortSignal): Promise<PlayerCampaign[]> {
+  const { campaigns } = await getJson<{ campaigns: PlayerCampaign[] }>(
+    `/api/characters/${encodeURIComponent(characterId)}/campaigns`,
+    signal,
+  );
+  return campaigns;
 }

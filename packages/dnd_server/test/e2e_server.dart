@@ -55,6 +55,10 @@ const smokeFavoriteId = 'zelda-de-humo';
 /// El clérigo sembrado, con trucos y conjuros preparados.
 const smokeClericId = 'elsbeth-de-humo';
 
+/// La cuenta del DM de la mesa sembrada, y su campaña.
+const _smokeDmId = 'dm-de-humo';
+const _smokeCampaignId = 'marca-del-cuervo';
+
 /// Un arma homebrew de la cuenta, que Aldric lleva equipada: la ficha de /v2
 /// tiene que fusionar `/api/homebrew` con el catálogo oficial para que su
 /// ataque aparezca (`e2e/ficha.spec.ts`).
@@ -151,6 +155,45 @@ Future<void> main() async {
       cantripIds: const ['guidance', 'sacred-flame', 'light'],
       spellIds: const ['bless', 'cure-wounds', 'shield-of-faith'],
       combat: CombatState(currentHp: 18),
+      // Para las pestañas Inventario y Diario (`e2e/ficha.spec.ts`): un arma
+      // equipada, una armadura que no, un objeto mágico sintonizado con
+      // cargas, munición y equipo, para que haya varias familias.
+      coins: const {'gp': 37, 'sp': 12, 'cp': 40},
+      inventory: const [
+        InventoryEntry(entryId: 'e-maza', itemId: 'mace', equipped: true),
+        InventoryEntry(entryId: 'e-ballesta', itemId: 'light-crossbow'),
+        InventoryEntry(entryId: 'e-virotes', itemId: 'bolts', quantity: 20),
+        InventoryEntry(
+          entryId: 'e-cota',
+          itemId: 'scale-mail',
+          note: 'Se la quita para nadar.',
+        ),
+        InventoryEntry(entryId: 'e-kit', itemId: 'healers-kit'),
+        InventoryEntry(entryId: 'e-raciones', itemId: 'rations', quantity: 5),
+        InventoryEntry(
+          entryId: 'e-anillo',
+          itemId: 'anillo-de-evasion',
+          equipped: true,
+          attuned: true,
+          charges: 2,
+        ),
+      ],
+      background:
+          'Elsbeth creció copiando manuscritos en la biblioteca del templo.\n\n'
+          'Cree que la biblioteca **no se quemó por accidente**.',
+      diary: const [
+        DiaryEntry(
+          entryId: 'd-oraculo',
+          title: 'Lo que dijo el oráculo',
+          body: 'El cuervo no guarda caminos: los borra.',
+        ),
+        DiaryEntry(
+          entryId: 'd-mapa',
+          kind: DiaryEntryKind.link,
+          title: 'Mapa de la Marca',
+          body: 'https://example.org/marca',
+        ),
+      ],
     ),
   );
   final settings = InMemorySettingsRepository();
@@ -166,6 +209,53 @@ Future<void> main() async {
   campaigns
     ..playerChaptersFor = chapters.listFor
     ..playerBattlesFor = encounters.logsFor;
+
+  // Una mesa para la pestaña Campaña: el jugador comparte a Elsbeth, otra
+  // cuenta (el DM) la suma, cierra un capítulo que reparte oro y un objeto, y
+  // deja una batalla registrada en ese capítulo. Por los mismos repositorios
+  // que usan las rutas, así el vínculo existe como en producción.
+  final code = await campaigns.createShareCode(
+    ownerUserId: smokeUserId,
+    characterId: smokeClericId,
+  );
+  await campaigns.create(
+    _smokeDmId,
+    const Campaign(
+      id: _smokeCampaignId,
+      name: 'La Marca del Cuervo',
+      premise:
+          'Un cuervo de piedra aparece en cada pueblo que el invierno vacía.',
+    ),
+  );
+  await campaigns.redeemShareCode(
+    dmUserId: _smokeDmId,
+    campaignId: _smokeCampaignId,
+    code: code!,
+  );
+  await chapters.create(
+    _smokeDmId,
+    _smokeCampaignId,
+    const Chapter(
+      id: 'paso-de-varn',
+      name: 'El paso de Varn',
+      state: ChapterState.completed,
+      grantsGold: 25,
+      grantsItems: ['una poción de curación'],
+    ),
+  );
+  encounters.logs.add((
+    dmUserId: _smokeDmId,
+    campaignId: _smokeCampaignId,
+    document: {
+      ...const EncounterLog(
+        id: 'lobos',
+        rounds: 4,
+        players: ['Elsbeth de Humo', 'Thalion'],
+        monsters: [EncounterLogMonsters(name: 'Lobo', count: 3, defeated: 3)],
+      ).toJson(),
+      'chapterId': 'paso-de-varn',
+    },
+  ));
   final events = InMemoryEventRepository();
   final npcs = InMemoryNpcRepository(campaigns, characters);
   final homebrew = InMemoryHomebrewRepository();

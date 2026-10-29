@@ -2,14 +2,17 @@ import { useEffect, useMemo } from 'react';
 import { useAppVersion, useRoster, useSheetCatalog } from '../api/queries';
 import { computeSheet, migrateCharacter, type CharacterFields, type ComputedSheet } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
-import { characterHref, navigate, rosterHref, type SheetTab } from '../router';
+import { characterHref, navigate, rosterHref, SHEET_TABS, type SheetTab } from '../router';
 import { LinkTabs, TabPanel } from '../ui/disclosure';
 import { Shell, SidebarBack } from '../ui/Shell';
 import { AppBusyLabel, AppErrorView, Notice } from '../ui/status';
 import { CharacterTab } from './CharacterTab';
 import { CombatTab } from './CombatTab';
 import { SheetHeader } from './SheetHeader';
-import { SheetFooter, SheetPanel, TAB_ICONS } from './SheetPanel';
+import { CampaignTab } from './CampaignTab';
+import { DiaryTab } from './DiaryTab';
+import { InventoryTab } from './InventoryTab';
+import { SheetFooter, SheetPanel, TAB_ICONS, tabLabel } from './SheetPanel';
 import type { SheetModel } from './model';
 
 type Computed =
@@ -88,10 +91,12 @@ export function CharacterPage({ id, tab }: { id: string; tab: SheetTab | null })
           label={t.sheetTabsLabel}
           value={activeTab}
           listClassName="shell:hidden"
-          tabs={[
-            { value: 'personaje', label: t.tabCharacter, href: characterHref(id, 'personaje'), icon: TAB_ICONS.personaje },
-            { value: 'combate', label: t.tabCombat, href: characterHref(id, 'combate'), icon: TAB_ICONS.combate },
-          ]}
+          tabs={SHEET_TABS.map((tabId) => ({
+            value: tabId,
+            label: tabLabel(t, tabId),
+            href: characterHref(id, tabId),
+            icon: TAB_ICONS[tabId],
+          }))}
         >
           <TabPanel value={activeTab} className="pt-4 shell:pt-0">
             <TabBody tab={activeTab} model={m} />
@@ -112,5 +117,16 @@ export function CharacterPage({ id, tab }: { id: string; tab: SheetTab | null })
 }
 
 function TabBody({ tab, model }: { tab: SheetTab; model: SheetModel }) {
-  return tab === 'personaje' ? <CharacterTab model={model} /> : <CombatTab model={model} />;
+  switch (tab) {
+    case 'personaje':
+      return <CharacterTab model={model} />;
+    case 'combate':
+      return <CombatTab model={model} />;
+    case 'inventario':
+      return <InventoryTab model={model} />;
+    case 'campana':
+      return <CampaignTab model={model} />;
+    case 'diario':
+      return <DiaryTab model={model} />;
+  }
 }
