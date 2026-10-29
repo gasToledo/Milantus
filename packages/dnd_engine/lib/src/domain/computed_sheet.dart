@@ -7,6 +7,21 @@ import 'effects.dart';
 import 'skill.dart';
 import 'spell_slots.dart';
 
+/// `Map<Ability, int>` a JSON: claves por nombre y en el orden del enum, para
+/// que el resultado sea determinista sin depender de cómo se armó el mapa.
+Map<String, int> _abilityMapJson(Map<Ability, int> m) => {
+      for (final a in Ability.values)
+        if (m.containsKey(a)) a.name: m[a]!,
+    };
+
+/// `Map<int, int>` (nivel → cantidad) a JSON, con las claves ordenadas.
+Map<String, int> _levelMapJson(Map<int, int> m) => {
+      for (final k in (m.keys.toList()..sort())) '$k': m[k]!,
+    };
+
+/// Conjunto de cadenas a lista ordenada: un `Set` no tiene orden estable.
+List<String> _sortedJson(Iterable<String> values) => values.toList()..sort();
+
 /// Rasgo pasivo mostrado en la ficha.
 class PassiveTrait {
   final String name;
@@ -118,6 +133,19 @@ class CompanionOption {
   bool get scalesWithSpellLevel =>
       forms.isNotEmpty && forms.first.scalesWithSpellLevel;
 
+  /// Las fórmulas de las formas viajan sin evaluar, igual que acá: el cliente
+  /// las resuelve con los `CreatureVars` del momento.
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'source': source,
+        'forms': [for (final f in forms) f.toJson()],
+        'maxActive': maxActive,
+        if (spellId != null) 'spellId': spellId,
+        'minSpellLevel': minSpellLevel,
+        'scalesWithSpellLevel': scalesWithSpellLevel,
+      };
+
   /// La forma que usa una instancia ya invocada.
   ///
   /// Si el id no está entre las formas **y el compañero tiene una sola**, se
@@ -203,6 +231,7 @@ class InnateSpell {
         'source': source,
         'grantedSpellId': grantedSpellId,
         'replaceableFrom': replaceableFrom,
+        'freeUses': freeUses,
       };
 }
 
@@ -265,6 +294,18 @@ class ProficiencyChoiceSlot {
   }
 
   String get featName => name;
+
+  Map<String, dynamic> toJson() => {
+        'groupId': groupId,
+        'name': name,
+        'count': count,
+        'skills': skills,
+        'tools': tools,
+        'chosen': chosen,
+        'replaceable': replaceable,
+        'expertise': expertise,
+        'featId': featId,
+      };
 }
 
 class FeatureChoiceSlot {
@@ -324,6 +365,16 @@ class ItemChoiceSlot {
   });
 
   int get pending => (count - chosenItemIds.length).clamp(0, count);
+
+  Map<String, dynamic> toJson() => {
+        'groupId': groupId,
+        'name': name,
+        'count': count,
+        'maxActive': maxActive,
+        'replaceable': replaceable,
+        'optionItemIds': optionItemIds,
+        'chosenItemIds': chosenItemIds,
+      };
 }
 
 /// Elección resuelta de ejemplares de arma para una regla contextual.
@@ -510,6 +561,17 @@ class WildShapeSlot {
   });
 
   int get pending => (count - chosen.length).clamp(0, count);
+
+  Map<String, dynamic> toJson() => {
+        'count': count,
+        'options': [for (final c in options) c.toJson()],
+        'chosen': [for (final c in chosen) c.toJson()],
+        'canCast': canCast,
+        'tempHpOnEnter': tempHpOnEnter,
+        'armorClassFloor': armorClassFloor,
+        'damageTypeOptions': damageTypeOptions,
+        'savingThrowBonuses': _abilityMapJson(savingThrowBonuses),
+      };
 }
 
 /// Qué economía de acción consume un ataque.
@@ -535,6 +597,8 @@ class WeaponExtraDamage {
   final String type;
 
   const WeaponExtraDamage({required this.dice, required this.type});
+
+  Map<String, dynamic> toJson() => {'dice': dice, 'type': type};
 }
 
 class Attack {
@@ -688,14 +752,15 @@ class Attack {
         'damageType': damageType,
         'damageTypeOptions': damageTypeOptions,
         if (extraDamage.isNotEmpty)
-          'extraDamage': [
-            for (final e in extraDamage) {'dice': e.dice, 'type': e.type},
-          ],
+          'extraDamage': [for (final e in extraDamage) e.toJson()],
         'spellcastingFocus': spellcastingFocus,
         'attacksPerAction': attacksPerAction,
         'mastery': mastery,
         'offHand': offHand,
         'action': action.toJson(),
+        'critRange': critRange,
+        'modeBonuses': [for (final b in modeBonuses) b.toJson()],
+        if (range != null) 'range': [range!.$1, range!.$2],
       };
 }
 
@@ -786,6 +851,12 @@ class SpellcastingBlock {
     required this.classLevel,
     required this.spellcasting,
   });
+
+  Map<String, dynamic> toJson() => {
+        'classId': classId,
+        'classLevel': classLevel,
+        'spellcasting': spellcasting.toJson(),
+      };
 }
 
 /// Una fórmula alternativa de CA sin armadura concedida por una clase.
@@ -799,6 +870,12 @@ class ArmorClassFormula {
     required this.ability,
     required this.allowShield,
   });
+
+  Map<String, dynamic> toJson() => {
+        'classId': classId,
+        'ability': ability.name,
+        'allowShield': allowShield,
+      };
 }
 
 /// Un bonus a una característica junto con **de dónde salió**.
@@ -820,6 +897,9 @@ class AbilityBonus {
     required this.amount,
     required this.source,
   });
+
+  Map<String, dynamic> toJson() =>
+      {'ability': ability.name, 'amount': amount, 'source': source};
 }
 
 /// Un aporte a las pruebas de una habilidad que no es competencia ni Pericia:
@@ -829,6 +909,8 @@ class SkillBonus {
   final int amount;
   final String source;
   const SkillBonus({required this.amount, required this.source});
+
+  Map<String, dynamic> toJson() => {'amount': amount, 'source': source};
 }
 
 /// Un aporte a la iniciativa además del mod. de Destreza: la dote Alerta
@@ -838,6 +920,8 @@ class InitiativeBonus {
   final int amount;
   final String source;
   const InitiativeBonus({required this.amount, required this.source});
+
+  Map<String, dynamic> toJson() => {'amount': amount, 'source': source};
 }
 
 /// Un estado activable que el personaje tiene, y si está activo. Ver
@@ -917,6 +1001,27 @@ class ActiveMode {
     this.damageAbility,
     this.noSpellcasting = false,
   });
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'resourceKey': resourceKey,
+        'variants': [for (final v in variants) v.toJson()],
+        'tempHpOnActivate': tempHpOnActivate,
+        'endsConditions': endsConditions,
+        'endsWhenIncapacitated': endsWhenIncapacitated,
+        'blockedBy': blockedBy?.name,
+        'available': available,
+        'active': active,
+        'activeVariant': activeVariant,
+        'requiresMode': requiresMode,
+        'multiSelect': multiSelect,
+        'resistances': resistances,
+        'advantages': [for (final a in advantages) a.toJson()],
+        'damageBonus': damageBonus,
+        'damageAbility': damageAbility?.name,
+        'noSpellcasting': noSpellcasting,
+      };
 }
 
 /// Por qué un estado activable no se puede prender ahora.
@@ -941,6 +1046,9 @@ class ModeDamageBonus {
     required this.name,
     required this.amount,
   });
+
+  Map<String, dynamic> toJson() =>
+      {'modeId': modeId, 'name': name, 'amount': amount};
 }
 
 /// Los dados de un rasgo al nivel actual: «Ataque Furtivo: 3d6». Ver
@@ -949,6 +1057,8 @@ class ScalingDice {
   final String name;
   final String dice;
   const ScalingDice({required this.name, required this.dice});
+
+  Map<String, dynamic> toJson() => {'name': name, 'dice': dice};
 }
 
 /// Una ventaja permanente ya resuelta, con el rasgo que la da. Ver
@@ -974,6 +1084,16 @@ class Advantage {
   /// conjuros. La ficha la muestra aparte y no en la fila de la salvación,
   /// para que no parezca que vale siempre.
   bool get conditional => conditions.isNotEmpty || vsSpells;
+
+  Map<String, dynamic> toJson() => {
+        'roll': roll.key,
+        'abilities': [for (final a in abilities) a.name],
+        'skill': skill,
+        'conditions': conditions,
+        'vsSpells': vsSpells,
+        'source': source,
+        'conditional': conditional,
+      };
 }
 
 /// Centinela para distinguir "no se pasó el argumento" de "se pasó null" en
@@ -1423,6 +1543,131 @@ class ComputedSheet {
             normalSpellSlotsByLevel ?? this.normalSpellSlotsByLevel,
         pactSlotsByLevel: pactSlotsByLevel ?? this.pactSlotsByLevel,
       );
+
+  /// Toda la ficha como JSON, para el cliente que no corre el motor en Dart.
+  ///
+  /// Lleva los campos y además lo que la ficha **calcula** con ellos —
+  /// salvaciones, pruebas, habilidades, Percepción pasiva, capacidad de
+  /// carga—, para que quien la consuma no reimplemente ninguna suma. Las
+  /// claves de los mapas por característica van por nombre y en el orden del
+  /// enum; los conjuntos, ordenados.
+  ///
+  /// Un campo público nuevo hay que sumarlo acá: `computed_sheet_json_test`
+  /// compara los campos de la clase contra las claves del resultado.
+  Map<String, dynamic> toJson() => {
+        'level': level,
+        'proficiencyBonus': proficiencyBonus,
+        'classLevels': {
+          for (final k in _sortedJson(classLevels.keys)) k: classLevels[k]!,
+        },
+        'hitDiceBySize': _levelMapJson(hitDiceBySize),
+        'abilityScores': _abilityMapJson(abilityScores),
+        'abilityModifiers': _abilityMapJson(abilityModifiers),
+        'abilityBonuses': [for (final b in abilityBonuses) b.toJson()],
+        'd20Modifier': d20Modifier,
+        'heroicInspirationOnLongRest': heroicInspirationOnLongRest,
+        'ignoresArmorStrength': ignoresArmorStrength,
+        'halfProficiencyUnskilled': halfProficiencyUnskilled,
+        'savingThrowProficiencies': [
+          for (final a in Ability.values)
+            if (savingThrowProficiencies.contains(a)) a.name,
+        ],
+        'savingThrowBonus': savingThrowBonus,
+        'savingThrowBonusByAbility': _abilityMapJson(savingThrowBonusByAbility),
+        'skillProficiencies': _sortedJson(skillProficiencies),
+        'expertiseSkills': _sortedJson(expertiseSkills),
+        'skillBonuses': {
+          for (final k in _sortedJson(skillBonuses.keys))
+            k: [for (final b in skillBonuses[k]!) b.toJson()],
+        },
+        'armorProficiencies': _sortedJson(armorProficiencies),
+        'weaponProficiencies': _sortedJson(weaponProficiencies),
+        'toolProficiencies': _sortedJson(toolProficiencies),
+        'maxHp': maxHp,
+        'hitDie': hitDie,
+        'armorClass': armorClass,
+        'unarmoredDefenseOptions': [
+          for (final o in unarmoredDefenseOptions) o.toJson(),
+        ],
+        'selectedUnarmoredDefenseClassId': selectedUnarmoredDefenseClassId,
+        'carriedWeight': carriedWeight,
+        'size': size,
+        'speed': speed,
+        'initiative': initiative,
+        'initiativeBonuses': [for (final b in initiativeBonuses) b.toJson()],
+        'advantages': [for (final a in advantages) a.toJson()],
+        'scalingDice': [for (final d in scalingDice) d.toJson()],
+        'activeModes': [for (final m in activeModes) m.toJson()],
+        'darkvision': darkvision,
+        'speeds': {
+          for (final m in MovementMode.values)
+            if (speeds.containsKey(m)) m.name: speeds[m]!,
+        },
+        'senses': {
+          for (final s in Sense.values)
+            if (senses.containsKey(s)) s.name: senses[s]!,
+        },
+        'resistances': _sortedJson(resistances),
+        'immunities': _sortedJson(immunities),
+        'weaponMasterySlots': weaponMasterySlots,
+        'attunementSlots': attunementSlots,
+        'attacksPerAction': attacksPerAction,
+        'attacks': [for (final a in attacks) a.toJson()],
+        'passives': [for (final p in passives) p.toJson()],
+        'resources': [for (final r in resources) r.toJson()],
+        'companions': [for (final c in companions) c.toJson()],
+        'innateSpells': [for (final i in innateSpells) i.toJson()],
+        'alwaysPreparedSpellIds': _sortedJson(alwaysPreparedSpellIds),
+        'alwaysPreparedSpellIdsByClass': {
+          for (final k in _sortedJson(alwaysPreparedSpellIdsByClass.keys))
+            k: _sortedJson(alwaysPreparedSpellIdsByClass[k]!),
+        },
+        'spellListAdditionIds': _sortedJson(spellListAdditionIds),
+        'featureChoiceSlots': [for (final c in featureChoiceSlots) c.toJson()],
+        'itemChoiceSlots': [for (final c in itemChoiceSlots) c.toJson()],
+        'targetChoiceSlots': [for (final c in targetChoiceSlots) c.toJson()],
+        'proficiencyChoiceSlots': [
+          for (final c in proficiencyChoiceSlots) c.toJson(),
+        ],
+        'expertiseChoiceSlots': [
+          for (final c in expertiseChoiceSlots) c.toJson(),
+        ],
+        'languages': _sortedJson(languages),
+        'languageChoiceSlots': [
+          for (final c in languageChoiceSlots) c.toJson()
+        ],
+        'spellChoiceSlots': [for (final c in spellChoiceSlots) c.toJson()],
+        'spellDamageBonuses': {
+          for (final k in _sortedJson(spellDamageBonuses.keys))
+            k: [for (final b in spellDamageBonuses[k]!) b.toJson()],
+        },
+        'wildShape': wildShape?.toJson(),
+        'spellcasting': spellcasting?.toJson(),
+        'spellcastingBlocks': [for (final b in spellcastingBlocks) b.toJson()],
+        'normalSpellSlotsByLevel': _levelMapJson(normalSpellSlotsByLevel),
+        'pactSlotsByLevel': _levelMapJson(pactSlotsByLevel),
+        // Lo que la ficha calcula con los campos de arriba. Va ya resuelto
+        // para que el cliente no repita la suma (ver [skillModifier]).
+        'baseAbilityScores': {
+          for (final a in Ability.values)
+            if (abilityScores.containsKey(a)) a.name: baseAbilityScore(a),
+        },
+        'abilityChecks': {
+          for (final a in Ability.values)
+            if (abilityModifiers.containsKey(a)) a.name: abilityCheck(a),
+        },
+        'savingThrows': {
+          for (final a in Ability.values)
+            if (abilityModifiers.containsKey(a)) a.name: savingThrow(a),
+        },
+        'skillModifiers': {
+          for (final k in _sortedJson([for (final s in Skill.values) s.id]))
+            k: skillModifier(k),
+        },
+        'passivePerception': passivePerception,
+        'carryingCapacity': carryingCapacity,
+        'isEncumbered': isEncumbered,
+      };
 
   /// Cuánto peso podés llevar: Fuerza × 15 libras (capítulo 1, "Carrying
   /// Capacity"). Getter y no campo guardado: es una multiplicación sobre una
