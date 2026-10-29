@@ -296,8 +296,11 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
 2. Lista de personajes y navegación entre pantallas *(existe)*.
 3. Lo de lectura más simple: ajustes de visualización *(existe)*,
    campañas del jugador en modo lectura *(existen; el cuaderno es del DM)*,
-   bestiario *(existe)* y catálogos *(el Códice existe)*. Con esto, el paso 3
-   está completo.
+   bestiario *(existe)* y catálogos *(el Códice existe)*.
+   **Lectura del Modo DM** (se sumó a este paso): Mesa, Capítulos, Cuaderno,
+   Bestiario y Biblioteca de PNJ *(existen)*; **faltan** los PNJ de la mesa, el
+   Homebrew de la cuenta y el Combate en solo lectura (hoy enlazan a Flutter).
+   Hasta que existan, la lectura no está cerrada.
 4. Escrituras de bajo riesgo: PG y usos de recursos en la ficha, descansos.
 5. Edición completa: creador de personajes, subida de nivel, inventario.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
