@@ -1,7 +1,7 @@
 import { BookMarked, BookOpen, NotebookText, FlaskConical, PawPrint, Users, UsersRound, Flame, Contact } from 'lucide-react';
 import type { DmCampaign } from '../api/client';
 import { useTexts } from '../i18n/context';
-import { dmBestiaryHref, dmCampaignHref, FLUTTER_HOME, rosterHref, dmHref, type DmSection } from '../router';
+import { dmBestiaryHref, dmCampaignHref, dmNpcsHref, FLUTTER_HOME, rosterHref, dmHref, type DmSection } from '../router';
 import { NavCollapsible } from '../ui/disclosure';
 import { ModeSwitch, NavGroup, NavItem } from '../ui/Shell';
 import { groupCampaigns, stateOf } from './campaigns';
@@ -10,8 +10,8 @@ import { groupCampaigns, stateOf } from './campaigns';
  * El panel del Modo DM (`_sidebar` de `dm_mode_screen.dart`): el interruptor
  * con «DM» activo, las herramientas de la cuenta, las campañas agrupadas por
  * estado y, de la campaña elegida, sus secciones. Lo que React todavía no
- * porta (Biblioteca de PNJ, Homebrew, PNJ de la mesa y Combate) enlaza a
- * Flutter con el ícono de enlace externo.
+ * porta (Homebrew, PNJ de la mesa y Combate) enlaza a Flutter con el ícono de
+ * enlace externo.
  */
 export function DmPanel({
   campaigns,
@@ -22,7 +22,7 @@ export function DmPanel({
   campaigns: readonly DmCampaign[] | undefined;
   current?: { campaign: DmCampaign; section: DmSection };
   /** La herramienta de la cuenta que está abierta, si no es una campaña. */
-  tool?: 'bestiary';
+  tool?: 'bestiary' | 'npcs';
 }) {
   const t = useTexts();
   const groups = campaigns ? groupCampaigns(campaigns) : null;
@@ -46,7 +46,7 @@ export function DmPanel({
           <NavItem href={dmBestiaryHref()} icon={PawPrint} label={t.navBestiary} active={tool === 'bestiary'} internal />
         </li>
         <li>
-          <NavItem href={FLUTTER_HOME} icon={Contact} label={t.dmNpcLibrary} external />
+          <NavItem href={dmNpcsHref()} icon={Contact} label={t.dmNpcLibrary} active={tool === 'npcs'} internal />
         </li>
         <li>
           <NavItem href={FLUTTER_HOME} icon={FlaskConical} label={t.navHomebrew} external />

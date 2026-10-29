@@ -32,18 +32,8 @@ const safeUrl = (body: string | undefined): string | null =>
  */
 export function DiaryTab({ model }: { model: SheetModel }) {
   const t = useTexts();
-  const lang = useLang();
   const { character } = model;
   const background = character.background?.trim() ?? '';
-  const entries = character.diary ?? [];
-  const [open, setOpen] = useState<DiaryEntry | null>(null);
-  const date = useMemo(() => new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long', year: 'numeric' }), [lang]);
-  const when = (e: DiaryEntry) => {
-    // Sin fecha (la entrada que salió de las notas viejas) no se inventa una.
-    const iso = e.updatedAt ?? e.createdAt;
-    const d = iso ? new Date(iso) : null;
-    return d && !Number.isNaN(d.getTime()) ? date.format(d) : null;
-  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -59,29 +49,61 @@ export function DiaryTab({ model }: { model: SheetModel }) {
           </div>
         )}
       </Card>
+      <DiaryEntries entries={character.diary ?? []} title={t.diaryEntries} emptyMessage={t.diaryEmpty(character.name)} />
+    </div>
+  );
+}
 
-      <section aria-labelledby="h-entries" data-card="entries">
-        <div className="mx-0.5 mb-2.5 flex items-center gap-2">
-          <h2 id="h-entries" className="flex flex-1 items-center gap-2">
-            <Feather size={18} aria-hidden="true" className="shrink-0 text-gold" />
-            <span className="font-display text-[16px] text-on-surface">{t.diaryEntries}</span>
-          </h2>
-          {entries.length > 0 && <span className="text-[12px] text-text-muted tabular-nums">{entries.length}</span>}
-        </div>
-        {entries.length === 0 ? (
-          <AppEmptyState kind="empty" message={t.diaryEmpty(character.name)} />
-        ) : (
-          // Columnas y no grilla: cada tarjeta mide lo que su contenido, sin
-          // filas igualadas a la más alta.
-          <ul className="[column-gap:14px] [columns:3_280px]">
-            {entries.map((e) => (
-              <li key={e.entryId} className="mb-3.5 break-inside-avoid">
-                <EntryCard entry={e} date={when(e)} onOpen={() => setOpen(e)} />
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+/**
+ * Las entradas del Diario: tarjetas en columnas que se abren en un diálogo.
+ * Son las mismas que usan las notas de un PNJ, como en Flutter
+ * (`DiaryEntriesCard`): un segundo molde obligaría a mantener dos.
+ */
+export function DiaryEntries({
+  entries,
+  title,
+  emptyMessage,
+  columns = '[columns:3_280px]',
+}: {
+  entries: DiaryEntry[];
+  title: string;
+  emptyMessage: string;
+  /** Cuántas columnas y de qué ancho mínimo: una columna lateral pide menos. */
+  columns?: string;
+}) {
+  const t = useTexts();
+  const lang = useLang();
+  const [open, setOpen] = useState<DiaryEntry | null>(null);
+  const date = useMemo(() => new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long', year: 'numeric' }), [lang]);
+  const when = (e: DiaryEntry) => {
+    // Sin fecha (la entrada que salió de las notas viejas) no se inventa una.
+    const iso = e.updatedAt ?? e.createdAt;
+    const d = iso ? new Date(iso) : null;
+    return d && !Number.isNaN(d.getTime()) ? date.format(d) : null;
+  };
+
+  return (
+    <section aria-labelledby="h-entries" data-card="entries">
+      <div className="mx-0.5 mb-2.5 flex items-center gap-2">
+        <h2 id="h-entries" className="flex flex-1 items-center gap-2">
+          <Feather size={18} aria-hidden="true" className="shrink-0 text-gold" />
+          <span className="font-display text-[16px] text-on-surface">{title}</span>
+        </h2>
+        {entries.length > 0 && <span className="text-[12px] text-text-muted tabular-nums">{entries.length}</span>}
+      </div>
+      {entries.length === 0 ? (
+        <AppEmptyState kind="empty" message={emptyMessage} />
+      ) : (
+        // Columnas y no grilla: cada tarjeta mide lo que su contenido, sin
+        // filas igualadas a la más alta.
+        <ul className={`[column-gap:14px] ${columns}`}>
+          {entries.map((e) => (
+            <li key={e.entryId} className="mb-3.5 break-inside-avoid">
+              <EntryCard entry={e} date={when(e)} onOpen={() => setOpen(e)} />
+            </li>
+          ))}
+        </ul>
+      )}
 
       {open && (
         <AppDialog
@@ -94,7 +116,7 @@ export function DiaryTab({ model }: { model: SheetModel }) {
           <EntryBody entry={open} />
         </AppDialog>
       )}
-    </div>
+    </section>
   );
 }
 

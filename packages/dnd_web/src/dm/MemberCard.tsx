@@ -125,7 +125,7 @@ export function MemberCard({ entry }: { entry: RosterEntry }) {
   );
 }
 
-function Abbr({ short, full }: { short: string; full: string }) {
+export function Abbr({ short, full }: { short: string; full: string }) {
   return (
     <>
       <span aria-hidden="true">{short}</span>

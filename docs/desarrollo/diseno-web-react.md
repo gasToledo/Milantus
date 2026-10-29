@@ -173,7 +173,7 @@ del motor, nunca se calcula acá.
 
 ## El Modo DM (`src/dm/`)
 
-Cada sección es una ruta bajo `/v2/dm/campanas/:id/` (el Bestiario, bajo `/v2/dm/bestiario`) y comparte tres piezas:
+Cada sección es una ruta bajo `/v2/dm/campanas/:id/` (el Bestiario y la Biblioteca de PNJ, herramientas de la cuenta, bajo `/v2/dm/bestiario` y `/v2/dm/pnj`) y comparte tres piezas:
 `DmPanel` (el panel: interruptor, herramientas, campañas, secciones),
 `DmHeader` (título Georgia 30, pill con el estado y la regla ornamental; el
 `h1` es el título) y `DmPage`, que resuelve la campaña por id y es la única que
@@ -197,6 +197,19 @@ control que escriba, y el e2e comprueba que no sale ningún pedido que no sea
 - **Bestiario** (`BestiaryPage dm`): la pantalla del jugador montada con el panel
   del DM; no hay un segundo navegador. `dm` cambia la cabecera (`DmHeader`, con
   «Solo lectura» y el conteo) y las URL (`dmBestiaryHref`).
+- **Biblioteca de PNJ** (`npcs/NpcLibraryView`, `npcs/NpcDetailView`,
+  `npcs/npc.ts`): la lista es una grilla `auto-fill` de `card` enlazadas, con el
+  buscador en pill y dos filas de pills `aria-pressed` con su conteo —campaña,
+  más grandes, y tag, más chicas: la jerarquía es la de Flutter— que son estado
+  local. La ficha abre con la identidad a todo el ancho (medallón de 76, `h1`
+  Georgia 28, la línea de tipo en `Pill` oro y los tags neutros, la voz como
+  cita con la comilla en oro) y debajo dos columnas: Trasfondo (`Card`) y Notas
+  (`DiaryEntries`, el mismo de la pestaña Diario, a dos columnas) a la izquierda,
+  Estadísticas y Campañas a la derecha. El estado por campaña es una pill con la
+  palabra y el color del estado (`STATUS_TONE`: verde, carmesí, apagado). La
+  línea de tipo la arma `npcTypeLine` con lo que da `npcViews`: ningún número se
+  calcula acá. El tablero es «Modo DM — Biblioteca de PNJ, PNJ de la mesa,
+  Homebrew y Combate» del Design.
 
 ## Reglas que más se olvidan
 
