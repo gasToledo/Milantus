@@ -110,7 +110,7 @@ repiten acá.
   la cuenta (`/api/settings`), buscador en el cliente por nombre, especie y
   clase, y los caídos al final, como en Flutter. Orden y favorito **se
   muestran, no se editan**; crear, Ajustes, Sugerencias, Cerrar sesión
-  y Homebrew enlazan a la raíz de Flutter
+  enlazan a la raíz de Flutter (el Homebrew es del Modo DM y no está en este panel)
   (`FLUTTER_HOME`, `src/router.tsx`). Cada tarjeta enlaza a la ficha. Las cifras
   (nivel, PG máximos, CA, velocidad, iniciativa) salen de `computeSheet`; los
   PG actuales, de la ficha cruda. Sigue el lienzo aprobado: título, buscador,
