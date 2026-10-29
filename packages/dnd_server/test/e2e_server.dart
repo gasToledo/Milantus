@@ -49,6 +49,9 @@ const smokeAccountName = 'Ada de Humo';
 const smokeUserId = 'cuenta-de-humo';
 const smokeCharacterId = 'guerrero-de-humo';
 
+/// La favorita de los ajustes sembrados, y el orden que esos ajustes piden.
+const smokeFavoriteId = 'zelda-de-humo';
+
 Future<void> main() async {
   final root = Platform.environment['DND_WEB_V2_ROOT'] ?? '';
   final port = int.parse(Platform.environment['DND_SERVER_PORT'] ?? '8787');
@@ -70,37 +73,41 @@ Future<void> main() async {
   final characters = InMemoryCharacterRepository();
   await characters.create(
     smokeUserId,
-    Character(
+    _smokeFighter(
       id: smokeCharacterId,
       name: 'Brunilda de Humo',
-      raceId: 'human',
-      classId: 'fighter',
-      backgroundId: 'soldier',
-      level: 5,
-      assignedScores: const {
-        Ability.strength: 15,
-        Ability.dexterity: 13,
-        Ability.constitution: 14,
-        Ability.intelligence: 12,
-        Ability.wisdom: 16,
-        Ability.charisma: 10,
-      },
-      backgroundAbilityBonuses: const {
-        Ability.strength: 2,
-        Ability.constitution: 1,
-      },
-      chosenSkills: const ['perception', 'survival', 'insight'],
-      featureChoices: const {
-        'fighting-style': ['fs-defense'],
-      },
-      weaponMasteryChoices: const ['longsword', 'greatsword', 'dagger'],
       hpPerLevel: const [10, 6, 6, 6, 6],
-      equippedArmorId: 'chain-mail',
-      shieldEquipped: true,
-      equippedWeaponIds: const ['longsword'],
-      combat: CombatState(currentHp: 31),
+      currentHp: 31,
     ),
   );
+  // Para el dashboard (`e2e/dashboard.spec.ts`): el mismo guerrero a otros
+  // niveles. Por nombre irían Aldric, Brunilda, Zelda; por nivel, Brunilda,
+  // Zelda, Aldric: con el orden «nivel» y a Zelda de favorita, la prueba
+  // distingue el orden de los ajustes del alfabético y el favorito del resto.
+  await characters.create(
+    smokeUserId,
+    _smokeFighter(
+      id: smokeFavoriteId,
+      name: 'Zelda de Humo',
+      hpPerLevel: const [10, 6, 6, 6],
+      currentHp: 9,
+    ),
+  );
+  await characters.create(
+    smokeUserId,
+    _smokeFighter(
+      id: 'aldric-de-humo',
+      name: 'Aldric de Humo',
+      hpPerLevel: const [10, 6],
+      currentHp: 16,
+    ),
+  );
+  final settings = InMemorySettingsRepository();
+  await settings.save(smokeUserId, {
+    'sortMode': 'level',
+    'favoriteCharacterId': smokeFavoriteId,
+    'characterOrder': <String>[],
+  });
   final campaigns = InMemoryCampaignRepository(characters);
   final chapters = InMemoryChapterRepository(campaigns);
   final notes = InMemoryNoteRepository(campaigns, chapters);
@@ -141,7 +148,7 @@ Future<void> main() async {
     ),
     homebrew: homebrew,
     levelUps: levelUps,
-    settings: InMemorySettingsRepository(),
+    settings: settings,
     webV2Handler: v2,
     v2Users: {smokeUserId},
   );
@@ -154,3 +161,42 @@ Future<void> main() async {
   // Playwright espera esta línea en la salida para saber que ya se puede abrir.
   print('e2e_server escuchando en ${server.address.host}:${server.port}');
 }
+
+/// Un guerrero completo: el nivel sale de cuántos PG por nivel se le dan.
+/// Los PG actuales no son los máximos a propósito, así la prueba distingue
+/// «PG actuales» de «PG máximos».
+Character _smokeFighter({
+  required String id,
+  required String name,
+  required List<int> hpPerLevel,
+  required int currentHp,
+}) => Character(
+  id: id,
+  name: name,
+  raceId: 'human',
+  classId: 'fighter',
+  backgroundId: 'soldier',
+  level: hpPerLevel.length,
+  assignedScores: const {
+    Ability.strength: 15,
+    Ability.dexterity: 13,
+    Ability.constitution: 14,
+    Ability.intelligence: 12,
+    Ability.wisdom: 16,
+    Ability.charisma: 10,
+  },
+  backgroundAbilityBonuses: const {
+    Ability.strength: 2,
+    Ability.constitution: 1,
+  },
+  chosenSkills: const ['perception', 'survival', 'insight'],
+  featureChoices: const {
+    'fighting-style': ['fs-defense'],
+  },
+  weaponMasteryChoices: const ['longsword', 'greatsword', 'dagger'],
+  hpPerLevel: hpPerLevel,
+  equippedArmorId: 'chain-mail',
+  shieldEquipped: true,
+  equippedWeaponIds: const ['longsword'],
+  combat: CombatState(currentHp: currentHp),
+);

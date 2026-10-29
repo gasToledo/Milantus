@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useTexts } from '../i18n/context';
 import { labelOf } from '../i18n/texts';
 import type {
@@ -6,8 +6,9 @@ import type {
   Catalog,
   CharacterFields,
   ComputedSheet,
-  JsonObject,
 } from '../engine';
+import { accentOf, nameOf } from '../api/catalog';
+import { Medallion } from '../ui/Medallion';
 import { signed } from './format';
 
 const ABILITIES: AbilityId[] = [
@@ -18,13 +19,6 @@ const ABILITIES: AbilityId[] = [
   'wisdom',
   'charisma',
 ];
-
-/** Nombre de una entrada del catálogo (ya en el idioma activo), o su id. */
-function nameOf(list: JsonObject[], id: string | null | undefined): string | null {
-  if (!id) return null;
-  const entry = list.find((e) => e.id === id);
-  return typeof entry?.name === 'string' ? entry.name : id;
-}
 
 /**
  * La ficha de solo lectura. Todo número sale de [sheet] (`ComputedSheet`); lo
@@ -42,11 +36,7 @@ export function CharacterSheet({
 }) {
   const t = useTexts();
 
-  const classEntry = catalog.classes.find((c) => c.id === character.classId);
-  // El acento de clase viene del JSON del catálogo (`accentColor`), no del
-  // código: así el homebrew usa el mismo mecanismo (`diseno-web.md` §3.3). Es
-  // un dato y no un color de diseño; cae al oro si falta.
-  const accent = typeof classEntry?.accentColor === 'string' ? classEntry.accentColor : null;
+  const accent = accentOf(catalog, character.classId);
 
   const classes = Object.entries(sheet.classLevels)
     .map(([id, level]) => t.levelOf(nameOf(catalog.classes, id) ?? id, level))
@@ -68,7 +58,7 @@ export function CharacterSheet({
   return (
     <div className="flex flex-col gap-4">
       <header className="card flex items-center gap-4 p-4">
-        <Medallion name={character.name} accent={accent} />
+        <Medallion name={character.name} accent={accent} size={64} />
         <div className="min-w-0">
           <h1 className="font-display text-[24px] leading-tight break-words text-on-surface">
             {character.name}
@@ -255,20 +245,6 @@ export function CharacterSheet({
           </Card>
         </div>
       </div>
-    </div>
-  );
-}
-
-function Medallion({ name, accent }: { name: string; accent: string | null }) {
-  // `--accent` es el único color que no sale de los tokens: viene del catálogo.
-  const style = { '--accent': accent ?? 'var(--gold)' } as CSSProperties;
-  return (
-    <div
-      aria-hidden="true"
-      style={style}
-      className="font-display flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-[3px] border-[var(--accent)] bg-plaque text-[28px] text-gold"
-    >
-      {Array.from(name)[0]?.toUpperCase()}
     </div>
   );
 }

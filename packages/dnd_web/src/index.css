@@ -24,6 +24,9 @@
   --radius-nav: 9px;
   --border-hairline: 1px solid var(--hairline);
   --sidebar-width: 236px;
+  /* La única sombra del sistema: el hover de la tarjeta de personaje
+     (`diseno-web.md` §3 y Apéndice B, `cardHover`). */
+  --shadow-card-hover: 0 10px 26px #00000046;
   --page-max-width: 760px;
 }
 
@@ -125,4 +128,33 @@ body {
 :focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 2px;
+}
+
+/* Tarjeta de personaje del dashboard. El favorito lleva el borde de 2 px (el
+   padding se achica 1 px para que la tarjeta no cambie de tamaño); el hover y
+   el foco dentro de la tarjeta la levantan con la única sombra del sistema. */
+.roster-card {
+  transition:
+    transform 120ms,
+    border-color 120ms,
+    box-shadow 120ms;
+}
+.roster-card[data-favorite='true'] {
+  border: 2px solid var(--gold);
+  padding: calc(1rem - 1px);
+}
+.roster-card:hover,
+.roster-card:focus-within {
+  border-color: var(--gold);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
+}
+@media (prefers-reduced-motion: reduce) {
+  .roster-card {
+    transition: none;
+  }
+  .roster-card:hover,
+  .roster-card:focus-within {
+    transform: none;
+  }
 }
