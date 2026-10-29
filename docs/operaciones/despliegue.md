@@ -239,9 +239,9 @@ Dos workflows en `.github/workflows/`:
 ### El cliente React bajo `/v2`
 
 `packages/dnd_web` (Vite + React + TypeScript) es el cliente que va a
-reemplazar al de Flutter pantalla por pantalla. Por ahora tiene una sola
-pantalla, la ficha de solo lectura (`/v2/personajes/:id`), sin enlaces desde el
-cliente actual; el estado completo está en
+reemplazar al de Flutter pantalla por pantalla. Por ahora tiene tres pantallas
+de solo lectura (el dashboard, la ficha en cinco pestañas y el Códice), sin
+enlaces desde el cliente actual; el estado completo está en
 [Migración a React](../arquitectura/migracion-react.md). Se sirve en el mismo origen que Flutter (`/`) y la API, así que
 comparte la cookie de sesión.
 

@@ -37,7 +37,7 @@ Un solo servidor, un solo origen, dos clientes:
   (`/v2/personajes/3`) cae a `index.html`; un archivo que falta es 404 de
   verdad. `index.html` va con `private, no-cache` y `assets/` (con hash en el
   nombre) con `immutable` por un año.
-- Vite compila con `base: '/v2/'`; el router de `src/router.ts` lee
+- Vite compila con `base: '/v2/'`; el router de `src/router.tsx` lee
   `import.meta.env.BASE_URL`, así que el prefijo vive en un solo lugar.
 - El catálogo SRD llega al navegador como archivos estáticos en
   `/v2/content/*.json`, que `npm run build` copia desde
@@ -111,7 +111,7 @@ repiten acá.
   clase, y los caídos al final, como en Flutter. Orden y favorito **se
   muestran, no se editan**; crear, Ajustes, Sugerencias, Cerrar sesión,
   Homebrew y el «DM» del interruptor de modo enlazan a la raíz de Flutter
-  (`FLUTTER_HOME`, `src/router.ts`). Cada tarjeta enlaza a la ficha. Las cifras
+  (`FLUTTER_HOME`, `src/router.tsx`). Cada tarjeta enlaza a la ficha. Las cifras
   (nivel, PG máximos, CA, velocidad, iniciativa) salen de `computeSheet`; los
   PG actuales, de la ficha cruda. Sigue el lienzo aprobado: título, buscador,
   orden y «Crear» en una barra que se envuelve, regla ornamental y tarjetas
