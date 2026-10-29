@@ -138,6 +138,15 @@ La pantalla de referencia de cómo se arma una vista con la biblioteca:
   «Guía N de 4» en lugar de la pista. El primer combate va en pasos unidos por
   una línea, y la de la ficha, pestaña por pestaña con `TAB_ICONS`.
 
+## Ajustes (`src/settings/`)
+
+Dos `Card` en una grilla que se adapta sola (`auto-fit`). La primera lleva
+controles (`Select` para el tema y el idioma) y la segunda una lista de
+definición (`dl`) de solo lectura, con un `ButtonLink` a Flutter para cambiar
+lo que se guarda en la cuenta. Esa separación es la regla de la pantalla: lo que
+vive en el navegador se edita ahí; lo que vive en la cuenta se muestra hasta
+que React escriba.
+
 ## Reglas que más se olvidan
 
 - Ningún color, radio ni fuente sueltos: variables o utilidades.

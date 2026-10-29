@@ -59,6 +59,8 @@ export interface RosterSettings {
   sortMode: string;
   favoriteCharacterId: string | null;
   characterOrder: string[];
+  /** Si la cuenta abre en el Modo DM (`AppSettings.startsInDmMode`). */
+  startsInDmMode: boolean;
 }
 
 /** Una cuenta que nunca guardó ajustes (`settings: null`) usa los valores por
@@ -74,6 +76,7 @@ export async function fetchRosterSettings(signal: AbortSignal): Promise<RosterSe
     sortMode: settings?.sortMode ?? 'name',
     favoriteCharacterId: settings?.favoriteCharacterId ?? null,
     characterOrder: settings?.characterOrder ?? [],
+    startsInDmMode: settings?.startsInDmMode === true,
   };
 }
 

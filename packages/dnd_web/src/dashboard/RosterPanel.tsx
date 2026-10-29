@@ -2,7 +2,7 @@ import { BookOpen, FlaskConical, LogOut, MessageSquare, Settings, Users } from '
 import { useAppVersion } from '../api/queries';
 import type { Account } from '../api/client';
 import { useTexts } from '../i18n/context';
-import { codexHref, FLUTTER_HOME, rosterHref } from '../router';
+import { codexHref, FLUTTER_HOME, rosterHref, settingsHref } from '../router';
 import { ModeSwitch, NavGroup, NavItem, ThemeMenu, VersionLabel } from '../ui/Shell';
 
 /**
@@ -31,18 +31,18 @@ export function RosterPanel({ current }: { current?: 'roster' }) {
 }
 
 /**
- * El pie del menú principal: Ajustes, sugerencias, la cuenta con «Cerrar
+ * El pie del menú principal: Ajustes (de solo lectura en React), sugerencias, la cuenta con «Cerrar
  * sesión», el tema y la versión. No se rediseña por pantalla: quien entra
  * tiene que poder salir de su cuenta sin buscar.
  */
-export function RosterFooter({ account }: { account: Account }) {
+export function RosterFooter({ account, current }: { account: Account; current?: 'settings' }) {
   const t = useTexts();
   const version = useAppVersion(true);
   return (
     <div className="flex flex-col gap-1">
       <ul className="flex flex-col gap-0.5">
         <li>
-          <NavItem href={FLUTTER_HOME} icon={Settings} label={t.settings} external />
+          <NavItem href={settingsHref()} icon={Settings} label={t.settings} active={current === 'settings'} internal />
         </li>
         <li>
           <NavItem href={FLUTTER_HOME} icon={MessageSquare} label={t.feedback} external />

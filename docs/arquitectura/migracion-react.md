@@ -98,7 +98,7 @@ repiten acá.
 - Sesión: `/api/me`, con los estados cargando, sin sesión, error con
   «Reintentar» y no disponible. Una cuenta sin `webV2` no pide nada más a la
   API.
-- Tema: oscuro por defecto, con selector al pie del panel. Lo elegido en el
+- Tema: oscuro por defecto, con selector al pie del panel (y en Ajustes). Lo elegido en el
   navegador (`localStorage`) gana sobre el `themeMode` de los ajustes de la
   cuenta, porque React todavía no escribe en la cuenta.
 - Idioma: español o inglés, resuelto una vez al cargar (clave `milantus.locale`
@@ -161,6 +161,18 @@ repiten acá.
   pasos del primer combate, la ficha por pestaña y el consejo. Las dotes sin
   descripción no muestran sus efectos: el texto de
   cada efecto (`describeEffect`) vive en Flutter (ver su `ponytail:`).
+- **Ajustes** en `/v2/ajustes` (`src/settings/`), a la que lleva «Ajustes» del
+  pie del panel. Dos tarjetas con una diferencia que importa. **En este
+  navegador**: el tema y el idioma, que son preferencias locales
+  (`localStorage`, las mismas claves que Flutter: `milantus.v2.theme` y
+  `milantus.locale`) y se cambian ahí mismo; cambiar el idioma recarga la
+  página, porque se resuelve una sola vez al cargar (también el del motor).
+  **En tu cuenta**: lo que Flutter guarda en `/api/settings` (con qué modo
+  abre, el orden de los personajes, el favorito), que **se lee y no se edita**;
+  un botón lleva a Flutter para cambiarlo. Quedan fuera lo que Flutter ofrece
+  y actúa sobre sus propias funciones (mantener la pantalla encendida, volver a
+  mostrar los tutoriales), la dificultad del encuentro (Modo DM) y el proveedor
+  de retratos (vive en la pantalla de retratos).
 - **Homebrew**: la ficha y el dashboard calculan con el catálogo oficial más
   el contenido homebrew de la cuenta (`GET /api/homebrew`, fusionado por id en
   `src/api/homebrew.ts`), como `HomebrewStore` + `ContentRepository.addAll` en
@@ -179,8 +191,9 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
 
 1. Ficha de personaje, solo lectura *(existe)*.
 2. Lista de personajes y navegación entre pantallas *(existe)*.
-3. Lo de lectura más simple: ajustes de visualización, cuaderno/campañas en
-   modo lectura, bestiario y catálogos *(el Códice existe)*.
+3. Lo de lectura más simple: ajustes de visualización *(existe)*,
+   cuaderno/campañas en modo lectura, bestiario y catálogos *(el Códice
+   existe)*.
 4. Escrituras de bajo riesgo: PG y usos de recursos en la ficha, descansos.
 5. Edición completa: creador de personajes, subida de nivel, inventario.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
@@ -215,7 +228,9 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    que manda la API (con una mesa sembrada: otra cuenta como DM, un capítulo
    cerrado y una batalla); que el Códice cuente y abra el homebrew de la
    cuenta, que su búsqueda general coincida con el catálogo y que el glosario
-   se lea en orden (`e2e/codice.spec.ts`); y que una cuenta sin `webV2` vea
+   se lea en orden (`e2e/codice.spec.ts`); que Ajustes muestre lo de la cuenta,
+   cambie el tema y el idioma sin escribir en la API y recuerde el idioma con la
+   clave de Flutter (`e2e/ajustes.spec.ts`); y que una cuenta sin `webV2` vea
    «No disponible» sin pedir sus datos (`e2e/acceso.spec.ts`). Lo esperado se
    calcula con el mismo motor y la misma fusión (`e2e/helpers.ts`). Sin
    reintentos: no hay «a veces anda».

@@ -48,6 +48,18 @@ const es = {
   feedback: 'Sugerencias y errores',
   signOut: 'Cerrar sesión',
 
+  // Ajustes (`settings*` de `app_es.arb`).
+  settingsLoading: 'Cargando los ajustes…',
+  settingsLoadError: 'No se pudieron cargar los ajustes',
+  settingsBrowserTitle: 'En este navegador',
+  settingsAccountTitle: 'En tu cuenta',
+  settingsLanguage: 'Idioma',
+  languageNames: { es: 'Español', en: 'English' },
+  settingsStartMode: 'Al abrir Milantus',
+  settingsStartModes: { player: 'Modo Jugador', dm: 'Modo DM' },
+  settingsNoFavorite: 'Ninguno',
+  settingsChange: 'Cambiar en la aplicación principal',
+
   // Dashboard.
   rosterTitle: 'Mis personajes',
   rosterCount: (n: number) => (n === 1 ? '1 personaje' : `${n} personajes`),
@@ -607,6 +619,18 @@ const en: Texts = {
   feedback: 'Ideas & bug reports',
   signOut: 'Sign out',
 
+  // Settings (`settings*` in `app_en.arb`).
+  settingsLoading: 'Loading your settings…',
+  settingsLoadError: "Couldn't load your settings",
+  settingsBrowserTitle: 'In this browser',
+  settingsAccountTitle: 'In your account',
+  settingsLanguage: 'Language',
+  languageNames: { es: 'Español', en: 'English' },
+  settingsStartMode: 'When Milantus opens',
+  settingsStartModes: { player: 'Player Mode', dm: 'DM Mode' },
+  settingsNoFavorite: 'None',
+  settingsChange: 'Change in the main app',
+
   rosterTitle: 'My characters',
   rosterCount: (n: number) => (n === 1 ? '1 character' : `${n} characters`),
   rosterFallen: (n: number) => `${n} down`,
@@ -1123,6 +1147,19 @@ export function labelOf(table: Record<string, string>, id: string): string {
 }
 
 const STORAGE_KEY = 'milantus.locale';
+
+/** Recuerda el idioma elegido, con la misma clave que Flutter: el cambio vale
+ *  en los dos clientes. Devuelve si pudo guardarlo: el idioma se resuelve
+ *  una sola vez al cargar, así que sin almacenamiento (modo privado) recargar
+ *  no lo cambiaría y la pantalla no recarga. */
+export function storeLang(lang: Lang): boolean {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, lang);
+    return window.localStorage.getItem(STORAGE_KEY) === lang;
+  } catch {
+    return false;
+  }
+}
 
 /** El idioma de la interfaz, resuelto como `resolveLocale` de Flutter
  *  (`l10n/app_locale.dart`): el guardado si es válido; si no, el del
