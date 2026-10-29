@@ -144,7 +144,7 @@ repiten acá.
   busca, como Flutter; lo ajeno y lo inexistente son lo mismo. El personaje se
   migra con el motor (`migrateCharacter`) antes de leerlo y calcularlo.
 - **El Códice** en `/v2/codice` (`src/codex/`): el catálogo de solo lectura
-  con el glosario, especies, linajes, clases, subclases, trasfondos, dotes, conjuros,
+  con el glosario, las guías, especies, linajes, clases, subclases, trasfondos, dotes, conjuros,
   objetos mágicos, armas, armaduras y equipo, más el homebrew de la cuenta
   marcado «Propio». Sin criaturas: en Flutter son del Modo DM. Cada categoría
   y cada entrada es una ruta (`/v2/codice/conjuros/fireball`); la portada
@@ -156,8 +156,10 @@ repiten acá.
   del catálogo: sus términos y la regla de cada estado se copian de Flutter
   (`gl*` de los `.arb` y `ui/conditions.dart`) a `src/i18n/texts.ts`, y se
   lee en orden (numerado, con anterior y siguiente); el modificador de su
-  tabla lo da el motor (`abilityModifier`). Las guías quedan para otra
-  vuelta, y las dotes sin descripción no muestran sus efectos: el texto de
+  tabla lo da el motor (`abilityModifier`). Las **guías** siguen el mismo
+  camino (`guide*` de los `.arb`), ya partidas en `texts.ts`: párrafos, los
+  pasos del primer combate, la ficha por pestaña y el consejo. Las dotes sin
+  descripción no muestran sus efectos: el texto de
   cada efecto (`describeEffect`) vive en Flutter (ver su `ponytail:`).
 - **Homebrew**: la ficha y el dashboard calculan con el catálogo oficial más
   el contenido homebrew de la cuenta (`GET /api/homebrew`, fusionado por id en

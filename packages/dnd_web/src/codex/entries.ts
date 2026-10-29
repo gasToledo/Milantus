@@ -12,7 +12,7 @@ import {
   type JsonObject,
 } from '../engine';
 import type { Lang, Texts } from '../i18n/texts';
-import type { CodexCategory } from '../router';
+import type { CodexCategory, SheetTab } from '../router';
 
 export interface CodexFact {
   label: string;
@@ -37,6 +37,14 @@ export interface CodexDetail {
   /** Solo el glosario: texto propio en párrafos, con el ejemplo aparte, y lo
    *  que dos entradas llevan además (la tabla de modificadores, los estados). */
   glossary?: { paragraphs: string[]; example?: string; extra?: 'modifiers' | 'conditions' };
+  /** Solo las guías: el texto corrido, o los pasos del primer combate, o la
+   *  ficha pestaña por pestaña, y el consejo final. */
+  guide?: {
+    paragraphs: string[];
+    steps?: { title: string; text: string }[];
+    tabs?: Record<SheetTab, string>;
+    tip?: string;
+  };
 }
 
 export interface CodexEntry {
@@ -55,7 +63,7 @@ export interface CodexEntry {
 
 /** Las categorías en el orden del panel, con su grupo de la portada. */
 export const CATEGORY_GROUPS: { group: 'start' | 'character' | 'gear'; categories: CodexCategory[] }[] = [
-  { group: 'start', categories: ['glossary'] },
+  { group: 'start', categories: ['glossary', 'guides'] },
   { group: 'character', categories: ['races', 'lineages', 'classes', 'subclasses', 'backgrounds', 'feats'] },
   { group: 'gear', categories: ['spells', 'magicItems', 'weapons', 'armor', 'gear'] },
 ];
@@ -99,6 +107,40 @@ function glossaryEntries(t: Texts): CodexEntry[] {
   );
 }
 
+/** Las guías en el orden en que le sirven a quien empieza, como en Flutter:
+ *  qué es una partida, armar el personaje, la primera pelea y leer la ficha. */
+const GUIDES: { id: string; key: keyof Texts['guides'] }[] = [
+  { id: 'session', key: 'session' },
+  { id: 'creation', key: 'creation' },
+  { id: 'first-combat', key: 'firstCombat' },
+  { id: 'sheet', key: 'sheet' },
+];
+
+function guideEntries(t: Texts): CodexEntry[] {
+  return GUIDES.map(({ id, key }) => {
+    const g: {
+      title: string;
+      body?: string[];
+      steps?: { title: string; text: string }[];
+      tabs?: Record<SheetTab, string>;
+      tip?: string;
+    } = t.guides[key];
+    return {
+      id,
+      name: g.title,
+      subtitle: '',
+      source: '',
+      facet: null,
+      facetRank: 0,
+      detail: () => ({
+        facts: [],
+        sections: [],
+        guide: { paragraphs: g.body ?? [], steps: g.steps, tabs: g.tabs, tip: g.tip },
+      }),
+    };
+  });
+}
+
 /** Para buscar sin que importen tildes ni mayúsculas (`foldForSearch`). */
 export const fold = (s: string): string => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
 
@@ -117,6 +159,8 @@ export function codexEntries(category: CodexCategory, catalog: Catalog, t: Texts
   switch (category) {
     case 'glossary':
       return glossaryEntries(t);
+    case 'guides':
+      return guideEntries(t);
     case 'races':
       return ctx.sorted(catalog.races).map((r) => ctx.race(r));
     case 'lineages':
