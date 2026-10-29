@@ -111,8 +111,11 @@ repiten acá.
   Homebrew y el «DM» del interruptor de modo enlazan a la raíz de Flutter
   (`FLUTTER_HOME`, `src/router.ts`). Cada tarjeta enlaza a la ficha. Las cifras
   (nivel, PG máximos, CA, velocidad, iniciativa) salen de `computeSheet`; los
-  PG actuales, de la ficha cruda. El panel lateral es el menú principal
-  (`src/dashboard/RosterPanel.tsx`).
+  PG actuales, de la ficha cruda. Sigue el lienzo aprobado: título, buscador,
+  orden y «Crear» en una barra que se envuelve, regla ornamental y tarjetas
+  con barra de PG en verde/oro/carmesí y CA/VEL/INIC en placas. El panel
+  lateral es el menú principal (`src/dashboard/RosterPanel.tsx`), con el
+  interruptor «Jugador / DM»: «DM» lleva al Modo DM de Flutter.
 - **La ficha de solo lectura** en `/v2/personajes/:id/personaje` y
   `/v2/personajes/:id/combate` (`src/sheet/`); la ruta sin sufijo redirige a
   `personaje` y una pestaña desconocida es «Página no encontrada». Cabecera

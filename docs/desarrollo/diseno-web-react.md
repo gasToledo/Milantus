@@ -69,12 +69,12 @@ una regla: reciben el número ya resuelto por `computeSheet`.
 | Componente | Qué hace | Cuándo |
 | --- | --- | --- |
 | `StatTile` | Placa de la banda táctica: ícono + rótulo, cifra en sans negrita tabular, `suffix` y `footer` | Solo la banda táctica. Va dentro de un `<dl>` |
-| `StatPlaque` | Rótulo y valor en Georgia, centrado; `dense` | Tiras cortas dentro de una tarjeta (CD, ataque de conjuro) |
+| `StatPlaque` | Rótulo y valor en Georgia, centrado; `dense`. El rótulo puede ser un nodo (abreviatura visible, palabra completa para el lector) | Tiras cortas dentro de una tarjeta (CD, ataque de conjuro, CA/VEL/INIC de la tarjeta del dashboard) |
 | `ShieldBadge` | La CA dentro de un escudo, con `aria-label` | **Solo CA**, y solo donde la CA es el tema (Defensa) |
 | `Pill` | Cápsula de radio 20; `highlighted={false}` neutra | Clase, subclase, nivel |
 | `Pips` | Usos restantes, llenos en oro; `label` dice la cuenta | Recursos, espacios de conjuro |
 | `ThinBar` + `hpTone` | Barra fina (`role="meter"`, con `aria-label` y valor); `hpTone` da verde/oro/carmesí según el cociente de PG (`AppPalette.hpColor`) | PG |
-| `Medallion` | Aro del color de clase con la inicial | Tarjeta y panel |
+| `Medallion` | Aro del color de clase con la inicial sobre un degradado del acento hacia la placa (`color-mix`, sin colores inventados) | Tarjeta y panel |
 | `Seal` | El sello de la marca | Solo la marca |
 
 ### Estados y acciones
@@ -85,7 +85,7 @@ una regla: reciben el número ya resuelto por `computeSheet`.
 | `AppErrorView` | Ícono, título, mensaje, detalle copiable y «Reintentar» | `onRetry` siempre que reintentar pueda arreglarlo; `as="h1"` si ocupa la pantalla |
 | `AppEmptyState` | «No hay nada» (`empty`) o «nada coincide» (`no-match`), con ícono distinto | Son situaciones distintas y piden acciones distintas |
 | `Notice` | Pantalla de un solo mensaje con su `h1` | Sin sesión, no disponible, no encontrado |
-| `Button`, `ButtonLink` | `primary` (oro, uno por vista), `secondary`, `danger` (carmesí, lo irreversible) | `ButtonLink internal` navega sin recargar |
+| `Button`, `ButtonLink` | `primary` (oro lleno, uno por vista), `soft` (oro sobre `goldSoft` con filete: el verbo de una barra de herramientas), `secondary`, `danger` (carmesí, lo irreversible); `shape="pill"` en una fila de pills | `ButtonLink internal` navega sin recargar |
 | `AppDialog` | El molde de diálogo: placa, velo, barra de acciones de 48 px al pie | 480 px por defecto, 560 si el cuerpo es una ficha |
 
 ## Datos
