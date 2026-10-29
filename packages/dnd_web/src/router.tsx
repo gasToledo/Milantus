@@ -46,7 +46,11 @@ export type DmSection = (typeof DM_SECTIONS)[number];
 
 /** Qué muestra el Modo DM. `home` es `/v2/dm` a secas: no muestra nada, redirige
  *  a la primera campaña en curso (o a donde haya algo que ver). */
-export type DmView = { kind: 'home' } | { kind: 'campaign'; id: string; section: DmSection };
+export type DmView =
+  | { kind: 'home' }
+  | { kind: 'campaign'; id: string; section: DmSection }
+  // El Bestiario del DM es una herramienta de la cuenta, no de una campaña.
+  | { kind: 'bestiary'; entryId: string | null };
 
 export type Route =
   | { name: 'roster' }
@@ -79,6 +83,13 @@ export function matchRoute(pathname: string): Route {
   if (section === 'dm') {
     // `/dm` y `/dm/campanas/:id/:seccion`; lo demás es «no encontrada».
     if (id === undefined) return { name: 'dm', view: { kind: 'home' } };
+    if (id === 'bestiario' && rest.length === 0) {
+      try {
+        return { name: 'dm', view: { kind: 'bestiary', entryId: tab === undefined ? null : decodeURIComponent(tab) } };
+      } catch {
+        return { name: 'unknown' };
+      }
+    }
     const dmSection = rest.length === 1 ? DM_SECTIONS.find((s) => s === rest[0]) : undefined;
     if (id === 'campanas' && tab !== undefined && dmSection !== undefined) {
       try {
@@ -130,6 +141,10 @@ export const campaignsHref = (): string => `${import.meta.env.BASE_URL}campanas`
 
 /** El Modo DM: sin campaña es `/v2/dm`, que redirige a la primera. */
 export const dmHref = (): string => `${import.meta.env.BASE_URL}dm`;
+
+/** El Bestiario del Modo DM, o una criatura abierta. */
+export const dmBestiaryHref = (entryId?: string): string =>
+  `${import.meta.env.BASE_URL}dm/bestiario` + (entryId ? `/${encodeURIComponent(entryId)}` : '');
 
 export const dmCampaignHref = (id: string, section: DmSection = 'mesa'): string =>
   `${import.meta.env.BASE_URL}dm/campanas/${encodeURIComponent(id)}/${section}`;

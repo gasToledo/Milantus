@@ -1,7 +1,7 @@
 import { BookMarked, BookOpen, NotebookText, FlaskConical, PawPrint, Users, UsersRound, Flame, Contact } from 'lucide-react';
 import type { DmCampaign } from '../api/client';
 import { useTexts } from '../i18n/context';
-import { dmCampaignHref, FLUTTER_HOME, rosterHref, dmHref, type DmSection } from '../router';
+import { dmBestiaryHref, dmCampaignHref, FLUTTER_HOME, rosterHref, dmHref, type DmSection } from '../router';
 import { NavCollapsible } from '../ui/disclosure';
 import { ModeSwitch, NavGroup, NavItem } from '../ui/Shell';
 import { groupCampaigns, stateOf } from './campaigns';
@@ -16,10 +16,13 @@ import { groupCampaigns, stateOf } from './campaigns';
 export function DmPanel({
   campaigns,
   current,
+  tool,
 }: {
   /** `undefined` mientras cargan: el panel muestra las herramientas igual. */
   campaigns: readonly DmCampaign[] | undefined;
   current?: { campaign: DmCampaign; section: DmSection };
+  /** La herramienta de la cuenta que está abierta, si no es una campaña. */
+  tool?: 'bestiary';
 }) {
   const t = useTexts();
   const groups = campaigns ? groupCampaigns(campaigns) : null;
@@ -40,7 +43,7 @@ export function DmPanel({
 
       <NavGroup label={t.dmToolsLabel}>
         <li>
-          <NavItem href={FLUTTER_HOME} icon={PawPrint} label={t.navBestiary} external />
+          <NavItem href={dmBestiaryHref()} icon={PawPrint} label={t.navBestiary} active={tool === 'bestiary'} internal />
         </li>
         <li>
           <NavItem href={FLUTTER_HOME} icon={Contact} label={t.dmNpcLibrary} external />

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { chapterGrants, computeSheet, type JsonObject } from '../src/engine';
+import { bestiary, chapterGrants, computeSheet, type JsonObject } from '../src/engine';
 import { signed } from '../src/sheet/format';
 import { api, catalogo, TOKEN, TOKEN_DM, TOKEN_SIN_V2, vigilarEscrituras, type PersonajeApi } from './helpers';
 
@@ -170,6 +170,51 @@ test('el Cuaderno junta notas, combates y subidas de nivel por capítulo, y nada
   for (const secreto of ['Nota reservada del DM', 'Garrick el Tabernero', 'subió a nivel', 'levelUps', 'encounterLogs']) {
     expect(crudo, `la API del jugador manda «${secreto}»`).not.toContain(secreto);
   }
+});
+
+test('el Bestiario del DM es el mismo del jugador montado bajo /v2/dm, con el homebrew de la cuenta y sin dárselo a otra', async ({
+  context,
+  page,
+  baseURL,
+}) => {
+  const catalog = catalogo();
+  const lista = '[data-field="bestiary-list"]';
+  const { content } = await api<{ content: { creatures: JsonObject[] } }>(page.request, '/api/homebrew', TOKEN);
+  const sombra = content.creatures[0]!;
+  const todas = bestiary({ ...catalog, creatures: [...catalog.creatures, sombra] });
+
+  // La cuenta de humo no dirige ninguna campaña, y el Bestiario abre igual.
+  await context.addCookies([{ name: 'dnd_session', value: TOKEN, url: baseURL! }]);
+  const escrituras = vigilarEscrituras(page);
+  await page.goto('/v2/dm');
+  await page.getByRole('navigation', { name: 'Herramientas del DM' }).getByRole('link', { name: 'Bestiario' }).click();
+  await expect(page).toHaveURL('/v2/dm/bestiario');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Bestiario');
+  await expect(page.getByText(`Solo lectura · ${todas.length} criaturas`)).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Modo' }).locator('[aria-current="true"]')).toHaveText('DM');
+  await expect(page.locator(`${lista} [data-entry]`)).toHaveCount(todas.length);
+
+  // El perfil abre en una URL del Modo DM, con lo que deriva el motor.
+  await page.locator(`[data-entry="${sombra.id}"]`).click();
+  await expect(page).toHaveURL(`/v2/dm/bestiario/${sombra.id}`);
+  const detalle = page.locator('[data-field="creature-detail"]');
+  await expect(detalle.getByRole('heading', { level: 2 })).toHaveText('Sombra de Humo');
+  await expect(detalle).toContainText('Propio');
+  await expect(detalle.locator('[data-actions="action"]')).toContainText('Roce helado');
+  await expect(page.getByRole('navigation', { name: 'Herramientas del DM' }).getByRole('link', { name: 'Bestiario' })).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
+  expect(escrituras).toEqual([]);
+
+  // El homebrew es de la cuenta: el DM de la mesa ve solo el catálogo oficial,
+  // y sus campañas siguen en el panel.
+  await context.clearCookies();
+  await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);
+  await page.goto('/v2/dm/bestiario');
+  await expect(page.locator(`${lista} [data-entry]`)).toHaveCount(bestiary(catalog).length);
+  await expect(page.locator(`[data-entry="${sombra.id}"]`)).toHaveCount(0);
+  await expect(page.getByRole('navigation', { name: 'Campañas' }).getByRole('link', { name: 'La Marca del Cuervo' })).toBeVisible();
 });
 
 test('el DM no escribe la ficha del jugador: leerla no la cambia', async ({ request }) => {

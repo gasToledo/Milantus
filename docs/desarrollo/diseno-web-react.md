@@ -173,7 +173,7 @@ del motor, nunca se calcula acá.
 
 ## El Modo DM (`src/dm/`)
 
-Cada sección es una ruta bajo `/v2/dm/campanas/:id/` y comparte tres piezas:
+Cada sección es una ruta bajo `/v2/dm/campanas/:id/` (el Bestiario, bajo `/v2/dm/bestiario`) y comparte tres piezas:
 `DmPanel` (el panel: interruptor, herramientas, campañas, secciones),
 `DmHeader` (título Georgia 30, pill con el estado y la regla ornamental; el
 `h1` es el título) y `DmPage`, que resuelve la campaña por id y es la única que
@@ -186,11 +186,17 @@ control que escriba, y el e2e comprueba que no sale ningún pedido que no sea
   `toRosterEntry` (`dashboard/roster.ts`, la misma cuenta que el dashboard). La
   CD sale de los bloques de lanzamiento del motor y, con varias clases
   lanzadoras, se muestran todas.
+- **Capítulos** (`ChaptersView`): lista ordenada de tarjetas `card`; el abierto
+  lleva `border-2 border-gold`, el estado va en una pill con el color del estado
+  (oro, apagado, neutro) y lo que reparte en `StatPlaque`.
 - **Cuaderno** (`NotebookView`, `notebook.ts`): pills `aria-pressed` por
   capítulo (la selección es estado local, no ruta), buscador en pill como el del
   Bestiario y entradas en `card` con `border-l-[3px]` del color del tipo. Titular,
   redactar un combate y buscar son presentación y viven en `notebook.ts`; los
   nombres salen del catálogo.
+- **Bestiario** (`BestiaryPage dm`): la pantalla del jugador montada con el panel
+  del DM; no hay un segundo navegador. `dm` cambia la cabecera (`DmHeader`, con
+  «Solo lectura» y el conteo) y las URL (`dmBestiaryHref`).
 
 ## Reglas que más se olvidan
 

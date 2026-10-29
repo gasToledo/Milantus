@@ -203,17 +203,19 @@ repiten acá.
   alcance de cada acción es cuerpo a cuerpo; el modificador de cada
   característica es `abilityModifier`. Es de solo lectura: **sumar al combate y
   «Editar una copia»** (Homebrew) son del Modo DM de Flutter y no están.
-- **Campañas y Bestiario del jugador no están en el menú**: se entra escribiendo
-  la URL. Pertenecen al Modo DM, que ahora existe en parte (abajo); el panel DM
-  enlazará el Bestiario cuando se porte esa sección.
+- **Campañas y Bestiario del jugador no están en el menú de Jugador**: se entra
+  escribiendo la URL. Pertenecen al Modo DM, que ahora existe en parte (abajo): el
+  panel DM enlaza el Bestiario.
 - **El Modo DM, de solo lectura** en `/v2/dm` (`src/dm/`), al que lleva «DM» del
   interruptor. **Ninguna escritura**: ni crear o editar campañas, ni cerrar
   capítulos, ni música, ni notas; todo eso sigue en Flutter. Se porta por
-  secciones, una por PR; hoy existe la **Mesa**. Rutas: `/v2/dm` (redirige a la
-  primera campaña en curso, o a la primera que haya) y
-  `/v2/dm/campanas/:id/mesa`. El panel (`DmPanel`) sigue al de Flutter: el
+  secciones, una por PR; hoy existen la **Mesa**, **Capítulos**, el **Cuaderno**
+  y el **Bestiario**. Rutas: `/v2/dm` (redirige a la primera campaña en curso, o
+  a la primera que haya), `/v2/dm/campanas/:id/mesa|capitulos|cuaderno` y
+  `/v2/dm/bestiario[/:criatura]`. El panel (`DmPanel`) sigue al de Flutter: el
   interruptor con «DM» activo, las herramientas (Bestiario, Biblioteca de PNJ y
-  Homebrew, que enlazan a Flutter con el ícono de enlace externo), las campañas
+  Homebrew; el Bestiario es interno y los otros dos enlazan a Flutter con el ícono
+  de enlace externo), las campañas
   agrupadas En curso / En pausa / Terminadas (plegable, abierta si la elegida
   es una de ellas) y, de la campaña elegida, sus secciones; PNJ y Combate enlazan
   a Flutter porque todavía no se portan. La **Mesa** lista a los jugadores
@@ -227,6 +229,32 @@ repiten acá.
   completa de un miembro sigue en Flutter. La campaña es una ruta, y una ajena
   o inexistente muestra la misma pantalla «No se encontró la campaña»: el
   servidor las responde igual (404).
+  **Capítulos** (`GET /api/campaigns/:id/chapters`): una tarjeta por capítulo con
+  su estado (Cerrado / Abierto con borde oro / Pendiente), el **objetivo** —que
+  el servidor nunca manda a un jugador, y por eso solo se lee con la cuenta del
+  DM— y lo que reparte (placas de nivel, oro y objetos, y la línea que arma el
+  motor con `chapterGrants`). Cerrar un capítulo avisa a otras cuentas y sigue en
+  Flutter. La cabecera de la Mesa dice el capítulo en marcha. **Cuaderno**
+  (`GET /api/campaigns/:id/notebook`, un solo pedido con `notes`,
+  `encounterLogs` y `levelUps`): una pill por capítulo —se abre en el que está
+  en marcha— más «Sin capítulo», un buscador que sin tildes ni mayúsculas cuenta
+  las coincidencias en cada pill, el conteo de lo que hay y las entradas de la
+  más vieja a la más nueva, con borde izquierdo oro (nota), carmesí (combate) y
+  verde (subida de nivel). La nota se lee con el Markdown chico de la mesa; el
+  combate se redacta como en Flutter (quiénes pelearon, contra quién, cuántos
+  cayeron, aliados y neutrales, con los monstruos por su nombre del catálogo) y
+  la subida de nivel dice la clase. Un combate o una subida de un capítulo que ya
+  no existe va a «Sin capítulo» en vez de perderse. Es solo del DM: lo que el
+  servidor poda para el jugador (notas, nombres propios de PNJ, subidas de
+  nivel) no existe en su API. **Las menciones `@Nombre` se leen como texto**: en
+  Flutter enlazan a la ficha del personaje o del PNJ, que acá todavía no
+  existen. **Bestiario del DM**: es el mismo `BestiaryPage` del jugador
+  (`/v2/bestiario`, ya completo) montado bajo `/v2/dm/bestiario` con el panel del
+  DM (`dm` en `BestiaryPage`): igual navegador, filtros y perfil, con la
+  cabecera del Modo DM y sus propias URL. Es una herramienta de la cuenta y no de
+  una campaña: abre también sin campañas, no depende de la lista y trae el
+  homebrew de **la cuenta** (el de otra no llega). Sumar al combate y «Editar una
+  copia» siguen en Flutter.
 - **Homebrew**: la ficha y el dashboard calculan con el catálogo oficial más
   el contenido homebrew de la cuenta (`GET /api/homebrew`, fusionado por id en
   `src/api/homebrew.ts`), como `HomebrewStore` + `ContentRepository.addAll` en
@@ -297,7 +325,12 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    (`e2e/bestiario.spec.ts`); que la Mesa del DM
    liste a los dos jugadores sembrados (de dos cuentas distintas) con los números
    del motor y los estados de la ficha, sin escribir nada, que leerla no cambie la
-   ficha del jugador, y que otra cuenta —con o sin `webV2`— reciba el mismo 404
+   ficha del jugador, que Capítulos muestre estado, objetivo y recompensas (y que
+   el objetivo y los capítulos sin cerrar no lleguen al jugador), que el
+   Cuaderno junte notas, combates (con un PNJ aliado por su nombre propio) y
+   subidas de nivel, busque, y que nada de eso llegue al jugador, que el
+   Bestiario del DM abra bajo `/v2/dm/bestiario` con el homebrew de la cuenta y
+   sin dárselo a otra, y que otra cuenta —con o sin `webV2`— reciba el mismo 404
    que ante una campaña inexistente, en la API y en la pantalla
    (`e2e/dm.spec.ts`); y que una cuenta sin `webV2` vea
    «No disponible» sin pedir sus datos (`e2e/acceso.spec.ts`). Lo esperado se
@@ -343,7 +376,7 @@ Para que nadie lo dé por hecho:
 
 - Reordenar, marcar favorito, crear, renombrar o borrar personajes desde React.
 - Cualquier escritura desde React: todo el cliente hoy es solo lectura.
-- Del Modo DM: Capítulos, Cuaderno, el Bestiario del DM, PNJ, Combate, Homebrew,
+- Del Modo DM: PNJ, Combate, Homebrew,
   la música y la ficha completa de un miembro (en curso, por secciones).
 - Enlaces desde Flutter hacia `/v2` o redirección automática por `webV2`.
 - Tests de componentes y chequeo de literales sueltos en `dnd_web`.

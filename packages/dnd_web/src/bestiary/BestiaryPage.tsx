@@ -4,7 +4,8 @@ import { useSheetCatalog } from '../api/queries';
 import { bestiary, type BestiaryRow, type Catalog } from '../engine';
 import { fold } from '../codex/entries';
 import { useLang, useTexts } from '../i18n/context';
-import { bestiaryHref, Link } from '../router';
+import { bestiaryHref, dmBestiaryHref, Link } from '../router';
+import { DmHeader } from '../dm/DmHeader';
 import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
 import { Pill } from '../ui/data';
@@ -27,8 +28,12 @@ interface Creature {
  * son URLs (`/v2/bestiario/goblin`). A diferencia de Flutter, donde es una
  * sección del Modo DM que además suma al combate o copia a Homebrew, acá solo
  * se lee: el catálogo es el mismo contenido público del Códice.
+ *
+ * Con [dm] es la misma pantalla montada en el Modo DM (`/v2/dm/bestiario`, con
+ * el panel del DM): igual navegador y perfil, con la cabecera del Modo DM y sus
+ * propias URL. No es otra pantalla: una criatura nueva sale en las dos.
  */
-export function BestiaryPage({ entryId }: { entryId: string | null }) {
+export function BestiaryPage({ entryId, dm = false }: { entryId: string | null; dm?: boolean }) {
   const t = useTexts();
   const lang = useLang();
   const catalog = useSheetCatalog(lang);
@@ -47,7 +52,7 @@ export function BestiaryPage({ entryId }: { entryId: string | null }) {
   if (failed.length > 0) {
     return (
       <div>
-        <Heading />
+        <Heading dm={dm} />
         <AppErrorView title={t.bestiaryLoadError} message={t.errorBody} onRetry={() => failed.forEach((q) => q.refetch())} />
       </div>
     );
@@ -55,16 +60,21 @@ export function BestiaryPage({ entryId }: { entryId: string | null }) {
   if (!creatures || !catalog.data) {
     return (
       <div>
-        <Heading />
+        <Heading dm={dm} />
         <AppBusyLabel label={t.bestiaryLoading} />
       </div>
     );
   }
-  return <Browser creatures={creatures} catalog={catalog.data} entryId={entryId} />;
+  return <Browser creatures={creatures} catalog={catalog.data} entryId={entryId} dm={dm} />;
 }
 
-function Heading({ count }: { count?: number }) {
+function Heading({ count, dm = false }: { count?: number; dm?: boolean }) {
   const t = useTexts();
+  // El Modo DM tiene su cabecera (título, pill y regla); el conteo va en la
+  // pill.
+  if (dm) {
+    return <DmHeader title={t.bestiaryTitle} kicker={count === undefined ? t.dmReadOnly : `${t.dmReadOnly} · ${t.bestiaryCount(count)}`} />;
+  }
   return (
     <header className="flex flex-wrap items-baseline gap-x-3.5 gap-y-1">
       <h1 className="font-display text-[30px] leading-tight text-on-surface">{t.bestiaryTitle}</h1>
@@ -73,7 +83,18 @@ function Heading({ count }: { count?: number }) {
   );
 }
 
-function Browser({ creatures, catalog, entryId }: { creatures: Creature[]; catalog: Catalog; entryId: string | null }) {
+function Browser({
+  creatures,
+  catalog,
+  entryId,
+  dm,
+}: {
+  creatures: Creature[];
+  catalog: Catalog;
+  entryId: string | null;
+  dm: boolean;
+}) {
+  const hrefOf = dm ? dmBestiaryHref : bestiaryHref;
   const t = useTexts();
   const [query, setQuery] = useState('');
   const [type, setType] = useState(ALL);
@@ -141,7 +162,7 @@ function Browser({ creatures, catalog, entryId }: { creatures: Creature[]; catal
 
   return (
     <div className="flex flex-col gap-4">
-      <Heading count={visible.length} />
+      <Heading count={visible.length} dm={dm} />
 
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2.5">
         <div role="search" className="relative min-w-[min(220px,100%)] max-w-[320px] flex-[1_1_220px]">
@@ -232,7 +253,7 @@ function Browser({ creatures, catalog, entryId }: { creatures: Creature[]; catal
                   return (
                     <li key={row.id}>
                       <Link
-                        href={bestiaryHref(row.id)}
+                        href={hrefOf(row.id)}
                         aria-current={on ? 'true' : undefined}
                         data-entry={row.id}
                         className={cx(
@@ -261,7 +282,7 @@ function Browser({ creatures, catalog, entryId }: { creatures: Creature[]; catal
             {open ? (
               <>
                 <Link
-                  href={bestiaryHref()}
+                  href={hrefOf()}
                   className="codex-back mb-3 inline-flex items-center gap-1.5 text-[13px] text-on-surface-variant hover:text-gold"
                 >
                   <ArrowLeft size={16} aria-hidden="true" className="text-gold" />
