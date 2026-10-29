@@ -23,6 +23,7 @@ export type SheetTab = (typeof SHEET_TABS)[number];
  *  tildes, como las pestañas de la ficha). */
 export const CODEX_CATEGORIES = {
   glossary: 'glosario',
+  guides: 'guias',
   races: 'especies',
   lineages: 'linajes',
   classes: 'clases',

@@ -8,6 +8,7 @@ import {
   ChevronRight,
   GitBranch,
   Lightbulb,
+  MapIcon,
   Medal,
   Network,
   ScrollText,
@@ -23,9 +24,9 @@ import {
 import { useAppVersion, useSheetCatalog } from '../api/queries';
 import { abilityModifier } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
-import { codexHref, Link, navigate, rosterHref, type CodexCategory } from '../router';
+import { codexHref, Link, navigate, rosterHref, SHEET_TABS, type CodexCategory } from '../router';
 import { signed } from '../sheet/format';
-import { SheetFooter } from '../sheet/SheetPanel';
+import { SheetFooter, TAB_ICONS, tabLabel } from '../sheet/SheetPanel';
 import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
 import { Eyebrow, Pill, SectionRule } from '../ui/data';
@@ -37,6 +38,7 @@ import { CATEGORY_GROUPS, codexEntries, fold, type CodexEntry } from './entries'
 /** Ícono por categoría (los de `CodexCategory` en Flutter, en lucide). */
 const ICONS: Record<CodexCategory, LucideIcon> = {
   glossary: Lightbulb,
+  guides: MapIcon,
   races: Users,
   lineages: Network,
   classes: Shield,
@@ -248,10 +250,10 @@ function CategoryView({
   const [query, setQuery] = useState(() => new URLSearchParams(window.location.search).get('q') ?? '');
   const [facet, setFacet] = useState<string | null>(null);
   const label = t.codexCategories[category];
-  // El glosario se lee en orden: la lista va agrupada y numerada, sin filtros
-  // (con 26 términos alcanza el buscador), y el detalle dice dónde estás y
+  // El glosario y las guías se leen en orden: la lista va numerada (el
+  // glosario, además, agrupado), sin filtros, y el detalle dice dónde estás y
   // lleva al anterior y al siguiente.
-  const reading = category === 'glossary';
+  const reading = category === 'glossary' || category === 'guides';
 
   // Los valores del filtro salen de lo cargado, así una rareza o categoría de
   // homebrew nueva también aparece; van en el orden del motor.
@@ -277,46 +279,53 @@ function CategoryView({
       <header className="flex flex-wrap items-baseline gap-x-3.5 gap-y-1">
         <h1 className="font-display text-[30px] leading-tight text-on-surface">{label}</h1>
         <span className="text-text-muted tabular-nums">
-          {reading ? t.codexTerms(entries.length) : t.codexEntries(entries.length)}
+          {category === 'glossary'
+            ? t.codexTerms(entries.length)
+            : category === 'guides'
+              ? t.codexGuidesIntro
+              : t.codexEntries(entries.length)}
         </span>
       </header>
 
-      <div className="flex flex-wrap items-center gap-x-3.5 gap-y-2.5">
-        <div role="search" className="relative min-w-[min(220px,100%)] flex-[1_1_220px] max-w-[320px]">
-          <label htmlFor="codex-category-search" className="sr-only">
-            {t.codexSearchIn(label)}
-          </label>
-          <input
-            id="codex-category-search"
-            type="search"
-            autoComplete="off"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={t.codexSearchIn(label)}
-            className="h-9 w-full rounded-[var(--radius-pill)] border border-hairline bg-plaque px-4 text-[13px] text-on-surface placeholder:text-text-muted"
-          />
-        </div>
-        {!reading && facets.length > 1 && (
-          <div role="group" aria-label={t.codexFilterLabel} className="flex flex-wrap gap-1.5">
-            {[null, ...facets].map((f) => (
-              <button
-                key={f ?? '*'}
-                type="button"
-                aria-pressed={facet === f}
-                onClick={() => setFacet(f)}
-                className={cx(
-                  'rounded-[var(--radius-pill)] border px-3 py-[5px] text-[12.5px] tabular-nums',
-                  facet === f
-                    ? 'border-gold bg-gold-soft font-semibold text-gold'
-                    : 'border-hairline text-on-surface-variant hover:text-on-surface',
-                )}
-              >
-                {f ?? t.codexAll}
-              </button>
-            ))}
+      {/* Cuatro guías no piden buscador. */}
+      {category !== 'guides' && (
+        <div className="flex flex-wrap items-center gap-x-3.5 gap-y-2.5">
+          <div role="search" className="relative min-w-[min(220px,100%)] flex-[1_1_220px] max-w-[320px]">
+            <label htmlFor="codex-category-search" className="sr-only">
+              {t.codexSearchIn(label)}
+            </label>
+            <input
+              id="codex-category-search"
+              type="search"
+              autoComplete="off"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t.codexSearchIn(label)}
+              className="h-9 w-full rounded-[var(--radius-pill)] border border-hairline bg-plaque px-4 text-[13px] text-on-surface placeholder:text-text-muted"
+            />
           </div>
-        )}
-      </div>
+          {!reading && facets.length > 1 && (
+            <div role="group" aria-label={t.codexFilterLabel} className="flex flex-wrap gap-1.5">
+              {[null, ...facets].map((f) => (
+                <button
+                  key={f ?? '*'}
+                  type="button"
+                  aria-pressed={facet === f}
+                  onClick={() => setFacet(f)}
+                  className={cx(
+                    'rounded-[var(--radius-pill)] border px-3 py-[5px] text-[12.5px] tabular-nums',
+                    facet === f
+                      ? 'border-gold bg-gold-soft font-semibold text-gold'
+                      : 'border-hairline text-on-surface-variant hover:text-on-surface',
+                  )}
+                >
+                  {f ?? t.codexAll}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="codex-split" data-open={open !== null}>
         <div>
@@ -415,8 +424,9 @@ function EntryList({
       </li>
     );
   };
-  if (!all) return <ul>{entries.map(item)}</ul>;
   const groups = [...new Set(entries.map((e) => e.subtitle))];
+  // Sin grupos con nombre (las guías), una lista sola.
+  if (!all || groups.every((g) => g === '')) return <ul>{entries.map(item)}</ul>;
   return (
     <div>
       {groups.map((g) => (
@@ -447,7 +457,14 @@ function EntryDetail({
   const source = (t.sources as Record<string, string>)[entry.source];
   return (
     <article aria-labelledby="codex-entry-title" className="card px-5 py-6 sm:px-8 sm:py-7" data-field="codex-detail">
-      {reading && <ReadingTrack entry={entry} entries={reading.entries} />}
+      {reading &&
+        (reading.category === 'guides' ? (
+          <Pill highlighted={false}>
+            {t.codexGuideOf(reading.entries.indexOf(entry) + 1, reading.entries.length)}
+          </Pill>
+        ) : (
+          <ReadingTrack entry={entry} entries={reading.entries} />
+        ))}
       {source && (
         <Pill highlighted={entry.source === 'srd_2024'}>
           <span aria-hidden="true">{source}</span>
@@ -494,6 +511,7 @@ function EntryDetail({
       ))}
 
       {detail.glossary && <GlossaryBody glossary={detail.glossary} />}
+      {detail.guide && <GuideBody guide={detail.guide} />}
 
       {detail.related && (
         <div className="mt-6 flex flex-wrap items-center gap-2">
@@ -610,6 +628,62 @@ function GlossaryBody({ glossary }: { glossary: NonNullable<ReturnType<CodexEntr
               </div>
             ))}
         </dl>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Una guía. El primer combate es una secuencia de verdad: pasos numerados y
+ * unidos por una línea, que se siguen con el dedo en la mesa. La ficha va
+ * pestaña por pestaña con el ícono que lleva en la ficha, para reconocerla.
+ */
+function GuideBody({ guide }: { guide: NonNullable<ReturnType<CodexEntry['detail']>['guide']> }) {
+  const t = useTexts();
+  return (
+    <div className="flex max-w-[640px] flex-col gap-4">
+      {guide.paragraphs.map((p, i) => (
+        <p key={i} className="text-[16px] leading-[1.7] text-on-surface">
+          {p}
+        </p>
+      ))}
+      {guide.steps && (
+        <ol>
+          {guide.steps.map((s, i) => (
+            <li key={s.title} className="grid grid-cols-[32px_minmax(0,1fr)] gap-x-3.5">
+              <div className="flex flex-col items-center">
+                <span className="flex size-[30px] shrink-0 items-center justify-center rounded-full border border-gold bg-gold-soft text-[14px] font-bold text-gold tabular-nums">
+                  {i + 1}
+                </span>
+                {i < guide.steps!.length - 1 && <span aria-hidden="true" className="my-1 w-px flex-1 bg-hairline" />}
+              </div>
+              <div className="pt-1 pb-5">
+                <p className="text-[16px] font-semibold text-on-surface">{s.title}</p>
+                <p className="mt-1 text-[15px] leading-[1.65] text-on-surface">{s.text}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      )}
+      {guide.tabs && (
+        <dl className="flex flex-col gap-2.5">
+          {SHEET_TABS.map((tab) => {
+            const Icon = TAB_ICONS[tab];
+            return (
+              <div key={tab} className="plaque grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1 px-4 py-3">
+                <Icon size={18} aria-hidden="true" className="mt-0.5 text-gold" />
+                <dt className="text-[15px] font-semibold text-on-surface">{tabLabel(t, tab)}</dt>
+                <dd className="col-start-2 text-[15px] leading-[1.6] text-on-surface-variant">{guide.tabs![tab]}</dd>
+              </div>
+            );
+          })}
+        </dl>
+      )}
+      {guide.tip && (
+        <div className="plaque px-[18px] py-3.5">
+          <p className="text-[12px] text-gold">{t.codexTip}</p>
+          <p className="mt-1.5 text-[15px] leading-[1.6] text-on-surface">{guide.tip}</p>
+        </div>
       )}
     </div>
   );

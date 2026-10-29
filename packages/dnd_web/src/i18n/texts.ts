@@ -306,6 +306,7 @@ const es = {
   codexGroups: { start: 'Primeros pasos', character: 'Personaje', gear: 'Magia y equipo' },
   codexCategories: {
     glossary: 'Glosario',
+    guides: 'Guías',
     races: 'Especies',
     lineages: 'Linajes',
     classes: 'Clases',
@@ -330,6 +331,50 @@ const es = {
   codexKeepReading: 'Seguir leyendo',
   codexPrevious: 'Anterior',
   codexNext: 'Siguiente',
+  // Las guías de Flutter (`guide*` de `app_es.arb`), ya partidas: el primer
+  // combate en pasos y la ficha por pestaña, que el detalle dibuja aparte.
+  codexGuidesIntro: 'Para tu primera partida',
+  codexGuideOf: (n: number, total: number) => `Guía ${n} de ${total}`,
+  codexTip: 'Un consejo',
+  guides: {
+    session: {
+      title: 'Cómo es una partida',
+      body: [
+        'Una partida de D&D es una conversación con dados. El grupo se junta, en persona o por internet, durante unas horas, y el DM describe dónde están y qué pasa a su alrededor. Cada jugador cuenta qué hace su personaje, y el DM decide qué pasa después.',
+        'Cuando el resultado de algo es incierto, ahí entran los dados: el DM te pide una tirada y el número decide. Una partida mezcla tres cosas: explorar lugares, hablar con los personajes del mundo y pelear. Algunas sesiones son casi todo charla y otras, casi todo combate.',
+        'No hay ganadores ni perdedores: la historia se construye entre todos. Una campaña sigue a los mismos personajes durante muchas sesiones, a lo largo de semanas o incluso años. También existen los one-shots: aventuras cortas que empiezan y terminan en una sola sesión, ideales para probar el juego o jugar con gente nueva.',
+      ],
+    },
+    creation: {
+      title: 'Antes de crear tu personaje',
+      body: [
+        'Antes de mirar números, pensá en quién querés ser: un guerrero curtido, una hechicera curiosa, un ladrón con buen corazón. La app se encarga de las cuentas; la idea es tuya.',
+        'Tres elecciones definen a tu personaje. La clase es lo que hace: pelear, lanzar conjuros, curar, moverse en las sombras. La especie es de dónde viene: humano, elfo, enano y otros pueblos. El trasfondo es lo que hacía antes de la aventura, y le da algunas habilidades y su primer equipo.',
+        'Si es tu primera vez, el guerrero y el pícaro son fáciles de llevar, porque tienen pocas opciones por turno. Si querés magia, el clérigo combina hechizos con buena resistencia. No hay elecciones malas: se juega para divertirse, no para ganar.',
+      ],
+    },
+    firstCombat: {
+      title: 'Tu primer combate',
+      steps: [
+        { title: 'Iniciativa', text: 'El DM avisa que empieza la pelea y te pide iniciativa: tirás un d20, le sumás el número que muestra tu ficha y le decís el total.' },
+        { title: 'Esperá tu turno', text: 'Mientras juegan los demás, pensá qué vas a hacer. Milantus te avisa en la ficha cuando te toca y cuando seguís vos.' },
+        { title: 'Tu turno', text: 'Moverte y hacer una acción, casi siempre atacar o lanzar un conjuro. En Combate tenés tus ataques con el bonificador ya sumado: tirás el d20, decís el total, y si el DM te dice que acertaste, tirás el daño.' },
+        { title: 'Cuando te pegan', text: 'Anotás el daño en tus PG, en Combate. Si llegás a 0 no te desesperes: caés inconsciente y tus compañeros todavía pueden salvarte.' },
+        { title: 'Después de la pelea', text: 'Si el grupo puede, descansa para recuperarse. El descanso también está en Combate.' },
+      ],
+      tip: 'Preguntá todo lo que no sepas. Ningún DM se enoja con alguien que está aprendiendo.',
+    },
+    sheet: {
+      title: 'Cómo leer tu ficha',
+      tabs: {
+        personaje: 'Quién es tu personaje: sus seis características con sus modificadores, las habilidades en las que se destaca, sus competencias y los rasgos y dotes que le dan su clase, su especie y su trasfondo.',
+        combate: 'Lo que más vas a mirar durante una partida. Arriba están tus PG, tu CA y tus descansos; más abajo, tus ataques con el bonificador y el daño ya calculados, tus conjuros si los tenés, tus salvaciones y los estados que te afectan.',
+        inventario: 'Tu equipo y tu dinero; desde ahí comprás y vendés.',
+        campana: 'Te conecta con la mesa de tu DM.',
+        diario: 'Tu cuaderno para anotar lo que va pasando en la historia.',
+      },
+    },
+  },
   glossaryGroups: {
     dice: 'Dados y tiradas',
     character: 'Tu personaje',
@@ -812,6 +857,7 @@ const en: Texts = {
   codexGroups: { start: 'Getting started', character: 'Character', gear: 'Magic and gear' },
   codexCategories: {
     glossary: 'Glossary',
+    guides: 'Guides',
     races: 'Species',
     lineages: 'Lineages',
     classes: 'Classes',
@@ -834,6 +880,48 @@ const en: Texts = {
   codexKeepReading: 'Keep reading',
   codexPrevious: 'Previous',
   codexNext: 'Next',
+  codexGuidesIntro: 'For your first game',
+  codexGuideOf: (n: number, total: number) => `Guide ${n} of ${total}`,
+  codexTip: 'A tip',
+  guides: {
+    session: {
+      title: 'What a game is like',
+      body: [
+        'A game of D&D is a conversation with dice. The group gets together, in person or online, for a few hours, and the DM describes where they are and what’s happening around them. Each player says what their character does, and the DM decides what happens next.',
+        'When the outcome of something is uncertain, that’s where the dice come in: the DM asks you for a roll and the number decides. A game mixes three things: exploring places, talking with the people of the world and fighting. Some sessions are almost all talk and others almost all combat.',
+        'There are no winners or losers: the story is built together. A campaign follows the same characters over many sessions, across weeks or even years. There are also one-shots: short adventures that start and end in a single session, great for trying the game or playing with new people.',
+      ],
+    },
+    creation: {
+      title: 'Before you create your character',
+      body: [
+        'Before looking at numbers, think about who you want to be: a battle-hardened warrior, a curious sorceress, a thief with a heart of gold. The app takes care of the math; the idea is yours.',
+        'Three choices define your character. Their class is what they do: fight, cast spells, heal, move through the shadows. Their species is where they come from: human, elf, dwarf and other peoples. Their background is what they did before the adventure, and it gives them some skills and their starting gear.',
+        'If it’s your first time, the fighter and the rogue are easy to play, because they have few options per turn. If you want magic, the cleric combines spells with good toughness. There are no bad choices: you play to have fun, not to win.',
+      ],
+    },
+    firstCombat: {
+      title: 'Your first combat',
+      steps: [
+        { title: 'Initiative', text: 'The DM announces the fight and asks for initiative: roll a d20, add the number shown on your sheet and tell them the total.' },
+        { title: 'Wait for your turn', text: 'While the others play, think about what you’ll do. Milantus lets you know on your sheet when it’s your turn and when you’re up next.' },
+        { title: 'Your turn', text: 'Move and take an action, usually attacking or casting a spell. In Combat you have your attacks with the bonus already added: roll the d20, say the total, and if the DM says you hit, roll the damage.' },
+        { title: 'When you get hit', text: 'Write the damage down on your HP, in Combat. If you reach 0, don’t panic: you fall unconscious and your companions can still save you.' },
+        { title: 'After the fight', text: 'If the group can, it rests to recover. Resting is also in Combat.' },
+      ],
+      tip: 'Ask about anything you don’t know. No DM gets upset with someone who’s learning.',
+    },
+    sheet: {
+      title: 'How to read your sheet',
+      tabs: {
+        personaje: 'Who your character is: their six abilities with their modifiers, the skills they’re good at, their proficiencies and the features and feats their class, species and background give them.',
+        combate: 'What you’ll look at most during a game. At the top are your HP, your AC and your rests; further down, your attacks with the bonus and damage already worked out, your spells if you have any, your saves and the conditions affecting you.',
+        inventario: 'Your gear and your money, and where you buy and sell.',
+        campana: 'Connects you with your DM’s table.',
+        diario: 'Your notebook for writing down what happens in the story.',
+      },
+    },
+  },
   glossaryGroups: {
     dice: 'Dice and rolls',
     character: 'Your character',

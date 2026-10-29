@@ -134,6 +134,9 @@ La pantalla de referencia de cómo se arma una vista con la biblioteca:
   numerada sin filtros (`EntryList`), el detalle abre con el grupo y una pista
   de una muesca por término (`ReadingTrack`) y cierra con anterior y siguiente
   (`ReadingSteps`). El ejemplo de cada término va hundido en una placa.
+- Las guías se leen igual, con la lista numerada sin grupos ni buscador y
+  «Guía N de 4» en lugar de la pista. El primer combate va en pasos unidos por
+  una línea, y la de la ficha, pestaña por pestaña con `TAB_ICONS`.
 
 ## Reglas que más se olvidan
 
