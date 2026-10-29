@@ -10,7 +10,7 @@ import { Medallion } from '../../ui/Medallion';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../../ui/status';
 import { DmHeader } from '../DmHeader';
 import { FilterPill } from './NpcLibraryView';
-import { hasTag, normalizeTags, npcTypeLine, STATUS_TONE } from './npc';
+import { hasTag, normalizeTags, npcPortrait, npcTypeLine, STATUS_TONE } from './npc';
 
 /**
  * Los PNJ de la campaña (`campaign_npcs_view.dart`), con su estado **en esta**
@@ -30,6 +30,8 @@ export function CampaignNpcsView({ campaign }: { campaign: DmCampaign }) {
     () => (npcs.data && catalog.data ? npcViews(npcs.data, catalog.data) : null),
     [npcs.data, catalog.data],
   );
+
+  const portraits = useMemo(() => new Map((npcs.data ?? []).map((e) => [e.npc.id, npcPortrait(e)])), [npcs.data]);
 
   const failed = [npcs, ...catalog.queries].filter((q) => q.isError);
 
@@ -82,7 +84,7 @@ export function CampaignNpcsView({ campaign }: { campaign: DmCampaign }) {
         ) : (
           <ul aria-label={t.dmCampaignNpcs} className="grid gap-3.5 [grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr))]">
             {visible.map((v) => (
-              <TableNpcCard key={v.npc.id} view={v} />
+              <TableNpcCard key={v.npc.id} view={v} portrait={portraits.get(v.npc.id) ?? null} />
             ))}
           </ul>
         )}
@@ -100,7 +102,7 @@ export function CampaignNpcsView({ campaign }: { campaign: DmCampaign }) {
 
 /** Un PNJ en la mesa: la identidad lleva a su ficha de la Biblioteca y el
  *  estado va al pie, para que en una fila de la grilla queden alineados. */
-function TableNpcCard({ view }: { view: NpcView }) {
+function TableNpcCard({ view, portrait }: { view: NpcView; portrait: string | null }) {
   const t = useTexts();
   const { npc, status } = view;
   // Tachado y atenuado, no solo en rojo: el estado se lee sin distinguir colores.
@@ -108,7 +110,7 @@ function TableNpcCard({ view }: { view: NpcView }) {
   return (
     <li className={cx('card flex min-w-0 flex-col gap-2.5 px-3.5 pt-3 pb-3.5', dead && 'opacity-70')} data-npc={npc.id}>
       <Link href={dmNpcsHref(npc.id)} className="flex items-center gap-3 rounded-[var(--radius-nav)] hover:text-gold">
-        <Medallion name={npc.name} accent={null} size={36} />
+        <Medallion name={npc.name} accent={null} size={36} portrait={portrait} />
         <span className="min-w-0 flex-1">
           <span className={cx('font-display block truncate text-[16px]', dead ? 'text-text-muted line-through' : 'text-on-surface')}>
             {npc.name}

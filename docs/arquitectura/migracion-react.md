@@ -237,7 +237,7 @@ repiten acá.
   escrituras (paso 6), y la oferta al empezar un combate no está porque acá
   nadie empieza uno. La **Mesa** lista a los jugadores
   vinculados (`GET /api/campaigns/:id/members`, que lee la ficha **real** del
-  jugador, no una copia): retrato inicial, nombre, especie y clase, nivel, barra
+  jugador, no una copia): retrato, nombre, especie y clase, nivel, barra
   de PG, placas CA / Inic / CD / Pasiva y los estados como pills carmesí. Las
   cifras salen de `computeSheet` con el catálogo del DM (SRD más **su** homebrew,
   como Flutter) y nunca se recalculan. **No muestra el nombre del jugador** que
@@ -300,9 +300,8 @@ repiten acá.
   Flutter se edita). Sale del mismo `GET /api/npcs/:id`. Un PNJ ajeno y uno
   inexistente dan la misma pantalla «No se encontró el PNJ» —también en su
   ficha, igual que un PNJ sin ficha—: el servidor los responde igual (404). Crear, importar,
-  editar, retratos, el estado por campaña, exportar y borrar siguen en Flutter,
-  y el retrato todavía no se muestra (el medallón lleva la inicial, como en el
-  resto de `/v2`).
+  editar, generar o subir retratos, el estado por campaña, exportar y borrar
+  siguen en Flutter.
   **PNJ de la mesa** (`GET /api/campaigns/:id/npcs`): los PNJ vinculados a la
   campaña con su estado **en esa** campaña. Arriba, el conteo («2 PNJ · 1 vivo ·
   0 muertos · 1 desconocido») y las pills de tag; cada tarjeta lleva la
@@ -346,6 +345,22 @@ repiten acá.
   `useCampaignEncounter`). Tirar iniciativa, dañar o curar, pasar el turno,
   sumar o sacar combatientes, anotar efectos, las acciones legendarias, la
   dificultad y cerrar siguen en Flutter.
+- **Retratos** (`src/ui/portrait.ts`, `Medallion`, `PortraitViewer`; en
+  Flutter `portrait_image.dart` y `portrait_viewer.dart`): el medallón muestra
+  el primer retrato de la ficha (`portraitPaths`) y, si no hay o no carga —uno
+  borrado, uno de otra cuenta—, la inicial. Lo propio (la ficha, el dashboard,
+  un PNJ y la ficha de un PNJ, que son del DM) va por `/api/portraits/<clave>`;
+  el de un miembro de la Mesa, por **el vínculo**
+  (`/api/campaigns/:id/members/:miembro/portrait/<archivo>`), porque con la
+  clave tal cual el servidor lo busca en la cuenta del DM y responde 404. Un
+  PNJ con ficha muestra el de su ficha, como `npcPortraitKey`. Cada medallón
+  pide la miniatura de su tamaño (`?w=`, la escalera de anchos duplicada a
+  propósito, como en Flutter). Donde el medallón no es parte de un enlace (el
+  panel de la ficha, la cabecera de la ficha de un miembro, de un PNJ y de su
+  ficha) se toca para abrir el **visor**: el original entero sobre el velo, que
+  se cierra con `Esc`, un clic afuera o el botón. Generar, subir, elegir o
+  borrar un retrato son escrituras: «Retrato» del panel sigue llevando a
+  Flutter.
 - **Homebrew**: la ficha y el dashboard calculan con el catálogo oficial más
   el contenido homebrew de la cuenta (`GET /api/homebrew`, fusionado por id en
   `src/api/homebrew.ts`), como `HomebrewStore` + `ContentRepository.addAll` en
@@ -370,10 +385,8 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    **Lectura del Modo DM** (se sumó a este paso): Mesa, Capítulos, Cuaderno,
    Bestiario, Biblioteca de PNJ, PNJ de la mesa, Homebrew y Combate *(existen)*.
    La ficha completa de un miembro y la de un PNJ con ficha, y la música (solo
-   escuchar) *(existen)*.
+   escuchar) y los retratos con su visor *(existen)*.
    **Faltan para cerrar el paso**, todas de lectura:
-   - los retratos (personaje, miembro y PNJ: hoy el medallón lleva la inicial)
-     y su visor;
    - las menciones `@Nombre` del Cuaderno como enlaces, que dependen de las dos
      fichas de arriba;
    - imprimir la ficha (`print_sheet.dart`).
@@ -427,7 +440,8 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    del motor y los estados de la ficha, sin escribir nada, que leerla no cambie la
    ficha del jugador, que su tarjeta abra la ficha completa del miembro (por el
    vínculo, con Personaje y Combate y los números del motor) y que otra cuenta
-   no la abra por URL, que la música ponga una escena sembrada con el reproductor
+   no la abra por URL, que el retrato sembrado del miembro llegue por el vínculo (y
+   por la clave dé 404), con miniatura en la Mesa y el original en el visor, que la música ponga una escena sembrada con el reproductor
    que arma el motor y siga al cambiar de sección, sin escribir, que Capítulos muestre estado, objetivo y recompensas (y que
    el objetivo y los capítulos sin cerrar no lleguen al jugador), que el
    Cuaderno junte notas, combates (con un PNJ aliado por su nombre propio) y
@@ -495,7 +509,7 @@ propio.
 Para que nadie lo dé por hecho:
 
 - Las lecturas que faltan del paso 3 (la lista está en «Orden previsto de
-  pantallas»): los retratos, las menciones `@Nombre` como enlaces e imprimir.
+  pantallas»): las menciones `@Nombre` como enlaces e imprimir.
 - Cualquier escritura desde React: todo el cliente hoy es solo lectura, así que
   los pasos 4 a 7 están enteros por hacer. Entre ellos, reordenar, marcar
   favorito, crear, renombrar o borrar personajes, y escribir en `/api/settings`

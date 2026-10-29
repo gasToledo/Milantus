@@ -321,6 +321,8 @@ export interface CharacterFields {
   /** Id del catálogo de armaduras, no de una entrada del inventario. */
   equippedArmorId?: string | null;
   shieldEquipped?: boolean;
+  /** Claves del almacén de retratos; el primero es el que se muestra. */
+  portraitPaths?: string[];
   cantripIds?: string[];
   spellIds?: string[];
   /** Clase → trucos y conjuros elegidos con ella. */

@@ -10,7 +10,7 @@ import { cx } from '../../ui/cx';
 import { Medallion } from '../../ui/Medallion';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../../ui/status';
 import { DmHeader } from '../DmHeader';
-import { hasTag, kindOf, nameMatches, normalizeTags, npcTypeLine } from './npc';
+import { hasTag, kindOf, nameMatches, normalizeTags, npcPortrait, npcTypeLine } from './npc';
 
 /** El filtro «sin campaña»: los PNJ que no están en ninguna. `null` es todas. */
 const NO_CAMPAIGN = '';
@@ -36,7 +36,11 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
   const entries = useMemo(() => {
     const stored = npcs.data;
     if (!stored || !catalog.data) return null;
-    return npcViews(stored, catalog.data).map((view, i) => ({ view, links: stored[i]?.campaigns ?? [] }));
+    return npcViews(stored, catalog.data).map((view, i) => ({
+      view,
+      links: stored[i]?.campaigns ?? [],
+      portrait: stored[i] ? npcPortrait(stored[i]) : null,
+    }));
   }, [npcs.data, catalog.data]);
 
   const failed = [npcs, ...catalog.queries].filter((q) => q.isError);
@@ -142,8 +146,8 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
           />
         ) : (
           <ul aria-label={t.dmNpcLibrary} className="grid gap-3.5 [grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr))]">
-            {visible.map(({ view, links }) => (
-              <NpcCard key={view.npc.id} view={view} campaigns={links.map((l) => l.campaignName)} />
+            {visible.map(({ view, links, portrait }) => (
+              <NpcCard key={view.npc.id} view={view} campaigns={links.map((l) => l.campaignName)} portrait={portrait} />
             ))}
           </ul>
         )}
@@ -192,7 +196,7 @@ export function FilterPill({
 
 /** Un PNJ de la biblioteca: identidad, tags y en qué campañas está. La tarjeta
  *  entera lleva a su ficha. */
-function NpcCard({ view, campaigns }: { view: NpcView; campaigns: string[] }) {
+function NpcCard({ view, campaigns, portrait }: { view: NpcView; campaigns: string[]; portrait: string | null }) {
   const t = useTexts();
   const { npc } = view;
   const tags = npc.tags ?? [];
@@ -200,7 +204,7 @@ function NpcCard({ view, campaigns }: { view: NpcView; campaigns: string[] }) {
     <li className="min-w-0" data-npc={npc.id}>
       <Link href={dmNpcsHref(npc.id)} className="card flex h-full min-h-[150px] flex-col gap-2.5 p-3.5 hover:border-gold">
         <span className="flex items-center gap-3">
-          <Medallion name={npc.name} accent={null} size={44} />
+          <Medallion name={npc.name} accent={null} size={44} portrait={portrait} />
           <span className="min-w-0 flex-1">
             <span className="font-display block truncate text-[17px] text-on-surface">{npc.name}</span>
             <span className={cx('mt-0.5 block truncate text-[12px] text-text-muted', kindOf(view) === 'none' && 'italic')} data-field="type">

@@ -6,6 +6,9 @@ import { useLang, useTexts } from '../../i18n/context';
 import { dmNpcSheetHref, dmNpcsHref, Link, navigate, NPC_SHEET_TABS, type SheetTab } from '../../router';
 import { computeModel } from '../../sheet/compute';
 import { SheetTabs } from '../../sheet/SheetTabs';
+import { accentFor } from '../../sheet/model';
+import { Medallion } from '../../ui/Medallion';
+import { ownPortrait } from '../../ui/portrait';
 import { AppBusyLabel, AppErrorView, Notice } from '../../ui/status';
 
 /**
@@ -52,6 +55,15 @@ export function NpcSheetView({ npcId, tab }: { npcId: string; tab: SheetTab | nu
         tabs={NPC_SHEET_TABS}
         active={tab ?? 'personaje'}
         hrefOf={(tabId) => dmNpcSheetHref(npcId, tabId)}
+        leading={
+          <Medallion
+            name={computed.model.character.name}
+            accent={accentFor(computed.model)}
+            size={64}
+            portrait={ownPortrait(computed.model.character)}
+            viewable
+          />
+        }
       />
     );
   }

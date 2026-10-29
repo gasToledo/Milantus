@@ -113,6 +113,29 @@ test('la tarjeta de la Mesa abre la ficha completa del miembro, de solo lectura 
   );
   expect(escrituras).toEqual([]);
 
+  // El retrato del jugador es de su cuenta: el DM lo pide por el vínculo, y con
+  // la clave tal cual recibe 404, como cualquier otra cuenta.
+  const clave = (elsbeth.character.portraitPaths as string[])[0]!;
+  const porVinculo = `/api/campaigns/${CAMPANA}/members/${elsbeth.memberId}/portrait/${clave.split('/').pop()}`;
+  const pedir = (path: string) => page.request.get(path, { headers: { cookie: `dnd_session=${TOKEN_DM}` } });
+  expect((await pedir(porVinculo)).status()).toBe(200);
+  expect((await pedir(`/api/portraits/${clave}`)).status()).toBe(404);
+  const cargada = (img: import('@playwright/test').Locator) => img.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth > 0);
+  const retrato = page.getByRole('button', { name: `Ver el retrato de ${elsbeth.character.name}` });
+  await expect(retrato.locator('img')).toHaveAttribute('src', new RegExp(`^${porVinculo}\\?w=\\d+$`));
+  await expect.poll(() => cargada(retrato.locator('img'))).toBe(true);
+  // El visor muestra el original y se cierra con Escape.
+  await retrato.click();
+  const visor = page.getByRole('dialog', { name: `Retrato de ${elsbeth.character.name}` });
+  await expect(visor.locator('img')).toHaveAttribute('src', porVinculo);
+  await expect.poll(() => cargada(visor.locator('img'))).toBe(true);
+  await page.keyboard.press('Escape');
+  await expect(visor).toHaveCount(0);
+  // En la Mesa también, y Sagan, sin retrato, lleva su inicial.
+  await page.goto(MESA);
+  await expect.poll(() => cargada(page.locator('[data-member="elsbeth-de-humo"] img'))).toBe(true);
+  await expect(page.locator('[data-member="sagan-de-humo"] img')).toHaveCount(0);
+
   // Un vínculo que no existe dice lo mismo que uno cortado.
   await page.goto(`${MESA}/no-existe/personaje`);
   await expect(page.getByText('Ya no ves esta ficha. Puede que te hayan cortado el vínculo.')).toBeVisible();

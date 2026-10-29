@@ -20,7 +20,7 @@ import { Link } from '../router';
  * sería abrir una puerta más entre cuentas (`modo-dm.md`); Flutter tampoco lo
  * muestra.
  */
-export function MemberCard({ entry, href }: { entry: RosterEntry; href: string }) {
+export function MemberCard({ entry, href, portrait }: { entry: RosterEntry; href: string; portrait: string | null }) {
   const t = useTexts();
   const { character, sheet } = entry;
   const fallen = isFallen(entry);
@@ -53,7 +53,7 @@ export function MemberCard({ entry, href }: { entry: RosterEntry; href: string }
   return (
     <li className="card relative flex min-w-0 flex-col p-4 hover:border-gold" data-member={character.id}>
       <div className="flex items-center gap-3">
-        <Medallion name={character.name} accent={entry.accent} size={54} muted={fallen} />
+        <Medallion name={character.name} accent={entry.accent} size={54} muted={fallen} portrait={portrait} />
         <div className="min-w-0 flex-1">
           <h2 className={`font-display truncate text-[18px] leading-tight ${fallen ? 'text-on-surface-variant' : 'text-on-surface'}`}>
             {/* El enlace cubre la tarjeta entera (como en el dashboard) y su

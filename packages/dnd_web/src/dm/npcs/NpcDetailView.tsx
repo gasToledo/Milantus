@@ -14,7 +14,7 @@ import { MarkdownText } from '../../ui/MarkdownText';
 import { Medallion } from '../../ui/Medallion';
 import { AppBusyLabel, AppErrorView, Notice } from '../../ui/status';
 import { Abbr } from '../MemberCard';
-import { kindOf, npcTypeLine, STATUS_TONE, statusOf } from './npc';
+import { kindOf, npcPortrait, npcTypeLine, STATUS_TONE, statusOf } from './npc';
 
 /** Cuántas acciones del bloque se ven en la tarjeta, como en Flutter: el perfil
  *  entero es del editor de bloques. */
@@ -78,7 +78,7 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
     <div className="flex flex-col gap-5" data-npc={npc.id}>
       {back}
       <header className="flex flex-wrap items-start gap-[18px]">
-        <Medallion name={npc.name} accent={null} size={76} />
+        <Medallion name={npc.name} accent={null} size={76} portrait={npcPortrait(stored.data)} viewable />
         <div className="flex min-w-0 flex-[1_1_300px] flex-col gap-2">
           <h1 className="font-display text-[28px] leading-tight break-words text-on-surface">{npc.name}</h1>
           <ul className="flex flex-wrap gap-1.5">

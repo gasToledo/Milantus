@@ -21,6 +21,7 @@ import 'package:dnd_server/src/app.dart';
 import 'package:dnd_server/src/auth/session_store.dart';
 import 'package:dnd_server/src/import/import_service.dart';
 import 'package:dnd_server/src/web/web_v2.dart';
+import 'package:image/image.dart' as img;
 import 'package:shelf/shelf_io.dart' as shelf_io;
 
 import 'fakes/fake_auth_dependencies.dart';
@@ -113,6 +114,15 @@ Future<void> main() async {
     email: 'sin-v2@example.org',
   );
 
+  // Un retrato de Elsbeth, para los medallones de /v2: su ficha lo pide con
+  // la clave, y el DM de su mesa por el vínculo (`e2e/dm.spec.ts`).
+  final portraits = InMemoryPortraitBlobStore();
+  final elsbethPortrait = await portraits.save(
+    userId: smokeUserId,
+    characterId: smokeClericId,
+    bytes: img.encodePng(img.Image(width: 8, height: 8)),
+  );
+
   final characters = InMemoryCharacterRepository();
   await characters.create(
     smokeUserId,
@@ -172,6 +182,7 @@ Future<void> main() async {
         Ability.intelligence: 1,
       },
       chosenSkills: const ['medicine', 'religion'],
+      portraitPaths: [elsbethPortrait],
       hpPerLevel: const [8, 5, 5],
       cantripIds: const ['guidance', 'sacred-flame', 'light'],
       spellIds: const ['bless', 'cure-wounds', 'shield-of-faith'],
@@ -504,7 +515,7 @@ Future<void> main() async {
 
   final handler = buildHandler(
     auth: auth.dependencies,
-    portraits: InMemoryPortraitBlobStore(),
+    portraits: portraits,
     generation: PortraitGenerationService([
       FakePortraitProvider(id: 'pollinations', name: 'Pollinations'),
     ]),

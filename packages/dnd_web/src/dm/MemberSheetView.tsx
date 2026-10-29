@@ -6,6 +6,9 @@ import { useLang, useTexts } from '../i18n/context';
 import { dmCampaignHref, dmMemberHref, Link, MEMBER_SHEET_TABS, navigate, type SheetTab } from '../router';
 import { computeModel } from '../sheet/compute';
 import { SheetTabs } from '../sheet/SheetTabs';
+import { accentFor } from '../sheet/model';
+import { Medallion } from '../ui/Medallion';
+import { memberPortrait } from '../ui/portrait';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 
 /**
@@ -74,6 +77,15 @@ export function MemberSheetView({
         tabs={MEMBER_SHEET_TABS}
         active={tab ?? 'personaje'}
         hrefOf={(tabId) => dmMemberHref(campaign.id, memberId, tabId)}
+        leading={
+          <Medallion
+            name={computed.model.character.name}
+            accent={accentFor(computed.model)}
+            size={64}
+            portrait={memberPortrait(campaign.id, memberId, computed.model.character)}
+            viewable
+          />
+        }
       />
     );
   }

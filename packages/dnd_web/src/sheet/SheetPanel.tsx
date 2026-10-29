@@ -15,6 +15,7 @@ import { useTexts } from '../i18n/context';
 import { characterHref, FLUTTER_HOME, rosterHref, SHEET_TABS, type SheetTab } from '../router';
 import type { Texts } from '../i18n/texts';
 import { Medallion } from '../ui/Medallion';
+import { ownPortrait } from '../ui/portrait';
 import { NavGroup, NavItem, SidebarBack, ThemeMenu, VersionLabel } from '../ui/Shell';
 import { accentFor, classesOf, type SheetModel } from './model';
 
@@ -47,7 +48,7 @@ export function SheetPanel({ model, tab }: { model: SheetModel; tab: SheetTab })
 
       {/* La tarjeta no es un enlace: ya se está en la ficha. */}
       <div className="plaque flex items-center gap-2.5 px-2.5 py-2">
-        <Medallion name={character.name} accent={accentFor(model)} size={38} />
+        <Medallion name={character.name} accent={accentFor(model)} size={38} portrait={ownPortrait(character)} viewable />
         <div className="min-w-0">
           <p className="truncate text-[13.5px] font-medium text-on-surface">{character.name}</p>
           <p className="mt-0.5 truncate text-[11px] text-text-muted">{t.miniClassLine(classes, sheet.level)}</p>

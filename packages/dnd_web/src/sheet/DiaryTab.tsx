@@ -5,6 +5,7 @@ import { useLang, useTexts } from '../i18n/context';
 import { AppDialog } from '../ui/AppDialog';
 import { Card } from '../ui/Card';
 import { MarkdownText } from '../ui/MarkdownText';
+import { portraitUrl } from '../ui/portrait';
 import { AppEmptyState } from '../ui/status';
 import type { SheetModel } from './model';
 
@@ -15,7 +16,7 @@ const KIND_ICON: Record<Kind, LucideIcon> = { text: NotebookText, image: ImageIc
 
 /** La imagen de una entrada vive en el almacén de retratos (`imageKey` es
  *  `<personaje>/<archivo>`), que se sirve con la misma cookie de sesión. */
-const imageUrl = (key: string) => `/api/portraits/${key.split('/').map(encodeURIComponent).join('/')}`;
+const imageUrl = portraitUrl;
 
 /** Solo se enlaza lo que es web: un `javascript:` escrito en una entrada no
  *  puede volverse un enlace que se ejecute al tocarlo. */

@@ -4,6 +4,7 @@ import { characterHref, Link } from '../router';
 import { signed } from '../sheet/format';
 import { HP_CRITICAL_RATIO, hpTone, StatPlaque, ThinBar } from '../ui/data';
 import { Medallion } from '../ui/Medallion';
+import { ownPortrait } from '../ui/portrait';
 import { isFallen, type RosterEntry } from './roster';
 
 /**
@@ -39,7 +40,7 @@ export function RosterCard({ entry, favorite }: { entry: RosterEntry; favorite: 
       data-favorite={favorite}
     >
       <div className="flex items-start gap-3">
-        <Medallion name={character.name} accent={entry.accent} size={64} muted={fallen} />
+        <Medallion name={character.name} accent={entry.accent} size={64} muted={fallen} portrait={ownPortrait(character)} />
         <div className="min-w-0 flex-1">
           <h2 className="flex items-center gap-1.5 font-display text-[18px] leading-tight">
             {favorite && (

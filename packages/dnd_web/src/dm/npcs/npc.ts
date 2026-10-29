@@ -2,7 +2,8 @@
 // de una campaña (`npc_shared.dart` de Flutter). Ningún número se calcula acá:
 // PG, CA, si viene herido, la especie y las clases los da el motor
 // (`npcViews`); esto solo los pone en palabras.
-import type { NpcView } from '../../engine';
+import type { JsonObject, NpcView } from '../../engine';
+import { firstPortrait, portraitUrl } from '../../ui/portrait';
 import type { Texts } from '../../i18n/texts';
 import { fold } from '../../codex/entries';
 
@@ -74,3 +75,11 @@ export const STATUS_TONE: Record<NpcStatus, string> = {
 /** Un estado desconocido es «vivo», como `NpcStatus.fromJson`. */
 export const statusOf = (raw: string | undefined): NpcStatus =>
   raw === 'dead' || raw === 'unknown' ? raw : 'alive';
+
+/** El retrato que representa al PNJ (`npcPortraitKey`): el de su ficha si es
+ *  un PNJ con ficha, el propio si no. Los dos son del almacén del DM. */
+export function npcPortrait(entry: { npc: JsonObject; character?: JsonObject }): string | null {
+  const source = entry.npc.sheetKind === 'character' ? entry.character : entry.npc;
+  const key = source ? firstPortrait(source) : null;
+  return key ? portraitUrl(key) : null;
+}
