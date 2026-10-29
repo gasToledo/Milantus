@@ -176,3 +176,26 @@ export async function fetchCampaignMembers(campaignId: string, signal: AbortSign
   );
   return members;
 }
+
+/** Un capítulo tal como lo ve su DM (`Chapter.toJson`). `summary` es el objetivo
+ *  que el DM escribe: **no viaja a ningún jugador** y por eso solo se lee con la
+ *  cuenta del DM (`modo-dm.md`). */
+export interface DmChapter extends JsonObject {
+  id: string;
+  name: string;
+  summary?: string;
+  /** `planned`, `active` o `completed`. */
+  state?: string;
+  grantsLevel?: boolean;
+  grantsGold?: number;
+  grantsItems?: string[];
+}
+
+/** Los capítulos de la campaña [campaignId], en el orden de la campaña. */
+export async function fetchCampaignChapters(campaignId: string, signal: AbortSignal): Promise<DmChapter[]> {
+  const { chapters } = await getJson<{ chapters: DmChapter[] }>(
+    `/api/campaigns/${encodeURIComponent(campaignId)}/chapters`,
+    signal,
+  );
+  return chapters;
+}
