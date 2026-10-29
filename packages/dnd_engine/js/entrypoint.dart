@@ -237,6 +237,82 @@ String bestiary(String catalogJson) => jsonEncode([
         },
     ]);
 
+/// Los PNJ del DM listos para mostrar, sin que el cliente repita una regla.
+/// Entra la lista que devuelven `GET /api/npcs` o `GET /api/campaigns/<id>/npcs`
+/// —`{npc, character?, status?, currentHp?}` por entrada— y sale, en el mismo
+/// orden, el PNJ **migrado** (`Npc.fromJson`, que rechaza una versión futura)
+/// con lo que deriva el motor: sus números de combate (`NpcStats`), si viene
+/// herido en esa campaña, el nombre de la criatura de base en el idioma
+/// activo (el guardado queda de respaldo), la especie y las clases de su
+/// ficha, y lo que la ficha muestra del bloque o de la ficha compilada.
+String npcs(String entriesJson, String catalogJson) {
+  final repo = _repoPara(catalogJson);
+  return jsonEncode([
+    for (final raw
+        in (jsonDecode(entriesJson) as List).cast<Map<String, dynamic>>())
+      _npcView(raw, repo),
+  ]);
+}
+
+Map<String, dynamic> _npcView(
+    Map<String, dynamic> raw, ContentRepository repo) {
+  final npc = Npc.fromJson((raw['npc'] as Map).cast<String, dynamic>());
+  final characterJson = raw['character'];
+  final character = characterJson is Map
+      ? Character.fromJson(characterJson.cast<String, dynamic>())
+      : null;
+  final status = NpcStatus.fromJson(raw['status'] as String?);
+  final stats = NpcStats.of(npc, character, repo);
+  final hurt = stats.hurt(status, raw['currentHp'] as int?);
+  final baseId = npc.baseCreatureId;
+  final block = npc.sheetKind == NpcSheetKind.block ? npc.block : null;
+  final sheet = stats.sheet;
+  return {
+    'npc': npc.toJson(),
+    'status': status.toJson(),
+    'maxHp': stats.maxHp,
+    'armorClass': stats.armorClass,
+    'hurt': hurt == null ? null : {'current': hurt.current, 'max': hurt.max},
+    'baseName': (baseId == null ? null : repo.creature(baseId)?.name) ??
+        npc.baseCreatureName,
+    'species': character == null
+        ? null
+        : repo.race(character.raceId)?.name ?? character.raceId,
+    'classes': character == null
+        ? const []
+        : [
+            for (final id in character.classHistory.toSet())
+              {
+                'name': repo.characterClass(id)?.name ?? id,
+                'level': character.classLevel(id),
+              },
+          ],
+    'block': block == null
+        ? null
+        : {
+            'ac': block.ac,
+            'hp': block.hp,
+            'crText': block.challengeRatingText,
+            'actions': [
+              for (final a in block.actions)
+                {
+                  'name': a.name,
+                  'attackBonus': a.attackBonus,
+                  'damage': a.damage,
+                },
+            ],
+          },
+    'sheet': sheet == null
+        ? null
+        : {
+            'armorClass': sheet.armorClass,
+            'maxHp': sheet.maxHp,
+            'initiative': sheet.initiative,
+            'passivePerception': sheet.passivePerception,
+          },
+  };
+}
+
 void main() {
   final motor = JSObject();
   motor['compute'] = compute.toJS;
@@ -251,5 +327,6 @@ void main() {
   motor['formatCost'] = formatCostFor.toJS;
   motor['abilityModifier'] = abilityModifierOf.toJS;
   motor['bestiary'] = bestiary.toJS;
+  motor['npcs'] = npcs.toJS;
   globalContext['dndEngine'] = motor;
 }

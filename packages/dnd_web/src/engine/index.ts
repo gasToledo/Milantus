@@ -1,4 +1,4 @@
-import type { BestiaryRow, Catalog, CharacterJson, ComputedSheet, InventoryLine, JsonObject } from './types';
+import type { BestiaryRow, Catalog, CharacterJson, ComputedSheet, InventoryLine, JsonObject, NpcView } from './types';
 // Lo genera `npm run build:engine` (o la etapa `engine-js` del Dockerfile) y
 // no se versiona. Es un script de dart2js, no un módulo: al cargarse deja
 // `globalThis.dndEngine`, y de ahí lo toma este archivo.
@@ -19,6 +19,7 @@ interface DartEngine {
   formatCost(cp: number, labelsJson: string): string;
   abilityModifier(score: number): number;
   bestiary(catalogJson: string): string;
+  npcs(entriesJson: string, catalogJson: string): string;
 }
 
 function engine(): DartEngine {
@@ -147,4 +148,19 @@ export function abilityModifier(score: number): number {
  *  sin las invocaciones por fórmula (`bestiary` del motor). */
 export function bestiary(catalog: Catalog): BestiaryRow[] {
   return JSON.parse(engine().bestiary(catalogJson(catalog))) as BestiaryRow[];
+}
+
+/** Lo que trae la API por cada PNJ: `GET /api/npcs` (sin estado) o
+ *  `GET /api/campaigns/:id/npcs` (con el estado y los PG en esa campaña). */
+export interface NpcEntryJson {
+  npc: JsonObject;
+  character?: CharacterJson;
+  status?: string;
+  currentHp?: number;
+}
+
+/** Cada PNJ migrado y con sus números de combate, en el mismo orden (`npcs`
+ *  del motor): los PG de un bloque, la ficha compilada, si viene herido. */
+export function npcViews(entries: readonly NpcEntryJson[], catalog: Catalog): NpcView[] {
+  return JSON.parse(engine().npcs(JSON.stringify(entries), catalogJson(catalog))) as NpcView[];
 }

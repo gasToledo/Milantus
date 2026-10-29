@@ -49,7 +49,8 @@ Un solo servidor, un solo origen, dos clientes:
   versiona.** `src/engine/index.ts` es la única puerta (`computeSheet`,
   `migrateCharacter`, `setEngineLanguage`, `applyTranslation`,
   `vocabularyLabel`, `inventoryOf`, `chapterGrants`, `catalogLabel`,
-  `catalogLabelOrder`, `formatCost`, `abilityModifier`); la
+  `catalogLabelOrder`, `formatCost`, `abilityModifier`, `bestiary`,
+  `npcViews`); la
   comunicación es JSON como texto de ida y vuelta. Los tipos de
   `src/engine/types.ts` están escritos a mano: los cuida la paridad (abajo).
 
@@ -209,12 +210,13 @@ repiten acá.
 - **El Modo DM, de solo lectura** en `/v2/dm` (`src/dm/`), al que lleva «DM» del
   interruptor. **Ninguna escritura**: ni crear o editar campañas, ni cerrar
   capítulos, ni música, ni notas; todo eso sigue en Flutter. Se porta por
-  secciones, una por PR; hoy existen la **Mesa**, **Capítulos**, el **Cuaderno**
-  y el **Bestiario**. Rutas: `/v2/dm` (redirige a la primera campaña en curso, o
-  a la primera que haya), `/v2/dm/campanas/:id/mesa|capitulos|cuaderno` y
-  `/v2/dm/bestiario[/:criatura]`. El panel (`DmPanel`) sigue al de Flutter: el
+  secciones, una por PR; hoy existen la **Mesa**, **Capítulos**, el **Cuaderno**,
+  el **Bestiario** y la **Biblioteca de PNJ**. Rutas: `/v2/dm` (redirige a la
+  primera campaña en curso, o a la primera que haya),
+  `/v2/dm/campanas/:id/mesa|capitulos|cuaderno`, `/v2/dm/bestiario[/:criatura]`
+  y `/v2/dm/pnj[/:pnj]`. El panel (`DmPanel`) sigue al de Flutter: el
   interruptor con «DM» activo, las herramientas (Bestiario, Biblioteca de PNJ y
-  Homebrew; el Bestiario es interno y los otros dos enlazan a Flutter con el ícono
+  Homebrew; los dos primeros son internos y Homebrew enlaza a Flutter con el ícono
   de enlace externo), las campañas
   agrupadas En curso / En pausa / Terminadas (plegable, abierta si la elegida
   es una de ellas) y, de la campaña elegida, sus secciones; PNJ y Combate enlazan
@@ -255,6 +257,25 @@ repiten acá.
   una campaña: abre también sin campañas, no depende de la lista y trae el
   homebrew de **la cuenta** (el de otra no llega). Sumar al combate y «Editar una
   copia» siguen en Flutter.
+  **Biblioteca de PNJ** (`GET /api/npcs` y `GET /api/npcs/:id`): también es de la
+  cuenta y no de una campaña. La lista lleva un buscador por nombre (sin tildes
+  ni mayúsculas), pills de campaña con su conteo (Todas, cada campaña, Sin
+  campaña) y, más chicas, de tag; cada tarjeta dice qué es el PNJ («Bandido ·
+  CA 12 · PG 11», «Elfo · Mago 3», «Sin estadísticas»), sus tags y en qué
+  campañas está, y lleva a su ficha (`/v2/dm/pnj/garrick`). La ficha muestra la
+  voz como cita, el trasfondo con el Markdown chico, las notas (las mismas
+  tarjetas del Diario, `DiaryEntries`), con qué pelea —el bloque con CA, PG, VD
+  y las primeras acciones, o la ficha compilada con CA, PG, iniciativa y
+  pasiva— y el estado en cada campaña como pill con la palabra. **Lo que deriva
+  el motor** llega por `npcViews` (`npcs` de `js/entrypoint.dart`, sobre
+  `NpcStats` del engine): el PNJ migrado, los PG de un bloque (su fórmula
+  resuelta) o de la ficha compilada, la CA, si viene herido en una campaña, el
+  nombre de la criatura de base en el idioma activo y la especie y las clases de
+  su ficha. Un PNJ ajeno y uno inexistente dan la misma pantalla «No se
+  encontró el PNJ»: el servidor los responde igual (404). Crear, importar,
+  editar, retratos, el estado por campaña, exportar y borrar siguen en Flutter,
+  y el retrato todavía no se muestra (el medallón lleva la inicial, como en el
+  resto de `/v2`).
 - **Homebrew**: la ficha y el dashboard calculan con el catálogo oficial más
   el contenido homebrew de la cuenta (`GET /api/homebrew`, fusionado por id en
   `src/api/homebrew.ts`), como `HomebrewStore` + `ContentRepository.addAll` en
@@ -332,7 +353,13 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    Bestiario del DM abra bajo `/v2/dm/bestiario` con el homebrew de la cuenta y
    sin dárselo a otra, y que otra cuenta —con o sin `webV2`— reciba el mismo 404
    que ante una campaña inexistente, en la API y en la pantalla
-   (`e2e/dm.spec.ts`); y que una cuenta sin `webV2` vea
+   (`e2e/dm.spec.ts`); que la Biblioteca de PNJ liste los tres PNJ sembrados
+   (bloque, ficha y sin estadísticas) con la línea que arma el motor, filtre por
+   campaña, tag y nombre, abra la ficha con la voz, el trasfondo, las notas, el
+   bloque o la ficha compilada y el estado por campaña, sin escribir nada, y que
+   otra cuenta tenga la biblioteca vacía, reciba por un PNJ ajeno el mismo 404
+   que por uno inexistente (en la API y en la pantalla) y no encuentre nada de
+   eso en la vista del jugador (`e2e/pnj.spec.ts`); y que una cuenta sin `webV2` vea
    «No disponible» sin pedir sus datos (`e2e/acceso.spec.ts`). Lo esperado se
    calcula con el mismo motor y la misma fusión (`e2e/helpers.ts`). Sin
    reintentos: no hay «a veces anda».
@@ -376,8 +403,8 @@ Para que nadie lo dé por hecho:
 
 - Reordenar, marcar favorito, crear, renombrar o borrar personajes desde React.
 - Cualquier escritura desde React: todo el cliente hoy es solo lectura.
-- Del Modo DM: PNJ, Combate, Homebrew,
-  la música y la ficha completa de un miembro (en curso, por secciones).
+- Del Modo DM: los PNJ de la mesa, Combate, Homebrew, la música y la ficha
+  completa de un miembro o de un PNJ con ficha (en curso, por secciones).
 - Enlaces desde Flutter hacia `/v2` o redirección automática por `webV2`.
 - Tests de componentes y chequeo de literales sueltos en `dnd_web`.
 - Un criterio medido de «paridad visual» con Flutter: hoy es la comparación

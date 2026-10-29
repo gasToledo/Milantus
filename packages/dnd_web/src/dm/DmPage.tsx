@@ -15,6 +15,8 @@ import { BestiaryPage } from '../bestiary/BestiaryPage';
 import { ChaptersView } from './ChaptersView';
 import { MesaView } from './MesaView';
 import { NotebookView } from './NotebookView';
+import { NpcDetailView } from './npcs/NpcDetailView';
+import { NpcLibraryView } from './npcs/NpcLibraryView';
 
 /**
  * El Modo DM de solo lectura (`/v2/dm/...`). Lo que el DM escribe (crear y
@@ -48,6 +50,10 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
     // El Bestiario no depende de las campañas: se abre también sin ninguna y
     // cuando la lista no cargó (el panel lo dice solo).
     body = <BestiaryPage entryId={view.entryId} dm />;
+  } else if (view.kind === 'npcs') {
+    // La Biblioteca tampoco depende de las campañas: sin la lista, los filtros
+    // por campaña salen de los vínculos de cada PNJ.
+    body = view.npcId === null ? <NpcLibraryView campaigns={list} /> : <NpcDetailView key={view.npcId} npcId={view.npcId} />;
   } else if (campaigns.isError) {
     body = (
       <>
@@ -87,7 +93,7 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
   }
 
   return (
-    <Shell panel={<DmPanel campaigns={list} current={current} tool={view.kind === 'bestiary' ? 'bestiary' : undefined} />} footer={<RosterFooter account={account} dm />}>
+    <Shell panel={<DmPanel campaigns={list} current={current} tool={view.kind === 'bestiary' || view.kind === 'npcs' ? view.kind : undefined} />} footer={<RosterFooter account={account} dm />}>
       {body}
     </Shell>
   );

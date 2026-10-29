@@ -50,7 +50,9 @@ export type DmView =
   | { kind: 'home' }
   | { kind: 'campaign'; id: string; section: DmSection }
   // El Bestiario del DM es una herramienta de la cuenta, no de una campaña.
-  | { kind: 'bestiary'; entryId: string | null };
+  | { kind: 'bestiary'; entryId: string | null }
+  // La Biblioteca de PNJ también: sin PNJ es la lista.
+  | { kind: 'npcs'; npcId: string | null };
 
 export type Route =
   | { name: 'roster' }
@@ -86,6 +88,13 @@ export function matchRoute(pathname: string): Route {
     if (id === 'bestiario' && rest.length === 0) {
       try {
         return { name: 'dm', view: { kind: 'bestiary', entryId: tab === undefined ? null : decodeURIComponent(tab) } };
+      } catch {
+        return { name: 'unknown' };
+      }
+    }
+    if (id === 'pnj' && rest.length === 0) {
+      try {
+        return { name: 'dm', view: { kind: 'npcs', npcId: tab === undefined ? null : decodeURIComponent(tab) } };
       } catch {
         return { name: 'unknown' };
       }
@@ -145,6 +154,10 @@ export const dmHref = (): string => `${import.meta.env.BASE_URL}dm`;
 /** El Bestiario del Modo DM, o una criatura abierta. */
 export const dmBestiaryHref = (entryId?: string): string =>
   `${import.meta.env.BASE_URL}dm/bestiario` + (entryId ? `/${encodeURIComponent(entryId)}` : '');
+
+/** La Biblioteca de PNJ del Modo DM, o la ficha de un PNJ. */
+export const dmNpcsHref = (npcId?: string): string =>
+  `${import.meta.env.BASE_URL}dm/pnj` + (npcId ? `/${encodeURIComponent(npcId)}` : '');
 
 export const dmCampaignHref = (id: string, section: DmSection = 'mesa'): string =>
   `${import.meta.env.BASE_URL}dm/campanas/${encodeURIComponent(id)}/${section}`;

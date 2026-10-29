@@ -359,6 +359,7 @@ Future<void> main() async {
   ));
   final events = InMemoryEventRepository();
   final npcs = InMemoryNpcRepository(campaigns, characters);
+  await _seedNpcs(npcs, characters);
   final homebrew = InMemoryHomebrewRepository();
   await homebrew.upsert(
     smokeUserId,
@@ -467,6 +468,96 @@ Future<void> main() async {
   );
   // Playwright espera esta línea en la salida para saber que ya se puede abrir.
   print('e2e_server escuchando en ${server.address.host}:${server.port}');
+}
+
+/// La biblioteca de PNJ del DM (`e2e/pnj.spec.ts`): uno de cada tipo. Garrick
+/// tiene bloque (copiado del bandido del SRD, así su línea dice la criatura de
+/// base por el catálogo), está en la mesa sembrada y volvió herido de un
+/// combate; Vesna tiene ficha de personaje, y en la mesa no se sabe si sigue
+/// viva; Odile no tiene estadísticas ni campaña. Su voz, su trasfondo y sus
+/// notas son textos que ninguna otra cuenta debe recibir.
+Future<void> _seedNpcs(
+  InMemoryNpcRepository npcs,
+  InMemoryCharacterRepository characters,
+) async {
+  await npcs.insert(
+    _smokeDmId,
+    Npc(
+      id: 'garrick',
+      name: 'Garrick el Tabernero',
+      sheetKind: NpcSheetKind.block,
+      block: const Creature(
+        id: 'bandit',
+        name: 'Bandido',
+        source: ContentSource.homebrew,
+        ac: '12',
+        hp: '11',
+        cr: 0.125,
+        actions: [
+          CreatureAction(name: 'Cimitarra', attackBonus: '3', damage: '1d6+1'),
+        ],
+      ),
+      baseCreatureId: 'bandit',
+      baseCreatureName: 'Bandido',
+      speech: 'Voz reservada del DM: nunca termina una frase.',
+      background: 'Trasfondo reservado del DM: **sirvió en la guardia**.',
+      tags: const ['Waterdeep', 'Aliados'],
+      notes: const [
+        DiaryEntry(
+          entryId: 'deuda',
+          title: 'Le debe al gremio',
+          body: 'Nota reservada del PNJ: doscientas piezas de oro.',
+        ),
+      ],
+    ),
+  );
+  final sheet = await characters.createNpcSheet(
+    _smokeDmId,
+    Character(
+      id: 'vesna-ficha',
+      name: 'Vesna la Cuervo',
+      raceId: 'elf',
+      classId: 'wizard',
+      backgroundId: 'sage',
+      level: 3,
+      assignedScores: const {
+        Ability.strength: 8,
+        Ability.dexterity: 14,
+        Ability.constitution: 13,
+        Ability.intelligence: 15,
+        Ability.wisdom: 12,
+        Ability.charisma: 10,
+      },
+      hpPerLevel: const [6, 4, 4],
+    ),
+  );
+  await npcs.insert(
+    _smokeDmId,
+    Npc(
+      id: 'vesna',
+      name: 'Vesna la Cuervo',
+      sheetKind: NpcSheetKind.character,
+      characterId: sheet.id,
+      tags: const ['Enemigos'],
+    ),
+  );
+  await npcs.insert(
+    _smokeDmId,
+    Npc(
+      id: 'odile',
+      name: 'La hermana Odile',
+      sheetKind: NpcSheetKind.none,
+      tags: const ['Gremio'],
+    ),
+  );
+  await npcs.link(_smokeDmId, _smokeCampaignId, 'garrick');
+  await npcs.saveHp(_smokeDmId, _smokeCampaignId, {'garrick': 7});
+  await npcs.link(
+    _smokeDmId,
+    _smokeCampaignId,
+    'vesna',
+    status: NpcStatus.unknown,
+  );
 }
 
 /// Un guerrero completo: el nivel sale de cuántos PG por nivel se le dan.

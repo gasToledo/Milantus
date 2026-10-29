@@ -252,3 +252,33 @@ export interface DmNotebook {
 export async function fetchCampaignNotebook(campaignId: string, signal: AbortSignal): Promise<DmNotebook> {
   return getJson<DmNotebook>(`/api/campaigns/${encodeURIComponent(campaignId)}/notebook`, signal);
 }
+
+/** En qué campaña está un PNJ de la biblioteca y cómo está **en esa** campaña
+ *  (`NpcCampaignLink.toJson`): el mismo PNJ puede estar muerto en una mesa y
+ *  vivo en otra. */
+export interface NpcCampaignLink {
+  campaignId: string;
+  campaignName: string;
+  /** `alive`, `dead` o `unknown`. */
+  status?: string;
+}
+
+/** Un PNJ de la biblioteca del DM tal como lo devuelve la API: el documento
+ *  `Npc` crudo, sus campañas y, si es un PNJ con ficha, la ficha. **Nada de
+ *  esto viaja a ningún jugador** (`modo-dm.md`, «PNJ»). */
+export interface StoredNpc {
+  npc: JsonObject & { id: string; name?: string };
+  campaigns: NpcCampaignLink[];
+  character?: CharacterJson;
+}
+
+/** La biblioteca entera de la cuenta, estén o no en alguna campaña. */
+export async function fetchNpcs(signal: AbortSignal): Promise<StoredNpc[]> {
+  const { npcs } = await getJson<{ npcs: StoredNpc[] }>('/api/npcs', signal);
+  return npcs;
+}
+
+/** Un PNJ de la cuenta. Uno ajeno y uno inexistente responden igual (404). */
+export async function fetchNpc(id: string, signal: AbortSignal): Promise<StoredNpc> {
+  return getJson<StoredNpc>(`/api/npcs/${encodeURIComponent(id)}`, signal);
+}

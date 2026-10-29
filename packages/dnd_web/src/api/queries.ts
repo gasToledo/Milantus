@@ -17,6 +17,8 @@ import {
   fetchCampaignMembers,
   fetchCampaignNotebook,
   fetchDmCampaigns,
+  fetchNpc,
+  fetchNpcs,
   fetchPlayerCampaigns,
   fetchRoster,
   fetchRosterSettings,
@@ -55,6 +57,8 @@ export const queryKeys = {
   campaignMembers: (campaignId: string) => ['dm', 'campaigns', campaignId, 'members'] as const,
   campaignNotebook: (campaignId: string) => ['dm', 'campaigns', campaignId, 'notebook'] as const,
   campaignChapters: (campaignId: string) => ['dm', 'campaigns', campaignId, 'chapters'] as const,
+  npcs: ['dm', 'npcs'] as const,
+  npc: (id: string) => ['dm', 'npcs', id] as const,
 };
 
 /** `null` = sin sesión (un 401 no es un error, ver `fetchAccount`). */
@@ -139,6 +143,15 @@ export const useCampaignNotebook = (campaignId: string) =>
     queryKey: queryKeys.campaignNotebook(campaignId),
     queryFn: ({ signal }) => fetchCampaignNotebook(campaignId, signal),
   });
+
+/** La biblioteca de PNJ de la cuenta: una herramienta del DM, no de una
+ *  campaña. */
+export const useNpcs = () => useQuery({ queryKey: queryKeys.npcs, queryFn: ({ signal }) => fetchNpcs(signal) });
+
+/** Un PNJ de la cuenta, con sus campañas y su ficha. Un 404 (ajeno o
+ *  inexistente) no se reintenta: es la pantalla «No se encontró». */
+export const useNpc = (id: string) =>
+  useQuery({ queryKey: queryKeys.npc(id), queryFn: ({ signal }) => fetchNpc(id, signal) });
 
 export const useHomebrew = () =>
   useQuery({ queryKey: queryKeys.homebrew, queryFn: ({ signal }) => fetchHomebrew(signal) });

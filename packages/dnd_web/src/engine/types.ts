@@ -381,3 +381,41 @@ export interface BestiaryRow {
   /** Por cada acción, en orden: si su alcance es cuerpo a cuerpo. */
   meleeReach: boolean[];
 }
+
+/** Lo que el motor deriva de un PNJ (`npcs` de `js/entrypoint.dart`): el
+ *  documento migrado y sus números de combate, para que la pantalla no repita
+ *  ninguna regla (resolver la fórmula de PG, compilar su ficha). */
+export interface NpcView {
+  /** El `Npc` migrado al esquema actual. */
+  npc: NpcJson;
+  /** El estado en la campaña (`alive` si no se pidió desde una). */
+  status: 'alive' | 'dead' | 'unknown';
+  maxHp: number;
+  armorClass: string | null;
+  /** Los PG guardados en la campaña, solo si sigue vivo y herido. */
+  hurt: { current: number; max: number } | null;
+  /** La criatura de la que salió el bloque, en el idioma activo. */
+  baseName: string | null;
+  /** Especie y clases de su ficha de personaje, si la tiene. */
+  species: string | null;
+  classes: { name: string; level: number }[];
+  block: {
+    ac: string;
+    hp: string;
+    crText: string | null;
+    actions: { name: string; attackBonus: string | null; damage: string | null }[];
+  } | null;
+  sheet: { armorClass: number; maxHp: number; initiative: number; passivePerception: number } | null;
+}
+
+/** El documento `Npc.toJson`. Solo se tipa lo que se lee. */
+export interface NpcJson extends JsonObject {
+  id: string;
+  name: string;
+  /** `none`, `block` o `character`. */
+  sheetKind: string;
+  speech?: string;
+  background?: string;
+  tags?: string[];
+  notes?: DiaryEntry[];
+}
