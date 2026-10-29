@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:engine": "node scripts/build-engine.mjs",
+    "test:parity": "node scripts/engine-parity.mjs",
+    "test:e2e": "playwright test"
   },
   "engines": {
     "node": ">=22"
@@ -17,6 +20,7 @@
     "react-dom": "19.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "1.64.1",
     "@tailwindcss/vite": "4.3.3",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",

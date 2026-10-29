@@ -18,6 +18,13 @@ String requireEnv(Map<String, String> env, String name) {
 String envOr(Map<String, String> env, String name, String fallback) =>
     env[name] ?? fallback;
 
+/// Lista separada por comas a conjunto de ids. Tolera espacios y comas de más
+/// (`"a, b,,"`), porque la variable se edita a mano en un `.env`.
+Set<String> parseIdList(String raw) => {
+  for (final id in raw.split(','))
+    if (id.trim().isNotEmpty) id.trim(),
+};
+
 int envIntOr(Map<String, String> env, String name, int fallback) {
   final raw = env[name];
   if (raw == null) return fallback;
@@ -174,7 +181,18 @@ class WebConfig {
   /// cliente de Flutter.
   final String v2Root;
 
-  const WebConfig({required this.root, this.v2Root = ''});
+  /// Ids de cuenta (los de `/api/me`) a los que el servidor les avisa que ya
+  /// pueden usar el cliente React (`webV2: true`). Vacía por defecto: nadie
+  /// migra hasta que se lo anota. Es una lista de ids y no un porcentaje ni un
+  /// indicador por rasgo a propósito: la migración es pantalla por pantalla y
+  /// la decisión es de quién la prueba primero, no de un azar.
+  final Set<String> v2Users;
+
+  const WebConfig({
+    required this.root,
+    this.v2Root = '',
+    this.v2Users = const {},
+  });
 
   bool get enabled => root.isNotEmpty;
 
@@ -184,6 +202,7 @@ class WebConfig {
     return WebConfig(
       root: envOr(env, 'DND_WEB_ROOT', ''),
       v2Root: envOr(env, 'DND_WEB_V2_ROOT', ''),
+      v2Users: parseIdList(envOr(env, 'DND_V2_USERS', '')),
     );
   }
 }

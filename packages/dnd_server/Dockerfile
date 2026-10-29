@@ -47,7 +47,22 @@ WORKDIR /workspace/packages/dnd_server
 RUN --mount=type=cache,id=pub-dart,target=/pub-cache dart pub get
 RUN --mount=type=cache,id=pub-dart,target=/pub-cache dart compile exe bin/server.dart -o /workspace/dnd_server_bin
 
-# ---- Etapa 3: build del cliente React (Node), servido bajo /v2 ----
+# ---- Etapa 3: el motor de reglas compilado a JS (Dart), para el cliente React ----
+# El cliente React no reimplementa ninguna regla: corre el mismo `dnd_engine`
+# compilado con dart2js (`js/entrypoint.dart`). La etapa de Node no tiene Dart,
+# así que se compila acá y la etapa 4 copia el resultado antes del build. Las
+# banderas son las de `packages/dnd_web/scripts/build-engine.mjs`; si cambian,
+# cambian en los dos lados. Mismo criterio de caché que la etapa 2, con su
+# propio id: corre en paralelo con ella.
+FROM dart:stable AS engine-js
+ENV PUB_CACHE=/pub-cache
+WORKDIR /workspace
+COPY packages/dnd_engine ./packages/dnd_engine
+WORKDIR /workspace/packages/dnd_engine
+RUN --mount=type=cache,id=pub-dart-js,target=/pub-cache dart pub get
+RUN --mount=type=cache,id=pub-dart-js,target=/pub-cache dart compile js -O2 --no-source-maps -o /workspace/dnd_engine.js js/entrypoint.dart
+
+# ---- Etapa 4: build del cliente React (Node), servido bajo /v2 ----
 # Versión de Node fijada a propósito (a diferencia de las otras etapas): el
 # `package-lock.json` ya fija las dependencias y acá solo falta que el runtime
 # que las instala no se mueva solo. El caché de npm sigue la misma lógica que
@@ -59,9 +74,12 @@ WORKDIR /workspace/packages/dnd_web
 COPY packages/dnd_web/package.json packages/dnd_web/package-lock.json ./
 RUN --mount=type=cache,id=npm-web-v2,target=/root/.npm npm ci
 COPY packages/dnd_web ./
+# Después del `COPY` de arriba y antes del build: el archivo no se versiona
+# (`packages/dnd_web/.gitignore`), así que el contexto no lo trae.
+COPY --from=engine-js /workspace/dnd_engine.js ./src/engine/dnd_engine.generated.js
 RUN npm run build
 
-# ---- Etapa 4: runtime mínimo ----
+# ---- Etapa 5: runtime mínimo ----
 # `dart compile exe` produce un binario nativo: no hace falta el SDK de Dart
 # ni el de Flutter en la imagen final, así que ninguna clave ni credencial de
 # build llega a la imagen publicada (no hay ninguna en primer lugar: la
