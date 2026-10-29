@@ -9,6 +9,7 @@ import { DashboardPage } from './dashboard/DashboardPage';
 import { RosterFooter, RosterPanel } from './dashboard/RosterPanel';
 import { useRoute } from './router';
 import { CodexPage } from './codex/CodexPage';
+import { BestiaryPage } from './bestiary/BestiaryPage';
 import { CampaignsPage } from './campaigns/CampaignsPage';
 import { CharacterPage } from './sheet/CharacterPage';
 import { SettingsPage } from './settings/SettingsPage';
@@ -102,6 +103,12 @@ function Enabled({ account }: { account: Account }) {
       return (
         <Shell panel={<RosterPanel current="roster" />} footer={<RosterFooter account={account} />}>
           <DashboardPage />
+        </Shell>
+      );
+    case 'bestiary':
+      return (
+        <Shell panel={<RosterPanel current="bestiary" />} footer={<RosterFooter account={account} />}>
+          <BestiaryPage entryId={route.entryId} />
         </Shell>
       );
     case 'campaigns':

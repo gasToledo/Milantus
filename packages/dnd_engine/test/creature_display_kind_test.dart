@@ -75,4 +75,19 @@ void main() {
       expect(c.displayKind, 'Aberración Grande, legal malvada');
     });
   });
+
+  group('Creature.challengeRatingText', () {
+    test('las fracciones del libro, los enteros sin decimales y la ausencia',
+        () {
+      String? texto(Object? cr) =>
+          _criatura({if (cr != null) 'cr': cr}).challengeRatingText;
+
+      expect(texto(0.125), '1/8');
+      expect(texto(0.25), '1/4');
+      expect(texto(0.5), '1/2');
+      expect(texto(0), '0');
+      expect(texto(10), '10');
+      expect(texto(null), isNull);
+    });
+  });
 }

@@ -65,6 +65,11 @@ const _smokeCampaignId = 'marca-del-cuervo';
 /// ataque aparezca (`e2e/ficha.spec.ts`).
 const smokeHomebrewWeaponId = 'hacha-de-humo';
 
+/// Una criatura homebrew de la cuenta, para el Bestiario
+/// (`e2e/bestiario.spec.ts`). Trae iniciativa propia (+6, con DES 16 sería
+/// +3) para distinguir lo que deriva el motor de una cuenta hecha en el cliente.
+const smokeHomebrewCreatureId = 'sombra-de-humo';
+
 /// Una segunda sesión, de una cuenta que **no** está en `v2Users`: /v2 le
 /// responde «No disponible» sin pedir nada más a la API.
 const smokeNoV2Token = 'sesion-sin-v2=';
@@ -309,6 +314,45 @@ Future<void> main() async {
       damageDice: '1d10',
       damageType: 'slashing',
       properties: ['heavy'],
+    ).toJson(),
+  );
+  await homebrew.upsert(
+    smokeUserId,
+    'creatures',
+    smokeHomebrewCreatureId,
+    const Creature(
+      id: smokeHomebrewCreatureId,
+      name: 'Sombra de Humo',
+      source: ContentSource.homebrew,
+      kind: 'Muerto viviente Mediano',
+      type: CreatureType.undead,
+      size: CreatureSize.medium,
+      ac: '13',
+      hp: '22',
+      hitDice: '5d8',
+      speed: '40 pies',
+      abilityScores: {
+        Ability.strength: 6,
+        Ability.dexterity: 16,
+        Ability.constitution: 10,
+        Ability.intelligence: 8,
+        Ability.wisdom: 12,
+        Ability.charisma: 14,
+      },
+      initiativeBonus: 6,
+      cr: 1,
+      traits: [
+        CreatureTrait(name: 'Paso sin huella', description: 'No deja rastro.'),
+      ],
+      actions: [
+        CreatureAction(
+          name: 'Roce helado',
+          attackBonus: '5',
+          damage: '2d6+3',
+          damageType: 'cold',
+          reach: '5 pies',
+        ),
+      ],
     ).toJson(),
   );
   final levelUps = InMemoryLevelUpRepository(campaigns);

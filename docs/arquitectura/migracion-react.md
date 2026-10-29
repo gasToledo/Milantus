@@ -146,7 +146,7 @@ repiten acá.
 - **El Códice** en `/v2/codice` (`src/codex/`): el catálogo de solo lectura
   con el glosario, las guías, especies, linajes, clases, subclases, trasfondos, dotes, conjuros,
   objetos mágicos, armas, armaduras y equipo, más el homebrew de la cuenta
-  marcado «Propio». Sin criaturas: en Flutter son del Modo DM. Cada categoría
+  marcado «Propio». Las criaturas no están acá sino en el Bestiario. Cada categoría
   y cada entrada es una ruta (`/v2/codice/conjuros/fireball`); la portada
   cuenta las entradas, la búsqueda del panel agrupa por categoría (cinco por
   grupo, «Ver las N» abre la categoría con `?q=`) y cada categoría tiene
@@ -186,6 +186,26 @@ repiten acá.
   lo más parecido a «miembros» es «En la mesa también juega…», que ya trae
   cada campaña. Leer las campañas *como DM* (`/api/campaigns`) es el Modo DM,
   paso 6.
+- **El Bestiario** en `/v2/bestiario` (`src/bestiary/`), «Bestiario» del panel
+  principal: la lista de criaturas del catálogo más las homebrew de la cuenta
+  (marcadas «Propio»), con búsqueda por nombre y por línea de tipo, filtro por
+  tipo y por rango de VD (un rango deja afuera a las que no tienen desafío; uno
+  invertido corre el otro extremo) y orden por nombre o por VD. Cada criatura es
+  una ruta (`/v2/bestiario/goblin`) y su perfil sigue al de Flutter: cifras
+  (CA, PG con dados de golpe, iniciativa, VD, percepción pasiva), las seis
+  características con sus salvaciones, datos de línea, rasgos y acciones
+  agrupadas (con acierto, daño y alcance en placas, y el lanzamiento de
+  conjuros enlazado al Códice). **Lo que deriva el motor** llega por
+  `bestiary()` (`js/entrypoint.dart`): el orden y qué criaturas se listan (las
+  invocaciones por fórmula quedan afuera), la línea de tipo (`displayKind`, que
+  en un homebrew sigue al idioma), el tipo, el VD impreso
+  (`Creature.challengeRatingText`), la iniciativa, la percepción pasiva y si el
+  alcance de cada acción es cuerpo a cuerpo; el modificador de cada
+  característica es `abilityModifier`. Es de solo lectura: **sumar al combate y
+  «Editar una copia»** (Homebrew) son del Modo DM de Flutter y no están. El
+  Bestiario es una sección del Modo DM allá; acá es una pantalla del jugador
+  porque el catálogo es el mismo contenido público que ya sirve `/v2/content`
+  y lo propio es de la cuenta.
 - **Homebrew**: la ficha y el dashboard calculan con el catálogo oficial más
   el contenido homebrew de la cuenta (`GET /api/homebrew`, fusionado por id en
   `src/api/homebrew.ts`), como `HomebrewStore` + `ContentRepository.addAll` en
@@ -206,7 +226,8 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
 2. Lista de personajes y navegación entre pantallas *(existe)*.
 3. Lo de lectura más simple: ajustes de visualización *(existe)*,
    campañas del jugador en modo lectura *(existen; el cuaderno es del DM)*,
-   bestiario y catálogos *(el Códice existe)*.
+   bestiario *(existe)* y catálogos *(el Códice existe)*. Con esto, el paso 3
+   está completo.
 4. Escrituras de bajo riesgo: PG y usos de recursos en la ficha, descansos.
 5. Edición completa: creador de personajes, subida de nivel, inventario.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
@@ -247,7 +268,12 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    sembrada con lo que reparte el motor y que **nada del DM** (escena de música,
    capítulo en marcha, nota) aparezca ni en la API ni en pantalla, y que otra
    cuenta, o el propio DM, reciba 404 al pedir las campañas de un personaje
-   ajeno, idéntico al de un id inexistente (`e2e/campanas.spec.ts`); y que una cuenta sin `webV2` vea
+   ajeno, idéntico al de un id inexistente (`e2e/campanas.spec.ts`); que el
+   Bestiario liste las criaturas que da el motor más una criatura homebrew
+   sembrada (con la iniciativa derivada por el motor, no la de la
+   característica), abra un perfil con sus modificadores, salvaciones y
+   conjuros, filtre y ordene, y que el homebrew no llegue a otra cuenta
+   (`e2e/bestiario.spec.ts`); y que una cuenta sin `webV2` vea
    «No disponible» sin pedir sus datos (`e2e/acceso.spec.ts`). Lo esperado se
    calcula con el mismo motor y la misma fusión (`e2e/helpers.ts`). Sin
    reintentos: no hay «a veces anda».

@@ -1,8 +1,8 @@
-import { BookOpen, Flag, FlaskConical, LogOut, MessageSquare, Settings, Users } from 'lucide-react';
+import { BookOpen, Flag, PawPrint, FlaskConical, LogOut, MessageSquare, Settings, Users } from 'lucide-react';
 import { useAppVersion } from '../api/queries';
 import type { Account } from '../api/client';
 import { useTexts } from '../i18n/context';
-import { campaignsHref, codexHref, FLUTTER_HOME, rosterHref, settingsHref } from '../router';
+import { bestiaryHref, campaignsHref, codexHref, FLUTTER_HOME, rosterHref, settingsHref } from '../router';
 import { ModeSwitch, NavGroup, NavItem, ThemeMenu, VersionLabel } from '../ui/Shell';
 
 /**
@@ -10,7 +10,7 @@ import { ModeSwitch, NavGroup, NavItem, ThemeMenu, VersionLabel } from '../ui/Sh
  * navegación. Lo que React todavía no tiene (Homebrew, el Modo DM) sigue en
  * Flutter.
  */
-export function RosterPanel({ current }: { current?: 'roster' | 'campaigns' }) {
+export function RosterPanel({ current }: { current?: 'roster' | 'campaigns' | 'bestiary' }) {
   const t = useTexts();
   return (
     <>
@@ -21,6 +21,9 @@ export function RosterPanel({ current }: { current?: 'roster' | 'campaigns' }) {
         </li>
         <li>
           <NavItem href={campaignsHref()} icon={Flag} label={t.navCampaigns} active={current === 'campaigns'} internal />
+        </li>
+        <li>
+          <NavItem href={bestiaryHref()} icon={PawPrint} label={t.navBestiary} active={current === 'bestiary'} internal />
         </li>
         <li>
           <NavItem href={codexHref()} icon={BookOpen} label={t.navCodex} internal />
