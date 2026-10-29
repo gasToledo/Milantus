@@ -270,9 +270,17 @@ repiten acá.
   la subida de nivel dice la clase. Un combate o una subida de un capítulo que ya
   no existe va a «Sin capítulo» en vez de perderse. Es solo del DM: lo que el
   servidor poda para el jugador (notas, nombres propios de PNJ, subidas de
-  nivel) no existe en su API. **Las menciones `@Nombre` se leen como texto**: en
-  Flutter enlazan a la ficha del personaje o del PNJ, que acá todavía no
-  existen. **Bestiario del DM**: es el mismo `BestiaryPage` del jugador
+  nivel) no existe en su API. **Las menciones `@Nombre` son enlaces**, como en
+  Flutter: las de una nota (en el Markdown chico, `MarkdownText` con
+  `mentions`) y, en un combate, los jugadores y los PNJ que siguen en la
+  campaña. Un personaje de la mesa (`GET /api/campaigns/:id/members`) lleva a
+  su ficha completa, por el vínculo; un PNJ de la campaña (`GET
+  /api/campaigns/:id/npcs`) a su ficha de la Biblioteca; si tienen el mismo
+  nombre gana el jugador. El corte es el de Flutter (`withMentions`): sin
+  distinguir mayúsculas ni tildes, gana el nombre más largo y tiene que
+  terminar ahí; una `@` que no es de nadie queda como texto, y el que se fue
+  de la campaña también. Si esas dos listas no cargan, las menciones se leen
+  como texto y el Cuaderno no se cae. **Bestiario del DM**: es el mismo `BestiaryPage` del jugador
   (`/v2/bestiario`, ya completo) montado bajo `/v2/dm/bestiario` con el panel del
   DM (`dm` en `BestiaryPage`): igual navegador, filtros y perfil, con la
   cabecera del Modo DM y sus propias URL. Es una herramienta de la cuenta y no de
@@ -385,10 +393,9 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    **Lectura del Modo DM** (se sumó a este paso): Mesa, Capítulos, Cuaderno,
    Bestiario, Biblioteca de PNJ, PNJ de la mesa, Homebrew y Combate *(existen)*.
    La ficha completa de un miembro y la de un PNJ con ficha, y la música (solo
-   escuchar) y los retratos con su visor *(existen)*.
+   escuchar), los retratos con su visor y las menciones `@Nombre` del Cuaderno
+   como enlaces *(existen)*.
    **Faltan para cerrar el paso**, todas de lectura:
-   - las menciones `@Nombre` del Cuaderno como enlaces, que dependen de las dos
-     fichas de arriba;
    - imprimir la ficha (`print_sheet.dart`).
 4. Escrituras de bajo riesgo: PG y usos de recursos en la ficha, descansos.
 5. Edición completa: creador de personajes, subida de nivel, inventario.
@@ -445,7 +452,9 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    que arma el motor y siga al cambiar de sección, sin escribir, que Capítulos muestre estado, objetivo y recompensas (y que
    el objetivo y los capítulos sin cerrar no lleguen al jugador), que el
    Cuaderno junte notas, combates (con un PNJ aliado por su nombre propio) y
-   subidas de nivel, busque, y que nada de eso llegue al jugador, que el
+   subidas de nivel, busque, enlace las menciones de una nota y de un combate a
+   la ficha del miembro o del PNJ (y deje como texto las de nadie), y que nada
+   de eso llegue al jugador, que el
    Bestiario del DM abra bajo `/v2/dm/bestiario` con el homebrew de la cuenta y
    sin dárselo a otra, y que otra cuenta —con o sin `webV2`— reciba el mismo 404
    que ante una campaña inexistente, en la API y en la pantalla
@@ -509,7 +518,7 @@ propio.
 Para que nadie lo dé por hecho:
 
 - Las lecturas que faltan del paso 3 (la lista está en «Orden previsto de
-  pantallas»): las menciones `@Nombre` como enlaces e imprimir.
+  pantallas»): imprimir.
 - Cualquier escritura desde React: todo el cliente hoy es solo lectura, así que
   los pasos 4 a 7 están enteros por hacer. Entre ellos, reordenar, marcar
   favorito, crear, renombrar o borrar personajes, y escribir en `/api/settings`

@@ -257,6 +257,30 @@ test('el Cuaderno junta notas, combates y subidas de nivel por capítulo, y nada
   await pill('Sin capítulo').click();
   await expect(page.locator('[data-entry="fight"]')).toContainText('Aliados: Garrick el Tabernero.');
 
+  // Las menciones enlazan a la ficha: un PNJ de la campaña a la Biblioteca y un
+  // jugador de la mesa a su ficha completa, por el vínculo. Quien no está (un
+  // monstruo, Thalion sin ficha vinculada, «@Nadie») queda como texto.
+  const { members } = await api<{ members: { memberId: string; character: PersonajeApi }[] }>(
+    page.request,
+    `/api/campaigns/${CAMPANA}/members`,
+    TOKEN_DM,
+  );
+  const fichaDeElsbeth = `${MESA}/${members.find((m) => m.character.id === 'elsbeth-de-humo')!.memberId}/personaje`;
+  await expect(page.locator('[data-entry="fight"] [data-mention]')).toHaveText(['Elsbeth de Humo', 'Garrick el Tabernero']);
+  await expect(page.locator('[data-entry="fight"]').getByRole('link', { name: 'Garrick el Tabernero' })).toHaveAttribute(
+    'href',
+    '/v2/dm/pnj/garrick',
+  );
+  await pill('El paso de Varn').click();
+  await expect(page.locator('[data-entry="fight"] [data-mention]')).toHaveText(['Elsbeth de Humo']);
+  await pill('El Valle Hueco').click();
+  // En la nota, sin distinguir mayúsculas: se muestra el nombre guardado.
+  await expect(nota.locator('[data-mention]')).toHaveText(['Elsbeth de Humo']);
+  await expect(nota).toContainText('@Nadie no es nadie.');
+  await nota.getByRole('link', { name: 'Elsbeth de Humo' }).click();
+  await expect(page).toHaveURL(fichaDeElsbeth);
+  await page.goBack();
+
   // Buscar suma las coincidencias por capítulo y apaga las pills vacías.
   await page.getByRole('searchbox', { name: 'Buscar en el cuaderno' }).fill('lobo');
   await expect(pill('El paso de Varn')).toContainText('1');

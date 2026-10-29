@@ -333,7 +333,11 @@ Future<void> main() async {
       id: 'nota-del-dm',
       chapterId: 'capitulo-en-marcha',
       title: 'Nota privada',
-      body: 'Nota reservada del DM: el herrero traiciona al grupo.',
+      // La mención va en minúsculas y sin cerrar: el Cuaderno la enlaza igual
+      // (`e2e/dm.spec.ts`).
+      body:
+          'Nota reservada del DM: el herrero traiciona al grupo. '
+          '@elsbeth de humo lo sospecha; @Nadie no es nadie.',
     ),
   );
   encounters.logs.add((

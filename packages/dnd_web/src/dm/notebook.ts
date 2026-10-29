@@ -37,11 +37,13 @@ function logNames(
   group: NonNullable<DmEncounterLog['monsters']>,
   joiner: string,
   catalog: Catalog,
+  mark: Mark,
 ): string {
   return group
     .map((m) => {
       const name = groupName(m, catalog);
-      return m.npc || (m.count ?? 1) <= 1 ? name : `${name} ×${m.count}`;
+      if (m.npc) return mark(name);
+      return (m.count ?? 1) <= 1 ? name : `${name} ×${m.count}`;
     })
     .join(joiner);
 }
@@ -57,13 +59,13 @@ function fightTitle(log: DmEncounterLog, t: Texts, catalog: Catalog): string {
     : t.dmFightAgainst(enemies.map((m) => groupName(m, catalog)).join(', '));
 }
 
-function fightBody(log: DmEncounterLog, t: Texts, catalog: Catalog): string {
-  const who = (log.players ?? []).length === 0 ? t.dmLogTheTable : (log.players ?? []).join(', ');
+function fightBody(log: DmEncounterLog, t: Texts, catalog: Catalog, mark: Mark): string {
+  const who = (log.players ?? []).length === 0 ? t.dmLogTheTable : (log.players ?? []).map(mark).join(', ');
   const allies = side(log, 'ally');
   const neutrals = side(log, 'neutral');
   const extra = [
-    ...(allies.length > 0 ? [t.dmLogAllies(logNames(allies, ', ', catalog))] : []),
-    ...(neutrals.length > 0 ? [t.dmLogNeutrals(logNames(neutrals, ', ', catalog))] : []),
+    ...(allies.length > 0 ? [t.dmLogAllies(logNames(allies, ', ', catalog, mark))] : []),
+    ...(neutrals.length > 0 ? [t.dmLogNeutrals(logNames(neutrals, ', ', catalog, mark))] : []),
   ];
   const enemies = side(log, 'enemy');
   if (enemies.length === 0) return [t.dmLogNoEnemies(who), ...extra].join('\n\n');
@@ -72,7 +74,7 @@ function fightBody(log: DmEncounterLog, t: Texts, catalog: Catalog): string {
   // El sujeto va siempre explícito: «cayeron todos» a secas, al lado de
   // «Sagan contra Goblin ×3», se leería como que cayó el grupo.
   const fell = down === 0 ? t.dmLogNoneFell : down === total ? t.dmLogAllFell : t.dmLogSomeFell(down, total);
-  return [t.dmLogAgainst(who, logNames(enemies, ` ${t.wordAnd} `, catalog), fell), ...extra].join('\n\n');
+  return [t.dmLogAgainst(who, logNames(enemies, ` ${t.wordAnd} `, catalog, mark), fell), ...extra].join('\n\n');
 }
 
 const ms = (iso: string | undefined): number | null => {
@@ -83,11 +85,18 @@ const ms = (iso: string | undefined): number | null => {
 /** Todas las entradas del cuaderno, de la más vieja a la más nueva: se lee como
  *  un diario. `sort` es estable: las que no traen fecha van primero en el orden
  *  en que las devolvió el servidor. */
+/** Le pone la `@` a un nombre de un registro de combate si es de alguien que
+ *  sigue en la campaña (`_mark` de Flutter): así el Cuaderno lo enlaza a su
+ *  ficha. El que se fue queda como texto, sin una `@` suelta que no lleva a
+ *  ningún lado. Un monstruo del bestiario no es nadie a quien abrirle la ficha. */
+export type Mark = (name: string) => string;
+
 export function buildEntries(
   notebook: DmNotebook,
   chapters: readonly DmChapter[],
   t: Texts,
   catalog: Catalog,
+  mark: Mark = (name) => name,
 ): Entry[] {
   const known = new Set(chapters.map((c) => c.id));
   const chapterOf = (id: string | null | undefined) => (id && known.has(id) ? id : null);
@@ -111,7 +120,7 @@ export function buildEntries(
         at: ms(l.endedAt),
         title: fightTitle(l, t, catalog),
         markdown: false,
-        body: fightBody(l, t, catalog),
+        body: fightBody(l, t, catalog, mark),
         rounds: l.rounds ?? 1,
       }),
     ),

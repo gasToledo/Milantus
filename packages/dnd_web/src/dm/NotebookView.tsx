@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react';
 import { Search, X } from 'lucide-react';
-import { useCampaignChapters, useCampaignNotebook, useSheetCatalog } from '../api/queries';
+import { useCampaignChapters, useCampaignMembers, useCampaignNotebook, useCampaignNpcs, useSheetCatalog } from '../api/queries';
 import type { DmCampaign } from '../api/client';
 import { useLang, useTexts } from '../i18n/context';
 import { cx } from '../ui/cx';
 import { MarkdownText } from '../ui/MarkdownText';
+import { withMentions, type Mentions } from '../ui/mentions';
+import { dmMemberHref, dmNpcsHref, Link } from '../router';
 import { Tooltip } from '../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { stateLabel, stateOf } from './campaigns';
@@ -26,9 +28,9 @@ const ACCENT: Record<EntryKind, { border: string; text: string }> = {
  * El Cuaderno de la campaña, de solo lectura: las notas del DM, los combates
  * cerrados y las subidas de nivel, por capítulo. Una pill por capítulo (más
  * «Sin capítulo» para lo que no cuelga de ninguno) y un buscador. Escribir,
- * editar o borrar una nota vive en Flutter; también las menciones `@Nombre`,
- * que acá se leen como texto. Es del DM: ninguna cuenta de jugador recibe nada
- * de esto (`modo-dm.md`).
+ * editar o borrar una nota vive en Flutter. Las menciones `@Nombre` de una nota
+ * y quienes pelearon en un combate enlazan a su ficha. Es del DM: ninguna
+ * cuenta de jugador recibe nada de esto (`modo-dm.md`).
  */
 export function NotebookView({ campaign }: { campaign: DmCampaign }) {
   const t = useTexts();
@@ -38,13 +40,43 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
   const catalog = useSheetCatalog(lang);
   const [query, setQuery] = useState('');
   const [picked, setPicked] = useState<string | null>(null);
+  // A quiénes enlaza una mención: los personajes de la mesa y los PNJ de la
+  // campaña. Si no cargan, las menciones se leen como texto y el Cuaderno no
+  // se cae por eso.
+  const members = useCampaignMembers(campaign.id);
+  const npcs = useCampaignNpcs(campaign.id);
+
+  const mentions = useMemo((): Mentions => {
+    const players = (members.data ?? []).map((m) => ({ name: String(m.character.name ?? ''), href: dmMemberHref(campaign.id, m.memberId) }));
+    const people = (npcs.data ?? []).map((e) => ({ name: e.npc.name ?? '', href: dmNpcsHref(e.npc.id) }));
+    // Un jugador y un PNJ con el mismo nombre: gana el jugador, que es de la
+    // mesa. Entre dos del mismo tipo, el primero, igual que en la lista.
+    const target = (name: string) => players.find((p) => p.name === name) ?? people.find((p) => p.name === name);
+    return {
+      names: [...players, ...people].map((p) => p.name),
+      render: (name, key) => {
+        const player = players.some((p) => p.name === name);
+        return (
+          <Tooltip key={key} content={player ? t.dmOpenSheet(name) : t.dmViewNpc(name)}>
+            <Link
+              href={target(name)!.href}
+              data-mention={player ? 'player' : 'npc'}
+              className="font-semibold text-gold underline decoration-gold underline-offset-2"
+            >
+              {name}
+            </Link>
+          </Tooltip>
+        );
+      },
+    };
+  }, [members.data, npcs.data, campaign.id, t]);
 
   const entries = useMemo(
     () =>
       notebook.data && chapters.data && catalog.data
-        ? buildEntries(notebook.data, chapters.data, t, catalog.data)
+        ? buildEntries(notebook.data, chapters.data, t, catalog.data, (name) => (mentions.names.includes(name) ? `@${name}` : name))
         : null,
-    [notebook.data, chapters.data, catalog.data, t],
+    [notebook.data, chapters.data, catalog.data, t, mentions],
   );
 
   const failed = [notebook, chapters, ...catalog.queries].filter((q) => q.isError);
@@ -167,11 +199,11 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
                 </div>
                 <div className="mt-1.5 text-[13.5px] leading-relaxed text-on-surface-variant">
                   {e.markdown ? (
-                    <MarkdownText text={e.body} />
+                    <MarkdownText text={e.body} mentions={mentions} />
                   ) : (
                     e.body.split('\n\n').map((p, i) => (
                       <p key={i} className="mb-2 last:mb-0">
-                        {p}
+                        {withMentions(p, mentions)}
                       </p>
                     ))
                   )}
