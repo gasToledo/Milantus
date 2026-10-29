@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
 import type { Account } from '../api/client';
 import { useDmCampaigns } from '../api/queries';
@@ -17,6 +17,7 @@ import { CombatView } from './CombatView';
 import { HomebrewView } from './HomebrewView';
 import { MemberSheetView } from './MemberSheetView';
 import { MesaView } from './MesaView';
+import { MusicPlayer } from './MusicPlayer';
 import { NotebookView } from './NotebookView';
 import { CampaignNpcsView } from './npcs/CampaignNpcsView';
 import { NpcDetailView } from './npcs/NpcDetailView';
@@ -50,6 +51,15 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
           return campaign ? { campaign, section: view.kind === 'member' ? ('mesa' as const) : view.section } : undefined;
         })()
       : undefined;
+
+  // La música es de la última campaña abierta, no de la URL: abrir el
+  // Bestiario o la Biblioteca (que no son de una campaña) no la corta.
+  const currentId = current?.campaign.id;
+  const [musicCampaignId, setMusicCampaignId] = useState<string | null>(null);
+  useEffect(() => {
+    if (currentId) setMusicCampaignId(currentId);
+  }, [currentId]);
+  const musicCampaign = list?.find((c) => c.id === (currentId ?? musicCampaignId));
 
   let body;
   if (view.kind === 'bestiary') {
@@ -114,6 +124,9 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
   return (
     <Shell panel={<DmPanel campaigns={list} current={current} tool={view.kind === 'npcSheet' ? 'npcs' : view.kind === 'bestiary' || view.kind === 'npcs' || view.kind === 'homebrew' ? view.kind : undefined} />} footer={<RosterFooter account={account} dm />}>
       {body}
+      {/* Otra campaña es otro reproductor: lo que sonaba se corta. La clave no
+          puede ser el id a secas: la sección hermana ya la usa. */}
+      {musicCampaign && <MusicPlayer key={`music:${musicCampaign.id}`} scenes={musicCampaign.musicScenes ?? []} />}
     </Shell>
   );
 }

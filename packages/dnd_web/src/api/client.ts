@@ -142,14 +142,25 @@ export async function fetchPlayerCampaigns(characterId: string, signal: AbortSig
 }
 
 /** Una campaña que dirige la cuenta (`GET /api/campaigns`, el documento del
- *  DM). Solo se tipa lo que el Modo DM de React lee: las escenas de música
- *  viajan en el mismo documento y esta pantalla no las toca. */
+ *  DM). Solo se tipa lo que el Modo DM de React lee. */
 export interface DmCampaign {
   id: string;
   name: string;
   premise?: string;
   /** `CampaignState.name`: `active`, `paused` o `finished`. */
   state?: string;
+  /** Las escenas de música (`MusicScene.toJson`). Son del DM: el servidor las
+   *  poda de la campaña que recibe el jugador (`Campaign.playerView`). */
+  musicScenes?: MusicScene[];
+}
+
+export interface MusicScene {
+  id: string;
+  name: string;
+  /** El enlace tal cual lo pegó el DM; lo interpreta el motor (`musicSource`). */
+  url: string;
+  /** Si Flutter la ofrece al iniciar un combate. */
+  offerOnCombat?: boolean;
 }
 
 /** Las campañas del DM, tal como las guarda el servidor. Un fallo se lanza: sin

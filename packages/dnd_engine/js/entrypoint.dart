@@ -365,6 +365,24 @@ String encounter(String encounterJson, String playersHpJson) {
   });
 }
 
+/// El enlace de una escena de música → qué es, su id, el reproductor embebido
+/// y la página de YouTube (`MusicSource.parse`), o `null` si no es un enlace
+/// de YouTube que el motor reconozca. Así el cliente nunca arma una dirección
+/// de iframe con lo que pegó el DM.
+String musicSource(String url) {
+  final source = MusicSource.parse(url);
+  return jsonEncode(
+    source == null
+        ? null
+        : {
+            'kind': source.kind.name,
+            'id': source.id,
+            'embedUrl': source.embedUrl,
+            'pageUrl': source.pageUrl,
+          },
+  );
+}
+
 void main() {
   final motor = JSObject();
   motor['compute'] = compute.toJS;
@@ -381,5 +399,6 @@ void main() {
   motor['bestiary'] = bestiary.toJS;
   motor['npcs'] = npcs.toJS;
   motor['encounter'] = encounter.toJS;
+  motor['musicSource'] = musicSource.toJS;
   globalContext['dndEngine'] = motor;
 }

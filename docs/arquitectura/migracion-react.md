@@ -50,7 +50,7 @@ Un solo servidor, un solo origen, dos clientes:
   `migrateCharacter`, `setEngineLanguage`, `applyTranslation`,
   `vocabularyLabel`, `inventoryOf`, `chapterGrants`, `catalogLabel`,
   `catalogLabelOrder`, `formatCost`, `abilityModifier`, `bestiary`,
-  `npcViews`, `encounterView`); la
+  `npcViews`, `encounterView`, `musicSource`); la
   comunicación es JSON como texto de ida y vuelta. Los tipos de
   `src/engine/types.ts` están escritos a mano: los cuida la paridad (abajo).
 
@@ -209,12 +209,11 @@ repiten acá.
   panel DM enlaza el Bestiario.
 - **El Modo DM, de solo lectura** en `/v2/dm` (`src/dm/`), al que lleva «DM» del
   interruptor. **Ninguna escritura**: ni crear o editar campañas, ni cerrar
-  capítulos, ni música, ni notas; todo eso sigue en Flutter. Se porta por
+  capítulos, ni escenas de música, ni notas; todo eso sigue en Flutter. Se porta por
   secciones, una por PR; hoy existen la **Mesa**, **Capítulos**, el **Cuaderno**,
   los **PNJ de la mesa**, el **Combate**, el **Bestiario**, la **Biblioteca de
   PNJ** y el **Homebrew**: todas las secciones del panel, más la **ficha
-  completa** de un miembro y la de un PNJ con ficha. De lectura falta todavía
-  la música (ver «Lo que todavía no existe»). Rutas:
+  completa** de un miembro y la de un PNJ con ficha y la **música**. Rutas:
   `/v2/dm` (redirige a la primera campaña en curso, o a la primera que haya),
   `/v2/dm/campanas/:id/mesa|capitulos|cuaderno|pnj|combate`,
   `/v2/dm/campanas/:id/mesa/:miembro/personaje|combate`, `/v2/dm/bestiario[/:criatura]`,
@@ -223,7 +222,20 @@ repiten acá.
   interruptor con «DM» activo, las herramientas (Bestiario, Biblioteca de PNJ y
   Homebrew), las campañas
   agrupadas En curso / En pausa / Terminadas (plegable, abierta si la elegida
-  es una de ellas) y, de la campaña elegida, sus secciones. La **Mesa** lista a los jugadores
+  es una de ellas) y, de la campaña elegida, sus secciones. La **música**
+  (`MusicPlayer`, el `dm/music/` de Flutter) es **solo para escuchar**: una pill
+  «Música» flotante abajo a la derecha que se despliega con las escenas de la
+  campaña (las del documento de `GET /api/campaigns`, que el servidor poda de la
+  vista del jugador) y el reproductor de YouTube embebido, con pausar, reanudar,
+  minimizar (que pausa: YouTube exige el reproductor a la vista) y «Abrir en
+  YouTube» si el dueño no deja verlo afuera. El enlace lo interpreta el motor
+  (`musicSource`, sobre `MusicSource.parse`): la pantalla nunca arma la dirección
+  del iframe con lo que pegó el DM, y una escena que no es de YouTube se lista
+  sin reproducirse. Vive en `DmPage` y no en una sección: cambiar de sección o
+  abrir una herramienta de la cuenta no la corta; cambiar de campaña, sí. Crear,
+  editar, reordenar, borrar y marcar «ofrecer al iniciar un combate» son
+  escrituras (paso 6), y la oferta al empezar un combate no está porque acá
+  nadie empieza uno. La **Mesa** lista a los jugadores
   vinculados (`GET /api/campaigns/:id/members`, que lee la ficha **real** del
   jugador, no una copia): retrato inicial, nombre, especie y clase, nivel, barra
   de PG, placas CA / Inic / CD / Pasiva y los estados como pills carmesí. Las
@@ -357,10 +369,9 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    bestiario *(existe)* y catálogos *(el Códice existe)*.
    **Lectura del Modo DM** (se sumó a este paso): Mesa, Capítulos, Cuaderno,
    Bestiario, Biblioteca de PNJ, PNJ de la mesa, Homebrew y Combate *(existen)*.
-   La ficha completa de un miembro y la de un PNJ con ficha *(existen)*.
+   La ficha completa de un miembro y la de un PNJ con ficha, y la música (solo
+   escuchar) *(existen)*.
    **Faltan para cerrar el paso**, todas de lectura:
-   - la música: escuchar las escenas de la campaña (`dm/music/` de Flutter),
-     que no escribe nada; crearlas y editarlas es del paso 6;
    - los retratos (personaje, miembro y PNJ: hoy el medallón lleva la inicial)
      y su visor;
    - las menciones `@Nombre` del Cuaderno como enlaces, que dependen de las dos
@@ -416,7 +427,8 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    del motor y los estados de la ficha, sin escribir nada, que leerla no cambie la
    ficha del jugador, que su tarjeta abra la ficha completa del miembro (por el
    vínculo, con Personaje y Combate y los números del motor) y que otra cuenta
-   no la abra por URL, que Capítulos muestre estado, objetivo y recompensas (y que
+   no la abra por URL, que la música ponga una escena sembrada con el reproductor
+   que arma el motor y siga al cambiar de sección, sin escribir, que Capítulos muestre estado, objetivo y recompensas (y que
    el objetivo y los capítulos sin cerrar no lleguen al jugador), que el
    Cuaderno junte notas, combates (con un PNJ aliado por su nombre propio) y
    subidas de nivel, busque, y que nada de eso llegue al jugador, que el
@@ -483,7 +495,7 @@ propio.
 Para que nadie lo dé por hecho:
 
 - Las lecturas que faltan del paso 3 (la lista está en «Orden previsto de
-  pantallas»): la música, los retratos, las menciones `@Nombre` como enlaces e imprimir.
+  pantallas»): los retratos, las menciones `@Nombre` como enlaces e imprimir.
 - Cualquier escritura desde React: todo el cliente hoy es solo lectura, así que
   los pasos 4 a 7 están enteros por hacer. Entre ellos, reordenar, marcar
   favorito, crear, renombrar o borrar personajes, y escribir en `/api/settings`

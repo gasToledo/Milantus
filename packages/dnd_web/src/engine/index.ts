@@ -21,6 +21,7 @@ interface DartEngine {
   bestiary(catalogJson: string): string;
   npcs(entriesJson: string, catalogJson: string): string;
   encounter(encounterJson: string, playersHpJson: string): string;
+  musicSource(url: string): string;
 }
 
 function engine(): DartEngine {
@@ -175,4 +176,21 @@ export function encounterView(
   playersHp: Record<string, { current: number; max: number }>,
 ): EncounterView {
   return JSON.parse(engine().encounter(JSON.stringify(encounter), JSON.stringify(playersHp))) as EncounterView;
+}
+
+/** Un enlace de YouTube reconocido por el motor (`MusicSource`). */
+export interface MusicSource {
+  kind: 'video' | 'playlist';
+  id: string;
+  /** El reproductor embebido, por `youtube-nocookie.com` y con `enablejsapi=1`. */
+  embedUrl: string;
+  /** La página de YouTube, armada con el id y no con lo que pegó el DM. */
+  pageUrl: string;
+}
+
+/** El enlace de una escena de música, o `null` si no es uno de YouTube que el
+ *  motor reconozca (`MusicSource.parse`): una escena de Spotify guardada antes
+ *  de sacarlo queda sin reproducir. */
+export function musicSource(url: string): MusicSource | null {
+  return JSON.parse(engine().musicSource(url)) as MusicSource | null;
 }

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { bestiary, chapterGrants, computeSheet, type JsonObject } from '../src/engine';
+import { bestiary, chapterGrants, computeSheet, musicSource, type JsonObject } from '../src/engine';
 import { signed } from '../src/sheet/format';
 import { api, catalogo, TOKEN, TOKEN_DM, TOKEN_SIN_V2, vigilarEscrituras, type PersonajeApi } from './helpers';
 
@@ -116,6 +116,40 @@ test('la tarjeta de la Mesa abre la ficha completa del miembro, de solo lectura 
   // Un vínculo que no existe dice lo mismo que uno cortado.
   await page.goto(`${MESA}/no-existe/personaje`);
   await expect(page.getByText('Ya no ves esta ficha. Puede que te hayan cortado el vínculo.')).toBeVisible();
+});
+
+test('la música pone una escena de la campaña con el reproductor que arma el motor, sigue al cambiar de sección y no escribe', async ({
+  context,
+  page,
+  baseURL,
+}) => {
+  await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);
+  // La prueba no sale a internet: YouTube no responde y el iframe queda vacío.
+  await page.route('https://www.youtube-nocookie.com/**', (r) => r.abort());
+  const escrituras = vigilarEscrituras(page);
+  const { campaigns } = await api<{ campaigns: { id: string; musicScenes: { name: string; url: string }[] }[] }>(
+    page.request,
+    '/api/campaigns',
+    TOKEN_DM,
+  );
+  const escena = campaigns.find((c) => c.id === CAMPANA)!.musicScenes[0]!;
+  const fuente = musicSource(escena.url)!;
+
+  await page.goto(MESA);
+  await page.getByRole('button', { name: 'Música' }).click();
+  const escenas = page.getByRole('list', { name: 'Escenas de la campaña' });
+  await expect(escenas.getByRole('listitem')).toHaveText([`${escena.name}Video de YouTube`]);
+  await escenas.getByRole('button', { name: `Reproducir: ${escena.name}` }).click();
+  // La dirección del iframe es la del motor, nunca el texto que pegó el DM.
+  const reproductor = page.locator('[data-music-player] iframe');
+  await expect(reproductor).toHaveAttribute('src', `${fuente.embedUrl}&autoplay=1`);
+
+  // Cambiar de sección o abrir una herramienta de la cuenta no la corta.
+  await page.getByRole('navigation', { name: 'Secciones de la campaña' }).getByRole('link', { name: 'Capítulos' }).click();
+  await page.getByRole('navigation', { name: 'Herramientas del DM' }).getByRole('link', { name: 'Bestiario' }).click();
+  await expect(page).toHaveURL('/v2/dm/bestiario');
+  await expect(reproductor).toHaveAttribute('src', `${fuente.embedUrl}&autoplay=1`);
+  expect(escrituras).toEqual([]);
 });
 
 test('Capítulos muestra estado, objetivo y recompensas de cada capítulo, y solo el DM lee el objetivo', async ({
