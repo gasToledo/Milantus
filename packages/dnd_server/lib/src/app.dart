@@ -131,6 +131,10 @@ Handler buildHandler({
   /// las pruebas que no lo miran no tienen que armarlo, y un despliegue sin
   /// proyecto en Zitadel arranca igual.
   McpDependencies? mcp,
+
+  /// Cuentas a las que `/api/me` les dice `webV2: true` (ver
+  /// `WebConfig.v2Users`). Vacío: a nadie.
+  Set<String> v2Users = const {},
 }) {
   final authenticated = requireSession(auth.resolveUserId);
   final feedbackLimiter = FeedbackRateLimiter();
@@ -142,7 +146,7 @@ Handler buildHandler({
     ..get(
       '/api/me',
       authenticated(
-        (request) => _meHandler(request, auth, sendFeedback != null),
+        (request) => _meHandler(request, auth, sendFeedback != null, v2Users),
       ),
     )
     ..get(
@@ -578,6 +582,7 @@ Future<Response> _meHandler(
   Request request,
   AuthDependencies auth,
   bool feedbackEnabled,
+  Set<String> v2Users,
 ) async {
   final token = readSessionToken(request.headers['cookie']);
   final profile = token == null ? null : await auth.sessionProfile(token);
@@ -588,6 +593,9 @@ Future<Response> _meHandler(
       'email': profile?.email,
       'pictureUrl': profile?.pictureUrl,
       'feedbackEnabled': feedbackEnabled,
+      // Solo el booleano de *esta* cuenta: la lista entera diría a cualquiera
+      // quién más está probando.
+      'webV2': v2Users.contains(request.userId),
     }),
     headers: {'content-type': 'application/json'},
   );

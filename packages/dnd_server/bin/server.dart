@@ -126,6 +126,7 @@ Future<void> main() async {
       webStaticHandler: webStaticHandler,
       webV2Handler: webV2Handler,
       mcp: mcp,
+      v2Users: config.web.v2Users,
       sendFeedback: config.feedback.enabled
           ? workerFeedbackSender(
               url: Uri.parse(config.feedback.workerUrl),

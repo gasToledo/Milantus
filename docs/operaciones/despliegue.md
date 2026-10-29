@@ -252,6 +252,20 @@ comparte la cookie de sesión.
 - Caché: `index.html` con `private, no-cache`, y los archivos de `assets/`
   (con hash en el nombre) `public, max-age=31536000, immutable`.
 - `/api`, `/auth` y `/mcp` no pasan por este camino.
+- `DND_V2_USERS` (en `.env` como `V2_USERS`) lista los ids de cuenta, separados
+  por coma, a quienes `GET /api/me` les responde `webV2: true`; al resto,
+  `false`. Vacía por defecto: nadie. El id es el `userId` de esa misma
+  respuesta (se ve en las herramientas de red del navegador con la sesión
+  iniciada). La respuesta trae solo el booleano de la cuenta que pregunta,
+  nunca la lista. Hoy el cliente de Flutter no lee el campo: sirve de base para
+  ir mandando a cada cuenta a las pantallas ya migradas. Cambiarla pide
+  `docker compose up -d` para recrear el contenedor del servidor.
+- El motor de reglas llega al cliente React compilado a JS (`dart compile js`,
+  `packages/dnd_engine/js/entrypoint.dart`): la imagen lo hace en la etapa
+  `engine-js` del Dockerfile y para desarrollar se corre `npm run build:engine`
+  en `packages/dnd_web` (hace falta el SDK de Dart en el PATH). CI verifica que
+  dé los mismos resultados que Dart (`engine_js`) y que `/v2` sirva con sesión
+  contra el servidor real (`web_e2e`, Playwright).
 
 Para probarlo sin Docker: `npm ci && npm run build` en `packages/dnd_web`, y
 levantar el servidor con `DND_WEB_V2_ROOT=$PWD/packages/dnd_web/dist`. Para

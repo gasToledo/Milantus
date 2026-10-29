@@ -34,6 +34,24 @@ void main() {
 
   group('DatabaseConfig.fromEnvironment', () {});
 
+  group('WebConfig.fromEnvironment', () {
+    test('DND_V2_USERS vacía o ausente no habilita a nadie', () {
+      expect(WebConfig.fromEnvironment(const {}).v2Users, isEmpty);
+      expect(
+        WebConfig.fromEnvironment(const {'DND_V2_USERS': ''}).v2Users,
+        isEmpty,
+      );
+    });
+
+    test('DND_V2_USERS tolera espacios y comas de más', () {
+      final config = WebConfig.fromEnvironment(const {
+        'DND_V2_USERS': ' a1, b2 ,,c3,',
+      });
+
+      expect(config.v2Users, {'a1', 'b2', 'c3'});
+    });
+  });
+
   group('OidcConfig.fromEnvironment', () {
     test('calcula la URI de callback a partir de la base pública', () {
       final config = OidcConfig.fromEnvironment(dbEnv);

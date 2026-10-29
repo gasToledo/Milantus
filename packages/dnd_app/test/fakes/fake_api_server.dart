@@ -148,6 +148,10 @@ class FakeApiServer {
   /// pruebas que lo piden.
   bool feedbackEnabled = false;
 
+  /// Cuentas con `DND_V2_USERS`, como el servidor. `/api/me` expone solo el
+  /// booleano de la cuenta de la sesión (`fake-user`), nunca la lista.
+  Set<String> v2Users = {};
+
   /// Los cuerpos de `POST /api/feedback` tal como llegaron.
   final List<Map<String, dynamic>> feedback = [];
 
@@ -186,6 +190,7 @@ class FakeApiServer {
         'email': accountEmail,
         'pictureUrl': null,
         'feedbackEnabled': feedbackEnabled,
+        'webV2': v2Users.contains('fake-user'),
       });
     }
 

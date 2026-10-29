@@ -286,6 +286,49 @@ void main() {
       expect(body['pictureUrl'], 'https://idp.example/ada.png');
     });
 
+    test('/api/me dice webV2 solo a las cuentas de DND_V2_USERS', () async {
+      Handler conLista(Set<String> v2Users) => buildHandler(
+        auth: fakeAuth.dependencies,
+        portraits: portraits,
+        generation: generation,
+        importBackup: importBackup,
+        importHomebrew: importHomebrew,
+        characters: characters,
+        campaigns: campaigns,
+        chapters: chapters,
+        notes: notes,
+        encounters: encounters,
+        events: events,
+        npcs: npcs,
+        transactions: transactions,
+        homebrew: homebrewRepo,
+        levelUps: levelUps,
+        settings: settingsRepo,
+        v2Users: v2Users,
+      );
+      Future<Map<String, dynamic>> me(Handler h, String token) async {
+        final response = await h(
+          Request(
+            'GET',
+            Uri.parse('http://localhost/api/me'),
+            headers: {'cookie': 'dnd_session=$token'},
+          ),
+        );
+        return jsonDecode(await response.readAsString());
+      }
+
+      // El primer login de cada prueba crea `account-1` (ver el fake).
+      final token = await _login(handler);
+      final userId = (await me(handler, token))['userId'] as String;
+
+      expect((await me(handler, token))['webV2'], isFalse);
+      expect((await me(conLista({'otra-cuenta'}), token))['webV2'], isFalse);
+      final habilitada = await me(conLista({userId, 'otra-cuenta'}), token);
+      expect(habilitada['webV2'], isTrue);
+      // La lista no se filtra: solo el booleano de quien pregunta.
+      expect(habilitada.values, isNot(contains('otra-cuenta')));
+    });
+
     // Una cuenta del proveedor sin nombre ni correo cargados no puede romper
     // el arranque de la aplicación.
     test('/api/me tolera una sesión sin perfil', () async {
