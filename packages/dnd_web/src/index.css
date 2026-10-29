@@ -208,6 +208,42 @@ body {
   }
 }
 
+/* El Códice: lista y detalle lado a lado cuando el contenido mide 760 px o
+   más (el corte del Bestiario en Flutter, medido sin el panel). Debajo, una
+   cosa por vez: la lista sin entrada abierta, el detalle con ella. */
+.codex-split {
+  container-type: inline-size;
+}
+.codex-split > div {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+}
+.codex-split[data-open='true'] .codex-list,
+.codex-split[data-open='false'] .codex-detail {
+  display: none;
+}
+@container (min-width: 760px) {
+  .codex-split > div {
+    grid-template-columns: 320px minmax(0, 1fr);
+  }
+  .codex-split[data-open] .codex-list,
+  .codex-split[data-open] .codex-detail {
+    display: block;
+  }
+  /* La lista tiene su propio scroll y queda a la vista mientras se lee el
+     detalle: con 392 conjuros, estirar la página la volvía una pared. */
+  .codex-split .codex-list {
+    position: sticky;
+    top: 24px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+  }
+  .codex-back {
+    display: none;
+  }
+}
+
 /* La barra de PG recorre el tramo (`ThinBar`, 220 ms easeOut). */
 .thin-bar-fill {
   transition: width 220ms ease-out;

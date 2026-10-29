@@ -14,6 +14,9 @@ interface DartEngine {
   vocabularyLabel(field: string, value: string): string;
   inventory(characterJson: string, catalogJson: string): string;
   chapterGrants(chapterJson: string): string;
+  catalogLabel(kind: string, id: string): string;
+  catalogLabelOrder(kind: string): string;
+  formatCost(cp: number, labelsJson: string): string;
 }
 
 function engine(): DartEngine {
@@ -97,4 +100,38 @@ export function inventoryOf(character: CharacterJson, catalog: Catalog): Invento
  *  vacío (`Chapter.grantsLabel`). */
 export function chapterGrants(chapter: JsonObject): string {
   return engine().chapterGrants(JSON.stringify(chapter));
+}
+
+/** Tablas de rótulos del motor que el cliente lee por id. */
+export type CatalogLabelKind =
+  | 'rarity'
+  | 'featCategory'
+  | 'itemCategory'
+  | 'armorTraining'
+  | 'weaponProficiency'
+  | 'tool'
+  | 'weaponProperty'
+  | 'weaponPropertyRule'
+  | 'mastery'
+  | 'damageType'
+  | 'skill'
+  | 'ability'
+  | 'language';
+
+/** El nombre visible de un id del catálogo (una rareza, una propiedad de
+ *  arma, una competencia…) en el idioma del motor; un id desconocido vuelve
+ *  tal cual. Son las tablas del motor, no copias en TypeScript. */
+export function catalogLabel(kind: CatalogLabelKind, id: string): string {
+  return engine().catalogLabel(kind, id);
+}
+
+/** El orden de las claves de una tabla de rótulos, el de los filtros. */
+export function catalogLabelOrder(kind: 'rarity' | 'featCategory' | 'itemCategory'): string[] {
+  return JSON.parse(engine().catalogLabelOrder(kind)) as string[];
+}
+
+/** Un precio en cobre con la denominación que lo expresa sin fracción
+ *  (`formatCost` del motor) y las abreviaturas del idioma de la interfaz. */
+export function formatCost(cp: number, labels: Record<string, string>): string {
+  return engine().formatCost(cp, JSON.stringify(labels));
 }

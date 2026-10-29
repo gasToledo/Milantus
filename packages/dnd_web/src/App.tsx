@@ -8,6 +8,7 @@ import { resolveLang, type Lang } from './i18n/texts';
 import { DashboardPage } from './dashboard/DashboardPage';
 import { RosterFooter, RosterPanel } from './dashboard/RosterPanel';
 import { useRoute } from './router';
+import { CodexPage } from './codex/CodexPage';
 import { CharacterPage } from './sheet/CharacterPage';
 import { ThemeProvider, useTheme } from './theme/theme';
 import { ButtonLink } from './ui/Button';
@@ -103,6 +104,8 @@ function Enabled({ account }: { account: Account }) {
       );
     case 'character':
       return <CharacterPage id={route.id} tab={route.tab} />;
+    case 'codex':
+      return <CodexPage category={route.category} entryId={route.entryId} />;
     case 'unknown':
       return (
         <Shell panel={<RosterPanel />} footer={<RosterFooter account={account} />}>

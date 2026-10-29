@@ -48,7 +48,8 @@ Un solo servidor, un solo origen, dos clientes:
   `dart compile js` sobre `packages/dnd_engine/js/entrypoint.dart`. **No se
   versiona.** `src/engine/index.ts` es la única puerta (`computeSheet`,
   `migrateCharacter`, `setEngineLanguage`, `applyTranslation`,
-  `vocabularyLabel`, `inventoryOf`, `chapterGrants`); la
+  `vocabularyLabel`, `inventoryOf`, `chapterGrants`, `catalogLabel`,
+  `catalogLabelOrder`, `formatCost`); la
   comunicación es JSON como texto de ida y vuelta. Los tipos de
   `src/engine/types.ts` están escritos a mano: los cuida la paridad (abajo).
 
@@ -103,12 +104,12 @@ repiten acá.
 - Idioma: español o inglés, resuelto una vez al cargar (clave `milantus.locale`
   de `localStorage`, luego `navigator.language`, luego español). Es el mismo
   criterio para los rótulos del motor.
-- **Dos pantallas de solo lectura.** La primera, el **dashboard** en `/v2/`
+- **Tres pantallas de solo lectura.** La primera, el **dashboard** en `/v2/`
   (`src/dashboard/`): la lista de personajes con el orden (`sortMode`:
   manual, más recientes, nombre, nivel, clase) y el favorito de los ajustes de
   la cuenta (`/api/settings`), buscador en el cliente por nombre, especie y
   clase, y los caídos al final, como en Flutter. Orden y favorito **se
-  muestran, no se editan**; crear, Ajustes, Sugerencias, Cerrar sesión, Códice,
+  muestran, no se editan**; crear, Ajustes, Sugerencias, Cerrar sesión,
   Homebrew y el «DM» del interruptor de modo enlazan a la raíz de Flutter
   (`FLUTTER_HOME`, `src/router.ts`). Cada tarjeta enlaza a la ficha. Las cifras
   (nivel, PG máximos, CA, velocidad, iniciativa) salen de `computeSheet`; los
@@ -142,6 +143,18 @@ repiten acá.
   lista de `/api/characters` (la misma consulta en caché que el dashboard) y
   busca, como Flutter; lo ajeno y lo inexistente son lo mismo. El personaje se
   migra con el motor (`migrateCharacter`) antes de leerlo y calcularlo.
+- **El Códice** en `/v2/codice` (`src/codex/`): el catálogo de solo lectura
+  con especies, linajes, clases, subclases, trasfondos, dotes, conjuros,
+  objetos mágicos, armas, armaduras y equipo, más el homebrew de la cuenta
+  marcado «Propio». Sin criaturas: en Flutter son del Modo DM. Cada categoría
+  y cada entrada es una ruta (`/v2/codice/conjuros/fireball`); la portada
+  cuenta las entradas, la búsqueda del panel agrupa por categoría (cinco por
+  grupo, «Ver las N» abre la categoría con `?q=`) y cada categoría tiene
+  filtros por faceta (rareza, categoría de dote, nivel, escuela, familia).
+  Rótulos, orden de las facetas y precios los da el motor (`catalogLabel`,
+  `catalogLabelOrder`, `formatCost`). Glosario y guías quedan para otra
+  vuelta, y las dotes sin descripción no muestran sus efectos: el texto de
+  cada efecto (`describeEffect`) vive en Flutter (ver su `ponytail:`).
 - **Homebrew**: la ficha y el dashboard calculan con el catálogo oficial más
   el contenido homebrew de la cuenta (`GET /api/homebrew`, fusionado por id en
   `src/api/homebrew.ts`), como `HomebrewStore` + `ContentRepository.addAll` en
@@ -161,7 +174,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
 1. Ficha de personaje, solo lectura *(existe)*.
 2. Lista de personajes y navegación entre pantallas *(existe)*.
 3. Lo de lectura más simple: ajustes de visualización, cuaderno/campañas en
-   modo lectura, bestiario y catálogos.
+   modo lectura, bestiario y catálogos *(el Códice existe)*.
 4. Escrituras de bajo riesgo: PG y usos de recursos en la ficha, descansos.
 5. Edición completa: creador de personajes, subida de nivel, inventario.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
@@ -194,7 +207,9 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    trucos y conjuros, con los siempre preparados en su grupo; que el
    inventario, la campaña y el diario muestren lo que resuelve el motor y lo
    que manda la API (con una mesa sembrada: otra cuenta como DM, un capítulo
-   cerrado y una batalla); y que una cuenta sin `webV2` vea
+   cerrado y una batalla); que el Códice cuente y abra el homebrew de la
+   cuenta y que su búsqueda general coincida con el catálogo
+   (`e2e/codice.spec.ts`); y que una cuenta sin `webV2` vea
    «No disponible» sin pedir sus datos (`e2e/acceso.spec.ts`). Lo esperado se
    calcula con el mismo motor y la misma fusión (`e2e/helpers.ts`). Sin
    reintentos: no hay «a veces anda».
