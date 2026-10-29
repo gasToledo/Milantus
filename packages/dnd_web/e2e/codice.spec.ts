@@ -54,3 +54,21 @@ test('la búsqueda general agrupa por categoría y «Ver las N» abre la categor
   await expect(page).toHaveURL(/\/v2\/codice\/conjuros\?q=fuego$/);
   await expect(page.locator('[data-field="codex-list"] [data-entry]')).toHaveCount(conjuros.length);
 });
+
+test('el glosario se lee en orden: cada término lleva al siguiente y filtrar no cambia su número', async ({ page }) => {
+  await page.goto('/v2/codice/glosario/dc');
+  const detalle = page.locator('[data-field="codex-detail"]');
+  await expect(detalle.getByRole('img', { name: 'Término 5 de 26' })).toBeVisible();
+
+  // El último de «Dados y tiradas» sigue con el primero de «Tu personaje».
+  await detalle.locator('[data-step="next"]').click();
+  await expect(page).toHaveURL('/v2/codice/glosario/abilities');
+  await expect(detalle.getByRole('img', { name: 'Término 6 de 26' })).toBeVisible();
+  await expect(detalle.getByRole('table')).toBeVisible();
+
+  // Filtrando, «Estados» conserva su lugar en la lectura.
+  await page.getByRole('searchbox', { name: 'Buscar en Glosario' }).fill('estados');
+  const lista = page.locator('[data-field="codex-list"] [data-entry]');
+  await expect(lista).toHaveCount(1);
+  await expect(lista).toHaveText(/^18\s*Estados$/);
+});

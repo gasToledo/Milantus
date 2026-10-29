@@ -34,6 +34,9 @@ export interface CodexDetail {
   /** Una lista de nombres relacionados: linajes de una especie, subclases de
    *  una clase, clases que preparan un conjuro. */
   related?: { title: string; names: string[] };
+  /** Solo el glosario: texto propio en párrafos, con el ejemplo aparte, y lo
+   *  que dos entradas llevan además (la tabla de modificadores, los estados). */
+  glossary?: { paragraphs: string[]; example?: string; extra?: 'modifiers' | 'conditions' };
 }
 
 export interface CodexEntry {
@@ -51,10 +54,50 @@ export interface CodexEntry {
 }
 
 /** Las categorías en el orden del panel, con su grupo de la portada. */
-export const CATEGORY_GROUPS: { group: 'character' | 'gear'; categories: CodexCategory[] }[] = [
+export const CATEGORY_GROUPS: { group: 'start' | 'character' | 'gear'; categories: CodexCategory[] }[] = [
+  { group: 'start', categories: ['glossary'] },
   { group: 'character', categories: ['races', 'lineages', 'classes', 'subclasses', 'backgrounds', 'feats'] },
   { group: 'gear', categories: ['spells', 'magicItems', 'weapons', 'armor', 'gear'] },
 ];
+
+/**
+ * El glosario en orden de lectura —de los dados al DM—, como `_glossary` de
+ * Flutter: quien empieza lo recorre de arriba abajo y cada término se apoya en
+ * los de antes. Por eso no va alfabético.
+ */
+const GLOSSARY: [keyof Texts['glossaryGroups'], (keyof Texts['glossary'])[]][] = [
+  ['dice', ['dice', 'notation', 'd20-test', 'advantage', 'dc']],
+  ['character', ['abilities', 'proficiency', 'skills', 'saves', 'hit-points', 'armor-class', 'level']],
+  ['combat', ['initiative', 'turn', 'attack', 'critical', 'zero-hp', 'conditions']],
+  ['magic', ['spells', 'slots', 'concentration', 'rests', 'inspiration']],
+  ['dm', ['challenge', 'npcs', 'difficulty']],
+];
+
+function glossaryEntries(t: Texts): CodexEntry[] {
+  return GLOSSARY.flatMap(([group, ids], rank) =>
+    ids.map((id) => {
+      const g: { title: string; body: string[]; example?: string } = t.glossary[id];
+      return {
+        id,
+        name: g.title,
+        subtitle: t.glossaryGroups[group],
+        // Texto nuestro y no de un libro: sin procedencia.
+        source: '',
+        facet: t.glossaryGroups[group],
+        facetRank: rank,
+        detail: () => ({
+          facts: [],
+          sections: [],
+          glossary: {
+            paragraphs: g.body,
+            example: g.example,
+            extra: id === 'abilities' ? 'modifiers' : id === 'conditions' ? 'conditions' : undefined,
+          },
+        }),
+      };
+    }),
+  );
+}
 
 /** Para buscar sin que importen tildes ni mayúsculas (`foldForSearch`). */
 export const fold = (s: string): string => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
@@ -72,6 +115,8 @@ const objs = (v: unknown): Json[] => (Array.isArray(v) ? v.filter((x): x is Json
 export function codexEntries(category: CodexCategory, catalog: Catalog, t: Texts, lang: Lang): CodexEntry[] {
   const ctx = new Ctx(catalog, t, lang);
   switch (category) {
+    case 'glossary':
+      return glossaryEntries(t);
     case 'races':
       return ctx.sorted(catalog.races).map((r) => ctx.race(r));
     case 'lineages':

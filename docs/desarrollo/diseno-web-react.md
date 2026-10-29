@@ -130,6 +130,10 @@ La pantalla de referencia de cómo se arma una vista con la biblioteca:
   y el detalle trae «volver a la lista».
 - La búsqueda ignora tildes y mayúsculas (`fold`), igual en el panel y en la
   categoría.
+- El glosario cambia tres cosas porque se lee en orden: la lista va agrupada y
+  numerada sin filtros (`EntryList`), el detalle abre con el grupo y una pista
+  de una muesca por término (`ReadingTrack`) y cierra con anterior y siguiente
+  (`ReadingSteps`). El ejemplo de cada término va hundido en una placa.
 
 ## Reglas que más se olvidan
 
