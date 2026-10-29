@@ -40,9 +40,7 @@ export function DiaryTab({ model }: { model: SheetModel }) {
     <div className="flex flex-col gap-4">
       <Card id="background" title={t.diaryBackground} icon={ScrollText}>
         {background ? (
-          // Medida de lectura: unos 66 caracteres, como el cuerpo de un
-          // diálogo; la prosa estirada a todo el ancho no se lee.
-          <MarkdownText text={background} className="max-w-[620px] text-[15px] leading-[1.65] text-on-surface" />
+          <BackgroundText text={background} label={t.diaryBackground} />
         ) : (
           <div className="max-w-[620px]">
             <p className="font-display text-[16px] text-on-surface">{t.diaryUnknownOrigin}</p>
@@ -184,4 +182,27 @@ function EntryBody({ entry }: { entry: DiaryEntry }) {
     );
   }
   return <MarkdownText text={entry.body ?? ''} className="text-[14px] leading-[1.6] text-on-surface" />;
+}
+
+/**
+ * Un trasfondo: la prosa a medida de lectura (unos 66 caracteres; estirada a
+ * todo el ancho no se lee) y con un alto máximo. Uno de diez páginas no
+ * empuja todo lo demás fuera de la pantalla: scrollea adentro de su tarjeta.
+ * Lo comparten la ficha (Diario) y la ficha del PNJ.
+ *
+ * La caja es enfocable y lleva nombre: quien usa el teclado tiene que poder
+ * llegar a ella para scrollearla.
+ */
+export function BackgroundText({ text, label }: { text: string; label: string }) {
+  return (
+    <div
+      tabIndex={0}
+      role="region"
+      aria-label={label}
+      className="max-h-[min(420px,60vh)] max-w-[620px] overflow-y-auto pr-2 focus-visible:outline-2 focus-visible:outline-gold"
+      data-field="background"
+    >
+      <MarkdownText text={text} className="text-[15px] leading-[1.65] text-on-surface" />
+    </div>
+  );
 }

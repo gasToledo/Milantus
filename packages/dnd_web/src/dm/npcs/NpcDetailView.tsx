@@ -6,11 +6,10 @@ import { npcViews, type NpcView } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
 import { dmNpcSheetHref, dmNpcsHref, Link } from '../../router';
 import { signed } from '../../sheet/format';
-import { DiaryEntries } from '../../sheet/DiaryTab';
+import { BackgroundText, DiaryEntries } from '../../sheet/DiaryTab';
 import { Card } from '../../ui/Card';
 import { cx } from '../../ui/cx';
 import { Pill, StatPlaque } from '../../ui/data';
-import { MarkdownText } from '../../ui/MarkdownText';
 import { Medallion } from '../../ui/Medallion';
 import { AppBusyLabel, AppErrorView, Notice } from '../../ui/status';
 import { Abbr } from '../MemberCard';
@@ -108,7 +107,7 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
         <div className="flex min-w-0 flex-[999_1_420px] flex-col gap-4">
           <Card id="npc-background" title={t.npcBackground} icon={ScrollText}>
             {background ? (
-              <MarkdownText text={background} className="max-w-[620px] text-[15px] leading-[1.65] text-on-surface" />
+              <BackgroundText text={background} label={t.npcBackground} />
             ) : (
               <p className="text-text-muted italic">{t.npcBackgroundEmpty}</p>
             )}
