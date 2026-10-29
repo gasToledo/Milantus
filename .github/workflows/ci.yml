@@ -110,12 +110,23 @@ jobs:
         working-directory: packages/dnd_web
     steps:
       - uses: actions/checkout@v6
+      # El motor JS (`src/engine/dnd_engine.generated.js`) no se versiona y
+      # `tsc` y Vite lo importan: hay que generarlo antes. Se compila acá y no
+      # se pasa como artefacto de `engine_js` porque ese job espera a los
+      # fixtures de paridad y un `needs` serializaría el CI por un solo archivo.
+      - uses: dart-lang/setup-dart@v1
+      - uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: pub-${{ runner.os }}-dnd_engine-${{ hashFiles('packages/dnd_engine/pubspec.lock') }}
+          restore-keys: pub-${{ runner.os }}-dnd_engine-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: packages/dnd_web/package-lock.json
       - run: npm ci
+      - run: npm run build:engine
       - run: npx tsc --noEmit
       - run: npm run build
 
@@ -176,6 +187,10 @@ jobs:
       - run: dart pub get
         working-directory: packages/dnd_server
       - run: npm ci
+        working-directory: packages/dnd_web
+      # Antes del build: Vite importa el JS del motor, que no se versiona.
+      # `build:engine` corre su propio `dart pub get` en dnd_engine.
+      - run: npm run build:engine
         working-directory: packages/dnd_web
       - run: npm run build
         working-directory: packages/dnd_web
