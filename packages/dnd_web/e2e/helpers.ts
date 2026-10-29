@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import type { APIRequestContext } from '@playwright/test';
+import type { APIRequestContext, Page } from '@playwright/test';
 import type { Catalog, JsonObject } from '../src/engine';
 
 // Mismos valores que `test/e2e_server.dart` en dnd_server.
@@ -39,4 +39,15 @@ export async function api<T>(request: APIRequestContext, path: string): Promise<
 export async function personajes(request: APIRequestContext): Promise<PersonajeApi[]> {
   const { characters } = await api<{ characters: { character: PersonajeApi }[] }>(request, '/api/characters');
   return characters.map((c) => c.character);
+}
+
+/** Las escrituras que la página le hace a la API (cualquier método que no sea
+ *  GET). `/v2` es de solo lectura: la lista tiene que quedar vacía. */
+export function vigilarEscrituras(page: Page): string[] {
+  const escrituras: string[] = [];
+  page.on('request', (r) => {
+    const { pathname } = new URL(r.url());
+    if (pathname.startsWith('/api/') && r.method() !== 'GET') escrituras.push(`${r.method()} ${pathname}`);
+  });
+  return escrituras;
 }

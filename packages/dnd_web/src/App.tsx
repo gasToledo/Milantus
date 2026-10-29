@@ -10,6 +10,7 @@ import { RosterFooter, RosterPanel } from './dashboard/RosterPanel';
 import { useRoute } from './router';
 import { CodexPage } from './codex/CodexPage';
 import { CharacterPage } from './sheet/CharacterPage';
+import { SettingsPage } from './settings/SettingsPage';
 import { ThemeProvider, useTheme } from './theme/theme';
 import { ButtonLink } from './ui/Button';
 import { TooltipProvider } from './ui/primitives';
@@ -100,6 +101,12 @@ function Enabled({ account }: { account: Account }) {
       return (
         <Shell panel={<RosterPanel current="roster" />} footer={<RosterFooter account={account} />}>
           <DashboardPage />
+        </Shell>
+      );
+    case 'settings':
+      return (
+        <Shell panel={<RosterPanel />} footer={<RosterFooter account={account} current="settings" />}>
+          <SettingsPage />
         </Shell>
       );
     case 'character':
