@@ -199,3 +199,56 @@ export async function fetchCampaignChapters(campaignId: string, signal: AbortSig
   );
   return chapters;
 }
+
+/** Una nota del DM (`Note.toJson`): texto plano con el Markdown chico de la mesa.
+ *  Sin `updatedAt` es una nota que nunca se guardó con fecha. */
+export interface DmNote {
+  id: string;
+  chapterId: string;
+  title: string;
+  body?: string;
+  updatedAt?: string;
+}
+
+/** Un combate cerrado, **con** lo que el DM sí ve y el jugador no: los tres
+ *  bandos y el nombre propio de cada PNJ (`EncounterLog.toJson`). */
+export interface DmEncounterLog {
+  id?: string;
+  chapterId?: string | null;
+  rounds?: number;
+  players?: string[];
+  monsters?: {
+    name: string;
+    count?: number;
+    defeated?: number;
+    /** `ally`, `enemy` o `neutral`. */
+    side?: string;
+    npc?: boolean;
+    creatureId?: string | null;
+  }[];
+  endedAt?: string;
+}
+
+/** Un nivel que ganó un personaje vinculado, anotado por el servidor al guardar
+ *  el jugador su ficha: una fila por nivel (`LevelUpLog.toJson`). */
+export interface DmLevelUp {
+  id: string;
+  chapterId?: string | null;
+  characterName: string;
+  level: number;
+  classId: string;
+  classLevel: number;
+  at: string;
+}
+
+export interface DmNotebook {
+  notes: DmNote[];
+  encounterLogs: DmEncounterLog[];
+  levelUps: DmLevelUp[];
+}
+
+/** El Cuaderno entero de la campaña en un solo pedido, como en Flutter: las
+ *  notas, los combates y las subidas de nivel se intercalan por capítulo. */
+export async function fetchCampaignNotebook(campaignId: string, signal: AbortSignal): Promise<DmNotebook> {
+  return getJson<DmNotebook>(`/api/campaigns/${encodeURIComponent(campaignId)}/notebook`, signal);
+}

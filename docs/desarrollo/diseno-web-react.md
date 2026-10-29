@@ -186,6 +186,11 @@ control que escriba, y el e2e comprueba que no sale ningún pedido que no sea
   `toRosterEntry` (`dashboard/roster.ts`, la misma cuenta que el dashboard). La
   CD sale de los bloques de lanzamiento del motor y, con varias clases
   lanzadoras, se muestran todas.
+- **Cuaderno** (`NotebookView`, `notebook.ts`): pills `aria-pressed` por
+  capítulo (la selección es estado local, no ruta), buscador en pill como el del
+  Bestiario y entradas en `card` con `border-l-[3px]` del color del tipo. Titular,
+  redactar un combate y buscar son presentación y viven en `notebook.ts`; los
+  nombres salen del catálogo.
 
 ## Reglas que más se olvidan
 

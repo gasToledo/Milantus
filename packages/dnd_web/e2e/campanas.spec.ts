@@ -14,6 +14,7 @@ const SOLO_DEL_DM = [
   'Nota reservada del DM',
   'Nota privada',
   'El Valle Hueco',
+  'Garrick el Tabernero',
   'capitulo-en-marcha',
 ];
 

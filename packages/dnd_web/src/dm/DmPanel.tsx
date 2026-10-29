@@ -1,4 +1,4 @@
-import { BookMarked, BookOpen, FlaskConical, PawPrint, Users, UsersRound, Flame, Contact } from 'lucide-react';
+import { BookMarked, BookOpen, NotebookText, FlaskConical, PawPrint, Users, UsersRound, Flame, Contact } from 'lucide-react';
 import type { DmCampaign } from '../api/client';
 import { useTexts } from '../i18n/context';
 import { dmCampaignHref, FLUTTER_HOME, rosterHref, dmHref, type DmSection } from '../router';
@@ -97,6 +97,15 @@ export function DmPanel({
                 icon={BookMarked}
                 label={t.dmSectionChapters}
                 active={current.section === 'capitulos'}
+                internal
+              />
+            </li>
+            <li>
+              <NavItem
+                href={dmCampaignHref(current.campaign.id, 'cuaderno')}
+                icon={NotebookText}
+                label={t.dmSectionNotebook}
+                active={current.section === 'cuaderno'}
                 internal
               />
             </li>
