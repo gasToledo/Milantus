@@ -173,6 +173,19 @@ repiten acá.
   y actúa sobre sus propias funciones (mantener la pantalla encendida, volver a
   mostrar los tutoriales), la dificultad del encuentro (Modo DM) y el proveedor
   de retratos (vive en la pantalla de retratos).
+- **Campañas** en `/v2/campanas` (`src/campaigns/`), «Campañas» del panel
+  principal: las mesas en las que juega la cuenta, de todos sus personajes en
+  una lista (cada una con «Con <personaje>», que lleva a la pestaña Campaña de
+  esa ficha). Es la **vista del jugador y nada más**: la misma consulta que la
+  ficha (`GET /api/characters/:id/campaigns`), que el servidor ya poda con
+  `Campaign.playerView()` y `EncounterLog.playerView()` —sin escenas de
+  música, sin capítulos abiertos ni sus resúmenes, sin las notas del DM ni los
+  PNJ—, y el bloque de cada mesa es el mismo componente que la pestaña
+  (`CampaignBlock`). **No hay Cuaderno, notas ni lista de miembros** porque en
+  Flutter son del Modo DM y el jugador no tiene ningún endpoint para leerlos;
+  lo más parecido a «miembros» es «En la mesa también juega…», que ya trae
+  cada campaña. Leer las campañas *como DM* (`/api/campaigns`) es el Modo DM,
+  paso 6.
 - **Homebrew**: la ficha y el dashboard calculan con el catálogo oficial más
   el contenido homebrew de la cuenta (`GET /api/homebrew`, fusionado por id en
   `src/api/homebrew.ts`), como `HomebrewStore` + `ContentRepository.addAll` en
@@ -192,8 +205,8 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
 1. Ficha de personaje, solo lectura *(existe)*.
 2. Lista de personajes y navegación entre pantallas *(existe)*.
 3. Lo de lectura más simple: ajustes de visualización *(existe)*,
-   cuaderno/campañas en modo lectura, bestiario y catálogos *(el Códice
-   existe)*.
+   campañas del jugador en modo lectura *(existen; el cuaderno es del DM)*,
+   bestiario y catálogos *(el Códice existe)*.
 4. Escrituras de bajo riesgo: PG y usos de recursos en la ficha, descansos.
 5. Edición completa: creador de personajes, subida de nivel, inventario.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
@@ -230,7 +243,11 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    cuenta, que su búsqueda general coincida con el catálogo y que el glosario
    se lea en orden (`e2e/codice.spec.ts`); que Ajustes muestre lo de la cuenta,
    cambie el tema y el idioma sin escribir en la API y recuerde el idioma con la
-   clave de Flutter (`e2e/ajustes.spec.ts`); y que una cuenta sin `webV2` vea
+   clave de Flutter (`e2e/ajustes.spec.ts`); que Campañas muestre la mesa
+   sembrada con lo que reparte el motor y que **nada del DM** (escena de música,
+   capítulo en marcha, nota) aparezca ni en la API ni en pantalla, y que otra
+   cuenta, o el propio DM, reciba 404 al pedir las campañas de un personaje
+   ajeno, idéntico al de un id inexistente (`e2e/campanas.spec.ts`); y que una cuenta sin `webV2` vea
    «No disponible» sin pedir sus datos (`e2e/acceso.spec.ts`). Lo esperado se
    calcula con el mismo motor y la misma fusión (`e2e/helpers.ts`). Sin
    reintentos: no hay «a veces anda».

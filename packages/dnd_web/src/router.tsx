@@ -41,6 +41,7 @@ export type CodexCategory = keyof typeof CODEX_CATEGORIES;
 export type Route =
   | { name: 'roster' }
   | { name: 'settings' }
+  | { name: 'campaigns' }
   // Sin categoría es la portada; sin entrada, la lista sin nada abierto.
   | { name: 'codex'; category: CodexCategory | null; entryId: string | null }
   // `tab: null` es la ruta sin sufijo, que redirige a la primera pestaña.
@@ -63,6 +64,7 @@ export function matchRoute(pathname: string): Route {
   const [section, id, tab, ...rest] = parts;
   if (parts.length === 0) return { name: 'roster' };
   if (section === 'ajustes' && id === undefined) return { name: 'settings' };
+  if (section === 'campanas' && id === undefined) return { name: 'campaigns' };
   if (section === 'codice' && rest.length === 0) {
     if (id === undefined) return { name: 'codex', category: null, entryId: null };
     const category = (Object.keys(CODEX_CATEGORIES) as CodexCategory[]).find((c) => CODEX_CATEGORIES[c] === id);
@@ -86,6 +88,8 @@ export function matchRoute(pathname: string): Route {
 }
 
 export const rosterHref = (): string => import.meta.env.BASE_URL;
+
+export const campaignsHref = (): string => `${import.meta.env.BASE_URL}campanas`;
 
 export const settingsHref = (): string => `${import.meta.env.BASE_URL}ajustes`;
 

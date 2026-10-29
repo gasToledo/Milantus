@@ -9,6 +9,7 @@ import { DashboardPage } from './dashboard/DashboardPage';
 import { RosterFooter, RosterPanel } from './dashboard/RosterPanel';
 import { useRoute } from './router';
 import { CodexPage } from './codex/CodexPage';
+import { CampaignsPage } from './campaigns/CampaignsPage';
 import { CharacterPage } from './sheet/CharacterPage';
 import { SettingsPage } from './settings/SettingsPage';
 import { ThemeProvider, useTheme } from './theme/theme';
@@ -101,6 +102,12 @@ function Enabled({ account }: { account: Account }) {
       return (
         <Shell panel={<RosterPanel current="roster" />} footer={<RosterFooter account={account} />}>
           <DashboardPage />
+        </Shell>
+      );
+    case 'campaigns':
+      return (
+        <Shell panel={<RosterPanel current="campaigns" />} footer={<RosterFooter account={account} />}>
+          <CampaignsPage />
         </Shell>
       );
     case 'settings':

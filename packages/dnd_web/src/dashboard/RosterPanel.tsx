@@ -1,8 +1,8 @@
-import { BookOpen, FlaskConical, LogOut, MessageSquare, Settings, Users } from 'lucide-react';
+import { BookOpen, Flag, FlaskConical, LogOut, MessageSquare, Settings, Users } from 'lucide-react';
 import { useAppVersion } from '../api/queries';
 import type { Account } from '../api/client';
 import { useTexts } from '../i18n/context';
-import { codexHref, FLUTTER_HOME, rosterHref, settingsHref } from '../router';
+import { campaignsHref, codexHref, FLUTTER_HOME, rosterHref, settingsHref } from '../router';
 import { ModeSwitch, NavGroup, NavItem, ThemeMenu, VersionLabel } from '../ui/Shell';
 
 /**
@@ -10,7 +10,7 @@ import { ModeSwitch, NavGroup, NavItem, ThemeMenu, VersionLabel } from '../ui/Sh
  * navegación. Lo que React todavía no tiene (Homebrew, el Modo DM) sigue en
  * Flutter.
  */
-export function RosterPanel({ current }: { current?: 'roster' }) {
+export function RosterPanel({ current }: { current?: 'roster' | 'campaigns' }) {
   const t = useTexts();
   return (
     <>
@@ -18,6 +18,9 @@ export function RosterPanel({ current }: { current?: 'roster' }) {
       <NavGroup label={t.navLabel}>
         <li>
           <NavItem href={rosterHref()} icon={Users} label={t.navCharacters} active={current === 'roster'} internal />
+        </li>
+        <li>
+          <NavItem href={campaignsHref()} icon={Flag} label={t.navCampaigns} active={current === 'campaigns'} internal />
         </li>
         <li>
           <NavItem href={codexHref()} icon={BookOpen} label={t.navCodex} internal />

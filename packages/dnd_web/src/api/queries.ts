@@ -4,7 +4,7 @@
 // catálogo y la lista de personajes que bajó el dashboard sirven tal cual
 // para la ficha. El contrato de la API no cambia: las funciones de
 // `client.ts` siguen siendo las que piden.
-import { QueryClient, useQuery, type UseQueryResult } from '@tanstack/react-query';
+import { QueryClient, useQueries, useQuery, type UseQueryResult } from '@tanstack/react-query';
 import type { Catalog } from '../engine';
 import type { Lang } from '../i18n/texts';
 import { loadCatalog } from './catalog';
@@ -93,6 +93,17 @@ export const usePlayerCampaigns = (characterId: string) =>
   useQuery({
     queryKey: queryKeys.playerCampaigns(characterId),
     queryFn: ({ signal }) => fetchPlayerCampaigns(characterId, signal),
+  });
+
+/** Las campañas de cada uno de [characterIds], en el mismo orden. Comparte
+ *  clave con `usePlayerCampaigns`: lo que bajó la pestaña Campaña de una ficha
+ *  no se vuelve a pedir acá. */
+export const usePlayerCampaignsOf = (characterIds: string[]) =>
+  useQueries({
+    queries: characterIds.map((id) => ({
+      queryKey: queryKeys.playerCampaigns(id),
+      queryFn: ({ signal }: { signal: AbortSignal }) => fetchPlayerCampaigns(id, signal),
+    })),
   });
 
 export const useHomebrew = () =>

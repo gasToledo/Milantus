@@ -1,7 +1,7 @@
 import { BookOpen, Coins, Flag, Share2, Swords } from 'lucide-react';
 import type { PlayerBattle, PlayerCampaign } from '../api/client';
 import { usePlayerCampaigns } from '../api/queries';
-import { chapterGrants, type JsonObject } from '../engine';
+import { chapterGrants, type Catalog, type JsonObject } from '../engine';
 import { useTexts } from '../i18n/context';
 import type { Texts } from '../i18n/texts';
 import { FLUTTER_HOME } from '../router';
@@ -48,13 +48,16 @@ export function CampaignTab({ model }: { model: SheetModel }) {
   return (
     <div className="flex flex-col gap-8">
       {campaigns.data.map((pc) => (
-        <CampaignBlock key={pc.memberId} pc={pc} model={model} />
+        <CampaignBlock key={pc.memberId} pc={pc} catalog={model.catalog} me={model.character.name} />
       ))}
     </div>
   );
 }
 
-function CampaignBlock({ pc, model }: { pc: PlayerCampaign; model: SheetModel }) {
+/** Una mesa de [pc]: la comparten la pestaña Campaña de la ficha y la pantalla
+ *  Campañas. [me] es el personaje de ese vínculo, para no listarlo entre
+ *  quienes pelearon con él; [catalog] nombra las criaturas de las batallas. */
+export function CampaignBlock({ pc, catalog, me }: { pc: PlayerCampaign; catalog: Catalog; me: string }) {
   const t = useTexts();
   const { campaign } = pc;
   const state = campaign.state === 'paused' || campaign.state === 'finished' ? campaign.state : 'active';
@@ -120,7 +123,7 @@ function CampaignBlock({ pc, model }: { pc: PlayerCampaign; model: SheetModel })
                   <Eyebrow className="mb-2">{g.title}</Eyebrow>
                   <ul className="flex flex-col gap-2.5">
                     {g.list.map((b, i) => (
-                      <BattleRow key={b.id ?? i} battle={b} me={model.character.name} model={model} />
+                      <BattleRow key={b.id ?? i} battle={b} me={me} catalog={catalog} />
                     ))}
                   </ul>
                 </div>
@@ -152,7 +155,7 @@ function CampaignBlock({ pc, model }: { pc: PlayerCampaign; model: SheetModel })
 }
 
 /** Una batalla, hundida sobre la placa: la escribió la app y no se corrige. */
-function BattleRow({ battle, me, model }: { battle: PlayerBattle; me: string; model: SheetModel }) {
+function BattleRow({ battle, me, catalog }: { battle: PlayerBattle; me: string; catalog: Catalog }) {
   const t = useTexts();
   // Quiénes más pelearon, por nombre: si el jugador se renombró después, la
   // línea los lista a todos en vez de romperse.
@@ -173,7 +176,7 @@ function BattleRow({ battle, me, model }: { battle: PlayerBattle; me: string; mo
   return (
     <li className="plaque flex items-start gap-3.5 px-3.5 py-3">
       <div className="min-w-0 flex-1">
-        <p className="text-[14px] text-on-surface">{battleTitle(t, monsters, model)}</p>
+        <p className="text-[14px] text-on-surface">{battleTitle(t, monsters, catalog)}</p>
         <p className="mt-0.5 text-[12px] text-text-muted">
           {[others.length === 0 ? t.battleAlone : t.battleWith(joinNames(t, others)), defeated].join(' · ')}
         </p>
@@ -189,7 +192,7 @@ function BattleRow({ battle, me, model }: { battle: PlayerBattle; me: string; mo
  *  el jugador no tiene por qué saberlo, se lee «un enemigo». El nombre de una
  *  criatura del catálogo sale del catálogo, en el idioma activo
  *  (`logGroupName` en Flutter). */
-function battleTitle(t: Texts, monsters: NonNullable<PlayerBattle['monsters']>, { catalog }: SheetModel): string {
+function battleTitle(t: Texts, monsters: NonNullable<PlayerBattle['monsters']>, catalog: Catalog): string {
   if (monsters.length === 0) return t.battleGeneric;
   const names = monsters.map((m) => {
     const count = m.count ?? 1;

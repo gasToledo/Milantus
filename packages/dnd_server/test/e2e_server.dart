@@ -57,6 +57,7 @@ const smokeClericId = 'elsbeth-de-humo';
 
 /// La cuenta del DM de la mesa sembrada, y su campaña.
 const _smokeDmId = 'dm-de-humo';
+const smokeDmToken = 'sesion-del-dm=';
 const _smokeCampaignId = 'marca-del-cuervo';
 
 /// Un arma homebrew de la cuenta, que Aldric lleva equipada: la ficha de /v2
@@ -85,6 +86,13 @@ Future<void> main() async {
   auth.profilesByToken[smokeSessionToken] = const SessionProfile(
     name: smokeAccountName,
     email: 'humo@example.org',
+  );
+  // El DM de la mesa sembrada: la prueba de aislamiento lo usa para pedir la
+  // ficha de otra cuenta y comprobar que responde 404.
+  auth.sessionsByToken[smokeDmToken] = _smokeDmId;
+  auth.profilesByToken[smokeDmToken] = const SessionProfile(
+    name: 'DM de Humo',
+    email: 'dm@example.org',
   );
   auth.sessionsByToken[smokeNoV2Token] = smokeNoV2UserId;
   auth.profilesByToken[smokeNoV2Token] = const SessionProfile(
@@ -225,6 +233,16 @@ Future<void> main() async {
       name: 'La Marca del Cuervo',
       premise:
           'Un cuervo de piedra aparece en cada pueblo que el invierno vacía.',
+      // Cosas del DM que el jugador no ve (`e2e/campanas.spec.ts` busca estos
+      // textos en la API y en la pantalla): escenas de música, un capítulo en
+      // marcha con su resumen y una nota.
+      musicScenes: [
+        MusicScene(
+          id: 'escena-secreta',
+          name: 'Tema secreto del DM',
+          url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        ),
+      ],
     ),
   );
   await campaigns.redeemShareCode(
@@ -241,6 +259,26 @@ Future<void> main() async {
       state: ChapterState.completed,
       grantsGold: 25,
       grantsItems: ['una poción de curación'],
+    ),
+  );
+  await chapters.create(
+    _smokeDmId,
+    _smokeCampaignId,
+    const Chapter(
+      id: 'capitulo-en-marcha',
+      name: 'El Valle Hueco',
+      summary: 'Resumen reservado del DM: el cuervo es el rey.',
+      state: ChapterState.active,
+    ),
+  );
+  await notes.create(
+    _smokeDmId,
+    _smokeCampaignId,
+    const Note(
+      id: 'nota-del-dm',
+      chapterId: 'capitulo-en-marcha',
+      title: 'Nota privada',
+      body: 'Nota reservada del DM: el herrero traiciona al grupo.',
     ),
   );
   encounters.logs.add((
