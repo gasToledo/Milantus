@@ -209,6 +209,10 @@ String formatCostFor(int cp, String labelsJson) => formatCost(
       labels: (jsonDecode(labelsJson) as Map).cast<String, String>(),
     );
 
+/// El modificador de una puntuación de característica (`abilityModifier`):
+/// la tabla del glosario lo muestra y la cuenta es del motor, no del cliente.
+int abilityModifierOf(int score) => abilityModifier(score);
+
 void main() {
   final motor = JSObject();
   motor['compute'] = compute.toJS;
@@ -221,5 +225,6 @@ void main() {
   motor['catalogLabel'] = catalogLabel.toJS;
   motor['catalogLabelOrder'] = catalogLabelOrder.toJS;
   motor['formatCost'] = formatCostFor.toJS;
+  motor['abilityModifier'] = abilityModifierOf.toJS;
   globalContext['dndEngine'] = motor;
 }

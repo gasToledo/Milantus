@@ -17,6 +17,7 @@ interface DartEngine {
   catalogLabel(kind: string, id: string): string;
   catalogLabelOrder(kind: string): string;
   formatCost(cp: number, labelsJson: string): string;
+  abilityModifier(score: number): number;
 }
 
 function engine(): DartEngine {
@@ -134,4 +135,9 @@ export function catalogLabelOrder(kind: 'rarity' | 'featCategory' | 'itemCategor
  *  (`formatCost` del motor) y las abreviaturas del idioma de la interfaz. */
 export function formatCost(cp: number, labels: Record<string, string>): string {
   return engine().formatCost(cp, JSON.stringify(labels));
+}
+
+/** El modificador de una puntuación de característica (`abilityModifier`). */
+export function abilityModifier(score: number): number {
+  return engine().abilityModifier(score);
 }

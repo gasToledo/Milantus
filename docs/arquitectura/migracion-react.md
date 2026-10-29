@@ -49,7 +49,7 @@ Un solo servidor, un solo origen, dos clientes:
   versiona.** `src/engine/index.ts` es la única puerta (`computeSheet`,
   `migrateCharacter`, `setEngineLanguage`, `applyTranslation`,
   `vocabularyLabel`, `inventoryOf`, `chapterGrants`, `catalogLabel`,
-  `catalogLabelOrder`, `formatCost`); la
+  `catalogLabelOrder`, `formatCost`, `abilityModifier`); la
   comunicación es JSON como texto de ida y vuelta. Los tipos de
   `src/engine/types.ts` están escritos a mano: los cuida la paridad (abajo).
 
@@ -144,7 +144,7 @@ repiten acá.
   busca, como Flutter; lo ajeno y lo inexistente son lo mismo. El personaje se
   migra con el motor (`migrateCharacter`) antes de leerlo y calcularlo.
 - **El Códice** en `/v2/codice` (`src/codex/`): el catálogo de solo lectura
-  con especies, linajes, clases, subclases, trasfondos, dotes, conjuros,
+  con el glosario, especies, linajes, clases, subclases, trasfondos, dotes, conjuros,
   objetos mágicos, armas, armaduras y equipo, más el homebrew de la cuenta
   marcado «Propio». Sin criaturas: en Flutter son del Modo DM. Cada categoría
   y cada entrada es una ruta (`/v2/codice/conjuros/fireball`); la portada
@@ -152,7 +152,11 @@ repiten acá.
   grupo, «Ver las N» abre la categoría con `?q=`) y cada categoría tiene
   filtros por faceta (rareza, categoría de dote, nivel, escuela, familia).
   Rótulos, orden de las facetas y precios los da el motor (`catalogLabel`,
-  `catalogLabelOrder`, `formatCost`). Glosario y guías quedan para otra
+  `catalogLabelOrder`, `formatCost`). El **glosario** es texto propio y no
+  del catálogo: sus términos y la regla de cada estado se copian de Flutter
+  (`gl*` de los `.arb` y `ui/conditions.dart`) a `src/i18n/texts.ts`, y se
+  lee en orden (numerado, con anterior y siguiente); el modificador de su
+  tabla lo da el motor (`abilityModifier`). Las guías quedan para otra
   vuelta, y las dotes sin descripción no muestran sus efectos: el texto de
   cada efecto (`describeEffect`) vive en Flutter (ver su `ponytail:`).
 - **Homebrew**: la ficha y el dashboard calculan con el catálogo oficial más
@@ -208,8 +212,8 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    inventario, la campaña y el diario muestren lo que resuelve el motor y lo
    que manda la API (con una mesa sembrada: otra cuenta como DM, un capítulo
    cerrado y una batalla); que el Códice cuente y abra el homebrew de la
-   cuenta y que su búsqueda general coincida con el catálogo
-   (`e2e/codice.spec.ts`); y que una cuenta sin `webV2` vea
+   cuenta, que su búsqueda general coincida con el catálogo y que el glosario
+   se lea en orden (`e2e/codice.spec.ts`); y que una cuenta sin `webV2` vea
    «No disponible» sin pedir sus datos (`e2e/acceso.spec.ts`). Lo esperado se
    calcula con el mismo motor y la misma fusión (`e2e/helpers.ts`). Sin
    reintentos: no hay «a veces anda».

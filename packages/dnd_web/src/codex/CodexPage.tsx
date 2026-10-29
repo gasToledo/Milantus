@@ -4,7 +4,10 @@ import {
   BookMarked,
   BookOpen,
   Box,
+  ChevronLeft,
+  ChevronRight,
   GitBranch,
+  Lightbulb,
   Medal,
   Network,
   ScrollText,
@@ -18,8 +21,10 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { useAppVersion, useSheetCatalog } from '../api/queries';
+import { abilityModifier } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import { codexHref, Link, navigate, rosterHref, type CodexCategory } from '../router';
+import { signed } from '../sheet/format';
 import { SheetFooter } from '../sheet/SheetPanel';
 import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
@@ -31,6 +36,7 @@ import { CATEGORY_GROUPS, codexEntries, fold, type CodexEntry } from './entries'
 
 /** Ícono por categoría (los de `CodexCategory` en Flutter, en lucide). */
 const ICONS: Record<CodexCategory, LucideIcon> = {
+  glossary: Lightbulb,
   races: Users,
   lineages: Network,
   classes: Shield,
@@ -49,6 +55,9 @@ const ALL_CATEGORIES = CATEGORY_GROUPS.flatMap((g) => g.categories);
 /** Cuántas coincidencias por categoría muestra la búsqueda general antes de
  *  ofrecer «Ver las N»: con una letra, «a» encuentra casi todo el catálogo. */
 const SEARCH_PREVIEW = 5;
+
+/** Las puntuaciones de la tabla del glosario: el patrón se ve de un vistazo. */
+const TABLE_SCORES = [8, 10, 12, 14, 16, 18, 20];
 
 /**
  * El Códice: todo el contenido del juego para leer, sin crear un personaje ni
@@ -239,6 +248,10 @@ function CategoryView({
   const [query, setQuery] = useState(() => new URLSearchParams(window.location.search).get('q') ?? '');
   const [facet, setFacet] = useState<string | null>(null);
   const label = t.codexCategories[category];
+  // El glosario se lee en orden: la lista va agrupada y numerada, sin filtros
+  // (con 26 términos alcanza el buscador), y el detalle dice dónde estás y
+  // lleva al anterior y al siguiente.
+  const reading = category === 'glossary';
 
   // Los valores del filtro salen de lo cargado, así una rareza o categoría de
   // homebrew nueva también aparece; van en el orden del motor.
@@ -263,7 +276,9 @@ function CategoryView({
     <div className="flex flex-col gap-4">
       <header className="flex flex-wrap items-baseline gap-x-3.5 gap-y-1">
         <h1 className="font-display text-[30px] leading-tight text-on-surface">{label}</h1>
-        <span className="text-text-muted tabular-nums">{t.codexEntries(entries.length)}</span>
+        <span className="text-text-muted tabular-nums">
+          {reading ? t.codexTerms(entries.length) : t.codexEntries(entries.length)}
+        </span>
       </header>
 
       <div className="flex flex-wrap items-center gap-x-3.5 gap-y-2.5">
@@ -281,7 +296,7 @@ function CategoryView({
             className="h-9 w-full rounded-[var(--radius-pill)] border border-hairline bg-plaque px-4 text-[13px] text-on-surface placeholder:text-text-muted"
           />
         </div>
-        {facets.length > 1 && (
+        {!reading && facets.length > 1 && (
           <div role="group" aria-label={t.codexFilterLabel} className="flex flex-wrap gap-1.5">
             {[null, ...facets].map((f) => (
               <button
@@ -325,27 +340,7 @@ function CategoryView({
                 />
               </div>
             ) : (
-              <ul>
-                {visible.map((e) => {
-                  const on = e.id === open?.id;
-                  return (
-                    <li key={e.id}>
-                      <Link
-                        href={codexHref(category, e.id)}
-                        aria-current={on ? 'true' : undefined}
-                        className={cx(
-                          'block rounded-[var(--radius-nav)] px-3 py-2',
-                          on ? 'bg-gold-soft text-gold' : 'text-on-surface hover:bg-plaque',
-                        )}
-                        data-entry={e.id}
-                      >
-                        <span className={cx('block text-[14px]', on && 'font-semibold')}>{e.name}</span>
-                        {e.subtitle && <span className="mt-0.5 block truncate text-[12px] text-text-muted">{e.subtitle}</span>}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
+              <EntryList category={category} entries={visible} all={reading ? entries : null} openId={open?.id ?? null} />
             )}
           </section>
 
@@ -359,7 +354,7 @@ function CategoryView({
                   <ArrowLeft size={16} aria-hidden="true" className="text-gold" />
                   {t.codexBackToList}
                 </Link>
-                <EntryDetail entry={open} />
+                <EntryDetail entry={open} reading={reading ? { category, entries } : null} />
               </>
             ) : (
               <p className="card p-6 text-on-surface-variant">{t.codexPickEntry}</p>
@@ -371,13 +366,88 @@ function CategoryView({
   );
 }
 
+/**
+ * Las entradas de la lista. Con [all] (el glosario) van bajo el nombre de su
+ * grupo y con su número de lectura, que es el de la lista completa: filtrando,
+ * «Estados» sigue siendo el 18.
+ */
+function EntryList({
+  category,
+  entries,
+  all,
+  openId,
+}: {
+  category: CodexCategory;
+  entries: CodexEntry[];
+  all: CodexEntry[] | null;
+  openId: string | null;
+}) {
+  const item = (e: CodexEntry) => {
+    const on = e.id === openId;
+    const n = all ? all.indexOf(e) + 1 : null;
+    return (
+      <li key={e.id}>
+        <Link
+          href={codexHref(category, e.id)}
+          aria-current={on ? 'true' : undefined}
+          className={cx(
+            'block rounded-[var(--radius-nav)] px-3 py-2',
+            n !== null && 'flex items-baseline gap-2.5',
+            on ? 'bg-gold-soft text-gold' : 'text-on-surface hover:bg-plaque',
+          )}
+          data-entry={e.id}
+        >
+          {n !== null && (
+            <span
+              aria-hidden="true"
+              className={cx('w-[18px] shrink-0 text-right text-[12px] tabular-nums', !on && 'text-text-muted')}
+            >
+              {n}
+            </span>
+          )}
+          <span className="min-w-0">
+            <span className={cx('block text-[14px]', on && 'font-semibold')}>{e.name}</span>
+            {n === null && e.subtitle && (
+              <span className="mt-0.5 block truncate text-[12px] text-text-muted">{e.subtitle}</span>
+            )}
+          </span>
+        </Link>
+      </li>
+    );
+  };
+  if (!all) return <ul>{entries.map(item)}</ul>;
+  const groups = [...new Set(entries.map((e) => e.subtitle))];
+  return (
+    <div>
+      {groups.map((g) => (
+        <section key={g} aria-label={g}>
+          <div className="flex items-center gap-2 px-2.5 pt-3.5 pb-1">
+            <span className="font-display text-[15px] text-gold">{g}</span>
+            <span aria-hidden="true" className="h-px flex-1 bg-hairline" />
+          </div>
+          <ul>{entries.filter((e) => e.subtitle === g).map(item)}</ul>
+        </section>
+      ))}
+    </div>
+  );
+}
+
 /** La entrada abierta: la «página» del manual. */
-function EntryDetail({ entry }: { entry: CodexEntry }) {
+function EntryDetail({
+  entry,
+  reading,
+}: {
+  entry: CodexEntry;
+  /** El glosario: la categoría y su lista completa, para la pista de lectura
+   *  y el anterior y el siguiente. */
+  reading: { category: CodexCategory; entries: CodexEntry[] } | null;
+}) {
   const t = useTexts();
   const detail = useMemo(() => entry.detail(), [entry]);
   const source = (t.sources as Record<string, string>)[entry.source];
   return (
     <article aria-labelledby="codex-entry-title" className="card px-5 py-6 sm:px-8 sm:py-7" data-field="codex-detail">
+      {reading && <ReadingTrack entry={entry} entries={reading.entries} />}
       {source && (
         <Pill highlighted={entry.source === 'srd_2024'}>
           <span aria-hidden="true">{source}</span>
@@ -387,7 +457,7 @@ function EntryDetail({ entry }: { entry: CodexEntry }) {
       <h2 id="codex-entry-title" className="font-display mt-3.5 text-[34px] leading-[1.1] break-words text-on-surface">
         {entry.name}
       </h2>
-      {entry.subtitle && <p className="mt-1.5 text-[15px] text-on-surface-variant">{entry.subtitle}</p>}
+      {!reading && entry.subtitle && <p className="mt-1.5 text-[15px] text-on-surface-variant">{entry.subtitle}</p>}
       <SectionRule className="my-[22px]" />
 
       {detail.facts
@@ -423,6 +493,8 @@ function EntryDetail({ entry }: { entry: CodexEntry }) {
         </section>
       ))}
 
+      {detail.glossary && <GlossaryBody glossary={detail.glossary} />}
+
       {detail.related && (
         <div className="mt-6 flex flex-wrap items-center gap-2">
           <span className="mr-0.5 text-[13px] text-text-muted">{detail.related.title}</span>
@@ -435,7 +507,156 @@ function EntryDetail({ entry }: { entry: CodexEntry }) {
           </ul>
         </div>
       )}
+
+      {reading && <ReadingSteps category={reading.category} entry={entry} entries={reading.entries} />}
     </article>
+  );
+}
+
+/**
+ * El grupo del término y dónde está en la lectura: un tramo por grupo y una
+ * muesca por término, lo leído atenuado y el actual en oro.
+ */
+function ReadingTrack({ entry, entries }: { entry: CodexEntry; entries: CodexEntry[] }) {
+  const t = useTexts();
+  const at = entries.indexOf(entry);
+  const groups = [...new Set(entries.map((e) => e.subtitle))];
+  return (
+    <div className="flex flex-wrap items-center gap-2.5">
+      <Pill highlighted={false}>{entry.subtitle}</Pill>
+      <span role="img" aria-label={t.codexTermOf(at + 1, entries.length)} className="flex items-center gap-1.5">
+        {groups.map((g) => (
+          <span key={g} className="flex gap-0.5">
+            {entries
+              .filter((e) => e.subtitle === g)
+              .map((e) => {
+                const i = entries.indexOf(e);
+                return (
+                  <span
+                    key={e.id}
+                    className={cx(
+                      'size-1.5 rounded-full',
+                      i === at ? 'bg-gold' : i < at ? 'bg-on-surface-variant' : 'bg-hairline',
+                    )}
+                  />
+                );
+              })}
+          </span>
+        ))}
+      </span>
+    </div>
+  );
+}
+
+/** El texto de un término del glosario, con el ejemplo hundido en una placa:
+ *  es lo que se busca con la vista al volver a la entrada. */
+function GlossaryBody({ glossary }: { glossary: NonNullable<ReturnType<CodexEntry['detail']>['glossary']> }) {
+  const t = useTexts();
+  return (
+    <div className="flex max-w-[640px] flex-col gap-4">
+      {glossary.paragraphs.map((p, i) => (
+        <p key={i} className="text-[16px] leading-[1.65] text-on-surface">
+          {p}
+        </p>
+      ))}
+      {glossary.example && (
+        <div className="plaque px-[18px] py-3.5">
+          <p className="text-[12px] text-gold">{t.codexExample}</p>
+          <p className="mt-1.5 text-[15px] leading-[1.6] text-on-surface tabular-nums">{glossary.example}</p>
+        </div>
+      )}
+      {glossary.extra === 'modifiers' && (
+        <div className="overflow-x-auto">
+          <table className="plaque border-separate border-spacing-0 overflow-hidden tabular-nums">
+            <tbody>
+              <tr>
+                <th scope="row" className="plaque-label border-r border-hairline px-3.5 py-2.5 text-left font-normal">
+                  {t.codexScore}
+                </th>
+                {TABLE_SCORES.map((s) => (
+                  <td key={s} className="border-r border-hairline px-3 py-2.5 text-center font-bold last:border-r-0">
+                    {s}
+                  </td>
+                ))}
+              </tr>
+              <tr>
+                <th
+                  scope="row"
+                  className="plaque-label border-t border-r border-hairline px-3.5 py-2.5 text-left font-normal"
+                >
+                  {t.codexModifier}
+                </th>
+                {TABLE_SCORES.map((s) => (
+                  <td
+                    key={s}
+                    className="border-t border-r border-hairline px-3 py-2.5 text-center font-bold text-gold last:border-r-0"
+                  >
+                    {signed(abilityModifier(s))}
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      )}
+      {glossary.extra === 'conditions' && (
+        <dl className="grid items-start gap-2.5 [grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr))]">
+          {Object.values(t.conditionRules)
+            .sort((a, b) => a.label.localeCompare(b.label))
+            .map((c) => (
+              <div key={c.label} className="plaque px-3.5 py-3">
+                <dt className="text-[14px] font-semibold text-on-surface">{c.label}</dt>
+                <dd className="mt-1 text-[13.5px] leading-normal text-on-surface-variant">{c.rule}</dd>
+              </div>
+            ))}
+        </dl>
+      )}
+    </div>
+  );
+}
+
+/** Anterior y siguiente: cada término se apoya en los de antes. */
+function ReadingSteps({
+  category,
+  entry,
+  entries,
+}: {
+  category: CodexCategory;
+  entry: CodexEntry;
+  entries: CodexEntry[];
+}) {
+  const t = useTexts();
+  const at = entries.indexOf(entry);
+  const prev = entries[at - 1];
+  const next = entries[at + 1];
+  const step =
+    'block rounded-[var(--radius-card)] border border-hairline px-3.5 py-2.5 text-on-surface hover:border-gold';
+  return (
+    <nav
+      aria-label={t.codexKeepReading}
+      className="mt-7 grid gap-2.5 border-t border-hairline pt-[18px] sm:grid-cols-2"
+    >
+      {prev ? (
+        <Link href={codexHref(category, prev.id)} className={step} data-step="previous">
+          <span className="flex items-center gap-1.5 text-[12px] text-text-muted">
+            <ChevronLeft size={14} aria-hidden="true" />
+            {t.codexPrevious}
+          </span>
+          <span className="mt-0.5 block text-[14px]">{prev.name}</span>
+        </Link>
+      ) : (
+        <span className="max-sm:hidden" />
+      )}
+      {next && (
+        <Link href={codexHref(category, next.id)} className={cx(step, 'text-right')} data-step="next">
+          <span className="flex items-center justify-end gap-1.5 text-[12px] text-text-muted">
+            {t.codexNext}
+            <ChevronRight size={14} aria-hidden="true" />
+          </span>
+          <span className="mt-0.5 block text-[14px]">{next.name}</span>
+        </Link>
+      )}
+    </nav>
   );
 }
 

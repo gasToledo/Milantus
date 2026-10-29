@@ -22,6 +22,7 @@ export type SheetTab = (typeof SHEET_TABS)[number];
 /** Las categorías del Códice, con el segmento de su URL (en español y sin
  *  tildes, como las pestañas de la ficha). */
 export const CODEX_CATEGORIES = {
+  glossary: 'glosario',
   races: 'especies',
   lineages: 'linajes',
   classes: 'clases',
