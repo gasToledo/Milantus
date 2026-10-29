@@ -3,6 +3,7 @@ import { useCampaignChapters, useCampaignMembers, useSheetCatalog } from '../api
 import type { DmCampaign } from '../api/client';
 import { toRosterEntry } from '../dashboard/roster';
 import { useLang, useTexts } from '../i18n/context';
+import { dmMemberHref } from '../router';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { stateLabel, stateOf } from './campaigns';
 import { DmHeader } from './DmHeader';
@@ -53,7 +54,7 @@ export function MesaView({ campaign }: { campaign: DmCampaign }) {
           className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr))]"
         >
           {entries.map(({ memberId, entry }) => (
-            <MemberCard key={memberId} entry={entry} />
+            <MemberCard key={memberId} entry={entry} href={dmMemberHref(campaign.id, memberId)} />
           ))}
         </ul>
       </>

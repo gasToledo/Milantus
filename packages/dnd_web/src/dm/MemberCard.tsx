@@ -4,13 +4,14 @@ import { labelOf } from '../i18n/texts';
 import { Medallion } from '../ui/Medallion';
 import { signed } from '../sheet/format';
 import { isFallen, type RosterEntry } from '../dashboard/roster';
+import { Link } from '../router';
 
 /**
  * Un jugador de la mesa, para leerlo de un vistazo: identidad, PG, cuatro
  * placas y los estados que tiene encima. Es la **ficha real** del jugador
  * (`GET /api/campaigns/:id/members` la lee en vivo, no es una copia) y el DM no
- * la escribe: no hay ningún control, y la tarjeta no es un enlace porque la
- * ficha completa de un miembro todavía vive en Flutter. Todo número sale de
+ * la escribe: no hay ningún control, y la tarjeta lleva a su ficha completa
+ * ([href]), también de solo lectura. Todo número sale de
  * `ComputedSheet`; de la ficha cruda solo lo que no es regla (PG actuales y
  * estados).
  *
@@ -19,7 +20,7 @@ import { isFallen, type RosterEntry } from '../dashboard/roster';
  * sería abrir una puerta más entre cuentas (`modo-dm.md`); Flutter tampoco lo
  * muestra.
  */
-export function MemberCard({ entry }: { entry: RosterEntry }) {
+export function MemberCard({ entry, href }: { entry: RosterEntry; href: string }) {
   const t = useTexts();
   const { character, sheet } = entry;
   const fallen = isFallen(entry);
@@ -50,12 +51,16 @@ export function MemberCard({ entry }: { entry: RosterEntry }) {
   const exhaustion = character.combat?.exhaustion ?? 0;
 
   return (
-    <li className="card flex min-w-0 flex-col p-4" data-member={character.id}>
+    <li className="card relative flex min-w-0 flex-col p-4 hover:border-gold" data-member={character.id}>
       <div className="flex items-center gap-3">
         <Medallion name={character.name} accent={entry.accent} size={54} muted={fallen} />
         <div className="min-w-0 flex-1">
           <h2 className={`font-display truncate text-[18px] leading-tight ${fallen ? 'text-on-surface-variant' : 'text-on-surface'}`}>
-            {character.name}
+            {/* El enlace cubre la tarjeta entera (como en el dashboard) y su
+                nombre es el del personaje: se lee igual que antes. */}
+            <Link href={href} className="after:absolute after:inset-0 after:rounded-[var(--radius-card)] after:content-['']">
+              {character.name}
+            </Link>
           </h2>
           <p className="mt-0.5 truncate text-[12.5px] text-on-surface-variant">
             {[entry.raceName, classes].filter(Boolean).join(' · ')}

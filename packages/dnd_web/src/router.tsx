@@ -46,6 +46,14 @@ export type DmSection = (typeof DM_SECTIONS)[number];
 /** Las categorías del Códice que pueden tener homebrew, en el orden del
  *  Homebrew de Flutter (los objetos se parten en mágicos y equipo, como en el
  *  Códice). Las criaturas no son del Códice: van aparte (`creatures`). */
+/** Las pestañas de la ficha de un miembro de la Mesa: lo que sirve en combate,
+ *  como `MemberSheetScreen` de Flutter. Inventario, campañas y diario son del
+ *  jugador. */
+export const MEMBER_SHEET_TABS = ['personaje', 'combate'] as const satisfies readonly SheetTab[];
+/** `undefined` es «no es una pestaña de esa ficha»; `null`, la ruta sin sufijo. */
+const sheetTabIn = (tabs: readonly SheetTab[], segment: string | undefined): SheetTab | null | undefined =>
+  segment === undefined ? null : tabs.find((t) => t === segment);
+
 export const HOMEBREW_CATEGORIES = ['weapons', 'armor', 'magicItems', 'gear', 'feats', 'races', 'backgrounds', 'spells'] as const satisfies readonly CodexCategory[];
 export type HomebrewCategory = (typeof HOMEBREW_CATEGORIES)[number] | 'creatures';
 const homebrewSegment = (c: HomebrewCategory): string => (c === 'creatures' ? 'criaturas' : CODEX_CATEGORIES[c]);
@@ -55,6 +63,10 @@ const homebrewSegment = (c: HomebrewCategory): string => (c === 'creatures' ? 'c
 export type DmView =
   | { kind: 'home' }
   | { kind: 'campaign'; id: string; section: DmSection }
+  // La ficha completa de un jugador de la Mesa, por su vínculo (`memberId`) y
+  // no por el id del personaje: es la fila de `campaign_members` la que le da
+  // al DM el permiso de leerla. `tab: null` redirige a la primera.
+  | { kind: 'member'; id: string; memberId: string; tab: SheetTab | null }
   // El Bestiario del DM es una herramienta de la cuenta, no de una campaña.
   | { kind: 'bestiary'; entryId: string | null }
   // La Biblioteca de PNJ también: sin PNJ es la lista.
@@ -114,6 +126,19 @@ export function matchRoute(pathname: string): Route {
       if (!category || (category === 'creatures' && rest.length > 0)) return { name: 'unknown' };
       try {
         return { name: 'dm', view: { kind: 'homebrew', category, entryId: rest[0] === undefined ? null : decodeURIComponent(rest[0]) } };
+      } catch {
+        return { name: 'unknown' };
+      }
+    }
+    // `/dm/campanas/:id/mesa/:miembro[/:pestaña]`.
+    if (id === 'campanas' && tab !== undefined && rest[0] === 'mesa' && rest[1] !== undefined && rest.length <= 3) {
+      const sheetTab = sheetTabIn(MEMBER_SHEET_TABS, rest[2]);
+      if (sheetTab === undefined) return { name: 'unknown' };
+      try {
+        return {
+          name: 'dm',
+          view: { kind: 'member', id: decodeURIComponent(tab), memberId: decodeURIComponent(rest[1]), tab: sheetTab },
+        };
       } catch {
         return { name: 'unknown' };
       }
@@ -187,6 +212,9 @@ export const dmHomebrewHref = (category?: HomebrewCategory, entryId?: string): s
 export const dmCampaignHref =(id: string, section: DmSection = 'mesa'): string =>
   `${import.meta.env.BASE_URL}dm/campanas/${encodeURIComponent(id)}/${section}`;
 
+/** La ficha completa de un miembro de la Mesa, en una de sus pestañas. */
+export const dmMemberHref = (campaignId: string, memberId: string, tab: SheetTab = 'personaje'): string =>
+  `${dmCampaignHref(campaignId)}/${encodeURIComponent(memberId)}/${tab}`;
 /**
  * Los ajustes son de la cuenta y los comparten los dos modos. `desdeDm` deja
  * dicho de cuál se vino (`?modo=dm`) para que el panel y el «atrás» sigan en

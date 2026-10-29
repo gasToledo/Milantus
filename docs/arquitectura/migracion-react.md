@@ -212,11 +212,12 @@ repiten acá.
   capítulos, ni música, ni notas; todo eso sigue en Flutter. Se porta por
   secciones, una por PR; hoy existen la **Mesa**, **Capítulos**, el **Cuaderno**,
   los **PNJ de la mesa**, el **Combate**, el **Bestiario**, la **Biblioteca de
-  PNJ** y el **Homebrew**: todas las secciones del panel. De lectura faltan
-  todavía la ficha completa de un miembro, la de un PNJ con ficha y la música
-  (ver «Lo que todavía no existe»). Rutas:
+  PNJ** y el **Homebrew**: todas las secciones del panel, más la **ficha
+  completa de un miembro**. De lectura faltan todavía la de un PNJ con ficha y
+  la música (ver «Lo que todavía no existe»). Rutas:
   `/v2/dm` (redirige a la primera campaña en curso, o a la primera que haya),
-  `/v2/dm/campanas/:id/mesa|capitulos|cuaderno|pnj|combate`, `/v2/dm/bestiario[/:criatura]`,
+  `/v2/dm/campanas/:id/mesa|capitulos|cuaderno|pnj|combate`,
+  `/v2/dm/campanas/:id/mesa/:miembro/personaje|combate`, `/v2/dm/bestiario[/:criatura]`,
   `/v2/dm/pnj[/:pnj]` y `/v2/dm/homebrew[/:categoria[/:entrada]]`. El panel
   (`DmPanel`) sigue al de Flutter: el
   interruptor con «DM» activo, las herramientas (Bestiario, Biblioteca de PNJ y
@@ -229,8 +230,15 @@ repiten acá.
   cifras salen de `computeSheet` con el catálogo del DM (SRD más **su** homebrew,
   como Flutter) y nunca se recalculan. **No muestra el nombre del jugador** que
   trae el diseño: la API de miembros no lo devuelve, y sumarlo abriría otra
-  puerta entre cuentas (`modo-dm.md`). Las tarjetas no son enlaces: la ficha
-  completa de un miembro sigue en Flutter. La campaña es una ruta, y una ajena
+  puerta entre cuentas (`modo-dm.md`). Cada tarjeta lleva a la **ficha completa
+  del miembro** (`MemberSheetView`, la `MemberSheetScreen` de Flutter): la misma
+  ficha de solo lectura del jugador (`SheetTabs`, que comparte con la ficha
+  propia) con las pestañas que sirven en combate, Personaje y Combate, y sin un
+  solo control. La URL lleva el **vínculo** (`memberId`) y no el id del
+  personaje, porque es la fila de `campaign_members` la que autoriza al DM; se
+  lee de la misma consulta que la Mesa, sin otra puerta, y como en Flutter no se
+  sondea. Un vínculo cortado y uno inexistente dicen lo mismo («Ya no ves esta
+  ficha»). La campaña es una ruta, y una ajena
   o inexistente muestra la misma pantalla «No se encontró la campaña»: el
   servidor las responde igual (404).
   **Capítulos** (`GET /api/campaigns/:id/chapters`): una tarjeta por capítulo con
@@ -344,9 +352,8 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    bestiario *(existe)* y catálogos *(el Códice existe)*.
    **Lectura del Modo DM** (se sumó a este paso): Mesa, Capítulos, Cuaderno,
    Bestiario, Biblioteca de PNJ, PNJ de la mesa, Homebrew y Combate *(existen)*.
+   La ficha completa de un miembro *(existe)*.
    **Faltan para cerrar el paso**, todas de lectura:
-   - la ficha completa de un miembro (`MemberSheetScreen` de Flutter; hoy la
-     tarjeta de la Mesa no es un enlace);
    - la ficha completa de un PNJ con ficha (Flutter abre `SheetScreen`; acá la
      ficha del PNJ muestra solo el resumen compilado);
    - la música: escuchar las escenas de la campaña (`dm/music/` de Flutter),
@@ -404,7 +411,9 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    (`e2e/bestiario.spec.ts`); que la Mesa del DM
    liste a los dos jugadores sembrados (de dos cuentas distintas) con los números
    del motor y los estados de la ficha, sin escribir nada, que leerla no cambie la
-   ficha del jugador, que Capítulos muestre estado, objetivo y recompensas (y que
+   ficha del jugador, que su tarjeta abra la ficha completa del miembro (por el
+   vínculo, con Personaje y Combate y los números del motor) y que otra cuenta
+   no la abra por URL, que Capítulos muestre estado, objetivo y recompensas (y que
    el objetivo y los capítulos sin cerrar no lleguen al jugador), que el
    Cuaderno junte notas, combates (con un PNJ aliado por su nombre propio) y
    subidas de nivel, busque, y que nada de eso llegue al jugador, que el
@@ -470,8 +479,7 @@ propio.
 Para que nadie lo dé por hecho:
 
 - Las lecturas que faltan del paso 3 (la lista está en «Orden previsto de
-  pantallas»): la ficha completa de un miembro y de un PNJ con ficha, la
-  música, los retratos, las menciones `@Nombre` como enlaces e imprimir.
+  pantallas»): la ficha completa de un PNJ con ficha, la música, los retratos, las menciones `@Nombre` como enlaces e imprimir.
 - Cualquier escritura desde React: todo el cliente hoy es solo lectura, así que
   los pasos 4 a 7 están enteros por hacer. Entre ellos, reordenar, marcar
   favorito, crear, renombrar o borrar personajes, y escribir en `/api/settings`

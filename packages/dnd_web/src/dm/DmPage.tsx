@@ -15,6 +15,7 @@ import { BestiaryPage } from '../bestiary/BestiaryPage';
 import { ChaptersView } from './ChaptersView';
 import { CombatView } from './CombatView';
 import { HomebrewView } from './HomebrewView';
+import { MemberSheetView } from './MemberSheetView';
 import { MesaView } from './MesaView';
 import { NotebookView } from './NotebookView';
 import { CampaignNpcsView } from './npcs/CampaignNpcsView';
@@ -40,11 +41,12 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
     if (target) navigate(dmCampaignHref(target.id), { replace: true });
   }, [target]);
 
+  // La ficha de un miembro es parte de la Mesa: el panel la marca como tal.
   const current =
-    view.kind === 'campaign' && list
+    (view.kind === 'campaign' || view.kind === 'member') && list
       ? (() => {
           const campaign = list.find((c) => c.id === view.id);
-          return campaign ? { campaign, section: view.section } : undefined;
+          return campaign ? { campaign, section: view.kind === 'member' ? ('mesa' as const) : view.section } : undefined;
         })()
       : undefined;
 
@@ -93,6 +95,8 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
     );
   } else if (!current) {
     body = <Notice title={t.dmCampaignNotFound} body={t.dmCampaignNotFoundBody} />;
+  } else if (view.kind === 'member') {
+    body = <MemberSheetView key={view.memberId} campaign={current.campaign} memberId={view.memberId} tab={view.tab} />;
   } else {
     const Section = {
       mesa: MesaView,

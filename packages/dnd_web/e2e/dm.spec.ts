@@ -78,6 +78,46 @@ test('la Mesa del DM lista a los jugadores vinculados con los números del motor
   expect(escrituras).toEqual([]);
 });
 
+test('la tarjeta de la Mesa abre la ficha completa del miembro, de solo lectura y con los números del motor', async ({
+  context,
+  page,
+  baseURL,
+}) => {
+  await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);
+  const escrituras = vigilarEscrituras(page);
+  const { members } = await api<{ members: { memberId: string; character: PersonajeApi }[] }>(
+    page.request,
+    `/api/campaigns/${CAMPANA}/members`,
+    TOKEN_DM,
+  );
+  const elsbeth = members.find((m) => m.character.id === 'elsbeth-de-humo')!;
+  const ficha = computeSheet(elsbeth.character, catalogo());
+
+  await page.goto(MESA);
+  await page.locator('[data-member="elsbeth-de-humo"]').getByRole('link', { name: elsbeth.character.name }).click();
+  // Por el vínculo y no por el id del personaje: es lo que autoriza al DM.
+  await expect(page).toHaveURL(`${MESA}/${elsbeth.memberId}/personaje`);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(elsbeth.character.name);
+  const cifra = (id: string) => page.locator(`section[aria-label="Cifras de combate"] [data-stat="${id}"] [data-field="value"]`);
+  await expect(cifra('ac')).toHaveText(String(ficha.armorClass));
+  await expect(cifra('initiative')).toHaveText(signed(ficha.initiative));
+  // Solo lo que sirve en combate: lo demás es del jugador.
+  const pestanas = page.getByRole('tablist', { name: 'Pestañas de la ficha' });
+  await expect(pestanas.getByRole('tab')).toHaveText(['Personaje', 'Combate']);
+  await pestanas.getByRole('tab', { name: 'Combate' }).click();
+  await expect(page).toHaveURL(`${MESA}/${elsbeth.memberId}/combate`);
+  await expect(page.locator('[data-stat="spell-dc"] [data-field="value"]')).toHaveText(String(ficha.spellcasting!.saveDc));
+  await expect(page.getByRole('navigation', { name: 'Secciones de la campaña' }).getByRole('link', { name: 'Mesa' })).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
+  expect(escrituras).toEqual([]);
+
+  // Un vínculo que no existe dice lo mismo que uno cortado.
+  await page.goto(`${MESA}/no-existe/personaje`);
+  await expect(page.getByText('Ya no ves esta ficha. Puede que te hayan cortado el vínculo.')).toBeVisible();
+});
+
 test('Capítulos muestra estado, objetivo y recompensas de cada capítulo, y solo el DM lee el objetivo', async ({
   context,
   page,
@@ -260,6 +300,10 @@ test('otra cuenta recibe 404 al pedir la campaña, idéntico al de una inexisten
     await page.goto(`/v2/dm/campanas/${id}/mesa`);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('No se encontró la campaña');
   }
+  // Tampoco la ficha de un miembro: la URL con un vínculo real no abre nada.
+  const { members } = await api<{ members: { memberId: string }[] }>(page.request, `/api/campaigns/${CAMPANA}/members`, TOKEN_DM);
+  await page.goto(`/v2/dm/campanas/${CAMPANA}/mesa/${members[0]!.memberId}/personaje`);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('No se encontró la campaña');
   const texto = await page.locator('body').innerText();
   for (const secreto of SOLO_DEL_DM) expect(texto, `la pantalla muestra «${secreto}»`).not.toContain(secreto);
   await expect(page.locator('[data-member]')).toHaveCount(0);

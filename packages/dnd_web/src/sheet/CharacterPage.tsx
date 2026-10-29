@@ -1,23 +1,12 @@
 import { useEffect, useMemo } from 'react';
 import { useAppVersion, useRoster, useSheetCatalog } from '../api/queries';
-import { computeSheet, migrateCharacter, type CharacterFields, type ComputedSheet } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import { characterHref, navigate, rosterHref, SHEET_TABS, type SheetTab } from '../router';
-import { LinkTabs, TabPanel } from '../ui/disclosure';
 import { Shell, SidebarBack } from '../ui/Shell';
 import { AppBusyLabel, AppErrorView, Notice } from '../ui/status';
-import { CharacterTab } from './CharacterTab';
-import { CombatTab } from './CombatTab';
-import { SheetHeader } from './SheetHeader';
-import { CampaignTab } from './CampaignTab';
-import { DiaryTab } from './DiaryTab';
-import { InventoryTab } from './InventoryTab';
-import { SheetFooter, SheetPanel, TAB_ICONS, tabLabel } from './SheetPanel';
-import type { SheetModel } from './model';
-
-type Computed =
-  | { ok: true; model: SheetModel }
-  | { ok: false; detail: string };
+import { computeModel, type ComputedModel } from './compute';
+import { SheetFooter, SheetPanel } from './SheetPanel';
+import { SheetTabs } from './SheetTabs';
 
 /**
  * La ficha de [id], de solo lectura, en la pestaña [tab]. La API no tiene
@@ -40,28 +29,10 @@ export function CharacterPage({ id, tab }: { id: string; tab: SheetTab | null })
   }, [id, tab]);
 
   const raw = roster.data?.find((c) => c.character.id === id)?.character ?? null;
-  const computed = useMemo((): Computed | null => {
-    if (!raw || !catalog.data) return null;
-    try {
-      // Se migra una vez y se usa lo migrado para todo: el motor calcula sobre
-      // la forma actual y la pantalla lee los mismos campos (el PG actual, los
-      // espacios gastados) sin conocer esquemas viejos.
-      const migrated = migrateCharacter(raw);
-      // El motor de Dart compilado a JS, el mismo que usan el servidor y
-      // Flutter: acá no se recalcula ninguna regla.
-      const sheet: ComputedSheet = computeSheet(migrated, catalog.data);
-      return {
-        ok: true,
-        // `CharacterFields` es el subconjunto que esta pantalla lee de un
-        // `Character.toJson` que el servidor ya validó al guardarlo.
-        model: { character: migrated as unknown as CharacterFields, sheet, catalog: catalog.data },
-      };
-    } catch (e) {
-      // Un esquema más nuevo que este cliente, o una ficha que el motor no
-      // entiende: se dice, en vez de mostrar números a medias.
-      return { ok: false, detail: String(e) };
-    }
-  }, [raw, catalog.data]);
+  const computed = useMemo(
+    (): ComputedModel | null => (raw && catalog.data ? computeModel(raw, catalog.data) : null),
+    [raw, catalog.data],
+  );
 
   const failed = [roster, ...catalog.queries].filter((q) => q.isError);
   const activeTab: SheetTab = tab ?? 'personaje';
@@ -79,30 +50,19 @@ export function CharacterPage({ id, tab }: { id: string; tab: SheetTab | null })
   } else if (!computed.ok) {
     body = <AppErrorView as="h1" title={t.computeErrorTitle} message={t.computeErrorBody} detail={computed.detail} />;
   } else {
-    const m = computed.model;
+    // Debajo de 900 px el panel es un cajón: la tira de pestañas va arriba del
+    // contenido, para cambiar sin abrirlo. Desde 900 las pestañas viven en el
+    // panel y la tira se oculta; el panel de la pestaña es el mismo en los dos
+    // casos (se monta una sola vez).
     body = (
-      <div className="flex flex-col gap-4">
-        <SheetHeader model={m} />
-        {/* Debajo de 900 px el panel es un cajón: la tira de pestañas va
-            arriba del contenido, para cambiar sin abrirlo. Desde 900 las
-            pestañas viven en el panel y la tira se oculta; el panel de la
-            pestaña es el mismo en los dos casos (se monta una sola vez). */}
-        <LinkTabs
-          label={t.sheetTabsLabel}
-          value={activeTab}
-          listClassName="shell:hidden"
-          tabs={SHEET_TABS.map((tabId) => ({
-            value: tabId,
-            label: tabLabel(t, tabId),
-            href: characterHref(id, tabId),
-            icon: TAB_ICONS[tabId],
-          }))}
-        >
-          <TabPanel value={activeTab} className="pt-4 shell:pt-0">
-            <TabBody tab={activeTab} model={m} />
-          </TabPanel>
-        </LinkTabs>
-      </div>
+      <SheetTabs
+        model={computed.model}
+        tabs={SHEET_TABS}
+        active={activeTab}
+        hrefOf={(tabId) => characterHref(id, tabId)}
+        listClassName="shell:hidden"
+        panelClassName="pt-4 shell:pt-0"
+      />
     );
   }
 
@@ -114,19 +74,4 @@ export function CharacterPage({ id, tab }: { id: string; tab: SheetTab | null })
       {body}
     </Shell>
   );
-}
-
-function TabBody({ tab, model }: { tab: SheetTab; model: SheetModel }) {
-  switch (tab) {
-    case 'personaje':
-      return <CharacterTab model={model} />;
-    case 'combate':
-      return <CombatTab model={model} />;
-    case 'inventario':
-      return <InventoryTab model={model} />;
-    case 'campana':
-      return <CampaignTab model={model} />;
-    case 'diario':
-      return <DiaryTab model={model} />;
-  }
 }
