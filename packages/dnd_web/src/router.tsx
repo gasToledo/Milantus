@@ -14,8 +14,9 @@ import {
 
 /** Las pestañas de la ficha. Son parte de la URL (`/personajes/:id/combate`):
  *  se comparten, se recargan y «atrás» vuelve a la anterior. El segmento va
- *  en español porque es lo que se lee en la barra de direcciones. */
-export const SHEET_TABS = ['personaje', 'combate'] as const;
+ *  en español porque es lo que se lee en la barra de direcciones, y sin tilde
+ *  (`campana`) para que no viaje como `%C3%B1`. */
+export const SHEET_TABS = ['personaje', 'combate', 'inventario', 'campana', 'diario'] as const;
 export type SheetTab = (typeof SHEET_TABS)[number];
 
 export type Route =

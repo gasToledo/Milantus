@@ -1,0 +1,354 @@
+import { useMemo, useState } from 'react';
+import {
+  ArrowUpRight,
+  Backpack,
+  Box,
+  Check,
+  CircleHelp,
+  Luggage,
+  Package,
+  Shield,
+  Sparkles,
+  Sword,
+  WandSparkles,
+  Wrench,
+  X,
+  type LucideIcon,
+} from 'lucide-react';
+import { inventoryOf, type CharacterJson, type InventoryLine } from '../engine';
+import { useLang, useTexts } from '../i18n/context';
+import type { Texts } from '../i18n/texts';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
+import { cx } from '../ui/cx';
+import { Eyebrow, Pips, ThinBar } from '../ui/data';
+import { Tooltip } from '../ui/primitives';
+import { AppEmptyState } from '../ui/status';
+import type { SheetModel } from './model';
+
+/** Las familias en que se agrupa la mochila, en el orden de `itemGroupOrder`
+ *  de Flutter: primero lo que se empuña, después lo que se gasta y al final
+ *  lo que solo se lleva encima. */
+const GROUP_ORDER = [
+  'weapon',
+  'armor',
+  'ammunition',
+  'focus',
+  'magic',
+  'tool',
+  'container',
+  'pack',
+  'gear',
+  'missing',
+] as const;
+type Group = (typeof GROUP_ORDER)[number];
+
+/** Ícono por familia: es lo único que distingue el tipo dentro de un grupo
+ *  (`_itemIcon` en Flutter; §8.7 no permite un color por tipo). */
+const GROUP_ICON: Record<Group, LucideIcon> = {
+  weapon: Sword,
+  armor: Shield,
+  ammunition: ArrowUpRight,
+  focus: Sparkles,
+  magic: WandSparkles,
+  tool: Wrench,
+  container: Package,
+  pack: Luggage,
+  gear: Box,
+  missing: CircleHelp,
+};
+
+/** La familia de una línea, como `itemKindLabel` de Flutter. Es agrupación y
+ *  no regla: qué es arma, armadura o mágico ya lo resolvió el motor. */
+function groupOf(line: InventoryLine): Group {
+  if (line.kind === null) return 'missing';
+  if (line.kind === 'weapon' || line.kind === 'armor') return line.kind;
+  const family = line.family;
+  return GROUP_ORDER.find((g) => g === family) ?? 'gear';
+}
+
+/** Monedas de mayor a menor, como se leen en la mesa. */
+const COINS = ['pp', 'gp', 'ep', 'sp', 'cp'] as const;
+
+type Filter = 'all' | 'equipped' | 'magic';
+
+/**
+ * Pestaña Inventario, de **solo lectura**: la bolsa (monedas, carga y
+ * sintonización) y la mochila agrupada por familia. Cada entrada la resolvió
+ * el motor (`inventoryOf`): nombre, peso, si cuenta como equipada, si es
+ * mágica. La carga y la capacidad son de `ComputedSheet`. Buscar y filtrar no
+ * escriben nada; equipar, comprar, vender y editar siguen en Flutter.
+ */
+export function InventoryTab({ model }: { model: SheetModel }) {
+  const t = useTexts();
+  const lang = useLang();
+  const { character, sheet, catalog } = model;
+  // `character` es el `Character.toJson` migrado entero (ver `CharacterPage`);
+  // el tipo solo nombra lo que la ficha lee, así que vuelve a su forma JSON.
+  const lines = useMemo(() => inventoryOf(character as unknown as CharacterJson, catalog), [character, catalog]);
+  const [query, setQuery] = useState('');
+  const [filter, setFilter] = useState<Filter>('all');
+
+  const number = useMemo(() => new Intl.NumberFormat(lang, { maximumFractionDigits: 2 }), [lang]);
+  const attuned = lines.filter((l) => l.attuned).length;
+
+  const needle = query.trim().toLowerCase();
+  const visible = lines.filter(
+    (l) =>
+      (needle === '' || l.name.toLowerCase().includes(needle)) &&
+      (filter === 'all' || (filter === 'equipped' ? l.equipped : l.magic)),
+  );
+  const groups = GROUP_ORDER.map((g) => ({ group: g, lines: visible.filter((l) => groupOf(l) === g) })).filter(
+    (g) => g.lines.length > 0,
+  );
+
+  return (
+    <div className="flex flex-col gap-4">
+      <Card id="bag" title={t.bagHeading} icon={Backpack}>
+        <div className="flex flex-wrap gap-x-7 gap-y-5">
+          <div className="min-w-0 flex-[2_1_320px]">
+            <Eyebrow className="mb-2">{t.coinsHeading}</Eyebrow>
+            <dl className="grid grid-cols-5 gap-2">
+              {COINS.map((c) => {
+                const n = character.coins?.[c] ?? 0;
+                return (
+                  <div key={c} className="plaque px-1.5 pt-3 pb-2.5 text-center" data-coin={c}>
+                    <dt className="text-[10px] tracking-[1.2px] text-text-muted uppercase">
+                      <span aria-hidden="true">{t.coins[c].abbr}</span>
+                      <span className="sr-only">{t.coins[c].name}</span>
+                    </dt>
+                    {/* Las que están en cero se atenúan: lo que hay se ve primero. */}
+                    <dd className={cx('font-display mt-[7px] text-[22px] leading-none tabular-nums', n > 0 ? 'text-gold' : 'text-text-muted')}>
+                      {n}
+                    </dd>
+                  </div>
+                );
+              })}
+            </dl>
+          </div>
+
+          <div className="flex min-w-0 flex-[1_1_220px] flex-col gap-3.5">
+            <div data-stat="load">
+              <div className="flex items-baseline justify-between gap-2.5">
+                <Eyebrow>{t.loadHeading}</Eyebrow>
+                <span className="num text-[14px]" data-field="value">
+                  {number.format(sheet.carriedWeight)}
+                  <span className="font-normal text-text-muted">
+                    {' / '}
+                    {number.format(sheet.carryingCapacity)} {t.pounds}
+                  </span>
+                </span>
+              </div>
+              <div className="mt-2">
+                <ThinBar
+                  value={sheet.carriedWeight}
+                  max={sheet.carryingCapacity}
+                  label={t.loadHeading}
+                  valueText={t.loadLabel(number.format(sheet.carriedWeight), number.format(sheet.carryingCapacity))}
+                  colorClassName={sheet.isEncumbered ? 'bg-crimson' : 'bg-gold'}
+                  height={6}
+                />
+              </div>
+            </div>
+            {sheet.attunementSlots > 0 && (
+              <div className="flex items-center justify-between gap-2.5">
+                <Eyebrow>{t.attunementHeading}</Eyebrow>
+                <Pips
+                  max={sheet.attunementSlots}
+                  left={Math.min(attuned, sheet.attunementSlots)}
+                  label={t.attunementLabel(attuned, sheet.attunementSlots)}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      </Card>
+
+      <section aria-labelledby="h-pack" className="card @container min-w-0 px-5 pt-[18px] pb-2.5" data-card="pack">
+        <div className="mb-5 flex flex-wrap items-center gap-x-4 gap-y-3">
+          <h2 id="h-pack" className="flex min-w-0 flex-[1_1_140px] items-center gap-2">
+            <Backpack size={18} aria-hidden="true" className="shrink-0 text-gold" />
+            <span className="font-display text-[16px] text-on-surface">{t.packHeading}</span>
+            <span className="text-[12px] text-text-muted tabular-nums">{t.itemsCount(lines.length)}</span>
+          </h2>
+          {lines.length > 0 && (
+            <>
+              <div role="search" className="relative min-w-[min(200px,100%)] flex-[1_1_200px] @xl:max-w-[260px]">
+                <label htmlFor="pack-search" className="sr-only">
+                  {t.packSearchLabel}
+                </label>
+                <input
+                  id="pack-search"
+                  type="search"
+                  autoComplete="off"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={t.packSearchHint}
+                  className="h-9 w-full rounded-[var(--radius-pill)] border border-hairline bg-plaque px-4 pr-9 text-[13px] text-on-surface placeholder:text-text-muted"
+                />
+                {query !== '' && (
+                  <Tooltip content={t.rosterClearSearch}>
+                    <button
+                      type="button"
+                      aria-label={t.rosterClearSearch}
+                      onClick={() => setQuery('')}
+                      className="absolute inset-y-0 right-1 flex w-8 items-center justify-center text-text-muted hover:text-on-surface"
+                    >
+                      <X size={16} aria-hidden="true" />
+                    </button>
+                  </Tooltip>
+                )}
+              </div>
+              <div
+                role="group"
+                aria-label={t.packFilterLabel}
+                className="flex gap-1 rounded-[var(--radius-pill)] border border-hairline bg-plaque p-[3px]"
+              >
+                {(['all', 'equipped', 'magic'] as const).map((f) => (
+                  <button
+                    key={f}
+                    type="button"
+                    aria-pressed={filter === f}
+                    onClick={() => setFilter(f)}
+                    className={cx(
+                      'rounded-[var(--radius-pill)] px-3 py-[5px] text-[12px]',
+                      filter === f ? 'bg-gold-soft font-semibold text-gold' : 'text-on-surface-variant hover:text-on-surface',
+                    )}
+                  >
+                    {t.packFilters[f]}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
+        {lines.length === 0 ? (
+          <div className="pb-2.5">
+            <AppEmptyState kind="empty" message={t.packEmpty} />
+          </div>
+        ) : visible.length === 0 ? (
+          <div className="pb-2.5">
+            <AppEmptyState
+              kind="no-match"
+              message={needle ? t.packNoMatch(query.trim()) : t.packNoMatchHint}
+              hint={needle ? t.packNoMatchHint : undefined}
+              actions={
+                <Button
+                  tone="secondary"
+                  onClick={() => {
+                    setQuery('');
+                    setFilter('all');
+                  }}
+                >
+                  {t.packShowAll}
+                </Button>
+              }
+            />
+          </div>
+        ) : (
+          // Una tabla de verdad: las columnas Cantidad, Equipado y Peso no se
+          // mueven entre filas y se leen en vertical (§8.7). Debajo de 576 px
+          // de tarjeta el peso se oculta para que el resto no quede apretado.
+          <table className="w-full border-collapse text-left" data-field="pack">
+            <thead>
+              <tr className="border-b border-hairline text-[10px] tracking-[1.2px] text-text-muted uppercase">
+                <th scope="col" className="px-2 pb-2.5 font-normal">
+                  {t.colItem}
+                </th>
+                <th scope="col" className="w-12 px-2 pb-2.5 text-right font-normal @xl:w-16">
+                  {t.colQuantity}
+                </th>
+                <th scope="col" className="w-16 px-2 pb-2.5 text-center font-normal @xl:w-24">
+                  {t.colEquipped}
+                </th>
+                <th scope="col" className="hidden w-[72px] px-2 pb-2.5 text-right font-normal @xl:table-cell">
+                  {t.colWeight}
+                </th>
+              </tr>
+            </thead>
+            {groups.map(({ group, lines: rows }) => (
+              <tbody key={group} data-group={group}>
+                <tr>
+                  <th scope="colgroup" colSpan={4} className="px-2 pt-[22px] pb-2 font-normal">
+                    <Eyebrow>{t.itemGroups[group]}</Eyebrow>
+                  </th>
+                </tr>
+                {rows.map((line) => (
+                  <PackRow key={line.entryId} line={line} group={group} t={t} format={number.format} />
+                ))}
+              </tbody>
+            ))}
+          </table>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function PackRow({
+  line,
+  group,
+  t,
+  format,
+}: {
+  line: InventoryLine;
+  group: Group;
+  t: Texts;
+  format: (n: number) => string;
+}) {
+  const Icon = GROUP_ICON[group];
+  const notes = [
+    line.attuned ? t.attunedNote : null,
+    line.maxCharges !== null ? t.chargesNote(line.charges ?? line.maxCharges, line.maxCharges) : null,
+    line.note || null,
+  ].filter(Boolean);
+  return (
+    <tr className="border-t border-hairline" data-entry={line.entryId}>
+      <th scope="row" className="px-2 py-3 text-left font-normal">
+        <span className="flex min-w-0 items-center gap-3.5">
+          <span
+            aria-hidden="true"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-nav)] border border-hairline bg-plaque"
+          >
+            <Icon size={16} className="text-on-surface-variant" />
+          </span>
+          <span className="min-w-0">
+            <span className="flex flex-wrap items-center gap-1.5 text-[14px] text-on-surface">
+              <span className="break-words" data-field="name">
+                {line.name}
+              </span>
+              {line.homebrew && (
+                <span className="rounded-[var(--radius-pill)] border border-hairline px-1.5 text-[10px] text-on-surface-variant">
+                  {t.homebrewTag}
+                </span>
+              )}
+            </span>
+            {notes.length > 0 && <span className="mt-1 block text-[12px] text-text-muted">{notes.join(' · ')}</span>}
+          </span>
+        </span>
+      </th>
+      <td className="num px-2 py-3 text-right text-[14px]" data-field="quantity">
+        {line.quantity}
+      </td>
+      <td className="px-2 py-3 text-center text-[12px]" data-field="equipped">
+        {line.equipped ? (
+          <span className="inline-flex items-center gap-1 text-gold">
+            <Check size={14} aria-hidden="true" />
+            {t.equippedYes}
+          </span>
+        ) : (
+          <>
+            <span aria-hidden="true" className="text-text-muted">
+              —
+            </span>
+            <span className="sr-only">{t.equippedNo}</span>
+          </>
+        )}
+      </td>
+      <td className="hidden px-2 py-3 text-right text-[13px] text-on-surface-variant tabular-nums @xl:table-cell">
+        {format(line.weight)} {t.pounds}
+      </td>
+    </tr>
+  );
+}

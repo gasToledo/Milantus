@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { mergeHomebrew, type HomebrewContent } from '../src/api/homebrew';
-import { computeSheet, type AbilityId } from '../src/engine';
+import { chapterGrants, computeSheet, inventoryOf, type AbilityId, type JsonObject } from '../src/engine';
 import { signed } from '../src/sheet/format';
 import { api, catalogo, personajes, TOKEN, type PersonajeApi } from './helpers';
 
@@ -125,4 +125,63 @@ test('la ficha de un lanzador lista sus trucos y conjuros, con la CD del motor',
     if (siempre.has(id)) await expect(grupo('chosen')).not.toContainText(nombre(id));
     else await expect(grupo('chosen')).toContainText(nombre(id));
   }
+});
+
+test('el inventario muestra la mochila que resuelve el motor, con la carga de la ficha', async ({
+  page,
+  request,
+}) => {
+  const personaje = (await personajes(request)).find((c) => c.id === ELSBETH)!;
+  const catalog = catalogo();
+  const ficha = computeSheet(personaje, catalog);
+  const lineas = inventoryOf(personaje, catalog);
+  const libras = new Intl.NumberFormat('es-AR', { maximumFractionDigits: 2 });
+
+  await page.goto(`/v2/personajes/${ELSBETH}/inventario`);
+  await expect(page.locator('[data-stat="load"] [data-field="value"]')).toHaveText(
+    `${libras.format(ficha.carriedWeight)} / ${libras.format(ficha.carryingCapacity)} lb`,
+  );
+  // Cada entrada con el nombre que resuelve el motor y su marca de equipado.
+  for (const l of lineas) {
+    const fila = page.locator(`[data-entry="${l.entryId}"]`);
+    await expect(fila.locator('[data-field="name"]')).toHaveText(l.name);
+    await expect(fila.locator('[data-field="equipped"]')).toHaveText(l.equipped ? 'Sí' : '—No');
+  }
+  // Filtrar no escribe nada: solo deja a la vista lo equipado.
+  await page.getByRole('button', { name: 'Equipados' }).click();
+  await expect(page.locator('[data-entry]')).toHaveCount(lineas.filter((l) => l.equipped).length);
+});
+
+test('la campaña muestra la mesa, sus batallas y lo que repartió cada capítulo cerrado', async ({
+  page,
+  request,
+}) => {
+  const [mesa] = await api<{ campaigns: { campaign: { name: string }; chapters: JsonObject[] }[] }>(
+    request,
+    `/api/characters/${ELSBETH}/campaigns`,
+  ).then((r) => r.campaigns);
+
+  await page.goto(`/v2/personajes/${ELSBETH}/campana`);
+  await expect(page.getByRole('heading', { level: 2, name: mesa!.campaign.name })).toBeVisible();
+  // Lo repartido lo nombra el motor (`Chapter.grantsLabel`).
+  for (const capitulo of mesa!.chapters) {
+    await expect(page.locator(`[data-chapter="${capitulo.id}"]`)).toContainText(
+      `Te llevaste ${chapterGrants(capitulo)}`,
+    );
+  }
+  await expect(page.getByText('Contra Lobo ×3')).toBeVisible();
+  await expect(page.getByText('Con Thalion · cayeron todos')).toBeVisible();
+});
+
+test('el diario muestra el trasfondo y abre cada entrada', async ({
+  page,
+}) => {
+  await page.goto(`/v2/personajes/${ELSBETH}/diario`);
+  // El Markdown del trasfondo se arma como elementos, no como HTML.
+  await expect(page.locator('[data-card="background"] strong')).toHaveText('no se quemó por accidente');
+  await page.locator('[data-entry="d-mapa"]').click();
+  const dialogo = page.getByRole('dialog', { name: 'Mapa de la Marca' });
+  await expect(dialogo.getByRole('link')).toHaveAttribute('href', 'https://example.org/marca');
+  await dialogo.getByRole('button', { name: 'Cerrar' }).click();
+  await expect(dialogo).toHaveCount(0);
 });

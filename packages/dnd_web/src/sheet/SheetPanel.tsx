@@ -12,18 +12,26 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { useTexts } from '../i18n/context';
-import { characterHref, FLUTTER_HOME, rosterHref, type SheetTab } from '../router';
+import { characterHref, FLUTTER_HOME, rosterHref, SHEET_TABS, type SheetTab } from '../router';
+import type { Texts } from '../i18n/texts';
 import { Medallion } from '../ui/Medallion';
 import { NavGroup, NavItem, SidebarBack, ThemeMenu, VersionLabel } from '../ui/Shell';
 import { accentFor, classesOf, type SheetModel } from './model';
 
-export const TAB_ICONS: Record<SheetTab, LucideIcon> = { personaje: User, combate: Swords };
+export const TAB_ICONS: Record<SheetTab, LucideIcon> = {
+  personaje: User,
+  combate: Swords,
+  inventario: Backpack,
+  campana: Flag,
+  diario: BookOpen,
+};
 
 /**
  * El panel de una pantalla de adentro (`SidebarBackButton` + navegación de la
  * ficha): «volver», la tarjeta del personaje, las secciones y las acciones.
- * Personaje y Combate son pestañas de `/v2`; lo demás (Inventario, Campaña,
- * Diario y las cuatro acciones) todavía vive en Flutter y enlaza allá.
+ * Las cinco secciones son pestañas de `/v2`; las cuatro acciones (retrato,
+ * subir de nivel, compartir, imprimir) escriben o generan algo y todavía viven
+ * en Flutter, así que enlazan allá.
  */
 export function SheetPanel({ model, tab }: { model: SheetModel; tab: SheetTab }) {
   const t = useTexts();
@@ -47,21 +55,17 @@ export function SheetPanel({ model, tab }: { model: SheetModel; tab: SheetTab })
       </div>
 
       <NavGroup label={t.sheetNavLabel}>
-        <li>
-          <NavItem href={characterHref(id, 'personaje')} icon={TAB_ICONS.personaje} label={t.tabCharacter} active={tab === 'personaje'} internal />
-        </li>
-        <li>
-          <NavItem href={characterHref(id, 'combate')} icon={TAB_ICONS.combate} label={t.tabCombat} active={tab === 'combate'} internal />
-        </li>
-        <li>
-          <NavItem href={FLUTTER_HOME} icon={Backpack} label={t.navInventory} external />
-        </li>
-        <li>
-          <NavItem href={FLUTTER_HOME} icon={Flag} label={t.navCampaign} external />
-        </li>
-        <li>
-          <NavItem href={FLUTTER_HOME} icon={BookOpen} label={t.navDiary} external />
-        </li>
+        {SHEET_TABS.map((tabId) => (
+          <li key={tabId}>
+            <NavItem
+              href={characterHref(id, tabId)}
+              icon={TAB_ICONS[tabId]}
+              label={tabLabel(t, tabId)}
+              active={tab === tabId}
+              internal
+            />
+          </li>
+        ))}
       </NavGroup>
 
       <NavGroup label={t.sheetActionsLabel}>
@@ -98,4 +102,19 @@ export function SheetFooter({ version }: { version: string | null | undefined })
       </div>
     </div>
   );
+}
+
+export function tabLabel(t: Texts, tab: SheetTab): string {
+  switch (tab) {
+    case 'personaje':
+      return t.tabCharacter;
+    case 'combate':
+      return t.tabCombat;
+    case 'inventario':
+      return t.navInventory;
+    case 'campana':
+      return t.navCampaign;
+    case 'diario':
+      return t.navDiary;
+  }
 }

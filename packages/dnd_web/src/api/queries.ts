@@ -13,6 +13,7 @@ import {
   ApiError,
   fetchAccount,
   fetchAppVersion,
+  fetchPlayerCampaigns,
   fetchRoster,
   fetchRosterSettings,
   fetchThemeMode,
@@ -44,6 +45,7 @@ export const queryKeys = {
   roster: ['characters'] as const,
   catalog: (lang: Lang) => ['catalog', lang] as const,
   homebrew: ['homebrew'] as const,
+  playerCampaigns: (characterId: string) => ['characters', characterId, 'campaigns'] as const,
   appVersion: ['app-version'] as const,
 };
 
@@ -84,6 +86,13 @@ export const useAppVersion = (enabled: boolean) =>
     enabled,
     staleTime: Infinity,
     retry: false,
+  });
+
+/** Solo se pide al abrir la pestaña Campaña: es lo único que la usa. */
+export const usePlayerCampaigns = (characterId: string) =>
+  useQuery({
+    queryKey: queryKeys.playerCampaigns(characterId),
+    queryFn: ({ signal }) => fetchPlayerCampaigns(characterId, signal),
   });
 
 export const useHomebrew = () =>

@@ -173,6 +173,41 @@ body {
   box-shadow: var(--shadow-card-hover);
 }
 
+/* La banda táctica: columnas fijas y no placas que se reparten el ancho como
+   pueden (con `auto-fit` a ciertos anchos quedaba una placa sola y estirada en
+   la última fila). Se mide el ancho del contenido, no la ventana: el panel
+   lateral de 236 px no cuenta. PG es la más ancha porque lleva barra; en
+   anchos medios ocupa dos lugares y en teléfono la fila entera. */
+.tactical-band {
+  container-type: inline-size;
+}
+.tactical-band > dl {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-flow: row dense;
+  margin: 0;
+}
+.tactical-band [data-stat='hp'] {
+  grid-column: 1 / -1;
+}
+@container (min-width: 540px) {
+  .tactical-band > dl {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .tactical-band [data-stat='hp'] {
+    grid-column: span 2;
+  }
+}
+@container (min-width: 900px) {
+  .tactical-band > dl {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) repeat(3, minmax(0, 1fr));
+  }
+  .tactical-band [data-stat='hp'] {
+    grid-column: auto;
+  }
+}
+
 /* La barra de PG recorre el tramo (`ThinBar`, 220 ms easeOut). */
 .thin-bar-fill {
   transition: width 220ms ease-out;

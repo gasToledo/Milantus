@@ -101,6 +101,71 @@ String vocabularyLabelFor(String field, String value) {
   return value;
 }
 
+/// La mochila de una ficha, cada entrada **resuelta por el motor**: el nombre
+/// (`Espada larga +1 (Espada larga)`), el peso por unidad, si cuenta como
+/// equipada, si es mágica y sus cargas. Son `InventoryOps.resolve` e
+/// `InventoryOps.isEquipped`, las mismas que usan el compilador y Flutter: un
+/// cliente que las repitiera podría tildar como equipado algo que no le suma
+/// la CA.
+///
+/// Devuelve una lista JSON en el orden del inventario. `kind` es `weapon`,
+/// `armor`, `item`, o `null` si el id no está en el catálogo (homebrew que no
+/// se cargó): la fila se muestra igual, como en Flutter. `family` es la
+/// categoría del objeto, o `magic` si tiene rareza (`itemFamily` de la app).
+String inventory(String characterJson, String catalogJson) {
+  final character = Character.fromJson(
+    jsonDecode(characterJson) as Map<String, dynamic>,
+  );
+  final repo = _repoPara(catalogJson);
+  return jsonEncode([
+    for (final e in character.inventory) _inventoryLine(character, e, repo),
+  ]);
+}
+
+Map<String, dynamic> _inventoryLine(
+  Character c,
+  InventoryEntry e,
+  ContentRepository repo,
+) {
+  final entry = repo.catalogEntry(e.itemId);
+  final resolved = InventoryOps.resolve(e, repo);
+  final item = resolved.item;
+  final replica =
+      e.origin?.startsWith('artificer:replicate-magic-item:') == true;
+  final source =
+      item?.source ?? resolved.weapon?.source ?? resolved.armor?.source;
+  return {
+    'entryId': e.entryId,
+    'itemId': e.itemId,
+    'name': entry == null ? e.itemId : resolved.name,
+    'kind': entry == null
+        ? null
+        : resolved.weapon != null
+            ? 'weapon'
+            : resolved.armor != null
+                ? 'armor'
+                : entry.kind,
+    'family': item == null ? null : (item.isMagic ? 'magic' : item.category),
+    'weight': resolved.weight,
+    'quantity': e.quantity,
+    'equipped': InventoryOps.isEquipped(c, e, repo),
+    'attuned': e.attuned,
+    'requiresAttunement': item?.requiresAttunement ?? false,
+    'magic': (item?.isMagic ?? false) || replica,
+    'charges': e.charges,
+    'maxCharges': item?.maxCharges,
+    'note': e.note,
+    'homebrew': source == ContentSource.homebrew,
+  };
+}
+
+/// Lo que reparte un capítulo cerrado, en una línea y en el idioma activo
+/// («25 po y una poción de curación»), o vacío. Es `Chapter.grantsLabel`:
+/// cómo se nombran el oro, los objetos y la subida de nivel vive en el motor.
+String chapterGrants(String chapterJson) => Chapter.fromJson(
+      jsonDecode(chapterJson) as Map<String, dynamic>,
+    ).grantsLabel;
+
 void main() {
   final motor = JSObject();
   motor['compute'] = compute.toJS;
@@ -108,5 +173,7 @@ void main() {
   motor['setLanguage'] = setLanguage.toJS;
   motor['applyTranslation'] = applyTranslation.toJS;
   motor['vocabularyLabel'] = vocabularyLabelFor.toJS;
+  motor['inventory'] = inventory.toJS;
+  motor['chapterGrants'] = chapterGrants.toJS;
   globalContext['dndEngine'] = motor;
 }

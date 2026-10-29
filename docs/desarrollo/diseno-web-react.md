@@ -68,12 +68,13 @@ una regla: reciben el número ya resuelto por `computeSheet`.
 
 | Componente | Qué hace | Cuándo |
 | --- | --- | --- |
-| `StatTile` | Placa de la banda táctica: ícono + rótulo, cifra en sans negrita tabular, `suffix` y `footer` | Solo la banda táctica. Va dentro de un `<dl>` |
+| `StatTile` | Placa de la banda táctica, **centrada**: ícono + rótulo arriba, cifra en sans negrita tabular con su `suffix` en la misma línea, `footer` a todo el ancho y `caption` debajo | Solo la banda táctica, dentro de `.tactical-band` (`index.css`): columnas fijas medidas con *container query*, PG más ancha, sin placas huérfanas |
 | `StatPlaque` | Rótulo y valor en Georgia, centrado; `dense`. El rótulo puede ser un nodo (abreviatura visible, palabra completa para el lector) | Tiras cortas dentro de una tarjeta (CD, ataque de conjuro, CA/VEL/INIC de la tarjeta del dashboard) |
 | `ShieldBadge` | La CA dentro de un escudo, con `aria-label` | **Solo CA**, y solo donde la CA es el tema (Defensa) |
 | `Pill` | Cápsula de radio 20; `highlighted={false}` neutra | Clase, subclase, nivel |
 | `Pips` | Usos restantes, llenos en oro; `label` dice la cuenta | Recursos, espacios de conjuro |
 | `ThinBar` + `hpTone` | Barra fina (`role="meter"`, con `aria-label` y valor); `hpTone` da verde/oro/carmesí según el cociente de PG (`AppPalette.hpColor`) | PG |
+| `MarkdownText` | El Markdown de una mesa (títulos, viñetas, negrita, itálica), armado como elementos y nunca como HTML | Trasfondo y entradas del Diario |
 | `Medallion` | Aro del color de clase con la inicial sobre un degradado del acento hacia la placa (`color-mix`, sin colores inventados) | Tarjeta y panel |
 | `Seal` | El sello de la marca | Solo la marca |
 

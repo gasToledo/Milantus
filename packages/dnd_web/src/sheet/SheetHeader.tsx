@@ -41,14 +41,14 @@ export function SheetHeader({ model }: { model: SheetModel }) {
         </ul>
       </header>
 
-      <section aria-label={t.tacticalBand}>
-        <dl className="grid gap-2.5 [grid-template-columns:repeat(auto-fit,minmax(min(150px,100%),1fr))]">
+      <section aria-label={t.tacticalBand} className="tactical-band">
+        <dl>
           <StatTile id="ac" icon={Shield} label={t.armor} value={sheet.armorClass} />
           <StatTile
             id="hp"
             icon={Heart}
             label={t.hitPoints}
-            labelTrailing={t.hpPercent(Math.round(ratio * 100))}
+            caption={t.hpPercent(Math.round(ratio * 100))}
             value={currentHp}
             valueClassName={tone.text}
             suffix={`/ ${sheet.maxHp}`}

@@ -271,6 +271,30 @@ export interface Catalog {
   creatures: JsonObject[];
 }
 
+/** Una entrada de la mochila resuelta por el motor (`inventory` en
+ *  `js/entrypoint.dart`). */
+export interface InventoryLine {
+  entryId: string;
+  itemId: string;
+  name: string;
+  /** `null`: el id no está en el catálogo (homebrew que no se cargó). */
+  kind: 'weapon' | 'armor' | 'item' | null;
+  /** Categoría del objeto (`tool`, `pack`…) o `magic`; `null` en armas y
+   *  armaduras sin objeto mágico encima. */
+  family: string | null;
+  /** Libras por unidad. */
+  weight: number;
+  quantity: number;
+  equipped: boolean;
+  attuned: boolean;
+  requiresAttunement: boolean;
+  magic: boolean;
+  charges: number | null;
+  maxCharges: number | null;
+  note: string;
+  homebrew: boolean;
+}
+
 /** El JSON de `Character` (ver `Character.toJson` en el motor). */
 export type CharacterJson = JsonObject;
 
@@ -317,4 +341,23 @@ export interface CharacterFields {
     heroicInspiration?: boolean;
     concentratingOn?: string | null;
   };
+  /** Denominación (`cp`, `sp`, `ep`, `gp`, `pp`) → cantidad. */
+  coins?: Record<string, number>;
+  /** El trasfondo, en el Markdown chico que usa la mesa. */
+  background?: string;
+  diary?: DiaryEntry[];
+}
+
+/** Una entrada del Diario (`DiaryEntry.toJson`). */
+export interface DiaryEntry {
+  entryId: string;
+  /** Un tipo desconocido se lee como texto, como en el motor. */
+  kind: 'text' | 'image' | 'link' | string;
+  title: string;
+  /** La prosa de una entrada de texto, o la URL de una de enlace. */
+  body?: string;
+  /** Clave del almacén de retratos (`<personaje>/<archivo>`). */
+  imageKey?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
 }
