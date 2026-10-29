@@ -28,7 +28,9 @@ comportamiento tal como están **implementados hoy** en
 2. Las prohibiciones duras están en [Anti-patrones](#12-anti-patrones). Son
    restricciones de arquitectura, no preferencias estéticas: violarlas rompe
    pruebas o el build.
-3. El destino real es **Flutter/Dart**, no HTML/CSS. Si producís un mockup en
+3. El destino real es **Flutter/Dart**, no HTML/CSS. *(Durante la migración
+   a React hay un segundo destino, `packages/dnd_web`: ver la nota de
+   [Stack](#1-stack-tecnológico-del-frontend). Los tokens son los mismos.)* Si producís un mockup en
    HTML, marcá explícitamente que es un mockup y traducí los tokens a los
    nombres Dart de la tabla de [Color](#3-color).
 
@@ -44,7 +46,8 @@ proceso completo para un cambio visible es:
    existentes antes de crear otros.
 3. Mantener las reglas de D&D en `dnd_engine`. La UI recibe resultados de
    `ComputedSheet` y se limita a presentación y orquestación.
-4. Implementar la pantalla en Flutter contemplando tema oscuro y claro, estado
+4. Implementar la pantalla en Flutter (o, si ya se migró, en `dnd_web`; ver
+   [Migración a React](../arquitectura/migracion-react.md)) contemplando tema oscuro y claro, estado
    vacío, texto largo y los anchos definidos en Layout y responsividad.
 5. Agregar pruebas de regresión del comportamiento y de la interacción visible.
 6. Formatear, analizar, ejecutar las suites afectadas y generar
@@ -57,6 +60,16 @@ proceso completo para un cambio visible es:
 ---
 
 ## 1. Stack tecnológico del frontend
+
+> **Nota durante la migración a React.** Esta tabla describe el cliente de
+> Flutter (`packages/dnd_app`), que sigue siendo el que sirve `/`. Junto a él
+> existe `packages/dnd_web` (React + Vite + TypeScript + Tailwind, bajo `/v2`),
+> que **sí** usa CSS. Mientras convivan, esta guía sigue siendo la fuente de
+> verdad visual de los dos: los tokens del
+> [Apéndice B](#apéndice-b--equivalencia-en-css) son los que `dnd_web` carga
+> en `src/index.css`, y no se cambia ningún valor sin cambiarlo en ambos
+> clientes. Qué hay migrado y cómo conviven:
+> [Migración a React](../arquitectura/migracion-react.md).
 
 | Capa | Tecnología | Detalle |
 | --- | --- | --- |
@@ -891,9 +904,10 @@ exactamente con los del código Dart.
 
 ## Apéndice B — Equivalencia en CSS
 
-**Solo para mockups y prototipos fuera de la aplicación.** El cliente real no
-usa CSS: estos valores existen para que una maqueta HTML se vea como el
-producto.
+**Para mockups y prototipos, y para `packages/dnd_web`.** El cliente de
+Flutter no usa CSS: estos valores existen para que una maqueta HTML se vea como
+el producto. El cliente React (`/v2`) sí los usa, tal cual, como variables CSS
+en `src/index.css`.
 
 ```css
 :root {

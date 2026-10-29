@@ -10,6 +10,9 @@ trabajar en el repositorio. Los detalles viven acá, una sola vez.
   campañas, capítulos, combate y PNJ.
 - [MCP](arquitectura/mcp.md): el conector de Claude, su autorización con
   Zitadel y sus herramientas.
+- [Migración a React](arquitectura/migracion-react.md): el cliente
+  `packages/dnd_web` bajo `/v2`, el flag por cuenta (`webV2`), el orden de
+  pantallas, cómo se prueba y se vuelve atrás, y qué todavía no existe.
 - [dnd_engine](../packages/dnd_engine/README.md): motor de reglas, modelos y
   catálogo dirigido por datos.
 
