@@ -147,6 +147,15 @@ lo que se guarda en la cuenta. Esa separación es la regla de la pantalla: lo qu
 vive en el navegador se edita ahí; lo que vive en la cuenta se muestra hasta
 que React escriba.
 
+## Campañas (`src/campaigns/`)
+
+La lista reutiliza `CampaignBlock` (`src/sheet/CampaignTab.tsx`), el bloque de
+una mesa de la pestaña Campaña: recibe el catálogo y el nombre del personaje
+en lugar del `SheetModel` justamente para poder usarse fuera de una ficha.
+Cada bloque va debajo de un enlace «Con <personaje>». Una pantalla nueva con
+datos de campaña pasa por ahí y por `usePlayerCampaignsOf`, nunca por una
+consulta propia: la poda del jugador es del servidor.
+
 ## Reglas que más se olvidan
 
 - Ningún color, radio ni fuente sueltos: variables o utilidades.
