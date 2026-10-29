@@ -140,3 +140,39 @@ export async function fetchPlayerCampaigns(characterId: string, signal: AbortSig
   );
   return campaigns;
 }
+
+/** Una campaña que dirige la cuenta (`GET /api/campaigns`, el documento del
+ *  DM). Solo se tipa lo que el Modo DM de React lee: las escenas de música
+ *  viajan en el mismo documento y esta pantalla no las toca. */
+export interface DmCampaign {
+  id: string;
+  name: string;
+  premise?: string;
+  /** `CampaignState.name`: `active`, `paused` o `finished`. */
+  state?: string;
+}
+
+/** Las campañas del DM, tal como las guarda el servidor. Un fallo se lanza: sin
+ *  la lista no hay panel que mostrar. */
+export async function fetchDmCampaigns(signal: AbortSignal): Promise<DmCampaign[]> {
+  const { campaigns } = await getJson<{ campaigns: DmCampaign[] }>('/api/campaigns', signal);
+  return campaigns;
+}
+
+/** Un personaje vinculado a la campaña. `character` es la ficha **real** del
+ *  jugador en este momento, no una copia (`modo-dm.md`): el DM la lee y no la
+ *  escribe. */
+export interface CampaignMember {
+  memberId: string;
+  character: CharacterJson;
+}
+
+/** Los jugadores vinculados a la campaña [campaignId]. Una campaña ajena y una
+ *  inexistente responden igual (404). */
+export async function fetchCampaignMembers(campaignId: string, signal: AbortSignal): Promise<CampaignMember[]> {
+  const { members } = await getJson<{ members: CampaignMember[] }>(
+    `/api/campaigns/${encodeURIComponent(campaignId)}/members`,
+    signal,
+  );
+  return members;
+}

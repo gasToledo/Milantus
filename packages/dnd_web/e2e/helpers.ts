@@ -30,10 +30,10 @@ export const catalogo = (): Catalog => {
 
 export type PersonajeApi = JsonObject & { id: string; name: string; combat: { currentHp: number } };
 
-/** Lo que sirve la API a la cuenta de humo: lo esperado sale de acá y del
+/** Lo que sirve la API a la cuenta de [token] (por defecto la de humo): lo esperado sale de acá y del
  *  motor, no de una transcripción. */
-export async function api<T>(request: APIRequestContext, path: string): Promise<T> {
-  const res = await request.get(path, { headers: { cookie: `dnd_session=${TOKEN}` } });
+export async function api<T>(request: APIRequestContext, path: string, token: string = TOKEN): Promise<T> {
+  const res = await request.get(path, { headers: { cookie: `dnd_session=${token}` } });
   return (await res.json()) as T;
 }
 

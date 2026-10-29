@@ -55,10 +55,15 @@ const smokeFavoriteId = 'zelda-de-humo';
 /// El clérigo sembrado, con trucos y conjuros preparados.
 const smokeClericId = 'elsbeth-de-humo';
 
-/// La cuenta del DM de la mesa sembrada, y su campaña.
+/// La cuenta del DM de la mesa sembrada, y su campaña. Está en `v2Users`: el
+/// Modo DM de /v2 (`e2e/dm.spec.ts`) es de las cuentas con `webV2`.
 const _smokeDmId = 'dm-de-humo';
 const smokeDmToken = 'sesion-del-dm=';
 const _smokeCampaignId = 'marca-del-cuervo';
+
+/// La cuenta del segundo jugador de esa mesa. No tiene sesión: solo es dueña
+/// de una ficha vinculada.
+const _smokeSecondPlayerId = 'segundo-jugador-de-humo';
 
 /// Un arma homebrew de la cuenta, que Aldric lleva equipada: la ficha de /v2
 /// tiene que fusionar `/api/homebrew` con el catálogo oficial para que su
@@ -255,6 +260,30 @@ Future<void> main() async {
     campaignId: _smokeCampaignId,
     code: code!,
   );
+  // Un segundo jugador, de **otra cuenta**, con estados que salen en su
+  // tarjeta como pills: la Mesa del DM (`e2e/dm.spec.ts`) lista a los dos. Es
+  // otra cuenta a propósito: así la lista de campañas de la cuenta de humo
+  // (`e2e/campanas.spec.ts`) sigue teniendo una sola mesa.
+  await characters.create(
+    _smokeSecondPlayerId,
+    _smokeFighter(
+      id: 'sagan-de-humo',
+      name: 'Sagan de Humo',
+      hpPerLevel: const [10, 6, 6],
+      currentHp: 12,
+      conditions: const {'poisoned'},
+      exhaustion: 2,
+    ),
+  );
+  final fighterCode = await campaigns.createShareCode(
+    ownerUserId: _smokeSecondPlayerId,
+    characterId: 'sagan-de-humo',
+  );
+  await campaigns.redeemShareCode(
+    dmUserId: _smokeDmId,
+    campaignId: _smokeCampaignId,
+    code: fighterCode!,
+  );
   await chapters.create(
     _smokeDmId,
     _smokeCampaignId,
@@ -387,7 +416,8 @@ Future<void> main() async {
     levelUps: levelUps,
     settings: settings,
     webV2Handler: v2,
-    v2Users: {smokeUserId},
+    // El DM también: el Modo DM de /v2 es de las cuentas con `webV2`.
+    v2Users: {smokeUserId, _smokeDmId},
   );
 
   final server = await shelf_io.serve(
@@ -408,6 +438,8 @@ Character _smokeFighter({
   required List<int> hpPerLevel,
   required int currentHp,
   List<String> weapons = const ['longsword'],
+  Set<String> conditions = const {},
+  int exhaustion = 0,
 }) => Character(
   id: id,
   name: name,
@@ -436,5 +468,9 @@ Character _smokeFighter({
   equippedArmorId: 'chain-mail',
   shieldEquipped: true,
   equippedWeaponIds: weapons,
-  combat: CombatState(currentHp: currentHp),
+  combat: CombatState(
+    currentHp: currentHp,
+    conditions: {...conditions},
+    exhaustion: exhaustion,
+  ),
 );

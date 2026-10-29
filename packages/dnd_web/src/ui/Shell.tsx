@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
-import { ArrowLeft, Menu, Monitor, Moon, Sun, X, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Menu, Monitor, Moon, Sun, X, type LucideIcon } from 'lucide-react';
 import { useTexts } from '../i18n/context';
 import { Link, useRoute } from '../router';
 import { useTheme, type ThemeMode } from '../theme/theme';
@@ -177,7 +177,12 @@ export function NavItem({
       {count !== undefined && (
         <span className={cx('text-[12px] font-normal tabular-nums', active ? 'text-gold' : 'text-text-muted')}>{count}</span>
       )}
-      {external && <span className="sr-only">{` (${t.opensFlutter})`}</span>}
+      {external && (
+        <>
+          <ExternalLink size={13} aria-hidden="true" className="shrink-0 opacity-60" />
+          <span className="sr-only">{` (${t.opensFlutter})`}</span>
+        </>
+      )}
     </>
   );
   return internal ? (
@@ -218,23 +223,39 @@ export function SidebarBack({ href, label }: { href: string; label: string }) {
 }
 
 /**
- * «Jugador / DM». El Modo DM no existe en React, así que «DM» lleva de vuelta
- * a Flutter, donde sí; «Jugador» es el estado actual y no un botón.
+ * «Jugador / DM»: el modo actual es un `span` con `aria-current` y el otro un
+ * enlace. Los dos viven en `/v2`, así que navegan sin recargar; los hrefs los
+ * pone cada panel (el de Jugador no sabe nada del Modo DM más que adónde ir).
  */
-export function ModeSwitch({ dmHref }: { dmHref: string }) {
+export function ModeSwitch({ mode, playerHref, dmHref }: { mode: 'player' | 'dm'; playerHref: string; dmHref: string }) {
   const t = useTexts();
+  const current = 'rounded-[var(--radius-pill)] bg-gold-soft py-1.5 font-medium text-gold';
+  const other =
+    'rounded-[var(--radius-pill)] py-1.5 text-on-surface-variant hover:bg-surface hover:text-on-surface';
   return (
     <div
       role="group"
       aria-label={t.modeSwitchLabel}
       className="grid grid-cols-2 gap-1 rounded-[var(--radius-pill)] border border-hairline bg-plaque p-[3px] text-center text-[12px]"
     >
-      <span aria-current="true" className="rounded-[var(--radius-pill)] bg-gold-soft py-1.5 font-medium text-gold">
-        {t.modePlayer}
-      </span>
-      <a href={dmHref} className="rounded-[var(--radius-pill)] py-1.5 text-on-surface-variant hover:bg-surface hover:text-on-surface">
-        {t.modeDm}
-      </a>
+      {mode === 'player' ? (
+        <span aria-current="true" className={current}>
+          {t.modePlayer}
+        </span>
+      ) : (
+        <Link href={playerHref} className={other}>
+          {t.modePlayer}
+        </Link>
+      )}
+      {mode === 'dm' ? (
+        <span aria-current="true" className={current}>
+          {t.modeDm}
+        </span>
+      ) : (
+        <Link href={dmHref} className={other}>
+          {t.modeDm}
+        </Link>
+      )}
     </div>
   );
 }

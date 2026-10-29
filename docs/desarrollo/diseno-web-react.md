@@ -56,9 +56,10 @@ una regla: reciben el número ya resuelto por `computeSheet`.
 | Componente | Qué hace | Cuándo |
 | --- | --- | --- |
 | `Shell` | El marco: panel de 236 px fijo desde 900 px, barra con cajón debajo; el contenido ocupa todo el ancho (sin máximo). `panel` y `footer` son de cada pantalla | Toda pantalla. Sin `panel` ni `footer`, solo la marca (sin sesión, no disponible) |
-| `NavGroup`, `NavItem` | Grupo con nombre (`nav`) e ítem del panel: ícono, rótulo, activo en oro sobre `goldSoft` con `aria-current` | `internal` navega sin recargar; `external` avisa al lector que abre Flutter; `count` lleva la cifra tabular a la derecha (oro si está activo) y `muted` atenúa la categoría sin coincidencias en el Códice |
+| `NavGroup`, `NavItem` | Grupo con nombre (`nav`) e ítem del panel: ícono, rótulo, activo en oro sobre `goldSoft` con `aria-current` | `internal` navega sin recargar; `external` avisa al lector que abre Flutter y muestra el ícono de enlace externo; `count` lleva la cifra tabular a la derecha (oro si está activo) y `muted` atenúa la categoría sin coincidencias en el Códice |
 | `SidebarBack` | El «volver» de una pantalla de adentro, con la forma del interruptor de modo | Ficha |
-| `ModeSwitch` | «Jugador / DM» | Menú principal. «DM» lleva a Flutter |
+| `ModeSwitch` | «Jugador / DM»: el modo actual es un `span` con `aria-current` y el otro un enlace interno (`mode`, `playerHref`, `dmHref`) | Panel de cada modo |
+| `NavCollapsible` (`ui/disclosure.tsx`) | Grupo del panel que se pliega: el rótulo es el botón | Campañas terminadas del Modo DM |
 | `ThemeMenu`, `VersionLabel` | Selector de tema y versión, al pie del panel | Los dos pies |
 | `Card` | Tarjeta de sección (`sheetCard`): ícono dorado, título Georgia 16, `trailing`; `collapsible` la pliega | Toda sección de la ficha. `id` único por pantalla |
 | `SectionRule` | Filete con rombo dorado | Separar bloques dentro de una tarjeta |
@@ -71,7 +72,7 @@ una regla: reciben el número ya resuelto por `computeSheet`.
 | `StatTile` | Placa de la banda táctica, **centrada**: ícono + rótulo arriba, cifra en sans negrita tabular con su `suffix` en la misma línea, `footer` a todo el ancho y `caption` debajo | Solo la banda táctica, dentro de `.tactical-band` (`index.css`): columnas fijas medidas con *container query*, PG más ancha, sin placas huérfanas |
 | `StatPlaque` | Rótulo y valor en Georgia, centrado; `dense`. El rótulo puede ser un nodo (abreviatura visible, palabra completa para el lector) | Tiras cortas dentro de una tarjeta (CD, ataque de conjuro, CA/VEL/INIC de la tarjeta del dashboard) |
 | `ShieldBadge` | La CA dentro de un escudo, con `aria-label` | **Solo CA**, y solo donde la CA es el tema (Defensa) |
-| `Pill` | Cápsula de radio 20; `highlighted={false}` neutra | Clase, subclase, nivel |
+| `Pill` | Cápsula de radio 20; `highlighted={false}` neutra, `danger` carmesí | Clase, subclase, nivel; `danger` solo para un estado malo (envenenado) |
 | `Pips` | Usos restantes, llenos en oro; `label` dice la cuenta | Recursos, espacios de conjuro |
 | `ThinBar` + `hpTone` | Barra fina (`role="meter"`, con `aria-label` y valor); `hpTone` da verde/oro/carmesí según el cociente de PG (`AppPalette.hpColor`) | PG |
 | `MarkdownText` | El Markdown de una mesa (títulos, viñetas, negrita, itálica), armado como elementos y nunca como HTML | Trasfondo y entradas del Diario |
@@ -169,6 +170,22 @@ línea como lista de definición y las acciones agrupadas con acierto, daño y
 alcance en placas. Una criatura nueva en el catálogo no pide código: sale sola.
 Lo que el perfil necesita y no es un dato del catálogo se agrega a `bestiary()`
 del motor, nunca se calcula acá.
+
+## El Modo DM (`src/dm/`)
+
+Cada sección es una ruta bajo `/v2/dm/campanas/:id/` y comparte tres piezas:
+`DmPanel` (el panel: interruptor, herramientas, campañas, secciones),
+`DmHeader` (título Georgia 30, pill con el estado y la regla ornamental; el
+`h1` es el título) y `DmPage`, que resuelve la campaña por id y es la única que
+sabe distinguir «cargando», «error» y «no se encontró» (una campaña ajena y una
+inexistente son la misma pantalla). **Solo lectura**: ninguna sección tiene un
+control que escriba, y el e2e comprueba que no sale ningún pedido que no sea
+`GET`.
+
+- **Mesa** (`MesaView`, `MemberCard`): grilla `auto-fill` de tarjetas con
+  `toRosterEntry` (`dashboard/roster.ts`, la misma cuenta que el dashboard). La
+  CD sale de los bloques de lanzamiento del motor y, con varias clases
+  lanzadoras, se muestran todas.
 
 ## Reglas que más se olvidan
 

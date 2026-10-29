@@ -136,23 +136,30 @@ export function SectionRule({ className }: { className?: string }) {
 }
 
 /** Cápsula de radio 20 (`GoldPill`). `highlighted={false}` la vuelve neutra:
- *  el oro es información y no se gasta en lo que no la lleva. */
+ *  el oro es información y no se gasta en lo que no la lleva. `danger` es el
+ *  carmesí, solo para un estado que le pasa mal a alguien (envenenado). */
 export function Pill({
   children,
   highlighted = true,
+  danger = false,
   as: Tag = 'span',
   className,
 }: {
   children: ReactNode;
   highlighted?: boolean;
+  danger?: boolean;
   as?: 'span' | 'li';
   className?: string;
 }) {
   return (
     <Tag
       className={cx(
-        'inline-flex items-center gap-1 rounded-[var(--radius-pill)] border border-hairline px-[9px] py-[2px] text-[11px]',
-        highlighted ? 'bg-gold-soft text-gold' : 'bg-plaque text-on-surface-variant',
+        'inline-flex items-center gap-1 rounded-[var(--radius-pill)] border px-[9px] py-[2px] text-[11px]',
+        danger
+          ? 'border-crimson text-crimson'
+          : highlighted
+            ? 'border-hairline bg-gold-soft text-gold'
+            : 'border-hairline bg-plaque text-on-surface-variant',
         className,
       )}
     >

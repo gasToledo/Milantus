@@ -2,7 +2,8 @@
 // el criterio de `_visible` en `dashboard_screen.dart` de Flutter para que la
 // misma cuenta vea la misma lista en los dos clientes. Todos los números que
 // intervienen (nivel) salen del motor.
-import type { CharacterFields, ComputedSheet } from '../engine';
+import { accentOf, nameOf } from '../api/catalog';
+import { computeSheet, type Catalog, type CharacterFields, type CharacterJson, type ComputedSheet } from '../engine';
 import type { RosterSettings } from '../api/client';
 
 export type SortMode = 'manual' | 'dateAdded' | 'name' | 'level' | 'klass';
@@ -26,6 +27,35 @@ export interface RosterEntry {
   /** Una por clase, en el orden de la ficha. */
   classes: { name: string; level: number }[];
   accent: string | null;
+}
+
+/**
+ * La ficha de un personaje lista para una tarjeta: la calcula el motor, y una
+ * ficha que el motor no entiende (un esquema más nuevo) queda sin cifras en
+ * vez de tirar abajo la lista. La usan el dashboard y la Mesa del DM.
+ */
+export function toRosterEntry(raw: CharacterJson, createdAt: string, catalog: Catalog): RosterEntry {
+  // `raw` es un `Character.toJson` que el servidor ya validó al guardarlo;
+  // `CharacterFields` es el subconjunto que las tarjetas leen.
+  const character = raw as unknown as CharacterFields;
+  let sheet: ComputedSheet | null = null;
+  try {
+    // El motor de Dart compilado a JS: acá no se recalcula ninguna regla.
+    sheet = computeSheet(raw, catalog);
+  } catch {
+    // Un personaje que el motor no entiende no tira abajo a los demás.
+  }
+  // Las clases salen de la ficha calculada (en el orden en que se subió de
+  // nivel); sin ella, la única que el personaje declara.
+  const levels = sheet?.classLevels ?? { [character.classId]: 0 };
+  return {
+    character,
+    sheet,
+    createdAt,
+    raceName: nameOf(catalog.races, character.raceId) ?? character.raceId,
+    classes: Object.entries(levels).map(([id, level]) => ({ name: nameOf(catalog.classes, id) ?? id, level })),
+    accent: accentOf(catalog, character.classId),
+  };
 }
 
 /** Sin PG. No es un estado guardado aparte: es lo que dicen los PG, como en

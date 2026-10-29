@@ -13,6 +13,8 @@ import {
   ApiError,
   fetchAccount,
   fetchAppVersion,
+  fetchCampaignMembers,
+  fetchDmCampaigns,
   fetchPlayerCampaigns,
   fetchRoster,
   fetchRosterSettings,
@@ -47,6 +49,8 @@ export const queryKeys = {
   homebrew: ['homebrew'] as const,
   playerCampaigns: (characterId: string) => ['characters', characterId, 'campaigns'] as const,
   appVersion: ['app-version'] as const,
+  dmCampaigns: ['dm', 'campaigns'] as const,
+  campaignMembers: (campaignId: string) => ['dm', 'campaigns', campaignId, 'members'] as const,
 };
 
 /** `null` = sin sesión (un 401 no es un error, ver `fetchAccount`). */
@@ -104,6 +108,18 @@ export const usePlayerCampaignsOf = (characterIds: string[]) =>
       queryKey: queryKeys.playerCampaigns(id),
       queryFn: ({ signal }: { signal: AbortSignal }) => fetchPlayerCampaigns(id, signal),
     })),
+  });
+
+/** Las campañas que dirige la cuenta: el panel del Modo DM y su contenido. Solo
+ *  se piden dentro del Modo DM: el Modo Jugador no las necesita. */
+export const useDmCampaigns = () =>
+  useQuery({ queryKey: queryKeys.dmCampaigns, queryFn: ({ signal }) => fetchDmCampaigns(signal) });
+
+/** La Mesa: las fichas vinculadas a [campaignId], leídas en vivo del jugador. */
+export const useCampaignMembers = (campaignId: string) =>
+  useQuery({
+    queryKey: queryKeys.campaignMembers(campaignId),
+    queryFn: ({ signal }) => fetchCampaignMembers(campaignId, signal),
   });
 
 export const useHomebrew = () =>

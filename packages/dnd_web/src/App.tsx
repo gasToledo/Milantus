@@ -8,6 +8,7 @@ import { resolveLang, type Lang } from './i18n/texts';
 import { DashboardPage } from './dashboard/DashboardPage';
 import { RosterFooter, RosterPanel } from './dashboard/RosterPanel';
 import { useRoute } from './router';
+import { DmPage } from './dm/DmPage';
 import { CodexPage } from './codex/CodexPage';
 import { BestiaryPage } from './bestiary/BestiaryPage';
 import { CampaignsPage } from './campaigns/CampaignsPage';
@@ -105,6 +106,8 @@ function Enabled({ account }: { account: Account }) {
           <DashboardPage />
         </Shell>
       );
+    case 'dm':
+      return <DmPage view={route.view} account={account} />;
     case 'bestiary':
       return (
         <Shell panel={<RosterPanel />} footer={<RosterFooter account={account} />}>

@@ -109,15 +109,15 @@ repiten acá.
   manual, más recientes, nombre, nivel, clase) y el favorito de los ajustes de
   la cuenta (`/api/settings`), buscador en el cliente por nombre, especie y
   clase, y los caídos al final, como en Flutter. Orden y favorito **se
-  muestran, no se editan**; crear, Ajustes, Sugerencias, Cerrar sesión,
-  Homebrew y el «DM» del interruptor de modo enlazan a la raíz de Flutter
+  muestran, no se editan**; crear, Ajustes, Sugerencias, Cerrar sesión
+  y Homebrew enlazan a la raíz de Flutter
   (`FLUTTER_HOME`, `src/router.tsx`). Cada tarjeta enlaza a la ficha. Las cifras
   (nivel, PG máximos, CA, velocidad, iniciativa) salen de `computeSheet`; los
   PG actuales, de la ficha cruda. Sigue el lienzo aprobado: título, buscador,
   orden y «Crear» en una barra que se envuelve, regla ornamental y tarjetas
   con barra de PG en verde/oro/carmesí y CA/VEL/INIC en placas. El panel
   lateral es el menú principal (`src/dashboard/RosterPanel.tsx`), con el
-  interruptor «Jugador / DM»: «DM» lleva al Modo DM de Flutter.
+  interruptor «Jugador / DM»: «DM» lleva al Modo DM de `/v2` (ver abajo).
 - **La ficha de solo lectura**, con cinco pestañas que son rutas:
   `/v2/personajes/:id/personaje`, `/combate`, `/inventario`, `/campana` y
   `/diario` (`src/sheet/`); la ruta sin sufijo redirige a `personaje` y una
@@ -203,10 +203,30 @@ repiten acá.
   alcance de cada acción es cuerpo a cuerpo; el modificador de cada
   característica es `abilityModifier`. Es de solo lectura: **sumar al combate y
   «Editar una copia»** (Homebrew) son del Modo DM de Flutter y no están.
-- **Campañas y Bestiario no están en el menú**: se entra escribiendo la URL.
-  Pertenecen al Modo DM y React todavía no lo tiene (paso 6); cuando exista, el
-  panel DM los enlaza. Hasta entonces el interruptor «DM» sigue llevando a
-  Flutter.
+- **Campañas y Bestiario del jugador no están en el menú**: se entra escribiendo
+  la URL. Pertenecen al Modo DM, que ahora existe en parte (abajo); el panel DM
+  enlazará el Bestiario cuando se porte esa sección.
+- **El Modo DM, de solo lectura** en `/v2/dm` (`src/dm/`), al que lleva «DM» del
+  interruptor. **Ninguna escritura**: ni crear o editar campañas, ni cerrar
+  capítulos, ni música, ni notas; todo eso sigue en Flutter. Se porta por
+  secciones, una por PR; hoy existe la **Mesa**. Rutas: `/v2/dm` (redirige a la
+  primera campaña en curso, o a la primera que haya) y
+  `/v2/dm/campanas/:id/mesa`. El panel (`DmPanel`) sigue al de Flutter: el
+  interruptor con «DM» activo, las herramientas (Bestiario, Biblioteca de PNJ y
+  Homebrew, que enlazan a Flutter con el ícono de enlace externo), las campañas
+  agrupadas En curso / En pausa / Terminadas (plegable, abierta si la elegida
+  es una de ellas) y, de la campaña elegida, sus secciones; PNJ y Combate enlazan
+  a Flutter porque todavía no se portan. La **Mesa** lista a los jugadores
+  vinculados (`GET /api/campaigns/:id/members`, que lee la ficha **real** del
+  jugador, no una copia): retrato inicial, nombre, especie y clase, nivel, barra
+  de PG, placas CA / Inic / CD / Pasiva y los estados como pills carmesí. Las
+  cifras salen de `computeSheet` con el catálogo del DM (SRD más **su** homebrew,
+  como Flutter) y nunca se recalculan. **No muestra el nombre del jugador** que
+  trae el diseño: la API de miembros no lo devuelve, y sumarlo abriría otra
+  puerta entre cuentas (`modo-dm.md`). Las tarjetas no son enlaces: la ficha
+  completa de un miembro sigue en Flutter. La campaña es una ruta, y una ajena
+  o inexistente muestra la misma pantalla «No se encontró la campaña»: el
+  servidor las responde igual (404).
 - **Homebrew**: la ficha y el dashboard calculan con el catálogo oficial más
   el contenido homebrew de la cuenta (`GET /api/homebrew`, fusionado por id en
   `src/api/homebrew.ts`), como `HomebrewStore` + `ContentRepository.addAll` en
@@ -274,7 +294,12 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    sembrada (con la iniciativa derivada por el motor, no la de la
    característica), abra un perfil con sus modificadores, salvaciones y
    conjuros, filtre y ordene, y que el homebrew no llegue a otra cuenta
-   (`e2e/bestiario.spec.ts`); y que una cuenta sin `webV2` vea
+   (`e2e/bestiario.spec.ts`); que la Mesa del DM
+   liste a los dos jugadores sembrados (de dos cuentas distintas) con los números
+   del motor y los estados de la ficha, sin escribir nada, que leerla no cambie la
+   ficha del jugador, y que otra cuenta —con o sin `webV2`— reciba el mismo 404
+   que ante una campaña inexistente, en la API y en la pantalla
+   (`e2e/dm.spec.ts`); y que una cuenta sin `webV2` vea
    «No disponible» sin pedir sus datos (`e2e/acceso.spec.ts`). Lo esperado se
    calcula con el mismo motor y la misma fusión (`e2e/helpers.ts`). Sin
    reintentos: no hay «a veces anda».
@@ -318,6 +343,8 @@ Para que nadie lo dé por hecho:
 
 - Reordenar, marcar favorito, crear, renombrar o borrar personajes desde React.
 - Cualquier escritura desde React: todo el cliente hoy es solo lectura.
+- Del Modo DM: Capítulos, Cuaderno, el Bestiario del DM, PNJ, Combate, Homebrew,
+  la música y la ficha completa de un miembro (en curso, por secciones).
 - Enlaces desde Flutter hacia `/v2` o redirección automática por `webV2`.
 - Tests de componentes y chequeo de literales sueltos en `dnd_web`.
 - Un criterio medido de «paridad visual» con Flutter: hoy es la comparación

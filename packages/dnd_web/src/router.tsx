@@ -38,8 +38,19 @@ export const CODEX_CATEGORIES = {
 } as const;
 export type CodexCategory = keyof typeof CODEX_CATEGORIES;
 
+/** Las secciones de una campaña en el Modo DM. PNJ y Combate no están: siguen
+ *  en Flutter (`FLUTTER_HOME`). Mismo criterio de segmentos que las pestañas
+ *  de la ficha: en español y sin tildes. */
+export const DM_SECTIONS = ['mesa'] as const;
+export type DmSection = (typeof DM_SECTIONS)[number];
+
+/** Qué muestra el Modo DM. `home` es `/v2/dm` a secas: no muestra nada, redirige
+ *  a la primera campaña en curso (o a donde haya algo que ver). */
+export type DmView = { kind: 'home' } | { kind: 'campaign'; id: string; section: DmSection };
+
 export type Route =
   | { name: 'roster' }
+  | { name: 'dm'; view: DmView }
   | { name: 'settings' }
   | { name: 'campaigns' }
   // Sin criatura es la lista con nada abierto.
@@ -65,6 +76,19 @@ export function matchRoute(pathname: string): Route {
   const parts = pathname.slice(base.length).split('/').filter(Boolean);
   const [section, id, tab, ...rest] = parts;
   if (parts.length === 0) return { name: 'roster' };
+  if (section === 'dm') {
+    // `/dm` y `/dm/campanas/:id/:seccion`; lo demás es «no encontrada».
+    if (id === undefined) return { name: 'dm', view: { kind: 'home' } };
+    const dmSection = rest.length === 1 ? DM_SECTIONS.find((s) => s === rest[0]) : undefined;
+    if (id === 'campanas' && tab !== undefined && dmSection !== undefined) {
+      try {
+        return { name: 'dm', view: { kind: 'campaign', id: decodeURIComponent(tab), section: dmSection } };
+      } catch {
+        return { name: 'unknown' };
+      }
+    }
+    return { name: 'unknown' };
+  }
   if (section === 'ajustes' && id === undefined) return { name: 'settings' };
   if (section === 'campanas' && id === undefined) return { name: 'campaigns' };
   if (section === 'bestiario' && tab === undefined) {
@@ -103,6 +127,12 @@ export const bestiaryHref = (entryId?: string): string =>
   `${import.meta.env.BASE_URL}bestiario` + (entryId ? `/${encodeURIComponent(entryId)}` : '');
 
 export const campaignsHref = (): string => `${import.meta.env.BASE_URL}campanas`;
+
+/** El Modo DM: sin campaña es `/v2/dm`, que redirige a la primera. */
+export const dmHref = (): string => `${import.meta.env.BASE_URL}dm`;
+
+export const dmCampaignHref = (id: string, section: DmSection = 'mesa'): string =>
+  `${import.meta.env.BASE_URL}dm/campanas/${encodeURIComponent(id)}/${section}`;
 
 export const settingsHref = (): string => `${import.meta.env.BASE_URL}ajustes`;
 
