@@ -117,6 +117,61 @@ test('Capítulos muestra estado, objetivo y recompensas de cada capítulo, y sol
   }
 });
 
+test('el Cuaderno junta notas, combates y subidas de nivel por capítulo, y nada de eso llega al jugador', async ({
+  context,
+  page,
+  baseURL,
+}) => {
+  await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);
+  const escrituras = vigilarEscrituras(page);
+
+  await page.goto(MESA);
+  await page.getByRole('navigation', { name: 'Secciones de la campaña' }).getByRole('link', { name: 'Cuaderno' }).click();
+  await expect(page).toHaveURL(`/v2/dm/campanas/${CAMPANA}/cuaderno`);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Cuaderno');
+
+  // Se abre en el capítulo en marcha: su nota y la subida de nivel que anotó
+  // el servidor, con la clase que da el catálogo.
+  const pill = (n: string) => page.getByRole('group', { name: 'Capítulo' }).getByRole('button', { name: n });
+  await expect(pill('El Valle Hueco')).toHaveAttribute('aria-pressed', 'true');
+  const nota = page.locator('[data-entry="note"]');
+  await expect(nota).toContainText('Nota privada');
+  await expect(nota).toContainText('Nota reservada del DM: el herrero traiciona al grupo.');
+  const subida = page.locator('[data-entry="levelUp"]');
+  await expect(subida).toContainText('Elsbeth de Humo subió a nivel 3');
+  await expect(subida).toContainText('Clérigo 3');
+  await expect(page.locator('[data-field="counts"]')).toHaveText('1 nota1 subida de nivel');
+
+  // El combate cerrado de otro capítulo, con quiénes pelearon y cuánto duró.
+  await pill('El paso de Varn').click();
+  const combate = page.locator('[data-entry="fight"]');
+  await expect(combate).toContainText('Combate contra Lobo');
+  await expect(combate).toContainText('Elsbeth de Humo, Thalion contra Lobo ×3. Cayeron todos los enemigos.');
+  await expect(combate).toContainText('4 rondas');
+
+  // Lo que no cuelga de ningún capítulo, con el PNJ aliado por su nombre propio:
+  // eso es solo del DM.
+  await pill('Sin capítulo').click();
+  await expect(page.locator('[data-entry="fight"]')).toContainText('Aliados: Garrick el Tabernero.');
+
+  // Buscar suma las coincidencias por capítulo y apaga las pills vacías.
+  await page.getByRole('searchbox', { name: 'Buscar en el cuaderno' }).fill('lobo');
+  await expect(pill('El paso de Varn')).toContainText('1');
+  await expect(pill('El Valle Hueco')).toContainText('0');
+  await pill('El paso de Varn').click();
+  await expect(page.locator('[data-entry]')).toHaveCount(1);
+  await page.getByRole('searchbox', { name: 'Buscar en el cuaderno' }).fill('zzz');
+  await expect(page.getByText('Nada en este capítulo coincide con la búsqueda.')).toBeVisible();
+  expect(escrituras).toEqual([]);
+
+  // El jugador vinculado no recibe ni las notas, ni los nombres propios de los
+  // PNJ, ni las subidas de nivel anotadas para el DM.
+  const crudo = JSON.stringify(await api<unknown>(page.request, '/api/characters/elsbeth-de-humo/campaigns', TOKEN));
+  for (const secreto of ['Nota reservada del DM', 'Garrick el Tabernero', 'subió a nivel', 'levelUps', 'encounterLogs']) {
+    expect(crudo, `la API del jugador manda «${secreto}»`).not.toContain(secreto);
+  }
+});
+
 test('el DM no escribe la ficha del jugador: leerla no la cambia', async ({ request }) => {
   const leer = async () =>
     JSON.stringify((await api<{ characters: unknown[] }>(request, '/api/characters', TOKEN)).characters);

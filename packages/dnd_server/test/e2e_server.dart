@@ -335,6 +335,28 @@ Future<void> main() async {
       'chapterId': 'paso-de-varn',
     },
   ));
+  // Un combate que no cuelga de ningún capítulo, con un PNJ aliado de nombre
+  // propio: el Cuaderno del DM lo nombra, la vista del jugador no
+  // (`e2e/dm.spec.ts`).
+  encounters.logs.add((
+    dmUserId: _smokeDmId,
+    campaignId: _smokeCampaignId,
+    document: const EncounterLog(
+      id: 'emboscada',
+      rounds: 2,
+      players: ['Elsbeth de Humo'],
+      monsters: [
+        EncounterLogMonsters(name: 'Bandido', count: 2, defeated: 1),
+        EncounterLogMonsters(
+          name: 'Garrick el Tabernero',
+          side: CombatantSide.ally,
+          npc: true,
+          publicName: 'Bandido',
+          creatureId: 'bandit',
+        ),
+      ],
+    ).toJson(),
+  ));
   final events = InMemoryEventRepository();
   final npcs = InMemoryNpcRepository(campaigns, characters);
   final homebrew = InMemoryHomebrewRepository();
@@ -392,6 +414,17 @@ Future<void> main() async {
     ).toJson(),
   );
   final levelUps = InMemoryLevelUpRepository(campaigns);
+  // Lo que el servidor anota cuando el jugador sube de nivel con el capítulo
+  // en marcha.
+  await levelUps.append(
+    _smokeDmId,
+    _smokeCampaignId,
+    chapterId: 'capitulo-en-marcha',
+    characterName: 'Elsbeth de Humo',
+    level: 3,
+    classId: 'cleric',
+    classLevel: 3,
+  );
 
   final handler = buildHandler(
     auth: auth.dependencies,

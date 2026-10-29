@@ -15,6 +15,7 @@ import {
   fetchAppVersion,
   fetchCampaignChapters,
   fetchCampaignMembers,
+  fetchCampaignNotebook,
   fetchDmCampaigns,
   fetchPlayerCampaigns,
   fetchRoster,
@@ -52,6 +53,7 @@ export const queryKeys = {
   appVersion: ['app-version'] as const,
   dmCampaigns: ['dm', 'campaigns'] as const,
   campaignMembers: (campaignId: string) => ['dm', 'campaigns', campaignId, 'members'] as const,
+  campaignNotebook: (campaignId: string) => ['dm', 'campaigns', campaignId, 'notebook'] as const,
   campaignChapters: (campaignId: string) => ['dm', 'campaigns', campaignId, 'chapters'] as const,
 };
 
@@ -129,6 +131,13 @@ export const useCampaignChapters = (campaignId: string) =>
   useQuery({
     queryKey: queryKeys.campaignChapters(campaignId),
     queryFn: ({ signal }) => fetchCampaignChapters(campaignId, signal),
+  });
+
+/** El Cuaderno del DM: notas, combates cerrados y subidas de nivel. */
+export const useCampaignNotebook = (campaignId: string) =>
+  useQuery({
+    queryKey: queryKeys.campaignNotebook(campaignId),
+    queryFn: ({ signal }) => fetchCampaignNotebook(campaignId, signal),
   });
 
 export const useHomebrew = () =>

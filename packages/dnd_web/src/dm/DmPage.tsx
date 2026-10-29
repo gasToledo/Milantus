@@ -13,6 +13,7 @@ import { DmHeader } from './DmHeader';
 import { DmPanel } from './DmPanel';
 import { ChaptersView } from './ChaptersView';
 import { MesaView } from './MesaView';
+import { NotebookView } from './NotebookView';
 
 /**
  * El Modo DM de solo lectura (`/v2/dm/...`). Lo que el DM escribe (crear y
@@ -76,7 +77,7 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
   } else if (!current) {
     body = <Notice title={t.dmCampaignNotFound} body={t.dmCampaignNotFoundBody} />;
   } else {
-    const Section = current.section === 'mesa' ? MesaView : ChaptersView;
+    const Section = { mesa: MesaView, capitulos: ChaptersView, cuaderno: NotebookView }[current.section];
     body = <Section key={current.campaign.id} campaign={current.campaign} />;
   }
 
