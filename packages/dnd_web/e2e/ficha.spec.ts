@@ -2,12 +2,13 @@ import { expect, test } from '@playwright/test';
 import { mergeHomebrew, type HomebrewContent } from '../src/api/homebrew';
 import { computeSheet, type AbilityId } from '../src/engine';
 import { signed } from '../src/sheet/format';
-import { api, catalogo, personajes, TOKEN } from './helpers';
+import { api, catalogo, personajes, TOKEN, type PersonajeApi } from './helpers';
 
 // Mismos valores que `test/e2e_server.dart` en dnd_server.
 const BRUNILDA = 'guerrero-de-humo';
 const ALDRIC = 'aldric-de-humo';
 const HACHA = 'hacha-de-humo';
+const ELSBETH = 'elsbeth-de-humo';
 
 // Español fijo: sin esto el idioma sería el del navegador de CI (en-US).
 test.use({ locale: 'es-AR' });
@@ -96,4 +97,32 @@ test('el ataque de un arma homebrew aparece, con el bonificador del motor sobre 
   const fila = page.locator(`[data-attack="${HACHA}"]`);
   await expect(fila).toContainText('Hacha de Humo');
   await expect(fila.locator('[data-field="attack-bonus"] [aria-hidden="true"]')).toHaveText(signed(ataque!.attackBonus));
+});
+
+test('la ficha de un lanzador lista sus trucos y conjuros, con la CD del motor', async ({ page, request }) => {
+  const personaje = (await personajes(request)).find((c) => c.id === ELSBETH)! as PersonajeApi & {
+    cantripIds: string[];
+    spellIds: string[];
+  };
+  const catalog = catalogo();
+  const ficha = computeSheet(personaje, catalog);
+  const nombre = (id: string) => catalog.spells.find((s) => s.id === id)!.name as string;
+
+  await page.goto(`/v2/personajes/${ELSBETH}/combate`);
+  await expect(page.locator('[data-stat="spell-dc"] [data-field="value"]')).toHaveText(
+    String(ficha.spellcasting!.saveDc),
+  );
+  // Lo elegido aparece, cada uno en su grupo: era lo que faltaba (la tarjeta
+  // mostraba CD, espacios y reacciones, pero no los conjuros).
+  const grupo = (id: string) => page.locator(`[data-spell-group="${id}"]`);
+  for (const id of personaje.cantripIds) await expect(grupo('cantrips')).toContainText(nombre(id));
+  // Lo que el motor da por siempre preparado (el dominio del clérigo) va en su
+  // grupo y no se repite entre los elegidos.
+  const siempre = new Set(ficha.alwaysPreparedSpellIds);
+  expect(siempre.size).toBeGreaterThan(0);
+  for (const id of siempre) await expect(grupo('always')).toContainText(nombre(id));
+  for (const id of personaje.spellIds) {
+    if (siempre.has(id)) await expect(grupo('chosen')).not.toContainText(nombre(id));
+    else await expect(grupo('chosen')).toContainText(nombre(id));
+  }
 });

@@ -1,5 +1,6 @@
 import { IdCard, Landmark, ScrollText, Shield, Sparkles } from 'lucide-react';
 import { nameOf } from '../api/catalog';
+import { vocabularyLabel } from '../engine';
 import { useTexts } from '../i18n/context';
 import { labelOf } from '../i18n/texts';
 import { Card } from '../ui/Card';
@@ -28,8 +29,10 @@ export function CharacterTab({ model }: { model: SheetModel }) {
   const creatureType = typeof race?.creatureType === 'string' ? race.creatureType : null;
   const identity = [
     { label: t.alignmentLabel, value: character.alignment ? labelOf(t.alignments, character.alignment) : null },
-    { label: t.creatureTypeLabel, value: creatureType ? labelOf(t.creatureTypes, creatureType) : null },
-    { label: t.sizeLabel, value: labelOf(t.sizes, sheet.size) },
+    // Tipo y tamaño son vocabulario del catálogo en español: los traduce el
+    // motor, igual que en Flutter.
+    { label: t.creatureTypeLabel, value: creatureType ? vocabularyLabel('creatureType', creatureType) : null },
+    { label: t.sizeLabel, value: vocabularyLabel('size', sheet.size) },
     { label: t.backgroundLabel, value: nameOf(catalog.backgrounds, character.backgroundId) },
     { label: t.personalityLabel, value: character.personalityTrait?.trim() || null },
   ].filter((row): row is { label: string; value: string } => Boolean(row.value));
