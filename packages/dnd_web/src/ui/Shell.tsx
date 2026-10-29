@@ -148,12 +148,19 @@ export function NavItem({
   active = false,
   internal = false,
   external = false,
+  count,
+  muted = false,
 }: {
   href: string;
   icon: LucideIcon;
   label: string;
   active?: boolean;
   internal?: boolean;
+  /** Una cifra al final de la fila, en cifras tabulares: los ítems se apilan
+   *  y la columna de números se lee como columna. */
+  count?: number;
+  /** Atenuado: una categoría sin coincidencias mientras se busca. */
+  muted?: boolean;
   /** Lleva a Flutter: se marca para que no sorprenda el cambio de cliente. */
   external?: boolean;
 }) {
@@ -161,11 +168,15 @@ export function NavItem({
   const className = cx(
     'flex min-h-9 items-center gap-2.5 rounded-[var(--radius-nav)] px-3 py-2 text-[14px]',
     active ? 'bg-gold-soft font-semibold text-gold' : 'text-on-surface-variant hover:bg-plaque hover:text-on-surface',
+    muted && !active && 'opacity-60',
   );
   const body = (
     <>
       <Icon size={17} aria-hidden="true" className="shrink-0" />
       <span className="min-w-0 flex-1 truncate">{label}</span>
+      {count !== undefined && (
+        <span className={cx('text-[12px] font-normal tabular-nums', active ? 'text-gold' : 'text-text-muted')}>{count}</span>
+      )}
       {external && <span className="sr-only">{` (${t.opensFlutter})`}</span>}
     </>
   );

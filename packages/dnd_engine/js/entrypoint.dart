@@ -166,6 +166,49 @@ String chapterGrants(String chapterJson) => Chapter.fromJson(
       jsonDecode(chapterJson) as Map<String, dynamic>,
     ).grantsLabel;
 
+/// El nombre visible de un id de vocabulario del catálogo, en el idioma
+/// activo: rareza, categoría de dote o de objeto, competencias, propiedades y
+/// maestrías de arma, tipos de daño, habilidades, características (su
+/// abreviatura) e idiomas. Son las tablas y `labelFor` del motor, las mismas
+/// que lee Flutter; un tipo o id desconocido vuelve tal cual. Con
+/// `weaponPropertyRule` devuelve la explicación de la propiedad.
+String catalogLabel(String kind, String id) => switch (kind) {
+      'rarity' => itemRarityLabels[id] ?? id,
+      'featCategory' => featCategoryLabels[id] ?? id,
+      'itemCategory' => itemCategoryLabels[id] ?? id,
+      'armorTraining' => armorTrainingLabel(id),
+      'weaponProficiency' => weaponProficiencyLabel(id),
+      'tool' => toolProficiencyLabel(id),
+      'weaponProperty' => weaponProperties[id]?.name ?? id,
+      'weaponPropertyRule' => weaponProperties[id]?.description ?? '',
+      'mastery' => weaponMasteryName(id),
+      'damageType' => DamageType.labelFor(id),
+      'skill' => Skill.labelFor(id),
+      'ability' =>
+        Ability.values.where((a) => a.name == id).firstOrNull?.abbr ?? id,
+      'language' => Language.labelFor(id),
+      _ => id,
+    };
+
+/// El orden de las claves de una tabla de rótulos (`rarity`, `featCategory`,
+/// `itemCategory`), como lista JSON: de la rareza más común a la más rara, por
+/// ejemplo. Es el que usan los filtros del Códice en Flutter.
+String catalogLabelOrder(String kind) => jsonEncode(switch (kind) {
+      'rarity' => itemRarityLabels.keys.toList(),
+      'featCategory' => featCategoryLabels.keys.toList(),
+      'itemCategory' => itemCategoryLabels.keys.toList(),
+      _ => const <String>[],
+    });
+
+/// Un precio de tabla guardado en cobre (`formatCost`): la cuenta de qué
+/// denominación lo expresa sin fracción es del motor; las abreviaturas las pone
+/// el cliente ([labelsJson]: `{"cp": "pc", …}`), porque en inglés «pp» es
+/// platino y no plata.
+String formatCostFor(int cp, String labelsJson) => formatCost(
+      cp,
+      labels: (jsonDecode(labelsJson) as Map).cast<String, String>(),
+    );
+
 void main() {
   final motor = JSObject();
   motor['compute'] = compute.toJS;
@@ -175,5 +218,8 @@ void main() {
   motor['vocabularyLabel'] = vocabularyLabelFor.toJS;
   motor['inventory'] = inventory.toJS;
   motor['chapterGrants'] = chapterGrants.toJS;
+  motor['catalogLabel'] = catalogLabel.toJS;
+  motor['catalogLabelOrder'] = catalogLabelOrder.toJS;
+  motor['formatCost'] = formatCostFor.toJS;
   globalContext['dndEngine'] = motor;
 }

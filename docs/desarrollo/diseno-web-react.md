@@ -56,7 +56,7 @@ una regla: reciben el número ya resuelto por `computeSheet`.
 | Componente | Qué hace | Cuándo |
 | --- | --- | --- |
 | `Shell` | El marco: panel de 236 px fijo desde 900 px, barra con cajón debajo; el contenido ocupa todo el ancho (sin máximo). `panel` y `footer` son de cada pantalla | Toda pantalla. Sin `panel` ni `footer`, solo la marca (sin sesión, no disponible) |
-| `NavGroup`, `NavItem` | Grupo con nombre (`nav`) e ítem del panel: ícono, rótulo, activo en oro sobre `goldSoft` con `aria-current` | `internal` navega sin recargar; `external` avisa al lector que abre Flutter |
+| `NavGroup`, `NavItem` | Grupo con nombre (`nav`) e ítem del panel: ícono, rótulo, activo en oro sobre `goldSoft` con `aria-current` | `internal` navega sin recargar; `external` avisa al lector que abre Flutter; `count` lleva la cifra tabular a la derecha (oro si está activo) y `muted` atenúa la categoría sin coincidencias en el Códice |
 | `SidebarBack` | El «volver» de una pantalla de adentro, con la forma del interruptor de modo | Ficha |
 | `ModeSwitch` | «Jugador / DM» | Menú principal. «DM» lleva a Flutter |
 | `ThemeMenu`, `VersionLabel` | Selector de tema y versión, al pie del panel | Los dos pies |
@@ -118,6 +118,18 @@ La pantalla de referencia de cómo se arma una vista con la biblioteca:
 - Rótulos que necesitan vocabulario del motor (la característica de cada
   habilidad, si un conjuro es una reacción) salen de `vocabulary.ts`, que
   copia el enum del motor y lo dice; ningún número sale de ahí.
+
+## El Códice (`src/codex/`)
+
+- `entries.ts` traduce cada categoría del catálogo a `CodexEntry` (nombre,
+  subtítulo, procedencia, faceta) con el detalle armado a pedido: la lista de
+  392 conjuros no arma 392 fichas.
+- Lista y detalle van en `.codex-split` (`index.css`), medido con *container
+  query* y no con el viewport, porque el panel le come ancho: desde 760 px son
+  dos columnas con la lista pegajosa y su propio scroll; debajo se ve una sola
+  y el detalle trae «volver a la lista».
+- La búsqueda ignora tildes y mayúsculas (`fold`), igual en el panel y en la
+  categoría.
 
 ## Reglas que más se olvidan
 

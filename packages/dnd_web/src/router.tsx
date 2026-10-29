@@ -19,8 +19,27 @@ import {
 export const SHEET_TABS = ['personaje', 'combate', 'inventario', 'campana', 'diario'] as const;
 export type SheetTab = (typeof SHEET_TABS)[number];
 
+/** Las categorías del Códice, con el segmento de su URL (en español y sin
+ *  tildes, como las pestañas de la ficha). */
+export const CODEX_CATEGORIES = {
+  races: 'especies',
+  lineages: 'linajes',
+  classes: 'clases',
+  subclasses: 'subclases',
+  backgrounds: 'trasfondos',
+  feats: 'dotes',
+  spells: 'conjuros',
+  magicItems: 'objetos-magicos',
+  weapons: 'armas',
+  armor: 'armaduras',
+  gear: 'equipo',
+} as const;
+export type CodexCategory = keyof typeof CODEX_CATEGORIES;
+
 export type Route =
   | { name: 'roster' }
+  // Sin categoría es la portada; sin entrada, la lista sin nada abierto.
+  | { name: 'codex'; category: CodexCategory | null; entryId: string | null }
   // `tab: null` es la ruta sin sufijo, que redirige a la primera pestaña.
   | { name: 'character'; id: string; tab: SheetTab | null }
   | { name: 'unknown' };
@@ -40,6 +59,16 @@ export function matchRoute(pathname: string): Route {
   const parts = pathname.slice(base.length).split('/').filter(Boolean);
   const [section, id, tab, ...rest] = parts;
   if (parts.length === 0) return { name: 'roster' };
+  if (section === 'codice' && rest.length === 0) {
+    if (id === undefined) return { name: 'codex', category: null, entryId: null };
+    const category = (Object.keys(CODEX_CATEGORIES) as CodexCategory[]).find((c) => CODEX_CATEGORIES[c] === id);
+    if (!category) return { name: 'unknown' };
+    try {
+      return { name: 'codex', category, entryId: tab === undefined ? null : decodeURIComponent(tab) };
+    } catch {
+      return { name: 'unknown' };
+    }
+  }
   if (section === 'personajes' && id && rest.length === 0) {
     const sheetTab = tab === undefined ? null : SHEET_TABS.find((t) => t === tab);
     if (sheetTab === undefined) return { name: 'unknown' };
@@ -53,6 +82,12 @@ export function matchRoute(pathname: string): Route {
 }
 
 export const rosterHref = (): string => import.meta.env.BASE_URL;
+
+/** La portada del Códice, una categoría o una entrada abierta. */
+export const codexHref = (category?: CodexCategory, entryId?: string): string =>
+  `${import.meta.env.BASE_URL}codice` +
+  (category ? `/${CODEX_CATEGORIES[category]}` : '') +
+  (category && entryId ? `/${encodeURIComponent(entryId)}` : '');
 
 export const characterHref = (id: string, tab: SheetTab = 'personaje'): string =>
   `${import.meta.env.BASE_URL}personajes/${encodeURIComponent(id)}/${tab}`;
