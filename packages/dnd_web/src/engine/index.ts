@@ -1,4 +1,4 @@
-import type { Catalog, CharacterJson, ComputedSheet, InventoryLine, JsonObject } from './types';
+import type { BestiaryRow, Catalog, CharacterJson, ComputedSheet, InventoryLine, JsonObject } from './types';
 // Lo genera `npm run build:engine` (o la etapa `engine-js` del Dockerfile) y
 // no se versiona. Es un script de dart2js, no un módulo: al cargarse deja
 // `globalThis.dndEngine`, y de ahí lo toma este archivo.
@@ -18,6 +18,7 @@ interface DartEngine {
   catalogLabelOrder(kind: string): string;
   formatCost(cp: number, labelsJson: string): string;
   abilityModifier(score: number): number;
+  bestiary(catalogJson: string): string;
 }
 
 function engine(): DartEngine {
@@ -140,4 +141,10 @@ export function formatCost(cp: number, labels: Record<string, string>): string {
 /** El modificador de una puntuación de característica (`abilityModifier`). */
 export function abilityModifier(score: number): number {
   return engine().abilityModifier(score);
+}
+
+/** Las criaturas del catálogo listas para el Bestiario, en orden alfabético y
+ *  sin las invocaciones por fórmula (`bestiary` del motor). */
+export function bestiary(catalog: Catalog): BestiaryRow[] {
+  return JSON.parse(engine().bestiary(catalogJson(catalog))) as BestiaryRow[];
 }

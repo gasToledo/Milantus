@@ -361,3 +361,23 @@ export interface DiaryEntry {
   createdAt?: string | null;
   updatedAt?: string | null;
 }
+
+/** Una criatura del Bestiario tal como la deriva el motor (`bestiary` en
+ *  `js/entrypoint.dart`): lo que no se puede leer del catálogo sin repetir una
+ *  regla. El resto del perfil se lee del catálogo, por `id`. */
+export interface BestiaryRow {
+  id: string;
+  /** La línea de tipo, tamaño y alineamiento, en el idioma activo. */
+  kind: string;
+  /** Id del tipo (`beast`), o `null` si no se deduce. */
+  type: string | null;
+  typeLabel: string | null;
+  /** El desafío como número (para ordenar y filtrar) y como se imprime. */
+  cr: number | null;
+  crText: string | null;
+  /** Modificador de iniciativa, con la competencia del perfil si la trae. */
+  initiative: number;
+  passivePerception: number | null;
+  /** Por cada acción, en orden: si su alcance es cuerpo a cuerpo. */
+  meleeReach: boolean[];
+}

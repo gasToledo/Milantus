@@ -17,7 +17,7 @@ test('una cuenta sin webV2 ve «No disponible» en cualquier ruta y no pide sus 
     if (path.startsWith('/api/') && path !== '/api/me') pedidos.push(path);
   });
 
-  for (const ruta of ['/v2/', '/v2/personajes/guerrero-de-humo/combate', '/v2/lo-que-sea']) {
+  for (const ruta of ['/v2/', '/v2/personajes/guerrero-de-humo/combate', '/v2/bestiario', '/v2/campanas', '/v2/ajustes', '/v2/lo-que-sea']) {
     await page.goto(ruta);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('No disponible');
     await expect(page.getByRole('link', { name: /Personajes|Mis personajes/ })).toHaveCount(0);

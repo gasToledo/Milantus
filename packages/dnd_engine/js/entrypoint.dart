@@ -213,6 +213,30 @@ String formatCostFor(int cp, String labelsJson) => formatCost(
 /// la tabla del glosario lo muestra y la cuenta es del motor, no del cliente.
 int abilityModifierOf(int score) => abilityModifier(score);
 
+/// El Bestiario: cada criatura del catálogo (con el homebrew encima), en el
+/// orden de `creaturesSorted` —alfabético, sin las invocaciones por fórmula,
+/// cuya CA y PG dependen de quien las invoca—, con lo que el motor deriva y la
+/// pantalla no debe repetir: la línea de tipo (`displayKind`, que en un
+/// homebrew sigue al idioma), el tipo con su rótulo, el desafío como se
+/// imprime, el modificador de iniciativa (que el perfil puede traer
+/// competente), la percepción pasiva y, por cada acción, si su alcance es
+/// cuerpo a cuerpo. El resto del perfil (CA, PG,
+/// características, acciones) viaja tal cual está en el catálogo.
+String bestiary(String catalogJson) => jsonEncode([
+      for (final c in _repoPara(catalogJson).creaturesSorted)
+        {
+          'id': c.id,
+          'kind': c.displayKind,
+          'type': c.creatureType?.id,
+          'typeLabel': c.creatureType?.label,
+          'cr': c.cr,
+          'crText': c.challengeRatingText,
+          'initiative': c.initiativeModifier,
+          'passivePerception': c.passivePerceptionValue,
+          'meleeReach': [for (final a in c.actions) a.isMeleeReach],
+        },
+    ]);
+
 void main() {
   final motor = JSObject();
   motor['compute'] = compute.toJS;
@@ -226,5 +250,6 @@ void main() {
   motor['catalogLabelOrder'] = catalogLabelOrder.toJS;
   motor['formatCost'] = formatCostFor.toJS;
   motor['abilityModifier'] = abilityModifierOf.toJS;
+  motor['bestiary'] = bestiary.toJS;
   globalContext['dndEngine'] = motor;
 }

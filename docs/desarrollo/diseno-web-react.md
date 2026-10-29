@@ -156,6 +156,20 @@ Cada bloque va debajo de un enlace «Con <personaje>». Una pantalla nueva con
 datos de campaña pasa por ahí y por `usePlayerCampaignsOf`, nunca por una
 consulta propia: la poda del jugador es del servidor.
 
+## El Bestiario (`src/bestiary/`)
+
+Reutiliza el marco lista + detalle del Códice (`.codex-split`, `.codex-list`,
+`.codex-detail`, `.codex-back`), pero con su propia barra de herramientas: búsqueda
+en pill, tres `Select` con rótulo visible (tipo, VD desde, VD hasta) y un
+par de botones `aria-pressed` para el orden, que no es un filtro y por eso
+«Limpiar filtros» no lo toca. El perfil (`CreatureProfile`) arma las cifras en
+placas con `.plaque-label` y `.num` (carmesí los PG, oro el VD), las
+características en seis celdas con su salvación reservando el alto, los datos de
+línea como lista de definición y las acciones agrupadas con acierto, daño y
+alcance en placas. Una criatura nueva en el catálogo no pide código: sale sola.
+Lo que el perfil necesita y no es un dato del catálogo se agrega a `bestiary()`
+del motor, nunca se calcula acá.
+
 ## Reglas que más se olvidan
 
 - Ningún color, radio ni fuente sueltos: variables o utilidades.

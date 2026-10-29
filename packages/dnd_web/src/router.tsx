@@ -42,6 +42,8 @@ export type Route =
   | { name: 'roster' }
   | { name: 'settings' }
   | { name: 'campaigns' }
+  // Sin criatura es la lista con nada abierto.
+  | { name: 'bestiary'; entryId: string | null }
   // Sin categoría es la portada; sin entrada, la lista sin nada abierto.
   | { name: 'codex'; category: CodexCategory | null; entryId: string | null }
   // `tab: null` es la ruta sin sufijo, que redirige a la primera pestaña.
@@ -65,6 +67,13 @@ export function matchRoute(pathname: string): Route {
   if (parts.length === 0) return { name: 'roster' };
   if (section === 'ajustes' && id === undefined) return { name: 'settings' };
   if (section === 'campanas' && id === undefined) return { name: 'campaigns' };
+  if (section === 'bestiario' && tab === undefined) {
+    try {
+      return { name: 'bestiary', entryId: id === undefined ? null : decodeURIComponent(id) };
+    } catch {
+      return { name: 'unknown' };
+    }
+  }
   if (section === 'codice' && rest.length === 0) {
     if (id === undefined) return { name: 'codex', category: null, entryId: null };
     const category = (Object.keys(CODEX_CATEGORIES) as CodexCategory[]).find((c) => CODEX_CATEGORIES[c] === id);
@@ -88,6 +97,10 @@ export function matchRoute(pathname: string): Route {
 }
 
 export const rosterHref = (): string => import.meta.env.BASE_URL;
+
+/** El Bestiario, o una criatura abierta. */
+export const bestiaryHref = (entryId?: string): string =>
+  `${import.meta.env.BASE_URL}bestiario` + (entryId ? `/${encodeURIComponent(entryId)}` : '');
 
 export const campaignsHref = (): string => `${import.meta.env.BASE_URL}campanas`;
 

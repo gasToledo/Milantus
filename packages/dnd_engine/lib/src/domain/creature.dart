@@ -815,6 +815,18 @@ class Creature {
     );
   }
 
+  /// El valor de desafío como se imprime en el libro: las fracciones como
+  /// «1/8», «1/4» y «1/2» y el resto sin decimales («10»), o null si la
+  /// criatura no declara desafío. Es lo que muestra el Bestiario.
+  String? get challengeRatingText {
+    final value = cr;
+    if (value == null) return null;
+    if (value == 0.125) return '1/8';
+    if (value == 0.25) return '1/4';
+    if (value == 0.5) return '1/2';
+    return value == value.roundToDouble() ? '${value.round()}' : '$value';
+  }
+
   /// Tiene velocidad volando, que la Forma Salvaje prohíbe hasta nivel 8.
   bool get canFly => RegExp(r'volar|\b[Ff]ly\b').hasMatch(speed);
 
