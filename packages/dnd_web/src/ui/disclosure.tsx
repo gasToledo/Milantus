@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import * as AccordionPrimitive from '@radix-ui/react-accordion';
+import * as CollapsiblePrimitive from '@radix-ui/react-collapsible';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 import { ChevronDown, type LucideIcon } from 'lucide-react';
 import { Link, navigate } from '../router';
@@ -114,5 +115,35 @@ export function Accordion({
         );
       })}
     </AccordionPrimitive.Root>
+  );
+}
+
+/**
+ * Un grupo del panel que se pliega (las campañas terminadas del Modo DM): el
+ * rótulo es el botón, con `aria-expanded` de Radix, y lleva la misma voz que
+ * el rótulo de un `NavGroup`. [defaultOpen] solo vale al montar: quien la
+ * usa cambia la `key` si necesita que vuelva a abrirse.
+ */
+export function NavCollapsible({
+  label,
+  defaultOpen = false,
+  children,
+}: {
+  label: string;
+  defaultOpen?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <CollapsiblePrimitive.Root defaultOpen={defaultOpen}>
+      <CollapsiblePrimitive.Trigger className="group eyebrow flex w-full items-center gap-1 rounded-[var(--radius-nav)] px-3 pt-1 pb-1.5 text-left">
+        <span className="min-w-0 flex-1">{label}</span>
+        <ChevronDown
+          size={14}
+          aria-hidden="true"
+          className="shrink-0 text-text-muted transition-transform group-data-[state=open]:rotate-180"
+        />
+      </CollapsiblePrimitive.Trigger>
+      <CollapsiblePrimitive.Content>{children}</CollapsiblePrimitive.Content>
+    </CollapsiblePrimitive.Root>
   );
 }

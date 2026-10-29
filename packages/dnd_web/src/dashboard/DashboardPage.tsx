@@ -1,8 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Plus, X } from 'lucide-react';
-import { accentOf, nameOf } from '../api/catalog';
 import { useRoster, useRosterSettings, useSheetCatalog } from '../api/queries';
-import { computeSheet, type CharacterFields, type ComputedSheet } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import { FLUTTER_HOME } from '../router';
 import { Button, ButtonLink } from '../ui/Button';
@@ -10,7 +8,7 @@ import { SectionRule } from '../ui/data';
 import { Tooltip } from '../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { RosterCard } from './RosterCard';
-import { isFallen, parseSortMode, visibleRoster, type RosterEntry } from './roster';
+import { isFallen, parseSortMode, toRosterEntry, visibleRoster, type RosterEntry } from './roster';
 
 /**
  * El dashboard de solo lectura. El orden y el favorito se leen de los ajustes
@@ -32,29 +30,7 @@ export function DashboardPage() {
   const entries = useMemo((): RosterEntry[] | null => {
     if (!roster.data || !catalog.data) return null;
     const cat = catalog.data;
-    return roster.data.map(({ character: raw, createdAt }): RosterEntry => {
-      // `raw` es un `Character.toJson` que el servidor ya validó al guardarlo;
-      // `CharacterFields` es el subconjunto que esta pantalla lee.
-      const character = raw as unknown as CharacterFields;
-      let sheet: ComputedSheet | null = null;
-      try {
-        // El motor de Dart compilado a JS: acá no se recalcula ninguna regla.
-        sheet = computeSheet(raw, cat);
-      } catch {
-        // Un personaje que el motor no entiende no tira abajo a los demás.
-      }
-      // Las clases salen de la ficha calculada (en el orden en que se subió de
-      // nivel); sin ella, la única que el personaje declara.
-      const levels = sheet?.classLevels ?? { [character.classId]: 0 };
-      return {
-        character,
-        sheet,
-        createdAt,
-        raceName: nameOf(cat.races, character.raceId) ?? character.raceId,
-        classes: Object.entries(levels).map(([id, level]) => ({ name: nameOf(cat.classes, id) ?? id, level })),
-        accent: accentOf(cat, character.classId),
-      };
-    });
+    return roster.data.map(({ character, createdAt }) => toRosterEntry(character, createdAt, cat));
   }, [roster.data, catalog.data]);
 
   const sort = parseSortMode(settings.data?.sortMode ?? 'name');

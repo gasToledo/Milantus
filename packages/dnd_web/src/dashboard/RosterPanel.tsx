@@ -2,19 +2,18 @@ import { BookOpen, FlaskConical, LogOut, MessageSquare, Settings, Users } from '
 import { useAppVersion } from '../api/queries';
 import type { Account } from '../api/client';
 import { useTexts } from '../i18n/context';
-import { codexHref, FLUTTER_HOME, rosterHref, settingsHref } from '../router';
+import { codexHref, dmHref, FLUTTER_HOME, rosterHref, settingsHref } from '../router';
 import { ModeSwitch, NavGroup, NavItem, ThemeMenu, VersionLabel } from '../ui/Shell';
 
 /**
  * El menú principal del Modo Jugador (`AppSidebar`): interruptor de modo y la
- * navegación. Lo que React todavía no tiene (Homebrew, el Modo DM) sigue en
- * Flutter.
+ * navegación. Lo que React todavía no tiene (Homebrew) sigue en Flutter.
  */
 export function RosterPanel({ current }: { current?: 'roster' }) {
   const t = useTexts();
   return (
     <>
-      <ModeSwitch dmHref={FLUTTER_HOME} />
+      <ModeSwitch mode="player" playerHref={rosterHref()} dmHref={dmHref()} />
       <NavGroup label={t.navLabel}>
         <li>
           <NavItem href={rosterHref()} icon={Users} label={t.navCharacters} active={current === 'roster'} internal />

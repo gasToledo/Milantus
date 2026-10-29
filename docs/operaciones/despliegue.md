@@ -240,7 +240,7 @@ Dos workflows en `.github/workflows/`:
 
 `packages/dnd_web` (Vite + React + TypeScript) es el cliente que va a
 reemplazar al de Flutter pantalla por pantalla. Por ahora tiene pantallas de
-solo lectura (el dashboard, la ficha en cinco pestañas, Campañas, el Bestiario, el Códice y Ajustes), sin
+solo lectura (el dashboard, la ficha en cinco pestañas, Campañas, el Bestiario, el Códice, Ajustes y el Modo DM en `/v2/dm`), sin
 enlaces desde el cliente actual; el estado completo está en
 [Migración a React](../arquitectura/migracion-react.md). Se sirve en el mismo origen que Flutter (`/`) y la API, así que
 comparte la cookie de sesión.
@@ -260,7 +260,10 @@ comparte la cookie de sesión.
   iniciada). La respuesta trae solo el booleano de la cuenta que pregunta,
   nunca la lista. Hoy el cliente de Flutter no lee el campo: sirve de base para
   ir mandando a cada cuenta a las pantallas ya migradas. Cambiarla pide
-  `docker compose up -d` para recrear el contenedor del servidor.
+  `docker compose up -d` para recrear el contenedor del servidor. El flag es de
+  **quien mira**: para probar el Modo DM de `/v2` alcanza con habilitar la
+  cuenta del DM; los jugadores de su mesa no necesitan estar en la lista, porque
+  lo que el DM lee es la ficha de ellos por la API de siempre.
 - El motor de reglas llega al cliente React compilado a JS (`dart compile js`,
   `packages/dnd_engine/js/entrypoint.dart`): la imagen lo hace en la etapa
   `engine-js` del Dockerfile y para desarrollar se corre `npm run build:engine`
