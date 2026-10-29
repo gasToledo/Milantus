@@ -309,7 +309,9 @@ Lo que más se olvida:
 ### Frontend React (`packages/dnd_web`)
 
 Las reglas de arriba valen igual, traducidas. Los tokens de
-`diseno-web.md` (Apéndice B) viven en `src/index.css`.
+`diseno-web.md` (Apéndice B) viven en `src/index.css`, y el catálogo de
+componentes de `src/ui/` está en `docs/desarrollo/diseno-web-react.md`:
+**antes de crear un componente nuevo, buscá ahí**.
 
 - Colores, radios y fuentes **solo como variables CSS** (`var(--gold)`) o sus
   utilidades de Tailwind (`bg-surface`): nunca un hex suelto ni un color de
@@ -378,6 +380,8 @@ mismo cambio.
 - `docs/arquitectura/mcp.md` — el conector de Claude: autorización y herramientas.
 - `docs/desarrollo/contenido-y-reglas.md` — fuentes, catálogo y validación.
 - `docs/desarrollo/diseno-web.md` — sistema visual y componentes.
+- `docs/desarrollo/diseno-web-react.md` — el mismo sistema en `dnd_web` y su
+  catálogo de componentes.
 - `docs/desarrollo/textos.md` — glosario y convenciones de los textos visibles,
   en español e inglés.
 - `docs/desarrollo/versionado-y-changelog.md` — versión visible y `CHANGELOG.md`.

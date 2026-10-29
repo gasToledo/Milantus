@@ -83,10 +83,22 @@ repiten acá.
 
 - Andamiaje: Vite 8, React 19, TypeScript 7, Tailwind 4; tokens del
   [Apéndice B de diseño web](../desarrollo/diseno-web.md#apéndice-b--equivalencia-en-css)
-  en `src/index.css` y como utilidades de Tailwind.
+  en `src/index.css` y como utilidades de Tailwind (la paleta por defecto está
+  borrada).
+- **Base de componentes** en `src/ui/` sobre primitivas de Radix UI (headless),
+  íconos de `lucide-react` y la capa de datos de TanStack Query
+  (`src/api/queries.ts`): el catálogo y su uso están en
+  [Diseño web en React](../desarrollo/diseno-web-react.md).
+- **Navegación sin recarga** (`src/router.tsx`, `Link` y `useRoute`): el
+  catálogo y la lista de personajes quedan en caché entre pantallas.
+- Marco (`Shell`): panel lateral de 236 px fijo desde 900 px y cajón debajo; el
+  contenido ocupa todo el ancho.
 - Sesión: `/api/me`, con los estados cargando, sin sesión, error con
-  «Reintentar» y no disponible. El tema (`dark`, `light`, `system`) sale de los
-  ajustes de la cuenta (`/api/settings`) y solo se aplica a cuentas con `webV2`.
+  «Reintentar» y no disponible. Una cuenta sin `webV2` no pide nada más a la
+  API.
+- Tema: oscuro por defecto, con selector al pie del panel. Lo elegido en el
+  navegador (`localStorage`) gana sobre el `themeMode` de los ajustes de la
+  cuenta, porque React todavía no escribe en la cuenta.
 - Idioma: español o inglés, resuelto una vez al cargar (clave `milantus.locale`
   de `localStorage`, luego `navigator.language`, luego español). Es el mismo
   criterio para los rótulos del motor.
@@ -99,13 +111,15 @@ repiten acá.
   Homebrew y el «DM» del interruptor de modo enlazan a la raíz de Flutter
   (`FLUTTER_HOME`, `src/router.ts`). Cada tarjeta enlaza a la ficha. Las cifras
   (nivel, PG máximos, CA, velocidad, iniciativa) salen de `computeSheet`; los
-  PG actuales, de la ficha cruda. El panel lateral (`src/ui/Shell.tsx`) es el
-  mismo en las dos pantallas.
+  PG actuales, de la ficha cruda. El panel lateral es el menú principal
+  (`src/dashboard/RosterPanel.tsx`).
 - **La ficha de solo lectura** en `/v2/personajes/:id`
   (`src/sheet/`). Muestra cifras de combate, características, ataques,
   recursos, rasgos, salvaciones y habilidades, todo desde `ComputedSheet`.
-  La API no tiene `GET` por id, así que carga la lista de `/api/characters` y
-  busca (como el cliente de Flutter); lo ajeno y lo inexistente son lo mismo.
+  La API no tiene `GET` por id, así que usa la lista de `/api/characters` (la
+  misma consulta en caché que el dashboard) y busca, como el cliente de
+  Flutter; lo ajeno y lo inexistente son lo mismo. Su panel lateral es el de
+  una pantalla de adentro: «volver» a la lista, tema y versión.
 - **Ningún enlace** desde Flutter hacia `/v2` y Flutter no lee `webV2`: se
   entra escribiendo la URL.
 
@@ -117,8 +131,7 @@ y conviene que el motor y la API estén probados en producción con el riesgo
 anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
 
 1. Ficha de personaje, solo lectura *(existe)*.
-2. Lista de personajes y navegación entre pantallas *(la lista existe; el
-   router sigue siendo mínimo y los enlaces recargan la página)*.
+2. Lista de personajes y navegación entre pantallas *(existe)*.
 3. Lo de lectura más simple: ajustes de visualización, cuaderno/campañas en
    modo lectura, bestiario y catálogos.
 4. Escrituras de bajo riesgo: PG y usos de recursos en la ficha, descansos.
@@ -187,8 +200,6 @@ propio.
 
 Para que nadie lo dé por hecho:
 
-- Navegación interna sin recarga: los enlaces entre `/v2/` y la ficha son
-  enlaces reales, y cada pantalla vuelve a cargar el catálogo.
 - Reordenar, marcar favorito, crear, renombrar o borrar personajes desde React.
 - Cualquier escritura desde React: todo el cliente hoy es solo lectura.
 - Enlaces desde Flutter hacia `/v2` o redirección automática por `webV2`.

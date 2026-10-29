@@ -1,73 +1,84 @@
-import { useCallback, useEffect, useState } from 'react';
-import { fetchCharacter } from '../api/client';
-import { loadCatalog } from '../api/catalog';
-import {
-  computeSheet,
-  type Catalog,
-  type CharacterFields,
-  type ComputedSheet,
-} from '../engine';
+import { useMemo } from 'react';
+import { ScrollText } from 'lucide-react';
+import { useAppVersion, useCatalog, useRoster } from '../api/queries';
+import { computeSheet, type CharacterFields } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
-import { ActionButton, Notice } from '../ui/Shell';
+import { rosterHref } from '../router';
+import { NavGroup, NavItem, Shell, SidebarBack, ThemeMenu, VersionLabel } from '../ui/Shell';
+import { AppBusyLabel, AppErrorView, Notice } from '../ui/status';
 import { CharacterSheet } from './CharacterSheet';
 
-type State =
-  | { kind: 'loading' }
-  | { kind: 'error' }
-  // La API responde igual para lo ajeno y lo inexistente: acá tampoco se
-  // distinguen.
-  | { kind: 'not-found' }
-  | { kind: 'ready'; character: CharacterFields; sheet: ComputedSheet; catalog: Catalog };
-
+/**
+ * La ficha de [id]. La API no tiene `GET` por id (el cliente de Flutter
+ * tampoco: carga la lista), así que se busca en `/api/characters`; con la
+ * caché, si se viene del dashboard, ni siquiera se vuelve a pedir. Lo ajeno y
+ * lo inexistente son lo mismo para la API; acá también.
+ */
 export function CharacterPage({ id }: { id: string }) {
   const t = useTexts();
   const lang = useLang();
-  const [state, setState] = useState<State>({ kind: 'loading' });
-  const [attempt, setAttempt] = useState(0);
-  const retry = useCallback(() => {
-    setState({ kind: 'loading' });
-    setAttempt((n) => n + 1);
-  }, []);
+  const roster = useRoster();
+  const catalog = useCatalog(lang);
+  const version = useAppVersion(true);
 
-  useEffect(() => {
-    const controller = new AbortController();
-    (async () => {
-      // El personaje y el catálogo no dependen uno del otro: juntos.
-      const [raw, catalog] = await Promise.all([
-        fetchCharacter(id, controller.signal),
-        loadCatalog(lang, controller.signal),
-      ]);
-      if (raw === null) return { kind: 'not-found' } as const;
-      // La ficha se calcula con el motor de Dart compilado a JS: el mismo que
-      // usan el servidor y Flutter. Acá no se recalcula ninguna regla.
-      const sheet = computeSheet(raw, catalog);
-      // `raw` es un `Character.toJson` que el servidor ya validó al guardarlo;
-      // `CharacterFields` es el subconjunto que esta pantalla lee.
-      return { kind: 'ready', character: raw as unknown as CharacterFields, sheet, catalog } as const;
-    })()
-      .then(setState)
-      .catch(() => {
-        if (!controller.signal.aborted) setState({ kind: 'error' });
-      });
-    return () => controller.abort();
-  }, [id, lang, attempt]);
+  const raw = roster.data?.find((c) => c.character.id === id)?.character ?? null;
+  // La ficha se calcula con el motor de Dart compilado a JS: el mismo que usan
+  // el servidor y Flutter. Acá no se recalcula ninguna regla.
+  const computed = useMemo(() => {
+    if (!raw || !catalog.data) return null;
+    try {
+      return { ok: true as const, sheet: computeSheet(raw, catalog.data) };
+    } catch (e) {
+      return { ok: false as const, detail: String(e) };
+    }
+  }, [raw, catalog.data]);
 
-  switch (state.kind) {
-    case 'loading':
-      return <Notice title={t.loading} />;
-    case 'error':
-      return (
-        <Notice
-          title={t.errorTitle}
-          body={t.errorBody}
-          action={<ActionButton onClick={retry}>{t.retry}</ActionButton>}
-        />
-      );
-    case 'not-found':
-      return <Notice title={t.notFoundTitle} body={t.notFoundBody} />;
-    case 'ready':
-      return (
-        <CharacterSheet character={state.character} sheet={state.sheet} catalog={state.catalog} />
-      );
+  const failed = [roster, catalog].filter((q) => q.isError);
+  let body;
+  if (failed.length > 0) {
+    body = (
+      <AppErrorView as="h1" title={t.errorTitle} message={t.errorBody} onRetry={() => failed.forEach((q) => q.refetch())} />
+    );
+  } else if (roster.data && !raw) {
+    body = <Notice title={t.notFoundTitle} body={t.notFoundBody} />;
+  } else if (!computed) {
+    body = <AppBusyLabel label={t.loading} />;
+  } else if (!computed.ok) {
+    // Un esquema más nuevo que este cliente, o una ficha que el motor no
+    // entiende: se dice, en vez de mostrar números a medias.
+    body = <AppErrorView as="h1" title={t.computeErrorTitle} message={t.computeErrorBody} detail={computed.detail} />;
+  } else {
+    body = (
+      <CharacterSheet
+        // `raw` es un `Character.toJson` que el servidor ya validó al guardarlo;
+        // `CharacterFields` es el subconjunto que esta pantalla lee.
+        character={raw as unknown as CharacterFields}
+        sheet={computed.sheet}
+        catalog={catalog.data!}
+      />
+    );
   }
+
+  return (
+    <Shell
+      panel={
+        <>
+          <SidebarBack href={rosterHref()} label={t.backToCharacters} />
+          <NavGroup label={t.sheetNavLabel}>
+            <li>
+              <NavItem href="#contenido" icon={ScrollText} label={t.navSheet} active />
+            </li>
+          </NavGroup>
+        </>
+      }
+      footer={
+        <div className="flex items-center justify-between gap-2">
+          <ThemeMenu />
+          <VersionLabel version={version.data} />
+        </div>
+      }
+    >
+      {body}
+    </Shell>
+  );
 }

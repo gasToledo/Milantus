@@ -22,6 +22,8 @@ trabajar en el repositorio. Los detalles viven acá, una sola vez.
   precedencia, estructura del catálogo, generadores y verificaciones.
 - [Diseño web](desarrollo/diseno-web.md): lenguaje visual, componentes,
   responsividad y accesibilidad.
+- [Diseño web en React](desarrollo/diseno-web-react.md): cómo se aplica ese
+  lenguaje en `packages/dnd_web` y el catálogo de componentes de `src/ui/`.
 - [Textos de la interfaz](desarrollo/textos.md): voz, glosario de términos,
   etiquetas de acciones, mensajes de error y cómo agregar un texto en español
   e inglés.

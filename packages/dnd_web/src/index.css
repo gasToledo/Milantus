@@ -2,7 +2,13 @@
 
 /* Tokens de `docs/desarrollo/diseno-web.md` Apéndice B, tal cual: no se
    inventan valores intermedios. El tema claro se activa con
-   `data-theme="light"` en <html>; por defecto es el oscuro. */
+   `data-theme="light"` en <html> (lo pone `src/theme/theme.tsx`, y antes del
+   primer cuadro el script de `index.html`); por defecto es el oscuro.
+
+   Ningún componente lleva un hex: todo color sale de acá, como variable o
+   como utilidad de Tailwind (`bg-surface`, `text-gold`). La única excepción
+   es el acento de clase, que es un dato del catálogo y no del diseño
+   (`diseno-web.md` §3.3). */
 :root {
   --scaffold: #151210;
   --surface: #1e1915;
@@ -10,11 +16,17 @@
   --on-surface-variant: #a2937e;
   --gold: #c9a24b;
   --crimson: #d4665a;
+  /* `verdant` no está en el Apéndice B pero sí en §3.1 (`AppPalette`): el
+     verde de «la salida esperada», y el de la barra de PG cuando sobran. */
+  --verdant: #6fa85c;
   --plaque: #12100c;
   --hairline: #3a2f25;
   --gold-soft: #2e2617;
   --text-muted: #9c8b6e;
   --on-primary: #201a10;
+  /* El velo detrás de un diálogo: separa por oscurecimiento, no por sombra
+     (`diseno-web.md` §8, «El molde de diálogo»). */
+  --scrim: #000000a6;
 
   --font-display: Georgia, 'Times New Roman', serif;
   --font-body: Roboto, system-ui, sans-serif;
@@ -25,9 +37,10 @@
   --border-hairline: 1px solid var(--hairline);
   --sidebar-width: 236px;
   /* La única sombra del sistema: el hover de la tarjeta de personaje
-     (`diseno-web.md` §3 y Apéndice B, `cardHover`). */
+     (`diseno-web.md` §3.4 y Apéndice B, `cardHover`). */
   --shadow-card-hover: 0 10px 26px #00000046;
-  --page-max-width: 760px;
+
+  color-scheme: dark;
 }
 
 :root[data-theme='light'] {
@@ -37,11 +50,15 @@
   --on-surface-variant: #6e5f49;
   --gold: #8a6a1e;
   --crimson: #a6392e;
+  --verdant: #3e7a33;
   --plaque: #ebe0c9;
   --hairline: #d9c9a8;
   --gold-soft: #eee1bf;
   --text-muted: #6e6047;
   --on-primary: #ffffff;
+  --scrim: #2a211880;
+
+  color-scheme: light;
 }
 
 body {
@@ -49,12 +66,18 @@ body {
   background: var(--scaffold);
   color: var(--on-surface);
   font-family: var(--font-body);
+  font-size: 14px;
+  /* 360 px es el piso: nada debajo puede empujar un scroll horizontal. */
+  overflow-x: hidden;
 }
 
 /* Los tokens de arriba como utilidades de Tailwind (`bg-surface`,
    `text-gold`…). `inline` deja la referencia `var(--x)` sin resolver: el tema
-   claro cambia las variables y las utilidades lo siguen, sin repetir valores. */
+   claro cambia las variables y las utilidades lo siguen, sin repetir valores.
+   Se reemplaza la paleta entera (`--color-*: initial`): así `bg-red-500` ni
+   siquiera existe y no hay forma de colar un color por fuera del sistema. */
 @theme inline {
+  --color-*: initial;
   --color-scaffold: var(--scaffold);
   --color-surface: var(--surface);
   --color-plaque: var(--plaque);
@@ -63,14 +86,26 @@ body {
   --color-gold: var(--gold);
   --color-gold-soft: var(--gold-soft);
   --color-crimson: var(--crimson);
+  --color-verdant: var(--verdant);
   --color-hairline: var(--hairline);
   --color-text-muted: var(--text-muted);
   --color-on-primary: var(--on-primary);
+  --color-scrim: var(--scrim);
+  --color-transparent: transparent;
+  --color-current: currentColor;
+}
+
+/* El único breakpoint de marco (`diseno-web.md` §7.2): desde 900 px el panel
+   lateral queda fijo; debajo, barra superior y cajón. Se usa como `shell:`.
+   Los radios no se registran como utilidades con el mismo nombre que su
+   variable (sería una referencia circular): van como `rounded-[var(--radius-card)]`. */
+@theme {
+  --breakpoint-shell: 900px;
 }
 
 /* Componentes del Apéndice B de `diseno-web.md`. Tres niveles de fondo y no
    más (scaffold → surface → plaque): la placa se hunde, nada se eleva, así
-   que no hay `box-shadow` en ningún lado. */
+   que no hay `box-shadow` salvo el hover de la tarjeta. */
 .card {
   background: var(--surface);
   border: var(--border-hairline);
@@ -88,14 +123,6 @@ body {
   text-transform: uppercase;
   color: var(--text-muted);
 }
-.pill {
-  background: var(--gold-soft);
-  border: var(--border-hairline);
-  border-radius: var(--radius-pill);
-  padding: 2px 9px;
-  font-size: 11px;
-  color: var(--gold);
-}
 /* Georgia solo para títulos y valores de plaqueta. */
 .font-display {
   font-family: var(--font-display);
@@ -112,10 +139,6 @@ body {
 .num {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-}
-.stat-tile-value {
-  font-size: 28px;
-  line-height: 1.05;
 }
 .plaque-label {
   font-size: 10px;
@@ -146,12 +169,34 @@ body {
 .roster-card:hover,
 .roster-card:focus-within {
   border-color: var(--gold);
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   box-shadow: var(--shadow-card-hover);
 }
+
+/* La barra de PG recorre el tramo (`ThinBar`, 220 ms easeOut). */
+.thin-bar-fill {
+  transition: width 220ms ease-out;
+}
+
+/* El cajón del panel en teléfono entra desde la izquierda; Radix deja
+   `data-state` en el contenido, así que alcanza con CSS. */
+@keyframes drawer-in {
+  from {
+    transform: translateX(-100%);
+  }
+}
+.drawer[data-state='open'] {
+  animation: drawer-in 180ms ease-out;
+}
+
+/* Toda duración se apaga si el sistema pide menos movimiento: lo animado
+   nunca lleva información que no esté ya en su valor final. */
 @media (prefers-reduced-motion: reduce) {
-  .roster-card {
-    transition: none;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0s !important;
+    transition-duration: 0s !important;
   }
   .roster-card:hover,
   .roster-card:focus-within {
