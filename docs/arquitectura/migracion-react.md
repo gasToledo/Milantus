@@ -111,15 +111,34 @@ repiten acá.
   Homebrew y el «DM» del interruptor de modo enlazan a la raíz de Flutter
   (`FLUTTER_HOME`, `src/router.ts`). Cada tarjeta enlaza a la ficha. Las cifras
   (nivel, PG máximos, CA, velocidad, iniciativa) salen de `computeSheet`; los
-  PG actuales, de la ficha cruda. El panel lateral es el menú principal
-  (`src/dashboard/RosterPanel.tsx`).
-- **La ficha de solo lectura** en `/v2/personajes/:id`
-  (`src/sheet/`). Muestra cifras de combate, características, ataques,
-  recursos, rasgos, salvaciones y habilidades, todo desde `ComputedSheet`.
-  La API no tiene `GET` por id, así que usa la lista de `/api/characters` (la
-  misma consulta en caché que el dashboard) y busca, como el cliente de
-  Flutter; lo ajeno y lo inexistente son lo mismo. Su panel lateral es el de
-  una pantalla de adentro: «volver» a la lista, tema y versión.
+  PG actuales, de la ficha cruda. Sigue el lienzo aprobado: título, buscador,
+  orden y «Crear» en una barra que se envuelve, regla ornamental y tarjetas
+  con barra de PG en verde/oro/carmesí y CA/VEL/INIC en placas. El panel
+  lateral es el menú principal (`src/dashboard/RosterPanel.tsx`), con el
+  interruptor «Jugador / DM»: «DM» lleva al Modo DM de Flutter.
+- **La ficha de solo lectura** en `/v2/personajes/:id/personaje` y
+  `/v2/personajes/:id/combate` (`src/sheet/`); la ruta sin sufijo redirige a
+  `personaje` y una pestaña desconocida es «Página no encontrada». Cabecera
+  con nombre, especie y trasfondo, pills de nivel y de cada clase con su
+  subclase, y una banda táctica de cinco placas (Armadura, Puntos de golpe con
+  barra y porcentaje, Iniciativa, Velocidad, Competencia: la percepción pasiva
+  va con las habilidades). **Personaje**: identidad, características,
+  habilidades y rasgos y dotes. **Combate**: PG y dados de golpe, defensa,
+  ataques, conjuros (CD, ataque, aptitud, preparados y trucos, espacios que
+  quedan, reacciones), salvaciones, condiciones y recursos. Nada se gasta ni
+  se edita. El panel es el de una pantalla de adentro: «volver», la tarjeta del
+  personaje, las dos pestañas, y Inventario, Campaña, Diario, Retrato, Subir
+  nivel, Compartir e Imprimir, que enlazan a Flutter; al pie, «Solo lectura»,
+  el tema y la versión. La API no tiene `GET` por id, así que usa la lista de
+  `/api/characters` (la misma consulta en caché que el dashboard) y busca, como
+  Flutter; lo ajeno y lo inexistente son lo mismo. El personaje se migra con
+  el motor (`migrateCharacter`) antes de leerlo y calcularlo.
+- **Homebrew**: la ficha y el dashboard calculan con el catálogo oficial más
+  el contenido homebrew de la cuenta (`GET /api/homebrew`, fusionado por id en
+  `src/api/homebrew.ts`), como `HomebrewStore` + `ContentRepository.addAll` en
+  Flutter. Igual que allá, se descarta una entrada sin id o cuyo `source` no es
+  `homebrew`; a diferencia de allá, una entrada que el motor no puede leer no
+  se descarta sola (ver su `ponytail:`).
 - **Ningún enlace** desde Flutter hacia `/v2` y Flutter no lee `webV2`: se
   entra escribiendo la URL.
 
@@ -155,13 +174,17 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    dobles, orden ni redondeos. Es también la red del tipo escrito a mano de
    `types.ts`: un campo nuevo en `ComputedSheet.toJson` rompe acá aunque el tipo
    no lo diga.
-2. **Playwright** (job `web_e2e`). Una prueba por pantalla, a propósito
-   (`e2e/ficha.spec.ts` y `e2e/dashboard.spec.ts`): levanta el servidor real con repositorios en memoria
-   y una sesión falsa (`dnd_server/test/e2e_server.dart`), sirve el `dist` de
-   `/v2` con personajes y ajustes sembrados y verifica que cada pantalla
-   muestre los números que da el motor (el dashboard, además, el orden de los
-   ajustes, el favorito y el buscador). Cubre el cableado servidor ↔ build ↔ cookie ↔ catálogo ↔
-   motor en el navegador. Sin reintentos: no hay «a veces anda».
+2. **Playwright** (job `web_e2e`). Pocas pruebas y solo de reglas
+   (`e2e/`): levanta el servidor real con repositorios en memoria y sesiones
+   falsas (`dnd_server/test/e2e_server.dart`), sirve el `dist` de `/v2` con
+   personajes, ajustes y un arma homebrew sembrados, y verifica que la ficha y
+   el dashboard muestren los números que da el motor (el dashboard, además, el
+   orden de los ajustes, el favorito y el buscador); que las pestañas de la
+   ficha sean rutas propias con historial; que el ataque del arma homebrew
+   aparezca (y que sin la fusión no estaría); y que una cuenta sin `webV2` vea
+   «No disponible» sin pedir sus datos (`e2e/acceso.spec.ts`). Lo esperado se
+   calcula con el mismo motor y la misma fusión (`e2e/helpers.ts`). Sin
+   reintentos: no hay «a veces anda».
 3. **Comparación manual en producción con una cuenta habilitada.** Lo que solo
    se ve con el stack real (túnel, caché, cuenta de verdad, personajes
    complejos) se compara a ojo contra la misma pantalla de Flutter, con una

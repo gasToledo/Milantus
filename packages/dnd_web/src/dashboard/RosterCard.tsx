@@ -1,9 +1,8 @@
-import type { ReactNode } from 'react';
 import { Star } from 'lucide-react';
 import { useTexts } from '../i18n/context';
 import { characterHref, Link } from '../router';
 import { signed } from '../sheet/format';
-import { HP_CRITICAL_RATIO, hpTone, ThinBar } from '../ui/data';
+import { HP_CRITICAL_RATIO, hpTone, StatPlaque, ThinBar } from '../ui/data';
 import { Medallion } from '../ui/Medallion';
 import { isFallen, type RosterEntry } from './roster';
 
@@ -87,9 +86,11 @@ export function RosterCard({ entry, favorite }: { entry: RosterEntry; favorite: 
             >
               {hpLabel}
             </p>
-            <p className="font-display text-[13px] tabular-nums" data-stat="hp">
+            {/* Sans negrita con cifras tabulares: se compara con la tarjeta de
+                al lado. */}
+            <p className="num text-[14px]" data-stat="hp">
               <span className={fallen || critical ? 'text-crimson' : 'text-on-surface'}>{hp}</span>
-              <span className="text-text-muted"> / {maxHp}</span>
+              <span className="font-normal text-text-muted"> / {maxHp}</span>
             </p>
           </div>
           {/* Recorre el tramo y cambia de color como en Flutter (verde, oro,
@@ -105,20 +106,26 @@ export function RosterCard({ entry, favorite }: { entry: RosterEntry; favorite: 
             />
           </div>
 
-          <dl className="plaque mt-3 grid grid-cols-3 divide-x divide-hairline">
-            <Stat id="ac" short={t.acShort} full={t.acFull}>
-              {sheet.armorClass}
-            </Stat>
-            <Stat id="speed" short={t.speedShort} full={t.speed}>
-              {sheet.speed}
-              <span className="ml-0.5 text-[11px] font-normal text-text-muted">
-                {' '}
-                {t.feet}
-              </span>
-            </Stat>
-            <Stat id="initiative" short={t.initiativeShort} full={t.initiative}>
-              {signed(sheet.initiative)}
-            </Stat>
+          {/* Tres placas cortas dentro de la tarjeta: es el caso de
+              `StatPlaque` (rótulo y valor en Georgia sobre la placa). El
+              rótulo corto se ve; el completo se lee. */}
+          <dl className="mt-3.5 grid grid-cols-3 gap-2">
+            <StatPlaque id="ac" label={<Abbr short={t.acShort} full={t.acFull} />} value={sheet.armorClass} />
+            <StatPlaque
+              id="speed"
+              label={<Abbr short={t.speedShort} full={t.speed} />}
+              value={
+                <>
+                  {sheet.speed}
+                  <span className="sr-only"> {t.feet}</span>
+                </>
+              }
+            />
+            <StatPlaque
+              id="initiative"
+              label={<Abbr short={t.initiativeShort} full={t.initiative} />}
+              value={signed(sheet.initiative)}
+            />
           </dl>
         </>
       )}
@@ -126,26 +133,11 @@ export function RosterCard({ entry, favorite }: { entry: RosterEntry; favorite: 
   );
 }
 
-function Stat({
-  id,
-  short,
-  full,
-  children,
-}: {
-  id: string;
-  short: string;
-  full: string;
-  children: ReactNode;
-}) {
+function Abbr({ short, full }: { short: string; full: string }) {
   return (
-    <div className="min-w-0 px-2.5 py-2">
-      <dt className="plaque-label">
-        <span aria-hidden="true">{short}</span>
-        <span className="sr-only">{full}</span>
-      </dt>
-      <dd className="num mt-0.5 truncate text-[20px] leading-tight text-on-surface" data-stat={id}>
-        {children}
-      </dd>
-    </div>
+    <>
+      <span aria-hidden="true">{short}</span>
+      <span className="sr-only">{full}</span>
+    </>
   );
 }

@@ -8,7 +8,7 @@ const servidor = fileURLToPath(new URL('../dnd_server', import.meta.url));
 
 export default defineConfig({
   testDir: './e2e',
-  // Pocas pruebas (la ficha y el dashboard): reintentar escondería una falla real, y en CI no
+  // Pocas pruebas (ficha, dashboard, acceso): reintentar escondería una falla real, y en CI no
   // hay "a veces anda".
   retries: 0,
   reporter: process.env.CI ? 'github' : 'list',

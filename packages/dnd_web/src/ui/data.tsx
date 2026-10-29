@@ -24,6 +24,7 @@ export function StatTile({
   value,
   suffix,
   valueClassName = 'text-on-surface',
+  labelTrailing,
   footer,
 }: {
   id: string;
@@ -32,13 +33,16 @@ export function StatTile({
   value: ReactNode;
   suffix?: ReactNode;
   valueClassName?: string;
+  /** Un dato chico a la derecha del rótulo (el porcentaje de PG). */
+  labelTrailing?: ReactNode;
   footer?: ReactNode;
 }) {
   return (
-    <div className="plaque flex min-w-0 flex-col p-3" data-stat={id}>
+    <div className="plaque flex min-w-0 flex-col px-3.5 py-3" data-stat={id}>
       <dt className="flex items-center gap-1.5 text-[11px] tracking-[1.1px] text-text-muted uppercase">
         {Icon && <Icon size={14} aria-hidden="true" className="shrink-0 text-gold" />}
-        <span className="truncate">{label}</span>
+        <span className="min-w-0 flex-1 truncate">{label}</span>
+        {labelTrailing && <span className="shrink-0 tracking-normal normal-case tabular-nums">{labelTrailing}</span>}
       </dt>
       <dd className="mt-1.5 flex min-w-0 flex-col">
         <span className="flex items-baseline gap-1">
@@ -47,7 +51,7 @@ export function StatTile({
           </span>
           {suffix && <span className="text-[13px] text-on-surface-variant">{suffix}</span>}
         </span>
-        {footer}
+        {footer && <div className="mt-2">{footer}</div>}
       </dd>
     </div>
   );
@@ -66,7 +70,9 @@ export function StatPlaque({
   valueClassName = 'text-gold',
 }: {
   id?: string;
-  label: string;
+  /** Texto, o un nodo cuando el rótulo visible es una abreviatura y el lector
+   *  necesita la palabra completa. */
+  label: ReactNode;
   value: ReactNode;
   dense?: boolean;
   valueClassName?: string;

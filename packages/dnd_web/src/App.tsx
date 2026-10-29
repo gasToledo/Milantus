@@ -102,7 +102,7 @@ function Enabled({ account }: { account: Account }) {
         </Shell>
       );
     case 'character':
-      return <CharacterPage id={route.id} />;
+      return <CharacterPage id={route.id} tab={route.tab} />;
     case 'unknown':
       return (
         <Shell panel={<RosterPanel />} footer={<RosterFooter account={account} />}>

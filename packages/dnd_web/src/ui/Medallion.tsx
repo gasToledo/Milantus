@@ -21,17 +21,21 @@ export function Medallion({
   muted?: boolean;
 }) {
   // `--accent` es el único color que no sale de los tokens: viene del catálogo.
+  // El degradado es el de `ClassMedallion` sin retrato: el acento arriba, que
+  // se hunde hacia la placa. `color-mix` lo aclara sin inventar un color.
   const style = {
     '--accent': accent ?? 'var(--gold)',
     width: size,
     height: size,
     fontSize: Math.round(size * 0.44),
+    background:
+      'radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--accent) 40%, transparent), var(--plaque))',
   } as CSSProperties;
   return (
     <div
       aria-hidden="true"
       style={style}
-      className={`font-display flex shrink-0 items-center justify-center rounded-full border-[3px] border-[var(--accent)] bg-plaque text-gold ${
+      className={`font-display flex shrink-0 items-center justify-center rounded-full border-2 border-[var(--accent)] text-on-surface ${
         muted ? 'opacity-55 grayscale' : ''
       }`}
     >

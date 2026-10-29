@@ -1,29 +1,7 @@
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
-import { computeSheet, type Catalog, type JsonObject } from '../src/engine';
+import { computeSheet } from '../src/engine';
 import { signed } from '../src/sheet/format';
-
-// Mismos valores que `test/e2e_server.dart` en dnd_server.
-const TOKEN = 'sesion-de-humo=';
-
-const catalogo = (): Catalog => {
-  const dir = fileURLToPath(new URL('../../dnd_engine/lib/assets/srd_2024/', import.meta.url));
-  const leer = (n: string) => JSON.parse(readFileSync(dir + `${n}.json`, 'utf8')) as JsonObject[];
-  return {
-    races: leer('races'),
-    classes: leer('classes'),
-    subclasses: leer('subclasses'),
-    lineages: leer('lineages'),
-    backgrounds: leer('backgrounds'),
-    feats: leer('feats'),
-    weapons: leer('weapons'),
-    armor: leer('armor'),
-    items: [...leer('items'), ...leer('magic_items'), ...leer('efa_magic_items')],
-    spells: leer('spells'),
-    creatures: leer('creatures'),
-  };
-};
+import { catalogo, personajes, TOKEN } from './helpers';
 
 // Español fijo: sin esto el idioma sería el del navegador de CI (en-US).
 test.use({ locale: 'es-AR' });
@@ -35,15 +13,13 @@ test('el dashboard lista los personajes en el orden de los ajustes, marca el fav
   baseURL,
 }) => {
   await context.addCookies([{ name: 'dnd_session', value: TOKEN, url: baseURL! }]);
-  const headers = { cookie: `dnd_session=${TOKEN}` };
 
-  // Lo esperado sale del motor y de la API, no de una transcripción.
-  const { characters } = (await (await request.get('/api/characters', { headers })).json()) as {
-    characters: { character: JsonObject & { id: string; combat: { currentHp: number } } }[];
-  };
+  // Lo esperado sale del motor y de la API, no de una transcripción. Las
+  // cifras de la tarjeta (nivel, PG, CA, velocidad, iniciativa) no dependen
+  // del arma homebrew de Aldric: alcanza con el catálogo oficial.
   const catalog = catalogo();
   const porId = new Map(
-    characters.map(({ character }) => [character.id, { character, ficha: computeSheet(character, catalog) }]),
+    (await personajes(request)).map((character) => [character.id, { character, ficha: computeSheet(character, catalog) }]),
   );
 
   await page.goto('/v2/');
@@ -68,12 +44,13 @@ test('el dashboard lista los personajes en el orden de los ajustes, marca el fav
   for (const [id, { character, ficha }] of porId) {
     const tarjeta = page.locator(`[data-character="${id}"]`);
     const cifra = (stat: string) => tarjeta.locator(`[data-stat="${stat}"]`);
+    const placa = (stat: string) => cifra(stat).locator('[data-field="value"]');
     await expect(cifra('level')).toHaveText(String(ficha.level));
     await expect(cifra('hp')).toHaveText(`${character.combat.currentHp} / ${ficha.maxHp}`);
-    await expect(cifra('ac')).toHaveText(String(ficha.armorClass));
-    await expect(cifra('speed')).toHaveText(`${ficha.speed} pies`);
-    await expect(cifra('initiative')).toHaveText(signed(ficha.initiative));
-    await expect(tarjeta.getByRole('link')).toHaveAttribute('href', `/v2/personajes/${id}`);
+    await expect(placa('ac')).toHaveText(String(ficha.armorClass));
+    await expect(placa('speed')).toHaveText(`${ficha.speed} pies`);
+    await expect(placa('initiative')).toHaveText(signed(ficha.initiative));
+    await expect(tarjeta.getByRole('link')).toHaveAttribute('href', `/v2/personajes/${id}/personaje`);
   }
 
   // El buscador filtra en el cliente; sin coincidencias no es la lista vacía.

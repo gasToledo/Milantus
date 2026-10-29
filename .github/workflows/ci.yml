@@ -166,9 +166,10 @@ jobs:
   # Prueba de humo del cliente React contra el servidor de verdad (el
   # `buildHandler` real con repositorios en memoria y una sesión falsa, ver
   # `packages/dnd_server/test/e2e_server.dart`): sirve el build de `/v2` con un
-  # personaje sembrado y el test verifica que la ficha muestre los números del
-  # motor. Una sola prueba a propósito: cubre el cableado servidor ↔ build ↔
-  # cookie ↔ catálogo ↔ motor en el navegador.
+  # personaje sembrado y las pruebas verifican que la ficha y el dashboard
+  # muestren los números del motor (también con homebrew) y el acceso por
+  # `webV2`. Pocas a propósito: cubren el cableado servidor ↔ build ↔ cookie ↔
+  # catálogo ↔ motor en el navegador.
   web_e2e:
     name: web_e2e
     runs-on: ubuntu-latest

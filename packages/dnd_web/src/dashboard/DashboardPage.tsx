@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { accentOf, nameOf } from '../api/catalog';
-import { useCatalog, useRoster, useRosterSettings } from '../api/queries';
+import { useRoster, useRosterSettings, useSheetCatalog } from '../api/queries';
 import { computeSheet, type CharacterFields, type ComputedSheet } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import { FLUTTER_HOME } from '../router';
 import { Button, ButtonLink } from '../ui/Button';
+import { SectionRule } from '../ui/data';
 import { Tooltip } from '../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { RosterCard } from './RosterCard';
@@ -21,7 +22,9 @@ export function DashboardPage() {
   const lang = useLang();
   const roster = useRoster();
   const settings = useRosterSettings();
-  const catalog = useCatalog(lang);
+  // Con el homebrew encima, como la ficha: si no, una tarjeta mostraría otra
+  // CA que la ficha del mismo personaje.
+  const catalog = useSheetCatalog(lang);
   const [query, setQuery] = useState('');
 
   // Cada ficha se calcula una vez por lista y catálogo, no en cada tecla del
@@ -60,7 +63,7 @@ export function DashboardPage() {
     [entries, settings.data, query, sort],
   );
 
-  const failed = [roster, settings, catalog].filter((q) => q.isError);
+  const failed = [roster, settings, ...catalog.queries].filter((q) => q.isError);
   let body;
   if (failed.length > 0) {
     body = (
@@ -84,39 +87,6 @@ export function DashboardPage() {
   } else {
     body = (
       <>
-        <div role="search" className="card flex flex-wrap items-center gap-x-3 gap-y-2.5 p-3">
-          <div className="relative min-w-[min(200px,100%)] flex-1">
-            <label htmlFor="roster-search" className="sr-only">
-              {t.rosterSearchLabel}
-            </label>
-            <input
-              id="roster-search"
-              type="search"
-              autoComplete="off"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={t.rosterSearchHint}
-              className="plaque h-10 w-full rounded-[var(--radius-nav)] px-3 pr-9 text-[13px] text-on-surface placeholder:text-text-muted"
-            />
-            {query !== '' && (
-              <Tooltip content={t.rosterClearSearch}>
-                <button
-                  type="button"
-                  aria-label={t.rosterClearSearch}
-                  onClick={() => setQuery('')}
-                  className="absolute inset-y-0 right-0 flex w-9 items-center justify-center text-text-muted hover:text-on-surface"
-                >
-                  <X size={16} aria-hidden="true" />
-                </button>
-              </Tooltip>
-            )}
-          </div>
-          {/* El orden se muestra, no se edita: elegirlo es una escritura. */}
-          <p className="plaque rounded-[var(--radius-nav)] px-3 py-2.5 text-[13px] text-on-surface-variant">
-            <span className="text-text-muted">{t.sortLabel}: </span>
-            <span data-field="sort">{t.sortModes[sort]}</span>
-          </p>
-        </div>
         {visible.length === 0 ? (
           <AppEmptyState
             kind="no-match"
@@ -153,11 +123,13 @@ export function DashboardPage() {
   const fallen = entries?.filter(isFallen).length ?? 0;
   return (
     <div className="flex flex-col gap-5">
-      <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
-        <div>
+      {/* La barra de acciones del lienzo: título, buscador, orden y «Crear»
+          en una fila que se envuelve sola en un teléfono. */}
+      <header className="flex flex-wrap items-center gap-3.5">
+        <div className="min-w-0 flex-[1_1_220px]">
           {/* El título está siempre, también mientras carga: un h1 por
               pantalla y el lector sabe dónde está desde el primer momento. */}
-          <h1 className="font-display text-[28px] leading-tight text-on-surface">{t.rosterTitle}</h1>
+          <h1 className="font-display text-[30px] leading-tight text-on-surface">{t.rosterTitle}</h1>
           {entries && (
             <p className="mt-1 text-[13px] text-on-surface-variant tabular-nums">
               {fallen === 0
@@ -166,11 +138,47 @@ export function DashboardPage() {
             </p>
           )}
         </div>
+        {entries && entries.length > 0 && (
+          <div role="search" className="flex min-w-0 flex-[1_1_320px] flex-wrap items-center gap-2.5 shell:max-w-[460px]">
+            <div className="relative min-w-[min(200px,100%)] flex-1">
+              <label htmlFor="roster-search" className="sr-only">
+                {t.rosterSearchLabel}
+              </label>
+              <input
+                id="roster-search"
+                type="search"
+                autoComplete="off"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={t.rosterSearchHint}
+                className="h-9 w-full rounded-[var(--radius-pill)] border border-hairline bg-plaque px-4 pr-9 text-[13px] text-on-surface placeholder:text-text-muted"
+              />
+              {query !== '' && (
+                <Tooltip content={t.rosterClearSearch}>
+                  <button
+                    type="button"
+                    aria-label={t.rosterClearSearch}
+                    onClick={() => setQuery('')}
+                    className="absolute inset-y-0 right-1 flex w-8 items-center justify-center text-text-muted hover:text-on-surface"
+                  >
+                    <X size={16} aria-hidden="true" />
+                  </button>
+                </Tooltip>
+              )}
+            </div>
+            {/* El orden se muestra, no se edita: elegirlo es una escritura. */}
+            <p className="flex h-9 items-center rounded-[var(--radius-pill)] border border-hairline px-4 text-[13px] text-on-surface">
+              <span className="text-text-muted">{t.sortLabel}:&nbsp;</span>
+              <span data-field="sort">{t.sortModes[sort]}</span>
+            </p>
+          </div>
+        )}
         {/* Crear no existe en React: lleva al asistente de Flutter. */}
-        <ButtonLink href={FLUTTER_HOME} icon={Plus}>
+        <ButtonLink href={FLUTTER_HOME} icon={Plus} tone="soft" shape="pill">
           {t.rosterCreate}
         </ButtonLink>
       </header>
+      <SectionRule className="my-0" />
       {body}
     </div>
   );
