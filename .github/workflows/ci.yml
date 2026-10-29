@@ -98,3 +98,23 @@ jobs:
       - run: dart format --output=none --set-exit-if-changed lib bin test
       - run: dart analyze
       - run: dart test
+
+  # Cliente React (`/v2`, ver `docs/operaciones/despliegue.md`). El build ya
+  # corre `tsc --noEmit`; se deja el paso aparte para que un error de tipos
+  # se lea como tal y no enterrado en la salida de Vite.
+  dnd_web:
+    name: dnd_web
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/dnd_web
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: packages/dnd_web/package-lock.json
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npm run build

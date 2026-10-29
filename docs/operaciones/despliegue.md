@@ -223,8 +223,8 @@ cuenta.
 
 Dos workflows en `.github/workflows/`:
 
-- `ci.yml`: formato, análisis y pruebas de los tres paquetes en runners
-  alojados por GitHub, en cada push y cada pull request (y a mano, con
+- `ci.yml`: formato, análisis y pruebas de los tres paquetes Dart/Flutter (más el tipado
+  y el build de `dnd_web`) en runners alojados por GitHub, en cada push y cada pull request (y a mano, con
   `workflow_dispatch`). Las pruebas de la app van en dos mitades en paralelo con
   el build web, para que CD, que espera a CI entero, no cargue con la suma. No
   necesita configuración en el host.
@@ -235,6 +235,28 @@ Dos workflows en `.github/workflows/`:
   sobre un push a `main`: si CI falló no despliega, y si no cambió ninguna
   ruta desplegable desde el último CD exitoso tampoco (lo decide el job
   `gate`, en un runner de GitHub). Necesita el runner de esta sección.
+
+### El cliente React bajo `/v2`
+
+`packages/dnd_web` (Vite + React + TypeScript) es el cliente que va a
+reemplazar al de Flutter pantalla por pantalla. Por ahora es andamiaje: una
+página que consulta `/api/me` y dice si hay sesión, sin enlaces desde el
+cliente actual. Se sirve en el mismo origen que Flutter (`/`) y la API, así que
+comparte la cookie de sesión.
+
+- `DND_WEB_V2_ROOT` apunta al `dist` del build. La imagen lo fija en
+  `/app/web-v2`; sin la variable (o si el directorio no existe) `/v2` responde
+  404 y nada más cambia.
+- Las rutas de cliente (`/v2/lo-que-sea`) devuelven `index.html`; un archivo
+  que falta es 404.
+- Caché: `index.html` con `private, no-cache`, y los archivos de `assets/`
+  (con hash en el nombre) `public, max-age=31536000, immutable`.
+- `/api`, `/auth` y `/mcp` no pasan por este camino.
+
+Para probarlo sin Docker: `npm ci && npm run build` en `packages/dnd_web`, y
+levantar el servidor con `DND_WEB_V2_ROOT=$PWD/packages/dnd_web/dist`. Para
+desarrollar con recarga en caliente, `npm run dev` (puerto 5173, proxy de `/api`
+y `/auth` al servidor en `localhost:8080`; entrar por `/v2/`).
 
 ### Registrar el runner autoalojado
 

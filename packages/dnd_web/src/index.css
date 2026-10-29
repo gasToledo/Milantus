@@ -1,0 +1,49 @@
+@import 'tailwindcss';
+
+/* Tokens de `docs/desarrollo/diseno-web.md` Apéndice B, tal cual: no se
+   inventan valores intermedios. El tema claro se activa con
+   `data-theme="light"` en <html>; por defecto es el oscuro. */
+:root {
+  --scaffold: #151210;
+  --surface: #1e1915;
+  --on-surface: #efe7da;
+  --on-surface-variant: #a2937e;
+  --gold: #c9a24b;
+  --crimson: #d4665a;
+  --plaque: #12100c;
+  --hairline: #3a2f25;
+  --gold-soft: #2e2617;
+  --text-muted: #9c8b6e;
+  --on-primary: #201a10;
+
+  --font-display: Georgia, 'Times New Roman', serif;
+  --font-body: Roboto, system-ui, sans-serif;
+
+  --radius-card: 12px;
+  --radius-pill: 20px;
+  --radius-nav: 9px;
+  --border-hairline: 1px solid var(--hairline);
+  --sidebar-width: 236px;
+  --page-max-width: 760px;
+}
+
+:root[data-theme='light'] {
+  --scaffold: #f3ecdd;
+  --surface: #fbf7ec;
+  --on-surface: #2a2118;
+  --on-surface-variant: #6e5f49;
+  --gold: #8a6a1e;
+  --crimson: #a6392e;
+  --plaque: #ebe0c9;
+  --hairline: #d9c9a8;
+  --gold-soft: #eee1bf;
+  --text-muted: #6e6047;
+  --on-primary: #ffffff;
+}
+
+body {
+  margin: 0;
+  background: var(--scaffold);
+  color: var(--on-surface);
+  font-family: var(--font-body);
+}

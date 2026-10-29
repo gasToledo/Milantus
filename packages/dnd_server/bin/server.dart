@@ -27,6 +27,7 @@ import 'package:dnd_server/src/repositories/npc_repository.dart';
 import 'package:dnd_server/src/repositories/repository_transaction_runner.dart';
 import 'package:dnd_server/src/repositories/settings_repository.dart';
 import 'package:dnd_server/src/web/cache_headers.dart';
+import 'package:dnd_server/src/web/web_v2.dart';
 import 'package:postgres/postgres.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
@@ -84,6 +85,14 @@ Future<void> main() async {
   );
 
   final webStaticHandler = _buildWebStaticHandler(config.web);
+  final webV2Handler = config.web.v2Enabled
+      ? buildWebV2Handler(config.web.v2Root)
+      : null;
+  if (config.web.v2Enabled && webV2Handler == null) {
+    print(
+      'DND_WEB_V2_ROOT="${config.web.v2Root}" no existe: /v2 responderá 404.',
+    );
+  }
 
   final server = await shelf_io.serve(
     buildHandler(
@@ -115,6 +124,7 @@ Future<void> main() async {
       levelUps: PostgresLevelUpRepository(pool),
       settings: PostgresSettingsRepository(pool),
       webStaticHandler: webStaticHandler,
+      webV2Handler: webV2Handler,
       mcp: mcp,
       sendFeedback: config.feedback.enabled
           ? workerFeedbackSender(
