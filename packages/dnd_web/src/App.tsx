@@ -3,6 +3,7 @@ import { fetchAccount, fetchThemeMode, type Account } from './api/client';
 import { setEngineLanguage } from './engine';
 import { LangProvider, useTexts } from './i18n/context';
 import { resolveLang, type Lang } from './i18n/texts';
+import { DashboardPage } from './dashboard/DashboardPage';
 import { matchRoute } from './router';
 import { CharacterPage } from './sheet/CharacterPage';
 import { ActionButton, ActionLink, Notice, Shell } from './ui/Shell';
@@ -34,9 +35,7 @@ function applyTheme(mode: string) {
 export function App() {
   return (
     <LangProvider lang={LANG}>
-      <Shell>
-        <Screen />
-      </Shell>
+      <Screen />
     </LangProvider>
   );
 }
@@ -67,34 +66,67 @@ function Screen() {
     return () => controller.abort();
   }, [attempt]);
 
+  // Cada estado arma su marco: solo con sesión y `webV2` el panel lleva
+  // navegación y cuenta.
   switch (session.kind) {
     case 'loading':
-      return <Notice title={t.loadingSession} />;
+      return (
+        <Shell>
+          <Notice title={t.loadingSession} />
+        </Shell>
+      );
     case 'error':
       return (
-        <Notice
-          title={t.errorTitle}
-          body={t.errorBody}
-          action={<ActionButton onClick={retry}>{t.retry}</ActionButton>}
-        />
+        <Shell>
+          <Notice
+            title={t.errorTitle}
+            body={t.errorBody}
+            action={<ActionButton onClick={retry}>{t.retry}</ActionButton>}
+          />
+        </Shell>
       );
     case 'anonymous':
       return (
-        <Notice
-          title={t.signedOutTitle}
-          body={t.signedOutBody}
-          action={<ActionLink href="/auth/login">{t.signIn}</ActionLink>}
-        />
+        <Shell>
+          <Notice
+            title={t.signedOutTitle}
+            body={t.signedOutBody}
+            action={<ActionLink href="/auth/login">{t.signIn}</ActionLink>}
+          />
+        </Shell>
       );
     case 'signed-in': {
       // Sin `webV2` la ruta no existe: no hay pista de que haya algo detrás.
       // Es la misma pantalla para cualquier ruta, conocida o no.
       if (session.account.webV2 !== true) {
-        return <Notice title={t.unavailableTitle} body={t.unavailableBody} />;
+        return (
+          <Shell>
+            <Notice title={t.unavailableTitle} body={t.unavailableBody} />
+          </Shell>
+        );
       }
+      const { account } = session;
       const route = matchRoute(window.location.pathname);
-      if (route.name === 'character') return <CharacterPage id={route.id} />;
-      return <Notice title={t.notFoundTitleRoute} />;
+      switch (route.name) {
+        case 'roster':
+          return (
+            <Shell account={account} current="roster">
+              <DashboardPage />
+            </Shell>
+          );
+        case 'character':
+          return (
+            <Shell account={account} current="sheet">
+              <CharacterPage id={route.id} />
+            </Shell>
+          );
+        case 'unknown':
+          return (
+            <Shell account={account}>
+              <Notice title={t.notFoundTitleRoute} />
+            </Shell>
+          );
+      }
     }
   }
 }
