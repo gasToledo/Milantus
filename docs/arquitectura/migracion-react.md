@@ -212,7 +212,9 @@ repiten acá.
   capítulos, ni música, ni notas; todo eso sigue en Flutter. Se porta por
   secciones, una por PR; hoy existen la **Mesa**, **Capítulos**, el **Cuaderno**,
   los **PNJ de la mesa**, el **Combate**, el **Bestiario**, la **Biblioteca de
-  PNJ** y el **Homebrew**: toda la lectura del Modo DM. Rutas:
+  PNJ** y el **Homebrew**: todas las secciones del panel. De lectura faltan
+  todavía la ficha completa de un miembro, la de un PNJ con ficha y la música
+  (ver «Lo que todavía no existe»). Rutas:
   `/v2/dm` (redirige a la primera campaña en curso, o a la primera que haya),
   `/v2/dm/campanas/:id/mesa|capitulos|cuaderno|pnj|combate`, `/v2/dm/bestiario[/:criatura]`,
   `/v2/dm/pnj[/:pnj]` y `/v2/dm/homebrew[/:categoria[/:entrada]]`. El panel
@@ -341,8 +343,19 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    campañas del jugador en modo lectura *(existen; el cuaderno es del DM)*,
    bestiario *(existe)* y catálogos *(el Códice existe)*.
    **Lectura del Modo DM** (se sumó a este paso): Mesa, Capítulos, Cuaderno,
-   Bestiario, Biblioteca de PNJ, PNJ de la mesa, Homebrew y Combate *(existen)*:
-   con ellos la lectura del Modo DM está completa.
+   Bestiario, Biblioteca de PNJ, PNJ de la mesa, Homebrew y Combate *(existen)*.
+   **Faltan para cerrar el paso**, todas de lectura:
+   - la ficha completa de un miembro (`MemberSheetScreen` de Flutter; hoy la
+     tarjeta de la Mesa no es un enlace);
+   - la ficha completa de un PNJ con ficha (Flutter abre `SheetScreen`; acá la
+     ficha del PNJ muestra solo el resumen compilado);
+   - la música: escuchar las escenas de la campaña (`dm/music/` de Flutter),
+     que no escribe nada; crearlas y editarlas es del paso 6;
+   - los retratos (personaje, miembro y PNJ: hoy el medallón lleva la inicial)
+     y su visor;
+   - las menciones `@Nombre` del Cuaderno como enlaces, que dependen de las dos
+     fichas de arriba;
+   - imprimir la ficha (`print_sheet.dart`).
 4. Escrituras de bajo riesgo: PG y usos de recursos en la ficha, descansos.
 5. Edición completa: creador de personajes, subida de nivel, inventario.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
@@ -456,15 +469,18 @@ propio.
 
 Para que nadie lo dé por hecho:
 
-- Reordenar, marcar favorito, crear, renombrar o borrar personajes desde React.
-- Cualquier escritura desde React: todo el cliente hoy es solo lectura.
-- Del Modo DM: la música y la ficha
-  completa de un miembro o de un PNJ con ficha (en curso, por secciones).
+- Las lecturas que faltan del paso 3 (la lista está en «Orden previsto de
+  pantallas»): la ficha completa de un miembro y de un PNJ con ficha, la
+  música, los retratos, las menciones `@Nombre` como enlaces e imprimir.
+- Cualquier escritura desde React: todo el cliente hoy es solo lectura, así que
+  los pasos 4 a 7 están enteros por hacer. Entre ellos, reordenar, marcar
+  favorito, crear, renombrar o borrar personajes, y escribir en `/api/settings`
+  (por eso el tema elegido en el navegador gana sobre el de la cuenta).
 - Enlaces desde Flutter hacia `/v2` o redirección automática por `webV2`.
 - Tests de componentes y chequeo de literales sueltos en `dnd_web`.
 - Un criterio medido de «paridad visual» con Flutter: hoy es la comparación
   manual.
-- Retiro de Flutter: ver abajo; ninguno de los criterios está cumplido.
+- Retiro de Flutter: ver abajo; de los seis criterios solo está cumplido el 4.
 
 ## Criterios para retirar Flutter
 
