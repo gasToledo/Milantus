@@ -74,6 +74,9 @@ WORKDIR /workspace/packages/dnd_web
 COPY packages/dnd_web/package.json packages/dnd_web/package-lock.json ./
 RUN --mount=type=cache,id=npm-web-v2,target=/root/.npm npm ci
 COPY packages/dnd_web ./
+# El SRD que el navegador pide en `/v2/content/`: `npm run build` lo copia de
+# esta ruta (`scripts/copy-content.mjs`, relativa a `packages/dnd_web`).
+COPY packages/dnd_engine/lib/assets/srd_2024 /workspace/packages/dnd_engine/lib/assets/srd_2024
 # Después del `COPY` de arriba y antes del build: el archivo no se versiona
 # (`packages/dnd_web/.gitignore`), así que el contexto no lo trae.
 COPY --from=engine-js /workspace/dnd_engine.js ./src/engine/dnd_engine.generated.js

@@ -68,9 +68,31 @@ String migrateCharacter(String characterJson) => jsonEncode(
       Character.migrateJson(jsonDecode(characterJson) as Map<String, dynamic>),
     );
 
+/// Fija el idioma de los rótulos que el motor arma al calcular («Mediano»,
+/// el nombre de una condición…). Es el estado global `ContentLanguage.current`
+/// que `main.dart` de Flutter también fija con el idioma de la interfaz; hay
+/// que llamarlo **antes** de `compute`. Cualquier código que no sea `en` deja
+/// el español, que es la fuente.
+void setLanguage(String code) {
+  ContentLanguage.current =
+      code == 'en' ? ContentLanguage.en : ContentLanguage.es;
+}
+
+/// Superpone la traducción (`X.en.json`) a un catálogo (`X.json`), ambos como
+/// texto JSON. Es el `applyContentTranslation` de Flutter y del servidor, no
+/// una copia en TypeScript: la regla de qué ruta se pisa vive en un solo lado.
+String applyTranslation(String packJson, String overlayJson) => jsonEncode(
+      applyContentTranslation(
+        (jsonDecode(packJson) as List).cast<Map<String, dynamic>>(),
+        (jsonDecode(overlayJson) as Map).cast<String, dynamic>(),
+      ),
+    );
+
 void main() {
   final motor = JSObject();
   motor['compute'] = compute.toJS;
   motor['migrateCharacter'] = migrateCharacter.toJS;
+  motor['setLanguage'] = setLanguage.toJS;
+  motor['applyTranslation'] = applyTranslation.toJS;
   globalContext['dndEngine'] = motor;
 }
