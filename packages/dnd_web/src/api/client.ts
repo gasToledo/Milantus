@@ -278,6 +278,23 @@ export async function fetchNpcs(signal: AbortSignal): Promise<StoredNpc[]> {
   return npcs;
 }
 
+/** Un PNJ de una campaña (`GET /api/campaigns/:id/npcs`): el documento, su
+ *  estado **en esa** campaña, los PG con que volvió del último combate (sin
+ *  `currentHp` está entero) y su ficha si la tiene. */
+export interface CampaignNpc {
+  npc: JsonObject & { id: string; name?: string };
+  status?: string;
+  currentHp?: number;
+  character?: CharacterJson;
+}
+
+/** Los PNJ de la campaña [campaignId]. Una ajena y una inexistente responden
+ *  igual (404). */
+export async function fetchCampaignNpcs(campaignId: string, signal: AbortSignal): Promise<CampaignNpc[]> {
+  const { npcs } = await getJson<{ npcs: CampaignNpc[] }>(`/api/campaigns/${encodeURIComponent(campaignId)}/npcs`, signal);
+  return npcs;
+}
+
 /** Un PNJ de la cuenta. Uno ajeno y uno inexistente responden igual (404). */
 export async function fetchNpc(id: string, signal: AbortSignal): Promise<StoredNpc> {
   return getJson<StoredNpc>(`/api/npcs/${encodeURIComponent(id)}`, signal);

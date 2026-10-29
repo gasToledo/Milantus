@@ -107,6 +107,49 @@ test('la ficha de un PNJ muestra su voz, trasfondo, notas, cómo pelea y su esta
   expect(escrituras).toEqual([]);
 });
 
+test('los PNJ de la mesa muestran su estado y los PG con que volvieron del último combate, sin escribir', async ({ context, page, baseURL }) => {
+  await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);
+  const escrituras = vigilarEscrituras(page);
+  const { npcs } = await api<{ npcs: NpcEntryJson[] }>(page.request, '/api/campaigns/marca-del-cuervo/npcs', TOKEN_DM);
+  const vistas = npcViews(npcs, catalogo());
+  // Lo sembrado: Garrick volvió herido de un combate de esta mesa, y de Vesna
+  // no se sabe si sigue viva. Odile no está en la campaña.
+  expect(vistas.map((v) => [v.npc.id, v.status]).sort()).toEqual([
+    ['garrick', 'alive'],
+    ['vesna', 'unknown'],
+  ]);
+  const garrick = vistas.find((v) => v.npc.id === 'garrick')!;
+  expect(garrick.hurt).not.toBeNull();
+
+  await page.goto('/v2/dm/campanas/marca-del-cuervo/mesa');
+  await page.getByRole('navigation', { name: 'Secciones de la campaña' }).getByRole('link', { name: 'PNJ' }).click();
+  await expect(page).toHaveURL('/v2/dm/campanas/marca-del-cuervo/pnj');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('PNJ');
+  await expect(page.locator('[data-field="summary"]')).toHaveText(t.npcCounts(2, 1, 0, 1));
+  await expect(page.locator('[data-npc]')).toHaveCount(2);
+  await expect(page.locator('[data-npc="odile"]')).toHaveCount(0);
+  for (const vista of vistas) {
+    const tarjeta = page.locator(`[data-npc="${vista.npc.id}"]`);
+    // Con los PG del herido: «Bandido · CA 12 · PG 7/11», no el máximo.
+    await expect(tarjeta.locator('[data-field="type"]')).toHaveText(npcTypeLine(vista, t, { withHurt: true }));
+    await expect(tarjeta.locator('[data-status]')).toHaveText(t.npcStatus[vista.status]);
+  }
+  await expect(page.locator('[data-npc="garrick"] [data-field="type"]')).toContainText(`${garrick.hurt!.current}/${garrick.hurt!.max}`);
+
+  // El tag filtra, y tocar el elegido lo suelta.
+  const tags = page.getByRole('group', { name: 'Tags' });
+  await tags.getByRole('button', { name: /Enemigos/ }).click();
+  await expect(page.locator('[data-npc]')).toHaveCount(1);
+  await tags.getByRole('button', { name: /Enemigos/ }).click();
+  await expect(page.locator('[data-npc]')).toHaveCount(2);
+
+  // La identidad lleva a la ficha de la Biblioteca.
+  await page.locator('[data-npc="garrick"]').getByRole('link').click();
+  await expect(page).toHaveURL(`${BIBLIOTECA}/garrick`);
+
+  expect(escrituras).toEqual([]);
+});
+
 test('los PNJ del DM no llegan a otra cuenta: lo ajeno responde igual que lo inexistente', async ({ context, page, baseURL }) => {
   // En la API: la otra cuenta tiene la biblioteca vacía, y pedir un PNJ del DM
   // da el mismo 404 que uno que no existe.
@@ -118,6 +161,11 @@ test('los PNJ del DM no llegan a otra cuenta: lo ajeno responde igual que lo ine
   expect(ajeno.status()).toBe(404);
   expect(inexistente.status()).toBe(404);
   expect(await ajeno.text()).toBe(await inexistente.text());
+  // Los PNJ de una mesa ajena, igual que los de una que no existe.
+  const mesaAjena = await pedir('/api/campaigns/marca-del-cuervo/npcs');
+  const mesaInexistente = await pedir('/api/campaigns/no-existe/npcs');
+  expect(mesaAjena.status()).toBe(404);
+  expect(await mesaAjena.text()).toBe(await mesaInexistente.text());
 
   // Ni por la campaña del jugador: nada de lo que el DM escribió de sus PNJ.
   const jugador = JSON.stringify(await api<unknown>(page.request, '/api/characters/elsbeth-de-humo/campaigns', TOKEN));
@@ -129,5 +177,7 @@ test('los PNJ del DM no llegan a otra cuenta: lo ajeno responde igual que lo ine
     await page.goto(`${BIBLIOTECA}/${id}`);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(t.npcNotFound);
   }
+  await page.goto('/v2/dm/campanas/marca-del-cuervo/pnj');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(t.dmCampaignNotFound);
   for (const secreto of SOLO_DEL_DM) await expect(page.getByText(secreto)).toHaveCount(0);
 });

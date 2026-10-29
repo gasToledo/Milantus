@@ -211,16 +211,16 @@ repiten acá.
   interruptor. **Ninguna escritura**: ni crear o editar campañas, ni cerrar
   capítulos, ni música, ni notas; todo eso sigue en Flutter. Se porta por
   secciones, una por PR; hoy existen la **Mesa**, **Capítulos**, el **Cuaderno**,
-  el **Bestiario** y la **Biblioteca de PNJ**. Rutas: `/v2/dm` (redirige a la
-  primera campaña en curso, o a la primera que haya),
-  `/v2/dm/campanas/:id/mesa|capitulos|cuaderno`, `/v2/dm/bestiario[/:criatura]`
+  los **PNJ de la mesa**, el **Bestiario** y la **Biblioteca de PNJ**. Rutas:
+  `/v2/dm` (redirige a la primera campaña en curso, o a la primera que haya),
+  `/v2/dm/campanas/:id/mesa|capitulos|cuaderno|pnj`, `/v2/dm/bestiario[/:criatura]`
   y `/v2/dm/pnj[/:pnj]`. El panel (`DmPanel`) sigue al de Flutter: el
   interruptor con «DM» activo, las herramientas (Bestiario, Biblioteca de PNJ y
   Homebrew; los dos primeros son internos y Homebrew enlaza a Flutter con el ícono
   de enlace externo), las campañas
   agrupadas En curso / En pausa / Terminadas (plegable, abierta si la elegida
-  es una de ellas) y, de la campaña elegida, sus secciones; PNJ y Combate enlazan
-  a Flutter porque todavía no se portan. La **Mesa** lista a los jugadores
+  es una de ellas) y, de la campaña elegida, sus secciones; Combate enlaza
+  a Flutter porque todavía no se porta. La **Mesa** lista a los jugadores
   vinculados (`GET /api/campaigns/:id/members`, que lee la ficha **real** del
   jugador, no una copia): retrato inicial, nombre, especie y clase, nivel, barra
   de PG, placas CA / Inic / CD / Pasiva y los estados como pills carmesí. Las
@@ -276,6 +276,15 @@ repiten acá.
   editar, retratos, el estado por campaña, exportar y borrar siguen en Flutter,
   y el retrato todavía no se muestra (el medallón lleva la inicial, como en el
   resto de `/v2`).
+  **PNJ de la mesa** (`GET /api/campaigns/:id/npcs`): los PNJ vinculados a la
+  campaña con su estado **en esa** campaña. Arriba, el conteo («2 PNJ · 1 vivo ·
+  0 muertos · 1 desconocido») y las pills de tag; cada tarjeta lleva la
+  identidad (que abre la ficha de la Biblioteca), la línea de tipo con los PG
+  con que volvió del último combate de esa mesa («Bandido · CA 12 · PG 7/11»),
+  sus tags y el estado como pill con la palabra; un muerto va tachado y
+  atenuado. Los PG del herido los resuelve el motor (`npcViews` con `currentHp`
+  y `status` de cada entrada), igual que en la Biblioteca. Cambiar el estado,
+  traer de la biblioteca y quitar de la campaña siguen en Flutter.
 - **Homebrew**: la ficha y el dashboard calculan con el catálogo oficial más
   el contenido homebrew de la cuenta (`GET /api/homebrew`, fusionado por id en
   `src/api/homebrew.ts`), como `HomebrewStore` + `ContentRepository.addAll` en
@@ -298,7 +307,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    campañas del jugador en modo lectura *(existen; el cuaderno es del DM)*,
    bestiario *(existe)* y catálogos *(el Códice existe)*.
    **Lectura del Modo DM** (se sumó a este paso): Mesa, Capítulos, Cuaderno,
-   Bestiario y Biblioteca de PNJ *(existen)*; **faltan** los PNJ de la mesa, el
+   Bestiario, Biblioteca de PNJ y PNJ de la mesa *(existen)*; **faltan** el
    Homebrew de la cuenta y el Combate en solo lectura (hoy enlazan a Flutter).
    Hasta que existan, la lectura no está cerrada.
 4. Escrituras de bajo riesgo: PG y usos de recursos en la ficha, descansos.
@@ -360,9 +369,11 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    (bloque, ficha y sin estadísticas) con la línea que arma el motor, filtre por
    campaña, tag y nombre, abra la ficha con la voz, el trasfondo, las notas, el
    bloque o la ficha compilada y el estado por campaña, sin escribir nada, y que
-   otra cuenta tenga la biblioteca vacía, reciba por un PNJ ajeno el mismo 404
-   que por uno inexistente (en la API y en la pantalla) y no encuentre nada de
-   eso en la vista del jugador (`e2e/pnj.spec.ts`); y que una cuenta sin `webV2` vea
+   los PNJ de la mesa muestren su estado y los PG con que volvió el herido, sin
+   escribir, y que
+   otra cuenta tenga la biblioteca vacía, reciba por un PNJ ajeno o por los PNJ
+   de una mesa ajena el mismo 404 que por lo inexistente (en la API y en la
+   pantalla) y no encuentre nada de eso en la vista del jugador (`e2e/pnj.spec.ts`); y que una cuenta sin `webV2` vea
    «No disponible» sin pedir sus datos (`e2e/acceso.spec.ts`). Lo esperado se
    calcula con el mismo motor y la misma fusión (`e2e/helpers.ts`). Sin
    reintentos: no hay «a veces anda».
@@ -406,7 +417,7 @@ Para que nadie lo dé por hecho:
 
 - Reordenar, marcar favorito, crear, renombrar o borrar personajes desde React.
 - Cualquier escritura desde React: todo el cliente hoy es solo lectura.
-- Del Modo DM: los PNJ de la mesa, Combate, Homebrew, la música y la ficha
+- Del Modo DM: Combate, Homebrew, la música y la ficha
   completa de un miembro o de un PNJ con ficha (en curso, por secciones).
 - Enlaces desde Flutter hacia `/v2` o redirección automática por `webV2`.
 - Tests de componentes y chequeo de literales sueltos en `dnd_web`.

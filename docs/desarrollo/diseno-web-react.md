@@ -210,6 +210,12 @@ control que escriba, y el e2e comprueba que no sale ningún pedido que no sea
   línea de tipo la arma `npcTypeLine` con lo que da `npcViews`: ningún número se
   calcula acá. El tablero es «Modo DM — Biblioteca de PNJ, PNJ de la mesa,
   Homebrew y Combate» del Design.
+- **PNJ de la mesa** (`npcs/CampaignNpcsView`): la grilla `auto-fill` de `card`
+  de 280 px con la misma `FilterPill` de tag que la Biblioteca (exportada de
+  `NpcLibraryView`) y el conteo por estado a su izquierda. La tarjeta no es un
+  enlace entero: lo es la identidad (medallón de 36 y nombre), porque así es en
+  Flutter, donde el resto de la tarjeta lleva controles. El estado va al pie con
+  `STATUS_TONE`, y un muerto se tacha y atenúa además del color.
 
 ## Reglas que más se olvidan
 

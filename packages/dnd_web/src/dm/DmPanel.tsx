@@ -10,8 +10,7 @@ import { groupCampaigns, stateOf } from './campaigns';
  * El panel del Modo DM (`_sidebar` de `dm_mode_screen.dart`): el interruptor
  * con «DM» activo, las herramientas de la cuenta, las campañas agrupadas por
  * estado y, de la campaña elegida, sus secciones. Lo que React todavía no
- * porta (Homebrew, PNJ de la mesa y Combate) enlaza a Flutter con el ícono de
- * enlace externo.
+ * porta (Homebrew y Combate) enlaza a Flutter con el ícono de enlace externo.
  */
 export function DmPanel({
   campaigns,
@@ -113,7 +112,13 @@ export function DmPanel({
               />
             </li>
             <li>
-              <NavItem href={FLUTTER_HOME} icon={UsersRound} label={t.dmSectionNpcs} external />
+              <NavItem
+                href={dmCampaignHref(current.campaign.id, 'pnj')}
+                icon={UsersRound}
+                label={t.dmSectionNpcs}
+                active={current.section === 'pnj'}
+                internal
+              />
             </li>
             <li>
               <NavItem href={FLUTTER_HOME} icon={Flame} label={t.dmSectionCombat} external />

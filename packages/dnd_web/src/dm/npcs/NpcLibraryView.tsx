@@ -159,8 +159,9 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
   );
 }
 
-/** Una pill de filtro con su conteo: la selección es estado local, no ruta. */
-function FilterPill({
+/** Una pill de filtro con su conteo: la selección es estado local, no ruta.
+ *  La comparten la Biblioteca y los PNJ de la mesa. */
+export function FilterPill({
   label,
   count,
   pressed,

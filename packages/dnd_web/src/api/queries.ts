@@ -16,6 +16,7 @@ import {
   fetchCampaignChapters,
   fetchCampaignMembers,
   fetchCampaignNotebook,
+  fetchCampaignNpcs,
   fetchDmCampaigns,
   fetchNpc,
   fetchNpcs,
@@ -57,6 +58,7 @@ export const queryKeys = {
   campaignMembers: (campaignId: string) => ['dm', 'campaigns', campaignId, 'members'] as const,
   campaignNotebook: (campaignId: string) => ['dm', 'campaigns', campaignId, 'notebook'] as const,
   campaignChapters: (campaignId: string) => ['dm', 'campaigns', campaignId, 'chapters'] as const,
+  campaignNpcs: (campaignId: string) => ['dm', 'campaigns', campaignId, 'npcs'] as const,
   npcs: ['dm', 'npcs'] as const,
   npc: (id: string) => ['dm', 'npcs', id] as const,
 };
@@ -142,6 +144,13 @@ export const useCampaignNotebook = (campaignId: string) =>
   useQuery({
     queryKey: queryKeys.campaignNotebook(campaignId),
     queryFn: ({ signal }) => fetchCampaignNotebook(campaignId, signal),
+  });
+
+/** Los PNJ de la campaña, con su estado y sus PG en ella. */
+export const useCampaignNpcs = (campaignId: string) =>
+  useQuery({
+    queryKey: queryKeys.campaignNpcs(campaignId),
+    queryFn: ({ signal }) => fetchCampaignNpcs(campaignId, signal),
   });
 
 /** La biblioteca de PNJ de la cuenta: una herramienta del DM, no de una

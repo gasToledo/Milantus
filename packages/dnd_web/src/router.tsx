@@ -38,10 +38,10 @@ export const CODEX_CATEGORIES = {
 } as const;
 export type CodexCategory = keyof typeof CODEX_CATEGORIES;
 
-/** Las secciones de una campaña en el Modo DM. PNJ y Combate no están: siguen
- *  en Flutter (`FLUTTER_HOME`). Mismo criterio de segmentos que las pestañas
- *  de la ficha: en español y sin tildes. */
-export const DM_SECTIONS = ['mesa', 'capitulos', 'cuaderno'] as const;
+/** Las secciones de una campaña en el Modo DM. Combate no está: sigue en
+ *  Flutter (`FLUTTER_HOME`). Mismo criterio de segmentos que las pestañas de
+ *  la ficha: en español y sin tildes. */
+export const DM_SECTIONS = ['mesa', 'capitulos', 'cuaderno', 'pnj'] as const;
 export type DmSection = (typeof DM_SECTIONS)[number];
 
 /** Qué muestra el Modo DM. `home` es `/v2/dm` a secas: no muestra nada, redirige
