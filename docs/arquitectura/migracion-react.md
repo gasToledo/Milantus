@@ -90,7 +90,18 @@ repiten acá.
 - Idioma: español o inglés, resuelto una vez al cargar (clave `milantus.locale`
   de `localStorage`, luego `navigator.language`, luego español). Es el mismo
   criterio para los rótulos del motor.
-- **Una pantalla: la ficha de solo lectura** en `/v2/personajes/:id`
+- **Dos pantallas de solo lectura.** La primera, el **dashboard** en `/v2/`
+  (`src/dashboard/`): la lista de personajes con el orden (`sortMode`:
+  manual, más recientes, nombre, nivel, clase) y el favorito de los ajustes de
+  la cuenta (`/api/settings`), buscador en el cliente por nombre, especie y
+  clase, y los caídos al final, como en Flutter. Orden y favorito **se
+  muestran, no se editan**; crear, Ajustes, Sugerencias, Cerrar sesión, Códice,
+  Homebrew y el «DM» del interruptor de modo enlazan a la raíz de Flutter
+  (`FLUTTER_HOME`, `src/router.ts`). Cada tarjeta enlaza a la ficha. Las cifras
+  (nivel, PG máximos, CA, velocidad, iniciativa) salen de `computeSheet`; los
+  PG actuales, de la ficha cruda. El panel lateral (`src/ui/Shell.tsx`) es el
+  mismo en las dos pantallas.
+- **La ficha de solo lectura** en `/v2/personajes/:id`
   (`src/sheet/`). Muestra cifras de combate, características, ataques,
   recursos, rasgos, salvaciones y habilidades, todo desde `ComputedSheet`.
   La API no tiene `GET` por id, así que carga la lista de `/api/characters` y
@@ -106,8 +117,8 @@ y conviene que el motor y la API estén probados en producción con el riesgo
 anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
 
 1. Ficha de personaje, solo lectura *(existe)*.
-2. Lista de personajes y navegación entre pantallas (hoy el router tiene una
-   sola ruta a propósito).
+2. Lista de personajes y navegación entre pantallas *(la lista existe; el
+   router sigue siendo mínimo y los enlaces recargan la página)*.
 3. Lo de lectura más simple: ajustes de visualización, cuaderno/campañas en
    modo lectura, bestiario y catálogos.
 4. Escrituras de bajo riesgo: PG y usos de recursos en la ficha, descansos.
@@ -131,11 +142,12 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    dobles, orden ni redondeos. Es también la red del tipo escrito a mano de
    `types.ts`: un campo nuevo en `ComputedSheet.toJson` rompe acá aunque el tipo
    no lo diga.
-2. **Playwright** (job `web_e2e`). Una sola prueba de humo a propósito
-   (`e2e/ficha.spec.ts`): levanta el servidor real con repositorios en memoria
+2. **Playwright** (job `web_e2e`). Una prueba por pantalla, a propósito
+   (`e2e/ficha.spec.ts` y `e2e/dashboard.spec.ts`): levanta el servidor real con repositorios en memoria
    y una sesión falsa (`dnd_server/test/e2e_server.dart`), sirve el `dist` de
-   `/v2` con un personaje sembrado y verifica que la ficha muestre los números
-   que da el motor. Cubre el cableado servidor ↔ build ↔ cookie ↔ catálogo ↔
+   `/v2` con personajes y ajustes sembrados y verifica que cada pantalla
+   muestre los números que da el motor (el dashboard, además, el orden de los
+   ajustes, el favorito y el buscador). Cubre el cableado servidor ↔ build ↔ cookie ↔ catálogo ↔
    motor en el navegador. Sin reintentos: no hay «a veces anda».
 3. **Comparación manual en producción con una cuenta habilitada.** Lo que solo
    se ve con el stack real (túnel, caché, cuenta de verdad, personajes
@@ -175,7 +187,9 @@ propio.
 
 Para que nadie lo dé por hecho:
 
-- Más de una pantalla, navegación entre pantallas y lista de personajes.
+- Navegación interna sin recarga: los enlaces entre `/v2/` y la ficha son
+  enlaces reales, y cada pantalla vuelve a cargar el catálogo.
+- Reordenar, marcar favorito, crear, renombrar o borrar personajes desde React.
 - Cualquier escritura desde React: todo el cliente hoy es solo lectura.
 - Enlaces desde Flutter hacia `/v2` o redirección automática por `webV2`.
 - Tests de componentes y chequeo de literales sueltos en `dnd_web`.
