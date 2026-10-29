@@ -9,6 +9,8 @@ export type * from './types';
 interface DartEngine {
   compute(characterJson: string, catalogJson: string): string;
   migrateCharacter(characterJson: string): string;
+  setLanguage(code: string): void;
+  applyTranslation(packJson: string, overlayJson: string): string;
 }
 
 function engine(): DartEngine {
@@ -50,4 +52,18 @@ export function migrateCharacter(character: CharacterJson): CharacterJson {
   return JSON.parse(
     engine().migrateCharacter(JSON.stringify(character)),
   ) as CharacterJson;
+}
+
+/**
+ * Idioma de los rótulos que el motor arma al calcular («Mediano»). Es estado
+ * global del motor, igual que en Flutter: se fija **antes** de `computeSheet`.
+ */
+export function setEngineLanguage(code: 'es' | 'en'): void {
+  engine().setLanguage(code);
+}
+
+/** Superpone una traducción (`X.en.json`) a un catálogo (`X.json`), como
+ *  texto JSON: es el `applyContentTranslation` de Dart, no una copia. */
+export function applyTranslation(packJson: string, overlayJson: string): string {
+  return engine().applyTranslation(packJson, overlayJson);
 }

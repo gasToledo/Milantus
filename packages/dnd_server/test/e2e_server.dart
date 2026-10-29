@@ -15,6 +15,7 @@ library;
 
 import 'dart:io';
 
+import 'package:dnd_engine/dnd_engine.dart';
 import 'package:dnd_server/src/ai/portrait_generation_service.dart';
 import 'package:dnd_server/src/app.dart';
 import 'package:dnd_server/src/auth/session_store.dart';
@@ -38,9 +39,15 @@ import 'fakes/in_memory_repository_transaction_runner.dart';
 import 'fakes/in_memory_settings_repository.dart';
 
 /// Cookie que el test de Playwright instala en el navegador, y el nombre que
-/// la sesión falsa muestra. Si cambian, cambian en `e2e/smoke.spec.ts`.
+/// la sesión falsa muestra. Si cambian, cambian en `e2e/ficha.spec.ts`.
 const smokeSessionToken = 'sesion-de-humo=';
 const smokeAccountName = 'Ada de Humo';
+
+/// Cuenta de la sesión falsa, y el personaje que tiene sembrado (lo abre
+/// `e2e/ficha.spec.ts`). Los PG actuales no son los máximos a propósito: así
+/// la prueba distingue «PG actuales» de «PG máximos».
+const smokeUserId = 'cuenta-de-humo';
+const smokeCharacterId = 'guerrero-de-humo';
 
 Future<void> main() async {
   final root = Platform.environment['DND_WEB_V2_ROOT'] ?? '';
@@ -54,13 +61,46 @@ Future<void> main() async {
   }
 
   final auth = FakeAuthDependencies();
-  auth.sessionsByToken[smokeSessionToken] = 'cuenta-de-humo';
+  auth.sessionsByToken[smokeSessionToken] = smokeUserId;
   auth.profilesByToken[smokeSessionToken] = const SessionProfile(
     name: smokeAccountName,
     email: 'humo@example.org',
   );
 
   final characters = InMemoryCharacterRepository();
+  await characters.create(
+    smokeUserId,
+    Character(
+      id: smokeCharacterId,
+      name: 'Brunilda de Humo',
+      raceId: 'human',
+      classId: 'fighter',
+      backgroundId: 'soldier',
+      level: 5,
+      assignedScores: const {
+        Ability.strength: 15,
+        Ability.dexterity: 13,
+        Ability.constitution: 14,
+        Ability.intelligence: 12,
+        Ability.wisdom: 16,
+        Ability.charisma: 10,
+      },
+      backgroundAbilityBonuses: const {
+        Ability.strength: 2,
+        Ability.constitution: 1,
+      },
+      chosenSkills: const ['perception', 'survival', 'insight'],
+      featureChoices: const {
+        'fighting-style': ['fs-defense'],
+      },
+      weaponMasteryChoices: const ['longsword', 'greatsword', 'dagger'],
+      hpPerLevel: const [10, 6, 6, 6, 6],
+      equippedArmorId: 'chain-mail',
+      shieldEquipped: true,
+      equippedWeaponIds: const ['longsword'],
+      combat: CombatState(currentHp: 31),
+    ),
+  );
   final campaigns = InMemoryCampaignRepository(characters);
   final chapters = InMemoryChapterRepository(campaigns);
   final notes = InMemoryNoteRepository(campaigns, chapters);
@@ -103,6 +143,7 @@ Future<void> main() async {
     levelUps: levelUps,
     settings: InMemorySettingsRepository(),
     webV2Handler: v2,
+    v2Users: {smokeUserId},
   );
 
   final server = await shelf_io.serve(

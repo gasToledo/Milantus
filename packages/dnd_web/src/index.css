@@ -47,3 +47,82 @@ body {
   color: var(--on-surface);
   font-family: var(--font-body);
 }
+
+/* Los tokens de arriba como utilidades de Tailwind (`bg-surface`,
+   `text-gold`…). `inline` deja la referencia `var(--x)` sin resolver: el tema
+   claro cambia las variables y las utilidades lo siguen, sin repetir valores. */
+@theme inline {
+  --color-scaffold: var(--scaffold);
+  --color-surface: var(--surface);
+  --color-plaque: var(--plaque);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-crimson: var(--crimson);
+  --color-hairline: var(--hairline);
+  --color-text-muted: var(--text-muted);
+  --color-on-primary: var(--on-primary);
+}
+
+/* Componentes del Apéndice B de `diseno-web.md`. Tres niveles de fondo y no
+   más (scaffold → surface → plaque): la placa se hunde, nada se eleva, así
+   que no hay `box-shadow` en ningún lado. */
+.card {
+  background: var(--surface);
+  border: var(--border-hairline);
+  border-radius: var(--radius-card);
+}
+.plaque {
+  background: var(--plaque);
+  border: var(--border-hairline);
+  border-radius: var(--radius-card);
+}
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 1.6px;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.pill {
+  background: var(--gold-soft);
+  border: var(--border-hairline);
+  border-radius: var(--radius-pill);
+  padding: 2px 9px;
+  font-size: 11px;
+  color: var(--gold);
+}
+/* Georgia solo para títulos y valores de plaqueta. */
+.font-display {
+  font-family: var(--font-display);
+}
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+/* Un número pensado para comparar contra el de al lado: sans negrita y cifras
+   tabulares (`diseno-web.md` §4.3). */
+.num {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.stat-tile-value {
+  font-size: 28px;
+  line-height: 1.05;
+}
+.plaque-label {
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* El foco siempre se ve: el oro de la marca sobre cualquier fondo del tema. */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}

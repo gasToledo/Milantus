@@ -8,7 +8,7 @@ const servidor = fileURLToPath(new URL('../dnd_server', import.meta.url));
 
 export default defineConfig({
   testDir: './e2e',
-  // Una sola prueba de humo: reintentar escondería una falla real, y en CI no
+  // Una sola prueba (la ficha): reintentar escondería una falla real, y en CI no
   // hay "a veces anda".
   retries: 0,
   reporter: process.env.CI ? 'github' : 'list',
@@ -20,7 +20,7 @@ export default defineConfig({
     launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH },
   },
   // El servidor real con repositorios en memoria y una sesión falsa, sirviendo
-  // el `dist` de /v2: ver `packages/dnd_server/test/e2e_server.dart`. Requiere
+  // el `dist` de /v2 con un personaje sembrado: ver `packages/dnd_server/test/e2e_server.dart`. Requiere
   // `npm run build` antes. `/health` no pide sesión.
   webServer: {
     command: 'dart run test/e2e_server.dart',

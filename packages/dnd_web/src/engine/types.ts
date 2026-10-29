@@ -247,3 +247,23 @@ export interface Catalog {
 
 /** El JSON de `Character` (ver `Character.toJson` en el motor). */
 export type CharacterJson = JsonObject;
+
+/**
+ * Los campos del personaje que una pantalla lee **tal cual**, sin pasar por el
+ * motor: identidad y estado de la mesa (PG actuales, usos gastados), que no
+ * son un resultado de reglas. Todo número derivado sale de [ComputedSheet].
+ */
+export interface CharacterFields {
+  id: string;
+  name: string;
+  raceId: string;
+  classId: string;
+  backgroundId: string;
+  subclassId?: string | null;
+  combat?: {
+    currentHp?: number;
+    tempHp?: number;
+    /** Clave del recurso (`CharacterResource.key`) → usos gastados. */
+    resourceUsage?: Record<string, number>;
+  };
+}
