@@ -173,8 +173,8 @@ repiten acá.
   y actúa sobre sus propias funciones (mantener la pantalla encendida, volver a
   mostrar los tutoriales), la dificultad del encuentro (Modo DM) y el proveedor
   de retratos (vive en la pantalla de retratos).
-- **Campañas** en `/v2/campanas` (`src/campaigns/`), «Campañas» del panel
-  principal: las mesas en las que juega la cuenta, de todos sus personajes en
+- **Campañas** en `/v2/campanas` (`src/campaigns/`), **sin enlace en el menú
+  de Jugador** (es del Modo DM; ver abajo): las mesas en las que juega la cuenta, de todos sus personajes en
   una lista (cada una con «Con <personaje>», que lleva a la pestaña Campaña de
   esa ficha). Es la **vista del jugador y nada más**: la misma consulta que la
   ficha (`GET /api/characters/:id/campaigns`), que el servidor ya poda con
@@ -186,8 +186,8 @@ repiten acá.
   lo más parecido a «miembros» es «En la mesa también juega…», que ya trae
   cada campaña. Leer las campañas *como DM* (`/api/campaigns`) es el Modo DM,
   paso 6.
-- **El Bestiario** en `/v2/bestiario` (`src/bestiary/`), «Bestiario» del panel
-  principal: la lista de criaturas del catálogo más las homebrew de la cuenta
+- **El Bestiario** en `/v2/bestiario` (`src/bestiary/`), **sin enlace en el menú de
+  Jugador** (en Flutter es del Modo DM; ver abajo): la lista de criaturas del catálogo más las homebrew de la cuenta
   (marcadas «Propio»), con búsqueda por nombre y por línea de tipo, filtro por
   tipo y por rango de VD (un rango deja afuera a las que no tienen desafío; uno
   invertido corre el otro extremo) y orden por nombre o por VD. Cada criatura es
@@ -202,10 +202,11 @@ repiten acá.
   (`Creature.challengeRatingText`), la iniciativa, la percepción pasiva y si el
   alcance de cada acción es cuerpo a cuerpo; el modificador de cada
   característica es `abilityModifier`. Es de solo lectura: **sumar al combate y
-  «Editar una copia»** (Homebrew) son del Modo DM de Flutter y no están. El
-  Bestiario es una sección del Modo DM allá; acá es una pantalla del jugador
-  porque el catálogo es el mismo contenido público que ya sirve `/v2/content`
-  y lo propio es de la cuenta.
+  «Editar una copia»** (Homebrew) son del Modo DM de Flutter y no están.
+- **Campañas y Bestiario no están en el menú**: se entra escribiendo la URL.
+  Pertenecen al Modo DM y React todavía no lo tiene (paso 6); cuando exista, el
+  panel DM los enlaza. Hasta entonces el interruptor «DM» sigue llevando a
+  Flutter.
 - **Homebrew**: la ficha y el dashboard calculan con el catálogo oficial más
   el contenido homebrew de la cuenta (`GET /api/homebrew`, fusionado por id en
   `src/api/homebrew.ts`), como `HomebrewStore` + `ContentRepository.addAll` en
