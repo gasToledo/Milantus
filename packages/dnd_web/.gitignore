@@ -4,3 +4,5 @@ dist
 # El motor de Dart compilado a JS (npm run build:engine): se genera, no se versiona.
 src/engine/dnd_engine.generated.js
 src/engine/dnd_engine.generated.js.deps
+test-results
+playwright-report
