@@ -1,9 +1,7 @@
-import 'fakes/localized_app.dart';
 import 'dart:convert';
 
 import 'package:dnd_engine/dnd_engine.dart';
-import 'package:dnd_app/creation/creation_draft.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 
 /// La creación del Brujo gnomo de la observación del 24/09/2026: el equipo
 /// que nacía sin poner, la aptitud de Iniciado en la Magia que nadie pedía y
@@ -13,7 +11,7 @@ void main() {
 
   setUpAll(() async {
     repo = await ContentRepository.loadFromDirectory(
-      '../dnd_engine/lib/assets/srd_2024',
+      'lib/assets/srd_2024',
     );
   });
 
@@ -146,11 +144,11 @@ void main() {
       final d = brujo();
       final feat = d.originFeatWithAbilityChoice!;
       expect(
-        d.pendingFor(CreationStep.trasfondo, l10nEs),
-        contains('Elegí la aptitud mágica de ${feat.name}.'),
+        faltan(d, [CreationSection.background]),
+        contains(p(CreationPendingKind.pickFeatAbility, name: feat.name)),
       );
       d.originFeatSpellcastingAbility = Ability.charisma;
-      expect(d.pendingFor(CreationStep.trasfondo, l10nEs), isEmpty);
+      expect(faltan(d, [CreationSection.background]), isEmpty);
     });
 
     test('el personaje nace con la aptitud y sin la advertencia', () {
@@ -166,7 +164,7 @@ void main() {
       final d = brujo(backgroundId: 'soldier')
         ..originFeatSpellcastingAbility = Ability.charisma;
       expect(d.originFeatWithAbilityChoice, isNull);
-      expect(d.pendingFor(CreationStep.trasfondo, l10nEs), isEmpty);
+      expect(faltan(d, [CreationSection.background]), isEmpty);
       expect(d.build().featSpellcastingAbilities, isEmpty);
     });
 
@@ -190,9 +188,10 @@ void main() {
         containsAll(['pact-of-the-tome:cantrips', 'pact-of-the-tome:rituals']),
       );
       expect(
-        d.pendingFor(CreationStep.equipo, l10nEs),
+        faltan(d, [CreationSection.equipment, CreationSection.spells]),
         contains(
-          'Conjuros a elección: ${slots.values.fold<int>(0, (n, s) => n + s.count)}.',
+          p(CreationPendingKind.spellChoices,
+              need: slots.values.fold<int>(0, (n, s) => n + s.count)),
         ),
       );
 
@@ -200,11 +199,22 @@ void main() {
         d.spellChoices[s.groupId] = s.options.take(s.count).toList();
       }
       expect(
-        d
-            .pendingFor(CreationStep.equipo, l10nEs)
+        faltan(d, [CreationSection.equipment, CreationSection.spells])
             .where((m) => m.startsWith('Conjuros a elección')),
         isEmpty,
       );
     });
   });
 }
+
+/// Lo que falta en [sections], en una forma comparable: el texto lo pone cada
+/// cliente, y acá alcanza con el qué y el cuánto.
+List<String> faltan(CreationDraft d, List<CreationSection> sections) => [
+      for (final s in sections)
+        for (final x in d.pendingIn(s))
+          p(x.kind, have: x.have, need: x.need, name: x.name),
+    ];
+
+String p(CreationPendingKind kind,
+        {int have = 0, int need = 0, String name = ''}) =>
+    '${kind.name} $have/$need $name';

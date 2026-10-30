@@ -27,14 +27,7 @@ class _RaceStep extends StatelessWidget {
                 accent: pal.gold,
                 selected: draft.raceId == r.id,
                 onTap: () {
-                  if (draft.raceId != r.id) {
-                    draft.raceId = r.id;
-                    draft.lineageId = null;
-                    draft.speciesSpellcastingAbility = null;
-                    draft.chosenSize = null;
-                    draft.raceSkills.clear();
-                    draft.raceFeatId = null;
-                  }
+                  draft.selectRace(r.id);
                   onChanged();
                 },
               ),
@@ -129,8 +122,7 @@ class _RaceStep extends StatelessWidget {
                           },
                           selected: draft.lineageId,
                           onSelect: (id) {
-                            draft.lineageId = id;
-                            draft.speciesSpellcastingAbility = null;
+                            draft.selectLineage(id);
                             onChanged();
                           },
                         ),
@@ -214,12 +206,7 @@ class _ClassStep extends StatelessWidget {
                 accent: classAccent(c, context.palette.gold),
                 selected: draft.classId == c.id,
                 onTap: () {
-                  draft.classId = c.id;
-                  draft.classSkills.clear();
-                  draft.weaponMasteries.clear();
-                  draft.featureChoices.clear();
-                  draft.cantrips.clear();
-                  draft.spells.clear();
+                  draft.selectClass(c.id);
                   onChanged();
                 },
               ),
@@ -319,24 +306,7 @@ class _BackgroundStep extends StatelessWidget {
                 accent: context.palette.gold,
                 selected: draft.backgroundId == b.id,
                 onTap: () {
-                  if (draft.backgroundId != b.id) {
-                    // Otra dote puede no ofrecerla, o no las mismas opciones.
-                    draft.originFeatSpellcastingAbility = null;
-                  }
-                  draft.backgroundId = b.id;
-                  draft.spreadPlusTwo = null;
-                  draft.spreadPlusOne = null;
-                  // El trasfondo nuevo puede conceder justo la dote de origen
-                  // que ya estaba elegida para la especie. El paso de aptitudes
-                  // deja de ofrecerla, pero volver atrás a cambiar el trasfondo
-                  // dejaría la elección vieja en pie y duplicada.
-                  final granted = b.originFeatId;
-                  final chosen = draft.raceFeatId;
-                  if (chosen != null &&
-                      chosen == granted &&
-                      !(draft.repo.feat(chosen)?.repeatable ?? false)) {
-                    draft.raceFeatId = null;
-                  }
+                  draft.selectBackground(b.id);
                   onChanged();
                 },
               ),

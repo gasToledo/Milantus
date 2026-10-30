@@ -17,28 +17,6 @@ void main() {
     );
   });
 
-  /// Regresión: el Bardo es la única clase con `skillChoiceFrom` vacío (2024:
-  /// elige libremente entre las 18). Antes eso se leía como "ninguna opción" y
-  /// el picker salía vacío. La regla vive ahora en un solo lugar.
-  group('skillOptions', () {
-    test('lista vacía significa las 18 habilidades, no ninguna', () {
-      expect(skillOptions(const []), hasLength(18));
-      expect(skillOptions(const []), same(allSkills2024));
-    });
-
-    test('el Bardo puede elegir entre las 18', () {
-      final bard = repo.characterClass('bard')!;
-      expect(bard.skillChoiceFrom, isEmpty, reason: 'premisa del caso');
-      expect(skillOptions(bard.skillChoiceFrom), hasLength(18));
-    });
-
-    test('una lista acotada se respeta tal cual', () {
-      final fighter = repo.characterClass('fighter')!;
-      expect(fighter.skillChoiceFrom, isNotEmpty);
-      expect(skillOptions(fighter.skillChoiceFrom), fighter.skillChoiceFrom);
-    });
-  });
-
   testWidgets('el wizard abre en Especie con el stepper de 8 pasos', (
     tester,
   ) async {

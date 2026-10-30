@@ -469,6 +469,20 @@ repiten acá.
   rechaza confirmar una subida a medias. Las piezas del circuito (`Option`,
   `Block`, `Status`) viven en el asistente; si el creador (5d) las reusa,
   pasan a `src/ui/`.
+  **Creador de personajes** (5d, en curso). El diseño aprobado está en el
+  lienzo «Creador de personajes»: las mismas piezas que la subida, nueve pasos
+  (Especie, Clase, Trasfondo, Características, Competencias, Conjuros,
+  Equipo, Detalles, Revisión), la clase en una fila y las características en
+  una matriz. Desde 5d1 el borrador vive en el motor
+  (`dnd_engine/lib/src/engine/character_creation.dart`, `CreationDraft`) y
+  Flutter lo usa de ahí: lo que falta es un dato (`CreationPending`, por
+  `CreationSection`) que cada cliente pone en texto, y lo que una elección
+  arrastra (otra especie suelta el linaje, otra clase sus maestrías) está en
+  sus métodos y no en el widget. Flutter conserva sus ocho pasos, que agrupan
+  esas secciones. El puente es `creation(catálogo, borrador, acción)`: aplica
+  la acción (`CreationDraft.apply`) con todas las podas y devuelve
+  `viewJson` (borrador, pendientes, el personaje para «Así queda» y lo que
+  deciden las reglas de cada paso). Todavía no hay pantallas en `/v2`.
   - **Toda escritura la hace el motor.** `actOn` (`act` de `js/entrypoint.dart`,
     sobre `SheetActions.apply` del engine) recibe la ficha y la acción y
     devuelve la ficha nueva, migrada y con el `schemaVersion` actual, más lo
@@ -523,7 +537,10 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    editar la mochila desde la fila y las monedas *(existe)*; 5b2, catálogo,
    comprar y vender *(existe)*; 5c1, subida de nivel sin elecciones de rasgos,
    competencias ni conjuros *(existe)*; 5c2, esas elecciones de rasgos y
-   competencias *(existe)*; 5c3, los conjuros *(existe)*; 5d, creador.
+   competencias *(existe)*; 5c3, los conjuros *(existe)*; 5d, creador, en
+   cuatro: 5d1, el borrador en el motor *(existe)*; 5d2, Especie, Clase,
+   Trasfondo y Características; 5d3, Competencias, Conjuros y Equipo; 5d4,
+   Detalles, Revisión y el alta.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
    combate, vínculos y códigos de campaña. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de

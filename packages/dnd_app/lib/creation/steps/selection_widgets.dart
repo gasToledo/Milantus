@@ -405,19 +405,8 @@ class _FeatureChoiceSelect extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final repo = draft.repo;
     final chosen = draft.featureChoices[slot.groupId] ?? const <String>[];
-    final base = draft.build();
-    final validator = CharacterValidator(repo);
-    final options = repo
-        .featureChoiceOptions(slot)
-        .where(
-          (f) =>
-              chosen.contains(f.id) ||
-              validator.unmetFeatPrerequisite(f, base, draft.previewSheet) ==
-                  null,
-        )
-        .toList();
+    final options = draft.featureChoiceOptions(slot);
 
     if (options.isEmpty) {
       return Text(

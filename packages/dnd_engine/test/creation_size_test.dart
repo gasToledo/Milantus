@@ -1,7 +1,5 @@
-import 'fakes/localized_app.dart';
 import 'package:dnd_engine/dnd_engine.dart';
-import 'package:dnd_app/creation/creation_draft.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 
 /// Elección de tamaño en el wizard: gating, poda al cambiar de especie y
 /// round-trip del borrador.
@@ -10,19 +8,19 @@ void main() {
 
   setUpAll(() async {
     repo = await ContentRepository.loadFromDirectory(
-      '../dnd_engine/lib/assets/srd_2024',
+      'lib/assets/srd_2024',
     );
   });
 
   test('el paso Raza bloquea hasta elegir el tamaño', () {
     final d = CreationDraft(repo)..raceId = 'human';
     expect(d.sizeOptions, ['Mediano', 'Pequeño']);
-    expect(d.pendingFor(CreationStep.raza, l10nEs), [
-      'Elegí el tamaño de la especie.',
+    expect(faltan(d, [CreationSection.species]), [
+      p(CreationPendingKind.pickSize),
     ]);
 
     d.chosenSize = 'Pequeño';
-    expect(d.pendingFor(CreationStep.raza, l10nEs), isEmpty);
+    expect(faltan(d, [CreationSection.species]), isEmpty);
   });
 
   test('una especie de tamaño fijo no bloquea', () {
@@ -31,8 +29,8 @@ void main() {
     // El Goliat sí exige linaje, así que se comprueba que lo que falta no es
     // el tamaño.
     expect(
-      d.pendingFor(CreationStep.raza, l10nEs),
-      isNot(contains('Elegí el tamaño de la especie.')),
+      faltan(d, [CreationSection.species]),
+      isNot(contains(p(CreationPendingKind.pickSize))),
     );
   });
 
@@ -40,8 +38,8 @@ void main() {
     final d = CreationDraft(repo)
       ..raceId = 'human'
       ..chosenSize = 'Enorme';
-    expect(d.pendingFor(CreationStep.raza, l10nEs), [
-      'Elegí el tamaño de la especie.',
+    expect(faltan(d, [CreationSection.species]), [
+      p(CreationPendingKind.pickSize),
     ]);
   });
 
@@ -88,3 +86,15 @@ void main() {
     expect(d.previewSheet.size, 'Pequeño');
   });
 }
+
+/// Lo que falta en [sections], en una forma comparable: el texto lo pone cada
+/// cliente, y acá alcanza con el qué y el cuánto.
+List<String> faltan(CreationDraft d, List<CreationSection> sections) => [
+      for (final s in sections)
+        for (final x in d.pendingIn(s))
+          p(x.kind, have: x.have, need: x.need, name: x.name),
+    ];
+
+String p(CreationPendingKind kind,
+        {int have = 0, int need = 0, String name = ''}) =>
+    '${kind.name} $have/$need $name';

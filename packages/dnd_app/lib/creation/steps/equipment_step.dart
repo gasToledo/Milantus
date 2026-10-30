@@ -501,15 +501,7 @@ class _ReceivedEquipmentSection extends StatelessWidget {
                     ? draft.shieldEquipped
                     : draft.equippedArmorId == item.id,
                 onSelected: (on) {
-                  draft.equipmentTouched = true;
-                  if (item.isShield) {
-                    draft.shieldEquipped = on;
-                    // Con escudo no hay mano libre: una versátil marcada a dos
-                    // manos seguiría calculándose con el dado mayor.
-                    if (on) draft.weaponTwoHanded.clear();
-                  } else {
-                    draft.equippedArmorId = on ? item.id : null;
-                  }
+                  draft.setArmorWorn(item.id, on);
                   onChanged();
                 },
               ),
@@ -518,9 +510,7 @@ class _ReceivedEquipmentSection extends StatelessWidget {
                 label: Text(item.name),
                 selected: draft.weaponIds.contains(item.id),
                 onSelected: (on) {
-                  draft.equipmentTouched = true;
-                  draft.weaponIds.remove(item.id);
-                  if (on) draft.weaponIds.add(item.id);
+                  draft.setWeaponWielded(item.id, on);
                   onChanged();
                 },
               ),
@@ -591,10 +581,7 @@ class _WeaponGripSection extends StatelessWidget {
                     label: Text(context.l10n.equipOffHandShort),
                     selected: draft.weaponOffHand[w.id] ?? false,
                     onSelected: (v) {
-                      // Solo se empuña un arma en la secundaria.
-                      draft.weaponOffHand
-                        ..clear()
-                        ..addAll(v ? {w.id: true} : const {});
+                      draft.setOffHand(w.id, v);
                       onChanged();
                     },
                   ),

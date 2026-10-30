@@ -130,13 +130,10 @@ class _CreationWizardState extends State<CreationWizard> {
   }
 
   Future<void> _finish() async {
-    final character = d.build(
+    final character = d.create(
       unnamed: context.l10n.characterUnnamed,
       replacing: widget.replacing,
     );
-    // PG actuales al máximo al crear.
-    final sheet = CharacterCompiler(widget.repo).compile(character);
-    character.combat.currentHp = sheet.maxHp;
     if (!mounted) return;
     widget.onCreate(character);
     _closeWithoutPrompt();

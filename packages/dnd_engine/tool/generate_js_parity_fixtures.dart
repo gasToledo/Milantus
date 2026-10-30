@@ -156,6 +156,29 @@ final _acciones = <String, (String, Map<String, dynamic>)>{
   'accion-descanso-largo': ('druida', {'type': 'longRest'}),
 };
 
+/// El creador de personajes (`creation` en JS): un borrador a medio armar y
+/// una acción. Uno por cosa que cambia la vista: la clase con sus cupos, la
+/// tirada de 4d6 (con la semilla) y el trasfondo con la dote que pide aptitud.
+const _borradorElfo = {
+  'raceId': 'elf',
+  'lineageId': 'elf-high',
+  'speciesSpellcastingAbility': 'intelligence',
+};
+final _creaciones = <String, (Map<String, dynamic>, Map<String, dynamic>)>{
+  'creacion-guerrero': (
+    {..._borradorElfo, 'classId': 'fighter'},
+    {'type': 'toggle', 'pick': 'weaponMastery', 'id': 'longsword'},
+  ),
+  'creacion-tirada': (
+    {..._borradorElfo, 'classId': 'wizard'},
+    {'type': 'applyScoreMethod', 'method': 'roll4d6'},
+  ),
+  'creacion-trasfondo': (
+    {..._borradorElfo, 'classId': 'wizard'},
+    {'type': 'selectBackground', 'id': 'sage'},
+  ),
+};
+
 const _semilla = 7;
 
 CombatState _gastado() => CombatState(
@@ -233,5 +256,20 @@ Future<void> main(List<String> args) async {
       }),
     );
   }
-  print('${_casos.length + _acciones.length} casos en ${out.path}');
+  for (final MapEntry(key: nombre, value: (borrador, accion))
+      in _creaciones.entries) {
+    final draft = CreationDraft.fromJson(repo, borrador)
+      ..apply(accion, dice: Dice(Random(_semilla)));
+    File('${out.path}/$nombre.json').writeAsStringSync(
+      jsonEncode({
+        'creation': {'draft': borrador, 'action': accion},
+        'seed': _semilla,
+        'expected': draft.viewJson(),
+      }),
+    );
+  }
+  print(
+    '${_casos.length + _acciones.length + _creaciones.length} casos en '
+    '${out.path}',
+  );
 }

@@ -655,8 +655,33 @@ String act(
   );
 }
 
+/// El creador de personajes (`CreationDraft` del motor): aplica [actionJson]
+/// (vacío o `{}` para solo leer) al borrador [draftJson] con sus podas, y
+/// devuelve `CreationDraft.viewJson`: el borrador nuevo, lo que falta y lo
+/// que deciden las reglas en cada paso. Las acciones están en
+/// `CreationDraft.apply`. [seed] fija la tirada de 4d6 en la prueba de
+/// paridad.
+String creation(
+  String catalogJson,
+  String draftJson,
+  String actionJson, [
+  int? seed,
+]) {
+  final repo = _repoPara(catalogJson);
+  final draft = CreationDraft.fromJson(
+    repo,
+    jsonDecode(draftJson) as Map<String, dynamic>,
+  );
+  final action = actionJson.isEmpty ? null : jsonDecode(actionJson);
+  if (action is Map<String, dynamic> && action.isNotEmpty) {
+    draft.apply(action, dice: seed == null ? null : Dice(Random(seed)));
+  }
+  return jsonEncode(draft.viewJson());
+}
+
 void main() {
   final motor = JSObject();
+  motor['creation'] = creation.toJS;
   motor['act'] = act.toJS;
   motor['compute'] = compute.toJS;
   motor['migrateCharacter'] = migrateCharacter.toJS;

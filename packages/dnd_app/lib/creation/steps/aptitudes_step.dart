@@ -305,9 +305,7 @@ class _AptitudesStep extends StatelessWidget {
     final bg = draft.background;
     final granted = {...?bg?.skillProficiencies};
     final grantsFeat = race?.effects.any((e) => e is GrantFeatEffect) ?? false;
-    final originFeats = grantsFeat
-        ? _eligibleOriginFeats(draft)
-        : const <Feat>[];
+    final originFeats = draft.originFeatOptions;
 
     // Las dos listas de habilidades y la de competencias por dote salen de
     // catálogos que se pisan, así que se bloquean entre sí. Tomar la misma
@@ -419,9 +417,7 @@ class _AptitudesStep extends StatelessWidget {
                         repo: draft.repo,
                         selected: draft.raceFeatId == f.id,
                         onTap: () {
-                          draft.raceFeatId = draft.raceFeatId == f.id
-                              ? null
-                              : f.id;
+                          draft.toggleRaceFeat(f.id);
                           onChanged();
                         },
                       ),
@@ -603,30 +599,6 @@ class _LanguagesSection extends StatelessWidget {
       ],
     );
   }
-}
-
-/// Dotes de origen que el personaje puede tomar realmente. Ninguna de las
-/// oficiales tiene prerrequisitos, pero una homebrew sí puede tenerlos, y el
-/// paso corre después de Puntuaciones, así que ya hay con qué compararlos.
-///
-/// La dote tentativa se deja fuera del personaje evaluado: una dote que sube
-/// una característica no debe poder cumplir su propio prerrequisito.
-///
-/// Tampoco se ofrece la dote de origen que ya concede el trasfondo: el
-/// personaje la tendría por dos vías y el PHB solo permite repetir las dotes
-/// que lo declaran. Sin este filtro, un Humano con trasfondo de Soldado podía
-/// elegir Atacante Salvaje y quedar con la dote duplicada.
-List<Feat> _eligibleOriginFeats(CreationDraft draft) {
-  final repo = draft.repo;
-  final base = draft.build().copyWith(featIds: const []);
-  final sheet = CharacterCompiler(repo).compile(base);
-  final validator = CharacterValidator(repo);
-  final grantedByBackground = draft.background?.originFeatId;
-  return repo.featsSorted
-      .where((f) => f.category == 'origin')
-      .where((f) => f.repeatable || f.id != grantedByBackground)
-      .where((f) => validator.unmetFeatPrerequisite(f, base, sheet) == null)
-      .toList();
 }
 
 /// Tarjeta de dote: ícono, nombre, descripción y marca de selección.
