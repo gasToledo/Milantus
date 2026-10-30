@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
-import type { LucideIcon } from 'lucide-react';
+import { Minus, Plus, type LucideIcon } from 'lucide-react';
 import { cx } from './cx';
+import { Tooltip } from './primitives';
 
 // Las piezas que muestran números de la ficha. Ninguna calcula nada: reciben
 // el valor ya resuelto por el motor (`computeSheet`) y solo deciden cómo se ve
@@ -250,4 +251,42 @@ export function hpTone(ratio: number): { bar: string; text: string } {
   if (ratio > 0.5) return { bar: 'bg-verdant', text: 'text-verdant' };
   if (ratio > HP_CRITICAL_RATIO) return { bar: 'bg-gold', text: 'text-gold' };
   return { bar: 'bg-crimson', text: 'text-crimson' };
+}
+
+/**
+ * Gastar y recuperar un uso (`SpendRecoverButtons` de Flutter): dos botones de
+ * ícono con su rótulo para el lector y su tooltip. Sin `onSpend` u
+ * `onRecover` el botón queda deshabilitado (no quedan usos, o no hay nada
+ * gastado): no desaparece, para que la fila no salte.
+ */
+export function SpendRecoverButtons({
+  spendLabel,
+  recoverLabel,
+  onSpend,
+  onRecover,
+}: {
+  spendLabel: string;
+  recoverLabel: string;
+  onSpend?: () => void;
+  onRecover?: () => void;
+}) {
+  const button = (label: string, Icon: typeof Minus, onClick?: () => void) => (
+    <Tooltip content={label}>
+      <button
+        type="button"
+        aria-label={label}
+        disabled={!onClick}
+        onClick={onClick}
+        className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-nav)] text-on-surface-variant hover:bg-plaque hover:text-gold disabled:pointer-events-none disabled:opacity-40"
+      >
+        <Icon size={16} aria-hidden="true" />
+      </button>
+    </Tooltip>
+  );
+  return (
+    <span className="flex shrink-0 items-center" data-controls="spend-recover">
+      {button(spendLabel, Minus, onSpend)}
+      {button(recoverLabel, Plus, onRecover)}
+    </span>
+  );
 }

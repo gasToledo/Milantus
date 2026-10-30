@@ -1109,7 +1109,9 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Nuevo
 
-- Sin cambios.
+- En `/v2`, la ficha propia también gasta y recupera espacios de conjuro y
+  usos de recursos (con los puntos de una reserva en un diálogo) y gasta dados
+  de golpe para curarse.
 
 ### Modificado
 

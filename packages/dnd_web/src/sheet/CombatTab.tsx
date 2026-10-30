@@ -1,14 +1,15 @@
-import { BookOpen, Check, Crosshair, Heart, Minus, Plus, RefreshCw, Shield, ShieldHalf, Zap } from 'lucide-react';
+import { BookOpen, Check, Crosshair, Dices, Heart, Minus, Plus, RefreshCw, Shield, ShieldHalf, Zap } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { nameOf } from '../api/catalog';
-import type { InnateSpell, SpellcastingBlock } from '../engine';
+import type { CharacterResource, InnateSpell, SpellcastingBlock } from '../engine';
 import { useTexts } from '../i18n/context';
 import { labelOf } from '../i18n/texts';
+import { AppDialog } from '../ui/AppDialog';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
-import { Eyebrow, hpTone, Pill, Pips, ShieldBadge, StatPlaque, ThinBar } from '../ui/data';
+import { Eyebrow, hpTone, Pill, Pips, ShieldBadge, SpendRecoverButtons, StatPlaque, ThinBar } from '../ui/data';
 import { COLUMNS } from './CharacterTab';
-import { signed } from './format';
+import { resourceKey, signed } from './format';
 import { SpellList } from './SpellList';
 import { resourceLeft, type SheetModel } from './model';
 import { ProficiencyRow } from './rows';
@@ -16,8 +17,9 @@ import { ABILITIES, isReactionSpell } from './vocabulary';
 
 /**
  * Pestaña Combate: lo que se consulta en el turno y, en la ficha propia
- * (`model.write`), lo que se anota en él: daño, curación, PG temporales y
- * salvaciones de muerte. Cada acción la hace el motor (`actOn`); acá no se
+ * (`model.write`), lo que se anota en él: daño, curación, PG temporales,
+ * salvaciones de muerte, dados de golpe, espacios de conjuro y usos de
+ * recursos. Cada acción la hace el motor (`actOn`); acá no se
  * suma ni se resta nada. Preparar conjuros y el resto de la edición siguen en
  * Flutter. Los números son del motor; de la mesa (lo crudo) solo los PG
  * actuales, lo gastado y las condiciones.
@@ -82,7 +84,32 @@ function HitPointsCard({ model }: { model: SheetModel }) {
           </Line>
         )}
       </dl>
+      {model.write && <HitDieButton model={model} />}
     </Card>
+  );
+}
+
+/** Gastar un dado de golpe para curarse: la tirada y el mod. de CON los pone
+ *  el motor, que dice cuánto curó. Sin dados, deshabilitado (como Flutter). */
+function HitDieButton({ model }: { model: SheetModel }) {
+  const t = useTexts();
+  const { character, sheet, write } = model;
+  const total = Object.values(sheet.hitDiceBySize).reduce((a, b) => a + b, 0);
+  const spent = Object.values(character.combat?.hitDiceUsed ?? {}).reduce((a, b) => a + b, 0);
+  const left = Math.max(0, total - spent);
+  return (
+    <Button
+      tone="secondary"
+      icon={Dices}
+      className="mt-3"
+      disabled={left <= 0}
+      onClick={() => {
+        const r = write!.act({ type: 'spendHitDie' });
+        if (r) write!.notify(t.hitDieHealed(r.outcome.healed ?? 0), { tone: 'success' });
+      }}
+    >
+      {t.hitDieButton(left, total)}
+    </Button>
   );
 }
 
@@ -238,7 +265,7 @@ function AttacksCard({ model }: { model: SheetModel }) {
  */
 function SpellsCard({ model }: { model: SheetModel }) {
   const t = useTexts();
-  const { character, sheet, catalog } = model;
+  const { character, sheet, catalog, write } = model;
   const blocks: SpellcastingBlock[] =
     sheet.spellcastingBlocks.length > 0
       ? sheet.spellcastingBlocks
@@ -260,11 +287,28 @@ function SpellsCard({ model }: { model: SheetModel }) {
       .filter(([, max]) => max > 0)
       .sort(([a], [b]) => Number(a) - Number(b))
       .map(([level, max]) => {
-        const left = Math.max(0, max - (used?.[level] ?? 0));
+        const spent = used?.[level] ?? 0;
+        const left = Math.max(0, max - spent);
+        const act = (type: 'spendSlot' | 'recoverSlot') => () =>
+          write!.act({ type, level: Number(level), pact });
         return (
-          <li key={`${pact ? 'p' : 'n'}-${level}`} className="flex items-center justify-between gap-3">
+          <li
+            key={`${pact ? 'p' : 'n'}-${level}`}
+            className="flex items-center justify-between gap-3"
+            data-slot={`${pact ? 'pact' : 'normal'}-${level}`}
+          >
             <span className="text-[13px]">{pact ? t.pactSlotLevel(level) : t.slotLevel(level)}</span>
-            <Pips max={max} left={left} label={t.slotsLabel(left, max, level)} />
+            <span className="flex items-center gap-2">
+              <Pips max={max} left={left} label={t.slotsLabel(left, max, level)} />
+              {write && (
+                <SpendRecoverButtons
+                  spendLabel={t.spendSlot(level)}
+                  recoverLabel={t.recoverSlot(level)}
+                  onSpend={left > 0 ? act('spendSlot') : undefined}
+                  onRecover={spent > 0 ? act('recoverSlot') : undefined}
+                />
+              )}
+            </span>
           </li>
         );
       });
@@ -424,9 +468,36 @@ function ConditionsCard({ model }: { model: SheetModel }) {
   );
 }
 
+/** El recurso de reserva (Imposición de Manos, Puntos de Concentración) cuyo
+ *  diálogo de puntos está abierto, y si es para gastar o recuperar. */
+interface PointsAsk {
+  resource: CharacterResource;
+  spend: boolean;
+  limit: number;
+}
+
 function ResourcesCard({ model }: { model: SheetModel }) {
   const t = useTexts();
-  const { sheet } = model;
+  const { sheet, write, character } = model;
+  const [ask, setAsk] = useState<PointsAsk | null>(null);
+  // Una reserva pide cuántos puntos (como `_askPoints` de Flutter); lo demás
+  // gasta de a uno. Pasarse de lo que queda no es un error: el motor lo
+  // deja entre cero y el máximo.
+  const controls = (r: CharacterResource, left: number) => {
+    const used = character.combat?.resourceUsage?.[resourceKey(r)] ?? 0;
+    const go = (spend: boolean, limit: number) => () =>
+      r.pool
+        ? setAsk({ resource: r, spend, limit })
+        : write!.act({ type: spend ? 'spendResource' : 'recoverResource', resource: resourceKey(r) });
+    return (
+      <SpendRecoverButtons
+        spendLabel={t.spendResource(r.name)}
+        recoverLabel={t.recoverResource(r.name)}
+        onSpend={left > 0 ? go(true, left) : undefined}
+        onRecover={used > 0 ? go(false, used) : undefined}
+      />
+    );
+  };
   return (
     <Card id="resources" title={t.resourcesAndRests} icon={RefreshCw}>
       {sheet.resources.length === 0 ? (
@@ -444,19 +515,74 @@ function ResourcesCard({ model }: { model: SheetModel }) {
                 </div>
                 {/* Una reserva grande (Imposición de Manos: 25) en puntos no
                     se lee: va como cifra. */}
-                {r.pool || r.max > 8 ? (
-                  <span className="num shrink-0 text-[15px]" role="img" aria-label={label}>
-                    {t.poolValue(left, r.max)}
-                  </span>
-                ) : (
-                  <Pips max={r.max} left={left} label={label} />
-                )}
+                <span className="flex shrink-0 items-center gap-2">
+                  {r.pool || r.max > 8 ? (
+                    <span className="num text-[15px]" role="img" aria-label={label}>
+                      {t.poolValue(left, r.max)}
+                    </span>
+                  ) : (
+                    <Pips max={r.max} left={left} label={label} />
+                  )}
+                  {write && controls(r, left)}
+                </span>
               </li>
             );
           })}
         </ul>
       )}
+      {ask && <PointsDialog ask={ask} onClose={() => setAsk(null)} model={model} />}
     </Card>
+  );
+}
+
+/** Cuántos puntos de una reserva gastar o recuperar. Un número vacío o que no
+ *  es positivo no hace nada, como en Flutter. */
+function PointsDialog({ ask, onClose, model }: { ask: PointsAsk; onClose: () => void; model: SheetModel }) {
+  const t = useTexts();
+  const [value, setValue] = useState('');
+  const confirm = () => {
+    const n = Number.parseInt(value, 10);
+    if (n > 0) {
+      model.write!.act({
+        type: ask.spend ? 'spendResource' : 'recoverResource',
+        resource: resourceKey(ask.resource),
+        amount: n,
+      });
+    }
+    onClose();
+  };
+  return (
+    <AppDialog
+      open
+      onOpenChange={(open) => !open && onClose()}
+      title={ask.resource.name}
+      actions={[
+        { label: t.cancel },
+        { label: ask.spend ? t.spendPoints : t.recoverPoints, primary: true, onSelect: confirm },
+      ]}
+    >
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          confirm();
+        }}
+      >
+        <label htmlFor="points-amount" className="text-[13px] text-on-surface-variant">
+          {t.pointsPrompt(ask.spend, ask.limit)}
+        </label>
+        <input
+          id="points-amount"
+          type="number"
+          inputMode="numeric"
+          min={1}
+          max={ask.limit}
+          autoFocus
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          className="num mt-2 h-9 w-full rounded-[var(--radius-nav)] border border-hairline bg-plaque px-3 text-[14px] text-on-surface"
+        />
+      </form>
+    </AppDialog>
   );
 }
 

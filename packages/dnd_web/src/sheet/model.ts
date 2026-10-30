@@ -1,5 +1,6 @@
 import type { Catalog, CharacterFields, ComputedSheet } from '../engine';
 import { accentOf, nameOf } from '../api/catalog';
+import { resourceKey } from './format';
 import type { SheetWriter } from './writer';
 
 /** Lo que toda pieza de la ficha recibe: el personaje (ya migrado), la ficha
@@ -36,6 +37,6 @@ export function resourceLeft(
   { character }: SheetModel,
   r: { classId?: string; id: string; max: number },
 ): number {
-  const key = r.classId ? `${r.classId}:${r.id}` : r.id;
-  return Math.max(0, r.max - (character.combat?.resourceUsage?.[key] ?? 0));
+  return Math.max(0, r.max - (character.combat?.resourceUsage?.[resourceKey(r)] ?? 0));
 }
+

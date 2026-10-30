@@ -19,7 +19,8 @@ const TONES: Record<ButtonTone, string> = {
   danger: 'border border-crimson text-crimson hover:bg-plaque',
 };
 
-const BASE = 'inline-flex min-h-9 items-center justify-center gap-2 px-4 py-2 text-[14px] no-underline';
+const BASE =
+  'inline-flex min-h-9 items-center justify-center gap-2 px-4 py-2 text-[14px] no-underline disabled:pointer-events-none disabled:opacity-40';
 
 /** Radio 9 (el de los controles) o 20: una pill en una barra de pills. */
 const SHAPES = { nav: 'rounded-[var(--radius-nav)]', pill: 'rounded-[var(--radius-pill)]' } as const;

@@ -74,6 +74,7 @@ una regla: reciben el número ya resuelto por `computeSheet`.
 | `ShieldBadge` | La CA dentro de un escudo, con `aria-label` | **Solo CA**, y solo donde la CA es el tema (Defensa) |
 | `Pill` | Cápsula de radio 20; `highlighted={false}` neutra, `danger` carmesí | Clase, subclase, nivel; `danger` solo para un estado malo (envenenado) |
 | `Pips` | Usos restantes, llenos en oro; `label` dice la cuenta; `tone="crimson"` para lo que cuenta en contra | Recursos, espacios de conjuro; carmesí solo en los fallos de muerte |
+| `SpendRecoverButtons` | Gastar y recuperar un uso: dos botones de ícono (−/+) con `aria-label` y tooltip; sin `onSpend`/`onRecover`, deshabilitado y en su lugar | Solo en la ficha propia (`model.write`), al lado de los `Pips` de cada espacio o recurso |
 | `ThinBar` + `hpTone` | Barra fina (`role="meter"`, con `aria-label` y valor); `hpTone` da verde/oro/carmesí según el cociente de PG (`AppPalette.hpColor`) | PG |
 | `MarkdownText` | El Markdown de una mesa (títulos, viñetas, negrita, itálica), armado como elementos y nunca como HTML | Trasfondo y entradas del Diario |
 | `Medallion` | Aro del color de clase con el retrato (miniatura de su tamaño) o, si no hay o no carga, la inicial sobre un degradado del acento hacia la placa (`color-mix`, sin colores inventados). `viewable` lo vuelve botón que abre el visor | Tarjeta y panel; `viewable` solo fuera de un enlace |
@@ -87,7 +88,7 @@ una regla: reciben el número ya resuelto por `computeSheet`.
 | `AppErrorView` | Ícono, título, mensaje, detalle copiable y «Reintentar» | `onRetry` siempre que reintentar pueda arreglarlo; `as="h1"` si ocupa la pantalla |
 | `AppEmptyState` | «No hay nada» (`empty`) o «nada coincide» (`no-match`), con ícono distinto | Son situaciones distintas y piden acciones distintas |
 | `Notice` | Pantalla de un solo mensaje con su `h1` | Sin sesión, no disponible, no encontrado |
-| `Button`, `ButtonLink` | `primary` (oro lleno, uno por vista), `soft` (oro sobre `goldSoft` con filete: el verbo de una barra de herramientas), `secondary`, `danger` (carmesí, lo irreversible); `shape="pill"` en una fila de pills | `ButtonLink internal` navega sin recargar |
+| `Button`, `ButtonLink` | `primary` (oro lleno, uno por vista), `soft` (oro sobre `goldSoft` con filete: el verbo de una barra de herramientas), `secondary`, `danger` (carmesí, lo irreversible); `shape="pill"` en una fila de pills; `disabled` lo atenúa | `ButtonLink internal` navega sin recargar |
 | `SaveStatusBadge` | La pill del guardado automático (`SaveStatusIndicator`): Guardando… / Guardado / No se guardó con «Reintentar» | Al pie del panel de una pantalla que escribe, en lugar de «Solo lectura» |
 | `AppDialog` | El molde de diálogo: placa, velo, barra de acciones de 48 px al pie | 480 px por defecto, 560 si el cuerpo es una ficha |
 | `PortraitViewer` | El retrato original entero sobre el velo, con cerrar; `Esc` y clic afuera también cierran | Lo abre `Medallion` con `viewable` |

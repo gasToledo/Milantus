@@ -277,7 +277,7 @@ Future<void> main() async {
         hitDiceUsed: const {8: 1},
         exhaustion: 1,
         spellSlotsUsed: const {1: 1},
-        resourceUsage: const {'cleric:channel_divinity': 1},
+        resourceUsage: const {'channel_divinity': 1},
       ),
     ),
   );

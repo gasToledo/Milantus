@@ -1,5 +1,6 @@
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
 import { actOn, computeSheet, migrateCharacter, type CharacterJson, type SheetAction } from '../src/engine';
+import { resourceKey } from '../src/sheet/format';
 import { api, catalogo, TOKEN_DM, TOKEN_ESCRITURA, vigilarEscrituras, type PersonajeApi } from './helpers';
 
 // La ficha que escriben estas pruebas es de una cuenta propia (`e2e_server.dart`):
@@ -89,6 +90,41 @@ test('a 0 PG se marcan las salvaciones de muerte y tres éxitos estabilizan', as
   for (let i = 0; i < 3; i++) await tarjeta.getByRole('button', { name: '+Éxito' }).click();
   await expect(page.getByText('¡Estabilizado!', { exact: true })).toBeVisible();
   await expect.poll(async () => (await ilse(request)).combat).toEqual((estable as PersonajeApi).combat);
+});
+
+test('gastar y recuperar espacios y usos guarda lo que da el motor', async ({ page, request }) => {
+  const ficha = computeSheet(await ilse(request), catalogo());
+  const canalizar = ficha.resources.find((r) => r.id === 'channel_divinity')!;
+  await page.goto(COMBATE);
+
+  for (const [boton, accion] of [
+    ['Gastar espacio de nivel 1', { type: 'spendSlot', level: 1, pact: false }],
+    [`Usar ${canalizar.name}`, { type: 'spendResource', resource: resourceKey(canalizar) }],
+    ['Recuperar espacio de nivel 1', { type: 'recoverSlot', level: 1, pact: false }],
+  ] as const) {
+    const esperado = segunMotor(await ilse(request), accion);
+    const enviado = await proximoGuardado(page, () => page.getByRole('button', { name: boton }).click());
+    expect(enviado).toEqual(esperado);
+    expect(await ilse(request)).toEqual(esperado);
+  }
+});
+
+test('el dado de golpe lo tira el motor: cura lo que dice el aviso y gasta uno', async ({ page, request }) => {
+  const antes = await ilse(request);
+  const { maxHp } = computeSheet(antes, catalogo());
+  const gastados = (c: PersonajeApi) =>
+    Object.values((c.combat as { hitDiceUsed?: Record<string, number> }).hitDiceUsed ?? {}).reduce((a, b) => a + b, 0);
+  await page.goto(COMBATE);
+
+  const enviado = (await proximoGuardado(page, () =>
+    page.getByRole('button', { name: /^Dado de golpe/ }).click(),
+  )) as PersonajeApi;
+  const aviso = await page.getByText(/^Recuperaste \d+ PG/).textContent();
+  const curado = Number(/\d+/.exec(aviso!)![0]);
+
+  expect(gastados(enviado)).toBe(gastados(antes) + 1);
+  expect(enviado.combat.currentHp).toBe(Math.min(maxHp, antes.combat.currentHp + curado));
+  expect(await ilse(request)).toEqual(enviado);
 });
 
 test('la ficha de otra cuenta no tiene controles para escribir', async ({ context, page, baseURL }) => {
