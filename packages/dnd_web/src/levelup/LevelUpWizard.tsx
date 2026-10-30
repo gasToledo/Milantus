@@ -1,18 +1,19 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { Check } from 'lucide-react';
 import {
-  catalogLabel,
   computeSheet,
   levelUpView,
   rollDie,
   type AbilityId,
+  type Catalog,
   type CharacterJson,
   type ComputedSheet,
   type LevelUpDraft,
   type LevelUpView,
 } from '../engine';
+import { codexEntries, type CodexDetail } from '../codex/entries';
 import { useLang, useTexts } from '../i18n/context';
-import type { Texts } from '../i18n/texts';
+import type { Lang, Texts } from '../i18n/texts';
 import { characterHref, FLUTTER_HOME, navigate } from '../router';
 import type { SheetModel } from '../sheet/model';
 import { ABILITIES } from '../sheet/vocabulary';
@@ -290,7 +291,7 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="flex min-w-0 flex-col gap-4">{main}</div>
         <aside className="flex min-w-0 flex-col gap-4">
-          <DetailPanel focus={focus} view={view} t={t} />
+          <DetailPanel focus={focus} view={view} catalog={catalog} lang={lang} t={t} />
           <AfterPanel before={sheet} after={after} t={t} />
         </aside>
       </div>
@@ -561,27 +562,43 @@ function AsiStep({
   );
 }
 
-/** A la derecha, arriba: qué es lo último que se tocó. */
-function DetailPanel({ focus, view, t }: { focus: Focus; view: LevelUpView; t: Texts }) {
+/** A la derecha, arriba: qué es lo último que se tocó. Una dote o una
+ *  subclase se describen con la misma ficha que el Códice (`codexEntries`):
+ *  las dotes del catálogo no traen `description`, su texto vive en los
+ *  rasgos de sus efectos, y armarlo dos veces dejaría dos versiones. */
+function DetailPanel({
+  focus,
+  view,
+  catalog,
+  lang,
+  t,
+}: {
+  focus: Focus;
+  view: LevelUpView;
+  catalog: Catalog;
+  lang: Lang;
+  t: Texts;
+}) {
   let title: string | null = null;
   let meta: string | null = null;
   let body: string | null = null;
+  let detail: CodexDetail | null = null;
   let homebrew = false;
   if (focus?.kind === 'class') {
     const c = view.classOptions.find((o) => o.id === focus.id);
     title = c?.name ?? null;
     meta = c ? (c.unmet !== null ? t.luRequires(c.unmet) : `d${c.hitDie}`) : null;
-  } else if (focus?.kind === 'subclass') {
-    const s = view.subclassOptions.find((o) => o.id === focus.id);
-    title = s?.name ?? null;
-    body = s?.description ?? null;
-    homebrew = !!s?.homebrew;
-  } else if (focus?.kind === 'feat') {
-    const f = view.featOptions.find((o) => o.id === focus.id);
-    title = f?.name ?? null;
-    meta = f ? [catalogLabel('featCategory', f.category), f.unmet !== null ? t.luRequires(f.unmet) : null].filter(Boolean).join(' · ') : null;
-    body = f?.description ?? null;
-    homebrew = !!f?.homebrew;
+  } else if (focus?.kind === 'subclass' || focus?.kind === 'feat') {
+    const entry = codexEntries(focus.kind === 'feat' ? 'feats' : 'subclasses', catalog, t, lang).find((e) => e.id === focus.id);
+    title = entry?.name ?? null;
+    detail = entry?.detail() ?? null;
+    if (focus.kind === 'feat') {
+      const f = view.featOptions.find((o) => o.id === focus.id);
+      meta = f && f.unmet !== null ? t.luRequires(f.unmet) : null;
+      homebrew = !!f?.homebrew;
+    } else {
+      homebrew = !!view.subclassOptions.find((o) => o.id === focus.id)?.homebrew;
+    }
   } else if (focus?.kind === 'feature') {
     const f = view.gainedFeatures.find((o) => o.name === focus.id);
     title = f?.name ?? null;
@@ -597,7 +614,37 @@ function DetailPanel({ focus, view, t }: { focus: Focus; view: LevelUpView; t: T
             <h2 className="font-display text-[18px] text-on-surface">{title}</h2>
             {homebrew && <Tag>{t.homebrewTag}</Tag>}
           </div>
-          {meta && <p className="text-[12.5px] text-on-surface-variant">{meta}</p>}
+          {meta && <p className="text-[12.5px] text-crimson">{meta}</p>}
+          {detail && (
+            <div className="flex flex-col gap-3 border-t border-hairline pt-3 text-[13.5px]">
+              {detail.facts.flat().length > 0 && (
+                <dl className="flex flex-col gap-1 text-[12.5px]">
+                  {detail.facts.flat().map((f) => (
+                    <div key={f.label} className="flex gap-2">
+                      <dt className="text-text-muted">{f.label}</dt>
+                      <dd className="text-on-surface">{f.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+              {detail.prose && <p className="leading-[1.55] whitespace-pre-line">{detail.prose}</p>}
+              {detail.sections.map((sec) => (
+                <section key={sec.title}>
+                  <Eyebrow className="mb-1.5">{sec.title}</Eyebrow>
+                  <ul className="flex flex-col gap-2">
+                    {sec.traits.map((tr, i) => (
+                      <li key={`${tr.name}-${i}`}>
+                        <p className="font-medium">{tr.name}</p>
+                        {tr.description && (
+                          <p className="mt-0.5 leading-[1.5] whitespace-pre-line text-on-surface-variant">{tr.description}</p>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ))}
+            </div>
+          )}
           {body && (
             <div className="border-t border-hairline pt-3 text-[13.5px]">
               <MarkdownText text={body} />
