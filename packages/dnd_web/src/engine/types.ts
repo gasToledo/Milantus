@@ -286,6 +286,14 @@ export interface InventoryLine {
   weight: number;
   quantity: number;
   equipped: boolean;
+  /** Si lleva casilla de equipar (`InventoryOps.isEquippable`). */
+  equippable: boolean;
+  /** Unidades por paquete (la munición se cuenta de a 20). */
+  bundleSize: number;
+  /** La marca de mano secundaria (solo armas ligeras) y de a dos manos (solo
+   *  versátiles); `null` donde no aplica. */
+  offHand: boolean | null;
+  twoHanded: boolean | null;
   attuned: boolean;
   requiresAttunement: boolean;
   magic: boolean;

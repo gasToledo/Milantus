@@ -176,6 +176,84 @@ class InventoryOps {
     return c.copyWith(inventory: inventory);
   }
 
+  /// Si [e] tiene sentido equiparse: un arma, una armadura, o un objeto que
+  /// hace algo puesto (efectos o magia). El resto —una cuerda, raciones— no
+  /// lleva casilla.
+  static bool isEquippable(InventoryEntry e, ContentRepository repo) {
+    if (repo.catalogEntry(e.itemId) == null) return false;
+    final resolved = resolve(e, repo);
+    final item = resolved.item;
+    return resolved.weapon != null ||
+        resolved.armor != null ||
+        (item != null && (item.effects.isNotEmpty || item.isMagic));
+  }
+
+  /// Cambia una línea por lo que devuelva [change]. Lo comparten la ficha de
+  /// Flutter y `SheetActions`, así las dos editan la misma lista.
+  static Character updateEntry(
+    Character c,
+    String entryId,
+    InventoryEntry Function(InventoryEntry) change,
+  ) =>
+      c.copyWith(
+        inventory: [
+          for (final e in c.inventory) e.entryId == entryId ? change(e) : e,
+        ],
+      );
+
+  /// Anota las cargas de una línea, entre 0 y el máximo del catálogo. Con
+  /// máximo 0 el objeto se tiró al aparecer («1d8 + 1 cargas») y no hay techo
+  /// que imponer: quien sabe cuántas tiene es la mesa.
+  static Character setCharges(
+    Character c,
+    String entryId,
+    int value,
+    ContentRepository repo,
+  ) =>
+      updateEntry(c, entryId, (e) {
+        final max = repo.item(e.itemId)?.maxCharges;
+        if (max == null) return e;
+        final floor = value < 0 ? 0 : value;
+        return e.copyWith(charges: max > 0 && floor > max ? max : floor);
+      });
+
+  /// Marca o desmarca el arma de [entryId] para la mano secundaria. Solo se
+  /// empuña un arma ahí: marcar una desmarca la otra. La marca va por el arma
+  /// de base y no por el objeto, que es lo que lee el motor: con el id del
+  /// objeto, una daga +1 se marcaba sin efecto.
+  static Character toggleOffHand(
+    Character c,
+    String entryId,
+    ContentRepository repo,
+  ) {
+    final id = _weaponIdOf(c, entryId, repo);
+    if (id == null) return c;
+    final on = c.weaponOffHand[id] ?? false;
+    return c.copyWith(weaponOffHand: on ? const {} : {id: true});
+  }
+
+  /// Alterna empuñar a dos manos el arma versátil de [entryId] (por el arma
+  /// de base, como [toggleOffHand]).
+  static Character toggleTwoHanded(
+    Character c,
+    String entryId,
+    ContentRepository repo,
+  ) {
+    final id = _weaponIdOf(c, entryId, repo);
+    if (id == null) return c;
+    final on = c.weaponTwoHanded[id] ?? false;
+    return c.copyWith(weaponTwoHanded: {...c.weaponTwoHanded, id: !on});
+  }
+
+  static String? _weaponIdOf(
+    Character c,
+    String entryId,
+    ContentRepository repo,
+  ) {
+    final entry = c.inventory.where((e) => e.entryId == entryId).firstOrNull;
+    return entry == null ? null : resolve(entry, repo).weapon?.id;
+  }
+
   /// Suma [quantity] unidades de [itemId], juntándolas con la línea que ya
   /// exista. Una segunda línea del mismo objeto haría que la ficha mostrara
   /// "Antorcha 3" y "Antorcha 5" sin que ninguna de las dos sea el total.

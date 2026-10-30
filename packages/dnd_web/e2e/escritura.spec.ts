@@ -199,6 +199,54 @@ test('la Inspiración Heroica y la concentración se marcan a mano y guardan lo 
   }
 });
 
+test('la mochila se edita desde la fila y quitar se deshace', async ({ page, request }) => {
+  await page.goto(`/v2/personajes/${ILSE}/inventario`);
+  const fila = page.locator('tr[data-entry="e-baston"]');
+  const baston = String(catalogo().items.find((i) => i.id === 'baston-de-curacion')!.name);
+  const entry = 'e-baston';
+
+  const pasos: [() => Promise<void>, SheetAction][] = [
+    [() => fila.getByRole('checkbox', { name: `Equipar ${baston}` }).click(), { type: 'equip', entry, value: true }],
+    [
+      () => fila.getByRole('button', { name: `Agregar una unidad de ${baston}` }).click(),
+      { type: 'setQuantity', entry, value: 2 },
+    ],
+    [
+      async () => {
+        await fila.getByRole('button', { name: `Acciones de ${baston}` }).click();
+        await page.getByRole('menuitem', { name: 'Nota…' }).click();
+        await page.getByLabel('Qué dice, de dónde salió, para qué sirve').fill('Del templo');
+        await page.getByRole('button', { name: 'Guardar', exact: true }).click();
+      },
+      { type: 'note', entry, text: 'Del templo' },
+    ],
+  ];
+  for (const [tocar, accion] of pasos) {
+    const esperado = segunMotor(await ilse(request), accion);
+    expect(await proximoGuardado(page, tocar)).toEqual(esperado);
+    expect(await ilse(request)).toEqual(esperado);
+  }
+
+  const bolsa = (await ilse(request)) as PersonajeApi & { coins?: Record<string, number> };
+  const oro = segunMotor(bolsa, { type: 'setCoins', coins: { ...bolsa.coins, gp: 99 } });
+  expect(
+    await proximoGuardado(page, async () => {
+      await page.getByLabel('Monedas de Oro').fill('99');
+      await page.getByLabel('Monedas de Oro').press('Enter');
+    }),
+  ).toEqual(oro);
+
+  const antes = await ilse(request);
+  await proximoGuardado(page, async () => {
+    await fila.getByRole('button', { name: `Acciones de ${baston}` }).click();
+    await page.getByRole('menuitem', { name: 'Quitar', exact: true }).click();
+  });
+  await expect(fila).toHaveCount(0);
+  expect(await proximoGuardado(page, () => page.getByRole('button', { name: 'Deshacer' }).click())).toEqual(
+    migrateCharacter(antes),
+  );
+});
+
 test('la ficha de otra cuenta no tiene controles para escribir', async ({ context, page, baseURL }) => {
   await context.clearCookies();
   await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);

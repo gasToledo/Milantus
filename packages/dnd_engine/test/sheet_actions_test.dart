@@ -154,6 +154,43 @@ void main() {
     expect(fin.character.combat.concentratingOn, isNull);
   });
 
+  test('la mano secundaria es una sola y se marca por el arma de base', () {
+    final c = monje().copyWith(inventory: const [
+      InventoryEntry(entryId: 'daga', itemId: 'dagger', equipped: true),
+      InventoryEntry(entryId: 'hacha', itemId: 'handaxe', equipped: true),
+    ]);
+
+    final daga = act(c, {'type': 'offHand', 'entry': 'daga'}).character;
+    expect(daga.weaponOffHand, {'dagger': true});
+    final hacha = act(daga, {'type': 'offHand', 'entry': 'hacha'}).character;
+    expect(hacha.weaponOffHand, {'handaxe': true});
+    expect(
+        act(hacha, {'type': 'offHand', 'entry': 'hacha'})
+            .character
+            .weaponOffHand,
+        isEmpty);
+  });
+
+  test('cantidad, cargas y monedas escritas a mano no se salen de rango', () {
+    final max = repo.item('baston-de-curacion')!.maxCharges!;
+    final c = monje().copyWith(inventory: const [
+      InventoryEntry(entryId: 'baston', itemId: 'baston-de-curacion'),
+    ]);
+    InventoryEntry baston(Map<String, dynamic> a) =>
+        act(c, {...a, 'entry': 'baston'}).character.inventory.single;
+
+    expect(baston({'type': 'setQuantity', 'value': 0}).quantity, 1);
+    expect(baston({'type': 'setCharges', 'value': max + 3}).charges, max);
+    expect(baston({'type': 'setCharges', 'value': -1}).charges, 0);
+    expect(
+      act(c, {
+        'type': 'setCoins',
+        'coins': {'gp': 12, 'sp': 0, 'cp': -2},
+      }).character.coins,
+      {'gp': 12},
+    );
+  });
+
   test('una acción desconocida no devuelve una ficha', () {
     expect(
       () => act(monje(), {'type': 'fly'}),

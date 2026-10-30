@@ -204,7 +204,12 @@ export type SheetAction =
   | { type: 'spendResource' | 'recoverResource'; resource: string; amount?: number }
   | { type: 'spendHitDie' | 'shortRest' | 'longRest' | 'endConcentration' }
   | { type: 'heroicInspiration'; value: boolean }
-  | { type: 'concentrate'; spell: string };
+  | { type: 'concentrate'; spell: string }
+  | { type: 'equip' | 'attune'; entry: string; value: boolean }
+  | { type: 'setQuantity' | 'setCharges'; entry: string; value: number }
+  | { type: 'note'; entry: string; text: string }
+  | { type: 'offHand' | 'twoHanded' | 'removeItem'; entry: string }
+  | { type: 'setCoins'; coins: Record<string, number> };
 
 /** Lo que cuenta el motor de una acción, para el aviso. Cada campo existe
  *  solo en la acción que lo da (ver `SheetActions.apply`). */

@@ -44,7 +44,7 @@ class CoinOps {
   /// de rehacerla del lado de la pantalla.
   static CoinPayment? plan(Map<String, int> coins, int costCp) {
     if (costCp <= 0) {
-      return (spent: const {}, change: const {}, purse: _normalize(coins));
+      return (spent: const {}, change: const {}, purse: normalize(coins));
     }
     if (totalCp(coins) < costCp) return null;
 
@@ -89,7 +89,7 @@ class CoinOps {
         purse[e.key] = purse[e.key]! + e.value;
       }
     }
-    return (spent: spent, change: change, purse: _normalize(purse));
+    return (spent: spent, change: change, purse: normalize(purse));
   }
 
   /// Un monto en la menor cantidad de monedas de oro, plata y cobre, para
@@ -124,7 +124,7 @@ class CoinOps {
     for (final e in changeFor(amountCp).entries) {
       purse[e.key] = purse[e.key]! + e.value;
     }
-    return _normalize(purse);
+    return normalize(purse);
   }
 
   /// [amountCp] en la menor cantidad de monedas de oro, plata y cobre.
@@ -144,7 +144,8 @@ class CoinOps {
     return out;
   }
 
-  static Map<String, int> _normalize(Map<String, int> coins) => {
+  /// Solo las denominaciones conocidas y con algo: la bolsa que se guarda.
+  static Map<String, int> normalize(Map<String, int> coins) => {
         for (final k in coinDenominations)
           if ((coins[k] ?? 0) > 0) k: coins[k]!,
       };

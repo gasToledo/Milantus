@@ -2,6 +2,7 @@ import '../data/content_repository.dart';
 import '../domain/character.dart';
 import '../domain/effects.dart';
 import 'character_compiler.dart';
+import 'coin_ops.dart';
 import 'combat_ops.dart';
 import 'dice.dart';
 import 'inventory_ops.dart';
@@ -53,6 +54,11 @@ class SheetActions {
   ///   `outcome.dismissed` son los compañeros que dependían de la concentración
   ///   anterior y se fueron.
   /// - `endConcentration`; `outcome.dismissed` como en `concentrate`.
+  /// - Mochila, todas con `entry` (el `entryId`): `equip` y `attune` con
+  ///   `value`; `setQuantity` y `setCharges` con `value`; `note` con `text`;
+  ///   `offHand` y `twoHanded` alternan la marca del arma; `removeItem` saca
+  ///   la línea entera.
+  /// - `setCoins` con `coins` (denominación → cantidad).
   ///
   /// Una acción desconocida lanza [FormatException]: un cliente desfasado no
   /// tiene que guardar una ficha que el motor no tocó creyendo que sí.
@@ -171,6 +177,57 @@ class SheetActions {
         } else {
           CombatOps.endConcentration(combat);
         }
+      case 'equip':
+        c = InventoryOps.setEquipped(
+          c,
+          action['entry'] as String,
+          action['value'] == true,
+          repo,
+        );
+      case 'attune':
+        c = InventoryOps.updateEntry(
+          c,
+          action['entry'] as String,
+          (e) => e.copyWith(attuned: action['value'] == true),
+        );
+      case 'setQuantity':
+        // El − se apaga en 1: quitar la línea es otra acción.
+        final value = (action['value'] as num).toInt();
+        c = InventoryOps.updateEntry(
+          c,
+          action['entry'] as String,
+          (e) => e.copyWith(quantity: value < 1 ? 1 : value),
+        );
+      case 'setCharges':
+        c = InventoryOps.setCharges(
+          c,
+          action['entry'] as String,
+          (action['value'] as num).toInt(),
+          repo,
+        );
+      case 'note':
+        c = InventoryOps.updateEntry(
+          c,
+          action['entry'] as String,
+          (e) => e.copyWith(note: action['text'] as String? ?? ''),
+        );
+      case 'offHand':
+        c = InventoryOps.toggleOffHand(c, action['entry'] as String, repo);
+      case 'twoHanded':
+        c = InventoryOps.toggleTwoHanded(c, action['entry'] as String, repo);
+      case 'removeItem':
+        final id = action['entry'] as String;
+        final entry = c.inventory.where((e) => e.entryId == id).firstOrNull;
+        if (entry != null) {
+          c = InventoryOps.remove(c, id, repo, quantity: entry.quantity);
+        }
+      case 'setCoins':
+        c = c.copyWith(
+          coins: CoinOps.normalize({
+            for (final e in (action['coins'] as Map).entries)
+              e.key as String: (e.value as num).toInt(),
+          }),
+        );
       default:
         throw FormatException('Acción de ficha desconocida: ${action['type']}');
     }

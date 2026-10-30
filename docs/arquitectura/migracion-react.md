@@ -137,8 +137,8 @@ repiten acá.
   capítulos cerrados con lo que repartieron (`GET /api/characters/:id/campaigns`,
   el mismo contrato que Flutter, y lo repartido lo nombra el motor). **Diario**:
   el trasfondo con el Markdown chico de Flutter y las entradas, que se abren en
-  un diálogo. Lo único que se escribe son las acciones de partida (abajo): nada
-  se equipa ni se edita. El panel es el de una pantalla de
+  un diálogo. Lo único que se escribe son las acciones de partida y la
+  mochila (abajo): el resto de la ficha no se edita. El panel es el de una pantalla de
   adentro: «volver», la tarjeta del personaje, las cinco pestañas, Retrato,
   Subir nivel y Compartir, que enlazan a Flutter, e **Imprimir**; al pie, el
   estado del guardado, el tema y la versión. **Imprimir** (`PrintSheet`, el
@@ -412,6 +412,15 @@ repiten acá.
   un espacio o el uso gratis al lanzar solo pasa al invocar un compañero, que
   sigue en Flutter. El uso gratis de un conjuro innato es su recurso
   (`innate-<id>`) y ya se gasta con los botones de recursos.
+  En **Inventario** (5b1): las cinco monedas se escriben a mano (se guardan al
+  salir del campo o con Enter); cada fila lleva la casilla de equipar (solo lo
+  que se equipa, `InventoryOps.isEquippable`), − y + en la cantidad (el − se
+  apaga en 1), − y + en las cargas, y el menú de Flutter: cantidad exacta,
+  nota, sintonizar, mano secundaria (una sola, por el arma de base), a dos
+  manos y quitar, que avisa con «Deshacer». Las reglas que estaban en el widget
+  de Flutter (la mano secundaria única, el tope de cargas, qué se equipa, la
+  bolsa sin monedas en cero) pasaron a `InventoryOps` y `CoinOps`, y Flutter
+  las usa de ahí. Agregar del catálogo, comprar y vender son 5b2.
   - **Toda escritura la hace el motor.** `actOn` (`act` de `js/entrypoint.dart`,
     sobre `SheetActions.apply` del engine) recibe la ficha y la acción y
     devuelve la ficha nueva, migrada y con el `schemaVersion` actual, más lo
@@ -462,8 +471,9 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    espacios, recursos y dados de golpe, y los descansos con «Deshacer», solo
    en la ficha propia.
 5. Edición completa: creador de personajes, subida de nivel, inventario. Por
-   partes: 5a, la Inspiración Heroica y la concentración *(existe)*; 5b,
-   inventario; 5c, subida de nivel; 5d, creador.
+   partes: 5a, la Inspiración Heroica y la concentración *(existe)*; 5b1,
+   editar la mochila desde la fila y las monedas *(existe)*; 5b2, catálogo,
+   comprar y vender; 5c, subida de nivel; 5d, creador.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
    combate, vínculos y códigos de campaña. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de
@@ -611,7 +621,9 @@ Para que nadie lo dé por hecho:
 - Toda otra escritura desde React: los pasos 5 a 7 están enteros por hacer.
   Entre ellos, reordenar, marcar favorito, crear, renombrar o borrar
   personajes, condiciones, compañeros (y con ellos lanzar gastando espacio o
-  uso gratis), cambiar el truco innato y Forma Salvaje, y
+  uso gratis), cambiar el truco innato y Forma Salvaje; en el inventario,
+  agregar del catálogo, comprar y vender (5b2), los planos del Artífice y los
+  objetivos de arma de un rasgo (Pacto del Filo), y
   escribir en `/api/settings` (por eso el tema elegido en el navegador gana
   sobre el de la cuenta).
 - Control de versión en el servidor para las escrituras (rechazar una copia

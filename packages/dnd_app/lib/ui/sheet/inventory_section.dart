@@ -185,11 +185,10 @@ extension _SheetInventorySection on _SheetScreenState {
   }
 
   void _commitCoins() {
-    final next = <String, int>{};
-    for (final k in coinDenominations) {
-      final value = int.tryParse(_coinCtrls[k]!.text.trim()) ?? 0;
-      if (value > 0) next[k] = value;
-    }
+    final next = CoinOps.normalize({
+      for (final k in coinDenominations)
+        k: int.tryParse(_coinCtrls[k]!.text.trim()) ?? 0,
+    });
     if (mapEquals(next, _c.coins)) return;
     _replace(_c.copyWith(coins: next));
   }
@@ -873,7 +872,7 @@ extension _SheetInventorySection on _SheetScreenState {
     final max = info.maxCharges!;
     final left = InventoryOps.chargesLeft(e, repo)!;
     void set(int value) =>
-        _updateEntry(e.entryId, (entry) => entry.copyWith(charges: value));
+        _replace(InventoryOps.setCharges(_c, e.entryId, value, repo));
     return Padding(
       padding: const EdgeInsets.only(top: 4),
       child: Row(
@@ -1107,20 +1106,10 @@ extension _SheetInventorySection on _SheetScreenState {
           e.entryId,
           (entry) => entry.copyWith(attuned: !entry.attuned),
         );
-      // Las marcas van por el arma de base y no por el objeto: es lo que lee el
-      // motor, y con el id del objeto una daga +1 se marcaba sin efecto.
       case 'off-hand':
-        // Solo se empuña un arma en la secundaria: marcar una desmarca la otra.
-        // Con dos dagas, el motor manda a la secundaria solo una.
-        final id = InventoryOps.resolve(e, repo).weapon!.id;
-        final on = _c.weaponOffHand[id] ?? false;
-        _replace(_c.copyWith(weaponOffHand: on ? const {} : {id: true}));
+        _replace(InventoryOps.toggleOffHand(_c, e.entryId, repo));
       case 'two-handed':
-        final id = InventoryOps.resolve(e, repo).weapon!.id;
-        final on = _c.weaponTwoHanded[id] ?? false;
-        _replace(
-          _c.copyWith(weaponTwoHanded: {..._c.weaponTwoHanded, id: !on}),
-        );
+        _replace(InventoryOps.toggleTwoHanded(_c, e.entryId, repo));
       case 'transmute':
         await _transmuteReplica(e);
       case 'sell':
@@ -1189,11 +1178,10 @@ extension _SheetInventorySection on _SheetScreenState {
     String entryId,
     InventoryEntry Function(InventoryEntry) change,
   ) => _replace(
-    _c.copyWith(
-      inventory: [
-        for (final entry in _inventoryEntries)
-          entry.entryId == entryId ? change(entry) : entry,
-      ],
+    InventoryOps.updateEntry(
+      _c.copyWith(inventory: _inventoryEntries),
+      entryId,
+      change,
     ),
   );
 
@@ -1696,10 +1684,7 @@ extension _SheetInventorySection on _SheetScreenState {
       icon: _itemIcon(kind, itemFamily(item)),
       weight: resolved.weight,
       bundleSize: item?.bundleSize ?? 1,
-      equippable:
-          resolved.weapon != null ||
-          resolved.armor != null ||
-          (item != null && (item.effects.isNotEmpty || item.isMagic)),
+      equippable: InventoryOps.isEquippable(e, repo),
       equipped: InventoryOps.isEquipped(_c, e, repo),
       attunable: item?.requiresAttunement ?? false,
       magic: (item?.isMagic ?? false) || replica,

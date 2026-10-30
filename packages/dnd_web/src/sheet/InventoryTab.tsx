@@ -5,6 +5,7 @@ import {
   Box,
   Check,
   CircleHelp,
+  EllipsisVertical,
   Luggage,
   Package,
   Shield,
@@ -18,13 +19,15 @@ import {
 import { inventoryOf, type CharacterJson, type InventoryLine } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import type { Texts } from '../i18n/texts';
+import { AppDialog } from '../ui/AppDialog';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { cx } from '../ui/cx';
-import { Eyebrow, Pips, ThinBar } from '../ui/data';
-import { Tooltip } from '../ui/primitives';
+import { Eyebrow, Pips, SpendRecoverButtons, ThinBar } from '../ui/data';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Tooltip } from '../ui/primitives';
 import { AppEmptyState } from '../ui/status';
 import type { SheetModel } from './model';
+import type { SheetWriter } from './writer';
 
 /** Las familias en que se agrupa la mochila, en el orden de `itemGroupOrder`
  *  de Flutter: primero lo que se empuña, después lo que se gasta y al final
@@ -72,17 +75,24 @@ const COINS = ['pp', 'gp', 'ep', 'sp', 'cp'] as const;
 
 type Filter = 'all' | 'equipped' | 'magic';
 
+/** El diálogo de una línea que está abierto: cantidad exacta o nota. */
+type Ask = { kind: 'quantity' | 'note'; line: InventoryLine };
+
 /**
- * Pestaña Inventario, de **solo lectura**: la bolsa (monedas, carga y
- * sintonización) y la mochila agrupada por familia. Cada entrada la resolvió
- * el motor (`inventoryOf`): nombre, peso, si cuenta como equipada, si es
- * mágica. La carga y la capacidad son de `ComputedSheet`. Buscar y filtrar no
- * escriben nada; equipar, comprar, vender y editar siguen en Flutter.
+ * Pestaña Inventario: la bolsa (monedas, carga y sintonización) y la mochila
+ * agrupada por familia. Cada entrada la resolvió el motor (`inventoryOf`):
+ * nombre, peso, si cuenta como equipada, si es mágica, si se equipa. La carga
+ * y la capacidad son de `ComputedSheet`. En la ficha propia (`model.write`)
+ * se escriben las monedas y, por fila, equipar, cantidad, cargas y el menú de
+ * Flutter (cantidad exacta, nota, sintonizar, mano secundaria, a dos manos,
+ * quitar); cada cambio lo hace el motor. Agregar, comprar y vender siguen en
+ * Flutter.
  */
 export function InventoryTab({ model }: { model: SheetModel }) {
   const t = useTexts();
   const lang = useLang();
-  const { character, sheet, catalog } = model;
+  const { character, sheet, catalog, write } = model;
+  const [ask, setAsk] = useState<Ask | null>(null);
   // `character` es el `Character.toJson` migrado entero (ver `CharacterPage`);
   // el tipo solo nombra lo que la ficha lee, así que vuelve a su forma JSON.
   const lines = useMemo(() => inventoryOf(character as unknown as CharacterJson, catalog), [character, catalog]);
@@ -119,7 +129,18 @@ export function InventoryTab({ model }: { model: SheetModel }) {
                     </dt>
                     {/* Las que están en cero se atenúan: lo que hay se ve primero. */}
                     <dd className={cx('font-display mt-[7px] text-[22px] leading-none tabular-nums', n > 0 ? 'text-gold' : 'text-text-muted')}>
-                      {n}
+                      {write ? (
+                        <CoinInput
+                          // La clave reinicia el campo cuando el motor guarda
+                          // otra cantidad (un descanso, otra pestaña).
+                          key={n}
+                          value={n}
+                          label={t.invCoinField(t.coins[c].name)}
+                          onCommit={(v) => write.act({ type: 'setCoins', coins: { ...character.coins, [c]: v } })}
+                        />
+                      ) : (
+                        n
+                      )}
                     </dd>
                   </div>
                 );
@@ -265,24 +286,116 @@ export function InventoryTab({ model }: { model: SheetModel }) {
                 <th scope="col" className="hidden w-[72px] px-2 pb-2.5 text-right font-normal @xl:table-cell">
                   {t.colWeight}
                 </th>
+                {write && <td className="w-10 pb-2.5" />}
               </tr>
             </thead>
             {groups.map(({ group, lines: rows }) => (
               <tbody key={group} data-group={group}>
                 <tr>
-                  <th scope="colgroup" colSpan={4} className="px-2 pt-[22px] pb-2 font-normal">
+                  <th scope="colgroup" colSpan={write ? 5 : 4} className="px-2 pt-[22px] pb-2 font-normal">
                     <Eyebrow>{t.itemGroups[group]}</Eyebrow>
                   </th>
                 </tr>
                 {rows.map((line) => (
-                  <PackRow key={line.entryId} line={line} group={group} t={t} format={number.format} />
+                  <PackRow
+                    key={line.entryId}
+                    line={line}
+                    group={group}
+                    t={t}
+                    format={number.format}
+                    write={write}
+                    onAsk={(kind) => setAsk({ kind, line })}
+                  />
                 ))}
               </tbody>
             ))}
           </table>
         )}
       </section>
+      {ask && write && <EntryDialog ask={ask} write={write} onClose={() => setAsk(null)} />}
     </div>
+  );
+}
+
+/** Una moneda escrita a mano. Se guarda al salir del campo o con Enter, como
+ *  en Flutter: guardar con cada tecla mandaría «1», «12», «120». */
+function CoinInput({ value, label, onCommit }: { value: number; label: string; onCommit: (v: number) => void }) {
+  const [text, setText] = useState(String(value));
+  const commit = () => {
+    const v = Number.parseInt(text, 10) || 0;
+    if (v !== value) onCommit(v);
+    else setText(String(value));
+  };
+  return (
+    <input
+      type="number"
+      inputMode="numeric"
+      min={0}
+      aria-label={label}
+      value={text}
+      onChange={(e) => setText(e.target.value)}
+      onBlur={commit}
+      onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+      className="w-full bg-transparent text-center tabular-nums outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+    />
+  );
+}
+
+/** Cantidad exacta o nota de una línea (`showTextPromptDialog` de Flutter). */
+function EntryDialog({ ask, write, onClose }: { ask: Ask; write: SheetWriter; onClose: () => void }) {
+  const t = useTexts();
+  const { kind, line } = ask;
+  const [value, setValue] = useState(kind === 'quantity' ? String(line.quantity) : line.note);
+  const confirm = () => {
+    if (kind === 'note') {
+      write.act({ type: 'note', entry: line.entryId, text: value.trim() });
+    } else {
+      const n = Number.parseInt(value, 10);
+      if (n >= 1) write.act({ type: 'setQuantity', entry: line.entryId, value: n });
+    }
+    onClose();
+  };
+  const label = kind === 'note' ? t.invNoteLabel : line.bundleSize > 1 ? t.invBundlesOf(line.bundleSize) : t.invUnits;
+  const field = 'mt-2 w-full rounded-[var(--radius-nav)] border border-hairline bg-plaque px-3 text-[14px] text-on-surface';
+  return (
+    <AppDialog
+      open
+      onOpenChange={(open) => !open && onClose()}
+      title={kind === 'note' ? t.invNoteTitle : t.invQuantityTitle}
+      actions={[{ label: t.cancel }, { label: t.commonSave, primary: true, onSelect: confirm }]}
+    >
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          confirm();
+        }}
+      >
+        <label htmlFor="entry-value" className="text-[13px] text-on-surface-variant">
+          {label}
+        </label>
+        {kind === 'note' ? (
+          <textarea
+            id="entry-value"
+            rows={4}
+            autoFocus
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            className={cx(field, 'py-2')}
+          />
+        ) : (
+          <input
+            id="entry-value"
+            type="number"
+            inputMode="numeric"
+            min={1}
+            autoFocus
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            className={cx(field, 'num h-9')}
+          />
+        )}
+      </form>
+    </AppDialog>
   );
 }
 
@@ -291,18 +404,25 @@ function PackRow({
   group,
   t,
   format,
+  write,
+  onAsk,
 }: {
   line: InventoryLine;
   group: Group;
   t: Texts;
   format: (n: number) => string;
+  write: SheetWriter | undefined;
+  onAsk: (kind: Ask['kind']) => void;
 }) {
   const Icon = GROUP_ICON[group];
+  const max = line.maxCharges;
+  const charges = max === null ? null : (line.charges ?? max);
   const notes = [
     line.attuned ? t.attunedNote : null,
-    line.maxCharges !== null ? t.chargesNote(line.charges ?? line.maxCharges, line.maxCharges) : null,
+    max !== null && charges !== null ? t.chargesNote(charges, max) : null,
     line.note || null,
   ].filter(Boolean);
+  const entry = line.entryId;
   return (
     <tr className="border-t border-hairline" data-entry={line.entryId}>
       <th scope="row" className="px-2 py-3 text-left font-normal">
@@ -325,14 +445,54 @@ function PackRow({
               )}
             </span>
             {notes.length > 0 && <span className="mt-1 block text-[12px] text-text-muted">{notes.join(' · ')}</span>}
+            {write && max !== null && charges !== null && (
+              // Con máximo 0 (cargas tiradas al aparecer) no hay techo; el
+              // tope lo pone el motor y acá solo se apaga lo que no cambiaría.
+              <SpendRecoverButtons
+                spendLabel={t.invSpendCharge(line.name)}
+                recoverLabel={t.invRecoverCharge(line.name)}
+                onSpend={charges > 0 ? () => write.act({ type: 'setCharges', entry, value: charges - 1 }) : undefined}
+                onRecover={
+                  max !== 0 && charges >= max
+                    ? undefined
+                    : () => write.act({ type: 'setCharges', entry, value: charges + 1 })
+                }
+              />
+            )}
           </span>
         </span>
       </th>
       <td className="num px-2 py-3 text-right text-[14px]" data-field="quantity">
-        {line.quantity}
+        {write ? (
+          // − y + en la fila: sumar una flecha es el caso frecuente. El − se
+          // apaga en 1; quitar la línea está en el menú.
+          <span className="inline-flex items-center gap-0.5">
+            <SpendRecoverButtons
+              spendLabel={t.invRemoveOne(line.name)}
+              recoverLabel={t.invAddOne(line.name)}
+              onSpend={
+                line.quantity > 1
+                  ? () => write.act({ type: 'setQuantity', entry, value: line.quantity - 1 })
+                  : undefined
+              }
+              onRecover={() => write.act({ type: 'setQuantity', entry, value: line.quantity + 1 })}
+            />
+            <span className="min-w-6 text-center">{line.quantity}</span>
+          </span>
+        ) : (
+          line.quantity
+        )}
       </td>
       <td className="px-2 py-3 text-center text-[12px]" data-field="equipped">
-        {line.equipped ? (
+        {write && line.equippable ? (
+          <input
+            type="checkbox"
+            aria-label={t.invEquip(line.name)}
+            checked={line.equipped}
+            onChange={(e) => write.act({ type: 'equip', entry, value: e.target.checked })}
+            className="h-4 w-4 accent-[var(--gold)]"
+          />
+        ) : line.equipped ? (
           <span className="inline-flex items-center gap-1 text-gold">
             <Check size={14} aria-hidden="true" />
             {t.equippedYes}
@@ -342,13 +502,75 @@ function PackRow({
             <span aria-hidden="true" className="text-text-muted">
               —
             </span>
-            <span className="sr-only">{t.equippedNo}</span>
+            <span className="sr-only">{write && !line.equippable ? t.invNotEquippable : t.equippedNo}</span>
           </>
         )}
       </td>
       <td className="hidden px-2 py-3 text-right text-[13px] text-on-surface-variant tabular-nums @xl:table-cell">
         {format(line.weight)} {t.pounds}
       </td>
+      {write && (
+        <td className="py-3 text-right">
+          <ItemMenu line={line} t={t} write={write} onAsk={onAsk} />
+        </td>
+      )}
     </tr>
+  );
+}
+
+/** Las acciones secundarias de una línea, en menú como pide §8.7 (`_itemMenu`
+ *  de Flutter). Equipar y la cantidad quedan en la fila porque son las
+ *  frecuentes. Quitar no pregunta: avisa con «Deshacer». */
+function ItemMenu({
+  line,
+  t,
+  write,
+  onAsk,
+}: {
+  line: InventoryLine;
+  t: Texts;
+  write: SheetWriter;
+  onAsk: (kind: Ask['kind']) => void;
+}) {
+  const entry = line.entryId;
+  const toggle = (label: string, on: boolean, act: () => void) => (
+    <DropdownMenuItem onSelect={act}>
+      <span className="flex-1">{label}</span>
+      {on && <Check size={16} aria-hidden="true" className="text-gold" />}
+    </DropdownMenuItem>
+  );
+  return (
+    <DropdownMenu>
+      <Tooltip content={t.invActions(line.name)}>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            aria-label={t.invActions(line.name)}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius-nav)] text-on-surface-variant hover:bg-plaque hover:text-gold"
+          >
+            <EllipsisVertical size={18} aria-hidden="true" />
+          </button>
+        </DropdownMenuTrigger>
+      </Tooltip>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onSelect={() => onAsk('quantity')}>{t.invExactQuantity}</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => onAsk('note')}>{t.invNote}</DropdownMenuItem>
+        {line.requiresAttunement &&
+          toggle(line.attuned ? t.invUnattune : t.invAttune, line.attuned, () =>
+            write.act({ type: 'attune', entry, value: !line.attuned }),
+          )}
+        {line.offHand !== null && toggle(t.invOffHand, line.offHand, () => write.act({ type: 'offHand', entry }))}
+        {line.twoHanded !== null &&
+          toggle(t.invTwoHanded, line.twoHanded, () => write.act({ type: 'twoHanded', entry }))}
+        <DropdownMenuItem
+          onSelect={() => {
+            const r = write.act({ type: 'removeItem', entry });
+            if (r) write.notify(t.invRemoved(line.name), { undo: () => write.restore(r.before) });
+          }}
+        >
+          {t.invRemove}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

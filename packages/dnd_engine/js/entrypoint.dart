@@ -150,6 +150,16 @@ Map<String, dynamic> _inventoryLine(
     'weight': resolved.weight,
     'quantity': e.quantity,
     'equipped': InventoryOps.isEquipped(c, e, repo),
+    'equippable': InventoryOps.isEquippable(e, repo),
+    'bundleSize': item?.bundleSize ?? 1,
+    // La marca de mano secundaria (solo armas ligeras) y de a dos manos (solo
+    // versátiles), por el arma de base; null donde no aplica.
+    'offHand': resolved.weapon?.isLight == true
+        ? c.weaponOffHand[resolved.weapon!.id] ?? false
+        : null,
+    'twoHanded': resolved.weapon?.versatileDice != null
+        ? c.weaponTwoHanded[resolved.weapon!.id] ?? false
+        : null,
     'attuned': e.attuned,
     'requiresAttunement': item?.requiresAttunement ?? false,
     'magic': (item?.isMagic ?? false) || replica,
