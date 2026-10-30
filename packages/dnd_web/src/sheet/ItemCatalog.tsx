@@ -239,9 +239,11 @@ export function TradeDialog({
 }) {
   const t = useTexts();
   const labels = coinLabels(t);
-  const partsOf = (cp: number) => {
+  // Un objeto con las tres claves y no un `Record<string, …>`: con
+  // `noUncheckedIndexedAccess`, leer `price[k]` de un Record da `undefined`.
+  const partsOf = (cp: number): Record<(typeof PRICE_COINS)[number], string> => {
     const p = coinParts(cp);
-    return Object.fromEntries(PRICE_COINS.map((k) => [k, String(p[k] ?? 0)]));
+    return { gp: String(p.gp ?? 0), sp: String(p.sp ?? 0), cp: String(p.cp ?? 0) };
   };
   const [quantity, setQuantity] = useState(1);
   const [price, setPrice] = useState(() => partsOf(catalogCp));

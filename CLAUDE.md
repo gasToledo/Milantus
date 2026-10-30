@@ -92,7 +92,9 @@ desde la raíz: ni `tsc` ni Vite ven esa etapa.
 
 **Trampa de entorno:** en algunas máquinas Windows con antivirus corporativo
 `npm ci` deja sin binarios nativos a TypeScript 7, rolldown y compañía. Si
-pasa, `dnd_web` se valida en CI y no se pierde tiempo reinstalando.
+pasa, no se pierde tiempo reinstalando: el chequeo de tipos corre igual con el
+TypeScript 5 de JavaScript puro (`npx -y -p typescript@5.8.3 tsc --noEmit -p .`
+en `packages/dnd_web`), y el build y Playwright se validan en CI.
 
 El stack completo (Postgres + Zitadel + servidor + cloudflared) se levanta con
 `docker compose up -d --build`; el runbook está en
