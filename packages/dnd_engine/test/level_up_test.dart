@@ -140,6 +140,49 @@ void main() {
     expect(resuelta.open.proficiencies, 0);
   });
 
+  test('los conjuros de clase se eligen sin lo que ya concede un rasgo', () {
+    final clerigo = Character(
+      id: 'ilse',
+      name: 'Ilse',
+      raceId: 'dwarf',
+      classId: 'cleric',
+      subclassId: 'life-domain',
+      backgroundId: 'acolyte',
+      level: 3,
+      assignedScores: _scores,
+      hpPerLevel: const [8, 5, 5],
+      cantripIds: const ['guidance', 'sacred-flame'],
+      spellIds: const ['bless', 'cure-wounds'],
+    );
+    final up = LevelUp(clerigo, repo, const LevelUpDraft(classId: 'cleric'));
+    expect(up.open.classSpells, greaterThan(0));
+    final cs = up.classSpellcasting!;
+    final o = LevelUp.classSpells(up.built, up.after, repo, cs.sc,
+        classId: cs.classId);
+    expect(
+      o.spells
+          .map((s) => s.id)
+          .toSet()
+          .intersection(up.after.alwaysPreparedSpellIds),
+      isEmpty,
+    );
+    List<String> llenar(List<String> chosen, List<Spell> pool, int n) => [
+          ...chosen,
+          ...pool.map((s) => s.id).where((id) => !chosen.contains(id)),
+        ].take(n).toList();
+    final elegido = LevelUp(
+      clerigo,
+      repo,
+      LevelUpDraft(
+        classId: 'cleric',
+        classCantripPicks:
+            llenar(o.chosenCantrips, o.cantrips, cs.sc.cantripsKnown),
+        classSpellPicks: llenar(o.chosenSpells, o.spells, cs.sc.preparedCount),
+      ),
+    );
+    expect(elegido.open.classSpells, 0);
+  });
+
   test('lo que la subida obliga a elegir aparece en open', () {
     final barbaro = LevelUp(
         pj('barbarian', 4), repo, const LevelUpDraft(classId: 'barbarian'));

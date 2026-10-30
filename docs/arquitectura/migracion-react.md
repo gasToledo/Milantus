@@ -458,9 +458,15 @@ repiten acá.
   prerrequisito, lo bloqueado y lo que el personaje ya traía fijo
   (`LevelUp.featureSlots`, `proficiencySlots`) también son del motor, y
   Flutter los usa. Un cupo que no se revisa traba lo que ya traía, no lo
-  elegido en esta subida. **Corte que queda:** si la subida obliga a elegir
-  conjuros (`LevelUp.open`: casi todo lanzador), el resumen lo dice y manda a
-  la app principal; el motor rechaza confirmar una subida a medias. Las piezas del circuito (`Option`,
+  elegido en esta subida. Desde 5c3, **Conjuros de rasgos** (los cupos que
+  concede un rasgo o una dote, como Iniciado en la Magia) y **Conjuros** (los
+  trucos y los preparados o conocidos de la clase que sube, con buscador y
+  scroll propio, y la ficha del conjuro a la derecha) cierran el circuito:
+  ninguna subida manda ya a la app principal. Qué se ofrece y qué ya concede
+  un rasgo (y por eso no ocupa cupo) es `LevelUp.classSpells`, que también
+  usa el editor de conjuros de Flutter (`SpellEditScreen`); lo elegido viaja
+  como `spellPicks`, `classCantripPicks` y `classSpellPicks`. El motor
+  rechaza confirmar una subida a medias. Las piezas del circuito (`Option`,
   `Block`, `Status`) viven en el asistente; si el creador (5d) las reusa,
   pasan a `src/ui/`.
   - **Toda escritura la hace el motor.** `actOn` (`act` de `js/entrypoint.dart`,
@@ -517,7 +523,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    editar la mochila desde la fila y las monedas *(existe)*; 5b2, catálogo,
    comprar y vender *(existe)*; 5c1, subida de nivel sin elecciones de rasgos,
    competencias ni conjuros *(existe)*; 5c2, esas elecciones de rasgos y
-   competencias *(existe)*; 5c3, los conjuros; 5d, creador.
+   competencias *(existe)*; 5c3, los conjuros *(existe)*; 5d, creador.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
    combate, vínculos y códigos de campaña. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de
@@ -615,8 +621,9 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    deshaga, que comprar del catálogo y vender guarden lo del motor y vender
    se deshaga, que una bárbara sembrada suba a 4 por PG, subclase y mejora
    guardando lo del motor y se deshaga, que un guerrero elija en la subida el
-   estilo de combate pendiente y guarde lo del motor, y que la clériga, cuya
-   subida pide conjuros, quede frenada sin escribir, y
+   estilo de combate pendiente y guarde lo del motor, que la clériga suba
+   eligiendo Orden Divina, los conjuros de Iniciado en la Magia y los de
+   clase y guarde lo del motor, y
    que la ficha de otra cuenta (la de un miembro, para el DM) no
    tenga un solo control (`e2e/escritura.spec.ts`, con una cuenta propia para
    no cambiar lo que leen las demás); y que una cuenta sin `webV2` vea
@@ -691,7 +698,8 @@ Para que nadie lo dé por hecho:
   personajes, condiciones, compañeros (y con ellos lanzar gastando espacio o
   uso gratis), cambiar el truco innato y Forma Salvaje; en el inventario,
   los planos del Artífice y los objetivos de arma de un rasgo (Pacto del
-  Filo); en la subida de nivel, elegir conjuros (5c3), y
+  Filo); preparar conjuros desde la ficha (el editor ya existe en la subida),
+  y
   escribir en `/api/settings` (por eso el tema elegido en el navegador gana
   sobre el de la cuenta).
 - Control de versión en el servidor para las escrituras (rechazar una copia

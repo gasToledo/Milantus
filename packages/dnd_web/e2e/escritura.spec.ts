@@ -1,5 +1,14 @@
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
-import { actOn, computeSheet, inventoryOf, levelUpView, migrateCharacter, type CharacterJson, type SheetAction } from '../src/engine';
+import {
+  actOn,
+  computeSheet,
+  inventoryOf,
+  levelUpView,
+  migrateCharacter,
+  type CharacterJson,
+  type LevelUpDraft,
+  type SheetAction,
+} from '../src/engine';
 import { resourceKey } from '../src/sheet/format';
 import { api, catalogo, TOKEN_DM, TOKEN_ESCRITURA, vigilarEscrituras, type PersonajeApi } from './helpers';
 
@@ -347,12 +356,51 @@ test('la subida elige el estilo de combate pendiente y guarda lo del motor', asy
   ).toEqual(esperado);
 });
 
-test('si la subida pide elegir conjuros, el asistente manda a la app principal sin escribir', async ({ page }) => {
-  const escrituras = vigilarEscrituras(page);
+test('la clériga sube eligiendo Orden Divina, los conjuros de su dote y los de clase', async ({ page, request }) => {
+  const antes = await ilse(request);
+  // El borrador se arma paso a paso con el motor, como lo arma la pantalla:
+  // lo elegido en un cupo cambia las opciones del siguiente.
+  const ver = (d: LevelUpDraft) => levelUpView(antes, catalogo(), d);
+  let d: LevelUpDraft = { classId: 'cleric', abilityA: 'wisdom' };
+  const orden = ver(d).featureSlots.find((s) => s.chosen.length < s.count)!;
+  const ordenId = orden.options.find((o) => o.unmet === null)!.id;
+  d = { ...d, featurePicks: { [orden.groupId]: [ordenId] } };
+  const dote: string[] = [];
+  const spellPicks: Record<string, string[]> = {};
+  for (const slot of ver(d).spellSlots) {
+    const ids = slot.options.map((o) => o.id).filter((id) => !dote.includes(id)).slice(0, slot.count);
+    spellPicks[slot.groupId] = ids;
+    dote.push(...ids);
+  }
+  d = { ...d, spellPicks };
+  const cs = ver(d).classSpells!;
+  const llenar = (chosen: string[], pool: { id: string }[], n: number) =>
+    pool.map((o) => o.id).filter((id) => !chosen.includes(id)).slice(0, n - chosen.length);
+  const trucos = llenar(cs.chosenCantrips, cs.cantrips, cs.cantripsKnown);
+  const conjuros = llenar(cs.chosenSpells, cs.spells, cs.preparedCount);
+  d = {
+    ...d,
+    classCantripPicks: [...cs.chosenCantrips, ...trucos],
+    classSpellPicks: [...cs.chosenSpells, ...conjuros],
+  };
+  const esperado = segunMotor(antes, { type: 'levelUp', draft: d });
+  const tocar = (id: string) => page.locator(`[data-option="${id}"]`).first().click();
+  const continuar = () => page.getByRole('button', { name: 'Continuar' }).click();
   await page.goto(`/v2/personajes/${ILSE}/subir-nivel`);
-  await expect(page.locator('[data-field="level-up-blocked"]')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Empezar' })).toBeDisabled();
-  expect(escrituras).toEqual([]);
+
+  await page.getByRole('button', { name: 'Empezar' }).click();
+  await continuar();
+  await page.getByRole('radio', { name: /^Sabiduría/ }).click();
+  await continuar();
+  await tocar(ordenId);
+  await continuar();
+  for (const id of dote) await tocar(id);
+  await continuar();
+  for (const id of [...trucos, ...conjuros]) await tocar(id);
+  await continuar();
+  expect(await proximoGuardado(page, () => page.getByRole('button', { name: 'Subir a nivel 4' }).click())).toEqual(
+    esperado,
+  );
 });
 
 test('la ficha de otra cuenta no tiene controles para escribir', async ({ context, page, baseURL }) => {

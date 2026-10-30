@@ -388,6 +388,49 @@ String levelUp(String characterJson, String catalogJson, String draftJson) {
           ],
         },
     ],
+    // Los cupos de conjuros que concede un rasgo: ya traen sus opciones y lo
+    // elegido revalidado.
+    'spellSlots': [
+      for (final slot in up.after.spellChoiceSlots)
+        {
+          'groupId': slot.groupId,
+          'name': slot.name,
+          'count': slot.count,
+          'replaceable': slot.replaceable,
+          'grantsSpells': slot.grantsSpells,
+          'chosen': slot.chosen,
+          'options': [
+            for (final id in slot.options)
+              if (up.repo.spell(id) case final sp?)
+                {'id': id, 'name': sp.name, 'level': sp.level},
+          ],
+        },
+    ],
+    // Los trucos y conjuros de la clase que sube (`LevelUp.classSpells`), o
+    // null si no lanza.
+    'classSpells': switch (up.classSpellcasting) {
+      null => null,
+      final cs => () {
+          final o = LevelUp.classSpells(up.built, up.after, up.repo, cs.sc,
+              classId: cs.classId);
+          return {
+            'cantripsKnown': cs.sc.cantripsKnown,
+            'preparedCount': cs.sc.preparedCount,
+            'prepared': cs.sc.preparation == SpellPreparation.prepared,
+            'cantrips': [
+              for (final sp in o.cantrips) {'id': sp.id, 'name': sp.name},
+            ],
+            'spells': [
+              for (final sp in o.spells)
+                {'id': sp.id, 'name': sp.name, 'level': sp.level},
+            ],
+            'chosenCantrips': o.chosenCantrips,
+            'chosenSpells': o.chosenSpells,
+            'grantedCantrips': o.grantedCantrips,
+            'grantedSpells': o.grantedSpells,
+          };
+        }(),
+    },
     'open': {
       'features': open.features,
       'proficiencies': open.proficiencies,

@@ -191,6 +191,10 @@ export interface LevelUpDraft {
   /** Lo elegido en esta subida para cada cupo, por su `groupId`. */
   featurePicks?: Record<string, string[]>;
   proficiencyPicks?: Record<string, string[]>;
+  spellPicks?: Record<string, string[]>;
+  /** Los trucos y conjuros de la clase que sube, enteros. */
+  classCantripPicks?: string[] | null;
+  classSpellPicks?: string[] | null;
 }
 
 export interface AbilityChoice {
@@ -252,6 +256,26 @@ export interface LevelUpView {
     chosen: string[];
     options: { id: string; label: string; locked: boolean }[];
   }[];
+  spellSlots: {
+    groupId: string;
+    name: string;
+    count: number;
+    replaceable: boolean;
+    grantsSpells: boolean;
+    chosen: string[];
+    options: { id: string; name: string; level: number }[];
+  }[];
+  classSpells: {
+    cantripsKnown: number;
+    preparedCount: number;
+    prepared: boolean;
+    cantrips: { id: string; name: string }[];
+    spells: { id: string; name: string; level: number }[];
+    chosenCantrips: string[];
+    chosenSpells: string[];
+    grantedCantrips: string[];
+    grantedSpells: string[];
+  } | null;
   /** Lo que la subida obliga a elegir y todavía se elige en Flutter. */
   open: { features: number; proficiencies: number; spellChoices: number; classSpells: number };
   /** El personaje como quedaría, para comparar las dos fichas. */

@@ -48,6 +48,15 @@ class LevelUpDraft {
   final Map<String, List<String>> featurePicks;
   final Map<String, List<String>> proficiencyPicks;
 
+  /// Lo elegido para cada cupo de conjuros de un rasgo, igual que
+  /// [featurePicks].
+  final Map<String, List<String>> spellPicks;
+
+  /// Los trucos y conjuros de la clase que sube, enteros (null: los que ya
+  /// tenía). Van con [Character.withClassSpells].
+  final List<String>? classCantripPicks;
+  final List<String>? classSpellPicks;
+
   const LevelUpDraft({
     required this.classId,
     this.subclassId,
@@ -68,10 +77,12 @@ class LevelUpDraft {
     this.classSpellChoices,
     this.featurePicks = const {},
     this.proficiencyPicks = const {},
+    this.spellPicks = const {},
+    this.classCantripPicks,
+    this.classSpellPicks,
   });
 
-  /// Lo que manda el cliente. Las elecciones de conjuros todavía siguen en
-  /// Flutter (ver `LevelUp.open`).
+  /// Lo que manda el cliente React.
   factory LevelUpDraft.fromJson(Map<String, dynamic> j) {
     Ability? ability(Object? name) =>
         name == null ? null : Ability.values.byName(name as String);
@@ -90,6 +101,9 @@ class LevelUpDraft {
       featId: j['featId'] as String?,
       featurePicks: picks(j['featurePicks']),
       proficiencyPicks: picks(j['proficiencyPicks']),
+      spellPicks: picks(j['spellPicks']),
+      classCantripPicks: (j['classCantripPicks'] as List?)?.cast<String>(),
+      classSpellPicks: (j['classSpellPicks'] as List?)?.cast<String>(),
     );
   }
 }
@@ -222,9 +236,15 @@ class LevelUp {
     if (draft.subclassId != null) {
       subclassIds[draft.classId] = draft.subclassId!;
     }
-    final (featureChoices, classFeatureChoices) = _withFeaturePicks(
+    final (featureChoices, classFeatureChoices) = _withPicks(
       draft.featureChoices ?? c.featureChoices,
       draft.classFeatureChoices ?? c.classFeatureChoices,
+      draft.featurePicks,
+    );
+    final (spellChoices, classSpellChoices) = _withPicks(
+      draft.spellChoices ?? c.spellChoices,
+      draft.classSpellChoices ?? c.classSpellChoices,
+      draft.spellPicks,
     );
     final proficiencyChoices = {
       ...(draft.proficiencyChoices ?? c.proficiencyChoices),
@@ -236,7 +256,7 @@ class LevelUp {
         proficiencyChoices[e.key] = e.value;
       }
     }
-    return c.copyWith(
+    final updated = c.copyWith(
       level: newLevel,
       classHistory: [...c.classHistory, draft.classId],
       subclassId: draft.classId == c.classId
@@ -253,19 +273,30 @@ class LevelUp {
       featureChoices: featureChoices,
       classFeatureChoices: classFeatureChoices,
       proficiencyChoices: proficiencyChoices,
-      spellChoices: draft.spellChoices,
-      classSpellChoices: draft.classSpellChoices,
+      spellChoices: spellChoices,
+      classSpellChoices: classSpellChoices,
+    );
+    final cantrips = draft.classCantripPicks;
+    final spells = draft.classSpellPicks;
+    if (cantrips == null && spells == null) return updated;
+    return updated.withClassSpells(
+      draft.classId,
+      cantrips: cantrips ?? updated.cantripIdsFor(draft.classId),
+      spells: spells ?? updated.spellIdsFor(draft.classId),
     );
   }
 
-  /// Mezcla [LevelUpDraft.featurePicks] en las elecciones del personaje. Los
+  /// Mezcla lo elegido por cupo ([LevelUpDraft.featurePicks],
+  /// [LevelUpDraft.spellPicks]) en las elecciones del personaje. Los
   /// grupos legacy de una ficha monoclase también llevan `:` (por ejemplo
   /// `class:wizard:signature-spells`) y no son mapas anidados: solo el
   /// prefijo de la clase que sube es un ámbito persistido (`wizard:class:…`).
   (Map<String, List<String>>, Map<String, Map<String, List<String>>>)
-      _withFeaturePicks(Map<String, List<String>> flat,
-          Map<String, Map<String, List<String>>> byClass) {
-    if (draft.featurePicks.isEmpty) return (flat, byClass);
+      _withPicks(
+          Map<String, List<String>> flat,
+          Map<String, Map<String, List<String>>> byClass,
+          Map<String, List<String>> picks) {
+    if (picks.isEmpty) return (flat, byClass);
     final nextFlat = {
       for (final e in flat.entries) e.key: [...e.value]
     };
@@ -275,7 +306,7 @@ class LevelUp {
           for (final e in c.value.entries) e.key: [...e.value]
         },
     };
-    for (final pick in draft.featurePicks.entries) {
+    for (final pick in picks.entries) {
       final groupId = pick.key;
       if (groupId.startsWith('${draft.classId}:')) {
         final i = groupId.indexOf(':');
@@ -335,6 +366,90 @@ class LevelUp {
                 validator.unmetFeatPrerequisite(f, target, sheet, held: held),
           ),
     ];
+  }
+
+  /// Qué trucos y conjuros de [classId] se pueden elegir en [c] (el editor de
+  /// conjuros de la ficha y de la subida): los de su lista hasta el nivel de
+  /// espacio más alto, más los que suman los rasgos, sin lo que ya concede un
+  /// rasgo —un conjuro innato o uno siempre preparado no ocupa cupo—. Lo
+  /// elegido sale sin lo concedido: una ficha vieja que los traía elegidos
+  /// recupera el cupo desperdiciado. Con [classId] null es la clase
+  /// principal de una ficha que no lleva conjuros por clase.
+  static ({
+    List<Spell> cantrips,
+    List<Spell> spells,
+    List<String> chosenCantrips,
+    List<String> chosenSpells,
+    List<String> grantedCantrips,
+    List<String> grantedSpells,
+  }) classSpells(
+    Character c,
+    ComputedSheet sheet,
+    ContentRepository repo,
+    Spellcasting sc, {
+    String? classId,
+  }) {
+    final forClass = classId ?? c.classId;
+    final granted = <String>{
+      for (final s in sheet.innateSpells) s.spellId,
+      if (classId == null) ...sheet.alwaysPreparedSpellIds,
+      if (classId != null) ...{
+        ...sheet.alwaysPreparedSpellIds.difference(
+          sheet.alwaysPreparedSpellIdsByClass.values
+              .expand((ids) => ids)
+              .toSet(),
+        ),
+        ...?sheet.alwaysPreparedSpellIdsByClass[classId],
+      },
+    };
+    final maxLevel = sc.slotsByLevel.keys.fold<int>(0, (m, l) => l > m ? l : m);
+    final all = repo.spellsForList(sc.spellList,
+        extraSpellIds: sheet.spellListAdditionIds);
+    return (
+      cantrips: [
+        for (final s in all)
+          if (s.isCantrip && !granted.contains(s.id)) s,
+      ],
+      spells: [
+        for (final s in all)
+          if (!s.isCantrip && s.level <= maxLevel && !granted.contains(s.id)) s,
+      ],
+      chosenCantrips: [
+        for (final id in c.cantripIdsFor(forClass))
+          if (!granted.contains(id)) id,
+      ],
+      chosenSpells: [
+        for (final id in c.spellIdsFor(forClass))
+          if (!granted.contains(id)) id,
+      ],
+      // Los nombres de lo concedido, para decir que no ocupa cupo.
+      grantedCantrips: [
+        for (final s in all)
+          if (s.isCantrip && granted.contains(s.id)) s.name,
+      ],
+      grantedSpells: [
+        for (final s in all)
+          if (!s.isCantrip && granted.contains(s.id)) s.name,
+      ],
+    );
+  }
+
+  /// El lanzamiento de la clase que sube, al nivel nuevo, y el `classId` con
+  /// que se editan sus conjuros (null en una ficha monoclase sin bloques), o
+  /// null si esa clase no lanza conjuros.
+  ({Spellcasting sc, String? classId})? get classSpellcasting {
+    if (after.spellcastingBlocks.isEmpty) {
+      final sc = after.spellcasting;
+      return sc != null && draft.classId == character.classId
+          ? (sc: sc, classId: null)
+          : null;
+    }
+    final block = after.spellcastingBlocks
+        .where((b) => b.classId == draft.classId)
+        .firstOrNull;
+    return block == null
+        ? null
+        : (sc: block.spellcasting, classId: block.classId);
   }
 
   /// Lo elegido para [groupId] en [c], con el ámbito por clase.

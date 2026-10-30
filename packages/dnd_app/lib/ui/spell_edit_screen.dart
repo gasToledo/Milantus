@@ -28,45 +28,26 @@ class SpellEditScreen extends StatefulWidget {
 }
 
 class _SpellEditScreenState extends State<SpellEditScreen> {
-  /// Ids de conjuros que ya concede un rasgo y por eso no deben ocupar un cupo
-  /// de truco ni de preparado. Son dos casos distintos con la misma
-  /// consecuencia acá: el conjuro **innato** (linaje, dote de origen), que
-  /// además trae un uso gratis, y el **siempre preparado** de una subclase,
-  /// que se lanza con los espacios normales.
   late final ComputedSheet _sheet = CharacterCompiler(
     widget.repo,
   ).compile(widget.character);
 
-  late final Set<String> _sourceAlwaysPreparedSpellIds = {
-    if (widget.classId == null) ..._sheet.alwaysPreparedSpellIds,
-    if (widget.classId != null) ...{
-      ..._sheet.alwaysPreparedSpellIds.difference(
-        _sheet.alwaysPreparedSpellIdsByClass.values
-            .expand((ids) => ids)
-            .toSet(),
-      ),
-      ...?_sheet.alwaysPreparedSpellIdsByClass[widget.classId],
-    },
-  };
+  /// Qué se ofrece, qué ya concede un rasgo (y por eso no ocupa cupo) y lo
+  /// elegido sin lo concedido lo decide el motor (`LevelUp.classSpells`), el
+  /// mismo que usa el cliente React.
+  late final _options = LevelUp.classSpells(
+    widget.character,
+    _sheet,
+    widget.repo,
+    widget.spellcasting,
+    classId: widget.classId,
+  );
 
-  late final Set<String> _grantedSpellIds = {
-    for (final s in _sheet.innateSpells) s.spellId,
-    ..._sourceAlwaysPreparedSpellIds,
-  };
-
-  // Una ficha guardada antes de que la selección los excluyera puede traerlos
-  // elegidos: se podan al abrir para devolver el cupo desperdiciado, en vez de
-  // quedar atrapados en la selección sin chip que los saque.
-  /// La clase cuyos conjuros se editan. Sin [SpellEditScreen.classId] es la
-  /// principal: una ficha monoclase también los lee por clase, porque después
-  /// de una subida de nivel ya no viven en las listas planas.
+  /// La clase cuyos conjuros se editan, para el título.
   String get _classId => widget.classId ?? widget.character.classId;
 
-  late final Set<String> _cantrips = {
-    ...widget.character.cantripIdsFor(_classId),
-  }..removeAll(_grantedSpellIds);
-  late final Set<String> _spells = {...widget.character.spellIdsFor(_classId)}
-    ..removeAll(_grantedSpellIds);
+  late final Set<String> _cantrips = {..._options.chosenCantrips};
+  late final Set<String> _spells = {..._options.chosenSpells};
 
   Spellcasting get _sc => widget.spellcasting;
   bool get _prepared => _sc.preparation == SpellPreparation.prepared;
@@ -84,30 +65,10 @@ class _SpellEditScreenState extends State<SpellEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final all = widget.repo.spellsForList(
-      _sc.spellList,
-      extraSpellIds: _sheet.spellListAdditionIds,
-    );
-    final grantedSpellIds = _grantedSpellIds;
-    final cantrips = all
-        .where((s) => s.isCantrip && !grantedSpellIds.contains(s.id))
-        .toList();
-    final grantedCantrips = all.any(
-      (s) => s.isCantrip && grantedSpellIds.contains(s.id),
-    );
-    final leveled = all
-        .where(
-          (s) =>
-              !s.isCantrip &&
-              s.level <= _maxSlotLevel &&
-              !grantedSpellIds.contains(s.id),
-        )
-        .toList();
-    final grantedLeveledNames = [
-      for (final s in all)
-        if (!s.isCantrip && grantedSpellIds.contains(s.id)) s.name,
-    ];
-
+    final cantrips = _options.cantrips;
+    final grantedCantrips = _options.grantedCantrips.isNotEmpty;
+    final leveled = _options.spells;
+    final grantedLeveledNames = _options.grantedSpells;
     return Scaffold(
       appBar: AppBar(
         title: Text(

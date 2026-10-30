@@ -14,7 +14,7 @@ import {
 import { codexEntries, fold, type CodexDetail } from '../codex/entries';
 import { useLang, useTexts } from '../i18n/context';
 import type { Lang, Texts } from '../i18n/texts';
-import { characterHref, FLUTTER_HOME, navigate } from '../router';
+import { characterHref, navigate } from '../router';
 import type { SheetModel } from '../sheet/model';
 import { ABILITIES } from '../sheet/vocabulary';
 import type { SheetWriter } from '../sheet/writer';
@@ -23,16 +23,21 @@ import { cx } from '../ui/cx';
 import { Eyebrow } from '../ui/data';
 import { MarkdownText } from '../ui/MarkdownText';
 
-type StepId = 'resumen' | 'pg' | 'subclase' | 'mejora' | 'elecciones' | 'competencias' | 'revision';
+type StepId =
+  | 'resumen'
+  | 'pg'
+  | 'subclase'
+  | 'mejora'
+  | 'elecciones'
+  | 'competencias'
+  | 'conjurosRasgo'
+  | 'conjuros'
+  | 'revision';
 
 /** Lo que muestra el panel de la derecha: la explicación de lo último que se
  *  tocó (clase, subclase, dote o rasgo ganado). */
-type Focus = { kind: 'class' | 'subclass' | 'feat' | 'feature' | 'option'; id: string } | null;
+type Focus = { kind: 'class' | 'subclass' | 'feat' | 'feature' | 'option' | 'spell'; id: string } | null;
 
-type OpenKey = keyof LevelUpView['open'];
-/** Lo que todavía se elige en Flutter (5c3): los conjuros. Rasgos y
- *  competencias ya se eligen acá. */
-const OPEN_KEYS: OpenKey[] = ['spellChoices', 'classSpells'];
 
 /**
  * El asistente de subida de nivel de la ficha propia (`LevelUpScreen` de
@@ -66,7 +71,15 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
   // no, un cupo resuelto desaparecería (y su paso con él) a mitad de camino,
   // como pasaba en Flutter antes de `_shownSteps`.
   const base = useMemo(
-    () => levelUpView(raw, catalog, { ...fullDraft, featurePicks: {}, proficiencyPicks: {} }),
+    () =>
+      levelUpView(raw, catalog, {
+        ...fullDraft,
+        featurePicks: {},
+        proficiencyPicks: {},
+        spellPicks: {},
+        classCantripPicks: null,
+        classSpellPicks: null,
+      }),
     [raw, catalog, fullDraft],
   );
   const featureGroups = base.featureSlots
@@ -75,6 +88,8 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
   const proficiencyGroups = base.proficiencySlots.filter((s) => s.chosen.length < s.count).map((s) => s.groupId);
   const featureSlots = view.featureSlots.filter((s) => featureGroups.includes(s.groupId));
   const proficiencySlots = view.proficiencySlots.filter((s) => proficiencyGroups.includes(s.groupId));
+  const spellGroups = base.spellSlots.filter((s) => s.replaceable || s.chosen.length < s.count).map((s) => s.groupId);
+  const spellSlots = view.spellSlots.filter((s) => spellGroups.includes(s.groupId));
   const after = useMemo(() => computeSheet(view.character, catalog), [view, catalog]);
 
   const steps: StepId[] = [
@@ -86,16 +101,18 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
     // sumar cupos, y la Pericia mira competencias que esa dote puede dar.
     ...(featureSlots.length > 0 ? (['elecciones'] as const) : []),
     ...(proficiencySlots.length > 0 ? (['competencias'] as const) : []),
+    // Los conjuros al final, como en Flutter: el editor esconde lo que ya está
+    // siempre preparado, y lo elegido en un rasgo entra en esa lista.
+    ...(spellSlots.length > 0 ? (['conjurosRasgo'] as const) : []),
+    ...(view.classSpells ? (['conjuros'] as const) : []),
     'revision',
   ];
   const index = Math.max(0, steps.indexOf(stepId));
   const current = steps[index]!;
-  const openParts = OPEN_KEYS.filter((k) => view.open[k] > 0);
 
   const pendingOf = (s: StepId): string | null => {
     switch (s) {
       case 'resumen':
-        if (openParts.length > 0) return t.luOpenBlocked(openParts.map((k) => t.luOpenParts[k]).join(t.luAnd));
         return view.unmetMulticlass ? t.luRequires(view.unmetMulticlass) : null;
       case 'pg':
         return hpMode === 'roll' && rolled === null ? t.luPendingHp : null;
@@ -109,10 +126,12 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
         return view.open.features > 0 ? t.luPendingChoices(view.open.features) : null;
       case 'competencias':
         return view.open.proficiencies > 0 ? t.luPendingChoices(view.open.proficiencies) : null;
+      case 'conjurosRasgo':
+        return view.open.spellChoices > 0 ? t.luPendingChoices(view.open.spellChoices) : null;
+      case 'conjuros':
+        return view.open.classSpells > 0 ? t.luPendingChoices(view.open.classSpells) : null;
       case 'revision':
-        // Una subclase elegida acá puede traer su propia elección (la del
-        // Corazón Salvaje): la revisión no confirma y dice por qué.
-        return openParts.length > 0 ? t.luOpenBlocked(openParts.map((k) => t.luOpenParts[k]).join(t.luAnd)) : null;
+        return null;
     }
   };
   // Se llega a un paso si los de antes están completos, como en Flutter.
@@ -129,7 +148,7 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
     setRolled(null);
   };
 
-  const pick = (kind: 'featurePicks' | 'proficiencyPicks', groupId: string, ids: string[]) =>
+  const pick = (kind: 'featurePicks' | 'proficiencyPicks' | 'spellPicks', groupId: string, ids: string[]) =>
     setDraft((d) => ({ ...d, [kind]: { ...d[kind], [groupId]: ids } }));
 
   const confirm = () => {
@@ -144,7 +163,7 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
     case 'resumen':
       main = (
         <SummaryStep
-          {...{ t, view, sheet, draft, chooseClass, openParts }}
+          {...{ t, view, sheet, draft, chooseClass }}
           choices={[...featureSlots.map((s) => s.name), ...proficiencySlots.map((s) => s.name)]}
           setFocus={setFocus}
         />
@@ -277,6 +296,59 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
         </>
       );
       break;
+    case 'conjurosRasgo':
+      main = (
+        <>
+          {spellSlots.map((slot) => (
+            <SpellPickBlock
+              key={slot.groupId}
+              title={slot.name}
+              options={slot.options}
+              chosen={slot.chosen}
+              cap={slot.count}
+              ready={slot.chosen.length >= slot.count}
+              t={t}
+              onChange={(ids) => pick('spellPicks', slot.groupId, ids)}
+              onFocus={(id) => setFocus({ kind: 'spell', id })}
+            />
+          ))}
+        </>
+      );
+      break;
+    case 'conjuros': {
+      const cs = view.classSpells!;
+      main = (
+        <>
+          {cs.cantripsKnown > 0 && (
+            <SpellPickBlock
+              title={t.luCantripsTitle}
+              note={cs.grantedCantrips.length > 0 ? t.luGrantedNote(cs.grantedCantrips.join(', ')) : undefined}
+              options={cs.cantrips.map((c) => ({ ...c, level: 0 }))}
+              chosen={cs.chosenCantrips}
+              cap={cs.cantripsKnown}
+              ready={cs.chosenCantrips.length >= cs.cantripsKnown}
+              t={t}
+              onChange={(ids) => setDraft((d) => ({ ...d, classCantripPicks: ids }))}
+              onFocus={(id) => setFocus({ kind: 'spell', id })}
+            />
+          )}
+          <SpellPickBlock
+            title={cs.prepared ? t.luPreparedTitle : t.luKnownTitle}
+            note={cs.grantedSpells.length > 0 ? t.luGrantedNote(cs.grantedSpells.join(', ')) : undefined}
+            options={cs.spells}
+            chosen={cs.chosenSpells}
+            // Un lanzador que prepara tiene tope; el que conoce, no (como en
+            // Flutter): lo que falta lo cuenta el motor.
+            cap={cs.prepared ? cs.preparedCount : null}
+            ready={view.open.classSpells === 0}
+            t={t}
+            onChange={(ids) => setDraft((d) => ({ ...d, classSpellPicks: ids }))}
+            onFocus={(id) => setFocus({ kind: 'spell', id })}
+          />
+        </>
+      );
+      break;
+    }
     case 'revision':
       main = (
         <>
@@ -446,7 +518,6 @@ function SummaryStep({
   sheet,
   draft,
   chooseClass,
-  openParts,
   choices,
   setFocus,
 }: {
@@ -455,7 +526,6 @@ function SummaryStep({
   sheet: ComputedSheet;
   draft: LevelUpDraft;
   chooseClass: (id: string) => void;
-  openParts: OpenKey[];
   /** Los cupos de rasgo y de competencia que esta subida pone delante. */
   choices: string[];
   setFocus: (f: Focus) => void;
@@ -495,14 +565,6 @@ function SummaryStep({
         </div>
       </Block>
 
-      {openParts.length > 0 && (
-        <section className="card flex flex-col items-start gap-3 p-4" data-field="level-up-blocked">
-          <p className="text-[14px]">{t.luOpenBlocked(openParts.map((k) => t.luOpenParts[k]).join(t.luAnd))}</p>
-          <ButtonLink tone="soft" href={FLUTTER_HOME}>
-            {t.luOpenInFlutter}
-          </ButtonLink>
-        </section>
-      )}
 
       <Block title={t.luWhatComes(view.newLevel)}>
         <SummaryRow label={t.luRowHp} status={<Status ready={false} t={t} />} />
@@ -702,9 +764,11 @@ function DetailPanel({
     const c = view.classOptions.find((o) => o.id === focus.id);
     title = c?.name ?? null;
     meta = c ? (c.unmet !== null ? t.luRequires(c.unmet) : `d${c.hitDie}`) : null;
-  } else if (focus?.kind === 'subclass' || focus?.kind === 'feat') {
-    const entry = codexEntries(focus.kind === 'feat' ? 'feats' : 'subclasses', catalog, t, lang).find((e) => e.id === focus.id);
+  } else if (focus?.kind === 'subclass' || focus?.kind === 'feat' || focus?.kind === 'spell') {
+    const category = focus.kind === 'feat' ? 'feats' : focus.kind === 'spell' ? 'spells' : 'subclasses';
+    const entry = codexEntries(category, catalog, t, lang).find((e) => e.id === focus.id);
     title = entry?.name ?? null;
+    meta = focus.kind === 'spell' ? (entry?.subtitle ?? null) : null;
     detail = entry?.detail() ?? null;
     if (focus.kind === 'feat') {
       const f = view.featOptions.find((o) => o.id === focus.id);
@@ -862,6 +926,7 @@ function FeatureSlotBlock({
           return (
             <Option
               key={o.id}
+              id={o.id}
               multi={!single}
               selected={on}
               disabled={on ? !canDrop(o.id) : o.unmet !== null || (full && !(single && chosen.every(canDrop)))}
@@ -870,6 +935,74 @@ function FeatureSlotBlock({
               trailing={o.homebrew ? <Tag>{t.homebrewTag}</Tag> : undefined}
               onClick={() => {
                 toggle(o.id);
+                onFocus(o.id);
+              }}
+            />
+          );
+        })}
+      </div>
+    </Block>
+  );
+}
+
+/** Una lista de conjuros para elegir, con scroll propio y buscador: un mago
+ *  alto tiene decenas. [cap] null es sin tope (el que conoce conjuros). */
+function SpellPickBlock({
+  title,
+  note,
+  options,
+  chosen,
+  cap,
+  ready,
+  t,
+  onChange,
+  onFocus,
+}: {
+  title: string;
+  /** Si el bloque está completo: lo dice el motor, que también sabe cuántos
+   *  conjuros conoce quien no los prepara. */
+  ready: boolean;
+  note?: string;
+  options: { id: string; name: string; level: number }[];
+  chosen: string[];
+  cap: number | null;
+  t: Texts;
+  onChange: (ids: string[]) => void;
+  onFocus: (id: string) => void;
+}) {
+  const [query, setQuery] = useState('');
+  const words = fold(query).split(/\s+/).filter(Boolean);
+  const visible = options.filter((o) => words.every((w) => fold(o.name).includes(w)));
+  const full = cap !== null && chosen.length >= cap;
+  return (
+    <Block
+      title={title}
+      status={<Status ready={ready} count={cap === null || ready ? undefined : [chosen.length, cap]} t={t} />}
+    >
+      {note && <p className="text-[12.5px] text-on-surface-variant">{note}</p>}
+      <input
+        type="search"
+        autoComplete="off"
+        aria-label={t.luSpellSearch}
+        placeholder={t.luSpellSearch}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        className="h-9 rounded-[var(--radius-pill)] border border-hairline bg-plaque px-4 text-[13px] text-on-surface placeholder:text-text-muted"
+      />
+      <div className="grid max-h-[360px] gap-2 overflow-y-auto pr-1 sm:grid-cols-2" role="group" aria-label={title}>
+        {visible.map((o) => {
+          const on = chosen.includes(o.id);
+          return (
+            <Option
+              key={o.id}
+              id={o.id}
+              multi
+              selected={on}
+              disabled={!on && full}
+              title={o.name}
+              detail={o.level === 0 ? t.cantrip : t.spellLevelShort(o.level)}
+              onClick={() => {
+                onChange(on ? chosen.filter((x) => x !== o.id) : [...chosen, o.id]);
                 onFocus(o.id);
               }}
             />
@@ -915,6 +1048,7 @@ function Status({ ready = false, auto = false, count, t }: { ready?: boolean; au
 
 /** La única forma de elegir: círculo si es una, cuadrado si son varias. */
 function Option({
+  id,
   selected,
   multi = false,
   disabled = false,
@@ -923,6 +1057,8 @@ function Option({
   trailing,
   onClick,
 }: {
+  /** El id de lo que se elige, en `data-option` (lo leen las pruebas). */
+  id?: string;
   selected: boolean;
   multi?: boolean;
   disabled?: boolean;
@@ -936,6 +1072,7 @@ function Option({
       type="button"
       role={multi ? 'checkbox' : 'radio'}
       aria-checked={selected}
+      data-option={id}
       disabled={disabled}
       onClick={onClick}
       className={cx(
