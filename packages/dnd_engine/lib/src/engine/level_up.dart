@@ -41,6 +41,13 @@ class LevelUpDraft {
   final Map<String, List<String>>? spellChoices;
   final Map<String, Map<String, List<String>>>? classSpellChoices;
 
+  /// Lo elegido en esta subida para cada cupo de rasgo o de competencia, por
+  /// el `groupId` que da la ficha. Es lo que manda el cliente React: el motor
+  /// lo mezcla con lo que el personaje ya tenía ([LevelUp.build]), incluido
+  /// el ámbito por clase de una multiclase, que el cliente no conoce.
+  final Map<String, List<String>> featurePicks;
+  final Map<String, List<String>> proficiencyPicks;
+
   const LevelUpDraft({
     required this.classId,
     this.subclassId,
@@ -59,13 +66,19 @@ class LevelUpDraft {
     this.proficiencyChoices,
     this.spellChoices,
     this.classSpellChoices,
+    this.featurePicks = const {},
+    this.proficiencyPicks = const {},
   });
 
-  /// Lo que manda el cliente. Solo las decisiones de 5c1: las elecciones de
-  /// rasgos, competencias y conjuros siguen en Flutter (ver `LevelUp.open`).
+  /// Lo que manda el cliente. Las elecciones de conjuros todavía siguen en
+  /// Flutter (ver `LevelUp.open`).
   factory LevelUpDraft.fromJson(Map<String, dynamic> j) {
     Ability? ability(Object? name) =>
         name == null ? null : Ability.values.byName(name as String);
+    Map<String, List<String>> picks(Object? m) => {
+          for (final e in ((m as Map?) ?? const {}).entries)
+            e.key as String: [for (final id in e.value as List) id as String],
+        };
     return LevelUpDraft(
       classId: j['classId'] as String,
       subclassId: j['subclassId'] as String?,
@@ -75,6 +88,8 @@ class LevelUpDraft {
       abilityA: ability(j['abilityA']),
       abilityB: ability(j['abilityB']),
       featId: j['featId'] as String?,
+      featurePicks: picks(j['featurePicks']),
+      proficiencyPicks: picks(j['proficiencyPicks']),
     );
   }
 }
@@ -207,6 +222,20 @@ class LevelUp {
     if (draft.subclassId != null) {
       subclassIds[draft.classId] = draft.subclassId!;
     }
+    final (featureChoices, classFeatureChoices) = _withFeaturePicks(
+      draft.featureChoices ?? c.featureChoices,
+      draft.classFeatureChoices ?? c.classFeatureChoices,
+    );
+    final proficiencyChoices = {
+      ...(draft.proficiencyChoices ?? c.proficiencyChoices),
+    };
+    for (final e in draft.proficiencyPicks.entries) {
+      if (e.value.isEmpty) {
+        proficiencyChoices.remove(e.key);
+      } else {
+        proficiencyChoices[e.key] = e.value;
+      }
+    }
     return c.copyWith(
       level: newLevel,
       classHistory: [...c.classHistory, draft.classId],
@@ -221,12 +250,49 @@ class LevelUp {
       spellIds: draft.spellIds,
       classCantripIds: draft.classCantripIds,
       classSpellIds: draft.classSpellIds,
-      featureChoices: draft.featureChoices,
-      classFeatureChoices: draft.classFeatureChoices,
-      proficiencyChoices: draft.proficiencyChoices,
+      featureChoices: featureChoices,
+      classFeatureChoices: classFeatureChoices,
+      proficiencyChoices: proficiencyChoices,
       spellChoices: draft.spellChoices,
       classSpellChoices: draft.classSpellChoices,
     );
+  }
+
+  /// Mezcla [LevelUpDraft.featurePicks] en las elecciones del personaje. Los
+  /// grupos legacy de una ficha monoclase también llevan `:` (por ejemplo
+  /// `class:wizard:signature-spells`) y no son mapas anidados: solo el
+  /// prefijo de la clase que sube es un ámbito persistido (`wizard:class:…`).
+  (Map<String, List<String>>, Map<String, Map<String, List<String>>>)
+      _withFeaturePicks(Map<String, List<String>> flat,
+          Map<String, Map<String, List<String>>> byClass) {
+    if (draft.featurePicks.isEmpty) return (flat, byClass);
+    final nextFlat = {
+      for (final e in flat.entries) e.key: [...e.value]
+    };
+    final nextByClass = {
+      for (final c in byClass.entries)
+        c.key: {
+          for (final e in c.value.entries) e.key: [...e.value]
+        },
+    };
+    for (final pick in draft.featurePicks.entries) {
+      final groupId = pick.key;
+      if (groupId.startsWith('${draft.classId}:')) {
+        final i = groupId.indexOf(':');
+        final scoped = nextByClass[groupId.substring(0, i)] ??= {};
+        final raw = groupId.substring(i + 1);
+        if (pick.value.isEmpty) {
+          scoped.remove(raw);
+        } else {
+          scoped[raw] = pick.value;
+        }
+      } else if (pick.value.isEmpty) {
+        nextFlat.remove(groupId);
+      } else {
+        nextFlat[groupId] = pick.value;
+      }
+    }
+    return (nextFlat, nextByClass);
   }
 
   late final ComputedSheet before = CharacterCompiler(repo).compile(character);
@@ -271,13 +337,92 @@ class LevelUp {
     ];
   }
 
+  /// Lo elegido para [groupId] en [c], con el ámbito por clase.
+  static List<String> chosenFeatures(Character c, String groupId) {
+    final i = groupId.indexOf(':');
+    if (i > 0) {
+      return c.classFeatureChoices[groupId.substring(0, i)]
+              ?[groupId.substring(i + 1)] ??
+          c.featureChoices[groupId] ??
+          const [];
+    }
+    return c.featureChoices[groupId] ?? const [];
+  }
+
+  /// Cada cupo de elección de rasgo al nivel nuevo (estilo de combate,
+  /// invocaciones…) con lo elegido ahora y antes, y sus opciones con el
+  /// prerrequisito que falta (null si se puede). Lo ya elegido nunca se marca
+  /// como inelegible: si no, no se podría soltar.
+  List<
+      ({
+        FeatureChoiceSlot slot,
+        List<String> chosen,
+        List<String> original,
+        List<({Feat feat, String? unmet})> options,
+      })> get featureSlots {
+    final validator = CharacterValidator(repo);
+    return [
+      for (final slot in after.featureChoiceSlots)
+        if (chosenFeatures(built, slot.groupId) case final chosen)
+          (
+            slot: slot,
+            chosen: chosen,
+            original: chosenFeatures(character, slot.groupId),
+            options: [
+              for (final f in repo.featureChoiceOptions(slot))
+                (
+                  feat: f,
+                  unmet: chosen.contains(f.id)
+                      ? null
+                      : validator.unmetFeatPrerequisite(f, built, after),
+                ),
+            ],
+          ),
+    ];
+  }
+
+  /// Los cupos de competencia y de Pericia que esta subida pone delante: los
+  /// nuevos (un cupo viejo sin resolver lo reclama el aviso de la ficha, que
+  /// no traba) y todos los de Pericia. [locked] es lo que no se puede elegir
+  /// en ese cupo: lo que ya se tiene por otra vía y lo elegido en otro cupo.
+  /// En un cupo de Pericia no se bloquea nada: ser competente es justamente
+  /// el requisito, y sus opciones ya vienen filtradas.
+  List<({ProficiencyChoiceSlot slot, List<String> chosen, Set<String> locked})>
+      get proficiencySlots {
+    final old = before.proficiencyChoiceSlots.map((s) => s.groupId).toSet();
+    final choices = built.proficiencyChoices;
+    final fixed = {...after.skillProficiencies, ...after.toolProficiencies};
+    for (final ids in choices.values) {
+      fixed.removeAll(ids);
+    }
+    return [
+      for (final slot in [
+        for (final s in after.proficiencyChoiceSlots)
+          if (!old.contains(s.groupId)) s,
+        ...after.expertiseChoiceSlots,
+      ])
+        (
+          slot: slot,
+          chosen: choices[slot.groupId] ?? const [],
+          locked: slot.expertise
+              ? const {}
+              : {
+                  ...fixed,
+                  for (final e in choices.entries)
+                    if (e.key != slot.groupId) ...e.value,
+                },
+        ),
+    ];
+  }
+
   /// Lo que esta subida **obliga** a elegir y que [LevelUpDraft.fromJson]
   /// todavía no sabe llevar (rasgos, competencias y conjuros), contado como en
   /// Flutter. Revisar una elección ya hecha es opcional y no cuenta.
   ///
-  /// ponytail: Flutter cuenta esto en su widget con lo que ya se eligió en el
-  /// asistente; acá se cuenta sobre el borrador. Al portar esas elecciones a
-  /// React (5c2 y 5c3) Flutter pasa a usar esto y su copia se va.
+  /// ponytail: Flutter todavía cuenta lo pendiente con sus contadores del
+  /// widget, memoizados por firma, porque `LevelUp` recompila dos fichas en
+  /// cada acceso y el asistente de Flutter lo pediría en cada build. Si se
+  /// memoiza `LevelUp` en la pantalla, Flutter pasa a usar esto.
   ({int features, int proficiencies, int spellChoices, int classSpells})
       get open {
     final c = built;

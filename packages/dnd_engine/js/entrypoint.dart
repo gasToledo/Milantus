@@ -334,6 +334,60 @@ String levelUp(String characterJson, String catalogJson, String draftJson) {
       for (final f in up.gainedFeatures)
         {'name': f.name, 'description': f.description},
     ],
+    // Los cupos de elección de rasgo, con sus opciones (lo elegido nunca va
+    // como inelegible) y lo que ya traía el personaje: el cliente muestra los
+    // que tienen algo sin elegir o se pueden revisar.
+    'featureSlots': [
+      for (final f in up.featureSlots)
+        {
+          'groupId': f.slot.groupId,
+          'name': f.slot.name,
+          'count': f.slot.count,
+          'replaceable': f.slot.replaceable,
+          'chosen': f.chosen,
+          'original': f.original,
+          'options': [
+            for (final o in f.options)
+              {
+                'id': o.feat.id,
+                'name': o.feat.name,
+                'repeatable': o.feat.repeatable,
+                // Para el panel de detalle: las opciones de un rasgo (una
+                // invocación) no son dotes del catálogo y el Códice no las
+                // conoce. Su texto, como en `featSummary`: la descripción si
+                // la hay, si no la de sus rasgos.
+                'description': o.feat.description.isNotEmpty
+                    ? o.feat.description
+                    : [
+                        for (final e in o.feat.effects)
+                          if (e is PassiveTraitEffect) e.description,
+                      ].join(' '),
+                'homebrew': o.feat.source == ContentSource.homebrew,
+                'unmet': o.unmet,
+              },
+          ],
+        },
+    ],
+    'proficiencySlots': [
+      for (final p in up.proficiencySlots)
+        {
+          'groupId': p.slot.groupId,
+          'name': p.slot.name,
+          'count': p.slot.count,
+          'expertise': p.slot.expertise,
+          'chosen': p.chosen,
+          'options': [
+            for (final id in p.slot.options)
+              {
+                'id': id,
+                'label': p.slot.skills.contains(id)
+                    ? Skill.labelFor(id)
+                    : toolProficiencyLabel(id),
+                'locked': p.locked.contains(id),
+              },
+          ],
+        },
+    ],
     'open': {
       'features': open.features,
       'proficiencies': open.proficiencies,

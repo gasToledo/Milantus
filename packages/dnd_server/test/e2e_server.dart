@@ -305,6 +305,29 @@ Future<void> main() async {
       combat: CombatState(currentHp: 20),
     ),
   );
+  // Un guerrero 1 sin estilo de combate: su subida a 2 pide elegirlo, y es
+  // la prueba de las elecciones de rasgo en `/v2` (5c2).
+  await characters.create(
+    writerUserId,
+    Character(
+      id: 'garra-de-humo',
+      name: 'Garra de Humo',
+      raceId: 'human',
+      classId: 'fighter',
+      backgroundId: 'soldier',
+      level: 1,
+      assignedScores: const {
+        Ability.strength: 15,
+        Ability.dexterity: 13,
+        Ability.constitution: 14,
+        Ability.intelligence: 8,
+        Ability.wisdom: 12,
+        Ability.charisma: 10,
+      },
+      hpPerLevel: const [10],
+      combat: CombatState(currentHp: 10),
+    ),
+  );
   final settings = InMemorySettingsRepository();
   await settings.save(smokeUserId, {
     'sortMode': 'level',

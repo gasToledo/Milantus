@@ -438,7 +438,7 @@ class _LevelUpScreenState extends State<LevelUpScreen> {
   ComputedSheet? _sheetBeforeCache;
   int? _sheetBeforeRevision;
 
-  ({List<ProficiencyChoiceSlot> slots, Set<String> fixed})? _proficiencyCache;
+  ({List<ProficiencyChoiceSlot> slots})? _proficiencyCache;
   String? _proficiencySig;
 
   /// Cupos de competencia y de Pericia al nivel nuevo, más las competencias que
@@ -454,8 +454,7 @@ class _LevelUpScreenState extends State<LevelUpScreen> {
   /// de Batalla y las Herramientas del Oficio de las cinco subclases del
   /// Artífice, todos a nivel 3. Antes ninguno se preguntaba acá y el jugador
   /// tenía que ir a buscarlos al aviso de la ficha.
-  ({List<ProficiencyChoiceSlot> slots, Set<String> fixed})
-  get _proficiencyData {
+  ({List<ProficiencyChoiceSlot> slots}) get _proficiencyData {
     final sig = [
       _newLevel,
       _levelUpClassId,
@@ -471,20 +470,13 @@ class _LevelUpScreenState extends State<LevelUpScreen> {
     ].join('|');
     if (sig != _proficiencySig) {
       final sheet = CharacterCompiler(widget.repo).compile(_buildUpdated());
-      // Lo que ya se tiene bloquea un cupo normal. Se descuenta lo elegido en
-      // estos mismos cupos: si no, la opción recién marcada se bloquearía sola
-      // y no se podría desmarcar.
-      final fixed = {...sheet.skillProficiencies, ...sheet.toolProficiencies};
-      for (final ids in _effectiveProficiencyChoices.values) {
-        fixed.removeAll(ids);
-      }
+      // Lo bloqueado de cada cupo lo da el motor (`LevelUp.proficiencySlots`).
       _proficiencyCache = (
         slots: [
           for (final s in sheet.proficiencyChoiceSlots)
             if (!_oldProficiencyGroups.contains(s.groupId)) s,
           ...sheet.expertiseChoiceSlots,
         ],
-        fixed: fixed,
       );
       _proficiencySig = sig;
     }

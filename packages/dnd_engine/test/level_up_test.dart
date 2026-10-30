@@ -106,6 +106,40 @@ void main() {
         elegir(Ability.charisma).built.featIds, contains(conAumento.feat.id));
   });
 
+  test('las elecciones de rasgo y de Pericia se resuelven con el borrador', () {
+    // Un guerrero 1 sin estilo de combate y una barda que gana Pericia.
+    final guerrero = pj('fighter', 1);
+    final sinElegir =
+        LevelUp(guerrero, repo, const LevelUpDraft(classId: 'fighter'));
+    final cupo = sinElegir.featureSlots
+        .firstWhere((s) => s.chosen.length < s.slot.count);
+    final opcion = cupo.options.firstWhere((o) => o.unmet == null).feat.id;
+    final elegido = LevelUp(
+      guerrero,
+      repo,
+      LevelUpDraft(classId: 'fighter', featurePicks: {
+        cupo.slot.groupId: [opcion],
+      }),
+    );
+    expect(LevelUp.chosenFeatures(elegido.built, cupo.slot.groupId), [opcion]);
+    expect(elegido.open.features, sinElegir.open.features - 1);
+
+    final barda = pj('bard', 1);
+    final pericia = LevelUp(barda, repo, const LevelUpDraft(classId: 'bard'))
+        .proficiencySlots
+        .firstWhere((s) => s.slot.expertise);
+    expect(pericia.locked, isEmpty);
+    final dos = pericia.slot.options.take(pericia.slot.count).toList();
+    final resuelta = LevelUp(
+      barda,
+      repo,
+      LevelUpDraft(
+          classId: 'bard', proficiencyPicks: {pericia.slot.groupId: dos}),
+    );
+    expect(resuelta.built.proficiencyChoices[pericia.slot.groupId], dos);
+    expect(resuelta.open.proficiencies, 0);
+  });
+
   test('lo que la subida obliga a elegir aparece en open', () {
     final barbaro = LevelUp(
         pj('barbarian', 4), repo, const LevelUpDraft(classId: 'barbarian'));

@@ -461,9 +461,15 @@ extension _LevelUpSections on _LevelUpScreenState {
   /// selector de dotes. Un grupo lleno y revisable deja cambiar la elección,
   /// que es lo que pide la regla de las invocaciones.
   Widget _buildFeatureChoicesSection() {
-    final target = _buildUpdated();
-    final sheet = _updatedSheet;
-    final validator = CharacterValidator(widget.repo);
+    // Qué opciones se ofrecen (prerrequisitos al nivel nuevo, sin esconder lo
+    // ya elegido) lo dice el motor, el mismo que usa el cliente React.
+    final options = {
+      for (final s in _levelUp.featureSlots)
+        s.slot.groupId: [
+          for (final o in s.options)
+            if (o.unmet == null) o.feat,
+        ],
+    };
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -478,14 +484,7 @@ extension _LevelUpSections on _LevelUpScreenState {
             chosen: _choicesFor(slot.groupId),
             original: _originalChoicesFor(slot.groupId),
             repo: widget.repo,
-            options: widget.repo
-                .featureChoiceOptions(slot)
-                .where(
-                  (f) =>
-                      _choicesFor(slot.groupId).contains(f.id) ||
-                      validator.unmetFeatPrerequisite(f, target, sheet) == null,
-                )
-                .toList(),
+            options: options[slot.groupId] ?? const [],
             onChanged: (ids) => _setChoices(slot.groupId, ids),
           ),
           const SizedBox(height: 22),
@@ -496,6 +495,11 @@ extension _LevelUpSections on _LevelUpScreenState {
 
   Widget _buildProficiencySection() {
     final data = _proficiencyData;
+    // Lo bloqueado de cada cupo (lo que ya se tiene y lo elegido en otro) es
+    // del motor, como en el cliente React.
+    final locked = {
+      for (final s in _levelUp.proficiencySlots) s.slot.groupId: s.locked,
+    };
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -510,11 +514,7 @@ extension _LevelUpSections on _LevelUpScreenState {
             chosen: _proficiencyFor(slot.groupId),
             // Lo elegido en otro cupo también bloquea: dos cupos abiertos a la
             // vez no pueden repartirse la misma competencia.
-            locked: {
-              ...data.fixed,
-              for (final e in _effectiveProficiencyChoices.entries)
-                if (e.key != slot.groupId) ...e.value,
-            },
+            locked: locked[slot.groupId] ?? const {},
             onChanged: (ids) => _setProficiency(slot.groupId, ids),
           ),
           const SizedBox(height: 22),

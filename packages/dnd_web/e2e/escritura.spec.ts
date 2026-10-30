@@ -323,6 +323,30 @@ test('la subida de nivel pasa por PG, subclase y mejora, guarda lo del motor y s
   expect(deshecho).toEqual(migrateCharacter(antes));
 });
 
+test('la subida elige el estilo de combate pendiente y guarda lo del motor', async ({ page, request }) => {
+  const GARRA = 'garra-de-humo';
+  const antes = await ilse(request, GARRA);
+  const cupo = levelUpView(antes, catalogo(), { classId: 'fighter' }).featureSlots[0]!;
+  const estilo = cupo.options.find((o) => o.unmet === null)!;
+  const esperado = segunMotor(antes, {
+    type: 'levelUp',
+    draft: { classId: 'fighter', featurePicks: { [cupo.groupId]: [estilo.id] } },
+  });
+  await page.goto(`/v2/personajes/${GARRA}/subir-nivel`);
+
+  await page.getByRole('button', { name: 'Empezar' }).click();
+  await page.getByRole('button', { name: 'Continuar' }).click();
+  await expect(page.getByRole('button', { name: 'Continuar' })).toBeDisabled();
+  const literal = estilo.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  await page.getByRole('radio', { name: new RegExp(`^${literal}`) }).click();
+  // El panel derecho explica la opción elegida.
+  await expect(page.locator('[data-field="level-up-detail"]')).toContainText(estilo.name);
+  await page.getByRole('button', { name: 'Continuar' }).click();
+  expect(
+    await proximoGuardado(page, () => page.getByRole('button', { name: 'Subir a nivel 2' }).click(), GARRA),
+  ).toEqual(esperado);
+});
+
 test('si la subida pide elegir conjuros, el asistente manda a la app principal sin escribir', async ({ page }) => {
   const escrituras = vigilarEscrituras(page);
   await page.goto(`/v2/personajes/${ILSE}/subir-nivel`);

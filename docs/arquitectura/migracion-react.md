@@ -448,10 +448,19 @@ repiten acá.
   `LevelUpDraft`, `level_up.dart`): cómo queda el personaje, qué pasos hacen
   falta, si la mejora está completa, las dotes que se ofrecen con el
   prerrequisito que falta, los rasgos ganados y los PG actuales al confirmar.
-  Flutter (`LevelUpScreen`) la usa de ahí. **Corte de 5c1:** si la subida
-  obliga a elegir rasgos, competencias o Pericia, o conjuros (`LevelUp.open`:
-  casi todo lanzador), el resumen lo dice y manda a la app principal; el motor
-  rechaza confirmar una subida a medias. Las piezas del circuito (`Option`,
+  Flutter (`LevelUpScreen`) la usa de ahí. Desde 5c2, los pasos
+  **Elecciones** (estilo de combate, invocaciones y demás cupos de rasgo, con
+  la explicación de cada opción a la derecha) y **Competencias** (competencias
+  nuevas y Pericia) aparecen si la subida los pide, después de la mejora. Lo
+  elegido viaja en el borrador por `groupId` (`featurePicks`,
+  `proficiencyPicks`) y el motor lo mezcla con lo que el personaje ya tenía,
+  con el ámbito por clase de una multiclase; las opciones de cada cupo, su
+  prerrequisito, lo bloqueado y lo que el personaje ya traía fijo
+  (`LevelUp.featureSlots`, `proficiencySlots`) también son del motor, y
+  Flutter los usa. Un cupo que no se revisa traba lo que ya traía, no lo
+  elegido en esta subida. **Corte que queda:** si la subida obliga a elegir
+  conjuros (`LevelUp.open`: casi todo lanzador), el resumen lo dice y manda a
+  la app principal; el motor rechaza confirmar una subida a medias. Las piezas del circuito (`Option`,
   `Block`, `Status`) viven en el asistente; si el creador (5d) las reusa,
   pasan a `src/ui/`.
   - **Toda escritura la hace el motor.** `actOn` (`act` de `js/entrypoint.dart`,
@@ -508,7 +517,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    editar la mochila desde la fila y las monedas *(existe)*; 5b2, catálogo,
    comprar y vender *(existe)*; 5c1, subida de nivel sin elecciones de rasgos,
    competencias ni conjuros *(existe)*; 5c2, esas elecciones de rasgos y
-   competencias; 5c3, los conjuros; 5d, creador.
+   competencias *(existe)*; 5c3, los conjuros; 5d, creador.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
    combate, vínculos y códigos de campaña. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de
@@ -605,8 +614,9 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    se edite desde la fila (equipar, cantidad, nota, monedas) y que quitar se
    deshaga, que comprar del catálogo y vender guarden lo del motor y vender
    se deshaga, que una bárbara sembrada suba a 4 por PG, subclase y mejora
-   guardando lo del motor y se deshaga, y que la clériga, cuya subida pide
-   conjuros, quede frenada sin escribir, y
+   guardando lo del motor y se deshaga, que un guerrero elija en la subida el
+   estilo de combate pendiente y guarde lo del motor, y que la clériga, cuya
+   subida pide conjuros, quede frenada sin escribir, y
    que la ficha de otra cuenta (la de un miembro, para el DM) no
    tenga un solo control (`e2e/escritura.spec.ts`, con una cuenta propia para
    no cambiar lo que leen las demás); y que una cuenta sin `webV2` vea
@@ -681,8 +691,7 @@ Para que nadie lo dé por hecho:
   personajes, condiciones, compañeros (y con ellos lanzar gastando espacio o
   uso gratis), cambiar el truco innato y Forma Salvaje; en el inventario,
   los planos del Artífice y los objetivos de arma de un rasgo (Pacto del
-  Filo); en la subida de nivel, elegir rasgos, competencias o Pericia (5c2) y
-  conjuros (5c3), y
+  Filo); en la subida de nivel, elegir conjuros (5c3), y
   escribir en `/api/settings` (por eso el tema elegido en el navegador gana
   sobre el de la cuenta).
 - Control de versión en el servidor para las escrituras (rechazar una copia

@@ -188,6 +188,9 @@ export interface LevelUpDraft {
   abilityA?: AbilityId | null;
   abilityB?: AbilityId | null;
   featId?: string | null;
+  /** Lo elegido en esta subida para cada cupo, por su `groupId`. */
+  featurePicks?: Record<string, string[]>;
+  proficiencyPicks?: Record<string, string[]>;
 }
 
 export interface AbilityChoice {
@@ -225,6 +228,30 @@ export interface LevelUpView {
   }[];
   featAbilityChoice: AbilityChoice | null;
   gainedFeatures: { name: string; description: string }[];
+  featureSlots: {
+    groupId: string;
+    name: string;
+    count: number;
+    replaceable: boolean;
+    chosen: string[];
+    original: string[];
+    options: {
+      id: string;
+      name: string;
+      repeatable: boolean;
+      description: string;
+      homebrew: boolean;
+      unmet: string | null;
+    }[];
+  }[];
+  proficiencySlots: {
+    groupId: string;
+    name: string;
+    count: number;
+    expertise: boolean;
+    chosen: string[];
+    options: { id: string; label: string; locked: boolean }[];
+  }[];
   /** Lo que la subida obliga a elegir y todavía se elige en Flutter. */
   open: { features: number; proficiencies: number; spellChoices: number; classSpells: number };
   /** El personaje como quedaría, para comparar las dos fichas. */

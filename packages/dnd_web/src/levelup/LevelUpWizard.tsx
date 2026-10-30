@@ -23,14 +23,16 @@ import { cx } from '../ui/cx';
 import { Eyebrow } from '../ui/data';
 import { MarkdownText } from '../ui/MarkdownText';
 
-type StepId = 'resumen' | 'pg' | 'subclase' | 'mejora' | 'revision';
+type StepId = 'resumen' | 'pg' | 'subclase' | 'mejora' | 'elecciones' | 'competencias' | 'revision';
 
 /** Lo que muestra el panel de la derecha: la explicación de lo último que se
  *  tocó (clase, subclase, dote o rasgo ganado). */
-type Focus = { kind: 'class' | 'subclass' | 'feat' | 'feature'; id: string } | null;
+type Focus = { kind: 'class' | 'subclass' | 'feat' | 'feature' | 'option'; id: string } | null;
 
 type OpenKey = keyof LevelUpView['open'];
-const OPEN_KEYS: OpenKey[] = ['features', 'proficiencies', 'spellChoices', 'classSpells'];
+/** Lo que todavía se elige en Flutter (5c3): los conjuros. Rasgos y
+ *  competencias ya se eligen acá. */
+const OPEN_KEYS: OpenKey[] = ['spellChoices', 'classSpells'];
 
 /**
  * El asistente de subida de nivel de la ficha propia (`LevelUpScreen` de
@@ -39,9 +41,8 @@ const OPEN_KEYS: OpenKey[] = ['features', 'proficiencies', 'spellChoices', 'clas
  *
  * Toda regla es del motor (`levelUpView`, sobre `LevelUp`): acá solo se juntan
  * las decisiones en un borrador. Confirmar es la acción `levelUp`, que el
- * motor rechaza si la subida está incompleta. Las elecciones de rasgos,
- * competencias y conjuros todavía se hacen en Flutter: si esta subida las
- * pide, el resumen lo dice y manda allá.
+ * motor rechaza si la subida está incompleta. Los conjuros todavía se eligen
+ * en Flutter: si esta subida los pide, el resumen lo dice y manda allá.
  */
 export function LevelUpWizard({ model, write }: { model: SheetModel; write: SheetWriter }) {
   const t = useTexts();
@@ -61,6 +62,19 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
     [draft, hpMode, rolled],
   );
   const view = useMemo(() => levelUpView(raw, catalog, fullDraft), [raw, catalog, fullDraft]);
+  // Qué cupos pone delante esta subida se decide sin lo elegido en ella: si
+  // no, un cupo resuelto desaparecería (y su paso con él) a mitad de camino,
+  // como pasaba en Flutter antes de `_shownSteps`.
+  const base = useMemo(
+    () => levelUpView(raw, catalog, { ...fullDraft, featurePicks: {}, proficiencyPicks: {} }),
+    [raw, catalog, fullDraft],
+  );
+  const featureGroups = base.featureSlots
+    .filter((s) => s.replaceable || s.chosen.length < s.count)
+    .map((s) => s.groupId);
+  const proficiencyGroups = base.proficiencySlots.filter((s) => s.chosen.length < s.count).map((s) => s.groupId);
+  const featureSlots = view.featureSlots.filter((s) => featureGroups.includes(s.groupId));
+  const proficiencySlots = view.proficiencySlots.filter((s) => proficiencyGroups.includes(s.groupId));
   const after = useMemo(() => computeSheet(view.character, catalog), [view, catalog]);
 
   const steps: StepId[] = [
@@ -68,6 +82,10 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
     'pg',
     ...(view.needsSubclass ? (['subclase'] as const) : []),
     ...(view.isAsi ? (['mejora'] as const) : []),
+    // Después de la mejora, como en Flutter: una dote recién elegida puede
+    // sumar cupos, y la Pericia mira competencias que esa dote puede dar.
+    ...(featureSlots.length > 0 ? (['elecciones'] as const) : []),
+    ...(proficiencySlots.length > 0 ? (['competencias'] as const) : []),
     'revision',
   ];
   const index = Math.max(0, steps.indexOf(stepId));
@@ -87,6 +105,10 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
         if (view.asiComplete) return null;
         if (!draft.asiFeat) return t.luPendingImprove;
         return draft.featId ? t.luPendingFeatAbility : t.luPendingFeat;
+      case 'elecciones':
+        return view.open.features > 0 ? t.luPendingChoices(view.open.features) : null;
+      case 'competencias':
+        return view.open.proficiencies > 0 ? t.luPendingChoices(view.open.proficiencies) : null;
       case 'revision':
         // Una subclase elegida acá puede traer su propia elección (la del
         // Corazón Salvaje): la revisión no confirma y dice por qué.
@@ -107,6 +129,9 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
     setRolled(null);
   };
 
+  const pick = (kind: 'featurePicks' | 'proficiencyPicks', groupId: string, ids: string[]) =>
+    setDraft((d) => ({ ...d, [kind]: { ...d[kind], [groupId]: ids } }));
+
   const confirm = () => {
     const r = write.act({ type: 'levelUp', draft: fullDraft });
     if (!r) return;
@@ -117,7 +142,13 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
   let main: ReactNode;
   switch (current) {
     case 'resumen':
-      main = <SummaryStep {...{ t, view, sheet, draft, chooseClass, openParts }} setFocus={setFocus} />;
+      main = (
+        <SummaryStep
+          {...{ t, view, sheet, draft, chooseClass, openParts }}
+          choices={[...featureSlots.map((s) => s.name), ...proficiencySlots.map((s) => s.name)]}
+          setFocus={setFocus}
+        />
+      );
       break;
     case 'pg':
       main = (
@@ -191,6 +222,61 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
     case 'mejora':
       main = <AsiStep {...{ t, view, draft, setDraft, sheet, after, featQuery, setFeatQuery, setFocus }} />;
       break;
+    case 'elecciones':
+      main = (
+        <>
+          {featureSlots.map((slot) => (
+            <FeatureSlotBlock
+              key={slot.groupId}
+              slot={slot}
+              t={t}
+              onChange={(ids) => pick('featurePicks', slot.groupId, ids)}
+              onFocus={(id) => setFocus({ kind: 'option', id })}
+            />
+          ))}
+        </>
+      );
+      break;
+    case 'competencias':
+      main = (
+        <>
+          {proficiencySlots.map((slot) => {
+            const single = slot.count === 1;
+            return (
+              <Block
+                key={slot.groupId}
+                title={slot.name}
+                status={<Status ready={slot.chosen.length >= slot.count} count={[slot.chosen.length, slot.count]} t={t} />}
+              >
+                <div className="grid gap-2 sm:grid-cols-3" role={single ? 'radiogroup' : 'group'} aria-label={slot.name}>
+                  {slot.options.map((o) => {
+                    const on = slot.chosen.includes(o.id);
+                    const full = slot.chosen.length >= slot.count;
+                    return (
+                      <Option
+                        key={o.id}
+                        multi={!single}
+                        selected={on}
+                        disabled={!on && (o.locked || (full && !single))}
+                        title={o.label}
+                        detail={!on && o.locked ? t.luAlreadyHave : undefined}
+                        onClick={() =>
+                          pick(
+                            'proficiencyPicks',
+                            slot.groupId,
+                            on ? slot.chosen.filter((x) => x !== o.id) : single ? [o.id] : [...slot.chosen, o.id],
+                          )
+                        }
+                      />
+                    );
+                  })}
+                </div>
+              </Block>
+            );
+          })}
+        </>
+      );
+      break;
     case 'revision':
       main = (
         <>
@@ -228,6 +314,24 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
                 t={t}
               />
             )}
+            {featureSlots.map((slot) => (
+              <ReviewRow
+                key={slot.groupId}
+                label={slot.name}
+                value={slot.chosen.map((id) => slot.options.find((o) => o.id === id)?.name ?? id).join(' · ')}
+                onChange={() => setStepId('elecciones')}
+                t={t}
+              />
+            ))}
+            {proficiencySlots.map((slot) => (
+              <ReviewRow
+                key={slot.groupId}
+                label={slot.name}
+                value={slot.chosen.map((id) => slot.options.find((o) => o.id === id)?.label ?? id).join(' · ')}
+                onChange={() => setStepId('competencias')}
+                t={t}
+              />
+            ))}
           </Block>
           {view.gainedFeatures.length > 0 && (
             <Block title={t.luReviewAuto}>
@@ -343,6 +447,7 @@ function SummaryStep({
   draft,
   chooseClass,
   openParts,
+  choices,
   setFocus,
 }: {
   t: Texts;
@@ -351,6 +456,8 @@ function SummaryStep({
   draft: LevelUpDraft;
   chooseClass: (id: string) => void;
   openParts: OpenKey[];
+  /** Los cupos de rasgo y de competencia que esta subida pone delante. */
+  choices: string[];
   setFocus: (f: Focus) => void;
 }) {
   // La actual primero, después las que se pueden tomar y al final las que no.
@@ -401,6 +508,9 @@ function SummaryStep({
         <SummaryRow label={t.luRowHp} status={<Status ready={false} t={t} />} />
         {view.needsSubclass && <SummaryRow label={t.luRowSubclass} status={<Status ready={false} t={t} />} />}
         {view.isAsi && <SummaryRow label={t.luRowAsi} status={<Status ready={false} t={t} />} />}
+        {choices.map((name) => (
+          <SummaryRow key={name} label={name} status={<Status ready={false} t={t} />} />
+        ))}
         {view.gainedFeatures.map((f) => (
           <SummaryRow
             key={f.name}
@@ -603,6 +713,12 @@ function DetailPanel({
     } else {
       homebrew = !!view.subclassOptions.find((o) => o.id === focus.id)?.homebrew;
     }
+  } else if (focus?.kind === 'option') {
+    const o = view.featureSlots.flatMap((s) => s.options).find((x) => x.id === focus.id);
+    title = o?.name ?? null;
+    meta = o?.unmet ? t.luRequires(o.unmet) : null;
+    body = o?.description || null;
+    homebrew = !!o?.homebrew;
   } else if (focus?.kind === 'feature') {
     const f = view.gainedFeatures.find((o) => o.name === focus.id);
     title = f?.name ?? null;
@@ -703,6 +819,64 @@ function AfterPanel({ before, after, t }: { before: ComputedSheet; after: Comput
         ))}
       </dl>
     </section>
+  );
+}
+
+/** Un cupo de elección de rasgo (`_FeatureChoiceGroup` de Flutter). Lo que
+ *  el personaje ya traía en un cupo que no se revisa queda fijo: lo elegido
+ *  en esta subida, no. Con un solo lugar, tocar otra opción la cambia. */
+function FeatureSlotBlock({
+  slot,
+  t,
+  onChange,
+  onFocus,
+}: {
+  slot: LevelUpView['featureSlots'][number];
+  t: Texts;
+  onChange: (ids: string[]) => void;
+  onFocus: (id: string) => void;
+}) {
+  const { chosen, original, count } = slot;
+  const full = chosen.length >= count;
+  const copies = (ids: string[], id: string) => ids.filter((x) => x === id).length;
+  const canDrop = (id: string) => slot.replaceable || !full || copies(chosen, id) > copies(original, id);
+  const single = count === 1;
+  const toggle = (id: string) => {
+    if (chosen.includes(id)) {
+      if (canDrop(id)) onChange(chosen.filter((x) => x !== id));
+    } else if (!full) {
+      onChange([...chosen, id]);
+    } else if (single && chosen.every(canDrop)) {
+      onChange([id]);
+    }
+  };
+  return (
+    <Block title={slot.name} status={<Status ready={full} count={[chosen.length, count]} t={t} />}>
+      <div
+        className="flex max-h-[420px] flex-col gap-2 overflow-y-auto pr-1"
+        role={single ? 'radiogroup' : 'group'}
+        aria-label={slot.name}
+      >
+        {slot.options.map((o) => {
+          const on = chosen.includes(o.id);
+          return (
+            <Option
+              key={o.id}
+              multi={!single}
+              selected={on}
+              disabled={on ? !canDrop(o.id) : o.unmet !== null || (full && !(single && chosen.every(canDrop)))}
+              title={o.name}
+              detail={!on && o.unmet !== null ? t.luRequires(o.unmet) : undefined}
+              trailing={o.homebrew ? <Tag>{t.homebrewTag}</Tag> : undefined}
+              onClick={() => {
+                toggle(o.id);
+                onFocus(o.id);
+              }}
+            />
+          );
+        })}
+      </div>
+    </Block>
   );
 }
 
