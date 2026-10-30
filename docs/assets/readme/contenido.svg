@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="390" viewBox="0 0 720 390" role="img" aria-labelledby="title description">
+  <title id="title">Tus opciones, en la misma ficha</title>
+  <desc id="description">El catálogo incluido y el contenido homebrew se integran en la ficha de personaje con el mismo motor de reglas.</desc>
+  <rect width="720" height="390" rx="12" fill="#151210"/>
+  <rect x="1" y="1" width="718" height="388" rx="11" fill="none" stroke="#3A2F25"/>
+  <g font-family="Arial, Helvetica, sans-serif" text-anchor="middle">
+    <text x="360" y="48" fill="#EFE7DA" font-family="Georgia, 'Times New Roman', serif" font-size="27">Tus opciones, en la misma ficha</text>
+    <rect x="28" y="78" width="320" height="124" rx="12" fill="#211B16" stroke="#3A2F25"/>
+    <rect x="372" y="78" width="320" height="124" rx="12" fill="#211B16" stroke="#3A2F25"/>
+    <text x="188" y="118" fill="#C9A24B" font-size="23" font-weight="bold">Catálogo incluido</text>
+    <text x="188" y="151" fill="#EFE7DA" font-size="19">Especies · Clases · Dotes</text>
+    <text x="188" y="178" fill="#A2937E" font-size="19">Conjuros y equipo</text>
+    <text x="532" y="118" fill="#C9A24B" font-size="23" font-weight="bold">Tu homebrew</text>
+    <text x="532" y="151" fill="#EFE7DA" font-size="19">Las opciones que creás</text>
+    <text x="532" y="178" fill="#A2937E" font-size="19">para tu mesa</text>
+    <path d="M188 202V226H532V202M360 226V254" fill="none" stroke="#C9A24B" stroke-width="2"/>
+    <path d="m353 247 7 8 7-8" fill="none" stroke="#C9A24B" stroke-width="2"/>
+    <rect x="128" y="268" width="464" height="88" rx="12" fill="#211B16" stroke="#C9A24B"/>
+    <text x="360" y="303" fill="#EFE7DA" font-size="24" font-weight="bold">Tu personaje</text>
+    <text x="360" y="333" fill="#A2937E" font-size="19">El mismo motor de reglas para tus elecciones</text>
+  </g>
+</svg>

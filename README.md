@@ -1,144 +1,115 @@
 <p align="center">
-  <img src="docs/assets/readme/milantus-banner.png" alt="Milantus — Asistente de aventuras" width="100%">
+  <a href="https://app.milantus.com.ar/">
+    <img src="docs/assets/readme/milantus-banner.png" alt="Milantus — Asistente de aventuras" width="100%">
+  </a>
 </p>
 
 <p align="center">
-  <strong>Tus personajes. Tu mesa. La próxima aventura.</strong><br>
-  Creá personajes, combiná clases y dirigí campañas de D&D con las reglas de 2024, desde tu navegador.
+  <strong>Tu personaje y tu mesa, en el mismo lugar.</strong><br>
+  Creá personajes, dirigí campañas y prepará tu próxima sesión de D&D 5e con las reglas de 2024, desde el navegador.
+</p>
+
+<p align="center">
+  <a href="https://app.milantus.com.ar/"><strong>Abrir Milantus →</strong></a> ·
+  <a href="docs/README.md">Documentación</a> ·
+  <a href="docs/operaciones/despliegue.md">Autoalojamiento</a> ·
+  <a href="https://github.com/gasToledo/Milantus/issues">Reportar un problema</a>
 </p>
 
 <p align="center">
   <a href="https://github.com/gasToledo/Milantus/actions/workflows/ci.yml"><img src="https://github.com/gasToledo/Milantus/actions/workflows/ci.yml/badge.svg?branch=main" alt="Estado de CI"></a>
-  &nbsp; · &nbsp; Flutter Web &nbsp; · &nbsp; En español &nbsp; · &nbsp; Autoalojado
+  &nbsp; · &nbsp; Español e inglés &nbsp; · &nbsp; Web &nbsp; · &nbsp; Autoalojado
 </p>
 
-<p align="center">
-  <a href="#en-la-mesa">Funcionalidades</a> ·
-  <a href="docs/README.md">Documentación</a> ·
-  <a href="CHANGELOG.md">Novedades</a>
-</p>
+[![Ficha de personaje con características, habilidades y rasgos](docs/assets/readme/ficha-personaje.png)](docs/assets/readme/ficha-personaje.png)
 
----
+*Capturas de la aplicación con datos de ejemplo. Abrí cada imagen para verla en detalle.*
 
-## La aventura sigue donde la dejaste
+## Un personaje que te acompaña de nivel en nivel
 
-Milantus reúne fichas de personaje, herramientas para dirigir y contenido
-propio en una misma aplicación web. Entrás con tu cuenta y recuperás tus
-personajes, sus recursos y tus campañas desde cualquier navegador.
+Elegí quién querés llevar a la mesa. Milantus calcula modificadores,
+competencias, armadura, ataques y magia a partir de tus elecciones.
 
-El motor resuelve modificadores, competencias, armadura, ataques y magia a
-partir de tus elecciones. Si una elección no cumple los requisitos, te avisa
-y te deja continuar: **la última palabra la tiene tu mesa**.
+- **Creación guiada y multiclase.** Elegí especie, trasfondo, clase, dotes y
+  equipo. Al subir de nivel, revisá los cambios antes de confirmar.
+- **La ficha durante la partida.** Llevá puntos de golpe, condiciones,
+  concentración, conjuros, recursos y descansos. Consultá tu inventario y
+  anotá lo que pasó en el diario.
+- **También en papel.** Imprimí la ficha o guardala como PDF para llevarla
+  a la mesa.
 
-![Ficha de Sagan: características, habilidades y rasgos en Milantus](docs/assets/readme/ficha-personaje.png)
+[![Panel de personajes con niveles, puntos de golpe y estadísticas de cada ficha](docs/assets/readme/personajes.png)](docs/assets/readme/personajes.png)
 
-*Interfaz de Milantus con datos de demostración.*
+## Prepará la sesión. Dirigí tu mesa.
 
-## En la mesa
+Pasá al Modo DM con la misma cuenta. Reuní la preparación y lo que sucede
+durante la partida en tus campañas.
 
-| Para tus personajes | Para dirigir la mesa | Para crear contenido |
-| --- | --- | --- |
-| Creación guiada y subida de nivel | Campañas, capítulos y cuaderno | Armas, armaduras y dotes |
-| Multiclase y subclases por clase | Personajes compartidos por sus jugadores | Especies y trasfondos |
-| Combate, conjuros y recursos | Bestiario y orden de iniciativa | Conjuros y criaturas |
-| Inventario, retratos y respaldos | Registro de combates y avisos de recompensas | Opciones integradas con el catálogo |
+- **Campañas y capítulos.** Organizá objetivos, notas y el cuaderno de la
+  mesa. Anunciá nivel, oro y objetos al cerrar un capítulo.
+- **Encuentros y PNJ.** Consultá el bestiario, prepará los participantes y
+  llevá iniciativa, rondas y puntos de golpe. Ambientá cada campaña con
+  escenas de música.
+- **La mesa conectada.** Los jugadores comparten sus personajes mediante un
+  código temporal. Vos consultás sus fichas; cada jugador conserva el
+  control de la suya.
 
-### Tu personaje, de la primera tirada al próximo nivel
+[![Modo DM con los capítulos de una campaña y sus objetivos](docs/assets/readme/modo-dm.png)](docs/assets/readme/modo-dm.png)
 
-Elegí especie, trasfondo, clase, dotes y equipo con un asistente que muestra
-las opciones de cada paso. Definí tus características por compra de puntos,
-arreglo estándar o tiradas de 4d6.
+## Consultá el Códice. Creá tus propias opciones.
 
-Al subir de nivel, seguí con tu clase o sumá otra. Milantus combina rasgos y
-competencias, calcula los espacios de conjuro y mantiene separados los de
-Magia de Pacto. Antes de confirmar, revisás el resumen de los cambios.
+Buscá lo que necesitás para jugar o preparar la próxima sesión, sin tener
+que crear un personaje para leer una opción.
 
-Durante la partida llevás daño, curación, condiciones, concentración,
-salvaciones de muerte y descansos desde la ficha. Podés cargar un retrato o
-generarlo con los proveedores de IA disponibles en tu servidor.
+- **Reglas a mano.** Consultá especies, clases, subclases, trasfondos, dotes,
+  conjuros y equipo desde el Códice.
+- **Primeros pasos.** Un glosario y guías para entender la partida, crear tu
+  primer personaje y aprender a leer la ficha.
+- **Homebrew integrado.** Creá equipo, especies, trasfondos, dotes, conjuros y
+  criaturas. Tus opciones usan el mismo motor de efectos que el catálogo
+  incluido y aparecen en los asistentes y las fichas.
 
-### Detrás de la pantalla del DM
-
-Con la misma cuenta, pasás de tus personajes a tus campañas. Organizá
-capítulos, prepará encuentros con el bestiario y llevá turnos, rondas y puntos
-de golpe de los monstruos. El cuaderno reúne tus notas y los combates cerrados.
-
-Los jugadores comparten sus personajes mediante un código temporal. Ves la
-ficha actualizada y cada jugador conserva el control de la suya. Al cerrar
-un capítulo, podés anunciar nivel, oro y objetos para que cada participante
-los incorpore a su personaje.
-
-| Tus personajes | Tus campañas |
-| --- | --- |
-| [![Panel de personajes con sus clases, nivel y puntos de golpe](docs/assets/readme/personajes.png)](docs/assets/readme/personajes.png) | [![Modo DM con capítulos en marcha, próximos y completados](docs/assets/readme/modo-dm.png)](docs/assets/readme/modo-dm.png) |
-
-*Paneles con datos de demostración. Abrí cada imagen para verla en detalle.*
-
-### Tus reglas también tienen lugar
-
-El contenido homebrew queda en tu cuenta y aparece junto al catálogo en los
-asistentes y las fichas. Usa el mismo motor de efectos que el contenido
-incluido. Las criaturas propias también están disponibles en el bestiario;
-vos decidís cuáles pueden utilizarse como formas de personaje.
+[![El catálogo incluido y tu homebrew se integran en la misma ficha de personaje](docs/assets/readme/contenido.svg)](docs/assets/readme/contenido.svg)
 
 <details>
-<summary><strong>También te acompaña entre sesiones</strong></summary>
+<summary><strong>Respaldos y herramientas opcionales</strong></summary>
 
-- **Personajes organizados:** búsqueda, criterios de orden, orden manual y un favorito
-  destacado al principio de la lista.
-- **La campaña desde tu ficha:** compañeros de mesa, combates registrados y
-  capítulos completados, con sus recompensas anunciadas.
-- **Respaldo y traslado:** exportación de personajes o un ZIP con fichas,
-  retratos, homebrew y preferencias, sin credenciales. Al importar se
-  conservan las fichas existentes; los identificadores repetidos se reasignan.
-- **Continuidad de tus datos:** los formatos de personaje, homebrew y ajustes
-  están versionados para migrar los documentos anteriores al abrirlos.
+- **Exportación e importación.** Trasladá personajes o guardá un respaldo
+  con fichas, retratos, homebrew y preferencias, sin credenciales.
+- **Retratos.** Cargá una imagen o generala con los proveedores de IA
+  configurados en tu servidor.
+- **Conexión con Claude.** El [conector MCP](docs/arquitectura/mcp.md) permite
+  trabajar con tus personajes, campañas y contenido desde tu cuenta, con
+  permisos de lectura y escritura.
 
 </details>
 
-## Dentro del proyecto
+<p align="center">
+  <a href="https://app.milantus.com.ar/"><strong>Abrir Milantus →</strong></a>
+</p>
+
+## Estado del proyecto y desarrollo
+
+Milantus se desarrolla para la web y ofrece la interfaz en español e inglés.
+El cliente Flutter convive con un cliente React en `/v2`, en migración y
+habilitado por cuenta. El [estado de la migración](docs/arquitectura/migracion-react.md)
+detalla qué está disponible en el cliente nuevo.
 
 | Paquete | Responsabilidad |
 | --- | --- |
-| [`dnd_app`](packages/dnd_app) | Cliente Flutter Web: fichas, asistentes y Modo DM. |
-| [`dnd_engine`](packages/dnd_engine) | Motor en Dart: reglas, modelos y catálogo dirigido por datos. |
+| [`dnd_app`](packages/dnd_app) | Cliente Flutter Web. |
+| [`dnd_web`](packages/dnd_web) | Cliente React, TypeScript y Vite bajo `/v2`. |
+| [`dnd_engine`](packages/dnd_engine) | Motor de reglas en Dart y catálogo dirigido por datos. |
 | [`dnd_server`](packages/dnd_server) | API con Shelf y PostgreSQL: sesiones, persistencia y permisos. |
 
-El cliente y el servidor comparten el motor. Los cálculos de reglas viven en
-`dnd_engine`; la interfaz presenta sus resultados. **Web es la plataforma
-mantenida del cliente.**
+Los dos clientes usan el mismo motor de reglas; React lo ejecuta compilado
+a JavaScript.
 
-<details>
-<summary><strong>Desarrollo local y verificaciones</strong></summary>
-
-Necesitás Dart y Flutter en el `PATH`, con las versiones compatibles que
-declaran los `pubspec.yaml`. Ejecutá los comandos desde cada paquete:
-
-| Directorio | Dependencias | Análisis y pruebas |
-| --- | --- | --- |
-| `packages/dnd_engine` | `dart pub get` | `dart analyze` y `dart test` |
-| `packages/dnd_server` | `dart pub get` | `dart analyze` y `dart test` |
-| `packages/dnd_app` | `flutter pub get` | `dart analyze` y `flutter test` |
-
-Desde `packages/dnd_app`, generá el cliente con `flutter build web --release`.
-Desde la raíz, instalá el hook de formato con
-`git config core.hooksPath .githooks`. CI verifica formato, análisis y pruebas.
-
-Las convenciones de trabajo están en [CLAUDE.md](CLAUDE.md) y la identidad
-visual en la [guía de diseño web](docs/desarrollo/diseno-web.md).
-
-</details>
-
-## El camino recorrido
-
-La versión **0.14.0** suma el Códice, para leer cualquier especie, clase,
-dote, conjuro, objeto o criatura sin tener que crear un personaje, y deja el
-catálogo entero en voseo, con los objetos mágicos vueltos a extraer del SRD:
-completos, en pies y libras, y legibles desde el inventario.
-
-Consultá el [changelog](CHANGELOG.md) para conocer los cambios de cada versión
-y el [índice de documentación](docs/README.md) para profundizar en arquitectura,
-contenido y operaciones.
+- [Documentación](docs/README.md): arquitectura, contenido y guías de desarrollo.
+- [Autoalojamiento](docs/operaciones/despliegue.md): instalación y operación del stack.
+- [Convenciones de desarrollo](CLAUDE.md): requisitos, comandos y verificaciones.
+- [Novedades](CHANGELOG.md): cambios visibles de cada versión.
+- [Problemas y propuestas](https://github.com/gasToledo/Milantus/issues): errores e ideas para mejorar la aplicación.
 
 ## Reglas y atribuciones
 
