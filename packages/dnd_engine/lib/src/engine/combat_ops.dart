@@ -135,16 +135,36 @@ class CombatOps {
 
   /// Gasta un espacio de conjuro del [slotLevel] indicado. Devuelve false si no
   /// quedan espacios disponibles de ese nivel.
-  static bool spendSpellSlot(CombatState c, Spellcasting sc, int slotLevel) {
-    final available = sc.slotsByLevel[slotLevel] ?? 0;
-    final usedMap = sc.progression == CasterProgression.pact
-        ? c.pactSlotsUsed
-        : c.spellSlotsUsed;
+  static bool spendSpellSlot(CombatState c, Spellcasting sc, int slotLevel) =>
+      spendSlot(
+        c,
+        sc.slotsByLevel,
+        slotLevel,
+        pact: sc.progression == CasterProgression.pact,
+      );
+
+  /// Lo mismo que [spendSpellSlot] contra una tabla de espacios suelta: la de
+  /// `ComputedSheet.normalSpellSlotsByLevel` o `pactSlotsByLevel`, que es lo
+  /// que la ficha muestra también a un multiclase.
+  static bool spendSlot(
+    CombatState c,
+    Map<int, int> slotsByLevel,
+    int slotLevel, {
+    bool pact = false,
+  }) {
+    final available = slotsByLevel[slotLevel] ?? 0;
+    final usedMap = pact ? c.pactSlotsUsed : c.spellSlotsUsed;
     final used = usedMap[slotLevel] ?? 0;
     if (used >= available) return false;
     usedMap[slotLevel] = used + 1;
     return true;
   }
+
+  /// Fija los usos gastados de [r] dentro de [0, máximo]. En una reserva lo que
+  /// se pide puede pasarse de lo que queda, y recuperar de más no deja usos
+  /// negativos.
+  static void setResourceUsed(CombatState c, CharacterResource r, int used) =>
+      c.resourceUsage[r.key] = used.clamp(0, r.max);
 
   /// Recupera manualmente un espacio de conjuro del [slotLevel] indicado.
   static void recoverSpellSlot(
@@ -273,6 +293,34 @@ class CombatOps {
     );
     c.companions.add(instance);
     return instance;
+  }
+
+  /// Las variables con que se resuelven las fórmulas de un compañero (sus PG,
+  /// su ataque): las de la ficha más el nivel del espacio con que se lo
+  /// convocó.
+  static CreatureVars companionVars(ComputedSheet s, {int spellLevel = 0}) =>
+      CreatureVars.from(
+        level: s.level,
+        proficiencyBonus: s.proficiencyBonus,
+        abilityModifiers: s.abilityModifiers,
+        spellAttackBonus: s.spellcasting?.attackBonus ?? 0,
+        spellSaveDc: s.spellcasting?.saveDc ?? 0,
+        spellLevel: spellLevel,
+      );
+
+  /// PG máximos de un compañero invocado, o null si su forma ya no está en el
+  /// catálogo.
+  static int? companionMaxHp(ComputedSheet s, CompanionInstance instance) {
+    for (final option in s.companions) {
+      if (option.id != instance.optionId) continue;
+      final form = option.form(instance.creatureId);
+      if (form == null) return null;
+      return resolveCreatureInt(
+        form.hp,
+        companionVars(s, spellLevel: instance.spellLevel),
+      );
+    }
+    return null;
   }
 
   /// Despide un compañero (o lo retira cuando fue destruido).

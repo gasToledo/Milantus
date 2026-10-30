@@ -84,6 +84,13 @@ const smokeHomebrewFeatId = 'paso-de-humo';
 const smokeNoV2Token = 'sesion-sin-v2=';
 const smokeNoV2UserId = 'cuenta-sin-v2';
 
+/// La cuenta de las pruebas de escritura (`e2e/escritura.spec.ts`), aparte de
+/// la de humo a propósito: lo que esas pruebas guardan no cambia los números
+/// que leen las demás, que corren en paralelo contra el mismo servidor.
+const writerToken = 'sesion-de-escritura=';
+const writerUserId = 'cuenta-de-escritura';
+const writerCharacterId = 'ilse-de-humo';
+
 Future<void> main() async {
   final root = Platform.environment['DND_WEB_V2_ROOT'] ?? '';
   final port = int.parse(Platform.environment['DND_SERVER_PORT'] ?? '8787');
@@ -107,6 +114,11 @@ Future<void> main() async {
   auth.profilesByToken[smokeDmToken] = const SessionProfile(
     name: 'DM de Humo',
     email: 'dm@example.org',
+  );
+  auth.sessionsByToken[writerToken] = writerUserId;
+  auth.profilesByToken[writerToken] = const SessionProfile(
+    name: 'Ilse de Humo',
+    email: 'escritura@example.org',
   );
   auth.sessionsByToken[smokeNoV2Token] = smokeNoV2UserId;
   auth.profilesByToken[smokeNoV2Token] = const SessionProfile(
@@ -226,6 +238,47 @@ Future<void> main() async {
           body: 'https://example.org/marca',
         ),
       ],
+    ),
+  );
+  // La ficha que escriben las pruebas de escritura: una clériga herida y con
+  // algo gastado (un espacio, un dado de golpe, un uso de Canalizar
+  // Divinidad), un objeto con cargas que el descanso largo recarga y un nivel
+  // de cansancio que el descanso baja, para que cada acción tenga qué cambiar.
+  await characters.create(
+    writerUserId,
+    Character(
+      id: writerCharacterId,
+      name: 'Ilse de Humo',
+      raceId: 'dwarf',
+      classId: 'cleric',
+      subclassId: 'life-domain',
+      backgroundId: 'acolyte',
+      level: 3,
+      assignedScores: const {
+        Ability.strength: 14,
+        Ability.dexterity: 8,
+        Ability.constitution: 14,
+        Ability.intelligence: 10,
+        Ability.wisdom: 15,
+        Ability.charisma: 12,
+      },
+      hpPerLevel: const [8, 5, 5],
+      cantripIds: const ['guidance', 'sacred-flame'],
+      spellIds: const ['bless', 'cure-wounds'],
+      inventory: const [
+        InventoryEntry(
+          entryId: 'e-baston',
+          itemId: 'baston-de-curacion',
+          charges: 2,
+        ),
+      ],
+      combat: CombatState(
+        currentHp: 12,
+        hitDiceUsed: const {8: 1},
+        exhaustion: 1,
+        spellSlotsUsed: const {1: 1},
+        resourceUsage: const {'cleric:channel_divinity': 1},
+      ),
     ),
   );
   final settings = InMemorySettingsRepository();
@@ -548,7 +601,7 @@ Future<void> main() async {
     settings: settings,
     webV2Handler: v2,
     // El DM también: el Modo DM de /v2 es de las cuentas con `webV2`.
-    v2Users: {smokeUserId, _smokeDmId},
+    v2Users: {smokeUserId, _smokeDmId, writerUserId},
   );
 
   final server = await shelf_io.serve(

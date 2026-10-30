@@ -1,9 +1,10 @@
-import { BookOpen, Check, Crosshair, Heart, RefreshCw, Shield, ShieldHalf, Zap } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { BookOpen, Check, Crosshair, Heart, Minus, Plus, RefreshCw, Shield, ShieldHalf, Zap } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
 import { nameOf } from '../api/catalog';
 import type { InnateSpell, SpellcastingBlock } from '../engine';
 import { useTexts } from '../i18n/context';
 import { labelOf } from '../i18n/texts';
+import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Eyebrow, hpTone, Pill, Pips, ShieldBadge, StatPlaque, ThinBar } from '../ui/data';
 import { COLUMNS } from './CharacterTab';
@@ -14,10 +15,12 @@ import { ProficiencyRow } from './rows';
 import { ABILITIES, isReactionSpell } from './vocabulary';
 
 /**
- * Pestaña Combate, de **solo lectura**: lo que se consulta en el turno. No hay
- * daño, curación, gastar espacios ni preparar conjuros: eso es escribir la
- * ficha y sigue en Flutter. Los números son del motor; de la mesa (lo crudo)
- * solo los PG actuales, lo gastado y las condiciones.
+ * Pestaña Combate: lo que se consulta en el turno y, en la ficha propia
+ * (`model.write`), lo que se anota en él: daño, curación, PG temporales y
+ * salvaciones de muerte. Cada acción la hace el motor (`actOn`); acá no se
+ * suma ni se resta nada. Preparar conjuros y el resto de la edición siguen en
+ * Flutter. Los números son del motor; de la mesa (lo crudo) solo los PG
+ * actuales, lo gastado y las condiciones.
  */
 export function CombatTab({ model }: { model: SheetModel }) {
   return (
@@ -64,6 +67,8 @@ function HitPointsCard({ model }: { model: SheetModel }) {
         />
       </div>
       {temp > 0 && <p className="mt-2 text-[13px] text-on-surface-variant">{t.tempHp(temp)}</p>}
+      {model.write && <HitPointControls model={model} />}
+      {current <= 0 && <DeathSaves model={model} />}
       <dl className="mt-3 divide-y divide-hairline border-t border-hairline text-[13px]">
         {Object.entries(sheet.hitDiceBySize).map(([size, total]) => (
           <Line key={size} label={t.hitDice}>
@@ -78,6 +83,81 @@ function HitPointsCard({ model }: { model: SheetModel }) {
         )}
       </dl>
     </Card>
+  );
+}
+
+/** Cantidad, Daño, Curar y PG temp, como `_hpControls` de Flutter: un campo
+ *  y tres verbos. Un campo vacío o inválido cuenta 0, como allá. */
+function HitPointControls({ model }: { model: SheetModel }) {
+  const t = useTexts();
+  const [amount, setAmount] = useState('');
+  const run = (type: 'damage' | 'heal' | 'tempHp') => {
+    model.write!.act({ type, amount: Number.parseInt(amount, 10) || 0 });
+    setAmount('');
+  };
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-2" data-controls="hit-points">
+      <label htmlFor="hp-amount" className="sr-only">
+        {t.hpAmount}
+      </label>
+      <input
+        id="hp-amount"
+        type="number"
+        inputMode="numeric"
+        min={0}
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
+        placeholder={t.hpAmount}
+        className="num h-9 w-[90px] rounded-[var(--radius-nav)] border border-hairline bg-plaque px-3 text-[14px] text-on-surface placeholder:text-text-muted"
+      />
+      <Button tone="danger" icon={Minus} onClick={() => run('damage')}>
+        {t.hpDamage}
+      </Button>
+      <Button tone="secondary" icon={Plus} onClick={() => run('heal')}>
+        {t.hpHeal}
+      </Button>
+      <Button tone="secondary" onClick={() => run('tempHp')}>
+        {t.hpTemp}
+      </Button>
+    </div>
+  );
+}
+
+/** A 0 PG, los éxitos y fallos (`_deathSaves` de Flutter). Se leen en
+ *  cualquier ficha; marcarlos, solo en la propia. Que tres éxitos estabilicen
+ *  y tres fallos maten lo dice el motor. */
+function DeathSaves({ model }: { model: SheetModel }) {
+  const t = useTexts();
+  const { character, write } = model;
+  const successes = character.combat?.deathSuccesses ?? 0;
+  const failures = character.combat?.deathFailures ?? 0;
+  const mark = (success: boolean) => {
+    const r = write!.act({ type: 'deathSave', success });
+    if (r?.outcome.deathSave === 'stable') write!.notify(t.stabilized, { tone: 'success' });
+    if (r?.outcome.deathSave === 'dead') write!.notify(t.characterDied, { tone: 'error' });
+  };
+  return (
+    <div className="mt-4" data-death-saves>
+      <Eyebrow>{t.deathSaves}</Eyebrow>
+      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2">
+        <span className="flex items-center gap-2" data-field="death-successes">
+          <Pips max={3} left={successes} label={t.deathSuccesses(successes)} />
+          {write && (
+            <Button tone="secondary" onClick={() => mark(true)}>
+              {t.deathSuccessPlus}
+            </Button>
+          )}
+        </span>
+        <span className="flex items-center gap-2" data-field="death-failures">
+          <Pips max={3} left={failures} label={t.deathFailures(failures)} tone="crimson" />
+          {write && (
+            <Button tone="secondary" onClick={() => mark(false)}>
+              {t.deathFailurePlus}
+            </Button>
+          )}
+        </span>
+      </div>
+    </div>
   );
 }
 

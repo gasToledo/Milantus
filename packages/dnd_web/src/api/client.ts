@@ -53,6 +53,22 @@ export async function fetchRoster(signal: AbortSignal): Promise<StoredCharacter[
   return characters;
 }
 
+/**
+ * Guarda una ficha propia entera (`PUT /api/characters/:id`), como
+ * `upsertCharacter` de Flutter. [character] es siempre lo que devolvió el
+ * motor (`actOn`), nunca un documento armado acá; el servidor lo vuelve a
+ * leer con `Character.fromJson`, que rechaza una versión futura.
+ */
+export async function saveCharacter(character: CharacterJson & { id: string }): Promise<void> {
+  const path = `/api/characters/${encodeURIComponent(character.id)}`;
+  const response = await fetch(path, {
+    method: 'PUT',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ character }),
+  });
+  if (!response.ok) throw new ApiError(response.status, path);
+}
+
 /** Lo que el dashboard lee de los ajustes de la cuenta (`AppSettings` en
  *  Flutter). Crudo: `sortMode` es el nombre del modo tal como se guardó. */
 export interface RosterSettings {

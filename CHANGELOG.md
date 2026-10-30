@@ -1084,6 +1084,27 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
+## [0.44.0+1] - 2026-10-29
+
+### Nuevo
+
+- El cliente nuevo (`/v2`, habilitado por cuenta) empieza a escribir en la
+  ficha propia: daño, curación, PG temporales y las salvaciones de muerte a 0
+  PG, con el estado del guardado al pie del panel y «Reintentar» si falla.
+  Guarda igual que la app de siempre, así que lo anotado ahí se abre en ella
+  sin cambios.
+
+### Modificado
+
+- El motor hace cada acción de partida de la ficha (PG, salvaciones, espacios,
+  usos, dados de golpe y descansos) en una sola puerta que comparten los dos
+  clientes; el tope de usos de un recurso y los PG de un compañero al
+  descansar dejaron de calcularse en la pantalla.
+
+### Eliminado
+
+- Sin cambios.
+
 ## [Unreleased]
 
 ### Nuevo

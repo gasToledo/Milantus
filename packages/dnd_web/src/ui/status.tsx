@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
-import { CircleAlert, Inbox, LoaderCircle, RotateCw, SearchX } from 'lucide-react';
+import { CircleAlert, CloudCheck, Inbox, LoaderCircle, RefreshCw, RotateCw, SearchX } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useTexts } from '../i18n/context';
 import { Button } from './Button';
+import { cx } from './cx';
 
 // Los tres estados que toda pantalla con datos tiene, siempre con los mismos
 // componentes (`diseno-web.md` §8, «Retroalimentación»): si cada pantalla
@@ -100,5 +102,48 @@ export function Notice({ title, body, action }: { title: string; body?: string; 
       {body && <p className="mt-2 text-on-surface-variant">{body}</p>}
       {action && <div className="mt-4">{action}</div>}
     </section>
+  );
+}
+
+/**
+ * El estado del guardado automático (`SaveStatusIndicator`), en la pill del
+ * pie del panel: la ficha guarda sola, sin botón, y sin esto no hay forma de
+ * saber si lo que se tocó llegó. Ícono, color **y** palabra; región viva. Al
+ * fallar, «Reintentar» manda la última copia (lo local no se perdió).
+ */
+export function SaveStatusBadge({
+  state,
+  onRetry,
+}: {
+  state: 'saved' | 'saving' | 'error';
+  onRetry: () => void;
+}) {
+  const t = useTexts();
+  const looks: Record<typeof state, [LucideIcon, string, string]> = {
+    saving: [RefreshCw, t.saveSaving, 'text-gold'],
+    error: [CircleAlert, t.saveFailed, 'text-crimson'],
+    saved: [CloudCheck, t.saveSaved, 'text-on-surface-variant'],
+  };
+  const [Icon, label, color] = looks[state];
+  return (
+    <span className="flex min-w-0 items-center gap-1.5" data-save-state={state}>
+      <span
+        role="status"
+        className={cx(
+          'inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] border px-2.5 py-1 text-[11.5px]',
+          state === 'error' ? 'border-crimson' : 'border-hairline',
+          color,
+        )}
+      >
+        <Icon size={13} aria-hidden="true" className={state === 'saving' ? 'animate-spin' : undefined} />
+        <span className="sr-only">{t.saveStateLabel}</span>
+        {label}
+      </span>
+      {state === 'error' && (
+        <button type="button" onClick={onRetry} className="text-[11.5px] text-gold hover:underline">
+          {t.retry}
+        </button>
+      )}
+    </span>
   );
 }

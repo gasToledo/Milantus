@@ -11,6 +11,7 @@ import {
   User,
   type LucideIcon,
 } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { useTexts } from '../i18n/context';
 import { characterHref, FLUTTER_HOME, rosterHref, SHEET_TABS, type SheetTab } from '../router';
 import type { Texts } from '../i18n/texts';
@@ -90,16 +91,19 @@ export function SheetPanel({ model, tab }: { model: SheetModel; tab: SheetTab })
   );
 }
 
-/** El pie liviano (`SidebarLightFooter`): «Solo lectura», el tema y la
- *  versión. Ajustes y la cuenta quedan a un «volver» de distancia. */
-export function SheetFooter({ version }: { version: string | null | undefined }) {
+/** El pie liviano (`SidebarLightFooter`): «Solo lectura» —o, en la ficha
+ *  propia, el estado del guardado ([status])—, el tema y la versión. Ajustes y
+ *  la cuenta quedan a un «volver» de distancia. */
+export function SheetFooter({ version, status }: { version: string | null | undefined; status?: ReactNode }) {
   const t = useTexts();
   return (
     <div className="flex items-center justify-between gap-2">
-      <span className="inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] border border-hairline px-2.5 py-1 text-[11.5px] text-on-surface-variant">
-        <Eye size={13} aria-hidden="true" />
-        {t.readOnly}
-      </span>
+      {status ?? (
+        <span className="inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] border border-hairline px-2.5 py-1 text-[11.5px] text-on-surface-variant">
+          <Eye size={13} aria-hidden="true" />
+          {t.readOnly}
+        </span>
+      )}
       <div className="flex items-center gap-2">
         <VersionLabel version={version} />
         <ThemeMenu />

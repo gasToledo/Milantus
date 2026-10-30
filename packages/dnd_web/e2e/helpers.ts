@@ -7,6 +7,7 @@ import type { Catalog, JsonObject } from '../src/engine';
 export const TOKEN = 'sesion-de-humo=';
 export const TOKEN_SIN_V2 = 'sesion-sin-v2=';
 export const TOKEN_DM = 'sesion-del-dm=';
+export const TOKEN_ESCRITURA = 'sesion-de-escritura=';
 
 /** El SRD tal como lo arma `loadCatalog`, leído del motor: lo esperado se
  *  calcula con el mismo catálogo que ve el navegador. */

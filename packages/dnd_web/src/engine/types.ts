@@ -331,6 +331,8 @@ export interface CharacterFields {
   combat?: {
     currentHp?: number;
     tempHp?: number;
+    deathSuccesses?: number;
+    deathFailures?: number;
     /** Clave del recurso (`CharacterResource.key`) → usos gastados. */
     resourceUsage?: Record<string, number>;
     /** Nivel (como texto) → espacios gastados. */

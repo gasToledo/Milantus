@@ -3,8 +3,10 @@
 ///
 ///     dart run tool/generate_js_parity_fixtures.dart <directorio de salida>
 ///
-/// Escribe `catalog.json` y un `<caso>.json` por personaje, con la ficha de
-/// entrada y la salida de Dart (`ComputedSheet.toJson()`). Las fichas se arman
+/// Escribe `catalog.json`, un `<caso>.json` por personaje, con la ficha de
+/// entrada y la salida de Dart (`ComputedSheet.toJson()`), y un
+/// `accion-<caso>.json` por acción de partida, con la acción, la semilla y lo
+/// que devuelve `SheetActions.apply`. Las fichas se arman
 /// acá con el constructor y no a mano en JSON: así siguen válidas cuando el
 /// modelo cambia, y la salida esperada la produce el propio motor.
 ///
@@ -13,6 +15,7 @@
 library;
 
 import 'dart:convert';
+import 'dart:math';
 import 'dart:io';
 
 import 'package:dnd_engine/dnd_engine.dart';
@@ -137,6 +140,34 @@ final _casos = <String, Character>{
   ),
 };
 
+/// Acciones de partida (`SheetActions`, `act` en JS) sobre los mismos
+/// personajes, con un estado de combate gastado para que cada una tenga algo
+/// que cambiar. La semilla fija las tiradas: el dado de golpe y la recarga al
+/// amanecer. Una por rama del motor que toca algo distinto del documento.
+final _acciones = <String, (String, Map<String, dynamic>)>{
+  'accion-dano': ('clerigo', {'type': 'damage', 'amount': 7}),
+  'accion-espacio-pacto': (
+    'brujo',
+    {'type': 'spendSlot', 'level': 3, 'pact': true},
+  ),
+  'accion-recurso': ('barbaro', {'type': 'spendResource', 'resource': 'rage'}),
+  'accion-dado-de-golpe': ('guerrero', {'type': 'spendHitDie'}),
+  'accion-descanso-corto': ('brujo', {'type': 'shortRest'}),
+  'accion-descanso-largo': ('druida', {'type': 'longRest'}),
+};
+
+const _semilla = 7;
+
+CombatState _gastado() => CombatState(
+      currentHp: 3,
+      tempHp: 2,
+      hitDiceUsed: const {8: 1},
+      exhaustion: 1,
+      resourceUsage: const {'wild_shape': 1},
+      spellSlotsUsed: const {1: 1},
+      pactSlotsUsed: const {3: 1},
+    );
+
 Future<void> main(List<String> args) async {
   if (args.length != 1) {
     stderr.writeln('Uso: dart run tool/generate_js_parity_fixtures.dart <dir>');
@@ -181,5 +212,26 @@ Future<void> main(List<String> args) async {
       jsonEncode({'character': entrada, 'expected': esperado}),
     );
   }
-  print('${_casos.length} casos en ${out.path}');
+  for (final MapEntry(key: nombre, value: (caso, accion))
+      in _acciones.entries) {
+    final entrada = jsonDecode(
+      jsonEncode(_casos[caso]!.copyWith(combat: _gastado()).toJson()),
+    );
+    final ficha = Character.fromJson(entrada as Map<String, dynamic>);
+    final esperado = SheetActions.apply(
+      ficha,
+      repo,
+      accion,
+      dice: Dice(Random(_semilla)),
+    ).toJson();
+    File('${out.path}/$nombre.json').writeAsStringSync(
+      jsonEncode({
+        'character': entrada,
+        'action': accion,
+        'seed': _semilla,
+        'expected': esperado,
+      }),
+    );
+  }
+  print('${_casos.length + _acciones.length} casos en ${out.path}');
 }

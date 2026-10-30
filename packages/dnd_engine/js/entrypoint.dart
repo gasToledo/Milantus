@@ -14,6 +14,7 @@ library;
 import 'dart:convert';
 import 'dart:js_interop';
 import 'dart:js_interop_unsafe';
+import 'dart:math';
 
 import 'package:dnd_engine/dnd_engine.dart';
 
@@ -383,8 +384,35 @@ String musicSource(String url) {
   );
 }
 
+/// Una acción de partida sobre la ficha propia (daño, un espacio, un
+/// descanso…) → `{character, outcome}`. Es `SheetActions.apply`: la ficha que
+/// vuelve ya está migrada y con el `schemaVersion` actual, y es lo que el
+/// cliente guarda tal cual. Ver las acciones en `sheet_actions.dart`.
+///
+/// Las tiradas (el dado de golpe, la recarga al amanecer) las hace el motor,
+/// como en Flutter; [seed] las fija y sirve solo para la prueba de paridad.
+String act(
+  String characterJson,
+  String catalogJson,
+  String actionJson, [
+  int? seed,
+]) {
+  final character = Character.fromJson(
+    jsonDecode(characterJson) as Map<String, dynamic>,
+  );
+  return jsonEncode(
+    SheetActions.apply(
+      character,
+      _repoPara(catalogJson),
+      jsonDecode(actionJson) as Map<String, dynamic>,
+      dice: seed == null ? null : Dice(Random(seed)),
+    ).toJson(),
+  );
+}
+
 void main() {
   final motor = JSObject();
+  motor['act'] = act.toJS;
   motor['compute'] = compute.toJS;
   motor['migrateCharacter'] = migrateCharacter.toJS;
   motor['setLanguage'] = setLanguage.toJS;

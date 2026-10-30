@@ -50,7 +50,7 @@ Un solo servidor, un solo origen, dos clientes:
   `migrateCharacter`, `setEngineLanguage`, `applyTranslation`,
   `vocabularyLabel`, `inventoryOf`, `chapterGrants`, `catalogLabel`,
   `catalogLabelOrder`, `formatCost`, `abilityModifier`, `bestiary`,
-  `npcViews`, `encounterView`, `musicSource`); la
+  `npcViews`, `encounterView`, `musicSource`, `actOn`); la
   comunicación es JSON como texto de ida y vuelta. Los tipos de
   `src/engine/types.ts` están escritos a mano: los cuida la paridad (abajo).
 
@@ -101,7 +101,7 @@ repiten acá.
   API.
 - Tema: oscuro por defecto, con selector al pie del panel (y en Ajustes). Lo elegido en el
   navegador (`localStorage`) gana sobre el `themeMode` de los ajustes de la
-  cuenta, porque React todavía no escribe en la cuenta.
+  cuenta, porque React todavía no escribe en los ajustes de la cuenta.
 - Idioma: español o inglés, resuelto una vez al cargar (clave `milantus.locale`
   de `localStorage`, luego `navigator.language`, luego español). Es el mismo
   criterio para los rótulos del motor.
@@ -137,10 +137,11 @@ repiten acá.
   capítulos cerrados con lo que repartieron (`GET /api/characters/:id/campaigns`,
   el mismo contrato que Flutter, y lo repartido lo nombra el motor). **Diario**:
   el trasfondo con el Markdown chico de Flutter y las entradas, que se abren en
-  un diálogo. Nada se gasta, equipa ni edita. El panel es el de una pantalla de
+  un diálogo. Lo único que se escribe son las acciones de partida (abajo): nada
+  se equipa ni se edita. El panel es el de una pantalla de
   adentro: «volver», la tarjeta del personaje, las cinco pestañas, Retrato,
-  Subir nivel y Compartir, que enlazan a Flutter, e **Imprimir**; al pie, «Solo
-  lectura», el tema y la versión. **Imprimir** (`PrintSheet`, el
+  Subir nivel y Compartir, que enlazan a Flutter, e **Imprimir**; al pie, el
+  estado del guardado, el tema y la versión. **Imprimir** (`PrintSheet`, el
   `print_sheet.dart` de Flutter) monta una hoja propia al pie de `body` y abre
   el diálogo del navegador (que ofrece también «Guardar como PDF»); la hoja de
   estilos de impresión (`index.css`) la deja sola en papel y en pantalla no se
@@ -386,6 +387,40 @@ repiten acá.
   Flutter. Igual que allá, se descarta una entrada sin id o cuyo `source` no es
   `homebrew`; a diferencia de allá, una entrada que el motor no puede leer no
   se descarta sola (ver su `ponytail:`).
+- **Escrituras de la ficha propia** (paso 4). Es lo primero que React escribe
+  en una cuenta, y solo en la ficha de `/v2/personajes/:id`: la de un miembro
+  de la Mesa y la de un PNJ usan los mismos componentes sin `model.write` y no
+  muestran un solo control. Hoy: **daño, curación y PG temporales** (un campo
+  «Cantidad» y tres verbos, como Flutter) y, a 0 PG, las **salvaciones de
+  muerte** con «+Éxito» y «+Fallo» (a tres éxitos se estabiliza y a tres
+  fallos muere, con su aviso).
+  - **Toda escritura la hace el motor.** `actOn` (`act` de `js/entrypoint.dart`,
+    sobre `SheetActions.apply` del engine) recibe la ficha y la acción y
+    devuelve la ficha nueva, migrada y con el `schemaVersion` actual, más lo
+    que pasó para el aviso. React no suma ni resta nada ni arma un formato
+    propio: guarda lo que devolvió el motor. Lo que antes vivía en widgets de
+    Flutter (el tope de usos de un recurso, los PG máximos de un compañero al
+    descansar) pasó al engine y Flutter lo usa de ahí.
+  - **El guardado es el de Flutter** (`src/api/characterSave.ts`, el
+    `CharactersController`): `PUT /api/characters/:id` con la ficha entera,
+    400 ms de espera para juntar toques seguidos y una cola por personaje que
+    siempre manda la última copia. Mandar el estado y no la acción hace seguro
+    reintentar. La ficha se actualiza al instante en la caché de
+    `/api/characters` (`src/sheet/writer.ts`) y no se vuelve a pedir después de
+    guardar.
+  - **Conflictos: gana el último que guarda**, como entre dos pestañas de
+    Flutter; el servidor no tiene versión con qué rechazar una copia vieja. Para
+    no pisar lo hecho en Flutter, la ficha se vuelve a pedir al volver a la
+    pestaña de `/v2`, **solo si no hay nada pendiente**, y una acción cancela el
+    pedido de la lista que esté en vuelo. Lo que no cubre: una pestaña de
+    Flutter abierta desde antes puede pisar lo que hizo React al guardar algo,
+    porque Flutter no vuelve a pedir la lista. Evitarlo pide versión en el
+    servidor (409) y que Flutter la use.
+  - **Qué se ve**: al pie del panel, en vez de «Solo lectura», la pill del
+    guardado (`SaveStatusBadge`: Guardando… / Guardado / No se guardó con
+    «Reintentar»). Si falla, lo local se conserva; cerrar o recargar con algo
+    pendiente lo pregunta el navegador (`beforeunload`). Los avisos van en
+    `Toast`.
 - **Ningún enlace** desde Flutter hacia `/v2` y Flutter no lee `webV2`: se
   entra escribiendo la URL.
 
@@ -405,7 +440,8 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    la ficha completa de un miembro y la de un PNJ con ficha; la música (solo
    escuchar); los retratos con su visor; las menciones `@Nombre` del Cuaderno
    como enlaces, e imprimir la ficha.
-4. Escrituras de bajo riesgo: PG y usos de recursos en la ficha, descansos.
+4. Escrituras de bajo riesgo: PG y usos de recursos en la ficha, descansos
+   *(en curso: existen los PG y las salvaciones de muerte)*.
 5. Edición completa: creador de personajes, subida de nivel, inventario.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
    combate, vínculos y códigos de campaña. Antes de portar esto es lectura
@@ -423,7 +459,9 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    recalcula con el JS compilado (`npm run test:parity`) y compara el JSON
    completo, **incluido el orden de las claves**. No prueba reglas (las prueban
    los tests de `dnd_engine`): prueba que `dart2js` no cambie enteros contra
-   dobles, orden ni redondeos. Es también la red del tipo escrito a mano de
+   dobles, orden ni redondeos. Los casos `accion-*` prueban lo mismo con `act`:
+   la ficha que el cliente guarda después de una acción (con una semilla fija
+   para el dado de golpe y la recarga al amanecer). Es también la red del tipo escrito a mano de
    `types.ts`: un campo nuevo en `ComputedSheet.toJson` rompe acá aunque el tipo
    no lo diga.
 2. **Playwright** (job `web_e2e`). Pocas pruebas y solo de reglas
@@ -485,7 +523,13 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    turno, ACTUÓ y SALTA, los PG de cada fuente (los del jugador, de su ficha), la
    CA de cada una, el perfil del que juega y los combates cerrados, sin escribir,
    y que otra cuenta reciba el mismo 404 que ante una campaña inexistente y el
-   jugador vinculado solo su estado de turno (`e2e/combate.spec.ts`); y que una cuenta sin `webV2` vea
+   jugador vinculado solo su estado de turno (`e2e/combate.spec.ts`); que
+   daño, curación y PG temporales manden y dejen guardada exactamente la ficha
+   que da el motor, que se relea sin migrar y al recargar, que solo se escriba
+   la ficha propia, que a 0 PG tres «+Éxito» seguidos estabilicen y guarden lo
+   del motor, y que la ficha de otra cuenta (la de un miembro, para el DM) no
+   tenga un solo control (`e2e/escritura.spec.ts`, con una cuenta propia para
+   no cambiar lo que leen las demás); y que una cuenta sin `webV2` vea
    «No disponible» sin pedir sus datos (`e2e/acceso.spec.ts`). Lo esperado se
    calcula con el mismo motor y la misma fusión (`e2e/helpers.ts`). Sin
    reintentos: no hay «a veces anda».
@@ -508,7 +552,8 @@ Un cambio en `packages/dnd_web` despliega igual que los de los otros paquetes
 (el `gate` de `cd.yml` lo incluye), también el revert. Cada nivel se deshace sin tocar el código de Flutter:
 
 - **Una cuenta**: sacar su id de `V2_USERS` y `docker compose up -d`. Deja de
-  ver `/v2` y nunca perdió nada: la ficha de solo lectura no escribe.
+  ver `/v2`; lo que ya escribió desde ahí (ver abajo) queda en su ficha y
+  Flutter lo abre como propio.
 - **Todas**: vaciar `V2_USERS`. `/v2` sigue respondiendo pero ninguna cuenta
   pasa de «No disponible».
 - **Apagar `/v2`**: sacar `DND_WEB_V2_ROOT` (la imagen lo fija; habría que
@@ -516,21 +561,38 @@ Un cambio en `packages/dnd_web` despliega igual que los de los otros paquetes
   el resto del servidor arranca igual.
 - **Un cambio malo**: un commit de revert en `main`, como cualquier otro.
 
-Cuando existan pantallas que **escriban**, el criterio tendrá que ser otro:
-volver atrás ya no alcanza si una escritura dejó datos en un formato que
-Flutter no entiende. Los documentos de usuario llevan `schemaVersion` y
-rechazan versiones futuras (ver `CLAUDE.md`); cualquier escritura desde React
-pasa por los mismos modelos y migraciones del engine, nunca por un formato
-propio.
+**Con escrituras el criterio cambia** (paso 4 en adelante): sacar una cuenta
+de `V2_USERS` o revertir el commit ya no deshace lo que React guardó. Lo que
+hace seguro volver atrás es que **no hay nada que deshacer en el formato**:
+
+- Toda ficha que guarda React la produjo el motor (`actOn`): sale de
+  `Character.fromJson` → la acción → `Character.toJson`, el mismo camino que un
+  guardado de Flutter, con el `schemaVersion` actual. Flutter la abre igual que
+  una propia y no hay campo que solo entienda React.
+- La imagen compila Flutter, React y el motor del mismo commit, así que nunca
+  conviven un motor de `/v2` más nuevo que el de `/`. El servidor vuelve a leer
+  cada ficha con `Character.fromJson`, que rechaza una versión futura.
+- Lo que sí puede pasar es un **valor** equivocado (un daño de más): se
+  corrige a mano en la ficha, desde Flutter o desde `/v2`, como cualquier
+  error de la mesa. Un revert del cliente no lo arregla.
+- Un cambio malo del motor que escribiera algo raro se arregla como siempre:
+  un commit nuevo (y, si dejó documentos que ya no se leen, una migración del
+  modelo con su test, nunca editar la base a mano).
 
 ## Lo que todavía no existe
 
 Para que nadie lo dé por hecho:
 
-- Cualquier escritura desde React: todo el cliente hoy es solo lectura, así que
-  los pasos 4 a 7 están enteros por hacer. Entre ellos, reordenar, marcar
-  favorito, crear, renombrar o borrar personajes, y escribir en `/api/settings`
-  (por eso el tema elegido en el navegador gana sobre el de la cuenta).
+- Del paso 4, los **usos de recursos** (espacios de conjuro, rasgos con
+  usos, dados de golpe) y los **descansos** corto y largo con «Deshacer»: hoy
+  se ven pero no se tocan.
+- Toda otra escritura desde React: los pasos 5 a 7 están enteros por hacer.
+  Entre ellos, reordenar, marcar favorito, crear, renombrar o borrar
+  personajes, condiciones, concentración, compañeros y Forma Salvaje, y
+  escribir en `/api/settings` (por eso el tema elegido en el navegador gana
+  sobre el de la cuenta).
+- Control de versión en el servidor para las escrituras (rechazar una copia
+  vieja con 409): hoy gana el último que guarda, como en Flutter.
 - Enlaces desde Flutter hacia `/v2` o redirección automática por `webV2`.
 - Tests de componentes y chequeo de literales sueltos en `dnd_web`.
 - Un criterio medido de «paridad visual» con Flutter: hoy es la comparación

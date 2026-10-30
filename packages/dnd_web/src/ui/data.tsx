@@ -173,7 +173,18 @@ export function Pill({
  * no alcanza solo, así que `label` dice la cuenta («Canalizar divinidad: 1 de
  * 2») y los puntos quedan ocultos al lector.
  */
-export function Pips({ max, left, label }: { max: number; left: number; label: string }) {
+export function Pips({
+  max,
+  left,
+  label,
+  tone = 'gold',
+}: {
+  max: number;
+  left: number;
+  label: string;
+  /** `crimson` solo para lo que cuenta en contra (los fallos de muerte). */
+  tone?: 'gold' | 'crimson';
+}) {
   return (
     <span role="img" aria-label={label} className="flex flex-wrap justify-end gap-1">
       {Array.from({ length: max }, (_, i) => (
@@ -182,7 +193,11 @@ export function Pips({ max, left, label }: { max: number; left: number; label: s
           aria-hidden="true"
           className={cx(
             'h-3 w-3 rounded-full border',
-            i < left ? 'border-gold bg-gold' : 'border-text-muted bg-transparent',
+            i >= left
+              ? 'border-text-muted bg-transparent'
+              : tone === 'crimson'
+                ? 'border-crimson bg-crimson'
+                : 'border-gold bg-gold',
           )}
         />
       ))}

@@ -22,6 +22,7 @@ interface DartEngine {
   npcs(entriesJson: string, catalogJson: string): string;
   encounter(encounterJson: string, playersHpJson: string): string;
   musicSource(url: string): string;
+  act(characterJson: string, catalogJson: string, actionJson: string, seed?: number): string;
 }
 
 function engine(): DartEngine {
@@ -193,4 +194,40 @@ export interface MusicSource {
  *  de sacarlo queda sin reproducir. */
 export function musicSource(url: string): MusicSource | null {
   return JSON.parse(engine().musicSource(url)) as MusicSource | null;
+}
+
+/** Una acción de partida sobre la ficha propia (`SheetActions` del motor). */
+export type SheetAction =
+  | { type: 'damage' | 'heal' | 'tempHp'; amount: number }
+  | { type: 'deathSave'; success: boolean }
+  | { type: 'spendSlot' | 'recoverSlot'; level: number; pact: boolean }
+  | { type: 'spendResource' | 'recoverResource'; resource: string; amount?: number }
+  | { type: 'spendHitDie' | 'shortRest' | 'longRest' };
+
+/** Lo que cuenta el motor de una acción, para el aviso. Cada campo existe
+ *  solo en la acción que lo da (ver `SheetActions.apply`). */
+export interface SheetOutcome {
+  deathSave?: 'stable' | 'dead' | null;
+  healed?: number;
+  restored?: string[];
+  exhaustion?: number | null;
+  inspirationGained?: boolean;
+  itemsRecharged?: number;
+}
+
+/**
+ * Aplica [action] a la ficha con el motor y devuelve la ficha nueva —migrada,
+ * con el `schemaVersion` actual, lista para guardar tal cual— y lo que pasó.
+ * Las tiradas (el dado de golpe, la recarga al amanecer) las hace el motor. No
+ * modifica la de entrada; una acción desconocida o una ficha de una versión
+ * futura lanzan.
+ */
+export function actOn(
+  character: CharacterJson,
+  catalog: Catalog,
+  action: SheetAction,
+): { character: CharacterJson; outcome: SheetOutcome } {
+  return JSON.parse(
+    engine().act(JSON.stringify(character), catalogJson(catalog), JSON.stringify(action)),
+  ) as { character: CharacterJson; outcome: SheetOutcome };
 }

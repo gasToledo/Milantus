@@ -239,28 +239,40 @@ export function ToastViewport() {
 }
 
 /** Un aviso (`showAppMessage`): ícono, color **y** texto, los tres; Radix lo
- *  anuncia como región viva. */
+ *  anuncia como región viva. [action] es el «Deshacer» de `onUndo`: con él
+ *  dura lo que un error, para que dé tiempo a tocarlo. */
 export function Toast({
   tone,
   message,
   open,
   onOpenChange,
+  action,
 }: {
   tone: ToastTone;
   message: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  action?: { label: string; onSelect: () => void };
 }) {
   const Icon = TOAST_ICON[tone];
   return (
     <ToastPrimitive.Root
       open={open}
       onOpenChange={onOpenChange}
-      duration={TOAST_MS[tone]}
+      duration={action ? TOAST_MS.error : TOAST_MS[tone]}
       className="card flex items-center gap-2.5 px-4 py-3"
     >
       <Icon size={20} aria-hidden="true" className={cx('shrink-0', TOAST_COLOR[tone])} />
-      <ToastPrimitive.Description className="text-[14px] text-on-surface">{message}</ToastPrimitive.Description>
+      <ToastPrimitive.Description className="min-w-0 flex-1 text-[14px] text-on-surface">{message}</ToastPrimitive.Description>
+      {action && (
+        <ToastPrimitive.Action
+          altText={action.label}
+          onClick={action.onSelect}
+          className="shrink-0 rounded-[var(--radius-nav)] px-2 py-1 text-[14px] font-semibold text-gold hover:bg-plaque"
+        >
+          {action.label}
+        </ToastPrimitive.Action>
+      )}
     </ToastPrimitive.Root>
   );
 }

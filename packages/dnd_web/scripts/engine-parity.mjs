@@ -62,8 +62,14 @@ if (casos.length < 5) {
 
 let fallas = 0;
 for (const archivo of casos.sort()) {
-  const { character, expected } = JSON.parse(readFileSync(resolve(base, archivo), 'utf8'));
-  const obtenido = JSON.parse(motor.compute(JSON.stringify(character), catalogo));
+  const { character, action, seed, expected } = JSON.parse(readFileSync(resolve(base, archivo), 'utf8'));
+  // Un caso con `action` prueba `act` (la ficha que el cliente guarda); el
+  // resto, `compute`.
+  const obtenido = JSON.parse(
+    action
+      ? motor.act(JSON.stringify(character), catalogo, JSON.stringify(action), seed)
+      : motor.compute(JSON.stringify(character), catalogo),
+  );
   // `JSON.stringify` compara también el orden de las claves, que un
   // `deepEqual` dejaría pasar.
   if (JSON.stringify(obtenido) === JSON.stringify(expected)) {

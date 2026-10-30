@@ -324,19 +324,9 @@ extension _SheetCombatSection on _SheetScreenState {
   }
 
   /// PG máximos de un compañero invocado, o null si su forma ya no está en el
-  /// catálogo.
-  int? _companionMaxHp(ComputedSheet s, CompanionInstance instance) {
-    for (final option in s.companions) {
-      if (option.id != instance.optionId) continue;
-      final form = option.form(instance.creatureId);
-      if (form == null) return null;
-      return resolveCreatureInt(
-        form.hp,
-        _companionVars(s, spellLevel: instance.spellLevel),
-      );
-    }
-    return null;
-  }
+  /// catálogo. La regla vive en el motor: el cliente React descansa con ella.
+  int? _companionMaxHp(ComputedSheet s, CompanionInstance instance) =>
+      CombatOps.companionMaxHp(s, instance);
 
   Widget _restResourcesCard(ComputedSheet s) {
     final muted = Theme.of(context).colorScheme.onSurfaceVariant;
@@ -528,10 +518,8 @@ extension _SheetCombatSection on _SheetScreenState {
     );
   }
 
-  /// Deja el gasto dentro de [0, máximo]. En una reserva, lo que se pide
-  /// puede pasarse de lo que queda.
   void _setUsed(CharacterResource r, int used) =>
-      _c.combat.resourceUsage[r.key] = used.clamp(0, r.max);
+      CombatOps.setResourceUsed(_c.combat, r, used);
 
   /// Cuántos puntos de una reserva gastar o recuperar. Null si se cancela o
   /// no es un número positivo.
@@ -670,14 +658,7 @@ extension _SheetCombatSection on _SheetScreenState {
   /// [spellLevel] es el del espacio gastado al invocar; congelado en la
   /// instancia, así que un corcel ya convocado no mejora al subir de nivel.
   CreatureVars _companionVars(ComputedSheet s, {int spellLevel = 0}) =>
-      CreatureVars.from(
-        level: s.level,
-        proficiencyBonus: s.proficiencyBonus,
-        abilityModifiers: s.abilityModifiers,
-        spellAttackBonus: s.spellcasting?.attackBonus ?? 0,
-        spellSaveDc: s.spellcasting?.saveDc ?? 0,
-        spellLevel: spellLevel,
-      );
+      CombatOps.companionVars(s, spellLevel: spellLevel);
 
   // --------------------------------------------------------- Forma Salvaje
 

@@ -1,13 +1,16 @@
 import type { Catalog, CharacterFields, ComputedSheet } from '../engine';
 import { accentOf, nameOf } from '../api/catalog';
+import type { SheetWriter } from './writer';
 
 /** Lo que toda pieza de la ficha recibe: el personaje (ya migrado), la ficha
  *  que calculó el motor y el catálogo con el que se calculó (oficial +
- *  homebrew), para los nombres. */
+ *  homebrew), para los nombres. [write] solo existe en la ficha propia: sin
+ *  él, ningún componente muestra un control que escriba. */
 export interface SheetModel {
   character: CharacterFields;
   sheet: ComputedSheet;
   catalog: Catalog;
+  write?: SheetWriter;
 }
 
 /** Cada clase con su nivel y su subclase, en el orden de la ficha (el orden

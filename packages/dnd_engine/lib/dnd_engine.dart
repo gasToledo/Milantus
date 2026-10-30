@@ -39,6 +39,7 @@ export 'src/engine/encounter_difficulty.dart';
 export 'src/engine/encounter_monsters.dart';
 export 'src/engine/initiative.dart';
 export 'src/engine/combat_ops.dart';
+export 'src/engine/sheet_actions.dart';
 export 'src/engine/coin_ops.dart';
 export 'src/engine/inventory_ops.dart';
 export 'src/engine/wild_shape.dart';
