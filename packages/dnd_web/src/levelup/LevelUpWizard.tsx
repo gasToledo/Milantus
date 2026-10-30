@@ -11,7 +11,7 @@ import {
   type LevelUpDraft,
   type LevelUpView,
 } from '../engine';
-import { codexEntries, type CodexDetail } from '../codex/entries';
+import { codexEntries, fold, type CodexDetail } from '../codex/entries';
 import { useLang, useTexts } from '../i18n/context';
 import type { Lang, Texts } from '../i18n/texts';
 import { characterHref, FLUTTER_HOME, navigate } from '../router';
@@ -189,7 +189,7 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
       );
       break;
     case 'mejora':
-      main = <AsiStep {...{ t, lang, view, draft, setDraft, sheet, after, featQuery, setFeatQuery, setFocus }} />;
+      main = <AsiStep {...{ t, view, draft, setDraft, sheet, after, featQuery, setFeatQuery, setFocus }} />;
       break;
     case 'revision':
       main = (
@@ -417,7 +417,6 @@ function SummaryStep({
 /** Mejora de característica o dote, con el +1 de los dones épicos. */
 function AsiStep({
   t,
-  lang,
   view,
   draft,
   setDraft,
@@ -428,7 +427,6 @@ function AsiStep({
   setFocus,
 }: {
   t: Texts;
-  lang: string;
   view: LevelUpView;
   draft: LevelUpDraft;
   setDraft: (f: (d: LevelUpDraft) => LevelUpDraft) => void;
@@ -470,8 +468,14 @@ function AsiStep({
     </div>
   );
 
-  const needle = featQuery.trim().toLocaleLowerCase(lang);
-  const feats = view.featOptions.filter((f) => needle === '' || f.name.toLocaleLowerCase(lang).includes(needle));
+  // Sin tildes ni mayúsculas, como el Códice, y por palabras sueltas: «dos
+  // armas» encuentra «Combatiente con Dos Armas» y «combatiente fuerza», su
+  // variante de Fuerza.
+  const words = fold(featQuery).split(/\s+/).filter(Boolean);
+  const feats = view.featOptions.filter((f) => {
+    const name = fold(f.name);
+    return words.every((w) => name.includes(w));
+  });
 
   return (
     <>
