@@ -34,6 +34,7 @@ import { Tooltip } from '../ui/primitives';
 import { NavGroup, NavItem, Shell, SidebarBack } from '../ui/Shell';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { CATEGORY_GROUPS, codexEntries, fold, type CodexEntry } from './entries';
+import { useListFitsViewport } from './listHeight';
 
 /** Ícono por categoría (los de `CodexCategory` en Flutter, en lucide). */
 export const ICONS: Record<CodexCategory, LucideIcon> = {
@@ -284,6 +285,7 @@ export function CategoryView({
   // La entrada abierta queda a la vista en la lista: llegando por un enlace a
   // Bola de Fuego, estaría tres niveles más abajo.
   const listRef = useRef<HTMLElement>(null);
+  useListFitsViewport(listRef);
   useEffect(() => {
     listRef.current?.querySelector('[aria-current="true"]')?.scrollIntoView({ block: 'nearest' });
   }, [open?.id]);

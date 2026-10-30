@@ -3,6 +3,7 @@ import { ArrowLeft, Search, X } from 'lucide-react';
 import { useSheetCatalog } from '../api/queries';
 import { bestiary, type BestiaryRow, type Catalog } from '../engine';
 import { fold } from '../codex/entries';
+import { useListFitsViewport } from '../codex/listHeight';
 import { useLang, useTexts } from '../i18n/context';
 import { bestiaryHref, dmBestiaryHref, Link } from '../router';
 import { DmHeader } from '../dm/DmHeader';
@@ -138,6 +139,7 @@ function Browser({
 
   // La criatura abierta queda a la vista en una lista de 300.
   const listRef = useRef<HTMLElement>(null);
+  useListFitsViewport(listRef);
   useEffect(() => {
     listRef.current?.querySelector('[aria-current="true"]')?.scrollIntoView({ block: 'nearest' });
   }, [open?.row.id]);

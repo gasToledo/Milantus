@@ -75,7 +75,7 @@ export function Shell({
       </div>
 
       {/* Debajo de 900 px: barra con la marca y el botón del cajón. */}
-      <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-hairline bg-surface pr-3 shell:hidden">
+      <header className="sticky top-0 z-30 flex h-[var(--topbar-height)] items-center gap-2 border-b border-hairline bg-surface pr-3 shell:hidden">
         <div className="min-w-0 flex-1">
           <SidebarBrand />
         </div>

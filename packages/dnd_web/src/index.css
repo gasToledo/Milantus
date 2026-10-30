@@ -36,6 +36,8 @@
   --radius-nav: 9px;
   --border-hairline: 1px solid var(--hairline);
   --sidebar-width: 236px;
+  /* La barra de arriba debajo de 900 px: lo `sticky` se ancla debajo de ella. */
+  --topbar-height: 72px;
   /* La única sombra del sistema: el hover de la tarjeta de personaje
      (`diseno-web.md` §3.4 y Apéndice B, `cardHover`). */
   --shadow-card-hover: 0 10px 26px #00000046;
@@ -292,15 +294,24 @@ body {
     display: block;
   }
   /* La lista tiene su propio scroll y queda a la vista mientras se lee el
-     detalle: con 392 conjuros, estirar la página la volvía una pared. */
+     detalle: con 392 conjuros, estirar la página la volvía una pared. Su alto
+     se cuenta desde donde empieza (`useListFitsViewport`) y no desde arriba
+     de la ventana: si no, el final quedaba abajo de la pantalla. */
   .codex-split .codex-list {
     position: sticky;
     top: 24px;
-    max-height: calc(100vh - 48px);
+    max-height: calc(100dvh - var(--codex-list-top, 24px) - 24px);
     overflow-y: auto;
   }
   .codex-back {
     display: none;
+  }
+}
+/* Con la barra de arriba (sin panel), anclada en 24 px la lista quedaba con
+   sus primeras entradas tapadas por la barra. */
+@media (max-width: 899.98px) {
+  .codex-split .codex-list {
+    top: calc(var(--topbar-height) + 16px);
   }
 }
 
