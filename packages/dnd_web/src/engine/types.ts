@@ -297,6 +297,10 @@ export interface InventoryLine {
   attuned: boolean;
   requiresAttunement: boolean;
   magic: boolean;
+  /** Precio de catálogo por unidad de `quantity` y el sugerido al vender (la
+   *  mitad), en cobre. */
+  costCp: number;
+  salePriceCp: number;
   charges: number | null;
   maxCharges: number | null;
   note: string;

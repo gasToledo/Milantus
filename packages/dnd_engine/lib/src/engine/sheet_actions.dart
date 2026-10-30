@@ -59,6 +59,12 @@ class SheetActions {
   ///   `offHand` y `twoHanded` alternan la marca del arma; `removeItem` saca
   ///   la línea entera.
   /// - `setCoins` con `coins` (denominación → cantidad).
+  /// - `addItem` con `item`: suma sin pagar (botín, regalo).
+  /// - `buy` con `item`, `quantity`, `unitPriceCp` y `at` (la fecha del
+  ///   asiento en «Cuentas», `AAAA-MM-DD`, que la pone quien llama para que
+  ///   el motor no dependa del reloj); `outcome.paid` es false si no alcanzó
+  ///   y la ficha vuelve intacta.
+  /// - `sell` con `entry`, `quantity`, `unitPriceCp` y `at`.
   ///
   /// Una acción desconocida lanza [FormatException]: un cliente desfasado no
   /// tiene que guardar una ficha que el motor no tocó creyendo que sí.
@@ -227,6 +233,28 @@ class SheetActions {
             for (final e in (action['coins'] as Map).entries)
               e.key as String: (e.value as num).toInt(),
           }),
+        );
+      case 'addItem':
+        c = InventoryOps.add(c, action['item'] as String);
+      case 'buy':
+        final bought = InventoryOps.buy(
+          c,
+          action['item'] as String,
+          repo,
+          quantity: (action['quantity'] as num).toInt(),
+          unitPriceCp: (action['unitPriceCp'] as num).toInt(),
+          at: DateTime.parse(action['at'] as String),
+        );
+        outcome['paid'] = bought != null;
+        c = bought ?? c;
+      case 'sell':
+        c = InventoryOps.sell(
+          c,
+          action['entry'] as String,
+          repo,
+          quantity: (action['quantity'] as num).toInt(),
+          unitPriceCp: (action['unitPriceCp'] as num).toInt(),
+          at: DateTime.parse(action['at'] as String),
         );
       default:
         throw FormatException('Acción de ficha desconocida: ${action['type']}');

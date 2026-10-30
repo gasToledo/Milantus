@@ -420,7 +420,18 @@ repiten acá.
   manos y quitar, que avisa con «Deshacer». Las reglas que estaban en el widget
   de Flutter (la mano secundaria única, el tope de cargas, qué se equipa, la
   bolsa sin monedas en cero) pasaron a `InventoryOps` y `CoinOps`, y Flutter
-  las usa de ahí. Agregar del catálogo, comprar y vender son 5b2.
+  las usa de ahí. Desde 5b2, **«Agregar objeto»** abre el catálogo
+  (`src/sheet/ItemCatalog.tsx`, el `ItemCatalogDialog` de Flutter): buscador,
+  pills de familia y, por fila, «Gratis» (suma sin pagar y el catálogo sigue
+  abierto) y «Comprar», apagado con «te faltan…» si la bolsa no alcanza.
+  Comprar, y «Vender…» del menú de la fila, abren el diálogo de Flutter
+  (`TradeDialog`): cantidad, precio por unidad en po, pp y pc que se puede
+  corregir, y la cuenta —qué sale de la bolsa, el vuelto, cuánto falta o cómo
+  queda— que hace el motor (`tradePreview`, sobre `CoinOps.plan` y
+  `receive`, las mismas que aplican `buy` y `sell`). Las dos se anotan en
+  «Cuentas» del Diario con la fecha local que manda el cliente, y avisan con
+  «Deshacer». Lo único que React resta es el precio de una fila contra la
+  bolsa para el «te faltan»; la compra la vuelve a validar el motor.
   - **Toda escritura la hace el motor.** `actOn` (`act` de `js/entrypoint.dart`,
     sobre `SheetActions.apply` del engine) recibe la ficha y la acción y
     devuelve la ficha nueva, migrada y con el `schemaVersion` actual, más lo
@@ -473,7 +484,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
 5. Edición completa: creador de personajes, subida de nivel, inventario. Por
    partes: 5a, la Inspiración Heroica y la concentración *(existe)*; 5b1,
    editar la mochila desde la fila y las monedas *(existe)*; 5b2, catálogo,
-   comprar y vender; 5c, subida de nivel; 5d, creador.
+   comprar y vender *(existe)*; 5c, subida de nivel; 5d, creador.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
    combate, vínculos y códigos de campaña. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de
@@ -564,7 +575,8 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    lo cuente) y que «Deshacer» vuelva a guardar la ficha de antes, que la
    Inspiración Heroica y la concentración guarden lo del motor, que la mochila
    se edite desde la fila (equipar, cantidad, nota, monedas) y que quitar se
-   deshaga, y
+   deshaga, que comprar del catálogo y vender guarden lo del motor y vender
+   se deshaga, y
    que la ficha de otra cuenta (la de un miembro, para el DM) no
    tenga un solo control (`e2e/escritura.spec.ts`, con una cuenta propia para
    no cambiar lo que leen las demás); y que una cuenta sin `webV2` vea
@@ -636,8 +648,8 @@ Para que nadie lo dé por hecho:
   Entre ellos, reordenar, marcar favorito, crear, renombrar o borrar
   personajes, condiciones, compañeros (y con ellos lanzar gastando espacio o
   uso gratis), cambiar el truco innato y Forma Salvaje; en el inventario,
-  agregar del catálogo, comprar y vender (5b2), los planos del Artífice y los
-  objetivos de arma de un rasgo (Pacto del Filo), y
+  los planos del Artífice y los objetivos de arma de un rasgo (Pacto del
+  Filo), y
   escribir en `/api/settings` (por eso el tema elegido en el navegador gana
   sobre el de la cuenta).
 - Control de versión en el servidor para las escrituras (rechazar una copia

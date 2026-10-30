@@ -13,6 +13,8 @@ export interface DialogAction {
   tone?: 'gold' | 'crimson' | 'verdant';
   /** Cerrar al tocarla (por defecto sí: «Cancelar», «Entendido»). */
   closes?: boolean;
+  /** Apagada: «Comprar» cuando la bolsa no alcanza. */
+  disabled?: boolean;
 }
 
 const TONE: Record<NonNullable<DialogAction['tone']>, string> = {
@@ -76,8 +78,9 @@ export function AppDialog({
                 <button
                   type="button"
                   onClick={a.onSelect}
+                  disabled={a.disabled}
                   className={cx(
-                    'min-h-12 flex-1 px-3 text-[14px] hover:bg-surface',
+                    'min-h-12 flex-1 px-3 text-[14px] hover:bg-surface disabled:pointer-events-none disabled:opacity-40',
                     i > 0 && 'border-l border-hairline',
                     a.primary && 'font-bold',
                     a.tone ? TONE[a.tone] : a.primary ? 'text-gold' : 'text-on-surface',

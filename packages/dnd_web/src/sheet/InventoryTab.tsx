@@ -8,6 +8,7 @@ import {
   EllipsisVertical,
   Luggage,
   Package,
+  Plus,
   Shield,
   Sparkles,
   Sword,
@@ -16,7 +17,7 @@ import {
   X,
   type LucideIcon,
 } from 'lucide-react';
-import { inventoryOf, type CharacterJson, type InventoryLine } from '../engine';
+import { formatCost, inventoryOf, type CharacterJson, type InventoryLine } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import type { Texts } from '../i18n/texts';
 import { AppDialog } from '../ui/AppDialog';
@@ -26,6 +27,7 @@ import { cx } from '../ui/cx';
 import { Eyebrow, Pips, SpendRecoverButtons, ThinBar } from '../ui/data';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Tooltip } from '../ui/primitives';
 import { AppEmptyState } from '../ui/status';
+import { coinLabels, ItemCatalogDialog, TradeDialog, type CatalogRow, type Trade } from './ItemCatalog';
 import type { SheetModel } from './model';
 import type { SheetWriter } from './writer';
 
@@ -76,7 +78,15 @@ const COINS = ['pp', 'gp', 'ep', 'sp', 'cp'] as const;
 type Filter = 'all' | 'equipped' | 'magic';
 
 /** El diálogo de una línea que está abierto: cantidad exacta o nota. */
-type Ask = { kind: 'quantity' | 'note'; line: InventoryLine };
+type Ask = { kind: 'quantity' | 'note' | 'sell'; line: InventoryLine };
+
+/** La fecha del asiento en «Cuentas», local y no UTC: a la noche, UTC ya es
+ *  mañana. */
+function today(): string {
+  const d = new Date();
+  const two = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${two(d.getMonth() + 1)}-${two(d.getDate())}`;
+}
 
 /**
  * Pestaña Inventario: la bolsa (monedas, carga y sintonización) y la mochila
@@ -85,14 +95,41 @@ type Ask = { kind: 'quantity' | 'note'; line: InventoryLine };
  * y la capacidad son de `ComputedSheet`. En la ficha propia (`model.write`)
  * se escriben las monedas y, por fila, equipar, cantidad, cargas y el menú de
  * Flutter (cantidad exacta, nota, sintonizar, mano secundaria, a dos manos,
- * quitar); cada cambio lo hace el motor. Agregar, comprar y vender siguen en
- * Flutter.
+ * vender, quitar), más «Agregar objeto» con el catálogo (`ItemCatalog.tsx`);
+ * cada cambio lo hace el motor.
  */
 export function InventoryTab({ model }: { model: SheetModel }) {
   const t = useTexts();
   const lang = useLang();
   const { character, sheet, catalog, write } = model;
   const [ask, setAsk] = useState<Ask | null>(null);
+  const [catalogOpen, setCatalogOpen] = useState(false);
+  const [buying, setBuying] = useState<CatalogRow | null>(null);
+  const coins = character.coins ?? {};
+
+  const buy = (row: CatalogRow, trade: Trade) => {
+    const r = write!.act({ type: 'buy', item: row.id, quantity: trade.quantity, unitPriceCp: trade.unitCp, at: today() });
+    setBuying(null);
+    if (!r) return;
+    if (!r.outcome.paid) {
+      write!.notify(t.tradeNotPaid, { tone: 'error' });
+      return;
+    }
+    // El catálogo se cierra para que «Deshacer» quede a mano, como en Flutter.
+    setCatalogOpen(false);
+    write!.notify(t.invBought(trade.quantity, row.name, trade.total), { undo: () => write!.restore(r.before) });
+  };
+  const sell = (line: InventoryLine, trade: Trade) => {
+    const r = write!.act({
+      type: 'sell',
+      entry: line.entryId,
+      quantity: trade.quantity,
+      unitPriceCp: trade.unitCp,
+      at: today(),
+    });
+    setAsk(null);
+    if (r) write!.notify(t.invSold(trade.quantity, line.name, trade.total), { undo: () => write!.restore(r.before) });
+  };
   // `character` es el `Character.toJson` migrado entero (ver `CharacterPage`);
   // el tipo solo nombra lo que la ficha lee, así que vuelve a su forma JSON.
   const lines = useMemo(() => inventoryOf(character as unknown as CharacterJson, catalog), [character, catalog]);
@@ -192,6 +229,11 @@ export function InventoryTab({ model }: { model: SheetModel }) {
             <span className="font-display text-[16px] text-on-surface">{t.packHeading}</span>
             <span className="text-[12px] text-text-muted tabular-nums">{t.itemsCount(lines.length)}</span>
           </h2>
+          {write && (
+            <Button tone="soft" icon={Plus} onClick={() => setCatalogOpen(true)}>
+              {t.catalogAddTitle}
+            </Button>
+          )}
           {lines.length > 0 && (
             <>
               <div role="search" className="relative min-w-[min(200px,100%)] flex-[1_1_200px] @xl:max-w-[260px]">
@@ -312,7 +354,41 @@ export function InventoryTab({ model }: { model: SheetModel }) {
           </table>
         )}
       </section>
-      {ask && write && <EntryDialog ask={ask} write={write} onClose={() => setAsk(null)} />}
+      {ask && write && ask.kind !== 'sell' && <EntryDialog ask={ask} write={write} onClose={() => setAsk(null)} />}
+      {ask && write && ask.kind === 'sell' && (
+        <TradeDialog
+          buying={false}
+          title={t.invSellTitle(ask.line.name)}
+          detail={t.invSellDetail(ask.line.quantity, formatCost(ask.line.costCp, coinLabels(t)))}
+          bundleSize={ask.line.bundleSize}
+          catalogCp={ask.line.salePriceCp}
+          maxQuantity={ask.line.quantity}
+          coins={coins}
+          onConfirm={(trade) => sell(ask.line, trade)}
+          onClose={() => setAsk(null)}
+        />
+      )}
+      {catalogOpen && write && (
+        <ItemCatalogDialog
+          catalog={catalog}
+          coins={coins}
+          onAdd={(row) => write.act({ type: 'addItem', item: row.id })}
+          onBuy={setBuying}
+          onClose={() => setCatalogOpen(false)}
+        />
+      )}
+      {buying && write && (
+        <TradeDialog
+          buying
+          title={t.invBuyTitle(buying.name)}
+          detail={buying.detail}
+          bundleSize={buying.bundleSize}
+          catalogCp={buying.costCp}
+          coins={coins}
+          onConfirm={(trade) => buy(buying, trade)}
+          onClose={() => setBuying(null)}
+        />
+      )}
     </div>
   );
 }
@@ -562,6 +638,7 @@ function ItemMenu({
         {line.offHand !== null && toggle(t.invOffHand, line.offHand, () => write.act({ type: 'offHand', entry }))}
         {line.twoHanded !== null &&
           toggle(t.invTwoHanded, line.twoHanded, () => write.act({ type: 'twoHanded', entry }))}
+        <DropdownMenuItem onSelect={() => onAsk('sell')}>{t.invSellMenu}</DropdownMenuItem>
         <DropdownMenuItem
           onSelect={() => {
             const r = write.act({ type: 'removeItem', entry });

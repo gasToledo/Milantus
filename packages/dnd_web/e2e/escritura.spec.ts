@@ -1,5 +1,5 @@
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
-import { actOn, computeSheet, migrateCharacter, type CharacterJson, type SheetAction } from '../src/engine';
+import { actOn, computeSheet, inventoryOf, migrateCharacter, type CharacterJson, type SheetAction } from '../src/engine';
 import { resourceKey } from '../src/sheet/format';
 import { api, catalogo, TOKEN_DM, TOKEN_ESCRITURA, vigilarEscrituras, type PersonajeApi } from './helpers';
 
@@ -244,6 +244,50 @@ test('la mochila se edita desde la fila y quitar se deshace', async ({ page, req
   await expect(fila).toHaveCount(0);
   expect(await proximoGuardado(page, () => page.getByRole('button', { name: 'Deshacer' }).click())).toEqual(
     migrateCharacter(antes),
+  );
+});
+
+test('comprar del catálogo y vender pagan con la cuenta del motor, y vender se deshace', async ({
+  page,
+  request,
+}) => {
+  const daga = catalogo().weapons.find((w) => w.id === 'dagger')!;
+  const nombre = String(daga.name);
+  const d = new Date();
+  const hoy = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  await page.goto(`/v2/personajes/${ILSE}/inventario`);
+
+  const compra: SheetAction = { type: 'buy', item: 'dagger', quantity: 1, unitPriceCp: Number(daga.costCp), at: hoy };
+  const comprada = segunMotor(await ilse(request), compra);
+  expect(
+    await proximoGuardado(page, async () => {
+      await page.getByRole('button', { name: 'Agregar objeto' }).click();
+      await page.getByRole('searchbox', { name: 'Buscar objeto…' }).fill(nombre);
+      await page.getByRole('button', { name: `Comprar ${nombre}`, exact: true }).click();
+      await page.getByRole('button', { name: 'Comprar', exact: true }).click();
+    }),
+  ).toEqual(comprada);
+  // El catálogo se cierra para dejar a mano «Deshacer».
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+
+  const linea = inventoryOf(comprada, catalogo()).find((l) => l.itemId === 'dagger')!;
+  const venta: SheetAction = {
+    type: 'sell',
+    entry: linea.entryId,
+    quantity: 1,
+    unitPriceCp: linea.salePriceCp,
+    at: hoy,
+  };
+  expect(
+    await proximoGuardado(page, async () => {
+      await page.locator(`tr[data-entry="${linea.entryId}"]`).getByRole('button', { name: `Acciones de ${nombre}` }).click();
+      await page.getByRole('menuitem', { name: 'Vender…' }).click();
+      await page.getByRole('button', { name: 'Vender', exact: true }).click();
+    }),
+  ).toEqual(segunMotor(comprada, venta));
+  // El aviso de la compra puede seguir a la vista: «Deshacer» es el último.
+  expect(await proximoGuardado(page, () => page.getByRole('button', { name: 'Deshacer' }).last().click())).toEqual(
+    migrateCharacter(comprada),
   );
 });
 

@@ -17,6 +17,9 @@ interface DartEngine {
   catalogLabel(kind: string, id: string): string;
   catalogLabelOrder(kind: string): string;
   formatCost(cp: number, labelsJson: string): string;
+  trade(requestJson: string, labelsJson: string): string;
+  coinParts(cp: number): string;
+  formatAmount(cp: number, labelsJson: string): string;
   abilityModifier(score: number): number;
   bestiary(catalogJson: string): string;
   npcs(entriesJson: string, catalogJson: string): string;
@@ -142,6 +145,46 @@ export function formatCost(cp: number, labels: Record<string, string>): string {
   return engine().formatCost(cp, JSON.stringify(labels));
 }
 
+/** Lo que se escribe en el diálogo de comprar o vender. */
+export interface TradeRequest {
+  coins: Record<string, number>;
+  /** Precio por unidad en po, pp y pc, como se escribió. */
+  price: Record<string, number>;
+  quantity: number;
+  buying: boolean;
+}
+
+/** La cuenta del diálogo (`trade` del motor): montos en cobre y ya escritos. */
+export interface TradePreview {
+  unitCp: number;
+  totalCp: number;
+  total: string;
+  purseCp: number;
+  purse: string;
+  /** Cuánto falta, si al comprar no alcanza; `null` si alcanza. */
+  short: string | null;
+  spent: string;
+  change: string;
+  after: string;
+  afterCoins: string;
+}
+
+/** La cuenta de comprar o vender con las funciones del motor que después
+ *  aplican `buy` y `sell` (`CoinOps.plan`, `receive`). */
+export function tradePreview(request: TradeRequest, labels: Record<string, string>): TradePreview {
+  return JSON.parse(engine().trade(JSON.stringify(request), JSON.stringify(labels))) as TradePreview;
+}
+
+/** [cp] partido en oro, plata y cobre (`CoinOps.changeFor`). */
+export function coinParts(cp: number): Record<string, number> {
+  return JSON.parse(engine().coinParts(cp)) as Record<string, number>;
+}
+
+/** Un monto en cobre para leer («7 po 5 pp», `CoinOps.formatAmount`). */
+export function formatAmount(cp: number, labels: Record<string, string>): string {
+  return engine().formatAmount(cp, JSON.stringify(labels));
+}
+
 /** El modificador de una puntuación de característica (`abilityModifier`). */
 export function abilityModifier(score: number): number {
   return engine().abilityModifier(score);
@@ -209,7 +252,10 @@ export type SheetAction =
   | { type: 'setQuantity' | 'setCharges'; entry: string; value: number }
   | { type: 'note'; entry: string; text: string }
   | { type: 'offHand' | 'twoHanded' | 'removeItem'; entry: string }
-  | { type: 'setCoins'; coins: Record<string, number> };
+  | { type: 'setCoins'; coins: Record<string, number> }
+  | { type: 'addItem'; item: string }
+  | { type: 'buy'; item: string; quantity: number; unitPriceCp: number; at: string }
+  | { type: 'sell'; entry: string; quantity: number; unitPriceCp: number; at: string };
 
 /** Lo que cuenta el motor de una acción, para el aviso. Cada campo existe
  *  solo en la acción que lo da (ver `SheetActions.apply`). */
@@ -221,6 +267,7 @@ export interface SheetOutcome {
   inspirationGained?: boolean;
   itemsRecharged?: number;
   dismissed?: string[];
+  paid?: boolean;
 }
 
 /**

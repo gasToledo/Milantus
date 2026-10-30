@@ -163,6 +163,10 @@ Map<String, dynamic> _inventoryLine(
     'attuned': e.attuned,
     'requiresAttunement': item?.requiresAttunement ?? false,
     'magic': (item?.isMagic ?? false) || replica,
+    // Precio de catálogo por unidad de `quantity` y lo que se ofrece al
+    // vender (la mitad, `suggestedSalePriceCp`).
+    'costCp': resolved.costCp,
+    'salePriceCp': InventoryOps.suggestedSalePriceCp(e, repo),
     'charges': e.charges,
     'maxCharges': item?.maxCharges,
     'note': e.note,
@@ -216,6 +220,51 @@ String catalogLabelOrder(String kind) => jsonEncode(switch (kind) {
 /// el cliente ([labelsJson]: `{"cp": "pc", …}`), porque en inglés «pp» es
 /// platino y no plata.
 String formatCostFor(int cp, String labelsJson) => formatCost(
+      cp,
+      labels: (jsonDecode(labelsJson) as Map).cast<String, String>(),
+    );
+
+/// La cuenta del diálogo de comprar o vender (`TradeDialog` de Flutter), con
+/// las mismas funciones que después aplican `buy` y `sell`: el precio por
+/// unidad sale de lo que se escribió en po, pp y pc; al comprar, qué monedas
+/// salen, el vuelto y cuánto falta si no alcanza; al vender, cómo queda la
+/// bolsa. Los montos van en cobre y ya escritos con [labelsJson].
+String trade(String requestJson, String labelsJson) {
+  final r = jsonDecode(requestJson) as Map<String, dynamic>;
+  final labels = (jsonDecode(labelsJson) as Map).cast<String, String>();
+  Map<String, int> ints(Object? m) => {
+        for (final e in ((m as Map?) ?? const {}).entries)
+          e.key as String: (e.value as num).toInt(),
+      };
+  final coins = ints(r['coins']);
+  final unitCp = CoinOps.totalCp(ints(r['price']));
+  final total = unitCp * (r['quantity'] as num).toInt();
+  final buying = r['buying'] == true;
+  final plan = buying ? CoinOps.plan(coins, total) : null;
+  final after = buying ? (plan?.purse ?? coins) : CoinOps.receive(coins, total);
+  final purse = CoinOps.totalCp(coins);
+  String amount(int cp) => CoinOps.formatAmount(cp, labels: labels);
+  String list(Map<String, int> m) => CoinOps.formatCoins(m, labels: labels);
+  return jsonEncode({
+    'unitCp': unitCp,
+    'totalCp': total,
+    'total': amount(total),
+    'purseCp': purse,
+    'purse': amount(purse),
+    'short': buying && plan == null ? amount(total - purse) : null,
+    'spent': plan == null ? '' : list(plan.spent),
+    'change': plan == null ? '' : list(plan.change),
+    'after': amount(CoinOps.totalCp(after)),
+    'afterCoins': list(after),
+  });
+}
+
+/// [cp] partido en oro, plata y cobre (`CoinOps.changeFor`): los tres campos
+/// del precio en el diálogo de comprar o vender.
+String coinParts(int cp) => jsonEncode(CoinOps.changeFor(cp));
+
+/// Un monto en cobre escrito para leer («7 po 5 pp», `CoinOps.formatAmount`).
+String formatAmountFor(int cp, String labelsJson) => CoinOps.formatAmount(
       cp,
       labels: (jsonDecode(labelsJson) as Map).cast<String, String>(),
     );
@@ -433,6 +482,9 @@ void main() {
   motor['catalogLabel'] = catalogLabel.toJS;
   motor['catalogLabelOrder'] = catalogLabelOrder.toJS;
   motor['formatCost'] = formatCostFor.toJS;
+  motor['trade'] = trade.toJS;
+  motor['coinParts'] = coinParts.toJS;
+  motor['formatAmount'] = formatAmountFor.toJS;
   motor['abilityModifier'] = abilityModifierOf.toJS;
   motor['bestiary'] = bestiary.toJS;
   motor['npcs'] = npcs.toJS;

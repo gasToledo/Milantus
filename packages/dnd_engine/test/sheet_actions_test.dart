@@ -191,6 +191,21 @@ void main() {
     );
   });
 
+  test('comprar sin fondos devuelve la ficha intacta y lo dice', () {
+    final c = monje().copyWith(coins: const {'cp': 1});
+
+    final r = act(c, {
+      'type': 'buy',
+      'item': 'dagger',
+      'quantity': 1,
+      'unitPriceCp': 200,
+      'at': '2026-10-30',
+    });
+
+    expect(r.outcome['paid'], isFalse);
+    expect(r.character.toJson(), c.toJson());
+  });
+
   test('una acción desconocida no devuelve una ficha', () {
     expect(
       () => act(monje(), {'type': 'fly'}),
