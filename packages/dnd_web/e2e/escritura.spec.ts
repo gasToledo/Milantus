@@ -170,6 +170,35 @@ test('el descanso largo cura, recarga y lo cuenta; «Deshacer» devuelve tambié
   expect(deshecho).toEqual(migrateCharacter(antes));
 });
 
+test('la Inspiración Heroica y la concentración se marcan a mano y guardan lo del motor', async ({
+  page,
+  request,
+}) => {
+  const tiene = Boolean((await ilse(request)).combat.heroicInspiration);
+  const bendecir = String(catalogo().spells.find((s) => s.id === 'bless')!.name);
+  await page.goto(COMBATE);
+
+  const pasos: [() => Promise<void>, SheetAction][] = [
+    [
+      () => page.getByRole('button', { name: /^Inspiración Heroica/ }).click(),
+      { type: 'heroicInspiration', value: !tiene },
+    ],
+    [
+      async () => {
+        await page.getByRole('button', { name: new RegExp(`^${bendecir}`) }).click();
+        await page.getByRole('button', { name: 'Concentrar', exact: true }).click();
+      },
+      { type: 'concentrate', spell: bendecir },
+    ],
+    [() => page.getByRole('button', { name: 'Terminar', exact: true }).click(), { type: 'endConcentration' }],
+  ];
+  for (const [tocar, accion] of pasos) {
+    const esperado = segunMotor(await ilse(request), accion);
+    expect(await proximoGuardado(page, tocar)).toEqual(esperado);
+    expect(await ilse(request)).toEqual(esperado);
+  }
+});
+
 test('la ficha de otra cuenta no tiene controles para escribir', async ({ context, page, baseURL }) => {
   await context.clearCookies();
   await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);

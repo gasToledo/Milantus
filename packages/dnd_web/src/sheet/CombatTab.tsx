@@ -1,4 +1,4 @@
-import { Bed, BookOpen, Check, Coffee, Crosshair, Dices, Heart, Minus, Plus, RefreshCw, Shield, ShieldHalf, Zap } from 'lucide-react';
+import { Bed, BookOpen, Check, Coffee, Crosshair, Dices, Heart, Minus, Plus, RefreshCw, Shield, ShieldHalf, Star, Zap } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { nameOf } from '../api/catalog';
 import type { CharacterResource, InnateSpell, SpellcastingBlock } from '../engine';
@@ -20,7 +20,7 @@ import { ABILITIES, isReactionSpell } from './vocabulary';
  * Pestaña Combate: lo que se consulta en el turno y, en la ficha propia
  * (`model.write`), lo que se anota en él: daño, curación, PG temporales,
  * salvaciones de muerte, dados de golpe, espacios de conjuro, usos de
- * recursos y los descansos. Cada acción la hace el motor (`actOn`); acá no se
+ * recursos, los descansos, la Inspiración Heroica y la concentración. Cada acción la hace el motor (`actOn`); acá no se
  * suma ni se resta nada. Preparar conjuros y el resto de la edición siguen en
  * Flutter. Los números son del motor; de la mesa (lo crudo) solo los PG
  * actuales, lo gastado y las condiciones.
@@ -78,7 +78,7 @@ function HitPointsCard({ model }: { model: SheetModel }) {
             {t.hitDiceValue(Math.max(0, total - (used[size] ?? 0)), total, size)}
           </Line>
         ))}
-        {character.combat?.heroicInspiration && (
+        {!model.write && character.combat?.heroicInspiration && (
           <Line label={t.heroicInspiration}>
             <Check size={16} aria-hidden="true" className="inline text-gold" />
             <span className="sr-only">{t.yes}</span>
@@ -86,7 +86,36 @@ function HitPointsCard({ model }: { model: SheetModel }) {
         )}
       </dl>
       {model.write && <HitDieButton model={model} />}
+      {model.write && <InspirationToggle model={model} />}
     </Card>
+  );
+}
+
+/** El casillero de la Inspiración Heroica (`_heroicInspirationTile` de
+ *  Flutter): se toca para marcarla o gastarla. Con ella se pinta del dorado
+ *  suave de lo activo; sin ella se hunde a la placa. */
+function InspirationToggle({ model }: { model: SheetModel }) {
+  const t = useTexts();
+  const { character, sheet, write } = model;
+  const has = Boolean(character.combat?.heroicInspiration);
+  const help = has ? t.inspirationUse : sheet.heroicInspirationOnLongRest ? t.inspirationLongRest : t.inspirationGrant;
+  return (
+    <button
+      type="button"
+      aria-pressed={has}
+      title={has ? t.inspirationSpend : t.inspirationMark}
+      onClick={() => write!.act({ type: 'heroicInspiration', value: !has })}
+      className={`mt-3 flex w-full items-center gap-2.5 rounded-[var(--radius-card)] border px-3 py-2.5 text-left ${
+        has ? 'border-gold bg-gold-soft text-gold' : 'border-hairline bg-plaque text-text-muted'
+      }`}
+    >
+      <Star size={22} aria-hidden="true" fill={has ? 'currentColor' : 'none'} className="shrink-0" />
+      <span className="min-w-0 flex-1">
+        <span className="block font-medium">{t.heroicInspiration}</span>
+        <span className="mt-0.5 block text-[11px] text-on-surface-variant">{help}</span>
+      </span>
+      <span className="text-[11px] font-medium tracking-[1.2px]">{has ? t.inspirationHave : t.inspirationSpent}</span>
+    </button>
   );
 }
 
@@ -267,6 +296,9 @@ function AttacksCard({ model }: { model: SheetModel }) {
 function SpellsCard({ model }: { model: SheetModel }) {
   const t = useTexts();
   const { character, sheet, catalog, write } = model;
+  // El conjuro que se quiere empezar mientras hay compañeros que dependen de
+  // la concentración actual: se pregunta antes de despedirlos, como Flutter.
+  const [cutFor, setCutFor] = useState<string | null>(null);
   const blocks: SpellcastingBlock[] =
     sheet.spellcastingBlocks.length > 0
       ? sheet.spellcastingBlocks
@@ -331,9 +363,36 @@ function SpellsCard({ model }: { model: SheetModel }) {
     .filter((id) => !innateIds.has(id) && isReactionSpell(spell(id)))
     .map((id) => ({ id, name: nameOf(catalog.spells, id) ?? id, level: Number(spell(id)?.level ?? 0) }));
 
+  const previous = character.combat?.concentratingOn ?? null;
+  const dependents = (character.combat?.companions ?? [])
+    .filter((c) => c.concentration)
+    .map((c) => nameOf(catalog.creatures, c.creatureId) ?? c.creatureId);
+  const concentrate = (spell: string) => {
+    const r = write!.act({ type: 'concentrate', spell });
+    // Cambiar de conjuro se avisa después; empezar de cero no hace falta.
+    if (r && previous) {
+      const gone = r.outcome.dismissed ?? [];
+      write!.notify(t.spellsSwitched(spell, previous, gone.length, gone.join(', ')));
+    }
+  };
+  const onConcentrate = (spell: string) => {
+    if (spell === previous) return;
+    if (dependents.length > 0) setCutFor(spell);
+    else concentrate(spell);
+  };
+
   return (
     <Card id="spells" title={t.spellsHeading} icon={BookOpen}>
       <div className="flex flex-col gap-4">
+        {write && previous && (
+          <div className="flex items-center gap-2 rounded-[var(--radius-nav)] border border-gold px-3 py-2 text-[13px]">
+            <Zap size={18} aria-hidden="true" className="shrink-0 text-gold" />
+            <span className="min-w-0 flex-1">{t.spellsConcentratingOn(previous)}</span>
+            <Button tone="secondary" onClick={() => write.act({ type: 'endConcentration' })}>
+              {t.spellsEndConcentration}
+            </Button>
+          </div>
+        )}
         {blocks.map((b) => {
           const sc = b.spellcasting;
           const prepared = spellIdsFor(b.classId).size;
@@ -380,6 +439,7 @@ function SpellsCard({ model }: { model: SheetModel }) {
             preparation={sheet.spellcasting?.preparation ?? null}
             catalog={catalog.spells}
             innateNote={(s) => innateNote(s, t)}
+            onConcentrate={write ? onConcentrate : undefined}
           />
         </div>
 
@@ -405,6 +465,21 @@ function SpellsCard({ model }: { model: SheetModel }) {
           </div>
         )}
       </div>
+      {cutFor && (
+        <AppDialog
+          open
+          onOpenChange={(open) => !open && setCutFor(null)}
+          title={t.spellsCutTitle}
+          actions={[
+            { label: t.cancel },
+            { label: t.spellsConcentrateAnyway, primary: true, onSelect: () => concentrate(cutFor) },
+          ]}
+        >
+          <p className="text-[14px]">
+            {t.spellsCutBody(cutFor, previous ?? t.spellsCurrentConcentration, dependents.length, dependents.join(', '))}
+          </p>
+        </AppDialog>
+      )}
     </Card>
   );
 }

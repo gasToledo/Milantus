@@ -344,6 +344,8 @@ export interface CharacterFields {
     exhaustion?: number;
     heroicInspiration?: boolean;
     concentratingOn?: string | null;
+    /** `CompanionInstance.toJson`: lo que se va con la concentración. */
+    companions?: { creatureId: string; concentration?: boolean }[];
   };
   /** Denominación (`cp`, `sp`, `ep`, `gp`, `pp`) → cantidad. */
   coins?: Record<string, number>;

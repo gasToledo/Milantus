@@ -126,6 +126,34 @@ void main() {
     });
   });
 
+  test(
+      'concentrarse en otro conjuro despide a los compañeros que dependían '
+      'de la concentración, y repetir el mismo no', () {
+    CombatState combat() => CombatState(
+          concentratingOn: 'Hallar corcel',
+          companions: [
+            CompanionInstance(
+              optionId: 'corcel',
+              creatureId: 'warhorse',
+              concentration: true,
+            ),
+          ],
+        );
+
+    final mismo = act(monje(combat: combat()),
+        {'type': 'concentrate', 'spell': 'Hallar corcel'});
+    expect(mismo.character.combat.companions, hasLength(1));
+
+    final otro = act(
+        monje(combat: combat()), {'type': 'concentrate', 'spell': 'Bendecir'});
+    expect(otro.character.combat.concentratingOn, 'Bendecir');
+    expect(otro.character.combat.companions, isEmpty);
+    expect(otro.outcome['dismissed'], [repo.creature('warhorse')!.name]);
+
+    final fin = act(otro.character, {'type': 'endConcentration'});
+    expect(fin.character.combat.concentratingOn, isNull);
+  });
+
   test('una acción desconocida no devuelve una ficha', () {
     expect(
       () => act(monje(), {'type': 'fly'}),

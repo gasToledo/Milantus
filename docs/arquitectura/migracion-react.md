@@ -403,6 +403,15 @@ repiten acá.
   Heroica ganada y los objetos que recargaron al amanecer) y su **«Deshacer»**,
   que vuelve a guardar la ficha entera de antes del descanso (con la mochila
   de antes de la recarga), tal como la dio el motor.
+  Desde el paso 5: la **Inspiración Heroica** a mano (el casillero de Combate
+  se toca para marcarla o gastarla, como en Flutter) y la **concentración**:
+  «Concentrar» en cada conjuro de concentración de la lista (al desplegarlo) y
+  «Terminar» en el aviso de la tarjeta de conjuros. Si hay compañeros que
+  dependen de la concentración actual, se pregunta antes de despedirlos; cambiar
+  de conjuro se avisa después. En Flutter la lista **no lanza** conjuros: gastar
+  un espacio o el uso gratis al lanzar solo pasa al invocar un compañero, que
+  sigue en Flutter. El uso gratis de un conjuro innato es su recurso
+  (`innate-<id>`) y ya se gasta con los botones de recursos.
   - **Toda escritura la hace el motor.** `actOn` (`act` de `js/entrypoint.dart`,
     sobre `SheetActions.apply` del engine) recibe la ficha y la acción y
     devuelve la ficha nueva, migrada y con el `schemaVersion` actual, más lo
@@ -452,7 +461,9 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
 4. Escrituras de bajo riesgo *(existe)*: PG y salvaciones de muerte, usos de
    espacios, recursos y dados de golpe, y los descansos con «Deshacer», solo
    en la ficha propia.
-5. Edición completa: creador de personajes, subida de nivel, inventario.
+5. Edición completa: creador de personajes, subida de nivel, inventario. Por
+   partes: 5a, la Inspiración Heroica y la concentración *(existe)*; 5b,
+   inventario; 5c, subida de nivel; 5d, creador.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
    combate, vínculos y códigos de campaña. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de
@@ -597,11 +608,10 @@ hace seguro volver atrás es que **no hay nada que deshacer en el formato**:
 
 Para que nadie lo dé por hecho:
 
-- Lanzar un conjuro desde la lista (que en Flutter gasta su espacio o su uso
-  gratis) y la Inspiración Heroica a mano: quedan para el paso 5.
 - Toda otra escritura desde React: los pasos 5 a 7 están enteros por hacer.
   Entre ellos, reordenar, marcar favorito, crear, renombrar o borrar
-  personajes, condiciones, concentración, compañeros y Forma Salvaje, y
+  personajes, condiciones, compañeros (y con ellos lanzar gastando espacio o
+  uso gratis), cambiar el truco innato y Forma Salvaje, y
   escribir en `/api/settings` (por eso el tema elegido en el navegador gana
   sobre el de la cuenta).
 - Control de versión en el servidor para las escrituras (rechazar una copia

@@ -331,6 +331,25 @@ const es = {
   longRestInspiration: 'ganaste Inspiración Heroica',
   longRestItemsRecharged: (n: number) =>
     n === 1 ? '1 objeto mágico recuperó cargas' : `${n} objetos mágicos recuperaron cargas`,
+  inspirationUse: 'Repetí un dado apenas lo tirás y quedate con el resultado nuevo',
+  inspirationLongRest: 'La recuperás al terminar un descanso largo',
+  inspirationGrant: 'Marcala cuando el DM te la dé',
+  inspirationSpend: 'Gastar la Inspiración Heroica',
+  inspirationMark: 'Marcar que la tenés',
+  inspirationHave: 'LA TENÉS',
+  inspirationSpent: 'GASTADA',
+  spellsConcentrate: 'Concentrar',
+  spellsConcentratingOn: (spell: string) => `Concentrándote en ${spell}`,
+  spellsEndConcentration: 'Terminar',
+  spellsCutTitle: 'Cortar la concentración',
+  spellsCutBody: (spell: string, previous: string, count: number, names: string) =>
+    `Concentrarte en ${spell} termina ${previous}, y con ella ${count === 1 ? 'se va' : 'se van'} ${names}.`,
+  spellsCurrentConcentration: 'tu concentración actual',
+  spellsConcentrateAnyway: 'Concentrar igual',
+  spellsSwitched: (spell: string, previous: string, count: number, names: string) =>
+    count === 0
+      ? `Te concentrás en ${spell}: dejaste ${previous}.`
+      : `Te concentrás en ${spell}: dejaste ${previous} y ${count === 1 ? 'se va' : 'se van'} ${names}.`,
 
   // Pestaña Inventario.
   bagHeading: 'Bolsa',
@@ -1226,6 +1245,25 @@ const en: Texts = {
   longRestInspiration: 'you gained Heroic Inspiration',
   longRestItemsRecharged: (n: number) =>
     n === 1 ? '1 magic item regained charges' : `${n} magic items regained charges`,
+  inspirationUse: 'Reroll a die right after rolling it and keep the new result',
+  inspirationLongRest: 'You regain it when you finish a long rest',
+  inspirationGrant: 'Mark it when the DM gives it to you',
+  inspirationSpend: 'Spend Heroic Inspiration',
+  inspirationMark: 'Mark that you have it',
+  inspirationHave: 'YOU HAVE IT',
+  inspirationSpent: 'SPENT',
+  spellsConcentrate: 'Concentrate',
+  spellsConcentratingOn: (spell: string) => `Concentrating on ${spell}`,
+  spellsEndConcentration: 'End',
+  spellsCutTitle: 'Break concentration',
+  spellsCutBody: (spell: string, previous: string, count: number, names: string) =>
+    `Concentrating on ${spell} ends ${previous}, and ${names} ${count === 1 ? 'goes' : 'go'} with it.`,
+  spellsCurrentConcentration: 'your current concentration',
+  spellsConcentrateAnyway: 'Concentrate anyway',
+  spellsSwitched: (spell: string, previous: string, count: number, names: string) =>
+    count === 0
+      ? `You’re now concentrating on ${spell}: you dropped ${previous}.`
+      : `You’re now concentrating on ${spell}: you dropped ${previous}, and ${names} ${count === 1 ? 'goes' : 'go'} with it.`,
 
   bagHeading: 'Bag',
   coinsHeading: 'Coins',

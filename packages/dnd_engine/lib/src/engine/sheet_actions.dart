@@ -48,6 +48,11 @@ class SheetActions {
   /// - `shortRest`; `outcome.restored` son los nombres de lo que se recargó.
   /// - `longRest`; `outcome` lleva `exhaustion` (el que queda, solo si había),
   ///   `inspirationGained` e `itemsRecharged`.
+  /// - `heroicInspiration` con `value`: marcarla o gastarla a mano.
+  /// - `concentrate` con `spell` (el nombre, como lo guarda Flutter);
+  ///   `outcome.dismissed` son los compañeros que dependían de la concentración
+  ///   anterior y se fueron.
+  /// - `endConcentration`; `outcome.dismissed` como en `concentrate`.
   ///
   /// Una acción desconocida lanza [FormatException]: un cliente desfasado no
   /// tiene que guardar una ficha que el motor no tocó creyendo que sí.
@@ -145,6 +150,27 @@ class SheetActions {
           ..['exhaustion'] = exhaustionBefore > 0 ? combat.exhaustion : null
           ..['inspirationGained'] = !hadInspiration && combat.heroicInspiration
           ..['itemsRecharged'] = items;
+      case 'heroicInspiration':
+        combat.heroicInspiration = action['value'] == true;
+      case 'concentrate' || 'endConcentration':
+        final spell = action['spell'] as String?;
+        // Volver a tocar el conjuro en que ya te concentrás no cambia nada en
+        // la mesa, pero `startConcentration` despediría a lo que ese mismo
+        // conjuro sostiene.
+        if (action['type'] == 'concentrate' &&
+            combat.concentratingOn == spell) {
+          break;
+        }
+        outcome['dismissed'] = [
+          for (final i in combat.companions)
+            if (i.concentration)
+              repo.creature(i.creatureId)?.name ?? i.creatureId,
+        ];
+        if (action['type'] == 'concentrate') {
+          CombatOps.startConcentration(combat, spell!);
+        } else {
+          CombatOps.endConcentration(combat);
+        }
       default:
         throw FormatException('Acción de ficha desconocida: ${action['type']}');
     }

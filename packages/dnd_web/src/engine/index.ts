@@ -202,7 +202,9 @@ export type SheetAction =
   | { type: 'deathSave'; success: boolean }
   | { type: 'spendSlot' | 'recoverSlot'; level: number; pact: boolean }
   | { type: 'spendResource' | 'recoverResource'; resource: string; amount?: number }
-  | { type: 'spendHitDie' | 'shortRest' | 'longRest' };
+  | { type: 'spendHitDie' | 'shortRest' | 'longRest' | 'endConcentration' }
+  | { type: 'heroicInspiration'; value: boolean }
+  | { type: 'concentrate'; spell: string };
 
 /** Lo que cuenta el motor de una acción, para el aviso. Cada campo existe
  *  solo en la acción que lo da (ver `SheetActions.apply`). */
@@ -213,6 +215,7 @@ export interface SheetOutcome {
   exhaustion?: number | null;
   inspirationGained?: boolean;
   itemsRecharged?: number;
+  dismissed?: string[];
 }
 
 /**

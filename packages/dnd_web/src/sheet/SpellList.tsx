@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { vocabularyLabel, type InnateSpell, type JsonObject } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
+import { Button } from '../ui/Button';
 import { Eyebrow } from '../ui/data';
 import { Accordion } from '../ui/disclosure';
 
@@ -23,7 +24,8 @@ type SpellJson = JsonObject & {
  * Los conjuros del personaje, como la sección de Flutter (`_spellsCard`):
  * trucos, siempre preparados, preparados (o conocidos) y los que concede un
  * rasgo. Cada uno se despliega con su ficha (tiempo, alcance, componentes,
- * duración y descripción). Solo lectura: no se preparan ni se lanzan acá.
+ * duración y descripción). No se preparan ni se lanzan acá; en la ficha propia
+ * ([onConcentrate]) los de concentración llevan «Concentrar», como Flutter.
  *
  * Lo elegido se junta como en Flutter: la lista vieja y las de cada clase,
  * sin repetir. Nada de esto es una regla: qué está siempre preparado y qué
@@ -38,6 +40,7 @@ export function SpellList({
   preparation,
   catalog,
   innateNote,
+  onConcentrate,
 }: {
   cantripIds: string[];
   spellIds: string[];
@@ -46,6 +49,8 @@ export function SpellList({
   preparation: 'prepared' | 'known' | null;
   catalog: JsonObject[];
   innateNote: (s: InnateSpell) => string;
+  /** El nombre del conjuro, como lo guarda Flutter en `concentratingOn`. */
+  onConcentrate?: (name: string) => void;
 }) {
   const t = useTexts();
   const lang = useLang();
@@ -80,7 +85,7 @@ export function SpellList({
           items={list.map((s) => ({
             id: s.id,
             title: <SpellTitle spell={s} />,
-            content: <SpellDetail spell={s} />,
+            content: <SpellDetail spell={s} onConcentrate={onConcentrate && (() => onConcentrate(s.name ?? s.id))} />,
           }))}
         />
       </section>
@@ -105,7 +110,9 @@ export function SpellList({
                 // El nombre que da el motor (puede venir del rasgo) y su uso,
                 // CD y ataque, que son los del rasgo y no los de la clase.
                 title: <SpellTitle spell={s} name={i.name} note={innateNote(i)} />,
-                content: s ? <SpellDetail spell={s} /> : null,
+                content: s ? (
+                  <SpellDetail spell={s} onConcentrate={onConcentrate && (() => onConcentrate(i.name))} />
+                ) : null,
               };
             })}
           />
@@ -149,8 +156,10 @@ function Tag({ children }: { children: ReactNode }) {
 }
 
 /** La ficha del conjuro al desplegarlo. Los cuatro datos de lanzamiento son
- *  vocabulario del catálogo en español: los traduce el motor. */
-function SpellDetail({ spell }: { spell: SpellJson }) {
+ *  vocabulario del catálogo en español: los traduce el motor. «Concentrar» va
+ *  acá y no en la fila porque la fila ya es el botón del acordeón. */
+function SpellDetail({ spell, onConcentrate }: { spell: SpellJson; onConcentrate?: () => void }) {
+  const t = useTexts();
   const meta = [
     spell.castingTime && vocabularyLabel('castingTime', spell.castingTime),
     spell.range && vocabularyLabel('range', spell.range),
@@ -163,6 +172,13 @@ function SpellDetail({ spell }: { spell: SpellJson }) {
     <>
       {meta && <p className="mb-1.5 text-[12px] text-on-surface">{meta}</p>}
       {spell.description}
+      {spell.concentration && onConcentrate && (
+        <div className="mt-2">
+          <Button tone="secondary" onClick={onConcentrate}>
+            {t.spellsConcentrate}
+          </Button>
+        </div>
+      )}
     </>
   );
 }
