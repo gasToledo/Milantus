@@ -318,7 +318,7 @@ test('la subida de nivel pasa por PG, subclase y mejora, guarda lo del motor y s
   expect(enviado).toEqual(esperado);
   // Vuelve a la ficha con el aviso, y «Deshacer» guarda la de antes.
   await expect(page).toHaveURL(new RegExp(`/personajes/${BRUNA}/personaje$`));
-  await expect(page.getByText('Bruna de Humo subió a nivel 4.')).toBeVisible();
+  await expect(page.getByText('Bruna de Humo subió a nivel 4.', { exact: true })).toBeVisible();
   const deshecho = await proximoGuardado(page, () => page.getByRole('button', { name: 'Deshacer' }).click(), BRUNA);
   expect(deshecho).toEqual(migrateCharacter(antes));
 });
