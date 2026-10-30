@@ -69,6 +69,16 @@
   color-scheme: light;
 }
 
+/* Toda barra de scroll nativa (la página, la lista del Códice y del
+   Bestiario, la planilla del Combate, la tira de pestañas en un teléfono, el
+   cuerpo de un diálogo) va fina y con el filete del sistema, igual que la de
+   `ScrollArea`: la del navegador, en el tema oscuro, es un bloque gris. */
+html,
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--hairline) transparent;
+}
+
 body {
   margin: 0;
   background: var(--scaffold);
@@ -224,6 +234,10 @@ body {
 }
 .codex-split > div {
   display: grid;
+  /* La columna única de abajo de 760 también es `minmax(0, …)`: implícita,
+     crecía hasta la línea más larga de la lista (el tipo de una criatura) en
+     vez de truncarla, y el Bestiario se salía 73 px de un teléfono. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   align-items: start;
 }

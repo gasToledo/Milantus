@@ -41,7 +41,7 @@ Radix directo salvo para algo que esos envoltorios no cubran.
 | `Popover*` | Contenido flotante que se lee y se cierra | Topeado al ancho de la ventana |
 | `Select` | Selección única con rótulo visible | El rótulo no desaparece al elegir |
 | `Switch` | Encendido/apagado con rótulo | El pulgar se mueve: el estado no depende solo del color |
-| `ScrollArea` | Zona con scroll propio y barra fina (nunca la del navegador, que en oscuro es un bloque gris) | La usa el panel lateral; un texto que crece hasta un tope lo lleva en `viewportClassName`, con `label` para que se enfoque con el teclado y `type="auto"` para que la barra avise que hay más (el trasfondo) |
+| `ScrollArea` | Zona con scroll propio y barra fina (las nativas toman el mismo tema desde `index.css`: `scrollbar-color` con el filete) | La usa el panel lateral; un texto que crece hasta un tope lo lleva en `viewportClassName`, con `label` para que se enfoque con el teclado y `type="auto"` para que la barra avise que hay más (el trasfondo) |
 | `Toast` / `ToastViewport` | Avisos (`showAppMessage`) | Ícono, color y texto; error 6 s, el resto 3 s. `action` es el «Deshacer» (`onUndo`) y alarga a 6 s. Hoy los usa la ficha propia (`CharacterPage`) |
 | `LinkTabs` / `TabPanel` | Pestañas **que son URLs** | Flechas para moverse, Enter para abrir; cada pestaña es un enlace real |
 | `Accordion` | Lista de entradas plegables (rasgos, dotes) | Varias abiertas a la vez; el botón va dentro de un encabezado |
