@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { IdCard, Landmark, ScrollText, Shield, Sparkles } from 'lucide-react';
 import { nameOf } from '../api/catalog';
 import { vocabularyLabel } from '../engine';
@@ -11,10 +12,15 @@ import type { SheetModel } from './model';
 import { ProficiencyRow } from './rows';
 import { ABILITIES, SKILL_ABILITY } from './vocabulary';
 
-/** Tres columnas fluidas: tantas como entren de 300 px, y una sola en un
- *  teléfono. `items-start`: cada columna tiene su alto y no se estira. */
-export const COLUMNS =
-  'grid items-start gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr))]';
+/** Tres columnas de 300 px como mínimo, dos o una según el ancho; el porqué
+ *  de la ubicación a dos columnas está en `.sheet-columns` (`index.css`). */
+export function SheetColumns({ children }: { children: ReactNode }) {
+  return (
+    <div className="sheet-columns">
+      <div>{children}</div>
+    </div>
+  );
+}
 
 /**
  * Pestaña Personaje: quién es (identidad y características), qué sabe hacer
@@ -38,7 +44,7 @@ export function CharacterTab({ model }: { model: SheetModel }) {
   ].filter((row): row is { label: string; value: string } => Boolean(row.value));
 
   return (
-    <div className={COLUMNS}>
+    <SheetColumns>
       <div className="flex min-w-0 flex-col gap-4">
         <Card id="identity" title={t.identityHeading} icon={IdCard} collapsible>
           <dl className="divide-y divide-hairline border-t border-hairline">
@@ -140,6 +146,6 @@ export function CharacterTab({ model }: { model: SheetModel }) {
           />
         )}
       </Card>
-    </div>
+    </SheetColumns>
   );
 }

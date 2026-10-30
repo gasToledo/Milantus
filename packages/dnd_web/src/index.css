@@ -191,6 +191,44 @@ body {
   box-shadow: var(--shadow-card-hover);
 }
 
+/* Las tres columnas de las pestañas de la ficha. Con `auto-fit` a dos columnas
+   la tercera bajaba a otra fila de la grilla, que empieza debajo de la más
+   alta (Conjuros, Habilidades) y dejaba un hueco del alto de esa columna bajo
+   la primera. A dos columnas la tercera va debajo de la primera y la segunda
+   ocupa las dos filas: la fila 2 es `1fr` para que el alto de la segunda se
+   cargue ahí y la fila 1 mida solo la primera columna. Cortes: 300 px por
+   columna más los 16 de separación, medidos sobre el contenido (sin panel). */
+.sheet-columns {
+  container-type: inline-size;
+}
+.sheet-columns > div {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+  grid-template-columns: minmax(0, 1fr);
+}
+@container (min-width: 616px) {
+  .sheet-columns > div {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto 1fr;
+  }
+  .sheet-columns > div > :nth-child(2) {
+    grid-area: 1 / 2 / span 2;
+  }
+  .sheet-columns > div > :nth-child(3) {
+    grid-area: 2 / 1;
+  }
+}
+@container (min-width: 932px) {
+  .sheet-columns > div {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: none;
+  }
+  .sheet-columns > div > :nth-child(n) {
+    grid-area: auto;
+  }
+}
+
 /* La banda táctica: columnas fijas y no placas que se reparten el ancho como
    pueden (con `auto-fit` a ciertos anchos quedaba una placa sola y estirada en
    la última fila). Se mide el ancho del contenido, no la ventana: el panel

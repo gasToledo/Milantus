@@ -8,7 +8,7 @@ import { AppDialog } from '../ui/AppDialog';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Eyebrow, hpTone, Pill, Pips, ShieldBadge, SpendRecoverButtons, StatPlaque, ThinBar } from '../ui/data';
-import { COLUMNS } from './CharacterTab';
+import { SheetColumns } from './CharacterTab';
 import { resourceKey, signed } from './format';
 import { SpellList } from './SpellList';
 import { resourceLeft, type SheetModel } from './model';
@@ -27,7 +27,7 @@ import { ABILITIES, isReactionSpell } from './vocabulary';
  */
 export function CombatTab({ model }: { model: SheetModel }) {
   return (
-    <div className={COLUMNS}>
+    <SheetColumns>
       <div className="flex min-w-0 flex-col gap-4">
         <HitPointsCard model={model} />
         <DefenseCard model={model} />
@@ -41,7 +41,7 @@ export function CombatTab({ model }: { model: SheetModel }) {
         <ConditionsCard model={model} />
         <ResourcesCard model={model} />
       </div>
-    </div>
+    </SheetColumns>
   );
 }
 
