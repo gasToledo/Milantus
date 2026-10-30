@@ -321,6 +321,16 @@ const es = {
   cancel: 'Cancelar',
   hitDieButton: (left: number, total: number) => `Dado de golpe (${left}/${total})`,
   hitDieHealed: (hp: number) => `Recuperaste ${hp} PG (dado de golpe)`,
+  restShort: 'Descanso corto',
+  restLong: 'Descanso largo',
+  shortRestNoRestore: 'Descanso corto. No cura PG: gastá dados de golpe para curarte.',
+  shortRestRestored: (list: string) => `Descanso corto: recuperaste ${list}. Para curarte, gastá dados de golpe.`,
+  longRestSummary: (parts: string) => `Descanso largo: ${parts}.`,
+  longRestBase: 'PG al máximo y recursos recargados',
+  longRestExhaustion: (level: number) => `cansancio a nivel ${level}`,
+  longRestInspiration: 'ganaste Inspiración Heroica',
+  longRestItemsRecharged: (n: number) =>
+    n === 1 ? '1 objeto mágico recuperó cargas' : `${n} objetos mágicos recuperaron cargas`,
 
   // Pestaña Inventario.
   bagHeading: 'Bolsa',
@@ -1206,6 +1216,16 @@ const en: Texts = {
   cancel: 'Cancel',
   hitDieButton: (left: number, total: number) => `Hit Point Die (${left}/${total})`,
   hitDieHealed: (hp: number) => `You recovered ${hp} HP (Hit Point Die)`,
+  restShort: 'Short rest',
+  restLong: 'Long rest',
+  shortRestNoRestore: 'Short rest. It doesn’t heal HP: spend Hit Point Dice to heal.',
+  shortRestRestored: (list: string) => `Short rest: you regained ${list}. To heal, spend Hit Point Dice.`,
+  longRestSummary: (parts: string) => `Long rest: ${parts}.`,
+  longRestBase: 'HP restored to max and resources recharged',
+  longRestExhaustion: (level: number) => `exhaustion down to level ${level}`,
+  longRestInspiration: 'you gained Heroic Inspiration',
+  longRestItemsRecharged: (n: number) =>
+    n === 1 ? '1 magic item regained charges' : `${n} magic items regained charges`,
 
   bagHeading: 'Bag',
   coinsHeading: 'Coins',

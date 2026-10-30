@@ -127,6 +127,49 @@ test('el dado de golpe lo tira el motor: cura lo que dice el aviso y gasta uno',
   expect(await ilse(request)).toEqual(enviado);
 });
 
+test('el descanso corto guarda lo del motor y «Deshacer» vuelve a guardar la ficha de antes', async ({
+  page,
+  request,
+}) => {
+  const antes = await ilse(request);
+  const esperado = segunMotor(antes, { type: 'shortRest' });
+  await page.goto(COMBATE);
+
+  expect(await proximoGuardado(page, () => page.getByRole('button', { name: 'Descanso corto' }).click())).toEqual(
+    esperado,
+  );
+  // Deshacer guarda la ficha de antes del descanso tal como la dio el motor.
+  const deshecho = await proximoGuardado(page, () => page.getByRole('button', { name: 'Deshacer' }).click());
+  expect(deshecho).toEqual(migrateCharacter(antes));
+  expect(await ilse(request)).toEqual(migrateCharacter(antes));
+});
+
+test('el descanso largo cura, recarga y lo cuenta; «Deshacer» devuelve también las cargas', async ({
+  page,
+  request,
+}) => {
+  const antes = await ilse(request);
+  const ficha = computeSheet(antes, catalogo());
+  const cargas = (c: CharacterJson) =>
+    (c as { inventory: { itemId: string; charges?: number }[] }).inventory.find((e) => e.itemId === 'baston-de-curacion')!
+      .charges;
+  await page.goto(COMBATE);
+
+  const enviado = (await proximoGuardado(page, () =>
+    page.getByRole('button', { name: 'Descanso largo' }).click(),
+  )) as PersonajeApi;
+  // Lo que no tira dados es exactamente lo del motor; el bastón se recarga con
+  // una tirada, así que se compara aparte.
+  const sinTirada = (c: CharacterJson) => ({ ...c, inventory: undefined });
+  expect(sinTirada(enviado)).toEqual(sinTirada(segunMotor(antes, { type: 'longRest' })));
+  expect(enviado.combat.currentHp).toBe(ficha.maxHp);
+  expect(cargas(enviado)!).toBeGreaterThan(cargas(antes)!);
+  await expect(page.getByText(/^Descanso largo: PG al máximo y recursos recargados; cansancio a nivel 0.*1 objeto mágico recuperó cargas/)).toBeVisible();
+
+  const deshecho = await proximoGuardado(page, () => page.getByRole('button', { name: 'Deshacer' }).click());
+  expect(deshecho).toEqual(migrateCharacter(antes));
+});
+
 test('la ficha de otra cuenta no tiene controles para escribir', async ({ context, page, baseURL }) => {
   await context.clearCookies();
   await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);

@@ -397,7 +397,12 @@ repiten acá.
   cuánto curó; y **gastar y recuperar** cada espacio de conjuro (normal o de
   pacto) y cada recurso con usos, con los botones de cada fila. Una reserva
   (Imposición de Manos, Puntos de Concentración) pregunta cuántos puntos en un
-  diálogo, como Flutter; pasarse de lo que queda lo recorta el motor.
+  diálogo, como Flutter; pasarse de lo que queda lo recorta el motor. Y los
+  **descansos corto y largo**, en «Recursos y descansos», con el aviso de
+  Flutter (qué recuperó; en el largo, el cansancio que queda, la Inspiración
+  Heroica ganada y los objetos que recargaron al amanecer) y su **«Deshacer»**,
+  que vuelve a guardar la ficha entera de antes del descanso (con la mochila
+  de antes de la recarga), tal como la dio el motor.
   - **Toda escritura la hace el motor.** `actOn` (`act` de `js/entrypoint.dart`,
     sobre `SheetActions.apply` del engine) recibe la ficha y la acción y
     devuelve la ficha nueva, migrada y con el `schemaVersion` actual, más lo
@@ -444,9 +449,9 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    la ficha completa de un miembro y la de un PNJ con ficha; la música (solo
    escuchar); los retratos con su visor; las menciones `@Nombre` del Cuaderno
    como enlaces, e imprimir la ficha.
-4. Escrituras de bajo riesgo: PG y usos de recursos en la ficha, descansos
-   *(en curso: existen los PG, las salvaciones de muerte y los usos de
-   espacios, recursos y dados de golpe)*.
+4. Escrituras de bajo riesgo *(existe)*: PG y salvaciones de muerte, usos de
+   espacios, recursos y dados de golpe, y los descansos con «Deshacer», solo
+   en la ficha propia.
 5. Edición completa: creador de personajes, subida de nivel, inventario.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
    combate, vínculos y códigos de campaña. Antes de portar esto es lectura
@@ -533,7 +538,9 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    que da el motor, que se relea sin migrar y al recargar, que solo se escriba
    la ficha propia, que a 0 PG tres «+Éxito» seguidos estabilicen y guarden lo
    del motor, que gastar y recuperar un espacio y un uso manden y guarden lo
-   del motor, que el dado de golpe gaste uno y cure lo que dice su aviso, y
+   del motor, que el dado de golpe gaste uno y cure lo que dice su aviso, que
+   los descansos guarden lo del motor (el largo, además, recargue el objeto y
+   lo cuente) y que «Deshacer» vuelva a guardar la ficha de antes, y
    que la ficha de otra cuenta (la de un miembro, para el DM) no
    tenga un solo control (`e2e/escritura.spec.ts`, con una cuenta propia para
    no cambiar lo que leen las demás); y que una cuenta sin `webV2` vea
@@ -590,9 +597,8 @@ hace seguro volver atrás es que **no hay nada que deshacer en el formato**:
 
 Para que nadie lo dé por hecho:
 
-- Del paso 4, los **descansos** corto y largo con «Deshacer»: hoy se ven los
-  botones en Flutter y no en `/v2`. Tampoco lanzar un conjuro desde la lista
-  (que en Flutter gasta su espacio o su uso gratis).
+- Lanzar un conjuro desde la lista (que en Flutter gasta su espacio o su uso
+  gratis) y la Inspiración Heroica a mano: quedan para el paso 5.
 - Toda otra escritura desde React: los pasos 5 a 7 están enteros por hacer.
   Entre ellos, reordenar, marcar favorito, crear, renombrar o borrar
   personajes, condiciones, concentración, compañeros y Forma Salvaje, y

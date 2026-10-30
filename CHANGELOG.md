@@ -1112,6 +1112,8 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 - En `/v2`, la ficha propia también gasta y recupera espacios de conjuro y
   usos de recursos (con los puntos de una reserva en un diálogo) y gasta dados
   de golpe para curarse.
+- En `/v2`, los descansos corto y largo de la ficha propia, con el mismo
+  aviso que la app de siempre y «Deshacer».
 
 ### Modificado
 

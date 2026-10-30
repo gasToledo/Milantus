@@ -1,4 +1,4 @@
-import { BookOpen, Check, Crosshair, Dices, Heart, Minus, Plus, RefreshCw, Shield, ShieldHalf, Zap } from 'lucide-react';
+import { Bed, BookOpen, Check, Coffee, Crosshair, Dices, Heart, Minus, Plus, RefreshCw, Shield, ShieldHalf, Zap } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { nameOf } from '../api/catalog';
 import type { CharacterResource, InnateSpell, SpellcastingBlock } from '../engine';
@@ -12,14 +12,15 @@ import { COLUMNS } from './CharacterTab';
 import { resourceKey, signed } from './format';
 import { SpellList } from './SpellList';
 import { resourceLeft, type SheetModel } from './model';
+import type { SheetWriter } from './writer';
 import { ProficiencyRow } from './rows';
 import { ABILITIES, isReactionSpell } from './vocabulary';
 
 /**
  * Pestaña Combate: lo que se consulta en el turno y, en la ficha propia
  * (`model.write`), lo que se anota en él: daño, curación, PG temporales,
- * salvaciones de muerte, dados de golpe, espacios de conjuro y usos de
- * recursos. Cada acción la hace el motor (`actOn`); acá no se
+ * salvaciones de muerte, dados de golpe, espacios de conjuro, usos de
+ * recursos y los descansos. Cada acción la hace el motor (`actOn`); acá no se
  * suma ni se resta nada. Preparar conjuros y el resto de la edición siguen en
  * Flutter. Los números son del motor; de la mesa (lo crudo) solo los PG
  * actuales, lo gastado y las condiciones.
@@ -135,7 +136,7 @@ function HitPointControls({ model }: { model: SheetModel }) {
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
         placeholder={t.hpAmount}
-        className="num h-9 w-[90px] rounded-[var(--radius-nav)] border border-hairline bg-plaque px-3 text-[14px] text-on-surface placeholder:text-text-muted"
+        className="num h-9 w-[110px] rounded-[var(--radius-nav)] border border-hairline bg-plaque px-3 text-[14px] text-on-surface placeholder:font-normal placeholder:text-text-muted"
       />
       <Button tone="danger" icon={Minus} onClick={() => run('damage')}>
         {t.hpDamage}
@@ -500,6 +501,7 @@ function ResourcesCard({ model }: { model: SheetModel }) {
   };
   return (
     <Card id="resources" title={t.resourcesAndRests} icon={RefreshCw}>
+      {write && <RestButtons write={write} />}
       {sheet.resources.length === 0 ? (
         <p className="text-[13px] text-text-muted">{t.noResources}</p>
       ) : (
@@ -532,6 +534,47 @@ function ResourcesCard({ model }: { model: SheetModel }) {
       )}
       {ask && <PointsDialog ask={ask} onClose={() => setAsk(null)} model={model} />}
     </Card>
+  );
+}
+
+/**
+ * Los descansos, con el aviso de Flutter y su «Deshacer»: un toque de más en
+ * plena sesión devuelve PG, espacios y recursos ya gastados, y volver a
+ * marcarlos a mano es justo lo que nadie recuerda bien. Deshacer vuelve a
+ * guardar la ficha entera de antes, con la mochila de antes del amanecer.
+ * Qué recupera cada uno y qué cuenta el aviso lo dice el motor.
+ */
+function RestButtons({ write }: { write: SheetWriter }) {
+  const t = useTexts();
+  const short = () => {
+    const r = write.act({ type: 'shortRest' });
+    if (!r) return;
+    const restored = r.outcome.restored ?? [];
+    write.notify(restored.length === 0 ? t.shortRestNoRestore : t.shortRestRestored(restored.join(', ')), {
+      undo: () => write.restore(r.before),
+    });
+  };
+  const long = () => {
+    const r = write.act({ type: 'longRest' });
+    if (!r) return;
+    const { exhaustion, inspirationGained, itemsRecharged = 0 } = r.outcome;
+    const parts = [
+      t.longRestBase,
+      exhaustion != null ? t.longRestExhaustion(exhaustion) : null,
+      inspirationGained ? t.longRestInspiration : null,
+      itemsRecharged > 0 ? t.longRestItemsRecharged(itemsRecharged) : null,
+    ].filter(Boolean);
+    write.notify(t.longRestSummary(parts.join('; ')), { undo: () => write.restore(r.before) });
+  };
+  return (
+    <div className="mb-3 flex flex-wrap gap-2" data-controls="rests">
+      <Button tone="secondary" icon={Coffee} onClick={short}>
+        {t.restShort}
+      </Button>
+      <Button tone="primary" icon={Bed} onClick={long}>
+        {t.restLong}
+      </Button>
+    </div>
   );
 }
 
