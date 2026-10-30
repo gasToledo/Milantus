@@ -295,26 +295,36 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
         </aside>
       </div>
 
-      <footer className="sticky bottom-0 mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-hairline bg-surface py-3">
-        <span className="text-[13px] text-on-surface-variant" role="status">
-          {pending ?? (current === 'revision' ? t.luConfirmHint : '')}
-        </span>
-        <span className="flex gap-2">
+      {/* Una tarjeta más, flotando al pie: con fondo, filete y radio como las
+          de arriba, y despegada del borde. Una franja a sangre se leía como
+          parte de otra pantalla. En un teléfono el mensaje va arriba y los
+          dos botones se reparten el ancho. */}
+      <footer className="card sticky bottom-3 mt-auto flex flex-wrap items-center gap-x-4 gap-y-2.5 px-4 py-3">
+        {(pending ?? (current === 'revision' ? t.luConfirmHint : null)) && (
+          <span className="min-w-0 flex-[1_1_240px] text-[13px] text-on-surface-variant" role="status">
+            {pending ?? t.luConfirmHint}
+          </span>
+        )}
+        <span className="ml-auto flex w-full gap-2 sm:w-auto">
           {index === 0 ? (
-            <ButtonLink tone="secondary" href={characterHref(character.id)} internal>
+            <ButtonLink tone="secondary" href={characterHref(character.id)} internal className="flex-1 sm:flex-none">
               {t.cancel}
             </ButtonLink>
           ) : (
-            <Button tone="secondary" onClick={() => setStepId(steps[index - 1]!)}>
+            <Button tone="secondary" className="flex-1 sm:flex-none" onClick={() => setStepId(steps[index - 1]!)}>
               {t.luBack}
             </Button>
           )}
           {current === 'revision' ? (
-            <Button disabled={!view.complete} onClick={confirm}>
+            <Button className="flex-[2] sm:flex-none" disabled={!view.complete} onClick={confirm}>
               {t.luConfirm(view.newLevel)}
             </Button>
           ) : (
-            <Button disabled={pending !== null} onClick={() => setStepId(steps[index + 1]!)}>
+            <Button
+              className="flex-[2] sm:flex-none"
+              disabled={pending !== null}
+              onClick={() => setStepId(steps[index + 1]!)}
+            >
               {index === 0 ? t.luStart : t.luContinue}
             </Button>
           )}
