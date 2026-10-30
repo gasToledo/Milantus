@@ -561,13 +561,27 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    del motor, que gastar y recuperar un espacio y un uso manden y guarden lo
    del motor, que el dado de golpe gaste uno y cure lo que dice su aviso, que
    los descansos guarden lo del motor (el largo, además, recargue el objeto y
-   lo cuente) y que «Deshacer» vuelva a guardar la ficha de antes, y
+   lo cuente) y que «Deshacer» vuelva a guardar la ficha de antes, que la
+   Inspiración Heroica y la concentración guarden lo del motor, que la mochila
+   se edite desde la fila (equipar, cantidad, nota, monedas) y que quitar se
+   deshaga, y
    que la ficha de otra cuenta (la de un miembro, para el DM) no
    tenga un solo control (`e2e/escritura.spec.ts`, con una cuenta propia para
    no cambiar lo que leen las demás); y que una cuenta sin `webV2` vea
    «No disponible» sin pedir sus datos (`e2e/acceso.spec.ts`). Lo esperado se
    calcula con el mismo motor y la misma fusión (`e2e/helpers.ts`). Sin
    reintentos: no hay «a veces anda».
+
+   **Trampa al volver escribible una pantalla:** las pruebas de lectura
+   (`ficha.spec.ts`, `codice.spec.ts`…) entran con la cuenta de `TOKEN`, que es
+   **dueña** de sus fichas, así que ven los controles nuevos. Una celda que
+   antes mostraba «Sí» y ahora es una casilla las rompe sin que el cambio
+   toque esos archivos (pasó con la columna «Equipado» del Inventario en 5b1:
+   CI en rojo y el CD salteado). Antes de commitear, buscá en `e2e/` cada
+   `data-field` y cada texto de la pantalla que cambió, y adaptá lo que lea
+   como texto lo que ahora es un control. Si Playwright no corre en la máquina
+   (ver la trampa del antivirus en `CLAUDE.md`), mirá el resultado de CI antes
+   de seguir con el próximo cambio: CI en rojo no llega a producción.
 3. **Comparación manual en producción con una cuenta habilitada.** Lo que solo
    se ve con el stack real (túnel, caché, cuenta de verdad, personajes
    complejos) se compara a ojo contra la misma pantalla de Flutter, con una

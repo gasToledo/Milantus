@@ -178,10 +178,13 @@ test('el inventario muestra la mochila que resuelve el motor, con la carga de la
     `${libras.format(ficha.carriedWeight)} / ${libras.format(ficha.carryingCapacity)} lb`,
   );
   // Cada entrada con el nombre que resuelve el motor y su marca de equipado.
+  // La ficha es propia, así que lo que se equipa es una casilla.
   for (const l of lineas) {
     const fila = page.locator(`[data-entry="${l.entryId}"]`);
+    const marca = fila.locator('[data-field="equipped"]');
     await expect(fila.locator('[data-field="name"]')).toHaveText(l.name);
-    await expect(fila.locator('[data-field="equipped"]')).toHaveText(l.equipped ? 'Sí' : '—No');
+    if (l.equippable) await expect(marca.getByRole('checkbox')).toBeChecked({ checked: l.equipped });
+    else await expect(marca).toHaveText(l.equipped ? 'Sí' : '—No se equipa');
   }
   // Filtrar no escribe nada: solo deja a la vista lo equipado.
   await page.getByRole('button', { name: 'Equipados' }).click();
