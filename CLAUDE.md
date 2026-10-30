@@ -52,6 +52,25 @@ El build no es un trámite: lo que vive en `packages/dnd_app/lib/web/*_web.dart`
 (iframes, `postMessage`, la pantalla encendida) se exporta condicionalmente, y
 `flutter test` corre con el `*_stub.dart`. Ese código solo se compila acá.
 
+**Obligatorio antes de commitear y de pushear un cambio en `dnd_web`**, también
+en las máquinas donde `tsc`, el build y Playwright no corren (ver la trampa del
+antivirus más abajo). Los pasos 5a, 5b1 y 5b2 de la migración llegaron a CI en
+rojo por saltear esto, y CI en rojo saltea el despliegue:
+
+1. Chequeo de tipos. Si el `tsc` de TypeScript 7 no corre, el de TypeScript 5
+   (JavaScript puro) encuentra los mismos errores:
+
+   ```bash
+   cd packages/dnd_web && npx -y -p typescript@5.9.3 tsc --noEmit -p .
+   ```
+
+2. Buscá en `packages/dnd_web/e2e/` cada `data-field`, rótulo y texto de la
+   pantalla que tocaste, y ajustá las pruebas que lo lean. Las de lectura
+   entran con una cuenta dueña de sus fichas, así que un texto que pasó a ser
+   un control, o un rótulo con otra mayúscula, las rompe.
+3. Después del push, mirá que CI termine en verde antes de empezar el próximo
+   cambio.
+
 CI verifica el formato **antes que nada**, así que un commit sin formatear falla
 sin llegar a decir nada útil sobre el código. Conviene instalar el hook, que
 formatea lo preparado antes de cada commit:
@@ -92,9 +111,12 @@ desde la raíz: ni `tsc` ni Vite ven esa etapa.
 
 **Trampa de entorno:** en algunas máquinas Windows con antivirus corporativo
 `npm ci` deja sin binarios nativos a TypeScript 7, rolldown y compañía. Si
-pasa, no se pierde tiempo reinstalando: el chequeo de tipos corre igual con el
-TypeScript 5 de JavaScript puro (`npx -y -p typescript@5.8.3 tsc --noEmit -p .`
-en `packages/dnd_web`), y el build y Playwright se validan en CI.
+pasa, no se pierde tiempo reinstalando: el chequeo de tipos se corre con
+TypeScript 5 (ver «Obligatorio antes de commitear» más arriba), y el build y
+Playwright se validan en CI. Además, `npm run build:engine` puede fallar con
+«Unable to determine engine version» (el `dart` del wrapper de Flutter): se
+compila igual desde `packages/dnd_engine` con
+`dart compile js -O2 --no-source-maps -o ../dnd_web/src/engine/dnd_engine.generated.js js/entrypoint.dart`.
 
 El stack completo (Postgres + Zitadel + servidor + cloudflared) se levanta con
 `docker compose up -d --build`; el runbook está en
