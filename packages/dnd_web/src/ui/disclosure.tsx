@@ -41,13 +41,16 @@ export function LinkTabs({
     >
       <TabsPrimitive.List
         aria-label={label}
-        className={`flex gap-1 overflow-x-auto border-b border-hairline ${listClassName ?? ''}`}
+        // El filete va pintado de fondo y no como borde: así el subrayado de la
+        // pestaña activa lo tapa sin salirse 1 px de la tira, que con
+        // `overflow-x-auto` se volvía scrolleable en vertical (una barra fantasma).
+        className={`flex gap-1 overflow-x-auto bg-[linear-gradient(var(--hairline),var(--hairline))] bg-[length:100%_1px] bg-bottom bg-no-repeat ${listClassName ?? ''}`}
       >
         {tabs.map(({ value: v, label: l, href, icon: Icon }) => (
           <TabsPrimitive.Trigger key={v} value={v} asChild>
             <Link
               href={href}
-              className="-mb-px flex shrink-0 items-center gap-2 border-b-2 border-transparent px-3 py-2.5 text-[14px] text-on-surface-variant hover:text-on-surface data-[state=active]:border-gold data-[state=active]:font-semibold data-[state=active]:text-gold"
+              className="flex shrink-0 items-center gap-2 border-b-2 border-transparent px-3 py-2.5 text-[14px] text-on-surface-variant hover:text-on-surface data-[state=active]:border-gold data-[state=active]:font-semibold data-[state=active]:text-gold"
             >
               {Icon && <Icon size={16} aria-hidden="true" />}
               {l}
