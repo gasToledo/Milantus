@@ -127,6 +127,10 @@ function Enabled({ account }: { account: Account }) {
       );
     case 'character':
       return <CharacterPage id={route.id} tab={route.tab} />;
+    // La misma página, para que el aviso con «Deshacer» siga al volver a la
+    // ficha: React conserva la instancia entre las dos rutas.
+    case 'levelUp':
+      return <CharacterPage id={route.id} tab={null} levelUp />;
     case 'codex':
       return <CodexPage category={route.category} entryId={route.entryId} />;
     case 'unknown':

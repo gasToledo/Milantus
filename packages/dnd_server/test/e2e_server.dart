@@ -281,6 +281,30 @@ Future<void> main() async {
       ),
     ),
   );
+  // La que sube de nivel en `/v2`: sin conjuros (lo que pide elegir un
+  // lanzador todavía se elige en Flutter) y sin senda, así la subida a 4 pasa
+  // por PG, subclase y mejora de característica.
+  await characters.create(
+    writerUserId,
+    Character(
+      id: 'bruna-de-humo',
+      name: 'Bruna de Humo',
+      raceId: 'human',
+      classId: 'barbarian',
+      backgroundId: 'soldier',
+      level: 3,
+      assignedScores: const {
+        Ability.strength: 15,
+        Ability.dexterity: 13,
+        Ability.constitution: 14,
+        Ability.intelligence: 8,
+        Ability.wisdom: 12,
+        Ability.charisma: 10,
+      },
+      hpPerLevel: const [12, 7, 7],
+      combat: CombatState(currentHp: 20),
+    ),
+  );
   final settings = InMemorySettingsRepository();
   await settings.save(smokeUserId, {
     'sortMode': 'level',

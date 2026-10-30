@@ -1207,45 +1207,12 @@ extension _LevelUpSections on _LevelUpScreenState {
     // Los prerrequisitos se evalúan sobre el personaje tal como quedará al
     // nuevo nivel: las marcas mayores exigen nivel 4, y a nivel 3 el personaje
     // todavía no lo tiene aunque esté subiendo justo a ese nivel.
-    final target = _buildUpdated(withFeat: false);
-    final sheet = CharacterCompiler(widget.repo).compile(target);
-    final validator = CharacterValidator(widget.repo);
-    final held = validator.heldFeatIds(target);
-
-    // No se puede repetir una dote ya tomada salvo que sea repetible (2024).
-    // Se mide contra `held`, que incluye la dote de origen del trasfondo y el
-    // estilo de combate, no solo `featIds`: con el catálogo oficial no hay
-    // solapamiento porque acá solo se ofrecen dotes generales, pero un
-    // trasfondo homebrew puede conceder cualquiera.
-    final allFeats = widget.repo.featsSorted
-        // Generales y dones épicos, que es lo que dice el rasgo de nivel 19:
-        // "obtenés una dote de don épico u otra dote para la que cumplas las
-        // condiciones". No hace falta gatear el nivel acá porque los trece
-        // dones declaran `minLevel: 19` y el filtro de prerrequisitos de más
-        // abajo los esconde solo.
-        .where((f) => f.category == 'general' || f.category == 'epic-boon')
-        // "Mejora de Característica" ya es la opción hermana de este
-        // selector y necesita registrar sus puntuaciones, no un featId.
-        .where((f) => f.id != 'ability-score-improvement')
-        .where((f) => f.repeatable || !held.contains(f.id))
-        .where((f) {
-          final group = f.effectiveExclusiveGroup;
-          return group == null ||
-              !held.any(
-                (id) =>
-                    id != f.id &&
-                    widget.repo.feat(id)?.effectiveExclusiveGroup == group,
-              );
-        })
-        // Las reglas viven en el motor: la UI solo esconde lo inelegible.
-        .where(
-          (f) =>
-              validator.unmetFeatPrerequisite(f, target, sheet, held: held) ==
-              null,
-        )
-        // Ya viene alfabético de `featsSorted`: reordenar acá con
-        // `compareTo` crudo desharía el plegado de tildes.
-        .toList();
+    // Las reglas (qué dotes se ofrecen, prerrequisitos al nivel nuevo y sin
+    // la dote tentativa) son del motor; la UI solo esconde lo inelegible.
+    final allFeats = [
+      for (final o in _levelUp.featOptions)
+        if (o.unmet == null) o.feat,
+    ];
     if (allFeats.isEmpty) {
       return Text(
         context.l10n.luNoFeats,

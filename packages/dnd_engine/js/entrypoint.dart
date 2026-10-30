@@ -259,6 +259,95 @@ String trade(String requestJson, String labelsJson) {
   });
 }
 
+/// Una subida de nivel en curso (`LevelUp` del motor): con las decisiones
+/// juntadas hasta ahora ([draftJson], `LevelUpDraft.fromJson`) devuelve lo que
+/// el asistente muestra —clases, subclases y dotes con lo que les falta, si la
+/// mejora está completa, los rasgos que se ganan, lo que obliga a elegir y
+/// todavía se elige en Flutter (`open`)— y el personaje tal como quedaría
+/// (`character`), para que la pantalla compare las dos fichas. Confirmar es la
+/// acción `levelUp` de [act].
+String levelUp(String characterJson, String catalogJson, String draftJson) {
+  final up = LevelUp(
+    Character.fromJson(jsonDecode(characterJson) as Map<String, dynamic>),
+    _repoPara(catalogJson),
+    LevelUpDraft.fromJson(jsonDecode(draftJson) as Map<String, dynamic>),
+  );
+  Map<String, dynamic>? choice(AbilityScoreChoiceEffect? e) => e == null
+      ? null
+      : {
+          'amount': e.amount,
+          'max': e.max,
+          'allowed': [for (final a in e.allowed) a.name],
+        };
+  final open = up.open;
+  return jsonEncode({
+    'newLevel': up.newLevel,
+    'newClassLevel': up.newClassLevel,
+    'hitDie': up.hitDie,
+    'averageHp': averageHitDie(up.hitDie),
+    'hpGain': up.hpGain,
+    // Lo que sube el máximo con cada opción, para las dos tarjetas del paso.
+    'hpIfAverage': up.hpIncreaseWith(averageHitDie(up.hitDie)),
+    'hpIfRoll': up.draft.hpRoll == null ? null : up.hpIncreaseWith(up.hpGain),
+    'hpRange': [up.hpIncreaseWith(1), up.hpIncreaseWith(up.hitDie)],
+    'isAsi': up.isAsi,
+    'needsSubclass': up.needsSubclass,
+    'asiComplete': up.asiComplete,
+    'complete': up.complete,
+    'unmetMulticlass': up.unmetMulticlass,
+    'classOptions': [
+      for (final o in up.classOptions)
+        {
+          'id': o.klass.id,
+          'name': o.klass.name,
+          'hitDie': o.klass.hitDie,
+          'unmet': o.unmet,
+        },
+    ],
+    'subclassOptions': [
+      for (final s in up.subclassOptions)
+        {
+          'id': s.id,
+          'name': s.name,
+          'description': s.description,
+          'homebrew': s.source == ContentSource.homebrew,
+        },
+    ],
+    'featOptions': up.isAsi
+        ? [
+            for (final o in up.featOptions)
+              {
+                'id': o.feat.id,
+                'name': o.feat.name,
+                'category': o.feat.category,
+                'description': o.feat.description,
+                'homebrew': o.feat.source == ContentSource.homebrew,
+                'unmet': o.unmet,
+                'abilityChoice': choice(o.feat.effects
+                    .whereType<AbilityScoreChoiceEffect>()
+                    .firstOrNull),
+              },
+          ]
+        : const [],
+    'featAbilityChoice': choice(up.featAbilityChoice),
+    'gainedFeatures': [
+      for (final f in up.gainedFeatures)
+        {'name': f.name, 'description': f.description},
+    ],
+    'open': {
+      'features': open.features,
+      'proficiencies': open.proficiencies,
+      'spellChoices': open.spellChoices,
+      'classSpells': open.classSpells,
+    },
+    'character': up.built.toJson(),
+  });
+}
+
+/// Una tirada de un dado de [sides] caras (la de PG al subir de nivel): la
+/// hace el motor, como el dado de golpe del paso 4.
+int rollDie(int sides) => Dice().rollHitDie(sides);
+
 /// [cp] partido en oro, plata y cobre (`CoinOps.changeFor`): los tres campos
 /// del precio en el diálogo de comprar o vender.
 String coinParts(int cp) => jsonEncode(CoinOps.changeFor(cp));
@@ -483,6 +572,8 @@ void main() {
   motor['catalogLabelOrder'] = catalogLabelOrder.toJS;
   motor['formatCost'] = formatCostFor.toJS;
   motor['trade'] = trade.toJS;
+  motor['levelUp'] = levelUp.toJS;
+  motor['rollDie'] = rollDie.toJS;
   motor['coinParts'] = coinParts.toJS;
   motor['formatAmount'] = formatAmountFor.toJS;
   motor['abilityModifier'] = abilityModifierOf.toJS;

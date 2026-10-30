@@ -1,5 +1,5 @@
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
-import { actOn, computeSheet, inventoryOf, migrateCharacter, type CharacterJson, type SheetAction } from '../src/engine';
+import { actOn, computeSheet, inventoryOf, levelUpView, migrateCharacter, type CharacterJson, type SheetAction } from '../src/engine';
 import { resourceKey } from '../src/sheet/format';
 import { api, catalogo, TOKEN_DM, TOKEN_ESCRITURA, vigilarEscrituras, type PersonajeApi } from './helpers';
 
@@ -14,13 +14,13 @@ test.use({ locale: 'es-AR' });
 // dejó la anterior (que lee de la API, no de una constante).
 test.describe.configure({ mode: 'serial' });
 
-async function ilse(request: APIRequestContext): Promise<PersonajeApi> {
+async function ilse(request: APIRequestContext, id = ILSE): Promise<PersonajeApi> {
   const { characters } = await api<{ characters: { character: PersonajeApi }[] }>(
     request,
     '/api/characters',
     TOKEN_ESCRITURA,
   );
-  return characters.map((c) => c.character).find((c) => c.id === ILSE)!;
+  return characters.map((c) => c.character).find((c) => c.id === id)!;
 }
 
 /** Lo que el motor da para [acciones] en fila sobre [ficha]: lo que la página
@@ -30,8 +30,8 @@ function segunMotor(ficha: CharacterJson, ...acciones: SheetAction[]): Character
 }
 
 /** Espera a que la cola de guardado mande y devuelve lo que mandó. */
-async function proximoGuardado(page: Page, accion: () => Promise<void>): Promise<CharacterJson> {
-  const put = page.waitForRequest((r) => r.method() === 'PUT' && r.url().endsWith(`/api/characters/${ILSE}`));
+async function proximoGuardado(page: Page, accion: () => Promise<void>, id = ILSE): Promise<CharacterJson> {
+  const put = page.waitForRequest((r) => r.method() === 'PUT' && r.url().endsWith(`/api/characters/${id}`));
   await accion();
   const enviado = (await put).postDataJSON() as { character: CharacterJson };
   await expect(page.locator('[data-save-state="saved"]')).toBeVisible();
@@ -289,6 +289,46 @@ test('comprar del catálogo y vender pagan con la cuenta del motor, y vender se 
   expect(await proximoGuardado(page, () => page.getByRole('button', { name: 'Deshacer' }).last().click())).toEqual(
     migrateCharacter(comprada),
   );
+});
+
+test('la subida de nivel pasa por PG, subclase y mejora, guarda lo del motor y se deshace', async ({
+  page,
+  request,
+}) => {
+  const BRUNA = 'bruna-de-humo';
+  const antes = await ilse(request, BRUNA);
+  const senda = levelUpView(antes, catalogo(), { classId: 'barbarian' }).subclassOptions[0]!;
+  const esperado = segunMotor(antes, {
+    type: 'levelUp',
+    draft: { classId: 'barbarian', subclassId: senda.id, abilityA: 'strength' },
+  });
+  await page.goto(`/v2/personajes/${BRUNA}/subir-nivel`);
+
+  await page.getByRole('button', { name: 'Empezar' }).click();
+  await page.getByRole('button', { name: 'Continuar' }).click();
+  await page.getByRole('radio', { name: new RegExp(`^${senda.name}`) }).click();
+  await page.getByRole('button', { name: 'Continuar' }).click();
+  await page.getByRole('radio', { name: /^Fuerza/ }).click();
+  await page.getByRole('button', { name: 'Continuar' }).click();
+  const enviado = await proximoGuardado(
+    page,
+    () => page.getByRole('button', { name: 'Subir a nivel 4' }).click(),
+    BRUNA,
+  );
+  expect(enviado).toEqual(esperado);
+  // Vuelve a la ficha con el aviso, y «Deshacer» guarda la de antes.
+  await expect(page).toHaveURL(new RegExp(`/personajes/${BRUNA}/personaje$`));
+  await expect(page.getByText('Bruna de Humo subió a nivel 4.')).toBeVisible();
+  const deshecho = await proximoGuardado(page, () => page.getByRole('button', { name: 'Deshacer' }).click(), BRUNA);
+  expect(deshecho).toEqual(migrateCharacter(antes));
+});
+
+test('si la subida pide elegir conjuros, el asistente manda a la app principal sin escribir', async ({ page }) => {
+  const escrituras = vigilarEscrituras(page);
+  await page.goto(`/v2/personajes/${ILSE}/subir-nivel`);
+  await expect(page.locator('[data-field="level-up-blocked"]')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Empezar' })).toBeDisabled();
+  expect(escrituras).toEqual([]);
 });
 
 test('la ficha de otra cuenta no tiene controles para escribir', async ({ context, page, baseURL }) => {

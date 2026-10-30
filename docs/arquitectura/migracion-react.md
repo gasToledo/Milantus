@@ -139,8 +139,9 @@ repiten acá.
   el trasfondo con el Markdown chico de Flutter y las entradas, que se abren en
   un diálogo. Lo único que se escribe son las acciones de partida y la
   mochila (abajo): el resto de la ficha no se edita. El panel es el de una pantalla de
-  adentro: «volver», la tarjeta del personaje, las cinco pestañas, Retrato,
-  Subir nivel y Compartir, que enlazan a Flutter, e **Imprimir**; al pie, el
+  adentro: «volver», la tarjeta del personaje, las cinco pestañas, **Subir
+  nivel** (el asistente de `/v2`, abajo), Retrato y Compartir, que enlazan a
+  Flutter, e **Imprimir**; al pie, el
   estado del guardado, el tema y la versión. **Imprimir** (`PrintSheet`, el
   `print_sheet.dart` de Flutter) monta una hoja propia al pie de `body` y abre
   el diálogo del navegador (que ofrece también «Guardar como PDF»); la hoja de
@@ -432,6 +433,27 @@ repiten acá.
   «Cuentas» del Diario con la fecha local que manda el cliente, y avisan con
   «Deshacer». Lo único que React resta es el precio de una fila contra la
   bolsa para el «te faltan»; la compra la vuelve a validar el motor.
+  **Subida de nivel** (5c1, `/v2/personajes/:id/subir-nivel`,
+  `src/levelup/LevelUpWizard.tsx`; «Subir nivel» del panel lleva ahí). Es el
+  circuito rediseñado en el lienzo «Subida de nivel»: una sola forma de elegir
+  (la opción, círculo si es una y cuadrado si son varias, apagada con el
+  motivo si no se puede), un estado por bloque (falta o «n de m», listo,
+  automático) y a la derecha la explicación de lo último que se tocó y «Así
+  queda», que compara la ficha de antes con la que da el motor. Pasos:
+  resumen (la clase en una fila con scroll horizontal, y qué trae el nivel),
+  PG (promedio o tirada, que tira el motor, o lo que salió en la mesa),
+  subclase si toca, mejora de característica o dote (con el +1 de los dones
+  épicos) y revisión. Confirmar es la acción `levelUp`; vuelve a la ficha con
+  el aviso y «Deshacer». **La lógica bajó al engine** (`LevelUp` y
+  `LevelUpDraft`, `level_up.dart`): cómo queda el personaje, qué pasos hacen
+  falta, si la mejora está completa, las dotes que se ofrecen con el
+  prerrequisito que falta, los rasgos ganados y los PG actuales al confirmar.
+  Flutter (`LevelUpScreen`) la usa de ahí. **Corte de 5c1:** si la subida
+  obliga a elegir rasgos, competencias o Pericia, o conjuros (`LevelUp.open`:
+  casi todo lanzador), el resumen lo dice y manda a la app principal; el motor
+  rechaza confirmar una subida a medias. Las piezas del circuito (`Option`,
+  `Block`, `Status`) viven en el asistente; si el creador (5d) las reusa,
+  pasan a `src/ui/`.
   - **Toda escritura la hace el motor.** `actOn` (`act` de `js/entrypoint.dart`,
     sobre `SheetActions.apply` del engine) recibe la ficha y la acción y
     devuelve la ficha nueva, migrada y con el `schemaVersion` actual, más lo
@@ -484,11 +506,17 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
 5. Edición completa: creador de personajes, subida de nivel, inventario. Por
    partes: 5a, la Inspiración Heroica y la concentración *(existe)*; 5b1,
    editar la mochila desde la fila y las monedas *(existe)*; 5b2, catálogo,
-   comprar y vender *(existe)*; 5c, subida de nivel; 5d, creador.
+   comprar y vender *(existe)*; 5c1, subida de nivel sin elecciones de rasgos,
+   competencias ni conjuros *(existe)*; 5c2, esas elecciones de rasgos y
+   competencias; 5c3, los conjuros; 5d, creador.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
    combate, vínculos y códigos de campaña. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de
-   otra cuenta» es del servidor y vale igual para el cliente nuevo.
+   otra cuenta» es del servidor y vale igual para el cliente nuevo. Entra acá
+   también la edición de la ficha completa de un PNJ (inventario, comprar y
+   vender, y el resto de lo que ya se escribe en la ficha propia): reutiliza
+   las acciones del motor y la cola de guardado del paso 5, pero guarda por
+   `PUT /api/npcs/:id`.
 7. Homebrew, importación/exportación y el resto.
 
 ## Cómo se prueba
@@ -576,7 +604,9 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    Inspiración Heroica y la concentración guarden lo del motor, que la mochila
    se edite desde la fila (equipar, cantidad, nota, monedas) y que quitar se
    deshaga, que comprar del catálogo y vender guarden lo del motor y vender
-   se deshaga, y
+   se deshaga, que una bárbara sembrada suba a 4 por PG, subclase y mejora
+   guardando lo del motor y se deshaga, y que la clériga, cuya subida pide
+   conjuros, quede frenada sin escribir, y
    que la ficha de otra cuenta (la de un miembro, para el DM) no
    tenga un solo control (`e2e/escritura.spec.ts`, con una cuenta propia para
    no cambiar lo que leen las demás); y que una cuenta sin `webV2` vea
@@ -644,12 +674,15 @@ hace seguro volver atrás es que **no hay nada que deshacer en el formato**:
 
 Para que nadie lo dé por hecho:
 
+- Editar la ficha completa de un PNJ (paso 6): reutiliza las acciones y la
+  cola de guardado del paso 5, pero guarda por `PUT /api/npcs/:id`.
 - Toda otra escritura desde React: los pasos 5 a 7 están enteros por hacer.
   Entre ellos, reordenar, marcar favorito, crear, renombrar o borrar
   personajes, condiciones, compañeros (y con ellos lanzar gastando espacio o
   uso gratis), cambiar el truco innato y Forma Salvaje; en el inventario,
   los planos del Artífice y los objetivos de arma de un rasgo (Pacto del
-  Filo), y
+  Filo); en la subida de nivel, elegir rasgos, competencias o Pericia (5c2) y
+  conjuros (5c3), y
   escribir en `/api/settings` (por eso el tema elegido en el navegador gana
   sobre el de la cuenta).
 - Control de versión en el servidor para las escrituras (rechazar una copia

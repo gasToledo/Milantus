@@ -92,6 +92,8 @@ export type Route =
   | { name: 'codex'; category: CodexCategory | null; entryId: string | null }
   // `tab: null` es la ruta sin sufijo, que redirige a la primera pestaña.
   | { name: 'character'; id: string; tab: SheetTab | null }
+  // El asistente de subida de nivel de la ficha propia.
+  | { name: 'levelUp'; id: string }
   | { name: 'unknown' };
 
 /** Adónde mandan los enlaces a lo que todavía vive solo en Flutter (crear,
@@ -188,6 +190,13 @@ export function matchRoute(pathname: string): Route {
       return { name: 'unknown' };
     }
   }
+  if (section === 'personajes' && id && tab === 'subir-nivel' && rest.length === 0) {
+    try {
+      return { name: 'levelUp', id: decodeURIComponent(id) };
+    } catch {
+      return { name: 'unknown' };
+    }
+  }
   if (section === 'personajes' && id && rest.length === 0) {
     const sheetTab = tab === undefined ? null : SHEET_TABS.find((t) => t === tab);
     if (sheetTab === undefined) return { name: 'unknown' };
@@ -251,6 +260,9 @@ export const codexHref = (category?: CodexCategory, entryId?: string): string =>
 
 export const characterHref = (id: string, tab: SheetTab = 'personaje'): string =>
   `${import.meta.env.BASE_URL}personajes/${encodeURIComponent(id)}/${tab}`;
+
+export const levelUpHref = (id: string): string =>
+  `${import.meta.env.BASE_URL}personajes/${encodeURIComponent(id)}/subir-nivel`;
 
 // `pushState` no dispara ningún evento: se avisa a mano a quien escucha.
 const listeners = new Set<() => void>();

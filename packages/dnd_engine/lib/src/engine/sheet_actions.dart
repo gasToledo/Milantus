@@ -6,6 +6,7 @@ import 'coin_ops.dart';
 import 'combat_ops.dart';
 import 'dice.dart';
 import 'inventory_ops.dart';
+import 'level_up.dart';
 
 /// Lo que devuelve [SheetActions.apply]: la ficha nueva y lo que pasó, para
 /// el aviso que muestra la pantalla («Te estabilizaste», «Recuperaste 7 PG»).
@@ -65,6 +66,8 @@ class SheetActions {
   ///   el motor no dependa del reloj); `outcome.paid` es false si no alcanzó
   ///   y la ficha vuelve intacta.
   /// - `sell` con `entry`, `quantity`, `unitPriceCp` y `at`.
+  /// - `levelUp` con `draft` (`LevelUpDraft.fromJson`): sube el nivel con
+  ///   [LevelUp.confirm], PG actuales incluidos.
   ///
   /// Una acción desconocida lanza [FormatException]: un cliente desfasado no
   /// tiene que guardar una ficha que el motor no tocó creyendo que sí.
@@ -256,6 +259,17 @@ class SheetActions {
           unitPriceCp: (action['unitPriceCp'] as num).toInt(),
           at: DateTime.parse(action['at'] as String),
         );
+      case 'levelUp':
+        final up = LevelUp(
+          c,
+          repo,
+          LevelUpDraft.fromJson(action['draft'] as Map<String, dynamic>),
+        );
+        // Un cliente desfasado no guarda una subida a medias.
+        if (!up.complete) {
+          throw const FormatException('Subida de nivel incompleta');
+        }
+        c = up.confirm();
       default:
         throw FormatException('Acción de ficha desconocida: ${action['type']}');
     }

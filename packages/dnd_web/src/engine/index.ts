@@ -1,4 +1,4 @@
-import type { BestiaryRow, Catalog, CharacterJson, ComputedSheet, EncounterView, InventoryLine, JsonObject, NpcView } from './types';
+import type { AbilityId, BestiaryRow, Catalog, CharacterJson, ComputedSheet, EncounterView, InventoryLine, JsonObject, NpcView } from './types';
 // Lo genera `npm run build:engine` (o la etapa `engine-js` del Dockerfile) y
 // no se versiona. Es un script de dart2js, no un módulo: al cargarse deja
 // `globalThis.dndEngine`, y de ahí lo toma este archivo.
@@ -18,6 +18,8 @@ interface DartEngine {
   catalogLabelOrder(kind: string): string;
   formatCost(cp: number, labelsJson: string): string;
   trade(requestJson: string, labelsJson: string): string;
+  levelUp(characterJson: string, catalogJson: string, draftJson: string): string;
+  rollDie(sides: number): number;
   coinParts(cp: number): string;
   formatAmount(cp: number, labelsJson: string): string;
   abilityModifier(score: number): number;
@@ -175,6 +177,72 @@ export function tradePreview(request: TradeRequest, labels: Record<string, strin
   return JSON.parse(engine().trade(JSON.stringify(request), JSON.stringify(labels))) as TradePreview;
 }
 
+/** Las decisiones de una subida de nivel (`LevelUpDraft` del motor). */
+export interface LevelUpDraft {
+  classId: string;
+  subclassId?: string | null;
+  /** Lo que salió en el dado; sin él, el promedio. */
+  hpRoll?: number | null;
+  asiFeat?: boolean;
+  asiPlusTwo?: boolean;
+  abilityA?: AbilityId | null;
+  abilityB?: AbilityId | null;
+  featId?: string | null;
+}
+
+export interface AbilityChoice {
+  amount: number;
+  max: number;
+  allowed: AbilityId[];
+}
+
+/** Lo que el motor resuelve de una subida en curso (`levelUp` de
+ *  `js/entrypoint.dart`). `unmet` es el requisito que falta, o `null`. */
+export interface LevelUpView {
+  newLevel: number;
+  newClassLevel: number;
+  hitDie: number;
+  averageHp: number;
+  hpGain: number;
+  hpIfAverage: number;
+  hpIfRoll: number | null;
+  hpRange: [number, number];
+  isAsi: boolean;
+  needsSubclass: boolean;
+  asiComplete: boolean;
+  complete: boolean;
+  unmetMulticlass: string | null;
+  classOptions: { id: string; name: string; hitDie: number; unmet: string | null }[];
+  subclassOptions: { id: string; name: string; description: string; homebrew: boolean }[];
+  featOptions: {
+    id: string;
+    name: string;
+    category: string;
+    description: string;
+    homebrew: boolean;
+    unmet: string | null;
+    abilityChoice: AbilityChoice | null;
+  }[];
+  featAbilityChoice: AbilityChoice | null;
+  gainedFeatures: { name: string; description: string }[];
+  /** Lo que la subida obliga a elegir y todavía se elige en Flutter. */
+  open: { features: number; proficiencies: number; spellChoices: number; classSpells: number };
+  /** El personaje como quedaría, para comparar las dos fichas. */
+  character: CharacterJson;
+}
+
+/** Una subida de nivel en curso, resuelta por el motor (`LevelUp`). */
+export function levelUpView(character: CharacterJson, catalog: Catalog, draft: LevelUpDraft): LevelUpView {
+  return JSON.parse(
+    engine().levelUp(JSON.stringify(character), catalogJson(catalog), JSON.stringify(draft)),
+  ) as LevelUpView;
+}
+
+/** Una tirada de un dado de [sides] caras, hecha por el motor. */
+export function rollDie(sides: number): number {
+  return engine().rollDie(sides);
+}
+
 /** [cp] partido en oro, plata y cobre (`CoinOps.changeFor`). */
 export function coinParts(cp: number): Record<string, number> {
   return JSON.parse(engine().coinParts(cp)) as Record<string, number>;
@@ -255,7 +323,8 @@ export type SheetAction =
   | { type: 'setCoins'; coins: Record<string, number> }
   | { type: 'addItem'; item: string }
   | { type: 'buy'; item: string; quantity: number; unitPriceCp: number; at: string }
-  | { type: 'sell'; entry: string; quantity: number; unitPriceCp: number; at: string };
+  | { type: 'sell'; entry: string; quantity: number; unitPriceCp: number; at: string }
+  | { type: 'levelUp'; draft: LevelUpDraft };
 
 /** Lo que cuenta el motor de una acción, para el aviso. Cada campo existe
  *  solo en la acción que lo da (ver `SheetActions.apply`). */

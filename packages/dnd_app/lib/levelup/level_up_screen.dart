@@ -70,24 +70,44 @@ class LevelUpScreen extends StatefulWidget {
 class _LevelUpScreenState extends State<LevelUpScreen> {
   String _levelUpClassId = '';
 
-  CharacterClass? get _klass => widget.repo.characterClass(_levelUpClassId);
-  int get _newLevel => widget.character.totalLevel + 1;
-  int get _newClassLevel => widget.character.classLevel(_levelUpClassId) + 1;
-  int get _hitDie => _klass?.hitDie ?? 10;
-  bool get _isAsi => _klass?.isAsiLevel(_newClassLevel) ?? false;
+  /// Las reglas de la subida viven en el motor (`LevelUp`), que comparte el
+  /// cliente React: acá solo se juntan las decisiones del asistente.
+  LevelUpDraft get _draft => LevelUpDraft(
+    classId: _levelUpClassId,
+    subclassId: _subclassId,
+    // Elegir tirar sin haber tirado suma 0 y no deja confirmar.
+    hpRoll: _hpMethod == _HpMethod.roll ? (_rolledHp ?? 0) : null,
+    asiFeat: _asiKind == _AsiKind.feat,
+    asiPlusTwo: _impMode == _ImproveMode.plusTwo,
+    abilityA: _abilityA,
+    abilityB: _abilityB,
+    featId: _featId,
+    cantripIds: _newCantrips,
+    spellIds: _newSpells,
+    classCantripIds: _newClassCantrips,
+    classSpellIds: _newClassSpells,
+    featureChoices: _newFeatureChoices,
+    classFeatureChoices: _newClassFeatureChoices,
+    proficiencyChoices: _newProficiencyChoices,
+    spellChoices: _newSpellChoices,
+    classSpellChoices: _newClassSpellChoices,
+  );
+
+  LevelUp get _levelUp => LevelUp(widget.character, widget.repo, _draft);
+
+  CharacterClass? get _klass => _levelUp.klass;
+  int get _newLevel => _levelUp.newLevel;
+  int get _newClassLevel => _levelUp.newClassLevel;
+  int get _hitDie => _levelUp.hitDie;
+  bool get _isAsi => _levelUp.isAsi;
   List<CharacterClass> get _classOptions =>
       widget.repo.classes.values.toList()
         ..sort((a, b) => a.name.compareTo(b.name));
 
   /// Este nivel debe elegir subclase: se alcanza el nivel de subclase de la
   /// clase y aún no hay una elegida.
-  bool get _needsSubclass =>
-      _klass != null &&
-      widget.character.subclassForClass(_levelUpClassId) == null &&
-      _newClassLevel >= _klass!.subclassLevel;
-  List<Subclass> get _subclassOptions => _needsSubclass
-      ? widget.repo.subclassesForClass(_levelUpClassId)
-      : const [];
+  bool get _needsSubclass => _levelUp.needsSubclass;
+  List<Subclass> get _subclassOptions => _levelUp.subclassOptions;
   String? _subclassId;
 
   @override
@@ -107,9 +127,7 @@ class _LevelUpScreenState extends State<LevelUpScreen> {
   String _featQuery = '';
   int _currentStep = 0;
 
-  int get _hpGain => _hpMethod == _HpMethod.average
-      ? averageHitDie(_hitDie)
-      : (_rolledHp ?? 0);
+  int get _hpGain => _levelUp.hpGain;
 
   bool get _canConfirm {
     if (_hpMethod == _HpMethod.roll && _rolledHp == null) return false;
@@ -153,32 +171,10 @@ class _LevelUpScreenState extends State<LevelUpScreen> {
   /// elección". La declaran los trece dones épicos (techo 30) y las doce marcas
   /// mayores (techo 20). Se pregunta por el efecto y no por la categoría, así
   /// que una dote homebrew que lo declare funciona igual.
-  AbilityScoreChoiceEffect? get _featAbilityChoice {
-    if (!_isAsi || _asiKind != _AsiKind.feat || _featId == null) return null;
-    return widget.repo
-        .feat(_featId!)
-        ?.effects
-        .whereType<AbilityScoreChoiceEffect>()
-        .firstOrNull;
-  }
+  AbilityScoreChoiceEffect? get _featAbilityChoice =>
+      _levelUp.featAbilityChoice;
 
-  Map<Ability, int> get _abilityIncreases {
-    if (!_isAsi) return const {};
-    // Tomar una dote normal no sube ninguna característica; un don épico o una
-    // marca mayor sí, y ese aumento viaja en el mismo `AsiChoice` que la dote.
-    if (_asiKind == _AsiKind.feat) {
-      final boon = _featAbilityChoice;
-      if (boon == null || _abilityA == null) return const {};
-      return {_abilityA!: boon.amount};
-    }
-    if (_impMode == _ImproveMode.plusTwo) {
-      return {?_abilityA: 2};
-    }
-    final m = <Ability, int>{};
-    if (_abilityA != null) m[_abilityA!] = 1;
-    if (_abilityB != null) m[_abilityB!] = (m[_abilityB!] ?? 0) + 1;
-    return m;
-  }
+  Map<Ability, int> get _abilityIncreases => _levelUp.abilityIncreases;
 
   // Conjuros re-elegidos en este nivel (null = sin cambios respecto al actual).
   List<String>? _newCantrips;
@@ -696,17 +692,7 @@ class _LevelUpScreenState extends State<LevelUpScreen> {
     return steps[index];
   }
 
-  bool get _asiComplete {
-    if (!_isAsi) return true;
-    if (_asiKind == _AsiKind.feat) {
-      if (_featId == null) return false;
-      // Una dote que sube una característica no está completa sola: falta decir a
-      // característica va su +1.
-      return _featAbilityChoice == null || _abilityA != null;
-    }
-    if (_abilityA == null) return false;
-    return _impMode == _ImproveMode.plusTwo || _abilityB != null;
-  }
+  bool get _asiComplete => _levelUp.asiComplete;
 
   bool _isStepComplete(_LevelUpStepKind kind) => switch (kind) {
     _LevelUpStepKind.hitPoints =>
@@ -801,94 +787,18 @@ class _LevelUpScreenState extends State<LevelUpScreen> {
   /// [withFeat] en false deja fuera la dote tentativa. El selector lo necesita
   /// para evaluar prerrequisitos: una dote que sube una característica no debe
   /// poder habilitarse a sí misma.
-  Character _buildUpdated({bool withFeat = true}) {
-    final c = widget.character;
-    final asiChoices = List<AsiChoice>.of(c.asiChoices);
-    final featIds = List<String>.of(c.featIds);
-
-    if (_isAsi) {
-      if (_asiKind == _AsiKind.improve) {
-        asiChoices.add(
-          AsiChoice(
-            classId: _levelUpClassId,
-            level: _newClassLevel,
-            abilityIncreases: _abilityIncreases,
-          ),
-        );
-      } else if (withFeat && _featId != null) {
-        // La dote solo se agrega si ya se eligió: `_buildUpdated` corre en cada
-        // build (previsualización de conjuros), incluso antes de elegir dote.
-        // `abilityIncreases` va vacío para una dote normal y trae el +1 del
-        // aumento de la dote cuando corresponde: es el único caso en que un `AsiChoice`
-        // lleva dote y aumento a la vez.
-        asiChoices.add(
-          AsiChoice(
-            classId: _levelUpClassId,
-            level: _newClassLevel,
-            featId: _featId,
-            abilityIncreases: _abilityIncreases,
-          ),
-        );
-        featIds.add(_featId!);
-      }
-    }
-
-    final subclassIds = {...c.subclassIds};
-    if (_subclassId != null) subclassIds[_levelUpClassId] = _subclassId!;
-    return c.copyWith(
-      level: _newLevel,
-      classHistory: [...c.classHistory, _levelUpClassId],
-      // Si se eligió subclase en esta subida se fija; si no, se conserva la
-      // actual (pasar null solo ocurre por debajo del nivel de subclase).
-      subclassId: _levelUpClassId == c.classId
-          ? _subclassId ?? c.subclassId
-          : c.subclassId,
-      subclassIds: subclassIds,
-      hpPerLevel: [...c.hpPerLevel, _hpGain],
-      asiChoices: asiChoices,
-      featIds: featIds,
-      cantripIds: _newCantrips,
-      spellIds: _newSpells,
-      classCantripIds: _newClassCantrips,
-      classSpellIds: _newClassSpells,
-      featureChoices: _newFeatureChoices,
-      classFeatureChoices: _newClassFeatureChoices,
-      proficiencyChoices: _newProficiencyChoices,
-      spellChoices: _newSpellChoices,
-      classSpellChoices: _newClassSpellChoices,
-    );
-  }
+  Character _buildUpdated({bool withFeat = true}) =>
+      _levelUp.build(withFeat: withFeat);
 
   /// Rasgos ganados exactamente en el nuevo nivel: los de clase más, si hay
   /// subclase (elegida ahora o antes), los de subclase.
-  List<ClassFeature> _gainedFeatures() {
-    final feats = <ClassFeature>[...?_klass?.featuresAt(_newClassLevel)];
-    final subId =
-        _subclassId ?? widget.character.subclassForClass(_levelUpClassId);
-    if (subId != null) {
-      final sub = widget.repo.subclass(subId);
-      if (sub != null && sub.classId == _levelUpClassId) {
-        feats.addAll(sub.featuresAt(_newClassLevel));
-      }
-    }
-    return feats;
-  }
+  List<ClassFeature> _gainedFeatures() => _levelUp.gainedFeatures;
 
   void _confirm() {
-    final c = widget.character;
-    final updated = _buildUpdated();
-
-    final compiler = CharacterCompiler(widget.repo);
-    final before = compiler.compile(c);
-    final after = compiler.compile(updated);
-
-    // Sube los PG actuales por el incremento del máximo (se comparte el
-    // CombatState por referencia vía copyWith).
-    final delta = after.maxHp - before.maxHp;
-    updated.combat.currentHp = (updated.combat.currentHp + delta).clamp(
-      0,
-      after.maxHp,
-    );
+    final levelUp = _levelUp;
+    final updated = levelUp.confirm();
+    final before = levelUp.before;
+    final after = levelUp.after;
 
     widget.onDone(updated);
 

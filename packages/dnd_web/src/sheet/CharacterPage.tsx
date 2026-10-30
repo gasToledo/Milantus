@@ -10,6 +10,7 @@ import { AppBusyLabel, AppErrorView, Notice, SaveStatusBadge } from '../ui/statu
 import { computeModel, type ComputedModel } from './compute';
 import { SheetFooter, SheetPanel } from './SheetPanel';
 import { SheetTabs } from './SheetTabs';
+import { LevelUpWizard } from '../levelup/LevelUpWizard';
 import { useSheetWriter, type SheetNotify } from './writer';
 
 interface ToastState {
@@ -29,7 +30,7 @@ interface ToastState {
  * Es la única ficha que escribe (`useSheetWriter`): PG, usos y descansos, cada
  * uno pasado por el motor y guardado con la cola de `characterSave.ts`.
  */
-export function CharacterPage({ id, tab }: { id: string; tab: SheetTab | null }) {
+export function CharacterPage({ id, tab, levelUp = false }: { id: string; tab: SheetTab | null; levelUp?: boolean }) {
   const t = useTexts();
   const lang = useLang();
   const roster = useRoster();
@@ -41,8 +42,8 @@ export function CharacterPage({ id, tab }: { id: string; tab: SheetTab | null })
   // La ruta sin pestaña es la primera: se reemplaza en el historial para que
   // «atrás» no vuelva a una URL que solo redirige.
   useEffect(() => {
-    if (tab === null) navigate(characterHref(id), { replace: true });
-  }, [id, tab]);
+    if (tab === null && !levelUp) navigate(characterHref(id), { replace: true });
+  }, [id, tab, levelUp]);
 
   // Al volver a la pestaña se pide la ficha de nuevo, por si se tocó en
   // Flutter mientras tanto: así la próxima acción parte de esa copia y no la
@@ -89,6 +90,8 @@ export function CharacterPage({ id, tab }: { id: string; tab: SheetTab | null })
     body = <AppBusyLabel label={t.loading} />;
   } else if (!model) {
     body = <AppErrorView as="h1" title={t.computeErrorTitle} message={t.computeErrorBody} detail={computed.ok ? undefined : computed.detail} />;
+  } else if (levelUp) {
+    body = model.write ? <LevelUpWizard model={model} write={model.write} /> : <AppBusyLabel label={t.loading} />;
   } else {
     // Debajo de 900 px el panel es un cajón: la tira de pestañas va arriba del
     // contenido, para cambiar sin abrirlo. Desde 900 las pestañas viven en el
