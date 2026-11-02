@@ -68,7 +68,15 @@ rojo por saltear esto, y un commit roto llega a producción igual:
    pantalla que tocaste, y ajustá las pruebas que lo lean. Las de lectura
    entran con una cuenta dueña de sus fichas, así que un texto que pasó a ser
    un control, o un rótulo con otra mayúscula, las rompe.
-3. Después del push, mirá que CI termine en verde antes de empezar el próximo
+3. Una prueba e2e nueva que no pudiste correr es código sin probar: 5e2 llegó a
+   CI con tres y falló en dos commits seguidos, porque cada falla frena las que
+   siguen. Sumá las menos posibles (ver [Tests](#tests)) y, antes de commitear,
+   revisá cada una contra estas trampas, que ya rompieron CI:
+   - Un aviso existe dos veces, el visible y la región para lectores de
+     pantalla: `getByText` va con `{ exact: true }`.
+   - Playwright no le hace clic a un elemento con `aria-disabled`: se queda
+     esperando hasta el tiempo límite si no lleva `{ force: true }`.
+4. Después del push, mirá que CI termine en verde antes de empezar el próximo
    cambio.
 
 CI verifica el formato **antes que nada**, así que un commit sin formatear falla
@@ -371,6 +379,11 @@ uno, fijate si ya hay otro que cubra la misma regla, y no escribas tests para
 verificar un arreglo puntual, explorar un comportamiento o dejar constancia de
 un dato: eso se comprueba una vez y no se commitea. Cada test que entra se
 paga en cada corrida de CI y en cada despliegue.
+
+En `dnd_web/e2e/` el listón es más alto: lo esencial es que una escritura mande
+lo que da el motor y que la ficha ajena no tenga controles. Una regla va en el
+test del motor, que corre en todas las máquinas, y no se repite en Playwright.
+Un detalle de pantalla (un aviso, un estado apagado) no justifica una prueba.
 
 Los tests de widget montan el árbol real contra `FakeApiServer`
 (`packages/dnd_app/test/fakes/fake_api_server.dart`), un doble en memoria que
