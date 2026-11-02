@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Footprints, Heart, Medal, Shield, Zap } from 'lucide-react';
+import { Footprints, Heart, Medal, Zap } from 'lucide-react';
 import { nameOf } from '../api/catalog';
 import { useTexts } from '../i18n/context';
 import { hpTone, Pill, SectionRule, StatTile, ThinBar } from '../ui/data';
@@ -14,7 +14,18 @@ import { classesOf, type SheetModel } from './model';
  * va en la banda: es de la pestaña Personaje (Habilidades), y una sexta placa
  * le quita ancho a los PG, que son los que cambian.
  */
-export function SheetHeader({ model, leading }: { model: SheetModel; leading?: ReactNode }) {
+export function SheetHeader({
+  model,
+  leading,
+  showBand = true,
+}: {
+  model: SheetModel;
+  leading?: ReactNode;
+  /** La banda solo va donde se juega (Personaje y Combate): en Inventario,
+   *  Campaña y Diario ocupa lugar sin aportar. El cartel del modo activo sí
+   *  se queda: dice por qué cambiaron los números, y eso vale en todas. */
+  showBand?: boolean;
+}) {
   const t = useTexts();
   const { character, sheet, catalog } = model;
   const currentHp = character.combat?.currentHp ?? 0;
@@ -48,9 +59,9 @@ export function SheetHeader({ model, leading }: { model: SheetModel; leading?: R
 
       <ActiveModeBanners model={model} />
 
+      {showBand && (
       <section aria-label={t.tacticalBand} className="tactical-band">
         <dl>
-          <StatTile id="ac" icon={Shield} label={t.armor} value={sheet.armorClass} />
           <StatTile
             id="hp"
             icon={Heart}
@@ -85,6 +96,7 @@ export function SheetHeader({ model, leading }: { model: SheetModel; leading?: R
             ))}
         </dl>
       </section>
+      )}
 
       <SectionRule className="my-1" />
     </>

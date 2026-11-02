@@ -31,7 +31,8 @@ test('la ficha muestra los números que da el motor para el personaje sembrado',
   const cifra = (id: string) => page.locator(`[data-stat="${id}"] [data-field="value"]`);
   await expect(cifra('hp')).toHaveText(String(personaje.combat.currentHp));
   await expect(page.locator('[data-stat="hp"] dd')).toContainText(`/ ${ficha.maxHp}`);
-  await expect(cifra('ac')).toHaveText(String(ficha.armorClass));
+  // La CA ya no va en la banda: se lee en la tarjeta Defensa de Combate.
+  await expect(page.locator('section[aria-label="Cifras de combate"] [data-stat="ac"]')).toHaveCount(0);
   await expect(cifra('initiative')).toHaveText(signed(ficha.initiative));
   await expect(cifra('proficiency')).toHaveText(signed(ficha.proficiencyBonus));
   // La percepción pasiva no va en la banda táctica sino con las habilidades.

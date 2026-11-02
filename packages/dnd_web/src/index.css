@@ -249,6 +249,10 @@ body {
 .tactical-band [data-stat='hp'] {
   grid-column: 1 / -1;
 }
+/* Un estado activable (la Furia) es una franja a todo el ancho. */
+.tactical-band [data-mode] {
+  grid-column: 1 / -1 !important;
+}
 @container (min-width: 540px) {
   .tactical-band > dl {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -259,7 +263,7 @@ body {
 }
 @container (min-width: 900px) {
   .tactical-band > dl {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) repeat(3, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr));
   }
   .tactical-band [data-stat='hp'] {
     grid-column: auto;

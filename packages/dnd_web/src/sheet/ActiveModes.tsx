@@ -4,7 +4,7 @@ import type { ActiveMode } from '../engine';
 import { useTexts } from '../i18n/context';
 import { labelOf } from '../i18n/texts';
 import { AppDialog } from '../ui/AppDialog';
-import { StatTile } from '../ui/data';
+import { cx } from '../ui/cx';
 import { resourceKey } from './format';
 import { resourceLeft, type SheetModel } from './model';
 import { ABILITIES } from './vocabulary';
@@ -75,8 +75,8 @@ export function ActiveModeBanners({ model }: { model: SheetModel }) {
   );
 }
 
-/** La placa de un estado activable en la banda táctica: los usos que quedan y
- *  «Activar», o «En curso» y «Terminar». Sin escritura solo se muestra el que
+/** La franja de un estado activable en la banda táctica: los usos que quedan
+ *  y «Activar», o «En curso · Terminar». Sin escritura solo se muestra el que
  *  está en curso. La regla (gastar el uso, la armadura pesada) es del motor;
  *  acá solo se dice por qué no se puede. */
 export function ActiveModeTile({ model, mode: m }: { model: SheetModel; mode: ActiveMode }) {
@@ -105,32 +105,44 @@ export function ActiveModeTile({ model, mode: m }: { model: SheetModel; mode: Ac
     const r = write!.act({ type: 'activateMode', mode: m.id, ...choice });
     if (r && r.outcome.activated === false) write!.notify(t.modeFailed, { tone: 'error' });
   };
-  const state = m.active ? t.modeOn : (blocked ?? t.modeActivate);
-  return (
+  const action = m.active ? `${t.modeOn} · ${t.modeEnd}` : (blocked ?? t.modeActivate);
+  const off = !m.active && blocked !== null;
+  const body = (
     <>
-        <StatTile
-          id={`mode-${m.id}`}
-          icon={Flame}
-          label={m.name}
-          // Sin recurso (el Poder de lo Salvaje) no hay usos que contar.
-          value={m.active ? t.modeOn : (left ?? '—')}
-          valueClassName={m.active ? 'text-gold' : 'text-on-surface'}
-          suffix={m.active || !resource ? undefined : ` / ${resource.max}`}
-          footer={
-            write ? (
-              <button
-                type="button"
-                disabled={!m.active && blocked !== null}
-                onClick={m.active ? () => write.act({ type: 'deactivateMode', mode: m.id }) : activate}
-                className={`mt-1 text-[11px] ${m.active ? 'text-on-surface' : blocked ? 'text-text-muted' : 'text-gold'}`}
-              >
-                {m.active ? t.modeEnd : state}
-              </button>
-            ) : undefined
-          }
-        />
-      {choosing && <VariantDialog mode={m} onClose={() => setChoosing(false)} onChoose={activateWith} />}
+      <Flame size={22} aria-hidden="true" className={cx('shrink-0', off ? 'text-text-muted' : 'text-gold')} />
+      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span className={cx('text-[15px] font-semibold', m.active ? 'text-gold' : 'text-on-surface')}>{titleOf(m)}</span>
+        {resource && <span className="text-[12.5px] text-on-surface-variant">{t.modeUses(left ?? 0, resource.max)}</span>}
+      </span>
+      <span className={cx('text-right text-[13px] font-semibold', off ? 'text-text-muted' : 'text-gold')}>{action}</span>
     </>
+  );
+  // Una franja a todo el ancho de la banda y no una quinta placa: con las
+  // cuatro de arriba, quedaba sola en la segunda fila. Toda ella es el botón.
+  const strip = cx(
+    'plaque flex min-h-[60px] w-full items-center gap-3.5 px-4 py-2.5 text-left font-[family-name:var(--font-body)]',
+    m.active && '!border-gold bg-gold-soft',
+    off && 'opacity-60',
+  );
+  return (
+    <div data-stat={`mode-${m.id}`} data-mode className="min-w-0">
+      <dt className="sr-only">{m.name}</dt>
+      <dd>
+        {write ? (
+          <button
+            type="button"
+            disabled={off}
+            onClick={m.active ? () => write.act({ type: 'deactivateMode', mode: m.id }) : activate}
+            className={cx(strip, off ? 'cursor-not-allowed' : 'cursor-pointer')}
+          >
+            {body}
+          </button>
+        ) : (
+          <div className={strip}>{body}</div>
+        )}
+      </dd>
+      {choosing && <VariantDialog mode={m} onClose={() => setChoosing(false)} onChoose={activateWith} />}
+    </div>
   );
 }
 

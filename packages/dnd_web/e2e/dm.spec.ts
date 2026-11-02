@@ -99,7 +99,6 @@ test('la tarjeta de la Mesa abre la ficha completa del miembro, de solo lectura 
   await expect(page).toHaveURL(`${MESA}/${elsbeth.memberId}/personaje`);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(elsbeth.character.name);
   const cifra = (id: string) => page.locator(`section[aria-label="Cifras de combate"] [data-stat="${id}"] [data-field="value"]`);
-  await expect(cifra('ac')).toHaveText(String(ficha.armorClass));
   await expect(cifra('initiative')).toHaveText(signed(ficha.initiative));
   // Solo lo que sirve en combate: lo demás es del jugador.
   const pestanas = page.getByRole('tablist', { name: 'Pestañas de la ficha' });

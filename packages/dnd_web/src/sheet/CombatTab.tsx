@@ -586,7 +586,7 @@ function ConditionChips({ model }: { model: SheetModel }) {
                 aria-pressed={on}
                 data-condition={id}
                 onClick={toggle}
-                className={`inline-flex items-center rounded-[var(--radius-pill)] border px-[10px] py-[3px] text-[12px] ${
+                className={`inline-flex items-center rounded-[var(--radius-pill)] border px-3 py-1 font-[family-name:var(--font-body)] text-[13px] ${
                   on ? 'border-gold bg-gold-soft text-gold' : 'border-hairline bg-plaque text-on-surface-variant'
                 }`}
               >
@@ -615,22 +615,22 @@ function ExhaustionRow({ model }: { model: SheetModel }) {
     if (r?.outcome.died) write!.notify(t.exhaustionDeath(MAX_EXHAUSTION), { tone: 'error' });
   };
   return (
-    <div className="mt-3 border-t border-hairline pt-3" data-field="exhaustion">
-      <div className="flex items-center justify-between gap-3">
+    <div className="mt-4 border-t border-hairline pt-4" data-field="exhaustion">
+      <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-            <button
-              type="button"
-              onClick={() => setRule(true)}
-              aria-label={t.exhaustionRuleOpen}
-              className="inline-flex items-center gap-1.5 font-medium"
-            >
-              {t.exhaustionTitle}
-              <Info size={14} aria-hidden="true" className="text-text-muted" />
-            </button>
-            {n >= 1 && <span className="text-[12px] text-crimson">{t.exhaustionPenalty(2 * n, 5 * n)}</span>}
-          </div>
-          <div className="mt-1.5">
+          <button
+            type="button"
+            onClick={() => setRule(true)}
+            aria-label={t.exhaustionRuleOpen}
+            className="inline-flex items-center gap-1.5 font-[family-name:var(--font-body)] text-[16px] font-medium text-on-surface"
+          >
+            {t.exhaustionTitle}
+            <Info size={16} aria-hidden="true" className="text-text-muted" />
+          </button>
+          {/* La línea de la penalización siempre ocupa su lugar: si apareciera
+              recién en el nivel 1, subir el cansancio movería los pips. */}
+          <p className="mt-1 min-h-[20px] text-[13px] text-crimson">{n >= 1 ? t.exhaustionPenalty(2 * n, 5 * n) : ''}</p>
+          <div className="mt-2">
             <Pips max={MAX_EXHAUSTION} left={n} label={t.exhaustionLevelOf(n, MAX_EXHAUSTION)} tone="crimson" />
           </div>
         </div>
@@ -641,10 +641,10 @@ function ExhaustionRow({ model }: { model: SheetModel }) {
           onRecover={n < MAX_EXHAUSTION ? () => set(n + 1) : undefined}
         />
       </div>
-      {n >= MAX_EXHAUSTION && (
-        <p className="mt-2.5 flex items-start gap-2 text-[12px] text-crimson">
+      {n >= MAX_EXHAUSTION - 1 && (
+        <p className="mt-2.5 flex items-start gap-2 text-[12.5px] text-crimson">
           <TriangleAlert size={18} aria-hidden="true" className="shrink-0" />
-          {t.exhaustionNote(MAX_EXHAUSTION)}
+          {n >= MAX_EXHAUSTION ? t.exhaustionDead : t.exhaustionWarn}
         </p>
       )}
       {rule && (

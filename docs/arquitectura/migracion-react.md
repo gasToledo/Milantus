@@ -416,8 +416,9 @@ repiten acá.
   Desde 5e1: en la tarjeta **Condiciones** los 13 estados son chips que se
   marcan (con su regla en el tooltip) y el **Cansancio** es un contador de 0 a
   6 con su regla en un diálogo; al 6 avisa que el personaje muere y no toca los
-  PG. Los **modos activos** (la Furia) son una placa en la banda táctica —usos
-  que quedan, «Activar» o «Terminar», o el motivo del bloqueo— con un diálogo
+  PG; el nivel 5 avisa que otro nivel mata al personaje. Los **modos activos** (la Furia) son una franja a todo el ancho de la
+  banda táctica, toda ella un botón —usos que quedan, «Activar» o «En curso ·
+  Terminar», o el motivo del bloqueo— con un diálogo
   de variantes (casillas si admite varias) y un cartel arriba de la banda, en
   todas las pestañas, que dice qué suma. Las reglas (marcar un estado que
   incapacita termina la concentración y los modos, el tope del cansancio, gastar
@@ -425,7 +426,9 @@ repiten acá.
   `setExhaustion`, `activateMode` y `deactivateMode`; una activación rechazada
   devuelve la ficha intacta. `compute` aplica `applyExhaustion` sobre la ficha
   calculada, como Flutter: antes `/v2` mostraba descansado a quien no lo está.
-  Todavía **no** aplica la Forma Salvaje (5e4). Sin escritura, la ficha ajena
+  Todavía **no** aplica la Forma Salvaje (5e4). La banda táctica (PG, Iniciativa,
+  Velocidad, Competencia; sin Armadura, que se lee en Defensa) solo va en
+  Personaje y Combate, como en Flutter; el cartel del modo se queda en todas. Sin escritura, la ficha ajena
   sigue mostrando solo los estados puestos y el modo en curso.
   En **Inventario** (5b1): las cinco monedas se escriben a mano (se guardan al
   salir del campo o con Enter); cada fila lleva la casilla de equipar (solo lo
