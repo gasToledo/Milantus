@@ -11,6 +11,7 @@ import { computeModel, type ComputedModel } from './compute';
 import { SheetFooter, SheetPanel } from './SheetPanel';
 import { SheetTabs } from './SheetTabs';
 import { LevelUpWizard } from '../levelup/LevelUpWizard';
+import { MagicItemPlans } from './MagicItemPlans';
 import { SpellEditor } from './SpellEditor';
 import { useSheetWriter, type SheetNotify } from './writer';
 
@@ -36,12 +37,15 @@ export function CharacterPage({
   tab,
   levelUp = false,
   spellEdit,
+  magicPlans = false,
 }: {
   id: string;
   tab: SheetTab | null;
   levelUp?: boolean;
   /** La clase cuyos conjuros se editan (la ruta del editor), o undefined. */
   spellEdit?: string;
+  /** La ruta de los planos y réplicas del Artífice. */
+  magicPlans?: boolean;
 }) {
   const t = useTexts();
   const lang = useLang();
@@ -54,8 +58,8 @@ export function CharacterPage({
   // La ruta sin pestaña es la primera: se reemplaza en el historial para que
   // «atrás» no vuelva a una URL que solo redirige.
   useEffect(() => {
-    if (tab === null && !levelUp && spellEdit === undefined) navigate(characterHref(id), { replace: true });
-  }, [id, tab, levelUp, spellEdit]);
+    if (tab === null && !levelUp && spellEdit === undefined && !magicPlans) navigate(characterHref(id), { replace: true });
+  }, [id, tab, levelUp, spellEdit, magicPlans]);
 
   // Al volver a la pestaña se pide la ficha de nuevo, por si se tocó en
   // Flutter mientras tanto: así la próxima acción parte de esa copia y no la
@@ -110,6 +114,8 @@ export function CharacterPage({
     ) : (
       <AppBusyLabel label={t.loading} />
     );
+  } else if (magicPlans) {
+    body = model.write ? <MagicItemPlans model={model} write={model.write} /> : <AppBusyLabel label={t.loading} />;
   } else {
     // Debajo de 900 px el panel es un cajón: la tira de pestañas va arriba del
     // contenido, para cambiar sin abrirlo. Desde 900 las pestañas viven en el

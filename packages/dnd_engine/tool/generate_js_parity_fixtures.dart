@@ -133,6 +133,30 @@ final _casos = <String, Character>{
       'pact-weapon': ['estoque'],
     },
   ),
+  // Artífice de nivel 14: tres planos elegidos y una réplica de uno, para que
+  // marcar, quitar, replicar y transmutar tengan algo que cambiar.
+  'artifice': Character(
+    id: 'p-artificer',
+    name: 'Artífice',
+    raceId: 'human',
+    classId: 'artificer',
+    backgroundId: 'sage',
+    level: 14,
+    assignedScores: _scores,
+    hpPerLevel: List.filled(14, 6),
+    magicItemChoices: const [
+      'bolsa-de-contencion',
+      'manifold-tool',
+      'escudo-1'
+    ],
+    inventory: const [
+      InventoryEntry(
+        entryId: 'replica-bolsa',
+        itemId: 'bolsa-de-contencion',
+        origin: 'artificer:replicate-magic-item:bolsa-de-contencion',
+      ),
+    ],
+  ),
   // Estado activable (Furia) con arma a dos manos y desventaja de lanzar.
   'barbaro': Character(
     id: 'p-barbarian',
@@ -227,6 +251,26 @@ final _acciones = <String, (String, Map<String, dynamic>)>{
   'accion-pacto-soltar': (
     'brujo-filo',
     {'type': 'clearEffectTargets', 'group': 'pact-weapon'},
+  ),
+  'accion-plan-marcar': (
+    'artifice',
+    {'type': 'setMagicItemPlan', 'item': 'cuerda-de-escalada', 'value': true},
+  ),
+  'accion-plan-quitar': (
+    'artifice',
+    {'type': 'setMagicItemPlan', 'item': 'bolsa-de-contencion', 'value': false},
+  ),
+  'accion-replica': (
+    'artifice',
+    {'type': 'replicateItem', 'item': 'escudo-1', 'base': 'shield'},
+  ),
+  'accion-transmutar': (
+    'artifice',
+    {
+      'type': 'transmuteReplica',
+      'entry': 'replica-bolsa',
+      'item': 'manifold-tool',
+    },
   ),
   'accion-truco-innato': (
     'altoelfo',
@@ -415,6 +459,70 @@ Future<void> main(List<String> args) async {
     [
       for (final s in LevelUp.innateCantripOptions(repo, innato))
         {'id': s.id, 'name': s.name, 'school': s.school},
+    ],
+  );
+  // Los planos del Artífice: la forma del puente escrita otra vez a propósito.
+  final artifice = Character.fromJson(
+    jsonDecode(jsonEncode(_casos['artifice']!.toJson()))
+        as Map<String, dynamic>,
+  );
+  final cupoPlanos =
+      CharacterCompiler(repo).compile(artifice).itemChoiceSlots.single;
+  final opciones = [
+    for (final id in cupoPlanos.optionItemIds) repo.item(id)!,
+  ]..sort((a, b) => compareContentNames(a.name, b.name));
+  void puenteSinFicha(String nombre, String fn, String arg, Object? esperado) =>
+      File('${out.path}/$nombre.json').writeAsStringSync(
+        jsonEncode({
+          'bridge': {
+            'fn': fn,
+            'args': [arg],
+            'withoutCharacter': true,
+          },
+          'expected': esperado,
+        }),
+      );
+  puente(
+    'puente-planos',
+    artifice,
+    'magicItemPlans',
+    '',
+    {
+      'groupId': cupoPlanos.groupId,
+      'name': cupoPlanos.name,
+      'count': cupoPlanos.count,
+      'maxActive': cupoPlanos.maxActive,
+      'options': [
+        for (final i in opciones)
+          {
+            'id': i.id,
+            'name': i.name,
+            'rarity': i.rarity,
+            'requiresAttunement': i.requiresAttunement,
+            'baseItemKind': i.baseItemKind,
+          },
+      ],
+      'chosen': [
+        for (final id in artifice.magicItemChoices)
+          {'id': id, 'name': repo.item(id)!.name},
+      ],
+      'replicas': [
+        {
+          'itemId': 'bolsa-de-contencion',
+          'entryId': 'replica-bolsa',
+          'name': repo.item('bolsa-de-contencion')!.name,
+          'baseName': null,
+        },
+      ],
+    },
+  );
+  puenteSinFicha(
+    'puente-bases',
+    'magicBaseOptions',
+    'escudo-1',
+    [
+      for (final a in repo.armorSorted.where((e) => e.isShield))
+        {'id': a.id, 'name': a.name},
     ],
   );
   for (final MapEntry(key: nombre, value: (borrador, accion))

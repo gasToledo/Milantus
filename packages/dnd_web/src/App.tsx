@@ -134,6 +134,8 @@ function Enabled({ account }: { account: Account }) {
       return <CharacterPage id={route.id} tab={null} levelUp />;
     case 'spellEdit':
       return <CharacterPage id={route.id} tab={null} spellEdit={route.classId} />;
+    case 'magicPlans':
+      return <CharacterPage id={route.id} tab={null} magicPlans />;
     case 'creation':
       return <CreationPage account={account} />;
     case 'codex':

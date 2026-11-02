@@ -355,6 +355,29 @@ Future<void> main() async {
       combat: CombatState(currentHp: 8),
     ),
   );
+  // Una Artífice de nivel 14 sin planos elegidos ni réplicas: la prueba de
+  // escritura de los planos (5e3) elige uno, lo replica y quita la réplica.
+  await characters.create(
+    writerUserId,
+    Character(
+      id: 'artifice-de-humo',
+      name: 'Artífice de Humo',
+      raceId: 'human',
+      classId: 'artificer',
+      backgroundId: 'sage',
+      level: 14,
+      assignedScores: const {
+        Ability.strength: 8,
+        Ability.dexterity: 14,
+        Ability.constitution: 14,
+        Ability.intelligence: 18,
+        Ability.wisdom: 10,
+        Ability.charisma: 10,
+      },
+      hpPerLevel: List.filled(14, 6),
+      combat: CombatState(currentHp: 40),
+    ),
+  );
   final settings = InMemorySettingsRepository();
   await settings.save(smokeUserId, {
     'sortMode': 'level',

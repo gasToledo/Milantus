@@ -478,4 +478,152 @@ void main() {
       }
     });
   });
+
+  group('planos y réplicas del Artífice', () {
+    Character artifice({List<String> planes = const []}) => Character(
+          id: 'artifice',
+          name: 'Artífice',
+          raceId: 'human',
+          classId: 'artificer',
+          backgroundId: 'sage',
+          level: 14,
+          assignedScores: _scores,
+          hpPerLevel: List.filled(14, 6),
+          magicItemChoices: planes,
+        );
+    ItemChoiceSlot cupo(Character c) =>
+        CharacterCompiler(repo).compile(c).itemChoiceSlots.single;
+    // Los planos salen del cupo y no de ids transcriptos: sin base y con base.
+    String sinBase(ItemChoiceSlot s, [int n = 0]) => s.optionItemIds
+        .where((id) => repo.item(id)!.baseItemKind == null)
+        .elementAt(n);
+    String conBase(ItemChoiceSlot s) => s.optionItemIds
+        .firstWhere((id) => repo.item(id)!.baseItemKind == 'weapon');
+
+    Map<String, dynamic> plan(String id, bool on) =>
+        {'type': 'setMagicItemPlan', 'item': id, 'value': on};
+
+    test('marcar y desmarcar un plano; sacar uno que tenía réplica se la lleva',
+        () {
+      final slot = cupo(artifice());
+      final id = sinBase(slot);
+
+      final marcado = act(artifice(), plan(id, true));
+      expect(marcado.character.magicItemChoices, [id]);
+      expect(marcado.outcome['removedReplica'], isFalse);
+
+      final replicado =
+          act(marcado.character, {'type': 'replicateItem', 'item': id});
+      expect(replicado.outcome['created'], isTrue);
+      expect(replicado.character.inventory.single.itemId, id);
+
+      final sacado = act(replicado.character, plan(id, false));
+      expect(sacado.character.magicItemChoices, isEmpty);
+      expect(sacado.character.inventory, isEmpty);
+      expect(sacado.outcome['removedReplica'], isTrue);
+
+      final sinReplica = act(marcado.character, plan(id, false));
+      expect(sinReplica.outcome['removedReplica'], isFalse);
+    });
+
+    test(
+        'un plano fuera de las opciones, repetido o con el cupo lleno no toca '
+        'la ficha', () {
+      final slot = cupo(artifice());
+      final llenos = [
+        for (var i = 0; i < slot.count; i++) sinBase(slot, i),
+      ];
+      final lleno = artifice(planes: llenos);
+      final extra = sinBase(slot, slot.count);
+
+      for (final (c, accion) in [
+        (artifice(), plan('longsword', true)),
+        (artifice(planes: [llenos.first]), plan(llenos.first, true)),
+        (lleno, plan(extra, true)),
+        (artifice(), plan(sinBase(slot), false)),
+      ]) {
+        expect(act(c, accion).character.toJson(), c.toJson(),
+            reason: '$accion');
+      }
+    });
+
+    test('la réplica respeta plano elegido, base de la plantilla y cupo', () {
+      final slot = cupo(artifice());
+      final base = conBase(slot);
+      final c = artifice(planes: [base, sinBase(slot)]);
+      // La base válida sale de las opciones de la plantilla, no de un id fijo.
+      final valida =
+          InventoryOps.magicBaseOptions(repo.item(base)!, repo).first;
+
+      // Sin base, o con una que no es de su tipo, no se crea.
+      for (final malo in [null, 'plate']) {
+        final r = act(c, {'type': 'replicateItem', 'item': base, 'base': malo});
+        expect(r.outcome['created'], isFalse);
+        expect(r.character.toJson(), c.toJson());
+      }
+      // Un plano que no se eligió tampoco.
+      final ajeno = act(c, {'type': 'replicateItem', 'item': sinBase(slot, 3)});
+      expect(ajeno.outcome['created'], isFalse);
+      expect(ajeno.character.toJson(), c.toJson());
+
+      final ok =
+          act(c, {'type': 'replicateItem', 'item': base, 'base': valida});
+      expect(ok.outcome['created'], isTrue);
+      expect(ok.character.inventory.single.baseItemId, valida);
+
+      // El mismo plano dos veces: la segunda no entra.
+      final dos = act(ok.character,
+          {'type': 'replicateItem', 'item': base, 'base': valida});
+      expect(dos.outcome['created'], isFalse);
+    });
+
+    test('con todos los cupos de réplica ocupados no se crea otra', () {
+      final slot = cupo(artifice());
+      final planes = [
+        for (var i = 0; i <= slot.maxActive; i++) sinBase(slot, i),
+      ];
+      var c = artifice(planes: planes);
+      for (final id in planes.take(slot.maxActive)) {
+        c = act(c, {'type': 'replicateItem', 'item': id}).character;
+      }
+      expect(c.inventory, hasLength(slot.maxActive));
+      final r = act(c, {'type': 'replicateItem', 'item': planes.last});
+      expect(r.outcome['created'], isFalse);
+      expect(r.character.toJson(), c.toJson());
+    });
+
+    test('transmutar cambia el plano de la réplica y no admite uno no elegido',
+        () {
+      final slot = cupo(artifice());
+      final a = sinBase(slot);
+      final b = sinBase(slot, 1);
+      var c = artifice(planes: [a, b]);
+      c = act(c, {'type': 'replicateItem', 'item': a}).character;
+      final entry = c.inventory.single.entryId;
+
+      final t = act(c, {'type': 'transmuteReplica', 'entry': entry, 'item': b});
+      expect(t.character.inventory.single.itemId, b);
+      expect(t.character.inventory.single.origin,
+          'artificer:replicate-magic-item:$b');
+
+      final ajeno = act(c, {
+        'type': 'transmuteReplica',
+        'entry': entry,
+        'item': sinBase(slot, 3),
+      });
+      expect(ajeno.character.toJson(), c.toJson());
+    });
+
+    test('sin cupo de planos las tres acciones dejan la ficha como estaba', () {
+      final c = monje();
+      for (final accion in [
+        plan('anteojos-de-la-noche', true),
+        {'type': 'replicateItem', 'item': 'anteojos-de-la-noche'},
+        {'type': 'transmuteReplica', 'entry': 'x', 'item': 'manifold-tool'},
+      ]) {
+        expect(act(c, accion).character.toJson(), c.toJson(),
+            reason: '$accion');
+      }
+    });
+  });
 }

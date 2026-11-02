@@ -450,6 +450,21 @@ repiten acá.
   `clearEffectTargets`. Las tres dejan la ficha intacta si el cupo no existe,
   si la opción no es elegible o si el cupo está lleno y no es reemplazable. Lo
   que el rasgo creó sale de la mochila al cambiarlo (`createdByFeature`).
+  Los **planos y réplicas del Artífice** (5e3) tienen su ruta,
+  `/personajes/:id/planos` (`sheet/MagicItemPlans.tsx`), con el botón
+  «Planos y réplicas (n/m)» de Inventario: pestañas Planos y Réplicas
+  activas, bandeja de chips, lista por rareza y el detalle a la derecha (en un
+  teléfono, un diálogo). **Se guarda al tocar, sin botón «Guardar»**: elegir un
+  plano es `setMagicItemPlan`, crear una réplica es `replicateItem` (con la
+  base, si la plantilla la pide, que sale de `magicBaseOptions`) y quitarla es
+  `removeItem`. Sacar un plano se lleva su réplica, y eso (`removedReplica`) y
+  quitar una réplica avisan con «Deshacer». Una réplica es un objeto real de la
+  mochila: lleva la etiqueta «Réplica» y su menú tiene «Transmutar réplica…»
+  (`sheet/TransmuteDialog.tsx`, acción `transmuteReplica`) si hay otro plano
+  elegido. Las tres acciones dejan la ficha intacta si no hay cupo de planos o
+  el motor rechaza la opción. Qué se ofrece y los topes salen de
+  `magicItemPlans` (`sheet.itemChoiceSlots`); en Flutter, el cuadro llama a las
+  mismas `InventoryOps.setMagicItemPlan` y `magicBaseOptions`.
   Todavía **no** aplica la Forma Salvaje (5e4). La banda táctica (PG, Iniciativa,
   Velocidad, Competencia; sin Armadura, que se lee en Defensa) solo va en
   Personaje y Combate, como en Flutter; el modo en curso lo dice su propia franja (con lo que suma), sin cartel aparte. Sin escritura, la ficha ajena
@@ -591,7 +606,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    tiene todavía acción en `SheetActions.apply`, en cinco: 5e1, condiciones,
    cansancio y modos activos (Furia) *(existe)*; 5e2, preparar conjuros (el editor ya
    existe en la subida) y cambiar el truco innato *(existe)*; 5e3, los planos del Artífice
-   y los objetivos de arma de un rasgo (Pacto del Filo); 5e4, Forma Salvaje;
+   y los objetivos de arma de un rasgo (Pacto del Filo) *(existe)*; 5e4, Forma Salvaje;
    5e5, compañeros, y con ellos lanzar gastando espacio o uso gratis. Antes de
    cerrar 5e, comparar los controles de la ficha de Flutter con los de React:
    esta lista no salió de revisar pantalla por pantalla. 5f, la lista de
@@ -623,7 +638,9 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    la ficha que el cliente guarda después de una acción (con una semilla fija
    para el dado de golpe y la recarga al amanecer); los `puente-*` prueban las
    funciones de lectura del editor de conjuros (`spellEdit`,
-   `innateCantripOptions`), con la función y sus argumentos en el caso. Es también la red del tipo escrito a mano de
+   `innateCantripOptions`) y de los planos (`magicItemPlans`,
+   `magicBaseOptions`, esta sin ficha: `withoutCharacter`), con la función y sus
+   argumentos en el caso. Es también la red del tipo escrito a mano de
    `types.ts`: un campo nuevo en `ComputedSheet.toJson` rompe acá aunque el tipo
    no lo diga.
 2. **Playwright** (job `web_e2e`). Pocas pruebas, con el criterio de `CLAUDE.md`
@@ -634,7 +651,7 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
      salvaciones de muerte (con la cola que junta toques), espacios y usos, dado
      de golpe y descansos, Inspiración y concentración, mochila, compra y venta,
      subida de nivel, Furia, estados y cansancio, conjuros preparados y truco
-     innato, y «Deshacer» donde lo hay (`e2e/escritura.spec.ts`, con una cuenta
+     innato, arma de pacto, planos y réplicas del Artífice, y «Deshacer» donde lo hay (`e2e/escritura.spec.ts`, con una cuenta
      propia para no cambiar lo que leen las demás), más el alta del creador
      (`e2e/creador.spec.ts`).
    - **Que lo ajeno no se alcance:** otra cuenta recibe el mismo 404 que ante lo
@@ -715,7 +732,7 @@ hace seguro volver atrás es que **no hay nada que deshacer en el formato**:
 
 Para que nadie lo dé por hecho:
 
-- Las escrituras de 5e, 5f y los pasos 6 y 7: el detalle está en
+- Las escrituras de 5e4 (Forma Salvaje), 5e5 (compañeros), 5f y los pasos 6 y 7: el detalle está en
   [Orden previsto de pantallas](#orden-previsto-de-pantallas).
 - Control de versión en el servidor para las escrituras (rechazar una copia
   vieja con 409): hoy gana el último que guarda, como en Flutter.

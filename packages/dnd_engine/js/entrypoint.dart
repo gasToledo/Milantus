@@ -178,6 +178,7 @@ Map<String, dynamic> _inventoryLine(
     'homebrew': source == ContentSource.homebrew,
     // Lo creó un rasgo (el arma de pacto): al cambiarla sale de la mochila.
     'createdByFeature': e.origin?.startsWith('effect-target:') == true,
+    'replica': replica,
   };
 }
 
@@ -318,6 +319,69 @@ String spellEdit(String characterJson, String catalogJson, String classId) {
           classId: blocks.isEmpty ? null : classId),
     ),
   );
+}
+
+/// Los planos del Artífice (`sheet.itemChoiceSlots`) con lo que la pantalla
+/// necesita, o `null` si la ficha no tiene cupo: `{groupId, name, count,
+/// maxActive, options, chosen, replicas}`. `options` va por
+/// `compareContentNames`; `chosen` es lo que la ficha guarda, **incluido lo que
+/// quedó fuera de las opciones** (si no, no habría cómo sacarlo); `replicas`
+/// son las réplicas de la mochila con el nombre de su base.
+String magicItemPlans(String characterJson, String catalogJson) {
+  final c = Character.fromJson(
+    jsonDecode(characterJson) as Map<String, dynamic>,
+  );
+  final repo = _repoPara(catalogJson);
+  final slot = CharacterCompiler(repo).compile(c).itemChoiceSlots.firstOrNull;
+  if (slot == null) return jsonEncode(null);
+  final options = [
+    for (final item in slot.optionItemIds.map(repo.item).nonNulls) item,
+  ]..sort((a, b) => compareContentNames(a.name, b.name));
+  return jsonEncode({
+    'groupId': slot.groupId,
+    'name': slot.name,
+    'count': slot.count,
+    'maxActive': slot.maxActive,
+    'options': [
+      for (final item in options)
+        {
+          'id': item.id,
+          'name': item.name,
+          'rarity': item.rarity,
+          'requiresAttunement': item.requiresAttunement,
+          'baseItemKind': item.baseItemKind,
+        },
+    ],
+    'chosen': [
+      for (final id in c.magicItemChoices)
+        {'id': id, 'name': repo.item(id)?.name ?? id},
+    ],
+    'replicas': [
+      for (final e in c.inventory)
+        if (e.origin?.startsWith('artificer:replicate-magic-item:') == true)
+          {
+            'itemId': e.itemId,
+            'entryId': e.entryId,
+            'name': repo.item(e.itemId)?.name ?? e.itemId,
+            'baseName': e.baseItemId == null
+                ? null
+                : repo.catalogEntry(e.baseItemId!)?.name ?? e.baseItemId,
+          },
+    ],
+  });
+}
+
+/// Los objetos base entre los que se elige para replicar [itemId]
+/// (`InventoryOps.magicBaseOptions`): `[{id, name}]`, vacío si el plano no
+/// pide base.
+String magicBaseOptions(String catalogJson, String itemId) {
+  final repo = _repoPara(catalogJson);
+  final item = repo.item(itemId);
+  return jsonEncode([
+    if (item != null)
+      for (final id in InventoryOps.magicBaseOptions(item, repo))
+        {'id': id, 'name': repo.catalogEntry(id)?.name ?? id},
+  ]);
 }
 
 /// Los trucos entre los que se puede cambiar el innato [granted]
@@ -767,6 +831,8 @@ void main() {
   motor['act'] = act.toJS;
   motor['spellEdit'] = spellEdit.toJS;
   motor['innateCantripOptions'] = innateCantripOptions.toJS;
+  motor['magicItemPlans'] = magicItemPlans.toJS;
+  motor['magicBaseOptions'] = magicBaseOptions.toJS;
   motor['compute'] = compute.toJS;
   motor['migrateCharacter'] = migrateCharacter.toJS;
   motor['setLanguage'] = setLanguage.toJS;

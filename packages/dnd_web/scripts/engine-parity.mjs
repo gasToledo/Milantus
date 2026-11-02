@@ -66,13 +66,17 @@ for (const archivo of casos.sort()) {
     readFileSync(resolve(base, archivo), 'utf8'),
   );
   // Un caso con `creation` prueba el creador; con `bridge`, una función de
-  // lectura del puente (`fn` con la ficha, el catálogo y `args`); con
+  // lectura del puente (`fn` con la ficha, el catálogo y `args`; sin ficha si
+  // `withoutCharacter`); con
   // `action`, `act` (la ficha que el cliente guarda); el resto, `compute`.
   const obtenido = JSON.parse(
     creation
       ? motor.creation(catalogo, JSON.stringify(creation.draft), JSON.stringify(creation.action), seed)
       : bridge
-        ? motor[bridge.fn](JSON.stringify(character), catalogo, ...bridge.args)
+        ? // Algunas funciones del puente no leen una ficha (`magicBaseOptions`).
+          bridge.withoutCharacter
+          ? motor[bridge.fn](catalogo, ...bridge.args)
+          : motor[bridge.fn](JSON.stringify(character), catalogo, ...bridge.args)
         : action
         ? motor.act(JSON.stringify(character), catalogo, JSON.stringify(action), seed)
         : motor.compute(JSON.stringify(character), catalogo),

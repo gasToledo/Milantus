@@ -44,11 +44,9 @@ test('la ficha de otra cuenta no tiene controles para escribir', async ({ contex
   // Ni estados, ni cansancio, ni estados activables: nada que escriba.
   await expect(page.locator('[data-condition], [data-field="exhaustion"]')).toHaveCount(0);
   await expect(page.getByRole('button', { name: /^(Activar|Terminar)$/ })).toHaveCount(0);
-  // Ni preparar conjuros ni cambiar el truco innato.
+  // Ni preparar conjuros ni cambiar el truco innato. La ficha de un miembro
+  // no tiene pestaña Inventario (`MEMBER_SHEET_TABS`), así que el arma de
+  // pacto y los planos (`target-*`, `magic-plans`) no tienen dónde aparecer.
   await expect(page.locator('[data-action="edit-spells"], [data-action="swap-innate"]')).toHaveCount(0);
-  // Ni vincular el arma de pacto ni elegir planos y réplicas, en Inventario.
-  await page.goto(`/v2/dm/campanas/marca-del-cuervo/mesa/${sagan.memberId}/inventario`);
-  await expect(page.locator('[data-card="pack"]')).toBeVisible();
-  await expect(page.locator('[data-action^="target-"], [data-action="magic-plans"]')).toHaveCount(0);
   expect(escrituras).toEqual([]);
 });

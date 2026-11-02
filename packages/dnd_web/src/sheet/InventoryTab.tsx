@@ -17,19 +17,21 @@ import {
   X,
   type LucideIcon,
 } from 'lucide-react';
-import { formatCost, inventoryOf, type CharacterJson, type InventoryLine } from '../engine';
+import { formatCost, inventoryOf, magicPlansView, type CharacterJson, type InventoryLine } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import type { Texts } from '../i18n/texts';
 import { AppDialog } from '../ui/AppDialog';
-import { Button } from '../ui/Button';
+import { Button, ButtonLink } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { cx } from '../ui/cx';
 import { Eyebrow, Pips, SpendRecoverButtons, ThinBar } from '../ui/data';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Tooltip } from '../ui/primitives';
 import { AppEmptyState } from '../ui/status';
+import { magicPlansHref } from '../router';
 import { EffectTargetDialog } from './EffectTargetDialog';
 import { coinLabels, ItemCatalogDialog, TradeDialog, type CatalogRow, type Trade } from './ItemCatalog';
 import type { SheetModel } from './model';
+import { TransmuteDialog } from './TransmuteDialog';
 import type { SheetWriter } from './writer';
 
 /** Las familias en que se agrupa la mochila, en el orden de `itemGroupOrder`
@@ -107,6 +109,8 @@ export function InventoryTab({ model }: { model: SheetModel }) {
   const [catalogOpen, setCatalogOpen] = useState(false);
   /** El cupo de arma (pacto) cuyo diálogo está abierto. */
   const [targetGroup, setTargetGroup] = useState<string | null>(null);
+  /** La réplica que se está transmutando. */
+  const [transmuting, setTransmuting] = useState<InventoryLine | null>(null);
   const [buying, setBuying] = useState<CatalogRow | null>(null);
   const coins = character.coins ?? {};
 
@@ -136,6 +140,8 @@ export function InventoryTab({ model }: { model: SheetModel }) {
   // `character` es el `Character.toJson` migrado entero (ver `CharacterPage`);
   // el tipo solo nombra lo que la ficha lee, así que vuelve a su forma JSON.
   const lines = useMemo(() => inventoryOf(character as unknown as CharacterJson, catalog), [character, catalog]);
+  // Los planos del Artífice; `null` si la ficha no tiene cupo de planos.
+  const plans = useMemo(() => magicPlansView(character as unknown as CharacterJson, catalog), [character, catalog]);
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
 
@@ -236,6 +242,11 @@ export function InventoryTab({ model }: { model: SheetModel }) {
             <Button tone="soft" icon={Plus} onClick={() => setCatalogOpen(true)}>
               {t.catalogAddTitle}
             </Button>
+          )}
+          {write && plans && (
+            <ButtonLink tone="soft" internal href={magicPlansHref(character.id)} data-action="magic-plans">
+              {t.invPlansButton(plans.chosen.length, plans.count)}
+            </ButtonLink>
           )}
           {write &&
             sheet.targetChoiceSlots.map((slot) => (
@@ -356,6 +367,8 @@ export function InventoryTab({ model }: { model: SheetModel }) {
                     format={number.format}
                     write={write}
                     slotLabels={sheet.targetChoiceSlots.filter((s) => s.chosenEntryIds.includes(line.entryId)).map((s) => s.name)}
+                    canTransmute={plans !== null && plans.chosen.some((c) => c.id !== line.itemId)}
+                    onTransmute={() => setTransmuting(line)}
                     onAsk={(kind) => setAsk({ kind, line })}
                   />
                 ))}
@@ -377,6 +390,9 @@ export function InventoryTab({ model }: { model: SheetModel }) {
           onConfirm={(trade) => sell(ask.line, trade)}
           onClose={() => setAsk(null)}
         />
+      )}
+      {transmuting && write && plans && (
+        <TransmuteDialog model={model} write={write} line={transmuting} plans={plans} onClose={() => setTransmuting(null)} />
       )}
       {targetGroup && write && (
         <EffectTargetDialog
@@ -500,6 +516,8 @@ function PackRow({
   format,
   write,
   slotLabels,
+  canTransmute,
+  onTransmute,
   onAsk,
 }: {
   line: InventoryLine;
@@ -509,6 +527,9 @@ function PackRow({
   write: SheetWriter | undefined;
   /** Los cupos (arma de pacto) a los que esta línea está vinculada. */
   slotLabels: string[];
+  /** Si la línea es una réplica y hay otro plano elegido al que pasarla. */
+  canTransmute: boolean;
+  onTransmute: () => void;
   onAsk: (kind: Ask['kind']) => void;
 }) {
   const Icon = GROUP_ICON[group];
@@ -536,6 +557,11 @@ function PackRow({
               <span className="break-words" data-field="name">
                 {line.name}
               </span>
+              {line.replica && (
+                <span className="rounded-[var(--radius-pill)] border border-hairline px-1.5 text-[10px] text-on-surface-variant">
+                  {t.invReplica}
+                </span>
+              )}
               {line.homebrew && (
                 <span className="rounded-[var(--radius-pill)] border border-hairline px-1.5 text-[10px] text-on-surface-variant">
                   {t.homebrewTag}
@@ -609,7 +635,7 @@ function PackRow({
       </td>
       {write && (
         <td className="py-3 text-right">
-          <ItemMenu line={line} t={t} write={write} onAsk={onAsk} />
+          <ItemMenu line={line} t={t} write={write} onAsk={onAsk} canTransmute={canTransmute && line.replica} onTransmute={onTransmute} />
         </td>
       )}
     </tr>
@@ -624,11 +650,15 @@ function ItemMenu({
   t,
   write,
   onAsk,
+  canTransmute,
+  onTransmute,
 }: {
   line: InventoryLine;
   t: Texts;
   write: SheetWriter;
   onAsk: (kind: Ask['kind']) => void;
+  canTransmute: boolean;
+  onTransmute: () => void;
 }) {
   const entry = line.entryId;
   const toggle = (label: string, on: boolean, act: () => void) => (
@@ -660,6 +690,7 @@ function ItemMenu({
         {line.offHand !== null && toggle(t.invOffHand, line.offHand, () => write.act({ type: 'offHand', entry }))}
         {line.twoHanded !== null &&
           toggle(t.invTwoHanded, line.twoHanded, () => write.act({ type: 'twoHanded', entry }))}
+        {canTransmute && <DropdownMenuItem onSelect={onTransmute}>{t.invTransmute}</DropdownMenuItem>}
         <DropdownMenuItem onSelect={() => onAsk('sell')}>{t.invSellMenu}</DropdownMenuItem>
         <DropdownMenuItem
           onSelect={() => {

@@ -5,6 +5,7 @@ import {
   innateCantripOptions,
   inventoryOf,
   levelUpView,
+  magicPlansView,
   migrateCharacter,
   spellEditView,
   type CharacterJson,
@@ -509,5 +510,35 @@ test('vincular el arma de pacto la crea con lo del motor y se relee al recargar'
 
   await page.reload();
   await expect(page.locator(`[data-action="target-${cupo.groupId}"]`)).toContainText('(1/1)');
+});
+
+test('elegir un plano, replicarlo y quitar la réplica guardan lo del motor, y «Deshacer» guarda la de antes', async ({
+  page,
+  request,
+}) => {
+  const ARTIFICE = 'artifice-de-humo';
+  const antes = await ilse(request, ARTIFICE);
+  // Un plano que no pide objeto base: la réplica se crea sin diálogo.
+  const plan = magicPlansView(antes, catalogo())!.options.find((o) => o.baseItemKind === null)!;
+  const elegido = segunMotor(antes, { type: 'setMagicItemPlan', item: plan.id, value: true });
+  const replicado = segunMotor(elegido, { type: 'replicateItem', item: plan.id });
+  const entrada = (replicado.inventory as { entryId: string }[])[0]!.entryId;
+  const sinReplica = segunMotor(replicado, { type: 'removeItem', entry: entrada });
+
+  await page.goto(`/v2/personajes/${ARTIFICE}/planos`);
+  expect(await proximoGuardado(page, () => page.locator(`[data-option="${plan.id}"]`).click(), ARTIFICE)).toEqual(elegido);
+  expect(await ilse(request, ARTIFICE)).toEqual(elegido);
+
+  await page.locator('[data-tab="replicas"]').click();
+  const accion = page.locator(`[data-replica="${plan.id}"]`);
+  await expect(accion).toHaveText('Crear réplica');
+  expect(await proximoGuardado(page, () => accion.click(), ARTIFICE)).toEqual(replicado);
+  expect(await ilse(request, ARTIFICE)).toEqual(replicado);
+
+  await expect(accion).toHaveText('Quitar réplica');
+  expect(await proximoGuardado(page, () => accion.click(), ARTIFICE)).toEqual(sinReplica);
+  const vuelta = await proximoGuardado(page, () => page.getByRole('button', { name: 'Deshacer' }).click(), ARTIFICE);
+  expect(vuelta).toEqual(replicado);
+  expect(await ilse(request, ARTIFICE)).toEqual(replicado);
 });
 

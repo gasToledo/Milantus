@@ -1,4 +1,4 @@
-import type { AbilityId, BestiaryRow, Catalog, CharacterJson, ComputedSheet, EncounterView, InventoryLine, JsonObject, NpcView } from './types';
+import type { AbilityId, BestiaryRow, Catalog, CharacterJson, ComputedSheet, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
 // Lo genera `npm run build:engine` (o la etapa `engine-js` del Dockerfile) y
 // no se versiona. Es un script de dart2js, no un módulo: al cargarse deja
 // `globalThis.dndEngine`, y de ahí lo toma este archivo.
@@ -32,6 +32,8 @@ interface DartEngine {
   act(characterJson: string, catalogJson: string, actionJson: string, seed?: number): string;
   spellEdit(characterJson: string, catalogJson: string, classId: string): string;
   innateCantripOptions(characterJson: string, catalogJson: string, granted: string): string;
+  magicItemPlans(characterJson: string, catalogJson: string): string;
+  magicBaseOptions(catalogJson: string, itemId: string): string;
 }
 
 function engine(): DartEngine {
@@ -302,6 +304,17 @@ export type SpellEditView = NonNullable<LevelUpView['classSpells']>;
  *  o `null` si esa clase no lanza conjuros. */
 export function spellEditView(character: CharacterJson, catalog: Catalog, classId: string): SpellEditView | null {
   return JSON.parse(engine().spellEdit(JSON.stringify(character), catalogJson(catalog), classId)) as SpellEditView | null;
+}
+
+/** Los planos del Artífice con sus opciones y réplicas, o `null` si la ficha
+ *  no tiene cupo de planos. */
+export function magicPlansView(character: CharacterJson, catalog: Catalog): MagicPlansView | null {
+  return JSON.parse(engine().magicItemPlans(JSON.stringify(character), catalogJson(catalog))) as MagicPlansView | null;
+}
+
+/** Los objetos base entre los que se elige para replicar [itemId]. */
+export function magicBaseOptions(catalog: Catalog, itemId: string): { id: string; name: string }[] {
+  return JSON.parse(engine().magicBaseOptions(catalogJson(catalog), itemId));
 }
 
 /** Los trucos entre los que se puede cambiar el innato [granted]; vacío si no
@@ -668,7 +681,10 @@ export type SheetAction =
   | { type: 'setInnateCantrip'; granted: string; spell: string }
   | { type: 'setEffectTarget'; group: string; entry: string }
   | { type: 'createEffectTarget'; group: string; weapon: string }
-  | { type: 'clearEffectTargets'; group: string };
+  | { type: 'clearEffectTargets'; group: string }
+  | { type: 'setMagicItemPlan'; item: string; value: boolean }
+  | { type: 'replicateItem'; item: string; base?: string }
+  | { type: 'transmuteReplica'; entry: string; item: string; base?: string };
 
 /** Lo que cuenta el motor de una acción, para el aviso. Cada campo existe
  *  solo en la acción que lo da (ver `SheetActions.apply`). */
@@ -683,6 +699,8 @@ export interface SheetOutcome {
   paid?: boolean;
   died?: boolean;
   activated?: boolean;
+  removedReplica?: boolean;
+  created?: boolean;
 }
 
 /**

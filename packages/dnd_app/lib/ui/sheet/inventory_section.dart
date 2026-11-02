@@ -1463,7 +1463,14 @@ extension _SheetInventorySection on _SheetScreenState {
                               !chosen.contains(id) &&
                                   chosen.length >= slot.count
                               ? null
-                              : (on) => apply(_togglePlan(id, on)),
+                              : (on) => apply(
+                                  InventoryOps.setMagicItemPlan(
+                                    _c,
+                                    slot,
+                                    id,
+                                    on,
+                                  ),
+                                ),
                         ),
                     ],
                   ),
@@ -1499,26 +1506,6 @@ extension _SheetInventorySection on _SheetScreenState {
           );
         },
       ),
-    );
-  }
-
-  /// Marca o desmarca un plano. Al desmarcarlo se lleva su réplica: una réplica
-  /// de un plano que ya no conocés no puede seguir en la mochila.
-  Character _togglePlan(String id, bool on) {
-    final choices = [..._c.magicItemChoices];
-    if (on) {
-      choices.add(id);
-    } else {
-      choices.remove(id);
-    }
-    return _c.copyWith(
-      magicItemChoices: choices,
-      inventory: [
-        for (final e in _c.inventory)
-          if (e.origin?.startsWith('artificer:replicate-magic-item:') != true ||
-              choices.contains(e.itemId))
-            e,
-      ],
     );
   }
 
@@ -1618,22 +1605,7 @@ extension _SheetInventorySection on _SheetScreenState {
   }
 
   Future<String?> _chooseMagicBase(Item item) {
-    final ids = item.eligibleBaseItemIds.isNotEmpty
-        ? item.eligibleBaseItemIds
-        : switch (item.baseItemKind) {
-            'weapon' => repo.weaponsSorted.map((e) => e.id).toList(),
-            'armor' =>
-              repo.armorSorted
-                  .where((e) => !e.isShield)
-                  .map((e) => e.id)
-                  .toList(),
-            'shield' =>
-              repo.armorSorted
-                  .where((e) => e.isShield)
-                  .map((e) => e.id)
-                  .toList(),
-            _ => <String>[],
-          };
+    final ids = InventoryOps.magicBaseOptions(item, repo);
     // `_pickFromList` y no un `SimpleDialog` con el molde de Material. Además
     // resuelve su propio alto, que es lo que pide una lista con todas las
     // armas del catálogo.

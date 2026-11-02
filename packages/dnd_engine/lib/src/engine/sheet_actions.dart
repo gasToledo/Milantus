@@ -85,6 +85,13 @@ class SheetActions {
   ///   un `spell` fuera de [LevelUp.innateCantripOptions], no toca la ficha.
   ///   Ninguna de las dos toca el combate: los espacios y la concentración
   ///   siguen igual, y los usos del truco se indexan por el conjuro original.
+  /// - `setMagicItemPlan` con `item` y `value`: marca o desmarca un plano del
+  ///   Artífice ([InventoryOps.setMagicItemPlan]); `outcome.removedReplica` es
+  ///   true si desmarcarlo se llevó su réplica. `replicateItem` con `item` y
+  ///   `base` (opcional): crea la réplica; `outcome.created` es false si no se
+  ///   pudo (sin cupo, plano no elegido, base inválida). `transmuteReplica`
+  ///   con `entry`, `item` y `base` (opcional). Sin cupo de planos, las tres
+  ///   dejan la ficha como estaba; quitar una réplica es `removeItem`.
   /// - `setEffectTarget` con `group` y `entry`: vincula un ejemplar de la
   ///   mochila al cupo (el arma de pacto). `createEffectTarget` con `group` y
   ///   `weapon`: crea el arma del catálogo y la vincula. `clearEffectTargets`
@@ -349,6 +356,36 @@ class SheetActions {
                 .any((o) => o.id == spell)) {
           c = c.withInnateCantrip(granted, spell);
         }
+      case 'setMagicItemPlan':
+        final slot = sheet.itemChoiceSlots.firstOrNull;
+        if (slot == null) break;
+        c = InventoryOps.setMagicItemPlan(
+          c,
+          slot,
+          action['item'] as String,
+          action['value'] == true,
+        );
+        outcome['removedReplica'] =
+            c.inventory.length < character.inventory.length;
+      case 'replicateItem':
+        if (sheet.itemChoiceSlots.isEmpty) break;
+        final replicated = InventoryOps.replicateMagicItem(
+          c,
+          action['item'] as String,
+          repo,
+          baseItemId: action['base'] as String?,
+        );
+        outcome['created'] = replicated.inventory.length > c.inventory.length;
+        c = replicated;
+      case 'transmuteReplica':
+        if (sheet.itemChoiceSlots.isEmpty) break;
+        c = InventoryOps.transmuteReplica(
+          c,
+          action['entry'] as String,
+          action['item'] as String,
+          repo,
+          baseItemId: action['base'] as String?,
+        );
       case 'setEffectTarget' || 'createEffectTarget' || 'clearEffectTargets':
         final group = action['group'] as String;
         final slot = sheet.targetChoiceSlots

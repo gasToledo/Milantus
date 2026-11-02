@@ -5,6 +5,7 @@ import 'dice.dart';
 import '../domain/character.dart';
 import 'coin_ops.dart';
 import '../domain/content.dart';
+import '../domain/computed_sheet.dart' show ItemChoiceSlot;
 import '../domain/content_language.dart';
 
 /// Operaciones sobre la mochila. Puras: no mutan, devuelven una ficha nueva.
@@ -635,6 +636,55 @@ class InventoryOps {
     }
     return (c.copyWith(inventory: inventory), tocados);
   }
+
+  /// Marca o desmarca un plano del [slot]. Marcar exige que el plano esté entre
+  /// las opciones, que no esté ya elegido y que quede cupo; si no, la ficha
+  /// vuelve igual. Desmarcarlo se lleva su réplica: una réplica de un plano
+  /// que ya no conocés no puede seguir en la mochila.
+  static Character setMagicItemPlan(
+    Character c,
+    ItemChoiceSlot slot,
+    String id,
+    bool on,
+  ) {
+    final choices = [...c.magicItemChoices];
+    if (on) {
+      if (!slot.optionItemIds.contains(id) ||
+          choices.contains(id) ||
+          slot.chosenItemIds.length >= slot.count) return c;
+      choices.add(id);
+    } else {
+      if (!choices.remove(id)) return c;
+    }
+    return c.copyWith(
+      magicItemChoices: choices,
+      inventory: [
+        for (final e in c.inventory)
+          if (e.origin?.startsWith('artificer:replicate-magic-item:') != true ||
+              choices.contains(e.itemId))
+            e,
+      ],
+    );
+  }
+
+  /// Los ids entre los que se elige la base de una réplica de [item]: los que
+  /// la plantilla declara o, si no declara, todas las armas, armaduras (sin
+  /// escudos) o escudos del catálogo, en su orden.
+  static List<String> magicBaseOptions(Item item, ContentRepository repo) =>
+      item.eligibleBaseItemIds.isNotEmpty
+          ? item.eligibleBaseItemIds
+          : switch (item.baseItemKind) {
+              'weapon' => repo.weaponsSorted.map((e) => e.id).toList(),
+              'armor' => repo.armorSorted
+                  .where((e) => !e.isShield)
+                  .map((e) => e.id)
+                  .toList(),
+              'shield' => repo.armorSorted
+                  .where((e) => e.isShield)
+                  .map((e) => e.id)
+                  .toList(),
+              _ => <String>[],
+            };
 
   /// Crea una réplica solo para un Artífice que conoce el plano y respeta el
   /// cupo simultáneo. La base se valida contra la plantilla.

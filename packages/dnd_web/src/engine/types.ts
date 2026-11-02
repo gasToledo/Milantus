@@ -328,6 +328,29 @@ export interface InventoryLine {
   homebrew: boolean;
   /** La creó un rasgo (el arma de pacto): al cambiarla sale de la mochila. */
   createdByFeature: boolean;
+  /** La creó el Artífice al replicar un plano. */
+  replica: boolean;
+}
+
+/** Los planos del Artífice y sus réplicas (`magicItemPlans` en
+ *  `js/entrypoint.dart`). */
+export interface MagicPlansView {
+  groupId: string;
+  name: string;
+  /** Cuántos planos se eligen y cuántas réplicas pueden estar activas. */
+  count: number;
+  maxActive: number;
+  options: {
+    id: string;
+    name: string;
+    rarity: string;
+    requiresAttunement: boolean;
+    /** `weapon`, `armor`, `shield` o `null`: si pide objeto base al replicar. */
+    baseItemKind: 'weapon' | 'armor' | 'shield' | null;
+  }[];
+  /** Lo guardado, incluido lo que ya no está entre las opciones. */
+  chosen: { id: string; name: string }[];
+  replicas: { itemId: string; entryId: string; name: string; baseName: string | null }[];
 }
 
 /** El JSON de `Character` (ver `Character.toJson` en el motor). */
