@@ -435,10 +435,10 @@ test('la Furia, los estados y el cansancio guardan lo del motor y se releen al r
     const esperado = segunMotor(await ilse(request, BRUNA), accion);
     expect(await proximoGuardado(page, tocar, BRUNA)).toEqual(esperado);
     expect(await ilse(request, BRUNA)).toEqual(esperado);
-    // Con la Furia en curso aparece su cartel, y se va al quedar aturdida.
-    if (i === 0) await expect(page.locator('[data-mode-banner="rage"]')).toBeVisible();
+    // Con la Furia en curso su franja lo dice, y al quedar aturdida se apaga.
+    if (i === 0) await expect(furia).toContainText('En curso');
   }
-  await expect(page.locator('[data-mode-banner="rage"]')).toHaveCount(0);
+  await expect(furia).not.toContainText('En curso');
 
   // Al recargar la pantalla lee lo guardado: los estados siguen marcados, el
   // cansancio en 1 y los números de la ficha ya lo traen aplicado.

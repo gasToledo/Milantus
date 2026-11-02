@@ -36,45 +36,6 @@ function titleOf(m: ActiveMode): string {
   return [m.name, ...m.variants.filter((v) => chosen.includes(v.id)).map((v) => v.name)].join(' · ');
 }
 
-/** El cartel de un estado activo, arriba de la banda y en todas las pestañas:
- *  es otra forma de que los números de la ficha cambien, y tiene que decir
- *  por qué. «Terminar» solo en la ficha propia. */
-export function ActiveModeBanners({ model }: { model: SheetModel }) {
-  const t = useTexts();
-  const { sheet, write } = model;
-  return (
-    <>
-      {sheet.activeModes
-        .filter((m) => m.active)
-        .map((m) => {
-          const summary = summaryOf(t, m);
-          return (
-            <div
-              key={m.id}
-              data-mode-banner={m.id}
-              className="flex items-center gap-2 rounded-[var(--radius-nav)] border border-gold py-2 pr-2 pl-3"
-            >
-              <Flame size={18} aria-hidden="true" className="shrink-0 text-gold" />
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold text-gold">{titleOf(m)}</p>
-                {summary && <p className="mt-0.5 text-[12.5px] text-on-surface-variant">{summary}</p>}
-              </div>
-              {write && (
-                <button
-                  type="button"
-                  onClick={() => write.act({ type: 'deactivateMode', mode: m.id })}
-                  className="h-8 shrink-0 rounded-[var(--radius-nav)] px-3 text-[14px] text-gold hover:bg-plaque"
-                >
-                  {t.modeEnd}
-                </button>
-              )}
-            </div>
-          );
-        })}
-    </>
-  );
-}
-
 /** La franja de un estado activable en la banda táctica: los usos que quedan
  *  y «Activar», o «En curso · Terminar». Sin escritura solo se muestra el que
  *  está en curso. La regla (gastar el uso, la armadura pesada) es del motor;
@@ -107,12 +68,17 @@ export function ActiveModeTile({ model, mode: m }: { model: SheetModel; mode: Ac
   };
   const action = m.active ? `${t.modeOn} · ${t.modeEnd}` : (blocked ?? t.modeActivate);
   const off = !m.active && blocked !== null;
+  // Los usos y, con el modo en curso, lo que le suma a la ficha (resistencias,
+  // ventajas): la franja es el único cartel, no hay otra barra que lo repita.
+  const meta = [resource ? t.modeUses(left ?? 0, resource.max) : null, m.active ? summaryOf(t, m) : null]
+    .filter(Boolean)
+    .join(' · ');
   const body = (
     <>
       <Flame size={22} aria-hidden="true" className={cx('shrink-0', off ? 'text-text-muted' : 'text-gold')} />
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className={cx('text-[15px] font-semibold', m.active ? 'text-gold' : 'text-on-surface')}>{titleOf(m)}</span>
-        {resource && <span className="text-[12.5px] text-on-surface-variant">{t.modeUses(left ?? 0, resource.max)}</span>}
+        {meta && <span className="text-[12.5px] text-on-surface-variant">{meta}</span>}
       </span>
       <span className={cx('text-right text-[13px] font-semibold', off ? 'text-text-muted' : 'text-gold')}>{action}</span>
     </>

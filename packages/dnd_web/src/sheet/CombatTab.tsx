@@ -630,7 +630,9 @@ function ExhaustionRow({ model }: { model: SheetModel }) {
           {/* La línea de la penalización siempre ocupa su lugar: si apareciera
               recién en el nivel 1, subir el cansancio movería los pips. */}
           <p className="mt-1 min-h-[20px] text-[13px] text-crimson">{n >= 1 ? t.exhaustionPenalty(2 * n, 5 * n) : ''}</p>
-          <div className="mt-2">
+          {/* Pips alinea a la derecha (como en los recursos); acá la columna mide
+              lo que el texto de arriba, y con otro nivel los puntos se correrían. */}
+          <div className="mt-2 [&>[role=img]]:justify-start">
             <Pips max={MAX_EXHAUSTION} left={n} label={t.exhaustionLevelOf(n, MAX_EXHAUSTION)} tone="crimson" />
           </div>
         </div>

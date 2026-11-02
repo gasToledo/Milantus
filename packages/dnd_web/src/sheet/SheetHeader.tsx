@@ -4,7 +4,7 @@ import { nameOf } from '../api/catalog';
 import { useTexts } from '../i18n/context';
 import { hpTone, Pill, SectionRule, StatTile, ThinBar } from '../ui/data';
 import { signed } from './format';
-import { ActiveModeBanners, ActiveModeTile } from './ActiveModes';
+import { ActiveModeTile } from './ActiveModes';
 import { classesOf, type SheetModel } from './model';
 
 /**
@@ -22,8 +22,7 @@ export function SheetHeader({
   model: SheetModel;
   leading?: ReactNode;
   /** La banda solo va donde se juega (Personaje y Combate): en Inventario,
-   *  Campaña y Diario ocupa lugar sin aportar. El cartel del modo activo sí
-   *  se queda: dice por qué cambiaron los números, y eso vale en todas. */
+   *  Campaña y Diario ocupa lugar sin aportar. */
   showBand?: boolean;
 }) {
   const t = useTexts();
@@ -56,8 +55,6 @@ export function SheetHeader({
           </ul>
         </div>
       </header>
-
-      <ActiveModeBanners model={model} />
 
       {showBand && (
       <section aria-label={t.tacticalBand} className="tactical-band">

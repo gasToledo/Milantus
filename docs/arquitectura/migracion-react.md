@@ -419,8 +419,7 @@ repiten acá.
   PG; el nivel 5 avisa que otro nivel mata al personaje. Los **modos activos** (la Furia) son una franja a todo el ancho de la
   banda táctica, toda ella un botón —usos que quedan, «Activar» o «En curso ·
   Terminar», o el motivo del bloqueo— con un diálogo
-  de variantes (casillas si admite varias) y un cartel arriba de la banda, en
-  todas las pestañas, que dice qué suma. Las reglas (marcar un estado que
+  de variantes (casillas si admite varias); con el modo en curso la misma franja dice qué suma. Las reglas (marcar un estado que
   incapacita termina la concentración y los modos, el tope del cansancio, gastar
   el uso al activar) son `CombatOps`, por las acciones `setCondition`,
   `setExhaustion`, `activateMode` y `deactivateMode`; una activación rechazada
@@ -428,7 +427,7 @@ repiten acá.
   calculada, como Flutter: antes `/v2` mostraba descansado a quien no lo está.
   Todavía **no** aplica la Forma Salvaje (5e4). La banda táctica (PG, Iniciativa,
   Velocidad, Competencia; sin Armadura, que se lee en Defensa) solo va en
-  Personaje y Combate, como en Flutter; el cartel del modo se queda en todas. Sin escritura, la ficha ajena
+  Personaje y Combate, como en Flutter; el modo en curso lo dice su propia franja (con lo que suma), sin cartel aparte. Sin escritura, la ficha ajena
   sigue mostrando solo los estados puestos y el modo en curso.
   En **Inventario** (5b1): las cinco monedas se escriben a mano (se guardan al
   salir del campo o con Enter); cada fila lleva la casilla de equipar (solo lo

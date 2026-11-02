@@ -104,9 +104,9 @@ test('la ficha de un PNJ muestra su voz, trasfondo, notas, cómo pelea y su esta
   await hoja.getByRole('link', { name: t.npcOpenSheet(vesna.npc.name) }).click();
   await expect(page).toHaveURL(`${BIBLIOTECA}/vesna/ficha/personaje`);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(vesna.character!.name as string);
-  await expect(page.locator(`section[aria-label="${t.tacticalBand}"] [data-stat="ac"] [data-field="value"]`)).toHaveText(
-    String(ficha.armorClass),
-  );
+  await expect(
+    page.locator(`section[aria-label="${t.tacticalBand}"] [data-stat="initiative"] [data-field="value"]`),
+  ).toHaveText(signed(ficha.initiative));
   await expect(page.getByRole('tablist', { name: t.sheetTabsLabel }).getByRole('tab')).toHaveText([
     t.tabCharacter,
     t.tabCombat,
