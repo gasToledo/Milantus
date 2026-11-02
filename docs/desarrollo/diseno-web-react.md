@@ -84,16 +84,42 @@ un control a un asistente, buscá acá.
 | `DetailBody`, `TraitList` | La ficha del Códice (`CodexDetail`) y una lista de rasgos, para el panel derecho | Explicar lo último que se tocó |
 | `AfterCard`, `AfterList` | «Así queda»: cada fila con el valor solo o «de → a» (`from`), `gold` para lo que cambió y `note` para una aclaración apagada | Panel derecho; `AfterList` suelta en el pie del teléfono |
 
-Nada se pliega solo: lo que se acaba de elegir se está leyendo en el panel
-derecho y no puede irse de abajo del dedo. Las listas largas se contienen con
-su scroll propio (`SearchableList`).
+#### Reglas para toda pantalla nueva con elecciones
+
+Salieron de revisar el creador en uso. Valen para cualquier pantalla donde se
+elige algo, sea o no un asistente:
+
+1. **Nada se mueve solo.** Un bloque no se pliega al completarse y un cupo
+   completo no salta al siguiente: lo recién elegido se está leyendo en el panel
+   derecho y no puede irse de abajo del dedo. Plegar o avanzar lo decide quien
+   usa la pantalla.
+2. **La explicación siempre a la vista.** Si hay detalle de lo que se toca, no
+   puede obligar a subir para leerlo: la columna derecha es fija al bajar
+   (`WIZARD_ASIDE`).
+3. **Una pantalla, no un rollo.** Varios grupos de listas largas no se apilan:
+   uno a la vez, en pestañas con el estado de cada uno (Conjuros). Las listas
+   largas llevan buscador y su propio scroll (`SearchableList`). Antes de sumar
+   un bloque, mirá cuánto hay que bajar con el caso más cargado.
+4. **Lo repetido se ve repetido.** Cada cosa elegible es su propia opción: dos
+   valores iguales son dos columnas (`ScoreMatrix`). Juntarlos parece un error
+   porque falta una elección.
+5. **Cada opción dice qué es, sin depender de un encabezado.** El valor va en
+   todas las celdas, y el estado se distingue por algo más que el color: libre,
+   tomada (en gris y con borde punteado) y elegida (rellena). La fila que falta
+   se marca y el pie la nombra: decir qué hacer, no cuántas cosas faltan.
+6. **En el teléfono, leer no obliga a elegir.** Sin panel al costado, tocar elige
+   y un botón aparte abre el detalle en un diálogo (`AppDialog`).
+7. **Probá con el caso difícil,** no con el cómodo: la clase con más cupos, la
+   tirada con valores repetidos, el mago con todos sus conjuros. Los problemas de
+   arriba no se veían con el ejemplo del lienzo.
 
 **Movimiento.** Es la excepción a «sin animaciones de entrada» de
-`diseno-web.md`, pedida para los asistentes porque todo aparecía de golpe: el
-`Block` y el detalle entran con `.step-in` (`index.css`, 160 ms de opacidad y
-4 px) y `Option` y la tira cambian de color en 120 ms. Nada más, y se apaga con
-«reducir movimiento». Un paso nuevo tiene que remontar sus bloques: si son del
-mismo tipo, lleva `key` con el paso.
+`diseno-web.md`, pedida porque todo aparecía de golpe y se sentía brusco: lo que
+aparece (un paso, un bloque que abre una elección, el detalle) entra con
+`.step-in` (`index.css`, 160 ms de opacidad y 4 px), y las opciones y la tira
+cambian de color en 120 ms. Solo CSS y nada más, y se apaga con «reducir
+movimiento». Lo que no cambia de lugar no se anima. Un paso nuevo tiene que
+remontar sus bloques: si son del mismo tipo, lleva `key` con el paso.
 
 El creador (`src/creation/CreationWizard.tsx`) suma dos piezas propias, que por
 ahora solo usa él: la fila de clases (`ClassCard`, scroll horizontal) y la

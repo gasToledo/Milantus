@@ -344,6 +344,9 @@ componentes de `src/ui/` está en `docs/desarrollo/diseno-web-react.md`:
 - La UI no recalcula reglas: todo número sale de `computeSheet`
   (`src/engine/index.ts`). Del personaje crudo solo se lee lo que no es un
   resultado de reglas (PG actuales, usos gastados).
+- Al crear una pantalla con elecciones, seguí las **Reglas para toda pantalla
+  nueva con elecciones** de `diseno-web-react.md`: nada se pliega ni avanza
+  solo, y el detalle de lo que se toca queda siempre a la vista.
 - Todo texto visible sale de `useTexts()` (`src/i18n/texts.ts`, es y en del
   mismo tipo: `tsc` falla si falta una clave). Nunca un literal en un
   componente. **No hay test que cace literales sueltos** como en Flutter:
