@@ -438,7 +438,7 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
       </header>
 
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="flex min-w-0 flex-col gap-4">{main}</div>
+        <div key={current} className="flex min-w-0 flex-col gap-4">{main}</div>
         <aside className="flex min-w-0 flex-col gap-4">
           <DetailPanel focus={focus} view={view} catalog={catalog} lang={lang} t={t} />
           <AfterPanel before={sheet} after={after} t={t} />

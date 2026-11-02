@@ -75,13 +75,23 @@ un control a un asistente, buscá acá.
 | --- | --- | --- |
 | `Option` | La opción: círculo si se elige una, cuadrado (`multi`) si son varias. Apagada, con el motivo en `detail`, nunca escondida. `id` va en `data-option` | Toda elección de un asistente |
 | `Block` | Tarjeta de un grupo de opciones: título y un solo `status` | Cada grupo |
-| `FoldedBlock` | Un bloque resuelto, plegado: lo elegido y «Cambiar» | Cuando una lista larga empujaría hacia abajo lo que falta |
-| `Status` | Los tres estados, y ningún otro: falta (`count` para «n de m»), `ready` y `auto` | En `Block` y `FoldedBlock` |
+| `Status` | Los tres estados, y ningún otro: falta (`count` para «n de m»), `ready` y `auto` | En `Block` |
 | `SearchableList` | Buscador sin tildes y por palabras (`matchesQuery`), cuenta y scroll propio | Listas largas: especies, trasfondos, armas |
 | `StepRail` | La tira de pasos; `progress` la cambia en un teléfono por «Paso n de m» y una barra | Arriba de cada asistente |
 | `WizardFooter` | El pie: lo que falta y Atrás/Continuar, como tarjeta flotante; `above` a todo el ancho | Abajo de cada asistente |
 | `DetailBody`, `TraitList` | La ficha del Códice (`CodexDetail`) y una lista de rasgos, para el panel derecho | Explicar lo último que se tocó |
 | `AfterCard`, `AfterList` | «Así queda»: cada fila con el valor solo o «de → a» (`from`), `gold` para lo que cambió y `note` para una aclaración apagada | Panel derecho; `AfterList` suelta en el pie del teléfono |
+
+Nada se pliega solo: lo que se acaba de elegir se está leyendo en el panel
+derecho y no puede irse de abajo del dedo. Las listas largas se contienen con
+su scroll propio (`SearchableList`).
+
+**Movimiento.** Es la excepción a «sin animaciones de entrada» de
+`diseno-web.md`, pedida para los asistentes porque todo aparecía de golpe: el
+`Block` y el detalle entran con `.step-in` (`index.css`, 160 ms de opacidad y
+4 px) y `Option` y la tira cambian de color en 120 ms. Nada más, y se apaga con
+«reducir movimiento». Un paso nuevo tiene que remontar sus bloques: si son del
+mismo tipo, lleva `key` con el paso.
 
 El creador (`src/creation/CreationWizard.tsx`) suma dos piezas propias, que por
 ahora solo usa él: la fila de clases (`ClassCard`, scroll horizontal) y la

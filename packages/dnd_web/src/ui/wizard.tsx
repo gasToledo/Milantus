@@ -2,53 +2,22 @@ import { useState, type ReactNode } from 'react';
 import { Check } from 'lucide-react';
 import { fold, type CodexDetail } from '../codex/entries';
 import type { Texts } from '../i18n/texts';
-import { Button } from './Button';
 import { cx } from './cx';
 import { Eyebrow } from './data';
 
 // Las piezas del circuito de los asistentes (subida de nivel y creador). El
 // catálogo y cuándo usar cada una están en `docs/desarrollo/diseno-web-react.md`.
 
-/** Un bloque de elección: título, un solo contador y las opciones. */
+/** Un bloque de elección: título, un solo contador y las opciones. Entra con
+ *  `step-in`, tanto al cambiar de paso como al aparecer por lo que se eligió. */
 export function Block({ title, status, children }: { title: string; status?: ReactNode; children: ReactNode }) {
   return (
-    <section className="card flex min-w-0 flex-col gap-3 p-4">
+    <section className="step-in card flex min-w-0 flex-col gap-3 p-4">
       <div className="flex items-center justify-between gap-3">
         <h2 className="font-display text-[16px] text-on-surface">{title}</h2>
         {status}
       </div>
       {children}
-    </section>
-  );
-}
-
-/** Un bloque ya resuelto, plegado: lo elegido y «Cambiar». Para que una lista
- *  larga no empuje hacia abajo lo que todavía falta. */
-export function FoldedBlock({
-  title,
-  summary,
-  status,
-  onOpen,
-  t,
-}: {
-  title: string;
-  summary: string;
-  status: ReactNode;
-  onOpen: () => void;
-  t: Texts;
-}) {
-  return (
-    <section className="card flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-3">
-      <span className="min-w-0 flex-[1_1_180px]">
-        <span className="block font-display text-[16px] text-on-surface">{title}</span>
-        <span className="block text-[12.5px] text-on-surface-variant">{summary}</span>
-      </span>
-      <span className="flex items-center gap-2.5">
-        {status}
-        <Button tone="secondary" onClick={onOpen}>
-          {t.luChange}
-        </Button>
-      </span>
     </section>
   );
 }
@@ -113,7 +82,7 @@ export function Option({
       disabled={disabled}
       onClick={onClick}
       className={cx(
-        'flex min-h-12 w-full items-center gap-3 rounded-[var(--radius-card)] border px-3.5 py-2.5 text-left text-on-surface disabled:cursor-default',
+        'flex min-h-12 w-full items-center gap-3 rounded-[var(--radius-card)] border px-3.5 py-2.5 text-left text-on-surface transition-colors duration-[120ms] disabled:cursor-default',
         selected ? 'border-gold bg-gold-soft' : 'border-hairline bg-plaque',
       )}
     >
@@ -252,7 +221,7 @@ export function StepRail({
                   disabled={!reachable(i)}
                   onClick={() => onSelect(s.id)}
                   className={cx(
-                    'flex items-center gap-2 rounded-[var(--radius-pill)] border py-1.5 pr-3 pl-1.5 text-[13px] disabled:cursor-default',
+                    'flex items-center gap-2 rounded-[var(--radius-pill)] border py-1.5 pr-3 pl-1.5 text-[13px] transition-colors duration-[120ms] disabled:cursor-default',
                     cur ? 'border-gold bg-gold-soft font-medium text-gold' : 'border-hairline text-on-surface-variant',
                   )}
                 >

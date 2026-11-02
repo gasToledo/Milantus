@@ -55,7 +55,6 @@ import {
   AfterList,
   Block,
   DetailBody,
-  FoldedBlock,
   Option,
   SearchableList,
   Status,
@@ -397,68 +396,39 @@ function AbilityBlock({
   );
 }
 
-/** Clase: la fila, y después cada cupo que pide. Lo resuelto se pliega para
- *  que el paso abra en lo que falta; «Cambiar» lo vuelve a abrir. */
+/** Clase: la fila, y después cada cupo que pide. Todo queda abierto: lo que se
+ *  acaba de elegir se está leyendo a la derecha y no tiene que irse de abajo
+ *  del dedo. */
 function ClassStep({ t, lang, catalog, view, act, setFocus }: StepProps) {
   const d = view.draft;
   const { featureSlots, features, weaponMasterySlots, weapons } = view.class;
   const masteries = d.weaponMasteries ?? [];
-  const [reopened, setReopened] = useState<string | null>(null);
   const classes = useMemo(() => codexEntries('classes', catalog, t, lang), [catalog, t, lang]);
-  const selected = classes.find((c) => c.id === d.classId);
-
-  const blocks = [
-    { key: 'class', done: !!d.classId },
-    ...featureSlots.map((s) => ({ key: s.groupId, done: s.chosen.length >= s.count })),
-    ...(weaponMasterySlots > 0 ? [{ key: 'mastery', done: masteries.length >= weaponMasterySlots }] : []),
-  ];
-  const firstOpen = blocks.find((b) => !b.done)?.key;
-  // Una clase que no pide nada no tiene nada a qué dejarle lugar.
-  const folded = (key: string) => blocks.length > 1 && key !== firstOpen && key !== reopened && !!blocks.find((b) => b.key === key)?.done;
 
   return (
     <>
-      {folded('class') ? (
-        <FoldedBlock
-          title={t.crSteps.clase}
-          summary={selected ? `${selected.name} · ${selected.subtitle}` : ''}
-          status={<Status ready t={t} />}
-          onOpen={() => setReopened('class')}
-          t={t}
-        />
-      ) : (
-        <Block title={t.crSteps.clase} status={<Status ready={!!d.classId} t={t} />}>
-          <div role="radiogroup" aria-label={t.crSteps.clase} className="flex gap-2 overflow-x-auto pb-2.5">
-            {classes.map((c) => (
-              <ClassCard
-                key={c.id}
-                entry={c}
-                icon={CLASS_ICONS[String(catalog.classes.find((k) => k.id === c.id)?.iconId)] ?? User}
-                color={accentOf(catalog, c.id)}
-                selected={d.classId === c.id}
-                onClick={() => {
-                  act({ type: 'selectClass', id: c.id });
-                  setFocus({ kind: 'class', id: c.id });
-                }}
-              />
-            ))}
-          </div>
-        </Block>
-      )}
+      <Block title={t.crSteps.clase} status={<Status ready={!!d.classId} t={t} />}>
+        <div role="radiogroup" aria-label={t.crSteps.clase} className="flex gap-2 overflow-x-auto pb-2.5">
+          {classes.map((c) => (
+            <ClassCard
+              key={c.id}
+              entry={c}
+              icon={CLASS_ICONS[String(catalog.classes.find((k) => k.id === c.id)?.iconId)] ?? User}
+              color={accentOf(catalog, c.id)}
+              selected={d.classId === c.id}
+              onClick={() => {
+                act({ type: 'selectClass', id: c.id });
+                setFocus({ kind: 'class', id: c.id });
+              }}
+            />
+          ))}
+        </div>
+      </Block>
 
       {featureSlots.map((slot) => {
         const single = slot.count === 1;
         const full = slot.chosen.length >= slot.count;
-        return folded(slot.groupId) ? (
-          <FoldedBlock
-            key={slot.groupId}
-            title={slot.name}
-            summary={slot.chosen.map((id) => slot.options.find((o) => o.id === id)?.name ?? id).join(', ')}
-            status={<Status ready t={t} />}
-            onOpen={() => setReopened(slot.groupId)}
-            t={t}
-          />
-        ) : (
+        return (
           <Block
             key={slot.groupId}
             title={slot.name}
@@ -493,16 +463,7 @@ function ClassStep({ t, lang, catalog, view, act, setFocus }: StepProps) {
         );
       })}
 
-      {weaponMasterySlots > 0 &&
-        (folded('mastery') ? (
-          <FoldedBlock
-            title={t.crWeaponMastery}
-            summary={masteries.map((id) => nameOf(catalog.weapons, id) ?? id).join(', ')}
-            status={<Status ready t={t} />}
-            onOpen={() => setReopened('mastery')}
-            t={t}
-          />
-        ) : (
+      {weaponMasterySlots > 0 && (
           <Block
             title={t.crWeaponMastery}
             status={
@@ -541,7 +502,7 @@ function ClassStep({ t, lang, catalog, view, act, setFocus }: StepProps) {
               }}
             </SearchableList>
           </Block>
-        ))}
+      )}
 
       {d.classId && features.length > 0 && (
         <Block title={t.crClassFeatures} status={<Status auto t={t} />}>
@@ -925,12 +886,12 @@ function DetailPanel({ focus, view, catalog, lang, t }: { focus: Focus; view: Cr
   return (
     <section className="card flex flex-col gap-2.5 p-4" aria-live="polite" data-field="creation-detail">
       {ability ? (
-        <>
+        <div key={ability} className="step-in flex flex-col gap-2.5">
           <h2 className="font-display text-[18px] text-on-surface">{t.abilities[ability]}</h2>
           <p className="border-t border-hairline pt-3 text-[13.5px] leading-[1.55]">{view.scores.descriptions[ability]}</p>
-        </>
+        </div>
       ) : entry && detail ? (
-        <>
+        <div key={`${focus!.kind}-${entry.id}`} className="step-in flex flex-col gap-2.5">
           <div className="flex items-center justify-between gap-2.5">
             <h2 className="font-display text-[18px] text-on-surface">{entry.name}</h2>
             <SourceTag source={entry.source} t={t} />
@@ -938,7 +899,7 @@ function DetailPanel({ focus, view, catalog, lang, t }: { focus: Focus; view: Cr
           {entry.subtitle && <p className="text-[12.5px] text-on-surface-variant">{entry.subtitle}</p>}
           <DetailBody detail={detail} />
           {extra}
-        </>
+        </div>
       ) : (
         <p className="text-[13px] text-text-muted">{t.luDetailEmpty}</p>
       )}

@@ -43,11 +43,12 @@ test('de Especie a Características: cada paso frena hasta completarse y nada se
   await opcion('intelligence').click();
   await seguir.click();
 
-  // Clase: lo resuelto se pliega y el paso abre en lo que falta.
+  // Clase: lo elegido sigue a la vista, para leerlo a la derecha.
   await expect(seguir).toBeDisabled();
   await opcion('fighter').click();
   await opcion('fs-defense').click();
-  await expect(opcion('fs-defense')).toHaveCount(0);
+  await expect(opcion('fs-defense')).toBeVisible();
+  await expect(detalle).toContainText('Defensa');
   for (const arma of ['longsword', 'greatsword']) await opcion(arma).click();
   await expect(seguir).toBeDisabled();
   await opcion('dagger').click();

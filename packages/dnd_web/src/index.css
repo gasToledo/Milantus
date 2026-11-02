@@ -331,6 +331,19 @@ body {
   animation: drawer-in 180ms ease-out;
 }
 
+/* Lo que aparece en un asistente (el paso nuevo, un bloque que abre una
+   elección, el detalle de la derecha) entra suave en vez de saltar. Corto y sin
+   rellenar: al terminar no queda ninguna capa ni transformación encima. */
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+.step-in {
+  animation: step-in 160ms ease-out;
+}
+
 /* Toda duración se apaga si el sistema pide menos movimiento: lo animado
    nunca lleva información que no esté ya en su valor final. */
 @media (prefers-reduced-motion: reduce) {
