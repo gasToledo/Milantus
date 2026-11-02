@@ -413,6 +413,20 @@ repiten acá.
   un espacio o el uso gratis al lanzar solo pasa al invocar un compañero, que
   sigue en Flutter. El uso gratis de un conjuro innato es su recurso
   (`innate-<id>`) y ya se gasta con los botones de recursos.
+  Desde 5e1: en la tarjeta **Condiciones** los 13 estados son chips que se
+  marcan (con su regla en el tooltip) y el **Cansancio** es un contador de 0 a
+  6 con su regla en un diálogo; al 6 avisa que el personaje muere y no toca los
+  PG. Los **modos activos** (la Furia) son una placa en la banda táctica —usos
+  que quedan, «Activar» o «Terminar», o el motivo del bloqueo— con un diálogo
+  de variantes (casillas si admite varias) y un cartel arriba de la banda, en
+  todas las pestañas, que dice qué suma. Las reglas (marcar un estado que
+  incapacita termina la concentración y los modos, el tope del cansancio, gastar
+  el uso al activar) son `CombatOps`, por las acciones `setCondition`,
+  `setExhaustion`, `activateMode` y `deactivateMode`; una activación rechazada
+  devuelve la ficha intacta. `compute` aplica `applyExhaustion` sobre la ficha
+  calculada, como Flutter: antes `/v2` mostraba descansado a quien no lo está.
+  Todavía **no** aplica la Forma Salvaje (5e4). Sin escritura, la ficha ajena
+  sigue mostrando solo los estados puestos y el modo en curso.
   En **Inventario** (5b1): las cinco monedas se escriben a mano (se guardan al
   salir del campo o con Enter); cada fila lleva la casilla de equipar (solo lo
   que se equipa, `InventoryOps.isEquippable`), − y + en la cantidad (el − se
@@ -548,7 +562,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    Detalles, Revisión y el alta *(existe)*; 5e, lo que falta escribir en la
    ficha propia, de menor a mayor riesgo porque ninguna de estas escrituras
    tiene todavía acción en `SheetActions.apply`, en cinco: 5e1, condiciones,
-   cansancio y modos activos (Furia); 5e2, preparar conjuros (el editor ya
+   cansancio y modos activos (Furia) *(existe)*; 5e2, preparar conjuros (el editor ya
    existe en la subida) y cambiar el truco innato; 5e3, los planos del Artífice
    y los objetivos de arma de un rasgo (Pacto del Filo); 5e4, Forma Salvaje;
    5e5, compañeros, y con ellos lanzar gastando espacio o uso gratis. Antes de
@@ -657,7 +671,10 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    guardando lo del motor y se deshaga, que un guerrero elija en la subida el
    estilo de combate pendiente y guarde lo del motor, que la clériga suba
    eligiendo Orden Divina, los conjuros de Iniciado en la Magia y los de
-   clase y guarde lo del motor, y
+   clase y guarde lo del motor, que una bárbara active la Furia, marque
+   estados (uno que incapacita la termina) y suba y baje el cansancio
+   guardando lo del motor y releyéndolo al recargar, con la velocidad y la
+   iniciativa ya penalizadas, y
    que la ficha de otra cuenta (la de un miembro, para el DM) no
    tenga un solo control (`e2e/escritura.spec.ts`, con una cuenta propia para
    no cambiar lo que leen las demás); y que una cuenta sin `webV2` vea

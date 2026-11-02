@@ -58,7 +58,12 @@ String compute(String characterJson, String catalogJson) {
     jsonDecode(characterJson) as Map<String, dynamic>,
   );
   final sheet = CharacterCompiler(_repoPara(catalogJson)).compile(character);
-  return jsonEncode(sheet.toJson());
+  // El Cansancio va encima, como en Flutter, la ficha del miembro y el MCP:
+  // sin esto /v2 mostraba descansado a quien no lo está. La Forma Salvaje
+  // (que va antes) todavía no se aplica acá.
+  return jsonEncode(
+    applyExhaustion(sheet, character.combat.exhaustion).toJson(),
+  );
 }
 
 /// Lleva una ficha de cualquier versión al esquema actual. Rechaza una versión

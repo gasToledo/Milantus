@@ -55,6 +55,13 @@ class SheetActions {
   ///   `outcome.dismissed` son los compañeros que dependían de la concentración
   ///   anterior y se fueron.
   /// - `endConcentration`; `outcome.dismissed` como en `concentrate`.
+  /// - `setCondition` con `condition` (el id del estado) y `value`; uno que
+  ///   incapacita termina la concentración y los modos, y `outcome.dismissed`
+  ///   son los compañeros que se fueron con ella.
+  /// - `setExhaustion` con `value` (0 a 6); `outcome.died` es true en el 6.
+  /// - `activateMode` con `mode` y `variant` o `variants`; `outcome.activated`
+  ///   es false si no se pudo (sin usos, armadura pesada) y la ficha vuelve
+  ///   intacta. `deactivateMode` con `mode`.
   /// - Mochila, todas con `entry` (el `entryId`): `equip` y `attune` con
   ///   `value`; `setQuantity` y `setCharges` con `value`; `note` con `text`;
   ///   `offHand` y `twoHanded` alternan la marca del arma; `removeItem` saca
@@ -176,16 +183,48 @@ class SheetActions {
             combat.concentratingOn == spell) {
           break;
         }
-        outcome['dismissed'] = [
-          for (final i in combat.companions)
-            if (i.concentration)
-              repo.creature(i.creatureId)?.name ?? i.creatureId,
-        ];
+        outcome['dismissed'] = _concentrationCompanions(combat, repo);
         if (action['type'] == 'concentrate') {
           CombatOps.startConcentration(combat, spell!);
         } else {
           CombatOps.endConcentration(combat);
         }
+      case 'setCondition':
+        final condition = action['condition'] as String;
+        final on = action['value'] == true;
+        // Solo incapacitar rompe la concentración; los nombres se toman antes
+        // de que `setCondition` se lleve a los compañeros que la sostenían.
+        if (on && CombatOps.incapacitatingConditions.contains(condition)) {
+          outcome['dismissed'] = _concentrationCompanions(combat, repo);
+        }
+        CombatOps.setCondition(combat, condition, on, sheet: sheet);
+      case 'setExhaustion':
+        outcome['died'] = CombatOps.setExhaustion(
+          combat,
+          (action['value'] as num).toInt(),
+        );
+      case 'activateMode':
+        final ok = CombatOps.activateMode(
+          combat,
+          sheet,
+          action['mode'] as String,
+          variant: action['variant'] as String?,
+          variants: [
+            for (final v in (action['variants'] as List?) ?? const [])
+              v as String,
+          ],
+        );
+        outcome['activated'] = ok;
+        // `activateMode` puede haber dado PG temporales o quitado estados
+        // antes de descubrir que no hay usos: un rechazo deja la ficha como
+        // estaba, no a medias.
+        if (!ok) c = character;
+      case 'deactivateMode':
+        CombatOps.deactivateMode(
+          combat,
+          action['mode'] as String,
+          sheet: sheet,
+        );
       case 'equip':
         c = InventoryOps.setEquipped(
           c,
@@ -275,4 +314,16 @@ class SheetActions {
     }
     return SheetActionResult(c, outcome);
   }
+
+  /// Los nombres de los compañeros que sostiene la concentración actual: los
+  /// que se van si ella termina.
+  static List<String> _concentrationCompanions(
+    CombatState combat,
+    ContentRepository repo,
+  ) =>
+      [
+        for (final i in combat.companions)
+          if (i.concentration)
+            repo.creature(i.creatureId)?.name ?? i.creatureId,
+      ];
 }

@@ -74,6 +74,8 @@ final _casos = <String, Character>{
     equippedArmorId: 'chain-mail',
     shieldEquipped: true,
     equippedWeaponIds: const ['longsword'],
+    // Cansado: `compute` aplica el Cansancio sobre la ficha calculada.
+    combat: CombatState(currentHp: 40, exhaustion: 2),
   ),
   // Multiclase: bloques de lanzamiento propios y espacios combinados.
   'multiclase': Character(
@@ -152,6 +154,13 @@ final _acciones = <String, (String, Map<String, dynamic>)>{
   ),
   'accion-recurso': ('barbaro', {'type': 'spendResource', 'resource': 'rage'}),
   'accion-dado-de-golpe': ('guerrero', {'type': 'spendHitDie'}),
+  'accion-condicion': (
+    'barbaro',
+    {'type': 'setCondition', 'condition': 'stunned', 'value': true},
+  ),
+  'accion-cansancio': ('guerrero', {'type': 'setExhaustion', 'value': 6}),
+  'accion-modo': ('barbaro', {'type': 'activateMode', 'mode': 'rage'}),
+  'accion-modo-fin': ('barbaro', {'type': 'deactivateMode', 'mode': 'rage'}),
   'accion-descanso-corto': ('brujo', {'type': 'shortRest'}),
   'accion-descanso-largo': ('druida', {'type': 'longRest'}),
 };
@@ -230,7 +239,10 @@ Future<void> main(List<String> args) async {
   for (final MapEntry(key: nombre, value: personaje) in _casos.entries) {
     final entrada = jsonDecode(jsonEncode(personaje.toJson()));
     final ficha = Character.fromJson(entrada as Map<String, dynamic>);
-    final esperado = CharacterCompiler(repo).compile(ficha).toJson();
+    final esperado = applyExhaustion(
+      CharacterCompiler(repo).compile(ficha),
+      ficha.combat.exhaustion,
+    ).toJson();
     File('${out.path}/$nombre.json').writeAsStringSync(
       jsonEncode({'character': entrada, 'expected': esperado}),
     );

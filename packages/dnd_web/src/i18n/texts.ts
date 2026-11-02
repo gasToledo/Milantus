@@ -317,6 +317,34 @@ const es = {
   noConditions: 'Sin condiciones activas.',
   exhaustion: (n: number) => `Agotamiento ${n}`,
   concentrating: (name: string) => `Concentración: ${name}`,
+  // Cansancio y modos activos (5e1); los textos son los de Flutter.
+  exhaustionTitle: 'Cansancio',
+  exhaustionRules: (max: number) =>
+    `Cada nivel resta 2 a las pruebas de característica, salvaciones, tiradas de ataque e iniciativa, y 5 pies a la velocidad. Al nivel ${max} el personaje muere.
+
+La ficha ya trae la penalización aplicada en todos sus números: no la restes de nuevo. También le entra a las salvaciones de muerte, aunque esas no lleven número.
+
+Un descanso largo baja un nivel.`,
+  exhaustionPenalty: (rolls: number, feet: number) => `−${rolls} a las tiradas · −${feet} pies`,
+  exhaustionLevelOf: (level: number, max: number) => `Cansancio nivel ${level} de ${max}`,
+  exhaustionLower: 'Bajar un nivel de cansancio',
+  exhaustionRaise: 'Subir un nivel de cansancio',
+  exhaustionDeath: (max: number) => `Cansancio nivel ${max}: tu personaje muere.`,
+  exhaustionNote: (max: number) =>
+    `Nivel ${max}: tu personaje muere. La ficha no lo aplica ni te toca los PG — esa decisión es de la mesa.`,
+  exhaustionRuleOpen: 'Ver la regla del cansancio',
+  modeActivate: 'Activar',
+  modeEnd: 'Terminar',
+  modeOn: 'En curso',
+  modeNoUses: 'Sin usos',
+  modeHeavyArmor: 'Con armadura pesada',
+  modeRequires: (mode: string) => `Requiere ${mode}`,
+  modeResistance: (types: string) => `Resistencia a ${types}`,
+  modeDamage: (amount: number, ability: string) => `+${amount} al daño con ${ability}`,
+  modeAdvantage: (abilities: string) => `Ventaja en ${abilities}`,
+  modeNoSpells: 'Sin conjuros ni concentración',
+  modeFailed: 'No se pudo activar.',
+  conditionsDismissed: (names: string) => `Se fue: ${names}.`,
   resourcesAndRests: 'Recursos y descansos',
   recharge: { short: 'Descanso corto', long: 'Descanso largo', none: '' },
   poolValue: (left: number, max: number) => `${left} / ${max}`,
@@ -1540,6 +1568,33 @@ const en: Texts = {
   noConditions: 'No active conditions.',
   exhaustion: (n: number) => `Exhaustion ${n}`,
   concentrating: (name: string) => `Concentration: ${name}`,
+  exhaustionTitle: 'Exhaustion',
+  exhaustionRules: (max: number) =>
+    `Each level subtracts 2 from ability checks, saving throws, attack rolls and initiative, and 5 feet from speed. At level ${max} the character dies.
+
+The sheet already applies the penalty to all of its numbers: do not subtract it again. It also affects Death Saving Throws, even though those carry no number.
+
+A long rest lowers it by one level.`,
+  exhaustionPenalty: (rolls: number, feet: number) => `−${rolls} to rolls · −${feet} ft.`,
+  exhaustionLevelOf: (level: number, max: number) => `Exhaustion level ${level} of ${max}`,
+  exhaustionLower: 'Lower exhaustion by one level',
+  exhaustionRaise: 'Raise exhaustion by one level',
+  exhaustionDeath: (max: number) => `Exhaustion level ${max}: your character dies.`,
+  exhaustionNote: (max: number) =>
+    `Level ${max}: your character dies. The sheet doesn’t apply it or touch your HP — that decision is up to the table.`,
+  exhaustionRuleOpen: 'See the exhaustion rule',
+  modeActivate: 'Activate',
+  modeEnd: 'End',
+  modeOn: 'Active',
+  modeNoUses: 'No uses left',
+  modeHeavyArmor: 'In heavy armor',
+  modeRequires: (mode: string) => `Needs ${mode}`,
+  modeResistance: (types: string) => `Resistance to ${types}`,
+  modeDamage: (amount: number, ability: string) => `+${amount} damage with ${ability}`,
+  modeAdvantage: (abilities: string) => `Advantage on ${abilities}`,
+  modeNoSpells: 'No spells or Concentration',
+  modeFailed: 'Couldn’t activate it.',
+  conditionsDismissed: (names: string) => `Gone: ${names}.`,
   resourcesAndRests: 'Resources and rests',
   recharge: { short: 'Short rest', long: 'Long rest', none: '' },
   poolValue: (left: number, max: number) => `${left} / ${max}`,

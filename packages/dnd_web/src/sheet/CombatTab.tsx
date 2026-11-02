@@ -1,10 +1,11 @@
-import { Bed, BookOpen, Check, Coffee, Crosshair, Dices, Heart, Minus, Plus, RefreshCw, Shield, ShieldHalf, Star, Zap } from 'lucide-react';
+import { Bed, BookOpen, Check, Coffee, Crosshair, Dices, Heart, Info, Minus, Plus, RefreshCw, Shield, ShieldHalf, Star, TriangleAlert, Zap } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { nameOf } from '../api/catalog';
 import type { CharacterResource, InnateSpell, SpellcastingBlock } from '../engine';
 import { useTexts } from '../i18n/context';
 import { labelOf } from '../i18n/texts';
 import { AppDialog } from '../ui/AppDialog';
+import { Tooltip } from '../ui/primitives';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Eyebrow, hpTone, Pill, Pips, ShieldBadge, SpendRecoverButtons, StatPlaque, ThinBar } from '../ui/data';
@@ -44,6 +45,10 @@ export function CombatTab({ model }: { model: SheetModel }) {
     </SheetColumns>
   );
 }
+
+/** `maxExhaustionLevel` del motor: el nivel en que el personaje muere. Es el
+ *  tope de los pips; el que se guarda lo pone `setExhaustion`. */
+const MAX_EXHAUSTION = 6;
 
 function HitPointsCard({ model }: { model: SheetModel }) {
   const t = useTexts();
@@ -516,11 +521,27 @@ function SavesCard({ model }: { model: SheetModel }) {
 
 function ConditionsCard({ model }: { model: SheetModel }) {
   const t = useTexts();
-  const { character, catalog } = model;
+  const { character, catalog, write } = model;
   const conditions = character.combat?.conditions ?? [];
   const exhaustion = character.combat?.exhaustion ?? 0;
   const concentrating = character.combat?.concentratingOn;
   const any = conditions.length > 0 || exhaustion > 0 || Boolean(concentrating);
+  const concentratingPill = concentrating && (
+    <Pill as="li" highlighted={false}>
+      {t.concentrating(nameOf(catalog.spells, concentrating) ?? concentrating)}
+    </Pill>
+  );
+  // En la ficha propia los estados son chips que se marcan y el cansancio un
+  // contador; sin escritura, solo lo que está puesto.
+  if (write) {
+    return (
+      <Card id="conditions" title={t.conditionsHeading} icon={Zap}>
+        <ConditionChips model={model} />
+        <ExhaustionRow model={model} />
+        {concentratingPill && <ul className="mt-3 flex flex-wrap gap-1.5">{concentratingPill}</ul>}
+      </Card>
+    );
+  }
   return (
     <Card id="conditions" title={t.conditionsHeading} icon={Zap}>
       {any ? (
@@ -531,16 +552,112 @@ function ConditionsCard({ model }: { model: SheetModel }) {
             </Pill>
           ))}
           {exhaustion > 0 && <Pill as="li">{t.exhaustion(exhaustion)}</Pill>}
-          {concentrating && (
-            <Pill as="li" highlighted={false}>
-              {t.concentrating(nameOf(catalog.spells, concentrating) ?? concentrating)}
-            </Pill>
-          )}
+          {concentratingPill}
         </ul>
       ) : (
         <p className="text-[13px] text-text-muted">{t.noConditions}</p>
       )}
     </Card>
+  );
+}
+
+/** Los 13 estados como chips que se marcan (`_conditionChips` de Flutter), con
+ *  la regla de cada uno al pasar el mouse. Marcar uno que incapacita termina
+ *  la concentración y los modos activos: lo hace el motor, y avisa quién se
+ *  fue con la concentración. */
+function ConditionChips({ model }: { model: SheetModel }) {
+  const t = useTexts();
+  const { character, write } = model;
+  const active = character.combat?.conditions ?? [];
+  return (
+    <ul className="flex flex-wrap gap-1.5" data-controls="conditions">
+      {Object.keys(t.conditions).map((id) => {
+        const on = active.includes(id);
+        const toggle = () => {
+          const r = write!.act({ type: 'setCondition', condition: id, value: !on });
+          const gone = r?.outcome.dismissed ?? [];
+          if (gone.length > 0) write!.notify(t.conditionsDismissed(gone.join(', ')));
+        };
+        return (
+          <li key={id}>
+            <Tooltip content={(t.conditionRules as Record<string, { rule: string }>)[id]?.rule ??labelOf(t.conditions, id)}>
+              <button
+                type="button"
+                aria-pressed={on}
+                data-condition={id}
+                onClick={toggle}
+                className={`inline-flex items-center rounded-[var(--radius-pill)] border px-[10px] py-[3px] text-[12px] ${
+                  on ? 'border-gold bg-gold-soft text-gold' : 'border-hairline bg-plaque text-on-surface-variant'
+                }`}
+              >
+                {labelOf(t.conditions, id)}
+              </button>
+            </Tooltip>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+/** El Cansancio con la anatomía de un recurso (`_exhaustionRow`): el nombre
+ *  abre la regla, los pips debajo y el par −/+, que acá es al revés: bajar es
+ *  lo bueno. Los números penalizados ya los trae el motor; el «−4 a las
+ *  tiradas» es solo el aviso de cuánto. Al nivel 6 la ficha no hace nada (esa
+ *  decisión es de la mesa), pero lo dice. */
+function ExhaustionRow({ model }: { model: SheetModel }) {
+  const t = useTexts();
+  const { character, write } = model;
+  const [rule, setRule] = useState(false);
+  const n = character.combat?.exhaustion ?? 0;
+  const set = (value: number) => {
+    const r = write!.act({ type: 'setExhaustion', value });
+    if (r?.outcome.died) write!.notify(t.exhaustionDeath(MAX_EXHAUSTION), { tone: 'error' });
+  };
+  return (
+    <div className="mt-3 border-t border-hairline pt-3" data-field="exhaustion">
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+            <button
+              type="button"
+              onClick={() => setRule(true)}
+              aria-label={t.exhaustionRuleOpen}
+              className="inline-flex items-center gap-1.5 font-medium"
+            >
+              {t.exhaustionTitle}
+              <Info size={14} aria-hidden="true" className="text-text-muted" />
+            </button>
+            {n >= 1 && <span className="text-[12px] text-crimson">{t.exhaustionPenalty(2 * n, 5 * n)}</span>}
+          </div>
+          <div className="mt-1.5">
+            <Pips max={MAX_EXHAUSTION} left={n} label={t.exhaustionLevelOf(n, MAX_EXHAUSTION)} tone="crimson" />
+          </div>
+        </div>
+        <SpendRecoverButtons
+          spendLabel={t.exhaustionLower}
+          recoverLabel={t.exhaustionRaise}
+          onSpend={n > 0 ? () => set(n - 1) : undefined}
+          onRecover={n < MAX_EXHAUSTION ? () => set(n + 1) : undefined}
+        />
+      </div>
+      {n >= MAX_EXHAUSTION && (
+        <p className="mt-2.5 flex items-start gap-2 text-[12px] text-crimson">
+          <TriangleAlert size={18} aria-hidden="true" className="shrink-0" />
+          {t.exhaustionNote(MAX_EXHAUSTION)}
+        </p>
+      )}
+      {rule && (
+        <AppDialog
+          open
+          onOpenChange={(open) => !open && setRule(false)}
+          title={t.exhaustionTitle}
+          actions={[{ label: t.close, primary: true }]}
+        >
+          <p className="whitespace-pre-line text-on-surface-variant">{t.exhaustionRules(MAX_EXHAUSTION)}</p>
+        </AppDialog>
+      )}
+    </div>
   );
 }
 

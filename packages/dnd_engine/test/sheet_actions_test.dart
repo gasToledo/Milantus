@@ -206,6 +206,83 @@ void main() {
     expect(r.character.toJson(), c.toJson());
   });
 
+  group('estados, cansancio y modos activos', () {
+    Character barbaro({CombatState? combat}) => Character(
+          id: 'barbaro',
+          name: 'Bárbaro',
+          raceId: 'human',
+          classId: 'barbarian',
+          backgroundId: 'soldier',
+          level: 3,
+          assignedScores: _scores,
+          hpPerLevel: const [12, 7, 7],
+          combat: combat ?? CombatState(currentHp: 20),
+        );
+
+    test('un estado que incapacita termina la Furia y la concentración', () {
+      final furiosa = act(barbaro(), {'type': 'activateMode', 'mode': 'rage'});
+      expect(furiosa.outcome['activated'], isTrue);
+      expect(furiosa.character.combat.activeModes, contains('rage'));
+
+      final c = furiosa.character.copyWith(
+        combat: CombatState.fromJson(
+          (furiosa.character.combat..concentratingOn = 'Bendición').toJson(),
+        ),
+      );
+      final aturdida = act(c, {
+        'type': 'setCondition',
+        'condition': 'stunned',
+        'value': true,
+      });
+      expect(aturdida.character.combat.conditions, contains('stunned'));
+      expect(aturdida.character.combat.activeModes, isEmpty);
+      expect(aturdida.character.combat.concentratingOn, isNull);
+
+      // Uno que no incapacita no corta nada.
+      final envenenada = act(furiosa.character, {
+        'type': 'setCondition',
+        'condition': 'poisoned',
+        'value': true,
+      });
+      expect(envenenada.character.combat.activeModes, contains('rage'));
+    });
+
+    test('el cansancio no se sale de 0 a 6 y avisa en el máximo', () {
+      final c = barbaro();
+      final tope = act(c, {'type': 'setExhaustion', 'value': 9});
+      expect(tope.character.combat.exhaustion, maxExhaustionLevel);
+      expect(tope.outcome['died'], isTrue);
+      expect(
+        act(c, {'type': 'setExhaustion', 'value': -2})
+            .character
+            .combat
+            .exhaustion,
+        0,
+      );
+    });
+
+    test('sin usos la Furia no se activa y la ficha vuelve intacta', () {
+      final sheet = CharacterCompiler(repo).compile(barbaro());
+      final rage = sheet.resources.firstWhere((r) => r.id == 'rage');
+      final c = barbaro(
+        combat: CombatState(currentHp: 20, resourceUsage: {rage.key: rage.max}),
+      );
+
+      final r = act(c, {'type': 'activateMode', 'mode': 'rage'});
+
+      expect(r.outcome['activated'], isFalse);
+      expect(r.character.toJson(), c.toJson());
+    });
+
+    test('terminar la Furia no devuelve el uso', () {
+      final on = act(barbaro(), {'type': 'activateMode', 'mode': 'rage'});
+      final off = act(on.character, {'type': 'deactivateMode', 'mode': 'rage'});
+      expect(off.character.combat.activeModes, isEmpty);
+      expect(off.character.combat.resourceUsage,
+          on.character.combat.resourceUsage);
+    });
+  });
+
   test('una acción desconocida no devuelve una ficha', () {
     expect(
       () => act(monje(), {'type': 'fly'}),

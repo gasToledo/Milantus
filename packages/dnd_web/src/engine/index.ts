@@ -628,6 +628,10 @@ export type SheetAction =
   | { type: 'spendResource' | 'recoverResource'; resource: string; amount?: number }
   | { type: 'spendHitDie' | 'shortRest' | 'longRest' | 'endConcentration' }
   | { type: 'heroicInspiration'; value: boolean }
+  | { type: 'setCondition'; condition: string; value: boolean }
+  | { type: 'setExhaustion'; value: number }
+  | { type: 'activateMode'; mode: string; variant?: string; variants?: string[] }
+  | { type: 'deactivateMode'; mode: string }
   | { type: 'concentrate'; spell: string }
   | { type: 'equip' | 'attune'; entry: string; value: boolean }
   | { type: 'setQuantity' | 'setCharges'; entry: string; value: number }
@@ -650,6 +654,8 @@ export interface SheetOutcome {
   itemsRecharged?: number;
   dismissed?: string[];
   paid?: boolean;
+  died?: boolean;
+  activated?: boolean;
 }
 
 /**

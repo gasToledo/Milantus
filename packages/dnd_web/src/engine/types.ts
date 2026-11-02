@@ -113,15 +113,24 @@ export interface Advantage {
   conditional: boolean;
 }
 
+/** Una variante de un modo activo (Oso, Águila, Lobo): `ActiveModeVariant`
+ *  sin sus efectos, que el motor ya aplicó a la ficha. */
+export interface ActiveModeVariant {
+  id: string;
+  name: string;
+  /** Falta si la variante no tiene texto. */
+  description?: string;
+}
+
 export interface ActiveMode {
   id: string;
   name: string;
-  resourceKey: string;
-  variants: JsonObject[];
+  resourceKey: string | null;
+  variants: ActiveModeVariant[];
   tempHpOnActivate: number;
   endsConditions: string[];
   endsWhenIncapacitated: boolean;
-  blockedBy: string | null;
+  blockedBy: 'heavyArmor' | 'incapacitated' | 'needsMode' | null;
   available: boolean;
   active: boolean;
   activeVariant: string | null;

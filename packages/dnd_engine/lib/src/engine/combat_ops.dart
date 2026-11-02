@@ -445,6 +445,17 @@ class CombatOps {
     endConcentration(c);
   }
 
+  /// Fija el Cansancio en [level], entre 0 y [maxExhaustionLevel]. Devuelve
+  /// true si quedó en el máximo, que es donde la regla dice que el personaje
+  /// muere: la ficha no lo aplica (esa decisión es de la mesa), solo avisa.
+  ///
+  /// Vive acá y no en el botón de la pantalla por lo mismo que [setCondition]:
+  /// el tope es una regla, y un cliente que lo repitiera podría guardar un 9.
+  static bool setExhaustion(CombatState c, int level) {
+    c.exhaustion = level.clamp(0, maxExhaustionLevel);
+    return c.exhaustion >= maxExhaustionLevel;
+  }
+
   /// Prende el estado activable [modeId] (la Furia), con la [variant] elegida
   /// si tiene. Gasta un uso de su recurso; devuelve false sin tocar nada si
   /// no quedan usos, si el estado no está disponible (armadura pesada) o si

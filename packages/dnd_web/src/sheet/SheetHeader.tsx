@@ -4,6 +4,7 @@ import { nameOf } from '../api/catalog';
 import { useTexts } from '../i18n/context';
 import { hpTone, Pill, SectionRule, StatTile, ThinBar } from '../ui/data';
 import { signed } from './format';
+import { ActiveModeBanners, ActiveModeTile } from './ActiveModes';
 import { classesOf, type SheetModel } from './model';
 
 /**
@@ -45,6 +46,8 @@ export function SheetHeader({ model, leading }: { model: SheetModel; leading?: R
         </div>
       </header>
 
+      <ActiveModeBanners model={model} />
+
       <section aria-label={t.tacticalBand} className="tactical-band">
         <dl>
           <StatTile id="ac" icon={Shield} label={t.armor} value={sheet.armorClass} />
@@ -72,6 +75,14 @@ export function SheetHeader({ model, leading }: { model: SheetModel; leading?: R
           <StatTile id="initiative" icon={Zap} label={t.initiative} value={signed(sheet.initiative)} />
           <StatTile id="speed" icon={Footprints} label={t.speed} value={sheet.speed} suffix={t.feet} />
           <StatTile id="proficiency" icon={Medal} label={t.proficiency} value={signed(sheet.proficiencyBonus)} />
+          {/* Los estados activables viven en la banda y no en una tarjeta de
+              Combate: se prenden en el turno desde cualquier pestaña. Sin
+              escritura, solo el que está en curso. */}
+          {sheet.activeModes
+            .filter((m) => model.write || m.active)
+            .map((m) => (
+              <ActiveModeTile key={m.id} model={model} mode={m} />
+            ))}
         </dl>
       </section>
 

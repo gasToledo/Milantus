@@ -9,7 +9,7 @@ import {
   type LevelUpDraft,
   type SheetAction,
 } from '../src/engine';
-import { resourceKey } from '../src/sheet/format';
+import { resourceKey, signed } from '../src/sheet/format';
 import { api, catalogo, TOKEN_DM, TOKEN_ESCRITURA, vigilarEscrituras, type PersonajeApi } from './helpers';
 
 // La ficha que escriben estas pruebas es de una cuenta propia (`e2e_server.dart`):
@@ -403,6 +403,60 @@ test('la clériga sube eligiendo Orden Divina, los conjuros de su dote y los de 
   );
 });
 
+test('la Furia, los estados y el cansancio guardan lo del motor y se releen al recargar', async ({ page, request }) => {
+  const BRUNA = 'bruna-de-humo';
+  await page.goto(`/v2/personajes/${BRUNA}/combate`);
+  const furia = page.locator('[data-stat="mode-rage"]');
+  const pasos: [() => Promise<void>, SheetAction][] = [
+    [() => furia.getByRole('button', { name: 'Activar' }).click(), { type: 'activateMode', mode: 'rage' }],
+    [
+      () => page.locator('[data-condition="poisoned"]').click(),
+      { type: 'setCondition', condition: 'poisoned', value: true },
+    ],
+    // Aturdido incluye Incapacitado: el motor termina la Furia.
+    [
+      () => page.locator('[data-condition="stunned"]').click(),
+      { type: 'setCondition', condition: 'stunned', value: true },
+    ],
+    [
+      () => page.getByRole('button', { name: 'Subir un nivel de cansancio' }).click(),
+      { type: 'setExhaustion', value: 1 },
+    ],
+    [
+      () => page.getByRole('button', { name: 'Subir un nivel de cansancio' }).click(),
+      { type: 'setExhaustion', value: 2 },
+    ],
+    [
+      () => page.getByRole('button', { name: 'Bajar un nivel de cansancio' }).click(),
+      { type: 'setExhaustion', value: 1 },
+    ],
+  ];
+  for (const [i, [tocar, accion]] of pasos.entries()) {
+    const esperado = segunMotor(await ilse(request, BRUNA), accion);
+    expect(await proximoGuardado(page, tocar, BRUNA)).toEqual(esperado);
+    expect(await ilse(request, BRUNA)).toEqual(esperado);
+    // Con la Furia en curso aparece su cartel, y se va al quedar aturdida.
+    if (i === 0) await expect(page.locator('[data-mode-banner="rage"]')).toBeVisible();
+  }
+  await expect(page.locator('[data-mode-banner="rage"]')).toHaveCount(0);
+
+  // Al recargar la pantalla lee lo guardado: los estados siguen marcados, el
+  // cansancio en 1 y los números de la ficha ya lo traen aplicado.
+  await page.reload();
+  await expect(page.locator('[data-condition="stunned"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('[data-condition="poisoned"]')).toHaveAttribute('aria-pressed', 'true');
+  const ficha = computeSheet(migrateCharacter(await ilse(request, BRUNA)), catalogo());
+  await expect(page.locator('[data-stat="speed"] [data-field="value"]')).toHaveText(String(ficha.speed));
+  await expect(page.locator('[data-stat="initiative"] [data-field="value"]')).toHaveText(
+    signed(ficha.initiative),
+  );
+
+  // Limpia la ficha para el resto de la corrida.
+  for (const id of ['poisoned', 'stunned']) await page.locator(`[data-condition="${id}"]`).click();
+  await page.getByRole('button', { name: 'Bajar un nivel de cansancio' }).click();
+  await expect(page.locator('[data-save-state="saved"]')).toBeVisible();
+});
+
 test('la ficha de otra cuenta no tiene controles para escribir', async ({ context, page, baseURL }) => {
   await context.clearCookies();
   await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);
@@ -418,5 +472,8 @@ test('la ficha de otra cuenta no tiene controles para escribir', async ({ contex
   await expect(page.locator('[data-card="hit-points"]')).toBeVisible();
   await expect(page.locator('[data-controls]')).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Daño' })).toHaveCount(0);
+  // Ni estados, ni cansancio, ni estados activables: nada que escriba.
+  await expect(page.locator('[data-condition], [data-field="exhaustion"]')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /^(Activar|Terminar)$/ })).toHaveCount(0);
   expect(escrituras).toEqual([]);
 });
