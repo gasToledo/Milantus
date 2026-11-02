@@ -816,6 +816,14 @@ void main() {
       });
     expect(d.spreadPlusOne, isNull);
     expect(d.abilitySpread, {Ability.intelligence: 2});
+    expect(faltan(d, [CreationSection.background]), isNotEmpty);
+
+    // Mover el +2 adonde estaba el +1 también lo suelta, en vez de perderlo.
+    d
+      ..setSpread(Ability.intelligence, Ability.constitution)
+      ..setSpread(Ability.constitution, d.spreadPlusOne);
+    expect(d.spreadPlusOne, isNull);
+    expect(faltan(d, [CreationSection.background]), isNotEmpty);
   });
 
   test('el personaje creado arranca con los PG al máximo', () {

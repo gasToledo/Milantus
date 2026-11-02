@@ -448,7 +448,7 @@ class _TwoOnePicker extends StatelessWidget {
             value: draft.spreadPlusTwo,
             options: opts,
             onChanged: (a) {
-              draft.spreadPlusTwo = a;
+              draft.setSpread(a, draft.spreadPlusOne);
               onChanged();
             },
           ),
@@ -460,7 +460,7 @@ class _TwoOnePicker extends StatelessWidget {
             value: draft.spreadPlusOne,
             options: opts.where((a) => a != draft.spreadPlusTwo).toList(),
             onChanged: (a) {
-              draft.spreadPlusOne = a;
+              draft.setSpread(draft.spreadPlusTwo, a);
               onChanged();
             },
           ),

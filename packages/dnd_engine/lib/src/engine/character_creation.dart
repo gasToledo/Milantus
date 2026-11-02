@@ -595,6 +595,13 @@ class CreationDraft {
     spells.clear();
   }
 
+  /// El +2 y el +1 van a características distintas: con las dos iguales el
+  /// paso se daba por completo y el +1 se perdía sin avisar.
+  void setSpread(Ability? plusTwo, Ability? plusOne) {
+    spreadPlusTwo = plusTwo;
+    spreadPlusOne = plusOne == plusTwo ? null : plusOne;
+  }
+
   void selectBackground(String id) {
     if (backgroundId != id) {
       // Otra dote puede no ofrecerla, o no las mismas opciones.
@@ -800,11 +807,7 @@ class CreationDraft {
         spreadMode =
             _enumByName(AbilitySpreadMode.values, action['mode'], spreadMode);
       case 'setSpread':
-        spreadPlusTwo = _ability(action['plusTwo']);
-        spreadPlusOne = _ability(action['plusOne']);
-        // El +2 y el +1 van a características distintas: con las dos iguales
-        // el paso se daba por completo y el +1 se perdía sin avisar.
-        if (spreadPlusOne == spreadPlusTwo) spreadPlusOne = null;
+        setSpread(_ability(action['plusTwo']), _ability(action['plusOne']));
       case 'applyScoreMethod':
         applyScoreMethod(
           _enumByName(ScoreMethod.values, action['method'], scoreMethod),
