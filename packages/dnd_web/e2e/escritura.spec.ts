@@ -488,7 +488,7 @@ test('preparar conjuros desde la ficha guarda lo del motor y «Deshacer» vuelve
   expect(enviado).toEqual(esperado);
   expect(await ilse(request)).toEqual(esperado);
   await expect(page).toHaveURL(COMBATE);
-  await expect(page.getByText('Conjuros guardados.')).toBeVisible();
+  await expect(page.getByText('Conjuros guardados.', { exact: true })).toBeVisible();
 
   const vuelta = await proximoGuardado(page, () => page.getByRole('button', { name: 'Deshacer' }).click());
   expect(vuelta).toEqual(migrateCharacter(antes));
@@ -542,7 +542,7 @@ test('cambiar el truco innato se confirma con «Cambiar» y guarda lo del motor'
   const enviado = await proximoGuardado(page, () => cambiar.click(), ELFO);
   expect(enviado).toEqual(esperado);
   expect(await ilse(request, ELFO)).toEqual(esperado);
-  await expect(page.getByText(`Truco cambiado a ${otro.name}.`)).toBeVisible();
+  await expect(page.getByText(`Truco cambiado a ${otro.name}.`, { exact: true })).toBeVisible();
 });
 
 test('la ficha de otra cuenta no tiene controles para escribir', async ({ context, page, baseURL }) => {
