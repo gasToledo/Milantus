@@ -1021,6 +1021,10 @@ function DetailPanel({ focus, view, catalog, lang, t }: { focus: Focus; view: Cr
   const ability = focus?.kind === 'ability' ? (focus.id as AbilityId) : null;
   const skills = [...view.proficiencies.classSkills.options, ...view.proficiencies.speciesSkills.options];
   const skill = focus?.kind === 'skill' ? skills.find((o) => o.id === focus.id) : undefined;
+  // Orden Divina y Orden Primordial traen sus opciones dentro del rasgo: no
+  // están en el catálogo de dotes, y su descripción la da el motor.
+  const inlineOption =
+    focus?.kind === 'feat' && !entry ? view.class.featureSlots.flatMap((s) => s.options).find((o) => o.id === focus.id) : undefined;
   return (
     <section className="card flex flex-col gap-2.5 p-4" aria-live="polite" data-field="creation-detail">
       {ability ? (
@@ -1043,6 +1047,11 @@ function DetailPanel({ focus, view, catalog, lang, t }: { focus: Focus; view: Cr
               </div>
             ))}
           </dl>
+        </div>
+      ) : inlineOption ? (
+        <div key={inlineOption.id} className="step-in flex flex-col gap-2.5">
+          <h2 className="font-display text-[18px] text-on-surface">{inlineOption.name}</h2>
+          <p className="border-t border-hairline pt-3 text-[13.5px] leading-[1.55]">{inlineOption.description}</p>
         </div>
       ) : entry && detail ? (
         <div key={`${focus!.kind}-${entry.id}`} className="step-in flex flex-col gap-2.5">

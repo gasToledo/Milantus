@@ -205,10 +205,9 @@ class CreationDraft {
     if (rawChoices is Map) {
       for (final e in rawChoices.entries) {
         if (e.key is! String || e.value is! List) continue;
-        final ids = (e.value as List)
-            .whereType<String>()
-            .where((id) => repo.feat(id) != null)
-            .toList();
+        // Lo que no existe se poda al final, cuando ya se sabe qué ofrece el
+        // borrador restaurado (ver `_pruneUnknownFeatureChoices`).
+        final ids = (e.value as List).whereType<String>().toList();
         if (ids.isNotEmpty) draft.featureChoices[e.key as String] = ids;
       }
     }
@@ -403,7 +402,33 @@ class CreationDraft {
     if (personalityTrait is String) {
       draft.personalityTrait = personalityTrait;
     }
+    draft._pruneUnknownFeatureChoices();
     return draft;
+  }
+
+  /// Suelta lo elegido que ya no existe. Una opción puede ser una dote del
+  /// catálogo o venir dentro del propio rasgo (Orden Divina, Orden Primordial),
+  /// y estas no están en `repo.feat`: filtrar solo por el catálogo las borraba
+  /// en cada ida y vuelta por JSON, y en `/v2`, donde el borrador hace ese viaje
+  /// tras cada acción, tocarlas no marcaba nada y la clase no se podía crear.
+  void _pruneUnknownFeatureChoices() {
+    bool known(String id) => repo.feat(id) != null;
+    // Compilar para ver los cupos se paga solo si hay algo que comprobar.
+    if (featureChoices.values.every((ids) => ids.every(known))) return;
+    final inline = {
+      for (final slot in featureChoiceSlots)
+        for (final option in slot.options) option.id,
+    };
+    for (final group in featureChoices.keys.toList()) {
+      final ids = featureChoices[group]!
+          .where((id) => known(id) || inline.contains(id))
+          .toList();
+      if (ids.isEmpty) {
+        featureChoices.remove(group);
+      } else {
+        featureChoices[group] = ids;
+      }
+    }
   }
 
   /// Clase elegida. Arranca vacía, igual que la especie: con un valor por

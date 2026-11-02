@@ -80,6 +80,53 @@ void main() {
     expect(character.name, 'Sagan "The Red"');
   });
 
+  // `/v2` pasa el borrador por JSON tras cada acción: una opción que trae el
+  // propio rasgo no está en el catálogo de dotes y tiene que sobrevivir igual,
+  // o el Clérigo y el Druida no se pueden crear.
+  group('opciones que trae el propio rasgo', () {
+    for (final (classId, group) in [
+      ('cleric', 'divine-order'),
+      ('druid', 'primal-order'),
+    ]) {
+      test('$group se conserva en la ida y vuelta y llega a la ficha', () {
+        final d = CreationDraft(repo)..classId = classId;
+        final slot = d.featureChoiceSlots.singleWhere(
+          (s) => s.groupId == group,
+        );
+        final option = slot.options.first;
+        d.apply({
+          'type': 'toggle',
+          'pick': 'feature',
+          'id': option.id,
+          'group': group,
+        });
+
+        final back = CreationDraft.fromJson(repo, d.toJson());
+        expect(back.featureChoices[group], [option.id]);
+        expect(back.build().featureChoices[group], [option.id]);
+      });
+    }
+
+    test('lo elegido que no existe se suelta al leer el borrador', () {
+      final d = CreationDraft(repo)..classId = 'cleric';
+      final valid = d.featureChoiceSlots
+          .singleWhere((s) => s.groupId == 'divine-order')
+          .options
+          .first
+          .id;
+      final back = CreationDraft.fromJson(repo, {
+        ...d.toJson(),
+        'featureChoices': {
+          'divine-order': [valid, 'no-existe'],
+          'grupo-viejo': ['no-existe'],
+        },
+      });
+      expect(back.featureChoices, {
+        'divine-order': [valid],
+      });
+    });
+  });
+
   // Rehacer cambia las reglas pero no el personaje: del id cuelgan las
   // campañas y los retratos, y lo escrito por el jugador no vuelve a pedirse.
   test('rehacer conserva la identidad y arranca de nivel 1', () {
