@@ -668,7 +668,11 @@ error).
 
 ## 10. Movimiento
 
-Poco y corto, y solo para marcar un cambio de estado. Las principales:
+Las animaciones son **suaves y eficaces**: evitan la brusquedad y la sensación de
+cosa inacabada que da una pantalla donde todo aparece de golpe, sin cobrarle
+espera ni memoria a una herramienta que se abre cincuenta veces por sesión. Lo
+que aparece o cambia entra con una transición corta (hasta unos 200 ms), con
+opacidad, color o un desplazamiento mínimo. Las principales:
 
 | Animación | Duración | Curva |
 | --- | --- | --- |
@@ -685,9 +689,9 @@ sistema pide menos movimiento. Lo animado nunca lleva información que no esté
 ya en su valor final: el número de PG cambia en el primer cuadro y el destello
 solo dice para qué lado fue.
 
-**No hay animaciones de entrada de página, ni de listas, ni parallax, ni
-transiciones personalizadas de ruta.** Una herramienta que se abre cincuenta
-veces por sesión no puede cobrar peaje de 300 ms cada vez.
+**Sin parallax ni efectos largos o decorativos,** y nada que recalcule la página
+o trabe la respuesta al toque: una entrada de 300 ms ya es un peaje. Lo que hoy
+entra sin transición en Flutter es deuda de esta regla, no un ejemplo a seguir.
 
 ---
 

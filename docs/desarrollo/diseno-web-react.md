@@ -113,13 +113,13 @@ elige algo, sea o no un asistente:
    tirada con valores repetidos, el mago con todos sus conjuros. Los problemas de
    arriba no se veían con el ejemplo del lienzo.
 
-**Movimiento.** Es la excepción a «sin animaciones de entrada» de
-`diseno-web.md`, pedida porque todo aparecía de golpe y se sentía brusco: lo que
-aparece (un paso, un bloque que abre una elección, el detalle) entra con
-`.step-in` (`index.css`, 160 ms de opacidad y 4 px), y las opciones y la tira
-cambian de color en 120 ms. Solo CSS y nada más, y se apaga con «reducir
-movimiento». Lo que no cambia de lugar no se anima. Un paso nuevo tiene que
-remontar sus bloques: si son del mismo tipo, lleva `key` con el paso.
+**Movimiento.** Suave y eficaz, como pide `diseno-web.md` §10: nada aparece de
+golpe, porque lo brusco se siente inacabado. Lo que aparece (un paso, un bloque
+que abre una elección, el detalle) entra con `.step-in` (`index.css`, 160 ms de
+opacidad y 4 px), y las opciones y la tira cambian de color en 120 ms. Solo CSS,
+y se apaga con «reducir movimiento». Usá estas mismas clases en cualquier
+pantalla nueva. Un paso nuevo tiene que remontar sus bloques: si son del mismo
+tipo, lleva `key` con el paso.
 
 El creador (`src/creation/CreationWizard.tsx`) suma dos piezas propias, que por
 ahora solo usa él: la fila de clases (`ClassCard`, scroll horizontal) y la
