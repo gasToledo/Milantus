@@ -472,12 +472,8 @@ class _ReceivedEquipmentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final armor = [
-      for (final id in draft.receivedItemIds) ?draft.repo.armorPiece(id),
-    ];
-    final weapons = [
-      for (final id in draft.receivedItemIds) ?draft.repo.weapon(id),
-    ];
+    final armor = draft.receivedArmor;
+    final weapons = draft.receivedWeapons;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -543,16 +539,8 @@ class _WeaponGripSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Secundaria solo con dos armas en las manos, y A dos manos solo sin
-    // escudo: con una espada y un escudo se ofrecían las dos cosas, y el texto
-    // hablaba de un ataque con la otra mano que no había.
     final dual = draft.weaponIds.length >= 2;
-    final shield = draft.shieldEquipped;
-    final grips = [
-      for (final id in draft.weaponIds)
-        if (draft.repo.weapon(id) case final w?)
-          if ((dual && w.isLight) || (!shield && w.versatileDice != null)) w,
-    ];
+    final grips = draft.gripOptions;
     if (grips.isEmpty) return const SizedBox.shrink();
 
     return Column(
@@ -569,11 +557,11 @@ class _WeaponGripSection extends StatelessWidget {
             style: Theme.of(context).textTheme.bodySmall,
           ),
         const SizedBox(height: 6),
-        for (final w in grips)
+        for (final (weapon: w, :canOffHand, :canTwoHanded) in grips)
           Row(
             children: [
               Expanded(child: Text(w.name)),
-              if (dual && w.isLight)
+              if (canOffHand)
                 Padding(
                   padding: const EdgeInsets.only(left: 6),
                   child: FilterChip(
@@ -586,7 +574,7 @@ class _WeaponGripSection extends StatelessWidget {
                     },
                   ),
                 ),
-              if (!shield && w.versatileDice != null)
+              if (canTwoHanded)
                 Padding(
                   padding: const EdgeInsets.only(left: 6),
                   child: FilterChip(
@@ -740,31 +728,12 @@ class _SpellsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final sc = draft.spellcasting;
     if (sc == null) return const SizedBox.shrink();
-    final all = draft.repo.spellsForList(
-      sc.spellList,
-      extraSpellIds: draft.spellListAdditionIds,
-    );
     final maxLevel = sc.slotsByLevel.keys.fold<int>(0, (m, l) => l > m ? l : m);
-    final grantedSpellIds = draft.grantedSpellIds;
-    final cantrips = all
-        .where((s) => s.isCantrip && !grantedSpellIds.contains(s.id))
-        .toList();
-    final grantedCantripNames = [
-      for (final s in all)
-        if (s.isCantrip && grantedSpellIds.contains(s.id)) s.name,
-    ];
-    final leveled = all
-        .where(
-          (s) =>
-              !s.isCantrip &&
-              s.level <= maxLevel &&
-              !grantedSpellIds.contains(s.id),
-        )
-        .toList();
-    final grantedLeveledNames = [
-      for (final s in all)
-        if (!s.isCantrip && grantedSpellIds.contains(s.id)) s.name,
-    ];
+    final classSpells = draft.classSpells!;
+    final cantrips = classSpells.cantrips;
+    final grantedCantripNames = classSpells.grantedCantrips;
+    final leveled = classSpells.spells;
+    final grantedLeveledNames = classSpells.grantedSpells;
     final prepared = sc.preparation == SpellPreparation.prepared;
 
     return Column(

@@ -76,6 +76,7 @@ un control a un asistente, buscá acá.
 | `Option` | La opción: círculo si se elige una, cuadrado (`multi`) si son varias. Apagada, con el motivo en `detail`, nunca escondida. `id` va en `data-option` | Toda elección de un asistente |
 | `Block` | Tarjeta de un grupo de opciones: título y un solo `status` | Cada grupo |
 | `Status` | Los tres estados, y ningún otro: falta (`count` para «n de m»), `ready` y `auto` | En `Block` |
+| `SpellPickBlock` | Un cupo de conjuros: buscador, scroll propio y `cap` (null para quien conoce en vez de preparar) | Conjuros de la subida y del creador |
 | `SearchableList` | Buscador sin tildes y por palabras (`matchesQuery`), cuenta y scroll propio | Listas largas: especies, trasfondos, armas |
 | `StepRail` | La tira de pasos; `progress` la cambia en un teléfono por «Paso n de m» y una barra | Arriba de cada asistente |
 | `WizardFooter` | El pie: lo que falta y Atrás/Continuar, como tarjeta flotante; `above` a todo el ancho | Abajo de cada asistente |
@@ -97,7 +98,9 @@ El creador (`src/creation/CreationWizard.tsx`) suma dos piezas propias, que por
 ahora solo usa él: la fila de clases (`ClassCard`, scroll horizontal) y la
 matriz de características (`ScoreRow`: una fila es una elección de una, y el
 valor que ya tiene otra va en gris y tocarlo las intercambia; en compra de
-puntos es −/+ y a mano, un campo).
+puntos es −/+ y a mano, un campo). Sus pasos de elecciones viven en
+`src/creation/ChoiceSteps.tsx`; el catálogo de compras reusa `catalogRows` y
+`FamilyFilter` de `src/sheet/ItemCatalog.tsx`, sin el diálogo de pago.
 
 ### Datos de personaje (`src/ui/data.tsx`)
 

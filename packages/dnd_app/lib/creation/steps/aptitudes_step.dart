@@ -302,21 +302,12 @@ class _AptitudesStep extends StatelessWidget {
   Widget build(BuildContext context) {
     final klass = draft.klass;
     final race = draft.race;
-    final bg = draft.background;
-    final granted = {...?bg?.skillProficiencies};
+    final granted = draft.backgroundSkills;
     final grantsFeat = race?.effects.any((e) => e is GrantFeatEffect) ?? false;
     final originFeats = draft.originFeatOptions;
 
-    // Las dos listas de habilidades y la de competencias por dote salen de
-    // catálogos que se pisan, así que se bloquean entre sí. Tomar la misma
-    // competencia dos veces no agrega nada y deja al personaje con una de
-    // menos; antes solo lo avisaba la ficha ya terminada.
     draft.pruneProficiencyChoices();
     final proficiencySlots = draft.proficiencyChoiceSlots;
-    final chosenByFeat = {
-      for (final slot in proficiencySlots)
-        ...?draft.proficiencyChoices[slot.groupId],
-    };
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -356,11 +347,9 @@ class _AptitudesStep extends StatelessWidget {
           ],
           const SizedBox(height: 12),
           _SkillPicker(
-            options: skillOptions(
-              klass.skillChoiceFrom,
-            ).where((s) => !granted.contains(s)).toList(),
+            options: draft.classSkillChoices,
             selected: draft.classSkills,
-            locked: {...draft.raceSkills, ...chosenByFeat},
+            locked: draft.classSkillsTaken,
             max: klass.skillChoiceCount,
             onChanged: onChanged,
           ),
@@ -377,11 +366,9 @@ class _AptitudesStep extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           _SkillPicker(
-            options: skillOptions(
-              race.skillChoiceFrom,
-            ).where((s) => !granted.contains(s)).toList(),
+            options: draft.speciesSkillChoices,
             selected: draft.raceSkills,
-            locked: {...draft.classSkills, ...chosenByFeat},
+            locked: draft.speciesSkillsTaken,
             max: race.skillChoiceCount,
             onChanged: onChanged,
           ),
@@ -433,13 +420,7 @@ class _AptitudesStep extends StatelessWidget {
         ...() {
           final slots = proficiencySlots;
           if (slots.isEmpty) return <Widget>[];
-          // Lo que ya se tiene por otra vía, para no gastar la dote dos veces.
-          final sheet = draft.previewSheet;
-          final already =
-              {...sheet.skillProficiencies, ...sheet.toolProficiencies}
-                ..removeAll(
-                  draft.proficiencyChoices.values.expand((chosen) => chosen),
-                );
+          final already = draft.proficienciesFromElsewhere;
           final total = slots.fold<int>(0, (n, s) => n + s.count);
           final selected = slots.fold<int>(
             0,

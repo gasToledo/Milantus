@@ -178,6 +178,74 @@ export function SearchableList<T>({
   );
 }
 
+/** Una lista de conjuros para elegir, con scroll propio y buscador: un mago
+ *  alto tiene decenas. [cap] null es sin tope (el que conoce conjuros). */
+export function SpellPickBlock({
+  title,
+  note,
+  options,
+  chosen,
+  cap,
+  ready,
+  t,
+  onChange,
+  onFocus,
+}: {
+  title: string;
+  /** Si el bloque está completo: lo dice el motor, que también sabe cuántos
+   *  conjuros conoce quien no los prepara. */
+  ready: boolean;
+  note?: string;
+  options: { id: string; name: string; level?: number }[];
+  chosen: string[];
+  cap: number | null;
+  t: Texts;
+  /** Las elegidas después del toque, y cuál se tocó. */
+  onChange: (ids: string[], touched: string) => void;
+  onFocus: (id: string) => void;
+}) {
+  const [query, setQuery] = useState('');
+  const visible = options.filter((o) => matchesQuery(query, o.name));
+  const full = cap !== null && chosen.length >= cap;
+  return (
+    <Block
+      title={title}
+      status={<Status ready={ready} count={cap === null || ready ? undefined : [chosen.length, cap]} t={t} />}
+    >
+      {note && <p className="text-[12.5px] text-on-surface-variant">{note}</p>}
+      <input
+        type="search"
+        autoComplete="off"
+        aria-label={t.luSpellSearch}
+        placeholder={t.luSpellSearch}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        className="h-9 rounded-[var(--radius-pill)] border border-hairline bg-plaque px-4 text-[13px] text-on-surface placeholder:text-text-muted"
+      />
+      <div className="grid max-h-[360px] gap-2 overflow-y-auto pr-1 sm:grid-cols-2" role="group" aria-label={title}>
+        {visible.map((o) => {
+          const on = chosen.includes(o.id);
+          return (
+            <Option
+              key={o.id}
+              id={o.id}
+              multi
+              selected={on}
+              disabled={!on && full}
+              title={o.name}
+              detail={!o.level ? t.cantrip : t.spellLevelShort(o.level)}
+              onClick={() => {
+                onChange(on ? chosen.filter((x) => x !== o.id) : [...chosen, o.id], o.id);
+                onFocus(o.id);
+              }}
+            />
+          );
+        })}
+      </div>
+    </Block>
+  );
+}
+
 /** La tira de pasos. Se llega a un paso solo si los anteriores están
  *  completos; [progress] la cambia en un teléfono por «Paso n de m» y una barra,
  *  para que nueve pasos no ocupen media pantalla. */

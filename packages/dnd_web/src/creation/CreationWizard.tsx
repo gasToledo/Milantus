@@ -27,6 +27,7 @@ import {
   catalogLabel,
   computeSheet,
   creationView,
+  formatAmount,
   vocabularyLabel,
   type AbilityId,
   type Catalog,
@@ -43,6 +44,7 @@ import { useLang, useTexts } from '../i18n/context';
 import type { Lang, Texts } from '../i18n/texts';
 import { navigate, rosterHref } from '../router';
 import { signed } from '../sheet/format';
+import { coinLabels } from '../sheet/ItemCatalog';
 import { ABILITIES } from '../sheet/vocabulary';
 import { AppDialog } from '../ui/AppDialog';
 import { Button } from '../ui/Button';
@@ -65,6 +67,7 @@ import {
   type AfterRow,
 } from '../ui/wizard';
 import type { Account } from '../api/client';
+import { EquipmentStep, ProficienciesStep, SpellsStep, type Focus, type StepProps } from './ChoiceSteps';
 
 const STEPS = [
   'especie',
@@ -92,13 +95,9 @@ const SECTIONS: Record<StepId, CreationSectionId[]> = {
   revision: [],
 };
 
-// ponytail: el último paso construido. Competencias, Conjuros y Equipo llegan
-// con 5d3, y Detalles, Revisión y el alta con 5d4; hasta entonces no se avanza
-// más allá ni hay enlace a esta ruta.
-const LAST_BUILT = STEPS.indexOf('caracteristicas');
-
-/** Lo que explica el panel de la derecha: lo último que se tocó. */
-type Focus = { kind: 'race' | 'lineage' | 'class' | 'background' | 'feat' | 'weapon' | 'ability'; id: string } | null;
+// ponytail: el último paso construido. Detalles, Revisión y el alta llegan con
+// 5d4; hasta entonces no se avanza más allá ni hay enlace a esta ruta.
+const LAST_BUILT: StepId = 'equipo';
 
 const CLASS_ICONS: Record<string, LucideIcon> = {
   shield: Shield,
@@ -176,9 +175,12 @@ function CreationWizard({ catalog, onExit, onTouched }: { catalog: Catalog; onEx
     setDraft(creationView(catalog, draft, action).draft);
   };
 
-  const index = STEPS.indexOf(stepId);
+  // Quien no lanza ni recibe un cupo de conjuros no tiene nada que hacer ahí.
+  const steps = STEPS.filter((s) => s !== 'conjuros' || view.spells.applicable);
+  const index = Math.max(0, steps.indexOf(stepId));
+  const lastBuilt = steps.indexOf(LAST_BUILT);
   const pendingOf = (s: StepId) => view.pending.filter((p) => SECTIONS[s].includes(p.section));
-  const reachable = (i: number) => i <= LAST_BUILT && STEPS.slice(0, i).every((s) => pendingOf(s).length === 0);
+  const reachable = (i: number) => i <= lastBuilt && steps.slice(0, i).every((s) => pendingOf(s).length === 0);
   const pending = pendingOf(stepId);
 
   const go = (s: StepId) => {
@@ -201,7 +203,7 @@ function CreationWizard({ catalog, onExit, onTouched }: { catalog: Catalog; onEx
   const rows = afterRows(stepId, view, sheet, catalog, t);
   const message =
     pending.length === 0
-      ? index === LAST_BUILT
+      ? index === lastBuilt
         ? t.crNextSoon
         : null
       : pending.length === 1
@@ -213,12 +215,12 @@ function CreationWizard({ catalog, onExit, onTouched }: { catalog: Catalog; onEx
       <header className="flex flex-col gap-3">
         <h1 className="font-display text-[24px] text-on-surface">{t.rosterCreate}</h1>
         <StepRail
-          steps={STEPS.map((id) => ({ id, label: t.crSteps[id] }))}
+          steps={steps.map((id) => ({ id, label: t.crSteps[id] }))}
           index={index}
           reachable={reachable}
           onSelect={(id) => go(id as StepId)}
           label={t.luStepsLabel}
-          progress={t.crProgress(index + 1, STEPS.length, t.crSteps[stepId])}
+          progress={t.crProgress(index + 1, steps.length, t.crSteps[stepId])}
         />
       </header>
 
@@ -228,6 +230,9 @@ function CreationWizard({ catalog, onExit, onTouched }: { catalog: Catalog; onEx
           {stepId === 'clase' && <ClassStep {...props} />}
           {stepId === 'trasfondo' && <BackgroundStep {...props} />}
           {stepId === 'caracteristicas' && <ScoresStep {...props} />}
+          {stepId === 'competencias' && <ProficienciesStep {...props} />}
+          {stepId === 'conjuros' && <SpellsStep {...props} />}
+          {stepId === 'equipo' && <EquipmentStep {...props} />}
         </div>
         <aside className="flex min-w-0 flex-col gap-4">
           <DetailPanel focus={focus} view={view} catalog={catalog} lang={lang} t={t} />
@@ -257,14 +262,14 @@ function CreationWizard({ catalog, onExit, onTouched }: { catalog: Catalog; onEx
             {t.cancel}
           </Button>
         ) : (
-          <Button tone="secondary" className="flex-1 sm:flex-none" onClick={() => go(STEPS[index - 1]!)}>
+          <Button tone="secondary" className="flex-1 sm:flex-none" onClick={() => go(steps[index - 1]!)}>
             {t.luBack}
           </Button>
         )}
         <Button
           className="flex-[2] sm:flex-none"
-          disabled={pending.length > 0 || index >= LAST_BUILT}
-          onClick={() => go(STEPS[index + 1]!)}
+          disabled={pending.length > 0 || index >= lastBuilt}
+          onClick={() => go(steps[index + 1]!)}
         >
           {t.luContinue}
         </Button>
@@ -274,16 +279,7 @@ function CreationWizard({ catalog, onExit, onTouched }: { catalog: Catalog; onEx
 }
 
 function pendingText(p: CreationPending, t: Texts): string {
-  return t.crPending[p.kind](p);
-}
-
-interface StepProps {
-  t: Texts;
-  lang: Lang;
-  catalog: Catalog;
-  view: CreationView;
-  act: (action: CreationAction) => void;
-  setFocus: (f: Focus) => void;
+  return t.crPending[p.kind]({ ...p, amount: formatAmount(p.need, coinLabels(t)) });
 }
 
 /** El rótulo de procedencia, igual que en el Códice. */
@@ -851,9 +847,21 @@ function ScoreRow({
 /** A la derecha, arriba: la explicación de lo último que se tocó, con la misma
  *  ficha que el Códice. */
 function DetailPanel({ focus, view, catalog, lang, t }: { focus: Focus; view: CreationView; catalog: Catalog; lang: Lang; t: Texts }) {
-  const CATEGORY = { race: 'races', lineage: 'lineages', class: 'classes', background: 'backgrounds', feat: 'feats', weapon: 'weapons' } as const;
+  const CATEGORY = {
+    race: 'races',
+    lineage: 'lineages',
+    class: 'classes',
+    background: 'backgrounds',
+    feat: 'feats',
+    weapon: 'weapons',
+    spell: 'spells',
+    // Un objeto del equipo puede ser arma, armadura o cualquier otra cosa.
+    item: focus && catalog.weapons.some((w) => w.id === focus.id) ? 'weapons' : focus && catalog.armor.some((a) => a.id === focus.id) ? 'armor' : 'gear',
+  } as const;
   const entry =
-    focus && focus.kind !== 'ability' ? codexEntries(CATEGORY[focus.kind], catalog, t, lang).find((e) => e.id === focus.id) : undefined;
+    focus && focus.kind !== 'ability' && focus.kind !== 'skill'
+      ? codexEntries(CATEGORY[focus.kind], catalog, t, lang).find((e) => e.id === focus.id)
+      : undefined;
   const detail = entry?.detail();
 
   let extra: ReactNode = null;
@@ -883,12 +891,30 @@ function DetailPanel({ focus, view, catalog, lang, t }: { focus: Focus; view: Cr
   }
 
   const ability = focus?.kind === 'ability' ? (focus.id as AbilityId) : null;
+  const skills = [...view.proficiencies.classSkills.options, ...view.proficiencies.speciesSkills.options];
+  const skill = focus?.kind === 'skill' ? skills.find((o) => o.id === focus.id) : undefined;
   return (
     <section className="card flex flex-col gap-2.5 p-4" aria-live="polite" data-field="creation-detail">
       {ability ? (
         <div key={ability} className="step-in flex flex-col gap-2.5">
           <h2 className="font-display text-[18px] text-on-surface">{t.abilities[ability]}</h2>
           <p className="border-t border-hairline pt-3 text-[13.5px] leading-[1.55]">{view.scores.descriptions[ability]}</p>
+        </div>
+      ) : skill ? (
+        <div key={skill.id} className="step-in flex flex-col gap-2.5">
+          <h2 className="font-display text-[18px] text-on-surface">{skill.label}</h2>
+          <dl className="flex flex-col gap-1 border-t border-hairline pt-3 text-[12.5px]">
+            {[
+              [t.crSkillAbility, skill.ability ? t.abilities[skill.ability] : ''],
+              [t.crSkillBase, signed(skill.base)],
+              [t.crSkillProficient, signed(skill.withProficiency)],
+            ].map(([label, value]) => (
+              <div key={label} className="flex gap-2">
+                <dt className="text-text-muted">{label}</dt>
+                <dd className="text-on-surface">{value}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
       ) : entry && detail ? (
         <div key={`${focus!.kind}-${entry.id}`} className="step-in flex flex-col gap-2.5">
@@ -970,6 +996,31 @@ function afterRows(step: StepId, view: CreationView, sheet: ComputedSheet, catal
               { label: t.crSpellAttack, to: signed(sc.attackBonus) },
             ]
           : []),
+      ];
+    case 'competencias':
+      return [
+        ...sheet.skillProficiencies.map((id) => ({
+          label: catalogLabel('skill', id),
+          to: signed(sheet.skillModifiers[id] ?? 0),
+        })),
+        { label: t.crPassivePerception, to: sheet.passivePerception },
+        { label: t.crLanguages, to: sheet.languages.map((l) => catalogLabel('language', l)).join(', ') },
+      ];
+    case 'conjuros': {
+      if (!sc) return [];
+      const cs = view.spells.class;
+      return [
+        { label: t.luRowSpellDc, to: sc.saveDc },
+        { label: t.crSpellAttack, to: signed(sc.attackBonus) },
+        { label: t.crSlotsFirst, to: sc.slotsByLevel[1] ?? 0 },
+        ...(cs ? [{ label: t.crPrepared, to: `${cs.chosenSpells.length} / ${cs.preparedCount}`, gold: true }] : []),
+      ];
+    }
+    case 'equipo':
+      return [
+        { label: t.crGold, to: formatAmount(Math.max(view.equipment.goldLeftCp, 0), coinLabels(t)), gold: true },
+        { label: t.crArmorClass, to: sheet.armorClass },
+        ...sheet.attacks.map((a) => ({ label: a.name, to: `${signed(a.attackBonus)} · ${a.damage}` })),
       ];
     default:
       return [];

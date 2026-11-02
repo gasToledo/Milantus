@@ -7,12 +7,14 @@ import '../domain/content.dart';
 import '../domain/content_source.dart';
 import '../domain/effects.dart';
 import '../domain/language.dart';
+import '../domain/proficiency_labels.dart';
 import '../domain/skill.dart';
 import '../domain/spell_slots.dart';
 import 'character_compiler.dart';
 import 'coin_ops.dart';
 import 'dice.dart';
 import 'inventory_ops.dart';
+import 'level_up.dart';
 import 'validation.dart';
 
 /// Las 18 habilidades de 2024, tomadas del catálogo del motor.
@@ -1043,6 +1045,37 @@ class CreationDraft {
     }
   }
 
+  /// Las armaduras y escudos recibidos, para ponérselos.
+  List<Armor> get receivedArmor => [
+        for (final id in receivedItemIds)
+          if (repo.armorPiece(id) case final a?) a,
+      ];
+
+  /// Las armas recibidas, para empuñarlas.
+  List<Weapon> get receivedWeapons => [
+        for (final id in receivedItemIds)
+          if (repo.weapon(id) case final w?) w,
+      ];
+
+  /// Cómo se puede empuñar cada arma en la mano. Secundaria solo con dos armas
+  /// y si es ligera; a dos manos solo sin escudo y si es versátil: con una
+  /// espada y un escudo se ofrecían las dos cosas, y el texto hablaba de un
+  /// ataque con la otra mano que no había.
+  List<({Weapon weapon, bool canOffHand, bool canTwoHanded})> get gripOptions {
+    final dual = weaponIds.length >= 2;
+    return [
+      for (final id in weaponIds)
+        if (repo.weapon(id) case final w?)
+          if ((dual && w.isLight) ||
+              (!shieldEquipped && w.versatileDice != null))
+            (
+              weapon: w,
+              canOffHand: dual && w.isLight,
+              canTwoHanded: !shieldEquipped && w.versatileDice != null,
+            ),
+    ];
+  }
+
   /// Armas con las que la clase elegida es competente. La Maestría de Armas
   /// 2024 solo puede aplicarse a estas.
   List<Weapon> get proficientWeapons {
@@ -1166,6 +1199,44 @@ class CreationDraft {
         .toList();
   }
 
+  /// Las habilidades que da el trasfondo: no se eligen ni se ofrecen en los
+  /// cupos de clase y de especie.
+  Set<String> get backgroundSkills => {...?background?.skillProficiencies};
+
+  /// Lo que se tomó con una dote: las dos listas de habilidades y las de una
+  /// dote salen de catálogos que se pisan. Tomar la misma dos veces no agrega
+  /// nada y deja al personaje con una competencia de menos.
+  Set<String> get skillsChosenByFeat => {
+        for (final slot in proficiencyChoiceSlots)
+          ...?proficiencyChoices[slot.groupId],
+      };
+
+  /// Lo que elige la clase, sin lo que ya da el trasfondo.
+  List<String> get classSkillChoices => [
+        for (final s in skillOptions(klass?.skillChoiceFrom ?? const []))
+          if (!backgroundSkills.contains(s)) s,
+      ];
+
+  /// Lo que elige la especie, sin lo que ya da el trasfondo.
+  List<String> get speciesSkillChoices => [
+        for (final s in skillOptions(race?.skillChoiceFrom ?? const []))
+          if (!backgroundSkills.contains(s)) s,
+      ];
+
+  /// Lo que no se puede tomar en el cupo de clase por tenerlo de otro origen.
+  Set<String> get classSkillsTaken => {...raceSkills, ...skillsChosenByFeat};
+
+  /// Lo que no se puede tomar en el cupo de especie por tenerlo de otro origen.
+  Set<String> get speciesSkillsTaken => {...classSkills, ...skillsChosenByFeat};
+
+  /// Lo que ya se tiene por otra vía, para no gastar una dote de competencias
+  /// en eso. No vale para la Pericia: ahí ser competente es el requisito.
+  Set<String> get proficienciesFromElsewhere {
+    final sheet = previewSheet;
+    return {...sheet.skillProficiencies, ...sheet.toolProficiencies}
+      ..removeAll(proficiencyChoices.values.expand((chosen) => chosen));
+  }
+
   /// Competencias a elegir por dote (Habilidoso, Mente Aguda). Cambian con la
   /// dote de origen elegida y con la que concede el trasfondo, así que se
   /// preguntan a la ficha en cada build en vez de guardarse.
@@ -1257,6 +1328,27 @@ class CreationDraft {
         languageChoices[slot.groupId] = List.of(slot.chosen);
       }
     }
+  }
+
+  /// Si hay algo que elegir en el paso de conjuros: quien no lanza ni recibe
+  /// un cupo por un rasgo no tiene nada que hacer ahí.
+  bool get choosesSpells => isCaster || spellChoiceSlots.isNotEmpty;
+
+  /// Los conjuros de clase que se pueden elegir y los que ya concede un rasgo,
+  /// que no ocupan cupo. Null si la clase no lanza. Es la misma cuenta que la
+  /// subida de nivel y el editor de conjuros.
+  ({
+    List<Spell> cantrips,
+    List<Spell> spells,
+    List<String> chosenCantrips,
+    List<String> chosenSpells,
+    List<String> grantedCantrips,
+    List<String> grantedSpells,
+  })? get classSpells {
+    final sc = spellcasting;
+    return sc == null
+        ? null
+        : LevelUp.classSpells(build(id: 'borrador'), previewSheet, repo, sc);
   }
 
   /// Bloque de lanzamiento derivado (cupos de trucos/preparados y CD).
@@ -1762,9 +1854,6 @@ class CreationDraft {
   /// que falta (`pending`, sin texto: lo pone el cliente), el personaje tal
   /// como quedaría (`character`, para «Así queda») y lo que deciden las
   /// reglas en cada paso. Es la salida de `creation` en el puente JS.
-  ///
-  /// ponytail: por ahora trae lo derivado de Especie, Clase, Trasfondo y
-  /// Características; competencias, conjuros y equipo se suman con sus pasos.
   Map<String, dynamic> viewJson() {
     final draft = this;
     List<String> abilities(Iterable<Ability> list) => [
@@ -1853,6 +1942,210 @@ class CreationDraft {
               a.name: draft.previewScore(a),
         },
       },
+      'proficiencies': _proficienciesView(),
+      'spells': _spellsView(),
+      'equipment': _equipmentView(),
+    };
+  }
+
+  Map<String, dynamic> _proficienciesView() {
+    final sheet = previewSheet;
+    Map<String, dynamic> skill(String id, Set<String> taken) {
+      final bonus = sheet.skillModifier(id);
+      final has = sheet.skillProficiencies.contains(id);
+      final prof = sheet.proficiencyBonus;
+      return {
+        'id': id,
+        'label': Skill.labelFor(id),
+        'ability': Skill.fromId(id)?.ability.name,
+        'base': has ? bonus - prof : bonus,
+        'withProficiency': has ? bonus : bonus + prof,
+        'taken': taken.contains(id),
+      };
+    }
+
+    final already = proficienciesFromElsewhere;
+    Map<String, dynamic> slotView(ProficiencyChoiceSlot slot) => {
+          'groupId': slot.groupId,
+          'name': slot.name,
+          'count': slot.count,
+          'expertise': slot.expertise,
+          'chosen': proficiencyChoices[slot.groupId] ?? slot.chosen,
+          'options': [
+            for (final id in slot.options)
+              {
+                'id': id,
+                'label': slot.skills.contains(id)
+                    ? Skill.labelFor(id)
+                    : toolProficiencyLabel(id),
+                'taken': !slot.expertise && already.contains(id),
+              },
+          ],
+        };
+    return {
+      'backgroundSkills': [
+        for (final id in backgroundSkills) Skill.labelFor(id),
+      ],
+      'backgroundTools': [
+        for (final id in background?.toolProficiencies ?? const <String>[])
+          toolProficiencyLabel(id),
+      ],
+      'classSkills': {
+        'count': klass?.skillChoiceCount ?? 0,
+        'options': [
+          for (final id in classSkillChoices) skill(id, classSkillsTaken),
+        ],
+      },
+      'speciesSkills': {
+        'count': race?.skillChoiceCount ?? 0,
+        'options': race == null || race!.skillChoiceCount == 0
+            ? const <Map<String, dynamic>>[]
+            : [
+                for (final id in speciesSkillChoices)
+                  skill(id, speciesSkillsTaken),
+              ],
+      },
+      'grantsOriginFeat':
+          race?.effects.any((e) => e is GrantFeatEffect) ?? false,
+      'originFeats': [
+        for (final f in originFeatOptions) {'id': f.id, 'name': f.name},
+      ],
+      'slots': [for (final s in allProficiencyChoiceSlots) slotView(s)],
+      'languages': {
+        'universal': Language.universal.label,
+        'count': Language.originChoiceCount,
+        'options': [
+          for (final l in Language.originChoices)
+            {'id': l.id, 'label': l.label},
+        ],
+      },
+      'languageSlots': [
+        for (final slot in languageChoiceSlots)
+          {
+            'groupId': slot.groupId,
+            'name': slot.name,
+            'count': slot.count,
+            'chosen': languageChoices[slot.groupId] ?? const <String>[],
+            'options': [
+              for (final id in slot.options)
+                {'id': id, 'label': Language.labelFor(id)},
+            ],
+          },
+      ],
+    };
+  }
+
+  Map<String, dynamic> _spellsView() {
+    final sc = spellcasting;
+    final cs = classSpells;
+    Map<String, dynamic> row(Spell s) =>
+        {'id': s.id, 'name': s.name, 'level': s.level};
+    return {
+      'applicable': choosesSpells,
+      'slots': [
+        for (final slot in spellChoiceSlots)
+          {
+            'groupId': slot.groupId,
+            'name': slot.name,
+            'count': slot.count,
+            'chosen': slot.chosen,
+            'options': [
+              for (final id in slot.options)
+                if (repo.spell(id) case final s?) row(s),
+            ],
+          },
+      ],
+      'class': sc == null || cs == null
+          ? null
+          : {
+              'prepared': sc.preparation == SpellPreparation.prepared,
+              'cantripsKnown': sc.cantripsKnown,
+              'preparedCount': sc.preparedCount,
+              'cantrips': [for (final s in cs.cantrips) row(s)],
+              'spells': [for (final s in cs.spells) row(s)],
+              'chosenCantrips': cs.chosenCantrips,
+              'chosenSpells': cs.chosenSpells,
+              'grantedCantrips': cs.grantedCantrips,
+              'grantedSpells': cs.grantedSpells,
+            },
+    };
+  }
+
+  Map<String, dynamic> _equipmentView() {
+    String nameOf(String id) => repo.catalogEntry(id)?.name ?? id;
+    Map<String, dynamic> option(StartingEquipmentOption o) => {
+          'id': o.id,
+          'label': o.label,
+          'items': [
+            for (final g in o.grants)
+              if (g.itemId case final id?)
+                {'name': nameOf(id), 'quantity': g.quantity},
+          ],
+          'choices': [
+            for (final g in o.grants)
+              if (g.isChoice)
+                [for (final id in g.chooseFromItemIds) nameOf(id)],
+          ],
+          'coins': {
+            for (final g in o.grants) ...g.coins,
+          },
+        };
+    return {
+      'classOptions': [
+        for (final o in klass?.startingEquipment ?? const []) option(o),
+      ],
+      'backgroundOptions': [
+        for (final o in background?.startingEquipment ?? const []) option(o),
+      ],
+      'choices': [
+        for (final (:key, :grant) in selectedEquipmentGrants)
+          if (grant.isChoice)
+            {
+              'key': key,
+              'fromClass': key.startsWith('class:'),
+              'chosen': equipmentChoices[key],
+              'options': [
+                for (final id in grant.chooseFromItemIds)
+                  {'id': id, 'name': nameOf(id)},
+              ],
+            },
+      ],
+      'grantedCp': CoinOps.totalCp(grantedCoins),
+      'purchasesCp': purchasesCp,
+      'goldLeftCp': goldLeftCp,
+      'purchases': [
+        for (final e in purchases.entries)
+          {
+            'id': e.key,
+            'name': nameOf(e.key),
+            'quantity': e.value,
+            'unitCp': InventoryOps.catalogPriceCp(e.key, repo),
+            'bundleSize': repo.item(e.key)?.bundleSize ?? 1,
+          },
+      ],
+      'armor': [
+        for (final a in receivedArmor)
+          {
+            'id': a.id,
+            'name': a.name,
+            'worn': a.isShield ? shieldEquipped : equippedArmorId == a.id,
+          },
+      ],
+      'weapons': [
+        for (final w in receivedWeapons)
+          {'id': w.id, 'name': w.name, 'wielded': weaponIds.contains(w.id)},
+      ],
+      'grips': [
+        for (final g in gripOptions)
+          {
+            'id': g.weapon.id,
+            'name': g.weapon.name,
+            'canOffHand': g.canOffHand,
+            'offHand': weaponOffHand[g.weapon.id] ?? false,
+            'canTwoHanded': g.canTwoHanded,
+            'twoHanded': weaponTwoHanded[g.weapon.id] ?? false,
+          },
+      ],
     };
   }
 

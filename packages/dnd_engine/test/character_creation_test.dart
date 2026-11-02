@@ -826,6 +826,53 @@ void main() {
     expect(faltan(d, [CreationSection.background]), isNotEmpty);
   });
 
+  test('la vista bloquea entre orígenes lo que ya se tomó en otro', () {
+    final d = newDraft()
+      ..apply({'type': 'selectRace', 'id': 'elf'})
+      ..apply({'type': 'selectClass', 'id': 'wizard'})
+      ..apply({'type': 'selectBackground', 'id': 'sage'})
+      ..apply({'type': 'toggle', 'pick': 'speciesSkill', 'id': 'insight'});
+    final view = d.viewJson()['proficiencies'] as Map<String, dynamic>;
+    final clase = (view['classSkills'] as Map)['options'] as List;
+    Map<dynamic, dynamic> de(String id) =>
+        clase.cast<Map<dynamic, dynamic>>().firstWhere((o) => o['id'] == id);
+    // El Erudito ya da Arcanos: ni se ofrece.
+    expect(clase.where((o) => (o as Map)['id'] == 'arcana'), isEmpty);
+    expect(de('insight')['taken'], isTrue);
+    expect(de('medicine')['taken'], isFalse);
+    expect(
+      de('medicine')['withProficiency'],
+      (de('medicine')['base'] as int) + 2,
+    );
+  });
+
+  test('el paso de conjuros solo existe si hay algo que elegir', () {
+    final d = newDraft()..selectRace('elf');
+    d.selectClass('fighter');
+    expect(d.choosesSpells, isFalse);
+    d.selectClass('wizard');
+    expect(d.choosesSpells, isTrue);
+    expect(d.classSpells!.cantrips, isNotEmpty);
+    // Un rasgo concede y no ocupa cupo: no se ofrece.
+    d
+      ..selectLineage('elf-high')
+      ..speciesSpellcastingAbility = Ability.intelligence;
+    expect(d.classSpells!.cantrips.map((s) => s.id),
+        isNot(contains('prestidigitation')));
+  });
+
+  test('la empuñadura se ofrece según las armas en la mano y el escudo', () {
+    final d = newDraft();
+    d.weaponIds.addAll(['dagger', 'longsword']);
+    final daga = d.gripOptions.firstWhere((g) => g.weapon.id == 'dagger');
+    final espada = d.gripOptions.firstWhere((g) => g.weapon.id == 'longsword');
+    expect(daga.canOffHand, isTrue);
+    expect(espada.canOffHand, isFalse);
+    expect(espada.canTwoHanded, isTrue);
+    d.shieldEquipped = true;
+    expect(d.gripOptions.map((g) => g.weapon.id), ['dagger']);
+  });
+
   test('el personaje creado arranca con los PG al máximo', () {
     final d = newDraft()
       ..selectRace('dwarf')

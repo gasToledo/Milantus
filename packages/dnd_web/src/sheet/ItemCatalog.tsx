@@ -11,7 +11,7 @@ import { Tooltip } from '../ui/primitives';
 
 /** Las familias del catálogo, en el orden de la mochila (`itemGroupOrder`). */
 const FAMILIES = ['weapon', 'armor', 'ammunition', 'focus', 'magic', 'tool', 'container', 'pack', 'gear'] as const;
-type Family = (typeof FAMILIES)[number];
+export type Family = (typeof FAMILIES)[number];
 
 /** Una fila del catálogo (`CatalogRow` de Flutter). */
 export interface CatalogRow {
@@ -37,7 +37,7 @@ const str = (v: unknown) => (typeof v === 'string' ? v : '');
  * Es agrupar datos del catálogo, no una regla: lo mágico es lo que trae
  * rareza (`Item.isMagic`), igual que en el Códice.
  */
-function catalogRows(catalog: Catalog, t: Texts, lang: string): CatalogRow[] {
+export function catalogRows(catalog: Catalog, t: Texts, lang: string): CatalogRow[] {
   const row = (e: JsonObject, family: Family, detail: string[]): CatalogRow => ({
     id: str(e.id),
     name: str(e.name) || str(e.id),
@@ -61,6 +61,43 @@ function catalogRows(catalog: Catalog, t: Texts, lang: string): CatalogRow[] {
     ...catalog.armor.map((a) => row(a, 'armor', [a.category === 'shield' ? t.itemKinds.shield : t.itemKinds.armor])),
     ...items,
   ].sort((a, b) => a.name.localeCompare(b.name, lang));
+}
+
+/** Las pills de familia del catálogo. Solo las que hay: con homebrew, una pill
+ *  fija ofrecería vacías. En un teléfono van en un renglón que se desliza:
+ *  envueltas se comían la mitad del diálogo. */
+export function FamilyFilter({
+  rows,
+  family,
+  onChange,
+  label,
+  t,
+}: {
+  rows: CatalogRow[];
+  family: Family | 'all';
+  onChange: (f: Family | 'all') => void;
+  label: string;
+  t: Texts;
+}) {
+  const present = FAMILIES.filter((f) => rows.some((r) => r.family === f));
+  return (
+    <div role="group" aria-label={label} className="flex gap-1.5 overflow-x-auto pb-1 sm:flex-wrap">
+      {(['all', ...present] as const).map((f) => (
+        <button
+          key={f}
+          type="button"
+          aria-pressed={family === f}
+          onClick={() => onChange(f)}
+          className={cx(
+            'shrink-0 rounded-[var(--radius-pill)] border px-3 py-[3px] text-[12px]',
+            family === f ? 'border-gold bg-gold-soft text-gold' : 'border-hairline text-on-surface-variant',
+          )}
+        >
+          {f === 'all' ? t.packFilters.all : t.itemGroups[f]}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 /**
@@ -98,8 +135,6 @@ export function ItemCatalogDialog({
   const matches = all.filter(
     (r) => (needle === '' || r.name.toLowerCase().includes(needle)) && (family === 'all' || r.family === family),
   );
-  // Solo las familias que hay: con homebrew, una pill fija ofrecería vacías.
-  const present = FAMILIES.filter((f) => all.some((r) => r.family === f));
 
   return (
     <AppDialog
@@ -126,24 +161,7 @@ export function ItemCatalogDialog({
             className="h-9 w-full rounded-[var(--radius-pill)] border border-hairline bg-plaque pr-3 pl-9 text-[13px] text-on-surface placeholder:text-text-muted"
           />
         </div>
-        {/* En un teléfono las pills van en un renglón que se desliza: envueltas
-            se comían la mitad del diálogo. */}
-        <div role="group" aria-label={t.catalogAddTitle} className="flex gap-1.5 overflow-x-auto pb-1 sm:flex-wrap">
-          {(['all', ...present] as const).map((f) => (
-            <button
-              key={f}
-              type="button"
-              aria-pressed={family === f}
-              onClick={() => setFamily(f)}
-              className={cx(
-                'shrink-0 rounded-[var(--radius-pill)] border px-3 py-[3px] text-[12px]',
-                family === f ? 'border-gold bg-gold-soft text-gold' : 'border-hairline text-on-surface-variant',
-              )}
-            >
-              {f === 'all' ? t.packFilters.all : t.itemGroups[f]}
-            </button>
-          ))}
-        </div>
+        <FamilyFilter rows={all} family={family} onChange={setFamily} label={t.catalogAddTitle} t={t} />
         {matches.length === 0 ? (
           <p className="py-6 text-center text-[13px] text-text-muted">{t.catalogNoMatches}</p>
         ) : (

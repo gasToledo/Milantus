@@ -358,6 +358,12 @@ export interface CreationDraftJson {
   spreadPlusOne?: AbilityId | null;
   scoreMethod?: ScoreMethodId;
   assignedScores?: Partial<Record<AbilityId, number>>;
+  classSkills?: string[];
+  raceSkills?: string[];
+  raceFeatId?: string | null;
+  languages?: string[];
+  classEquipmentOptionId?: string | null;
+  backgroundEquipmentOptionId?: string | null;
   [key: string]: unknown;
 }
 
@@ -402,6 +408,85 @@ export interface CreationView {
     preview: Partial<Record<AbilityId, number>>;
     descriptions: Record<AbilityId, string>;
   };
+  proficiencies: {
+    backgroundSkills: string[];
+    backgroundTools: string[];
+    classSkills: CreationSkillBlock;
+    speciesSkills: CreationSkillBlock;
+    grantsOriginFeat: boolean;
+    originFeats: { id: string; name: string }[];
+    slots: {
+      groupId: string;
+      name: string;
+      count: number;
+      expertise: boolean;
+      chosen: string[];
+      options: { id: string; label: string; taken: boolean }[];
+    }[];
+    languages: { universal: string; count: number; options: { id: string; label: string }[] };
+    languageSlots: {
+      groupId: string;
+      name: string;
+      count: number;
+      chosen: string[];
+      options: { id: string; label: string }[];
+    }[];
+  };
+  spells: {
+    applicable: boolean;
+    slots: {
+      groupId: string;
+      name: string;
+      count: number;
+      chosen: string[];
+      options: { id: string; name: string; level: number }[];
+    }[];
+    class: {
+      prepared: boolean;
+      cantripsKnown: number;
+      preparedCount: number;
+      cantrips: { id: string; name: string; level: number }[];
+      spells: { id: string; name: string; level: number }[];
+      chosenCantrips: string[];
+      chosenSpells: string[];
+      grantedCantrips: string[];
+      grantedSpells: string[];
+    } | null;
+  };
+  equipment: {
+    classOptions: CreationPackage[];
+    backgroundOptions: CreationPackage[];
+    choices: { key: string; fromClass: boolean; chosen: string | null; options: { id: string; name: string }[] }[];
+    grantedCp: number;
+    purchasesCp: number;
+    goldLeftCp: number;
+    purchases: { id: string; name: string; quantity: number; unitCp: number; bundleSize: number }[];
+    armor: { id: string; name: string; worn: boolean }[];
+    weapons: { id: string; name: string; wielded: boolean }[];
+    grips: { id: string; name: string; canOffHand: boolean; offHand: boolean; canTwoHanded: boolean; twoHanded: boolean }[];
+  };
+}
+
+/** Un cupo de habilidades: lo que suma cada una sin y con competencia. */
+export interface CreationSkillBlock {
+  count: number;
+  options: {
+    id: string;
+    label: string;
+    ability: AbilityId | null;
+    base: number;
+    withProficiency: number;
+    taken: boolean;
+  }[];
+}
+
+/** Una opción de equipo inicial, con lo que trae. */
+export interface CreationPackage {
+  id: string;
+  label: string;
+  items: { name: string; quantity: number }[];
+  choices: string[][];
+  coins: Record<string, number>;
 }
 
 /** Lo que el jugador tocó (`CreationDraft.apply`). */
@@ -415,7 +500,26 @@ export type CreationAction =
   | { type: 'assignScore'; ability: AbilityId; value: number }
   | { type: 'stepPointBuy'; ability: AbilityId; delta: number }
   | { type: 'setManualScore'; ability: AbilityId; value: number | null }
-  | { type: 'toggle'; pick: 'feature' | 'weaponMastery'; id: string; group?: string };
+  | {
+      type: 'toggle';
+      pick:
+        | 'classSkill'
+        | 'speciesSkill'
+        | 'weaponMastery'
+        | 'feature'
+        | 'proficiency'
+        | 'language'
+        | 'featureLanguage'
+        | 'featureSpell'
+        | 'cantrip'
+        | 'spell';
+      id: string;
+      group?: string;
+    }
+  | { type: 'toggleRaceFeat' | 'setClassEquipment' | 'setBackgroundEquipment' | 'buy'; id: string }
+  | { type: 'setEquipmentChoice'; key: string; id: string }
+  | { type: 'setPurchase'; id: string; quantity: number }
+  | { type: 'setArmorWorn' | 'setWeaponWielded' | 'setOffHand' | 'setTwoHanded'; id: string; on: boolean };
 
 /** El creador: aplica [action] al borrador y devuelve el borrador nuevo y lo
  *  que muestran los pasos. Sin acción, solo lee. */
