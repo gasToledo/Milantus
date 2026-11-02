@@ -55,7 +55,7 @@ El build no es un trámite: lo que vive en `packages/dnd_app/lib/web/*_web.dart`
 **Obligatorio antes de commitear y de pushear un cambio en `dnd_web`**, también
 en las máquinas donde `tsc`, el build y Playwright no corren (ver la trampa del
 antivirus más abajo). Los pasos 5a, 5b1 y 5b2 de la migración llegaron a CI en
-rojo por saltear esto, y CI en rojo saltea el despliegue:
+rojo por saltear esto, y un commit roto llega a producción igual:
 
 1. Chequeo de tipos. Si el `tsc` de TypeScript 7 no corre, el de TypeScript 5
    (JavaScript puro) encuentra los mismos errores:
@@ -147,9 +147,10 @@ están en `docs/desarrollo/versionado-y-changelog.md`.
 
 El push dispara CI (`.github/workflows/ci.yml`, en cualquier rama y en los pull
 requests): formato, análisis y pruebas de los tres paquetes, con las pruebas de
-la app en dos mitades en paralelo con el build web. CD (`cd.yml`) arranca recién
-cuando CI termina en verde sobre `main`: **CI en rojo no llega a producción**
-(el commit queda en `main` y se arregla con otro). Su job `gate` despliega solo
+la app en dos mitades en paralelo con el build web. CD (`cd.yml`) arranca por el
+mismo push a `main`, en paralelo y sin esperar a CI: **CI en rojo llega igual a
+producción** (se decidió que tardar es peor que explotar; se arregla con otro
+commit). Su job `gate` despliega solo
 si cambió algo desplegable desde el último CD exitoso — `packages/dnd_server`,
 `packages/dnd_app`, `packages/dnd_engine` o `packages/dnd_web`, `docker-compose.yml`,
 `postgres-init/**` o el propio `cd.yml`, sin contar `packages/*/test/` ni

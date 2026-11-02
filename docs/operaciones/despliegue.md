@@ -231,9 +231,9 @@ Dos workflows en `.github/workflows/`:
 - `cd.yml`: reconstruye y levanta el stack (`docker compose build --pull` y
   después `docker compose up -d`; el `--pull` fuerza a repreguntar el registro por
   las imágenes base, que si no se reutilizan aunque queden viejas) en el
-  **runner autoalojado**. Lo dispara `workflow_run` cuando CI termina
-  sobre un push a `main`: si CI falló no despliega, y si no cambió ninguna
-  ruta desplegable desde el último CD exitoso tampoco (lo decide el job
+  **runner autoalojado**. Lo dispara el push a `main`, en paralelo
+  con CI y sin esperarlo (un CI en rojo no frena el despliegue). Si no cambió
+  ninguna ruta desplegable desde el último CD exitoso no despliega (lo decide el job
   `gate`, en un runner de GitHub). Necesita el runner de esta sección.
 
 ### El cliente React bajo `/v2`
@@ -311,14 +311,11 @@ Configurar en *Settings → Branches* para `main`:
 - Sin *force-push* ni borrado de la rama.
 - Restringir el push a quienes deban poder disparar un despliegue: es el control
   de acceso sobre `cd.yml`.
-- No exigir pull request. CI corre después del push y CD espera su resultado:
-  un commit con CI en rojo queda en `main` pero no llega a producción hasta
-  que un commit posterior lo arregle.
+- No exigir pull request. CI y CD corren en paralelo tras el push:
+  un commit con CI en rojo llega igual a producción y se arregla con otro.
 
 ### Verificar el pipeline
 
-- Un push a `main` con CI en rojo crea una corrida de CD con los dos jobs
-  salteados.
 - Un push a `main` que solo toque `docs/**` u otra ruta fuera de la
   lista del job `gate` corre `gate` y saltea `Deploy`.
 - Un push a `main` que toque `packages/dnd_server/**` (por ejemplo)
