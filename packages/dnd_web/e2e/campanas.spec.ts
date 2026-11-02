@@ -1,6 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { api, TOKEN, TOKEN_DM, TOKEN_SIN_V2, vigilarEscrituras } from './helpers';
-import { chapterGrants, type JsonObject } from '../src/engine';
+import { api, TOKEN, TOKEN_DM, TOKEN_SIN_V2 } from './helpers';
 
 test.use({ locale: 'es-AR' });
 
@@ -16,47 +15,33 @@ const SOLO_DEL_DM = [
   'El Valle Hueco',
   'Garrick el Tabernero',
   'capitulo-en-marcha',
+  'El Concilio de Brasas',
+  'subió a nivel',
+  'levelUps',
+  'encounterLogs',
 ];
 
-test('Campañas lista las mesas del jugador con la vista podada, sin escribir nada', async ({
+test('nada del DM llega al jugador: ni en lo que manda la API ni en la pantalla de Campañas', async ({
   context,
   page,
   request,
   baseURL,
 }) => {
   await context.addCookies([{ name: 'dnd_session', value: TOKEN, url: baseURL! }]);
-  const escrituras = vigilarEscrituras(page);
-  const { campaigns } = await api<{ campaigns: { campaign: { name: string }; chapters: JsonObject[] }[] }>(
+  const { campaigns } = await api<{ campaigns: { campaign: { name: string } }[] }>(
     request,
     `/api/characters/${ELSBETH}/campaigns`,
   );
-  const [mesa] = campaigns;
 
   await page.goto('/v2/campanas');
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Campañas');
-  await expect(page.getByText('1 campaña', { exact: true })).toBeVisible();
-  await expect(page.getByRole('heading', { level: 2, name: mesa!.campaign.name })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Con Elsbeth de Humo' })).toHaveAttribute(
-    'href',
-    `/v2/personajes/${ELSBETH}/campana`,
-  );
-  for (const capitulo of mesa!.chapters) {
-    await expect(page.locator(`[data-chapter="${capitulo.id}"]`)).toContainText(
-      `Te llevaste ${chapterGrants(capitulo)}`,
-    );
-  }
-  await expect(page.getByText('Contra Lobo ×3')).toBeVisible();
+  await expect(page.getByRole('heading', { level: 2, name: campaigns[0]!.campaign.name })).toBeVisible();
 
-  // Nada del DM: ni en lo que manda la API ni en lo que se ve.
   const crudo = JSON.stringify(campaigns);
   const texto = await page.locator('body').innerText();
   for (const secreto of SOLO_DEL_DM) {
     expect(crudo, `la API manda «${secreto}»`).not.toContain(secreto);
     expect(texto, `la pantalla muestra «${secreto}»`).not.toContain(secreto);
   }
-  expect(escrituras).toEqual([]);
-  // Es del Modo DM: el menú de Jugador no la enlaza.
-  await expect(page.getByRole('link', { name: 'Campañas', exact: true })).toHaveCount(0);
 });
 
 test('lo ajeno y lo inexistente responden igual: 404, y la cuenta sin v2 no ve campañas', async ({

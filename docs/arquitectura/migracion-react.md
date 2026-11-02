@@ -618,93 +618,37 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    `innateCantripOptions`), con la función y sus argumentos en el caso. Es también la red del tipo escrito a mano de
    `types.ts`: un campo nuevo en `ComputedSheet.toJson` rompe acá aunque el tipo
    no lo diga.
-2. **Playwright** (job `web_e2e`). Pocas pruebas y solo de reglas
-   (`e2e/`): levanta el servidor real con repositorios en memoria y sesiones
+2. **Playwright** (job `web_e2e`). Pocas pruebas, con el criterio de `CLAUDE.md`
+   §Tests: levanta el servidor real con repositorios en memoria y sesiones
    falsas (`dnd_server/test/e2e_server.dart`), sirve el `dist` de `/v2` con
-   personajes, ajustes y un arma homebrew sembrados, y verifica que la ficha y
-   el dashboard muestren los números que da el motor (el dashboard, además, el
-   orden de los ajustes, el favorito y el buscador); que las pestañas de la
-   ficha sean rutas propias con historial; que el ataque del arma homebrew
-   aparezca (y que sin la fusión no estaría); que un lanzador liste sus
-   trucos y conjuros, con los siempre preparados en su grupo; que imprimir arme
-   la hoja con los números del motor, que solo se vea en papel y se vaya al
-   cerrar el diálogo; que el
-   inventario, la campaña y el diario muestren lo que resuelve el motor y lo
-   que manda la API (con una mesa sembrada: otra cuenta como DM, un capítulo
-   cerrado y una batalla); que el Códice cuente y abra el homebrew de la
-   cuenta, que su búsqueda general coincida con el catálogo y que el glosario
-   se lea en orden (`e2e/codice.spec.ts`); que Ajustes muestre lo de la cuenta,
-   cambie el tema y el idioma sin escribir en la API y recuerde el idioma con la
-   clave de Flutter (`e2e/ajustes.spec.ts`); que Campañas muestre la mesa
-   sembrada con lo que reparte el motor y que **nada del DM** (escena de música,
-   capítulo en marcha, nota) aparezca ni en la API ni en pantalla, y que otra
-   cuenta, o el propio DM, reciba 404 al pedir las campañas de un personaje
-   ajeno, idéntico al de un id inexistente (`e2e/campanas.spec.ts`); que el
-   Bestiario liste las criaturas que da el motor más una criatura homebrew
-   sembrada (con la iniciativa derivada por el motor, no la de la
-   característica), abra un perfil con sus modificadores, salvaciones y
-   conjuros, filtre y ordene, y que el homebrew no llegue a otra cuenta
-   (`e2e/bestiario.spec.ts`); que la Mesa del DM
-   liste a los dos jugadores sembrados (de dos cuentas distintas) con los números
-   del motor y los estados de la ficha, sin escribir nada, que leerla no cambie la
-   ficha del jugador, que su tarjeta abra la ficha completa del miembro (por el
-   vínculo, con Personaje y Combate y los números del motor) y que otra cuenta
-   no la abra por URL, que el retrato sembrado del miembro llegue por el vínculo (y
-   por la clave dé 404), con miniatura en la Mesa y el original en el visor, que la música ponga una escena sembrada con el reproductor
-   que arma el motor y siga al cambiar de sección, sin escribir, que Capítulos muestre estado, objetivo y recompensas (y que
-   el objetivo y los capítulos sin cerrar no lleguen al jugador), que el
-   Cuaderno junte notas, combates (con un PNJ aliado por su nombre propio) y
-   subidas de nivel, busque, enlace las menciones de una nota y de un combate a
-   la ficha del miembro o del PNJ (y deje como texto las de nadie), y que nada
-   de eso llegue al jugador, que el
-   Bestiario del DM abra bajo `/v2/dm/bestiario` con el homebrew de la cuenta y
-   sin dárselo a otra, y que otra cuenta —con o sin `webV2`— reciba el mismo 404
-   que ante una campaña inexistente, en la API y en la pantalla
-   (`e2e/dm.spec.ts`); que la Biblioteca de PNJ liste los tres PNJ sembrados
-   (bloque, ficha y sin estadísticas) con la línea que arma el motor, filtre por
-   campaña, tag y nombre, abra la ficha con la voz, el trasfondo, las notas, el
-   bloque o la ficha compilada y el estado por campaña, y de ahí la ficha
-   completa con Personaje, Combate e Inventario, sin escribir nada, y que
-   los PNJ de la mesa muestren su estado y los PG con que volvió el herido, sin
-   escribir, y que
-   otra cuenta tenga la biblioteca vacía, reciba por un PNJ ajeno o por los PNJ
-   de una mesa ajena el mismo 404 que por lo inexistente (en la API y en la
-   pantalla, también en la ficha completa del PNJ) y no encuentre nada de eso en la vista del jugador (`e2e/pnj.spec.ts`); que el Homebrew cuente lo
-   propio por categoría (un arma, una dote y una criatura sembradas), abra la
-   ficha del Códice bajo `/v2/dm/homebrew`, busque en todo y lleve la criatura al
-   Bestiario, sin escribir, y que otra cuenta no reciba nada ni lo abra por URL
-   (`e2e/homebrew.spec.ts`); que el Combate muestre el orden sembrado con el
-   turno, ACTUÓ y SALTA, los PG de cada fuente (los del jugador, de su ficha), la
-   CA de cada una, el perfil del que juega y los combates cerrados, sin escribir,
-   y que otra cuenta reciba el mismo 404 que ante una campaña inexistente y el
-   jugador vinculado solo su estado de turno (`e2e/combate.spec.ts`); que
-   daño, curación y PG temporales manden y dejen guardada exactamente la ficha
-   que da el motor, que se relea sin migrar y al recargar, que solo se escriba
-   la ficha propia, que a 0 PG tres «+Éxito» seguidos estabilicen y guarden lo
-   del motor, que gastar y recuperar un espacio y un uso manden y guarden lo
-   del motor, que el dado de golpe gaste uno y cure lo que dice su aviso, que
-   los descansos guarden lo del motor (el largo, además, recargue el objeto y
-   lo cuente) y que «Deshacer» vuelva a guardar la ficha de antes, que la
-   Inspiración Heroica y la concentración guarden lo del motor, que la mochila
-   se edite desde la fila (equipar, cantidad, nota, monedas) y que quitar se
-   deshaga, que comprar del catálogo y vender guarden lo del motor y vender
-   se deshaga, que una bárbara sembrada suba a 4 por PG, subclase y mejora
-   guardando lo del motor y se deshaga, que un guerrero elija en la subida el
-   estilo de combate pendiente y guarde lo del motor, que la clériga suba
-   eligiendo Orden Divina, los conjuros de Iniciado en la Magia y los de
-   clase y guarde lo del motor, que una bárbara active la Furia, marque
-   estados (uno que incapacita la termina) y suba y baje el cansancio
-   guardando lo del motor y releyéndolo al recargar, con la velocidad y la
-   iniciativa ya penalizadas, que la clériga prepare conjuros (saca uno y elige otro) guardando lo del motor y se deshaga, que un alto elfo cambie su truco innato con «Cambiar» guardando lo del motor, y
-   que la ficha de otra cuenta (la de un miembro, para el DM) no
-   tenga un solo control (`e2e/escritura.spec.ts`, con una cuenta propia para
-   no cambiar lo que leen las demás); y que una cuenta sin `webV2` vea
-   «No disponible» sin pedir sus datos (`e2e/acceso.spec.ts`). Lo esperado se
-   calcula con el mismo motor y la misma fusión (`e2e/helpers.ts`). Sin
-   reintentos: no hay «a veces anda».
+   personajes, campañas y homebrew sembrados, y verifica tres cosas:
+   - **Que una escritura mande lo que da el motor** y quede guardado: daño,
+     salvaciones de muerte (con la cola que junta toques), espacios y usos, dado
+     de golpe y descansos, Inspiración y concentración, mochila, compra y venta,
+     subida de nivel, Furia, estados y cansancio, conjuros preparados y truco
+     innato, y «Deshacer» donde lo hay (`e2e/escritura.spec.ts`, con una cuenta
+     propia para no cambiar lo que leen las demás), más el alta del creador
+     (`e2e/creador.spec.ts`).
+   - **Que lo ajeno no se alcance:** otra cuenta recibe el mismo 404 que ante lo
+     inexistente, en la API y en la pantalla, para campañas, combates, PNJ y
+     homebrew; nada del DM llega a la vista del jugador; el retrato de un miembro
+     se pide por el vínculo y no por la clave; la ficha ajena no tiene un solo
+     control, y una cuenta sin `webV2` ve «No disponible» sin pedir sus datos
+     (`e2e/acceso.spec.ts`, `campanas`, `combate`, `dm`, `homebrew` y `pnj`).
+   - **Que la ficha muestre los números del motor,** incluido el ataque de un arma
+     homebrew, que depende de `mergeHomebrew`, del cliente (`e2e/ficha.spec.ts`).
+
+   Lo esperado se calcula con el mismo motor y la misma fusión (`e2e/helpers.ts`).
+   Sin reintentos: no hay «a veces anda». Las de `escritura.spec.ts` corren en
+   serie, así que una falla frena las que siguen.
+
+   **Lo que Playwright no mira:** el resto de las pantallas de lectura (dashboard,
+   Bestiario, Códice, Ajustes, Mesa, Capítulos, Cuaderno, Biblioteca de PNJ) y sus
+   filtros. Sus reglas están en los tests del motor; el dibujo se compara a mano
+   (nivel 3).
 
    **Trampa al volver escribible una pantalla:** las pruebas de lectura
-   (`ficha.spec.ts`, `codice.spec.ts`…) entran con la cuenta de `TOKEN`, que es
+   (`ficha.spec.ts`) entran con la cuenta de `TOKEN`, que es
    **dueña** de sus fichas, así que ven los controles nuevos. Una celda que
    antes mostraba «Sí» y ahora es una casilla las rompe sin que el cambio
    toque esos archivos (pasó con la columna «Equipado» del Inventario en 5b1:
@@ -712,7 +656,7 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    `data-field` y cada texto de la pantalla que cambió, y adaptá lo que lea
    como texto lo que ahora es un control. Si Playwright no corre en la máquina
    (ver la trampa del antivirus en `CLAUDE.md`), mirá el resultado de CI antes
-   de seguir con el próximo cambio: CI en rojo no llega a producción.
+   de seguir con el próximo cambio: CI en rojo llega igual a producción.
 3. **Comparación manual en producción con una cuenta habilitada.** Lo que solo
    se ve con el stack real (túnel, caché, cuenta de verdad, personajes
    complejos) se compara a ojo contra la misma pantalla de Flutter, con una

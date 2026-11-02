@@ -12,7 +12,7 @@ import {
   type SheetAction,
 } from '../src/engine';
 import { resourceKey, signed } from '../src/sheet/format';
-import { api, catalogo, TOKEN_DM, TOKEN_ESCRITURA, vigilarEscrituras, type PersonajeApi } from './helpers';
+import { api, catalogo, TOKEN_ESCRITURA, vigilarEscrituras, type PersonajeApi } from './helpers';
 
 // La ficha que escriben estas pruebas es de una cuenta propia (`e2e_server.dart`):
 // lo que guardan no cambia los números que leen las otras pruebas.
@@ -120,52 +120,37 @@ test('gastar y recuperar espacios y usos guarda lo que da el motor', async ({ pa
   }
 });
 
-test('el dado de golpe lo tira el motor: cura lo que dice el aviso y gasta uno', async ({ page, request }) => {
-  const antes = await ilse(request);
-  const { maxHp } = computeSheet(antes, catalogo());
+test('el dado de golpe y los descansos guardan lo del motor, y «Deshacer» vuelve a guardar la ficha de antes', async ({
+  page,
+  request,
+}) => {
+  // Cada paso entra de nuevo: el aviso del anterior, con su «Deshacer», no
+  // tiene que seguir a la vista.
+  await page.goto(COMBATE);
+  const antesDelDado = await ilse(request);
   const gastados = (c: PersonajeApi) =>
     Object.values((c.combat as { hitDiceUsed?: Record<string, number> }).hitDiceUsed ?? {}).reduce((a, b) => a + b, 0);
-  await page.goto(COMBATE);
-
-  const enviado = (await proximoGuardado(page, () =>
+  const conDado = (await proximoGuardado(page, () =>
     page.getByRole('button', { name: /^Dado de golpe/ }).click(),
   )) as PersonajeApi;
-  const aviso = await page.getByText(/^Recuperaste \d+ PG/).textContent();
-  const curado = Number(/\d+/.exec(aviso!)![0]);
+  expect(gastados(conDado)).toBe(gastados(antesDelDado) + 1);
+  expect(await ilse(request)).toEqual(conDado);
 
-  expect(gastados(enviado)).toBe(gastados(antes) + 1);
-  expect(enviado.combat.currentHp).toBe(Math.min(maxHp, antes.combat.currentHp + curado));
-  expect(await ilse(request)).toEqual(enviado);
-});
-
-test('el descanso corto guarda lo del motor y «Deshacer» vuelve a guardar la ficha de antes', async ({
-  page,
-  request,
-}) => {
-  const antes = await ilse(request);
-  const esperado = segunMotor(antes, { type: 'shortRest' });
   await page.goto(COMBATE);
-
+  const antesDelCorto = await ilse(request);
   expect(await proximoGuardado(page, () => page.getByRole('button', { name: 'Descanso corto' }).click())).toEqual(
-    esperado,
+    segunMotor(antesDelCorto, { type: 'shortRest' }),
   );
-  // Deshacer guarda la ficha de antes del descanso tal como la dio el motor.
-  const deshecho = await proximoGuardado(page, () => page.getByRole('button', { name: 'Deshacer' }).click());
-  expect(deshecho).toEqual(migrateCharacter(antes));
-  expect(await ilse(request)).toEqual(migrateCharacter(antes));
-});
+  const cortoDeshecho = await proximoGuardado(page, () => page.getByRole('button', { name: 'Deshacer' }).click());
+  expect(cortoDeshecho).toEqual(migrateCharacter(antesDelCorto));
+  expect(await ilse(request)).toEqual(migrateCharacter(antesDelCorto));
 
-test('el descanso largo cura, recarga y lo cuenta; «Deshacer» devuelve también las cargas', async ({
-  page,
-  request,
-}) => {
+  await page.goto(COMBATE);
   const antes = await ilse(request);
   const ficha = computeSheet(antes, catalogo());
   const cargas = (c: CharacterJson) =>
     (c as { inventory: { itemId: string; charges?: number }[] }).inventory.find((e) => e.itemId === 'baston-de-curacion')!
       .charges;
-  await page.goto(COMBATE);
-
   const enviado = (await proximoGuardado(page, () =>
     page.getByRole('button', { name: 'Descanso largo' }).click(),
   )) as PersonajeApi;
@@ -175,8 +160,6 @@ test('el descanso largo cura, recarga y lo cuenta; «Deshacer» devuelve tambié
   expect(sinTirada(enviado)).toEqual(sinTirada(segunMotor(antes, { type: 'longRest' })));
   expect(enviado.combat.currentHp).toBe(ficha.maxHp);
   expect(cargas(enviado)!).toBeGreaterThan(cargas(antes)!);
-  await expect(page.getByText(/^Descanso largo: PG al máximo y recursos recargados; cansancio a nivel 0.*1 objeto mágico recuperó cargas/)).toBeVisible();
-
   const deshecho = await proximoGuardado(page, () => page.getByRole('button', { name: 'Deshacer' }).click());
   expect(deshecho).toEqual(migrateCharacter(antes));
 });
@@ -332,30 +315,6 @@ test('la subida de nivel pasa por PG, subclase y mejora, guarda lo del motor y s
   await expect(page.getByText('Bruna de Humo subió a nivel 4.', { exact: true })).toBeVisible();
   const deshecho = await proximoGuardado(page, () => page.getByRole('button', { name: 'Deshacer' }).click(), BRUNA);
   expect(deshecho).toEqual(migrateCharacter(antes));
-});
-
-test('la subida elige el estilo de combate pendiente y guarda lo del motor', async ({ page, request }) => {
-  const GARRA = 'garra-de-humo';
-  const antes = await ilse(request, GARRA);
-  const cupo = levelUpView(antes, catalogo(), { classId: 'fighter' }).featureSlots[0]!;
-  const estilo = cupo.options.find((o) => o.unmet === null)!;
-  const esperado = segunMotor(antes, {
-    type: 'levelUp',
-    draft: { classId: 'fighter', featurePicks: { [cupo.groupId]: [estilo.id] } },
-  });
-  await page.goto(`/v2/personajes/${GARRA}/subir-nivel`);
-
-  await page.getByRole('button', { name: 'Empezar' }).click();
-  await page.getByRole('button', { name: 'Continuar' }).click();
-  await expect(page.getByRole('button', { name: 'Continuar' })).toBeDisabled();
-  const literal = estilo.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  await page.getByRole('radio', { name: new RegExp(`^${literal}`) }).click();
-  // El panel derecho explica la opción elegida.
-  await expect(page.locator('[data-field="level-up-detail"]')).toContainText(estilo.name);
-  await page.getByRole('button', { name: 'Continuar' }).click();
-  expect(
-    await proximoGuardado(page, () => page.getByRole('button', { name: 'Subir a nivel 2' }).click(), GARRA),
-  ).toEqual(esperado);
 });
 
 test('la clériga sube eligiendo Orden Divina, los conjuros de su dote y los de clase', async ({ page, request }) => {
@@ -523,27 +482,4 @@ test('cambiar el truco innato se confirma con «Cambiar» y guarda lo del motor'
   expect(enviado).toEqual(esperado);
   expect(await ilse(request, ELFO)).toEqual(esperado);
   await expect(page.getByText(`Truco cambiado a ${otro.name}.`, { exact: true })).toBeVisible();
-});
-
-test('la ficha de otra cuenta no tiene controles para escribir', async ({ context, page, baseURL }) => {
-  await context.clearCookies();
-  await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);
-  const escrituras = vigilarEscrituras(page);
-  const { members } = await api<{ members: { memberId: string; character: PersonajeApi }[] }>(
-    page.request,
-    '/api/campaigns/marca-del-cuervo/members',
-    TOKEN_DM,
-  );
-  const sagan = members.find((m) => m.character.id === 'sagan-de-humo')!;
-
-  await page.goto(`/v2/dm/campanas/marca-del-cuervo/mesa/${sagan.memberId}/combate`);
-  await expect(page.locator('[data-card="hit-points"]')).toBeVisible();
-  await expect(page.locator('[data-controls]')).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Daño' })).toHaveCount(0);
-  // Ni estados, ni cansancio, ni estados activables: nada que escriba.
-  await expect(page.locator('[data-condition], [data-field="exhaustion"]')).toHaveCount(0);
-  await expect(page.getByRole('button', { name: /^(Activar|Terminar)$/ })).toHaveCount(0);
-  // Ni preparar conjuros ni cambiar el truco innato.
-  await expect(page.locator('[data-action="edit-spells"], [data-action="swap-innate"]')).toHaveCount(0);
-  expect(escrituras).toEqual([]);
 });

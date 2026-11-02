@@ -71,9 +71,8 @@ const _smokeSecondPlayerId = 'segundo-jugador-de-humo';
 /// ataque aparezca (`e2e/ficha.spec.ts`).
 const smokeHomebrewWeaponId = 'hacha-de-humo';
 
-/// Una criatura homebrew de la cuenta, para el Bestiario
-/// (`e2e/bestiario.spec.ts`). Trae iniciativa propia (+6, con DES 16 sería
-/// +3) para distinguir lo que deriva el motor de una cuenta hecha en el cliente.
+/// Una criatura homebrew de la cuenta, que otra cuenta no tiene que recibir
+/// (`e2e/homebrew.spec.ts`).
 const smokeHomebrewCreatureId = 'sombra-de-humo';
 
 /// Una dote homebrew de la cuenta (`e2e/homebrew.spec.ts`).
@@ -145,7 +144,7 @@ Future<void> main() async {
       currentHp: 31,
     ),
   );
-  // Para el dashboard (`e2e/dashboard.spec.ts`): el mismo guerrero a otros
+  // Para el dashboard: el mismo guerrero a otros
   // niveles. Por nombre irían Aldric, Brunilda, Zelda; por nivel, Brunilda,
   // Zelda, Aldric: con el orden «nivel» y a Zelda de favorita, la prueba
   // distingue el orden de los ajustes del alfabético y el favorito del resto.
@@ -303,29 +302,6 @@ Future<void> main() async {
       },
       hpPerLevel: const [12, 7, 7],
       combat: CombatState(currentHp: 20),
-    ),
-  );
-  // Un guerrero 1 sin estilo de combate: su subida a 2 pide elegirlo, y es
-  // la prueba de las elecciones de rasgo en `/v2` (5c2).
-  await characters.create(
-    writerUserId,
-    Character(
-      id: 'garra-de-humo',
-      name: 'Garra de Humo',
-      raceId: 'human',
-      classId: 'fighter',
-      backgroundId: 'soldier',
-      level: 1,
-      assignedScores: const {
-        Ability.strength: 15,
-        Ability.dexterity: 13,
-        Ability.constitution: 14,
-        Ability.intelligence: 8,
-        Ability.wisdom: 12,
-        Ability.charisma: 10,
-      },
-      hpPerLevel: const [10],
-      combat: CombatState(currentHp: 10),
     ),
   );
   // Un alto elfo: su truco de especie es reemplazable tras un descanso largo
