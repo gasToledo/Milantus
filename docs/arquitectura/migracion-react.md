@@ -466,9 +466,8 @@ repiten acá.
   un rasgo (y por eso no ocupa cupo) es `LevelUp.classSpells`, que también
   usa el editor de conjuros de Flutter (`SpellEditScreen`); lo elegido viaja
   como `spellPicks`, `classCantripPicks` y `classSpellPicks`. El motor
-  rechaza confirmar una subida a medias. Las piezas del circuito (`Option`,
-  `Block`, `Status`) viven en el asistente; si el creador (5d) las reusa,
-  pasan a `src/ui/`.
+  rechaza confirmar una subida a medias. Las piezas del circuito viven en
+  `src/ui/wizard.tsx`, compartidas con el creador.
   **Creador de personajes** (5d, en curso). El diseño aprobado está en el
   lienzo «Creador de personajes»: las mismas piezas que la subida, nueve pasos
   (Especie, Clase, Trasfondo, Características, Competencias, Conjuros,
@@ -482,7 +481,13 @@ repiten acá.
   esas secciones. El puente es `creation(catálogo, borrador, acción)`: aplica
   la acción (`CreationDraft.apply`) con todas las podas y devuelve
   `viewJson` (borrador, pendientes, el personaje para «Así queda» y lo que
-  deciden las reglas de cada paso). Todavía no hay pantallas en `/v2`.
+  deciden las reglas de cada paso). Desde 5d2 existen en
+  `/v2/personajes/nuevo` (`src/creation/CreationWizard.tsx`, **sin enlace
+  todavía**: «Crear personaje» sigue yendo a Flutter hasta 5d4) Especie, Clase,
+  Trasfondo y Características, sin guardar nada. El detalle sale de
+  `codexEntries`, como en la subida, y «Así queda» compila el personaje que
+  devuelve el motor. Competencias, Conjuros, Equipo, Detalles y Revisión se ven
+  en la tira de pasos, apagados.
   - **Toda escritura la hace el motor.** `actOn` (`act` de `js/entrypoint.dart`,
     sobre `SheetActions.apply` del engine) recibe la ficha y la acción y
     devuelve la ficha nueva, migrada y con el `schemaVersion` actual, más lo
@@ -539,7 +544,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    competencias ni conjuros *(existe)*; 5c2, esas elecciones de rasgos y
    competencias *(existe)*; 5c3, los conjuros *(existe)*; 5d, creador, en
    cuatro: 5d1, el borrador en el motor *(existe)*; 5d2, Especie, Clase,
-   Trasfondo y Características; 5d3, Competencias, Conjuros y Equipo; 5d4,
+   Trasfondo y Características *(existe)*; 5d3, Competencias, Conjuros y Equipo; 5d4,
    Detalles, Revisión y el alta.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
    combate, vínculos y códigos de campaña. Antes de portar esto es lectura

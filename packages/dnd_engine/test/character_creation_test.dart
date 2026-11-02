@@ -806,6 +806,18 @@ void main() {
     expect(d.raceSkills, isEmpty);
   });
 
+  test('el +1 no puede ir a la misma característica que el +2', () {
+    final d = newDraft()
+      ..apply({'type': 'selectBackground', 'id': 'sage'})
+      ..apply({
+        'type': 'setSpread',
+        'plusTwo': 'intelligence',
+        'plusOne': 'intelligence',
+      });
+    expect(d.spreadPlusOne, isNull);
+    expect(d.abilitySpread, {Ability.intelligence: 2});
+  });
+
   test('el personaje creado arranca con los PG al máximo', () {
     final d = newDraft()
       ..selectRace('dwarf')

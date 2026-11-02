@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode, type MouseEventHandler } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { ArrowLeft, ExternalLink, Menu, Monitor, Moon, Sun, X, type LucideIcon } from 'lucide-react';
 import { useTexts } from '../i18n/context';
@@ -221,10 +221,20 @@ export function NavGroup({ label, title, children }: { label: string; title?: st
 /** El «volver» de una pantalla de adentro (`SidebarBackButton`): ocupa el
  *  lugar y la forma del interruptor de modo, para que la salida esté siempre
  *  en el mismo sitio. */
-export function SidebarBack({ href, label }: { href: string; label: string }) {
+export function SidebarBack({
+  href,
+  label,
+  onClick,
+}: {
+  href: string;
+  label: string;
+  /** Para confirmar antes de salir: `preventDefault` frena la navegación. */
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
+}) {
   return (
     <Link
       href={href}
+      onClick={onClick}
       className="plaque flex min-h-9 items-center gap-2 rounded-[var(--radius-nav)] px-3 py-2 text-[13px] text-on-surface hover:text-gold"
     >
       <ArrowLeft size={16} aria-hidden="true" className="text-gold" />

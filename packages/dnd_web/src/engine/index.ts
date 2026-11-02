@@ -19,6 +19,7 @@ interface DartEngine {
   formatCost(cp: number, labelsJson: string): string;
   trade(requestJson: string, labelsJson: string): string;
   levelUp(characterJson: string, catalogJson: string, draftJson: string): string;
+  creation(catalogJson: string, draftJson: string, actionJson: string, seed?: number): string;
   rollDie(sides: number): number;
   coinParts(cp: number): string;
   formatAmount(cp: number, labelsJson: string): string;
@@ -124,6 +125,7 @@ export type CatalogLabelKind =
   | 'weaponProperty'
   | 'weaponPropertyRule'
   | 'mastery'
+  | 'masteryRule'
   | 'damageType'
   | 'skill'
   | 'ability'
@@ -290,6 +292,139 @@ export function levelUpView(character: CharacterJson, catalog: Catalog, draft: L
 }
 
 /** Una tirada de un dado de [sides] caras, hecha por el motor. */
+/** Las secciones del borrador (`CreationSection` de Dart). */
+export type CreationSectionId =
+  | 'species'
+  | 'characterClass'
+  | 'background'
+  | 'scores'
+  | 'proficiencies'
+  | 'spells'
+  | 'equipment';
+
+/** Lo que falta (`CreationPendingKind` de Dart). */
+export type CreationPendingKind =
+  | 'pickSpecies'
+  | 'pickLineage'
+  | 'pickLineageAbility'
+  | 'pickSize'
+  | 'pickClass'
+  | 'featureChoice'
+  | 'weaponMastery'
+  | 'pickBackground'
+  | 'pickFeatAbility'
+  | 'spread'
+  | 'assignScores'
+  | 'classSkills'
+  | 'speciesSkills'
+  | 'originFeat'
+  | 'proficiencies'
+  | 'expertise'
+  | 'languages'
+  | 'languageChoices'
+  | 'spellChoices'
+  | 'cantrips'
+  | 'spells'
+  | 'classEquipment'
+  | 'backgroundEquipment'
+  | 'equipmentChoices'
+  | 'overspent';
+
+/** Una elección sin resolver: qué y cuánto. El texto lo pone el cliente. */
+export interface CreationPending {
+  kind: CreationPendingKind;
+  section: CreationSectionId;
+  have: number;
+  need: number;
+  name: string;
+}
+
+export type ScoreMethodId = 'standardArray' | 'roll4d6' | 'pointBuy' | 'manual';
+export type SpreadModeId = 'twoOne' | 'oneOneOne';
+
+/** El borrador (`CreationDraft.toJson`), con lo que las pantallas leen. Se
+ *  devuelve tal cual al motor: React no le cambia nada. */
+export interface CreationDraftJson {
+  raceId?: string | null;
+  lineageId?: string | null;
+  speciesSpellcastingAbility?: AbilityId | null;
+  chosenSize?: string | null;
+  classId?: string | null;
+  weaponMasteries?: string[];
+  backgroundId?: string | null;
+  originFeatSpellcastingAbility?: AbilityId | null;
+  spreadMode?: SpreadModeId;
+  spreadPlusTwo?: AbilityId | null;
+  spreadPlusOne?: AbilityId | null;
+  scoreMethod?: ScoreMethodId;
+  assignedScores?: Partial<Record<AbilityId, number>>;
+  [key: string]: unknown;
+}
+
+/** Lo que el motor resuelve del borrador (`CreationDraft.viewJson`). */
+export interface CreationView {
+  draft: CreationDraftJson;
+  pending: CreationPending[];
+  character: CharacterJson;
+  species: {
+    lineages: { id: string; name: string; description: string; homebrew: boolean }[];
+    sizes: string[];
+    needsLineageAbility: boolean;
+    abilityOptions: AbilityId[];
+  };
+  class: {
+    featureSlots: {
+      groupId: string;
+      name: string;
+      count: number;
+      chosen: string[];
+      options: { id: string; name: string; description: string }[];
+    }[];
+    features: { name: string; description: string }[];
+    weaponMasterySlots: number;
+    weapons: { id: string; name: string; mastery: string | null }[];
+  };
+  background: {
+    abilityOptions: AbilityId[];
+    featAbilityOptions: AbilityId[];
+    spread: Partial<Record<AbilityId, number>>;
+  };
+  scores: {
+    suggested: Partial<Record<AbilityId, number>>;
+    standardArray: number[];
+    values: number[];
+    taken: Record<AbilityId, number[]>;
+    manualRange: [number, number];
+    pointBudget: number;
+    pointsRemaining: number;
+    canRaise: AbilityId[];
+    canLower: AbilityId[];
+    preview: Partial<Record<AbilityId, number>>;
+    descriptions: Record<AbilityId, string>;
+  };
+}
+
+/** Lo que el jugador tocó (`CreationDraft.apply`). */
+export type CreationAction =
+  | { type: 'selectRace' | 'selectLineage' | 'selectClass' | 'selectBackground' | 'setSize'; id: string }
+  | { type: 'setSpeciesAbility' | 'setOriginFeatAbility'; ability: AbilityId }
+  | { type: 'setSpreadMode'; mode: SpreadModeId }
+  | { type: 'setSpread'; plusTwo: AbilityId | null; plusOne: AbilityId | null }
+  | { type: 'applyScoreMethod'; method: ScoreMethodId }
+  | { type: 'applySuggestedScores' | 'clearScores' }
+  | { type: 'assignScore'; ability: AbilityId; value: number }
+  | { type: 'stepPointBuy'; ability: AbilityId; delta: number }
+  | { type: 'setManualScore'; ability: AbilityId; value: number | null }
+  | { type: 'toggle'; pick: 'feature' | 'weaponMastery'; id: string; group?: string };
+
+/** El creador: aplica [action] al borrador y devuelve el borrador nuevo y lo
+ *  que muestran los pasos. Sin acción, solo lee. */
+export function creationView(catalog: Catalog, draft: CreationDraftJson, action?: CreationAction): CreationView {
+  return JSON.parse(
+    engine().creation(catalogJson(catalog), JSON.stringify(draft), action ? JSON.stringify(action) : ''),
+  ) as CreationView;
+}
+
 export function rollDie(sides: number): number {
   return engine().rollDie(sides);
 }

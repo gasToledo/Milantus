@@ -197,6 +197,7 @@ String catalogLabel(String kind, String id) => switch (kind) {
       'weaponProperty' => weaponProperties[id]?.name ?? id,
       'weaponPropertyRule' => weaponProperties[id]?.description ?? '',
       'mastery' => weaponMasteryName(id),
+      'masteryRule' => weaponMasteries[id]?.description ?? '',
       'damageType' => DamageType.labelFor(id),
       'skill' => Skill.labelFor(id),
       'ability' =>

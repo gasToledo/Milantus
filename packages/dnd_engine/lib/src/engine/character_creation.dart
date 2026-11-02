@@ -40,6 +40,13 @@ enum ScoreMethod { standardArray, roll4d6, pointBuy, manual }
 const manualScoreMin = 1;
 const manualScoreMax = 30;
 
+/// Entre qué aptitudes mágicas elige un linaje que lanza conjuros (2024).
+const lineageAbilityOptions = [
+  Ability.intelligence,
+  Ability.wisdom,
+  Ability.charisma,
+];
+
 /// Las partes del personaje que el creador pide completar. No son los pasos
 /// de ningún asistente: Flutter junta conjuros y equipo en un paso y `/v2` los
 /// separa, y cada uno arma sus pasos con estas piezas.
@@ -164,11 +171,7 @@ class CreationDraft {
     final speciesSpellcastingAbility = _ability(
       json['speciesSpellcastingAbility'],
     );
-    if (const {
-      Ability.intelligence,
-      Ability.wisdom,
-      Ability.charisma,
-    }.contains(speciesSpellcastingAbility)) {
+    if (lineageAbilityOptions.contains(speciesSpellcastingAbility)) {
       draft.speciesSpellcastingAbility = speciesSpellcastingAbility;
     }
     // Se acepta solo si sigue siendo una opción de la especie restaurada: al
@@ -799,6 +802,9 @@ class CreationDraft {
       case 'setSpread':
         spreadPlusTwo = _ability(action['plusTwo']);
         spreadPlusOne = _ability(action['plusOne']);
+        // El +2 y el +1 van a características distintas: con las dos iguales
+        // el paso se daba por completo y el +1 se perdía sin avisar.
+        if (spreadPlusOne == spreadPlusTwo) spreadPlusOne = null;
       case 'applyScoreMethod':
         applyScoreMethod(
           _enumByName(ScoreMethod.values, action['method'], scoreMethod),
@@ -1104,6 +1110,16 @@ class CreationDraft {
   /// o un catálogo nuevo no toca este archivo.
   List<FeatureChoiceSlot> get featureChoiceSlots =>
       previewSheet.featureChoiceSlots;
+
+  /// Lo que la clase da a nivel 1 sin pedir nada: lo que abre una elección ya
+  /// tiene su propio cupo en el paso.
+  List<ClassFeature> get automaticClassFeatures => [
+        for (final f in klass?.featuresUpTo(1) ?? const <ClassFeature>[])
+          if (!f.effects.any(
+            (e) => e is FeatureChoiceEffect || e is WeaponMasterySlotsEffect,
+          ))
+            f,
+      ];
 
   /// Lo que se puede elegir en [slot]: las opciones cuyo prerrequisito se
   /// cumple, más las ya elegidas (soltarlas tiene que seguir siendo posible).
@@ -1768,6 +1784,7 @@ class CreationDraft {
         ],
         'sizes': draft.sizeOptions,
         'needsLineageAbility': draft.lineageUsesSpellcastingAbility,
+        'abilityOptions': abilities(lineageAbilityOptions),
       },
       'class': {
         'featureSlots': [
@@ -1782,6 +1799,10 @@ class CreationDraft {
                   {'id': f.id, 'name': f.name, 'description': f.description},
               ],
             },
+        ],
+        'features': [
+          for (final f in draft.automaticClassFeatures)
+            {'name': f.name, 'description': f.description},
         ],
         'weaponMasterySlots': draft.weaponMasterySlots,
         'weapons': [
@@ -1801,9 +1822,25 @@ class CreationDraft {
         },
       },
       'scores': {
+        'standardArray': standardArray,
+        'descriptions': {
+          for (final a in Ability.values) a.name: a.description,
+        },
         'suggested': {
           for (final e in draft.suggestedScores.entries) e.key.name: e.value,
         },
+        // Las columnas de la matriz: una por valor distinto (una tirada puede
+        // repetirlos), y por característica los que ya no tienen copia libre.
+        'values': draft.pool.toSet().toList()..sort((a, b) => b.compareTo(a)),
+        'taken': {
+          for (final a in Ability.values)
+            a.name: [
+              for (final v in draft.pool.toSet())
+                if (draft.freeCopiesOf(v, a) <= 0) v,
+            ],
+        },
+        'manualRange': [manualScoreMin, manualScoreMax],
+        'pointBudget': pointBuyBudget,
         'pointsRemaining': draft.pointsRemaining,
         'canRaise': abilities(Ability.values.where(draft.canRaisePointBuy)),
         'canLower': abilities(Ability.values.where(draft.canLowerPointBuy)),

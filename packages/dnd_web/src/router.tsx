@@ -94,6 +94,8 @@ export type Route =
   | { name: 'character'; id: string; tab: SheetTab | null }
   // El asistente de subida de nivel de la ficha propia.
   | { name: 'levelUp'; id: string }
+  // El creador de personajes.
+  | { name: 'creation' }
   | { name: 'unknown' };
 
 /** Adónde mandan los enlaces a lo que todavía vive solo en Flutter (crear,
@@ -190,6 +192,7 @@ export function matchRoute(pathname: string): Route {
       return { name: 'unknown' };
     }
   }
+  if (section === 'personajes' && id === 'nuevo' && tab === undefined) return { name: 'creation' };
   if (section === 'personajes' && id && tab === 'subir-nivel' && rest.length === 0) {
     try {
       return { name: 'levelUp', id: decodeURIComponent(id) };
@@ -260,6 +263,8 @@ export const codexHref = (category?: CodexCategory, entryId?: string): string =>
 
 export const characterHref = (id: string, tab: SheetTab = 'personaje'): string =>
   `${import.meta.env.BASE_URL}personajes/${encodeURIComponent(id)}/${tab}`;
+
+export const creationHref = (): string => `${import.meta.env.BASE_URL}personajes/nuevo`;
 
 export const levelUpHref = (id: string): string =>
   `${import.meta.env.BASE_URL}personajes/${encodeURIComponent(id)}/subir-nivel`;

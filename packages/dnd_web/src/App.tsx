@@ -6,6 +6,7 @@ import { setEngineLanguage } from './engine';
 import { LangProvider, useTexts } from './i18n/context';
 import { resolveLang, type Lang } from './i18n/texts';
 import { DashboardPage } from './dashboard/DashboardPage';
+import { CreationPage } from './creation/CreationWizard';
 import { RosterFooter, RosterPanel } from './dashboard/RosterPanel';
 import { DmPanel } from './dm/DmPanel';
 import { useRoute } from './router';
@@ -131,6 +132,8 @@ function Enabled({ account }: { account: Account }) {
     // ficha: React conserva la instancia entre las dos rutas.
     case 'levelUp':
       return <CharacterPage id={route.id} tab={null} levelUp />;
+    case 'creation':
+      return <CreationPage account={account} />;
     case 'codex':
       return <CodexPage category={route.category} entryId={route.entryId} />;
     case 'unknown':

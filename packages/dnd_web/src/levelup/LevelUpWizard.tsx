@@ -1,5 +1,4 @@
 import { useMemo, useState, type ReactNode } from 'react';
-import { Check } from 'lucide-react';
 import {
   computeSheet,
   levelUpView,
@@ -11,7 +10,7 @@ import {
   type LevelUpDraft,
   type LevelUpView,
 } from '../engine';
-import { codexEntries, fold, type CodexDetail } from '../codex/entries';
+import { codexEntries, type CodexDetail } from '../codex/entries';
 import { useLang, useTexts } from '../i18n/context';
 import type { Lang, Texts } from '../i18n/texts';
 import { characterHref, navigate } from '../router';
@@ -20,8 +19,8 @@ import { ABILITIES } from '../sheet/vocabulary';
 import type { SheetWriter } from '../sheet/writer';
 import { Button, ButtonLink } from '../ui/Button';
 import { cx } from '../ui/cx';
-import { Eyebrow } from '../ui/data';
 import { MarkdownText } from '../ui/MarkdownText';
+import { AfterCard, Block, DetailBody, matchesQuery, Option, Status, StepRail, Tag, WizardFooter } from '../ui/wizard';
 
 type StepId =
   | 'resumen'
@@ -429,39 +428,13 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
             {t.luProgress(className(draft.classId), view.newClassLevel - 1, view.newClassLevel)}
           </span>
         </div>
-        <nav aria-label={t.luStepsLabel}>
-          <ol className="flex flex-wrap gap-1.5">
-            {steps.map((s, i) => {
-              const done = i < index;
-              const cur = i === index;
-              return (
-                <li key={s}>
-                  <button
-                    type="button"
-                    aria-current={cur ? 'step' : undefined}
-                    disabled={!reachable(i)}
-                    onClick={() => setStepId(s)}
-                    className={cx(
-                      'flex items-center gap-2 rounded-[var(--radius-pill)] border py-1.5 pr-3 pl-1.5 text-[13px] disabled:cursor-default',
-                      cur ? 'border-gold bg-gold-soft font-medium text-gold' : 'border-hairline text-on-surface-variant',
-                    )}
-                  >
-                    <span
-                      aria-hidden="true"
-                      className={cx(
-                        'flex h-[22px] w-[22px] items-center justify-center rounded-full text-[12px] font-bold',
-                        cur ? 'bg-gold text-on-primary' : done ? 'bg-gold-soft text-gold' : 'border border-hairline bg-plaque',
-                      )}
-                    >
-                      {done ? <Check size={12} strokeWidth={3} /> : i + 1}
-                    </span>
-                    {t.luSteps[s]}
-                  </button>
-                </li>
-              );
-            })}
-          </ol>
-        </nav>
+        <StepRail
+          steps={steps.map((id) => ({ id, label: t.luSteps[id] }))}
+          index={index}
+          reachable={reachable}
+          onSelect={(id) => setStepId(id as StepId)}
+          label={t.luStepsLabel}
+        />
       </header>
 
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
@@ -472,41 +445,30 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
         </aside>
       </div>
 
-      {/* Una tarjeta más, flotando al pie: con fondo, filete y radio como las
-          de arriba, y despegada del borde. Una franja a sangre se leía como
-          parte de otra pantalla. En un teléfono el mensaje va arriba y los
-          dos botones se reparten el ancho. */}
-      <footer className="card sticky bottom-3 mt-auto flex flex-wrap items-center gap-x-4 gap-y-2.5 px-4 py-3">
-        {(pending ?? (current === 'revision' ? t.luConfirmHint : null)) && (
-          <span className="min-w-0 flex-[1_1_240px] text-[13px] text-on-surface-variant" role="status">
-            {pending ?? t.luConfirmHint}
-          </span>
+      <WizardFooter message={pending ?? (current === 'revision' ? t.luConfirmHint : null)}>
+        {index === 0 ? (
+          <ButtonLink tone="secondary" href={characterHref(character.id)} internal className="flex-1 sm:flex-none">
+            {t.cancel}
+          </ButtonLink>
+        ) : (
+          <Button tone="secondary" className="flex-1 sm:flex-none" onClick={() => setStepId(steps[index - 1]!)}>
+            {t.luBack}
+          </Button>
         )}
-        <span className="ml-auto flex w-full gap-2 sm:w-auto">
-          {index === 0 ? (
-            <ButtonLink tone="secondary" href={characterHref(character.id)} internal className="flex-1 sm:flex-none">
-              {t.cancel}
-            </ButtonLink>
-          ) : (
-            <Button tone="secondary" className="flex-1 sm:flex-none" onClick={() => setStepId(steps[index - 1]!)}>
-              {t.luBack}
-            </Button>
-          )}
-          {current === 'revision' ? (
-            <Button className="flex-[2] sm:flex-none" disabled={!view.complete} onClick={confirm}>
-              {t.luConfirm(view.newLevel)}
-            </Button>
-          ) : (
-            <Button
-              className="flex-[2] sm:flex-none"
-              disabled={pending !== null}
-              onClick={() => setStepId(steps[index + 1]!)}
-            >
-              {index === 0 ? t.luStart : t.luContinue}
-            </Button>
-          )}
-        </span>
-      </footer>
+        {current === 'revision' ? (
+          <Button className="flex-[2] sm:flex-none" disabled={!view.complete} onClick={confirm}>
+            {t.luConfirm(view.newLevel)}
+          </Button>
+        ) : (
+          <Button
+            className="flex-[2] sm:flex-none"
+            disabled={pending !== null}
+            onClick={() => setStepId(steps[index + 1]!)}
+          >
+            {index === 0 ? t.luStart : t.luContinue}
+          </Button>
+        )}
+      </WizardFooter>
     </div>
   );
 }
@@ -643,11 +605,7 @@ function AsiStep({
   // Sin tildes ni mayúsculas, como el Códice, y por palabras sueltas: «dos
   // armas» encuentra «Combatiente con Dos Armas» y «combatiente fuerza», su
   // variante de Fuerza.
-  const words = fold(featQuery).split(/\s+/).filter(Boolean);
-  const feats = view.featOptions.filter((f) => {
-    const name = fold(f.name);
-    return words.every((w) => name.includes(w));
-  });
+  const feats = view.featOptions.filter((f) => matchesQuery(featQuery, f.name));
 
   return (
     <>
@@ -799,36 +757,7 @@ function DetailPanel({
             {homebrew && <Tag>{t.homebrewTag}</Tag>}
           </div>
           {meta && <p className="text-[12.5px] text-crimson">{meta}</p>}
-          {detail && (
-            <div className="flex flex-col gap-3 border-t border-hairline pt-3 text-[13.5px]">
-              {detail.facts.flat().length > 0 && (
-                <dl className="flex flex-col gap-1 text-[12.5px]">
-                  {detail.facts.flat().map((f) => (
-                    <div key={f.label} className="flex gap-2">
-                      <dt className="text-text-muted">{f.label}</dt>
-                      <dd className="text-on-surface">{f.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              )}
-              {detail.prose && <p className="leading-[1.55] whitespace-pre-line">{detail.prose}</p>}
-              {detail.sections.map((sec) => (
-                <section key={sec.title}>
-                  <Eyebrow className="mb-1.5">{sec.title}</Eyebrow>
-                  <ul className="flex flex-col gap-2">
-                    {sec.traits.map((tr, i) => (
-                      <li key={`${tr.name}-${i}`}>
-                        <p className="font-medium">{tr.name}</p>
-                        {tr.description && (
-                          <p className="mt-0.5 leading-[1.5] whitespace-pre-line text-on-surface-variant">{tr.description}</p>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              ))}
-            </div>
-          )}
+          {detail && <DetailBody detail={detail} />}
           {body && (
             <div className="border-t border-hairline pt-3 text-[13.5px]">
               <MarkdownText text={body} />
@@ -861,29 +790,7 @@ function AfterPanel({ before, after, t }: { before: ComputedSheet; after: Comput
         ]
       : []),
   ];
-  return (
-    <section className="card p-4" aria-labelledby="lu-after" data-field="level-up-after">
-      <Eyebrow className="mb-2">
-        <span id="lu-after">{t.luAfterHeading}</span>
-      </Eyebrow>
-      <dl className="plaque divide-y divide-hairline px-3.5 py-0.5 text-[13px]">
-        {rows.map((r) => (
-          <div key={r.label} className="flex items-baseline justify-between gap-3 py-2">
-            <dt>{r.label}</dt>
-            <dd className="num font-bold tabular-nums">
-              {r.from === r.to ? (
-                r.to
-              ) : (
-                <>
-                  {r.from} → <span className="text-gold">{r.to}</span>
-                </>
-              )}
-            </dd>
-          </div>
-        ))}
-      </dl>
-    </section>
-  );
+  return <AfterCard rows={rows} heading={t.luAfterHeading} field="level-up-after" />;
 }
 
 /** Un cupo de elección de rasgo (`_FeatureChoiceGroup` de Flutter). Lo que
@@ -971,8 +878,7 @@ function SpellPickBlock({
   onFocus: (id: string) => void;
 }) {
   const [query, setQuery] = useState('');
-  const words = fold(query).split(/\s+/).filter(Boolean);
-  const visible = options.filter((o) => words.every((w) => fold(o.name).includes(w)));
+  const visible = options.filter((o) => matchesQuery(query, o.name));
   const full = cap !== null && chosen.length >= cap;
   return (
     <Block
@@ -1010,98 +916,6 @@ function SpellPickBlock({
         })}
       </div>
     </Block>
-  );
-}
-
-/** Un bloque de elección: título, un solo contador y las opciones. */
-function Block({ title, status, children }: { title: string; status?: ReactNode; children: ReactNode }) {
-  return (
-    <section className="card flex flex-col gap-3 p-4">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="font-display text-[16px] text-on-surface">{title}</h2>
-        {status}
-      </div>
-      {children}
-    </section>
-  );
-}
-
-/** Los tres estados de un bloque, y ningún otro: falta (con la cuenta si la
- *  hay), listo y automático. */
-function Status({ ready = false, auto = false, count, t }: { ready?: boolean; auto?: boolean; count?: [number, number]; t: Texts }) {
-  const pill = 'inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] border border-hairline px-[9px] py-[2px] text-[11px] whitespace-nowrap';
-  if (auto) return <span className={cx(pill, 'bg-plaque text-text-muted')}>{t.luAuto}</span>;
-  if (ready)
-    return (
-      <span className={cx(pill, 'bg-gold-soft text-gold')}>
-        <Check size={11} strokeWidth={3} aria-hidden="true" />
-        {t.luReady}
-      </span>
-    );
-  return (
-    <span className={cx(pill, 'bg-plaque text-on-surface')}>
-      <span aria-hidden="true" className="h-[7px] w-[7px] rounded-full border-[1.5px] border-current" />
-      {count ? t.luCount(count[0], count[1]) : t.luPending}
-    </span>
-  );
-}
-
-/** La única forma de elegir: círculo si es una, cuadrado si son varias. */
-function Option({
-  id,
-  selected,
-  multi = false,
-  disabled = false,
-  title,
-  detail,
-  trailing,
-  onClick,
-}: {
-  /** El id de lo que se elige, en `data-option` (lo leen las pruebas). */
-  id?: string;
-  selected: boolean;
-  multi?: boolean;
-  disabled?: boolean;
-  title: string;
-  detail?: string;
-  trailing?: ReactNode;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      role={multi ? 'checkbox' : 'radio'}
-      aria-checked={selected}
-      data-option={id}
-      disabled={disabled}
-      onClick={onClick}
-      className={cx(
-        'flex min-h-12 w-full items-center gap-3 rounded-[var(--radius-card)] border px-3.5 py-2.5 text-left text-on-surface disabled:cursor-default',
-        selected ? 'border-gold bg-gold-soft' : 'border-hairline bg-plaque',
-      )}
-    >
-      <span
-        aria-hidden="true"
-        className={cx(
-          'flex h-[18px] w-[18px] shrink-0 items-center justify-center border-[1.5px]',
-          multi ? 'rounded-[5px]' : 'rounded-full',
-          selected ? (multi ? 'border-gold bg-gold' : 'border-gold') : 'border-text-muted',
-          disabled && 'opacity-45',
-        )}
-      >
-        {selected &&
-          (multi ? (
-            <Check size={12} strokeWidth={3.5} className="text-on-primary" />
-          ) : (
-            <span className="h-2 w-2 rounded-full bg-gold" />
-          ))}
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className={cx('block font-medium', disabled && 'opacity-45')}>{title}</span>
-        {detail && <span className="mt-0.5 block text-[12.5px] text-on-surface-variant">{detail}</span>}
-      </span>
-      {trailing}
-    </button>
   );
 }
 
@@ -1187,13 +1001,5 @@ function ReviewRow({ label, value, onChange, t }: { label: string; value: string
         {t.luChange}
       </Button>
     </div>
-  );
-}
-
-function Tag({ children }: { children: ReactNode }) {
-  return (
-    <span className="shrink-0 rounded-[var(--radius-pill)] border border-hairline px-1.5 text-[10px] text-on-surface-variant">
-      {children}
-    </span>
   );
 }

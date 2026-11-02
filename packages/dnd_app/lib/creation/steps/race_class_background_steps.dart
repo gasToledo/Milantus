@@ -147,11 +147,7 @@ class _RaceStep extends StatelessWidget {
                           _AbilityDropdown(
                             label: context.l10n.speciesSpellAbility,
                             value: draft.speciesSpellcastingAbility,
-                            options: const [
-                              Ability.intelligence,
-                              Ability.wisdom,
-                              Ability.charisma,
-                            ],
+                            options: lineageAbilityOptions,
                             onChanged: (ability) {
                               draft.speciesSpellcastingAbility = ability;
                               onChanged();

@@ -57,13 +57,37 @@ una regla: reciben el número ya resuelto por `computeSheet`.
 | --- | --- | --- |
 | `Shell` | El marco: panel de 236 px fijo desde 900 px, barra con cajón debajo; el contenido ocupa todo el ancho (sin máximo). `panel` y `footer` son de cada pantalla | Toda pantalla. Sin `panel` ni `footer`, solo la marca (sin sesión, no disponible) |
 | `NavGroup`, `NavItem` | Grupo con nombre (`nav`) e ítem del panel: ícono, rótulo, activo en oro sobre `goldSoft` con `aria-current` | `internal` navega sin recargar; `external` avisa al lector que abre Flutter y muestra el ícono de enlace externo; `count` lleva la cifra tabular a la derecha (oro si está activo), `muted` atenúa la categoría sin coincidencias en el Códice y `onSelect` en vez de `href` lo vuelve un botón para una acción de la pantalla (Imprimir) |
-| `SidebarBack` | El «volver» de una pantalla de adentro, con la forma del interruptor de modo | Ficha |
+| `SidebarBack` | El «volver» de una pantalla de adentro, con la forma del interruptor de modo. `onClick` con `preventDefault` frena la salida para confirmar | Ficha, creador |
 | `ModeSwitch` | «Jugador / DM»: el modo actual es un `span` con `aria-current` y el otro un enlace interno (`mode`, `playerHref`, `dmHref`) | Panel de cada modo |
 | `NavCollapsible` (`ui/disclosure.tsx`) | Grupo del panel que se pliega: el rótulo es el botón | Campañas terminadas del Modo DM |
 | `ThemeMenu`, `VersionLabel` | Selector de tema y versión, al pie del panel | Los dos pies |
 | `Card` | Tarjeta de sección (`sheetCard`): ícono dorado, título Georgia 16, `trailing`; `collapsible` la pliega | Toda sección de la ficha. `id` único por pantalla |
 | `SectionRule` | Filete con rombo dorado | Separar bloques dentro de una tarjeta |
 | `Eyebrow` | Rótulo de sección en mayúsculas espaciadas | — |
+
+### Asistentes (`src/ui/wizard.tsx`)
+
+El circuito de la subida de nivel y el creador, tal como se aprobó en los
+lienzos: **una sola forma de elegir y un estado por bloque**. Antes de sumar
+un control a un asistente, buscá acá.
+
+| Componente | Qué hace | Cuándo |
+| --- | --- | --- |
+| `Option` | La opción: círculo si se elige una, cuadrado (`multi`) si son varias. Apagada, con el motivo en `detail`, nunca escondida. `id` va en `data-option` | Toda elección de un asistente |
+| `Block` | Tarjeta de un grupo de opciones: título y un solo `status` | Cada grupo |
+| `FoldedBlock` | Un bloque resuelto, plegado: lo elegido y «Cambiar» | Cuando una lista larga empujaría hacia abajo lo que falta |
+| `Status` | Los tres estados, y ningún otro: falta (`count` para «n de m»), `ready` y `auto` | En `Block` y `FoldedBlock` |
+| `SearchableList` | Buscador sin tildes y por palabras (`matchesQuery`), cuenta y scroll propio | Listas largas: especies, trasfondos, armas |
+| `StepRail` | La tira de pasos; `progress` la cambia en un teléfono por «Paso n de m» y una barra | Arriba de cada asistente |
+| `WizardFooter` | El pie: lo que falta y Atrás/Continuar, como tarjeta flotante; `above` a todo el ancho | Abajo de cada asistente |
+| `DetailBody`, `TraitList` | La ficha del Códice (`CodexDetail`) y una lista de rasgos, para el panel derecho | Explicar lo último que se tocó |
+| `AfterCard`, `AfterList` | «Así queda»: cada fila con el valor solo o «de → a» (`from`), `gold` para lo que cambió y `note` para una aclaración apagada | Panel derecho; `AfterList` suelta en el pie del teléfono |
+
+El creador (`src/creation/CreationWizard.tsx`) suma dos piezas propias, que por
+ahora solo usa él: la fila de clases (`ClassCard`, scroll horizontal) y la
+matriz de características (`ScoreRow`: una fila es una elección de una, y el
+valor que ya tiene otra va en gris y tocarlo las intercambia; en compra de
+puntos es −/+ y a mano, un campo).
 
 ### Datos de personaje (`src/ui/data.tsx`)
 
