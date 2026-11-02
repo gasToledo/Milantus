@@ -238,7 +238,7 @@ export interface ComputedSheet {
   spellListAdditionIds: string[];
   featureChoiceSlots: JsonObject[];
   itemChoiceSlots: JsonObject[];
-  targetChoiceSlots: JsonObject[];
+  targetChoiceSlots: TargetChoiceSlot[];
   proficiencyChoiceSlots: JsonObject[];
   expertiseChoiceSlots: JsonObject[];
   languages: string[];
@@ -280,6 +280,18 @@ export interface Catalog {
   creatures: JsonObject[];
 }
 
+/** Un cupo de elección de arma (`TargetChoiceSlot` del motor): el arma de pacto. */
+export interface TargetChoiceSlot {
+  groupId: string;
+  name: string;
+  count: number;
+  /** Si lo elegido se puede cambiar o soltar. */
+  replaceable: boolean;
+  eligibleEntryIds: string[];
+  creatableWeaponIds: string[];
+  chosenEntryIds: string[];
+}
+
 /** Una entrada de la mochila resuelta por el motor (`inventory` en
  *  `js/entrypoint.dart`). */
 export interface InventoryLine {
@@ -314,6 +326,8 @@ export interface InventoryLine {
   maxCharges: number | null;
   note: string;
   homebrew: boolean;
+  /** La creó un rasgo (el arma de pacto): al cambiarla sale de la mochila. */
+  createdByFeature: boolean;
 }
 
 /** El JSON de `Character` (ver `Character.toJson` en el motor). */

@@ -27,6 +27,7 @@ import { cx } from '../ui/cx';
 import { Eyebrow, Pips, SpendRecoverButtons, ThinBar } from '../ui/data';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Tooltip } from '../ui/primitives';
 import { AppEmptyState } from '../ui/status';
+import { EffectTargetDialog } from './EffectTargetDialog';
 import { coinLabels, ItemCatalogDialog, TradeDialog, type CatalogRow, type Trade } from './ItemCatalog';
 import type { SheetModel } from './model';
 import type { SheetWriter } from './writer';
@@ -104,6 +105,8 @@ export function InventoryTab({ model }: { model: SheetModel }) {
   const { character, sheet, catalog, write } = model;
   const [ask, setAsk] = useState<Ask | null>(null);
   const [catalogOpen, setCatalogOpen] = useState(false);
+  /** El cupo de arma (pacto) cuyo diálogo está abierto. */
+  const [targetGroup, setTargetGroup] = useState<string | null>(null);
   const [buying, setBuying] = useState<CatalogRow | null>(null);
   const coins = character.coins ?? {};
 
@@ -234,6 +237,12 @@ export function InventoryTab({ model }: { model: SheetModel }) {
               {t.catalogAddTitle}
             </Button>
           )}
+          {write &&
+            sheet.targetChoiceSlots.map((slot) => (
+              <Button key={slot.groupId} tone="soft" data-action={`target-${slot.groupId}`} onClick={() => setTargetGroup(slot.groupId)}>
+                {t.invTargetButton(slot.name, slot.chosenEntryIds.length, slot.count)}
+              </Button>
+            ))}
           {lines.length > 0 && (
             <>
               <div role="search" className="relative min-w-[min(200px,100%)] flex-[1_1_200px] @xl:max-w-[260px]">
@@ -346,6 +355,7 @@ export function InventoryTab({ model }: { model: SheetModel }) {
                     t={t}
                     format={number.format}
                     write={write}
+                    slotLabels={sheet.targetChoiceSlots.filter((s) => s.chosenEntryIds.includes(line.entryId)).map((s) => s.name)}
                     onAsk={(kind) => setAsk({ kind, line })}
                   />
                 ))}
@@ -366,6 +376,14 @@ export function InventoryTab({ model }: { model: SheetModel }) {
           coins={coins}
           onConfirm={(trade) => sell(ask.line, trade)}
           onClose={() => setAsk(null)}
+        />
+      )}
+      {targetGroup && write && (
+        <EffectTargetDialog
+          model={model}
+          write={write}
+          slot={sheet.targetChoiceSlots.find((s) => s.groupId === targetGroup)!}
+          onClose={() => setTargetGroup(null)}
         />
       )}
       {catalogOpen && write && (
@@ -481,6 +499,7 @@ function PackRow({
   t,
   format,
   write,
+  slotLabels,
   onAsk,
 }: {
   line: InventoryLine;
@@ -488,12 +507,15 @@ function PackRow({
   t: Texts;
   format: (n: number) => string;
   write: SheetWriter | undefined;
+  /** Los cupos (arma de pacto) a los que esta línea está vinculada. */
+  slotLabels: string[];
   onAsk: (kind: Ask['kind']) => void;
 }) {
   const Icon = GROUP_ICON[group];
   const max = line.maxCharges;
   const charges = max === null ? null : (line.charges ?? max);
   const notes = [
+    ...slotLabels,
     line.attuned ? t.attunedNote : null,
     max !== null && charges !== null ? t.chargesNote(charges, max) : null,
     line.note || null,

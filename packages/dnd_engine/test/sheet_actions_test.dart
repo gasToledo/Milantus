@@ -393,4 +393,89 @@ void main() {
       throwsFormatException,
     );
   });
+
+  group('arma de pacto', () {
+    Character brujo({List<InventoryEntry> inventory = const []}) => Character(
+          id: 'brujo',
+          name: 'Brujo',
+          raceId: 'human',
+          classId: 'warlock',
+          backgroundId: 'sage',
+          level: 1,
+          assignedScores: _scores,
+          featureChoices: const {
+            'warlock-invocation': ['pact-of-the-blade'],
+          },
+          hpPerLevel: const [8],
+          inventory: inventory,
+        );
+    TargetChoiceSlot slotOf(Character c) =>
+        CharacterCompiler(repo).compile(c).targetChoiceSlots.single;
+
+    test('crear vincula el arma del catálogo y cambiarla se lleva la anterior',
+        () {
+      final slot = slotOf(brujo());
+      final first = slot.creatableWeaponIds.first;
+      final second = slot.creatableWeaponIds.last;
+
+      final a = act(brujo(), {
+        'type': 'createEffectTarget',
+        'group': slot.groupId,
+        'weapon': first
+      });
+      final linked = slotOf(a.character);
+      expect(linked.chosenEntryIds, hasLength(1));
+      expect(
+        a.character.inventory.single.itemId,
+        repo.weapon(first)!.id,
+      );
+
+      final b = act(a.character, {
+        'type': 'createEffectTarget',
+        'group': slot.groupId,
+        'weapon': second
+      });
+      expect(b.character.inventory, hasLength(1));
+      expect(b.character.inventory.single.itemId, repo.weapon(second)!.id);
+
+      final cleared = act(
+          b.character, {'type': 'clearEffectTargets', 'group': slot.groupId});
+      expect(cleared.character.inventory, isEmpty);
+      expect(slotOf(cleared.character).chosenEntryIds, isEmpty);
+    });
+
+    test('vincular un ejemplar de la mochila no lo crea ni lo borra', () {
+      final c = act(brujo(), {
+        'type': 'createEffectTarget',
+        'group': 'pact-weapon',
+        'weapon': slotOf(brujo()).creatableWeaponIds.first,
+      }).character;
+      final entry = c.inventory.single.entryId;
+      final r = act(c,
+          {'type': 'setEffectTarget', 'group': 'pact-weapon', 'entry': entry});
+      expect(r.character.toJson(), c.toJson());
+    });
+
+    test('lo no elegible, un grupo ajeno o nada que limpiar dejan la ficha',
+        () {
+      final c = brujo(inventory: const [
+        InventoryEntry(entryId: 'mundano', itemId: 'rapier'),
+      ]);
+      final intacta = c.toJson();
+      for (final action in [
+        {'type': 'setEffectTarget', 'group': 'pact-weapon', 'entry': 'mundano'},
+        {'type': 'setEffectTarget', 'group': 'pact-weapon', 'entry': 'nope'},
+        {
+          'type': 'createEffectTarget',
+          'group': 'pact-weapon',
+          'weapon': 'no-existe'
+        },
+        {'type': 'createEffectTarget', 'group': 'otro', 'weapon': 'rapier'},
+        {'type': 'clearEffectTargets', 'group': 'pact-weapon'},
+        {'type': 'clearEffectTargets', 'group': 'otro'},
+      ]) {
+        expect(act(c, action).character.toJson(), intacta, reason: '$action');
+      }
+    });
+  });
 }

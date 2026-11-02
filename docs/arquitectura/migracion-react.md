@@ -442,6 +442,14 @@ repiten acá.
   (elegir no guarda) por la acción `setInnateCantrip`, que además comprueba
   que la opción sea válida. Ninguna de las dos acciones toca el combate. No se
   valida *cuándo* se puede preparar (descanso, grimorio): como Flutter.
+  Desde 5e3, en **Inventario**: un botón por cupo de arma de un rasgo
+  (`targetChoiceSlots`, el arma de pacto de Pacto del Filo) abre
+  `sheet/EffectTargetDialog.tsx`, que vincula un ejemplar de la mochila o crea
+  el arma con «Vincular» (elegir no guarda) por las acciones
+  `setEffectTarget` y `createEffectTarget`; «Limpiar vínculo» es
+  `clearEffectTargets`. Las tres dejan la ficha intacta si el cupo no existe,
+  si la opción no es elegible o si el cupo está lleno y no es reemplazable. Lo
+  que el rasgo creó sale de la mochila al cambiarlo (`createdByFeature`).
   Todavía **no** aplica la Forma Salvaje (5e4). La banda táctica (PG, Iniciativa,
   Velocidad, Competencia; sin Armadura, que se lee en Defensa) solo va en
   Personaje y Combate, como en Flutter; el modo en curso lo dice su propia franja (con lo que suma), sin cartel aparte. Sin escritura, la ficha ajena

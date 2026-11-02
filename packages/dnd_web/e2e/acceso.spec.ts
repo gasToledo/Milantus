@@ -46,5 +46,9 @@ test('la ficha de otra cuenta no tiene controles para escribir', async ({ contex
   await expect(page.getByRole('button', { name: /^(Activar|Terminar)$/ })).toHaveCount(0);
   // Ni preparar conjuros ni cambiar el truco innato.
   await expect(page.locator('[data-action="edit-spells"], [data-action="swap-innate"]')).toHaveCount(0);
+  // Ni vincular el arma de pacto ni elegir planos y réplicas, en Inventario.
+  await page.goto(`/v2/dm/campanas/marca-del-cuervo/mesa/${sagan.memberId}/inventario`);
+  await expect(page.locator('[data-card="pack"]')).toBeVisible();
+  await expect(page.locator('[data-action^="target-"], [data-action="magic-plans"]')).toHaveCount(0);
   expect(escrituras).toEqual([]);
 });

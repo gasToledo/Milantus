@@ -102,6 +102,37 @@ final _casos = <String, Character>{
     hpPerLevel: List.filled(8, 5),
     wildShapeForms: const ['wolf'],
   ),
+  // Arma de pacto: dos ejemplares que creó el rasgo y uno vinculado, para que
+  // vincular el otro, crear y soltar tengan algo que desplazar.
+  'brujo-filo': Character(
+    id: 'p-blade',
+    name: 'Brujo del Filo',
+    raceId: 'human',
+    classId: 'warlock',
+    backgroundId: 'sage',
+    level: 1,
+    assignedScores: _scores,
+    featureChoices: const {
+      'warlock-invocation': ['pact-of-the-blade'],
+    },
+    hpPerLevel: const [8],
+    inventory: const [
+      InventoryEntry(
+        entryId: 'estoque',
+        itemId: 'rapier',
+        origin: 'effect-target:pact-weapon',
+        equipped: true,
+      ),
+      InventoryEntry(
+        entryId: 'daga',
+        itemId: 'dagger',
+        origin: 'effect-target:pact-weapon',
+      ),
+    ],
+    effectTargets: const {
+      'pact-weapon': ['estoque'],
+    },
+  ),
   // Estado activable (Furia) con arma a dos manos y desventaja de lanzar.
   'barbaro': Character(
     id: 'p-barbarian',
@@ -184,6 +215,18 @@ final _acciones = <String, (String, Map<String, dynamic>)>{
       'cantrips': ['fire-bolt'],
       'spells': ['shield'],
     },
+  ),
+  'accion-pacto-vincular': (
+    'brujo-filo',
+    {'type': 'setEffectTarget', 'group': 'pact-weapon', 'entry': 'daga'},
+  ),
+  'accion-pacto-crear': (
+    'brujo-filo',
+    {'type': 'createEffectTarget', 'group': 'pact-weapon', 'weapon': 'mace'},
+  ),
+  'accion-pacto-soltar': (
+    'brujo-filo',
+    {'type': 'clearEffectTargets', 'group': 'pact-weapon'},
   ),
   'accion-truco-innato': (
     'altoelfo',

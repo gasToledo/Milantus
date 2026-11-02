@@ -329,6 +329,32 @@ Future<void> main() async {
       combat: CombatState(currentHp: 17),
     ),
   );
+  // Un brujo con Pacto del Filo y sin arma vinculada: su cupo de arma de
+  // pacto es el que vincula la prueba de escritura (5e3).
+  await characters.create(
+    writerUserId,
+    Character(
+      id: 'brujo-de-humo',
+      name: 'Brujo de Humo',
+      raceId: 'human',
+      classId: 'warlock',
+      backgroundId: 'sage',
+      level: 1,
+      assignedScores: const {
+        Ability.strength: 8,
+        Ability.dexterity: 14,
+        Ability.constitution: 14,
+        Ability.intelligence: 10,
+        Ability.wisdom: 10,
+        Ability.charisma: 18,
+      },
+      featureChoices: const {
+        'warlock-invocation': ['pact-of-the-blade'],
+      },
+      hpPerLevel: const [8],
+      combat: CombatState(currentHp: 8),
+    ),
+  );
   final settings = InMemorySettingsRepository();
   await settings.save(smokeUserId, {
     'sortMode': 'level',

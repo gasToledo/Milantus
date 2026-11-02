@@ -483,3 +483,31 @@ test('cambiar el truco innato se confirma con «Cambiar» y guarda lo del motor'
   expect(await ilse(request, ELFO)).toEqual(esperado);
   await expect(page.getByText(`Truco cambiado a ${otro.name}.`, { exact: true })).toBeVisible();
 });
+
+test('vincular el arma de pacto la crea con lo del motor y se relee al recargar', async ({ page, request }) => {
+  const BRUJO = 'brujo-de-humo';
+  const antes = await ilse(request, BRUJO);
+  const cupo = computeSheet(antes, catalogo()).targetChoiceSlots[0]!;
+  const arma = cupo.creatableWeaponIds[0]!;
+  const esperado = segunMotor(antes, { type: 'createEffectTarget', group: cupo.groupId, weapon: arma });
+  const escrituras = vigilarEscrituras(page);
+
+  await page.goto(`/v2/personajes/${BRUJO}/inventario`);
+  const boton = page.locator(`[data-action="target-${cupo.groupId}"]`);
+  await expect(boton).toContainText('(0/1)');
+  await boton.click();
+  const dialogo = page.getByRole('dialog');
+  const vincular = dialogo.getByRole('button', { name: 'Vincular', exact: true });
+  await expect(vincular).toBeDisabled();
+  await dialogo.locator(`[data-option="weapon:${arma}"]`).click();
+  // Elegir no guarda ni cierra: lo hace «Vincular».
+  await expect(vincular).toBeEnabled();
+  expect(escrituras).toEqual([]);
+  const enviado = await proximoGuardado(page, () => vincular.click(), BRUJO);
+  expect(enviado).toEqual(esperado);
+  expect(await ilse(request, BRUJO)).toEqual(esperado);
+
+  await page.reload();
+  await expect(page.locator(`[data-action="target-${cupo.groupId}"]`)).toContainText('(1/1)');
+});
+

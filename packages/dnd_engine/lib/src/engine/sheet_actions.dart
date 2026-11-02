@@ -85,6 +85,13 @@ class SheetActions {
   ///   un `spell` fuera de [LevelUp.innateCantripOptions], no toca la ficha.
   ///   Ninguna de las dos toca el combate: los espacios y la concentración
   ///   siguen igual, y los usos del truco se indexan por el conjuro original.
+  /// - `setEffectTarget` con `group` y `entry`: vincula un ejemplar de la
+  ///   mochila al cupo (el arma de pacto). `createEffectTarget` con `group` y
+  ///   `weapon`: crea el arma del catálogo y la vincula. `clearEffectTargets`
+  ///   con `group`: suelta el vínculo y se lleva lo que creó el rasgo. Las tres
+  ///   dejan la ficha como estaba si el cupo no existe, si la opción no es
+  ///   elegible, si el cupo está lleno y no es reemplazable, o (la tercera)
+  ///   si no hay nada que limpiar.
   ///
   /// Una acción desconocida lanza [FormatException]: un cliente desfasado no
   /// tiene que guardar una ficha que el motor no tocó creyendo que sí.
@@ -341,6 +348,40 @@ class SheetActions {
             LevelUp.innateCantripOptions(repo, innate)
                 .any((o) => o.id == spell)) {
           c = c.withInnateCantrip(granted, spell);
+        }
+      case 'setEffectTarget' || 'createEffectTarget' || 'clearEffectTargets':
+        final group = action['group'] as String;
+        final slot = sheet.targetChoiceSlots
+            .where((s) => s.groupId == group)
+            .firstOrNull;
+        if (slot == null) break;
+        final full = slot.chosenEntryIds.length >= slot.count;
+        if (action['type'] == 'clearEffectTargets') {
+          if (slot.replaceable && slot.chosenEntryIds.isNotEmpty) {
+            c = InventoryOps.clearEffectTargets(c, group);
+          }
+          break;
+        }
+        // Un cupo lleno y fijo no admite otra elección: sin esto el motor
+        // desplazaría la anterior aunque la regla diga que no se cambia.
+        if (full && !slot.replaceable) break;
+        if (action['type'] == 'setEffectTarget') {
+          final entry = action['entry'] as String;
+          if (slot.eligibleEntryIds.contains(entry)) {
+            c = InventoryOps.setEffectTarget(c, group, entry,
+                count: slot.count);
+          }
+        } else {
+          final weapon = action['weapon'] as String;
+          if (slot.creatableWeaponIds.contains(weapon)) {
+            c = InventoryOps.createEffectTarget(
+              c,
+              group,
+              weapon,
+              repo,
+              count: slot.count,
+            );
+          }
         }
       default:
         throw FormatException('Acción de ficha desconocida: ${action['type']}');

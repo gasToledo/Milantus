@@ -665,7 +665,10 @@ export type SheetAction =
   | { type: 'sell'; entry: string; quantity: number; unitPriceCp: number; at: string }
   | { type: 'levelUp'; draft: LevelUpDraft }
   | { type: 'setClassSpells'; classId: string; cantrips: string[]; spells: string[] }
-  | { type: 'setInnateCantrip'; granted: string; spell: string };
+  | { type: 'setInnateCantrip'; granted: string; spell: string }
+  | { type: 'setEffectTarget'; group: string; entry: string }
+  | { type: 'createEffectTarget'; group: string; weapon: string }
+  | { type: 'clearEffectTargets'; group: string };
 
 /** Lo que cuenta el motor de una acción, para el aviso. Cada campo existe
  *  solo en la acción que lo da (ver `SheetActions.apply`). */

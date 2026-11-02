@@ -176,6 +176,8 @@ Map<String, dynamic> _inventoryLine(
     'maxCharges': item?.maxCharges,
     'note': e.note,
     'homebrew': source == ContentSource.homebrew,
+    // Lo creó un rasgo (el arma de pacto): al cambiarla sale de la mochila.
+    'createdByFeature': e.origin?.startsWith('effect-target:') == true,
   };
 }
 
