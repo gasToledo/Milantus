@@ -63,6 +63,7 @@ import {
   StepRail,
   Tag,
   TraitList,
+  WIZARD_ASIDE,
   WizardFooter,
   type AfterRow,
 } from '../ui/wizard';
@@ -236,8 +237,12 @@ function CreationWizard({ catalog, onExit, onTouched }: { catalog: Catalog; onEx
           {stepId === 'conjuros' && <SpellsStep {...props} />}
           {stepId === 'equipo' && <EquipmentStep {...props} />}
         </div>
-        <aside className="flex min-w-0 flex-col gap-4">
-          <DetailPanel focus={focus} view={view} catalog={catalog} lang={lang} t={t} />
+        <aside className={WIZARD_ASIDE}>
+          {/* En un teléfono cada conjuro se lee en su diálogo: acá abajo quedaba
+              lejos de la lista. */}
+          <div className={cx('flex flex-col', stepId === 'conjuros' && 'hidden lg:flex')}>
+            <DetailPanel focus={focus} view={view} catalog={catalog} lang={lang} t={t} />
+          </div>
           {rows.length > 0 && <AfterCard rows={rows} heading={t.luAfterHeading} field="creation-after" className="hidden lg:block" />}
         </aside>
       </div>

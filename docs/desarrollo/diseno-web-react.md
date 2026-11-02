@@ -77,6 +77,7 @@ un control a un asistente, buscá acá.
 | `Block` | Tarjeta de un grupo de opciones: título y un solo `status` | Cada grupo |
 | `Status` | Los tres estados, y ningún otro: falta (`count` para «n de m»), `ready` y `auto` | En `Block` |
 | `SpellPickBlock` | Un cupo de conjuros: buscador, scroll propio y `cap` (null para quien conoce en vez de preparar) | Conjuros de la subida y del creador |
+| `WIZARD_ASIDE` | Las clases de la columna derecha: sigue a la vista al bajar y, si no entra, se desplaza sola | Panel derecho de cada asistente |
 | `SearchableList` | Buscador sin tildes y por palabras (`matchesQuery`), cuenta y scroll propio | Listas largas: especies, trasfondos, armas |
 | `StepRail` | La tira de pasos; `progress` la cambia en un teléfono por «Paso n de m» y una barra | Arriba de cada asistente |
 | `WizardFooter` | El pie: lo que falta y Atrás/Continuar, como tarjeta flotante; `above` a todo el ancho | Abajo de cada asistente |
@@ -100,7 +101,8 @@ matriz de características (`ScoreMatrix`: una columna por dado, así dos 14 son
 dos columnas; una fila es una elección de una; la cabecera dice qué queda libre
 y quién tiene cada dado; tocar uno ocupado los intercambia y el propio lo suelta;
 mide su contenedor y debajo de 540 px apila cada característica en dos líneas).
-En compra de puntos y a mano no hay dados: es `ScoreRow`, con −/+ o un campo. Sus pasos de elecciones viven en
+En compra de puntos y a mano no hay dados: es `ScoreRow`, con −/+ o un campo. Conjuros muestra un cupo a la vez, en pestañas con su estado; en un teléfono cada
+conjuro abre su detalle en un diálogo. Sus pasos de elecciones viven en
 `src/creation/ChoiceSteps.tsx`; el catálogo de compras reusa `catalogRows` y
 `FamilyFilter` de `src/sheet/ItemCatalog.tsx`, sin el diálogo de pago.
 

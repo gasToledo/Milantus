@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Minus, Plus, Trash2 } from 'lucide-react';
+import { Info, Minus, Plus, Trash2 } from 'lucide-react';
 import { nameOf } from '../api/catalog';
 import { codexEntries } from '../codex/entries';
 import {
@@ -8,13 +8,16 @@ import {
   type AbilityId,
   type Catalog,
   type CreationAction,
+  type CreationSpellRow,
   type CreationView,
 } from '../engine';
 import type { Lang, Texts } from '../i18n/texts';
 import { signed } from '../sheet/format';
 import { catalogRows, coinLabels, FamilyFilter, type CatalogRow, type Family } from '../sheet/ItemCatalog';
+import { AppDialog } from '../ui/AppDialog';
 import { Button } from '../ui/Button';
-import { Block, Option, SearchableList, SpellPickBlock, Status } from '../ui/wizard';
+import { cx } from '../ui/cx';
+import { Block, DetailBody, Option, SearchableList, Status } from '../ui/wizard';
 
 /** Lo que explica el panel de la derecha: lo último que se tocó. */
 export type Focus = {
@@ -201,61 +204,181 @@ export function ProficienciesStep({ t, lang, catalog, view, act, setFocus }: Ste
   );
 }
 
-/** Conjuros: primero los que da un rasgo o una dote, que quedan preparados y
- *  salen del pozo de abajo; preguntarlo después haría preparar uno que se está
- *  por recibir gratis. */
-export function SpellsStep({ t, view, act, setFocus }: StepProps) {
+/** Un cupo del paso Conjuros, sea de un rasgo o de la clase. */
+interface SpellTab {
+  key: string;
+  title: string;
+  /** Null para quien conoce en vez de preparar: no hay tope. */
+  cap: number | null;
+  count: [number, number] | undefined;
+  ready: boolean;
+  chosen: string[];
+  options: CreationSpellRow[];
+  action: (id: string) => CreationAction;
+}
+
+/** Conjuros, un cupo a la vez: con todos abiertos la página se hacía larguísima
+ *  y el detalle de la derecha quedaba muy arriba de lo que se estaba eligiendo.
+ *  Primero los que da un rasgo o una dote, que quedan preparados y salen del
+ *  pozo de abajo: preguntarlos después haría preparar uno que se está por
+ *  recibir gratis. Completar un cupo no pasa solo al siguiente. */
+export function SpellsStep({ t, lang, catalog, view, act, setFocus }: StepProps) {
   const { slots, class: cs } = view.spells;
-  const focus = (id: string) => setFocus({ kind: 'spell', id });
   const missingSpells = view.pending.some((p) => p.kind === 'spells');
+  const tabs: SpellTab[] = [
+    ...slots.map((slot) => ({
+      key: slot.groupId,
+      title: slot.name,
+      cap: slot.count,
+      count: [slot.chosen.length, slot.count] as [number, number],
+      ready: slot.chosen.length >= slot.count,
+      chosen: slot.chosen,
+      options: slot.options,
+      action: (id: string): CreationAction => ({ type: 'toggle', pick: 'featureSpell', id, group: slot.groupId }),
+    })),
+    ...(cs && cs.cantripsKnown > 0
+      ? [
+          {
+            key: 'cantrips',
+            title: t.luCantripsTitle,
+            cap: cs.cantripsKnown,
+            count: [cs.chosenCantrips.length, cs.cantripsKnown] as [number, number],
+            ready: cs.chosenCantrips.length >= cs.cantripsKnown,
+            chosen: cs.chosenCantrips,
+            options: cs.cantrips,
+            action: (id: string): CreationAction => ({ type: 'toggle', pick: 'cantrip', id }),
+          },
+        ]
+      : []),
+    ...(cs
+      ? [
+          {
+            key: 'spells',
+            title: cs.prepared ? t.luPreparedTitle : t.luKnownTitle,
+            // Un lanzador que prepara tiene tope; el que conoce, no (como en
+            // Flutter): lo que falta lo cuenta el motor.
+            cap: cs.prepared ? cs.preparedCount : null,
+            count: cs.prepared ? ([cs.chosenSpells.length, cs.preparedCount] as [number, number]) : undefined,
+            ready: !missingSpells,
+            chosen: cs.chosenSpells,
+            options: cs.spells,
+            action: (id: string): CreationAction => ({ type: 'toggle', pick: 'spell', id }),
+          },
+        ]
+      : []),
+  ];
+  const [tabKey, setTabKey] = useState(() => (tabs.find((x) => !x.ready) ?? tabs[0])?.key);
+  const [sheet, setSheet] = useState<string | null>(null);
+  const spells = useMemo(() => codexEntries('spells', catalog, t, lang), [catalog, t, lang]);
+  const tab = tabs.find((x) => x.key === tabKey) ?? tabs[0];
+  if (!tab) return null;
+
+  const single = tab.cap === 1;
+  const full = tab.cap !== null && tab.chosen.length >= tab.cap;
+  const nameOfSpell = (id: string) => tab.options.find((o) => o.id === id)?.name ?? id;
+  const blockedFull = (id: string) => !tab.chosen.includes(id) && full && !single;
+  const toggle = (id: string) => {
+    act(tab.action(id));
+    setFocus({ kind: 'spell', id });
+  };
   const granted = cs ? [...cs.grantedCantrips, ...cs.grantedSpells] : [];
+  const open = sheet ? spells.find((e) => e.id === sheet) : undefined;
+  const openDetail = open?.detail();
+
   return (
-    <>
-      {slots.map((slot) => (
-        <SpellPickBlock
-          key={slot.groupId}
-          title={slot.name}
-          options={slot.options}
-          chosen={slot.chosen}
-          cap={slot.count}
-          ready={slot.chosen.length >= slot.count}
-          t={t}
-          onChange={(_, id) => act({ type: 'toggle', pick: 'featureSpell', id, group: slot.groupId })}
-          onFocus={focus}
-        />
-      ))}
-      {cs && cs.cantripsKnown > 0 && (
-        <SpellPickBlock
-          title={t.luCantripsTitle}
-          options={cs.cantrips}
-          chosen={cs.chosenCantrips}
-          cap={cs.cantripsKnown}
-          ready={cs.chosenCantrips.length >= cs.cantripsKnown}
-          t={t}
-          onChange={(_, id) => act({ type: 'toggle', pick: 'cantrip', id })}
-          onFocus={focus}
-        />
-      )}
-      {cs && (
-        <SpellPickBlock
-          title={cs.prepared ? t.luPreparedTitle : t.luKnownTitle}
-          options={cs.spells}
-          chosen={cs.chosenSpells}
-          // Un lanzador que prepara tiene tope; el que conoce, no (como en
-          // Flutter): lo que falta lo cuenta el motor.
-          cap={cs.prepared ? cs.preparedCount : null}
-          ready={!missingSpells}
-          t={t}
-          onChange={(_, id) => act({ type: 'toggle', pick: 'spell', id })}
-          onFocus={focus}
-        />
-      )}
+    <section className="step-in card flex min-w-0 flex-col gap-3 p-4">
+      <div role="tablist" aria-label={t.crSteps.conjuros} className="flex gap-2 overflow-x-auto pb-1">
+        {tabs.map((x) => {
+          const on = x.key === tab.key;
+          return (
+            <button
+              key={x.key}
+              type="button"
+              role="tab"
+              aria-selected={on}
+              data-tab={x.key}
+              onClick={() => setTabKey(x.key)}
+              className={cx(
+                'flex w-[148px] shrink-0 flex-col items-start gap-1 rounded-[var(--radius-card)] border px-3 py-2.5 text-left text-on-surface transition-colors duration-[120ms] sm:w-auto sm:min-w-0 sm:flex-1',
+                on ? 'border-gold bg-gold-soft' : 'border-hairline bg-plaque',
+              )}
+            >
+              <span className="text-[13px] leading-[1.25] font-medium">{x.title}</span>
+              <Status ready={x.ready} count={x.count} t={t} />
+            </button>
+          );
+        })}
+      </div>
+      <p className="text-[12.5px] text-on-surface-variant">
+        <span className="font-medium text-on-surface">{t.crChosen}</span>{' '}
+        {tab.chosen.length > 0 ? tab.chosen.map(nameOfSpell).join(', ') : t.crNoneYet}
+      </p>
+      {/* Con `key`, cada cupo arranca con el buscador vacío. */}
+      <SearchableList
+        key={tab.key}
+        items={tab.options}
+        textOf={(o) => o.name}
+        label={t.luSpellSearch}
+        count={t.crCountSpells(tab.options.length)}
+        columns={2}
+        multi={!single}
+        height="max-h-[420px]"
+      >
+        {(o) => (
+          <div key={o.id} className="flex min-w-0 items-stretch gap-1.5">
+            <div className="min-w-0 flex-1">
+              <Option
+                id={o.id}
+                multi={!single}
+                selected={tab.chosen.includes(o.id)}
+                disabled={blockedFull(o.id)}
+                title={o.name}
+                detail={o.level === 0 ? o.school : `${t.spellLevelShort(o.level)} · ${o.school}`}
+                onClick={() => toggle(o.id)}
+              />
+            </div>
+            {/* En un teléfono no hay panel al costado: tocar elige, y esto
+                deja leerlo antes de elegir. */}
+            <Button
+              tone="secondary"
+              className="shrink-0 lg:hidden"
+              aria-label={t.crSpellInfo(o.name)}
+              title={t.crSpellInfo(o.name)}
+              onClick={() => setSheet(o.id)}
+            >
+              <Info size={16} aria-hidden="true" />
+            </Button>
+          </div>
+        )}
+      </SearchableList>
       {granted.length > 0 && (
-        <Block title={t.crGrantedSpells} status={<Status auto t={t} />}>
-          <p className="text-[13px] text-on-surface-variant">{granted.join(' · ')}</p>
-        </Block>
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-hairline pt-2.5">
+          <span className="text-[12.5px] text-on-surface-variant">
+            <span className="font-medium text-on-surface">{t.crGrantedSpells}:</span> {granted.join(', ')}
+          </span>
+          <Status auto t={t} />
+        </div>
       )}
-    </>
+      {open && openDetail && (
+        <AppDialog
+          open
+          onOpenChange={(v) => !v && setSheet(null)}
+          title={open.name}
+          description={open.subtitle || undefined}
+          actions={[
+            { label: t.close },
+            {
+              label: tab.chosen.includes(open.id) ? t.crRemove : t.crChoose,
+              primary: true,
+              disabled: blockedFull(open.id),
+              onSelect: () => toggle(open.id),
+            },
+          ]}
+        >
+          <DetailBody detail={openDetail} />
+        </AppDialog>
+      )}
+    </section>
   );
 }
 

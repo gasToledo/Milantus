@@ -20,7 +20,7 @@ import type { SheetWriter } from '../sheet/writer';
 import { Button, ButtonLink } from '../ui/Button';
 import { cx } from '../ui/cx';
 import { MarkdownText } from '../ui/MarkdownText';
-import { AfterCard, Block, DetailBody, matchesQuery, Option, SpellPickBlock, Status, StepRail, Tag, WizardFooter } from '../ui/wizard';
+import { AfterCard, Block, DetailBody, matchesQuery, Option, SpellPickBlock, Status, StepRail, Tag, WIZARD_ASIDE, WizardFooter } from '../ui/wizard';
 
 type StepId =
   | 'resumen'
@@ -439,7 +439,7 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
 
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div key={current} className="flex min-w-0 flex-col gap-4">{main}</div>
-        <aside className="flex min-w-0 flex-col gap-4">
+        <aside className={WIZARD_ASIDE}>
           <DetailPanel focus={focus} view={view} catalog={catalog} lang={lang} t={t} />
           <AfterPanel before={sheet} after={after} t={t} />
         </aside>

@@ -106,8 +106,10 @@ test('de Especie a Equipo: cada paso frena hasta completarse y nada se guarda', 
   await expect(page.getByRole('navigation', { name: 'Pasos' }).getByRole('button', { name: 'Conjuros' })).toBeVisible();
   await expect(seguir).toBeDisabled();
   for (const cupo of vista.spells.slots) {
+    await page.locator(`[data-tab="${cupo.groupId}"]`).click();
     for (const o of cupo.options.slice(0, cupo.count)) {
-      await opcion(o.id).first().click();
+      await opcion(o.id).click();
+      await expect(detalle).toContainText(o.name);
       vista = motor({ type: 'toggle', pick: 'featureSpell', id: o.id, group: cupo.groupId });
     }
   }

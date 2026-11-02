@@ -8,6 +8,11 @@ import { Eyebrow } from './data';
 // Las piezas del circuito de los asistentes (subida de nivel y creador). El
 // catálogo y cuándo usar cada una están en `docs/desarrollo/diseno-web-react.md`.
 
+/** La columna derecha de un asistente. Sigue a la vista al bajar por los pasos
+ *  largos: si no, explicar lo último que se tocó obligaba a volver a subir. El
+ *  tope deja lugar al pie flotante, y si no entra se desplaza sola. */
+export const WIZARD_ASIDE = 'flex min-w-0 flex-col gap-4 lg:sticky lg:top-4 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto';
+
 /** Un bloque de elección: título, un solo contador y las opciones. Entra con
  *  `step-in`, tanto al cambiar de paso como al aparecer por lo que se eligió. */
 export function Block({ title, status, children }: { title: string; status?: ReactNode; children: ReactNode }) {

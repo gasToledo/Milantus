@@ -2056,7 +2056,7 @@ class CreationDraft {
     final sc = spellcasting;
     final cs = classSpells;
     Map<String, dynamic> row(Spell s) =>
-        {'id': s.id, 'name': s.name, 'level': s.level};
+        {'id': s.id, 'name': s.name, 'level': s.level, 'school': s.school};
     return {
       'applicable': choosesSpells,
       'slots': [

@@ -265,14 +265,14 @@ export interface LevelUpView {
     replaceable: boolean;
     grantsSpells: boolean;
     chosen: string[];
-    options: { id: string; name: string; level: number }[];
+    options: CreationSpellRow[];
   }[];
   classSpells: {
     cantripsKnown: number;
     preparedCount: number;
     prepared: boolean;
     cantrips: { id: string; name: string }[];
-    spells: { id: string; name: string; level: number }[];
+    spells: CreationSpellRow[];
     chosenCantrips: string[];
     chosenSpells: string[];
     grantedCantrips: string[];
@@ -439,14 +439,14 @@ export interface CreationView {
       name: string;
       count: number;
       chosen: string[];
-      options: { id: string; name: string; level: number }[];
+      options: CreationSpellRow[];
     }[];
     class: {
       prepared: boolean;
       cantripsKnown: number;
       preparedCount: number;
-      cantrips: { id: string; name: string; level: number }[];
-      spells: { id: string; name: string; level: number }[];
+      cantrips: CreationSpellRow[];
+      spells: CreationSpellRow[];
       chosenCantrips: string[];
       chosenSpells: string[];
       grantedCantrips: string[];
@@ -465,6 +465,14 @@ export interface CreationView {
     weapons: { id: string; name: string; wielded: boolean }[];
     grips: { id: string; name: string; canOffHand: boolean; offHand: boolean; canTwoHanded: boolean; twoHanded: boolean }[];
   };
+}
+
+/** Un conjuro para elegir. */
+export interface CreationSpellRow {
+  id: string;
+  name: string;
+  level: number;
+  school: string;
 }
 
 /** Un cupo de habilidades: lo que suma cada una sin y con competencia. */
