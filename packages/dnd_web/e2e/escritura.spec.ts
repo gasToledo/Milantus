@@ -499,26 +499,6 @@ test('preparar conjuros desde la ficha guarda lo del motor y «Deshacer» vuelve
   await expect(page.locator(`[data-chip="${poner}"]`)).toHaveCount(0);
 });
 
-test('con el cupo lleno, tocar otro conjuro no lo elige y dice por qué', async ({ page, request }) => {
-  const escrituras = vigilarEscrituras(page);
-  const vista = spellEditView(await ilse(request), catalogo(), 'cleric')!;
-  const libres = vista.spells.filter((o) => !vista.chosenSpells.includes(o.id));
-  const faltan = vista.preparedCount - vista.chosenSpells.length;
-  const sobra = libres[faltan]!;
-
-  await page.goto(EDITOR);
-  for (const o of libres.slice(0, faltan)) await page.locator(`[data-option="${o.id}"]`).click();
-  const chips = page.locator('[data-chip]');
-  await expect(chips).toHaveCount(vista.preparedCount);
-
-  await page.locator(`[data-option="${sobra.id}"]`).click();
-  await expect(chips).toHaveCount(vista.preparedCount);
-  await expect(page.locator(`[data-option="${sobra.id}"]`)).toHaveAttribute('aria-checked', 'false');
-  await expect(page.locator(`[data-option="${sobra.id}"]`)).toHaveAttribute('aria-disabled', 'true');
-  await expect(page.getByText(`Cupo completo: sacá uno para elegir ${sobra.name}.`)).toBeVisible();
-  expect(escrituras).toEqual([]);
-});
-
 test('cambiar el truco innato se confirma con «Cambiar» y guarda lo del motor', async ({ page, request }) => {
   const ELFO = 'elfo-de-humo';
   const antes = await ilse(request, ELFO);

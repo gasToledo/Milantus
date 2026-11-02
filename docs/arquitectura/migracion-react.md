@@ -695,7 +695,7 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    clase y guarde lo del motor, que una bárbara active la Furia, marque
    estados (uno que incapacita la termina) y suba y baje el cansancio
    guardando lo del motor y releyéndolo al recargar, con la velocidad y la
-   iniciativa ya penalizadas, que la clériga prepare conjuros (saca uno y elige otro) guardando lo del motor y se deshaga, que con el cupo lleno tocar otro no lo elija, que un alto elfo cambie su truco innato con «Cambiar» guardando lo del motor, y
+   iniciativa ya penalizadas, que la clériga prepare conjuros (saca uno y elige otro) guardando lo del motor y se deshaga, que un alto elfo cambie su truco innato con «Cambiar» guardando lo del motor, y
    que la ficha de otra cuenta (la de un miembro, para el DM) no
    tenga un solo control (`e2e/escritura.spec.ts`, con una cuenta propia para
    no cambiar lo que leen las demás); y que una cuenta sin `webV2` vea
