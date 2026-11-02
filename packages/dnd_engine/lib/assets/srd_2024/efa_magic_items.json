@@ -1,7 +1,7 @@
 [
   {
     "id": "boots-of-the-winding-path",
-    "name": "Boots of the Winding Path",
+    "name": "Botas del sendero sinuoso",
     "source": "foa_2025",
     "category": "magic",
     "rarity": "uncommon",
@@ -14,7 +14,7 @@
   },
   {
     "id": "dazzling-weapon",
-    "name": "Dazzling Weapon",
+    "name": "Arma deslumbrante",
     "source": "foa_2025",
     "category": "magic",
     "rarity": "rare",
@@ -31,7 +31,7 @@
   },
   {
     "id": "helm-of-awareness",
-    "name": "Helm of Awareness",
+    "name": "Yelmo de alerta",
     "source": "foa_2025",
     "category": "magic",
     "rarity": "uncommon",
@@ -43,7 +43,7 @@
   },
   {
     "id": "manifold-tool",
-    "name": "Manifold Tool",
+    "name": "Herramienta polimorfa",
     "source": "foa_2025",
     "category": "magic",
     "rarity": "common",
@@ -56,7 +56,7 @@
   },
   {
     "id": "mind-sharpener",
-    "name": "Mind Sharpener",
+    "name": "Afilamentes",
     "source": "foa_2025",
     "category": "magic",
     "rarity": "uncommon",
@@ -71,7 +71,7 @@
   },
   {
     "id": "repeating-shot",
-    "name": "Repeating Shot",
+    "name": "Arma de disparo incesante",
     "source": "foa_2025",
     "category": "magic",
     "rarity": "uncommon",
@@ -97,7 +97,7 @@
   },
   {
     "id": "repulsion-shield",
-    "name": "Repulsion Shield",
+    "name": "Escudo de repulsión",
     "source": "foa_2025",
     "category": "magic",
     "rarity": "uncommon",
@@ -116,7 +116,7 @@
   },
   {
     "id": "returning-weapon",
-    "name": "Returning Weapon",
+    "name": "Arma retornante",
     "source": "foa_2025",
     "category": "magic",
     "rarity": "uncommon",
@@ -139,7 +139,7 @@
   },
   {
     "id": "spell-refueling-ring",
-    "name": "Spell-Refueling Ring",
+    "name": "Anillo de recarga de conjuros",
     "source": "foa_2025",
     "category": "magic",
     "rarity": "uncommon",

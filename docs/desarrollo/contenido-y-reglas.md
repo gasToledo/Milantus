@@ -89,6 +89,9 @@ Las herramientas viven en `packages/dnd_engine/tool/`:
   poción o pergamino, maldito o de rareza variable, leído de su descripción
   en español. Los planos del Artífice dependen de eso, y la descripción se
   traduce: por eso queda como dato y no se deduce al compilar.
+- `apply_magic_item_bases.dart` escribe `baseItemKind` en «Arma +N» y
+  «Armadura +N» (el generador no lo hace): sin él, una réplica de esos
+  objetos no tiene datos de arma ni de armadura.
 - `apply_voseo.dart` pasa a voseo la prosa de todos los catálogos salvo el
   bestiario. Se corre después de cualquier generador: el SRD en español está
   en tuteo.

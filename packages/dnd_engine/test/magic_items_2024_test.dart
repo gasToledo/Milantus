@@ -38,6 +38,28 @@ void main() {
     }
   });
 
+  test('todo «Arma (…)» o «Armadura (…)» declara su tipo de base', () {
+    for (final item in repo.items.values.where((e) =>
+        e.description.startsWith('Arma (') ||
+        e.description.startsWith('Armadura ('))) {
+      expect(item.baseItemKind, isNotNull, reason: item.id);
+    }
+  });
+
+  test('armadura +1 con base suma 1 a la CA', () {
+    InventoryEntry armor(String? itemId) => InventoryEntry(
+          entryId: 'a',
+          itemId: itemId ?? 'chain-mail',
+          baseItemId: itemId == null ? null : 'chain-mail',
+          equipped: true,
+        );
+    final compiler = CharacterCompiler(repo);
+    final plain = compiler.compile(_character(inventory: [armor(null)]));
+    final magic =
+        compiler.compile(_character(inventory: [armor('armadura-1')]));
+    expect(magic.armorClass, plain.armorClass + 1);
+  });
+
   test('espada +1 modifica solo su propio ataque y conserva identidad', () {
     final c = _character(inventory: const [
       InventoryEntry(
