@@ -545,16 +545,28 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    competencias *(existe)*; 5c3, los conjuros *(existe)*; 5d, creador *(existe)*, en
    cuatro: 5d1, el borrador en el motor *(existe)*; 5d2, Especie, Clase,
    Trasfondo y Características *(existe)*; 5d3, Competencias, Conjuros y Equipo *(existe)*; 5d4,
-   Detalles, Revisión y el alta *(existe)*.
+   Detalles, Revisión y el alta *(existe)*; 5e, lo que falta escribir en la
+   ficha propia, de menor a mayor riesgo porque ninguna de estas escrituras
+   tiene todavía acción en `SheetActions.apply`, en cinco: 5e1, condiciones,
+   cansancio y modos activos (Furia); 5e2, preparar conjuros (el editor ya
+   existe en la subida) y cambiar el truco innato; 5e3, los planos del Artífice
+   y los objetivos de arma de un rasgo (Pacto del Filo); 5e4, Forma Salvaje;
+   5e5, compañeros, y con ellos lanzar gastando espacio o uso gratis. Antes de
+   cerrar 5e, comparar los controles de la ficha de Flutter con los de React:
+   esta lista no salió de revisar pantalla por pantalla. 5f, la lista de
+   personajes: reordenar, marcar favorito, renombrar, borrar y rehacer. Van
+   antes del paso 6 porque solo tocan datos de la propia cuenta.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
    combate, vínculos y códigos de campaña. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de
    otra cuenta» es del servidor y vale igual para el cliente nuevo. Entra acá
    también la edición de la ficha completa de un PNJ (inventario, comprar y
-   vender, y el resto de lo que ya se escribe en la ficha propia): reutiliza
-   las acciones del motor y la cola de guardado del paso 5, pero guarda por
-   `PUT /api/npcs/:id`.
-7. Homebrew, importación/exportación y el resto.
+   vender, y el resto de lo que ya se escribe en la ficha propia) y crearla:
+   reutiliza las acciones del motor y la cola de guardado del paso 5, pero
+   guarda por `PUT /api/npcs/:id`.
+7. Homebrew, importación/exportación y el resto, entre ello escribir en
+   `/api/settings` (hasta entonces, el tema elegido en el navegador gana sobre
+   el de la cuenta).
 
 ## Cómo se prueba
 
@@ -713,17 +725,8 @@ hace seguro volver atrás es que **no hay nada que deshacer en el formato**:
 
 Para que nadie lo dé por hecho:
 
-- Editar la ficha completa de un PNJ (paso 6): reutiliza las acciones y la
-  cola de guardado del paso 5, pero guarda por `PUT /api/npcs/:id`.
-- Toda otra escritura desde React: los pasos 5 a 7 están enteros por hacer.
-  Entre ellos, reordenar, marcar favorito, crear, renombrar o borrar
-  personajes, condiciones, compañeros (y con ellos lanzar gastando espacio o
-  uso gratis), cambiar el truco innato y Forma Salvaje; en el inventario,
-  los planos del Artífice y los objetivos de arma de un rasgo (Pacto del
-  Filo); preparar conjuros desde la ficha (el editor ya existe en la subida),
-  y
-  escribir en `/api/settings` (por eso el tema elegido en el navegador gana
-  sobre el de la cuenta).
+- Las escrituras de 5e, 5f y los pasos 6 y 7: el detalle está en
+  [Orden previsto de pantallas](#orden-previsto-de-pantallas).
 - Control de versión en el servidor para las escrituras (rechazar una copia
   vieja con 409): hoy gana el último que guarda, como en Flutter.
 - Enlaces desde Flutter hacia `/v2` o redirección automática por `webV2`.
