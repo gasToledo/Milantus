@@ -22,7 +22,7 @@ import { AppDialog } from '../ui/AppDialog';
 import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
 import { Medallion } from '../ui/Medallion';
-import { Block, DetailBody, Option, ReviewRow, SearchableList, Status } from '../ui/wizard';
+import { Block, DetailBody, Option, ReviewRow, SearchableList, SpellTabs, Status } from '../ui/wizard';
 
 /** Lo que explica el panel de la derecha: lo último que se tocó. */
 export type Focus = {
@@ -295,28 +295,7 @@ export function SpellsStep({ t, lang, catalog, view, act, setFocus }: StepProps)
 
   return (
     <section className="step-in card flex min-w-0 flex-col gap-3 p-4">
-      <div role="tablist" aria-label={t.crSteps.conjuros} className="flex gap-2 overflow-x-auto pb-1">
-        {tabs.map((x) => {
-          const on = x.key === tab.key;
-          return (
-            <button
-              key={x.key}
-              type="button"
-              role="tab"
-              aria-selected={on}
-              data-tab={x.key}
-              onClick={() => setTabKey(x.key)}
-              className={cx(
-                'flex w-[148px] shrink-0 flex-col items-start gap-1 rounded-[var(--radius-card)] border px-3 py-2.5 text-left text-on-surface transition-colors duration-[120ms] sm:w-auto sm:min-w-0 sm:flex-1',
-                on ? 'border-gold bg-gold-soft' : 'border-hairline bg-plaque',
-              )}
-            >
-              <span className="text-[13px] leading-[1.25] font-medium">{x.title}</span>
-              <Status ready={x.ready} count={x.count} t={t} />
-            </button>
-          );
-        })}
-      </div>
+      <SpellTabs tabs={tabs} current={tab.key} onSelect={setTabKey} label={t.crSteps.conjuros} t={t} />
       <p className="text-[12.5px] text-on-surface-variant">
         <span className="font-medium text-on-surface">{t.crChosen}</span>{' '}
         {tab.chosen.length > 0 ? tab.chosen.map(nameOfSpell).join(', ') : t.crNoneYet}

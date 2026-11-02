@@ -62,15 +62,18 @@ if (casos.length < 5) {
 
 let fallas = 0;
 for (const archivo of casos.sort()) {
-  const { character, action, creation, seed, expected } = JSON.parse(
+  const { character, action, creation, bridge, seed, expected } = JSON.parse(
     readFileSync(resolve(base, archivo), 'utf8'),
   );
-  // Un caso con `creation` prueba el creador; con `action`, `act` (la ficha
-  // que el cliente guarda); el resto, `compute`.
+  // Un caso con `creation` prueba el creador; con `bridge`, una función de
+  // lectura del puente (`fn` con la ficha, el catálogo y `args`); con
+  // `action`, `act` (la ficha que el cliente guarda); el resto, `compute`.
   const obtenido = JSON.parse(
     creation
       ? motor.creation(catalogo, JSON.stringify(creation.draft), JSON.stringify(creation.action), seed)
-      : action
+      : bridge
+        ? motor[bridge.fn](JSON.stringify(character), catalogo, ...bridge.args)
+        : action
         ? motor.act(JSON.stringify(character), catalogo, JSON.stringify(action), seed)
         : motor.compute(JSON.stringify(character), catalogo),
   );

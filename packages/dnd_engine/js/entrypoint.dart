@@ -265,6 +265,83 @@ String trade(String requestJson, String labelsJson) {
   });
 }
 
+/// Los trucos y conjuros de una clase como los lee el cliente: el editor de la
+/// subida de nivel y el de la ficha ([spellEdit]) comparten forma.
+Map<String, dynamic> _classSpellsMap(
+  Spellcasting sc,
+  ({
+    List<Spell> cantrips,
+    List<Spell> spells,
+    List<String> chosenCantrips,
+    List<String> chosenSpells,
+    List<String> grantedCantrips,
+    List<String> grantedSpells,
+  }) o,
+) =>
+    {
+      'cantripsKnown': sc.cantripsKnown,
+      'preparedCount': sc.preparedCount,
+      'prepared': sc.preparation == SpellPreparation.prepared,
+      'cantrips': [
+        for (final sp in o.cantrips) {'id': sp.id, 'name': sp.name},
+      ],
+      'spells': [
+        for (final sp in o.spells)
+          {'id': sp.id, 'name': sp.name, 'level': sp.level},
+      ],
+      'chosenCantrips': o.chosenCantrips,
+      'chosenSpells': o.chosenSpells,
+      'grantedCantrips': o.grantedCantrips,
+      'grantedSpells': o.grantedSpells,
+    };
+
+/// El editor de conjuros de la ficha para [classId] (`LevelUp.classSpells`),
+/// con la forma de `levelUp.classSpells`, o `null` si esa clase no lanza. Sin
+/// bloques de lanzamiento (ficha monoclase) la clase es la principal.
+String spellEdit(String characterJson, String catalogJson, String classId) {
+  final c = Character.fromJson(
+    jsonDecode(characterJson) as Map<String, dynamic>,
+  );
+  final repo = _repoPara(catalogJson);
+  final sheet = CharacterCompiler(repo).compile(c);
+  final blocks = sheet.spellcastingBlocks;
+  final sc = blocks.isEmpty
+      ? (classId == c.classId ? sheet.spellcasting : null)
+      : blocks.where((b) => b.classId == classId).firstOrNull?.spellcasting;
+  if (sc == null) return jsonEncode(null);
+  return jsonEncode(
+    _classSpellsMap(
+      sc,
+      LevelUp.classSpells(c, sheet, repo, sc,
+          classId: blocks.isEmpty ? null : classId),
+    ),
+  );
+}
+
+/// Los trucos entre los que se puede cambiar el innato [granted]
+/// (`LevelUp.innateCantripOptions`): `[{id, name, school}]`, vacío si ese
+/// truco no existe o no es reemplazable.
+String innateCantripOptions(
+  String characterJson,
+  String catalogJson,
+  String granted,
+) {
+  final c = Character.fromJson(
+    jsonDecode(characterJson) as Map<String, dynamic>,
+  );
+  final repo = _repoPara(catalogJson);
+  final innate = CharacterCompiler(repo)
+      .compile(c)
+      .innateSpells
+      .where((s) => s.grantedSpellId == granted && s.isReplaceable)
+      .firstOrNull;
+  return jsonEncode([
+    if (innate != null)
+      for (final sp in LevelUp.innateCantripOptions(repo, innate))
+        {'id': sp.id, 'name': sp.name, 'school': sp.school},
+  ]);
+}
+
 /// Una subida de nivel en curso (`LevelUp` del motor): con las decisiones
 /// juntadas hasta ahora ([draftJson], `LevelUpDraft.fromJson`) devuelve lo que
 /// el asistente muestra —clases, subclases y dotes con lo que les falta, si la
@@ -416,26 +493,11 @@ String levelUp(String characterJson, String catalogJson, String draftJson) {
     // null si no lanza.
     'classSpells': switch (up.classSpellcasting) {
       null => null,
-      final cs => () {
-          final o = LevelUp.classSpells(up.built, up.after, up.repo, cs.sc,
-              classId: cs.classId);
-          return {
-            'cantripsKnown': cs.sc.cantripsKnown,
-            'preparedCount': cs.sc.preparedCount,
-            'prepared': cs.sc.preparation == SpellPreparation.prepared,
-            'cantrips': [
-              for (final sp in o.cantrips) {'id': sp.id, 'name': sp.name},
-            ],
-            'spells': [
-              for (final sp in o.spells)
-                {'id': sp.id, 'name': sp.name, 'level': sp.level},
-            ],
-            'chosenCantrips': o.chosenCantrips,
-            'chosenSpells': o.chosenSpells,
-            'grantedCantrips': o.grantedCantrips,
-            'grantedSpells': o.grantedSpells,
-          };
-        }(),
+      final cs => _classSpellsMap(
+          cs.sc,
+          LevelUp.classSpells(up.built, up.after, up.repo, cs.sc,
+              classId: cs.classId),
+        ),
     },
     'open': {
       'features': open.features,
@@ -701,6 +763,8 @@ void main() {
   motor['creationConfirm'] = creationConfirm.toJS;
   motor['creation'] = creation.toJS;
   motor['act'] = act.toJS;
+  motor['spellEdit'] = spellEdit.toJS;
+  motor['innateCantripOptions'] = innateCantripOptions.toJS;
   motor['compute'] = compute.toJS;
   motor['migrateCharacter'] = migrateCharacter.toJS;
   motor['setLanguage'] = setLanguage.toJS;

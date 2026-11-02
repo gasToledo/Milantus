@@ -6,7 +6,7 @@ import { Eyebrow } from '../ui/data';
 import { Accordion } from '../ui/disclosure';
 
 /** Lo que una fila lee de un conjuro del catálogo (`Spell.toJson`). */
-type SpellJson = JsonObject & {
+export type SpellJson = JsonObject & {
   id: string;
   name?: string;
   level?: number;
@@ -41,6 +41,7 @@ export function SpellList({
   catalog,
   innateNote,
   onConcentrate,
+  onSwapInnate,
 }: {
   cantripIds: string[];
   spellIds: string[];
@@ -51,6 +52,9 @@ export function SpellList({
   innateNote: (s: InnateSpell) => string;
   /** El nombre del conjuro, como lo guarda Flutter en `concentratingOn`. */
   onConcentrate?: (name: string) => void;
+  /** Abre el cambio del truco innato (el del rasgo, `grantedSpellId`). Solo en
+   *  la ficha propia; solo lo llevan los que el rasgo deja reemplazar. */
+  onSwapInnate?: (innate: InnateSpell) => void;
 }) {
   const t = useTexts();
   const lang = useLang();
@@ -111,7 +115,11 @@ export function SpellList({
                 // CD y ataque, que son los del rasgo y no los de la clase.
                 title: <SpellTitle spell={s} name={i.name} note={innateNote(i)} />,
                 content: s ? (
-                  <SpellDetail spell={s} onConcentrate={onConcentrate && (() => onConcentrate(i.name))} />
+                  <SpellDetail
+                    spell={s}
+                    onConcentrate={onConcentrate && (() => onConcentrate(i.name))}
+                    onSwap={onSwapInnate && i.replaceableFrom.length > 0 ? () => onSwapInnate(i) : undefined}
+                  />
                 ) : null,
               };
             })}
@@ -155,12 +163,10 @@ function Tag({ children }: { children: ReactNode }) {
   );
 }
 
-/** La ficha del conjuro al desplegarlo. Los cuatro datos de lanzamiento son
- *  vocabulario del catálogo en español: los traduce el motor. «Concentrar» va
- *  acá y no en la fila porque la fila ya es el botón del acordeón. */
-function SpellDetail({ spell, onConcentrate }: { spell: SpellJson; onConcentrate?: () => void }) {
-  const t = useTexts();
-  const meta = [
+/** Tiempo, alcance, componentes y duración en una línea. Son vocabulario del
+ *  catálogo en español: los traduce el motor. */
+export function spellMeta(spell: SpellJson): string {
+  return [
     spell.castingTime && vocabularyLabel('castingTime', spell.castingTime),
     spell.range && vocabularyLabel('range', spell.range),
     spell.components,
@@ -168,15 +174,38 @@ function SpellDetail({ spell, onConcentrate }: { spell: SpellJson; onConcentrate
   ]
     .filter(Boolean)
     .join(' · ');
+}
+
+/** La ficha del conjuro al desplegarlo. Los cuatro datos de lanzamiento son
+ *  vocabulario del catálogo en español: los traduce el motor. «Concentrar» va
+ *  acá y no en la fila porque la fila ya es el botón del acordeón. */
+function SpellDetail({
+  spell,
+  onConcentrate,
+  onSwap,
+}: {
+  spell: SpellJson;
+  onConcentrate?: () => void;
+  onSwap?: () => void;
+}) {
+  const t = useTexts();
+  const meta = spellMeta(spell);
   return (
     <>
       {meta && <p className="mb-1.5 text-[12px] text-on-surface">{meta}</p>}
       {spell.description}
-      {spell.concentration && onConcentrate && (
-        <div className="mt-2">
-          <Button tone="secondary" onClick={onConcentrate}>
-            {t.spellsConcentrate}
-          </Button>
+      {((spell.concentration && onConcentrate) || onSwap) && (
+        <div className="mt-2 flex flex-wrap gap-2">
+          {spell.concentration && onConcentrate && (
+            <Button tone="secondary" onClick={onConcentrate}>
+              {t.spellsConcentrate}
+            </Button>
+          )}
+          {onSwap && (
+            <Button tone="secondary" data-action="swap-innate" onClick={onSwap}>
+              {t.swapAction}
+            </Button>
+          )}
         </div>
       )}
     </>

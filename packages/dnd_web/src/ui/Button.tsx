@@ -62,8 +62,9 @@ export function ButtonLink({
   className,
   href,
   internal = false,
-}: Common & { href: string; internal?: boolean }) {
-  const props = { href, className: cx(BASE, SHAPES[shape], TONES[tone], className) };
+  'data-action': dataAction,
+}: Common & { href: string; internal?: boolean; 'data-action'?: string }) {
+  const props = { href, 'data-action': dataAction, className: cx(BASE, SHAPES[shape], TONES[tone], className) };
   const body = (
     <>
       {Icon && <Icon size={16} aria-hidden="true" />}

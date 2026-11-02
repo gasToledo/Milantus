@@ -4,6 +4,7 @@ import '../domain/character.dart';
 import '../domain/computed_sheet.dart';
 import '../domain/content.dart';
 import '../domain/effects.dart';
+import '../domain/name_sort.dart';
 import 'character_compiler.dart';
 import 'dice.dart';
 import 'validation.dart';
@@ -433,6 +434,26 @@ class LevelUp {
       ],
     );
   }
+
+  /// Los trucos entre los que se puede cambiar el innato [innate]: los de cada
+  /// lista de `replaceableFrom` del mismo nivel, sin repetir. El del rasgo va
+  /// primero y el resto alfabético: volver al original es la acción más
+  /// frecuente y en una lista de más de treinta trucos quedaba enterrada donde
+  /// cayera por nombre.
+  static List<Spell> innateCantripOptions(
+    ContentRepository repo,
+    InnateSpell innate,
+  ) =>
+      <String, Spell>{
+        for (final listId in innate.replaceableFrom)
+          for (final spell in repo.spellsForList(listId))
+            if (spell.level == innate.level) spell.id: spell,
+      }.values.toList()
+        ..sort((a, b) {
+          if (a.id == innate.grantedSpellId) return -1;
+          if (b.id == innate.grantedSpellId) return 1;
+          return compareContentNames(a.name, b.name);
+        });
 
   /// El lanzamiento de la clase que sube, al nivel nuevo, y el `classId` con
   /// que se editan sus conjuros (null en una ficha monoclase sin bloques), o

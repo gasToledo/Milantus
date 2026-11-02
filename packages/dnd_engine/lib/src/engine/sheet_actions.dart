@@ -75,6 +75,16 @@ class SheetActions {
   /// - `sell` con `entry`, `quantity`, `unitPriceCp` y `at`.
   /// - `levelUp` con `draft` (`LevelUpDraft.fromJson`): sube el nivel con
   ///   [LevelUp.confirm], PG actuales incluidos.
+  /// - `setClassSpells` con `classId`, `cantrips` y `spells`: lo que queda
+  ///   elegido para esa clase ([Character.withClassSpells]). No valida el tope:
+  ///   una ficha pasada de cupo tiene que poder guardarse mientras se saca de
+  ///   a uno. Un `classId` que no es un bloque de lanzamiento ni la clase
+  ///   principal no toca la ficha.
+  /// - `setInnateCantrip` con `granted` (el conjuro que declara el rasgo) y
+  ///   `spell`: cambia un truco innato reemplazable. Un truco que no lo es, o
+  ///   un `spell` fuera de [LevelUp.innateCantripOptions], no toca la ficha.
+  ///   Ninguna de las dos toca el combate: los espacios y la concentración
+  ///   siguen igual, y los usos del truco se indexan por el conjuro original.
   ///
   /// Una acción desconocida lanza [FormatException]: un cliente desfasado no
   /// tiene que guardar una ficha que el motor no tocó creyendo que sí.
@@ -309,6 +319,29 @@ class SheetActions {
           throw const FormatException('Subida de nivel incompleta');
         }
         c = up.confirm();
+      case 'setClassSpells':
+        final classId = action['classId'] as String;
+        if (sheet.spellcastingBlocks.any((b) => b.classId == classId) ||
+            classId == c.classId) {
+          c = c.withClassSpells(
+            classId,
+            cantrips: [
+              for (final id in action['cantrips'] as List) id as String
+            ],
+            spells: [for (final id in action['spells'] as List) id as String],
+          );
+        }
+      case 'setInnateCantrip':
+        final granted = action['granted'] as String;
+        final spell = action['spell'] as String;
+        final innate = sheet.innateSpells
+            .where((s) => s.grantedSpellId == granted && s.isReplaceable)
+            .firstOrNull;
+        if (innate != null &&
+            LevelUp.innateCantripOptions(repo, innate)
+                .any((o) => o.id == spell)) {
+          c = c.withInnateCantrip(granted, spell);
+        }
       default:
         throw FormatException('Acción de ficha desconocida: ${action['type']}');
     }

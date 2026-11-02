@@ -94,6 +94,8 @@ export type Route =
   | { name: 'character'; id: string; tab: SheetTab | null }
   // El asistente de subida de nivel de la ficha propia.
   | { name: 'levelUp'; id: string }
+  // El editor de conjuros de una clase de la ficha propia.
+  | { name: 'spellEdit'; id: string; classId: string }
   // El creador de personajes.
   | { name: 'creation' }
   | { name: 'unknown' };
@@ -200,6 +202,13 @@ export function matchRoute(pathname: string): Route {
       return { name: 'unknown' };
     }
   }
+  if (section === 'personajes' && id && tab === 'conjuros' && rest.length === 1) {
+    try {
+      return { name: 'spellEdit', id: decodeURIComponent(id), classId: decodeURIComponent(rest[0]!) };
+    } catch {
+      return { name: 'unknown' };
+    }
+  }
   if (section === 'personajes' && id && rest.length === 0) {
     const sheetTab = tab === undefined ? null : SHEET_TABS.find((t) => t === tab);
     if (sheetTab === undefined) return { name: 'unknown' };
@@ -268,6 +277,9 @@ export const creationHref = (): string => `${import.meta.env.BASE_URL}personajes
 
 export const levelUpHref = (id: string): string =>
   `${import.meta.env.BASE_URL}personajes/${encodeURIComponent(id)}/subir-nivel`;
+
+export const spellEditHref = (id: string, classId: string): string =>
+  `${import.meta.env.BASE_URL}personajes/${encodeURIComponent(id)}/conjuros/${encodeURIComponent(classId)}`;
 
 // `pushState` no dispara ningún evento: se avisa a mano a quien escucha.
 const listeners = new Set<() => void>();

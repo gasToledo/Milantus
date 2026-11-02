@@ -328,6 +328,31 @@ Future<void> main() async {
       combat: CombatState(currentHp: 10),
     ),
   );
+  // Un alto elfo: su truco de especie es reemplazable tras un descanso largo
+  // (el cambio del truco innato de la ficha, 5e2).
+  await characters.create(
+    writerUserId,
+    Character(
+      id: 'elfo-de-humo',
+      name: 'Elfo de Humo',
+      raceId: 'elf',
+      lineageId: 'elf-high',
+      speciesSpellcastingAbility: Ability.intelligence,
+      classId: 'wizard',
+      backgroundId: 'sage',
+      level: 3,
+      assignedScores: const {
+        Ability.strength: 8,
+        Ability.dexterity: 14,
+        Ability.constitution: 13,
+        Ability.intelligence: 16,
+        Ability.wisdom: 12,
+        Ability.charisma: 10,
+      },
+      hpPerLevel: const [6, 4, 4],
+      combat: CombatState(currentHp: 17),
+    ),
+  );
   final settings = InMemorySettingsRepository();
   await settings.save(smokeUserId, {
     'sortMode': 'level',

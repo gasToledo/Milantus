@@ -11,6 +11,7 @@ import { computeModel, type ComputedModel } from './compute';
 import { SheetFooter, SheetPanel } from './SheetPanel';
 import { SheetTabs } from './SheetTabs';
 import { LevelUpWizard } from '../levelup/LevelUpWizard';
+import { SpellEditor } from './SpellEditor';
 import { useSheetWriter, type SheetNotify } from './writer';
 
 interface ToastState {
@@ -30,7 +31,18 @@ interface ToastState {
  * Es la única ficha que escribe (`useSheetWriter`): PG, usos y descansos, cada
  * uno pasado por el motor y guardado con la cola de `characterSave.ts`.
  */
-export function CharacterPage({ id, tab, levelUp = false }: { id: string; tab: SheetTab | null; levelUp?: boolean }) {
+export function CharacterPage({
+  id,
+  tab,
+  levelUp = false,
+  spellEdit,
+}: {
+  id: string;
+  tab: SheetTab | null;
+  levelUp?: boolean;
+  /** La clase cuyos conjuros se editan (la ruta del editor), o undefined. */
+  spellEdit?: string;
+}) {
   const t = useTexts();
   const lang = useLang();
   const roster = useRoster();
@@ -42,8 +54,8 @@ export function CharacterPage({ id, tab, levelUp = false }: { id: string; tab: S
   // La ruta sin pestaña es la primera: se reemplaza en el historial para que
   // «atrás» no vuelva a una URL que solo redirige.
   useEffect(() => {
-    if (tab === null && !levelUp) navigate(characterHref(id), { replace: true });
-  }, [id, tab, levelUp]);
+    if (tab === null && !levelUp && spellEdit === undefined) navigate(characterHref(id), { replace: true });
+  }, [id, tab, levelUp, spellEdit]);
 
   // Al volver a la pestaña se pide la ficha de nuevo, por si se tocó en
   // Flutter mientras tanto: así la próxima acción parte de esa copia y no la
@@ -92,6 +104,12 @@ export function CharacterPage({ id, tab, levelUp = false }: { id: string; tab: S
     body = <AppErrorView as="h1" title={t.computeErrorTitle} message={t.computeErrorBody} detail={computed.ok ? undefined : computed.detail} />;
   } else if (levelUp) {
     body = model.write ? <LevelUpWizard model={model} write={model.write} /> : <AppBusyLabel label={t.loading} />;
+  } else if (spellEdit !== undefined) {
+    body = model.write ? (
+      <SpellEditor model={model} write={model.write} classId={spellEdit} />
+    ) : (
+      <AppBusyLabel label={t.loading} />
+    );
   } else {
     // Debajo de 900 px el panel es un cajón: la tira de pestañas va arriba del
     // contenido, para cambiar sin abrirlo. Desde 900 las pestañas viven en el

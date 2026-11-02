@@ -283,6 +283,110 @@ void main() {
     });
   });
 
+  group('conjuros de la ficha', () {
+    Character clerigo() => Character(
+          id: 'clerigo',
+          name: 'Clérigo',
+          raceId: 'human',
+          classId: 'cleric',
+          backgroundId: 'hermit',
+          level: 3,
+          assignedScores: _scores,
+          hpPerLevel: const [8, 5, 5],
+          cantripIds: const ['guidance'],
+          spellIds: const ['bless'],
+        );
+    Character altoElfo() => Character(
+          id: 'elfo',
+          name: 'Elfo',
+          raceId: 'elf',
+          lineageId: 'elf-high',
+          speciesSpellcastingAbility: Ability.intelligence,
+          classId: 'wizard',
+          backgroundId: 'sage',
+          level: 3,
+          assignedScores: _scores,
+          hpPerLevel: const [6, 4, 4],
+        );
+
+    test('setClassSpells deja lo elegido y vacía las listas planas', () {
+      final r = act(clerigo(), {
+        'type': 'setClassSpells',
+        'classId': 'cleric',
+        'cantrips': ['sacred-flame'],
+        'spells': ['cure-wounds', 'bless'],
+      }).character;
+
+      expect(r.cantripIdsFor('cleric'), ['sacred-flame']);
+      expect(r.spellIdsFor('cleric'), ['cure-wounds', 'bless']);
+      expect(r.cantripIds, isEmpty);
+      expect(r.spellIds, isEmpty);
+    });
+
+    test('setClassSpells con una clase ajena no toca la ficha', () {
+      final c = clerigo();
+      final r = act(c, {
+        'type': 'setClassSpells',
+        'classId': 'wizard',
+        'cantrips': ['fire-bolt'],
+        'spells': const <String>[],
+      }).character;
+
+      expect(r.toJson(), c.toJson());
+    });
+
+    test('el truco innato cambia, y volver al original borra la entrada', () {
+      final c = altoElfo();
+      final innate = CharacterCompiler(repo)
+          .compile(c)
+          .innateSpells
+          .firstWhere((s) => s.isReplaceable);
+      final options = LevelUp.innateCantripOptions(repo, innate);
+      final other = options.firstWhere((o) => o.id != innate.grantedSpellId);
+      expect(options.first.id, innate.grantedSpellId);
+
+      Map<String, dynamic> swap(String spell) => {
+            'type': 'setInnateCantrip',
+            'granted': innate.grantedSpellId,
+            'spell': spell,
+          };
+      final changed = act(c, swap(other.id)).character;
+      expect(changed.innateCantripChoices, {innate.grantedSpellId: other.id});
+
+      final back = act(changed, swap(innate.grantedSpellId)).character;
+      expect(back.innateCantripChoices, isEmpty);
+    });
+
+    test('un truco fuera de las opciones o no reemplazable no toca nada', () {
+      final c = altoElfo();
+      final innate = CharacterCompiler(repo)
+          .compile(c)
+          .innateSpells
+          .firstWhere((s) => s.isReplaceable);
+      final fuera = repo.spellsForList('cleric').firstWhere(
+            (s) =>
+                s.level == innate.level &&
+                !LevelUp.innateCantripOptions(repo, innate)
+                    .any((o) => o.id == s.id),
+          );
+
+      for (final action in [
+        {
+          'type': 'setInnateCantrip',
+          'granted': innate.grantedSpellId,
+          'spell': fuera.id,
+        },
+        {
+          'type': 'setInnateCantrip',
+          'granted': 'no-es-innato',
+          'spell': innate.grantedSpellId,
+        },
+      ]) {
+        expect(act(c, action).character.toJson(), c.toJson());
+      }
+    });
+  });
+
   test('una acción desconocida no devuelve una ficha', () {
     expect(
       () => act(monje(), {'type': 'fly'}),

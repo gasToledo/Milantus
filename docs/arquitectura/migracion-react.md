@@ -425,6 +425,23 @@ repiten acá.
   `setExhaustion`, `activateMode` y `deactivateMode`; una activación rechazada
   devuelve la ficha intacta. `compute` aplica `applyExhaustion` sobre la ficha
   calculada, como Flutter: antes `/v2` mostraba descansado a quien no lo está.
+  Desde 5e2: en la tarjeta **Conjuros** de Combate, un botón por bloque de
+  lanzamiento («Preparar conjuros» si la clase prepara, «Editar conjuros» si
+  conoce) lleva a `/personajes/:id/conjuros/:clase`, el editor
+  (`sheet/SpellEditor.tsx`): pestañas Trucos y conjuros, bandeja de chips,
+  buscador, lista por nivel y el detalle a la derecha (en un teléfono, un
+  diálogo). Con el cupo lleno una opción se atenúa pero responde y el pie dice
+  por qué. Guardar es **una** acción `setClassSpells` (sin validar el tope, a
+  propósito: una ficha pasada de cupo tiene que poder guardarse mientras se
+  saca de a uno) y avisa con «Deshacer». La ruta se monta en `CharacterPage`
+  como la subida, para que el aviso siga al volver. Qué se ofrece y los topes
+  salen de `spellEdit` (`LevelUp.classSpells`); la tarjeta usa siempre el
+  `classId` del bloque, no el de la ficha. El **truco innato** reemplazable
+  (Alto Elfo) tiene «Cambiar truco» en el detalle de su fila: un diálogo con
+  las opciones de `innateCantripOptions`, que se confirma con «Cambiar»
+  (elegir no guarda) por la acción `setInnateCantrip`, que además comprueba
+  que la opción sea válida. Ninguna de las dos acciones toca el combate. No se
+  valida *cuándo* se puede preparar (descanso, grimorio): como Flutter.
   Todavía **no** aplica la Forma Salvaje (5e4). La banda táctica (PG, Iniciativa,
   Velocidad, Competencia; sin Armadura, que se lee en Defensa) solo va en
   Personaje y Combate, como en Flutter; el modo en curso lo dice su propia franja (con lo que suma), sin cartel aparte. Sin escritura, la ficha ajena
@@ -565,7 +582,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    ficha propia, de menor a mayor riesgo porque ninguna de estas escrituras
    tiene todavía acción en `SheetActions.apply`, en cinco: 5e1, condiciones,
    cansancio y modos activos (Furia) *(existe)*; 5e2, preparar conjuros (el editor ya
-   existe en la subida) y cambiar el truco innato; 5e3, los planos del Artífice
+   existe en la subida) y cambiar el truco innato *(existe)*; 5e3, los planos del Artífice
    y los objetivos de arma de un rasgo (Pacto del Filo); 5e4, Forma Salvaje;
    5e5, compañeros, y con ellos lanzar gastando espacio o uso gratis. Antes de
    cerrar 5e, comparar los controles de la ficha de Flutter con los de React:
@@ -596,7 +613,9 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    los tests de `dnd_engine`): prueba que `dart2js` no cambie enteros contra
    dobles, orden ni redondeos. Los casos `accion-*` prueban lo mismo con `act`:
    la ficha que el cliente guarda después de una acción (con una semilla fija
-   para el dado de golpe y la recarga al amanecer). Es también la red del tipo escrito a mano de
+   para el dado de golpe y la recarga al amanecer); los `puente-*` prueban las
+   funciones de lectura del editor de conjuros (`spellEdit`,
+   `innateCantripOptions`), con la función y sus argumentos en el caso. Es también la red del tipo escrito a mano de
    `types.ts`: un campo nuevo en `ComputedSheet.toJson` rompe acá aunque el tipo
    no lo diga.
 2. **Playwright** (job `web_e2e`). Pocas pruebas y solo de reglas
@@ -676,7 +695,7 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    clase y guarde lo del motor, que una bárbara active la Furia, marque
    estados (uno que incapacita la termina) y suba y baje el cansancio
    guardando lo del motor y releyéndolo al recargar, con la velocidad y la
-   iniciativa ya penalizadas, y
+   iniciativa ya penalizadas, que la clériga prepare conjuros (saca uno y elige otro) guardando lo del motor y se deshaga, que con el cupo lleno tocar otro no lo elija, que un alto elfo cambie su truco innato con «Cambiar» guardando lo del motor, y
    que la ficha de otra cuenta (la de un miembro, para el DM) no
    tenga un solo control (`e2e/escritura.spec.ts`, con una cuenta propia para
    no cambiar lo que leen las demás); y que una cuenta sin `webV2` vea

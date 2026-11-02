@@ -441,20 +441,7 @@ extension _SheetSpellsSection on _SheetScreenState {
   /// contenido— para que volver al original sea sacar la entrada.
   void _openInnateCantripPicker(InnateSpell innate) {
     final granted = repo.spell(innate.grantedSpellId);
-    final options =
-        <String, Spell>{
-            for (final listId in innate.replaceableFrom)
-              for (final spell in repo.spellsForList(listId))
-                if (spell.level == innate.level) spell.id: spell,
-          }.values.toList()
-          // El del rasgo primero y el resto alfabético: volver al original es la
-          // acción más frecuente y en una lista de más de treinta trucos quedaba
-          // enterrada donde cayera por nombre.
-          ..sort((a, b) {
-            if (a.id == innate.grantedSpellId) return -1;
-            if (b.id == innate.grantedSpellId) return 1;
-            return compareContentNames(a.name, b.name);
-          });
+    final options = LevelUp.innateCantripOptions(repo, innate);
 
     showDialog<void>(
       context: context,
@@ -512,15 +499,8 @@ extension _SheetSpellsSection on _SheetScreenState {
 
   /// Guarda el reemplazo. Volver al truco del rasgo **borra** la entrada en vez
   /// de escribirla apuntando a sí misma, para que el mapa no acumule ruido.
-  void _setInnateCantrip(InnateSpell innate, String spellId) {
-    final choices = Map<String, String>.from(_c.innateCantripChoices);
-    if (spellId == innate.grantedSpellId) {
-      choices.remove(innate.grantedSpellId);
-    } else {
-      choices[innate.grantedSpellId] = spellId;
-    }
-    _replace(_c.copyWith(innateCantripChoices: choices));
-  }
+  void _setInnateCantrip(InnateSpell innate, String spellId) =>
+      _replace(_c.withInnateCantrip(innate.grantedSpellId, spellId));
 
   /// Nombres de las listas de las que se puede tomar el reemplazo, para el
   /// texto del diálogo ("la lista de Mago", "Clérigo, Druida o Mago").

@@ -132,6 +132,8 @@ function Enabled({ account }: { account: Account }) {
     // ficha: React conserva la instancia entre las dos rutas.
     case 'levelUp':
       return <CharacterPage id={route.id} tab={null} levelUp />;
+    case 'spellEdit':
+      return <CharacterPage id={route.id} tab={null} spellEdit={route.classId} />;
     case 'creation':
       return <CreationPage account={account} />;
     case 'codex':

@@ -1672,6 +1672,19 @@ class Character {
     );
   }
 
+  /// Copia con el truco innato [granted] (el conjuro que declara el contenido)
+  /// reemplazado por [spellId]. Volver al original **borra** la entrada en vez
+  /// de escribirla apuntando a sí misma, para que el mapa no acumule ruido.
+  Character withInnateCantrip(String granted, String spellId) {
+    final choices = Map<String, String>.from(innateCantripChoices);
+    if (spellId == granted) {
+      choices.remove(granted);
+    } else {
+      choices[granted] = spellId;
+    }
+    return copyWith(innateCantripChoices: choices);
+  }
+
   /// Copia con overrides. Preserva el [CombatState] por referencia salvo que se
   /// pase uno nuevo. Útil para editar equipo/nivel sin perder estado de partida.
   Character copyWith({

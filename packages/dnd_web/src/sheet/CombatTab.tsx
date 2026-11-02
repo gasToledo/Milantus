@@ -6,12 +6,14 @@ import { useTexts } from '../i18n/context';
 import { labelOf } from '../i18n/texts';
 import { AppDialog } from '../ui/AppDialog';
 import { Tooltip } from '../ui/primitives';
-import { Button } from '../ui/Button';
+import { Button, ButtonLink } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Eyebrow, hpTone, Pill, Pips, ShieldBadge, SpendRecoverButtons, StatPlaque, ThinBar } from '../ui/data';
 import { SheetColumns } from './CharacterTab';
 import { resourceKey, signed } from './format';
+import { InnateCantripDialog } from './InnateCantripDialog';
 import { SpellList } from './SpellList';
+import { spellEditHref } from '../router';
 import { resourceLeft, type SheetModel } from './model';
 import type { SheetWriter } from './writer';
 import { ProficiencyRow } from './rows';
@@ -22,7 +24,7 @@ import { ABILITIES, isReactionSpell } from './vocabulary';
  * (`model.write`), lo que se anota en él: daño, curación, PG temporales,
  * salvaciones de muerte, dados de golpe, espacios de conjuro, usos de
  * recursos, los descansos, la Inspiración Heroica y la concentración. Cada acción la hace el motor (`actOn`); acá no se
- * suma ni se resta nada. Preparar conjuros y el resto de la edición siguen en
+ * suma ni se resta nada. Preparar conjuros y cambiar el truco innato llevan a su editor; el resto de la edición sigue en
  * Flutter. Los números son del motor; de la mesa (lo crudo) solo los PG
  * actuales, lo gastado y las condiciones.
  */
@@ -304,6 +306,7 @@ function SpellsCard({ model }: { model: SheetModel }) {
   // El conjuro que se quiere empezar mientras hay compañeros que dependen de
   // la concentración actual: se pregunta antes de despedirlos, como Flutter.
   const [cutFor, setCutFor] = useState<string | null>(null);
+  const [swapping, setSwapping] = useState<InnateSpell | null>(null);
   const blocks: SpellcastingBlock[] =
     sheet.spellcastingBlocks.length > 0
       ? sheet.spellcastingBlocks
@@ -421,14 +424,26 @@ function SpellsCard({ model }: { model: SheetModel }) {
                   }
                 />
               </dl>
-              <p className="mt-2.5 text-[13px] text-on-surface-variant tabular-nums">
-                {[
-                  sc.preparation === 'prepared' ? t.spellsPrepared(prepared, sc.preparedCount) : t.spellsKnown(prepared),
-                  sc.cantripsKnown > 0 ? t.spellsCantrips(cantrips, sc.cantripsKnown) : null,
-                ]
-                  .filter(Boolean)
-                  .join(' · ')}
-              </p>
+              <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                <p className="text-[13px] text-on-surface-variant tabular-nums">
+                  {[
+                    sc.preparation === 'prepared' ? t.spellsPrepared(prepared, sc.preparedCount) : t.spellsKnown(prepared),
+                    sc.cantripsKnown > 0 ? t.spellsCantrips(cantrips, sc.cantripsKnown) : null,
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </p>
+                {write && (
+                  <ButtonLink
+                    tone="secondary"
+                    internal
+                    data-action="edit-spells"
+                    href={spellEditHref(character.id, b.classId)}
+                  >
+                    {sc.preparation === 'prepared' ? t.seActionPrepare : t.seActionEdit}
+                  </ButtonLink>
+                )}
+              </div>
             </div>
           );
         })}
@@ -445,6 +460,7 @@ function SpellsCard({ model }: { model: SheetModel }) {
             catalog={catalog.spells}
             innateNote={(s) => innateNote(s, t)}
             onConcentrate={write ? onConcentrate : undefined}
+            onSwapInnate={write ? setSwapping : undefined}
           />
         </div>
 
@@ -470,6 +486,9 @@ function SpellsCard({ model }: { model: SheetModel }) {
           </div>
         )}
       </div>
+      {swapping && write && (
+        <InnateCantripDialog model={model} write={write} innate={swapping} onClose={() => setSwapping(null)} />
+      )}
       {cutFor && (
         <AppDialog
           open

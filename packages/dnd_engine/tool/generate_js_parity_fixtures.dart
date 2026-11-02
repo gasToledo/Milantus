@@ -140,6 +140,19 @@ final _casos = <String, Character>{
     cantripIds: const ['eldritch-blast', 'mage-hand'],
     spellIds: const ['hex', 'sleep'],
   ),
+  // Truco innato reemplazable (`setInnateCantrip`, `innateCantripOptions`).
+  'altoelfo': Character(
+    id: 'p-high-elf',
+    name: 'Alto Elfo',
+    raceId: 'elf',
+    lineageId: 'elf-high',
+    speciesSpellcastingAbility: Ability.intelligence,
+    classId: 'wizard',
+    backgroundId: 'sage',
+    level: 3,
+    assignedScores: _scores,
+    hpPerLevel: const [6, 4, 4],
+  ),
 };
 
 /// Acciones de partida (`SheetActions`, `act` en JS) sobre los mismos
@@ -163,6 +176,23 @@ final _acciones = <String, (String, Map<String, dynamic>)>{
   'accion-modo-fin': ('barbaro', {'type': 'deactivateMode', 'mode': 'rage'}),
   'accion-descanso-corto': ('brujo', {'type': 'shortRest'}),
   'accion-descanso-largo': ('druida', {'type': 'longRest'}),
+  'accion-conjuros': (
+    'multiclase',
+    {
+      'type': 'setClassSpells',
+      'classId': 'wizard',
+      'cantrips': ['fire-bolt'],
+      'spells': ['shield'],
+    },
+  ),
+  'accion-truco-innato': (
+    'altoelfo',
+    {
+      'type': 'setInnateCantrip',
+      'granted': 'prestidigitation',
+      'spell': 'fire-bolt'
+    },
+  ),
 };
 
 /// El creador de personajes (`creation` en JS): un borrador a medio armar y
@@ -268,6 +298,82 @@ Future<void> main(List<String> args) async {
       }),
     );
   }
+  // Las dos funciones de lectura del editor de conjuros de la ficha
+  // (`spellEdit`, `innateCantripOptions`): el JSON que devuelve el puente.
+  final multiclase = Character.fromJson(
+    jsonDecode(jsonEncode(_casos['multiclase']!.toJson()))
+        as Map<String, dynamic>,
+  );
+  final altoElfo = Character.fromJson(
+    jsonDecode(jsonEncode(_casos['altoelfo']!.toJson()))
+        as Map<String, dynamic>,
+  );
+  final hojaMulti = CharacterCompiler(repo).compile(multiclase);
+  final bloque = hojaMulti.spellcastingBlocks.firstWhere(
+    (b) => b.classId == 'wizard',
+  );
+  final o = LevelUp.classSpells(
+    multiclase,
+    hojaMulti,
+    repo,
+    bloque.spellcasting,
+    classId: 'wizard',
+  );
+  final innato = CharacterCompiler(repo)
+      .compile(altoElfo)
+      .innateSpells
+      .firstWhere((s) => s.isReplaceable);
+  void puente(
+    String nombre,
+    Character ficha,
+    String fn,
+    String arg,
+    Object? esperado,
+  ) =>
+      File('${out.path}/$nombre.json').writeAsStringSync(
+        jsonEncode({
+          'character': jsonDecode(jsonEncode(ficha.toJson())),
+          'bridge': {
+            'fn': fn,
+            'args': [arg]
+          },
+          'expected': esperado,
+        }),
+      );
+  puente(
+    'puente-conjuros',
+    multiclase,
+    'spellEdit',
+    'wizard',
+    // La forma de `_classSpellsMap` del puente, escrita otra vez a propósito:
+    // la paridad es justamente que el JS compilado dé lo mismo.
+    {
+      'cantripsKnown': bloque.spellcasting.cantripsKnown,
+      'preparedCount': bloque.spellcasting.preparedCount,
+      'prepared': bloque.spellcasting.preparation == SpellPreparation.prepared,
+      'cantrips': [
+        for (final sp in o.cantrips) {'id': sp.id, 'name': sp.name},
+      ],
+      'spells': [
+        for (final sp in o.spells)
+          {'id': sp.id, 'name': sp.name, 'level': sp.level},
+      ],
+      'chosenCantrips': o.chosenCantrips,
+      'chosenSpells': o.chosenSpells,
+      'grantedCantrips': o.grantedCantrips,
+      'grantedSpells': o.grantedSpells,
+    },
+  );
+  puente(
+    'puente-truco-innato',
+    altoElfo,
+    'innateCantripOptions',
+    innato.grantedSpellId,
+    [
+      for (final s in LevelUp.innateCantripOptions(repo, innato))
+        {'id': s.id, 'name': s.name, 'school': s.school},
+    ],
+  );
   for (final MapEntry(key: nombre, value: (borrador, accion))
       in _creaciones.entries) {
     final draft = CreationDraft.fromJson(repo, borrador)

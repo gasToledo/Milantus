@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { Fragment, useState, type ReactNode } from 'react';
 import { Check } from 'lucide-react';
 import { fold, type CodexDetail } from '../codex/entries';
 import type { Texts } from '../i18n/texts';
@@ -64,6 +64,7 @@ export function Option({
   selected,
   multi = false,
   disabled = false,
+  blocked = false,
   title,
   detail,
   trailing,
@@ -74,6 +75,9 @@ export function Option({
   selected: boolean;
   multi?: boolean;
   disabled?: boolean;
+  /** Atenuada como `disabled`, pero **responde al toque**: sirve para decir por
+   *  qué no se puede elegir (el cupo está lleno) y mostrar su detalle. */
+  blocked?: boolean;
   title: string;
   detail?: string;
   trailing?: ReactNode;
@@ -86,6 +90,7 @@ export function Option({
       aria-checked={selected}
       data-option={id}
       disabled={disabled}
+      aria-disabled={blocked || undefined}
       onClick={onClick}
       className={cx(
         'flex min-h-12 w-full items-center gap-3 rounded-[var(--radius-card)] border px-3.5 py-2.5 text-left text-on-surface transition-colors duration-[120ms] disabled:cursor-default',
@@ -98,7 +103,7 @@ export function Option({
           'flex h-[18px] w-[18px] shrink-0 items-center justify-center border-[1.5px]',
           multi ? 'rounded-[5px]' : 'rounded-full',
           selected ? (multi ? 'border-gold bg-gold' : 'border-gold') : 'border-text-muted',
-          disabled && 'opacity-45',
+          (disabled || blocked) && 'opacity-45',
         )}
       >
         {selected &&
@@ -109,7 +114,7 @@ export function Option({
           ))}
       </span>
       <span className="min-w-0 flex-1">
-        <span className={cx('block font-medium', disabled && 'opacity-45')}>{title}</span>
+        <span className={cx('block font-medium', (disabled || blocked) && 'opacity-45')}>{title}</span>
         {detail && <span className="mt-0.5 block text-[12.5px] text-on-surface-variant">{detail}</span>}
       </span>
       {trailing}
@@ -135,6 +140,47 @@ export const matchesQuery = (query: string, text: string): boolean => {
     .every((w) => haystack.includes(w));
 };
 
+/** La tira de pestañas de los conjuros (el creador y el editor de la ficha):
+ *  una por cupo, con el estado de cada una. Elegir una no cambia lo demás. */
+export function SpellTabs({
+  tabs,
+  current,
+  onSelect,
+  label,
+  t,
+}: {
+  tabs: { key: string; title: string; ready: boolean; count?: [number, number] }[];
+  current: string;
+  onSelect: (key: string) => void;
+  label: string;
+  t: Texts;
+}) {
+  return (
+    <div role="tablist" aria-label={label} className="flex gap-2 overflow-x-auto pb-1">
+      {tabs.map((x) => {
+        const on = x.key === current;
+        return (
+          <button
+            key={x.key}
+            type="button"
+            role="tab"
+            aria-selected={on}
+            data-tab={x.key}
+            onClick={() => onSelect(x.key)}
+            className={cx(
+              'flex w-[148px] shrink-0 flex-col items-start gap-1 rounded-[var(--radius-card)] border px-3 py-2.5 text-left text-on-surface transition-colors duration-[120ms] sm:w-auto sm:min-w-0 sm:flex-1',
+              on ? 'border-gold bg-gold-soft' : 'border-hairline bg-plaque',
+            )}
+          >
+            <span className="text-[13px] leading-[1.25] font-medium">{x.title}</span>
+            <Status ready={x.ready} count={x.count} t={t} />
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 /** Una lista larga: buscador, cuenta y scroll propio. [children] arma cada fila
  *  de lo que deja pasar el filtro. */
 export function SearchableList<T>({
@@ -145,10 +191,19 @@ export function SearchableList<T>({
   columns = 1,
   multi = false,
   height = 'max-h-[300px]',
+  groupOf,
+  empty,
   children,
 }: {
   items: T[];
   textOf: (item: T) => string;
+  /** El grupo de cada ítem (los conjuros por nivel): un `Eyebrow` a todo el
+   *  ancho cada vez que cambia. Los grupos se arman sobre lo que deja pasar
+   *  el filtro, así que buscar no deja encabezados vacíos. Los ítems vienen
+   *  ya ordenados por grupo. */
+  groupOf?: (item: T) => string;
+  /** Lo que se dice si el filtro no deja nada. */
+  empty?: string;
   /** El nombre del buscador y de la lista, para el lector de pantalla. */
   label: string;
   count?: string;
@@ -176,9 +231,21 @@ export function SearchableList<T>({
       <div
         role={multi ? 'group' : 'radiogroup'}
         aria-label={label}
-        className={cx('grid gap-2 overflow-y-auto pr-1', height, columns === 2 && 'sm:grid-cols-2')}
+        className={cx('grid auto-rows-max gap-2 overflow-y-auto pr-1', height, columns === 2 && 'sm:grid-cols-2')}
       >
-        {visible.map(children)}
+        {visible.length === 0 && empty && <p className="text-[13px] text-on-surface-variant">{empty}</p>}
+        {visible.map((item, i) => {
+          const group = groupOf?.(item);
+          const head = group !== undefined && (i === 0 || group !== groupOf!(visible[i - 1]!));
+          return head ? (
+            <Fragment key={group}>
+              <Eyebrow className="col-span-full pt-0.5">{group}</Eyebrow>
+              {children(item)}
+            </Fragment>
+          ) : (
+            children(item)
+          );
+        })}
       </div>
     </>
   );

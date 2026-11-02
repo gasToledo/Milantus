@@ -30,6 +30,8 @@ interface DartEngine {
   encounter(encounterJson: string, playersHpJson: string): string;
   musicSource(url: string): string;
   act(characterJson: string, catalogJson: string, actionJson: string, seed?: number): string;
+  spellEdit(characterJson: string, catalogJson: string, classId: string): string;
+  innateCantripOptions(characterJson: string, catalogJson: string, granted: string): string;
 }
 
 function engine(): DartEngine {
@@ -290,6 +292,26 @@ export function levelUpView(character: CharacterJson, catalog: Catalog, draft: L
   return JSON.parse(
     engine().levelUp(JSON.stringify(character), catalogJson(catalog), JSON.stringify(draft)),
   ) as LevelUpView;
+}
+
+/** Lo que el editor de conjuros de la ficha lee del motor (`spellEdit`): la
+ *  forma de `LevelUpView.classSpells`. */
+export type SpellEditView = NonNullable<LevelUpView['classSpells']>;
+
+/** Los trucos y conjuros de la clase [classId] de la ficha (`LevelUp.classSpells`),
+ *  o `null` si esa clase no lanza conjuros. */
+export function spellEditView(character: CharacterJson, catalog: Catalog, classId: string): SpellEditView | null {
+  return JSON.parse(engine().spellEdit(JSON.stringify(character), catalogJson(catalog), classId)) as SpellEditView | null;
+}
+
+/** Los trucos entre los que se puede cambiar el innato [granted]; vacío si no
+ *  es reemplazable. El del rasgo va primero. */
+export function innateCantripOptions(
+  character: CharacterJson,
+  catalog: Catalog,
+  granted: string,
+): { id: string; name: string; school: string }[] {
+  return JSON.parse(engine().innateCantripOptions(JSON.stringify(character), catalogJson(catalog), granted));
 }
 
 /** Una tirada de un dado de [sides] caras, hecha por el motor. */
@@ -641,7 +663,9 @@ export type SheetAction =
   | { type: 'addItem'; item: string }
   | { type: 'buy'; item: string; quantity: number; unitPriceCp: number; at: string }
   | { type: 'sell'; entry: string; quantity: number; unitPriceCp: number; at: string }
-  | { type: 'levelUp'; draft: LevelUpDraft };
+  | { type: 'levelUp'; draft: LevelUpDraft }
+  | { type: 'setClassSpells'; classId: string; cantrips: string[]; spells: string[] }
+  | { type: 'setInnateCantrip'; granted: string; spell: string };
 
 /** Lo que cuenta el motor de una acción, para el aviso. Cada campo existe
  *  solo en la acción que lo da (ver `SheetActions.apply`). */

@@ -73,12 +73,14 @@ un control a un asistente, buscá acá.
 
 | Componente | Qué hace | Cuándo |
 | --- | --- | --- |
-| `Option` | La opción: círculo si se elige una, cuadrado (`multi`) si son varias. Apagada, con el motivo en `detail`, nunca escondida. `id` va en `data-option` | Toda elección de un asistente |
+| `Option` | La opción: círculo si se elige una, cuadrado (`multi`) si son varias. Apagada, con el motivo en `detail`, nunca escondida. `id` va en `data-option`. `blocked` la atenúa pero **responde** (`aria-disabled`, sin `disabled`): para decir por qué no se puede elegir (cupo lleno) y mostrar su detalle | Toda elección de un asistente |
 | `Block` | Tarjeta de un grupo de opciones: título y un solo `status` | Cada grupo |
 | `Status` | Los tres estados, y ningún otro: falta (`count` para «n de m»), `ready` y `auto` | En `Block` |
 | `SpellPickBlock` | Un cupo de conjuros: buscador, scroll propio y `cap` (null para quien conoce en vez de preparar) | Conjuros de la subida y del creador |
+| `SpellTabs` | La tira de pestañas de los conjuros (una por cupo, con su `Status`): elegir una no cambia lo demás ni avanza sola | Conjuros del creador y editor de la ficha |
+| Bandeja de elegidos | Los elegidos como chips que se sacan con ✕ (`data-chip`), sobre la lista, en vez de un texto «Elegidos:». Uno elegido que ya no está en la lista también sale ahí, con su id si no está en el catálogo. Vive en `sheet/SpellEditor.tsx`, no es un componente suelto | Editor de conjuros de la ficha |
 | `WIZARD_ASIDE` | Las clases de la columna derecha: sigue a la vista al bajar y, si no entra, se desplaza sola | Panel derecho de cada asistente |
-| `SearchableList` | Buscador sin tildes y por palabras (`matchesQuery`), cuenta y scroll propio | Listas largas: especies, trasfondos, armas |
+| `SearchableList` | Buscador sin tildes y por palabras (`matchesQuery`), cuenta y scroll propio; `groupOf` pinta un `Eyebrow` a todo el ancho al cambiar de grupo (los conjuros por nivel, sin grupos vacíos al buscar) y `empty` dice qué pasa si el filtro no deja nada | Listas largas: especies, trasfondos, armas |
 | `StepRail` | La tira de pasos; `progress` la cambia en un teléfono por «Paso n de m» y una barra | Arriba de cada asistente |
 | `WizardFooter` | El pie: lo que falta y Atrás/Continuar, como tarjeta flotante; `above` a todo el ancho | Abajo de cada asistente |
 | `DetailBody`, `TraitList` | La ficha del Códice (`CodexDetail`) y una lista de rasgos, para el panel derecho | Explicar lo último que se tocó |

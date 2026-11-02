@@ -2,9 +2,11 @@ import { expect, test, type APIRequestContext, type Page } from '@playwright/tes
 import {
   actOn,
   computeSheet,
+  innateCantripOptions,
   inventoryOf,
   levelUpView,
   migrateCharacter,
+  spellEditView,
   type CharacterJson,
   type LevelUpDraft,
   type SheetAction,
@@ -457,6 +459,92 @@ test('la Furia, los estados y el cansancio guardan lo del motor y se releen al r
   await expect(page.locator('[data-save-state="saved"]')).toBeVisible();
 });
 
+const EDITOR = `/v2/personajes/${ILSE}/conjuros/cleric`;
+
+test('preparar conjuros desde la ficha guarda lo del motor y «Deshacer» vuelve a guardar la de antes', async ({
+  page,
+  request,
+}) => {
+  const antes = await ilse(request);
+  const vista = spellEditView(antes, catalogo(), 'cleric')!;
+  const quitar = vista.chosenSpells[0]!;
+  const poner = vista.spells.find((o) => !vista.chosenSpells.includes(o.id))!.id;
+  const esperado = segunMotor(antes, {
+    type: 'setClassSpells',
+    classId: 'cleric',
+    cantrips: vista.chosenCantrips,
+    spells: [...vista.chosenSpells.slice(1), poner],
+  });
+
+  await page.goto(COMBATE);
+  await page.locator('[data-action="edit-spells"]').click();
+  await expect(page).toHaveURL(EDITOR);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Preparar conjuros · Clérigo');
+  const guardar = page.getByRole('button', { name: 'Guardar', exact: true });
+  await expect(guardar).toBeDisabled();
+  await page.locator(`[data-chip="${quitar}"]`).click();
+  await page.locator(`[data-option="${poner}"]`).click();
+  const enviado = await proximoGuardado(page, () => guardar.click());
+  expect(enviado).toEqual(esperado);
+  expect(await ilse(request)).toEqual(esperado);
+  await expect(page).toHaveURL(COMBATE);
+  await expect(page.getByText('Conjuros guardados.')).toBeVisible();
+
+  const vuelta = await proximoGuardado(page, () => page.getByRole('button', { name: 'Deshacer' }).click());
+  expect(vuelta).toEqual(migrateCharacter(antes));
+
+  // Al recargar el editor lee lo guardado: lo que se sacó vuelve a estar.
+  await page.goto(EDITOR);
+  await expect(page.locator(`[data-chip="${quitar}"]`)).toBeVisible();
+  await expect(page.locator(`[data-chip="${poner}"]`)).toHaveCount(0);
+});
+
+test('con el cupo lleno, tocar otro conjuro no lo elige y dice por qué', async ({ page, request }) => {
+  const escrituras = vigilarEscrituras(page);
+  const vista = spellEditView(await ilse(request), catalogo(), 'cleric')!;
+  const libres = vista.spells.filter((o) => !vista.chosenSpells.includes(o.id));
+  const faltan = vista.preparedCount - vista.chosenSpells.length;
+  const sobra = libres[faltan]!;
+
+  await page.goto(EDITOR);
+  for (const o of libres.slice(0, faltan)) await page.locator(`[data-option="${o.id}"]`).click();
+  const chips = page.locator('[data-chip]');
+  await expect(chips).toHaveCount(vista.preparedCount);
+
+  await page.locator(`[data-option="${sobra.id}"]`).click();
+  await expect(chips).toHaveCount(vista.preparedCount);
+  await expect(page.locator(`[data-option="${sobra.id}"]`)).toHaveAttribute('aria-checked', 'false');
+  await expect(page.locator(`[data-option="${sobra.id}"]`)).toHaveAttribute('aria-disabled', 'true');
+  await expect(page.getByText(`Cupo completo: sacá uno para elegir ${sobra.name}.`)).toBeVisible();
+  expect(escrituras).toEqual([]);
+});
+
+test('cambiar el truco innato se confirma con «Cambiar» y guarda lo del motor', async ({ page, request }) => {
+  const ELFO = 'elfo-de-humo';
+  const antes = await ilse(request, ELFO);
+  const innato = computeSheet(antes, catalogo()).innateSpells.find((s) => s.replaceableFrom.length > 0)!;
+  const otro = innateCantripOptions(antes, catalogo(), innato.grantedSpellId).find(
+    (o) => o.id !== innato.grantedSpellId,
+  )!;
+  const esperado = segunMotor(antes, { type: 'setInnateCantrip', granted: innato.grantedSpellId, spell: otro.id });
+  const escrituras = vigilarEscrituras(page);
+
+  await page.goto(`/v2/personajes/${ELFO}/combate`);
+  await page.locator('[data-spell-group="innate"]').getByRole('button', { name: innato.name }).click();
+  await page.locator('[data-action="swap-innate"]').click();
+  const dialogo = page.getByRole('dialog');
+  const cambiar = dialogo.getByRole('button', { name: 'Cambiar', exact: true });
+  await expect(cambiar).toBeDisabled();
+  await dialogo.locator(`[data-option="${otro.id}"]`).click();
+  // Elegir no guarda ni cierra: lo hace «Cambiar».
+  await expect(cambiar).toBeEnabled();
+  expect(escrituras).toEqual([]);
+  const enviado = await proximoGuardado(page, () => cambiar.click(), ELFO);
+  expect(enviado).toEqual(esperado);
+  expect(await ilse(request, ELFO)).toEqual(esperado);
+  await expect(page.getByText(`Truco cambiado a ${otro.name}.`)).toBeVisible();
+});
+
 test('la ficha de otra cuenta no tiene controles para escribir', async ({ context, page, baseURL }) => {
   await context.clearCookies();
   await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);
@@ -475,5 +563,7 @@ test('la ficha de otra cuenta no tiene controles para escribir', async ({ contex
   // Ni estados, ni cansancio, ni estados activables: nada que escriba.
   await expect(page.locator('[data-condition], [data-field="exhaustion"]')).toHaveCount(0);
   await expect(page.getByRole('button', { name: /^(Activar|Terminar)$/ })).toHaveCount(0);
+  // Ni preparar conjuros ni cambiar el truco innato.
+  await expect(page.locator('[data-action="edit-spells"], [data-action="swap-innate"]')).toHaveCount(0);
   expect(escrituras).toEqual([]);
 });
