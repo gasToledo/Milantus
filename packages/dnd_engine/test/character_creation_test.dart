@@ -873,6 +873,24 @@ void main() {
     expect(d.gripOptions.map((g) => g.weapon.id), ['dagger']);
   });
 
+  test('dos valores iguales son dos columnas, cada una con su dueño', () {
+    final d = newDraft()..pool = [14, 8, 14, 12, 10, 16];
+    expect(d.scoreColumns.map((c) => c.value), [16, 14, 14, 12, 10, 8]);
+    d
+      ..assignScore(Ability.dexterity, 14)
+      ..assignScore(Ability.strength, 14);
+    final catorces = d.scoreColumns.where((c) => c.value == 14);
+    expect(
+        catorces.map((c) => c.holder), [Ability.strength, Ability.dexterity]);
+
+    d.apply({'type': 'unassignScore', 'ability': 'strength'});
+    expect(d.assignedScores[Ability.strength], isNull);
+    expect(
+      d.scoreColumns.where((c) => c.value == 14).map((c) => c.holder),
+      [Ability.dexterity, null],
+    );
+  });
+
   test('el personaje creado arranca con los PG al máximo', () {
     final d = newDraft()
       ..selectRace('dwarf')

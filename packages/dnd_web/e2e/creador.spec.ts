@@ -69,6 +69,12 @@ test('de Especie a Equipo: cada paso frena hasta completarse y nada se guarda', 
     { type: 'setSpread', plusTwo: 'intelligence', plusOne: 'constitution' },
     { type: 'applySuggestedScores' },
   );
+  // Una columna por dado, aunque la tirada repita un valor.
+  await opcion('roll4d6').click();
+  await expect(page.locator('[data-ability="strength"] [role="radio"]')).toHaveCount(6);
+  await opcion('standardArray').click();
+  await page.locator('[data-ability="strength"] [data-value="8"]').click();
+  await expect(page.locator('[data-ability="strength"] [role="radio"][aria-checked="true"]')).toHaveText('8');
   await page.getByRole('button', { name: /^Usar lo sugerido/ }).click();
   await expect(page.locator('[data-field="score-intelligence"]')).toContainText(String(vista.scores.preview.intelligence));
   await expect(page.locator('[data-field="creation-after"]')).toContainText(

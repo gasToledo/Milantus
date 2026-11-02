@@ -206,7 +206,9 @@ function CreationWizard({ catalog, onExit, onTouched }: { catalog: Catalog; onEx
       ? index === lastBuilt
         ? t.crNextSoon
         : null
-      : pending.length === 1
+      : pending[0]!.kind === 'assignScores'
+        ? t.crMissingScore(t.abilities[ABILITIES.find((a) => view.draft.assignedScores?.[a] === undefined)!])
+        : pending.length === 1
         ? pendingText(pending[0]!, t)
         : t.crPendingMore(pendingText(pending[0]!, t).replace(/\.$/, ''), pending.length - 1);
 
@@ -707,27 +709,146 @@ function ScoresStep({ t, view, act, setFocus, catalog }: StepProps) {
             </span>
           )}
         </div>
-        <div className="flex flex-col gap-2.5" data-field="scores-matrix">
-          {ABILITIES.map((a) => (
-            <ScoreRow
-              key={a}
-              ability={a}
-              method={method}
-              base={assigned[a] ?? null}
-              view={view}
-              act={act}
-              onFocus={() => setFocus({ kind: 'ability', id: a })}
-              t={t}
-            />
-          ))}
-        </div>
+        {method === 'manual' || method === 'pointBuy' ? (
+          <div className="flex flex-col gap-2.5" data-field="scores-rows">
+            {ABILITIES.map((a) => (
+              <ScoreRow
+                key={a}
+                ability={a}
+                method={method}
+                base={assigned[a] ?? null}
+                view={view}
+                act={act}
+                onFocus={() => setFocus({ kind: 'ability', id: a })}
+                t={t}
+              />
+            ))}
+          </div>
+        ) : (
+          <ScoreMatrix view={view} act={act} setFocus={setFocus} t={t} />
+        )}
       </Block>
     </>
   );
 }
 
-/** Una fila de la matriz: una elección de una. El valor que ya tiene otra va
- *  en gris y tocarlo las intercambia (lo resuelve el motor). */
+// Mientras entre, la matriz es una tabla; si no, cada característica son dos
+// líneas y las celdas ocupan todo el ancho. Se mide el contenedor y no la
+// ventana: el panel lateral y el de la derecha le comen lugar.
+const MATRIX_GRID =
+  'grid grid-cols-6 gap-x-1.5 @[540px]:grid-cols-[minmax(110px,1fr)_repeat(6,44px)_36px_40px_32px]';
+
+/** La matriz de valores: un dado por columna, y dos 14 son dos columnas. Cada
+ *  fila es una elección de una. La cabecera dice qué queda libre y quién tiene
+ *  cada dado; tocar uno ocupado los intercambia y tocar el propio lo suelta
+ *  (todo lo resuelve el motor). */
+function ScoreMatrix({
+  view,
+  act,
+  setFocus,
+  t,
+}: {
+  view: CreationView;
+  act: (a: CreationAction) => void;
+  setFocus: (f: Focus) => void;
+  t: Texts;
+}) {
+  const s = view.scores;
+  const assigned = view.draft.assignedScores ?? {};
+  const next = ABILITIES.find((a) => assigned[a] === undefined);
+  const labelCls = 'hidden text-center text-[10.5px] tracking-[1px] text-text-muted uppercase @[540px]:block';
+  return (
+    <div className="@container" data-field="scores-matrix">
+      {/* Fija arriba: en un teléfono las seis filas no entran y el número de
+          cada columna tiene que seguir a la vista. */}
+      <div aria-hidden="true" className={cx(MATRIX_GRID, 'sticky top-0 z-10 items-center bg-surface py-1')}>
+        <span className="hidden @[540px]:block" />
+        {s.columns.map((c, i) => (
+          <span
+            key={i}
+            className={cx(
+              'flex h-12 flex-col items-center justify-center rounded-[var(--radius-nav)] font-display text-[20px] leading-[1.1] tabular-nums',
+              c.holder ? 'text-text-muted' : 'bg-gold-soft text-gold',
+            )}
+          >
+            {c.value}
+            <span className="h-3 font-sans text-[10px] tracking-[0.8px] text-text-muted">
+              {c.holder ? t.abilityAbbr[c.holder] : ''}
+            </span>
+          </span>
+        ))}
+        <span className={labelCls}>{t.crColBackground}</span>
+        <span className={labelCls}>{t.crColTotal}</span>
+        <span className={labelCls}>{t.crColModifier}</span>
+      </div>
+      <div className="flex flex-col gap-2.5 @[540px]:gap-1">
+        {ABILITIES.map((a) => {
+          const spread = view.background.spread[a];
+          const total = s.preview[a];
+          return (
+            <div key={a} className={cx(MATRIX_GRID, 'items-center gap-y-1')} data-ability={a} role="radiogroup" aria-label={t.abilities[a]}>
+              <button
+                type="button"
+                onClick={() => setFocus({ kind: 'ability', id: a })}
+                className={cx(
+                  'col-span-3 flex min-h-9 items-center gap-2 rounded-[var(--radius-nav)] px-2 text-left @[540px]:col-span-1',
+                  next === a && 'bg-gold-soft',
+                )}
+              >
+                <span className={cx('text-[13px] font-bold tracking-[1.5px]', next === a ? 'text-gold' : 'text-on-surface-variant')}>
+                  {t.abilityAbbr[a]}
+                </span>
+                <span className="truncate text-[12px] text-text-muted">{t.abilities[a]}</span>
+              </button>
+              {/* En la tabla son tres columnas al final; apiladas van al lado del nombre. */}
+              <span className="col-span-3 flex items-baseline justify-end gap-3 @[540px]:contents" data-field={`score-${a}`}>
+                <span className="num text-center text-[12px] font-bold text-gold @[540px]:order-1">{spread ? signed(spread) : ''}</span>
+                <span className={cx('text-center font-display text-[21px] tabular-nums @[540px]:order-2', total === undefined && 'text-text-muted')}>
+                  {total ?? '—'}
+                </span>
+                <span className="num w-7 text-right font-bold tabular-nums @[540px]:order-3 @[540px]:w-auto">
+                  {total === undefined ? '—' : signed(abilityModifier(total))}
+                </span>
+              </span>
+              {s.columns.map((c, i) => {
+                const on = c.holder === a;
+                const other = c.holder && !on ? t.abilities[c.holder] : null;
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    role="radio"
+                    aria-checked={on}
+                    data-value={c.value}
+                    aria-label={other ? t.crSwapWith(c.value, other) : String(c.value)}
+                    title={other ? t.crSwapWith(c.value, other) : undefined}
+                    onClick={() => {
+                      act(on ? { type: 'unassignScore', ability: a } : { type: 'assignScore', ability: a, value: c.value });
+                      setFocus({ kind: 'ability', id: a });
+                    }}
+                    className={cx(
+                      'num h-12 w-full rounded-[var(--radius-nav)] border text-[16px] tabular-nums transition-colors duration-[120ms] hover:border-gold @[540px]:h-11',
+                      on
+                        ? 'border-gold bg-gold font-bold text-on-primary'
+                        : other
+                          ? 'border-dashed border-hairline text-text-muted'
+                          : 'border-hairline bg-plaque text-on-surface',
+                    )}
+                  >
+                    {c.value}
+                  </button>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/** Una fila de los métodos que no reparten dados: −/+ en compra de puntos y un
+ *  campo a mano. */
 function ScoreRow({
   ability,
   method,
@@ -766,7 +887,7 @@ function ScoreRow({
         className="num h-11 w-20 rounded-[var(--radius-input)] border border-hairline bg-plaque px-2 text-center text-on-surface"
       />
     );
-  } else if (method === 'pointBuy') {
+  } else {
     control = (
       <span className="flex items-center gap-2">
         <Button
@@ -794,37 +915,6 @@ function ScoreRow({
         >
           <Plus size={16} aria-hidden="true" />
         </Button>
-      </span>
-    );
-  } else {
-    control = (
-      <span className="flex flex-wrap gap-1.5" role="radiogroup" aria-label={t.abilities[ability]}>
-        {s.values.map((v) => {
-          const on = base === v;
-          return (
-            <button
-              key={v}
-              type="button"
-              role="radio"
-              aria-checked={on}
-              data-value={v}
-              onClick={() => {
-                act({ type: 'assignScore', ability, value: v });
-                onFocus();
-              }}
-              className={cx(
-                'num h-11 w-11 rounded-[var(--radius-nav)] border text-[15px] tabular-nums',
-                on
-                  ? 'border-gold bg-gold-soft font-bold text-gold'
-                  : s.taken[ability].includes(v)
-                    ? 'border-hairline bg-plaque text-text-muted'
-                    : 'border-hairline bg-plaque text-on-surface',
-              )}
-            >
-              {v}
-            </button>
-          );
-        })}
       </span>
     );
   }

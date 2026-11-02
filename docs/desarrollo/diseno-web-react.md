@@ -96,9 +96,11 @@ mismo tipo, lleva `key` con el paso.
 
 El creador (`src/creation/CreationWizard.tsx`) suma dos piezas propias, que por
 ahora solo usa él: la fila de clases (`ClassCard`, scroll horizontal) y la
-matriz de características (`ScoreRow`: una fila es una elección de una, y el
-valor que ya tiene otra va en gris y tocarlo las intercambia; en compra de
-puntos es −/+ y a mano, un campo). Sus pasos de elecciones viven en
+matriz de características (`ScoreMatrix`: una columna por dado, así dos 14 son
+dos columnas; una fila es una elección de una; la cabecera dice qué queda libre
+y quién tiene cada dado; tocar uno ocupado los intercambia y el propio lo suelta;
+mide su contenedor y debajo de 540 px apila cada característica en dos líneas).
+En compra de puntos y a mano no hay dados: es `ScoreRow`, con −/+ o un campo. Sus pasos de elecciones viven en
 `src/creation/ChoiceSteps.tsx`; el catálogo de compras reusa `catalogRows` y
 `FamilyFilter` de `src/sheet/ItemCatalog.tsx`, sin el diálogo de pago.
 

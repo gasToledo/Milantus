@@ -817,6 +817,8 @@ class CreationDraft {
         );
       case 'applySuggestedScores':
         applySuggestedScores();
+      case 'unassignScore':
+        if (ability != null) assignedScores.remove(ability);
       case 'clearScores':
         clearScores();
       case 'assignScore':
@@ -1491,6 +1493,27 @@ class CreationDraft {
     return m;
   }
 
+  /// Un dado por columna, de mayor a menor, con quién lo tiene. Dos 14 son dos
+  /// columnas: juntos parecía que faltaba una elección. El borrador guarda
+  /// valores y no dados, así que las copias se reparten en el orden de las
+  /// características; como valen lo mismo, da igual cuál le toque a cuál.
+  List<({int value, Ability? holder})> get scoreColumns {
+    final holders = <int, List<Ability>>{};
+    for (final a in Ability.values) {
+      if (assignedScores[a] case final v?) (holders[v] ??= []).add(a);
+    }
+    final dice = List.of(pool)..sort((a, b) => b.compareTo(a));
+    return [
+      for (final v in dice)
+        (
+          value: v,
+          holder: (holders[v]?.isNotEmpty ?? false)
+              ? holders[v]!.removeAt(0)
+              : null,
+        ),
+    ];
+  }
+
   /// Cuántas copias de [v] quedan libres en el pool, ignorando lo que tenga [a].
   int freeCopiesOf(int v, Ability a) {
     final total = pool.where((x) => x == v).length;
@@ -1921,16 +1944,10 @@ class CreationDraft {
         'suggested': {
           for (final e in draft.suggestedScores.entries) e.key.name: e.value,
         },
-        // Las columnas de la matriz: una por valor distinto (una tirada puede
-        // repetirlos), y por característica los que ya no tienen copia libre.
-        'values': draft.pool.toSet().toList()..sort((a, b) => b.compareTo(a)),
-        'taken': {
-          for (final a in Ability.values)
-            a.name: [
-              for (final v in draft.pool.toSet())
-                if (draft.freeCopiesOf(v, a) <= 0) v,
-            ],
-        },
+        'columns': [
+          for (final c in draft.scoreColumns)
+            {'value': c.value, 'holder': c.holder?.name},
+        ],
         'manualRange': [manualScoreMin, manualScoreMax],
         'pointBudget': pointBuyBudget,
         'pointsRemaining': draft.pointsRemaining,

@@ -398,8 +398,8 @@ export interface CreationView {
   scores: {
     suggested: Partial<Record<AbilityId, number>>;
     standardArray: number[];
-    values: number[];
-    taken: Record<AbilityId, number[]>;
+    /** Un dado por columna, con quién lo tiene. */
+    columns: { value: number; holder: AbilityId | null }[];
     manualRange: [number, number];
     pointBudget: number;
     pointsRemaining: number;
@@ -498,6 +498,7 @@ export type CreationAction =
   | { type: 'applyScoreMethod'; method: ScoreMethodId }
   | { type: 'applySuggestedScores' | 'clearScores' }
   | { type: 'assignScore'; ability: AbilityId; value: number }
+  | { type: 'unassignScore'; ability: AbilityId }
   | { type: 'stepPointBuy'; ability: AbilityId; delta: number }
   | { type: 'setManualScore'; ability: AbilityId; value: number | null }
   | {
