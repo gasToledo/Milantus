@@ -69,6 +69,18 @@ export async function saveCharacter(character: CharacterJson & { id: string }): 
   if (!response.ok) throw new ApiError(response.status, path);
 }
 
+/** Da de alta un personaje (`POST /api/characters`). Como al guardar,
+ *  [character] es lo que devolvió el motor. */
+export async function createCharacter(character: CharacterJson & { id: string }): Promise<void> {
+  const path = '/api/characters';
+  const response = await fetch(path, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ character }),
+  });
+  if (!response.ok) throw new ApiError(response.status, path);
+}
+
 /** Lo que el dashboard lee de los ajustes de la cuenta (`AppSettings` en
  *  Flutter). Crudo: `sortMode` es el nombre del modo tal como se guardó. */
 export interface RosterSettings {

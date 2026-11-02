@@ -20,7 +20,7 @@ import type { SheetWriter } from '../sheet/writer';
 import { Button, ButtonLink } from '../ui/Button';
 import { cx } from '../ui/cx';
 import { MarkdownText } from '../ui/MarkdownText';
-import { AfterCard, Block, DetailBody, matchesQuery, Option, SpellPickBlock, Status, StepRail, Tag, WIZARD_ASIDE, WizardFooter } from '../ui/wizard';
+import { AfterCard, Block, DetailBody, matchesQuery, Option, ReviewRow, SpellPickBlock, Status, StepRail, Tag, WIZARD_ASIDE, WizardFooter } from '../ui/wizard';
 
 type StepId =
   | 'resumen'
@@ -919,20 +919,6 @@ function SummaryRow({ label, status, onClick }: { label: string; status: ReactNo
         <span className="font-medium">{label}</span>
       )}
       {status}
-    </div>
-  );
-}
-
-function ReviewRow({ label, value, onChange, t }: { label: string; value: string; onChange: () => void; t: Texts }) {
-  return (
-    <div className="flex items-center gap-3.5 border-t border-hairline py-2.5 first:border-t-0">
-      <span className="min-w-0 flex-1">
-        <span className="block font-medium">{label}</span>
-        <span className="mt-0.5 block text-[12.5px] text-on-surface-variant">{value}</span>
-      </span>
-      <Button tone="secondary" onClick={onChange}>
-        {t.luChange}
-      </Button>
     </div>
   );
 }

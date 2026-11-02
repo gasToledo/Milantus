@@ -468,7 +468,7 @@ repiten acá.
   como `spellPicks`, `classCantripPicks` y `classSpellPicks`. El motor
   rechaza confirmar una subida a medias. Las piezas del circuito viven en
   `src/ui/wizard.tsx`, compartidas con el creador.
-  **Creador de personajes** (5d, en curso). El diseño aprobado está en el
+  **Creador de personajes** (5d). El diseño aprobado está en el
   lienzo «Creador de personajes»: las mismas piezas que la subida, nueve pasos
   (Especie, Clase, Trasfondo, Características, Competencias, Conjuros,
   Equipo, Detalles, Revisión), la clase en una fila y las características en
@@ -481,14 +481,13 @@ repiten acá.
   esas secciones. El puente es `creation(catálogo, borrador, acción)`: aplica
   la acción (`CreationDraft.apply`) con todas las podas y devuelve
   `viewJson` (borrador, pendientes, el personaje para «Así queda» y lo que
-  deciden las reglas de cada paso). Desde 5d2 existen en
-  `/v2/personajes/nuevo` (`src/creation/CreationWizard.tsx`, **sin enlace
-  todavía**: «Crear personaje» sigue yendo a Flutter hasta 5d4) Especie, Clase,
-  Trasfondo y Características, y desde 5d3 Competencias, Conjuros (que se saltea
-  si no hay nada que elegir) y Equipo con su catálogo de compras, sin guardar
-  nada. El detalle sale de
-  `codexEntries`, como en la subida, y «Así queda» compila el personaje que
-  devuelve el motor. Detalles y Revisión se ven en la tira de pasos, apagados.
+  deciden las reglas de cada paso). Los nueve pasos están en
+  `/v2/personajes/nuevo` (`src/creation/`), y «Crear personaje» del tablero lleva
+  ahí en las cuentas con `/v2`. El detalle sale de `codexEntries`, como en la
+  subida, y «Así queda» compila el personaje que devuelve el motor. El alta es
+  `creationConfirm` del motor, que rechaza un borrador incompleto, y
+  `POST /api/characters`. Rehacer un personaje y crear la ficha de un PNJ siguen
+  en Flutter.
   - **Toda escritura la hace el motor.** `actOn` (`act` de `js/entrypoint.dart`,
     sobre `SheetActions.apply` del engine) recibe la ficha y la acción y
     devuelve la ficha nueva, migrada y con el `schemaVersion` actual, más lo
@@ -543,10 +542,10 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    editar la mochila desde la fila y las monedas *(existe)*; 5b2, catálogo,
    comprar y vender *(existe)*; 5c1, subida de nivel sin elecciones de rasgos,
    competencias ni conjuros *(existe)*; 5c2, esas elecciones de rasgos y
-   competencias *(existe)*; 5c3, los conjuros *(existe)*; 5d, creador, en
+   competencias *(existe)*; 5c3, los conjuros *(existe)*; 5d, creador *(existe)*, en
    cuatro: 5d1, el borrador en el motor *(existe)*; 5d2, Especie, Clase,
    Trasfondo y Características *(existe)*; 5d3, Competencias, Conjuros y Equipo *(existe)*; 5d4,
-   Detalles, Revisión y el alta.
+   Detalles, Revisión y el alta *(existe)*.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
    combate, vínculos y códigos de campaña. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de

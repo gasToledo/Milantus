@@ -1,4 +1,5 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useRef, useMemo, useState, type ReactNode } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   BookOpen,
   Church,
@@ -19,18 +20,21 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { accentOf, nameOf } from '../api/catalog';
-import { useSheetCatalog } from '../api/queries';
+import { createCharacter } from '../api/client';
+import { queryKeys, useSheetCatalog } from '../api/queries';
 import { codexEntries, type CodexEntry } from '../codex/entries';
 import { RosterFooter } from '../dashboard/RosterPanel';
 import {
   abilityModifier,
   catalogLabel,
   computeSheet,
+  creationConfirm,
   creationView,
   formatAmount,
   vocabularyLabel,
   type AbilityId,
   type Catalog,
+  type CharacterJson,
   type ComputedSheet,
   type CreationAction,
   type CreationDraftJson,
@@ -42,7 +46,7 @@ import {
 } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import type { Lang, Texts } from '../i18n/texts';
-import { navigate, rosterHref } from '../router';
+import { characterHref, navigate, rosterHref } from '../router';
 import { signed } from '../sheet/format';
 import { coinLabels } from '../sheet/ItemCatalog';
 import { ABILITIES } from '../sheet/vocabulary';
@@ -68,7 +72,7 @@ import {
   type AfterRow,
 } from '../ui/wizard';
 import type { Account } from '../api/client';
-import { EquipmentStep, ProficienciesStep, SpellsStep, type Focus, type StepProps } from './ChoiceSteps';
+import { DetailsStep, EquipmentStep, ProficienciesStep, ReviewStep, SpellsStep, type Focus, type StepProps } from './ChoiceSteps';
 
 const STEPS = [
   'especie',
@@ -96,9 +100,6 @@ const SECTIONS: Record<StepId, CreationSectionId[]> = {
   revision: [],
 };
 
-// ponytail: el último paso construido. Detalles, Revisión y el alta llegan con
-// 5d4; hasta entonces no se avanza más allá ni hay enlace a esta ruta.
-const LAST_BUILT: StepId = 'equipo';
 
 const CLASS_ICONS: Record<string, LucideIcon> = {
   shield: Shield,
@@ -171,17 +172,41 @@ function CreationWizard({ catalog, onExit, onTouched }: { catalog: Catalog; onEx
   const view = useMemo(() => creationView(catalog, draft), [catalog, draft]);
   const sheet = useMemo(() => computeSheet(view.character, catalog), [view, catalog]);
 
+  const client = useQueryClient();
+  const [creating, setCreating] = useState(false);
+  const [failed, setFailed] = useState(false);
+  // El mismo personaje en cada reintento: otro id, si la primera vez sí llegó y
+  // lo que se perdió fue la respuesta, daría dos.
+  const toCreate = useRef<(CharacterJson & { id: string }) | null>(null);
+
+  const create = async () => {
+    setCreating(true);
+    setFailed(false);
+    try {
+      toCreate.current ??= creationConfirm(catalog, view.draft, t.crUnnamed);
+      await createCharacter(toCreate.current);
+      // Se espera a tener la lista nueva: la ficha se lee de ahí.
+      await client.invalidateQueries({ queryKey: queryKeys.roster });
+      navigate(characterHref(toCreate.current.id));
+    } catch {
+      setFailed(true);
+      setCreating(false);
+    }
+  };
+
   const act = (action: CreationAction) => {
     onTouched();
+    toCreate.current = null;
+    setFailed(false);
     setDraft(creationView(catalog, draft, action).draft);
   };
 
   // Quien no lanza ni recibe un cupo de conjuros no tiene nada que hacer ahí.
   const steps = STEPS.filter((s) => s !== 'conjuros' || view.spells.applicable);
   const index = Math.max(0, steps.indexOf(stepId));
-  const lastBuilt = steps.indexOf(LAST_BUILT);
+  const last = steps.length - 1;
   const pendingOf = (s: StepId) => view.pending.filter((p) => SECTIONS[s].includes(p.section));
-  const reachable = (i: number) => i <= lastBuilt && steps.slice(0, i).every((s) => pendingOf(s).length === 0);
+  const reachable = (i: number) => steps.slice(0, i).every((s) => pendingOf(s).length === 0);
   const pending = pendingOf(stepId);
 
   const go = (s: StepId) => {
@@ -204,8 +229,10 @@ function CreationWizard({ catalog, onExit, onTouched }: { catalog: Catalog; onEx
   const rows = afterRows(stepId, view, sheet, catalog, t);
   const message =
     pending.length === 0
-      ? index === lastBuilt
-        ? t.crNextSoon
+      ? index === last
+        ? failed
+          ? t.crCreateFailed
+          : t.crCreateHint
         : null
       : pending[0]!.kind === 'assignScores'
         ? t.crMissingScore(t.abilities[ABILITIES.find((a) => view.draft.assignedScores?.[a] === undefined)!])
@@ -236,13 +263,17 @@ function CreationWizard({ catalog, onExit, onTouched }: { catalog: Catalog; onEx
           {stepId === 'competencias' && <ProficienciesStep {...props} />}
           {stepId === 'conjuros' && <SpellsStep {...props} />}
           {stepId === 'equipo' && <EquipmentStep {...props} />}
+          {stepId === 'detalles' && <DetailsStep {...props} />}
+          {stepId === 'revision' && <ReviewStep {...props} sheet={sheet} onChange={go} />}
         </div>
         <aside className={WIZARD_ASIDE}>
           {/* En un teléfono cada conjuro se lee en su diálogo: acá abajo quedaba
               lejos de la lista. */}
-          <div className={cx('flex flex-col', stepId === 'conjuros' && 'hidden lg:flex')}>
-            <DetailPanel focus={focus} view={view} catalog={catalog} lang={lang} t={t} />
-          </div>
+          {stepId !== 'detalles' && stepId !== 'revision' && (
+            <div className={cx('flex flex-col', stepId === 'conjuros' && 'hidden lg:flex')}>
+              <DetailPanel focus={focus} view={view} catalog={catalog} lang={lang} t={t} />
+            </div>
+          )}
           {rows.length > 0 && <AfterCard rows={rows} heading={t.luAfterHeading} field="creation-after" className="hidden lg:block" />}
         </aside>
       </div>
@@ -273,13 +304,15 @@ function CreationWizard({ catalog, onExit, onTouched }: { catalog: Catalog; onEx
             {t.luBack}
           </Button>
         )}
-        <Button
-          className="flex-[2] sm:flex-none"
-          disabled={pending.length > 0 || index >= lastBuilt}
-          onClick={() => go(steps[index + 1]!)}
-        >
-          {t.luContinue}
-        </Button>
+        {index === last ? (
+          <Button className="flex-[2] sm:flex-none" disabled={view.pending.length > 0 || creating} onClick={() => void create()}>
+            {failed ? t.retry : t.rosterCreate}
+          </Button>
+        ) : (
+          <Button className="flex-[2] sm:flex-none" disabled={pending.length > 0} onClick={() => go(steps[index + 1]!)}>
+            {t.luContinue}
+          </Button>
+        )}
       </WizardFooter>
     </div>
   );
@@ -1117,7 +1150,32 @@ function afterRows(step: StepId, view: CreationView, sheet: ComputedSheet, catal
         { label: t.crArmorClass, to: sheet.armorClass },
         ...sheet.attacks.map((a) => ({ label: a.name, to: `${signed(a.attackBonus)} · ${a.damage}` })),
       ];
-    default:
-      return [];
+    case 'detalles':
+      return [
+        { label: t.crIdentity, to: (d.name ?? '').trim() || t.crUnnamed },
+        { label: t.luRowMaxHp, to: sheet.maxHp },
+        { label: t.crArmorClass, to: sheet.armorClass },
+      ];
+    case 'revision':
+      return [
+        ...ABILITIES.map((a) => ({
+          label: t.abilities[a],
+          to: `${sheet.abilityScores[a] ?? 0} (${signed(sheet.abilityModifiers[a] ?? 0)})`,
+        })),
+        { label: t.luRowMaxHp, to: sheet.maxHp, gold: true },
+        { label: t.crArmorClass, to: sheet.armorClass },
+        { label: t.crSpeed, to: t.codexFeet(sheet.speed) },
+        { label: t.crInitiative, to: signed(sheet.initiative) },
+        { label: t.crProficiencyBonus, to: signed(sheet.proficiencyBonus) },
+        ...(sc
+          ? [
+              { label: t.luRowSpellDc, to: sc.saveDc },
+              { label: t.crSpellAttack, to: signed(sc.attackBonus) },
+              { label: t.crSlotsFirst, to: sc.slotsByLevel[1] ?? 0 },
+            ]
+          : []),
+        { label: t.crPassivePerception, to: sheet.passivePerception },
+        { label: t.crGold, to: formatAmount(Math.max(view.equipment.goldLeftCp, 0), coinLabels(t)) },
+      ];
   }
 }

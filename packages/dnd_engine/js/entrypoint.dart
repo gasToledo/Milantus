@@ -680,8 +680,20 @@ String creation(
   return jsonEncode(draft.viewJson());
 }
 
+/// Confirma el creador: el personaje listo para guardar, con su id y los PG al
+/// máximo. Lanza si falta algo (`CreationDraft.confirm`). [unnamed] es el nombre
+/// si no se escribió ninguno, en el idioma del cliente.
+String creationConfirm(String catalogJson, String draftJson, String unnamed) =>
+    jsonEncode(
+      CreationDraft.fromJson(
+        _repoPara(catalogJson),
+        jsonDecode(draftJson) as Map<String, dynamic>,
+      ).confirm(unnamed: unnamed).toJson(),
+    );
+
 void main() {
   final motor = JSObject();
+  motor['creationConfirm'] = creationConfirm.toJS;
   motor['creation'] = creation.toJS;
   motor['act'] = act.toJS;
   motor['compute'] = compute.toJS;

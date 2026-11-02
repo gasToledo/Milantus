@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { Check } from 'lucide-react';
 import { fold, type CodexDetail } from '../codex/entries';
 import type { Texts } from '../i18n/texts';
+import { Button } from './Button';
 import { cx } from './cx';
 import { Eyebrow } from './data';
 
@@ -381,6 +382,21 @@ export function TraitList({ traits }: { traits: { name: string; description?: st
         </li>
       ))}
     </ul>
+  );
+}
+
+/** Una fila de la revisión final: qué se eligió y cómo volver a ese paso. */
+export function ReviewRow({ label, value, onChange, t }: { label: string; value: string; onChange: () => void; t: Texts }) {
+  return (
+    <div className="flex items-center gap-3.5 border-t border-hairline py-2.5 first:border-t-0">
+      <span className="min-w-0 flex-1">
+        <span className="block font-medium">{label}</span>
+        <span className="mt-0.5 block text-[12.5px] text-on-surface-variant">{value}</span>
+      </span>
+      <Button tone="secondary" onClick={onChange}>
+        {t.luChange}
+      </Button>
+    </div>
   );
 }
 

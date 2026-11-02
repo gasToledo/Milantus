@@ -1,15 +1,15 @@
 import { expect, test } from '@playwright/test';
 import { computeSheet, creationView, formatAmount, type CreationAction, type CreationDraftJson } from '../src/engine';
 import { textsFor } from '../src/i18n/texts';
-import { catalogo, TOKEN, vigilarEscrituras } from './helpers';
+import { api, catalogo, TOKEN_ESCRITURA, vigilarEscrituras, type PersonajeApi } from './helpers';
 
 test.use({ locale: 'es-AR' });
 
 test.beforeEach(async ({ context, baseURL }) => {
-  await context.addCookies([{ name: 'dnd_session', value: TOKEN, url: baseURL! }]);
+  await context.addCookies([{ name: 'dnd_session', value: TOKEN_ESCRITURA, url: baseURL! }]);
 });
 
-test('de Especie a Equipo: cada paso frena hasta completarse y nada se guarda', async ({ page }) => {
+test('de Especie a la ficha: cada paso frena hasta completarse y solo el final guarda', async ({ page, request }) => {
   const catalog = catalogo();
   let draft: CreationDraftJson = {};
   // Lo que el motor da para los mismos toques: lo que la página tiene que mostrar.
@@ -135,8 +135,32 @@ test('de Especie a Equipo: cada paso frena hasta completarse y nada se guarda', 
   const monedas = Object.fromEntries(Object.entries(textsFor('es').coins).map(([k, v]) => [k, v.abbr]));
   await expect(page.locator('[data-field="gold-left"]')).toContainText(formatAmount(vista.equipment.goldLeftCp, monedas));
 
-  // ponytail: hasta acá llega 5d3; cuando estén Detalles y Revisión, esto sigue.
-  await expect(page.locator('[data-page="creation"] footer [role="status"]')).toBeVisible();
-  await expect(seguir).toBeDisabled();
+  await seguir.click();
+
+  // Detalles: nada obligatorio.
+  await page.getByLabel('Nombre').fill('Mirela de humo');
+  await opcion('neutralGood').click();
+  await page.getByLabel('Rasgo de personalidad').fill('Anota en los márgenes.');
+  await seguir.click();
+
+  // Revisión: «Cambiar» vuelve al paso y lo elegido sigue ahí.
+  await expect(page.getByText('Mirela de humo')).toBeVisible();
+  await page.getByRole('button', { name: 'Cambiar' }).last().click();
+  await expect(page.getByLabel('Nombre')).toHaveValue('Mirela de humo');
+  await seguir.click();
   expect(escrituras).toEqual([]);
+
+  // El alta: el personaje que guarda es el que dice el motor.
+  const hecho = page.waitForResponse((r) => r.request().method() === 'POST' && r.url().endsWith('/api/characters'));
+  await page.getByRole('button', { name: 'Crear personaje', exact: true }).click();
+  expect((await hecho).ok()).toBe(true);
+  await expect(page).toHaveURL(/\/v2\/personajes\/[^/]+\/personaje$/);
+  expect(escrituras).toEqual(['POST /api/characters']);
+
+  const { characters } = await api<{ characters: { character: PersonajeApi }[] }>(request, '/api/characters', TOKEN_ESCRITURA);
+  const creado = characters.map((c) => c.character).find((c) => c.name === 'Mirela de humo')!;
+  vista = motor({ type: 'setName', name: 'Mirela de humo' });
+  const ficha = computeSheet(vista.character, catalog);
+  expect(creado.combat.currentHp).toBe(ficha.maxHp);
+  await expect(page.locator('[data-page="creation"]')).toHaveCount(0);
 });

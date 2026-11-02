@@ -891,6 +891,34 @@ void main() {
     );
   });
 
+  test('no se confirma un personaje a medias, y completo sale con nombre y PG',
+      () {
+    final d = newDraft()..selectRace('dwarf');
+    expect(() => d.confirm(), throwsStateError);
+
+    d
+      ..selectClass('barbarian')
+      ..selectBackground('soldier')
+      ..setSpread(Ability.strength, Ability.constitution)
+      ..applySuggestedScores()
+      ..classEquipmentOptionId = 'B'
+      ..backgroundEquipmentOptionId = 'B'
+      ..languages.addAll(['elvish', 'orc']);
+    d.classSkills.addAll(d.classSkillChoices.take(d.klass!.skillChoiceCount));
+    d.weaponMasteries.addAll(
+      d.proficientWeapons.take(d.weaponMasterySlots).map((w) => w.id),
+    );
+    for (final slot in d.allProficiencyChoiceSlots) {
+      d.proficiencyChoices[slot.groupId] =
+          slot.options.take(slot.count).toList();
+    }
+    expect(d.pending, isEmpty);
+
+    final c = d.confirm(unnamed: 'Sin nombre');
+    expect(c.name, 'Sin nombre');
+    expect(c.combat.currentHp, CharacterCompiler(repo).compile(c).maxHp);
+  });
+
   test('el personaje creado arranca con los PG al máximo', () {
     final d = newDraft()
       ..selectRace('dwarf')

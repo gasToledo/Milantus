@@ -20,6 +20,7 @@ interface DartEngine {
   trade(requestJson: string, labelsJson: string): string;
   levelUp(characterJson: string, catalogJson: string, draftJson: string): string;
   creation(catalogJson: string, draftJson: string, actionJson: string, seed?: number): string;
+  creationConfirm(catalogJson: string, draftJson: string, unnamed: string): string;
   rollDie(sides: number): number;
   coinParts(cp: number): string;
   formatAmount(cp: number, labelsJson: string): string;
@@ -364,6 +365,9 @@ export interface CreationDraftJson {
   languages?: string[];
   classEquipmentOptionId?: string | null;
   backgroundEquipmentOptionId?: string | null;
+  name?: string;
+  alignment?: string | null;
+  personalityTrait?: string;
   [key: string]: unknown;
 }
 
@@ -408,6 +412,7 @@ export interface CreationView {
     preview: Partial<Record<AbilityId, number>>;
     descriptions: Record<AbilityId, string>;
   };
+  details: { alignments: { id: string; label: string }[] };
   proficiencies: {
     backgroundSkills: string[];
     backgroundTools: string[];
@@ -528,6 +533,9 @@ export type CreationAction =
   | { type: 'toggleRaceFeat' | 'setClassEquipment' | 'setBackgroundEquipment' | 'buy'; id: string }
   | { type: 'setEquipmentChoice'; key: string; id: string }
   | { type: 'setPurchase'; id: string; quantity: number }
+  | { type: 'setName'; name: string }
+  | { type: 'setAlignment'; alignment: string | null }
+  | { type: 'setTrait'; text: string }
   | { type: 'setArmorWorn' | 'setWeaponWielded' | 'setOffHand' | 'setTwoHanded'; id: string; on: boolean };
 
 /** El creador: aplica [action] al borrador y devuelve el borrador nuevo y lo
@@ -536,6 +544,12 @@ export function creationView(catalog: Catalog, draft: CreationDraftJson, action?
   return JSON.parse(
     engine().creation(catalogJson(catalog), JSON.stringify(draft), action ? JSON.stringify(action) : ''),
   ) as CreationView;
+}
+
+/** El personaje listo para guardar. Lanza si el borrador está incompleto: la
+ *  pantalla no lo ofrece, pero la regla es del motor. */
+export function creationConfirm(catalog: Catalog, draft: CreationDraftJson, unnamed: string): CharacterJson & { id: string } {
+  return JSON.parse(engine().creationConfirm(catalogJson(catalog), JSON.stringify(draft), unnamed)) as CharacterJson & { id: string };
 }
 
 export function rollDie(sides: number): number {

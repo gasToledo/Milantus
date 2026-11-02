@@ -1,12 +1,15 @@
 import { useMemo, useState } from 'react';
 import { Info, Minus, Plus, Trash2 } from 'lucide-react';
-import { nameOf } from '../api/catalog';
+import { accentOf, nameOf } from '../api/catalog';
 import { codexEntries } from '../codex/entries';
 import {
+  catalogLabel,
   formatAmount,
   formatCost,
+  vocabularyLabel,
   type AbilityId,
   type Catalog,
+  type ComputedSheet,
   type CreationAction,
   type CreationSpellRow,
   type CreationView,
@@ -14,16 +17,21 @@ import {
 import type { Lang, Texts } from '../i18n/texts';
 import { signed } from '../sheet/format';
 import { catalogRows, coinLabels, FamilyFilter, type CatalogRow, type Family } from '../sheet/ItemCatalog';
+import { ABILITIES } from '../sheet/vocabulary';
 import { AppDialog } from '../ui/AppDialog';
 import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
-import { Block, DetailBody, Option, SearchableList, Status } from '../ui/wizard';
+import { Medallion } from '../ui/Medallion';
+import { Block, DetailBody, Option, ReviewRow, SearchableList, Status } from '../ui/wizard';
 
 /** Lo que explica el panel de la derecha: lo último que se tocó. */
 export type Focus = {
   kind: 'race' | 'lineage' | 'class' | 'background' | 'feat' | 'weapon' | 'ability' | 'skill' | 'spell' | 'item';
   id: string;
 } | null;
+
+/** Los pasos a los que vuelve la revisión. */
+export type ReviewStepId = 'especie' | 'clase' | 'trasfondo' | 'caracteristicas' | 'competencias' | 'conjuros' | 'equipo' | 'detalles';
 
 export interface StepProps {
   t: Texts;
@@ -379,6 +387,178 @@ export function SpellsStep({ t, lang, catalog, view, act, setFocus }: StepProps)
         </AppDialog>
       )}
     </section>
+  );
+}
+
+/** Detalles: nombre y sabor. Nada de esto pide el motor: se puede crear sin
+ *  nombre, y sale con el de «Sin nombre». */
+export function DetailsStep({ t, catalog, view, act }: StepProps) {
+  const d = view.draft;
+  const klass = nameOf(catalog.classes, d.classId);
+  const inputCls = 'w-full rounded-[var(--radius-input)] border border-hairline bg-plaque px-3 py-2.5 text-on-surface';
+  return (
+    <>
+      <section className="step-in card flex flex-wrap items-center gap-4 p-4">
+        <Medallion name={d.name || (klass ?? t.crUnnamed)} accent={d.classId ? accentOf(catalog, d.classId) : null} size={72} />
+        <label className="flex min-w-[220px] flex-1 flex-col gap-1.5 text-[12.5px] text-on-surface-variant">
+          {t.crName}
+          <input
+            type="text"
+            autoComplete="off"
+            value={d.name ?? ''}
+            onChange={(e) => act({ type: 'setName', name: e.target.value })}
+            className={cx(inputCls, 'text-[15px]')}
+          />
+          <span>{t.crPortraitLater}</span>
+        </label>
+      </section>
+
+      <Block title={t.crAlignment}>
+        <div className="grid gap-2 sm:grid-cols-3" role="radiogroup" aria-label={t.crAlignment}>
+          {view.details.alignments.map((a) => (
+            <Option
+              key={a.id}
+              id={a.id}
+              selected={d.alignment === a.id}
+              title={a.label}
+              onClick={() => act({ type: 'setAlignment', alignment: a.id })}
+            />
+          ))}
+          <Option
+            id="no-alignment"
+            selected={!d.alignment}
+            title={t.crNoAlignment}
+            onClick={() => act({ type: 'setAlignment', alignment: null })}
+          />
+        </div>
+      </Block>
+
+      <section className="step-in card flex flex-col gap-2 p-4">
+        <label htmlFor="creation-trait" className="font-display text-[16px] text-on-surface">
+          {t.crTrait}
+        </label>
+        <textarea
+          id="creation-trait"
+          rows={3}
+          value={d.personalityTrait ?? ''}
+          onChange={(e) => act({ type: 'setTrait', text: e.target.value })}
+          className={cx(inputCls, 'resize-y text-[14px]')}
+        />
+      </section>
+    </>
+  );
+}
+
+/** Revisión: todo lo elegido, con «Cambiar» para volver a ese paso. Volver no
+ *  borra nada, salvo lo que el cambio arrastre por reglas. */
+export function ReviewStep({
+  t,
+  catalog,
+  view,
+  sheet,
+  onChange,
+}: StepProps & { sheet: ComputedSheet; onChange: (step: ReviewStepId) => void }) {
+  const d = view.draft;
+  const p = view.proficiencies;
+  const { slots, class: cs } = view.spells;
+  const join = (parts: (string | null | undefined | false)[]) => parts.filter(Boolean).join(' · ');
+  const abbr = (a: AbilityId | null | undefined) => (a ? t.abilityAbbr[a] : null);
+  const spellName = (options: { id: string; name: string }[], id: string) => options.find((o) => o.id === id)?.name ?? id;
+  const skills = [...(d.classSkills ?? []), ...(d.raceSkills ?? [])].map((id) => catalogLabel('skill', id));
+  const profs = p.slots.flatMap((slot) => slot.chosen.map((id) => slot.options.find((o) => o.id === id)?.label ?? id));
+  const pack = (options: CreationView['equipment']['classOptions'], id: string | null | undefined) =>
+    options.find((o) => o.id === id)?.label;
+  const alignment = view.details.alignments.find((a) => a.id === d.alignment)?.label;
+  const spread = ABILITIES.flatMap((a) => {
+    const n = view.background.spread[a];
+    return n ? [`${signed(n)} ${t.abilityAbbr[a]}`] : [];
+  });
+  const rows: { step: ReviewStepId; value: string }[] = [
+    {
+      step: 'especie',
+      value: join([
+        nameOf(catalog.races, d.raceId),
+        nameOf(catalog.lineages, d.lineageId),
+        abbr(d.speciesSpellcastingAbility),
+        d.chosenSize && vocabularyLabel('size', d.chosenSize),
+      ]),
+    },
+    {
+      step: 'clase',
+      value: join([
+        nameOf(catalog.classes, d.classId),
+        ...view.class.featureSlots.flatMap((s) => s.chosen.map((id) => s.options.find((o) => o.id === id)?.name ?? id)),
+        ...(d.weaponMasteries ?? []).map((id) => nameOf(catalog.weapons, id) ?? id),
+      ]),
+    },
+    {
+      step: 'trasfondo',
+      value: join([nameOf(catalog.backgrounds, d.backgroundId), spread.join(', '), abbr(d.originFeatSpellcastingAbility)]),
+    },
+    {
+      step: 'caracteristicas',
+      value: ABILITIES.map((a) => `${t.abilityAbbr[a]} ${sheet.abilityScores[a] ?? ''}`).join(' · '),
+    },
+    {
+      step: 'competencias',
+      value: join([
+        skills.join(', '),
+        profs.join(', '),
+        nameOf(catalog.feats, d.raceFeatId),
+        (d.languages ?? []).map((id) => catalogLabel('language', id)).join(', '),
+      ]),
+    },
+    ...(view.spells.applicable
+      ? [
+          {
+            step: 'conjuros' as const,
+            value: join([
+              ...slots.flatMap((s) => s.chosen.map((id) => spellName(s.options, id))),
+              ...(cs ? cs.chosenCantrips.map((id) => spellName(cs.cantrips, id)) : []),
+              ...(cs ? cs.chosenSpells.map((id) => spellName(cs.spells, id)) : []),
+            ]),
+          },
+        ]
+      : []),
+    {
+      step: 'equipo',
+      value: join([
+        pack(view.equipment.classOptions, d.classEquipmentOptionId),
+        pack(view.equipment.backgroundOptions, d.backgroundEquipmentOptionId),
+        ...view.equipment.purchases.map((x) => (x.quantity > 1 ? `${x.name} ×${x.quantity}` : x.name)),
+      ]),
+    },
+    { step: 'detalles', value: join([(d.name ?? '').trim() || t.crUnnamed, alignment]) },
+  ];
+  const automatic = [
+    ...(p.backgroundSkills.length + p.backgroundTools.length > 0
+      ? [{ label: nameOf(catalog.backgrounds, d.backgroundId) ?? '', value: [...p.backgroundSkills, ...p.backgroundTools].join(', ') }]
+      : []),
+    ...(cs && cs.grantedCantrips.length + cs.grantedSpells.length > 0
+      ? [{ label: t.crGrantedSpells, value: [...cs.grantedCantrips, ...cs.grantedSpells].join(', ') }]
+      : []),
+  ];
+  return (
+    <>
+      <Block title={t.crReviewChosen}>
+        {rows.map((r) => (
+          <ReviewRow key={r.step} label={t.crSteps[r.step]} value={r.value} onChange={() => onChange(r.step)} t={t} />
+        ))}
+      </Block>
+      {automatic.length > 0 && (
+        <Block title={t.crReviewAuto}>
+          {automatic.map((a) => (
+            <div key={a.label} className="flex items-center justify-between gap-3 border-t border-hairline py-2.5 first:border-t-0">
+              <span className="min-w-0">
+                <span className="block font-medium">{a.label}</span>
+                <span className="mt-0.5 block text-[12.5px] text-on-surface-variant">{a.value}</span>
+              </span>
+              <Status auto t={t} />
+            </div>
+          ))}
+        </Block>
+      )}
+    </>
   );
 }
 

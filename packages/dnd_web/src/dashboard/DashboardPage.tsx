@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { useRoster, useRosterSettings, useSheetCatalog } from '../api/queries';
 import { useLang, useTexts } from '../i18n/context';
-import { FLUTTER_HOME } from '../router';
+import { creationHref } from '../router';
 import { Button, ButtonLink } from '../ui/Button';
 import { SectionRule } from '../ui/data';
 import { Tooltip } from '../ui/primitives';
@@ -57,7 +57,7 @@ export function DashboardPage() {
         kind="empty"
         message={t.rosterEmpty}
         hint={t.rosterEmptyHint}
-        actions={<ButtonLink href={FLUTTER_HOME} icon={Plus}>{t.rosterCreate}</ButtonLink>}
+        actions={<ButtonLink href={creationHref()} internal icon={Plus}>{t.rosterCreate}</ButtonLink>}
       />
     );
   } else {
@@ -149,8 +149,7 @@ export function DashboardPage() {
             </p>
           </div>
         )}
-        {/* Crear no existe en React: lleva al asistente de Flutter. */}
-        <ButtonLink href={FLUTTER_HOME} icon={Plus} tone="soft" shape="pill">
+        <ButtonLink href={creationHref()} internal icon={Plus} tone="soft" shape="pill">
           {t.rosterCreate}
         </ButtonLink>
       </header>
