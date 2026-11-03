@@ -1133,6 +1133,11 @@ class Item {
   /// Bases concretas admitidas. Vacío significa cualquier base del tipo.
   final List<String> eligibleBaseItemIds;
 
+  /// Propiedad que la base tiene que tener (`ammunition`, `thrown`). Va por
+  /// propiedad y no por lista de ids cuando la regla habla de un tipo de arma:
+  /// una lista cerrada deja afuera a toda arma homebrew que la cumpla.
+  final String? eligibleBaseProperty;
+
   /// Efectos que el objeto aporta a la ficha mientras está equipado (y
   /// sintonizado, si lo exige). Vacío = objeto sin mecánica, que es el caso de
   /// todo el catálogo mundano.
@@ -1165,6 +1170,7 @@ class Item {
     this.magicBonus = 0,
     this.baseItemKind,
     this.eligibleBaseItemIds = const [],
+    this.eligibleBaseProperty,
     this.effects = const [],
     this.magicItemType,
     this.cursed = false,
@@ -1216,6 +1222,8 @@ class Item {
         if (baseItemKind != null) 'baseItemKind': baseItemKind,
         if (eligibleBaseItemIds.isNotEmpty)
           'eligibleBaseItemIds': eligibleBaseItemIds,
+        if (eligibleBaseProperty != null)
+          'eligibleBaseProperty': eligibleBaseProperty,
         if (effects.isNotEmpty)
           'effects': [for (final e in effects) e.toJson()],
         if (magicItemType != null) 'magicItemType': magicItemType,
@@ -1249,6 +1257,7 @@ class Item {
       eligibleBaseItemIds: (j['eligibleBaseItemIds'] as List? ?? const [])
           .whereType<String>()
           .toList(),
+      eligibleBaseProperty: j['eligibleBaseProperty'] as String?,
       effects: Effect.listFromJson(j['effects']),
       magicItemType: derived?.type ?? j['magicItemType'] as String?,
       cursed: derived?.cursed ?? j['cursed'] as bool? ?? false,

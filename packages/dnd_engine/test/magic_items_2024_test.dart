@@ -193,6 +193,46 @@ void main() {
     );
   });
 
+  test('un arma homebrew sirve de base si tiene la propiedad que pide',
+      () async {
+    final conHomebrew =
+        await ContentRepository.loadFromDirectory('lib/assets/srd_2024');
+    Map<String, dynamic> arma(String id, List<String> properties) => {
+          'id': id,
+          'name': id,
+          'source': 'homebrew',
+          'category': 'martial',
+          'damageDice': '1d10',
+          'damageType': 'piercing',
+          'properties': properties,
+        };
+    conHomebrew.addAll(ContentRepository.fromJsonPacks(weapons: [
+      arma('hb-mosquete', ['ammunition', 'ranged']),
+      arma('hb-sable', []),
+    ]));
+    final plantilla = conHomebrew.item('repeating-shot')!;
+    final bases = InventoryOps.magicBaseOptions(plantilla, conHomebrew);
+    expect(bases, contains('hb-mosquete'));
+    expect(bases, isNot(contains('hb-sable')));
+
+    final c = _character(
+        classId: 'artificer', level: 2, plans: const ['repeating-shot']);
+    expect(
+      InventoryOps.replicateMagicItem(c, 'repeating-shot', conHomebrew,
+              baseItemId: 'hb-mosquete')
+          .inventory
+          .single
+          .baseItemId,
+      'hb-mosquete',
+    );
+    expect(
+      InventoryOps.replicateMagicItem(c, 'repeating-shot', conHomebrew,
+              baseItemId: 'hb-sable')
+          .inventory,
+      isEmpty,
+    );
+  });
+
   test('los planes abiertos de EFA respetan rareza, tipo y nivel', () {
     ItemChoiceSlot slotAt(int level) => CharacterCompiler(repo)
         .compile(_character(classId: 'artificer', level: level))

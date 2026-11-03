@@ -674,13 +674,16 @@ class InventoryOps {
   }
 
   /// Los ids entre los que se elige la base de una réplica de [item]: los que
-  /// la plantilla declara o, si no declara, todas las armas, armaduras (sin
-  /// escudos) o escudos del catálogo, en su orden.
+  /// la plantilla declara o, si no declara, todas las armas (con la propiedad
+  /// que pida), armaduras (sin escudos) o escudos del catálogo, en su orden.
   static List<String> magicBaseOptions(Item item, ContentRepository repo) =>
       item.eligibleBaseItemIds.isNotEmpty
           ? item.eligibleBaseItemIds
           : switch (item.baseItemKind) {
-              'weapon' => repo.weaponsSorted.map((e) => e.id).toList(),
+              'weapon' => repo.weaponsSorted
+                  .where((e) => _hasBaseProperty(item, e))
+                  .map((e) => e.id)
+                  .toList(),
               'armor' => repo.armorSorted
                   .where((e) => !e.isShield)
                   .map((e) => e.id)
@@ -801,6 +804,10 @@ class InventoryOps {
     ]);
   }
 
+  static bool _hasBaseProperty(Item item, Weapon weapon) =>
+      item.eligibleBaseProperty == null ||
+      weapon.properties.contains(item.eligibleBaseProperty);
+
   static bool _validBase(
     Item item,
     String? baseItemId,
@@ -811,7 +818,10 @@ class InventoryOps {
         item.eligibleBaseItemIds.isNotEmpty &&
             !item.eligibleBaseItemIds.contains(baseItemId)) return false;
     return switch (item.baseItemKind) {
-      'weapon' => repo.weapon(baseItemId) != null,
+      'weapon' => switch (repo.weapon(baseItemId)) {
+          final Weapon w => _hasBaseProperty(item, w),
+          null => false,
+        },
       'armor' => repo.armorPiece(baseItemId)?.isShield == false,
       'shield' => repo.armorPiece(baseItemId)?.isShield == true,
       _ => false,

@@ -84,6 +84,7 @@ class _ItemFormState extends State<ItemForm> with _GuidedForm {
     magicBonus: _magicBonusValue,
     baseItemKind: _baseItemKind == 'none' ? null : _baseItemKind,
     eligibleBaseItemIds: _eligibleBases.toList(),
+    eligibleBaseProperty: widget.initial?.eligibleBaseProperty,
     // Las cargas no se editan acá, pero un objeto del catálogo que las
     // tiene deja de ser el mismo objeto sin ellas.
     maxCharges: widget.initial?.maxCharges,
