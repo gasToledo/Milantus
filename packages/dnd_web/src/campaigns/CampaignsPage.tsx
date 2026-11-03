@@ -1,8 +1,8 @@
-import { Share2, UserRound } from 'lucide-react';
+import { UserRound } from 'lucide-react';
 import { usePlayerCampaignsOf, useRoster, useSheetCatalog } from '../api/queries';
 import { useLang, useTexts } from '../i18n/context';
 import type { CharacterFields } from '../engine';
-import { characterHref, FLUTTER_HOME, Link } from '../router';
+import { characterHref, Link, rosterHref } from '../router';
 import { CampaignBlock } from '../sheet/CampaignTab';
 import { ButtonLink } from '../ui/Button';
 import { SectionRule } from '../ui/data';
@@ -51,9 +51,9 @@ export function CampaignsPage() {
           message={t.campaignsPageEmpty}
           hint={t.campaignsPageEmptyHint}
           actions={
-            // Compartir un personaje es una escritura, y vive en Flutter.
-            <ButtonLink href={FLUTTER_HOME} icon={Share2} tone="secondary">
-              {t.actionShare}
+            // No sabe de qué personaje: lleva a elegirlo, y ahí se comparte.
+            <ButtonLink internal href={rosterHref()} icon={UserRound} tone="secondary">
+              {t.campaignsPageGoToCharacters}
             </ButtonLink>
           }
         />

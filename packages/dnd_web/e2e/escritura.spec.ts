@@ -13,7 +13,7 @@ import {
   type SheetAction,
 } from '../src/engine';
 import { resourceKey, signed } from '../src/sheet/format';
-import { api, catalogo, TOKEN_ESCRITURA, vigilarEscrituras, type PersonajeApi } from './helpers';
+import { api, catalogo, TOKEN_ESCRITURA, TOKEN_SIN_V2, vigilarEscrituras, type PersonajeApi } from './helpers';
 
 // La ficha que escriben estas pruebas es de una cuenta propia (`e2e_server.dart`):
 // lo que guardan no cambia los números que leen las otras pruebas.
@@ -661,4 +661,34 @@ test('renombrar desde la lista guarda lo que da el motor', async ({ page, reques
   // Se deja el nombre original: las otras pruebas de esta cuenta lo leen.
   await renombrar(nuevo, antes.name);
   expect((await ilse(request)).name).toBe(antes.name);
+});
+
+test('compartir: el código se canjea, el aviso llega y dejar de compartir avisa al DM', async ({ page, request }) => {
+  const { name } = await ilse(request);
+
+  await page.goto(`/v2/personajes/${ILSE}/personaje`);
+  await page.getByRole('button', { name: 'Compartir' }).click();
+  await page.getByRole('button', { name: 'Generar código' }).click();
+  const code = (await page.locator('[data-field="share-code"]').textContent())!;
+
+  // El DM es la cuenta sin /v2 y solo por API: sus avisos no aparecen en
+  // ninguna pantalla ni chocan con las pruebas que corren en paralelo.
+  const comoDm = { headers: { cookie: `dnd_session=${TOKEN_SIN_V2}` } };
+  await request.post('/api/campaigns', { ...comoDm, data: { campaign: { id: 'mesa-de-compartir', name: 'Mesa de Compartir' } } });
+  await request.post('/api/campaigns/mesa-de-compartir/members', { ...comoDm, data: { code } });
+
+  await page.reload();
+  await expect(page.getByText(`«${name}» se sumó a la campaña «Mesa de Compartir».`, { exact: true })).toBeVisible();
+  // Marcado visto: no vuelve a la próxima entrada.
+  await expect
+    .poll(async () => (await api<{ events: unknown[] }>(request, '/api/events', TOKEN_ESCRITURA)).events)
+    .toEqual([]);
+
+  await page.getByRole('button', { name: 'Compartir' }).click();
+  await page.getByRole('button', { name: 'Dejar de compartir con Mesa de Compartir' }).click();
+  await page.getByRole('button', { name: 'Dejar de compartir', exact: true }).click();
+  await expect(page.getByText('Ya no se comparte con Mesa de Compartir.', { exact: true })).toBeVisible();
+
+  const { events } = await api<{ events: { kind: string }[] }>(request, '/api/events', TOKEN_SIN_V2);
+  expect(events.map((e) => e.kind)).toContain('character_unlinked_by_owner');
 });

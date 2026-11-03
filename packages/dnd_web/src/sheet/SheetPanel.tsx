@@ -11,16 +11,17 @@ import {
   User,
   type LucideIcon,
 } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { canLevelUp, type CharacterJson } from '../engine';
 import { useTexts } from '../i18n/context';
-import { characterHref, FLUTTER_HOME, levelUpHref, portraitHref, rosterHref, SHEET_TABS, type SheetTab } from '../router';
+import { characterHref, levelUpHref, portraitHref, rosterHref, SHEET_TABS, type SheetTab } from '../router';
 import type { Texts } from '../i18n/texts';
 import { Medallion } from '../ui/Medallion';
 import { PrintSheet, usePrintSheet } from './PrintSheet';
 import { ownPortrait } from '../ui/portrait';
 import { NavGroup, NavItem, SidebarBack, ThemeMenu, VersionLabel } from '../ui/Shell';
 import { accentFor, classesOf, type SheetModel } from './model';
+import { ShareDialog } from './ShareDialog';
 
 export const TAB_ICONS: Record<SheetTab, LucideIcon> = {
   personaje: User,
@@ -35,8 +36,7 @@ export const TAB_ICONS: Record<SheetTab, LucideIcon> = {
  * ficha): «volver», la tarjeta del personaje, las secciones y las acciones.
  * Las cinco secciones son pestañas de `/v2`. Imprimir es de acá (`PrintSheet`);
  * subir de nivel y el retrato son pantallas de `/v2` (`LevelUpWizard`,
- * `PortraitPage`); compartir emite un código y todavía vive en Flutter, así
- * que enlaza allá.
+ * `PortraitPage`); compartir abre `ShareDialog`, que emite el código.
  */
 export function SheetPanel({ model, tab }: { model: SheetModel; tab: SheetTab }) {
   const t = useTexts();
@@ -46,6 +46,7 @@ export function SheetPanel({ model, tab }: { model: SheetModel; tab: SheetTab })
     .join(' / ');
   const id = character.id;
   const printing = usePrintSheet();
+  const [sharing, setSharing] = useState(false);
 
   return (
     <>
@@ -87,12 +88,13 @@ export function SheetPanel({ model, tab }: { model: SheetModel; tab: SheetTab })
           )}
         </li>
         <li>
-          <NavItem href={FLUTTER_HOME} icon={Share2} label={t.actionShare} external />
+          <NavItem onSelect={() => setSharing(true)} icon={Share2} label={t.actionShare} />
         </li>
         <li>
           <NavItem onSelect={printing.print} icon={Printer} label={t.actionPrint} />
         </li>
       </NavGroup>
+      {sharing && <ShareDialog characterId={id} characterName={character.name} onClose={() => setSharing(false)} />}
       {printing.printing && <PrintSheet model={model} onDone={printing.done} />}
     </>
   );

@@ -1,15 +1,16 @@
+import { useState } from 'react';
 import { BookOpen, Coins, Flag, Share2, Swords } from 'lucide-react';
 import type { PlayerBattle, PlayerCampaign } from '../api/client';
 import { usePlayerCampaigns } from '../api/queries';
 import { chapterGrants, type Catalog, type JsonObject } from '../engine';
 import { useTexts } from '../i18n/context';
 import type { Texts } from '../i18n/texts';
-import { FLUTTER_HOME } from '../router';
-import { ButtonLink } from '../ui/Button';
+import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Eyebrow, Pill } from '../ui/data';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import type { SheetModel } from './model';
+import { ShareDialog } from './ShareDialog';
 
 /**
  * Pestaña Campaña: la vuelta del vínculo con el DM. Qué mesa, qué batallas se
@@ -23,24 +24,30 @@ import type { SheetModel } from './model';
 export function CampaignTab({ model }: { model: SheetModel }) {
   const t = useTexts();
   const campaigns = usePlayerCampaigns(model.character.id);
+  const [sharing, setSharing] = useState(false);
 
   if (campaigns.isError) {
     return <AppErrorView title={t.campaignsLoadError} message={t.errorBody} onRetry={() => campaigns.refetch()} />;
   }
   if (!campaigns.data) return <AppBusyLabel label={t.campaignsLoading} />;
   if (campaigns.data.length === 0) {
-    // Vacío con salida: falta compartir la ficha, y eso todavía vive en Flutter.
+    // Vacío con salida: falta compartir la ficha, y el diálogo se abre acá.
     return (
+      <>
       <AppEmptyState
         kind="empty"
         message={t.campaignEmpty}
         hint={t.campaignEmptyHint}
         actions={
-          <ButtonLink href={FLUTTER_HOME} icon={Share2} tone="secondary">
+          <Button icon={Share2} tone="secondary" onClick={() => setSharing(true)}>
             {t.actionShare}
-          </ButtonLink>
+          </Button>
         }
       />
+      {sharing && (
+        <ShareDialog characterId={model.character.id} characterName={model.character.name} onClose={() => setSharing(false)} />
+      )}
+      </>
     );
   }
 
