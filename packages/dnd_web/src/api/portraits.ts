@@ -2,6 +2,7 @@
 // sola clave opaca `<dueño>/<archivo>` por imagen; las lee `ui/portrait.ts`.
 import { ApiError } from './client';
 import { portraitUrl } from '../ui/portrait';
+import { patchSettings } from './settingsSave';
 
 /** Los bytes a base64 **de a pedazos**: `String.fromCharCode(...bytes)` entero
  *  desborda la pila con una imagen de varios megas. 32 KiB por vez es un
@@ -99,23 +100,7 @@ export async function fetchImageProvider(signal: AbortSignal): Promise<string | 
   return settings?.imageProvider ?? null;
 }
 
-/** Fija [id] como motor predeterminado. Relee los ajustes antes de guardarlos
- *  en vez de usar los que trajo la pantalla: el documento se guarda **entero**
- *  y la pantalla puede quedar abierta un buen rato mientras genera. Con una
- *  copia vieja, fijar el motor pisaría el favorito, el orden o el tema que se
- *  hubieran tocado mientras tanto.
- *
- *  ponytail: es el primer guardado de ajustes de `/v2` y solo sabe de
- *  `imageProvider`; el paso 7 trae el guardado general de ajustes. */
-export async function setImageProvider(id: string): Promise<void> {
-  const path = '/api/settings';
-  const read = await fetch(path);
-  if (!read.ok) throw new ApiError(read.status, path);
-  const { settings } = (await read.json()) as { settings: Record<string, unknown> | null };
-  const response = await fetch(path, {
-    method: 'PUT',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ ...settings, imageProvider: id }),
-  });
-  if (!response.ok) throw new ApiError(response.status, path);
-}
+/** Fija [id] como motor predeterminado. Va por la cola de ajustes: el
+ *  documento se guarda entero y la pantalla puede quedar abierta mientras
+ *  genera. */
+export const setImageProvider = (id: string): Promise<void> => patchSettings({ imageProvider: id });

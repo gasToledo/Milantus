@@ -1,19 +1,43 @@
-import { useMemo, useState } from 'react';
-import { Plus, X } from 'lucide-react';
-import { useRoster, useRosterSettings, useSheetCatalog } from '../api/queries';
+import { useCallback, useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { ChevronDown, Plus, X } from 'lucide-react';
+import type { RosterSettings } from '../api/client';
+import { queryKeys, useRoster, useRosterSettings, useSheetCatalog } from '../api/queries';
+import { patchSettings } from '../api/settingsSave';
 import { useLang, useTexts } from '../i18n/context';
 import { creationHref } from '../router';
 import { Button, ButtonLink } from '../ui/Button';
 import { SectionRule } from '../ui/data';
-import { Tooltip } from '../ui/primitives';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+  Toast,
+  ToastProvider,
+  ToastViewport,
+  Tooltip,
+} from '../ui/primitives';
+import { useReorder } from '../ui/reorder';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { RosterCard } from './RosterCard';
-import { isFallen, parseSortMode, toRosterEntry, visibleRoster, type RosterEntry } from './roster';
+import {
+  isFallen,
+  moveGroup,
+  movedOrder,
+  parseSortMode,
+  SORT_MODES,
+  toRosterEntry,
+  visibleRoster,
+  type RosterEntry,
+} from './roster';
 
 /**
- * El dashboard de solo lectura. El orden y el favorito se leen de los ajustes
- * de la cuenta y se muestran; cambiarlos (y crear, renombrar, borrar…) vive en
- * Flutter hasta que React escriba.
+ * El dashboard. El orden y el favorito se leen de los ajustes de la cuenta y se
+ * escriben desde acá (el selector de orden, arrastrar una tarjeta y el menú ⋮).
+ * Renombrar, borrar, rehacer y el ejemplo se suman en las partes siguientes del
+ * paso 5f.
  */
 export function DashboardPage() {
   const t = useTexts();
@@ -24,6 +48,26 @@ export function DashboardPage() {
   // CA que la ficha del mismo personaje.
   const catalog = useSheetCatalog(lang);
   const [query, setQuery] = useState('');
+  const client = useQueryClient();
+  const [toastKey, setToastKey] = useState(0);
+  const [toastOpen, setToastOpen] = useState(false);
+
+  // Lo elegido se ve al instante y el guardado va después. Si falla, el cambio
+  // queda en pantalla hasta la próxima carga, como en Flutter: revertirlo
+  // desordenaría la lista bajo las manos de quien la está usando.
+  const saveSettings = useCallback(
+    async (patch: Partial<RosterSettings>) => {
+      await client.cancelQueries({ queryKey: queryKeys.rosterSettings });
+      client.setQueryData<RosterSettings>(queryKeys.rosterSettings, (old) => old && { ...old, ...patch });
+      try {
+        await patchSettings(patch);
+      } catch {
+        setToastKey((k) => k + 1);
+        setToastOpen(true);
+      }
+    },
+    [client],
+  );
 
   // Cada ficha se calcula una vez por lista y catálogo, no en cada tecla del
   // buscador.
@@ -38,6 +82,25 @@ export function DashboardPage() {
     () => (entries && settings.data ? visibleRoster(entries, query, settings.data, sort) : []),
     [entries, settings.data, query, sort],
   );
+
+  // Mover con la lista filtrada perdería el lugar de las tarjetas ocultas.
+  const canMove = query.trim() === '';
+  const favoriteId = settings.data?.favoriteCharacterId ?? null;
+  const entryById = useMemo(() => new Map((entries ?? []).map((e) => [e.character.id, e])), [entries]);
+  const visibleIds = useMemo(() => visible.map((e) => e.character.id), [visible]);
+  const groupOf = (id: string) => {
+    const e = entryById.get(id);
+    return e ? moveGroup(e, favoriteId) : null;
+  };
+  const reorder = useReorder({
+    ids: visibleIds,
+    onMove: (from, to) => {
+      // El orden al mostrar deja al favorito arriba y a los caídos al final:
+      // cruzar de grupo no tendría efecto.
+      if (groupOf(from) !== groupOf(to)) return;
+      void saveSettings({ characterOrder: movedOrder(visibleIds, from, to), sortMode: 'manual' });
+    },
+  });
 
   const failed = [roster, settings, ...catalog.queries].filter((q) => q.isError);
   let body;
@@ -83,13 +146,29 @@ export function DashboardPage() {
             className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr))]"
             data-field="roster"
           >
-            {visible.map((entry) => (
-              <RosterCard
-                key={entry.character.id}
-                entry={entry}
-                favorite={entry.character.id === settings.data.favoriteCharacterId}
-              />
-            ))}
+            {visible.map((entry) => {
+              const id = entry.character.id;
+              const favorite = id === settings.data.favoriteCharacterId;
+              return (
+                <RosterCard
+                  key={id}
+                  entry={entry}
+                  favorite={favorite}
+                  onToggleFavorite={() => void saveSettings({ favoriteCharacterId: favorite ? null : id })}
+                  reorder={
+                    canMove && !favorite
+                      ? {
+                          item: reorder.item(id),
+                          grip: reorder.grip(id),
+                          dragging: reorder.dragging === id,
+                          // La marca solo en el mismo grupo: soltar en otro no hace nada.
+                          over: reorder.over === id && reorder.dragging !== null && groupOf(reorder.dragging) === groupOf(id),
+                        }
+                      : undefined
+                  }
+                />
+              );
+            })}
           </ul>
         )}
       </>
@@ -98,63 +177,86 @@ export function DashboardPage() {
 
   const fallen = entries?.filter(isFallen).length ?? 0;
   return (
-    <div className="flex flex-col gap-5">
-      {/* La barra de acciones del lienzo: título, buscador, orden y «Crear»
-          en una fila que se envuelve sola en un teléfono. */}
-      <header className="flex flex-wrap items-center gap-3.5">
-        <div className="min-w-0 flex-[1_1_220px]">
-          {/* El título está siempre, también mientras carga: un h1 por
-              pantalla y el lector sabe dónde está desde el primer momento. */}
-          <h1 className="font-display text-[30px] leading-tight text-on-surface">{t.rosterTitle}</h1>
-          {entries && (
-            <p className="mt-1 text-[13px] text-on-surface-variant tabular-nums">
-              {fallen === 0
-                ? t.rosterCount(entries.length)
-                : `${t.rosterCount(entries.length)} · ${t.rosterFallen(fallen)}`}
-            </p>
-          )}
-        </div>
-        {entries && entries.length > 0 && (
-          <div role="search" className="flex min-w-0 flex-[1_1_320px] flex-wrap items-center gap-2.5 shell:max-w-[460px]">
-            <div className="relative min-w-[min(200px,100%)] flex-1">
-              <label htmlFor="roster-search" className="sr-only">
-                {t.rosterSearchLabel}
-              </label>
-              <input
-                id="roster-search"
-                type="search"
-                autoComplete="off"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={t.rosterSearchHint}
-                className="h-9 w-full rounded-[var(--radius-pill)] border border-hairline bg-plaque px-4 pr-9 text-[13px] text-on-surface placeholder:text-text-muted"
-              />
-              {query !== '' && (
-                <Tooltip content={t.rosterClearSearch}>
+    <ToastProvider>
+      <div className="flex flex-col gap-5">
+        {/* La barra de acciones del lienzo: título, buscador, orden y «Crear»
+            en una fila que se envuelve sola en un teléfono. */}
+        <header className="flex flex-wrap items-center gap-3.5">
+          <div className="min-w-0 flex-[1_1_220px]">
+            {/* El título está siempre, también mientras carga: un h1 por
+                pantalla y el lector sabe dónde está desde el primer momento. */}
+            <h1 className="font-display text-[30px] leading-tight text-on-surface">{t.rosterTitle}</h1>
+            {entries && (
+              <p className="mt-1 text-[13px] text-on-surface-variant tabular-nums">
+                {fallen === 0
+                  ? t.rosterCount(entries.length)
+                  : `${t.rosterCount(entries.length)} · ${t.rosterFallen(fallen)}`}
+              </p>
+            )}
+          </div>
+          {entries && entries.length > 0 && (
+            <div role="search" className="flex min-w-0 flex-[1_1_320px] flex-wrap items-center gap-2.5 shell:max-w-[460px]">
+              <div className="relative min-w-[min(200px,100%)] flex-1">
+                <label htmlFor="roster-search" className="sr-only">
+                  {t.rosterSearchLabel}
+                </label>
+                <input
+                  id="roster-search"
+                  type="search"
+                  autoComplete="off"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={t.rosterSearchHint}
+                  className="h-9 w-full rounded-[var(--radius-pill)] border border-hairline bg-plaque px-4 pr-9 text-[13px] text-on-surface placeholder:text-text-muted"
+                />
+                {query !== '' && (
+                  <Tooltip content={t.rosterClearSearch}>
+                    <button
+                      type="button"
+                      aria-label={t.rosterClearSearch}
+                      onClick={() => setQuery('')}
+                      className="absolute inset-y-0 right-1 flex w-8 items-center justify-center text-text-muted hover:text-on-surface"
+                    >
+                      <X size={16} aria-hidden="true" />
+                    </button>
+                  </Tooltip>
+                )}
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
                   <button
                     type="button"
-                    aria-label={t.rosterClearSearch}
-                    onClick={() => setQuery('')}
-                    className="absolute inset-y-0 right-1 flex w-8 items-center justify-center text-text-muted hover:text-on-surface"
+                    className="flex h-9 items-center rounded-[var(--radius-pill)] border border-hairline pr-3 pl-4 text-[13px] text-on-surface data-[state=open]:border-gold"
                   >
-                    <X size={16} aria-hidden="true" />
+                    <span className="text-text-muted">{t.sortLabel}:&nbsp;</span>
+                    <span data-field="sort">{t.sortModes[sort]}</span>
+                    <ChevronDown size={15} aria-hidden="true" className="ml-1.5 text-text-muted" />
                   </button>
-                </Tooltip>
-              )}
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuRadioGroup
+                    value={sort}
+                    onValueChange={(mode) => void saveSettings({ sortMode: parseSortMode(mode) })}
+                  >
+                    {SORT_MODES.map((mode) => (
+                      <DropdownMenuRadioItem key={mode} value={mode}>
+                        {t.sortModes[mode]}
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-            {/* El orden se muestra, no se edita: elegirlo es una escritura. */}
-            <p className="flex h-9 items-center rounded-[var(--radius-pill)] border border-hairline px-4 text-[13px] text-on-surface">
-              <span className="text-text-muted">{t.sortLabel}:&nbsp;</span>
-              <span data-field="sort">{t.sortModes[sort]}</span>
-            </p>
-          </div>
-        )}
-        <ButtonLink href={creationHref()} internal icon={Plus} tone="soft" shape="pill">
-          {t.rosterCreate}
-        </ButtonLink>
-      </header>
-      <SectionRule className="my-0" />
-      {body}
-    </div>
+          )}
+          <ButtonLink href={creationHref()} internal icon={Plus} tone="soft" shape="pill">
+            {t.rosterCreate}
+          </ButtonLink>
+        </header>
+        <SectionRule className="my-0" />
+        {body}
+      </div>
+      <Toast key={toastKey} tone="error" message={t.sortSaveError} open={toastOpen} onOpenChange={setToastOpen} />
+      <ToastViewport />
+    </ToastProvider>
   );
 }

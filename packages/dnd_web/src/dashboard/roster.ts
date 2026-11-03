@@ -9,7 +9,7 @@ import { withoutForm } from '../sheet/compute';
 
 export type SortMode = 'manual' | 'dateAdded' | 'name' | 'level' | 'klass';
 
-const SORT_MODES: readonly SortMode[] = ['manual', 'dateAdded', 'name', 'level', 'klass'];
+export const SORT_MODES: readonly SortMode[] = ['manual', 'dateAdded', 'name', 'level', 'klass'];
 
 /** Los nombres son los que Flutter guarda en `AppSettings.sortMode`; uno
  *  desconocido cae a `name`, igual que allá. */
@@ -71,6 +71,27 @@ const classText = (e: RosterEntry): string => e.classes.map((c) => c.name).join(
 // (`String.compareTo`), y la cuenta tiene que ver el mismo orden en los dos
 // clientes aunque «Álvaro» quede después de la «Z».
 const cmp = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
+
+/** El grupo en el que `visibleRoster` deja a una tarjeta: favorito arriba,
+ *  caídos al final. Reordenar solo vale dentro de un grupo, porque esa
+ *  posición la vuelve a imponer el orden al mostrar. */
+export type MoveGroup = 'favorite' | 'alive' | 'fallen';
+
+export const moveGroup = (e: RosterEntry, favoriteId: string | null): MoveGroup =>
+  e.character.id === favoriteId ? 'favorite' : isFallen(e) ? 'fallen' : 'alive';
+
+/** El orden que queda al soltar [from] sobre [to]: se parte de lo que se está
+ *  viendo (que ya incluye a todos) y [from] ocupa el lugar que tenía [to]. Es
+ *  el `_reorder` de `dashboard_screen.dart`. */
+export function movedOrder(visibleIds: readonly string[], from: string, to: string): string[] {
+  const ids = [...visibleIds];
+  const f = ids.indexOf(from);
+  const t = ids.indexOf(to);
+  if (f < 0 || t < 0 || f === t) return ids;
+  ids.splice(f, 1);
+  ids.splice(t, 0, from);
+  return ids;
+}
 
 export function visibleRoster(
   all: readonly RosterEntry[],

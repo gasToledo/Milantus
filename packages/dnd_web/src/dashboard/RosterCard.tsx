@@ -1,9 +1,11 @@
-import { Star } from 'lucide-react';
+import { EllipsisVertical, GripVertical, Star } from 'lucide-react';
 import { useTexts } from '../i18n/context';
 import { characterHref, Link } from '../router';
 import { signed } from '../sheet/format';
 import { HP_CRITICAL_RATIO, hpTone, StatPlaque, ThinBar } from '../ui/data';
 import { Medallion } from '../ui/Medallion';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Tooltip } from '../ui/primitives';
+import type { useReorder } from '../ui/reorder';
 import { ownPortrait } from '../ui/portrait';
 import { isFallen, type RosterEntry } from './roster';
 
@@ -17,7 +19,25 @@ import { isFallen, type RosterEntry } from './roster';
  * de Humo» y no la tarjeta entera leída de corrido, y el clic cae en cualquier
  * parte.
  */
-export function RosterCard({ entry, favorite }: { entry: RosterEntry; favorite: boolean }) {
+export interface CardReorder {
+  item: ReturnType<ReturnType<typeof useReorder>['item']>;
+  grip: ReturnType<ReturnType<typeof useReorder>['grip']>;
+  dragging: boolean;
+  over: boolean;
+}
+
+export function RosterCard({
+  entry,
+  favorite,
+  onToggleFavorite,
+  reorder,
+}: {
+  entry: RosterEntry;
+  favorite: boolean;
+  onToggleFavorite: () => void;
+  /** Sin esto la tarjeta no se puede mover: el favorito, o la lista filtrada. */
+  reorder?: CardReorder;
+}) {
   const t = useTexts();
   const { character, sheet } = entry;
   const fallen = isFallen(entry);
@@ -35,9 +55,12 @@ export function RosterCard({ entry, favorite }: { entry: RosterEntry; favorite: 
 
   return (
     <li
-      className="roster-card card relative flex flex-col p-4"
+      className={`roster-card card relative flex flex-col p-4 ${reorder?.dragging ? 'opacity-40' : ''} ${
+        reorder?.over ? 'outline-2 outline-offset-1 outline-gold' : ''
+      }`}
       data-character={character.id}
       data-favorite={favorite}
+      {...reorder?.item}
     >
       <div className="flex items-start gap-3">
         <Medallion name={character.name} accent={entry.accent} size={64} muted={fallen} portrait={ownPortrait(character)} />
@@ -74,6 +97,43 @@ export function RosterCard({ entry, favorite }: { entry: RosterEntry; favorite: 
             </p>
           </div>
         )}
+        {/* Una columna a la derecha del nivel (el ⋮ y, debajo, el ícono de
+            mover), con margen negativo para no correr el medallón. Los dos
+            llevan `relative z-10`: el enlace del nombre se estira sobre toda
+            la tarjeta y los taparía. */}
+        <div className="-mt-1 -mr-2 -ml-0.5 flex shrink-0 flex-col gap-1">
+          <DropdownMenu>
+            <Tooltip content={t.cardActionsTooltip(character.name)}>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  aria-label={t.cardActionsTooltip(character.name)}
+                  className="relative z-10 inline-flex h-7 w-7 items-center justify-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold data-[state=open]:bg-gold-soft data-[state=open]:text-gold"
+                >
+                  <EllipsisVertical size={18} aria-hidden="true" />
+                </button>
+              </DropdownMenuTrigger>
+            </Tooltip>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={onToggleFavorite}>
+                <Star size={15} aria-hidden="true" className="text-text-muted" />
+                {favorite ? t.cardUnfavorite : t.cardFavorite}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {reorder && (
+            <Tooltip content={t.cardMoveTip}>
+              <button
+                type="button"
+                aria-label={t.cardMove(character.name)}
+                className="relative z-10 inline-flex h-7 w-7 cursor-grab items-center justify-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold"
+                {...reorder.grip}
+              >
+                <GripVertical size={16} aria-hidden="true" />
+              </button>
+            </Tooltip>
+          )}
+        </div>
       </div>
 
       {sheet && (
