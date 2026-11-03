@@ -542,3 +542,23 @@ test('elegir un plano, replicarlo y quitar la rÃ©plica guardan lo del motor, y Â
   expect(await ilse(request, ARTIFICE)).toEqual(replicado);
 });
 
+test('transformarse en lobo y volver guardan lo que da el motor', async ({ page, request }) => {
+  const DRUIDA = 'druida-de-humo';
+  const antes = await ilse(request, DRUIDA);
+  const transformado = segunMotor(antes, { type: 'enterWildShape', creature: 'wolf' });
+  const vuelta = segunMotor(transformado, { type: 'leaveWildShape' });
+
+  await page.goto(`/v2/personajes/${DRUIDA}/combate`);
+  await page.locator('[data-stat="wild-shape"] button').click();
+  const enviado = await proximoGuardado(
+    page,
+    () => page.getByRole('dialog').getByRole('button', { name: 'Transformarse' }).click(),
+    DRUIDA,
+  );
+  expect(enviado).toEqual(transformado);
+  // Transformado, los ataques son los de la bestia.
+  await expect(page.locator('[data-attack="wolf"]').first()).toBeVisible();
+
+  const fin = await proximoGuardado(page, () => page.locator('[data-stat="wild-shape"] button').click(), DRUIDA);
+  expect(fin).toEqual(vuelta);
+});

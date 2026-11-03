@@ -378,6 +378,30 @@ Future<void> main() async {
       combat: CombatState(currentHp: 40),
     ),
   );
+  // Un druida de nivel 8 con el lobo anotado: la prueba de escritura de la
+  // Forma Salvaje (5e4) se transforma en lobo y vuelve.
+  await characters.create(
+    writerUserId,
+    Character(
+      id: 'druida-de-humo',
+      name: 'Druida de Humo',
+      raceId: 'human',
+      classId: 'druid',
+      backgroundId: 'sage',
+      level: 8,
+      assignedScores: const {
+        Ability.strength: 8,
+        Ability.dexterity: 14,
+        Ability.constitution: 14,
+        Ability.intelligence: 18,
+        Ability.wisdom: 10,
+        Ability.charisma: 10,
+      },
+      hpPerLevel: List.filled(8, 5),
+      wildShapeForms: const ['wolf'],
+      combat: CombatState(currentHp: 30),
+    ),
+  );
   final settings = InMemorySettingsRepository();
   await settings.save(smokeUserId, {
     'sortMode': 'level',

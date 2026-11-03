@@ -5,6 +5,7 @@ import { useTexts } from '../i18n/context';
 import { hpTone, Pill, SectionRule, StatTile, ThinBar } from '../ui/data';
 import { signed } from './format';
 import { ActiveModeTile } from './ActiveModes';
+import { WildShapeTile } from './WildShape';
 import { classesOf, type SheetModel } from './model';
 
 /**
@@ -86,6 +87,7 @@ export function SheetHeader({
           {/* Los estados activables viven en la banda y no en una tarjeta de
               Combate: se prenden en el turno desde cualquier pestaña. Sin
               escritura, solo el que está en curso. */}
+          <WildShapeTile model={model} />
           {sheet.activeModes
             .filter((m) => model.write || m.active)
             .map((m) => (

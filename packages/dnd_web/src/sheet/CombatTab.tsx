@@ -1,4 +1,4 @@
-import { Bed, BookOpen, Check, Coffee, Crosshair, Dices, Heart, Info, Minus, Plus, RefreshCw, Shield, ShieldHalf, Star, TriangleAlert, Zap } from 'lucide-react';
+import { Ban, Bed, BookOpen, Check, Coffee, Crosshair, Dices, Heart, Info, Minus, Plus, RefreshCw, Shield, ShieldHalf, Star, TriangleAlert, Zap } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { nameOf } from '../api/catalog';
 import type { CharacterResource, InnateSpell, SpellcastingBlock } from '../engine';
@@ -15,6 +15,7 @@ import { InnateCantripDialog } from './InnateCantripDialog';
 import { SpellList } from './SpellList';
 import { spellEditHref } from '../router';
 import { resourceLeft, type SheetModel } from './model';
+import { activeForm } from './WildShape';
 import type { SheetWriter } from './writer';
 import { ProficiencyRow } from './rows';
 import { ABILITIES, isReactionSpell } from './vocabulary';
@@ -26,7 +27,10 @@ import { ABILITIES, isReactionSpell } from './vocabulary';
  * recursos, los descansos, la Inspiración Heroica y la concentración. Cada acción la hace el motor (`actOn`); acá no se
  * suma ni se resta nada. Preparar conjuros y cambiar el truco innato llevan a su editor; el resto de la edición sigue en
  * Flutter. Los números son del motor; de la mesa (lo crudo) solo los PG
- * actuales, lo gastado y las condiciones.
+ * actuales, lo gastado y las condiciones. Transformado (Forma Salvaje), el
+ * motor ya trae la ficha de la bestia: Ataques muestra los suyos con sus
+ * rasgos debajo, y Conjuros avisa que no se lanza. La franja para
+ * transformarse vive en la banda, no acá.
  */
 export function CombatTab({ model }: { model: SheetModel }) {
   return (
@@ -257,6 +261,10 @@ function DefenseCard({ model }: { model: SheetModel }) {
 function AttacksCard({ model }: { model: SheetModel }) {
   const t = useTexts();
   const { sheet } = model;
+  const form = activeForm(model);
+  const notes = [...(form?.traits ?? []), ...(form?.actions ?? [])].filter(
+    (n): n is { name: string; description: string } => Boolean(n.description),
+  );
   return (
     <Card id="attacks" title={t.attacksHeading} icon={Crosshair}>
       {sheet.attacks.length === 0 ? (
@@ -292,6 +300,18 @@ function AttacksCard({ model }: { model: SheetModel }) {
           })}
         </ul>
       )}
+      {/* Lo que el perfil de la bestia dice de sí misma (Pies Ligeros, el
+          empujón del lobo): en el turno es lo que se consulta junto a los
+          ataques, y se ve también sin escritura. */}
+      {form && notes.length > 0 && (
+        <div data-field="wild-shape-traits" className="mt-3 flex flex-col gap-2 border-t border-hairline pt-3">
+          {notes.map((n, i) => (
+            <p key={`${n.name}-${i}`} className="text-[13px] text-on-surface-variant">
+              <span className="font-medium text-on-surface">{n.name}</span> {n.description}
+            </p>
+          ))}
+        </div>
+      )}
     </Card>
   );
 }
@@ -309,6 +329,7 @@ function SpellsCard({ model }: { model: SheetModel }) {
   // la concentración actual: se pregunta antes de despedirlos, como Flutter.
   const [cutFor, setCutFor] = useState<string | null>(null);
   const [swapping, setSwapping] = useState<InnateSpell | null>(null);
+  const form = activeForm(model);
   const blocks: SpellcastingBlock[] =
     sheet.spellcastingBlocks.length > 0
       ? sheet.spellcastingBlocks
@@ -394,6 +415,15 @@ function SpellsCard({ model }: { model: SheetModel }) {
   return (
     <Card id="spells" title={t.spellsHeading} icon={BookOpen}>
       <div className="flex flex-col gap-4">
+        {form && !sheet.wildShape?.canCast && (
+          <div
+            data-field="wild-shape-block"
+            className="flex items-center gap-2 rounded-[var(--radius-nav)] border border-gold px-3 py-2 text-[13px]"
+          >
+            <Ban size={18} aria-hidden="true" className="shrink-0 text-gold" />
+            <span className="min-w-0 flex-1">{t.wsNoCast(form.name)}</span>
+          </div>
+        )}
         {write && previous && (
           <div className="flex items-center gap-2 rounded-[var(--radius-nav)] border border-gold px-3 py-2 text-[13px]">
             <Zap size={18} aria-hidden="true" className="shrink-0 text-gold" />

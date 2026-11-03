@@ -788,6 +788,9 @@ function AfterPanel({ before, after, t }: { before: ComputedSheet; after: Comput
     ...(before.proficiencyBonus !== after.proficiencyBonus
       ? [{ label: t.luRowProf, from: before.proficiencyBonus, to: after.proficiencyBonus }]
       : []),
+    ...((before.wildShape?.count ?? 0) !== (after.wildShape?.count ?? 0)
+      ? [{ label: t.wsFormsRow, from: before.wildShape?.count ?? 0, to: after.wildShape?.count ?? 0 }]
+      : []),
     ...(after.spellcasting
       ? [
           { label: t.luRowSpellDc, from: before.spellcasting?.saveDc ?? 0, to: after.spellcasting.saveDc },

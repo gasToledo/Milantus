@@ -465,7 +465,23 @@ repiten acá.
   el motor rechaza la opción. Qué se ofrece y los topes salen de
   `magicItemPlans` (`sheet.itemChoiceSlots`); en Flutter, el cuadro llama a las
   mismas `InventoryOps.setMagicItemPlan` y `magicBaseOptions`.
-  Todavía **no** aplica la Forma Salvaje (5e4). La banda táctica (PG, Iniciativa,
+  Desde 5e4, la **Forma Salvaje** se juega en la ficha propia. `compute`
+  aplica la forma (`withWildShape`, antes del Cansancio) a quien tiene
+  `combat.wildShapeCreatureId` en el catálogo, así que Combate muestra la CA, la
+  velocidad, FUE/DES/CON y los ataques de la bestia, con sus rasgos debajo de
+  Ataques y el aviso «no podés lanzar conjuros» en Conjuros (salvo que
+  `canCast`). El tablero, la subida de nivel y la impresión miran al personaje
+  y no a la bestia (`withoutForm`). La franja `WildShapeTile`, en la banda
+  táctica, abre `WildShapeDialog` (elegir forma y «Transformarse», acción
+  `enterWildShape`, con «Deshacer») y, transformado, vuelve con
+  `leaveWildShape`. Las formas se anotan en `/personajes/:id/formas`
+  (`sheet/WildShapeForms.tsx`), que guarda al tocar con `setWildShapeForm`; una
+  forma que dejó de calificar queda guardada y se puede sacar. Transformarse
+  **incapacitado se permite**, como en Flutter: el motor corta la forma al
+  quedar incapacitado, no impide entrar. La ficha de un miembro transformado se
+  ve en su forma, sin controles. El **combate del DM no muestra la forma** hasta
+  el paso 6.
+  La banda táctica (PG, Iniciativa,
   Velocidad, Competencia; sin Armadura, que se lee en Defensa) solo va en
   Personaje y Combate, como en Flutter; el modo en curso lo dice su propia franja (con lo que suma), sin cartel aparte. Sin escritura, la ficha ajena
   sigue mostrando solo los estados puestos y el modo en curso.
@@ -610,7 +626,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    tiene todavía acción en `SheetActions.apply`, en cinco: 5e1, condiciones,
    cansancio y modos activos (Furia) *(existe)*; 5e2, preparar conjuros (el editor ya
    existe en la subida) y cambiar el truco innato *(existe)*; 5e3, los planos del Artífice
-   y los objetivos de arma de un rasgo (Pacto del Filo) *(existe)*; 5e4, Forma Salvaje;
+   y los objetivos de arma de un rasgo (Pacto del Filo) *(existe)*; 5e4, Forma Salvaje *(existe)*;
    5e5, compañeros, y con ellos lanzar gastando espacio o uso gratis. Antes de
    cerrar 5e, comparar los controles de la ficha de Flutter con los de React:
    esta lista no salió de revisar pantalla por pantalla. 5f, la lista de
@@ -736,7 +752,7 @@ hace seguro volver atrás es que **no hay nada que deshacer en el formato**:
 
 Para que nadie lo dé por hecho:
 
-- Las escrituras de 5e4 (Forma Salvaje), 5e5 (compañeros), 5f y los pasos 6 y 7: el detalle está en
+- Las escrituras de 5e5 (compañeros), 5f y los pasos 6 y 7: el detalle está en
   [Orden previsto de pantallas](#orden-previsto-de-pantallas).
 - Control de versión en el servidor para las escrituras (rechazar una copia
   vieja con 409): hoy gana el último que guarda, como en Flutter.
