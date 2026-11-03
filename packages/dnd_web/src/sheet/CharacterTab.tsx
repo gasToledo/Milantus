@@ -10,6 +10,7 @@ import { Accordion } from '../ui/disclosure';
 import { BreakdownDialog } from './BreakdownDialog';
 import { signed } from './format';
 import type { SheetModel } from './model';
+import { ChangeChoicesButton, useChoicesView, WarningsStrip } from './Choices';
 import { ProficiencyRow } from './rows';
 import { ABILITIES, SKILL_ABILITY } from './vocabulary';
 
@@ -35,8 +36,10 @@ export function CharacterTab({ model }: { model: SheetModel }) {
   // en la ficha ajena.
   const [breakdown, setBreakdown] = useState<AbilityId | null>(null);
   const { character, sheet, catalog } = model;
+  // Los avisos y las elecciones son de la ficha propia; la ajena no los pide.
+  const choices = useChoicesView(model);
 
-  const race = catalog.races.find((r) => r.id === character.raceId);
+  const race =catalog.races.find((r) => r.id === character.raceId);
   const creatureType = typeof race?.creatureType === 'string' ? race.creatureType : null;
   const identity = [
     { label: t.alignmentLabel, value: character.alignment ? labelOf(t.alignments, character.alignment) : null },
@@ -71,9 +74,19 @@ export function CharacterTab({ model }: { model: SheetModel }) {
   ].filter((g) => g.chips.length > 0);
 
   return (
+    <>
+    {/* Solo en la ficha propia, arriba de las columnas y no en la banda ni en
+        otras pestañas: es lo primero que se ve al abrir el personaje. */}
+    {choices && <WarningsStrip model={model} view={choices} />}
     <SheetColumns>
       <div className="flex min-w-0 flex-col gap-4">
-        <Card id="identity" title={t.identityHeading} icon={IdCard} collapsible>
+        <Card
+          id="identity"
+          title={t.identityHeading}
+          icon={IdCard}
+          collapsible
+          trailing={choices?.replaceable ? <ChangeChoicesButton id={character.id} /> : undefined}
+        >
           <dl className="divide-y divide-hairline border-t border-hairline">
             {identity.map((row) => (
               <div key={row.label} className="py-2">
@@ -214,5 +227,6 @@ export function CharacterTab({ model }: { model: SheetModel }) {
       </Card>
       </div>
     </SheetColumns>
+    </>
   );
 }

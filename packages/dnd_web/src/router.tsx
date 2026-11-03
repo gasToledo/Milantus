@@ -302,6 +302,11 @@ export const spellEditHref = (id: string, classId: string): string =>
 export const magicPlansHref = (id: string): string =>
   `${import.meta.env.BASE_URL}personajes/${encodeURIComponent(id)}/planos`;
 
+/** La pantalla de elecciones de la ficha propia, en la pestaña [tab] (`origin`,
+ *  `features`…); sin ella abre en la primera con algo pendiente. */
+export const choicesHref = (id: string, tab?: string): string =>
+  `${import.meta.env.BASE_URL}personajes/${encodeURIComponent(id)}/elecciones${tab ? `?tab=${tab}` : ''}`;
+
 export const wildShapeFormsHref = (id: string): string =>
   `${import.meta.env.BASE_URL}personajes/${encodeURIComponent(id)}/formas`;
 

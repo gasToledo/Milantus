@@ -5,7 +5,7 @@ import { catalogLabel, type Advantage, type CharacterResource, type InnateSpell,
 import { useLang, useTexts } from '../i18n/context';
 import { labelOf, type Lang, type Texts } from '../i18n/texts';
 import { AppDialog } from '../ui/AppDialog';
-import { Tooltip } from '../ui/primitives';
+import { Select, Tooltip } from '../ui/primitives';
 import { Button, ButtonLink } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Eyebrow, hpTone, Pill, Pips, ShieldBadge, SpendRecoverButtons, StatPlaque, ThinBar } from '../ui/data';
@@ -282,6 +282,24 @@ function DefenseCard({ model }: { model: SheetModel }) {
           )}
         </div>
       </div>
+      {/* Con dos clases que dan Defensa sin armadura (Monje + Bárbaro) la
+          fórmula se elige; el motor cuenta cuál rige y qué opciones hay. Solo
+          en la ficha propia: la ajena no tiene controles. */}
+      {model.write && sheet.unarmoredDefenseOptions.length > 1 && (
+        <div className="mt-3">
+          <Select
+            label={t.unarmoredFormula}
+            value={sheet.selectedUnarmoredDefenseClassId ?? sheet.unarmoredDefenseOptions[0]?.classId ?? ''}
+            onValueChange={(classId) => model.write?.act({ type: 'setUnarmoredDefense', classId })}
+            options={sheet.unarmoredDefenseOptions.map((o) => ({
+              value: o.classId ?? '',
+              label: [nameOf(catalog.classes, o.classId ?? '') ?? o.classId, t.abilities[o.ability], o.allowShield ? t.shield : null]
+                .filter(Boolean)
+                .join(' · '),
+            }))}
+          />
+        </div>
+      )}
     </Card>
   );
 }

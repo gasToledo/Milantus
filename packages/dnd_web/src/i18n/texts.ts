@@ -656,6 +656,17 @@ Un descanso largo baja un nivel.`,
   luWhichClass: '¿En qué clase subís?',
   luClassHint: (name: string, level: number, die: number) => `${name} ${level} · d${die}`,
   luMulticlassHint: (die: number) => `Multiclase · d${die}`,
+  // Avisos del motor y elecciones de la ficha propia (5e7).
+  chReviewCount: (n: number) => (n === 1 ? '1 cosa por revisar' : `${n} cosas por revisar`),
+  chReviewDetail: (serious: number) =>
+    serious === 1
+      ? '1 puede traer problemas, el resto está por elegir'
+      : `${serious} pueden traer problemas, el resto está por elegir`,
+  chPendingCount: (n: number) => (n === 1 ? 'Te queda 1 cosa por elegir' : `Te quedan ${n} cosas por elegir`),
+  chReview: 'Revisar',
+  chResolve: 'Resolver',
+  chChangeChoices: 'Cambiar elecciones',
+  unarmoredFormula: 'Defensa sin armadura',
   luRequires: (what: string) => `Pide ${what}.`,
   luWhatComes: (n: number) => `Qué trae el nivel ${n}`,
   luRowHp: 'Puntos de golpe',
@@ -2104,6 +2115,16 @@ A long rest lowers it by one level.`,
   luWhichClass: 'Which class are you leveling in?',
   luClassHint: (name: string, level: number, die: number) => `${name} ${level} · d${die}`,
   luMulticlassHint: (die: number) => `Multiclass · d${die}`,
+  chReviewCount: (n: number) => (n === 1 ? '1 thing to review' : `${n} things to review`),
+  chReviewDetail: (serious: number) =>
+    serious === 1
+      ? '1 may cause problems, the rest is yet to be chosen'
+      : `${serious} may cause problems, the rest is yet to be chosen`,
+  chPendingCount: (n: number) => (n === 1 ? '1 thing left to choose' : `${n} things left to choose`),
+  chReview: 'Review',
+  chResolve: 'Resolve',
+  chChangeChoices: 'Change choices',
+  unarmoredFormula: 'Unarmored Defense',
   luRequires: (what: string) => `Requires ${what}.`,
   luWhatComes: (n: number) => `What level ${n} brings`,
   luRowHp: 'Hit points',
