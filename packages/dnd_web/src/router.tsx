@@ -104,8 +104,9 @@ export type Route =
   | { name: 'portrait'; id: string }
   // Las elecciones pendientes o reemplazables de la ficha propia.
   | { name: 'choices'; id: string }
-  // El creador de personajes.
+  // El creador de personajes, y el mismo para rehacer uno desde nivel 1.
   | { name: 'creation' }
+  | { name: 'rebuild'; id: string }
   | { name: 'unknown' };
 
 /** Adónde mandan los enlaces a lo que todavía vive solo en Flutter (crear,
@@ -238,6 +239,13 @@ export function matchRoute(pathname: string): Route {
       return { name: 'unknown' };
     }
   }
+  if (section === 'personajes' && id && tab === 'rehacer' && rest.length === 0) {
+    try {
+      return { name: 'rebuild', id: decodeURIComponent(id) };
+    } catch {
+      return { name: 'unknown' };
+    }
+  }
   if (section === 'personajes' && id && tab === 'retrato' && rest.length === 0) {
     try {
       return { name: 'portrait', id: decodeURIComponent(id) };
@@ -328,6 +336,8 @@ export const choicesHref = (id: string, tab?: string): string =>
 export const wildShapeFormsHref = (id: string): string =>
   `${import.meta.env.BASE_URL}personajes/${encodeURIComponent(id)}/formas`;
 
+export const rebuildHref = (id: string): string =>
+  `${import.meta.env.BASE_URL}personajes/${encodeURIComponent(id)}/rehacer`;
 export const portraitHref = (id: string): string =>
   `${import.meta.env.BASE_URL}personajes/${encodeURIComponent(id)}/retrato`;
 

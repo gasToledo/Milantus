@@ -2,12 +2,13 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChevronDown, Plus, X } from 'lucide-react';
 import { dropPending } from '../api/characterSave';
-import { deleteCharacter, saveCharacter, type RosterSettings, type StoredCharacter } from '../api/client';
+import { createCharacter, deleteCharacter, saveCharacter, type RosterSettings, type StoredCharacter } from '../api/client';
 import { queryKeys, useRoster, useRosterSettings, useSheetCatalog } from '../api/queries';
 import { patchSettings } from '../api/settingsSave';
-import { actOn, migrateCharacter, type CharacterJson } from '../engine';
+import { actOn, demoCharacter, migrateCharacter, type CharacterJson } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
-import { creationHref } from '../router';
+import { characterHref, creationHref, navigate, rebuildHref } from '../router';
+import { AppDialog } from '../ui/AppDialog';
 import { Button, ButtonLink } from '../ui/Button';
 import { SectionRule } from '../ui/data';
 import {
@@ -53,8 +54,11 @@ export function DashboardPage() {
   const catalog = useSheetCatalog(lang);
   const [query, setQuery] = useState('');
   const client = useQueryClient();
-  const [toastKey, setToastKey] = useState(0);
-  const [toastOpen, setToastOpen] = useState(false);
+  const [toast, setToast] = useState<{ key: number; message: string } | null>(null);
+  const showError = useCallback(
+    (message: string) => setToast((prev) => ({ key: (prev?.key ?? 0) + 1, message })),
+    [],
+  );
 
   // Lo elegido se ve al instante y el guardado va después. Si falla, el cambio
   // queda en pantalla hasta la próxima carga, como en Flutter: revertirlo
@@ -66,11 +70,10 @@ export function DashboardPage() {
       try {
         await patchSettings(patch);
       } catch {
-        setToastKey((k) => k + 1);
-        setToastOpen(true);
+        showError(t.sortSaveError);
       }
     },
-    [client],
+    [client, showError, t],
   );
 
   // Cada ficha se calcula una vez por lista y catálogo, no en cada tecla del
@@ -108,6 +111,8 @@ export function DashboardPage() {
 
   const [renaming, setRenaming] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [rebuilding, setRebuilding] = useState<string | null>(null);
+  const [creatingExample, setCreatingExample] = useState(false);
   const titleRef = useRef<HTMLHeadingElement>(null);
 
   type Doc = CharacterJson & { id: string };
@@ -139,6 +144,19 @@ export function DashboardPage() {
     setTimeout(() => titleRef.current?.focus(), 0);
   };
 
+  const tryExample = async () => {
+    setCreatingExample(true);
+    try {
+      // El servidor puede reasignar el id si choca: se abre la ficha con el suyo.
+      const id = await createCharacter(demoCharacter());
+      await client.invalidateQueries({ queryKey: queryKeys.roster });
+      navigate(characterHref(id));
+    } catch {
+      showError(t.rosterExampleError);
+      setCreatingExample(false);
+    }
+  };
+
   const failed = [roster, settings, ...catalog.queries].filter((q) => q.isError);
   let body;
   if (failed.length > 0) {
@@ -156,8 +174,14 @@ export function DashboardPage() {
       <AppEmptyState
         kind="empty"
         message={t.rosterEmpty}
-        hint={t.rosterEmptyHint}
-        actions={<ButtonLink href={creationHref()} internal icon={Plus}>{t.rosterCreate}</ButtonLink>}
+        actions={
+          <>
+            <ButtonLink href={creationHref()} internal icon={Plus}>{t.rosterCreate}</ButtonLink>
+            <Button tone="secondary" disabled={creatingExample} onClick={() => void tryExample()}>
+              {t.rosterTryExample}
+            </Button>
+          </>
+        }
       />
     );
   } else {
@@ -193,6 +217,7 @@ export function DashboardPage() {
                   favorite={favorite}
                   onToggleFavorite={() => void saveSettings({ favoriteCharacterId: favorite ? null : id })}
                   onRename={() => setRenaming(id)}
+                  onRebuild={() => setRebuilding(id)}
                   onDelete={() => setDeleting(id)}
                   reorder={
                     canMove && !favorite
@@ -308,7 +333,22 @@ export function DashboardPage() {
           onClose={() => setDeleting(null)}
         />
       )}
-      <Toast key={toastKey} tone="error" message={t.sortSaveError} open={toastOpen} onOpenChange={setToastOpen} />
+      {rebuilding && entryById.get(rebuilding) && (
+        <AppDialog
+          open
+          onOpenChange={(open) => !open && setRebuilding(null)}
+          title={t.rebuildCharacterTitle(entryById.get(rebuilding)!.character.name)}
+          actions={[
+            { label: t.cancel },
+            { label: t.rebuildCharacterConfirm, primary: true, onSelect: () => navigate(rebuildHref(rebuilding)) },
+          ]}
+        >
+          <p className="text-[14px] text-on-surface-variant">{t.rebuildCharacterBody}</p>
+        </AppDialog>
+      )}
+      {toast && (
+        <Toast key={toast.key} tone="error" message={toast.message} open onOpenChange={(open) => !open && setToast(null)} />
+      )}
       <ToastViewport />
     </ToastProvider>
   );

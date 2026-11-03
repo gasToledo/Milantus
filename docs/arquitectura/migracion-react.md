@@ -101,16 +101,25 @@ repiten acá.
   API.
 - Tema: oscuro por defecto, con selector al pie del panel (y en Ajustes). Lo elegido en el
   navegador (`localStorage`) gana sobre el `themeMode` de los ajustes de la
-  cuenta, porque React todavía no escribe en los ajustes de la cuenta.
+  cuenta: el favorito y el orden sí se escriben desde 5f (`/api/settings`, ver
+  abajo), pero el tema no, y el del navegador sigue ganando.
 - Idioma: español o inglés, resuelto una vez al cargar (clave `milantus.locale`
   de `localStorage`, luego `navigator.language`, luego español). Es el mismo
   criterio para los rótulos del motor.
-- **Tres pantallas de solo lectura.** La primera, el **dashboard** en `/v2/`
-  (`src/dashboard/`): la lista de personajes con el orden (`sortMode`:
-  manual, más recientes, nombre, nivel, clase) y el favorito de los ajustes de
-  la cuenta (`/api/settings`), buscador en el cliente por nombre, especie y
-  clase, y los caídos al final, como en Flutter. Orden y favorito **se
-  muestran, no se editan**; crear, Ajustes, Sugerencias, Cerrar sesión
+- **El dashboard** en `/v2/` (`src/dashboard/`) es la primera de las
+  pantallas de lectura, y desde 5f también escribe: la lista de personajes con
+  el orden (`sortMode`: manual, más recientes, nombre, nivel, clase) y el
+  favorito de los ajustes de la cuenta (`/api/settings`), buscador en el
+  cliente por nombre, especie y clase, y los caídos al final, como en Flutter.
+  **5f *(existe)***: el selector de orden, reordenar (puntero o flechas, solo
+  dentro del mismo grupo —favorito, vivos, caídos— y sin buscador activo, para
+  no perder el lugar de las tarjetas ocultas), el favorito, renombrar, borrar,
+  rehacer desde nivel 1 (`/v2/personajes/:id/rehacer`, el mismo creador con
+  `replacing`) y «Probar con uno de ejemplo» en la cuenta vacía. Los ajustes
+  se guardan con `patchSettings` (`src/api/settingsSave.ts`): el documento
+  viaja entero, así que hay una cola de un solo guardado a la vez que combina
+  los parches. Renombrar y borrar descartan lo pendiente de la ficha
+  (`dropPending`). Ajustes, Sugerencias, Cerrar sesión
   enlazan a la raíz de Flutter (el Homebrew es del Modo DM y no está en este panel)
   (`FLUTTER_HOME`, `src/router.tsx`). Cada tarjeta enlaza a la ficha. Las cifras
   (nivel, PG máximos, CA, velocidad, iniciativa) salen de `computeSheet`; los
@@ -652,8 +661,10 @@ repiten acá.
   ahí en las cuentas con `/v2`. El detalle sale de `codexEntries`, como en la
   subida, y «Así queda» compila el personaje que devuelve el motor. El alta es
   `creationConfirm` del motor, que rechaza un borrador incompleto, y
-  `POST /api/characters`. Rehacer un personaje y crear la ficha de un PNJ siguen
-  en Flutter.
+  `POST /api/characters`, cuya respuesta trae el id con que quedó guardado (el
+  servidor lo reasigna si choca). Rehacer (5f) usa `creationConfirm` con el
+  personaje que se rehace y `PUT` con `rebuilt: true`, que avisa a los DM; crear
+  la ficha de un PNJ sigue en Flutter.
   - **Toda escritura la hace el motor.** `actOn` (`act` de `js/entrypoint.dart`,
     sobre `SheetActions.apply` del engine) recibe la ficha y la acción y
     devuelve la ficha nueva, migrada y con el `schemaVersion` actual, más lo
@@ -723,8 +734,9 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    sentidos y desgloses, sin escrituras *(existe)*; 5e7, los avisos y
    «Resolver», con la Defensa sin armadura *(existe)*; 5e8, escribir el Diario *(existe)*; 5e9, los
    retratos *(existe)*. El aviso de turno y Compartir van al paso 6. 5f, la lista de
-   personajes: reordenar, marcar favorito, renombrar, borrar y rehacer. Van
-   antes del paso 6 porque solo tocan datos de la propia cuenta.
+   personajes: reordenar, marcar favorito, renombrar, borrar y rehacer, más el
+   personaje de ejemplo *(existe)*. Van antes del paso 6 porque solo tocan
+   datos de la propia cuenta.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
    combate, vínculos y códigos de campaña. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de
@@ -850,7 +862,7 @@ hace seguro volver atrás es que **no hay nada que deshacer en el formato**:
 Para que nadie lo dé por hecho:
 
 - El taller de retratos del PNJ y las notas del PNJ (paso 6), el Compañero Salvaje
-  (invocarlo, que no cobra ni se va con el descanso), las escrituras de 5f y los pasos 6 y 7: el detalle está en
+  (invocarlo, que no cobra ni se va con el descanso) y los pasos 6 y 7: el detalle está en
   [Orden previsto de pantallas](#orden-previsto-de-pantallas).
 - Control de versión en el servidor para las escrituras (rechazar una copia
   vieja con 409): hoy gana el último que guarda, como en Flutter.

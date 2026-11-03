@@ -20,7 +20,8 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { accentOf, nameOf } from '../api/catalog';
-import { createCharacter } from '../api/client';
+import { dropPending } from '../api/characterSave';
+import { createCharacter, saveCharacter } from '../api/client';
 import { queryKeys, useSheetCatalog } from '../api/queries';
 import { codexEntries, type CodexEntry } from '../codex/entries';
 import { RosterFooter } from '../dashboard/RosterPanel';
@@ -119,7 +120,7 @@ const CLASS_ICONS: Record<string, LucideIcon> = {
 
 /** La página del creador: el marco de siempre y salir pasa por la misma
  *  confirmación que en Flutter, porque hay un borrador que se puede perder. */
-export function CreationPage({ account }: { account: Account }) {
+export function CreationPage({ account, replacing }: { account: Account; replacing?: CharacterJson & { id: string } }) {
   const t = useTexts();
   const lang = useLang();
   const catalog = useSheetCatalog(lang);
@@ -136,7 +137,7 @@ export function CreationPage({ account }: { account: Account }) {
       footer={<RosterFooter account={account} />}
     >
       {catalog.data ? (
-        <CreationWizard catalog={catalog.data} onExit={exit} onTouched={() => setTouched(true)} />
+        <CreationWizard catalog={catalog.data} replacing={replacing} onExit={exit} onTouched={() => setTouched(true)} />
       ) : failed.length > 0 ? (
         <AppErrorView as="h1" title={t.crLoadError} message={t.errorBody} onRetry={() => failed.forEach((q) => q.refetch())} />
       ) : (
@@ -163,10 +164,26 @@ export function CreationPage({ account }: { account: Account }) {
  * Toda regla es del motor (`creationView`, sobre `CreationDraft`): acá solo se
  * manda qué tocó el jugador y se dibuja lo que vuelve, incluido qué falta.
  */
-function CreationWizard({ catalog, onExit, onTouched }: { catalog: Catalog; onExit: () => void; onTouched: () => void }) {
+function CreationWizard({
+  catalog,
+  replacing,
+  onExit,
+  onTouched,
+}: {
+  catalog: Catalog;
+  /** El personaje que se rehace: el borrador arranca con lo que no son reglas
+   *  (nombre, alineamiento, personalidad) y al terminar se guarda sobre él. */
+  replacing?: CharacterJson & { id: string };
+  onExit: () => void;
+  onTouched: () => void;
+}) {
   const t = useTexts();
   const lang = useLang();
-  const [draft, setDraft] = useState<CreationDraftJson>({});
+  const [draft, setDraft] = useState<CreationDraftJson>(() => {
+    if (!replacing) return {};
+    const old = replacing as unknown as { name: string; alignment?: string | null; personalityTrait?: string };
+    return { name: old.name, alignment: old.alignment ?? null, personalityTrait: old.personalityTrait ?? '' };
+  });
   const [stepId, setStepId] = useState<StepId>('especie');
   const [focus, setFocus] = useState<Focus>(null);
   const view = useMemo(() => creationView(catalog, draft), [catalog, draft]);
@@ -183,11 +200,20 @@ function CreationWizard({ catalog, onExit, onTouched }: { catalog: Catalog; onEx
     setCreating(true);
     setFailed(false);
     try {
-      toCreate.current ??= creationConfirm(catalog, view.draft, t.crUnnamed);
-      await createCharacter(toCreate.current);
+      toCreate.current ??= creationConfirm(catalog, view.draft, t.crUnnamed, replacing);
+      let id = toCreate.current.id;
+      if (replacing) {
+        // Lo que había pendiente es de la ficha vieja: no puede llegar después
+        // y pisar la rehecha.
+        await dropPending(replacing.id);
+        await saveCharacter(toCreate.current, { rebuilt: true });
+      } else {
+        // El servidor puede reasignar el id si choca: se navega con el suyo.
+        id = await createCharacter(toCreate.current);
+      }
       // Se espera a tener la lista nueva: la ficha se lee de ahí.
       await client.invalidateQueries({ queryKey: queryKeys.roster });
-      navigate(characterHref(toCreate.current.id));
+      navigate(characterHref(id));
     } catch {
       setFailed(true);
       setCreating(false);
@@ -243,7 +269,9 @@ function CreationWizard({ catalog, onExit, onTouched }: { catalog: Catalog; onEx
   return (
     <div className="flex min-h-full flex-col gap-4" data-page="creation">
       <header className="flex flex-col gap-3">
-        <h1 className="font-display text-[24px] text-on-surface">{t.rosterCreate}</h1>
+        <h1 className="font-display text-[24px] text-on-surface">
+          {replacing ? t.rebuildTitle((replacing as unknown as { name: string }).name) : t.rosterCreate}
+        </h1>
         <StepRail
           steps={steps.map((id) => ({ id, label: t.crSteps[id] }))}
           index={index}
@@ -306,7 +334,7 @@ function CreationWizard({ catalog, onExit, onTouched }: { catalog: Catalog; onEx
         )}
         {index === last ? (
           <Button className="flex-[2] sm:flex-none" disabled={view.pending.length > 0 || creating} onClick={() => void create()}>
-            {failed ? t.retry : t.rosterCreate}
+            {failed ? t.retry : replacing ? t.wizardRebuild : t.rosterCreate}
           </Button>
         ) : (
           <Button className="flex-[2] sm:flex-none" disabled={pending.length > 0} onClick={() => go(steps[index + 1]!)}>

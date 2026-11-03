@@ -59,12 +59,17 @@ export async function fetchRoster(signal: AbortSignal): Promise<StoredCharacter[
  * motor (`actOn`), nunca un documento armado acá; el servidor lo vuelve a
  * leer con `Character.fromJson`, que rechaza una versión futura.
  */
-export async function saveCharacter(character: CharacterJson & { id: string }): Promise<void> {
+export async function saveCharacter(
+  character: CharacterJson & { id: string },
+  options?: { rebuilt?: boolean },
+): Promise<void> {
   const path = `/api/characters/${encodeURIComponent(character.id)}`;
   const response = await fetch(path, {
     method: 'PUT',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ character }),
+    // `rebuilt` lo marca quien rehace desde nivel 1 (el servidor no lo deduce):
+    // es lo que avisa a los DM que tienen al personaje en una campaña.
+    body: JSON.stringify(options?.rebuilt ? { character, rebuilt: true } : { character }),
   });
   if (!response.ok) throw new ApiError(response.status, path);
 }
@@ -77,9 +82,11 @@ export async function deleteCharacter(id: string): Promise<void> {
   if (!response.ok) throw new ApiError(response.status, path);
 }
 
-/** Da de alta un personaje (`POST /api/characters`). Como al guardar,
- *  [character] es lo que devolvió el motor. */
-export async function createCharacter(character: CharacterJson & { id: string }): Promise<void> {
+/** Da de alta un personaje (`POST /api/characters`) y devuelve **su id**. Como
+ *  al guardar, [character] es lo que devolvió el motor. El servidor puede
+ *  reasignar el id si choca con otro de la cuenta: quien navega a la ficha usa
+ *  este, no el que mandó. */
+export async function createCharacter(character: CharacterJson & { id: string }): Promise<string> {
   const path = '/api/characters';
   const response = await fetch(path, {
     method: 'POST',
@@ -87,6 +94,7 @@ export async function createCharacter(character: CharacterJson & { id: string })
     body: JSON.stringify({ character }),
   });
   if (!response.ok) throw new ApiError(response.status, path);
+  return ((await response.json()) as { character: { id: string } }).character.id;
 }
 
 /** Lo que el dashboard lee de los ajustes de la cuenta (`AppSettings` en

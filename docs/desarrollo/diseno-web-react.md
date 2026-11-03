@@ -167,7 +167,10 @@ conjuro abre su detalle en un diálogo. Sus pasos de elecciones viven en
 | `AppDialog` | El molde de diálogo: placa, velo, barra de acciones de 48 px al pie | 480 px por defecto, 560 si el cuerpo es una ficha; una acción con `disabled` se apaga (Comprar sin fondos) |
 | `PortraitViewer` | El retrato original entero sobre el velo, con cerrar; `Esc` y clic afuera también cierran | Lo abre `Medallion` con `viewable` y la imagen de una entrada del Diario |
 | `DiaryEntries` (`src/sheet/DiaryTab.tsx`) | Tarjeta de entradas en grilla (`minWidth`, 280 por defecto); con `edit` (un `DiaryEditor`: `save`, `remove`, `move`, `upload`) suma «+», editor, borrado y el ícono de mover | Sin `edit` es de solo lectura (ficha ajena, notas del PNJ) |
-| `useReorder` (`src/ui/reorder.ts`) | Reordenar con el puntero (desde un ícono con `touch-action: none`) o con flechas; da `item(id)`, `grip(id)`, `dragging` y `over` | `onMove(desde, hasta)`; sin dependencias, lo reusa la lista de personajes (5f) |
+| `useReorder` (`src/ui/reorder.ts`) | Reordenar con el puntero (desde un ícono con `touch-action: none`) o con flechas; da `item(id)`, `grip(id)`, `dragging` y `over` | `onMove(desde, hasta)`; sin dependencias, lo usan el Diario y la lista de personajes (5f, que ignora el movimiento entre grupos) |
+| `RosterCard` (`src/dashboard/`) | La tarjeta de personaje: el nombre es el enlace y se estira con `::after`; una columna a la derecha del nivel con el menú ⋮ (favorito, renombrar, rehacer, borrar) y, debajo, el ícono de mover | El ⋮ y el ícono de mover llevan `relative z-10` o el enlace estirado los tapa; el favorito y la lista filtrada no llevan ícono de mover |
+| `RenameDialog`, `DeleteDialog` (`src/dashboard/`) | «Editar nombre» y «¿Borrar a …?» sobre `AppDialog`; reciben una promesa y, si falla, **no se cierran**: error en carmesí y «Reintentar» | Los usan la lista y la ficha (el lápiz junto al nombre, solo en la ficha propia) |
+| `patchSettings` (`src/api/settingsSave.ts`) | Cambia campos de `/api/settings` sin pisar el resto: cola de un guardado a la vez que combina parches | Todo guardado de ajustes pasa por acá; el documento viaja entero |
 | `src/api/portraits.ts` | `uploadPortrait(id, file)` (base64 de a pedazos) y `deletePortrait(key)` (un 404 cuenta como hecho) | Imágenes de retratos y del Diario; 5e9 las reusa |
 
 ## Datos
