@@ -150,8 +150,8 @@ repiten acá.
   escribe son las acciones de partida, la mochila, las elecciones y el Diario
   (abajo): el resto de la ficha no se edita. El panel es el de una pantalla de
   adentro: «volver», la tarjeta del personaje, las cinco pestañas, **Subir
-  nivel** (el asistente de `/v2`, abajo), **Retrato** (abajo), Compartir, que
-  enlaza a Flutter, e **Imprimir**; al pie, el
+  nivel** (el asistente de `/v2`, abajo), **Retrato** (abajo), **Compartir**
+  (`ShareDialog`, abajo) e **Imprimir**; al pie, el
   estado del guardado, el tema y la versión. **Imprimir** (`PrintSheet`, el
   `print_sheet.dart` de Flutter) monta una hoja propia al pie de `body` y abre
   el diálogo del navegador (que ofrece también «Guardar como PDF»); la hoja de
@@ -695,6 +695,30 @@ repiten acá.
 - **Ningún enlace** desde Flutter hacia `/v2` y Flutter no lee `webV2`: se
   entra escribiendo la URL.
 
+**Paso 6a: compartir, avisos y turno** *(existe)*. Es la parte del jugador del
+paso 6, y no toca motor, servidor ni Flutter: las rutas ya existían.
+- **Avisos de la cola** (`src/events/`): `PendingEvents` pide `GET /api/events`
+  al entrar a la lista, al Modo DM o a una ficha (las subrutas de la ficha no
+  cuentan, como en Flutter), los muestra de a uno con `Toast` (8 s y una X) y
+  marca cada uno visto al mostrarlo; un `kind` desconocido se marca sin
+  mostrar. `eventMessage` es el `messageForEvent` de Flutter y el botín lo
+  nombra el motor (`chapterGrants`). Un fallo al pedir o al marcar se traga en
+  silencio. Los avisos tienen **una sola columna**: `ToastProvider` y
+  `ToastViewport` viven en `Enabled` (`App.tsx`), y ninguna pantalla monta los
+  suyos.
+- **Compartir** (`ShareDialog`): genera el código, lo copia (el aviso va en el
+  botón, no flotante) y lista las campañas con las que está compartido, con el
+  corte confirmado en un segundo diálogo. Lo abren «Compartir» del panel de la
+  ficha y el vacío de la pestaña Campaña; el vacío de la pantalla Campañas,
+  que no sabe de qué personaje, lleva a la lista. Las claves de las consultas
+  (`characterShares`, `turn`) **no** empiezan con `'characters'`: ese prefijo
+  es el de `roster`, que `writer.ts` cancela en cada acción.
+- **Aviso de turno** (`TurnBanner`): solo en la ficha propia. Se consulta con
+  `refetchInterval` (20 s fuera de combate, 5 s con uno abierto) y **no**
+  por la cola de avisos: el turno es estado efímero. Con la pestaña oculta
+  pausa. Dice «Preparate, seguís vos» o «Es tu turno» y nada más: nunca el
+  orden ni quién sigue.
+
 ## Orden previsto de pantallas
 
 De solo lectura a escritura, y de lo simple a lo crítico. La razón: cada paso
@@ -733,12 +757,15 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    dados de Ataque Furtivo, maestrías, ventajas, competencias, idiomas,
    sentidos y desgloses, sin escrituras *(existe)*; 5e7, los avisos y
    «Resolver», con la Defensa sin armadura *(existe)*; 5e8, escribir el Diario *(existe)*; 5e9, los
-   retratos *(existe)*. El aviso de turno y Compartir van al paso 6. 5f, la lista de
+   retratos *(existe)*. 5f, la lista de
    personajes: reordenar, marcar favorito, renombrar, borrar y rehacer, más el
    personaje de ejemplo *(existe)*. Van antes del paso 6 porque solo tocan
    datos de la propia cuenta.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
-   combate, vínculos y códigos de campaña. Antes de portar esto es lectura
+   combate, vínculos y códigos de campaña. Por partes: 6a, la del jugador:
+   compartir, los avisos de la cola y el aviso de turno *(existe)*; 6b, la
+   Mesa; 6c, Capítulos y Cuaderno; 6d, la música; 6e, los PNJ; 6f, la ficha de
+   PNJ; 6g, el combate. Importar y exportar PNJ sigue en el paso 7. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de
    otra cuenta» es del servidor y vale igual para el cliente nuevo. Entra acá
    también la edición de la ficha completa de un PNJ (inventario, comprar y

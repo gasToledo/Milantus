@@ -42,7 +42,7 @@ Radix directo salvo para algo que esos envoltorios no cubran.
 | `Select` | Selección única con rótulo visible | El rótulo no desaparece al elegir |
 | `Switch` | Encendido/apagado con rótulo | El pulgar se mueve: el estado no depende solo del color |
 | `ScrollArea` | Zona con scroll propio y barra fina (las nativas toman el mismo tema desde `index.css`: `scrollbar-color` con el filete) | La usa el panel lateral; un texto que crece hasta un tope lo lleva en `viewportClassName`, con `label` para que se enfoque con el teclado y `type="auto"` para que la barra avise que hay más (el trasfondo) |
-| `Toast` / `ToastViewport` | Avisos (`showAppMessage`) | Ícono, color y texto; error 6 s, el resto 3 s. `action` es el «Deshacer» (`onUndo`) y alarga a 6 s. Hoy los usa la ficha propia (`CharacterPage`) |
+| `Toast` / `ToastViewport` | Avisos (`showAppMessage`) | Ícono, color y texto; error 6 s, el resto 3 s. `action` es el «Deshacer» (`onUndo`) y alarga a 6 s. `duration` gana sobre ese cálculo y `closeLabel` dibuja una X para descartarlo. **Una sola columna, en `Enabled`**: ninguna pantalla monta su `ToastProvider` ni su viewport (dos fijos en la misma esquina se pisan); solo dibuja su `<Toast>` |
 | `LinkTabs` / `TabPanel` | Pestañas **que son URLs** | Flechas para moverse, Enter para abrir; cada pestaña es un enlace real |
 | `Accordion` | Lista de entradas plegables (rasgos, dotes) | Varias abiertas a la vez; el botón va dentro de un encabezado |
 
@@ -263,6 +263,12 @@ definición (`dl`) de solo lectura, con un `ButtonLink` a Flutter para cambiar
 lo que se guarda en la cuenta. Esa separación es la regla de la pantalla: lo que
 vive en el navegador se edita ahí; lo que vive en la cuenta se muestra hasta
 que React escriba.
+
+### Compartir, avisos y turno
+
+- `ShareDialog` (`src/sheet/`): el diálogo de Compartir, sobre `AppDialog` con una sola acción («Cerrar»). El aviso de «copiado» va **en el botón** y el de «ya no se comparte» debajo de la lista: un aviso flotante queda detrás del velo. Cortar un vínculo abre un segundo `AppDialog` con el patrón de `DeleteDialog`: si falla no se cierra y el botón pasa a «Reintentar».
+- `PendingEvents` (`src/events/`): la cola de avisos al entrar a la lista, al Modo DM o a una ficha, de a uno y marcados vistos al mostrarse. Se monta una vez, en `Enabled`.
+- `TurnBanner` (`src/sheet/`): región `role="status"` siempre montada, para que el lector anuncie el cambio; dibuja la franja solo con `next` o `active`. Nunca muestra el orden ni quién sigue.
 
 ## Campañas (`src/campaigns/`)
 

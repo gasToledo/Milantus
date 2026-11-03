@@ -11,6 +11,7 @@ import { AppBusyLabel, AppErrorView, Notice, SaveStatusBadge } from '../ui/statu
 import { computeModel, type ComputedModel } from './compute';
 import { SheetFooter, SheetPanel } from './SheetPanel';
 import { SheetTabs } from './SheetTabs';
+import { TurnBanner } from './TurnBanner';
 import { LevelUpWizard } from '../levelup/LevelUpWizard';
 import { MagicItemPlans } from './MagicItemPlans';
 import { WildShapeForms } from './WildShapeForms';
@@ -149,15 +150,20 @@ export function CharacterPage({
     // contenido, para cambiar sin abrirlo. Desde 900 las pestañas viven en el
     // panel y la tira se oculta; el panel de la pestaña es el mismo en los dos
     // casos (se monta una sola vez).
+    // El cartel de turno solo en la ficha que se escribe: el editor, los
+    // asistentes y las fichas ajenas no lo llevan.
     body = (
-      <SheetTabs
-        model={model}
-        tabs={SHEET_TABS}
-        active={activeTab}
-        hrefOf={(tabId) => characterHref(id, tabId)}
-        listClassName="shell:hidden"
-        panelClassName="pt-4 shell:pt-0"
-      />
+      <div className="flex flex-col gap-4">
+        {model.write && <TurnBanner characterId={id} />}
+        <SheetTabs
+          model={model}
+          tabs={SHEET_TABS}
+          active={activeTab}
+          hrefOf={(tabId) => characterHref(id, tabId)}
+          listClassName="shell:hidden"
+          panelClassName="pt-4 shell:pt-0"
+        />
+      </div>
     );
   }
 
