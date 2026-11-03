@@ -4,24 +4,32 @@ import {
   Download,
   ExternalLink,
   Feather,
+  GripVertical,
   Image as ImageIcon,
   Link2,
   NotebookText,
   Pencil,
+  Plus,
   ScrollText,
   TriangleAlert,
   Upload,
   type LucideIcon,
 } from 'lucide-react';
+import { ApiError } from '../api/client';
+import { deletePortrait, uploadPortrait } from '../api/portraits';
 import type { DiaryEntry } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import { AppDialog } from '../ui/AppDialog';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
+import { cx } from '../ui/cx';
+import { Eyebrow } from '../ui/data';
 import { MarkdownText } from '../ui/MarkdownText';
+import { PortraitViewer } from '../ui/PortraitViewer';
 import { ScrollArea, Tooltip } from '../ui/primitives';
-import { portraitUrl } from '../ui/portrait';
-import { AppEmptyState } from '../ui/status';
+import { portraitUrl, thumbnailUrl } from '../ui/portrait';
+import { useReorder } from '../ui/reorder';
+import { AppBusyLabel, AppEmptyState } from '../ui/status';
 import type { SheetModel } from './model';
 import type { SheetWriter } from './writer';
 
@@ -43,7 +51,8 @@ const safeUrl = (body: string | undefined): string | null =>
  * Pestaña Diario: el lado creativo del personaje. El **trasfondo** está
  * siempre (vacío, dice «Origen desconocido»): todo personaje viene de algún
  * lado. Las **entradas** son opcionales; van en el orden en que el jugador
- * las acomodó, no por fecha. Solo lectura: escribir sigue en Flutter.
+ * las acomodó, no por fecha. En la ficha propia (con `model.write`) se
+ * escribe todo; en la de un miembro de la Mesa no hay ni un control.
  *
  * Nada de acá es una regla: no llega a `ComputedSheet` ni cambia un número.
  */
@@ -51,6 +60,31 @@ export function DiaryTab({ model }: { model: SheetModel }) {
   const t = useTexts();
   const { character } = model;
   const background = character.background?.trim() ?? '';
+  const write = model.write;
+  const edit = useMemo<DiaryEditor | undefined>(
+    () =>
+      write && {
+        // `at` lo pone esta capa y no el motor, para que el motor no dependa del
+        // reloj.
+        save: (input) => write.act({ type: 'saveDiaryEntry', ...input, at: new Date().toISOString() }),
+        remove(entry) {
+          const r = write.act({ type: 'removeDiaryEntry', entry: entry.entryId });
+          if (!r) return;
+          if (hasImage(entry)) {
+            // Con imagen no se ofrece deshacer: el archivo se va y volvería roto.
+            // La entrada ya salió del documento, que es lo que se pidió; un
+            // archivo que queda es basura barata que se lleva la cascada de
+            // borrar al dueño.
+            void deletePortrait(entry.imageKey!).catch(() => undefined);
+            return;
+          }
+          write.notify(t.diaryDeleted(entry.title || t.diaryUntitled), { undo: () => write.restore(r.before) });
+        },
+        move: (from, to) => void write.act({ type: 'moveDiaryEntry', entry: from, to }),
+        upload: (file) => uploadPortrait(character.id, file),
+      },
+    [write, character.id, t],
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -68,7 +102,12 @@ export function DiaryTab({ model }: { model: SheetModel }) {
           )}
         </Card>
       )}
-      <DiaryEntries entries={character.diary ?? []} title={t.diaryEntries} emptyMessage={t.diaryEmpty(character.name)} />
+      <DiaryEntries
+        entries={character.diary ?? []}
+        title={t.diaryEntries}
+        emptyMessage={t.diaryEmpty(character.name)}
+        edit={edit}
+      />
     </div>
   );
 }
@@ -271,8 +310,24 @@ function BackgroundCard({ model, write }: { model: SheetModel; write: SheetWrite
   );
 }
 
+/** Lo que la ficha propia puede hacer con sus entradas. Lo arma `DiaryTab` con
+ *  `model.write`; `DiaryEntries` no lo toca directamente porque las notas del
+ *  PNJ (paso 6) van a tener otro dueño. Sin él, la tarjeta es de solo lectura:
+ *  sin «+», sin ícono de mover y sin «Editar». */
+export interface DiaryEditor {
+  /** Alta (un `entry` nuevo) o edición. El motor recorta y limpia por tipo. */
+  save(input: { entry: string; kind: Kind; title: string; body: string; imageKey: string | null }): void;
+  /** Borra, avisa y, sin imagen, ofrece deshacer. */
+  remove(entry: DiaryEntry): void;
+  move(from: string, to: string): void;
+  /** Sube una imagen al almacén bajo el dueño y devuelve su clave. */
+  upload(file: File): Promise<string>;
+}
+
+const hasImage = (e: DiaryEntry) => kindOf(e) === 'image' && !!e.imageKey;
+
 /**
- * Las entradas del Diario: tarjetas en columnas que se abren en un diálogo.
+ * Las entradas del Diario: una grilla de tarjetas que se abren en un diálogo.
  * Son las mismas que usan las notas de un PNJ, como en Flutter
  * (`DiaryEntriesCard`): un segundo molde obligaría a mantener dos.
  */
@@ -280,96 +335,252 @@ export function DiaryEntries({
   entries,
   title,
   emptyMessage,
-  columns = '[columns:3_280px]',
+  minWidth = 280,
+  edit,
 }: {
   entries: DiaryEntry[];
   title: string;
   emptyMessage: string;
-  /** Cuántas columnas y de qué ancho mínimo: una columna lateral pide menos. */
-  columns?: string;
+  /** Ancho mínimo de una tarjeta: una columna lateral pide menos. */
+  minWidth?: number;
+  edit?: DiaryEditor;
 }) {
   const t = useTexts();
   const lang = useLang();
   const [open, setOpen] = useState<DiaryEntry | null>(null);
-  const date = useMemo(() => new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long', year: 'numeric' }), [lang]);
-  const when = (e: DiaryEntry) => {
-    // Sin fecha (la entrada que salió de las notas viejas) no se inventa una.
-    const iso = e.updatedAt ?? e.createdAt;
-    const d = iso ? new Date(iso) : null;
-    return d && !Number.isNaN(d.getTime()) ? date.format(d) : null;
+  // `null` es una entrada nueva; `undefined`, el editor cerrado.
+  const [editing, setEditing] = useState<DiaryEntry | null | undefined>(undefined);
+  const [deleting, setDeleting] = useState<DiaryEntry | null>(null);
+  const reorder = useReorder({ ids: entries.map((e) => e.entryId), onMove: (from, to) => edit?.move(from, to) });
+  const date = useMemo(() => new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'numeric' }), [lang]);
+  // «12/3», o «12/3 · editada 2/4» si se tocó después. Sin fecha (la entrada
+  // que salió de las notas viejas) no se inventa una.
+  const dates = (e: DiaryEntry): string => {
+    const created = e.createdAt ? new Date(e.createdAt) : null;
+    if (!created || Number.isNaN(created.getTime())) return '';
+    const base = date.format(created);
+    const touched = e.updatedAt ? new Date(e.updatedAt) : null;
+    return touched && touched > created ? t.diaryEditedOn(base, date.format(touched)) : base;
   };
 
+  const add = edit && (
+    <Tooltip content={t.diaryAddEntryTooltip}>
+      <button
+        type="button"
+        aria-label={t.diaryAddEntryTooltip}
+        onClick={() => setEditing(null)}
+        className={`${ICON_BUTTON} text-gold`}
+        data-action="add-entry"
+      >
+        <Plus size={18} aria-hidden="true" />
+      </button>
+    </Tooltip>
+  );
+
   return (
-    <section aria-labelledby="h-entries" data-card="entries">
-      <div className="mx-0.5 mb-2.5 flex items-center gap-2">
-        <h2 id="h-entries" className="flex flex-1 items-center gap-2">
-          <Feather size={18} aria-hidden="true" className="shrink-0 text-gold" />
-          <span className="font-display text-[16px] text-on-surface">{title}</span>
-        </h2>
-        {entries.length > 0 && <span className="text-[12px] text-text-muted tabular-nums">{entries.length}</span>}
-      </div>
+    <Card
+      id="entries"
+      title={title}
+      icon={Feather}
+      trailing={
+        <div className="flex items-center gap-1">
+          {entries.length > 0 && <span className="text-[12px] text-text-muted tabular-nums">{entries.length}</span>}
+          {add}
+        </div>
+      }
+    >
       {entries.length === 0 ? (
-        <AppEmptyState kind="empty" message={emptyMessage} />
+        <AppEmptyState
+          kind="empty"
+          message={emptyMessage}
+          actions={
+            edit && (
+              <Button tone="secondary" icon={Plus} onClick={() => setEditing(null)}>
+                {t.diaryAddEntry}
+              </Button>
+            )
+          }
+        />
       ) : (
-        // Columnas y no grilla: cada tarjeta mide lo que su contenido, sin
-        // filas igualadas a la más alta.
-        <ul className={`[column-gap:14px] ${columns}`}>
+        // Grilla y no columnas: al reordenar, el orden tiene que leerse de
+        // izquierda a derecha, y en columnas la tarjeta siguiente quedaba
+        // abajo. Las de una misma fila miden lo mismo.
+        <ul
+          className="grid gap-3"
+          style={{ gridTemplateColumns: `repeat(auto-fill, minmax(min(${minWidth}px, 100%), 1fr))` }}
+        >
           {entries.map((e) => (
-            <li key={e.entryId} className="mb-3.5 break-inside-avoid">
-              <EntryCard entry={e} date={when(e)} onOpen={() => setOpen(e)} />
-            </li>
+            <EntryCard
+              key={e.entryId}
+              entry={e}
+              dates={dates(e)}
+              onOpen={() => setOpen(e)}
+              reorder={edit ? reorder : undefined}
+            />
           ))}
         </ul>
       )}
 
       {open && (
+        <EntryReader
+          entry={open}
+          dates={dates(open)}
+          onClose={() => setOpen(null)}
+          onEdit={edit ? () => setEditing(open) : undefined}
+        />
+      )}
+      {edit && editing !== undefined && (
+        <EntryEditor
+          entry={editing}
+          edit={edit}
+          onClose={() => setEditing(undefined)}
+          onDelete={(e) => setDeleting(e)}
+        />
+      )}
+      {edit && deleting && (
         <AppDialog
           open
-          onOpenChange={(v) => !v && setOpen(null)}
-          title={open.title}
-          icon={KIND_ICON[kindOf(open)]}
-          actions={[{ label: t.close, primary: true }]}
+          onOpenChange={(v) => !v && setDeleting(null)}
+          title={t.diaryDeleteTitle}
+          icon={TriangleAlert}
+          iconClassName="text-crimson"
+          actions={[
+            { label: t.cancel },
+            {
+              label: t.diaryDeleteAction,
+              primary: true,
+              tone: 'crimson',
+              onSelect: () => edit.remove(deleting),
+            },
+          ]}
         >
-          <EntryBody entry={open} />
+          <p>
+            {/* Con imagen no hay vuelta atrás: el archivo se borra del servidor.
+                Sin imagen sí, y el aviso de después lo deshace. */}
+            {hasImage(deleting)
+              ? t.diaryDeleteBodyImage(deleting.title || t.diaryUntitled)
+              : t.diaryDeleteBody(deleting.title || t.diaryUntitled)}
+          </p>
         </AppDialog>
       )}
-    </section>
+    </Card>
   );
 }
 
-function EntryCard({ entry, date, onOpen }: { entry: DiaryEntry; date: string | null; onOpen: () => void }) {
+function EntryCard({
+  entry,
+  dates,
+  onOpen,
+  reorder,
+}: {
+  entry: DiaryEntry;
+  dates: string;
+  onOpen: () => void;
+  reorder?: ReturnType<typeof useReorder>;
+}) {
   const t = useTexts();
   const kind = kindOf(entry);
   const Icon = KIND_ICON[kind];
+  const title = entry.title || t.diaryUntitled;
+  const link = kind === 'link' ? safeUrl(entry.body) : null;
+  const id = entry.entryId;
   return (
-    <button
-      type="button"
-      onClick={onOpen}
-      className="card block w-full overflow-hidden text-left hover:border-gold"
-      data-entry={entry.entryId}
-    >
-      {kind === 'image' && entry.imageKey && (
-        <img
-          src={imageUrl(entry.imageKey)}
-          alt={t.diaryImageAlt(entry.title)}
-          loading="lazy"
-          className="block max-h-[220px] w-full border-b border-hairline bg-plaque object-cover"
-        />
+    // Un `<li>` con el botón que abre y, como hermano, el pie con el ícono de
+    // mover: un botón no puede ir adentro de otro.
+    <li
+      {...reorder?.item(id)}
+      className={cx(
+        'flex min-w-0 flex-col overflow-hidden rounded-[var(--radius-card)] border-2 bg-plaque',
+        reorder?.over === id ? 'border-gold' : 'border-hairline',
+        reorder?.dragging === id && 'opacity-30',
       )}
-      <span className="block px-[15px] pt-[13px] pb-3.5">
-        <span className="flex items-center gap-2">
-          <Icon size={15} aria-hidden="true" className="shrink-0 text-gold" />
-          <span className="sr-only">{t.diaryKinds[kind]}: </span>
-          <span className="min-w-0 flex-1 text-[14.5px] font-medium break-words text-on-surface">{entry.title}</span>
-        </span>
-        {kind !== 'image' && entry.body && (
-          <span className="mt-[7px] line-clamp-4 block text-[13px] leading-[1.5] break-words text-on-surface-variant">
-            {entry.body}
-          </span>
+    >
+      <button
+        type="button"
+        onClick={onOpen}
+        aria-label={t.diaryOpenEntry(title)}
+        className="flex w-full flex-1 flex-col justify-start text-left"
+        data-entry={id}
+      >
+        {kind === 'image' && entry.imageKey && (
+          <img
+            src={thumbnailUrl(imageUrl(entry.imageKey), 512)}
+            alt=""
+            loading="lazy"
+            className="block h-[120px] w-full object-cover"
+          />
         )}
-        {date && <span className="mt-[9px] block text-[11.5px] text-text-muted">{date}</span>}
-      </span>
-    </button>
+        <span className="block px-[13px] pt-3">
+          <span className="flex items-center gap-[7px]">
+            <Icon size={15} aria-hidden="true" className="shrink-0 text-gold" />
+            <span className="font-display min-w-0 flex-1 text-[15px] leading-[1.3] break-words text-on-surface">{title}</span>
+          </span>
+          {kind === 'image' && !entry.imageKey && (
+            <span className="mt-[7px] block text-[12.5px] text-on-surface-variant">{t.diaryNoImage}</span>
+          )}
+          {kind !== 'image' && entry.body && (
+            <span
+              className={cx(
+                'mt-[7px] line-clamp-4 block text-[12.5px] leading-[1.6] [overflow-wrap:anywhere] whitespace-pre-line',
+                link ? 'text-gold' : 'text-on-surface-variant',
+              )}
+            >
+              {entry.body}
+            </span>
+          )}
+        </span>
+      </button>
+      <div className="flex min-h-9 items-center justify-between pr-1 pl-[13px] text-[11.5px] text-text-muted tabular-nums">
+        <span>{dates}</span>
+        {reorder && (
+          <Tooltip content={t.diaryDragHint}>
+            <button
+              type="button"
+              aria-label={t.diaryMoveEntry(title)}
+              className="inline-flex h-8 w-8 cursor-grab items-center justify-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold"
+              {...reorder.grip(id)}
+            >
+              <GripVertical size={16} aria-hidden="true" />
+            </button>
+          </Tooltip>
+        )}
+      </div>
+    </li>
+  );
+}
+
+/** Leer una entrada. Editar sale de acá y no de la tarjeta: es chica y un lápiz
+ *  ahí competiría con el toque que abre la entrada. */
+function EntryReader({
+  entry,
+  dates,
+  onClose,
+  onEdit,
+}: {
+  entry: DiaryEntry;
+  dates: string;
+  onClose: () => void;
+  onEdit?: () => void;
+}) {
+  const t = useTexts();
+  return (
+    <AppDialog
+      open
+      onOpenChange={(v) => !v && onClose()}
+      title={entry.title || t.diaryUntitled}
+      icon={KIND_ICON[kindOf(entry)]}
+      // 560 y no 480: el cuerpo puede ser una imagen.
+      width={560}
+      actions={[
+        { label: t.close },
+        ...(onEdit ? [{ label: t.diaryEditAction, primary: true, onSelect: onEdit }] : []),
+      ]}
+    >
+      <div className="flex flex-col gap-3">
+        {dates && <p className="text-[12px] text-text-muted tabular-nums">{dates}</p>}
+        <EntryBody entry={entry} />
+      </div>
+    </AppDialog>
   );
 }
 
@@ -377,10 +588,25 @@ function EntryCard({ entry, date, onOpen }: { entry: DiaryEntry; date: string | 
 function EntryBody({ entry }: { entry: DiaryEntry }) {
   const t = useTexts();
   const kind = kindOf(entry);
+  const [viewing, setViewing] = useState(false);
+  const [gone, setGone] = useState(false);
   if (kind === 'image') {
-    return entry.imageKey ? (
-      <img src={imageUrl(entry.imageKey)} alt={t.diaryImageAlt(entry.title)} className="w-full rounded-[var(--radius-card)]" />
-    ) : null;
+    if (!entry.imageKey) return <p>{t.diaryEntryNoImage}</p>;
+    if (gone) return <p>{t.diaryImageGone}</p>;
+    const src = imageUrl(entry.imageKey);
+    return (
+      <>
+        <button type="button" aria-label={t.diarySeeFullImage} onClick={() => setViewing(true)} className="block cursor-zoom-in">
+          <img
+            src={src}
+            alt={t.diaryImageAlt(entry.title)}
+            onError={() => setGone(true)}
+            className="w-full rounded-[var(--radius-nav)]"
+          />
+        </button>
+        <PortraitViewer src={src} name={entry.title} open={viewing} onOpenChange={setViewing} />
+      </>
+    );
   }
   if (kind === 'link') {
     const url = safeUrl(entry.body);
@@ -400,6 +626,173 @@ function EntryBody({ entry }: { entry: DiaryEntry }) {
     );
   }
   return <MarkdownText text={entry.body ?? ''} className="text-[14px] leading-[1.6] text-on-surface" />;
+}
+
+const FIELD =
+  'w-full rounded-[var(--radius-nav)] border border-hairline bg-plaque px-3 py-2 text-[14px] text-on-surface placeholder:text-text-muted';
+
+/** Alta y edición. [entry] en null es una entrada nueva. */
+function EntryEditor({
+  entry,
+  edit,
+  onClose,
+  onDelete,
+}: {
+  entry: DiaryEntry | null;
+  edit: DiaryEditor;
+  onClose: () => void;
+  onDelete: (entry: DiaryEntry) => void;
+}) {
+  const t = useTexts();
+  const [title, setTitle] = useState(entry?.title ?? '');
+  const [kind, setKind] = useState<Kind>(entry ? kindOf(entry) : 'text');
+  // Un solo cuerpo para texto y enlace, como en Flutter: ninguna entrada usa
+  // los dos a la vez.
+  const [body, setBody] = useState(entry?.body ?? '');
+  const [imageKey, setImageKey] = useState<string | null>(entry?.imageKey ?? null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
+
+  const canSave = !uploading && title.trim() !== '' && (kind !== 'image' || imageKey !== null);
+
+  const choose = async (file: File | undefined) => {
+    if (fileInput.current) fileInput.current.value = '';
+    if (!file) return;
+    setUploading(true);
+    setError(null);
+    try {
+      // ponytail: cambiar la imagen de una entrada, o cancelar después de
+      // subir, deja la anterior en el almacén hasta que se borra el dueño (la
+      // cascada se la lleva). Si algún día molesta el espacio, borrarla acá es
+      // una llamada a `deletePortrait`.
+      setImageKey(await edit.upload(file));
+    } catch (e) {
+      // El servidor rechaza con 400 (tipo) o 413 (tamaño) sin decir cuál: el
+      // aviso nombra las dos causas.
+      setError(e instanceof ApiError && (e.status === 400 || e.status === 413) ? t.diaryUploadRejected : t.diaryUploadError);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const save = () =>
+    edit.save({
+      entry: entry?.entryId ?? `diary-${Date.now()}`,
+      kind,
+      title,
+      body,
+      imageKey: kind === 'image' ? imageKey : null,
+    });
+
+  return (
+    <AppDialog
+      open
+      onOpenChange={(v) => !v && onClose()}
+      title={entry ? t.diaryEditEntry : t.diaryNewEntry}
+      icon={entry ? Pencil : Plus}
+      width={560}
+      actions={[
+        { label: t.cancel },
+        ...(entry ? [{ label: t.diaryDeleteAction, tone: 'crimson' as const, onSelect: () => onDelete(entry) }] : []),
+        { label: t.commonSave, primary: true, disabled: !canSave, onSelect: save },
+      ]}
+    >
+      <div className="flex flex-col gap-4">
+        <label className="flex flex-col gap-1.5 text-[12px] text-text-muted">
+          <span>{t.diaryTitleLabel}</span>
+          <input
+            data-field="entry-title"
+            value={title}
+            autoFocus
+            onChange={(e) => setTitle(e.target.value)}
+            className={FIELD}
+          />
+        </label>
+        <div>
+          <Eyebrow>{t.diaryEntryType}</Eyebrow>
+          <div role="radiogroup" aria-label={t.diaryEntryType} className="mt-2 flex flex-wrap gap-2">
+            {(['text', 'image', 'link'] as const).map((k) => {
+              const Icon = KIND_ICON[k];
+              return (
+                <button
+                  key={k}
+                  type="button"
+                  role="radio"
+                  aria-checked={kind === k}
+                  onClick={() => setKind(k)}
+                  className={cx(
+                    'inline-flex min-h-9 items-center gap-1.5 rounded-[var(--radius-pill)] border px-3.5 text-[13px]',
+                    kind === k ? 'border-gold bg-gold-soft text-gold' : 'border-hairline text-on-surface',
+                  )}
+                >
+                  <Icon size={15} aria-hidden="true" />
+                  {t.diaryKinds[k]}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        {kind === 'image' ? (
+          <div className="flex flex-col gap-3">
+            {imageKey && (
+              <img
+                src={thumbnailUrl(imageUrl(imageKey), 512)}
+                alt=""
+                className="block h-[150px] w-full rounded-[var(--radius-nav)] object-cover"
+              />
+            )}
+            <input
+              ref={fileInput}
+              type="file"
+              accept=".png,.jpg,.jpeg,.webp,.gif"
+              hidden
+              onChange={(e) => void choose(e.target.files?.[0])}
+            />
+            {uploading ? (
+              <AppBusyLabel label={t.diaryUploading} />
+            ) : (
+              <div>
+                <Button tone="secondary" icon={Upload} onClick={() => fileInput.current?.click()}>
+                  {imageKey ? t.diaryChangeImage : t.diaryChooseImage}
+                </Button>
+              </div>
+            )}
+            <p className="text-[12px] text-text-muted">{t.diaryImageFormats}</p>
+          </div>
+        ) : kind === 'link' ? (
+          <label className="flex flex-col gap-1.5 text-[12px] text-text-muted">
+            <span>{t.diaryKinds.link}</span>
+            <input
+              type="url"
+              data-field="entry-body"
+              value={body}
+              placeholder="https://…"
+              onChange={(e) => setBody(e.target.value)}
+              className={FIELD}
+            />
+          </label>
+        ) : (
+          <label className="flex flex-col gap-1.5 text-[12px] text-text-muted">
+            <span>{t.diaryKinds.text}</span>
+            <textarea
+              data-field="entry-body"
+              rows={6}
+              value={body}
+              placeholder={t.diaryBodyHint}
+              onChange={(e) => setBody(e.target.value)}
+              className={`${FIELD} resize-y`}
+            />
+          </label>
+        )}
+        {error && (
+          <p role="alert" className="text-[12.5px] text-crimson">
+            {error}
+          </p>
+        )}
+      </div>
+    </AppDialog>
+  );
 }
 
 /**

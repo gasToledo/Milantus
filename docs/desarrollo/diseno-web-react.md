@@ -165,7 +165,10 @@ conjuro abre su detalle en un diálogo. Sus pasos de elecciones viven en
 | `Button`, `ButtonLink` | `primary` (oro lleno, uno por vista), `soft` (oro sobre `goldSoft` con filete: el verbo de una barra de herramientas), `secondary`, `danger` (carmesí, lo irreversible); `shape="pill"` en una fila de pills; `disabled` lo atenúa | `ButtonLink internal` navega sin recargar |
 | `SaveStatusBadge` | La pill del guardado automático (`SaveStatusIndicator`): Guardando… / Guardado / No se guardó con «Reintentar» | Al pie del panel de una pantalla que escribe, en lugar de «Solo lectura» |
 | `AppDialog` | El molde de diálogo: placa, velo, barra de acciones de 48 px al pie | 480 px por defecto, 560 si el cuerpo es una ficha; una acción con `disabled` se apaga (Comprar sin fondos) |
-| `PortraitViewer` | El retrato original entero sobre el velo, con cerrar; `Esc` y clic afuera también cierran | Lo abre `Medallion` con `viewable` |
+| `PortraitViewer` | El retrato original entero sobre el velo, con cerrar; `Esc` y clic afuera también cierran | Lo abre `Medallion` con `viewable` y la imagen de una entrada del Diario |
+| `DiaryEntries` (`src/sheet/DiaryTab.tsx`) | Tarjeta de entradas en grilla (`minWidth`, 280 por defecto); con `edit` (un `DiaryEditor`: `save`, `remove`, `move`, `upload`) suma «+», editor, borrado y el ícono de mover | Sin `edit` es de solo lectura (ficha ajena, notas del PNJ) |
+| `useReorder` (`src/ui/reorder.ts`) | Reordenar con el puntero (desde un ícono con `touch-action: none`) o con flechas; da `item(id)`, `grip(id)`, `dragging` y `over` | `onMove(desde, hasta)`; sin dependencias, lo reusa la lista de personajes (5f) |
+| `src/api/portraits.ts` | `uploadPortrait(id, file)` (base64 de a pedazos) y `deletePortrait(key)` (un 404 cuenta como hecho) | Imágenes de retratos y del Diario; 5e9 las reusa |
 
 ## Datos
 

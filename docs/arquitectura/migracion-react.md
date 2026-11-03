@@ -137,8 +137,9 @@ repiten acá.
   capítulos cerrados con lo que repartieron (`GET /api/characters/:id/campaigns`,
   el mismo contrato que Flutter, y lo repartido lo nombra el motor). **Diario**:
   el trasfondo con el Markdown chico de Flutter y las entradas, que se abren en
-  un diálogo. Lo único que se escribe son las acciones de partida y la
-  mochila (abajo): el resto de la ficha no se edita. El panel es el de una pantalla de
+  un diálogo (desde 5e8 se escriben en la ficha propia, abajo). Lo que se
+  escribe son las acciones de partida, la mochila, las elecciones y el Diario
+  (abajo): el resto de la ficha no se edita. El panel es el de una pantalla de
   adentro: «volver», la tarjeta del personaje, las cinco pestañas, **Subir
   nivel** (el asistente de `/v2`, abajo), Retrato y Compartir, que enlazan a
   Flutter, e **Imprimir**; al pie, el
@@ -524,6 +525,19 @@ repiten acá.
   muestra solo la celda de pacto. **Siguen en Flutter:** invocar en forma de
   bestia, el Defensor de Acero, y el Compañero Salvaje, que no cobra ni se va
   con el descanso.
+  Desde 5e8, la ficha propia **escribe el Diario** (`DiaryTab`). El trasfondo
+  tiene editor (el borrador es local y `setBackground` se manda espaciado a
+  400 ms, y al terminar, al salir del campo y al desmontar: cada acción
+  recompila la ficha), e importar y exportar un `.md`. Las entradas se crean,
+  editan, borran y reordenan con `saveDiaryEntry`, `removeDiaryEntry` y
+  `moveDiaryEntry`; la fecha la pone el cliente (`at`). Las imágenes suben al
+  almacén de retratos (`src/api/portraits.ts`, bajo el id del personaje) y un
+  rechazo 400 o 413 dice las dos causas posibles, porque el servidor no
+  distingue. Reordenar es `useReorder` (`src/ui/reorder.ts`): arrastre desde el
+  ícono de mover o flechas del teclado, sin quitarle el desplazamiento a la
+  pantalla táctil. `DiaryEntries` recibe `edit` desde `DiaryTab`; sin él (ficha
+  ajena, notas del PNJ) no tiene ni un control, y las notas del PNJ se
+  escriben recién en el paso 6.
   Desde 5e7, la ficha propia **dice lo que el motor avisa y deja resolverlo**.
   `choicesView` (`character_choices.dart`) entrega las advertencias del
   validador y los cupos de rasgos, competencias, conjuros, idiomas y origen con
@@ -690,7 +704,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    5e6, lo que la comparación de las dos fichas mostró que /v2 no decía:
    dados de Ataque Furtivo, maestrías, ventajas, competencias, idiomas,
    sentidos y desgloses, sin escrituras *(existe)*; 5e7, los avisos y
-   «Resolver», con la Defensa sin armadura *(existe)*; 5e8, escribir el Diario; 5e9, los
+   «Resolver», con la Defensa sin armadura *(existe)*; 5e8, escribir el Diario *(existe)*; 5e9, los
    retratos. El aviso de turno y Compartir van al paso 6. 5f, la lista de
    personajes: reordenar, marcar favorito, renombrar, borrar y rehacer. Van
    antes del paso 6 porque solo tocan datos de la propia cuenta.
@@ -818,7 +832,7 @@ hace seguro volver atrás es que **no hay nada que deshacer en el formato**:
 
 Para que nadie lo dé por hecho:
 
-- Los pasos 5e8 y 5e9 (escribir el Diario, retratos), el Compañero Salvaje
+- El paso 5e9 (retratos), escribir las notas del PNJ (paso 6), el Compañero Salvaje
   (invocarlo, que no cobra ni se va con el descanso), las escrituras de 5f y los pasos 6 y 7: el detalle está en
   [Orden previsto de pantallas](#orden-previsto-de-pantallas).
 - Control de versión en el servidor para las escrituras (rechazar una copia

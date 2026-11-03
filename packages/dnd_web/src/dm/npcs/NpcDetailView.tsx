@@ -116,7 +116,7 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
             entries={npc.notes ?? []}
             title={t.npcNotes}
             emptyMessage={t.npcNotesEmpty(npc.name)}
-            columns="[columns:2_260px]"
+            minWidth={260}
           />
         </div>
         <div className="flex min-w-0 max-w-[380px] flex-[1_1_300px] flex-col gap-4">

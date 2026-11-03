@@ -606,3 +606,16 @@ test('un aviso del motor lleva a la pantalla de elecciones, y elegir guarda lo q
   const enviado = await proximoGuardado(page, () => page.locator('[data-option="elf-high"]').click(), ELFA);
   expect(enviado).toEqual(segunMotor(antes, { type: 'setLineage', lineage: 'elf-high' }));
 });
+
+test('escribir el trasfondo guarda lo que da el motor', async ({ page, request }) => {
+  const antes = await ilse(request);
+  const text = '## Antes del pacto\n\nCopiaba manuscritos en la biblioteca de Lenn.';
+
+  await page.goto(`/v2/personajes/${ILSE}/diario`);
+  await page.locator('[data-action="edit-background"]').click();
+  const enviado = await proximoGuardado(page, async () => {
+    await page.locator('[data-field="background-input"]').fill(text);
+    await page.locator('[data-action="edit-background"]').click();
+  });
+  expect(enviado).toEqual(segunMotor(antes, { type: 'setBackground', text }));
+});
