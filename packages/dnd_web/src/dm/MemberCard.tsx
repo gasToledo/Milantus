@@ -1,3 +1,5 @@
+import { EllipsisVertical, Sparkles, UserMinus } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, Tooltip } from '../ui/primitives';
 import { HP_CRITICAL_RATIO, hpTone, Pill, StatPlaque, ThinBar } from '../ui/data';
 import { useTexts } from '../i18n/context';
 import { labelOf } from '../i18n/texts';
@@ -10,8 +12,9 @@ import { Link } from '../router';
  * Un jugador de la mesa, para leerlo de un vistazo: identidad, PG, cuatro
  * placas y los estados que tiene encima. Es la **ficha real** del jugador
  * (`GET /api/campaigns/:id/members` la lee en vivo, no es una copia) y el DM no
- * la escribe: no hay ningún control, y la tarjeta lleva a su ficha completa
- * ([href]), también de solo lectura. Todo número sale de
+ * la escribe: la tarjeta lleva a su ficha completa ([href]), también de solo
+ * lectura. Lo único que tiene son `actions` sobre el vínculo y los avisos
+ * (conceder Inspiración Heroica, echar de la mesa), nunca sobre la ficha. Todo número sale de
  * `ComputedSheet`; de la ficha cruda solo lo que no es regla (PG actuales y
  * estados).
  *
@@ -20,7 +23,17 @@ import { Link } from '../router';
  * sería abrir una puerta más entre cuentas (`modo-dm.md`); Flutter tampoco lo
  * muestra.
  */
-export function MemberCard({ entry, href, portrait }: { entry: RosterEntry; href: string; portrait: string | null }) {
+export function MemberCard({
+  entry,
+  href,
+  portrait,
+  actions,
+}: {
+  entry: RosterEntry;
+  href: string;
+  portrait: string | null;
+  actions?: { onGrantInspiration: () => void; onRemove: () => void };
+}) {
   const t = useTexts();
   const { character, sheet } = entry;
   const fallen = isFallen(entry);
@@ -73,6 +86,35 @@ export function MemberCard({ entry, href, portrait }: { entry: RosterEntry; href
               {sheet.level}
             </p>
           </div>
+        )}
+        {actions && (
+          // `relative z-10`: el enlace del nombre se estira sobre toda la
+          // tarjeta y taparía el botón (como en `RosterCard`).
+          <DropdownMenu>
+            <Tooltip content={t.dmActionsOf(character.name)}>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  aria-label={t.dmActionsOf(character.name)}
+                  data-action="member-actions"
+                  className="relative z-10 -mt-3.5 -mr-2 -ml-1.5 inline-flex size-8 shrink-0 items-center justify-center self-start rounded-[var(--radius-nav)] text-text-muted hover:text-gold data-[state=open]:bg-gold-soft data-[state=open]:text-gold"
+                >
+                  <EllipsisVertical size={18} aria-hidden="true" />
+                </button>
+              </DropdownMenuTrigger>
+            </Tooltip>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={actions.onGrantInspiration}>
+                <Sparkles size={15} aria-hidden="true" className="text-gold" />
+                {t.dmGrantInspiration}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={actions.onRemove} className="text-crimson">
+                <UserMinus size={15} aria-hidden="true" />
+                {t.dmRemoveFromTable}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
       </div>
 

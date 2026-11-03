@@ -1,18 +1,27 @@
-import { useMemo } from 'react';
-import { useCampaignChapters, useCampaignMembers, useSheetCatalog } from '../api/queries';
+import { useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { UserPlus } from 'lucide-react';
+import { deleteCampaignLink, grantHeroicInspiration } from '../api/client';
+import { queryKeys, useCampaignChapters, useCampaignMembers, useSheetCatalog } from '../api/queries';
 import type { DmCampaign } from '../api/client';
 import { toRosterEntry } from '../dashboard/roster';
 import { useLang, useTexts } from '../i18n/context';
 import { dmMemberHref } from '../router';
+import { Button } from '../ui/Button';
+import { ConfirmDialog } from '../ui/ConfirmDialog';
+import { Toast, type ToastTone } from '../ui/primitives';
 import { memberPortrait } from '../ui/portrait';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { stateLabel, stateOf } from './campaigns';
+import { AddMemberDialog } from './AddMemberDialog';
 import { CampaignMenu } from './CampaignMenu';
 import { DmHeader } from './DmHeader';
 import { MemberCard } from './MemberCard';
 
 /**
- * La Mesa: los personajes vinculados a la campaña, de solo lectura. Cada ficha
+ * La Mesa: los personajes vinculados a la campaña. Sumar uno (con el código que
+ * compartió el jugador) y echarlo cortan o crean el vínculo; conceder
+ * Inspiración Heroica es un aviso. Ninguna acción escribe una ficha ajena. Cada ficha
  * se lee en vivo de la cuenta del jugador y se calcula con el motor y el
  * catálogo del DM (SRD más **su** homebrew, como Flutter): un objeto propio del
  * jugador que el DM no tiene no se resuelve, y la tarjeta lo dice con la CA
@@ -25,6 +34,30 @@ export function MesaView({ campaign }: { campaign: DmCampaign }) {
   const catalog = useSheetCatalog(lang);
   // Solo para decir en qué capítulo va la mesa: si falla, la cabecera calla.
   const chapters = useCampaignChapters(campaign.id);
+  const client = useQueryClient();
+  const [adding, setAdding] = useState(false);
+  const [removing, setRemoving] = useState<{ memberId: string; name: string } | null>(null);
+  const [toast, setToast] = useState<{ key: number; tone: ToastTone; message: string } | null>(null);
+  const notify = (tone: ToastTone, message: string) => setToast((prev) => ({ key: (prev?.key ?? 0) + 1, tone, message }));
+
+  // Sin diálogo de confirmación: no rompe nada y se puede volver a conceder. Lo
+  // que sí hace el aviso es decir que esto es un **aviso**, no una escritura en
+  // la ficha ajena: si no, el DM la marca y después se sorprende de que el
+  // jugador no la tenga.
+  const grant = async (memberId: string, name: string) => {
+    try {
+      await grantHeroicInspiration(campaign.id, memberId);
+      notify('success', t.dmInspirationSent(name));
+    } catch {
+      notify('error', t.dmInspirationError(name));
+    }
+  };
+
+  const remove = async ({ memberId, name }: { memberId: string; name: string }) => {
+    await deleteCampaignLink(memberId);
+    await client.invalidateQueries({ queryKey: queryKeys.campaignMembers(campaign.id) });
+    notify('info', t.dmMemberLeft(name));
+  };
 
   const entries = useMemo(() => {
     if (!members.data || !catalog.data) return null;
@@ -47,7 +80,7 @@ export function MesaView({ campaign }: { campaign: DmCampaign }) {
   } else if (!entries) {
     body = <AppBusyLabel label={t.dmTableLoading} />;
   } else if (entries.length === 0) {
-    body = <AppEmptyState kind="empty" message={t.dmTableEmpty} hint={t.dmTableEmptyHint} />;
+    body = <AppEmptyState kind="empty" message={t.dmTableEmptyTitle} hint={t.dmTableEmpty} />;
   } else {
     body = (
       <>
@@ -61,6 +94,10 @@ export function MesaView({ campaign }: { campaign: DmCampaign }) {
               entry={entry}
               href={dmMemberHref(campaign.id, memberId)}
               portrait={memberPortrait(campaign.id, memberId, entry.character)}
+              actions={{
+                onGrantInspiration: () => void grant(memberId, entry.character.name),
+                onRemove: () => setRemoving({ memberId, name: entry.character.name }),
+              }}
             />
           ))}
         </ul>
@@ -70,8 +107,37 @@ export function MesaView({ campaign }: { campaign: DmCampaign }) {
 
   return (
     <div className="flex flex-col gap-5">
-      <DmHeader title={campaign.name} kicker={kicker} actions={<CampaignMenu campaign={campaign} />} />
+      <DmHeader
+        title={campaign.name}
+        kicker={kicker}
+        actions={
+          <>
+            <CampaignMenu campaign={campaign} />
+            <Button icon={UserPlus} data-action="add-member" onClick={() => setAdding(true)} className="min-h-11">
+              {t.dmAddMember}
+            </Button>
+          </>
+        }
+      />
       {body}
+      {adding && (
+        <AddMemberDialog
+          campaign={campaign}
+          onAdded={(name) => notify('success', t.dmMemberAdded(name, campaign.name))}
+          onClose={() => setAdding(false)}
+        />
+      )}
+      {removing && (
+        <ConfirmDialog
+          title={t.dmRemoveMember}
+          body={t.dmRemoveMemberBody(removing.name, campaign.name)}
+          confirmLabel={t.dmRemoveMember}
+          errorText={t.dmMemberRemoveError}
+          onConfirm={() => remove(removing)}
+          onClose={() => setRemoving(null)}
+        />
+      )}
+      {toast && <Toast key={toast.key} tone={toast.tone} message={toast.message} open onOpenChange={(open) => !open && setToast(null)} />}
     </div>
   );
 }
