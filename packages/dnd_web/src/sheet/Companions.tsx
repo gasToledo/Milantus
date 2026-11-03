@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ChevronDown, Info, PawPrint, TriangleAlert } from 'lucide-react';
+import { ChevronDown, Info, PawPrint } from 'lucide-react';
 import { asProfile } from '../bestiary/creature';
 import { CreatureProfile } from '../bestiary/CreatureProfile';
 import {
@@ -173,15 +173,19 @@ function CompanionRow({
         onClick={onToggle}
         className="flex w-full items-center gap-2 text-left"
       >
-        <span className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
-          <span className="font-medium break-words">{c.name}</span>
-          {c.spellLevel > 0 && <Tag>{t.compSlotLevel(c.spellLevel)}</Tag>}
-          {c.concentration && <Tag>{t.compConcentration}</Tag>}
-          {c.conditions.map((id) => (
-            <Pill key={id} highlighted={false}>
-              {labelOf(t.conditions, id)}
-            </Pill>
-          ))}
+        <span className="min-w-0 flex-1">
+          <span className="block font-medium break-words">{c.name}</span>
+          {(c.spellLevel > 0 || c.concentration || c.conditions.length > 0) && (
+            <span className="mt-0.5 flex flex-wrap items-center gap-1">
+              {c.spellLevel > 0 && <Tag>{t.compSlotLevel(c.spellLevel)}</Tag>}
+              {c.concentration && <Tag>{t.compConcentration}</Tag>}
+              {c.conditions.map((id) => (
+                <Pill key={id} highlighted={false}>
+                  {labelOf(t.conditions, id)}
+                </Pill>
+              ))}
+            </span>
+          )}
         </span>
         <span className="shrink-0 text-[12.5px] text-on-surface-variant">{t.compAc(c.armorClass ?? '')}</span>
         <b className={cx('num shrink-0 text-[14px] tabular-nums', tone.text)}>{t.compHp(c.currentHp, max)}</b>
@@ -228,7 +232,7 @@ function CompanionRow({
               </div>
             </>
           )}
-          {c.profile && c.row && <CreatureProfile profile={asProfile(c.profile)} row={c.row} catalog={catalog} compact />}
+          {c.profile && c.row && <CreatureProfile profile={asProfile(c.profile)} row={c.row} catalog={catalog} compact summary />}
         </div>
       )}
     </li>
@@ -277,11 +281,21 @@ function SummonDialog({
   const noPay = o.scales && freeLeft === 0 && cells.length === 0;
   const cell = cells.find((c) => c.key === sel.pay);
   const level = !o.scales ? 0 : sel.pay === 'free' ? o.minSpellLevel : (cell?.level ?? o.minSpellLevel);
-  const shown = peek ?? sel.form;
-  const preview = useMemo(
-    () => companionPreview(character as unknown as CharacterJson, catalog, o.id, shown, level),
-    [character, catalog, o.id, shown, level],
+  // El perfil de cada forma al nivel elegido: da el detalle de la lista (CA y
+  // PG) y el panel del costado. Se recalcula al cambiar de opción o de nivel.
+  const previews = useMemo(
+    () =>
+      new Map(
+        o.forms.map((f) => [
+          f.id,
+          companionPreview(character as unknown as CharacterJson, catalog, o.id, f.id, level),
+        ]),
+      ),
+    [character, catalog, o.id, o.forms, level],
   );
+  const preview = previews.get(peek ?? sel.form) ?? null;
+  // «con espacio de nivel n» solo cuando el pago es un espacio.
+  const kindNote = o.scales && sel.pay !== 'free' && cell ? t.compWithSlot(cell.level) : undefined;
 
   const concentrating = character.combat?.concentratingOn ?? null;
   const leaving = view.instances.filter((i) => i.concentration).map((i) => i.name);
@@ -318,6 +332,10 @@ function SummonDialog({
       <Info size={16} aria-hidden="true" />
     </Button>
   );
+  const formDetail = (f: CompanionOptionView['forms'][number]) => {
+    const p = previews.get(f.id);
+    return p ? t.compFormDetail(asProfile(p.profile).ac, asProfile(p.profile).hp) : f.kind;
+  };
   const formRow = (f: CompanionOptionView['forms'][number]) => (
     <div key={f.id} className="flex min-w-0 shrink-0 items-stretch gap-1.5">
       <div className="min-w-0 flex-1">
@@ -325,7 +343,7 @@ function SummonDialog({
           id={f.id}
           selected={f.id === sel.form}
           title={f.name}
-          detail={f.kind}
+          detail={formDetail(f)}
           onClick={() => setSel({ ...sel, form: f.id })}
         />
       </div>
@@ -418,23 +436,33 @@ function SummonDialog({
           <Button tone="secondary" className="self-start" onClick={() => setPeek(null)}>
             {t.compBack}
           </Button>
-          <CreatureProfile profile={asProfile(preview.profile)} row={preview.row} catalog={catalog} compact />
+          <CreatureProfile
+            profile={asProfile(preview.profile)}
+            row={preview.row}
+            catalog={catalog}
+            compact
+            summary
+            kindNote={kindNote}
+          />
         </div>
       ) : null}
       <div className={cx('gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_340px]', peek ? 'hidden' : 'grid')}>
         {list}
         <div className="hidden lg:block">
-          {preview && <CreatureProfile profile={asProfile(preview.profile)} row={preview.row} catalog={catalog} compact />}
+          {preview && <CreatureProfile
+            profile={asProfile(preview.profile)}
+            row={preview.row}
+            catalog={catalog}
+            compact
+            summary
+            kindNote={kindNote}
+          />}
         </div>
       </div>
       {warnings.length > 0 && (
-        <div className="mt-4 flex flex-col gap-2">
+        <div className="mt-4 flex flex-col gap-1 border-t border-hairline pt-3">
           {warnings.map((w) => (
-            <p
-              key={w}
-              className="flex items-start gap-2 rounded-[var(--radius-nav)] border border-gold px-3 py-2 text-[13px]"
-            >
-              <TriangleAlert size={18} aria-hidden="true" className="shrink-0 text-gold" />
+            <p key={w} className="text-[13px] text-gold">
               {w}
             </p>
           ))}

@@ -20,6 +20,8 @@ export function CreatureProfile({
   row,
   catalog,
   compact = false,
+  summary = false,
+  kindNote,
 }: {
   profile: Profile;
   row: BestiaryRow;
@@ -28,6 +30,12 @@ export function CreatureProfile({
    *  sin tarjeta propia ni píldoras, y con un título de panel. No es otra
    *  ficha, así que una criatura nueva sale igual en las dos. */
   compact?: boolean;
+  /** La vista resumida de un compañero (con `compact`): título, tipo, CA, PG y
+   *  ataque, velocidad, rasgos y acciones; sin características, salvaciones ni
+   *  líneas de datos. */
+  summary?: boolean;
+  /** Se suma a la línea de tipo («con espacio de nivel 5»). */
+  kindNote?: string;
 }) {
   const t = useTexts();
   const source = (t.sources as Record<string, string>)[profile.source ?? ''];
@@ -61,27 +69,39 @@ export function CreatureProfile({
       >
         {profile.name}
       </h2>
-      <p className={cx('text-on-surface-variant', compact ? 'mt-1 text-[13px]' : 'mt-1.5 text-[15px]')}>{row.kind}</p>
+      <p className={cx('text-on-surface-variant', compact ? 'mt-1 text-[13px]' : 'mt-1.5 text-[15px]')}>{kindNote ? `${row.kind} · ${kindNote}` : row.kind}</p>
       <SectionRule className={compact ? 'my-4' : 'my-[22px]'} />
 
-      <Numbers profile={profile} row={row} />
-      <Abilities profile={profile} />
-      <Lines profile={profile} hasPassive={row.passivePerception !== null} />
+      <Numbers profile={profile} row={row} summary={summary} />
+      {summary ? (
+        profile.speed && <p className="mt-3 text-[12.5px] text-on-surface-variant">{profile.speed}</p>
+      ) : (
+        <>
+          <Abilities profile={profile} />
+          <Lines profile={profile} hasPassive={row.passivePerception !== null} />
+        </>
+      )}
       <Traits profile={profile} />
       <Actions profile={profile} row={row} catalog={catalog} />
     </article>
   );
 }
 
-function Numbers({ profile, row }: { profile: Profile; row: BestiaryRow }) {
+function Numbers({ profile, row, summary }: { profile: Profile; row: BestiaryRow; summary: boolean }) {
   const t = useTexts();
   const cells: { label: string; value: string; suffix?: string; gold?: boolean; crimson?: boolean }[] = [
     { label: t.creatureAc, value: profile.ac },
-    { label: t.creatureHp, value: profile.hp, suffix: profile.hitDice, crimson: true },
-    { label: t.creatureInitiative, value: signed(row.initiative) },
+    { label: t.creatureHp, value: profile.hp, suffix: summary ? undefined : profile.hitDice, crimson: true },
   ];
-  if (row.crText !== null) cells.push({ label: t.creatureCr, value: row.crText, gold: true });
-  if (row.passivePerception !== null) cells.push({ label: t.creaturePassive, value: String(row.passivePerception) });
+  if (summary) {
+    // El primer ataque, con signo; sin ninguno no hay celda.
+    const bonus = profile.actions?.find((a) => a.attackBonus != null)?.attackBonus;
+    if (bonus != null) cells.push({ label: t.compAttack, value: signed(Number(bonus)), gold: true });
+  } else {
+    cells.push({ label: t.creatureInitiative, value: signed(row.initiative) });
+    if (row.crText !== null) cells.push({ label: t.creatureCr, value: row.crText, gold: true });
+    if (row.passivePerception !== null) cells.push({ label: t.creaturePassive, value: String(row.passivePerception) });
+  }
   return (
     <dl className="grid gap-2.5 [grid-template-columns:repeat(auto-fill,minmax(min(120px,100%),1fr))]">
       {cells.map((c) => (
