@@ -98,6 +98,8 @@ export type Route =
   | { name: 'spellEdit'; id: string; classId: string }
   // Los planos y réplicas del Artífice de la ficha propia.
   | { name: 'magicPlans'; id: string }
+  // Las formas anotadas de Forma Salvaje de la ficha propia.
+  | { name: 'wildShapeForms'; id: string }
   // El creador de personajes.
   | { name: 'creation' }
   | { name: 'unknown' };
@@ -218,6 +220,13 @@ export function matchRoute(pathname: string): Route {
       return { name: 'unknown' };
     }
   }
+  if (section === 'personajes' && id && tab === 'formas' && rest.length === 0) {
+    try {
+      return { name: 'wildShapeForms', id: decodeURIComponent(id) };
+    } catch {
+      return { name: 'unknown' };
+    }
+  }
   if (section === 'personajes' && id && rest.length === 0) {
     const sheetTab = tab === undefined ? null : SHEET_TABS.find((t) => t === tab);
     if (sheetTab === undefined) return { name: 'unknown' };
@@ -292,6 +301,9 @@ export const spellEditHref = (id: string, classId: string): string =>
 
 export const magicPlansHref = (id: string): string =>
   `${import.meta.env.BASE_URL}personajes/${encodeURIComponent(id)}/planos`;
+
+export const wildShapeFormsHref = (id: string): string =>
+  `${import.meta.env.BASE_URL}personajes/${encodeURIComponent(id)}/formas`;
 
 // `pushState` no dispara ningún evento: se avisa a mano a quien escucha.
 const listeners = new Set<() => void>();

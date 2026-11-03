@@ -15,29 +15,54 @@ import { ABILITY_KEYS, type CreatureAction, type CreatureProfile as Profile } fr
  * `abilityModifier`, y la iniciativa, el desafío y la percepción pasiva llegan
  * en [row], ya derivados por el motor.
  */
-export function CreatureProfile({ profile, row, catalog }: { profile: Profile; row: BestiaryRow; catalog: Catalog }) {
+export function CreatureProfile({
+  profile,
+  row,
+  catalog,
+  compact = false,
+}: {
+  profile: Profile;
+  row: BestiaryRow;
+  catalog: Catalog;
+  /** La misma ficha dentro de otra superficie (el diálogo de Forma Salvaje):
+   *  sin tarjeta propia ni píldoras, y con un título de panel. No es otra
+   *  ficha, así que una criatura nueva sale igual en las dos. */
+  compact?: boolean;
+}) {
   const t = useTexts();
   const source = (t.sources as Record<string, string>)[profile.source ?? ''];
   return (
-    <article aria-labelledby="creature-title" className="card px-5 py-6 sm:px-8 sm:py-7" data-field="creature-detail">
-      <div className="flex flex-wrap items-center gap-2">
-        {row.crText !== null && (
-          <Pill highlighted>
-            <span data-field="creature-cr">{t.bestiaryCr(row.crText)}</span>
-          </Pill>
+    <article
+      aria-labelledby="creature-title"
+      className={compact ? undefined : 'card px-5 py-6 sm:px-8 sm:py-7'}
+      data-field="creature-detail"
+    >
+      {!compact && (
+        <div className="flex flex-wrap items-center gap-2">
+          {row.crText !== null && (
+            <Pill highlighted>
+              <span data-field="creature-cr">{t.bestiaryCr(row.crText)}</span>
+            </Pill>
+          )}
+          {source && (
+            <Pill highlighted={false}>
+              <span aria-hidden="true">{source}</span>
+              <span className="sr-only">{t.sourceLabel(source)}</span>
+            </Pill>
+          )}
+        </div>
+      )}
+      <h2
+        id="creature-title"
+        className={cx(
+          'font-display break-words text-on-surface',
+          compact ? 'text-[16px]' : 'mt-3.5 text-[34px] leading-[1.1]',
         )}
-        {source && (
-          <Pill highlighted={false}>
-            <span aria-hidden="true">{source}</span>
-            <span className="sr-only">{t.sourceLabel(source)}</span>
-          </Pill>
-        )}
-      </div>
-      <h2 id="creature-title" className="font-display mt-3.5 text-[34px] leading-[1.1] break-words text-on-surface">
+      >
         {profile.name}
       </h2>
-      <p className="mt-1.5 text-[15px] text-on-surface-variant">{row.kind}</p>
-      <SectionRule className="my-[22px]" />
+      <p className={cx('text-on-surface-variant', compact ? 'mt-1 text-[13px]' : 'mt-1.5 text-[15px]')}>{row.kind}</p>
+      <SectionRule className={compact ? 'my-4' : 'my-[22px]'} />
 
       <Numbers profile={profile} row={row} />
       <Abilities profile={profile} />
