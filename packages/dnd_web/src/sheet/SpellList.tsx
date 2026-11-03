@@ -1,10 +1,18 @@
 import { useState, type ReactNode } from 'react';
-import { vocabularyLabel, type InnateSpell, type JsonObject } from '../engine';
+import { vocabularyLabel, type AbilityId, type ByAbility, type InnateSpell, type JsonObject } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
 import { Eyebrow } from '../ui/data';
 import { Accordion } from '../ui/disclosure';
+import { signed } from './format';
+
+/** La aptitud con que se lanza: la de la clase o la de un conjuro innato. */
+export interface CastingStats {
+  ability: AbilityId;
+  attackBonus: number;
+  saveDc: number;
+}
 
 /** Lo que una fila lee de un conjuro del catálogo (`Spell.toJson`). */
 export type SpellJson = JsonObject & {
@@ -47,7 +55,15 @@ export function SpellList({
   onSwapInnate,
   levelFilter,
   caps,
+  damageBonuses,
+  casting,
+  abilityModifiers,
 }: {
+  /** Lo que se suma al daño de cada conjuro, con su fuente (`spellDamageBonuses`). */
+  damageBonuses: Record<string, { bonus: number; source: string }[]>;
+  /** La aptitud de la clase, para los que no son innatos; `null` si no lanza. */
+  casting: CastingStats | null;
+  abilityModifiers: ByAbility;
   /** El nivel elegido en la grilla de espacios: `upTo` (el pacto, que se
    *  lanza a ese nivel o menos) muestra hasta él; si no, solo ese. `null` si
    *  no hay grilla. Solo filtra la vista: no es una regla. */
@@ -71,6 +87,23 @@ export function SpellList({
   const t = useTexts();
   const lang = useLang();
   const byId = new Map(catalog.map((s) => [s.id, s as SpellJson]));
+  // El bono al daño en palabras (`+4 al daño (Descarga Agónica)`); vacío si
+  // el conjuro no lleva ninguno. La suma es la de la lista del motor.
+  const bonusOf = (id: string | undefined): string | undefined => {
+    const list = id ? damageBonuses[id] : undefined;
+    if (!list || list.length === 0) return undefined;
+    const total = list.reduce((sum, b) => sum + b.bonus, 0);
+    return t.spellsDamageBonus(signed(total), [...new Set(list.map((b) => b.source))].join(', '));
+  };
+  // «Lanzás con Carisma (+4). Ataque de conjuro +7 · CD de salvación 15.» con
+  // la aptitud de quien lo da; sin aptitud no hay línea.
+  const detail = (spell: SpellJson, stats: CastingStats | null) => {
+    const bonus = bonusOf(spell.id);
+    const cast = stats
+      ? t.spellsCastWith(t.abilities[stats.ability], signed(abilityModifiers[stats.ability] ?? 0), signed(stats.attackBonus), stats.saveDc)
+      : null;
+    return cast ? [cast, bonus && `${bonus}.`].filter(Boolean).join(' ') : undefined;
+  };
   const resolve = (ids: string[]) =>
     [...new Set(ids)]
       .map((id) => byId.get(id))
@@ -121,8 +154,10 @@ export function SpellList({
         headingLevel={4}
         items={l.map((s) => ({
           id: s.id,
-          title: <SpellTitle spell={s} hideLevel />,
-          content: <SpellDetail spell={s} onConcentrate={onConcentrate && (() => onConcentrate(s.name ?? s.id))} />,
+          title: <SpellTitle spell={s} hideLevel bonus={bonusOf(s.id)} />,
+          content: (
+            <SpellDetail spell={s} castLine={detail(s, casting)} onConcentrate={onConcentrate && (() => onConcentrate(s.name ?? s.id))} />
+          ),
         }))}
       />
     );
@@ -150,8 +185,10 @@ export function SpellList({
         headingLevel={4}
         items={cantrips.map((s) => ({
           id: s.id,
-          title: <SpellTitle spell={s} />,
-          content: <SpellDetail spell={s} onConcentrate={onConcentrate && (() => onConcentrate(s.name ?? s.id))} />,
+          title: <SpellTitle spell={s} bonus={bonusOf(s.id)} />,
+          content: (
+            <SpellDetail spell={s} castLine={detail(s, casting)} onConcentrate={onConcentrate && (() => onConcentrate(s.name ?? s.id))} />
+          ),
         }))}
       />
     );
@@ -169,10 +206,11 @@ export function SpellList({
             id: `innate-${i.spellId}`,
             // El nombre que da el motor (puede venir del rasgo) y su uso,
             // CD y ataque, que son los del rasgo y no los de la clase.
-            title: <SpellTitle spell={s} name={i.name} note={innateNote(i)} />,
+            title: <SpellTitle spell={s} name={i.name} note={innateNote(i)} bonus={bonusOf(i.spellId)} />,
             content: s ? (
               <SpellDetail
                 spell={s}
+                castLine={detail(s, i)}
                 onConcentrate={onConcentrate && (() => onConcentrate(i.name))}
                 onSwap={onSwapInnate && i.replaceableFrom.length > 0 ? () => onSwapInnate(i) : undefined}
               />
@@ -222,7 +260,10 @@ function SpellTitle({
   name,
   note,
   hideLevel,
+  bonus,
 }: {
+  /** Lo que se suma al daño, después de la escuela. */
+  bonus?: string;
   spell: SpellJson | undefined;
   name?: string;
   note?: string;
@@ -231,14 +272,17 @@ function SpellTitle({
 }) {
   const t = useTexts();
   const level = spell?.level ?? 0;
-  const line =
-    note ??
-    [
-      hideLevel ? null : level === 0 ? t.cantrip : t.spellLevelShort(level),
-      spell?.school ? vocabularyLabel('school', spell.school) : null,
-    ]
-      .filter(Boolean)
-      .join(' · ');
+  const line = [
+    ...(note
+      ? [note]
+      : [
+          hideLevel ? null : level === 0 ? t.cantrip : t.spellLevelShort(level),
+          spell?.school ? vocabularyLabel('school', spell.school) : null,
+        ]),
+    bonus,
+  ]
+    .filter(Boolean)
+    .join(' · ');
   return (
     <span className="flex flex-col">
       <span className="flex flex-wrap items-center gap-1.5">
@@ -279,10 +323,13 @@ export function spellMeta(spell: SpellJson): string {
  *  acá y no en la fila porque la fila ya es el botón del acordeón. */
 function SpellDetail({
   spell,
+  castLine,
   onConcentrate,
   onSwap,
 }: {
   spell: SpellJson;
+  /** «Lanzás con…» más el bono al daño; falta si el conjuro no tiene aptitud. */
+  castLine?: string;
   onConcentrate?: () => void;
   onSwap?: () => void;
 }) {
@@ -291,6 +338,7 @@ function SpellDetail({
   return (
     <>
       {meta && <p className="mb-1.5 text-[12px] text-on-surface">{meta}</p>}
+      {castLine && <p className="mb-1.5 text-[12px] text-on-surface">{castLine}</p>}
       {spell.description}
       {((spell.concentration && onConcentrate) || onSwap) && (
         <div className="mt-2 flex flex-wrap gap-2">

@@ -1,6 +1,16 @@
 import { useTexts } from '../i18n/context';
+import type { Advantage } from '../engine';
+import type { Texts } from '../i18n/texts';
 import { cx } from '../ui/cx';
+import { Tooltip } from '../ui/primitives';
 import { signed } from './format';
+import { Tag } from './SpellList';
+
+/** De dónde sale cada ventaja, sin repetir (`_advantageSources` de Flutter).
+ *  Una fuente vacía es un rasgo sin nombre. */
+export function advantageSources(advantages: Advantage[], t: Texts): string {
+  return [...new Set(advantages.map((v) => v.source || t.advantageOtherTrait))].join(', ');
+}
 
 /**
  * Una habilidad o una salvación: punto, nombre, (abreviatura de la
@@ -16,6 +26,7 @@ export function ProficiencyRow({
   modifier,
   proficient,
   expertise = false,
+  advantage,
 }: {
   id: string;
   kind: 'save' | 'skill';
@@ -24,6 +35,8 @@ export function ProficiencyRow({
   modifier: number;
   proficient: boolean;
   expertise?: boolean;
+  /** Las ventajas que valen en toda tirada de la fila, con su fuente. */
+  advantage?: Advantage[];
 }) {
   const t = useTexts();
   const on = proficient || expertise;
@@ -45,9 +58,12 @@ export function ProficiencyRow({
           }
         />
       </span>
-      <span className="min-w-0 flex-1 truncate">
-        {label}
-        <span className="sr-only">{`, ${state}`}</span>
+      <span className="flex min-w-0 flex-1 items-center gap-1.5">
+        <span className="truncate">
+          {label}
+          <span className="sr-only">{`, ${state}`}</span>
+        </span>
+        {advantage && advantage.length > 0 && <AdvantageMark advantages={advantage} />}
       </span>
       {abbr && (
         <span aria-hidden="true" className="text-[10px] tracking-[1px] text-text-muted uppercase">
@@ -58,5 +74,20 @@ export function ProficiencyRow({
         {signed(modifier)}
       </span>
     </li>
+  );
+}
+
+/** «Ventaja» al lado del nombre, con quién la da. El tooltip no existe en el
+ *  teléfono, así que el mismo texto va también oculto para el lector. */
+function AdvantageMark({ advantages }: { advantages: Advantage[] }) {
+  const t = useTexts();
+  const from = t.advantageFrom(advantageSources(advantages, t));
+  return (
+    <Tooltip content={from}>
+      <span className="shrink-0">
+        <Tag>{t.advantageTag}</Tag>
+        <span className="sr-only">{`, ${from}`}</span>
+      </span>
+    </Tooltip>
   );
 }

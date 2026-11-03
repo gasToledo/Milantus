@@ -28,6 +28,7 @@ import { Eyebrow, Pips, SpendRecoverButtons, ThinBar } from '../ui/data';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Tooltip } from '../ui/primitives';
 import { AppEmptyState } from '../ui/status';
 import { magicPlansHref } from '../router';
+import { InfoName } from './InfoName';
 import { EffectTargetDialog } from './EffectTargetDialog';
 import { BaseDialog } from './MagicItemPlans';
 import { coinLabels, ItemCatalogDialog, TradeDialog, type CatalogRow, type Trade } from './ItemCatalog';
@@ -615,9 +616,11 @@ function PackRow({
           </span>
           <span className="min-w-0">
             <span className="flex flex-wrap items-center gap-1.5 text-[14px] text-on-surface">
-              <span className="break-words" data-field="name">
-                {line.name}
-              </span>
+              <InfoName title={line.name} description={line.description}>
+                <span className="break-words" data-field="name">
+                  {line.name}
+                </span>
+              </InfoName>
               {line.replica && (
                 <span className="rounded-[var(--radius-pill)] border border-hairline px-1.5 text-[10px] text-on-surface-variant">
                   {t.invReplica}

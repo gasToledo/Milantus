@@ -1,9 +1,9 @@
 import { Ban, Bed, BookOpen, Check, Coffee, Crosshair, Dices, Heart, Info, Minus, Plus, RefreshCw, Shield, ShieldHalf, Star, TriangleAlert, Zap } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { nameOf } from '../api/catalog';
-import type { CharacterResource, InnateSpell, SpellcastingBlock } from '../engine';
-import { useTexts } from '../i18n/context';
-import { labelOf } from '../i18n/texts';
+import { catalogLabel, type Advantage, type CharacterResource, type InnateSpell, type SpellcastingBlock } from '../engine';
+import { useLang, useTexts } from '../i18n/context';
+import { labelOf, type Lang, type Texts } from '../i18n/texts';
 import { AppDialog } from '../ui/AppDialog';
 import { Tooltip } from '../ui/primitives';
 import { Button, ButtonLink } from '../ui/Button';
@@ -12,14 +12,15 @@ import { Eyebrow, hpTone, Pill, Pips, ShieldBadge, SpendRecoverButtons, StatPlaq
 import { SheetColumns } from './CharacterTab';
 import { resourceKey, signed } from './format';
 import { CompanionsCard } from './Companions';
+import { InfoName } from './InfoName';
 import { InnateCantripDialog } from './InnateCantripDialog';
-import { SpellList } from './SpellList';
+import { SpellList, Tag } from './SpellList';
 import { SpellSlotAction, SpellSlotGrid, spellSlotCells } from './SpellSlots';
 import { spellEditHref } from '../router';
 import { resourceLeft, type SheetModel } from './model';
 import { activeForm } from './WildShape';
 import type { SheetWriter } from './writer';
-import { ProficiencyRow } from './rows';
+import { advantageSources, ProficiencyRow } from './rows';
 import { ABILITIES, isReactionSpell } from './vocabulary';
 
 /**
@@ -291,21 +292,41 @@ function AttacksCard({ model }: { model: SheetModel }) {
   const notes = [...(form?.traits ?? []), ...(form?.actions ?? [])].filter(
     (n): n is { name: string; description: string } => Boolean(n.description),
   );
+  // La regla de la maestría se lee tocándola: un tooltip no existe en el
+  // teléfono. Guarda el id de la maestría abierta.
+  const [masteryRule, setMasteryRule] = useState<string | null>(null);
+  const dice = sheet.scalingDice;
   return (
     <Card id="attacks" title={t.attacksHeading} icon={Crosshair}>
-      {sheet.attacks.length === 0 ? (
+      {sheet.attacks.length === 0 && dice.length === 0 ? (
         <p className="text-[13px] text-text-muted">{t.noAttacks}</p>
       ) : (
         <ul className="divide-y divide-hairline border-t border-hairline">
           {sheet.attacks.map((a) => {
             const note = [
-              // Un ataque de bestia sin daño (el agarre) no lleva el tramo.
-              a.damage ? `${a.damage} ${labelOf(t.damageTypes, a.damageType)}` : null,
-              ...(a.extraDamage ?? []).map((x) => `${x.dice} ${labelOf(t.damageTypes, x.type)}`),
+              // Un ataque de bestia sin daño (el agarre) no lleva el tramo. El
+              // «o» de un daño extra de dos tipos ya viene resuelto por el motor.
+              a.damage || a.extraDamage?.length ? a.damageText : null,
               a.range ? t.attackRange(a.range[0], a.range[1]) : null,
             ]
               .filter(Boolean)
               .join(' · ');
+            const marks = [
+              a.mastery && (
+                <button
+                  key="mastery"
+                  type="button"
+                  onClick={() => setMasteryRule(a.mastery)}
+                  className="rounded-[var(--radius-pill)]"
+                >
+                  <Pill>{t.combatMastery(catalogLabel('mastery', a.mastery))}</Pill>
+                </button>
+              ),
+              ...a.modeBonuses.map((b) => <Tag key={`mode-${b.modeId}`}>{`${b.name.toUpperCase()} ${signed(b.amount)}`}</Tag>),
+              a.critRange < 20 && <Pill key="crit">{t.combatCritRange(a.critRange)}</Pill>,
+              a.offHand && <Pill key="off">{t.combatOffHand}</Pill>,
+              a.action === 'bonusAction' && <Pill key="bonus">{t.combatBonusAction}</Pill>,
+            ].filter(Boolean);
             return (
               <li
                 // El nombre: la Garra y el Mordisco del oso comparten `weaponId`.
@@ -316,6 +337,7 @@ function AttacksCard({ model }: { model: SheetModel }) {
                 <div className="min-w-0 flex-1">
                   <p className="font-medium break-words">{a.name}</p>
                   <p className="mt-0.5 text-[12px] text-text-muted">{note}</p>
+                  {marks.length > 0 && <div className="mt-1 flex flex-wrap items-center gap-1.5">{marks}</div>}
                 </div>
                 <span className="num shrink-0 text-[18px] text-gold" data-field="attack-bonus">
                   <span aria-hidden="true">{signed(a.attackBonus)}</span>
@@ -324,7 +346,25 @@ function AttacksCard({ model }: { model: SheetModel }) {
               </li>
             );
           })}
+          {/* Los dados de un rasgo que no es un arma (Ataque Furtivo): van con
+              los ataques porque es ahí donde se buscan en el turno. */}
+          {dice.map((d) => (
+            <li key={d.name} data-scaling-dice={d.name} className="flex items-center gap-3 py-2.5">
+              <p className="min-w-0 flex-1 font-medium break-words">{d.name}</p>
+              <span className="num shrink-0 text-[18px] text-gold">{d.dice}</span>
+            </li>
+          ))}
         </ul>
+      )}
+      {masteryRule && (
+        <AppDialog
+          open
+          onOpenChange={(open) => !open && setMasteryRule(null)}
+          title={catalogLabel('mastery', masteryRule)}
+          actions={[{ label: t.close, primary: true }]}
+        >
+          <p className="text-on-surface-variant">{catalogLabel('masteryRule', masteryRule)}</p>
+        </AppDialog>
       )}
       {/* Lo que el perfil de la bestia dice de sí misma (Pies Ligeros, el
           empujón del lobo): en el turno es lo que se consulta junto a los
@@ -507,6 +547,9 @@ function SpellsCard({ model }: { model: SheetModel }) {
             }
             cantripIds={[...(character.cantripIds ?? []), ...Object.values(character.classCantripIds ?? {}).flat()]}
             spellIds={[...(character.spellIds ?? []), ...Object.values(character.classSpellIds ?? {}).flat()]}
+            damageBonuses={sheet.spellDamageBonuses}
+            casting={sheet.spellcasting}
+            abilityModifiers={sheet.abilityModifiers}
             alwaysPreparedIds={sheet.alwaysPreparedSpellIds}
             innate={sheet.innateSpells}
             preparation={sheet.spellcasting?.preparation ?? null}
@@ -570,8 +613,29 @@ function innateNote(s: InnateSpell, t: ReturnType<typeof useTexts>): string {
   ].join(' · ');
 }
 
+/** Una ventaja que no cabe en una fila dicha en una frase
+ *  (`_conditionalAdvantageText` de Flutter). Los estados salen del glosario del
+ *  motor; en español van en minúscula dentro de la frase («contra
+ *  envenenado») y en inglés 2024 se escriben con mayúscula. */
+function conditionalAdvantageText(v: Advantage, t: Texts, lang: Lang): string {
+  const conditions = v.conditions
+    .map((c) => catalogLabel('damageType', c))
+    .map((label) => (lang === 'es' ? label.toLowerCase() : label))
+    .join(', ');
+  const text =
+    v.roll === 'deathSave'
+      ? t.advantageDeathSaves
+      : v.vsSpells
+        ? t.advantageSavesVsSpells
+        : v.roll === 'check'
+          ? t.advantageChecksToEnd(conditions)
+          : t.advantageSavesAgainst(conditions);
+  return `${text} · ${advantageSources([v], t)}`;
+}
+
 function SavesCard({ model }: { model: SheetModel }) {
   const t = useTexts();
+  const lang = useLang();
   const { sheet } = model;
   return (
     <Card id="saves" title={t.savesHeading} icon={ShieldHalf}>
@@ -584,9 +648,22 @@ function SavesCard({ model }: { model: SheetModel }) {
             label={t.abilities[ability]}
             modifier={sheet.savingThrows[ability] ?? 0}
             proficient={sheet.savingThrowProficiencies.includes(ability)}
+            advantage={sheet.saveAdvantages[ability]}
           />
         ))}
       </ul>
+      {/* Las ventajas contra un estado o contra conjuros van al pie y no en la
+          fila de su característica: marcarlas ahí diría que valen en toda
+          salvación de Constitución, y la del enano vale solo contra veneno. */}
+      {sheet.conditionalAdvantages.length > 0 && (
+        <div className="mt-2.5 flex flex-col gap-0.5">
+          {sheet.conditionalAdvantages.map((v, i) => (
+            <p key={i} className="text-[12.5px] text-text-muted">
+              {conditionalAdvantageText(v, t, lang)}
+            </p>
+          ))}
+        </div>
+      )}
     </Card>
   );
 }
@@ -801,7 +878,11 @@ function ResourcesCard({ model }: { model: SheetModel }) {
             return (
               <li key={`${r.classId ?? ''}:${r.id}`} className="flex items-center justify-between gap-3 py-2.5" data-resource={r.id}>
                 <div className="min-w-0">
-                  <p className="break-words">{r.name}</p>
+                  <p className="break-words">
+                    <InfoName title={r.name} description={r.description}>
+                      {r.name}
+                    </InfoName>
+                  </p>
                   {t.recharge[r.recharge] && <p className="text-[11.5px] text-text-muted">{t.recharge[r.recharge]}</p>}
                 </div>
                 {/* Una reserva grande (Imposición de Manos: 25) en puntos no
