@@ -1,3 +1,4 @@
+import { canLevelUp, type CharacterJson } from '../engine';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { hasUnsavedChanges, retrySave, useSaveState } from '../api/characterSave';
@@ -100,6 +101,13 @@ export function CharacterPage({
     () => (computed?.ok ? { ...computed.model, write: write ?? undefined } : null),
     [computed, write],
   );
+
+  // Un personaje en el nivel máximo no tiene asistente: la ruta, escrita a
+  // mano, vuelve a la ficha.
+  const atMaxLevel = model ? !canLevelUp(model.character as unknown as CharacterJson) : false;
+  useEffect(() => {
+    if (levelUp && atMaxLevel) navigate(characterHref(id), { replace: true });
+  }, [id, levelUp, atMaxLevel]);
 
   let body;
   if (failed.length > 0) {

@@ -12,6 +12,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { canLevelUp, type CharacterJson } from '../engine';
 import { useTexts } from '../i18n/context';
 import { characterHref, FLUTTER_HOME, levelUpHref, rosterHref, SHEET_TABS, type SheetTab } from '../router';
 import type { Texts } from '../i18n/texts';
@@ -78,7 +79,12 @@ export function SheetPanel({ model, tab }: { model: SheetModel; tab: SheetTab })
           <NavItem href={FLUTTER_HOME} icon={Image} label={t.actionPortrait} external />
         </li>
         <li>
-          <NavItem href={levelUpHref(id)} icon={ArrowUpCircle} label={t.actionLevelUp} internal />
+          {/* En el nivel máximo no hay a dónde ir: el tope lo dice el motor. */}
+          {canLevelUp(character as unknown as CharacterJson) ? (
+            <NavItem href={levelUpHref(id)} icon={ArrowUpCircle} label={t.actionLevelUp} internal />
+          ) : (
+            <NavItem icon={ArrowUpCircle} label={t.levelMaxReached} disabled />
+          )}
         </li>
         <li>
           <NavItem href={FLUTTER_HOME} icon={Share2} label={t.actionShare} external />

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Minus, Plus, type LucideIcon } from 'lucide-react';
+import { Info, Minus, Plus, type LucideIcon } from 'lucide-react';
 import { cx } from './cx';
 import { Tooltip } from './primitives';
 
@@ -21,6 +21,11 @@ export function Eyebrow({ children, className }: { children: ReactNode; classNam
  * que la cifra; `footer` va abajo a todo el ancho (la barra de PG) y
  * `caption`, debajo de él (el porcentaje). Es un par `dt`/`dd`: va adentro de
  * un `<dl>`, que arma la grilla (`.tactical-band` en `index.css`).
+ *
+ * Con `onClick` toda la placa es un `button` (la Iniciativa abre su
+ * desglose) y el rótulo lleva un ícono `Info` que lo anuncia. Pierde el par
+ * `dt`/`dd` —un botón no es hijo válido de `dl`—, y el botón ya se anuncia
+ * con rótulo y valor.
  */
 export function StatTile({
   id,
@@ -31,6 +36,7 @@ export function StatTile({
   valueClassName = 'text-on-surface',
   caption,
   footer,
+  onClick,
 }: {
   id: string;
   icon?: LucideIcon;
@@ -40,14 +46,23 @@ export function StatTile({
   valueClassName?: string;
   caption?: ReactNode;
   footer?: ReactNode;
+  onClick?: () => void;
 }) {
+  const Root = onClick ? 'button' : 'div';
+  const Label = onClick ? 'span' : 'dt';
+  const Body = onClick ? 'span' : 'dd';
   return (
-    <div className="plaque flex min-h-[96px] min-w-0 flex-col items-center px-4 py-3.5 text-center" data-stat={id}>
-      <dt className="flex max-w-full items-center justify-center gap-1.5 text-[11px] tracking-[1.1px] text-text-muted uppercase">
+    <Root
+      {...(onClick ? { type: 'button' as const, onClick } : {})}
+      className={cx('plaque flex min-h-[96px] min-w-0 flex-col items-center px-4 py-3.5 text-center', onClick && 'cursor-pointer')}
+      data-stat={id}
+    >
+      <Label className="flex max-w-full items-center justify-center gap-1.5 text-[11px] tracking-[1.1px] text-text-muted uppercase">
         {Icon && <Icon size={14} aria-hidden="true" className="shrink-0 text-gold" />}
         <span className="truncate">{label}</span>
-      </dt>
-      <dd className="flex w-full min-w-0 flex-1 flex-col">
+        {onClick && <Info size={13} aria-hidden="true" className="shrink-0" />}
+      </Label>
+      <Body className="flex w-full min-w-0 flex-1 flex-col">
         <span className="flex flex-1 items-center justify-center pt-2">
           <span className="leading-none whitespace-nowrap">
             <span className={cx('num text-[30px]', valueClassName)} data-field="value">
@@ -58,8 +73,8 @@ export function StatTile({
         </span>
         {footer && <div className="w-full pt-2.5">{footer}</div>}
         {caption && <span className="mt-1 text-[11px] text-text-muted tabular-nums">{caption}</span>}
-      </dd>
-    </div>
+      </Body>
+    </Root>
   );
 }
 

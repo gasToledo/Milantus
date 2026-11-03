@@ -142,7 +142,7 @@ conjuro abre su detalle en un diálogo. Sus pasos de elecciones viven en
 
 | Componente | Qué hace | Cuándo |
 | --- | --- | --- |
-| `StatTile` | Placa de la banda táctica, **centrada**: ícono + rótulo arriba, cifra en sans negrita tabular con su `suffix` en la misma línea, `footer` a todo el ancho y `caption` debajo | Solo la banda táctica, dentro de `.tactical-band` (`index.css`): columnas fijas medidas con *container query*, PG más ancha, sin placas huérfanas |
+| `StatTile` | Placa de la banda táctica, **centrada**: ícono + rótulo arriba, cifra en sans negrita tabular con su `suffix` en la misma línea, `footer` a todo el ancho y `caption` debajo | Solo la banda táctica, dentro de `.tactical-band` (`index.css`): columnas fijas medidas con *container query*, PG más ancha, sin placas huérfanas. Con `onClick` toda la placa es un `button` con ícono `Info` en el rótulo (la Iniciativa abre su desglose) y deja de ser un par `dt`/`dd` |
 | `StatPlaque` | Rótulo y valor en Georgia, centrado; `dense`. El rótulo puede ser un nodo (abreviatura visible, palabra completa para el lector) | Tiras cortas dentro de una tarjeta (CD, ataque de conjuro, CA/VEL/INIC de la tarjeta del dashboard) |
 | `ShieldBadge` | La CA dentro de un escudo, con `aria-label` | **Solo CA**, y solo donde la CA es el tema (Defensa) |
 | `Pill` | Cápsula de radio 20; `highlighted={false}` neutra, `danger` carmesí | Clase, subclase, nivel; `danger` solo para un estado malo (envenenado) |
@@ -194,6 +194,14 @@ La pantalla de referencia de cómo se arma una vista con la biblioteca:
 - Desde 900 px las pestañas viven en el panel (`NavItem` con `aria-current`);
   debajo, como `LinkTabs` arriba del contenido, para no tener que abrir el
   cajón. El panel de la pestaña se monta una sola vez.
+- `BreakdownDialog` (`BreakdownDialog.tsx`): el «de dónde sale» de una
+  característica o de la Iniciativa, en un `AppDialog` de filas rótulo / cifra
+  (total en negrita, filete encima). Solo lista lo que trae `sheet`: no suma.
+  Se abre también sin `write`.
+- `InfoName` (`InfoName.tsx`): un nombre que, si tiene texto, es un botón con
+  ícono `Info` que lo abre en un `AppDialog` (recursos, objetos). Sin texto es
+  el nombre solo. Un texto que hay que poder leer en el teléfono no va en un
+  `Tooltip`.
 - Columnas: `COLUMNS` (`CharacterTab.tsx`), tantas de 300 px como entren y una
   en un teléfono, con `items-start`.
 - Rótulos que necesitan vocabulario del motor (la característica de cada

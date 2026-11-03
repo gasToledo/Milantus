@@ -489,6 +489,23 @@ repiten acá.
   quedar incapacitado, no impide entrar. La ficha de un miembro transformado se
   ve en su forma, sin controles. El **combate del DM no muestra la forma** hasta
   el paso 6.
+  Desde 5e6, la ficha **muestra lo que antes solo mostraba Flutter**, sin
+  escribir nada. Del motor llegan las ventajas ya filtradas por tirada
+  (`saveAdvantages`, `skillAdvantages`, `initiativeAdvantages`,
+  `conditionalAdvantages`), `Attack.damageText` (que resuelve el «o» de un daño
+  extra de dos tipos), la descripción de cada línea del inventario,
+  `canLevelUp` y el rótulo `abilityRule`. En Combate, cada ataque lleva su
+  maestría (se toca y abre su regla; un tooltip no existe en el teléfono), el
+  bono de un estado activo, el crítico, la mano secundaria y la acción
+  adicional; el Ataque Furtivo y similares van como filas de dados; las
+  Salvaciones y Habilidades marcan «Ventaja» con su fuente; los recursos y los
+  objetos con texto son un nombre-botón que lo abre; los conjuros dicen su
+  bono al daño y con qué aptitud se lanzan. En Personaje, la tarjeta
+  «Competencias e idiomas» y los sentidos al pie de Habilidades. Tocar una
+  característica o la Iniciativa abre su desglose (`BreakdownDialog`), que
+  lista lo que ya trae la ficha; la Velocidad suma sus otros modos y el
+  Cansancio. En el nivel máximo, «Subir nivel» se apaga y la ruta del asistente
+  vuelve a la ficha. Todo esto se ve también en la ficha de un miembro.
   Desde 5e5, los **compañeros** se invocan y se manejan en la ficha propia.
   La tarjeta `CompanionsCard` (`sheet/Companions.tsx`), bajo Defensa en Combate,
   lista los que están en juego, plegados de entrada: PG, CA, estados, daño,
@@ -653,9 +670,12 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    cansancio y modos activos (Furia) *(existe)*; 5e2, preparar conjuros (el editor ya
    existe en la subida) y cambiar el truco innato *(existe)*; 5e3, los planos del Artífice
    y los objetivos de arma de un rasgo (Pacto del Filo) *(existe)*; 5e4, Forma Salvaje *(existe)*;
-   5e5, compañeros, y con ellos lanzar gastando espacio o uso gratis *(existe)*.
-   Para cerrar 5e falta comparar los controles de la ficha de Flutter con los
-   de React: esta lista no salió de revisar pantalla por pantalla. 5f, la lista de
+   5e5, compañeros, y con ellos lanzar gastando espacio o uso gratis *(existe)*;
+   5e6, lo que la comparación de las dos fichas mostró que /v2 no decía:
+   dados de Ataque Furtivo, maestrías, ventajas, competencias, idiomas,
+   sentidos y desgloses, sin escrituras *(existe)*; 5e7, los avisos y
+   «Resolver», con la Defensa sin armadura; 5e8, escribir el Diario; 5e9, los
+   retratos. El aviso de turno y Compartir van al paso 6. 5f, la lista de
    personajes: reordenar, marcar favorito, renombrar, borrar y rehacer. Van
    antes del paso 6 porque solo tocan datos de la propia cuenta.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
@@ -782,7 +802,8 @@ hace seguro volver atrás es que **no hay nada que deshacer en el formato**:
 
 Para que nadie lo dé por hecho:
 
-- Las escrituras de 5f y los pasos 6 y 7: el detalle está en
+- Los pasos 5e7 a 5e9 (avisos y «Resolver», Defensa sin armadura, escribir el
+  Diario, retratos), las escrituras de 5f y los pasos 6 y 7: el detalle está en
   [Orden previsto de pantallas](#orden-previsto-de-pantallas).
 - Control de versión en el servidor para las escrituras (rechazar una copia
   vieja con 409): hoy gana el último que guarda, como en Flutter.

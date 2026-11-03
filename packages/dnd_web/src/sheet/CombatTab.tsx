@@ -29,7 +29,8 @@ import { ABILITIES, isReactionSpell } from './vocabulary';
  * salvaciones de muerte, dados de golpe, espacios de conjuro, usos de
  * recursos, los descansos, la Inspiración Heroica y la concentración. Cada acción la hace el motor (`actOn`); acá no se
  * suma ni se resta nada. Preparar conjuros y cambiar el truco innato llevan a su editor; el resto de la edición sigue en
- * Flutter. Los números son del motor; de la mesa (lo crudo) solo los PG
+ * Flutter. Desde 5e6 muestra también maestrías, ventajas, dados de rasgos y
+ * el texto de recursos (solo lectura). Los números son del motor; de la mesa (lo crudo) solo los PG
  * actuales, lo gastado y las condiciones. Transformado (Forma Salvaje), el
  * motor ya trae la ficha de la bestia: Ataques muestra los suyos con sus
  * rasgos debajo, y Conjuros avisa que no se lanza. La franja para

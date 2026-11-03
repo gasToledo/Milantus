@@ -152,6 +152,7 @@ export function NavItem({
   external = false,
   count,
   muted = false,
+  disabled = false,
   onSelect,
 }: {
   href?: string;
@@ -164,6 +165,8 @@ export function NavItem({
   count?: number;
   /** Atenuado: una categoría sin coincidencias mientras se busca. */
   muted?: boolean;
+  /** Apagado y sin destino: una acción que hoy no corresponde (nivel máximo). */
+  disabled?: boolean;
   onSelect?: () => void;
   /** Lleva a Flutter: se marca para que no sorprenda el cambio de cliente. */
   external?: boolean;
@@ -189,6 +192,13 @@ export function NavItem({
       )}
     </>
   );
+  if (disabled) {
+    return (
+      <span aria-disabled="true" className={cx(className, 'cursor-not-allowed opacity-50 hover:bg-transparent hover:text-on-surface-variant')}>
+        {body}
+      </span>
+    );
+  }
   if (onSelect) {
     return (
       <button type="button" onClick={onSelect} className={cx(className, 'w-full text-left')}>

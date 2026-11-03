@@ -1,12 +1,13 @@
-import type { ReactNode } from 'react';
-import { IdCard, Landmark, ScrollText, Shield, Sparkles } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
+import { BadgeCheck, IdCard, Landmark, ScrollText, Shield, Sparkles } from 'lucide-react';
 import { nameOf } from '../api/catalog';
-import { vocabularyLabel } from '../engine';
-import { useTexts } from '../i18n/context';
+import { catalogLabel, vocabularyLabel, type AbilityId } from '../engine';
+import { useLang, useTexts } from '../i18n/context';
 import { labelOf } from '../i18n/texts';
 import { Card } from '../ui/Card';
-import { Pill } from '../ui/data';
+import { Eyebrow, Pill } from '../ui/data';
 import { Accordion } from '../ui/disclosure';
+import { BreakdownDialog } from './BreakdownDialog';
 import { signed } from './format';
 import type { SheetModel } from './model';
 import { ProficiencyRow } from './rows';
@@ -29,6 +30,10 @@ export function SheetColumns({ children }: { children: ReactNode }) {
  */
 export function CharacterTab({ model }: { model: SheetModel }) {
   const t = useTexts();
+  const lang = useLang();
+  // La característica cuyo desglose está abierto. Es lectura: se abre también
+  // en la ficha ajena.
+  const [breakdown, setBreakdown] = useState<AbilityId | null>(null);
   const { character, sheet, catalog } = model;
 
   const race = catalog.races.find((r) => r.id === character.raceId);
@@ -42,6 +47,28 @@ export function CharacterTab({ model }: { model: SheetModel }) {
     { label: t.backgroundLabel, value: nameOf(catalog.backgrounds, character.backgroundId) },
     { label: t.personalityLabel, value: character.personalityTrait?.trim() || null },
   ].filter((row): row is { label: string; value: string } => Boolean(row.value));
+
+  // Visión en la oscuridad y después los demás sentidos, con su alcance en pies.
+  const senses: [string, number][] = [
+    ...(sheet.darkvision != null ? ([[t.sheetDarkvision, sheet.darkvision]] as [string, number][]) : []),
+    ...Object.entries(sheet.senses).map(([sense, range]): [string, number] => [labelOf(t.senseNames, sense), range]),
+  ];
+
+  // Competencias. Las armas se nombran por el catálogo si son un arma concreta
+  // y por la categoría del motor si no («Armas simples»). Los idiomas llevan
+  // Común primero, que lo sabe todo personaje, y el resto por nombre
+  // (`_languagesCard` de Flutter).
+  const weaponName = (id: string) => nameOf(catalog.weapons, id) ?? catalogLabel('weaponProficiency', id);
+  const languages = sheet.languages
+    .filter((id) => id !== 'common')
+    .map((id) => catalogLabel('language', id))
+    .sort((a, b) => a.localeCompare(b, lang));
+  const proficiencyGroups = [
+    { label: t.armor, chips: sheet.armorProficiencies.map((id) => catalogLabel('armorTraining', id)) },
+    { label: t.profsWeapons, chips: sheet.weaponProficiencies.map(weaponName) },
+    { label: t.profsTools, chips: sheet.toolProficiencies.map((id) => catalogLabel('tool', id)) },
+    { label: t.creatureLanguages, chips: [catalogLabel('language', 'common'), ...languages] },
+  ].filter((g) => g.chips.length > 0);
 
   return (
     <SheetColumns>
@@ -62,10 +89,12 @@ export function CharacterTab({ model }: { model: SheetModel }) {
             {ABILITIES.map((ability) => {
               const save = sheet.savingThrowProficiencies.includes(ability);
               return (
-                <li
-                  key={ability}
+                <li key={ability} className="flex">
+                <button
+                  type="button"
                   data-ability={ability}
-                  className="plaque flex min-w-0 flex-col items-center px-1 py-2.5 text-center"
+                  onClick={() => setBreakdown(ability)}
+                  className="plaque flex w-full min-w-0 cursor-pointer flex-col items-center px-1 py-2.5 text-center"
                 >
                   {/* La abreviatura se ve; el nombre completo se lee. */}
                   <span className="plaque-label" aria-hidden="true">
@@ -89,10 +118,12 @@ export function CharacterTab({ model }: { model: SheetModel }) {
                       </>
                     )}
                   </span>
+                </button>
                 </li>
               );
             })}
           </ul>
+          {breakdown && <BreakdownDialog model={model} target={breakdown} onClose={() => setBreakdown(null)} />}
         </Card>
       </div>
 
@@ -110,6 +141,7 @@ export function CharacterTab({ model }: { model: SheetModel }) {
                 modifier={modifier}
                 proficient={sheet.skillProficiencies.includes(skill)}
                 expertise={sheet.expertiseSkills.includes(skill)}
+                advantage={sheet.skillAdvantages[skill]}
               />
             );
           })}
@@ -120,6 +152,40 @@ export function CharacterTab({ model }: { model: SheetModel }) {
             {sheet.passivePerception}
           </span>
         </p>
+        {/* Los sentidos no tienen tarjeta: responden la misma pregunta que la
+            Percepción pasiva (qué nota el personaje sin buscarlo) y van debajo
+            con su formato. */}
+        {senses.map(([label, range]) => (
+          <p key={label} className="mt-1.5 flex items-baseline justify-between gap-3 text-[13px] text-on-surface-variant">
+            <span>{label}</span>
+            <span className="num text-[16px] text-on-surface">
+              {range} <small className="text-[12px] font-normal text-text-muted">{t.feet}</small>
+            </span>
+          </p>
+        ))}
+      </Card>
+
+      {/* Un solo hijo para la tercera columna: la grilla de dos columnas
+          ubica por posición (`.sheet-columns`). */}
+      <div className="flex min-w-0 flex-col gap-4">
+      <Card id="proficiencies" title={t.profsHeading} icon={BadgeCheck} collapsible>
+        <div className="flex flex-col gap-2.5">
+          {proficiencyGroups.map((g) => (
+            <div key={g.label}>
+              <Eyebrow>{g.label}</Eyebrow>
+              <ul className="mt-1.5 flex flex-wrap gap-1">
+                {g.chips.map((chip, i) => (
+                  <li
+                    key={`${chip}-${i}`}
+                    className="rounded-[var(--radius-pill)] border border-hairline px-[9px] py-[3px] text-[12px] text-on-surface-variant"
+                  >
+                    {chip}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
       </Card>
 
       <Card
@@ -146,6 +212,7 @@ export function CharacterTab({ model }: { model: SheetModel }) {
           />
         )}
       </Card>
+      </div>
     </SheetColumns>
   );
 }
