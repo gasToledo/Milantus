@@ -1,9 +1,21 @@
-import { useRef, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Check, History, Trash2, Upload } from 'lucide-react';
+import { useMemo, useRef, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft, Check, History, Image as ImageIcon, Sparkles, Trash2, Upload, X } from 'lucide-react';
 import { ApiError } from '../api/client';
-import { deletePortrait, fetchPortraitProviders, uploadPortrait } from '../api/portraits';
+import {
+  deletePortrait,
+  fetchImageProvider,
+  fetchPortraitProviders,
+  generatePortraits,
+  PortraitGenerateError,
+  savePortraitBase64,
+  setImageProvider,
+  toBase64,
+  uploadPortrait,
+} from '../api/portraits';
+import { portraitPrompt, portraitStyles, type CharacterJson } from '../engine';
 import { useTexts } from '../i18n/context';
+import type { Texts } from '../i18n/texts';
 import { nameOf } from '../api/catalog';
 import { characterHref, Link } from '../router';
 import { AppDialog } from '../ui/AppDialog';
@@ -13,7 +25,8 @@ import { Medallion } from '../ui/Medallion';
 import { portraitUrl, thumbnailUrl } from '../ui/portrait';
 import { AppBusyLabel, AppErrorView } from '../ui/status';
 import { Button } from '../ui/Button';
-import { SpellTabs } from '../ui/wizard';
+import { Select, Tooltip } from '../ui/primitives';
+import { Option, SpellTabs } from '../ui/wizard';
 import { accentFor, classesOf, type SheetModel } from './model';
 import type { SheetWriter } from './writer';
 
@@ -21,6 +34,29 @@ import type { SheetWriter } from './writer';
  *  Flutter. El servidor valida el contenido de verdad (`sniffPortraitImageType`);
  *  esto solo filtra el selector. */
 const IMPORT_ACCEPT = '.png,.jpg,.jpeg,.webp,.gif';
+
+/** La referencia no admite GIF: se le manda al proveedor de IA, que espera una
+ *  imagen fija. */
+const REFERENCE_ACCEPT = '.png,.jpg,.jpeg,.webp';
+
+/** Los estilos son identificadores en español porque se guardan así y viajan
+ *  al prompt tal cual (el motor los traduce a inglés); solo lo que se muestra
+ *  se traduce. `CUSTOM_STYLE` es el estilo escrito por la persona. */
+const CUSTOM_STYLE = 'Personalizado';
+const styleLabel = (t: Texts, id: string): string =>
+  ({
+    'Arte digital de fantasía': t.styleDigitalFantasy,
+    'Óleo clásico': t.styleClassicOil,
+    'Ilustración de cómic': t.styleComic,
+    'Realista cinematográfico': t.styleCinematic,
+    Acuarela: t.styleWatercolor,
+    'Pixel art': t.stylePixelArt,
+    'Boceto a lápiz': t.stylePencilSketch,
+    [CUSTOM_STYLE]: t.styleCustom,
+  })[id] ?? id;
+
+const FIELD =
+  'w-full rounded-[var(--radius-nav)] border border-hairline bg-plaque px-3 py-2 text-[14px] text-on-surface';
 
 /** Una de las cuatro escuadras doradas del retrato. */
 function Corner({ at }: { at: 'tl' | 'tr' | 'bl' | 'br' }) {
@@ -43,10 +79,14 @@ function ThumbStrip({
   label,
   items,
   onSelect,
+  inline = false,
 }: {
   label: string;
   items: { id: string; src: string; label: string; selected: boolean; current?: boolean }[];
   onSelect: (id: string) => void;
+  /** Las imágenes son `data:` (resultados recién generados): no hay
+   *  miniatura del servidor que pedir. */
+  inline?: boolean;
 }) {
   const [failed, setFailed] = useState<ReadonlySet<string>>(new Set());
   return (
@@ -66,7 +106,7 @@ function ThumbStrip({
           >
             {!failed.has(item.src) && (
               <img
-                src={thumbnailUrl(item.src, 57)}
+                src={inline ? item.src : thumbnailUrl(item.src, 57)}
                 alt=""
                 onError={() => setFailed((prev) => new Set(prev).add(item.src))}
                 className="h-full w-full object-cover"
@@ -101,11 +141,42 @@ export function PortraitPage({ model, write }: { model: SheetModel; write: Sheet
   const paths = character.portraitPaths ?? [];
   const prompts = character.portraitPrompts ?? {};
 
+  const client = useQueryClient();
   const providers = useQuery({
     queryKey: ['portrait-providers'],
     queryFn: ({ signal }) => fetchPortraitProviders(signal),
   });
+  const savedProvider = useQuery({
+    queryKey: ['portrait-image-provider'],
+    queryFn: ({ signal }) => fetchImageProvider(signal),
+  });
   const noProviders = providers.isSuccess && providers.data.length === 0;
+  const loadFailed = providers.isError || savedProvider.isError;
+  const loading = !loadFailed && (providers.isPending || savedProvider.isPending);
+  const list = providers.data ?? [];
+
+  // Arranca en el motor que la cuenta dejó fijado, si sigue entre los
+  // disponibles; si no, en el primero. Tocar uno lo fija (`selectProvider`).
+  const [chosenProvider, setChosenProvider] = useState<string | null>(null);
+  const providerId =
+    chosenProvider ?? (list.some((p) => p.id === savedProvider.data) ? savedProvider.data! : (list[0]?.id ?? null));
+  const provider = list.find((p) => p.id === providerId);
+
+  const [style, setStyle] = useState<string>(() => portraitStyles()[0] ?? '');
+  const [customStyle, setCustomStyle] = useState('');
+  const [details, setDetails] = useState('');
+  const [reference, setReference] = useState<{ name: string; base64: string } | null>(null);
+  const referenceInput = useRef<HTMLInputElement>(null);
+  const [generating, setGenerating] = useState(false);
+  const [saving, setSaving] = useState(false);
+  // Los candidatos recién generados, en base64, y cuál se mira. Se miran antes
+  // de comprometer nada: usar uno es un paso aparte.
+  const [results, setResults] = useState<string[]>([]);
+  const [resultIndex, setResultIndex] = useState<number | null>(null);
+  // El prompt con que se pidieron los [results], tomado **al pedirlos**: el
+  // texto puede cambiar entre generar y elegir, y lo que se guarda tiene que
+  // ser lo que de verdad produjo la imagen.
+  const [resultsPrompt, setResultsPrompt] = useState<string | null>(null);
 
   // Qué vía está abierta. Sin proveedores no hay nada que generar: la única
   // vía es el archivo, así que se abre ahí en vez de mostrar una pestaña vacía.
@@ -120,10 +191,27 @@ export function PortraitPage({ model, write }: { model: SheetModel; write: Sheet
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
-  const busy = importing || deleting;
+  const busy = importing || deleting || generating || saving;
 
-  const shownKey = viewKey ?? paths[0] ?? null;
-  const heroSrc = shownKey ? portraitUrl(shownKey) : null;
+  const effectiveStyle = style === CUSTOM_STYLE ? customStyle : style;
+  // El motor arma el prompt. Azure rechaza los retratos que nombran un arma
+  // (su filtro de contenido), así que con él se omite.
+  const includeWeapon = providerId !== 'azure';
+  const raw = character as unknown as CharacterJson;
+  const prompt = useMemo(
+    () => portraitPrompt(raw, catalog, effectiveStyle, details, includeWeapon),
+    [raw, catalog, effectiveStyle, details, includeWeapon],
+  );
+  // El aporte propio se pinta en oro. Se busca dentro del prompt y no con
+  // `startsWith` del prompt base: el base termina en otra frase («Bust/portrait
+  // framing…»), así que el prompt nunca empieza con él y no coincidiría jamás.
+  const extra = details.trim();
+  const at = extra ? prompt.indexOf(', ' + extra) : -1;
+
+  // Un resultado mirado no es de nadie todavía: no hay acciones de guardado.
+  const resultSrc = resultIndex === null ? null : `data:image/png;base64,${results[resultIndex]}`;
+  const shownKey = resultIndex !== null ? null : (viewKey ?? paths[0] ?? null);
+  const heroSrc = resultSrc ?? (shownKey ? portraitUrl(shownKey) : null);
   const shownPrompt = shownKey ? prompts[shownKey] : undefined;
 
   const classes = classesOf(model);
@@ -151,6 +239,84 @@ export function PortraitPage({ model, write }: { model: SheetModel; write: Sheet
     } finally {
       setImporting(false);
     }
+  };
+
+  const selectProvider = async (id: string) => {
+    setChosenProvider(id);
+    try {
+      await setImageProvider(id);
+      client.setQueryData(['portrait-image-provider'], id);
+    } catch {
+      // La elección sigue valiendo en esta sesión aunque no quede guardada.
+      write.notify(t.portraitDefaultError, { tone: 'error' });
+    }
+  };
+
+  const pickReference = async (file: File | undefined) => {
+    if (referenceInput.current) referenceInput.current.value = '';
+    if (!file) return;
+    try {
+      setReference({ name: file.name, base64: toBase64(new Uint8Array(await file.arrayBuffer())) });
+    } catch {
+      setError(t.portraitReferenceError);
+    }
+  };
+
+  const generate = async () => {
+    if (!provider) return;
+    setGenerating(true);
+    setError(null);
+    setResults([]);
+    setResultIndex(null);
+    // Lo que llegue va a quedar a la vista: un guardado mirado de antes dejaría
+    // dos cosas compitiendo por el mismo lienzo.
+    setViewKey(null);
+    const asked = prompt;
+    try {
+      const images = await generatePortraits({
+        providerId: provider.id,
+        prompt: asked,
+        referenceBase64: provider.supportsReference ? reference?.base64 : undefined,
+      });
+      setResults(images);
+      setResultsPrompt(asked);
+      // El primero queda mirado: si vino uno solo, usarlo es un toque.
+      setResultIndex(images.length ? 0 : null);
+    } catch (e) {
+      // Un `TypeError` de `fetch` es que no hay red.
+      setError(
+        e instanceof TypeError
+          ? t.portraitOffline
+          : e instanceof PortraitGenerateError
+            ? t.portraitGenerateError(e.message)
+            : t.portraitGenerateFailed,
+      );
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  // Guarda el resultado mirado como retrato, con el prompt que lo produjo. El
+  // usado **sale de la tira**: dejarlo permitiría guardarlo dos veces.
+  const useResult = async () => {
+    if (resultIndex === null) return;
+    const index = resultIndex;
+    setSaving(true);
+    setError(null);
+    let key: string;
+    try {
+      key = await savePortraitBase64(character.id, results[index] ?? "");
+    } catch {
+      setError(t.portraitSaveError);
+      setSaving(false);
+      return;
+    }
+    write.act({ type: 'addPortrait', key, prompt: resultsPrompt ?? undefined });
+    setResults((all) => all.filter((_, i) => i !== index));
+    setResultIndex(null);
+    setViewKey(null);
+    setSaving(false);
+    write.notify(t.portraitSaved, { tone: 'success' });
   };
 
   // Vuelve a un retrato ya guardado: no sube nada, solo pasa adelante.
@@ -208,6 +374,19 @@ export function PortraitPage({ model, write }: { model: SheetModel; write: Sheet
               ) : (
                 <Medallion name={character.name} accent={accentFor(model)} size={120} />
               )}
+              {generating && (
+                <div
+                  role="status"
+                  className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-gold"
+                  style={{ background: 'color-mix(in srgb, var(--scaffold) 78%, transparent)' }}
+                >
+                  <span
+                    aria-hidden="true"
+                    className="h-[30px] w-[30px] animate-spin rounded-full border-2 border-gold-soft border-t-gold"
+                  />
+                  <b className="eyebrow !text-gold">{t.portraitSummoning}</b>
+                </div>
+              )}
               <Corner at="tl" />
               <Corner at="tr" />
               <Corner at="bl" />
@@ -219,6 +398,34 @@ export function PortraitPage({ model, write }: { model: SheetModel; write: Sheet
             </figcaption>
           </figure>
 
+          {results.length > 0 && (
+            <>
+              <ThumbStrip
+                inline
+                label={t.portraitResults}
+                items={results.map((b64, i) => ({
+                  id: String(i),
+                  src: `data:image/png;base64,${b64}`,
+                  label: t.portraitResult(i + 1),
+                  selected: i === resultIndex,
+                }))}
+                onSelect={(id) => {
+                  setResultIndex(Number(id));
+                  setViewKey(null);
+                }}
+              />
+              <Button
+                icon={Check}
+                data-action="use-portrait"
+                disabled={busy || resultIndex === null}
+                onClick={() => void useResult()}
+                className="min-h-11 w-full"
+              >
+                {t.portraitUseThis}
+              </Button>
+            </>
+          )}
+
           {paths.length > 0 && (
             <>
               <Eyebrow>{t.portraitSavedTitle}</Eyebrow>
@@ -228,10 +435,13 @@ export function PortraitPage({ model, write }: { model: SheetModel; write: Sheet
                   id: key,
                   src: portraitUrl(key),
                   label: i === 0 ? t.portraitCurrent : t.portraitPrevious(i),
-                  selected: key === shownKey,
+                  selected: resultIndex === null && key === shownKey,
                   current: i === 0,
                 }))}
-                onSelect={(key) => setViewKey(key === paths[0] ? null : key)}
+                onSelect={(key) => {
+                  setResultIndex(null);
+                  setViewKey(key === paths[0] ? null : key);
+                }}
               />
             </>
           )}
@@ -269,13 +479,42 @@ export function PortraitPage({ model, write }: { model: SheetModel; write: Sheet
               </button>
             </>
           )}
+
+          {/* La lámina del guardado mirado no la lleva: ahí el panel es el del
+              prompt usado, y dos prompts a la vez no se sabrían distinguir. */}
+          {shownMode === 'ai' && !viewKey && (
+            <section className="plaque px-3.5 py-3">
+              <Eyebrow>{t.portraitBaseDescription}</Eyebrow>
+              <p
+                data-field="portrait-prompt"
+                className="mt-[7px] text-[12.5px] leading-[1.5] break-words text-on-surface-variant select-text"
+              >
+                {at < 0 ? (
+                  prompt
+                ) : (
+                  <>
+                    {prompt.slice(0, at)}
+                    <span className="text-gold">{prompt.slice(at, at + 2 + extra.length)}</span>
+                    {prompt.slice(at + 2 + extra.length)}
+                  </>
+                )}
+              </p>
+            </section>
+          )}
         </div>
 
         <div className="flex min-w-0 flex-col gap-3">
-          {providers.isPending ? (
+          {loading ? (
             <AppBusyLabel label={t.portraitLoadingSettings} />
-          ) : providers.isError ? (
-            <AppErrorView title={t.errorTitle} message={t.errorBody} onRetry={() => void providers.refetch()} />
+          ) : loadFailed ? (
+            <AppErrorView
+              title={t.errorTitle}
+              message={t.errorBody}
+              onRetry={() => {
+                void providers.refetch();
+                void savedProvider.refetch();
+              }}
+            />
           ) : (
             <>
               {!noProviders && (
@@ -290,6 +529,102 @@ export function PortraitPage({ model, write }: { model: SheetModel; write: Sheet
                     { key: 'upload', title: t.portraitUpload, ready: false },
                   ]}
                 />
+              )}
+              {shownMode === 'ai' && provider && (
+                <section className="card flex flex-col gap-3 p-4">
+                  <Eyebrow>{t.portraitEngine}</Eyebrow>
+                  <div role="radiogroup" aria-label={t.portraitEngine} className="grid gap-2 sm:grid-cols-3">
+                    {list.map((p) => (
+                      <Option
+                        key={p.id}
+                        id={p.id}
+                        selected={p.id === providerId}
+                        title={p.name}
+                        detail={p.supportsReference ? t.portraitAcceptsReference : t.portraitTextOnly}
+                        onClick={() => void selectProvider(p.id)}
+                      />
+                    ))}
+                  </div>
+                  <Select
+                    label={t.portraitStyle}
+                    value={style}
+                    onValueChange={setStyle}
+                    options={[...portraitStyles(), CUSTOM_STYLE].map((id) => ({ value: id, label: styleLabel(t, id) }))}
+                  />
+                  {style === CUSTOM_STYLE && (
+                    <input
+                      data-field="portrait-custom-style"
+                      aria-label={t.portraitCustomStyle}
+                      placeholder={t.portraitCustomStyle}
+                      value={customStyle}
+                      onChange={(e) => setCustomStyle(e.target.value)}
+                      className={FIELD}
+                    />
+                  )}
+                  <label className="flex flex-col gap-1.5 text-[12px] text-text-muted">
+                    {t.portraitExtraDetails}
+                    <textarea
+                      data-field="portrait-details"
+                      rows={3}
+                      placeholder={t.portraitDetailsHint}
+                      value={details}
+                      onChange={(e) => setDetails(e.target.value)}
+                      className={`${FIELD} resize-y leading-normal`}
+                    />
+                  </label>
+                  {provider.supportsReference && (
+                    <div className="flex flex-col gap-1.5 text-[12px] text-text-muted">
+                      {t.portraitReference}
+                      <input
+                        ref={referenceInput}
+                        type="file"
+                        hidden
+                        data-field="portrait-reference"
+                        accept={REFERENCE_ACCEPT}
+                        onChange={(e) => void pickReference(e.target.files?.[0])}
+                      />
+                      <div className="flex items-center gap-2">
+                        <Button
+                          tone="secondary"
+                          icon={ImageIcon}
+                          disabled={busy}
+                          onClick={() => referenceInput.current?.click()}
+                          className="min-w-0"
+                        >
+                          <span className="truncate">{reference?.name ?? t.portraitChooseImage}</span>
+                        </Button>
+                        {reference && (
+                          <Tooltip content={t.portraitRemoveReference}>
+                            <button
+                              type="button"
+                              aria-label={t.portraitRemoveReference}
+                              onClick={() => setReference(null)}
+                              className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-nav)] text-on-surface-variant hover:bg-plaque"
+                            >
+                              <X size={18} aria-hidden="true" />
+                            </button>
+                          </Tooltip>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  <Button
+                    icon={generating ? undefined : Sparkles}
+                    data-action="generate-portrait"
+                    disabled={busy}
+                    onClick={() => void generate()}
+                    className="min-h-11 w-full"
+                  >
+                    {generating && (
+                      <span
+                        aria-hidden="true"
+                        className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-on-primary/30 border-t-on-primary"
+                      />
+                    )}
+                    {generating ? t.portraitGenerating : resultsPrompt !== null ? t.portraitGenerateAgain : t.portraitGenerate}
+                  </Button>
+                  {providerId === 'pollinations' && <p className="m-0 text-[12px] text-text-muted">{t.portraitFreeNote}</p>}
+                </section>
               )}
               {shownMode === 'upload' && (
                 <section className="card flex flex-col gap-3 p-4">

@@ -77,7 +77,7 @@ un control a un asistente, buscá acá.
 | `Block` | Tarjeta de un grupo de opciones: título y un solo `status` | Cada grupo |
 | `Status` | Los tres estados, y ningún otro: falta (`count` para «n de m»), `ready` y `auto` | En `Block` |
 | `SpellPickBlock` | Un cupo de conjuros: buscador, scroll propio y `cap` (null para quien conoce en vez de preparar) | Conjuros de la subida y del creador |
-| `SpellTabs` | La tira de pestañas de los conjuros (una por cupo, con su `Status`): elegir una no cambia lo demás ni avanza sola | Conjuros del creador y editor de la ficha |
+| `SpellTabs` | La tira de pestañas de los conjuros (una por cupo, con su `Status`; con `plain`, solo el título, para vías alternativas como generar o subir un retrato): elegir una no cambia lo demás ni avanza sola | Conjuros del creador y editor de la ficha |
 | Bandeja de elegidos | Los elegidos como chips que se sacan con ✕ (`data-chip`), sobre la lista, en vez de un texto «Elegidos:». Uno elegido que ya no está en la lista también sale ahí, con su id si no está en el catálogo. Vive en `sheet/SpellEditor.tsx` y `sheet/MagicItemPlans.tsx`, no es un componente suelto | Editor de conjuros de la ficha |
 | `WildShapeTile`, `WildShapeDialog` | La franja de Forma Salvaje en la banda táctica (`data-stat="wild-shape"`, con la estructura de `ActiveModeTile`) y su diálogo: las formas anotadas como `Option` de elección única, el perfil a la derecha (debajo de `lg`, un botón `Info` lo muestra dentro del mismo diálogo). Elegir no transforma. Vive en `sheet/WildShape.tsx` | Banda de Personaje y Combate de un druida |
 | `CompanionsCard`, `SummonDialog` | La tarjeta de compañeros en juego (`data-card="companions"`, `data-companion="n"`): cada fila plegada de entrada, varias abiertas a la vez, con PG, CA, estados y perfil; «Invocar» (`data-action="summon"`) abre el diálogo: `Select` de opción si hay más de una, formas como `Option` (con más de 6, en `SearchableList`), pago con el uso gratis (`data-free`) y `SpellSlotGrid`, y el perfil a la derecha (debajo de `lg`, un botón `Info` lo muestra dentro del mismo diálogo). Avisos en oro entre el cuerpo y la barra. Vive en `sheet/Companions.tsx` | Combate, columna de PG y Defensa |
@@ -217,6 +217,16 @@ La pantalla de referencia de cómo se arma una vista con la biblioteca:
   «Guardar» ni «Deshacer»; con el cupo lleno el pie dice por qué y no manda
   nada. El detalle va a la derecha desde 1024 px y en un `AppDialog` (botón
   `Info`) debajo.
+- `PortraitPage` (`PortraitPage.tsx`, ruta `/personajes/:id/retrato`, solo ficha
+  propia): a la izquierda el retrato grande 3:4 con escuadras doradas (o el
+  medallón con la inicial si no hay), nombre y línea de especie y clase; la tira
+  de resultados con «Usar este retrato»; la de guardados (tocar **solo mira**) y,
+  sobre el guardado mirado, «Volver a este retrato», «Prompt usado» y «Borrar».
+  A la derecha, `SpellTabs` en variante `plain` (sin estado por pestaña) con
+  «Generar con IA» y «Subir imagen»; sin proveedores solo la segunda. Cada
+  acción deja la pantalla abierta y avisa con un toast. Generar vela el retrato
+  grande con un spinner y apaga los botones; el aporte propio del jugador se
+  pinta en oro dentro del prompt automático.
 - Columnas: `COLUMNS` (`CharacterTab.tsx`), tantas de 300 px como entren y una
   en un teléfono, con `items-start`.
 - Rótulos que necesitan vocabulario del motor (la característica de cada

@@ -141,8 +141,8 @@ repiten acá.
   escribe son las acciones de partida, la mochila, las elecciones y el Diario
   (abajo): el resto de la ficha no se edita. El panel es el de una pantalla de
   adentro: «volver», la tarjeta del personaje, las cinco pestañas, **Subir
-  nivel** (el asistente de `/v2`, abajo), Retrato y Compartir, que enlazan a
-  Flutter, e **Imprimir**; al pie, el
+  nivel** (el asistente de `/v2`, abajo), **Retrato** (abajo), Compartir, que
+  enlaza a Flutter, e **Imprimir**; al pie, el
   estado del guardado, el tema y la versión. **Imprimir** (`PrintSheet`, el
   `print_sheet.dart` de Flutter) monta una hoja propia al pie de `body` y abre
   el diálogo del navegador (que ofrece también «Guardar como PDF»); la hoja de
@@ -381,8 +381,8 @@ repiten acá.
   panel de la ficha, la cabecera de la ficha de un miembro, de un PNJ y de su
   ficha) se toca para abrir el **visor**: el original entero sobre el velo, que
   se cierra con `Esc`, un clic afuera o el botón. Generar, subir, elegir o
-  borrar un retrato son escrituras: «Retrato» del panel sigue llevando a
-  Flutter.
+  borrar un retrato se hace en la pantalla de retratos de la ficha propia
+  (desde 5e9, abajo).
 - **Homebrew**: la ficha y el dashboard calculan con el catálogo oficial más
   el contenido homebrew de la cuenta (`GET /api/homebrew`, fusionado por id en
   `src/api/homebrew.ts`), como `HomebrewStore` + `ContentRepository.addAll` en
@@ -538,6 +538,23 @@ repiten acá.
   pantalla táctil. `DiaryEntries` recibe `edit` desde `DiaryTab`; sin él (ficha
   ajena, notas del PNJ) no tiene ni un control, y las notas del PNJ se
   escriben recién en el paso 6.
+  Desde 5e9, la ficha propia **maneja sus retratos** en `/personajes/:id/retrato`
+  (`PortraitPage`, el `PortraitScreen` de Flutter; solo ficha propia, con el
+  patrón de ruta de `WildShapeForms`). Subir un archivo, volver a un retrato
+  guardado, ver el prompt con que se generó y borrarlo; y generar con el
+  proveedor que el servidor tenga configurado (`GET /api/portraits/providers`,
+  `POST /api/portraits/generate`), con estilo, detalles y, si el motor la
+  acepta, una imagen de referencia. Las reglas son del motor: el orden y el
+  borrado de los retratos son las acciones `addPortrait`, `restorePortrait` y
+  `removePortrait`, y el prompt lo arma `portraitPrompt` (`portrait_prompt.dart`,
+  movido de la app al engine); TypeScript solo pasa los textos. Cada acción
+  **deja la pantalla abierta** y avisa (Flutter cerraba sola). Borrar saca
+  primero el archivo del servidor y después la clave de la ficha. Elegir motor
+  es el primer guardado de ajustes de `/v2` (`setImageProvider`: relee el
+  documento y lo guarda entero con `imageProvider` cambiado, para no pisar
+  favorito, orden ni tema); el resto de los ajustes llega en el paso 7. El
+  taller de retratos del PNJ va en el paso 6: `buildNpcPortraitPrompt` ya está en
+  el motor, falta solo la pantalla.
   Desde 5e7, la ficha propia **dice lo que el motor avisa y deja resolverlo**.
   `choicesView` (`character_choices.dart`) entrega las advertencias del
   validador y los cupos de rasgos, competencias, conjuros, idiomas y origen con
@@ -705,7 +722,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    dados de Ataque Furtivo, maestrías, ventajas, competencias, idiomas,
    sentidos y desgloses, sin escrituras *(existe)*; 5e7, los avisos y
    «Resolver», con la Defensa sin armadura *(existe)*; 5e8, escribir el Diario *(existe)*; 5e9, los
-   retratos. El aviso de turno y Compartir van al paso 6. 5f, la lista de
+   retratos *(existe)*. El aviso de turno y Compartir van al paso 6. 5f, la lista de
    personajes: reordenar, marcar favorito, renombrar, borrar y rehacer. Van
    antes del paso 6 porque solo tocan datos de la propia cuenta.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
@@ -832,7 +849,7 @@ hace seguro volver atrás es que **no hay nada que deshacer en el formato**:
 
 Para que nadie lo dé por hecho:
 
-- El paso 5e9 (retratos), escribir las notas del PNJ (paso 6), el Compañero Salvaje
+- El taller de retratos del PNJ y las notas del PNJ (paso 6), el Compañero Salvaje
   (invocarlo, que no cobra ni se va con el descanso), las escrituras de 5f y los pasos 6 y 7: el detalle está en
   [Orden previsto de pantallas](#orden-previsto-de-pantallas).
 - Control de versión en el servidor para las escrituras (rechazar una copia
