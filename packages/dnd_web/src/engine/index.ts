@@ -14,6 +14,7 @@ interface DartEngine {
   vocabularyLabel(field: string, value: string): string;
   inventory(characterJson: string, catalogJson: string): string;
   chapterGrants(chapterJson: string): string;
+  canLevelUp(characterJson: string): boolean;
   catalogLabel(kind: string, id: string): string;
   catalogLabelOrder(kind: string): string;
   formatCost(cp: number, labelsJson: string): string;
@@ -121,6 +122,12 @@ export function chapterGrants(chapter: JsonObject): string {
   return engine().chapterGrants(JSON.stringify(chapter));
 }
 
+/** Si el personaje todavía puede subir de nivel (`Character.canLevelUp`): el
+ *  tope de nivel es una regla del motor. */
+export function canLevelUp(character: CharacterJson): boolean {
+  return engine().canLevelUp(JSON.stringify(character));
+}
+
 /** Tablas de rótulos del motor que el cliente lee por id. */
 export type CatalogLabelKind =
   | 'rarity'
@@ -136,6 +143,7 @@ export type CatalogLabelKind =
   | 'damageType'
   | 'skill'
   | 'ability'
+  | 'abilityRule'
   | 'language';
 
 /** El nombre visible de un id del catálogo (una rareza, una propiedad de

@@ -185,6 +185,24 @@ final _casos = <String, Character>{
       InventoryEntry(entryId: 'hacha', itemId: 'greataxe', equipped: true),
     ],
   ),
+  // Furia activa de la Senda del Fanático: un daño extra de dos tipos
+  // (`necrotic|radiant`) cuyo «o» resuelve `Attack.damageText`, y las ventajas
+  // ya filtradas por tirada.
+  'barbaro-fanatico': Character(
+    id: 'p-zealot',
+    name: 'Bárbaro Fanático',
+    raceId: 'orc',
+    classId: 'barbarian',
+    subclassId: 'zealot',
+    backgroundId: 'soldier',
+    level: 5,
+    assignedScores: _scores,
+    hpPerLevel: List.filled(5, 7),
+    inventory: const [
+      InventoryEntry(entryId: 'hacha', itemId: 'greataxe', equipped: true),
+    ],
+    combat: CombatState(currentHp: 30, activeModes: {'rage': null}),
+  ),
   // Pacto, invocaciones y un linaje con lanzamiento de especie.
   'brujo': Character(
     id: 'p-warlock',

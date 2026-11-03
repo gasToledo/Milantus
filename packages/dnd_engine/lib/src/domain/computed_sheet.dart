@@ -751,6 +751,8 @@ class Attack {
         'damage': damage,
         'damageType': damageType,
         'damageTypeOptions': damageTypeOptions,
+        // El daño ya armado, con el «o» de un extra de dos tipos resuelto.
+        'damageText': damageText,
         if (extraDamage.isNotEmpty)
           'extraDamage': [for (final e in extraDamage) e.toJson()],
         'spellcastingFocus': spellcastingFocus,
@@ -1664,6 +1666,24 @@ class ComputedSheet {
           for (final k in _sortedJson([for (final s in Skill.values) s.id]))
             k: skillModifier(k),
         },
+        // Las ventajas ya filtradas por tirada (con su fuente): el cliente no
+        // repite qué ventaja vale en qué fila.
+        'saveAdvantages': {
+          for (final a in Ability.values)
+            if (abilityModifiers.containsKey(a))
+              a.name: [for (final v in saveAdvantages(a)) v.toJson()],
+        },
+        'skillAdvantages': {
+          for (final s in Skill.values)
+            if (skillAdvantages(s.id).isNotEmpty)
+              s.id: [for (final v in skillAdvantages(s.id)) v.toJson()],
+        },
+        'initiativeAdvantages': [
+          for (final v in initiativeAdvantages) v.toJson(),
+        ],
+        'conditionalAdvantages': [
+          for (final v in conditionalAdvantages) v.toJson(),
+        ],
         'passivePerception': passivePerception,
         'carryingCapacity': carryingCapacity,
         'isEncumbered': isEncumbered,

@@ -64,6 +64,8 @@ export interface Attack {
   damage: string;
   damageType: string;
   damageTypeOptions: string[];
+  /** El daño ya armado por el motor («1d6 + 3 Perforante + 1d6 Fuego o Frío»). */
+  damageText: string;
   /** Ausente cuando no hay daño extra. */
   extraDamage?: WeaponExtraDamage[];
   spellcastingFocus: boolean;
@@ -244,7 +246,7 @@ export interface ComputedSheet {
   languages: string[];
   languageChoiceSlots: JsonObject[];
   spellChoiceSlots: JsonObject[];
-  spellDamageBonuses: Record<string, SourcedBonus[]>;
+  spellDamageBonuses: Record<string, { bonus: number; source: string }[]>;
   wildShape: WildShapeSlot | null;
   spellcasting: Spellcasting | null;
   spellcastingBlocks: SpellcastingBlock[];
@@ -256,6 +258,13 @@ export interface ComputedSheet {
   savingThrows: ByAbility;
   /** Id de habilidad → modificador total. */
   skillModifiers: Record<string, number>;
+  /** Ventajas que valen en toda salvación de cada característica. */
+  saveAdvantages: Record<string, Advantage[]>;
+  /** Id de habilidad → ventajas; solo las que tienen alguna. */
+  skillAdvantages: Record<string, Advantage[]>;
+  initiativeAdvantages: Advantage[];
+  /** Contra estados o conjuros y salvaciones contra muerte: se listan aparte. */
+  conditionalAdvantages: Advantage[];
   passivePerception: number;
   carryingCapacity: number;
   isEncumbered: boolean;
@@ -327,6 +336,8 @@ export interface InventoryLine {
   charges: number | null;
   maxCharges: number | null;
   note: string;
+  /** El texto del objeto; vacío si no tiene (equipo común). */
+  description: string;
   homebrew: boolean;
   /** La creó un rasgo (el arma de pacto): al cambiarla sale de la mochila. */
   createdByFeature: boolean;

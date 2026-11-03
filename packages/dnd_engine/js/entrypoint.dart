@@ -180,6 +180,8 @@ Map<String, dynamic> _inventoryLine(
     'charges': e.charges,
     'maxCharges': item?.maxCharges,
     'note': e.note,
+    // El texto del objeto, la misma fuente que `_itemInfo` de Flutter.
+    'description': item?.description ?? '',
     'homebrew': source == ContentSource.homebrew,
     // Lo creó un rasgo (el arma de pacto): al cambiarla sale de la mochila.
     'createdByFeature': e.origin?.startsWith('effect-target:') == true,
@@ -188,6 +190,11 @@ Map<String, dynamic> _inventoryLine(
     'needsBase': item?.baseItemKind != null && e.baseItemId == null,
   };
 }
+
+/// Si el personaje todavía puede subir de nivel (`Character.canLevelUp`).
+bool canLevelUp(String characterJson) => Character.fromJson(
+      jsonDecode(characterJson) as Map<String, dynamic>,
+    ).canLevelUp;
 
 /// Lo que reparte un capítulo cerrado, en una línea y en el idioma activo
 /// («25 po y una poción de curación»), o vacío. Es `Chapter.grantsLabel`:
@@ -218,6 +225,10 @@ String catalogLabel(String kind, String id) => switch (kind) {
       'ability' =>
         Ability.values.where((a) => a.name == id).firstOrNull?.abbr ?? id,
       'language' => Language.labelFor(id),
+      // Qué mide la característica: el texto que Flutter muestra en su ayuda.
+      'abilityRule' =>
+        Ability.values.where((a) => a.name == id).firstOrNull?.description ??
+            '',
       _ => id,
     };
 
@@ -877,6 +888,7 @@ void main() {
   motor['vocabularyLabel'] = vocabularyLabelFor.toJS;
   motor['inventory'] = inventory.toJS;
   motor['chapterGrants'] = chapterGrants.toJS;
+  motor['canLevelUp'] = canLevelUp.toJS;
   motor['catalogLabel'] = catalogLabel.toJS;
   motor['catalogLabelOrder'] = catalogLabelOrder.toJS;
   motor['formatCost'] = formatCostFor.toJS;
