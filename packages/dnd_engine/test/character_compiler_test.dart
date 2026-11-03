@@ -635,4 +635,18 @@ void main() {
       expect(offHandAttack(s).action, AttackAction.bonusAction);
     });
   });
+
+  test('al Monje no se le reclama un arma, aunque sea multiclase', () {
+    bool reclamaArma(Character c) =>
+        CharacterValidator(repo).validate(c).any((w) => w.code == 'no_weapon');
+    expect(
+        reclamaArma(multiclassCharacter(
+            classId: 'monk', classHistory: ['monk', 'fighter'])),
+        isFalse);
+    // Sin un golpe que tire dados, las manos vacías siguen siendo un olvido.
+    expect(
+        reclamaArma(multiclassCharacter(
+            classId: 'barbarian', classHistory: ['barbarian', 'fighter'])),
+        isTrue);
+  });
 }

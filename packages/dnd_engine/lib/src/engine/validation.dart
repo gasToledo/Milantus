@@ -331,8 +331,14 @@ class CharacterValidator {
       }
     }
 
-    // El golpe sin armas está siempre, así que se mira si hay algún arma.
-    if (sheet.attacks.every((a) => a.baseWeaponId == unarmedStrikeId)) {
+    // El golpe sin armas está siempre, así que se mira si hay algún arma. Uno
+    // que tira dados (Artes Marciales, Matón de Taberna, Golpes Radiantes) es
+    // una forma de pelear, no unas manos vacías por olvido: al Monje no se le
+    // reclama un arma. Un retoque fijo, como el de la Furia, no alcanza.
+    if (sheet.attacks.every((a) =>
+        a.baseWeaponId == unarmedStrikeId &&
+        !a.damage.contains('d') &&
+        a.extraDamage.isEmpty)) {
       w.add(ValidationWarning(
           'no_weapon',
           localized(
