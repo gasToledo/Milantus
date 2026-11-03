@@ -39,7 +39,7 @@ Radix directo salvo para algo que esos envoltorios no cubran.
 | `Tooltip` | Explicación corta al pasar el mouse o enfocar | No reemplaza el `aria-label` de un botón de ícono |
 | `DropdownMenu*` | Menú de opciones (el selector de tema) | `RadioItem` con tilde dorado para opciones excluyentes |
 | `Popover*` | Contenido flotante que se lee y se cierra | Topeado al ancho de la ventana |
-| `Select` | Selección única con rótulo visible | El rótulo no desaparece al elegir |
+| `Select` | Selección única con rótulo visible | El rótulo no desaparece al elegir; `className` sobre el botón (un formulario lo estira con `w-full justify-between`) |
 | `Switch` | Encendido/apagado con rótulo | El pulgar se mueve: el estado no depende solo del color |
 | `ScrollArea` | Zona con scroll propio y barra fina (las nativas toman el mismo tema desde `index.css`: `scrollbar-color` con el filete) | La usa el panel lateral; un texto que crece hasta un tope lo lleva en `viewportClassName`, con `label` para que se enfoque con el teclado y `type="auto"` para que la barra avise que hay más (el trasfondo) |
 | `Toast` / `ToastViewport` | Avisos (`showAppMessage`) | Ícono, color y texto; error 6 s, el resto 3 s. `action` es el «Deshacer» (`onUndo`) y alarga a 6 s. `duration` gana sobre ese cálculo y `closeLabel` dibuja una X para descartarlo. **Una sola columna, en `Enabled`**: ninguna pantalla monta su `ToastProvider` ni su viewport (dos fijos en la misma esquina se pisan); solo dibuja su `<Toast>` |
@@ -169,6 +169,7 @@ conjuro abre su detalle en un diálogo. Sus pasos de elecciones viven en
 | `DiaryEntries` (`src/sheet/DiaryTab.tsx`) | Tarjeta de entradas en grilla (`minWidth`, 280 por defecto); con `edit` (un `DiaryEditor`: `save`, `remove`, `move`, `upload`) suma «+», editor, borrado y el ícono de mover | Sin `edit` es de solo lectura (ficha ajena, notas del PNJ) |
 | `useReorder` (`src/ui/reorder.ts`) | Reordenar con el puntero (desde un ícono con `touch-action: none`) o con flechas; da `item(id)`, `grip(id)`, `dragging` y `over` | `onMove(desde, hasta)`; sin dependencias, lo usan el Diario y la lista de personajes (5f, que ignora el movimiento entre grupos) |
 | `RosterCard` (`src/dashboard/`) | La tarjeta de personaje: el nombre es el enlace y se estira con `::after`; una columna a la derecha del nivel con el menú ⋮ (favorito, renombrar, rehacer, borrar) y, debajo, el ícono de mover | El ⋮ y el ícono de mover llevan `relative z-10` o el enlace estirado los tapa; el favorito y la lista filtrada no llevan ícono de mover |
+| `ConfirmDialog` (`src/ui/`) | Confirmar algo irreversible sobre `AppDialog`: `title`, `body` (con párrafos), `confirmLabel`, `errorText`, `onConfirm`. Con el patrón de `DeleteDialog`: si falla no se cierra y el botón pasa a «Reintentar» | Borrar campaña y echar de la mesa; `DeleteDialog` y `ShareDialog` aún tienen el suyo |
 | `RenameDialog`, `DeleteDialog` (`src/dashboard/`) | «Editar nombre» y «¿Borrar a …?» sobre `AppDialog`; reciben una promesa y, si falla, **no se cierran**: error en carmesí y «Reintentar» | Los usan la lista y la ficha (el lápiz junto al nombre, solo en la ficha propia) |
 | `patchSettings` (`src/api/settingsSave.ts`) | Cambia campos de `/api/settings` sin pisar el resto: cola de un guardado a la vez que combina parches | Todo guardado de ajustes pasa por acá; el documento viaja entero |
 | `src/api/portraits.ts` | `uploadPortrait(id, file)` (base64 de a pedazos) y `deletePortrait(key)` (un 404 cuenta como hecho) | Imágenes de retratos y del Diario; 5e9 las reusa |
@@ -297,17 +298,24 @@ del motor, nunca se calcula acá.
 
 Cada sección es una ruta bajo `/v2/dm/campanas/:id/` (el Bestiario, la Biblioteca de PNJ y el Homebrew, herramientas de la cuenta, bajo `/v2/dm/bestiario`, `/v2/dm/pnj` y `/v2/dm/homebrew`) y comparte tres piezas:
 `DmPanel` (el panel: interruptor, herramientas, campañas, secciones),
-`DmHeader` (título Georgia 30, pill con el estado y la regla ornamental; el
+`DmHeader` (título Georgia 30, pill con el estado, `actions` a su derecha y la regla ornamental; el
 `h1` es el título) y `DmPage`, que resuelve la campaña por id y es la única que
 sabe distinguir «cargando», «error» y «no se encontró» (una campaña ajena y una
-inexistente son la misma pantalla). **Solo lectura**: ninguna sección tiene un
-control que escriba, y el e2e comprueba que no sale ningún pedido que no sea
-`GET`.
+inexistente son la misma pantalla). Desde 6b escribe campañas y la Mesa (abajo); lo demás sigue de solo lectura.
 
 - **Mesa** (`MesaView`, `MemberCard`): grilla `auto-fill` de tarjetas con
   `toRosterEntry` (`dashboard/roster.ts`, la misma cuenta que el dashboard). La
   CD sale de los bloques de lanzamiento del motor y, con varias clases
   lanzadoras, se muestran todas.
+- **Escritura de 6b**: `CampaignEditorDialog` (nombre, premisa y `Select` de
+  estado con `className="w-full justify-between"`; sin nombre no cierra y, si
+  `onSubmit` falla, queda abierto con «Reintentar»), `CampaignMenu` (el ⋮ de 44 × 44
+  con Editar y Borrar, solo en Mesa, Capítulos y Cuaderno), `DmOnboarding` (la
+  bienvenida sin campañas: tres pasos y «Crear campaña»), `AddMemberDialog` (campo del
+  código centrado, 18 px y mayúsculas; un 404 dice «Código inválido o vencido» y
+  conserva el código) y `MemberCard` con `actions`: un ⋮ de 32 × 32 con `relative z-10`
+  (conceder Inspiración Heroica, echar). Las acciones son sobre el vínculo y los
+  avisos, nunca sobre la ficha del jugador.
 - **Capítulos** (`ChaptersView`): lista ordenada de tarjetas `card`; el abierto
   lleva `border-2 border-gold`, el estado va en una pill con el color del estado
   (oro, apagado, neutro) y lo que reparte en `StatPlaque`.

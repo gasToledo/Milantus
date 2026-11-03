@@ -230,9 +230,10 @@ repiten acá.
 - **Campañas y Bestiario del jugador no están en el menú de Jugador**: se entra
   escribiendo la URL. Pertenecen al Modo DM, que ahora existe en parte (abajo): el
   panel DM enlaza el Bestiario.
-- **El Modo DM, de solo lectura** en `/v2/dm` (`src/dm/`), al que lleva «DM» del
-  interruptor. **Ninguna escritura**: ni crear o editar campañas, ni cerrar
-  capítulos, ni escenas de música, ni notas; todo eso sigue en Flutter. Se porta por
+- **El Modo DM** en `/v2/dm` (`src/dm/`), al que lleva «DM» del
+  interruptor. Desde 6b escribe campañas y la Mesa (bloque de 6b, abajo); cerrar
+  capítulos, las escenas de música, las notas, los PNJ y el combate **siguen
+  en Flutter** hasta 6c a 6g, y esas secciones se leen. Se porta por
   secciones, una por PR; hoy existen la **Mesa**, **Capítulos**, el **Cuaderno**,
   los **PNJ de la mesa**, el **Combate**, el **Bestiario**, la **Biblioteca de
   PNJ** y el **Homebrew**: todas las secciones del panel, más la **ficha
@@ -257,7 +258,7 @@ repiten acá.
   sin reproducirse. Vive en `DmPage` y no en una sección: cambiar de sección o
   abrir una herramienta de la cuenta no la corta; cambiar de campaña, sí. Crear,
   editar, reordenar, borrar y marcar «ofrecer al iniciar un combate» son
-  escrituras (paso 6), y la oferta al empezar un combate no está porque acá
+  escrituras (paso 6; crear, editar y borrar campañas ya están, ver 6b), y la oferta al empezar un combate no está porque acá
   nadie empieza uno. La **Mesa** lista a los jugadores
   vinculados (`GET /api/campaigns/:id/members`, que lee la ficha **real** del
   jugador, no una copia): retrato, nombre, especie y clase, nivel, barra
@@ -695,6 +696,25 @@ repiten acá.
 - **Ningún enlace** desde Flutter hacia `/v2` y Flutter no lee `webV2`: se
   entra escribiendo la URL.
 
+**Paso 6b: campañas y Mesa** *(existe)*. Es la parte del DM que escribe
+primero, y no toca motor, servidor ni Flutter: las rutas ya existían. La
+frontera sigue donde estaba: **el DM no escribe la ficha de otra cuenta**.
+- **Campañas** (`CampaignEditorDialog`, `CampaignMenu`, `DmOnboarding`): crear
+  desde «Nueva campaña» del panel o desde la bienvenida de quien no tiene
+  ninguna; editar y borrar desde el menú de la cabecera de Mesa, Capítulos y
+  Cuaderno (a propósito no en PNJ ni Combate, para que no quede a mano de lo que
+  se toca jugando). Crear navega al id que **devuelve** el servidor. Editar
+  **relee la campaña antes del PUT**: las escenas de música viven en ese
+  documento y el PUT lo reemplaza entero. Borrar sale de la campaña antes de
+  releer la lista, para no mostrar «No se encontró la campaña».
+- **La Mesa** (`AddMemberDialog`, `MemberCard` con `actions`): sumar canjea el
+  código del jugador; conceder Inspiración Heroica es un **aviso** del servidor
+  (no escribe la ficha) y echar corta el vínculo tras confirmar. `MemberSheetView`
+  sigue sin un solo control. No se pide el aviso de eventos tras cada acción
+  (`_checkEventsSoon` de Flutter): decisión tomada, no un olvido.
+- Queda en Flutter, hasta 6c a 6g: capítulos, cuaderno, música, PNJ, ficha de PNJ
+  y combate.
+
 **Paso 6a: compartir, avisos y turno** *(existe)*. Es la parte del jugador del
 paso 6, y no toca motor, servidor ni Flutter: las rutas ya existían.
 - **Avisos de la cola** (`src/events/`): `PendingEvents` pide `GET /api/events`
@@ -763,8 +783,8 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    datos de la propia cuenta.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
    combate, vínculos y códigos de campaña. Por partes: 6a, la del jugador:
-   compartir, los avisos de la cola y el aviso de turno *(existe)*; 6b, la
-   Mesa; 6c, Capítulos y Cuaderno; 6d, la música; 6e, los PNJ; 6f, la ficha de
+   compartir, los avisos de la cola y el aviso de turno *(existe)*; 6b, las
+   campañas y la Mesa *(existe)*; 6c, Capítulos y Cuaderno; 6d, la música; 6e, los PNJ; 6f, la ficha de
    PNJ; 6g, el combate. Importar y exportar PNJ sigue en el paso 7. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de
    otra cuenta» es del servidor y vale igual para el cliente nuevo. Entra acá

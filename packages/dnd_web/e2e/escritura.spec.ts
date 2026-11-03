@@ -692,3 +692,54 @@ test('compartir: el código se canjea, el aviso llega y dejar de compartir avisa
   const { events } = await api<{ events: { kind: string }[] }>(request, '/api/events', TOKEN_SIN_V2);
   expect(events.map((e) => e.kind)).toContain('character_unlinked_by_owner');
 });
+
+test('Mesa: crear campaña, sumar con un código, conceder, echar y borrar sin tocar la ficha del jugador', async ({ page, request }) => {
+  // El jugador es la cuenta sin /v2 y solo por API: sus avisos no aparecen en
+  // ninguna pantalla ni chocan con las pruebas que corren en paralelo.
+  const comoJugador = { headers: { cookie: `dnd_session=${TOKEN_SIN_V2}` } };
+  const creado = await request.post('/api/characters', {
+    ...comoJugador,
+    data: { character: { ...(await ilse(request)), id: 'pj-de-la-mesa', name: 'Pj de la Mesa' } },
+  });
+  const pjId = ((await creado.json()) as { character: { id: string } }).character.id;
+  const { code } = (await (await request.post(`/api/characters/${pjId}/share`, comoJugador)).json()) as { code: string };
+  const fichaDelJugador = async () =>
+    JSON.stringify(
+      (await api<{ characters: { character: PersonajeApi }[] }>(request, '/api/characters', TOKEN_SIN_V2)).characters.find(
+        (c) => c.character.id === pjId,
+      ),
+    );
+  const antes = await fichaDelJugador();
+  const eventos = async () =>
+    (await api<{ events: { kind: string }[] }>(request, '/api/events', TOKEN_SIN_V2)).events.map((e) => e.kind);
+
+  await page.goto('/v2/dm');
+  await page.getByRole('button', { name: 'Crear campaña', exact: true }).click();
+  await page.locator('[data-field="campaign-name"]').fill('Mesa de la Prueba');
+  await page.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Mesa de la Prueba');
+
+  await page.locator('[data-action="add-member"]').click();
+  await page.locator('[data-field="member-code"]').fill(code);
+  await page.getByRole('button', { name: 'Sumar', exact: true }).click();
+  const tarjeta = page.locator(`[data-member="${pjId}"]`);
+  await expect(tarjeta).toBeVisible();
+
+  await tarjeta.locator('[data-action="member-actions"]').click();
+  await page.getByRole('menuitem', { name: 'Conceder Inspiración Heroica' }).click();
+  await expect.poll(eventos).toContain('heroic_inspiration_granted');
+
+  await tarjeta.locator('[data-action="member-actions"]').click();
+  await page.getByRole('menuitem', { name: 'Echar de la mesa' }).click();
+  await page.getByRole('button', { name: 'Echar personaje', exact: true }).click();
+  await expect(tarjeta).toHaveCount(0);
+  await expect.poll(eventos).toContain('character_unlinked_by_dm');
+
+  // La frontera: el DM avisa y corta el vínculo, pero no escribe la ficha ajena.
+  expect(await fichaDelJugador()).toBe(antes);
+
+  await page.locator('[data-action="campaign-actions"]').click();
+  await page.getByRole('menuitem', { name: 'Borrar campaña' }).click();
+  await page.getByRole('button', { name: 'Borrar campaña', exact: true }).click();
+  await expect(page.getByText('Prepará tu primera mesa', { exact: true })).toBeVisible();
+});
