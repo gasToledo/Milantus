@@ -128,6 +128,15 @@ export function SheetHeader({
             }
           />
           <StatTile id="proficiency" icon={Medal} label={t.proficiency} value={signed(sheet.proficiencyBonus)} />
+          {/* Los avisos del motor: una franja de la banda. Con espacio va en la
+              fila de las cifras, a la derecha (`data-warnings`, ver
+              `.tactical-band`); debajo, a todo el ancho. Va antes de los
+              estados para que el autoflujo la suba a la primera fila. */}
+          {warnings && choices && choices.warnings.length > 0 && (
+            <div data-warnings className="min-w-0">
+              <WarningsStrip model={model} view={choices} />
+            </div>
+          )}
           {/* Los estados activables viven en la banda y no en una tarjeta de
               Combate: se prenden en el turno desde cualquier pestaña. Sin
               escritura, solo el que está en curso. */}
@@ -137,12 +146,6 @@ export function SheetHeader({
             .map((m) => (
               <ActiveModeTile key={m.id} model={model} mode={m} />
             ))}
-          {/* Los avisos del motor, como la lámina: una franja más de la banda. */}
-          {warnings && choices && choices.warnings.length > 0 && (
-            <div data-mode className="min-w-0">
-              <WarningsStrip model={model} view={choices} />
-            </div>
-          )}
         </dl>
       </section>
       )}

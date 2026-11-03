@@ -254,6 +254,9 @@ body {
 .tactical-band [data-stat='wild-shape'] {
   grid-column: 1 / -1 !important;
 }
+.tactical-band [data-warnings] {
+  grid-column: 1 / -1;
+}
 @container (min-width: 540px) {
   .tactical-band > dl {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -267,6 +270,14 @@ body {
     grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr));
   }
   .tactical-band [data-stat='hp'] {
+    grid-column: auto;
+  }
+  /* La franja de avisos, a la derecha de las cuatro cifras (como `.band` de
+     la lámina): una quinta columna solo cuando hay avisos. */
+  .tactical-band > dl:has([data-warnings]) {
+    grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr)) minmax(0, 2.2fr);
+  }
+  .tactical-band [data-warnings] {
     grid-column: auto;
   }
 }
