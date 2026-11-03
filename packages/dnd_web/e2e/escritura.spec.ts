@@ -619,3 +619,20 @@ test('escribir el trasfondo guarda lo que da el motor', async ({ page, request }
   });
   expect(enviado).toEqual(segunMotor(antes, { type: 'setBackground', text }));
 });
+
+test('subir un retrato guarda lo que da el motor', async ({ page, request }) => {
+  const antes = await ilse(request);
+  // Un PNG de 1×1: al servidor le alcanza la cabecera (`sniffPortraitImageType`).
+  const png = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYGD4DwABBAEAwS2OUAAAAABJRU5ErkJggg==',
+    'base64',
+  );
+
+  await page.goto(`/v2/personajes/${ILSE}/retrato`);
+  // Con proveedores la pantalla abre en Generar: se pasa a Subir.
+  await page.locator('[data-tab="upload"]').click();
+  const enviado = await proximoGuardado(page, () =>
+    page.locator('[data-field="portrait-file"]').setInputFiles({ name: 'retrato.png', mimeType: 'image/png', buffer: png }),
+  );
+  expect(enviado).toEqual(segunMotor(antes, { type: 'addPortrait', key: enviado.portraitPaths![0] }));
+});

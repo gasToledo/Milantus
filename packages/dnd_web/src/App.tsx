@@ -138,6 +138,8 @@ function Enabled({ account }: { account: Account }) {
       return <CharacterPage id={route.id} tab={null} magicPlans />;
     case 'wildShapeForms':
       return <CharacterPage id={route.id} tab={null} wildShapeForms />;
+    case 'portrait':
+      return <CharacterPage id={route.id} tab={null} portrait />;
     case 'choices':
       return <CharacterPage id={route.id} tab={null} choices />;
     case 'creation':

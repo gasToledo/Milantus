@@ -14,7 +14,7 @@ import {
 import type { ReactNode } from 'react';
 import { canLevelUp, type CharacterJson } from '../engine';
 import { useTexts } from '../i18n/context';
-import { characterHref, FLUTTER_HOME, levelUpHref, rosterHref, SHEET_TABS, type SheetTab } from '../router';
+import { characterHref, FLUTTER_HOME, levelUpHref, portraitHref, rosterHref, SHEET_TABS, type SheetTab } from '../router';
 import type { Texts } from '../i18n/texts';
 import { Medallion } from '../ui/Medallion';
 import { PrintSheet, usePrintSheet } from './PrintSheet';
@@ -34,9 +34,9 @@ export const TAB_ICONS: Record<SheetTab, LucideIcon> = {
  * El panel de una pantalla de adentro (`SidebarBackButton` + navegación de la
  * ficha): «volver», la tarjeta del personaje, las secciones y las acciones.
  * Las cinco secciones son pestañas de `/v2`. Imprimir es de acá (`PrintSheet`);
- * subir de nivel es el asistente de `/v2` (`LevelUpWizard`); retrato y
- * compartir escriben o generan algo y todavía viven en Flutter, así que
- * enlazan allá.
+ * subir de nivel y el retrato son pantallas de `/v2` (`LevelUpWizard`,
+ * `PortraitPage`); compartir emite un código y todavía vive en Flutter, así
+ * que enlaza allá.
  */
 export function SheetPanel({ model, tab }: { model: SheetModel; tab: SheetTab }) {
   const t = useTexts();
@@ -76,7 +76,7 @@ export function SheetPanel({ model, tab }: { model: SheetModel; tab: SheetTab })
 
       <NavGroup label={t.sheetActionsLabel}>
         <li>
-          <NavItem href={FLUTTER_HOME} icon={Image} label={t.actionPortrait} external />
+          <NavItem href={portraitHref(id)} icon={Image} label={t.actionPortrait} internal />
         </li>
         <li>
           {/* En el nivel máximo no hay a dónde ir: el tope lo dice el motor. */}

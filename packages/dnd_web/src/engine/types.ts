@@ -414,6 +414,8 @@ export interface CharacterFields {
   shieldEquipped?: boolean;
   /** Claves del almacén de retratos; el primero es el que se muestra. */
   portraitPaths?: string[];
+  /** Prompt con que se generó cada retrato: clave → texto. */
+  portraitPrompts?: Record<string, string>;
   cantripIds?: string[];
   spellIds?: string[];
   /** Clase → trucos y conjuros elegidos con ella. */

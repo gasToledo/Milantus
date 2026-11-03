@@ -152,12 +152,16 @@ export function SpellTabs({
   onSelect,
   label,
   t,
+  plain = false,
 }: {
   tabs: { key: string; title: string; ready: boolean; count?: [number, number]; label?: string }[];
   current: string;
   onSelect: (key: string) => void;
   label: string;
   t: Texts;
+  /** Sin el estado de cada pestaña ni el alto de dos renglones: dos vías
+   *  alternativas (generar o subir un retrato) que no «se completan». */
+  plain?: boolean;
 }) {
   return (
     <div role="tablist" aria-label={label} className="flex gap-2 overflow-x-auto pb-1">
@@ -172,12 +176,15 @@ export function SpellTabs({
             data-tab={x.key}
             onClick={() => onSelect(x.key)}
             className={cx(
-              'flex w-[148px] shrink-0 flex-col items-start gap-1 rounded-[var(--radius-card)] border px-3 py-2.5 text-left text-on-surface transition-colors duration-[120ms] sm:w-auto sm:min-w-0 sm:flex-1',
+              'flex shrink-0 rounded-[var(--radius-card)] border text-left text-on-surface transition-colors duration-[120ms]',
+              plain
+                ? 'h-[38px] items-center px-3.5'
+                : 'w-[148px] flex-col items-start gap-1 px-3 py-2.5 sm:w-auto sm:min-w-0 sm:flex-1',
               on ? 'border-gold bg-gold-soft' : 'border-hairline bg-plaque',
             )}
           >
             <span className="text-[13px] leading-[1.25] font-medium">{x.title}</span>
-            <Status ready={x.ready} count={x.count} label={x.label} t={t} />
+            {!plain && <Status ready={x.ready} count={x.count} label={x.label} t={t} />}
           </button>
         );
       })}

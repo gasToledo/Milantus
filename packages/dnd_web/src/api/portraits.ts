@@ -29,6 +29,21 @@ export async function uploadPortrait(characterId: string, file: File): Promise<s
   return ((await response.json()) as { key: string }).key;
 }
 
+/** Un proveedor de generación ya configurado en el servidor: la clave nunca
+ *  llega acá, solo su nombre y si acepta una imagen de referencia. */
+export interface PortraitProvider {
+  id: string;
+  name: string;
+  supportsReference: boolean;
+}
+
+export async function fetchPortraitProviders(signal: AbortSignal): Promise<PortraitProvider[]> {
+  const path = '/api/portraits/providers';
+  const response = await fetch(path, { signal });
+  if (!response.ok) throw new ApiError(response.status, path);
+  return ((await response.json()) as { providers: PortraitProvider[] }).providers;
+}
+
 /** Borra una imagen del almacén (`DELETE /api/portraits/<clave>`). Un 404 es
  *  que ya no estaba: cuenta como hecho. */
 export async function deletePortrait(key: string): Promise<void> {

@@ -100,6 +100,8 @@ export type Route =
   | { name: 'magicPlans'; id: string }
   // Las formas anotadas de Forma Salvaje de la ficha propia.
   | { name: 'wildShapeForms'; id: string }
+  // Los retratos de la ficha propia: generar, subir, volver a uno y borrar.
+  | { name: 'portrait'; id: string }
   // Las elecciones pendientes o reemplazables de la ficha propia.
   | { name: 'choices'; id: string }
   // El creador de personajes.
@@ -236,6 +238,13 @@ export function matchRoute(pathname: string): Route {
       return { name: 'unknown' };
     }
   }
+  if (section === 'personajes' && id && tab === 'retrato' && rest.length === 0) {
+    try {
+      return { name: 'portrait', id: decodeURIComponent(id) };
+    } catch {
+      return { name: 'unknown' };
+    }
+  }
   if (section === 'personajes' && id && rest.length === 0) {
     const sheetTab = tab === undefined ? null : SHEET_TABS.find((t) => t === tab);
     if (sheetTab === undefined) return { name: 'unknown' };
@@ -318,6 +327,9 @@ export const choicesHref = (id: string, tab?: string): string =>
 
 export const wildShapeFormsHref = (id: string): string =>
   `${import.meta.env.BASE_URL}personajes/${encodeURIComponent(id)}/formas`;
+
+export const portraitHref = (id: string): string =>
+  `${import.meta.env.BASE_URL}personajes/${encodeURIComponent(id)}/retrato`;
 
 // `pushState` no dispara ningún evento: se avisa a mano a quien escucha.
 const listeners = new Set<() => void>();

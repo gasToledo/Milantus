@@ -15,6 +15,7 @@ import { LevelUpWizard } from '../levelup/LevelUpWizard';
 import { MagicItemPlans } from './MagicItemPlans';
 import { WildShapeForms } from './WildShapeForms';
 import { ChoicesPage } from './Choices';
+import { PortraitPage } from './PortraitPage';
 import { SpellEditor } from './SpellEditor';
 import { useSheetWriter, type SheetNotify } from './writer';
 
@@ -42,6 +43,7 @@ export function CharacterPage({
   spellEdit,
   magicPlans = false,
   wildShapeForms = false,
+  portrait = false,
   choices = false,
 }: {
   id: string;
@@ -53,6 +55,8 @@ export function CharacterPage({
   magicPlans?: boolean;
   /** La ruta de las formas anotadas de Forma Salvaje. */
   wildShapeForms?: boolean;
+  /** La ruta de los retratos. */
+  portrait?: boolean;
   /** La ruta de las elecciones pendientes o reemplazables. */
   choices?: boolean;
 }) {
@@ -67,10 +71,10 @@ export function CharacterPage({
   // La ruta sin pestaña es la primera: se reemplaza en el historial para que
   // «atrás» no vuelva a una URL que solo redirige.
   useEffect(() => {
-    if (tab === null && !levelUp && spellEdit === undefined && !magicPlans && !wildShapeForms && !choices) {
+    if (tab === null && !levelUp && spellEdit === undefined && !magicPlans && !wildShapeForms && !portrait && !choices) {
       navigate(characterHref(id), { replace: true });
     }
-  }, [id, tab, levelUp, spellEdit, magicPlans, wildShapeForms, choices]);
+  }, [id, tab, levelUp, spellEdit, magicPlans, wildShapeForms, portrait, choices]);
 
   // Al volver a la pestaña se pide la ficha de nuevo, por si se tocó en
   // Flutter mientras tanto: así la próxima acción parte de esa copia y no la
@@ -136,6 +140,8 @@ export function CharacterPage({
     body = model.write ? <MagicItemPlans model={model} write={model.write} /> : <AppBusyLabel label={t.loading} />;
   } else if (wildShapeForms) {
     body = model.write ? <WildShapeForms model={model} write={model.write} /> : <AppBusyLabel label={t.loading} />;
+  } else if (portrait) {
+    body = model.write ? <PortraitPage model={model} write={model.write} /> : <AppBusyLabel label={t.loading} />;
   } else if (choices) {
     body = model.write ? <ChoicesPage model={model} write={model.write} /> : <AppBusyLabel label={t.loading} />;
   } else {
