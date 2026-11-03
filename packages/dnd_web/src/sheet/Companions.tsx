@@ -77,7 +77,7 @@ export function CompanionsCard({ model }: { model: SheetModel }) {
       trailing={
         write &&
         options.length > 0 && (
-          <Button tone="secondary" data-action="summon" onClick={() => setSummoning(true)}>
+          <Button tone="primary" data-action="summon" onClick={() => setSummoning(true)}>
             {t.compSummon}
           </Button>
         )
@@ -188,7 +188,10 @@ function CompanionRow({
           )}
         </span>
         <span className="shrink-0 text-[12.5px] text-on-surface-variant">{t.compAc(c.armorClass ?? '')}</span>
-        <b className={cx('num shrink-0 text-[14px] tabular-nums', tone.text)}>{t.compHp(c.currentHp, max)}</b>
+        <span className="shrink-0 whitespace-nowrap tabular-nums">
+          <b className={cx('num text-[18px]', tone.text)}>{c.currentHp}</b>
+          <small className="ml-1 text-[12px] text-text-muted">{t.compHpMax(max)}</small>
+        </span>
         <ChevronDown
           size={16}
           aria-hidden="true"

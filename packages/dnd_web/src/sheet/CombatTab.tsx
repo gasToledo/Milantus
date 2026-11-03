@@ -422,7 +422,7 @@ function SpellsCard({ model }: { model: SheetModel }) {
 
   const editButton = (b: SpellcastingBlock) =>
     write && (
-      <ButtonLink tone="secondary" internal data-action="edit-spells" href={spellEditHref(character.id, b.classId)}>
+      <ButtonLink tone="primary" internal data-action="edit-spells" href={spellEditHref(character.id, b.classId)}>
         {b.spellcasting.preparation === 'prepared' ? t.seActionPrepare : t.seActionEdit}
       </ButtonLink>
     );
