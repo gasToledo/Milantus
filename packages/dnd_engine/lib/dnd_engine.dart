@@ -42,6 +42,7 @@ export 'src/engine/combat_ops.dart';
 export 'src/engine/level_up.dart';
 export 'src/engine/character_creation.dart';
 export 'src/engine/sheet_actions.dart';
+export 'src/engine/companion_view.dart';
 export 'src/engine/coin_ops.dart';
 export 'src/engine/inventory_ops.dart';
 export 'src/engine/wild_shape.dart';

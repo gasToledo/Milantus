@@ -205,6 +205,15 @@ void main() {
     expect(pact.pactSlotsByLevel, {2: 2});
   });
 
+  test('un brujo puro no tiene espacios normales, solo los de pacto', () {
+    final sheet = compiler.compile(multiclassCharacter(
+      classId: 'warlock',
+      classHistory: const ['warlock', 'warlock', 'warlock'],
+    ));
+    expect(sheet.normalSpellSlotsByLevel, isEmpty);
+    expect(sheet.pactSlotsByLevel, isNotEmpty);
+  });
+
   test('combina Ranger 4 / Sorcerer 3 sin mezclar sus fuentes', () {
     final c = multiclassCharacter(
       classId: 'ranger',

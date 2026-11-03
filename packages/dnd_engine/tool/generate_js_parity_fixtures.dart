@@ -208,6 +208,19 @@ final _casos = <String, Character>{
     cantripIds: const ['eldritch-blast', 'mage-hand'],
     spellIds: const ['hex', 'sleep'],
   ),
+  // Artífice con espacios y un Sirviente Homúnculo en juego: invocar paga un
+  // espacio, despedir lo saca de la lista y `companionsView` lo lee.
+  'invocador': Character(
+    id: 'p-summoner',
+    name: 'Invocador',
+    raceId: 'human',
+    classId: 'artificer',
+    backgroundId: 'sage',
+    level: 11,
+    assignedScores: _scores,
+    hpPerLevel: List.filled(11, 6),
+    spellIds: const ['homunculus-servant'],
+  ),
   // Truco innato reemplazable (`setInnateCantrip`, `innateCantripOptions`).
   'altoelfo': Character(
     id: 'p-high-elf',
@@ -298,6 +311,20 @@ final _acciones = <String, (String, Map<String, dynamic>)>{
       'item': 'manifold-tool',
     },
   ),
+  'accion-invocar': (
+    'invocador',
+    {
+      'type': 'summonCompanion',
+      'option': 'homunculus-servant',
+      'creature': 'homunculus-servant',
+      'level': 3,
+      'pact': false,
+    },
+  ),
+  'accion-despedir': (
+    'invocador',
+    {'type': 'dismissCompanion', 'index': 0},
+  ),
   'accion-truco-innato': (
     'altoelfo',
     {
@@ -333,7 +360,7 @@ final _creaciones = <String, (Map<String, dynamic>, Map<String, dynamic>)>{
 
 const _semilla = 7;
 
-CombatState _gastado() => CombatState(
+CombatState _gastado(String caso) => CombatState(
       currentHp: 3,
       tempHp: 2,
       hitDiceUsed: const {8: 1},
@@ -341,6 +368,16 @@ CombatState _gastado() => CombatState(
       resourceUsage: const {'wild_shape': 1},
       spellSlotsUsed: const {1: 1},
       pactSlotsUsed: const {3: 1},
+      companions: caso == 'invocador'
+          ? [
+              CompanionInstance(
+                optionId: 'homunculus-servant',
+                creatureId: 'homunculus-servant',
+                spellLevel: 2,
+                currentHp: 5,
+              ),
+            ]
+          : null,
     );
 
 Future<void> main(List<String> args) async {
@@ -393,7 +430,7 @@ Future<void> main(List<String> args) async {
   for (final MapEntry(key: nombre, value: (caso, accion))
       in _acciones.entries) {
     final entrada = jsonDecode(
-      jsonEncode(_casos[caso]!.copyWith(combat: _gastado()).toJson()),
+      jsonEncode(_casos[caso]!.copyWith(combat: _gastado(caso)).toJson()),
     );
     final ficha = Character.fromJson(entrada as Map<String, dynamic>);
     final esperado = SheetActions.apply(
@@ -541,6 +578,43 @@ Future<void> main(List<String> args) async {
         },
       ],
     },
+  );
+  // Los compañeros: la salida del motor tal cual. Que la forma sea la que
+  // escribe `companion_view.dart` ya lo prueba `companion_test.dart`; acá
+  // solo importa que el JS compilado dé lo mismo.
+  final invocador = Character.fromJson(
+    jsonDecode(
+      jsonEncode(_casos['invocador']!
+          .copyWith(combat: _gastado('invocador'))
+          .toJson()),
+    ) as Map<String, dynamic>,
+  );
+  void puenteCon(
+          String nombre, String fn, List<Object> args, Object? esperado) =>
+      File('${out.path}/$nombre.json').writeAsStringSync(
+        jsonEncode({
+          'character': jsonDecode(jsonEncode(invocador.toJson())),
+          'bridge': {'fn': fn, 'args': args},
+          'expected': esperado,
+        }),
+      );
+  puenteCon(
+    'puente-companeros',
+    'companionsView',
+    const [],
+    companionsView(invocador, repo),
+  );
+  puenteCon(
+    'puente-companero-vista-previa',
+    'companionPreview',
+    const ['homunculus-servant', 'homunculus-servant', 3],
+    companionPreview(
+      invocador,
+      repo,
+      'homunculus-servant',
+      'homunculus-servant',
+      3,
+    ),
   );
   puenteSinFicha(
     'puente-bases',

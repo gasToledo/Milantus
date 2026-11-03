@@ -1,4 +1,4 @@
-import type { AbilityId, BestiaryRow, Catalog, CharacterJson, ComputedSheet, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
+import type { AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
 // Lo genera `npm run build:engine` (o la etapa `engine-js` del Dockerfile) y
 // no se versiona. Es un script de dart2js, no un módulo: al cargarse deja
 // `globalThis.dndEngine`, y de ahí lo toma este archivo.
@@ -34,6 +34,8 @@ interface DartEngine {
   innateCantripOptions(characterJson: string, catalogJson: string, granted: string): string;
   magicItemPlans(characterJson: string, catalogJson: string): string;
   magicBaseOptions(catalogJson: string, itemId: string): string;
+  companionsView(characterJson: string, catalogJson: string): string;
+  companionPreview(characterJson: string, catalogJson: string, option: string, creature: string, level: number): string;
 }
 
 function engine(): DartEngine {
@@ -310,6 +312,26 @@ export function spellEditView(character: CharacterJson, catalog: Catalog, classI
  *  no tiene cupo de planos. */
 export function magicPlansView(character: CharacterJson, catalog: Catalog): MagicPlansView | null {
   return JSON.parse(engine().magicItemPlans(JSON.stringify(character), catalogJson(catalog))) as MagicPlansView | null;
+}
+
+/** Los compañeros de la ficha: lo que puede invocar, lo que tiene en juego y
+ *  lo que quedó sin sostén (`companionsView` del motor). */
+export function companionsView(character: CharacterJson, catalog: Catalog): CompanionsView {
+  return JSON.parse(engine().companionsView(JSON.stringify(character), catalogJson(catalog))) as CompanionsView;
+}
+
+/** El perfil y la fila de una forma invocada con un espacio de [level], o
+ *  `null` si no existe (`companionPreview` del motor). */
+export function companionPreview(
+  character: CharacterJson,
+  catalog: Catalog,
+  option: string,
+  creature: string,
+  level: number,
+): { profile: JsonObject; row: BestiaryRow } | null {
+  return JSON.parse(
+    engine().companionPreview(JSON.stringify(character), catalogJson(catalog), option, creature, level),
+  ) as { profile: JsonObject; row: BestiaryRow } | null;
 }
 
 /** Los objetos base entre los que se elige para replicar [itemId]. */
@@ -688,7 +710,11 @@ export type SheetAction =
   | { type: 'transmuteReplica'; entry: string; item: string; base?: string }
   | { type: 'enterWildShape'; creature: string }
   | { type: 'leaveWildShape' }
-  | { type: 'setWildShapeForm'; creature: string; value: boolean };
+  | { type: 'setWildShapeForm'; creature: string; value: boolean }
+  | { type: 'summonCompanion'; option: string; creature: string; level?: number; pact?: boolean; free?: boolean }
+  | { type: 'damageCompanion' | 'healCompanion' | 'companionTempHp'; index: number; amount: number }
+  | { type: 'dismissCompanion'; index: number }
+  | { type: 'setCompanionCondition'; index: number; condition: string; value: boolean };
 
 /** Lo que cuenta el motor de una acción, para el aviso. Cada campo existe
  *  solo en la acción que lo da (ver `SheetActions.apply`). */
@@ -710,6 +736,19 @@ export interface SheetOutcome {
   entered?: boolean;
   /** `enterWildShape`: los PG temporales que dio. */
   tempHp?: number;
+  /** `summonCompanion`: false si se rechazó (sin espacio, uso o forma). */
+  summoned?: boolean;
+  /** Compañeros: la forma invocada, dañada o despedida. */
+  name?: string;
+  /** `summonCompanion`: el nivel de espacio gastado, o `null`. */
+  spentSlot?: number | null;
+  /** `summonCompanion`: el recurso gratis que se gastó, o `null`. */
+  freeName?: string | null;
+  concentrates?: boolean;
+  /** `summonCompanion`: cortó una concentración anterior. */
+  brokeConcentration?: boolean;
+  /** `damageCompanion`: el daño lo destruyó. */
+  destroyed?: boolean;
 }
 
 /**

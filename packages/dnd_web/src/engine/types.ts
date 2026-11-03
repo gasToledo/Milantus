@@ -473,6 +473,57 @@ export interface BestiaryRow {
   meleeReach: boolean[];
 }
 
+/** Un compañero que la ficha puede invocar (`companionsView` del motor). */
+export interface CompanionOptionView {
+  id: string;
+  name: string;
+  source: string;
+  maxActive: number;
+  spellId: string | null;
+  minSpellLevel: number;
+  /** Invocarlo se paga con un espacio y sus números dependen de su nivel. */
+  scales: boolean;
+  /** El conjuro que lo invoca pide concentración. */
+  concentrates: boolean;
+  forms: { id: string; name: string; kind: string }[];
+  /** El uso gratis del conjuro, si lo tiene. */
+  free: { name: string; left: number; max: number } | null;
+  /** Los espacios libres que alcanzan; vacío si no escala. */
+  slots: { level: number; pact: boolean; max: number; used: number }[];
+  /** La forma que se va si se invoca otro más, o `null` si hay lugar. */
+  going: string | null;
+}
+
+/** Un compañero en juego. `profile` y `row` son `null` si `gone`. Se pasan por
+ *  `asProfile` para pintarlos con `CreatureProfile`. */
+export interface CompanionInstanceView {
+  /** Su lugar en `combat.companions`: lo que piden las acciones. */
+  index: number;
+  optionId: string;
+  optionName: string;
+  creatureId: string;
+  name: string;
+  spellLevel: number;
+  concentration: boolean;
+  currentHp: number;
+  tempHp: number;
+  conditions: string[];
+  /** La forma ya no está en el catálogo. */
+  gone: boolean;
+  maxHp: number | null;
+  armorClass: number | null;
+  profile: JsonObject | null;
+  row: BestiaryRow | null;
+}
+
+/** Lo que el motor lee de los compañeros de una ficha (`companionsView`). */
+export interface CompanionsView {
+  options: CompanionOptionView[];
+  instances: CompanionInstanceView[];
+  /** Sin opción que los sostenga (se sacó el conjuro). */
+  orphans: { index: number; name: string }[];
+}
+
 /** Lo que el motor deriva de un PNJ (`npcs` de `js/entrypoint.dart`): el
  *  documento migrado y sus números de combate, para que la pantalla no repita
  *  ninguna regla (resolver la fórmula de PG, compilar su ficha). */

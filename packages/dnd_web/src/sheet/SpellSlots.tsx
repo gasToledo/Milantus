@@ -34,7 +34,11 @@ export function spellSlotCells({
   /** Nivel de cada conjuro elegido o siempre preparado (los trucos no gastan). */
   spellLevels: number[];
 }): SlotCell[] {
-  const levels = new Set<number>(spellLevels.filter((l) => l > 0));
+  const pactEntry = Object.entries(pact).find(([, max]) => max > 0);
+  // Sin espacios normales y con pacto (el brujo puro) la grilla es solo la
+  // celda de pacto: los niveles de sus conjuros no inventan celdas vacías.
+  const hasNormal = Object.values(normal).some((max) => max > 0);
+  const levels = new Set<number>(pactEntry && !hasNormal ? [] : spellLevels.filter((l) => l > 0));
   for (const [level, max] of Object.entries(normal)) if (max > 0) levels.add(Number(level));
   const cells: SlotCell[] = [...levels]
     .sort((a, b) => a - b)
@@ -45,7 +49,6 @@ export function spellSlotCells({
       max: normal[String(level)] ?? 0,
       used: normalUsed?.[String(level)] ?? 0,
     }));
-  const pactEntry = Object.entries(pact).find(([, max]) => max > 0);
   if (pactEntry) {
     const [level, max] = pactEntry;
     cells.push({ key: `pact-${level}`, level: Number(level), pact: true, max, used: pactUsed?.[level] ?? 0 });

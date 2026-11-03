@@ -1056,7 +1056,13 @@ class CharacterCompiler {
       languageChoiceSlots: languageChoiceSlots,
       spellcasting: spellcasting,
       spellcastingBlocks: spellcastingBlocks,
-      normalSpellSlotsByLevel: spellcasting?.slotsByLevel ?? const {},
+      // Un brujo puro no tiene espacios normales: su tabla es la del pacto y
+      // contarla dos veces le mostraba celdas de más, con lo gastado en la
+      // normal cayendo en `spellSlotsUsed`, que el descanso corto no devuelve.
+      normalSpellSlotsByLevel:
+          spellcasting?.progression == CasterProgression.pact
+              ? const {}
+              : spellcasting?.slotsByLevel ?? const {},
       pactSlotsByLevel: _pactSlots(spellcastingBlocks),
     );
   }

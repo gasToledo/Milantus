@@ -796,6 +796,34 @@ String act(
   );
 }
 
+/// Los compañeros de la ficha para leerlos (`companionsView`): `{options,
+/// instances, orphans}`. Las acciones sobre ellos son las de [act].
+String companionsViewJs(String characterJson, String catalogJson) => jsonEncode(
+      companionsView(
+        Character.fromJson(jsonDecode(characterJson) as Map<String, dynamic>),
+        _repoPara(catalogJson),
+      ),
+    );
+
+/// Cómo se vería una forma invocada con un espacio de [level]
+/// (`companionPreview`): `{profile, row}`, o `null` si no existe.
+String companionPreviewJs(
+  String characterJson,
+  String catalogJson,
+  String option,
+  String creature,
+  int level,
+) =>
+    jsonEncode(
+      companionPreview(
+        Character.fromJson(jsonDecode(characterJson) as Map<String, dynamic>),
+        _repoPara(catalogJson),
+        option,
+        creature,
+        level,
+      ),
+    );
+
 /// El creador de personajes (`CreationDraft` del motor): aplica [actionJson]
 /// (vacío o `{}` para solo leer) al borrador [draftJson] con sus podas, y
 /// devuelve `CreationDraft.viewJson`: el borrador nuevo, lo que falta y lo
@@ -836,6 +864,8 @@ void main() {
   motor['creationConfirm'] = creationConfirm.toJS;
   motor['creation'] = creation.toJS;
   motor['act'] = act.toJS;
+  motor['companionsView'] = companionsViewJs.toJS;
+  motor['companionPreview'] = companionPreviewJs.toJS;
   motor['spellEdit'] = spellEdit.toJS;
   motor['innateCantripOptions'] = innateCantripOptions.toJS;
   motor['magicItemPlans'] = magicItemPlans.toJS;

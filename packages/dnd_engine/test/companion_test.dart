@@ -885,4 +885,192 @@ void main() {
       expect(restored.concentratingOn, 'Invocar Dragón');
     });
   });
+  group('companionsView', () {
+    late ContentRepository srd;
+    setUpAll(() async {
+      srd = await ContentRepository.loadFromDirectory('lib/assets/srd_2024');
+    });
+
+    Character lanzador(
+      String classId,
+      int level, {
+      List<String> spells = const [],
+      List<String>? history,
+      CombatState? combat,
+    }) =>
+        Character(
+          id: 'probe',
+          name: 'Prueba',
+          raceId: 'human',
+          classId: classId,
+          backgroundId: 'sage',
+          level: level,
+          classHistory: history ?? const [],
+          spellIds: spells,
+          assignedScores: {for (final a in Ability.values) a: 14},
+          hpPerLevel: List.filled(history?.length ?? level, 5),
+          combat: combat,
+        );
+
+    Map<String, dynamic> option(Map<String, dynamic> view, String id) =>
+        (view['options'] as List)
+            .cast<Map<String, dynamic>>()
+            .firstWhere((o) => o['id'] == id);
+
+    test('el Paladín ve el uso gratis y los espacios desde el mínimo', () {
+      final c = lanzador('paladin', 5);
+      final sheet = CharacterCompiler(srd).compile(c);
+      final o = option(companionsView(c, srd), 'otherworldly-steed');
+      final recurso = sheet.resources
+          .firstWhere((r) => r.id == innateSpellResourceId('find-steed'));
+
+      expect(o['scales'], isTrue);
+      expect(o['free'], {
+        'name': recurso.name,
+        'left': recurso.max,
+        'max': recurso.max,
+      });
+      expect(
+        [for (final s in o['slots'] as List) (s as Map)['level']],
+        [
+          for (final l in sheet.normalSpellSlotsByLevel.keys.toList()..sort())
+            if (l >= o['minSpellLevel']) l,
+        ],
+      );
+
+      final gastado = c.copyWith(
+        combat: CombatState(resourceUsage: {recurso.key: recurso.max}),
+      );
+      expect(
+        option(companionsView(gastado, srd), 'otherworldly-steed')['free'],
+        containsPair('left', 0),
+      );
+    });
+
+    test('un multiclase con pacto ofrece los dos pagos, el de pacto al final',
+        () {
+      final c = lanzador(
+        'artificer',
+        8,
+        spells: ['homunculus-servant'],
+        history: [...List.filled(5, 'artificer'), ...List.filled(3, 'warlock')],
+      );
+      final o = option(companionsView(c, srd), 'homunculus-servant');
+      final slots = (o['slots'] as List).cast<Map<String, dynamic>>();
+
+      expect(slots.where((s) => !s['pact']), isNotEmpty);
+      expect(slots.last['pact'], isTrue);
+    });
+
+    test('un compañero que no escala no ofrece pagos', () {
+      final c = lanzador('wizard', 3, spells: ['find-familiar']);
+      final o = option(companionsView(c, srd), 'familiar');
+      expect(o['scales'], isFalse);
+      expect(o['slots'], isEmpty);
+      expect(o['free'], isNull);
+    });
+
+    test('going nombra a quien se va cuando ya está lleno', () {
+      final vacio = lanzador('wizard', 3, spells: ['find-familiar']);
+      expect(option(companionsView(vacio, srd), 'familiar')['going'], isNull);
+
+      final lleno = vacio.copyWith(
+        combat: CombatState(companions: [
+          CompanionInstance(optionId: 'familiar', creatureId: 'bat'),
+        ]),
+      );
+      expect(
+        option(companionsView(lleno, srd), 'familiar')['going'],
+        srd.creature('bat')!.name,
+      );
+    });
+
+    test('el que sostiene la concentración no ocupa lugar si la nueva la corta',
+        () {
+      final c = lanzador('wizard', 11, spells: ['summon-dragon']);
+      final o = CharacterCompiler(srd)
+          .compile(c)
+          .companions
+          .firstWhere((o) => o.id == 'summon-dragon');
+      final enJuego = c.copyWith(
+        combat: CombatState(
+          concentratingOn: 'Invocar dragón',
+          companions: [
+            CompanionInstance(
+              optionId: o.id,
+              creatureId: o.forms.first.id,
+              concentration: true,
+            ),
+          ],
+        ),
+      );
+      expect(option(companionsView(enJuego, srd), o.id)['going'], isNull);
+    });
+
+    test('las instancias llevan su índice y el perfil con el nivel del espacio',
+        () {
+      final c = lanzador('artificer', 11, spells: ['homunculus-servant']);
+      final sheet = CharacterCompiler(srd).compile(c);
+      final o =
+          sheet.companions.firstWhere((o) => o.id == 'homunculus-servant');
+      final nivel = o.minSpellLevel + 1;
+      final enJuego = c.copyWith(
+        combat: CombatState(companions: [
+          CompanionInstance(
+            optionId: o.id,
+            creatureId: o.forms.first.id,
+            spellLevel: nivel,
+            currentHp: 3,
+          ),
+        ]),
+      );
+
+      final i = (companionsView(enJuego, srd)['instances'] as List).single
+          as Map<String, dynamic>;
+      final esperado = o.forms.first
+          .resolve(CombatOps.companionVars(sheet, spellLevel: nivel));
+
+      expect(i['index'], 0);
+      expect(i['gone'], isFalse);
+      expect(i['maxHp'], esperado.maxHp);
+      expect((i['profile'] as Map)['hp'], '${esperado.maxHp}');
+      expect((i['profile'] as Map)['ac'], '${esperado.armorClass}');
+      expect(
+        companionPreview(
+            enJuego, srd, o.id, o.forms.first.id, nivel)!['profile'],
+        i['profile'],
+      );
+    });
+
+    test('sacar el conjuro deja al compañero como huérfano', () {
+      final c = lanzador('wizard', 3).copyWith(
+        combat: CombatState(companions: [
+          CompanionInstance(optionId: 'familiar', creatureId: 'bat'),
+        ]),
+      );
+      final v = companionsView(c, srd);
+      expect(v['instances'], isEmpty);
+      expect(v['orphans'], [
+        {'index': 0, 'name': srd.creature('bat')!.name},
+      ]);
+    });
+
+    test('una forma que ya no existe se marca gone, sin perfil', () {
+      final c = lanzador('wizard', 3, spells: ['find-familiar']).copyWith(
+        combat: CombatState(companions: [
+          CompanionInstance(optionId: 'familiar', creatureId: 'ya-no-esta'),
+        ]),
+      );
+      final i = (companionsView(c, srd)['instances'] as List).single as Map;
+      expect(i['gone'], isTrue);
+      expect(i['profile'], isNull);
+      expect(i['row'], isNull);
+    });
+
+    test('la vista previa de algo que no existe es null', () {
+      final c = lanzador('wizard', 3, spells: ['find-familiar']);
+      expect(companionPreview(c, srd, 'nope', 'bat', 0), isNull);
+      expect(companionPreview(c, srd, 'familiar', 'nope', 0), isNull);
+    });
+  });
 }

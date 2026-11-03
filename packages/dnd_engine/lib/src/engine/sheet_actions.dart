@@ -4,6 +4,7 @@ import '../domain/effects.dart';
 import 'character_compiler.dart';
 import 'coin_ops.dart';
 import 'combat_ops.dart';
+import '../domain/spell_slots.dart';
 import 'dice.dart';
 import 'inventory_ops.dart';
 import 'level_up.dart';
@@ -113,6 +114,21 @@ class SheetActions {
   ///   Anotar respeta el cupo y las opciones del pozo; sacar vale siempre, y
   ///   una forma que dejó de calificar queda guardada hasta que se saque.
   ///   `spendHitDie` transformado cura con la CON de la bestia.
+  /// - `summonCompanion` con `option`, `creature` y, si la opción escala con el
+  ///   espacio, `level` y `pact` (paga ese espacio) o `free: true` (paga el uso
+  ///   gratis del conjuro, con el nivel mínimo). `outcome.summoned` es false si
+  ///   la opción o la forma no existen, si el nivel no alcanza, si no queda
+  ///   espacio o uso, y la ficha vuelve intacta. Si invoca: `name` (la forma),
+  ///   `spentSlot` (el nivel pagado o null), `freeName` (el recurso gratis o
+  ///   null), `concentrates`, `brokeConcentration` (había otra) y `dismissed`
+  ///   (los compañeros que se fueron con ella). Si ya hay `maxActive`, el más
+  ///   viejo se reemplaza.
+  /// - `damageCompanion`, `healCompanion` y `companionTempHp` con `index` (su
+  ///   lugar en `combat.companions`) y `amount`; `damageCompanion` cuenta
+  ///   `destroyed` y `name`: a 0 PG el compañero sale de la lista.
+  ///   `dismissCompanion` con `index` cuenta `name`. `setCompanionCondition`
+  ///   con `index`, `condition` y `value`: sus estados no terminan nada. Un
+  ///   `index` que no existe deja la ficha como estaba.
   ///
   /// Una acción desconocida lanza [FormatException]: un cliente desfasado no
   /// tiene que guardar una ficha que el motor no tocó creyendo que sí.
@@ -201,6 +217,105 @@ class SheetActions {
                 if (f != id) f,
             ],
           );
+        }
+      case 'summonCompanion':
+        final option =
+            sheet.companions.where((o) => o.id == action['option']).firstOrNull;
+        final form =
+            option?.forms.where((f) => f.id == action['creature']).firstOrNull;
+        if (option == null || form == null) {
+          outcome['summoned'] = false;
+          c = character;
+          break;
+        }
+        var level = 0;
+        int? spentSlot;
+        String? freeName;
+        var paid = true;
+        if (option.scalesWithSpellLevel) {
+          if (action['free'] == true) {
+            final id = option.spellId == null
+                ? null
+                : innateSpellResourceId(option.spellId!);
+            final r = sheet.resources
+                .where((r) => r.id == id && r.max > 0)
+                .firstOrNull;
+            final used = r == null ? 0 : combat.resourceUsage[r.key] ?? 0;
+            paid = r != null && used < r.max;
+            if (paid) {
+              combat.resourceUsage[r.key] = used + 1;
+              level = option.minSpellLevel;
+              freeName = r.name;
+            }
+          } else {
+            level = (action['level'] as num?)?.toInt() ?? 0;
+            final pact = action['pact'] == true;
+            paid = level >= option.minSpellLevel &&
+                CombatOps.spendSlot(
+                  combat,
+                  pact ? sheet.pactSlotsByLevel : sheet.normalSpellSlotsByLevel,
+                  level,
+                  pact: pact,
+                );
+            if (paid) spentSlot = level;
+          }
+        }
+        // Un rechazo no deja el espacio gastado a medias.
+        if (!paid) {
+          outcome['summoned'] = false;
+          c = character;
+          break;
+        }
+        final spell =
+            option.spellId == null ? null : repo.spell(option.spellId!);
+        final concentrates = spell?.concentration ?? false;
+        // Los nombres se toman antes: `summonCompanion` empieza la
+        // concentración y se lleva a los que la sostenían.
+        outcome
+          ..['dismissed'] =
+              concentrates ? _concentrationCompanions(combat, repo) : <String>[]
+          ..['brokeConcentration'] =
+              concentrates && combat.concentratingOn != null;
+        CombatOps.summonCompanion(
+          combat,
+          option,
+          form,
+          CombatOps.companionVars(sheet, spellLevel: level),
+          concentration: concentrates,
+          concentratingOn: spell?.name ?? '',
+        );
+        outcome
+          ..['summoned'] = true
+          ..['name'] = form.name
+          ..['spentSlot'] = spentSlot
+          ..['freeName'] = freeName
+          ..['concentrates'] = concentrates;
+      case 'damageCompanion' ||
+            'healCompanion' ||
+            'companionTempHp' ||
+            'dismissCompanion' ||
+            'setCompanionCondition':
+        final index = (action['index'] as num?)?.toInt() ?? -1;
+        if (index < 0 || index >= combat.companions.length) break;
+        final i = combat.companions[index];
+        outcome['name'] = repo.creature(i.creatureId)?.name ?? i.creatureId;
+        switch (action['type']) {
+          case 'damageCompanion':
+            outcome['destroyed'] = CombatOps.damageCompanion(combat, i, amount);
+          case 'healCompanion':
+            final max = CombatOps.companionMaxHp(sheet, i);
+            if (max != null) CombatOps.healCompanion(i, max, amount);
+          case 'companionTempHp':
+            CombatOps.setCompanionTempHp(i, amount);
+          case 'dismissCompanion':
+            CombatOps.dismissCompanion(combat, i);
+          default:
+            final condition = action['condition'] as String;
+            if (action['value'] == true) {
+              i.conditions.add(condition);
+            } else {
+              i.conditions.remove(condition);
+            }
         }
       case 'spendHitDie':
         outcome['healed'] = CombatOps.spendHitDie(

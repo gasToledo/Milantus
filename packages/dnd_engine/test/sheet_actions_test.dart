@@ -474,6 +474,266 @@ void main() {
     });
   });
 
+  group('compañeros', () {
+    Character lanzador(
+      String classId,
+      int level, {
+      List<String> spells = const [],
+      List<String>? history,
+      CombatState? combat,
+    }) =>
+        Character(
+          id: classId,
+          name: classId,
+          raceId: 'human',
+          classId: classId,
+          backgroundId: 'sage',
+          level: level,
+          classHistory: history ?? const [],
+          assignedScores: _scores,
+          hpPerLevel: List.filled(history?.length ?? level, 5),
+          spellIds: spells,
+          combat: combat,
+        );
+
+    CompanionOption opcion(Character c, String id) => CharacterCompiler(repo)
+        .compile(c)
+        .companions
+        .firstWhere((o) => o.id == id);
+
+    Map<String, dynamic> invocar(
+      CompanionOption o, {
+      int? level,
+      bool pact = false,
+      bool free = false,
+    }) =>
+        {
+          'type': 'summonCompanion',
+          'option': o.id,
+          'creature': o.forms.first.id,
+          if (level != null) 'level': level,
+          if (pact) 'pact': true,
+          if (free) 'free': true,
+        };
+
+    test('un espacio se gasta y los PG salen del nivel elegido', () {
+      final c = lanzador('artificer', 11, spells: ['homunculus-servant']);
+      final o = opcion(c, 'homunculus-servant');
+      final sheet = CharacterCompiler(repo).compile(c);
+      final nivel = o.minSpellLevel + 1;
+      expect(sheet.normalSpellSlotsByLevel[nivel], greaterThan(0));
+
+      final r = act(c, invocar(o, level: nivel));
+
+      expect(r.outcome['summoned'], isTrue);
+      expect(r.outcome['spentSlot'], nivel);
+      expect(r.character.combat.spellSlotsUsed[nivel], 1);
+      final i = r.character.combat.companions.single;
+      expect(i.spellLevel, nivel);
+      expect(
+        i.currentHp,
+        resolveCreatureInt(o.forms.first.hp,
+            CombatOps.companionVars(sheet, spellLevel: nivel)),
+      );
+    });
+
+    test('bajo el nivel mínimo o sin espacios se rechaza y la ficha no cambia',
+        () {
+      final c = lanzador('artificer', 11, spells: ['homunculus-servant']);
+      final o = opcion(c, 'homunculus-servant');
+      final nivel = o.minSpellLevel;
+      final agotado = c.copyWith(
+        combat: CombatState(
+          spellSlotsUsed: {
+            nivel: CharacterCompiler(repo)
+                .compile(c)
+                .normalSpellSlotsByLevel[nivel]!,
+          },
+        ),
+      );
+
+      for (final (ficha, level) in [(c, nivel - 1), (agotado, nivel)]) {
+        final r = act(ficha, invocar(o, level: level));
+        expect(r.outcome['summoned'], isFalse, reason: '$level');
+        expect(r.character.toJson(), ficha.toJson(), reason: '$level');
+      }
+    });
+
+    test('Artífice 5 y Brujo 3 pagan con el espacio de pacto', () {
+      final c = lanzador(
+        'artificer',
+        8,
+        spells: ['homunculus-servant'],
+        history: [...List.filled(5, 'artificer'), ...List.filled(3, 'warlock')],
+      );
+      final sheet = CharacterCompiler(repo).compile(c);
+      final o = opcion(c, 'homunculus-servant');
+      final nivel = sheet.pactSlotsByLevel.keys.single;
+      expect(nivel, greaterThanOrEqualTo(o.minSpellLevel));
+
+      final r = act(c, invocar(o, level: nivel, pact: true));
+
+      expect(r.outcome['summoned'], isTrue);
+      expect(r.character.combat.pactSlotsUsed[nivel], 1);
+      expect(r.character.combat.spellSlotsUsed, isEmpty);
+    });
+
+    test('el Paladín usa el Corcel Fiel gratis, sin espacio y hasta agotarlo',
+        () {
+      final c = lanzador('paladin', 5);
+      final o = opcion(c, 'otherworldly-steed');
+      final recurso = CharacterCompiler(repo)
+          .compile(c)
+          .resources
+          .firstWhere((r) => r.id == innateSpellResourceId('find-steed'));
+
+      final r = act(c, invocar(o, free: true));
+
+      expect(r.outcome['summoned'], isTrue);
+      expect(r.outcome['freeName'], recurso.name);
+      expect(r.outcome['spentSlot'], isNull);
+      expect(r.character.combat.resourceUsage[recurso.key], 1);
+      expect(r.character.combat.spellSlotsUsed, isEmpty);
+      expect(r.character.combat.companions.single.spellLevel, o.minSpellLevel);
+
+      final otra = act(r.character, invocar(o, free: true));
+      expect(otra.outcome['summoned'], isFalse);
+      expect(otra.character.toJson(), r.character.toJson());
+    });
+
+    test('un conjuro de concentración corta la anterior y despide a la suya',
+        () {
+      final c = lanzador(
+        'wizard',
+        11,
+        spells: ['summon-dragon', 'summon-undead'],
+      );
+      final previo = opcion(c, 'summon-undead');
+      final o = opcion(c, 'summon-dragon');
+      final enJuego = c.copyWith(
+        combat: CombatState(
+          concentratingOn: 'Invocar muerto viviente',
+          companions: [
+            CompanionInstance(
+              optionId: previo.id,
+              creatureId: previo.forms.first.id,
+              spellLevel: previo.minSpellLevel,
+              concentration: true,
+              currentHp: 10,
+            ),
+          ],
+        ),
+      );
+
+      final r = act(enJuego, invocar(o, level: o.minSpellLevel));
+
+      expect(r.outcome['concentrates'], isTrue);
+      expect(r.outcome['brokeConcentration'], isTrue);
+      expect(r.outcome['dismissed'], [previo.forms.first.name]);
+      expect(r.character.combat.concentratingOn,
+          repo.spell('summon-dragon')!.name);
+      expect(r.character.combat.companions.single.optionId, o.id);
+      expect(r.character.combat.companions.single.concentration, isTrue);
+    });
+
+    test('con el máximo lleno la nueva invocación reemplaza a la más vieja',
+        () {
+      final c = lanzador('wizard', 3, spells: ['find-familiar']);
+      final o = opcion(c, 'familiar');
+      expect(o.maxActive, 1);
+      final otra = o.forms.last.id;
+
+      final r1 = act(c, invocar(o));
+      final r2 = act(r1.character, {
+        'type': 'summonCompanion',
+        'option': o.id,
+        'creature': otra,
+      });
+
+      expect(r2.character.combat.companions.single.creatureId, otra);
+    });
+
+    test('el daño que lo deja en 0 lo destruye; un índice ajeno no toca nada',
+        () {
+      final c = lanzador('wizard', 3, spells: ['find-familiar']);
+      final o = opcion(c, 'familiar');
+      final invocado = act(c, invocar(o)).character;
+      final hp = invocado.combat.companions.single.currentHp;
+
+      final herido = act(invocado, {
+        'type': 'damageCompanion',
+        'index': 0,
+        'amount': hp - 1,
+      });
+      expect(herido.outcome['destroyed'], isFalse);
+      expect(herido.character.combat.companions.single.currentHp, 1);
+
+      final muerto = act(herido.character, {
+        'type': 'damageCompanion',
+        'index': 0,
+        'amount': 5,
+      });
+      expect(muerto.outcome['destroyed'], isTrue);
+      expect(muerto.character.combat.companions, isEmpty);
+
+      for (final type in [
+        'damageCompanion',
+        'healCompanion',
+        'companionTempHp',
+        'dismissCompanion',
+        'setCompanionCondition',
+      ]) {
+        final r = act(invocado, {
+          'type': type,
+          'index': 3,
+          'amount': 5,
+          'condition': 'prone',
+          'value': true,
+        });
+        expect(r.character.toJson(), invocado.toJson(), reason: type);
+      }
+    });
+
+    test('curar, PG temporales, estados y despedir', () {
+      final c = lanzador('wizard', 3, spells: ['find-familiar']);
+      final o = opcion(c, 'familiar');
+      // Una forma con PG de sobra: el murciélago tiene 1 y cae al primer golpe.
+      final vars = CombatOps.companionVars(CharacterCompiler(repo).compile(c));
+      final grande =
+          o.forms.firstWhere((f) => resolveCreatureInt(f.hp, vars) > 3);
+      var f = act(c, {...invocar(o), 'creature': grande.id}).character;
+      final max = f.combat.companions.single.currentHp;
+
+      f = act(f, {'type': 'damageCompanion', 'index': 0, 'amount': 1})
+          .character;
+      f = act(f, {'type': 'healCompanion', 'index': 0, 'amount': 50}).character;
+      expect(f.combat.companions.single.currentHp, max);
+
+      f = act(f, {'type': 'companionTempHp', 'index': 0, 'amount': 4})
+          .character;
+      expect(f.combat.companions.single.tempHp, 4);
+
+      f = act(f, {
+        'type': 'setCompanionCondition',
+        'index': 0,
+        'condition': 'stunned',
+        'value': true,
+      }).character;
+      expect(f.combat.companions.single.conditions, {'stunned'});
+      f = act(f, {
+        'type': 'setCompanionCondition',
+        'index': 0,
+        'condition': 'stunned',
+        'value': false,
+      }).character;
+      expect(f.combat.companions.single.conditions, isEmpty);
+
+      final fuera = act(f, {'type': 'dismissCompanion', 'index': 0});
+      expect(fuera.character.combat.companions, isEmpty);
+      expect(fuera.outcome['name'], grande.name);
+    });
+  });
+
   test('una acción desconocida no devuelve una ficha', () {
     expect(
       () => act(monje(), {'type': 'fly'}),
