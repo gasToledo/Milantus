@@ -650,7 +650,11 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    guarda por `PUT /api/npcs/:id`.
 7. Homebrew, importación/exportación y el resto, entre ello escribir en
    `/api/settings` (hasta entonces, el tema elegido en el navegador gana sobre
-   el de la cuenta).
+   el de la cuenta). Opcional, sin equivalente en Flutter y sin diseñar todavía:
+   acomodar las tarjetas de Combate y Personaje con un modo de edición, guardado
+   en la cuenta y no en el personaje, porque es una preferencia de quien mira la
+   ficha. Depende de escribir en `/api/settings`; antes hay que comprobar que un
+   guardado de Flutter, con su lista cerrada de campos, no borre el orden.
 
 ## Cómo se prueba
 
