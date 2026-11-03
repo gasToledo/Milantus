@@ -1,6 +1,9 @@
 import '../data/content_repository.dart';
 import '../domain/character.dart';
 import '../domain/effects.dart';
+import '../domain/ability.dart';
+import '../domain/language.dart';
+import 'character_choices.dart';
 import 'character_compiler.dart';
 import 'coin_ops.dart';
 import 'combat_ops.dart';
@@ -129,6 +132,20 @@ class SheetActions {
   ///   `dismissCompanion` con `index` cuenta `name`. `setCompanionCondition`
   ///   con `index`, `condition` y `value`: sus estados no terminan nada. Un
   ///   `index` que no existe deja la ficha como estaba.
+  /// - `setFeatureChoice`, `setProficiencyChoice` y `setSpellChoice` con
+  ///   `group`, `id` y `value`: marcan o desmarcan una opción de un cupo de
+  ///   rasgo, de competencia o Pericia, o de conjuros. Marcar respeta el cupo
+  ///   y las opciones (sin requisito sin cumplir, ni bloqueada por otro cupo);
+  ///   sacar vale siempre, también en un cupo que no se puede reemplazar: si
+  ///   no, un toque equivocado deja sin salida. Los demás grupos se conservan,
+  ///   y un grupo que la ficha no tiene deja todo como estaba.
+  /// - `setLanguage` con `group` (null es el origen), `id` y `value`: el tope
+  ///   del origen es [Language.originChoiceCount].
+  /// - `setSize`, `setLineage`, `setSpeciesAbility` (`ability`: INT, SAB o CAR)
+  ///   y `setFeatAbility` (`feat` y `ability`): el origen. Un valor fuera de
+  ///   sus opciones no toca la ficha. `setLineage` no limpia la aptitud
+  ///   mágica: ver el comentario de `_resolveLineage` en Flutter.
+  /// - `setUnarmoredDefense` con `classId`, entre las fórmulas de la ficha.
   ///
   /// Una acción desconocida lanza [FormatException]: un cliente desfasado no
   /// tiene que guardar una ficha que el motor no tocó creyendo que sí.
@@ -602,10 +619,138 @@ class SheetActions {
             );
           }
         }
+      case 'setFeatureChoice' ||
+            'setProficiencyChoice' ||
+            'setSpellChoice' ||
+            'setLanguage':
+        c = _setChoice(c, repo, action);
+      case 'setSize':
+        final size = action['size'] as String;
+        if ((repo.race(c.raceId)?.sizeOptions ?? const []).contains(size)) {
+          c = c.copyWith(chosenSize: size);
+        }
+      case 'setLineage':
+        final lineage = action['lineage'] as String;
+        // La aptitud mágica no se limpia: los linajes que lanzan conjuros
+        // ofrecen las mismas opciones, y borrarla solo obligaría a elegir de
+        // nuevo lo mismo. Si el nuevo la necesita y falta, el aviso sale solo.
+        if (repo.lineagesForRace(c.raceId).any((l) => l.id == lineage)) {
+          c = c.copyWith(lineageId: lineage);
+        }
+      case 'setSpeciesAbility':
+        final a = _abilityNamed(action['ability'] as String);
+        if (a == Ability.intelligence ||
+            a == Ability.wisdom ||
+            a == Ability.charisma) {
+          c = c.copyWith(speciesSpellcastingAbility: a);
+        }
+      case 'setFeatAbility':
+        final feat = action['feat'] as String;
+        final a = _abilityNamed(action['ability'] as String);
+        if (a != null &&
+            (repo.feat(feat)?.spellcastingAbilityOptions ?? const [])
+                .contains(a)) {
+          c = c.copyWith(
+            featSpellcastingAbilities: {
+              ...c.featSpellcastingAbilities,
+              feat: a
+            },
+          );
+        }
+      case 'setUnarmoredDefense':
+        final classId = action['classId'] as String;
+        if (sheet.unarmoredDefenseOptions.any((o) => o.classId == classId)) {
+          c = c.copyWith(unarmoredDefenseClassId: classId);
+        }
       default:
         throw FormatException('Acción de ficha desconocida: ${action['type']}');
     }
     return SheetActionResult(c, outcome);
+  }
+
+  static Ability? _abilityNamed(String name) =>
+      Ability.values.where((a) => a.name == name).firstOrNull;
+
+  /// Marcar o desmarcar una opción de un cupo de elección. Las opciones, el
+  /// tope y los bloqueos salen de [choicesView]: la regla vive en un solo lado.
+  static Character _setChoice(
+    Character c,
+    ContentRepository repo,
+    Map<String, dynamic> action,
+  ) {
+    final type = action['type'] as String;
+    final id = action['id'] as String;
+    final on = action['value'] == true;
+    final view = choicesView(c, repo);
+
+    // La lista nueva, o null si la acción no corresponde.
+    List<String>? edit(List<String> chosen, int count, bool Function() ok) {
+      // Sacar vale siempre, también en un cupo no reemplazable.
+      // ponytail: el `Set` de la UI no representa una opción repetible tomada
+      // dos veces, así que acá no se toma dos veces (`contains` abajo) y
+      // sacar quita una aparición. Para repetir está la subida de nivel.
+      if (!on) return [...chosen]..remove(id);
+      if (chosen.length >= count || chosen.contains(id) || !ok()) return null;
+      return [...chosen, id];
+    }
+
+    Map<String, dynamic>? slot(Object? list, String? groupId) => (list as List)
+        .cast<Map<String, dynamic>>()
+        .where((g) => g['groupId'] == groupId)
+        .firstOrNull;
+
+    bool hasOption(Map<String, dynamic> g, bool Function(Map) ok) =>
+        (g['options'] as List).cast<Map>().any((o) => o['id'] == id && ok(o));
+
+    List<String> strings(Object? l) => [for (final e in l as List) e as String];
+
+    List<String>? editGroup(Map<String, dynamic> g, bool Function(Map) ok) =>
+        edit(
+          strings(g['chosen']),
+          g['count'] as int,
+          () => hasOption(g, ok),
+        );
+
+    final groupId = action['group'] as String?;
+    switch (type) {
+      case 'setFeatureChoice':
+        final g = slot(view['features'], groupId);
+        final next = g == null ? null : editGroup(g, (o) => o['unmet'] == null);
+        if (g == null || next == null) return c;
+        return c.copyWith(
+          featureChoices: {...c.featureChoices, groupId!: next},
+        );
+      case 'setProficiencyChoice':
+        final g = slot(view['proficiencies'], groupId);
+        final next =
+            g == null ? null : editGroup(g, (o) => o['locked'] != true);
+        if (g == null || next == null) return c;
+        // `chosenProficiencies` vacío, como el editor de Flutter: la lista
+        // suelta heredada taparía lo que se elige acá.
+        return c.copyWith(
+          chosenProficiencies: const [],
+          proficiencyChoices: {...c.proficiencyChoices, groupId!: next},
+        );
+      case 'setSpellChoice':
+        final g = slot(view['spells'], groupId);
+        final next = g == null ? null : editGroup(g, (_) => true);
+        if (g == null || next == null) return c;
+        return c.copyWith(spellChoices: {...c.spellChoices, groupId!: next});
+      default: // setLanguage
+        if (groupId == null) {
+          final next = edit(
+            c.languages,
+            Language.originChoiceCount,
+            () => Language.originChoices.any((l) => l.id == id),
+          );
+          return next == null ? c : c.copyWith(languages: next);
+        }
+        final g = slot((view['languages'] as Map)['slots'], groupId);
+        final next = g == null ? null : editGroup(g, (_) => true);
+        if (g == null || next == null) return c;
+        return c
+            .copyWith(languageChoices: {...c.languageChoices, groupId: next});
+    }
   }
 
   /// Los nombres de los compañeros que sostiene la concentración actual: los

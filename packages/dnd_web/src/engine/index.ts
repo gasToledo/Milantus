@@ -8,6 +8,7 @@ export type * from './types';
 
 interface DartEngine {
   compute(characterJson: string, catalogJson: string): string;
+  choicesView(characterJson: string, catalogJson: string): string;
   migrateCharacter(characterJson: string): string;
   setLanguage(code: string): void;
   applyTranslation(packJson: string, overlayJson: string): string;
@@ -71,6 +72,65 @@ export function computeSheet(
   return JSON.parse(
     engine().compute(JSON.stringify(character), catalogJson(catalog)),
   ) as ComputedSheet;
+}
+
+/** Un aviso del motor (`CharacterValidator`). `info` es algo por elegir, no
+ *  una ficha rota. */
+export interface SheetWarning {
+  code: string;
+  message: string;
+  severity: 'info' | 'warning';
+}
+
+export interface ChoiceGroup {
+  groupId: string;
+  name: string;
+  count: number;
+  replaceable: boolean;
+  chosen: string[];
+  pending: number;
+}
+
+/** Lo que la ficha propia deja elegir o revisar (`choicesView` del motor). */
+export interface ChoicesView {
+  warnings: SheetWarning[];
+  /** Hay algún cupo completo que se puede cambiar. */
+  replaceable: boolean;
+  features: (ChoiceGroup & {
+    options: { id: string; name: string; description: string; homebrew: boolean; unmet: string | null }[];
+  })[];
+  proficiencies: (ChoiceGroup & {
+    expertise: boolean;
+    options: { id: string; label: string; locked: boolean }[];
+  })[];
+  spells: (ChoiceGroup & {
+    grantsSpells: boolean;
+    options: { id: string; name: string; level: number }[];
+  })[];
+  languages: {
+    originCount: number;
+    origin: { id: string; label: string }[];
+    chosenOrigin: string[];
+    universal: { id: string; label: string };
+    slots: (Omit<ChoiceGroup, 'replaceable'> & { options: { id: string; label: string }[] })[];
+  };
+  origin: {
+    sizes: { id: string; label: string }[];
+    size: string | null;
+    lineages: { id: string; name: string; description: string }[];
+    lineage: string | null;
+    speciesAbilityPending: boolean;
+    speciesAbilityOptions: { id: AbilityId; label: string }[];
+    speciesAbility: AbilityId | null;
+    featAbilities: { feat: string; name: string; options: { id: AbilityId; label: string }[]; chosen: AbilityId | null }[];
+  };
+}
+
+/** Las advertencias y los cupos de elección de la ficha, del motor. */
+export function choicesView(character: CharacterJson, catalog: Catalog): ChoicesView {
+  return JSON.parse(
+    engine().choicesView(JSON.stringify(character), catalogJson(catalog)),
+  ) as ChoicesView;
 }
 
 /** Lleva una ficha al esquema actual sin modificar la de entrada. */
@@ -719,6 +779,14 @@ export type SheetAction =
   | { type: 'enterWildShape'; creature: string }
   | { type: 'leaveWildShape' }
   | { type: 'setWildShapeForm'; creature: string; value: boolean }
+  | { type: 'setFeatureChoice' | 'setProficiencyChoice' | 'setSpellChoice'; group: string; id: string; value: boolean }
+  /** `group` null es la elección del origen. */
+  | { type: 'setLanguage'; group: string | null; id: string; value: boolean }
+  | { type: 'setSize'; size: string }
+  | { type: 'setLineage'; lineage: string }
+  | { type: 'setSpeciesAbility'; ability: AbilityId }
+  | { type: 'setFeatAbility'; feat: string; ability: AbilityId }
+  | { type: 'setUnarmoredDefense'; classId: string }
   | { type: 'summonCompanion'; option: string; creature: string; level?: number; pact?: boolean; free?: boolean }
   | { type: 'damageCompanion' | 'healCompanion' | 'companionTempHp'; index: number; amount: number }
   | { type: 'dismissCompanion'; index: number }

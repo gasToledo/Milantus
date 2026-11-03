@@ -284,6 +284,19 @@ final _acciones = <String, (String, Map<String, dynamic>)>{
     'druida',
     {'type': 'setWildShapeForm', 'creature': 'panther', 'value': true},
   ),
+  'accion-elegir-rasgo': (
+    'brujo',
+    {
+      'type': 'setFeatureChoice',
+      'group': 'warlock-invocation',
+      'id': 'armor-of-shadows',
+      'value': true,
+    },
+  ),
+  'accion-linaje': (
+    'brujo',
+    {'type': 'setLineage', 'lineage': 'gnome-rock'},
+  ),
   'accion-conjuros': (
     'multiclase',
     {
@@ -621,6 +634,12 @@ Future<void> main(List<String> args) async {
     'companionsView',
     const [],
     companionsView(invocador, repo),
+  );
+  puenteCon(
+    'puente-elecciones',
+    'choicesView',
+    const [],
+    choicesView(invocador, repo),
   );
   puenteCon(
     'puente-companero-vista-previa',

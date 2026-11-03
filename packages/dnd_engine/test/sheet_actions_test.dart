@@ -1108,4 +1108,216 @@ void main() {
               .clamp(0, 1 << 30));
     });
   });
+
+  group('elecciones', () {
+    Character brujo() => Character(
+          id: 'brujo',
+          name: 'Brujo',
+          raceId: 'human',
+          classId: 'warlock',
+          backgroundId: 'sage',
+          level: 5,
+          assignedScores: _scores,
+          hpPerLevel: List.filled(5, 6),
+        );
+
+    List<Map<String, dynamic>> lista(Object? l) =>
+        (l as List).cast<Map<String, dynamic>>();
+    Map<String, dynamic> primero(Character c, String clave) =>
+        lista(choicesView(c, repo)[clave]).first;
+    List<String> opciones(Map<String, dynamic> g, bool Function(Map) donde) => [
+          for (final o in lista(g['options']))
+            if (donde(o)) o['id'] as String,
+        ];
+    Map<String, dynamic> eleccion(
+      String type,
+      String group,
+      String id, {
+      bool value = true,
+    }) =>
+        {'type': type, 'group': group, 'id': id, 'value': value};
+
+    test('agregar respeta el cupo y las opciones', () {
+      var c = brujo();
+      final g = primero(c, 'features');
+      final libres = opciones(g, (o) => o['unmet'] == null);
+      final count = g['count'] as int;
+      expect(libres.length, greaterThan(count));
+
+      for (final id in libres.take(count + 1)) {
+        c = act(c, eleccion('setFeatureChoice', g['groupId'], id)).character;
+      }
+      expect(c.featureChoices[g['groupId']], libres.take(count));
+
+      final fuera = act(c, eleccion('setFeatureChoice', g['groupId'], 'nada'));
+      expect(fuera.character.toJson(), c.toJson());
+    });
+
+    test('una opción con requisito sin cumplir se rechaza', () {
+      final c = brujo();
+      final g = primero(c, 'features');
+      final bloqueada = opciones(g, (o) => o['unmet'] != null).first;
+
+      final r = act(c, eleccion('setFeatureChoice', g['groupId'], bloqueada));
+
+      expect(r.character.featureChoices[g['groupId']] ?? const [], isEmpty);
+    });
+
+    test('sacar vale con el cupo lleno y los demás grupos se conservan', () {
+      var c = brujo();
+      final g = primero(c, 'features');
+      final libres = opciones(g, (o) => o['unmet'] == null);
+      final count = g['count'] as int;
+      c = c.copyWith(featureChoices: {
+        'otro-grupo': ['x'],
+        g['groupId']: libres.take(count).toList(),
+      });
+
+      final r = act(
+        c,
+        eleccion('setFeatureChoice', g['groupId'], libres.first, value: false),
+      );
+
+      expect(
+          r.character.featureChoices[g['groupId']], libres.take(count).skip(1));
+      expect(r.character.featureChoices['otro-grupo'], ['x']);
+    });
+
+    test('un grupo que la ficha no tiene deja todo intacto', () {
+      final c = brujo();
+      for (final type in [
+        'setFeatureChoice',
+        'setProficiencyChoice',
+        'setSpellChoice',
+        'setLanguage',
+      ]) {
+        final r = act(c, eleccion(type, 'no-existe', 'x'));
+        expect(r.character.toJson(), c.toJson(), reason: type);
+      }
+    });
+
+    test('las competencias bloquean lo que el personaje ya tiene', () {
+      final c = Character(
+        id: 'h',
+        name: 'H',
+        raceId: 'human',
+        classId: 'fighter',
+        backgroundId: 'sage',
+        level: 1,
+        featIds: const ['skilled'],
+        assignedScores: _scores,
+        hpPerLevel: const [10],
+      );
+      final g = primero(c, 'proficiencies');
+      final tenidas = opciones(g, (o) => o['locked'] == true);
+      final libres = opciones(g, (o) => o['locked'] != true);
+      expect(tenidas, isNotEmpty);
+
+      final rechazada = act(
+        c,
+        eleccion('setProficiencyChoice', g['groupId'], tenidas.first),
+      );
+      expect(
+          rechazada.character.proficiencyChoices[g['groupId']] ?? [], isEmpty);
+
+      final ok = act(
+        c,
+        eleccion('setProficiencyChoice', g['groupId'], libres.first),
+      );
+      expect(ok.character.proficiencyChoices[g['groupId']], [libres.first]);
+      expect(ok.character.chosenProficiencies, isEmpty);
+      expect(primero(ok.character, 'proficiencies')['pending'],
+          (g['count'] as int) - 1);
+    });
+
+    test('los conjuros y los idiomas respetan su cupo', () {
+      var c = brujo();
+      final g = primero(c, 'spells');
+      final id = lista(g['options']).first['id'] as String;
+      final r = act(c, eleccion('setSpellChoice', g['groupId'], id));
+      expect(r.character.spellChoices[g['groupId']], [id]);
+
+      // Origen: tope de dos, y solo de los estándar.
+      for (final lang in ['draconic', 'elvish', 'orc', 'abyssal']) {
+        c = act(c, {'type': 'setLanguage', 'id': lang, 'value': true})
+            .character;
+      }
+      expect(c.languages, ['draconic', 'elvish']);
+      c = act(c, {'type': 'setLanguage', 'id': 'draconic', 'value': false})
+          .character;
+      expect(c.languages, ['elvish']);
+    });
+
+    test('setLineage no toca la aptitud mágica y rechaza lo ajeno', () {
+      final elfa = Character(
+        id: 'e',
+        name: 'E',
+        raceId: 'elf',
+        classId: 'druid',
+        backgroundId: 'sage',
+        level: 1,
+        speciesSpellcastingAbility: Ability.wisdom,
+        assignedScores: _scores,
+        hpPerLevel: const [8],
+      );
+      final r = act(elfa, {'type': 'setLineage', 'lineage': 'elf-high'});
+      expect(r.character.lineageId, 'elf-high');
+      expect(r.character.speciesSpellcastingAbility, Ability.wisdom);
+
+      final ajeno = act(r.character, {'type': 'setLineage', 'lineage': 'nada'});
+      expect(ajeno.character.lineageId, 'elf-high');
+
+      final aptitud = act(
+        r.character,
+        {'type': 'setSpeciesAbility', 'ability': 'strength'},
+      );
+      expect(aptitud.character.speciesSpellcastingAbility, Ability.wisdom);
+    });
+
+    test('setUnarmoredDefense rechaza una clase fuera de las opciones', () {
+      final c = Character(
+        id: 'm',
+        name: 'M',
+        raceId: 'human',
+        classId: 'monk',
+        backgroundId: 'soldier',
+        classHistory: const ['monk', 'barbarian'],
+        assignedScores: {for (final a in Ability.values) a: 14},
+        hpPerLevel: const [8, 8],
+      );
+      final formulas =
+          CharacterCompiler(repo).compile(c).unarmoredDefenseOptions;
+      expect(formulas.length, greaterThan(1));
+
+      final otra = formulas.last.classId!;
+      final r = act(c, {'type': 'setUnarmoredDefense', 'classId': otra});
+      expect(r.character.unarmoredDefenseClassId, otra);
+
+      final fuera =
+          act(c, {'type': 'setUnarmoredDefense', 'classId': 'wizard'});
+      expect(fuera.character.unarmoredDefenseClassId, isNull);
+    });
+
+    test('choicesView cuenta lo pendiente y lo reemplazable', () {
+      final c = brujo();
+      final v = choicesView(c, repo);
+      final g = primero(c, 'features');
+
+      expect(g['pending'], g['count']);
+      expect(g['replaceable'], isTrue);
+      // Con todo pendiente nada está completo: no hay nada que reemplazar.
+      expect(v['replaceable'], isFalse);
+      expect(
+        lista(v['warnings']).map((w) => w['code']),
+        contains('feature_choice_pending'),
+      );
+
+      final libres = opciones(g, (o) => o['unmet'] == null);
+      final lleno = c.copyWith(featureChoices: {
+        g['groupId']: libres.take(g['count'] as int).toList(),
+      });
+      expect(choicesView(lleno, repo)['replaceable'], isTrue);
+      expect(primero(lleno, 'features')['pending'], 0);
+    });
+  });
 }

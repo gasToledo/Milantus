@@ -50,6 +50,15 @@ ContentRepository _repoPara(String catalogJson) {
   return _repo = repo;
 }
 
+/// Lo que la ficha deja elegir o revisar (`choicesView`): las advertencias y
+/// los cupos con sus opciones, para los avisos y la pantalla de elecciones.
+String choicesViewJs(String characterJson, String catalogJson) => jsonEncode(
+      choicesView(
+        Character.fromJson(jsonDecode(characterJson) as Map<String, dynamic>),
+        _repoPara(catalogJson),
+      ),
+    );
+
 /// Ficha (JSON de `Character`) + catálogo → `ComputedSheet.toJson()` completo.
 /// `Character.fromJson` ya migra: una ficha vieja entra igual que en el
 /// servidor.
@@ -882,6 +891,7 @@ void main() {
   motor['magicItemPlans'] = magicItemPlans.toJS;
   motor['magicBaseOptions'] = magicBaseOptions.toJS;
   motor['compute'] = compute.toJS;
+  motor['choicesView'] = choicesViewJs.toJS;
   motor['migrateCharacter'] = migrateCharacter.toJS;
   motor['setLanguage'] = setLanguage.toJS;
   motor['applyTranslation'] = applyTranslation.toJS;
