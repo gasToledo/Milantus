@@ -50,3 +50,4 @@ export 'src/engine/wild_shape.dart';
 export 'src/engine/exhaustion.dart';
 export 'src/engine/sheet_diff.dart';
 export 'src/engine/npc_stats.dart';
+export 'src/engine/portrait_prompt.dart';

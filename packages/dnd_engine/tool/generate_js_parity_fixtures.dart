@@ -77,6 +77,9 @@ final _casos = <String, Character>{
         createdAt: DateTime.utc(2026, 3, 20),
       ),
     ],
+    // Dos retratos, el segundo con su prompt, para el alta y la baja.
+    portraitPaths: const ['retrato-a', 'retrato-b'],
+    portraitPrompts: const {'retrato-b': 'prompt de b'},
     backgroundAbilityBonuses: const {
       Ability.strength: 2,
       Ability.constitution: 1,
@@ -324,6 +327,14 @@ final _acciones = <String, (String, Map<String, dynamic>)>{
   'accion-diario-mover': (
     'guerrero',
     {'type': 'moveDiaryEntry', 'entry': 'diario-a', 'to': 'diario-b'},
+  ),
+  'accion-retrato-agregar': (
+    'guerrero',
+    {'type': 'addPortrait', 'key': 'retrato-c', 'prompt': 'prompt de c'},
+  ),
+  'accion-retrato-borrar': (
+    'guerrero',
+    {'type': 'removePortrait', 'key': 'retrato-b'},
   ),
   'accion-linaje': (
     'brujo',
@@ -666,6 +677,24 @@ Future<void> main(List<String> args) async {
     'companionsView',
     const [],
     companionsView(invocador, repo),
+  );
+  // El prompt es texto, no JSON: `text` le dice al verificador que no lo parsee.
+  File('${out.path}/puente-retrato-prompt.json').writeAsStringSync(
+    jsonEncode({
+      'character': jsonDecode(jsonEncode(invocador.toJson())),
+      'bridge': {
+        'fn': 'portraitPrompt',
+        'args': ['Acuarela', 'pelo blanco', false],
+        'text': true,
+      },
+      'expected': buildPortraitPrompt(
+        character: invocador,
+        repo: repo,
+        style: 'Acuarela',
+        extraText: 'pelo blanco',
+        includeWeapon: false,
+      ),
+    }),
   );
   puenteCon(
     'puente-elecciones',

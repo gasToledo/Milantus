@@ -69,7 +69,7 @@ for (const archivo of casos.sort()) {
   // lectura del puente (`fn` con la ficha, el catálogo y `args`; sin ficha si
   // `withoutCharacter`); con
   // `action`, `act` (la ficha que el cliente guarda); el resto, `compute`.
-  const obtenido = JSON.parse(
+  const crudo =
     creation
       ? motor.creation(catalogo, JSON.stringify(creation.draft), JSON.stringify(creation.action), seed)
       : bridge
@@ -79,8 +79,9 @@ for (const archivo of casos.sort()) {
           : motor[bridge.fn](JSON.stringify(character), catalogo, ...bridge.args)
         : action
         ? motor.act(JSON.stringify(character), catalogo, JSON.stringify(action), seed)
-        : motor.compute(JSON.stringify(character), catalogo),
-  );
+        : motor.compute(JSON.stringify(character), catalogo);
+  // El prompt de retrato es texto, no JSON.
+  const obtenido = bridge?.text ? crudo : JSON.parse(crudo);
   // `JSON.stringify` compara también el orden de las claves, que un
   // `deepEqual` dejaría pasar.
   if (JSON.stringify(obtenido) === JSON.stringify(expected)) {

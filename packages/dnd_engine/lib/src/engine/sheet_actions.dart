@@ -157,6 +157,13 @@ class SheetActions {
   ///   `imageKey`, la ficha vuelve intacta y `outcome.saved` es false.
   ///   `removeDiaryEntry` con `entry`. `moveDiaryEntry` con `entry` y `to` (el
   ///   id del destino). Ids que no existen dejan la ficha como estaba.
+  /// - Retratos: `addPortrait` con `key` y `prompt` (opcional) antepone la
+  ///   clave a `portraitPaths`, y con `prompt` lo guarda en `portraitPrompts`.
+  ///   Una clave vacía o ya presente deja la ficha como estaba (no se duplica
+  ///   ni se pisa el prompt del que ya estaba). `restorePortrait` con `key` la
+  ///   mueve al frente; si no está o ya es la primera, la ficha vuelve intacta.
+  ///   `removePortrait` con `key` la saca de las dos estructuras, y si no está
+  ///   no toca nada. Borrar el archivo del servidor lo hace quien llama.
   ///
   /// Una acción desconocida lanza [FormatException]: un cliente desfasado no
   /// tiene que guardar una ficha que el motor no tocó creyendo que sí.
@@ -692,6 +699,32 @@ class SheetActions {
       case 'moveDiaryEntry':
         c = _moveDiaryEntry(
             c, action['entry'] as String, action['to'] as String);
+      case 'addPortrait':
+        final key = action['key'] as String? ?? '';
+        if (key.isNotEmpty && !c.portraitPaths.contains(key)) {
+          final prompt = action['prompt'] as String?;
+          c = c.copyWith(
+            portraitPaths: [key, ...c.portraitPaths],
+            portraitPrompts:
+                prompt == null ? null : {...c.portraitPrompts, key: prompt},
+          );
+        }
+      case 'restorePortrait':
+        final key = action['key'] as String;
+        final i = c.portraitPaths.indexOf(key);
+        if (i > 0) {
+          c = c.copyWith(
+            portraitPaths: [key, ...c.portraitPaths.where((k) => k != key)],
+          );
+        }
+      case 'removePortrait':
+        final key = action['key'] as String;
+        if (c.portraitPaths.contains(key)) {
+          c = c.copyWith(
+            portraitPaths: [...c.portraitPaths.where((k) => k != key)],
+            portraitPrompts: {...c.portraitPrompts}..remove(key),
+          );
+        }
       default:
         throw FormatException('Acción de ficha desconocida: ${action['type']}');
     }

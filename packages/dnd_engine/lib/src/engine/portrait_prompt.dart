@@ -1,5 +1,8 @@
-// l10n-ignore-file: el prompt del generador de imágenes se redacta en inglés a propósito, sea cual sea el idioma de la interfaz; no es texto que se muestre.
-import 'package:dnd_engine/dnd_engine.dart';
+import '../data/content_repository.dart';
+import '../domain/character.dart';
+import '../domain/content_source.dart';
+import '../domain/name_sort.dart';
+import '../domain/npc.dart';
 
 /// Estilos predeterminados para la generación de retratos.
 ///
@@ -50,20 +53,17 @@ String buildPortraitPrompt({
   bool includeWeapon = true,
 }) {
   final race = repo.race(character.raceId);
-  final raceName = race == null
-      ? ''
-      : _englishName(race.id, race.source, race.name);
+  final raceName =
+      race == null ? '' : _englishName(race.id, race.source, race.name);
   final classIds = <String>[];
   for (final id in character.classHistory) {
     if (!classIds.contains(id)) classIds.add(id);
   }
-  final klass = classIds
-      .map((id) {
-        final c = repo.characterClass(id);
-        return '${_englishName(id, c?.source, c?.name)} '
-            '${character.classLevel(id)}';
-      })
-      .join(' · ');
+  final klass = classIds.map((id) {
+    final c = repo.characterClass(id);
+    return '${_englishName(id, c?.source, c?.name)} '
+        '${character.classLevel(id)}';
+  }).join(' · ');
   final armorId = character.equippedArmorId;
   final armor = armorId == null ? null : repo.armorPiece(armorId);
   final weaponId = !includeWeapon || character.equippedWeaponIds.isEmpty

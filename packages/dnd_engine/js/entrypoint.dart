@@ -80,6 +80,30 @@ String compute(String characterJson, String catalogJson) {
   );
 }
 
+/// El prompt de retrato de la ficha, del motor: el cliente no arma frases ni
+/// nombres en inglés. `includeWeapon` en false lo deja sin el arma (Azure
+/// rechaza el prompt si nombra un arma).
+String portraitPromptJs(
+  String characterJson,
+  String catalogJson,
+  String style,
+  String extraText,
+  bool includeWeapon,
+) =>
+    buildPortraitPrompt(
+      character: Character.fromJson(
+        jsonDecode(characterJson) as Map<String, dynamic>,
+      ),
+      repo: _repoPara(catalogJson),
+      style: style,
+      extraText: extraText,
+      includeWeapon: includeWeapon,
+    );
+
+/// Los estilos predeterminados de retrato (sus ids, que son lo que se guarda
+/// en los ajustes), como lista JSON.
+String portraitStylesJs() => jsonEncode(portraitStyles);
+
 /// Lleva una ficha de cualquier versión al esquema actual. Rechaza una versión
 /// futura (`UnsupportedDataVersionException`) en vez de devolverla: el cliente
 /// no debe guardar de vuelta una ficha que no entiende.
@@ -892,6 +916,8 @@ void main() {
   motor['magicBaseOptions'] = magicBaseOptions.toJS;
   motor['compute'] = compute.toJS;
   motor['choicesView'] = choicesViewJs.toJS;
+  motor['portraitPrompt'] = portraitPromptJs.toJS;
+  motor['portraitStyles'] = portraitStylesJs.toJS;
   motor['migrateCharacter'] = migrateCharacter.toJS;
   motor['setLanguage'] = setLanguage.toJS;
   motor['applyTranslation'] = applyTranslation.toJS;

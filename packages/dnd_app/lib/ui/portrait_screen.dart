@@ -5,7 +5,6 @@ import 'package:dnd_engine/dnd_engine.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-import '../ai/portrait_prompt.dart';
 import '../api/api_client.dart';
 import '../api/api_exception.dart';
 import '../api/api_models.dart';

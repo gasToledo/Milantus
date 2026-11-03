@@ -10,6 +10,8 @@ interface DartEngine {
   compute(characterJson: string, catalogJson: string): string;
   choicesView(characterJson: string, catalogJson: string): string;
   migrateCharacter(characterJson: string): string;
+  portraitPrompt(characterJson: string, catalogJson: string, style: string, extraText: string, includeWeapon: boolean): string;
+  portraitStyles(): string;
   setLanguage(code: string): void;
   applyTranslation(packJson: string, overlayJson: string): string;
   vocabularyLabel(field: string, value: string): string;
@@ -131,6 +133,22 @@ export function choicesView(character: CharacterJson, catalog: Catalog): Choices
   return JSON.parse(
     engine().choicesView(JSON.stringify(character), catalogJson(catalog)),
   ) as ChoicesView;
+}
+
+/** El prompt de retrato que arma el motor (siempre en inglés). */
+export function portraitPrompt(
+  character: CharacterJson,
+  catalog: Catalog,
+  style: string,
+  extraText: string,
+  includeWeapon: boolean,
+): string {
+  return engine().portraitPrompt(JSON.stringify(character), catalogJson(catalog), style, extraText, includeWeapon);
+}
+
+/** Los ids de los estilos predeterminados (lo que se guarda en los ajustes). */
+export function portraitStyles(): string[] {
+  return JSON.parse(engine().portraitStyles()) as string[];
 }
 
 /** Lleva una ficha al esquema actual sin modificar la de entrada. */
@@ -799,6 +817,8 @@ export type SheetAction =
     }
   | { type: 'removeDiaryEntry'; entry: string }
   | { type: 'moveDiaryEntry'; entry: string; to: string }
+  | { type: 'addPortrait'; key: string; prompt?: string }
+  | { type: 'restorePortrait' | 'removePortrait'; key: string }
   | { type: 'summonCompanion'; option: string; creature: string; level?: number; pact?: boolean; free?: boolean }
   | { type: 'damageCompanion' | 'healCompanion' | 'companionTempHp'; index: number; amount: number }
   | { type: 'dismissCompanion'; index: number }

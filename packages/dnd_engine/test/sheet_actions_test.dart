@@ -1414,4 +1414,56 @@ void main() {
       expect(ids(mover('zzz', 'a')), ['a', 'b', 'c', 'd']);
     });
   });
+
+  group('retratos', () {
+    Character con(List<String> paths,
+            [Map<String, String> prompts = const {}]) =>
+        monje().copyWith(portraitPaths: paths, portraitPrompts: prompts);
+
+    test('agregar antepone la clave y guarda su prompt, sin duplicar', () {
+      final uno = act(con(['a']), {
+        'type': 'addPortrait',
+        'key': 'b',
+        'prompt': 'pb',
+      }).character;
+      expect(uno.portraitPaths, ['b', 'a']);
+      expect(uno.portraitPrompts, {'b': 'pb'});
+
+      // Una clave repetida no se mueve ni pisa el prompt del que ya estaba.
+      final igual = act(uno, {
+        'type': 'addPortrait',
+        'key': 'a',
+        'prompt': 'otro',
+      }).character;
+      expect(igual.portraitPaths, ['b', 'a']);
+      expect(igual.portraitPrompts, {'b': 'pb'});
+
+      final sinPrompt = act(uno, {'type': 'addPortrait', 'key': 'c'}).character;
+      expect(sinPrompt.portraitPaths, ['c', 'b', 'a']);
+      expect(sinPrompt.portraitPrompts, {'b': 'pb'});
+      expect(
+        act(uno, {'type': 'addPortrait', 'key': ''}).character.portraitPaths,
+        ['b', 'a'],
+      );
+    });
+
+    test('volver mueve al frente sin repetir; la primera o una ajena no', () {
+      final c = con(['a', 'b', 'c']);
+      Character volver(String k) =>
+          act(c, {'type': 'restorePortrait', 'key': k}).character;
+      expect(volver('c').portraitPaths, ['c', 'a', 'b']);
+      expect(volver('a').portraitPaths, ['a', 'b', 'c']);
+      expect(volver('zzz').portraitPaths, ['a', 'b', 'c']);
+    });
+
+    test('borrar saca la clave y su prompt; una ajena no toca nada', () {
+      final c = con(['a', 'b'], {'a': 'pa', 'b': 'pb'});
+      final sin = act(c, {'type': 'removePortrait', 'key': 'a'}).character;
+      expect(sin.portraitPaths, ['b']);
+      expect(sin.portraitPrompts, {'b': 'pb'});
+      final igual = act(c, {'type': 'removePortrait', 'key': 'zzz'}).character;
+      expect(igual.portraitPaths, ['a', 'b']);
+      expect(igual.portraitPrompts, {'a': 'pa', 'b': 'pb'});
+    });
+  });
 }
