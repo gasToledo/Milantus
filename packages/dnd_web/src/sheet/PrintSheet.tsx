@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal, flushSync } from 'react-dom';
 import { nameOf } from '../api/catalog';
-import { catalogLabel, inventoryOf, vocabularyLabel, type CharacterJson, type JsonObject } from '../engine';
+import { catalogLabel, computeSheet, inventoryOf, vocabularyLabel, type CharacterJson, type JsonObject } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import { labelOf } from '../i18n/texts';
 import { signed } from './format';
+import { withoutForm } from './compute';
 import { classesOf, type SheetModel } from './model';
 import { ABILITIES, SKILL_ABILITY } from './vocabulary';
 
@@ -63,7 +64,9 @@ export function usePrintSheet(): { printing: boolean; print: () => void; done: (
 function Sheet({ model }: { model: SheetModel }) {
   const t = useTexts();
   const lang = useLang();
-  const { character, sheet: s, catalog } = model;
+  const { character, catalog } = model;
+  // La hoja impresa es la del personaje, no la de la bestia (como la de Flutter).
+  const s = useMemo(() => computeSheet(withoutForm(character as unknown as CharacterJson), catalog), [character, catalog]);
   const p = t.print;
   const sortByName = (a: string, b: string) => a.localeCompare(b, lang);
   const number = new Intl.NumberFormat(lang, { maximumFractionDigits: 2 });

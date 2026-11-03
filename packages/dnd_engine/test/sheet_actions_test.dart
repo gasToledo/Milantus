@@ -713,4 +713,139 @@ void main() {
       }
     });
   });
+
+  group('Forma Salvaje', () {
+    Character druida({
+      List<String> formas = const [],
+      CombatState? combat,
+      List<String>? historial,
+    }) =>
+        Character(
+          id: 'druida',
+          name: 'Druida',
+          raceId: 'human',
+          classId: 'druid',
+          backgroundId: 'sage',
+          level: historial?.length ?? 8,
+          classHistory: historial ?? const [],
+          assignedScores: _scores,
+          hpPerLevel: List.filled(historial?.length ?? 8, 5),
+          wildShapeForms: formas,
+          combat: combat,
+        );
+    WildShapeSlot cupo(Character c) =>
+        CharacterCompiler(repo).compile(c).wildShape!;
+    CharacterResource recurso(Character c) => CharacterCompiler(repo)
+        .compile(c)
+        .resources
+        .firstWhere((r) => r.id == 'wild_shape');
+    Map<String, dynamic> entrar(String id) =>
+        {'type': 'enterWildShape', 'creature': id};
+    Map<String, dynamic> anotar(String id, bool on) =>
+        {'type': 'setWildShapeForm', 'creature': id, 'value': on};
+
+    test('entrar gasta un uso, aplica los temporales y deja la forma marcada',
+        () {
+      final base = druida();
+      final lobo = cupo(base).options.first.id;
+      final c = druida(formas: [lobo], combat: CombatState(currentHp: 20));
+
+      final r = act(c, entrar(lobo));
+
+      final res = recurso(c);
+      expect(r.outcome['entered'], isTrue);
+      expect(r.outcome['tempHp'], c.level);
+      expect(r.character.combat.wildShapeCreatureId, lobo);
+      expect(r.character.combat.resourceUsage[res.key], 1);
+      expect(r.character.combat.tempHp, c.level);
+    });
+
+    test('sin usos o con una forma no anotada se rechaza y la ficha no cambia',
+        () {
+      final lobo = cupo(druida()).options.first.id;
+      final otra = cupo(druida()).options.last.id;
+      final res = recurso(druida());
+      final sinUsos = druida(
+        formas: [lobo],
+        combat: CombatState(resourceUsage: {res.key: res.max}),
+      );
+      final sinAnotar = druida(formas: [lobo]);
+
+      for (final (c, id) in [(sinUsos, lobo), (sinAnotar, otra)]) {
+        final r = act(c, entrar(id));
+        expect(r.outcome['entered'], isFalse);
+        expect(r.character.toJson(), c.toJson());
+      }
+    });
+
+    test(
+        'un multiclase gasta en la clave de la ficha y los temporales son el '
+        'nivel de Druida', () {
+      final historial = ['druid', 'druid', 'druid', 'druid', 'wizard'];
+      final lobo = cupo(druida(historial: historial)).options.first.id;
+      final c = druida(formas: [lobo], historial: historial);
+      final res = recurso(c);
+      expect(res.key, isNot(res.id));
+
+      final primera = act(c, entrar(lobo));
+      expect(primera.outcome['tempHp'], 4);
+      expect(primera.character.combat.resourceUsage[res.key], 1);
+      expect(
+          primera.character.combat.resourceUsage.containsKey(res.id), isFalse);
+
+      // Con los usos agotados, la segunda vez ya no entra.
+      final agotado = c.copyWith(
+        combat: CombatState(resourceUsage: {res.key: res.max}),
+      );
+      expect(act(agotado, entrar(lobo)).outcome['entered'], isFalse);
+    });
+
+    test('anotar respeta el cupo y las opciones, y sacar quita lo que sobra',
+        () {
+      final base = druida();
+      final slot = cupo(base);
+      final ids = [for (final b in slot.options.take(slot.count)) b.id];
+
+      var c = base;
+      for (final id in ids) {
+        c = act(c, anotar(id, true)).character;
+      }
+      expect(c.wildShapeForms, ids);
+
+      // Lleno, repetido, o fuera del pozo: no escribe.
+      final extra = slot.options.firstWhere((b) => !ids.contains(b.id)).id;
+      for (final accion in [
+        anotar(extra, true),
+        anotar(ids.first, true),
+        anotar('no-existe', true),
+      ]) {
+        expect(act(c, accion).character.toJson(), c.toJson(),
+            reason: '$accion');
+      }
+
+      // Sacar vale aunque la forma ya no califique.
+      final vieja = c.copyWith(wildShapeForms: [...ids, 'no-existe']);
+      expect(
+          act(vieja, anotar('no-existe', false)).character.wildShapeForms, ids);
+      expect(act(c, anotar(ids.first, false)).character.wildShapeForms,
+          ids.skip(1));
+    });
+
+    test('transformado, el dado de golpe cura con la CON de la bestia', () {
+      final lobo = repo.creature(cupo(druida()).options.first.id)!;
+      final c = druida(
+        formas: [lobo.id],
+        combat: CombatState(currentHp: 1, wildShapeCreatureId: lobo.id),
+      );
+      final hoja = CharacterCompiler(repo).compile(c);
+      final tirada = Dice(Random(7)).rollHitDie(hoja.hitDie);
+
+      final r = act(c, {'type': 'spendHitDie'});
+
+      expect(
+          r.outcome['healed'],
+          (tirada + lobo.abilityModifierFor(Ability.constitution))
+              .clamp(0, 1 << 30));
+    });
+  });
 }

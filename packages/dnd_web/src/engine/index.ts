@@ -685,7 +685,10 @@ export type SheetAction =
   | { type: 'clearEffectTargets'; group: string }
   | { type: 'setMagicItemPlan'; item: string; value: boolean }
   | { type: 'replicateItem'; item: string; base?: string }
-  | { type: 'transmuteReplica'; entry: string; item: string; base?: string };
+  | { type: 'transmuteReplica'; entry: string; item: string; base?: string }
+  | { type: 'enterWildShape'; creature: string }
+  | { type: 'leaveWildShape' }
+  | { type: 'setWildShapeForm'; creature: string; value: boolean };
 
 /** Lo que cuenta el motor de una acción, para el aviso. Cada campo existe
  *  solo en la acción que lo da (ver `SheetActions.apply`). */
@@ -703,6 +706,10 @@ export interface SheetOutcome {
   activated?: boolean;
   removedReplica?: boolean;
   created?: boolean;
+  /** `enterWildShape`: false si la forma no está anotada o no quedan usos. */
+  entered?: boolean;
+  /** `enterWildShape`: los PG temporales que dio. */
+  tempHp?: number;
 }
 
 /**

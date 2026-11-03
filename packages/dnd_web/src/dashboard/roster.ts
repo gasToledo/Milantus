@@ -5,6 +5,7 @@
 import { accentOf, nameOf } from '../api/catalog';
 import { computeSheet, type Catalog, type CharacterFields, type CharacterJson, type ComputedSheet } from '../engine';
 import type { RosterSettings } from '../api/client';
+import { withoutForm } from '../sheet/compute';
 
 export type SortMode = 'manual' | 'dateAdded' | 'name' | 'level' | 'klass';
 
@@ -41,7 +42,8 @@ export function toRosterEntry(raw: CharacterJson, createdAt: string, catalog: Ca
   let sheet: ComputedSheet | null = null;
   try {
     // El motor de Dart compilado a JS: acá no se recalcula ninguna regla.
-    sheet = computeSheet(raw, catalog);
+    // Sin la forma: la tarjeta muestra al personaje, no a la bestia.
+    sheet = computeSheet(withoutForm(raw), catalog);
   } catch {
     // Un personaje que el motor no entiende no tira abajo a los demás.
   }

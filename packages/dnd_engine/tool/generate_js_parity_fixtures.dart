@@ -102,6 +102,19 @@ final _casos = <String, Character>{
     hpPerLevel: List.filled(8, 5),
     wildShapeForms: const ['wolf'],
   ),
+  // Transformado en lobo: `compute` aplica la forma antes del Cansancio.
+  'druida-transformado': Character(
+    id: 'p-druid-wolf',
+    name: 'Druida transformado',
+    raceId: 'human',
+    classId: 'druid',
+    backgroundId: 'sage',
+    level: 8,
+    assignedScores: _scores,
+    hpPerLevel: List.filled(8, 5),
+    wildShapeForms: const ['wolf'],
+    combat: CombatState(currentHp: 20, wildShapeCreatureId: 'wolf'),
+  ),
   // Arma de pacto: dos ejemplares que creó el rasgo y uno vinculado, para que
   // vincular el otro, crear y soltar tengan algo que desplazar.
   'brujo-filo': Character(
@@ -231,6 +244,15 @@ final _acciones = <String, (String, Map<String, dynamic>)>{
   'accion-modo-fin': ('barbaro', {'type': 'deactivateMode', 'mode': 'rage'}),
   'accion-descanso-corto': ('brujo', {'type': 'shortRest'}),
   'accion-descanso-largo': ('druida', {'type': 'longRest'}),
+  'accion-entrar-forma': (
+    'druida',
+    {'type': 'enterWildShape', 'creature': 'wolf'}
+  ),
+  'accion-volver-forma': ('druida', {'type': 'leaveWildShape'}),
+  'accion-anotar-forma': (
+    'druida',
+    {'type': 'setWildShapeForm', 'creature': 'panther', 'value': true},
+  ),
   'accion-conjuros': (
     'multiclase',
     {
@@ -361,7 +383,7 @@ Future<void> main(List<String> args) async {
     final entrada = jsonDecode(jsonEncode(personaje.toJson()));
     final ficha = Character.fromJson(entrada as Map<String, dynamic>);
     final esperado = applyExhaustion(
-      CharacterCompiler(repo).compile(ficha),
+      withWildShape(CharacterCompiler(repo).compile(ficha), ficha, repo),
       ficha.combat.exhaustion,
     ).toJson();
     File('${out.path}/$nombre.json').writeAsStringSync(

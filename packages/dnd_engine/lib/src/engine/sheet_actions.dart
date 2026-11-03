@@ -7,6 +7,7 @@ import 'combat_ops.dart';
 import 'dice.dart';
 import 'inventory_ops.dart';
 import 'level_up.dart';
+import 'wild_shape.dart';
 
 /// Lo que devuelve [SheetActions.apply]: la ficha nueva y lo que pasó, para
 /// el aviso que muestra la pantalla («Te estabilizaste», «Recuperaste 7 PG»).
@@ -104,6 +105,14 @@ class SheetActions {
   ///   dejan la ficha como estaba si el cupo no existe, si la opción no es
   ///   elegible, si el cupo está lleno y no es reemplazable, o (la tercera)
   ///   si no hay nada que limpiar.
+  /// - `enterWildShape` con `creature`: se transforma gastando un uso;
+  ///   `outcome.entered` es false si la forma no está anotada o no quedan usos
+  ///   (la ficha vuelve intacta) y, si entró, `outcome.tempHp` son los PG
+  ///   temporales que da. `leaveWildShape` vuelve a la forma propia.
+  /// - `setWildShapeForm` con `creature` y `value`: anota o saca una forma.
+  ///   Anotar respeta el cupo y las opciones del pozo; sacar vale siempre, y
+  ///   una forma que dejó de calificar queda guardada hasta que se saque.
+  ///   `spendHitDie` transformado cura con la CON de la bestia.
   ///
   /// Una acción desconocida lanza [FormatException]: un cliente desfasado no
   /// tiene que guardar una ficha que el motor no tocó creyendo que sí.
@@ -158,10 +167,46 @@ class SheetActions {
             action['type'] == 'spendResource' ? used + n : used - n,
           );
         }
+      case 'enterWildShape':
+        final id = action['creature'] as String;
+        // Solo una forma anotada (y que todavía califica): `chosen` ya viene
+        // revalidada contra el pozo.
+        final beast =
+            sheet.wildShape?.chosen.where((b) => b.id == id).firstOrNull;
+        final ok =
+            beast != null && CombatOps.enterWildShape(combat, sheet, beast);
+        outcome['entered'] = ok;
+        if (ok) outcome['tempHp'] = CombatOps.wildShapeTempHp(sheet);
+        // Como `activateMode`: un rechazo no deja la ficha a medias.
+        if (!ok) c = character;
+      case 'leaveWildShape':
+        CombatOps.leaveWildShape(combat);
+      case 'setWildShapeForm':
+        final slot = sheet.wildShape;
+        if (slot == null) break;
+        final id = action['creature'] as String;
+        if (action['value'] == true) {
+          if (slot.chosen.length < slot.count &&
+              slot.options.any((b) => b.id == id) &&
+              !slot.chosen.any((b) => b.id == id)) {
+            c = c.copyWith(wildShapeForms: [...c.wildShapeForms, id]);
+          }
+        } else {
+          // Sacar vale siempre: una forma que dejó de calificar sigue
+          // guardada y vuelve al subir de nivel, así que tiene que poder
+          // quitarse aunque `chosen` ya no la muestre.
+          c = c.copyWith(
+            wildShapeForms: [
+              for (final f in c.wildShapeForms)
+                if (f != id) f,
+            ],
+          );
+        }
       case 'spendHitDie':
         outcome['healed'] = CombatOps.spendHitDie(
           combat,
-          sheet,
+          // Transformado se cura con la CON de la bestia.
+          withWildShape(sheet, c, repo),
           c.level,
           dice: dice,
         );

@@ -380,16 +380,29 @@ class CombatOps {
     ComputedSheet sheet,
     Creature beast,
   ) {
-    final resource =
-        sheet.resources.where((r) => r.id == wildShapeResourceId).firstOrNull;
+    final resource = _wildShapeResource(sheet);
     if (resource == null) return false;
-    final used = c.resourceUsage[wildShapeResourceId] ?? 0;
+    // Se lee y se escribe por `key`, que es lo que mira la ficha: en un
+    // multiclase la clave es `druid:wild_shape` y el `id` pelado gastaba un
+    // contador que nadie muestra, con lo que nunca se quedaba sin usos.
+    final used = c.resourceUsage[resource.key] ?? 0;
     if (used >= resource.max) return false;
-    c.resourceUsage[wildShapeResourceId] = used + 1;
+    c.resourceUsage[resource.key] = used + 1;
     c.wildShapeCreatureId = beast.id;
-    setTempHp(c, sheet.wildShape?.tempHpOnEnter ?? sheet.level);
+    setTempHp(c, wildShapeTempHp(sheet));
     return true;
   }
+
+  static CharacterResource? _wildShapeResource(ComputedSheet sheet) =>
+      sheet.resources.where((r) => r.id == wildShapeResourceId).firstOrNull;
+
+  /// PG temporales al transformarse: los de Formas de Círculo si los hay, y si
+  /// no «igual a tu nivel de Druida» —el de la clase que da el rasgo, no el
+  /// nivel total de un multiclase.
+  static int wildShapeTempHp(ComputedSheet sheet) =>
+      sheet.wildShape?.tempHpOnEnter ??
+      sheet.classLevels[_wildShapeResource(sheet)?.classId] ??
+      sheet.level;
 
   /// Estados que incluyen Incapacitado (SRD 5.2.1, glosario): Paralizado,
   /// Petrificado, Aturdido e Inconsciente dicen «tienes el estado de

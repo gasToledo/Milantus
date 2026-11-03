@@ -265,7 +265,8 @@ function AttacksCard({ model }: { model: SheetModel }) {
         <ul className="divide-y divide-hairline border-t border-hairline">
           {sheet.attacks.map((a) => {
             const note = [
-              `${a.damage} ${labelOf(t.damageTypes, a.damageType)}`,
+              // Un ataque de bestia sin daño (el agarre) no lleva el tramo.
+              a.damage ? `${a.damage} ${labelOf(t.damageTypes, a.damageType)}` : null,
               ...(a.extraDamage ?? []).map((x) => `${x.dice} ${labelOf(t.damageTypes, x.type)}`),
               a.range ? t.attackRange(a.range[0], a.range[1]) : null,
             ]
@@ -273,7 +274,8 @@ function AttacksCard({ model }: { model: SheetModel }) {
               .join(' · ');
             return (
               <li
-                key={`${a.weaponId}-${a.sourceEntryId ?? ''}-${a.offHand}`}
+                // El nombre: la Garra y el Mordisco del oso comparten `weaponId`.
+                key={`${a.weaponId}-${a.name}-${a.sourceEntryId ?? ''}-${a.offHand}`}
                 data-attack={a.weaponId}
                 className="flex items-center gap-3 py-2.5"
               >

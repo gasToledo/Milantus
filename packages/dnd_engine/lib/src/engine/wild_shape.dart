@@ -1,6 +1,25 @@
+import '../data/content_repository.dart';
 import '../domain/ability.dart';
+import '../domain/character.dart';
 import '../domain/computed_sheet.dart';
 import '../domain/creature.dart';
+
+/// La ficha [base] ya transformada en la bestia que el personaje tiene
+/// marcada, o la misma [base] si no está transformado o la bestia ya no está
+/// en el catálogo.
+///
+/// Es el único lugar que decide cuándo se aplica la forma: `compute` del
+/// puente y los cálculos de partida (el dado de golpe, que cura con la CON de
+/// la bestia) pasan por acá y no cada uno por su cuenta.
+ComputedSheet withWildShape(
+  ComputedSheet base,
+  Character c,
+  ContentRepository repo,
+) {
+  final id = c.combat.wildShapeCreatureId;
+  final beast = id == null ? null : repo.creature(id);
+  return beast == null ? base : applyWildShape(base, beast);
+}
 
 /// Características que la bestia reemplaza. Las otras tres —INT, SAB y CAR—
 /// son las tuyas, y por eso una salvación de Sabiduría en forma de lobo sigue

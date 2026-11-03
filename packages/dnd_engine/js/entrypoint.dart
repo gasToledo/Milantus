@@ -57,12 +57,17 @@ String compute(String characterJson, String catalogJson) {
   final character = Character.fromJson(
     jsonDecode(characterJson) as Map<String, dynamic>,
   );
-  final sheet = CharacterCompiler(_repoPara(catalogJson)).compile(character);
-  // El Cansancio va encima, como en Flutter, la ficha del miembro y el MCP:
-  // sin esto /v2 mostraba descansado a quien no lo está. La Forma Salvaje
-  // (que va antes) todavía no se aplica acá.
+  final repo = _repoPara(catalogJson);
+  final sheet = CharacterCompiler(repo).compile(character);
+  // Primero la forma y después el Cansancio, como en Flutter, la ficha del
+  // miembro y el MCP: sin lo segundo /v2 mostraba descansado a quien no lo
+  // está, y sin lo primero mostraba al druida con la CA de humano en forma de
+  // oso.
   return jsonEncode(
-    applyExhaustion(sheet, character.combat.exhaustion).toJson(),
+    applyExhaustion(
+      withWildShape(sheet, character, repo),
+      character.combat.exhaustion,
+    ).toJson(),
   );
 }
 

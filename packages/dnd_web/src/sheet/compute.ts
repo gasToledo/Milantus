@@ -1,7 +1,17 @@
 import { computeSheet, migrateCharacter, type Catalog, type CharacterFields, type CharacterJson } from '../engine';
 import type { SheetModel } from './model';
 
-export type ComputedModel = { ok: true; model: SheetModel } | { ok: false; detail: string };
+/**
+ * El personaje sin la forma de bestia puesta. El tablero, la subida de nivel y
+ * la impresión miran al personaje y no a la bestia (`print_sheet.dart` de
+ * Flutter hace lo mismo): un druida transformado no sube de nivel con los PG
+ * del lobo ni imprime la CA del oso.
+ */
+export function withoutForm(raw: CharacterJson): CharacterJson {
+  return { ...raw, combat: { ...(raw.combat as object), wildShapeCreatureId: null } } as CharacterJson;
+}
+
+export type ComputedModel ={ ok: true; model: SheetModel } | { ok: false; detail: string };
 
 /**
  * La ficha lista para mostrar: migrada y calculada por el motor. La comparten

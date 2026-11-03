@@ -245,7 +245,7 @@ export interface ComputedSheet {
   languageChoiceSlots: JsonObject[];
   spellChoiceSlots: JsonObject[];
   spellDamageBonuses: Record<string, SourcedBonus[]>;
-  wildShape: JsonObject | null;
+  wildShape: WildShapeSlot | null;
   spellcasting: Spellcasting | null;
   spellcastingBlocks: SpellcastingBlock[];
   normalSpellSlotsByLevel: ByLevel;
@@ -358,6 +358,26 @@ export interface MagicPlansView {
 /** El JSON de `Character` (ver `Character.toJson` en el motor). */
 export type CharacterJson = JsonObject;
 
+/** `WildShapeSlot.toJson`: el cupo de formas de Forma Salvaje. Las bestias son
+ *  `Creature.toJson`; la pantalla solo lee el `id` y el `name`, y el perfil
+ *  completo sale del catálogo. */
+export interface WildShapeSlot {
+  /** Cuántas formas puede tener anotadas. */
+  count: number;
+  /** Bestias elegibles, ordenadas por nombre. */
+  options: WildShapeBeast[];
+  /** Las anotadas que todavía califican. */
+  chosen: WildShapeBeast[];
+  canCast: boolean;
+  /** PG temporales al transformarse, o null para los de la regla base. */
+  tempHpOnEnter: number | null;
+  armorClassFloor: number | null;
+  damageTypeOptions: string[];
+  savingThrowBonuses: ByAbility;
+}
+
+export type WildShapeBeast = JsonObject & { id: string; name: string };
+
 /**
  * Los campos del personaje que una pantalla lee **tal cual**, sin pasar por el
  * motor: identidad, lo que eligió el jugador y el estado de la mesa (PG
@@ -406,7 +426,12 @@ export interface CharacterFields {
     concentratingOn?: string | null;
     /** `CompanionInstance.toJson`: lo que se va con la concentración. */
     companions?: { creatureId: string; concentration?: boolean }[];
+    /** La bestia en que está transformado, o null. */
+    wildShapeCreatureId?: string | null;
   };
+  /** Ids de las bestias anotadas para Forma Salvaje, también las que dejaron
+   *  de calificar (el motor las conserva hasta que se sacan). */
+  wildShapeForms?: string[];
   /** Denominación (`cp`, `sp`, `ep`, `gp`, `pp`) → cantidad. */
   coins?: Record<string, number>;
   /** El trasfondo, en el Markdown chico que usa la mesa. */

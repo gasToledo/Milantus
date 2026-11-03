@@ -14,6 +14,7 @@ import { codexEntries, type CodexDetail } from '../codex/entries';
 import { useLang, useTexts } from '../i18n/context';
 import type { Lang, Texts } from '../i18n/texts';
 import { characterHref, navigate } from '../router';
+import { withoutForm } from '../sheet/compute';
 import type { SheetModel } from '../sheet/model';
 import { ABILITIES } from '../sheet/vocabulary';
 import type { SheetWriter } from '../sheet/writer';
@@ -51,8 +52,12 @@ type Focus = { kind: 'class' | 'subclass' | 'feat' | 'feature' | 'option' | 'spe
 export function LevelUpWizard({ model, write }: { model: SheetModel; write: SheetWriter }) {
   const t = useTexts();
   const lang = useLang();
-  const { character, sheet, catalog } = model;
+  const { character, catalog } = model;
   const raw = character as unknown as CharacterJson;
+  // El "antes" es el personaje y no la bestia: transformado, `model.sheet`
+  // traería los PG y la CA de la forma, y el "después" (sin forma) no se
+  // podría comparar contra eso.
+  const sheet = useMemo(() => computeSheet(withoutForm(raw), catalog), [raw, catalog]);
 
   const [draft, setDraft] = useState<LevelUpDraft>({ classId: character.classId });
   const [hpMode, setHpMode] = useState<'average' | 'roll'>('average');
@@ -89,7 +94,7 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
   const proficiencySlots = view.proficiencySlots.filter((s) => proficiencyGroups.includes(s.groupId));
   const spellGroups = base.spellSlots.filter((s) => s.replaceable || s.chosen.length < s.count).map((s) => s.groupId);
   const spellSlots = view.spellSlots.filter((s) => spellGroups.includes(s.groupId));
-  const after = useMemo(() => computeSheet(view.character, catalog), [view, catalog]);
+  const after = useMemo(() => computeSheet(withoutForm(view.character), catalog), [view, catalog]);
 
   const steps: StepId[] = [
     'resumen',
