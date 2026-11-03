@@ -1,16 +1,19 @@
-import { BookMarked, BookOpen, NotebookText, FlaskConical, PawPrint, Users, UsersRound, Flame, Contact } from 'lucide-react';
+import { useState } from 'react';
+import { BookMarked, BookOpen, NotebookText, FlaskConical, PawPrint, Plus, Users, UsersRound, Flame, Contact } from 'lucide-react';
 import type { DmCampaign } from '../api/client';
 import { useTexts } from '../i18n/context';
 import { dmBestiaryHref, dmCampaignHref, dmHomebrewHref, dmNpcsHref, rosterHref, dmHref, type DmSection } from '../router';
 import { NavCollapsible } from '../ui/disclosure';
 import { ModeSwitch, NavGroup, NavItem } from '../ui/Shell';
-import { groupCampaigns, stateOf } from './campaigns';
+import { CampaignEditorDialog } from './CampaignEditorDialog';
+import { groupCampaigns, stateOf, useCreateCampaign } from './campaigns';
 
 /**
  * El panel del Modo DM (`_sidebar` de `dm_mode_screen.dart`): el interruptor
  * con «DM» activo, las herramientas de la cuenta, las campañas agrupadas por
- * estado y, de la campaña elegida, sus secciones. Todo es de lectura: lo que
- * escribe sigue en Flutter, desde cada pantalla.
+ * estado y, de la campaña elegida, sus secciones. El panel solo escribe para
+ * crear una campaña («Nueva campaña»); capítulos, cuaderno, PNJ y combate
+ * siguen en Flutter, desde cada pantalla.
  */
 export function DmPanel({
   campaigns,
@@ -25,6 +28,8 @@ export function DmPanel({
 }) {
   const t = useTexts();
   const groups = campaigns ? groupCampaigns(campaigns) : null;
+  const [creating, setCreating] = useState(false);
+  const create = useCreateCampaign();
   const item = (c: DmCampaign) => (
     <li key={c.id}>
       <NavItem
@@ -78,6 +83,18 @@ export function DmPanel({
             </NavCollapsible>
           )}
         </nav>
+      )}
+
+      {groups && (
+        <NavItem icon={Plus} label={t.dmNewCampaign} accent onSelect={() => setCreating(true)} />
+      )}
+      {creating && (
+        <CampaignEditorDialog
+          title={t.dmNewCampaign}
+          initial={{ name: '', premise: '', state: 'active' }}
+          onSubmit={create}
+          onClose={() => setCreating(false)}
+        />
       )}
 
       {current && (

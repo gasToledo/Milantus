@@ -214,6 +214,60 @@ export async function fetchDmCampaigns(signal: AbortSignal): Promise<DmCampaign[
   return campaigns;
 }
 
+/** Crea una campaña. El servidor devuelve la guardada: su `id` puede no ser el
+ *  pedido (si choca con otra del DM, lo cambia), así que se usa el devuelto. */
+export async function createCampaign(campaign: DmCampaign): Promise<DmCampaign> {
+  const path = '/api/campaigns';
+  const response = await fetch(path, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ campaign }),
+  });
+  if (!response.ok) throw new ApiError(response.status, path);
+  return ((await response.json()) as { campaign: DmCampaign }).campaign;
+}
+
+/** Reemplaza la campaña entera: quien llama manda el documento completo. */
+export async function saveCampaign(campaign: DmCampaign): Promise<void> {
+  const path = `/api/campaigns/${encodeURIComponent(campaign.id)}`;
+  const response = await fetch(path, {
+    method: 'PUT',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ campaign }),
+  });
+  if (!response.ok) throw new ApiError(response.status, path);
+}
+
+export async function deleteCampaign(id: string): Promise<void> {
+  const path = `/api/campaigns/${encodeURIComponent(id)}`;
+  const response = await fetch(path, { method: 'DELETE' });
+  if (!response.ok) throw new ApiError(response.status, path);
+}
+
+/** Canjea el código que compartió un jugador. Un código inválido o vencido es
+ *  un 404. */
+export async function addCampaignMember(
+  campaignId: string,
+  code: string,
+): Promise<{ memberId: string; character?: CharacterJson }> {
+  const path = `/api/campaigns/${encodeURIComponent(campaignId)}/members`;
+  const response = await fetch(path, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ code }),
+  });
+  if (!response.ok) throw new ApiError(response.status, path);
+  return ((await response.json()) as { member: { memberId: string; character?: CharacterJson } }).member;
+}
+
+/** Un **aviso** para el jugador, no una escritura en su ficha: la marca la
+ *  anota él (`modo-dm.md`). */
+export async function grantHeroicInspiration(campaignId: string, memberId: string): Promise<void> {
+  const path = `/api/campaigns/${encodeURIComponent(campaignId)}/members/${encodeURIComponent(memberId)}/heroic-inspiration`;
+  const response = await fetch(path, { method: 'POST' });
+  if (!response.ok) throw new ApiError(response.status, path);
+}
+
 /** Un personaje vinculado a la campaña. `character` es la ficha **real** del
  *  jugador en este momento, no una copia (`modo-dm.md`): el DM la lee y no la
  *  escribe. */

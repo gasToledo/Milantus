@@ -1,8 +1,12 @@
 // Presentación de la lista de campañas del DM. El estado se lee tolerante, como
 // `CampaignState.fromJson`: ausente o desconocido es «en curso», que es el
 // estado en que nace toda campaña.
-import type { DmCampaign } from '../api/client';
+import { useQueryClient } from '@tanstack/react-query';
+import { createCampaign, type DmCampaign } from '../api/client';
+import { queryKeys } from '../api/queries';
+import { dmCampaignHref, navigate } from '../router';
 import type { Texts } from '../i18n/texts';
+import type { CampaignDraft } from './CampaignEditorDialog';
 
 export type CampaignState = 'active' | 'paused' | 'finished';
 
@@ -29,4 +33,29 @@ export function defaultCampaign(campaigns: readonly DmCampaign[]): DmCampaign | 
 /** «En curso», «En pausa» o «Terminada». */
 export function stateLabel(t: Texts, state: CampaignState): string {
   return { active: t.campaignStateActive, paused: t.campaignStatePaused, finished: t.campaignStateFinished }[state];
+}
+
+/** Crear una campaña y abrirla en su Mesa: lo comparten el panel y la
+ *  bienvenida. Se navega al id que **devuelve** el servidor, porque lo cambia
+ *  si el pedido choca con otra campaña. */
+export function useCreateCampaign(): (draft: CampaignDraft) => Promise<void> {
+  const client = useQueryClient();
+  return async ({ name, premise, state }) => {
+    const saved = await createCampaign({ id: campaignIdFrom(name), name, premise, state });
+    await client.invalidateQueries({ queryKey: queryKeys.dmCampaigns });
+    navigate(dmCampaignHref(saved.id, 'mesa'));
+  };
+}
+
+/** El id con que se pide una campaña nueva, de su nombre (`_idFrom` de
+ *  `campaigns_controller.dart`). No es una regla del juego: solo un nombre
+ *  legible para la URL, y el servidor resuelve las colisiones. */
+export function campaignIdFrom(name: string): string {
+  const id = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 40)
+    .replace(/-+$/, '');
+  return id === '' ? String(Date.now()) : id;
 }

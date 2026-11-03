@@ -10,6 +10,7 @@ import { dmMemberHref, dmNpcsHref, Link } from '../router';
 import { Tooltip } from '../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { stateLabel, stateOf } from './campaigns';
+import { CampaignMenu } from './CampaignMenu';
 import { DmHeader } from './DmHeader';
 import { buildEntries, matches, stamp, type EntryKind } from './notebook';
 
@@ -218,7 +219,7 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
 
   return (
     <div className="flex flex-col gap-5">
-      <DmHeader title={t.dmSectionNotebook} kicker={state} />
+      <DmHeader title={t.dmSectionNotebook} kicker={state} actions={<CampaignMenu campaign={campaign} />} />
       <p className="-mt-2 text-[13px] text-text-muted">{campaign.name}</p>
       {body}
     </div>

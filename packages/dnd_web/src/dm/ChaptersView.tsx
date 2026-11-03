@@ -6,6 +6,7 @@ import { cx } from '../ui/cx';
 import { StatPlaque } from '../ui/data';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { stateLabel, stateOf } from './campaigns';
+import { CampaignMenu } from './CampaignMenu';
 import { DmHeader } from './DmHeader';
 
 type ChapterStatus = 'closed' | 'open' | 'pending';
@@ -90,7 +91,7 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
 
   return (
     <div className="flex flex-col gap-5">
-      <DmHeader title={t.dmSectionChapters} kicker={kicker} />
+      <DmHeader title={t.dmSectionChapters} kicker={kicker} actions={<CampaignMenu campaign={campaign} />} />
       <p className="-mt-2 text-[13px] text-text-muted">{campaign.name}</p>
       {body}
     </div>

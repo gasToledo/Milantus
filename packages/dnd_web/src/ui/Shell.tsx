@@ -153,6 +153,7 @@ export function NavItem({
   count,
   muted = false,
   disabled = false,
+  accent = false,
   onSelect,
 }: {
   href?: string;
@@ -167,6 +168,8 @@ export function NavItem({
   muted?: boolean;
   /** Apagado y sin destino: una acción que hoy no corresponde (nivel máximo). */
   disabled?: boolean;
+  /** En oro aunque no esté activo: el verbo del panel («Nueva campaña»). */
+  accent?: boolean;
   onSelect?: () => void;
   /** Lleva a Flutter: se marca para que no sorprenda el cambio de cliente. */
   external?: boolean;
@@ -174,7 +177,11 @@ export function NavItem({
   const t = useTexts();
   const className = cx(
     'flex min-h-9 items-center gap-2.5 rounded-[var(--radius-nav)] px-3 py-2 text-[14px]',
-    active ? 'bg-gold-soft font-semibold text-gold' : 'text-on-surface-variant hover:bg-plaque hover:text-on-surface',
+    active
+      ? 'bg-gold-soft font-semibold text-gold'
+      : accent
+        ? 'font-medium text-gold hover:bg-plaque'
+        : 'text-on-surface-variant hover:bg-plaque hover:text-on-surface',
     muted && !active && 'opacity-60',
   );
   const body = (

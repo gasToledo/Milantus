@@ -7,6 +7,7 @@ import { dmMemberHref } from '../router';
 import { memberPortrait } from '../ui/portrait';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { stateLabel, stateOf } from './campaigns';
+import { CampaignMenu } from './CampaignMenu';
 import { DmHeader } from './DmHeader';
 import { MemberCard } from './MemberCard';
 
@@ -69,7 +70,7 @@ export function MesaView({ campaign }: { campaign: DmCampaign }) {
 
   return (
     <div className="flex flex-col gap-5">
-      <DmHeader title={campaign.name} kicker={kicker} />
+      <DmHeader title={campaign.name} kicker={kicker} actions={<CampaignMenu campaign={campaign} />} />
       {body}
     </div>
   );

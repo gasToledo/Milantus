@@ -1,11 +1,13 @@
+import type { ReactNode } from 'react';
 import { SectionRule } from '../ui/data';
 
 /**
  * La cabecera de toda sección del Modo DM: título en Georgia 30 con una pill
- * que dice en qué está (el estado de la campaña, «Solo lectura») y debajo la
- * regla ornamental. El `h1` es el título: uno por pantalla.
+ * que dice en qué está (el estado de la campaña, «Solo lectura»), a su derecha
+ * las `actions` de la pantalla (menú de la campaña, «Sumar personaje») y
+ * debajo la regla ornamental. El `h1` es el título: uno por pantalla.
  */
-export function DmHeader({ title, kicker }: { title: string; kicker?: string }) {
+export function DmHeader({ title, kicker, actions }: { title: string; kicker?: string; actions?: ReactNode }) {
   return (
     <>
       <header className="flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -17,6 +19,7 @@ export function DmHeader({ title, kicker }: { title: string; kicker?: string }) 
             {kicker}
           </span>
         )}
+        {actions && <div className="flex items-center gap-2">{actions}</div>}
       </header>
       <SectionRule className="my-0" />
     </>

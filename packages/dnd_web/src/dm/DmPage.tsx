@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Plus } from 'lucide-react';
 import type { Account } from '../api/client';
 import { useDmCampaigns } from '../api/queries';
 import { RosterFooter } from '../dashboard/RosterPanel';
 import { useTexts } from '../i18n/context';
-import { dmCampaignHref, FLUTTER_HOME, navigate, type DmView } from '../router';
-import { ButtonLink } from '../ui/Button';
+import { dmCampaignHref, navigate, type DmView } from '../router';
 import { Shell } from '../ui/Shell';
-import { AppBusyLabel, AppEmptyState, AppErrorView, Notice } from '../ui/status';
+import { AppBusyLabel, AppErrorView, Notice } from '../ui/status';
 import { defaultCampaign } from './campaigns';
 import { DmHeader } from './DmHeader';
+import { DmOnboarding } from './DmOnboarding';
 import { DmPanel } from './DmPanel';
 import { BestiaryPage } from '../bestiary/BestiaryPage';
 import { ChaptersView } from './ChaptersView';
@@ -25,9 +24,9 @@ import { NpcLibraryView } from './npcs/NpcLibraryView';
 import { NpcSheetView } from './npcs/NpcSheetView';
 
 /**
- * El Modo DM de solo lectura (`/v2/dm/...`). Lo que el DM escribe (crear y
- * editar campañas, capítulos, notas, el combate, la música) sigue en Flutter;
- * acá se lee. Cada pedido pasa por la API de campañas, cuya autorización va
+ * El Modo DM (`/v2/dm/...`). Acá el DM crea, edita y borra campañas y suma o
+ * echa personajes de la mesa; lo demás que escribe (capítulos, notas, el
+ * combate, la música) sigue en Flutter y acá se lee. Cada pedido pasa por la API de campañas, cuya autorización va
  * adentro del `WHERE`: una campaña ajena y una inexistente responden igual
  * (404), y la pantalla tampoco las distingue.
  */
@@ -90,20 +89,11 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
       </>
     );
   } else if (view.kind === 'home') {
-    // Sin ninguna campaña: crear es una escritura, y vive en Flutter.
+    // Sin ninguna campaña: la bienvenida, que lleva a crear la primera.
     body = (
       <>
         <DmHeader title={t.dmCampaignsLabel} />
-        <AppEmptyState
-          kind="empty"
-          message={t.dmNoCampaigns}
-          hint={t.dmNoCampaignsHint}
-          actions={
-            <ButtonLink href={FLUTTER_HOME} icon={Plus} tone="secondary">
-              {t.dmCreateCampaign}
-            </ButtonLink>
-          }
-        />
+        <DmOnboarding />
       </>
     );
   } else if (!current) {

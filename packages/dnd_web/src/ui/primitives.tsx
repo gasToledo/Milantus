@@ -119,20 +119,25 @@ export function Select({
   value,
   onValueChange,
   options,
+  className,
 }: {
   label: string;
   value: string;
   onValueChange: (value: string) => void;
   options: { value: string; label: string }[];
+  /** Sobre el botón: un formulario lo estira a todo el ancho. */
+  className?: string;
 }) {
   return (
     <SelectPrimitive.Root value={value} onValueChange={onValueChange}>
       <SelectPrimitive.Trigger
         aria-label={label}
-        className="plaque inline-flex min-h-9 items-center gap-2 rounded-[var(--radius-nav)] px-3 text-[13px] text-on-surface"
+        className={cx('plaque inline-flex min-h-9 items-center gap-2 rounded-[var(--radius-nav)] px-3 text-[13px] text-on-surface', className)}
       >
-        <span className="text-text-muted">{label}:</span>
-        <SelectPrimitive.Value />
+        <span className="flex items-center gap-2">
+          <span className="text-text-muted">{label}:</span>
+          <SelectPrimitive.Value />
+        </span>
         <SelectPrimitive.Icon>
           <ChevronDown size={16} aria-hidden="true" className="text-text-muted" />
         </SelectPrimitive.Icon>
