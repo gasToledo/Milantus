@@ -569,3 +569,28 @@ test('transformarse en lobo y volver guardan lo que da el motor', async ({ page,
   const fin = await proximoGuardado(page, () => page.locator('[data-stat="wild-shape"] button').click(), DRUIDA);
   expect(fin).toEqual(vuelta);
 });
+
+test('invocar un familiar y despedirlo guardan lo que da el motor', async ({ page, request }) => {
+  const DRUIDA = 'druida-de-humo';
+  const antes = await ilse(request, DRUIDA);
+  // Su única opción es el familiar, que no cuesta nada: la primera forma es el murciélago.
+  const invocado = segunMotor(antes, { type: 'summonCompanion', option: 'familiar', creature: 'bat' });
+  const despedido = segunMotor(invocado, { type: 'dismissCompanion', index: 0 });
+
+  await page.goto(`/v2/personajes/${DRUIDA}/combate`);
+  await page.locator('[data-action="summon"]').click();
+  const enviado = await proximoGuardado(
+    page,
+    () => page.getByRole('dialog').getByRole('button', { name: 'Invocar', exact: true }).click(),
+    DRUIDA,
+  );
+  expect(enviado).toEqual(invocado);
+
+  await page.locator('[data-companion="0"] button').first().click();
+  const fin = await proximoGuardado(
+    page,
+    () => page.locator('[data-companion="0"]').getByRole('button', { name: 'Despedir', exact: true }).click(),
+    DRUIDA,
+  );
+  expect(fin).toEqual(despedido);
+});

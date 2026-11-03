@@ -1,17 +1,29 @@
 import { useMemo, useState } from 'react';
-import { ChevronDown, PawPrint } from 'lucide-react';
+import { ChevronDown, Info, PawPrint, TriangleAlert } from 'lucide-react';
 import { asProfile } from '../bestiary/creature';
 import { CreatureProfile } from '../bestiary/CreatureProfile';
-import { companionsView, type CharacterJson, type CompanionInstanceView } from '../engine';
+import {
+  companionPreview,
+  companionsView,
+  type CharacterJson,
+  type CompanionInstanceView,
+  type CompanionOptionView,
+  type CompanionsView,
+} from '../engine';
 import { useTexts } from '../i18n/context';
 import { labelOf } from '../i18n/texts';
+import { AppDialog } from '../ui/AppDialog';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { cx } from '../ui/cx';
-import { hpTone, Pill, ThinBar } from '../ui/data';
+import { Eyebrow, hpTone, Pill, ThinBar } from '../ui/data';
+import { Select } from '../ui/primitives';
+import { Option, SearchableList } from '../ui/wizard';
 import { AmountControls, ConditionToggleList } from './CombatTab';
 import type { SheetModel } from './model';
+import { SpellSlotGrid, type SlotCell } from './SpellSlots';
 import { Tag } from './SpellList';
+import type { SheetWriter } from './writer';
 
 const ROW = 'rounded-[var(--radius-card)] border border-hairline bg-plaque px-3 py-2';
 
@@ -29,6 +41,7 @@ export function CompanionsCard({ model }: { model: SheetModel }) {
   // Las filas abiertas, por índice. Varias a la vez, y nada se abre ni se cierra
   // solo; lo único que se corrige es el corrimiento cuando una sale de la lista.
   const [open, setOpen] = useState<ReadonlySet<number>>(new Set());
+  const [summoning, setSummoning] = useState(false);
   const toggle = (index: number) =>
     setOpen((cur) => {
       const next = new Set(cur);
@@ -57,7 +70,19 @@ export function CompanionsCard({ model }: { model: SheetModel }) {
   };
 
   return (
-    <Card id="companions" title={t.compTitle} icon={PawPrint}>
+    <Card
+      id="companions"
+      title={t.compTitle}
+      icon={PawPrint}
+      trailing={
+        write &&
+        options.length > 0 && (
+          <Button tone="secondary" data-action="summon" onClick={() => setSummoning(true)}>
+            {t.compSummon}
+          </Button>
+        )
+      }
+    >
       {rows.length === 0 ? (
         <p className="text-[13px] text-text-muted">{t.compNone}</p>
       ) : (
@@ -87,6 +112,7 @@ export function CompanionsCard({ model }: { model: SheetModel }) {
           )}
         </ul>
       )}
+      {summoning && write && <SummonDialog model={model} write={write} view={view} onClose={() => setSummoning(false)} />}
     </Card>
   );
 }
@@ -206,5 +232,214 @@ function CompanionRow({
         </div>
       )}
     </li>
+  );
+}
+
+/** Los espacios que paga una opción, como celdas de la grilla. */
+const cellsOf = (o: CompanionOptionView): SlotCell[] =>
+  o.slots.map((c) => ({ key: `${c.pact ? 'pact' : 'normal'}-${c.level}`, ...c }));
+
+/** Cómo arranca una opción: la primera forma y, si escala, el uso gratis (si
+ *  queda) o el primer espacio. Cambiar de opción vuelve a empezar de acá. */
+const startOf = (o: CompanionOptionView) => ({
+  option: o.id,
+  form: o.forms[0]?.id ?? '',
+  pay: o.free && o.free.left > 0 ? 'free' : (cellsOf(o)[0]?.key ?? null),
+});
+
+/**
+ * Invocar un compañero: opción, forma y con qué se paga (un espacio o el uso
+ * gratis del conjuro), con el perfil resuelto al lado para ver los números
+ * antes de gastar. Elegir no gasta: lo hace «Invocar». Qué espacios alcanzan,
+ * a quién reemplaza y qué concentración se corta lo dice el motor; el pago y
+ * los PG los resuelve `summonCompanion`.
+ */
+function SummonDialog({
+  model,
+  write,
+  view,
+  onClose,
+}: {
+  model: SheetModel;
+  write: SheetWriter;
+  view: CompanionsView;
+  onClose: () => void;
+}) {
+  const t = useTexts();
+  const { character, catalog } = model;
+  const [sel, setSel] = useState(() => startOf(view.options[0]!));
+  // En teléfono el perfil de una forma reemplaza a la lista dentro del mismo
+  // diálogo, sin anidar otro.
+  const [peek, setPeek] = useState<string | null>(null);
+  const o = view.options.find((x) => x.id === sel.option) ?? view.options[0]!;
+  const cells = cellsOf(o);
+  const freeLeft = o.free?.left ?? 0;
+  const noPay = o.scales && freeLeft === 0 && cells.length === 0;
+  const cell = cells.find((c) => c.key === sel.pay);
+  const level = !o.scales ? 0 : sel.pay === 'free' ? o.minSpellLevel : (cell?.level ?? o.minSpellLevel);
+  const shown = peek ?? sel.form;
+  const preview = useMemo(
+    () => companionPreview(character as unknown as CharacterJson, catalog, o.id, shown, level),
+    [character, catalog, o.id, shown, level],
+  );
+
+  const concentrating = character.combat?.concentratingOn ?? null;
+  const leaving = view.instances.filter((i) => i.concentration).map((i) => i.name);
+
+  const summon = () => {
+    const r = write.act({
+      type: 'summonCompanion',
+      option: o.id,
+      creature: sel.form,
+      ...(o.scales ? (sel.pay === 'free' ? { free: true } : { level: cell?.level, pact: cell?.pact }) : {}),
+    });
+    if (!r) return;
+    const out = r.outcome;
+    if (!out.summoned) {
+      write.notify(t.compFailed, { tone: 'error' });
+      return;
+    }
+    const notes = [
+      out.spentSlot != null ? t.compNoteSlot(out.spentSlot) : null,
+      out.freeName ? t.compNoteFree(out.freeName) : null,
+      out.brokeConcentration ? t.compNoteBroke : out.concentrates ? t.compNoteConcentrating : null,
+    ].filter((n): n is string => Boolean(n));
+    write.notify(t.compSummoned(out.name ?? '', notes), { undo: () => write.restore(r.before) });
+  };
+
+  const infoButton = (formId: string, name: string) => (
+    <Button
+      tone="secondary"
+      className="shrink-0 lg:hidden"
+      aria-label={t.compInfo(name)}
+      title={t.compInfo(name)}
+      onClick={() => setPeek(formId)}
+    >
+      <Info size={16} aria-hidden="true" />
+    </Button>
+  );
+  const formRow = (f: CompanionOptionView['forms'][number]) => (
+    <div key={f.id} className="flex min-w-0 shrink-0 items-stretch gap-1.5">
+      <div className="min-w-0 flex-1">
+        <Option
+          id={f.id}
+          selected={f.id === sel.form}
+          title={f.name}
+          detail={f.kind}
+          onClick={() => setSel({ ...sel, form: f.id })}
+        />
+      </div>
+      {infoButton(f.id, f.name)}
+    </div>
+  );
+  const single = o.forms.length === 1 ? o.forms[0]! : null;
+
+  const warnings = [
+    o.going ? t.compReplaces(o.going) : null,
+    o.concentrates && concentrating
+      ? leaving.length > 0
+        ? t.compBreaksWith(concentrating, leaving.join(', '))
+        : t.compBreaks(concentrating)
+      : null,
+  ].filter((w): w is string => Boolean(w));
+
+  const list = (
+    <div className="flex min-w-0 flex-col gap-4">
+      {view.options.length > 1 && (
+        <Select
+          label={t.compOption}
+          value={o.id}
+          onValueChange={(id) => setSel(startOf(view.options.find((x) => x.id === id)!))}
+          options={view.options.map((x) => ({ value: x.id, label: x.name }))}
+        />
+      )}
+      {!single && (
+        <div className="flex flex-col gap-2">
+          <Eyebrow>{t.compForm}</Eyebrow>
+          {o.forms.length > 6 ? (
+            <SearchableList items={o.forms} textOf={(f) => f.name} label={t.compForm} height="max-h-[280px]">
+              {formRow}
+            </SearchableList>
+          ) : (
+            <div
+              role="radiogroup"
+              aria-label={t.compForm}
+              className="flex max-h-[420px] flex-col gap-2 overflow-y-auto pr-1"
+            >
+              {o.forms.map(formRow)}
+            </div>
+          )}
+        </div>
+      )}
+      {o.scales && (
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between gap-2">
+            <Eyebrow>{t.compSlot}</Eyebrow>
+            {single && infoButton(single.id, single.name)}
+          </div>
+          {noPay ? (
+            <p className="text-[13px] text-on-surface-variant">{t.compNoSlots(o.minSpellLevel)}</p>
+          ) : (
+            <>
+              {o.free && (
+                <div data-free>
+                  <Option
+                    selected={sel.pay === 'free'}
+                    disabled={freeLeft === 0}
+                    title={t.compFreeOption}
+                    detail={t.compFreeLeft(o.free.name, o.free.left, o.free.max)}
+                    onClick={() => setSel({ ...sel, pay: 'free' })}
+                  />
+                </div>
+              )}
+              <SpellSlotGrid cells={cells} selected={sel.pay} onSelect={(key) => setSel({ ...sel, pay: key })} />
+            </>
+          )}
+        </div>
+      )}
+      {single && !o.scales && <div>{infoButton(single.id, single.name)}</div>}
+    </div>
+  );
+
+  return (
+    <AppDialog
+      open
+      onOpenChange={(v) => !v && onClose()}
+      title={t.compSummon}
+      icon={PawPrint}
+      width={860}
+      actions={[
+        { label: t.cancel },
+        { label: t.compSummon, primary: true, tone: 'gold', disabled: noPay || !sel.form, onSelect: summon },
+      ]}
+    >
+      {peek && preview ? (
+        <div className="flex flex-col gap-3 lg:hidden">
+          <Button tone="secondary" className="self-start" onClick={() => setPeek(null)}>
+            {t.compBack}
+          </Button>
+          <CreatureProfile profile={asProfile(preview.profile)} row={preview.row} catalog={catalog} compact />
+        </div>
+      ) : null}
+      <div className={cx('gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_340px]', peek ? 'hidden' : 'grid')}>
+        {list}
+        <div className="hidden lg:block">
+          {preview && <CreatureProfile profile={asProfile(preview.profile)} row={preview.row} catalog={catalog} compact />}
+        </div>
+      </div>
+      {warnings.length > 0 && (
+        <div className="mt-4 flex flex-col gap-2">
+          {warnings.map((w) => (
+            <p
+              key={w}
+              className="flex items-start gap-2 rounded-[var(--radius-nav)] border border-gold px-3 py-2 text-[13px]"
+            >
+              <TriangleAlert size={18} aria-hidden="true" className="shrink-0 text-gold" />
+              {w}
+            </p>
+          ))}
+        </div>
+      )}
+    </AppDialog>
   );
 }

@@ -489,6 +489,24 @@ repiten acá.
   quedar incapacitado, no impide entrar. La ficha de un miembro transformado se
   ve en su forma, sin controles. El **combate del DM no muestra la forma** hasta
   el paso 6.
+  Desde 5e5, los **compañeros** se invocan y se manejan en la ficha propia.
+  La tarjeta `CompanionsCard` (`sheet/Companions.tsx`), bajo Defensa en Combate,
+  lista los que están en juego, plegados de entrada: PG, CA, estados, daño,
+  curación, PG temporales y «Despedir» (acciones `damageCompanion`,
+  `healCompanion`, `companionTempHp`, `setCompanionCondition` y
+  `dismissCompanion`), y su perfil. «Invocar» abre `SummonDialog`: opción,
+  forma y con qué se paga, un espacio (también de pacto) o el uso gratis del
+  conjuro (Corcel Fiel); acción `summonCompanion`, con «Deshacer». Qué se
+  ofrece, a quién reemplaza y qué concentración corta lo lee el cliente de
+  `companionsView` y `companionPreview` (`companion_view.dart`); el pago, los
+  PG y la concentración los resuelve `SheetActions`. Un compañero cuyo conjuro
+  ya no está preparado queda como huérfano y solo se puede despedir. Sin
+  escritura (ficha de un miembro) no hay ningún control. Con 5e5 se arregló
+  también al brujo puro: su tabla de pacto ya no se repite como espacios
+  normales (`normalSpellSlotsByLevel` queda vacío) y la tarjeta Conjuros le
+  muestra solo la celda de pacto. **Siguen en Flutter:** invocar en forma de
+  bestia, el Defensor de Acero, y el Compañero Salvaje, que no cobra ni se va
+  con el descanso.
   La banda táctica (PG, Iniciativa,
   Velocidad, Competencia; sin Armadura, que se lee en Defensa) solo va en
   Personaje y Combate, como en Flutter; el modo en curso lo dice su propia franja (con lo que suma), sin cartel aparte. Sin escritura, la ficha ajena
@@ -635,9 +653,9 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    cansancio y modos activos (Furia) *(existe)*; 5e2, preparar conjuros (el editor ya
    existe en la subida) y cambiar el truco innato *(existe)*; 5e3, los planos del Artífice
    y los objetivos de arma de un rasgo (Pacto del Filo) *(existe)*; 5e4, Forma Salvaje *(existe)*;
-   5e5, compañeros, y con ellos lanzar gastando espacio o uso gratis. Antes de
-   cerrar 5e, comparar los controles de la ficha de Flutter con los de React:
-   esta lista no salió de revisar pantalla por pantalla. 5f, la lista de
+   5e5, compañeros, y con ellos lanzar gastando espacio o uso gratis *(existe)*.
+   Para cerrar 5e falta comparar los controles de la ficha de Flutter con los
+   de React: esta lista no salió de revisar pantalla por pantalla. 5f, la lista de
    personajes: reordenar, marcar favorito, renombrar, borrar y rehacer. Van
    antes del paso 6 porque solo tocan datos de la propia cuenta.
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
@@ -764,7 +782,7 @@ hace seguro volver atrás es que **no hay nada que deshacer en el formato**:
 
 Para que nadie lo dé por hecho:
 
-- Las escrituras de 5e5 (compañeros), 5f y los pasos 6 y 7: el detalle está en
+- Las escrituras de 5f y los pasos 6 y 7: el detalle está en
   [Orden previsto de pantallas](#orden-previsto-de-pantallas).
 - Control de versión en el servidor para las escrituras (rechazar una copia
   vieja con 409): hoy gana el último que guarda, como en Flutter.
