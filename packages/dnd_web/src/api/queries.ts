@@ -14,6 +14,7 @@ import {
   fetchAccount,
   fetchAppVersion,
   fetchCampaignChapters,
+  fetchCharacterShares,
   fetchCampaignEncounter,
   fetchCampaignMembers,
   fetchCampaignNotebook,
@@ -25,6 +26,7 @@ import {
   fetchRoster,
   fetchRosterSettings,
   fetchThemeMode,
+  fetchTurn,
 } from './client';
 
 export function createQueryClient(): QueryClient {
@@ -54,6 +56,10 @@ export const queryKeys = {
   catalog: (lang: Lang) => ['catalog', lang] as const,
   homebrew: ['homebrew'] as const,
   playerCampaigns: (characterId: string) => ['characters', characterId, 'campaigns'] as const,
+  // Sin el prefijo 'characters': `roster` lo es, `writer.ts` lo cancela en cada
+  // acción y otras pantallas lo invalidan; estas no tienen que moverse con él.
+  characterShares: (characterId: string) => ['shares', characterId] as const,
+  turn: (characterId: string) => ['turn', characterId] as const,
   appVersion: ['app-version'] as const,
   dmCampaigns: ['dm', 'campaigns'] as const,
   campaignMembers: (campaignId: string) => ['dm', 'campaigns', campaignId, 'members'] as const,
@@ -109,6 +115,38 @@ export const usePlayerCampaigns = (characterId: string) =>
   useQuery({
     queryKey: queryKeys.playerCampaigns(characterId),
     queryFn: ({ signal }) => fetchPlayerCampaigns(characterId, signal),
+  });
+
+/** Con qué campañas está compartido el personaje (el diálogo de Compartir). */
+export const useCharacterShares = (characterId: string) =>
+  useQuery({
+    queryKey: queryKeys.characterShares(characterId),
+    queryFn: ({ signal }) => fetchCharacterShares(characterId, signal),
+  });
+
+/**
+ * El turno del personaje en el combate abierto de alguna mesa, para el cartel
+ * de la ficha. Se consulta con `refetchInterval` y **nunca** por la cola de
+ * avisos (`events/PendingEvents.tsx`): el turno es estado efímero («esto es
+ * verdad ahora»), no un hecho pasado que haya que entregar una sola vez. Si
+ * viajara por esa cola, una ronda vieja dejaría avisos de «es tu turno»
+ * acumulados para siempre.
+ *
+ * Cada 20 s fuera de combate y cada 5 s con uno abierto. Con la pestaña oculta
+ * pausa (`refetchIntervalInBackground` queda en `false`): nadie lee el cartel
+ * y un teléfono con la ficha abierta en segundo plano no tiene por qué gastar
+ * batería ni datos; al volver, `refetchOnWindowFocus` lo pone al día.
+ */
+export const useTurnStatus = (characterId: string, enabled: boolean) =>
+  useQuery({
+    queryKey: queryKeys.turn(characterId),
+    queryFn: ({ signal }) => fetchTurn(characterId, signal),
+    enabled,
+    refetchInterval: (q) => ((q.state.data ?? 'none') === 'none' ? 20_000 : 5_000),
+    refetchOnWindowFocus: true,
+    staleTime: 0,
+    // No poder leerlo no interrumpe la ficha: se reintenta en el próximo ciclo.
+    retry: false,
   });
 
 /** Las campañas de cada uno de [characterIds], en el mismo orden. Comparte

@@ -373,3 +373,77 @@ export async function fetchCampaignNpcs(campaignId: string, signal: AbortSignal)
 export async function fetchNpc(id: string, signal: AbortSignal): Promise<StoredNpc> {
   return getJson<StoredNpc>(`/api/npcs/${encodeURIComponent(id)}`, signal);
 }
+
+/** Un aviso de la cola de la cuenta (`GET /api/events`): el servidor guarda
+ *  **qué pasó** (`kind` y los datos del `payload`) y el cliente decide cómo se
+ *  dice (`events/messages.ts`). */
+export interface UserEvent {
+  id: string;
+  kind: string;
+  payload: JsonObject;
+}
+
+/** Los avisos que esta cuenta todavía no vio. Sin `signal` a propósito: es una
+ *  lectura que consume la cola, y abortarla al navegar dejaría al servidor con
+ *  el aviso entregado y al cliente sin saberlo. */
+export async function fetchUnseenEvents(): Promise<UserEvent[]> {
+  const path = '/api/events';
+  const response = await fetch(path);
+  if (!response.ok) throw new ApiError(response.status, path);
+  return ((await response.json()) as { events: UserEvent[] }).events;
+}
+
+/** Marca avisos como vistos: dejan de volver para siempre. */
+export async function markEventsSeen(ids: string[]): Promise<void> {
+  const path = '/api/events/seen';
+  const response = await fetch(path, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ ids }),
+  });
+  if (!response.ok) throw new ApiError(response.status, path);
+}
+
+/** Emite un código de un solo uso para que un DM sume a [characterId] a su
+ *  campaña (`POST /api/characters/:id/share`). Nace del lado del dueño: el
+ *  acceso a una ficha solo puede empezar por su decisión. */
+export async function createShareCode(characterId: string): Promise<{ code: string; expiresAt: string }> {
+  const path = `/api/characters/${encodeURIComponent(characterId)}/share`;
+  const response = await fetch(path, { method: 'POST' });
+  if (!response.ok) throw new ApiError(response.status, path);
+  return (await response.json()) as { code: string; expiresAt: string };
+}
+
+/** Una campaña con la que el personaje está compartido. */
+export interface CharacterShare {
+  memberId: string;
+  campaignName: string;
+}
+
+export async function fetchCharacterShares(characterId: string, signal: AbortSignal): Promise<CharacterShare[]> {
+  const { shares } = await getJson<{ shares: CharacterShare[] }>(
+    `/api/characters/${encodeURIComponent(characterId)}/shares`,
+    signal,
+  );
+  return shares;
+}
+
+/** Corta un vínculo (`DELETE /api/campaign-links/:memberId`): el DM deja de ver
+ *  la ficha. Lo puede hacer el dueño del personaje o el DM de la campaña. */
+export async function deleteCampaignLink(memberId: string): Promise<void> {
+  const path = `/api/campaign-links/${encodeURIComponent(memberId)}`;
+  const response = await fetch(path, { method: 'DELETE' });
+  if (!response.ok) throw new ApiError(response.status, path);
+}
+
+/** Dónde está el personaje en el combate abierto de alguna mesa (`none`: en
+ *  ninguno). `waiting` es un combate abierto que no es su turno ni el que
+ *  sigue. */
+export type TurnStatus = 'none' | 'waiting' | 'next' | 'active';
+
+/** Un valor que este cliente no conoce se lee como `none`: el servidor puede
+ *  ser más nuevo que la pestaña abierta. */
+export async function fetchTurn(characterId: string, signal: AbortSignal): Promise<TurnStatus> {
+  const { turn } = await getJson<{ turn: string }>(`/api/characters/${encodeURIComponent(characterId)}/turn`, signal);
+  return turn === 'waiting' || turn === 'next' || turn === 'active' ? turn : 'none';
+}

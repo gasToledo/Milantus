@@ -18,8 +18,6 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
   Toast,
-  ToastProvider,
-  ToastViewport,
   Tooltip,
 } from '../ui/primitives';
 import { useReorder } from '../ui/reorder';
@@ -241,7 +239,7 @@ export function DashboardPage() {
 
   const fallen = entries?.filter(isFallen).length ?? 0;
   return (
-    <ToastProvider>
+    <>
       <div className="flex flex-col gap-5">
         {/* La barra de acciones del lienzo: título, buscador, orden y «Crear»
             en una fila que se envuelve sola en un teléfono. */}
@@ -349,7 +347,6 @@ export function DashboardPage() {
       {toast && (
         <Toast key={toast.key} tone="error" message={toast.message} open onOpenChange={(open) => !open && setToast(null)} />
       )}
-      <ToastViewport />
-    </ToastProvider>
+    </>
   );
 }

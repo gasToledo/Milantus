@@ -19,7 +19,8 @@ import { CharacterPage } from './sheet/CharacterPage';
 import { SettingsPage } from './settings/SettingsPage';
 import { ThemeProvider, useTheme } from './theme/theme';
 import { ButtonLink } from './ui/Button';
-import { TooltipProvider } from './ui/primitives';
+import { PendingEvents } from './events/PendingEvents';
+import { ToastProvider, ToastViewport, TooltipProvider } from './ui/primitives';
 import { Shell } from './ui/Shell';
 import { AppBusyLabel, AppErrorView, Notice } from './ui/status';
 
@@ -92,15 +93,29 @@ function Screen() {
   return <Enabled account={account.data} />;
 }
 
-/** Solo para cuentas con `webV2`: el tema de la cuenta y las rutas. */
+/** Solo para cuentas con `webV2`: el tema de la cuenta, las rutas y la única
+ *  columna de avisos. Los avisos viven acá y no en cada pantalla: dos
+ *  viewports fijos en la misma esquina se pisarían, y los de la cola
+ *  (`PendingEvents`) tienen que compartir el lugar con los de las acciones. */
 function Enabled({ account }: { account: Account }) {
-  const t = useTexts();
-  const { route } = useRoute();
   const themeMode = useThemeMode(true);
   const { adoptAccountMode } = useTheme();
   useEffect(() => {
     if (themeMode.data) adoptAccountMode(themeMode.data);
   }, [themeMode.data, adoptAccountMode]);
+
+  return (
+    <ToastProvider>
+      <Routes account={account} />
+      <PendingEvents />
+      <ToastViewport />
+    </ToastProvider>
+  );
+}
+
+function Routes({ account }: { account: Account }) {
+  const t = useTexts();
+  const { route } = useRoute();
 
   switch (route.name) {
     case 'roster':

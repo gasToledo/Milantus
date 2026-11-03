@@ -14,7 +14,7 @@ import * as SelectPrimitive from '@radix-ui/react-select';
 import * as SwitchPrimitive from '@radix-ui/react-switch';
 import * as ToastPrimitive from '@radix-ui/react-toast';
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
-import { Check, ChevronDown, CircleAlert, CircleCheck, Info } from 'lucide-react';
+import { Check, ChevronDown, CircleAlert, CircleCheck, Info, X } from 'lucide-react';
 import { cx } from './cx';
 
 /** Placa flotante: la misma superficie que una tarjeta. Sin sombra: lo que la
@@ -244,26 +244,32 @@ export function ToastViewport() {
 
 /** Un aviso (`showAppMessage`): ícono, color **y** texto, los tres; Radix lo
  *  anuncia como región viva. [action] es el «Deshacer» de `onUndo`: con él
- *  dura lo que un error, para que dé tiempo a tocarlo. */
+ *  dura lo que un error, para que dé tiempo a tocarlo. [duration] gana sobre
+ *  ese cálculo (los avisos de la cola, que se leen con calma); [closeLabel]
+ *  dibuja una X para descartarlo sin esperar. */
 export function Toast({
   tone,
   message,
   open,
   onOpenChange,
   action,
+  duration,
+  closeLabel,
 }: {
   tone: ToastTone;
   message: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   action?: { label: string; onSelect: () => void };
+  duration?: number;
+  closeLabel?: string;
 }) {
   const Icon = TOAST_ICON[tone];
   return (
     <ToastPrimitive.Root
       open={open}
       onOpenChange={onOpenChange}
-      duration={action ? TOAST_MS.error : TOAST_MS[tone]}
+      duration={duration ?? (action ? TOAST_MS.error : TOAST_MS[tone])}
       className="card flex items-center gap-2.5 px-4 py-3"
     >
       <Icon size={20} aria-hidden="true" className={cx('shrink-0', TOAST_COLOR[tone])} />
@@ -276,6 +282,15 @@ export function Toast({
         >
           {action.label}
         </ToastPrimitive.Action>
+      )}
+      {closeLabel && (
+        <ToastPrimitive.Close
+          aria-label={closeLabel}
+          title={closeLabel}
+          className="-my-1 -mr-2 inline-flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-nav)] text-text-muted hover:bg-plaque"
+        >
+          <X size={16} aria-hidden="true" />
+        </ToastPrimitive.Close>
       )}
     </ToastPrimitive.Root>
   );

@@ -5,7 +5,7 @@ import { hasUnsavedChanges, retrySave, useSaveState } from '../api/characterSave
 import { queryKeys, useAppVersion, useRoster, useSheetCatalog } from '../api/queries';
 import { useLang, useTexts } from '../i18n/context';
 import { characterHref, navigate, rosterHref, SHEET_TABS, type SheetTab } from '../router';
-import { Toast, ToastProvider, ToastViewport, type ToastTone } from '../ui/primitives';
+import { Toast, type ToastTone } from '../ui/primitives';
 import { Shell, SidebarBack } from '../ui/Shell';
 import { AppBusyLabel, AppErrorView, Notice, SaveStatusBadge } from '../ui/status';
 import { computeModel, type ComputedModel } from './compute';
@@ -162,7 +162,7 @@ export function CharacterPage({
   }
 
   return (
-    <ToastProvider>
+    <>
       <Shell
         panel={model ? <SheetPanel model={model} tab={activeTab} /> : <SidebarBack href={rosterHref()} label={t.backToCharacters} />}
         footer={
@@ -184,7 +184,6 @@ export function CharacterPage({
           action={toast.undo ? { label: t.undo, onSelect: toast.undo } : undefined}
         />
       )}
-      <ToastViewport />
-    </ToastProvider>
+    </>
   );
 }
