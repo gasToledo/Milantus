@@ -7,6 +7,7 @@ import { hpTone, Pill, SectionRule, StatTile, ThinBar } from '../ui/data';
 import { BreakdownDialog } from './BreakdownDialog';
 import { signed } from './format';
 import { ActiveModeTile } from './ActiveModes';
+import { useChoicesView, WarningsStrip } from './Choices';
 import { WildShapeTile } from './WildShape';
 import { classesOf, type SheetModel } from './model';
 import { advantageSources } from './rows';
@@ -22,15 +23,20 @@ export function SheetHeader({
   model,
   leading,
   showBand = true,
+  warnings = false,
 }: {
   model: SheetModel;
   leading?: ReactNode;
   /** La banda solo va donde se juega (Personaje y Combate): en Inventario,
    *  Campaña y Diario ocupa lugar sin aportar. */
   showBand?: boolean;
+  /** La franja de avisos del motor en la banda: solo en Personaje y solo en
+   *  la ficha propia (sin `write` el modelo no pide los avisos). */
+  warnings?: boolean;
 }) {
   const t = useTexts();
   const [initiativeOpen, setInitiativeOpen] = useState(false);
+  const choices = useChoicesView(model);
   const { character, sheet, catalog } = model;
   const exhaustion = character.combat?.exhaustion ?? 0;
   // Las otras velocidades (trepar, nadar, volar) van al pie: es donde se mira
@@ -131,6 +137,12 @@ export function SheetHeader({
             .map((m) => (
               <ActiveModeTile key={m.id} model={model} mode={m} />
             ))}
+          {/* Los avisos del motor, como la lámina: una franja más de la banda. */}
+          {warnings && choices && choices.warnings.length > 0 && (
+            <div data-mode className="min-w-0">
+              <WarningsStrip model={model} view={choices} />
+            </div>
+          )}
         </dl>
       </section>
       )}

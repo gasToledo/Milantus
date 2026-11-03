@@ -532,7 +532,7 @@ repiten acá.
   `setLanguage`, `setSize`, `setLineage`, `setSpeciesAbility`,
   `setFeatAbility` y `setUnarmoredDefense` las escriben con las mismas
   condiciones que los editores de Flutter (sacar vale siempre). En Personaje,
-  `WarningsStrip` (`sheet/Choices.tsx`) encabeza la pestaña y «Revisar» abre
+  `WarningsStrip` (`sheet/Choices.tsx`) es una franja de la banda (solo en Personaje) y «Revisar» abre
   `WarningsDialog`, con «Resolver» hacia la pantalla de elecciones
   (`/personajes/:id/elecciones?tab=`, `ChoicesPage`), el editor de conjuros o
   Inventario; el mapa `code` → destino vive en la pantalla, como `_resolverFor`

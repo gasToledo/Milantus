@@ -88,7 +88,7 @@ const bySeverity = (warnings: SheetWarning[]): SheetWarning[] => [
 ];
 
 /**
- * Arriba de la pestaña Personaje de la ficha propia: lo que el motor avisa
+ * En la banda de la pestaña Personaje de la ficha propia: lo que el motor avisa
  * (`CharacterValidator`) en una sola franja, y «Revisar» abre el detalle. Con
  * algún `warning` va en carmesí; con solo `info` —cosas por elegir, no una
  * ficha rota— en oro, para que una elección pendiente no parezca un error.
@@ -394,7 +394,7 @@ function ChoicesScreen({ model, write, view }: { model: SheetModel; write: Sheet
                 disabled={!on && o.locked}
                 blocked={!on && !o.locked && g.chosen.length >= g.count}
                 title={o.label}
-                detail={!on && o.locked ? t.crTakenElsewhere : undefined}
+                detail={!on && o.locked ? t.luAlreadyHave : undefined}
                 onClick={() => pick('setProficiencyChoice', g, o.id)}
               />
             );

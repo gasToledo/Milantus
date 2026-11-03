@@ -203,7 +203,7 @@ La pantalla de referencia de cómo se arma una vista con la biblioteca:
   el nombre solo. Un texto que hay que poder leer en el teléfono no va en un
   `Tooltip`.
 - `WarningsStrip` y `WarningsDialog` (`Choices.tsx`): las advertencias del
-  motor, solo en la ficha propia y encima de las columnas de Personaje. Con
+  motor, solo en la ficha propia, como una franja más de la banda táctica y solo en la pestaña Personaje. Con
   algún `warning` el borde y el ícono son carmesí; con solo `info` (cosas por
   elegir) van en oro. «Resolver» sale del mapa `code` → destino de
   `destinationOf`; un código sin destino no lleva botón.

@@ -10,7 +10,7 @@ import { Accordion } from '../ui/disclosure';
 import { BreakdownDialog } from './BreakdownDialog';
 import { signed } from './format';
 import type { SheetModel } from './model';
-import { ChangeChoicesButton, useChoicesView, WarningsStrip } from './Choices';
+import { ChangeChoicesButton, useChoicesView } from './Choices';
 import { ProficiencyRow } from './rows';
 import { ABILITIES, SKILL_ABILITY } from './vocabulary';
 
@@ -75,9 +75,6 @@ export function CharacterTab({ model }: { model: SheetModel }) {
 
   return (
     <>
-    {/* Solo en la ficha propia, arriba de las columnas y no en la banda ni en
-        otras pestañas: es lo primero que se ve al abrir el personaje. */}
-    {choices && <WarningsStrip model={model} view={choices} />}
     <SheetColumns>
       <div className="flex min-w-0 flex-col gap-4">
         <Card

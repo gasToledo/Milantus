@@ -41,7 +41,7 @@ export function SheetTabs({
   const t = useTexts();
   return (
     <div className="flex flex-col gap-4">
-      <SheetHeader model={model} leading={leading} showBand={active === 'personaje' || active === 'combate'} />
+      <SheetHeader model={model} leading={leading} showBand={active === 'personaje' || active === 'combate'} warnings={active === 'personaje'} />
       <LinkTabs
         label={t.sheetTabsLabel}
         value={active}
