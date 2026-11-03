@@ -13,6 +13,7 @@ import { SheetColumns } from './CharacterTab';
 import { resourceKey, signed } from './format';
 import { InnateCantripDialog } from './InnateCantripDialog';
 import { SpellList } from './SpellList';
+import { SpellSlotAction, SpellSlotGrid, spellSlotCells } from './SpellSlots';
 import { spellEditHref } from '../router';
 import { resourceLeft, type SheetModel } from './model';
 import { activeForm } from './WildShape';
@@ -336,7 +337,6 @@ function SpellsCard({ model }: { model: SheetModel }) {
       : sheet.spellcasting
         ? [{ classId: character.classId, classLevel: sheet.level, spellcasting: sheet.spellcasting }]
         : [];
-  if (blocks.length === 0 && sheet.innateSpells.length === 0) return null;
 
   // Lo elegido, como lo junta Flutter (`_spellsCard`): la lista vieja y las de
   // cada clase, sin repetir. Contar lo elegido no es una regla; el tope sí, y
@@ -346,49 +346,32 @@ function SpellsCard({ model }: { model: SheetModel }) {
   const cantripIdsFor = (classId: string) =>
     new Set([...(character.classCantripIds?.[classId] ?? (blocks.length === 1 ? (character.cantripIds ?? []) : []))]);
 
-  const slots = (byLevel: Record<string, number>, used: Record<string, number> | undefined, pact: boolean) =>
-    Object.entries(byLevel)
-      .filter(([, max]) => max > 0)
-      .sort(([a], [b]) => Number(a) - Number(b))
-      .map(([level, max]) => {
-        const spent = used?.[level] ?? 0;
-        const left = Math.max(0, max - spent);
-        const act = (type: 'spendSlot' | 'recoverSlot') => () =>
-          write!.act({ type, level: Number(level), pact });
-        return (
-          <li
-            key={`${pact ? 'p' : 'n'}-${level}`}
-            className="flex items-center justify-between gap-3"
-            data-slot={`${pact ? 'pact' : 'normal'}-${level}`}
-          >
-            <span className="text-[13px]">{pact ? t.pactSlotLevel(level) : t.slotLevel(level)}</span>
-            <span className="flex items-center gap-2">
-              <Pips max={max} left={left} label={t.slotsLabel(left, max, level)} />
-              {write && (
-                <SpendRecoverButtons
-                  spendLabel={t.spendSlot(level)}
-                  recoverLabel={t.recoverSlot(level)}
-                  onSpend={left > 0 ? act('spendSlot') : undefined}
-                  onRecover={spent > 0 ? act('recoverSlot') : undefined}
-                />
-              )}
-            </span>
-          </li>
-        );
-      });
-  const slotRows = [
-    ...slots(sheet.normalSpellSlotsByLevel, character.combat?.spellSlotsUsed, false),
-    ...slots(sheet.pactSlotsByLevel, character.combat?.pactSlotsUsed, true),
-  ];
-
   // Reacciones: los conjuros de rasgo (con su uso, CD y ataque ya calculados)
   // y los elegidos de clase cuyo tiempo de lanzamiento es una reacción.
   const spell = (id: string) => catalog.spells.find((s) => s.id === id);
-  const innateReactions = sheet.innateSpells.filter((s) => isReactionSpell(spell(s.spellId)));
   const chosen = new Set([
     ...blocks.flatMap((b) => [...spellIdsFor(b.classId)]),
     ...sheet.alwaysPreparedSpellIds,
   ]);
+
+  // La grilla tiene una celda por nivel con espacios o con algún conjuro
+  // elegido; los espacios y lo gastado son del motor y de la mesa.
+  const cells = spellSlotCells({
+    normal: sheet.normalSpellSlotsByLevel,
+    pact: sheet.pactSlotsByLevel,
+    normalUsed: character.combat?.spellSlotsUsed,
+    pactUsed: character.combat?.pactSlotsUsed,
+    spellLevels: [...chosen].map((id) => Number(spell(id)?.level ?? 0)),
+  });
+  // Solo se calcula al montar: gastar el último espacio o descansar no debe
+  // mover la elección de quien está mirando otro nivel.
+  const [selected, setSelected] = useState<string | null>(
+    () => (cells.find((c) => c.max > c.used) ?? cells[0])?.key ?? null,
+  );
+  if (blocks.length === 0 && sheet.innateSpells.length === 0) return null;
+  const cell = cells.find((c) => c.key === selected) ?? cells[0];
+
+  const innateReactions = sheet.innateSpells.filter((s) => isReactionSpell(spell(s.spellId)));
   const innateIds = new Set(sheet.innateSpells.map((s) => s.spellId));
   const classReactions = [...chosen]
     .filter((id) => !innateIds.has(id) && isReactionSpell(spell(id)))
@@ -412,8 +395,16 @@ function SpellsCard({ model }: { model: SheetModel }) {
     else concentrate(spell);
   };
 
+  const editButton = (b: SpellcastingBlock) =>
+    write && (
+      <ButtonLink tone="secondary" internal data-action="edit-spells" href={spellEditHref(character.id, b.classId)}>
+        {b.spellcasting.preparation === 'prepared' ? t.seActionPrepare : t.seActionEdit}
+      </ButtonLink>
+    );
+  const single = blocks.length === 1 ? blocks[0]! : null;
+
   return (
-    <Card id="spells" title={t.spellsHeading} icon={BookOpen}>
+    <Card id="spells" title={t.spellsHeading} icon={BookOpen} trailing={single && editButton(single)}>
       <div className="flex flex-col gap-4">
         {form && !sheet.wildShape?.canCast && (
           <div
@@ -443,7 +434,7 @@ function SpellsCard({ model }: { model: SheetModel }) {
                 <Eyebrow className="mb-2">{t.classLevel(nameOf(catalog.classes, b.classId) ?? b.classId, b.classLevel)}</Eyebrow>
               )}
               <dl className="grid grid-cols-3 gap-2">
-                <StatPlaque id="spell-dc" label={t.spellSaveDc} value={sc.saveDc} />
+                <StatPlaque id="spell-dc" label={t.spellDcCard} value={sc.saveDc} />
                 <StatPlaque id="spell-attack" label={t.spellAttack} value={signed(sc.attackBonus)} />
                 <StatPlaque
                   id="spell-ability"
@@ -456,34 +447,39 @@ function SpellsCard({ model }: { model: SheetModel }) {
                   }
                 />
               </dl>
-              <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
-                <p className="text-[13px] text-on-surface-variant tabular-nums">
-                  {[
-                    sc.preparation === 'prepared' ? t.spellsPrepared(prepared, sc.preparedCount) : t.spellsKnown(prepared),
-                    sc.cantripsKnown > 0 ? t.spellsCantrips(cantrips, sc.cantripsKnown) : null,
-                  ]
-                    .filter(Boolean)
-                    .join(' · ')}
-                </p>
-                {write && (
-                  <ButtonLink
-                    tone="secondary"
-                    internal
-                    data-action="edit-spells"
-                    href={spellEditHref(character.id, b.classId)}
-                  >
-                    {sc.preparation === 'prepared' ? t.seActionPrepare : t.seActionEdit}
-                  </ButtonLink>
-                )}
-              </div>
+              {/* Con una sola clase el botón vive en la cabecera y los cupos en
+                  las pestañas; con varias, cada bloque conserva los suyos. */}
+              {!single && (
+                <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                  <p className="text-[13px] text-on-surface-variant tabular-nums">
+                    {[
+                      sc.preparation === 'prepared' ? t.spellsPrepared(prepared, sc.preparedCount) : t.spellsKnown(prepared),
+                      sc.cantripsKnown > 0 ? t.spellsCantrips(cantrips, sc.cantripsKnown) : null,
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </p>
+                  {editButton(b)}
+                </div>
+              )}
             </div>
           );
         })}
 
-        {slotRows.length > 0 && <ul className="flex flex-col gap-2">{slotRows}</ul>}
+        <SpellSlotGrid cells={cells} selected={cell?.key ?? null} onSelect={setSelected} />
+        <SpellSlotAction cell={cell} write={write} />
 
         <div className="border-t border-hairline pt-3">
           <SpellList
+            levelFilter={cell ? { upTo: cell.pact, level: cell.level } : null}
+            caps={
+              single
+                ? {
+                    cantrips: single.spellcasting.cantripsKnown,
+                    spells: single.spellcasting.preparation === 'prepared' ? single.spellcasting.preparedCount : null,
+                  }
+                : null
+            }
             cantripIds={[...(character.cantripIds ?? []), ...Object.values(character.classCantripIds ?? {}).flat()]}
             spellIds={[...(character.spellIds ?? []), ...Object.values(character.classSpellIds ?? {}).flat()]}
             alwaysPreparedIds={sheet.alwaysPreparedSpellIds}

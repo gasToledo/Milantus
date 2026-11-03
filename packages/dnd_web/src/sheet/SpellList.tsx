@@ -1,7 +1,8 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { vocabularyLabel, type InnateSpell, type JsonObject } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import { Button } from '../ui/Button';
+import { cx } from '../ui/cx';
 import { Eyebrow } from '../ui/data';
 import { Accordion } from '../ui/disclosure';
 
@@ -21,10 +22,12 @@ export type SpellJson = JsonObject & {
 };
 
 /**
- * Los conjuros del personaje, como la sección de Flutter (`_spellsCard`):
- * trucos, siempre preparados, preparados (o conocidos) y los que concede un
- * rasgo. Cada uno se despliega con su ficha (tiempo, alcance, componentes,
- * duración y descripción). No se preparan ni se lanzan acá; en la ficha propia
+ * Los conjuros del personaje en **pestañas** (a propósito, la ficha de Flutter
+ * los apila): trucos, siempre preparados, preparados (o conocidos) y los que
+ * concede un rasgo, y solo las que tienen algo. Las de siempre preparados y
+ * elegidos siguen a la grilla de espacios (`levelFilter`): un mago de nivel 20
+ * llenaba la pantalla con la lista entera. Cada uno se despliega con su ficha
+ * (tiempo, alcance, componentes, duración y descripción). No se preparan ni se lanzan acá; en la ficha propia
  * ([onConcentrate]) los de concentración llevan «Concentrar», como Flutter.
  *
  * Lo elegido se junta como en Flutter: la lista vieja y las de cada clase,
@@ -42,7 +45,16 @@ export function SpellList({
   innateNote,
   onConcentrate,
   onSwapInnate,
+  levelFilter,
+  caps,
 }: {
+  /** El nivel elegido en la grilla de espacios: `upTo` (el pacto, que se
+   *  lanza a ese nivel o menos) muestra hasta él; si no, solo ese. `null` si
+   *  no hay grilla. Solo filtra la vista: no es una regla. */
+  levelFilter: { upTo: boolean; level: number } | null;
+  /** Los cupos del motor, para «25 de 25»; `spells` es `null` si conoce. Solo
+   *  con una clase lanzadora: con varias no hay un cupo único. */
+  caps: { cantrips: number; spells: number | null } | null;
   cantripIds: string[];
   spellIds: string[];
   alwaysPreparedIds: string[];
@@ -74,69 +86,155 @@ export function SpellList({
   const alwaysSet = new Set(always.map((s) => s.id));
   const spells = resolve([...chosen].filter((id) => !alwaysSet.has(id)));
 
-  if (cantrips.length + always.length + spells.length + innate.length === 0) {
+  const tabs: { key: TabKey; title: string; count: string }[] = [];
+  const num = (n: number, cap: number | null | undefined) =>
+    cap ? t.spellsTabCount(n, cap) : String(n);
+  if (cantrips.length > 0)
+    tabs.push({ key: 'cantrips', title: t.spellsTabCantrips, count: num(cantrips.length, caps?.cantrips) });
+  if (always.length > 0) tabs.push({ key: 'always', title: t.spellsTabAlways, count: String(always.length) });
+  if (spells.length > 0)
+    tabs.push({
+      key: 'chosen',
+      title: preparation === 'known' ? t.spellsTabKnown : t.spellsTabChosen,
+      count: num(spells.length, caps?.spells),
+    });
+  if (innate.length > 0) tabs.push({ key: 'innate', title: t.spellsTabInnate, count: String(innate.length) });
+
+  // Local a la lista: elegir una pestaña no mueve nada más. Empieza en los
+  // conjuros elegidos (lo que más se consulta) y, si la elegida desaparece
+  // (se desprepara el último), cae en la primera.
+  const [picked, setPicked] = useState<TabKey>(() => (tabs.some((x) => x.key === 'chosen') ? 'chosen' : (tabs[0]?.key ?? 'chosen')));
+
+  if (tabs.length === 0) {
     return <p className="text-[13px] text-text-muted">{t.spellsNoneChosen}</p>;
   }
+  const tab = tabs.some((x) => x.key === picked) ? picked : tabs[0]!.key;
 
-  const group = (id: string, title: string, list: SpellJson[]) =>
-    list.length > 0 && (
-      <section aria-labelledby={`spells-${id}`} data-spell-group={id}>
-        <Eyebrow className="mb-1">
-          <span id={`spells-${id}`}>{title}</span>
-        </Eyebrow>
-        <Accordion
-          headingLevel={4}
-          items={list.map((s) => ({
-            id: s.id,
-            title: <SpellTitle spell={s} />,
-            content: <SpellDetail spell={s} onConcentrate={onConcentrate && (() => onConcentrate(s.name ?? s.id))} />,
-          }))}
-        />
-      </section>
+  // `always` y `chosen` siguen a la grilla: un nivel, o hasta él si es pacto.
+  const leveled = (list: SpellJson[], empty: string) => {
+    const shown = levelFilter
+      ? list.filter((s) => (levelFilter.upTo ? (s.level ?? 0) <= levelFilter.level : (s.level ?? 0) === levelFilter.level))
+      : list;
+    if (shown.length === 0) return <p className="text-[13px] text-text-muted">{empty}</p>;
+    const items = (l: SpellJson[]) => (
+      <Accordion
+        headingLevel={4}
+        items={l.map((s) => ({
+          id: s.id,
+          title: <SpellTitle spell={s} hideLevel />,
+          content: <SpellDetail spell={s} onConcentrate={onConcentrate && (() => onConcentrate(s.name ?? s.id))} />,
+        }))}
+      />
     );
+    // Una celda normal ya dice el nivel: lista plana, sin rótulo.
+    if (levelFilter && !levelFilter.upTo) return items(shown);
+    const byLevel = new Map<number, SpellJson[]>();
+    for (const s of shown) byLevel.set(s.level ?? 0, [...(byLevel.get(s.level ?? 0) ?? []), s]);
+    return (
+      <div className="max-h-[420px] overflow-y-auto">
+        {[...byLevel].map(([level, l]) => (
+          <div key={level}>
+            <Eyebrow className="mb-1 mt-2 first:mt-0">{t.spellLevelShort(level)}</Eyebrow>
+            {items(l)}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const level = levelFilter?.level ?? 0;
+  let panel: ReactNode;
+  if (tab === 'cantrips') {
+    panel = (
+      <Accordion
+        headingLevel={4}
+        items={cantrips.map((s) => ({
+          id: s.id,
+          title: <SpellTitle spell={s} />,
+          content: <SpellDetail spell={s} onConcentrate={onConcentrate && (() => onConcentrate(s.name ?? s.id))} />,
+        }))}
+      />
+    );
+  } else if (tab === 'always') {
+    panel = leveled(always, t.spellsNoAlwaysAtLevel(level));
+  } else if (tab === 'chosen') {
+    panel = leveled(spells, preparation === 'known' ? t.spellsNoKnownAtLevel(level) : t.spellsNoneAtLevel(level));
+  } else {
+    panel = (
+      <Accordion
+        headingLevel={4}
+        items={innate.map((i) => {
+          const s = byId.get(i.spellId);
+          return {
+            id: `innate-${i.spellId}`,
+            // El nombre que da el motor (puede venir del rasgo) y su uso,
+            // CD y ataque, que son los del rasgo y no los de la clase.
+            title: <SpellTitle spell={s} name={i.name} note={innateNote(i)} />,
+            content: s ? (
+              <SpellDetail
+                spell={s}
+                onConcentrate={onConcentrate && (() => onConcentrate(i.name))}
+                onSwap={onSwapInnate && i.replaceableFrom.length > 0 ? () => onSwapInnate(i) : undefined}
+              />
+            ) : null,
+          };
+        })}
+      />
+    );
+  }
 
   return (
-    <div className="flex flex-col gap-3.5">
-      {group('cantrips', t.spellsCantripsTitle, cantrips)}
-      {group('always', t.spellsAlwaysPrepared, always)}
-      {group('chosen', preparation === 'known' ? t.spellsKnownTitle : t.spellsPreparedTitle, spells)}
-      {innate.length > 0 && (
-        <section aria-labelledby="spells-innate" data-spell-group="innate">
-          <Eyebrow className="mb-1">
-            <span id="spells-innate">{t.spellsFromFeatures}</span>
-          </Eyebrow>
-          <Accordion
-            headingLevel={4}
-            items={innate.map((i) => {
-              const s = byId.get(i.spellId);
-              return {
-                id: `innate-${i.spellId}`,
-                // El nombre que da el motor (puede venir del rasgo) y su uso,
-                // CD y ataque, que son los del rasgo y no los de la clase.
-                title: <SpellTitle spell={s} name={i.name} note={innateNote(i)} />,
-                content: s ? (
-                  <SpellDetail
-                    spell={s}
-                    onConcentrate={onConcentrate && (() => onConcentrate(i.name))}
-                    onSwap={onSwapInnate && i.replaceableFrom.length > 0 ? () => onSwapInnate(i) : undefined}
-                  />
-                ) : null,
-              };
-            })}
-          />
-        </section>
-      )}
+    <div className="flex flex-col gap-3">
+      {/* Local a este archivo: `SpellTabs` lleva estados de cupo que acá no van. */}
+      <div role="tablist" className="grid auto-cols-fr grid-flow-col gap-1.5">
+        {tabs.map((x) => {
+          const on = x.key === tab;
+          return (
+            <button
+              key={x.key}
+              type="button"
+              role="tab"
+              aria-selected={on}
+              data-tab={x.key}
+              onClick={() => setPicked(x.key)}
+              className={cx(
+                'flex min-h-[52px] min-w-0 flex-col items-center justify-center rounded-[var(--radius-card)] border px-2.5 py-1.5',
+                on ? 'border-gold bg-gold-soft text-gold' : 'border-hairline bg-plaque',
+              )}
+            >
+              <span className="text-[12.5px]">{x.title}</span>
+              <b className="text-[13px] font-bold tabular-nums">{x.count}</b>
+            </button>
+          );
+        })}
+      </div>
+      <div role="tabpanel" data-spell-group={tab}>
+        {panel}
+      </div>
     </div>
   );
 }
 
-function SpellTitle({ spell, name, note }: { spell: SpellJson | undefined; name?: string; note?: string }) {
+type TabKey = 'cantrips' | 'always' | 'chosen' | 'innate';
+
+function SpellTitle({
+  spell,
+  name,
+  note,
+  hideLevel,
+}: {
+  spell: SpellJson | undefined;
+  name?: string;
+  note?: string;
+  /** El nivel ya se lee en la celda o en el rótulo de grupo: la línea es la escuela. */
+  hideLevel?: boolean;
+}) {
   const t = useTexts();
   const level = spell?.level ?? 0;
   const line =
     note ??
     [
-      level === 0 ? t.cantrip : t.spellLevelShort(level),
+      hideLevel ? null : level === 0 ? t.cantrip : t.spellLevelShort(level),
       spell?.school ? vocabularyLabel('school', spell.school) : null,
     ]
       .filter(Boolean)

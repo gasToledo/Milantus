@@ -108,6 +108,8 @@ test('gastar y recuperar espacios y usos guarda lo que da el motor', async ({ pa
   const ficha = computeSheet(await ilse(request), catalogo());
   const canalizar = ficha.resources.find((r) => r.id === 'channel_divinity')!;
   await page.goto(COMBATE);
+  // Los botones de espacio son los del nivel elegido en la grilla.
+  await page.locator('[data-slot="normal-1"]').click();
 
   for (const [boton, accion] of [
     ['Gastar espacio de nivel 1', { type: 'spendSlot', level: 1, pact: false }],
@@ -180,6 +182,8 @@ test('la Inspiración Heroica y la concentración se marcan a mano y guardan lo 
     ],
     [
       async () => {
+        // Bendición es de nivel 1: la lista sigue a la celda elegida.
+        await page.locator('[data-slot="normal-1"]').click();
         await page.getByRole('button', { name: new RegExp(`^${bendecir}`) }).click();
         await page.getByRole('button', { name: 'Concentrar', exact: true }).click();
       },
@@ -470,6 +474,7 @@ test('cambiar el truco innato se confirma con «Cambiar» y guarda lo del motor'
   const escrituras = vigilarEscrituras(page);
 
   await page.goto(`/v2/personajes/${ELFO}/combate`);
+  await page.locator('[data-tab="innate"]').click();
   await page.locator('[data-spell-group="innate"]').getByRole('button', { name: innato.name }).click();
   await page.locator('[data-action="swap-innate"]').click();
   const dialogo = page.getByRole('dialog');

@@ -425,6 +425,14 @@ repiten acá.
   `setExhaustion`, `activateMode` y `deactivateMode`; una activación rechazada
   devuelve la ficha intacta. `compute` aplica `applyExhaustion` sobre la ficha
   calculada, como Flutter: antes `/v2` mostraba descansado a quien no lo está.
+  La tarjeta **Conjuros** ya no apila filas de espacios y listas: los espacios
+  son una grilla (`SpellSlotGrid`) que elige un nivel, una fila dice lo que
+  queda de él y, en la ficha propia, lo gasta o recupera; debajo, pestañas
+  (Trucos, Siempre preparados, Conjuros o Conocidos, De rasgos) donde las dos
+  del medio se filtran por ese nivel (el pacto, hasta él). Con una sola clase
+  el botón de editar pasa a la cabecera. Un mago de nivel 20 llenaba la
+  pantalla con la lista entera. **La ficha de `/v2` se aleja a propósito de la
+  de Flutter en este punto**; no hay regla nueva, solo otra vista de lo mismo.
   Desde 5e2: en la tarjeta **Conjuros** de Combate, un botón por bloque de
   lanzamiento («Preparar conjuros» si la clase prepara, «Editar conjuros» si
   conoce) lleva a `/personajes/:id/conjuros/:clase`, el editor

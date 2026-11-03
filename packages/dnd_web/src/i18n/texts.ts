@@ -300,6 +300,23 @@ const es = {
   spellsKnownTitle: 'Conjuros conocidos',
   spellsFromFeatures: 'Conjuros de rasgos',
   spellsNoneChosen: 'Todavía no elegiste conjuros.',
+  spellDcCard: 'CD',
+  slotCellPact: (level: number) => `Pacto, nivel ${level}`,
+  slotCellNone: 'Sin espacios',
+  slotCellLeft: (level: number, left: number, max: number, pact: boolean) => {
+    const who = pact ? 'Pacto' : `Nivel ${level}`;
+    if (max === 0) return `${who}: sin espacios`;
+    return `${who}: ${left === 1 ? 'queda' : 'quedan'} ${left} de ${max}`;
+  },
+  spellsTabCantrips: 'Trucos',
+  spellsTabAlways: 'Siempre preparados',
+  spellsTabChosen: 'Conjuros',
+  spellsTabKnown: 'Conocidos',
+  spellsTabInnate: 'De rasgos',
+  spellsTabCount: (n: number, cap: number) => `${n} de ${cap}`,
+  spellsNoneAtLevel: (level: number) => `No preparaste conjuros de nivel ${level}.`,
+  spellsNoKnownAtLevel: (level: number) => `No conocés conjuros de nivel ${level}.`,
+  spellsNoAlwaysAtLevel: (level: number) => `No tenés siempre preparados de nivel ${level}.`,
   concentration: 'Concentración',
   ritual: 'Ritual',
   cantrip: 'Truco',
@@ -1654,6 +1671,23 @@ const en: Texts = {
   spellsKnownTitle: 'Known spells',
   spellsFromFeatures: 'Spells from features',
   spellsNoneChosen: 'You haven’t chosen any spells yet.',
+  spellDcCard: 'DC',
+  slotCellPact: (level: number) => `Pact, level ${level}`,
+  slotCellNone: 'No slots',
+  slotCellLeft: (level: number, left: number, max: number, pact: boolean) => {
+    const who = pact ? 'Pact' : `Level ${level}`;
+    if (max === 0) return `${who}: no slots`;
+    return `${who}: ${left} of ${max} left`;
+  },
+  spellsTabCantrips: 'Cantrips',
+  spellsTabAlways: 'Always prepared',
+  spellsTabChosen: 'Spells',
+  spellsTabKnown: 'Known',
+  spellsTabInnate: 'From features',
+  spellsTabCount: (n: number, cap: number) => `${n} of ${cap}`,
+  spellsNoneAtLevel: (level: number) => `You haven’t prepared any level ${level} spells.`,
+  spellsNoKnownAtLevel: (level: number) => `You don’t know any level ${level} spells.`,
+  spellsNoAlwaysAtLevel: (level: number) => `You have no always-prepared level ${level} spells.`,
   concentration: 'Concentration',
   ritual: 'Ritual',
   cantrip: 'Cantrip',
