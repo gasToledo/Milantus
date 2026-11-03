@@ -182,8 +182,10 @@ test('la Inspiración Heroica y la concentración se marcan a mano y guardan lo 
     ],
     [
       async () => {
-        // Bendición es de nivel 1: la lista sigue a la celda elegida.
+        // Bendición es de nivel 1 y, en Dominio de la Vida, siempre preparada:
+        // vive en esa pestaña, que también sigue a la celda elegida.
         await page.locator('[data-slot="normal-1"]').click();
+        await page.locator('[data-tab="always"]').click();
         await page.getByRole('button', { name: new RegExp(`^${bendecir}`) }).click();
         await page.getByRole('button', { name: 'Concentrar', exact: true }).click();
       },
