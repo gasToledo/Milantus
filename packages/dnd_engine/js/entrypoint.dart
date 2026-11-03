@@ -894,19 +894,39 @@ String creation(
 
 /// Confirma el creador: el personaje listo para guardar, con su id y los PG al
 /// máximo. Lanza si falta algo (`CreationDraft.confirm`). [unnamed] es el nombre
-/// si no se escribió ninguno, en el idioma del cliente.
-String creationConfirm(String catalogJson, String draftJson, String unnamed) =>
+/// si no se escribió ninguno, en el idioma del cliente. [replacingJson] (vacío
+/// si no hay) es el personaje que se rehace: conserva su id, retratos y diario.
+/// `Character.fromJson` lo migra, igual que en [act].
+String creationConfirm(
+  String catalogJson,
+  String draftJson,
+  String unnamed, [
+  String replacingJson = '',
+]) =>
     jsonEncode(
       CreationDraft.fromJson(
         _repoPara(catalogJson),
         jsonDecode(draftJson) as Map<String, dynamic>,
-      ).confirm(unnamed: unnamed).toJson(),
+      )
+          .confirm(
+            unnamed: unnamed,
+            replacing: replacingJson.isEmpty
+                ? null
+                : Character.fromJson(
+                    jsonDecode(replacingJson) as Map<String, dynamic>,
+                  ),
+          )
+          .toJson(),
     );
+
+/// El personaje de ejemplo de la cuenta vacía ([demoSagan]).
+String demoCharacter() => jsonEncode(demoSagan().toJson());
 
 void main() {
   final motor = JSObject();
   motor['creationConfirm'] = creationConfirm.toJS;
   motor['creation'] = creation.toJS;
+  motor['demoCharacter'] = demoCharacter.toJS;
   motor['act'] = act.toJS;
   motor['companionsView'] = companionsViewJs.toJS;
   motor['companionPreview'] = companionPreviewJs.toJS;

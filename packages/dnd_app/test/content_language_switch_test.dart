@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dnd_app/api/api_client.dart';
-import 'package:dnd_app/demo/demo_characters.dart';
 import 'package:dnd_app/l10n/app_locale.dart';
 import 'package:dnd_app/l10n/app_localizations.dart';
 import 'package:dnd_app/main.dart';

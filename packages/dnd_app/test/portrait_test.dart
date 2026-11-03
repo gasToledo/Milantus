@@ -1,5 +1,4 @@
 import 'package:dnd_engine/dnd_engine.dart';
-import 'package:dnd_app/demo/demo_characters.dart';
 import 'package:dnd_app/theme/app_theme.dart';
 import 'package:dnd_app/theme/app_widgets.dart';
 import 'package:dnd_app/ui/portrait_image.dart';

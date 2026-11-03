@@ -1466,4 +1466,16 @@ void main() {
       expect(igual.portraitPrompts, {'a': 'pa', 'b': 'pb'});
     });
   });
+
+  group('Renombrar', () {
+    test('recorta el nombre; uno vacío no toca la ficha', () {
+      final c = monje();
+      final r = act(c, {'type': 'rename', 'name': '  Brunilda '});
+      expect(r.character.name, 'Brunilda');
+      expect(r.outcome['renamed'], isTrue);
+      final vacio = act(c, {'type': 'rename', 'name': '   '});
+      expect(vacio.character.name, c.name);
+      expect(vacio.outcome['renamed'], isFalse);
+    });
+  });
 }

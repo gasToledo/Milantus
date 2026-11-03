@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:dnd_app/data/backup_bundle.dart';
-import 'package:dnd_app/demo/demo_characters.dart';
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
 

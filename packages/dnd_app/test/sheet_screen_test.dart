@@ -1,6 +1,5 @@
 import 'package:dnd_app/api/api_client.dart';
 import 'package:dnd_app/data/characters_controller.dart';
-import 'package:dnd_app/demo/demo_characters.dart';
 import 'package:dnd_app/theme/app_theme.dart';
 import 'package:dnd_app/theme/app_widgets.dart';
 import 'package:dnd_app/ui/sheet_screen.dart';

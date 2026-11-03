@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:dnd_app/api/api_client.dart';
 import 'package:dnd_app/api/api_exception.dart';
 import 'package:dnd_app/data/characters_controller.dart';
-import 'package:dnd_app/demo/demo_characters.dart';
+import 'package:dnd_engine/dnd_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'fakes/fake_api_server.dart';

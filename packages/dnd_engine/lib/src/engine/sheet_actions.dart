@@ -157,6 +157,8 @@ class SheetActions {
   ///   `imageKey`, la ficha vuelve intacta y `outcome.saved` es false.
   ///   `removeDiaryEntry` con `entry`. `moveDiaryEntry` con `entry` y `to` (el
   ///   id del destino). Ids que no existen dejan la ficha como estaba.
+  /// - `rename` con `name`: el nombre del personaje, recortado. Vacío (o solo
+  ///   espacios) deja la ficha como estaba y `outcome.renamed` es false.
   /// - Retratos: `addPortrait` con `key` y `prompt` (opcional) antepone la
   ///   clave a `portraitPaths`, y con `prompt` lo guarda en `portraitPrompts`.
   ///   Una clave vacía o ya presente deja la ficha como estaba (no se duplica
@@ -684,6 +686,10 @@ class SheetActions {
         // Sin recortar: se manda mientras alguien escribe, y un espacio al
         // final de la palabra que viene en camino no puede comerse.
         c = c.copyWith(background: action['text'] as String? ?? '');
+      case 'rename':
+        final name = (action['name'] as String? ?? '').trim();
+        outcome['renamed'] = name.isNotEmpty;
+        if (name.isNotEmpty) c = c.copyWith(name: name);
       case 'saveDiaryEntry':
         final saved = _saveDiaryEntry(c, action);
         outcome['saved'] = saved != null;

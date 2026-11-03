@@ -4,7 +4,6 @@ import 'package:dnd_app/api/api_models.dart';
 import 'package:dnd_app/data/characters_controller.dart';
 import 'package:dnd_app/data/homebrew_store.dart';
 import 'package:dnd_app/data/settings_service.dart';
-import 'package:dnd_app/demo/demo_characters.dart';
 import 'package:dnd_app/homebrew/homebrew_screen.dart';
 import 'package:dnd_app/theme/app_theme.dart';
 import 'package:dnd_app/ui/dashboard_screen.dart';

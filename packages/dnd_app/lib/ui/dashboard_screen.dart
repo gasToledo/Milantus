@@ -6,7 +6,6 @@ import '../api/api_models.dart';
 import '../codex/codex_screen.dart';
 import '../creation/creation_wizard.dart';
 import '../data/characters_controller.dart';
-import '../demo/demo_characters.dart';
 import '../data/homebrew_store.dart';
 import '../data/npc_bundle.dart';
 import '../data/settings_service.dart';

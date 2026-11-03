@@ -24,7 +24,8 @@ interface DartEngine {
   trade(requestJson: string, labelsJson: string): string;
   levelUp(characterJson: string, catalogJson: string, draftJson: string): string;
   creation(catalogJson: string, draftJson: string, actionJson: string, seed?: number): string;
-  creationConfirm(catalogJson: string, draftJson: string, unnamed: string): string;
+  creationConfirm(catalogJson: string, draftJson: string, unnamed: string, replacingJson?: string): string;
+  demoCharacter(): string;
   rollDie(sides: number): number;
   coinParts(cp: number): string;
   formatAmount(cp: number, labelsJson: string): string;
@@ -691,8 +692,20 @@ export function creationView(catalog: Catalog, draft: CreationDraftJson, action?
 
 /** El personaje listo para guardar. Lanza si el borrador está incompleto: la
  *  pantalla no lo ofrece, pero la regla es del motor. */
-export function creationConfirm(catalog: Catalog, draft: CreationDraftJson, unnamed: string): CharacterJson & { id: string } {
-  return JSON.parse(engine().creationConfirm(catalogJson(catalog), JSON.stringify(draft), unnamed)) as CharacterJson & { id: string };
+export function creationConfirm(
+  catalog: Catalog,
+  draft: CreationDraftJson,
+  unnamed: string,
+  replacing?: CharacterJson,
+): CharacterJson & { id: string } {
+  return JSON.parse(
+    engine().creationConfirm(catalogJson(catalog), JSON.stringify(draft), unnamed, replacing ? JSON.stringify(replacing) : ''),
+  ) as CharacterJson & { id: string };
+}
+
+/** El personaje de ejemplo de la cuenta vacía (`demoSagan` del motor). */
+export function demoCharacter(): CharacterJson & { id: string } {
+  return JSON.parse(engine().demoCharacter()) as CharacterJson & { id: string };
 }
 
 export function rollDie(sides: number): number {
@@ -767,6 +780,7 @@ export function musicSource(url: string): MusicSource | null {
 export type SheetAction =
   | { type: 'damage' | 'heal' | 'tempHp'; amount: number }
   | { type: 'deathSave'; success: boolean }
+  | { type: 'rename'; name: string }
   | { type: 'spendSlot' | 'recoverSlot'; level: number; pact: boolean }
   | { type: 'spendResource' | 'recoverResource'; resource: string; amount?: number }
   | { type: 'spendHitDie' | 'shortRest' | 'longRest' | 'endConcentration' }

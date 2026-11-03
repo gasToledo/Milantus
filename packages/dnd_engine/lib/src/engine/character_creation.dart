@@ -2200,12 +2200,12 @@ class CreationDraft {
   /// El alta desde el puente: con algo pendiente no hay personaje, igual que
   /// una subida de nivel a medias. Flutter no llega hasta acá: su botón final
   /// no aparece sin completar los pasos.
-  Character confirm({String unnamed = ''}) {
+  Character confirm({String unnamed = '', Character? replacing}) {
     pruneAll();
     if (pending.isNotEmpty) {
       throw StateError('Falta completar: ${pending.first.kind.name}');
     }
-    return create(unnamed: unnamed);
+    return create(unnamed: unnamed, replacing: replacing);
   }
 
   /// El personaje que se guarda al terminar: [build] con los PG actuales en el

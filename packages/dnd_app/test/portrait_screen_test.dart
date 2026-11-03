@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:dnd_app/api/api_client.dart';
-import 'package:dnd_app/demo/demo_characters.dart';
 import 'package:dnd_app/theme/app_theme.dart';
 import 'package:dnd_app/ui/portrait_screen.dart';
 import 'package:dnd_engine/dnd_engine.dart';

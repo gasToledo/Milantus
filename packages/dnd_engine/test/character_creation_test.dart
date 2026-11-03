@@ -141,6 +141,7 @@ void main() {
       portraitPaths: ['retrato-1'],
       portraitPrompts: {'retrato-1': 'acuarela'},
       background: 'Nació en la frontera.',
+      diary: [const DiaryEntry(entryId: 'e1', title: 'Manía')],
       coins: {'gp': 900},
     );
     final d = CreationDraft(repo)
@@ -155,6 +156,7 @@ void main() {
     expect(rebuilt.portraitPaths, old.portraitPaths);
     expect(rebuilt.portraitPrompts, old.portraitPrompts);
     expect(rebuilt.background, old.background);
+    expect(rebuilt.diary.single.entryId, 'e1');
     expect(rebuilt.classId, 'wizard');
     expect(rebuilt.totalLevel, 1);
     expect(rebuilt.coins, isNot(old.coins));
