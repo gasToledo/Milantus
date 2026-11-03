@@ -594,3 +594,15 @@ test('invocar un familiar y despedirlo guardan lo que da el motor', async ({ pag
   );
   expect(fin).toEqual(despedido);
 });
+
+test('un aviso del motor lleva a la pantalla de elecciones, y elegir guarda lo que da el motor', async ({ page, request }) => {
+  const ELFA = 'elfa-de-humo';
+  const antes = await ilse(request, ELFA);
+
+  await page.goto(`/v2/personajes/${ELFA}/personaje`);
+  await page.locator('[data-action="review-warnings"]').click();
+  await page.locator('[data-resolve="lineage_pending"]').click();
+
+  const enviado = await proximoGuardado(page, () => page.locator('[data-option="elf-high"]').click(), ELFA);
+  expect(enviado).toEqual(segunMotor(antes, { type: 'setLineage', lineage: 'elf-high' }));
+});

@@ -524,6 +524,22 @@ repiten acá.
   muestra solo la celda de pacto. **Siguen en Flutter:** invocar en forma de
   bestia, el Defensor de Acero, y el Compañero Salvaje, que no cobra ni se va
   con el descanso.
+  Desde 5e7, la ficha propia **dice lo que el motor avisa y deja resolverlo**.
+  `choicesView` (`character_choices.dart`) entrega las advertencias del
+  validador y los cupos de rasgos, competencias, conjuros, idiomas y origen con
+  sus opciones ya resueltas (requisito sin cumplir, bloqueos, pendientes); las
+  acciones `setFeatureChoice`, `setProficiencyChoice`, `setSpellChoice`,
+  `setLanguage`, `setSize`, `setLineage`, `setSpeciesAbility`,
+  `setFeatAbility` y `setUnarmoredDefense` las escriben con las mismas
+  condiciones que los editores de Flutter (sacar vale siempre). En Personaje,
+  `WarningsStrip` (`sheet/Choices.tsx`) encabeza la pestaña y «Revisar» abre
+  `WarningsDialog`, con «Resolver» hacia la pantalla de elecciones
+  (`/personajes/:id/elecciones?tab=`, `ChoicesPage`), el editor de conjuros o
+  Inventario; el mapa `code` → destino vive en la pantalla, como `_resolverFor`
+  de Flutter. «Cambiar elecciones», en Identidad, abre la misma pantalla para
+  revisar lo ya elegido; Defensa elige la fórmula sin armadura (Monje +
+  Bárbaro). **Sin botón, como en Flutter:** los avisos de subclase, mejora de
+  nivel y habilidades de clase. El Compañero Salvaje sigue pendiente.
   La banda táctica (PG, Iniciativa,
   Velocidad, Competencia; sin Armadura, que se lee en Defensa) solo va en
   Personaje y Combate, como en Flutter; el modo en curso lo dice su propia franja (con lo que suma), sin cartel aparte. Sin escritura, la ficha ajena
@@ -674,7 +690,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    5e6, lo que la comparación de las dos fichas mostró que /v2 no decía:
    dados de Ataque Furtivo, maestrías, ventajas, competencias, idiomas,
    sentidos y desgloses, sin escrituras *(existe)*; 5e7, los avisos y
-   «Resolver», con la Defensa sin armadura; 5e8, escribir el Diario; 5e9, los
+   «Resolver», con la Defensa sin armadura *(existe)*; 5e8, escribir el Diario; 5e9, los
    retratos. El aviso de turno y Compartir van al paso 6. 5f, la lista de
    personajes: reordenar, marcar favorito, renombrar, borrar y rehacer. Van
    antes del paso 6 porque solo tocan datos de la propia cuenta.
@@ -802,8 +818,8 @@ hace seguro volver atrás es que **no hay nada que deshacer en el formato**:
 
 Para que nadie lo dé por hecho:
 
-- Los pasos 5e7 a 5e9 (avisos y «Resolver», Defensa sin armadura, escribir el
-  Diario, retratos), las escrituras de 5f y los pasos 6 y 7: el detalle está en
+- Los pasos 5e8 y 5e9 (escribir el Diario, retratos), el Compañero Salvaje
+  (invocarlo, que no cobra ni se va con el descanso), las escrituras de 5f y los pasos 6 y 7: el detalle está en
   [Orden previsto de pantallas](#orden-previsto-de-pantallas).
 - Control de versión en el servidor para las escrituras (rechazar una copia
   vieja con 409): hoy gana el último que guarda, como en Flutter.

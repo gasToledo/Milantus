@@ -100,6 +100,8 @@ export type Route =
   | { name: 'magicPlans'; id: string }
   // Las formas anotadas de Forma Salvaje de la ficha propia.
   | { name: 'wildShapeForms'; id: string }
+  // Las elecciones pendientes o reemplazables de la ficha propia.
+  | { name: 'choices'; id: string }
   // El creador de personajes.
   | { name: 'creation' }
   | { name: 'unknown' };
@@ -216,6 +218,13 @@ export function matchRoute(pathname: string): Route {
   if (section === 'personajes' && id && tab === 'planos' && rest.length === 0) {
     try {
       return { name: 'magicPlans', id: decodeURIComponent(id) };
+    } catch {
+      return { name: 'unknown' };
+    }
+  }
+  if (section === 'personajes' && id && tab === 'elecciones' && rest.length === 0) {
+    try {
+      return { name: 'choices', id: decodeURIComponent(id) };
     } catch {
       return { name: 'unknown' };
     }

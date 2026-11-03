@@ -202,6 +202,18 @@ La pantalla de referencia de cómo se arma una vista con la biblioteca:
   ícono `Info` que lo abre en un `AppDialog` (recursos, objetos). Sin texto es
   el nombre solo. Un texto que hay que poder leer en el teléfono no va en un
   `Tooltip`.
+- `WarningsStrip` y `WarningsDialog` (`Choices.tsx`): las advertencias del
+  motor, solo en la ficha propia y encima de las columnas de Personaje. Con
+  algún `warning` el borde y el ícono son carmesí; con solo `info` (cosas por
+  elegir) van en oro. «Resolver» sale del mapa `code` → destino de
+  `destinationOf`; un código sin destino no lleva botón.
+- `ChoicesPage` (`Choices.tsx`, ruta `/elecciones?tab=`): `SpellTabs` con
+  Rasgos, Competencias, Conjuros, Idiomas y Origen, solo las que tienen grupos.
+  Los grupos se fijan al abrir (pendientes o reemplazables): uno que se
+  completa sigue a la vista. Cada toque guarda una acción del motor, sin
+  «Guardar» ni «Deshacer»; con el cupo lleno el pie dice por qué y no manda
+  nada. El detalle va a la derecha desde 1024 px y en un `AppDialog` (botón
+  `Info`) debajo.
 - Columnas: `COLUMNS` (`CharacterTab.tsx`), tantas de 300 px como entren y una
   en un teléfono, con `items-start`.
 - Rótulos que necesitan vocabulario del motor (la característica de cada

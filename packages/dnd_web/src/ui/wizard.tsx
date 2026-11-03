@@ -34,11 +34,15 @@ export function Status({
   ready = false,
   auto = false,
   count,
+  label,
   t,
 }: {
   ready?: boolean;
   auto?: boolean;
   count?: [number, number];
+  /** Lo que falta dicho con palabras («Faltan 2»), cuando no es una cuenta de
+   *  n de m. */
+  label?: string;
   t: Texts;
 }) {
   const pill = 'inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] border border-hairline px-[9px] py-[2px] text-[11px] whitespace-nowrap';
@@ -53,7 +57,7 @@ export function Status({
   return (
     <span className={cx(pill, 'bg-plaque text-on-surface')}>
       <span aria-hidden="true" className="h-[7px] w-[7px] rounded-full border-[1.5px] border-current" />
-      {count ? t.luCount(count[0], count[1]) : t.luPending}
+      {label ?? (count ? t.luCount(count[0], count[1]) : t.luPending)}
     </span>
   );
 }
@@ -149,7 +153,7 @@ export function SpellTabs({
   label,
   t,
 }: {
-  tabs: { key: string; title: string; ready: boolean; count?: [number, number] }[];
+  tabs: { key: string; title: string; ready: boolean; count?: [number, number]; label?: string }[];
   current: string;
   onSelect: (key: string) => void;
   label: string;
@@ -173,7 +177,7 @@ export function SpellTabs({
             )}
           >
             <span className="text-[13px] leading-[1.25] font-medium">{x.title}</span>
-            <Status ready={x.ready} count={x.count} t={t} />
+            <Status ready={x.ready} count={x.count} label={x.label} t={t} />
           </button>
         );
       })}

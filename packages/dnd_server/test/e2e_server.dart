@@ -402,6 +402,29 @@ Future<void> main() async {
       combat: CombatState(currentHp: 30),
     ),
   );
+  // Una elfa sin linaje: el motor avisa `lineage_pending` y «Resolver» lleva a
+  // la pantalla de elecciones.
+  await characters.create(
+    writerUserId,
+    Character(
+      id: 'elfa-de-humo',
+      name: 'Elfa de Humo',
+      raceId: 'elf',
+      classId: 'druid',
+      backgroundId: 'sage',
+      level: 8,
+      assignedScores: const {
+        Ability.strength: 8,
+        Ability.dexterity: 14,
+        Ability.constitution: 14,
+        Ability.intelligence: 18,
+        Ability.wisdom: 10,
+        Ability.charisma: 10,
+      },
+      hpPerLevel: List.filled(8, 5),
+      combat: CombatState(currentHp: 30),
+    ),
+  );
   final settings = InMemorySettingsRepository();
   await settings.save(smokeUserId, {
     'sortMode': 'level',
