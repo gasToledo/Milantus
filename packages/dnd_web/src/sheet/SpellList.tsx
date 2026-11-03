@@ -253,7 +253,7 @@ function SpellTitle({
 
 /** Concentración y ritual: rótulo chico con filete (`OutlinedTag`), más
  *  liviano que una pill para no competir con el nombre. */
-function Tag({ children }: { children: ReactNode }) {
+export function Tag({ children }: { children: ReactNode }) {
   return (
     <span className="rounded-[var(--radius-pill)] border border-hairline px-1.5 text-[10px] font-normal text-on-surface-variant">
       {children}

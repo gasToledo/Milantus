@@ -11,6 +11,7 @@ import { Card } from '../ui/Card';
 import { Eyebrow, hpTone, Pill, Pips, ShieldBadge, SpendRecoverButtons, StatPlaque, ThinBar } from '../ui/data';
 import { SheetColumns } from './CharacterTab';
 import { resourceKey, signed } from './format';
+import { CompanionsCard } from './Companions';
 import { InnateCantripDialog } from './InnateCantripDialog';
 import { SpellList } from './SpellList';
 import { SpellSlotAction, SpellSlotGrid, spellSlotCells } from './SpellSlots';
@@ -39,6 +40,7 @@ export function CombatTab({ model }: { model: SheetModel }) {
       <div className="flex min-w-0 flex-col gap-4">
         <HitPointsCard model={model} />
         <DefenseCard model={model} />
+        <CompanionsCard model={model} />
       </div>
       <div className="flex min-w-0 flex-col gap-4">
         <AttacksCard model={model} />
@@ -158,19 +160,42 @@ function HitDieButton({ model }: { model: SheetModel }) {
 /** Cantidad, Daño, Curar y PG temp, como `_hpControls` de Flutter: un campo
  *  y tres verbos. Un campo vacío o inválido cuenta 0, como allá. */
 function HitPointControls({ model }: { model: SheetModel }) {
+  return (
+    <AmountControls
+      id="hp-amount"
+      dataControls="hit-points"
+      onRun={(type, amount) => model.write!.act({ type, amount })}
+    />
+  );
+}
+
+/** El campo de cantidad con Daño, Curar y PG temp: lo comparten los PG del
+ *  personaje y los de cada compañero. [id] ata el rótulo al campo y tiene que
+ *  ser único en la pantalla; [onRun] recibe la cantidad ya leída. */
+export function AmountControls({
+  id,
+  dataControls,
+  onRun,
+  className = 'mt-3',
+}: {
+  id: string;
+  dataControls: string;
+  onRun: (type: 'damage' | 'heal' | 'tempHp', amount: number) => void;
+  className?: string;
+}) {
   const t = useTexts();
   const [amount, setAmount] = useState('');
   const run = (type: 'damage' | 'heal' | 'tempHp') => {
-    model.write!.act({ type, amount: Number.parseInt(amount, 10) || 0 });
+    onRun(type, Number.parseInt(amount, 10) || 0);
     setAmount('');
   };
   return (
-    <div className="mt-3 flex flex-wrap items-center gap-2" data-controls="hit-points">
-      <label htmlFor="hp-amount" className="sr-only">
+    <div className={`${className} flex flex-wrap items-center gap-2`} data-controls={dataControls}>
+      <label htmlFor={id} className="sr-only">
         {t.hpAmount}
       </label>
       <input
-        id="hp-amount"
+        id={id}
         type="number"
         inputMode="numeric"
         min={0}
@@ -615,24 +640,47 @@ function ConditionsCard({ model }: { model: SheetModel }) {
 function ConditionChips({ model }: { model: SheetModel }) {
   const t = useTexts();
   const { character, write } = model;
-  const active = character.combat?.conditions ?? [];
   return (
-    <ul className="flex flex-wrap gap-1.5" data-controls="conditions">
+    <ConditionToggleList
+      controls="conditions"
+      attr="data-condition"
+      active={character.combat?.conditions ?? []}
+      onToggle={(id, value) => {
+        const r = write!.act({ type: 'setCondition', condition: id, value });
+        const gone = r?.outcome.dismissed ?? [];
+        if (gone.length > 0) write!.notify(t.conditionsDismissed(gone.join(', ')));
+      }}
+    />
+  );
+}
+
+/** Los estados como chips que se marcan: los de la ficha y los de cada
+ *  compañero. [attr] es el atributo con que se encuentra cada chip y
+ *  [controls] el que marca la lista como control de escritura. */
+export function ConditionToggleList({
+  active,
+  onToggle,
+  attr,
+  controls,
+}: {
+  active: string[];
+  onToggle: (id: string, value: boolean) => void;
+  attr: 'data-condition' | 'data-companion-condition';
+  controls: string;
+}) {
+  const t = useTexts();
+  return (
+    <ul className="flex flex-wrap gap-1.5" data-controls={controls}>
       {Object.keys(t.conditions).map((id) => {
         const on = active.includes(id);
-        const toggle = () => {
-          const r = write!.act({ type: 'setCondition', condition: id, value: !on });
-          const gone = r?.outcome.dismissed ?? [];
-          if (gone.length > 0) write!.notify(t.conditionsDismissed(gone.join(', ')));
-        };
         return (
           <li key={id}>
-            <Tooltip content={(t.conditionRules as Record<string, { rule: string }>)[id]?.rule ??labelOf(t.conditions, id)}>
+            <Tooltip content={(t.conditionRules as Record<string, { rule: string }>)[id]?.rule ?? labelOf(t.conditions, id)}>
               <button
                 type="button"
                 aria-pressed={on}
-                data-condition={id}
-                onClick={toggle}
+                {...{ [attr]: id }}
+                onClick={() => onToggle(id, !on)}
                 className={`inline-flex items-center rounded-[var(--radius-pill)] border px-3 py-1 font-[family-name:var(--font-body)] text-[13px] ${
                   on ? 'border-gold bg-gold-soft text-gold' : 'border-hairline bg-plaque text-on-surface-variant'
                 }`}
