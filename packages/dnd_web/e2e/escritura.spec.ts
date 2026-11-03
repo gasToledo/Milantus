@@ -636,3 +636,29 @@ test('subir un retrato guarda lo que da el motor', async ({ page, request }) => 
   );
   expect(enviado).toEqual(segunMotor(antes, { type: 'addPortrait', key: enviado.portraitPaths![0] }));
 });
+
+test('renombrar desde la lista guarda lo que da el motor', async ({ page, request }) => {
+  const antes = await ilse(request);
+  const nuevo = 'Ilse de las Cenizas';
+
+  // Por el menú ⋮ de la tarjeta; devuelve lo que viajó en el PUT.
+  async function renombrar(actual: string, nombre: string): Promise<CharacterJson> {
+    await page.locator(`[data-character="${ILSE}"]`).getByRole('button', { name: `Acciones de ${actual}` }).click();
+    await page.getByRole('menuitem', { name: 'Renombrar' }).click();
+    await page.locator('[data-field="rename"]').fill(nombre);
+    const put = page.waitForRequest((r) => r.method() === 'PUT' && r.url().endsWith(`/api/characters/${ILSE}`));
+    await page.getByRole('button', { name: 'Guardar', exact: true }).click();
+    const enviado = ((await put).postDataJSON() as { character: CharacterJson }).character;
+    await expect(page.getByRole('dialog')).toBeHidden();
+    return enviado;
+  }
+
+  await page.goto('/v2/');
+  const enviado = await renombrar(antes.name, nuevo);
+  expect(enviado).toEqual(segunMotor(antes, { type: 'rename', name: nuevo }));
+  expect((await ilse(request)).name).toBe(nuevo);
+
+  // Se deja el nombre original: las otras pruebas de esta cuenta lo leen.
+  await renombrar(nuevo, antes.name);
+  expect((await ilse(request)).name).toBe(antes.name);
+});

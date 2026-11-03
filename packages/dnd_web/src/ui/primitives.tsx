@@ -84,6 +84,10 @@ export function DropdownMenuRadioItem({
   );
 }
 
+export function DropdownMenuSeparator(props: ComponentProps<typeof DropdownMenuPrimitive.Separator>) {
+  return <DropdownMenuPrimitive.Separator {...props} className={cx('mx-1.5 my-1 h-px bg-hairline', props.className)} />;
+}
+
 export function DropdownMenuLabel(props: ComponentProps<typeof DropdownMenuPrimitive.Label>) {
   return <DropdownMenuPrimitive.Label {...props} className={cx('eyebrow px-2.5 pt-1.5 pb-1', props.className)} />;
 }

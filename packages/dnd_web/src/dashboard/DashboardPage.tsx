@@ -1,9 +1,11 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChevronDown, Plus, X } from 'lucide-react';
-import type { RosterSettings } from '../api/client';
+import { dropPending } from '../api/characterSave';
+import { deleteCharacter, saveCharacter, type RosterSettings, type StoredCharacter } from '../api/client';
 import { queryKeys, useRoster, useRosterSettings, useSheetCatalog } from '../api/queries';
 import { patchSettings } from '../api/settingsSave';
+import { actOn, migrateCharacter, type CharacterJson } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import { creationHref } from '../router';
 import { Button, ButtonLink } from '../ui/Button';
@@ -21,6 +23,8 @@ import {
 } from '../ui/primitives';
 import { useReorder } from '../ui/reorder';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
+import { DeleteDialog } from './DeleteDialog';
+import { RenameDialog } from './RenameDialog';
 import { RosterCard } from './RosterCard';
 import {
   isFallen,
@@ -102,6 +106,39 @@ export function DashboardPage() {
     },
   });
 
+  const [renaming, setRenaming] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+
+  type Doc = CharacterJson & { id: string };
+  const replaceInRoster = async (update: (list: StoredCharacter[]) => StoredCharacter[]) => {
+    // Un pedido de la lista en vuelo traería la copia de antes.
+    await client.cancelQueries({ queryKey: queryKeys.roster });
+    client.setQueryData<StoredCharacter[]>(queryKeys.roster, (list) => list && update(list));
+  };
+
+  // Renombrar no usa la cola de guardado: se espera al servidor para poder
+  // dejar el diálogo abierto si falla. La copia de la caché ya incluye lo que
+  // esté pendiente, así que se descarta la cola y se manda esa.
+  const rename = async (id: string, name: string) => {
+    const raw = client.getQueryData<StoredCharacter[]>(queryKeys.roster)?.find((s) => s.character.id === id)?.character;
+    if (!raw || !catalog.data) throw new Error('sin ficha');
+    const { character } = actOn(migrateCharacter(raw), catalog.data, { type: 'rename', name });
+    await dropPending(id);
+    await saveCharacter(character as Doc);
+    await replaceInRoster((list) => list.map((s) => (s.character.id === id ? { ...s, character } : s)));
+  };
+
+  // Favorito y orden no se tocan: se reconcilian al mostrar, como en Flutter.
+  const remove = async (id: string) => {
+    await dropPending(id);
+    await deleteCharacter(id);
+    await replaceInRoster((list) => list.filter((s) => s.character.id !== id));
+    void client.invalidateQueries({ queryKey: queryKeys.roster });
+    // El botón que abrió el diálogo ya no existe: el foco pasa al título.
+    setTimeout(() => titleRef.current?.focus(), 0);
+  };
+
   const failed = [roster, settings, ...catalog.queries].filter((q) => q.isError);
   let body;
   if (failed.length > 0) {
@@ -155,6 +192,8 @@ export function DashboardPage() {
                   entry={entry}
                   favorite={favorite}
                   onToggleFavorite={() => void saveSettings({ favoriteCharacterId: favorite ? null : id })}
+                  onRename={() => setRenaming(id)}
+                  onDelete={() => setDeleting(id)}
                   reorder={
                     canMove && !favorite
                       ? {
@@ -185,7 +224,7 @@ export function DashboardPage() {
           <div className="min-w-0 flex-[1_1_220px]">
             {/* El título está siempre, también mientras carga: un h1 por
                 pantalla y el lector sabe dónde está desde el primer momento. */}
-            <h1 className="font-display text-[30px] leading-tight text-on-surface">{t.rosterTitle}</h1>
+            <h1 ref={titleRef} tabIndex={-1} className="font-display text-[30px] leading-tight text-on-surface outline-none">{t.rosterTitle}</h1>
             {entries && (
               <p className="mt-1 text-[13px] text-on-surface-variant tabular-nums">
                 {fallen === 0
@@ -255,6 +294,20 @@ export function DashboardPage() {
         <SectionRule className="my-0" />
         {body}
       </div>
+      {renaming && entryById.get(renaming) && (
+        <RenameDialog
+          current={entryById.get(renaming)!.character.name}
+          onSubmit={(name) => rename(renaming, name)}
+          onClose={() => setRenaming(null)}
+        />
+      )}
+      {deleting && entryById.get(deleting) && (
+        <DeleteDialog
+          name={entryById.get(deleting)!.character.name}
+          onConfirm={() => remove(deleting)}
+          onClose={() => setDeleting(null)}
+        />
+      )}
       <Toast key={toastKey} tone="error" message={t.sortSaveError} open={toastOpen} onOpenChange={setToastOpen} />
       <ToastViewport />
     </ToastProvider>

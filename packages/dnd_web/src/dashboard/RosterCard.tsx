@@ -1,10 +1,10 @@
-import { EllipsisVertical, GripVertical, Star } from 'lucide-react';
+import { EllipsisVertical, GripVertical, Pencil, Star, Trash2 } from 'lucide-react';
 import { useTexts } from '../i18n/context';
 import { characterHref, Link } from '../router';
 import { signed } from '../sheet/format';
 import { HP_CRITICAL_RATIO, hpTone, StatPlaque, ThinBar } from '../ui/data';
 import { Medallion } from '../ui/Medallion';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Tooltip } from '../ui/primitives';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, Tooltip } from '../ui/primitives';
 import type { useReorder } from '../ui/reorder';
 import { ownPortrait } from '../ui/portrait';
 import { isFallen, type RosterEntry } from './roster';
@@ -30,11 +30,15 @@ export function RosterCard({
   entry,
   favorite,
   onToggleFavorite,
+  onRename,
+  onDelete,
   reorder,
 }: {
   entry: RosterEntry;
   favorite: boolean;
   onToggleFavorite: () => void;
+  onRename: () => void;
+  onDelete: () => void;
   /** Sin esto la tarjeta no se puede mover: el favorito, o la lista filtrada. */
   reorder?: CardReorder;
 }) {
@@ -118,6 +122,15 @@ export function RosterCard({
               <DropdownMenuItem onSelect={onToggleFavorite}>
                 <Star size={15} aria-hidden="true" className="text-text-muted" />
                 {favorite ? t.cardUnfavorite : t.cardFavorite}
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={onRename}>
+                <Pencil size={15} aria-hidden="true" className="text-text-muted" />
+                {t.cardRename}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={onDelete} className="text-crimson">
+                <Trash2 size={15} aria-hidden="true" />
+                {t.cardDelete}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

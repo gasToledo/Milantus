@@ -69,6 +69,14 @@ export async function saveCharacter(character: CharacterJson & { id: string }): 
   if (!response.ok) throw new ApiError(response.status, path);
 }
 
+/** Borra un personaje propio (`DELETE /api/characters/:id`): el servidor se
+ *  lleva también sus retratos. */
+export async function deleteCharacter(id: string): Promise<void> {
+  const path = `/api/characters/${encodeURIComponent(id)}`;
+  const response = await fetch(path, { method: 'DELETE' });
+  if (!response.ok) throw new ApiError(response.status, path);
+}
+
 /** Da de alta un personaje (`POST /api/characters`). Como al guardar,
  *  [character] es lo que devolvió el motor. */
 export async function createCharacter(character: CharacterJson & { id: string }): Promise<void> {

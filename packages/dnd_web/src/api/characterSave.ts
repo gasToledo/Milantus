@@ -23,6 +23,10 @@ interface Entry {
   pending: (CharacterJson & { id: string }) | null;
   timer: ReturnType<typeof setTimeout> | null;
   running: boolean;
+  /** El guardado en vuelo, para poder esperarlo. */
+  inflight: Promise<void> | null;
+  /** `dropPending` lo descartó: un fallo del guardado en vuelo no lo revive. */
+  dropped: boolean;
   failed: boolean;
 }
 
@@ -33,7 +37,7 @@ const notify = () => listeners.forEach((l) => l());
 function entryOf(id: string): Entry {
   let e = entries.get(id);
   if (!e) {
-    e = { pending: null, timer: null, running: false, failed: false };
+    e = { pending: null, timer: null, running: false, inflight: null, dropped: false, failed: false };
     entries.set(id, e);
   }
   return e;
@@ -58,21 +62,45 @@ async function flush(id: string): Promise<void> {
   if (e.running) return;
   e.running = true;
   notify();
-  while (e.pending) {
-    const doc = e.pending;
-    e.pending = null;
-    try {
-      await saveCharacter(doc);
-      e.failed = false;
-    } catch {
-      // Lo local se conserva: la copia vuelve a esperar (salvo que ya haya
-      // una más nueva) y «Reintentar» la manda.
-      e.failed = true;
-      e.pending ??= doc;
-      break;
+  e.inflight = (async () => {
+    while (e.pending) {
+      const doc = e.pending;
+      e.pending = null;
+      try {
+        await saveCharacter(doc);
+        e.failed = false;
+      } catch {
+        // Lo local se conserva: la copia vuelve a esperar (salvo que ya haya
+        // una más nueva) y «Reintentar» la manda. Si la ficha se descartó
+        // mientras tanto no hay a qué volver.
+        if (!e.dropped) {
+          e.failed = true;
+          e.pending ??= doc;
+        }
+        break;
+      }
     }
-  }
+  })();
+  await e.inflight;
+  e.inflight = null;
   e.running = false;
+  notify();
+}
+
+/** Olvida lo que [id] tenga para guardar y espera al guardado en vuelo. Lo
+ *  llaman quienes escriben la ficha por otro camino (renombrar desde la lista,
+ *  rehacer, borrar): un guardado viejo no puede llegar después y pisar lo
+ *  borrado o lo rehecho. La entrada se borra para que un fallo viejo no deje
+ *  el aviso de `beforeunload` encendido. */
+export async function dropPending(id: string): Promise<void> {
+  const e = entries.get(id);
+  if (!e) return;
+  e.dropped = true;
+  if (e.timer) clearTimeout(e.timer);
+  e.timer = null;
+  e.pending = null;
+  await e.inflight;
+  entries.delete(id);
   notify();
 }
 

@@ -1,9 +1,11 @@
 import { useState, type ReactNode } from 'react';
-import { Footprints, Heart, Medal, Zap } from 'lucide-react';
+import { Footprints, Heart, Medal, Pencil, Zap } from 'lucide-react';
 import { nameOf } from '../api/catalog';
 import { useTexts } from '../i18n/context';
 import { labelOf } from '../i18n/texts';
+import { RenameDialog } from '../dashboard/RenameDialog';
 import { hpTone, Pill, SectionRule, StatTile, ThinBar } from '../ui/data';
+import { Tooltip } from '../ui/primitives';
 import { BreakdownDialog } from './BreakdownDialog';
 import { signed } from './format';
 import { ActiveModeTile } from './ActiveModes';
@@ -36,6 +38,7 @@ export function SheetHeader({
 }) {
   const t = useTexts();
   const [initiativeOpen, setInitiativeOpen] = useState(false);
+  const [renaming, setRenaming] = useState(false);
   const choices = useChoicesView(model);
   const { character, sheet, catalog } = model;
   const exhaustion = character.combat?.exhaustion ?? 0;
@@ -56,7 +59,23 @@ export function SheetHeader({
         {leading}
         <div className="flex min-w-0 flex-1 flex-col gap-2.5">
           <div className="flex flex-wrap items-baseline gap-x-3.5 gap-y-1">
-            <h1 className="font-display text-[28px] leading-[1.1] break-words text-on-surface">{character.name}</h1>
+            <h1 className="font-display text-[28px] leading-[1.1] break-words text-on-surface">
+              {character.name}
+              {/* Solo en la ficha propia: sin `write` (la de otra cuenta, un
+                  PNJ) no hay ni el control. */}
+              {model.write && (
+                <Tooltip content={t.renameTitle}>
+                  <button
+                    type="button"
+                    aria-label={t.renameTitle}
+                    onClick={() => setRenaming(true)}
+                    className="ml-0.5 inline-flex h-7 w-7 items-center justify-center rounded-[var(--radius-nav)] align-middle text-text-muted hover:text-gold"
+                  >
+                    <Pencil size={15} aria-hidden="true" />
+                  </button>
+                </Tooltip>
+              )}
+            </h1>
             {origin && <p className="text-[14px] text-on-surface-variant">{origin}</p>}
           </div>
           <ul className="flex flex-wrap gap-1.5">
@@ -70,6 +89,13 @@ export function SheetHeader({
           </ul>
         </div>
       </header>
+      {renaming && model.write && (
+        <RenameDialog
+          current={character.name}
+          onSubmit={async (name) => void model.write?.act({ type: 'rename', name })}
+          onClose={() => setRenaming(false)}
+        />
+      )}
 
       {showBand && (
       <section aria-label={t.tacticalBand} className="tactical-band">
