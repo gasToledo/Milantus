@@ -146,6 +146,17 @@ class SheetActions {
   ///   sus opciones no toca la ficha. `setLineage` no limpia la aptitud
   ///   mágica: ver el comentario de `_resolveLineage` en Flutter.
   /// - `setUnarmoredDefense` con `classId`, entre las fórmulas de la ficha.
+  /// - `setBackground` con `text`: el trasfondo tal cual, sin recortar, porque
+  ///   se manda mientras alguien escribe.
+  /// - Diario: `saveDiaryEntry` con `entry` (el id), `kind`, `title`, `body`,
+  ///   `imageKey` y `at` (fecha ISO que pone quien llama, para que el motor no
+  ///   dependa del reloj). Título y cuerpo se recortan. Un id existente se
+  ///   reemplaza en su lugar, conserva `createdAt` y pone `updatedAt`; uno nuevo
+  ///   va al final y sin `updatedAt`. Una imagen lleva el cuerpo vacío y los
+  ///   otros tipos no llevan `imageKey`. Sin título, o una imagen sin
+  ///   `imageKey`, la ficha vuelve intacta y `outcome.saved` es false.
+  ///   `removeDiaryEntry` con `entry`. `moveDiaryEntry` con `entry` y `to` (el
+  ///   id del destino). Ids que no existen dejan la ficha como estaba.
   ///
   /// Una acción desconocida lanza [FormatException]: un cliente desfasado no
   /// tiene que guardar una ficha que el motor no tocó creyendo que sí.
@@ -662,10 +673,85 @@ class SheetActions {
         if (sheet.unarmoredDefenseOptions.any((o) => o.classId == classId)) {
           c = c.copyWith(unarmoredDefenseClassId: classId);
         }
+      case 'setBackground':
+        // Sin recortar: se manda mientras alguien escribe, y un espacio al
+        // final de la palabra que viene en camino no puede comerse.
+        c = c.copyWith(background: action['text'] as String? ?? '');
+      case 'saveDiaryEntry':
+        final saved = _saveDiaryEntry(c, action);
+        outcome['saved'] = saved != null;
+        if (saved != null) c = saved;
+      case 'removeDiaryEntry':
+        final id = action['entry'] as String;
+        c = c.copyWith(
+          diary: [
+            for (final e in c.diary)
+              if (e.entryId != id) e,
+          ],
+        );
+      case 'moveDiaryEntry':
+        c = _moveDiaryEntry(
+            c, action['entry'] as String, action['to'] as String);
       default:
         throw FormatException('Acción de ficha desconocida: ${action['type']}');
     }
     return SheetActionResult(c, outcome);
+  }
+
+  /// Alta o edición de una entrada del Diario; null si no corresponde guardar
+  /// (sin título, o una imagen sin clave).
+  static Character? _saveDiaryEntry(Character c, Map<String, dynamic> action) {
+    final kind = DiaryEntryKind.fromJson(action['kind']);
+    final title = (action['title'] as String? ?? '').trim();
+    final imageKey = action['imageKey'] as String?;
+    if (title.isEmpty || (kind == DiaryEntryKind.image && imageKey == null)) {
+      return null;
+    }
+    final id = action['entry'] as String;
+    final at = DateTime.parse(action['at'] as String);
+    final isImage = kind == DiaryEntryKind.image;
+    final body = isImage ? '' : (action['body'] as String? ?? '').trim();
+    final index = c.diary.indexWhere((e) => e.entryId == id);
+    final DiaryEntry entry;
+    if (index < 0) {
+      // `updatedAt` queda vacío: en una entrada recién escrita las dos fechas
+      // serían la misma y la tarjeta diría «editada» de algo nuevo.
+      entry = DiaryEntry(
+        entryId: id,
+        kind: kind,
+        title: title,
+        body: body,
+        imageKey: isImage ? imageKey : null,
+        createdAt: at,
+      );
+    } else {
+      entry = c.diary[index].copyWith(
+        kind: kind,
+        title: title,
+        body: body,
+        imageKey: isImage ? imageKey : null,
+        updatedAt: at,
+      );
+    }
+    final list = [...c.diary];
+    if (index < 0) {
+      list.add(entry);
+    } else {
+      list[index] = entry;
+    }
+    return c.copyWith(diary: list);
+  }
+
+  /// Saca [id] y lo reinserta en el lugar que ocupa [to], como el reorden de
+  /// Flutter. Ids que no existen, o iguales, dejan la ficha como estaba.
+  static Character _moveDiaryEntry(Character c, String id, String to) {
+    if (id == to) return c;
+    final list = [...c.diary];
+    final from = list.indexWhere((e) => e.entryId == id);
+    final target = list.indexWhere((e) => e.entryId == to);
+    if (from < 0 || target < 0) return c;
+    list.insert(target, list.removeAt(from));
+    return c.copyWith(diary: list);
   }
 
   static Ability? _abilityNamed(String name) =>

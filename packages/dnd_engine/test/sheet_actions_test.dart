@@ -1320,4 +1320,98 @@ void main() {
       expect(primero(lleno, 'features')['pending'], 0);
     });
   });
+
+  group('diario', () {
+    Map<String, dynamic> guardar(String id, String titulo, String at,
+            {String kind = 'text', String body = '', String? imageKey}) =>
+        {
+          'type': 'saveDiaryEntry',
+          'entry': id,
+          'kind': kind,
+          'title': titulo,
+          'body': body,
+          'imageKey': imageKey,
+          'at': at,
+        };
+
+    List<String> ids(Character c) => [for (final e in c.diary) e.entryId];
+
+    test('el trasfondo se guarda tal cual, sin recortar', () {
+      final r = act(monje(), {'type': 'setBackground', 'text': '  hola \n'});
+      expect(r.character.background, '  hola \n');
+    });
+
+    test('alta con createdAt y sin updatedAt, y edición que lo conserva', () {
+      final alta = act(monje(),
+          guardar('a', '  Manía ', '2026-03-12T10:00:00Z', body: ' texto '));
+      expect(alta.outcome['saved'], isTrue);
+      final e = alta.character.diary.single;
+      expect(e.title, 'Manía');
+      expect(e.body, 'texto');
+      expect(e.createdAt, DateTime.parse('2026-03-12T10:00:00Z'));
+      expect(e.updatedAt, isNull);
+
+      final edicion = act(alta.character,
+          guardar('a', 'Manía 2', '2026-04-02T10:00:00Z', body: 'otro'));
+      final f = edicion.character.diary.single;
+      expect(f.title, 'Manía 2');
+      expect(f.createdAt, e.createdAt);
+      expect(f.updatedAt, DateTime.parse('2026-04-02T10:00:00Z'));
+    });
+
+    test('sin título, o imagen sin clave, la ficha queda intacta', () {
+      final c = monje();
+      final sinTitulo = act(c, guardar('a', '   ', '2026-03-12T10:00:00Z'));
+      expect(sinTitulo.outcome['saved'], isFalse);
+      expect(sinTitulo.character.diary, isEmpty);
+
+      final sinClave =
+          act(c, guardar('a', 'Mapa', '2026-03-12T10:00:00Z', kind: 'image'));
+      expect(sinClave.outcome['saved'], isFalse);
+      expect(sinClave.character.diary, isEmpty);
+    });
+
+    test('la imagen no lleva cuerpo y los otros tipos no llevan clave', () {
+      final img = act(
+          monje(),
+          guardar('a', 'Mapa', '2026-03-12T10:00:00Z',
+              kind: 'image', body: 'sobra', imageKey: 'k1'));
+      expect(img.character.diary.single.body, '');
+      expect(img.character.diary.single.imageKey, 'k1');
+
+      final texto = act(
+          img.character,
+          guardar('a', 'Mapa', '2026-03-13T10:00:00Z',
+              body: 'ahora texto', imageKey: 'k1'));
+      expect(texto.character.diary.single.imageKey, isNull);
+      expect(texto.character.diary.single.body, 'ahora texto');
+    });
+
+    test('borrar saca solo esa entrada, y un id que no existe no toca nada',
+        () {
+      var c = monje();
+      for (final id in ['a', 'b', 'c']) {
+        c = act(c, guardar(id, id, '2026-03-12T10:00:00Z')).character;
+      }
+      final sin = act(c, {'type': 'removeDiaryEntry', 'entry': 'b'}).character;
+      expect(ids(sin), ['a', 'c']);
+      final igual =
+          act(c, {'type': 'removeDiaryEntry', 'entry': 'zzz'}).character;
+      expect(ids(igual), ['a', 'b', 'c']);
+    });
+
+    test('mover reinserta en el lugar del destino; ids malos no mueven', () {
+      var c = monje();
+      for (final id in ['a', 'b', 'c', 'd']) {
+        c = act(c, guardar(id, id, '2026-03-12T10:00:00Z')).character;
+      }
+      Character mover(String from, String to) =>
+          act(c, {'type': 'moveDiaryEntry', 'entry': from, 'to': to}).character;
+      expect(ids(mover('a', 'c')), ['b', 'c', 'a', 'd']);
+      expect(ids(mover('d', 'b')), ['a', 'd', 'b', 'c']);
+      expect(ids(mover('a', 'a')), ['a', 'b', 'c', 'd']);
+      expect(ids(mover('a', 'zzz')), ['a', 'b', 'c', 'd']);
+      expect(ids(mover('zzz', 'a')), ['a', 'b', 'c', 'd']);
+    });
+  });
 }

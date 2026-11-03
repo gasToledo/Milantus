@@ -787,6 +787,18 @@ export type SheetAction =
   | { type: 'setSpeciesAbility'; ability: AbilityId }
   | { type: 'setFeatAbility'; feat: string; ability: AbilityId }
   | { type: 'setUnarmoredDefense'; classId: string }
+  | { type: 'setBackground'; text: string }
+  | {
+      type: 'saveDiaryEntry';
+      entry: string;
+      kind: 'text' | 'image' | 'link';
+      title: string;
+      body: string;
+      imageKey: string | null;
+      at: string;
+    }
+  | { type: 'removeDiaryEntry'; entry: string }
+  | { type: 'moveDiaryEntry'; entry: string; to: string }
   | { type: 'summonCompanion'; option: string; creature: string; level?: number; pact?: boolean; free?: boolean }
   | { type: 'damageCompanion' | 'healCompanion' | 'companionTempHp'; index: number; amount: number }
   | { type: 'dismissCompanion'; index: number }

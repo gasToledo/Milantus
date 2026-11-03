@@ -61,6 +61,22 @@ final _casos = <String, Character>{
     backgroundId: 'soldier',
     level: 5,
     assignedScores: _scores,
+    // Dos entradas para que el reorden del Diario tenga algo que mover.
+    diary: [
+      DiaryEntry(
+        entryId: 'diario-a',
+        title: 'Primera',
+        body: 'texto',
+        createdAt: DateTime.utc(2026, 3, 12),
+      ),
+      DiaryEntry(
+        entryId: 'diario-b',
+        kind: DiaryEntryKind.link,
+        title: 'Segunda',
+        body: 'https://example.org',
+        createdAt: DateTime.utc(2026, 3, 20),
+      ),
+    ],
     backgroundAbilityBonuses: const {
       Ability.strength: 2,
       Ability.constitution: 1,
@@ -292,6 +308,22 @@ final _acciones = <String, (String, Map<String, dynamic>)>{
       'id': 'armor-of-shadows',
       'value': true,
     },
+  ),
+  'accion-diario-guardar': (
+    'guerrero',
+    {
+      'type': 'saveDiaryEntry',
+      'entry': 'diario-a',
+      'kind': 'text',
+      'title': ' Primera, editada ',
+      'body': 'otro texto',
+      'imageKey': null,
+      'at': '2026-04-02T10:00:00.000Z',
+    },
+  ),
+  'accion-diario-mover': (
+    'guerrero',
+    {'type': 'moveDiaryEntry', 'entry': 'diario-a', 'to': 'diario-b'},
   ),
   'accion-linaje': (
     'brujo',
