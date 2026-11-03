@@ -321,9 +321,9 @@ function Plans({ model, write, view }: { model: SheetModel; write: SheetWriter; 
   );
 }
 
-/** La elección del objeto base de una réplica: radios con lo que el motor
+/** La elección del objeto base de una plantilla: radios con lo que el motor
  *  permite para esa plantilla (`magicBaseOptions`). */
-function BaseDialog({
+export function BaseDialog({
   catalog,
   itemId,
   title,

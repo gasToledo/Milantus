@@ -67,11 +67,16 @@ class SheetActions {
   ///   `offHand` y `twoHanded` alternan la marca del arma; `removeItem` saca
   ///   la línea entera.
   /// - `setCoins` con `coins` (denominación → cantidad).
-  /// - `addItem` con `item`: suma sin pagar (botín, regalo).
-  /// - `buy` con `item`, `quantity`, `unitPriceCp` y `at` (la fecha del
+  /// - `addItem` con `item` y `base` si la plantilla la pide: suma sin pagar
+  ///   (botín, regalo); `outcome.added` es false si la base no vale y la ficha
+  ///   vuelve intacta.
+  /// - `setItemBase` con `entry` y `base`: le pone la base a una línea que
+  ///   quedó sin ella.
+  /// - `buy` con `item`, `quantity`, `unitPriceCp`, `at` (la fecha del
   ///   asiento en «Cuentas», `AAAA-MM-DD`, que la pone quien llama para que
-  ///   el motor no dependa del reloj); `outcome.paid` es false si no alcanzó
-  ///   y la ficha vuelve intacta.
+  ///   el motor no dependa del reloj) y `base` si la plantilla la pide;
+  ///   `outcome.paid` es false si no alcanzó o la base no vale, y la ficha
+  ///   vuelve intacta.
   /// - `sell` con `entry`, `quantity`, `unitPriceCp` y `at`.
   /// - `levelUp` con `draft` (`LevelUpDraft.fromJson`): sube el nivel con
   ///   [LevelUp.confirm], PG actuales incluidos.
@@ -301,16 +306,33 @@ class SheetActions {
           }),
         );
       case 'addItem':
-        c = InventoryOps.add(c, action['item'] as String);
-      case 'buy':
-        final bought = InventoryOps.buy(
+        final item = action['item'] as String;
+        final base = action['base'] as String?;
+        final ok = InventoryOps.acceptsBase(item, base, repo);
+        outcome['added'] = ok;
+        if (ok) c = InventoryOps.add(c, item, baseItemId: base);
+      case 'setItemBase':
+        c = InventoryOps.setBase(
           c,
-          action['item'] as String,
+          action['entry'] as String,
+          action['base'] as String,
           repo,
-          quantity: (action['quantity'] as num).toInt(),
-          unitPriceCp: (action['unitPriceCp'] as num).toInt(),
-          at: DateTime.parse(action['at'] as String),
         );
+      case 'buy':
+        final item = action['item'] as String;
+        final base = action['base'] as String?;
+        // Sin base no se cobra: pagar un arma con la que no se puede atacar.
+        final bought = InventoryOps.acceptsBase(item, base, repo)
+            ? InventoryOps.buy(
+                c,
+                item,
+                repo,
+                quantity: (action['quantity'] as num).toInt(),
+                unitPriceCp: (action['unitPriceCp'] as num).toInt(),
+                baseItemId: base,
+                at: DateTime.parse(action['at'] as String),
+              )
+            : null;
         outcome['paid'] = bought != null;
         c = bought ?? c;
       case 'sell':

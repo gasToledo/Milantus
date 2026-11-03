@@ -673,8 +673,9 @@ export type SheetAction =
   | { type: 'note'; entry: string; text: string }
   | { type: 'offHand' | 'twoHanded' | 'removeItem'; entry: string }
   | { type: 'setCoins'; coins: Record<string, number> }
-  | { type: 'addItem'; item: string }
-  | { type: 'buy'; item: string; quantity: number; unitPriceCp: number; at: string }
+  | { type: 'addItem'; item: string; base?: string }
+  | { type: 'setItemBase'; entry: string; base: string }
+  | { type: 'buy'; item: string; quantity: number; unitPriceCp: number; at: string; base?: string }
   | { type: 'sell'; entry: string; quantity: number; unitPriceCp: number; at: string }
   | { type: 'levelUp'; draft: LevelUpDraft }
   | { type: 'setClassSpells'; classId: string; cantrips: string[]; spells: string[] }
@@ -697,6 +698,7 @@ export interface SheetOutcome {
   itemsRecharged?: number;
   dismissed?: string[];
   paid?: boolean;
+  added?: boolean;
   died?: boolean;
   activated?: boolean;
   removedReplica?: boolean;

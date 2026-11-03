@@ -151,7 +151,8 @@ class ItemCatalogDialog extends StatefulWidget {
   final String? purseLabel;
 
   /// Null quita «Agregar»: en la creación todo se compra.
-  final ValueChanged<String>? onAdd;
+  /// Devuelve si se agregó: elegir el objeto base se puede cancelar.
+  final Future<bool> Function(String)? onAdd;
 
   /// «Comprar». Devuelve si hay que cerrar el catálogo: la ficha lo cierra
   /// para que el cartel con «Deshacer» quede a mano; la creación no.
@@ -274,9 +275,8 @@ class _ItemCatalogDialogState extends State<ItemCatalogDialog> {
         if (onAdd != null) ...[
           TextButton(
             key: ValueKey('add-${e.id}'),
-            onPressed: () {
-              onAdd(e.id);
-              setState(() => _added++);
+            onPressed: () async {
+              if (await onAdd(e.id) && mounted) setState(() => _added++);
             },
             // «Agregar» a secas, al lado de «Comprar», se leía como otra forma
             // de comprar: en la primera prueba con un grupo lo usaron sin

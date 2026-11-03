@@ -3482,6 +3482,18 @@ abstract class AppLocalizations {
   /// **'Elegí el objeto base'**
   String get invPickBase;
 
+  /// No description provided for @invChooseBase.
+  ///
+  /// In es, this message translates to:
+  /// **'Elegir objeto base…'**
+  String get invChooseBase;
+
+  /// No description provided for @invNoBase.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin objeto base'**
+  String get invNoBase;
+
   /// No description provided for @invRangeHint.
   ///
   /// In es, this message translates to:

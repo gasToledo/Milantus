@@ -564,6 +564,8 @@
   "invCreateReplica": "Create a replica of {name}",
   "invNoReplicaSlots": "No replica slots left",
   "invPickBase": "Choose the base item",
+  "invChooseBase": "Choose base item…",
+  "invNoBase": "No base item",
   "invRangeHint": "range {range}",
   "invTwoHandedMounted": "requires two hands unless mounted",
   "invTwoHandedHint": "requires two hands",

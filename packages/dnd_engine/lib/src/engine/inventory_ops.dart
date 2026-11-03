@@ -459,13 +459,19 @@ class InventoryOps {
     ContentRepository repo, {
     int quantity = 1,
     int? unitPriceCp,
+    String? baseItemId,
     required DateTime at,
   }) {
     if (quantity <= 0) return null;
     final total = (unitPriceCp ?? catalogPriceCp(itemId, repo)) * quantity;
     final coins = CoinOps.pay(c.coins, total);
     if (coins == null) return null;
-    final bought = add(c.copyWith(coins: coins), itemId, quantity: quantity);
+    final bought = add(
+      c.copyWith(coins: coins),
+      itemId,
+      quantity: quantity,
+      baseItemId: baseItemId,
+    );
     final item = resolve(InventoryEntry(itemId: itemId), repo);
     return _ledger(
       bought,
@@ -685,6 +691,58 @@ class InventoryOps {
                   .toList(),
               _ => <String>[],
             };
+
+  /// Si [itemId] puede entrar a la mochila con esa base. Un id que no es una
+  /// plantilla (un arma común) no lleva base, y una plantilla que la pide no
+  /// entra sin ella: sin base, «Arma de advertencia» se equipa pero no ataca.
+  static bool acceptsBase(
+    String itemId,
+    String? baseItemId,
+    ContentRepository repo,
+  ) {
+    final item = repo.item(itemId);
+    return item == null
+        ? baseItemId == null
+        : _validBase(item, baseItemId, repo);
+  }
+
+  /// Le pone la base a una línea que quedó sin ella: se agregó o se compró
+  /// cuando el catálogo no la pedía. Una línea que ya la tiene no se toca, y
+  /// tampoco una que no la admite. Si estaba equipada se vuelve a equipar,
+  /// porque recién ahora es armadura y tiene que desplazar a la puesta.
+  static Character setBase(
+    Character c,
+    String entryId,
+    String baseItemId,
+    ContentRepository repo,
+  ) {
+    final entry = c.inventory.where((e) => e.entryId == entryId).firstOrNull;
+    final item = entry == null ? null : repo.item(entry.itemId);
+    if (entry == null ||
+        item?.baseItemKind == null ||
+        entry.baseItemId != null ||
+        !_validBase(item!, baseItemId, repo)) {
+      return c;
+    }
+    final next = c.copyWith(inventory: [
+      for (final e in c.inventory)
+        if (e.entryId == entryId)
+          InventoryEntry(
+            entryId: e.entryId,
+            itemId: e.itemId,
+            baseItemId: baseItemId,
+            origin: e.origin,
+            quantity: e.quantity,
+            equipped: e.equipped,
+            attuned: e.attuned,
+            charges: e.charges,
+            note: e.note,
+          )
+        else
+          e,
+    ]);
+    return entry.equipped ? setEquipped(next, entryId, true, repo) : next;
+  }
 
   /// Crea una réplica solo para un Artífice que conoce el plano y respeta el
   /// cupo simultáneo. La base se valida contra la plantilla.

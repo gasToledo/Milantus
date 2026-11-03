@@ -264,6 +264,10 @@ final _acciones = <String, (String, Map<String, dynamic>)>{
     'artifice',
     {'type': 'replicateItem', 'item': 'escudo-1', 'base': 'shield'},
   ),
+  'accion-agregar-con-base': (
+    'artifice',
+    {'type': 'addItem', 'item': 'arma-de-advertencia', 'base': 'longsword'},
+  ),
   'accion-transmutar': (
     'artifice',
     {

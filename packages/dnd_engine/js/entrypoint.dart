@@ -179,6 +179,8 @@ Map<String, dynamic> _inventoryLine(
     // Lo creó un rasgo (el arma de pacto): al cambiarla sale de la mochila.
     'createdByFeature': e.origin?.startsWith('effect-target:') == true,
     'replica': replica,
+    // Una plantilla que pide base y no la tiene se equipa pero no ataca.
+    'needsBase': item?.baseItemKind != null && e.baseItemId == null,
   };
 }
 

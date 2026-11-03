@@ -1899,6 +1899,8 @@
   },
   "invNoReplicaSlots": "No quedan cupos de réplica",
   "invPickBase": "Elegí el objeto base",
+  "invChooseBase": "Elegir objeto base…",
+  "invNoBase": "Sin objeto base",
   "invRangeHint": "alcance {range}",
   "@invRangeHint": {
     "placeholders": {

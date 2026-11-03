@@ -29,6 +29,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { AppEmptyState } from '../ui/status';
 import { magicPlansHref } from '../router';
 import { EffectTargetDialog } from './EffectTargetDialog';
+import { BaseDialog } from './MagicItemPlans';
 import { coinLabels, ItemCatalogDialog, TradeDialog, type CatalogRow, type Trade } from './ItemCatalog';
 import type { SheetModel } from './model';
 import { TransmuteDialog } from './TransmuteDialog';
@@ -81,7 +82,7 @@ const COINS = ['pp', 'gp', 'ep', 'sp', 'cp'] as const;
 type Filter = 'all' | 'equipped' | 'magic';
 
 /** El diálogo de una línea que está abierto: cantidad exacta o nota. */
-type Ask = { kind: 'quantity' | 'note' | 'sell'; line: InventoryLine };
+type Ask = { kind: 'quantity' | 'note' | 'sell' | 'base'; line: InventoryLine };
 
 /** La fecha del asiento en «Cuentas», local y no UTC: a la noche, UTC ya es
  *  mañana. */
@@ -112,10 +113,22 @@ export function InventoryTab({ model }: { model: SheetModel }) {
   /** La réplica que se está transmutando. */
   const [transmuting, setTransmuting] = useState<InventoryLine | null>(null);
   const [buying, setBuying] = useState<CatalogRow | null>(null);
+  // La base de la compra en curso: se elige antes de ponerle precio.
+  const [buyingBase, setBuyingBase] = useState<string | undefined>(undefined);
+  // La plantilla del catálogo a la que se le está eligiendo base.
+  const [askBase, setAskBase] = useState<{ row: CatalogRow; buy: boolean } | null>(null);
+  const [added, setAdded] = useState(0);
   const coins = character.coins ?? {};
 
   const buy = (row: CatalogRow, trade: Trade) => {
-    const r = write!.act({ type: 'buy', item: row.id, quantity: trade.quantity, unitPriceCp: trade.unitCp, at: today() });
+    const r = write!.act({
+      type: 'buy',
+      item: row.id,
+      quantity: trade.quantity,
+      unitPriceCp: trade.unitCp,
+      at: today(),
+      ...(buyingBase ? { base: buyingBase } : {}),
+    });
     setBuying(null);
     if (!r) return;
     if (!r.outcome.paid) {
@@ -125,6 +138,10 @@ export function InventoryTab({ model }: { model: SheetModel }) {
     // El catálogo se cierra para que «Deshacer» quede a mano, como en Flutter.
     setCatalogOpen(false);
     write!.notify(t.invBought(trade.quantity, row.name, trade.total), { undo: () => write!.restore(r.before) });
+  };
+  const add = (row: CatalogRow, base?: string) => {
+    const r = write!.act({ type: 'addItem', item: row.id, ...(base ? { base } : {}) });
+    if (r?.outcome.added) setAdded((n) => n + 1);
   };
   const sell = (line: InventoryLine, trade: Trade) => {
     const r = write!.act({
@@ -239,7 +256,14 @@ export function InventoryTab({ model }: { model: SheetModel }) {
             <span className="text-[12px] text-text-muted tabular-nums">{t.itemsCount(lines.length)}</span>
           </h2>
           {write && (
-            <Button tone="soft" icon={Plus} onClick={() => setCatalogOpen(true)}>
+            <Button
+              tone="soft"
+              icon={Plus}
+              onClick={() => {
+                setAdded(0);
+                setCatalogOpen(true);
+              }}
+            >
               {t.catalogAddTitle}
             </Button>
           )}
@@ -377,7 +401,7 @@ export function InventoryTab({ model }: { model: SheetModel }) {
           </table>
         )}
       </section>
-      {ask && write && ask.kind !== 'sell' && <EntryDialog ask={ask} write={write} onClose={() => setAsk(null)} />}
+      {ask && write && (ask.kind === 'quantity' || ask.kind === 'note') && <EntryDialog ask={ask} write={write} onClose={() => setAsk(null)} />}
       {ask && write && ask.kind === 'sell' && (
         <TradeDialog
           buying={false}
@@ -388,6 +412,19 @@ export function InventoryTab({ model }: { model: SheetModel }) {
           maxQuantity={ask.line.quantity}
           coins={coins}
           onConfirm={(trade) => sell(ask.line, trade)}
+          onClose={() => setAsk(null)}
+        />
+      )}
+      {ask && write && ask.kind === 'base' && (
+        <BaseDialog
+          catalog={catalog}
+          itemId={ask.line.itemId}
+          title={ask.line.name}
+          confirm={t.crChoose}
+          onConfirm={(base) => {
+            write.act({ type: 'setItemBase', entry: ask.line.entryId, base });
+            setAsk(null);
+          }}
           onClose={() => setAsk(null)}
         />
       )}
@@ -406,9 +443,32 @@ export function InventoryTab({ model }: { model: SheetModel }) {
         <ItemCatalogDialog
           catalog={catalog}
           coins={coins}
-          onAdd={(row) => write.act({ type: 'addItem', item: row.id })}
-          onBuy={setBuying}
+          added={added}
+          onAdd={(row) => (row.needsBase ? setAskBase({ row, buy: false }) : add(row))}
+          onBuy={(row) => {
+            setBuyingBase(undefined);
+            if (row.needsBase) setAskBase({ row, buy: true });
+            else setBuying(row);
+          }}
           onClose={() => setCatalogOpen(false)}
+        />
+      )}
+      {askBase && write && (
+        <BaseDialog
+          catalog={catalog}
+          itemId={askBase.row.id}
+          title={askBase.row.name}
+          confirm={t.crChoose}
+          onConfirm={(base) => {
+            if (askBase.buy) {
+              setBuyingBase(base);
+              setBuying(askBase.row);
+            } else {
+              add(askBase.row, base);
+            }
+            setAskBase(null);
+          }}
+          onClose={() => setAskBase(null)}
         />
       )}
       {buying && write && (
@@ -537,6 +597,7 @@ function PackRow({
   const charges = max === null ? null : (line.charges ?? max);
   const notes = [
     ...slotLabels,
+    line.needsBase ? t.invNoBase : null,
     line.attuned ? t.attunedNote : null,
     max !== null && charges !== null ? t.chargesNote(charges, max) : null,
     line.note || null,
@@ -690,6 +751,7 @@ function ItemMenu({
         {line.offHand !== null && toggle(t.invOffHand, line.offHand, () => write.act({ type: 'offHand', entry }))}
         {line.twoHanded !== null &&
           toggle(t.invTwoHanded, line.twoHanded, () => write.act({ type: 'twoHanded', entry }))}
+        {line.needsBase && <DropdownMenuItem onSelect={() => onAsk('base')}>{t.invChooseBase}</DropdownMenuItem>}
         {canTransmute && <DropdownMenuItem onSelect={onTransmute}>{t.invTransmute}</DropdownMenuItem>}
         <DropdownMenuItem onSelect={() => onAsk('sell')}>{t.invSellMenu}</DropdownMenuItem>
         <DropdownMenuItem

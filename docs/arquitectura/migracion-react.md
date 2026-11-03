@@ -480,7 +480,11 @@ repiten acá.
   las usa de ahí. Desde 5b2, **«Agregar objeto»** abre el catálogo
   (`src/sheet/ItemCatalog.tsx`, el `ItemCatalogDialog` de Flutter): buscador,
   pills de familia y, por fila, «Gratis» (suma sin pagar y el catálogo sigue
-  abierto) y «Comprar», apagado con «te faltan…» si la bolsa no alcanza.
+  abierto) y «Comprar», apagado con «te faltan…» si la bolsa no alcanza. Una
+  plantilla (`baseItemKind`) pide antes su objeto base, porque sin él se equipa
+  pero no ataca; el motor rechaza agregarla o comprarla sin base, y la línea que
+  ya estaba sin ella dice «Sin objeto base» y ofrece «Elegir objeto base…»
+  (`setItemBase`).
   Comprar, y «Vender…» del menú de la fila, abren el diálogo de Flutter
   (`TradeDialog`): cantidad, precio por unidad en po, pp y pc que se puede
   corregir, y la cuenta —qué sale de la bolsa, el vuelto, cuánto falta o cómo

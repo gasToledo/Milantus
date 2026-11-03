@@ -206,6 +206,93 @@ void main() {
     expect(r.character.toJson(), c.toJson());
   });
 
+  group('objeto base', () {
+    const plantilla = 'arma-de-advertencia';
+
+    test('una plantilla no entra sin su base, ni gratis ni pagando', () {
+      final c = monje().copyWith(coins: const {'gp': 10000});
+      final gratis = act(c, {'type': 'addItem', 'item': plantilla});
+      final comprada = act(c, {
+        'type': 'buy',
+        'item': plantilla,
+        'quantity': 1,
+        'unitPriceCp': 100,
+        'at': '2026-11-02',
+      });
+
+      expect(gratis.outcome['added'], isFalse);
+      expect(gratis.character.toJson(), c.toJson());
+      expect(comprada.outcome['paid'], isFalse);
+      expect(comprada.character.toJson(), c.toJson());
+    });
+
+    test('con su base entra y da un ataque', () {
+      final c = monje().copyWith(coins: const {'gp': 10000});
+      final r = act(c, {
+        'type': 'buy',
+        'item': plantilla,
+        'quantity': 1,
+        'unitPriceCp': 100,
+        'at': '2026-11-02',
+        'base': 'longsword',
+      });
+      expect(r.outcome['paid'], isTrue);
+      final entry = r.character.inventory.last.entryId;
+      final equipada = act(r.character, {
+        'type': 'equip',
+        'entry': entry,
+        'value': true,
+      }).character;
+
+      final ataques = CharacterCompiler(repo).compile(equipada).attacks;
+      expect(ataques.map((a) => a.weaponId), contains(entry));
+    });
+
+    test('un objeto común no admite base', () {
+      final r = act(
+          monje(), {'type': 'addItem', 'item': 'dagger', 'base': 'longsword'});
+      expect(r.outcome['added'], isFalse);
+    });
+
+    test('una armadura que recibe su base desplaza a la que estaba puesta', () {
+      const puesta = InventoryEntry(
+        entryId: 'puesta',
+        itemId: 'leather',
+        equipped: true,
+      );
+      const sinBase = InventoryEntry(
+        entryId: 'magica',
+        itemId: 'armadura-1',
+        equipped: true,
+      );
+      final r = act(
+        monje().copyWith(inventory: const [puesta, sinBase]),
+        {'type': 'setItemBase', 'entry': 'magica', 'base': 'chain-mail'},
+      ).character;
+
+      final magica = r.inventory.singleWhere((e) => e.entryId == 'magica');
+      expect(magica.baseItemId, 'chain-mail');
+      expect(r.inventory.singleWhere((e) => e.entryId == 'puesta').equipped,
+          isFalse);
+    });
+
+    test('una línea con base o que no la admite no cambia', () {
+      const conBase = InventoryEntry(
+        entryId: 'con',
+        itemId: 'arma-1',
+        baseItemId: 'dagger',
+      );
+      const comun = InventoryEntry(entryId: 'comun', itemId: 'dagger');
+      final c = monje().copyWith(inventory: const [conBase, comun]);
+
+      for (final entry in ['con', 'comun', 'no-existe']) {
+        final r = act(
+            c, {'type': 'setItemBase', 'entry': entry, 'base': 'longsword'});
+        expect(r.character.toJson(), c.toJson());
+      }
+    });
+  });
+
   group('estados, cansancio y modos activos', () {
     Character barbaro({CombatState? combat}) => Character(
           id: 'barbaro',

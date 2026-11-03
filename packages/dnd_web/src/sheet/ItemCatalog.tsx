@@ -22,6 +22,8 @@ export interface CatalogRow {
   weight: number;
   costCp: number;
   bundleSize: number;
+  /** Una plantilla: se le elige el objeto base antes de agregarla o comprarla. */
+  needsBase: boolean;
 }
 
 /** Abreviaturas de las monedas en el idioma de la interfaz, para el motor. */
@@ -46,6 +48,7 @@ export function catalogRows(catalog: Catalog, t: Texts, lang: string): CatalogRo
     weight: num(e.weight),
     costCp: num(e.costCp),
     bundleSize: Math.max(1, num(e.bundleSize)),
+    needsBase: typeof e.baseItemKind === 'string',
   });
   const items = catalog.items.map((i) => {
     const family: Family =
@@ -111,12 +114,16 @@ export function FamilyFilter({
 export function ItemCatalogDialog({
   catalog,
   coins,
+  added,
   onAdd,
   onBuy,
   onClose,
 }: {
   catalog: Catalog;
   coins: Record<string, number>;
+  /** Cuántos se sumaron: lo cuenta quien agrega, porque elegir la base se puede
+   *  cancelar. */
+  added: number;
   onAdd: (row: CatalogRow) => void;
   onBuy: (row: CatalogRow) => void;
   onClose: () => void;
@@ -127,7 +134,6 @@ export function ItemCatalogDialog({
   const all = useMemo(() => catalogRows(catalog, t, lang), [catalog, t, lang]);
   const [query, setQuery] = useState('');
   const [family, setFamily] = useState<Family | 'all'>('all');
-  const [added, setAdded] = useState(0);
   const purse = tradePreview({ coins, price: {}, quantity: 0, buying: true }, labels);
   const pounds = useMemo(() => new Intl.NumberFormat(lang, { maximumFractionDigits: 2 }), [lang]);
 
@@ -188,10 +194,7 @@ export function ItemCatalogDialog({
                     <Button
                       tone="secondary"
                       aria-label={t.catalogAddFreeLabel(r.name)}
-                      onClick={() => {
-                        onAdd(r);
-                        setAdded((n) => n + 1);
-                      }}
+                      onClick={() => onAdd(r)}
                     >
                       {t.catalogAddFree}
                     </Button>

@@ -298,6 +298,8 @@ export interface InventoryLine {
   entryId: string;
   itemId: string;
   name: string;
+  /** Una plantilla que pide objeto base y no lo tiene (ver `setItemBase`). */
+  needsBase: boolean;
   /** `null`: el id no está en el catálogo (homebrew que no se cargó). */
   kind: 'weapon' | 'armor' | 'item' | null;
   /** Categoría del objeto (`tool`, `pack`…) o `magic`; `null` en armas y

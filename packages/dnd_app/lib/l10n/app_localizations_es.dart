@@ -2131,6 +2131,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get invPickBase => 'Elegí el objeto base';
 
   @override
+  String get invChooseBase => 'Elegir objeto base…';
+
+  @override
+  String get invNoBase => 'Sin objeto base';
+
+  @override
   String invRangeHint(String range) {
     return 'alcance $range';
   }

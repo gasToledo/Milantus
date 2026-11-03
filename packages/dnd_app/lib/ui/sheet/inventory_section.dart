@@ -913,6 +913,7 @@ extension _SheetInventorySection on _SheetScreenState {
     // que no tienen plural distinto.
     final kind = itemKindText(context.l10n, info.kindLabel);
     final detail = <String>[
+      if (_needsBase(e)) context.l10n.invNoBase,
       if (kind != itemGroupTitle(context.l10n, info.kindLabel)) kind,
       if (info.bundleSize > 1) context.l10n.catalogBundleOf(info.bundleSize),
       if (info.rangeHint != null) context.l10n.invRangeHint(info.rangeHint!),
@@ -1063,6 +1064,8 @@ extension _SheetInventorySection on _SheetScreenState {
             checked: _c.weaponTwoHanded[weapon!.id] ?? false,
             child: Text(context.l10n.invTwoHanded),
           ),
+        if (_needsBase(e))
+          PopupMenuItem(value: 'base', child: Text(context.l10n.invChooseBase)),
         if (info.replica)
           PopupMenuItem(
             value: 'transmute',
@@ -1110,6 +1113,10 @@ extension _SheetInventorySection on _SheetScreenState {
         _replace(InventoryOps.toggleOffHand(_c, e.entryId, repo));
       case 'two-handed':
         _replace(InventoryOps.toggleTwoHanded(_c, e.entryId, repo));
+      case 'base':
+        final base = await _chooseMagicBase(repo.item(e.itemId)!);
+        if (base == null) return;
+        _replace(InventoryOps.setBase(_c, e.entryId, base, repo));
       case 'transmute':
         await _transmuteReplica(e);
       case 'sell':
@@ -1193,17 +1200,36 @@ extension _SheetInventorySection on _SheetScreenState {
     builder: (_) => ItemCatalogDialog(
       repo: repo,
       purseCp: () => CoinOps.totalCp(_c.coins),
-      onAdd: (id) => _replace(InventoryOps.add(_c, id)),
+      onAdd: _addFromCatalog,
       onBuy: _buyFromCatalog,
       hint: context.l10n.invCatalogHint,
     ),
   );
+
+  /// Una plantilla pide su objeto base antes de entrar: sin él se equipa pero
+  /// no ataca. Devuelve si se agregó.
+  Future<bool> _addFromCatalog(String id) async {
+    final item = repo.item(id);
+    String? baseItemId;
+    if (item?.baseItemKind != null) {
+      baseItemId = await _chooseMagicBase(item!);
+      if (baseItemId == null || !mounted) return false;
+    }
+    _replace(InventoryOps.add(_c, id, baseItemId: baseItemId));
+    return true;
+  }
 
   /// Abre «Comprar» sobre el catálogo y, si se confirma, paga y agrega en un
   /// solo cambio. Devuelve si compró, para que el catálogo se cierre: el
   /// cartel con «Deshacer» vive en la ficha, y con el catálogo abierto encima
   /// su botón quedaba detrás de la barrera del diálogo.
   Future<bool> _buyFromCatalog(CatalogRow row) async {
+    final item = repo.item(row.id);
+    String? baseItemId;
+    if (item?.baseItemKind != null) {
+      baseItemId = await _chooseMagicBase(item!);
+      if (baseItemId == null || !mounted) return false;
+    }
     final trade = await showDialog<Trade>(
       context: context,
       builder: (_) => TradeDialog(
@@ -1223,6 +1249,7 @@ extension _SheetInventorySection on _SheetScreenState {
       repo,
       quantity: trade.quantity,
       unitPriceCp: trade.unitCp,
+      baseItemId: baseItemId,
       at: DateTime.now(),
     );
     if (next == null) return false;
@@ -1603,6 +1630,10 @@ extension _SheetInventorySection on _SheetScreenState {
       InventoryOps.replicateMagicItem(_c, id, repo, baseItemId: baseItemId),
     );
   }
+
+  /// Una línea que quedó sin base: se agregó cuando el catálogo no la pedía.
+  bool _needsBase(InventoryEntry e) =>
+      repo.item(e.itemId)?.baseItemKind != null && e.baseItemId == null;
 
   Future<String?> _chooseMagicBase(Item item) {
     final ids = InventoryOps.magicBaseOptions(item, repo);
