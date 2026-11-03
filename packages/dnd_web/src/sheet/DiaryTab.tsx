@@ -1,14 +1,29 @@
-import { useMemo, useState } from 'react';
-import { ExternalLink, Feather, Image as ImageIcon, Link2, NotebookText, ScrollText, type LucideIcon } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Check,
+  Download,
+  ExternalLink,
+  Feather,
+  Image as ImageIcon,
+  Link2,
+  NotebookText,
+  Pencil,
+  ScrollText,
+  TriangleAlert,
+  Upload,
+  type LucideIcon,
+} from 'lucide-react';
 import type { DiaryEntry } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import { AppDialog } from '../ui/AppDialog';
+import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { MarkdownText } from '../ui/MarkdownText';
-import { ScrollArea } from '../ui/primitives';
+import { ScrollArea, Tooltip } from '../ui/primitives';
 import { portraitUrl } from '../ui/portrait';
 import { AppEmptyState } from '../ui/status';
 import type { SheetModel } from './model';
+import type { SheetWriter } from './writer';
 
 /** Un tipo desconocido se lee como texto, igual que `DiaryEntryKind.fromJson`. */
 type Kind = 'text' | 'image' | 'link';
@@ -39,18 +54,220 @@ export function DiaryTab({ model }: { model: SheetModel }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <Card id="background" title={t.diaryBackground} icon={ScrollText}>
-        {background ? (
-          <BackgroundText text={background} label={t.diaryBackground} />
-        ) : (
-          <div className="max-w-[620px]">
-            <p className="font-display text-[16px] text-on-surface">{t.diaryUnknownOrigin}</p>
-            <p className="mt-1 text-on-surface-variant">{t.diaryUnknownOriginBody(character.name)}</p>
-          </div>
-        )}
-      </Card>
+      {model.write ? (
+        <BackgroundCard model={model} write={model.write} />
+      ) : (
+        <Card id="background" title={t.diaryBackground} icon={ScrollText}>
+          {background ? (
+            <BackgroundText text={background} label={t.diaryBackground} />
+          ) : (
+            <div className="max-w-[620px]">
+              <p className="font-display text-[16px] text-on-surface">{t.diaryUnknownOrigin}</p>
+              <p className="mt-1 text-on-surface-variant">{t.diaryUnknownOriginBody(character.name)}</p>
+            </div>
+          )}
+        </Card>
+      )}
       <DiaryEntries entries={character.diary ?? []} title={t.diaryEntries} emptyMessage={t.diaryEmpty(character.name)} />
     </div>
+  );
+}
+
+const ICON_BUTTON =
+  'inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius-nav)] hover:bg-plaque disabled:pointer-events-none disabled:opacity-40';
+
+/** Igual que `_fileSlug` de Flutter: lo que se baja tiene que poder guardarse
+ *  en cualquier sistema de archivos. */
+const fileSlug = (name: string, fallback: string) =>
+  name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || fallback;
+
+/**
+ * El trasfondo de la ficha **propia**: lectura con Markdown, editor, importar y
+ * exportar un `.md` (`DiaryBackgroundCard` de Flutter).
+ *
+ * El borrador vive en estado local y la acción `setBackground` se manda
+ * espaciada: cada acción recompila la ficha entera, y no puede pasar por
+ * tecla. Se manda igual de inmediato al terminar de editar, al salir del campo
+ * y al desmontar, para que lo escrito a medias no se pierda.
+ */
+function BackgroundCard({ model, write }: { model: SheetModel; write: SheetWriter }) {
+  const t = useTexts();
+  const { character } = model;
+  const saved = character.background ?? '';
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState('');
+  const [replacing, setReplacing] = useState<string | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const timer = useRef<number | undefined>(undefined);
+  const pending = useRef<string | null>(null);
+  // El escritor se rearma cuando cambia la ficha; el vaciado al desmontar tiene
+  // que usar el último, no el de cuando se montó.
+  const writeRef = useRef(write);
+  writeRef.current = write;
+
+  const flush = useCallback(() => {
+    window.clearTimeout(timer.current);
+    const text = pending.current;
+    pending.current = null;
+    if (text !== null) writeRef.current.act({ type: 'setBackground', text });
+  }, []);
+  useEffect(() => flush, [flush]);
+
+  const type = (text: string) => {
+    setDraft(text);
+    pending.current = text;
+    window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(flush, 400);
+  };
+  const current = editing ? draft : saved;
+  const empty = current.trim() === '';
+
+  const startEditing = () => {
+    setDraft(saved);
+    setEditing(true);
+  };
+  const toggleEditing = () => {
+    if (editing) {
+      flush();
+      setEditing(false);
+    } else startEditing();
+  };
+
+  const apply = (text: string) => {
+    // Lo escrito a medias queda pisado por el archivo: que no vuelva con el
+    // vaciado pendiente.
+    window.clearTimeout(timer.current);
+    pending.current = null;
+    write.act({ type: 'setBackground', text });
+    setEditing(false);
+    write.notify(t.diaryImported);
+  };
+
+  const onFile = async (file: File | undefined) => {
+    if (fileInput.current) fileInput.current.value = '';
+    if (!file) return;
+    let text: string;
+    try {
+      // Un .md no es cualquier cosa renombrada: si no es UTF-8, meterlo en la
+      // ficha dejaría el trasfondo ilegible y guardado.
+      text = new TextDecoder('utf-8', { fatal: true }).decode(await file.arrayBuffer());
+    } catch {
+      write.notify(t.diaryNotUtf8, { tone: 'error' });
+      return;
+    }
+    // Reemplazar lo escrito no se puede deshacer: se pregunta. Vacío no hay
+    // nada que perder.
+    if (current.trim() !== '') setReplacing(text);
+    else apply(text);
+  };
+
+  const exportMd = () => {
+    const url = URL.createObjectURL(new Blob([current], { type: 'text/markdown' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${fileSlug(character.name, t.diaryFileFallback)}-${t.diaryFileSuffix}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const trailing = (
+    <div className="flex items-center">
+      <Tooltip content={t.diaryImportMd}>
+        <button
+          type="button"
+          aria-label={t.diaryImportMd}
+          onClick={() => fileInput.current?.click()}
+          className={`${ICON_BUTTON} text-on-surface-variant`}
+          data-action="import-background"
+        >
+          <Upload size={18} aria-hidden="true" />
+        </button>
+      </Tooltip>
+      <Tooltip content={t.diaryExportMd}>
+        <button
+          type="button"
+          aria-label={t.diaryExportMd}
+          // Sin trasfondo no hay archivo que bajar.
+          disabled={empty}
+          onClick={exportMd}
+          className={`${ICON_BUTTON} text-on-surface-variant`}
+          data-action="export-background"
+        >
+          <Download size={18} aria-hidden="true" />
+        </button>
+      </Tooltip>
+      <Tooltip content={editing ? t.diaryFinishEditing : t.diaryEditBackground}>
+        <button
+          type="button"
+          aria-label={editing ? t.diaryFinishEditing : t.diaryEditBackground}
+          onClick={toggleEditing}
+          className={`${ICON_BUTTON} text-gold`}
+          data-action="edit-background"
+        >
+          {editing ? <Check size={18} aria-hidden="true" /> : <Pencil size={18} aria-hidden="true" />}
+        </button>
+      </Tooltip>
+    </div>
+  );
+
+  return (
+    <Card id="background" title={t.diaryBackground} icon={ScrollText} trailing={trailing}>
+      <input
+        ref={fileInput}
+        type="file"
+        accept=".md,text/markdown"
+        hidden
+        onChange={(e) => void onFile(e.target.files?.[0])}
+      />
+      {editing ? (
+        <>
+          <textarea
+            data-field="background-input"
+            aria-label={t.diaryBackground}
+            rows={11}
+            autoFocus
+            value={draft}
+            onChange={(e) => type(e.target.value)}
+            onBlur={flush}
+            className="w-full resize-y rounded-[var(--radius-nav)] border border-hairline bg-plaque px-3 py-2 text-[14px] text-on-surface"
+          />
+          <p className="mt-2 text-[12px] text-text-muted">{t.diaryMarkdownHint}</p>
+        </>
+      ) : saved.trim() ? (
+        <BackgroundText text={saved.trim()} label={t.diaryBackground} />
+      ) : (
+        <div className="max-w-[620px]">
+          <p className="font-display text-[16px] text-on-surface-variant italic">{t.diaryUnknownOrigin}</p>
+          <p className="mt-1 text-on-surface-variant">{t.diaryUnknownOriginBody(character.name)}</p>
+          <div className="mt-4 flex flex-wrap gap-2.5">
+            <Button tone="secondary" icon={Pencil} onClick={startEditing}>
+              {t.diaryWriteBackground}
+            </Button>
+            <Button tone="secondary" icon={Upload} onClick={() => fileInput.current?.click()}>
+              {t.diaryImportMdShort}
+            </Button>
+          </div>
+        </div>
+      )}
+      {replacing !== null && (
+        <AppDialog
+          open
+          onOpenChange={(v) => !v && setReplacing(null)}
+          title={t.diaryReplaceTitle}
+          icon={TriangleAlert}
+          iconClassName="text-crimson"
+          actions={[
+            { label: t.cancel },
+            { label: t.diaryReplace, primary: true, tone: 'crimson', onSelect: () => apply(replacing) },
+          ]}
+        >
+          <p>{t.diaryReplaceBody}</p>
+        </AppDialog>
+      )}
+    </Card>
   );
 }
 
