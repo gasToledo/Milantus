@@ -25,6 +25,7 @@ import 'fakes/in_memory_character_repository.dart';
 import 'fakes/in_memory_encounter_repository.dart';
 import 'fakes/in_memory_event_repository.dart';
 import 'fakes/in_memory_homebrew_repository.dart';
+import 'fakes/in_memory_item_grant_repository.dart';
 import 'fakes/in_memory_level_up_repository.dart';
 import 'fakes/in_memory_portrait_blob_store.dart';
 import 'fakes/in_memory_repository_transaction_runner.dart';
@@ -73,6 +74,7 @@ void main() {
   late InMemoryRepositoryTransactionRunner transactions;
   late InMemoryHomebrewRepository homebrewRepo;
   late InMemoryLevelUpRepository levelUps;
+  late InMemoryItemGrantRepository itemGrants;
   late InMemorySettingsRepository settingsRepo;
   late Handler handler;
 
@@ -96,6 +98,7 @@ void main() {
     npcs = InMemoryNpcRepository(campaigns, characters);
     homebrewRepo = InMemoryHomebrewRepository();
     levelUps = InMemoryLevelUpRepository(campaigns);
+    itemGrants = InMemoryItemGrantRepository(characters);
     transactions = InMemoryRepositoryTransactionRunner(
       characters: characters,
       campaigns: campaigns,
@@ -105,6 +108,7 @@ void main() {
       encounters: encounters,
       homebrew: homebrewRepo,
       levelUps: levelUps,
+      itemGrants: itemGrants,
     );
     importHomebrew = ({required userId, required content}) async {
       var count = 0;
@@ -138,6 +142,7 @@ void main() {
       transactions: transactions,
       homebrew: homebrewRepo,
       levelUps: levelUps,
+      itemGrants: itemGrants,
       settings: settingsRepo,
     );
   });
@@ -303,6 +308,7 @@ void main() {
         transactions: transactions,
         homebrew: homebrewRepo,
         levelUps: levelUps,
+        itemGrants: itemGrants,
         settings: settingsRepo,
         v2Users: v2Users,
       );
@@ -880,6 +886,7 @@ void main() {
           transactions: transactions,
           homebrew: homebrewRepo,
           levelUps: levelUps,
+          itemGrants: itemGrants,
           settings: settingsRepo,
         );
         final token = await _login('subject-gen-3');
@@ -933,6 +940,7 @@ void main() {
           transactions: transactions,
           homebrew: homebrewRepo,
           levelUps: levelUps,
+          itemGrants: itemGrants,
           settings: settingsRepo,
         );
         final token = await _login('subject-gen-count');
@@ -1016,6 +1024,7 @@ void main() {
         transactions: transactions,
         homebrew: homebrewRepo,
         levelUps: levelUps,
+        itemGrants: itemGrants,
         settings: settingsRepo,
       );
       fakeAuth.nextVerifiedSubject = 'subject-upload-no-providers';
@@ -1087,6 +1096,7 @@ void main() {
         transactions: transactions,
         homebrew: homebrewRepo,
         levelUps: levelUps,
+        itemGrants: itemGrants,
         settings: settingsRepo,
       );
 
@@ -1158,6 +1168,7 @@ void main() {
         transactions: transactions,
         homebrew: homebrewRepo,
         levelUps: levelUps,
+        itemGrants: itemGrants,
         settings: settingsRepo,
       );
 
@@ -1913,6 +1924,7 @@ void main() {
         transactions: transactions,
         homebrew: homebrewRepo,
         levelUps: levelUps,
+        itemGrants: itemGrants,
         settings: settingsRepo,
         webStaticHandler: (request) =>
             Response.ok('build web', headers: {'x-fuente': 'estatico'}),
@@ -1943,6 +1955,7 @@ void main() {
         transactions: transactions,
         homebrew: homebrewRepo,
         levelUps: levelUps,
+        itemGrants: itemGrants,
         settings: settingsRepo,
         webStaticHandler: (request) =>
             Response.ok('build web', headers: {'x-fuente': 'estatico'}),
@@ -1975,6 +1988,7 @@ void main() {
         transactions: transactions,
         homebrew: homebrewRepo,
         levelUps: levelUps,
+        itemGrants: itemGrants,
         settings: settingsRepo,
         webStaticHandler: (request) =>
             Response.ok('build web', headers: {'x-fuente': 'estatico'}),
@@ -2018,6 +2032,7 @@ void main() {
       transactions: transactions,
       homebrew: homebrewRepo,
       levelUps: levelUps,
+      itemGrants: itemGrants,
       settings: settingsRepo,
       webStaticHandler: flutter,
       webV2Handler: v2,
@@ -3306,6 +3321,429 @@ void main() {
           (e) => e['kind'] == 'chapter_completed',
         );
         expect(chapterEvent['payload']['grantsLevel'], isFalse);
+      });
+
+      group('reparto de objetos', () {
+        const potion = {
+          'category': 'items',
+          'itemId': 'potion-of-healing',
+          'name': 'Poción de curación',
+          'quantity': 2,
+        };
+
+        // Una mesa con dos personajes de dos cuentas y un capítulo con oro.
+        Future<
+          ({String dm, String a, String b, String memberA, String memberB})
+        >
+        table(String prefix) async {
+          final dm = await login('$prefix-dm');
+          await createCampaign(dm, 'tumba');
+          final a = await login('$prefix-a');
+          final b = await login('$prefix-b');
+          final ids = <String>[];
+          for (final (token, character) in [(a, 'sagan'), (b, 'elsbeth')]) {
+            final redeemed = await send(
+              'POST',
+              '/api/campaigns/tumba/members',
+              token: dm,
+              body: {'code': await shareCharacter(token, character)},
+            );
+            ids.add(redeemed['body']['member']['memberId'] as String);
+          }
+          await createChapter(dm, 'tumba', 'cripta', grantsGold: 50);
+          return (dm: dm, a: a, b: b, memberA: ids[0], memberB: ids[1]);
+        }
+
+        Future<Map<String, dynamic>> close(String dm, Object? allocations) =>
+            send(
+              'POST',
+              '/api/campaigns/tumba/chapters/cripta/close',
+              token: dm,
+              body: {'allocations': allocations},
+            );
+
+        Future<List<dynamic>> grantsOf(String token, String character) async =>
+            (await send(
+                  'GET',
+                  '/api/characters/$character/item-grants',
+                  token: token,
+                ))['body']['grants']
+                as List;
+
+        Future<Map<String, dynamic>> completedEvent(String token) async =>
+            ((await send('GET', '/api/events', token: token))['body']['events']
+                        as List)
+                    .firstWhere(
+                      (e) => e['kind'] == 'chapter_completed',
+                    )['payload']
+                as Map<String, dynamic>;
+
+        test(
+          'cada dueño recibe solo lo suyo, y el aviso lleva lo suyo',
+          () async {
+            final t = await table('rep-own');
+
+            final closed = await close(t.dm, [
+              {
+                'memberId': t.memberA,
+                'items': [potion],
+                'freeItems': ['Mapa del contrabandista'],
+              },
+            ]);
+            expect(closed['status'], 200);
+
+            final grants = await grantsOf(t.a, 'sagan');
+            expect(grants, hasLength(1));
+            expect(grants.single['name'], 'Poción de curación');
+            expect(grants.single['quantity'], 2);
+            expect(grants.single['campaignName'], 'La Tumba');
+            expect(grants.single['chapterName'], 'La Cripta');
+            expect(grants.single['homebrew'], isFalse);
+            // El documento nunca viaja al cliente.
+            expect(grants.single.containsKey('homebrewDocument'), isFalse);
+            expect(await grantsOf(t.b, 'elsbeth'), isEmpty);
+
+            final mine = await completedEvent(t.a);
+            expect(mine['grantsItems'], [
+              'Mapa del contrabandista',
+              'Poción de curación ×2',
+            ]);
+            expect(mine['hasGrants'], isTrue);
+            // Sin objetos, el aviso llega igual con su oro, y sin la marca.
+            final theirs = await completedEvent(t.b);
+            expect(theirs['grantsGold'], 50);
+            expect(theirs['grantsItems'], isEmpty);
+            expect(theirs.containsKey('hasGrants'), isFalse);
+
+            // El capítulo guarda lo repartido, no a quién le tocó.
+            final chapter = (await listChapters(t.dm, 'tumba')).single;
+            expect(chapter['state'], 'completed');
+            expect(chapter['grantsCatalog'], hasLength(1));
+            expect(chapter['grantsItems'], ['Mapa del contrabandista']);
+            expect(jsonEncode(chapter), isNot(contains(t.memberA)));
+          },
+        );
+
+        // La frontera del Modo DM: el reparto deja una bandeja, no escribe la ficha.
+        test('cerrar con reparto no cambia el documento de la ficha', () async {
+          final t = await table('rep-sheet');
+          Future<dynamic> sheet() async =>
+              (await send('GET', '/api/characters', token: t.a))['body'];
+          final before = jsonEncode(await sheet());
+
+          await close(t.dm, [
+            {
+              'memberId': t.memberA,
+              'items': [potion],
+            },
+          ]);
+
+          expect(jsonEncode(await sheet()), before);
+        });
+
+        test(
+          'un memberId de otra mesa es un 400 y no deja nada hecho',
+          () async {
+            final t = await table('rep-foreign');
+            final other = await login('rep-foreign-other');
+            await createCampaign(other, 'otra');
+            final alien = await send(
+              'POST',
+              '/api/campaigns/otra/members',
+              token: other,
+              body: {'code': await shareCharacter(t.a, 'sagan-2')},
+            );
+            final alienId = alien['body']['member']['memberId'] as String;
+
+            final closed = await close(t.dm, [
+              {
+                'memberId': alienId,
+                'items': [potion],
+              },
+            ]);
+
+            expect(closed['status'], 400);
+            expect(
+              (await listChapters(t.dm, 'tumba')).single['state'],
+              'planned',
+            );
+            expect(await grantsOf(t.a, 'sagan'), isEmpty);
+            expect(await grantsOf(t.a, 'sagan-2'), isEmpty);
+          },
+        );
+
+        test('un homebrew que no es del DM es un 400', () async {
+          final t = await table('rep-hb-foreign');
+          // El objeto existe, pero en la cuenta del jugador y no en la del DM.
+          await send(
+            'PUT',
+            '/api/homebrew/items/hoja',
+            token: t.a,
+            body: _homebrewItem('hoja', 'Hoja del Cuervo'),
+          );
+
+          final closed = await close(t.dm, [
+            {
+              'memberId': t.memberA,
+              'items': [
+                {
+                  'category': 'items',
+                  'itemId': 'hoja',
+                  'name': 'Hoja del Cuervo',
+                  'homebrew': true,
+                },
+              ],
+            },
+          ]);
+
+          expect(closed['status'], 400);
+          expect(
+            (await listChapters(t.dm, 'tumba')).single['state'],
+            'planned',
+          );
+        });
+
+        test(
+          'cerrar sin cuerpo sigue igual: los nombres, sin regalos',
+          () async {
+            final t = await table('rep-nobody');
+
+            final closed = await send(
+              'POST',
+              '/api/campaigns/tumba/chapters/cripta/close',
+              token: t.dm,
+            );
+
+            expect(closed['status'], 200);
+            expect(await grantsOf(t.a, 'sagan'), isEmpty);
+            final event = await completedEvent(t.a);
+            expect(event['grantsGold'], 50);
+            expect(event.containsKey('hasGrants'), isFalse);
+          },
+        );
+
+        test('cerrar dos veces no repite regalos ni avisos', () async {
+          final t = await table('rep-twice');
+          final allocations = [
+            {
+              'memberId': t.memberA,
+              'items': [potion],
+            },
+          ];
+
+          await close(t.dm, allocations);
+          final again = await close(t.dm, allocations);
+
+          expect(again['status'], 200);
+          expect(await grantsOf(t.a, 'sagan'), hasLength(1));
+          final events =
+              (await send('GET', '/api/events', token: t.a))['body']['events']
+                  as List;
+          expect(
+            events.where((e) => e['kind'] == 'chapter_completed'),
+            hasLength(1),
+          );
+        });
+
+        test(
+          'la campaña vista por el jugador no dice a quién le tocó qué',
+          () async {
+            final t = await table('rep-playerview');
+            await close(t.dm, [
+              {
+                'memberId': t.memberA,
+                'items': [potion],
+                'freeItems': ['Mapa del contrabandista'],
+              },
+            ]);
+
+            final view = await send(
+              'GET',
+              '/api/characters/elsbeth/campaigns',
+              token: t.b,
+            );
+            final text = jsonEncode(view['body']);
+
+            // Lo repartido (la unión) es público para la mesa, como siempre lo fue el
+            // botín; lo que no viaja es nada por persona.
+            expect(text, contains('Poción de curación'));
+            expect(text, isNot(contains(t.memberA)));
+            expect(text, isNot(contains('allocations')));
+            expect(text, isNot(contains('hasGrants')));
+            expect(text, isNot(contains('homebrewDocument')));
+          },
+        );
+
+        test('borrar el personaje se lleva sus regalos', () async {
+          final t = await table('rep-cascade');
+          await close(t.dm, [
+            {
+              'memberId': t.memberA,
+              'items': [potion],
+            },
+          ]);
+          expect(itemGrants.count, 1);
+
+          await send('DELETE', '/api/characters/sagan', token: t.a);
+
+          expect(itemGrants.count, 0);
+        });
+
+        group('la bandeja del jugador', () {
+          Future<(String, String, Map<String, dynamic>)> withGift(
+            String prefix, {
+            bool homebrewItem = false,
+          }) async {
+            final t = await table(prefix);
+            var item = potion as Map<String, Object?>;
+            if (homebrewItem) {
+              await send(
+                'PUT',
+                '/api/homebrew/items/hoja',
+                token: t.dm,
+                body: _homebrewItem('hoja', 'Hoja del Cuervo'),
+              );
+              item = {
+                'category': 'items',
+                'itemId': 'hoja',
+                'name': 'Hoja del Cuervo',
+                'homebrew': true,
+              };
+            }
+            await close(t.dm, [
+              {
+                'memberId': t.memberA,
+                'items': [item],
+              },
+            ]);
+            final id = (await grantsOf(t.a, 'sagan')).single['id'] as String;
+            return (t.a, id, {'dm': t.dm, 'b': t.b});
+          }
+
+          test('lo ajeno responde igual que lo inexistente', () async {
+            final (_, id, others) = await withGift('rep-404');
+            final stranger = await login('rep-404-stranger');
+            const missing = '00000000-0000-4000-a000-999999999999';
+
+            for (final token in [stranger, others['b'] as String]) {
+              final listed = await send(
+                'GET',
+                '/api/characters/sagan/item-grants',
+                token: token,
+              );
+              expect(listed['status'], 404);
+              final claim = await send(
+                'POST',
+                '/api/item-grants/$id/claim',
+                token: token,
+              );
+              final claimMissing = await send(
+                'POST',
+                '/api/item-grants/$missing/claim',
+                token: token,
+              );
+              expect(claim['status'], 404);
+              expect(claim['body'], claimMissing['body']);
+              final resolve = await send(
+                'DELETE',
+                '/api/item-grants/$id',
+                token: token,
+              );
+              expect(resolve['status'], 404);
+              expect(
+                resolve['body'],
+                (await send(
+                  'DELETE',
+                  '/api/item-grants/$missing',
+                  token: token,
+                ))['body'],
+              );
+            }
+            // Ni siquiera el DM que lo repartió lo toca.
+            expect(
+              (await send(
+                'DELETE',
+                '/api/item-grants/$id',
+                token: others['dm'] as String,
+              ))['status'],
+              404,
+            );
+          });
+
+          test(
+            'reclamar devuelve el objeto, no borra la fila y resolver la saca',
+            () async {
+              final (player, id, _) = await withGift('rep-claim');
+
+              final claimed = await send(
+                'POST',
+                '/api/item-grants/$id/claim',
+                token: player,
+              );
+              expect(claimed['status'], 200);
+              expect(claimed['body']['itemId'], 'potion-of-healing');
+              expect(claimed['body']['quantity'], 2);
+              expect(await grantsOf(player, 'sagan'), hasLength(1));
+
+              expect(
+                (await send(
+                  'DELETE',
+                  '/api/item-grants/$id',
+                  token: player,
+                ))['status'],
+                200,
+              );
+              expect(await grantsOf(player, 'sagan'), isEmpty);
+            },
+          );
+
+          test(
+            'reclamar un homebrew crea la copia en la cuenta del jugador',
+            () async {
+              final (player, id, _) = await withGift(
+                'rep-hb',
+                homebrewItem: true,
+              );
+              // El jugador ya tiene un objeto propio con el mismo id de origen.
+              await send(
+                'PUT',
+                '/api/homebrew/items/hoja',
+                token: player,
+                body: _homebrewItem('hoja', 'Mi hoja'),
+              );
+
+              final first = await send(
+                'POST',
+                '/api/item-grants/$id/claim',
+                token: player,
+              );
+              final second = await send(
+                'POST',
+                '/api/item-grants/$id/claim',
+                token: player,
+              );
+
+              expect(first['body']['itemId'], isNot('hoja'));
+              expect(second['body']['itemId'], first['body']['itemId']);
+              final own =
+                  (await send(
+                        'GET',
+                        '/api/homebrew',
+                        token: player,
+                      ))['body']['content']['items']
+                      as List;
+              // Lo propio no se pisa, y la copia entra una sola vez con su id.
+              expect(
+                own.map((d) => d['name']),
+                unorderedEquals(['Mi hoja', 'Hoja del Cuervo']),
+              );
+              expect(
+                own.singleWhere((d) => d['name'] == 'Hoja del Cuervo')['id'],
+                first['body']['itemId'],
+              );
+            },
+          );
+        });
       });
 
       test('el botín del capítulo viaja en el aviso', () async {

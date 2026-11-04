@@ -463,4 +463,31 @@ CREATE TABLE mcp_audit_log (
 CREATE INDEX mcp_audit_log_created_idx ON mcp_audit_log (created_at);
 ''',
   ),
+  Migration(
+    id: '0015_item_grants',
+    sql: '''
+-- Objetos que un DM le reparte a un personaje al cerrar un capítulo y que el
+-- jugador todavía no aceptó. Es una bandeja: el DM nunca escribe la ficha, el
+-- jugador agrega el objeto a su mochila cuando lo acepta.
+--
+-- Cuelga del personaje y no de la campaña a propósito: si el DM borra la mesa,
+-- el regalo sigue en pie. Se va solo con el personaje (o la cuenta).
+-- `campaign_name` y `chapter_name` son texto de cuando se repartió, por lo
+-- mismo: la fila no puede depender de una campaña que ya no existe.
+CREATE TABLE item_grants (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  owner_user_id UUID NOT NULL,
+  character_id TEXT NOT NULL,
+  campaign_name TEXT NOT NULL,
+  chapter_name TEXT NOT NULL,
+  item JSONB NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  FOREIGN KEY (owner_user_id, character_id)
+    REFERENCES characters (user_id, id) ON DELETE CASCADE
+);
+
+CREATE INDEX item_grants_owner_idx
+  ON item_grants (owner_user_id, character_id, created_at);
+''',
+  ),
 ];

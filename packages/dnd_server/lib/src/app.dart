@@ -26,6 +26,7 @@ import 'repositories/encounter_repository.dart';
 import 'repositories/event_repository.dart';
 import 'repositories/homebrew_repository.dart';
 import 'repositories/id_allocation.dart';
+import 'repositories/item_grant_repository.dart';
 import 'repositories/level_up_repository.dart';
 import 'repositories/mcp_audit_repository.dart';
 import 'repositories/note_repository.dart';
@@ -34,6 +35,7 @@ import 'repositories/repository_transaction_runner.dart';
 import 'repositories/settings_repository.dart';
 import 'util/safe_path.dart';
 
+part 'app_item_grants.dart';
 part 'app_mcp.dart';
 part 'app_npcs.dart';
 
@@ -109,6 +111,7 @@ Handler buildHandler({
   required RepositoryTransactionRunner transactions,
   required HomebrewRepository homebrew,
   required LevelUpRepository levelUps,
+  required ItemGrantRepository itemGrants,
   required SettingsRepository settings,
 
   /// Sirve el build web (`flutter build web`) para todo lo que el enrutado de
@@ -361,6 +364,22 @@ Handler buildHandler({
     ..get(
       '/api/characters/<id>/turn',
       authenticated((request) => _turnHandler(request, characters, encounters)),
+    )
+    ..get(
+      '/api/characters/<id>/item-grants',
+      authenticated(
+        (request) => _listItemGrantsHandler(request, characters, itemGrants),
+      ),
+    )
+    ..post(
+      '/api/item-grants/<id>/claim',
+      authenticated(
+        (request) => _claimItemGrantHandler(request, itemGrants, homebrew),
+      ),
+    )
+    ..delete(
+      '/api/item-grants/<id>',
+      authenticated((request) => _resolveItemGrantHandler(request, itemGrants)),
     )
     ..get(
       '/api/events',
@@ -966,6 +985,7 @@ const _notFoundMessages = {
   'character_not_found': 'Personaje no encontrado.',
   'portrait_not_found': 'Retrato no encontrado.',
   'link_not_found': 'Vínculo no encontrado.',
+  'item_grant_not_found': 'Objeto no encontrado.',
 };
 
 Response _notFound(String code) => Response.notFound(
@@ -1687,6 +1707,12 @@ Future<Response> _grantHeroicInspirationHandler(
 /// lo toca el asistente de subida del jugador y el inventario lo escribe él.
 /// Este handler es el único punto del servidor que le escribe algo a otra
 /// cuenta, y lo que le escribe es un aviso en su bandeja, nunca su ficha.
+///
+/// El cuerpo es opcional. Sin él (Flutter, el conector MCP) todos reciben los
+/// mismos nombres y ningún regalo. Con `allocations` el DM reparte objetos a
+/// personajes concretos: cada uno recibe solo lo suyo en la bandeja de regalos
+/// (`item_grants`) y en su aviso, y **la ficha sigue sin tocarse**: el objeto
+/// lo agrega el jugador cuando acepta. Todo se valida antes de escribir nada.
 Future<Response> _closeChapterHandler(
   Request request,
   RepositoryTransactionRunner transactions,
@@ -1699,6 +1725,7 @@ Future<Response> _closeChapterHandler(
     request.params['chapterId']!,
     label: 'id de capítulo',
   );
+  final body = await _readOptionalJsonBody(request);
   return transactions.run((repositories) async {
     final campaign = await repositories.campaigns.find(
       request.userId,
@@ -1716,26 +1743,80 @@ Future<Response> _closeChapterHandler(
       return _jsonOk({'status': 'ok'});
     }
 
-    await repositories.chapters.upsert(
-      request.userId,
-      campaignId,
-      chapter.copyWith(state: ChapterState.completed),
-    );
-
     final members = await repositories.campaigns.listMembers(
       request.userId,
       campaignId,
     );
+    // Se lee y se valida todo antes de la primera escritura: un 400 acá deja
+    // el capítulo abierto y sin regalos (además de que la transacción vuelve
+    // atrás).
+    final allocations = body['allocations'] == null
+        ? null
+        : await _parseAllocations(
+            body['allocations'],
+            members: members,
+            homebrew: repositories.homebrew,
+            dmUserId: request.userId,
+          );
+
+    Map<String, dynamic> grantsOf(CampaignMember member) => {
+      'characterName': member.character.name,
+      'campaignName': campaign.name,
+      'chapterName': chapter.name,
+      'grantsLevel': chapter.grantsLevel,
+      'grantsGold': chapter.grantsGold,
+    };
+
+    if (allocations == null) {
+      await repositories.chapters.upsert(
+        request.userId,
+        campaignId,
+        chapter.copyWith(state: ChapterState.completed),
+      );
+      for (final member in members) {
+        await repositories.events.append(
+          member.ownerUserId,
+          'chapter_completed',
+          {...grantsOf(member), 'grantsItems': chapter.itemLabels},
+        );
+      }
+      return _jsonOk({'status': 'ok'});
+    }
+
+    // El capítulo guarda la unión de lo repartido y no a quién le tocó cada
+    // cosa: eso vive solo en la bandeja y en el aviso de cada jugador.
+    await repositories.chapters.upsert(
+      request.userId,
+      campaignId,
+      chapter.copyWith(
+        state: ChapterState.completed,
+        grantsItems: allocations.unionFree,
+        grantsCatalog: allocations.unionCatalog,
+      ),
+    );
     for (final member in members) {
-      await repositories.events
-          .append(member.ownerUserId, 'chapter_completed', {
-            'characterName': member.character.name,
-            'campaignName': campaign.name,
-            'chapterName': chapter.name,
-            'grantsLevel': chapter.grantsLevel,
-            'grantsGold': chapter.grantsGold,
-            'grantsItems': chapter.grantsItems,
-          });
+      final mine = allocations.byMember[member.memberId];
+      final items = mine?.items ?? const <_AllocatedItem>[];
+      final free = mine?.free ?? const <String>[];
+      if (items.isNotEmpty) {
+        await repositories.itemGrants.addAll(
+          member.ownerUserId,
+          member.character.id,
+          campaign.name,
+          chapter.name,
+          [for (final item in items) item.toStoredJson()],
+        );
+      }
+      // Un miembro sin objetos recibe el aviso igual, con su oro y su nivel.
+      await repositories.events.append(
+        member.ownerUserId,
+        'chapter_completed',
+        {
+          ...grantsOf(member),
+          'grantsItems': [...free, for (final item in items) item.item.label],
+          if (items.isNotEmpty) 'hasGrants': true,
+        },
+      );
     }
     return _jsonOk({'status': 'ok'});
   });

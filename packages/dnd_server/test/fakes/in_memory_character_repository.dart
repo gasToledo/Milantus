@@ -20,6 +20,10 @@ class InMemoryCharacterRepository implements CharacterRepository {
   final Map<String, Map<String, DateTime>> _createdAt = {};
   int _clock = 0;
 
+  /// Lo que la base borra en cascada al borrar un personaje (sus regalos).
+  final List<void Function(String ownerUserId, String characterId)>
+  onCharacterDeleted = [];
+
   Object snapshot() => (
     byUser: {
       for (final entry in _byUser.entries) entry.key: Map.of(entry.value),
@@ -126,7 +130,14 @@ class InMemoryCharacterRepository implements CharacterRepository {
   @override
   Future<bool> delete(String userId, String id) async {
     if (_isNpc(userId, id)) return false;
-    return _byUser[userId]?.remove(id) != null;
+    final removed = _byUser[userId]?.remove(id) != null;
+    // La cascada de la base: lo que cuelga del personaje se va con él.
+    if (removed) {
+      for (final cascade in onCharacterDeleted) {
+        cascade(userId, id);
+      }
+    }
+    return removed;
   }
 
   @override

@@ -21,6 +21,7 @@ import 'package:dnd_server/src/repositories/character_repository.dart';
 import 'package:dnd_server/src/repositories/encounter_repository.dart';
 import 'package:dnd_server/src/repositories/event_repository.dart';
 import 'package:dnd_server/src/repositories/homebrew_repository.dart';
+import 'package:dnd_server/src/repositories/item_grant_repository.dart';
 import 'package:dnd_server/src/repositories/level_up_repository.dart';
 import 'package:dnd_server/src/repositories/mcp_audit_repository.dart';
 import 'package:dnd_server/src/repositories/npc_repository.dart';
@@ -122,6 +123,7 @@ Future<void> main() async {
       transactions: PostgresRepositoryTransactionRunner(pool),
       homebrew: PostgresHomebrewRepository(pool),
       levelUps: PostgresLevelUpRepository(pool),
+      itemGrants: PostgresItemGrantRepository(pool),
       settings: PostgresSettingsRepository(pool),
       webStaticHandler: webStaticHandler,
       webV2Handler: webV2Handler,

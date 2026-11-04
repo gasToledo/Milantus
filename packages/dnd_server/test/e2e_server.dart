@@ -32,6 +32,7 @@ import 'fakes/in_memory_character_repository.dart';
 import 'fakes/in_memory_encounter_repository.dart';
 import 'fakes/in_memory_event_repository.dart';
 import 'fakes/in_memory_homebrew_repository.dart';
+import 'fakes/in_memory_item_grant_repository.dart';
 import 'fakes/in_memory_level_up_repository.dart';
 import 'fakes/in_memory_note_repository.dart';
 import 'fakes/in_memory_npc_repository.dart';
@@ -702,6 +703,7 @@ Future<void> main() async {
     ).toJson(),
   );
   final levelUps = InMemoryLevelUpRepository(campaigns);
+  final itemGrants = InMemoryItemGrantRepository(characters);
   // Lo que el servidor anota cuando el jugador sube de nivel con el capítulo
   // en marcha.
   await levelUps.append(
@@ -739,9 +741,11 @@ Future<void> main() async {
       encounters: encounters,
       homebrew: homebrew,
       levelUps: levelUps,
+      itemGrants: itemGrants,
     ),
     homebrew: homebrew,
     levelUps: levelUps,
+    itemGrants: itemGrants,
     settings: settings,
     webV2Handler: v2,
     // El DM también: el Modo DM de /v2 es de las cuentas con `webV2`.

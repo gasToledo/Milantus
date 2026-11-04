@@ -6,6 +6,7 @@ import 'character_repository.dart';
 import 'encounter_repository.dart';
 import 'event_repository.dart';
 import 'homebrew_repository.dart';
+import 'item_grant_repository.dart';
 import 'level_up_repository.dart';
 import 'npc_repository.dart';
 
@@ -33,6 +34,10 @@ class TransactionRepositories {
   /// siempre, porque el próximo guardado ya no ve diferencia de nivel.
   final LevelUpRepository levelUps;
 
+  /// Los regalos entran porque cerrar un capítulo con reparto escribe el
+  /// capítulo, los avisos y la bandeja de cada jugador, todo junto o nada.
+  final ItemGrantRepository itemGrants;
+
   const TransactionRepositories({
     required this.characters,
     required this.campaigns,
@@ -42,6 +47,7 @@ class TransactionRepositories {
     required this.encounters,
     required this.homebrew,
     required this.levelUps,
+    required this.itemGrants,
   });
 }
 
@@ -71,6 +77,7 @@ class PostgresRepositoryTransactionRunner
         encounters: PostgresEncounterRepository(session),
         homebrew: PostgresHomebrewRepository(session),
         levelUps: PostgresLevelUpRepository(session),
+        itemGrants: PostgresItemGrantRepository(session),
       ),
     ),
   );

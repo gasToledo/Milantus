@@ -204,6 +204,46 @@ capítulo entero — no hay nada que un DM pueda arreglar leyendo ese error.
 
 Cerrar dos veces responde 200 y no vuelve a avisar.
 
+### Repartir objetos al cerrar (`item_grants`)
+
+`POST .../close` acepta un cuerpo opcional `{ allocations: [{ memberId, items,
+freeItems }] }` con el que el DM le da cada objeto del catálogo (o de su
+homebrew) a personajes concretos. **Sin cuerpo** (Flutter, el conector MCP)
+todo sigue igual: todos reciben los nombres en el aviso y ningún regalo.
+
+Con cuerpo, el servidor valida **antes de escribir nada**: un `memberId` que no
+esté en `listMembers` de ese DM, una categoría que no sea `weapons`, `armor` o
+`items`, o un homebrew que no esté en el homebrew **de quien cierra** es un 400
+y no deja ni capítulo cerrado ni regalos. El documento de un homebrew lo lee el
+servidor de la cuenta del DM; nunca se acepta uno del pedido.
+
+Cada regalo es una fila de `item_grants` (migración `0015`), con el dueño del
+personaje en la clave foránea contra `characters (user_id, id)` y en cada
+`WHERE` del repositorio. Cuelga del personaje y no de la campaña a propósito:
+si el DM borra la mesa, el regalo sigue en pie; se va con el personaje. Guarda
+también el nombre de la campaña y del capítulo, como texto, por lo mismo.
+`addAll` es la única escritura en la cuenta de otro, y su `ownerUserId` sale de
+`campaign_members`, no del pedido.
+
+- El capítulo cerrado guarda la **unión** de lo repartido (`grantsCatalog`,
+  `grantsItems`), no a quién le tocó cada cosa: eso vive solo en la bandeja y en
+  el aviso de cada jugador, y la campaña vista por el jugador no lo dice.
+- El aviso `chapter_completed` de cada miembro lleva **solo lo suyo**, más
+  `hasGrants: true` si le tocó algún objeto del catálogo. Un miembro sin objetos
+  lo recibe igual, con su oro y su nivel.
+- `GET /api/characters/<id>/item-grants` lista la bandeja **sin el documento**.
+  `POST /api/item-grants/<id>/claim` devuelve `{ itemId, baseItemId, quantity }`
+  y, si es homebrew, crea **la copia en la cuenta del jugador** (id
+  `regalo-<id>`, que no pisa nada suyo) al aceptar él: contenido que el DM
+  eligió darle, con su consentimiento. No borra la fila, así que si agregar el
+  objeto falla se reintenta, y reclamar dos veces no duplica. `DELETE
+  /api/item-grants/<id>` la saca. Lo ajeno y lo inexistente responden el mismo
+  404.
+
+**La frontera se mantiene:** el reparto no escribe la ficha. Lo agrega el
+jugador a su inventario, con su propia sesión, cuando acepta. Una prueba compara
+el documento antes y después de cerrar con reparto.
+
 ### Las subidas de nivel en el Cuaderno
 
 Lo que el DM sí ve es la subida ya hecha: cuando el jugador guarda la ficha con
@@ -617,6 +657,14 @@ El subgrupo `capítulos` agrega:
   capítulo;
 - cerrar dos veces no repite el aviso;
 - borrar la campaña se lleva sus capítulos.
+
+El subgrupo `reparto de objetos` fija: cada dueño recibe solo lo suyo y el aviso
+lleva lo suyo; la ficha no cambia; un `memberId` de otra mesa o un homebrew que
+no es del DM es un 400 sin efectos; cerrar sin cuerpo no cambia; cerrar dos
+veces no repite regalos; la campaña del jugador no dice a quién le tocó qué;
+borrar el personaje se lleva sus regalos; listar, reclamar y resolver lo ajeno
+responde como lo inexistente; y reclamar un homebrew crea la copia sin pisar
+nada propio y sin duplicarse.
 
 El subgrupo `campaña vista por el jugador` agrega:
 
