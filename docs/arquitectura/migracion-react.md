@@ -743,14 +743,16 @@ frontera sigue donde estaba: **el DM no escribe la ficha de otra cuenta**.
 
 **Paso 6d: escenas de música** *(existe)*. No toca motor, servidor ni Flutter:
 las escenas viven en `Campaign.musicScenes` y el servidor ya las poda para el
-jugador. En `MusicPlayer` el DM crea, edita y borra escenas (`MusicSceneDialog`
+jugador. En `MusicPlayer` el DM crea, edita, mueve y borra escenas (`MusicSceneDialog`
 y el ⋮ de cada fila: Editar, «Ofrecerla al iniciar un combate», Abrir en
 YouTube y Borrar) y, con el enlace que el dueño no deja ver afuera, puede
 cambiarlo desde el aviso. Todo escribe con `editCampaign`, que relee la
 campaña antes del PUT, y las escrituras van **en fila** (`updateScenes`): dos
 toques seguidos releerían lo mismo y el segundo pisaría al primero. Borrar no
 confirma: avisa **adentro del panel** (no con `Toast`, que saldría en la misma
-esquina y taparía el reproductor) con «Deshacer» durante 8 s. Un enlace que
+esquina y taparía el reproductor) con «Deshacer» durante 8 s. Mover es tomar la fila
+(`useHoldDrag` con `group: 'music'` y `axis: 'y'`; hoy una fila solo llega hasta
+las cinco que se ven, marcado `ponytail:`). Un enlace que
 `musicSource` no reconoce no se guarda. Si la escena que suena se borra, el
 video se corta; si cambia su enlace, el iframe se recarga; si cambia solo el
 nombre, no.

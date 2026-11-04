@@ -833,3 +833,36 @@ test('Capítulos: crear, empezar, escribir una nota y cerrar con un objeto llega
   // La prueba de la Mesa espera que esta cuenta no tenga campañas.
   await request.delete('/api/campaigns/mesa-de-capitulos', comoDm);
 });
+
+test('escenas de música: el enlace ajeno no se guarda, y crear, borrar y deshacer escriben la campaña', async ({ page, request }) => {
+  const comoDm = { headers: { cookie: `dnd_session=${TOKEN_ESCRITURA}` } };
+  await request.post('/api/campaigns', { ...comoDm, data: { campaign: { id: 'mesa-de-musica', name: 'Mesa de Música' } } });
+  const escenas = async () =>
+    (await api<{ campaigns: { id: string; musicScenes?: { name: string; offerOnCombat?: boolean }[] }[] }>(request, '/api/campaigns', TOKEN_ESCRITURA))
+      .campaigns.find((c) => c.id === 'mesa-de-musica')?.musicScenes ?? [];
+
+  await page.goto('/v2/dm/campanas/mesa-de-musica/mesa');
+  await page.getByRole('button', { name: 'Música', exact: true }).click();
+  await page.locator('[data-action="new-scene"]').click();
+  const dialogo = page.getByRole('dialog');
+  await dialogo.locator('[data-field="scene-name"]').fill('Cripta');
+
+  // Lo que fallaría en la mesa no se guarda, y el diálogo sigue abierto.
+  await dialogo.locator('[data-field="scene-url"]').fill('https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC');
+  await dialogo.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await expect(dialogo.getByText('El enlace tiene que ser de YouTube o YouTube Music.', { exact: true })).toBeVisible();
+
+  await dialogo.locator('[data-field="scene-url"]').fill('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+  await dialogo.getByRole('switch').click();
+  await dialogo.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await expect.poll(async () => (await escenas()).map((e) => [e.name, e.offerOnCombat])).toEqual([['Cripta', true]]);
+
+  await page.locator('[data-action="scene-actions"]').click();
+  await page.getByRole('menuitem', { name: 'Borrar', exact: true }).click();
+  await expect.poll(escenas).toEqual([]);
+  await page.getByRole('button', { name: 'Deshacer', exact: true }).click();
+  await expect.poll(async () => (await escenas()).map((e) => e.name)).toEqual(['Cripta']);
+
+  // La prueba de la Mesa espera que esta cuenta no tenga campañas.
+  await request.delete('/api/campaigns/mesa-de-musica', comoDm);
+});

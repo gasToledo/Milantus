@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChevronDown, EllipsisVertical, ExternalLink, ListMusic, Music, Pause, Pencil, Play, Plus, Trash2 } from 'lucide-react';
-import type { MusicScene } from '../api/client';
+import type { DmCampaign, MusicScene } from '../api/client';
+import { queryKeys } from '../api/queries';
 import { musicSource, type MusicSource } from '../engine';
 import { useTexts } from '../i18n/context';
 import { Button, ButtonLink } from '../ui/Button';
 import { cx } from '../ui/cx';
 import { Eyebrow } from '../ui/data';
+import { useHoldDrag } from '../ui/holdDrag';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -75,7 +77,11 @@ export function MusicPlayer({ campaignId, scenes }: { campaignId: string; scenes
   };
   /** Un cambio sin diálogo: si falla, el aviso lo dice y las escenas quedan como estaban. */
   const write = (change: (latest: MusicScene[]) => MusicScene[], onDone?: () => void) =>
-    void updateScenes(change).then(onDone, () => showNotice({ kind: 'error' }));
+    void updateScenes(change).then(onDone, () => {
+      showNotice({ kind: 'error' });
+      // Si la pantalla se adelantó (mover), vuelve a lo que hay guardado.
+      void client.invalidateQueries({ queryKey: queryKeys.dmCampaigns });
+    });
 
   const remove = (scene: MusicScene) => {
     const index = scenes.findIndex((s) => s.id === scene.id);
@@ -94,6 +100,37 @@ export function MusicPlayer({ campaignId, scenes }: { campaignId: string; scenes
       return [...all.slice(0, at), scene, ...all.slice(at)];
     });
   };
+
+  // Mover una fila: la escena `from` pasa al lugar de `to`, sobre lo último
+  // del servidor. `group` aparte del de la Mesa, que está debajo del panel; y
+  // solo en vertical, porque la lista tiene scroll propio y recortaría una
+  // fila que se va de costado. Sin «Subir» en el menú: se toma la fila.
+  // ponytail: con más de cinco escenas una fila solo llega hasta las que se
+  // ven, porque el arrastre desplaza la ventana y no la lista; salida: que el
+  // hook desplace también su contenedor.
+  const ids = useMemo(() => scenes.map((s) => s.id), [scenes]);
+  const reorder = useHoldDrag({
+    ids,
+    group: 'music',
+    axis: 'y',
+    canDrop: () => true,
+    onMove: (from, to) => {
+      const moved = (all: MusicScene[]) => {
+        const a = all.findIndex((x) => x.id === from);
+        const b = all.findIndex((x) => x.id === to);
+        if (a < 0 || b < 0) return all;
+        const next = [...all];
+        next.splice(b, 0, ...next.splice(a, 1));
+        return next;
+      };
+      // La lista cambia al instante: el hook suelta la fila a los 300 ms y
+      // esperar al servidor la mostraría volviendo a su lugar.
+      client.setQueryData<DmCampaign[]>(queryKeys.dmCampaigns, (old) =>
+        old?.map((c) => (c.id === campaignId ? { ...c, musicScenes: moved(c.musicScenes ?? []) } : c)),
+      );
+      write(moved);
+    },
+  });
 
   const current = scenes.find((s) => s.id === currentId) ?? null;
   const source = current ? (sources.get(current.id) ?? null) : null;
@@ -266,7 +303,15 @@ export function MusicPlayer({ campaignId, scenes }: { campaignId: string; scenes
                     <li
                       key={scene.id}
                       data-scene={scene.id}
-                      className={cx('flex items-center gap-1 rounded-[var(--radius-nav)] py-1 pr-1 pl-3', isCurrent ? 'bg-gold-soft' : 'bg-plaque')}
+                      {...reorder.item(scene.id)}
+                      className={cx(
+                        // Sostenerla no puede seleccionar el texto ni abrir el menú del teléfono.
+                        'flex items-center gap-1 rounded-[var(--radius-nav)] py-1 pr-1 pl-3 select-none [-webkit-touch-callout:none]',
+                        reorder.dragging === scene.id && reorder.animated ? 'bg-surface outline-1 outline-gold [&_*]:cursor-grabbing'
+                          : isCurrent ? 'bg-gold-soft' : 'bg-plaque',
+                        reorder.dragging === scene.id && !reorder.animated && 'opacity-40',
+                        reorder.over === scene.id && !reorder.animated && 'outline-2 outline-offset-1 outline-gold',
+                      )}
                     >
                       <div className="min-w-0 flex-1">
                         <p className={cx('truncate text-[14px] font-semibold', isCurrent ? 'text-gold' : 'text-on-surface')}>{scene.name}</p>

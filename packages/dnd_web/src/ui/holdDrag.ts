@@ -57,13 +57,22 @@ interface Press {
  * Con el teclado, Alt más una flecha sobre la tarjeta enfocada la mueve al
  * vecino anterior o siguiente, si [canDrop] lo permite. No dibuja nada: el
  * orden nuevo llega por [onMove] como con el puntero.
+ *
+ * [group] separa listas que conviven en pantalla (la música flota sobre la
+ * Mesa): cada una mide solo sus propias filas. Quien no lo pasa mide las
+ * suyas, las que no tienen grupo. [axis] `'y'` deja la fila en su columna: una
+ * lista con scroll propio recortaría lo que se va de costado.
  */
 export function useHoldDrag({
   ids,
+  group,
+  axis,
   canDrop,
   onMove,
 }: {
   ids: string[];
+  group?: string;
+  axis?: 'y';
   canDrop: (from: string, to: string) => boolean;
   onMove: (from: string, to: string) => void;
 }) {
@@ -80,6 +89,8 @@ export function useHoldDrag({
   const startRef = useRef<() => void>(() => {});
   const callbacks = useRef({ canDrop, onMove });
   callbacks.current = { canDrop, onMove };
+  const options = useRef({ group, axis });
+  options.current = { group, axis };
 
   // Al soltar, el orden nuevo llega un momento después (lo guarda quien usa
   // esto). Se limpia recién al recibirlo y antes de pintar: limpiar primero
@@ -100,7 +111,7 @@ export function useHoldDrag({
       const current = dragRef.current;
       const p = press.current;
       if (!current || !p || current.settling) return;
-      const dx = p.clientX + window.scrollX - p.startX;
+      const dx = options.current.axis === 'y' ? 0 : p.clientX + window.scrollX - p.startX;
       const dy = p.clientY + window.scrollY - p.startY;
       const self = current.slots.find((s) => s.id === current.id)!;
       const cx = self.x + self.width / 2 + dx;
@@ -134,7 +145,9 @@ export function useHoldDrag({
       const p = press.current;
       if (!p) return;
       justDragged.current = true;
-      const slots = [...document.querySelectorAll<HTMLElement>('[data-reorder-id]')].map((el) => {
+      const { group } = options.current;
+      const selector = group ? `[data-reorder-group="${CSS.escape(group)}"]` : '[data-reorder-id]:not([data-reorder-group])';
+      const slots = [...document.querySelectorAll<HTMLElement>(selector)].map((el) => {
         const r = el.getBoundingClientRect();
         return {
           id: el.getAttribute('data-reorder-id')!,
@@ -283,6 +296,7 @@ export function useHoldDrag({
   return {
     item: (id: string) => ({
       'data-reorder-id': id,
+      'data-reorder-group': group,
       style: styleOf(id),
       onPointerDown: onPointerDown(id),
       // Sostener un enlace abre el menú del teléfono; arrastrarlo con el mouse,
