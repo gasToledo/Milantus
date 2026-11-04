@@ -328,44 +328,6 @@ class CharacterCompiler {
       }
     }
 
-    // Elecciones abiertas que el rasgo declara en línea (Orden Primordial,
-    // Orden Divina): no son dotes, así que se resuelven contra las opciones del
-    // slot. Las clases ya se recorrieron arriba.
-    List<String> chosenFeatureChoices(String groupId) {
-      if (multipleClasses) {
-        final separator = groupId.indexOf(':');
-        if (separator > 0) {
-          final classId = groupId.substring(0, separator);
-          final rawGroup = groupId.substring(separator + 1);
-          return c.classFeatureChoices[classId]?[rawGroup] ??
-              c.classFeatureChoices[classId]?[groupId] ??
-              c.featureChoices[groupId] ??
-              const <String>[];
-        }
-      }
-      return c.featureChoices[groupId] ?? const <String>[];
-    }
-
-    for (final slot in builder.featureChoiceSlots.values) {
-      if (slot.options.isEmpty) continue;
-      final chosen = chosenFeatureChoices(slot.groupId);
-      final sourceClassId = multipleClasses
-          ? _classIdFromScopedGroupId(slot.groupId, classLevels)
-          : null;
-      for (final option in slot.options
-          .where((o) => chosen.contains(o.id))
-          .take(slot.count)) {
-        applySource(
-          'featureOption:' + slot.groupId + ':' + option.id,
-          // "Orden Divina: Taumaturgo": sola, la opción no dice de qué elección
-          // salió, y así es como se lee en el desglose de la ficha.
-          slot.name + ': ' + option.name,
-          option.effects,
-          sourceClassId: sourceClassId,
-        );
-      }
-    }
-
     // Dotes: la de origen del trasfondo + las elegidas + estilo de combate.
     //
     // Una dote se toma una sola vez salvo que sea repetible (PHB, cap. 5). Un
@@ -454,6 +416,48 @@ class CharacterCompiler {
       if (!InventoryOps.isEquipped(c, entry, repo)) continue;
       if (item.requiresAttunement && !entry.attuned) continue;
       applySource('item:${item.id}', item.name, item.effects);
+    }
+
+    // Elecciones en línea (Orden Divina, Don de la Resistencia a Energías).
+    // Van después de las dotes y los objetos: una dote puede declarar el cupo,
+    // y antes de aplicarla el slot todavía no existe. No son dotes del
+    // catálogo, así que `chosenFeatureOptionIds` no las alcanza —ese camino
+    // busca un `Feat` y estas opciones no lo son.
+    List<String> chosenFeatureChoices(String groupId) {
+      if (multipleClasses) {
+        final separator = groupId.indexOf(':');
+        if (separator > 0) {
+          final classId = groupId.substring(0, separator);
+          final rawGroup = groupId.substring(separator + 1);
+          return c.classFeatureChoices[classId]?[rawGroup] ??
+              c.classFeatureChoices[classId]?[groupId] ??
+              c.featureChoices[groupId] ??
+              const <String>[];
+        }
+      }
+      return c.featureChoices[groupId] ?? const <String>[];
+    }
+
+    // Copia: aplicar una opción puede registrar otro cupo y el mapa no se
+    // puede recorrer mientras cambia.
+    for (final slot in [...builder.featureChoiceSlots.values]) {
+      if (slot.options.isEmpty) continue;
+      final chosen = chosenFeatureChoices(slot.groupId);
+      final sourceClassId = multipleClasses
+          ? _classIdFromScopedGroupId(slot.groupId, classLevels)
+          : null;
+      for (final option in slot.options
+          .where((o) => chosen.contains(o.id))
+          .take(slot.count)) {
+        applySource(
+          'featureOption:' + slot.groupId + ':' + option.id,
+          // "Orden Divina: Taumaturgo": sola, la opción no dice de qué elección
+          // salió, y así es como se lee en el desglose de la ficha.
+          slot.name + ': ' + option.name,
+          option.effects,
+          sourceClassId: sourceClassId,
+        );
+      }
     }
 
     // Estados activables (Furia). Van después de todas las fuentes porque

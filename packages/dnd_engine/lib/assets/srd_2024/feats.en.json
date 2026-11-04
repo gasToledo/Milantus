@@ -195,10 +195,12 @@
     "effects.1.description": "You add your Proficiency Bonus to your Initiative. You can swap your Initiative with that of a willing ally."
   },
   "lucky": {
-    "_es": "d11c9a4d",
+    "_es": "887f7038",
     "name": "Lucky",
     "effects.0.name": "Lucky",
-    "effects.0.description": "You have Luck Points equal to your Proficiency Bonus. You can spend them to gain Advantage on a d20 roll or to impose Disadvantage on an attack roll against you."
+    "effects.0.description": "You have Luck Points equal to your Proficiency Bonus. You can spend one to gain Advantage on a d20 roll or to impose Disadvantage on an attack roll against you. You regain them when you finish a Long Rest.",
+    "effects.1.name": "Luck Points",
+    "effects.1.description": "Uses of Lucky."
   },
   "crafter": {
     "_es": "ce26bb72",
@@ -220,11 +222,11 @@
     "effects.0.description": "You gain proficiency with three Musical Instruments. After a rest, you can play to give Heroic Inspiration to allies (up to your Proficiency Bonus)."
   },
   "fs-defense": {
-    "_es": "33ae3dd2",
+    "_es": "7d0bb086",
     "name": "Defense",
     "effects.1.name": "Defense",
     "prerequisite.requiredClassFeature": "Fighting Style",
-    "effects.1.description": "While you are wearing armor, you gain a +1 bonus to Armor Class."
+    "effects.1.description": "While you are wearing Light, Medium, or Heavy armor, you gain a +1 bonus to Armor Class."
   },
   "fs-dueling": {
     "_es": "1c1a5822",
@@ -368,22 +370,25 @@
     "effects.1.description": "Choose a damage type (Acid, Cold, Fire, Lightning, or Thunder): your spells ignore Resistance to it and treat 1s on the dice as 2s."
   },
   "fey-touched-intelligence": {
-    "_es": "21976bd8",
+    "_es": "f0537448",
     "name": "Fey-Touched (Intelligence)",
     "effects.1.name": "Fey-Touched",
-    "effects.1.description": "You learn Misty Step and one level 1 Divination or Enchantment spell, each castable for free once per Long Rest."
+    "effects.1.description": "You always have Misty Step and one level 1 Divination or Enchantment spell prepared. You can cast each without a spell slot once per Long Rest, and you can also cast them with your slots. The spellcasting ability is the ability this feat increases.",
+    "effects.4.name": "Fey-Touched: spell"
   },
   "fey-touched-wisdom": {
-    "_es": "a8917b4e",
+    "_es": "848535de",
     "name": "Fey-Touched (Wisdom)",
     "effects.1.name": "Fey-Touched",
-    "effects.1.description": "You learn Misty Step and one level 1 Divination or Enchantment spell, each castable for free once per Long Rest."
+    "effects.1.description": "You always have Misty Step and one level 1 Divination or Enchantment spell prepared. You can cast each without a spell slot once per Long Rest, and you can also cast them with your slots. The spellcasting ability is the ability this feat increases.",
+    "effects.4.name": "Fey-Touched: spell"
   },
   "fey-touched-charisma": {
-    "_es": "7ad629b4",
+    "_es": "2fa0a564",
     "name": "Fey-Touched (Charisma)",
     "effects.1.name": "Fey-Touched",
-    "effects.1.description": "You learn Misty Step and one level 1 Divination or Enchantment spell, each castable for free once per Long Rest."
+    "effects.1.description": "You always have Misty Step and one level 1 Divination or Enchantment spell prepared. You can cast each without a spell slot once per Long Rest, and you can also cast them with your slots. The spellcasting ability is the ability this feat increases.",
+    "effects.4.name": "Fey-Touched: spell"
   },
   "grappler-strength": {
     "_es": "a1035c45",
@@ -631,22 +636,25 @@
     "effects.1.description": "Guardian: you can make an Opportunity Attack against a creature within 5 feet that takes the Disengage action or hits a target other than you. Halt: when you hit with an Opportunity Attack, the target's Speed becomes 0 for the rest of the turn."
   },
   "shadow-touched-intelligence": {
-    "_es": "e1bc902e",
+    "_es": "a4efd7db",
     "name": "Shadow-Touched (Intelligence)",
     "effects.1.name": "Shadow-Touched",
-    "effects.1.description": "You learn Invisibility and one level 1 Illusion or Necromancy spell, each castable for free once per Long Rest."
+    "effects.1.description": "You always have Invisibility and one level 1 Illusion or Necromancy spell prepared. You can cast each without a spell slot once per Long Rest, and you can also cast them with your slots. The spellcasting ability is the ability this feat increases.",
+    "effects.4.name": "Shadow-Touched: spell"
   },
   "shadow-touched-wisdom": {
-    "_es": "56a0f6ac",
+    "_es": "aab581c3",
     "name": "Shadow-Touched (Wisdom)",
     "effects.1.name": "Shadow-Touched",
-    "effects.1.description": "You learn Invisibility and one level 1 Illusion or Necromancy spell, each castable for free once per Long Rest."
+    "effects.1.description": "You always have Invisibility and one level 1 Illusion or Necromancy spell prepared. You can cast each without a spell slot once per Long Rest, and you can also cast them with your slots. The spellcasting ability is the ability this feat increases.",
+    "effects.4.name": "Shadow-Touched: spell"
   },
   "shadow-touched-charisma": {
-    "_es": "258d923a",
+    "_es": "cac65625",
     "name": "Shadow-Touched (Charisma)",
     "effects.1.name": "Shadow-Touched",
-    "effects.1.description": "You learn Invisibility and one level 1 Illusion or Necromancy spell, each castable for free once per Long Rest."
+    "effects.1.description": "You always have Invisibility and one level 1 Illusion or Necromancy spell prepared. You can cast each without a spell slot once per Long Rest, and you can also cast them with your slots. The spellcasting ability is the ability this feat increases.",
+    "effects.4.name": "Shadow-Touched: spell"
   },
   "shield-master": {
     "_es": "bfa585e2",
@@ -655,40 +663,52 @@
     "effects.1.description": "Shield Bash: if you attack a creature within 5 feet of you as part of the Attack action and hit with a melee weapon, you can immediately bash the target with your Shield if you have it equipped. The target makes a Strength saving throw (DC 8 + your Strength modifier + your Proficiency Bonus) and, on a failure, you either push it 5 feet or give it the Prone condition, your choice. Only once on each of your turns. Interpose Shield: if you are subjected to an effect that allows you to make a Dexterity saving throw to take only half damage, you can take a Reaction to take no damage if you succeed on the save and are holding a Shield."
   },
   "skill-expert-strength": {
-    "_es": "f6ad0153",
+    "_es": "0c1bcf29",
     "name": "Skill Expert (Strength)",
     "effects.1.name": "Skill Expert",
-    "effects.1.description": "You gain proficiency in one skill and Expertise (double bonus) in another skill you are already proficient in."
+    "effects.1.description": "You gain proficiency in one skill and Expertise (double bonus) in another skill you are already proficient in.",
+    "effects.2.name": "Skill Expert: proficiency",
+    "effects.3.name": "Skill Expert: expertise"
   },
   "skill-expert-dexterity": {
-    "_es": "cc65fcb0",
+    "_es": "d703f0fe",
     "name": "Skill Expert (Dexterity)",
     "effects.1.name": "Skill Expert",
-    "effects.1.description": "You gain proficiency in one skill and Expertise (double bonus) in another skill you are already proficient in."
+    "effects.1.description": "You gain proficiency in one skill and Expertise (double bonus) in another skill you are already proficient in.",
+    "effects.2.name": "Skill Expert: proficiency",
+    "effects.3.name": "Skill Expert: expertise"
   },
   "skill-expert-constitution": {
-    "_es": "1a06dba4",
+    "_es": "a5d77242",
     "name": "Skill Expert (Constitution)",
     "effects.1.name": "Skill Expert",
-    "effects.1.description": "You gain proficiency in one skill and Expertise (double bonus) in another skill you are already proficient in."
+    "effects.1.description": "You gain proficiency in one skill and Expertise (double bonus) in another skill you are already proficient in.",
+    "effects.2.name": "Skill Expert: proficiency",
+    "effects.3.name": "Skill Expert: expertise"
   },
   "skill-expert-intelligence": {
-    "_es": "efbfda26",
+    "_es": "6dfb5598",
     "name": "Skill Expert (Intelligence)",
     "effects.1.name": "Skill Expert",
-    "effects.1.description": "You gain proficiency in one skill and Expertise (double bonus) in another skill you are already proficient in."
+    "effects.1.description": "You gain proficiency in one skill and Expertise (double bonus) in another skill you are already proficient in.",
+    "effects.2.name": "Skill Expert: proficiency",
+    "effects.3.name": "Skill Expert: expertise"
   },
   "skill-expert-wisdom": {
-    "_es": "4d566c34",
+    "_es": "af9ddb0e",
     "name": "Skill Expert (Wisdom)",
     "effects.1.name": "Skill Expert",
-    "effects.1.description": "You gain proficiency in one skill and Expertise (double bonus) in another skill you are already proficient in."
+    "effects.1.description": "You gain proficiency in one skill and Expertise (double bonus) in another skill you are already proficient in.",
+    "effects.2.name": "Skill Expert: proficiency",
+    "effects.3.name": "Skill Expert: expertise"
   },
   "skill-expert-charisma": {
-    "_es": "5f764042",
+    "_es": "2d943774",
     "name": "Skill Expert (Charisma)",
     "effects.1.name": "Skill Expert",
-    "effects.1.description": "You gain proficiency in one skill and Expertise (double bonus) in another skill you are already proficient in."
+    "effects.1.description": "You gain proficiency in one skill and Expertise (double bonus) in another skill you are already proficient in.",
+    "effects.2.name": "Skill Expert: proficiency",
+    "effects.3.name": "Skill Expert: expertise"
   },
   "skulker": {
     "_es": "ba848ec1",
@@ -739,40 +759,40 @@
     "effects.1.description": "Bypass Cover: your spell attack rolls ignore Half Cover and Three-Quarters Cover. Casting in Melee: being within 5 feet of an enemy doesn't impose Disadvantage on your spell attack rolls. Increased Range: when you cast a spell that has a range of at least 10 feet and requires an attack roll, you can increase its range by 60 feet; it doesn't double."
   },
   "telekinetic-intelligence": {
-    "_es": "c122cb9e",
+    "_es": "c9cb7c01",
     "name": "Telekinetic (Intelligence)",
     "effects.1.name": "Telekinetic",
-    "effects.1.description": "You learn Mage Hand (invisible) and can shove creatures 5 feet with your mind as a Bonus Action."
+    "effects.1.description": "You learn Mage Hand. You can cast it without verbal or somatic components, the spectral hand can be invisible, and its range and the distance it can be away from you both increase by 30 feet. The spellcasting ability is the ability this feat increases. As a Bonus Action, you can telekinetically shove a creature you can see within 30 feet: it makes a Strength saving throw (DC 8 + that ability's modifier + your Proficiency Bonus) or is moved 5 feet toward or away from you."
   },
   "telekinetic-wisdom": {
-    "_es": "47baa7fc",
+    "_es": "4b0bee11",
     "name": "Telekinetic (Wisdom)",
     "effects.1.name": "Telekinetic",
-    "effects.1.description": "You learn Mage Hand (invisible) and can shove creatures 5 feet with your mind as a Bonus Action."
+    "effects.1.description": "You learn Mage Hand. You can cast it without verbal or somatic components, the spectral hand can be invisible, and its range and the distance it can be away from you both increase by 30 feet. The spellcasting ability is the ability this feat increases. As a Bonus Action, you can telekinetically shove a creature you can see within 30 feet: it makes a Strength saving throw (DC 8 + that ability's modifier + your Proficiency Bonus) or is moved 5 feet toward or away from you."
   },
   "telekinetic-charisma": {
-    "_es": "bd030aaa",
+    "_es": "b3f2b6e3",
     "name": "Telekinetic (Charisma)",
     "effects.1.name": "Telekinetic",
-    "effects.1.description": "You learn Mage Hand (invisible) and can shove creatures 5 feet with your mind as a Bonus Action."
+    "effects.1.description": "You learn Mage Hand. You can cast it without verbal or somatic components, the spectral hand can be invisible, and its range and the distance it can be away from you both increase by 30 feet. The spellcasting ability is the ability this feat increases. As a Bonus Action, you can telekinetically shove a creature you can see within 30 feet: it makes a Strength saving throw (DC 8 + that ability's modifier + your Proficiency Bonus) or is moved 5 feet toward or away from you."
   },
   "telepathic-intelligence": {
-    "_es": "deb63372",
+    "_es": "48919bc6",
     "name": "Telepathic (Intelligence)",
     "effects.1.name": "Telepathic",
-    "effects.1.description": "You gain short-range telepathy and can cast Detect Thoughts without expending slots."
+    "effects.1.description": "You can speak telepathically to a creature you can see within 60 feet, in a language you know. You always have Detect Thoughts prepared: you can cast it without components and without a spell slot once per Long Rest, and you can also cast it with your slots. The spellcasting ability is the ability this feat increases."
   },
   "telepathic-wisdom": {
-    "_es": "b7a24c98",
+    "_es": "eaaa1ad4",
     "name": "Telepathic (Wisdom)",
     "effects.1.name": "Telepathic",
-    "effects.1.description": "You gain short-range telepathy and can cast Detect Thoughts without expending slots."
+    "effects.1.description": "You can speak telepathically to a creature you can see within 60 feet, in a language you know. You always have Detect Thoughts prepared: you can cast it without components and without a spell slot once per Long Rest, and you can also cast it with your slots. The spellcasting ability is the ability this feat increases."
   },
   "telepathic-charisma": {
-    "_es": "3e13a386",
+    "_es": "27731562",
     "name": "Telepathic (Charisma)",
     "effects.1.name": "Telepathic",
-    "effects.1.description": "You gain short-range telepathy and can cast Detect Thoughts without expending slots."
+    "effects.1.description": "You can speak telepathically to a creature you can see within 60 feet, in a language you know. You always have Detect Thoughts prepared: you can cast it without components and without a spell slot once per Long Rest, and you can also cast it with your slots. The spellcasting ability is the ability this feat increases."
   },
   "war-caster-intelligence": {
     "_es": "220bbf73",
@@ -918,10 +938,20 @@
     "effects.1.description": "Increase one ability score by 1, to a maximum of 30. Once per Long Rest, when you drop to 0 HP, you drop to 1 instead and regain half your HP maximum. You also have a daily pool of 10d10 that you can spend as a Bonus Action to heal yourself."
   },
   "boon-of-energy-resistance": {
-    "_es": "1a4fb1bd",
+    "_es": "214d754c",
     "name": "Boon of Energy Resistance",
     "effects.1.name": "Energy Resistances",
-    "effects.1.description": "Increase one ability score by 1, to a maximum of 30. Choose two Resistances among Acid, Cold, Fire, Necrotic, Psychic, Radiant, Lightning, Thunder, and Poison; you can change them after a Long Rest. When you take one of those damage types, you can redirect energy with your Reaction."
+    "effects.1.description": "Increase one ability score by 1, to a maximum of 30. Choose two Resistances among Acid, Cold, Fire, Necrotic, Psychic, Radiant, Lightning, Thunder, and Poison; you can change them after a Long Rest. When you take one of those damage types, you can redirect energy with your Reaction.",
+    "effects.2.name": "Energy Resistances",
+    "effects.2.options.0.name": "Acid",
+    "effects.2.options.1.name": "Cold",
+    "effects.2.options.2.name": "Fire",
+    "effects.2.options.3.name": "Lightning",
+    "effects.2.options.4.name": "Necrotic",
+    "effects.2.options.5.name": "Poison",
+    "effects.2.options.6.name": "Psychic",
+    "effects.2.options.7.name": "Radiant",
+    "effects.2.options.8.name": "Thunder"
   },
   "boon-of-speed": {
     "_es": "83f4ffef",

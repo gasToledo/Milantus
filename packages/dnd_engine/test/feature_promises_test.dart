@@ -194,7 +194,9 @@ void main() {
     // de especie...). Los de especie que llegan con el nivel van envueltos en
     // `leveled` y este recorrido no los ve.
     // 83 con Paso de Luz Lunar del Círculo de la Luna.
-    expect(recursos, hasLength(83));
+    // 84 con los Puntos de Suerte de Afortunado, que escalan con el
+    // bonificador de competencia del nivel total.
+    expect(recursos, hasLength(84));
 
     var porCaracteristica = 0;
     var porNivel = 0;
