@@ -233,6 +233,16 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String effectConditionImmunity(String name) {
+    return 'Inmunidad al estado: $name';
+  }
+
+  @override
+  String effectCheckBonus(String ability, String from) {
+    return 'Pruebas de $ability: +mod. de $from';
+  }
+
+  @override
   String effectDarkvision(Object range) {
     return 'Visión en la oscuridad: $range pies';
   }
@@ -962,6 +972,11 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String modeConditionImmunity(String conditions) {
+    return 'Inmune a $conditions';
+  }
+
+  @override
   String modeDamage(Object amount, Object ability) {
     return '+$amount al daño con $ability';
   }
@@ -987,6 +1002,11 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String combatImmunities(String list) {
     return 'Inmunidades: $list';
+  }
+
+  @override
+  String combatConditionImmunities(String list) {
+    return 'Inmunidades a estados: $list';
   }
 
   @override
@@ -5200,6 +5220,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get effKindImmunity => 'Inmunidad a daño';
+
+  @override
+  String get effKindConditionImmunity => 'Inmunidad a un estado';
 
   @override
   String get effKindGrantSpell => 'Conceder un conjuro';

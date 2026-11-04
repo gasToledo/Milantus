@@ -19,6 +19,9 @@ function summaryOf(t: ReturnType<typeof useTexts>, m: ActiveMode): string {
   const abilities = new Set(m.advantages.flatMap((a) => a.abilities));
   return [
     types.length > 0 ? t.modeResistance(types.join(', ')) : null,
+    m.conditionImmunities.length > 0
+      ? t.modeConditionImmunity(m.conditionImmunities.map((id) => labelOf(t.conditions, id).toLowerCase()).join(', '))
+      : null,
     m.damageAbility && m.damageBonus > 0 ? t.modeDamage(m.damageBonus, t.abilityAbbr[m.damageAbility]) : null,
     abilities.size > 0
       ? t.modeAdvantage(ABILITIES.filter((a) => abilities.has(a)).map((a) => t.abilityAbbr[a]).join(', '))

@@ -280,6 +280,13 @@ function DefenseCard({ model }: { model: SheetModel }) {
           {sheet.immunities.length > 0 && (
             <p className="mt-1 text-[12.5px] text-text-muted">{t.immunities(damage(sheet.immunities))}</p>
           )}
+          {sheet.conditionImmunities.length > 0 && (
+            <p className="mt-1 text-[12.5px] text-text-muted">
+              {t.conditionImmunities(
+                [...sheet.conditionImmunities].map((id) => labelOf(t.conditions, id)).sort().join(', '),
+              )}
+            </p>
+          )}
         </div>
       </div>
       {/* Con dos clases que dan Defensa sin armadura (Monje + Bárbaro) la

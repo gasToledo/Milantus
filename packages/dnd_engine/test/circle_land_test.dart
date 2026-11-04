@@ -227,10 +227,12 @@ void main() {
     }
 
     test('la inmunidad al estado envenenado llega a 10 con o sin terreno', () {
-      expect(druida(9, terreno: 'druid-land-arid').immunities,
+      expect(druida(9, terreno: 'druid-land-arid').conditionImmunities,
           isNot(contains('poisoned')));
-      expect(druida(10, terreno: 'druid-land-arid').immunities,
+      expect(druida(10, terreno: 'druid-land-arid').conditionImmunities,
           contains('poisoned'));
+      expect(druida(10, terreno: 'druid-land-arid').immunities,
+          isNot(contains('poisoned')));
     });
   });
 

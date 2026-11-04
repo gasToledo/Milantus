@@ -261,7 +261,10 @@ class CreationDraft {
       }
     }
     final raceFeatId = json['raceFeatId'];
-    if (raceFeatId is String && repo.feat(raceFeatId) != null) {
+    // Versátil concede una dote de Origen. Una general guardada en un borrador
+    // viejo o mandada por el puente no se conserva: `featId` null en el dato
+    // no significa «cualquier dote».
+    if (raceFeatId is String && repo.feat(raceFeatId)?.category == 'origin') {
       draft.raceFeatId = raceFeatId;
     }
     draft.cantrips.addAll(
@@ -650,8 +653,21 @@ class CreationDraft {
     }
   }
 
-  /// Tocar la dote elegida la suelta; tocar otra la reemplaza.
-  void toggleRaceFeat(String id) => raceFeatId = raceFeatId == id ? null : id;
+  /// Tocar la dote elegida la suelta; tocar otra de Origen la reemplaza.
+  ///
+  /// Una que no es de Origen no entra: el Humano elige entre esas, y el
+  /// catálogo deja `featId` en null justamente porque la elección es del
+  /// jugador, no porque valga cualquier dote.
+  void toggleRaceFeat(String id) {
+    if (raceFeatId == id) {
+      raceFeatId = null;
+      return;
+    }
+    if (repo.feat(id)?.category == 'origin') raceFeatId = id;
+  }
+
+  bool get _raceFeatIsOrigin =>
+      raceFeatId != null && repo.feat(raceFeatId!)?.category == 'origin';
 
   /// Ponerse o sacarse armadura o escudo. Desde el primer toque manda lo que
   /// eligió el jugador y no el paquete (ver [equipmentTouched]).
@@ -1718,7 +1734,7 @@ class CreationDraft {
             ));
           }
           final grantsFeat = r.effects.any((e) => e is GrantFeatEffect);
-          if (grantsFeat && raceFeatId == null) {
+          if (grantsFeat && !_raceFeatIsOrigin) {
             out.add(const CreationPending(CreationPendingKind.originFeat));
           }
         }
@@ -1880,7 +1896,7 @@ class CreationDraft {
         for (final e in languageChoices.entries) e.key: List.of(e.value),
       },
       weaponMasteryChoices: List.of(weaponMasteries),
-      featIds: [if (raceFeatId != null) raceFeatId!],
+      featIds: [if (_raceFeatIsOrigin) raceFeatId!],
       hpPerLevel: [hitDie],
       equippedArmorId: equippedArmorId,
       shieldEquipped: shieldEquipped,

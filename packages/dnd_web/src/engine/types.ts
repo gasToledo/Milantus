@@ -139,6 +139,7 @@ export interface ActiveMode {
   requiresMode: string | null;
   multiSelect: boolean;
   resistances: string[];
+  conditionImmunities: string[];
   advantages: Advantage[];
   damageBonus: number;
   damageAbility: AbilityId | null;
@@ -204,6 +205,7 @@ export interface ComputedSheet {
   skillProficiencies: string[];
   expertiseSkills: string[];
   skillBonuses: Record<string, SourcedBonus[]>;
+  abilityCheckBonuses: Partial<Record<AbilityId, SourcedBonus[]>>;
   armorProficiencies: string[];
   weaponProficiencies: string[];
   toolProficiencies: string[];
@@ -227,6 +229,7 @@ export interface ComputedSheet {
   senses: Record<string, number>;
   resistances: string[];
   immunities: string[];
+  conditionImmunities: string[];
   weaponMasterySlots: number;
   attunementSlots: number;
   attacksPerAction: number;

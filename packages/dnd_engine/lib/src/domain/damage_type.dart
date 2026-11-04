@@ -106,15 +106,16 @@ enum DamageType {
     return null;
   }
 
-  /// Nombre para mostrar. Si el id no está en el catálogo devuelve el id
-  /// capitalizado en vez de fallar: `ImmunityEffect` también se usa hoy para
-  /// inmunidad a **estados** (el Artífice es inmune a `poisoned`), y el
-  /// homebrew puede traer cualquier cosa.
-  static String labelFor(String id) =>
-      fromId(id)?.label ??
-      localized(_conditionLabels, _conditionLabelsEn)[id] ??
-      titleCaseId(id);
+  /// Nombre para mostrar. Si el id no está en el catálogo devuelve el del
+  /// estado, o el id capitalizado: el homebrew puede traer cualquier cosa, y
+  /// una ventaja nombra estados por el mismo id.
+  static String labelFor(String id) => fromId(id)?.label ?? conditionLabel(id);
 }
+
+/// Nombre de un estado (`poisoned` → Envenenado). Un id que el glosario no
+/// conoce se capitaliza, igual que un tipo de daño homebrew.
+String conditionLabel(String id) =>
+    localized(_conditionLabels, _conditionLabelsEn)[id] ?? titleCaseId(id);
 
 /// Lo que el tipo de daño cambia en la mesa, que vale igual para los trece: no
 /// va en cada [DamageType.description] para no repetirlo trece veces.
@@ -128,12 +129,10 @@ String get damageTypeRule => localized(
     );
 
 /// Ids de los estados del glosario: `poisoned`, `charmed`... Las ventajas
-/// contra un estado los nombran por id y el catálogo se valida contra esto.
+/// contra un estado y las inmunidades a estados los nombran por id, y el
+/// catálogo se valida contra esto.
 Iterable<String> get conditionIds => _conditionLabels.keys;
 
-/// Estados que hoy viajan por el mismo campo que los tipos de daño. Separarlos
-/// en un efecto propio exigiría migrar contenido y personajes; mientras tanto,
-/// al menos se muestran en el idioma de la interfaz.
 const _conditionLabels = <String, String>{
   'blinded': 'Cegado',
   'charmed': 'Hechizado',

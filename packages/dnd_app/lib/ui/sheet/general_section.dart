@@ -583,9 +583,8 @@ extension _SheetGeneralSection on _SheetScreenState {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) {
-          final previewSheet = CharacterCompiler(
-            repo,
-          ).compile(withChoices(choices));
+          final previewSheet = CharacterCompiler(repo)
+              .compile(withChoices(choices));
           final slots = previewSheet.spellChoiceSlots;
 
           bool complete() => slots.every(
@@ -1780,6 +1779,15 @@ extension _SheetGeneralSection on _SheetScreenState {
             context.l10n.breakdownAbilityChecks,
             _signed(s.abilityCheck(ability)),
           ),
+          for (final b
+              in s.abilityCheckBonuses[ability] ?? const <SkillBonus>[])
+            Padding(
+              padding: const EdgeInsets.only(left: 14),
+              child: line(
+                context.l10n.breakdownIncludes(_signed(b.amount), b.source),
+                '',
+              ),
+            ),
           if (_c.combat.exhaustion > 0)
             Padding(
               padding: const EdgeInsets.only(left: 14),

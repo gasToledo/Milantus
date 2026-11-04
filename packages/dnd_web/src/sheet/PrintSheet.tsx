@@ -199,6 +199,9 @@ function Sheet({ model }: { model: SheetModel }) {
           )}
           {s.resistances.length > 0 && <p>{t.resistances(damage(s.resistances).join(', '))}</p>}
           {s.immunities.length > 0 && <p>{t.immunities(damage(s.immunities).join(', '))}</p>}
+          {s.conditionImmunities.length > 0 && (
+            <p>{t.conditionImmunities([...s.conditionImmunities].map((id) => labelOf(t.conditions, id)).sort().join(', '))}</p>
+          )}
         </div>
         <div>
           {/* ○ sin competencia, ● competente, ◉ pericia: se ve igual en

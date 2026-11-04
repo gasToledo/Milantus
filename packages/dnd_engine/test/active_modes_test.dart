@@ -196,8 +196,14 @@ void main() {
       c.combat.conditions.add('frightened');
       CombatOps.activateMode(c.combat, compiler.compile(c), 'rage');
       expect(c.combat.conditions, isNot(contains('frightened')));
-      expect(compiler.compile(c).immunities,
-          containsAll(['charmed', 'frightened']));
+      final sheet = compiler.compile(c);
+      expect(sheet.conditionImmunities, containsAll(['charmed', 'frightened']));
+      expect(sheet.immunities, isNot(contains('charmed')));
+      expect(sheet.immunities, isNot(contains('frightened')));
+      expect(
+        sheet.activeModes.firstWhere((m) => m.id == 'rage').conditionImmunities,
+        containsAll(['charmed', 'frightened']),
+      );
     });
 
     test('Fanático: 1d6 más la mitad del nivel, necrótico o radiante', () {

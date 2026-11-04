@@ -89,6 +89,7 @@ class SheetBuilder {
   final Set<String> toolProficiencies = {};
   final Set<String> resistances = {};
   final Set<String> immunities = {};
+  final Set<String> conditionImmunities = {};
 
   /// Idiomas que conceden los rasgos. Los dos que elige el jugador y el Común
   /// los suma el compilador: no vienen de un efecto.
@@ -100,6 +101,11 @@ class SheetBuilder {
   /// modificador de característica que todavía no está fijo cuando se aplican
   /// los efectos. Los resuelve [resolveSkillBonuses].
   final List<({SkillBonusEffect effect, String source})> skillBonusEffects = [];
+
+  /// Bonos a todas las pruebas de una característica (Glamour de Otro Mundo).
+  /// Se resuelven en [resolveAbilityCheckBonuses], cuando ya hay modificadores.
+  final List<({AbilityCheckBonusEffect effect, String source})>
+      abilityCheckBonusEffects = [];
 
   /// Conjuros concedidos por rasgos, sin resolver (el compilador los cruza con
   /// el repositorio para armar los [InnateSpell]).
@@ -288,6 +294,24 @@ class SheetBuilder {
     return out;
   }
 
+  /// Igual que [resolveSkillBonuses], pero el bono cae en la característica
+  /// entera: la ficha lo suma a la prueba y, por ahí, a cada habilidad.
+  Map<Ability, List<SkillBonus>> resolveAbilityCheckBonuses(
+    Map<Ability, int> mods,
+  ) {
+    final out = <Ability, List<SkillBonus>>{};
+    for (final entry in abilityCheckBonusEffects) {
+      final e = entry.effect;
+      final mod = mods[e.fromAbility]!;
+      final amount = mod > e.minimum ? mod : e.minimum;
+      if (amount == 0) continue;
+      (out[e.ability] ??= []).add(
+        SkillBonus(amount: amount, source: entry.source),
+      );
+    }
+    return out;
+  }
+
   /// Resuelve los bonificadores a habilidades contra los modificadores ya
   /// calculados. Devuelve, por habilidad, cada aporte con su fuente: el total
   /// suelto no se puede explicar en la ficha.
@@ -394,6 +418,8 @@ class SheetBuilder {
         skillProficiencies.add(skill);
       case SkillBonusEffect():
         skillBonusEffects.add((effect: e, source: sourceName));
+      case AbilityCheckBonusEffect():
+        abilityCheckBonusEffects.add((effect: e, source: sourceName));
       case PrepareSpellListAdditionsEffect():
         prepareSpellListAdditions = true;
       case AbilityScoreBonusFromFeatChoiceEffect():
@@ -417,6 +443,8 @@ class SheetBuilder {
         resistances.add(damageType);
       case ImmunityEffect(:final damageType):
         immunities.add(damageType);
+      case ConditionImmunityEffect(:final condition):
+        conditionImmunities.add(condition);
       case LanguageEffect(:final language):
         languages.add(language);
       case LanguageChoiceEffect():

@@ -117,6 +117,14 @@ extension _SheetPrint on _SheetScreenState {
     if (immunities.isNotEmpty) {
       out.write('<p>${_e(l10n.combatImmunities(immunities.join(', ')))}</p>');
     }
+    final conditionImmunities = [
+      ...s.conditionImmunities,
+    ].map(conditionLabel).toList()..sort();
+    if (conditionImmunities.isNotEmpty) {
+      out.write(
+        '<p>${_e(l10n.combatConditionImmunities(conditionImmunities.join(', ')))}</p>',
+      );
+    }
 
     out.write('</div><div>');
     // ○ sin competencia, ● competente, ◉ pericia: los mismos tres estados

@@ -67,9 +67,11 @@ void main() {
     ComputedSheet devocion(int level) => compile(
           paladin(level).copyWith(subclassId: 'oath-devotion'),
         );
-    expect(devocion(6).immunities, isEmpty);
-    expect(devocion(7).immunities, {'charmed'});
-    expect(devocion(10).immunities, {'charmed', 'frightened'});
+    expect(devocion(6).conditionImmunities, isEmpty);
+    expect(devocion(7).conditionImmunities, {'charmed'});
+    expect(devocion(7).immunities, isEmpty);
+    expect(devocion(10).conditionImmunities, {'charmed', 'frightened'});
+    expect(devocion(10).immunities, isEmpty);
     // «Encantado» no aparecía en ningún otro lado: el catálogo y la lista de
     // estados dicen «Hechizado».
     expect(DamageType.labelFor('charmed'), 'Hechizado');

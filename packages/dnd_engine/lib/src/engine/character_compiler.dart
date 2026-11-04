@@ -483,6 +483,7 @@ class CharacterCompiler {
       int tempHp,
       List<String> endsConditions,
       List<String> resistances,
+      List<String> conditionImmunities,
       List<Advantage> advantages,
     })>[];
     for (final (effect: mode, :level, :classId)
@@ -523,6 +524,7 @@ class CharacterCompiler {
       final chosen = chosenAll.firstOrNull;
       final rulesBefore = builder.weaponRules.length;
       final resistancesBefore = {...builder.resistances};
+      final conditionsBefore = {...builder.conditionImmunities};
       final advantagesBefore = builder.advantages.length;
       if (on) {
         applySource(
@@ -570,6 +572,10 @@ class CharacterCompiler {
         resistances: [
           for (final r in builder.resistances)
             if (!resistancesBefore.contains(r)) r,
+        ],
+        conditionImmunities: [
+          for (final c in builder.conditionImmunities)
+            if (!conditionsBefore.contains(c)) c,
         ],
         advantages: builder.advantages.sublist(advantagesBefore),
       ));
@@ -980,6 +986,7 @@ class CharacterCompiler {
       skillProficiencies: builder.skillProficiencies,
       expertiseSkills: builder.expertiseSkills,
       skillBonuses: builder.resolveSkillBonuses(mods),
+      abilityCheckBonuses: builder.resolveAbilityCheckBonuses(mods),
       armorProficiencies: builder.armorProficiencies,
       weaponProficiencies: builder.weaponProficiencies,
       toolProficiencies: builder.toolProficiencies,
@@ -1001,6 +1008,7 @@ class CharacterCompiler {
       senses: Map.unmodifiable(builder.senses),
       resistances: builder.resistances,
       immunities: builder.immunities,
+      conditionImmunities: builder.conditionImmunities,
       weaponMasterySlots: builder.weaponMasterySlots,
       attunementSlots: builder.attunementSlotCount,
       activeModes: List.unmodifiable([
@@ -1013,6 +1021,7 @@ class CharacterCompiler {
               tempHp: d.tempHp,
               endsConditions: d.endsConditions,
               resistances: d.resistances,
+              conditionImmunities: d.conditionImmunities,
               advantages: d.advantages,
               attacks: attacks),
       ]),
@@ -1997,6 +2006,7 @@ class CharacterCompiler {
     required int tempHp,
     required List<String> endsConditions,
     required List<String> resistances,
+    required List<String> conditionImmunities,
     required List<Advantage> advantages,
     required List<Attack> attacks,
   }) {
@@ -2031,6 +2041,7 @@ class CharacterCompiler {
       active: on,
       activeVariant: variant,
       resistances: List.unmodifiable(resistances),
+      conditionImmunities: List.unmodifiable(conditionImmunities),
       advantages: List.unmodifiable(advantages),
       damageBonus: damage,
       damageAbility: damage > 0 ? rulesAbility : null,
