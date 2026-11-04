@@ -708,6 +708,15 @@ String newNpc(
   );
 }
 
+/// Aplica una edición a un PNJ (`NpcEdits`) y devuelve el documento migrado, listo
+/// para `PUT /api/npcs/<id>`. No lee el catálogo: nada de esto es una regla del juego.
+String npcEdit(String npcJson, String actionJson) => jsonEncode(
+      NpcEdits.apply(
+        Npc.fromJson((jsonDecode(npcJson) as Map).cast<String, dynamic>()),
+        (jsonDecode(actionJson) as Map).cast<String, dynamic>(),
+      ).toJson(),
+    );
+
 Map<String, dynamic> _npcView(
     Map<String, dynamic> raw, ContentRepository repo) {
   final npc = Npc.fromJson((raw['npc'] as Map).cast<String, dynamic>());
@@ -980,6 +989,7 @@ void main() {
   motor['bestiary'] = bestiary.toJS;
   motor['npcs'] = npcs.toJS;
   motor['newNpc'] = newNpc.toJS;
+  motor['npcEdit'] = npcEdit.toJS;
   motor['encounter'] = encounter.toJS;
   motor['musicSource'] = musicSource.toJS;
   globalContext['dndEngine'] = motor;

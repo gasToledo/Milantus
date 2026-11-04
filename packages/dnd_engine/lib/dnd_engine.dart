@@ -49,6 +49,8 @@ export 'src/engine/inventory_ops.dart';
 export 'src/engine/wild_shape.dart';
 export 'src/engine/exhaustion.dart';
 export 'src/engine/sheet_diff.dart';
+export 'src/engine/diary_ops.dart';
+export 'src/engine/npc_edits.dart';
 export 'src/engine/npc_stats.dart';
 export 'src/engine/portrait_prompt.dart';
 export 'src/engine/demo_character.dart';

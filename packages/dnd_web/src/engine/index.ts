@@ -33,6 +33,7 @@ interface DartEngine {
   bestiary(catalogJson: string): string;
   npcs(entriesJson: string, catalogJson: string): string;
   newNpc(catalogJson: string, name: string, kind: string, baseCreatureId: string): string;
+  npcEdit(npcJson: string, actionJson: string): string;
   encounter(encounterJson: string, playersHpJson: string): string;
   musicSource(url: string): string;
   act(characterJson: string, catalogJson: string, actionJson: string, seed?: number): string;
@@ -753,6 +754,22 @@ export function npcViews(entries: readonly NpcEntryJson[], catalog: Catalog): Np
  *  copiado de la criatura. `kind` es `none` o `block`; los de ficha son de 6f. */
 export function newNpc(catalog: Catalog, name: string, kind: 'none' | 'block', baseCreatureId: string | null): JsonObject {
   return JSON.parse(engine().newNpc(catalogJson(catalog), name, kind, baseCreatureId ?? '')) as JsonObject;
+}
+
+export type NpcAction =
+  | { type: 'setName'; name: string }
+  | { type: 'setSpeech'; text: string }
+  | { type: 'setBackground'; text: string }
+  | { type: 'addTag'; tag: string }
+  | { type: 'removeTag'; tag: string }
+  | { type: 'saveNote'; entry: string; kind: string; title: string; body: string; imageKey: string | null; at: string }
+  | { type: 'removeNote'; entry: string }
+  | { type: 'moveNote'; entry: string; to: string };
+
+/** Aplica una edición a un PNJ con el motor (`NpcEdits`) y devuelve el documento
+ *  para guardar. Una acción desconocida o una versión futura lanzan. */
+export function npcEdit(npc: JsonObject, action: NpcAction): JsonObject & { id: string } {
+  return JSON.parse(engine().npcEdit(JSON.stringify(npc), JSON.stringify(action))) as JsonObject & { id: string };
 }
 
 /** El combate abierto, migrado y con lo que deriva el motor (`encounter`): de

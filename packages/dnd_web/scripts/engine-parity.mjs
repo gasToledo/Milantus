@@ -67,14 +67,16 @@ for (const archivo of casos.sort()) {
   );
   // Un caso con `creation` prueba el creador; con `bridge`, una función de
   // lectura del puente (`fn` con la ficha, el catálogo y `args`; sin ficha si
-  // `withoutCharacter`); con
+  // `withoutCharacter`, ni catálogo si `pure`); con
   // `action`, `act` (la ficha que el cliente guarda); el resto, `compute`.
   const crudo =
     creation
       ? motor.creation(catalogo, JSON.stringify(creation.draft), JSON.stringify(creation.action), seed)
       : bridge
-        ? // Algunas funciones del puente no leen una ficha (`magicBaseOptions`).
-          bridge.withoutCharacter
+        ? // Algunas no leen el catálogo (`npcEdit`), otras no leen una ficha (`magicBaseOptions`).
+          bridge.pure
+          ? motor[bridge.fn](...bridge.args)
+          : bridge.withoutCharacter
           ? motor[bridge.fn](catalogo, ...bridge.args)
           : motor[bridge.fn](JSON.stringify(character), catalogo, ...bridge.args)
         : action

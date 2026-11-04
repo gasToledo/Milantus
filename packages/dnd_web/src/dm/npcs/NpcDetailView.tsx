@@ -1,38 +1,45 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, EllipsisVertical, Plus, ScrollText, Trash2 } from 'lucide-react';
-import { ApiError, deleteNpc, type StoredNpc } from '../../api/client';
+import { ArrowLeft, EllipsisVertical, Pencil, Plus, Trash2, X } from 'lucide-react';
+import { ApiError, deleteNpc, saveCharacter, type StoredNpc } from '../../api/client';
+import { dropNpcSave, flushNpcSave, retryNpcSave } from '../../api/npcSave';
+import { deletePortrait, uploadNpcPortrait, uploadPortrait } from '../../api/portraits';
 import { queryKeys, useDmCampaigns, useNpc, useSheetCatalog } from '../../api/queries';
-import { npcViews, type NpcView } from '../../engine';
+import { actOn, npcViews, type CharacterJson, type NpcView } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
+import { RenameDialog } from '../../dashboard/RenameDialog';
 import { dmNpcSheetHref, dmNpcsHref, Link, navigate } from '../../router';
 import { signed } from '../../sheet/format';
-import { BackgroundText, DiaryEntries } from '../../sheet/DiaryTab';
+import { BackgroundEditor, DiaryEntries, type DiaryEditor } from '../../sheet/DiaryTab';
+import { type SheetNotify } from '../../sheet/writer';
 import { Button } from '../../ui/Button';
-import { Card } from '../../ui/Card';
 import { ConfirmDialog } from '../../ui/ConfirmDialog';
 import { cx } from '../../ui/cx';
 import { Pill, StatPlaque } from '../../ui/data';
 import { Medallion } from '../../ui/Medallion';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Toast, Tooltip } from '../../ui/primitives';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Toast, Tooltip, type ToastTone } from '../../ui/primitives';
 import { AppBusyLabel, AppErrorView, Notice } from '../../ui/status';
 import { Abbr } from '../MemberCard';
 import { useNpcLinks } from './links';
 import { NpcStatusSelector } from './NpcStatusSelector';
 import { kindOf, npcPortrait, npcTypeLine, statusOf } from './npc';
+import { NpcSpeechDialog, NpcTagDialog } from './NpcTextDialogs';
+import { useNpcWriter } from './npcWriter';
 import { PickManyDialog } from './PickManyDialog';
 
 /** Cuántas acciones del bloque se ven en la tarjeta, como en Flutter: el perfil
  *  entero es del editor de bloques. */
 const BLOCK_ACTIONS = 4;
 
+const ICON_BUTTON = 'inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold';
+
 /**
  * La ficha de un PNJ (`npc_detail_screen.dart`): quién es, cómo habla, qué se
  * sabe de él, con qué pelea y cómo está en cada campaña. Es del DM y de nadie
  * más: un PNJ ajeno y uno inexistente responden el mismo 404 y la pantalla
- * dice lo mismo. Acá se escribe el estado por campaña, se suma a otra y se
- * borra el PNJ; lo demás (renombrar, tags, el bloque, el retrato y exportar)
- * sigue en Flutter.
+ * dice lo mismo. Acá se escribe el estado por campaña, se suma a otra, se
+ * borra el PNJ y se escribe su texto (nombre, voz, tags, trasfondo y notas);
+ * siguen en Flutter el bloque, el retrato y exportar.
  */
 export function NpcDetailView({ npcId }: { npcId: string }) {
   const t = useTexts();
@@ -42,8 +49,30 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
   const [adding, setAdding] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const client = useQueryClient();
-  const [toast, setToast] = useState<{ key: number; message: string } | null>(null);
-  const links = useNpcLinks(() => setToast((prev) => ({ key: (prev?.key ?? 0) + 1, message: t.npcSaveFailed })));
+  const [toast, setToast] = useState<{ key: number; tone: ToastTone; message: string; action?: { label: string; onSelect: () => void } } | null>(null);
+  const notify = useCallback<SheetNotify>(
+    (message, options) =>
+      setToast((prev) => ({
+        key: (prev?.key ?? 0) + 1,
+        tone: options?.tone ?? 'info',
+        message,
+        action: options?.undo ? { label: t.undo, onSelect: options.undo } : undefined,
+      })),
+    [t],
+  );
+  const onSaveFailed = useCallback(
+    () =>
+      setToast((prev) => ({
+        key: (prev?.key ?? 0) + 1,
+        tone: 'error',
+        message: t.npcSaveFailed,
+        action: { label: t.retry, onSelect: () => retryNpcSave(npcId) },
+      })),
+    [t, npcId],
+  );
+  const writer = useNpcWriter(npcId, onSaveFailed);
+  const [dialog, setDialog] = useState<'name' | 'speech' | 'tag' | null>(null);
+  const links = useNpcLinks(() => notify(t.npcSaveFailed, { tone: 'error' }));
   const catalog = useSheetCatalog(lang);
   const view = useMemo(
     () => (stored.data && catalog.data ? npcViews([stored.data], catalog.data)[0] : null),
@@ -87,6 +116,7 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
   const { npc } = view;
   const inCampaigns = stored.data.campaigns;
   const remove = async () => {
+    await dropNpcSave(npc.id);
     await deleteNpc(npc.id);
     // Primero se sale y después se relee: al revés, la pantalla pediría un PNJ que
     // ya no está y diría «No se encontró». La lista se corrige antes de salir para
@@ -100,34 +130,99 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
     ]);
   };
   const speech = npc.speech?.trim() ?? '';
-  const background = npc.background?.trim() ?? '';
+  const rename = async (name: string) => {
+    writer.edit({ type: 'setName', name });
+    await flushNpcSave(npc.id);
+    // La biblioteca busca por el nombre del PNJ y la ficha muestra el suyo: tienen que
+    // quedar iguales. El guardado de la ficha va aparte porque es otro documento.
+    const sheet = stored.data?.character;
+    if (sheet && catalog.data) {
+      await saveCharacter(actOn(sheet, catalog.data, { type: 'rename', name }).character as CharacterJson & { id: string });
+    }
+    await client.invalidateQueries({ queryKey: queryKeys.npc(npc.id) });
+  };
+
+  const noteEditor: DiaryEditor = {
+    // `at` lo pone esta capa y no el motor, para que el motor no dependa del reloj.
+    save: (input) => void writer.edit({ type: 'saveNote', ...input, at: new Date().toISOString() }),
+    remove(entry) {
+      const r = writer.edit({ type: 'removeNote', entry: entry.entryId });
+      if (!r) return;
+      if (entry.kind === 'image' && entry.imageKey) {
+        // Con imagen no se ofrece deshacer: el archivo se va y volvería roto.
+        void deletePortrait(entry.imageKey).catch(() => undefined);
+        return;
+      }
+      notify(t.diaryDeleted(entry.title || t.diaryUntitled), { undo: () => writer.restore(r.before) });
+    },
+    move: (from, to) => void writer.edit({ type: 'moveNote', entry: from, to }),
+    // Un PNJ con ficha no puede usar la ruta de retratos del PNJ: el servidor se la
+    // reserva a los que no tienen. Borrarlo se lleva las dos carpetas.
+    upload: (file) => (npc.characterId ? uploadPortrait(npc.characterId, file) : uploadNpcPortrait(npc.id, file)),
+  };
   return (
     <div className="flex flex-col gap-5" data-npc={npc.id}>
       {back}
       <header className="flex flex-wrap items-start gap-[18px]">
         <Medallion name={npc.name} accent={null} size={76} portrait={npcPortrait(stored.data)} viewable />
         <div className="flex min-w-0 flex-[1_1_300px] flex-col gap-2">
-          <h1 className="font-display text-[28px] leading-tight break-words text-on-surface">{npc.name}</h1>
-          <ul className="flex flex-wrap gap-1.5">
+          <div className="flex items-start gap-1">
+            <h1 className="font-display min-w-0 text-[28px] leading-tight break-words text-on-surface">{npc.name}</h1>
+            <Tooltip content={t.renameTitle}>
+              <button type="button" aria-label={t.renameTitle} data-action="npc-rename" onClick={() => setDialog('name')} className={ICON_BUTTON}>
+                <Pencil size={18} aria-hidden="true" />
+              </button>
+            </Tooltip>
+          </div>
+          <ul className="flex flex-wrap items-center gap-1.5">
             <Pill as="li" className="text-[12px]">
               <span data-field="type">{npcTypeLine(view, t)}</span>
             </Pill>
             {(npc.tags ?? []).map((tag) => (
               <Pill as="li" key={tag} highlighted={false} className="text-[12px]">
-                {tag}
+                <span data-tag={tag}>{tag}</span>
+                <Tooltip content={t.npcRemoveTag(tag)}>
+                  <button
+                    type="button"
+                    aria-label={t.npcRemoveTag(tag)}
+                    data-action="remove-tag"
+                    onClick={() => writer.edit({ type: 'removeTag', tag })}
+                    className="relative -mr-1 inline-flex size-4 items-center justify-center rounded-full text-text-muted before:absolute before:-inset-3 before:content-[''] hover:text-crimson"
+                  >
+                    <X size={13} aria-hidden="true" />
+                  </button>
+                </Tooltip>
               </Pill>
             ))}
+            <li>
+              <button
+                type="button"
+                data-action="add-tag"
+                onClick={() => setDialog('tag')}
+                className="relative inline-flex items-center gap-1 rounded-[var(--radius-pill)] px-2 py-0.5 text-[12px] text-on-surface-variant before:absolute before:-inset-y-3 before:inset-x-0 before:content-[''] hover:text-gold"
+              >
+                <Plus size={14} aria-hidden="true" />
+                {t.npcTagWord}
+              </button>
+            </li>
           </ul>
           {/* La voz va bajo el nombre y no en una tarjeta: es lo primero que el
               DM necesita para interpretarlo, y como cita no pide rótulo. */}
-          <blockquote className="mt-1 flex max-w-[620px] gap-2" aria-label={t.npcSpeech} data-field="speech">
-            <span aria-hidden="true" className="font-display text-[34px] leading-[0.9] text-gold">
-              “
-            </span>
-            <span className={cx('pt-1.5 text-[16px] leading-normal italic', speech ? 'text-on-surface' : 'text-text-muted')}>
-              {speech || t.npcSpeechEmpty}
-            </span>
-          </blockquote>
+          <div className="mt-1 flex max-w-[620px] items-start gap-1">
+            <blockquote className="flex min-w-0 flex-1 gap-2" aria-label={t.npcSpeech} data-field="speech">
+              <span aria-hidden="true" className="font-display text-[34px] leading-[0.9] text-gold">
+                “
+              </span>
+              <span className={cx('pt-1.5 text-[16px] leading-normal italic', speech ? 'text-on-surface' : 'text-text-muted')}>
+                {speech || t.npcSpeechEmpty}
+              </span>
+            </blockquote>
+            <Tooltip content={t.npcEditSpeech}>
+              <button type="button" aria-label={t.npcEditSpeech} data-action="npc-speech" onClick={() => setDialog('speech')} className={ICON_BUTTON}>
+                <Pencil size={16} aria-hidden="true" />
+              </button>
+            </Tooltip>
+          </div>
         </div>
         <DropdownMenu>
           <Tooltip content={t.npcMoreActions}>
@@ -153,18 +248,18 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
 
       <div className="flex flex-wrap items-start gap-4">
         <div className="flex min-w-0 flex-[999_1_420px] flex-col gap-4">
-          <Card id="npc-background" title={t.npcBackground} icon={ScrollText}>
-            {background ? (
-              <BackgroundText text={background} label={t.npcBackground} />
-            ) : (
-              <p className="text-text-muted italic">{t.npcBackgroundEmpty}</p>
-            )}
-          </Card>
+          <BackgroundEditor
+            saved={npc.background ?? ''}
+            ownerName={npc.name}
+            onSave={(text) => void writer.edit({ type: 'setBackground', text })}
+            notify={notify}
+          />
           <DiaryEntries
             entries={npc.notes ?? []}
             title={t.npcNotes}
             emptyMessage={t.npcNotesEmpty(npc.name)}
             minWidth={260}
+            edit={noteEditor}
           />
         </div>
         <div className="flex min-w-0 max-w-[380px] flex-[1_1_300px] flex-col gap-4">
@@ -222,7 +317,16 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
           onClose={() => setDeleting(false)}
         />
       )}
-      {toast && <Toast key={toast.key} tone="error" message={toast.message} open onOpenChange={(open) => !open && setToast(null)} />}
+      {dialog === 'name' && <RenameDialog current={npc.name} onSubmit={rename} onClose={() => setDialog(null)} />}
+      {dialog === 'speech' && (
+        <NpcSpeechDialog current={npc.speech ?? ''} onSubmit={(text) => void writer.edit({ type: 'setSpeech', text })} onClose={() => setDialog(null)} />
+      )}
+      {dialog === 'tag' && (
+        <NpcTagDialog present={npc.tags ?? []} onSubmit={(tag) => void writer.edit({ type: 'addTag', tag })} onClose={() => setDialog(null)} />
+      )}
+      {toast && (
+        <Toast key={toast.key} tone={toast.tone} message={toast.message} action={toast.action} open onOpenChange={(open) => !open && setToast(null)} />
+      )}
     </div>
   );
 }

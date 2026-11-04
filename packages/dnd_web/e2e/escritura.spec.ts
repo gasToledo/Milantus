@@ -929,3 +929,41 @@ test('Nuevo PNJ: guarda el bloque que da el motor, abre la ficha y se puede borr
   await page.waitForURL(/\/v2\/dm\/pnj$/);
   expect((await request.get(`/api/npcs/${id}`, comoDm)).status()).toBe(404);
 });
+
+test('Ficha de un PNJ: nombre, voz, tag, trasfondo y nota se guardan en su documento', async ({ page, request }) => {
+  const comoDm = { headers: { cookie: `dnd_session=${TOKEN_ESCRITURA}` } };
+  const creado = await request.post('/api/npcs', { ...comoDm, data: { npc: { id: 'nuevo', name: 'Bruna', sheetKind: 'none' } } });
+  const { npc } = (await creado.json()) as { npc: { id: string } };
+  const guardado = async () =>
+    (await api<{ npc: { name: string; speech?: string; tags?: string[]; background?: string; notes?: { title: string }[] } }>(request, `/api/npcs/${npc.id}`, TOKEN_ESCRITURA)).npc;
+
+  await page.goto(`/v2/dm/pnj/${npc.id}`);
+
+  await page.locator('[data-action="npc-rename"]').click();
+  await page.locator('[data-field="rename"]').fill('Bruna la Barquera');
+  await page.getByRole('dialog').getByRole('button', { name: 'Guardar', exact: true }).click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Bruna la Barquera');
+  await expect.poll(async () => (await guardado()).name).toBe('Bruna la Barquera');
+
+  await page.locator('[data-action="npc-speech"]').click();
+  await page.locator('[data-field="npc-speech"]').fill('Cobra por adelantado.');
+  await page.getByRole('dialog').getByRole('button', { name: 'Guardar', exact: true }).click();
+  await expect.poll(async () => (await guardado()).speech).toBe('Cobra por adelantado.');
+
+  await page.locator('[data-action="add-tag"]').click();
+  await page.locator('[data-field="npc-tag"]').fill('Río');
+  await page.getByRole('dialog').getByRole('button', { name: 'Sumar', exact: true }).click();
+  await expect.poll(async () => (await guardado()).tags).toEqual(['Río']);
+
+  await page.locator('[data-action="edit-background"]').click();
+  await page.locator('[data-field="background-input"]').fill('Cruzó el río mil veces.');
+  await page.locator('[data-action="edit-background"]').click();
+  await expect.poll(async () => (await guardado()).background).toBe('Cruzó el río mil veces.');
+
+  await page.locator('[data-action="add-entry"]').first().click();
+  await page.locator('[data-field="entry-title"]').fill('Le debe al gremio');
+  await page.getByRole('dialog').getByRole('button', { name: 'Guardar', exact: true }).click();
+  await expect.poll(async () => (await guardado()).notes?.map((n) => n.title)).toEqual(['Le debe al gremio']);
+
+  await request.delete(`/api/npcs/${npc.id}`, comoDm);
+});

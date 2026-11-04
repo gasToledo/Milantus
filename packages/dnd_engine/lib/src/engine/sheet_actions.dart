@@ -7,6 +7,7 @@ import 'character_choices.dart';
 import 'character_compiler.dart';
 import 'coin_ops.dart';
 import 'combat_ops.dart';
+import 'diary_ops.dart';
 import '../domain/spell_slots.dart';
 import 'dice.dart';
 import 'inventory_ops.dart';
@@ -691,20 +692,20 @@ class SheetActions {
         outcome['renamed'] = name.isNotEmpty;
         if (name.isNotEmpty) c = c.copyWith(name: name);
       case 'saveDiaryEntry':
-        final saved = _saveDiaryEntry(c, action);
+        final saved = DiaryOps.save(c.diary, action);
         outcome['saved'] = saved != null;
-        if (saved != null) c = saved;
+        if (saved != null) c = c.copyWith(diary: saved);
       case 'removeDiaryEntry':
-        final id = action['entry'] as String;
         c = c.copyWith(
-          diary: [
-            for (final e in c.diary)
-              if (e.entryId != id) e,
-          ],
-        );
+            diary: DiaryOps.remove(c.diary, action['entry'] as String));
       case 'moveDiaryEntry':
-        c = _moveDiaryEntry(
-            c, action['entry'] as String, action['to'] as String);
+        c = c.copyWith(
+          diary: DiaryOps.move(
+            c.diary,
+            action['entry'] as String,
+            action['to'] as String,
+          ),
+        );
       case 'addPortrait':
         final key = action['key'] as String? ?? '';
         if (key.isNotEmpty && !c.portraitPaths.contains(key)) {
@@ -735,62 +736,6 @@ class SheetActions {
         throw FormatException('Acción de ficha desconocida: ${action['type']}');
     }
     return SheetActionResult(c, outcome);
-  }
-
-  /// Alta o edición de una entrada del Diario; null si no corresponde guardar
-  /// (sin título, o una imagen sin clave).
-  static Character? _saveDiaryEntry(Character c, Map<String, dynamic> action) {
-    final kind = DiaryEntryKind.fromJson(action['kind']);
-    final title = (action['title'] as String? ?? '').trim();
-    final imageKey = action['imageKey'] as String?;
-    if (title.isEmpty || (kind == DiaryEntryKind.image && imageKey == null)) {
-      return null;
-    }
-    final id = action['entry'] as String;
-    final at = DateTime.parse(action['at'] as String);
-    final isImage = kind == DiaryEntryKind.image;
-    final body = isImage ? '' : (action['body'] as String? ?? '').trim();
-    final index = c.diary.indexWhere((e) => e.entryId == id);
-    final DiaryEntry entry;
-    if (index < 0) {
-      // `updatedAt` queda vacío: en una entrada recién escrita las dos fechas
-      // serían la misma y la tarjeta diría «editada» de algo nuevo.
-      entry = DiaryEntry(
-        entryId: id,
-        kind: kind,
-        title: title,
-        body: body,
-        imageKey: isImage ? imageKey : null,
-        createdAt: at,
-      );
-    } else {
-      entry = c.diary[index].copyWith(
-        kind: kind,
-        title: title,
-        body: body,
-        imageKey: isImage ? imageKey : null,
-        updatedAt: at,
-      );
-    }
-    final list = [...c.diary];
-    if (index < 0) {
-      list.add(entry);
-    } else {
-      list[index] = entry;
-    }
-    return c.copyWith(diary: list);
-  }
-
-  /// Saca [id] y lo reinserta en el lugar que ocupa [to], como el reorden de
-  /// Flutter. Ids que no existen, o iguales, dejan la ficha como estaba.
-  static Character _moveDiaryEntry(Character c, String id, String to) {
-    if (id == to) return c;
-    final list = [...c.diary];
-    final from = list.indexWhere((e) => e.entryId == id);
-    final target = list.indexWhere((e) => e.entryId == to);
-    if (from < 0 || target < 0) return c;
-    list.insert(target, list.removeAt(from));
-    return c.copyWith(diary: list);
   }
 
   static Ability? _abilityNamed(String name) =>

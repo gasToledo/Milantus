@@ -239,8 +239,8 @@ repiten acá.
   interruptor. Desde 6b escribe campañas y la Mesa y desde 6c capítulos,
   notas y el reparto de objetos y desde 6d las escenas de música (bloques de
   6b, 6c y 6d, abajo); los PNJ y el combate **siguen en Flutter** hasta 6e a 6g
-  (desde 6e1 los vínculos de un PNJ con sus campañas ya se escriben y desde 6e2
-  se crea y se borra un PNJ sin ficha de personaje),
+  (desde 6e1 los vínculos de un PNJ con sus campañas ya se escriben, desde 6e2
+  se crea y se borra un PNJ sin ficha de personaje y desde 6e3 se escribe su texto),
   y esas secciones se leen salvo eso. Se porta por
   secciones, una por PR; hoy existen la **Mesa**, **Capítulos**, el **Cuaderno**,
   los **PNJ de la mesa**, el **Combate**, el **Bestiario**, la **Biblioteca de
@@ -340,9 +340,9 @@ repiten acá.
   Flutter se edita). Sale del mismo `GET /api/npcs/:id`. Un PNJ ajeno y uno
   inexistente dan la misma pantalla «No se encontró el PNJ» —también en su
   ficha, igual que un PNJ sin ficha—: el servidor los responde igual (404). Importar,
-  editar, generar o subir retratos, exportar y crear uno con ficha de personaje
-  siguen en Flutter (el estado por campaña se escribe desde 6e1; crear sin ficha
-  y borrar, desde 6e2).
+  editar el bloque, generar o subir retratos, exportar y crear uno con ficha de
+  personaje siguen en Flutter (el estado por campaña se escribe desde 6e1; crear
+  sin ficha y borrar, desde 6e2; nombre, voz, tags, trasfondo y notas, desde 6e3).
   **PNJ de la mesa** (`GET /api/campaigns/:id/npcs`): los PNJ vinculados a la
   campaña con su estado **en esa** campaña. Arriba, el conteo («2 PNJ · 1 vivo ·
   0 muertos · 1 desconocido») y las pills de tag; cada tarjeta lleva la
@@ -744,6 +744,22 @@ frontera sigue donde estaba: **el DM no escribe la ficha de otra cuenta**.
   (`_checkEventsSoon` de Flutter): decisión tomada, no un olvido.
 - Queda en Flutter, hasta 6e a 6g: PNJ, ficha de PNJ y combate.
 
+**Paso 6e3: el texto de la ficha** *(existe)*. Toca el motor y `dnd_web`; Flutter,
+el servidor y la versión no cambian. En la ficha de un PNJ el DM escribe nombre,
+voz, tags, trasfondo y notas. Toda edición la aplica el motor (`NpcEdits`, por
+el puente `npcEdit`): tags normalizados, textos recortados y las reglas de las
+notas, que son las del Diario y se extrajeron de `sheet_actions.dart` a
+`DiaryOps` sin cambiarles la lógica (los tests de la ficha propia pasan sin
+tocarse). El guardado (`npcSave.ts`) tiene la forma del de la ficha propia: se
+ve al instante en la caché, 400 ms de espera, una cola por PNJ y siempre la
+última copia entera. **Un fallo no pierde lo escrito**: sale un aviso con
+«Reintentar» y la copia sigue pendiente (Flutter relee y la pierde; un
+trasfondo largo es lo que más duele perder). **Renombrar escribe dos
+documentos**, el PNJ y su ficha si la tiene, y el diálogo no se cierra si uno
+falla; reintentar repite los dos. `BackgroundEditor` y `DiaryEntries` son los
+del Diario, con otro dueño; sin trasfondo dice «Origen desconocido». Borrar una
+nota con imagen no ofrece «Deshacer»: el archivo se va.
+
 **Paso 6e2: alta y borrado** *(existe)*. Toca el motor (`Npc.draft`, que Flutter
 usa de ahí en vez de armar el documento en `npc_shared.dart`) y `dnd_web`; las
 rutas ya existían (`POST /api/npcs`, `DELETE /api/npcs/:id`). «Nuevo PNJ»
@@ -854,7 +870,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    combate, vínculos y códigos de campaña. Por partes: 6a, la del jugador:
    compartir, los avisos de la cola y el aviso de turno *(existe)*; 6b, las
    campañas y la Mesa *(existe)*; 6c, Capítulos y Cuaderno *(existe)*; 6d, la música *(existe)*; 6e, los PNJ, en cinco: 6e1, los vínculos con las campañas *(existe)*; 6e2,
-   alta y borrado *(existe)*; 6e3, el texto de la ficha; 6e4, el editor del bloque; 6e5,
+   alta y borrado *(existe)*; 6e3, el texto de la ficha *(existe)*; 6e4, el editor del bloque; 6e5,
    retrato y mostrar a la mesa; 6f, la ficha de
    PNJ; 6g, el combate. Importar y exportar PNJ sigue en el paso 7. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de
@@ -886,8 +902,9 @@ Tres niveles, de lo mecánico a lo humano. Los comandos exactos están en
    para el dado de golpe y la recarga al amanecer); los `puente-*` prueban las
    funciones de lectura del editor de conjuros (`spellEdit`,
    `innateCantripOptions`) y de los planos (`magicItemPlans`,
-   `magicBaseOptions`, esta sin ficha: `withoutCharacter`) y el alta de un PNJ
-   (`newNpc`, también sin ficha), con la función y sus argumentos en el caso. Es también la red del tipo escrito a mano de
+   `magicBaseOptions`, esta sin ficha: `withoutCharacter`), el alta de un PNJ
+   (`newNpc`, también sin ficha) y su edición (`npcEdit`, que no lee ni ficha ni
+   catálogo: `pure`), con la función y sus argumentos en el caso. Es también la red del tipo escrito a mano de
    `types.ts`: un campo nuevo en `ComputedSheet.toJson` rompe acá aunque el tipo
    no lo diga.
 2. **Playwright** (job `web_e2e`). Pocas pruebas, con el criterio de `CLAUDE.md`

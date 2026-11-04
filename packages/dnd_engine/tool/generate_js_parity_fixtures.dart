@@ -738,6 +738,26 @@ Future<void> main(List<String> args) async {
       ).toJson(),
     }),
   );
+  final notaAccion = {
+    'type': 'saveNote',
+    'entry': 'nota-1',
+    'kind': 'text',
+    'title': '  Le debe al gremio ',
+    'body': ' Doscientas piezas. ',
+    'imageKey': null,
+    'at': '2026-11-04T12:00:00.000Z',
+  };
+  final pnjBase = Npc(id: 'pnj', name: 'Bruna', sheetKind: NpcSheetKind.none);
+  File('${out.path}/puente-pnj-edicion.json').writeAsStringSync(
+    jsonEncode({
+      'bridge': {
+        'fn': 'npcEdit',
+        'args': [jsonEncode(pnjBase.toJson()), jsonEncode(notaAccion)],
+        'pure': true,
+      },
+      'expected': NpcEdits.apply(pnjBase, notaAccion).toJson(),
+    }),
+  );
   for (final MapEntry(key: nombre, value: (borrador, accion))
       in _creaciones.entries) {
     final draft = CreationDraft.fromJson(repo, borrador)

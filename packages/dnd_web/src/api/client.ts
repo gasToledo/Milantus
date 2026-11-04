@@ -637,3 +637,8 @@ export const giveItems = (campaignId: string, memberId: string, items: ChapterIt
     `/api/campaigns/${encodeURIComponent(campaignId)}/members/${encodeURIComponent(memberId)}/item-grants`,
     { items },
   );
+
+/** Guarda el documento entero de un PNJ. */
+export async function saveNpc(npc: JsonObject & { id: string }): Promise<void> {
+  await sendJson('PUT', `/api/npcs/${encodeURIComponent(npc.id)}`, { npc });
+}

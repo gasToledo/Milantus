@@ -31,7 +31,7 @@ import { portraitUrl, thumbnailUrl } from '../ui/portrait';
 import { useReorder } from '../ui/reorder';
 import { AppBusyLabel, AppEmptyState } from '../ui/status';
 import type { SheetModel } from './model';
-import type { SheetWriter } from './writer';
+import type { SheetNotify } from './writer';
 
 /** Un tipo desconocido se lee como texto, igual que `DiaryEntryKind.fromJson`. */
 type Kind = 'text' | 'image' | 'link';
@@ -89,7 +89,12 @@ export function DiaryTab({ model }: { model: SheetModel }) {
   return (
     <div className="flex flex-col gap-4">
       {model.write ? (
-        <BackgroundCard model={model} write={model.write} />
+        <BackgroundEditor
+          saved={character.background ?? ''}
+          ownerName={character.name}
+          onSave={(text) => void model.write?.act({ type: 'setBackground', text })}
+          notify={model.write.notify}
+        />
       ) : (
         <Card id="background" title={t.diaryBackground} icon={ScrollText}>
           {background ? (
@@ -124,34 +129,43 @@ const fileSlug = (name: string, fallback: string) =>
     .replace(/^-+|-+$/g, '') || fallback;
 
 /**
- * El trasfondo de la ficha **propia**: lectura con Markdown, editor, importar y
- * exportar un `.md` (`DiaryBackgroundCard` de Flutter).
+ * El trasfondo de la ficha **propia** y el de un PNJ: lectura con Markdown,
+ * editor, importar y exportar un `.md` (`DiaryBackgroundCard` de Flutter). No
+ * sabe de quién es: recibe el texto guardado y `onSave`, y cada dueño lo
+ * escribe a su manera.
  *
- * El borrador vive en estado local y la acción `setBackground` se manda
- * espaciada: cada acción recompila la ficha entera, y no puede pasar por
+ * El borrador vive en estado local y `onSave` se llama espaciado: cada acción recompila la ficha entera, y no puede pasar por
  * tecla. Se manda igual de inmediato al terminar de editar, al salir del campo
  * y al desmontar, para que lo escrito a medias no se pierda.
  */
-function BackgroundCard({ model, write }: { model: SheetModel; write: SheetWriter }) {
+export function BackgroundEditor({
+  saved,
+  ownerName,
+  onSave,
+  notify,
+}: {
+  saved: string;
+  ownerName: string;
+  onSave: (text: string) => void;
+  notify: SheetNotify;
+}) {
   const t = useTexts();
-  const { character } = model;
-  const saved = character.background ?? '';
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
   const [replacing, setReplacing] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const timer = useRef<number | undefined>(undefined);
   const pending = useRef<string | null>(null);
-  // El escritor se rearma cuando cambia la ficha; el vaciado al desmontar tiene
-  // que usar el último, no el de cuando se montó.
-  const writeRef = useRef(write);
-  writeRef.current = write;
+  // El escritor se rearma cuando cambia el documento; el vaciado al desmontar
+  // tiene que usar el último, no el de cuando se montó.
+  const onSaveRef = useRef(onSave);
+  onSaveRef.current = onSave;
 
   const flush = useCallback(() => {
     window.clearTimeout(timer.current);
     const text = pending.current;
     pending.current = null;
-    if (text !== null) writeRef.current.act({ type: 'setBackground', text });
+    if (text !== null) onSaveRef.current(text);
   }, []);
   useEffect(() => flush, [flush]);
 
@@ -180,9 +194,9 @@ function BackgroundCard({ model, write }: { model: SheetModel; write: SheetWrite
     // vaciado pendiente.
     window.clearTimeout(timer.current);
     pending.current = null;
-    write.act({ type: 'setBackground', text });
+    onSave(text);
     setEditing(false);
-    write.notify(t.diaryImported);
+    notify(t.diaryImported);
   };
 
   const onFile = async (file: File | undefined) => {
@@ -194,7 +208,7 @@ function BackgroundCard({ model, write }: { model: SheetModel; write: SheetWrite
       // ficha dejaría el trasfondo ilegible y guardado.
       text = new TextDecoder('utf-8', { fatal: true }).decode(await file.arrayBuffer());
     } catch {
-      write.notify(t.diaryNotUtf8, { tone: 'error' });
+      notify(t.diaryNotUtf8, { tone: 'error' });
       return;
     }
     // Reemplazar lo escrito no se puede deshacer: se pregunta. Vacío no hay
@@ -207,7 +221,7 @@ function BackgroundCard({ model, write }: { model: SheetModel; write: SheetWrite
     const url = URL.createObjectURL(new Blob([current], { type: 'text/markdown' }));
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${fileSlug(character.name, t.diaryFileFallback)}-${t.diaryFileSuffix}.md`;
+    a.download = `${fileSlug(ownerName, t.diaryFileFallback)}-${t.diaryFileSuffix}.md`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -280,7 +294,7 @@ function BackgroundCard({ model, write }: { model: SheetModel; write: SheetWrite
       ) : (
         <div className="max-w-[620px]">
           <p className="font-display text-[16px] text-on-surface-variant italic">{t.diaryUnknownOrigin}</p>
-          <p className="mt-1 text-on-surface-variant">{t.diaryUnknownOriginBody(character.name)}</p>
+          <p className="mt-1 text-on-surface-variant">{t.diaryUnknownOriginBody(ownerName)}</p>
           <div className="mt-4 flex flex-wrap gap-2.5">
             <Button tone="secondary" icon={Pencil} onClick={startEditing}>
               {t.diaryWriteBackground}
@@ -310,9 +324,9 @@ function BackgroundCard({ model, write }: { model: SheetModel; write: SheetWrite
   );
 }
 
-/** Lo que la ficha propia puede hacer con sus entradas. Lo arma `DiaryTab` con
- *  `model.write`; `DiaryEntries` no lo toca directamente porque las notas del
- *  PNJ (paso 6) van a tener otro dueño. Sin él, la tarjeta es de solo lectura:
+/** Lo que se puede hacer con una lista de entradas. Lo arma quien tiene el
+ *  documento: `DiaryTab` con `model.write`, `NpcDetailView` con su escritor.
+ *  Sin él, la tarjeta es de solo lectura:
  *  sin «+», sin ícono de mover y sin «Editar». */
 export interface DiaryEditor {
   /** Alta (un `entry` nuevo) o edición. El motor recorta y limpia por tipo. */

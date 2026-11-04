@@ -165,11 +165,13 @@ conjuro abre su detalle en un diálogo. Sus pasos de elecciones viven en
 | `Button`, `ButtonLink` | `primary` (oro lleno, uno por vista), `soft` (oro sobre `goldSoft` con filete: el verbo de una barra de herramientas), `secondary`, `danger` (carmesí, lo irreversible); `shape="pill"` en una fila de pills; `disabled` lo atenúa | `ButtonLink internal` navega sin recargar |
 | `SaveStatusBadge` | La pill del guardado automático (`SaveStatusIndicator`): Guardando… / Guardado / No se guardó con «Reintentar» | Al pie del panel de una pantalla que escribe, en lugar de «Solo lectura» |
 | `NpcStatusSelector` (`src/dm/npcs/`) | Vivo · Muerto · Desconocido en una fila de botones `aria-pressed`; el elegido se rellena con el color de su estado (`STATUS_FILL`) | El muerto atenúa identidad y tags, **nunca** el selector: un control usable no puede verse apagado |
+| `BackgroundEditor` (`src/sheet/DiaryTab.tsx`) | El trasfondo con Markdown: lectura, editor, importar y exportar `.md`; recibe `saved`, `ownerName`, `onSave` y `notify`, así que sirve a la ficha propia y a un PNJ | El borrador es local y `onSave` va espaciado (400 ms) y al salir |
+| `NpcSpeechDialog` y `NpcTagDialog` (`src/dm/npcs/NpcTextDialogs.tsx`) | La voz (textarea) y un tag nuevo, este con los de la biblioteca como atajo | Una voz vacía la borra; un tag vacío no se manda |
 | `PickManyDialog` (`src/dm/npcs/`) | Marcar varios (`Option multi`) y «Sumar n» sobre `AppDialog`, con buscador o sin él | Si falla no se cierra y el botón pasa a «Reintentar» |
 | `NewNpcDialog` (`src/dm/npcs/`) | «Nuevo PNJ»: nombre, qué ficha lleva (`Option`: sin estadísticas, con bloque y «Personaje jugable» apagado con su motivo) y, si es un bloque, de qué criatura parte; crear abre la ficha | El documento lo arma el motor (`newNpc`). Si falla no se cierra y reintentar no vuelve a crear. «Bloque vacío» va fuera de la lista para que el buscador no lo esconda |
 | `AppDialog` | El molde de diálogo: placa, velo, barra de acciones de 48 px al pie | 480 px por defecto, 560 si el cuerpo es una ficha; una acción con `disabled` se apaga (Comprar sin fondos) |
 | `PortraitViewer` | El retrato original entero sobre el velo, con cerrar; `Esc` y clic afuera también cierran | Lo abre `Medallion` con `viewable` y la imagen de una entrada del Diario |
-| `DiaryEntries` (`src/sheet/DiaryTab.tsx`) | Tarjeta de entradas en grilla (`minWidth`, 280 por defecto); con `edit` (un `DiaryEditor`: `save`, `remove`, `move`, `upload`) suma «+», editor, borrado y el ícono de mover | Sin `edit` es de solo lectura (ficha ajena, notas del PNJ) |
+| `DiaryEntries` (`src/sheet/DiaryTab.tsx`) | Tarjeta de entradas en grilla (`minWidth`, 280 por defecto); con `edit` (un `DiaryEditor`: `save`, `remove`, `move`, `upload`) suma «+», editor, borrado y el ícono de mover | Sin `edit` es de solo lectura (ficha ajena) |
 | `useReorder` (`src/ui/reorder.ts`) | Reordenar con el puntero (desde un ícono con `touch-action: none`) o con flechas; da `item(id)`, `grip(id)`, `dragging` y `over` | `onMove(desde, hasta)`; sin dependencias, lo usa el Diario |
 | `useHoldDrag` (`src/ui/holdDrag.ts`) | Reordenar tomando la tarjeta entera, sin ícono: con el mouse, apretando y moviendo 6 px; con el dedo, sosteniendo 350 ms, para que deslizar siga desplazando. La tarjeta sigue al puntero, las demás se corren y la ventana se desplaza cerca de los bordes; `Escape` cancela. Da `item(id)`, `dragging`, `over` y `animated` | `canDrop(desde, hasta)` y `onMove(desde, hasta)`; `group` (la fila lleva `data-reorder-group` y el hook mide solo las de su grupo: sin él, solo las que no tienen grupo, así el panel de música no se mezcla con las tarjetas de la Mesa) y `axis: 'y'` (`dx` queda en 0, para una lista con scroll propio). Con «reducir movimiento» nada sigue al puntero: se atenúa y se marca. Con teclado, `Alt` más una flecha sobre la tarjeta enfocada la mueve al vecino (`canDrop` manda) y no dibuja nada |
 | `RosterCard` (`src/dashboard/`) | La tarjeta de personaje: el nombre es el enlace y se estira con `::after`; a la derecha del nivel, el menú ⋮ de 40 × 40 (favorito, renombrar, rehacer, borrar). Se mueve tomándola entera (`useHoldDrag`) | El ⋮ lleva `relative z-10` o el enlace estirado lo tapa; el favorito y la lista filtrada no se mueven |
@@ -352,8 +354,9 @@ inexistente son la misma pantalla). Desde 6b escribe campañas y la Mesa y desde
   buscador en pill y dos filas de pills `aria-pressed` con su conteo —campaña,
   más grandes, y tag, más chicas: la jerarquía es la de Flutter— que son estado
   local. La ficha abre con la identidad a todo el ancho (medallón de 76, `h1`
-  Georgia 28, la línea de tipo en `Pill` oro y los tags neutros, la voz como
-  cita con la comilla en oro) y debajo dos columnas: Trasfondo (`Card`) y Notas
+  Georgia 28 con su lápiz, la línea de tipo en `Pill` oro y los tags neutros
+  con su ✕ y un «Tag» al final, la voz como cita con la comilla en oro y su
+  lápiz) y debajo dos columnas: Trasfondo (`Card`) y Notas
   (`DiaryEntries`, el mismo de la pestaña Diario, a dos columnas) a la izquierda,
   Estadísticas y Campañas a la derecha. En Campañas, cada una lleva su
   `NpcStatusSelector` y la tarjeta un «Sumar» (`PickManyDialog` con las campañas
