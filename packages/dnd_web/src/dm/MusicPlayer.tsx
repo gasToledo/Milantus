@@ -1,21 +1,37 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { ChevronDown, ExternalLink, ListMusic, Music, Pause, Play } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { ChevronDown, EllipsisVertical, ExternalLink, ListMusic, Music, Pause, Pencil, Play, Plus, Trash2 } from 'lucide-react';
 import type { MusicScene } from '../api/client';
 import { musicSource, type MusicSource } from '../engine';
 import { useTexts } from '../i18n/context';
+import { Button, ButtonLink } from '../ui/Button';
 import { cx } from '../ui/cx';
 import { Eyebrow } from '../ui/data';
-import { Tooltip } from '../ui/primitives';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  Tooltip,
+} from '../ui/primitives';
+import { editCampaign } from './campaigns';
+import { MusicSceneDialog } from './MusicSceneDialog';
 
 /** El sitio del reproductor: un nombre de marca, igual en los dos idiomas. */
 const SITE = 'YouTube';
+/** Lo que tarda en irse solo un aviso del panel. */
+const NOTICE_MS = 8000;
+
+type Notice = { kind: 'deleted'; scene: MusicScene; index: number } | { kind: 'error' };
 
 /**
- * La música del Modo DM (`dm/music/` de Flutter), **solo para escuchar**: las
- * escenas de la campaña y el reproductor de YouTube embebido. Crear, editar,
- * reordenar, borrar y marcar «ofrecer al iniciar un combate» son escrituras y
- * siguen en Flutter (paso 6). La oferta al empezar un combate tampoco está:
- * acá nadie empieza uno.
+ * La música del Modo DM (`dm/music/` de Flutter): las escenas de la campaña y
+ * el reproductor de YouTube embebido. El DM también las crea, edita y borra
+ * (6d), y marca cuáles ofrecer al iniciar un combate. Esas escrituras releen la
+ * campaña antes del PUT (`editCampaign`) y van en fila: ver `updateScenes`. La
+ * oferta al empezar un combate sigue afuera hasta 6g: acá nadie empieza uno.
  *
  * Vive en la pantalla del Modo DM y no en una sección: cambiar de sección no lo
  * desmonta, así que la música sigue; cambiar de campaña sí (va con `key`), como
@@ -24,18 +40,78 @@ const SITE = 'YouTube';
  * El enlace lo interpreta el motor (`musicSource`): esta pantalla nunca arma la
  * dirección del iframe con lo que pegó el DM.
  */
-export function MusicPlayer({ scenes }: { scenes: readonly MusicScene[] }) {
+export function MusicPlayer({ campaignId, scenes }: { campaignId: string; scenes: readonly MusicScene[] }) {
   const t = useTexts();
+  const client = useQueryClient();
   const sources = useMemo(() => new Map(scenes.map((s) => [s.id, musicSource(s.url)])), [scenes]);
   const [expanded, setExpanded] = useState(false);
   const [showList, setShowList] = useState(true);
   const [currentId, setCurrentId] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
   const [unembeddable, setUnembeddable] = useState(false);
+  const [editing, setEditing] = useState<MusicScene | 'new' | null>(null);
+  const [notice, setNotice] = useState<Notice | null>(null);
   const frame = useRef<HTMLIFrameElement>(null);
+  const noticeTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(noticeTimer.current), []);
+
+  const showNotice = (next: Notice) => {
+    window.clearTimeout(noticeTimer.current);
+    setNotice(next);
+    noticeTimer.current = window.setTimeout(() => setNotice(null), NOTICE_MS);
+  };
+
+  // Cada cambio se aplica sobre lo último del servidor y no sobre lo que cargó
+  // la pantalla, y las escrituras van **en fila**: dos toques seguidos
+  // releerían lo mismo y el segundo pisaría al primero. El error se atrapa en
+  // la cola para que un fallo no la corte; quien llama sí lo recibe.
+  const queue = useRef<Promise<unknown>>(Promise.resolve());
+  const updateScenes = (change: (latest: MusicScene[]) => MusicScene[]): Promise<void> => {
+    const run = queue.current.then(() =>
+      editCampaign(client, campaignId, (latest) => ({ ...latest, musicScenes: change(latest.musicScenes ?? []) })),
+    );
+    queue.current = run.catch(() => {});
+    return run;
+  };
+  /** Un cambio sin diálogo: si falla, el aviso lo dice y las escenas quedan como estaban. */
+  const write = (change: (latest: MusicScene[]) => MusicScene[], onDone?: () => void) =>
+    void updateScenes(change).then(onDone, () => showNotice({ kind: 'error' }));
+
+  const remove = (scene: MusicScene) => {
+    const index = scenes.findIndex((s) => s.id === scene.id);
+    write(
+      (all) => all.filter((s) => s.id !== scene.id),
+      () => showNotice({ kind: 'deleted', scene, index }),
+    );
+  };
+  const undo = (scene: MusicScene, index: number) => {
+    window.clearTimeout(noticeTimer.current);
+    setNotice(null);
+    // En su lugar, recortado al largo de ahora; y nada si ya volvió.
+    write((all) => {
+      if (all.some((s) => s.id === scene.id)) return all;
+      const at = Math.min(index, all.length);
+      return [...all.slice(0, at), scene, ...all.slice(at)];
+    });
+  };
 
   const current = scenes.find((s) => s.id === currentId) ?? null;
   const source = current ? (sources.get(current.id) ?? null) : null;
+
+  // Si la escena en curso se borró, el video se corta. Se mira la escena y no
+  // el nombre: renombrarla no recarga nada.
+  useEffect(() => {
+    if (currentId !== null && !current) {
+      setCurrentId(null);
+      setPlaying(false);
+    }
+  }, [current, currentId]);
+  // Con otro enlace el iframe cambia solo (`key`); lo que contaba el anterior
+  // ya no vale.
+  useEffect(() => {
+    setUnembeddable(false);
+    setPlaying(false);
+  }, [source?.embedUrl]);
 
   const command = (func: 'playVideo' | 'pauseVideo') => {
     if (source) post(frame.current, source, { event: 'command', func, args: [] });
@@ -137,22 +213,47 @@ export function MusicPlayer({ scenes }: { scenes: readonly MusicScene[] }) {
           </div>
         )}
         {source && unembeddable && (
-          <p className="mt-2 text-[13px] text-on-surface-variant" role="status">
-            {t.dmMusicUnembeddable(SITE)}{' '}
-            <a href={source.pageUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-gold underline">
-              {t.dmMusicOpenIn(SITE)}
-              <ExternalLink size={13} aria-hidden="true" />
-            </a>
-          </p>
+          <>
+            <p className="mt-2.5 text-[13px] text-crimson" role="status">
+              {t.dmMusicUnembeddable(SITE)}
+            </p>
+            <div className="mt-2.5 flex flex-wrap gap-2">
+              <ButtonLink tone="secondary" href={source.pageUrl} newTab>
+                {t.dmMusicOpenIn(SITE)}
+              </ButtonLink>
+              <Button tone="secondary" onClick={() => current && setEditing(current)}>
+                {t.dmMusicChangeLink}
+              </Button>
+            </div>
+          </>
         )}
 
         {(showList || !current) && (
           <div className="mt-2.5">
             {current && <Eyebrow className="mb-1.5">{t.dmMusicScenes}</Eyebrow>}
+            {/* Adentro del panel y no un `Toast`: el aviso flotante sale en la
+                misma esquina y taparía el reproductor. */}
+            {notice && (
+              <div
+                role={notice.kind === 'error' ? 'alert' : 'status'}
+                className="mb-2 flex items-center gap-2 rounded-[var(--radius-nav)] bg-plaque py-2 pr-2 pl-3 text-[13px]"
+              >
+                <span className={cx('min-w-0 flex-1', notice.kind === 'error' && 'text-crimson')}>
+                  {notice.kind === 'error' ? t.dmMusicSaveError : t.dmMusicDeleted(notice.scene.name)}
+                </span>
+                {notice.kind === 'deleted' && (
+                  <button
+                    type="button"
+                    onClick={() => undo(notice.scene, notice.index)}
+                    className="shrink-0 px-2 py-1 font-semibold text-gold"
+                  >
+                    {t.undo}
+                  </button>
+                )}
+              </div>
+            )}
             {scenes.length === 0 ? (
-              <p className="text-[13px] text-text-muted">
-                {t.dmMusicEmpty} {t.dmMusicEmptyHint}
-              </p>
+              <p className="text-[13px] text-text-muted">{t.dmMusicEmpty}</p>
             ) : (
               // Con muchas escenas la lista scrollea sola y no empuja la
               // tarjeta fuera de la pantalla de una notebook.
@@ -183,14 +284,76 @@ export function MusicPlayer({ scenes }: { scenes: readonly MusicScene[] }) {
                       >
                         {isPlaying ? <Pause size={18} aria-hidden="true" /> : <Play size={18} aria-hidden="true" />}
                       </IconAction>
+                      <DropdownMenu>
+                        <Tooltip content={t.dmMusicSceneActions(scene.name)}>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              type="button"
+                              aria-label={t.dmMusicSceneActions(scene.name)}
+                              data-action="scene-actions"
+                              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-nav)] text-on-surface-variant hover:bg-plaque hover:text-on-surface data-[state=open]:bg-gold-soft data-[state=open]:text-gold"
+                            >
+                              <EllipsisVertical size={18} aria-hidden="true" />
+                            </button>
+                          </DropdownMenuTrigger>
+                        </Tooltip>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onSelect={() => setEditing(scene)}>
+                            <Pencil size={15} aria-hidden="true" className="text-text-muted" />
+                            {t.commonEdit}
+                          </DropdownMenuItem>
+                          <DropdownMenuCheckboxItem
+                            checked={scene.offerOnCombat === true}
+                            onCheckedChange={(on) =>
+                              write((all) => all.map((x) => (x.id === scene.id ? { ...x, offerOnCombat: on } : x)))
+                            }
+                          >
+                            {t.dmMusicOfferOnCombat}
+                          </DropdownMenuCheckboxItem>
+                          {s && (
+                            <DropdownMenuItem asChild>
+                              <a href={s.pageUrl} target="_blank" rel="noreferrer">
+                                <ExternalLink size={15} aria-hidden="true" className="text-text-muted" />
+                                {t.dmMusicOpenIn(SITE)}
+                              </a>
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onSelect={() => remove(scene)} className="text-crimson">
+                            <Trash2 size={15} aria-hidden="true" />
+                            {t.commonDelete}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </li>
                   );
                 })}
               </ul>
             )}
+            <Button
+              tone="secondary"
+              icon={Plus}
+              data-action="new-scene"
+              onClick={() => setEditing('new')}
+              className="mt-2 min-h-10 w-full [&_svg]:text-gold"
+            >
+              {t.dmMusicNewScene}
+            </Button>
           </div>
         )}
       </section>
+
+      {editing && (
+        <MusicSceneDialog
+          current={editing === 'new' ? undefined : editing}
+          onSubmit={(scene) =>
+            updateScenes((all) =>
+              all.some((x) => x.id === scene.id) ? all.map((x) => (x.id === scene.id ? scene : x)) : [...all, scene],
+            )
+          }
+          onClose={() => setEditing(null)}
+        />
+      )}
 
       {!expanded && (
         <div className="card flex items-center gap-1 rounded-[var(--radius-pill)] py-1 pr-1 pl-1">

@@ -116,7 +116,7 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
       {body}
       {/* Otra campaña es otro reproductor: lo que sonaba se corta. La clave no
           puede ser el id a secas: la sección hermana ya la usa. */}
-      {musicCampaign && <MusicPlayer key={`music:${musicCampaign.id}`} scenes={musicCampaign.musicScenes ?? []} />}
+      {musicCampaign && <MusicPlayer key={`music:${musicCampaign.id}`} campaignId={musicCampaign.id} scenes={musicCampaign.musicScenes ?? []} />}
     </Shell>
   );
 }

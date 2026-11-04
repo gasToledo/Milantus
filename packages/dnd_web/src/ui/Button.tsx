@@ -52,7 +52,8 @@ export function Button({
 
 /**
  * Lo mismo, como enlace. `internal` navega dentro de `/v2` sin recargar; sin
- * él es un enlace común (a Flutter, a `/auth/login`).
+ * él es un enlace común (a Flutter, a `/auth/login`); `newTab` lo abre en otra
+ * pestaña (un sitio ajeno).
  */
 export function ButtonLink({
   tone = 'primary',
@@ -62,8 +63,9 @@ export function ButtonLink({
   className,
   href,
   internal = false,
+  newTab = false,
   'data-action': dataAction,
-}: Common & { href: string; internal?: boolean; 'data-action'?: string }) {
+}: Common & { href: string; internal?: boolean; newTab?: boolean; 'data-action'?: string }) {
   const props = { href, 'data-action': dataAction, className: cx(BASE, SHAPES[shape], TONES[tone], className) };
   const body = (
     <>
@@ -71,5 +73,13 @@ export function ButtonLink({
       {children}
     </>
   );
-  return internal ? <Link {...props}>{body}</Link> : <a {...props}>{body}</a>;
+  if (internal) return <Link {...props}>{body}</Link>;
+  // `noreferrer` también corta `opener`: la otra página no alcanza a esta.
+  return newTab ? (
+    <a {...props} target="_blank" rel="noreferrer">
+      {body}
+    </a>
+  ) : (
+    <a {...props}>{body}</a>
+  );
 }

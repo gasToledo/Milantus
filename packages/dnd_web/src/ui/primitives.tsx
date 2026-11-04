@@ -66,6 +66,22 @@ export function DropdownMenuItem(props: ComponentProps<typeof DropdownMenuPrimit
   return <DropdownMenuPrimitive.Item {...props} className={cx(ITEM, props.className)} />;
 }
 
+/** Opción que se enciende y se apaga sin cerrar nada más que el menú: el tilde
+ *  dorado dice si está marcada, y Radix la anuncia como `menuitemcheckbox`. */
+export function DropdownMenuCheckboxItem({
+  children,
+  ...props
+}: ComponentProps<typeof DropdownMenuPrimitive.CheckboxItem>) {
+  return (
+    <DropdownMenuPrimitive.CheckboxItem {...props} className={cx(ITEM, 'pr-8', props.className)}>
+      {children}
+      <DropdownMenuPrimitive.ItemIndicator className="ml-auto text-gold">
+        <Check size={16} aria-hidden="true" />
+      </DropdownMenuPrimitive.ItemIndicator>
+    </DropdownMenuPrimitive.CheckboxItem>
+  );
+}
+
 export const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
 
 /** Opción de un grupo excluyente: el tilde dorado dice cuál está elegida,

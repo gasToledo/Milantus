@@ -237,9 +237,9 @@ repiten acá.
   panel DM enlaza el Bestiario.
 - **El Modo DM** en `/v2/dm` (`src/dm/`), al que lleva «DM» del
   interruptor. Desde 6b escribe campañas y la Mesa y desde 6c capítulos,
-  notas y el reparto de objetos (bloques de 6b y 6c, abajo); las escenas de
-  música, los PNJ y el combate **siguen en Flutter** hasta 6d a 6g, y esas
-  secciones se leen. Se porta por
+  notas y el reparto de objetos y desde 6d las escenas de música (bloques de
+  6b, 6c y 6d, abajo); los PNJ y el combate **siguen en Flutter** hasta 6e a 6g,
+  y esas secciones se leen. Se porta por
   secciones, una por PR; hoy existen la **Mesa**, **Capítulos**, el **Cuaderno**,
   los **PNJ de la mesa**, el **Combate**, el **Bestiario**, la **Biblioteca de
   PNJ** y el **Homebrew**: todas las secciones del panel, más la **ficha
@@ -253,7 +253,7 @@ repiten acá.
   Homebrew), las campañas
   agrupadas En curso / En pausa / Terminadas (plegable, abierta si la elegida
   es una de ellas) y, de la campaña elegida, sus secciones. La **música**
-  (`MusicPlayer`, el `dm/music/` de Flutter) es **solo para escuchar**: una pill
+  (`MusicPlayer`, el `dm/music/` de Flutter): una pill
   «Música» flotante abajo a la derecha que se despliega con las escenas de la
   campaña (las del documento de `GET /api/campaigns`, que el servidor poda de la
   vista del jugador) y el reproductor de YouTube embebido, con pausar, reanudar,
@@ -263,9 +263,9 @@ repiten acá.
   del iframe con lo que pegó el DM, y una escena que no es de YouTube se lista
   sin reproducirse. Vive en `DmPage` y no en una sección: cambiar de sección o
   abrir una herramienta de la cuenta no la corta; cambiar de campaña, sí. Crear,
-  editar, reordenar, borrar y marcar «ofrecer al iniciar un combate» son
-  escrituras (paso 6; crear, editar y borrar campañas ya están, ver 6b; capítulos y notas, ver 6c), y la oferta al empezar un combate no está porque acá
-  nadie empieza uno. La **Mesa** lista a los jugadores
+  editar, mover y borrar escenas y marcar «ofrecer al iniciar un combate» son
+  escrituras de 6d (bloque abajo), y la oferta al empezar un combate no está
+  porque acá nadie empieza uno (llega con 6g). La **Mesa** lista a los jugadores
   vinculados (`GET /api/campaigns/:id/members`, que lee la ficha **real** del
   jugador, no una copia): retrato, nombre, especie y clase, nivel, barra
   de PG, placas CA / Inic / CD / Pasiva y los estados como pills carmesí. Las
@@ -739,8 +739,21 @@ frontera sigue donde estaba: **el DM no escribe la ficha de otra cuenta**.
   (no escribe la ficha) y echar corta el vínculo tras confirmar. `MemberSheetView`
   sigue sin un solo control. No se pide el aviso de eventos tras cada acción
   (`_checkEventsSoon` de Flutter): decisión tomada, no un olvido.
-- Queda en Flutter, hasta 6c a 6g: capítulos, cuaderno, música, PNJ, ficha de PNJ
-  y combate.
+- Queda en Flutter, hasta 6e a 6g: PNJ, ficha de PNJ y combate.
+
+**Paso 6d: escenas de música** *(existe)*. No toca motor, servidor ni Flutter:
+las escenas viven en `Campaign.musicScenes` y el servidor ya las poda para el
+jugador. En `MusicPlayer` el DM crea, edita y borra escenas (`MusicSceneDialog`
+y el ⋮ de cada fila: Editar, «Ofrecerla al iniciar un combate», Abrir en
+YouTube y Borrar) y, con el enlace que el dueño no deja ver afuera, puede
+cambiarlo desde el aviso. Todo escribe con `editCampaign`, que relee la
+campaña antes del PUT, y las escrituras van **en fila** (`updateScenes`): dos
+toques seguidos releerían lo mismo y el segundo pisaría al primero. Borrar no
+confirma: avisa **adentro del panel** (no con `Toast`, que saldría en la misma
+esquina y taparía el reproductor) con «Deshacer» durante 8 s. Un enlace que
+`musicSource` no reconoce no se guarda. Si la escena que suena se borra, el
+video se corta; si cambia su enlace, el iframe se recarga; si cambia solo el
+nombre, no.
 
 **Paso 6a: compartir, avisos y turno** *(existe)*. Es la parte del jugador del
 paso 6, y no toca motor, servidor ni Flutter: las rutas ya existían.
@@ -779,8 +792,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    jugador en modo lectura (el cuaderno es del DM), bestiario y catálogos (el
    Códice). **Lectura del Modo DM** (se sumó a este paso): Mesa, Capítulos,
    Cuaderno, Bestiario, Biblioteca de PNJ, PNJ de la mesa, Homebrew y Combate;
-   la ficha completa de un miembro y la de un PNJ con ficha; la música (solo
-   escuchar); los retratos con su visor; las menciones `@Nombre` del Cuaderno
+   la ficha completa de un miembro y la de un PNJ con ficha; la música; los retratos con su visor; las menciones `@Nombre` del Cuaderno
    como enlaces, e imprimir la ficha.
 4. Escrituras de bajo riesgo *(existe)*: PG y salvaciones de muerte, usos de
    espacios, recursos y dados de golpe, y los descansos con «Deshacer», solo
@@ -811,7 +823,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
    combate, vínculos y códigos de campaña. Por partes: 6a, la del jugador:
    compartir, los avisos de la cola y el aviso de turno *(existe)*; 6b, las
-   campañas y la Mesa *(existe)*; 6c, Capítulos y Cuaderno *(existe)*; 6d, la música; 6e, los PNJ; 6f, la ficha de
+   campañas y la Mesa *(existe)*; 6c, Capítulos y Cuaderno *(existe)*; 6d, la música *(existe)*; 6e, los PNJ; 6f, la ficha de
    PNJ; 6g, el combate. Importar y exportar PNJ sigue en el paso 7. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de
    otra cuenta» es del servidor y vale igual para el cliente nuevo. Entra acá
