@@ -83,7 +83,7 @@ void main() {
       'druid': (
         abilities: ['wisdom'],
         mode: 'all',
-        armor: ['light', 'medium', 'shield'],
+        armor: ['light', 'shield'],
         weapons: <String>[],
       ),
       'fighter': (
@@ -96,7 +96,7 @@ void main() {
         abilities: ['dexterity', 'wisdom'],
         mode: 'all',
         armor: <String>[],
-        weapons: ['simple', 'martial-light'],
+        weapons: <String>[],
       ),
       'paladin': (
         abilities: ['strength', 'charisma'],
@@ -114,7 +114,7 @@ void main() {
         abilities: ['dexterity'],
         mode: 'all',
         armor: ['light'],
-        weapons: ['simple', 'martial-finesse', 'martial-light'],
+        weapons: <String>[],
       ),
       'sorcerer': (
         abilities: ['charisma'],
@@ -160,6 +160,14 @@ void main() {
         ['musical-instrument']);
     expect(repo.characterClass('rogue')!.multiclass!.toolProficiencies,
         ['thieves-tools']);
+    expect(repo.characterClass('rogue')!.multiclass!.skillChoiceCount, 1);
+    // El PHB 2024 suma una habilidad de la lista del Explorador; el motor ya
+    // arma el cupo cuando el bloque trae skillChoiceCount.
+    expect(repo.characterClass('ranger')!.multiclass!.skillChoiceCount, 1);
+    expect(
+      repo.characterClass('ranger')!.multiclass!.skillChoiceFrom,
+      repo.characterClass('ranger')!.skillChoiceFrom,
+    );
     expect(repo.characterClass('artificer')!.source, ContentSource.foa2025);
   });
 

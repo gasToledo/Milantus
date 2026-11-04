@@ -91,7 +91,10 @@ sealed class Effect {
       'attunementSlots' => AttunementSlotsEffect(json['count'] as int),
       'extraAttack' => ExtraAttackEffect(json['extra'] as int),
       'bonusMaxHpFlat' => BonusMaxHpFlatEffect(json['amount'] as int),
-      'bonusMaxHpPerLevel' => BonusMaxHpPerLevelEffect(json['perLevel'] as int),
+      'bonusMaxHpPerLevel' => BonusMaxHpPerLevelEffect(
+          json['perLevel'] as int,
+          perClassLevel: json['perClassLevel'] as bool? ?? false,
+        ),
       'armorClassBonus' => ArmorClassBonusEffect(json['amount'] as int),
       'advantage' => AdvantageEffect(
           roll: AdvantageRoll.fromKey(json['roll'] as String),
@@ -1964,13 +1967,22 @@ class BonusMaxHpFlatEffect extends Effect {
   Map<String, dynamic> toJson() => {'type': 'bonusMaxHpFlat', 'amount': amount};
 }
 
-/// PG máximos adicionales por nivel de personaje (p.ej. dote Duro).
+/// PG máximos adicionales por nivel.
+///
+/// Por defecto el nivel es el del personaje: Duro (+2) y Dureza Enana (+1).
+/// [perClassLevel] usa el nivel de la clase que concede el rasgo. Resistencia
+/// Dracónica es 1 por nivel de Hechicero, que es lo mismo que «+3 al obtener
+/// el rasgo en nivel 3 y +1 por cada nivel de Hechicero que venga después».
 class BonusMaxHpPerLevelEffect extends Effect {
   final int perLevel;
-  const BonusMaxHpPerLevelEffect(this.perLevel);
+  final bool perClassLevel;
+  const BonusMaxHpPerLevelEffect(this.perLevel, {this.perClassLevel = false});
   @override
-  Map<String, dynamic> toJson() =>
-      {'type': 'bonusMaxHpPerLevel', 'perLevel': perLevel};
+  Map<String, dynamic> toJson() => {
+        'type': 'bonusMaxHpPerLevel',
+        'perLevel': perLevel,
+        if (perClassLevel) 'perClassLevel': true,
+      };
 }
 
 /// Bonus plano a la Clase de Armadura (p.ej. estilo de combate Defensa).
@@ -2137,12 +2149,11 @@ class SpellcastingEffect extends Effect {
   /// nivel puede refinarse luego con efectos gated).
   final int cantripsKnown;
 
-  /// Niveles de personaje en los que se gana un truco adicional. `null`
-  /// conserva el escalado por defecto (+1 a nivel 4 y +1 a nivel 10 para
-  /// lanzadores completos y semi-lanzadores con trucos; +1 a nivel 10 para
-  /// `third`), que es el que usan las 8 clases y 2 subclases existentes. El
-  /// Artífice, con trucos a niveles 1/10/14, es el primer caso que necesita
-  /// una progresión propia.
+  /// Niveles de **clase** en los que se gana un truco adicional. `null`
+  /// conserva el escalado por defecto (+1 al nivel de clase 4 y +1 al 10;
+  /// para `third`, solo +1 al nivel de clase 10). El Artífice, con trucos a
+  /// niveles 10 y 14, declara los suyos. Es el nivel de la clase y no el del
+  /// personaje: si no, un Guerrero 9 / Mago 1 se lleva los trucos del 4 y del 10.
   final List<int>? cantripIncreases;
 
   const SpellcastingEffect({

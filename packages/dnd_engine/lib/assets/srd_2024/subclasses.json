@@ -2185,7 +2185,7 @@
         "name": "Resistencia Dracónica",
         "description": "Ganás 1 punto de golpe adicional por cada nivel de Hechicero y, sin armadura, tu CA base es 10 + Destreza + Carisma.",
         "effects": [
-          { "type": "bonusMaxHpPerLevel", "perLevel": 1 },
+          { "type": "bonusMaxHpPerLevel", "perLevel": 1, "perClassLevel": true },
           { "type": "unarmoredDefense", "ability": "charisma", "allowShield": true },
           { "type": "passiveTrait", "name": "Resistencia Dracónica (CA)", "description": "Partes de tu cuerpo están cubiertas por escamas dracónicas: mientras no lleves armadura, tu Clase de Armadura base es 10 + tu modificador de Destreza + tu modificador de Carisma." }
         ]

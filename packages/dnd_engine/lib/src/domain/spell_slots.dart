@@ -200,10 +200,38 @@ const List<(int count, int slotLevel)> _pactTable = [
 //
 // A diferencia de 2014, la cantidad de conjuros preparados NO depende del
 // modificador de característica: es una columna fija por clase que escala con el
-// nivel. Índice = nivel de personaje (1..20); el 0 es relleno.
+// nivel de esa clase (el compilador pasa el nivel de clase, no el total).
+// Índice = nivel (1..20); el 0 es relleno.
 
-/// Lanzadores completos con progresión estándar (Mago, Clérigo, Druida, Bardo).
+/// Clérigo, Druida y Bardo. Del 1 al 13 coinciden con el Mago; del 14 al 20
+/// el PHB 2024 los deja un escalón (o más) por debajo.
 const List<int> _preparedFull = [
+  0,
+  4,
+  5,
+  6,
+  7,
+  9,
+  10,
+  11,
+  12,
+  14,
+  15,
+  16,
+  16,
+  17,
+  17,
+  18,
+  18,
+  19,
+  20,
+  21,
+  22,
+];
+
+/// Mago: la única lista completa que sigue subiendo 18, 19, 21… a partir
+/// del nivel 14. El resto de los completos usa [_preparedFull].
+const List<int> _preparedWizard = [
   0,
   4,
   5,
@@ -227,7 +255,8 @@ const List<int> _preparedFull = [
   25,
 ];
 
-/// Hechicero: arranca más bajo (2/4) y luego converge con los completos.
+/// Hechicero: 2/4/6 en los tres primeros niveles y, desde el 4, la misma
+/// columna que Clérigo, Druida y Bardo (no la del Mago).
 const List<int> _preparedSorcerer = [
   0,
   2,
@@ -243,13 +272,13 @@ const List<int> _preparedSorcerer = [
   16,
   16,
   17,
+  17,
+  18,
   18,
   19,
+  20,
   21,
   22,
-  23,
-  24,
-  25,
 ];
 
 /// Semi-lanzadores (Paladín, Explorador).
@@ -328,8 +357,9 @@ const List<int> _preparedThird = [
 ];
 
 /// Conjuros preparados para una [progression] a [level], según las tablas fijas
-/// de 2024. [spellList] distingue al Hechicero (progresión propia) del resto de
-/// lanzadores completos.
+/// de 2024. En los lanzadores completos [spellList] separa al Mago (columna
+/// alta desde el nivel 14) y al Hechicero (2/4/6 al principio); Clérigo, Druida
+/// y Bardo comparten [_preparedFull].
 int preparedSpellsFor(
     CasterProgression progression, int level, String spellList) {
   final lv = level.clamp(0, 20);
@@ -338,8 +368,11 @@ int preparedSpellsFor(
     CasterProgression.half => _preparedHalf,
     CasterProgression.third => _preparedThird,
     CasterProgression.pact => _preparedPact,
-    CasterProgression.full =>
-      spellList == 'sorcerer' ? _preparedSorcerer : _preparedFull,
+    CasterProgression.full => spellList == 'wizard'
+        ? _preparedWizard
+        : spellList == 'sorcerer'
+            ? _preparedSorcerer
+            : _preparedFull,
   };
   return lv < table.length ? table[lv] : table.last;
 }

@@ -1177,7 +1177,23 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
-- Sin cambios.
+- Cada nivel suma al menos 1 punto de golpe: el resultado del dado más
+  Constitución, con ese piso. Un dado de 1 con Constitución negativa ya no
+  baja los PG, y cambiar Constitución sigue corrigiendo los niveles ya
+  ganados.
+- Resistencia Dracónica suma tantos PG como niveles de Hechicero (3 al
+  obtenerla y 1 más por cada nivel de Hechicero). Un Guerrero 10 / Hechicero
+  3 gana 3, no 13. Duro y Dureza Enana siguen sumando por nivel de personaje.
+- Clérigo, Druida, Bardo y Hechicero preparan, del nivel 13 al 20, 17, 17,
+  18, 18, 19, 20, 21 y 22 conjuros. El Mago conserva 17, 18, 19, 21, 22, 23,
+  24 y 25.
+- Los trucos de más (niveles 4 y 10, y el del nivel 10 de Caballero Arcano y
+  Embaucador Arcano) cuentan el nivel de esa clase. Un Guerrero 9 / Mago 1
+  conoce 3 trucos de Mago.
+- Al tomar una clase por multiclase, el Druida da armadura ligera y escudos;
+  el Monje no da competencias; el Pícaro da armadura ligera, una habilidad de
+  su lista y Herramientas de Ladrón, sin armas; el Explorador suma además una
+  habilidad de su lista.
 
 ### Eliminado
 
