@@ -64,12 +64,18 @@ export const nameMatches = (v: NpcView, query: string): boolean => fold(v.npc.na
 
 export type NpcStatus = NpcView['status'];
 
-/** El color de cada estado, siempre junto con la palabra: quien no distingue
- *  el verde del rojo tiene que saber igual si el PNJ sigue vivo. */
-export const STATUS_TONE: Record<NpcStatus, string> = {
-  alive: 'border-verdant text-verdant',
-  dead: 'border-crimson text-crimson',
-  unknown: 'border-text-muted text-text-muted',
+export const NPC_STATUSES: readonly NpcStatus[] = ['alive', 'dead', 'unknown'];
+
+/**
+ * El relleno del estado elegido en el selector. Es una excepción consciente a
+ * «ningún chip seleccionable va en carmesí»: el color del estado es la
+ * información (como en Flutter), y la palabra va siempre al lado para quien no
+ * distingue el verde del rojo.
+ */
+export const STATUS_FILL: Record<NpcStatus, string> = {
+  alive: 'bg-verdant text-on-primary font-semibold',
+  dead: 'bg-crimson text-on-primary font-semibold',
+  unknown: 'bg-text-muted text-on-primary font-semibold',
 };
 
 /** Un estado desconocido es «vivo», como `NpcStatus.fromJson`. */

@@ -463,6 +463,20 @@ export async function fetchNpc(id: string, signal: AbortSignal): Promise<StoredN
   return getJson<StoredNpc>(`/api/npcs/${encodeURIComponent(id)}`, signal);
 }
 
+const campaignNpcPath = (campaignId: string, npcId: string) =>
+  `/api/campaigns/${encodeURIComponent(campaignId)}/npcs/${encodeURIComponent(npcId)}`;
+
+/** Suma un PNJ a la campaña o le cambia el estado. Sin [status], un vínculo
+ *  nuevo nace vivo y uno existente queda como estaba: reintentar es seguro. */
+export async function linkCampaignNpc(campaignId: string, npcId: string, status?: 'alive' | 'dead' | 'unknown'): Promise<void> {
+  await sendJson('PUT', campaignNpcPath(campaignId, npcId), status ? { status } : {});
+}
+
+/** Quita el vínculo, y solo el vínculo: el PNJ sigue en la biblioteca. */
+export async function unlinkCampaignNpc(campaignId: string, npcId: string): Promise<void> {
+  await remove(campaignNpcPath(campaignId, npcId));
+}
+
 /** Un aviso de la cola de la cuenta (`GET /api/events`): el servidor guarda
  *  **qué pasó** (`kind` y los datos del `payload`) y el cliente decide cómo se
  *  dice (`events/messages.ts`). */

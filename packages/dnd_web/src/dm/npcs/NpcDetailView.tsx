@@ -1,35 +1,45 @@
-import { useMemo } from 'react';
-import { ArrowLeft, ScrollText } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { ArrowLeft, Plus, ScrollText } from 'lucide-react';
 import { ApiError } from '../../api/client';
-import { useNpc, useSheetCatalog } from '../../api/queries';
+import { useDmCampaigns, useNpc, useSheetCatalog } from '../../api/queries';
 import { npcViews, type NpcView } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
 import { dmNpcSheetHref, dmNpcsHref, Link } from '../../router';
 import { signed } from '../../sheet/format';
 import { BackgroundText, DiaryEntries } from '../../sheet/DiaryTab';
+import { Button } from '../../ui/Button';
 import { Card } from '../../ui/Card';
 import { cx } from '../../ui/cx';
 import { Pill, StatPlaque } from '../../ui/data';
 import { Medallion } from '../../ui/Medallion';
+import { Toast } from '../../ui/primitives';
 import { AppBusyLabel, AppErrorView, Notice } from '../../ui/status';
 import { Abbr } from '../MemberCard';
-import { kindOf, npcPortrait, npcTypeLine, STATUS_TONE, statusOf } from './npc';
+import { useNpcLinks } from './links';
+import { NpcStatusSelector } from './NpcStatusSelector';
+import { kindOf, npcPortrait, npcTypeLine, statusOf } from './npc';
+import { PickManyDialog } from './PickManyDialog';
 
 /** Cuántas acciones del bloque se ven en la tarjeta, como en Flutter: el perfil
  *  entero es del editor de bloques. */
 const BLOCK_ACTIONS = 4;
 
 /**
- * La ficha de un PNJ (`npc_detail_screen.dart`), de solo lectura: quién es,
- * cómo habla, qué se sabe de él, con qué pelea y cómo está en cada campaña. Es
- * del DM y de nadie más: un PNJ ajeno y uno inexistente responden el mismo 404
- * y la pantalla dice lo mismo. Renombrar, tags, el bloque, el retrato, el
- * estado por campaña, exportar y borrar siguen en Flutter.
+ * La ficha de un PNJ (`npc_detail_screen.dart`): quién es, cómo habla, qué se
+ * sabe de él, con qué pelea y cómo está en cada campaña. Es del DM y de nadie
+ * más: un PNJ ajeno y uno inexistente responden el mismo 404 y la pantalla
+ * dice lo mismo. Acá se escribe el estado por campaña y se suma a otra; lo
+ * demás (renombrar, tags, el bloque, el retrato, exportar y borrar) sigue en
+ * Flutter.
  */
 export function NpcDetailView({ npcId }: { npcId: string }) {
   const t = useTexts();
   const lang = useLang();
   const stored = useNpc(npcId);
+  const campaigns = useDmCampaigns();
+  const [adding, setAdding] = useState(false);
+  const [toast, setToast] = useState<{ key: number; message: string } | null>(null);
+  const links = useNpcLinks(() => setToast((prev) => ({ key: (prev?.key ?? 0) + 1, message: t.npcSaveFailed })));
   const catalog = useSheetCatalog(lang);
   const view = useMemo(
     () => (stored.data && catalog.data ? npcViews([stored.data], catalog.data)[0] : null),
@@ -122,33 +132,49 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
         <div className="flex min-w-0 max-w-[380px] flex-[1_1_300px] flex-col gap-4">
           <Stats view={view} />
           <section className="card px-4 pt-3 pb-4" aria-labelledby="npc-campaigns" data-card="campaigns">
-            <h2 id="npc-campaigns" className="font-display mb-2 text-[17px] text-on-surface">
-              {t.npcInCampaigns}
-            </h2>
+            <div className="mb-2 flex items-center gap-2">
+              <h2 id="npc-campaigns" className="font-display flex-1 text-[17px] text-on-surface">
+                {t.npcInCampaigns}
+              </h2>
+              <Button tone="secondary" icon={Plus} data-action="npc-add-campaign" onClick={() => setAdding(true)}>
+                {t.dmAddShort}
+              </Button>
+            </div>
             {stored.data.campaigns.length === 0 ? (
               <p className="text-text-muted italic">{t.npcNoCampaignsYet}</p>
             ) : (
-              <ul className="flex flex-col gap-2">
-                {stored.data.campaigns.map((c) => {
-                  const status = statusOf(c.status);
-                  return (
-                    <li key={c.campaignId} className="flex items-center gap-2" data-campaign={c.campaignId}>
-                      <span className="min-w-0 flex-1 break-words text-[14px] text-on-surface">{c.campaignName}</span>
-                      <span
-                        aria-label={`${t.npcStatusIn(c.campaignName)}: ${t.npcStatus[status]}`}
-                        className={cx('shrink-0 rounded-[var(--radius-pill)] border px-2.5 py-0.5 text-[11.5px]', STATUS_TONE[status])}
-                        data-status={status}
-                      >
-                        {t.npcStatus[status]}
-                      </span>
-                    </li>
-                  );
-                })}
+              <ul className="flex flex-col gap-3">
+                {stored.data.campaigns.map((c) => (
+                  <li key={c.campaignId} className="flex flex-col gap-1.5" data-campaign={c.campaignId}>
+                    <span className="break-words text-[14px] text-on-surface">{c.campaignName}</span>
+                    <NpcStatusSelector
+                      status={statusOf(c.status)}
+                      label={t.npcStatusIn(c.campaignName)}
+                      onChange={(s) => links.setStatus(c.campaignId, npc.id, s)}
+                    />
+                  </li>
+                ))}
               </ul>
             )}
           </section>
         </div>
       </div>
+      {adding && (
+        <PickManyDialog
+          title={t.npcAddToCampaign}
+          items={(campaigns.data ?? [])
+            .filter((c) => !stored.data!.campaigns.some((l) => l.campaignId === c.id))
+            .map((c) => ({ id: c.id, title: c.name }))}
+          loading={!campaigns.data}
+          loadError={campaigns.isError ? t.dmCampaignsLoadFail : undefined}
+          onRetryLoad={() => void campaigns.refetch()}
+          emptyText={t.npcInAllCampaigns}
+          errorText={t.dmLinkError}
+          onSubmit={(ids) => links.linkMany(ids.map((campaignId) => ({ campaignId, npcId: npc.id })))}
+          onClose={() => setAdding(false)}
+        />
+      )}
+      {toast && <Toast key={toast.key} tone="error" message={toast.message} open onOpenChange={(open) => !open && setToast(null)} />}
     </div>
   );
 }

@@ -164,6 +164,8 @@ conjuro abre su detalle en un diálogo. Sus pasos de elecciones viven en
 | `Notice` | Pantalla de un solo mensaje con su `h1` | Sin sesión, no disponible, no encontrado |
 | `Button`, `ButtonLink` | `primary` (oro lleno, uno por vista), `soft` (oro sobre `goldSoft` con filete: el verbo de una barra de herramientas), `secondary`, `danger` (carmesí, lo irreversible); `shape="pill"` en una fila de pills; `disabled` lo atenúa | `ButtonLink internal` navega sin recargar |
 | `SaveStatusBadge` | La pill del guardado automático (`SaveStatusIndicator`): Guardando… / Guardado / No se guardó con «Reintentar» | Al pie del panel de una pantalla que escribe, en lugar de «Solo lectura» |
+| `NpcStatusSelector` (`src/dm/npcs/`) | Vivo · Muerto · Desconocido en una fila de botones `aria-pressed`; el elegido se rellena con el color de su estado (`STATUS_FILL`) | El muerto atenúa identidad y tags, **nunca** el selector: un control usable no puede verse apagado |
+| `PickManyDialog` (`src/dm/npcs/`) | Marcar varios (`Option multi`) y «Sumar n» sobre `AppDialog`, con buscador o sin él | Si falla no se cierra y el botón pasa a «Reintentar» |
 | `AppDialog` | El molde de diálogo: placa, velo, barra de acciones de 48 px al pie | 480 px por defecto, 560 si el cuerpo es una ficha; una acción con `disabled` se apaga (Comprar sin fondos) |
 | `PortraitViewer` | El retrato original entero sobre el velo, con cerrar; `Esc` y clic afuera también cierran | Lo abre `Medallion` con `viewable` y la imagen de una entrada del Diario |
 | `DiaryEntries` (`src/sheet/DiaryTab.tsx`) | Tarjeta de entradas en grilla (`minWidth`, 280 por defecto); con `edit` (un `DiaryEditor`: `save`, `remove`, `move`, `upload`) suma «+», editor, borrado y el ícono de mover | Sin `edit` es de solo lectura (ficha ajena, notas del PNJ) |
@@ -352,8 +354,9 @@ inexistente son la misma pantalla). Desde 6b escribe campañas y la Mesa y desde
   Georgia 28, la línea de tipo en `Pill` oro y los tags neutros, la voz como
   cita con la comilla en oro) y debajo dos columnas: Trasfondo (`Card`) y Notas
   (`DiaryEntries`, el mismo de la pestaña Diario, a dos columnas) a la izquierda,
-  Estadísticas y Campañas a la derecha. El estado por campaña es una pill con la
-  palabra y el color del estado (`STATUS_TONE`: verde, carmesí, apagado). La
+  Estadísticas y Campañas a la derecha. En Campañas, cada una lleva su
+  `NpcStatusSelector` y la tarjeta un «Sumar» (`PickManyDialog` con las campañas
+  que faltan). La
   línea de tipo la arma `npcTypeLine` con lo que da `npcViews`: ningún número se
   calcula acá. El tablero es «Modo DM — Biblioteca de PNJ, PNJ de la mesa,
   Homebrew y Combate» del Design.
@@ -362,7 +365,10 @@ inexistente son la misma pantalla). Desde 6b escribe campañas y la Mesa y desde
   `NpcLibraryView`) y el conteo por estado a su izquierda. La tarjeta no es un
   enlace entero: lo es la identidad (medallón de 36 y nombre), porque así es en
   Flutter, donde el resto de la tarjeta lleva controles. El estado va al pie con
-  `STATUS_TONE`, y un muerto se tacha y atenúa además del color.
+  `NpcStatusSelector`; un muerto se tacha y atenúa en identidad y tags, no en el
+  selector. Un ⋮ de 44 px abre la ficha o quita de la campaña (con confirmación),
+  y «Traer de la biblioteca» va en la cabecera —o en el estado vacío, nunca en
+  los dos—.
 - **Homebrew** (`HomebrewView`): la portada repite las tarjetas de la portada del
   Códice (ícono, nombre, cifra y muestra), atenuadas cuando la categoría está
   vacía, con un buscador en pill que reemplaza la grilla por una lista de

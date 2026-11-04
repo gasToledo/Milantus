@@ -866,3 +866,36 @@ test('escenas de música: el enlace ajeno no se guarda, y crear, borrar y deshac
   // La prueba de la Mesa espera que esta cuenta no tenga campañas.
   await request.delete('/api/campaigns/mesa-de-musica', comoDm);
 });
+
+test('PNJ de la mesa: traer de la biblioteca, cambiar el estado y quitar', async ({ page, request }) => {
+  const comoDm = { headers: { cookie: `dnd_session=${TOKEN_ESCRITURA}` } };
+  await request.post('/api/campaigns', { ...comoDm, data: { campaign: { id: 'mesa-de-pnj', name: 'Mesa de PNJ' } } });
+  const creado = await request.post('/api/npcs', { ...comoDm, data: { npc: { id: 'nuevo', name: 'Bruna la Barquera', sheetKind: 'none' } } });
+  expect(creado.ok()).toBe(true);
+  const { npc } = (await creado.json()) as { npc: { id: string } };
+  const vinculo = async () =>
+    (await api<{ npcs: { npc: { id: string }; status: string }[] }>(request, '/api/campaigns/mesa-de-pnj/npcs', TOKEN_ESCRITURA)).npcs.find(
+      (e) => e.npc.id === npc.id,
+    );
+
+  await page.goto('/v2/dm/campanas/mesa-de-pnj/pnj');
+  await page.locator('[data-action="bring-npcs"]').click();
+  const dialogo = page.getByRole('dialog');
+  await dialogo.locator(`[data-option="${npc.id}"]`).click();
+  await dialogo.getByRole('button', { name: 'Sumar', exact: true }).click();
+  const tarjeta = page.locator(`[data-npc="${npc.id}"]`);
+  await expect(tarjeta).toBeVisible();
+  expect((await vinculo())?.status).toBe('alive');
+
+  await tarjeta.locator('[data-status-option="dead"]').click();
+  await expect.poll(async () => (await vinculo())?.status).toBe('dead');
+
+  await tarjeta.locator('[data-action="npc-actions"]').click();
+  await page.getByRole('menuitem', { name: 'Quitar de esta campaña', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Quitar', exact: true }).click();
+  await expect(tarjeta).toHaveCount(0);
+  expect(await vinculo()).toBeUndefined();
+
+  await request.delete('/api/campaigns/mesa-de-pnj', comoDm);
+  await request.delete(`/api/npcs/${npc.id}`, comoDm);
+});
