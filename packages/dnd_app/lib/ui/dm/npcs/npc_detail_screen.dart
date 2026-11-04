@@ -792,7 +792,7 @@ class _NpcDetailScreenState extends State<NpcDetailScreen> {
           child: _prose(context, '', context.l10n.npcNoStatsNote),
         );
       case NpcSheetKind.block:
-        final block = npc.block ?? emptyNpcBlock(npc.name);
+        final block = npc.block ?? Npc.emptyBlock(npc.name);
         final baseName = npcBaseName(npc, widget.repo);
         return _card(
           context,

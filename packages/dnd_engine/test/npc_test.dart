@@ -229,6 +229,35 @@ void main() {
     });
   });
 
+  group('Npc.draft', () {
+    test('un bloque vacío arranca en 0 y resuelve, sin inventar números', () {
+      final npc = Npc.draft(name: 'Bruna', kind: NpcSheetKind.block);
+      expect(npc.block!.ac, '0');
+      expect(npc.block!.resolve(const CreatureVars({})).maxHp, 0);
+      expect(npc.baseCreatureId, isNull);
+    });
+
+    test('copia la criatura de base y recuerda de cuál salió', () {
+      final base = repo.creaturesSorted.first;
+      final npc =
+          Npc.draft(name: 'Bruna', kind: NpcSheetKind.block, base: base);
+      expect(npc.block!.toJson(), base.toJson());
+      expect(identical(npc.block, base), isFalse);
+      expect(npc.baseCreatureId, base.id);
+      expect(npc.baseCreatureName, base.name);
+    });
+
+    test('un PNJ sin estadísticas ignora la criatura', () {
+      final npc = Npc.draft(
+        name: 'Toblen',
+        kind: NpcSheetKind.none,
+        base: repo.creaturesSorted.first,
+      );
+      expect(npc.block, isNull);
+      expect(npc.baseCreatureId, isNull);
+    });
+  });
+
   group('NpcStatus', () {
     test('un estado desconocido cae en vivo', () {
       expect(NpcStatus.fromJson('zombi'), NpcStatus.alive);

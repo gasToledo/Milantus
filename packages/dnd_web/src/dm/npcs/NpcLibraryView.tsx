@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Search } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { useNpcs, useSheetCatalog } from '../../api/queries';
 import type { DmCampaign } from '../../api/client';
 import { npcViews, type NpcView } from '../../engine';
@@ -10,6 +10,7 @@ import { cx } from '../../ui/cx';
 import { Medallion } from '../../ui/Medallion';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../../ui/status';
 import { DmHeader } from '../DmHeader';
+import { NewNpcDialog } from './NewNpcDialog';
 import { hasTag, kindOf, nameMatches, normalizeTags, npcPortrait, npcTypeLine } from './npc';
 
 /** El filtro «sin campaña»: los PNJ que no están en ninguna. `null` es todas. */
@@ -17,11 +18,12 @@ const NO_CAMPAIGN = '';
 
 /**
  * La Biblioteca de PNJ (`npc_library_view.dart`): todos los de la cuenta,
- * estén o no en alguna campaña, de solo lectura. El filtro principal es **por
- * campaña** y los tags van debajo, más chicos: en la mesa la pregunta es
- * «¿quién está en esta campaña?», y el tag afina dentro de eso. Crear,
- * importar, editar y borrar siguen en Flutter. Nada de esto viaja a un
- * jugador: la API de PNJ es del DM y de nadie más.
+ * estén o no en alguna campaña. El filtro principal es **por campaña** y los
+ * tags van debajo, más chicos: en la mesa la pregunta es «¿quién está en esta
+ * campaña?», y el tag afina dentro de eso. Acá se crea un PNJ (sin ficha de
+ * personaje: eso sigue en Flutter) y se borra desde su ficha; importar y
+ * editar siguen en Flutter. Nada de esto viaja a un jugador: la API de PNJ es
+ * del DM y de nadie más.
  */
 export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[] | undefined }) {
   const t = useTexts();
@@ -31,6 +33,12 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
   const [query, setQuery] = useState('');
   const [campaign, setCampaign] = useState<string | null>(null);
   const [tag, setTag] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const newButton = (
+    <Button icon={Plus} data-action="new-npc" onClick={() => setCreating(true)}>
+      {t.npcNew}
+    </Button>
+  );
 
   // El motor migra cada PNJ y le saca los números una vez por respuesta.
   const entries = useMemo(() => {
@@ -44,7 +52,7 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
   }, [npcs.data, catalog.data]);
 
   const failed = [npcs, ...catalog.queries].filter((q) => q.isError);
-  const kicker = entries ? t.dmLibraryCount(entries.length) : t.dmReadOnly;
+  const kicker = entries ? t.dmLibraryCount(entries.length) : undefined;
 
   let body;
   if (failed.length > 0) {
@@ -52,7 +60,7 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
   } else if (!entries) {
     body = <AppBusyLabel label={t.dmLibraryLoading} />;
   } else if (entries.length === 0) {
-    body = <AppEmptyState kind="empty" message={t.dmLibraryEmpty} hint={t.dmLibraryEmptyHint} />;
+    body = <AppEmptyState kind="empty" message={t.dmLibraryEmpty} actions={newButton} />;
   } else {
     const inCampaign = (links: { campaignId: string }[], id: string | null) =>
       id === null ? true : id === NO_CAMPAIGN ? links.length === 0 : links.some((l) => l.campaignId === id);
@@ -157,8 +165,9 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
 
   return (
     <div className="flex flex-col gap-5">
-      <DmHeader title={t.dmNpcLibrary} kicker={kicker} />
+      <DmHeader title={t.dmNpcLibrary} kicker={kicker} actions={entries && entries.length > 0 ? newButton : undefined} />
       {body}
+      {creating && <NewNpcDialog onClose={() => setCreating(false)} />}
     </div>
   );
 }

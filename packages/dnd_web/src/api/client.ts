@@ -477,6 +477,24 @@ export async function unlinkCampaignNpc(campaignId: string, npcId: string): Prom
   await remove(campaignNpcPath(campaignId, npcId));
 }
 
+/** Crea un PNJ y devuelve el id que le asignó el servidor. */
+export async function createNpc(npc: JsonObject): Promise<string> {
+  const path = '/api/npcs';
+  const response = await fetch(path, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ npc }),
+  });
+  if (!response.ok) throw new ApiError(response.status, path);
+  return ((await response.json()) as { npc: { id: string } }).npc.id;
+}
+
+/** Borra un PNJ de la biblioteca y de todas sus campañas, con su ficha si tiene.
+ *  Uno ajeno y uno inexistente responden igual, y el servidor no falla por eso. */
+export async function deleteNpc(id: string): Promise<void> {
+  await remove(`/api/npcs/${encodeURIComponent(id)}`);
+}
+
 /** Un aviso de la cola de la cuenta (`GET /api/events`): el servidor guarda
  *  **qué pasó** (`kind` y los datos del `payload`) y el cliente decide cómo se
  *  dice (`events/messages.ts`). */

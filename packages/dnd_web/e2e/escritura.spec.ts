@@ -899,3 +899,33 @@ test('PNJ de la mesa: traer de la biblioteca, cambiar el estado y quitar', async
   await request.delete('/api/campaigns/mesa-de-pnj', comoDm);
   await request.delete(`/api/npcs/${npc.id}`, comoDm);
 });
+
+test('Nuevo PNJ: guarda el bloque que da el motor, abre la ficha y se puede borrar', async ({ page, request }) => {
+  const comoDm = { headers: { cookie: `dnd_session=${TOKEN_ESCRITURA}` } };
+  const criatura = catalogo().creatures.find((c) => /^\d+$/.test(String(c.ac)) && /^\d+$/.test(String(c.hp)))!;
+
+  await page.goto('/v2/dm/pnj');
+  await page.locator('[data-action="new-npc"]').click();
+  const dialogo = page.getByRole('dialog');
+  await dialogo.locator('[data-field="npc-name"]').fill('Bruna la Barquera');
+  await dialogo.locator('[data-option="kind-block"]').click();
+  await dialogo.getByRole('searchbox').fill(criatura.name as string);
+  await dialogo.locator(`[data-option="${criatura.id as string}"]`).click();
+  await dialogo.getByRole('button', { name: 'Crear', exact: true }).click();
+
+  await page.waitForURL(/\/v2\/dm\/pnj\/npc-/);
+  const id = new URL(page.url()).pathname.split('/').pop()!;
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Bruna la Barquera');
+
+  const { npc } = await api<{ npc: { sheetKind: string; baseCreatureId: string; block: { ac: string; hp: string } } }>(request, `/api/npcs/${id}`, TOKEN_ESCRITURA);
+  expect(npc.sheetKind).toBe('block');
+  expect(npc.baseCreatureId).toBe(criatura.id);
+  expect(npc.block.ac).toBe(String(criatura.ac));
+  expect(npc.block.hp).toBe(String(criatura.hp));
+
+  await page.locator('[data-action="npc-menu"]').click();
+  await page.getByRole('menuitem', { name: 'Borrar PNJ', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Borrar PNJ', exact: true }).click();
+  await page.waitForURL(/\/v2\/dm\/pnj$/);
+  expect((await request.get(`/api/npcs/${id}`, comoDm)).status()).toBe(404);
+});

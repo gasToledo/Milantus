@@ -73,7 +73,7 @@ export function PickManyDialog({
   else if (items.length === 0) body = <p className="text-on-surface-variant">{emptyText}</p>;
   else if (searchLabel)
     body = (
-      <SearchableList items={items} textOf={(i) => i.title} label={searchLabel} multi empty={t.dmNoMatchesShort}>
+      <SearchableList items={items} textOf={(i) => i.title} label={searchLabel} multi empty={t.catalogNoMatches}>
         {option}
       </SearchableList>
     );

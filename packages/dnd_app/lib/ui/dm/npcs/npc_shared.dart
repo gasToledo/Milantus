@@ -243,18 +243,6 @@ Widget npcTagPills(Npc npc) => Wrap(
 /// Lo que se eligió en el diálogo «Nuevo PNJ».
 typedef NewNpcChoice = ({String name, NpcSheetKind kind, Creature? base});
 
-/// Un bloque para empezar de cero. CA y PG en 0 y no en blanco: el evaluador
-/// de fórmulas no acepta un campo vacío, y un 0 dice «falta completar» sin
-/// inventar un número que el DM pueda confundir con uno elegido.
-Creature emptyNpcBlock(String name) => Creature(
-  id: 'bloque-propio',
-  name: name,
-  source: ContentSource.homebrew,
-  ac: '0',
-  hp: '0',
-  availableToCharacters: false,
-);
-
 /// Crea un PNJ de principio a fin: el diálogo, el creador de personajes si
 /// hace falta, el alta en el servidor y, con [campaignId], el vínculo con esa
 /// campaña. Devuelve el PNJ creado, o `null` si se canceló o falló (el error
@@ -286,19 +274,7 @@ Future<NpcEntry?> createNpcFlow(
   // El creador arranca con el nombre del diálogo, así que el que sale de ahí
   // es el último que eligió el DM: si lo retocó en Detalles, vale el retoque.
   final name = sheet?.name ?? choice.name;
-  final base = choice.base;
-  final npc = Npc(
-    id: 'nuevo',
-    name: name,
-    sheetKind: choice.kind,
-    block: choice.kind == NpcSheetKind.block
-        ? (base == null
-              ? emptyNpcBlock(choice.name)
-              : Creature.fromJson(base.toJson()))
-        : null,
-    baseCreatureId: choice.kind == NpcSheetKind.block ? base?.id : null,
-    baseCreatureName: choice.kind == NpcSheetKind.block ? base?.name : null,
-  );
+  final npc = Npc.draft(name: name, kind: choice.kind, base: choice.base);
   try {
     final created = await api.createNpc(npc, sheet: sheet);
     if (campaignId != null) {

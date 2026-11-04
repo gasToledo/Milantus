@@ -1,18 +1,20 @@
 import { useMemo, useState } from 'react';
-import { ArrowLeft, Plus, ScrollText } from 'lucide-react';
-import { ApiError } from '../../api/client';
-import { useDmCampaigns, useNpc, useSheetCatalog } from '../../api/queries';
+import { useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft, EllipsisVertical, Plus, ScrollText, Trash2 } from 'lucide-react';
+import { ApiError, deleteNpc, type StoredNpc } from '../../api/client';
+import { queryKeys, useDmCampaigns, useNpc, useSheetCatalog } from '../../api/queries';
 import { npcViews, type NpcView } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
-import { dmNpcSheetHref, dmNpcsHref, Link } from '../../router';
+import { dmNpcSheetHref, dmNpcsHref, Link, navigate } from '../../router';
 import { signed } from '../../sheet/format';
 import { BackgroundText, DiaryEntries } from '../../sheet/DiaryTab';
 import { Button } from '../../ui/Button';
 import { Card } from '../../ui/Card';
+import { ConfirmDialog } from '../../ui/ConfirmDialog';
 import { cx } from '../../ui/cx';
 import { Pill, StatPlaque } from '../../ui/data';
 import { Medallion } from '../../ui/Medallion';
-import { Toast } from '../../ui/primitives';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Toast, Tooltip } from '../../ui/primitives';
 import { AppBusyLabel, AppErrorView, Notice } from '../../ui/status';
 import { Abbr } from '../MemberCard';
 import { useNpcLinks } from './links';
@@ -28,9 +30,9 @@ const BLOCK_ACTIONS = 4;
  * La ficha de un PNJ (`npc_detail_screen.dart`): quién es, cómo habla, qué se
  * sabe de él, con qué pelea y cómo está en cada campaña. Es del DM y de nadie
  * más: un PNJ ajeno y uno inexistente responden el mismo 404 y la pantalla
- * dice lo mismo. Acá se escribe el estado por campaña y se suma a otra; lo
- * demás (renombrar, tags, el bloque, el retrato, exportar y borrar) sigue en
- * Flutter.
+ * dice lo mismo. Acá se escribe el estado por campaña, se suma a otra y se
+ * borra el PNJ; lo demás (renombrar, tags, el bloque, el retrato y exportar)
+ * sigue en Flutter.
  */
 export function NpcDetailView({ npcId }: { npcId: string }) {
   const t = useTexts();
@@ -38,6 +40,8 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
   const stored = useNpc(npcId);
   const campaigns = useDmCampaigns();
   const [adding, setAdding] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const client = useQueryClient();
   const [toast, setToast] = useState<{ key: number; message: string } | null>(null);
   const links = useNpcLinks(() => setToast((prev) => ({ key: (prev?.key ?? 0) + 1, message: t.npcSaveFailed })));
   const catalog = useSheetCatalog(lang);
@@ -81,6 +85,20 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
   }
 
   const { npc } = view;
+  const inCampaigns = stored.data.campaigns;
+  const remove = async () => {
+    await deleteNpc(npc.id);
+    // Primero se sale y después se relee: al revés, la pantalla pediría un PNJ que
+    // ya no está y diría «No se encontró». La lista se corrige antes de salir para
+    // que no se vea el borrado ni un cuadro.
+    client.setQueryData<StoredNpc[]>(queryKeys.npcs, (old) => old?.filter((e) => e.npc.id !== npc.id));
+    navigate(dmNpcsHref(), { replace: true });
+    client.removeQueries({ queryKey: queryKeys.npc(npc.id) });
+    await Promise.all([
+      client.invalidateQueries({ queryKey: queryKeys.npcs, exact: true }),
+      ...inCampaigns.map((l) => client.invalidateQueries({ queryKey: queryKeys.campaignNpcs(l.campaignId) })),
+    ]);
+  };
   const speech = npc.speech?.trim() ?? '';
   const background = npc.background?.trim() ?? '';
   return (
@@ -111,6 +129,26 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
             </span>
           </blockquote>
         </div>
+        <DropdownMenu>
+          <Tooltip content={t.npcMoreActions}>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                aria-label={t.npcMoreActions}
+                data-action="npc-menu"
+                className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold data-[state=open]:bg-gold-soft data-[state=open]:text-gold"
+              >
+                <EllipsisVertical size={20} aria-hidden="true" />
+              </button>
+            </DropdownMenuTrigger>
+          </Tooltip>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onSelect={() => setDeleting(true)} className="text-crimson">
+              <Trash2 size={15} aria-hidden="true" />
+              {t.npcDelete}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </header>
 
       <div className="flex flex-wrap items-start gap-4">
@@ -172,6 +210,16 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
           errorText={t.dmLinkError}
           onSubmit={(ids) => links.linkMany(ids.map((campaignId) => ({ campaignId, npcId: npc.id })))}
           onClose={() => setAdding(false)}
+        />
+      )}
+      {deleting && (
+        <ConfirmDialog
+          title={t.npcDeleteTitle(npc.name)}
+          body={inCampaigns.length === 0 ? t.npcDeleteBodyLibrary : t.npcDeleteBodyCampaigns(inCampaigns.map((l) => l.campaignName).join(', '))}
+          confirmLabel={t.npcDelete}
+          errorText={t.npcDeleteFailed}
+          onConfirm={remove}
+          onClose={() => setDeleting(false)}
         />
       )}
       {toast && <Toast key={toast.key} tone="error" message={toast.message} open onOpenChange={(open) => !open && setToast(null)} />}

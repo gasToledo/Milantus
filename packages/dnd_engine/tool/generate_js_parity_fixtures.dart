@@ -723,6 +723,21 @@ Future<void> main(List<String> args) async {
         {'id': a.id, 'name': a.name},
     ],
   );
+  final baseDeBloque = repo.creaturesSorted.first;
+  File('${out.path}/puente-pnj-nuevo.json').writeAsStringSync(
+    jsonEncode({
+      'bridge': {
+        'fn': 'newNpc',
+        'args': ['Bruna', 'block', baseDeBloque.id],
+        'withoutCharacter': true,
+      },
+      'expected': Npc.draft(
+        name: 'Bruna',
+        kind: NpcSheetKind.block,
+        base: baseDeBloque,
+      ).toJson(),
+    }),
+  );
   for (final MapEntry(key: nombre, value: (borrador, accion))
       in _creaciones.entries) {
     final draft = CreationDraft.fromJson(repo, borrador)

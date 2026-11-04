@@ -32,6 +32,7 @@ interface DartEngine {
   abilityModifier(score: number): number;
   bestiary(catalogJson: string): string;
   npcs(entriesJson: string, catalogJson: string): string;
+  newNpc(catalogJson: string, name: string, kind: string, baseCreatureId: string): string;
   encounter(encounterJson: string, playersHpJson: string): string;
   musicSource(url: string): string;
   act(characterJson: string, catalogJson: string, actionJson: string, seed?: number): string;
@@ -746,6 +747,12 @@ export interface NpcEntryJson {
  *  del motor): los PG de un bloque, la ficha compilada, si viene herido. */
 export function npcViews(entries: readonly NpcEntryJson[], catalog: Catalog): NpcView[] {
   return JSON.parse(engine().npcs(JSON.stringify(entries), catalogJson(catalog))) as NpcView[];
+}
+
+/** El documento de un PNJ nuevo (`Npc.draft`): lo arma el motor, con el bloque
+ *  copiado de la criatura. `kind` es `none` o `block`; los de ficha son de 6f. */
+export function newNpc(catalog: Catalog, name: string, kind: 'none' | 'block', baseCreatureId: string | null): JsonObject {
+  return JSON.parse(engine().newNpc(catalogJson(catalog), name, kind, baseCreatureId ?? '')) as JsonObject;
 }
 
 /** El combate abierto, migrado y con lo que deriva el motor (`encounter`): de

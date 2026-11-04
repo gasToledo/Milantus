@@ -1,4 +1,5 @@
 import 'character.dart' show DiaryEntry;
+import 'content_source.dart';
 import 'creature.dart';
 import 'data_version.dart';
 
@@ -137,6 +138,43 @@ class Npc {
     this.portraitPaths = const [],
     this.portraitPrompts = const {},
   }) : tags = normalizeTags(tags);
+
+  /// Un bloque para empezar de cero. CA y PG en 0 y no en blanco: el evaluador
+  /// de fórmulas no acepta un campo vacío, y un 0 dice «falta completar» sin
+  /// inventar un número que el DM pueda confundir con uno elegido.
+  static Creature emptyBlock(String name) => Creature(
+        id: 'bloque-propio',
+        name: name,
+        source: ContentSource.homebrew,
+        ac: '0',
+        hp: '0',
+        availableToCharacters: false,
+      );
+
+  /// Un PNJ recién elegido, todavía sin guardar: lo que los clientes le mandan
+  /// a `POST /api/npcs`. El id es provisorio, porque lo asigna el servidor.
+  ///
+  /// El bloque es una **copia** de [base], por lo mismo que dice [block]. Solo un
+  /// PNJ con bloque usa [base]: en los otros tipos se ignora.
+  factory Npc.draft({
+    required String name,
+    required NpcSheetKind kind,
+    Creature? base,
+  }) {
+    final isBlock = kind == NpcSheetKind.block;
+    return Npc(
+      id: 'nuevo',
+      name: name,
+      sheetKind: kind,
+      block: !isBlock
+          ? null
+          : base == null
+              ? emptyBlock(name)
+              : Creature.fromJson(base.toJson()),
+      baseCreatureId: isBlock ? base?.id : null,
+      baseCreatureName: isBlock ? base?.name : null,
+    );
+  }
 
   /// Tiene números con los que pelear. Un PNJ sin estadísticas entra al
   /// combate igual, pero fijo como neutral y sin PG.

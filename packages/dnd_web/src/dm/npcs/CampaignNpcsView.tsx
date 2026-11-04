@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { EllipsisVertical, LibraryBig, ScrollText, UserMinus } from 'lucide-react';
+import { EllipsisVertical, LibraryBig, Plus, ScrollText, UserMinus } from 'lucide-react';
 import { useCampaignNpcs, useSheetCatalog } from '../../api/queries';
 import type { DmCampaign } from '../../api/client';
 import { npcViews, type NpcView } from '../../engine';
@@ -22,6 +22,7 @@ import { AppBusyLabel, AppEmptyState, AppErrorView } from '../../ui/status';
 import { DmHeader } from '../DmHeader';
 import { BringNpcsDialog } from './BringNpcsDialog';
 import { useNpcLinks } from './links';
+import { NewNpcDialog } from './NewNpcDialog';
 import { FilterPill } from './NpcLibraryView';
 import { NpcStatusSelector } from './NpcStatusSelector';
 import { hasTag, normalizeTags, npcPortrait, npcTypeLine, type NpcStatus } from './npc';
@@ -29,8 +30,9 @@ import { hasTag, normalizeTags, npcPortrait, npcTypeLine, type NpcStatus } from 
 /**
  * Los PNJ de la campaña (`campaign_npcs_view.dart`), con su estado **en esta**
  * campaña: se cambia con el selector, se traen más de la biblioteca y se
- * quitan de la mesa (solo el vínculo: el PNJ sigue en la biblioteca). Crear,
- * borrar y editar el PNJ siguen en Flutter. Los PG de un herido son los que
+ * quitan de la mesa (solo el vínculo: el PNJ sigue en la biblioteca). Se crea
+ * uno nuevo y queda vinculado a esta mesa; borrarlo se hace desde su ficha y
+ * editarlo sigue en Flutter. Los PG de un herido son los que
  * guardó el último combate de esta mesa, y los resuelve el motor (`npcViews`)
  * con el resto de la línea.
  */
@@ -41,12 +43,18 @@ export function CampaignNpcsView({ campaign }: { campaign: DmCampaign }) {
   const catalog = useSheetCatalog(lang);
   const [tag, setTag] = useState<string | null>(null);
   const [bringing, setBringing] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [removing, setRemoving] = useState<{ id: string; name: string } | null>(null);
   const [toast, setToast] = useState<{ key: number; message: string } | null>(null);
   const links = useNpcLinks(() => setToast((prev) => ({ key: (prev?.key ?? 0) + 1, message: t.npcSaveFailed })));
   const bringButton = (
     <Button tone="soft" icon={LibraryBig} data-action="bring-npcs" onClick={() => setBringing(true)}>
       {t.dmBringFromLibrary}
+    </Button>
+  );
+  const newButton = (
+    <Button icon={Plus} data-action="new-npc" onClick={() => setCreating(true)}>
+      {t.npcNew}
     </Button>
   );
 
@@ -65,7 +73,14 @@ export function CampaignNpcsView({ campaign }: { campaign: DmCampaign }) {
   } else if (!views) {
     body = <AppBusyLabel label={t.dmNpcsLoading} />;
   } else if (views.length === 0) {
-    body = <AppEmptyState kind="empty" message={t.dmNpcsEmpty} actions={bringButton} />;
+    body = <AppEmptyState kind="empty" message={t.dmNpcsEmpty}
+        actions={
+          <div className="flex flex-wrap justify-center gap-2">
+            {newButton}
+            {bringButton}
+          </div>
+        }
+      />;
   } else {
     const count = (s: NpcView['status']) => views.filter((v) => v.status === s).length;
     const tags = normalizeTags(views.flatMap((v) => v.npc.tags ?? []));
@@ -124,8 +139,17 @@ export function CampaignNpcsView({ campaign }: { campaign: DmCampaign }) {
 
   return (
     <div className="flex flex-col gap-5">
-      <DmHeader title={t.dmSectionNpcs} kicker={campaign.name} actions={views && views.length > 0 ? bringButton : undefined} />
+      <DmHeader title={t.dmSectionNpcs} kicker={campaign.name} actions={
+          views && views.length > 0 ? (
+            <>
+              {bringButton}
+              {newButton}
+            </>
+          ) : undefined
+        }
+      />
       {body}
+      {creating && <NewNpcDialog campaignId={campaign.id} onClose={() => setCreating(false)} />}
       {bringing && <BringNpcsDialog campaignId={campaign.id} onLink={links.linkMany} onClose={() => setBringing(false)} />}
       {removing && (
         <ConfirmDialog

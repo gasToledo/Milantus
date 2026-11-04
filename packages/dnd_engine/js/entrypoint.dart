@@ -685,6 +685,29 @@ String npcs(String entriesJson, String catalogJson) {
   ]);
 }
 
+/// El documento de un PNJ nuevo (`Npc.draft`), listo para `POST /api/npcs`.
+/// [baseCreatureId] vacío es un bloque vacío; un id que no está en el catálogo
+/// es un error y no un bloque vacío: el DM eligió otra cosa.
+String newNpc(
+  String catalogJson,
+  String name,
+  String kind,
+  String baseCreatureId,
+) {
+  final repo = _repoPara(catalogJson);
+  final base = baseCreatureId.isEmpty ? null : repo.creature(baseCreatureId);
+  if (baseCreatureId.isNotEmpty && base == null) {
+    throw FormatException('No existe la criatura "$baseCreatureId".');
+  }
+  return jsonEncode(
+    Npc.draft(
+      name: name,
+      kind: NpcSheetKind.fromJson(kind),
+      base: base,
+    ).toJson(),
+  );
+}
+
 Map<String, dynamic> _npcView(
     Map<String, dynamic> raw, ContentRepository repo) {
   final npc = Npc.fromJson((raw['npc'] as Map).cast<String, dynamic>());
@@ -956,6 +979,7 @@ void main() {
   motor['abilityModifier'] = abilityModifierOf.toJS;
   motor['bestiary'] = bestiary.toJS;
   motor['npcs'] = npcs.toJS;
+  motor['newNpc'] = newNpc.toJS;
   motor['encounter'] = encounter.toJS;
   motor['musicSource'] = musicSource.toJS;
   globalContext['dndEngine'] = motor;

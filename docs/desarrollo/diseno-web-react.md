@@ -166,6 +166,7 @@ conjuro abre su detalle en un diálogo. Sus pasos de elecciones viven en
 | `SaveStatusBadge` | La pill del guardado automático (`SaveStatusIndicator`): Guardando… / Guardado / No se guardó con «Reintentar» | Al pie del panel de una pantalla que escribe, en lugar de «Solo lectura» |
 | `NpcStatusSelector` (`src/dm/npcs/`) | Vivo · Muerto · Desconocido en una fila de botones `aria-pressed`; el elegido se rellena con el color de su estado (`STATUS_FILL`) | El muerto atenúa identidad y tags, **nunca** el selector: un control usable no puede verse apagado |
 | `PickManyDialog` (`src/dm/npcs/`) | Marcar varios (`Option multi`) y «Sumar n» sobre `AppDialog`, con buscador o sin él | Si falla no se cierra y el botón pasa a «Reintentar» |
+| `NewNpcDialog` (`src/dm/npcs/`) | «Nuevo PNJ»: nombre, qué ficha lleva (`Option`: sin estadísticas, con bloque y «Personaje jugable» apagado con su motivo) y, si es un bloque, de qué criatura parte; crear abre la ficha | El documento lo arma el motor (`newNpc`). Si falla no se cierra y reintentar no vuelve a crear. «Bloque vacío» va fuera de la lista para que el buscador no lo esconda |
 | `AppDialog` | El molde de diálogo: placa, velo, barra de acciones de 48 px al pie | 480 px por defecto, 560 si el cuerpo es una ficha; una acción con `disabled` se apaga (Comprar sin fondos) |
 | `PortraitViewer` | El retrato original entero sobre el velo, con cerrar; `Esc` y clic afuera también cierran | Lo abre `Medallion` con `viewable` y la imagen de una entrada del Diario |
 | `DiaryEntries` (`src/sheet/DiaryTab.tsx`) | Tarjeta de entradas en grilla (`minWidth`, 280 por defecto); con `edit` (un `DiaryEditor`: `save`, `remove`, `move`, `upload`) suma «+», editor, borrado y el ícono de mover | Sin `edit` es de solo lectura (ficha ajena, notas del PNJ) |
@@ -356,7 +357,10 @@ inexistente son la misma pantalla). Desde 6b escribe campañas y la Mesa y desde
   (`DiaryEntries`, el mismo de la pestaña Diario, a dos columnas) a la izquierda,
   Estadísticas y Campañas a la derecha. En Campañas, cada una lleva su
   `NpcStatusSelector` y la tarjeta un «Sumar» (`PickManyDialog` con las campañas
-  que faltan). La
+  que faltan). «Nuevo PNJ» es la acción primaria (`Button` oro lleno) de la
+  cabecera —o del estado vacío, nunca en los dos—, y un ⋮ de 44 px en la
+  cabecera de la ficha lleva «Borrar PNJ» (con confirmación; es la única opción
+  por ahora y deja lo irreversible a un paso). La
   línea de tipo la arma `npcTypeLine` con lo que da `npcViews`: ningún número se
   calcula acá. El tablero es «Modo DM — Biblioteca de PNJ, PNJ de la mesa,
   Homebrew y Combate» del Design.
@@ -367,8 +371,8 @@ inexistente son la misma pantalla). Desde 6b escribe campañas y la Mesa y desde
   Flutter, donde el resto de la tarjeta lleva controles. El estado va al pie con
   `NpcStatusSelector`; un muerto se tacha y atenúa en identidad y tags, no en el
   selector. Un ⋮ de 44 px abre la ficha o quita de la campaña (con confirmación),
-  y «Traer de la biblioteca» va en la cabecera —o en el estado vacío, nunca en
-  los dos—.
+  y «Traer de la biblioteca» (`soft`) y «Nuevo PNJ» (primaria) van en la cabecera
+  —o en el estado vacío, nunca en los dos—.
 - **Homebrew** (`HomebrewView`): la portada repite las tarjetas de la portada del
   Códice (ícono, nombre, cifra y muestra), atenuadas cuando la categoría está
   vacía, con un buscador en pill que reemplaza la grilla por una lista de
