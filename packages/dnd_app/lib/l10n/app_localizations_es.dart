@@ -5390,6 +5390,11 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String evtCombatDone(String character, String campaign) {
+    return 'Terminó el combate de $character en $campaign.';
+  }
+
+  @override
   String evtTakes(String rewards) {
     return 'Se lleva $rewards.';
   }

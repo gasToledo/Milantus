@@ -124,6 +124,13 @@ La Inspiración Heroica sigue el mismo molde: `POST
 través de `findMember` (que exige que la campaña sea de quien pide). Quien la
 anota en su ficha es el jugador.
 
+Terminar un combate (sin `discard`) deja un `encounter_finished` en la bandeja
+del dueño de cada personaje que **peleó** en él (los combatientes jugadores del
+encuentro, cruzados con `listMembers`), no a los demás miembros de la mesa. El
+`payload` es solo `characterName` y `campaignName`: ni monstruos, ni rondas, ni
+resultado, que son del Cuaderno del DM. Descartar, o terminar sin combate
+abierto, no avisa. Una prueba fija que el cuerpo no trae datos del combate.
+
 `_deleteCharacterHandler` arma los avisos **antes** de borrar, porque la cascada
 se lleva los vínculos y después ya no hay a quién avisarle.
 
@@ -289,10 +296,15 @@ manda al jugador el documento del combate, solo esa proyección de cuatro
 estados. Es la misma frontera que ya separaba Modo DM del resto de la app,
 aplicada a una superficie nueva.
 
-### Por qué esto es lo único casi-en-vivo del proyecto
+### Por qué el turno es casi-en-vivo, y los avisos también (en `/v2`)
 
-El resto de Milantus se refresca al entrar a una pantalla o después de una
-acción propia — nunca con un timer. El turno es la excepción a propósito: el
+Flutter se refresca al entrar a una pantalla o después de una acción propia,
+sin timers, salvo el turno. `/v2` suma un segundo timer a propósito (decisión
+del 2026-11-04): `PendingEvents` pide los avisos cada 30 s con la página visible
+y al volver a la pestaña, porque el jugador deja la ficha abierta en la mesa y
+sin eso el aviso de un capítulo cerrado o de un combate terminado no le llega
+hasta que navegue. Sigue siendo una cola durable y de una sola entrega; el
+turno es lo otro. El turno es la excepción en Flutter a propósito: el
 aviso "preparate, seguís vos" solo sirve si llega mientras la ficha está
 abierta, así que `SheetScreen._pollTurn` sondea cada 5 segundos con combate
 abierto (20 si no hay ninguno), con un `Timer` que se reprograma solo y se

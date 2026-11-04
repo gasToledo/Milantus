@@ -61,6 +61,11 @@ UserEventMessage? messageForEvent(UserEvent event, AppLocalizations l10n) {
     // Los datos propios de este aviso se leen acá adentro y no arriba: los
     // otros seis `kind` no los traen.
     'chapter_completed' => _chapterCompleted(event, character, campaign, l10n),
+    // Solo quién y dónde: lo que pasó en el combate es del Cuaderno del DM.
+    'encounter_finished' => UserEventMessage(
+      l10n.evtCombatDone(character, campaign),
+      AppMessageTone.info,
+    ),
     _ => null,
   };
 }

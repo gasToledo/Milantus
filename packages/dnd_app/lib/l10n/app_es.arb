@@ -4403,6 +4403,17 @@
       }
     }
   },
+  "evtCombatDone": "Terminó el combate de {character} en {campaign}.",
+  "@evtCombatDone": {
+    "placeholders": {
+      "character": {
+        "type": "String"
+      },
+      "campaign": {
+        "type": "String"
+      }
+    }
+  },
   "evtTakes": "Se lleva {rewards}.",
   "@evtTakes": {
     "placeholders": {

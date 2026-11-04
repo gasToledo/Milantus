@@ -4531,6 +4531,86 @@ void main() {
         expect(encounters.logs, isEmpty);
       });
 
+      group('aviso de fin de combate', () {
+        // Una mesa con dos personajes; en el combate solo pelea el primero.
+        Future<({String dm, String fighter, String bystander})> table(
+          String prefix,
+        ) async {
+          final dm = await login('$prefix-dm');
+          await createCampaign(dm, 'tumba');
+          final fighter = await login('$prefix-a');
+          final bystander = await login('$prefix-b');
+          final ids = <String>[];
+          for (final (token, character) in [
+            (fighter, 'sagan'),
+            (bystander, 'elsbeth'),
+          ]) {
+            final redeemed = await send(
+              'POST',
+              '/api/campaigns/tumba/members',
+              token: dm,
+              body: {'code': await shareCharacter(token, character)},
+            );
+            ids.add(redeemed['body']['member']['memberId'] as String);
+          }
+          await send(
+            'PUT',
+            '/api/campaigns/tumba/encounter',
+            token: dm,
+            body: {
+              'encounter': encounterJson(
+                combatants: [
+                  playerCombatant('p1', memberId: ids.first),
+                  monsterCombatant('m1'),
+                ],
+              ),
+            },
+          );
+          return (dm: dm, fighter: fighter, bystander: bystander);
+        }
+
+        Future<List<dynamic>> finished(String token) async {
+          final response = await send('GET', '/api/events', token: token);
+          return [
+            for (final e in response['body']['events'] as List<dynamic>)
+              if (e['kind'] == 'encounter_finished') e,
+          ];
+        }
+
+        test(
+          'avisa solo a quienes pelearon, y el aviso no trae el combate',
+          () async {
+            final mesa = await table('enc-ev');
+            await send(
+              'DELETE',
+              '/api/campaigns/tumba/encounter',
+              token: mesa.dm,
+            );
+
+            final events = await finished(mesa.fighter);
+            expect(events, hasLength(1));
+            // Solo quién y dónde: lo que pasó en el combate es del DM.
+            expect(events.single['payload'], {
+              'characterName': 'Sagan',
+              'campaignName': 'La Tumba',
+            });
+            expect(await finished(mesa.bystander), isEmpty);
+            expect(await finished(mesa.dm), isEmpty);
+          },
+        );
+
+        test('descartar el combate no avisa a nadie', () async {
+          final mesa = await table('enc-ev-discard');
+          await send(
+            'DELETE',
+            '/api/campaigns/tumba/encounter?discard=true',
+            token: mesa.dm,
+          );
+
+          expect(await finished(mesa.fighter), isEmpty);
+        });
+      });
+
       test('borrar la campaña deja el combate inaccesible', () async {
         final token = await login('enc-cascade');
         await createCampaign(token, 'tumba');

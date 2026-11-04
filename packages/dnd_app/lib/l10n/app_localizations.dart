@@ -8815,6 +8815,12 @@ abstract class AppLocalizations {
   /// **'{character} terminó el capítulo {chapter} en {campaign}.'**
   String evtChapterDone(String character, String chapter, String campaign);
 
+  /// No description provided for @evtCombatDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Terminó el combate de {character} en {campaign}.'**
+  String evtCombatDone(String character, String campaign);
+
   /// No description provided for @evtTakes.
   ///
   /// In es, this message translates to:

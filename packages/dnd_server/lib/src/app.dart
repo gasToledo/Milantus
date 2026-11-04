@@ -1821,9 +1821,8 @@ Future<Response> _endEncounterHandler(
     request.params['id']!,
     label: 'id de campaña',
   );
-  if (await campaigns.find(request.userId, campaignId) == null) {
-    return _notFound('campaign_not_found');
-  }
+  final campaign = await campaigns.find(request.userId, campaignId);
+  if (campaign == null) return _notFound('campaign_not_found');
 
   if (request.url.queryParameters['discard'] == 'true') {
     await encounters.discard(request.userId, campaignId);
@@ -1876,6 +1875,24 @@ Future<Response> _endEncounterHandler(
       _buildEncounterLog(encounter, npcs),
       chapterId: active?.id,
     );
+    // Les avisa a quienes pelearon, para que la ficha abierta en la mesa se
+    // entere de que terminó. El payload es solo quién y dónde: ni monstruos,
+    // ni rondas, ni resultado, que son del Cuaderno del DM.
+    final fought = {
+      for (final c in encounter.combatants)
+        if (c.kind == CombatantKind.player && c.memberId != null) c.memberId!,
+    };
+    for (final member in await repositories.campaigns.listMembers(
+      request.userId,
+      campaignId,
+    )) {
+      if (!fought.contains(member.memberId)) continue;
+      await repositories.events.append(
+        member.ownerUserId,
+        'encounter_finished',
+        {'characterName': member.character.name, 'campaignName': campaign.name},
+      );
+    }
   });
   return _jsonOk({'status': 'ok'});
 }

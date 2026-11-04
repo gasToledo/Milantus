@@ -12,13 +12,16 @@ interface Notice {
 }
 
 /**
- * Pide los avisos pendientes de la cuenta al entrar a un lugar concreto y los
- * muestra de a uno (`PendingEventsGate` de Flutter). Sin timer propio: son una
- * cola durable de «esto pasó mientras no mirabas», no tiempo real. El turno es
- * lo otro, y por eso no viaja por acá (`useTurnStatus`).
+ * Pide los avisos pendientes de la cuenta y los muestra de a uno
+ * (`PendingEventsGate` de Flutter). Son una cola durable de «esto pasó mientras
+ * no mirabas»; el turno es lo otro, y por eso no viaja por acá
+ * (`useTurnStatus`).
  *
- * Los puntos de entrada son los mismos que en Flutter: la lista, el Modo DM y
- * una ficha; las subrutas de la ficha (subir de nivel, retrato…) no cuentan.
+ * Se piden al entrar a un lugar concreto (la lista, el Modo DM y una ficha; las
+ * subrutas de la ficha no cuentan), al volver a la pestaña y **cada 30 s con la
+ * página visible**. El timer es decisión del usuario (2026-11-04): el jugador
+ * deja la ficha abierta en la mesa, y sin él el aviso de un capítulo cerrado o
+ * de un combate terminado no le llega hasta que navegue. Flutter no lo tiene.
  *
  * Un fallo al pedirlos o al marcarlos se traga en silencio, por dos motivos:
  * no poder mostrar un aviso no es razón para interrumpir lo que la persona vino
@@ -40,27 +43,43 @@ export function PendingEvents() {
   // Evita pedidos duplicados: `StrictMode` monta dos veces en desarrollo, y un
   // cambio de ruta no debe volver a pedir lo que ya está en cola.
   const running = useRef(false);
+  const queued = useRef(new Set<string>());
 
   useEffect(() => {
-    if (key === null || running.current) return;
-    running.current = true;
-    void (async () => {
-      try {
-        const events = await fetchUnseenEvents();
-        const shown: Notice[] = [];
-        for (const event of events) {
-          const message = eventMessage(event, t);
-          if (message) shown.push({ id: event.id, ...message });
-          // Un `kind` desconocido igual se marca visto: dejarlo pendiente lo
-          // volvería a traer para siempre.
-          else void markEventsSeen([event.id]).catch(() => {});
+    if (key === null) return;
+    const pull = () => {
+      if (running.current) return;
+      running.current = true;
+      void (async () => {
+        try {
+          const events = await fetchUnseenEvents();
+          const shown: Notice[] = [];
+          for (const event of events) {
+            // Con el timer, uno en cola que todavía no se mostró (y por eso no
+            // está visto) volvería a llegar en cada pedido.
+            if (queued.current.has(event.id)) continue;
+            queued.current.add(event.id);
+            const message = eventMessage(event, t);
+            if (message) shown.push({ id: event.id, ...message });
+            // Un `kind` desconocido igual se marca visto: dejarlo pendiente lo
+            // volvería a traer para siempre.
+            else void markEventsSeen([event.id]).catch(() => {});
+          }
+          if (shown.length > 0) setQueue((q) => [...q, ...shown]);
+        } catch {
+          // Ver el comentario del componente.
         }
-        setQueue((q) => [...q, ...shown]);
-      } catch {
-        // Ver el comentario del componente.
-      }
-      running.current = false;
-    })();
+        running.current = false;
+      })();
+    };
+    pull();
+    const onVisible = () => document.visibilityState === 'visible' && pull();
+    const timer = setInterval(onVisible, 30_000);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
     // Solo la clave de entrada: el idioma no cambia con la página abierta.
   }, [key]);
 

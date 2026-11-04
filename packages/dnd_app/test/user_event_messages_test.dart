@@ -166,6 +166,22 @@ void main() {
     });
   });
 
+  group('Fin de combate', () {
+    test('nombra al personaje y la campaña, y es informativo', () {
+      final message = _message(
+        const UserEvent(
+          id: 'e10',
+          kind: 'encounter_finished',
+          payload: {'characterName': 'Sagan', 'campaignName': 'La Tumba'},
+        ),
+      )!;
+
+      expect(message.text, contains('Sagan'));
+      expect(message.text, contains('La Tumba'));
+      expect(message.tone, AppMessageTone.info);
+    });
+  });
+
   group('Inspiración Heroica concedida por el DM', () {
     test('nombra al personaje, la campaña y dice que la marque él', () {
       final message = _message(

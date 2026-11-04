@@ -34,6 +34,9 @@ export function eventMessage(event: UserEvent, t: Texts): { text: string; tone: 
       return { text: t.evtInspiration(campaign, character), tone: 'success' };
     case 'chapter_completed':
       return chapterCompleted(event, character, campaign, t);
+    // Solo quién y dónde: lo que pasó en el combate es del Cuaderno del DM.
+    case 'encounter_finished':
+      return { text: t.evtCombatDone(character, campaign), tone: 'info' };
     default:
       return null;
   }

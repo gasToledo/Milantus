@@ -1452,6 +1452,17 @@
   "evtRebuiltByOwner": "{character} was rebuilt from level 1 in {campaign}.",
   "evtInspiration": "The DM granted you Heroic Inspiration in {campaign}. Mark it on the sheet for {character}.",
   "evtChapterDone": "{character} finished the chapter {chapter} in {campaign}.",
+  "evtCombatDone": "The combat of {character} in {campaign} ended.",
+  "@evtCombatDone": {
+    "placeholders": {
+      "character": {
+        "type": "String"
+      },
+      "campaign": {
+        "type": "String"
+      }
+    }
+  },
   "evtTakes": "They get {rewards}.",
   "evtCanLevelUp": "You can level up.",
   "evtSomeCharacter": "A character",

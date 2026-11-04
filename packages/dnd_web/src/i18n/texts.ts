@@ -1392,6 +1392,7 @@ Los personajes que los jugadores le compartieron se sueltan, y sus fichas siguen
     `El DM te concedió Inspiración Heroica en ${campaign}. Marcala en la ficha de ${character}.`,
   evtChapterDone: (character: string, chapter: string, campaign: string) =>
     `${character} terminó el capítulo ${chapter} en ${campaign}.`,
+  evtCombatDone: (character: string, campaign: string) => `Terminó el combate de ${character} en ${campaign}.`,
   evtTakes: (rewards: string) => `Se lleva ${rewards}.`,
   evtCanLevelUp: 'Podés subir de nivel.',
   evtSomeCharacter: 'Un personaje',
@@ -3053,6 +3054,7 @@ The characters players shared with it are released, and their sheets remain thei
     `The DM granted you Heroic Inspiration in ${campaign}. Mark it on the sheet for ${character}.`,
   evtChapterDone: (character: string, chapter: string, campaign: string) =>
     `${character} finished the chapter ${chapter} in ${campaign}.`,
+  evtCombatDone: (character: string, campaign: string) => `The combat of ${character} in ${campaign} ended.`,
   evtTakes: (rewards: string) => `They get ${rewards}.`,
   evtCanLevelUp: 'You can level up.',
   evtSomeCharacter: 'A character',
