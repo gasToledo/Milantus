@@ -424,7 +424,16 @@
       {
         "type": "passiveTrait",
         "name": "Afortunado",
-        "description": "Tenés puntos de suerte iguales a tu bonif. de competencia. Podés gastarlos para obtener ventaja en una tirada de d20 o imponer desventaja en un ataque contra vos."
+        "description": "Tenés Puntos de Suerte iguales a tu bonif. de competencia. Podés gastar uno para obtener ventaja en una tirada de d20 o imponer desventaja en un ataque contra vos. Se recuperan al terminar un descanso largo."
+      },
+      {
+        "type": "resource",
+        "id": "luck",
+        "name": "Puntos de suerte",
+        "max": 0,
+        "maxFromProficiency": true,
+        "recharge": "long",
+        "description": "Usos de Afortunado."
       }
     ]
   },
@@ -482,13 +491,15 @@
     "category": "fighting-style",
     "effects": [
       {
-        "type": "armorClassBonus",
-        "amount": 1
+        "type": "whileArmored",
+        "effects": [
+          { "type": "armorClassBonus", "amount": 1 }
+        ]
       },
       {
         "type": "passiveTrait",
         "name": "Defensa",
-        "description": "Mientras lleves armadura, ganás un +1 a la Clase de Armadura."
+        "description": "Mientras lleves armadura ligera, media o pesada, ganás +1 a la Clase de Armadura."
       }
     ],
     "prerequisite": {
@@ -940,7 +951,20 @@
       {
         "type": "passiveTrait",
         "name": "Tocado por lo Feérico",
-        "description": "Aprendés Paso Brumoso y un conjuro de adivinación o encantamiento de nivel 1, lanzables gratis una vez por descanso largo."
+        "description": "Aprendés Paso Brumoso y un conjuro de nivel 1 de Adivinación o Encantamiento. Los tenés siempre preparados: cada uno se puede lanzar sin gastar un espacio una vez por descanso largo, y también con tus espacios. La aptitud es la característica que aumenta esta dote."
+      },
+      { "type": "grantSpell", "spellId": "misty-step", "ability": "intelligence", "use": "oncePerLongRest" },
+      { "type": "alwaysPreparedSpell", "spellId": "misty-step" },
+      {
+        "type": "spellChoice",
+        "groupId": "fey-touched-intelligence:spell",
+        "name": "Tocado por lo Feérico: conjuro",
+        "count": 1,
+        "minLevel": 1,
+        "maxLevel": 1,
+        "schools": ["Adivinación", "Encantamiento"],
+        "freeCast": "oncePerLongRest",
+        "ability": "intelligence"
       }
     ],
     "prerequisite": {
@@ -962,7 +986,20 @@
       {
         "type": "passiveTrait",
         "name": "Tocado por lo Feérico",
-        "description": "Aprendés Paso Brumoso y un conjuro de adivinación o encantamiento de nivel 1, lanzables gratis una vez por descanso largo."
+        "description": "Aprendés Paso Brumoso y un conjuro de nivel 1 de Adivinación o Encantamiento. Los tenés siempre preparados: cada uno se puede lanzar sin gastar un espacio una vez por descanso largo, y también con tus espacios. La aptitud es la característica que aumenta esta dote."
+      },
+      { "type": "grantSpell", "spellId": "misty-step", "ability": "wisdom", "use": "oncePerLongRest" },
+      { "type": "alwaysPreparedSpell", "spellId": "misty-step" },
+      {
+        "type": "spellChoice",
+        "groupId": "fey-touched-wisdom:spell",
+        "name": "Tocado por lo Feérico: conjuro",
+        "count": 1,
+        "minLevel": 1,
+        "maxLevel": 1,
+        "schools": ["Adivinación", "Encantamiento"],
+        "freeCast": "oncePerLongRest",
+        "ability": "wisdom"
       }
     ],
     "prerequisite": {
@@ -984,7 +1021,20 @@
       {
         "type": "passiveTrait",
         "name": "Tocado por lo Feérico",
-        "description": "Aprendés Paso Brumoso y un conjuro de adivinación o encantamiento de nivel 1, lanzables gratis una vez por descanso largo."
+        "description": "Aprendés Paso Brumoso y un conjuro de nivel 1 de Adivinación o Encantamiento. Los tenés siempre preparados: cada uno se puede lanzar sin gastar un espacio una vez por descanso largo, y también con tus espacios. La aptitud es la característica que aumenta esta dote."
+      },
+      { "type": "grantSpell", "spellId": "misty-step", "ability": "charisma", "use": "oncePerLongRest" },
+      { "type": "alwaysPreparedSpell", "spellId": "misty-step" },
+      {
+        "type": "spellChoice",
+        "groupId": "fey-touched-charisma:spell",
+        "name": "Tocado por lo Feérico: conjuro",
+        "count": 1,
+        "minLevel": 1,
+        "maxLevel": 1,
+        "schools": ["Adivinación", "Encantamiento"],
+        "freeCast": "oncePerLongRest",
+        "ability": "charisma"
       }
     ],
     "prerequisite": {
@@ -1612,7 +1662,20 @@
       {
         "type": "passiveTrait",
         "name": "Tocado por la Sombra",
-        "description": "Aprendés Invisibilidad y un conjuro de ilusión o nigromancia de nivel 1, lanzables gratis una vez por descanso largo."
+        "description": "Aprendés Invisibilidad y un conjuro de nivel 1 de Ilusión o Nigromancia. Los tenés siempre preparados: cada uno se puede lanzar sin gastar un espacio una vez por descanso largo, y también con tus espacios. La aptitud es la característica que aumenta esta dote."
+      },
+      { "type": "grantSpell", "spellId": "invisibility", "ability": "intelligence", "use": "oncePerLongRest" },
+      { "type": "alwaysPreparedSpell", "spellId": "invisibility" },
+      {
+        "type": "spellChoice",
+        "groupId": "shadow-touched-intelligence:spell",
+        "name": "Tocado por la Sombra: conjuro",
+        "count": 1,
+        "minLevel": 1,
+        "maxLevel": 1,
+        "schools": ["Ilusionismo", "Nigromancia"],
+        "freeCast": "oncePerLongRest",
+        "ability": "intelligence"
       }
     ],
     "prerequisite": {
@@ -1634,7 +1697,20 @@
       {
         "type": "passiveTrait",
         "name": "Tocado por la Sombra",
-        "description": "Aprendés Invisibilidad y un conjuro de ilusión o nigromancia de nivel 1, lanzables gratis una vez por descanso largo."
+        "description": "Aprendés Invisibilidad y un conjuro de nivel 1 de Ilusión o Nigromancia. Los tenés siempre preparados: cada uno se puede lanzar sin gastar un espacio una vez por descanso largo, y también con tus espacios. La aptitud es la característica que aumenta esta dote."
+      },
+      { "type": "grantSpell", "spellId": "invisibility", "ability": "wisdom", "use": "oncePerLongRest" },
+      { "type": "alwaysPreparedSpell", "spellId": "invisibility" },
+      {
+        "type": "spellChoice",
+        "groupId": "shadow-touched-wisdom:spell",
+        "name": "Tocado por la Sombra: conjuro",
+        "count": 1,
+        "minLevel": 1,
+        "maxLevel": 1,
+        "schools": ["Ilusionismo", "Nigromancia"],
+        "freeCast": "oncePerLongRest",
+        "ability": "wisdom"
       }
     ],
     "prerequisite": {
@@ -1656,7 +1732,20 @@
       {
         "type": "passiveTrait",
         "name": "Tocado por la Sombra",
-        "description": "Aprendés Invisibilidad y un conjuro de ilusión o nigromancia de nivel 1, lanzables gratis una vez por descanso largo."
+        "description": "Aprendés Invisibilidad y un conjuro de nivel 1 de Ilusión o Nigromancia. Los tenés siempre preparados: cada uno se puede lanzar sin gastar un espacio una vez por descanso largo, y también con tus espacios. La aptitud es la característica que aumenta esta dote."
+      },
+      { "type": "grantSpell", "spellId": "invisibility", "ability": "charisma", "use": "oncePerLongRest" },
+      { "type": "alwaysPreparedSpell", "spellId": "invisibility" },
+      {
+        "type": "spellChoice",
+        "groupId": "shadow-touched-charisma:spell",
+        "name": "Tocado por la Sombra: conjuro",
+        "count": 1,
+        "minLevel": 1,
+        "maxLevel": 1,
+        "schools": ["Ilusionismo", "Nigromancia"],
+        "freeCast": "oncePerLongRest",
+        "ability": "charisma"
       }
     ],
     "prerequisite": {
@@ -1695,7 +1784,9 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "strength", "amount": 1 },
-      { "type": "passiveTrait", "name": "Experto en Habilidades", "description": "Ganás competencia en una habilidad y competencia experta (doble bono) en otra en la que ya seas competente." }
+      { "type": "passiveTrait", "name": "Experto en Habilidades", "description": "Ganás competencia en una habilidad y competencia experta (doble bono) en otra en la que ya seas competente." },
+      { "type": "proficiencyChoice", "groupId": "skill-expert-strength:skill", "name": "Experto en Habilidades: competencia", "count": 1 },
+      { "type": "proficiencyChoice", "groupId": "skill-expert-strength:expertise", "name": "Experto en Habilidades: pericia", "count": 1, "expertise": true }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -1708,7 +1799,9 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "dexterity", "amount": 1 },
-      { "type": "passiveTrait", "name": "Experto en Habilidades", "description": "Ganás competencia en una habilidad y competencia experta (doble bono) en otra en la que ya seas competente." }
+      { "type": "passiveTrait", "name": "Experto en Habilidades", "description": "Ganás competencia en una habilidad y competencia experta (doble bono) en otra en la que ya seas competente." },
+      { "type": "proficiencyChoice", "groupId": "skill-expert-dexterity:skill", "name": "Experto en Habilidades: competencia", "count": 1 },
+      { "type": "proficiencyChoice", "groupId": "skill-expert-dexterity:expertise", "name": "Experto en Habilidades: pericia", "count": 1, "expertise": true }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -1721,7 +1814,9 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "constitution", "amount": 1 },
-      { "type": "passiveTrait", "name": "Experto en Habilidades", "description": "Ganás competencia en una habilidad y competencia experta (doble bono) en otra en la que ya seas competente." }
+      { "type": "passiveTrait", "name": "Experto en Habilidades", "description": "Ganás competencia en una habilidad y competencia experta (doble bono) en otra en la que ya seas competente." },
+      { "type": "proficiencyChoice", "groupId": "skill-expert-constitution:skill", "name": "Experto en Habilidades: competencia", "count": 1 },
+      { "type": "proficiencyChoice", "groupId": "skill-expert-constitution:expertise", "name": "Experto en Habilidades: pericia", "count": 1, "expertise": true }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -1734,7 +1829,9 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "intelligence", "amount": 1 },
-      { "type": "passiveTrait", "name": "Experto en Habilidades", "description": "Ganás competencia en una habilidad y competencia experta (doble bono) en otra en la que ya seas competente." }
+      { "type": "passiveTrait", "name": "Experto en Habilidades", "description": "Ganás competencia en una habilidad y competencia experta (doble bono) en otra en la que ya seas competente." },
+      { "type": "proficiencyChoice", "groupId": "skill-expert-intelligence:skill", "name": "Experto en Habilidades: competencia", "count": 1 },
+      { "type": "proficiencyChoice", "groupId": "skill-expert-intelligence:expertise", "name": "Experto en Habilidades: pericia", "count": 1, "expertise": true }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -1747,7 +1844,9 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "wisdom", "amount": 1 },
-      { "type": "passiveTrait", "name": "Experto en Habilidades", "description": "Ganás competencia en una habilidad y competencia experta (doble bono) en otra en la que ya seas competente." }
+      { "type": "passiveTrait", "name": "Experto en Habilidades", "description": "Ganás competencia en una habilidad y competencia experta (doble bono) en otra en la que ya seas competente." },
+      { "type": "proficiencyChoice", "groupId": "skill-expert-wisdom:skill", "name": "Experto en Habilidades: competencia", "count": 1 },
+      { "type": "proficiencyChoice", "groupId": "skill-expert-wisdom:expertise", "name": "Experto en Habilidades: pericia", "count": 1, "expertise": true }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -1760,7 +1859,9 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "charisma", "amount": 1 },
-      { "type": "passiveTrait", "name": "Experto en Habilidades", "description": "Ganás competencia en una habilidad y competencia experta (doble bono) en otra en la que ya seas competente." }
+      { "type": "passiveTrait", "name": "Experto en Habilidades", "description": "Ganás competencia en una habilidad y competencia experta (doble bono) en otra en la que ya seas competente." },
+      { "type": "proficiencyChoice", "groupId": "skill-expert-charisma:skill", "name": "Experto en Habilidades: competencia", "count": 1 },
+      { "type": "proficiencyChoice", "groupId": "skill-expert-charisma:expertise", "name": "Experto en Habilidades: pericia", "count": 1, "expertise": true }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -1914,7 +2015,8 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "intelligence", "amount": 1 },
-      { "type": "passiveTrait", "name": "Telequinético", "description": "Aprendés Mano de Mago (invisible) y podés empujar a criaturas 5 pies con la mente como acción adicional." }
+      { "type": "passiveTrait", "name": "Telequinético", "description": "Aprendés Mano de Mago. La podés lanzar sin componentes verbales ni somáticos, la mano espectral puede ser invisible, y su alcance y la distancia a la que puede alejarse de vos aumentan 30 pies. La aptitud es la característica que aumenta esta dote. Como acción adicional podés empujar con la mente a una criatura que veas a 30 pies: salvación de Fuerza (CD 8 + el modificador de esa característica + tu bonif. de competencia) o se mueve 5 pies hacia vos o en dirección contraria." },
+      { "type": "grantSpell", "spellId": "mage-hand", "ability": "intelligence", "use": "atWill" }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -1927,7 +2029,8 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "wisdom", "amount": 1 },
-      { "type": "passiveTrait", "name": "Telequinético", "description": "Aprendés Mano de Mago (invisible) y podés empujar a criaturas 5 pies con la mente como acción adicional." }
+      { "type": "passiveTrait", "name": "Telequinético", "description": "Aprendés Mano de Mago. La podés lanzar sin componentes verbales ni somáticos, la mano espectral puede ser invisible, y su alcance y la distancia a la que puede alejarse de vos aumentan 30 pies. La aptitud es la característica que aumenta esta dote. Como acción adicional podés empujar con la mente a una criatura que veas a 30 pies: salvación de Fuerza (CD 8 + el modificador de esa característica + tu bonif. de competencia) o se mueve 5 pies hacia vos o en dirección contraria." },
+      { "type": "grantSpell", "spellId": "mage-hand", "ability": "wisdom", "use": "atWill" }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -1940,7 +2043,8 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "charisma", "amount": 1 },
-      { "type": "passiveTrait", "name": "Telequinético", "description": "Aprendés Mano de Mago (invisible) y podés empujar a criaturas 5 pies con la mente como acción adicional." }
+      { "type": "passiveTrait", "name": "Telequinético", "description": "Aprendés Mano de Mago. La podés lanzar sin componentes verbales ni somáticos, la mano espectral puede ser invisible, y su alcance y la distancia a la que puede alejarse de vos aumentan 30 pies. La aptitud es la característica que aumenta esta dote. Como acción adicional podés empujar con la mente a una criatura que veas a 30 pies: salvación de Fuerza (CD 8 + el modificador de esa característica + tu bonif. de competencia) o se mueve 5 pies hacia vos o en dirección contraria." },
+      { "type": "grantSpell", "spellId": "mage-hand", "ability": "charisma", "use": "atWill" }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -1953,8 +2057,10 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "intelligence", "amount": 1 },
-      { "type": "passiveTrait", "name": "Telepático", "description": "Ganás telepatía a corta distancia y podés lanzar Detectar Pensamientos sin gastar espacios." },
-      { "type": "sense", "sense": "telepathy", "range": 60 }
+      { "type": "passiveTrait", "name": "Telepático", "description": "Podés hablar por telepatía con una criatura que veas a 60 pies, en un idioma que conozcas. Tenés siempre preparado Detectar Pensamientos: lo podés lanzar sin componentes y sin gastar un espacio una vez por descanso largo, y también con tus espacios. La aptitud es la característica que aumenta esta dote." },
+      { "type": "sense", "sense": "telepathy", "range": 60 },
+      { "type": "grantSpell", "spellId": "detect-thoughts", "ability": "intelligence", "use": "oncePerLongRest" },
+      { "type": "alwaysPreparedSpell", "spellId": "detect-thoughts" }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -1967,8 +2073,10 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "wisdom", "amount": 1 },
-      { "type": "passiveTrait", "name": "Telepático", "description": "Ganás telepatía a corta distancia y podés lanzar Detectar Pensamientos sin gastar espacios." },
-      { "type": "sense", "sense": "telepathy", "range": 60 }
+      { "type": "passiveTrait", "name": "Telepático", "description": "Podés hablar por telepatía con una criatura que veas a 60 pies, en un idioma que conozcas. Tenés siempre preparado Detectar Pensamientos: lo podés lanzar sin componentes y sin gastar un espacio una vez por descanso largo, y también con tus espacios. La aptitud es la característica que aumenta esta dote." },
+      { "type": "sense", "sense": "telepathy", "range": 60 },
+      { "type": "grantSpell", "spellId": "detect-thoughts", "ability": "wisdom", "use": "oncePerLongRest" },
+      { "type": "alwaysPreparedSpell", "spellId": "detect-thoughts" }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -1981,8 +2089,10 @@
     "repeatable": false,
     "effects": [
       { "type": "abilityScoreBonus", "ability": "charisma", "amount": 1 },
-      { "type": "passiveTrait", "name": "Telepático", "description": "Ganás telepatía a corta distancia y podés lanzar Detectar Pensamientos sin gastar espacios." },
-      { "type": "sense", "sense": "telepathy", "range": 60 }
+      { "type": "passiveTrait", "name": "Telepático", "description": "Podés hablar por telepatía con una criatura que veas a 60 pies, en un idioma que conozcas. Tenés siempre preparado Detectar Pensamientos: lo podés lanzar sin componentes y sin gastar un espacio una vez por descanso largo, y también con tus espacios. La aptitud es la característica que aumenta esta dote." },
+      { "type": "sense", "sense": "telepathy", "range": 60 },
+      { "type": "grantSpell", "spellId": "detect-thoughts", "ability": "charisma", "use": "oncePerLongRest" },
+      { "type": "alwaysPreparedSpell", "spellId": "detect-thoughts" }
     ],
     "prerequisite": { "minLevel": 4 }
   },
@@ -2442,6 +2552,25 @@
         "type": "passiveTrait",
         "name": "Resistencias a Energías",
         "description": "Aumenta una característica en 1, hasta un máximo de 30. Elegí dos resistencias entre ácido, frío, fuego, necrótico, psíquico, radiante, relámpago, trueno y veneno; podés cambiarlas tras un descanso largo. Cuando recibís uno de esos daños, podés redirigir energía con tu reacción."
+      },
+      {
+        "type": "featureChoice",
+        "groupId": "boon-of-energy-resistance",
+        "name": "Resistencias a energías",
+        "featCategory": "energy-resistance",
+        "count": 2,
+        "replaceable": true,
+        "options": [
+          { "id": "acid", "name": "Ácido", "source": "phb_2024", "effects": [{ "type": "resistance", "damageType": "acid" }] },
+          { "id": "cold", "name": "Frío", "source": "phb_2024", "effects": [{ "type": "resistance", "damageType": "cold" }] },
+          { "id": "fire", "name": "Fuego", "source": "phb_2024", "effects": [{ "type": "resistance", "damageType": "fire" }] },
+          { "id": "lightning", "name": "Relámpago", "source": "phb_2024", "effects": [{ "type": "resistance", "damageType": "lightning" }] },
+          { "id": "necrotic", "name": "Necrótico", "source": "phb_2024", "effects": [{ "type": "resistance", "damageType": "necrotic" }] },
+          { "id": "poison", "name": "Veneno", "source": "phb_2024", "effects": [{ "type": "resistance", "damageType": "poison" }] },
+          { "id": "psychic", "name": "Psíquico", "source": "phb_2024", "effects": [{ "type": "resistance", "damageType": "psychic" }] },
+          { "id": "radiant", "name": "Radiante", "source": "phb_2024", "effects": [{ "type": "resistance", "damageType": "radiant" }] },
+          { "id": "thunder", "name": "Trueno", "source": "phb_2024", "effects": [{ "type": "resistance", "damageType": "thunder" }] }
+        ]
       }
     ],
     "prerequisite": {
