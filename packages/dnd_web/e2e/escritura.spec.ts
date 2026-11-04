@@ -743,3 +743,93 @@ test('Mesa: crear campaña, sumar con un código, conceder, echar y borrar sin t
   await page.getByRole('button', { name: 'Borrar campaña', exact: true }).click();
   await expect(page.getByText('Prepará tu primera mesa', { exact: true })).toBeVisible();
 });
+
+test('Capítulos: crear, empezar, escribir una nota y cerrar con un objeto llega al jugador sin tocar su ficha', async ({ page, request }) => {
+  // El jugador es la cuenta sin /v2 y solo por API. Esa cuenta no puede abrir
+  // la pantalla de la bandeja, así que acepta por las mismas rutas que usa la
+  // pantalla (`claim` y `DELETE`); la tarjeta «El DM te dio» no se prueba acá.
+  const comoJugador = { headers: { cookie: `dnd_session=${TOKEN_SIN_V2}` } };
+  const comoDm = { headers: { cookie: `dnd_session=${TOKEN_ESCRITURA}` } };
+  const fichasDelJugador = () =>
+    api<{ characters: { character: PersonajeApi }[] }>(request, '/api/characters', TOKEN_SIN_V2);
+  // La ficha que dejó la prueba de la Mesa, o una nueva si corre sola.
+  let pjId = 'pj-de-la-mesa';
+  if (!(await fichasDelJugador()).characters.some((c) => c.character.id === pjId)) {
+    const creado = await request.post('/api/characters', {
+      ...comoJugador,
+      data: { character: { ...(await ilse(request)), id: pjId, name: 'Pj de la Mesa' } },
+    });
+    pjId = ((await creado.json()) as { character: { id: string } }).character.id;
+  }
+  const { code } = (await (await request.post(`/api/characters/${pjId}/share`, comoJugador)).json()) as { code: string };
+  await request.post('/api/campaigns', { ...comoDm, data: { campaign: { id: 'mesa-de-capitulos', name: 'Mesa de Capítulos' } } });
+  await request.post('/api/campaigns/mesa-de-capitulos/members', { ...comoDm, data: { code } });
+  const fichaDelJugador = async () =>
+    JSON.stringify((await fichasDelJugador()).characters.find((c) => c.character.id === pjId));
+  const antes = await fichaDelJugador();
+
+  // Un objeto cualquiera del catálogo que no sea plantilla ni mágico.
+  const objeto = catalogo().items.find(
+    (i) => i.category === 'gear' && typeof i.baseItemKind !== 'string' && typeof i.rarity !== 'string',
+  )!;
+  const nombre = objeto.name as string;
+
+  await page.goto('/v2/dm/campanas/mesa-de-capitulos/capitulos');
+  await page.locator('[data-action="new-chapter"]').click();
+  await page.locator('[data-field="chapter-name"]').fill('La Puerta de Ceniza');
+  await page.locator('[data-field="chapter-gold"]').fill('50');
+  await page.locator('[data-action="add-chapter-item"]').click();
+  await page.locator('[data-field="item-picker-search"]').fill(nombre);
+  await page.getByRole('button', { name: `Agregar: ${nombre}`, exact: true }).click();
+  await page.getByRole('button', { name: 'Listo', exact: true }).click();
+  await page.getByRole('button', { name: 'Guardar', exact: true }).click();
+  const capitulo = page.locator('[data-chapter]');
+  await expect(capitulo).toHaveAttribute('data-status', 'pending');
+
+  await page.locator('[data-action="start-chapter"]').click();
+  await expect(capitulo).toHaveAttribute('data-status', 'open');
+
+  await page.locator('[data-action="chapter-notebook"]').click();
+  await page.locator('[data-action="write-note"]').click();
+  await page.locator('[data-field="note-title"]').fill('Lo que Garrick no dijo');
+  await page.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await expect(page.locator('[data-entry="note"]')).toContainText('Lo que Garrick no dijo');
+
+  await page.goto('/v2/dm/campanas/mesa-de-capitulos/capitulos');
+  await page.locator('[data-action="close-chapter"]').click();
+  const cierre = page.getByRole('dialog');
+  await cierre.getByRole('button', { name: 'Pj de la Mesa', exact: true }).click();
+  await cierre.getByRole('button', { name: 'Cerrar capítulo', exact: true }).click();
+  await expect(capitulo).toHaveAttribute('data-status', 'closed');
+
+  // El aviso lleva el oro y dice que hay objetos esperando.
+  await expect
+    .poll(async () => {
+      const { events } = await api<{ events: { kind: string; payload: { grantsGold?: number; hasGrants?: boolean } }[] }>(
+        request,
+        '/api/events',
+        TOKEN_SIN_V2,
+      );
+      return events.some((e) => e.kind === 'chapter_completed' && e.payload.grantsGold === 50 && e.payload.hasGrants === true);
+    })
+    .toBe(true);
+
+  // La frontera: el reparto no escribe la ficha ajena.
+  expect(await fichaDelJugador()).toBe(antes);
+
+  // El jugador acepta por las rutas de la pantalla: el objeto está en su
+  // bandeja, `claim` lo devuelve y `DELETE` lo saca.
+  const { grants } = await api<{ grants: { id: string; name: string }[] }>(
+    request,
+    `/api/characters/${pjId}/item-grants`,
+    TOKEN_SIN_V2,
+  );
+  expect(grants.map((g) => g.name)).toEqual([nombre]);
+  const aceptado = await request.post(`/api/item-grants/${grants[0]!.id}/claim`, comoJugador);
+  expect(((await aceptado.json()) as { itemId: string }).itemId).toBe(objeto.id);
+  expect((await request.delete(`/api/item-grants/${grants[0]!.id}`, comoJugador)).ok()).toBe(true);
+  expect((await api<{ grants: unknown[] }>(request, `/api/characters/${pjId}/item-grants`, TOKEN_SIN_V2)).grants).toEqual([]);
+
+  // La prueba de la Mesa espera que esta cuenta no tenga campañas.
+  await request.delete('/api/campaigns/mesa-de-capitulos', comoDm);
+});

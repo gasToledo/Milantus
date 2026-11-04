@@ -1105,7 +1105,7 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
-## [Unreleased]
+## [0.45.0+1] - 2026-11-04
 
 ### Nuevo
 
@@ -1114,6 +1114,38 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   de golpe para curarse.
 - En `/v2`, los descansos corto y largo de la ficha propia, con el mismo
   aviso que la app de siempre y «Deshacer».
+- En `/v2`, el DM crea, edita, empieza y borra capítulos, y escribe, edita y
+  borra las notas del Cuaderno. «Ver en el Cuaderno» abre en el capítulo elegido
+  y guardar una nota lleva a su capítulo.
+- El DM puede repartir objetos del catálogo o de su homebrew al cerrar un
+  capítulo, a personajes concretos, desde `/v2`. El jugador los recibe en la
+  bandeja «El DM te dio», de Inventario, y los agrega a su mochila o los
+  descarta; el DM nunca escribe su ficha. Un objeto de homebrew se copia a la
+  cuenta del jugador cuando lo acepta.
+- Los avisos llegan también con la ficha abierta (se piden cada 30 segundos con
+  la pestaña a la vista) y al terminar un combate: «Terminó el combate de …»,
+  en `/v2` y en la app de siempre.
+- Servidor: tabla `item_grants` (migración 0015), rutas para listar, reclamar y
+  descartar regalos, y un reparto opcional al cerrar un capítulo.
+- Motor (`dnd_engine`): los capítulos guardan los objetos del catálogo que
+  reparten (`Chapter.grantsCatalog`, esquema 2).
+
+### Modificado
+
+- Los avisos de capítulo cerrado nombran también los objetos del catálogo, y en
+  `/v2` dicen que hay objetos esperando en Inventario.
+- La lista de capítulos de `/v2` ya no manda a la aplicación principal para
+  crearlos.
+
+### Eliminado
+
+- Sin cambios.
+
+## [Unreleased]
+
+### Nuevo
+
+- Sin cambios.
 
 ### Modificado
 

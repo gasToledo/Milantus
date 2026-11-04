@@ -302,7 +302,7 @@ Cada sección es una ruta bajo `/v2/dm/campanas/:id/` (el Bestiario, la Bibliote
 `DmHeader` (título Georgia 30, pill con el estado, `actions` a su derecha y la regla ornamental; el
 `h1` es el título) y `DmPage`, que resuelve la campaña por id y es la única que
 sabe distinguir «cargando», «error» y «no se encontró» (una campaña ajena y una
-inexistente son la misma pantalla). Desde 6b escribe campañas y la Mesa (abajo); lo demás sigue de solo lectura.
+inexistente son la misma pantalla). Desde 6b escribe campañas y la Mesa y desde 6c capítulos, notas y el reparto de objetos (abajo); lo demás sigue de solo lectura.
 
 - **Mesa** (`MesaView`, `MemberCard`): grilla `auto-fill` de tarjetas con
   `toRosterEntry` (`dashboard/roster.ts`, la misma cuenta que el dashboard). La
@@ -319,7 +319,22 @@ inexistente son la misma pantalla). Desde 6b escribe campañas y la Mesa (abajo)
   avisos, nunca sobre la ficha del jugador.
 - **Capítulos** (`ChaptersView`): lista ordenada de tarjetas `card`; el abierto
   lleva `border-2 border-gold`, el estado va en una pill con el color del estado
-  (oro, apagado, neutro) y lo que reparte en `StatPlaque`.
+  (oro, apagado, neutro) y lo que reparte en `StatPlaque`. Cada tarjeta tiene un
+  ⋮ de 40 × 40 (`chapter-actions`: «Editar», salvo cerrado, y «Borrar»), «Empezar»
+  o «Cerrar capítulo» según el estado, y el enlace «Ver en el Cuaderno».
+- **Escritura de 6c**: `ChapterEditorDialog` (el estado no se edita: guarda
+  `{ ...capítulo, cambios }` y nunca manda `completed`; lista de objetos con − y +),
+  `NoteEditorDialog` (`Select` de capítulo con el rótulo adentro), `ItemPicker`
+  (`AppDialog` con buscador, `FamilyFilter` más «Propios» y filas de `catalogRows`;
+  agregar no cierra y la fila pasa a «Agregado»; una plantilla pide base con el
+  `BaseDialog` de `MagicItemPlans`, que acepta `exclude` para no ofrecer el
+  homebrew) y `CloseChapterDialog` (como `ConfirmDialog` pero con el botón en oro
+  y sin ícono de alerta; un chip `aria-pressed` por personaje en cada objeto,
+  nada marcado de entrada, y apagado con `dmCloseMissing` si falta alguien).
+  `ItemGrants` es la tarjeta «El DM te dio» de Inventario (`data-card="item-grants"`),
+  solo en la ficha propia. `CatalogRow` (`sheet/ItemCatalog.tsx`) suma `category`
+  (`weapons`, `armor` o `items`, la lista donde vive) y `homebrew`
+  (`source === 'homebrew'`); quienes ya lo usaban no cambian.
 - **Cuaderno** (`NotebookView`, `notebook.ts`): pills `aria-pressed` por
   capítulo (la selección es estado local, no ruta), buscador en pill como el del
   Bestiario y entradas en `card` con `border-l-[3px]` del color del tipo. Titular,

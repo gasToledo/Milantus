@@ -231,9 +231,10 @@ repiten acá.
   escribiendo la URL. Pertenecen al Modo DM, que ahora existe en parte (abajo): el
   panel DM enlaza el Bestiario.
 - **El Modo DM** en `/v2/dm` (`src/dm/`), al que lleva «DM» del
-  interruptor. Desde 6b escribe campañas y la Mesa (bloque de 6b, abajo); cerrar
-  capítulos, las escenas de música, las notas, los PNJ y el combate **siguen
-  en Flutter** hasta 6c a 6g, y esas secciones se leen. Se porta por
+  interruptor. Desde 6b escribe campañas y la Mesa y desde 6c capítulos,
+  notas y el reparto de objetos (bloques de 6b y 6c, abajo); las escenas de
+  música, los PNJ y el combate **siguen en Flutter** hasta 6d a 6g, y esas
+  secciones se leen. Se porta por
   secciones, una por PR; hoy existen la **Mesa**, **Capítulos**, el **Cuaderno**,
   los **PNJ de la mesa**, el **Combate**, el **Bestiario**, la **Biblioteca de
   PNJ** y el **Homebrew**: todas las secciones del panel, más la **ficha
@@ -258,7 +259,7 @@ repiten acá.
   sin reproducirse. Vive en `DmPage` y no en una sección: cambiar de sección o
   abrir una herramienta de la cuenta no la corta; cambiar de campaña, sí. Crear,
   editar, reordenar, borrar y marcar «ofrecer al iniciar un combate» son
-  escrituras (paso 6; crear, editar y borrar campañas ya están, ver 6b), y la oferta al empezar un combate no está porque acá
+  escrituras (paso 6; crear, editar y borrar campañas ya están, ver 6b; capítulos y notas, ver 6c), y la oferta al empezar un combate no está porque acá
   nadie empieza uno. La **Mesa** lista a los jugadores
   vinculados (`GET /api/campaigns/:id/members`, que lee la ficha **real** del
   jugador, no una copia): retrato, nombre, especie y clase, nivel, barra
@@ -281,8 +282,8 @@ repiten acá.
   su estado (Cerrado / Abierto con borde oro / Pendiente), el **objetivo** —que
   el servidor nunca manda a un jugador, y por eso solo se lee con la cuenta del
   DM— y lo que reparte (placas de nivel, oro y objetos, y la línea que arma el
-  motor con `chapterGrants`). Cerrar un capítulo avisa a otras cuentas y sigue en
-  Flutter. La cabecera de la Mesa dice el capítulo en marcha. **Cuaderno**
+  motor con `chapterGrants`). Crear, editar, empezar, cerrar y borrar capítulos es
+  de 6c (abajo). La cabecera de la Mesa dice el capítulo en marcha. **Cuaderno**
   (`GET /api/campaigns/:id/notebook`, un solo pedido con `notes`,
   `encounterLogs` y `levelUps`): una pill por capítulo —se abre en el que está
   en marcha— más «Sin capítulo», un buscador que sin tildes ni mayúsculas cuenta
@@ -696,6 +697,27 @@ repiten acá.
 - **Ningún enlace** desde Flutter hacia `/v2` y Flutter no lee `webV2`: se
   entra escribiendo la URL.
 
+**Paso 6c: capítulos, notas, reparto de objetos y avisos** *(existe)*. Toca motor,
+servidor (una tabla nueva) y un poco de Flutter. La frontera no cambia: **el DM
+no escribe la ficha de otra cuenta**; el objeto repartido lo agrega el jugador
+al aceptar.
+- **Capítulos** (`ChapterEditorDialog`, `CloseChapterDialog`, `ItemPicker`):
+  crear, editar (salvo cerrados), empezar —con otro en marcha avisa sin llamar
+  al servidor— y borrar. Un `PUT` nunca cierra: cerrar tiene su ruta. El editor
+  lista los objetos (`grantsCatalog`, esquema 2 de `Chapter`) con cantidad, y el
+  texto libre de antes aparece como «Sin catálogo».
+- **Cerrar con reparto**: una fila por objeto con un chip por personaje; nada se
+  asigna solo y con un objeto sin nadie no se puede cerrar. Manda `allocations`;
+  sin objetos, o con la mesa vacía, cierra sin cuerpo.
+- **Cuaderno**: escribir, editar y borrar notas (solo las `note` tienen menú);
+  `?capitulo=` abre en un capítulo y guardar salta al de la nota.
+- **El jugador**: «El DM te dio» en Inventario (`ItemGrants`, solo ficha propia).
+  Aceptar reclama, espera al catálogo si es homebrew, agrega por el motor y
+  recién ahí saca la fila. Los avisos llegan también con la pantalla abierta
+  (cada 30 s con la página visible) y al terminar un combate.
+- **Servidor**: `item_grants` (migración 0015), las rutas de la bandeja y
+  `encounter_finished`: ver `modo-dm.md`.
+
 **Paso 6b: campañas y Mesa** *(existe)*. Es la parte del DM que escribe
 primero, y no toca motor, servidor ni Flutter: las rutas ya existían. La
 frontera sigue donde estaba: **el DM no escribe la ficha de otra cuenta**.
@@ -784,7 +806,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
 6. Lo crítico, que toca datos de otras cuentas o de varias a la vez: Modo DM,
    combate, vínculos y códigos de campaña. Por partes: 6a, la del jugador:
    compartir, los avisos de la cola y el aviso de turno *(existe)*; 6b, las
-   campañas y la Mesa *(existe)*; 6c, Capítulos y Cuaderno; 6d, la música; 6e, los PNJ; 6f, la ficha de
+   campañas y la Mesa *(existe)*; 6c, Capítulos y Cuaderno *(existe)*; 6d, la música; 6e, los PNJ; 6f, la ficha de
    PNJ; 6g, el combate. Importar y exportar PNJ sigue en el paso 7. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de
    otra cuenta» es del servidor y vale igual para el cliente nuevo. Entra acá
