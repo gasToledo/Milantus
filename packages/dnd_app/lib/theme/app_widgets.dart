@@ -404,8 +404,9 @@ class AppErrorView extends StatelessWidget {
                 Theme(
                   // El divisor propio del ExpansionTile parte la caja en dos
                   // aunque esté plegada, y acá no separa nada.
-                  data: Theme.of(context)
-                      .copyWith(dividerColor: Colors.transparent),
+                  data: Theme.of(
+                    context,
+                  ).copyWith(dividerColor: Colors.transparent),
                   child: ExpansionTile(
                     title: Text(
                       context.l10n.errorShowDetails,

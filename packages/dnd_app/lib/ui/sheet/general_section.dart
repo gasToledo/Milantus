@@ -583,8 +583,9 @@ extension _SheetGeneralSection on _SheetScreenState {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) {
-          final previewSheet = CharacterCompiler(repo)
-              .compile(withChoices(choices));
+          final previewSheet = CharacterCompiler(
+            repo,
+          ).compile(withChoices(choices));
           final slots = previewSheet.spellChoiceSlots;
 
           bool complete() => slots.every(

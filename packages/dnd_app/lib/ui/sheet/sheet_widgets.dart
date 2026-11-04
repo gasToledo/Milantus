@@ -41,9 +41,9 @@ String _activeModeSummary(BuildContext context, ActiveMode m) {
       .map(conditionLabel)
       .map((label) => localized(label.toLowerCase(), label))
       .toList();
-  final abilities = {for (final v in m.advantages) ...v.abilities}
-      .map((a) => a.abbr)
-      .toList();
+  final abilities = {
+    for (final v in m.advantages) ...v.abilities,
+  }.map((a) => a.abbr).toList();
   return [
     if (types.isNotEmpty) l10n.modeResistance(types.join(', ')),
     if (conditions.isNotEmpty)
