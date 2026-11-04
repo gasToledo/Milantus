@@ -328,7 +328,7 @@ inexistente son la misma pantalla). Desde 6b escribe campañas y la Mesa y desde
   (`AppDialog` con buscador, `FamilyFilter` más «Propios» y filas de `catalogRows`;
   agregar no cierra y la fila pasa a «Agregado»; solo se entrega lo que existe, sin texto libre (los capítulos viejos que lo tienen lo conservan como «Sin catálogo»); una plantilla pide base con el
   `BaseDialog` de `MagicItemPlans`, que acepta `exclude` para no ofrecer el
-  homebrew) y `CloseChapterDialog` (como `ConfirmDialog` pero con el botón en oro
+  homebrew) y `ChapterItemsField` (la lista de objetos con cantidad, quitar y «Agregar objeto» que comparten el editor de capítulos y `GiveItemDialog`), `GiveItemDialog` («Dar objeto a …» desde el ⋮ de `MemberCard`, con «Dar» apagado sin objetos) y `CloseChapterDialog` (como `ConfirmDialog` pero con el botón en oro
   y sin ícono de alerta; un chip `aria-pressed` por personaje en cada objeto,
   nada marcado de entrada, y apagado con `dmCloseMissing` si falta alguien).
   `ItemGrants` es la tarjeta «El DM te dio» de Inventario (`data-card="item-grants"`),

@@ -14,6 +14,7 @@ import { memberPortrait } from '../ui/portrait';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { stateLabel, stateOf } from './campaigns';
 import { AddMemberDialog } from './AddMemberDialog';
+import { GiveItemDialog } from './GiveItemDialog';
 import { CampaignMenu } from './CampaignMenu';
 import { DmHeader } from './DmHeader';
 import { MemberCard } from './MemberCard';
@@ -36,6 +37,7 @@ export function MesaView({ campaign }: { campaign: DmCampaign }) {
   const chapters = useCampaignChapters(campaign.id);
   const client = useQueryClient();
   const [adding, setAdding] = useState(false);
+  const [giving, setGiving] = useState<{ memberId: string; name: string } | null>(null);
   const [removing, setRemoving] = useState<{ memberId: string; name: string } | null>(null);
   const [toast, setToast] = useState<{ key: number; tone: ToastTone; message: string } | null>(null);
   const notify = (tone: ToastTone, message: string) => setToast((prev) => ({ key: (prev?.key ?? 0) + 1, tone, message }));
@@ -95,6 +97,7 @@ export function MesaView({ campaign }: { campaign: DmCampaign }) {
               href={dmMemberHref(campaign.id, memberId)}
               portrait={memberPortrait(campaign.id, memberId, entry.character)}
               actions={{
+                onGiveItem: () => setGiving({ memberId, name: entry.character.name }),
                 onGrantInspiration: () => void grant(memberId, entry.character.name),
                 onRemove: () => setRemoving({ memberId, name: entry.character.name }),
               }}
@@ -125,6 +128,14 @@ export function MesaView({ campaign }: { campaign: DmCampaign }) {
           campaign={campaign}
           onAdded={(name) => notify('success', t.dmMemberAdded(name, campaign.name))}
           onClose={() => setAdding(false)}
+        />
+      )}
+      {giving && (
+        <GiveItemDialog
+          campaignId={campaign.id}
+          member={giving}
+          onSent={(name) => notify('success', t.dmGiveItemSent(name))}
+          onClose={() => setGiving(null)}
         />
       )}
       {removing && (

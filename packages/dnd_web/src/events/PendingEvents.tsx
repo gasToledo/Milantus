@@ -61,8 +61,8 @@ export function PendingEvents() {
             // está visto) volvería a llegar en cada pedido.
             if (queued.current.has(event.id)) continue;
             queued.current.add(event.id);
-            // Un cierre con objetos deja regalos en la bandeja de Inventario.
-            if (event.kind === 'chapter_completed' && event.payload.hasGrants === true) {
+            // Un cierre con objetos, o uno dado desde la Mesa, deja regalos en la bandeja de Inventario.
+            if ((event.kind === 'chapter_completed' || event.kind === 'item_granted') && event.payload.hasGrants === true) {
               void client.invalidateQueries({ queryKey: ['itemGrants'] }); // prefijo de `queryKeys.itemGrants`
             }
             const message = eventMessage(event, t);

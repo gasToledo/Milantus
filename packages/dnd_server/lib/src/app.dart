@@ -266,6 +266,10 @@ Handler buildHandler({
         (request) => _grantHeroicInspirationHandler(request, campaigns, events),
       ),
     )
+    ..post(
+      '/api/campaigns/<id>/members/<memberId>/item-grants',
+      authenticated((request) => _giveItemsHandler(request, transactions)),
+    )
     ..get(
       '/api/campaigns/<id>/notebook',
       authenticated(

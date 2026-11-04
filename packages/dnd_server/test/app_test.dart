@@ -3589,6 +3589,134 @@ void main() {
           expect(itemGrants.count, 0);
         });
 
+        group('dar un objeto desde la Mesa', () {
+          Future<Map<String, dynamic>> give(
+            String dm,
+            String memberId,
+            Object? items,
+          ) => send(
+            'POST',
+            '/api/campaigns/tumba/members/$memberId/item-grants',
+            token: dm,
+            body: {'items': items},
+          );
+
+          test(
+            'crea el regalo y el aviso solo al dueño, y la ficha no cambia',
+            () async {
+              final t = await table('dar-ok');
+              Future<String> sheet() async => jsonEncode(
+                (await send('GET', '/api/characters', token: t.a))['body'],
+              );
+              final before = await sheet();
+
+              final given = await give(t.dm, t.memberA, [potion]);
+
+              expect(given['status'], 200);
+              final grants = await grantsOf(t.a, 'sagan');
+              expect(grants, hasLength(1));
+              expect(grants.single['chapterName'], '');
+              expect(grants.single['quantity'], 2);
+              final event =
+                  ((await send(
+                                'GET',
+                                '/api/events',
+                                token: t.a,
+                              ))['body']['events']
+                              as List)
+                          .firstWhere(
+                            (e) => e['kind'] == 'item_granted',
+                          )['payload']
+                      as Map;
+              expect(event['grantsItems'], ['Poción de curación ×2']);
+              expect(event['hasGrants'], isTrue);
+              // Solo al dueño: ni a otro miembro de la mesa ni al DM.
+              expect(await grantsOf(t.b, 'elsbeth'), isEmpty);
+              for (final other in [t.b, t.dm]) {
+                final kinds =
+                    ((await send(
+                              'GET',
+                              '/api/events',
+                              token: other,
+                            ))['body']['events']
+                            as List)
+                        .map((e) => e['kind']);
+                expect(kinds, isNot(contains('item_granted')));
+              }
+              expect(await sheet(), before);
+            },
+          );
+
+          test(
+            'un vínculo o una campaña ajenos responden igual que los inexistentes',
+            () async {
+              final t = await table('dar-404');
+              final stranger = await login('dar-404-stranger');
+              const missing = '00000000-0000-4000-8000-0000000000ff';
+
+              final foreign = await give(stranger, t.memberA, [potion]);
+              final unknown = await give(t.dm, missing, [potion]);
+              final noCampaign = await send(
+                'POST',
+                '/api/campaigns/otra/members/${t.memberA}/item-grants',
+                token: t.dm,
+                body: {
+                  'items': [potion],
+                },
+              );
+
+              expect(foreign['status'], 404);
+              expect(unknown['status'], 404);
+              expect(noCampaign['status'], 404);
+              expect(await grantsOf(t.a, 'sagan'), isEmpty);
+            },
+          );
+
+          test(
+            'una lista vacía, una categoría inválida o texto libre son un 400',
+            () async {
+              final t = await table('dar-400');
+
+              expect((await give(t.dm, t.memberA, []))['status'], 400);
+              expect(
+                (await give(t.dm, t.memberA, [
+                  {'category': 'spells', 'itemId': 'x', 'name': 'X'},
+                ]))['status'],
+                400,
+              );
+              expect(
+                (await give(t.dm, t.memberA, [
+                  'Mapa del contrabandista',
+                ]))['status'],
+                400,
+              );
+              expect(await grantsOf(t.a, 'sagan'), isEmpty);
+            },
+          );
+
+          test('un homebrew que no es del DM es un 400', () async {
+            final t = await table('dar-hb');
+            await send(
+              'PUT',
+              '/api/homebrew/items/hoja',
+              token: t.a,
+              body: _homebrewItem('hoja', 'Hoja del Cuervo'),
+            );
+
+            final given = await give(t.dm, t.memberA, [
+              {
+                'category': 'items',
+                'itemId': 'hoja',
+                'name': 'Hoja del Cuervo',
+                'homebrew': true,
+              },
+            ]);
+
+            expect(given['status'], 400);
+            expect(await grantsOf(t.a, 'sagan'), isEmpty);
+          });
+        });
+
         group('la bandeja del jugador', () {
           Future<(String, String, Map<String, dynamic>)> withGift(
             String prefix, {

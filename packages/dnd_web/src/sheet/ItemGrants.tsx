@@ -110,7 +110,7 @@ export function ItemGrants({ model }: { model: SheetModel }) {
                   </i>
                 )}
               </b>
-              <small className="block text-[12px] text-text-muted">{`${g.campaignName} · ${g.chapterName}`}</small>
+              <small className="block text-[12px] text-text-muted">{g.chapterName === '' ? g.campaignName : `${g.campaignName} · ${g.chapterName}`}</small>
             </span>
             <Button data-action="accept-grant" disabled={busy !== null} onClick={() => void accept(g)}>
               {t.grantsAdd}

@@ -594,3 +594,12 @@ export async function claimItemGrant(id: string): Promise<{ itemId: string; base
 
 /** Saca el regalo de la bandeja (aceptado o descartado). */
 export const resolveItemGrant = (id: string) => remove(`/api/item-grants/${encodeURIComponent(id)}`);
+
+/** Le da objetos a un personaje de la mesa fuera de un capítulo. Es un **aviso
+ *  más un regalo en su bandeja**: el DM no escribe la ficha (`modo-dm.md`). */
+export const giveItems = (campaignId: string, memberId: string, items: ChapterItem[]) =>
+  sendJson(
+    'POST',
+    `/api/campaigns/${encodeURIComponent(campaignId)}/members/${encodeURIComponent(memberId)}/item-grants`,
+    { items },
+  );

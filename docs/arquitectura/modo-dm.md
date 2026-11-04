@@ -240,6 +240,20 @@ también el nombre de la campaña y del capítulo, como texto, por lo mismo.
   /api/item-grants/<id>` la saca. Lo ajeno y lo inexistente responden el mismo
   404.
 
+### Dar un objeto fuera de un capítulo
+
+`POST /api/campaigns/<id>/members/<memberId>/item-grants` (cuerpo `{ items:
+[ChapterItem] }`) es el «Dar objeto…» de la Mesa. Autoriza como la Inspiración
+Heroica: `campaigns.find` y `findMember` con la cuenta de quien pide, y lo
+ajeno responde igual que lo inexistente. Una lista vacía, una categoría inválida
+o texto libre son un 400, y un homebrew se lee del homebrew **del DM**, nunca
+del pedido (la validación es la misma del reparto al cerrar: `_allocatedItem`).
+En una transacción deja el regalo con `chapter_name` vacío y un aviso
+`item_granted` (`characterName`, `campaignName`, `grantsItems`,
+`hasGrants: true`) al dueño. La ficha no se toca. Solo se entrega lo que
+existe: no hay texto libre en altas nuevas (los capítulos viejos que lo tienen
+lo conservan).
+
 **La frontera se mantiene:** el reparto no escribe la ficha. Lo agrega el
 jugador a su inventario, con su propia sesión, cuando acepta. Una prueba compara
 el documento antes y después de cerrar con reparto.
@@ -657,6 +671,8 @@ El subgrupo `capítulos` agrega:
   capítulo;
 - cerrar dos veces no repite el aviso;
 - borrar la campaña se lleva sus capítulos.
+
+El subgrupo `dar un objeto desde la Mesa` fija: regalo y aviso solo al dueño con la ficha intacta, el mismo 404 para lo ajeno y lo inexistente, 400 para lista vacía, categoría inválida, texto libre y homebrew ajeno.
 
 El subgrupo `reparto de objetos` fija: cada dueño recibe solo lo suyo y el aviso
 lleva lo suyo; la ficha no cambia; un `memberId` de otra mesa o un homebrew que

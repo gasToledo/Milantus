@@ -41,6 +41,32 @@ class _Allocations {
   const _Allocations(this.byMember, this.unionFree, this.unionCatalog);
 }
 
+/// Lee un objeto del pedido y resuelve su documento si es de homebrew. Lo usan
+/// el reparto al cerrar un capítulo y «Dar objeto» desde la Mesa, para que las
+/// dos validen igual. [ownHomebrew] lee el homebrew de la cuenta del DM, una
+/// sola vez y solo si hace falta. Un error es un 400.
+Future<_AllocatedItem> _allocatedItem(
+  Object? rawItem,
+  Future<Map<String, List<Map<String, dynamic>>>> Function() ownHomebrew,
+) async {
+  final item = ChapterItem.tryFromJson(rawItem);
+  if (item == null) throw const FormatException('Objeto inválido.');
+  Map<String, dynamic>? document;
+  if (item.homebrew) {
+    // Nunca se confía en un documento del pedido: se busca en el homebrew de
+    // quien reparte, por categoría e id.
+    document = (await ownHomebrew())[item.category]
+        ?.where((d) => d['id'] == item.itemId)
+        .firstOrNull;
+    if (document == null) {
+      throw FormatException(
+        'El objeto propio «${item.name}» no está en tu homebrew.',
+      );
+    }
+  }
+  return _AllocatedItem(item, document);
+}
+
 /// Valida `allocations` contra la mesa y el homebrew del DM. Cualquier error es
 /// un 400 y se detecta antes de escribir nada.
 Future<_Allocations> _parseAllocations(
@@ -72,24 +98,11 @@ Future<_Allocations> _parseAllocations(
     final mine = byMember.putIfAbsent(memberId, _MemberAllocation.new);
 
     for (final rawItem in (entry['items'] as List? ?? const [])) {
-      final item = ChapterItem.tryFromJson(rawItem);
-      if (item == null)
-        throw const FormatException('Objeto inválido en el reparto.');
-      Map<String, dynamic>? document;
-      if (item.homebrew) {
-        // Nunca se confía en un documento del pedido: se busca en el homebrew
-        // de quien cierra, por categoría e id.
-        own ??= await homebrew.listForUser(dmUserId);
-        document = own[item.category]
-            ?.where((d) => d['id'] == item.itemId)
-            .firstOrNull;
-        if (document == null) {
-          throw FormatException(
-            'El objeto propio «${item.name}» no está en tu homebrew.',
-          );
-        }
-      }
-      mine.items.add(_AllocatedItem(item, document));
+      final allocated = await _allocatedItem(rawItem, () async {
+        return own ??= await homebrew.listForUser(dmUserId);
+      });
+      final item = allocated.item;
+      mine.items.add(allocated);
       // La unión se arma sin repetidos: el mismo objeto a dos personajes es una
       // sola línea del capítulo.
       unionCatalog.putIfAbsent(
@@ -179,4 +192,65 @@ Future<Response> _resolveItemGrantHandler(
     return _notFound('item_grant_not_found');
   }
   return _jsonOk({'status': 'ok'});
+}
+
+/// Da objetos a un personaje de la mesa **fuera de un capítulo** (`chapterName`
+/// vacío). Deja los regalos en la bandeja del jugador y un aviso; la ficha no se
+/// toca. La autorización es la de Inspiración Heroica: `campaigns.find` y
+/// `findMember` con la cuenta de quien pide, y lo ajeno responde como lo
+/// inexistente. Sin texto libre: solo se entrega lo que existe.
+Future<Response> _giveItemsHandler(
+  Request request,
+  RepositoryTransactionRunner transactions,
+) async {
+  final campaignId = requireSafePathSegment(
+    request.params['id']!,
+    label: 'id de campaña',
+  );
+  final memberId = requireSafePathSegment(
+    request.params['memberId']!,
+    label: 'id de vínculo',
+  );
+  final body = await _readOptionalJsonBody(request);
+  final raw = body['items'];
+  if (raw is! List || raw.isEmpty) {
+    throw const FormatException('"items" debe ser una lista con objetos.');
+  }
+  return transactions.run((repositories) async {
+    final campaign = await repositories.campaigns.find(
+      request.userId,
+      campaignId,
+    );
+    if (campaign == null) return _notFound('campaign_not_found');
+    final member = await repositories.campaigns.findMember(
+      dmUserId: request.userId,
+      campaignId: campaignId,
+      memberId: memberId,
+    );
+    if (member == null) return _notFound('character_not_found');
+
+    Map<String, List<Map<String, dynamic>>>? own;
+    final items = [
+      for (final rawItem in raw)
+        await _allocatedItem(rawItem, () async {
+          return own ??= await repositories.homebrew.listForUser(
+            request.userId,
+          );
+        }),
+    ];
+    await repositories.itemGrants.addAll(
+      member.ownerUserId,
+      member.character.id,
+      campaign.name,
+      '',
+      [for (final item in items) item.toStoredJson()],
+    );
+    await repositories.events.append(member.ownerUserId, 'item_granted', {
+      'characterName': member.character.name,
+      'campaignName': campaign.name,
+      'grantsItems': [for (final item in items) item.item.label],
+      'hasGrants': true,
+    });
+    return _jsonOk({'status': 'ok'});
+  });
 }

@@ -1,4 +1,4 @@
-import { EllipsisVertical, Sparkles, UserMinus } from 'lucide-react';
+import { EllipsisVertical, Gift, Sparkles, UserMinus } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, Tooltip } from '../ui/primitives';
 import { HP_CRITICAL_RATIO, hpTone, Pill, StatPlaque, ThinBar } from '../ui/data';
 import { useTexts } from '../i18n/context';
@@ -32,7 +32,7 @@ export function MemberCard({
   entry: RosterEntry;
   href: string;
   portrait: string | null;
-  actions?: { onGrantInspiration: () => void; onRemove: () => void };
+  actions?: { onGiveItem: () => void; onGrantInspiration: () => void; onRemove: () => void };
 }) {
   const t = useTexts();
   const { character, sheet } = entry;
@@ -104,6 +104,10 @@ export function MemberCard({
               </DropdownMenuTrigger>
             </Tooltip>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={actions.onGiveItem}>
+                <Gift size={15} aria-hidden="true" className="text-gold" />
+                {t.dmGiveItemMenu}
+              </DropdownMenuItem>
               <DropdownMenuItem onSelect={actions.onGrantInspiration}>
                 <Sparkles size={15} aria-hidden="true" className="text-gold" />
                 {t.dmGrantInspiration}

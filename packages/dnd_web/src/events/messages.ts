@@ -35,6 +35,18 @@ export function eventMessage(event: UserEvent, t: Texts): { text: string; tone: 
     case 'chapter_completed':
       return chapterCompleted(event, character, campaign, t);
     // Solo quién y dónde: lo que pasó en el combate es del Cuaderno del DM.
+    // Un objeto dado fuera de un capítulo: llega a la bandeja de Inventario.
+    case 'item_granted': {
+      const { grantsItems } = event.payload;
+      const items = Array.isArray(grantsItems) ? grantsItems.filter((i): i is string => typeof i === 'string') : [];
+      const text = [
+        items.length > 0 ? t.evtItemGranted(items.join(', '), character, campaign) : null,
+        t.evtItemsWaiting,
+      ]
+        .filter(Boolean)
+        .join(' ');
+      return { text, tone: 'success' };
+    }
     case 'encounter_finished':
       return { text: t.evtCombatDone(character, campaign), tone: 'info' };
     default:
