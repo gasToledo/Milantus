@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { canLevelUp, type CharacterJson } from '../engine';
+import { useItemGrants } from '../api/queries';
 import { useTexts } from '../i18n/context';
 import { characterHref, levelUpHref, portraitHref, rosterHref, SHEET_TABS, type SheetTab } from '../router';
 import type { Texts } from '../i18n/texts';
@@ -46,6 +47,8 @@ export function SheetPanel({ model, tab }: { model: SheetModel; tab: SheetTab })
     .join(' / ');
   const id = character.id;
   const printing = usePrintSheet();
+  // Los regalos del DM esperando en Inventario: solo en la ficha propia.
+  const waiting = useItemGrants(id, model.write !== undefined).data?.length ?? 0;
   const [sharing, setSharing] = useState(false);
 
   return (
@@ -69,6 +72,7 @@ export function SheetPanel({ model, tab }: { model: SheetModel; tab: SheetTab })
               icon={TAB_ICONS[tabId]}
               label={tabLabel(t, tabId)}
               active={tab === tabId}
+              count={tabId === 'inventario' && waiting > 0 ? waiting : undefined}
               internal
             />
           </li>

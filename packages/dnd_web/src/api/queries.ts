@@ -15,6 +15,7 @@ import {
   fetchAppVersion,
   fetchCampaignChapters,
   fetchCharacterShares,
+  fetchItemGrants,
   fetchCampaignEncounter,
   fetchCampaignMembers,
   fetchCampaignNotebook,
@@ -59,6 +60,8 @@ export const queryKeys = {
   // Sin el prefijo 'characters': `roster` lo es, `writer.ts` lo cancela en cada
   // acción y otras pantallas lo invalidan; estas no tienen que moverse con él.
   characterShares: (characterId: string) => ['shares', characterId] as const,
+  // No empieza con 'characters': `roster` es ese prefijo y lo invalida todo.
+  itemGrants: (characterId: string) => ['itemGrants', characterId] as const,
   turn: (characterId: string) => ['turn', characterId] as const,
   appVersion: ['app-version'] as const,
   dmCampaigns: ['dm', 'campaigns'] as const,
@@ -244,3 +247,12 @@ export function useSheetCatalog(lang: Lang): {
   const data = catalog.data && homebrew.data ? merged(catalog.data, homebrew.data) : undefined;
   return { data, queries: [catalog, homebrew] };
 }
+
+/** La bandeja de objetos que el DM le dio al personaje. Solo la ficha propia la
+ *  pide ([enabled]): es del dueño y nadie más la lee. */
+export const useItemGrants = (characterId: string, enabled: boolean) =>
+  useQuery({
+    queryKey: queryKeys.itemGrants(characterId),
+    queryFn: ({ signal }) => fetchItemGrants(characterId, signal),
+    enabled,
+  });

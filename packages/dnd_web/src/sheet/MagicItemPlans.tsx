@@ -328,6 +328,7 @@ export function BaseDialog({
   itemId,
   title,
   confirm,
+  exclude,
   onConfirm,
   onClose,
 }: {
@@ -335,11 +336,17 @@ export function BaseDialog({
   itemId: string;
   title: string;
   confirm: string;
+  /** Bases que no se ofrecen (los ids del homebrew, cuando el objeto se le da a
+   *  otra cuenta que no los tiene). */
+  exclude?: ReadonlySet<string>;
   onConfirm: (base: string) => void;
   onClose: () => void;
 }) {
   const t = useTexts();
-  const bases = useMemo(() => magicBaseOptions(catalog, itemId), [catalog, itemId]);
+  const bases = useMemo(
+    () => magicBaseOptions(catalog, itemId).filter((b) => !exclude?.has(b.id)),
+    [catalog, itemId, exclude],
+  );
   const [pick, setPick] = useState<string | null>(null);
   return (
     <AppDialog

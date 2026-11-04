@@ -61,6 +61,8 @@ function chapterCompleted(event: UserEvent, character: string, campaign: string,
     t.evtChapterDone(character, chapter, campaign),
     ...(rewards ? [t.evtTakes(rewards)] : []),
     ...(event.payload.grantsLevel === true ? [t.evtCanLevelUp] : []),
+    // Objetos esperando en la bandeja de Inventario. Flutter no la tiene: ve los nombres.
+    ...(event.payload.hasGrants === true ? [t.evtItemsWaiting] : []),
   ];
   return { text: lines.join(' '), tone: lines.length > 1 ? ('success' as const) : ('info' as const) };
 }

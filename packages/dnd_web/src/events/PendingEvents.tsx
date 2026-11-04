@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { fetchUnseenEvents, markEventsSeen } from '../api/client';
 import { useTexts } from '../i18n/context';
 import { useRoute } from '../router';
@@ -29,6 +30,7 @@ interface Notice {
  */
 export function PendingEvents() {
   const t = useTexts();
+  const client = useQueryClient();
   const { route } = useRoute();
   const key =
     route.name === 'roster'
@@ -59,6 +61,10 @@ export function PendingEvents() {
             // está visto) volvería a llegar en cada pedido.
             if (queued.current.has(event.id)) continue;
             queued.current.add(event.id);
+            // Un cierre con objetos deja regalos en la bandeja de Inventario.
+            if (event.kind === 'chapter_completed' && event.payload.hasGrants === true) {
+              void client.invalidateQueries({ queryKey: ['itemGrants'] }); // prefijo de `queryKeys.itemGrants`
+            }
             const message = eventMessage(event, t);
             if (message) shown.push({ id: event.id, ...message });
             // Un `kind` desconocido igual se marca visto: dejarlo pendiente lo

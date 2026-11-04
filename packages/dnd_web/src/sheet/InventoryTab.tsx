@@ -28,6 +28,7 @@ import { Eyebrow, Pips, SpendRecoverButtons, ThinBar } from '../ui/data';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Tooltip } from '../ui/primitives';
 import { AppEmptyState } from '../ui/status';
 import { magicPlansHref } from '../router';
+import { ItemGrants } from './ItemGrants';
 import { InfoName } from './InfoName';
 import { EffectTargetDialog } from './EffectTargetDialog';
 import { BaseDialog } from './MagicItemPlans';
@@ -178,6 +179,7 @@ export function InventoryTab({ model }: { model: SheetModel }) {
 
   return (
     <div className="flex flex-col gap-4">
+      <ItemGrants model={model} />
       <Card id="bag" title={t.bagHeading} icon={Backpack}>
         <div className="flex flex-wrap gap-x-7 gap-y-5">
           <div className="min-w-0 flex-[2_1_320px]">

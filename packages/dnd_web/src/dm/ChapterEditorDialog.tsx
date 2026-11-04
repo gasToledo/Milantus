@@ -1,8 +1,12 @@
 import { useState } from 'react';
-import type { DmChapter } from '../api/client';
-import { useTexts } from '../i18n/context';
+import { Minus, Plus, X } from 'lucide-react';
+import { useSheetCatalog } from '../api/queries';
+import type { ChapterItem, DmChapter } from '../api/client';
+import { useLang, useTexts } from '../i18n/context';
 import { AppDialog } from '../ui/AppDialog';
+import { Button } from '../ui/Button';
 import { Eyebrow } from '../ui/data';
+import { ItemPicker } from './ItemPicker';
 
 /**
  * Nombre, objetivo y qué reparte al cerrarse un capítulo
@@ -24,12 +28,18 @@ export function ChapterEditorDialog({
   onClose: () => void;
 }) {
   const t = useTexts();
+  const lang = useLang();
+  const catalog = useSheetCatalog(lang);
   const [name, setName] = useState(initial.name);
   const [summary, setSummary] = useState(initial.summary ?? '');
   const [level, setLevel] = useState(initial.grantsLevel ?? false);
   const [gold, setGold] = useState(initial.grantsGold ? String(initial.grantsGold) : '');
-  // Un ítem por línea: la forma más corta de escribir una lista corta a mano.
-  const [items, setItems] = useState((initial.grantsItems ?? []).join('\n'));
+  // Lo que se reparte: los objetos del catálogo (con cantidad) y el texto libre
+  // de antes, que aparece como «Sin catálogo». A quién le toca cada uno se
+  // marca al cerrar, no acá.
+  const [items, setItems] = useState<ChapterItem[]>(initial.grantsCatalog ?? []);
+  const [free, setFree] = useState<string[]>(initial.grantsItems ?? []);
+  const [picking, setPicking] = useState(false);
   const [missingName, setMissingName] = useState(false);
   const [failed, setFailed] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -46,10 +56,8 @@ export function ChapterEditorDialog({
         summary: summary.trim(),
         grantsLevel: level,
         grantsGold: Number(gold) || 0,
-        grantsItems: items
-          .split('\n')
-          .map((line) => line.trim())
-          .filter((line) => line !== ''),
+        grantsItems: free,
+        grantsCatalog: items,
       });
       onClose();
     } catch {
@@ -134,16 +142,71 @@ export function ChapterEditorDialog({
           </span>
           <span className="text-[12px] text-text-muted">{t.dmGoldHelper}</span>
         </label>
-        <label className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1.5">
           <span className="text-[12px] text-text-muted">{t.dmItems}</span>
-          <textarea
-            value={items}
-            onChange={(e) => setItems(e.target.value)}
-            placeholder={t.dmItemsHint}
-            data-field="chapter-items"
-            className={`${field} h-[84px] resize-none py-2 placeholder:text-text-muted`}
+          {(items.length > 0 || free.length > 0) && (
+            <ul className="flex flex-col divide-y divide-hairline" data-field="chapter-items">
+              {items.map((item, i) => (
+                <li key={`${item.category}:${item.itemId}:${item.baseItemId ?? ''}`} className="flex items-center gap-2 py-1.5">
+                  <span className="min-w-0 flex-1 truncate text-[14px] text-on-surface">
+                    {item.name}
+                    {item.homebrew && (
+                      <i className="ml-2 rounded-[var(--radius-pill)] border border-gold px-2 text-[11px] text-gold not-italic">
+                        {t.itemOwnTag}
+                      </i>
+                    )}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <StepButton
+                      label={t.itemQtyLess}
+                      icon={Minus}
+                      disabled={item.quantity <= 1}
+                      onClick={() => setItems(items.map((o, j) => (j === i ? { ...o, quantity: o.quantity - 1 } : o)))}
+                    />
+                    <span className="num w-6 text-center text-[14px]">{item.quantity}</span>
+                    <StepButton
+                      label={t.itemQtyMore}
+                      icon={Plus}
+                      onClick={() => setItems(items.map((o, j) => (j === i ? { ...o, quantity: o.quantity + 1 } : o)))}
+                    />
+                  </span>
+                  <StepButton label={t.itemRemove(item.name)} icon={X} onClick={() => setItems(items.filter((_, j) => j !== i))} />
+                </li>
+              ))}
+              {free.map((text, i) => (
+                <li key={`free:${text}`} className="flex items-center gap-2 py-1.5">
+                  <span className="min-w-0 flex-1 truncate text-[14px] text-on-surface">
+                    {text}
+                    <i className="ml-2 rounded-[var(--radius-pill)] border border-hairline px-2 text-[11px] text-text-muted not-italic">
+                      {t.itemFreeTag}
+                    </i>
+                  </span>
+                  <StepButton label={t.itemRemove(text)} icon={X} onClick={() => setFree(free.filter((_, j) => j !== i))} />
+                </li>
+              ))}
+            </ul>
+          )}
+          <Button
+            tone="secondary"
+            icon={Plus}
+            data-action="add-chapter-item"
+            disabled={!catalog.data}
+            onClick={() => setPicking(true)}
+            className="self-start"
+          >
+            {t.catalogAddTitle}
+          </Button>
+          <span className="text-[12px] text-text-muted">{t.dmItemsAssignHelp}</span>
+        </div>
+        {picking && catalog.data && (
+          <ItemPicker
+            catalog={catalog.data}
+            chosen={items}
+            onAdd={(item) => setItems((prev) => [...prev, item])}
+            onAddFree={(text) => setFree((prev) => (prev.includes(text) ? prev : [...prev, text]))}
+            onClose={() => setPicking(false)}
           />
-        </label>
+        )}
         {failed && (
           <p role="alert" className="text-[13px] text-crimson">
             {t.dmChapterSaveError}
@@ -151,5 +214,31 @@ export function ChapterEditorDialog({
         )}
       </div>
     </AppDialog>
+  );
+}
+
+/** Un botón de ícono de la lista de objetos (− + quitar). */
+function StepButton({
+  label,
+  icon: Icon,
+  disabled,
+  onClick,
+}: {
+  label: string;
+  icon: typeof X;
+  disabled?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      disabled={disabled}
+      onClick={onClick}
+      className="flex size-8 items-center justify-center rounded-[var(--radius-nav)] border border-hairline text-on-surface-variant hover:text-gold disabled:pointer-events-none disabled:opacity-40"
+    >
+      <Icon size={15} aria-hidden="true" />
+    </button>
   );
 }

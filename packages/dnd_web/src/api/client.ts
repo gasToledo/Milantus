@@ -298,6 +298,7 @@ export interface DmChapter extends JsonObject {
   grantsLevel?: boolean;
   grantsGold?: number;
   grantsItems?: string[];
+  grantsCatalog?: ChapterItem[];
 }
 
 /** Los capítulos de la campaña [campaignId], en el orden de la campaña. */
@@ -533,3 +534,63 @@ export async function fetchTurn(characterId: string, signal: AbortSignal): Promi
   const { turn } = await getJson<{ turn: string }>(`/api/characters/${encodeURIComponent(characterId)}/turn`, signal);
   return turn === 'waiting' || turn === 'next' || turn === 'active' ? turn : 'none';
 }
+
+/** Un objeto del catálogo (o del homebrew del DM) que un capítulo reparte
+ *  (`ChapterItem.toJson`). `name` es el del momento de elegirlo. */
+export interface ChapterItem {
+  category: 'weapons' | 'armor' | 'items';
+  itemId: string;
+  name: string;
+  baseItemId?: string;
+  quantity: number;
+  homebrew: boolean;
+}
+
+/** A quién va cada objeto al cerrar un capítulo. `items` son los del catálogo
+ *  y `freeItems` el texto libre, que llega solo como aviso. */
+export interface Allocation {
+  memberId: string;
+  items: ChapterItem[];
+  freeItems: string[];
+}
+
+/** Cierra el capítulo y avisa a la mesa. Con [allocations] además reparte
+ *  objetos a personajes concretos; el servidor valida todo antes de escribir y
+ *  el DM no toca ninguna ficha (`modo-dm.md`). */
+export async function closeChapter(campaignId: string, chapterId: string, allocations?: Allocation[]): Promise<void> {
+  await sendJson('POST', `${chaptersPath(campaignId)}/${encodeURIComponent(chapterId)}/close`, allocations ? { allocations } : {});
+}
+
+/** Un objeto que el DM le dio a este personaje y que todavía no aceptó
+ *  (`ItemGrant.toPublicJson`): sin el documento del homebrew. */
+export interface ItemGrant {
+  id: string;
+  campaignName: string;
+  chapterName: string;
+  category: 'weapons' | 'armor' | 'items';
+  itemId: string;
+  name: string;
+  baseItemId: string | null;
+  quantity: number;
+  homebrew: boolean;
+}
+
+export async function fetchItemGrants(characterId: string, signal: AbortSignal): Promise<ItemGrant[]> {
+  const { grants } = await getJson<{ grants: ItemGrant[] }>(
+    `/api/characters/${encodeURIComponent(characterId)}/item-grants`,
+    signal,
+  );
+  return grants;
+}
+
+/** Acepta el regalo: devuelve con qué id agregarlo (un homebrew pasa a ser una
+ *  copia en esta cuenta). **No** lo saca de la bandeja. */
+export async function claimItemGrant(id: string): Promise<{ itemId: string; baseItemId: string | null; quantity: number }> {
+  const path = `/api/item-grants/${encodeURIComponent(id)}/claim`;
+  const response = await fetch(path, { method: 'POST' });
+  if (!response.ok) throw new ApiError(response.status, path);
+  return response.json();
+}
+
+/** Saca el regalo de la bandeja (aceptado o descartado). */
+export const resolveItemGrant = (id: string) => remove(`/api/item-grants/${encodeURIComponent(id)}`);

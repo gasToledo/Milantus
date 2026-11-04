@@ -24,6 +24,10 @@ export interface CatalogRow {
   bundleSize: number;
   /** Una plantilla: se le elige el objeto base antes de agregarla o comprarla. */
   needsBase: boolean;
+  /** En qué lista del catálogo vive (la categoría del homebrew y de un regalo). */
+  category: 'weapons' | 'armor' | 'items';
+  /** Si es del homebrew del DM y no del catálogo oficial. */
+  homebrew: boolean;
 }
 
 /** Abreviaturas de las monedas en el idioma de la interfaz, para el motor. */
@@ -40,7 +44,9 @@ const str = (v: unknown) => (typeof v === 'string' ? v : '');
  * rareza (`Item.isMagic`), igual que en el Códice.
  */
 export function catalogRows(catalog: Catalog, t: Texts, lang: string): CatalogRow[] {
-  const row = (e: JsonObject, family: Family, detail: string[]): CatalogRow => ({
+  const row = (e: JsonObject, category: CatalogRow['category'], family: Family, detail: string[]): CatalogRow => ({
+    category,
+    homebrew: e.source === 'homebrew',
     id: str(e.id),
     name: str(e.name) || str(e.id),
     family,
@@ -53,15 +59,15 @@ export function catalogRows(catalog: Catalog, t: Texts, lang: string): CatalogRo
   const items = catalog.items.map((i) => {
     const family: Family =
       typeof i.rarity === 'string' ? 'magic' : (FAMILIES.find((f) => f === i.category) ?? 'gear');
-    return row(i, family, [
+    return row(i, 'items', family, [
       t.itemKinds[family],
       ...(num(i.bundleSize) > 1 ? [t.catalogBundleOf(num(i.bundleSize))] : []),
       ...(i.requiresAttunement === true ? [t.catalogAttunement] : []),
     ]);
   });
   return [
-    ...catalog.weapons.map((w) => row(w, 'weapon', [t.itemKinds.weapon])),
-    ...catalog.armor.map((a) => row(a, 'armor', [a.category === 'shield' ? t.itemKinds.shield : t.itemKinds.armor])),
+    ...catalog.weapons.map((w) => row(w, 'weapons', 'weapon', [t.itemKinds.weapon])),
+    ...catalog.armor.map((a) => row(a, 'armor', 'armor', [a.category === 'shield' ? t.itemKinds.shield : t.itemKinds.armor])),
     ...items,
   ].sort((a, b) => a.name.localeCompare(b.name, lang));
 }

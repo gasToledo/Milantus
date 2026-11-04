@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { BookOpen, EllipsisVertical, Pencil, Play, Plus, Trash2 } from 'lucide-react';
+import { BookOpen, CheckCheck, EllipsisVertical, Pencil, Play, Plus, Trash2 } from 'lucide-react';
 import { createChapter, deleteChapter, saveChapter } from '../api/client';
 import type { DmCampaign, DmChapter } from '../api/client';
 import { queryKeys, useCampaignChapters } from '../api/queries';
@@ -24,6 +24,7 @@ import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { stateLabel, stateOf } from './campaigns';
 import { CampaignMenu } from './CampaignMenu';
 import { ChapterEditorDialog } from './ChapterEditorDialog';
+import { CloseChapterDialog } from './CloseChapterDialog';
 import { DmHeader } from './DmHeader';
 
 type ChapterStatus = 'closed' | 'open' | 'pending';
@@ -35,10 +36,10 @@ const statusOf = (c: DmChapter): ChapterStatus =>
 
 /**
  * Los capítulos de la campaña: estado, objetivo y lo que reparten; crear,
- * editar, empezar y borrar. El objetivo (`summary`) lo lee solo su DM: es lo que
+ * editar, empezar, cerrar y borrar. El objetivo (`summary`) lo lee solo su DM: es lo que
  * el servidor poda para el jugador, y por eso esta pantalla pide `/chapters` con
  * la cuenta del DM y no reutiliza nada de la vista del jugador. Cerrar un
- * capítulo, que le avisa a otras cuentas, todavía vive en Flutter.
+ * capítulo le avisa a otras cuentas y reparte objetos: ver `CloseChapterDialog`.
  */
 export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
   const t = useTexts();
@@ -46,6 +47,7 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
   const client = useQueryClient();
   const [editing, setEditing] = useState<DmChapter | 'new' | null>(null);
   const [deleting, setDeleting] = useState<DmChapter | null>(null);
+  const [closing, setClosing] = useState<DmChapter | null>(null);
   const [toast, setToast] = useState<{ key: number; tone: ToastTone; message: string } | null>(null);
   const notify = (tone: ToastTone, message: string) => setToast((prev) => ({ key: (prev?.key ?? 0) + 1, tone, message }));
   // Borrar o cambiar un capítulo mueve también lo que cuelga de él en el Cuaderno.
@@ -102,7 +104,7 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
         {chapters.data.map((c) => {
           const status = statusOf(c);
           const gold = c.grantsGold ?? 0;
-          const items = c.grantsItems ?? [];
+          const itemCount = (c.grantsItems ?? []).length + (c.grantsCatalog ?? []).length;
           const rewards = chapterGrants(c);
           return (
             <li
@@ -129,11 +131,11 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
                 </p>
                 {rewards !== '' && <p className="mt-2 text-[12.5px] text-text-muted">{t.dmChapterRewards(rewards)}</p>}
               </div>
-              {(c.grantsLevel || gold > 0 || items.length > 0) && (
+              {(c.grantsLevel || gold > 0 || itemCount > 0) && (
                 <dl className="flex flex-none gap-2">
                   {c.grantsLevel && <StatPlaque id="level" label={t.dmChapterLevel} value={t.dmChapterLevelValue} />}
                   {gold > 0 && <StatPlaque id="gold" label={t.dmChapterGold} value={gold} />}
-                  {items.length > 0 && <StatPlaque id="items" label={t.dmChapterItems} value={items.length} />}
+                  {itemCount > 0 && <StatPlaque id="items" label={t.dmChapterItems} value={itemCount} />}
                 </dl>
               )}
               <DropdownMenu>
@@ -166,6 +168,11 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
                 {status === 'pending' && (
                   <Button icon={Play} data-action="start-chapter" onClick={() => void start(c)}>
                     {t.dmStart}
+                  </Button>
+                )}
+                {status === 'open' && (
+                  <Button icon={CheckCheck} data-action="close-chapter" onClick={() => setClosing(c)}>
+                    {t.dmCloseChapter}
                   </Button>
                 )}
                 <Link
@@ -216,6 +223,14 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
           errorText={t.dmChapterDeleteError}
           onConfirm={() => remove(deleting)}
           onClose={() => setDeleting(null)}
+        />
+      )}
+      {closing && (
+        <CloseChapterDialog
+          campaignId={campaign.id}
+          chapter={closing}
+          onClosed={(name) => notify('success', t.dmChapterCloseDone(name))}
+          onClose={() => setClosing(null)}
         />
       )}
       {toast && <Toast key={toast.key} tone={toast.tone} message={toast.message} open onOpenChange={(open) => !open && setToast(null)} />}
