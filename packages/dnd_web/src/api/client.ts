@@ -309,6 +309,38 @@ export async function fetchCampaignChapters(campaignId: string, signal: AbortSig
   return chapters;
 }
 
+async function sendJson(method: 'POST' | 'PUT', path: string, body: unknown): Promise<void> {
+  const response = await fetch(path, { method, headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+  if (!response.ok) throw new ApiError(response.status, path);
+}
+
+async function remove(path: string): Promise<void> {
+  const response = await fetch(path, { method: 'DELETE' });
+  if (!response.ok) throw new ApiError(response.status, path);
+}
+
+const chaptersPath = (campaignId: string) => `/api/campaigns/${encodeURIComponent(campaignId)}/chapters`;
+const notesPath = (campaignId: string) => `/api/campaigns/${encodeURIComponent(campaignId)}/notes`;
+
+/** Crea un capítulo. El estado no viaja de más: nace `planned`. */
+export const createChapter = (campaignId: string, chapter: DmChapter) => sendJson('POST', chaptersPath(campaignId), { chapter });
+
+/** Reemplaza el capítulo entero. Un `PUT` no puede cerrarlo (`completed` es un
+ *  400): eso tiene su ruta, porque le avisa a otras cuentas. */
+export const saveChapter = (campaignId: string, chapter: DmChapter) =>
+  sendJson('PUT', `${chaptersPath(campaignId)}/${encodeURIComponent(chapter.id)}`, { chapter });
+
+export const deleteChapter = (campaignId: string, chapterId: string) =>
+  remove(`${chaptersPath(campaignId)}/${encodeURIComponent(chapterId)}`);
+
+export const createNote = (campaignId: string, note: DmNote) => sendJson('POST', notesPath(campaignId), { note });
+
+export const saveNote = (campaignId: string, note: DmNote) =>
+  sendJson('PUT', `${notesPath(campaignId)}/${encodeURIComponent(note.id)}`, { note });
+
+export const deleteNote = (campaignId: string, noteId: string) =>
+  remove(`${notesPath(campaignId)}/${encodeURIComponent(noteId)}`);
+
 /** Una nota del DM (`Note.toJson`): texto plano con el Markdown chico de la mesa.
  *  Sin `updatedAt` es una nota que nunca se guardó con fecha. */
 export interface DmNote {

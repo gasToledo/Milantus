@@ -3,7 +3,7 @@
 // reglas: repite el criterio de `notebook_view.dart` de Flutter para que el DM
 // lea lo mismo en los dos clientes. Nombres de criaturas y de clases salen del
 // catálogo, en el idioma activo.
-import type { DmChapter, DmEncounterLog, DmLevelUp, DmNotebook } from '../api/client';
+import type { DmChapter, DmEncounterLog, DmLevelUp, DmNote, DmNotebook } from '../api/client';
 import { nameOf } from '../api/catalog';
 import { fold } from '../codex/entries';
 import type { Catalog } from '../engine';
@@ -24,6 +24,8 @@ export interface Entry {
   markdown: boolean;
   body: string;
   rounds?: number;
+  /** La nota original, solo en las entradas `note`: editarla la reenvía entera. */
+  note?: DmNote;
 }
 
 /** Un monstruo del catálogo se nombra por el catálogo (`logGroupName`): así el
@@ -110,6 +112,7 @@ export function buildEntries(
         title: n.title,
         markdown: true,
         body: n.body ?? '',
+        note: n,
       }),
     ),
     ...notebook.encounterLogs.map(

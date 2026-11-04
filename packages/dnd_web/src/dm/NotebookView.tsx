@@ -1,17 +1,28 @@
 import { useMemo, useState } from 'react';
-import { Search, X } from 'lucide-react';
-import { useCampaignChapters, useCampaignMembers, useCampaignNotebook, useCampaignNpcs, useSheetCatalog } from '../api/queries';
-import type { DmCampaign } from '../api/client';
+import { useQueryClient } from '@tanstack/react-query';
+import { EllipsisVertical, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
+import {
+  queryKeys,
+  useCampaignChapters,
+  useCampaignMembers,
+  useCampaignNotebook,
+  useCampaignNpcs,
+  useSheetCatalog,
+} from '../api/queries';
+import { createNote, deleteNote, saveNote, type DmCampaign, type DmNote } from '../api/client';
 import { useLang, useTexts } from '../i18n/context';
+import { Button, ButtonLink } from '../ui/Button';
+import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { cx } from '../ui/cx';
 import { MarkdownText } from '../ui/MarkdownText';
 import { withMentions, type Mentions } from '../ui/mentions';
-import { dmMemberHref, dmNpcsHref, Link } from '../router';
-import { Tooltip } from '../ui/primitives';
+import { dmCampaignHref, dmMemberHref, dmNpcsHref, Link } from '../router';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Tooltip } from '../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { stateLabel, stateOf } from './campaigns';
 import { CampaignMenu } from './CampaignMenu';
 import { DmHeader } from './DmHeader';
+import { NoteEditorDialog } from './NoteEditorDialog';
 import { buildEntries, matches, stamp, type EntryKind } from './notebook';
 
 /** Sin capítulo: el valor de la pill que junta lo que no cuelga de ninguno. */
@@ -26,12 +37,15 @@ const ACCENT: Record<EntryKind, { border: string; text: string }> = {
 };
 
 /**
- * El Cuaderno de la campaña, de solo lectura: las notas del DM, los combates
- * cerrados y las subidas de nivel, por capítulo. Una pill por capítulo (más
- * «Sin capítulo» para lo que no cuelga de ninguno) y un buscador. Escribir,
- * editar o borrar una nota vive en Flutter. Las menciones `@Nombre` de una nota
- * y quienes pelearon en un combate enlazan a su ficha. Es del DM: ninguna
- * cuenta de jugador recibe nada de esto (`modo-dm.md`).
+ * El Cuaderno de la campaña: las notas del DM, los combates cerrados y las
+ * subidas de nivel, por capítulo. Una pill por capítulo (más «Sin capítulo»
+ * para lo que no cuelga de ninguno) y un buscador. Solo las notas se escriben,
+ * editan y borran; lo demás lo registra la app. Se abre en el capítulo de
+ * `?capitulo=` (el enlace «Ver en el Cuaderno» de Capítulos). Al guardar una
+ * nota la vista pasa a su capítulo, o una nota escrita en otro parecería
+ * perdida. Las menciones `@Nombre` de una nota y quienes pelearon en un combate
+ * enlazan a su ficha. Es del DM: ninguna cuenta de jugador recibe nada de esto
+ * (`modo-dm.md`).
  */
 export function NotebookView({ campaign }: { campaign: DmCampaign }) {
   const t = useTexts();
@@ -40,7 +54,11 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
   const chapters = useCampaignChapters(campaign.id);
   const catalog = useSheetCatalog(lang);
   const [query, setQuery] = useState('');
-  const [picked, setPicked] = useState<string | null>(null);
+  const [picked, setPicked] = useState<string | null>(() => new URLSearchParams(window.location.search).get('capitulo'));
+  const client = useQueryClient();
+  const [editing, setEditing] = useState<DmNote | 'new' | null>(null);
+  const [deleting, setDeleting] = useState<DmNote | null>(null);
+  const refresh = () => client.invalidateQueries({ queryKey: queryKeys.campaignNotebook(campaign.id) });
   // A quiénes enlaza una mención: los personajes de la mesa y los PNJ de la
   // campaña. Si no cargan, las menciones se leen como texto y el Cuaderno no
   // se cae por eso.
@@ -91,7 +109,17 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
     body = <AppBusyLabel label={t.dmNotebookLoading} />;
   } else if (chapters.data.length === 0) {
     // Sin capítulos no hay dónde colgar nada: el cuaderno se ordena por ellos.
-    body = <AppEmptyState kind="empty" message={t.dmNotebookNeedsChapter} />;
+    body = (
+      <AppEmptyState
+        kind="empty"
+        message={t.dmNotebookNeedsChapter}
+        actions={
+          <ButtonLink internal tone="secondary" href={dmCampaignHref(campaign.id, 'capitulos')}>
+            {t.dmGoToChapters}
+          </ButtonLink>
+        }
+      />
+    );
   } else {
     // Se abre en el capítulo en marcha; sin uno, en el primero.
     const initial = chapters.data.find((c) => c.state === 'active') ?? chapters.data[0]!;
@@ -197,6 +225,33 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
                   <span className="text-[12px] text-text-muted tabular-nums">
                     {[stamp(e.at, now, t), e.rounds !== undefined && t.roundsCount(e.rounds)].filter(Boolean).join(' · ')}
                   </span>
+                  {e.note && (
+                    // Solo las notas se tocan: lo demás lo escribió la app.
+                    <DropdownMenu>
+                      <Tooltip content={t.dmNoteActions}>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            type="button"
+                            aria-label={t.dmNoteActions}
+                            data-action="note-actions"
+                            className="-my-2 -mr-2 inline-flex size-10 shrink-0 items-center justify-center self-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold data-[state=open]:bg-gold-soft data-[state=open]:text-gold"
+                          >
+                            <EllipsisVertical size={18} aria-hidden="true" />
+                          </button>
+                        </DropdownMenuTrigger>
+                      </Tooltip>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onSelect={() => setEditing(e.note!)}>
+                          <Pencil size={15} aria-hidden="true" className="text-text-muted" />
+                          {t.commonEdit}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => setDeleting(e.note!)} className="text-crimson">
+                          <Trash2 size={15} aria-hidden="true" />
+                          {t.commonDelete}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                 </div>
                 <div className="mt-1.5 text-[13.5px] leading-relaxed text-on-surface-variant">
                   {e.markdown ? (
@@ -217,11 +272,61 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
     );
   }
 
+  const chapterList = chapters.data ?? [];
+  // La nota nace en el capítulo en marcha o, si no hay, en el primero.
+  const bornIn = chapterList.find((c) => c.state === 'active') ?? chapterList[0];
+
+  const submit = async (note: DmNote) => {
+    if (editing === 'new') await createNote(campaign.id, note);
+    else await saveNote(campaign.id, note);
+    await refresh();
+    setPicked(note.chapterId);
+  };
+
   return (
     <div className="flex flex-col gap-5">
-      <DmHeader title={t.dmSectionNotebook} kicker={state} actions={<CampaignMenu campaign={campaign} />} />
+      <DmHeader
+        title={t.dmSectionNotebook}
+        kicker={state}
+        actions={
+          <>
+            <CampaignMenu campaign={campaign} />
+            <Button
+              icon={Plus}
+              data-action="write-note"
+              disabled={!bornIn}
+              onClick={() => setEditing('new')}
+              className="min-h-11"
+            >
+              {t.dmWriteNote}
+            </Button>
+          </>
+        }
+      />
       <p className="-mt-2 text-[13px] text-text-muted">{campaign.name}</p>
       {body}
+      {editing && bornIn && (
+        <NoteEditorDialog
+          title={editing === 'new' ? t.dmWriteNote : t.dmEditNote}
+          initial={editing === 'new' ? { id: `note-${Date.now()}`, chapterId: bornIn.id, title: '' } : editing}
+          chapters={chapterList}
+          onSubmit={submit}
+          onClose={() => setEditing(null)}
+        />
+      )}
+      {deleting && (
+        <ConfirmDialog
+          title={t.dmDeleteNote}
+          body={t.dmDeleteNoteBody(deleting.title)}
+          confirmLabel={t.dmDeleteNote}
+          errorText={t.dmNoteDeleteError}
+          onConfirm={async () => {
+            await deleteNote(campaign.id, deleting.id);
+            await refresh();
+          }}
+          onClose={() => setDeleting(null)}
+        />
+      )}
     </div>
   );
 }
