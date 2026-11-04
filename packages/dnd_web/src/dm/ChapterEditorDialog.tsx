@@ -203,7 +203,6 @@ export function ChapterEditorDialog({
             catalog={catalog.data}
             chosen={items}
             onAdd={(item) => setItems((prev) => [...prev, item])}
-            onAddFree={(text) => setFree((prev) => (prev.includes(text) ? prev : [...prev, text]))}
             onClose={() => setPicking(false)}
           />
         )}

@@ -208,7 +208,6 @@ export function CloseChapterDialog({
           catalog={catalog.data}
           chosen={entries.flatMap((e) => (e.item ? [e.item] : []))}
           onAdd={(item) => add({ item })}
-          onAddFree={(text) => add({ text })}
           onClose={() => setPicking(false)}
         />
       )}

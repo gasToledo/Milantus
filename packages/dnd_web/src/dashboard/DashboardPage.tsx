@@ -106,12 +106,6 @@ export function DashboardPage() {
     canDrop: (from, to) => groupOf(from) === groupOf(to),
     onMove: moveCard,
   });
-  /** El vecino de [id] a [step] lugares, si es de su grupo: lo que se ofrece en
-   *  el menú de la tarjeta para mover sin arrastrar. */
-  const moveTo = (id: string, step: number) => {
-    const to = visibleIds[visibleIds.indexOf(id) + step];
-    return to !== undefined && groupOf(to) === groupOf(id) ? () => moveCard(id, to) : undefined;
-  };
 
   const [renaming, setRenaming] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -230,8 +224,6 @@ export function DashboardPage() {
                           dragging: reorder.dragging === id,
                           over: reorder.over === id,
                           animated: reorder.animated,
-                          moveBefore: moveTo(id, -1),
-                          moveAfter: moveTo(id, 1),
                         }
                       : undefined
                   }

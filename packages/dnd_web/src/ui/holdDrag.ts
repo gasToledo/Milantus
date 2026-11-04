@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type DragEvent, type MouseEvent, type PointerEvent } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type DragEvent, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent, type PointerEvent } from 'react';
 
 /** Cuánto hay que sostener el dedo: menos se confunde con desplazar, y a los
  *  500 ms ya saltaría el menú propio del teléfono sobre el enlace. */
@@ -54,8 +54,9 @@ interface Press {
  * no con lo que hay bajo el puntero: como las tarjetas se corren, preguntar por
  * lo que está debajo haría saltar el destino con cada movimiento.
  *
- * No hay teclado: quien lo usa ofrece también otra forma de mover (el menú de la
- * tarjeta).
+ * Con el teclado, Alt más una flecha sobre la tarjeta enfocada la mueve al
+ * vecino anterior o siguiente, si [canDrop] lo permite. No dibuja nada: el
+ * orden nuevo llega por [onMove] como con el puntero.
  */
 export function useHoldDrag({
   ids,
@@ -290,6 +291,15 @@ export function useHoldDrag({
         if (press.current && !press.current.mouse) e.preventDefault();
       },
       onDragStart: (e: DragEvent<HTMLElement>) => e.preventDefault(),
+      onKeyDown: (e: ReactKeyboardEvent<HTMLElement>) => {
+        if (!e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+        const step = e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : 0;
+        if (step === 0) return;
+        // Alt más flecha también es «atrás» y «adelante» del navegador.
+        e.preventDefault();
+        const to = ids[ids.indexOf(id) + step];
+        if (to !== undefined && callbacks.current.canDrop(id, to)) callbacks.current.onMove(id, to);
+      },
     }),
     /** La tarjeta tomada y el destino. */
     dragging: drag?.id ?? null,

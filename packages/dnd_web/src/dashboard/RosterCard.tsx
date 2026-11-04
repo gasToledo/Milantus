@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, EllipsisVertical, Pencil, RotateCcw, Star, Trash2 } from 'lucide-react';
+import { EllipsisVertical, Pencil, RotateCcw, Star, Trash2 } from 'lucide-react';
 import { useTexts } from '../i18n/context';
 import { characterHref, Link } from '../router';
 import { signed } from '../sheet/format';
@@ -17,8 +17,8 @@ import { isFallen, type RosterEntry } from './roster';
  * La tarjeta entera es un enlace, pero el enlace es el nombre y se estira con
  * `::after` sobre toda la tarjeta: así el lector de pantalla anuncia «Brunilda
  * de Humo» y no la tarjeta entera leída de corrido, y el clic cae en cualquier
- * parte. La tarjeta también se toma entera para moverla (`useHoldDrag`), y el
- * menú ofrece lo mismo para quien no puede o no quiere arrastrar.
+ * parte. La tarjeta también se toma entera para moverla (`useHoldDrag`), y con
+ * el teclado se mueve con Alt más una flecha.
  */
 export interface CardReorder {
   item: ReturnType<ReturnType<typeof useHoldDrag>['item']>;
@@ -26,9 +26,6 @@ export interface CardReorder {
   over: boolean;
   /** Con «reducir movimiento» no sigue al puntero: se atenúa y se marca. */
   animated: boolean;
-  /** Sin vecino en su grupo, esa opción del menú se apaga. */
-  moveBefore?: () => void;
-  moveAfter?: () => void;
 }
 
 export function RosterCard({
@@ -144,18 +141,6 @@ export function RosterCard({
               <RotateCcw size={15} aria-hidden="true" className="text-text-muted" />
               {t.cardRebuild}
             </DropdownMenuItem>
-            {reorder && (
-              <>
-                <DropdownMenuItem disabled={!reorder.moveBefore} onSelect={reorder.moveBefore}>
-                  <ArrowUp size={15} aria-hidden="true" className="text-text-muted" />
-                  {t.cardMoveBefore}
-                </DropdownMenuItem>
-                <DropdownMenuItem disabled={!reorder.moveAfter} onSelect={reorder.moveAfter}>
-                  <ArrowDown size={15} aria-hidden="true" className="text-text-muted" />
-                  {t.cardMoveAfter}
-                </DropdownMenuItem>
-              </>
-            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={onDelete} className="text-crimson">
               <Trash2 size={15} aria-hidden="true" />

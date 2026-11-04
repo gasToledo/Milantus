@@ -151,6 +151,7 @@ export function NavItem({
   internal = false,
   external = false,
   count,
+  badge,
   muted = false,
   disabled = false,
   accent = false,
@@ -164,6 +165,9 @@ export function NavItem({
   /** Una cifra al final de la fila, en cifras tabulares: los ítems se apilan
    *  y la columna de números se lee como columna. */
   count?: number;
+  /** Un aviso que pide atención (objetos esperando): círculo de oro de 18 px que,
+   *  con dos cifras, se estira a píldora. Más fuerte que [count]. */
+  badge?: number;
   /** Atenuado: una categoría sin coincidencias mientras se busca. */
   muted?: boolean;
   /** Apagado y sin destino: una acción que hoy no corresponde (nivel máximo). */
@@ -190,6 +194,11 @@ export function NavItem({
       <span className="min-w-0 flex-1 truncate">{label}</span>
       {count !== undefined && (
         <span className={cx('text-[12px] font-normal tabular-nums', active ? 'text-gold' : 'text-text-muted')}>{count}</span>
+      )}
+      {badge !== undefined && (
+        <span className="inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-[9px] bg-gold px-[5px] text-[12px] leading-none font-bold text-on-primary tabular-nums">
+          {badge}
+        </span>
       )}
       {external && (
         <>

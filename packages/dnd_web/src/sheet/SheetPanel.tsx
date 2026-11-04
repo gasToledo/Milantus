@@ -72,7 +72,7 @@ export function SheetPanel({ model, tab }: { model: SheetModel; tab: SheetTab })
               icon={TAB_ICONS[tabId]}
               label={tabLabel(t, tabId)}
               active={tab === tabId}
-              count={tabId === 'inventario' && waiting > 0 ? waiting : undefined}
+              badge={tabId === 'inventario' && waiting > 0 ? waiting : undefined}
               internal
             />
           </li>

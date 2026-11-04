@@ -84,6 +84,11 @@ repiten acá.
 
 ## Qué hay hoy
 
+> **Desde 2026-11-04, las funciones nuevas van solo a `/v2`.** Flutter no recibe
+> nada más: se depreca al terminar la migración y no vale gastar en dárselas.
+> Tiene que seguir compilando y leyendo los datos. Lo que Flutter no conoce (por
+> ejemplo un `kind` de aviso nuevo) lo marca visto en silencio, y se acepta.
+
 - Andamiaje: Vite 8, React 19, TypeScript 7, Tailwind 4; tokens del
   [Apéndice B de diseño web](../desarrollo/diseno-web.md#apéndice-b--equivalencia-en-css)
   en `src/index.css` y como utilidades de Tailwind (la paleta por defecto está

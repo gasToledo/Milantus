@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Plus, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import type { ChapterItem } from '../api/client';
 import type { Catalog } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
@@ -10,28 +10,26 @@ import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
 
 /**
- * «Agregar objeto» para un capítulo (`Selector` del Diseño): buscador, familias
+ * «Agregar objeto» para un capítulo o un regalo (`Selector` del Diseño): buscador, familias
  * y «Propios» sobre el catálogo del DM (SRD más **su** homebrew). Agregar no
  * cierra el diálogo —se suelen sumar varios— y la fila pasa a «Agregado»; una
  * sola acción, «Listo». Una plantilla pide su objeto base antes de agregarse, y
  * esa base nunca es de homebrew: el objeto se copia a la cuenta del jugador y la
  * base propia del DM no viaja con él.
  *
- * Lo que no está en el catálogo se puede sumar igual como texto libre: le llega
- * solo como aviso.
+ * Solo se entrega lo que existe: no hay forma de sumar texto libre (decisión del
+ * usuario, 2026-11-04). Los capítulos viejos que ya lo tienen lo conservan.
  */
 export function ItemPicker({
   catalog,
   chosen,
   onAdd,
-  onAddFree,
   onClose,
 }: {
   catalog: Catalog;
   /** Lo que el capítulo ya reparte: marca las filas como «Agregado». */
   chosen: readonly ChapterItem[];
   onAdd: (item: ChapterItem) => void;
-  onAddFree: (text: string) => void;
   onClose: () => void;
 }) {
   const t = useTexts();
@@ -100,25 +98,7 @@ export function ItemPicker({
           )}
         </div>
         {matches.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 py-6 text-center text-[13px] text-text-muted">
-            <p>{t.catalogNoMatches}</p>
-            {needle !== '' && (
-              <>
-                <Button
-                  tone="secondary"
-                  icon={Plus}
-                  data-action="add-free-item"
-                  onClick={() => {
-                    onAddFree(query.trim());
-                    setQuery('');
-                  }}
-                >
-                  {t.itemPickAddFree(query.trim())}
-                </Button>
-                <p className="text-[12px]">{t.itemPickFreeHelp}</p>
-              </>
-            )}
-          </div>
+          <p className="py-6 text-center text-[13px] text-text-muted">{t.catalogNoMatches}</p>
         ) : (
           <ul className="h-[min(46vh,420px)] divide-y divide-hairline overflow-y-auto" data-field="item-picker">
             {matches.map((r) => {
