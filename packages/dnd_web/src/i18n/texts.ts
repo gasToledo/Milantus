@@ -1227,6 +1227,7 @@ Los personajes que los jugadores le compartieron se sueltan, y sus fichas siguen
   evtItemsWaiting: 'Agregá los objetos desde Inventario.',
   evtItemGranted: (items: string, character: string, campaign: string) =>
     `El DM le dio ${items} a ${character} en ${campaign}.`,
+  dmOrderSaveError: 'No se pudo guardar el orden.',
   dmGiveItemMenu: 'Dar objeto…',
   dmGiveItemTitle: (name: string) => `Dar objeto a ${name}`,
   dmGiveItem: 'Dar',
@@ -2971,6 +2972,7 @@ The characters players shared with it are released, and their sheets remain thei
   evtItemsWaiting: 'Add the items from Inventory.',
   evtItemGranted: (items: string, character: string, campaign: string) =>
     `The DM gave ${items} to ${character} in ${campaign}.`,
+  dmOrderSaveError: 'Could not save the order.',
   dmGiveItemMenu: 'Give item…',
   dmGiveItemTitle: (name: string) => `Give an item to ${name}`,
   dmGiveItem: 'Give',

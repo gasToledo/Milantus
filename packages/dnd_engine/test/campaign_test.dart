@@ -103,7 +103,8 @@ void main() {
       final r = Campaign.fromJson({'schemaVersion': 1, 'id': 'x', 'name': 'Y'});
 
       expect(r.musicScenes, isEmpty);
-      expect(r.toJson()['schemaVersion'], 2);
+      expect(r.toJson()['schemaVersion'], Campaign.currentSchemaVersion);
+      expect(r.memberOrder, isEmpty);
     });
 
     test('las escenas de música hacen el round-trip en orden', () {
@@ -130,18 +131,41 @@ void main() {
     });
 
     // Lo que recibe un jugador vinculado: las escenas son del DM.
-    test('la vista del jugador no incluye ids ni escenas de música', () {
+    test('la vista del jugador no incluye ids, escenas ni el orden de la Mesa',
+        () {
       const c = Campaign(
         id: 'x',
         name: 'Y',
         musicScenes: [MusicScene(id: 'a', name: 'Taberna', url: 'u')],
+        memberOrder: ['m2', 'm1'],
       );
 
       final view = c.playerView();
 
       expect(view.containsKey('id'), isFalse);
       expect(view.containsKey('musicScenes'), isFalse);
+      expect(view.containsKey('memberOrder'), isFalse);
       expect(view['name'], 'Y');
+    });
+
+    test('el orden de la Mesa sobrevive el round-trip y se limpia al leer', () {
+      const c = Campaign(id: 'x', name: 'Y', memberOrder: ['m2', 'm1']);
+
+      expect(Campaign.fromJson(c.toJson()).memberOrder, ['m2', 'm1']);
+      expect(c.copyWith(name: 'Z').memberOrder, ['m2', 'm1']);
+      final dirty = Campaign.fromJson({
+        'schemaVersion': Campaign.currentSchemaVersion,
+        'id': 'x',
+        'memberOrder': ['m1', '', 7, null, 'm1', 'm2'],
+      });
+      expect(dirty.memberOrder, ['m1', 'm2']);
+    });
+
+    test('una campaña de la versión 2 migra a la actual sin orden', () {
+      final migrated = Campaign.migrateJson({'schemaVersion': 2, 'id': 'x'});
+
+      expect(migrated['schemaVersion'], Campaign.currentSchemaVersion);
+      expect(migrated['memberOrder'], isEmpty);
     });
 
     test('migrar no modifica el mapa de entrada', () {

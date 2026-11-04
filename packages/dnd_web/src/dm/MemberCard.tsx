@@ -28,11 +28,21 @@ export function MemberCard({
   href,
   portrait,
   actions,
+  reorder,
 }: {
   entry: RosterEntry;
   href: string;
   portrait: string | null;
   actions?: { onGiveItem: () => void; onGrantInspiration: () => void; onRemove: () => void };
+  /** Mover la tarjeta tomándola entera (`useHoldDrag`), con las mismas clases
+   *  que `RosterCard`. Sin esto no se mueve (la ficha de un miembro no la usa). */
+  reorder?: {
+    item: Record<string, unknown>;
+    dragging: boolean;
+    over: boolean;
+    /** Con «reducir movimiento» no sigue al puntero: se atenúa y se marca. */
+    animated: boolean;
+  };
 }) {
   const t = useTexts();
   const { character, sheet } = entry;
@@ -64,14 +74,27 @@ export function MemberCard({
   const exhaustion = character.combat?.exhaustion ?? 0;
 
   return (
-    <li className="card relative flex min-w-0 flex-col p-4 hover:border-gold" data-member={character.id}>
+    <li
+      className={`card relative flex min-w-0 flex-col p-4 hover:border-gold ${
+        // Sostenerla no puede seleccionar el texto ni abrir el menú del teléfono.
+        reorder ? 'select-none [-webkit-touch-callout:none]' : ''
+      } ${
+        reorder?.dragging
+          ? reorder.animated
+            ? 'cursor-grabbing border-gold [&_*]:cursor-grabbing'
+            : 'opacity-40'
+          : ''
+      } ${reorder?.over && !reorder.animated ? 'outline-2 outline-offset-1 outline-gold' : ''}`}
+      data-member={character.id}
+      {...reorder?.item}
+    >
       <div className="flex items-center gap-3">
         <Medallion name={character.name} accent={entry.accent} size={54} muted={fallen} portrait={portrait} />
         <div className="min-w-0 flex-1">
           <h2 className={`font-display truncate text-[18px] leading-tight ${fallen ? 'text-on-surface-variant' : 'text-on-surface'}`}>
             {/* El enlace cubre la tarjeta entera (como en el dashboard) y su
                 nombre es el del personaje: se lee igual que antes. */}
-            <Link href={href} className="after:absolute after:inset-0 after:rounded-[var(--radius-card)] after:content-['']">
+            <Link href={href} draggable={false} className="after:absolute after:inset-0 after:rounded-[var(--radius-card)] after:content-['']">
               {character.name}
             </Link>
           </h2>

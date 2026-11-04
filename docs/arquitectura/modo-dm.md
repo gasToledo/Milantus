@@ -627,9 +627,18 @@ juntas y solo las toca el DM, así que se guardan con el mismo
 
 El costo es que la campaña ya no es entera del jugador. La proyección de
 `GET /api/characters/<id>/campaigns` las poda dos veces: la consulta lee
-`c.document - 'musicScenes'` y el handler serializa con `Campaign.playerView()`.
-La prueba «las escenas de música no viajan» lo fija, y `FakeApiServer` usa la
-misma función.
+`c.document - 'musicScenes' - 'memberOrder'` y el handler serializa con
+`Campaign.playerView()`. La prueba «las escenas de música y el orden de la Mesa no
+viajan» lo fija, y `FakeApiServer` usa la misma función.
+
+### El orden de la Mesa
+
+`Campaign.memberOrder` (esquema 3) guarda en qué orden acomodó el DM a los
+personajes de la Mesa: ids de vínculo, en el mismo documento y con la misma
+doble poda que las escenas. Los que no figuran van al final en el orden del
+servidor, y un id que ya no existe se ignora, así que echar a alguien no obliga a
+limpiarlo. Como el `PUT` reemplaza el documento entero, quien lo cambia relee la
+campaña antes de escribir (`editCampaign`) para no pisar las escenas.
 
 Milantus no guarda audio: cada escena es un enlace de YouTube o YouTube Music,
 y suena el reproductor embebido de YouTube (`lib/web/music_embed*.dart`).

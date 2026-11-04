@@ -4,15 +4,16 @@ import { UserPlus } from 'lucide-react';
 import { deleteCampaignLink, grantHeroicInspiration } from '../api/client';
 import { queryKeys, useCampaignChapters, useCampaignMembers, useSheetCatalog } from '../api/queries';
 import type { DmCampaign } from '../api/client';
-import { toRosterEntry } from '../dashboard/roster';
+import { movedOrder, toRosterEntry } from '../dashboard/roster';
 import { useLang, useTexts } from '../i18n/context';
 import { dmMemberHref } from '../router';
+import { useHoldDrag } from '../ui/holdDrag';
 import { Button } from '../ui/Button';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { Toast, type ToastTone } from '../ui/primitives';
 import { memberPortrait } from '../ui/portrait';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
-import { stateLabel, stateOf } from './campaigns';
+import { editCampaign, stateLabel, stateOf } from './campaigns';
 import { AddMemberDialog } from './AddMemberDialog';
 import { GiveItemDialog } from './GiveItemDialog';
 import { CampaignMenu } from './CampaignMenu';
@@ -61,12 +62,40 @@ export function MesaView({ campaign }: { campaign: DmCampaign }) {
     notify('info', t.dmMemberLeft(name));
   };
 
+  const memberOrder = campaign.memberOrder;
   const entries = useMemo(() => {
     if (!members.data || !catalog.data) return null;
     const cat = catalog.data;
     // El vínculo no guarda cuándo se creó la ficha: `createdAt` no se usa acá.
-    return members.data.map((m) => ({ memberId: m.memberId, entry: toRosterEntry(m.character, '', cat) }));
-  }, [members.data, catalog.data]);
+    const all = members.data.map((m) => ({ memberId: m.memberId, entry: toRosterEntry(m.character, '', cat) }));
+    // El orden del DM; lo que no figura va al final en el orden del servidor, y
+    // un id que ya no está (echaron a alguien) se ignora.
+    const rank = (id: string) => {
+      const i = memberOrder?.indexOf(id) ?? -1;
+      return i < 0 ? Number.MAX_SAFE_INTEGER : i;
+    };
+    return [...all].sort((a, b) => rank(a.memberId) - rank(b.memberId));
+  }, [members.data, catalog.data, memberOrder]);
+
+  const ids = useMemo(() => (entries ?? []).map((e) => e.memberId), [entries]);
+  // Guarda el orden nuevo: la caché cambia al instante y el documento se relee
+  // antes de escribir (`editCampaign`) para no pisar las escenas de música.
+  const moveMember = (from: string, to: string) => {
+    const order = movedOrder(ids, from, to);
+    void (async () => {
+      await client.cancelQueries({ queryKey: queryKeys.dmCampaigns });
+      client.setQueryData<DmCampaign[]>(queryKeys.dmCampaigns, (old) =>
+        old?.map((c) => (c.id === campaign.id ? { ...c, memberOrder: order } : c)),
+      );
+      try {
+        await editCampaign(client, campaign.id, (latest) => ({ ...latest, memberOrder: order }));
+      } catch {
+        notify('error', t.dmOrderSaveError);
+        void client.invalidateQueries({ queryKey: queryKeys.dmCampaigns });
+      }
+    })();
+  };
+  const reorder = useHoldDrag({ ids, canDrop: () => true, onMove: moveMember });
 
   const failed = [members, ...catalog.queries].filter((q) => q.isError);
   const state = stateLabel(t, stateOf(campaign));
@@ -96,6 +125,12 @@ export function MesaView({ campaign }: { campaign: DmCampaign }) {
               entry={entry}
               href={dmMemberHref(campaign.id, memberId)}
               portrait={memberPortrait(campaign.id, memberId, entry.character)}
+              reorder={{
+                item: reorder.item(memberId),
+                dragging: reorder.dragging === memberId,
+                over: reorder.over === memberId,
+                animated: reorder.animated,
+              }}
               actions={{
                 onGiveItem: () => setGiving({ memberId, name: entry.character.name }),
                 onGrantInspiration: () => void grant(memberId, entry.character.name),

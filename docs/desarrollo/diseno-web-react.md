@@ -304,7 +304,7 @@ Cada sección es una ruta bajo `/v2/dm/campanas/:id/` (el Bestiario, la Bibliote
 sabe distinguir «cargando», «error» y «no se encontró» (una campaña ajena y una
 inexistente son la misma pantalla). Desde 6b escribe campañas y la Mesa y desde 6c capítulos, notas y el reparto de objetos (abajo); lo demás sigue de solo lectura.
 
-- **Mesa** (`MesaView`, `MemberCard`): grilla `auto-fill` de tarjetas con
+- **Mesa** (`MesaView`, `MemberCard`): las tarjetas se mueven tomándolas enteras (`useHoldDrag`, con las clases de `RosterCard`; el orden es `Campaign.memberOrder`, que `editCampaign` guarda releyendo la campaña y la caché cambia al instante). Grilla `auto-fill` de tarjetas con
   `toRosterEntry` (`dashboard/roster.ts`, la misma cuenta que el dashboard). La
   CD sale de los bloques de lanzamiento del motor y, con varias clases
   lanzadoras, se muestran todas.

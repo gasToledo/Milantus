@@ -1141,6 +1141,34 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
+## [0.46.0+1] - 2026-11-04
+
+### Nuevo
+
+- En `/v2`, el DM puede dar un objeto a un personaje desde el menú de su
+  tarjeta en la Mesa («Dar objeto…»). El jugador recibe un aviso y lo encuentra
+  en la bandeja «El DM te dio» de su Inventario; el DM no escribe su ficha.
+- En `/v2`, el DM acomoda a los personajes de la Mesa tomando la tarjeta
+  entera, y el orden se guarda con la campaña. Servidor y motor: la campaña pasa
+  al esquema 3 con `memberOrder`, que no llega a los jugadores.
+- En `/v2`, las tarjetas se pueden mover con el teclado: `Alt` más una flecha
+  sobre la tarjeta enfocada.
+
+### Modificado
+
+- El aviso de objetos esperando en Inventario es ahora un círculo dorado con el
+  número en el panel de la ficha.
+- Los capítulos solo reparten objetos que existen en el catálogo o en el
+  homebrew: ya no se puede sumar un nombre libre. Los capítulos que ya lo tenían
+  lo conservan.
+- Desde esta versión las funciones nuevas llegan solo a `/v2`; la app de
+  siempre sigue leyendo los mismos datos, pero no suma novedades.
+
+### Eliminado
+
+- «Mover antes» y «Mover después» del menú de las tarjetas de personaje en
+  `/v2`: se mueven tomándolas o con el teclado.
+
 ## [Unreleased]
 
 ### Nuevo

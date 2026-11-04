@@ -4620,7 +4620,7 @@ void main() {
         expect(jsonEncode(raw['body']), isNot(contains('sellos')));
       });
 
-      test('las escenas de música no viajan', () async {
+      test('las escenas de música y el orden de la Mesa no viajan', () async {
         final (player, dm) = await table('sin-musica');
         await send(
           'PUT',
@@ -4629,7 +4629,8 @@ void main() {
           body: {
             'campaign': {
               ...campaignJson('tumba'),
-              'schemaVersion': 2,
+              'schemaVersion': 3,
+              'memberOrder': ['orden-secreto-del-dm'],
               'musicScenes': [
                 {
                   'id': 's1',
@@ -4645,6 +4646,7 @@ void main() {
         // pasaría igual sin probar nada.
         final delDm = await send('GET', '/api/campaigns', token: dm);
         expect(jsonEncode(delDm['body']), contains('Lamento'));
+        expect(jsonEncode(delDm['body']), contains('orden-secreto-del-dm'));
 
         final raw = await send(
           'GET',
@@ -4654,6 +4656,11 @@ void main() {
         expect(jsonEncode(raw['body']), isNot(contains('Lamento')));
         expect(jsonEncode(raw['body']), isNot(contains('youtu')));
         expect(jsonEncode(raw['body']), isNot(contains('musicScenes')));
+        expect(jsonEncode(raw['body']), isNot(contains('memberOrder')));
+        expect(
+          jsonEncode(raw['body']),
+          isNot(contains('orden-secreto-del-dm')),
+        );
       });
 
       test('las batallas cerradas viajan con la mesa', () async {

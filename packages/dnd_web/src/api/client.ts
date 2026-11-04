@@ -196,6 +196,8 @@ export interface DmCampaign {
   /** Las escenas de música (`MusicScene.toJson`). Son del DM: el servidor las
    *  poda de la campaña que recibe el jugador (`Campaign.playerView`). */
   musicScenes?: MusicScene[];
+  /** El orden de la Mesa: ids de vínculo. Es del DM (`Campaign.playerView` lo saca). */
+  memberOrder?: string[];
 }
 
 export interface MusicScene {

@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Ellipsis, Pencil, Trash2 } from 'lucide-react';
-import { ApiError, deleteCampaign, fetchDmCampaigns, saveCampaign, type DmCampaign } from '../api/client';
+import { deleteCampaign, type DmCampaign } from '../api/client';
 import { queryKeys } from '../api/queries';
 import { useTexts } from '../i18n/context';
 import { dmHref, navigate } from '../router';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Tooltip } from '../ui/primitives';
 import { CampaignEditorDialog, type CampaignDraft } from './CampaignEditorDialog';
-import { stateOf } from './campaigns';
+import { editCampaign, stateOf } from './campaigns';
 
 /**
  * «Editar» y «Borrar» la campaña, en un menú de la cabecera. Va solo en Mesa,
@@ -22,15 +22,8 @@ export function CampaignMenu({ campaign }: { campaign: DmCampaign }) {
   const client = useQueryClient();
   const [dialog, setDialog] = useState<'edit' | 'delete' | null>(null);
 
-  const edit = async ({ name, premise, state }: CampaignDraft) => {
-    // Se relee antes de escribir: las escenas de música viven en este mismo
-    // documento y el PUT lo reemplaza entero, así que escribir sobre la copia
-    // que cargó la pantalla las pisaría con lo que tuviera de viejo.
-    const latest = (await fetchDmCampaigns(new AbortController().signal)).find((c) => c.id === campaign.id);
-    if (!latest) throw new ApiError(404, `/api/campaigns/${campaign.id}`);
-    await saveCampaign({ ...latest, name, premise, state });
-    await client.invalidateQueries({ queryKey: queryKeys.dmCampaigns });
-  };
+  const edit = ({ name, premise, state }: CampaignDraft) =>
+    editCampaign(client, campaign.id, (latest) => ({ ...latest, name, premise, state }));
 
   const remove = async () => {
     await deleteCampaign(campaign.id);

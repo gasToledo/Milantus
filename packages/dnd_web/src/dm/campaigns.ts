@@ -1,12 +1,29 @@
 // Presentación de la lista de campañas del DM. El estado se lee tolerante, como
 // `CampaignState.fromJson`: ausente o desconocido es «en curso», que es el
 // estado en que nace toda campaña.
-import { useQueryClient } from '@tanstack/react-query';
-import { createCampaign, type DmCampaign } from '../api/client';
+import { useQueryClient, type QueryClient } from '@tanstack/react-query';
+import { ApiError, createCampaign, fetchDmCampaigns, saveCampaign, type DmCampaign } from '../api/client';
 import { queryKeys } from '../api/queries';
 import { dmCampaignHref, navigate } from '../router';
 import type { Texts } from '../i18n/texts';
 import type { CampaignDraft } from './CampaignEditorDialog';
+
+/**
+ * Cambia la campaña **releyéndola antes de escribir**: las escenas de música y
+ * el orden de la Mesa viven en el mismo documento y el PUT lo reemplaza entero,
+ * así que escribir sobre la copia que cargó la pantalla pisaría con lo que
+ * tuviera de viejo. Quien llama recibe la última y devuelve la que se guarda.
+ */
+export async function editCampaign(
+  client: QueryClient,
+  campaignId: string,
+  change: (latest: DmCampaign) => DmCampaign,
+): Promise<void> {
+  const latest = (await fetchDmCampaigns(new AbortController().signal)).find((c) => c.id === campaignId);
+  if (!latest) throw new ApiError(404, `/api/campaigns/${campaignId}`);
+  await saveCampaign(change(latest));
+  await client.invalidateQueries({ queryKey: queryKeys.dmCampaigns });
+}
 
 export type CampaignState = 'active' | 'paused' | 'finished';
 
