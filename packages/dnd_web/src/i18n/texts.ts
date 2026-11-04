@@ -396,6 +396,10 @@ const es = {
     proficiencyBonusPerLongRest: 'Competencia/descanso largo',
     abilityModifierPerLongRest: 'Modificador/descanso largo',
   },
+  innateTimesPerRest: {
+    oncePerLongRest: (n: number) => `${n}/descanso largo`,
+    oncePerShortRest: (n: number) => `${n}/descanso corto`,
+  },
   dcValue: (n: number) => `CD ${n}`,
   attackValue: (bonus: string) => `Ataque ${bonus}`,
   conditionsHeading: 'Condiciones',
@@ -2159,6 +2163,10 @@ const en: Texts = {
     proficiencyBonusPerLongRest: 'Proficiency/long rest',
     abilityModifierPerLongRest: 'Modifier/long rest',
   },
+  innateTimesPerRest: {
+    oncePerLongRest: (n: number) => `${n}/long rest`,
+    oncePerShortRest: (n: number) => `${n}/short rest`,
+  },
   dcValue: (n: number) => `DC ${n}`,
   attackValue: (bonus: string) => `Attack ${bonus}`,
   conditionsHeading: 'Conditions',
@@ -3541,6 +3549,16 @@ export type { Texts };
  *  un id nuevo del catálogo se ve crudo antes que desaparecer. */
 export function labelOf(table: Record<string, string>, id: string): string {
   return table[id] ?? id;
+}
+
+/** Cuántas veces se lanza gratis un conjuro de rasgo. Dos fuentes del mismo
+ *  conjuro llegan del motor como una fila con los usos sumados, y ahí el
+ *  rótulo fijo de «1/descanso» mentiría. */
+export function innateUseLabel(t: Texts, s: { use: string; freeUses: number }): string {
+  const perRest = t.innateTimesPerRest;
+  return s.freeUses > 1 && s.use in perRest
+    ? perRest[s.use as keyof typeof perRest](s.freeUses)
+    : labelOf(t.innateUses, s.use);
 }
 
 const STORAGE_KEY = 'milantus.locale';

@@ -1495,52 +1495,82 @@ class CharacterCompiler {
     Map<Ability, int> mods,
     int proficiencyBonus,
   ) {
-    final spells = <InnateSpell>[];
-    final resources = <CharacterResource>[];
+    // Por conjuro concedido: dos fuentes del mismo (Alto Elfo e Influencia
+    // Feérica dan Paso Brumoso) son una sola fila con los usos sumados. Como
+    // filas sueltas compartían el id del recurso, gastar una gastaba las dos.
+    final spells = <String, InnateSpell>{};
+    final resources = <String, CharacterResource>{};
     for (final g in builder.grantedSpells) {
       final granted = repo.spell(g.spellId);
       if (granted == null) continue; // contenido incompleto: se ignora
       final spell = _replacementFor(c, g, granted);
-      final mod = mods[g.ability] ?? 0;
-      final freeUses = switch (g.use) {
+      final ownMod = mods[g.ability] ?? 0;
+      final ownUses = switch (g.use) {
         InnateSpellUse.atWill => 0,
         InnateSpellUse.proficiencyBonusPerLongRest => proficiencyBonus,
         // "Mínimo una": con Carisma 8 el rasgo no desaparece.
-        InnateSpellUse.abilityModifierPerLongRest => max(1, mod),
+        InnateSpellUse.abilityModifierPerLongRest => max(1, ownMod),
         InnateSpellUse.oncePerLongRest || InnateSpellUse.oncePerShortRest => 1,
       };
-      spells.add(InnateSpell(
+      final prev = spells[granted.id];
+      // ponytail: con aptitudes distintas la fila muestra la mejor, aunque los
+      // usos de la otra fuente lancen con la suya; separarlos pide un recurso
+      // por fuente y hoy solo cambiaría la CD de conjuros sin tirada.
+      final ability = prev != null && (mods[prev.ability] ?? 0) >= ownMod
+          ? prev.ability
+          : g.ability;
+      final mod = mods[ability] ?? 0;
+      const shortRest = InnateSpellUse.oncePerShortRest;
+      const longRest = InnateSpellUse.oncePerLongRest;
+      final (use, freeUses) = switch (prev) {
+        null => (g.use, ownUses),
+        InnateSpell(use: InnateSpellUse.atWill) => (InnateSpellUse.atWill, 0),
+        _ when g.use == InnateSpellUse.atWill => (InnateSpellUse.atWill, 0),
+        // ponytail: un recurso recarga de una sola forma, así que al mezclar
+        // descansos queda el corto y se pierde el uso del largo.
+        InnateSpell(use: shortRest) when g.use == shortRest => (
+            shortRest,
+            prev.freeUses + ownUses,
+          ),
+        InnateSpell(use: shortRest) => (shortRest, prev.freeUses),
+        _ when g.use == shortRest => (shortRest, ownUses),
+        _ => (longRest, prev.freeUses + ownUses),
+      };
+      spells[granted.id] = InnateSpell(
         spellId: spell.id,
         name: spell.name,
         level: spell.level,
-        ability: g.ability,
-        use: g.use,
+        ability: ability,
+        use: use,
         saveDc: 8 + proficiencyBonus + mod,
         attackBonus: proficiencyBonus + mod,
         grantedSpellId: granted.id,
-        replaceableFrom: g.replaceableFrom,
+        replaceableFrom:
+            {...?prev?.replaceableFrom, ...g.replaceableFrom}.toList(),
         freeUses: freeUses,
-      ));
-      if (g.use != InnateSpellUse.atWill) {
-        resources.add(CharacterResource(
-          // Se indexa por el conjuro del contenido, no por el reemplazo: si no,
-          // cambiar el truco devolvería los usos ya gastados.
-          id: innateSpellResourceId(granted.id),
+      );
+      // Se indexa por el conjuro del contenido, no por el reemplazo: si no,
+      // cambiar el truco devolvería los usos ya gastados.
+      final resourceId = innateSpellResourceId(granted.id);
+      if (use == InnateSpellUse.atWill) {
+        resources.remove(resourceId);
+      } else {
+        resources[resourceId] = CharacterResource(
+          id: resourceId,
           name: spell.name,
           max: freeUses,
-          recharge: g.use == InnateSpellUse.oncePerShortRest
-              ? RechargeOn.shortRest
-              : RechargeOn.longRest,
+          recharge:
+              use == shortRest ? RechargeOn.shortRest : RechargeOn.longRest,
           description: localized(
             'Lanzarlo sin gastar espacio de conjuro. '
                 'También podés lanzarlo gastando un espacio.',
             'Cast it without expending a spell slot. You can also cast it '
                 'by expending a slot.',
           ),
-        ));
+        );
       }
     }
-    return _InnateResult(spells, resources);
+    return _InnateResult(spells.values.toList(), resources.values.toList());
   }
 
   /// Deriva los bloques de lanzamiento manteniendo el nivel y la lista de

@@ -3,7 +3,7 @@ import { useState, type ReactNode } from 'react';
 import { nameOf } from '../api/catalog';
 import { catalogLabel, type Advantage, type CharacterResource, type InnateSpell, type SpellcastingBlock } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
-import { labelOf, type Lang, type Texts } from '../i18n/texts';
+import { innateUseLabel, labelOf, type Lang, type Texts } from '../i18n/texts';
 import { AppDialog } from '../ui/AppDialog';
 import { Select, Tooltip } from '../ui/primitives';
 import { Button, ButtonLink } from '../ui/Button';
@@ -632,7 +632,7 @@ function SpellsCard({ model }: { model: SheetModel }) {
 
 function innateNote(s: InnateSpell, t: ReturnType<typeof useTexts>): string {
   return [
-    labelOf(t.innateUses, s.use),
+    innateUseLabel(t, s),
     t.abilityAbbr[s.ability],
     t.dcValue(s.saveDc),
     t.attackValue(signed(s.attackBonus)),

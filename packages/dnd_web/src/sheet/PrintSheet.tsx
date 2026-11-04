@@ -3,7 +3,7 @@ import { createPortal, flushSync } from 'react-dom';
 import { nameOf } from '../api/catalog';
 import { catalogLabel, computeSheet, inventoryOf, vocabularyLabel, type CharacterJson, type JsonObject } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
-import { labelOf } from '../i18n/texts';
+import { innateUseLabel, labelOf } from '../i18n/texts';
 import { signed } from './format';
 import { withoutForm } from './compute';
 import { classesOf, type SheetModel } from './model';
@@ -424,9 +424,9 @@ function Sheet({ model }: { model: SheetModel }) {
               <table className="wide">
                 <tbody>
                   {s.innateSpells.map((i) => (
-                    <tr key={`${i.source}-${i.spellId}`}>
+                    <tr key={i.grantedSpellId}>
                       <td>{i.name}</td>
-                      <td>{labelOf(t.innateUses, i.use)}</td>
+                      <td>{innateUseLabel(t, i)}</td>
                       <td>
                         {t.dcValue(i.saveDc)} · {t.attackValue(signed(i.attackBonus))}
                       </td>

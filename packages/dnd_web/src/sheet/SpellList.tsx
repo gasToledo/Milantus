@@ -203,7 +203,9 @@ export function SpellList({
         items={innate.map((i) => {
           const s = byId.get(i.spellId);
           return {
-            id: `innate-${i.spellId}`,
+            // Por el conjuro concedido, único en la lista: con dos filas de la
+            // misma clave React no desmonta la de más y se acumula en las pestañas.
+            id: `innate-${i.grantedSpellId}`,
             // El nombre que da el motor (puede venir del rasgo) y su uso,
             // CD y ataque, que son los del rasgo y no los de la clase.
             title: <SpellTitle spell={s} name={i.name} note={innateNote(i)} bonus={bonusOf(i.spellId)} />,

@@ -14,6 +14,8 @@ void main() {
   });
 
   Character pj({
+    String raceId = 'human',
+    String? lineageId,
     String classId = 'fighter',
     int level = 1,
     int dexterity = 14,
@@ -35,7 +37,8 @@ void main() {
       Character(
         id: 'dotes',
         name: 'Prueba',
-        raceId: 'human',
+        raceId: raceId,
+        lineageId: lineageId,
         classId: classId,
         subclassId: subclassId,
         backgroundId: backgroundId,
@@ -238,6 +241,25 @@ void main() {
       expect(extra.use, InnateSpellUse.oncePerLongRest);
       expect(con.alwaysPreparedSpellIds, containsAll(['misty-step', elegido]));
       expect(cupo(con, 'fey-touched-charisma:spell').pending, 0);
+    });
+
+    test('el mismo conjuro por dos fuentes es una fila con los usos sumados',
+        () {
+      final s = ficha(pj(
+        raceId: 'elf',
+        lineageId: 'elf-high',
+        classId: 'wizard',
+        level: 5,
+        charisma: 16,
+        featIds: const ['fey-touched-charisma'],
+      ));
+
+      final paso = s.innateSpells.singleWhere((i) => i.spellId == 'misty-step');
+      expect(paso.freeUses, 2);
+      final recurso = s.resources
+          .singleWhere((r) => r.id == innateSpellResourceId('misty-step'));
+      expect(recurso.max, 2);
+      expect(recurso.recharge, RechargeOn.longRest);
     });
 
     test('Invisibilidad y un conjuro de Ilusión o Nigromancia', () {
