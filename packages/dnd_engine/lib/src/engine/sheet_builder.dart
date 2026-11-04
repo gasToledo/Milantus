@@ -538,8 +538,15 @@ class SheetBuilder {
         if (extra > maxExtraAttack) maxExtraAttack = extra;
       case BonusMaxHpFlatEffect(:final amount):
         bonusMaxHpFlat += amount;
-      case BonusMaxHpPerLevelEffect(:final perLevel):
-        bonusMaxHpPerLevel += perLevel;
+      case BonusMaxHpPerLevelEffect(:final perLevel, :final perClassLevel):
+        if (perClassLevel) {
+          // El compilador pasa en [sourceLevel] el nivel de la clase de
+          // origen. Se suma acá, como un bono fijo, para no mezclarlo con
+          // Duro, que más abajo se multiplica por el nivel de personaje.
+          bonusMaxHpFlat += perLevel * (sourceLevel ?? level);
+        } else {
+          bonusMaxHpPerLevel += perLevel;
+        }
       case ArmorClassBonusEffect(:final amount):
         acBonus += amount;
       case InitiativeBonusEffect():

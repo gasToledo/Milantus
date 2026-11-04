@@ -924,7 +924,6 @@
     "multiclass": {
       "abilityRequirements": ["dexterity"],
       "armorProficiencies": ["light"],
-      "weaponProficiencies": ["simple", "martial-finesse", "martial-light"],
       "toolProficiencies": ["thieves-tools"],
       "skillChoiceCount": 1,
       "skillChoiceFrom": [
@@ -1288,8 +1287,7 @@
     "name": "Monje",
     "source": "srd_2024",
     "multiclass": {
-      "abilityRequirements": ["dexterity", "wisdom"],
-      "weaponProficiencies": ["simple", "martial-light"]
+      "abilityRequirements": ["dexterity", "wisdom"]
     },
     "accentColor": "#2E86AB",
     "iconId": "fist",
@@ -2800,7 +2798,7 @@
     "source": "srd_2024",
     "multiclass": {
       "abilityRequirements": ["wisdom"],
-      "armorProficiencies": ["light", "medium", "shield"]
+      "armorProficiencies": ["light", "shield"]
     },
     "accentColor": "#4C8B3F",
     "iconId": "leaf",
@@ -4568,7 +4566,18 @@
     "multiclass": {
       "abilityRequirements": ["dexterity", "wisdom"],
       "armorProficiencies": ["light", "medium", "shield"],
-      "weaponProficiencies": ["simple", "martial"]
+      "weaponProficiencies": ["simple", "martial"],
+      "skillChoiceCount": 1,
+      "skillChoiceFrom": [
+        "animal-handling",
+        "athletics",
+        "insight",
+        "investigation",
+        "nature",
+        "perception",
+        "stealth",
+        "survival"
+      ]
     },
     "accentColor": "#5B8C5A",
     "iconId": "bow",

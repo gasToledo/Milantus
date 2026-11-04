@@ -759,9 +759,16 @@ class CharacterCompiler {
     final dexMod = mods[Ability.dexterity]!;
     final initiativeBonuses = builder.resolveInitiativeBonuses(mods, profBonus);
 
-    final baseHp = c.hpPerLevel.fold<int>(0, (s, v) => s + v);
-    final maxHp = baseHp +
-        conMod * totalLevel +
+    // PHB 2024: cada nivel suma el resultado del dado (o el valor fijo) más
+    // el modificador de Constitución, con un mínimo de 1. Se recalcula con
+    // el CON actual, así que un cambio se aplica a los niveles ya ganados,
+    // pero un 1 con CON negativo no puede restar. Duro y los rasgos de PG
+    // por nivel van después y no entran en ese piso.
+    var fromLevels = 0;
+    for (final roll in c.hpPerLevel) {
+      fromLevels += max(1, roll + conMod);
+    }
+    final maxHp = fromLevels +
         builder.bonusMaxHpFlat +
         builder.bonusMaxHpPerLevel * totalLevel;
 
@@ -1550,7 +1557,6 @@ class CharacterCompiler {
             classLevels[entry.key]!,
             mods,
             profBonus,
-            totalLevel: classLevels.values.fold(0, (sum, value) => sum + value),
             slotsLevel: classLevels[entry.key]!,
           ),
         ),
@@ -1562,7 +1568,6 @@ class CharacterCompiler {
     int classLevel,
     Map<Ability, int> mods,
     int profBonus, {
-    required int totalLevel,
     required int slotsLevel,
   }) {
     final abilityMod = mods[sc.ability]!;
@@ -1576,9 +1581,13 @@ class CharacterCompiler {
       cantripBonus =
           sc.cantripIncreases!.where((lv) => classLevel >= lv).length;
     } else if (sc.progression == CasterProgression.third) {
-      cantripBonus = totalLevel >= 10 ? 1 : 0;
+      // «When you reach Fighter level 10»: el nivel es el de la clase que
+      // da el rasgo. El nivel total se lo regalaba a un Mago 9 / Pícaro 3.
+      cantripBonus = classLevel >= 10 ? 1 : 0;
     } else {
-      cantripBonus = (totalLevel >= 4 ? 1 : 0) + (totalLevel >= 10 ? 1 : 0);
+      // Igual para el +1 del 4 y el del 10 de las listas de clase. Un
+      // Guerrero 9 / Mago 1 se queda en los 3 trucos de nivel 1.
+      cantripBonus = (classLevel >= 4 ? 1 : 0) + (classLevel >= 10 ? 1 : 0);
     }
     return Spellcasting(
       ability: sc.ability,

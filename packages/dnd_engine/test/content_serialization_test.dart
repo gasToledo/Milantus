@@ -73,6 +73,14 @@ void main() {
       );
       expect(Feat.fromJson(feat.toJson()).effects.single,
           isA<BonusMaxHpPerLevelEffect>());
+      // Resistencia Dracónica marca que el bono escala con la clase. Si el
+      // round-trip pierde la marca, un Hechicero multiclase vuelve a sumar
+      // el nivel de personaje.
+      const draconico = BonusMaxHpPerLevelEffect(1, perClassLevel: true);
+      final vuelta =
+          Effect.fromJson(draconico.toJson()) as BonusMaxHpPerLevelEffect;
+      expect(vuelta.perLevel, 1);
+      expect(vuelta.perClassLevel, isTrue);
 
       const armor = Armor(
         id: 'hb-armadura',
