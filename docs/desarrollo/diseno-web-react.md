@@ -167,8 +167,9 @@ conjuro abre su detalle en un diálogo. Sus pasos de elecciones viven en
 | `AppDialog` | El molde de diálogo: placa, velo, barra de acciones de 48 px al pie | 480 px por defecto, 560 si el cuerpo es una ficha; una acción con `disabled` se apaga (Comprar sin fondos) |
 | `PortraitViewer` | El retrato original entero sobre el velo, con cerrar; `Esc` y clic afuera también cierran | Lo abre `Medallion` con `viewable` y la imagen de una entrada del Diario |
 | `DiaryEntries` (`src/sheet/DiaryTab.tsx`) | Tarjeta de entradas en grilla (`minWidth`, 280 por defecto); con `edit` (un `DiaryEditor`: `save`, `remove`, `move`, `upload`) suma «+», editor, borrado y el ícono de mover | Sin `edit` es de solo lectura (ficha ajena, notas del PNJ) |
-| `useReorder` (`src/ui/reorder.ts`) | Reordenar con el puntero (desde un ícono con `touch-action: none`) o con flechas; da `item(id)`, `grip(id)`, `dragging` y `over` | `onMove(desde, hasta)`; sin dependencias, lo usan el Diario y la lista de personajes (5f, que ignora el movimiento entre grupos) |
-| `RosterCard` (`src/dashboard/`) | La tarjeta de personaje: el nombre es el enlace y se estira con `::after`; una columna a la derecha del nivel con el menú ⋮ (favorito, renombrar, rehacer, borrar) y, debajo, el ícono de mover | El ⋮ y el ícono de mover llevan `relative z-10` o el enlace estirado los tapa; el favorito y la lista filtrada no llevan ícono de mover |
+| `useReorder` (`src/ui/reorder.ts`) | Reordenar con el puntero (desde un ícono con `touch-action: none`) o con flechas; da `item(id)`, `grip(id)`, `dragging` y `over` | `onMove(desde, hasta)`; sin dependencias, lo usa el Diario |
+| `useHoldDrag` (`src/ui/holdDrag.ts`) | Reordenar tomando la tarjeta entera, sin ícono: con el mouse, apretando y moviendo 6 px; con el dedo, sosteniendo 350 ms, para que deslizar siga desplazando. La tarjeta sigue al puntero, las demás se corren y la ventana se desplaza cerca de los bordes; `Escape` cancela. Da `item(id)`, `dragging`, `over` y `animated` | `canDrop(desde, hasta)` y `onMove(desde, hasta)`. Con «reducir movimiento» nada sigue al puntero: se atenúa y se marca. No tiene teclado: quien lo usa ofrece otra forma de mover |
+| `RosterCard` (`src/dashboard/`) | La tarjeta de personaje: el nombre es el enlace y se estira con `::after`; a la derecha del nivel, el menú ⋮ de 40 × 40 (favorito, renombrar, rehacer, mover antes y después, borrar). Se mueve tomándola entera (`useHoldDrag`) | El ⋮ lleva `relative z-10` o el enlace estirado lo tapa; el favorito y la lista filtrada no se mueven |
 | `ConfirmDialog` (`src/ui/`) | Confirmar algo irreversible sobre `AppDialog`: `title`, `body` (con párrafos), `confirmLabel`, `errorText`, `onConfirm`. Con el patrón de `DeleteDialog`: si falla no se cierra y el botón pasa a «Reintentar» | Borrar campaña y echar de la mesa; `DeleteDialog` y `ShareDialog` aún tienen el suyo |
 | `RenameDialog`, `DeleteDialog` (`src/dashboard/`) | «Editar nombre» y «¿Borrar a …?» sobre `AppDialog`; reciben una promesa y, si falla, **no se cierran**: error en carmesí y «Reintentar» | Los usan la lista y la ficha (el lápiz junto al nombre, solo en la ficha propia) |
 | `patchSettings` (`src/api/settingsSave.ts`) | Cambia campos de `/api/settings` sin pisar el resto: cola de un guardado a la vez que combina parches | Todo guardado de ajustes pasa por acá; el documento viaja entero |
@@ -313,7 +314,7 @@ inexistente son la misma pantalla). Desde 6b escribe campañas y la Mesa (abajo)
   con Editar y Borrar, solo en Mesa, Capítulos y Cuaderno), `DmOnboarding` (la
   bienvenida sin campañas: tres pasos y «Crear campaña»), `AddMemberDialog` (campo del
   código centrado, 18 px y mayúsculas; un 404 dice «Código inválido o vencido» y
-  conserva el código) y `MemberCard` con `actions`: un ⋮ de 32 × 32 con `relative z-10`
+  conserva el código) y `MemberCard` con `actions`: un ⋮ de 40 × 40 con `relative z-10`
   (conceder Inspiración Heroica, echar). Las acciones son sobre el vínculo y los
   avisos, nunca sobre la ficha del jugador.
 - **Capítulos** (`ChaptersView`): lista ordenada de tarjetas `card`; el abierto

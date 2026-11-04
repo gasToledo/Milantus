@@ -20,7 +20,7 @@ import {
   Toast,
   Tooltip,
 } from '../ui/primitives';
-import { useReorder } from '../ui/reorder';
+import { useHoldDrag } from '../ui/holdDrag';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { DeleteDialog } from './DeleteDialog';
 import { RenameDialog } from './RenameDialog';
@@ -97,15 +97,21 @@ export function DashboardPage() {
     const e = entryById.get(id);
     return e ? moveGroup(e, favoriteId) : null;
   };
-  const reorder = useReorder({
+  const moveCard = (from: string, to: string) =>
+    void saveSettings({ characterOrder: movedOrder(visibleIds, from, to), sortMode: 'manual' });
+  const reorder = useHoldDrag({
     ids: visibleIds,
-    onMove: (from, to) => {
-      // El orden al mostrar deja al favorito arriba y a los caídos al final:
-      // cruzar de grupo no tendría efecto.
-      if (groupOf(from) !== groupOf(to)) return;
-      void saveSettings({ characterOrder: movedOrder(visibleIds, from, to), sortMode: 'manual' });
-    },
+    // El orden al mostrar deja al favorito arriba y a los caídos al final:
+    // cruzar de grupo no tendría efecto.
+    canDrop: (from, to) => groupOf(from) === groupOf(to),
+    onMove: moveCard,
   });
+  /** El vecino de [id] a [step] lugares, si es de su grupo: lo que se ofrece en
+   *  el menú de la tarjeta para mover sin arrastrar. */
+  const moveTo = (id: string, step: number) => {
+    const to = visibleIds[visibleIds.indexOf(id) + step];
+    return to !== undefined && groupOf(to) === groupOf(id) ? () => moveCard(id, to) : undefined;
+  };
 
   const [renaming, setRenaming] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -221,10 +227,11 @@ export function DashboardPage() {
                     canMove && !favorite
                       ? {
                           item: reorder.item(id),
-                          grip: reorder.grip(id),
                           dragging: reorder.dragging === id,
-                          // La marca solo en el mismo grupo: soltar en otro no hace nada.
-                          over: reorder.over === id && reorder.dragging !== null && groupOf(reorder.dragging) === groupOf(id),
+                          over: reorder.over === id,
+                          animated: reorder.animated,
+                          moveBefore: moveTo(id, -1),
+                          moveAfter: moveTo(id, 1),
                         }
                       : undefined
                   }

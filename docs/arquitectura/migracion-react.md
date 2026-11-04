@@ -111,8 +111,8 @@ repiten acá.
   el orden (`sortMode`: manual, más recientes, nombre, nivel, clase) y el
   favorito de los ajustes de la cuenta (`/api/settings`), buscador en el
   cliente por nombre, especie y clase, y los caídos al final, como en Flutter.
-  **5f *(existe)***: el selector de orden, reordenar (puntero o flechas, solo
-  dentro del mismo grupo —favorito, vivos, caídos— y sin buscador activo, para
+  **5f *(existe)***: el selector de orden, reordenar (tomando la tarjeta entera
+  o desde su menú, solo dentro del mismo grupo —favorito, vivos, caídos— y sin buscador activo, para
   no perder el lugar de las tarjetas ocultas), el favorito, renombrar, borrar,
   rehacer desde nivel 1 (`/v2/personajes/:id/rehacer`, el mismo creador con
   `replacing`) y «Probar con uno de ejemplo» en la cuenta vacía. Los ajustes

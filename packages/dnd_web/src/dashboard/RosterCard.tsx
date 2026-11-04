@@ -1,11 +1,11 @@
-import { EllipsisVertical, GripVertical, Pencil, RotateCcw, Star, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, EllipsisVertical, Pencil, RotateCcw, Star, Trash2 } from 'lucide-react';
 import { useTexts } from '../i18n/context';
 import { characterHref, Link } from '../router';
 import { signed } from '../sheet/format';
 import { HP_CRITICAL_RATIO, hpTone, StatPlaque, ThinBar } from '../ui/data';
 import { Medallion } from '../ui/Medallion';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, Tooltip } from '../ui/primitives';
-import type { useReorder } from '../ui/reorder';
+import type { useHoldDrag } from '../ui/holdDrag';
 import { ownPortrait } from '../ui/portrait';
 import { isFallen, type RosterEntry } from './roster';
 
@@ -17,13 +17,18 @@ import { isFallen, type RosterEntry } from './roster';
  * La tarjeta entera es un enlace, pero el enlace es el nombre y se estira con
  * `::after` sobre toda la tarjeta: así el lector de pantalla anuncia «Brunilda
  * de Humo» y no la tarjeta entera leída de corrido, y el clic cae en cualquier
- * parte.
+ * parte. La tarjeta también se toma entera para moverla (`useHoldDrag`), y el
+ * menú ofrece lo mismo para quien no puede o no quiere arrastrar.
  */
 export interface CardReorder {
-  item: ReturnType<ReturnType<typeof useReorder>['item']>;
-  grip: ReturnType<ReturnType<typeof useReorder>['grip']>;
+  item: ReturnType<ReturnType<typeof useHoldDrag>['item']>;
   dragging: boolean;
   over: boolean;
+  /** Con «reducir movimiento» no sigue al puntero: se atenúa y se marca. */
+  animated: boolean;
+  /** Sin vecino en su grupo, esa opción del menú se apaga. */
+  moveBefore?: () => void;
+  moveAfter?: () => void;
 }
 
 export function RosterCard({
@@ -61,9 +66,16 @@ export function RosterCard({
 
   return (
     <li
-      className={`roster-card card relative flex flex-col p-4 ${reorder?.dragging ? 'opacity-40' : ''} ${
-        reorder?.over ? 'outline-2 outline-offset-1 outline-gold' : ''
-      }`}
+      className={`roster-card card relative flex flex-col p-4 ${
+        // Sostenerla no puede seleccionar el texto ni abrir el menú del teléfono.
+        reorder ? 'select-none [-webkit-touch-callout:none]' : ''
+      } ${
+        reorder?.dragging
+          ? reorder.animated
+            ? 'cursor-grabbing border-gold [&_*]:cursor-grabbing'
+            : 'opacity-40'
+          : ''
+      } ${reorder?.over && !reorder.animated ? 'outline-2 outline-offset-1 outline-gold' : ''}`}
       data-character={character.id}
       data-favorite={favorite}
       {...reorder?.item}
@@ -79,6 +91,7 @@ export function RosterCard({
             )}
             <Link
               href={characterHref(character.id)}
+              draggable={false}
               className={`truncate after:absolute after:inset-0 after:rounded-[var(--radius-card)] after:content-[''] ${
                 fallen ? 'text-on-surface-variant' : 'text-on-surface'
               }`}
@@ -103,56 +116,53 @@ export function RosterCard({
             </p>
           </div>
         )}
-        {/* Una columna a la derecha del nivel (el ⋮ y, debajo, el ícono de
-            mover), con margen negativo para no correr el medallón. Los dos
-            llevan `relative z-10`: el enlace del nombre se estira sobre toda
-            la tarjeta y los taparía. */}
-        <div className="-mt-1 -mr-2 -ml-0.5 flex shrink-0 flex-col gap-1">
-          <DropdownMenu>
-            <Tooltip content={t.cardActionsTooltip(character.name)}>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  aria-label={t.cardActionsTooltip(character.name)}
-                  className="relative z-10 inline-flex h-7 w-7 items-center justify-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold data-[state=open]:bg-gold-soft data-[state=open]:text-gold"
-                >
-                  <EllipsisVertical size={18} aria-hidden="true" />
-                </button>
-              </DropdownMenuTrigger>
-            </Tooltip>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onSelect={onToggleFavorite}>
-                <Star size={15} aria-hidden="true" className="text-text-muted" />
-                {favorite ? t.cardUnfavorite : t.cardFavorite}
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={onRename}>
-                <Pencil size={15} aria-hidden="true" className="text-text-muted" />
-                {t.cardRename}
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={onRebuild}>
-                <RotateCcw size={15} aria-hidden="true" className="text-text-muted" />
-                {t.cardRebuild}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={onDelete} className="text-crimson">
-                <Trash2 size={15} aria-hidden="true" />
-                {t.cardDelete}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          {reorder && (
-            <Tooltip content={t.cardMoveTip}>
+        {/* Margen negativo para no correr el medallón, y `relative z-10`
+            porque el enlace del nombre se estira sobre toda la tarjeta y lo
+            taparía. */}
+        <DropdownMenu>
+          <Tooltip content={t.cardActionsTooltip(character.name)}>
+            <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                aria-label={t.cardMove(character.name)}
-                className="relative z-10 inline-flex h-7 w-7 cursor-grab items-center justify-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold"
-                {...reorder.grip}
+                aria-label={t.cardActionsTooltip(character.name)}
+                className="relative z-10 -mt-2 -mr-2.5 -ml-1 inline-flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold data-[state=open]:bg-gold-soft data-[state=open]:text-gold"
               >
-                <GripVertical size={16} aria-hidden="true" />
+                <EllipsisVertical size={20} aria-hidden="true" />
               </button>
-            </Tooltip>
-          )}
-        </div>
+            </DropdownMenuTrigger>
+          </Tooltip>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onSelect={onToggleFavorite}>
+              <Star size={15} aria-hidden="true" className="text-text-muted" />
+              {favorite ? t.cardUnfavorite : t.cardFavorite}
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={onRename}>
+              <Pencil size={15} aria-hidden="true" className="text-text-muted" />
+              {t.cardRename}
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={onRebuild}>
+              <RotateCcw size={15} aria-hidden="true" className="text-text-muted" />
+              {t.cardRebuild}
+            </DropdownMenuItem>
+            {reorder && (
+              <>
+                <DropdownMenuItem disabled={!reorder.moveBefore} onSelect={reorder.moveBefore}>
+                  <ArrowUp size={15} aria-hidden="true" className="text-text-muted" />
+                  {t.cardMoveBefore}
+                </DropdownMenuItem>
+                <DropdownMenuItem disabled={!reorder.moveAfter} onSelect={reorder.moveAfter}>
+                  <ArrowDown size={15} aria-hidden="true" className="text-text-muted" />
+                  {t.cardMoveAfter}
+                </DropdownMenuItem>
+              </>
+            )}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={onDelete} className="text-crimson">
+              <Trash2 size={15} aria-hidden="true" />
+              {t.cardDelete}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {sheet && (

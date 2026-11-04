@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type Poin
 
 /**
  * Reordenar una lista de tarjetas con el puntero o el teclado, sin
- * dependencias (lo usa el Diario; la lista de personajes lo va a reusar).
+ * dependencias, desde un ícono (lo usa el Diario; la lista de personajes toma la
+ * tarjeta entera, con `useHoldDrag`).
  *
  * El gesto arranca **solo** en el ícono de mover (`grip`): el resto de la
  * tarjeta sigue siendo un botón y la pantalla táctil se desplaza con normalidad

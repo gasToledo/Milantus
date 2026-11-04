@@ -97,9 +97,9 @@ export function MemberCard({
                   type="button"
                   aria-label={t.dmActionsOf(character.name)}
                   data-action="member-actions"
-                  className="relative z-10 -mt-3.5 -mr-2 -ml-1.5 inline-flex size-8 shrink-0 items-center justify-center self-start rounded-[var(--radius-nav)] text-text-muted hover:text-gold data-[state=open]:bg-gold-soft data-[state=open]:text-gold"
+                  className="relative z-10 -mt-3 -mr-2.5 -ml-1 inline-flex size-10 shrink-0 items-center justify-center self-start rounded-[var(--radius-nav)] text-text-muted hover:text-gold data-[state=open]:bg-gold-soft data-[state=open]:text-gold"
                 >
-                  <EllipsisVertical size={18} aria-hidden="true" />
+                  <EllipsisVertical size={20} aria-hidden="true" />
                 </button>
               </DropdownMenuTrigger>
             </Tooltip>
