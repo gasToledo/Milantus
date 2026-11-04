@@ -28,6 +28,73 @@ enum ChapterState {
   }
 }
 
+/// Un objeto del catálogo (o del homebrew del DM) que un capítulo reparte.
+///
+/// Guarda el [name] del momento de elegirlo: es lo que el aviso nombra aunque
+/// el homebrew se borre después, y lo que ve quien no tiene ese contenido.
+/// Como el resto del botín, **es un aviso**: el objeto lo agrega a su
+/// inventario el jugador, nunca el DM.
+class ChapterItem {
+  /// Las tres categorías del catálogo de equipo donde vive un objeto.
+  static const categories = {'weapons', 'armor', 'items'};
+
+  final String category;
+  final String itemId;
+  final String name;
+
+  /// Para una plantilla («Arma +1»): el objeto sobre el que se aplica.
+  final String? baseItemId;
+
+  /// Al menos 1.
+  final int quantity;
+
+  /// Si [itemId] es del homebrew del DM y no del catálogo oficial.
+  final bool homebrew;
+
+  const ChapterItem({
+    required this.category,
+    required this.itemId,
+    required this.name,
+    this.baseItemId,
+    this.quantity = 1,
+    this.homebrew = false,
+  });
+
+  /// «Poción de curación» o «Poción de curación ×2».
+  String get label => quantity > 1 ? '$name ×$quantity' : name;
+
+  Map<String, dynamic> toJson() => {
+        'category': category,
+        'itemId': itemId,
+        'name': name,
+        if (baseItemId != null) 'baseItemId': baseItemId,
+        'quantity': quantity,
+        'homebrew': homebrew,
+      };
+
+  /// `null` si lo escrito afuera no se puede leer: el capítulo no se rechaza
+  /// entero por un objeto malformado, igual que con [Chapter.grantsItems].
+  static ChapterItem? tryFromJson(Object? source) {
+    if (source is! Map) return null;
+    final category = source['category'];
+    final itemId = source['itemId'];
+    final name = source['name'];
+    if (category is! String || !categories.contains(category)) return null;
+    if (itemId is! String || itemId.trim().isEmpty) return null;
+    if (name is! String || name.trim().isEmpty) return null;
+    final base = source['baseItemId'];
+    final quantity = source['quantity'];
+    return ChapterItem(
+      category: category,
+      itemId: itemId.trim(),
+      name: name.trim(),
+      baseItemId: base is String && base.trim().isNotEmpty ? base.trim() : null,
+      quantity: quantity is int && quantity > 1 ? quantity : 1,
+      homebrew: source['homebrew'] == true,
+    );
+  }
+}
+
 /// Un tramo de una campaña, tal como lo planifica y lo cierra el DM.
 ///
 /// Es el eje temporal del que va a colgar el cuaderno de campaña y el
@@ -38,7 +105,10 @@ enum ChapterState {
 class Chapter {
   /// Versión del formato de este documento. Mismo contrato que
   /// `Character.currentSchemaVersion` y `Campaign.currentSchemaVersion`.
-  static const int currentSchemaVersion = 1;
+  ///
+  /// 2: suma [grantsCatalog]. Un capítulo de la versión 1 se lee igual, sin
+  /// objetos del catálogo.
+  static const int currentSchemaVersion = 2;
 
   final String id;
   final String name;
@@ -80,6 +150,11 @@ class Chapter {
   /// no le ahorraría nada.
   final List<String> grantsItems;
 
+  /// Los objetos del catálogo o del homebrew que se llevan, aparte del texto
+  /// libre de [grantsItems]. A quién le toca cada uno se decide al cerrar y
+  /// **no se guarda acá**: el capítulo cerrado dice qué se repartió, no a quién.
+  final List<ChapterItem> grantsCatalog;
+
   const Chapter({
     required this.id,
     required this.name,
@@ -88,18 +163,27 @@ class Chapter {
     this.grantsLevel = false,
     this.grantsGold = 0,
     this.grantsItems = const [],
+    this.grantsCatalog = const [],
   });
 
   /// Si el cierre reparte algo además del aviso de subir de nivel.
-  bool get grantsRewards => grantsGold > 0 || grantsItems.isNotEmpty;
+  bool get grantsRewards =>
+      grantsGold > 0 || grantsItems.isNotEmpty || grantsCatalog.isNotEmpty;
+
+  /// Los nombres de todo lo que se lleva: primero el texto libre y después los
+  /// objetos del catálogo («Nombre» o «Nombre ×2»).
+  List<String> get itemLabels => [
+        ...grantsItems,
+        for (final item in grantsCatalog) item.label,
+      ];
 
   /// El botín en una línea, o vacío si no hay ninguno. Sin el nivel: en la
   /// lista de capítulos ese ya se ve como marca aparte.
-  String get rewardsLabel => describeRewards(grantsGold, grantsItems);
+  String get rewardsLabel => describeRewards(grantsGold, itemLabels);
 
   /// Todo lo que reparte al cerrarse, el nivel incluido, en una línea sola.
   String get grantsLabel =>
-      describeRewards(grantsGold, grantsItems, level: grantsLevel);
+      describeRewards(grantsGold, itemLabels, level: grantsLevel);
 
   Chapter copyWith({
     String? name,
@@ -108,6 +192,7 @@ class Chapter {
     bool? grantsLevel,
     int? grantsGold,
     List<String>? grantsItems,
+    List<ChapterItem>? grantsCatalog,
   }) =>
       Chapter(
         id: id,
@@ -117,6 +202,7 @@ class Chapter {
         grantsLevel: grantsLevel ?? this.grantsLevel,
         grantsGold: grantsGold ?? this.grantsGold,
         grantsItems: grantsItems ?? this.grantsItems,
+        grantsCatalog: grantsCatalog ?? this.grantsCatalog,
       );
 
   Map<String, dynamic> toJson() => {
@@ -128,6 +214,7 @@ class Chapter {
         'grantsLevel': grantsLevel,
         'grantsGold': grantsGold,
         'grantsItems': grantsItems,
+        'grantsCatalog': [for (final item in grantsCatalog) item.toJson()],
       };
 
   factory Chapter.fromJson(Map<String, dynamic> source) {
@@ -149,6 +236,10 @@ class Chapter {
       grantsItems: [
         for (final item in (j['grantsItems'] as List? ?? const []))
           if (item is String && item.trim().isNotEmpty) item.trim(),
+      ],
+      grantsCatalog: [
+        for (final raw in (j['grantsCatalog'] as List? ?? const []))
+          if (ChapterItem.tryFromJson(raw) case final item?) item,
       ],
     );
   }
@@ -175,7 +266,9 @@ class Chapter {
         supported: currentSchemaVersion,
       );
     }
-    return Map<String, dynamic>.from(source);
+    // 1 → 2: solo suma un campo opcional, así que migrar es sellar la versión.
+    return Map<String, dynamic>.from(source)
+      ..['schemaVersion'] = currentSchemaVersion;
   }
 }
 

@@ -233,5 +233,97 @@ void main() {
 
       expect(source, {'id': 'x', 'name': 'y'});
     });
+
+    test('un capítulo de la versión 1 migra a la actual y se lee igual', () {
+      final migrated = Chapter.migrateJson({
+        'schemaVersion': 1,
+        'id': 'x',
+        'name': 'y',
+        'grantsItems': ['Mapa'],
+      });
+
+      expect(migrated['schemaVersion'], Chapter.currentSchemaVersion);
+      final r = Chapter.fromJson({'schemaVersion': 1, 'id': 'x'});
+      expect(r.grantsCatalog, isEmpty);
+    });
+  });
+
+  group('Chapter, objetos del catálogo', () {
+    const potion = ChapterItem(
+      category: 'items',
+      itemId: 'potion-of-healing',
+      name: 'Poción de curación',
+      quantity: 2,
+    );
+    const blade = ChapterItem(
+      category: 'weapons',
+      itemId: 'regalo-1',
+      name: 'Hoja del Cuervo',
+      baseItemId: 'longsword',
+      homebrew: true,
+    );
+
+    test('sobreviven el round-trip', () {
+      const c = Chapter(id: 'x', name: 'y', grantsCatalog: [potion, blade]);
+
+      final r = Chapter.fromJson(c.toJson());
+
+      expect(r.grantsCatalog.map((i) => i.toJson()), [
+        potion.toJson(),
+        blade.toJson(),
+      ]);
+      expect(r.grantsCatalog.last.homebrew, isTrue);
+      expect(r.grantsCatalog.last.baseItemId, 'longsword');
+    });
+
+    test('lo que no se puede leer se descarta sin rechazar el capítulo', () {
+      final r = Chapter.fromJson({
+        'id': 'x',
+        'grantsCatalog': [
+          {
+            'category': 'items',
+            'itemId': 'rope',
+            'name': 'Cuerda',
+            'quantity': 0
+          },
+          {'category': 'spells', 'itemId': 'fireball', 'name': 'Bola de fuego'},
+          {'category': 'items', 'itemId': '  ', 'name': 'Vacío'},
+          {'category': 'items', 'itemId': 'rope'},
+          'texto suelto',
+          null,
+        ],
+      });
+
+      expect(r.grantsCatalog, hasLength(1));
+      // La cantidad mínima es 1.
+      expect(r.grantsCatalog.single.quantity, 1);
+    });
+
+    test('se nombran en el botín, con ×n si son más de uno', () {
+      const c = Chapter(
+        id: 'x',
+        name: 'y',
+        grantsGold: 120,
+        grantsItems: ['Mapa del contrabandista'],
+        grantsCatalog: [potion, blade],
+      );
+
+      expect(c.grantsRewards, isTrue);
+      expect(
+        c.rewardsLabel,
+        '120 po, Mapa del contrabandista, Poción de curación ×2 y Hoja del Cuervo',
+      );
+      expect(c.grantsLabel, startsWith('120 po'));
+      expect(
+        const Chapter(id: 'x', name: 'y', grantsCatalog: [blade]).grantsRewards,
+        isTrue,
+      );
+    });
+
+    test('copyWith conserva los objetos que no se pasaron', () {
+      const c = Chapter(id: 'x', name: 'y', grantsCatalog: [potion]);
+
+      expect(c.copyWith(state: ChapterState.active).grantsCatalog, [potion]);
+    });
   });
 }
