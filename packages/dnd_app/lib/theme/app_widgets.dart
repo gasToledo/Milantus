@@ -2048,6 +2048,11 @@ String? describeEffect(
   ImmunityEffect(:final damageType) => l10n.effectImmunity(
     DamageType.labelFor(damageType),
   ),
+  ConditionImmunityEffect(:final condition) => l10n.effectConditionImmunity(
+    conditionLabel(condition),
+  ),
+  AbilityCheckBonusEffect(:final ability, :final fromAbility) =>
+    l10n.effectCheckBonus(ability.abbr, fromAbility.abbr),
   DarkvisionEffect(:final range) => l10n.effectDarkvision(range),
   SpeedBonusEffect(:final feet) => l10n.effectSpeedBonus(feet),
   SetSpeedEffect(:final feet) => l10n.effectSpeedSet(feet),

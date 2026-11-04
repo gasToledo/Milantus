@@ -464,6 +464,18 @@ abstract class AppLocalizations {
   /// **'Inmunidad: {name}'**
   String effectImmunity(String name);
 
+  /// No description provided for @effectConditionImmunity.
+  ///
+  /// In es, this message translates to:
+  /// **'Inmunidad al estado: {name}'**
+  String effectConditionImmunity(String name);
+
+  /// No description provided for @effectCheckBonus.
+  ///
+  /// In es, this message translates to:
+  /// **'Pruebas de {ability}: +mod. de {from}'**
+  String effectCheckBonus(String ability, String from);
+
   /// No description provided for @effectDarkvision.
   ///
   /// In es, this message translates to:
@@ -1634,6 +1646,12 @@ abstract class AppLocalizations {
   /// **'Resistencia a {types}'**
   String modeResistance(Object types);
 
+  /// No description provided for @modeConditionImmunity.
+  ///
+  /// In es, this message translates to:
+  /// **'Inmune a {conditions}'**
+  String modeConditionImmunity(String conditions);
+
   /// No description provided for @modeDamage.
   ///
   /// In es, this message translates to:
@@ -1669,6 +1687,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Inmunidades: {list}'**
   String combatImmunities(String list);
+
+  /// No description provided for @combatConditionImmunities.
+  ///
+  /// In es, this message translates to:
+  /// **'Inmunidades a estados: {list}'**
+  String combatConditionImmunities(String list);
 
   /// No description provided for @shortRestNoRestore.
   ///
@@ -8484,6 +8508,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Inmunidad a daño'**
   String get effKindImmunity;
+
+  /// No description provided for @effKindConditionImmunity.
+  ///
+  /// In es, this message translates to:
+  /// **'Inmunidad a un estado'**
+  String get effKindConditionImmunity;
 
   /// No description provided for @effKindGrantSpell.
   ///

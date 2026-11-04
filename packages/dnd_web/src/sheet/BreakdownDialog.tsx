@@ -105,6 +105,9 @@ function AbilityBreakdown({ model, ability }: { model: SheetModel; ability: Abil
       {/* Siempre, y no solo cuando no hay habilidades: bajo Cansancio la prueba
           deja de coincidir con el modificador y esta es la cifra que se tira. */}
       <Line label={t.breakdownAbilityChecks} value={signed(check)} />
+      {(sheet.abilityCheckBonuses[ability] ?? []).map((b, i) => (
+        <Line key={i} indent label={t.breakdownIncludes(signed(b.amount), b.source)} />
+      ))}
       {exhaustion > 0 && <Line indent label={t.breakdownExhaustion(Math.abs(sheet.d20Modifier), exhaustion)} />}
       {casting && (
         <>

@@ -133,6 +133,7 @@ enum _EffectKind {
   language,
   resistance,
   immunity,
+  conditionImmunity,
   grantSpell,
   alwaysPrepared,
   spellListAddition,
@@ -161,6 +162,7 @@ enum _EffectKind {
     language => l10n.effLanguage,
     resistance => l10n.effKindResistance,
     immunity => l10n.effKindImmunity,
+    conditionImmunity => l10n.effKindConditionImmunity,
     grantSpell => l10n.effKindGrantSpell,
     alwaysPrepared => l10n.effKindAlwaysPrepared,
     spellListAddition => l10n.effKindSpellList,
@@ -201,6 +203,7 @@ class _AddEffectDialogState extends State<_AddEffectDialog> {
   Ability _ability = Ability.strength;
   late String _skill = _skillOptions.keys.first;
   late String _damageType = _damageTypeOptions.keys.first;
+  late String _condition = conditionIds.first;
   late String _weaponCategory = weaponProficiencyIds.first;
   late String _armorCategory = armorTrainingIds.first;
   late String _tool = toolProficiencyIds.first;
@@ -258,6 +261,7 @@ class _AddEffectDialogState extends State<_AddEffectDialog> {
     _EffectKind.language => LanguageEffect(_language),
     _EffectKind.resistance => ResistanceEffect(_damageType),
     _EffectKind.immunity => ImmunityEffect(_damageType),
+    _EffectKind.conditionImmunity => ConditionImmunityEffect(_condition),
     _EffectKind.grantSpell => GrantSpellEffect(
       spellId: _spellId,
       ability: _ability,
@@ -408,6 +412,14 @@ class _AddEffectDialogState extends State<_AddEffectDialog> {
       // Desplegable y no texto libre: escrito a mano, "fuego" no coincide con
       // el id `fire` y el efecto quedaba guardado sin hacer nada.
       _damageTypeDropdown(_damageType, (v) => setState(() => _damageType = v)),
+    ],
+    _EffectKind.conditionImmunity => [
+      _idDropdown(
+        label: context.l10n.effKindConditionImmunity,
+        value: _condition,
+        options: {for (final id in conditionIds) id: conditionLabel(id)},
+        onChanged: (v) => setState(() => _condition = v),
+      ),
     ],
     _EffectKind.grantSpell => [
       _spellDropdown(),

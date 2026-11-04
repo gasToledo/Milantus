@@ -10,11 +10,12 @@ void main() {
     repo = await ContentRepository.loadFromDirectory('lib/assets/srd_2024');
   });
 
-  test('un estado que viaja por el mismo campo también se traduce', () {
-    // El Artífice es inmune a `poisoned`, que es un estado y no un tipo de
-    // daño: comparten campo, así que la etiqueta tiene que cubrir ambos.
+  test('un estado se traduce aunque no sea un tipo de daño', () {
+    // Las ventajas nombran estados por id, y labelFor es el respaldo cuando
+    // el id no es un tipo de daño.
     expect(DamageType.fromId('poisoned'), isNull);
     expect(DamageType.labelFor('poisoned'), 'Envenenado');
+    expect(conditionLabel('poisoned'), 'Envenenado');
   });
 
   test('un id desconocido no rompe: cae al id capitalizado', () {

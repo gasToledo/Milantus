@@ -205,6 +205,19 @@ extension _SheetCombatSection on _SheetScreenState {
       ..sort();
     final immunities = [...s.immunities].map(DamageType.labelFor).toList()
       ..sort();
+    String conditionImmunityLabel(String id) {
+      final label = conditionLabel(id);
+      final mode = s.activeModes
+          .where((m) => m.conditionImmunities.contains(id))
+          .firstOrNull;
+      return mode == null
+          ? label
+          : context.l10n.combatResistanceFrom(label, mode.name);
+    }
+
+    final conditionImmunities = [
+      ...s.conditionImmunities,
+    ].map(conditionImmunityLabel).toList()..sort();
     return sheetCard(
       icon: Icons.shield,
       title: context.l10n.combatDefense,
@@ -231,6 +244,15 @@ extension _SheetCombatSection on _SheetScreenState {
                     const SizedBox(height: 4),
                     Text(
                       context.l10n.combatImmunities(immunities.join(", ")),
+                      style: TextStyle(fontSize: 12.5, color: pal.textMuted),
+                    ),
+                  ],
+                  if (conditionImmunities.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      context.l10n.combatConditionImmunities(
+                        conditionImmunities.join(", "),
+                      ),
                       style: TextStyle(fontSize: 12.5, color: pal.textMuted),
                     ),
                   ],

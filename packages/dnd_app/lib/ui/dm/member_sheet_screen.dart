@@ -358,6 +358,26 @@ class _MemberSheetScreenState extends State<MemberSheetScreen> {
               style: TextStyle(fontSize: 12.5, color: pal.textMuted),
             ),
           ],
+          if (sheet.conditionImmunities.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              context.l10n.combatConditionImmunities(
+                ([
+                  for (final id in sheet.conditionImmunities)
+                    switch (sheet.activeModes
+                        .where((m) => m.conditionImmunities.contains(id))
+                        .firstOrNull) {
+                      final mode? => context.l10n.combatResistanceFrom(
+                        conditionLabel(id),
+                        mode.name,
+                      ),
+                      null => conditionLabel(id),
+                    },
+                ]..sort()).join(', '),
+              ),
+              style: TextStyle(fontSize: 12.5, color: pal.textMuted),
+            ),
+          ],
           const SizedBox(height: 18),
           Eyebrow(context.l10n.savesTitle),
           DenseRows(

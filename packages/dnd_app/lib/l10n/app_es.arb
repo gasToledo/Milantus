@@ -210,6 +210,19 @@
     }
   },
   "effectImmunity": "Inmunidad: {name}",
+  "effectConditionImmunity": "Inmunidad al estado: {name}",
+  "@effectConditionImmunity": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "effectCheckBonus": "Pruebas de {ability}: +mod. de {from}",
+  "@effectCheckBonus": {
+    "placeholders": {
+      "ability": { "type": "String" },
+      "from": { "type": "String" }
+    }
+  },
   "@effectImmunity": {
     "placeholders": {
       "name": {
@@ -791,6 +804,12 @@
     }
   },
   "modeResistance": "Resistencia a {types}",
+  "modeConditionImmunity": "Inmune a {conditions}",
+  "@modeConditionImmunity": {
+    "placeholders": {
+      "conditions": { "type": "String" }
+    }
+  },
   "@modeResistance": {
     "placeholders": {
       "types": {
@@ -841,6 +860,12 @@
     }
   },
   "combatImmunities": "Inmunidades: {list}",
+  "combatConditionImmunities": "Inmunidades a estados: {list}",
+  "@combatConditionImmunities": {
+    "placeholders": {
+      "list": { "type": "String" }
+    }
+  },
   "@combatImmunities": {
     "placeholders": {
       "list": {
@@ -4244,6 +4269,7 @@
   "effLanguage": "Idioma",
   "effKindResistance": "Resistencia a daño",
   "effKindImmunity": "Inmunidad a daño",
+  "effKindConditionImmunity": "Inmunidad a un estado",
   "effKindGrantSpell": "Conceder un conjuro",
   "effKindAlwaysPrepared": "Conjuro siempre preparado",
   "effKindSpellList": "Sumar un conjuro a tu lista",

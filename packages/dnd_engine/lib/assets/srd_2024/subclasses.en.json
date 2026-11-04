@@ -546,7 +546,7 @@
     "features.0.effects.1.name": "Wrath of the Sea"
   },
   "circle-stars": {
-    "_es": "f489ddf9",
+    "_es": "635acfb7",
     "name": "Circle of the Stars",
     "features.0.name": "Star Map / Starry Form",
     "features.0.effects.2.name": "Starry Form",
@@ -557,7 +557,7 @@
     "features.3.name": "Full of Stars",
     "features.3.effects.0.name": "Full of Stars",
     "description": "Druids who have studied the wisdom of the constellations and channel their power into a Starry Form.",
-    "features.0.description": "You carry a star map that gives you Guidance and Guiding Bolt always prepared, and you can expend Wild Shape to take a Starry Form (Archer, Chalice, or Dragon).",
+    "features.0.description": "You carry a star map that keeps Guidance and Guiding Bolt prepared. You can cast Guiding Bolt without expending a spell slot a number of times equal to your Wisdom modifier (minimum of one); you regain the expended uses when you finish a Long Rest. You can also expend a use of Wild Shape to take a Starry Form (Archer, Chalice, or Dragon).",
     "features.0.effects.2.description": "As a Bonus Action, you expend a use of Wild Shape to take on a starry form rather than shape-shifting. It lasts 10 minutes and ends early if you dismiss it (no action required), have the Incapacitated condition, or use this feature again. It sheds Bright Light in a 10-foot radius and Dim Light for 10 more feet. Each time, you choose which constellation glimmers: Archer, Chalice, or Dragon.",
     "features.1.description": "After a Long Rest, you roll a die that gives you a beneficial, reusable Reaction (weal or woe).",
     "features.1.effects.0.description": "A Reaction based on a daily die: you reduce damage taken or increase damage dealt.",
@@ -638,7 +638,7 @@
     "features.3.effects.1.variants.4.description": "Resistance to Thunder damage."
   },
   "warrior-mercy": {
-    "_es": "a8506de9",
+    "_es": "5a24f9a0",
     "name": "Warrior of Mercy",
     "features.0.name": "Hand of Healing / Hand of Harm",
     "features.0.effects.0.name": "Hands of Mercy",
@@ -658,7 +658,11 @@
     "features.3.description": "Once per Long Rest, you can bring a recently deceased creature back to life.",
     "features.3.effects.0.description": "You revive a recently dead creature by spending Focus Points.",
     "features.3.effects.1.name": "Hand of Ultimate Mercy",
-    "features.3.effects.1.description": "Hand of Ultimate Mercy use."
+    "features.3.effects.1.description": "Hand of Ultimate Mercy use.",
+    "features.4.name": "Implements of Mercy",
+    "features.4.description": "You gain proficiency in Insight and Medicine, and with the Herbalism Kit.",
+    "features.4.effects.3.name": "Implements of Mercy",
+    "features.4.effects.3.description": "Proficiency in Insight, Medicine, and the Herbalism Kit."
   },
   "warrior-shadow": {
     "_es": "78009c45",
@@ -868,10 +872,10 @@
     "features.3.effects.0.description": "Your single-target spells can extend to your nearby companion."
   },
   "fey-wanderer": {
-    "_es": "0ee92da6",
+    "_es": "c3584daa",
     "name": "Fey Wanderer",
-    "features.0.name": "Dreadful Strikes / Otherworldly Glamour",
-    "features.0.effects.0.name": "Fey Wanderer",
+    "features.0.name": "Dreadful Strikes",
+    "features.0.effects.0.name": "Dreadful Strikes",
     "features.1.name": "Fey Wanderer Spells",
     "features.2.name": "Fey Wanderer Spells",
     "features.3.name": "Fey Wanderer Spells",
@@ -884,8 +888,13 @@
     "features.8.name": "Misty Wanderer",
     "features.8.effects.0.name": "Misty Wanderer",
     "description": "A ranger touched by the magic of the Feywild, with a beguiling aura and strikes that sow fear.",
-    "features.0.description": "Your attacks deal extra Psychic damage, and you add your Wisdom to a social skill.",
-    "features.0.effects.0.description": "Extra Psychic damage once per turn; you add your Wisdom modifier to Persuasion, Deception, or Intimidation.",
+    "features.0.description": "Once per turn, your weapon attacks deal extra Psychic damage.",
+    "features.0.effects.0.description": "Once per turn, when you hit with a weapon, you deal extra Psychic damage.",
+    "features.9.name": "Otherworldly Glamour",
+    "features.9.description": "You add your Wisdom modifier (minimum +1) to Charisma checks and gain proficiency in Deception, Performance, or Persuasion.",
+    "features.9.effects.0.name": "Otherworldly Glamour",
+    "features.9.effects.0.description": "Charisma checks add your Wisdom modifier (minimum +1). You choose proficiency in Deception, Performance, or Persuasion.",
+    "features.9.effects.2.name": "Otherworldly Glamour",
     "features.1.description": "You always have Charm Person prepared. It doesn't count against the number of spells you can prepare.",
     "features.2.description": "You always have Misty Step prepared. It doesn't count against the number of spells you can prepare.",
     "features.3.description": "You always have Summon Fey prepared. It doesn't count against the number of spells you can prepare.",

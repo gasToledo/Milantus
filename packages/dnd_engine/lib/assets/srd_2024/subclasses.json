@@ -262,7 +262,7 @@
         "description": "No podés ser hechizado ni asustado mientras estés en Furia; si lo estabas, el efecto se suspende.",
         "effects": [
           { "type": "passiveTrait", "name": "Furia Irracional", "description": "En Furia no podés ser hechizado ni asustado." },
-          { "type": "modeExtension", "modeId": "rage", "effects": [{ "type": "immunity", "damageType": "charmed" }, { "type": "immunity", "damageType": "frightened" }], "endsConditions": ["charmed", "frightened"] }
+          { "type": "modeExtension", "modeId": "rage", "effects": [{ "type": "conditionImmunity", "condition": "charmed" }, { "type": "conditionImmunity", "condition": "frightened" }], "endsConditions": ["charmed", "frightened"] }
         ]
       },
       {
@@ -498,7 +498,8 @@
         "name": "Manto de Majestad",
         "description": "Como acción adicional adoptás un aura majestuosa que te permite dar órdenes hipnóticas cada turno.",
         "effects": [
-          { "type": "passiveTrait", "name": "Manto de Majestad", "description": "Aura que te deja lanzar Orden sin gastar espacios durante un minuto." }
+          { "type": "passiveTrait", "name": "Manto de Majestad", "description": "Aura que te deja lanzar Orden sin gastar espacios durante un minuto." },
+          { "type": "alwaysPreparedSpell", "spellId": "command" }
         ]
       },
       {
@@ -959,7 +960,7 @@
         "name": "Protección de la Naturaleza",
         "description": "Sos inmune al estado envenenado y ganás resistencia a un tipo de daño según tu terreno.",
         "effects": [
-          { "type": "immunity", "damageType": "poisoned" },
+          { "type": "conditionImmunity", "condition": "poisoned" },
           { "type": "passiveTrait", "name": "Protección de la Naturaleza", "description": "Sos inmune al estado envenenado y tenés resistencia al tipo de daño asociado al terreno que hayas elegido en Conjuros de Círculo: fuego (árido), frío (polar), relámpago (templado) o veneno (tropical)." }
         ]
       },
@@ -1146,12 +1147,13 @@
       {
         "level": 3,
         "name": "Mapa Estelar / Forma Estelar",
-        "description": "Portás un mapa estelar que te da Guía y Saeta Guía siempre preparados, y podés gastar Forma Salvaje para adoptar una Forma Estelar (Arquero, Cáliz o Dragón).",
+        "description": "Portás un mapa estelar que te da Guía y Saeta Guía siempre preparados. Podés lanzar Saeta Guía sin gastar un espacio de conjuro tantas veces como tu mod. de Sabiduría (mínimo una); se recuperan al terminar un descanso largo. También podés gastar Forma Salvaje para adoptar una Forma Estelar (Arquero, Cáliz o Dragón).",
         "effects": [
           { "type": "alwaysPreparedSpell", "spellId": "guidance" },
           { "type": "alwaysPreparedSpell", "spellId": "guiding-bolt" },
           { "type": "passiveTrait", "name": "Forma Estelar", "description": "Como acción adicional gastás un uso de Forma Salvaje para adoptar una forma estelar en vez de transformarte. Dura 10 minutos y termina antes si la disipás (no requiere acción), quedás incapacitado o volvés a usar el rasgo. Emite luz brillante en 10 pies y tenue en 10 más. Cada vez elegís qué constelación brilla: Arquero, Cáliz o Dragón." },
-          { "type": "activeMode", "id": "starry_form", "name": "Forma Estelar", "resourceId": "wild_shape", "variants": [{ "id": "archer", "name": "Arquero", "description": "Al activarla, y como acción adicional en tus turnos siguientes, hacés un ataque de conjuro a distancia contra una criatura a 60 pies o menos: 1d8 + tu mod. de Sabiduría de daño radiante.", "effects": [] }, { "id": "chalice", "name": "Cáliz", "description": "Cuando lanzás un conjuro con un espacio que restaura PG, vos u otra criatura a 30 pies o menos recupera 1d8 + tu mod. de Sabiduría PG.", "effects": [] }, { "id": "dragon", "name": "Dragón", "description": "En las pruebas de Inteligencia o Sabiduría y en las salvaciones de Constitución para mantener la concentración, un 9 o menos en el d20 cuenta como 10.", "effects": [] }], "effects": [] }
+          { "type": "activeMode", "id": "starry_form", "name": "Forma Estelar", "resourceId": "wild_shape", "variants": [{ "id": "archer", "name": "Arquero", "description": "Al activarla, y como acción adicional en tus turnos siguientes, hacés un ataque de conjuro a distancia contra una criatura a 60 pies o menos: 1d8 + tu mod. de Sabiduría de daño radiante.", "effects": [] }, { "id": "chalice", "name": "Cáliz", "description": "Cuando lanzás un conjuro con un espacio que restaura PG, vos u otra criatura a 30 pies o menos recupera 1d8 + tu mod. de Sabiduría PG.", "effects": [] }, { "id": "dragon", "name": "Dragón", "description": "En las pruebas de Inteligencia o Sabiduría y en las salvaciones de Constitución para mantener la concentración, un 9 o menos en el d20 cuenta como 10.", "effects": [] }], "effects": [] },
+          { "type": "grantSpell", "spellId": "guiding-bolt", "ability": "wisdom", "use": "abilityModifierPerLongRest" }
         ]
       },
       {
@@ -1310,6 +1312,17 @@
           { "type": "passiveTrait", "name": "Misericordia Suprema", "description": "Revivís a una criatura muerta hace poco gastando Puntos de Enfoque." },
           { "type": "resource", "id": "hand_of_ultimate_mercy", "name": "Mano de Misericordia Suprema", "max": 1, "recharge": "long", "description": "Uso de Mano de Misericordia Suprema." }
         ]
+      },
+      {
+        "level": 3,
+        "name": "Implementos de la Misericordia",
+        "description": "Ganás competencia en Perspicacia y Medicina, y con el equipo de herborista.",
+        "effects": [
+          { "type": "skillProficiency", "skill": "insight" },
+          { "type": "skillProficiency", "skill": "medicine" },
+          { "type": "toolProficiency", "tool": "herbalism-kit" },
+          { "type": "passiveTrait", "name": "Implementos de la Misericordia", "description": "Competencia en Perspicacia, Medicina y el equipo de herborista." }
+        ]
       }
     ]
   },
@@ -1423,7 +1436,7 @@
         "description": "Vos y los aliados cercanos no pueden ser hechizados.",
         "effects": [
           { "type": "passiveTrait", "name": "Aura de Entrega", "description": "Inmunidad a estar hechizado para vos y aliados en tu aura." },
-          { "type": "immunity", "damageType": "charmed" }
+          { "type": "conditionImmunity", "condition": "charmed" }
         ]
       },
       {
@@ -1815,10 +1828,10 @@
     "features": [
       {
         "level": 3,
-        "name": "Golpes Terribles / Glamour de Otro Mundo",
-        "description": "Tus ataques infligen daño psíquico extra y sumás tu Sabiduría a una habilidad social.",
+        "name": "Golpes Terribles",
+        "description": "Una vez por turno, tus ataques con arma infligen daño psíquico extra.",
         "effects": [
-          { "type": "passiveTrait", "name": "Errante Feérico", "description": "Daño psíquico extra una vez por turno; sumás tu mod. de Sabiduría a Persuasión, Engaño o Intimidación." }
+          { "type": "passiveTrait", "name": "Golpes Terribles", "description": "Una vez por turno, al acertar con un arma, infligís daño psíquico extra." }
         ]
       },
       {
@@ -1886,6 +1899,16 @@
         "effects": [
           { "type": "passiveTrait", "name": "Errante Brumoso", "description": "Teletransporte de 30 pies como acción adicional; usos = mod. de Sabiduría." },
           { "type": "resource", "id": "misty_wanderer", "name": "Errante Brumoso", "max": 1, "maxFromAbility": "wisdom", "recharge": "long", "description": "Lanzamientos gratuitos de Paso Brumoso." }
+        ]
+      },
+      {
+        "level": 3,
+        "name": "Glamour de Otro Mundo",
+        "description": "Sumás tu mod. de Sabiduría (mínimo +1) a las pruebas de Carisma y ganás competencia en Engaño, Interpretación o Persuasión.",
+        "effects": [
+          { "type": "passiveTrait", "name": "Glamour de Otro Mundo", "description": "Las pruebas de Carisma suman tu mod. de Sabiduría (mínimo +1). Elegís competencia en Engaño, Interpretación o Persuasión." },
+          { "type": "abilityCheckBonus", "ability": "charisma", "fromAbility": "wisdom", "minimum": 1 },
+          { "type": "proficiencyChoice", "groupId": "subclass:fey-wanderer:glamour", "name": "Glamour de Otro Mundo", "count": 1, "skills": ["deception", "performance", "persuasion"] }
         ]
       }
     ]
@@ -3098,7 +3121,7 @@
         "effects": [
           { "type": "resistance", "damageType": "acid" },
           { "type": "resistance", "damageType": "poison" },
-          { "type": "immunity", "damageType": "poisoned" },
+          { "type": "conditionImmunity", "condition": "poisoned" },
           { "type": "passiveTrait", "name": "Erupción Química", "description": "Una vez por turno, al causar daño de ácido, fuego o veneno con un conjuro de Artífice, sumás 2d8 de daño de fuerza." },
           { "type": "resource", "id": "conjured_cauldron", "name": "Caldero Conjurado", "max": 1, "recharge": "long", "description": "Lanzás Caldero Burbujeante de Tasha sin espacio de conjuro, preparación ni componentes materiales, usando Suministros de Alquimista." }
         ]

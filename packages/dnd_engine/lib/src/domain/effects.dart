@@ -1,5 +1,6 @@
 import 'ability.dart';
 import 'content_source.dart';
+import 'damage_type.dart';
 import 'spell_slots.dart';
 
 /// Tipo de descanso que recarga un recurso.
@@ -81,7 +82,15 @@ sealed class Effect {
         WeaponProficiencyEffect(json['category'] as String),
       'toolProficiency' => ToolProficiencyEffect(json['tool'] as String),
       'resistance' => ResistanceEffect(json['damageType'] as String),
-      'immunity' => ImmunityEffect(json['damageType'] as String),
+      // El contenido viejo metía el id de un estado en `damageType`. Se lee
+      // como inmunidad a estado para que un homebrew anterior no siga
+      // figurando como inmunidad al daño.
+      'immunity' => conditionIds.contains(json['damageType'])
+          ? ConditionImmunityEffect(json['damageType'] as String)
+          : ImmunityEffect(json['damageType'] as String),
+      'conditionImmunity' => ConditionImmunityEffect(
+          json['condition'] as String? ?? json['damageType'] as String? ?? '',
+        ),
       'passiveTrait' => PassiveTraitEffect(
           name: json['name'] as String,
           description: json['description'] as String? ?? '',
@@ -360,6 +369,11 @@ sealed class Effect {
         AbilityScoreBonusFromFeatChoiceEffect(
           featCategory: json['featCategory'] as String,
           amount: json['amount'] as int? ?? 1,
+        ),
+      'abilityCheckBonus' => AbilityCheckBonusEffect(
+          ability: Ability.fromKey(json['ability'] as String),
+          fromAbility: Ability.fromKey(json['fromAbility'] as String),
+          minimum: json['minimum'] as int? ?? 0,
         ),
       'skillBonus' => SkillBonusEffect(
           skill: json['skill'] as String,
@@ -733,6 +747,17 @@ class ImmunityEffect extends Effect {
       {'type': 'immunity', 'damageType': damageType};
 }
 
+/// Inmunidad a un estado (`charmed`, `frightened`, `poisoned`…), no a un tipo
+/// de daño. Antes viajaba en [ImmunityEffect] y la ficha la listaba como si
+/// el personaje no recibiera ese daño.
+class ConditionImmunityEffect extends Effect {
+  final String condition;
+  const ConditionImmunityEffect(this.condition);
+  @override
+  Map<String, dynamic> toJson() =>
+      {'type': 'conditionImmunity', 'condition': condition};
+}
+
 /// Rasgo pasivo/narrativo que se muestra en la ficha (Segundo Aliento,
 /// Oleada de Acción, Inspiración Heroica, etc.).
 class PassiveTraitEffect extends Effect {
@@ -1048,6 +1073,33 @@ class AbilityScoreBonusFromFeatChoiceEffect extends Effect {
         'type': 'abilityScoreBonusFromFeatChoice',
         'featCategory': featCategory,
         'amount': amount,
+      };
+}
+
+/// Suma el modificador de [fromAbility] (con piso [minimum]) a las pruebas de
+/// [ability], incluidas las de sus habilidades.
+///
+/// No toca las salvaciones: una prueba de Carisma no es una salvación de
+/// Carisma. Existe por el Glamour de Otro Mundo del Errante Feérico, que suma
+/// Sabiduría (mínimo +1) a toda prueba de Carisma. [SkillBonusEffect] no
+/// alcanza: ese nombra una habilidad, y acá la regla es la característica.
+class AbilityCheckBonusEffect extends Effect {
+  final Ability ability;
+  final Ability fromAbility;
+  final int minimum;
+
+  const AbilityCheckBonusEffect({
+    required this.ability,
+    required this.fromAbility,
+    this.minimum = 0,
+  });
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'type': 'abilityCheckBonus',
+        'ability': ability.name,
+        'fromAbility': fromAbility.name,
+        'minimum': minimum,
       };
 }
 

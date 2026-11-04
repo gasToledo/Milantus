@@ -979,6 +979,10 @@ class ActiveMode {
   /// ya había), sus ventajas y el mayor bonificador al daño que dio a un
   /// ataque, con la característica que lo exige. Vacíos si está apagado.
   final List<String> resistances;
+
+  /// Inmunidades a estados que trajo este modo (la Furia Irracional), para
+  /// decirlo sin que la pantalla lo deduzca. Vacío si está apagado.
+  final List<String> conditionImmunities;
   final List<Advantage> advantages;
   final int damageBonus;
   final Ability? damageAbility;
@@ -998,6 +1002,7 @@ class ActiveMode {
     this.active = false,
     this.activeVariant,
     this.resistances = const [],
+    this.conditionImmunities = const [],
     this.advantages = const [],
     this.damageBonus = 0,
     this.damageAbility,
@@ -1019,6 +1024,7 @@ class ActiveMode {
         'requiresMode': requiresMode,
         'multiSelect': multiSelect,
         'resistances': resistances,
+        'conditionImmunities': conditionImmunities,
         'advantages': [for (final a in advantages) a.toJson()],
         'damageBonus': damageBonus,
         'damageAbility': damageAbility?.name,
@@ -1173,6 +1179,10 @@ class ComputedSheet {
   /// [skillModifier] los suma; la ficha los muestra en el desglose.
   final Map<String, List<SkillBonus>> skillBonuses;
 
+  /// Bonos a todas las pruebas de una característica (no a sus salvaciones).
+  /// El Glamour de Otro Mundo suma Sabiduría a las de Carisma.
+  final Map<Ability, List<SkillBonus>> abilityCheckBonuses;
+
   final Set<String> armorProficiencies;
   final Set<String> weaponProficiencies;
   final Set<String> toolProficiencies;
@@ -1224,6 +1234,11 @@ class ComputedSheet {
 
   final Set<String> resistances;
   final Set<String> immunities;
+
+  /// Estados a los que el personaje es inmune (`charmed`, `poisoned`…). No van
+  /// en [immunities]: eso es daño. Una que solo rige con un estado activo
+  /// (Furia) entra cuando ese estado está prendido.
+  final Set<String> conditionImmunities;
 
   final int weaponMasterySlots;
 
@@ -1338,6 +1353,7 @@ class ComputedSheet {
     required this.skillProficiencies,
     this.expertiseSkills = const {},
     this.skillBonuses = const {},
+    this.abilityCheckBonuses = const {},
     required this.armorProficiencies,
     required this.weaponProficiencies,
     required this.toolProficiencies,
@@ -1359,6 +1375,7 @@ class ComputedSheet {
     this.senses = const {},
     required this.resistances,
     required this.immunities,
+    this.conditionImmunities = const {},
     required this.weaponMasterySlots,
     this.attunementSlots = baseAttunementSlots,
     required this.attacksPerAction,
@@ -1415,6 +1432,7 @@ class ComputedSheet {
     Set<String>? skillProficiencies,
     Set<String>? expertiseSkills,
     Map<String, List<SkillBonus>>? skillBonuses,
+    Map<Ability, List<SkillBonus>>? abilityCheckBonuses,
     Set<String>? armorProficiencies,
     Set<String>? weaponProficiencies,
     Set<String>? toolProficiencies,
@@ -1436,6 +1454,7 @@ class ComputedSheet {
     Map<Sense, int>? senses,
     Set<String>? resistances,
     Set<String>? immunities,
+    Set<String>? conditionImmunities,
     int? weaponMasterySlots,
     int? attunementSlots,
     int? attacksPerAction,
@@ -1484,6 +1503,7 @@ class ComputedSheet {
         skillProficiencies: skillProficiencies ?? this.skillProficiencies,
         expertiseSkills: expertiseSkills ?? this.expertiseSkills,
         skillBonuses: skillBonuses ?? this.skillBonuses,
+        abilityCheckBonuses: abilityCheckBonuses ?? this.abilityCheckBonuses,
         armorProficiencies: armorProficiencies ?? this.armorProficiencies,
         weaponProficiencies: weaponProficiencies ?? this.weaponProficiencies,
         toolProficiencies: toolProficiencies ?? this.toolProficiencies,
@@ -1511,6 +1531,7 @@ class ComputedSheet {
         senses: senses ?? this.senses,
         resistances: resistances ?? this.resistances,
         immunities: immunities ?? this.immunities,
+        conditionImmunities: conditionImmunities ?? this.conditionImmunities,
         weaponMasterySlots: weaponMasterySlots ?? this.weaponMasterySlots,
         attunementSlots: attunementSlots ?? this.attunementSlots,
         attacksPerAction: attacksPerAction ?? this.attacksPerAction,
@@ -1582,6 +1603,11 @@ class ComputedSheet {
           for (final k in _sortedJson(skillBonuses.keys))
             k: [for (final b in skillBonuses[k]!) b.toJson()],
         },
+        'abilityCheckBonuses': {
+          for (final a in Ability.values)
+            if (abilityCheckBonuses.containsKey(a))
+              a.name: [for (final b in abilityCheckBonuses[a]!) b.toJson()],
+        },
         'armorProficiencies': _sortedJson(armorProficiencies),
         'weaponProficiencies': _sortedJson(weaponProficiencies),
         'toolProficiencies': _sortedJson(toolProficiencies),
@@ -1611,6 +1637,7 @@ class ComputedSheet {
         },
         'resistances': _sortedJson(resistances),
         'immunities': _sortedJson(immunities),
+        'conditionImmunities': _sortedJson(conditionImmunities),
         'weaponMasterySlots': weaponMasterySlots,
         'attunementSlots': attunementSlots,
         'attacksPerAction': attacksPerAction,
@@ -1712,16 +1739,30 @@ class ComputedSheet {
       abilityScores[a]! -
       bonusesFor(a).fold<int>(0, (sum, b) => sum + b.amount);
 
-  /// Prueba de característica: el modificador **más** lo situacional.
+  /// Modificador más lo situacional (Cansancio), sin los bonos que solo valen
+  /// para pruebas. Las salvaciones salen de acá para no arrastrarlos.
+  int _d20Base(Ability a) => abilityModifiers[a]! + d20Modifier;
+
+  int abilityCheckBonus(Ability a) =>
+      (abilityCheckBonuses[a] ?? const <SkillBonus>[]).fold(
+        0,
+        (sum, b) => sum + b.amount,
+      );
+
+  /// Prueba de característica: el modificador, lo situacional y los bonos a
+  /// las pruebas de esa característica (Glamour de Otro Mundo).
   ///
   /// Único lugar donde vive esta suma, por el mismo motivo que
   /// [skillModifier]: la ficha leía `abilityModifiers` directo y una capa que
   /// baje las tiradas no tenía dónde entrar sin ensuciar el daño y la CD.
-  int abilityCheck(Ability a) => abilityModifiers[a]! + d20Modifier;
+  int abilityCheck(Ability a) => _d20Base(a) + abilityCheckBonus(a);
 
   /// Tirada de salvación total para [a] (mod + competencia si aplica).
+  ///
+  /// No incluye [abilityCheckBonus]: sumar Sabiduría a las pruebas de Carisma
+  /// no la suma a la salvación.
   int savingThrow(Ability a) =>
-      abilityCheck(a) +
+      _d20Base(a) +
       (savingThrowProficiencies.contains(a) ? proficiencyBonus : 0) +
       savingThrowBonus +
       (savingThrowBonusByAbility[a] ?? 0);

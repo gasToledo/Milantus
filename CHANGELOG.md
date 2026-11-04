@@ -1194,6 +1194,16 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   el Monje no da competencias; el Pícaro da armadura ligera, una habilidad de
   su lista y Herramientas de Ladrón, sin armas; el Explorador suma además una
   habilidad de su lista.
+- La inmunidad a un estado (asustado, hechizado, envenenado) se muestra aparte
+  de la inmunidad al daño. La del Berserker solo rige en Furia.
+- Manto de Majestad deja Orden siempre preparado. El Mapa Estelar permite
+  lanzar Saeta Guía sin espacio tantas veces como el modificador de Sabiduría
+  (mínimo una) por descanso largo. Implementos de la Misericordia da
+  Perspicacia, Medicina y el equipo de herborista. Glamour de Otro Mundo suma
+  el modificador de Sabiduría (mínimo +1) a las pruebas de Carisma y una
+  competencia entre Engaño, Interpretación y Persuasión.
+- Versátil del Humano no acepta una dote que no sea de origen, aunque el dato
+  de la especie deje el id vacío.
 
 ### Eliminado
 
