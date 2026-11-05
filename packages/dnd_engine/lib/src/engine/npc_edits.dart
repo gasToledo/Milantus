@@ -1,3 +1,4 @@
+import '../domain/creature.dart';
 import '../domain/npc.dart';
 import 'diary_ops.dart';
 
@@ -11,6 +12,8 @@ import 'diary_ops.dart';
 ///   el espacio del final.
 /// - `addTag` con `tag` (el constructor normaliza). `removeTag` con `tag`, sin
 ///   distinguir mayúsculas.
+/// - `setBlock` con `block` (una criatura en JSON): reemplaza el bloque de un PNJ
+///   de bloque. En cualquier otro tipo lanza: no tendría dónde vivir.
 /// - `saveNote`, `removeNote` y `moveNote`: los campos de [DiaryOps]. Una nota
 ///   inválida deja el PNJ como estaba.
 class NpcEdits {
@@ -35,6 +38,15 @@ class NpcEdits {
             for (final t in npc.tags)
               if (t.toLowerCase() != tag) t,
           ],
+        );
+      case 'setBlock':
+        if (npc.sheetKind != NpcSheetKind.block) {
+          throw const FormatException('Solo un PNJ de bloque tiene bloque.');
+        }
+        return npc.copyWith(
+          block: Creature.fromJson(
+            (action['block'] as Map).cast<String, dynamic>(),
+          ),
         );
       case 'saveNote':
         final notes = DiaryOps.save(npc.notes, action);

@@ -654,19 +654,23 @@ int abilityModifierOf(int score) => abilityModifier(score);
 /// cuerpo a cuerpo. El resto del perfil (CA, PG,
 /// características, acciones) viaja tal cual está en el catálogo.
 String bestiary(String catalogJson) => jsonEncode([
-      for (final c in _repoPara(catalogJson).creaturesSorted)
-        {
-          'id': c.id,
-          'kind': c.displayKind,
-          'type': c.creatureType?.id,
-          'typeLabel': c.creatureType?.label,
-          'cr': c.cr,
-          'crText': c.challengeRatingText,
-          'initiative': c.initiativeModifier,
-          'passivePerception': c.passivePerceptionValue,
-          'meleeReach': [for (final a in c.actions) a.isMeleeReach],
-        },
+      for (final c in _repoPara(catalogJson).creaturesSorted) _bestiaryRow(c),
     ]);
+
+/// La fila del Bestiario de una criatura: la misma para el listado y para la
+/// vista previa del editor de bloques, que muestra el borrador con lo que
+/// derivaría el motor si ya estuviera en el catálogo.
+Map<String, dynamic> _bestiaryRow(Creature c) => {
+      'id': c.id,
+      'kind': c.displayKind,
+      'type': c.creatureType?.id,
+      'typeLabel': c.creatureType?.label,
+      'cr': c.cr,
+      'crText': c.challengeRatingText,
+      'initiative': c.initiativeModifier,
+      'passivePerception': c.passivePerceptionValue,
+      'meleeReach': [for (final a in c.actions) a.isMeleeReach],
+    };
 
 /// Los PNJ del DM listos para mostrar, sin que el cliente repita una regla.
 /// Entra la lista que devuelven `GET /api/npcs` o `GET /api/campaigns/<id>/npcs`
@@ -716,6 +720,50 @@ String npcEdit(String npcJson, String actionJson) => jsonEncode(
         (jsonDecode(actionJson) as Map).cast<String, dynamic>(),
       ).toJson(),
     );
+
+/// El bloque de un PNJ de bloque, o uno vacío si no lo tiene.
+String npcBlock(String npcJson) {
+  final npc =
+      Npc.fromJson((jsonDecode(npcJson) as Map).cast<String, dynamic>());
+  return jsonEncode((npc.block ?? Npc.emptyBlock(npc.name)).toJson());
+}
+
+Creature _criatura(String json) =>
+    Creature.fromJson((jsonDecode(json) as Map).cast<String, dynamic>());
+
+/// El formulario (todo texto) de una criatura: `CreatureDraft.formOf`.
+String creatureForm(String creatureJson) =>
+    jsonEncode(CreatureDraft.formOf(_criatura(creatureJson)));
+
+/// El borrador de un formulario sobre su criatura de partida: la criatura
+/// armada, su fila del Bestiario para la vista previa y los errores por campo.
+String creatureDraft(String creatureJson, String formJson) {
+  final form = (jsonDecode(formJson) as Map).cast<String, dynamic>();
+  final built = CreatureDraft.build(_criatura(creatureJson), form);
+  return jsonEncode({
+    'creature': built.toJson(),
+    'row': _bestiaryRow(built),
+    'errors': CreatureDraft.errors(form),
+  });
+}
+
+/// Las opciones de los desplegables del editor de bloques, con su rótulo en el
+/// idioma de `setLanguage`.
+String creatureFormOptions() => jsonEncode({
+      'types': [
+        for (final t in CreatureType.values) {'id': t.id, 'label': t.label},
+      ],
+      'sizes': [
+        for (final s in CreatureSize.values) {'id': s.id, 'label': s.label},
+      ],
+      'kinds': [
+        for (final k in CreatureActionKind.values)
+          {'id': k.id, 'label': k.label},
+      ],
+      'damageTypes': [
+        for (final d in DamageType.values) {'id': d.id, 'label': d.label},
+      ],
+    });
 
 Map<String, dynamic> _npcView(
     Map<String, dynamic> raw, ContentRepository repo) {
@@ -990,6 +1038,10 @@ void main() {
   motor['npcs'] = npcs.toJS;
   motor['newNpc'] = newNpc.toJS;
   motor['npcEdit'] = npcEdit.toJS;
+  motor['npcBlock'] = npcBlock.toJS;
+  motor['creatureForm'] = creatureForm.toJS;
+  motor['creatureDraft'] = creatureDraft.toJS;
+  motor['creatureFormOptions'] = creatureFormOptions.toJS;
   motor['encounter'] = encounter.toJS;
   motor['musicSource'] = musicSource.toJS;
   globalContext['dndEngine'] = motor;

@@ -1,4 +1,4 @@
-import type { AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
+import type { AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, CreatureForm, CreatureFormOptions, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
 // Lo genera `npm run build:engine` (o la etapa `engine-js` del Dockerfile) y
 // no se versiona. Es un script de dart2js, no un módulo: al cargarse deja
 // `globalThis.dndEngine`, y de ahí lo toma este archivo.
@@ -34,6 +34,10 @@ interface DartEngine {
   npcs(entriesJson: string, catalogJson: string): string;
   newNpc(catalogJson: string, name: string, kind: string, baseCreatureId: string): string;
   npcEdit(npcJson: string, actionJson: string): string;
+  npcBlock(npcJson: string): string;
+  creatureForm(creatureJson: string): string;
+  creatureDraft(creatureJson: string, formJson: string): string;
+  creatureFormOptions(): string;
   encounter(encounterJson: string, playersHpJson: string): string;
   musicSource(url: string): string;
   act(characterJson: string, catalogJson: string, actionJson: string, seed?: number): string;
@@ -764,12 +768,43 @@ export type NpcAction =
   | { type: 'removeTag'; tag: string }
   | { type: 'saveNote'; entry: string; kind: string; title: string; body: string; imageKey: string | null; at: string }
   | { type: 'removeNote'; entry: string }
-  | { type: 'moveNote'; entry: string; to: string };
+  | { type: 'moveNote'; entry: string; to: string }
+  | { type: 'setBlock'; block: JsonObject };
 
 /** Aplica una edición a un PNJ con el motor (`NpcEdits`) y devuelve el documento
  *  para guardar. Una acción desconocida o una versión futura lanzan. */
 export function npcEdit(npc: JsonObject, action: NpcAction): JsonObject & { id: string } {
   return JSON.parse(engine().npcEdit(JSON.stringify(npc), JSON.stringify(action))) as JsonObject & { id: string };
+}
+
+/** El bloque de un PNJ de bloque (vacío si no lo tiene), tal como lo guarda. */
+export function npcBlock(npc: JsonObject): JsonObject {
+  return JSON.parse(engine().npcBlock(JSON.stringify(npc))) as JsonObject;
+}
+
+/** Una criatura como formulario de texto (`CreatureDraft.formOf`). */
+export function creatureForm(creature: JsonObject): CreatureForm {
+  return JSON.parse(engine().creatureForm(JSON.stringify(creature))) as CreatureForm;
+}
+
+/** El borrador de un formulario sobre su criatura de partida: la criatura
+ *  armada, su fila del Bestiario para la vista previa y los errores por campo
+ *  (`CreatureDraft`). Nunca lanza por datos inválidos. */
+export function creatureDraft(
+  creature: JsonObject,
+  form: CreatureForm,
+): { creature: JsonObject; row: BestiaryRow; errors: Record<string, string> } {
+  return JSON.parse(engine().creatureDraft(JSON.stringify(creature), JSON.stringify(form))) as {
+    creature: JsonObject;
+    row: BestiaryRow;
+    errors: Record<string, string>;
+  };
+}
+
+/** Las opciones de los desplegables del editor de bloques, en el idioma fijado
+ *  con `setEngineLanguage`. */
+export function creatureFormOptions(): CreatureFormOptions {
+  return JSON.parse(engine().creatureFormOptions()) as CreatureFormOptions;
 }
 
 /** El combate abierto, migrado y con lo que deriva el motor (`encounter`): de

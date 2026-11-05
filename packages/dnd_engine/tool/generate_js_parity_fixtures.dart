@@ -758,6 +758,57 @@ Future<void> main(List<String> args) async {
       'expected': NpcEdits.apply(pnjBase, notaAccion).toJson(),
     }),
   );
+  // El bloque de un PNJ y el borrador de una criatura: el reemplazo del bloque
+  // y la cuenta del formulario (línea compuesta, errores) tienen que dar lo
+  // mismo en la VM y en el JS compilado.
+  final pnjConBloque = Npc(
+    id: 'pnj',
+    name: 'Bruna',
+    sheetKind: NpcSheetKind.block,
+    block: Npc.emptyBlock('Bruna'),
+  );
+  final bloqueNuevo = repo.creaturesSorted.first.toJson();
+  final accionBloque = {'type': 'setBlock', 'block': bloqueNuevo};
+  File('${out.path}/puente-pnj-bloque.json').writeAsStringSync(
+    jsonEncode({
+      'bridge': {
+        'fn': 'npcEdit',
+        'args': [jsonEncode(pnjConBloque.toJson()), jsonEncode(accionBloque)],
+        'pure': true,
+      },
+      'expected': NpcEdits.apply(pnjConBloque, accionBloque).toJson(),
+    }),
+  );
+  final criaturaBase = Npc.emptyBlock('Rurik');
+  final formulario = CreatureDraft.formOf(criaturaBase)
+    ..['ac'] = '14'
+    ..['cr'] = '1/4'
+    ..['hitDice'] = 'x';
+  final armada = CreatureDraft.build(criaturaBase, formulario);
+  File('${out.path}/puente-criatura-borrador.json').writeAsStringSync(
+    jsonEncode({
+      'bridge': {
+        'fn': 'creatureDraft',
+        'args': [jsonEncode(criaturaBase.toJson()), jsonEncode(formulario)],
+        'pure': true,
+      },
+      'expected': {
+        'creature': armada.toJson(),
+        'row': {
+          'id': armada.id,
+          'kind': armada.displayKind,
+          'type': armada.creatureType?.id,
+          'typeLabel': armada.creatureType?.label,
+          'cr': armada.cr,
+          'crText': armada.challengeRatingText,
+          'initiative': armada.initiativeModifier,
+          'passivePerception': armada.passivePerceptionValue,
+          'meleeReach': [for (final a in armada.actions) a.isMeleeReach],
+        },
+        'errors': CreatureDraft.errors(formulario),
+      },
+    }),
+  );
   for (final MapEntry(key: nombre, value: (borrador, accion))
       in _creaciones.entries) {
     final draft = CreationDraft.fromJson(repo, borrador)

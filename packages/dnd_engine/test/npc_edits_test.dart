@@ -36,4 +36,23 @@ void main() {
   test('una acción desconocida lanza en vez de guardar sin tocar nada', () {
     expect(() => NpcEdits.apply(npc, {'type': 'volar'}), throwsFormatException);
   });
+
+  test('setBlock reemplaza el bloque, y en un PNJ sin bloque lanza', () {
+    final withBlock = Npc(
+      id: 'npc-2',
+      name: 'Rurik',
+      sheetKind: NpcSheetKind.block,
+      block: Npc.emptyBlock('Rurik'),
+    );
+    final block = Npc.emptyBlock('Otro');
+    final result = NpcEdits.apply(withBlock, {
+      'type': 'setBlock',
+      'block': block.toJson(),
+    });
+    expect(result.block!.name, 'Otro');
+    expect(
+      () => NpcEdits.apply(npc, {'type': 'setBlock', 'block': block.toJson()}),
+      throwsFormatException,
+    );
+  });
 }

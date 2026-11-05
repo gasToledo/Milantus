@@ -611,3 +611,55 @@ export interface EncounterView {
   /** Una por combatiente, en el mismo orden. */
   rows: { id: string; down: boolean; bloodied: boolean; hp: { current: number; max: number } | null }[];
 }
+
+/** Una fila de rasgo de `CreatureForm`. `uid` lo suma el cliente para dar clave
+ *  estable a la fila; el motor lo ignora. */
+export interface CreatureFormTrait {
+  uid?: string;
+  name: string;
+  description: string;
+}
+
+export interface CreatureFormAction {
+  uid?: string;
+  /** Índice de la acción en la criatura original, o `null` si es nueva. */
+  from: number | null;
+  name: string;
+  description: string;
+  attackBonus: string;
+  reach: string;
+  damage: string;
+  damageType: string;
+  kind: string;
+}
+
+/** El bloque de una criatura como texto de formulario (`CreatureDraft.formOf`). */
+export interface CreatureForm {
+  name: string;
+  type: string;
+  size: string;
+  speed: string;
+  ac: string;
+  hp: string;
+  hitDice: string;
+  cr: string;
+  initiative: string;
+  passive: string;
+  legendary: string;
+  senses: string;
+  languages: string;
+  defenses: string;
+  abilities: Record<AbilityKey, string>;
+  traits: CreatureFormTrait[];
+  actions: CreatureFormAction[];
+}
+
+export type AbilityKey = 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
+
+/** Los desplegables del editor de bloques (`creatureFormOptions`). */
+export interface CreatureFormOptions {
+  types: { id: string; label: string }[];
+  sizes: { id: string; label: string }[];
+  kinds: { id: string; label: string }[];
+  damageTypes: { id: string; label: string }[];
+}
