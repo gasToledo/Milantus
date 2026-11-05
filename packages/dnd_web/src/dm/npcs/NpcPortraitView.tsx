@@ -1,24 +1,21 @@
-import { useCallback, useMemo, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { ApiError, saveCharacter, type StoredNpc } from '../../api/client';
+import { ApiError, type StoredNpc } from '../../api/client';
+import { useSaveState } from '../../api/characterSave';
 import { retryNpcSave } from '../../api/npcSave';
 import { saveNpcPortraitBase64, savePortraitBase64, uploadNpcPortrait, uploadPortrait } from '../../api/portraits';
-import { queryKeys, useNpc, useSheetCatalog } from '../../api/queries';
+import { useNpc, useSheetCatalog } from '../../api/queries';
 import {
-  actOn,
-  migrateCharacter,
   npcPortraitPrompt,
   npcViews,
   portraitPrompt,
   type Catalog,
-  type CharacterJson,
   type NpcView,
 } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
 import { dmNpcsHref, Link } from '../../router';
 import { PortraitWorkshop, type PortraitOwner } from '../../sheet/PortraitWorkshop';
-import type { SheetNotify } from '../../sheet/writer';
+import { useNpcSheetWriter, type SheetNotify, type SheetWriter } from '../../sheet/writer';
 import { Toast, type ToastTone } from '../../ui/primitives';
 import { AppBusyLabel, AppErrorView, Notice } from '../../ui/status';
 import { kindOf, npcTypeLine } from './npc';
@@ -55,6 +52,14 @@ export function NpcPortraitView({ npcId }: { npcId: string }) {
       })),
     [t, npcId],
   );
+  const write = useNpcSheetWriter(npcId, catalog.data, notify, t.npcSaveFailed);
+  // Esta pantalla no muestra el estado de guardado: antes el aviso lo daba el
+  // `catch` del guardado; ahora el fallo sale de la cola y se avisa desde acá.
+  const sheetId = (stored.data?.character as { id?: string } | null | undefined)?.id ?? '';
+  const saveState = useSaveState(sheetId);
+  useEffect(() => {
+    if (saveState === 'error') notify(t.npcSaveFailed, { tone: 'error' });
+  }, [saveState, notify, t]);
   const view = useMemo(
     () => (stored.data && catalog.data ? npcViews([stored.data], catalog.data)[0] : null),
     [stored.data, catalog.data],
@@ -99,7 +104,7 @@ export function NpcPortraitView({ npcId }: { npcId: string }) {
       </div>
     );
   } else {
-    body = <NpcWorkshop stored={stored.data} view={view} catalog={catalog.data} notify={notify} onSaveFailed={onSaveFailed} />;
+    body = <NpcWorkshop stored={stored.data} view={view} catalog={catalog.data} notify={notify} onSaveFailed={onSaveFailed} write={write} />;
   }
 
   return (
@@ -118,15 +123,16 @@ function NpcWorkshop({
   catalog,
   notify,
   onSaveFailed,
+  write,
 }: {
   stored: StoredNpc;
   view: NpcView;
   catalog: Catalog;
   notify: SheetNotify;
   onSaveFailed: () => void;
+  write: SheetWriter | null;
 }) {
   const t = useTexts();
-  const client = useQueryClient();
   const { npc } = view;
   const npcId = npc.id;
   const writer = useNpcWriter(npcId, onSaveFailed);
@@ -146,24 +152,8 @@ function NpcWorkshop({
   let owner: PortraitOwner;
   if (sheet) {
     // Con ficha, el retrato es de la ficha y se escribe en ella: la acción la
-    // aplica el motor sobre la ficha de la caché y se guarda como cualquier
-    // ficha. Es el mismo camino que `rename` en `NpcDetailView`.
-    const apply: PortraitOwner['apply'] = (action) => {
-      const current = client.getQueryData<StoredNpc>(queryKeys.npc(npcId))?.character;
-      if (!current) return;
-      const doc = actOn(migrateCharacter(current), catalog, action).character as CharacterJson & { id: string };
-      client.setQueryData<StoredNpc>(queryKeys.npc(npcId), (old) => old && { ...old, character: doc });
-      // ponytail: sin cola, dos acciones muy seguidas pueden guardarse en desorden;
-      // el camino de salida es una cola como la de `characterSave` si hace falta.
-      saveCharacter(doc)
-        .then(() =>
-          Promise.all([
-            client.invalidateQueries({ queryKey: queryKeys.npc(npcId) }),
-            client.invalidateQueries({ queryKey: queryKeys.npcs }),
-          ]),
-        )
-        .catch(() => notify(t.npcSaveFailed, { tone: 'error' }));
-    };
+    // aplica el motor y se guarda por la cola de la ficha, como cualquier ficha.
+    const apply: PortraitOwner['apply'] = (action) => void write?.act(action);
     const sheetId = (sheet as { id?: string }).id ?? '';
     owner = {
       ...common,

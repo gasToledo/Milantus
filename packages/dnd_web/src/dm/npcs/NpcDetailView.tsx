@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Camera, EllipsisVertical, Pencil, Plus, Presentation, Trash2, X } from 'lucide-react';
 import { ApiError, deleteNpc, saveCharacter, type StoredNpc } from '../../api/client';
+import { dropPending } from '../../api/characterSave';
 import { dropNpcSave, flushNpcSave, retryNpcSave } from '../../api/npcSave';
 import { deletePortrait, uploadNpcPortrait, uploadPortrait } from '../../api/portraits';
 import { queryKeys, useDmCampaigns, useNpc, useSheetCatalog } from '../../api/queries';
@@ -119,6 +120,11 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
   const inCampaigns = stored.data.campaigns;
   const remove = async () => {
     await dropNpcSave(npc.id);
+    // El `upsert` del servidor inserta sin `kind` si la fila no existe: un
+    // guardado de la ficha que llegara después de borrar recrearía el
+    // personaje fuera del PNJ.
+    const sheetId = (stored.data?.character as { id?: string } | null | undefined)?.id;
+    if (sheetId) await dropPending(sheetId);
     await deleteNpc(npc.id);
     // Primero se sale y después se relee: al revés, la pantalla pediría un PNJ que
     // ya no está y diría «No se encontró». La lista se corrige antes de salir para
@@ -139,6 +145,8 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
     // quedar iguales. El guardado de la ficha va aparte porque es otro documento.
     const sheet = stored.data?.character;
     if (sheet && catalog.data) {
+      // Lo pendiente ya está en la copia de la caché que se renombra: no se pierde.
+      await dropPending(sheet.id as string);
       await saveCharacter(actOn(sheet, catalog.data, { type: 'rename', name }).character as CharacterJson & { id: string });
     }
     await client.invalidateQueries({ queryKey: queryKeys.npc(npc.id) });

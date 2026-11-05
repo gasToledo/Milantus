@@ -109,6 +109,10 @@ export function retrySave(id: string): void {
   void flush(id);
 }
 
+/** Manda ya lo pendiente de [id] y espera a que termine: lo que sale de una
+ *  pantalla antes de releer, porque releer antes traería la copia vieja. */
+export const flushSave = (id: string): Promise<void> => flush(id);
+
 export function saveStateOf(id: string): SaveState {
   const e = entries.get(id);
   if (!e) return 'saved';
