@@ -48,6 +48,9 @@ Las procedencias persistidas son:
 - No debilitar validaciones ni conteos para hacer pasar una modificación.
 - Los cambios de contenido oficial deben preservar el fallback textual para
   homebrew antiguo cuando corresponda.
+- Una opción mágica de una reserva compartida usa `passiveTrait.resourceId`.
+  El motor entrega su `resourceKey` con la clase correspondiente y la ficha
+  la muestra también en Magia → De rasgos, gastando esa misma reserva.
 - Los conjuros oficiales declaran `concentration` y `ritual` explícitamente.
   La concentración se indica con la bandera, sin repetirla en `duration`.
   `components` incluye el detalle material, su valor mínimo y el consumo

@@ -48,6 +48,7 @@ void main() {
           final traits = sheet.passives.where((p) => p.name == name);
           expect(traits, hasLength(level < 2 ? 0 : 1), reason: '$name, $level');
           if (level >= 2) expect(traits.single.description, isNotEmpty);
+          if (level >= 2) expect(traits.single.resourceKey, 'channel_divinity');
         }
         final uses = sheet.resources.where((r) => r.id == 'channel_divinity');
         expect(uses, hasLength(level < 2 ? 0 : 1));
@@ -61,6 +62,9 @@ void main() {
                       : 2);
         }
         if (level == 5) {
+          expect(
+              sheet.passives.where((p) => p.resourceKey == 'channel_divinity'),
+              hasLength(3));
           expect(
               sheet.passives.map((p) => p.name),
               contains(catalog == repo
@@ -79,6 +83,35 @@ void main() {
         }
       }
     }
+  });
+
+  test('las opciones de Canalizar Divinidad usan la reserva de su clase', () {
+    final sheet = CharacterCompiler(repo).compile(Character(
+      id: 'multiclase',
+      name: 'Prueba',
+      raceId: 'human',
+      classId: 'cleric',
+      backgroundId: '',
+      classHistory: const [
+        'cleric',
+        'cleric',
+        'cleric',
+        'paladin',
+        'paladin',
+        'paladin'
+      ],
+      subclassIds: const {'cleric': 'light-domain'},
+      assignedScores: {for (final a in Ability.values) a: 14},
+      hpPerLevel: const [8, 5, 5, 6, 6, 6],
+    ));
+    expect(sheet.resources.map((r) => r.key),
+        containsAll(['cleric:channel_divinity', 'paladin:channel_divinity']));
+    final abilities = sheet.passives.where((p) => p.resourceKey != null);
+    expect(abilities, hasLength(3));
+    expect(abilities.map((p) => p.resourceKey),
+        everyElement('cleric:channel_divinity'));
+    expect(sheet.toJson()['passives'],
+        contains(containsPair('resourceKey', 'cleric:channel_divinity')));
   });
 
   test('Bardo: Pericia se obtiene a nivel 2, no a nivel 3', () {

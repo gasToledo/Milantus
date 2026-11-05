@@ -620,7 +620,7 @@
         "name": "Canalizar Divinidad: Preservar Vida",
         "description": "Gastás Canalizar Divinidad para repartir puntos de golpe curativos entre criaturas cercanas.",
         "effects": [
-          { "type": "passiveTrait", "name": "Preservar la Vida", "description": "Reparte PG curativos (5 × nivel de Clérigo) entre criaturas cercanas hasta la mitad de su máximo." }
+          { "type": "passiveTrait", "name": "Preservar la Vida", "resourceId": "channel_divinity", "description": "Reparte PG curativos (5 × nivel de Clérigo) entre criaturas cercanas hasta la mitad de su máximo." }
         ]
       },
       {
@@ -700,7 +700,7 @@
         "name": "Canalizar Divinidad: Resplandor del Alba",
         "description": "Gastás Canalizar Divinidad para emitir luz solar que disipa oscuridad mágica e inflige daño radiante alrededor.",
         "effects": [
-          { "type": "passiveTrait", "name": "Resplandor del Alba", "description": "Daño radiante (2d10 + nivel) a enemigos cercanos y disipa oscuridad mágica." }
+          { "type": "passiveTrait", "name": "Resplandor del Alba", "resourceId": "channel_divinity", "description": "Daño radiante (2d10 + nivel) a enemigos cercanos y disipa oscuridad mágica." }
         ]
       },
       {
@@ -780,7 +780,7 @@
         "name": "Canalizar Divinidad: Invocar Duplicidad",
         "description": "Gastás Canalizar Divinidad para crear una ilusión perfecta de vos mismo que podés mover y usar para engañar.",
         "effects": [
-          { "type": "passiveTrait", "name": "Invocar Duplicidad", "description": "Creás una duplicación ilusoria móvil; te da ventaja al atacar cerca de ella." }
+          { "type": "passiveTrait", "name": "Invocar Duplicidad", "resourceId": "channel_divinity", "description": "Creás una duplicación ilusoria móvil; te da ventaja al atacar cerca de ella." }
         ]
       },
       {
@@ -860,7 +860,7 @@
         "name": "Canalizar Divinidad: Golpe Guiado",
         "description": "Gastás Canalizar Divinidad para sumar +10 a una tirada de ataque tuya.",
         "effects": [
-          { "type": "passiveTrait", "name": "Golpe Guiado", "description": "+10 a una tirada de ataque gastando Canalizar Divinidad." }
+          { "type": "passiveTrait", "name": "Golpe Guiado", "resourceId": "channel_divinity", "description": "+10 a una tirada de ataque gastando Canalizar Divinidad." }
         ]
       },
       {
@@ -906,7 +906,7 @@
         "name": "Bendición del Dios de la Guerra",
         "description": "Como reacción gastás Canalizar Divinidad para dar +10 al ataque de un aliado cercano.",
         "effects": [
-          { "type": "passiveTrait", "name": "Bendición del Dios de la Guerra", "description": "Reacción: +10 al ataque de un aliado cercano." }
+          { "type": "passiveTrait", "name": "Bendición del Dios de la Guerra", "resourceId": "channel_divinity", "description": "Reacción: +10 al ataque de un aliado cercano." }
         ]
       },
       {

@@ -451,8 +451,19 @@ class SheetBuilder {
         // Marcador: lo resuelve el compilador, que sabe qué idiomas ya tiene
         // el personaje y por eso puede armar el pozo sin repetidos.
         break;
-      case PassiveTraitEffect(:final name, :final description):
-        passives.add(PassiveTrait(name, description));
+      case PassiveTraitEffect(
+          :final name,
+          :final description,
+          :final resourceId
+        ):
+        passives.add(PassiveTrait(
+            name,
+            description,
+            resourceId == null
+                ? null
+                : sourceClassId == null
+                    ? resourceId
+                    : '$sourceClassId:$resourceId'));
       case GrantFeatEffect():
         // La dote concreta ya está resuelta en Character.featIds y sus efectos
         // se aplican por separado; este efecto solo informa al wizard.

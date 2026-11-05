@@ -26,9 +26,16 @@ List<String> _sortedJson(Iterable<String> values) => values.toList()..sort();
 class PassiveTrait {
   final String name;
   final String description;
-  const PassiveTrait(this.name, [this.description = '']);
 
-  Map<String, dynamic> toJson() => {'name': name, 'description': description};
+  /// Reserva compartida de esta opción mágica; incluye la clase si hace falta.
+  final String? resourceKey;
+  const PassiveTrait(this.name, [this.description = '', this.resourceKey]);
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'description': description,
+        if (resourceKey != null) 'resourceKey': resourceKey,
+      };
 }
 
 /// Recurso consumible con su máximo y cómo se recarga.

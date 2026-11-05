@@ -3,6 +3,17 @@ import 'package:test/test.dart';
 
 void main() {
   group('Round-trip de contenido (toJson/fromJson)', () {
+    test(
+        'un rasgo conserva su recurso compartido sin cambiar el contenido antiguo',
+        () {
+      const effect =
+          PassiveTraitEffect(name: 'Prueba', resourceId: 'channel_divinity');
+      final restored = Effect.fromJson(effect.toJson()) as PassiveTraitEffect;
+      expect(restored.resourceId, 'channel_divinity');
+      final old = Effect.fromJson({'type': 'passiveTrait', 'name': 'Anterior'});
+      expect((old as PassiveTraitEffect).resourceId, isNull);
+      expect(old.toJson(), isNot(contains('resourceId')));
+    });
     test('Weapon conserva sus campos', () {
       const w = Weapon(
         id: 'hb-espada',

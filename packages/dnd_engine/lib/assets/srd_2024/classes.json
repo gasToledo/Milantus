@@ -2644,11 +2644,13 @@
           {
             "type": "passiveTrait",
             "name": "Chispa Divina",
+            "resourceId": "channel_divinity",
             "description": "Como acción de magia gastás un uso de Canalizar Divinidad y mostrás tu símbolo sagrado a otra criatura que veas a 30 pies o menos. Tirás 1d8 + tu modificador de Sabiduría: curás esos PG o causás daño necrótico o radiante (elegís), con salvación de Constitución contra tu CD de conjuros de Clérigo para recibir la mitad (redondeada hacia abajo). Los dados aumentan con el nivel de Clérigo: 2d8 al 7, 3d8 al 13 y 4d8 al 18."
           },
           {
             "type": "passiveTrait",
             "name": "Expulsar Muertos Vivientes",
+            "resourceId": "channel_divinity",
             "description": "Como acción de magia gastás un uso de Canalizar Divinidad y presentás tu símbolo sagrado. Los muertos vivientes que elijas a 30 pies o menos hacen una salvación de Sabiduría contra tu CD de conjuros de Clérigo. Si fallan, quedan asustados e incapacitados durante 1 minuto e intentan alejarse de vos. Termina antes si reciben daño, quedás incapacitado o morís."
           }
         ]
