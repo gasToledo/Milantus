@@ -170,6 +170,10 @@ puede llevar una cota de patch; y `cd.yml` usa `clean: false` porque el `.env`
 y las credenciales de cloudflared viven sin versionar en el directorio del
 runner. Ambas razones están escritas en el `Dockerfile` y en `cd.yml`.
 
+**El mapeo `"5432:5432"` del servicio `db` en `docker-compose.yml` no se toca:**
+no se quita, no se cambia y no se propone sacarlo. Si un comentario o una guía
+dice que ningún servicio publica puertos, se corrige el texto, no el mapeo.
+
 Lo que solo se ve con el stack real (migraciones, túnel, caché del navegador) se
 prueba a mano en producción y se anota en
 `docs/operaciones/pruebas-en-produccion.md`, un registro privado que Git ignora:

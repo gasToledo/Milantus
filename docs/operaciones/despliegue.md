@@ -432,18 +432,18 @@ se usó, no hay nada que reasignar.
 
 ## Aislamiento de red
 
-Ningún servicio de `docker-compose.yml` declara `ports:`. Verificar en cada
-arranque real:
+El único servicio de `docker-compose.yml` que declara `ports:` es `db`, con
+`"5432:5432"`, y ese mapeo no se toca. Verificar en cada arranque real:
 
 ```sh
 docker compose ps --format '{{.Name}}: {{.Ports}}'
 ```
 
-Ninguna fila debe mostrar un mapeo `0.0.0.0:<puerto>->...`: `cloudflared` es
-el único servicio con salida a internet, y es saliente (un túnel, no un
-puerto escuchando). `db` (que sirve las dos bases, aplicación y Zitadel) y
-`portraits-data` solo son alcanzables desde dentro de la red interna de
-Docker que arma `docker compose` para este proyecto.
+Solo la fila de `db` (que sirve las dos bases, aplicación y Zitadel) puede
+mostrar un mapeo, el de `5432`. `cloudflared` es el único servicio con salida a
+internet, y es saliente (un túnel, no un puerto escuchando). `portraits-data`
+solo es alcanzable desde dentro de la red interna de Docker que arma
+`docker compose` para este proyecto.
 
 ## Sin credenciales en la imagen
 
