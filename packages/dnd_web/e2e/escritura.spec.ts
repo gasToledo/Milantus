@@ -1067,8 +1067,44 @@ test('Ficha de un PNJ: los PG guardan lo que da el motor en su ficha', async ({ 
   );
   expect(enviado).toEqual(segunMotor(character, accion));
 
-  // La frontera: lo que lleva a una pantalla de la ficha propia no aparece.
-  await expect(page.locator('[data-action="change-choices"], [data-action="edit-spells"]')).toHaveCount(0);
+  // La frontera: el nombre de un PNJ se cambia en su pantalla, no con el lápiz de la ficha.
+  await expect(page.getByRole('button', { name: 'Editar nombre' })).toHaveCount(0);
+
+  await request.delete(`/api/npcs/${npc.id}`, comoDm);
+});
+
+test('Ficha de un PNJ: subir de nivel guarda lo que da el motor y vuelve a la ruta del PNJ', async ({ page, request }) => {
+  const comoDm = { headers: { cookie: `dnd_session=${TOKEN_ESCRITURA}` } };
+  // Bruna (bárbara de nivel 3): la subida más corta, sin elecciones de conjuros.
+  const creado = await request.post('/api/npcs', {
+    ...comoDm,
+    data: {
+      npc: { id: 'nuevo', name: 'Bruna sube', sheetKind: 'character' },
+      character: { ...(await ilse(request, 'bruna-de-humo')), name: 'Bruna sube' },
+    },
+  });
+  const { npc, character } = (await creado.json()) as { npc: { id: string; characterId: string }; character: CharacterJson };
+  const senda = levelUpView(character, catalogo(), { classId: 'barbarian' }).subclassOptions[0]!;
+  const esperado = segunMotor(character, {
+    type: 'levelUp',
+    draft: { classId: 'barbarian', subclassId: senda.id, abilityA: 'strength' },
+  });
+
+  await page.goto(`/v2/dm/pnj/${npc.id}/ficha`);
+  await page.locator('[data-action="npc-level-up"]').click();
+  await page.getByRole('button', { name: 'Empezar' }).click();
+  await page.getByRole('button', { name: 'Continuar' }).click();
+  await page.getByRole('radio', { name: new RegExp(`^${senda.name}`) }).click();
+  await page.getByRole('button', { name: 'Continuar' }).click();
+  await page.getByRole('radio', { name: /^Fuerza/ }).click();
+  await page.getByRole('button', { name: 'Continuar' }).click();
+  const enviado = await proximoGuardado(
+    page,
+    () => page.getByRole('button', { name: 'Subir a nivel 4' }).click(),
+    npc.characterId,
+  );
+  expect(enviado).toEqual(esperado);
+  await expect(page).toHaveURL(new RegExp(`/v2/dm/pnj/${npc.id}/ficha/personaje$`));
 
   await request.delete(`/api/npcs/${npc.id}`, comoDm);
 });

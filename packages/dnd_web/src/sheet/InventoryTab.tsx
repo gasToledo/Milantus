@@ -269,8 +269,7 @@ export function InventoryTab({ model }: { model: SheetModel }) {
               {t.catalogAddTitle}
             </Button>
           )}
-          {/* La pantalla de planos es de la ficha propia hasta 6f3. */}
-          {write?.kind === 'own' && plans && (
+          {write && plans && (
             <ButtonLink tone="soft" internal href={write.routes.plans()} data-action="magic-plans">
               {t.invPlansButton(plans.chosen.length, plans.count)}
             </ButtonLink>

@@ -49,6 +49,15 @@ export type DmSection = (typeof DM_SECTIONS)[number];
 /** Las pestañas de la ficha de un miembro de la Mesa: lo que sirve en combate,
  *  como `MemberSheetScreen` de Flutter. Inventario, campañas y diario son del
  *  jugador. */
+/** Las pantallas de edición de la ficha de un PNJ: las mismas que las de la
+ *  ficha propia, bajo `/dm/pnj/:pnj/ficha/`. */
+export type NpcSheetScreen =
+  | { name: 'levelUp' }
+  | { name: 'spells'; classId: string }
+  | { name: 'plans' }
+  | { name: 'choices' }
+  | { name: 'forms' };
+
 export const MEMBER_SHEET_TABS = ['personaje', 'combate'] as const satisfies readonly SheetTab[];
 
 /** Las de un PNJ con ficha, como `SheetScreen` en `npcMode`: sin campañas «de
@@ -72,7 +81,7 @@ export type DmView =
   // al DM el permiso de leerla. `tab: null` redirige a la primera.
   | { kind: 'member'; id: string; memberId: string; tab: SheetTab | null }
   // La ficha completa de un PNJ con ficha de personaje.
-  | { kind: 'npcSheet'; npcId: string; tab: SheetTab | null }
+  | { kind: 'npcSheet'; npcId: string; tab: SheetTab | null; screen?: NpcSheetScreen }
   // El Bestiario del DM es una herramienta de la cuenta, no de una campaña.
   | { kind: 'bestiary'; entryId: string | null }
   // La Biblioteca de PNJ también: sin PNJ es la lista.
@@ -141,6 +150,26 @@ export function matchRoute(pathname: string): Route {
     }
     // Antes de todo lo que lee `/dm/pnj/:pnj`: si no, `nuevo` se tomaría por un id.
     if (id === 'pnj' && tab === 'nuevo' && rest.length === 0) return { name: 'npcCreation' };
+    // Las pantallas de edición, antes que la pestaña: `subir-nivel` no es una.
+    if (id === 'pnj' && tab !== undefined && rest[0] === 'ficha' && rest[1] !== undefined) {
+      const screens: Record<string, NpcSheetScreen | undefined> = {
+        'subir-nivel': { name: 'levelUp' },
+        planos: { name: 'plans' },
+        elecciones: { name: 'choices' },
+        formas: { name: 'forms' },
+      };
+      try {
+        const screen =
+          rest[1] === 'conjuros' && rest.length === 3
+            ? ({ name: 'spells', classId: decodeURIComponent(rest[2]!) } as const)
+            : rest.length === 2
+              ? Object.hasOwn(screens, rest[1]) ? screens[rest[1]] : undefined
+              : undefined;
+        if (screen) return { name: 'dm', view: { kind: 'npcSheet', npcId: decodeURIComponent(tab), tab: null, screen } };
+      } catch {
+        return { name: 'unknown' };
+      }
+    }
     // `/dm/pnj/:pnj/ficha[/:pestaña]`.
     if (id === 'pnj' && tab !== undefined && rest[0] === 'ficha' && rest.length <= 2) {
       const sheetTab = sheetTabIn(NPC_SHEET_TABS, rest[1]);
@@ -388,6 +417,19 @@ export const ownSheetRoutes = (id: string): SheetRoutes => ({
   choices: (tab) => choicesHref(id, tab),
   forms: () => wildShapeFormsHref(id),
 });
+
+/** Lo mismo para la ficha de un PNJ. */
+export const npcSheetRoutes = (npcId: string): SheetRoutes => {
+  const base = `${dmNpcsHref(npcId)}/ficha`;
+  return {
+    sheet: (tab) => dmNpcSheetHref(npcId, tab),
+    levelUp: () => `${base}/subir-nivel`,
+    spells: (classId) => `${base}/conjuros/${encodeURIComponent(classId)}`,
+    plans: () => `${base}/planos`,
+    choices: (tab) => `${base}/elecciones${tab ? `?tab=${tab}` : ''}`,
+    forms: () => `${base}/formas`,
+  };
+};
 
 export const rebuildHref = (id: string): string =>
   `${import.meta.env.BASE_URL}personajes/${encodeURIComponent(id)}/rehacer`;

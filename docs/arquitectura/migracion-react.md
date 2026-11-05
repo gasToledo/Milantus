@@ -238,9 +238,9 @@ repiten acá.
 - **El Modo DM** en `/v2/dm` (`src/dm/`), al que lleva «DM» del
   interruptor. Desde 6b escribe campañas y la Mesa y desde 6c capítulos,
   notas y el reparto de objetos y desde 6d las escenas de música (bloques de
-  6b, 6c y 6d, abajo); los PNJ y el combate **siguen en Flutter** hasta 6e a 6g
+  6b, 6c y 6d, abajo); el combate **sigue en Flutter** hasta 6g
   (desde 6e1 los vínculos de un PNJ con sus campañas ya se escriben, desde 6e2
-  se crea y se borra un PNJ sin ficha de personaje, desde 6f1 se crea uno con ficha, desde 6f2 se escribe su ficha y desde 6e3 se escribe su texto
+  se crea y se borra un PNJ sin ficha de personaje, desde 6f1 se crea uno con ficha, desde 6f2 se escribe su ficha, desde 6f3 se sube de nivel y se editan sus elecciones y desde 6e3 se escribe su texto
   desde 6e4 su bloque y desde 6e5 su retrato),
   y esas secciones se leen salvo eso. Se porta por
   secciones, una por PR; hoy existen la **Mesa**, **Capítulos**, el **Cuaderno**,
@@ -338,7 +338,8 @@ repiten acá.
   PNJ** (`NpcSheetView`; Flutter abre `SheetScreen` en `npcMode`): la misma
   `SheetTabs` de un jugador con Personaje, Combate e Inventario, sin Campaña ni
   Diario porque en un PNJ son su trasfondo y sus notas, y escribible desde 6f2
-  (PG, usos, descansos, inventario; ver abajo). Sale del mismo `GET /api/npcs/:id`. Un PNJ ajeno y uno
+  (PG, usos, descansos, inventario) y 6f3 (subir de nivel y demás pantallas de
+  edición; ver abajo). Sale del mismo `GET /api/npcs/:id`. Un PNJ ajeno y uno
   inexistente dan la misma pantalla «No se encontró el PNJ» —también en su
   ficha, igual que un PNJ sin ficha—: el servidor los responde igual (404). Importar y
   exportar siguen en Flutter (el estado por campaña se escribe desde 6e1; crear
@@ -674,7 +675,7 @@ repiten acá.
   `POST /api/characters`, cuya respuesta trae el id con que quedó guardado (el
   servidor lo reasigna si choca). Rehacer (5f) usa `creationConfirm` con el
   personaje que se rehace y `PUT` con `rebuilt: true`, que avisa a los DM; crear
-  la ficha de un PNJ sigue en Flutter.
+  la ficha de un PNJ es de 6f1.
   - **Toda escritura la hace el motor.** `actOn` (`act` de `js/entrypoint.dart`,
     sobre `SheetActions.apply` del engine) recibe la ficha y la acción y
     devuelve la ficha nueva, migrada y con el `schemaVersion` actual, más lo
@@ -742,7 +743,21 @@ frontera sigue donde estaba: **el DM no escribe la ficha de otra cuenta**.
   (no escribe la ficha) y echar corta el vínculo tras confirmar. `MemberSheetView`
   sigue sin un solo control. No se pide el aviso de eventos tras cada acción
   (`_checkEventsSoon` de Flutter): decisión tomada, no un olvido.
-- Queda en Flutter, hasta 6e a 6g: PNJ, ficha de PNJ y combate.
+- Queda en Flutter, hasta 6g: el combate.
+
+**Paso 6f3: las pantallas de edición** *(existe)*. Toca solo `dnd_web`. Subir de
+nivel, elecciones, editor de conjuros, planos del Artífice y formas salvajes son
+las pantallas de la ficha propia, que dejan de asumir su URL: el `SheetWriter`
+lleva `routes: SheetRoutes` (`ownSheetRoutes(id)` o `npcSheetRoutes(npcId)`) y
+cada pantalla toma de ahí sus enlaces y sus «volver». Las del PNJ viven bajo
+`/v2/dm/pnj/:id/ficha/` (`subir-nivel`, `conjuros/:clase`, `planos`, `elecciones`,
+`formas`) y `NpcSheetView` las muestra con la prop `screen`, sin remontarse al
+pasar de una a otra (su `key` es solo el id del PNJ), así que el guardado «al
+salir» no se dispara entre pantallas. En la barra de la ficha, a la derecha del
+estado de guardado, van «Subir nivel» (apagado en el nivel máximo) e «Imprimir
+ficha». Sin renombrar ni regalos, que siguen siendo de `own`. Subir de nivel no
+avisa a nadie: el servidor no ve esa ficha como un personaje. Sin rehacer ni
+retrato desde ahí, como en Flutter.
 
 **Paso 6f2: escribir la ficha de un PNJ** *(existe)*. Toca solo `dnd_web`. La
 ficha completa de un PNJ (`NpcSheetView`) deja de ser de solo lectura: PG,
@@ -756,8 +771,8 @@ guarda primero y recién después se relee la biblioteca y las campañas. Borrar
 renombrar el PNJ descartan antes lo pendiente de su ficha (`dropPending`): el
 `upsert` del servidor inserta sin `kind` y un guardado tardío la recrearía fuera
 del PNJ. Sin renombrar desde la ficha (se hace en la pantalla del PNJ), sin
-compartir ni regalos. Hasta 6f3 quedan afuera editar conjuros, planos,
-elecciones y anotar formas.
+compartir ni regalos. Las pantallas de edición (conjuros, planos, elecciones,
+formas y subir de nivel) son de 6f3.
 
 **Paso 6f1: crear un PNJ con ficha** *(existe)*. Toca solo `dnd_web`: el motor, el
 servidor y Flutter no cambian (`POST /api/npcs` ya aceptaba `{ npc, character }` y
@@ -933,7 +948,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    alta y borrado *(existe)*; 6e3, el texto de la ficha *(existe)*; 6e4, el editor del bloque *(existe)*; 6e5,
    retrato y mostrar a la mesa *(existe)*; 6f, la ficha de PNJ, en tres: 6f1,
    crearla *(existe)*; 6f2, escribirla *(existe)*; 6f3, sus pantallas de edición (subir de
-   nivel, elecciones, conjuros, planos, formas e imprimir); 6g, el combate. Importar y exportar PNJ sigue en el paso 7. Antes de portar esto es lectura
+   nivel, elecciones, conjuros, planos, formas e imprimir) *(existe)*; 6g, el combate. Importar y exportar PNJ sigue en el paso 7. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de
    otra cuenta» es del servidor y vale igual para el cliente nuevo. Entra acá
    también la edición de la ficha completa de un PNJ (inventario, comprar y

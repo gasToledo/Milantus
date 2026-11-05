@@ -4,7 +4,7 @@ import { scheduleSave } from '../api/characterSave';
 import type { StoredCharacter, StoredNpc } from '../api/client';
 import { queryKeys } from '../api/queries';
 import { actOn, migrateCharacter, type Catalog, type CharacterJson, type SheetAction, type SheetOutcome } from '../engine';
-import { ownSheetRoutes, type SheetRoutes } from '../router';
+import { npcSheetRoutes, ownSheetRoutes, type SheetRoutes } from '../router';
 import type { ToastTone } from '../ui/primitives';
 
 /** Un aviso de la ficha; con [undo], lleva «Deshacer». */
@@ -17,8 +17,8 @@ export type SheetNotify = (message: string, options?: { tone?: ToastTone; undo?:
  * (`npc`): el DM sí escribe la de su PNJ, que es suya.
  */
 export interface SheetWriter {
-  /** Lo que conecta una ficha con otra cuenta o lleva a una pantalla de la
-   *  ficha propia (compartir, regalos, editores) solo aparece con `own`. */
+  /** Lo que conecta la ficha con otra cuenta (regalos) o con el nombre (el
+   *  lápiz; en un PNJ se cambia en su pantalla) solo aparece con `own`. */
   kind: 'own' | 'npc';
   /** Aplica la acción con el motor, la muestra al instante y la deja para
    *  guardar. `before` es la ficha de antes (para «Deshacer»); `null` si el
@@ -128,9 +128,7 @@ export function useNpcSheetWriter(
     if (!catalog) return null;
     return buildWriter({
       kind: 'npc',
-      // Provisorio: la parte 2 de 6f3 le pone las rutas del PNJ; mientras tanto
-      // esos enlaces siguen ocultos para `npc`.
-      routes: ownSheetRoutes(npcId),
+      routes: npcSheetRoutes(npcId),
       catalog,
       notify,
       failedMessage,

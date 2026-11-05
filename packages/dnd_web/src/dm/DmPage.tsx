@@ -80,7 +80,7 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
     // Sin guardia de salida: cada acción del taller ya se guarda sola.
     body = <NpcPortraitView key={view.npcId} npcId={view.npcId} />;
   } else if (view.kind === 'npcSheet') {
-    body = <NpcSheetView key={view.npcId} npcId={view.npcId} tab={view.tab} />;
+    body = <NpcSheetView key={view.npcId} npcId={view.npcId} tab={view.tab} screen={view.screen} />;
   } else if (view.kind === 'homebrew') {
     // Lo propio es de la cuenta, no de una campaña.
     body = <HomebrewView category={view.category} entryId={view.entryId} />;

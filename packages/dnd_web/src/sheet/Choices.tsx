@@ -20,10 +20,10 @@ import type { SheetWriter } from './writer';
  *  Se recalcula con cada cambio del personaje; no hay regla acá. */
 export function useChoicesView(model: SheetModel): ChoicesView | null {
   const raw = model.character as unknown as CharacterJson;
-  // Las elecciones se editan en una pantalla de la ficha propia (6f3 las trae
-  // al PNJ): sin `own` no hay avisos ni botón para cambiarlas.
-  const own = model.write?.kind === 'own';
-  return useMemo(() => (own ? choicesView(raw, model.catalog) : null), [own, raw, model.catalog]);
+  // Sin escritura (la ficha de un miembro de la Mesa) no hay avisos ni botón
+  // para cambiar las elecciones.
+  const writable = !!model.write;
+  return useMemo(() => (writable ? choicesView(raw, model.catalog) : null), [writable, raw, model.catalog]);
 }
 
 /**
