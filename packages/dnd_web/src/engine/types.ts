@@ -573,6 +573,7 @@ export interface NpcJson extends JsonObject {
   /** `none`, `block` o `character`. */
   sheetKind: string;
   characterId?: string;
+  block?: JsonObject;
   speech?: string;
   background?: string;
   tags?: string[];

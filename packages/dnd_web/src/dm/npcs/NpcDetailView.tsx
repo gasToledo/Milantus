@@ -8,11 +8,11 @@ import { queryKeys, useDmCampaigns, useNpc, useSheetCatalog } from '../../api/qu
 import { actOn, npcViews, type CharacterJson, type NpcView } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
 import { RenameDialog } from '../../dashboard/RenameDialog';
-import { dmNpcSheetHref, dmNpcsHref, Link, navigate } from '../../router';
+import { dmNpcBlockHref, dmNpcSheetHref, dmNpcsHref, Link, navigate } from '../../router';
 import { signed } from '../../sheet/format';
 import { BackgroundEditor, DiaryEntries, type DiaryEditor } from '../../sheet/DiaryTab';
 import { type SheetNotify } from '../../sheet/writer';
-import { Button } from '../../ui/Button';
+import { Button, ButtonLink } from '../../ui/Button';
 import { ConfirmDialog } from '../../ui/ConfirmDialog';
 import { cx } from '../../ui/cx';
 import { Pill, StatPlaque } from '../../ui/data';
@@ -38,8 +38,8 @@ const ICON_BUTTON = 'inline-flex size-11 shrink-0 items-center justify-center ro
  * sabe de él, con qué pelea y cómo está en cada campaña. Es del DM y de nadie
  * más: un PNJ ajeno y uno inexistente responden el mismo 404 y la pantalla
  * dice lo mismo. Acá se escribe el estado por campaña, se suma a otra, se
- * borra el PNJ y se escribe su texto (nombre, voz, tags, trasfondo y notas);
- * siguen en Flutter el bloque, el retrato y exportar.
+ * borra el PNJ, se escribe su texto (nombre, voz, tags, trasfondo y notas) y se
+ * abre el editor de su bloque; siguen en Flutter el retrato y exportar.
  */
 export function NpcDetailView({ npcId }: { npcId: string }) {
   const t = useTexts();
@@ -376,6 +376,9 @@ function Stats({ view }: { view: NpcView }) {
             )}
           </>
         )}
+        <ButtonLink internal tone="soft" icon={Pencil} href={dmNpcBlockHref(view.npc.id)} data-action="edit-block" className="mt-3">
+          {t.npcEditBlock}
+        </ButtonLink>
       </section>
     );
   }

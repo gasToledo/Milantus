@@ -1,5 +1,5 @@
 import { Fragment, useState, type ReactNode } from 'react';
-import { Check } from 'lucide-react';
+import { Check, CircleAlert } from 'lucide-react';
 import { fold, type CodexDetail } from '../codex/entries';
 import type { Texts } from '../i18n/texts';
 import { Button } from './Button';
@@ -154,7 +154,17 @@ export function SpellTabs({
   t,
   plain = false,
 }: {
-  tabs: { key: string; title: string; ready: boolean; count?: [number, number]; label?: string }[];
+  tabs: {
+    key: string;
+    title: string;
+    ready: boolean;
+    count?: [number, number];
+    label?: string;
+    /** Una cifra al lado del título (cuántas filas tiene la pestaña). */
+    badge?: number;
+    /** La pestaña tiene algo que corregir: borde rojo e ícono. */
+    alert?: boolean;
+  }[];
   current: string;
   onSelect: (key: string) => void;
   label: string;
@@ -180,10 +190,17 @@ export function SpellTabs({
               plain
                 ? 'h-[38px] items-center px-3.5'
                 : 'w-[148px] flex-col items-start gap-1 px-3 py-2.5 sm:w-auto sm:min-w-0 sm:flex-1',
-              on ? 'border-gold bg-gold-soft' : 'border-hairline bg-plaque',
+              x.alert ? 'border-crimson' : on ? 'border-gold' : 'border-hairline',
+              on ? 'bg-gold-soft' : 'bg-plaque',
             )}
           >
-            <span className="text-[13px] leading-[1.25] font-medium">{x.title}</span>
+            <span className="flex items-center gap-[7px]">
+              {x.alert && <CircleAlert size={14} aria-hidden="true" className="shrink-0 text-crimson" />}
+              <span className="text-[13px] leading-[1.25] font-medium">{x.title}</span>
+              {x.badge !== undefined && (
+                <span className={cx('text-[13px] tabular-nums', on ? 'text-gold' : 'text-text-muted')}>{x.badge}</span>
+              )}
+            </span>
             {!plain && <Status ready={x.ready} count={x.count} label={x.label} t={t} />}
           </button>
         );
@@ -405,17 +422,23 @@ export function StepRail({
 export function WizardFooter({
   message,
   above,
+  danger = false,
   children,
 }: {
   message?: string | null;
   above?: ReactNode;
+  /** El mensaje es un error (no se pudo guardar, falta corregir algo). */
+  danger?: boolean;
   children: ReactNode;
 }) {
   return (
     <footer className="card sticky bottom-3 mt-auto flex flex-wrap items-center gap-x-4 gap-y-2.5 px-4 py-3">
       {above}
       {message && (
-        <span className="min-w-0 flex-[1_1_240px] text-[13px] text-on-surface-variant" role="status">
+        <span
+          className={cx('min-w-0 flex-[1_1_240px] text-[13px]', danger ? 'text-crimson' : 'text-on-surface-variant')}
+          role="status"
+        >
           {message}
         </span>
       )}

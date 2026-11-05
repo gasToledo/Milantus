@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Account } from '../api/client';
 import { useDmCampaigns } from '../api/queries';
 import { RosterFooter } from '../dashboard/RosterPanel';
@@ -19,6 +19,7 @@ import { MesaView } from './MesaView';
 import { MusicPlayer } from './MusicPlayer';
 import { NotebookView } from './NotebookView';
 import { CampaignNpcsView } from './npcs/CampaignNpcsView';
+import { NpcBlockBack, NpcBlockView } from './npcs/NpcBlockView';
 import { NpcDetailView } from './npcs/NpcDetailView';
 import { NpcLibraryView } from './npcs/NpcLibraryView';
 import { NpcSheetView } from './npcs/NpcSheetView';
@@ -58,6 +59,9 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
   useEffect(() => {
     if (currentId) setMusicCampaignId(currentId);
   }, [currentId]);
+  // El editor de un bloque registra acá cómo salir (preguntando si hay cambios)
+  // para el «volver» del panel, que vive fuera de él.
+  const leave = useRef<(() => void) | null>(null);
   const musicCampaign = list?.find((c) => c.id === (currentId ?? musicCampaignId));
 
   let body;
@@ -69,6 +73,8 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
     // La Biblioteca tampoco depende de las campañas: sin la lista, los filtros
     // por campaña salen de los vínculos de cada PNJ.
     body = view.npcId === null ? <NpcLibraryView campaigns={list} /> : <NpcDetailView key={view.npcId} npcId={view.npcId} />;
+  } else if (view.kind === 'npcBlock') {
+    body = <NpcBlockView key={view.npcId} npcId={view.npcId} leaveRef={leave} />;
   } else if (view.kind === 'npcSheet') {
     body = <NpcSheetView key={view.npcId} npcId={view.npcId} tab={view.tab} />;
   } else if (view.kind === 'homebrew') {
@@ -112,7 +118,15 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
   }
 
   return (
-    <Shell panel={<DmPanel campaigns={list} current={current} tool={view.kind === 'npcSheet' ? 'npcs' : view.kind === 'bestiary' || view.kind === 'npcs' || view.kind === 'homebrew' ? view.kind : undefined} />} footer={<RosterFooter account={account} dm />}>
+    <Shell
+      panel={
+        view.kind === 'npcBlock' ? (
+          <NpcBlockBack npcId={view.npcId} leaveRef={leave} />
+        ) : (
+          <DmPanel campaigns={list} current={current} tool={view.kind === 'npcSheet' ? 'npcs' : view.kind === 'bestiary' || view.kind === 'npcs' || view.kind === 'homebrew' ? view.kind : undefined} />
+        )
+      }
+      footer={<RosterFooter account={account} dm />}>
       {body}
       {/* Otra campaña es otro reproductor: lo que sonaba se corta. La clave no
           puede ser el id a secas: la sección hermana ya la usa. */}

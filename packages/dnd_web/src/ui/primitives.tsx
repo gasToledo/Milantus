@@ -136,6 +136,7 @@ export function Select({
   onValueChange,
   options,
   className,
+  labelAbove,
 }: {
   label: string;
   value: string;
@@ -143,6 +144,9 @@ export function Select({
   options: { value: string; label: string }[];
   /** Sobre el botón: un formulario lo estira a todo el ancho. */
   className?: string;
+  /** El rótulo visible lo pone quien lo usa (arriba, como en un campo de
+   *  formulario): el botón no lo repite adentro, pero el `aria-label` queda. */
+  labelAbove?: boolean;
 }) {
   return (
     <SelectPrimitive.Root value={value} onValueChange={onValueChange}>
@@ -151,7 +155,7 @@ export function Select({
         className={cx('plaque inline-flex min-h-9 items-center gap-2 rounded-[var(--radius-nav)] px-3 text-[13px] text-on-surface', className)}
       >
         <span className="flex items-center gap-2">
-          <span className="text-text-muted">{label}:</span>
+          {!labelAbove && <span className="text-text-muted">{label}:</span>}
           <SelectPrimitive.Value />
         </span>
         <SelectPrimitive.Icon>
