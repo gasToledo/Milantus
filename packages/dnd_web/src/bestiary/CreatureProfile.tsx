@@ -22,6 +22,7 @@ export function CreatureProfile({
   compact = false,
   summary = false,
   kindNote,
+  stats,
 }: {
   profile: Profile;
   row: BestiaryRow;
@@ -36,13 +37,20 @@ export function CreatureProfile({
   summary?: boolean;
   /** Se suma a la línea de tipo («con espacio de nivel 5»). */
   kindNote?: string;
+  /** Reemplaza la banda de cifras del libro. Es para el combate, donde los PG y
+   *  la CA son los de la mesa y no los del catálogo: mostrar las dos bandas
+   *  repetía cifras que no coinciden. */
+  stats?: ReactNode;
 }) {
   const t = useTexts();
   const source = (t.sources as Record<string, string>)[profile.source ?? ''];
   return (
     <article
       aria-labelledby="creature-title"
-      className={compact ? undefined : 'card px-5 py-6 sm:px-8 sm:py-7'}
+      // `@container`: el perfil se mide contra su lugar y no contra la ventana.
+      // Montado en una columna angosta (el turno del combate, 300 px) en una
+      // pantalla ancha, las seis características se apretaban en una fila.
+      className={compact ? '@container' : '@container card px-5 py-6 sm:px-8 sm:py-7'}
       data-field="creature-detail"
     >
       {!compact && (
@@ -72,7 +80,7 @@ export function CreatureProfile({
       <p className={cx('text-on-surface-variant', compact ? 'mt-1 text-[13px]' : 'mt-1.5 text-[15px]')}>{kindNote ? `${row.kind} · ${kindNote}` : row.kind}</p>
       <SectionRule className={compact ? 'my-4' : 'my-[22px]'} />
 
-      <Numbers profile={profile} row={row} summary={summary} />
+      {stats ?? <Numbers profile={profile} row={row} summary={summary} />}
       {summary ? (
         profile.speed && <p className="mt-3 text-[12.5px] text-on-surface-variant">{profile.speed}</p>
       ) : (
@@ -123,7 +131,7 @@ function Abilities({ profile }: { profile: Profile }) {
   const t = useTexts();
   return (
     <section aria-label={t.creatureAbilities} className="mt-3">
-      <ul className="grid grid-cols-3 gap-2.5 sm:grid-cols-6">
+      <ul className="grid grid-cols-3 gap-2.5 @[520px]:grid-cols-6">
         {ABILITY_KEYS.map(([key, id]) => {
           const score = profile.abilityScores?.[key] ?? 10;
           const save = profile.savingThrows?.[key];
@@ -182,8 +190,8 @@ function Lines({ profile, hasPassive }: { profile: Profile; hasPassive: boolean 
   return (
     <dl className="mt-4">
       {rows.map(([label, value]) => (
-        <div key={label} className="flex flex-col gap-1 border-t border-hairline py-2.5 first:border-t-0 sm:flex-row sm:gap-4">
-          <dt className="plaque-label pt-0.5 sm:w-[104px] sm:shrink-0 sm:text-right">{label}</dt>
+        <div key={label} className="flex flex-col gap-1 border-t border-hairline py-2.5 first:border-t-0 @[440px]:flex-row @[440px]:gap-4">
+          <dt className="plaque-label pt-0.5 @[440px]:w-[104px] @[440px]:shrink-0 @[440px]:text-right">{label}</dt>
           <dd className="min-w-0 max-w-[620px] text-[13.5px] leading-[1.4] text-on-surface">{value}</dd>
         </div>
       ))}

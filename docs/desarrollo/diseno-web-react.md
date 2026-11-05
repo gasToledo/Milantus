@@ -82,7 +82,7 @@ un control a un asistente, buscá acá.
 | `WildShapeTile`, `WildShapeDialog` | La franja de Forma Salvaje en la banda táctica (`data-stat="wild-shape"`, con la estructura de `ActiveModeTile`) y su diálogo: las formas anotadas como `Option` de elección única, el perfil a la derecha (debajo de `lg`, un botón `Info` lo muestra dentro del mismo diálogo). Elegir no transforma. Vive en `sheet/WildShape.tsx` | Banda de Personaje y Combate de un druida |
 | `CompanionsCard`, `SummonDialog` | La tarjeta de compañeros en juego (`data-card="companions"`, `data-companion="n"`): cada fila plegada de entrada, varias abiertas a la vez, con PG, CA, estados y perfil; «Invocar» (`data-action="summon"`) abre el diálogo: `Select` de opción si hay más de una, formas como `Option` (con más de 6, en `SearchableList`), pago con el uso gratis (`data-free`) y `SpellSlotGrid`, y el perfil a la derecha (debajo de `lg`, un botón `Info` lo muestra dentro del mismo diálogo). Avisos en oro entre el cuerpo y la barra. Vive en `sheet/Companions.tsx` | Combate, columna de PG y Defensa |
 | `AmountControls` | El campo de cantidad con Daño, Curar y PG temp (`sheet/CombatTab.tsx`); recibe `id` y `dataControls` para que el personaje y cada compañero tengan el suyo. `ConditionToggleList` es lo mismo para los estados (`data-condition` o `data-companion-condition`) | PG de la ficha y de cada compañero |
-| `CreatureProfile` con `compact` | La misma ficha de criatura sin tarjeta propia ni píldoras y con título de panel (`font-display text-[16px]`): para el panel derecho y el diálogo de Forma Salvaje | Mostrar una criatura dentro de otra superficie |
+| `CreatureProfile` con `compact` | La misma ficha de criatura sin tarjeta propia ni píldoras y con título de panel (`font-display text-[16px]`): para el panel derecho y el diálogo de Forma Salvaje. Se mide con `@container` y no con la ventana (las seis características van en una fila desde 520 px de su lugar), y `stats` reemplaza la banda de cifras del libro | Mostrar una criatura dentro de otra superficie |
 | `WIZARD_ASIDE` | Las clases de la columna derecha: sigue a la vista al bajar y, si no entra, se desplaza sola | Panel derecho de cada asistente |
 | `SearchableList` | Buscador sin tildes y por palabras (`matchesQuery`), cuenta y scroll propio; `groupOf` pinta un `Eyebrow` a todo el ancho al cambiar de grupo (los conjuros por nivel, sin grupos vacíos al buscar) y `empty` dice qué pasa si el filtro no deja nada | Listas largas: especies, trasfondos, armas |
 | `StepRail` | La tira de pasos; `progress` la cambia en un teléfono por «Paso n de m» y una barra | Arriba de cada asistente |
@@ -399,9 +399,11 @@ inexistente son la misma pantalla). Desde 6b escribe campañas y la Mesa y desde
   verde al filo izquierdo de la fila sobre `goldSoft` (no un borde alrededor) y
   la palabra bajo la iniciativa; lo ya jugado se atenúa y un caído se tacha.
   Los PG van en carmesí con `ThinBar`, y el bando en una pill con la palabra
-  (verde, carmesí, apagado). «Del turno» va a la derecha: una `card` con tres
-  placas (Inic, PG, CA) y, debajo, el `CreatureProfile` del Bestiario como su
-  propia tarjeta, para no anidar una dentro de otra.
+  (verde, carmesí, apagado). «Del turno» va a la derecha: una sola `card` con el
+  `CreatureProfile` del Bestiario en `compact` y, en lugar de su banda de cifras,
+  tres placas de la mesa (Inic, PG, CA) por `stats`: los PG del libro dejan de
+  ser ciertos en el primer golpe, y las dos bandas juntas repetían cifras que no
+  coinciden.
 
 ## Reglas que más se olvidan
 

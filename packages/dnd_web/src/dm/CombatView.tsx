@@ -527,7 +527,8 @@ function TurnPanel({ row, catalog }: { row: Row | undefined; catalog: Catalog })
   } else if (row.c.kind === 'player') {
     body = <p className="text-[13px] text-text-muted">{t.encPlayerTurn(row.c.name)}</p>;
   } else if (row.creature) {
-    // El perfil del Bestiario es su propia tarjeta: va debajo, no adentro.
+    // El perfil va adentro de la misma tarjeta, sin la suya, y con las cifras
+    // de la mesa en lugar de las del libro (`stats`).
     body = null;
   } else if (row.npc?.block) {
     body = (
@@ -552,25 +553,33 @@ function TurnPanel({ row, catalog }: { row: Row | undefined; catalog: Catalog })
           </h2>
           {row && <span className="text-[12px] text-text-muted">{row.c.name}</span>}
         </div>
-        {row && row.c.kind !== 'player' && (
-          <dl className="grid grid-cols-3 gap-2">
-            {[
-              { label: t.encInitiativeShort, value: String(row.c.initiative), tone: 'text-verdant' },
-              { label: t.encHp, value: row.derived.hp ? `${row.derived.hp.current}/${row.derived.hp.max}` : t.dmNoValue, tone: 'text-crimson' },
-              { label: t.encAc, value: row.detail?.ac ?? t.dmNoValue, tone: 'text-on-surface' },
-            ].map((s) => (
-              <div key={s.label} className="plaque px-0.5 py-2 text-center">
-                <dt className="plaque-label">{s.label}</dt>
-                <dd className={cx('num mt-1 text-[17px] leading-none', s.tone)}>{s.value}</dd>
-              </div>
-            ))}
-          </dl>
+        {row?.creature ? (
+          <CreatureProfile profile={asProfile(row.creature.raw)} row={row.creature.row} catalog={catalog} compact stats={<TurnStats row={row} />} />
+        ) : (
+          row && row.c.kind !== 'player' && <TurnStats row={row} />
         )}
         {body}
       </div>
-      {row?.creature && (
-        <CreatureProfile profile={asProfile(row.creature.raw)} row={row.creature.row} catalog={catalog} />
-      )}
     </aside>
+  );
+}
+
+/** Iniciativa, PG y CA **de la mesa**: los PG bajan a golpes y el máximo del
+ *  libro deja de ser cierto en el primer ataque. */
+function TurnStats({ row }: { row: Row }) {
+  const t = useTexts();
+  return (
+    <dl className="grid grid-cols-3 gap-2">
+      {[
+        { label: t.encInitiativeShort, value: String(row.c.initiative), tone: 'text-verdant' },
+        { label: t.encHp, value: row.derived.hp ? `${row.derived.hp.current}/${row.derived.hp.max}` : t.dmNoValue, tone: 'text-crimson' },
+        { label: t.encAc, value: row.detail?.ac ?? t.dmNoValue, tone: 'text-on-surface' },
+      ].map((s) => (
+        <div key={s.label} className="plaque px-0.5 py-2 text-center">
+          <dt className="plaque-label">{s.label}</dt>
+          <dd className={cx('num mt-1 text-[17px] leading-none', s.tone)}>{s.value}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }
