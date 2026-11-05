@@ -4,7 +4,7 @@ import { asProfile, type CreatureProfile as Profile } from '../bestiary/creature
 import { CreatureProfile } from '../bestiary/CreatureProfile';
 import { bestiary, type BestiaryRow } from '../engine';
 import { useTexts } from '../i18n/context';
-import { characterHref, Link } from '../router';
+import { Link } from '../router';
 import { AppDialog } from '../ui/AppDialog';
 import { Button, ButtonLink } from '../ui/Button';
 import { Pill } from '../ui/data';
@@ -82,7 +82,7 @@ export function WildShapeForms({ model, write }: { model: SheetModel; write: She
     blocked && !chosenIds.has(blocked) ? t.wsFull(slot.chosen.length, slot.count, nameOfForm(blocked)) : null;
   const focused = focus ? byId.get(focus) : undefined;
   const sheetBeast = sheetId ? byId.get(sheetId) : undefined;
-  const back = characterHref(character.id, 'combate');
+  const back = write.routes.sheet('combate');
 
   return (
     <div className="flex min-h-full flex-col gap-4" data-page="wild-shape-forms">

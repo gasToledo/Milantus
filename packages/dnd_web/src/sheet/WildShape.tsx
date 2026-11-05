@@ -4,7 +4,7 @@ import { asProfile, type CreatureProfile as Profile } from '../bestiary/creature
 import { CreatureProfile } from '../bestiary/CreatureProfile';
 import { bestiary, type BestiaryRow } from '../engine';
 import { useTexts } from '../i18n/context';
-import { navigate, wildShapeFormsHref } from '../router';
+import { navigate } from '../router';
 import { AppDialog } from '../ui/AppDialog';
 import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
@@ -61,7 +61,7 @@ export function WildShapeTile({ model }: { model: SheetModel }) {
   const onClick = () => {
     if (!write) return;
     if (form) write.act({ type: 'leaveWildShape' });
-    else if (noForms) navigate(wildShapeFormsHref(model.character.id));
+    else if (noForms) navigate(write.routes.forms());
     else setOpen(true);
   };
 
@@ -108,7 +108,7 @@ interface Form {
  *  primaria. Anotar formas lleva a la ruta de las formas. */
 function WildShapeDialog({ model, write, onClose }: { model: SheetModel; write: SheetWriter; onClose: () => void }) {
   const t = useTexts();
-  const { sheet, catalog, character } = model;
+  const { sheet, catalog } = model;
   const slot = sheet.wildShape!;
   const resource = sheet.resources.find((r) => r.id === WILD_SHAPE_RESOURCE);
   const max = resource?.max ?? 0;
@@ -184,7 +184,7 @@ function WildShapeDialog({ model, write, onClose }: { model: SheetModel; write: 
       width={860}
       actions={[
         // Anotar formas es de la ficha propia hasta 6f3.
-        ...(write.kind === 'own' ? [{ label: t.wsActionAdd, onSelect: () => navigate(wildShapeFormsHref(character.id)) }] : []),
+        ...(write.kind === 'own' ? [{ label: t.wsActionAdd, onSelect: () => navigate(write.routes.forms()) }] : []),
         { label: t.cancel },
         {
           label: left > 0 ? t.wsActionGo : t.wsActionNoUses,

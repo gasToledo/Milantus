@@ -27,7 +27,6 @@ import { cx } from '../ui/cx';
 import { Eyebrow, Pips, SpendRecoverButtons, ThinBar } from '../ui/data';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Tooltip } from '../ui/primitives';
 import { AppEmptyState } from '../ui/status';
-import { magicPlansHref } from '../router';
 import { ItemGrants } from './ItemGrants';
 import { InfoName } from './InfoName';
 import { EffectTargetDialog } from './EffectTargetDialog';
@@ -272,7 +271,7 @@ export function InventoryTab({ model }: { model: SheetModel }) {
           )}
           {/* La pantalla de planos es de la ficha propia hasta 6f3. */}
           {write?.kind === 'own' && plans && (
-            <ButtonLink tone="soft" internal href={magicPlansHref(character.id)} data-action="magic-plans">
+            <ButtonLink tone="soft" internal href={write.routes.plans()} data-action="magic-plans">
               {t.invPlansButton(plans.chosen.length, plans.count)}
             </ButtonLink>
           )}

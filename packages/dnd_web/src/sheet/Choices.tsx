@@ -5,7 +5,7 @@ import { codexEntries } from '../codex/entries';
 import { choicesView, type AbilityId, type Catalog, type CharacterJson, type ChoicesView, type SheetWarning } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import type { Lang, Texts } from '../i18n/texts';
-import { characterHref, choicesHref, Link, navigate, spellEditHref } from '../router';
+import { Link, navigate } from '../router';
 import { AppDialog } from '../ui/AppDialog';
 import { Button, ButtonLink } from '../ui/Button';
 import { cx } from '../ui/cx';
@@ -37,8 +37,9 @@ export function useChoicesView(model: SheetModel): ChoicesView | null {
  * habilidades de clase tampoco lo tienen: en Flutter tampoco.
  */
 function destinationOf(code: string, model: SheetModel, view: ChoicesView): string | null {
-  const id = model.character.id;
-  const tab = (name: string) => choicesHref(id, name);
+  const routes = model.write?.routes;
+  if (!routes) return null;
+  const tab = (name: string) => routes.choices(name);
   switch (code) {
     case 'size_pending':
     case 'size_invalid':
@@ -72,12 +73,12 @@ function destinationOf(code: string, model: SheetModel, view: ChoicesView): stri
     case 'prepared_pending':
     case 'too_many_cantrips':
     case 'too_many_prepared':
-      return spellEditHref(id, model.character.classId);
+      return routes.spells(model.character.classId);
     // La mochila no se arregla con un diálogo: hay que decidir qué se suelta o
     // qué se desintoniza mirando la lista entera.
     case 'encumbered':
     case 'attunement_over_limit':
-      return characterHref(id, 'inventario');
+      return routes.sheet('inventario');
     default:
       return null;
   }
@@ -177,10 +178,10 @@ function WarningsDialog({
 
 /** «Cambiar elecciones» en la tarjeta Identidad: lo ya elegido que el juego
  *  deja cambiar (`replaceable` del motor), aunque no quede nada pendiente. */
-export function ChangeChoicesButton({ id }: { id: string }) {
+export function ChangeChoicesButton({ href }: { href: string }) {
   const t = useTexts();
   return (
-    <Button tone="secondary" data-action="change-choices" onClick={() => navigate(choicesHref(id))}>
+    <Button tone="secondary" data-action="change-choices" onClick={() => navigate(href)}>
       {t.chChangeChoices}
     </Button>
   );
@@ -286,7 +287,7 @@ function ChoicesScreen({ model, write, view }: { model: SheetModel; write: Sheet
   const [full, setFull] = useState<string | null>(null);
   const [sheetFocus, setSheetFocus] = useState<Focus>(null);
   const current: TabKey | null = tab && available.includes(tab) ? tab : (available[0] ?? null);
-  const back = characterHref(character.id);
+  const back = write.routes.sheet();
 
   const titles: Record<TabKey, string> = {
     features: t.chTabFeatures,

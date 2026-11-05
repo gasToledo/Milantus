@@ -4,6 +4,7 @@ import { scheduleSave } from '../api/characterSave';
 import type { StoredCharacter, StoredNpc } from '../api/client';
 import { queryKeys } from '../api/queries';
 import { actOn, migrateCharacter, type Catalog, type CharacterJson, type SheetAction, type SheetOutcome } from '../engine';
+import { ownSheetRoutes, type SheetRoutes } from '../router';
 import type { ToastTone } from '../ui/primitives';
 
 /** Un aviso de la ficha; con [undo], lleva «Deshacer». */
@@ -26,6 +27,8 @@ export interface SheetWriter {
   /** Vuelve a [before] y lo guarda: el «Deshacer» de un descanso. */
   restore(before: CharacterJson): void;
   notify: SheetNotify;
+  /** A dónde llevan las pantallas de la ficha (la propia o la del PNJ). */
+  routes: SheetRoutes;
 }
 
 type Doc = CharacterJson & { id: string };
@@ -34,6 +37,7 @@ type Doc = CharacterJson & { id: string };
  *  guarda la nueva cambia; el motor y los avisos no. */
 function buildWriter({
   kind,
+  routes,
   catalog,
   notify,
   failedMessage,
@@ -41,6 +45,7 @@ function buildWriter({
   put,
 }: {
   kind: SheetWriter['kind'];
+  routes: SheetRoutes;
   catalog: Catalog;
   notify: SheetNotify;
   failedMessage: string;
@@ -49,6 +54,7 @@ function buildWriter({
 }): SheetWriter {
   return {
     kind,
+    routes,
     act(action) {
       const raw = read();
       if (!raw) return null;
@@ -88,6 +94,7 @@ export function useSheetWriter(
     if (!catalog) return null;
     return buildWriter({
       kind: 'own',
+      routes: ownSheetRoutes(id),
       catalog,
       notify,
       failedMessage,
@@ -121,6 +128,9 @@ export function useNpcSheetWriter(
     if (!catalog) return null;
     return buildWriter({
       kind: 'npc',
+      // Provisorio: la parte 2 de 6f3 le pone las rutas del PNJ; mientras tanto
+      // esos enlaces siguen ocultos para `npc`.
+      routes: ownSheetRoutes(npcId),
       catalog,
       notify,
       failedMessage,

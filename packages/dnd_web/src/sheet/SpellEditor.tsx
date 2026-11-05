@@ -4,7 +4,7 @@ import { nameOf } from '../api/catalog';
 import { codexEntries } from '../codex/entries';
 import { spellEditView, vocabularyLabel, type CharacterJson, type SpellEditView } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
-import { characterHref, Link, navigate } from '../router';
+import { Link, navigate } from '../router';
 import { AppDialog } from '../ui/AppDialog';
 import { Button, ButtonLink } from '../ui/Button';
 import { Eyebrow } from '../ui/data';
@@ -50,7 +50,7 @@ function Editor({
 }) {
   const t = useTexts();
   const lang = useLang();
-  const { character, sheet, catalog } = model;
+  const { sheet, catalog } = model;
 
   // Lo guardado al abrir: contra eso se compara para apagar «Guardar» y para
   // decir qué sale y qué entra.
@@ -142,7 +142,7 @@ function Editor({
   const save = () => {
     const r = write.act({ type: 'setClassSpells', classId, cantrips: chosen.cantrips, spells: chosen.spells });
     if (!r) return;
-    navigate(characterHref(character.id, 'combate'));
+    navigate(write.routes.sheet('combate'));
     write.notify(t.seSaved, { undo: () => write.restore(r.before) });
   };
 
@@ -164,7 +164,7 @@ function Editor({
     <div className="flex min-h-full flex-col gap-4" data-page="spell-edit">
       <header className="flex flex-col gap-1">
         <Link
-          href={characterHref(character.id, 'combate')}
+          href={write.routes.sheet('combate')}
           className="inline-flex min-h-9 items-center gap-1.5 self-start text-[13px] text-gold no-underline hover:text-on-surface"
         >
           <ArrowLeft size={14} aria-hidden="true" />
@@ -270,7 +270,7 @@ function Editor({
       </div>
 
       <WizardFooter message={message}>
-        <ButtonLink tone="secondary" href={characterHref(character.id, 'combate')} internal className="flex-1 sm:flex-none">
+        <ButtonLink tone="secondary" href={write.routes.sheet('combate')} internal className="flex-1 sm:flex-none">
           {t.cancel}
         </ButtonLink>
         <Button className="flex-[2] sm:flex-none" disabled={unchanged} onClick={save}>

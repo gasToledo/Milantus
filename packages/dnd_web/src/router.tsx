@@ -369,6 +369,26 @@ export const choicesHref = (id: string, tab?: string): string =>
 export const wildShapeFormsHref = (id: string): string =>
   `${import.meta.env.BASE_URL}personajes/${encodeURIComponent(id)}/formas`;
 
+/** A dónde llevan las pantallas de una ficha que se escribe: la propia y la de un
+ *  PNJ son las mismas pantallas con otras URL. */
+export interface SheetRoutes {
+  sheet(tab?: SheetTab): string;
+  levelUp(): string;
+  spells(classId: string): string;
+  plans(): string;
+  choices(tab?: string): string;
+  forms(): string;
+}
+
+export const ownSheetRoutes = (id: string): SheetRoutes => ({
+  sheet: (tab) => characterHref(id, tab),
+  levelUp: () => levelUpHref(id),
+  spells: (classId) => spellEditHref(id, classId),
+  plans: () => magicPlansHref(id),
+  choices: (tab) => choicesHref(id, tab),
+  forms: () => wildShapeFormsHref(id),
+});
+
 export const rebuildHref = (id: string): string =>
   `${import.meta.env.BASE_URL}personajes/${encodeURIComponent(id)}/rehacer`;
 export const portraitHref = (id: string): string =>

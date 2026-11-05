@@ -13,7 +13,7 @@ import {
 import { codexEntries, type CodexDetail } from '../codex/entries';
 import { useLang, useTexts } from '../i18n/context';
 import type { Lang, Texts } from '../i18n/texts';
-import { characterHref, navigate } from '../router';
+import { navigate } from '../router';
 import { withoutForm } from '../sheet/compute';
 import type { SheetModel } from '../sheet/model';
 import { ABILITIES } from '../sheet/vocabulary';
@@ -158,7 +158,7 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
   const confirm = () => {
     const r = write.act({ type: 'levelUp', draft: fullDraft });
     if (!r) return;
-    navigate(characterHref(character.id));
+    navigate(write.routes.sheet());
     write.notify(t.luDone(character.name, view.newLevel), { tone: 'success', undo: () => write.restore(r.before) });
   };
 
@@ -452,7 +452,7 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
 
       <WizardFooter message={pending ?? (current === 'revision' ? t.luConfirmHint : null)}>
         {index === 0 ? (
-          <ButtonLink tone="secondary" href={characterHref(character.id)} internal className="flex-1 sm:flex-none">
+          <ButtonLink tone="secondary" href={write.routes.sheet()} internal className="flex-1 sm:flex-none">
             {t.cancel}
           </ButtonLink>
         ) : (

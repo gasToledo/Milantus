@@ -10,7 +10,7 @@ import {
   type MagicPlansView,
 } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
-import { characterHref, Link } from '../router';
+import { Link } from '../router';
 import { AppDialog } from '../ui/AppDialog';
 import { Button, ButtonLink } from '../ui/Button';
 import { cx } from '../ui/cx';
@@ -44,7 +44,7 @@ type TabKey = 'plans' | 'replicas';
 function Plans({ model, write, view }: { model: SheetModel; write: SheetWriter; view: MagicPlansView }) {
   const t = useTexts();
   const lang = useLang();
-  const { character, catalog } = model;
+  const { catalog } = model;
 
   const [tab, setTab] = useState<TabKey>('plans');
   // Lo último que se tocó, para el panel de la derecha.
@@ -141,7 +141,7 @@ function Plans({ model, write, view }: { model: SheetModel; write: SheetWriter; 
 
   const focused = focus ? details.find((e) => e.id === focus) : undefined;
   const sheetEntry = sheetId ? details.find((e) => e.id === sheetId) : undefined;
-  const back = characterHref(character.id, 'inventario');
+  const back = write.routes.sheet('inventario');
 
   /** En un teléfono no hay panel al costado: esto deja leer el detalle. */
   const info = (id: string, name: string) => (

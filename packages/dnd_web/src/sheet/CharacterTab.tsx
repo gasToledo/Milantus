@@ -82,7 +82,7 @@ export function CharacterTab({ model }: { model: SheetModel }) {
           title={t.identityHeading}
           icon={IdCard}
           collapsible
-          trailing={choices?.replaceable ? <ChangeChoicesButton id={character.id} /> : undefined}
+          trailing={choices?.replaceable ? <ChangeChoicesButton href={model.write!.routes.choices()} /> : undefined}
         >
           <dl className="divide-y divide-hairline border-t border-hairline">
             {identity.map((row) => (
