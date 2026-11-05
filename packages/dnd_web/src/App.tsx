@@ -10,6 +10,7 @@ import { CreationPage } from './creation/CreationWizard';
 import { RebuildPage } from './creation/RebuildPage';
 import { RosterFooter, RosterPanel } from './dashboard/RosterPanel';
 import { DmPanel } from './dm/DmPanel';
+import { NpcCreationPage } from './dm/npcs/NpcCreationPage';
 import { useRoute } from './router';
 import { DmPage } from './dm/DmPage';
 import { CodexPage } from './codex/CodexPage';
@@ -160,6 +161,8 @@ function Routes({ account }: { account: Account }) {
       return <CharacterPage id={route.id} tab={null} choices />;
     case 'creation':
       return <CreationPage account={account} />;
+    case 'npcCreation':
+      return <NpcCreationPage account={account} />;
     case 'rebuild':
       return <RebuildPage id={route.id} account={account} />;
     case 'codex':

@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { accentOf, nameOf } from '../api/catalog';
 import { dropPending } from '../api/characterSave';
-import { createCharacter, saveCharacter } from '../api/client';
+import { createCharacter, createNpc, linkCampaignNpc, saveCharacter } from '../api/client';
 import { queryKeys, useSheetCatalog } from '../api/queries';
 import { codexEntries, type CodexEntry } from '../codex/entries';
 import { RosterFooter } from '../dashboard/RosterPanel';
@@ -32,6 +32,7 @@ import {
   creationConfirm,
   creationView,
   formatAmount,
+  newNpc,
   vocabularyLabel,
   type AbilityId,
   type Catalog,
@@ -47,7 +48,7 @@ import {
 } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import type { Lang, Texts } from '../i18n/texts';
-import { characterHref, navigate, rosterHref } from '../router';
+import { characterHref, dmCampaignHref, dmNpcsHref, navigate, rosterHref } from '../router';
 import { signed } from '../sheet/format';
 import { coinLabels } from '../sheet/ItemCatalog';
 import { ABILITIES } from '../sheet/vocabulary';
@@ -120,24 +121,40 @@ const CLASS_ICONS: Record<string, LucideIcon> = {
 
 /** La página del creador: el marco de siempre y salir pasa por la misma
  *  confirmación que en Flutter, porque hay un borrador que se puede perder. */
-export function CreationPage({ account, replacing }: { account: Account; replacing?: CharacterJson & { id: string } }) {
+export function CreationPage({
+  account,
+  replacing,
+  npc,
+}: {
+  account: Account;
+  replacing?: CharacterJson & { id: string };
+  /** Crea la ficha de un PNJ (Modo DM) en vez de un personaje del jugador. */
+  npc?: { name: string; campaignId?: string };
+}) {
   const t = useTexts();
   const lang = useLang();
   const catalog = useSheetCatalog(lang);
   const [touched, setTouched] = useState(false);
   const [confirming, setConfirming] = useState(false);
+  const leaveHref = npc ? (npc.campaignId ? dmCampaignHref(npc.campaignId, 'pnj') : dmNpcsHref()) : rosterHref();
   const exit = () => {
     if (touched) setConfirming(true);
-    else navigate(rosterHref());
+    else navigate(leaveHref);
   };
   const failed = catalog.queries.filter((q) => q.isError);
   return (
     <Shell
-      panel={<SidebarBack href={rosterHref()} label={t.backToCharacters} onClick={(e) => { e.preventDefault(); exit(); }} />}
-      footer={<RosterFooter account={account} />}
+      panel={
+        <SidebarBack
+          href={leaveHref}
+          label={npc ? (npc.campaignId ? t.dmSectionNpcs : t.dmNpcLibrary) : t.backToCharacters}
+          onClick={(e) => { e.preventDefault(); exit(); }}
+        />
+      }
+      footer={<RosterFooter account={account} dm={npc !== undefined} />}
     >
       {catalog.data ? (
-        <CreationWizard catalog={catalog.data} replacing={replacing} onExit={exit} onTouched={() => setTouched(true)} />
+        <CreationWizard catalog={catalog.data} replacing={replacing} npc={npc} onExit={exit} onTouched={() => setTouched(true)} />
       ) : failed.length > 0 ? (
         <AppErrorView as="h1" title={t.crLoadError} message={t.errorBody} onRetry={() => failed.forEach((q) => q.refetch())} />
       ) : (
@@ -146,11 +163,11 @@ export function CreationPage({ account, replacing }: { account: Account; replaci
       <AppDialog
         open={confirming}
         onOpenChange={setConfirming}
-        title={t.crDiscardTitle}
+        title={npc ? t.crDiscardNpcTitle : t.crDiscardTitle}
         description={t.crDiscardBody}
         actions={[
           { label: t.crKeepCreating },
-          { label: t.crDiscard, primary: true, tone: 'crimson', onSelect: () => navigate(rosterHref()) },
+          { label: t.crDiscard, primary: true, tone: 'crimson', onSelect: () => navigate(leaveHref) },
         ]}
       />
     </Shell>
@@ -167,10 +184,12 @@ export function CreationPage({ account, replacing }: { account: Account; replaci
 function CreationWizard({
   catalog,
   replacing,
+  npc,
   onExit,
   onTouched,
 }: {
   catalog: Catalog;
+  npc?: { name: string; campaignId?: string };
   /** El personaje que se rehace: el borrador arranca con lo que no son reglas
    *  (nombre, alineamiento, personalidad) y al terminar se guarda sobre él. */
   replacing?: CharacterJson & { id: string };
@@ -180,6 +199,7 @@ function CreationWizard({
   const t = useTexts();
   const lang = useLang();
   const [draft, setDraft] = useState<CreationDraftJson>(() => {
+    if (npc) return { name: npc.name };
     if (!replacing) return {};
     const old = replacing as unknown as { name: string; alignment?: string | null; personalityTrait?: string };
     return { name: old.name, alignment: old.alignment ?? null, personalityTrait: old.personalityTrait ?? '' };
@@ -195,12 +215,32 @@ function CreationWizard({
   // El mismo personaje en cada reintento: otro id, si la primera vez sí llegó y
   // lo que se perdió fue la respuesta, daría dos.
   const toCreate = useRef<(CharacterJson & { id: string }) | null>(null);
+  // El mismo PNJ en cada reintento: crear y vincular son dos pedidos, y si falla el
+  // segundo, reintentar no tiene que crear otro con la misma ficha.
+  // ponytail: `act()` no limpia esto; si falló solo el vínculo y el DM cambia algo
+  // antes de reintentar, ese cambio no se aplica. Salida: guardar la ficha en ese
+  // reintento si alguna vez pasa.
+  const createdNpc = useRef<string | null>(null);
 
   const create = async () => {
     setCreating(true);
     setFailed(false);
     try {
       toCreate.current ??= creationConfirm(catalog, view.draft, t.crUnnamed, replacing);
+      if (npc) {
+        const sheet = toCreate.current;
+        // El nombre que vale es el de la ficha: el DM pudo retocarlo en Detalles.
+        const name = (sheet as unknown as { name: string }).name;
+        const npcId =
+          createdNpc.current ?? (await createNpc(newNpc(catalog, name, 'character', null), sheet as unknown as JsonObject));
+        createdNpc.current = npcId;
+        if (npc.campaignId) await linkCampaignNpc(npc.campaignId, npcId);
+        // No se invalida `roster`: la ficha de un PNJ no está en esa lista.
+        await client.invalidateQueries({ queryKey: queryKeys.npcs });
+        if (npc.campaignId) await client.invalidateQueries({ queryKey: queryKeys.campaignNpcs(npc.campaignId) });
+        navigate(dmNpcsHref(npcId));
+        return;
+      }
       let id = toCreate.current.id;
       if (replacing) {
         // Lo que había pendiente es de la ficha vieja: no puede llegar después
@@ -257,8 +297,8 @@ function CreationWizard({
     pending.length === 0
       ? index === last
         ? failed
-          ? t.crCreateFailed
-          : t.crCreateHint
+          ? npc ? t.crCreateNpcFailed : t.crCreateFailed
+          : npc ? t.crCreateNpcHint : t.crCreateHint
         : null
       : pending[0]!.kind === 'assignScores'
         ? t.crMissingScore(t.abilities[ABILITIES.find((a) => view.draft.assignedScores?.[a] === undefined)!])
@@ -270,7 +310,7 @@ function CreationWizard({
     <div className="flex min-h-full flex-col gap-4" data-page="creation">
       <header className="flex flex-col gap-3">
         <h1 className="font-display text-[24px] text-on-surface">
-          {replacing ? t.rebuildTitle((replacing as unknown as { name: string }).name) : t.rosterCreate}
+          {replacing ? t.rebuildTitle((replacing as unknown as { name: string }).name) : npc ? t.wizardCreateNpc : t.rosterCreate}
         </h1>
         <StepRail
           steps={steps.map((id) => ({ id, label: t.crSteps[id] }))}
@@ -334,7 +374,7 @@ function CreationWizard({
         )}
         {index === last ? (
           <Button className="flex-[2] sm:flex-none" disabled={view.pending.length > 0 || creating} onClick={() => void create()}>
-            {failed ? t.retry : replacing ? t.wizardRebuild : t.rosterCreate}
+            {failed ? t.retry : replacing ? t.wizardRebuild : npc ? t.wizardCreateNpc : t.rosterCreate}
           </Button>
         ) : (
           <Button className="flex-[2] sm:flex-none" disabled={pending.length > 0} onClick={() => go(steps[index + 1]!)}>

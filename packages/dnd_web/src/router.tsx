@@ -109,6 +109,8 @@ export type Route =
   | { name: 'choices'; id: string }
   // El creador de personajes, y el mismo para rehacer uno desde nivel 1.
   | { name: 'creation' }
+  // El mismo creador, para la ficha de un PNJ (`?nombre=` y `?campana=`).
+  | { name: 'npcCreation' }
   | { name: 'rebuild'; id: string }
   | { name: 'unknown' };
 
@@ -137,6 +139,8 @@ export function matchRoute(pathname: string): Route {
         return { name: 'unknown' };
       }
     }
+    // Antes de todo lo que lee `/dm/pnj/:pnj`: si no, `nuevo` se tomaría por un id.
+    if (id === 'pnj' && tab === 'nuevo' && rest.length === 0) return { name: 'npcCreation' };
     // `/dm/pnj/:pnj/ficha[/:pestaña]`.
     if (id === 'pnj' && tab !== undefined && rest[0] === 'ficha' && rest.length <= 2) {
       const sheetTab = sheetTabIn(NPC_SHEET_TABS, rest[1]);
@@ -302,6 +306,14 @@ export const dmBestiaryHref = (entryId?: string): string =>
 /** La Biblioteca de PNJ del Modo DM, o la ficha de un PNJ. */
 export const dmNpcsHref = (npcId?: string): string =>
   `${import.meta.env.BASE_URL}dm/pnj` + (npcId ? `/${encodeURIComponent(npcId)}` : '');
+
+/** El creador de personajes para un PNJ con ficha. Los datos viajan en la URL
+ *  para que recargar no los pierda (mismo patrón que `?capitulo=`). */
+export const dmNpcCreationHref = (name: string, campaignId?: string): string => {
+  const params = new URLSearchParams({ nombre: name });
+  if (campaignId) params.set('campana', campaignId);
+  return `${dmNpcsHref()}/nuevo?${params}`;
+};
 
 /** El Homebrew del Modo DM: la portada, una categoría o una entrada abierta. */
 export const dmHomebrewHref = (category?: HomebrewCategory, entryId?: string): string =>

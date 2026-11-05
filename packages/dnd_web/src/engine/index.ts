@@ -762,8 +762,9 @@ export function npcViews(entries: readonly NpcEntryJson[], catalog: Catalog): Np
 }
 
 /** El documento de un PNJ nuevo (`Npc.draft`): lo arma el motor, con el bloque
- *  copiado de la criatura. `kind` es `none` o `block`; los de ficha son de 6f. */
-export function newNpc(catalog: Catalog, name: string, kind: 'none' | 'block', baseCreatureId: string | null): JsonObject {
+ *  copiado de la criatura. `kind` es `none`, `block` o `character` (con ficha: el
+ *  documento solo la marca, la ficha viaja aparte). */
+export function newNpc(catalog: Catalog, name: string, kind: 'none' | 'block' | 'character', baseCreatureId: string | null): JsonObject {
   return JSON.parse(engine().newNpc(catalogJson(catalog), name, kind, baseCreatureId ?? '')) as JsonObject;
 }
 

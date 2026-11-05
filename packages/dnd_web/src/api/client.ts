@@ -477,13 +477,14 @@ export async function unlinkCampaignNpc(campaignId: string, npcId: string): Prom
   await remove(campaignNpcPath(campaignId, npcId));
 }
 
-/** Crea un PNJ y devuelve el id que le asignó el servidor. */
-export async function createNpc(npc: JsonObject): Promise<string> {
+/** Crea un PNJ y devuelve el id que le asignó el servidor. Con [character] crea
+ *  también su ficha, en la misma transacción. */
+export async function createNpc(npc: JsonObject, character?: JsonObject): Promise<string> {
   const path = '/api/npcs';
   const response = await fetch(path, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ npc }),
+    body: JSON.stringify({ npc, ...(character ? { character } : {}) }),
   });
   if (!response.ok) throw new ApiError(response.status, path);
   return ((await response.json()) as { npc: { id: string } }).npc.id;
