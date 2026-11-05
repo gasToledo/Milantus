@@ -1177,6 +1177,13 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
+- Las armaduras reducen la velocidad en 10 pies cuando no se alcanza su
+  requisito de Fuerza; la Armadura Arcana del Armero conserva su excepción.
+  El Dardo admite Fuerza o Destreza para ataque y daño por Sutileza.
+- Los conjuros muestran sus materiales, valores mínimos y consumo en español
+  e inglés. Se corrigen Contrahechizo, Guía, Palabra de Poder: Matar y los
+  componentes de Palabra de Poder: Sanar, y se unifican las marcas de
+  concentración y ritual.
 - Cada nivel suma al menos 1 punto de golpe: el resultado del dado más
   Constitución, con ese piso. Un dado de 1 con Constitución negativa ya no
   baja los PG, y cambiar Constitución sigue corrigiendo los niveles ya

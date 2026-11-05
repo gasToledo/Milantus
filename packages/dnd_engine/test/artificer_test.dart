@@ -233,8 +233,11 @@ void main() {
     });
 
     test('la Armadura Arcana no exige Fuerza', () {
-      final warnings = CharacterValidator(repo).validate(armero(3, 'guardian'));
+      final character = armero(3, 'guardian');
+      final warnings = CharacterValidator(repo).validate(character);
       expect(warnings.map((w) => w.code), isNot(contains('armor_strength')));
+      expect(compiler.compile(character).speed,
+          compiler.compile(armero(3, 'guardian', armor: false)).speed);
     });
   });
 }
