@@ -59,6 +59,25 @@ enum CombatantSide {
       kind == CombatantKind.player ? ally : enemy;
 }
 
+/// Si un combatiente tira con ventaja o desventaja en lo que el DM le tira.
+///
+/// Tiene [none] y no un `null` porque `copyWith` no puede borrar con `null`.
+enum CombatantAdvantage {
+  none,
+  advantage,
+  disadvantage;
+
+  String toJson() => name;
+
+  /// Tolerante: ausente o desconocido es [none], el valor que no marca nada.
+  static CombatantAdvantage fromJson(String? v) {
+    for (final a in CombatantAdvantage.values) {
+      if (a.name == v) return a;
+    }
+    return CombatantAdvantage.none;
+  }
+}
+
 /// Un puesto en el orden de iniciativa.
 ///
 /// Para un jugador, [memberId] es el vínculo (`campaign_members.id`) y no el
@@ -103,6 +122,21 @@ class Combatant {
   /// nada las devuelve solo; el máximo es `Creature.legendaryResistancesPerDay`.
   final int legendaryResistancesSpent;
 
+  /// Marca de ventaja o desventaja del DM sobre este combatiente.
+  ///
+  /// Igual que [tempHp] y [acBonus], sin subir `currentSchemaVersion`: mismo
+  /// criterio que [tags] y [legendaryActionsSpent]. Son notas del DM y nunca
+  /// le llegan al jugador.
+  final CombatantAdvantage advantage;
+
+  /// PG temporales del combatiente. Los de un jugador viven en su ficha, así
+  /// que acá solo se usan en monstruos y PNJ con estadísticas.
+  final int tempHp;
+
+  /// Bono temporal a la CA (un conjuro de escudo, cobertura), que se suma al
+  /// número que imprime el perfil.
+  final int acBonus;
+
   /// Sin [side] explícito, un jugador es aliado y cualquier otro enemigo.
   ///
   /// Dos bandos no se eligen, se pida lo que se pida: un jugador es aliado
@@ -122,6 +156,9 @@ class Combatant {
     this.tags = const [],
     this.legendaryActionsSpent = 0,
     this.legendaryResistancesSpent = 0,
+    this.advantage = CombatantAdvantage.none,
+    this.tempHp = 0,
+    this.acBonus = 0,
     CombatantSide? side,
   }) : side = kind == CombatantKind.player
             ? CombatantSide.ally
@@ -154,6 +191,9 @@ class Combatant {
     String? npcId,
     int? legendaryActionsSpent,
     int? legendaryResistancesSpent,
+    CombatantAdvantage? advantage,
+    int? tempHp,
+    int? acBonus,
   }) =>
       Combatant(
         id: id,
@@ -171,6 +211,9 @@ class Combatant {
             legendaryActionsSpent ?? this.legendaryActionsSpent,
         legendaryResistancesSpent:
             legendaryResistancesSpent ?? this.legendaryResistancesSpent,
+        advantage: advantage ?? this.advantage,
+        tempHp: tempHp ?? this.tempHp,
+        acBonus: acBonus ?? this.acBonus,
       );
 
   Map<String, dynamic> toJson() => {
@@ -189,6 +232,10 @@ class Combatant {
           'legendaryActionsSpent': legendaryActionsSpent,
         if (legendaryResistancesSpent != 0)
           'legendaryResistancesSpent': legendaryResistancesSpent,
+        if (advantage != CombatantAdvantage.none)
+          'advantage': advantage.toJson(),
+        if (tempHp != 0) 'tempHp': tempHp,
+        if (acBonus != 0) 'acBonus': acBonus,
       };
 
   factory Combatant.fromJson(Map<String, dynamic> j) => Combatant(
@@ -214,6 +261,9 @@ class Combatant {
         // a tachar, y rechazar el combate entero por eso sería peor.
         legendaryActionsSpent: j['legendaryActionsSpent'] as int? ?? 0,
         legendaryResistancesSpent: j['legendaryResistancesSpent'] as int? ?? 0,
+        advantage: CombatantAdvantage.fromJson(j['advantage'] as String?),
+        tempHp: j['tempHp'] as int? ?? 0,
+        acBonus: j['acBonus'] as int? ?? 0,
       );
 }
 
@@ -621,6 +671,40 @@ class Encounter {
               c,
         ],
         stage: stage,
+      );
+
+  Encounter _mapCombatant(
+          String combatantId, Combatant Function(Combatant) f) =>
+      Encounter(
+        id: id,
+        round: round,
+        turnIndex: turnIndex,
+        combatants: [
+          for (final c in combatants) c.id == combatantId ? f(c) : c,
+        ],
+        stage: stage,
+      );
+
+  /// Marca ventaja o desventaja de un combatiente ([CombatantAdvantage.none]
+  /// la quita).
+  Encounter withAdvantage(String combatantId, CombatantAdvantage advantage) =>
+      _mapCombatant(combatantId, (c) => c.copyWith(advantage: advantage));
+
+  /// Fija los PG temporales de un combatiente, acotados abajo en 0. No hace
+  /// nada con un jugador (los suyos viven en su ficha) ni con un PNJ sin
+  /// estadísticas.
+  Encounter withTempHp(String combatantId, int value) => _mapCombatant(
+        combatantId,
+        (c) => c.kind == CombatantKind.player || c.isStatless
+            ? c
+            : c.copyWith(tempHp: max(0, value)),
+      );
+
+  /// Fija el bono temporal a la CA, acotado abajo en 0. Vale para cualquier
+  /// combatiente.
+  Encounter withAcBonus(String combatantId, int value) => _mapCombatant(
+        combatantId,
+        (c) => c.copyWith(acBonus: max(0, value)),
       );
 
   /// Cambia el bando de un combatiente, a mitad de combate si hace falta: el

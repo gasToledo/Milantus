@@ -18,7 +18,7 @@ class CombatOps {
   /// Vive suelta porque la aplican dos cosas distintas —el personaje y cada
   /// compañero invocado— y una copia por cada una es una copia que se puede
   /// desincronizar.
-  static ({int hp, int tempHp}) _absorbDamage(int hp, int tempHp, int amount) {
+  static ({int hp, int tempHp}) absorbDamage(int hp, int tempHp, int amount) {
     if (amount <= 0) return (hp: hp, tempHp: tempHp);
     var dmg = amount;
     var temp = tempHp;
@@ -34,7 +34,7 @@ class CombatOps {
   /// (a 0 PG el personaje queda inconsciente y entran las salvaciones de muerte).
   /// La [sheet] dice qué estados activos sobreviven a quedar incapacitado.
   static void applyDamage(CombatState c, int amount, {ComputedSheet? sheet}) {
-    final next = _absorbDamage(c.currentHp, c.tempHp, amount);
+    final next = absorbDamage(c.currentHp, c.tempHp, amount);
     c.currentHp = next.hp;
     c.tempHp = next.tempHp;
     // A 0 PG quedás Inconsciente, que incluye Incapacitado. Va acá y no en
@@ -344,7 +344,7 @@ class CombatOps {
     CompanionInstance i,
     int amount,
   ) {
-    final next = _absorbDamage(i.currentHp, i.tempHp, amount);
+    final next = absorbDamage(i.currentHp, i.tempHp, amount);
     i.currentHp = next.hp;
     i.tempHp = next.tempHp;
     if (i.currentHp > 0) return false;

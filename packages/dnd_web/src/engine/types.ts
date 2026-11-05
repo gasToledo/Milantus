@@ -599,6 +599,14 @@ export interface CombatantJson extends JsonObject {
   currentHp?: number;
   maxHp?: number;
   tags?: string[];
+  /** `advantage` o `disadvantage`; ausente es sin marca. */
+  advantage?: string;
+  /** PG temporales (no los de un jugador: esos viven en su ficha). */
+  tempHp?: number;
+  /** Bono temporal a la CA. */
+  acBonus?: number;
+  legendaryActionsSpent?: number;
+  legendaryResistancesSpent?: number;
 }
 
 /** Lo que el motor deriva del combate abierto (`encounter` de
@@ -613,7 +621,45 @@ export interface EncounterView {
   currentIndex: number;
   standing: { allies: number; alliesUp: number; enemies: number; enemiesUp: number; neutrals: number };
   /** Una por combatiente, en el mismo orden. */
-  rows: { id: string; down: boolean; bloodied: boolean; hp: { current: number; max: number } | null }[];
+  rows: { id: string; down: boolean; bloodied: boolean; hp: { current: number; max: number } | null; temp: number }[];
+}
+
+/** Lo que la planilla del combate y la banda de dificultad muestran, ya
+ *  resuelto (`encounterDetails`). */
+export interface EncounterDetails {
+  /** Una por combatiente, en el mismo orden. */
+  rows: {
+    id: string;
+    legendaryActions: number;
+    legendaryResistances: number;
+    /** Con qué pega un monstruo (o su tipo); `null` si no es un monstruo. */
+    monsterLine: string | null;
+    /** PX que suma a la cuenta; `null` para neutrales y quien no tiene VD. */
+    xp: number | null;
+    /** La CA tal como la imprime el perfil. */
+    ac: string | null;
+    /** La CA con el bono temporal, solo si `ac` empieza con un número. */
+    acTotal: number | null;
+  }[];
+  difficulty: {
+    lowBudget: number;
+    moderateBudget: number;
+    highBudget: number;
+    enemyXp: number;
+    allyXp: number;
+    netXp: number;
+    remainingXp: number;
+    /** `low`, `moderate`, `high`, `extreme` o `null` sin con qué calcular. */
+    tier: string | null;
+    characters: number;
+    lowestLevel: number;
+    highestLevel: number;
+    enemies: number;
+    enemyCharacters: number;
+    uncountedEnemies: number;
+    powerfulCr: number | null;
+    manyCreatures: boolean;
+  };
 }
 
 /** Una fila de rasgo de `CreatureForm`. `uid` lo suma el cliente para dar clave

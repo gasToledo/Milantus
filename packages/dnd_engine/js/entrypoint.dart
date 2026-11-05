@@ -848,23 +848,35 @@ Map<String, dynamic> _npcView(
 /// Sale el encuentro **migrado** (`Encounter.fromJson`, que rechaza una
 /// versión futura), de quién es el turno —que salta a los caídos y no existe
 /// mientras se arma—, cuántos quedan en pie por bando y, por fila, si está
-/// caído, si está maltrecho y sus PG de la fuente que corresponde.
+/// caído, si está maltrecho y sus PG de la fuente que corresponde. Los PG
+/// temporales (`temp`) de un jugador entran en [playersHpJson] (opcional, 0 si
+/// falta) porque viven en su ficha; los del resto salen del encuentro.
 String encounter(String encounterJson, String playersHpJson) {
   final e = Encounter.fromJson(
       (jsonDecode(encounterJson) as Map).cast<String, dynamic>());
   final players = {
     for (final MapEntry(:key, :value)
         in (jsonDecode(playersHpJson) as Map).cast<String, Map>().entries)
-      key: (current: value['current'] as int, max: value['max'] as int),
+      key: (
+        current: value['current'] as int,
+        max: value['max'] as int,
+        temp: value['temp'] as int? ?? 0,
+      ),
   };
   final current = e.current;
   final standing =
       e.standing({for (final p in players.entries) p.key: p.value.current});
   ({int current, int max})? hpOf(Combatant c) => c.kind == CombatantKind.player
-      ? players[c.memberId]
+      ? switch (players[c.memberId]) {
+          final p? => (current: p.current, max: p.max),
+          null => null,
+        }
       : c.maxHp > 0
           ? (current: c.currentHp, max: c.maxHp)
           : null;
+  int tempOf(Combatant c) => c.kind == CombatantKind.player
+      ? players[c.memberId]?.temp ?? 0
+      : c.tempHp;
   return jsonEncode({
     'encounter': e.toJson(),
     'preparing': e.isPreparing,
@@ -888,10 +900,91 @@ String encounter(String encounterJson, String playersHpJson) {
             'bloodied':
                 hp != null && hp.current > 0 && isBloodied(hp.current, hp.max),
             'hp': hp == null ? null : {'current': hp.current, 'max': hp.max},
+            'temp': tempOf(c),
           },
     ],
   });
 }
+
+/// Contador de los ids sin semilla: dart2js da milisegundos y dos ids pedidos
+/// en el mismo milisegundo chocarían.
+int _contadorIds = 0;
+
+Map<String, EncounterNpc> _npcsPorId(String npcEntriesJson) => {
+      for (final raw
+          in (jsonDecode(npcEntriesJson) as List).cast<Map<String, dynamic>>())
+        if (EncounterNpc.fromEntry(raw) case final e) e.npc.id: e,
+    };
+
+/// Una acción sobre el combate de la campaña (`EncounterActions`): entra el
+/// documento (`'null'` si no hay combate abierto) y la acción, y sale el
+/// encuentro listo para `PUT .../encounter`, o `null` si no hay nada que
+/// guardar. Con [seed] las tiradas y los ids son deterministas (`prefijo-n`,
+/// con `n` desde 0 en cada llamada); sirve para la prueba de paridad.
+String encounterAct(
+  String catalogJson,
+  String encounterJson,
+  String actionJson, [
+  int? seed,
+]) {
+  final current = jsonDecode(encounterJson);
+  var n = 0;
+  final result = EncounterActions.apply(
+    current == null
+        ? null
+        : Encounter.fromJson((current as Map).cast<String, dynamic>()),
+    _repoPara(catalogJson),
+    (jsonDecode(actionJson) as Map).cast<String, dynamic>(),
+    newId: seed == null
+        ? (p) => '$p-${DateTime.now().microsecondsSinceEpoch}-${_contadorIds++}'
+        : (p) => '$p-${n++}',
+    random: seed == null ? null : Random(seed),
+  );
+  return jsonEncode(result?.toJson());
+}
+
+/// Lo que la planilla del combate y la banda de dificultad muestran, resuelto
+/// (`encounterDetails`). [membersJson] es `{memberId: {level, armorClass}}`;
+/// [npcEntriesJson], la lista cruda de PNJ de la campaña o de la biblioteca.
+String encounterDetailsJs(
+  String catalogJson,
+  String encounterJson,
+  String membersJson,
+  String npcEntriesJson,
+) =>
+    jsonEncode(
+      encounterDetails(
+        Encounter.fromJson(
+            (jsonDecode(encounterJson) as Map).cast<String, dynamic>()),
+        members: {
+          for (final MapEntry(:key, :value)
+              in (jsonDecode(membersJson) as Map).cast<String, Map>().entries)
+            key: (
+              level: value['level'] as int,
+              armorClass: value['armorClass'] as int,
+            ),
+        },
+        npcs: _npcsPorId(npcEntriesJson),
+        repo: _repoPara(catalogJson),
+      ),
+    );
+
+/// La iniciativa propuesta para cada combatiente (`suggestInitiatives`).
+String encounterInitiatives(
+  String catalogJson,
+  String encounterJson,
+  String npcEntriesJson, [
+  int? seed,
+]) =>
+    jsonEncode(
+      suggestInitiatives(
+        Encounter.fromJson(
+            (jsonDecode(encounterJson) as Map).cast<String, dynamic>()),
+        npcs: _npcsPorId(npcEntriesJson),
+        repo: _repoPara(catalogJson),
+        random: seed == null ? null : Random(seed),
+      ),
+    );
 
 /// El enlace de una escena de música → qué es, su id, el reproductor embebido
 /// y la página de YouTube (`MusicSource.parse`), o `null` si no es un enlace
@@ -1061,6 +1154,9 @@ void main() {
   motor['creatureDraft'] = creatureDraft.toJS;
   motor['creatureFormOptions'] = creatureFormOptions.toJS;
   motor['encounter'] = encounter.toJS;
+  motor['encounterAct'] = encounterAct.toJS;
+  motor['encounterDetails'] = encounterDetailsJs.toJS;
+  motor['encounterInitiatives'] = encounterInitiatives.toJS;
   motor['musicSource'] = musicSource.toJS;
   globalContext['dndEngine'] = motor;
 }

@@ -849,6 +849,124 @@ Future<void> main(List<String> args) async {
       },
     }),
   );
+  // El combate. Los ids son los del puente con semilla (`prefijo-n`, con `n`
+  // desde 0 en cada llamada), así que cada caso lleva su propio contador.
+  final trasgo = repo.creature('goblin-warrior')!;
+  Map<String, dynamic> accionDeCombate(
+    Encounter? actual,
+    Map<String, dynamic> accion,
+  ) {
+    var n = 0;
+    final resultado = EncounterActions.apply(
+      actual,
+      repo,
+      accion,
+      newId: (p) => '$p-${n++}',
+      random: Random(7),
+    );
+    return {
+      'bridge': {
+        'fn': 'encounterAct',
+        'args': [
+          jsonEncode(actual?.toJson()),
+          jsonEncode(accion),
+          7,
+        ],
+        'withoutCharacter': true,
+      },
+      'expected': resultado?.toJson(),
+    };
+  }
+
+  File('${out.path}/puente-combate-accion.json').writeAsStringSync(
+    jsonEncode(
+      accionDeCombate(null, {
+        'type': 'addMonsters',
+        'creatureId': trasgo.id,
+        'count': 2,
+        'rollHp': true,
+      }),
+    ),
+  );
+  final mesa = const Encounter(id: 'e').withMonsters(
+    trasgo,
+    1,
+    newId: () => 'g',
+  );
+  File('${out.path}/puente-combate-golpe.json').writeAsStringSync(
+    jsonEncode(
+      accionDeCombate(mesa.withTempHp('g', 4), {
+        'type': 'adjustHp',
+        'combatantId': 'g',
+        'delta': -6,
+      }),
+    ),
+  );
+  final bloquePnj = Npc(
+    id: 'pnj-bloque',
+    name: 'Bruna',
+    sheetKind: NpcSheetKind.block,
+    block: repo.creature('aboleth'),
+  );
+  final entradasPnj = [
+    {'npc': bloquePnj.toJson(), 'status': 'alive'},
+  ];
+  final mesaMixta = const Encounter(id: 'e', combatants: [
+    Combatant(
+      id: 'p',
+      kind: CombatantKind.player,
+      name: 'Ana',
+      initiative: 0,
+      memberId: 'm1',
+    ),
+  ]).withMonsters(trasgo, 1, newId: () => 'g').withCombatant(
+        Combatant(
+          id: 'b',
+          kind: CombatantKind.npc,
+          name: bloquePnj.name,
+          initiative: 0,
+          npcId: bloquePnj.id,
+          currentHp: 5,
+          maxHp: 5,
+          acBonus: 1,
+        ),
+      );
+  File('${out.path}/puente-combate-detalles.json').writeAsStringSync(
+    jsonEncode({
+      'bridge': {
+        'fn': 'encounterDetails',
+        'args': [
+          jsonEncode(mesaMixta.toJson()),
+          jsonEncode({
+            'm1': {'level': 5, 'armorClass': 17},
+          }),
+          jsonEncode(entradasPnj),
+        ],
+        'withoutCharacter': true,
+      },
+      'expected': encounterDetails(
+        mesaMixta,
+        members: {'m1': (level: 5, armorClass: 17)},
+        npcs: {bloquePnj.id: EncounterNpc.fromEntry(entradasPnj.single)},
+        repo: repo,
+      ),
+    }),
+  );
+  File('${out.path}/puente-combate-iniciativas.json').writeAsStringSync(
+    jsonEncode({
+      'bridge': {
+        'fn': 'encounterInitiatives',
+        'args': [jsonEncode(mesaMixta.toJson()), jsonEncode(entradasPnj), 7],
+        'withoutCharacter': true,
+      },
+      'expected': suggestInitiatives(
+        mesaMixta,
+        npcs: {bloquePnj.id: EncounterNpc.fromEntry(entradasPnj.single)},
+        repo: repo,
+        random: Random(7),
+      ),
+    }),
+  );
   for (final MapEntry(key: nombre, value: (borrador, accion))
       in _creaciones.entries) {
     final draft = CreationDraft.fromJson(repo, borrador)

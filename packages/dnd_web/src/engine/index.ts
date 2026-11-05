@@ -1,4 +1,4 @@
-import type { AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, CreatureForm, CreatureFormOptions, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
+import type { AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, CreatureForm, CreatureFormOptions, EncounterDetails, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
 // Lo genera `npm run build:engine` (o la etapa `engine-js` del Dockerfile) y
 // no se versiona. Es un script de dart2js, no un módulo: al cargarse deja
 // `globalThis.dndEngine`, y de ahí lo toma este archivo.
@@ -40,6 +40,9 @@ interface DartEngine {
   creatureDraft(creatureJson: string, formJson: string): string;
   creatureFormOptions(): string;
   encounter(encounterJson: string, playersHpJson: string): string;
+  encounterAct(catalogJson: string, encounterJson: string, actionJson: string, seed?: number): string;
+  encounterDetails(catalogJson: string, encounterJson: string, membersJson: string, npcEntriesJson: string): string;
+  encounterInitiatives(catalogJson: string, encounterJson: string, npcEntriesJson: string, seed?: number): string;
   musicSource(url: string): string;
   act(characterJson: string, catalogJson: string, actionJson: string, seed?: number): string;
   spellEdit(characterJson: string, catalogJson: string, classId: string): string;
@@ -824,9 +827,54 @@ export function creatureFormOptions(): CreatureFormOptions {
  *  actuales de su ficha y máximo de `computeSheet`): el encuentro no los lleva. */
 export function encounterView(
   encounter: JsonObject,
-  playersHp: Record<string, { current: number; max: number }>,
+  playersHp: Record<string, { current: number; max: number; temp?: number }>,
 ): EncounterView {
   return JSON.parse(engine().encounter(JSON.stringify(encounter), JSON.stringify(playersHp))) as EncounterView;
+}
+
+export type EncounterAction =
+  | { type: 'open' }
+  | { type: 'addPlayer'; memberId: string; name: string; initiative: number }
+  | { type: 'addMonsters'; creatureId: string; count: number; rollHp?: boolean; side?: 'ally' | 'enemy' | 'neutral' }
+  | { type: 'addNpc'; entry: NpcEntryJson; initiative: number; side?: 'ally' | 'enemy' | 'neutral'; revive?: boolean }
+  | { type: 'setSide'; combatantId: string; side: 'ally' | 'enemy' | 'neutral' }
+  | { type: 'convertToNpc'; combatantId: string; name: string; npcId: string }
+  | { type: 'start'; initiatives: Record<string, number> }
+  | { type: 'next' }
+  | { type: 'adjustHp'; combatantId: string; delta: number }
+  | { type: 'setTags'; combatantId: string; tags: string[] }
+  | { type: 'setLegendary'; combatantId: string; actions?: number; resistances?: number }
+  | { type: 'setInitiative'; combatantId: string; initiative: number }
+  | { type: 'remove'; combatantId: string }
+  | { type: 'setAdvantage'; combatantId: string; advantage: 'advantage' | 'disadvantage' | null }
+  | { type: 'setTempHp'; combatantId: string; value: number }
+  | { type: 'setAcBonus'; combatantId: string; value: number };
+
+/** Una acción sobre el combate de la campaña con el motor (`EncounterActions`):
+ *  devuelve el encuentro para `PUT .../encounter`, o `null` si no hay nada que
+ *  guardar. Sin combate abierto, [encounter] es `null`. Una acción desconocida
+ *  o una criatura inexistente lanzan. */
+export function encounterAct(catalog: Catalog, encounter: JsonObject | null, action: EncounterAction): JsonObject | null {
+  return JSON.parse(engine().encounterAct(catalogJson(catalog), JSON.stringify(encounter), JSON.stringify(action))) as JsonObject | null;
+}
+
+/** La planilla y la dificultad del combate, resueltas (`encounterDetails`).
+ *  [members] es `memberId` → nivel y CA de la ficha real del jugador. */
+export function encounterDetails(
+  catalog: Catalog,
+  encounter: JsonObject,
+  members: Record<string, { level: number; armorClass: number }>,
+  npcEntries: readonly NpcEntryJson[],
+): EncounterDetails {
+  return JSON.parse(
+    engine().encounterDetails(catalogJson(catalog), JSON.stringify(encounter), JSON.stringify(members), JSON.stringify(npcEntries)),
+  ) as EncounterDetails;
+}
+
+/** La iniciativa propuesta por combatiente (`combatId` → tirada); los jugadores
+ *  no tienen entrada. */
+export function encounterInitiatives(catalog: Catalog, encounter: JsonObject, npcEntries: readonly NpcEntryJson[]): Record<string, number> {
+  return JSON.parse(engine().encounterInitiatives(catalogJson(catalog), JSON.stringify(encounter), JSON.stringify(npcEntries))) as Record<string, number>;
 }
 
 /** Un enlace de YouTube reconocido por el motor (`MusicSource`). */
