@@ -61,9 +61,10 @@ export function SheetHeader({
           <div className="flex flex-wrap items-baseline gap-x-3.5 gap-y-1">
             <h1 className="font-display text-[28px] leading-[1.1] break-words text-on-surface">
               {character.name}
-              {/* Solo en la ficha propia: sin `write` (la de otra cuenta, un
-                  PNJ) no hay ni el control. */}
-              {model.write && (
+              {/* Solo en la ficha propia: sin `write` (la de otra cuenta) no hay ni
+                  el control, y el nombre de un PNJ se cambia en su pantalla, que
+                  lo escribe también en la ficha. */}
+              {model.write?.kind === 'own' && (
                 <Tooltip content={t.renameTitle}>
                   <button
                     type="button"
@@ -89,7 +90,7 @@ export function SheetHeader({
           </ul>
         </div>
       </header>
-      {renaming && model.write && (
+      {renaming && model.write?.kind === 'own' && (
         <RenameDialog
           current={character.name}
           onSubmit={async (name) => void model.write?.act({ type: 'rename', name })}

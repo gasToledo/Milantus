@@ -240,7 +240,7 @@ repiten acá.
   notas y el reparto de objetos y desde 6d las escenas de música (bloques de
   6b, 6c y 6d, abajo); los PNJ y el combate **siguen en Flutter** hasta 6e a 6g
   (desde 6e1 los vínculos de un PNJ con sus campañas ya se escriben, desde 6e2
-  se crea y se borra un PNJ sin ficha de personaje, desde 6f1 se crea uno con ficha y desde 6e3 se escribe su texto
+  se crea y se borra un PNJ sin ficha de personaje, desde 6f1 se crea uno con ficha, desde 6f2 se escribe su ficha y desde 6e3 se escribe su texto
   desde 6e4 su bloque y desde 6e5 su retrato),
   y esas secciones se leen salvo eso. Se porta por
   secciones, una por PR; hoy existen la **Mesa**, **Capítulos**, el **Cuaderno**,
@@ -337,8 +337,8 @@ repiten acá.
   su ficha. La tarjeta de la ficha compilada lleva a la **ficha completa del
   PNJ** (`NpcSheetView`; Flutter abre `SheetScreen` en `npcMode`): la misma
   `SheetTabs` de un jugador con Personaje, Combate e Inventario, sin Campaña ni
-  Diario porque en un PNJ son su trasfondo y sus notas, y de solo lectura (en
-  Flutter se edita). Sale del mismo `GET /api/npcs/:id`. Un PNJ ajeno y uno
+  Diario porque en un PNJ son su trasfondo y sus notas, y escribible desde 6f2
+  (PG, usos, descansos, inventario; ver abajo). Sale del mismo `GET /api/npcs/:id`. Un PNJ ajeno y uno
   inexistente dan la misma pantalla «No se encontró el PNJ» —también en su
   ficha, igual que un PNJ sin ficha—: el servidor los responde igual (404). Importar y
   exportar siguen en Flutter (el estado por campaña se escribe desde 6e1; crear
@@ -744,6 +744,21 @@ frontera sigue donde estaba: **el DM no escribe la ficha de otra cuenta**.
   (`_checkEventsSoon` de Flutter): decisión tomada, no un olvido.
 - Queda en Flutter, hasta 6e a 6g: PNJ, ficha de PNJ y combate.
 
+**Paso 6f2: escribir la ficha de un PNJ** *(existe)*. Toca solo `dnd_web`. La
+ficha completa de un PNJ (`NpcSheetView`) deja de ser de solo lectura: PG,
+usos, descansos, inventario y demás pasan por el motor y se guardan por la
+cola de la ficha propia (`characterSave.ts`, `PUT /api/characters/:id`), con
+`useNpcSheetWriter`, que comparte con `useSheetWriter` el `buildWriter`. El
+`SheetWriter` lleva `kind` (`own` o `npc`): lo que conecta con otra cuenta o
+lleva a una pantalla de la ficha propia solo aparece con `own`. Arriba, una
+barra con «volver» y el estado de guardado (`SaveStatusBadge`); al salir se
+guarda primero y recién después se relee la biblioteca y las campañas. Borrar y
+renombrar el PNJ descartan antes lo pendiente de su ficha (`dropPending`): el
+`upsert` del servidor inserta sin `kind` y un guardado tardío la recrearía fuera
+del PNJ. Sin renombrar desde la ficha (se hace en la pantalla del PNJ), sin
+compartir ni regalos. Hasta 6f3 quedan afuera editar conjuros, planos,
+elecciones y anotar formas.
+
 **Paso 6f1: crear un PNJ con ficha** *(existe)*. Toca solo `dnd_web`: el motor, el
 servidor y Flutter no cambian (`POST /api/npcs` ya aceptaba `{ npc, character }` y
 los creaba en una transacción). La tercera opción de «Nuevo PNJ» deja de estar
@@ -917,7 +932,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    campañas y la Mesa *(existe)*; 6c, Capítulos y Cuaderno *(existe)*; 6d, la música *(existe)*; 6e, los PNJ, en cinco: 6e1, los vínculos con las campañas *(existe)*; 6e2,
    alta y borrado *(existe)*; 6e3, el texto de la ficha *(existe)*; 6e4, el editor del bloque *(existe)*; 6e5,
    retrato y mostrar a la mesa *(existe)*; 6f, la ficha de PNJ, en tres: 6f1,
-   crearla *(existe)*; 6f2, escribirla; 6f3, sus pantallas de edición (subir de
+   crearla *(existe)*; 6f2, escribirla *(existe)*; 6f3, sus pantallas de edición (subir de
    nivel, elecciones, conjuros, planos, formas e imprimir); 6g, el combate. Importar y exportar PNJ sigue en el paso 7. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de
    otra cuenta» es del servidor y vale igual para el cliente nuevo. Entra acá

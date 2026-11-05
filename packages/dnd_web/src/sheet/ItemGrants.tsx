@@ -32,7 +32,9 @@ export function ItemGrants({ model }: { model: SheetModel }) {
   const t = useTexts();
   const client = useQueryClient();
   const { write, catalog, character } = model;
-  const grants = useItemGrants(character.id, write !== undefined);
+  // Los regalos del DM son de la ficha propia: un PNJ no los recibe.
+  const own = write?.kind === 'own';
+  const grants = useItemGrants(character.id, own);
   const [busy, setBusy] = useState<string | null>(null);
   const [waiting, setWaiting] = useState<Waiting | null>(null);
 
@@ -64,7 +66,7 @@ export function ItemGrants({ model }: { model: SheetModel }) {
     void finish(write, waiting.grant, waiting.itemId, waiting.base);
   }, [waiting, catalog, write]);
 
-  if (!write || !grants.data || grants.data.length === 0) return null;
+  if (!own || !write || !grants.data || grants.data.length === 0) return null;
 
   const accept = async (grant: ItemGrant) => {
     setBusy(grant.id);

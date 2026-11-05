@@ -490,8 +490,9 @@ function SpellsCard({ model }: { model: SheetModel }) {
     else concentrate(spell);
   };
 
+  // El editor de conjuros es de la ficha propia hasta 6f3.
   const editButton = (b: SpellcastingBlock) =>
-    write && (
+    write?.kind === 'own' && (
       <ButtonLink tone="primary" internal data-action="edit-spells" href={spellEditHref(character.id, b.classId)}>
         {b.spellcasting.preparation === 'prepared' ? t.seActionPrepare : t.seActionEdit}
       </ButtonLink>

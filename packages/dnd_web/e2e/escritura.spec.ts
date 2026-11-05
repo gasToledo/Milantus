@@ -1046,3 +1046,29 @@ test('Bloque de un PNJ: guarda lo que da el motor y conserva lo que no se edita'
 
   await request.delete(`/api/npcs/${npc.id}`, comoDm);
 });
+
+test('Ficha de un PNJ: los PG guardan lo que da el motor en su ficha', async ({ page, request }) => {
+  const comoDm = { headers: { cookie: `dnd_session=${TOKEN_ESCRITURA}` } };
+  const creado = await request.post('/api/npcs', {
+    ...comoDm,
+    data: { npc: { id: 'nuevo', name: 'Bruna con ficha', sheetKind: 'character' }, character: { ...(await ilse(request)), name: 'Bruna con ficha' } },
+  });
+  const { npc, character } = (await creado.json()) as { npc: { id: string; characterId: string }; character: CharacterJson };
+
+  await page.goto(`/v2/dm/pnj/${npc.id}/ficha/combate`);
+  const accion = { type: 'damage', amount: 5 } as const;
+  const enviado = await proximoGuardado(
+    page,
+    async () => {
+      await page.getByLabel('Cantidad').fill(String(accion.amount));
+      await page.locator('[data-card="hit-points"]').getByRole('button', { name: 'Daño' }).click();
+    },
+    npc.characterId,
+  );
+  expect(enviado).toEqual(segunMotor(character, accion));
+
+  // La frontera: lo que lleva a una pantalla de la ficha propia no aparece.
+  await expect(page.locator('[data-action="change-choices"], [data-action="edit-spells"]')).toHaveCount(0);
+
+  await request.delete(`/api/npcs/${npc.id}`, comoDm);
+});

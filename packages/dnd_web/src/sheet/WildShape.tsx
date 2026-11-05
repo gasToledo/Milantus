@@ -48,6 +48,9 @@ export function WildShapeTile({ model }: { model: SheetModel }) {
   const max = resource?.max ?? 0;
   const left = resource ? resourceLeft(model, resource) : 0;
   const noForms = slot.chosen.length === 0;
+  // Anotar formas es una pantalla de la ficha propia (6f3 la trae al PNJ): sin
+  // formas y sin forma activa no hay nada que mostrar ni adónde llevar.
+  if (write?.kind === 'npc' && noForms && !form) return null;
   const noUses = left === 0;
 
   const meta = form ? t.wsUses(left, max) : t.wsUsesForms(left, max, slot.chosen.length, slot.count);
@@ -180,7 +183,8 @@ function WildShapeDialog({ model, write, onClose }: { model: SheetModel; write: 
       description={t.wsUses(left, max)}
       width={860}
       actions={[
-        { label: t.wsActionAdd, onSelect: () => navigate(wildShapeFormsHref(character.id)) },
+        // Anotar formas es de la ficha propia hasta 6f3.
+        ...(write.kind === 'own' ? [{ label: t.wsActionAdd, onSelect: () => navigate(wildShapeFormsHref(character.id)) }] : []),
         { label: t.cancel },
         {
           label: left > 0 ? t.wsActionGo : t.wsActionNoUses,
