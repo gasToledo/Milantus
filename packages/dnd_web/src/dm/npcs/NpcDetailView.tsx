@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Camera, EllipsisVertical, Pencil, Plus, Trash2, X } from 'lucide-react';
+import { ArrowLeft, Camera, EllipsisVertical, Pencil, Plus, Presentation, Trash2, X } from 'lucide-react';
 import { ApiError, deleteNpc, saveCharacter, type StoredNpc } from '../../api/client';
 import { dropNpcSave, flushNpcSave, retryNpcSave } from '../../api/npcSave';
 import { deletePortrait, uploadNpcPortrait, uploadPortrait } from '../../api/portraits';
@@ -21,6 +21,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { AppBusyLabel, AppErrorView, Notice } from '../../ui/status';
 import { Abbr } from '../MemberCard';
 import { useNpcLinks } from './links';
+import { NpcTableView } from './NpcTableView';
 import { NpcStatusSelector } from './NpcStatusSelector';
 import { kindOf, npcPortrait, npcTypeLine, statusOf } from './npc';
 import { NpcSpeechDialog, NpcTagDialog } from './NpcTextDialogs';
@@ -48,6 +49,7 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
   const campaigns = useDmCampaigns();
   const [adding, setAdding] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [onTable, setOnTable] = useState(false);
   const client = useQueryClient();
   const [toast, setToast] = useState<{ key: number; tone: ToastTone; message: string; action?: { label: string; onSelect: () => void } } | null>(null);
   const notify = useCallback<SheetNotify>(
@@ -165,8 +167,8 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
       {back}
       {/* Grilla y no `flex-wrap`: al partirse, el ⋮ caía solo debajo de la voz. Se mide
           el contenedor porque el panel lateral es invisible para el ancho de ventana;
-          456 es lo que ocupan en una fila el medallón, 300 de texto y el ⋮. */}
-      <header className="grid grid-cols-[1fr_auto] items-start gap-x-[18px] gap-y-4 @[456px]:grid-cols-[auto_minmax(0,1fr)_auto]">
+          504 es medallón 76 + 18 + 300 de texto + 18 + 92 de los dos botones. */}
+      <header className="grid grid-cols-[1fr_auto] items-start gap-x-[18px] gap-y-4 @[504px]:grid-cols-[auto_minmax(0,1fr)_auto]">
         {/* El medallón abre el visor; la cámara, el taller. Son dos destinos. */}
         <div className="relative size-[76px] shrink-0">
           <Medallion name={npc.name} accent={null} size={76} portrait={npcPortrait(stored.data)} viewable />
@@ -181,7 +183,7 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
             </Link>
           </Tooltip>
         </div>
-        <div className="col-span-2 row-start-2 flex min-w-0 flex-col gap-2 @[456px]:col-span-1 @[456px]:col-start-2 @[456px]:row-start-1">
+        <div className="col-span-2 row-start-2 flex min-w-0 flex-col gap-2 @[504px]:col-span-1 @[504px]:col-start-2 @[504px]:row-start-1">
           <div className="flex items-start gap-1">
             <h1 className="font-display min-w-0 text-[28px] leading-tight break-words text-on-surface">{npc.name}</h1>
             <Tooltip content={t.renameTitle}>
@@ -240,26 +242,39 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
             </Tooltip>
           </div>
         </div>
-        <DropdownMenu>
-          <Tooltip content={t.npcMoreActions}>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                aria-label={t.npcMoreActions}
-                data-action="npc-menu"
-                className="col-start-2 row-start-1 inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold data-[state=open]:bg-gold-soft data-[state=open]:text-gold @[456px]:col-start-3"
-              >
-                <EllipsisVertical size={20} aria-hidden="true" />
-              </button>
-            </DropdownMenuTrigger>
+        <div className="col-start-2 row-start-1 flex gap-1 @[504px]:col-start-3">
+          <Tooltip content={t.npcShowTable}>
+            <button
+              type="button"
+              aria-label={t.npcShowTable}
+              data-action="npc-show-table"
+              onClick={() => setOnTable(true)}
+              className={cx(ICON_BUTTON, 'text-gold')}
+            >
+              <Presentation size={20} aria-hidden="true" />
+            </button>
           </Tooltip>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onSelect={() => setDeleting(true)} className="text-crimson">
-              <Trash2 size={15} aria-hidden="true" />
-              {t.npcDelete}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          <DropdownMenu>
+            <Tooltip content={t.npcMoreActions}>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  aria-label={t.npcMoreActions}
+                  data-action="npc-menu"
+                  className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold data-[state=open]:bg-gold-soft data-[state=open]:text-gold"
+                >
+                  <EllipsisVertical size={20} aria-hidden="true" />
+                </button>
+              </DropdownMenuTrigger>
+            </Tooltip>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => setDeleting(true)} className="text-crimson">
+                <Trash2 size={15} aria-hidden="true" />
+                {t.npcDelete}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </header>
 
       <div className="flex flex-wrap items-start gap-4">
@@ -308,6 +323,7 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
           </section>
         </div>
       </div>
+      <NpcTableView name={npc.name} portrait={npcPortrait(stored.data)} open={onTable} onOpenChange={setOnTable} />
       {adding && (
         <PickManyDialog
           title={t.npcAddToCampaign}

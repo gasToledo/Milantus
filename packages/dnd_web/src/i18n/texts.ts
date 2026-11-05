@@ -1421,6 +1421,9 @@ Los personajes que los jugadores le compartieron se sueltan, y sus fichas siguen
   npcTypeFixed: 'El tipo no se cambia después: define con qué se edita.',
   npcCreateFailed: 'No se pudo crear el PNJ.',
   npcMoreActions: 'Más acciones',
+  npcShowTable: 'Mostrar a la mesa',
+  npcHideName: 'Ocultar el nombre',
+  npcShowName: 'Mostrar el nombre',
   npcDelete: 'Borrar PNJ',
   npcDeleteTitle: (name: string) => `Borrar a ${name}`,
   npcDeleteBodyLibrary:
@@ -3279,6 +3282,9 @@ The characters players shared with it are released, and their sheets remain thei
   npcTypeFixed: 'The type can’t be changed later: it defines what it is edited with.',
   npcCreateFailed: 'The NPC could not be created.',
   npcMoreActions: 'More actions',
+  npcShowTable: 'Show to the table',
+  npcHideName: 'Hide the name',
+  npcShowName: 'Show the name',
   npcDelete: 'Delete NPC',
   npcDeleteTitle: (name: string) => `Delete ${name}`,
   npcDeleteBodyLibrary:

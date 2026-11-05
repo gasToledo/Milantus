@@ -241,7 +241,7 @@ repiten acá.
   6b, 6c y 6d, abajo); los PNJ y el combate **siguen en Flutter** hasta 6e a 6g
   (desde 6e1 los vínculos de un PNJ con sus campañas ya se escriben, desde 6e2
   se crea y se borra un PNJ sin ficha de personaje y desde 6e3 se escribe su texto
-  y desde 6e4 su bloque),
+  desde 6e4 su bloque y desde 6e5 su retrato),
   y esas secciones se leen salvo eso. Se porta por
   secciones, una por PR; hoy existen la **Mesa**, **Capítulos**, el **Cuaderno**,
   los **PNJ de la mesa**, el **Combate**, el **Bestiario**, la **Biblioteca de
@@ -341,9 +341,9 @@ repiten acá.
   Flutter se edita). Sale del mismo `GET /api/npcs/:id`. Un PNJ ajeno y uno
   inexistente dan la misma pantalla «No se encontró el PNJ» —también en su
   ficha, igual que un PNJ sin ficha—: el servidor los responde igual (404). Importar,
-  generar o subir retratos, exportar y crear uno con ficha de
+  exportar y crear uno con ficha de
   personaje siguen en Flutter (el estado por campaña se escribe desde 6e1; crear
-  sin ficha y borrar, desde 6e2; nombre, voz, tags, trasfondo y notas, desde 6e3; el bloque, desde 6e4).
+  sin ficha y borrar, desde 6e2; nombre, voz, tags, trasfondo y notas, desde 6e3; el bloque, desde 6e4; el retrato, desde 6e5).
   **PNJ de la mesa** (`GET /api/campaigns/:id/npcs`): los PNJ vinculados a la
   campaña con su estado **en esa** campaña. Arriba, el conteo («2 PNJ · 1 vivo ·
   0 muertos · 1 desconocido») y las pills de tag; cada tarjeta lleva la
@@ -745,6 +745,24 @@ frontera sigue donde estaba: **el DM no escribe la ficha de otra cuenta**.
   (`_checkEventsSoon` de Flutter): decisión tomada, no un olvido.
 - Queda en Flutter, hasta 6e a 6g: PNJ, ficha de PNJ y combate.
 
+**Paso 6e5: retrato y mostrar a la mesa** *(existe)*. Toca el motor y `dnd_web`;
+Flutter, el servidor y la versión no cambian. En `/v2/dm/pnj/:id/retrato` el DM
+genera, sube, restaura y borra los retratos de un PNJ con el mismo taller de la
+ficha propia: `PortraitWorkshop` recibe un dueño (`PortraitOwner`) y no sabe de
+fichas ni de PNJ. Un PNJ sin ficha (`none` y `block`) guarda retratos y prompts
+en su documento (`addPortrait`, `restorePortrait`, `removePortrait` de
+`NpcEdits`, con la lógica de `SheetActions`) y arma el prompt con
+`npcPortraitPrompt`, que nunca lee trasfondo, notas ni voz; uno con ficha usa
+`portraitPrompt` y escribe en su ficha (`actOn` y `saveCharacter`, el camino del
+renombrado), con la ruta de retratos de la ficha porque la del PNJ le da 404.
+**A diferencia de Flutter**, la «Apariencia» de un PNJ sin ficha se guarda al
+salir del campo (`setAppearance`) y no solo al guardar un retrato; el medallón sigue
+abriendo el visor y la cámara, junto a él, el taller. **Mostrar a la mesa**
+(`NpcTableView`) es una capa sobre la pantalla, sin ruta ni estado guardado:
+retrato y nombre a pantalla completa, con el nombre ocultable; la app no le
+manda nada al jugador, es el DM quien gira la pantalla. Sin API de pantalla
+completa del navegador.
+
 **Paso 6e4: el editor del bloque** *(existe)*. Toca el motor y `dnd_web`;
 Flutter, el servidor y la versión no cambian. En `/v2/dm/pnj/:id/bloque` el DM
 edita el bloque de estadísticas de un PNJ de bloque: «Lo básico», Rasgos y
@@ -887,7 +905,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    compartir, los avisos de la cola y el aviso de turno *(existe)*; 6b, las
    campañas y la Mesa *(existe)*; 6c, Capítulos y Cuaderno *(existe)*; 6d, la música *(existe)*; 6e, los PNJ, en cinco: 6e1, los vínculos con las campañas *(existe)*; 6e2,
    alta y borrado *(existe)*; 6e3, el texto de la ficha *(existe)*; 6e4, el editor del bloque *(existe)*; 6e5,
-   retrato y mostrar a la mesa; 6f, la ficha de
+   retrato y mostrar a la mesa *(existe)*; 6f, la ficha de
    PNJ; 6g, el combate. Importar y exportar PNJ sigue en el paso 7. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de
    otra cuenta» es del servidor y vale igual para el cliente nuevo. Entra acá
