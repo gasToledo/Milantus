@@ -1,0 +1,3147 @@
+{
+  "_meta": {
+    "revision": "e5f3e77b303a92df10487207857200245e71957c",
+    "repository": "5etools-mirror-3/5etools-src",
+    "sources": [
+      "EFA",
+      "XDMG",
+      "XMM",
+      "XPHB"
+    ],
+    "note": "Nombres oficiales solamente, extraídos de la revisión pineada. No incluye prosa."
+  },
+  "race": {
+    "aasimar": [
+      "Celestial Resistance",
+      "Celestial Revelation",
+      "Darkvision",
+      "Healing Hands",
+      "Heavenly Wings",
+      "Inner Radiance",
+      "Light Bearer",
+      "Necrotic Shroud"
+    ],
+    "changeling": [
+      "Changeling Instincts",
+      "Shape-Shifter"
+    ],
+    "dragonborn": [
+      "Breath Weapon",
+      "Damage Resistance",
+      "Darkvision",
+      "Draconic Ancestry",
+      "Draconic Flight"
+    ],
+    "dwarf": [
+      "Darkvision",
+      "Dwarven Resilience",
+      "Dwarven Toughness",
+      "Stonecunning"
+    ],
+    "elf": [
+      "Darkvision",
+      "Elven Lineage",
+      "Fey Ancestry",
+      "Keen Senses",
+      "Trance"
+    ],
+    "gnome": [
+      "Darkvision",
+      "Forest Gnome",
+      "Gnomish Cunning",
+      "Gnomish Lineage",
+      "Rock Gnome"
+    ],
+    "goliath": [
+      "Cloud's Jaunt (Cloud Giant)",
+      "Fire's Burn (Fire Giant)",
+      "Frost's Chill (Frost Giant)",
+      "Giant Ancestry",
+      "Hill's Tumble (Hill Giant)",
+      "Large Form",
+      "Powerful Build",
+      "Stone's Endurance (Stone Giant)",
+      "Storm's Thunder (Storm Giant)"
+    ],
+    "halfling": [
+      "Brave",
+      "Halfling Nimbleness",
+      "Luck",
+      "Naturally Stealthy"
+    ],
+    "human": [
+      "Resourceful",
+      "Skillful",
+      "Versatile"
+    ],
+    "kalashtar": [
+      "Dual Mind",
+      "Mental Discipline",
+      "Mind Link",
+      "Severed from Dreams"
+    ],
+    "khoravar": [
+      "Darkvision",
+      "Fey Ancestry",
+      "Fey Gift",
+      "Lethargy Resilience",
+      "Skill Versatility"
+    ],
+    "orc": [
+      "Adrenaline Rush",
+      "Darkvision",
+      "Relentless Endurance"
+    ],
+    "shifter": [
+      "Beasthide",
+      "Bestial Instincts",
+      "Darkvision",
+      "Longtooth",
+      "Shifting",
+      "Swiftstride",
+      "Wildhunt"
+    ],
+    "tiefling": [
+      "Darkvision",
+      "Fiendish Legacy",
+      "Otherworldly Presence"
+    ],
+    "warforged": [
+      "Construct Resilience",
+      "Integrated Protection",
+      "Sentry's Rest",
+      "Specialized Design",
+      "Tireless"
+    ]
+  },
+  "classFeature": {
+    "artificer": [
+      "Ability Score Improvement",
+      "Advanced Artifice",
+      "Artificer Subclass",
+      "Cantrips",
+      "Changing Your Prepared Spells",
+      "Charge Magic Item",
+      "Cheat Death",
+      "Crafting More Magic Items",
+      "Creating an Item",
+      "Drain Magic Item",
+      "Duration",
+      "Epic Boon",
+      "Flash of Genius",
+      "Magic Item Adept",
+      "Magic Item Master",
+      "Magic Item Savant",
+      "Magic Item Tinker",
+      "Magical Guidance",
+      "Plans Known",
+      "Prepared Spells of Level 1+",
+      "Refreshed Genius",
+      "Replicate Magic Item",
+      "Soul of Artifice",
+      "Spell Slots",
+      "Spell-Storing Item",
+      "Spellcasting",
+      "Spellcasting Ability",
+      "Spellcasting Focus",
+      "Subclass feature",
+      "Tinker's Magic",
+      "Tools Required",
+      "Transmute Magic Item"
+    ],
+    "barbarian": [
+      "Ability Score Improvement",
+      "Barbarian Subclass",
+      "Brutal Strike",
+      "Damage Resistance",
+      "Danger Sense",
+      "Duration",
+      "Epic Boon",
+      "Extra Attack",
+      "Fast Movement",
+      "Feral Instinct",
+      "Forceful Blow",
+      "Hamstring Blow",
+      "Improved Brutal Strike",
+      "Indomitable Might",
+      "Instinctive Pounce",
+      "No Concentration or Spells",
+      "Persistent Rage",
+      "Primal Champion",
+      "Primal Knowledge",
+      "Rage",
+      "Rage Damage",
+      "Reckless Attack",
+      "Relentless Rage",
+      "Staggering Blow",
+      "Strength Advantage",
+      "Subclass Feature",
+      "Sundering Blow",
+      "Unarmored Defense",
+      "Weapon Mastery"
+    ],
+    "bard": [
+      "A Bard's Repertoire",
+      "Ability Score Improvement",
+      "At Higher Levels",
+      "Bard Subclass",
+      "Bardic Inspiration",
+      "Cantrips",
+      "Changing Your Prepared Spells",
+      "Countercharm",
+      "Epic Boon",
+      "Expertise",
+      "Font of Inspiration",
+      "Jack of All Trades",
+      "Magical Secrets",
+      "Number of Uses",
+      "Prepared Spells of Level 1+",
+      "Spell Slots",
+      "Spellcasting",
+      "Spellcasting Ability",
+      "Spellcasting Focus",
+      "Subclass Feature",
+      "Superior Inspiration",
+      "Using Bardic Inspiration",
+      "Words of Creation"
+    ],
+    "cleric": [
+      "Ability Score Improvement",
+      "Blessed Strikes",
+      "Cantrips",
+      "Changing Your Prepared Spells",
+      "Channel Divinity",
+      "Cleric Subclass",
+      "Divine Intervention",
+      "Divine Order",
+      "Divine Spark",
+      "Divine Strike",
+      "Epic Boon",
+      "Greater Divine Intervention",
+      "Improved Blessed Strikes",
+      "Potent Spellcasting",
+      "Prepared Spells of Level 1+",
+      "Protector",
+      "Sear Undead",
+      "Spell Slots",
+      "Spellcasting",
+      "Spellcasting Ability",
+      "Spellcasting Focus",
+      "Subclass Feature",
+      "Thaumaturge",
+      "Turn Undead"
+    ],
+    "druid": [
+      "Ability Score Improvement",
+      "Archdruid",
+      "Beast Spells",
+      "Cantrips",
+      "Changing Your Prepared Spells",
+      "Druid Subclass",
+      "Druidic",
+      "Elemental Fury",
+      "Epic Boon",
+      "Evergreen Wild Shape",
+      "Game Statistics",
+      "Improved Elemental Fury",
+      "Known Forms",
+      "Longevity",
+      "Magician",
+      "Nature Magician",
+      "No Spellcasting",
+      "Number of Uses",
+      "Objects",
+      "Potent Spellcasting",
+      "Prepared Spells of Level 1+",
+      "Primal Order",
+      "Primal Strike",
+      "Rules While Shape-Shifted",
+      "Spell Slots",
+      "Spellcasting",
+      "Spellcasting Ability",
+      "Spellcasting Focus",
+      "Subclass Feature",
+      "Temporary Hit Points",
+      "Warden",
+      "Wild Companion",
+      "Wild Resurgence",
+      "Wild Shape"
+    ],
+    "fighter": [
+      "Ability Score Improvement",
+      "Action Surge",
+      "Epic Boon",
+      "Extra Attack",
+      "Fighter Subclass",
+      "Fighting Style",
+      "Indomitable",
+      "Second Wind",
+      "Studied Attacks",
+      "Subclass Feature",
+      "Tactical Master",
+      "Tactical Mind",
+      "Tactical Shift",
+      "Three Extra Attacks",
+      "Two Extra Attacks",
+      "Weapon Mastery"
+    ],
+    "monk": [
+      "",
+      "Ability Score Improvement",
+      "Acrobatic Movement",
+      "Body and Mind",
+      "Bonus Unarmed Strike",
+      "Deflect Attacks",
+      "Deflect Energy",
+      "Dexterous Attacks",
+      "Disciplined Survivor",
+      "Empowered Strikes",
+      "Epic Boon",
+      "Evasion",
+      "Extra Attack",
+      "Flurry of Blows",
+      "Focus Point",
+      "Heightened Focus",
+      "Martial Arts",
+      "Martial Arts Die",
+      "Monk Subclass",
+      "Monk's Focus",
+      "Patient Defense",
+      "Perfect Focus",
+      "Self-Restoration",
+      "Slow Fall",
+      "Step of the Wind",
+      "Stunning Strike",
+      "Subclass Feature",
+      "Superior Defense",
+      "Unarmored Defense",
+      "Unarmored Movement",
+      "Uncanny Metabolism"
+    ],
+    "paladin": [
+      "Ability Score Improvement",
+      "Abjure Foes",
+      "Aura Expansion",
+      "Aura of Courage",
+      "Aura of Protection",
+      "Breaking Your Oath",
+      "Changing Your Prepared Spells",
+      "Channel Divinity",
+      "Divine Sense",
+      "Epic Boon",
+      "Extra Attack",
+      "Faithful Steed",
+      "Fighting Style",
+      "Lay on Hands",
+      "Paladin Subclass",
+      "Paladin's Smite",
+      "Prepared Spells of Level 1+",
+      "Radiant Strikes",
+      "Restoring Touch",
+      "Spell Slots",
+      "Spellcasting",
+      "Spellcasting Ability",
+      "Spellcasting Focus",
+      "Subclass Feature",
+      "Weapon Mastery"
+    ],
+    "ranger": [
+      "Ability Score Improvement",
+      "Changing Your Prepared Spells",
+      "Decrease Exhaustion",
+      "Deft Explorer",
+      "Epic Boon",
+      "Expertise",
+      "Extra Attack",
+      "Favored Enemy",
+      "Feral Senses",
+      "Fighting Style",
+      "Foe Slayer",
+      "Languages",
+      "Nature's Veil",
+      "Precise Hunter",
+      "Prepared Spells of Level 1+",
+      "Ranger Subclass",
+      "Relentless Hunter",
+      "Roving",
+      "Spell Slots",
+      "Spellcasting",
+      "Spellcasting Ability",
+      "Spellcasting Focus",
+      "Subclass Feature",
+      "Temporary Hit Points",
+      "Tireless",
+      "Weapon Mastery"
+    ],
+    "rogue": [
+      "Ability Score Improvement",
+      "Cunning Action",
+      "Cunning Strike",
+      "Daze (Cost: 2d6)",
+      "Devious Strikes",
+      "Elusive",
+      "Epic Boon",
+      "Evasion",
+      "Expertise",
+      "Improved Cunning Strike",
+      "Knock Out (Cost: 6d6)",
+      "Obscure (Cost: 3d6)",
+      "Poison (Cost: 1d6)",
+      "Reliable Talent",
+      "Rogue Subclass",
+      "Slippery Mind",
+      "Sneak Attack",
+      "Steady Aim",
+      "Stroke of Luck",
+      "Subclass Feature",
+      "Thieves' Cant",
+      "Trip (Cost: 1d6)",
+      "Uncanny Dodge",
+      "Weapon Mastery",
+      "Withdraw (Cost: 1d6)"
+    ],
+    "sorcerer": [
+      "Ability Score Improvement",
+      "Arcane Apotheosis",
+      "Cantrips",
+      "Changing Your Prepared Spells",
+      "Converting Spell Slots to Sorcery Points",
+      "Creating Spell Slots",
+      "Epic Boon",
+      "Font of Magic",
+      "Innate Sorcery",
+      "Metamagic",
+      "Metamagic Options",
+      "Prepared Spells of Level 1+",
+      "Sorcerer Subclass",
+      "Sorcerous Restoration",
+      "Sorcery Incarnate",
+      "Sorcery Point",
+      "Spell Slots",
+      "Spellcasting",
+      "Spellcasting Ability",
+      "Spellcasting Focus",
+      "Subclass Feature"
+    ],
+    "warlock": [
+      "Ability Score Improvement",
+      "Cantrips",
+      "Changing Your Prepared Spells",
+      "Contact Patron",
+      "Eldritch Invocation Options",
+      "Eldritch Invocations",
+      "Eldritch Master",
+      "Epic Boon",
+      "Magical Cunning",
+      "Mystic Arcanum",
+      "Pact Magic",
+      "Prepared Spells of Level 1+",
+      "Prerequisites",
+      "Replacing and Gaining Invocations",
+      "Spell Slots",
+      "Spellcasting Ability",
+      "Spellcasting Focus",
+      "Subclass Feature",
+      "Warlock Subclass"
+    ],
+    "wizard": [
+      "Ability Score Improvement",
+      "Arcane Recovery",
+      "Cantrips",
+      "Changing Your Prepared Spells",
+      "Copying a Spell into the Book",
+      "Copying the Book",
+      "Epic Boon",
+      "Expanding and Replacing a Spellbook",
+      "Memorize Spell",
+      "Prepared Spells of Level 1+",
+      "Ritual Adept",
+      "Scholar",
+      "Signature Spells",
+      "Spell Mastery",
+      "Spell Slots",
+      "Spellbook",
+      "Spellcasting",
+      "Spellcasting Ability",
+      "Spellcasting Focus",
+      "Subclass Feature",
+      "Wizard Subclass"
+    ]
+  },
+  "subclassFeature": {
+    "champion": [
+      "Additional Fighting Style",
+      "Champion",
+      "Defy Death",
+      "Heroic Rally",
+      "Heroic Warrior",
+      "Improved Critical",
+      "Remarkable Athlete",
+      "Superior Critical",
+      "Survivor"
+    ],
+    "battle-master": [
+      "Battle Master",
+      "Combat Superiority",
+      "Improved Combat Superiority",
+      "Know Your Enemy",
+      "Maneuver Options",
+      "Maneuvers",
+      "Relentless",
+      "Saving Throws",
+      "Student of War",
+      "Superiority Dice",
+      "Ultimate Combat Superiority"
+    ],
+    "eldritch-knight": [
+      "Arcane Charge",
+      "Cantrips",
+      "Changing your Prepared Spells",
+      "Eldritch Knight",
+      "Eldritch Strike",
+      "Improved War Magic",
+      "Prepared Spells of Level 1+",
+      "Spell Slots",
+      "Spellcasting",
+      "Spellcasting Ability",
+      "Spellcasting Focus",
+      "War Bond",
+      "War Magic"
+    ],
+    "psi-warrior": [
+      "Bulwark of Force",
+      "Guarded Mind",
+      "Protective Field",
+      "Psi Warrior",
+      "Psi-Powered Leap",
+      "Psionic Energy Die",
+      "Psionic Power",
+      "Psionic Strike",
+      "Telekinetic Adept",
+      "Telekinetic Master",
+      "Telekinetic Movement",
+      "Telekinetic Thrust"
+    ],
+    "berserker": [
+      "Frenzy",
+      "Intimidating Presence",
+      "Mindless Rage",
+      "Path of the Berserker",
+      "Retaliation"
+    ],
+    "wild-heart": [
+      "Animal Speaker",
+      "Aspect of the Wilds",
+      "Bear",
+      "Eagle",
+      "Falcon",
+      "Lion",
+      "Nature Speaker",
+      "Owl",
+      "Panther",
+      "Path of the Wild Heart",
+      "Power of the Wilds",
+      "Rage of the Wilds",
+      "Ram",
+      "Salmon",
+      "Wolf"
+    ],
+    "world-tree": [
+      "Battering Roots",
+      "Branches of the Tree",
+      "Life-Giving Force",
+      "Path of the World Tree",
+      "Travel Along the Tree",
+      "Vitality Surge",
+      "Vitality of the Tree"
+    ],
+    "zealot": [
+      "Divine Fury",
+      "Fanatical Focus",
+      "Flight",
+      "Path of the Zealot",
+      "Rage of the Gods",
+      "Resistance",
+      "Revivification",
+      "Warrior of the Gods",
+      "Zealous Presence"
+    ],
+    "college-dance": [
+      "Agile Strikes",
+      "Bardic Damage",
+      "College of Dance",
+      "Dance Virtuoso",
+      "Dazzling Footwork",
+      "Inspiring Movement",
+      "Leading Evasion",
+      "Tandem Footwork",
+      "Unarmored Defense"
+    ],
+    "college-glamour": [
+      "Beguiling Magic",
+      "College of Glamour",
+      "Mantle of Inspiration",
+      "Mantle of Majesty",
+      "Unbreakable Majesty"
+    ],
+    "college-lore": [
+      "Bonus Proficiencies",
+      "College of Lore",
+      "Cutting Words",
+      "Magical Discoveries",
+      "Peerless Skill"
+    ],
+    "college-valor": [
+      "Battle Magic",
+      "College of Valor",
+      "Combat Inspiration",
+      "Defense",
+      "Extra Attack",
+      "Martial Training",
+      "Offense"
+    ],
+    "life-domain": [
+      "Blessed Healer",
+      "Channel Divinity",
+      "Disciple of Life",
+      "Life Domain",
+      "Life Domain Spells",
+      "Preserve Life",
+      "Supreme Healing"
+    ],
+    "light-domain": [
+      "Channel Divinity",
+      "Corona of Light",
+      "Improved Warding Flare",
+      "Light Domain",
+      "Light Domain Spells",
+      "Radiance of the Dawn",
+      "Warding Flare"
+    ],
+    "trickery-domain": [
+      "Blessing of the Trickster",
+      "Cast Spells",
+      "Channel Divinity",
+      "Distract",
+      "Healing Illusion",
+      "Improved Duplicity",
+      "Invoke Duplicity",
+      "Move",
+      "Shared Distraction",
+      "Trickery Domain",
+      "Trickery Domain Spells",
+      "Trickster's Transposition"
+    ],
+    "war-domain": [
+      "Avatar of Battle",
+      "Channel Divinity",
+      "Guided Strike",
+      "War Domain",
+      "War Domain Spells",
+      "War God's Blessing",
+      "War Priest"
+    ],
+    "circle-land": [
+      "Circle of the Land",
+      "Circle of the Land Spells",
+      "Land's Aid",
+      "Natural Recovery",
+      "Nature's Sanctuary",
+      "Nature's Ward"
+    ],
+    "circle-moon": [
+      "Armor Class",
+      "Challenge Rating",
+      "Circle Forms",
+      "Circle of the Moon",
+      "Circle of the Moon Spells",
+      "Improved Circle Forms",
+      "Improved Lunar Radiance",
+      "Increased Toughness",
+      "Lunar Form",
+      "Lunar Radiance",
+      "Moonlight Step",
+      "Shared Moonlight",
+      "Temporary Hit Points"
+    ],
+    "circle-sea": [
+      "Aquatic Affinity",
+      "Circle of the Sea",
+      "Circle of the Sea Spells",
+      "Flight",
+      "Oceanic Gift",
+      "Resistance",
+      "Stormborn",
+      "Wrath of the Sea"
+    ],
+    "circle-stars": [
+      "Archer",
+      "Chalice",
+      "Circle of the Stars",
+      "Cosmic Omen",
+      "Dragon",
+      "Full of Stars",
+      "Star Map",
+      "Starry Form",
+      "Twinkling Constellations",
+      "Weal (even)",
+      "Wild Shape",
+      "Woe (odd)"
+    ],
+    "open-hand": [
+      "Addle",
+      "Fleet Step",
+      "Focus Point",
+      "Open Hand Technique",
+      "Push",
+      "Quivering Palm",
+      "Topple",
+      "Warrior of the Open Hand",
+      "Wholeness of Body"
+    ],
+    "warrior-elements": [
+      "Damage Resistance",
+      "Destructive Stride",
+      "Elemental Attunement",
+      "Elemental Burst",
+      "Elemental Epitome",
+      "Elemental Strikes",
+      "Empowered Strikes",
+      "Focus Point",
+      "Manipulate Elements",
+      "Reach",
+      "Stride of the Elements",
+      "Warrior of the Elements"
+    ],
+    "warrior-mercy": [
+      "Flurry of Healing and Harm",
+      "Focus Point",
+      "Hand of Harm",
+      "Hand of Healing",
+      "Hand of Ultimate Mercy",
+      "Implements of Mercy",
+      "Physician's Touch",
+      "Warrior of Mercy"
+    ],
+    "warrior-shadow": [
+      "Cloak of Shadows",
+      "Darkness",
+      "Darkvision",
+      "Focus Point",
+      "Improved Shadow Step",
+      "Invisibility",
+      "Partially Incorporeal",
+      "Shadow Arts",
+      "Shadow Flurry",
+      "Shadow Step",
+      "Shadowy Figments",
+      "Warrior of Shadow"
+    ],
+    "oath-devotion": [
+      "Aura of Devotion",
+      "Channel Divinity",
+      "Holy Nimbus",
+      "Holy Ward",
+      "Oath of Devotion",
+      "Oath of Devotion Spells",
+      "Radiant Damage",
+      "Sacred Weapon",
+      "Smite of Protection",
+      "Sunlight"
+    ],
+    "oath-ancients": [
+      "Aura of Warding",
+      "Channel Divinity",
+      "Diminish Defiance",
+      "Elder Champion",
+      "Nature's Wrath",
+      "Oath of the Ancients",
+      "Oath of the Ancients Spells",
+      "Regeneration",
+      "Swift Spells",
+      "Undying Sentinel"
+    ],
+    "oath-glory": [
+      "Aura of Alacrity",
+      "Channel Divinity",
+      "Charismatic",
+      "Glorious Defense",
+      "Inspiring Smite",
+      "Living Legend",
+      "Oath of Glory",
+      "Oath of Glory Spells",
+      "Peerless Athlete",
+      "Saving Throw Reroll",
+      "Unerring Strike"
+    ],
+    "oath-vengeance": [
+      "Avenging Angel",
+      "Channel Divinity",
+      "Flight",
+      "Frightful Aura",
+      "Oath of Vengeance",
+      "Oath of Vengeance Spells",
+      "Relentless Avenger",
+      "Soul of Vengeance",
+      "Vow of Enmity"
+    ],
+    "hunter": [
+      "Colossus Slayer",
+      "Defensive Tactics",
+      "Escape the Horde",
+      "Horde Breaker",
+      "Hunter",
+      "Hunter's Lore",
+      "Hunter's Prey",
+      "Multiattack Defense",
+      "Superior Hunter's Defense",
+      "Superior Hunter's Prey"
+    ],
+    "beast-master": [
+      "Beast Master",
+      "Bestial Fury",
+      "Exceptional Training",
+      "Primal Companion",
+      "Restoring or Replacing the Beast",
+      "Share Spells",
+      "The Beast in Combat"
+    ],
+    "fey-wanderer": [
+      "Beguiling Twist",
+      "Dreadful Strikes",
+      "Fey Reinforcements",
+      "Fey Wanderer",
+      "Fey Wanderer Spells",
+      "Misty Wanderer",
+      "Otherworldly Glamour"
+    ],
+    "gloom-stalker": [
+      "Ambusher's Leap",
+      "Dread Ambusher",
+      "Dreadful Strike",
+      "Gloom Stalker",
+      "Gloom Stalker Spells",
+      "Initiative Bonus",
+      "Iron Mind",
+      "Mass Fear",
+      "Shadowy Dodge",
+      "Stalker's Flurry",
+      "Sudden Strike",
+      "Umbral Sight"
+    ],
+    "thief": [
+      "Attunement",
+      "Charges",
+      "Climber",
+      "Fast Hands",
+      "Jumper",
+      "Scrolls",
+      "Second-Story Work",
+      "Sleight of Hand",
+      "Stealth Attack (Cost: 1d6)",
+      "Supreme Sneak",
+      "Thief",
+      "Thief's Reflexes",
+      "Use Magic Device",
+      "Use an Object"
+    ],
+    "arcane-trickster": [
+      "Arcane Trickster",
+      "Cantrips",
+      "Changing Your Prepared Spells",
+      "Mage Hand Legerdemain",
+      "Magical Ambush",
+      "Prepared Spells of 1st+ Level",
+      "Spell Slots",
+      "Spell Thief",
+      "Spellcasting",
+      "Spellcasting Ability",
+      "Spellcasting Focus",
+      "Versatile Trickster"
+    ],
+    "assassin": [
+      "Assassin",
+      "Assassin's Tools",
+      "Assassinate",
+      "Death Strike",
+      "Envenom Weapons",
+      "Infiltration Expertise",
+      "Initiative",
+      "Masterful Mimicry",
+      "Roving Aim",
+      "Surprising Strikes"
+    ],
+    "soulknife": [
+      "Homing Strikes",
+      "Psi-Bolstered Knack",
+      "Psionic Energy Die",
+      "Psionic Power",
+      "Psychic Blade",
+      "Psychic Blades",
+      "Psychic Teleportation",
+      "Psychic Veil",
+      "Psychic Whispers",
+      "Rend Mind",
+      "Soul Blades",
+      "Soulknife"
+    ],
+    "draconic-sorcery": [
+      "Draconic Resilience",
+      "Draconic Sorcery",
+      "Draconic Spells",
+      "Dragon Companion",
+      "Dragon Wings",
+      "Elemental Affinity",
+      "Sorcery Point"
+    ],
+    "aberrant-sorcery": [
+      "Aberrant Sorcery",
+      "Aquatic Adaptation",
+      "Glistening Flight",
+      "Psionic Sorcery",
+      "Psionic Spells",
+      "Psychic Defenses",
+      "Revelation in Flesh",
+      "See the Invisible",
+      "Sorcery Point",
+      "Telepathic Speech",
+      "Warping Implosion",
+      "Wormlike Movement"
+    ],
+    "clockwork-sorcery": [
+      "Bastion of Law",
+      "Clockwork Cavalcade",
+      "Clockwork Sorcery",
+      "Clockwork Spells",
+      "Dispel",
+      "Heal",
+      "Repair",
+      "Restore Balance",
+      "Sorcery Point",
+      "Trance of Order"
+    ],
+    "wild-magic-sorcery": [
+      "Bend Luck",
+      "Controlled Chaos",
+      "Sorcery Point",
+      "Tamed Surge",
+      "Tides of Chaos",
+      "Wild Magic Sorcery",
+      "Wild Magic Surge"
+    ],
+    "fiend-patron": [
+      "Dark One's Blessing",
+      "Dark One's Own Luck",
+      "Fiend Patron",
+      "Fiend Spells",
+      "Fiendish Resilience",
+      "Hurl Through Hell"
+    ],
+    "archfey-patron": [
+      "Archfey Patron",
+      "Archfey Spells",
+      "Beguiling Defenses",
+      "Bewitching Magic",
+      "Disappearing Step",
+      "Dreadful Step",
+      "Misty Escape",
+      "Refreshing Step",
+      "Steps of the Fey",
+      "Taunting Step"
+    ],
+    "celestial-patron": [
+      "Celestial Patron",
+      "Celestial Resilience",
+      "Celestial Spells",
+      "Healing Light",
+      "Radiant Soul",
+      "Searing Vengeance"
+    ],
+    "great-old-one-patron": [
+      "Awakened Mind",
+      "Clairvoyant Combatant",
+      "Create Thrall",
+      "Eldritch Hex",
+      "Great Old One Patron",
+      "Great Old One Spells",
+      "Psychic Spells",
+      "Thought Shield"
+    ],
+    "evoker": [
+      "Empowered Evocation",
+      "Evocation Savant",
+      "Evoker",
+      "Overchannel",
+      "Potent Cantrip",
+      "Sculpt Spells"
+    ],
+    "abjurer": [
+      "Abjuration Savant",
+      "Abjurer",
+      "Arcane Ward",
+      "Projected Ward",
+      "Spell Breaker",
+      "Spell Resistance"
+    ],
+    "diviner": [
+      "Darkvision",
+      "Divination Savant",
+      "Diviner",
+      "Expert Divination",
+      "Greater Comprehension",
+      "Greater Portent",
+      "Portent",
+      "See Invisibility",
+      "The Third Eye"
+    ],
+    "illusionist": [
+      "Illusion Savant",
+      "Illusionist",
+      "Illusory Reality",
+      "Illusory Self",
+      "Improved Illusions",
+      "Phantasmal Creatures"
+    ],
+    "alchemist": [
+      "Alchemical Eruption",
+      "Alchemical Savant",
+      "Alchemist",
+      "Alchemist Spells",
+      "Chemical Mastery",
+      "Chemical Resistance",
+      "Conjured Cauldron",
+      "Creating Additional Elixirs",
+      "Drinking an Elixir",
+      "Experimental Elixir",
+      "Potion Crafting",
+      "Restorative Reagents",
+      "Tool Proficiency",
+      "Tools of the Trade"
+    ],
+    "armorer": [
+      "Arcane Armor",
+      "Armor Crafting",
+      "Armor Model",
+      "Armor Replication",
+      "Armor Training",
+      "Armorer",
+      "Armorer Spells",
+      "Dampening Field",
+      "Defensive Field",
+      "Dreadnaught",
+      "Extra Attack",
+      "Force Demolisher",
+      "Giant Stature",
+      "Guardian",
+      "Improved Armorer",
+      "Improved Arsenal",
+      "Infiltrator",
+      "Lightning Launcher",
+      "No Strength Requirement",
+      "Perfected Armor",
+      "Powered Steps",
+      "Quick Don and Doff",
+      "Spellcasting Focus",
+      "Thunder Pulse",
+      "Tool Proficiency",
+      "Tools of the Trade"
+    ],
+    "artillerist": [
+      "Arcane Firearm",
+      "Artillerist",
+      "Artillerist Spells",
+      "Detonate",
+      "Double Firepower",
+      "Eldritch Cannon",
+      "Explosive Cannon",
+      "Firepower",
+      "Fortified Position",
+      "Ranged Weaponry",
+      "Shimmering Field Projection",
+      "Tool Proficiency",
+      "Tools of the Trade",
+      "Wand Crafting"
+    ],
+    "battle-smith": [
+      "Arcane Empowerment",
+      "Arcane Jolt",
+      "Battle Ready",
+      "Battle Smith",
+      "Battle Smith Spells",
+      "Destructive Energy",
+      "Extra Attack",
+      "Improved Defender",
+      "Improved Deflection",
+      "Improved Jolt",
+      "Restorative Energy",
+      "Restoring or Replacing the Defender",
+      "Steel Defender",
+      "The Defender in Combat",
+      "Tool Proficiency",
+      "Tools of the Trade",
+      "Weapon Crafting",
+      "Weapon Knowledge"
+    ],
+    "cartographer": [
+      "Adventurer's Atlas",
+      "Awareness",
+      "Cartographer",
+      "Cartographer Spells",
+      "Guided Precision",
+      "Illuminated Cartography",
+      "Ingenious Movement",
+      "Mapping Magic",
+      "Portal Jump",
+      "Positioning",
+      "Safe Haven",
+      "Scroll Crafting",
+      "Superior Atlas",
+      "Tool Proficiency",
+      "Tools of the Trade",
+      "Unerring Path"
+    ]
+  },
+  "monster": {
+    "eagle": [
+      "Talons"
+    ],
+    "spider": [
+      "Bite",
+      "Spider Climb",
+      "Web Walker"
+    ],
+    "baboon": [
+      "Bite",
+      "Pack Tactics"
+    ],
+    "owl": [
+      "Flyby",
+      "Talons"
+    ],
+    "vulture": [
+      "Beak",
+      "Pack Tactics"
+    ],
+    "seahorse": [
+      "Bubble Dash",
+      "Water Breathing"
+    ],
+    "goat": [
+      "Ram"
+    ],
+    "crab": [
+      "Amphibious",
+      "Claw"
+    ],
+    "jackal": [
+      "Bite"
+    ],
+    "deer": [
+      "Agile",
+      "Ram"
+    ],
+    "weasel": [
+      "Bite"
+    ],
+    "raven": [
+      "Beak",
+      "Mimicry"
+    ],
+    "giant-fire-beetle": [
+      "Bite",
+      "Illumination"
+    ],
+    "scorpion": [
+      "Sting"
+    ],
+    "cat": [
+      "Jumper",
+      "Scratch"
+    ],
+    "hawk": [
+      "Talons"
+    ],
+    "hyena": [
+      "Bite",
+      "Pack Tactics"
+    ],
+    "lizard": [
+      "Bite",
+      "Spider Climb"
+    ],
+    "bat": [
+      "Bite"
+    ],
+    "piranha": [
+      "Bite",
+      "Water Breathing"
+    ],
+    "octopus": [
+      "Compression",
+      "Ink Cloud (1/Day)",
+      "Tentacles",
+      "Water Breathing"
+    ],
+    "frog": [
+      "Amphibious",
+      "Bite",
+      "Standing Leap"
+    ],
+    "rat": [
+      "Agile",
+      "Bite"
+    ],
+    "badger": [
+      "Bite"
+    ],
+    "camel": [
+      "Bite"
+    ],
+    "giant-crab": [
+      "Amphibious",
+      "Claw"
+    ],
+    "giant-weasel": [
+      "Bite"
+    ],
+    "blood-hawk": [
+      "Beak",
+      "Pack Tactics"
+    ],
+    "mastiff": [
+      "Bite"
+    ],
+    "mule": [
+      "Beast of Burden",
+      "Hooves"
+    ],
+    "pony": [
+      "Hooves"
+    ],
+    "giant-rat": [
+      "Bite",
+      "Pack Tactics"
+    ],
+    "elk": [
+      "Ram"
+    ],
+    "riding-horse": [
+      "Hooves"
+    ],
+    "draft-horse": [
+      "Hooves"
+    ],
+    "giant-centipede": [
+      "Bite"
+    ],
+    "boar": [
+      "Bloodied Fury",
+      "Gore"
+    ],
+    "giant-lizard": [
+      "Bite",
+      "Spider Climb"
+    ],
+    "wolf": [
+      "Bite",
+      "Pack Tactics"
+    ],
+    "giant-bat": [
+      "Bite"
+    ],
+    "panther": [
+      "Nimble Escape",
+      "Rend"
+    ],
+    "pteranodon": [
+      "Bite",
+      "Flyby"
+    ],
+    "giant-frog": [
+      "Amphibious",
+      "Bite",
+      "Standing Leap",
+      "Swallow"
+    ],
+    "constrictor-snake": [
+      "Bite",
+      "Constrict"
+    ],
+    "giant-poisonous-snake": [
+      "Bite"
+    ],
+    "giant-badger": [
+      "Bite"
+    ],
+    "giant-wasp": [
+      "Flyby",
+      "Sting"
+    ],
+    "giant-seahorse": [
+      "Bubble Dash",
+      "Ram",
+      "Water Breathing"
+    ],
+    "warhorse": [
+      "Hooves"
+    ],
+    "giant-goat": [
+      "Ram"
+    ],
+    "crocodile": [
+      "Bite",
+      "Hold Breath"
+    ],
+    "black-bear": [
+      "Multiattack",
+      "Rend"
+    ],
+    "ape": [
+      "Fist",
+      "Multiattack",
+      "Rock"
+    ],
+    "reef-shark": [
+      "Bite",
+      "Pack Tactics",
+      "Water Breathing"
+    ],
+    "giant-spider": [
+      "Bite",
+      "Spider Climb",
+      "Web",
+      "Web Walker"
+    ],
+    "giant-hyena": [
+      "Bite",
+      "Rampage (1/Day)"
+    ],
+    "lion": [
+      "Multiattack",
+      "Pack Tactics",
+      "Rend",
+      "Roar",
+      "Running Leap"
+    ],
+    "dire-wolf": [
+      "Bite",
+      "Pack Tactics"
+    ],
+    "brown-bear": [
+      "Bite",
+      "Claw",
+      "Multiattack"
+    ],
+    "giant-octopus": [
+      "Ink Cloud (1/Day)",
+      "Tentacles",
+      "Water Breathing"
+    ],
+    "giant-toad": [
+      "Amphibious",
+      "Bite",
+      "Standing Leap",
+      "Swallow"
+    ],
+    "tiger": [
+      "Nimble Escape",
+      "Rend"
+    ],
+    "imp": [
+      "Invisibility",
+      "Magic Resistance",
+      "Shape-Shift",
+      "Sting"
+    ],
+    "sprite": [
+      "Enchanting Bow",
+      "Heart Sight",
+      "Invisibility",
+      "Needle Sword"
+    ],
+    "sphinx-of-wonder": [
+      "Burst of Ingenuity (2/Day)",
+      "Magic Resistance",
+      "Rend"
+    ],
+    "skeleton": [
+      "Shortbow",
+      "Shortsword"
+    ],
+    "pseudodragon": [
+      "Bite",
+      "Magic Resistance",
+      "Multiattack",
+      "Sting"
+    ],
+    "quasit": [
+      "Invisibility",
+      "Magic Resistance",
+      "Rend",
+      "Scare (1/Day)",
+      "Shape-Shift"
+    ],
+    "poisonous-snake": [
+      "Bite"
+    ],
+    "steel-defender": [
+      "Deflect Attack",
+      "Force-Empowered Rend",
+      "Repair (3/Day)",
+      "Steel Bond"
+    ],
+    "homunculus-servant": [
+      "Channel Magic",
+      "Evasion",
+      "Force Strike",
+      "Magic Bond"
+    ],
+    "goblin-warrior": [
+      "Nimble Escape",
+      "Scimitar",
+      "Shortbow"
+    ],
+    "kobold-warrior": [
+      "Dagger",
+      "Pack Tactics",
+      "Sunlight Sensitivity"
+    ],
+    "zombie": [
+      "Slam",
+      "Undead Fortitude"
+    ],
+    "bandit": [
+      "Light Crossbow",
+      "Scimitar"
+    ],
+    "cultist": [
+      "Ritual Sickle"
+    ],
+    "ogre": [
+      "Greatclub",
+      "Javelin"
+    ],
+    "hobgoblin-warrior": [
+      "Longbow",
+      "Longsword",
+      "Pack Tactics"
+    ],
+    "bugbear-warrior": [
+      "Abduct",
+      "Grab",
+      "Light Hammer"
+    ],
+    "ghoul": [
+      "Bite",
+      "Claw",
+      "Multiattack"
+    ],
+    "stirge": [
+      "Proboscis"
+    ],
+    "aboleth": [
+      "Amphibious",
+      "Consume Memories",
+      "Dominate Mind (2/Day)",
+      "Eldritch Restoration",
+      "Lash",
+      "Legendary Resistance (3/Day, or 4/Day in Lair)",
+      "Mucus Cloud",
+      "Multiattack",
+      "Probing Telepathy",
+      "Psychic Drain",
+      "Tentacle"
+    ],
+    "invisible-stalker": [
+      "Air Form",
+      "Invisibility",
+      "Multiattack",
+      "Vortex",
+      "Wind Swipe"
+    ],
+    "bugbear-stalker": [
+      "Abduct",
+      "Javelin",
+      "Morningstar",
+      "Multiattack",
+      "Quick Grapple"
+    ],
+    "giant-elk": [
+      "Ram"
+    ],
+    "animated-rug-of-smothering": [
+      "Smother"
+    ],
+    "allosaurus": [
+      "Bite",
+      "Claws"
+    ],
+    "ankheg": [
+      "Acid Spray",
+      "Bite",
+      "Tunneler"
+    ],
+    "ankylosaurus": [
+      "Multiattack",
+      "Tail"
+    ],
+    "wraith": [
+      "Create Specter",
+      "Incorporeal Movement",
+      "Life Drain",
+      "Sunlight Sensitivity"
+    ],
+    "phase-spider": [
+      "Bite",
+      "Ethereal Jaunt",
+      "Ethereal Sight",
+      "Multiattack",
+      "Spider Climb",
+      "Web Walker"
+    ],
+    "awakened-shrub": [
+      "Rake"
+    ],
+    "archelon": [
+      "Amphibious",
+      "Bite",
+      "Multiattack"
+    ],
+    "archmage": [
+      "Arcane Burst",
+      "Magic Resistance",
+      "Misty Step (3/Day)",
+      "Multiattack",
+      "Protective Magic (3/Day)",
+      "Spellcasting"
+    ],
+    "animated-armor": [
+      "Multiattack",
+      "Slam"
+    ],
+    "harpy": [
+      "Claw",
+      "Luring Song"
+    ],
+    "assassin": [
+      "Cunning Action",
+      "Evasion",
+      "Light Crossbow",
+      "Multiattack",
+      "Shortsword"
+    ],
+    "balor": [
+      "Death Throes",
+      "Fire Aura",
+      "Flame Whip",
+      "Legendary Resistance (3/Day)",
+      "Lightning Blade",
+      "Magic Resistance",
+      "Multiattack",
+      "Teleport"
+    ],
+    "basilisk": [
+      "Bite",
+      "Petrifying Gaze"
+    ],
+    "scout": [
+      "Longbow",
+      "Multiattack",
+      "Shortsword"
+    ],
+    "behir": [
+      "Bite",
+      "Constrict",
+      "Lightning Breath",
+      "Multiattack",
+      "Swallow"
+    ],
+    "berserker": [
+      "Bloodied Frenzy",
+      "Greataxe"
+    ],
+    "gibbering-mouther": [
+      "1-4",
+      "5-6",
+      "7-8",
+      "Aberrant Ground",
+      "Bite",
+      "Blinding Spittle",
+      "Gibbering"
+    ],
+    "shambling-mound": [
+      "Charged Tendril",
+      "Engulf",
+      "Lightning Absorption",
+      "Multiattack"
+    ],
+    "giant-vulture": [
+      "Gouge",
+      "Pack Tactics"
+    ],
+    "bulette": [
+      "Bite",
+      "Deadly Leap",
+      "Leap",
+      "Multiattack"
+    ],
+    "giant-owl": [
+      "Flyby",
+      "Spellcasting",
+      "Talons"
+    ],
+    "knight": [
+      "Greatsword",
+      "Heavy Crossbow",
+      "Multiattack",
+      "Parry"
+    ],
+    "warhorse-skeleton": [
+      "Hooves"
+    ],
+    "bandit-captain": [
+      "Multiattack",
+      "Parry",
+      "Pistol",
+      "Scimitar"
+    ],
+    "guard-captain": [
+      "Javelin",
+      "Longsword",
+      "Multiattack"
+    ],
+    "hobgoblin-captain": [
+      "Aura of Authority",
+      "Greatsword",
+      "Longbow",
+      "Multiattack"
+    ],
+    "pirate-captain": [
+      "Captain's Charm",
+      "Multiattack",
+      "Pistol",
+      "Rapier",
+      "Riposte"
+    ],
+    "azer-sentinel": [
+      "Burning Hammer",
+      "Fire Aura",
+      "Illumination"
+    ],
+    "chuul": [
+      "Amphibious",
+      "Multiattack",
+      "Paralyzing Tentacles",
+      "Pincer",
+      "Sense Magic"
+    ],
+    "gray-ooze": [
+      "Amorphous",
+      "Corrosive Form",
+      "Pseudopod"
+    ],
+    "cockatrice": [
+      "Petrifying Bite"
+    ],
+    "giant-crocodile": [
+      "Bite",
+      "Hold Breath",
+      "Multiattack",
+      "Tail"
+    ],
+    "couatl": [
+      "Bite",
+      "Constrict",
+      "Divine Aid (2/Day)",
+      "Shielded Mind",
+      "Spellcasting"
+    ],
+    "blue-dragon-wyrmling": [
+      "Lightning Breath",
+      "Multiattack",
+      "Rend"
+    ],
+    "white-dragon-wyrmling": [
+      "Cold Breath",
+      "Ice Walk",
+      "Multiattack",
+      "Rend"
+    ],
+    "bronze-dragon-wyrmling": [
+      "Amphibious",
+      "Lightning Breath",
+      "Multiattack",
+      "Rend",
+      "Repulsion Breath"
+    ],
+    "copper-dragon-wyrmling": [
+      "Acid Breath",
+      "Rend",
+      "Slowing Breath"
+    ],
+    "gold-dragon-wyrmling": [
+      "Amphibious",
+      "Fire Breath",
+      "Multiattack",
+      "Rend",
+      "Weakening Breath"
+    ],
+    "brass-dragon-wyrmling": [
+      "Fire Breath",
+      "Rend",
+      "Sleep Breath"
+    ],
+    "silver-dragon-wyrmling": [
+      "Cold Breath",
+      "Multiattack",
+      "Paralyzing Breath",
+      "Rend"
+    ],
+    "black-dragon-wyrmling": [
+      "Acid Breath",
+      "Amphibious",
+      "Multiattack",
+      "Rend"
+    ],
+    "red-dragon-wyrmling": [
+      "Fire Breath",
+      "Multiattack",
+      "Rend"
+    ],
+    "green-dragon-wyrmling": [
+      "Amphibious",
+      "Multiattack",
+      "Poison Breath",
+      "Rend"
+    ],
+    "gelatinous-cube": [
+      "Engulf",
+      "Ooze Cube",
+      "Pseudopod",
+      "Transparent"
+    ],
+    "deva": [
+      "Divine Aid (2/Day)",
+      "Exalted Restoration",
+      "Holy Mace",
+      "Magic Resistance",
+      "Multiattack",
+      "Spellcasting"
+    ],
+    "horned-devil": [
+      "Diabolical Restoration",
+      "Hurl Flame",
+      "Infernal Tail",
+      "Magic Resistance",
+      "Multiattack",
+      "Searing Fork"
+    ],
+    "bearded-devil": [
+      "Beard",
+      "Infernal Glaive",
+      "Magic Resistance",
+      "Multiattack"
+    ],
+    "pit-fiend": [
+      "Bite",
+      "Devilish Claw",
+      "Diabolical Restoration",
+      "Fear Aura",
+      "Fiery Mace",
+      "Hellfire Spellcasting",
+      "Legendary Resistance (4/Day)",
+      "Magic Resistance",
+      "Multiattack"
+    ],
+    "chain-devil": [
+      "Chain",
+      "Conjure Infernal Chain",
+      "Diabolical Restoration",
+      "Magic Resistance",
+      "Multiattack",
+      "Unnerving Gaze"
+    ],
+    "ice-devil": [
+      "Diabolical Restoration",
+      "Ice Spear",
+      "Ice Wall",
+      "Magic Resistance",
+      "Multiattack",
+      "Tail"
+    ],
+    "barbed-devil": [
+      "Barbed Hide",
+      "Claws",
+      "Diabolical Restoration",
+      "Hurl Flame",
+      "Magic Resistance",
+      "Multiattack",
+      "Tail"
+    ],
+    "bone-devil": [
+      "Claw",
+      "Diabolical Restoration",
+      "Infernal Sting",
+      "Magic Resistance",
+      "Multiattack"
+    ],
+    "djinni": [
+      "Create Whirlwind",
+      "Elemental Restoration",
+      "Magic Resistance",
+      "Multiattack",
+      "Spellcasting",
+      "Storm Blade",
+      "Storm Bolt",
+      "Wishes"
+    ],
+    "doppelganger": [
+      "Multiattack",
+      "Read Thoughts",
+      "Shape-Shift",
+      "Slam",
+      "Unsettling Visage"
+    ],
+    "adult-blue-dragon": [
+      "Cloaked Flight",
+      "Legendary Resistance (3/Day, or 4/Day in Lair)",
+      "Lightning Breath",
+      "Multiattack",
+      "Rend",
+      "Sonic Boom",
+      "Spellcasting",
+      "Tail Swipe"
+    ],
+    "ancient-blue-dragon": [
+      "Cloaked Flight",
+      "Legendary Resistance (4/Day, or 5/Day in Lair)",
+      "Lightning Breath",
+      "Multiattack",
+      "Rend",
+      "Sonic Boom",
+      "Spellcasting",
+      "Tail Swipe"
+    ],
+    "young-blue-dragon": [
+      "Lightning Breath",
+      "Multiattack",
+      "Rend"
+    ],
+    "adult-white-dragon": [
+      "Cold Breath",
+      "Freezing Burst",
+      "Frightful Presence",
+      "Ice Walk",
+      "Legendary Resistance (3/Day, or 4/Day in Lair)",
+      "Multiattack",
+      "Pounce",
+      "Rend"
+    ],
+    "ancient-white-dragon": [
+      "Cold Breath",
+      "Freezing Burst",
+      "Frightful Presence",
+      "Ice Walk",
+      "Legendary Resistance (4/Day, or 5/Day in Lair)",
+      "Multiattack",
+      "Pounce",
+      "Rend"
+    ],
+    "young-white-dragon": [
+      "Cold Breath",
+      "Ice Walk",
+      "Multiattack",
+      "Rend"
+    ],
+    "adult-bronze-dragon": [
+      "Amphibious",
+      "Guiding Light",
+      "Legendary Resistance (3/Day, or 4/Day in Lair)",
+      "Lightning Breath",
+      "Multiattack",
+      "Pounce",
+      "Rend",
+      "Repulsion Breath",
+      "Spellcasting",
+      "Thunderclap"
+    ],
+    "ancient-bronze-dragon": [
+      "Amphibious",
+      "Guiding Light",
+      "Legendary Resistance (4/Day, or 5/Day in Lair)",
+      "Lightning Breath",
+      "Multiattack",
+      "Pounce",
+      "Rend",
+      "Repulsion Breath",
+      "Spellcasting",
+      "Thunderclap"
+    ],
+    "young-bronze-dragon": [
+      "Amphibious",
+      "Lightning Breath",
+      "Multiattack",
+      "Rend",
+      "Repulsion Breath"
+    ],
+    "adult-copper-dragon": [
+      "Acid Breath",
+      "Giggling Magic",
+      "Legendary Resistance (3/Day, or 4/Day in Lair)",
+      "Mind Jolt",
+      "Multiattack",
+      "Pounce",
+      "Rend",
+      "Slowing Breath",
+      "Spellcasting"
+    ],
+    "ancient-copper-dragon": [
+      "Acid Breath",
+      "Giggling Magic",
+      "Legendary Resistance (4/Day, or 5/Day in Lair)",
+      "Mind Jolt",
+      "Multiattack",
+      "Pounce",
+      "Rend",
+      "Slowing Breath",
+      "Spellcasting"
+    ],
+    "young-copper-dragon": [
+      "Acid Breath",
+      "Multiattack",
+      "Rend",
+      "Slowing Breath"
+    ],
+    "adult-gold-dragon": [
+      "Amphibious",
+      "Banish",
+      "Fire Breath",
+      "Guiding Light",
+      "Legendary Resistance (3/Day, or 4/Day in Lair)",
+      "Multiattack",
+      "Pounce",
+      "Rend",
+      "Spellcasting",
+      "Weakening Breath"
+    ],
+    "ancient-gold-dragon": [
+      "Amphibious",
+      "Banish",
+      "Fire Breath",
+      "Guiding Light",
+      "Legendary Resistance (4/Day, or 5/Day in Lair)",
+      "Multiattack",
+      "Pounce",
+      "Rend",
+      "Spellcasting",
+      "Weakening Breath"
+    ],
+    "young-gold-dragon": [
+      "Amphibious",
+      "Fire Breath",
+      "Multiattack",
+      "Rend",
+      "Weakening Breath"
+    ],
+    "adult-brass-dragon": [
+      "Blazing Light",
+      "Fire Breath",
+      "Legendary Resistance (3/Day, or 4/Day in Lair)",
+      "Multiattack",
+      "Pounce",
+      "Rend",
+      "Scorching Sands",
+      "Sleep Breath",
+      "Spellcasting"
+    ],
+    "ancient-brass-dragon": [
+      "Blazing Light",
+      "Fire Breath",
+      "Legendary Resistance (4/Day, or 5/Day in Lair)",
+      "Multiattack",
+      "Pounce",
+      "Rend",
+      "Scorching Sands",
+      "Sleep Breath",
+      "Spellcasting"
+    ],
+    "young-brass-dragon": [
+      "Fire Breath",
+      "Multiattack",
+      "Rend",
+      "Sleep Breath"
+    ],
+    "adult-silver-dragon": [
+      "Chill",
+      "Cold Breath",
+      "Cold Gale",
+      "Legendary Resistance (3/Day, or 4/Day in Lair)",
+      "Multiattack",
+      "Paralyzing Breath",
+      "Pounce",
+      "Rend",
+      "Spellcasting"
+    ],
+    "ancient-silver-dragon": [
+      "Chill",
+      "Cold Breath",
+      "Cold Gale",
+      "Legendary Resistance (4/Day, or 5/Day in Lair)",
+      "Multiattack",
+      "Paralyzing Breath",
+      "Pounce",
+      "Rend",
+      "Spellcasting"
+    ],
+    "young-silver-dragon": [
+      "Cold Breath",
+      "Multiattack",
+      "Paralyzing Breath",
+      "Rend"
+    ],
+    "adult-black-dragon": [
+      "Acid Breath",
+      "Amphibious",
+      "Cloud of Insects",
+      "Frightful Presence",
+      "Legendary Resistance (3/Day, or 4/Day in Lair)",
+      "Multiattack",
+      "Pounce",
+      "Rend",
+      "Spellcasting"
+    ],
+    "ancient-black-dragon": [
+      "Acid Breath",
+      "Amphibious",
+      "Cloud of Insects",
+      "Frightful Presence",
+      "Legendary Resistance (4/Day, or 5/Day in Lair)",
+      "Multiattack",
+      "Pounce",
+      "Rend",
+      "Spellcasting"
+    ],
+    "young-black-dragon": [
+      "Acid Breath",
+      "Amphibious",
+      "Multiattack",
+      "Rend"
+    ],
+    "adult-red-dragon": [
+      "Commanding Presence",
+      "Fiery Rays",
+      "Fire Breath",
+      "Legendary Resistance (3/Day, or 4/Day in Lair)",
+      "Multiattack",
+      "Pounce",
+      "Rend",
+      "Spellcasting"
+    ],
+    "ancient-red-dragon": [
+      "Commanding Presence",
+      "Fiery Rays",
+      "Fire Breath",
+      "Legendary Resistance (4/Day, or 5/Day in Lair)",
+      "Multiattack",
+      "Pounce",
+      "Rend",
+      "Spellcasting"
+    ],
+    "young-red-dragon": [
+      "Fire Breath",
+      "Multiattack",
+      "Rend"
+    ],
+    "dragon-turtle": [
+      "Amphibious",
+      "Bite",
+      "Multiattack",
+      "Steam Breath",
+      "Tail"
+    ],
+    "adult-green-dragon": [
+      "Amphibious",
+      "Legendary Resistance (3/Day, or 4/Day in Lair)",
+      "Mind Invasion",
+      "Multiattack",
+      "Noxious Miasma",
+      "Poison Breath",
+      "Pounce",
+      "Rend",
+      "Spellcasting"
+    ],
+    "ancient-green-dragon": [
+      "Amphibious",
+      "Legendary Resistance (4/Day, or 5/Day in Lair)",
+      "Mind Invasion",
+      "Multiattack",
+      "Noxious Miasma",
+      "Poison Breath",
+      "Pounce",
+      "Rend",
+      "Spellcasting"
+    ],
+    "young-green-dragon": [
+      "Amphibious",
+      "Multiattack",
+      "Poison Breath",
+      "Rend"
+    ],
+    "drider": [
+      "Foreleg",
+      "Magic of the Spider Queen",
+      "Multiattack",
+      "Poison Burst",
+      "Spider Climb",
+      "Sunlight Sensitivity",
+      "Web Walker"
+    ],
+    "dretch": [
+      "Fetid Cloud (1/Day)",
+      "Rend"
+    ],
+    "druid": [
+      "Multiattack",
+      "Spellcasting",
+      "Verdant Wisp",
+      "Vine Staff"
+    ],
+    "dryad": [
+      "Magic Resistance",
+      "Multiattack",
+      "Speak with Beasts and Plants",
+      "Spellcasting",
+      "Thorn Burst",
+      "Tree Stride",
+      "Vine Lash"
+    ],
+    "elephant": [
+      "Gore",
+      "Multiattack",
+      "Trample"
+    ],
+    "water-elemental": [
+      "Freeze",
+      "Multiattack",
+      "Slam",
+      "Water Form",
+      "Whelm"
+    ],
+    "air-elemental": [
+      "Air Form",
+      "Multiattack",
+      "Thunderous Slam",
+      "Whirlwind"
+    ],
+    "fire-elemental": [
+      "Burn",
+      "Fire Aura",
+      "Fire Form",
+      "Illumination",
+      "Multiattack",
+      "Water Susceptibility"
+    ],
+    "earth-elemental": [
+      "Earth Glide",
+      "Multiattack",
+      "Rock Launch",
+      "Siege Monster",
+      "Slam"
+    ],
+    "vampire-spawn": [
+      "Bite",
+      "Claw",
+      "Deathless Agility",
+      "Forbiddance",
+      "Multiattack",
+      "Running Water",
+      "Spider Climb",
+      "Stake to the Heart",
+      "Sunlight",
+      "Vampire Weakness"
+    ],
+    "swarm-of-ravens": [
+      "Beaks",
+      "Cacophony",
+      "Swarm"
+    ],
+    "swarm-of-crawling-claws": [
+      "Swarm",
+      "Swarm of Grasping Hands"
+    ],
+    "swarm-of-insects": [
+      "Bites",
+      "Spider Climb",
+      "Swarm"
+    ],
+    "swarm-of-bats": [
+      "Bites",
+      "Swarm"
+    ],
+    "swarm-of-piranhas": [
+      "Bites",
+      "Swarm",
+      "Water Breathing"
+    ],
+    "swarm-of-rats": [
+      "Bites",
+      "Swarm"
+    ],
+    "swarm-of-venomous-snakes": [
+      "Bites",
+      "Swarm"
+    ],
+    "treant": [
+      "Animate Trees (1/Day)",
+      "Hail of Bark",
+      "Multiattack",
+      "Siege Monster",
+      "Slam"
+    ],
+    "erinyes": [
+      "Diabolical Restoration",
+      "Entangling Rope (Requires Magic Rope)",
+      "Magic Resistance",
+      "Magic Rope",
+      "Multiattack",
+      "Parry",
+      "Withering Sword"
+    ],
+    "giant-scorpion": [
+      "Claw",
+      "Multiattack",
+      "Sting"
+    ],
+    "sphinx-of-lore": [
+      "Arcane Prowl",
+      "Claw",
+      "Inscrutable",
+      "Legendary Resistance (3/Day, or 4/Day in Lair)",
+      "Mind-Rending Roar",
+      "Multiattack",
+      "Spellcasting",
+      "Weight of Years"
+    ],
+    "sphinx-of-valor": [
+      "Arcane Prowl",
+      "Claw",
+      "First Roar",
+      "Inscrutable",
+      "Legendary Resistance (3/Day, or 4/Day in Lair)",
+      "Multiattack",
+      "Roar (3/Day)",
+      "Second Roar",
+      "Spellcasting",
+      "Third Roar",
+      "Weight of Years"
+    ],
+    "animated-flying-sword": [
+      "Slash"
+    ],
+    "specter": [
+      "Incorporeal Movement",
+      "Life Drain",
+      "Sunlight Sensitivity"
+    ],
+    "spy": [
+      "Cunning Action",
+      "Hand Crossbow",
+      "Shortsword"
+    ],
+    "ettercap": [
+      "Bite",
+      "Claw",
+      "Multiattack",
+      "Reel",
+      "Spider Climb",
+      "Web Strand",
+      "Web Walker"
+    ],
+    "ettin": [
+      "Battleaxe",
+      "Morningstar",
+      "Multiattack"
+    ],
+    "merfolk-skirmisher": [
+      "Amphibious",
+      "Ocean Spear"
+    ],
+    "troll-limb": [
+      "Regeneration",
+      "Rend",
+      "Troll Spawn"
+    ],
+    "ghost": [
+      "Ethereal Sight",
+      "Etherealness",
+      "Horrific Visage",
+      "Incorporeal Movement",
+      "Multiattack",
+      "Possession",
+      "Withering Touch"
+    ],
+    "cultist-fanatic": [
+      "Pact Blade",
+      "Spellcasting",
+      "Spiritual Weapon (2/Day)"
+    ],
+    "will-o-wisp": [
+      "Consume Life",
+      "Ephemeral",
+      "Illumination",
+      "Incorporeal Movement",
+      "Shock",
+      "Vanish"
+    ],
+    "ochre-jelly": [
+      "Amorphous",
+      "Pseudopod",
+      "Spider Climb",
+      "Split"
+    ],
+    "ghast": [
+      "Bite",
+      "Claw",
+      "Stench"
+    ],
+    "frost-giant": [
+      "Frost Axe",
+      "Great Bow",
+      "Multiattack",
+      "War Cry"
+    ],
+    "fire-giant": [
+      "Flame Sword",
+      "Hammer Throw",
+      "Multiattack"
+    ],
+    "hill-giant": [
+      "Multiattack",
+      "Trash Lob",
+      "Tree Club"
+    ],
+    "cloud-giant": [
+      "Misty Step",
+      "Multiattack",
+      "Spellcasting",
+      "Thundercloud",
+      "Thunderous Mace"
+    ],
+    "storm-giant": [
+      "Amphibious",
+      "Lightning Storm",
+      "Multiattack",
+      "Spellcasting",
+      "Storm Sword",
+      "Thunderbolt"
+    ],
+    "stone-giant": [
+      "Boulder",
+      "Deflect Missile",
+      "Multiattack",
+      "Stone Club"
+    ],
+    "glabrezu": [
+      "Demonic Restoration",
+      "Magic Resistance",
+      "Multiattack",
+      "Pincer",
+      "Pummel",
+      "Spellcasting"
+    ],
+    "gladiator": [
+      "Multiattack",
+      "Parry",
+      "Shield Bash",
+      "Spear"
+    ],
+    "gorgon": [
+      "Gore",
+      "Petrifying Breath",
+      "Trample"
+    ],
+    "grick": [
+      "Beak",
+      "Multiattack",
+      "Tentacles"
+    ],
+    "griffon": [
+      "Multiattack",
+      "Rend"
+    ],
+    "grimlock": [
+      "Bone Cudgel"
+    ],
+    "guard": [
+      "Spear"
+    ],
+    "shield-guardian": [
+      "Bound",
+      "Fist",
+      "Multiattack",
+      "Protection",
+      "Regeneration",
+      "Spell Storing"
+    ],
+    "warrior-infantry": [
+      "Pack Tactics",
+      "Spear"
+    ],
+    "gnoll-warrior": [
+      "Bone Bow",
+      "Rampage (1/Day)",
+      "Rend"
+    ],
+    "sahuagin-warrior": [
+      "Aquatic Charge",
+      "Blood Frenzy",
+      "Claw",
+      "Limited Amphibiousness",
+      "Multiattack",
+      "Shark Telepathy"
+    ],
+    "warrior-veteran": [
+      "Greatsword",
+      "Heavy Crossbow",
+      "Multiattack",
+      "Parry"
+    ],
+    "wyvern": [
+      "Bite",
+      "Multiattack",
+      "Sting"
+    ],
+    "purple-worm": [
+      "Bite",
+      "Multiattack",
+      "Swallow",
+      "Tail Stinger",
+      "Tunneler"
+    ],
+    "gargoyle": [
+      "Claw",
+      "Flyby",
+      "Multiattack"
+    ],
+    "clay-golem": [
+      "Acid Absorption",
+      "Berserk",
+      "Hasten",
+      "Immutable Form",
+      "Magic Resistance",
+      "Multiattack",
+      "Slam"
+    ],
+    "flesh-golem": [
+      "Aversion to Fire",
+      "Berserk",
+      "Immutable Form",
+      "Lightning Absorption",
+      "Magic Resistance",
+      "Multiattack",
+      "Slam"
+    ],
+    "iron-golem": [
+      "Bladed Arm",
+      "Fiery Bolt",
+      "Fire Absorption",
+      "Immutable Form",
+      "Magic Resistance",
+      "Multiattack",
+      "Poison Breath"
+    ],
+    "stone-golem": [
+      "Force Bolt",
+      "Immutable Form",
+      "Magic Resistance",
+      "Multiattack",
+      "Slam",
+      "Slow"
+    ],
+    "hezrou": [
+      "Demonic Restoration",
+      "Leap",
+      "Magic Resistance",
+      "Multiattack",
+      "Rend",
+      "Stench"
+    ],
+    "hydra": [
+      "Bite",
+      "Hold Breath",
+      "Multiattack",
+      "Multiple Heads",
+      "Reactive Heads"
+    ],
+    "hippogriff": [
+      "Flyby",
+      "Multiattack",
+      "Rend"
+    ],
+    "hippopotamus": [
+      "Bite",
+      "Hold Breath",
+      "Multiattack"
+    ],
+    "wereboar": [
+      "Gore (Boar or Hybrid Form Only)",
+      "Javelin (Humanoid or Hybrid Form Only)",
+      "Multiattack",
+      "Shape-Shift",
+      "Tusk (Boar or Hybrid Form Only)"
+    ],
+    "werewolf": [
+      "Bite (Wolf or Hybrid Form Only)",
+      "Longbow (Humanoid or Hybrid Form Only)",
+      "Multiattack",
+      "Pack Tactics",
+      "Scratch",
+      "Shape-Shift"
+    ],
+    "werebear": [
+      "Bite (Bear or Hybrid Form Only)",
+      "Handaxe (Humanoid or Hybrid Form Only)",
+      "Multiattack",
+      "Rend (Bear or Hybrid Form Only)",
+      "Shape-Shift"
+    ],
+    "wererat": [
+      "Bite (Rat or Hybrid Form Only)",
+      "Hand Crossbow (Humanoid or Hybrid Form Only)",
+      "Multiattack",
+      "Scratch",
+      "Shape-Shift"
+    ],
+    "weretiger": [
+      "Bite (Tiger or Hybrid Form Only)",
+      "Longbow (Humanoid or Hybrid Form Only)",
+      "Multiattack",
+      "Prowl (Tiger or Hybrid Form Only)",
+      "Scratch",
+      "Shape-Shift"
+    ],
+    "homunculus": [
+      "Bite",
+      "Telepathic Bond"
+    ],
+    "shrieker-fungus": [
+      "Shriek"
+    ],
+    "violet-fungus": [
+      "Multiattack",
+      "Rotting Touch"
+    ],
+    "worg": [
+      "Bite"
+    ],
+    "efreeti": [
+      "Elemental Restoration",
+      "Heated Blade",
+      "Hurl Flame",
+      "Magic Resistance",
+      "Multiattack",
+      "Spellcasting",
+      "Wishes"
+    ],
+    "giant-boar": [
+      "Bloodied Fury",
+      "Gore"
+    ],
+    "goblin-boss": [
+      "Multiattack",
+      "Nimble Escape",
+      "Redirect Attack",
+      "Scimitar",
+      "Shortbow"
+    ],
+    "tough-boss": [
+      "Heavy Crossbow",
+      "Multiattack",
+      "Pack Tactics",
+      "Warhammer"
+    ],
+    "kraken": [
+      "Amphibious",
+      "Fling",
+      "Legendary Resistance (4/Day, or 5/Day in Lair)",
+      "Lightning Strike",
+      "Multiattack",
+      "Siege Monster",
+      "Storm Bolt",
+      "Swallow",
+      "Tentacle",
+      "Toxic Ink"
+    ],
+    "roper": [
+      "Bite",
+      "Multiattack",
+      "Reel",
+      "Spider Climb",
+      "Tentacle"
+    ],
+    "lamia": [
+      "Claw",
+      "Corrupting Touch",
+      "Leap",
+      "Multiattack",
+      "Spellcasting"
+    ],
+    "lich": [
+      "Deathly Teleport",
+      "Disrupt Life",
+      "Eldritch Burst",
+      "Frightening Gaze",
+      "Legendary Resistance (4/Day, or 5/Day in Lair)",
+      "Multiattack",
+      "Paralyzing Touch",
+      "Protective Magic",
+      "Spellcasting",
+      "Spirit Jar"
+    ],
+    "winter-wolf": [
+      "Bite",
+      "Cold Breath",
+      "Pack Tactics"
+    ],
+    "lemure": [
+      "Hellish Restoration",
+      "Vile Slime"
+    ],
+    "magmin": [
+      "Death Burst",
+      "Ignited Illumination",
+      "Touch"
+    ],
+    "mage": [
+      "Arcane Burst",
+      "Misty Step (3/Day)",
+      "Multiattack",
+      "Protective Magic (3/Day)",
+      "Spellcasting"
+    ],
+    "mammoth": [
+      "Gore",
+      "Multiattack",
+      "Trample"
+    ],
+    "cloaker": [
+      "Attach",
+      "Light Sensitivity",
+      "Moan",
+      "Multiattack",
+      "Phantasms",
+      "Tail"
+    ],
+    "darkmantle": [
+      "Crush",
+      "Darkness Aura (1/Day)"
+    ],
+    "manticore": [
+      "Multiattack",
+      "Rend",
+      "Tail Spike"
+    ],
+    "marilith": [
+      "Constrict",
+      "Demonic Restoration",
+      "Magic Resistance",
+      "Multiattack",
+      "Pact Blade",
+      "Parry",
+      "Reactive",
+      "Teleport"
+    ],
+    "medusa": [
+      "Claw",
+      "Multiattack",
+      "Petrifying Gaze",
+      "Poison Ray",
+      "Snake Hair"
+    ],
+    "ice-mephit": [
+      "Claw",
+      "Death Burst",
+      "Fog Cloud (1/Day)",
+      "Frost Breath"
+    ],
+    "magma-mephit": [
+      "Claw",
+      "Death Burst",
+      "Fire Breath"
+    ],
+    "dust-mephit": [
+      "Blinding Breath",
+      "Claw",
+      "Death Burst",
+      "Sleep (1/Day)"
+    ],
+    "steam-mephit": [
+      "Blurred Form",
+      "Claw",
+      "Death Burst",
+      "Steam Breath"
+    ],
+    "merrow": [
+      "Amphibious",
+      "Bite",
+      "Claw",
+      "Harpoon",
+      "Multiattack"
+    ],
+    "mimic": [
+      "Adhesive (Object Form Only)",
+      "Bite",
+      "Pseudopod",
+      "Shape-Shift"
+    ],
+    "minotaur-of-baphomet": [
+      "Abyssal Glaive",
+      "Gore"
+    ],
+    "minotaur-skeleton": [
+      "Gore",
+      "Slam"
+    ],
+    "mummy": [
+      "Dreadful Glare",
+      "Multiattack",
+      "Rotting Fist"
+    ],
+    "rust-monster": [
+      "Antennae",
+      "Bite",
+      "Destroy Metal",
+      "Iron Scent",
+      "Multiattack",
+      "Reflexive Antennae"
+    ],
+    "spirit-naga": [
+      "Bite",
+      "Fiendish Restoration",
+      "Multiattack",
+      "Necrotic Ray",
+      "Spellcasting"
+    ],
+    "guardian-naga": [
+      "Bite",
+      "Celestial Restoration",
+      "Multiattack",
+      "Poisonous Spittle",
+      "Spellcasting"
+    ],
+    "nalfeshnee": [
+      "Demonic Restoration",
+      "Horror Nimbus",
+      "Magic Resistance",
+      "Multiattack",
+      "Pursuit",
+      "Rend",
+      "Teleport"
+    ],
+    "noble": [
+      "Parry",
+      "Rapier"
+    ],
+    "ogre-zombie": [
+      "Slam",
+      "Undead Fortitude"
+    ],
+    "oni": [
+      "Claw",
+      "Invisibility",
+      "Multiattack",
+      "Nightmare Ray",
+      "Regeneration",
+      "Shape-Shift",
+      "Spellcasting"
+    ],
+    "killer-whale": [
+      "Bite",
+      "Hold Breath"
+    ],
+    "owlbear": [
+      "Multiattack",
+      "Rend"
+    ],
+    "polar-bear": [
+      "Multiattack",
+      "Rend"
+    ],
+    "otyugh": [
+      "Bite",
+      "Multiattack",
+      "Tentacle",
+      "Tentacle Slam"
+    ],
+    "pegasus": [
+      "Hooves"
+    ],
+    "tough": [
+      "Heavy Crossbow",
+      "Mace",
+      "Pack Tactics"
+    ],
+    "death-dog": [
+      "Bite",
+      "Multiattack"
+    ],
+    "blink-dog": [
+      "Bite",
+      "Teleport"
+    ],
+    "nightmare": [
+      "Confer Fire Resistance",
+      "Ethereal Stride",
+      "Hooves",
+      "Illumination"
+    ],
+    "axe-beak": [
+      "Beak"
+    ],
+    "pirate": [
+      "Dagger",
+      "Enthralling Panache",
+      "Multiattack"
+    ],
+    "planetar": [
+      "Divine Aid (2/Day)",
+      "Divine Awareness",
+      "Exalted Restoration",
+      "Holy Burst",
+      "Magic Resistance",
+      "Multiattack",
+      "Radiant Sword",
+      "Spellcasting"
+    ],
+    "commoner": [
+      "Club",
+      "Training"
+    ],
+    "plesiosaurus": [
+      "Bite",
+      "Hold Breath"
+    ],
+    "black-pudding": [
+      "Amorphous",
+      "Corrosive Form",
+      "Dissolving Pseudopod",
+      "Spider Climb",
+      "Split"
+    ],
+    "chimera": [
+      "Bite",
+      "Claw",
+      "Fire Breath",
+      "Multiattack",
+      "Ram"
+    ],
+    "rakshasa": [
+      "Baleful Command",
+      "Cursed Touch",
+      "Fiendish Restoration",
+      "Greater Magic Resistance",
+      "Multiattack",
+      "Spellcasting"
+    ],
+    "remorhaz": [
+      "Bite",
+      "Heat Aura",
+      "Swallow"
+    ],
+    "rhinoceros": [
+      "Gore"
+    ],
+    "roc": [
+      "Beak",
+      "Multiattack",
+      "Swoop",
+      "Talons"
+    ],
+    "hell-hound": [
+      "Bite",
+      "Fire Breath",
+      "Multiattack",
+      "Pack Tactics"
+    ],
+    "priest": [
+      "Divine Aid (3/Day)",
+      "Mace",
+      "Multiattack",
+      "Radiant Flame",
+      "Spellcasting"
+    ],
+    "priest-acolyte": [
+      "Divine Aid (1/Day)",
+      "Mace",
+      "Radiant Flame",
+      "Spellcasting"
+    ],
+    "green-hag": [
+      "Amphibious",
+      "Claw",
+      "Coven Magic",
+      "Mimicry",
+      "Multiattack",
+      "Spellcasting"
+    ],
+    "night-hag": [
+      "Claw",
+      "Coven Magic",
+      "Magic Resistance",
+      "Multiattack",
+      "Nightmare Haunting (1/Day; Requires Soul Bag)",
+      "Shape-Shift",
+      "Soul Bag",
+      "Spellcasting"
+    ],
+    "sea-hag": [
+      "Amphibious",
+      "Claw",
+      "Coven Magic",
+      "Death Glare",
+      "Illusory Appearance",
+      "Vile Appearance"
+    ],
+    "salamander": [
+      "Constrict",
+      "Fire Aura",
+      "Flame Spear",
+      "Multiattack"
+    ],
+    "goblin-minion": [
+      "Dagger",
+      "Nimble Escape"
+    ],
+    "half-dragon": [
+      "Claw",
+      "Draconic Origin",
+      "Dragon's Breath",
+      "Leap",
+      "Multiattack"
+    ],
+    "giant-constrictor-snake": [
+      "Bite",
+      "Constrict",
+      "Multiattack"
+    ],
+    "flying-snake": [
+      "Bite",
+      "Flyby"
+    ],
+    "mummy-lord": [
+      "Channel Negative Energy",
+      "Dread Command",
+      "Dreadful Glare",
+      "Glare",
+      "Legendary Resistance (3/Day, or 4/Day in Lair)",
+      "Magic Resistance",
+      "Multiattack",
+      "Necrotic Strike",
+      "Rotting Fist",
+      "Spellcasting",
+      "Undead Restoration",
+      "Whirlwind of Sand"
+    ],
+    "vampire-familiar": [
+      "Deathless Agility",
+      "Multiattack",
+      "Umbral Dagger",
+      "Vampiric Connection"
+    ],
+    "giant-ape": [
+      "Boulder Toss",
+      "Fist",
+      "Leap",
+      "Multiattack"
+    ],
+    "solar": [
+      "Blinding Gaze",
+      "Divine Aid (3/Day)",
+      "Divine Awareness",
+      "Exalted Restoration",
+      "Flying Sword",
+      "Legendary Resistance (4/Day)",
+      "Magic Resistance",
+      "Multiattack",
+      "Radiant Teleport",
+      "Slaying Bow",
+      "Spellcasting"
+    ],
+    "centaur-trooper": [
+      "Longbow",
+      "Multiattack",
+      "Pike",
+      "Trampling Charge"
+    ],
+    "shadow": [
+      "Amorphous",
+      "Draining Swipe",
+      "Shadow Stealth",
+      "Sunlight Weakness"
+    ],
+    "satyr": [
+      "Hooves",
+      "Magic Resistance",
+      "Mockery"
+    ],
+    "succubus": [
+      "Charm",
+      "Draining Kiss",
+      "Fiendish Touch",
+      "Incubus Form",
+      "Multiattack",
+      "Shape-Shift"
+    ],
+    "tarrasque": [
+      "Bite",
+      "Claw",
+      "Legendary Resistance (6/Day)",
+      "Magic Resistance",
+      "Multiattack",
+      "Onslaught",
+      "Reflective Carapace",
+      "Siege Monster",
+      "Swallow",
+      "Tail",
+      "Thunderous Bellow",
+      "World-Shaking Movement"
+    ],
+    "hunter-shark": [
+      "Bite",
+      "Water Breathing"
+    ],
+    "giant-shark": [
+      "Bite",
+      "Multiattack",
+      "Water Breathing"
+    ],
+    "saber-toothed-tiger": [
+      "Multiattack",
+      "Nimble Escape",
+      "Rend",
+      "Running Leap"
+    ],
+    "tyrannosaurus-rex": [
+      "Bite",
+      "Multiattack",
+      "Tail"
+    ],
+    "triceratops": [
+      "Gore",
+      "Multiattack"
+    ],
+    "troll": [
+      "Charge",
+      "Loathsome Limbs (4/Day)",
+      "Multiattack",
+      "Regeneration",
+      "Rend"
+    ],
+    "wight": [
+      "Life Drain",
+      "Multiattack",
+      "Necrotic Bow",
+      "Necrotic Sword",
+      "Sunlight Sensitivity"
+    ],
+    "unicorn": [
+      "Charging Horn",
+      "Hooves",
+      "Legendary Resistance (3/Day)",
+      "Magic Resistance",
+      "Multiattack",
+      "Radiant Horn",
+      "Shimmering Shield",
+      "Spellcasting",
+      "Unicorn's Blessing (3/Day)"
+    ],
+    "vampire": [
+      "Beguile",
+      "Bite (Bat or Vampire Form Only)",
+      "Charm",
+      "Deathless Strike",
+      "Forbiddance",
+      "Grave Strike (Vampire Form Only)",
+      "Legendary Resistance (3/Day, or 4/Day in Lair)",
+      "Misty Escape",
+      "Multiattack (Vampire Form Only)",
+      "Running Water",
+      "Shape-Shift",
+      "Spider Climb",
+      "Stake to the Heart",
+      "Sunlight",
+      "Vampire Weakness"
+    ],
+    "vrock": [
+      "Demonic Restoration",
+      "Magic Resistance",
+      "Multiattack",
+      "Shred",
+      "Spores",
+      "Stunning Screech (1/Day)"
+    ],
+    "xorn": [
+      "Bite",
+      "Charge",
+      "Claw",
+      "Earth Glide",
+      "Multiattack",
+      "Treasure Sense"
+    ],
+    "giant-eagle": [
+      "Multiattack",
+      "Rend"
+    ],
+    "awakened-tree": [
+      "Slam"
+    ],
+    "incubus": [
+      "Multiattack",
+      "Nightmare",
+      "Restless Touch",
+      "Spellcasting",
+      "Succubus Form"
+    ]
+  },
+  "unmatchedMonster": [
+    "aberrant-spirit-beholderkin",
+    "aberrant-spirit-mind-flayer",
+    "aberrant-spirit-slaad",
+    "animated-object-huge",
+    "animated-object-large",
+    "animated-object-medium-or-smaller",
+    "beast-of-the-land",
+    "beast-of-the-sea",
+    "beast-of-the-sky",
+    "bestial-spirit-air",
+    "bestial-spirit-land",
+    "bestial-spirit-water",
+    "celestial-spirit-avenger",
+    "celestial-spirit-defender",
+    "construct-spirit-clay",
+    "construct-spirit-metal",
+    "construct-spirit-stone",
+    "draconic-spirit",
+    "eldritch-cannon",
+    "eldritch-cannon-explosive",
+    "elemental-spirit-air",
+    "elemental-spirit-earth",
+    "elemental-spirit-fire",
+    "elemental-spirit-water",
+    "fey-spirit",
+    "fiendish-spirit-demon",
+    "fiendish-spirit-devil",
+    "fiendish-spirit-yugoloth",
+    "giant-insect-centipede",
+    "giant-insect-spider",
+    "giant-insect-wasp",
+    "giant-tarantula",
+    "otherworldly-steed",
+    "undead-spirit-ghostly",
+    "undead-spirit-putrid",
+    "undead-spirit-skeletal"
+  ],
+  "item": {
+    "playing-card-set": "Playing Cards"
+  }
+}
