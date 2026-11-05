@@ -578,6 +578,9 @@ export interface NpcJson extends JsonObject {
   background?: string;
   tags?: string[];
   notes?: DiaryEntry[];
+  appearance?: string;
+  portraitPaths?: string[];
+  portraitPrompts?: Record<string, string>;
 }
 
 /** Un combatiente tal como lo guarda el encuentro (`Combatant.toJson`). Los

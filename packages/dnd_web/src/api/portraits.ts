@@ -108,11 +108,17 @@ export const setImageProvider = (id: string): Promise<void> => patchSettings({ i
 /** Sube [file] bajo un PNJ **sin** ficha de personaje: el servidor le reserva esta
  *  ruta y a uno con ficha le da 404; ese va por `uploadPortrait` con su ficha. */
 export async function uploadNpcPortrait(npcId: string, file: File): Promise<string> {
+  return saveNpcPortraitBase64(npcId, toBase64(new Uint8Array(await file.arrayBuffer())));
+}
+
+/** Guarda una imagen ya en base64 como retrato de un PNJ sin ficha
+ *  (`POST /api/npcs/<id>/portraits`) y devuelve la clave. */
+export async function saveNpcPortraitBase64(npcId: string, base64: string): Promise<string> {
   const path = `/api/npcs/${encodeURIComponent(npcId)}/portraits`;
   const response = await fetch(path, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ bytes: toBase64(new Uint8Array(await file.arrayBuffer())) }),
+    body: JSON.stringify({ bytes: base64 }),
   });
   if (!response.ok) throw new ApiError(response.status, path);
   return ((await response.json()) as { key: string }).key;

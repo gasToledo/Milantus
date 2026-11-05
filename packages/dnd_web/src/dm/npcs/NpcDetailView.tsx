@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, EllipsisVertical, Pencil, Plus, Trash2, X } from 'lucide-react';
+import { ArrowLeft, Camera, EllipsisVertical, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { ApiError, deleteNpc, saveCharacter, type StoredNpc } from '../../api/client';
 import { dropNpcSave, flushNpcSave, retryNpcSave } from '../../api/npcSave';
 import { deletePortrait, uploadNpcPortrait, uploadPortrait } from '../../api/portraits';
@@ -8,7 +8,7 @@ import { queryKeys, useDmCampaigns, useNpc, useSheetCatalog } from '../../api/qu
 import { actOn, npcViews, type CharacterJson, type NpcView } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
 import { RenameDialog } from '../../dashboard/RenameDialog';
-import { dmNpcBlockHref, dmNpcSheetHref, dmNpcsHref, Link, navigate } from '../../router';
+import { dmNpcBlockHref, dmNpcPortraitHref, dmNpcSheetHref, dmNpcsHref, Link, navigate } from '../../router';
 import { signed } from '../../sheet/format';
 import { BackgroundEditor, DiaryEntries, type DiaryEditor } from '../../sheet/DiaryTab';
 import { type SheetNotify } from '../../sheet/writer';
@@ -39,7 +39,7 @@ const ICON_BUTTON = 'inline-flex size-11 shrink-0 items-center justify-center ro
  * más: un PNJ ajeno y uno inexistente responden el mismo 404 y la pantalla
  * dice lo mismo. Acá se escribe el estado por campaña, se suma a otra, se
  * borra el PNJ, se escribe su texto (nombre, voz, tags, trasfondo y notas) y se
- * abre el editor de su bloque; siguen en Flutter el retrato y exportar.
+ * abre el editor de su bloque y el taller de retratos; sigue en Flutter exportar.
  */
 export function NpcDetailView({ npcId }: { npcId: string }) {
   const t = useTexts();
@@ -167,7 +167,20 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
           el contenedor porque el panel lateral es invisible para el ancho de ventana;
           456 es lo que ocupan en una fila el medallón, 300 de texto y el ⋮. */}
       <header className="grid grid-cols-[1fr_auto] items-start gap-x-[18px] gap-y-4 @[456px]:grid-cols-[auto_minmax(0,1fr)_auto]">
-        <Medallion name={npc.name} accent={null} size={76} portrait={npcPortrait(stored.data)} viewable />
+        {/* El medallón abre el visor; la cámara, el taller. Son dos destinos. */}
+        <div className="relative size-[76px] shrink-0">
+          <Medallion name={npc.name} accent={null} size={76} portrait={npcPortrait(stored.data)} viewable />
+          <Tooltip content={t.actionPortrait}>
+            <Link
+              href={dmNpcPortraitHref(npc.id)}
+              aria-label={t.actionPortrait}
+              data-action="npc-portrait"
+              className="absolute -right-1.5 -bottom-1.5 inline-flex size-8 items-center justify-center rounded-full border border-hairline bg-surface text-gold before:absolute before:-inset-1.5 before:content-['']"
+            >
+              <Camera size={16} aria-hidden="true" />
+            </Link>
+          </Tooltip>
+        </div>
         <div className="col-span-2 row-start-2 flex min-w-0 flex-col gap-2 @[456px]:col-span-1 @[456px]:col-start-2 @[456px]:row-start-1">
           <div className="flex items-start gap-1">
             <h1 className="font-display min-w-0 text-[28px] leading-tight break-words text-on-surface">{npc.name}</h1>

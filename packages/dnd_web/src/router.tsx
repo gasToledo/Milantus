@@ -79,6 +79,7 @@ export type DmView =
   | { kind: 'npcs'; npcId: string | null }
   // El editor del bloque de un PNJ de bloque.
   | { kind: 'npcBlock'; npcId: string }
+  | { kind: 'npcPortrait'; npcId: string }
   // El Homebrew también. Sin categoría es la portada; las criaturas no tienen
   // entrada propia acá: su perfil es el del Bestiario.
   | { kind: 'homebrew'; category: HomebrewCategory | null; entryId: string | null };
@@ -150,6 +151,14 @@ export function matchRoute(pathname: string): Route {
     if (id === 'pnj' && tab !== undefined && rest[0] === 'bloque' && rest.length === 1) {
       try {
         return { name: 'dm', view: { kind: 'npcBlock', npcId: decodeURIComponent(tab) } };
+      } catch {
+        return { name: 'unknown' };
+      }
+    }
+    // `/dm/pnj/:pnj/retrato`.
+    if (id === 'pnj' && tab !== undefined && rest[0] === 'retrato' && rest.length === 1) {
+      try {
+        return { name: 'dm', view: { kind: 'npcPortrait', npcId: decodeURIComponent(tab) } };
       } catch {
         return { name: 'unknown' };
       }
@@ -309,6 +318,7 @@ export const dmMemberHref = (campaignId: string, memberId: string, tab: SheetTab
 
 /** La ficha completa de un PNJ con ficha, en una de sus pestañas. */
 export const dmNpcBlockHref = (npcId: string): string => `${dmNpcsHref(npcId)}/bloque`;
+export const dmNpcPortraitHref = (npcId: string): string => `${dmNpcsHref(npcId)}/retrato`;
 export const dmNpcSheetHref = (npcId: string, tab: SheetTab = 'personaje'): string =>
   `${dmNpcsHref(npcId)}/ficha/${tab}`;
 /**

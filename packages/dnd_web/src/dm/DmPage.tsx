@@ -20,6 +20,7 @@ import { MusicPlayer } from './MusicPlayer';
 import { NotebookView } from './NotebookView';
 import { CampaignNpcsView } from './npcs/CampaignNpcsView';
 import { NpcBlockBack, NpcBlockView } from './npcs/NpcBlockView';
+import { NpcPortraitView } from './npcs/NpcPortraitView';
 import { NpcDetailView } from './npcs/NpcDetailView';
 import { NpcLibraryView } from './npcs/NpcLibraryView';
 import { NpcSheetView } from './npcs/NpcSheetView';
@@ -75,6 +76,9 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
     body = view.npcId === null ? <NpcLibraryView campaigns={list} /> : <NpcDetailView key={view.npcId} npcId={view.npcId} />;
   } else if (view.kind === 'npcBlock') {
     body = <NpcBlockView key={view.npcId} npcId={view.npcId} leaveRef={leave} />;
+  } else if (view.kind === 'npcPortrait') {
+    // Sin guardia de salida: cada acción del taller ya se guarda sola.
+    body = <NpcPortraitView key={view.npcId} npcId={view.npcId} />;
   } else if (view.kind === 'npcSheet') {
     body = <NpcSheetView key={view.npcId} npcId={view.npcId} tab={view.tab} />;
   } else if (view.kind === 'homebrew') {
@@ -123,7 +127,7 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
         view.kind === 'npcBlock' ? (
           <NpcBlockBack npcId={view.npcId} leaveRef={leave} />
         ) : (
-          <DmPanel campaigns={list} current={current} tool={view.kind === 'npcSheet' ? 'npcs' : view.kind === 'bestiary' || view.kind === 'npcs' || view.kind === 'homebrew' ? view.kind : undefined} />
+          <DmPanel campaigns={list} current={current} tool={view.kind === 'npcSheet' || view.kind === 'npcPortrait' ? 'npcs' : view.kind === 'bestiary' || view.kind === 'npcs' || view.kind === 'homebrew' ? view.kind : undefined} />
         )
       }
       footer={<RosterFooter account={account} dm />}>

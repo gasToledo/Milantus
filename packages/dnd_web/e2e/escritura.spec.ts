@@ -968,6 +968,27 @@ test('Ficha de un PNJ: nombre, voz, tag, trasfondo y nota se guardan en su docum
   await request.delete(`/api/npcs/${npc.id}`, comoDm);
 });
 
+test('subir el retrato de un PNJ lo guarda en su documento', async ({ page, request }) => {
+  const comoDm = { headers: { cookie: `dnd_session=${TOKEN_ESCRITURA}` } };
+  const creado = await request.post('/api/npcs', { ...comoDm, data: { npc: { id: 'nuevo', name: 'Bruna', sheetKind: 'none' } } });
+  const { npc } = (await creado.json()) as { npc: { id: string } };
+  // Un PNG de 1×1: al servidor le alcanza la cabecera.
+  const png = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYGD4DwABBAEAwS2OUAAAAABJRU5ErkJggg==',
+    'base64',
+  );
+
+  await page.goto(`/v2/dm/pnj/${npc.id}/retrato`);
+  // Con proveedores la pantalla abre en Generar: se pasa a Subir.
+  await page.locator('[data-tab="upload"]').click();
+  await page.locator('[data-field="portrait-file"]').setInputFiles({ name: 'retrato.png', mimeType: 'image/png', buffer: png });
+  await expect
+    .poll(async () => (await api<{ npc: { portraitPaths?: string[] } }>(request, `/api/npcs/${npc.id}`, TOKEN_ESCRITURA)).npc.portraitPaths?.length)
+    .toBe(1);
+
+  await request.delete(`/api/npcs/${npc.id}`, comoDm);
+});
+
 test('Bloque de un PNJ: guarda lo que da el motor y conserva lo que no se edita', async ({ page, request }) => {
   const comoDm = { headers: { cookie: `dnd_session=${TOKEN_ESCRITURA}` } };
   const criatura = catalogo().creatures.find(
