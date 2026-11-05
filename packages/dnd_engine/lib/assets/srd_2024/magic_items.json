@@ -573,7 +573,8 @@
     "effects": [
       {
         "type": "darkvision",
-        "range": 18
+        "range": 60,
+        "stacking": true
       }
     ],
     "sourcePage": 233,

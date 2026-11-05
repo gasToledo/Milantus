@@ -181,7 +181,9 @@ def passive_effects(name: str, metadata: str):
     if lower in {"anillo de protección", "capa de protección"}:
         effects.append({"type": "armorClassBonus", "amount": 1})
         effects.append({"type": "savingThrowBonus", "amount": 1})
-    if "visión en la oscuridad" in metadata.lower() or lower == "anteojos de la noche":
+    if lower == "anteojos de la noche":
+        effects.append({"type": "darkvision", "range": 60, "stacking": True})
+    elif "visión en la oscuridad" in metadata.lower():
         effects.append({"type": "darkvision", "range": 18})
     fixed_scores = {
         "amuleto de salud": ("constitution", 19),
