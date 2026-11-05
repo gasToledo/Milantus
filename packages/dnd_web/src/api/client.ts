@@ -422,6 +422,8 @@ export async function fetchNpcs(signal: AbortSignal): Promise<StoredNpc[]> {
   return npcs;
 }
 
+const encounterPath = (campaignId: string) => `/api/campaigns/${encodeURIComponent(campaignId)}/encounter`;
+
 /**
  * El combate abierto de la campaña (`GET /api/campaigns/:id/encounter`), crudo:
  * lo migra el motor (`encounterView`). `null` si no hay ninguno: el servidor
@@ -430,16 +432,19 @@ export async function fetchNpcs(signal: AbortSignal): Promise<StoredNpc[]> {
  */
 export async function fetchCampaignEncounter(campaignId: string, signal: AbortSignal): Promise<JsonObject | null> {
   try {
-    const { encounter } = await getJson<{ encounter: JsonObject }>(
-      `/api/campaigns/${encodeURIComponent(campaignId)}/encounter`,
-      signal,
-    );
+    const { encounter } = await getJson<{ encounter: JsonObject }>(encounterPath(campaignId), signal);
     return encounter;
   } catch (e) {
     if (e instanceof ApiError && e.status === 404) return null;
     throw e;
   }
 }
+
+/** Guarda el combate entero (`PUT`): lo arma el motor y gana el último que guarda. */
+export const saveCampaignEncounter = (campaignId: string, encounter: JsonObject) => sendJson('PUT', encounterPath(campaignId), { encounter });
+
+/** Descarta el combate que se está armando: no queda registro. */
+export const discardCampaignEncounter = (campaignId: string) => remove(`${encounterPath(campaignId)}?discard=true`);
 
 /** Un PNJ de una campaña (`GET /api/campaigns/:id/npcs`): el documento, su
  *  estado **en esa** campaña, los PG con que volvió del último combate (sin

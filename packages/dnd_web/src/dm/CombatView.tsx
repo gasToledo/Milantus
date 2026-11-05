@@ -1,44 +1,66 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
+import { FileText, Flame, Plus, X } from 'lucide-react';
 import { useCampaignEncounter, useCampaignMembers, useCampaignNotebook, useCampaignNpcs, useSheetCatalog } from '../api/queries';
 import type { DmCampaign } from '../api/client';
 import { CreatureProfile } from '../bestiary/CreatureProfile';
 import { asProfile } from '../bestiary/creature';
 import { toRosterEntry, type RosterEntry } from '../dashboard/roster';
-import { bestiary, encounterView, npcViews, type BestiaryRow, type Catalog, type CombatantJson, type EncounterView, type JsonObject, type NpcView } from '../engine';
+import {
+  bestiary,
+  encounterDetails,
+  encounterView,
+  npcViews,
+  type BestiaryRow,
+  type Catalog,
+  type CombatantJson,
+  type EncounterAction,
+  type EncounterDetails,
+  type EncounterView,
+  type JsonObject,
+  type NpcView,
+} from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import type { Texts } from '../i18n/texts';
+import { dmMemberHref, Link } from '../router';
+import { Button } from '../ui/Button';
+import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { cx } from '../ui/cx';
 import { ThinBar } from '../ui/data';
+import { Toast, Tooltip, type ToastTone } from '../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
+import { AddCombatantDialog } from './combat/AddCombatantDialog';
+import { retryEncounterSave, useEncounterWriter } from './combat/encounterWriter';
+import { SIDE_TONE, SideMenu } from './combat/SideMenu';
 import { DmHeader } from './DmHeader';
 import { buildEntries } from './notebook';
 import { npcTypeLine } from './npcs/npc';
 
-/** Las cinco columnas de la planilla, iguales en la cabecera y en cada fila. */
+/** Las cinco columnas de la planilla en curso, iguales en la cabecera y en cada fila. */
 const LEDGER = 'grid grid-cols-[56px_minmax(0,1fr)_150px_50px_minmax(0,160px)] gap-3.5';
-
-const SIDE_TONE: Record<string, string> = {
-  ally: 'border-verdant text-verdant',
-  enemy: 'border-crimson text-crimson',
-  neutral: 'border-text-muted text-text-muted',
-};
+/** Mientras se arma: la lámina. La columna de Efectos queda vacía y sin rótulo
+ *  (es de una parte siguiente) para que la planilla no cambie de forma después. */
+const LEDGER_PREPARING = 'grid grid-cols-[46px_minmax(0,1fr)_132px_64px_150px_186px] gap-3';
 
 /** Lo que la pantalla cruza para cada fila: el combatiente, lo que derivó el
  *  motor, y de dónde sale su perfil. */
 interface Row {
   c: CombatantJson;
   derived: EncounterView['rows'][number];
+  /** Lo que resolvió el motor para la planilla: la CA y la línea de un monstruo. */
+  detail: EncounterDetails['rows'][number] | undefined;
   member: RosterEntry | undefined;
   npc: NpcView | undefined;
   creature: { row: BestiaryRow; raw: JsonObject } | undefined;
 }
 
 /**
- * El combate abierto de la campaña (`encounter_view.dart`), de **solo lectura**:
- * el orden de iniciativa con el turno, los PG, la CA y los efectos de cada
- * combatiente, quién queda en pie, el perfil del que juega y, abajo, los
- * combates ya cerrados. Ningún control: tirar iniciativa, dañar, curar, pasar
- * el turno, sumar o sacar y cerrar siguen en Flutter.
+ * El combate abierto de la campaña (`encounter_view.dart`): el orden de
+ * iniciativa con el turno, los PG, la CA y los efectos de cada combatiente,
+ * quién queda en pie, el perfil del que juega y, abajo, los combates ya
+ * cerrados. **Mientras se arma** el DM suma jugadores, monstruos y PNJ, cambia el
+ * bando, saca y descarta (`combat/`); empezar, tirar iniciativa y todo lo que
+ * pasa **en curso** (dañar, curar, pasar el turno, efectos, cerrar) siguen en
+ * Flutter, y acá en curso solo se mira.
  *
  * Los PG de un monstruo o de un PNJ son los del encuentro; los de un jugador,
  * los de **su ficha real** (`modo-dm.md`: el DM no los escribe), con el máximo
@@ -53,6 +75,19 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
   const npcs = useCampaignNpcs(campaign.id);
   const notebook = useCampaignNotebook(campaign.id);
   const catalog = useSheetCatalog(lang);
+  const [toast, setToast] = useState<{ key: number; tone: ToastTone; message: string; action?: { label: string; onSelect: () => void } } | null>(null);
+  const [dialog, setDialog] = useState<'add' | 'discard' | null>(null);
+  const onSaveFailed = useCallback(
+    () =>
+      setToast((prev) => ({
+        key: (prev?.key ?? 0) + 1,
+        tone: 'error',
+        message: t.dmSaveCombatFailed,
+        action: { label: t.retry, onSelect: () => retryEncounterSave(campaign.id) },
+      })),
+    [t, campaign.id],
+  );
+  const writer = useEncounterWriter(campaign.id, catalog.data, onSaveFailed);
 
   const data = useMemo(() => {
     const cat = catalog.data;
@@ -63,6 +98,11 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
     const playersHp: Record<string, { current: number; max: number }> = {};
     for (const [id, e] of byMember) if (e.sheet) playersHp[id] = { current: e.character.combat?.currentHp ?? 0, max: e.sheet.maxHp };
     const view = encounter.data ? encounterView(encounter.data, playersHp) : null;
+    // Nivel y CA reales de cada jugador, solo de los que tienen ficha calculada.
+    const levels: Record<string, { level: number; armorClass: number }> = {};
+    for (const [id, e] of byMember) if (e.sheet) levels[id] = { level: e.sheet.level, armorClass: e.sheet.armorClass };
+    const details = encounter.data ? encounterDetails(cat, encounter.data, levels, npcs.data) : null;
+    const detailById = new Map((details?.rows ?? []).map((r) => [r.id, r] as const));
     const npcById = new Map(npcViews(npcs.data, cat).map((v) => [v.npc.id, v] as const));
     const raws = new Map(cat.creatures.map((c) => [c.id, c] as const));
     const rowsById = new Map(bestiary(cat).map((r) => [r.id, r] as const));
@@ -76,6 +116,7 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
           return {
             c,
             derived: view.rows[i]!,
+            detail: detailById.get(c.id),
             member: c.memberId ? byMember.get(c.memberId) : undefined,
             npc: c.npcId ? npcById.get(c.npcId) : undefined,
             creature: row && raw ? { row, raw } : undefined,
@@ -85,7 +126,10 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
     // Los combates cerrados, del más nuevo al más viejo, redactados como en el
     // Cuaderno.
     const past = buildEntries({ notes: [], encounterLogs: notebook.data.encounterLogs, levelUps: [] }, [], t, cat).reverse();
-    return { view, rows, past, cat };
+    // Los jugadores que todavía no entraron, para sumarlos mientras se arma.
+    const inCombat = new Set(view?.encounter.combatants.map((c) => c.memberId) ?? []);
+    const pending = members.data.filter((m) => !inCombat.has(m.memberId));
+    return { view, rows, past, cat, pending };
   }, [encounter.data, members.data, npcs.data, notebook.data, catalog.data, t]);
 
   const failed = [encounter, members, npcs, notebook, ...catalog.queries].filter((q) => q.isError);
@@ -97,20 +141,56 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
   } else if (!data) {
     body = <AppBusyLabel label={t.encLoading} />;
   } else {
-    const { view, rows, past, cat } = data;
+    const { view, rows, past, cat, pending } = data;
     body = (
       <>
         {!view ? (
-          <AppEmptyState kind="empty" message={t.encNone} hint={t.encNoneHint} />
+          <AppEmptyState
+            kind="empty"
+            message={t.encNone}
+            actions={
+              <Button icon={Flame} data-action="setup-combat" onClick={() => writer.act({ type: 'open' })}>
+                {t.dmSetUpCombat}
+              </Button>
+            }
+          />
         ) : (
           <>
-            <ControlBar view={view} />
+            <ControlBar view={view} onAdd={() => setDialog('add')} onDiscard={() => setDialog('discard')} />
             {rows.length === 0 ? (
               <AppEmptyState kind="empty" message={t.encEmptyOrder} />
             ) : (
               <div className="flex flex-wrap items-start gap-4">
-                <Ledger view={view} rows={rows} />
+                <Ledger view={view} rows={rows} rowExtras={(r) => (view.preparing ? preparingExtras(r, campaign.id, writer.act, t) : {})} />
                 {!view.preparing && <TurnPanel row={rows.find((r) => r.c.id === view.currentId)} catalog={cat} />}
+              </div>
+            )}
+            {view.preparing && pending.length > 0 && (
+              <div className="plaque flex flex-col px-3.5 py-2.5" data-field="pending">
+                <div className="flex items-center justify-between">
+                  <span className="text-[12px] text-text-muted">{t.encNotInCombat}</span>
+                  {pending.length > 1 && (
+                    <button
+                      type="button"
+                      className="min-h-9 px-1.5 text-[13px] text-gold"
+                      onClick={() => pending.forEach((m) => writer.act({ type: 'addPlayer', memberId: m.memberId, name: String(m.character.name), initiative: 0 }))}
+                    >
+                      {t.encAddAll}
+                    </button>
+                  )}
+                </div>
+                {pending.map((m) => (
+                  <div key={m.memberId} className="flex min-h-[34px] items-center justify-between" data-pending={m.memberId}>
+                    <span>{String(m.character.name)}</span>
+                    <button
+                      type="button"
+                      className="min-h-9 px-1.5 text-[13px] text-gold"
+                      onClick={() => writer.act({ type: 'addPlayer', memberId: m.memberId, name: String(m.character.name), initiative: 0 })}
+                    >
+                      {t.dmAddShort}
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
           </>
@@ -143,13 +223,34 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
     <div className="flex flex-col gap-5">
       <DmHeader title={t.dmSectionCombat} kicker={kicker} />
       {body}
+      {dialog === 'add' && catalog.data && npcs.data && (
+        <AddCombatantDialog
+          campaign={campaign}
+          catalog={catalog.data}
+          campaignNpcs={npcs.data}
+          encounter={encounter.data ?? null}
+          act={writer.act}
+          onClose={() => setDialog(null)}
+        />
+      )}
+      {dialog === 'discard' && (
+        <ConfirmDialog
+          title={t.encDiscardTitle}
+          body={t.encDiscardBody}
+          confirmLabel={t.encDiscardShort}
+          errorText={t.dmSaveCombatFailed}
+          onConfirm={writer.discard}
+          onClose={() => setDialog(null)}
+        />
+      )}
+      {toast && <Toast key={toast.key} tone={toast.tone} message={toast.message} action={toast.action} open onOpenChange={(open) => !open && setToast(null)} />}
     </div>
   );
 }
 
 /** La placa de arriba: ronda, turno y cuántos quedan en pie; o, mientras se
  *  arma, que todavía no empezó. */
-function ControlBar({ view }: { view: EncounterView }) {
+function ControlBar({ view, onAdd, onDiscard }: { view: EncounterView; onAdd: () => void; onDiscard: () => void }) {
   const t = useTexts();
   const plaque = 'plaque flex flex-wrap items-center gap-x-[18px] gap-y-2.5 px-4 py-3';
   if (view.preparing) {
@@ -159,6 +260,13 @@ function ControlBar({ view }: { view: EncounterView }) {
           <p className="font-display text-[20px] text-on-surface">{t.encPreparing}</p>
           <p className="mt-0.5 text-[12px] text-text-muted">{t.encPreparingNote}</p>
         </div>
+        <span className="flex-1" />
+        <Button tone="soft" icon={Plus} data-action="add-combatant" onClick={onAdd}>
+          {t.dmAddToCombat}
+        </Button>
+        <Button tone="secondary" icon={X} data-action="discard-combat" onClick={onDiscard}>
+          {t.encDiscard}
+        </Button>
       </div>
     );
   }
@@ -191,17 +299,24 @@ function ControlBar({ view }: { view: EncounterView }) {
 
 /** La planilla. Con poco ancho se desplaza dentro de su caja en lugar de partir
  *  las columnas: en una planilla, lo que se compara es la fila. */
-function Ledger({ view, rows }: { view: EncounterView; rows: Row[] }) {
+function Ledger({ view, rows, rowExtras }: { view: EncounterView; rows: Row[]; rowExtras: (row: Row) => RowExtras }) {
   const t = useTexts();
   return (
     <section aria-label={t.encOrder} className="card min-w-0 flex-[999_1_640px] overflow-x-auto p-0">
-      <div className="min-w-[560px]">
-        <div className={cx(LEDGER, 'eyebrow border-b border-hairline px-3.5 py-2.5')} aria-hidden="true">
+      <div className={view.preparing ? 'min-w-[820px]' : 'min-w-[560px]'}>
+        <div className={cx(view.preparing ? LEDGER_PREPARING : LEDGER, 'eyebrow border-b border-hairline px-3.5 py-2.5')} aria-hidden="true">
           <span className="text-center">{t.encInitiativeShort}</span>
           <span>{t.encCombatant}</span>
           <span>{t.encHp}</span>
           <span className="text-center">{t.encAc}</span>
-          <span>{t.encEffects}</span>
+          {view.preparing ? (
+            <>
+              <span />
+              <span />
+            </>
+          ) : (
+            <span>{t.encEffects}</span>
+          )}
         </div>
         <ol>
           {rows.map((r, i) => (
@@ -211,6 +326,7 @@ function Ledger({ view, rows }: { view: EncounterView; rows: Row[] }) {
               active={r.c.id === view.currentId}
               acted={!view.preparing && view.currentIndex >= 0 && i < view.currentIndex}
               preparing={view.preparing}
+              {...rowExtras(r)}
             />
           ))}
         </ol>
@@ -219,17 +335,23 @@ function Ledger({ view, rows }: { view: EncounterView; rows: Row[] }) {
   );
 }
 
-function LedgerRow({ row, active, acted, preparing }: { row: Row; active: boolean; acted: boolean; preparing: boolean }) {
+/** Lo que una fila suma mientras se arma: el control del bando y la última columna. */
+interface RowExtras {
+  sideControl?: ReactNode;
+  actions?: ReactNode;
+}
+
+function LedgerRow({ row, active, acted, preparing, sideControl, actions }: { row: Row; active: boolean; acted: boolean; preparing: boolean } & RowExtras) {
   const t = useTexts();
   const { c, derived } = row;
   const player = c.kind === 'player';
   const mark = derived.down ? t.encSkips : active ? t.encTurnWord : acted ? t.encActed : '';
-  const ac = armorClassOf(row);
+  const ac = row.detail?.ac ?? null;
   const hp = derived.hp;
   return (
     <li
       className={cx(
-        LEDGER,
+        preparing ? LEDGER_PREPARING : LEDGER,
         'items-center border-b border-l-[3px] border-hairline py-[9px] pr-3.5 pl-[11px] last:border-b-0',
         active ? 'border-l-verdant bg-gold-soft' : 'border-l-transparent',
         acted && 'opacity-60',
@@ -241,18 +363,21 @@ function LedgerRow({ row, active, acted, preparing }: { row: Row; active: boolea
         <div className={cx('num leading-none', active ? 'text-[19px] text-verdant' : 'text-[17px] text-text-muted')}>
           {preparing ? t.dmNoValue : c.initiative}
         </div>
-        <div className={cx('mt-[3px] text-[9px] font-semibold tracking-[.8px] uppercase', derived.down ? 'text-crimson' : active ? 'text-verdant' : 'text-text-muted')} data-field="mark">
-          {mark}
-        </div>
+        {!preparing && (
+          <div className={cx('mt-[3px] text-[9px] font-semibold tracking-[.8px] uppercase', derived.down ? 'text-crimson' : active ? 'text-verdant' : 'text-text-muted')} data-field="mark">
+            {mark}
+          </div>
+        )}
       </div>
       <div className="min-w-0">
         <div className={cx('font-display truncate text-[15px] text-on-surface', derived.down && 'line-through')}>{c.name}</div>
         <div className="mt-[3px] flex min-w-0 items-center gap-1.5">
-          {!player && (
-            <span className={cx('shrink-0 rounded-[var(--radius-pill)] border px-2 text-[11px]', SIDE_TONE[c.side] ?? SIDE_TONE.neutral)} data-field="side">
-              {t.encSides[c.side] ?? c.side}
-            </span>
-          )}
+          {!player &&
+            (sideControl ?? (
+              <span className={cx('shrink-0 rounded-[var(--radius-pill)] border px-2 text-[11px]', SIDE_TONE[c.side] ?? SIDE_TONE.neutral)} data-field="side">
+                {t.encSides[c.side] ?? c.side}
+              </span>
+            ))}
           <span className={cx('truncate text-[11.5px]', derived.down ? 'text-crimson' : 'text-on-surface-variant')}>{metaOf(row, derived.down, t)}</span>
         </div>
       </div>
@@ -268,7 +393,7 @@ function LedgerRow({ row, active, acted, preparing }: { row: Row; active: boolea
             <div className="mt-[5px]">
               <ThinBar value={hp.current} max={hp.max} label={t.dmHpAria(hp.current, hp.max)} colorClassName="bg-crimson" />
             </div>
-            {player && <div className="mt-[3px] text-[11px] text-text-muted">{t.encOnTheirSheet}</div>}
+            {player && !preparing && <div className="mt-[3px] text-[11px] text-text-muted">{t.encOnTheirSheet}</div>}
           </>
         ) : (
           <span className="text-[12px] text-text-muted">{t.encNoHp}</span>
@@ -284,28 +409,67 @@ function LedgerRow({ row, active, acted, preparing }: { row: Row; active: boolea
           </span>
         ))}
       </div>
+      {preparing && <div className="flex items-center justify-end gap-1">{actions}</div>}
     </li>
   );
 }
 
-/** La CA de la fila: la de la ficha compilada de un jugador, la del bloque o
- *  la ficha de un PNJ (que da el motor), la del catálogo de un monstruo. */
-function armorClassOf({ c, member, npc, creature }: Row): string | null {
-  if (c.kind === 'player') return member?.sheet ? String(member.sheet.armorClass) : null;
-  if (c.kind === 'npc') return npc?.armorClass ?? null;
-  return typeof creature?.raw.ac === 'string' || typeof creature?.raw.ac === 'number' ? String(creature.raw.ac) : null;
-}
-
 /** La línea bajo el nombre: especie y clases de un jugador, la línea de tipo
  *  de un PNJ o de un monstruo; un caído dice que se salta su turno. */
-function metaOf({ c, member, npc, creature }: Row, down: boolean, t: Texts): string {
+function metaOf({ c, member, npc, detail }: Row, down: boolean, t: Texts): string {
   if (down) return t.encDownMeta;
   if (c.kind === 'player') {
     if (!member) return '';
     return t.npcCharacterLine(member.raceName, member.classes.map((k) => `${k.name} ${k.level}`).join(' · '));
   }
   if (c.kind === 'npc') return npc ? npcTypeLine(npc, t) : '';
-  return creature?.row.kind ?? '';
+  return detail?.monsterLine ?? '';
+}
+
+/** Lo que una fila lleva mientras se arma: el bando (menos un jugador, que no
+ *  tiene), abrir la ficha de un jugador y sacar a cualquiera. Sacar no confirma,
+ *  como en Flutter: volver a sumarlo es un toque. */
+function preparingExtras(row: Row, campaignId: string, act: (a: EncounterAction) => void, t: Texts): RowExtras {
+  const { c, detail } = row;
+  const remove = (
+    <Tooltip content={t.encRemoveFromCombat}>
+      <button
+        type="button"
+        aria-label={t.encRemoveFromCombat}
+        data-action="remove-combatant"
+        onClick={() => act({ type: 'remove', combatantId: c.id })}
+        className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-nav)] text-on-surface-variant hover:text-on-surface"
+      >
+        <X size={18} aria-hidden="true" />
+      </button>
+    </Tooltip>
+  );
+  if (c.kind === 'player') {
+    return {
+      actions: (
+        <>
+          {c.memberId && (
+            <Link href={dmMemberHref(campaignId, c.memberId, 'personaje')} className="inline-flex min-h-11 items-center gap-1.5 px-1.5 text-[13px] whitespace-nowrap text-gold">
+              <FileText size={16} aria-hidden="true" />
+              {t.encOpenSheet}
+            </Link>
+          )}
+          {remove}
+        </>
+      ),
+    };
+  }
+  return {
+    sideControl: (
+      <SideMenu
+        side={c.side}
+        name={c.name}
+        canChange={detail?.canChangeSide ?? false}
+        onChange={(side) => act({ type: 'setSide', combatantId: c.id, side: side as 'ally' | 'enemy' | 'neutral' })}
+      />
+    ),
+    actions: remove,
+  };
 }
 
 /** «Del turno»: el perfil de quien está jugando. Un jugador no tiene perfil que
@@ -348,7 +512,7 @@ function TurnPanel({ row, catalog }: { row: Row | undefined; catalog: Catalog })
             {[
               { label: t.encInitiativeShort, value: String(row.c.initiative), tone: 'text-verdant' },
               { label: t.encHp, value: row.derived.hp ? `${row.derived.hp.current}/${row.derived.hp.max}` : t.dmNoValue, tone: 'text-crimson' },
-              { label: t.encAc, value: armorClassOf(row) ?? t.dmNoValue, tone: 'text-on-surface' },
+              { label: t.encAc, value: row.detail?.ac ?? t.dmNoValue, tone: 'text-on-surface' },
             ].map((s) => (
               <div key={s.label} className="plaque px-0.5 py-2 text-center">
                 <dt className="plaque-label">{s.label}</dt>

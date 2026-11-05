@@ -640,6 +640,8 @@ export interface EncounterDetails {
     ac: string | null;
     /** La CA con el bono temporal, solo si `ac` empieza con un número. */
     acTotal: number | null;
+    /** Un jugador y un PNJ sin estadísticas tienen el bando fijo. */
+    canChangeSide: boolean;
   }[];
   difficulty: {
     lowBudget: number;

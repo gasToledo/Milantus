@@ -110,6 +110,19 @@ void main() {
     );
   });
 
+  test('setSide sin bando o con uno desconocido no guarda nada', () {
+    final e = withGoblin();
+    final id = e.combatants.single.id;
+    expect(act(e, {'type': 'setSide', 'combatantId': id}), isNull);
+    expect(
+      act(e, {'type': 'setSide', 'combatantId': id, 'side': 'otro'}),
+      isNull,
+    );
+    final ally =
+        act(e, {'type': 'setSide', 'combatantId': id, 'side': 'ally'})!;
+    expect(ally.combatants.single.side, CombatantSide.ally);
+  });
+
   test('un jugador y un PNJ no entran dos veces', () {
     final player = {
       'type': 'addPlayer',

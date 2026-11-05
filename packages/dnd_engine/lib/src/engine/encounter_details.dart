@@ -146,6 +146,7 @@ Map<String, dynamic> _row(
     'ac': ac,
     'acTotal':
         leading == null ? null : int.parse(leading.group(1)!) + c.acBonus,
+    'canChangeSide': c.canChangeSide,
   };
 }
 

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { textsFor } from '../src/i18n/texts';
-import { api, TOKEN } from './helpers';
+import { api, catalogo, TOKEN, TOKEN_DM } from './helpers';
 
 test.use({ locale: 'es-AR' });
 
@@ -37,4 +37,41 @@ test('el combate es del DM: otra cuenta recibe el mismo 404 que ante lo inexiste
   await page.goto(COMBATE);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(t.dmCampaignNotFound);
   for (const secreto of SOLO_DEL_DM) await expect(page.getByText(secreto)).toHaveCount(0);
+});
+
+test('armar un combate guarda lo que da el motor y descartarlo no deja nada', async ({ context, page, baseURL }) => {
+  const cookie = `dnd_session=${TOKEN_DM}`;
+  await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);
+  // Una campaña propia de la prueba: no toca el combate sembrado de la del cuervo.
+  const creada = await page.request.post('/api/campaigns', {
+    headers: { cookie },
+    data: { campaign: { id: 'combate-e2e', name: 'Combate e2e', premise: '', state: 'active' } },
+  });
+  expect(creada.ok()).toBe(true);
+  const { campaign } = (await creada.json()) as { campaign: { id: string } };
+  const ruta = `/api/campaigns/${campaign.id}/encounter`;
+
+  await page.goto(`/v2/dm/campanas/${campaign.id}/combate`);
+  await page.locator('[data-action="setup-combat"]').click();
+  await page.locator('[data-action="add-combatant"]').click();
+  // Sin PNJ en la campaña, el diálogo abre en el Bestiario.
+  await page.locator('[data-option="goblin-minion"]').click();
+  const mas = page.getByRole('button', { name: t.dmOneMore, exact: true });
+  await mas.click();
+  await mas.click();
+  await page.getByRole('button', { name: t.dmAddCount(3), exact: true }).click();
+  await page.getByRole('button', { name: t.close, exact: true }).click();
+
+  // El guardado espera 400 ms: se lee hasta que llega.
+  const nombre = String(catalogo().creatures.find((c) => c.id === 'goblin-minion')!.name);
+  await expect
+    .poll(async () => {
+      const { encounter } = await api<{ encounter?: { stage: string; combatants: { name: string }[] } }>(page.request, ruta, TOKEN_DM);
+      return encounter ? [encounter.stage, ...encounter.combatants.map((c) => c.name)] : null;
+    })
+    .toEqual(['preparing', `${nombre} 1`, `${nombre} 2`, `${nombre} 3`]);
+
+  await page.locator('[data-action="discard-combat"]').click();
+  await page.getByRole('button', { name: t.encDiscardShort, exact: true }).click();
+  await expect.poll(async () => (await page.request.get(ruta, { headers: { cookie } })).status()).toBe(404);
 });

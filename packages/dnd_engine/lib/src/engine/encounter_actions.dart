@@ -115,11 +115,11 @@ class EncounterActions {
         );
       case 'setSide':
         if (find() == null) return null;
-        return current!.withSide(
-          action['combatantId'] as String,
-          CombatantSide.fromJson(action['side'] as String?) ??
-              CombatantSide.enemy,
-        );
+        // Sin bando, o con uno desconocido, no hay nada que guardar: caer a
+        // enemigo cambiaba el bando de un combatiente por un cliente desfasado.
+        final side = CombatantSide.fromJson(action['side'] as String?);
+        if (side == null) return null;
+        return current!.withSide(action['combatantId'] as String, side);
       case 'convertToNpc':
         final c = find();
         if (c == null) return null;
