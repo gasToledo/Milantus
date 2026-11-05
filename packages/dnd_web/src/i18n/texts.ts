@@ -2146,7 +2146,7 @@ const en: Texts = {
   deathFailurePlus: '+Failure',
   stabilized: 'Stabilized!',
   characterDied: 'The character has died.',
-  hitDice: 'Hit Dice',
+  hitDice: 'Hit Point Dice',
   hitDiceValue: (left: number, total: number, size: string) => `${left} of ${total} d${size}`,
   heroicInspiration: 'Heroic Inspiration',
   yes: 'Yes',
