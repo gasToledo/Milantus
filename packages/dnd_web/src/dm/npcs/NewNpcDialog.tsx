@@ -4,7 +4,7 @@ import { createNpc, linkCampaignNpc } from '../../api/client';
 import { queryKeys, useSheetCatalog } from '../../api/queries';
 import { bestiary, newNpc } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
-import { dmNpcsHref, navigate } from '../../router';
+import { dmNpcCreationHref, dmNpcsHref, navigate } from '../../router';
 import { AppDialog } from '../../ui/AppDialog';
 import { Eyebrow } from '../../ui/data';
 import { AppBusyLabel, AppErrorView } from '../../ui/status';
@@ -14,7 +14,9 @@ import { Option, SearchableList } from '../../ui/wizard';
  * «Nuevo PNJ» (`_NewNpcDialog` de Flutter): nombre, qué ficha lleva y, si es un
  * bloque, de qué criatura parte. El documento lo arma el motor (`newNpc`). Crear
  * abre la ficha: el diálogo solo pidió nombre y tipo, y lo que sigue se hace ahí.
- * Con [campaignId] además lo suma a esa campaña.
+ * Con [campaignId] además lo suma a esa campaña. El PNJ con ficha de personaje
+ * no se crea acá: el diálogo sigue al creador (`/dm/pnj/nuevo`), que lo crea al
+ * terminar, con su ficha.
  */
 export function NewNpcDialog({ campaignId, onClose }: { campaignId?: string; onClose: () => void }) {
   const t = useTexts();
@@ -22,7 +24,7 @@ export function NewNpcDialog({ campaignId, onClose }: { campaignId?: string; onC
   const client = useQueryClient();
   const catalog = useSheetCatalog(lang);
   const [name, setName] = useState('');
-  const [kind, setKind] = useState<'none' | 'block'>('none');
+  const [kind, setKind] = useState<'none' | 'block' | 'character'>('none');
   const [base, setBase] = useState<string | null>(null);
   const [missingName, setMissingName] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -45,6 +47,12 @@ export function NewNpcDialog({ campaignId, onClose }: { campaignId?: string; onC
     const trimmed = name.trim();
     if (trimmed === '') {
       setMissingName(true);
+      return;
+    }
+    // Este paso no crea nada: el PNJ con ficha se crea al final del creador.
+    if (kind === 'character') {
+      onClose();
+      navigate(dmNpcCreationHref(trimmed, campaignId));
       return;
     }
     setBusy(true);
@@ -73,7 +81,7 @@ export function NewNpcDialog({ campaignId, onClose }: { campaignId?: string; onC
       width={560}
       actions={[
         { label: t.cancel },
-        { label: failed ? t.retry : t.npcCreate, primary: true, closes: false, disabled: busy || !catalog.data, onSelect: () => void save() },
+        { label: kind === 'character' ? t.npcContinueToCreator : failed ? t.retry : t.npcCreate, primary: true, closes: false, disabled: busy || !catalog.data, onSelect: () => void save() },
       ]}
     >
       <div className="flex flex-col gap-3.5">
@@ -102,8 +110,7 @@ export function NewNpcDialog({ campaignId, onClose }: { campaignId?: string; onC
           <div role="radiogroup" aria-label={t.npcWhichSheet} className="grid gap-2">
             <Option id="kind-none" selected={kind === 'none'} title={t.npcNewNone} detail={t.npcNewNoneHint} onClick={() => setKind('none')} />
             <Option id="kind-block" selected={kind === 'block'} title={t.npcNewBlock} detail={t.npcNewBlockHint} onClick={() => setKind('block')} />
-            {/* Se ve apagada y dice por qué: esconderla haría creer que no existe. */}
-            <Option id="kind-character" selected={false} disabled title={t.npcNewCharacter} detail={t.npcNewCharacterLater} onClick={() => {}} />
+            <Option id="kind-character" selected={kind === 'character'} title={t.npcNewCharacter} detail={t.npcNewCharacterHint} onClick={() => setKind('character')} />
           </div>
         </div>
 

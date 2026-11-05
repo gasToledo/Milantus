@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { computeSheet, creationView, formatAmount, type CreationAction, type CreationDraftJson } from '../src/engine';
+import { computeSheet, creationView, formatAmount, newNpc, type CreationAction, type CreationDraftJson } from '../src/engine';
 import { textsFor } from '../src/i18n/texts';
 import { api, catalogo, TOKEN_ESCRITURA, vigilarEscrituras, type PersonajeApi } from './helpers';
 
@@ -163,4 +163,110 @@ test('de Especie a la ficha: cada paso frena hasta completarse y solo el final g
   const ficha = computeSheet(vista.character, catalog);
   expect(creado.combat.currentHp).toBe(ficha.maxHp);
   await expect(page.locator('[data-page="creation"]')).toHaveCount(0);
+});
+
+test('Nuevo PNJ con ficha: el alta manda lo que da el motor y no entra en Mis personajes', async ({ page, request }) => {
+  const catalog = catalogo();
+  let draft: CreationDraftJson = {};
+  const motor = (...acciones: CreationAction[]) => {
+    for (const a of acciones) draft = creationView(catalog, draft, a).draft;
+    return creationView(catalog, draft);
+  };
+  const opcion = (id: string) => page.locator(`[data-option="${id}"]`);
+  const seguir = page.getByRole('button', { name: 'Continuar', exact: true });
+
+  await page.goto('/v2/dm/pnj');
+  await page.locator('[data-action="new-npc"]').click();
+  const dialogo = page.getByRole('dialog');
+  await dialogo.locator('[data-field="npc-name"]').fill('Bruna de la ficha');
+  await dialogo.locator('[data-option="kind-character"]').click();
+  await dialogo.getByRole('button', { name: 'Continuar al creador', exact: true }).click();
+
+  // Especie, clase y trasfondo: los mismos toques del creador de jugadores.
+  await opcion('elf').click();
+  await opcion('elf-high').click();
+  await opcion('intelligence').click();
+  await seguir.click();
+  await opcion('fighter').click();
+  await opcion('fs-defense').click();
+  for (const arma of ['longsword', 'greatsword', 'dagger']) await opcion(arma).click();
+  await seguir.click();
+  await opcion('sage').click();
+  await opcion('intelligence').click();
+  await opcion('two-intelligence').click();
+  await opcion('one-constitution').click();
+  await seguir.click();
+  let vista = motor(
+    { type: 'selectRace', id: 'elf' },
+    { type: 'selectLineage', id: 'elf-high' },
+    { type: 'setSpeciesAbility', ability: 'intelligence' },
+    { type: 'selectClass', id: 'fighter' },
+    { type: 'toggle', pick: 'feature', id: 'fs-defense', group: 'fighting-style' },
+    { type: 'toggle', pick: 'weaponMastery', id: 'longsword' },
+    { type: 'toggle', pick: 'weaponMastery', id: 'greatsword' },
+    { type: 'toggle', pick: 'weaponMastery', id: 'dagger' },
+    { type: 'selectBackground', id: 'sage' },
+    { type: 'setOriginFeatAbility', ability: 'intelligence' },
+    { type: 'setSpread', plusTwo: 'intelligence', plusOne: 'constitution' },
+  );
+  // Características.
+  await page.getByRole('button', { name: /^Usar lo sugerido/ }).click();
+  await seguir.click();
+  vista = motor({ type: 'applySuggestedScores' });
+
+  // Competencias.
+  const especie = vista.proficiencies.speciesSkills.options[0]!.id;
+  await opcion(`species-${especie}`).click();
+  vista = motor({ type: 'toggle', pick: 'speciesSkill', id: especie });
+  const libres = vista.proficiencies.classSkills.options.filter((o) => !o.taken);
+  for (const o of libres.slice(0, vista.proficiencies.classSkills.count)) {
+    await opcion(`class-${o.id}`).click();
+    vista = motor({ type: 'toggle', pick: 'classSkill', id: o.id });
+  }
+  for (const l of vista.proficiencies.languages.options.slice(0, 2)) {
+    await opcion(`lang-${l.id}`).click();
+    vista = motor({ type: 'toggle', pick: 'language', id: l.id });
+  }
+  await seguir.click();
+
+  // Conjuros: el cupo de la dote del Erudito.
+  for (const cupo of vista.spells.slots) {
+    await page.locator(`[data-tab="${cupo.groupId}"]`).click();
+    for (const o of cupo.options.slice(0, cupo.count)) {
+      await opcion(o.id).click();
+      vista = motor({ type: 'toggle', pick: 'featureSpell', id: o.id, group: cupo.groupId });
+    }
+  }
+  await seguir.click();
+
+  // Equipo.
+  const clase = vista.equipment.classOptions[0]!.id;
+  const oro = vista.equipment.backgroundOptions.find((o) => Object.keys(o.coins).length > 0 && o.items.length === 0)!.id;
+  await opcion(`class-pack-${clase}`).click();
+  await opcion(`background-pack-${oro}`).click();
+  vista = motor({ type: 'setClassEquipment', id: clase }, { type: 'setBackgroundEquipment', id: oro });
+  for (const c of vista.equipment.choices) {
+    await opcion(`choice-${c.options[0]!.id}`).click();
+    vista = motor({ type: 'setEquipmentChoice', key: c.key, id: c.options[0]!.id });
+  }
+  await seguir.click();
+
+  // Detalles (el nombre ya viene del diálogo) y revisión.
+  await expect(page.getByLabel('Nombre')).toHaveValue('Bruna de la ficha');
+  await seguir.click();
+
+  // El alta: el PNJ que manda es el que arma el motor, con su ficha.
+  const pedido = page.waitForRequest((r) => r.method() === 'POST' && r.url().endsWith('/api/npcs'));
+  await page.getByRole('button', { name: 'Crear PNJ', exact: true }).click();
+  const cuerpo = (await pedido).postDataJSON() as { npc: unknown; character: { name: string } };
+  expect(cuerpo.npc).toEqual(newNpc(catalog, 'Bruna de la ficha', 'character', null));
+  expect(cuerpo.character.name).toBe('Bruna de la ficha');
+  await expect(page).toHaveURL(/\/v2\/dm\/pnj\/npc-/);
+  const id = new URL(page.url()).pathname.split('/').pop()!;
+
+  // La ficha de un PNJ no es un personaje del jugador.
+  const { characters } = await api<{ characters: { character: PersonajeApi }[] }>(request, '/api/characters', TOKEN_ESCRITURA);
+  expect(characters.some((c) => c.character.name === 'Bruna de la ficha')).toBe(false);
+
+  await request.delete(`/api/npcs/${id}`, { headers: { cookie: `dnd_session=${TOKEN_ESCRITURA}` } });
 });
