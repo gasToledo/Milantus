@@ -2630,7 +2630,7 @@
       {
         "level": 2,
         "name": "Canalizar Divinidad",
-        "description": "Canalizás energía divina para efectos como Expulsar Muertos Vivientes.",
+        "description": "Gastás un uso para usar Chispa Divina o Expulsar Muertos Vivientes. La CD de sus salvaciones es tu CD de conjuros de Clérigo.",
         "effects": [
           {
             "type": "resource",
@@ -2640,6 +2640,16 @@
             "recharge": "long",
             "shortRestRecovery": 1,
             "description": "Usos de Canalizar Divinidad (p.ej. Expulsar Muertos Vivientes o Chispa Divina). Recuperás uno tras un descanso corto y todos tras un descanso largo."
+          },
+          {
+            "type": "passiveTrait",
+            "name": "Chispa Divina",
+            "description": "Como acción de magia gastás un uso de Canalizar Divinidad y mostrás tu símbolo sagrado a otra criatura que veas a 30 pies o menos. Tirás 1d8 + tu modificador de Sabiduría: curás esos PG o causás daño necrótico o radiante (elegís), con salvación de Constitución contra tu CD de conjuros de Clérigo para recibir la mitad (redondeada hacia abajo). Los dados aumentan con el nivel de Clérigo: 2d8 al 7, 3d8 al 13 y 4d8 al 18."
+          },
+          {
+            "type": "passiveTrait",
+            "name": "Expulsar Muertos Vivientes",
+            "description": "Como acción de magia gastás un uso de Canalizar Divinidad y presentás tu símbolo sagrado. Los muertos vivientes que elijas a 30 pies o menos hacen una salvación de Sabiduría contra tu CD de conjuros de Clérigo. Si fallan, quedan asustados e incapacitados durante 1 minuto e intentan alejarse de vos. Termina antes si reciben daño, quedás incapacitado o morís."
           }
         ]
       },

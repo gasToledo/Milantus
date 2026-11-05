@@ -392,7 +392,7 @@
     "features.2.effects.1.description": "Arcane Recovery use."
   },
   "cleric": {
-    "_es": "6be6093a",
+    "_es": "0756c812",
     "name": "Cleric",
     "features.0.name": "Spellcasting",
     "features.0.effects.1.name": "Celestial Spirit",
@@ -429,7 +429,7 @@
     "features.1.effects.0.options.0.effects.2.description": "Proficiency with Martial weapons and training with Heavy armor.",
     "features.1.effects.0.options.1.description": "You know one extra cantrip from the Cleric spell list. In addition, your mystical connection to the divine gives you a bonus equal to your Wisdom modifier (minimum of +1) to your Intelligence (Arcana) and Intelligence (Religion) checks.",
     "features.1.effects.0.options.1.effects.3.description": "One extra Cleric cantrip and a bonus equal to your Wisdom modifier (minimum of +1) to Intelligence (Arcana) and Intelligence (Religion) checks.",
-    "features.2.description": "You channel divine energy for effects such as Turn Undead.",
+    "features.2.description": "Expend one use to create Divine Spark or Turn Undead. Their saving throws use your Cleric spell save DC.",
     "features.2.effects.0.description": "Channel Divinity uses (e.g. Turn Undead or Divine Spark). You regain one use on a Short Rest and all of them on a Long Rest.",
     "features.3.description": "When you use Turn Undead, those that fail the save also take Radiant damage.",
     "features.3.effects.0.description": "When you use Turn Undead, you can roll a number of d8s equal to your Wisdom modifier (minimum of 1d8): Undead that fail the save take that total as Radiant damage. The damage doesn't end the turn effect.",
@@ -446,7 +446,11 @@
     "features.9.description": "You gain an Epic Boon feat; Boon of Fate is recommended.",
     "features.9.effects.0.description": "You gain an Epic Boon feat or another feat for which you qualify.",
     "features.10.description": "Divine Intervention can cast Wish, at the cost of 2d4 Long Rests.",
-    "features.10.effects.0.description": "When you use Divine Intervention, you can choose the Wish spell. If you do, you can't use Divine Intervention again until you finish 2d4 Long Rests."
+    "features.10.effects.0.description": "When you use Divine Intervention, you can choose the Wish spell. If you do, you can't use Divine Intervention again until you finish 2d4 Long Rests.",
+    "features.2.effects.1.name": "Divine Spark",
+    "features.2.effects.1.description": "As a Magic action, expend one Channel Divinity use and present your Holy Symbol to another creature you can see within 30 feet. Roll 1d8 + your Wisdom modifier: restore that many Hit Points or deal Necrotic or Radiant damage (your choice), with a Constitution save against your Cleric spell save DC for half damage, rounded down. The dice increase at Cleric levels 7 (2d8), 13 (3d8), and 18 (4d8).",
+    "features.2.effects.2.name": "Turn Undead",
+    "features.2.effects.2.description": "As a Magic action, expend one Channel Divinity use and present your Holy Symbol. Undead you choose within 30 feet make a Wisdom save against your Cleric spell save DC. On a failure, they are Frightened and Incapacitated for 1 minute and try to move away from you. The effect ends early if they take damage, you become Incapacitated, or you die."
   },
   "druid": {
     "_es": "5af24883",

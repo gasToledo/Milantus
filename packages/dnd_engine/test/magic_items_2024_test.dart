@@ -5,6 +5,7 @@ import 'support/weapon_attacks.dart';
 
 Character _character({
   String classId = 'fighter',
+  String raceId = 'human',
   int level = 1,
   List<String> plans = const [],
   List<InventoryEntry> inventory = const [],
@@ -12,7 +13,7 @@ Character _character({
     Character(
       id: 'magic-test',
       name: 'Prueba',
-      raceId: 'human',
+      raceId: raceId,
       classId: classId,
       backgroundId: 'soldier',
       level: level,
@@ -27,6 +28,37 @@ void main() {
 
   setUpAll(() async {
     repo = await ContentRepository.loadFromDirectory('lib/assets/srd_2024');
+  });
+
+  test('los anteojos replicados dan 60 pies o suman 60 a la visión existente',
+      () async {
+    final english = await ContentRepository.loadFromDirectory(
+        'lib/assets/srd_2024',
+        translation: 'en');
+    for (final catalog in [repo, english]) {
+      final compiler = CharacterCompiler(catalog);
+      for (final race in ['human', 'elf', 'dwarf']) {
+        final base = _character(
+          classId: 'artificer',
+          raceId: race,
+          level: 2,
+          plans: const ['anteojos-de-la-noche'],
+        );
+        final before = compiler.compile(base).darkvision;
+        final replica = InventoryOps.replicateMagicItem(
+            base, 'anteojos-de-la-noche', catalog);
+        expect(replica.inventory.single.origin,
+            'artificer:replicate-magic-item:anteojos-de-la-noche');
+        expect(compiler.compile(replica).darkvision, before);
+        final equipped = InventoryOps.setEquipped(
+            replica, replica.inventory.single.entryId, true, catalog);
+        expect(compiler.compile(equipped).darkvision, (before ?? 0) + 60,
+            reason: race);
+        final removed = InventoryOps.setEquipped(
+            equipped, equipped.inventory.single.entryId, false, catalog);
+        expect(compiler.compile(removed).darkvision, before);
+      }
+    }
   });
 
   test('todas las plantillas con base resuelven un tipo existente', () {

@@ -23,6 +23,64 @@ void main() {
   Iterable<String> featureNames(String classId) =>
       repo.characterClass(classId)!.features.map((f) => f.name);
 
+  test('Clérigo: Canalizar Divinidad muestra sus dos opciones desde nivel 2',
+      () async {
+    final english = await ContentRepository.loadFromDirectory(
+        'lib/assets/srd_2024',
+        translation: 'en');
+    for (final (catalog, names) in [
+      (repo, ['Chispa Divina', 'Expulsar Muertos Vivientes']),
+      (english, ['Divine Spark', 'Turn Undead']),
+    ]) {
+      for (final level in [1, 2, 5, 6, 18]) {
+        final sheet = CharacterCompiler(catalog).compile(Character(
+          id: 'clerigo',
+          name: 'Prueba',
+          raceId: 'human',
+          classId: 'cleric',
+          subclassId: level == 5 ? 'light-domain' : null,
+          backgroundId: '',
+          level: level,
+          assignedScores: {for (final a in Ability.values) a: 14},
+          hpPerLevel: List.filled(level, 5),
+        ));
+        for (final name in names) {
+          final traits = sheet.passives.where((p) => p.name == name);
+          expect(traits, hasLength(level < 2 ? 0 : 1), reason: '$name, $level');
+          if (level >= 2) expect(traits.single.description, isNotEmpty);
+        }
+        final uses = sheet.resources.where((r) => r.id == 'channel_divinity');
+        expect(uses, hasLength(level < 2 ? 0 : 1));
+        if (level >= 2) {
+          expect(
+              uses.single.max,
+              level >= 18
+                  ? 4
+                  : level >= 6
+                      ? 3
+                      : 2);
+        }
+        if (level == 5) {
+          expect(
+              sheet.passives.map((p) => p.name),
+              contains(catalog == repo
+                  ? 'Resplandor del Alba'
+                  : 'Radiance of the Dawn'));
+          expect(
+              sheet.alwaysPreparedSpellIds,
+              unorderedEquals([
+                'faerie-fire',
+                'burning-hands',
+                'scorching-ray',
+                'see-invisibility',
+                'fireball',
+                'daylight',
+              ]));
+        }
+      }
+    }
+  });
+
   test('Bardo: Pericia se obtiene a nivel 2, no a nivel 3', () {
     expect(levelOf('bard', 'Pericia'), 2);
   });

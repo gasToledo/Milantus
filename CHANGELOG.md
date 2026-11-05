@@ -1177,6 +1177,11 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
+- Los Anteojos de la noche otorgan 60 pies de visión en la oscuridad o suman
+  60 pies al alcance existente, también cuando los replica un Artífice.
+- La ficha del Clérigo muestra Chispa Divina y Expulsar Muertos Vivientes
+  desde nivel 2, con sus reglas y el uso compartido de Canalizar Divinidad,
+  en español e inglés.
 - Las armaduras reducen la velocidad en 10 pies cuando no se alcanza su
   requisito de Fuerza; la Armadura Arcana del Armero conserva su excepción.
   El Dardo admite Fuerza o Destreza para ataque y daño por Sutileza.
