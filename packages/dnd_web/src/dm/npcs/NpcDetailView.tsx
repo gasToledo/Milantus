@@ -161,11 +161,14 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
     upload: (file) => (npc.characterId ? uploadPortrait(npc.characterId, file) : uploadNpcPortrait(npc.id, file)),
   };
   return (
-    <div className="flex flex-col gap-5" data-npc={npc.id}>
+    <div className="@container flex flex-col gap-5" data-npc={npc.id}>
       {back}
-      <header className="flex flex-wrap items-start gap-[18px]">
+      {/* Grilla y no `flex-wrap`: al partirse, el ⋮ caía solo debajo de la voz. Se mide
+          el contenedor porque el panel lateral es invisible para el ancho de ventana;
+          456 es lo que ocupan en una fila el medallón, 300 de texto y el ⋮. */}
+      <header className="grid grid-cols-[1fr_auto] items-start gap-x-[18px] gap-y-4 @[456px]:grid-cols-[auto_minmax(0,1fr)_auto]">
         <Medallion name={npc.name} accent={null} size={76} portrait={npcPortrait(stored.data)} viewable />
-        <div className="flex min-w-0 flex-[1_1_300px] flex-col gap-2">
+        <div className="col-span-2 row-start-2 flex min-w-0 flex-col gap-2 @[456px]:col-span-1 @[456px]:col-start-2 @[456px]:row-start-1">
           <div className="flex items-start gap-1">
             <h1 className="font-display min-w-0 text-[28px] leading-tight break-words text-on-surface">{npc.name}</h1>
             <Tooltip content={t.renameTitle}>
@@ -231,7 +234,7 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
                 type="button"
                 aria-label={t.npcMoreActions}
                 data-action="npc-menu"
-                className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold data-[state=open]:bg-gold-soft data-[state=open]:text-gold"
+                className="col-start-2 row-start-1 inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold data-[state=open]:bg-gold-soft data-[state=open]:text-gold @[456px]:col-start-3"
               >
                 <EllipsisVertical size={20} aria-hidden="true" />
               </button>
