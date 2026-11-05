@@ -17,6 +17,8 @@ void main() {
     int level, {
     String raceId = 'human',
     String? subclassId,
+    int strength = 12,
+    List<InventoryEntry> inventory = const [],
   }) =>
       compiler.compile(Character(
         id: 'p',
@@ -26,9 +28,77 @@ void main() {
         subclassId: subclassId,
         backgroundId: 'soldier',
         level: level,
-        assignedScores: {for (final a in Ability.values) a: 12},
+        assignedScores: {
+          for (final a in Ability.values)
+            a: a == Ability.strength ? strength : 12,
+        },
         hpPerLevel: List.filled(level, 6),
+        inventory: inventory,
       ));
+
+  test('la armadura resta 10 pies solo si está puesta y falta Fuerza', () {
+    final base = ficha('fighter', 1).speed;
+    for (final armor in repo.armor.values.where(
+      (a) => a.strengthRequirement != null,
+    )) {
+      final required = armor.strengthRequirement!;
+      for (final equipped in [false, true]) {
+        for (final strength in [required - 1, required, required + 1]) {
+          final sheet = ficha('fighter', 1, strength: strength, inventory: [
+            InventoryEntry(
+                entryId: 'armadura', itemId: armor.id, equipped: equipped),
+          ]);
+          expect(sheet.speed, base - (equipped && strength < required ? 10 : 0),
+              reason: '${armor.id}, FUE $strength, equipada $equipped');
+        }
+      }
+    }
+    expect(
+        ficha('fighter', 1, strength: 8, inventory: const [
+          InventoryEntry(entryId: 'cuero', itemId: 'leather', equipped: true),
+        ]).speed,
+        base);
+  });
+
+  test('las velocidades iguales a caminar reciben la penalización de armadura',
+      () {
+    const inventory = [
+      InventoryEntry(entryId: 'placas', itemId: 'plate', equipped: true),
+    ];
+    final base = ficha('ranger', 6, strength: 15, inventory: inventory);
+    final armored = ficha('ranger', 6, inventory: inventory);
+    expect(armored.speed, base.speed - 10);
+    expect(armored.speeds[MovementMode.climb], armored.speed);
+    expect(armored.speeds[MovementMode.swim], armored.speed);
+  });
+
+  test('la armadura mágica usa el requisito de su base y no baja de cero', () {
+    repo.races['lenta'] = const Race(
+        id: 'lenta', name: 'Prueba', source: ContentSource.homebrew, speed: 5);
+    repo.items['armadura-prueba'] = const Item(
+      id: 'armadura-prueba',
+      name: 'Armadura de prueba +1',
+      source: ContentSource.homebrew,
+      category: 'magic',
+      magicBonus: 1,
+      baseItemKind: 'armor',
+      eligibleBaseItemIds: ['plate'],
+    );
+    addTearDown(() {
+      repo.races.remove('lenta');
+      repo.items.remove('armadura-prueba');
+    });
+    const inventory = [
+      InventoryEntry(
+          entryId: 'magica',
+          itemId: 'armadura-prueba',
+          baseItemId: 'plate',
+          equipped: true),
+    ];
+    expect(ficha('fighter', 1, inventory: inventory).speed,
+        ficha('fighter', 1, strength: 15, inventory: inventory).speed - 10);
+    expect(ficha('fighter', 1, raceId: 'lenta', inventory: inventory).speed, 0);
+  });
 
   test('«igual a tu velocidad» se resuelve con la velocidad final', () {
     // Errante suma 10 a caminar y da trepar y nado iguales: 40, no 30.

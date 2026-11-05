@@ -65,6 +65,39 @@ void main() {
     repo.feats.remove('test-targeted-weapon');
   });
 
+  test('el Dardo admite Fuerza o Destreza por Sutileza, el arco solo Destreza',
+      () {
+    for (final strength in [8, 18]) {
+      final character = Character(
+        id: 'dardo',
+        name: 'Prueba',
+        raceId: 'human',
+        classId: 'fighter',
+        backgroundId: '',
+        assignedScores: {
+          for (final a in Ability.values)
+            a: a == Ability.strength ? strength : 14,
+        },
+        hpPerLevel: const [10],
+        inventory: const [
+          InventoryEntry(entryId: 'dardo', itemId: 'dart', equipped: true),
+          InventoryEntry(entryId: 'arco', itemId: 'shortbow', equipped: true),
+        ],
+      );
+      final sheet = compiler.compile(character);
+      final dart =
+          sheet.weaponAttacks.firstWhere((a) => a.baseWeaponId == 'dart');
+      final bow =
+          sheet.weaponAttacks.firstWhere((a) => a.baseWeaponId == 'shortbow');
+      final ability = strength > 14 ? Ability.strength : Ability.dexterity;
+      final modifier = sheet.abilityModifiers[ability]!;
+      expect(dart.abilityUsed, ability);
+      expect(dart.attackBonus, modifier + sheet.proficiencyBonus);
+      expect(dart.damage, '1d4 + $modifier');
+      expect(bow.abilityUsed, Ability.dexterity);
+    }
+  });
+
   Character wizard({bool withRule = false, bool magic = true}) => Character(
         id: 'weapon-rule-probe',
         name: 'Prueba',

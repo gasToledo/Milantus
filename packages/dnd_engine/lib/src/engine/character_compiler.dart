@@ -1728,15 +1728,21 @@ class CharacterCompiler {
 
   int _speed(Character c, SheetBuilder b) {
     var speed = b.speed;
+    final equipped = c.inventory
+        .where((e) => e.equipped)
+        .map((e) => InventoryOps.resolve(e, repo));
+    final armor = equipped
+        .map((e) => e.armor)
+        .whereType<Armor>()
+        .where((e) => !e.isShield)
+        .firstOrNull;
+    final strReq = armor?.strengthRequirement;
+    if (strReq != null &&
+        !b.ignoresArmorStrength &&
+        b.finalScore(Ability.strength) < strReq) {
+      speed -= 10;
+    }
     if (b.unarmoredMovementBonus != 0) {
-      final equipped = c.inventory
-          .where((e) => e.equipped)
-          .map((e) => InventoryOps.resolve(e, repo));
-      final armor = equipped
-          .map((e) => e.armor)
-          .whereType<Armor>()
-          .where((e) => !e.isShield)
-          .firstOrNull;
       var voided = false;
       if (armor != null && !armor.isShield) {
         voided =
@@ -1746,7 +1752,7 @@ class CharacterCompiler {
       if (hasShield && !b.unarmoredMovementAllowShield) voided = true;
       if (!voided) speed += b.unarmoredMovementBonus;
     }
-    return speed;
+    return max(0, speed);
   }
 
   /// Tamaño final: el elegido si la especie ofrece la elección y el valor sigue
@@ -1886,10 +1892,10 @@ class CharacterCompiler {
       List<Ability> extraAbilities = const []}) {
     final unarmed = w.id == unarmedStrikeId;
     final normalAbilities = <Ability>[];
-    if (w.isRanged) {
-      normalAbilities.add(Ability.dexterity);
-    } else if (w.isFinesse) {
+    if (w.isFinesse) {
       normalAbilities.addAll([Ability.strength, Ability.dexterity]);
+    } else if (w.isRanged) {
+      normalAbilities.add(Ability.dexterity);
     } else {
       normalAbilities.add(Ability.strength);
     }
