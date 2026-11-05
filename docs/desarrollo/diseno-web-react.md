@@ -39,7 +39,7 @@ Radix directo salvo para algo que esos envoltorios no cubran.
 | `Tooltip` | Explicación corta al pasar el mouse o enfocar | No reemplaza el `aria-label` de un botón de ícono |
 | `DropdownMenu*` | Menú de opciones (el selector de tema) | `RadioItem` con tilde dorado para opciones excluyentes |
 | `Popover*` | Contenido flotante que se lee y se cierra | Topeado al ancho de la ventana |
-| `Select` | Selección única con rótulo visible | El rótulo no desaparece al elegir; `className` sobre el botón (un formulario lo estira con `w-full justify-between`) |
+| `Select` | Selección única con rótulo visible | El rótulo no desaparece al elegir; `className` sobre el botón (un formulario lo estira con `w-full justify-between`); `labelAbove` no lo repite adentro (lo pone quien lo usa arriba, el `aria-label` queda) |
 | `Switch` | Encendido/apagado con rótulo | El pulgar se mueve: el estado no depende solo del color |
 | `ScrollArea` | Zona con scroll propio y barra fina (las nativas toman el mismo tema desde `index.css`: `scrollbar-color` con el filete) | La usa el panel lateral; un texto que crece hasta un tope lo lleva en `viewportClassName`, con `label` para que se enfoque con el teclado y `type="auto"` para que la barra avise que hay más (el trasfondo) |
 | `Toast` / `ToastViewport` | Avisos (`showAppMessage`) | Ícono, color y texto; error 6 s, el resto 3 s. `action` es el «Deshacer» (`onUndo`) y alarga a 6 s. `duration` gana sobre ese cálculo y `closeLabel` dibuja una X para descartarlo. **Una sola columna, en `Enabled`**: ninguna pantalla monta su `ToastProvider` ni su viewport (dos fijos en la misma esquina se pisan); solo dibuja su `<Toast>` |
@@ -77,7 +77,7 @@ un control a un asistente, buscá acá.
 | `Block` | Tarjeta de un grupo de opciones: título y un solo `status` | Cada grupo |
 | `Status` | Los tres estados, y ningún otro: falta (`count` para «n de m»), `ready` y `auto` | En `Block` |
 | `SpellPickBlock` | Un cupo de conjuros: buscador, scroll propio y `cap` (null para quien conoce en vez de preparar) | Conjuros de la subida y del creador |
-| `SpellTabs` | La tira de pestañas de los conjuros (una por cupo, con su `Status`; con `plain`, solo el título, para vías alternativas como generar o subir un retrato): elegir una no cambia lo demás ni avanza sola | Conjuros del creador y editor de la ficha |
+| `SpellTabs` | La tira de pestañas de los conjuros (una por cupo, con su `Status`; con `plain`, solo el título, para vías alternativas como generar o subir un retrato): elegir una no cambia lo demás ni avanza sola; `badge` suma una cifra al título y `alert` el borde carmesí con ícono, ambos visibles con `plain` | Conjuros del creador y editor de la ficha |
 | Bandeja de elegidos | Los elegidos como chips que se sacan con ✕ (`data-chip`), sobre la lista, en vez de un texto «Elegidos:». Uno elegido que ya no está en la lista también sale ahí, con su id si no está en el catálogo. Vive en `sheet/SpellEditor.tsx` y `sheet/MagicItemPlans.tsx`, no es un componente suelto | Editor de conjuros de la ficha |
 | `WildShapeTile`, `WildShapeDialog` | La franja de Forma Salvaje en la banda táctica (`data-stat="wild-shape"`, con la estructura de `ActiveModeTile`) y su diálogo: las formas anotadas como `Option` de elección única, el perfil a la derecha (debajo de `lg`, un botón `Info` lo muestra dentro del mismo diálogo). Elegir no transforma. Vive en `sheet/WildShape.tsx` | Banda de Personaje y Combate de un druida |
 | `CompanionsCard`, `SummonDialog` | La tarjeta de compañeros en juego (`data-card="companions"`, `data-companion="n"`): cada fila plegada de entrada, varias abiertas a la vez, con PG, CA, estados y perfil; «Invocar» (`data-action="summon"`) abre el diálogo: `Select` de opción si hay más de una, formas como `Option` (con más de 6, en `SearchableList`), pago con el uso gratis (`data-free`) y `SpellSlotGrid`, y el perfil a la derecha (debajo de `lg`, un botón `Info` lo muestra dentro del mismo diálogo). Avisos en oro entre el cuerpo y la barra. Vive en `sheet/Companions.tsx` | Combate, columna de PG y Defensa |
@@ -86,7 +86,7 @@ un control a un asistente, buscá acá.
 | `WIZARD_ASIDE` | Las clases de la columna derecha: sigue a la vista al bajar y, si no entra, se desplaza sola | Panel derecho de cada asistente |
 | `SearchableList` | Buscador sin tildes y por palabras (`matchesQuery`), cuenta y scroll propio; `groupOf` pinta un `Eyebrow` a todo el ancho al cambiar de grupo (los conjuros por nivel, sin grupos vacíos al buscar) y `empty` dice qué pasa si el filtro no deja nada | Listas largas: especies, trasfondos, armas |
 | `StepRail` | La tira de pasos; `progress` la cambia en un teléfono por «Paso n de m» y una barra | Arriba de cada asistente |
-| `WizardFooter` | El pie: lo que falta y Atrás/Continuar, como tarjeta flotante; `above` a todo el ancho | Abajo de cada asistente |
+| `WizardFooter` | El pie: lo que falta y Atrás/Continuar, como tarjeta flotante; `above` a todo el ancho; `danger` pinta el mensaje en carmesí | Abajo de cada asistente |
 | `DetailBody`, `TraitList` | La ficha del Códice (`CodexDetail`) y una lista de rasgos, para el panel derecho | Explicar lo último que se tocó |
 | `AfterCard`, `AfterList` | «Así queda»: cada fila con el valor solo o «de → a» (`from`), `gold` para lo que cambió y `note` para una aclaración apagada | Panel derecho; `AfterList` suelta en el pie del teléfono |
 
@@ -165,6 +165,7 @@ conjuro abre su detalle en un diálogo. Sus pasos de elecciones viven en
 | `Button`, `ButtonLink` | `primary` (oro lleno, uno por vista), `soft` (oro sobre `goldSoft` con filete: el verbo de una barra de herramientas), `secondary`, `danger` (carmesí, lo irreversible); `shape="pill"` en una fila de pills; `disabled` lo atenúa | `ButtonLink internal` navega sin recargar |
 | `SaveStatusBadge` | La pill del guardado automático (`SaveStatusIndicator`): Guardando… / Guardado / No se guardó con «Reintentar» | Al pie del panel de una pantalla que escribe, en lugar de «Solo lectura» |
 | `NpcStatusSelector` (`src/dm/npcs/`) | Vivo · Muerto · Desconocido en una fila de botones `aria-pressed`; el elegido se rellena con el color de su estado (`STATUS_FILL`) | El muerto atenúa identidad y tags, **nunca** el selector: un control usable no puede verse apagado |
+| `CreatureForm` (`src/dm/npcs/`) | El formulario del bloque de una criatura: pestañas Lo básico, Rasgos y Acciones (`SpellTabs plain` con `badge` y `alert`), filas plegables (`data-row`, todas plegadas de entrada, varias abiertas) y la vista previa de `CreatureProfile` a la derecha (en un teléfono, «Ver» la abre en un diálogo). El motor arma la criatura y los errores (`creatureDraft`) | Errores desde el primer intento de guardar; salir con cambios pregunta. El paso 7 lo reusa para el homebrew |
 | `BackgroundEditor` (`src/sheet/DiaryTab.tsx`) | El trasfondo con Markdown: lectura, editor, importar y exportar `.md`; recibe `saved`, `ownerName`, `onSave` y `notify`, así que sirve a la ficha propia y a un PNJ | El borrador es local y `onSave` va espaciado (400 ms) y al salir |
 | `NpcSpeechDialog` y `NpcTagDialog` (`src/dm/npcs/NpcTextDialogs.tsx`) | La voz (textarea) y un tag nuevo, este con los de la biblioteca como atajo | Una voz vacía la borra; un tag vacío no se manda |
 | `PickManyDialog` (`src/dm/npcs/`) | Marcar varios (`Option multi`) y «Sumar n» sobre `AppDialog`, con buscador o sin él | Si falla no se cierra y el botón pasa a «Reintentar» |
@@ -358,7 +359,8 @@ inexistente son la misma pantalla). Desde 6b escribe campañas y la Mesa y desde
   con su ✕ y un «Tag» al final, la voz como cita con la comilla en oro y su
   lápiz) y debajo dos columnas: Trasfondo (`Card`) y Notas
   (`DiaryEntries`, el mismo de la pestaña Diario, a dos columnas) a la izquierda,
-  Estadísticas y Campañas a la derecha. En Campañas, cada una lleva su
+  Estadísticas y Campañas a la derecha; la tarjeta de un PNJ de bloque termina con
+  «Editar bloque» (`soft`, `data-action="edit-block"`), que abre el editor. En Campañas, cada una lleva su
   `NpcStatusSelector` y la tarjeta un «Sumar» (`PickManyDialog` con las campañas
   que faltan). «Nuevo PNJ» es la acción primaria (`Button` oro lleno) de la
   cabecera —o del estado vacío, nunca en los dos—, y un ⋮ de 44 px en la

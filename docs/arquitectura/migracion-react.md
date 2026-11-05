@@ -240,7 +240,8 @@ repiten acá.
   notas y el reparto de objetos y desde 6d las escenas de música (bloques de
   6b, 6c y 6d, abajo); los PNJ y el combate **siguen en Flutter** hasta 6e a 6g
   (desde 6e1 los vínculos de un PNJ con sus campañas ya se escriben, desde 6e2
-  se crea y se borra un PNJ sin ficha de personaje y desde 6e3 se escribe su texto),
+  se crea y se borra un PNJ sin ficha de personaje y desde 6e3 se escribe su texto
+  y desde 6e4 su bloque),
   y esas secciones se leen salvo eso. Se porta por
   secciones, una por PR; hoy existen la **Mesa**, **Capítulos**, el **Cuaderno**,
   los **PNJ de la mesa**, el **Combate**, el **Bestiario**, la **Biblioteca de
@@ -340,9 +341,9 @@ repiten acá.
   Flutter se edita). Sale del mismo `GET /api/npcs/:id`. Un PNJ ajeno y uno
   inexistente dan la misma pantalla «No se encontró el PNJ» —también en su
   ficha, igual que un PNJ sin ficha—: el servidor los responde igual (404). Importar,
-  editar el bloque, generar o subir retratos, exportar y crear uno con ficha de
+  generar o subir retratos, exportar y crear uno con ficha de
   personaje siguen en Flutter (el estado por campaña se escribe desde 6e1; crear
-  sin ficha y borrar, desde 6e2; nombre, voz, tags, trasfondo y notas, desde 6e3).
+  sin ficha y borrar, desde 6e2; nombre, voz, tags, trasfondo y notas, desde 6e3; el bloque, desde 6e4).
   **PNJ de la mesa** (`GET /api/campaigns/:id/npcs`): los PNJ vinculados a la
   campaña con su estado **en esa** campaña. Arriba, el conteo («2 PNJ · 1 vivo ·
   0 muertos · 1 desconocido») y las pills de tag; cada tarjeta lleva la
@@ -744,6 +745,21 @@ frontera sigue donde estaba: **el DM no escribe la ficha de otra cuenta**.
   (`_checkEventsSoon` de Flutter): decisión tomada, no un olvido.
 - Queda en Flutter, hasta 6e a 6g: PNJ, ficha de PNJ y combate.
 
+**Paso 6e4: el editor del bloque** *(existe)*. Toca el motor y `dnd_web`;
+Flutter, el servidor y la versión no cambian. En `/v2/dm/pnj/:id/bloque` el DM
+edita el bloque de estadísticas de un PNJ de bloque: «Lo básico», Rasgos y
+Acciones, con la vista previa (el mismo `CreatureProfile` del Bestiario) a la
+derecha y, debajo de `lg`, en un diálogo con «Ver». El formulario lo arma
+`CreatureDraft` (`formOf`, `build` y `errors`, por el puente `creatureForm`,
+`creatureDraft` y `creatureFormOptions`): la UI no calcula nada, ni la línea de
+tipo ni los rangos. Guardar es explícito y reemplaza el bloque entero con
+`setBlock` (`NpcEdits`); los errores aparecen desde el primer intento de
+guardar y salir con cambios pregunta. **A diferencia de Flutter**, conserva la
+lista de conjuros de una acción, las salvaciones, las habilidades y la línea
+del libro («(mago), neutral», los enjambres) cuando no se toca tipo ni tamaño:
+el formulario de Flutter las pierde al guardar. Las invocaciones con fórmula
+(CA «13+WIS») salen marcadas para que el DM escriba números, como en Flutter.
+
 **Paso 6e3: el texto de la ficha** *(existe)*. Toca el motor y `dnd_web`; Flutter,
 el servidor y la versión no cambian. En la ficha de un PNJ el DM escribe nombre,
 voz, tags, trasfondo y notas. Toda edición la aplica el motor (`NpcEdits`, por
@@ -870,7 +886,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    combate, vínculos y códigos de campaña. Por partes: 6a, la del jugador:
    compartir, los avisos de la cola y el aviso de turno *(existe)*; 6b, las
    campañas y la Mesa *(existe)*; 6c, Capítulos y Cuaderno *(existe)*; 6d, la música *(existe)*; 6e, los PNJ, en cinco: 6e1, los vínculos con las campañas *(existe)*; 6e2,
-   alta y borrado *(existe)*; 6e3, el texto de la ficha *(existe)*; 6e4, el editor del bloque; 6e5,
+   alta y borrado *(existe)*; 6e3, el texto de la ficha *(existe)*; 6e4, el editor del bloque *(existe)*; 6e5,
    retrato y mostrar a la mesa; 6f, la ficha de
    PNJ; 6g, el combate. Importar y exportar PNJ sigue en el paso 7. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de

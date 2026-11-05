@@ -967,3 +967,25 @@ test('Ficha de un PNJ: nombre, voz, tag, trasfondo y nota se guardan en su docum
 
   await request.delete(`/api/npcs/${npc.id}`, comoDm);
 });
+
+test('Bloque de un PNJ: guarda lo que da el motor y conserva lo que no se edita', async ({ page, request }) => {
+  const comoDm = { headers: { cookie: `dnd_session=${TOKEN_ESCRITURA}` } };
+  const criatura = catalogo().creatures.find(
+    (c) => (c.actions as { spellcasting?: unknown }[]).some((a) => a.spellcasting) && /^\d+$/.test(String(c.ac)) && /^\d+$/.test(String(c.hp)),
+  )!;
+  const creado = await request.post('/api/npcs', { ...comoDm, data: { npc: { id: 'nuevo', name: 'Oriel', sheetKind: 'block', block: criatura } } });
+  const { npc } = (await creado.json()) as { npc: { id: string } };
+
+  await page.goto(`/v2/dm/pnj/${npc.id}`);
+  await page.locator('[data-action="edit-block"]').click();
+  await page.locator('[data-field="block-hp"]').fill('99');
+  await page.locator('[data-action="block-save"]').click();
+  await page.waitForURL(new RegExp(`/v2/dm/pnj/${npc.id}$`));
+
+  const { npc: guardado } = await api<{ npc: { block: { hp: string; kind: string; actions: { spellcasting?: unknown }[] } } }>(request, `/api/npcs/${npc.id}`, TOKEN_ESCRITURA);
+  expect(guardado.block.hp).toBe('99');
+  expect(guardado.block.kind).toBe(criatura.kind);
+  expect(guardado.block.actions.some((a) => a.spellcasting !== undefined)).toBe(true);
+
+  await request.delete(`/api/npcs/${npc.id}`, comoDm);
+});
