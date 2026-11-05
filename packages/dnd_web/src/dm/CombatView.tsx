@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { Dices, FileText, Flame, Plus, X } from 'lucide-react';
 import { useCampaignEncounter, useCampaignMembers, useCampaignNotebook, useCampaignNpcs, useRosterSettings, useSheetCatalog } from '../api/queries';
 import type { DmCampaign } from '../api/client';
-import { CreatureProfile } from '../bestiary/CreatureProfile';
+import { TurnProfile } from './combat/TurnProfile';
 import { asProfile } from '../bestiary/creature';
 import { toRosterEntry, type RosterEntry } from '../dashboard/roster';
 import {
@@ -527,8 +527,7 @@ function TurnPanel({ row, catalog }: { row: Row | undefined; catalog: Catalog })
   } else if (row.c.kind === 'player') {
     body = <p className="text-[13px] text-text-muted">{t.encPlayerTurn(row.c.name)}</p>;
   } else if (row.creature) {
-    // El perfil va adentro de la misma tarjeta, sin la suya, y con las cifras
-    // de la mesa en lugar de las del libro (`stats`).
+    // Va adentro de la misma tarjeta (`TurnProfile`), con las cifras de la mesa.
     body = null;
   } else if (row.npc?.block) {
     body = (
@@ -554,7 +553,7 @@ function TurnPanel({ row, catalog }: { row: Row | undefined; catalog: Catalog })
           {row && <span className="text-[12px] text-text-muted">{row.c.name}</span>}
         </div>
         {row?.creature ? (
-          <CreatureProfile profile={asProfile(row.creature.raw)} row={row.creature.row} catalog={catalog} compact stats={<TurnStats row={row} />} />
+          <TurnProfile profile={asProfile(row.creature.raw)} row={row.creature.row} catalog={catalog} stats={<TurnStats row={row} />} />
         ) : (
           row && row.c.kind !== 'player' && <TurnStats row={row} />
         )}
@@ -569,7 +568,9 @@ function TurnPanel({ row, catalog }: { row: Row | undefined; catalog: Catalog })
 function TurnStats({ row }: { row: Row }) {
   const t = useTexts();
   return (
-    <dl className="grid grid-cols-3 gap-2">
+    // Iniciativa y CA angostas y los PG con el resto, como en la lámina: «118/256»
+    // no entra en un tercio.
+    <dl className="grid grid-cols-[56px_minmax(0,1fr)_56px] gap-2">
       {[
         { label: t.encInitiativeShort, value: String(row.c.initiative), tone: 'text-verdant' },
         { label: t.encHp, value: row.derived.hp ? `${row.derived.hp.current}/${row.derived.hp.max}` : t.dmNoValue, tone: 'text-crimson' },

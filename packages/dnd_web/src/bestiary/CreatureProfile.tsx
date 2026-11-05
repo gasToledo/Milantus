@@ -22,7 +22,6 @@ export function CreatureProfile({
   compact = false,
   summary = false,
   kindNote,
-  stats,
 }: {
   profile: Profile;
   row: BestiaryRow;
@@ -37,10 +36,6 @@ export function CreatureProfile({
   summary?: boolean;
   /** Se suma a la línea de tipo («con espacio de nivel 5»). */
   kindNote?: string;
-  /** Reemplaza la banda de cifras del libro. Es para el combate, donde los PG y
-   *  la CA son los de la mesa y no los del catálogo: mostrar las dos bandas
-   *  repetía cifras que no coinciden. */
-  stats?: ReactNode;
 }) {
   const t = useTexts();
   const source = (t.sources as Record<string, string>)[profile.source ?? ''];
@@ -80,7 +75,7 @@ export function CreatureProfile({
       <p className={cx('text-on-surface-variant', compact ? 'mt-1 text-[13px]' : 'mt-1.5 text-[15px]')}>{kindNote ? `${row.kind} · ${kindNote}` : row.kind}</p>
       <SectionRule className={compact ? 'my-4' : 'my-[22px]'} />
 
-      {stats ?? <Numbers profile={profile} row={row} summary={summary} />}
+      <Numbers profile={profile} row={row} summary={summary} />
       {summary ? (
         profile.speed && <p className="mt-3 text-[12.5px] text-on-surface-variant">{profile.speed}</p>
       ) : (
@@ -217,28 +212,30 @@ function Traits({ profile }: { profile: Profile }) {
   );
 }
 
-const KINDS = ['action', 'bonus', 'reaction', 'legendary'] as const;
+/** Los tipos de acción, en el orden del libro. */
+export const ACTION_KINDS = ['action', 'bonus', 'reaction', 'legendary'] as const;
+
+/** El rótulo de cada grupo de acciones. Lo comparte el turno del combate. */
+export function actionKindLabel(t: ReturnType<typeof useTexts>, profile: Profile, kind: (typeof ACTION_KINDS)[number]): string {
+  switch (kind) {
+    case 'action':
+      return t.creatureActions;
+    case 'bonus':
+      return t.creatureBonusActions;
+    case 'reaction':
+      return t.creatureReactions;
+    case 'legendary':
+      return profile.legendaryActionsPerRound === undefined ? t.creatureLegendary : t.creatureLegendaryPerRound(profile.legendaryActionsPerRound);
+  }
+}
 
 function Actions({ profile, row, catalog }: { profile: Profile; row: BestiaryRow; catalog: Catalog }) {
   const t = useTexts();
   const actions = (profile.actions ?? []).map((a, i) => ({ a, melee: row.meleeReach[i] ?? true }));
-  const label = (kind: (typeof KINDS)[number]): string => {
-    switch (kind) {
-      case 'action':
-        return t.creatureActions;
-      case 'bonus':
-        return t.creatureBonusActions;
-      case 'reaction':
-        return t.creatureReactions;
-      case 'legendary':
-        return profile.legendaryActionsPerRound === undefined
-          ? t.creatureLegendary
-          : t.creatureLegendaryPerRound(profile.legendaryActionsPerRound);
-    }
-  };
+  const label = (kind: (typeof ACTION_KINDS)[number]): string => actionKindLabel(t, profile, kind);
   return (
     <>
-      {KINDS.map((kind) => {
+      {ACTION_KINDS.map((kind) => {
         const group = actions.filter(({ a }) => (a.kind ?? 'action') === kind);
         if (group.length === 0) return null;
         return (
@@ -295,7 +292,7 @@ function ActionRow({ action: a, melee, catalog }: { action: CreatureAction; mele
   );
 }
 
-function Spellcasting({
+export function Spellcasting({
   spellcasting: sc,
   catalog,
 }: {
