@@ -234,7 +234,7 @@ export interface ComputedSheet {
   attunementSlots: number;
   attacksPerAction: number;
   attacks: Attack[];
-  passives: { name: string; description: string }[];
+  passives: { name: string; description: string; resourceKey?: string }[];
   resources: CharacterResource[];
   companions: JsonObject[];
   innateSpells: InnateSpell[];

@@ -54,6 +54,42 @@ test.beforeEach(async ({ context, baseURL }) => {
   await context.addCookies([{ name: 'dnd_session', value: TOKEN_ESCRITURA, url: baseURL! }]);
 });
 
+test('Canalizar Divinidad aparece en De rasgos y sus opciones gastan la misma reserva', async ({ page, request }) => {
+  const base = await ilse(request);
+  const created = await request.post('/api/characters', {
+    headers: { cookie: `dnd_session=${TOKEN_ESCRITURA}` },
+    data: { character: {
+      ...base, id: 'clerigo-luz-canalizar', name: 'Clérigo de Luz', level: 5,
+      classHistory: Array(5).fill('cleric'),
+      subclassId: 'light-domain', subclassIds: { cleric: 'light-domain' },
+      hpPerLevel: [8, 5, 5, 5, 5], combat: { ...base.combat, resourceUsage: {} },
+    } },
+  });
+  expect(created.ok()).toBe(true);
+  const id = ((await created.json()) as { character: { id: string } }).character.id;
+  await page.goto(`/v2/personajes/${id}/combate`);
+  const magic = page.locator('[data-card="spells"]');
+  await magic.locator('[data-tab="innate"]').click();
+  const panel = magic.locator('[data-spell-group="innate"]');
+  for (const name of ['Chispa Divina', 'Expulsar Muertos Vivientes', 'Resplandor del Alba']) {
+    await panel.getByRole('button', { name: new RegExp(`^${name}`) }).click();
+    await expect(panel.getByRole('button', { name: `Usar ${name}`, exact: true })).toBeEnabled();
+  }
+  for (const name of ['Chispa Divina', 'Expulsar Muertos Vivientes']) {
+    await proximoGuardado(page, () => panel.getByRole('button', { name: `Usar ${name}`, exact: true }).click(), id);
+  }
+  await expect(panel.getByText('Canalizar Divinidad · 0 / 2', { exact: true })).toHaveCount(3);
+  await expect(panel.getByRole('button', { name: 'Usar Resplandor del Alba', exact: true })).toBeDisabled();
+  await expect(page.locator('[data-resource="channel_divinity"]').getByRole('img')).toHaveAttribute('aria-label', /0.*2/);
+  expect((await ilse(request, id)).combat).toMatchObject({ resourceUsage: { channel_divinity: 2 } });
+  await page.reload();
+  await magic.locator('[data-tab="innate"]').click();
+  await panel.getByRole('button', { name: /^Chispa Divina/ }).click();
+  await expect(panel.getByRole('button', { name: 'Usar Chispa Divina', exact: true })).toBeDisabled();
+  const deleted = await request.delete(`/api/characters/${id}`, { headers: { cookie: `dnd_session=${TOKEN_ESCRITURA}` } });
+  expect(deleted.ok()).toBe(true);
+});
+
 test('daño, curación y PG temporales guardan la ficha que da el motor, y se relee igual', async ({ page, request }) => {
   const escrituras = vigilarEscrituras(page);
   await page.goto(COMBATE);

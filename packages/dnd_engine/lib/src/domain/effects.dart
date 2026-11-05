@@ -94,6 +94,7 @@ sealed class Effect {
       'passiveTrait' => PassiveTraitEffect(
           name: json['name'] as String,
           description: json['description'] as String? ?? '',
+          resourceId: json['resourceId'] as String?,
         ),
       'grantFeat' => GrantFeatEffect(featId: json['featId'] as String?),
       'weaponMasterySlots' => WeaponMasterySlotsEffect(json['count'] as int),
@@ -763,10 +764,18 @@ class ConditionImmunityEffect extends Effect {
 class PassiveTraitEffect extends Effect {
   final String name;
   final String description;
-  const PassiveTraitEffect({required this.name, this.description = ''});
+
+  /// Una opción mágica de una reserva compartida, visible también en Magia.
+  final String? resourceId;
+  const PassiveTraitEffect(
+      {required this.name, this.description = '', this.resourceId});
   @override
-  Map<String, dynamic> toJson() =>
-      {'type': 'passiveTrait', 'name': name, 'description': description};
+  Map<String, dynamic> toJson() => {
+        'type': 'passiveTrait',
+        'name': name,
+        'description': description,
+        if (resourceId != null) 'resourceId': resourceId,
+      };
 }
 
 /// Concede una dote. Si [featId] es null, es una dote **a elección** del

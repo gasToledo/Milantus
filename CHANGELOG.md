@@ -1177,6 +1177,8 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
+- Las opciones de Canalizar Divinidad aparecen también en Magia → De rasgos,
+  con su descripción y controles que comparten los usos del recurso.
 - Los Anteojos de la noche otorgan 60 pies de visión en la oscuridad o suman
   60 pies al alcance existente, también cuando los replica un Artífice.
 - La ficha del Clérigo muestra Chispa Divina y Expulsar Muertos Vivientes

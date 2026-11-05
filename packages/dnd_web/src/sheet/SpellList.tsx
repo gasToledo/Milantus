@@ -29,6 +29,15 @@ export type SpellJson = JsonObject & {
   description?: string;
 };
 
+export interface ResourceAbility {
+  name: string;
+  description: string;
+  resourceKey: string;
+  resourceName: string;
+  left: number;
+  max: number;
+}
+
 /**
  * Los conjuros del personaje en **pestañas** (a propósito, la ficha de Flutter
  * los apila): trucos, siempre preparados, preparados (o conocidos) y los que
@@ -41,7 +50,8 @@ export type SpellJson = JsonObject & {
  * Lo elegido se junta como en Flutter: la lista vieja y las de cada clase,
  * sin repetir. Nada de esto es una regla: qué está siempre preparado y qué
  * conceden los rasgos lo dice el motor (`alwaysPreparedSpellIds`,
- * `innateSpells`).
+ * `innateSpells`). Las opciones mágicas de recursos compartidos llegan como
+ * `abilities`: conservan su reserva y no se inventan conjuros en el catálogo.
  */
 export function SpellList({
   cantripIds,
@@ -58,7 +68,11 @@ export function SpellList({
   damageBonuses,
   casting,
   abilityModifiers,
+  abilities,
+  onUseAbility,
 }: {
+  abilities: ResourceAbility[];
+  onUseAbility?: (key: string) => void;
   /** Lo que se suma al daño de cada conjuro, con su fuente (`spellDamageBonuses`). */
   damageBonuses: Record<string, { bonus: number; source: string }[]>;
   /** La aptitud de la clase, para los que no son innatos; `null` si no lanza. */
@@ -131,7 +145,7 @@ export function SpellList({
       title: preparation === 'known' ? t.spellsTabKnown : t.spellsTabChosen,
       count: num(spells.length, caps?.spells),
     });
-  if (innate.length > 0) tabs.push({ key: 'innate', title: t.spellsTabInnate, count: String(innate.length) });
+  if (innate.length + abilities.length > 0) tabs.push({ key: 'innate', title: t.spellsTabInnate, count: String(innate.length + abilities.length) });
 
   // Local a la lista: elegir una pestaña no mueve nada más. Empieza en los
   // conjuros elegidos (lo que más se consulta) y, si la elegida desaparece
@@ -200,7 +214,7 @@ export function SpellList({
     panel = (
       <Accordion
         headingLevel={4}
-        items={innate.map((i) => {
+        items={[...innate.map((i) => {
           const s = byId.get(i.spellId);
           return {
             // Por el conjuro concedido, único en la lista: con dos filas de la
@@ -218,7 +232,20 @@ export function SpellList({
               />
             ) : null,
           };
-        })}
+        }), ...abilities.map((a, index) => ({
+          id: `ability-${index}-${a.name}`,
+          title: <SpellTitle spell={undefined} name={a.name} note={`${a.resourceName} · ${t.poolValue(a.left, a.max)}`} />,
+          content: (
+            <div data-resource-ability={a.resourceKey}>
+              <p>{a.description}</p>
+              {onUseAbility && (
+                <Button className="mt-2" tone="secondary" disabled={a.left === 0} onClick={() => onUseAbility(a.resourceKey)}>
+                  {t.spendResource(a.name)}
+                </Button>
+              )}
+            </div>
+          ),
+        }))]}
       />
     );
   }

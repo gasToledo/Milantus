@@ -459,7 +459,11 @@ function SpellsCard({ model }: { model: SheetModel }) {
   const [selected, setSelected] = useState<string | null>(
     () => (cells.find((c) => c.max > c.used) ?? cells[0])?.key ?? null,
   );
-  if (blocks.length === 0 && sheet.innateSpells.length === 0) return null;
+  const abilities = sheet.passives.flatMap((p) => {
+    const resource = sheet.resources.find((r) => resourceKey(r) === p.resourceKey);
+    return resource && p.resourceKey ? [{ ...p, resourceKey: p.resourceKey, resourceName: resource.name, left: resourceLeft(model, resource), max: resource.max }] : [];
+  });
+  if (blocks.length === 0 && sheet.innateSpells.length === 0 && abilities.length === 0) return null;
   const cell = cells.find((c) => c.key === selected) ?? cells[0];
 
   const innateReactions = sheet.innateSpells.filter((s) => isReactionSpell(spell(s.spellId)));
@@ -578,6 +582,8 @@ function SpellsCard({ model }: { model: SheetModel }) {
             abilityModifiers={sheet.abilityModifiers}
             alwaysPreparedIds={sheet.alwaysPreparedSpellIds}
             innate={sheet.innateSpells}
+            abilities={abilities}
+            onUseAbility={write ? (key) => write.act({ type: 'spendResource', resource: key }) : undefined}
             preparation={sheet.spellcasting?.preparation ?? null}
             catalog={catalog.spells}
             innateNote={(s) => innateNote(s, t)}
