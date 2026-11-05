@@ -105,6 +105,8 @@ export interface RosterSettings {
   characterOrder: string[];
   /** Si la cuenta abre en el Modo DM (`AppSettings.startsInDmMode`). */
   startsInDmMode: boolean;
+  /** Si el combate que se arma muestra su dificultad y los PX (`AppSettings.showEncounterDifficulty`). Acá solo se lee; editarla es del paso 7. */
+  showEncounterDifficulty: boolean;
 }
 
 /** Una cuenta que nunca guardó ajustes (`settings: null`) usa los valores por
@@ -121,6 +123,9 @@ export async function fetchRosterSettings(signal: AbortSignal): Promise<RosterSe
     favoriteCharacterId: settings?.favoriteCharacterId ?? null,
     characterOrder: settings?.characterOrder ?? [],
     startsInDmMode: settings?.startsInDmMode === true,
+    // Prendida por defecto, igual que `AppSettings` de Flutter: solo un `false`
+    // explícito la apaga (una cuenta sin ajustes guardados la ve).
+    showEncounterDifficulty: settings?.showEncounterDifficulty !== false,
   };
 }
 

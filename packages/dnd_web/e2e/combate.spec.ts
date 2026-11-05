@@ -39,7 +39,7 @@ test('el combate es del DM: otra cuenta recibe el mismo 404 que ante lo inexiste
   for (const secreto of SOLO_DEL_DM) await expect(page.getByText(secreto)).toHaveCount(0);
 });
 
-test('armar un combate guarda lo que da el motor y descartarlo no deja nada', async ({ context, page, baseURL }) => {
+test('armar, descartar y empezar un combate guardan lo que da el motor', async ({ context, page, baseURL }) => {
   const cookie = `dnd_session=${TOKEN_DM}`;
   await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);
   // Una campaña propia de la prueba: no toca el combate sembrado de la del cuervo.
@@ -74,4 +74,22 @@ test('armar un combate guarda lo que da el motor y descartarlo no deja nada', as
   await page.locator('[data-action="discard-combat"]').click();
   await page.getByRole('button', { name: t.encDiscardShort, exact: true }).click();
   await expect.poll(async () => (await page.request.get(ruta, { headers: { cookie } })).status()).toBe(404);
+
+  // Empezar: se arma de nuevo con una sola criatura y «Tirar iniciativa» manda
+  // la tirada que propuso el motor (el campo la trae escrita).
+  await page.locator('[data-action="setup-combat"]').click();
+  await page.locator('[data-action="add-combatant"]').click();
+  await page.locator('[data-option="goblin-minion"]').click();
+  await page.getByRole('button', { name: t.dmAddShort, exact: true }).click();
+  await page.getByRole('button', { name: t.close, exact: true }).click();
+  await page.locator('[data-action="roll-initiative"]').click();
+  const campo = page.locator('[data-initiative]');
+  const n = Number(await campo.inputValue());
+  await page.getByRole('button', { name: t.dmStart, exact: true }).click();
+  await expect
+    .poll(async () => {
+      const { encounter } = await api<{ encounter?: { stage: string; combatants: { initiative: number }[] } }>(page.request, ruta, TOKEN_DM);
+      return encounter ? [encounter.stage, encounter.combatants[0]?.initiative] : null;
+    })
+    .toEqual(['running', n]);
 });

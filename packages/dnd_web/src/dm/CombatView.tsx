@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState, type ReactNode } from 'react';
-import { FileText, Flame, Plus, X } from 'lucide-react';
-import { useCampaignEncounter, useCampaignMembers, useCampaignNotebook, useCampaignNpcs, useSheetCatalog } from '../api/queries';
+import { Dices, FileText, Flame, Plus, X } from 'lucide-react';
+import { useCampaignEncounter, useCampaignMembers, useCampaignNotebook, useCampaignNpcs, useRosterSettings, useSheetCatalog } from '../api/queries';
 import type { DmCampaign } from '../api/client';
 import { CreatureProfile } from '../bestiary/CreatureProfile';
 import { asProfile } from '../bestiary/creature';
@@ -8,6 +8,7 @@ import { toRosterEntry, type RosterEntry } from '../dashboard/roster';
 import {
   bestiary,
   encounterDetails,
+  encounterInitiatives,
   encounterView,
   npcViews,
   type BestiaryRow,
@@ -29,7 +30,9 @@ import { ThinBar } from '../ui/data';
 import { Toast, Tooltip, type ToastTone } from '../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { AddCombatantDialog } from './combat/AddCombatantDialog';
+import { DifficultyBand } from './combat/DifficultyBand';
 import { retryEncounterSave, useEncounterWriter } from './combat/encounterWriter';
+import { RollInitiativeDialog } from './combat/RollInitiativeDialog';
 import { SIDE_TONE, SideMenu } from './combat/SideMenu';
 import { DmHeader } from './DmHeader';
 import { buildEntries } from './notebook';
@@ -58,9 +61,10 @@ interface Row {
  * iniciativa con el turno, los PG, la CA y los efectos de cada combatiente,
  * quién queda en pie, el perfil del que juega y, abajo, los combates ya
  * cerrados. **Mientras se arma** el DM suma jugadores, monstruos y PNJ, cambia el
- * bando, saca y descarta (`combat/`); empezar, tirar iniciativa y todo lo que
- * pasa **en curso** (dañar, curar, pasar el turno, efectos, cerrar) siguen en
- * Flutter, y acá en curso solo se mira.
+ * bando, saca y descarta, ve la dificultad y los PX (si la cuenta lo permite) y
+ * empieza con «Tirar iniciativa» (`combat/`); todo lo que pasa **en curso**
+ * (dañar, curar, pasar el turno, efectos, cerrar) sigue en Flutter hasta 6g4, y
+ * acá en curso solo se mira.
  *
  * Los PG de un monstruo o de un PNJ son los del encuentro; los de un jugador,
  * los de **su ficha real** (`modo-dm.md`: el DM no los escribe), con el máximo
@@ -77,6 +81,12 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
   const catalog = useSheetCatalog(lang);
   const [toast, setToast] = useState<{ key: number; tone: ToastTone; message: string; action?: { label: string; onSelect: () => void } } | null>(null);
   const [dialog, setDialog] = useState<'add' | 'discard' | null>(null);
+  // Las tiradas propuestas se calculan una sola vez, al abrir «Tirar
+  // iniciativa»: recalculadas en cada redibujo, los dados volverían a tirar.
+  const [roll, setRoll] = useState<Record<string, number> | null>(null);
+  const settings = useRosterSettings();
+  // Si la consulta carga o falla, se trata como prendida: no traba el combate.
+  const showDifficulty = settings.data?.showEncounterDifficulty ?? true;
   const onSaveFailed = useCallback(
     () =>
       setToast((prev) => ({
@@ -129,7 +139,7 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
     // Los jugadores que todavía no entraron, para sumarlos mientras se arma.
     const inCombat = new Set(view?.encounter.combatants.map((c) => c.memberId) ?? []);
     const pending = members.data.filter((m) => !inCombat.has(m.memberId));
-    return { view, rows, past, cat, pending };
+    return { view, rows, past, cat, pending, details };
   }, [encounter.data, members.data, npcs.data, notebook.data, catalog.data, t]);
 
   const failed = [encounter, members, npcs, notebook, ...catalog.queries].filter((q) => q.isError);
@@ -141,7 +151,7 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
   } else if (!data) {
     body = <AppBusyLabel label={t.encLoading} />;
   } else {
-    const { view, rows, past, cat, pending } = data;
+    const { view, rows, past, cat, pending, details } = data;
     body = (
       <>
         {!view ? (
@@ -157,11 +167,17 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
         ) : (
           <>
             <ControlBar view={view} onAdd={() => setDialog('add')} onDiscard={() => setDialog('discard')} />
+            {view.preparing && showDifficulty && rows.length > 0 && details && <DifficultyBand difficulty={details.difficulty} />}
             {rows.length === 0 ? (
               <AppEmptyState kind="empty" message={t.encEmptyOrder} />
             ) : (
               <div className="flex flex-wrap items-start gap-4">
-                <Ledger view={view} rows={rows} rowExtras={(r) => (view.preparing ? preparingExtras(r, campaign.id, writer.act, t) : {})} />
+                <Ledger
+                  view={view}
+                  rows={rows}
+                  showXp={view.preparing && showDifficulty}
+                  rowExtras={(r) => (view.preparing ? preparingExtras(r, campaign.id, writer.act, t) : {})}
+                />
                 {!view.preparing && <TurnPanel row={rows.find((r) => r.c.id === view.currentId)} catalog={cat} />}
               </div>
             )}
@@ -221,8 +237,32 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
 
   return (
     <div className="flex flex-col gap-5">
-      <DmHeader title={t.dmSectionCombat} kicker={kicker} />
+      <DmHeader
+        title={t.dmSectionCombat}
+        kicker={kicker}
+        actions={
+          data?.view?.preparing && (
+            <Button
+              icon={Dices}
+              data-action="roll-initiative"
+              disabled={data.rows.length === 0}
+              onClick={() => encounter.data && catalog.data && npcs.data && setRoll(encounterInitiatives(catalog.data, encounter.data, npcs.data))}
+            >
+              {t.dmRollInitiative}
+            </Button>
+          )
+        }
+      />
       {body}
+      {roll && data?.view && (
+        <RollInitiativeDialog
+          combatants={data.view.encounter.combatants}
+          suggested={roll}
+          playerModifiers={Object.fromEntries(data.rows.flatMap((r) => (r.c.kind === 'player' && r.member?.sheet ? [[r.c.id, r.member.sheet.initiative] as const] : [])))}
+          onStart={(initiatives) => writer.act({ type: 'start', initiatives })}
+          onClose={() => setRoll(null)}
+        />
+      )}
       {dialog === 'add' && catalog.data && npcs.data && (
         <AddCombatantDialog
           campaign={campaign}
@@ -299,7 +339,7 @@ function ControlBar({ view, onAdd, onDiscard }: { view: EncounterView; onAdd: ()
 
 /** La planilla. Con poco ancho se desplaza dentro de su caja en lugar de partir
  *  las columnas: en una planilla, lo que se compara es la fila. */
-function Ledger({ view, rows, rowExtras }: { view: EncounterView; rows: Row[]; rowExtras: (row: Row) => RowExtras }) {
+function Ledger({ view, rows, showXp, rowExtras }: { view: EncounterView; rows: Row[]; showXp: boolean; rowExtras: (row: Row) => RowExtras }) {
   const t = useTexts();
   return (
     <section aria-label={t.encOrder} className="card min-w-0 flex-[999_1_640px] overflow-x-auto p-0">
@@ -326,6 +366,7 @@ function Ledger({ view, rows, rowExtras }: { view: EncounterView; rows: Row[]; r
               active={r.c.id === view.currentId}
               acted={!view.preparing && view.currentIndex >= 0 && i < view.currentIndex}
               preparing={view.preparing}
+              showXp={showXp}
               {...rowExtras(r)}
             />
           ))}
@@ -341,8 +382,12 @@ interface RowExtras {
   actions?: ReactNode;
 }
 
-function LedgerRow({ row, active, acted, preparing, sideControl, actions }: { row: Row; active: boolean; acted: boolean; preparing: boolean } & RowExtras) {
+function LedgerRow({ row, active, acted, preparing, showXp, sideControl, actions }: { row: Row; active: boolean; acted: boolean; preparing: boolean; showXp: boolean } & RowExtras) {
   const t = useTexts();
+  const lang = useLang();
+  // Los PX van primero: la línea se recorta por el final.
+  const xp = showXp && row.detail?.xp != null ? new Intl.NumberFormat(lang).format(row.detail.xp) : null;
+  const xpText = xp === null ? null : row.c.side === 'ally' ? t.encAllyXpValue(xp) : t.encXpValue(xp);
   const { c, derived } = row;
   const player = c.kind === 'player';
   const mark = derived.down ? t.encSkips : active ? t.encTurnWord : acted ? t.encActed : '';
@@ -378,7 +423,7 @@ function LedgerRow({ row, active, acted, preparing, sideControl, actions }: { ro
                 {t.encSides[c.side] ?? c.side}
               </span>
             ))}
-          <span className={cx('truncate text-[11.5px]', derived.down ? 'text-crimson' : 'text-on-surface-variant')}>{metaOf(row, derived.down, t)}</span>
+          <span className={cx('truncate text-[11.5px]', derived.down ? 'text-crimson' : 'text-on-surface-variant')}>{[xpText, metaOf(row, derived.down, t)].filter(Boolean).join(' · ')}</span>
         </div>
       </div>
       <div data-field="hp">

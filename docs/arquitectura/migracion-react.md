@@ -239,7 +239,7 @@ repiten acá.
 - **El Modo DM** en `/v2/dm` (`src/dm/`), al que lleva «DM» del
   interruptor. Desde 6b escribe campañas y la Mesa y desde 6c capítulos,
   notas y el reparto de objetos y desde 6d las escenas de música (bloques de
-  6b, 6c y 6d, abajo); el combate se **arma** acá desde 6g2 y empezarlo y jugarlo **siguen en Flutter** hasta 6g3 y 6g4
+  6b, 6c y 6d, abajo); el combate se **arma** acá desde 6g2 y se **empieza** desde 6g3; jugarlo **sigue en Flutter** hasta 6g4
   (desde 6e1 los vínculos de un PNJ con sus campañas ya se escriben, desde 6e2
   se crea y se borra un PNJ sin ficha de personaje, desde 6f1 se crea uno con ficha, desde 6f2 se escribe su ficha, desde 6f3 se sube de nivel y se editan sus elecciones y desde 6e3 se escribe su texto
   desde 6e4 su bloque y desde 6e5 su retrato),
@@ -269,7 +269,7 @@ repiten acá.
   abrir una herramienta de la cuenta no la corta; cambiar de campaña, sí. Crear,
   editar, mover y borrar escenas y marcar «ofrecer al iniciar un combate» son
   escrituras de 6d (bloque abajo), y la oferta al empezar un combate no está
-  porque acá nadie empieza uno (llega con 6g3). La **Mesa** lista a los jugadores
+  porque acá se empieza un combate pero la oferta es de 6g7. La **Mesa** lista a los jugadores
   vinculados (`GET /api/campaigns/:id/members`, que lee la ficha **real** del
   jugador, no una copia): retrato, nombre, especie y clase, nivel, barra
   de PG, placas CA / Inic / CD / Pasiva y los estados como pills carmesí. Las
@@ -382,8 +382,13 @@ repiten acá.
   uno o todos juntos y «Descartar combate» lo borra. Cada acción la resuelve el
   motor (`encounterAct`) y se guarda entero por una cola (`encounterWriter.ts`,
   sobre `saveQueue.ts`); vincular un PNJ de la biblioteca a la campaña es un
-  pedido aparte, antes de sumarlo. **En curso sigue siendo de solo lectura** y
-  empezar (con la iniciativa y la dificultad) sigue en Flutter hasta 6g3: el
+  pedido aparte, antes de sumarlo. **Mientras se arma (6g3)** también se ve la
+  **dificultad** (`DifficultyBand`, entre la placa y la planilla) y los **PX** de
+  cada fila, si la preferencia de la cuenta lo permite (`showEncounterDifficulty`,
+  prendida por defecto; acá se lee y no se edita, editarla es del paso 7), y
+  «Tirar iniciativa» (`RollInitiativeDialog`, con las tiradas que propone el
+  motor y sin dejar casilleros en blanco) lo **empieza** desde `/v2`. **Ya en
+  curso sigue siendo de solo lectura**: jugarlo sigue en Flutter hasta 6g4, y el
   documento es el mismo, así que conviven. **Los PG salen de dos fuentes**,
   como en Flutter: los de un monstruo o un PNJ, del encuentro; los de un
   jugador, de **su ficha real** (actuales de la ficha cruda, máximo de
@@ -755,7 +760,7 @@ frontera sigue donde estaba: **el DM no escribe la ficha de otra cuenta**.
   (no escribe la ficha) y echar corta el vínculo tras confirmar. `MemberSheetView`
   sigue sin un solo control. No se pide el aviso de eventos tras cada acción
   (`_checkEventsSoon` de Flutter): decisión tomada, no un olvido.
-- Queda en Flutter: empezar el combate (hasta 6g3) y llevarlo en curso (hasta 6g4 en adelante).
+- Queda en Flutter: llevar el combate en curso (hasta 6g4 en adelante).
 
 **Paso 6f3: las pantallas de edición** *(existe)*. Toca solo `dnd_web`. Subir de
 nivel, elecciones, editor de conjuros, planos del Artífice y formas salvajes son
@@ -961,7 +966,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    alta y borrado *(existe)*; 6e3, el texto de la ficha *(existe)*; 6e4, el editor del bloque *(existe)*; 6e5,
    retrato y mostrar a la mesa *(existe)*; 6f, la ficha de PNJ, en tres: 6f1,
    crearla *(existe)*; 6f2, escribirla *(existe)*; 6f3, sus pantallas de edición (subir de
-   nivel, elecciones, conjuros, planos, formas e imprimir) *(existe)*; 6g, el combate, en siete: 6g1, el puente del motor *(existe)*; 6g2, armar *(existe)*; 6g3, dificultad e iniciativa; 6g4, jugar; 6g5, efectos, legendarias y defensas; 6g6, cerrar; 6g7, música, «Convertir en PNJ» y sumar desde el Bestiario. Importar y exportar PNJ sigue en el paso 7. Antes de portar esto es lectura
+   nivel, elecciones, conjuros, planos, formas e imprimir) *(existe)*; 6g, el combate, en siete: 6g1, el puente del motor *(existe)*; 6g2, armar *(existe)*; 6g3, dificultad e iniciativa *(existe)*; 6g4, jugar; 6g5, efectos, legendarias y defensas; 6g6, cerrar; 6g7, música, «Convertir en PNJ» y sumar desde el Bestiario. Importar y exportar PNJ sigue en el paso 7. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de
    otra cuenta» es del servidor y vale igual para el cliente nuevo. Entra acá
    también la edición de la ficha completa de un PNJ (inventario, comprar y
