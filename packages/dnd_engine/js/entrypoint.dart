@@ -721,6 +721,23 @@ String npcEdit(String npcJson, String actionJson) => jsonEncode(
       ).toJson(),
     );
 
+/// El prompt de retrato de un PNJ **sin ficha** (`none` o `block`). No lleva ficha
+/// ni arma: un PNJ con ficha de personaje usa `portraitPrompt` con su ficha, y
+/// sin ficha no hay arma que nombrar. Nunca lee trasfondo, notas ni voz
+/// (`buildNpcPortraitPrompt`); lo único libre es `extraText`, su apariencia.
+String npcPortraitPrompt(
+  String npcJson,
+  String catalogJson,
+  String style,
+  String extraText,
+) =>
+    buildNpcPortraitPrompt(
+      npc: Npc.fromJson((jsonDecode(npcJson) as Map).cast<String, dynamic>()),
+      repo: _repoPara(catalogJson),
+      style: style,
+      extraText: extraText,
+    );
+
 /// El bloque de un PNJ de bloque, o uno vacío si no lo tiene.
 String npcBlock(String npcJson) {
   final npc =
@@ -1038,6 +1055,7 @@ void main() {
   motor['npcs'] = npcs.toJS;
   motor['newNpc'] = newNpc.toJS;
   motor['npcEdit'] = npcEdit.toJS;
+  motor['npcPortraitPrompt'] = npcPortraitPrompt.toJS;
   motor['npcBlock'] = npcBlock.toJS;
   motor['creatureForm'] = creatureForm.toJS;
   motor['creatureDraft'] = creatureDraft.toJS;

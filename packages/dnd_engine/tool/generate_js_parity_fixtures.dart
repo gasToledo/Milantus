@@ -758,6 +758,46 @@ Future<void> main(List<String> args) async {
       'expected': NpcEdits.apply(pnjBase, notaAccion).toJson(),
     }),
   );
+  final accionRetrato = {
+    'type': 'addPortrait',
+    'key': 'pnj/a.png',
+    'prompt': 'una tabernera',
+  };
+  File('${out.path}/puente-pnj-retrato.json').writeAsStringSync(
+    jsonEncode({
+      'bridge': {
+        'fn': 'npcEdit',
+        'args': [jsonEncode(pnjBase.toJson()), jsonEncode(accionRetrato)],
+        'pure': true,
+      },
+      'expected': NpcEdits.apply(pnjBase, accionRetrato).toJson(),
+    }),
+  );
+  // El prompt de un PNJ sin ficha: texto, y el «character» del caso es el PNJ
+  // (el verificador le pasa primero ese JSON y después el catálogo).
+  final pnjConBloqueRetrato = Npc(
+    id: 'pnj',
+    name: 'Bruna',
+    sheetKind: NpcSheetKind.block,
+    block: repo.creaturesSorted.first,
+    baseCreatureId: repo.creaturesSorted.first.id,
+  );
+  File('${out.path}/puente-pnj-retrato-prompt.json').writeAsStringSync(
+    jsonEncode({
+      'character': jsonDecode(jsonEncode(pnjConBloqueRetrato.toJson())),
+      'bridge': {
+        'fn': 'npcPortraitPrompt',
+        'args': ['Acuarela', 'cicatriz en la ceja'],
+        'text': true,
+      },
+      'expected': buildNpcPortraitPrompt(
+        npc: pnjConBloqueRetrato,
+        repo: repo,
+        style: 'Acuarela',
+        extraText: 'cicatriz en la ceja',
+      ),
+    }),
+  );
   // El bloque de un PNJ y el borrador de una criatura: el reemplazo del bloque
   // y la cuenta del formulario (línea compuesta, errores) tienen que dar lo
   // mismo en la VM y en el JS compilado.

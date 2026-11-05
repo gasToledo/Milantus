@@ -37,6 +37,32 @@ void main() {
     expect(() => NpcEdits.apply(npc, {'type': 'volar'}), throwsFormatException);
   });
 
+  test(
+      'los retratos se anteponen sin duplicar, se restauran y borrar se lleva el prompt',
+      () {
+    var n = NpcEdits.apply(
+        npc, {'type': 'addPortrait', 'key': 'a', 'prompt': 'pa'});
+    n = NpcEdits.apply(n, {'type': 'addPortrait', 'key': 'b', 'prompt': 'pb'});
+    n = NpcEdits.apply(
+        n, {'type': 'addPortrait', 'key': 'a', 'prompt': 'otro'});
+    expect(n.portraitPaths, ['b', 'a']);
+    expect(n.portraitPrompts, {'a': 'pa', 'b': 'pb'});
+    n = NpcEdits.apply(n, {'type': 'restorePortrait', 'key': 'a'});
+    expect(n.portraitPaths, ['a', 'b']);
+    n = NpcEdits.apply(n, {'type': 'removePortrait', 'key': 'a'});
+    expect(n.portraitPaths, ['b']);
+    expect(n.portraitPrompts, {'b': 'pb'});
+  });
+
+  test('setAppearance recorta, y vacío la borra', () {
+    final con =
+        NpcEdits.apply(npc, {'type': 'setAppearance', 'text': '  alta '});
+    expect(con.appearance, 'alta');
+    expect(
+        NpcEdits.apply(con, {'type': 'setAppearance', 'text': ' '}).appearance,
+        isEmpty);
+  });
+
   test('setBlock reemplaza el bloque, y en un PNJ sin bloque lanza', () {
     final withBlock = Npc(
       id: 'npc-2',

@@ -16,6 +16,12 @@ import 'diary_ops.dart';
 ///   de bloque. En cualquier otro tipo lanza: no tendría dónde vivir.
 /// - `saveNote`, `removeNote` y `moveNote`: los campos de [DiaryOps]. Una nota
 ///   inválida deja el PNJ como estaba.
+/// - `addPortrait` con `key` y, si hay, `prompt`: antepone el retrato (queda como
+///   el actual) y no duplica una clave que ya está. `restorePortrait` con `key`
+///   lo pasa al frente. `removePortrait` con `key` lo quita y se lleva su prompt.
+///   Misma lógica que las de la ficha (`SheetActions`), porque un PNJ sin ficha
+///   guarda sus retratos en su propio documento.
+/// - `setAppearance` con `text`, recortado. Vacío la borra.
 class NpcEdits {
   const NpcEdits._();
 
@@ -62,6 +68,32 @@ class NpcEdits {
             action['entry'] as String,
             action['to'] as String,
           ),
+        );
+      case 'addPortrait':
+        final key = action['key'] as String? ?? '';
+        if (key.isEmpty || npc.portraitPaths.contains(key)) return npc;
+        final prompt = action['prompt'] as String?;
+        return npc.copyWith(
+          portraitPaths: [key, ...npc.portraitPaths],
+          portraitPrompts:
+              prompt == null ? null : {...npc.portraitPrompts, key: prompt},
+        );
+      case 'restorePortrait':
+        final key = action['key'] as String;
+        if (npc.portraitPaths.indexOf(key) <= 0) return npc;
+        return npc.copyWith(
+          portraitPaths: [key, ...npc.portraitPaths.where((k) => k != key)],
+        );
+      case 'removePortrait':
+        final key = action['key'] as String;
+        if (!npc.portraitPaths.contains(key)) return npc;
+        return npc.copyWith(
+          portraitPaths: [...npc.portraitPaths.where((k) => k != key)],
+          portraitPrompts: {...npc.portraitPrompts}..remove(key),
+        );
+      case 'setAppearance':
+        return npc.copyWith(
+          appearance: (action['text'] as String? ?? '').trim(),
         );
       default:
         throw FormatException('Acción de PNJ desconocida: ${action['type']}');

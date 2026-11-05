@@ -34,6 +34,7 @@ interface DartEngine {
   npcs(entriesJson: string, catalogJson: string): string;
   newNpc(catalogJson: string, name: string, kind: string, baseCreatureId: string): string;
   npcEdit(npcJson: string, actionJson: string): string;
+  npcPortraitPrompt(npcJson: string, catalogJson: string, style: string, extraText: string): string;
   npcBlock(npcJson: string): string;
   creatureForm(creatureJson: string): string;
   creatureDraft(creatureJson: string, formJson: string): string;
@@ -151,6 +152,12 @@ export function portraitPrompt(
   includeWeapon: boolean,
 ): string {
   return engine().portraitPrompt(JSON.stringify(character), catalogJson(catalog), style, extraText, includeWeapon);
+}
+
+/** El prompt de retrato de un PNJ sin ficha (`none` o `block`). Con ficha se usa
+ *  `portraitPrompt`. `extraText` es su apariencia. */
+export function npcPortraitPrompt(npc: JsonObject, catalog: Catalog, style: string, extraText: string): string {
+  return engine().npcPortraitPrompt(JSON.stringify(npc), catalogJson(catalog), style, extraText);
 }
 
 /** Los ids de los estilos predeterminados (lo que se guarda en los ajustes). */
@@ -769,7 +776,10 @@ export type NpcAction =
   | { type: 'saveNote'; entry: string; kind: string; title: string; body: string; imageKey: string | null; at: string }
   | { type: 'removeNote'; entry: string }
   | { type: 'moveNote'; entry: string; to: string }
-  | { type: 'setBlock'; block: JsonObject };
+  | { type: 'setBlock'; block: JsonObject }
+  | { type: 'addPortrait'; key: string; prompt?: string }
+  | { type: 'restorePortrait' | 'removePortrait'; key: string }
+  | { type: 'setAppearance'; text: string };
 
 /** Aplica una edición a un PNJ con el motor (`NpcEdits`) y devuelve el documento
  *  para guardar. Una acción desconocida o una versión futura lanzan. */
