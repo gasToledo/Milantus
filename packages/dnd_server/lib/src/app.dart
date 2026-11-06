@@ -317,6 +317,12 @@ Handler buildHandler({
             _endEncounterHandler(request, campaigns, encounters, transactions),
       ),
     )
+    ..put(
+      '/api/campaigns/<id>/encounter/<encounterId>/combatants/<combatantId>/npc',
+      authenticated(
+        (request) => _convertCombatantHandler(request, transactions),
+      ),
+    )
     ..get(
       '/api/campaigns/<id>/npcs',
       authenticated(
@@ -1924,6 +1930,7 @@ Future<Response> _endEncounterHandler(
     final encounter = await repositories.encounters.find(
       request.userId,
       campaignId,
+      forUpdate: true,
     );
     if (encounter == null) return;
     // El capítulo lo resuelve el servidor y no lo manda el cliente: el DM

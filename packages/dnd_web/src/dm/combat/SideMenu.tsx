@@ -1,6 +1,6 @@
 import { useTexts } from '../../i18n/context';
 import { cx } from '../../ui/cx';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger, Tooltip } from '../../ui/primitives';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger, Tooltip } from '../../ui/primitives';
 
 export const SIDE_TONE: Record<string, string> = {
   ally: 'border-verdant text-verdant',
@@ -12,7 +12,7 @@ const PILL = 'shrink-0 rounded-[var(--radius-pill)] border px-2 text-[11px]';
 
 /** El bando de una fila. Con [canChange] la pill abre el menú para cambiarlo; sin
  *  él (un PNJ sin estadísticas) es neutral fijo y lo dice. */
-export function SideMenu({ side, name, canChange, onChange }: { side: string; name: string; canChange: boolean; onChange: (side: string) => void }) {
+export function SideMenu({ side, name, canChange, onChange, onConvert }: { side: string; name: string; canChange: boolean; onChange: (side: string) => void; onConvert?: () => void }) {
   const t = useTexts();
   const tone = SIDE_TONE[side] ?? SIDE_TONE.neutral;
   const word = t.encSides[side] ?? side;
@@ -40,6 +40,12 @@ export function SideMenu({ side, name, canChange, onChange }: { side: string; na
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>
+        {onConvert && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={onConvert}>{t.encConvertToNpcEllipsis}</DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

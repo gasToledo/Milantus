@@ -38,6 +38,17 @@ import 'npc_stats.dart';
 class EncounterActions {
   const EncounterActions._();
 
+  /// Conserva la fila, incluido lo que ya pasó en este combate.
+  static Encounter convertToNpc(
+    Encounter current,
+    Combatant combatant, {
+    required String name,
+    required String npcId,
+  }) =>
+      current.withReplaced(
+        combatant.copyWith(kind: CombatantKind.npc, name: name, npcId: npcId),
+      );
+
   static Encounter? apply(
     Encounter? current,
     ContentRepository repo,
@@ -123,12 +134,11 @@ class EncounterActions {
       case 'convertToNpc':
         final c = find();
         if (c == null) return null;
-        return current!.withReplaced(
-          c.copyWith(
-            kind: CombatantKind.npc,
-            name: action['name'] as String,
-            npcId: action['npcId'] as String,
-          ),
+        return convertToNpc(
+          current!,
+          c,
+          name: action['name'] as String,
+          npcId: action['npcId'] as String,
         );
       case 'start':
         return current?.start(

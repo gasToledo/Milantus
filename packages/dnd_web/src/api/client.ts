@@ -448,6 +448,17 @@ export async function fetchCampaignEncounter(campaignId: string, signal: AbortSi
 /** Guarda el combate entero (`PUT`): lo arma el motor y gana el último que guarda. */
 export const saveCampaignEncounter = (campaignId: string, encounter: JsonObject) => sendJson('PUT', encounterPath(campaignId), { encounter });
 
+export async function convertCampaignCombatant(campaignId: string, encounterId: string, combatantId: string, npc: JsonObject): Promise<JsonObject> {
+  const path = `${encounterPath(campaignId)}/${encodeURIComponent(encounterId)}/combatants/${encodeURIComponent(combatantId)}/npc`;
+  const response = await fetch(path, {
+    method: 'PUT',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ npc }),
+  });
+  if (!response.ok) throw new ApiError(response.status, path);
+  return ((await response.json()) as { encounter: JsonObject }).encounter;
+}
+
 /** Descarta el combate que se está armando: no queda registro. */
 export const discardCampaignEncounter = (campaignId: string) => remove(`${encounterPath(campaignId)}?discard=true`);
 

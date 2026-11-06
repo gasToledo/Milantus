@@ -35,7 +35,7 @@ void main() {
   late InMemoryPortraitBlobStore portraits;
   late InMemoryCharacterRepository characters;
   late InMemoryCampaignRepository campaigns;
-  late InMemoryEncounterRepository encounters;
+  late _EncounterRepositoryWithFailingSave encounters;
   late InMemoryNpcRepository npcs;
   late InMemoryHomebrewRepository homebrew;
   late Handler handler;
@@ -47,7 +47,7 @@ void main() {
     campaigns = InMemoryCampaignRepository(characters);
     final chapters = InMemoryChapterRepository(campaigns);
     final notes = InMemoryNoteRepository(campaigns, chapters);
-    encounters = InMemoryEncounterRepository(campaigns);
+    encounters = _EncounterRepositoryWithFailingSave(campaigns);
     campaigns
       ..playerChaptersFor = chapters.listFor
       ..playerBattlesFor = encounters.logsFor;
@@ -647,6 +647,117 @@ void main() {
   });
 
   group('combate con PNJ', () {
+    test(
+      'convertir conserva la fila, revierte fallos y no duplica el PNJ',
+      () async {
+        final dm = await login('dm');
+        final other = await login('otro');
+        await createCampaign(dm, 'mesa');
+        const monster = Combatant(
+          id: 'm',
+          kind: CombatantKind.monster,
+          name: 'Bandido 1',
+          initiative: 13,
+          creatureId: 'bandit',
+          currentHp: 4,
+          maxHp: 11,
+          tempHp: 3,
+          acBonus: 2,
+          advantage: CombatantAdvantage.advantage,
+          legendaryActionsSpent: 1,
+          legendaryResistancesSpent: 2,
+          side: CombatantSide.ally,
+          tags: ['Marcado'],
+        );
+        final encounter = Encounter(
+          id: 'e',
+          stage: EncounterStage.running,
+          round: 3,
+          turnIndex: 1,
+          combatants: [
+            const Combatant(
+              id: 'otro',
+              kind: CombatantKind.monster,
+              name: 'Otro',
+              initiative: 17,
+            ),
+            monster,
+          ],
+        );
+        final owner = userIdOf('dm');
+        await encounters.save(owner, 'mesa', encounter);
+        const path = '/api/campaigns/mesa/encounter/e/combatants/m/npc';
+        final body = {
+          'npc': Npc.draft(
+            name: 'Bandido 1',
+            kind: NpcSheetKind.block,
+            base: bandit,
+          ).toJson(),
+        };
+        Future<({int status, String body})> convert(String token) =>
+            send('PUT', path, token: token, body: body);
+
+        final foreign = await convert(other);
+        final absent = await send(
+          'PUT',
+          path.replaceFirst('/mesa/', '/ausente/'),
+          token: other,
+          body: body,
+        );
+        expect(foreign.status, 404);
+        expect(foreign.body, absent.body);
+
+        encounters.failNextSave = true;
+        expect((await convert(dm)).status, 500);
+        expect(await npcs.listForDm(owner), isEmpty);
+        expect(await npcs.listForCampaign(owner, 'mesa'), isEmpty);
+        expect(
+          (await encounters.find(owner, 'mesa'))?.toJson(),
+          encounter.toJson(),
+        );
+
+        final converted = await convert(dm);
+        expect(converted.status, 200, reason: converted.body);
+        final response = decode(converted.body);
+        final npcId = response['npcId'] as String;
+        final updated = Encounter.fromJson(
+          response['encounter'] as Map<String, dynamic>,
+        );
+        expect(updated.round, encounter.round);
+        expect(updated.turnIndex, encounter.turnIndex);
+        expect(
+          updated.combatants.first.toJson(),
+          encounter.combatants.first.toJson(),
+        );
+        expect(updated.combatants.last.toJson(), {
+          ...monster.toJson(),
+          'kind': 'npc',
+          'npcId': npcId,
+        });
+        final stored = (await npcs.listForDm(owner)).single;
+        expect(stored.npc.block?.toJson(), bandit.toJson());
+        expect(
+          (await npcs.listForCampaign(owner, 'mesa')).single.npc.id,
+          npcId,
+        );
+        expect((await convert(dm)).body, converted.body);
+        expect(await npcs.listForDm(owner), hasLength(1));
+
+        await encounters.discard(owner, 'mesa');
+        await encounters.save(
+          owner,
+          'mesa',
+          Encounter(id: 'nuevo', combatants: [monster]),
+        );
+        expect((await convert(dm)).status, 404);
+        expect(
+          (await encounters.find(owner, 'mesa'))?.combatants.single.kind,
+          CombatantKind.monster,
+        );
+        expect(await npcs.listForDm(owner), hasLength(1));
+      },
+    );
+
     /// Una mesa con un jugador vinculado y un combate en curso contra Garrick
     /// (PNJ con bloque de Bandido) y un goblin, con Ilse aliada y Toblen
     /// neutral. Garrick y el goblin quedaron a 0 PG.
@@ -1179,4 +1290,23 @@ void main() {
       );
     });
   });
+}
+
+class _EncounterRepositoryWithFailingSave extends InMemoryEncounterRepository {
+  _EncounterRepositoryWithFailingSave(super.campaigns);
+
+  bool failNextSave = false;
+
+  @override
+  Future<void> save(
+    String dmUserId,
+    String campaignId,
+    Encounter encounter,
+  ) async {
+    if (failNextSave) {
+      failNextSave = false;
+      throw StateError('No se pudo guardar el combate.');
+    }
+    await super.save(dmUserId, campaignId, encounter);
+  }
 }

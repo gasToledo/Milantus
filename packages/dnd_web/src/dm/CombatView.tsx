@@ -33,6 +33,7 @@ import { MarkdownText } from '../ui/MarkdownText';
 import { Toast, Tooltip, type ToastTone } from '../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { AddCombatantDialog } from './combat/AddCombatantDialog';
+import { ConvertNpcDialog } from './combat/ConvertNpcDialog';
 import { tagLabel } from './combat/conditions';
 import { DifficultyBand } from './combat/DifficultyBand';
 import { EffectsDialog } from './combat/EffectsDialog';
@@ -101,6 +102,7 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
   const [dialog, setDialog] = useState<'add' | 'discard' | 'finish' | null>(null);
   // El combatiente cuyos efectos y defensas se editan.
   const [effectsId, setEffectsId] = useState<string | null>(null);
+  const [conversion, setConversion] = useState<{ encounterId: string; combatantId: string; creatureId: string; name: string } | null>(null);
   // La cifra de daño o curación es una sola para todo el combate. Se lee de la
   // referencia al tocar un botón: un toque no usa una cifra vieja si el campo
   // acaba de cambiar.
@@ -223,6 +225,10 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
                       readAmount: () => Number(amountRef.current) || 0,
                       onFix: (row) => setFix({ id: row.c.id, name: row.c.name, initiative: row.c.initiative }),
                       onEffects: (row) => setEffectsId(row.c.id),
+                      onConvert: (row) => {
+                        if (!row.c.creatureId) return;
+                        setConversion({ encounterId: view.encounter.id, combatantId: row.c.id, creatureId: row.c.creatureId, name: row.c.name });
+                      },
                     })
                   }
                 />
@@ -327,6 +333,13 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
           running={!!data?.view && !data.view.preparing}
           act={writer.act}
           onClose={() => setDialog(null)}
+        />
+      )}
+      {conversion && (
+        <ConvertNpcDialog
+          current={conversion.name}
+          onConvert={(name) => writer.convert(conversion.encounterId, conversion.combatantId, conversion.creatureId, name)}
+          onClose={() => setConversion(null)}
         />
       )}
       {effectsRow && data && catalog.data && npcs.data && (
@@ -845,6 +858,7 @@ interface RowCtx {
   readAmount: () => number;
   onFix: (row: Row) => void;
   onEffects: (row: Row) => void;
+  onConvert: (row: Row) => void;
 }
 
 /** El enlace a la ficha de un jugador de la mesa. Es una pill con borde y no
@@ -867,7 +881,7 @@ function OpenSheetLink({ campaignId, memberId }: { campaignId: string; memberId:
  *  curar (menos un jugador y un PNJ sin estadísticas), abrir la ficha de un
  *  jugador y sacar a cualquiera. Sacar no confirma, como en Flutter: volver a
  *  sumarlo es un toque. */
-function rowParts(row: Row, { campaignId, act, t, running, amount, readAmount, onFix, onEffects }: RowCtx): RowExtras {
+function rowParts(row: Row, { campaignId, act, t, running, amount, readAmount, onFix, onEffects, onConvert }: RowCtx): RowExtras {
   const { c, detail, member } = row;
   const removeTag = (tag: string) => act({ type: 'setTags', combatantId: c.id, tags: (c.tags ?? []).filter((x) => x !== tag) });
   // Dorado y relleno si el combatiente lleva algo; apagado si no.
@@ -928,6 +942,7 @@ function rowParts(row: Row, { campaignId, act, t, running, amount, readAmount, o
         name={c.name}
         canChange={detail?.canChangeSide ?? false}
         onChange={(side) => act({ type: 'setSide', combatantId: c.id, side: side as 'ally' | 'enemy' | 'neutral' })}
+        onConvert={row.creature ? () => onConvert(row) : undefined}
       />
     ),
     actions: (

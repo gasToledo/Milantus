@@ -60,8 +60,11 @@ class InMemoryEncounterRepository implements EncounterRepository {
   }
 
   @override
-  Future<Encounter?> find(String dmUserId, String campaignId) async =>
-      _byCampaign[_key(dmUserId, campaignId)];
+  Future<Encounter?> find(
+    String dmUserId,
+    String campaignId, {
+    bool forUpdate = false,
+  }) async => _byCampaign[_key(dmUserId, campaignId)];
 
   @override
   Future<void> save(

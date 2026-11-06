@@ -413,7 +413,10 @@ repiten acá.
   «Terminar combate» en la placa. El DM puede guardar el combate en el Cuaderno
   o descartarlo. Al guardar se envían primero los cambios pendientes y el
   servidor marca muertos solo a los PNJ caídos que el DM eligió y conserva los
-  PG de los demás para el próximo combate de esa campaña. **Los PG salen de dos fuentes**,
+  PG de los demás para el próximo combate de esa campaña. **6g7b** suma
+  «Convertir en PNJ…» al menú de bando de un monstruo con perfil. Guarda lo
+  pendiente y luego crea, vincula y reemplaza la fila en una transacción. La
+  conversión conserva el turno y el estado del combatiente. **Los PG salen de dos fuentes**,
   como en Flutter: los de un monstruo o un PNJ, del encuentro; los de un
   jugador, de **su ficha real** (actuales de la ficha cruda, máximo de
   `computeSheet`), que el DM no escribe: la fila dice «En su ficha». Sin combate
@@ -784,7 +787,7 @@ frontera sigue donde estaba: **el DM no escribe la ficha de otra cuenta**.
   (no escribe la ficha) y echar corta el vínculo tras confirmar. `MemberSheetView`
   sigue sin un solo control. No se pide el aviso de eventos tras cada acción
   (`_checkEventsSoon` de Flutter): decisión tomada, no un olvido.
-- Del combate quedan 6g7b, «Convertir en PNJ», y 6g7c, sumar desde el Bestiario.
+- Del combate queda 6g7c, sumar desde el Bestiario.
 
 **Paso 6f3: las pantallas de edición** *(existe)*. Toca solo `dnd_web`. Subir de
 nivel, elecciones, editor de conjuros, planos del Artífice y formas salvajes son
@@ -990,7 +993,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    alta y borrado *(existe)*; 6e3, el texto de la ficha *(existe)*; 6e4, el editor del bloque *(existe)*; 6e5,
    retrato y mostrar a la mesa *(existe)*; 6f, la ficha de PNJ, en tres: 6f1,
    crearla *(existe)*; 6f2, escribirla *(existe)*; 6f3, sus pantallas de edición (subir de
-   nivel, elecciones, conjuros, planos, formas e imprimir) *(existe)*; 6g, el combate, en siete: 6g1, el puente del motor *(existe)*; 6g2, armar *(existe)*; 6g3, dificultad e iniciativa *(existe)*; 6g4, jugar *(existe)*; 6g5, efectos, legendarias y defensas *(existe)*; 6g6, cerrar *(existe)*; 6g7a, ofrecer música *(existe)*; 6g7b, «Convertir en PNJ»; 6g7c, sumar desde el Bestiario. Importar y exportar PNJ sigue en el paso 7. Antes de portar esto es lectura
+   nivel, elecciones, conjuros, planos, formas e imprimir) *(existe)*; 6g, el combate, en siete: 6g1, el puente del motor *(existe)*; 6g2, armar *(existe)*; 6g3, dificultad e iniciativa *(existe)*; 6g4, jugar *(existe)*; 6g5, efectos, legendarias y defensas *(existe)*; 6g6, cerrar *(existe)*; 6g7a, ofrecer música *(existe)*; 6g7b, «Convertir en PNJ» *(existe)*; 6g7c, sumar desde el Bestiario. Importar y exportar PNJ sigue en el paso 7. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de
    otra cuenta» es del servidor y vale igual para el cliente nuevo. Entra acá
    también la edición de la ficha completa de un PNJ (inventario, comprar y

@@ -1473,6 +1473,11 @@ Los personajes que los jugadores le compartieron se sueltan, y sus fichas siguen
   encNoAllyStanding: 'No queda ningún aliado en pie.',
   encWrapUp: '¿Damos el encuentro por terminado?',
   encRemoveFromCombat: 'Sacar del combate',
+  encConvertToNpc: 'Convertir en PNJ',
+  encConvertToNpcEllipsis: 'Convertir en PNJ…',
+  encConvert: 'Convertir',
+  encConvertFailed: 'No se pudo convertir el combatiente en PNJ.',
+  encConvertGone: 'El combatiente ya no está disponible en este combate.',
   // Efectos y defensas (6g5): copiados de las claves homónimas de Flutter, salvo
   // las que nacieron acá (ventaja, temporales y bono a la CA solo existen en /v2).
   dmEffectsOf: (name: string) => `Efectos de ${name}`,
@@ -3458,6 +3463,11 @@ The characters players shared with it are released, and their sheets remain thei
   encNoAllyStanding: 'No ally is left standing.',
   encWrapUp: 'Shall we wrap up the encounter?',
   encRemoveFromCombat: 'Remove from combat',
+  encConvertToNpc: 'Convert to NPC',
+  encConvertToNpcEllipsis: 'Convert to NPC…',
+  encConvert: 'Convert',
+  encConvertFailed: 'The combatant could not be converted to an NPC.',
+  encConvertGone: 'The combatant is no longer available in this combat.',
   dmEffectsOf: (name: string) => `Effects on ${name}`,
   dmNoteEffect: 'Note an effect',
   dmNoteEffectHint: 'Marked by the rogue…',

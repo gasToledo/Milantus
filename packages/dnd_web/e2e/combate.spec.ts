@@ -106,7 +106,7 @@ test('el combate es del DM: otra cuenta recibe el mismo 404 que ante lo inexiste
   for (const secreto of SOLO_DEL_DM) await expect(page.getByText(secreto)).toHaveCount(0);
 });
 
-test('armar, descartar, empezar, jugar, anotar efectos y terminar un combate guardan lo que da el motor', async ({ context, page, baseURL }) => {
+test('el DM arma, juega, convierte un monstruo en PNJ y termina el combate', async ({ context, page, baseURL }) => {
   const cookie = `dnd_session=${TOKEN_DM}`;
   await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);
   // Una campaña propia de la prueba: no toca el combate sembrado de la del cuervo.
@@ -190,6 +190,36 @@ test('armar, descartar, empezar, jugar, anotar efectos y terminar un combate gua
       return g ? [g.advantage, g.tempHp, g.tags] : null;
     })
     .toEqual(['advantage', 3, [textsFor('es').conditionRules.prone.label]]);
+
+  type Combate = { id: string; round: number; turnIndex: number; combatants: { id: string; name: string; npcId?: string }[] };
+  const { encounter: antes } = await api<{ encounter: Combate }>(page.request, ruta, TOKEN_DM);
+  const original = antes.combatants[0]!;
+  const convertir = `${ruta}/${antes.id}/combatants/${original.id}/npc`;
+  await page.route(`**${convertir}`, async (route) => {
+    // El servidor guardó los tres cambios pero el navegador perdió la respuesta.
+    await route.fetch();
+    await route.abort();
+  }, { times: 1 });
+  const fila = page.locator(`[data-combatant="${original.id}"]`);
+  await fila.getByRole('button', { name: t.encSideOf(original.name), exact: true }).click();
+  await page.getByRole('menuitem', { name: t.encConvertToNpcEllipsis, exact: true }).click();
+  const dialogo = page.getByRole('dialog', { name: t.encConvertToNpc, exact: true });
+  const campoNombre = dialogo.getByRole('textbox', { name: t.npcNameLabel, exact: true });
+  await expect(campoNombre).toHaveValue(original.name);
+  await campoNombre.fill('Sable');
+  await dialogo.getByRole('button', { name: t.encConvert, exact: true }).click();
+  await expect(dialogo.getByRole('alert')).toHaveText(t.encConvertFailed);
+  await expect(campoNombre).toHaveValue('Sable');
+  const { encounter: convertido } = await api<{ encounter: Combate }>(page.request, ruta, TOKEN_DM);
+  const npcId = convertido.combatants[0]?.npcId;
+  expect(npcId).toBeTruthy();
+  await dialogo.getByRole('button', { name: t.retry, exact: true }).click();
+  await expect(fila.getByText('Sable', { exact: true })).toBeVisible();
+  expect(convertido).toEqual({ ...antes, combatants: [{ ...original, name: 'Sable', kind: 'npc', npcId }] });
+  const { npcs } = await api<{ npcs: { npc: { id: string; name: string } }[] }>(page.request, `/api/campaigns/${campaign.id}/npcs`, TOKEN_DM);
+  expect(npcs.map(({ npc }) => [npc.id, npc.name])).toEqual([[npcId, 'Sable']]);
+  const biblioteca = await api<{ npcs: { npc: { id: string; name: string } }[] }>(page.request, '/api/npcs', TOKEN_DM);
+  expect(biblioteca.npcs.filter(({ npc }) => npc.name === 'Sable').map(({ npc }) => npc.id)).toEqual([npcId]);
 
   await page.locator('[data-action="finish-combat"]').click();
   await page.getByRole('button', { name: t.encFinishAndSave, exact: true }).click();

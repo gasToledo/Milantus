@@ -12,7 +12,12 @@ import 'package:postgres/postgres.dart';
 abstract class EncounterRepository {
   /// El combate abierto de [campaignId], o `null` si no hay ninguno o la
   /// campaña no es de [dmUserId]. Los dos casos no se distinguen.
-  Future<Encounter?> find(String dmUserId, String campaignId);
+  /// [forUpdate] reserva la fila hasta que termine la transacción.
+  Future<Encounter?> find(
+    String dmUserId,
+    String campaignId, {
+    bool forUpdate = false,
+  });
 
   /// Guarda el documento entero. No hay operaciones fïnas de "avanzar turno"
   /// o "dañar monstruo": el cliente del DM es dueño del estado y lo manda
@@ -62,11 +67,16 @@ class PostgresEncounterRepository implements EncounterRepository {
   const PostgresEncounterRepository(this._session);
 
   @override
-  Future<Encounter?> find(String dmUserId, String campaignId) async {
+  Future<Encounter?> find(
+    String dmUserId,
+    String campaignId, {
+    bool forUpdate = false,
+  }) async {
     final result = await _session.execute(
       Sql.named('''
         SELECT document FROM encounters
         WHERE dm_user_id = @dmUserId AND campaign_id = @campaignId
+        ${forUpdate ? 'FOR UPDATE' : ''}
       '''),
       parameters: {
         'dmUserId': TypedValue(Type.uuid, dmUserId),

@@ -316,8 +316,13 @@ explícita y nunca lo que pasa si el parámetro viene mal escrito.
 El documento de `encounters` se reemplaza entero en cada guardado
 (`PUT /api/campaigns/<id>/encounter`), igual que una ficha. No hay rutas finas
 de "avanzar turno" o "dañar monstruo": el cliente del DM es dueño del estado
-completo, así que no hay nada que se pueda desincronizar entre dos rutas que
-deberían ir juntas.
+completo. Convertir un monstruo en PNJ es la excepción porque escribe tres
+documentos relacionados. `PUT .../encounter/<encuentro>/combatants/<fila>/npc`
+recibe el borrador del PNJ con bloque, comprueba la criatura de origen y
+bloquea el encuentro de la cuenta mientras crea el PNJ, lo vincula y guarda
+la fila convertida. Si se reintenta sobre la misma fila ya convertida,
+devuelve el mismo PNJ. El id del encuentro evita aplicar el reintento al
+siguiente combate. React confirma lo pendiente de la cola antes del `PUT`.
 
 ### `turnFor`, la consulta que ve el jugador
 

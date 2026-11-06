@@ -117,7 +117,17 @@ Future<StoredNpc> _insertNpc(
   String userId,
   Npc requested,
   Character? sheet,
-) => transactions.run((repositories) async {
+) => transactions.run(
+  (repositories) =>
+      _insertNpcInTransaction(repositories, userId, requested, sheet),
+);
+
+Future<StoredNpc> _insertNpcInTransaction(
+  TransactionRepositories repositories,
+  String userId,
+  Npc requested,
+  Character? sheet,
+) async {
   final taken = {
     ...await repositories.characters.existingIds(userId),
     ...await repositories.npcs.existingIds(userId),
@@ -135,7 +145,80 @@ Future<StoredNpc> _insertNpc(
   final npc = _normalizedNpc(requested, id: id, characterId: storedSheet?.id);
   await repositories.npcs.insert(userId, npc);
   return StoredNpc(npc: npc, sheet: storedSheet);
-});
+}
+
+/// El id del encuentro impide que un reintento toque el combate siguiente.
+Future<Response> _convertCombatantHandler(
+  Request request,
+  RepositoryTransactionRunner transactions,
+) async {
+  final campaignId = requireSafePathSegment(
+    request.params['id']!,
+    label: 'id de campaña',
+  );
+  final encounterId = requireSafePathSegment(
+    request.params['encounterId']!,
+    label: 'id de combate',
+  );
+  final combatantId = requireSafePathSegment(
+    request.params['combatantId']!,
+    label: 'id de combatiente',
+  );
+  final body = await _readJsonBody(request);
+  final requested = _npcFromRequestJson(body['npc']);
+  final baseId = requested.baseCreatureId;
+  if (requested.sheetKind != NpcSheetKind.block ||
+      baseId == null ||
+      requested.block?.id != baseId) {
+    throw const FormatException(
+      'La conversión necesita el bloque de la criatura.',
+    );
+  }
+
+  return transactions.run((repositories) async {
+    final userId = request.userId;
+    // Dos conversiones de la misma fila se resuelven en orden: la segunda
+    // encuentra el PNJ de la primera, aun si se perdió la respuesta.
+    final encounter = await repositories.encounters.find(
+      userId,
+      campaignId,
+      forUpdate: true,
+    );
+    if (encounter == null || encounter.id != encounterId)
+      return _notFound('no_active_combat');
+    final combatant = encounter.combatants
+        .where((c) => c.id == combatantId)
+        .firstOrNull;
+    if (combatant == null || combatant.creatureId != baseId)
+      return _notFound('no_active_combat');
+    if (combatant.kind == CombatantKind.npc && combatant.npcId != null) {
+      return _jsonOk({
+        'encounter': encounter.toJson(),
+        'npcId': combatant.npcId,
+      });
+    }
+    if (combatant.kind != CombatantKind.monster)
+      return _notFound('no_active_combat');
+
+    final npc = (await _insertNpcInTransaction(
+      repositories,
+      userId,
+      requested,
+      null,
+    )).npc;
+    if (await repositories.npcs.link(userId, campaignId, npc.id) == null) {
+      throw StateError('No se pudo vincular el PNJ de este combate.');
+    }
+    final next = EncounterActions.convertToNpc(
+      encounter,
+      combatant,
+      name: npc.name,
+      npcId: npc.id,
+    );
+    await repositories.encounters.save(userId, campaignId, next);
+    return _jsonOk({'encounter': next.toJson(), 'npcId': npc.id});
+  });
+}
 
 /// Edita el documento de un PNJ propio. El tipo no se cambia: cada uno se
 /// edita con otro constructor y pasar de uno a otro perdería datos.
