@@ -131,7 +131,6 @@ export interface PortraitOwner {
   caption: string;
   accent: string | null;
   backHref: string;
-  backLabel: string;
   paths: string[];
   prompts: Record<string, string>;
   detailsLabel: string;
@@ -357,12 +356,12 @@ export function PortraitWorkshop({ owner }: { owner: PortraitOwner }) {
   return (
     <div className="flex min-h-full flex-col gap-4" data-page="portrait">
       <header className="flex flex-col gap-1">
-        <Link
+        <Link back
           href={owner.backHref}
           className="inline-flex min-h-9 items-center gap-1.5 self-start text-[13px] text-gold no-underline hover:text-on-surface"
         >
           <ArrowLeft size={16} aria-hidden="true" />
-          {owner.backLabel}
+          {t.luBack}
         </Link>
         <h1 className="font-display text-[28px] leading-[1.1] text-on-surface">{t.actionPortrait}</h1>
       </header>

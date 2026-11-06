@@ -35,7 +35,6 @@ export function PortraitPage({ model, write }: { model: SheetModel; write: Sheet
     caption,
     accent: accentFor(model),
     backHref: characterHref(character.id),
-    backLabel: t.chBack,
     paths: character.portraitPaths ?? [],
     prompts: character.portraitPrompts ?? {},
     detailsLabel: t.portraitExtraDetails,

@@ -12,6 +12,17 @@ const COMBATE = '/v2/dm/campanas/marca-del-cuervo/combate';
 // jugador no tiene que recibir por ningún lado.
 const SOLO_DEL_DM = ['Marca reservada del DM', 'emboscada-del-valle', 'Lobo 1'];
 
+test('la ficha de un jugador abierta desde el combate vuelve al combate', async ({ context, page, baseURL }) => {
+  await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);
+  await page.goto(COMBATE);
+  await page.locator('[data-combatant="c-elsbeth"]').getByRole('link', { name: t.encOpenSheet, exact: true }).click();
+  const ficha = page.locator('[data-member-sheet]');
+  await ficha.getByRole('tab', { name: t.tabCombat, exact: true }).click();
+  await page.reload();
+  await ficha.getByRole('link', { name: t.luBack, exact: true }).click();
+  await expect(page).toHaveURL(`${baseURL}${COMBATE}`);
+});
+
 test('el combate es del DM: otra cuenta recibe el mismo 404 que ante lo inexistente y el jugador solo ve su turno', async ({
   context,
   page,

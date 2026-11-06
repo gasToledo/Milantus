@@ -57,7 +57,7 @@ una regla: reciben el número ya resuelto por `computeSheet`.
 | --- | --- | --- |
 | `Shell` | El marco: panel de 236 px fijo desde 900 px, barra con cajón debajo; el contenido ocupa todo el ancho (sin máximo). `panel` y `footer` son de cada pantalla | Toda pantalla. Sin `panel` ni `footer`, solo la marca (sin sesión, no disponible) |
 | `NavGroup`, `NavItem` | Grupo con nombre (`nav`) e ítem del panel: ícono, rótulo, activo en oro sobre `goldSoft` con `aria-current` | `internal` navega sin recargar; `external` avisa al lector que abre Flutter y muestra el ícono de enlace externo; `count` lleva la cifra tabular a la derecha (oro si está activo), `badge` es el aviso que pide atención (objetos esperando en Inventario): círculo de oro de 18 px que con dos cifras se estira a píldora, `muted` atenúa la categoría sin coincidencias en el Códice y `onSelect` en vez de `href` lo vuelve un botón para una acción de la pantalla (Imprimir) |
-| `SidebarBack` | El «volver» de una pantalla de adentro, con la forma del interruptor de modo. `onClick` con `preventDefault` frena la salida para confirmar | Ficha, creador |
+| `SidebarBack` | El «Atrás» de una pantalla de adentro, con la forma del interruptor de modo. `onClick` con `preventDefault` frena la salida para confirmar | Ficha, creador |
 | `ModeSwitch` | «Jugador / DM»: el modo actual es un `span` con `aria-current` y el otro un enlace interno (`mode`, `playerHref`, `dmHref`) | Panel de cada modo |
 | `NavCollapsible` (`ui/disclosure.tsx`) | Grupo del panel que se pliega: el rótulo es el botón | Campañas terminadas del Modo DM |
 | `ThemeMenu`, `VersionLabel` | Selector de tema y versión, al pie del panel | Los dos pies |
@@ -206,6 +206,11 @@ que ir del dashboard a la ficha no vuelva a pedir nada.
 
 ## Navegación
 
+Los enlaces «Atrás» usan `Link back`. Vuelven a la pantalla desde la que se
+entró, con su URL completa. Cambiar de pestaña dentro de una ficha conserva ese
+origen y deja cada pestaña en el historial del navegador. Si se entró por URL
+directa, el `href` del enlace indica el destino de respaldo.
+
 `src/router.tsx`: `useRoute()` y `Link` (un `<a href>` de verdad que, con
 clic simple, navega sin recargar). Los enlaces a Flutter son `<a>` comunes.
 Una pestaña que el usuario querría compartir o recargar es una ruta
@@ -267,7 +272,7 @@ La pantalla de referencia de cómo se arma una vista con la biblioteca:
 - Lista y detalle van en `.codex-split` (`index.css`), medido con *container
   query* y no con el viewport, porque el panel le come ancho: desde 760 px son
   dos columnas con la lista pegajosa y su propio scroll; debajo se ve una sola
-  y el detalle trae «volver a la lista».
+  y el detalle trae «Atrás», con la lista como destino de respaldo.
 - La búsqueda ignora tildes y mayúsculas (`fold`), igual en el panel y en la
   categoría.
 - El glosario cambia tres cosas porque se lee en orden: la lista va agrupada y

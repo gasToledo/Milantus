@@ -63,9 +63,10 @@ export function ButtonLink({
   className,
   href,
   internal = false,
+  back,
   newTab = false,
   'data-action': dataAction,
-}: Common & { href: string; internal?: boolean; newTab?: boolean; 'data-action'?: string }) {
+}: Common & { href: string; internal?: boolean; back?: boolean; newTab?: boolean; 'data-action'?: string }) {
   const props = { href, 'data-action': dataAction, className: cx(BASE, SHAPES[shape], TONES[tone], className) };
   const body = (
     <>
@@ -73,7 +74,7 @@ export function ButtonLink({
       {children}
     </>
   );
-  if (internal) return <Link {...props}>{body}</Link>;
+  if (internal) return <Link back={back} {...props}>{body}</Link>;
   // `noreferrer` también corta `opener`: la otra página no alcanza a esta.
   return newTab ? (
     <a {...props} target="_blank" rel="noreferrer">

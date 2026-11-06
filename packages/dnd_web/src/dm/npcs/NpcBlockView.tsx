@@ -15,12 +15,9 @@ import { useNpcWriter } from './npcWriter';
 /** El «volver» del panel lateral: al PNJ, preguntando antes si hay cambios
  *  (la pregunta la hace el formulario, que es quien sabe). */
 export function NpcBlockBack({ npcId, leaveRef }: { npcId: string; leaveRef: MutableRefObject<(() => void) | null> }) {
-  const t = useTexts();
-  const stored = useNpc(npcId);
   return (
     <SidebarBack
       href={dmNpcsHref(npcId)}
-      label={stored.data?.npc.name || t.dmNpcLibrary}
       onClick={(e) => {
         // Sin formulario montado (cargando, error) es un enlace común.
         if (!leaveRef.current) return;

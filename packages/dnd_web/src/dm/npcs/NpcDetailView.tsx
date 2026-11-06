@@ -83,9 +83,9 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
   );
 
   const back = (
-    <Link href={dmNpcsHref()} className="inline-flex items-center gap-1.5 self-start text-[13px] text-on-surface-variant hover:text-gold">
+    <Link back href={dmNpcsHref()} className="inline-flex items-center gap-1.5 self-start text-[13px] text-on-surface-variant hover:text-gold">
       <ArrowLeft size={16} aria-hidden="true" className="text-gold" />
-      {t.dmNpcLibrary}
+      {t.luBack}
     </Link>
   );
 

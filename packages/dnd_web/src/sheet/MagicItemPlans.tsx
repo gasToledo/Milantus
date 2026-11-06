@@ -159,12 +159,12 @@ function Plans({ model, write, view }: { model: SheetModel; write: SheetWriter; 
   return (
     <div className="flex min-h-full flex-col gap-4" data-page="magic-plans">
       <header className="flex flex-col gap-1">
-        <Link
+        <Link back
           href={back}
           className="inline-flex min-h-9 items-center gap-1.5 self-start text-[13px] text-gold no-underline hover:text-on-surface"
         >
           <ArrowLeft size={14} aria-hidden="true" />
-          {t.mpBack}
+          {t.luBack}
         </Link>
         <h1 className="font-display text-[24px] text-on-surface">{t.mpTitle}</h1>
       </header>
@@ -290,7 +290,7 @@ function Plans({ model, write, view }: { model: SheetModel; write: SheetWriter; 
       </div>
 
       <WizardFooter message={message}>
-        <ButtonLink href={back} internal className="flex-1 sm:flex-none">
+        <ButtonLink href={back} internal back className="flex-1 sm:flex-none">
           {t.mpDone}
         </ButtonLink>
       </WizardFooter>

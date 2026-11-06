@@ -170,7 +170,7 @@ export function CharacterPage({
   return (
     <>
       <Shell
-        panel={model ? <SheetPanel model={model} tab={activeTab} /> : <SidebarBack href={rosterHref()} label={t.backToCharacters} />}
+        panel={model ? <SheetPanel model={model} tab={activeTab} /> : <SidebarBack href={rosterHref()} />}
         footer={
           <SheetFooter
             version={version.data}

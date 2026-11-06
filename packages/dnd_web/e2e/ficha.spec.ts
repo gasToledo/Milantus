@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { mergeHomebrew, type HomebrewContent } from '../src/api/homebrew';
 import { computeSheet, type AbilityId } from '../src/engine';
+import { textsFor } from '../src/i18n/texts';
 import { signed } from '../src/sheet/format';
 import { api, catalogo, personajes, TOKEN } from './helpers';
 
@@ -14,6 +15,15 @@ test.use({ locale: 'es-AR' });
 
 test.beforeEach(async ({ context, baseURL }) => {
   await context.addCookies([{ name: 'dnd_session', value: TOKEN, url: baseURL! }]);
+});
+
+test('el retrato vuelve a la pestaña de la ficha desde la que se abrió', async ({ page }) => {
+  const t = textsFor('es');
+  const combate = `/v2/personajes/${BRUNILDA}/combate`;
+  await page.goto(combate);
+  await page.getByRole('link', { name: t.actionPortrait, exact: true }).click();
+  await page.getByRole('main').getByRole('link', { name: t.luBack, exact: true }).click();
+  await expect(page).toHaveURL(combate);
 });
 
 test('la ficha muestra los números que da el motor para el personaje sembrado', async ({ page, request }) => {

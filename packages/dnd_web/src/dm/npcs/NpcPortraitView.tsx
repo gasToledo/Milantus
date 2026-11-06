@@ -66,9 +66,9 @@ export function NpcPortraitView({ npcId }: { npcId: string }) {
   );
 
   const back = (
-    <Link href={dmNpcsHref(npcId)} className="inline-flex items-center gap-1.5 self-start text-[13px] text-on-surface-variant hover:text-gold">
+    <Link back href={dmNpcsHref(npcId)} className="inline-flex items-center gap-1.5 self-start text-[13px] text-on-surface-variant hover:text-gold">
       <ArrowLeft size={16} aria-hidden="true" className="text-gold" />
-      {stored.data?.npc.name || t.dmNpcLibrary}
+      {t.luBack}
     </Link>
   );
 
@@ -147,7 +147,7 @@ function NpcWorkshop({
     [sheet, npc, catalog],
   );
 
-  const common = { name: npc.name, accent: null, backHref: dmNpcsHref(npcId), backLabel: npc.name, notify, buildPrompt };
+  const common = { name: npc.name, accent: null, backHref: dmNpcsHref(npcId), notify, buildPrompt };
 
   let owner: PortraitOwner;
   if (sheet) {

@@ -449,21 +449,52 @@ function subscribe(listener: () => void) {
   };
 }
 
-const getPath = () => window.location.pathname;
+const getLocation = () => window.location.pathname + window.location.search + window.location.hash;
+const pathnameOf = (href: string) => href.split(/[?#]/, 1)[0]!;
+
+type ScreenBack = { href: string; steps: number };
+const screenBack = (): ScreenBack | undefined => window.history.state?.milantusBack;
+
+function sheetKey(pathname: string): string | undefined {
+  const route = matchRoute(pathname);
+  if (route.name === 'character') return `character:${route.id}`;
+  if (route.name !== 'dm') return undefined;
+  const { view } = route;
+  if (view.kind === 'member') return JSON.stringify(['member', view.id, view.memberId]);
+  if (view.kind === 'npcSheet' && !view.screen) return `npc:${view.npcId}`;
+}
 
 /** Navega dentro de `/v2` sin recargar. `replace` para las redirecciones:
  *  «atrás» no tiene que volver a una URL que solo redirige. */
 export function navigate(href: string, { replace = false } = {}) {
-  if (href === window.location.pathname) return;
-  if (replace) window.history.replaceState(null, '', href);
-  else window.history.pushState(null, '', href);
+  const current = getLocation();
+  if (href === current) return;
+  if (replace) window.history.replaceState(window.history.state, '', href);
+  else {
+    const currentPath = pathnameOf(current);
+    const nextPath = pathnameOf(href);
+    const sheet = sheetKey(currentPath);
+    // Las pestañas quedan en el historial del navegador. El «Atrás» de la
+    // ficha salta esas entradas para regresar a la pantalla que la abrió.
+    const withinScreen = currentPath === nextPath || (sheet !== undefined && sheet === sheetKey(nextPath));
+    const previous = withinScreen ? screenBack() : { href: current, steps: 0 };
+    const milantusBack = previous && { ...previous, steps: previous.steps + 1 };
+    window.history.pushState({ milantusBack }, '', href);
+  }
   window.scrollTo(0, 0);
   notify();
 }
 
+/** Una URL abierta directamente conserva el destino habitual de la pantalla. */
+export function navigateBack(fallback: string) {
+  const back = screenBack();
+  if (back) window.history.go(-back.steps);
+  else navigate(fallback, { replace: true });
+}
+
 /** La ruta actual, y vuelve a dibujar cuando cambia. */
 export function useRoute(): { route: Route; pathname: string } {
-  const pathname = useSyncExternalStore(subscribe, getPath);
+  const pathname = pathnameOf(useSyncExternalStore(subscribe, getLocation));
   return { route: matchRoute(pathname), pathname };
 }
 
@@ -472,10 +503,10 @@ export function useRoute(): { route: Route; pathname: string } {
  * leer en la barra de estado) que, con un clic simple, navega sin recargar.
  * Los clics con modificador o con otro botón quedan para el navegador.
  */
-export function Link({ href, onClick, ...rest }: AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }) {
+export function Link({ href, back, onClick, ...rest }: AnchorHTMLAttributes<HTMLAnchorElement> & { href: string; back?: boolean }) {
   const handle = useCallback(
     (e: MouseEvent<HTMLAnchorElement>) => {
-      onClick?.(e);
+      if (!back) onClick?.(e);
       if (
         e.defaultPrevented ||
         e.button !== 0 ||
@@ -487,10 +518,13 @@ export function Link({ href, onClick, ...rest }: AnchorHTMLAttributes<HTMLAnchor
       ) {
         return;
       }
+      if (back) onClick?.(e);
+      if (e.defaultPrevented) return;
       e.preventDefault();
-      navigate(href);
+      if (back) navigateBack(href);
+      else navigate(href);
     },
-    [href, onClick, rest.target],
+    [back, href, onClick, rest.target],
   );
-  return <a href={href} onClick={handle} {...rest} />;
+  return <a href={(back && screenBack()?.href) || href} onClick={handle} {...rest} />;
 }

@@ -283,12 +283,12 @@ function Browser({
           <div className="codex-detail min-w-0">
             {open ? (
               <>
-                <Link
+                <Link back
                   href={hrefOf()}
                   className="codex-back mb-3 inline-flex items-center gap-1.5 text-[13px] text-on-surface-variant hover:text-gold"
                 >
                   <ArrowLeft size={16} aria-hidden="true" className="text-gold" />
-                  {t.codexBackToList}
+                  {t.luBack}
                 </Link>
                 <CreatureProfile profile={open.profile} row={open.row} catalog={catalog} />
               </>

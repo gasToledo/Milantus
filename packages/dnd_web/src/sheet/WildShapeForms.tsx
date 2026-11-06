@@ -87,12 +87,12 @@ export function WildShapeForms({ model, write }: { model: SheetModel; write: She
   return (
     <div className="flex min-h-full flex-col gap-4" data-page="wild-shape-forms">
       <header className="flex flex-col gap-1">
-        <Link
+        <Link back
           href={back}
           className="inline-flex min-h-9 items-center gap-1.5 self-start text-[13px] text-gold no-underline hover:text-on-surface"
         >
           <ArrowLeft size={14} aria-hidden="true" />
-          {t.wsBack}
+          {t.luBack}
         </Link>
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="font-display text-[24px] text-on-surface">{t.wsFormsTitle}</h1>
@@ -172,7 +172,7 @@ export function WildShapeForms({ model, write }: { model: SheetModel; write: She
       </div>
 
       <WizardFooter message={message}>
-        <ButtonLink href={back} internal className="flex-1 sm:flex-none">
+        <ButtonLink href={back} internal back className="flex-1 sm:flex-none">
           {t.wsReady}
         </ButtonLink>
       </WizardFooter>

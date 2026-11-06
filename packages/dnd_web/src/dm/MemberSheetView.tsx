@@ -44,12 +44,12 @@ export function MemberSheetView({
   const computed = useMemo(() => (raw && catalog.data ? computeModel(raw, catalog.data) : null), [raw, catalog.data]);
 
   const back = (
-    <Link
+    <Link back
       href={dmCampaignHref(campaign.id)}
       className="inline-flex items-center gap-1.5 self-start text-[13px] text-on-surface-variant hover:text-gold"
     >
       <ArrowLeft size={16} aria-hidden="true" className="text-gold" />
-      {t.dmSectionTable}
+      {t.luBack}
     </Link>
   );
 

@@ -249,22 +249,22 @@ export function NavGroup({ label, title, children }: { label: string; title?: st
  *  en el mismo sitio. */
 export function SidebarBack({
   href,
-  label,
   onClick,
 }: {
   href: string;
-  label: string;
   /** Para confirmar antes de salir: `preventDefault` frena la navegación. */
   onClick?: MouseEventHandler<HTMLAnchorElement>;
 }) {
+  const t = useTexts();
   return (
     <Link
+      back
       href={href}
       onClick={onClick}
       className="plaque flex min-h-9 items-center gap-2 rounded-[var(--radius-nav)] px-3 py-2 text-[13px] text-on-surface hover:text-gold"
     >
       <ArrowLeft size={16} aria-hidden="true" className="text-gold" />
-      {label}
+      {t.luBack}
     </Link>
   );
 }

@@ -15,7 +15,7 @@ export function RebuildPage({ id, account }: { id: string; account: Account }) {
   const character = roster.data?.find((c) => c.character.id === id)?.character;
   if (character) return <CreationPage account={account} replacing={character as typeof character & { id: string }} />;
   return (
-    <Shell panel={<SidebarBack href={rosterHref()} label={t.backToCharacters} />} footer={<RosterFooter account={account} />}>
+    <Shell panel={<SidebarBack href={rosterHref()} />} footer={<RosterFooter account={account} />}>
       {roster.isError ? (
         <AppErrorView as="h1" title={t.errorTitle} message={t.errorBody} onRetry={() => void roster.refetch()} />
       ) : roster.data ? (

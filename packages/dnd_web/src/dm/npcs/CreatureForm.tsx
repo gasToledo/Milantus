@@ -13,7 +13,7 @@ import {
 } from '../../engine';
 import { useTexts } from '../../i18n/context';
 import type { Texts } from '../../i18n/texts';
-import { navigate } from '../../router';
+import { navigateBack } from '../../router';
 import { signed } from '../../sheet/format';
 import { AppDialog } from '../../ui/AppDialog';
 import { Button } from '../../ui/Button';
@@ -117,7 +117,7 @@ export function CreatureForm({
 
   // ponytail: el botón «atrás» del navegador no pregunta, igual que el creador;
   // frenarlo pide interceptar el historial del router.
-  const requestLeave = () => (dirty ? setDiscarding(true) : navigate(exitHref));
+  const requestLeave = () => (dirty ? setDiscarding(true) : navigateBack(exitHref));
   useEffect(() => {
     leaveRef.current = requestLeave;
     return () => {
@@ -533,7 +533,7 @@ export function CreatureForm({
         description={t.blockDiscardBody}
         actions={[
           { label: t.blockKeepEditing },
-          { label: t.blockDiscard, primary: true, tone: 'crimson', onSelect: () => navigate(exitHref) },
+          { label: t.blockDiscard, primary: true, tone: 'crimson', onSelect: () => navigateBack(exitHref) },
         ]}
       />
       <AppDialog open={previewing} onOpenChange={setPreviewing} title={t.blockPreviewTitle} width={560} actions={[{ label: t.close }]}>

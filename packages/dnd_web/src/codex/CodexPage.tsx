@@ -115,7 +115,7 @@ export function CodexPage({ category, entryId }: { category: CodexCategory | nul
     <Shell
       panel={
         <>
-          <SidebarBack href={rosterHref()} label={t.backToCharacters} />
+          <SidebarBack href={rosterHref()} />
           <div role="search" className="relative">
             <label htmlFor="codex-search" className="sr-only">
               {t.codexSearchAll}
@@ -374,12 +374,12 @@ export function CategoryView({
           <div className="codex-detail min-w-0">
             {open ? (
               <>
-                <Link
+                <Link back
                   href={hrefOf(category)}
                   className="codex-back mb-3 inline-flex items-center gap-1.5 text-[13px] text-on-surface-variant hover:text-gold"
                 >
                   <ArrowLeft size={16} aria-hidden="true" className="text-gold" />
-                  {t.codexBackToList}
+                  {t.luBack}
                 </Link>
                 <EntryDetail entry={open} reading={reading ? { category, entries } : null} />
               </>

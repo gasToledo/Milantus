@@ -48,7 +48,7 @@ import {
 } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import type { Lang, Texts } from '../i18n/texts';
-import { characterHref, dmCampaignHref, dmNpcsHref, navigate, rosterHref } from '../router';
+import { characterHref, dmCampaignHref, dmNpcsHref, navigate, navigateBack, rosterHref } from '../router';
 import { signed } from '../sheet/format';
 import { coinLabels } from '../sheet/ItemCatalog';
 import { ABILITIES } from '../sheet/vocabulary';
@@ -139,7 +139,7 @@ export function CreationPage({
   const leaveHref = npc ? (npc.campaignId ? dmCampaignHref(npc.campaignId, 'pnj') : dmNpcsHref()) : rosterHref();
   const exit = () => {
     if (touched) setConfirming(true);
-    else navigate(leaveHref);
+    else navigateBack(leaveHref);
   };
   const failed = catalog.queries.filter((q) => q.isError);
   return (
@@ -147,7 +147,6 @@ export function CreationPage({
       panel={
         <SidebarBack
           href={leaveHref}
-          label={npc ? (npc.campaignId ? t.dmSectionNpcs : t.dmNpcLibrary) : t.backToCharacters}
           onClick={(e) => { e.preventDefault(); exit(); }}
         />
       }
@@ -167,7 +166,7 @@ export function CreationPage({
         description={t.crDiscardBody}
         actions={[
           { label: t.crKeepCreating },
-          { label: t.crDiscard, primary: true, tone: 'crimson', onSelect: () => navigate(leaveHref) },
+          { label: t.crDiscard, primary: true, tone: 'crimson', onSelect: () => navigateBack(leaveHref) },
         ]}
       />
     </Shell>

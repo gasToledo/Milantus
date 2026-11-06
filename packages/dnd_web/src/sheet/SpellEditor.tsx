@@ -163,12 +163,12 @@ function Editor({
   return (
     <div className="flex min-h-full flex-col gap-4" data-page="spell-edit">
       <header className="flex flex-col gap-1">
-        <Link
+        <Link back
           href={write.routes.sheet('combate')}
           className="inline-flex min-h-9 items-center gap-1.5 self-start text-[13px] text-gold no-underline hover:text-on-surface"
         >
           <ArrowLeft size={14} aria-hidden="true" />
-          {t.seBack}
+          {t.luBack}
         </Link>
         <h1 className="font-display text-[24px] text-on-surface">{title}</h1>
       </header>
@@ -270,7 +270,7 @@ function Editor({
       </div>
 
       <WizardFooter message={message}>
-        <ButtonLink tone="secondary" href={write.routes.sheet('combate')} internal className="flex-1 sm:flex-none">
+        <ButtonLink tone="secondary" href={write.routes.sheet('combate')} internal back className="flex-1 sm:flex-none">
           {t.cancel}
         </ButtonLink>
         <Button className="flex-[2] sm:flex-none" disabled={unchanged} onClick={save}>

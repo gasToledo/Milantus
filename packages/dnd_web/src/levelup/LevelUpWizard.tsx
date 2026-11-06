@@ -452,7 +452,7 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
 
       <WizardFooter message={pending ?? (current === 'revision' ? t.luConfirmHint : null)}>
         {index === 0 ? (
-          <ButtonLink tone="secondary" href={write.routes.sheet()} internal className="flex-1 sm:flex-none">
+          <ButtonLink tone="secondary" href={write.routes.sheet()} internal back className="flex-1 sm:flex-none">
             {t.cancel}
           </ButtonLink>
         ) : (
