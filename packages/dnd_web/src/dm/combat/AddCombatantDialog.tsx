@@ -10,6 +10,7 @@ import { Eyebrow } from '../../ui/data';
 import { AppBusyLabel, AppErrorView } from '../../ui/status';
 import { Option, SearchableList } from '../../ui/wizard';
 import { npcTypeLine } from '../npcs/npc';
+import { isWholeNumber, NUMBER_FILTER } from './NumberPromptDialog';
 import { Segmented, SideSelector } from './SideSelector';
 
 type Tab = 'npc' | 'bestiary';
@@ -38,6 +39,7 @@ export function AddCombatantDialog({
   catalog,
   campaignNpcs,
   encounter,
+  running,
   act,
   onClose,
 }: {
@@ -45,6 +47,8 @@ export function AddCombatantDialog({
   catalog: Catalog;
   campaignNpcs: CampaignNpc[];
   encounter: JsonObject | null;
+  /** Con el combate en curso, un PNJ entra con la iniciativa que sacó. */
+  running: boolean;
   act: (action: EncounterAction) => void;
   onClose: () => void;
 }) {
@@ -55,7 +59,7 @@ export function AddCombatantDialog({
   // Las dos pestañas viven siempre: cambiar de una a otra no pierde lo elegido, y el
   // botón de sumar está en la barra del diálogo, que es una sola.
   const bestiaryTab = useBestiaryTab(catalog, act, note, setNote);
-  const npcTab = useNpcTab(campaign, catalog, campaignNpcs, encounter, act, note, setNote);
+  const npcTab = useNpcTab(campaign, catalog, campaignNpcs, encounter, running, act, note, setNote);
   const current = tab === 'bestiary' ? bestiaryTab : npcTab;
 
   return (
@@ -202,6 +206,7 @@ function useNpcTab(
   catalog: Catalog,
   campaignNpcs: CampaignNpc[],
   encounter: JsonObject | null,
+  running: boolean,
   act: (action: EncounterAction) => void,
   note: string | null,
   setNote: (note: string | null) => void,
@@ -213,6 +218,8 @@ function useNpcTab(
   const [selected, setSelected] = useState<string | null>(null);
   const [side, setSide] = useState<string | null>(null);
   const [revive, setRevive] = useState(false);
+  // Solo en curso: el monstruo no la pide (el motor tira por cada copia), el PNJ sí.
+  const [initiative, setInitiative] = useState('');
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
 
@@ -234,17 +241,19 @@ function useNpcTab(
   const statless = current ? current.view.maxHp === 0 : false;
   const dead = current ? !current.fromLibrary && current.view.status === 'dead' : false;
   const effectiveSide = statless ? 'neutral' : side;
+  const initiativeOk = !running || isWholeNumber(initiative);
 
   const choose = (id: string) => {
     setSelected(id);
     setSide(null);
     setRevive(false);
+    setInitiative('');
     setFailed(false);
     setNote(null);
   };
 
   const add = async () => {
-    if (busy || !current || !effectiveSide) return;
+    if (busy || !current || !effectiveSide || !initiativeOk) return;
     setBusy(true);
     setFailed(false);
     try {
@@ -260,12 +269,13 @@ function useNpcTab(
       setBusy(false);
       return;
     }
-    act({ type: 'addNpc', entry: current.entry, initiative: 0, side: effectiveSide as Side, revive });
+    act({ type: 'addNpc', entry: current.entry, initiative: running ? Number(initiative) : 0, side: effectiveSide as Side, revive });
     setNote(t.dmAddedNote(current.view.npc.name));
     // Ya está en el combate: no queda nada que elegir.
     setSelected(null);
     setSide(null);
     setRevive(false);
+    setInitiative('');
     setBusy(false);
   };
 
@@ -327,6 +337,19 @@ function useNpcTab(
               <Eyebrow className="mb-1.5">{t.dmWhichSide}</Eyebrow>
               <SideSelector value={effectiveSide} onChange={setSide} disabled={statless} />
             </div>
+            {running && (
+              <label className="block">
+                <span className="eyebrow mb-1.5 block">{t.encWhatTheyGot}</span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={initiative}
+                  onChange={(e) => NUMBER_FILTER.test(e.target.value) && setInitiative(e.target.value)}
+                  data-field="add-initiative"
+                  className="h-10 w-full rounded-[8px] border border-hairline bg-surface px-3 text-[14px] text-on-surface"
+                />
+              </label>
+            )}
             {failed && (
               <p role="alert" className="text-[13px] text-crimson">
                 {t.dmSaveCombatFailed}
@@ -345,6 +368,6 @@ function useNpcTab(
   );
   return {
     body,
-    action: { label: failed ? t.retry : t.dmAddShort, disabled: busy || !effectiveSide, onSelect: () => void add() },
+    action: { label: failed ? t.retry : t.dmAddShort, disabled: busy || !effectiveSide || !initiativeOk, onSelect: () => void add() },
   };
 }

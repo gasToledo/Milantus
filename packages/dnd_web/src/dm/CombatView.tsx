@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { Dices, FileText, Flame, Plus, X } from 'lucide-react';
+import { BookOpen, Dices, ExternalLink, FileText, Flame, Plus, SkipForward, X } from 'lucide-react';
 import { useCampaignEncounter, useCampaignMembers, useCampaignNotebook, useCampaignNpcs, useRosterSettings, useSheetCatalog } from '../api/queries';
 import type { DmCampaign } from '../api/client';
 import { TurnProfile } from './combat/TurnProfile';
@@ -22,15 +22,19 @@ import {
 } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import type { Texts } from '../i18n/texts';
-import { dmMemberHref, Link } from '../router';
-import { Button } from '../ui/Button';
+import { dmMemberHref, dmNpcSheetHref, Link } from '../router';
+import { AppDialog } from '../ui/AppDialog';
+import { Button, ButtonLink } from '../ui/Button';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { cx } from '../ui/cx';
-import { ThinBar } from '../ui/data';
+import { Eyebrow, ThinBar } from '../ui/data';
+import { MarkdownText } from '../ui/MarkdownText';
 import { Toast, Tooltip, type ToastTone } from '../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { AddCombatantDialog } from './combat/AddCombatantDialog';
 import { DifficultyBand } from './combat/DifficultyBand';
+import { NumberPromptDialog } from './combat/NumberPromptDialog';
+import { SideSelector } from './combat/SideSelector';
 import { retryEncounterSave, useEncounterWriter } from './combat/encounterWriter';
 import { RollInitiativeDialog } from './combat/RollInitiativeDialog';
 import { SIDE_TONE, SideMenu } from './combat/SideMenu';
@@ -68,9 +72,10 @@ interface Row {
  * quién queda en pie, el perfil del que juega y, abajo, los combates ya
  * cerrados. **Mientras se arma** el DM suma jugadores, monstruos y PNJ, cambia el
  * bando, saca y descarta, ve la dificultad y los PX (si la cuenta lo permite) y
- * empieza con «Tirar iniciativa» (`combat/`); todo lo que pasa **en curso**
- * (dañar, curar, pasar el turno, efectos, cerrar) sigue en Flutter hasta 6g4, y
- * acá en curso solo se mira.
+ * empieza con «Tirar iniciativa» (`combat/`). **En curso** pasa el turno, daña y
+ * cura con la cifra compartida, corrige la iniciativa, suma tarde, cambia el
+ * bando y saca; los efectos, las marcas y terminar el combate siguen en Flutter
+ * (6g5 y 6g6).
  *
  * Los PG de un monstruo o de un PNJ son los del encuentro; los de un jugador,
  * los de **su ficha real** (`modo-dm.md`: el DM no los escribe), con el máximo
@@ -87,6 +92,18 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
   const catalog = useSheetCatalog(lang);
   const [toast, setToast] = useState<{ key: number; tone: ToastTone; message: string; action?: { label: string; onSelect: () => void } } | null>(null);
   const [dialog, setDialog] = useState<'add' | 'discard' | null>(null);
+  // La cifra de daño o curación es una sola para todo el combate. Se lee de la
+  // referencia al tocar un botón: un toque no usa una cifra vieja si el campo
+  // acaba de cambiar.
+  const [amount, setAmount] = useState('1');
+  const amountRef = useRef(amount);
+  const changeAmount = (v: string) => {
+    amountRef.current = v;
+    setAmount(v);
+  };
+  // La iniciativa que se corrige, y el jugador que entra tarde y la pide.
+  const [fix, setFix] = useState<{ id: string; name: string; initiative: number } | null>(null);
+  const [late, setLate] = useState<{ memberId: string; name: string } | null>(null);
   // Las tiradas propuestas se calculan una sola vez, al abrir «Tirar
   // iniciativa»: recalculadas en cada redibujo, los dados volverían a tirar.
   const [roll, setRoll] = useState<Record<string, number> | null>(null);
@@ -183,16 +200,27 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
                   rows={rows}
                   catalog={cat}
                   showXp={view.preparing && showDifficulty}
-                  rowExtras={(r) => (view.preparing ? preparingExtras(r, campaign.id, writer.act, t) : {})}
+                  amount={view.preparing ? undefined : { value: amount, onChange: changeAmount }}
+                  rowExtras={(r) =>
+                    rowParts(r, {
+                      campaignId: campaign.id,
+                      act: writer.act,
+                      t,
+                      running: !view.preparing,
+                      amount: Number(amount) || 0,
+                      readAmount: () => Number(amountRef.current) || 0,
+                      onFix: (row) => setFix({ id: row.c.id, name: row.c.name, initiative: row.c.initiative }),
+                    })
+                  }
                 />
-                {!view.preparing && <TurnPanel row={rows.find((r) => r.c.id === view.currentId)} catalog={cat} />}
+                {!view.preparing && <TurnPanel row={rows.find((r) => r.c.id === view.currentId)} catalog={cat} campaignId={campaign.id} act={writer.act} />}
               </div>
             )}
-            {view.preparing && pending.length > 0 && (
+            {pending.length > 0 && (
               <div className="plaque flex flex-col px-3.5 py-2.5" data-field="pending">
                 <div className="flex items-center justify-between">
-                  <span className="text-[12px] text-text-muted">{t.encNotInCombat}</span>
-                  {pending.length > 1 && (
+                  <span className="text-[12px] text-text-muted">{view.preparing ? t.encNotInCombat : t.encJoinedLate}</span>
+                  {view.preparing && pending.length > 1 && (
                     <button
                       type="button"
                       className="min-h-9 px-1.5 text-[13px] text-gold"
@@ -208,9 +236,14 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
                     <button
                       type="button"
                       className="min-h-9 px-1.5 text-[13px] text-gold"
-                      onClick={() => writer.act({ type: 'addPlayer', memberId: m.memberId, name: String(m.character.name), initiative: 0 })}
+                      // En curso entra con lo que tiró en la mesa: se pregunta.
+                      onClick={() =>
+                        view.preparing
+                          ? writer.act({ type: 'addPlayer', memberId: m.memberId, name: String(m.character.name), initiative: 0 })
+                          : setLate({ memberId: m.memberId, name: String(m.character.name) })
+                      }
                     >
-                      {t.dmAddShort}
+                      {view.preparing ? t.dmAddShort : t.encAddToInitiative}
                     </button>
                   </div>
                 ))}
@@ -248,7 +281,8 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
         title={t.dmSectionCombat}
         kicker={kicker}
         actions={
-          data?.view?.preparing && (
+          data?.view &&
+          (data.view.preparing ? (
             <Button
               icon={Dices}
               data-action="roll-initiative"
@@ -257,7 +291,11 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
             >
               {t.dmRollInitiative}
             </Button>
-          )
+          ) : (
+            <Button icon={SkipForward} data-action="next-turn" disabled={data.rows.length === 0} onClick={() => writer.act({ type: 'next' })}>
+              {t.dmNextTurn}
+            </Button>
+          ))
         }
       />
       {body}
@@ -276,8 +314,26 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
           catalog={catalog.data}
           campaignNpcs={npcs.data}
           encounter={encounter.data ?? null}
+          running={!!data?.view && !data.view.preparing}
           act={writer.act}
           onClose={() => setDialog(null)}
+        />
+      )}
+      {fix && (
+        <NumberPromptDialog
+          title={t.encInitiativeOf(fix.name)}
+          label={t.initiative}
+          initial={fix.initiative}
+          onSubmit={(n) => writer.act({ type: 'setInitiative', combatantId: fix.id, initiative: n })}
+          onClose={() => setFix(null)}
+        />
+      )}
+      {late && (
+        <NumberPromptDialog
+          title={t.encInitiativeOf(late.name)}
+          label={t.encWhatTheyRolled}
+          onSubmit={(n) => writer.act({ type: 'addPlayer', memberId: late.memberId, name: late.name, initiative: n })}
+          onClose={() => setLate(null)}
         />
       )}
       {dialog === 'discard' && (
@@ -340,27 +396,69 @@ function ControlBar({ view, onAdd, onDiscard }: { view: EncounterView; onAdd: ()
         {t.encEnemies} {s.enemiesUp}/{s.enemies}
       </span>
       {s.neutrals > 0 && <span className="text-[12.5px] text-text-muted">{t.encNeutralsCount(s.neutrals)}</span>}
+      <span className="flex-1" />
+      <Button tone="soft" icon={Plus} data-action="add-combatant" onClick={onAdd}>
+        {t.dmAddToCombat}
+      </Button>
     </div>
   );
 }
 
 /** La planilla. Con poco ancho se desplaza dentro de su caja en lugar de partir
  *  las columnas: en una planilla, lo que se compara es la fila. */
-function Ledger({ view, rows, catalog, showXp, rowExtras }: { view: EncounterView; rows: Row[]; catalog: Catalog; showXp: boolean; rowExtras: (row: Row) => RowExtras }) {
+function Ledger({
+  view,
+  rows,
+  catalog,
+  showXp,
+  amount,
+  rowExtras,
+}: {
+  view: EncounterView;
+  rows: Row[];
+  catalog: Catalog;
+  showXp: boolean;
+  /** La cifra de daño o curación; solo en curso. */
+  amount?: { value: string; onChange: (v: string) => void };
+  rowExtras: (row: Row) => RowExtras;
+}) {
   const t = useTexts();
   return (
     // `@container`: la fila se parte por el ancho de la planilla y no por el de
     // la ventana, porque con el panel «Del turno» al lado la planilla es mucho
     // más angosta que la pantalla.
     <section aria-label={t.encOrder} className="card @container min-w-0 flex-[999_1_640px] overflow-hidden p-0">
-      <div className={cx(LEDGER, 'eyebrow hidden border-b border-hairline px-3.5 py-2.5 @[760px]:grid')} aria-hidden="true">
-        <span className="text-center">{t.encInitiativeShort}</span>
-        <span>{t.encCombatant}</span>
-        <span>{t.encHp}</span>
-        <span className="text-center">{t.encAc}</span>
-        <span />
-        <span />
+      <div className={cx(LEDGER, 'eyebrow hidden items-center border-b border-hairline px-3.5 py-2.5 @[760px]:grid')}>
+        <span aria-hidden="true" className="text-center">
+          {t.encInitiativeShort}
+        </span>
+        <span aria-hidden="true">{t.encCombatant}</span>
+        <span aria-hidden="true">{t.encHp}</span>
+        <span aria-hidden="true" className="text-center">
+          {t.encAc}
+        </span>
+        {amount ? (
+          <div className="col-span-2 flex items-center justify-end gap-2">
+            <span aria-hidden="true">{t.encDamageOrHeal}</span>
+            <AmountControl value={amount.value} onChange={amount.onChange} field="amount" />
+          </div>
+        ) : (
+          <>
+            <span />
+            <span />
+          </>
+        )}
       </div>
+      {/* Con la fila partida no hay encabezado: la cifra va en su barra, como en
+          la lámina «Teléfono». */}
+      {amount && (
+        <div className="border-b border-hairline bg-plaque px-3.5 py-2.5 @[760px]:hidden">
+          <div className="plaque-label mb-1.5">{t.encDamageOrHeal}</div>
+          <div className="flex items-center gap-2">
+            <AmountControl value={amount.value} onChange={amount.onChange} field="amount" narrow />
+          </div>
+        </div>
+      )}
       <ol>
         {rows.map((r, i) => (
           <LedgerRow
@@ -379,13 +477,47 @@ function Ledger({ view, rows, catalog, showXp, rowExtras }: { view: EncounterVie
   );
 }
 
-/** Lo que una fila suma mientras se arma: el control del bando y la última columna. */
+/** El campo de la cifra y sus tres atajos. Solo dígitos y hasta tres: es lo que
+ *  cabe en una tirada de daño y no deja pegar una cifra que rompa la fila. */
+function AmountControl({ value, onChange, field, narrow = false }: { value: string; onChange: (v: string) => void; field: string; narrow?: boolean }) {
+  const t = useTexts();
+  return (
+    <>
+      <Tooltip content={t.encAmountExplain}>
+        <input
+          type="text"
+          inputMode="numeric"
+          aria-label={`${t.encDamageOrHeal}. ${t.encAmountExplain}`}
+          data-field={field}
+          value={value}
+          onChange={(e) => onChange(e.target.value.replace(/\D/g, '').slice(0, 3))}
+          className={cx('w-[52px] rounded-[8px] border border-hairline bg-surface text-center text-[14px] tracking-normal text-on-surface normal-case', narrow ? 'h-10 w-14' : 'h-[34px]')}
+        />
+      </Tooltip>
+      {[1, 5, 10].map((n) => (
+        <button
+          key={n}
+          type="button"
+          aria-label={t.encSetAmount(n)}
+          onClick={() => onChange(String(n))}
+          className={cx('rounded-[var(--radius-pill)] border border-hairline px-2 text-[12.5px] tracking-normal text-on-surface normal-case', narrow ? 'min-h-10 min-w-11' : 'min-h-[30px] min-w-[34px]')}
+        >
+          {n}
+        </button>
+      ))}
+    </>
+  );
+}
+
+/** Lo que una fila suma: el control del bando, la última columna y, en curso,
+ *  corregir la iniciativa. */
 interface RowExtras {
   sideControl?: ReactNode;
   actions?: ReactNode;
+  fixInitiative?: () => void;
 }
 
-function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl, actions }: { row: Row; catalog: Catalog; active: boolean; acted: boolean; preparing: boolean; showXp: boolean } & RowExtras) {
+function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl, actions, fixInitiative }: { row: Row; catalog: Catalog; active: boolean; acted: boolean; preparing: boolean; showXp: boolean } & RowExtras) {
   const t = useTexts();
   const lang = useLang();
   // El turno que pasa se lleva la vista con él: en una mesa con muchos
@@ -410,6 +542,16 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
   const mark = derived.down ? t.encSkips : active ? t.encTurnWord : acted ? t.encActed : '';
   const ac = row.detail?.ac ?? null;
   const hp = derived.hp;
+  const initiativeCell = (
+    <>
+      <div className={cx('num leading-none', active ? 'text-[19px] text-verdant' : 'text-[17px] text-text-muted')}>{preparing ? t.dmNoValue : c.initiative}</div>
+      {!preparing && (
+        <div className={cx('mt-[3px] text-[9px] font-semibold tracking-[.8px] uppercase', derived.down ? 'text-crimson' : active ? 'text-verdant' : 'text-text-muted')} data-field="mark">
+          {mark}
+        </div>
+      )}
+    </>
+  );
   return (
     <li
       ref={ref}
@@ -423,13 +565,14 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
       data-combatant={c.id}
     >
       <div className="order-1 text-center">
-        <div className={cx('num leading-none', active ? 'text-[19px] text-verdant' : 'text-[17px] text-text-muted')}>
-          {preparing ? t.dmNoValue : c.initiative}
-        </div>
-        {!preparing && (
-          <div className={cx('mt-[3px] text-[9px] font-semibold tracking-[.8px] uppercase', derived.down ? 'text-crimson' : active ? 'text-verdant' : 'text-text-muted')} data-field="mark">
-            {mark}
-          </div>
+        {fixInitiative ? (
+          <Tooltip content={t.encFixInitiative}>
+            <button type="button" aria-label={t.encFixInitiative} data-action="fix-initiative" onClick={fixInitiative} className="w-full rounded-[var(--radius-nav)] py-1 hover:bg-plaque">
+              {initiativeCell}
+            </button>
+          </Tooltip>
+        ) : (
+          initiativeCell
         )}
       </div>
       <div className="order-2 min-w-0">
@@ -456,7 +599,6 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
             <div className="mt-[5px]">
               <ThinBar value={hp.current} max={hp.max} label={t.dmHpAria(hp.current, hp.max)} colorClassName="bg-crimson" />
             </div>
-            {player && !preparing && <div className="mt-[3px] text-[11px] text-text-muted">{t.encOnTheirSheet}</div>}
           </>
         ) : (
           <span className="text-[12px] text-text-muted">{t.encNoHp}</span>
@@ -473,7 +615,7 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
           </span>
         ))}
       </div>
-      {preparing && <div className="order-6 col-span-3 mt-1.5 flex items-center justify-end gap-1 @[760px]:col-auto @[760px]:mt-0">{actions}</div>}
+      <div className="order-6 col-span-3 mt-1.5 flex items-center justify-end gap-1 @[760px]:col-auto @[760px]:mt-0">{actions}</div>
     </li>
   );
 }
@@ -503,11 +645,35 @@ function metaOf({ c, member, npc, detail }: Row, down: boolean, catalog: Catalog
   return detail?.monsterLine ?? '';
 }
 
-/** Lo que una fila lleva mientras se arma: el bando (menos un jugador, que no
- *  tiene), abrir la ficha de un jugador y sacar a cualquiera. Sacar no confirma,
- *  como en Flutter: volver a sumarlo es un toque. */
-function preparingExtras(row: Row, campaignId: string, act: (a: EncounterAction) => void, t: Texts): RowExtras {
-  const { c, detail } = row;
+interface RowCtx {
+  campaignId: string;
+  act: (a: EncounterAction) => void;
+  t: Texts;
+  running: boolean;
+  /** La cifra de ahora, para rotular los botones. */
+  amount: number;
+  /** La cifra al momento del toque. */
+  readAmount: () => number;
+  onFix: (row: Row) => void;
+}
+
+/** El enlace a la ficha de un jugador de la mesa. */
+function OpenSheetLink({ campaignId, memberId }: { campaignId: string; memberId: string }) {
+  const t = useTexts();
+  return (
+    <Link href={dmMemberHref(campaignId, memberId, 'personaje')} className="inline-flex min-h-12 items-center gap-1.5 px-1.5 text-[13px] whitespace-nowrap text-gold @[760px]:min-h-11">
+      <FileText size={16} aria-hidden="true" />
+      {t.encOpenSheet}
+    </Link>
+  );
+}
+
+/** Lo que una fila lleva: el bando (menos un jugador, que no tiene), dañar y
+ *  curar (menos un jugador y un PNJ sin estadísticas), abrir la ficha de un
+ *  jugador y sacar a cualquiera. Sacar no confirma, como en Flutter: volver a
+ *  sumarlo es un toque. */
+function rowParts(row: Row, { campaignId, act, t, running, amount, readAmount, onFix }: RowCtx): RowExtras {
+  const { c, detail, member } = row;
   const remove = (
     <Tooltip content={t.encRemoveFromCombat}>
       <button
@@ -515,28 +681,32 @@ function preparingExtras(row: Row, campaignId: string, act: (a: EncounterAction)
         aria-label={t.encRemoveFromCombat}
         data-action="remove-combatant"
         onClick={() => act({ type: 'remove', combatantId: c.id })}
-        className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-nav)] text-on-surface-variant hover:text-on-surface"
+        className="flex h-12 w-12 items-center justify-center rounded-[var(--radius-nav)] text-on-surface-variant hover:text-on-surface @[760px]:h-11 @[760px]:w-11"
       >
         <X size={18} aria-hidden="true" />
       </button>
     </Tooltip>
   );
+  const fixInitiative = running ? () => onFix(row) : undefined;
   if (c.kind === 'player') {
     return {
+      fixInitiative,
       actions: (
         <>
-          {c.memberId && (
-            <Link href={dmMemberHref(campaignId, c.memberId, 'personaje')} className="inline-flex min-h-11 items-center gap-1.5 px-1.5 text-[13px] whitespace-nowrap text-gold">
-              <FileText size={16} aria-hidden="true" />
-              {t.encOpenSheet}
-            </Link>
-          )}
+          {member && c.memberId ? <OpenSheetLink campaignId={campaignId} memberId={c.memberId} /> : <span className="text-[11px] text-text-muted">{t.encOnTheirSheet}</span>}
           {remove}
         </>
       ),
     };
   }
+  // Se lee la cifra al tocar y un cero no manda nada.
+  const hit = (sign: 1 | -1) => {
+    const n = readAmount();
+    if (n > 0) act({ type: 'adjustHp', combatantId: c.id, delta: sign * n });
+  };
+  const pill = 'num min-h-12 min-w-16 rounded-[var(--radius-pill)] border-[1.5px] px-[7px] text-[13px] @[760px]:min-h-[34px] @[760px]:min-w-[46px]';
   return {
+    fixInitiative,
     sideControl: (
       <SideMenu
         side={c.side}
@@ -545,35 +715,94 @@ function preparingExtras(row: Row, campaignId: string, act: (a: EncounterAction)
         onChange={(side) => act({ type: 'setSide', combatantId: c.id, side: side as 'ally' | 'enemy' | 'neutral' })}
       />
     ),
-    actions: remove,
+    actions: (
+      <>
+        {running && row.derived.hp && (
+          <>
+            <Tooltip content={t.encHurt}>
+              <button type="button" aria-label={t.encHurt} data-action="hurt" onClick={() => hit(-1)} className={cx(pill, 'border-crimson text-crimson')}>
+                −{amount}
+              </button>
+            </Tooltip>
+            <Tooltip content={t.encHeal}>
+              <button type="button" aria-label={t.encHeal} data-action="heal" onClick={() => hit(1)} className={cx(pill, 'border-verdant text-verdant')}>
+                +{amount}
+              </button>
+            </Tooltip>
+          </>
+        )}
+        {remove}
+      </>
+    ),
   };
 }
 
 /** «Del turno»: el perfil de quien está jugando. Un jugador no tiene perfil que
- *  mostrar, y se dice en vez de abrir la ficha ajena (`modo-dm.md`). */
-function TurnPanel({ row, catalog }: { row: Row | undefined; catalog: Catalog }) {
+ *  mostrar, y se dice en vez de abrir la ficha ajena (`modo-dm.md`): el enlace
+ *  lleva a la que el DM sí puede mirar. */
+function TurnPanel({ row, catalog, campaignId, act }: { row: Row | undefined; catalog: Catalog; campaignId: string; act: (a: EncounterAction) => void }) {
   const t = useTexts();
+  const [background, setBackground] = useState(false);
+  // El bando de quien juega: se cambia desde acá igual que desde la fila, y un
+  // PNJ sin estadísticas dice por qué no se puede.
+  const side = (r: Row) =>
+    r.detail?.canChangeSide ? (
+      <SideSelector value={r.c.side} onChange={(s) => act({ type: 'setSide', combatantId: r.c.id, side: s as 'ally' | 'enemy' | 'neutral' })} />
+    ) : (
+      <p className="text-[12px] text-text-muted">{t.encNeutralNoStats}</p>
+    );
   let body;
   if (!row) {
     body = <p className="text-[13px] text-text-muted">{t.encNobodyTurn}</p>;
   } else if (row.c.kind === 'player') {
-    body = <p className="text-[13px] text-text-muted">{t.encPlayerTurn(row.c.name)}</p>;
+    body = (
+      <div className="flex flex-col items-start gap-1">
+        <p className="text-[13px] text-text-muted">{t.encPlayerTurn(row.c.name)}</p>
+        {row.member && row.c.memberId && <OpenSheetLink campaignId={campaignId} memberId={row.c.memberId} />}
+      </div>
+    );
   } else if (row.creature) {
     // Va adentro de la misma tarjeta (`TurnProfile`), con las cifras de la mesa.
-    body = null;
-  } else if (row.npc?.block) {
+    body = <TurnProfile profile={asProfile(row.creature.raw)} row={row.creature.row} catalog={catalog} stats={<TurnStats row={row} />} side={side(row)} />;
+  } else if (row.npc) {
+    const n = row.npc.npc;
     body = (
-      <ul className="flex flex-col gap-1">
-        {row.npc.block.actions.map((a, i) => (
-          <li key={`${a.name}-${i}`} className="text-[13px]">
-            <span className="font-medium text-on-surface">{a.name}. </span>
-            <span className="text-text-muted">{[a.attackBonus !== null ? `+${a.attackBonus}` : null, a.damage].filter(Boolean).join(' · ')}</span>
-          </li>
-        ))}
-      </ul>
+      <TurnProfile
+        title={row.c.name}
+        typeLine={npcTypeLine(row.npc, t)}
+        profile={n.block ? asProfile(n.block) : undefined}
+        catalog={catalog}
+        stats={<TurnStats row={row} />}
+        side={side(row)}
+        titleExtra={
+          n.sheetKind === 'character' ? (
+            <ButtonLink tone="secondary" internal icon={ExternalLink} href={dmNpcSheetHref(n.id, 'combate')}>
+              {t.encOpenSheet}
+            </ButtonLink>
+          ) : undefined
+        }
+      >
+        {n.speech && (
+          <div>
+            <Eyebrow className="mb-1">{t.npcSpeech}</Eyebrow>
+            <p className="text-[13px] text-on-surface-variant italic">{n.speech}</p>
+          </div>
+        )}
+        {n.background && (
+          <button type="button" onClick={() => setBackground(true)} className="inline-flex min-h-9 items-center gap-1.5 self-start text-[13px] text-gold">
+            <BookOpen size={16} aria-hidden="true" />
+            {t.stepBackground}
+          </button>
+        )}
+      </TurnProfile>
     );
   } else {
-    body = <p className="text-[13px] text-text-muted">{t.encNoProfile(row.c.name)}</p>;
+    body = (
+      <>
+        {row && <TurnStats row={row} />}
+        <p className="text-[13px] text-text-muted">{t.encNoProfile(row!.c.name)}</p>
+      </>
+    );
   }
   return (
     <aside aria-labelledby="turn-panel" className="flex min-w-0 flex-[1_1_300px] flex-col gap-3 shell:max-w-[420px]" data-field="turn-panel">
@@ -584,13 +813,13 @@ function TurnPanel({ row, catalog }: { row: Row | undefined; catalog: Catalog })
           </h2>
           {row && <span className="text-[12px] text-text-muted">{row.c.name}</span>}
         </div>
-        {row?.creature ? (
-          <TurnProfile profile={asProfile(row.creature.raw)} row={row.creature.row} catalog={catalog} stats={<TurnStats row={row} />} />
-        ) : (
-          row && row.c.kind !== 'player' && <TurnStats row={row} />
-        )}
         {body}
       </div>
+      {background && row?.npc?.npc.background && (
+        <AppDialog open onOpenChange={(open) => !open && setBackground(false)} title={t.encBackgroundOf(row.c.name)} actions={[{ label: t.close }]}>
+          <MarkdownText text={row.npc.npc.background} />
+        </AppDialog>
+      )}
     </aside>
   );
 }

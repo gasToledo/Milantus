@@ -39,7 +39,7 @@ test('el combate es del DM: otra cuenta recibe el mismo 404 que ante lo inexiste
   for (const secreto of SOLO_DEL_DM) await expect(page.getByText(secreto)).toHaveCount(0);
 });
 
-test('armar, descartar y empezar un combate guardan lo que da el motor', async ({ context, page, baseURL }) => {
+test('armar, descartar, empezar y jugar un combate guardan lo que da el motor', async ({ context, page, baseURL }) => {
   const cookie = `dnd_session=${TOKEN_DM}`;
   await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);
   // Una campaña propia de la prueba: no toca el combate sembrado de la del cuervo.
@@ -92,4 +92,21 @@ test('armar, descartar y empezar un combate guardan lo que da el motor', async (
       return encounter ? [encounter.stage, encounter.combatants[0]?.initiative] : null;
     })
     .toEqual(['running', n]);
+
+  // Jugar: la cifra existe dos veces (encabezado y barra de la fila partida) y
+  // solo una se ve según el ancho de la planilla. Dañar manda la cifra del campo y pasar el turno da la vuelta. El
+  // secuaz tira 2d6 de PG (mínimo 2): con 1 de daño siempre queda en pie, y con
+  // un solo combatiente el turno vuelve a él y suma una ronda (`Encounter.next`).
+  type Guardado = { encounter?: { round: number; combatants: { currentHp: number; maxHp: number }[] } };
+  await page.locator('[data-field="amount"]:visible').fill('1');
+  await page.locator('[data-action="hurt"]').click();
+  await expect
+    .poll(async () => {
+      const { encounter } = await api<Guardado>(page.request, ruta, TOKEN_DM);
+      const g = encounter?.combatants[0];
+      return g ? g.maxHp - g.currentHp : null;
+    })
+    .toBe(1);
+  await page.locator('[data-action="next-turn"]').click();
+  await expect.poll(async () => (await api<Guardado>(page.request, ruta, TOKEN_DM)).encounter?.round).toBe(2);
 });
