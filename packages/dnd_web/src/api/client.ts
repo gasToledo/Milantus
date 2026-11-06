@@ -210,7 +210,7 @@ export interface MusicScene {
   name: string;
   /** El enlace tal cual lo pegó el DM; lo interpreta el motor (`musicSource`). */
   url: string;
-  /** Si Flutter la ofrece al iniciar un combate. */
+  /** Si se ofrece al armar un combate. */
   offerOnCombat?: boolean;
 }
 

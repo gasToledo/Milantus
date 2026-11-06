@@ -10,6 +10,9 @@ import { encounterAct, type Catalog, type EncounterAction, type JsonObject } fro
 
 // La clave es la campaña: hay un solo combate abierto por campaña.
 const queue = createSaveQueue<JsonObject>((campaignId, doc) => saveCampaignEncounter(campaignId, doc));
+// Otra acción puede reemplazar el guardado de «Armar» en la cola. La oferta
+// sigue al id del combate hasta que se confirme, incluso si hay que reintentar.
+const pendingOpens = new Map<string, string>();
 
 export const retryEncounterSave = (campaignId: string): void => queue.retry(campaignId);
 
@@ -17,6 +20,7 @@ export function useEncounterWriter(
   campaignId: string,
   catalog: Catalog | undefined,
   onFailed: () => void,
+  onMusicOffer: (campaignId: string, show: boolean) => void,
 ): { act(action: EncounterAction): void; discard(): Promise<void>; close(deadNpcIds: string[]): Promise<void> } {
   const client = useQueryClient();
   return useMemo(() => {
@@ -38,6 +42,7 @@ export function useEncounterWriter(
         // `null` es que no hay nada que guardar (ya estaba, no cambia nada).
         if (!next) return;
         const doc = next;
+        if (action.type === 'open' && !base && typeof doc.id === 'string') pendingOpens.set(campaignId, doc.id);
         // Una lectura en vuelo traería el combate de antes y pisaría lo escrito.
         void client.cancelQueries({ queryKey: key });
         client.setQueryData<JsonObject | null>(key, doc);
@@ -46,14 +51,21 @@ export function useEncounterWriter(
           // Una lectura que entró entre el guardado y su respuesta pudo dejar la
           // caché con otra copia: lo guardado es lo que manda.
           client.setQueryData<JsonObject | null>(key, doc);
+          const openingId = pendingOpens.get(campaignId);
+          if (openingId && openingId === doc.id) {
+            pendingOpens.delete(campaignId);
+            onMusicOffer(campaignId, true);
+          }
         });
       },
       async discard() {
         // Primero se olvida lo pendiente: un guardado viejo que llegara después
         // del borrado volvería a crear el combate.
+        pendingOpens.delete(campaignId);
         await queue.drop(campaignId);
         await discardCampaignEncounter(campaignId);
         client.setQueryData<JsonObject | null>(key, null);
+        onMusicOffer(campaignId, false);
       },
       async close(deadNpcIds) {
         // El servidor archiva la copia guardada. Esperamos el último cambio
@@ -62,10 +74,11 @@ export function useEncounterWriter(
         await endCampaignEncounter(campaignId, deadNpcIds);
         await client.cancelQueries({ queryKey: key });
         client.setQueryData<JsonObject | null>(key, null);
+        onMusicOffer(campaignId, false);
         void client.invalidateQueries({ queryKey: queryKeys.campaignNotebook(campaignId) });
         void client.invalidateQueries({ queryKey: queryKeys.campaignNpcs(campaignId) });
         void client.invalidateQueries({ queryKey: queryKeys.npcs });
       },
     };
-  }, [client, campaignId, catalog, onFailed]);
+  }, [client, campaignId, catalog, onFailed, onMusicOffer]);
 }

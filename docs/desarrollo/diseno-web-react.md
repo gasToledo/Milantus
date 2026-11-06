@@ -323,6 +323,12 @@ del motor, nunca se calcula acá.
 
 ## El Modo DM (`src/dm/`)
 
+La oferta de música (6g7a) es una `card` encima del reproductor flotante de
+360 px, con el mismo ancho y margen al borde. Incluye un `Eyebrow`, la pregunta
+y botones que se envuelven. Con una escena el botón dice «Poner», con varias
+cada botón lleva el nombre de la escena. «Ahora no» es secundario. La oferta
+no toma el foco ni bloquea el combate.
+
 Cada sección es una ruta bajo `/v2/dm/campanas/:id/` (el Bestiario, la Biblioteca de PNJ y el Homebrew, herramientas de la cuenta, bajo `/v2/dm/bestiario`, `/v2/dm/pnj` y `/v2/dm/homebrew`) y comparte tres piezas:
 `DmPanel` (el panel: interruptor, herramientas, campañas, secciones),
 `DmHeader` (título Georgia 30, pill con el estado, `actions` a su derecha y la regla ornamental; el

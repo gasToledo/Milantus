@@ -12,6 +12,62 @@ const COMBATE = '/v2/dm/campanas/marca-del-cuervo/combate';
 // jugador no tiene que recibir por ningún lado.
 const SOLO_DEL_DM = ['Marca reservada del DM', 'emboscada-del-valle', 'Lobo 1'];
 
+test('la música se ofrece una vez que se guarda un combate y solo suena si el DM la elige', async ({ context, page, baseURL }) => {
+  const cookie = `dnd_session=${TOKEN_DM}`;
+  await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);
+  await context.route('https://www.youtube-nocookie.com/embed/**', (route) => route.fulfill({ body: '<html></html>', contentType: 'text/html' }));
+  const url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+  const creada = await page.request.post('/api/campaigns', {
+    headers: { cookie },
+    data: { campaign: { schemaVersion: 2, id: 'musica-combate-e2e', name: 'Música e2e', premise: '', state: 'active', musicScenes: [
+      { id: 'emboscada', name: 'La emboscada', url, offerOnCombat: true },
+      { id: 'descanso', name: 'El descanso', url },
+    ] } },
+  });
+  expect(creada.ok()).toBe(true);
+  const { campaign } = (await creada.json()) as { campaign: { id: string } };
+  const ruta = `/api/campaigns/${campaign.id}/encounter`;
+  let fallar = true;
+  await page.route(`**${ruta}`, async (route) => {
+    if (route.request().method() === 'PUT' && fallar) {
+      fallar = false;
+      await route.fulfill({ status: 500 });
+    } else await route.continue();
+  });
+
+  await page.goto(`/v2/dm/campanas/${campaign.id}/combate`);
+  const armar = page.locator('[data-action="setup-combat"]');
+  const oferta = page.locator('[data-music-offer]');
+  const reproductor = page.locator('[data-music-player] iframe');
+  await armar.click();
+  await expect(page.getByText(t.dmSaveCombatFailed, { exact: true }).first()).toBeVisible();
+  await expect(oferta).toHaveCount(0);
+  await page.getByRole('button', { name: t.retry, exact: true }).click();
+  await expect(oferta.getByText(t.dmMusicOfferOne('La emboscada'), { exact: true })).toBeVisible();
+  await expect(reproductor).toHaveCount(0);
+  await oferta.getByRole('button', { name: t.dmMusicNotNow, exact: true }).click();
+  await page.reload();
+  await expect(page.locator('[data-action="discard-combat"]')).toBeVisible();
+  await expect(oferta).toHaveCount(0);
+  await expect(reproductor).toHaveCount(0);
+
+  await page.locator('[data-action="add-combatant"]').click();
+  await page.locator('[data-option="goblin-minion"]').click();
+  await page.getByRole('button', { name: t.dmAddShort, exact: true }).click();
+  await page.getByRole('button', { name: t.close, exact: true }).click();
+  await page.locator('[data-action="roll-initiative"]').click();
+  await page.getByRole('button', { name: t.dmStart, exact: true }).click();
+  await expect.poll(async () => (await api<{ encounter: { stage: string } }>(page.request, ruta, TOKEN_DM)).encounter.stage).toBe('running');
+  await expect(oferta).toHaveCount(0);
+
+  await page.locator('[data-action="finish-combat"]').click();
+  await page.getByRole('button', { name: t.encDiscardNoSave, exact: true }).click();
+  await armar.click();
+  await oferta.getByRole('button', { name: t.dmMusicPlay, exact: true }).click();
+  await expect(oferta).toHaveCount(0);
+  await expect(reproductor).toHaveAttribute('title', 'La emboscada');
+});
+
 test('la ficha de un jugador abierta desde el combate vuelve al combate', async ({ context, page, baseURL }) => {
   await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);
   await page.goto(COMBATE);

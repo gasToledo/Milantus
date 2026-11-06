@@ -268,8 +268,10 @@ repiten acá.
   sin reproducirse. Vive en `DmPage` y no en una sección: cambiar de sección o
   abrir una herramienta de la cuenta no la corta; cambiar de campaña, sí. Crear,
   editar, mover y borrar escenas y marcar «ofrecer al iniciar un combate» son
-  escrituras de 6d (bloque abajo), y la oferta al empezar un combate no está
-  porque acá se empieza un combate pero la oferta es de 6g7. La **Mesa** lista a los jugadores
+  escrituras de 6d (bloque abajo). Desde 6g7a, al confirmar el primer guardado de
+  «Armar combate», el reproductor ofrece las escenas marcadas y reproducibles.
+  Si una de ellas ya está seleccionada, se omite la oferta. Elegir una escena
+  la pone y «Ahora no» deja la música como estaba. La **Mesa** lista a los jugadores
   vinculados (`GET /api/campaigns/:id/members`, que lee la ficha **real** del
   jugador, no una copia): retrato, nombre, especie y clase, nivel, barra
   de PG, placas CA / Inic / CD / Pasiva y los estados como pills carmesí. Las
@@ -782,7 +784,7 @@ frontera sigue donde estaba: **el DM no escribe la ficha de otra cuenta**.
   (no escribe la ficha) y echar corta el vínculo tras confirmar. `MemberSheetView`
   sigue sin un solo control. No se pide el aviso de eventos tras cada acción
   (`_checkEventsSoon` de Flutter): decisión tomada, no un olvido.
-- Del combate queda 6g7: ofrecer música, «Convertir en PNJ» y sumar desde el Bestiario.
+- Del combate quedan 6g7b, «Convertir en PNJ», y 6g7c, sumar desde el Bestiario.
 
 **Paso 6f3: las pantallas de edición** *(existe)*. Toca solo `dnd_web`. Subir de
 nivel, elecciones, editor de conjuros, planos del Artífice y formas salvajes son
@@ -988,7 +990,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    alta y borrado *(existe)*; 6e3, el texto de la ficha *(existe)*; 6e4, el editor del bloque *(existe)*; 6e5,
    retrato y mostrar a la mesa *(existe)*; 6f, la ficha de PNJ, en tres: 6f1,
    crearla *(existe)*; 6f2, escribirla *(existe)*; 6f3, sus pantallas de edición (subir de
-   nivel, elecciones, conjuros, planos, formas e imprimir) *(existe)*; 6g, el combate, en siete: 6g1, el puente del motor *(existe)*; 6g2, armar *(existe)*; 6g3, dificultad e iniciativa *(existe)*; 6g4, jugar *(existe)*; 6g5, efectos, legendarias y defensas *(existe)*; 6g6, cerrar *(existe)*; 6g7, música, «Convertir en PNJ» y sumar desde el Bestiario. Importar y exportar PNJ sigue en el paso 7. Antes de portar esto es lectura
+   nivel, elecciones, conjuros, planos, formas e imprimir) *(existe)*; 6g, el combate, en siete: 6g1, el puente del motor *(existe)*; 6g2, armar *(existe)*; 6g3, dificultad e iniciativa *(existe)*; 6g4, jugar *(existe)*; 6g5, efectos, legendarias y defensas *(existe)*; 6g6, cerrar *(existe)*; 6g7a, ofrecer música *(existe)*; 6g7b, «Convertir en PNJ»; 6g7c, sumar desde el Bestiario. Importar y exportar PNJ sigue en el paso 7. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de
    otra cuenta» es del servidor y vale igual para el cliente nuevo. Entra acá
    también la edición de la ficha completa de un PNJ (inventario, comprar y

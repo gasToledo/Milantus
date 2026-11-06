@@ -89,7 +89,7 @@ interface Row {
  * que la compila. De quién es el turno, quién está caído o maltrecho y cuántos
  * quedan en pie lo dice el motor (`encounterView`).
  */
-export function CombatView({ campaign }: { campaign: DmCampaign }) {
+export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; onMusicOffer: (campaignId: string, show: boolean) => void }) {
   const t = useTexts();
   const lang = useLang();
   const encounter = useCampaignEncounter(campaign.id);
@@ -129,7 +129,7 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
       })),
     [t, campaign.id],
   );
-  const writer = useEncounterWriter(campaign.id, catalog.data, onSaveFailed);
+  const writer = useEncounterWriter(campaign.id, catalog.data, onSaveFailed, onMusicOffer);
 
   const data = useMemo(() => {
     const cat = catalog.data;

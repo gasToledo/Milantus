@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Account } from '../api/client';
 import { useDmCampaigns } from '../api/queries';
 import { RosterFooter } from '../dashboard/RosterPanel';
@@ -56,14 +56,18 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
   // La música es de la última campaña abierta, no de la URL: abrir el
   // Bestiario o la Biblioteca (que no son de una campaña) no la corta.
   const currentId = current?.campaign.id;
-  const [musicCampaignId, setMusicCampaignId] = useState<string | null>(null);
+  const [music, setMusic] = useState<{ campaignId: string; offer: boolean } | null>(null);
   useEffect(() => {
-    if (currentId) setMusicCampaignId(currentId);
+    if (currentId) setMusic((old) => old?.campaignId === currentId ? old : { campaignId: currentId, offer: false });
   }, [currentId]);
+  const onMusicOffer = useCallback((campaignId: string, show: boolean) => {
+    // Un guardado de la campaña anterior puede confirmarse después de salir.
+    setMusic((old) => old?.campaignId === campaignId && old.offer !== show ? { campaignId, offer: show } : old);
+  }, []);
   // El editor de un bloque registra acá cómo salir (preguntando si hay cambios)
   // para el «volver» del panel, que vive fuera de él.
   const leave = useRef<(() => void) | null>(null);
-  const musicCampaign = list?.find((c) => c.id === (currentId ?? musicCampaignId));
+  const musicCampaign = list?.find((c) => c.id === (currentId ?? music?.campaignId));
 
   let body;
   if (view.kind === 'bestiary') {
@@ -110,13 +114,14 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
     body = <Notice title={t.dmCampaignNotFound} body={t.dmCampaignNotFoundBody} />;
   } else if (view.kind === 'member') {
     body = <MemberSheetView key={view.memberId} campaign={current.campaign} memberId={view.memberId} tab={view.tab} />;
+  } else if (current.section === 'combate') {
+    body = <CombatView key={current.campaign.id} campaign={current.campaign} onMusicOffer={onMusicOffer} />;
   } else {
     const Section = {
       mesa: MesaView,
       capitulos: ChaptersView,
       cuaderno: NotebookView,
       pnj: CampaignNpcsView,
-      combate: CombatView,
     }[current.section];
     body = <Section key={current.campaign.id} campaign={current.campaign} />;
   }
@@ -134,7 +139,15 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
       {body}
       {/* Otra campaña es otro reproductor: lo que sonaba se corta. La clave no
           puede ser el id a secas: la sección hermana ya la usa. */}
-      {musicCampaign && <MusicPlayer key={`music:${musicCampaign.id}`} campaignId={musicCampaign.id} scenes={musicCampaign.musicScenes ?? []} />}
+      {musicCampaign && (
+        <MusicPlayer
+          key={`music:${musicCampaign.id}`}
+          campaignId={musicCampaign.id}
+          scenes={musicCampaign.musicScenes ?? []}
+          offerCombat={music?.campaignId === musicCampaign.id && music.offer}
+          onDismissOffer={() => onMusicOffer(musicCampaign.id, false)}
+        />
+      )}
     </Shell>
   );
 }

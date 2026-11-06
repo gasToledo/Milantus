@@ -33,7 +33,7 @@ type Notice = { kind: 'deleted'; scene: MusicScene; index: number } | { kind: 'e
  * el reproductor de YouTube embebido. El DM también las crea, edita y borra
  * (6d), y marca cuáles ofrecer al iniciar un combate. Esas escrituras releen la
  * campaña antes del PUT (`editCampaign`) y van en fila: ver `updateScenes`. La
- * oferta al empezar un combate sigue afuera hasta 6g: acá nadie empieza uno.
+ * oferta llega cuando se confirmó el primer guardado del combate.
  *
  * Vive en la pantalla del Modo DM y no en una sección: cambiar de sección no lo
  * desmonta, así que la música sigue; cambiar de campaña sí (va con `key`), como
@@ -42,7 +42,12 @@ type Notice = { kind: 'deleted'; scene: MusicScene; index: number } | { kind: 'e
  * El enlace lo interpreta el motor (`musicSource`): esta pantalla nunca arma la
  * dirección del iframe con lo que pegó el DM.
  */
-export function MusicPlayer({ campaignId, scenes }: { campaignId: string; scenes: readonly MusicScene[] }) {
+export function MusicPlayer({ campaignId, scenes, offerCombat, onDismissOffer }: {
+  campaignId: string;
+  scenes: readonly MusicScene[];
+  offerCombat: boolean;
+  onDismissOffer: () => void;
+}) {
   const t = useTexts();
   const client = useQueryClient();
   const sources = useMemo(() => new Map(scenes.map((s) => [s.id, musicSource(s.url)])), [scenes]);
@@ -56,6 +61,14 @@ export function MusicPlayer({ campaignId, scenes }: { campaignId: string; scenes
   const frame = useRef<HTMLIFrameElement>(null);
   const noticeTimer = useRef<number | undefined>(undefined);
   useEffect(() => () => window.clearTimeout(noticeTimer.current), []);
+
+  const marked = offerCombat ? scenes.filter((scene) => scene.offerOnCombat && sources.get(scene.id)) : [];
+  const showOffer = marked.length > 0 && !marked.some((scene) => scene.id === currentId);
+  useEffect(() => {
+    // La oferta se consume aun si no se mostró, para que editar la lista o
+    // cambiar de escena después no la haga aparecer tarde.
+    if (offerCombat && !showOffer) onDismissOffer();
+  }, [offerCombat, showOffer, onDismissOffer]);
 
   const showNotice = (next: Notice) => {
     window.clearTimeout(noticeTimer.current);
@@ -187,6 +200,7 @@ export function MusicPlayer({ campaignId, scenes }: { campaignId: string; scenes
 
   const play = (scene: MusicScene) => {
     if (!sources.get(scene.id)) return;
+    if (offerCombat) onDismissOffer();
     setExpanded(true);
     if (scene.id === currentId) {
       // La misma escena se reanuda en vez de recargarse.
@@ -207,7 +221,23 @@ export function MusicPlayer({ campaignId, scenes }: { campaignId: string; scenes
   };
 
   return (
-    <div className="fixed right-4 bottom-4 z-40 flex max-w-[calc(100vw-32px)] flex-col items-end" data-music-player>
+    <div className={cx('fixed right-4 bottom-4 z-40 flex max-w-[calc(100vw-32px)] flex-col items-end', showOffer && 'max-h-[calc(100dvh-32px)] overflow-y-auto')} data-music-player>
+      {showOffer && (
+        <section aria-label={t.dmMusicCombatStarted} className="card mb-2 w-[360px] max-w-full shrink-0 p-3" data-music-offer>
+          <Eyebrow>{t.dmMusicCombatStarted}</Eyebrow>
+          <p className="font-display text-[17px] wrap-anywhere text-on-surface">
+            {marked.length === 1 ? t.dmMusicOfferOne(marked[0]!.name) : t.dmMusicOfferMany}
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {marked.map((scene) => (
+              <Button key={scene.id} icon={Play} className="min-w-0 max-w-full wrap-anywhere" onClick={() => play(scene)}>
+                {marked.length === 1 ? t.dmMusicPlay : scene.name}
+              </Button>
+            ))}
+            <Button tone="secondary" onClick={onDismissOffer}>{t.dmMusicNotNow}</Button>
+          </div>
+        </section>
+      )}
       <section
         aria-label={t.dmMusic}
         // Minimizado queda montado (el iframe sigue ahí) pero fuera del foco.
