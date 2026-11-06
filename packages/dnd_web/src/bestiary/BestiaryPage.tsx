@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ArrowLeft, Search, X } from 'lucide-react';
 import { useSheetCatalog } from '../api/queries';
 import { bestiary, type BestiaryRow, type Catalog } from '../engine';
@@ -27,14 +27,16 @@ interface Creature {
  * las del catálogo y las homebrew de la cuenta (el catálogo ya viene fusionado),
  * menos las invocaciones por fórmula, que el motor deja afuera. Lista y perfil
  * son URLs (`/v2/bestiario/goblin`). A diferencia de Flutter, donde es una
- * sección del Modo DM que además suma al combate o copia a Homebrew, acá solo
- * se lee: el catálogo es el mismo contenido público del Códice.
+ * sección del Modo DM, la vista de jugador solo muestra el perfil. El Modo DM
+ * agrega la acción de sumar al combate desde su propia pantalla.
  *
  * Con [dm] es la misma pantalla montada en el Modo DM (`/v2/dm/bestiario`, con
  * el panel del DM): igual navegador y perfil, con la cabecera del Modo DM y sus
  * propias URL. No es otra pantalla: una criatura nueva sale en las dos.
  */
-export function BestiaryPage({ entryId, dm = false }: { entryId: string | null; dm?: boolean }) {
+type ProfileAction = (creature: Creature, catalog: Catalog) => ReactNode;
+
+export function BestiaryPage({ entryId, dm = false, profileAction }: { entryId: string | null; dm?: boolean; profileAction?: ProfileAction }) {
   const t = useTexts();
   const lang = useLang();
   const catalog = useSheetCatalog(lang);
@@ -66,7 +68,7 @@ export function BestiaryPage({ entryId, dm = false }: { entryId: string | null; 
       </div>
     );
   }
-  return <Browser creatures={creatures} catalog={catalog.data} entryId={entryId} dm={dm} />;
+  return <Browser creatures={creatures} catalog={catalog.data} entryId={entryId} dm={dm} profileAction={profileAction} />;
 }
 
 function Heading({ count, dm = false }: { count?: number; dm?: boolean }) {
@@ -74,7 +76,7 @@ function Heading({ count, dm = false }: { count?: number; dm?: boolean }) {
   // El Modo DM tiene su cabecera (título, pill y regla); el conteo va en la
   // pill.
   if (dm) {
-    return <DmHeader title={t.bestiaryTitle} kicker={count === undefined ? t.dmReadOnly : `${t.dmReadOnly} · ${t.bestiaryCount(count)}`} />;
+    return <DmHeader title={t.bestiaryTitle} kicker={count === undefined ? undefined : t.bestiaryCount(count)} />;
   }
   return (
     <header className="flex flex-wrap items-baseline gap-x-3.5 gap-y-1">
@@ -89,11 +91,13 @@ function Browser({
   catalog,
   entryId,
   dm,
+  profileAction,
 }: {
   creatures: Creature[];
   catalog: Catalog;
   entryId: string | null;
   dm: boolean;
+  profileAction?: ProfileAction;
 }) {
   const hrefOf = dm ? dmBestiaryHref : bestiaryHref;
   const t = useTexts();
@@ -290,7 +294,7 @@ function Browser({
                   <ArrowLeft size={16} aria-hidden="true" className="text-gold" />
                   {t.luBack}
                 </Link>
-                <CreatureProfile profile={open.profile} row={open.row} catalog={catalog} />
+                <CreatureProfile profile={open.profile} row={open.row} catalog={catalog} headerAction={profileAction?.(open, catalog)} />
               </>
             ) : (
               <p className="card p-6 text-on-surface-variant">{t.bestiaryPick}</p>

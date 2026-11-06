@@ -3,7 +3,7 @@
 // (`api/saveQueue.ts`). Descartar no pasa por la cola: es un borrado.
 import { useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { convertCampaignCombatant, discardCampaignEncounter, endCampaignEncounter, saveCampaignEncounter } from '../../api/client';
+import { convertCampaignCombatant, discardCampaignEncounter, endCampaignEncounter, fetchCampaignEncounter, saveCampaignEncounter } from '../../api/client';
 import { queryKeys } from '../../api/queries';
 import { createSaveQueue } from '../../api/saveQueue';
 import { encounterAct, newNpc, type Catalog, type EncounterAction, type JsonObject } from '../../engine';
@@ -21,45 +21,59 @@ export const flushEncounterSave = (campaignId: string): Promise<void> => queue.f
 export function useEncounterWriter(
   campaignId: string,
   catalog: Catalog | undefined,
-  onFailed: () => void,
+  onFailed: (() => void) | undefined,
   onMusicOffer: (campaignId: string, show: boolean) => void,
 ) {
   const client = useQueryClient();
   return useMemo(() => {
     const key = queryKeys.campaignEncounter(campaignId);
-    return {
-      act(action: EncounterAction) {
-        if (!catalog) return;
-        if (converting.has(campaignId)) return onFailed();
-        // La base es lo último que se pidió guardar y no la caché sola: una relectura
-        // en vuelo puede haberla atrasado, y sumar sobre ella perdería lo anterior.
-        const base = queue.latest(campaignId) ?? client.getQueryData<JsonObject | null>(key) ?? null;
-        let next: JsonObject | null;
-        try {
-          next = encounterAct(catalog, base, action);
-        } catch {
-          // Un tipo desconocido o una criatura inexistente: mejor avisar que creer
-          // que se guardó.
-          return onFailed();
-        }
-        // `null` es que no hay nada que guardar (ya estaba, no cambia nada).
-        if (!next) return;
-        const doc = next;
-        if (action.type === 'open' && !base && typeof doc.id === 'string') pendingOpens.set(campaignId, doc.id);
-        // Una lectura en vuelo traería el combate de antes y pisaría lo escrito.
-        void client.cancelQueries({ queryKey: key });
+    const act = (action: EncounterAction): boolean => {
+      if (!catalog) return false;
+      if (converting.has(campaignId)) {
+        onFailed?.();
+        return false;
+      }
+      // La base es lo último que se pidió guardar y no la caché sola: una relectura
+      // en vuelo puede haberla atrasado, y sumar sobre ella perdería lo anterior.
+      const base = queue.latest(campaignId) ?? client.getQueryData<JsonObject | null>(key) ?? null;
+      let next: JsonObject | null;
+      try {
+        next = encounterAct(catalog, base, action);
+      } catch {
+        // Un tipo desconocido o una criatura inexistente: mejor avisar que creer
+        // que se guardó.
+        onFailed?.();
+        return false;
+      }
+      // `null` es que no hay nada que guardar (ya estaba, no cambia nada).
+      if (!next) return false;
+      const doc = next;
+      if (action.type === 'open' && !base && typeof doc.id === 'string') pendingOpens.set(campaignId, doc.id);
+      // Una lectura en vuelo traería el combate de antes y pisaría lo escrito.
+      void client.cancelQueries({ queryKey: key });
+      client.setQueryData<JsonObject | null>(key, doc);
+      queue.schedule(campaignId, doc, (ok) => {
+        if (!ok) return onFailed?.();
+        // Una lectura que entró entre el guardado y su respuesta pudo dejar la
+        // caché con otra copia: lo guardado es lo que manda.
         client.setQueryData<JsonObject | null>(key, doc);
-        queue.schedule(campaignId, doc, (ok) => {
-          if (!ok) return onFailed();
-          // Una lectura que entró entre el guardado y su respuesta pudo dejar la
-          // caché con otra copia: lo guardado es lo que manda.
-          client.setQueryData<JsonObject | null>(key, doc);
-          const openingId = pendingOpens.get(campaignId);
-          if (openingId && openingId === doc.id) {
-            pendingOpens.delete(campaignId);
-            onMusicOffer(campaignId, true);
-          }
-        });
+        const openingId = pendingOpens.get(campaignId);
+        if (openingId && openingId === doc.id) {
+          pendingOpens.delete(campaignId);
+          onMusicOffer(campaignId, true);
+        }
+      });
+      return true;
+    };
+    return {
+      act,
+      async stageBestiaryAdd(action: Extract<EncounterAction, { type: 'addMonsters' }>) {
+        // Desde el perfil no hay una planilla abierta. Leemos la base antes
+        // de sumar, salvo que esta pestaña ya tenga un guardado pendiente.
+        if (!queue.latest(campaignId)) {
+          await client.fetchQuery({ queryKey: key, queryFn: ({ signal }) => fetchCampaignEncounter(campaignId, signal), staleTime: 0 });
+        }
+        if (!act(action)) throw new Error('No se pudo preparar la criatura.');
       },
       async discard() {
         if (converting.has(campaignId)) throw new Error('Hay una conversión en curso.');

@@ -321,8 +321,11 @@ repiten acá.
   DM (`dm` en `BestiaryPage`): igual navegador, filtros y perfil, con la
   cabecera del Modo DM y sus propias URL. Es una herramienta de la cuenta y no de
   una campaña: abre también sin campañas, no depende de la lista y trae el
-  homebrew de **la cuenta** (el de otra no llega). Sumar al combate y «Editar una
-  copia» siguen en Flutter.
+  homebrew de **la cuenta** (el de otra no llega). Desde 6g7c, el perfil suma al
+  combate de la última campaña abierta o, si todavía no se eligió una, de la
+  campaña que abriría el Modo DM. El diálogo pide cantidad, PG y bando. El
+  motor resuelve los PG, la numeración y la iniciativa, y el DM sigue en el
+  perfil. «Editar una copia» sigue en Flutter.
   **Biblioteca de PNJ** (`GET /api/npcs` y `GET /api/npcs/:id`): también es de la
   cuenta y no de una campaña. La lista lleva un buscador por nombre (sin tildes
   ni mayúsculas), pills de campaña con su conteo (Todas, cada campaña, Sin
@@ -787,7 +790,6 @@ frontera sigue donde estaba: **el DM no escribe la ficha de otra cuenta**.
   (no escribe la ficha) y echar corta el vínculo tras confirmar. `MemberSheetView`
   sigue sin un solo control. No se pide el aviso de eventos tras cada acción
   (`_checkEventsSoon` de Flutter): decisión tomada, no un olvido.
-- Del combate queda 6g7c, sumar desde el Bestiario.
 
 **Paso 6f3: las pantallas de edición** *(existe)*. Toca solo `dnd_web`. Subir de
 nivel, elecciones, editor de conjuros, planos del Artífice y formas salvajes son
@@ -993,7 +995,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    alta y borrado *(existe)*; 6e3, el texto de la ficha *(existe)*; 6e4, el editor del bloque *(existe)*; 6e5,
    retrato y mostrar a la mesa *(existe)*; 6f, la ficha de PNJ, en tres: 6f1,
    crearla *(existe)*; 6f2, escribirla *(existe)*; 6f3, sus pantallas de edición (subir de
-   nivel, elecciones, conjuros, planos, formas e imprimir) *(existe)*; 6g, el combate, en siete: 6g1, el puente del motor *(existe)*; 6g2, armar *(existe)*; 6g3, dificultad e iniciativa *(existe)*; 6g4, jugar *(existe)*; 6g5, efectos, legendarias y defensas *(existe)*; 6g6, cerrar *(existe)*; 6g7a, ofrecer música *(existe)*; 6g7b, «Convertir en PNJ» *(existe)*; 6g7c, sumar desde el Bestiario. Importar y exportar PNJ sigue en el paso 7. Antes de portar esto es lectura
+   nivel, elecciones, conjuros, planos, formas e imprimir) *(existe)*; 6g, el combate, en siete: 6g1, el puente del motor *(existe)*; 6g2, armar *(existe)*; 6g3, dificultad e iniciativa *(existe)*; 6g4, jugar *(existe)*; 6g5, efectos, legendarias y defensas *(existe)*; 6g6, cerrar *(existe)*; 6g7a, ofrecer música *(existe)*; 6g7b, «Convertir en PNJ» *(existe)*; 6g7c, sumar desde el Bestiario *(existe)*. Importar y exportar PNJ sigue en el paso 7. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de
    otra cuenta» es del servidor y vale igual para el cliente nuevo. Entra acá
    también la edición de la ficha completa de un PNJ (inventario, comprar y
@@ -1118,8 +1120,8 @@ hace seguro volver atrás es que **no hay nada que deshacer en el formato**:
 
 Para que nadie lo dé por hecho:
 
-- El taller de retratos del PNJ y las notas del PNJ (paso 6), el Compañero Salvaje
-  (invocarlo, que no cobra ni se va con el descanso) y los pasos 6 y 7: el detalle está en
+- El Compañero Salvaje (invocarlo, que no cobra ni se va con el descanso) y las
+  operaciones del paso 7. El detalle está en
   [Orden previsto de pantallas](#orden-previsto-de-pantallas).
 - Control de versión en el servidor para las escrituras (rechazar una copia
   vieja con 409): hoy gana el último que guarda, como en Flutter.

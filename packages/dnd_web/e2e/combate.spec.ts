@@ -12,6 +12,67 @@ const COMBATE = '/v2/dm/campanas/marca-del-cuervo/combate';
 // jugador no tiene que recibir por ningún lado.
 const SOLO_DEL_DM = ['Marca reservada del DM', 'emboscada-del-valle', 'Lobo 1'];
 
+test('el DM suma desde el perfil del Bestiario y reintenta sin duplicar la tanda', async ({ context, page, baseURL }) => {
+  const cookie = `dnd_session=${TOKEN_DM}`;
+  await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);
+  const mesa = 'Bestiario e2e';
+  const creada = await page.request.post('/api/campaigns', {
+    headers: { cookie },
+    data: { campaign: { id: 'bestiario-e2e', name: mesa, premise: '', state: 'active' } },
+  });
+  expect(creada.ok()).toBe(true);
+  const { campaign } = (await creada.json()) as { campaign: { id: string } };
+  const ruta = `/api/campaigns/${campaign.id}/encounter`;
+  const combate = `/v2/dm/campanas/${campaign.id}/combate`;
+  const perfil = '/v2/dm/bestiario/goblin-minion';
+  const nombre = String(catalogo().creatures.find((c) => c.id === 'goblin-minion')!.name);
+  type Encuentro = { id: string; stage: string; combatants: { id: string; name: string; side: string }[] };
+  const leer = async () => (await api<{ encounter: Encuentro }>(page.request, ruta, TOKEN_DM)).encounter;
+  const abrirPerfil = async () => {
+    await page.getByRole('link', { name: t.navBestiary, exact: true }).click();
+    await page.locator('[data-entry="goblin-minion"]').click();
+    await expect(page).toHaveURL(`${baseURL}${perfil}`);
+  };
+
+  await page.goto(combate);
+  await abrirPerfil();
+  await page.route(`**${ruta}`, async (route) => {
+    if (route.request().method() !== 'PUT') return route.continue();
+    await route.fetch();
+    await route.abort();
+  });
+  const sumar = page.getByRole('button', { name: t.dmAddToCombatOf(mesa), exact: true });
+  await sumar.click();
+  const dialogo = page.getByRole('dialog', { name: t.dmAddToCombatOf(mesa), exact: true });
+  await dialogo.getByRole('button', { name: t.dmOneMore, exact: true }).click();
+  await dialogo.getByRole('button', { name: t.encSides.ally, exact: true }).click();
+  await dialogo.getByRole('button', { name: t.dmAddCount(2), exact: true }).click();
+  await page.getByRole('button', { name: t.retry, exact: true }).waitFor();
+  const primero = await leer();
+  expect(primero.stage).toBe('preparing');
+  expect(primero.combatants.map((c) => [c.name, c.side])).toEqual([[`${nombre} 1`, 'ally'], [`${nombre} 2`, 'ally']]);
+  await page.unroute(`**${ruta}`);
+  await page.getByRole('button', { name: t.retry, exact: true }).click();
+  await expect(page.getByText(t.dmAddedToCombat(`2 × ${nombre}`, mesa), { exact: true }).first()).toBeVisible();
+  expect(await leer()).toEqual(primero);
+  await expect(page).toHaveURL(`${baseURL}${perfil}`);
+
+  await page.locator(`a[href="/v2/dm/campanas/${campaign.id}/mesa"]`).click();
+  await page.getByRole('link', { name: t.dmSectionCombat, exact: true }).click();
+  await page.locator('[data-action="roll-initiative"]').click();
+  await page.getByRole('button', { name: t.dmStart, exact: true }).click();
+  await expect.poll(async () => (await leer()).stage).toBe('running');
+  await abrirPerfil();
+  await sumar.click();
+  await dialogo.getByRole('button', { name: t.dmAddShort, exact: true }).click();
+  await expect(page.getByText(t.dmAddedToCombat(nombre, mesa), { exact: true }).first()).toBeVisible();
+  const enCurso = await leer();
+  expect([enCurso.id, enCurso.stage]).toEqual([primero.id, 'running']);
+  expect(enCurso.combatants.find((c) => c.name === `${nombre} 3`)?.side).toBe('enemy');
+  expect(enCurso.combatants.map((c) => c.id)).toEqual(expect.arrayContaining(primero.combatants.map((c) => c.id)));
+  await expect(page).toHaveURL(`${baseURL}${perfil}`);
+});
+
 test('la música se ofrece una vez que se guarda un combate y solo suena si el DM la elige', async ({ context, page, baseURL }) => {
   const cookie = `dnd_session=${TOKEN_DM}`;
   await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);

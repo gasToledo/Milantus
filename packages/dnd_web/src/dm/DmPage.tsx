@@ -11,6 +11,7 @@ import { DmHeader } from './DmHeader';
 import { DmOnboarding } from './DmOnboarding';
 import { DmPanel } from './DmPanel';
 import { BestiaryPage } from '../bestiary/BestiaryPage';
+import { AddFromBestiary } from './combat/AddFromBestiary';
 import { ChaptersView } from './ChaptersView';
 import { CombatView } from './CombatView';
 import { HomebrewView } from './HomebrewView';
@@ -73,7 +74,12 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
   if (view.kind === 'bestiary') {
     // El Bestiario no depende de las campañas: se abre también sin ninguna y
     // cuando la lista no cargó (el panel lo dice solo).
-    body = <BestiaryPage entryId={view.entryId} dm />;
+    const campaign = musicCampaign ?? (list && defaultCampaign(list));
+    body = <BestiaryPage entryId={view.entryId} dm profileAction={({ row, profile }, catalog) => (
+      campaign ? (
+        <AddFromBestiary key={`${campaign.id}:${row.id}`} campaign={campaign} creatureId={row.id} profile={profile} catalog={catalog} onMusicOffer={onMusicOffer} />
+      ) : list ? <p className="text-[13px] text-text-muted">{t.dmCreateCampaignFirst}</p> : null
+    )} />;
   } else if (view.kind === 'npcs') {
     // La Biblioteca tampoco depende de las campañas: sin la lista, los filtros
     // por campaña salen de los vínculos de cada PNJ.

@@ -22,6 +22,7 @@ export function CreatureProfile({
   compact = false,
   summary = false,
   kindNote,
+  headerAction,
 }: {
   profile: Profile;
   row: BestiaryRow;
@@ -36,6 +37,7 @@ export function CreatureProfile({
   summary?: boolean;
   /** Se suma a la línea de tipo («con espacio de nivel 5»). */
   kindNote?: string;
+  headerAction?: ReactNode;
 }) {
   const t = useTexts();
   const source = (t.sources as Record<string, string>)[profile.source ?? ''];
@@ -61,6 +63,7 @@ export function CreatureProfile({
               <span className="sr-only">{t.sourceLabel(source)}</span>
             </Pill>
           )}
+          {headerAction && <div className="ml-auto">{headerAction}</div>}
         </div>
       )}
       <h2

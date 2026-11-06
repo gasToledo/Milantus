@@ -322,6 +322,12 @@ alcance en placas. Una criatura nueva en el catálogo no pide código: sale sola
 Lo que el perfil necesita y no es un dato del catálogo se agrega a `bestiary()`
 del motor, nunca se calcula acá.
 
+En el Modo DM, el encabezado del perfil lleva «Sumar al combate de
+{campaña}». Abre un `AppDialog` de 440 px con la criatura ya elegida y los
+mismos controles de cantidad, PG y bando que usa Combate (`MonsterQuantity`).
+Arranca con una copia enemiga y los PG promedio del libro. El aviso de
+guardado confirma la tanda desde el perfil.
+
 ## El Modo DM (`src/dm/`)
 
 La oferta de música (6g7a) es una `card` encima del reproductor flotante de

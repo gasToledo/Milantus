@@ -1,6 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { CircleMinus, CirclePlus } from 'lucide-react';
 import { linkCampaignNpc, type CampaignNpc, type DmCampaign } from '../../api/client';
 import { queryKeys, useNpcs } from '../../api/queries';
 import { bestiary, npcViews, type Catalog, type EncounterAction, type JsonObject, type NpcEntryJson, type NpcView } from '../../engine';
@@ -10,6 +9,7 @@ import { Eyebrow } from '../../ui/data';
 import { AppBusyLabel, AppErrorView } from '../../ui/status';
 import { Option, SearchableList } from '../../ui/wizard';
 import { npcTypeLine } from '../npcs/npc';
+import { MonsterQuantity, type MonsterDraft } from './MonsterQuantity';
 import { isWholeNumber, NUMBER_FILTER } from './NumberPromptDialog';
 import { Segmented, SideSelector } from './SideSelector';
 
@@ -92,9 +92,8 @@ interface TabParts {
 function useBestiaryTab(catalog: Catalog, act: (action: EncounterAction) => void, note: string | null, setNote: (note: string | null) => void): TabParts {
   const t = useTexts();
   const [selected, setSelected] = useState<string | null>(null);
-  const [count, setCount] = useState(1);
-  const [rollHp, setRollHp] = useState(true);
-  const [side, setSide] = useState<string>('enemy');
+  const [draft, setDraft] = useState<MonsterDraft>({ count: 1, rollHp: true, side: 'enemy' });
+  const { count, rollHp, side } = draft;
 
   const creatures = useMemo(() => {
     const byId = new Map(catalog.creatures.map((c) => [c.id as string, c] as const));
@@ -108,10 +107,10 @@ function useBestiaryTab(catalog: Catalog, act: (action: EncounterAction) => void
 
   const add = () => {
     if (!current) return;
-    act({ type: 'addMonsters', creatureId: current.row.id, count, rollHp: hitDice ? rollHp : false, side: side as Side });
+    act({ type: 'addMonsters', creatureId: current.row.id, count, rollHp: hitDice ? rollHp : false, side });
     setNote(t.dmAddedNote(count > 1 ? `${count} × ${current.name}` : current.name));
     // La selección queda para sumar más del mismo; el contador, no.
-    setCount(1);
+    setDraft({ ...draft, count: 1 });
   };
 
   const body = (
@@ -150,41 +149,7 @@ function useBestiaryTab(catalog: Catalog, act: (action: EncounterAction) => void
               <p className="mt-0.5 text-[12px] text-on-surface-variant">{current.row.kind}</p>
               <p className="text-[12px] text-on-surface-variant">{t.npcAcHp(String(current.raw.ac), String(current.raw.hp))}</p>
             </div>
-            <div className="flex items-center justify-center gap-2.5">
-              <button
-                type="button"
-                aria-label={t.dmOneFewer}
-                disabled={count <= 1}
-                onClick={() => setCount(count - 1)}
-                className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-nav)] text-on-surface-variant hover:text-on-surface disabled:opacity-40"
-              >
-                <CircleMinus size={22} aria-hidden="true" />
-              </button>
-              <b className="num w-10 text-center text-[20px]" data-field="count">
-                {count}
-              </b>
-              <button
-                type="button"
-                aria-label={t.dmOneMore}
-                onClick={() => setCount(count + 1)}
-                className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-nav)] text-on-surface-variant hover:text-on-surface"
-              >
-                <CirclePlus size={22} aria-hidden="true" />
-              </button>
-            </div>
-            {hitDice && (
-              <Option
-                multi
-                selected={rollHp}
-                title={t.dmRollEachHp}
-                detail={rollHp ? t.dmEachRolls(hitDice) : t.dmAllStartWith(String(current.raw.hp))}
-                onClick={() => setRollHp(!rollHp)}
-              />
-            )}
-            <div>
-              <Eyebrow className="mb-1.5">{t.dmWhichSide}</Eyebrow>
-              <SideSelector value={side} onChange={setSide} />
-            </div>
+            <MonsterQuantity draft={draft} onChange={setDraft} hp={String(current.raw.hp)} hitDice={hitDice} />
           </>
         )}
         {note && (

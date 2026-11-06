@@ -1169,14 +1169,24 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 - «Mover antes» y «Mover después» del menú de las tarjetas de personaje en
   `/v2`: se mueven tomándolas o con el teclado.
 
-## [Unreleased]
+## [0.47.0+1] - 2026-11-06
 
 ### Nuevo
 
-- Sin cambios.
+- El DM puede armar, jugar y cerrar combates desde `/v2`, con iniciativa,
+  dificultad, efectos, defensas y acciones legendarias. Al armar puede elegir
+  una escena de música. Desde el Bestiario puede sumar criaturas a la campaña
+  sin salir de su perfil.
+- Desde Combate se puede convertir un monstruo en PNJ en su misma fila.
+  Si se borra ese PNJ durante el encuentro, la fila vuelve a ser un monstruo
+  y conserva su estado de combate.
+- En `/v2` el DM puede crear y editar PNJ, sus bloques, fichas y retratos,
+  mostrar un retrato a la mesa y administrar las escenas de música.
 
 ### Modificado
 
+- «Atrás» vuelve a la pantalla desde la que se abrió la vista y conserva el
+  destino al cambiar de pestaña en una ficha.
 - Las opciones de Canalizar Divinidad aparecen también en Magia → De rasgos,
   con su descripción y controles que comparten los usos del recurso.
 - Los Anteojos de la noche otorgan 60 pies de visión en la oscuridad o suman
@@ -1218,6 +1228,20 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   competencia entre Engaño, Interpretación y Persuasión.
 - Versátil del Humano no acepta una dote que no sea de origen, aunque el dato
   de la especie deje el id vacío.
+
+### Eliminado
+
+- Sin cambios.
+
+## [Unreleased]
+
+### Nuevo
+
+- Sin cambios.
+
+### Modificado
+
+- Sin cambios.
 
 ### Eliminado
 
