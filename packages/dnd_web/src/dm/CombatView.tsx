@@ -79,8 +79,9 @@ interface Row {
  * bando, saca y descarta, ve la dificultad y los PX (si la cuenta lo permite) y
  * empieza con «Tirar iniciativa» (`combat/`). **En curso** pasa el turno, daña y
  * cura con la cifra compartida, corrige la iniciativa, suma tarde, cambia el
- * bando y saca; los efectos, las marcas y terminar el combate siguen en Flutter
- * (6g5 y 6g6).
+ * bando y saca; anota efectos, ventaja o desventaja, PG temporales y bono a la CA
+ * (`EffectsDialog`) y gasta las marcas legendarias; terminar el combate sigue en
+ * Flutter (6g6).
  *
  * Los PG de un monstruo o de un PNJ son los del encuentro; los de un jugador,
  * los de **su ficha real** (`modo-dm.md`: el DM no los escribe), con el máximo
@@ -223,7 +224,7 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
                     })
                   }
                 />
-                {!view.preparing && <TurnPanel row={rows.find((r) => r.c.id === view.currentId)} catalog={cat} campaignId={campaign.id} act={writer.act} />}
+                {!view.preparing && <TurnPanel row={rows.find((r) => r.c.id === view.currentId)} rows={rows} catalog={cat} campaignId={campaign.id} act={writer.act} />}
               </div>
             )}
             {pending.length > 0 && (
@@ -554,12 +555,47 @@ interface RowExtras {
   fixInitiative?: () => void;
   /** Saca un efecto de la fila (la ✕ de su chip). */
   removeTag?: (tag: string) => void;
+  /** Gasta o devuelve legendarias: el valor nuevo de gastadas. */
+  setLegendary?: (kind: 'actions' | 'resistances', value: number) => void;
 }
 
 const advantageOf = (c: CombatantJson): 'advantage' | 'disadvantage' | null => (c.advantage === 'advantage' || c.advantage === 'disadvantage' ? c.advantage : null);
 /** Lo que el DM le puso a la fila y se usa en turnos ajenos: ventaja o
  *  desventaja, temporales y bono a la CA. */
 const hasMarks = ({ c, derived }: Row) => advantageOf(c) !== null || derived.temp > 0 || (c.acBonus ?? 0) > 0;
+const hasLegendary = ({ detail }: Row) => (detail?.legendaryActions ?? 0) > 0 || (detail?.legendaryResistances ?? 0) > 0;
+
+/** Las marcas de acciones (círculos) o resistencias (rombos) legendarias, para
+ *  tacharlas tocándolas. Tocar una disponible la gasta junto con las anteriores y
+ *  tocar una gastada la devuelve junto con las que le siguen: así se corrige un
+ *  toque de más sin un botón aparte (`_LegendaryPips` de Flutter). Con la fila
+ *  partida (teléfono) el área tocable es de 40 px y el rótulo va arriba y entero:
+ *  a 28 px las marcas quedaban pegadas y se tachaba la de al lado. */
+function LegendaryPips({ kind, max, spent, onChange }: { kind: 'actions' | 'resistances'; max: number; spent: number; onChange: (value: number) => void }) {
+  const t = useTexts();
+  const diamond = kind === 'resistances';
+  const full = diamond ? t.encLegendaryResistances : t.encLegendaryActions;
+  return (
+    <div className="flex flex-wrap items-center @[760px]:flex-nowrap">
+      <span className="basis-full text-[10.5px] text-on-surface-variant @[760px]:hidden">{full}</span>
+      {Array.from({ length: max }, (_, i) => (
+        <button
+          key={i}
+          type="button"
+          aria-pressed={i < spent}
+          aria-label={t.encLegendaryPip(full, i + 1, max)}
+          data-legendary={`${kind}-${i}`}
+          onClick={() => onChange(i < spent ? i : i + 1)}
+          className="inline-flex h-10 w-10 items-center justify-center @[760px]:h-7 @[760px]:w-7"
+        >
+          {/* Disponible: llena en oro. Gastada: vacía y atenuada. */}
+          <span className={cx('box-border block border-[1.5px]', diamond ? 'h-2.5 w-2.5 rotate-45' : 'h-3 w-3 rounded-full', i < spent ? 'border-text-muted' : 'border-gold bg-gold')} />
+        </button>
+      ))}
+      <span className="ml-1.5 hidden text-[10.5px] text-on-surface-variant @[760px]:inline">{diamond ? t.encResistShort : t.encLegendaryShort}</span>
+    </div>
+  );
+}
 
 /** La barra de PG con los temporales pegados: el tramo carmesí es
  *  `actual / (máximo + temporales)` y el dorado `temporales / (máximo +
@@ -582,7 +618,7 @@ function HpBar({ current, max, temp, label }: { current: number; max: number; te
   );
 }
 
-function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl, actions, fixInitiative, removeTag }: { row: Row; catalog: Catalog; active: boolean; acted: boolean; preparing: boolean; showXp: boolean } & RowExtras) {
+function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl, actions, fixInitiative, removeTag, setLegendary }: { row: Row; catalog: Catalog; active: boolean; acted: boolean; preparing: boolean; showXp: boolean } & RowExtras) {
   const t = useTexts();
   const lang = useLang();
   // El turno que pasa se lleva la vista con él: en una mesa con muchos
@@ -610,12 +646,14 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
   const bonus = c.acBonus ?? 0;
   const adv = advantageOf(c);
   const hp = derived.hp;
+  // Solo en curso: mientras se arma no hay nada que gastar.
+  const legendary = hasLegendary(row);
   // Lo que ya jugó esta ronda se atenúa en sus datos y **no en sus botones**: al
   // goblin que ya actuó se le sigue pegando, y un botón gris se lee como apagado.
   // Un caído se atenúa entero: ahí sí terminó (a pedido del usuario). Una fila con
-  // marcas **no se atenúa** aunque ya haya jugado, porque lo que lleva (ventaja,
+  // marcas o con legendarias **no se atenúa** aunque ya haya jugado, porque lo que lleva (ventaja,
   // temporales, bono a la CA) se usa en turnos ajenos; un caído sí, siempre.
-  const faded = (derived.down || (acted && !hasMarks(row))) && 'opacity-60';
+  const faded = (derived.down || (acted && !hasMarks(row) && !(legendary && !preparing))) && 'opacity-60';
   const fadedActions = derived.down && 'opacity-60';
   const initiativeCell = (
     <>
@@ -672,6 +710,16 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
             ))}
           <span className={cx('truncate text-[11.5px]', derived.down ? 'text-crimson' : 'text-on-surface-variant')}>{[xpText, metaOf(row, derived.down, catalog, t)].filter(Boolean).join(' · ')}</span>
         </div>
+        {!preparing && legendary && setLegendary && (
+          <div className="mt-[3px] flex flex-wrap items-center gap-x-3">
+            {(row.detail?.legendaryActions ?? 0) > 0 && (
+              <LegendaryPips kind="actions" max={row.detail!.legendaryActions} spent={c.legendaryActionsSpent ?? 0} onChange={(v) => setLegendary('actions', v)} />
+            )}
+            {(row.detail?.legendaryResistances ?? 0) > 0 && (
+              <LegendaryPips kind="resistances" max={row.detail!.legendaryResistances} spent={c.legendaryResistancesSpent ?? 0} onChange={(v) => setLegendary('resistances', v)} />
+            )}
+          </div>
+        )}
       </div>
       <div className={cx('order-4 col-span-2 col-start-2 mt-2 @[760px]:order-3 @[760px]:col-auto @[760px]:mt-0', faded)} data-field="hp">
         {hp ? (
@@ -840,6 +888,7 @@ function rowParts(row: Row, { campaignId, act, t, running, amount, readAmount, o
   return {
     fixInitiative,
     removeTag,
+    setLegendary: (kind, value) => act({ type: 'setLegendary', combatantId: c.id, [kind]: value }),
     sideControl: (
       <SideMenu
         side={c.side}
@@ -874,9 +923,13 @@ function rowParts(row: Row, { campaignId, act, t, running, amount, readAmount, o
 /** «Del turno»: el perfil de quien está jugando. Un jugador no tiene perfil que
  *  mostrar, y se dice en vez de abrir la ficha ajena (`modo-dm.md`): el enlace
  *  lleva a la que el DM sí puede mirar. */
-function TurnPanel({ row, catalog, campaignId, act }: { row: Row | undefined; catalog: Catalog; campaignId: string; act: (a: EncounterAction) => void }) {
+function TurnPanel({ row, rows, catalog, campaignId, act }: { row: Row | undefined; rows: Row[]; catalog: Catalog; campaignId: string; act: (a: EncounterAction) => void }) {
   const t = useTexts();
   const [background, setBackground] = useState(false);
+  const [tab, setTab] = useState<'turn' | 'effects'>('turn');
+  // Todos los efectos de la mesa, juntos: repartidos en filas que se mueven cuando
+  // entra alguien, se pasa el veneno de turno.
+  const effects = rows.flatMap((r) => (r.c.tags ?? []).map((tag) => ({ id: r.c.id, name: r.c.name, tag, tags: r.c.tags ?? [] })));
   // El bando de quien juega: se cambia desde acá igual que desde la fila, y un
   // PNJ sin estadísticas dice por qué no se puede.
   const side = (r: Row) =>
@@ -939,15 +992,67 @@ function TurnPanel({ row, catalog, campaignId, act }: { row: Row | undefined; ca
     );
   }
   return (
-    <aside aria-labelledby="turn-panel" className="flex min-w-0 flex-[1_1_300px] flex-col gap-3 shell:max-w-[420px]" data-field="turn-panel">
-      <div className="card flex flex-col gap-2.5 px-4 py-3.5">
-        <div className="flex items-baseline gap-2">
-          <h2 id="turn-panel" className="font-display flex-1 text-[17px] text-on-surface">
-            {t.encOfTurn}
-          </h2>
-          {row && <span className="text-[12px] text-text-muted">{row.c.name}</span>}
+    <aside aria-label={t.encOfTurn} className="flex min-w-0 flex-[1_1_300px] flex-col gap-3 shell:max-w-[420px]" data-field="turn-panel">
+      <div className="card overflow-hidden p-0">
+        {/* Las solapas: la elegida lleva borde, color **y** peso, porque el color
+            solo no alcanza para quien no distingue el oro del gris. */}
+        <div role="tablist" aria-label={t.encOfTurn} className="flex border-b border-hairline">
+          {(
+            [
+              ['turn', t.encOfTurn, null],
+              ['effects', t.encEffects, effects.length],
+            ] as const
+          ).map(([id, label, count]) => (
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              aria-selected={tab === id}
+              data-tab={id}
+              onClick={() => setTab(id)}
+              className={cx(
+                'flex h-[41px] flex-1 items-center justify-center gap-1.5 border-b-2 text-[12.5px]',
+                tab === id ? 'border-gold font-semibold text-gold' : 'border-transparent text-on-surface-variant hover:text-on-surface',
+              )}
+            >
+              {label}
+              {count !== null && <span className="text-[11px]">{count}</span>}
+            </button>
+          ))}
         </div>
-        {body}
+        {tab === 'turn' ? (
+          <div role="tabpanel" className="flex flex-col gap-2.5 px-4 py-3.5">
+            {body}
+          </div>
+        ) : (
+          <div role="tabpanel" className="p-1.5 pl-3.5" data-field="effects-list">
+            {effects.length === 0 ? (
+              <AppEmptyState kind="empty" message={t.encNoEffects} />
+            ) : (
+              effects.map((e) => {
+                const label = tagLabel(t, e.tag);
+                return (
+                  <div key={`${e.id}-${e.tag}`} className="flex min-h-12 items-center">
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[13px] text-on-surface">{label}</div>
+                      <div className="truncate text-[11.5px] text-text-muted">{e.name}</div>
+                    </div>
+                    {/* Su rótulo nombra al combatiente: el mismo efecto se saca desde
+                        dos lugares y dos botones iguales no se distinguirían. */}
+                    <button
+                      type="button"
+                      aria-label={t.encRemoveEffect(label, e.name)}
+                      onClick={() => act({ type: 'setTags', combatantId: e.id, tags: e.tags.filter((x) => x !== e.tag) })}
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-nav)] text-on-surface-variant hover:text-on-surface"
+                    >
+                      <X size={18} aria-hidden="true" />
+                    </button>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        )}
       </div>
       {background && row?.npc?.npc.background && (
         <AppDialog open onOpenChange={(open) => !open && setBackground(false)} title={t.encBackgroundOf(row.c.name)} actions={[{ label: t.close }]}>
