@@ -46,7 +46,12 @@ class EncounterActions {
     required String npcId,
   }) =>
       current.withReplaced(
-        combatant.copyWith(kind: CombatantKind.npc, name: name, npcId: npcId),
+        combatant.copyWith(
+          kind: CombatantKind.npc,
+          name: name,
+          npcId: npcId,
+          originalMonsterName: combatant.originalMonsterName ?? combatant.name,
+        ),
       );
 
   static Encounter? apply(

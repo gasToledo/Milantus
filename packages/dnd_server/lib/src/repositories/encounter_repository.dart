@@ -25,6 +25,9 @@ abstract class EncounterRepository {
   /// desincronizar entre rutas.
   Future<void> save(String dmUserId, String campaignId, Encounter encounter);
 
+  /// Revierte las conversiones en encuentros abiertos al borrar un PNJ.
+  Future<void> restoreMonsters(String dmUserId, String npcId, String? baseName);
+
   /// Cierra el combate: borra la fila de `encounters` y archiva [log] en
   /// `encounter_logs`. Si no había combate abierto, no hace nada — silencioso,
   /// como cualquier borrado del proyecto que no encuentra qué borrar.
@@ -166,6 +169,37 @@ class PostgresEncounterRepository implements EncounterRepository {
               'endedAt': endedAt.toIso8601String(),
           }),
     ];
+  }
+
+  @override
+  Future<void> restoreMonsters(
+    String dmUserId,
+    String npcId,
+    String? baseName,
+  ) async {
+    final rows = await _session.execute(
+      Sql.named('''
+        SELECT campaign_id, document FROM encounters
+        WHERE dm_user_id = @dmUserId AND document @> @combatant
+        ORDER BY campaign_id
+        FOR UPDATE
+      '''),
+      parameters: {
+        'dmUserId': TypedValue(Type.uuid, dmUserId),
+        'combatant': TypedValue(Type.jsonb, {
+          'combatants': [
+            {'kind': 'npc', 'npcId': npcId},
+          ],
+        }),
+      },
+    );
+    for (final row in rows) {
+      final encounter = Encounter.fromJson(_documentOf(row));
+      final next = encounter.restoreMonsters({npcId: baseName});
+      if (!identical(next, encounter)) {
+        await save(dmUserId, row.toColumnMap()['campaign_id'] as String, next);
+      }
+    }
   }
 
   @override

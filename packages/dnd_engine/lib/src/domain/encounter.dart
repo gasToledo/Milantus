@@ -95,6 +95,9 @@ class Combatant {
   final String? memberId;
   final String? creatureId;
   final String? npcId;
+
+  /// Nombre de la fila antes de convertir el monstruo en PNJ.
+  final String? originalMonsterName;
   final int currentHp;
   final int maxHp;
 
@@ -151,6 +154,7 @@ class Combatant {
     this.memberId,
     this.creatureId,
     this.npcId,
+    this.originalMonsterName,
     this.currentHp = 0,
     this.maxHp = 0,
     this.tags = const [],
@@ -181,6 +185,9 @@ class Combatant {
   /// estadísticas.
   bool get canChangeSide => kind != CombatantKind.player && !isStatless;
 
+  bool get isConvertedMonster =>
+      kind == CombatantKind.npc && creatureId != null && npcId != null;
+
   Combatant copyWith({
     int? currentHp,
     List<String>? tags,
@@ -189,6 +196,7 @@ class Combatant {
     CombatantKind? kind,
     String? name,
     String? npcId,
+    String? originalMonsterName,
     int? legendaryActionsSpent,
     int? legendaryResistancesSpent,
     CombatantAdvantage? advantage,
@@ -202,7 +210,10 @@ class Combatant {
         initiative: initiative ?? this.initiative,
         memberId: memberId,
         creatureId: creatureId,
-        npcId: npcId ?? this.npcId,
+        npcId: kind == CombatantKind.monster ? null : npcId ?? this.npcId,
+        originalMonsterName: kind == CombatantKind.monster
+            ? null
+            : originalMonsterName ?? this.originalMonsterName,
         currentHp: currentHp ?? this.currentHp,
         maxHp: maxHp,
         tags: tags ?? this.tags,
@@ -225,6 +236,8 @@ class Combatant {
         if (memberId != null) 'memberId': memberId,
         if (creatureId != null) 'creatureId': creatureId,
         if (npcId != null) 'npcId': npcId,
+        if (originalMonsterName != null)
+          'originalMonsterName': originalMonsterName,
         if (maxHp != 0) 'currentHp': currentHp,
         if (maxHp != 0) 'maxHp': maxHp,
         if (tags.isNotEmpty) 'tags': tags,
@@ -246,6 +259,7 @@ class Combatant {
         memberId: j['memberId'] as String?,
         creatureId: j['creatureId'] as String?,
         npcId: j['npcId'] as String?,
+        originalMonsterName: j['originalMonsterName'] as String?,
         currentHp: j['currentHp'] as int? ?? 0,
         maxHp: j['maxHp'] as int? ?? 0,
         side: CombatantSide.fromJson(j['side'] as String?),
@@ -742,6 +756,20 @@ class Encounter {
         ],
         stage: stage,
       );
+
+  /// Restaura en su lugar los monstruos convertidos cuyo PNJ se borró.
+  /// El nombre base sirve para conversiones anteriores a [Combatant.originalMonsterName].
+  Encounter restoreMonsters(Map<String, String?> deletedNpcs) {
+    var next = this;
+    for (final c in combatants) {
+      if (!c.isConvertedMonster || !deletedNpcs.containsKey(c.npcId)) continue;
+      next = next.withReplaced(c.copyWith(
+        kind: CombatantKind.monster,
+        name: c.originalMonsterName ?? deletedNpcs[c.npcId] ?? c.name,
+      ));
+    }
+    return next;
+  }
 
   /// Cuántos quedan en pie de cada lado, cruzando las dos fuentes de PG: los
   /// de los monstruos y PNJ, que están acá, y los de los jugadores, que viven

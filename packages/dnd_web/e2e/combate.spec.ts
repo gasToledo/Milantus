@@ -106,7 +106,7 @@ test('el combate es del DM: otra cuenta recibe el mismo 404 que ante lo inexiste
   for (const secreto of SOLO_DEL_DM) await expect(page.getByText(secreto)).toHaveCount(0);
 });
 
-test('el DM arma, juega, convierte un monstruo en PNJ y termina el combate', async ({ context, page, baseURL }) => {
+test('el DM convierte un monstruo en PNJ, lo recupera al borrarlo y termina el combate', async ({ context, page, baseURL }) => {
   const cookie = `dnd_session=${TOKEN_DM}`;
   await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);
   // Una campaña propia de la prueba: no toca el combate sembrado de la del cuervo.
@@ -215,11 +215,22 @@ test('el DM arma, juega, convierte un monstruo en PNJ y termina el combate', asy
   expect(npcId).toBeTruthy();
   await dialogo.getByRole('button', { name: t.retry, exact: true }).click();
   await expect(fila.getByText('Sable', { exact: true })).toBeVisible();
-  expect(convertido).toEqual({ ...antes, combatants: [{ ...original, name: 'Sable', kind: 'npc', npcId }] });
+  expect(convertido).toEqual({ ...antes, combatants: [{ ...original, name: 'Sable', kind: 'npc', npcId, originalMonsterName: original.name }] });
   const { npcs } = await api<{ npcs: { npc: { id: string; name: string } }[] }>(page.request, `/api/campaigns/${campaign.id}/npcs`, TOKEN_DM);
   expect(npcs.map(({ npc }) => [npc.id, npc.name])).toEqual([[npcId, 'Sable']]);
   const biblioteca = await api<{ npcs: { npc: { id: string; name: string } }[] }>(page.request, '/api/npcs', TOKEN_DM);
   expect(biblioteca.npcs.filter(({ npc }) => npc.name === 'Sable').map(({ npc }) => npc.id)).toEqual([npcId]);
+
+  await page.getByRole('link', { name: t.dmSectionNpcs, exact: true }).click();
+  await page.locator(`[data-npc="${npcId}"]`).getByRole('link').getByText('Sable', { exact: true }).click();
+  await page.getByRole('button', { name: t.npcMoreActions, exact: true }).click();
+  await page.getByRole('menuitem', { name: t.npcDelete, exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: t.npcDelete, exact: true }).click();
+  await expect(page).toHaveURL(`${baseURL}/v2/dm/pnj`);
+  await page.locator(`a[href="/v2/dm/campanas/${campaign.id}/mesa"]`).click();
+  await page.getByRole('link', { name: t.dmSectionCombat, exact: true }).click();
+  await expect(fila.getByText(original.name, { exact: true })).toBeVisible();
+  expect((await api<{ encounter: Combate }>(page.request, ruta, TOKEN_DM)).encounter).toEqual(antes);
 
   await page.locator('[data-action="finish-combat"]').click();
   await page.getByRole('button', { name: t.encFinishAndSave, exact: true }).click();

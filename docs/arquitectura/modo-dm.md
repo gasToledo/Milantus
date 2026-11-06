@@ -323,6 +323,9 @@ bloquea el encuentro de la cuenta mientras crea el PNJ, lo vincula y guarda
 la fila convertida. Si se reintenta sobre la misma fila ya convertida,
 devuelve el mismo PNJ. El id del encuentro evita aplicar el reintento al
 siguiente combate. React confirma lo pendiente de la cola antes del `PUT`.
+Si se borra ese PNJ de la biblioteca durante un combate, la fila vuelve a ser
+un monstruo con su estado de combate y el nombre que tenía antes de convertirse.
+Para conversiones viejas se usa el nombre del perfil base cuando está disponible.
 
 ### `turnFor`, la consulta que ve el jugador
 

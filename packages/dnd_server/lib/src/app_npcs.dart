@@ -267,6 +267,11 @@ Future<Response> _deleteNpcHandler(
   final deleted = await transactions.run((repositories) async {
     final existing = await repositories.npcs.find(request.userId, id);
     if (existing == null) return null;
+    await repositories.encounters.restoreMonsters(
+      request.userId,
+      id,
+      existing.npc.baseCreatureName,
+    );
     await repositories.npcs.delete(request.userId, id);
     final sheetId = existing.npc.characterId;
     if (sheetId != null) {

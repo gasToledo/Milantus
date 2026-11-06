@@ -21,6 +21,7 @@ import { Medallion } from '../../ui/Medallion';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Toast, Tooltip, type ToastTone } from '../../ui/primitives';
 import { AppBusyLabel, AppErrorView, Notice } from '../../ui/status';
 import { Abbr } from '../MemberCard';
+import { flushEncounterSave } from '../combat/encounterWriter';
 import { useNpcLinks } from './links';
 import { NpcTableView } from './NpcTableView';
 import { NpcStatusSelector } from './NpcStatusSelector';
@@ -119,6 +120,17 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
   const { npc } = view;
   const inCampaigns = stored.data.campaigns;
   const remove = async () => {
+    const encounters = {
+      queryKey: queryKeys.dmCampaigns,
+      predicate: ({ queryKey }: { queryKey: readonly unknown[] }) => queryKey[3] === 'encounter',
+    };
+    // El último guardado de la planilla tiene que llegar antes del borrado
+    // para que se conserven los PG y efectos al restaurar al monstruo.
+    const cached = client.getQueriesData<{ combatants?: { npcId?: string; creatureId?: string }[] }>(encounters);
+    await Promise.all(cached.flatMap(([key, doc]) =>
+      typeof key[2] === 'string' && doc?.combatants?.some((row) => row.npcId === npc.id && row.creatureId)
+        ? [flushEncounterSave(key[2])]
+        : []));
     await dropNpcSave(npc.id);
     // El `upsert` del servidor inserta sin `kind` si la fila no existe: un
     // guardado de la ficha que llegara después de borrar recrearía el
@@ -134,6 +146,7 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
     client.removeQueries({ queryKey: queryKeys.npc(npc.id) });
     await Promise.all([
       client.invalidateQueries({ queryKey: queryKeys.npcs, exact: true }),
+      client.invalidateQueries(encounters),
       ...inCampaigns.map((l) => client.invalidateQueries({ queryKey: queryKeys.campaignNpcs(l.campaignId) })),
     ]);
   };

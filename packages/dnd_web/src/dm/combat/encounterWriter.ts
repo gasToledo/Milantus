@@ -16,6 +16,7 @@ const pendingOpens = new Map<string, string>();
 const converting = new Set<string>();
 
 export const retryEncounterSave = (campaignId: string): void => queue.retry(campaignId);
+export const flushEncounterSave = (campaignId: string): Promise<void> => queue.flush(campaignId);
 
 export function useEncounterWriter(
   campaignId: string,

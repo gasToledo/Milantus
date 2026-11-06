@@ -1437,9 +1437,9 @@ Los personajes que los jugadores le compartieron se sueltan, y sus fichas siguen
   npcDelete: 'Borrar PNJ',
   npcDeleteTitle: (name: string) => `Borrar a ${name}`,
   npcDeleteBodyLibrary:
-    'Se borra de tu biblioteca, con su ficha, su trasfondo, sus notas y sus retratos. No se puede deshacer.\n\nLas batallas pasadas lo siguen nombrando en el Cuaderno. Si está en un combate abierto, su fila queda con el nombre y sin perfil.',
+    'Se borra de tu biblioteca, con su ficha, su trasfondo, sus notas y sus retratos. No se puede deshacer.\n\nLas batallas pasadas lo siguen nombrando en el Cuaderno. Si lo convertiste desde un monstruo en un combate abierto, esa fila vuelve a ser un monstruo. Los demás PNJ quedan en su fila sin perfil.',
   npcDeleteBodyCampaigns: (campaigns: string) =>
-    `Se borra de tu biblioteca y de ${campaigns}, con su ficha, su trasfondo, sus notas y sus retratos. No se puede deshacer.\n\nLas batallas pasadas lo siguen nombrando en el Cuaderno. Si está en un combate abierto, su fila queda con el nombre y sin perfil.\n\n¿Solo querés sacarlo de una campaña? Usá «Quitar de esta campaña» desde la lista de PNJ de esa campaña.`,
+    `Se borra de tu biblioteca y de ${campaigns}, con su ficha, su trasfondo, sus notas y sus retratos. No se puede deshacer.\n\nLas batallas pasadas lo siguen nombrando en el Cuaderno. Si lo convertiste desde un monstruo en un combate abierto, esa fila vuelve a ser un monstruo. Los demás PNJ quedan en su fila sin perfil.\n\n¿Solo querés sacarlo de una campaña? Usá «Quitar de esta campaña» desde la lista de PNJ de esa campaña.`,
   npcDeleteFailed: 'No se pudo borrar el PNJ.',
   npcAddToCampaign: 'Sumar a una campaña',
   npcInAllCampaigns: 'Ya está en todas tus campañas.',
@@ -3433,9 +3433,9 @@ The characters players shared with it are released, and their sheets remain thei
   npcDelete: 'Delete NPC',
   npcDeleteTitle: (name: string) => `Delete ${name}`,
   npcDeleteBodyLibrary:
-    'It is deleted from your library, along with its sheet, background, notes and portraits. This cannot be undone.\n\nPast battles still name it in the Notebook. If it is in an open combat, its row keeps the name but has no profile.',
+    'It is deleted from your library, along with its sheet, background, notes and portraits. This cannot be undone.\n\nPast battles still name it in the Notebook. If it was converted from a monster in an open combat, that row becomes a monster again. Other NPCs stay in their row without a profile.',
   npcDeleteBodyCampaigns: (campaigns: string) =>
-    `It is deleted from your library and from ${campaigns}, along with its sheet, background, notes and portraits. This cannot be undone.\n\nPast battles still name it in the Notebook. If it is in an open combat, its row keeps the name but has no profile.\n\nJust want to take it out of a campaign? Use “Remove from this campaign” from that campaign’s NPC list.`,
+    `It is deleted from your library and from ${campaigns}, along with its sheet, background, notes and portraits. This cannot be undone.\n\nPast battles still name it in the Notebook. If it was converted from a monster in an open combat, that row becomes a monster again. Other NPCs stay in their row without a profile.\n\nJust want to take it out of a campaign? Use “Remove from this campaign” from that campaign’s NPC list.`,
   npcDeleteFailed: 'The NPC could not be deleted.',
   npcAddToCampaign: 'Add to a campaign',
   npcInAllCampaigns: 'It is already in all your campaigns.',

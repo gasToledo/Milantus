@@ -733,6 +733,7 @@ void main() {
           ...monster.toJson(),
           'kind': 'npc',
           'npcId': npcId,
+          'originalMonsterName': monster.name,
         });
         final stored = (await npcs.listForDm(owner)).single;
         expect(stored.npc.block?.toJson(), bandit.toJson());
@@ -742,6 +743,49 @@ void main() {
         );
         expect((await convert(dm)).body, converted.body);
         expect(await npcs.listForDm(owner), hasLength(1));
+
+        // Una fila de una conversión vieja conserva el perfil de origen,
+        // aunque todavía no guardaba el nombre original de la fila.
+        await createCampaign(dm, 'otra');
+        final legacy = Encounter(
+          id: 'viejo',
+          combatants: [
+            monster.copyWith(
+              kind: CombatantKind.npc,
+              name: 'Sable',
+              npcId: npcId,
+            ),
+          ],
+        );
+        await encounters.save(owner, 'otra', legacy);
+        final deleted = await send('DELETE', '/api/npcs/$npcId', token: dm);
+        expect(deleted.status, 200);
+        expect(
+          (await encounters.find(owner, 'mesa'))?.toJson(),
+          encounter.toJson(),
+        );
+        expect(
+          (await encounters.find(owner, 'otra'))?.combatants.single.toJson(),
+          {...monster.toJson(), 'name': bandit.name},
+        );
+        expect(await npcs.listForDm(owner), isEmpty);
+
+        // La lectura repara lo que quedó colgado antes del arreglo y un
+        // guardado viejo no puede volver a dejar la fila como PNJ.
+        const activePath = '/api/campaigns/mesa/encounter';
+        await encounters.save(owner, 'mesa', updated);
+        final read = await send('GET', activePath, token: dm);
+        expect(decode(read.body)['encounter'], encounter.toJson());
+        await send(
+          'PUT',
+          activePath,
+          token: dm,
+          body: {'encounter': updated.toJson()},
+        );
+        expect(
+          (await encounters.find(owner, 'mesa'))?.toJson(),
+          encounter.toJson(),
+        );
 
         await encounters.discard(owner, 'mesa');
         await encounters.save(
@@ -754,7 +798,7 @@ void main() {
           (await encounters.find(owner, 'mesa'))?.combatants.single.kind,
           CombatantKind.monster,
         );
-        expect(await npcs.listForDm(owner), hasLength(1));
+        expect(await npcs.listForDm(owner), isEmpty);
       },
     );
 

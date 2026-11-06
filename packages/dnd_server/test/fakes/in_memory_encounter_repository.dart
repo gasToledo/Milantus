@@ -76,6 +76,19 @@ class InMemoryEncounterRepository implements EncounterRepository {
   }
 
   @override
+  Future<void> restoreMonsters(
+    String dmUserId,
+    String npcId,
+    String? baseName,
+  ) async {
+    _byCampaign.updateAll(
+      (key, encounter) => key.startsWith('$dmUserId|')
+          ? encounter.restoreMonsters({npcId: baseName})
+          : encounter,
+    );
+  }
+
+  @override
   Future<void> close(
     String dmUserId,
     String campaignId,

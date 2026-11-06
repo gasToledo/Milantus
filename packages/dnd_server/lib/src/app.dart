@@ -301,13 +301,14 @@ Handler buildHandler({
     ..get(
       '/api/campaigns/<id>/encounter',
       authenticated(
-        (request) => _getEncounterHandler(request, campaigns, encounters),
+        (request) => _getEncounterHandler(request, campaigns, encounters, npcs),
       ),
     )
     ..put(
       '/api/campaigns/<id>/encounter',
       authenticated(
-        (request) => _saveEncounterHandler(request, campaigns, encounters),
+        (request) =>
+            _saveEncounterHandler(request, campaigns, encounters, npcs),
       ),
     )
     ..delete(
@@ -1845,6 +1846,7 @@ Future<Response> _getEncounterHandler(
   Request request,
   CampaignRepository campaigns,
   EncounterRepository encounters,
+  NpcRepository npcs,
 ) async {
   final campaignId = requireSafePathSegment(
     request.params['id']!,
@@ -1855,7 +1857,28 @@ Future<Response> _getEncounterHandler(
   }
   final encounter = await encounters.find(request.userId, campaignId);
   if (encounter == null) return _notFound('no_active_combat');
-  return _jsonOk({'encounter': encounter.toJson()});
+  final current = await _restoreDeletedMonsters(
+    encounter,
+    npcs,
+    request.userId,
+  );
+  return _jsonOk({'encounter': current.toJson()});
+}
+
+/// Las conversiones viejas y las pestañas desfasadas pueden seguir llevando
+/// la referencia a un PNJ que ya se borró.
+Future<Encounter> _restoreDeletedMonsters(
+  Encounter encounter,
+  NpcRepository npcs,
+  String dmUserId,
+) async {
+  final converted = {
+    for (final c in encounter.combatants)
+      if (c.isConvertedMonster) c.npcId!,
+  };
+  if (converted.isEmpty) return encounter;
+  final missing = converted.difference(await npcs.existingIds(dmUserId));
+  return encounter.restoreMonsters({for (final id in missing) id: null});
 }
 
 /// Guarda el combate entero. El cliente del DM es dueño del estado; acá solo
@@ -1864,6 +1887,7 @@ Future<Response> _saveEncounterHandler(
   Request request,
   CampaignRepository campaigns,
   EncounterRepository encounters,
+  NpcRepository npcs,
 ) async {
   final campaignId = requireSafePathSegment(
     request.params['id']!,
@@ -1885,7 +1909,12 @@ Future<Response> _saveEncounterHandler(
   } catch (error) {
     throw FormatException('Encuentro inválido: $error');
   }
-  await encounters.save(request.userId, campaignId, encounter);
+  final current = await _restoreDeletedMonsters(
+    encounter,
+    npcs,
+    request.userId,
+  );
+  await encounters.save(request.userId, campaignId, current);
   return _jsonOk({'status': 'ok'});
 }
 
@@ -1927,12 +1956,17 @@ Future<Response> _endEncounterHandler(
   };
 
   await transactions.run<void>((repositories) async {
-    final encounter = await repositories.encounters.find(
+    final stored = await repositories.encounters.find(
       request.userId,
       campaignId,
       forUpdate: true,
     );
-    if (encounter == null) return;
+    if (stored == null) return;
+    final encounter = await _restoreDeletedMonsters(
+      stored,
+      repositories.npcs,
+      request.userId,
+    );
     // El capítulo lo resuelve el servidor y no lo manda el cliente: el DM
     // cierra un combate, no elige dónde archivarlo.
     final active = (await repositories.chapters.listFor(
