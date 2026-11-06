@@ -113,6 +113,17 @@ export function retrySave(id: string): void {
  *  pantalla antes de releer, porque releer antes traería la copia vieja. */
 export const flushSave = (id: string): Promise<void> => flush(id);
 
+/** Una transferencia lee del servidor: espera también el PUT que ya salió. */
+export async function flushCharacterWrites(ids: Iterable<string> = entries.keys()): Promise<void> {
+  await Promise.all(Array.from(ids, async (id) => {
+    const entry = entries.get(id);
+    if (!entry) return;
+    await flush(id);
+    await entry.inflight;
+    if (entry.pending) throw new Error('La ficha tiene cambios sin guardar');
+  }));
+}
+
 export function saveStateOf(id: string): SaveState {
   const e = entries.get(id);
   if (!e) return 'saved';

@@ -1,4 +1,4 @@
-import { EllipsisVertical, Pencil, RotateCcw, Star, Trash2 } from 'lucide-react';
+import { Download, EllipsisVertical, Pencil, RotateCcw, Star, Trash2 } from 'lucide-react';
 import { useTexts } from '../i18n/context';
 import { characterHref, Link } from '../router';
 import { signed } from '../sheet/format';
@@ -34,6 +34,8 @@ export function RosterCard({
   onToggleFavorite,
   onRename,
   onRebuild,
+  onExport,
+  exporting,
   onDelete,
   reorder,
 }: {
@@ -42,6 +44,8 @@ export function RosterCard({
   onToggleFavorite: () => void;
   onRename: () => void;
   onRebuild: () => void;
+  onExport: () => void;
+  exporting: boolean;
   onDelete: () => void;
   /** Sin esto la tarjeta no se puede mover: el favorito, o la lista filtrada. */
   reorder?: CardReorder;
@@ -140,6 +144,10 @@ export function RosterCard({
             <DropdownMenuItem onSelect={onRebuild}>
               <RotateCcw size={15} aria-hidden="true" className="text-text-muted" />
               {t.cardRebuild}
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={onExport} disabled={exporting}>
+              <Download size={15} aria-hidden="true" className="text-text-muted" />
+              {t.transferExportCharacter}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={onDelete} className="text-crimson">

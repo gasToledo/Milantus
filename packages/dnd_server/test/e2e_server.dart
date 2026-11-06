@@ -90,6 +90,8 @@ const smokeNoV2UserId = 'cuenta-sin-v2';
 const writerToken = 'sesion-de-escritura=';
 const writerUserId = 'cuenta-de-escritura';
 const writerCharacterId = 'ilse-de-humo';
+const transferToken = 'sesion-de-transferencia=';
+const transferUserId = 'cuenta-de-transferencia';
 
 Future<void> main() async {
   final root = Platform.environment['DND_WEB_V2_ROOT'] ?? '';
@@ -124,6 +126,11 @@ Future<void> main() async {
   auth.profilesByToken[smokeNoV2Token] = const SessionProfile(
     name: 'Sin Humo',
     email: 'sin-v2@example.org',
+  );
+  auth.sessionsByToken[transferToken] = transferUserId;
+  auth.profilesByToken[transferToken] = const SessionProfile(
+    name: 'Transferencia de Humo',
+    email: 'transferencia@example.org',
   );
 
   // Un retrato de Elsbeth, para los medallones de /v2: su ficha lo pide con
@@ -722,8 +729,21 @@ Future<void> main() async {
     generation: PortraitGenerationService([
       FakePortraitProvider(id: 'pollinations', name: 'Pollinations'),
     ]),
-    importBackup: ({required userId, required bundle}) async =>
-        const ImportResult(charactersImported: 0, portraitsImported: 0),
+    importBackup: ({required userId, required bundle}) async {
+      final prepared = await prepareImport(
+        portraits: portraits,
+        userId: userId,
+        bundle: bundle,
+        existingIds: await characters.existingIds(userId),
+      );
+      for (final character in prepared.characters) {
+        await characters.upsert(userId, character);
+      }
+      return ImportResult(
+        charactersImported: prepared.characters.length,
+        portraitsImported: prepared.portraitsImported,
+      );
+    },
     importHomebrew: ({required userId, required content}) async => 0,
     characters: characters,
     campaigns: campaigns,
@@ -749,7 +769,7 @@ Future<void> main() async {
     settings: settings,
     webV2Handler: v2,
     // El DM también: el Modo DM de /v2 es de las cuentas con `webV2`.
-    v2Users: {smokeUserId, _smokeDmId, writerUserId},
+    v2Users: {smokeUserId, _smokeDmId, writerUserId, transferUserId},
   );
 
   final server = await shelf_io.serve(

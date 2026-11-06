@@ -2,25 +2,17 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
+import 'package:dnd_engine/backup_export.dart' as exporter;
+import 'package:dnd_engine/backup_export.dart'
+    show BackupScope, portableCredentialKeys;
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:path/path.dart' as p;
 
 import '../util/safe_path.dart';
 import 'homebrew_content.dart';
 
-/// Puerto del lado de lectura de `BackupBundleCodec`: el cliente Web exporta y
-/// el servidor importa (ver capacidad `account-data-import`). No se porta
-/// `encode()` porque el servidor nunca produce un ZIP de respaldo.
-enum BackupScope { character, full }
-
-/// Nombres de credencial que nunca pueden viajar en un respaldo. Incluye las de
-/// proveedores retirados: un `settings.json` viejo todavía puede tenerlas.
-const portableCredentialKeys = {
-  'geminiApiKey',
-  'huggingFaceToken',
-  'azureApiKey',
-  'azureOpenAiApiKey',
-};
+export 'package:dnd_engine/backup_export.dart'
+    show BackupScope, portableCredentialKeys;
 
 class BundlePortrait {
   final String fileName;
@@ -93,13 +85,13 @@ class BackupBundle {
 }
 
 class BackupBundleCodec {
-  static const type = 'dnd_bundle';
+  static const type = exporter.BackupBundleCodec.type;
 
   /// La 3 suma las imágenes del Diario.
-  static const formatVersion = 3;
-  static const maxArchiveBytes = 256 * 1024 * 1024;
-  static const maxEntryBytes = 32 * 1024 * 1024;
-  static const maxJsonBytes = 8 * 1024 * 1024;
+  static const formatVersion = exporter.BackupBundleCodec.formatVersion;
+  static const maxArchiveBytes = exporter.BackupBundleCodec.maxArchiveBytes;
+  static const maxEntryBytes = exporter.BackupBundleCodec.maxEntryBytes;
+  static const maxJsonBytes = exporter.BackupBundleCodec.maxJsonBytes;
 
   /// Decodifica y valida un respaldo ZIP. Una versión de formato futura, una
   /// ruta interna que intenta escapar, o cualquier otra inconsistencia se

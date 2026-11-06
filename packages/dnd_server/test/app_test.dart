@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
+import 'package:dnd_engine/dnd_engine.dart';
 import 'package:dnd_server/src/app.dart';
 import 'package:dnd_server/src/auth/oidc_service.dart';
 import 'package:dnd_server/src/web/web_v2.dart';
@@ -12,6 +13,7 @@ import 'package:test/test.dart';
 
 import 'package:dnd_server/src/ai/portrait_generation_service.dart';
 import 'package:dnd_server/src/ai/portrait_provider.dart';
+import 'package:dnd_server/src/import/backup_bundle.dart';
 import 'package:dnd_server/src/import/homebrew_content.dart';
 import 'package:dnd_server/src/import/import_service.dart';
 
@@ -1048,6 +1050,106 @@ void main() {
 
       expect(response.statusCode, 200);
     });
+  });
+
+  group('GET /api/export', () {
+    test(
+      'exporta solo datos de la cuenta y los ZIP pasan el lector de importación',
+      () async {
+        fakeAuth.sessionsByToken['export-token'] = 'export-owner';
+        final image = img.encodePng(img.Image(width: 1, height: 1));
+        final portraitKey = await portraits.save(
+          userId: 'export-owner',
+          characterId: 'sagan',
+          bytes: image,
+        );
+        final diaryKey = await portraits.save(
+          userId: 'export-owner',
+          characterId: 'sagan',
+          bytes: image,
+        );
+        await characters.create(
+          'export-owner',
+          Character.fromJson(
+            demoSagan().toJson()..['raceId'] = 'hb-especie',
+          ).copyWith(
+            portraitPaths: [portraitKey],
+            diary: [
+              DiaryEntry(
+                entryId: 'mapa',
+                kind: DiaryEntryKind.image,
+                imageKey: diaryKey,
+              ),
+            ],
+          ),
+        );
+        await characters.create(
+          'other-owner',
+          Character.fromJson(demoSagan().toJson()..['id'] = 'ajeno'),
+        );
+        await characters.createNpcSheet(
+          'export-owner',
+          Character.fromJson(demoSagan().toJson()..['id'] = 'solo-pnj'),
+        );
+        await homebrewRepo.upsert('export-owner', 'races', 'hb-especie', {
+          'id': 'hb-especie',
+          'name': 'Especie propia',
+          'source': 'homebrew',
+        });
+        await homebrewRepo.upsert(
+          'export-owner',
+          'weapons',
+          'hb-espada',
+          _homebrewWeapon('hb-espada'),
+        );
+        await settingsRepo.save('export-owner', {
+          'themeMode': 'light',
+          'azureApiKey': 'privada',
+        });
+
+        Future<Response> export([
+          String query = '',
+          bool authenticated = true,
+        ]) async => handler(
+          Request(
+            'GET',
+            Uri.parse('http://localhost/api/export$query'),
+            headers: {if (authenticated) 'cookie': 'dnd_session=export-token'},
+          ),
+        );
+        expect((await export('', false)).statusCode, 401);
+        expect((await export('?characterId=ajeno')).statusCode, 404);
+        expect((await export('?characterId=solo-pnj')).statusCode, 404);
+
+        final single = await export('?characterId=sagan');
+        expect(single.statusCode, 200);
+        expect(single.headers['content-type'], 'application/zip');
+        expect(single.headers['cache-control'], contains('no-store'));
+        final bundle = BackupBundleCodec.decode(
+          await single.read().expand((chunk) => chunk).toList(),
+        );
+        expect(bundle.scope, BackupScope.character);
+        expect(bundle.preferences, isNull);
+        expect(bundle.homebrew!['races']!.single['id'], 'hb-especie');
+        expect(bundle.homebrew!['weapons'], isEmpty);
+        final sheet = bundle.characters.single;
+        expect(sheet.character.id, 'sagan');
+        expect(sheet.portraits.single.bytes, image);
+        expect(sheet.diaryImages.single.entryId, 'mapa');
+        expect(sheet.diaryImages.single.bytes, image);
+
+        final complete = await export();
+        expect(complete.statusCode, 200);
+        final backup = BackupBundleCodec.decode(
+          await complete.read().expand((chunk) => chunk).toList(),
+        );
+        expect(backup.scope, BackupScope.full);
+        expect(backup.characters.single.character.id, 'sagan');
+        expect(backup.homebrew!['races']!.single['id'], 'hb-especie');
+        expect(backup.homebrew!['weapons']!.single['id'], 'hb-espada');
+        expect(backup.preferences, {'themeMode': 'light'});
+      },
+    );
   });
 
   group('POST /api/import', () {

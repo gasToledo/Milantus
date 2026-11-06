@@ -1,10 +1,11 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { ChevronDown, Plus, X } from 'lucide-react';
-import { dropPending } from '../api/characterSave';
+import { ArrowDownUp, ChevronDown, Download, Plus, Upload, X } from 'lucide-react';
+import { dropPending, flushCharacterWrites } from '../api/characterSave';
 import { createCharacter, deleteCharacter, saveCharacter, type RosterSettings, type StoredCharacter } from '../api/client';
 import { queryKeys, useRoster, useRosterSettings, useSheetCatalog } from '../api/queries';
-import { patchSettings } from '../api/settingsSave';
+import { patchSettings, waitForSettingsWrites } from '../api/settingsSave';
+import { downloadBackup } from '../api/transfer';
 import { actOn, demoCharacter, migrateCharacter, type CharacterJson } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import { characterHref, creationHref, navigate, rebuildHref } from '../router';
@@ -14,6 +15,7 @@ import { SectionRule } from '../ui/data';
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
@@ -23,6 +25,7 @@ import {
 import { useHoldDrag } from '../ui/holdDrag';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { DeleteDialog } from './DeleteDialog';
+import { ImportBackupDialog } from './ImportBackupDialog';
 import { RenameDialog } from './RenameDialog';
 import { RosterCard } from './RosterCard';
 import {
@@ -52,9 +55,10 @@ export function DashboardPage() {
   const catalog = useSheetCatalog(lang);
   const [query, setQuery] = useState('');
   const client = useQueryClient();
-  const [toast, setToast] = useState<{ key: number; message: string } | null>(null);
-  const showError = useCallback(
-    (message: string) => setToast((prev) => ({ key: (prev?.key ?? 0) + 1, message })),
+  const [toast, setToast] = useState<{ key: number; message: string; tone: 'error' | 'success' } | null>(null);
+  const showToast = useCallback(
+    (message: string, tone: 'error' | 'success' = 'error') =>
+      setToast((prev) => ({ key: (prev?.key ?? 0) + 1, message, tone })),
     [],
   );
 
@@ -68,10 +72,10 @@ export function DashboardPage() {
       try {
         await patchSettings(patch);
       } catch {
-        showError(t.sortSaveError);
+        showToast(t.sortSaveError);
       }
     },
-    [client, showError, t],
+    [client, showToast, t],
   );
 
   // Cada ficha se calcula una vez por lista y catálogo, no en cada tecla del
@@ -111,7 +115,22 @@ export function DashboardPage() {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [rebuilding, setRebuilding] = useState<string | null>(null);
   const [creatingExample, setCreatingExample] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const titleRef = useRef<HTMLHeadingElement>(null);
+
+  const exportZip = async (id?: string) => {
+    setExporting(true);
+    try {
+      await flushCharacterWrites(id === undefined ? entries?.map(({ character }) => character.id) : [id]);
+      if (id === undefined) await waitForSettingsWrites();
+      await downloadBackup(id);
+    } catch {
+      showToast(t.transferExportError);
+    } finally {
+      setExporting(false);
+    }
+  };
 
   type Doc = CharacterJson & { id: string };
   const replaceInRoster = async (update: (list: StoredCharacter[]) => StoredCharacter[]) => {
@@ -150,7 +169,7 @@ export function DashboardPage() {
       await client.invalidateQueries({ queryKey: queryKeys.roster });
       navigate(characterHref(id));
     } catch {
-      showError(t.rosterExampleError);
+      showToast(t.rosterExampleError);
       setCreatingExample(false);
     }
   };
@@ -216,6 +235,8 @@ export function DashboardPage() {
                   onToggleFavorite={() => void saveSettings({ favoriteCharacterId: favorite ? null : id })}
                   onRename={() => setRenaming(id)}
                   onRebuild={() => setRebuilding(id)}
+                  onExport={() => void exportZip(id)}
+                  exporting={exporting}
                   onDelete={() => setDeleting(id)}
                   reorder={
                     canMove && !favorite
@@ -309,6 +330,23 @@ export function DashboardPage() {
               </DropdownMenu>
             </div>
           )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button icon={ArrowDownUp} tone="secondary" shape="pill" disabled={exporting}>
+                {exporting ? t.transferExporting : t.transferTitle}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => setImporting(true)}>
+                <Upload size={15} aria-hidden="true" />
+                {t.transferImport}
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => void exportZip()}>
+                <Download size={15} aria-hidden="true" />
+                {t.transferExportBackup}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <ButtonLink href={creationHref()} internal icon={Plus} tone="soft" shape="pill">
             {t.rosterCreate}
           </ButtonLink>
@@ -316,6 +354,9 @@ export function DashboardPage() {
         <SectionRule className="my-0" />
         {body}
       </div>
+      {importing && (
+        <ImportBackupDialog onClose={() => setImporting(false)} onImported={(message) => showToast(message, 'success')} />
+      )}
       {renaming && entryById.get(renaming) && (
         <RenameDialog
           current={entryById.get(renaming)!.character.name}
@@ -344,7 +385,7 @@ export function DashboardPage() {
         </AppDialog>
       )}
       {toast && (
-        <Toast key={toast.key} tone="error" message={toast.message} open onOpenChange={(open) => !open && setToast(null)} />
+        <Toast key={toast.key} tone={toast.tone} message={toast.message} open onOpenChange={(open) => !open && setToast(null)} />
       )}
     </>
   );

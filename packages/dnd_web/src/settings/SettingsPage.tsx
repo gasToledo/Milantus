@@ -1,31 +1,19 @@
-import { ExternalLink, Globe, Palette } from 'lucide-react';
-import { useRoster, useRosterSettings } from '../api/queries';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Globe, Palette } from 'lucide-react';
+import type { RosterSettings } from '../api/client';
+import { queryKeys, useRoster, useRosterSettings } from '../api/queries';
+import { patchSettings } from '../api/settingsSave';
 import { useLang, useTexts } from '../i18n/context';
 import { storeLang, type Lang } from '../i18n/texts';
 import { parseSortMode } from '../dashboard/roster';
-import { FLUTTER_HOME } from '../router';
-import { useTheme, type ThemeMode } from '../theme/theme';
-import { ButtonLink } from '../ui/Button';
+import { isThemeMode, useTheme } from '../theme/theme';
 import { Card } from '../ui/Card';
 import { SectionRule } from '../ui/data';
-import { Select } from '../ui/primitives';
+import { Select, Switch } from '../ui/primitives';
 import { AppBusyLabel, AppErrorView } from '../ui/status';
 
-/**
- * Ajustes, en la medida en que React puede mostrarlos. Dos tarjetas, y la
- * diferencia entre ellas es lo único que hay que entender:
- *
- * - **En este navegador**: el tema y el idioma. Son preferencias locales
- *   (`localStorage`, con las mismas claves que Flutter), se cambian acá y no
- *   tocan ningún documento del servidor.
- * - **En tu cuenta**: lo que Flutter guarda en `/api/settings`. Se **lee y se
- *   muestra**; cambiarlo es una escritura y React todavía no escribe.
- *
- * Lo que Flutter ofrece además y acá no: mantener la pantalla encendida y
- * volver a mostrar los tutoriales (ambos actúan sobre funciones de Flutter),
- * la dificultad del encuentro (es del Modo DM) y el proveedor de retratos
- * (vive en la pantalla de retratos).
- */
+const THEME_MODES = ['dark', 'light', 'system'] as const;
+
 export function SettingsPage() {
   const t = useTexts();
   const settings = useRosterSettings();
@@ -52,15 +40,18 @@ export function SettingsPage() {
 function BrowserCard() {
   const t = useTexts();
   const lang = useLang();
-  const { mode, setMode } = useTheme();
+  const { browserMode, setMode } = useTheme();
   return (
     <Card id="settings-browser" title={t.settingsBrowserTitle} icon={Palette}>
       <div className="flex flex-col items-start gap-3">
         <Select
           label={t.themeLabel}
-          value={mode}
-          onValueChange={(v) => setMode(v as ThemeMode)}
-          options={(['dark', 'light', 'system'] as const).map((m) => ({ value: m, label: t.themeModes[m] }))}
+          value={browserMode ?? 'account'}
+          onValueChange={(v) => setMode(isThemeMode(v) ? v : null)}
+          options={[
+            { value: 'account', label: t.settingsUseAccountTheme },
+            ...THEME_MODES.map((m) => ({ value: m, label: t.themeModes[m] })),
+          ]}
         />
         <Select
           label={t.settingsLanguage}
@@ -77,21 +68,51 @@ function BrowserCard() {
   );
 }
 
-function AccountCard({ settings }: { settings: NonNullable<ReturnType<typeof useRosterSettings>['data']> }) {
+function AccountCard({ settings }: { settings: RosterSettings }) {
   const t = useTexts();
+  const client = useQueryClient();
+  const save = useMutation({
+    mutationFn: (patch: Pick<Partial<RosterSettings>, 'startsInDmMode' | 'themeMode' | 'showEncounterDifficulty'>) => patchSettings(patch),
+    onSuccess: async (_, patch) => {
+      await client.cancelQueries({ queryKey: queryKeys.rosterSettings });
+      client.setQueryData<RosterSettings>(queryKeys.rosterSettings, (current) => current && { ...current, ...patch });
+    },
+  });
   // El favorito se guarda por id: para nombrarlo hace falta la lista. Si
   // todavía no llegó (o falla), la fila dice «Ninguno» antes que un id crudo.
   const roster = useRoster();
   const name = roster.data?.find((c) => c.character.id === settings.favoriteCharacterId)?.character.name;
   const favorite = typeof name === 'string' ? name : undefined;
   const rows: [string, string, string][] = [
-    ['start-mode', t.settingsStartMode, settings.startsInDmMode ? t.settingsStartModes.dm : t.settingsStartModes.player],
     ['sort', t.sortLabel, t.sortModes[parseSortMode(settings.sortMode)]],
     ['favorite', t.favorite, favorite ?? t.settingsNoFavorite],
   ];
   return (
     <Card id="settings-account" title={t.settingsAccountTitle} icon={Globe}>
-      <dl className="flex flex-col">
+      <fieldset disabled={save.isPending} className="flex min-w-0 flex-col items-start gap-3">
+        <Select
+          label={t.settingsStartMode}
+          value={settings.startsInDmMode ? 'dm' : 'player'}
+          onValueChange={(value) => save.mutate({ startsInDmMode: value === 'dm' })}
+          options={(['player', 'dm'] as const).map((m) => ({ value: m, label: t.settingsStartModes[m] }))}
+        />
+        <Select
+          label={t.settingsAccountTheme}
+          value={isThemeMode(settings.themeMode) ? settings.themeMode : 'dark'}
+          onValueChange={(themeMode) => save.mutate({ themeMode })}
+          options={THEME_MODES.map((m) => ({ value: m, label: t.themeModes[m] }))}
+        />
+        <Switch
+          id="settings-encounter-difficulty"
+          label={t.settingsShowEncounterDifficulty}
+          checked={settings.showEncounterDifficulty}
+          onCheckedChange={(showEncounterDifficulty) => save.mutate({ showEncounterDifficulty })}
+        />
+      </fieldset>
+      {save.isPending && <p role="status" className="mt-2 text-[13px] text-text-muted">{t.settingsSaving}</p>}
+      {save.isSuccess && <p role="status" className="mt-2 text-[13px] text-verdant">{t.settingsSaved}</p>}
+      {save.isError && <p role="alert" className="mt-2 text-[13px] text-crimson">{t.settingsSaveError}</p>}
+      <dl className="mt-3 flex flex-col">
         {rows.map(([field, label, value]) => (
           <div
             key={field}
@@ -103,10 +124,6 @@ function AccountCard({ settings }: { settings: NonNullable<ReturnType<typeof use
           </div>
         ))}
       </dl>
-      {/* Cambiar esto es una escritura, y todavía vive en Flutter. */}
-      <ButtonLink href={FLUTTER_HOME} icon={ExternalLink} tone="secondary" className="mt-3">
-        {t.settingsChange}
-      </ButtonLink>
     </Card>
   );
 }

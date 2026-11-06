@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { createQueryClient, useAccount, useDmCampaigns, useThemeMode } from './api/queries';
+import { createQueryClient, useAccount, useDmCampaigns, useRosterSettings } from './api/queries';
 import type { Account } from './api/client';
 import { setEngineLanguage } from './engine';
 import { LangProvider, useTexts } from './i18n/context';
@@ -11,7 +11,7 @@ import { RebuildPage } from './creation/RebuildPage';
 import { RosterFooter, RosterPanel } from './dashboard/RosterPanel';
 import { DmPanel } from './dm/DmPanel';
 import { NpcCreationPage } from './dm/npcs/NpcCreationPage';
-import { useRoute } from './router';
+import { dmHref, navigate, rosterHref, useRoute } from './router';
 import { DmPage } from './dm/DmPage';
 import { CodexPage } from './codex/CodexPage';
 import { BestiaryPage } from './bestiary/BestiaryPage';
@@ -99,11 +99,11 @@ function Screen() {
  *  viewports fijos en la misma esquina se pisarían, y los de la cola
  *  (`PendingEvents`) tienen que compartir el lugar con los de las acciones. */
 function Enabled({ account }: { account: Account }) {
-  const themeMode = useThemeMode(true);
+  const themeMode = useRosterSettings().data?.themeMode;
   const { adoptAccountMode } = useTheme();
   useEffect(() => {
-    if (themeMode.data) adoptAccountMode(themeMode.data);
-  }, [themeMode.data, adoptAccountMode]);
+    if (themeMode !== undefined) adoptAccountMode(themeMode);
+  }, [themeMode, adoptAccountMode]);
 
   return (
     <ToastProvider>
@@ -119,6 +119,8 @@ function Routes({ account }: { account: Account }) {
   const { route } = useRoute();
 
   switch (route.name) {
+    case 'start':
+      return <StartPage />;
     case 'roster':
       return (
         <Shell panel={<RosterPanel current="roster" />} footer={<RosterFooter account={account} />}>
@@ -174,6 +176,18 @@ function Routes({ account }: { account: Account }) {
         </Shell>
       );
   }
+}
+
+function StartPage() {
+  const t = useTexts();
+  const settings = useRosterSettings();
+  const startsInDm = settings.data?.startsInDmMode === true;
+  const pending = settings.isPending;
+  useEffect(() => {
+    if (!pending) navigate(startsInDm ? dmHref() : rosterHref(), { replace: true });
+  }, [pending, startsInDm]);
+
+  return <AppBusyLabel label={t.settingsLoading} />;
 }
 
 /**

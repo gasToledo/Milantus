@@ -105,14 +105,13 @@ repiten acá.
 - Sesión: `/api/me`, con los estados cargando, sin sesión, error con
   «Reintentar» y no disponible. Una cuenta sin `webV2` no pide nada más a la
   API.
-- Tema: oscuro por defecto, con selector al pie del panel (y en Ajustes). Lo elegido en el
-  navegador (`localStorage`) gana sobre el `themeMode` de los ajustes de la
-  cuenta: el favorito y el orden sí se escriben desde 5f (`/api/settings`, ver
-  abajo), pero el tema no, y el del navegador sigue ganando.
+- Tema: oscuro por defecto. El selector al pie del panel cambia el tema de
+  este navegador (`localStorage`). En Ajustes se puede cambiar el tema de la
+  cuenta (`themeMode`) y quitar la preferencia local para usar el de la cuenta.
 - Idioma: español o inglés, resuelto una vez al cargar (clave `milantus.locale`
   de `localStorage`, luego `navigator.language`, luego español). Es el mismo
   criterio para los rótulos del motor.
-- **El dashboard** en `/v2/` (`src/dashboard/`) es la primera de las
+- **El dashboard** en `/v2/personajes` (`src/dashboard/`) es la primera de las
   pantallas de lectura, y desde 5f también escribe: la lista de personajes con
   el orden (`sortMode`: manual, más recientes, nombre, nivel, clase) y el
   favorito de los ajustes de la cuenta (`/api/settings`), buscador en el
@@ -197,12 +196,11 @@ repiten acá.
   (`localStorage`, las mismas claves que Flutter: `milantus.v2.theme` y
   `milantus.locale`) y se cambian ahí mismo; cambiar el idioma recarga la
   página, porque se resuelve una sola vez al cargar (también el del motor).
-  **En tu cuenta**: lo que Flutter guarda en `/api/settings` (con qué modo
-  abre, el orden de los personajes, el favorito), que **se lee y no se edita**;
-  un botón lleva a Flutter para cambiarlo. Quedan fuera lo que Flutter ofrece
-  y actúa sobre sus propias funciones (mantener la pantalla encendida, volver a
-  mostrar los tutoriales), la dificultad del encuentro (Modo DM) y el proveedor
-  de retratos (vive en la pantalla de retratos).
+  **En tu cuenta**: modo de inicio, tema y visibilidad de la dificultad del
+  encuentro, guardados con `patchSettings`. `/v2/` abre el modo elegido.
+  El orden y el favorito se muestran en Ajustes y se editan en la lista de
+  personajes. El proveedor se elige en Retratos. Pantalla encendida y reinicio
+  de los tutoriales quedan en Flutter.
 - **Campañas** en `/v2/campanas` (`src/campaigns/`), **sin enlace en el menú
   de Jugador** (es del Modo DM; ver abajo): las mesas en las que juega la cuenta, de todos sus personajes en
   una lista (cada una con «Con <personaje>», que lleva a la pestaña Campaña de
@@ -390,7 +388,7 @@ repiten acá.
   pedido aparte, antes de sumarlo. **Mientras se arma (6g3)** también se ve la
   **dificultad** (`DifficultyBand`, entre la placa y la planilla) y los **PX** de
   cada fila, si la preferencia de la cuenta lo permite (`showEncounterDifficulty`,
-  prendida por defecto; acá se lee y no se edita, editarla es del paso 7), y
+  prendida por defecto, se cambia en Ajustes), y
   «Tirar iniciativa» (`RollInitiativeDialog`, con las tiradas que propone el
   motor y sin dejar casilleros en blanco) lo **empieza** desde `/v2`. **6g4, ya en
   curso**: el DM pasa el turno («Siguiente turno»), daña y cura con la cifra
@@ -1003,9 +1001,28 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    reutiliza las acciones del motor y la cola de guardado del paso 5, pero
    guarda por `PUT /api/characters/:id`: `PUT /api/npcs/:id` solo escribe el
    documento del PNJ, y `_upsertCharacterHandler` ya acepta esa ficha.
-7. Homebrew, importación/exportación y el resto, entre ello escribir en
-   `/api/settings` (hasta entonces, el tema elegido en el navegador gana sobre
-   el de la cuenta). Opcional, sin equivalente en Flutter y sin diseñar todavía:
+7. Ajustes, transferencias y Homebrew:
+   - **7a · Ajustes de cuenta.** Modo de inicio, tema y dificultad del
+     encuentro desde React. La lista de personajes tiene una ruta propia para
+     volver a ella desde el Modo DM.
+   - **7b · Personajes y respaldos** *(existe)*. Importar y exportar desde Mis
+     personajes con los ZIP de Flutter (`dnd_bundle`). El menú de cada personaje ofrece
+     su descarga. «Transferir» agrupa importar un ZIP y descargar un respaldo
+     completo. Antes de exportar se espera el guardado de las fichas incluidas.
+     `GET /api/export` arma el ZIP con el mismo escritor Dart que usa Flutter.
+     Importar confirma el archivo y usa `POST /api/import`. Al terminar se
+     recargan personajes, catálogo y ajustes. Verificar el ida y vuelta con
+     Flutter, retratos, imágenes del diario, homebrew y ajustes portables,
+     además de que un ZIP inválido o en conflicto no deje una carga parcial.
+   - **7c · PNJ.** Importar y exportar desde la biblioteca y la campaña con los
+     ZIP de Flutter (`dnd_npc`). Las notas son optativas al exportar y el ZIP
+     excluye los vínculos y estados de campaña. Importar muestra la vista
+     previa y permite elegir una campaña. Verificar el bloque, la ficha, sus
+     imágenes y el homebrew asociado, más la conversión de un ZIP de personaje
+     en PNJ.
+   - **7d · Homebrew.** Gestión del catálogo propio y transferencia en JSON.
+
+   Opcional, sin equivalente en Flutter y sin diseñar todavía:
    acomodar las tarjetas de Combate y Personaje con un modo de edición, guardado
    en la cuenta y no en el personaje, porque es una preferencia de quien mira la
    ficha. Depende de escribir en `/api/settings`; antes hay que comprobar que un

@@ -94,6 +94,7 @@ export type DmView =
   | { kind: 'homebrew'; category: HomebrewCategory | null; entryId: string | null };
 
 export type Route =
+  | { name: 'start' }
   | { name: 'roster' }
   | { name: 'dm'; view: DmView }
   | { name: 'settings' }
@@ -127,17 +128,16 @@ export type Route =
  *  Códice, Ajustes, el Modo DM…): su raíz, que sirve el cliente de `/`. */
 export const FLUTTER_HOME = '/';
 
-/** `/v2/` (la lista) y `/v2/personajes/:id[/pestaña]`, con o sin barra final.
+/** `/v2/` (el inicio), `/v2/personajes` (la lista) y sus fichas, con o sin barra final.
  *  El prefijo lo pone Vite (`base`), y es el mismo con el que el servidor
  *  monta el build. */
 export function matchRoute(pathname: string): Route {
   const base = import.meta.env.BASE_URL; // `/v2/`
-  // `/v2` sin barra es la misma lista: nadie escribe la barra a mano.
-  if (pathname === base.slice(0, -1)) return { name: 'roster' };
+  if (pathname === base.slice(0, -1)) return { name: 'start' };
   if (!pathname.startsWith(base)) return { name: 'unknown' };
   const parts = pathname.slice(base.length).split('/').filter(Boolean);
   const [section, id, tab, ...rest] = parts;
-  if (parts.length === 0) return { name: 'roster' };
+  if (parts.length === 0) return { name: 'start' };
   if (section === 'dm') {
     // `/dm` y `/dm/campanas/:id/:seccion`; lo demás es «no encontrada».
     if (id === undefined) return { name: 'dm', view: { kind: 'home' } };
@@ -255,6 +255,7 @@ export function matchRoute(pathname: string): Route {
       return { name: 'unknown' };
     }
   }
+  if (section === 'personajes' && id === undefined) return { name: 'roster' };
   if (section === 'personajes' && id === 'nuevo' && tab === undefined) return { name: 'creation' };
   if (section === 'personajes' && id && tab === 'subir-nivel' && rest.length === 0) {
     try {
@@ -317,7 +318,7 @@ export function matchRoute(pathname: string): Route {
   return { name: 'unknown' };
 }
 
-export const rosterHref = (): string => import.meta.env.BASE_URL;
+export const rosterHref = (): string => `${import.meta.env.BASE_URL}personajes`;
 
 /** El Bestiario, o una criatura abierta. */
 export const bestiaryHref = (entryId?: string): string =>

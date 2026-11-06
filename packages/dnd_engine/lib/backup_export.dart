@@ -1,0 +1,214 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:archive/archive.dart';
+import 'dnd_engine.dart';
+
+enum BackupScope { character, full }
+
+/// Nombres de credencial que nunca pueden viajar en un respaldo. Incluye las de
+/// proveedores retirados: un settings.json viejo todavía puede tenerlas.
+const portableCredentialKeys = {
+  'geminiApiKey',
+  'huggingFaceToken',
+  'azureApiKey',
+  'azureOpenAiApiKey',
+};
+
+/// Segmento seguro para usar como nombre de archivo o directorio dentro del
+/// ZIP: la misma validación que ya usaba el cliente, ahora sin
+/// depender de `app_paths.dart` (que era filesystem-only).
+String requireSafePathSegment(String value, {String label = 'identificador'}) {
+  if (value.isEmpty ||
+      value == '.' ||
+      value == '..' ||
+      !RegExp(r'^[A-Za-z0-9._-]+$').hasMatch(value)) {
+    throw FormatException(
+      localized(
+        'El $label contiene caracteres no permitidos.',
+        'A name in the file contains characters that aren’t allowed.',
+      ),
+    );
+  }
+  return value;
+}
+
+/// Produce el ZIP de respaldo en memoria. La lectura y validación de ZIP
+/// ajenos corresponde al servidor, en `POST /api/import`.
+class BackupBundleCodec {
+  static const type = 'dnd_bundle';
+
+  /// La 3 suma las imágenes del Diario. Un respaldo viejo (2) se sigue
+  /// importando: el lector acepta versiones anteriores y solo rechaza las
+  /// futuras, igual que la migración de esquema de una ficha.
+  static const formatVersion = 3;
+  static const maxArchiveBytes = 256 * 1024 * 1024;
+  static const maxEntryBytes = 32 * 1024 * 1024;
+  static const maxJsonBytes = 8 * 1024 * 1024;
+
+  /// [readPortrait] resuelve los bytes de cada clave de retrato del
+  /// personaje; en el cliente web viene de una petición autenticada al
+  /// servidor (`ApiClient.fetchPortraitBytes`), no de disco — esa es la
+  /// única diferencia con la versión que usaba la aplicación de escritorio.
+  /// Una clave que ya no resuelve a nada (`null`) se omite en vez de fallar
+  /// todo el respaldo.
+  static Future<Uint8List> encode({
+    required BackupScope scope,
+    required List<Character> characters,
+    Map<String, List<Map<String, dynamic>>>? homebrew,
+    Map<String, dynamic>? preferences,
+    required Future<Uint8List?> Function(String portraitKey) readPortrait,
+  }) async {
+    final archive = Archive();
+    var totalSize = 0;
+    void add(ArchiveFile file, {int maxBytes = maxEntryBytes}) {
+      totalSize += file.size;
+      if (file.size > maxBytes || totalSize > maxArchiveBytes) {
+        throw FormatException(
+          localized(
+            'El respaldo supera el tamaño máximo.',
+            'The backup exceeds the maximum size.',
+          ),
+        );
+      }
+      archive.add(file);
+    }
+
+    final characterEntries = <Map<String, dynamic>>[];
+    final characterIds = <String>{};
+    final portablePreferences = Map<String, dynamic>.of(preferences ?? const {})
+      // Las credenciales nunca salen del equipo. Se listan por nombre, e
+      // incluyen las de proveedores ya retirados: un respaldo puede armarse a
+      // partir de un settings.json viejo que todavía las tenga.
+      ..removeWhere((key, _) => portableCredentialKeys.contains(key));
+
+    for (final character in characters) {
+      final id = requireSafePathSegment(character.id, label: 'id de personaje');
+      if (!characterIds.add(id)) {
+        throw FormatException(
+          localized(
+            'No se puede exportar dos veces el mismo personaje.',
+            'The same character can’t be exported twice.',
+          ),
+        );
+      }
+      final characterPath = 'characters/$id.json';
+      final portraitEntries = <String>[];
+
+      for (var i = 0; i < character.portraitPaths.length; i++) {
+        final bytes = await readPortrait(character.portraitPaths[i]);
+        if (bytes == null) continue;
+        if (bytes.length > maxEntryBytes) {
+          throw FormatException(
+            localized(
+              'Un retrato supera el tamaño máximo permitido.',
+              'A portrait exceeds the maximum allowed size.',
+            ),
+          );
+        }
+        final archivePath = 'portraits/$id/$i.png';
+        add(ArchiveFile.bytes(archivePath, bytes));
+        portraitEntries.add(archivePath);
+      }
+
+      // Las imágenes del Diario viajan aparte de los retratos porque no están
+      // en `portraitPaths` —una imagen del diario no es un retrato— y sin esto
+      // el respaldo se llevaba el texto de cada entrada y perdía la imagen.
+      //
+      // Van bajo la misma carpeta `portraits/<id>/` a propósito: el lector ya
+      // valida que nada se escape de ahí, y estrenar una segunda carpeta
+      // obligaría a duplicar esa comprobación.
+      final diaryEntries = <Map<String, String>>[];
+      for (final entry in character.diary) {
+        final imageKey = entry.imageKey;
+        if (entry.kind != DiaryEntryKind.image || imageKey == null) continue;
+        final bytes = await readPortrait(imageKey);
+        if (bytes == null) continue;
+        if (bytes.length > maxEntryBytes) {
+          throw FormatException(
+            localized(
+              'Una imagen del diario supera el tamaño máximo permitido.',
+              'A journal image exceeds the maximum allowed size.',
+            ),
+          );
+        }
+        final archivePath = 'portraits/$id/d${diaryEntries.length}.png';
+        add(ArchiveFile.bytes(archivePath, bytes));
+        diaryEntries.add({'entryId': entry.entryId, 'file': archivePath});
+      }
+
+      add(
+        ArchiveFile.string(
+          characterPath,
+          const JsonEncoder.withIndent('  ').convert(character.toJson()),
+        ),
+        maxBytes: maxJsonBytes,
+      );
+      characterEntries.add({
+        'id': id,
+        'file': characterPath,
+        'portraits': portraitEntries,
+        // Ausente cuando no hay ninguna: un personaje sin imágenes en el
+        // diario produce el mismo manifiesto que antes de que esto existiera.
+        if (diaryEntries.isNotEmpty) 'diary': diaryEntries,
+      });
+    }
+
+    // Un personaje lleva solo el homebrew que su ficha usa (quien exporta lo
+    // elige); un respaldo completo lleva todo lo que se le pase, aunque esté
+    // vacío.
+    final carriesHomebrew = scope == BackupScope.full ||
+        (homebrew?.values.any((docs) => docs.isNotEmpty) ?? false);
+    String? homebrewPath;
+    if (homebrew != null && carriesHomebrew) {
+      homebrewPath = 'homebrew/content.json';
+      add(
+        ArchiveFile.string(
+          homebrewPath,
+          const JsonEncoder.withIndent('  ').convert(homebrew),
+        ),
+        maxBytes: maxJsonBytes,
+      );
+    }
+
+    String? preferencesPath;
+    if (scope == BackupScope.full && preferences != null) {
+      preferencesPath = 'settings/preferences.json';
+      add(
+        ArchiveFile.string(
+          preferencesPath,
+          const JsonEncoder.withIndent('  ').convert(portablePreferences),
+        ),
+        maxBytes: maxJsonBytes,
+      );
+    }
+
+    final manifest = <String, dynamic>{
+      'type': type,
+      'formatVersion': formatVersion,
+      'scope': scope.name,
+      'exportedAt': DateTime.now().toIso8601String(),
+      'characters': characterEntries,
+      if (homebrewPath != null) 'homebrewFile': homebrewPath,
+      if (preferencesPath != null) 'preferencesFile': preferencesPath,
+    };
+    add(
+      ArchiveFile.string(
+        'manifest.json',
+        const JsonEncoder.withIndent('  ').convert(manifest),
+      ),
+      maxBytes: maxJsonBytes,
+    );
+
+    final encoded = ZipEncoder().encodeBytes(archive);
+    if (encoded.length > maxArchiveBytes) {
+      throw FormatException(
+        localized(
+          'El respaldo supera el tamaño máximo.',
+          'The backup exceeds the maximum size.',
+        ),
+      );
+    }
+    return encoded;
+  }
+}

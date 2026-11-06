@@ -6,7 +6,7 @@ import { ApiError } from './client';
 // mientras tanto se combina en un parche y sale en la vuelta siguiente.
 let queued: Record<string, unknown> | null = null;
 let waiters: { resolve: () => void; reject: (e: unknown) => void }[] = [];
-let running = false;
+let running: Promise<void> | null = null;
 
 /** Cambia [patch] en los ajustes de la cuenta sin tocar el resto. Relee antes
  *  de cada guardado en vez de usar los que trajo la pantalla: la pantalla puede
@@ -17,12 +17,15 @@ export function patchSettings(patch: Record<string, unknown>): Promise<void> {
   return new Promise((resolve, reject) => {
     queued = { ...queued, ...patch };
     waiters.push({ resolve, reject });
-    if (!running) void drain();
+    if (!running) running = Promise.resolve().then(drain);
   });
 }
 
+export async function waitForSettingsWrites(): Promise<void> {
+  await running;
+}
+
 async function drain(): Promise<void> {
-  running = true;
   while (queued) {
     const batch = queued;
     const batchWaiters = waiters;
@@ -44,5 +47,5 @@ async function drain(): Promise<void> {
       batchWaiters.forEach((w) => w.reject(e));
     }
   }
-  running = false;
+  running = null;
 }

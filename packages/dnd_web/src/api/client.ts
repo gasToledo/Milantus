@@ -103,9 +103,10 @@ export interface RosterSettings {
   sortMode: string;
   favoriteCharacterId: string | null;
   characterOrder: string[];
+  themeMode: string;
   /** Si la cuenta abre en el Modo DM (`AppSettings.startsInDmMode`). */
   startsInDmMode: boolean;
-  /** Si el combate que se arma muestra su dificultad y los PX (`AppSettings.showEncounterDifficulty`). Acá solo se lee; editarla es del paso 7. */
+  /** Si el combate que se arma muestra su dificultad y los PX (`AppSettings.showEncounterDifficulty`). */
   showEncounterDifficulty: boolean;
 }
 
@@ -122,6 +123,7 @@ export async function fetchRosterSettings(signal: AbortSignal): Promise<RosterSe
     sortMode: settings?.sortMode ?? 'name',
     favoriteCharacterId: settings?.favoriteCharacterId ?? null,
     characterOrder: settings?.characterOrder ?? [],
+    themeMode: settings?.themeMode ?? 'dark',
     startsInDmMode: settings?.startsInDmMode === true,
     // Prendida por defecto, igual que `AppSettings` de Flutter: solo un `false`
     // explícito la apaga (una cuenta sin ajustes guardados la ve).
@@ -138,20 +140,6 @@ export async function fetchAppVersion(signal: AbortSignal): Promise<string | nul
     return version ?? null;
   } catch {
     return null;
-  }
-}
-
-/** Tema elegido en los ajustes de la cuenta (`themeMode` de `AppSettings`).
- *  Es un adorno: si falla, se queda el oscuro, que es el que arranca. */
-export async function fetchThemeMode(signal: AbortSignal): Promise<string> {
-  try {
-    const { settings } = await getJson<{ settings: { themeMode?: string } | null }>(
-      '/api/settings',
-      signal,
-    );
-    return settings?.themeMode ?? 'dark';
-  } catch {
-    return 'dark';
   }
 }
 

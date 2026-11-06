@@ -4,9 +4,10 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:dnd_engine/dnd_engine.dart';
+import 'package:dnd_engine/homebrew_references.dart';
 
 import 'backup_bundle.dart';
-import 'homebrew_store.dart';
+export 'package:dnd_engine/homebrew_references.dart' show homebrewUsedBy;
 
 /// Un retrato que viaja en el archivo: de quién es (`npc` o `character`), la
 /// clave que tiene en esta cuenta y sus bytes.
@@ -301,17 +302,3 @@ List<String> missingOfficialContent(
       'trasfondo «${sheet.backgroundId}»',
   ];
 }
-
-/// El homebrew que usa la ficha: sin él, del otro lado no abriría.
-Map<String, List<Map<String, dynamic>>> homebrewUsedBy(
-  Character sheet,
-  Map<String, List<Map<String, dynamic>>> all,
-) => {
-  for (final entry in all.entries)
-    if ([
-          for (final doc in entry.value)
-            if (charactersUsing('${doc['id']}', [sheet]).isNotEmpty) doc,
-        ]
-        case final used when used.isNotEmpty)
-      entry.key: used,
-};

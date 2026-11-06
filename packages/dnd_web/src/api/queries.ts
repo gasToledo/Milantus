@@ -26,7 +26,6 @@ import {
   fetchPlayerCampaigns,
   fetchRoster,
   fetchRosterSettings,
-  fetchThemeMode,
   fetchTurn,
 } from './client';
 
@@ -51,7 +50,6 @@ export function createQueryClient(): QueryClient {
 
 export const queryKeys = {
   account: ['account'] as const,
-  themeMode: ['settings', 'theme'] as const,
   rosterSettings: ['settings', 'roster'] as const,
   roster: ['characters'] as const,
   catalog: (lang: Lang) => ['catalog', lang] as const,
@@ -77,13 +75,6 @@ export const queryKeys = {
 /** `null` = sin sesión (un 401 no es un error, ver `fetchAccount`). */
 export const useAccount = () =>
   useQuery({ queryKey: queryKeys.account, queryFn: ({ signal }) => fetchAccount(signal) });
-
-export const useThemeMode = (enabled: boolean) =>
-  useQuery({
-    queryKey: queryKeys.themeMode,
-    queryFn: ({ signal }) => fetchThemeMode(signal),
-    enabled,
-  });
 
 export const useRoster = () =>
   useQuery({ queryKey: queryKeys.roster, queryFn: ({ signal }) => fetchRoster(signal) });

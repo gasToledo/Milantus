@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:dnd_engine/backup_export.dart' as exporter;
 import 'package:dnd_engine/dnd_engine.dart';
+import 'package:dnd_engine/homebrew_references.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
@@ -38,6 +40,7 @@ import 'util/safe_path.dart';
 part 'app_item_grants.dart';
 part 'app_mcp.dart';
 part 'app_npcs.dart';
+part 'app_transfer.dart';
 
 /// Ejecuta la importación ya decodificada para [userId]. Se recibe como
 /// función (no como `Pool` concreto) por la misma razón que [AuthDependencies]:
@@ -447,6 +450,13 @@ Handler buildHandler({
     ..post(
       '/api/characters/<characterId>/portraits',
       authenticated((request) => _createPortraitHandler(request, portraits)),
+    )
+    ..get(
+      '/api/export',
+      authenticated(
+        (request) =>
+            _exportHandler(request, characters, homebrew, settings, portraits),
+      ),
     )
     ..post(
       '/api/import',

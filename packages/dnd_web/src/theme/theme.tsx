@@ -15,7 +15,7 @@ export type ThemeMode = 'dark' | 'light' | 'system';
 // cambia acá, cambia allá.
 const STORAGE_KEY = 'milantus.v2.theme';
 
-const isThemeMode = (v: unknown): v is ThemeMode =>
+export const isThemeMode = (v: unknown): v is ThemeMode =>
   v === 'dark' || v === 'light' || v === 'system';
 
 /** El modo que eligió este navegador, o `null`. El almacenamiento bloqueado
@@ -29,9 +29,10 @@ function readStored(): ThemeMode | null {
   }
 }
 
-function writeStored(mode: ThemeMode) {
+function writeStored(mode: ThemeMode | null) {
   try {
-    window.localStorage.setItem(STORAGE_KEY, mode);
+    if (mode === null) window.localStorage.removeItem(STORAGE_KEY);
+    else window.localStorage.setItem(STORAGE_KEY, mode);
   } catch {
     // Sin almacenamiento el tema dura lo que la pestaña: no es un error.
   }
@@ -46,8 +47,9 @@ function apply(mode: ThemeMode) {
 
 interface ThemeState {
   mode: ThemeMode;
+  browserMode: ThemeMode | null;
   /** Elige el modo y lo recuerda en este navegador. */
-  setMode: (mode: ThemeMode) => void;
+  setMode: (mode: ThemeMode | null) => void;
   /** El de la cuenta (`/api/settings`), si este navegador no eligió uno. */
   adoptAccountMode: (mode: string) => void;
 }
@@ -57,9 +59,7 @@ const ThemeContext = createContext<ThemeState | null>(null);
 /**
  * El tema arranca oscuro. Precedencia: lo elegido en este navegador; si no hay
  * nada, el de los ajustes de la cuenta (lo que Flutter guarda); si tampoco,
- * oscuro. El navegador gana porque el selector de /v2 no escribe en la cuenta
- * (React todavía no escribe nada) y una elección que se deshace sola en cada
- * recarga sería peor que no ofrecerla.
+ * oscuro. La preferencia local se puede quitar desde Ajustes.
  */
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [stored, setStored] = useState<ThemeMode | null>(readStored);
@@ -76,7 +76,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return () => query.removeEventListener('change', onChange);
   }, [mode]);
 
-  const setMode = useCallback((next: ThemeMode) => {
+  const setMode = useCallback((next: ThemeMode | null) => {
     writeStored(next);
     setStored(next);
   }, []);
@@ -84,7 +84,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setAccount(isThemeMode(value) ? value : null);
   }, []);
 
-  const value = useMemo(() => ({ mode, setMode, adoptAccountMode }), [mode, setMode, adoptAccountMode]);
+  const value = useMemo(
+    () => ({ mode, browserMode: stored, setMode, adoptAccountMode }),
+    [mode, stored, setMode, adoptAccountMode],
+  );
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 

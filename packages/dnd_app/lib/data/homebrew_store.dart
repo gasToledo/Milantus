@@ -3,6 +3,8 @@ import 'package:dnd_engine/dnd_engine.dart';
 
 import '../api/api_client.dart';
 
+export 'package:dnd_engine/homebrew_references.dart' show charactersUsing;
+
 class HomebrewLoadIssue {
   final String category;
   final String id;
@@ -307,36 +309,6 @@ class HomebrewStore {
     creatures.remove(id);
   }
 }
-
-/// Los personajes que están usando la entrada [contentId].
-///
-/// Es lo que convierte el aviso de borrado en una decisión: «lo usan Grommash
-/// y Lyra» dice qué se rompe, mientras que «los personajes que lo estén usando
-/// van a quedar con una advertencia» asusta sin informar.
-///
-/// ponytail: busca el id en el documento del personaje en vez de recorrer los
-/// veintipico campos que pueden referenciarlo (inventario, armas equipadas,
-/// conjuros, dotes, especie, trasfondo, formas salvajes, compañeros...). El
-/// techo es que compara la cadena completa contra cualquier valor o clave del
-/// JSON, así que un texto libre que sea *exactamente* el id contaría como uso.
-/// Si alguna vez hace falta decir **dónde** se usa, ahí sí hay que recorrer
-/// campo por campo.
-List<Character> charactersUsing(
-  String contentId,
-  Iterable<Character> characters,
-) => [
-  for (final character in characters)
-    if (_mentions(character.toJson(), contentId)) character,
-];
-
-bool _mentions(Object? node, String id) => switch (node) {
-  String value => value == id,
-  Map<Object?, Object?> map =>
-    map.keys.any((key) => key == id) ||
-        map.values.any((value) => _mentions(value, id)),
-  Iterable<Object?> list => list.any((value) => _mentions(value, id)),
-  _ => false,
-};
 
 /// Una copia propia de [json], con id y nombre nuevos y origen homebrew.
 ///

@@ -286,12 +286,11 @@ La pantalla de referencia de cómo se arma una vista con la biblioteca:
 
 ## Ajustes (`src/settings/`)
 
-Dos `Card` en una grilla que se adapta sola (`auto-fit`). La primera lleva
-controles (`Select` para el tema y el idioma) y la segunda una lista de
-definición (`dl`) de solo lectura, con un `ButtonLink` a Flutter para cambiar
-lo que se guarda en la cuenta. Esa separación es la regla de la pantalla: lo que
-vive en el navegador se edita ahí; lo que vive en la cuenta se muestra hasta
-que React escriba.
+Dos `Card` en una grilla que se adapta sola (`auto-fit`). «En este navegador»
+usa `Select` para el tema local y el idioma. «En tu cuenta» usa `Select` para
+el modo de inicio y el tema, y `Switch` para la dificultad del encuentro.
+Cada cambio de cuenta muestra el estado del guardado. El orden y el favorito
+se muestran en una lista de definición (`dl`) y se editan en Mis personajes.
 
 ### Compartir, avisos y turno
 
