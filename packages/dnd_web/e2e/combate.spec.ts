@@ -39,7 +39,7 @@ test('el combate es del DM: otra cuenta recibe el mismo 404 que ante lo inexiste
   for (const secreto of SOLO_DEL_DM) await expect(page.getByText(secreto)).toHaveCount(0);
 });
 
-test('armar, descartar, empezar y jugar un combate guardan lo que da el motor', async ({ context, page, baseURL }) => {
+test('armar, descartar, empezar, jugar y anotar efectos guardan lo que da el motor', async ({ context, page, baseURL }) => {
   const cookie = `dnd_session=${TOKEN_DM}`;
   await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);
   // Una campaña propia de la prueba: no toca el combate sembrado de la del cuervo.
@@ -109,4 +109,18 @@ test('armar, descartar, empezar y jugar un combate guardan lo que da el motor', 
     .toBe(1);
   await page.locator('[data-action="next-turn"]').click();
   await expect.poll(async () => (await api<Guardado>(page.request, ruta, TOKEN_DM)).encounter?.round).toBe(2);
+
+  // Efectos y defensas: el diálogo manda lo que cambió y el motor lo guarda.
+  await page.locator('[data-action="effects"]').first().click();
+  await page.getByRole('button', { name: t.encAdvantage, exact: true }).click();
+  await page.locator('[data-field="effects-temp"]').fill('3');
+  await page.getByRole('button', { name: t.conditionRules.prone.label, exact: true }).click();
+  await page.getByRole('button', { name: t.commonSave, exact: true }).click();
+  await expect
+    .poll(async () => {
+      const { encounter } = await api<{ encounter?: { combatants: { advantage?: string; tempHp?: number; tags?: string[] }[] } }>(page.request, ruta, TOKEN_DM);
+      const g = encounter?.combatants[0];
+      return g ? [g.advantage, g.tempHp, g.tags] : null;
+    })
+    .toEqual(['advantage', 3, [textsFor('es').conditionRules.prone.label]]);
 });

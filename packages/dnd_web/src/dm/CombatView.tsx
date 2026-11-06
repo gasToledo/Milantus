@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { BookOpen, Dices, ExternalLink, FileText, Flame, Plus, SkipForward, X } from 'lucide-react';
+import { ArrowDown, ArrowUp, BookOpen, Dices, ExternalLink, FileText, Flame, Plus, Shield, SkipForward, Tag, X } from 'lucide-react';
 import { useCampaignEncounter, useCampaignMembers, useCampaignNotebook, useCampaignNpcs, useRosterSettings, useSheetCatalog } from '../api/queries';
 import type { DmCampaign } from '../api/client';
 import { TurnProfile } from './combat/TurnProfile';
@@ -7,6 +7,7 @@ import { asProfile } from '../bestiary/creature';
 import { toRosterEntry, type RosterEntry } from '../dashboard/roster';
 import {
   bestiary,
+  encounterAct,
   encounterDetails,
   encounterInitiatives,
   encounterView,
@@ -27,12 +28,14 @@ import { AppDialog } from '../ui/AppDialog';
 import { Button, ButtonLink } from '../ui/Button';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { cx } from '../ui/cx';
-import { Eyebrow, ThinBar } from '../ui/data';
+import { Eyebrow } from '../ui/data';
 import { MarkdownText } from '../ui/MarkdownText';
 import { Toast, Tooltip, type ToastTone } from '../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { AddCombatantDialog } from './combat/AddCombatantDialog';
+import { tagLabel } from './combat/conditions';
 import { DifficultyBand } from './combat/DifficultyBand';
+import { EffectsDialog } from './combat/EffectsDialog';
 import { NumberPromptDialog } from './combat/NumberPromptDialog';
 import { SideSelector } from './combat/SideSelector';
 import { retryEncounterSave, useEncounterWriter } from './combat/encounterWriter';
@@ -47,12 +50,14 @@ import { npcTypeLine } from './npcs/npc';
  *  CA, efectos y acciones. En curso, las dos últimas del encabezado llevan juntas
  *  la cifra de daño o curación. Es la cabecera: vale desde 760 px de ancho de la
  *  planilla; debajo, la cabecera no se dibuja y cada fila se parte (`ROW`). */
-const LEDGER = 'grid grid-cols-[46px_minmax(0,1fr)_132px_64px_150px_186px] gap-x-3';
+// La última columna es de 208 px y no de los 186 de la lámina: con el botón de
+// efectos (44 × 44 como pide el brief) «Abrir ficha» + efectos + ✕ no entran en 186.
+const LEDGER = 'grid grid-cols-[46px_minmax(0,1fr)_132px_64px_150px_208px] gap-x-3';
 /** La fila: la grilla de [LEDGER] desde 760 px, y debajo la de la lámina
  *  «Teléfono» (tres columnas, con los PG, los efectos y las acciones en líneas
  *  propias). Las dos van escritas enteras porque Tailwind no arma clases a
  *  partir de pedazos. */
-const ROW = 'grid grid-cols-[40px_minmax(0,1fr)_44px] gap-x-2.5 @[760px]:grid-cols-[46px_minmax(0,1fr)_132px_64px_150px_186px] @[760px]:gap-x-3';
+const ROW = 'grid grid-cols-[40px_minmax(0,1fr)_44px] gap-x-2.5 @[760px]:grid-cols-[46px_minmax(0,1fr)_132px_64px_150px_208px] @[760px]:gap-x-3';
 
 /** Lo que la pantalla cruza para cada fila: el combatiente, lo que derivó el
  *  motor, y de dónde sale su perfil. */
@@ -92,6 +97,8 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
   const catalog = useSheetCatalog(lang);
   const [toast, setToast] = useState<{ key: number; tone: ToastTone; message: string; action?: { label: string; onSelect: () => void } } | null>(null);
   const [dialog, setDialog] = useState<'add' | 'discard' | null>(null);
+  // El combatiente cuyos efectos y defensas se editan.
+  const [effectsId, setEffectsId] = useState<string | null>(null);
   // La cifra de daño o curación es una sola para todo el combate. Se lee de la
   // referencia al tocar un botón: un toque no usa una cifra vieja si el campo
   // acaba de cambiar.
@@ -128,8 +135,9 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
     const byMember = new Map(members.data.map((m) => [m.memberId, toRosterEntry(m.character, '', cat)] as const));
     // Los actuales salen de la ficha cruda (no son una regla); el máximo, del
     // motor. Sin ficha calculada, el jugador va sin PG antes que con unos falsos.
-    const playersHp: Record<string, { current: number; max: number }> = {};
-    for (const [id, e] of byMember) if (e.sheet) playersHp[id] = { current: e.character.combat?.currentHp ?? 0, max: e.sheet.maxHp };
+    // Los temporales también son de la ficha (`modo-dm.md`): el DM los ve, no los escribe.
+    const playersHp: Record<string, { current: number; max: number; temp: number }> = {};
+    for (const [id, e] of byMember) if (e.sheet) playersHp[id] = { current: e.character.combat?.currentHp ?? 0, max: e.sheet.maxHp, temp: e.character.combat?.tempHp ?? 0 };
     const view = encounter.data ? encounterView(encounter.data, playersHp) : null;
     // Nivel y CA reales de cada jugador, solo de los que tienen ficha calculada.
     const levels: Record<string, { level: number; armorClass: number }> = {};
@@ -162,10 +170,11 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
     // Los jugadores que todavía no entraron, para sumarlos mientras se arma.
     const inCombat = new Set(view?.encounter.combatants.map((c) => c.memberId) ?? []);
     const pending = members.data.filter((m) => !inCombat.has(m.memberId));
-    return { view, rows, past, cat, pending, details };
+    return { view, rows, past, cat, pending, details, levels };
   }, [encounter.data, members.data, npcs.data, notebook.data, catalog.data, t]);
 
   const failed = [encounter, members, npcs, notebook, ...catalog.queries].filter((q) => q.isError);
+  const effectsRow = effectsId ? data?.rows.find((r) => r.c.id === effectsId) : undefined;
   const kicker = data?.view ? (data.view.preparing ? t.encPreparing : `${t.encRunning} · ${campaign.name}`) : campaign.name;
 
   let body;
@@ -210,6 +219,7 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
                       amount: Number(amount) || 0,
                       readAmount: () => Number(amountRef.current) || 0,
                       onFix: (row) => setFix({ id: row.c.id, name: row.c.name, initiative: row.c.initiative }),
+                      onEffects: (row) => setEffectsId(row.c.id),
                     })
                   }
                 />
@@ -314,6 +324,33 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
           running={!!data?.view && !data.view.preparing}
           act={writer.act}
           onClose={() => setDialog(null)}
+        />
+      )}
+      {effectsRow && data && catalog.data && npcs.data && (
+        <EffectsDialog
+          key={effectsRow.c.id}
+          target={{
+            id: effectsRow.c.id,
+            name: effectsRow.c.name,
+            tags: effectsRow.c.tags ?? [],
+            advantage: advantageOf(effectsRow.c),
+            tempHp: effectsRow.c.tempHp ?? 0,
+            acBonus: effectsRow.c.acBonus ?? 0,
+            playerTemp: effectsRow.c.kind === 'player' ? effectsRow.derived.temp : undefined,
+            hasHp: !!effectsRow.derived.hp,
+            ac: effectsRow.detail?.ac ?? null,
+          }}
+          // La CA con el bono la calcula el motor: se aplica la acción sobre el
+          // combate en memoria (sin guardar) y se lee el total de esa fila. La
+          // pantalla no suma.
+          previewAc={(bonus) => {
+            const cat = catalog.data!;
+            const next = encounter.data ? encounterAct(cat, encounter.data, { type: 'setAcBonus', combatantId: effectsRow.c.id, value: bonus }) : null;
+            if (!next) return effectsRow.detail?.acTotal ?? null;
+            return encounterDetails(cat, next, data.levels, npcs.data!).rows.find((r) => r.id === effectsRow.c.id)?.acTotal ?? null;
+          }}
+          act={writer.act}
+          onClose={() => setEffectsId(null)}
         />
       )}
       {fix && (
@@ -515,9 +552,37 @@ interface RowExtras {
   sideControl?: ReactNode;
   actions?: ReactNode;
   fixInitiative?: () => void;
+  /** Saca un efecto de la fila (la ✕ de su chip). */
+  removeTag?: (tag: string) => void;
 }
 
-function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl, actions, fixInitiative }: { row: Row; catalog: Catalog; active: boolean; acted: boolean; preparing: boolean; showXp: boolean } & RowExtras) {
+const advantageOf = (c: CombatantJson): 'advantage' | 'disadvantage' | null => (c.advantage === 'advantage' || c.advantage === 'disadvantage' ? c.advantage : null);
+/** Lo que el DM le puso a la fila y se usa en turnos ajenos: ventaja o
+ *  desventaja, temporales y bono a la CA. */
+const hasMarks = ({ c, derived }: Row) => advantageOf(c) !== null || derived.temp > 0 || (c.acBonus ?? 0) > 0;
+
+/** La barra de PG con los temporales pegados: el tramo carmesí es
+ *  `actual / (máximo + temporales)` y el dorado `temporales / (máximo +
+ *  temporales)`. Sin temporales es la barra de siempre (`ThinBar`). */
+function HpBar({ current, max, temp, label }: { current: number; max: number; temp: number; label: string }) {
+  const total = max + temp;
+  const pct = (n: number) => (total <= 0 ? 0 : Math.min(100, Math.max(0, (n / total) * 100)));
+  return (
+    <div
+      role="meter"
+      aria-label={label}
+      aria-valuemin={0}
+      aria-valuemax={max}
+      aria-valuenow={Math.max(0, Math.min(current, max))}
+      className="flex h-[5px] w-full overflow-hidden rounded-[3px] bg-hairline"
+    >
+      <div className="thin-bar-fill h-full bg-crimson" style={{ width: `${pct(current)}%` }} />
+      {temp > 0 && <div className="thin-bar-fill ml-px h-full bg-gold" style={{ width: `${pct(temp)}%` }} />}
+    </div>
+  );
+}
+
+function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl, actions, fixInitiative, removeTag }: { row: Row; catalog: Catalog; active: boolean; acted: boolean; preparing: boolean; showXp: boolean } & RowExtras) {
   const t = useTexts();
   const lang = useLang();
   // El turno que pasa se lleva la vista con él: en una mesa con muchos
@@ -541,11 +606,16 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
   const player = c.kind === 'player';
   const mark = derived.down ? t.encSkips : active ? t.encTurnWord : acted ? t.encActed : '';
   const ac = row.detail?.ac ?? null;
+  const acTotal = row.detail?.acTotal ?? null;
+  const bonus = c.acBonus ?? 0;
+  const adv = advantageOf(c);
   const hp = derived.hp;
   // Lo que ya jugó esta ronda se atenúa en sus datos y **no en sus botones**: al
   // goblin que ya actuó se le sigue pegando, y un botón gris se lee como apagado.
-  // Un caído se atenúa entero: ahí sí terminó (a pedido del usuario).
-  const faded = (acted || derived.down) && 'opacity-60';
+  // Un caído se atenúa entero: ahí sí terminó (a pedido del usuario). Una fila con
+  // marcas **no se atenúa** aunque ya haya jugado, porque lo que lleva (ventaja,
+  // temporales, bono a la CA) se usa en turnos ajenos; un caído sí, siempre.
+  const faded = (derived.down || (acted && !hasMarks(row))) && 'opacity-60';
   const fadedActions = derived.down && 'opacity-60';
   const initiativeCell = (
     <>
@@ -580,7 +650,19 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
         )}
       </div>
       <div className={cx('order-2 min-w-0', faded)}>
-        <div className={cx('font-display truncate text-[15px] text-on-surface', derived.down && 'line-through')}>{c.name}</div>
+        <div className="flex min-w-0 items-center gap-[7px]">
+          <div className={cx('font-display min-w-0 truncate text-[15px] text-on-surface', derived.down && 'line-through')}>{c.name}</div>
+          {/* Rellena y sin atenuar: se tiene que leer de un vistazo y de lejos. */}
+          {adv && (
+            <span
+              className={cx('inline-flex h-[19px] shrink-0 items-center gap-[3px] rounded-[var(--radius-pill)] pr-2 pl-[5px] text-[11px] font-bold text-on-primary', adv === 'advantage' ? 'bg-verdant' : 'bg-crimson')}
+              data-field="advantage"
+            >
+              {adv === 'advantage' ? <ArrowUp size={12} strokeWidth={3} aria-hidden="true" /> : <ArrowDown size={12} strokeWidth={3} aria-hidden="true" />}
+              {adv === 'advantage' ? t.encAdvantage : t.encDisadvantage}
+            </span>
+          )}
+        </div>
         <div className="mt-[3px] flex min-w-0 items-center gap-1.5">
           {!player &&
             (sideControl ?? (
@@ -598,10 +680,15 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
               <span className="num text-[13.5px] text-crimson" data-field="hp-value">
                 {hp.current}/{hp.max}
               </span>
+              {derived.temp > 0 && (
+                <span className="num text-[13.5px] text-gold" aria-label={t.encTempAria(derived.temp)} data-field="hp-temp">
+                  +{derived.temp}
+                </span>
+              )}
               {derived.bloodied && <span className="text-[9.5px] font-semibold tracking-[.8px] text-crimson uppercase">{t.encBloodied}</span>}
             </div>
             <div className="mt-[5px]">
-              <ThinBar value={hp.current} max={hp.max} label={t.dmHpAria(hp.current, hp.max)} colorClassName="bg-crimson" />
+              <HpBar current={hp.current} max={hp.max} temp={derived.temp} label={t.dmHpAria(hp.current, hp.max)} />
             </div>
           </>
         ) : (
@@ -610,14 +697,31 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
       </div>
       <div className={cx('order-3 text-center @[760px]:order-4', faded)} data-field="ac">
         <span className="plaque-label block @[760px]:hidden">{t.encAc}</span>
-        <div className="num text-[14px] text-on-surface">{ac ?? t.dmNoValue}</div>
+        {bonus > 0 ? (
+          <>
+            {/* Con bono, el total en oro con un escudo; debajo, la CA base y el bono. */}
+            <div className="num inline-flex items-center gap-[3px] text-[15px] text-gold">
+              {acTotal !== null && <Shield size={13} fill="currentColor" aria-hidden="true" />}
+              {acTotal ?? ac ?? t.dmNoValue}
+            </div>
+            <div className="text-[10.5px] font-semibold text-gold">{acTotal !== null ? `${ac} +${bonus}` : `+${bonus}`}</div>
+          </>
+        ) : (
+          <div className="num text-[14px] text-on-surface">{ac ?? t.dmNoValue}</div>
+        )}
       </div>
       <div className={cx('order-5 col-span-2 col-start-2 mt-2 flex-wrap gap-[5px] @[760px]:col-auto @[760px]:mt-0 @[760px]:flex', (c.tags ?? []).length > 0 ? 'flex' : 'hidden', faded)}>
-        {(c.tags ?? []).map((tag) => (
-          <span key={tag} className="plaque rounded-[var(--radius-pill)] px-[9px] py-px text-[11.5px] text-on-surface">
-            {tag}
-          </span>
-        ))}
+        {(c.tags ?? []).map((tag) => {
+          const label = tagLabel(t, tag);
+          return (
+            <span key={tag} className="plaque inline-flex items-center gap-1 rounded-[var(--radius-pill)] py-px pr-1 pl-[9px] text-[11.5px] text-on-surface">
+              {label}
+              <button type="button" aria-label={t.dmRemoveTag(label)} onClick={() => removeTag?.(tag)} className="flex items-center text-on-surface-variant hover:text-on-surface">
+                <X size={12} strokeWidth={2.5} aria-hidden="true" />
+              </button>
+            </span>
+          );
+        })}
       </div>
       <div className={cx('order-6 col-span-3 mt-1.5 flex items-center justify-end gap-1 @[760px]:col-auto @[760px]:mt-0', fadedActions)}>{actions}</div>
     </li>
@@ -659,6 +763,7 @@ interface RowCtx {
   /** La cifra al momento del toque. */
   readAmount: () => number;
   onFix: (row: Row) => void;
+  onEffects: (row: Row) => void;
 }
 
 /** El enlace a la ficha de un jugador de la mesa. Es una pill con borde y no
@@ -681,8 +786,24 @@ function OpenSheetLink({ campaignId, memberId }: { campaignId: string; memberId:
  *  curar (menos un jugador y un PNJ sin estadísticas), abrir la ficha de un
  *  jugador y sacar a cualquiera. Sacar no confirma, como en Flutter: volver a
  *  sumarlo es un toque. */
-function rowParts(row: Row, { campaignId, act, t, running, amount, readAmount, onFix }: RowCtx): RowExtras {
+function rowParts(row: Row, { campaignId, act, t, running, amount, readAmount, onFix, onEffects }: RowCtx): RowExtras {
   const { c, detail, member } = row;
+  const removeTag = (tag: string) => act({ type: 'setTags', combatantId: c.id, tags: (c.tags ?? []).filter((x) => x !== tag) });
+  // Dorado y relleno si el combatiente lleva algo; apagado si no.
+  const marked = (c.tags ?? []).length > 0 || hasMarks(row);
+  const effects = (
+    <Tooltip content={t.encEffectsAndDefenses}>
+      <button
+        type="button"
+        aria-label={t.encEffectsAndDefenses}
+        data-action="effects"
+        onClick={() => onEffects(row)}
+        className={cx('flex h-12 w-12 items-center justify-center rounded-[var(--radius-nav)] @[760px]:h-11 @[760px]:w-11', marked ? 'text-gold' : 'text-on-surface-variant hover:text-on-surface')}
+      >
+        <Tag size={19} fill={marked ? 'currentColor' : 'none'} aria-hidden="true" />
+      </button>
+    </Tooltip>
+  );
   const remove = (
     <Tooltip content={t.encRemoveFromCombat}>
       <button
@@ -700,9 +821,11 @@ function rowParts(row: Row, { campaignId, act, t, running, amount, readAmount, o
   if (c.kind === 'player') {
     return {
       fixInitiative,
+      removeTag,
       actions: (
         <>
           {member && c.memberId ? <OpenSheetLink campaignId={campaignId} memberId={c.memberId} /> : <span className="text-[11px] text-text-muted">{t.encOnTheirSheet}</span>}
+          {effects}
           {remove}
         </>
       ),
@@ -716,6 +839,7 @@ function rowParts(row: Row, { campaignId, act, t, running, amount, readAmount, o
   const pill = 'num min-h-12 min-w-16 rounded-[var(--radius-pill)] border-[1.5px] px-[7px] text-[13px] @[760px]:min-h-[34px] @[760px]:min-w-[46px]';
   return {
     fixInitiative,
+    removeTag,
     sideControl: (
       <SideMenu
         side={c.side}
@@ -740,6 +864,7 @@ function rowParts(row: Row, { campaignId, act, t, running, amount, readAmount, o
             </Tooltip>
           </>
         )}
+        {effects}
         {remove}
       </>
     ),
@@ -837,14 +962,33 @@ function TurnPanel({ row, catalog, campaignId, act }: { row: Row | undefined; ca
  *  libro deja de ser cierto en el primer ataque. */
 function TurnStats({ row }: { row: Row }) {
   const t = useTexts();
+  const { temp, hp } = { temp: row.derived.temp, hp: row.derived.hp };
+  const bonus = row.c.acBonus ?? 0;
+  const ac = bonus > 0 ? (row.detail?.acTotal ?? row.detail?.ac) : row.detail?.ac;
   return (
     // Iniciativa y CA angostas y los PG con el resto, como en la lámina: «118/256»
     // no entra en un tercio.
     <dl className="grid grid-cols-[56px_minmax(0,1fr)_56px] gap-2">
       {[
-        { label: t.encInitiativeShort, value: String(row.c.initiative), tone: 'text-verdant' },
-        { label: t.encHp, value: row.derived.hp ? `${row.derived.hp.current}/${row.derived.hp.max}` : t.dmNoValue, tone: 'text-crimson' },
-        { label: t.encAc, value: row.detail?.ac ?? t.dmNoValue, tone: 'text-on-surface' },
+        { label: t.encInitiativeShort, value: <>{row.c.initiative}</>, tone: 'text-verdant' },
+        {
+          label: t.encHp,
+          value: hp ? (
+            <>
+              {hp.current}/{hp.max}
+              {temp > 0 && (
+                <span className="text-gold" aria-label={t.encTempAria(temp)}>
+                  {' '}
+                  +{temp}
+                </span>
+              )}
+            </>
+          ) : (
+            t.dmNoValue
+          ),
+          tone: 'text-crimson',
+        },
+        { label: t.encAc, value: ac ?? t.dmNoValue, tone: bonus > 0 ? 'text-gold' : 'text-on-surface' },
       ].map((s) => (
         <div key={s.label} className="plaque px-0.5 py-2 text-center">
           <dt className="plaque-label">{s.label}</dt>
