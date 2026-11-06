@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { UserPlus } from 'lucide-react';
 import { deleteCampaignLink, grantHeroicInspiration } from '../api/client';
-import { queryKeys, useCampaignChapters, useCampaignMembers, useSheetCatalog } from '../api/queries';
+import { queryKeys, useCampaignChapters, useCampaignEncounter, useCampaignMembers, useSheetCatalog } from '../api/queries';
 import type { DmCampaign } from '../api/client';
 import { movedOrder, toRosterEntry } from '../dashboard/roster';
 import { useLang, useTexts } from '../i18n/context';
@@ -32,7 +32,9 @@ import { MemberCard } from './MemberCard';
 export function MesaView({ campaign }: { campaign: DmCampaign }) {
   const t = useTexts();
   const lang = useLang();
-  const members = useCampaignMembers(campaign.id);
+  // Con un combate abierto los PG de la Mesa se releen solos (ver `useCampaignMembers`).
+  const encounter = useCampaignEncounter(campaign.id);
+  const members = useCampaignMembers(campaign.id, { live: !!encounter.data });
   const catalog = useSheetCatalog(lang);
   // Solo para decir en qué capítulo va la mesa: si falla, la cabecera calla.
   const chapters = useCampaignChapters(campaign.id);

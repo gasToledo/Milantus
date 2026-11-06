@@ -168,11 +168,17 @@ export const usePlayerCampaignsOf = (characterIds: string[]) =>
 export const useDmCampaigns = ({ enabled = true }: { enabled?: boolean } = {}) =>
   useQuery({ queryKey: queryKeys.dmCampaigns, queryFn: ({ signal }) => fetchDmCampaigns(signal), enabled });
 
-/** La Mesa: las fichas vinculadas a [campaignId], leídas en vivo del jugador. */
-export const useCampaignMembers = (campaignId: string) =>
+/** La Mesa: las fichas vinculadas a [campaignId], leídas en vivo del jugador.
+ *  Con [live] se vuelven a leer cada 5 s: con un combate abierto el jugador
+ *  anota su daño en su ficha y el DM lo tiene que ver sin recargar (como
+ *  `_CampaignDetail` de Flutter). `refetchIntervalInBackground` queda apagado:
+ *  con la pestaña oculta no se pide nada. */
+export const useCampaignMembers = (campaignId: string, { live = false }: { live?: boolean } = {}) =>
   useQuery({
     queryKey: queryKeys.campaignMembers(campaignId),
     queryFn: ({ signal }) => fetchCampaignMembers(campaignId, signal),
+    refetchInterval: live ? 5_000 : false,
+    refetchIntervalInBackground: false,
   });
 
 /** Los capítulos de la campaña, con el objetivo que solo ve su DM. */
@@ -190,10 +196,9 @@ export const useCampaignNotebook = (campaignId: string) =>
   });
 
 /**
- * El combate abierto de la campaña (`null` si no hay). ponytail: se lee al
- * entrar y no se sondea como en Flutter (cada 5 s con combate abierto): acá
- * solo se mira y «Reintentar» o volver a la sección lo trae de nuevo. Si el DM
- * lo usa en la mesa, un `refetchInterval` aquí y en los miembros alcanza.
+ * El combate abierto de la campaña (`null` si no hay). No se sondea: lo escribe
+ * solo el DM, y sondearlo pisaría lo que está tecleando; lo que cambia solo son
+ * los PG de los jugadores (`useCampaignMembers` con `live`).
  */
 export const useCampaignEncounter = (campaignId: string) =>
   useQuery({

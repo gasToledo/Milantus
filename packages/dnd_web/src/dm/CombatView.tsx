@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Dices, FileText, Flame, Plus, X } from 'lucide-react';
 import { useCampaignEncounter, useCampaignMembers, useCampaignNotebook, useCampaignNpcs, useRosterSettings, useSheetCatalog } from '../api/queries';
 import type { DmCampaign } from '../api/client';
@@ -38,11 +38,17 @@ import { DmHeader } from './DmHeader';
 import { buildEntries } from './notebook';
 import { npcTypeLine } from './npcs/npc';
 
-/** Las cinco columnas de la planilla en curso, iguales en la cabecera y en cada fila. */
-const LEDGER = 'grid grid-cols-[56px_minmax(0,1fr)_150px_50px_minmax(0,160px)] gap-3.5';
-/** Mientras se arma: la lámina. La columna de Efectos queda vacía y sin rótulo
- *  (es de una parte siguiente) para que la planilla no cambie de forma después. */
-const LEDGER_PREPARING = 'grid grid-cols-[46px_minmax(0,1fr)_132px_64px_150px_186px] gap-3';
+/** Las seis columnas de la planilla de la lámina, **las mismas armando y en
+ *  curso**, para que no cambie de forma al empezar: iniciativa, combatiente, PG,
+ *  CA, efectos y acciones. En curso, las dos últimas del encabezado llevan juntas
+ *  la cifra de daño o curación. Es la cabecera: vale desde 760 px de ancho de la
+ *  planilla; debajo, la cabecera no se dibuja y cada fila se parte (`ROW`). */
+const LEDGER = 'grid grid-cols-[46px_minmax(0,1fr)_132px_64px_150px_186px] gap-x-3';
+/** La fila: la grilla de [LEDGER] desde 760 px, y debajo la de la lámina
+ *  «Teléfono» (tres columnas, con los PG, los efectos y las acciones en líneas
+ *  propias). Las dos van escritas enteras porque Tailwind no arma clases a
+ *  partir de pedazos. */
+const ROW = 'grid grid-cols-[40px_minmax(0,1fr)_44px] gap-x-2.5 @[760px]:grid-cols-[46px_minmax(0,1fr)_132px_64px_150px_186px] @[760px]:gap-x-3';
 
 /** Lo que la pantalla cruza para cada fila: el combatiente, lo que derivó el
  *  motor, y de dónde sale su perfil. */
@@ -75,7 +81,7 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
   const t = useTexts();
   const lang = useLang();
   const encounter = useCampaignEncounter(campaign.id);
-  const members = useCampaignMembers(campaign.id);
+  const members = useCampaignMembers(campaign.id, { live: !!encounter.data });
   const npcs = useCampaignNpcs(campaign.id);
   const notebook = useCampaignNotebook(campaign.id);
   const catalog = useSheetCatalog(lang);
@@ -175,6 +181,7 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
                 <Ledger
                   view={view}
                   rows={rows}
+                  catalog={cat}
                   showXp={view.preparing && showDifficulty}
                   rowExtras={(r) => (view.preparing ? preparingExtras(r, campaign.id, writer.act, t) : {})}
                 />
@@ -339,39 +346,35 @@ function ControlBar({ view, onAdd, onDiscard }: { view: EncounterView; onAdd: ()
 
 /** La planilla. Con poco ancho se desplaza dentro de su caja en lugar de partir
  *  las columnas: en una planilla, lo que se compara es la fila. */
-function Ledger({ view, rows, showXp, rowExtras }: { view: EncounterView; rows: Row[]; showXp: boolean; rowExtras: (row: Row) => RowExtras }) {
+function Ledger({ view, rows, catalog, showXp, rowExtras }: { view: EncounterView; rows: Row[]; catalog: Catalog; showXp: boolean; rowExtras: (row: Row) => RowExtras }) {
   const t = useTexts();
   return (
-    <section aria-label={t.encOrder} className="card min-w-0 flex-[999_1_640px] overflow-x-auto p-0">
-      <div className={view.preparing ? 'min-w-[820px]' : 'min-w-[560px]'}>
-        <div className={cx(view.preparing ? LEDGER_PREPARING : LEDGER, 'eyebrow border-b border-hairline px-3.5 py-2.5')} aria-hidden="true">
-          <span className="text-center">{t.encInitiativeShort}</span>
-          <span>{t.encCombatant}</span>
-          <span>{t.encHp}</span>
-          <span className="text-center">{t.encAc}</span>
-          {view.preparing ? (
-            <>
-              <span />
-              <span />
-            </>
-          ) : (
-            <span>{t.encEffects}</span>
-          )}
-        </div>
-        <ol>
-          {rows.map((r, i) => (
-            <LedgerRow
-              key={r.c.id}
-              row={r}
-              active={r.c.id === view.currentId}
-              acted={!view.preparing && view.currentIndex >= 0 && i < view.currentIndex}
-              preparing={view.preparing}
-              showXp={showXp}
-              {...rowExtras(r)}
-            />
-          ))}
-        </ol>
+    // `@container`: la fila se parte por el ancho de la planilla y no por el de
+    // la ventana, porque con el panel «Del turno» al lado la planilla es mucho
+    // más angosta que la pantalla.
+    <section aria-label={t.encOrder} className="card @container min-w-0 flex-[999_1_640px] overflow-hidden p-0">
+      <div className={cx(LEDGER, 'eyebrow hidden border-b border-hairline px-3.5 py-2.5 @[760px]:grid')} aria-hidden="true">
+        <span className="text-center">{t.encInitiativeShort}</span>
+        <span>{t.encCombatant}</span>
+        <span>{t.encHp}</span>
+        <span className="text-center">{t.encAc}</span>
+        <span />
+        <span />
       </div>
+      <ol>
+        {rows.map((r, i) => (
+          <LedgerRow
+            key={r.c.id}
+            row={r}
+            catalog={catalog}
+            active={r.c.id === view.currentId}
+            acted={!view.preparing && view.currentIndex >= 0 && i < view.currentIndex}
+            preparing={view.preparing}
+            showXp={showXp}
+            {...rowExtras(r)}
+          />
+        ))}
+      </ol>
     </section>
   );
 }
@@ -382,9 +385,23 @@ interface RowExtras {
   actions?: ReactNode;
 }
 
-function LedgerRow({ row, active, acted, preparing, showXp, sideControl, actions }: { row: Row; active: boolean; acted: boolean; preparing: boolean; showXp: boolean } & RowExtras) {
+function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl, actions }: { row: Row; catalog: Catalog; active: boolean; acted: boolean; preparing: boolean; showXp: boolean } & RowExtras) {
   const t = useTexts();
   const lang = useLang();
+  // El turno que pasa se lleva la vista con él: en una mesa con muchos
+  // combatientes la fila activa queda fuera de pantalla (`_RevealWhenActive` de
+  // Flutter). No en el primer dibujado, para no mover la página al entrar.
+  const ref = useRef<HTMLLIElement>(null);
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    if (!active || preparing) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    ref.current?.scrollIntoView?.({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
+  }, [active, preparing]);
   // Los PX van primero: la línea se recorta por el final.
   const xp = showXp && row.detail?.xp != null ? new Intl.NumberFormat(lang).format(row.detail.xp) : null;
   const xpText = xp === null ? null : row.c.side === 'ally' ? t.encAllyXpValue(xp) : t.encXpValue(xp);
@@ -395,8 +412,9 @@ function LedgerRow({ row, active, acted, preparing, showXp, sideControl, actions
   const hp = derived.hp;
   return (
     <li
+      ref={ref}
       className={cx(
-        preparing ? LEDGER_PREPARING : LEDGER,
+        ROW,
         'items-center border-b border-l-[3px] border-hairline py-[9px] pr-3.5 pl-[11px] last:border-b-0',
         active ? 'border-l-verdant bg-gold-soft' : 'border-l-transparent',
         acted && 'opacity-60',
@@ -404,7 +422,7 @@ function LedgerRow({ row, active, acted, preparing, showXp, sideControl, actions
       aria-current={active ? 'true' : undefined}
       data-combatant={c.id}
     >
-      <div className="text-center">
+      <div className="order-1 text-center">
         <div className={cx('num leading-none', active ? 'text-[19px] text-verdant' : 'text-[17px] text-text-muted')}>
           {preparing ? t.dmNoValue : c.initiative}
         </div>
@@ -414,7 +432,7 @@ function LedgerRow({ row, active, acted, preparing, showXp, sideControl, actions
           </div>
         )}
       </div>
-      <div className="min-w-0">
+      <div className="order-2 min-w-0">
         <div className={cx('font-display truncate text-[15px] text-on-surface', derived.down && 'line-through')}>{c.name}</div>
         <div className="mt-[3px] flex min-w-0 items-center gap-1.5">
           {!player &&
@@ -423,10 +441,10 @@ function LedgerRow({ row, active, acted, preparing, showXp, sideControl, actions
                 {t.encSides[c.side] ?? c.side}
               </span>
             ))}
-          <span className={cx('truncate text-[11.5px]', derived.down ? 'text-crimson' : 'text-on-surface-variant')}>{[xpText, metaOf(row, derived.down, t)].filter(Boolean).join(' · ')}</span>
+          <span className={cx('truncate text-[11.5px]', derived.down ? 'text-crimson' : 'text-on-surface-variant')}>{[xpText, metaOf(row, derived.down, catalog, t)].filter(Boolean).join(' · ')}</span>
         </div>
       </div>
-      <div data-field="hp">
+      <div className="order-4 col-span-2 col-start-2 mt-2 @[760px]:order-3 @[760px]:col-auto @[760px]:mt-0" data-field="hp">
         {hp ? (
           <>
             <div className="flex items-baseline gap-2">
@@ -444,28 +462,42 @@ function LedgerRow({ row, active, acted, preparing, showXp, sideControl, actions
           <span className="text-[12px] text-text-muted">{t.encNoHp}</span>
         )}
       </div>
-      <div className="text-center" data-field="ac">
+      <div className="order-3 text-center @[760px]:order-4" data-field="ac">
+        <span className="plaque-label block @[760px]:hidden">{t.encAc}</span>
         <div className="num text-[14px] text-on-surface">{ac ?? t.dmNoValue}</div>
       </div>
-      <div className="flex flex-wrap gap-[5px]">
+      <div className={cx('order-5 col-span-2 col-start-2 mt-2 flex-wrap gap-[5px] @[760px]:col-auto @[760px]:mt-0 @[760px]:flex', (c.tags ?? []).length > 0 ? 'flex' : 'hidden')}>
         {(c.tags ?? []).map((tag) => (
           <span key={tag} className="plaque rounded-[var(--radius-pill)] px-[9px] py-px text-[11.5px] text-on-surface">
             {tag}
           </span>
         ))}
       </div>
-      {preparing && <div className="flex items-center justify-end gap-1">{actions}</div>}
+      {preparing && <div className="order-6 col-span-3 mt-1.5 flex items-center justify-end gap-1 @[760px]:col-auto @[760px]:mt-0">{actions}</div>}
     </li>
   );
 }
 
 /** La línea bajo el nombre: especie y clases de un jugador, la línea de tipo
  *  de un PNJ o de un monstruo; un caído dice que se salta su turno. */
-function metaOf({ c, member, npc, detail }: Row, down: boolean, t: Texts): string {
+function metaOf({ c, member, npc, detail }: Row, down: boolean, catalog: Catalog, t: Texts): string {
   if (down) return t.encDownMeta;
   if (c.kind === 'player') {
     if (!member) return '';
-    return t.npcCharacterLine(member.raceName, member.classes.map((k) => `${k.name} ${k.level}`).join(' · '));
+    // Lo que el jugador tiene prendido va primero: la línea se recorta por el
+    // final, y en combate es lo que le cambia los números (`_playerStates`).
+    const beastId = member.character.combat?.wildShapeCreatureId;
+    const beast = beastId ? catalog.creatures.find((k) => k.id === beastId) : undefined;
+    const states = [
+      ...(beast ? [t.wildShapeAs(String(beast.name))] : []),
+      ...(member.sheet?.activeModes ?? [])
+        .filter((m) => m.active)
+        .map((m) => {
+          const variant = m.activeVariant ? m.variants.find((v) => v.id === m.activeVariant)?.name : undefined;
+          return variant ? `${m.name}: ${variant}` : m.name;
+        }),
+    ];
+    return [...states, t.npcCharacterLine(member.raceName, member.classes.map((k) => `${k.name} ${k.level}`).join(' · '))].join(' · ');
   }
   if (c.kind === 'npc') return npc ? npcTypeLine(npc, t) : '';
   return detail?.monsterLine ?? '';
