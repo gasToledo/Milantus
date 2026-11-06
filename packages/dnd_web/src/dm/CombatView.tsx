@@ -189,7 +189,7 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
           />
         ) : (
           <>
-            <ControlBar view={view} onAdd={() => setDialog('add')} onDiscard={() => setDialog('discard')} />
+            <ControlBar view={view} onAdd={() => setDialog('add')} onDiscard={() => setDialog('discard')} onNext={() => writer.act({ type: 'next' })} />
             {view.preparing && showDifficulty && rows.length > 0 && details && <DifficultyBand difficulty={details.difficulty} />}
             {rows.length === 0 ? (
               <AppEmptyState kind="empty" message={t.encEmptyOrder} />
@@ -281,8 +281,9 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
         title={t.dmSectionCombat}
         kicker={kicker}
         actions={
-          data?.view &&
-          (data.view.preparing ? (
+          // En curso, «Siguiente turno» va en la placa de la ronda (`ControlBar`),
+          // al lado de lo que cuenta: a pedido del usuario, que lo buscaba ahí.
+          data?.view?.preparing && (
             <Button
               icon={Dices}
               data-action="roll-initiative"
@@ -291,11 +292,7 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
             >
               {t.dmRollInitiative}
             </Button>
-          ) : (
-            <Button icon={SkipForward} data-action="next-turn" disabled={data.rows.length === 0} onClick={() => writer.act({ type: 'next' })}>
-              {t.dmNextTurn}
-            </Button>
-          ))
+          )
         }
       />
       {body}
@@ -353,7 +350,7 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
 
 /** La placa de arriba: ronda, turno y cuántos quedan en pie; o, mientras se
  *  arma, que todavía no empezó. */
-function ControlBar({ view, onAdd, onDiscard }: { view: EncounterView; onAdd: () => void; onDiscard: () => void }) {
+function ControlBar({ view, onAdd, onDiscard, onNext }: { view: EncounterView; onAdd: () => void; onDiscard: () => void; onNext: () => void }) {
   const t = useTexts();
   const plaque = 'plaque flex flex-wrap items-center gap-x-[18px] gap-y-2.5 px-4 py-3';
   if (view.preparing) {
@@ -399,6 +396,9 @@ function ControlBar({ view, onAdd, onDiscard }: { view: EncounterView; onAdd: ()
       <span className="flex-1" />
       <Button tone="soft" icon={Plus} data-action="add-combatant" onClick={onAdd}>
         {t.dmAddToCombat}
+      </Button>
+      <Button icon={SkipForward} data-action="next-turn" disabled={view.encounter.combatants.length === 0} onClick={onNext}>
+        {t.dmNextTurn}
       </Button>
     </div>
   );
@@ -542,6 +542,11 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
   const mark = derived.down ? t.encSkips : active ? t.encTurnWord : acted ? t.encActed : '';
   const ac = row.detail?.ac ?? null;
   const hp = derived.hp;
+  // Lo que ya jugó esta ronda se atenúa en sus datos y **no en sus botones**: al
+  // goblin que ya actuó se le sigue pegando, y un botón gris se lee como apagado.
+  // Un caído se atenúa entero: ahí sí terminó (a pedido del usuario).
+  const faded = (acted || derived.down) && 'opacity-60';
+  const fadedActions = derived.down && 'opacity-60';
   const initiativeCell = (
     <>
       <div className={cx('num leading-none', active ? 'text-[19px] text-verdant' : 'text-[17px] text-text-muted')}>{preparing ? t.dmNoValue : c.initiative}</div>
@@ -559,12 +564,11 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
         ROW,
         'items-center border-b border-l-[3px] border-hairline py-[9px] pr-3.5 pl-[11px] last:border-b-0',
         active ? 'border-l-verdant bg-gold-soft' : 'border-l-transparent',
-        acted && 'opacity-60',
       )}
       aria-current={active ? 'true' : undefined}
       data-combatant={c.id}
     >
-      <div className="order-1 text-center">
+      <div className={cx('order-1 text-center', faded)}>
         {fixInitiative ? (
           <Tooltip content={t.encFixInitiative}>
             <button type="button" aria-label={t.encFixInitiative} data-action="fix-initiative" onClick={fixInitiative} className="w-full rounded-[var(--radius-nav)] py-1 hover:bg-plaque">
@@ -575,7 +579,7 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
           initiativeCell
         )}
       </div>
-      <div className="order-2 min-w-0">
+      <div className={cx('order-2 min-w-0', faded)}>
         <div className={cx('font-display truncate text-[15px] text-on-surface', derived.down && 'line-through')}>{c.name}</div>
         <div className="mt-[3px] flex min-w-0 items-center gap-1.5">
           {!player &&
@@ -587,7 +591,7 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
           <span className={cx('truncate text-[11.5px]', derived.down ? 'text-crimson' : 'text-on-surface-variant')}>{[xpText, metaOf(row, derived.down, catalog, t)].filter(Boolean).join(' · ')}</span>
         </div>
       </div>
-      <div className="order-4 col-span-2 col-start-2 mt-2 @[760px]:order-3 @[760px]:col-auto @[760px]:mt-0" data-field="hp">
+      <div className={cx('order-4 col-span-2 col-start-2 mt-2 @[760px]:order-3 @[760px]:col-auto @[760px]:mt-0', faded)} data-field="hp">
         {hp ? (
           <>
             <div className="flex items-baseline gap-2">
@@ -604,18 +608,18 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
           <span className="text-[12px] text-text-muted">{t.encNoHp}</span>
         )}
       </div>
-      <div className="order-3 text-center @[760px]:order-4" data-field="ac">
+      <div className={cx('order-3 text-center @[760px]:order-4', faded)} data-field="ac">
         <span className="plaque-label block @[760px]:hidden">{t.encAc}</span>
         <div className="num text-[14px] text-on-surface">{ac ?? t.dmNoValue}</div>
       </div>
-      <div className={cx('order-5 col-span-2 col-start-2 mt-2 flex-wrap gap-[5px] @[760px]:col-auto @[760px]:mt-0 @[760px]:flex', (c.tags ?? []).length > 0 ? 'flex' : 'hidden')}>
+      <div className={cx('order-5 col-span-2 col-start-2 mt-2 flex-wrap gap-[5px] @[760px]:col-auto @[760px]:mt-0 @[760px]:flex', (c.tags ?? []).length > 0 ? 'flex' : 'hidden', faded)}>
         {(c.tags ?? []).map((tag) => (
           <span key={tag} className="plaque rounded-[var(--radius-pill)] px-[9px] py-px text-[11.5px] text-on-surface">
             {tag}
           </span>
         ))}
       </div>
-      <div className="order-6 col-span-3 mt-1.5 flex items-center justify-end gap-1 @[760px]:col-auto @[760px]:mt-0">{actions}</div>
+      <div className={cx('order-6 col-span-3 mt-1.5 flex items-center justify-end gap-1 @[760px]:col-auto @[760px]:mt-0', fadedActions)}>{actions}</div>
     </li>
   );
 }
@@ -657,11 +661,16 @@ interface RowCtx {
   onFix: (row: Row) => void;
 }
 
-/** El enlace a la ficha de un jugador de la mesa. */
+/** El enlace a la ficha de un jugador de la mesa. Es una pill con borde y no
+ *  texto suelto: en una fila de botones, lo único sin forma de botón no se
+ *  reconocía como tocable (a pedido del usuario). */
 function OpenSheetLink({ campaignId, memberId }: { campaignId: string; memberId: string }) {
   const t = useTexts();
   return (
-    <Link href={dmMemberHref(campaignId, memberId, 'personaje')} className="inline-flex min-h-12 items-center gap-1.5 px-1.5 text-[13px] whitespace-nowrap text-gold @[760px]:min-h-11">
+    <Link
+      href={dmMemberHref(campaignId, memberId, 'personaje')}
+      className="inline-flex min-h-12 items-center gap-1.5 rounded-[var(--radius-pill)] border-[1.5px] border-gold px-3 text-[13px] whitespace-nowrap text-gold hover:bg-gold-soft @[760px]:min-h-[34px]"
+    >
       <FileText size={16} aria-hidden="true" />
       {t.encOpenSheet}
     </Link>
