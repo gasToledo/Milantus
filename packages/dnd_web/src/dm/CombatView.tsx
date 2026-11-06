@@ -734,12 +734,12 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
         )}
       </div>
       <div className={cx('order-2 min-w-0', faded)}>
-        <div className="flex min-w-0 items-center gap-[7px]">
+        <div className="flex min-w-0 flex-wrap items-center gap-x-[7px] gap-y-1">
           <div className={cx('font-display min-w-0 truncate text-[15px] text-on-surface', derived.down && 'line-through')}>{c.name}</div>
           {/* Rellena y sin atenuar: se tiene que leer de un vistazo y de lejos. */}
           {adv && (
             <span
-              className={cx('inline-flex h-[19px] shrink-0 items-center gap-[3px] rounded-[var(--radius-pill)] pr-2 pl-[5px] text-[11px] font-bold text-on-primary', adv === 'advantage' ? 'bg-verdant' : 'bg-crimson')}
+              className={cx('inline-flex min-h-[19px] min-w-0 max-w-full items-center gap-[3px] rounded-[var(--radius-pill)] pr-2 pl-[5px] text-[11px] font-bold wrap-anywhere text-on-primary', adv === 'advantage' ? 'bg-verdant' : 'bg-crimson')}
               data-field="advantage"
             >
               {adv === 'advantage' ? <ArrowUp size={12} strokeWidth={3} aria-hidden="true" /> : <ArrowDown size={12} strokeWidth={3} aria-hidden="true" />}
