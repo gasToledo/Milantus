@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { ArrowDown, ArrowUp, BookOpen, Dices, ExternalLink, FileText, Flame, Plus, Shield, SkipForward, Tag, X } from 'lucide-react';
+import { ArrowDown, ArrowUp, BookOpen, CheckCheck, Dices, ExternalLink, FileText, Flame, Plus, Shield, SkipForward, Tag, X } from 'lucide-react';
 import { useCampaignEncounter, useCampaignMembers, useCampaignNotebook, useCampaignNpcs, useRosterSettings, useSheetCatalog } from '../api/queries';
 import type { DmCampaign } from '../api/client';
 import { TurnProfile } from './combat/TurnProfile';
@@ -36,6 +36,7 @@ import { AddCombatantDialog } from './combat/AddCombatantDialog';
 import { tagLabel } from './combat/conditions';
 import { DifficultyBand } from './combat/DifficultyBand';
 import { EffectsDialog } from './combat/EffectsDialog';
+import { EndCombatDialog } from './combat/EndCombatDialog';
 import { NumberPromptDialog } from './combat/NumberPromptDialog';
 import { SideSelector } from './combat/SideSelector';
 import { retryEncounterSave, useEncounterWriter } from './combat/encounterWriter';
@@ -80,8 +81,8 @@ interface Row {
  * empieza con «Tirar iniciativa» (`combat/`). **En curso** pasa el turno, daña y
  * cura con la cifra compartida, corrige la iniciativa, suma tarde, cambia el
  * bando y saca; anota efectos, ventaja o desventaja, PG temporales y bono a la CA
- * (`EffectsDialog`) y gasta las marcas legendarias; terminar el combate sigue en
- * Flutter (6g6).
+ * (`EffectsDialog`), gasta las marcas legendarias y termina el combate
+ * archivándolo en el Cuaderno o descartándolo (`EndCombatDialog`).
  *
  * Los PG de un monstruo o de un PNJ son los del encuentro; los de un jugador,
  * los de **su ficha real** (`modo-dm.md`: el DM no los escribe), con el máximo
@@ -97,7 +98,7 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
   const notebook = useCampaignNotebook(campaign.id);
   const catalog = useSheetCatalog(lang);
   const [toast, setToast] = useState<{ key: number; tone: ToastTone; message: string; action?: { label: string; onSelect: () => void } } | null>(null);
-  const [dialog, setDialog] = useState<'add' | 'discard' | null>(null);
+  const [dialog, setDialog] = useState<'add' | 'discard' | 'finish' | null>(null);
   // El combatiente cuyos efectos y defensas se editan.
   const [effectsId, setEffectsId] = useState<string | null>(null);
   // La cifra de daño o curación es una sola para todo el combate. Se lee de la
@@ -199,8 +200,9 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
           />
         ) : (
           <>
-            <ControlBar view={view} onAdd={() => setDialog('add')} onDiscard={() => setDialog('discard')} onNext={() => writer.act({ type: 'next' })} />
+            <ControlBar view={view} onAdd={() => setDialog('add')} onDiscard={() => setDialog('discard')} onFinish={() => setDialog('finish')} onNext={() => writer.act({ type: 'next' })} />
             {view.preparing && showDifficulty && rows.length > 0 && details && <DifficultyBand difficulty={details.difficulty} />}
+            {!view.preparing && <SideWipedBanner standing={view.standing} onFinish={() => setDialog('finish')} />}
             {rows.length === 0 ? (
               <AppEmptyState kind="empty" message={t.encEmptyOrder} />
             ) : (
@@ -381,6 +383,16 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
           onClose={() => setDialog(null)}
         />
       )}
+      {dialog === 'finish' && data?.view && (
+        <EndCombatDialog
+          fallen={data.rows.flatMap(({ c, derived }) => c.kind === 'npc' && c.npcId && derived.down
+            ? [{ npcId: c.npcId, name: c.name, side: c.side }]
+            : [])}
+          onFinish={writer.close}
+          onDiscard={writer.discard}
+          onClose={() => setDialog(null)}
+        />
+      )}
       {toast && <Toast key={toast.key} tone={toast.tone} message={toast.message} action={toast.action} open onOpenChange={(open) => !open && setToast(null)} />}
     </div>
   );
@@ -388,7 +400,7 @@ export function CombatView({ campaign }: { campaign: DmCampaign }) {
 
 /** La placa de arriba: ronda, turno y cuántos quedan en pie; o, mientras se
  *  arma, que todavía no empezó. */
-function ControlBar({ view, onAdd, onDiscard, onNext }: { view: EncounterView; onAdd: () => void; onDiscard: () => void; onNext: () => void }) {
+function ControlBar({ view, onAdd, onDiscard, onFinish, onNext }: { view: EncounterView; onAdd: () => void; onDiscard: () => void; onFinish: () => void; onNext: () => void }) {
   const t = useTexts();
   const plaque = 'plaque flex flex-wrap items-center gap-x-[18px] gap-y-2.5 px-4 py-3';
   if (view.preparing) {
@@ -435,8 +447,29 @@ function ControlBar({ view, onAdd, onDiscard, onNext }: { view: EncounterView; o
       <Button tone="soft" icon={Plus} data-action="add-combatant" onClick={onAdd}>
         {t.dmAddToCombat}
       </Button>
+      <Button tone="soft" icon={CheckCheck} data-action="finish-combat" onClick={onFinish}>
+        {t.encFinish}
+      </Button>
       <Button icon={SkipForward} data-action="next-turn" disabled={view.encounter.combatants.length === 0} onClick={onNext}>
         {t.dmNextTurn}
+      </Button>
+    </div>
+  );
+}
+
+function SideWipedBanner({ standing, onFinish }: { standing: EncounterView['standing']; onFinish: () => void }) {
+  const t = useTexts();
+  const enemiesWiped = standing.enemies > 0 && standing.enemiesUp === 0;
+  const alliesWiped = standing.allies > 0 && standing.alliesUp === 0;
+  if (!enemiesWiped && !alliesWiped) return null;
+
+  const message = enemiesWiped && alliesWiped ? t.encNobodyStanding : enemiesWiped ? t.encNoEnemyStanding : t.encNoAllyStanding;
+  // Los PG se releen cada 5 s. Un diálogo automático interrumpiría al DM mientras escribe.
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 rounded-[var(--radius-nav)] border border-gold px-3 py-2">
+      <span>{message} {t.encWrapUp}</span>
+      <Button icon={CheckCheck} data-action="finish-combat-banner" onClick={onFinish}>
+        {t.encFinish}
       </Button>
     </div>
   );

@@ -27,11 +27,10 @@ import { NpcSheetView } from './npcs/NpcSheetView';
 
 /**
  * El Modo DM (`/v2/dm/...`). Acá el DM crea, edita y borra campañas y suma o
- * echa personajes de la mesa, arma el combate y lo empieza (`combat/`); lo demás
- * que escribe (capítulos, notas, la música y jugar el turno, hasta 6g4) sigue en Flutter y
- * acá se lee. Cada pedido pasa por la API de campañas, cuya autorización va
- * adentro del `WHERE`: una campaña ajena y una inexistente responden igual
- * (404), y la pantalla tampoco las distingue.
+ * echa personajes de la mesa, edita capítulos, notas y escenas de música, y
+ * arma, juega y termina el combate (`combat/`). Cada pedido pasa por la API de
+ * campañas, cuya autorización va adentro del `WHERE`: una campaña ajena y una
+ * inexistente responden igual (404), y la pantalla tampoco las distingue.
  */
 export function DmPage({ view, account }: { view: DmView; account: Account }) {
   const t = useTexts();

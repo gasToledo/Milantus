@@ -317,7 +317,7 @@ export async function fetchCampaignChapters(campaignId: string, signal: AbortSig
   return chapters;
 }
 
-async function sendJson(method: 'POST' | 'PUT', path: string, body: unknown): Promise<void> {
+async function sendJson(method: 'POST' | 'PUT' | 'DELETE', path: string, body: unknown): Promise<void> {
   const response = await fetch(path, { method, headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
   if (!response.ok) throw new ApiError(response.status, path);
 }
@@ -450,6 +450,14 @@ export const saveCampaignEncounter = (campaignId: string, encounter: JsonObject)
 
 /** Descarta el combate que se está armando: no queda registro. */
 export const discardCampaignEncounter = (campaignId: string) => remove(`${encounterPath(campaignId)}?discard=true`);
+
+/** Archiva el combate en el Cuaderno. El servidor marca muertos en la misma
+ *  transacción solo a los PNJ que estaban en este combate y en esta campaña. */
+export async function endCampaignEncounter(campaignId: string, deadNpcIds: string[]): Promise<void> {
+  const path = encounterPath(campaignId);
+  if (deadNpcIds.length === 0) return remove(path);
+  return sendJson('DELETE', path, { deadNpcIds });
+}
 
 /** Un PNJ de una campaña (`GET /api/campaigns/:id/npcs`): el documento, su
  *  estado **en esa** campaña, los PG con que volvió del último combate (sin

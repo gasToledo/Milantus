@@ -3,7 +3,7 @@
 // (`api/saveQueue.ts`). Descartar no pasa por la cola: es un borrado.
 import { useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { discardCampaignEncounter, saveCampaignEncounter } from '../../api/client';
+import { discardCampaignEncounter, endCampaignEncounter, saveCampaignEncounter } from '../../api/client';
 import { queryKeys } from '../../api/queries';
 import { createSaveQueue } from '../../api/saveQueue';
 import { encounterAct, type Catalog, type EncounterAction, type JsonObject } from '../../engine';
@@ -17,7 +17,7 @@ export function useEncounterWriter(
   campaignId: string,
   catalog: Catalog | undefined,
   onFailed: () => void,
-): { act(action: EncounterAction): void; discard(): Promise<void> } {
+): { act(action: EncounterAction): void; discard(): Promise<void>; close(deadNpcIds: string[]): Promise<void> } {
   const client = useQueryClient();
   return useMemo(() => {
     const key = queryKeys.campaignEncounter(campaignId);
@@ -54,6 +54,17 @@ export function useEncounterWriter(
         await queue.drop(campaignId);
         await discardCampaignEncounter(campaignId);
         client.setQueryData<JsonObject | null>(key, null);
+      },
+      async close(deadNpcIds) {
+        // El servidor archiva la copia guardada. Esperamos el último cambio
+        // para que entre en el registro y ningún guardado recree el combate.
+        await queue.flush(campaignId);
+        await endCampaignEncounter(campaignId, deadNpcIds);
+        await client.cancelQueries({ queryKey: key });
+        client.setQueryData<JsonObject | null>(key, null);
+        void client.invalidateQueries({ queryKey: queryKeys.campaignNotebook(campaignId) });
+        void client.invalidateQueries({ queryKey: queryKeys.campaignNpcs(campaignId) });
+        void client.invalidateQueries({ queryKey: queryKeys.npcs });
       },
     };
   }, [client, campaignId, catalog, onFailed]);

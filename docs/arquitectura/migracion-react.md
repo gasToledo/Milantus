@@ -239,7 +239,7 @@ repiten acá.
 - **El Modo DM** en `/v2/dm` (`src/dm/`), al que lleva «DM» del
   interruptor. Desde 6b escribe campañas y la Mesa y desde 6c capítulos,
   notas y el reparto de objetos y desde 6d las escenas de música (bloques de
-  6b, 6c y 6d, abajo); el combate se **arma** acá desde 6g2 y se **empieza** desde 6g3; se **juega** desde 6g4 y se le anotan efectos y defensas desde 6g5 (terminarlo sigue en Flutter)
+  6b, 6c y 6d, abajo); el combate se **arma** acá desde 6g2 y se **empieza** desde 6g3; se **juega** desde 6g4, se le anotan efectos y defensas desde 6g5 y se **termina** desde 6g6
   (desde 6e1 los vínculos de un PNJ con sus campañas ya se escriben, desde 6e2
   se crea y se borra un PNJ sin ficha de personaje, desde 6f1 se crea uno con ficha, desde 6f2 se escribe su ficha, desde 6f3 se sube de nivel y se editan sus elecciones y desde 6e3 se escribe su texto
   desde 6e4 su bloque y desde 6e5 su retrato),
@@ -406,8 +406,12 @@ repiten acá.
   en «Del turno» y en el teléfono; las **legendarias** de un monstruo son
   círculos (acciones) y rombos (resistencias) que se tachan tocándolos, y la
   solapa **Efectos** junta los de toda la mesa. En Flutter, congelado, los −/+ no
-  gastan temporales y no se ven las marcas. **Terminar el combate sigue en
-  Flutter** (6g6); el documento es el mismo, así que conviven. **Los PG salen de dos fuentes**,
+  gastan temporales y no se ven las marcas. **6g6, terminar el combate**: si un
+  bando se queda sin nadie en pie, un aviso ofrece abrir el mismo diálogo que
+  «Terminar combate» en la placa. El DM puede guardar el combate en el Cuaderno
+  o descartarlo. Al guardar se envían primero los cambios pendientes y el
+  servidor marca muertos solo a los PNJ caídos que el DM eligió y conserva los
+  PG de los demás para el próximo combate de esa campaña. **Los PG salen de dos fuentes**,
   como en Flutter: los de un monstruo o un PNJ, del encuentro; los de un
   jugador, de **su ficha real** (actuales de la ficha cruda, máximo de
   `computeSheet`), que el DM no escribe: la fila dice «En su ficha». Sin combate
@@ -778,7 +782,7 @@ frontera sigue donde estaba: **el DM no escribe la ficha de otra cuenta**.
   (no escribe la ficha) y echar corta el vínculo tras confirmar. `MemberSheetView`
   sigue sin un solo control. No se pide el aviso de eventos tras cada acción
   (`_checkEventsSoon` de Flutter): decisión tomada, no un olvido.
-- Queda en Flutter, del combate en curso: terminarlo (6g6).
+- Del combate queda 6g7: ofrecer música, «Convertir en PNJ» y sumar desde el Bestiario.
 
 **Paso 6f3: las pantallas de edición** *(existe)*. Toca solo `dnd_web`. Subir de
 nivel, elecciones, editor de conjuros, planos del Artífice y formas salvajes son
@@ -984,7 +988,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    alta y borrado *(existe)*; 6e3, el texto de la ficha *(existe)*; 6e4, el editor del bloque *(existe)*; 6e5,
    retrato y mostrar a la mesa *(existe)*; 6f, la ficha de PNJ, en tres: 6f1,
    crearla *(existe)*; 6f2, escribirla *(existe)*; 6f3, sus pantallas de edición (subir de
-   nivel, elecciones, conjuros, planos, formas e imprimir) *(existe)*; 6g, el combate, en siete: 6g1, el puente del motor *(existe)*; 6g2, armar *(existe)*; 6g3, dificultad e iniciativa *(existe)*; 6g4, jugar *(existe)*; 6g5, efectos, legendarias y defensas *(existe)*; 6g6, cerrar; 6g7, música, «Convertir en PNJ» y sumar desde el Bestiario. Importar y exportar PNJ sigue en el paso 7. Antes de portar esto es lectura
+   nivel, elecciones, conjuros, planos, formas e imprimir) *(existe)*; 6g, el combate, en siete: 6g1, el puente del motor *(existe)*; 6g2, armar *(existe)*; 6g3, dificultad e iniciativa *(existe)*; 6g4, jugar *(existe)*; 6g5, efectos, legendarias y defensas *(existe)*; 6g6, cerrar *(existe)*; 6g7, música, «Convertir en PNJ» y sumar desde el Bestiario. Importar y exportar PNJ sigue en el paso 7. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de
    otra cuenta» es del servidor y vale igual para el cliente nuevo. Entra acá
    también la edición de la ficha completa de un PNJ (inventario, comprar y
