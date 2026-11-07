@@ -26,6 +26,17 @@ test('el retrato vuelve a la pestaña de la ficha desde la que se abrió', async
   await expect(page).toHaveURL(combate);
 });
 
+test('Atrás del panel vuelve a Mis personajes al cambiar del retrato a otra pestaña', async ({ page }) => {
+  const t = textsFor('es');
+  const panel = page.getByRole('complementary', { name: t.panelLabel });
+  await page.goto(`/v2/personajes/${BRUNILDA}/combate`);
+  await panel.getByRole('link', { name: t.actionPortrait, exact: true }).click();
+  await panel.getByRole('link', { name: t.navInventory, exact: true }).click();
+  await expect(page).toHaveURL(`/v2/personajes/${BRUNILDA}/inventario`);
+  await panel.getByRole('link', { name: t.luBack, exact: true }).click();
+  await expect(page).toHaveURL('/v2/personajes');
+});
+
 test('la ficha muestra los números que da el motor para el personaje sembrado', async ({ page, request }) => {
   // Lo esperado sale del motor, no de una transcripción: el mismo personaje
   // que sirve la API, calculado con el mismo dart2js que corre el navegador.

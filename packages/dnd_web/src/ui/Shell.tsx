@@ -249,16 +249,19 @@ export function NavGroup({ label, title, children }: { label: string; title?: st
  *  en el mismo sitio. */
 export function SidebarBack({
   href,
+  back = true,
   onClick,
 }: {
   href: string;
+  /** Si es falso, va siempre a href. */
+  back?: boolean;
   /** Para confirmar antes de salir: `preventDefault` frena la navegación. */
   onClick?: MouseEventHandler<HTMLAnchorElement>;
 }) {
   const t = useTexts();
   return (
     <Link
-      back
+      back={back}
       href={href}
       onClick={onClick}
       className="plaque flex min-h-9 items-center gap-2 rounded-[var(--radius-nav)] px-3 py-2 text-[13px] text-on-surface hover:text-gold"
