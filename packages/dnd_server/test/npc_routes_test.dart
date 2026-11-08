@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
+import 'package:dnd_engine/backup_export.dart' as backup;
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:dnd_server/src/ai/portrait_generation_service.dart';
 import 'package:dnd_server/src/app.dart';
@@ -1331,6 +1332,298 @@ void main() {
       expect(
         decode((await send('GET', '/api/npcs', token: token)).body)['npcs'],
         isEmpty,
+      );
+    });
+  });
+
+  group('exportar y vista previa de PNJ', () {
+    Future<({int status, Uint8List bytes})> getZip(
+      String token,
+      String path,
+    ) async {
+      final response = await handler(
+        Request(
+          'GET',
+          Uri.parse('http://localhost$path'),
+          headers: {'cookie': 'dnd_session=$token'},
+        ),
+      );
+      final bytes = Uint8List.fromList(
+        await response.read().expand((chunk) => chunk).toList(),
+      );
+      return (status: response.statusCode, bytes: bytes);
+    }
+
+    Map<String, dynamic> manifestOf(Uint8List zip) {
+      final file = ZipDecoder()
+          .decodeBytes(zip)
+          .findFile(NpcBundleCodec.manifestName)!;
+      return (jsonDecode(utf8.decode(file.readBytes()!)) as Map)
+          .cast<String, dynamic>();
+    }
+
+    // Un PNJ sin ficha con retrato, una nota de imagen, tags y una campaña.
+    Future<String> seedNpc(String token) async {
+      final created = await send(
+        'POST',
+        '/api/npcs',
+        token: token,
+        body: {
+          'npc': {
+            ...npcJson('Toblen'),
+            'tags': ['mercenario'],
+          },
+        },
+      );
+      final id = decode(created.body)['npc']['id'] as String;
+      Future<String> uploadImage() async => decode(
+        (await send(
+          'POST',
+          '/api/npcs/$id/portraits',
+          token: token,
+          body: {'bytes': base64Encode(png())},
+        )).body,
+      )['key'];
+      final portrait = await uploadImage();
+      final noteImage = await uploadImage();
+      final stored = (await npcs.find(userIdOf('dm'), id))!.npc;
+      await send(
+        'PUT',
+        '/api/npcs/$id',
+        token: token,
+        body: {
+          'npc': stored
+              .copyWith(
+                portraitPaths: [portrait],
+                notes: [
+                  ...stored.notes,
+                  DiaryEntry(
+                    entryId: 'img',
+                    kind: DiaryEntryKind.image,
+                    title: 'Mapa',
+                    imageKey: noteImage,
+                  ),
+                ],
+              )
+              .toJson(),
+        },
+      );
+      await createCampaign(token, 'mesa');
+      await send('PUT', '/api/campaigns/mesa/npcs/$id', token: token);
+      return id;
+    }
+
+    test('un PNJ ajeno responde igual que uno inexistente', () async {
+      final token = await login('dm');
+      final id = await seedNpc(token);
+      final otro = await login('otro');
+
+      final ajeno = await getZip(otro, '/api/npcs/$id/export?notes=1');
+      final falso = await getZip(otro, '/api/npcs/no-existe/export?notes=1');
+
+      expect(ajeno.status, 404);
+      expect(ajeno.status, falso.status);
+      expect(utf8.decode(ajeno.bytes), utf8.decode(falso.bytes));
+    });
+
+    test('lo que no se marca no viaja, y nunca viajan las campañas', () async {
+      final token = await login('dm');
+      final id = await seedNpc(token);
+
+      final sin = await getZip(token, '/api/npcs/$id/export');
+      expect(sin.status, 200);
+      final bare = manifestOf(sin.bytes);
+      final npc = Npc.fromJson(bare['npc']);
+      expect(npc.notes, isEmpty);
+      expect(npc.background, isEmpty);
+      expect(npc.tags, isEmpty);
+      // Solo el retrato: la imagen de la nota se queda afuera con la nota.
+      expect(bare['portraits'], hasLength(1));
+      expect(bare.keys, isNot(contains('campaigns')));
+      expect(
+        ZipDecoder().decodeBytes(sin.bytes).files.map((f) => f.name),
+        unorderedEquals([NpcBundleCodec.manifestName, 'portraits/0.png']),
+      );
+
+      final con = await getZip(
+        token,
+        '/api/npcs/$id/export?background=1&tags=1&notes=1',
+      );
+      final full = manifestOf(con.bytes);
+      final complete = Npc.fromJson(full['npc']);
+      expect(complete.notes, hasLength(2));
+      expect(complete.background, 'TRASFONDO-SECRETO');
+      expect(complete.tags, ['mercenario']);
+      expect(full['portraits'], hasLength(2));
+    });
+
+    test('ida y vuelta: otra cuenta recibe el mismo PNJ y su ficha', () async {
+      final token = await login('dm');
+      final block = await createNpc(
+        token,
+        'Garrick',
+        kind: NpcSheetKind.block,
+        block: bandit,
+      );
+      final withSheet = await createNpc(
+        token,
+        'Maerith',
+        kind: NpcSheetKind.character,
+      );
+      final otro = await login('otro');
+
+      for (final original in [block, withSheet]) {
+        final id = original['npc']['id'] as String;
+        final zip = await getZip(
+          token,
+          '/api/npcs/$id/export?background=1&tags=1&notes=1',
+        );
+        final response = await send(
+          'POST',
+          '/api/npcs/import',
+          token: otro,
+          body: {'bytes': base64Encode(zip.bytes)},
+        );
+        expect(response.status, 200, reason: response.body);
+        final copy = decode(response.body);
+        expect(copy['npc']['id'], isNot(id));
+        expect(copy['npc']['name'], original['npc']['name']);
+        expect(copy['npc']['block'], original['npc']['block']);
+        expect(copy['npc']['background'], original['npc']['background']);
+        expect(
+          ((copy['npc']['notes'] as List?) ?? []).length,
+          ((original['npc']['notes'] as List?) ?? []).length,
+        );
+        expect(
+          ((copy['npc']['portraitPaths'] as List?) ?? []).length,
+          ((original['npc']['portraitPaths'] as List?) ?? []).length,
+        );
+        if (original['character'] != null) {
+          final a = Map.of(original['character'] as Map<String, dynamic>);
+          final b = Map.of(copy['character'] as Map<String, dynamic>);
+          expect(b['id'], isNot(a['id']));
+          a.remove('id');
+          b.remove('id');
+          expect(b, a);
+        }
+      }
+    });
+
+    test('la vista previa muestra el PNJ y no escribe nada', () async {
+      final token = await login('dm');
+      final id = await seedNpc(token);
+      final zip = await getZip(token, '/api/npcs/$id/export?notes=1');
+      final otro = await login('otro');
+      // La sonda cuenta cuántas veces se escribió en el almacén: el doble
+      // numera cada retrato guardado.
+      Future<int> probe() async {
+        final key = await portraits.save(
+          userId: userIdOf('otro'),
+          characterId: 'sonda',
+          bytes: png(),
+        );
+        return int.parse(RegExp(r'/(\d+)\.').firstMatch(key)!.group(1)!);
+      }
+
+      final before = await probe();
+      final preview = await send(
+        'POST',
+        '/api/npcs/import/preview',
+        token: otro,
+        body: {'bytes': base64Encode(zip.bytes)},
+      );
+      expect(preview.status, 200, reason: preview.body);
+      final body = decode(preview.body);
+      expect(body['npc']['name'], 'Toblen');
+      expect(body['portraitCount'], 2);
+      expect(await probe(), before + 1);
+      expect(
+        decode((await send('GET', '/api/npcs', token: otro)).body)['npcs'],
+        isEmpty,
+      );
+
+      final roto = await send(
+        'POST',
+        '/api/npcs/import/preview',
+        token: otro,
+        body: {'bytes': base64Encode(utf8.encode('no soy un zip'))},
+      );
+      expect(roto.status, 400);
+      expect(decode(roto.body)['code'], 'invalid_data');
+    });
+
+    test('un personaje exportado entra como PNJ con ficha', () async {
+      Future<String> backupOf(List<Character> characters) async {
+        final bytes = await backup.BackupBundleCodec.encode(
+          scope: backup.BackupScope.character,
+          characters: characters,
+          readPortrait: (_) async => png(),
+        );
+        return base64Encode(bytes);
+      }
+
+      Character hero(String id, {bool withExtras = false}) => Character(
+        id: id,
+        name: 'Ilse Varga',
+        raceId: 'human',
+        classId: 'fighter',
+        backgroundId: 'soldier',
+        assignedScores: const {},
+        portraitPaths: withExtras ? ['$id/0.png'] : const [],
+        portraitPrompts: withExtras ? {'$id/0.png': 'una guerrera'} : const {},
+        background: withExtras ? 'Exiliada del norte.' : '',
+        diary: withExtras
+            ? const [
+                DiaryEntry(entryId: 'a', title: 'Cuenta', body: 'Debo oro'),
+                DiaryEntry(
+                  entryId: 'b',
+                  kind: DiaryEntryKind.image,
+                  title: 'Imagen',
+                ),
+              ]
+            : const [],
+      );
+
+      final token = await login('dm');
+      final response = await send(
+        'POST',
+        '/api/npcs/import',
+        token: token,
+        body: {
+          'bytes': await backupOf([hero('ilse', withExtras: true)]),
+        },
+      );
+
+      expect(response.status, 200, reason: response.body);
+      final imported = decode(response.body);
+      final npc = Npc.fromJson(imported['npc']);
+      expect(npc.sheetKind, NpcSheetKind.character);
+      expect(npc.background, 'Exiliada del norte.');
+      // El Diario pasa al PNJ, sin las entradas de imagen.
+      expect(npc.notes.map((n) => n.title), ['Cuenta']);
+      final sheet = Character.fromJson(imported['character']);
+      expect(sheet.background, isEmpty);
+      expect(sheet.diary, isEmpty);
+      final key = sheet.portraitPaths.single;
+      expect(sheet.portraitPrompts[key], 'una guerrera');
+      expect(
+        (await send('GET', '/api/portraits/$key', token: token)).status,
+        200,
+      );
+
+      // Con dos personajes no se importa ninguno.
+      final dos = await send(
+        'POST',
+        '/api/npcs/import',
+        token: token,
+        body: {
+          'bytes': await backupOf([hero('a'), hero('b')]),
+        },
+      );
+      expect(dos.status, 400);
+      expect(
+        decode((await send('GET', '/api/npcs', token: token)).body)['npcs'],
+        hasLength(1),
       );
     });
   });

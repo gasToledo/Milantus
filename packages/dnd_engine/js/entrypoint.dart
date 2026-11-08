@@ -689,6 +689,31 @@ String npcs(String entriesJson, String catalogJson) {
   ]);
 }
 
+/// Lo que la ficha de un PNJ a importar usa y este catálogo no tiene
+/// (`missingOfficialContent`). `sheetJson` puede ser `null`.
+String npcImportMissing(
+  String? sheetJson,
+  String homebrewJson,
+  String catalogJson,
+) {
+  final sheet = sheetJson == null
+      ? null
+      : Character.fromJson(
+          (jsonDecode(sheetJson) as Map).cast<String, dynamic>());
+  final raw = jsonDecode(homebrewJson) as Map;
+  return jsonEncode(missingOfficialContent(
+    sheet,
+    {
+      for (final e in raw.entries)
+        '${e.key}': [
+          for (final doc in (e.value as List? ?? const []))
+            if (doc is Map) doc.cast<String, dynamic>(),
+        ],
+    },
+    _repoPara(catalogJson),
+  ));
+}
+
 /// El documento de un PNJ nuevo (`Npc.draft`), listo para `POST /api/npcs`.
 /// [baseCreatureId] vacío es un bloque vacío; un id que no está en el catálogo
 /// es un error y no un bloque vacío: el DM eligió otra cosa.
@@ -1146,6 +1171,7 @@ void main() {
   motor['abilityModifier'] = abilityModifierOf.toJS;
   motor['bestiary'] = bestiary.toJS;
   motor['npcs'] = npcs.toJS;
+  motor['npcImportMissing'] = npcImportMissing.toJS;
   motor['newNpc'] = newNpc.toJS;
   motor['npcEdit'] = npcEdit.toJS;
   motor['npcPortraitPrompt'] = npcPortraitPrompt.toJS;

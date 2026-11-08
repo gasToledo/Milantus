@@ -56,5 +56,6 @@ export 'src/engine/diary_ops.dart';
 export 'src/engine/creature_draft.dart';
 export 'src/engine/npc_edits.dart';
 export 'src/engine/npc_stats.dart';
+export 'src/engine/npc_import_check.dart';
 export 'src/engine/portrait_prompt.dart';
 export 'src/engine/demo_character.dart';

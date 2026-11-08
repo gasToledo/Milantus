@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Camera, EllipsisVertical, Pencil, Plus, Presentation, Trash2, X } from 'lucide-react';
+import { ArrowLeft, Camera, Download, EllipsisVertical, Pencil, Plus, Presentation, Trash2, X } from 'lucide-react';
 import { ApiError, deleteNpc, saveCharacter, type StoredNpc } from '../../api/client';
 import { dropPending } from '../../api/characterSave';
 import { dropNpcSave, flushNpcSave, retryNpcSave } from '../../api/npcSave';
@@ -22,6 +22,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { AppBusyLabel, AppErrorView, Notice } from '../../ui/status';
 import { Abbr } from '../MemberCard';
 import { flushEncounterSave } from '../combat/encounterWriter';
+import { ExportNpcDialog } from './ExportNpcDialog';
 import { useNpcLinks } from './links';
 import { NpcTableView } from './NpcTableView';
 import { NpcStatusSelector } from './NpcStatusSelector';
@@ -42,7 +43,7 @@ const ICON_BUTTON = 'inline-flex size-11 shrink-0 items-center justify-center ro
  * más: un PNJ ajeno y uno inexistente responden el mismo 404 y la pantalla
  * dice lo mismo. Acá se escribe el estado por campaña, se suma a otra, se
  * borra el PNJ, se escribe su texto (nombre, voz, tags, trasfondo y notas) y se
- * abre el editor de su bloque y el taller de retratos; sigue en Flutter exportar.
+ * abre el editor de su bloque y el taller de retratos y se exporta (el ZIP lo arma el servidor).
  */
 export function NpcDetailView({ npcId }: { npcId: string }) {
   const t = useTexts();
@@ -51,6 +52,7 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
   const campaigns = useDmCampaigns();
   const [adding, setAdding] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [onTable, setOnTable] = useState(false);
   const client = useQueryClient();
   const [toast, setToast] = useState<{ key: number; tone: ToastTone; message: string; action?: { label: string; onSelect: () => void } } | null>(null);
@@ -289,6 +291,10 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
               </DropdownMenuTrigger>
             </Tooltip>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => setExporting(true)} data-action="npc-export">
+                <Download size={15} aria-hidden="true" />
+                {t.npcExport}
+              </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => setDeleting(true)} className="text-crimson">
                 <Trash2 size={15} aria-hidden="true" />
                 {t.npcDelete}
@@ -368,6 +374,16 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
           errorText={t.npcDeleteFailed}
           onConfirm={remove}
           onClose={() => setDeleting(false)}
+        />
+      )}
+      {exporting && (
+        <ExportNpcDialog
+          npcId={npc.id}
+          name={npc.name}
+          kind={kindOf(view)}
+          tags={npc.tags ?? []}
+          sheetId={npc.characterId}
+          onClose={() => setExporting(false)}
         />
       )}
       {dialog === 'name' && <RenameDialog current={npc.name} onSubmit={rename} onClose={() => setDialog(null)} />}

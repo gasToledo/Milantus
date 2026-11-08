@@ -4,14 +4,14 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:dnd_engine/dnd_engine.dart';
-import 'package:dnd_engine/homebrew_references.dart';
+import 'package:dnd_engine/npc_bundle_export.dart';
 
 import 'backup_bundle.dart';
 export 'package:dnd_engine/homebrew_references.dart' show homebrewUsedBy;
-
-/// Un retrato que viaja en el archivo: de quién es (`npc` o `character`), la
-/// clave que tiene en esta cuenta y sus bytes.
-typedef NpcBundlePortrait = ({String owner, String key, Uint8List bytes});
+// El escritor y los tipos del archivo viven en el motor, donde los comparte el
+// servidor; acá se reexportan para que el resto de la app no cambie de import.
+export 'package:dnd_engine/npc_bundle_export.dart'
+    show NpcBundlePortrait, NpcExportOptions, npcExportImageKeys, npcForExport;
 
 /// Lo que se ve de un archivo de PNJ antes de importarlo.
 class NpcBundlePreview {
@@ -42,36 +42,21 @@ class NpcBundlePreview {
 /// de personajes jugadores, y un PNJ que entrara por ahí terminaría en «Mis
 /// personajes».
 class NpcBundleCodec {
-  static const type = 'dnd_npc';
-  static const formatVersion = 1;
-  static const manifestName = 'npc-bundle.json';
+  static const type = NpcBundleWriter.type;
+  static const formatVersion = NpcBundleWriter.formatVersion;
+  static const manifestName = NpcBundleWriter.manifestName;
 
   static Uint8List encode({
     required Npc npc,
     Character? sheet,
     Map<String, List<Map<String, dynamic>>> homebrew = const {},
     List<NpcBundlePortrait> portraits = const [],
-  }) {
-    final archive = Archive();
-    final entries = <Map<String, dynamic>>[];
-    for (final (i, portrait) in portraits.indexed) {
-      final file = 'portraits/$i.${_extensionOf(portrait.bytes)}';
-      archive.addFile(ArchiveFile.bytes(file, portrait.bytes));
-      entries.add({'file': file, 'owner': portrait.owner, 'key': portrait.key});
-    }
-    final manifest = {
-      'type': type,
-      'formatVersion': formatVersion,
-      'npc': npc.toJson(),
-      if (sheet != null) 'character': sheet.toJson(),
-      if (homebrew.values.any((docs) => docs.isNotEmpty)) 'homebrew': homebrew,
-      'portraits': entries,
-    };
-    archive.addFile(
-      ArchiveFile.bytes(manifestName, utf8.encode(jsonEncode(manifest))),
-    );
-    return Uint8List.fromList(ZipEncoder().encode(archive));
-  }
+  }) => NpcBundleWriter.encode(
+    npc: npc,
+    sheet: sheet,
+    homebrew: homebrew,
+    portraits: portraits,
+  );
 
   /// Lee lo necesario para mostrar qué trae el archivo. Lanza
   /// [FormatException] si no es un PNJ exportado y
@@ -214,91 +199,19 @@ class NpcBundleCodec {
 
     final homebrewFile = manifest['homebrewFile'];
     final allHomebrew = homebrewFile is String ? json(homebrewFile) : null;
-    final homebrew = allHomebrew is Map
-        ? homebrewUsedBy(original, {
-            for (final e in allHomebrew.entries)
-              '${e.key}': [
-                for (final doc in (e.value as List? ?? const []))
-                  if (doc is Map) doc.cast<String, dynamic>(),
-              ],
-          })
-        : const <String, List<Map<String, dynamic>>>{};
-
-    final npc = Npc(
-      id: 'importado',
-      name: original.name,
-      sheetKind: NpcSheetKind.character,
-      background: original.background,
-      // Las entradas del Diario son del mismo tipo que las notas del PNJ, así
-      // que pasan tal cual (texto y enlaces). Las de imagen no: su archivo vive
-      // en el respaldo aparte de los retratos y acá no hay a dónde mandarlo.
-      notes: [
-        for (final e in original.diary)
-          if (e.kind != DiaryEntryKind.image &&
-              [e.title, e.body].any((t) => t.trim().isNotEmpty))
-            e,
-      ],
-    );
-    // Vaciados en la ficha para que no quede una copia que nadie ve.
-    final sheet = Character.fromJson(
-      original.toJson()
-        ..['background'] = ''
-        ..['diary'] = const [],
-    );
+    final adopted = adoptCharacterAsNpc(original, {
+      if (allHomebrew is Map)
+        for (final e in allHomebrew.entries)
+          '${e.key}': [
+            for (final doc in (e.value as List? ?? const []))
+              if (doc is Map) doc.cast<String, dynamic>(),
+          ],
+    });
     return encode(
-      npc: npc,
-      sheet: sheet,
-      homebrew: homebrew,
+      npc: adopted.npc,
+      sheet: adopted.sheet,
+      homebrew: adopted.homebrew,
       portraits: portraits,
     );
   }
-
-  static String _extensionOf(Uint8List bytes) {
-    if (bytes.length > 3 && bytes[0] == 0xFF && bytes[1] == 0xD8) return 'jpg';
-    if (bytes.length > 11 &&
-        bytes[8] == 0x57 &&
-        bytes[9] == 0x45 &&
-        bytes[10] == 0x42 &&
-        bytes[11] == 0x50) {
-      return 'webp';
-    }
-    if (bytes.length > 5 &&
-        bytes[0] == 0x47 &&
-        bytes[1] == 0x49 &&
-        bytes[2] == 0x46 &&
-        bytes[3] == 0x38) {
-      return 'gif';
-    }
-    return 'png';
-  }
-}
-
-/// El contenido oficial que la ficha de [preview] usa y este catálogo no tiene.
-///
-/// Lo mira el cliente porque el servidor no carga el catálogo. Un PNJ que
-/// venga de una instalación con más libros cargados (PHB, Forge of the
-/// Artificer) no se importa a medias: se avisa qué falta y no se escribe nada.
-/// El homebrew que viaja en el archivo cuenta como disponible.
-List<String> missingOfficialContent(
-  NpcBundlePreview preview,
-  ContentRepository repo,
-) {
-  final sheet = preview.sheet;
-  if (sheet == null) return const [];
-  final bundled = {
-    for (final docs in preview.homebrew.values)
-      for (final doc in docs) doc['id'],
-  };
-  bool known(String id, bool Function(String) inRepo) =>
-      inRepo(id) || bundled.contains(id);
-  return [
-    if (!known(sheet.raceId, (id) => repo.race(id) != null))
-      'especie «${sheet.raceId}»',
-    for (final id in sheet.classHistory.toSet())
-      if (!known(id, (id) => repo.characterClass(id) != null)) 'clase «$id»',
-    for (final id in sheet.subclassIds.values)
-      if (!known(id, (id) => repo.subclass(id) != null)) 'subclase «$id»',
-    if (!known(sheet.backgroundId, (id) => repo.background(id) != null))
-      'trasfondo «${sheet.backgroundId}»',
-  ];
 }

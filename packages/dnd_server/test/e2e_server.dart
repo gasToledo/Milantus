@@ -641,7 +641,7 @@ Future<void> main() async {
   );
   final events = InMemoryEventRepository();
   final npcs = InMemoryNpcRepository(campaigns, characters);
-  await _seedNpcs(npcs, characters);
+  await _seedNpcs(npcs, characters, portraits);
   final homebrew = InMemoryHomebrewRepository();
   await homebrew.upsert(
     smokeUserId,
@@ -790,6 +790,7 @@ Future<void> main() async {
 Future<void> _seedNpcs(
   InMemoryNpcRepository npcs,
   InMemoryCharacterRepository characters,
+  InMemoryPortraitBlobStore portraits,
 ) async {
   await npcs.insert(
     _smokeDmId,
@@ -852,6 +853,14 @@ Future<void> _seedNpcs(
       tags: const ['Enemigos'],
     ),
   );
+  // El retrato de Odile es lo que viaja en el archivo de `e2e/pnj.spec.ts`
+  // (exportar e importar un PNJ): sin un retrato, la prueba no vería que las
+  // imágenes cruzan el ZIP.
+  final odilePortrait = await portraits.save(
+    userId: _smokeDmId,
+    characterId: 'odile',
+    bytes: img.encodePng(img.Image(width: 8, height: 8)),
+  );
   await npcs.insert(
     _smokeDmId,
     Npc(
@@ -859,6 +868,7 @@ Future<void> _seedNpcs(
       name: 'La hermana Odile',
       sheetKind: NpcSheetKind.none,
       tags: const ['Gremio'],
+      portraitPaths: [odilePortrait],
     ),
   );
   await npcs.link(_smokeDmId, _smokeCampaignId, 'garrick');

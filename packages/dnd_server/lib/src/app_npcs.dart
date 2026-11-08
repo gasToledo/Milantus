@@ -429,7 +429,7 @@ Future<Response> _importNpcHandler(
   final campaignId = rawCampaignId is String && rawCampaignId.isNotEmpty
       ? requireSafePathSegment(rawCampaignId, label: 'id de campaña')
       : null;
-  final bundle = NpcBundleCodec.decode(
+  final bundle = NpcBundleCodec.decodeForImport(
     _decodeBase64(
       zipBase64,
       maxBytes: NpcBundleCodec.maxArchiveBytes,
@@ -567,6 +567,105 @@ Future<Response> _importNpcHandler(
     return StoredNpc(npc: npc, sheet: storedSheet, campaigns: campaigns);
   });
   return _jsonOk(_storedNpcJson(stored));
+}
+
+/// Lo que trae un archivo de PNJ, para mostrarlo antes de importar. **No
+/// escribe nada**: ni repositorios ni el almacén de retratos. Pasa por la misma
+/// lectura que la importación (`decodeForImport`), así que lo que se ve acá es
+/// exactamente lo que después se guardaría.
+Future<Response> _previewNpcImportHandler(Request request) async {
+  final body = await _readJsonBody(
+    request,
+    maxBytes: _base64JsonLimit(NpcBundleCodec.maxArchiveBytes),
+  );
+  final zipBase64 = body['bytes'];
+  if (zipBase64 is! String || zipBase64.isEmpty) {
+    throw const FormatException('Falta "bytes".');
+  }
+  final bundle = NpcBundleCodec.decodeForImport(
+    _decodeBase64(
+      zipBase64,
+      maxBytes: NpcBundleCodec.maxArchiveBytes,
+      label: 'El archivo del PNJ',
+    ),
+  );
+  return _jsonOk({
+    'npc': bundle.npc.toJson(),
+    if (bundle.sheet != null) 'character': bundle.sheet!.toJson(),
+    'homebrew': bundle.homebrew,
+    'portraitCount': bundle.portraits.length,
+  });
+}
+
+/// El ZIP de un PNJ (`dnd_npc`), armado con el mismo escritor que usa Flutter.
+///
+/// Qué viaja lo decide quien exporta: trasfondo, tags y notas valen `true`
+/// **solo** con `=1`, así que las notas (que son de las mesas del DM) nunca
+/// salen por un olvido de quien arma el pedido. Las campañas y el estado en cada
+/// una no están en el documento del PNJ: no hay nada que sacar.
+Future<Response> _exportNpcHandler(
+  Request request,
+  NpcRepository npcs,
+  HomebrewRepository homebrew,
+  PortraitBlobStore portraits,
+) async {
+  final userId = request.userId;
+  final id = requireSafePathSegment(request.params['id']!, label: 'id de PNJ');
+  // La autorización vive en el `WHERE` de `find`: lo ajeno y lo inexistente
+  // responden igual.
+  final stored = await npcs.find(userId, id);
+  if (stored == null) return _notFound('npc_not_found');
+
+  final query = request.url.queryParameters;
+  final options = (
+    background: query['background'] == '1',
+    tags: query['tags'] == '1',
+    notes: query['notes'] == '1',
+  );
+  final sheet = stored.sheet;
+  final used = sheet == null
+      ? const <String, List<Map<String, dynamic>>>{}
+      : homebrewUsedBy(sheet, await homebrew.listForUser(userId));
+
+  // Una clave que ya no resuelve (o que no es una clave del almacén) se omite
+  // en vez de costar el archivo entero, como en el respaldo.
+  final wanted = npc_export.npcExportImageKeys(stored.npc, sheet, options);
+  final fetched = await Future.wait(
+    wanted.map((w) async {
+      try {
+        return (await portraits.read(
+          userId: userId,
+          portraitKey: w.key,
+        ))?.bytes;
+      } on FormatException {
+        return null;
+      }
+    }),
+  );
+  final bytes = npc_export.NpcBundleWriter.encode(
+    npc: npc_export.npcForExport(stored.npc, options),
+    sheet: sheet,
+    homebrew: used,
+    portraits: [
+      for (var i = 0; i < wanted.length; i++)
+        if (fetched[i] case final data?)
+          (owner: wanted[i].owner, key: wanted[i].key, bytes: data),
+    ],
+  );
+
+  final slug = stored.npc.name
+      .toLowerCase()
+      .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
+      .replaceAll(RegExp(r'(^-|-$)'), '');
+  return Response.ok(
+    bytes,
+    headers: {
+      'content-type': 'application/zip',
+      'content-disposition':
+          'attachment; filename="${slug.isEmpty ? 'pnj' : slug}.zip"',
+      'cache-control': 'private, no-store',
+    },
+  );
 }
 
 Future<Response> _unlinkCampaignNpcHandler(

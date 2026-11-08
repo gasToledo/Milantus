@@ -16,6 +16,9 @@ export class ApiError extends Error {
   constructor(
     readonly status: number,
     path: string,
+    /** El `code` estable del cuerpo `{ error, code }`, cuando el servidor lo
+     *  manda: la pantalla traduce por él. */
+    readonly code?: string,
   ) {
     super(`${path} respondió ${status}`);
   }

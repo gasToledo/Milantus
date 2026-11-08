@@ -15,17 +15,9 @@ import '../../../web/browser.dart' as browser;
 import 'npc_shared.dart';
 import '../../../l10n/l10n_context.dart';
 
-/// Qué eligió el DM llevar en el archivo, además de lo que va siempre.
-typedef NpcExportOptions = ({bool background, bool tags, bool notes});
-
-/// El PNJ tal como viaja con [options]: lo desmarcado se vacía. Las campañas y
-/// el estado en cada una **nunca** viajan: no están en el documento del PNJ,
-/// así que no hay nada que sacar.
-Npc npcForExport(Npc npc, NpcExportOptions options) => npc.copyWith(
-  background: options.background ? npc.background : '',
-  tags: options.tags ? npc.tags : const [],
-  notes: options.notes ? npc.notes : const [],
-);
+// `NpcExportOptions` y `npcForExport` viven en el motor (los comparte el
+// servidor, que arma el mismo archivo); se reexportan para no cambiar imports.
+export '../../../data/npc_bundle.dart' show NpcExportOptions, npcForExport;
 
 Future<void> exportNpcFlow(
   BuildContext context, {
@@ -42,23 +34,7 @@ Future<void> exportNpcFlow(
     final homebrew = sheet == null
         ? const <String, List<Map<String, dynamic>>>{}
         : homebrewUsedBy(sheet, await api.listHomebrew());
-    final wanted = <({String owner, String key})>[
-      for (final key in entry.npc.portraitPaths) (owner: 'npc', key: key),
-      if (sheet != null)
-        for (final key in sheet.portraitPaths) (owner: 'character', key: key),
-      // Las imágenes de las notas viajan como los retratos, y solo si viajan
-      // las notas. Un PNJ con ficha las guarda en la carpeta de la ficha (ver
-      // `_uploadNoteImage`), y el servidor las reubica según el dueño.
-      if (options.notes)
-        for (final note in entry.npc.notes)
-          if (note.imageKey case final key?)
-            (
-              owner: sheet != null && key.startsWith('${sheet.id}/')
-                  ? 'character'
-                  : 'npc',
-              key: key,
-            ),
-    ];
+    final wanted = npcExportImageKeys(entry.npc, sheet, options);
     // Todas a la vez: una por una, exportar tardaba la suma de los viajes, y
     // con imágenes en las notas son muchos. `Future.wait` conserva el orden.
     final fetched = await Future.wait(
@@ -262,7 +238,8 @@ class _ImportNpcDialogState extends State<ImportNpcDialog> {
   String? _error;
 
   late final List<String> _missing = missingOfficialContent(
-    widget.preview,
+    widget.preview.sheet,
+    widget.preview.homebrew,
     widget.repo,
   );
 

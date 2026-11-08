@@ -345,8 +345,9 @@ repiten acá.
   (PG, usos, descansos, inventario) y 6f3 (subir de nivel y demás pantallas de
   edición; ver abajo). Sale del mismo `GET /api/npcs/:id`. Un PNJ ajeno y uno
   inexistente dan la misma pantalla «No se encontró el PNJ» —también en su
-  ficha, igual que un PNJ sin ficha—: el servidor los responde igual (404). Importar y
-  exportar siguen en Flutter (el estado por campaña se escribe desde 6e1; crear
+  ficha, igual que un PNJ sin ficha—: el servidor los responde igual (404). Exportar e
+  importar, desde 7c (menú «⋯» de la ficha y botón de la Biblioteca; el ZIP lo arma y lo lee
+  el servidor; el estado por campaña se escribe desde 6e1; crear
   sin ficha y borrar, desde 6e2; crear con ficha de personaje, desde 6f1; nombre, voz, tags, trasfondo y notas, desde 6e3; el bloque, desde 6e4; el retrato, desde 6e5).
   **PNJ de la mesa** (`GET /api/campaigns/:id/npcs`): los PNJ vinculados a la
   campaña con su estado **en esa** campaña. Arriba, el conteo («2 PNJ · 1 vivo ·
@@ -367,7 +368,7 @@ repiten acá.
   `homebrew` y las URL del Modo DM, así una ficha no puede quedar distinta en los
   dos lugares; una criatura propia abre su perfil en el Bestiario del DM. Lo de
   otra cuenta no llega (la API es por cuenta) y su URL muestra la categoría
-  vacía. Crear, editar, importar, exportar y borrar siguen en Flutter.
+  vacía. Crear, editar y borrar siguen en Flutter; importar y exportar están desde 7c.
   **Combate** (`GET /api/campaigns/:id/encounter`, más los miembros, los PNJ de
   la mesa y el Cuaderno): el combate abierto, de solo lectura. Arriba, una placa
   con la ronda, «Turno N de M» y cuántos quedan en pie por bando (o «Armando el
@@ -993,7 +994,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    alta y borrado *(existe)*; 6e3, el texto de la ficha *(existe)*; 6e4, el editor del bloque *(existe)*; 6e5,
    retrato y mostrar a la mesa *(existe)*; 6f, la ficha de PNJ, en tres: 6f1,
    crearla *(existe)*; 6f2, escribirla *(existe)*; 6f3, sus pantallas de edición (subir de
-   nivel, elecciones, conjuros, planos, formas e imprimir) *(existe)*; 6g, el combate, en siete: 6g1, el puente del motor *(existe)*; 6g2, armar *(existe)*; 6g3, dificultad e iniciativa *(existe)*; 6g4, jugar *(existe)*; 6g5, efectos, legendarias y defensas *(existe)*; 6g6, cerrar *(existe)*; 6g7a, ofrecer música *(existe)*; 6g7b, «Convertir en PNJ» *(existe)*; 6g7c, sumar desde el Bestiario *(existe)*. Importar y exportar PNJ sigue en el paso 7. Antes de portar esto es lectura
+   nivel, elecciones, conjuros, planos, formas e imprimir) *(existe)*; 6g, el combate, en siete: 6g1, el puente del motor *(existe)*; 6g2, armar *(existe)*; 6g3, dificultad e iniciativa *(existe)*; 6g4, jugar *(existe)*; 6g5, efectos, legendarias y defensas *(existe)*; 6g6, cerrar *(existe)*; 6g7a, ofrecer música *(existe)*; 6g7b, «Convertir en PNJ» *(existe)*; 6g7c, sumar desde el Bestiario *(existe)*. Importar y exportar PNJ es el paso 7c *(existe)*. Antes de portar esto es lectura
    obligatoria [Modo DM](modo-dm.md): la frontera «el DM no escribe la ficha de
    otra cuenta» es del servidor y vale igual para el cliente nuevo. Entra acá
    también la edición de la ficha completa de un PNJ (inventario, comprar y
@@ -1014,12 +1015,25 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
      recargan personajes, catálogo y ajustes. Verificar el ida y vuelta con
      Flutter, retratos, imágenes del diario, homebrew y ajustes portables,
      además de que un ZIP inválido o en conflicto no deje una carga parcial.
-   - **7c · PNJ.** Importar y exportar desde la biblioteca y la campaña con los
-     ZIP de Flutter (`dnd_npc`). Las notas son optativas al exportar y el ZIP
-     excluye los vínculos y estados de campaña. Importar muestra la vista
-     previa y permite elegir una campaña. Verificar el bloque, la ficha, sus
-     imágenes y el homebrew asociado, más la conversión de un ZIP de personaje
-     en PNJ.
+   - **7c · PNJ** *(existe)*. Exportar desde el menú «⋯» de la ficha
+     (`ExportNpcDialog`: trasfondo y tags marcados, notas no) e importar desde
+     la Biblioteca (`ImportNpcDialog`), con el ZIP `dnd_npc` de Flutter. Como
+     en 7b, el ZIP lo arma y lo lee el **servidor**: el navegador no tiene
+     lector de ZIP. `GET /api/npcs/:id/export?background=1&tags=1&notes=1`
+     (un flag ausente es «no»: las notas nunca viajan por olvido),
+     `POST /api/npcs/import/preview` (no escribe nada) y
+     `POST /api/npcs/import`, que ahora acepta también el ZIP de **un**
+     personaje exportado desde Mis personajes y lo adopta como PNJ con ficha
+     en el mismo handler. El escritor del ZIP, `npcForExport`, la conversión
+     personaje→PNJ (`adoptCharacterAsNpc`) y `missingOfficialContent` viven en
+     el motor (`npc_bundle_export.dart`, `npc_import_check.dart`) y los
+     comparten Flutter, el servidor y el cliente React (este último solo el
+     último, vía `npcImportMissing`). Antes de exportar se espera el guardado
+     del PNJ y de su ficha. Elegir el archivo muestra la vista previa; con
+     contenido oficial que falta, «Importar» queda apagado y no se le pregunta
+     al servidor. Al terminar se cierra, se actualiza la Biblioteca y sale un
+     aviso. Importar desde la vista de PNJ de una campaña no existe (Flutter
+     tampoco lo tiene).
    - **7d · Homebrew.** Gestión del catálogo propio y transferencia en JSON.
 
    Opcional, sin equivalente en Flutter y sin diseñar todavía:

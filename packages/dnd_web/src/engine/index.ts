@@ -32,6 +32,7 @@ interface DartEngine {
   abilityModifier(score: number): number;
   bestiary(catalogJson: string): string;
   npcs(entriesJson: string, catalogJson: string): string;
+  npcImportMissing(sheetJson: string | null, homebrewJson: string, catalogJson: string): string;
   newNpc(catalogJson: string, name: string, kind: string, baseCreatureId: string): string;
   npcEdit(npcJson: string, actionJson: string): string;
   npcPortraitPrompt(npcJson: string, catalogJson: string, style: string, extraText: string): string;
@@ -762,6 +763,19 @@ export interface NpcEntryJson {
  *  del motor): los PG de un bloque, la ficha compilada, si viene herido. */
 export function npcViews(entries: readonly NpcEntryJson[], catalog: Catalog): NpcView[] {
   return JSON.parse(engine().npcs(JSON.stringify(entries), catalogJson(catalog))) as NpcView[];
+}
+
+/** Lo que la ficha de un PNJ a importar usa y este catálogo no tiene
+ *  (`missingOfficialContent`): rótulos ya en el idioma activo. El homebrew que
+ *  viaja en el archivo cuenta como disponible. Sin ficha, no falta nada. */
+export function npcImportMissing(
+  sheet: CharacterJson | null,
+  homebrew: Record<string, readonly JsonObject[]>,
+  catalog: Catalog,
+): string[] {
+  return JSON.parse(
+    engine().npcImportMissing(sheet === null ? null : JSON.stringify(sheet), JSON.stringify(homebrew), catalogJson(catalog)),
+  ) as string[];
 }
 
 /** El documento de un PNJ nuevo (`Npc.draft`): lo arma el motor, con el bloque

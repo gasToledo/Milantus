@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, Upload } from 'lucide-react';
 import { useNpcs, useSheetCatalog } from '../../api/queries';
 import type { DmCampaign } from '../../api/client';
 import { npcViews, type NpcView } from '../../engine';
@@ -7,9 +7,11 @@ import { useLang, useTexts } from '../../i18n/context';
 import { dmNpcsHref, Link } from '../../router';
 import { Button } from '../../ui/Button';
 import { cx } from '../../ui/cx';
+import { Toast } from '../../ui/primitives';
 import { Medallion } from '../../ui/Medallion';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../../ui/status';
 import { DmHeader } from '../DmHeader';
+import { ImportNpcDialog } from './ImportNpcDialog';
 import { NewNpcDialog } from './NewNpcDialog';
 import { hasTag, kindOf, nameMatches, normalizeTags, npcPortrait, npcTypeLine } from './npc';
 
@@ -21,8 +23,8 @@ const NO_CAMPAIGN = '';
  * estén o no en alguna campaña. El filtro principal es **por campaña** y los
  * tags van debajo, más chicos: en la mesa la pregunta es «¿quién está en esta
  * campaña?», y el tag afina dentro de eso. Acá se crea un PNJ (sin ficha de
- * personaje: eso sigue en Flutter) y se borra desde su ficha; importar y
- * editar siguen en Flutter. Nada de esto viaja a un jugador: la API de PNJ es
+ * personaje: eso sigue en Flutter), se importa un ZIP (de un PNJ o de un
+ * personaje exportado) y se borra desde su ficha; editar sigue en Flutter. Nada de esto viaja a un jugador: la API de PNJ es
  * del DM y de nadie más.
  */
 export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[] | undefined }) {
@@ -34,10 +36,19 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
   const [campaign, setCampaign] = useState<string | null>(null);
   const [tag, setTag] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
-  const newButton = (
-    <Button icon={Plus} data-action="new-npc" onClick={() => setCreating(true)}>
-      {t.npcNew}
-    </Button>
+  const [importing, setImporting] = useState(false);
+  const [imported, setImported] = useState<{ key: number; message: string } | null>(null);
+  // Importar es secundario (filete y texto): «Nuevo PNJ» sigue siendo el único
+  // oro de la vista.
+  const actions = (
+    <>
+      <Button tone="secondary" icon={Upload} data-action="import-npc" onClick={() => setImporting(true)}>
+        {t.npcImport}
+      </Button>
+      <Button icon={Plus} data-action="new-npc" onClick={() => setCreating(true)}>
+        {t.npcNew}
+      </Button>
+    </>
   );
 
   // El motor migra cada PNJ y le saca los números una vez por respuesta.
@@ -60,7 +71,7 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
   } else if (!entries) {
     body = <AppBusyLabel label={t.dmLibraryLoading} />;
   } else if (entries.length === 0) {
-    body = <AppEmptyState kind="empty" message={t.dmLibraryEmpty} actions={newButton} />;
+    body = <AppEmptyState kind="empty" message={t.dmLibraryEmpty} actions={<div className="flex flex-wrap justify-center gap-2">{actions}</div>} />;
   } else {
     const inCampaign = (links: { campaignId: string }[], id: string | null) =>
       id === null ? true : id === NO_CAMPAIGN ? links.length === 0 : links.some((l) => l.campaignId === id);
@@ -165,9 +176,19 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
 
   return (
     <div className="flex flex-col gap-5">
-      <DmHeader title={t.dmNpcLibrary} kicker={kicker} actions={entries && entries.length > 0 ? newButton : undefined} />
+      <DmHeader title={t.dmNpcLibrary} kicker={kicker} actions={entries && entries.length > 0 ? actions : undefined} />
       {body}
       {creating && <NewNpcDialog onClose={() => setCreating(false)} />}
+      {importing && (
+        <ImportNpcDialog
+          campaigns={campaigns ?? []}
+          onClose={() => setImporting(false)}
+          onImported={(name) => setImported((prev) => ({ key: (prev?.key ?? 0) + 1, message: t.npcImported(name) }))}
+        />
+      )}
+      {imported && (
+        <Toast key={imported.key} tone="success" message={imported.message} open onOpenChange={(open) => !open && setImported(null)} />
+      )}
     </div>
   );
 }

@@ -137,6 +137,7 @@ export function Select({
   options,
   className,
   labelAbove,
+  disabled,
 }: {
   label: string;
   value: string;
@@ -147,12 +148,14 @@ export function Select({
   /** El rótulo visible lo pone quien lo usa (arriba, como en un campo de
    *  formulario): el botón no lo repite adentro, pero el `aria-label` queda. */
   labelAbove?: boolean;
+  /** Apagado mientras una acción en curso no admite cambios. */
+  disabled?: boolean;
 }) {
   return (
-    <SelectPrimitive.Root value={value} onValueChange={onValueChange}>
+    <SelectPrimitive.Root value={value} onValueChange={onValueChange} disabled={disabled}>
       <SelectPrimitive.Trigger
         aria-label={label}
-        className={cx('plaque inline-flex min-h-9 items-center gap-2 rounded-[var(--radius-nav)] px-3 text-[13px] text-on-surface', className)}
+        className={cx('plaque inline-flex min-h-9 items-center gap-2 rounded-[var(--radius-nav)] px-3 text-[13px] text-on-surface disabled:opacity-40', className)}
       >
         <span className="flex items-center gap-2">
           {!labelAbove && <span className="text-text-muted">{label}:</span>}

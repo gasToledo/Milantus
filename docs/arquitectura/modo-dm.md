@@ -619,12 +619,23 @@ además de `campaign_members`, y todo este documento existe para que haya una
 sola. El archivo nunca lleva en qué campañas estaba ni su estado en cada una;
 las notas viajan solo si quien exporta las marca.
 
+El ZIP lo arma el servidor (`GET /api/npcs/<id>/export`, con el escritor del
+motor que usa también Flutter) y la autorización vive en el `WHERE` de
+`npcs.find`: un PNJ ajeno responde igual que uno inexistente. Qué viaja lo
+decide quien exporta —`background`, `tags` y `notes` valen `true` solo con
+`=1`—. La vista previa (`POST /api/npcs/import/preview`) pasa por la misma
+lectura que la importación y **no escribe nada**: ni repositorios ni retratos.
+
 El personaje que un jugador exportó desde «Mis personajes» (`dnd_bundle` con
-un solo personaje) también entra como PNJ con ficha: el cliente lo rearma como
-`dnd_npc` (`NpcBundleCodec.adoptCharacterExport`) y usa la misma ruta de
-importación, así que el servidor no suma una segunda puerta. Es el mismo
-criterio que el resto: el jugador entrega un archivo, nadie lee su cuenta. Al
-revés no hay camino — un PNJ nunca se traspasa a un jugador.
+un solo personaje) también entra como PNJ con ficha, y la misma ruta de
+importación lo adopta **en el servidor** (`NpcBundleCodec.decodeForImport`),
+así que sigue habiendo una sola puerta. Se lee con el decodificador validado
+del respaldo, con sus límites de tamaño y de rutas, y no con el del cliente,
+que abre el ZIP sin límites. Flutter lo sigue adoptando en el cliente
+(`NpcBundleCodec.adoptCharacterExport`), con la misma conversión
+(`adoptCharacterAsNpc`, en el motor). Es el mismo criterio que el resto: el
+jugador entrega un archivo, nadie lee su cuenta. Al revés no hay camino — un
+PNJ nunca se traspasa a un jugador.
 
 ## Música
 

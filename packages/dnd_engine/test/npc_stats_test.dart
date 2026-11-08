@@ -93,4 +93,47 @@ void main() {
       expect(stats.hurt(NpcStatus.dead, 1), isNull);
     });
   });
+
+  group('missingOfficialContent', () {
+    test(
+        'una ficha con una clase que el catálogo no tiene no se importa, '
+        'salvo que el homebrew la traiga', () {
+      final existente = repo.classes.keys.first;
+      Character ficha(String classId) => Character(
+            id: 'ficha',
+            name: 'Ilse',
+            raceId: repo.races.keys.first,
+            classId: classId,
+            backgroundId: repo.backgrounds.keys.first,
+            assignedScores: const {
+              Ability.strength: 10,
+              Ability.dexterity: 10,
+              Ability.constitution: 10,
+              Ability.intelligence: 10,
+              Ability.wisdom: 10,
+              Ability.charisma: 10,
+            },
+          );
+
+      expect(missingOfficialContent(ficha(existente), const {}, repo), isEmpty);
+
+      final faltantes = missingOfficialContent(
+        ficha('clase-de-otro-libro'),
+        const {},
+        repo,
+      );
+      expect(faltantes.single, contains('clase-de-otro-libro'));
+
+      final conHomebrew = missingOfficialContent(
+        ficha('clase-de-otro-libro'),
+        {
+          'classes': [
+            {'id': 'clase-de-otro-libro'},
+          ],
+        },
+        repo,
+      );
+      expect(conHomebrew, isEmpty);
+    });
+  });
 }

@@ -920,6 +920,26 @@ class FakeApiServer {
       return _json(entryJson(npc));
     }
 
+    // Como el servidor: lee el archivo igual que la importación y **no escribe**.
+    if (method == 'POST' && path == '/api/npcs/import/preview') {
+      try {
+        final bundle = NpcBundleCodec.preview(
+          base64Decode(_body(request)['bytes'] as String),
+        );
+        return _json({
+          'npc': bundle.npc.toJson(),
+          if (bundle.sheet != null) 'character': bundle.sheet!.toJson(),
+          'homebrew': bundle.homebrew,
+          'portraitCount': bundle.portraitCount,
+        });
+      } on Object {
+        return _json({
+          'error': 'El ZIP no es un PNJ exportado.',
+          'code': 'invalid_data',
+        }, 400);
+      }
+    }
+
     if (method == 'POST' && path == '/api/npcs/import') {
       importNpcCalls.add(_body(request));
       final npc = importNpcResult;
@@ -972,6 +992,30 @@ class FakeApiServer {
         final key = '$id/${portraits.length}.png';
         portraits[key] = bytes;
         return _json({'key': key});
+      }
+      // El ZIP lo arma el servidor; un flag ausente es «no», así que las notas
+      // nunca viajan por olvido.
+      if (rest.length == 2 && rest[1] == 'export' && method == 'GET') {
+        final query = request.url.queryParameters;
+        final options = (
+          background: query['background'] == '1',
+          tags: query['tags'] == '1',
+          notes: query['notes'] == '1',
+        );
+        final sheet = characters[npc.characterId];
+        return http.Response.bytes(
+          NpcBundleCodec.encode(
+            npc: npcForExport(npc, options),
+            sheet: sheet,
+            portraits: [
+              for (final w in npcExportImageKeys(npc, sheet, options))
+                if (portraits[w.key] case final bytes?)
+                  (owner: w.owner, key: w.key, bytes: bytes),
+            ],
+          ),
+          200,
+          headers: {'content-type': 'application/zip'},
+        );
       }
       if (method == 'GET') return _json(entryJson(npc));
       if (method == 'PUT') {

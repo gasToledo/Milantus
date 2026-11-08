@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:dnd_engine/backup_export.dart' as exporter;
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:dnd_engine/homebrew_references.dart';
+import 'package:dnd_engine/npc_bundle_export.dart' as npc_export;
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
@@ -350,9 +351,19 @@ Handler buildHandler({
       authenticated((request) => _createNpcHandler(request, transactions)),
     )
     ..post(
+      '/api/npcs/import/preview',
+      authenticated((request) => _previewNpcImportHandler(request)),
+    )
+    ..post(
       '/api/npcs/import',
       authenticated(
         (request) => _importNpcHandler(request, transactions, portraits),
+      ),
+    )
+    ..get(
+      '/api/npcs/<id>/export',
+      authenticated(
+        (request) => _exportNpcHandler(request, npcs, homebrew, portraits),
       ),
     )
     ..get(

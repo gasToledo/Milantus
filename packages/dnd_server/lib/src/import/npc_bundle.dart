@@ -3,7 +3,9 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:dnd_engine/dnd_engine.dart';
+import 'package:dnd_engine/npc_bundle_export.dart' show adoptCharacterAsNpc;
 
+import 'backup_bundle.dart';
 import 'homebrew_content.dart';
 
 /// Un retrato que viaja en el paquete, con a quién pertenece.
@@ -57,6 +59,83 @@ class NpcBundleCodec {
   static const maxJsonBytes = 8 * 1024 * 1024;
 
   static final _portraitName = RegExp(r'^portraits/\d+\.(png|jpe?g|webp|gif)$');
+
+  /// Lo que lee **toda** entrada de un PNJ (la vista previa y la importación):
+  /// el archivo de un PNJ (`dnd_npc`) o el de **un** personaje exportado desde
+  /// «Mis personajes» (`dnd_bundle`), que entra como PNJ con ficha.
+  ///
+  /// Sigue habiendo una sola puerta: el personaje se adopta acá, antes de que
+  /// la ruta de importación escriba nada. Se lee con el decodificador validado
+  /// del respaldo (límites de tamaño, rutas, entradas), no con el de Flutter,
+  /// que abre el ZIP sin límites: en un servidor eso es un riesgo.
+  static NpcBundle decodeForImport(List<int> bytes) {
+    if (bytes.length > maxArchiveBytes) {
+      throw const FormatException('El archivo del PNJ es demasiado grande.');
+    }
+    // Se abre solo para ver qué manifiesto trae; la validación de verdad la
+    // hace el decodificador que corresponda.
+    final Archive archive;
+    try {
+      archive = ZipDecoder().decodeBytes(bytes);
+    } catch (_) {
+      throw const FormatException('El archivo no es un ZIP válido.');
+    }
+    if (archive.findFile(manifestName) != null) return decode(bytes);
+    if (archive.findFile('manifest.json') != null) {
+      return _adoptBackup(BackupBundleCodec.decode(bytes));
+    }
+    throw const FormatException('El ZIP no es un PNJ exportado.');
+  }
+
+  static NpcBundle _adoptBackup(BackupBundle backup) {
+    if (backup.characters.length != 1) {
+      throw const FormatException(
+        'Para sumar un personaje como PNJ hay que exportar uno solo.',
+      );
+    }
+    final entry = backup.characters.single;
+
+    // El decodificador del respaldo suelta las claves de retrato del personaje
+    // (no sirven en otra cuenta) y deja a cada retrato su nombre de archivo,
+    // que empieza con su posición en `portraitPaths`. Acá se arman claves
+    // propias en ese orden: lo único que importa es que cada retrato y su
+    // prompt encuentren su lugar en la ficha. Uno sin número, o repetido, se
+    // omite en vez de adivinar.
+    final byIndex = <int, BundlePortrait>{};
+    for (final portrait in entry.portraits) {
+      final index = int.tryParse(
+        RegExp(r'^\d+').stringMatch(portrait.fileName) ?? '',
+      );
+      if (index != null) byIndex.putIfAbsent(index, () => portrait);
+    }
+    final ordered = byIndex.keys.toList()..sort();
+    final keys = {for (final i in ordered) i: 'retrato-$i'};
+    final original = entry.character.copyWith(
+      portraitPaths: [for (final i in ordered) keys[i]!],
+      portraitPrompts: {
+        for (final i in ordered)
+          if (byIndex[i]!.prompt case final prompt?) keys[i]!: prompt,
+      },
+    );
+
+    final adopted = adoptCharacterAsNpc(original, backup.homebrew ?? const {});
+    if (adopted.npc.name.trim().isEmpty) {
+      throw const FormatException('El PNJ no tiene nombre.');
+    }
+    return NpcBundle(
+      npc: adopted.npc,
+      sheet: adopted.sheet,
+      homebrew: adopted.homebrew,
+      portraits: [
+        for (final i in ordered)
+          NpcBundlePortrait(
+            owner: 'character',
+            originalKey: keys[i]!,
+            bytes: byIndex[i]!.bytes,
+          ),
+      ],
+    );
+  }
 
   static NpcBundle decode(List<int> bytes) {
     try {
