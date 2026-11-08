@@ -69,6 +69,9 @@ const sheetTabIn = (tabs: readonly SheetTab[], segment: string | undefined): She
 
 export const HOMEBREW_CATEGORIES = ['weapons', 'armor', 'magicItems', 'gear', 'feats', 'races', 'backgrounds', 'spells'] as const satisfies readonly CodexCategory[];
 export type HomebrewCategory = (typeof HOMEBREW_CATEGORIES)[number] | 'creatures';
+/** Las categorías del Homebrew que ya se editan desde `/v2`. */
+export const EDITABLE_HOMEBREW = ['creatures', 'feats'] as const;
+export type EditableHomebrew = (typeof EDITABLE_HOMEBREW)[number];
 const homebrewSegment = (c: HomebrewCategory): string => (c === 'creatures' ? 'criaturas' : CODEX_CATEGORIES[c]);
 
 /** Qué muestra el Modo DM. `home` es `/v2/dm` a secas: no muestra nada, redirige
@@ -92,9 +95,9 @@ export type DmView =
   // El Homebrew también. Sin categoría es la portada; las criaturas no tienen
   // entrada propia acá: su perfil es el del Bestiario.
   | { kind: 'homebrew'; category: HomebrewCategory | null; entryId: string | null }
-  // El editor de una criatura propia: `creatureId` es la que se edita, o `null`
-  // para una nueva (`?de=<id>` la abre como copia de otra).
-  | { kind: 'homebrewCreature'; creatureId: string | null };
+  // El editor de una entrada propia (hoy criaturas y dotes): `entryId` es la que
+  // se edita, o `null` para una nueva (`?de=<id>` la abre como copia de otra).
+  | { kind: 'homebrewEditor'; category: EditableHomebrew; entryId: string | null };
 
 export type Route =
   | { name: 'start' }
@@ -206,13 +209,14 @@ export function matchRoute(pathname: string): Route {
         return { name: 'unknown' };
       }
     }
-    // El editor de criaturas, antes que la lista: `nueva` no es una criatura.
-    if (id === 'homebrew' && tab === 'criaturas' && rest[0] === 'nueva' && rest.length === 1) {
-      return { name: 'dm', view: { kind: 'homebrewCreature', creatureId: null } };
+    // Los editores, antes que la lista: `nueva` no es una criatura ni una dote.
+    const editable = id === 'homebrew' ? EDITABLE_HOMEBREW.find((c) => homebrewSegment(c) === tab) : undefined;
+    if (editable && rest[0] === 'nueva' && rest.length === 1) {
+      return { name: 'dm', view: { kind: 'homebrewEditor', category: editable, entryId: null } };
     }
-    if (id === 'homebrew' && tab === 'criaturas' && rest[1] === 'editar' && rest.length === 2) {
+    if (editable && rest[1] === 'editar' && rest.length === 2) {
       try {
-        return { name: 'dm', view: { kind: 'homebrewCreature', creatureId: decodeURIComponent(rest[0]!) } };
+        return { name: 'dm', view: { kind: 'homebrewEditor', category: editable, entryId: decodeURIComponent(rest[0]!) } };
       } catch {
         return { name: 'unknown' };
       }
@@ -365,11 +369,12 @@ export const dmHomebrewHref = (category?: HomebrewCategory, entryId?: string): s
   (category ? `/${homebrewSegment(category)}` : '') +
   (category && entryId ? `/${encodeURIComponent(entryId)}` : '');
 
-/** El editor de una criatura propia: la nueva (vacía, o copia de `from`, propia
- *  u oficial) o la que se edita. */
-export const dmHomebrewNewCreatureHref = (from?: string): string =>
-  `${dmHomebrewHref('creatures')}/nueva${from ? `?de=${encodeURIComponent(from)}` : ''}`;
-export const dmHomebrewEditCreatureHref = (id: string): string => `${dmHomebrewHref('creatures')}/${encodeURIComponent(id)}/editar`;
+/** El editor de una entrada propia: la nueva (vacía, o copia de `from`, propia u
+ *  oficial) o la que se edita. */
+export const dmHomebrewNewHref = (category: EditableHomebrew, from?: string): string =>
+  `${dmHomebrewHref(category)}/nueva${from ? `?de=${encodeURIComponent(from)}` : ''}`;
+export const dmHomebrewEditHref = (category: EditableHomebrew, id: string): string =>
+  `${dmHomebrewHref(category)}/${encodeURIComponent(id)}/editar`;
 
 export const dmCampaignHref =(id: string, section: DmSection = 'mesa'): string =>
   `${import.meta.env.BASE_URL}dm/campanas/${encodeURIComponent(id)}/${section}`;

@@ -1,29 +1,42 @@
 import { useMemo, useState } from 'react';
 import { Copy } from 'lucide-react';
-import { fold } from '../codex/entries';
+import { codexEntries, fold } from '../codex/entries';
 import { bestiary, type Catalog } from '../engine';
-import { useTexts } from '../i18n/context';
+import { useLang, useTexts } from '../i18n/context';
 import { AppDialog } from '../ui/AppDialog';
 
+/** Las categorías que se duplican desde el catálogo. */
+export type DuplicableCategory = 'creatures' | 'feats';
+
 /**
- * «Duplicar criatura» (`_CatalogPicker` de Flutter): elegir una del catálogo
- * para abrirla como copia propia. Salen solo las que **no** son tuyas, porque
- * para lo propio está «Duplicar» en su perfil. El orden y la línea de tipo
- * salen del motor (`bestiary`), igual que el Bestiario.
+ * «Duplicar criatura» / «Duplicar dote» (`_CatalogPicker` de Flutter): elegir una
+ * del catálogo para abrirla como copia propia. Salen solo las que **no** son
+ * tuyas, porque para lo propio está «Duplicar» en su perfil. Las criaturas
+ * llevan el orden y la línea de tipo del motor (`bestiary`), igual que el
+ * Bestiario; las dotes, el orden y la categoría del Códice.
  */
-export function DuplicateCreatureDialog({
+export function DuplicateFromCatalogDialog({
+  category,
   catalog,
   onPick,
   onClose,
 }: {
+  category: DuplicableCategory;
   catalog: Catalog;
-  onPick: (creatureId: string) => void;
+  onPick: (id: string) => void;
   onClose: () => void;
 }) {
   const t = useTexts();
+  const lang = useLang();
   const [query, setQuery] = useState('');
+  const title = category === 'creatures' ? t.hbDuplicateCreature : t.hbDuplicateFeat;
 
   const options = useMemo(() => {
+    if (category === 'feats') {
+      return codexEntries('feats', catalog, t, lang)
+        .filter((e) => e.source !== 'homebrew')
+        .map((e) => ({ id: e.id, name: e.name, kind: e.subtitle }));
+    }
     const names = new Map(catalog.creatures.filter((c) => c.source !== 'homebrew').map((c) => [c.id, String(c.name ?? c.id)] as const));
     return bestiary(catalog)
       .filter((r) => names.has(r.id))
@@ -32,7 +45,7 @@ export function DuplicateCreatureDialog({
         name: names.get(r.id)!,
         kind: [r.kind, r.crText !== null ? t.bestiaryCr(r.crText) : null].filter(Boolean).join(' · '),
       }));
-  }, [catalog, t]);
+  }, [category, catalog, t, lang]);
 
   const needle = fold(query.trim());
   const visible = needle ? options.filter((o) => fold(o.name).includes(needle)) : options;
@@ -41,7 +54,7 @@ export function DuplicateCreatureDialog({
     <AppDialog
       open
       onOpenChange={(open) => !open && onClose()}
-      title={t.hbDuplicateCreature}
+      title={title}
       icon={Copy}
       actions={[{ label: t.cancel }]}
     >
@@ -61,7 +74,7 @@ export function DuplicateCreatureDialog({
         {visible.length === 0 ? (
           <p className="text-[14px] text-on-surface-variant">{t.hbCatalogNoMatch(query.trim())}</p>
         ) : (
-          <ul aria-label={t.hbDuplicateCreature} className="plaque max-h-[320px] overflow-y-auto rounded-[var(--radius-card)] border border-hairline p-1">
+          <ul aria-label={title} className="plaque max-h-[320px] overflow-y-auto rounded-[var(--radius-card)] border border-hairline p-1">
             {visible.map((o) => (
               <li key={o.id}>
                 <button

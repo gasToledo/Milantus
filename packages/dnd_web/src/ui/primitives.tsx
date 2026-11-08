@@ -166,7 +166,14 @@ export function Select({
         </SelectPrimitive.Icon>
       </SelectPrimitive.Trigger>
       <SelectPrimitive.Portal>
-        <SelectPrimitive.Content position="popper" sideOffset={6} className={FLOATING}>
+        {/* Con una lista larga (los 26 tipos de efecto, los conjuros del catálogo)
+            el menú se pasaba del borde y lo de abajo no se alcanzaba: el tope es
+            el alto libre de la ventana, y el Viewport de Radix scrollea. */}
+        <SelectPrimitive.Content
+          position="popper"
+          sideOffset={6}
+          className={cx(FLOATING, 'max-h-[min(var(--radix-select-content-available-height),22rem)]')}
+        >
           <SelectPrimitive.Viewport>
             {options.map((o) => (
               <SelectPrimitive.Item key={o.value} value={o.value} className={cx(ITEM, 'pr-8')}>

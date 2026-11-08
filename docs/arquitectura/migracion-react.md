@@ -369,8 +369,9 @@ repiten acá.
   dos lugares; una criatura propia abre su perfil en el Bestiario del DM. Lo de
   otra cuenta no llega (la API es por cuenta) y su URL muestra la categoría
   vacía. Desde 7d1 se **importa y se exporta** todo (portada), se **borra** cualquier
-  entrada propia y se **crean, editan y duplican criaturas**; crear y editar las
-  otras siete categorías siguen en Flutter hasta 7d2–7d4.
+  entrada propia y se **crean, editan y duplican criaturas** y, desde 7d2a,
+  **dotes**; crear y editar las otras seis categorías siguen en Flutter hasta
+  7d2b–7d4.
   **Combate** (`GET /api/campaigns/:id/encounter`, más los miembros, los PNJ de
   la mesa y el Cuaderno): el combate abierto, de solo lectura. Arriba, una placa
   con la ronda, «Turno N de M» y cuántos quedan en pie por bando (o «Armando el
@@ -1057,7 +1058,28 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
        borrar usa `charactersUsing` sobre Mis personajes. Quedan afuera la lista
        de entradas inválidas de Flutter (`loadIssues`; `ponytail:` en
        `HomebrewView.tsx`) y los formularios de las demás categorías.
-     - **7d2 · Dotes, especies y trasfondos**, con el editor de efectos.
+     - **7d2a · El editor de efectos y las dotes** *(existe)*. El motor suma
+       `EffectDraft` (`effect_draft.dart`: los 26 tipos de efecto de Flutter, en
+       su orden, con sus campos, valores iniciales, unidades y opciones sacadas
+       del catálogo fusionado, y `build`, que arma el efecto o dice qué campo
+       falta; `effectParts`, que resuelve lo que cada efecto nombra) y
+       `FeatDraft` (`feat_draft.dart`, el patrón de `CreatureDraft`: formulario,
+       dote armada que conserva requisito, grupo exclusivo y los efectos que el
+       editor no sabe armar, y errores). React **no escribe nunca el JSON de un
+       efecto**: dibuja los campos que el motor declara y manda tipo y valores
+       (`effectKinds`, `effectBuild`, `effectParts`, `featForm`, `featDraft`,
+       `featNew` en el puente). La frase de un efecto la arma cada cliente con
+       sus textos (`describeEffectParts`, traducción literal de `describeEffect`
+       de Flutter, que no cambia). En pantalla: el `EffectEditor` y su diálogo
+       «Agregar efecto» (`src/dm/homebrew/`), el `FeatForm` y las rutas
+       `/dm/homebrew/dotes/nueva[?de=<id>]` y `/dm/homebrew/dotes/<id>/editar`
+       (el view kind `homebrewEditor` generaliza al de criaturas). El Códice
+       —también el del jugador— muestra los efectos descriptos, uno por línea, de
+       una dote sin descripción ni rasgo (cierra el `ponytail` de `entries.ts`).
+       Quedan afuera editar un efecto en el lugar, los efectos de elección o de
+       clase, esconder tipos por formulario (`hiddenKinds`, que usan los objetos
+       en 7d3) y editar el requisito. Sin cambios en el servidor ni en Flutter.
+     - **7d2b · Especies y trasfondos**, que reusan el editor de efectos.
      - **7d3 · Armas, armaduras y objetos.**
      - **7d4 · Conjuros.**
 
@@ -1177,7 +1199,7 @@ hace seguro volver atrás es que **no hay nada que deshacer en el formato**:
 Para que nadie lo dé por hecho:
 
 - El Compañero Salvaje (invocarlo, que no cobra ni se va con el descanso), los
-  formularios del Homebrew que no son de criatura (7d2–7d4) y las operaciones
+  formularios del Homebrew que no son de criatura ni de dote (7d2b–7d4) y las operaciones
   del paso 7 que faltan. El detalle está en
   [Orden previsto de pantallas](#orden-previsto-de-pantallas).
 - Control de versión en el servidor para las escrituras (rechazar una copia

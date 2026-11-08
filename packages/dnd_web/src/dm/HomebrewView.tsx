@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState, type ReactNode } from 'react';
-import { ArrowLeft, Copy, Download, PawPrint, Plus, Search, Trash2, Upload, X, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, Copy, Download, Pencil, PawPrint, Plus, Search, Trash2, Upload, X, type LucideIcon } from 'lucide-react';
 import { CATEGORIES, downloadText } from '../api/homebrew';
 import { useHomebrew, useSheetCatalog } from '../api/queries';
 import { CategoryView, ICONS } from '../codex/CodexPage';
@@ -8,8 +8,9 @@ import { bestiary, homebrewExport, type Catalog } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import {
   dmBestiaryHref,
+  dmHomebrewEditHref,
   dmHomebrewHref,
-  dmHomebrewNewCreatureHref,
+  dmHomebrewNewHref,
   HOMEBREW_CATEGORIES,
   Link,
   navigate,
@@ -22,7 +23,7 @@ import { Tooltip } from '../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { DeleteHomebrewDialog } from './DeleteHomebrewDialog';
 import { DmHeader } from './DmHeader';
-import { DuplicateCreatureDialog } from './DuplicateCreatureDialog';
+import { DuplicateFromCatalogDialog } from './DuplicateFromCatalogDialog';
 import { storageOf } from './homebrewKinds';
 import { ImportHomebrewDialog } from './ImportHomebrewDialog';
 
@@ -42,9 +43,9 @@ interface Own {
  * de ninguna otra.
  *
  * Desde acá se **importa y se exporta** todo el homebrew (en la portada), se
- * **borra** cualquier entrada propia (en su ficha) y se **crean y duplican
- * criaturas**. Crear y editar las otras siete categorías siguen en Flutter: los
- * formularios llegan con 7d2–7d4.
+ * **borra** cualquier entrada propia (en su ficha) y se **crean, editan y
+ * duplican criaturas y dotes**. Crear y editar las otras seis categorías siguen
+ * en Flutter: los formularios llegan con 7d2b–7d4.
  *
  * ponytail: Flutter además lista las entradas inválidas que no pudo cargar
  * (`loadIssues`) para borrarlas; `fetchHomebrew` las descarta al leer y esta
@@ -59,6 +60,8 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
   // Borrar una entrada que no es criatura: el diálogo vive acá y no en la ficha,
   // que se desmonta al volver a la lista.
   const [deleting, setDeleting] = useState<{ category: HomebrewCategory; id: string; name: string } | null>(null);
+  // «Duplicar del catálogo» de las dotes: el selector de lo que no es propio.
+  const [picking, setPicking] = useState(false);
 
   // Por categoría, solo lo propio y en el orden del Códice.
   const own = useMemo(() => {
@@ -103,14 +106,62 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
     return <CreatureList creatures={own.creatures} catalog={catalog.data} headerWith={headerWith} />;
   }
   if (category !== null) {
+    // Las dotes se crean y se duplican desde acá; las demás categorías, todavía
+    // en la aplicación principal (7d2b–7d4 suman las suyas).
+    const isFeats = category === 'feats';
+    const duplicate = (
+      <Button tone="secondary" icon={Copy} onClick={() => setPicking(true)} data-action="homebrew-duplicate-catalog">
+        {t.hbDuplicateFromCatalog}
+      </Button>
+    );
+    const create = (
+      <ButtonLink internal icon={Plus} href={dmHomebrewNewHref('feats')} data-action="homebrew-new-feat">
+        {t.hbNewFeat}
+      </ButtonLink>
+    );
+    const categoryHeader = isFeats ? (
+      headerWith(
+        <>
+          {duplicate}
+          {create}
+        </>,
+      )
+    ) : (
+      header
+    );
+    const picker = isFeats && picking && (
+      <DuplicateFromCatalogDialog
+        category="feats"
+        catalog={catalog.data}
+        onClose={() => setPicking(false)}
+        onPick={(id) => {
+          setPicking(false);
+          navigate(dmHomebrewNewHref('feats', id));
+        }}
+      />
+    );
     // Sin nada propio en la categoría, el vacío es «no hay», no el «nada
     // coincide» de una lista filtrada.
     if (own.codex.get(category)!.length === 0) {
       return (
         <div className="flex flex-col gap-4">
           <BackToHome />
-          {header}
-          <AppEmptyState kind="empty" message={t.dmHomebrewEmptyIn(t.codexCategories[category])} hint={t.dmHomebrewCreatedInMain} />
+          {categoryHeader}
+          {picker}
+          {isFeats ? (
+            <AppEmptyState
+              kind="empty"
+              message={t.hbFeatEmpty}
+              actions={
+                <>
+                  {create}
+                  {duplicate}
+                </>
+              }
+            />
+          ) : (
+            <AppEmptyState kind="empty" message={t.dmHomebrewEmptyIn(t.codexCategories[category])} hint={t.dmHomebrewCreatedInMain} />
+          )}
         </div>
       );
     }
@@ -123,22 +174,45 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
           entries={own.codex.get(category)!}
           entryId={entryId}
           hrefOf={(c, id) => dmHomebrewHref(c as HomebrewCategory, id)}
-          header={header}
+          header={categoryHeader}
           detailActions={(entry) => (
-            // 7d2–7d4 suman «Editar» y «Duplicar» al lado, con cada formulario.
-            <Tooltip content={t.cardDelete}>
-              <button
-                type="button"
-                aria-label={t.hbDeleteTooltip(entry.name)}
-                data-action="homebrew-delete"
-                onClick={() => setDeleting({ category, id: entry.id, name: entry.name })}
-                className="inline-flex size-9 items-center justify-center rounded-[var(--radius-nav)] border border-hairline text-crimson hover:bg-plaque"
-              >
-                <Trash2 size={16} aria-hidden="true" />
-              </button>
-            </Tooltip>
+            // «Editar», «Duplicar» y «Borrar», en el mismo orden y forma que el
+            // perfil de una criatura. Las demás categorías suman las suyas con
+            // cada formulario (7d2b–7d4).
+            <>
+              {isFeats && (
+                <>
+                  <ButtonLink internal tone="secondary" icon={Pencil} href={dmHomebrewEditHref('feats', entry.id)} data-action="homebrew-edit">
+                    {t.commonEdit}
+                  </ButtonLink>
+                  <Tooltip content={t.hbDuplicateTooltip}>
+                    <button
+                      type="button"
+                      aria-label={t.hbDuplicateTitle(entry.name)}
+                      data-action="homebrew-duplicate"
+                      onClick={() => navigate(dmHomebrewNewHref('feats', entry.id))}
+                      className="inline-flex size-9 items-center justify-center rounded-[var(--radius-nav)] border border-hairline text-on-surface hover:bg-plaque"
+                    >
+                      <Copy size={16} aria-hidden="true" />
+                    </button>
+                  </Tooltip>
+                </>
+              )}
+              <Tooltip content={t.cardDelete}>
+                <button
+                  type="button"
+                  aria-label={t.hbDeleteTooltip(entry.name)}
+                  data-action="homebrew-delete"
+                  onClick={() => setDeleting({ category, id: entry.id, name: entry.name })}
+                  className="inline-flex size-9 items-center justify-center rounded-[var(--radius-nav)] border border-hairline text-crimson hover:bg-plaque"
+                >
+                  <Trash2 size={16} aria-hidden="true" />
+                </button>
+              </Tooltip>
+            </>
           )}
         />
+        {picker}
         {deleting && (
           <DeleteHomebrewDialog
             category={storageOf(deleting.category)}
@@ -337,7 +411,7 @@ function CreatureList({
     </Button>
   );
   const create = (
-    <ButtonLink internal icon={Plus} href={dmHomebrewNewCreatureHref()} data-action="homebrew-new-creature">
+    <ButtonLink internal icon={Plus} href={dmHomebrewNewHref('creatures')} data-action="homebrew-new-creature">
       {t.hbNewCreature}
     </ButtonLink>
   );
@@ -351,12 +425,13 @@ function CreatureList({
         </>,
       )}
       {picking && (
-        <DuplicateCreatureDialog
+        <DuplicateFromCatalogDialog
+          category="creatures"
           catalog={catalog}
           onClose={() => setPicking(false)}
           onPick={(id) => {
             setPicking(false);
-            navigate(dmHomebrewNewCreatureHref(id));
+            navigate(dmHomebrewNewHref('creatures', id));
           }}
         />
       )}

@@ -809,6 +809,63 @@ String creatureFormOptions() => jsonEncode({
       ],
     });
 
+Feat _dote(String json) =>
+    Feat.fromJson((jsonDecode(json) as Map).cast<String, dynamic>());
+
+/// El formulario (todo texto) de una dote: `FeatDraft.formOf`.
+String featForm(String featJson) =>
+    jsonEncode(FeatDraft.formOf(_dote(featJson)));
+
+/// La dote armada con un formulario sobre su dote de partida, y los errores por
+/// campo. Nunca lanza por datos inválidos: también alimenta la vista previa.
+String featDraft(String featJson, String formJson) {
+  final form = (jsonDecode(formJson) as Map).cast<String, dynamic>();
+  return jsonEncode({
+    'feat': FeatDraft.build(_dote(featJson), form).toJson(),
+    'errors': FeatDraft.errors(form),
+  });
+}
+
+/// La plantilla de «Nueva dote» (`FeatDraft.empty`).
+String featNew() => jsonEncode(FeatDraft.empty().toJson());
+
+/// Los tipos de efecto que el editor ofrece, con sus campos y las opciones de
+/// cada uno sacadas del catálogo fusionado (`EffectDraft.kinds`).
+String effectKinds(String catalogJson) =>
+    jsonEncode(EffectDraft.kinds(_repoPara(catalogJson)));
+
+/// Arma un efecto con los valores del diálogo: `{ok: true, effect}` o
+/// `{ok: false, field, error}` si falta algo (`EffectDraft.build`).
+String effectBuild(String kindId, String valuesJson) {
+  final kind = EffectKind.byId(kindId);
+  if (kind == null) {
+    throw ArgumentError('Tipo de efecto desconocido: "$kindId"');
+  }
+  final values = (jsonDecode(valuesJson) as Map).cast<String, Object?>();
+  try {
+    return jsonEncode({
+      'ok': true,
+      'effect': EffectDraft.build(kind, values).toJson(),
+    });
+  } on EffectFieldError catch (e) {
+    return jsonEncode({'ok': false, 'field': e.field, 'error': e.code});
+  }
+}
+
+/// Las partes de cada efecto de la lista, alineadas con la entrada: `parts` es
+/// null cuando el motor no lo describe (`effectParts`).
+String effectPartsJs(String effectsJson, String catalogJson) {
+  final repo = _repoPara(catalogJson);
+  return jsonEncode([
+    for (final raw in (jsonDecode(effectsJson) as List))
+      {
+        'type': (raw as Map)['type'],
+        'parts':
+            effectParts(Effect.fromJson(raw.cast<String, dynamic>()), repo),
+      },
+  ]);
+}
+
 Map<String, dynamic> _npcView(
     Map<String, dynamic> raw, ContentRepository repo) {
   final npc = Npc.fromJson((raw['npc'] as Map).cast<String, dynamic>());
@@ -1295,6 +1352,12 @@ void main() {
   motor['creatureForm'] = creatureForm.toJS;
   motor['creatureDraft'] = creatureDraft.toJS;
   motor['creatureFormOptions'] = creatureFormOptions.toJS;
+  motor['featForm'] = featForm.toJS;
+  motor['featDraft'] = featDraft.toJS;
+  motor['featNew'] = featNew.toJS;
+  motor['effectKinds'] = effectKinds.toJS;
+  motor['effectBuild'] = effectBuild.toJS;
+  motor['effectParts'] = effectPartsJs.toJS;
   motor['encounter'] = encounter.toJS;
   motor['encounterAct'] = encounterAct.toJS;
   motor['encounterDetails'] = encounterDetailsJs.toJS;

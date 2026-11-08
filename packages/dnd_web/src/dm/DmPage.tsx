@@ -15,7 +15,9 @@ import { AddFromBestiary } from './combat/AddFromBestiary';
 import { ChaptersView } from './ChaptersView';
 import { CombatView } from './CombatView';
 import { HomebrewCreatureActions } from './HomebrewCreatureActions';
-import { HomebrewCreatureBack, HomebrewCreatureView } from './HomebrewCreatureView';
+import { creatureEditorExit, HomebrewCreatureView } from './HomebrewCreatureView';
+import { HomebrewEditorBack } from './HomebrewEditorBack';
+import { featEditorExit, HomebrewFeatView } from './homebrew/HomebrewFeatView';
 import { HomebrewView } from './HomebrewView';
 import { MemberSheetView } from './MemberSheetView';
 import { MesaView } from './MesaView';
@@ -98,8 +100,16 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
     body = <NpcPortraitView key={view.npcId} npcId={view.npcId} />;
   } else if (view.kind === 'npcSheet') {
     body = <NpcSheetView key={view.npcId} npcId={view.npcId} tab={view.tab} screen={view.screen} />;
-  } else if (view.kind === 'homebrewCreature') {
-    body = <HomebrewCreatureView key={view.creatureId ?? 'nueva'} creatureId={view.creatureId} leaveRef={leave} />;
+  } else if (view.kind === 'homebrewEditor') {
+    // Cada editor es una pantalla propia: la clave deja que la nueva y la que se
+    // edita no compartan estado.
+    const key = `${view.category}:${view.entryId ?? 'nueva'}`;
+    body =
+      view.category === 'creatures' ? (
+        <HomebrewCreatureView key={key} creatureId={view.entryId} leaveRef={leave} />
+      ) : (
+        <HomebrewFeatView key={key} featId={view.entryId} leaveRef={leave} />
+      );
   } else if (view.kind === 'homebrew') {
     // Lo propio es de la cuenta, no de una campaña.
     body = <HomebrewView category={view.category} entryId={view.entryId} />;
@@ -146,8 +156,11 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
       panel={
         view.kind === 'npcBlock' ? (
           <NpcBlockBack npcId={view.npcId} leaveRef={leave} />
-        ) : view.kind === 'homebrewCreature' ? (
-          <HomebrewCreatureBack creatureId={view.creatureId} leaveRef={leave} />
+        ) : view.kind === 'homebrewEditor' ? (
+          <HomebrewEditorBack
+            exitHref={view.category === 'creatures' ? creatureEditorExit(view.entryId) : featEditorExit(view.entryId)}
+            leaveRef={leave}
+          />
         ) : (
           <DmPanel campaigns={list} current={current} tool={view.kind === 'npcSheet' || view.kind === 'npcPortrait' ? 'npcs' : view.kind === 'bestiary' || view.kind === 'npcs' || view.kind === 'homebrew' ? view.kind : undefined} />
         )

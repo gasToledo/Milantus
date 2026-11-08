@@ -54,6 +54,8 @@ export 'src/engine/exhaustion.dart';
 export 'src/engine/sheet_diff.dart';
 export 'src/engine/diary_ops.dart';
 export 'src/engine/creature_draft.dart';
+export 'src/engine/effect_draft.dart';
+export 'src/engine/feat_draft.dart';
 export 'src/engine/npc_edits.dart';
 export 'src/engine/npc_stats.dart';
 export 'src/engine/npc_import_check.dart';

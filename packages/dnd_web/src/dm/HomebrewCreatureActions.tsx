@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Copy, Pencil, Trash2 } from 'lucide-react';
 import type { CreatureProfile } from '../bestiary/creature';
 import { useTexts } from '../i18n/context';
-import { dmHomebrewEditCreatureHref, dmHomebrewHref, dmHomebrewNewCreatureHref, navigate } from '../router';
+import { dmHomebrewEditHref, dmHomebrewHref, dmHomebrewNewHref, navigate } from '../router';
 import { ButtonLink } from '../ui/Button';
 import { Tooltip } from '../ui/primitives';
 import { DeleteHomebrewDialog } from './DeleteHomebrewDialog';
@@ -23,7 +23,7 @@ export function HomebrewCreatureActions({ profile, id }: { profile: CreatureProf
 
   if (profile.source !== 'homebrew') {
     return (
-      <ButtonLink internal tone="secondary" icon={Copy} href={dmHomebrewNewCreatureHref(id)} data-action="homebrew-edit-copy">
+      <ButtonLink internal tone="secondary" icon={Copy} href={dmHomebrewNewHref('creatures', id)} data-action="homebrew-edit-copy">
         {t.hbEditCopy}
       </ButtonLink>
     );
@@ -31,11 +31,11 @@ export function HomebrewCreatureActions({ profile, id }: { profile: CreatureProf
   return (
     <>
       <div className="flex flex-wrap items-center justify-end gap-2">
-        <ButtonLink internal tone="secondary" icon={Pencil} href={dmHomebrewEditCreatureHref(id)} data-action="homebrew-edit">
+        <ButtonLink internal tone="secondary" icon={Pencil} href={dmHomebrewEditHref('creatures', id)} data-action="homebrew-edit">
           {t.commonEdit}
         </ButtonLink>
         <Tooltip content={t.hbDuplicateTooltip}>
-          <button type="button" aria-label={t.hbDuplicateTitle(profile.name)} onClick={() => navigate(dmHomebrewNewCreatureHref(id))} className={`${ICON_BUTTON} text-on-surface`}>
+          <button type="button" aria-label={t.hbDuplicateTitle(profile.name)} onClick={() => navigate(dmHomebrewNewHref('creatures', id))} className={`${ICON_BUTTON} text-on-surface`}>
             <Copy size={16} aria-hidden="true" />
           </button>
         </Tooltip>

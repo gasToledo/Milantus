@@ -715,3 +715,69 @@ export interface CreatureFormOptions {
   kinds: { id: string; label: string }[];
   damageTypes: { id: string; label: string }[];
 }
+
+/** Lo que el editor de efectos sabe de un campo de un tipo de efecto
+ *  (`EffectDraft.kinds`). `options` sale del catálogo fusionado; en `spellUse`
+ *  y en la opción `any` de `feat` el rótulo es el id y lo pone el cliente. */
+export interface EffectFieldInfo {
+  id:
+    | 'ability'
+    | 'castAbility'
+    | 'amount'
+    | 'addProficiency'
+    | 'skill'
+    | 'weapon'
+    | 'armor'
+    | 'tool'
+    | 'language'
+    | 'damageType'
+    | 'condition'
+    | 'spell'
+    | 'spellUse'
+    | 'feat'
+    | 'traitName'
+    | 'traitDescription';
+  default: string | number | boolean;
+  options?: { id: string; label: string }[];
+}
+
+/** Un tipo de efecto que el editor ofrece, en el orden del motor. */
+export interface EffectKindInfo {
+  id: string;
+  start: number;
+  /** Qué es el número; el rótulo lo pone el cliente. */
+  unit: 'feet' | 'rangeFeet' | 'value';
+  fields: EffectFieldInfo[];
+}
+
+/** El resultado de armar un efecto: el efecto, o el campo que falta. */
+export type EffectBuild = { ok: true; effect: JsonObject } | { ok: false; field: string; error: string };
+
+/** Las partes de un efecto con lo que nombra ya resuelto (`effectParts`). La
+ *  frase la arma cada cliente. `type` es el del JSON del efecto. */
+export interface EffectParts {
+  type: string;
+  name?: string;
+  ability?: string;
+  fromAbility?: string | null;
+  amount?: number;
+  score?: number;
+  feet?: number;
+  range?: number;
+  count?: number;
+  extra?: number;
+  addProficiency?: boolean;
+  use?: string;
+  choice?: boolean;
+}
+
+/** Una dote como texto de formulario (`FeatDraft.formOf`). Los efectos viajan
+ *  como su JSON: el editor los arma y los quita, pero no los abre. */
+export interface FeatForm {
+  name: string;
+  category: string;
+  description: string;
+  repeatable: boolean;
+  effects: JsonObject[];
+  hasPrerequisite: boolean;
+}

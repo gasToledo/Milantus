@@ -1,4 +1,4 @@
-import type { AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, CreatureForm, CreatureFormOptions, EncounterDetails, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
+import type { AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, CreatureForm, EffectBuild, EffectKindInfo, EffectParts, FeatForm, CreatureFormOptions, EncounterDetails, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
 // Lo genera `npm run build:engine` (o la etapa `engine-js` del Dockerfile) y
 // no se versiona. Es un script de dart2js, no un módulo: al cargarse deja
 // `globalThis.dndEngine`, y de ahí lo toma este archivo.
@@ -40,6 +40,12 @@ interface DartEngine {
   creatureForm(creatureJson: string): string;
   creatureDraft(creatureJson: string, formJson: string): string;
   creatureFormOptions(): string;
+  featForm(featJson: string): string;
+  featDraft(featJson: string, formJson: string): string;
+  featNew(): string;
+  effectKinds(catalogJson: string): string;
+  effectBuild(kindId: string, valuesJson: string): string;
+  effectParts(effectsJson: string, catalogJson: string): string;
   encounter(encounterJson: string, playersHpJson: string): string;
   encounterAct(catalogJson: string, encounterJson: string, actionJson: string, seed?: number): string;
   encounterDetails(catalogJson: string, encounterJson: string, membersJson: string, npcEntriesJson: string): string;
@@ -839,6 +845,44 @@ export function creatureDraft(
  *  con `setEngineLanguage`. */
 export function creatureFormOptions(): CreatureFormOptions {
   return JSON.parse(engine().creatureFormOptions()) as CreatureFormOptions;
+}
+
+/** Una dote como formulario de texto (`FeatDraft.formOf`). */
+export function featForm(feat: JsonObject): FeatForm {
+  return JSON.parse(engine().featForm(JSON.stringify(feat))) as FeatForm;
+}
+
+/** La dote armada con un formulario sobre su dote de partida y los errores por
+ *  campo (`FeatDraft`). Nunca lanza por datos inválidos. */
+export function featDraft(feat: JsonObject, form: FeatForm): { feat: JsonObject; errors: Record<string, string> } {
+  return JSON.parse(engine().featDraft(JSON.stringify(feat), JSON.stringify(form))) as {
+    feat: JsonObject;
+    errors: Record<string, string>;
+  };
+}
+
+/** La plantilla de «Nueva dote». */
+export function featNew(): JsonObject {
+  return JSON.parse(engine().featNew()) as JsonObject;
+}
+
+/** Los tipos de efecto que el editor ofrece, con sus campos y las opciones del
+ *  catálogo fusionado, en el idioma fijado con `setEngineLanguage`. */
+export function effectKinds(catalog: Catalog): EffectKindInfo[] {
+  return JSON.parse(engine().effectKinds(catalogJson(catalog))) as EffectKindInfo[];
+}
+
+/** Arma un efecto con los valores del diálogo (`EffectDraft.build`): React no
+ *  escribe nunca el JSON de un efecto. */
+export function effectBuild(kindId: string, values: Record<string, string | number | boolean>): EffectBuild {
+  return JSON.parse(engine().effectBuild(kindId, JSON.stringify(values))) as EffectBuild;
+}
+
+/** Las partes de cada efecto de [effects], alineadas con la entrada; `parts`
+ *  es null si el motor no lo describe (`effectParts`). */
+export function effectParts(effects: readonly JsonObject[], catalog: Catalog): { type: string; parts: EffectParts | null }[] {
+  if (effects.length === 0) return [];
+  return JSON.parse(engine().effectParts(JSON.stringify(effects), catalogJson(catalog))) as { type: string; parts: EffectParts | null }[];
 }
 
 /** El combate abierto, migrado y con lo que deriva el motor (`encounter`): de

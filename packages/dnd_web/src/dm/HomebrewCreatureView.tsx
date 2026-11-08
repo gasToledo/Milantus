@@ -5,7 +5,6 @@ import { queryKeys, useSheetCatalog } from '../api/queries';
 import { homebrewCopy, homebrewId, homebrewNewCreature, type JsonObject } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import { dmBestiaryHref, dmHomebrewHref, navigate } from '../router';
-import { SidebarBack } from '../ui/Shell';
 import { showNotice } from '../ui/notices';
 import { AppBusyLabel, AppErrorView, Notice } from '../ui/status';
 import { DmHeader } from './DmHeader';
@@ -15,21 +14,6 @@ import { CreatureForm } from './npcs/CreatureForm';
  *  (vacía o copia), a la lista de criaturas propias. */
 export const creatureEditorExit = (creatureId: string | null): string =>
   creatureId === null ? dmHomebrewHref('creatures') : dmBestiaryHref(creatureId);
-
-/** El «volver» del panel lateral: pregunta antes si hay cambios (lo sabe el formulario). */
-export function HomebrewCreatureBack({ creatureId, leaveRef }: { creatureId: string | null; leaveRef: MutableRefObject<(() => void) | null> }) {
-  return (
-    <SidebarBack
-      href={creatureEditorExit(creatureId)}
-      onClick={(e) => {
-        // Sin formulario montado (cargando, error) es un enlace común.
-        if (!leaveRef.current) return;
-        e.preventDefault();
-        leaveRef.current();
-      }}
-    />
-  );
-}
 
 /** Lo que se edita: el bloque de partida y cómo se llama la pantalla. */
 interface Start {

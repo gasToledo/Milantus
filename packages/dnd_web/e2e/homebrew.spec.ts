@@ -68,3 +68,28 @@ test('el DM importa una criatura propia desde un archivo y la borra desde su per
   const { content } = await api<{ content: { creatures: { id: string }[] } }>(page.request, '/api/homebrew', TOKEN_TRANSFERENCIA);
   expect(content.creatures.map((c) => c.id)).not.toContain(id);
 });
+
+test('el DM crea una dote propia con un efecto, la lee en su detalle y la borra', async ({ context, page, baseURL }) => {
+  const nombre = `Mano firme ${Date.now().toString(36)}`;
+  await context.addCookies([{ name: 'dnd_session', value: TOKEN_TRANSFERENCIA, url: baseURL! }]);
+  await page.goto('/v2/dm/homebrew/dotes');
+  await page.getByRole('link', { name: t.hbNewFeat, exact: true }).first().click();
+
+  await page.locator('[data-field="feat-name"]').fill(nombre);
+  // El primer tipo del diálogo arranca en «+1 Fuerza»: su frase es estable y no
+  // hace falta abrir ningún desplegable.
+  await page.locator('[data-action="effect-add"]').click();
+  await page.getByRole('dialog', { name: t.effAdd }).getByRole('button', { name: t.effConfirm, exact: true }).click();
+  await page.locator('[data-action="feat-save"]').click();
+
+  await expect(page.getByText(t.hbSaved(nombre), { exact: true }).first()).toBeVisible();
+  // Sin descripción ni rasgo, el Códice muestra el efecto descripto.
+  await expect(page.getByText('+1 FUE', { exact: true })).toBeVisible();
+
+  await page.getByRole('button', { name: t.hbDeleteTooltip(nombre), exact: true }).click();
+  const borrar = page.getByRole('dialog', { name: t.hbDeleteTitle(t.hbDeleteKinds.feats, nombre) });
+  await borrar.getByRole('button', { name: t.cardDelete, exact: true }).click();
+  await expect(page.getByText(t.hbDeleted(nombre), { exact: true }).first()).toBeVisible();
+  const { content } = await api<{ content: { feats: { name: string }[] } }>(page.request, '/api/homebrew', TOKEN_TRANSFERENCIA);
+  expect(content.feats.map((f) => f.name)).not.toContain(nombre);
+});

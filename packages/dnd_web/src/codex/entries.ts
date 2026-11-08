@@ -6,12 +6,14 @@
 import {
   catalogLabel,
   catalogLabelOrder,
+  effectParts,
   formatCost,
   vocabularyLabel,
   type Catalog,
   type JsonObject,
 } from '../engine';
 import type { Lang, Texts } from '../i18n/texts';
+import { describeEffectParts } from './effectText';
 import type { CodexCategory, SheetTab } from '../router';
 
 export interface CodexFact {
@@ -189,6 +191,12 @@ export function codexEntries(category: CodexCategory, catalog: Catalog, t: Texts
   }
 }
 
+/** La ficha del Códice de una sola dote, sin pasar por la lista: la vista previa
+ *  del formulario de dotes propias la arma con lo que se tipea. */
+export function featEntry(feat: JsonObject, catalog: Catalog, t: Texts, lang: Lang): CodexEntry {
+  return new Ctx(catalog, t, lang).feat(feat);
+}
+
 class Ctx {
   private readonly pounds: Intl.NumberFormat;
   private readonly coinLabels: Record<string, string>;
@@ -231,6 +239,16 @@ class Ctx {
     return objs(effects)
       .filter((e) => e.type === 'passiveTrait' && str(e.name))
       .map((e) => ({ name: str(e.name), description: str(e.description) }));
+  }
+
+  /** Los efectos de [effects] que se pueden leer, uno por línea (`readableTraits`
+   *  de Flutter sin rasgos): la frase la arma `describeEffectParts` con lo que el
+   *  motor resolvió. Lo que el motor no describe no se muestra. */
+  private effectLines(effects: unknown): string {
+    return effectParts(objs(effects), this.catalog)
+      .map((r) => (r.parts ? describeEffectParts(r.parts, this.t) : null))
+      .filter((x): x is string => x !== null)
+      .join('\n');
   }
 
   /** Rasgos agrupados por nivel, como `_features` de Flutter. */
@@ -368,12 +386,11 @@ class Ctx {
       () => {
         const prerequisite = this.prerequisite(f.prerequisite);
         const traits = this.traits(f.effects);
-        // `featSummary`: la descripción si la tiene; si no, sus rasgos.
-        // ponytail: sin rasgo ni descripción (Duro, Resiliente) Flutter
-        // describe los efectos uno por línea con `describeEffect`, que vive en
-        // la app y no en el motor; acá esas dotes quedan sin prosa. La salida es
-        // mover `describeEffect` al motor y exponerlo en el puente.
-        const prose = str(f.description) || traits.map((x) => x.description).join(' ');
+        // `featSummary`: la descripción si la tiene; si no, sus rasgos; y sin
+        // rasgos, los efectos descriptos uno por línea. Es una cosa o la otra a
+        // propósito: 26 dotes del catálogo traen un rasgo que ya cuenta en prosa
+        // lo mismo que su efecto, y sumar las dos lo diría dos veces.
+        const prose = str(f.description) || traits.map((x) => x.description).join(' ') || this.effectLines(f.effects);
         return {
           facts: [
             [
