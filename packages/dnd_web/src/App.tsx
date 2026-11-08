@@ -21,6 +21,7 @@ import { SettingsPage } from './settings/SettingsPage';
 import { ThemeProvider, useTheme } from './theme/theme';
 import { ButtonLink } from './ui/Button';
 import { PendingEvents } from './events/PendingEvents';
+import { AppNotices } from './ui/notices';
 import { ToastProvider, ToastViewport, TooltipProvider } from './ui/primitives';
 import { Shell } from './ui/Shell';
 import { AppBusyLabel, AppErrorView, Notice } from './ui/status';
@@ -109,6 +110,7 @@ function Enabled({ account }: { account: Account }) {
     <ToastProvider>
       <Routes account={account} />
       <PendingEvents />
+      <AppNotices />
       <ToastViewport />
     </ToastProvider>
   );

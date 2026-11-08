@@ -69,8 +69,8 @@ function errorText(code: string, key: string, t: Texts): string {
 }
 
 /**
- * El formulario del bloque de una criatura (el de un PNJ hoy; el homebrew del
- * paso 7 lo reusa). No sabe de reglas: el motor arma la criatura y los errores
+ * El formulario del bloque de una criatura (el de un PNJ y el de una criatura
+ * propia del Homebrew). No sabe de reglas: el motor arma la criatura y los errores
  * (`creatureDraft`) con cada cambio, y la vista previa es el mismo
  * `CreatureProfile` del Bestiario.
  *
@@ -85,6 +85,7 @@ export function CreatureForm({
   kicker,
   exitHref,
   onSave,
+  saveFailedText,
   leaveRef,
 }: {
   /** El bloque tal como está guardado (`npcBlock`). */
@@ -95,6 +96,9 @@ export function CreatureForm({
   /** Adónde se vuelve al cancelar, descartar o guardar. */
   exitHref: string;
   onSave: (creature: JsonObject) => Promise<void>;
+  /** Lo que dice el formulario si [onSave] falla; por defecto, el del bloque de
+   *  un PNJ. El Homebrew pone el suyo. */
+  saveFailedText?: string;
   /** Lo que llama el «volver» del panel lateral, que no vive acá. */
   leaveRef: MutableRefObject<(() => void) | null>;
 }) {
@@ -195,7 +199,7 @@ export function CreatureForm({
     }
   };
 
-  const message = failed ? t.blockSaveFailed : labels.length > 0 ? t.blockFix(labels.join(' · ')) : null;
+  const message = failed ? (saveFailedText ?? t.blockSaveFailed) : labels.length > 0 ? t.blockFix(labels.join(' · ')) : null;
 
   const typeOptions = [
     ...(start.type === '' ? [{ value: BOOK, label: t.blockTypeAsBook }] : []),

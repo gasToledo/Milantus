@@ -1,9 +1,15 @@
 // l10n-ignore-file: errores sin contexto de interfaz, en los dos idiomas con `localized` (siguen a `ContentLanguage`, que `main.dart` fija con el idioma de la interfaz).
 import 'package:dnd_engine/dnd_engine.dart';
+import 'package:dnd_engine/homebrew_transfer.dart'
+    show countHomebrewCollisions, validateHomebrewInventoryIds;
 
 import '../api/api_client.dart';
 
 export 'package:dnd_engine/homebrew_references.dart' show charactersUsing;
+// La lógica del archivo de homebrew vive en el motor (la comparte el cliente
+// web); estas dos las siguen usando los formularios por este import.
+export 'package:dnd_engine/homebrew_transfer.dart'
+    show homebrewCopy, homebrewId;
 
 class HomebrewLoadIssue {
   final String category;
@@ -104,7 +110,7 @@ class HomebrewStore {
   /// puramente aditivo. La UI lo usa para pedir confirmación antes de pisar
   /// homebrew.
   int countCollisions(Map<String, List<Map<String, dynamic>>> content) {
-    final existingIds = <String, Set<String>>{
+    return countHomebrewCollisions(content, {
       'weapons': weapons.keys.toSet(),
       'armor': armor.keys.toSet(),
       'items': items.keys.toSet(),
@@ -113,16 +119,7 @@ class HomebrewStore {
       'backgrounds': backgrounds.keys.toSet(),
       'spells': spells.keys.toSet(),
       'creatures': creatures.keys.toSet(),
-    };
-    var n = 0;
-    for (final entry in content.entries) {
-      final ids = existingIds[entry.key];
-      if (ids == null) continue;
-      for (final j in entry.value) {
-        if (ids.contains(j['id'] as String?)) n++;
-      }
-    }
-    return n;
+    });
   }
 
   /// Importa contenido homebrew (mismo formato que [exportContent])
@@ -133,7 +130,7 @@ class HomebrewStore {
     Map<String, List<Map<String, dynamic>>> content, {
     required ContentRepository repository,
   }) async {
-    _validateInventoryIds(content, repository);
+    validateHomebrewInventoryIds(content, repository);
     final count = await api.importHomebrew(content);
     await load();
     return count;
@@ -142,79 +139,6 @@ class HomebrewStore {
   Future<void> deleteInvalid(HomebrewLoadIssue issue) async {
     await api.deleteHomebrew(issue.category, issue.id);
     loadIssues.remove(issue);
-  }
-
-  /// Evita que un id de inventario cambie de significado según qué catálogo
-  /// lo resuelva primero. Se permite sobrescribir homebrew del mismo tipo; el
-  /// contenido oficial y los cruces arma/armadura/objeto son inmutables.
-  void _validateInventoryIds(
-    Map<String, List<Map<String, dynamic>>> content,
-    ContentRepository repository,
-  ) {
-    final incomingKinds = <String, String>{};
-    for (final entry in content.entries) {
-      if (!const {'weapons', 'armor', 'items'}.contains(entry.key)) continue;
-      for (final json in entry.value) {
-        final id = json['id'];
-        if (id is! String || id.trim().isEmpty) {
-          throw FormatException(
-            localized(
-              'Un arma, armadura u objeto del archivo no tiene un id válido.',
-              'A weapon, armor, or item in the file doesn’t have a valid id.',
-            ),
-          );
-        }
-        final previousKind = incomingKinds[id];
-        if (previousKind != null && previousKind != entry.key) {
-          throw FormatException(
-            localized(
-              'El id "$id" aparece en $previousKind y ${entry.key}.',
-              'The id "$id" appears in $previousKind and ${entry.key}.',
-            ),
-          );
-        }
-        incomingKinds[id] = entry.key;
-
-        final matches = <({String kind, ContentSource source})>[
-          if (repository.weapons[id] case final value?)
-            (kind: 'weapons', source: value.source),
-          if (repository.armor[id] case final value?)
-            (kind: 'armor', source: value.source),
-          if (repository.items[id] case final value?)
-            (kind: 'items', source: value.source),
-        ];
-        if (matches.isEmpty) continue;
-        if (matches.length > 1) {
-          throw FormatException(
-            localized(
-              'El id "$id" ya está repetido entre los catálogos de inventario.',
-              'The id "$id" is already repeated across the inventory catalogs.',
-            ),
-          );
-        }
-        final existing = matches.single;
-        if (existing.kind != entry.key) {
-          throw FormatException(
-            localized(
-              'El id "$id" ya pertenece a ${existing.kind} y no puede usarse '
-                  'en ${entry.key}.',
-              'The id "$id" already belongs to ${existing.kind} and can’t be '
-                  'used in ${entry.key}.',
-            ),
-          );
-        }
-        if (existing.source != ContentSource.homebrew) {
-          throw FormatException(
-            localized(
-              'El id "$id" pertenece al catálogo oficial y no puede '
-                  'sobrescribirse.',
-              'The id "$id" belongs to the official catalog and can’t be '
-                  'overwritten.',
-            ),
-          );
-        }
-      }
-    }
   }
 
   /// Copia del contenido homebrew como repositorio, para fusionar con el oficial.
@@ -308,30 +232,4 @@ class HomebrewStore {
     await api.deleteHomebrew('creatures', id);
     creatures.remove(id);
   }
-}
-
-/// Una copia propia de [json], con id y nombre nuevos y origen homebrew.
-///
-/// Viaja por JSON porque es el mismo ida y vuelta que ya hacen el guardado y
-/// la importación: lo que el formulario no edita llega igual al documento
-/// nuevo. La usan el botón de duplicar de Homebrew y el «Editar una copia» del
-/// Bestiario.
-Map<String, dynamic> homebrewCopy(Map<String, dynamic> json) {
-  final name = '${json['name']} (copia)';
-  return {
-    ...json,
-    'id': homebrewId(name),
-    'name': name,
-    'source': ContentSource.homebrew.toJson(),
-  };
-}
-
-/// Genera un id a partir de un nombre (slug + sufijo para evitar colisiones).
-String homebrewId(String name) {
-  final slug = name
-      .toLowerCase()
-      .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
-      .replaceAll(RegExp(r'(^-|-$)'), '');
-  final suffix = DateTime.now().microsecondsSinceEpoch.toRadixString(36);
-  return 'hb-${slug.isEmpty ? 'item' : slug}-$suffix';
 }

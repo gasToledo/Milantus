@@ -1,19 +1,13 @@
 import 'dart:convert';
 
 import 'package:dnd_engine/dnd_engine.dart';
+import 'package:dnd_engine/homebrew_transfer.dart' show homebrewCategories;
 
 import '../util/safe_path.dart';
 
-const homebrewCategories = [
-  'weapons',
-  'armor',
-  'items',
-  'feats',
-  'races',
-  'backgrounds',
-  'spells',
-  'creatures',
-];
+// La lista vive en el motor (la comparte el cliente web); acá se reexporta para
+// que los que importan este archivo sigan viéndola.
+export 'package:dnd_engine/homebrew_transfer.dart' show homebrewCategories;
 
 /// Valida y normaliza el mapa de categorías antes de escribir una sola fila.
 Map<String, List<Map<String, dynamic>>> parseHomebrewContent(

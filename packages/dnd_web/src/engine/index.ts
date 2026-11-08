@@ -52,6 +52,12 @@ interface DartEngine {
   magicBaseOptions(catalogJson: string, itemId: string): string;
   companionsView(characterJson: string, catalogJson: string): string;
   companionPreview(characterJson: string, catalogJson: string, option: string, creature: string, level: number): string;
+  homebrewExport(contentJson: string, nowIso: string): string;
+  homebrewImportCheck(text: string, catalogJson: string): string;
+  homebrewNewCreature(): string;
+  homebrewId(name: string): string;
+  homebrewCopy(json: string): string;
+  charactersUsing(contentId: string, charactersJson: string): string;
 }
 
 function engine(): DartEngine {
@@ -1020,4 +1026,54 @@ export function actOn(
   return JSON.parse(
     engine().act(JSON.stringify(character), catalogJson(catalog), JSON.stringify(action)),
   ) as { character: CharacterJson; outcome: SheetOutcome };
+}
+
+/** Las categorías del homebrew, en el orden en que se exporta (`homebrewCategories` del motor). */
+export type HomebrewCategoryKey = "weapons" | "armor" | "items" | "feats" | "races" | "backgrounds" | "spells" | "creatures";
+
+/** El archivo `dnd_homebrew` de todo lo propio: lo arma el motor, el mismo
+ *  formato que exporta Flutter. [now] es la hora del archivo. */
+export function homebrewExport(
+  content: Partial<Record<HomebrewCategoryKey, readonly JsonObject[]>>,
+  now: Date,
+): { fileName: string; text: string } {
+  return JSON.parse(engine().homebrewExport(JSON.stringify(content), now.toISOString())) as { fileName: string; text: string };
+}
+
+/** Lo que dice el motor de un archivo de homebrew a importar, contra el catálogo
+ *  fusionado: qué trae por categoría y cuántas entradas pisan lo propio, o por
+ *  qué no sirve (el mensaje es el del motor). No escribe nada. */
+export type HomebrewImportCheck =
+  | {
+      ok: true;
+      content: Record<HomebrewCategoryKey, JsonObject[]>;
+      counts: Record<HomebrewCategoryKey, number>;
+      names: Record<HomebrewCategoryKey, string[]>;
+      collisions: number;
+    }
+  | { ok: false; error: string };
+
+export function homebrewImportCheck(text: string, catalog: Catalog): HomebrewImportCheck {
+  return JSON.parse(engine().homebrewImportCheck(text, catalogJson(catalog))) as HomebrewImportCheck;
+}
+
+/** El bloque vacío de una criatura propia, para «Nueva criatura». */
+export function homebrewNewCreature(): JsonObject {
+  return JSON.parse(engine().homebrewNewCreature()) as JsonObject;
+}
+
+/** El id nuevo de un homebrew a partir de su nombre. */
+export function homebrewId(name: string): string {
+  return engine().homebrewId(name);
+}
+
+/** Una copia propia de [entry], con id y nombre nuevos y origen homebrew. */
+export function homebrewCopy(entry: JsonObject): JsonObject {
+  return JSON.parse(engine().homebrewCopy(JSON.stringify(entry))) as JsonObject;
+}
+
+/** Los ids de las fichas de [characters] que mencionan [contentId]
+ *  (`charactersUsing`): lo que el diálogo de borrar nombra. */
+export function charactersUsing(contentId: string, characters: readonly CharacterJson[]): string[] {
+  return JSON.parse(engine().charactersUsing(contentId, JSON.stringify(characters))) as string[];
 }

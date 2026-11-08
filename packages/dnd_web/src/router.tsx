@@ -91,7 +91,10 @@ export type DmView =
   | { kind: 'npcPortrait'; npcId: string }
   // El Homebrew también. Sin categoría es la portada; las criaturas no tienen
   // entrada propia acá: su perfil es el del Bestiario.
-  | { kind: 'homebrew'; category: HomebrewCategory | null; entryId: string | null };
+  | { kind: 'homebrew'; category: HomebrewCategory | null; entryId: string | null }
+  // El editor de una criatura propia: `creatureId` es la que se edita, o `null`
+  // para una nueva (`?de=<id>` la abre como copia de otra).
+  | { kind: 'homebrewCreature'; creatureId: string | null };
 
 export type Route =
   | { name: 'start' }
@@ -199,6 +202,17 @@ export function matchRoute(pathname: string): Route {
     if (id === 'pnj' && rest.length === 0) {
       try {
         return { name: 'dm', view: { kind: 'npcs', npcId: tab === undefined ? null : decodeURIComponent(tab) } };
+      } catch {
+        return { name: 'unknown' };
+      }
+    }
+    // El editor de criaturas, antes que la lista: `nueva` no es una criatura.
+    if (id === 'homebrew' && tab === 'criaturas' && rest[0] === 'nueva' && rest.length === 1) {
+      return { name: 'dm', view: { kind: 'homebrewCreature', creatureId: null } };
+    }
+    if (id === 'homebrew' && tab === 'criaturas' && rest[1] === 'editar' && rest.length === 2) {
+      try {
+        return { name: 'dm', view: { kind: 'homebrewCreature', creatureId: decodeURIComponent(rest[0]!) } };
       } catch {
         return { name: 'unknown' };
       }
@@ -350,6 +364,12 @@ export const dmHomebrewHref = (category?: HomebrewCategory, entryId?: string): s
   `${import.meta.env.BASE_URL}dm/homebrew` +
   (category ? `/${homebrewSegment(category)}` : '') +
   (category && entryId ? `/${encodeURIComponent(entryId)}` : '');
+
+/** El editor de una criatura propia: la nueva (vacía, o copia de `from`, propia
+ *  u oficial) o la que se edita. */
+export const dmHomebrewNewCreatureHref = (from?: string): string =>
+  `${dmHomebrewHref('creatures')}/nueva${from ? `?de=${encodeURIComponent(from)}` : ''}`;
+export const dmHomebrewEditCreatureHref = (id: string): string => `${dmHomebrewHref('creatures')}/${encodeURIComponent(id)}/editar`;
 
 export const dmCampaignHref =(id: string, section: DmSection = 'mesa'): string =>
   `${import.meta.env.BASE_URL}dm/campanas/${encodeURIComponent(id)}/${section}`;

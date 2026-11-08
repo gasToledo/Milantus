@@ -744,7 +744,24 @@ Future<void> main() async {
         portraitsImported: prepared.portraitsImported,
       );
     },
-    importHomebrew: ({required userId, required content}) async => 0,
+    // Escribe en el repositorio en memoria (la transacción real vive en
+    // `import_service.dart`): `e2e/homebrew.spec.ts` importa una criatura y la
+    // espera en el Homebrew.
+    importHomebrew: ({required userId, required content}) async {
+      var count = 0;
+      for (final MapEntry(:key, :value) in content.entries) {
+        for (final document in value) {
+          await homebrew.upsert(
+            userId,
+            key,
+            document['id'] as String,
+            document,
+          );
+          count++;
+        }
+      }
+      return count;
+    },
     characters: characters,
     campaigns: campaigns,
     chapters: chapters,

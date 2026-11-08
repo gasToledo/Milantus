@@ -229,8 +229,8 @@ repiten acá.
   en un homebrew sigue al idioma), el tipo, el VD impreso
   (`Creature.challengeRatingText`), la iniciativa, la percepción pasiva y si el
   alcance de cada acción es cuerpo a cuerpo; el modificador de cada
-  característica es `abilityModifier`. Es de solo lectura: **sumar al combate y
-  «Editar una copia»** (Homebrew) son del Modo DM de Flutter y no están.
+  característica es `abilityModifier`. El del jugador es de solo lectura; el del
+  DM suma al combate (6g7c) y, desde 7d1, las acciones del homebrew (abajo).
 - **Campañas y Bestiario del jugador no están en el menú de Jugador**: se entra
   escribiendo la URL. Pertenecen al Modo DM, que ahora existe en parte (abajo): el
   panel DM enlaza el Bestiario.
@@ -368,7 +368,9 @@ repiten acá.
   `homebrew` y las URL del Modo DM, así una ficha no puede quedar distinta en los
   dos lugares; una criatura propia abre su perfil en el Bestiario del DM. Lo de
   otra cuenta no llega (la API es por cuenta) y su URL muestra la categoría
-  vacía. Crear, editar y borrar siguen en Flutter; importar y exportar están desde 7c.
+  vacía. Desde 7d1 se **importa y se exporta** todo (portada), se **borra** cualquier
+  entrada propia y se **crean, editan y duplican criaturas**; crear y editar las
+  otras siete categorías siguen en Flutter hasta 7d2–7d4.
   **Combate** (`GET /api/campaigns/:id/encounter`, más los miembros, los PNJ de
   la mesa y el Cuaderno): el combate abierto, de solo lectura. Arriba, una placa
   con la ronda, «Turno N de M» y cuántos quedan en pie por bando (o «Armando el
@@ -1034,7 +1036,30 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
      al servidor. Al terminar se cierra, se actualiza la Biblioteca y sale un
      aviso. Importar desde la vista de PNJ de una campaña no existe (Flutter
      tampoco lo tiene).
-   - **7d · Homebrew.** Gestión del catálogo propio y transferencia en JSON.
+   - **7d · Homebrew.** Gestión del catálogo propio y transferencia en JSON,
+     partida en cuatro:
+     - **7d1 · Transferir, borrar y criaturas** *(existe)*. Importar y exportar el
+       JSON `dnd_homebrew` desde la portada del Homebrew, borrar cualquier
+       entrada propia diciendo qué fichas de Mis personajes la usan, y crear,
+       editar y duplicar criaturas propias (más «Editar una copia» de una
+       oficial) con el `CreatureForm` de 6e4 en rutas del Homebrew
+       (`/dm/homebrew/criaturas/nueva[?de=<id>]` y `/dm/homebrew/criaturas/<id>/editar`).
+       **Sin rutas nuevas en el servidor**: a diferencia de 7b y 7c, el archivo es
+       texto JSON y no ZIP, así que lo arma y lo lee el navegador por el puente del
+       motor, y se escribe con las rutas que ya existían
+       (`POST /api/homebrew/import`, `PUT` y `DELETE /api/homebrew/<categoría>/<id>`).
+       La lógica se mudó de `dnd_app` al motor (`homebrew_transfer.dart`: el
+       sobre y su lectura, los choques, la validación de ids de inventario,
+       `homebrewId` y `homebrewCopy`, y la lista de categorías que usa también
+       el servidor); Flutter delega sin cambiar sus firmas. Importar siempre pasa
+       por una vista previa (`homebrewImportCheck`: valida contra el catálogo
+       fusionado y cuenta los choques con lo propio, que piden «Sobrescribir»);
+       borrar usa `charactersUsing` sobre Mis personajes. Quedan afuera la lista
+       de entradas inválidas de Flutter (`loadIssues`; `ponytail:` en
+       `HomebrewView.tsx`) y los formularios de las demás categorías.
+     - **7d2 · Dotes, especies y trasfondos**, con el editor de efectos.
+     - **7d3 · Armas, armaduras y objetos.**
+     - **7d4 · Conjuros.**
 
    Opcional, sin equivalente en Flutter y sin diseñar todavía:
    acomodar las tarjetas de Combate y Personaje con un modo de edición, guardado
@@ -1151,8 +1176,9 @@ hace seguro volver atrás es que **no hay nada que deshacer en el formato**:
 
 Para que nadie lo dé por hecho:
 
-- El Compañero Salvaje (invocarlo, que no cobra ni se va con el descanso) y las
-  operaciones del paso 7. El detalle está en
+- El Compañero Salvaje (invocarlo, que no cobra ni se va con el descanso), los
+  formularios del Homebrew que no son de criatura (7d2–7d4) y las operaciones
+  del paso 7 que faltan. El detalle está en
   [Orden previsto de pantallas](#orden-previsto-de-pantallas).
 - Control de versión en el servidor para las escrituras (rechazar una copia
   vieja con 409): hoy gana el último que guarda, como en Flutter.

@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dnd_engine/dnd_engine.dart';
+import 'package:dnd_engine/homebrew_transfer.dart' as engine_transfer;
+import 'package:dnd_engine/homebrew_transfer.dart' show homebrewExportEnvelope;
 
 import '../api/api_client.dart';
 import 'backup_bundle.dart';
@@ -13,8 +15,6 @@ import 'backup_bundle.dart';
 /// de una carpeta de exportaciones: cada método devuelve bytes y un nombre
 /// de archivo sugerido.
 class TransferService {
-  static const int formatVersion = 1;
-
   final ApiClient api;
 
   const TransferService(this.api);
@@ -58,66 +58,20 @@ class TransferService {
   String backupFileName() => 'backup-${_timestamp()}.zip';
 
   /// Todo el contenido homebrew (listas JSON por tipo) envuelto en el
-  /// formato `dnd_homebrew`, como bytes UTF-8 listos para descargar.
-  Uint8List exportHomebrew(Map<String, List<Map<String, dynamic>>> content) {
-    final envelope = {
-      'type': 'dnd_homebrew',
-      'formatVersion': formatVersion,
-      'exportedAt': DateTime.now().toIso8601String(),
-      'content': content,
-    };
-    return Uint8List.fromList(utf8.encode(jsonEncode(envelope)));
-  }
+  /// formato `dnd_homebrew`, como bytes UTF-8 listos para descargar. El
+  /// formato vive en el motor, que también lo arma en el cliente web.
+  Uint8List exportHomebrew(Map<String, List<Map<String, dynamic>>> content) =>
+      Uint8List.fromList(
+        utf8.encode(
+          jsonEncode(homebrewExportEnvelope(content, DateTime.now())),
+        ),
+      );
 
-  String homebrewExportFileName() => 'homebrew-${_timestamp()}.json';
+  String homebrewExportFileName() =>
+      engine_transfer.homebrewExportFileName(DateTime.now());
 
   /// Parsea un export de homebrew (`dnd_homebrew`) a listas JSON por tipo.
-  /// Lógica pura (testeable): mismo formato liviano de siempre, sin relación
-  /// con el respaldo ZIP principal (ver capacidad `account-data-import`, que
-  /// cubre ese otro flujo vía `POST /api/import`).
   static Map<String, List<Map<String, dynamic>>> parseHomebrewImport(
     String jsonText,
-  ) {
-    final data = jsonDecode(jsonText);
-    if (data is Map<String, dynamic> && data['type'] == 'dnd_homebrew') {
-      final version = data['formatVersion'];
-      if (version is! int || version < 1) {
-        throw FormatException(
-          localized(
-            'La versión de la exportación de homebrew debe ser un entero positivo.',
-            'The homebrew export version must be a positive integer.',
-          ),
-        );
-      }
-      if (version > formatVersion) {
-        throw UnsupportedDataVersionException(
-          dataType: 'exportación de homebrew',
-          found: version,
-          supported: formatVersion,
-        );
-      }
-      final content = (data['content'] as Map?)?.cast<String, dynamic>() ?? {};
-      return {
-        for (final key in const [
-          'weapons',
-          'armor',
-          'items',
-          'feats',
-          'races',
-          'backgrounds',
-          'spells',
-          'creatures',
-        ])
-          key: ((content[key] as List?) ?? const [])
-              .map((e) => (e as Map).cast<String, dynamic>())
-              .toList(),
-      };
-    }
-    throw FormatException(
-      localized(
-        'El archivo no es una exportación de homebrew válida.',
-        'The file isn’t a valid homebrew export.',
-      ),
-    );
-  }
+  ) => engine_transfer.parseHomebrewImport(jsonText);
 }

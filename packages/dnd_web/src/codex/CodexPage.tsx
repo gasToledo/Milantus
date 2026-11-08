@@ -252,12 +252,17 @@ export function CategoryView({
   entryId,
   hrefOf = codexHref,
   header,
+  detailActions,
 }: {
   category: CodexCategory;
   entries: CodexEntry[];
   entryId: string | null;
   hrefOf?: HrefOf;
   header?: ReactNode;
+  /** Acciones de la entrada abierta, arriba a la derecha de su ficha. Solo el
+   *  Homebrew las pasa (borrar, y con 7d2–7d4 editar y duplicar): el Códice no
+   *  tiene qué hacer con una entrada, y su ficha queda igual. */
+  detailActions?: (entry: CodexEntry) => ReactNode;
 }) {
   const t = useTexts();
   // «Ver las N» de la búsqueda general llega con `?q=`: la lista arranca
@@ -381,7 +386,7 @@ export function CategoryView({
                   <ArrowLeft size={16} aria-hidden="true" className="text-gold" />
                   {t.luBack}
                 </Link>
-                <EntryDetail entry={open} reading={reading ? { category, entries } : null} />
+                <EntryDetail entry={open} reading={reading ? { category, entries } : null} actions={detailActions?.(open)} />
               </>
             ) : (
               <p className="card p-6 text-on-surface-variant">{t.codexPickEntry}</p>
@@ -466,8 +471,10 @@ function EntryList({
 function EntryDetail({
   entry,
   reading,
+  actions,
 }: {
   entry: CodexEntry;
+  actions?: ReactNode;
   /** El glosario: la categoría y su lista completa, para la pista de lectura
    *  y el anterior y el siguiente. */
   reading: { category: CodexCategory; entries: CodexEntry[] } | null;
@@ -485,16 +492,21 @@ function EntryDetail({
         ) : (
           <ReadingTrack entry={entry} entries={reading.entries} />
         ))}
-      {source && (
-        <Pill highlighted={entry.source === 'srd_2024'}>
-          <span aria-hidden="true">{source}</span>
-          <span className="sr-only">{t.sourceLabel(source)}</span>
-        </Pill>
-      )}
-      <h2 id="codex-entry-title" className="font-display mt-3.5 text-[34px] leading-[1.1] break-words text-on-surface">
-        {entry.name}
-      </h2>
-      {!reading && entry.subtitle && <p className="mt-1.5 text-[15px] text-on-surface-variant">{entry.subtitle}</p>}
+      <div className="flex items-start gap-3">
+        <div className="min-w-0 flex-1">
+          {source && (
+            <Pill highlighted={entry.source === 'srd_2024'}>
+              <span aria-hidden="true">{source}</span>
+              <span className="sr-only">{t.sourceLabel(source)}</span>
+            </Pill>
+          )}
+          <h2 id="codex-entry-title" className="font-display mt-3.5 text-[34px] leading-[1.1] break-words text-on-surface">
+            {entry.name}
+          </h2>
+          {!reading && entry.subtitle && <p className="mt-1.5 text-[15px] text-on-surface-variant">{entry.subtitle}</p>}
+        </div>
+        {actions && <div className="flex shrink-0 gap-2">{actions}</div>}
+      </div>
       <SectionRule className="my-[22px]" />
 
       {detail.facts

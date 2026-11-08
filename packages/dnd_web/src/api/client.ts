@@ -19,6 +19,9 @@ export class ApiError extends Error {
     /** El `code` estable del cuerpo `{ error, code }`, cuando el servidor lo
      *  manda: la pantalla traduce por él. */
     readonly code?: string,
+    /** El mensaje del cuerpo `{ error }` cuando el servidor lo manda en un 400
+     *  (validó y rechazó): se muestra tal cual. */
+    readonly detail?: string,
   ) {
     super(`${path} respondió ${status}`);
   }

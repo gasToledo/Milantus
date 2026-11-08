@@ -1,15 +1,30 @@
-import { useMemo, useState, type ReactNode } from 'react';
-import { ArrowLeft, PawPrint, Search, X, type LucideIcon } from 'lucide-react';
-import { useSheetCatalog } from '../api/queries';
+import { useMemo, useRef, useState, type ReactNode } from 'react';
+import { ArrowLeft, Copy, Download, PawPrint, Plus, Search, Trash2, Upload, X, type LucideIcon } from 'lucide-react';
+import { CATEGORIES, downloadText } from '../api/homebrew';
+import { useHomebrew, useSheetCatalog } from '../api/queries';
 import { CategoryView, ICONS } from '../codex/CodexPage';
 import { codexEntries, fold, type CodexEntry } from '../codex/entries';
-import { bestiary } from '../engine';
+import { bestiary, homebrewExport, type Catalog } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
-import { dmBestiaryHref, dmHomebrewHref, HOMEBREW_CATEGORIES, Link, type HomebrewCategory } from '../router';
-import { Button } from '../ui/Button';
+import {
+  dmBestiaryHref,
+  dmHomebrewHref,
+  dmHomebrewNewCreatureHref,
+  HOMEBREW_CATEGORIES,
+  Link,
+  navigate,
+  type HomebrewCategory,
+} from '../router';
+import { Button, ButtonLink } from '../ui/Button';
 import { cx } from '../ui/cx';
+import { showNotice } from '../ui/notices';
+import { Tooltip } from '../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
+import { DeleteHomebrewDialog } from './DeleteHomebrewDialog';
 import { DmHeader } from './DmHeader';
+import { DuplicateCreatureDialog } from './DuplicateCreatureDialog';
+import { storageOf } from './homebrewKinds';
+import { ImportHomebrewDialog } from './ImportHomebrewDialog';
 
 /** Una entrada propia, sea del Códice o una criatura. */
 interface Own {
@@ -19,18 +34,31 @@ interface Own {
 }
 
 /**
- * El Homebrew de la cuenta (`homebrew_screen.dart`), de solo lectura: lo propio
- * de cada categoría, con la misma lista y la misma ficha del Códice (la vista
- * es `CategoryView`, montada con las URL del Modo DM). Una criatura propia se
- * lee en el perfil del Bestiario, que ya la trae. Lo propio es lo que el
- * catálogo fusionado marca `homebrew`: el que llega de `/api/homebrew`, de esta
- * cuenta y de ninguna otra. Crear, editar, importar, exportar y borrar siguen
- * en Flutter.
+ * El Homebrew de la cuenta (`homebrew_screen.dart`): lo propio de cada
+ * categoría, con la misma lista y la misma ficha del Códice (la vista es
+ * `CategoryView`, montada con las URL del Modo DM). Una criatura propia se lee
+ * en el perfil del Bestiario, que ya la trae. Lo propio es lo que el catálogo
+ * fusionado marca `homebrew`: el que llega de `/api/homebrew`, de esta cuenta y
+ * de ninguna otra.
+ *
+ * Desde acá se **importa y se exporta** todo el homebrew (en la portada), se
+ * **borra** cualquier entrada propia (en su ficha) y se **crean y duplican
+ * criaturas**. Crear y editar las otras siete categorías siguen en Flutter: los
+ * formularios llegan con 7d2–7d4.
+ *
+ * ponytail: Flutter además lista las entradas inválidas que no pudo cargar
+ * (`loadIssues`) para borrarlas; `fetchHomebrew` las descarta al leer y esta
+ * pantalla no las ve. El servidor valida al guardar, así que no debería haber.
+ * Si aparece una, el camino es exponer la validación por entrada en el puente
+ * (`js/entrypoint.dart`) y listarla acá.
  */
 export function HomebrewView({ category, entryId }: { category: HomebrewCategory | null; entryId: string | null }) {
   const t = useTexts();
   const lang = useLang();
   const catalog = useSheetCatalog(lang);
+  // Borrar una entrada que no es criatura: el diálogo vive acá y no en la ficha,
+  // que se desmonta al volver a la lista.
+  const [deleting, setDeleting] = useState<{ category: HomebrewCategory; id: string; name: string } | null>(null);
 
   // Por categoría, solo lo propio y en el orden del Códice.
   const own = useMemo(() => {
@@ -50,7 +78,10 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
 
   const failed = catalog.queries.filter((q) => q.isError);
   const total = own ? [...own.codex.values()].reduce((n, l) => n + l.length, own.creatures.length) : 0;
-  const header = <DmHeader title={t.navHomebrew} kicker={own ? `${t.dmHomebrewCount(total)} · ${t.dmReadOnly}` : t.dmReadOnly} />;
+  const headerWith = (actions?: ReactNode) => (
+    <DmHeader title={t.navHomebrew} kicker={own ? t.dmHomebrewCount(total) : undefined} actions={actions} />
+  );
+  const header = headerWith();
 
   if (failed.length > 0) {
     return (
@@ -60,7 +91,7 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
       </div>
     );
   }
-  if (!own) {
+  if (!own || !catalog.data) {
     return (
       <div className="flex flex-col gap-5">
         {header}
@@ -68,7 +99,9 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
       </div>
     );
   }
-  if (category === 'creatures') return <CreatureList creatures={own.creatures} header={header} />;
+  if (category === 'creatures') {
+    return <CreatureList creatures={own.creatures} catalog={catalog.data} headerWith={headerWith} />;
+  }
   if (category !== null) {
     // Sin nada propio en la categoría, el vacío es «no hay», no el «nada
     // coincide» de una lista filtrada.
@@ -77,7 +110,7 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
         <div className="flex flex-col gap-4">
           <BackToHome />
           {header}
-          <AppEmptyState kind="empty" message={t.dmHomebrewEmptyIn(t.codexCategories[category])} hint={t.dmHomebrewEmptyHint} />
+          <AppEmptyState kind="empty" message={t.dmHomebrewEmptyIn(t.codexCategories[category])} hint={t.dmHomebrewCreatedInMain} />
         </div>
       );
     }
@@ -91,11 +124,34 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
           entryId={entryId}
           hrefOf={(c, id) => dmHomebrewHref(c as HomebrewCategory, id)}
           header={header}
+          detailActions={(entry) => (
+            // 7d2–7d4 suman «Editar» y «Duplicar» al lado, con cada formulario.
+            <Tooltip content={t.cardDelete}>
+              <button
+                type="button"
+                aria-label={t.hbDeleteTooltip(entry.name)}
+                data-action="homebrew-delete"
+                onClick={() => setDeleting({ category, id: entry.id, name: entry.name })}
+                className="inline-flex size-9 items-center justify-center rounded-[var(--radius-nav)] border border-hairline text-crimson hover:bg-plaque"
+              >
+                <Trash2 size={16} aria-hidden="true" />
+              </button>
+            </Tooltip>
+          )}
         />
+        {deleting && (
+          <DeleteHomebrewDialog
+            category={storageOf(deleting.category)}
+            id={deleting.id}
+            name={deleting.name}
+            onClose={() => setDeleting(null)}
+            onDeleted={() => navigate(dmHomebrewHref(deleting.category))}
+          />
+        )}
       </div>
     );
   }
-  return <Home own={own} total={total} header={header} />;
+  return <Home own={own} total={total} headerWith={headerWith} />;
 }
 
 function BackToHome() {
@@ -110,18 +166,40 @@ function BackToHome() {
 
 /** La portada: una tarjeta por categoría con lo propio que tiene, y un
  *  buscador que mira todas a la vez: con lo propio uno se acuerda del nombre,
- *  no de en qué categoría lo guardó (como en Flutter). */
+ *  no de en qué categoría lo guardó (como en Flutter). Acá también se importa
+ *  y se exporta todo. */
 function Home({
   own,
   total,
-  header,
+  headerWith,
 }: {
   own: { codex: Map<(typeof HOMEBREW_CATEGORIES)[number], CodexEntry[]>; creatures: Own[] };
   total: number;
-  header: ReactNode;
+  headerWith: (actions?: ReactNode) => ReactNode;
 }) {
   const t = useTexts();
+  const homebrew = useHomebrew();
   const [query, setQuery] = useState('');
+  // Elegir el archivo abre el diálogo de la vista previa; el `input` queda
+  // oculto y lo abren los dos «Importar archivo» (el de la cabecera y el del vacío).
+  const picker = useRef<HTMLInputElement>(null);
+  const [file, setFile] = useState<File | null>(null);
+
+  const exportAll = () => {
+    const content = homebrew.data;
+    if (!content) return;
+    // Lo que viaja lo arma el motor, en el formato `dnd_homebrew` de Flutter.
+    const count = CATEGORIES.reduce((n, c) => n + (content[c]?.length ?? 0), 0);
+    const { fileName, text } = homebrewExport(content, new Date());
+    downloadText(fileName, text);
+    showNotice(t.hbExported(count));
+  };
+  const importButton = (
+    <Button tone="secondary" icon={Upload} onClick={() => picker.current?.click()} data-action="homebrew-import">
+      {t.hbImportFile}
+    </Button>
+  );
+
   const sections: { c: HomebrewCategory; label: string; icon: LucideIcon; list: Own[] }[] = [
     ...HOMEBREW_CATEGORIES.map((c) => ({ c, label: t.codexCategories[c], icon: ICONS[c], list: own.codex.get(c)! })),
     { c: 'creatures' as const, label: t.dmHomebrewCreatures, icon: PawPrint, list: own.creatures },
@@ -135,7 +213,7 @@ function Home({
 
   let body;
   if (total === 0) {
-    body = <AppEmptyState kind="empty" message={t.dmHomebrewEmpty} hint={t.dmHomebrewEmptyHint} />;
+    body = <AppEmptyState kind="empty" message={t.dmHomebrewEmpty} hint={t.dmHomebrewEmptyHint} actions={importButton} />;
   } else if (hits && hits.length === 0) {
     body = (
       <AppEmptyState
@@ -188,9 +266,35 @@ function Home({
     );
   }
 
+  // Sin nada propio no hay qué exportar: «Exportar todo» no aparece, y
+  // «Importar archivo» va en el estado vacío.
+  const actions =
+    total > 0 ? (
+      <>
+        {importButton}
+        <Button tone="secondary" icon={Download} onClick={exportAll} disabled={!homebrew.data} data-action="homebrew-export">
+          {t.hbExportAll}
+        </Button>
+      </>
+    ) : undefined;
+
   return (
     <div className="flex flex-col gap-5">
-      {header}
+      {headerWith(actions)}
+      <input
+        ref={picker}
+        type="file"
+        hidden
+        accept=".json,application/json"
+        aria-label={t.hbPickFile}
+        data-field="homebrew-import-file"
+        onChange={(e) => {
+          setFile(e.currentTarget.files?.[0] ?? null);
+          // Sin esto, elegir de nuevo el mismo archivo no dispararía el cambio.
+          e.currentTarget.value = '';
+        }}
+      />
+      {file && <ImportHomebrewDialog file={file} onClose={() => setFile(null)} />}
       {total > 0 && (
         <div role="search" className="relative max-w-[320px]">
           <label htmlFor="homebrew-search" className="sr-only">
@@ -214,15 +318,59 @@ function Home({
 }
 
 /** Las criaturas propias: cada una abre su perfil en el Bestiario del DM, que
- *  es donde se lee una criatura (no hay una segunda ficha). */
-function CreatureList({ creatures, header }: { creatures: Own[]; header: ReactNode }) {
+ *  es donde se lee una criatura (no hay una segunda ficha) y donde están sus
+ *  acciones. Acá se crea una nueva, vacía o copiada del catálogo. */
+function CreatureList({
+  creatures,
+  catalog,
+  headerWith,
+}: {
+  creatures: Own[];
+  catalog: Catalog;
+  headerWith: (actions?: ReactNode) => ReactNode;
+}) {
   const t = useTexts();
+  const [picking, setPicking] = useState(false);
+  const duplicate = (
+    <Button tone="secondary" icon={Copy} onClick={() => setPicking(true)} data-action="homebrew-duplicate-catalog">
+      {t.hbDuplicateFromCatalog}
+    </Button>
+  );
+  const create = (
+    <ButtonLink internal icon={Plus} href={dmHomebrewNewCreatureHref()} data-action="homebrew-new-creature">
+      {t.hbNewCreature}
+    </ButtonLink>
+  );
   return (
     <div className="flex flex-col gap-4">
       <BackToHome />
-      {header}
+      {headerWith(
+        <>
+          {duplicate}
+          {create}
+        </>,
+      )}
+      {picking && (
+        <DuplicateCreatureDialog
+          catalog={catalog}
+          onClose={() => setPicking(false)}
+          onPick={(id) => {
+            setPicking(false);
+            navigate(dmHomebrewNewCreatureHref(id));
+          }}
+        />
+      )}
       {creatures.length === 0 ? (
-        <AppEmptyState kind="empty" message={t.dmHomebrewNoCreatures} hint={t.dmHomebrewEmptyHint} />
+        <AppEmptyState
+          kind="empty"
+          message={t.dmHomebrewNoCreatures}
+          actions={
+            <>
+              {create}
+              {duplicate}
+            </>
+          }
+        />
       ) : (
         <ul aria-label={t.dmHomebrewCreatures} className="card max-w-[720px] p-1.5">
           {creatures.map((c) => (

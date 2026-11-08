@@ -17,6 +17,8 @@ import 'dart:js_interop_unsafe';
 import 'dart:math';
 
 import 'package:dnd_engine/dnd_engine.dart';
+import 'package:dnd_engine/homebrew_references.dart';
+import 'package:dnd_engine/homebrew_transfer.dart' as transfer;
 
 String? _catalogJsonVisto;
 ContentRepository? _repo;
@@ -1137,8 +1139,122 @@ String creationConfirm(
 /// El personaje de ejemplo de la cuenta vacía ([demoSagan]).
 String demoCharacter() => jsonEncode(demoSagan().toJson());
 
+/// El archivo `dnd_homebrew` de [contentJson] (`{categoría: [documento]}`):
+/// `{"fileName", "text"}`. [nowIso] es la hora de la exportación (ISO 8601); el
+/// motor no lee el reloj, así que un mismo instante da el mismo archivo.
+String homebrewExport(String contentJson, String nowIso) {
+  final raw = (jsonDecode(contentJson) as Map).cast<String, dynamic>();
+  final content = {
+    for (final c in transfer.homebrewCategories)
+      c: [
+        for (final doc in (raw[c] as List? ?? const []))
+          (doc as Map).cast<String, dynamic>(),
+      ],
+  };
+  final now = DateTime.parse(nowIso);
+  return jsonEncode({
+    'fileName': transfer.homebrewExportFileName(now),
+    'text': jsonEncode(transfer.homebrewExportEnvelope(content, now)),
+  });
+}
+
+/// Lee y valida un archivo de homebrew a importar contra el catálogo
+/// **fusionado** (el oficial más lo propio): `{"ok": true, "content",
+/// "counts", "names", "collisions"}`, o `{"ok": false, "error"}` con el mensaje
+/// del motor. Los choques son las entradas del archivo que pisan homebrew
+/// propio (origen `homebrew` en ese catálogo). Nada se escribe.
+String homebrewImportCheck(String text, String catalogJson) {
+  final noEsHomebrew = jsonEncode({
+    'ok': false,
+    'error': localized(
+      'El archivo no es una exportación de homebrew válida.',
+      'The file isn’t a valid homebrew export.',
+    ),
+  });
+  // Un archivo que ni siquiera es JSON diría el error del parser de Dart
+  // («Unexpected character…»), que no le sirve a nadie: es lo mismo que cualquier
+  // otro archivo que no es un homebrew.
+  try {
+    jsonDecode(text);
+  } on FormatException {
+    return noEsHomebrew;
+  }
+  try {
+    final content = transfer.parseHomebrewImport(text);
+    final repo = _repoPara(catalogJson);
+    transfer.validateHomebrewInventoryIds(content, repo);
+    Set<String> propios<T>(Map<String, T> m, ContentSource Function(T) src) => {
+          for (final e in m.entries)
+            if (src(e.value) == ContentSource.homebrew) e.key,
+        };
+    final ownIds = {
+      'weapons': propios(repo.weapons, (e) => e.source),
+      'armor': propios(repo.armor, (e) => e.source),
+      'items': propios(repo.items, (e) => e.source),
+      'feats': propios(repo.feats, (e) => e.source),
+      'races': propios(repo.races, (e) => e.source),
+      'backgrounds': propios(repo.backgrounds, (e) => e.source),
+      'spells': propios(repo.spells, (e) => e.source),
+      'creatures': propios(repo.creatures, (e) => e.source),
+    };
+    return jsonEncode({
+      'ok': true,
+      'content': content,
+      'counts': {for (final e in content.entries) e.key: e.value.length},
+      'names': {
+        for (final e in content.entries)
+          e.key: [for (final d in e.value) '${d['name'] ?? d['id']}'],
+      },
+      'collisions': transfer.countHomebrewCollisions(content, ownIds),
+    });
+  } on FormatException catch (e) {
+    return jsonEncode({'ok': false, 'error': e.message});
+  } on UnsupportedDataVersionException catch (e) {
+    return jsonEncode({'ok': false, 'error': e.toString()});
+  } on TypeError catch (_) {
+    // Un `content` que no es lista de objetos: el archivo está dañado.
+    return noEsHomebrew;
+  }
+}
+
+/// El bloque vacío de una criatura propia (`Npc.emptyBlock`), para el
+/// formulario de «Nueva criatura».
+String homebrewNewCreature() => jsonEncode(Npc.emptyBlock('').toJson());
+
+/// El id nuevo de un homebrew a partir de su nombre (`homebrewId`).
+String homebrewIdFor(String name) => transfer.homebrewId(name);
+
+/// Una copia propia de [json] con id y nombre nuevos (`homebrewCopy`).
+String homebrewCopyJs(String json) => jsonEncode(
+      transfer.homebrewCopy((jsonDecode(json) as Map).cast<String, dynamic>()),
+    );
+
+/// Los ids de las fichas de [charactersJson] (lista de documentos) que mencionan
+/// [contentId] (`charactersUsing`): lo que el diálogo de borrar nombra. Una
+/// ficha de una versión que este motor no entiende no se puede leer y no se
+/// cuenta, como en la lista de Mis personajes.
+String charactersUsingJs(String contentId, String charactersJson) {
+  final characters = <Character>[];
+  for (final raw in (jsonDecode(charactersJson) as List)) {
+    try {
+      characters.add(Character.fromJson((raw as Map).cast<String, dynamic>()));
+    } on Object {
+      continue;
+    }
+  }
+  return jsonEncode([
+    for (final c in charactersUsing(contentId, characters)) c.id,
+  ]);
+}
+
 void main() {
   final motor = JSObject();
+  motor['homebrewExport'] = homebrewExport.toJS;
+  motor['homebrewImportCheck'] = homebrewImportCheck.toJS;
+  motor['homebrewNewCreature'] = homebrewNewCreature.toJS;
+  motor['homebrewId'] = homebrewIdFor.toJS;
+  motor['homebrewCopy'] = homebrewCopyJs.toJS;
+  motor['charactersUsing'] = charactersUsingJs.toJS;
   motor['creationConfirm'] = creationConfirm.toJS;
   motor['creation'] = creation.toJS;
   motor['demoCharacter'] = demoCharacter.toJS;

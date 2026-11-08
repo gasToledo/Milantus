@@ -14,6 +14,8 @@ import { BestiaryPage } from '../bestiary/BestiaryPage';
 import { AddFromBestiary } from './combat/AddFromBestiary';
 import { ChaptersView } from './ChaptersView';
 import { CombatView } from './CombatView';
+import { HomebrewCreatureActions } from './HomebrewCreatureActions';
+import { HomebrewCreatureBack, HomebrewCreatureView } from './HomebrewCreatureView';
 import { HomebrewView } from './HomebrewView';
 import { MemberSheetView } from './MemberSheetView';
 import { MesaView } from './MesaView';
@@ -75,10 +77,15 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
     // El Bestiario no depende de las campañas: se abre también sin ninguna y
     // cuando la lista no cargó (el panel lo dice solo).
     const campaign = musicCampaign ?? (list && defaultCampaign(list));
+    // Junto a lo de la campaña van las acciones del homebrew (editar, duplicar,
+    // borrar o «Editar una copia»), que no dependen de que haya una.
     body = <BestiaryPage entryId={view.entryId} dm profileAction={({ row, profile }, catalog) => (
-      campaign ? (
-        <AddFromBestiary key={`${campaign.id}:${row.id}`} campaign={campaign} creatureId={row.id} profile={profile} catalog={catalog} onMusicOffer={onMusicOffer} />
-      ) : list ? <p className="text-[13px] text-text-muted">{t.dmCreateCampaignFirst}</p> : null
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        {campaign ? (
+          <AddFromBestiary key={`${campaign.id}:${row.id}`} campaign={campaign} creatureId={row.id} profile={profile} catalog={catalog} onMusicOffer={onMusicOffer} />
+        ) : list ? <p className="text-[13px] text-text-muted">{t.dmCreateCampaignFirst}</p> : null}
+        <HomebrewCreatureActions key={row.id} id={row.id} profile={profile} />
+      </div>
     )} />;
   } else if (view.kind === 'npcs') {
     // La Biblioteca tampoco depende de las campañas: sin la lista, los filtros
@@ -91,6 +98,8 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
     body = <NpcPortraitView key={view.npcId} npcId={view.npcId} />;
   } else if (view.kind === 'npcSheet') {
     body = <NpcSheetView key={view.npcId} npcId={view.npcId} tab={view.tab} screen={view.screen} />;
+  } else if (view.kind === 'homebrewCreature') {
+    body = <HomebrewCreatureView key={view.creatureId ?? 'nueva'} creatureId={view.creatureId} leaveRef={leave} />;
   } else if (view.kind === 'homebrew') {
     // Lo propio es de la cuenta, no de una campaña.
     body = <HomebrewView category={view.category} entryId={view.entryId} />;
@@ -137,6 +146,8 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
       panel={
         view.kind === 'npcBlock' ? (
           <NpcBlockBack npcId={view.npcId} leaveRef={leave} />
+        ) : view.kind === 'homebrewCreature' ? (
+          <HomebrewCreatureBack creatureId={view.creatureId} leaveRef={leave} />
         ) : (
           <DmPanel campaigns={list} current={current} tool={view.kind === 'npcSheet' || view.kind === 'npcPortrait' ? 'npcs' : view.kind === 'bestiary' || view.kind === 'npcs' || view.kind === 'homebrew' ? view.kind : undefined} />
         )
