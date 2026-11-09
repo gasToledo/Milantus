@@ -17,7 +17,7 @@ import { CombatView } from './CombatView';
 import { HomebrewCreatureActions } from './HomebrewCreatureActions';
 import { creatureEditorExit, HomebrewCreatureView } from './HomebrewCreatureView';
 import { HomebrewEditorBack } from './HomebrewEditorBack';
-import { featEditorExit, HomebrewFeatView } from './homebrew/HomebrewFeatView';
+import { entryEditorExit, HomebrewEntryEditorView } from './homebrew/HomebrewEntryEditorView';
 import { HomebrewView } from './HomebrewView';
 import { MemberSheetView } from './MemberSheetView';
 import { MesaView } from './MesaView';
@@ -108,7 +108,7 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
       view.category === 'creatures' ? (
         <HomebrewCreatureView key={key} creatureId={view.entryId} leaveRef={leave} />
       ) : (
-        <HomebrewFeatView key={key} featId={view.entryId} leaveRef={leave} />
+        <HomebrewEntryEditorView key={key} category={view.category} entryId={view.entryId} leaveRef={leave} />
       );
   } else if (view.kind === 'homebrew') {
     // Lo propio es de la cuenta, no de una campaña.
@@ -158,7 +158,7 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
           <NpcBlockBack npcId={view.npcId} leaveRef={leave} />
         ) : view.kind === 'homebrewEditor' ? (
           <HomebrewEditorBack
-            exitHref={view.category === 'creatures' ? creatureEditorExit(view.entryId) : featEditorExit(view.entryId)}
+            exitHref={view.category === 'creatures' ? creatureEditorExit(view.entryId) : entryEditorExit(view.category, view.entryId)}
             leaveRef={leave}
           />
         ) : (

@@ -369,9 +369,9 @@ repiten acá.
   dos lugares; una criatura propia abre su perfil en el Bestiario del DM. Lo de
   otra cuenta no llega (la API es por cuenta) y su URL muestra la categoría
   vacía. Desde 7d1 se **importa y se exporta** todo (portada), se **borra** cualquier
-  entrada propia y se **crean, editan y duplican criaturas** y, desde 7d2a,
-  **dotes**; crear y editar las otras seis categorías siguen en Flutter hasta
-  7d2b–7d4.
+  entrada propia y se **crean, editan y duplican criaturas** y, desde 7d2a y 7d2b,
+  **dotes, especies y trasfondos**; crear y editar las otras cuatro categorías
+  siguen en Flutter hasta 7d3 y 7d4.
   **Combate** (`GET /api/campaigns/:id/encounter`, más los miembros, los PNJ de
   la mesa y el Cuaderno): el combate abierto, de solo lectura. Arriba, una placa
   con la ronda, «Turno N de M» y cuántos quedan en pie por bando (o «Armando el
@@ -1079,7 +1079,23 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
        Quedan afuera editar un efecto en el lugar, los efectos de elección o de
        clase, esconder tipos por formulario (`hiddenKinds`, que usan los objetos
        en 7d3) y editar el requisito. Sin cambios en el servidor ni en Flutter.
-     - **7d2b · Especies y trasfondos**, que reusan el editor de efectos.
+     - **7d2b · Especies y trasfondos** *(existe)*: cierra la 7d2. El motor suma
+       `RaceDraft` y `BackgroundDraft` (el patrón de `FeatDraft`: formulario como
+       texto, entrada armada que conserva emblema y, en el trasfondo, el equipo
+       inicial, y errores; el tamaño a elegir con menos de dos marcados queda
+       vacío, y el trasfondo pide exactamente tres características) y
+       `homebrewFormOptions` (tamaños, habilidades, herramientas, características y
+       dotes de origen con su rótulo en el idioma). En el puente: `raceForm`,
+       `raceDraft`, `raceNew`, `backgroundForm`, `backgroundDraft`,
+       `backgroundNew`. En pantalla: `HomebrewFormShell` (el armazón que se
+       extrajo de `FeatForm`, que cumple su `ponytail`), `RaceForm`,
+       `BackgroundForm` y la vista `HomebrewEntryEditorView`, que generaliza la de
+       dotes (`EDITABLE_HOMEBREW` suma `races` y `backgrounds`). El Códice
+       —también el del jugador— suma a la especie el dato «Habilidades» y, sin
+       rasgos pasivos, sus efectos uno por línea, y al trasfondo una sección
+       «Rasgos» con sus efectos. Quedan afuera el panel de reglas por campo de
+       Flutter, editar el equipo inicial y el emblema, los linajes y esconder
+       tipos de efecto. Sin cambios en el servidor ni en Flutter.
      - **7d3 · Armas, armaduras y objetos.**
      - **7d4 · Conjuros.**
 
@@ -1199,7 +1215,7 @@ hace seguro volver atrás es que **no hay nada que deshacer en el formato**:
 Para que nadie lo dé por hecho:
 
 - El Compañero Salvaje (invocarlo, que no cobra ni se va con el descanso), los
-  formularios del Homebrew que no son de criatura ni de dote (7d2b–7d4) y las operaciones
+  formularios del Homebrew de armas, armaduras, objetos y conjuros (7d3 y 7d4) y las operaciones
   del paso 7 que faltan. El detalle está en
   [Orden previsto de pantallas](#orden-previsto-de-pantallas).
 - Control de versión en el servidor para las escrituras (rechazar una copia

@@ -93,3 +93,26 @@ test('el DM crea una dote propia con un efecto, la lee en su detalle y la borra'
   const { content } = await api<{ content: { feats: { name: string }[] } }>(page.request, '/api/homebrew', TOKEN_TRANSFERENCIA);
   expect(content.feats.map((f) => f.name)).not.toContain(nombre);
 });
+
+test('el DM crea un trasfondo propio con tres características, lo lee en su detalle y lo borra', async ({ context, page, baseURL }) => {
+  const nombre = `Contrabandista ${Date.now().toString(36)}`;
+  await context.addCookies([{ name: 'dnd_session', value: TOKEN_TRANSFERENCIA, url: baseURL! }]);
+  await page.goto('/v2/dm/homebrew/trasfondos');
+  await page.getByRole('link', { name: t.hbNewBackground, exact: true }).first().click();
+
+  await page.locator('[data-field="background-name"]').fill(nombre);
+  for (const ability of ['FUE', 'DES', 'CON']) await page.getByRole('button', { name: ability, exact: true }).click();
+  // Con tres marcadas, las demás quedan apagadas.
+  await expect(page.getByRole('button', { name: 'INT', exact: true })).toHaveAttribute('aria-disabled', 'true');
+  await page.locator('[data-action="background-save"]').click();
+
+  await expect(page.getByText(t.hbSaved(nombre), { exact: true }).first()).toBeVisible();
+  await expect(page.getByText('FUE · DES · CON', { exact: true }).first()).toBeVisible();
+
+  await page.getByRole('button', { name: t.hbDeleteTooltip(nombre), exact: true }).click();
+  const borrar = page.getByRole('dialog', { name: t.hbDeleteTitle(t.hbDeleteKinds.backgrounds, nombre) });
+  await borrar.getByRole('button', { name: t.cardDelete, exact: true }).click();
+  await expect(page.getByText(t.hbDeleted(nombre), { exact: true }).first()).toBeVisible();
+  const { content } = await api<{ content: { backgrounds: { name: string }[] } }>(page.request, '/api/homebrew', TOKEN_TRANSFERENCIA);
+  expect(content.backgrounds.map((b) => b.name)).not.toContain(nombre);
+});

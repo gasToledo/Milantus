@@ -197,6 +197,16 @@ export function featEntry(feat: JsonObject, catalog: Catalog, t: Texts, lang: La
   return new Ctx(catalog, t, lang).feat(feat);
 }
 
+/** La ficha del Códice de una sola especie: la vista previa del formulario. */
+export function raceEntry(race: JsonObject, catalog: Catalog, t: Texts, lang: Lang): CodexEntry {
+  return new Ctx(catalog, t, lang).race(race);
+}
+
+/** La ficha del Códice de un solo trasfondo: la vista previa del formulario. */
+export function backgroundEntry(background: JsonObject, catalog: Catalog, t: Texts, lang: Lang): CodexEntry {
+  return new Ctx(catalog, t, lang).background(background);
+}
+
 class Ctx {
   private readonly pounds: Intl.NumberFormat;
   private readonly coinLabels: Record<string, string>;
@@ -251,6 +261,18 @@ class Ctx {
       .join('\n');
   }
 
+  /** Los rasgos de una especie o un trasfondo: los pasivos con nombre y, si no
+   *  tiene ninguno, sus efectos uno por línea (la misma regla que la dote). Sin
+   *  esto una especie propia con resistencias y sin prosa se vería muda. */
+  private traitsOrLines(effects: unknown): CodexTrait[] {
+    const passive = this.traits(effects);
+    if (passive.length > 0) return passive;
+    return this.effectLines(effects)
+      .split('\n')
+      .filter(Boolean)
+      .map((line) => ({ name: line, description: '' }));
+  }
+
   /** Rasgos agrupados por nivel, como `_features` de Flutter. */
   private features(list: unknown): CodexDetail['sections'] {
     const byLevel = new Map<number, CodexTrait[]>();
@@ -270,7 +292,9 @@ class Ctx {
       const sizes = strs(r.sizeOptions);
       const darkvision = objs(r.effects).filter((e) => e.type === 'darkvision');
       const lineages = this.sorted(this.catalog.lineages.filter((l) => l.raceId === r.id)).map((l) => str(l.name));
-      const traits = this.traits(r.effects);
+      const traits = this.traitsOrLines(r.effects);
+      const skillCount = num(r.skillChoiceCount);
+      const skillFrom = strs(r.skillChoiceFrom);
       return {
         facts: [
           [
@@ -283,6 +307,17 @@ class Ctx {
             },
             { label: t.codexSpeed, value: t.codexFeet(num(r.speed)) },
             ...darkvision.map((d) => ({ label: t.codexDarkvision, value: t.codexFeet(num(d.range)) })),
+            ...(skillCount > 0
+              ? [
+                  {
+                    label: t.codexSkills,
+                    value:
+                      skillFrom.length === 0
+                        ? t.codexPickAny(skillCount)
+                        : t.codexPickFrom(skillCount, skillFrom.map((s) => catalogLabel('skill', s)).join(', ')),
+                  },
+                ]
+              : []),
           ],
         ],
         prose: str(r.description) || undefined,
@@ -360,6 +395,7 @@ class Ctx {
       const skills = strs(b.skillProficiencies);
       const tools = strs(b.toolProficiencies);
       const feat = str(b.originFeatId);
+      const traits = this.traitsOrLines(b.effects);
       return {
         facts: [
           [
@@ -370,7 +406,7 @@ class Ctx {
           ],
         ],
         prose: str(b.description) || undefined,
-        sections: [],
+        sections: traits.length > 0 ? [{ title: t.codexTraits, traits }] : [],
       };
     });
   }

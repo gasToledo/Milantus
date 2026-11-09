@@ -44,8 +44,8 @@ interface Own {
  *
  * Desde acá se **importa y se exporta** todo el homebrew (en la portada), se
  * **borra** cualquier entrada propia (en su ficha) y se **crean, editan y
- * duplican criaturas y dotes**. Crear y editar las otras seis categorías siguen
- * en Flutter: los formularios llegan con 7d2b–7d4.
+ * duplican criaturas, dotes, especies y trasfondos**. Crear y editar las otras
+ * cuatro categorías siguen en Flutter: los formularios llegan con 7d3 y 7d4.
  *
  * ponytail: Flutter además lista las entradas inválidas que no pudo cargar
  * (`loadIssues`) para borrarlas; `fetchHomebrew` las descarta al leer y esta
@@ -60,7 +60,7 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
   // Borrar una entrada que no es criatura: el diálogo vive acá y no en la ficha,
   // que se desmonta al volver a la lista.
   const [deleting, setDeleting] = useState<{ category: HomebrewCategory; id: string; name: string } | null>(null);
-  // «Duplicar del catálogo» de las dotes: el selector de lo que no es propio.
+  // «Duplicar del catálogo»: el selector de lo que no es propio.
   const [picking, setPicking] = useState(false);
 
   // Por categoría, solo lo propio y en el orden del Códice.
@@ -106,20 +106,26 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
     return <CreatureList creatures={own.creatures} catalog={catalog.data} headerWith={headerWith} />;
   }
   if (category !== null) {
-    // Las dotes se crean y se duplican desde acá; las demás categorías, todavía
-    // en la aplicación principal (7d2b–7d4 suman las suyas).
-    const isFeats = category === 'feats';
+    // Dotes, especies y trasfondos se crean y se duplican desde acá; las demás
+    // categorías, todavía en la aplicación principal (7d3 y 7d4 suman las suyas).
+    const editable = category === 'feats' || category === 'races' || category === 'backgrounds' ? category : null;
+    const isEditable = editable !== null;
+    const labels = {
+      feats: { create: t.hbNewFeat, action: 'homebrew-new-feat', empty: t.hbFeatEmpty },
+      races: { create: t.hbNewRace, action: 'homebrew-new-race', empty: t.hbRaceEmpty },
+      backgrounds: { create: t.hbNewBackground, action: 'homebrew-new-background', empty: t.hbBackgroundEmpty },
+    };
     const duplicate = (
       <Button tone="secondary" icon={Copy} onClick={() => setPicking(true)} data-action="homebrew-duplicate-catalog">
         {t.hbDuplicateFromCatalog}
       </Button>
     );
-    const create = (
-      <ButtonLink internal icon={Plus} href={dmHomebrewNewHref('feats')} data-action="homebrew-new-feat">
-        {t.hbNewFeat}
+    const create = editable && (
+      <ButtonLink internal icon={Plus} href={dmHomebrewNewHref(editable)} data-action={labels[editable].action}>
+        {labels[editable].create}
       </ButtonLink>
     );
-    const categoryHeader = isFeats ? (
+    const categoryHeader = isEditable ? (
       headerWith(
         <>
           {duplicate}
@@ -129,14 +135,14 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
     ) : (
       header
     );
-    const picker = isFeats && picking && (
+    const picker = editable && picking && (
       <DuplicateFromCatalogDialog
-        category="feats"
+        category={editable}
         catalog={catalog.data}
         onClose={() => setPicking(false)}
         onPick={(id) => {
           setPicking(false);
-          navigate(dmHomebrewNewHref('feats', id));
+          navigate(dmHomebrewNewHref(editable, id));
         }}
       />
     );
@@ -148,10 +154,10 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
           <BackToHome />
           {categoryHeader}
           {picker}
-          {isFeats ? (
+          {editable ? (
             <AppEmptyState
               kind="empty"
-              message={t.hbFeatEmpty}
+              message={labels[editable].empty}
               actions={
                 <>
                   {create}
@@ -178,11 +184,11 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
           detailActions={(entry) => (
             // «Editar», «Duplicar» y «Borrar», en el mismo orden y forma que el
             // perfil de una criatura. Las demás categorías suman las suyas con
-            // cada formulario (7d2b–7d4).
+            // cada formulario (7d3 y 7d4).
             <>
-              {isFeats && (
+              {editable && (
                 <>
-                  <ButtonLink internal tone="secondary" icon={Pencil} href={dmHomebrewEditHref('feats', entry.id)} data-action="homebrew-edit">
+                  <ButtonLink internal tone="secondary" icon={Pencil} href={dmHomebrewEditHref(editable, entry.id)} data-action="homebrew-edit">
                     {t.commonEdit}
                   </ButtonLink>
                   <Tooltip content={t.hbDuplicateTooltip}>
@@ -190,7 +196,7 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
                       type="button"
                       aria-label={t.hbDuplicateTitle(entry.name)}
                       data-action="homebrew-duplicate"
-                      onClick={() => navigate(dmHomebrewNewHref('feats', entry.id))}
+                      onClick={() => navigate(dmHomebrewNewHref(editable, entry.id))}
                       className="inline-flex size-9 items-center justify-center rounded-[var(--radius-nav)] border border-hairline text-on-surface hover:bg-plaque"
                     >
                       <Copy size={16} aria-hidden="true" />

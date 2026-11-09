@@ -1,4 +1,4 @@
-import type { AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, CreatureForm, EffectBuild, EffectKindInfo, EffectParts, FeatForm, CreatureFormOptions, EncounterDetails, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
+import type { AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, CreatureForm, EffectBuild, EffectKindInfo, EffectParts, FeatForm, RaceForm, BackgroundForm, HomebrewFormOptions, CreatureFormOptions, EncounterDetails, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
 // Lo genera `npm run build:engine` (o la etapa `engine-js` del Dockerfile) y
 // no se versiona. Es un script de dart2js, no un módulo: al cargarse deja
 // `globalThis.dndEngine`, y de ahí lo toma este archivo.
@@ -43,6 +43,13 @@ interface DartEngine {
   featForm(featJson: string): string;
   featDraft(featJson: string, formJson: string): string;
   featNew(): string;
+  raceForm(raceJson: string): string;
+  raceDraft(raceJson: string, formJson: string): string;
+  raceNew(): string;
+  backgroundForm(backgroundJson: string): string;
+  backgroundDraft(backgroundJson: string, formJson: string): string;
+  backgroundNew(): string;
+  homebrewFormOptions(catalogJson: string): string;
   effectKinds(catalogJson: string): string;
   effectBuild(kindId: string, valuesJson: string): string;
   effectParts(effectsJson: string, catalogJson: string): string;
@@ -864,6 +871,54 @@ export function featDraft(feat: JsonObject, form: FeatForm): { feat: JsonObject;
 /** La plantilla de «Nueva dote». */
 export function featNew(): JsonObject {
   return JSON.parse(engine().featNew()) as JsonObject;
+}
+
+/** Una especie como formulario de texto (`RaceDraft.formOf`). */
+export function raceForm(race: JsonObject): RaceForm {
+  return JSON.parse(engine().raceForm(JSON.stringify(race))) as RaceForm;
+}
+
+/** La especie armada con un formulario sobre su especie de partida y los errores
+ *  por campo (`RaceDraft`). Nunca lanza por datos inválidos. */
+export function raceDraft(race: JsonObject, form: RaceForm): { race: JsonObject; errors: Record<string, string> } {
+  return JSON.parse(engine().raceDraft(JSON.stringify(race), JSON.stringify(form))) as {
+    race: JsonObject;
+    errors: Record<string, string>;
+  };
+}
+
+/** La plantilla de «Nueva especie». */
+export function raceNew(): JsonObject {
+  return JSON.parse(engine().raceNew()) as JsonObject;
+}
+
+/** Un trasfondo como formulario de texto (`BackgroundDraft.formOf`). */
+export function backgroundForm(background: JsonObject): BackgroundForm {
+  return JSON.parse(engine().backgroundForm(JSON.stringify(background))) as BackgroundForm;
+}
+
+/** El trasfondo armado con un formulario sobre su trasfondo de partida y los
+ *  errores por campo (`BackgroundDraft`). Nunca lanza por datos inválidos. */
+export function backgroundDraft(
+  background: JsonObject,
+  form: BackgroundForm,
+): { background: JsonObject; errors: Record<string, string> } {
+  return JSON.parse(engine().backgroundDraft(JSON.stringify(background), JSON.stringify(form))) as {
+    background: JsonObject;
+    errors: Record<string, string>;
+  };
+}
+
+/** La plantilla de «Nuevo trasfondo». */
+export function backgroundNew(): JsonObject {
+  return JSON.parse(engine().backgroundNew()) as JsonObject;
+}
+
+/** Las opciones cerradas de los formularios de especie y trasfondo, con su
+ *  rótulo en el idioma fijado con `setEngineLanguage`. Las dotes salen del
+ *  catálogo fusionado, así que incluyen las propias. */
+export function homebrewFormOptions(catalog: Catalog): HomebrewFormOptions {
+  return JSON.parse(engine().homebrewFormOptions(catalogJson(catalog))) as HomebrewFormOptions;
 }
 
 /** Los tipos de efecto que el editor ofrece, con sus campos y las opciones del

@@ -781,3 +781,42 @@ export interface FeatForm {
   effects: JsonObject[];
   hasPrerequisite: boolean;
 }
+
+/** Una especie como texto de formulario (`RaceDraft.formOf`): los números van
+ *  como texto para poder escribirlos a medias. */
+export interface RaceForm {
+  name: string;
+  creatureType: string;
+  size: string;
+  speed: string;
+  tagline: string;
+  description: string;
+  skillChoiceCount: string;
+  skillChoiceFrom: string[];
+  sizeOptions: string[];
+  effects: JsonObject[];
+}
+
+/** Un trasfondo como texto de formulario (`BackgroundDraft.formOf`).
+ *  `hasStartingEquipment` no se edita: solo avisa que se conserva. */
+export interface BackgroundForm {
+  name: string;
+  abilityOptions: string[];
+  originFeatId: string;
+  skillProficiencies: string[];
+  toolProficiencies: string[];
+  tagline: string;
+  description: string;
+  effects: JsonObject[];
+  hasStartingEquipment: boolean;
+}
+
+/** Las opciones cerradas de los formularios de especie y trasfondo
+ *  (`homebrewFormOptions`), con su rótulo en el idioma activo. */
+export interface HomebrewFormOptions {
+  sizes: { id: string; label: string }[];
+  skills: { id: string; label: string }[];
+  tools: { id: string; label: string }[];
+  abilities: { id: string; label: string }[];
+  originFeats: { id: string; name: string }[];
+}

@@ -201,25 +201,37 @@ export function FilterPill({
   pressed,
   onClick,
   small = false,
+  disabled = false,
+  dashed = false,
 }: {
   label: string;
-  count: number;
+  /** Sin número, la pill es una opción a marcar (los formularios del Homebrew). */
+  count?: number;
   pressed: boolean;
   onClick: () => void;
   small?: boolean;
+  /** Apagada: no responde y se ve apagada (`aria-disabled`, que sigue en el
+   *  orden de tabulación; `onClick` no se llama). */
+  disabled?: boolean;
+  /** Borde punteado: lo que el glosario no conoce y se muestra por su id. */
+  dashed?: boolean;
 }) {
   return (
     <button
       type="button"
       aria-pressed={pressed}
-      onClick={onClick}
+      aria-disabled={disabled ? true : undefined}
+      onClick={disabled ? undefined : onClick}
       className={cx(
         'rounded-[var(--radius-pill)] border',
+        dashed && 'border-dashed',
+        disabled && 'opacity-40',
         small ? 'px-[11px] py-[3px] text-[12px]' : 'px-3 py-[5px] text-[12.5px]',
         pressed ? 'border-gold bg-gold-soft font-semibold text-gold' : 'border-hairline text-on-surface-variant hover:text-on-surface',
       )}
     >
-      {label} <span className="tabular-nums opacity-80">{count}</span>
+      {label}
+      {count !== undefined && <> <span className="tabular-nums opacity-80">{count}</span></>}
     </button>
   );
 }

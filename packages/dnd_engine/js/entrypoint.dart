@@ -829,6 +829,80 @@ String featDraft(String featJson, String formJson) {
 /// La plantilla de «Nueva dote» (`FeatDraft.empty`).
 String featNew() => jsonEncode(FeatDraft.empty().toJson());
 
+Race _especie(String json) =>
+    Race.fromJson((jsonDecode(json) as Map).cast<String, dynamic>());
+
+/// El formulario (todo texto) de una especie: `RaceDraft.formOf`.
+String raceForm(String raceJson) =>
+    jsonEncode(RaceDraft.formOf(_especie(raceJson)));
+
+/// La especie armada con un formulario sobre su especie de partida, y los
+/// errores por campo. Nunca lanza por datos inválidos: alimenta la vista previa.
+String raceDraft(String raceJson, String formJson) {
+  final form = (jsonDecode(formJson) as Map).cast<String, dynamic>();
+  return jsonEncode({
+    'race': RaceDraft.build(_especie(raceJson), form).toJson(),
+    'errors': RaceDraft.errors(form),
+  });
+}
+
+/// La plantilla de «Nueva especie» (`RaceDraft.empty`).
+String raceNew() => jsonEncode(RaceDraft.empty().toJson());
+
+Background _trasfondo(String json) =>
+    Background.fromJson((jsonDecode(json) as Map).cast<String, dynamic>());
+
+/// El formulario (todo texto) de un trasfondo: `BackgroundDraft.formOf`.
+String backgroundForm(String backgroundJson) =>
+    jsonEncode(BackgroundDraft.formOf(_trasfondo(backgroundJson)));
+
+/// El trasfondo armado con un formulario sobre su trasfondo de partida, y los
+/// errores por campo (ver [raceDraft]).
+String backgroundDraft(String backgroundJson, String formJson) {
+  final form = (jsonDecode(formJson) as Map).cast<String, dynamic>();
+  return jsonEncode({
+    'background':
+        BackgroundDraft.build(_trasfondo(backgroundJson), form).toJson(),
+    'errors': BackgroundDraft.errors(form),
+  });
+}
+
+/// La plantilla de «Nuevo trasfondo» (`BackgroundDraft.empty`).
+String backgroundNew() => jsonEncode(BackgroundDraft.empty().toJson());
+
+/// Las opciones cerradas de los formularios de especie y trasfondo, con su
+/// rótulo en el idioma de `setLanguage`. Las dotes salen del catálogo
+/// **fusionado** (`catalogJson`), así que incluyen las propias.
+String homebrewFormOptions(String catalogJson) {
+  final repo = _repoPara(catalogJson);
+  final skills = sortedByName(
+    [for (final s in Skill.values) (id: s.id, label: s.label)],
+    (o) => o.label,
+  );
+  return jsonEncode({
+    // El id es el valor guardado (`Race.size`); el rótulo, el del idioma.
+    'sizes': [
+      for (final s in RaceDraft.sizes)
+        {'id': s, 'label': vocabularyLabel(VocabularyField.size, s)},
+    ],
+    'skills': [
+      for (final s in skills) {'id': s.id, 'label': s.label},
+    ],
+    'tools': [
+      for (final id in toolProficiencyIds)
+        {'id': id, 'label': toolProficiencyLabel(id)},
+    ],
+    'abilities': [
+      for (final a in Ability.values) {'id': a.name, 'label': a.abbr},
+    ],
+    'originFeats': [
+      for (final f in repo.featsSorted)
+        if (BackgroundDraft.originFeatCategories.contains(f.category))
+          {'id': f.id, 'name': f.name},
+    ],
+  });
+}
+
 /// Los tipos de efecto que el editor ofrece, con sus campos y las opciones de
 /// cada uno sacadas del catálogo fusionado (`EffectDraft.kinds`).
 String effectKinds(String catalogJson) =>
@@ -1355,6 +1429,13 @@ void main() {
   motor['featForm'] = featForm.toJS;
   motor['featDraft'] = featDraft.toJS;
   motor['featNew'] = featNew.toJS;
+  motor['raceForm'] = raceForm.toJS;
+  motor['raceDraft'] = raceDraft.toJS;
+  motor['raceNew'] = raceNew.toJS;
+  motor['backgroundForm'] = backgroundForm.toJS;
+  motor['backgroundDraft'] = backgroundDraft.toJS;
+  motor['backgroundNew'] = backgroundNew.toJS;
+  motor['homebrewFormOptions'] = homebrewFormOptions.toJS;
   motor['effectKinds'] = effectKinds.toJS;
   motor['effectBuild'] = effectBuild.toJS;
   motor['effectParts'] = effectPartsJs.toJS;

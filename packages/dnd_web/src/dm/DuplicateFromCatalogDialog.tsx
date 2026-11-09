@@ -1,19 +1,22 @@
 import { useMemo, useState } from 'react';
 import { Copy } from 'lucide-react';
 import { codexEntries, fold } from '../codex/entries';
-import { bestiary, type Catalog } from '../engine';
+import { bestiary, catalogLabel, type Catalog } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import { AppDialog } from '../ui/AppDialog';
 
 /** Las categorías que se duplican desde el catálogo. */
-export type DuplicableCategory = 'creatures' | 'feats';
+export type DuplicableCategory = 'creatures' | 'feats' | 'races' | 'backgrounds';
 
 /**
- * «Duplicar criatura» / «Duplicar dote» (`_CatalogPicker` de Flutter): elegir una
+ * «Duplicar criatura» / «Duplicar dote» / «Duplicar especie» / «Duplicar
+ * trasfondo» (`_CatalogPicker` de Flutter): elegir una
  * del catálogo para abrirla como copia propia. Salen solo las que **no** son
  * tuyas, porque para lo propio está «Duplicar» en su perfil. Las criaturas
  * llevan el orden y la línea de tipo del motor (`bestiary`), igual que el
- * Bestiario; las dotes, el orden y la categoría del Códice.
+ * Bestiario; el resto, el orden y la línea secundaria del Códice (la categoría
+ * de la dote, el lema o el tipo de la especie, las características del
+ * trasfondo).
  */
 export function DuplicateFromCatalogDialog({
   category,
@@ -29,13 +32,22 @@ export function DuplicateFromCatalogDialog({
   const t = useTexts();
   const lang = useLang();
   const [query, setQuery] = useState('');
-  const title = category === 'creatures' ? t.hbDuplicateCreature : t.hbDuplicateFeat;
+  const title = {
+    creatures: t.hbDuplicateCreature,
+    feats: t.hbDuplicateFeat,
+    races: t.hbDuplicateRace,
+    backgrounds: t.hbDuplicateBackground,
+  }[category];
 
   const options = useMemo(() => {
-    if (category === 'feats') {
-      return codexEntries('feats', catalog, t, lang)
+    if (category !== 'creatures') {
+      // El trasfondo se reconoce por sus características, no por su lema.
+      const abilities = new Map(
+        catalog.backgrounds.map((b) => [b.id, (Array.isArray(b.abilityOptions) ? b.abilityOptions : []).map((a) => catalogLabel('ability', String(a))).join(' · ')] as const),
+      );
+      return codexEntries(category, catalog, t, lang)
         .filter((e) => e.source !== 'homebrew')
-        .map((e) => ({ id: e.id, name: e.name, kind: e.subtitle }));
+        .map((e) => ({ id: e.id, name: e.name, kind: category === 'backgrounds' ? (abilities.get(e.id) ?? '') : e.subtitle }));
     }
     const names = new Map(catalog.creatures.filter((c) => c.source !== 'homebrew').map((c) => [c.id, String(c.name ?? c.id)] as const));
     return bestiary(catalog)
