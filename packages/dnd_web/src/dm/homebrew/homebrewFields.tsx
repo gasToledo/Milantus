@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useTexts } from '../../i18n/context';
 import type { Texts } from '../../i18n/texts';
 import { cx } from '../../ui/cx';
 import { FilterPill } from '../npcs/NpcLibraryView';
@@ -15,6 +16,21 @@ export function numberError(code: string | undefined, t: Texts): string | null {
   if (code === 'integer') return t.hbIntInvalid;
   const range = /^range:(-?\d+):(-?\d+)$/.exec(code);
   return range ? t.hbRange(Number(range[1]), Number(range[2])) : null;
+}
+
+/** El texto de un código de error del peso: vacío, no numérico o negativo. */
+export function weightError(code: string | undefined, t: Texts): string | null {
+  if (code === undefined) return null;
+  if (code === 'number') return t.hbWeightRequired;
+  if (code === 'decimal') return t.hbNumberInvalid;
+  if (code === 'negative') return t.hbNegative;
+  return null;
+}
+
+/** El texto de un código de error de un dado (`required` o `dice`). */
+export function diceError(code: string | undefined, t: Texts): string | null {
+  if (code === undefined) return null;
+  return code === 'required' ? t.hbDiceRequired : t.hbDiceInvalid;
 }
 
 const INPUT = 'h-[38px] w-full min-w-0 rounded-[var(--radius-input)] border bg-plaque px-3 text-[14px] text-on-surface';
@@ -83,6 +99,28 @@ export function FormSection({ title, children }: { title: string; children: Reac
     <section className="card flex flex-col gap-2.5 p-4">
       <h2 className="font-display text-[16px] text-on-surface">{title}</h2>
       {children}
+    </section>
+  );
+}
+
+/** Peso y precio en cobre, que arma y armadura piden igual: la sección Economía. */
+export function EconomySection({
+  weight,
+  costCp,
+  errors,
+  onChange,
+}: {
+  weight: string;
+  costCp: string;
+  errors: Record<string, string>;
+  onChange: (patch: { weight?: string; costCp?: string }) => void;
+}) {
+  const t = useTexts();
+  return (
+    <section className="card grid gap-3.5 p-4 sm:grid-cols-2">
+      <h2 className="font-display text-[16px] text-on-surface sm:col-span-2">{t.hbEconomy}</h2>
+      <TextField numeric label={t.hbWeightLabel} value={weight} onChange={(weight) => onChange({ weight })} error={weightError(errors.weight, t)} />
+      <TextField numeric label={t.hbPriceLabel} value={costCp} onChange={(costCp) => onChange({ costCp })} error={numberError(errors.costCp, t)} />
     </section>
   );
 }

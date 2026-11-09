@@ -370,8 +370,9 @@ repiten acá.
   otra cuenta no llega (la API es por cuenta) y su URL muestra la categoría
   vacía. Desde 7d1 se **importa y se exporta** todo (portada), se **borra** cualquier
   entrada propia y se **crean, editan y duplican criaturas** y, desde 7d2a y 7d2b,
-  **dotes, especies y trasfondos**; crear y editar las otras cuatro categorías
-  siguen en Flutter hasta 7d3 y 7d4.
+  **dotes, especies, trasfondos** y, desde 7d3a, **armas y armaduras**; crear y
+  editar las otras dos categorías (objetos y conjuros) siguen en Flutter hasta
+  7d3b y 7d4.
   **Combate** (`GET /api/campaigns/:id/encounter`, más los miembros, los PNJ de
   la mesa y el Cuaderno): el combate abierto, de solo lectura. Arriba, una placa
   con la ronda, «Turno N de M» y cuántos quedan en pie por bando (o «Armando el
@@ -1096,7 +1097,24 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
        «Rasgos» con sus efectos. Quedan afuera el panel de reglas por campo de
        Flutter, editar el equipo inicial y el emblema, los linajes y esconder
        tipos de efecto. Sin cambios en el servidor ni en Flutter.
-     - **7d3 · Armas, armaduras y objetos.**
+     - **7d3 · Armas, armaduras y objetos**, partida en dos:
+     - **7d3a · Armas y armaduras** *(existe)*: el motor suma `WeaponDraft` y
+       `ArmorDraft` (el patrón de `RaceDraft`, con los límites de Flutter: dado con
+       formato, alcance 5–1000 y obligatorio con «A distancia» o «Arrojadiza», largo
+       no menor que el normal, bonificador 0–3, CA 1–30, tope de DES 0–10, Fuerza
+       1–30). Elegir la categoría de una armadura repone lo que suma la Destreza
+       (`ArmorDraft.withCategory`, que es `_applyCategoryDex` hecho regla) y
+       `acExamples` da la CA con DES +3 y +1 (`armorClassFor`, vacía en un escudo).
+       `homebrewFormOptions` suma categorías, propiedades, maestrías y tipos de daño.
+       En el puente: `weaponForm`, `weaponDraft`, `weaponNew`, `armorForm`,
+       `armorDraft`, `armorNew`, `armorWithCategory`. En pantalla: `WeaponForm` y
+       `ArmorForm` sobre `HomebrewFormShell`, con `EconomySection` en
+       `homebrewFields`; `EDITABLE_HOMEBREW` suma `weapons` y `armor`. El Códice de
+       armas —también el del jugador— suma el dato «Mágica» (`+N`). Quedan afuera
+       el panel de reglas por campo, editar «a dos manos salvo montado» (se
+       conserva) y el precio en monedas (sigue en cobre). Sin cambios en el
+       servidor ni en Flutter.
+     - **7d3b · Objetos.**
      - **7d4 · Conjuros.**
 
    Opcional, sin equivalente en Flutter y sin diseñar todavía:
@@ -1215,7 +1233,7 @@ hace seguro volver atrás es que **no hay nada que deshacer en el formato**:
 Para que nadie lo dé por hecho:
 
 - El Compañero Salvaje (invocarlo, que no cobra ni se va con el descanso), los
-  formularios del Homebrew de armas, armaduras, objetos y conjuros (7d3 y 7d4) y las operaciones
+  formularios del Homebrew de objetos y conjuros (7d3b y 7d4) y las operaciones
   del paso 7 que faltan. El detalle está en
   [Orden previsto de pantallas](#orden-previsto-de-pantallas).
 - Control de versión en el servidor para las escrituras (rechazar una copia

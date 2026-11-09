@@ -819,4 +819,49 @@ export interface HomebrewFormOptions {
   tools: { id: string; label: string }[];
   abilities: { id: string; label: string }[];
   originFeats: { id: string; name: string }[];
+  weaponCategories: { id: string; label: string }[];
+  armorCategories: { id: string; label: string }[];
+  weaponProperties: { id: string; label: string }[];
+  masteries: { id: string; label: string }[];
+  damageTypes: { id: string; label: string }[];
+}
+
+/** Un arma como texto de formulario (`WeaponDraft.formOf`): los números van
+ *  como texto para poder escribirlos a medias. */
+export interface WeaponForm {
+  name: string;
+  category: string;
+  damageDice: string;
+  damageType: string;
+  properties: string[];
+  versatileDice: string;
+  rangeNormal: string;
+  rangeLong: string;
+  /** `''` es «sin maestría». */
+  mastery: string;
+  magicBonus: string;
+  weight: string;
+  costCp: string;
+  description: string;
+}
+
+/** Una armadura como texto de formulario (`ArmorDraft.formOf`). */
+export interface ArmorForm {
+  name: string;
+  category: string;
+  baseAc: string;
+  addDexMod: boolean;
+  /** `''` es «sin tope». */
+  maxDexBonus: string;
+  strengthRequirement: string;
+  stealthDisadvantage: boolean;
+  weight: string;
+  costCp: string;
+  description: string;
+}
+
+/** La CA que la ficha da con una Destreza de ejemplo (`ArmorDraft.acExamples`). */
+export interface ArmorAcExample {
+  dex: number;
+  ac: number;
 }

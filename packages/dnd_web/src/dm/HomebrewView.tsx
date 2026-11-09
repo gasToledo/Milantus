@@ -106,14 +106,18 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
     return <CreatureList creatures={own.creatures} catalog={catalog.data} headerWith={headerWith} />;
   }
   if (category !== null) {
-    // Dotes, especies y trasfondos se crean y se duplican desde acá; las demás
-    // categorías, todavía en la aplicación principal (7d3 y 7d4 suman las suyas).
-    const editable = category === 'feats' || category === 'races' || category === 'backgrounds' ? category : null;
+    // Dotes, especies, trasfondos, armas y armaduras se crean y se duplican desde
+    // acá; las demás categorías, todavía en la aplicación principal (7d3b y 7d4
+    // suman las suyas).
+    const editable =
+      category === 'feats' || category === 'races' || category === 'backgrounds' || category === 'weapons' || category === 'armor' ? category : null;
     const isEditable = editable !== null;
     const labels = {
       feats: { create: t.hbNewFeat, action: 'homebrew-new-feat', empty: t.hbFeatEmpty },
       races: { create: t.hbNewRace, action: 'homebrew-new-race', empty: t.hbRaceEmpty },
       backgrounds: { create: t.hbNewBackground, action: 'homebrew-new-background', empty: t.hbBackgroundEmpty },
+      weapons: { create: t.hbNewWeapon, action: 'homebrew-new-weapon', empty: t.hbWeaponEmpty },
+      armor: { create: t.hbNewArmor, action: 'homebrew-new-armor', empty: t.hbArmorEmpty },
     };
     const duplicate = (
       <Button tone="secondary" icon={Copy} onClick={() => setPicking(true)} data-action="homebrew-duplicate-catalog">
@@ -184,7 +188,7 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
           detailActions={(entry) => (
             // «Editar», «Duplicar» y «Borrar», en el mismo orden y forma que el
             // perfil de una criatura. Las demás categorías suman las suyas con
-            // cada formulario (7d3 y 7d4).
+            // cada formulario (7d3b y 7d4).
             <>
               {editable && (
                 <>

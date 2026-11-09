@@ -870,6 +870,70 @@ String backgroundDraft(String backgroundJson, String formJson) {
 /// La plantilla de «Nuevo trasfondo» (`BackgroundDraft.empty`).
 String backgroundNew() => jsonEncode(BackgroundDraft.empty().toJson());
 
+Weapon _arma(String json) =>
+    Weapon.fromJson((jsonDecode(json) as Map).cast<String, dynamic>());
+
+/// El formulario (todo texto) de un arma: `WeaponDraft.formOf`.
+String weaponForm(String weaponJson) =>
+    jsonEncode(WeaponDraft.formOf(_arma(weaponJson)));
+
+/// El arma armada con un formulario sobre su arma de partida, y los errores por
+/// campo (ver [raceDraft]).
+String weaponDraft(String weaponJson, String formJson) {
+  final form = (jsonDecode(formJson) as Map).cast<String, dynamic>();
+  return jsonEncode({
+    'weapon': WeaponDraft.build(_arma(weaponJson), form).toJson(),
+    'errors': WeaponDraft.errors(form),
+  });
+}
+
+/// La plantilla de «Nueva arma» (`WeaponDraft.empty`).
+String weaponNew() => jsonEncode(WeaponDraft.empty().toJson());
+
+Armor _armadura(String json) =>
+    Armor.fromJson((jsonDecode(json) as Map).cast<String, dynamic>());
+
+/// El formulario (todo texto) de una armadura: `ArmorDraft.formOf`.
+String armorForm(String armorJson) =>
+    jsonEncode(ArmorDraft.formOf(_armadura(armorJson)));
+
+/// La armadura armada con un formulario, sus errores por campo y la CA de
+/// ejemplo que la ficha le daría (`ArmorDraft.acExamples`, vacía en un escudo).
+String armorDraft(String armorJson, String formJson) {
+  final form = (jsonDecode(formJson) as Map).cast<String, dynamic>();
+  final built = ArmorDraft.build(_armadura(armorJson), form);
+  return jsonEncode({
+    'armor': built.toJson(),
+    'errors': ArmorDraft.errors(form),
+    'acExamples': [
+      for (final e in ArmorDraft.acExamples(built)) {'dex': e.dex, 'ac': e.ac},
+    ],
+  });
+}
+
+/// La plantilla de «Nueva armadura» (`ArmorDraft.empty`).
+String armorNew() => jsonEncode(ArmorDraft.empty().toJson());
+
+/// El formulario con la categoría nueva y la Destreza repuesta
+/// (`ArmorDraft.withCategory`).
+String armorWithCategory(String formJson, String category) {
+  final form = (jsonDecode(formJson) as Map).cast<String, dynamic>();
+  return jsonEncode(ArmorDraft.withCategory(form, category));
+}
+
+/// Las categorías de arma y de armadura con su rótulo corto `(es, en)`, en el
+/// orden en que se ofrecen. Los ids son los guardados.
+const _weaponCategoryLabels = <String, (String, String)>{
+  'simple': ('Sencilla', 'Simple'),
+  'martial': ('Marcial', 'Martial'),
+};
+const _armorCategoryLabels = <String, (String, String)>{
+  'light': ('Ligera', 'Light'),
+  'medium': ('Media', 'Medium'),
+  'heavy': ('Pesada', 'Heavy'),
+  'shield': ('Escudo', 'Shield'),
+};
+
 /// Las opciones cerradas de los formularios de especie y trasfondo, con su
 /// rótulo en el idioma de `setLanguage`. Las dotes salen del catálogo
 /// **fusionado** (`catalogJson`), así que incluyen las propias.
@@ -899,6 +963,24 @@ String homebrewFormOptions(String catalogJson) {
       for (final f in repo.featsSorted)
         if (BackgroundDraft.originFeatCategories.contains(f.category))
           {'id': f.id, 'name': f.name},
+    ],
+    // Armas y armaduras: el rótulo del idioma y el orden en que se ofrecen.
+    'weaponCategories': [
+      for (final e in _weaponCategoryLabels.entries)
+        {'id': e.key, 'label': localized(e.value.$1, e.value.$2)},
+    ],
+    'armorCategories': [
+      for (final e in _armorCategoryLabels.entries)
+        {'id': e.key, 'label': localized(e.value.$1, e.value.$2)},
+    ],
+    'weaponProperties': [
+      for (final p in weaponProperties.values) {'id': p.id, 'label': p.name},
+    ],
+    'masteries': [
+      for (final m in weaponMasteries.values) {'id': m.id, 'label': m.name},
+    ],
+    'damageTypes': [
+      for (final d in DamageType.values) {'id': d.id, 'label': d.label},
     ],
   });
 }
@@ -1435,6 +1517,13 @@ void main() {
   motor['backgroundForm'] = backgroundForm.toJS;
   motor['backgroundDraft'] = backgroundDraft.toJS;
   motor['backgroundNew'] = backgroundNew.toJS;
+  motor['weaponForm'] = weaponForm.toJS;
+  motor['weaponDraft'] = weaponDraft.toJS;
+  motor['weaponNew'] = weaponNew.toJS;
+  motor['armorForm'] = armorForm.toJS;
+  motor['armorDraft'] = armorDraft.toJS;
+  motor['armorNew'] = armorNew.toJS;
+  motor['armorWithCategory'] = armorWithCategory.toJS;
   motor['homebrewFormOptions'] = homebrewFormOptions.toJS;
   motor['effectKinds'] = effectKinds.toJS;
   motor['effectBuild'] = effectBuild.toJS;

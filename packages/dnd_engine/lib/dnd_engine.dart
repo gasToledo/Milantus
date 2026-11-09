@@ -58,6 +58,8 @@ export 'src/engine/effect_draft.dart';
 export 'src/engine/feat_draft.dart';
 export 'src/engine/race_draft.dart';
 export 'src/engine/background_draft.dart';
+export 'src/engine/weapon_draft.dart';
+export 'src/engine/armor_draft.dart';
 export 'src/engine/npc_edits.dart';
 export 'src/engine/npc_stats.dart';
 export 'src/engine/npc_import_check.dart';

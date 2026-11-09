@@ -20,7 +20,7 @@ test('el Homebrew es de la cuenta: otra cuenta no ve nada de lo ajeno, ni por UR
   await expect(page.getByText(t.dmHomebrewEmpty)).toBeVisible();
   // La entrada ajena por su URL no se abre: la lista de esta cuenta no la tiene.
   await page.goto(`/v2/dm/homebrew/armas/${hacha.id}`);
-  await expect(page.getByText(t.dmHomebrewEmptyIn(t.codexCategories.weapons))).toBeVisible();
+  await expect(page.getByText(t.hbWeaponEmpty)).toBeVisible();
   await expect(page.getByText(String(hacha.name))).toHaveCount(0);
   // En el Bestiario, solo el catálogo oficial: la criatura propia no está.
   await page.goto('/v2/dm/bestiario');
@@ -115,4 +115,32 @@ test('el DM crea un trasfondo propio con tres características, lo lee en su det
   await expect(page.getByText(t.hbDeleted(nombre), { exact: true }).first()).toBeVisible();
   const { content } = await api<{ content: { backgrounds: { name: string }[] } }>(page.request, '/api/homebrew', TOKEN_TRANSFERENCIA);
   expect(content.backgrounds.map((b) => b.name)).not.toContain(nombre);
+});
+
+test('el DM crea un arma arrojadiza: sin alcance no se guarda, con alcance sí, y la borra', async ({ context, page, baseURL }) => {
+  const nombre = `Hacha de lanzar ${Date.now().toString(36)}`;
+  await context.addCookies([{ name: 'dnd_session', value: TOKEN_TRANSFERENCIA, url: baseURL! }]);
+  await page.goto('/v2/dm/homebrew/armas');
+  await page.getByRole('link', { name: t.hbNewWeapon, exact: true }).first().click();
+
+  await page.locator('[data-field="weapon-name"]').fill(nombre);
+  await page.getByRole('button', { name: 'Arrojadiza', exact: true }).click();
+  // El alcance aparece con la propiedad y el motor lo exige: sin él no se guarda.
+  await page.locator('[data-action="weapon-save"]').click();
+  await expect(page.locator('[data-field="weapon-range-normal"]')).toBeVisible();
+  await expect(page.getByText(t.hbSaved(nombre), { exact: true })).toHaveCount(0);
+
+  await page.locator('[data-field="weapon-range-normal"]').fill('20');
+  await page.locator('[data-field="weapon-range-long"]').fill('60');
+  await page.locator('[data-action="weapon-save"]').click();
+
+  await expect(page.getByText(t.hbSaved(nombre), { exact: true }).first()).toBeVisible();
+  await expect(page.getByText(t.codexRangeFeet(20, 60), { exact: true }).first()).toBeVisible();
+
+  await page.getByRole('button', { name: t.hbDeleteTooltip(nombre), exact: true }).click();
+  const borrar = page.getByRole('dialog', { name: t.hbDeleteTitle(t.hbDeleteKinds.weapons, nombre) });
+  await borrar.getByRole('button', { name: t.cardDelete, exact: true }).click();
+  await expect(page.getByText(t.hbDeleted(nombre), { exact: true }).first()).toBeVisible();
+  const { content } = await api<{ content: { weapons: { name: string }[] } }>(page.request, '/api/homebrew', TOKEN_TRANSFERENCIA);
+  expect(content.weapons.map((w) => w.name)).not.toContain(nombre);
 });

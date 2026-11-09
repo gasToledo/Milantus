@@ -207,6 +207,16 @@ export function backgroundEntry(background: JsonObject, catalog: Catalog, t: Tex
   return new Ctx(catalog, t, lang).background(background);
 }
 
+/** La ficha del Códice de una sola arma: la vista previa del formulario. */
+export function weaponEntry(weapon: JsonObject, catalog: Catalog, t: Texts, lang: Lang): CodexEntry {
+  return new Ctx(catalog, t, lang).weapon(weapon);
+}
+
+/** La ficha del Códice de una sola armadura: la vista previa del formulario. */
+export function armorEntry(armor: JsonObject, catalog: Catalog, t: Texts, lang: Lang): CodexEntry {
+  return new Ctx(catalog, t, lang).armor(armor);
+}
+
 class Ctx {
   private readonly pounds: Intl.NumberFormat;
   private readonly coinLabels: Record<string, string>;
@@ -551,6 +561,7 @@ class Ctx {
               ...(str(w.versatileDice) ? [{ label: t.codexTwoHanded, value: str(w.versatileDice) }] : []),
               ...(range ? [{ label: t.codexRange, value: range }] : []),
               ...(str(w.mastery) ? [{ label: t.codexMastery, value: catalogLabel('mastery', str(w.mastery)) }] : []),
+              ...(num(w.magicBonus) !== 0 ? [{ label: t.codexMagic, value: `+${num(w.magicBonus)}` }] : []),
               ...this.weightAndPrice(w),
             ],
           ],

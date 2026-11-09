@@ -1,4 +1,4 @@
-import type { AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, CreatureForm, EffectBuild, EffectKindInfo, EffectParts, FeatForm, RaceForm, BackgroundForm, HomebrewFormOptions, CreatureFormOptions, EncounterDetails, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
+import type { AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, CreatureForm, EffectBuild, EffectKindInfo, EffectParts, FeatForm, RaceForm, BackgroundForm, WeaponForm, ArmorForm, ArmorAcExample, HomebrewFormOptions, CreatureFormOptions, EncounterDetails, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
 // Lo genera `npm run build:engine` (o la etapa `engine-js` del Dockerfile) y
 // no se versiona. Es un script de dart2js, no un módulo: al cargarse deja
 // `globalThis.dndEngine`, y de ahí lo toma este archivo.
@@ -49,6 +49,13 @@ interface DartEngine {
   backgroundForm(backgroundJson: string): string;
   backgroundDraft(backgroundJson: string, formJson: string): string;
   backgroundNew(): string;
+  weaponForm(weaponJson: string): string;
+  weaponDraft(weaponJson: string, formJson: string): string;
+  weaponNew(): string;
+  armorForm(armorJson: string): string;
+  armorDraft(armorJson: string, formJson: string): string;
+  armorNew(): string;
+  armorWithCategory(formJson: string, category: string): string;
   homebrewFormOptions(catalogJson: string): string;
   effectKinds(catalogJson: string): string;
   effectBuild(kindId: string, valuesJson: string): string;
@@ -919,6 +926,54 @@ export function backgroundNew(): JsonObject {
  *  catálogo fusionado, así que incluyen las propias. */
 export function homebrewFormOptions(catalog: Catalog): HomebrewFormOptions {
   return JSON.parse(engine().homebrewFormOptions(catalogJson(catalog))) as HomebrewFormOptions;
+}
+
+/** Un arma como formulario de texto (`WeaponDraft.formOf`). */
+export function weaponForm(weapon: JsonObject): WeaponForm {
+  return JSON.parse(engine().weaponForm(JSON.stringify(weapon))) as WeaponForm;
+}
+
+/** El arma armada con un formulario sobre su arma de partida y los errores por
+ *  campo (`WeaponDraft`). Nunca lanza por datos inválidos. */
+export function weaponDraft(weapon: JsonObject, form: WeaponForm): { weapon: JsonObject; errors: Record<string, string> } {
+  return JSON.parse(engine().weaponDraft(JSON.stringify(weapon), JSON.stringify(form))) as {
+    weapon: JsonObject;
+    errors: Record<string, string>;
+  };
+}
+
+/** La plantilla de «Nueva arma». */
+export function weaponNew(): JsonObject {
+  return JSON.parse(engine().weaponNew()) as JsonObject;
+}
+
+/** Una armadura como formulario de texto (`ArmorDraft.formOf`). */
+export function armorForm(armor: JsonObject): ArmorForm {
+  return JSON.parse(engine().armorForm(JSON.stringify(armor))) as ArmorForm;
+}
+
+/** La armadura armada con un formulario, sus errores por campo y la CA que la
+ *  ficha le daría con una Destreza de ejemplo (vacía en un escudo). */
+export function armorDraft(
+  armor: JsonObject,
+  form: ArmorForm,
+): { armor: JsonObject; errors: Record<string, string>; acExamples: ArmorAcExample[] } {
+  return JSON.parse(engine().armorDraft(JSON.stringify(armor), JSON.stringify(form))) as {
+    armor: JsonObject;
+    errors: Record<string, string>;
+    acExamples: ArmorAcExample[];
+  };
+}
+
+/** La plantilla de «Nueva armadura». */
+export function armorNew(): JsonObject {
+  return JSON.parse(engine().armorNew()) as JsonObject;
+}
+
+/** El formulario con otra categoría y lo que suma la Destreza repuesto: lo decide
+ *  el motor (`ArmorDraft.withCategory`). */
+export function armorWithCategory(form: ArmorForm, category: string): ArmorForm {
+  return JSON.parse(engine().armorWithCategory(JSON.stringify(form), category)) as ArmorForm;
 }
 
 /** Los tipos de efecto que el editor ofrece, con sus campos y las opciones del

@@ -70,7 +70,7 @@ const sheetTabIn = (tabs: readonly SheetTab[], segment: string | undefined): She
 export const HOMEBREW_CATEGORIES = ['weapons', 'armor', 'magicItems', 'gear', 'feats', 'races', 'backgrounds', 'spells'] as const satisfies readonly CodexCategory[];
 export type HomebrewCategory = (typeof HOMEBREW_CATEGORIES)[number] | 'creatures';
 /** Las categorías del Homebrew que ya se editan desde `/v2`. */
-export const EDITABLE_HOMEBREW = ['creatures', 'feats', 'races', 'backgrounds'] as const;
+export const EDITABLE_HOMEBREW = ['creatures', 'feats', 'races', 'backgrounds', 'weapons', 'armor'] as const;
 export type EditableHomebrew = (typeof EDITABLE_HOMEBREW)[number];
 const homebrewSegment = (c: HomebrewCategory): string => (c === 'creatures' ? 'criaturas' : CODEX_CATEGORIES[c]);
 

@@ -2,19 +2,21 @@ import { useRef, type MutableRefObject } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { saveHomebrew } from '../../api/homebrew';
 import { queryKeys, useSheetCatalog } from '../../api/queries';
-import { backgroundNew, featNew, homebrewCopy, homebrewId, raceNew, type Catalog, type JsonObject } from '../../engine';
+import { armorNew, backgroundNew, featNew, homebrewCopy, homebrewId, raceNew, weaponNew, type Catalog, type JsonObject } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
 import type { Texts } from '../../i18n/texts';
 import { dmHomebrewHref, navigate } from '../../router';
 import { showNotice } from '../../ui/notices';
 import { AppBusyLabel, AppErrorView, Notice } from '../../ui/status';
 import { DmHeader } from '../DmHeader';
+import { ArmorForm } from './ArmorForm';
 import { BackgroundForm } from './BackgroundForm';
 import { FeatForm } from './FeatForm';
 import { RaceForm } from './RaceForm';
+import { WeaponForm } from './WeaponForm';
 
 /** Las categorías de entrada propia que se editan con un formulario con vista previa. */
-export type EntryCategory = 'feats' | 'races' | 'backgrounds';
+export type EntryCategory = 'feats' | 'races' | 'backgrounds' | 'weapons' | 'armor';
 
 /** Adónde se vuelve al salir: una entrada que se edita, a su detalle; una nueva
  *  (vacía o copia), a la lista de su categoría. */
@@ -49,6 +51,18 @@ const KINDS: Record<
     newTitle: (t) => t.hbNewBackground,
     notFound: (t) => [t.hbBackgroundNotFound, t.hbBackgroundNotFoundBody],
   },
+  weapons: {
+    template: weaponNew,
+    list: (c) => c.weapons,
+    newTitle: (t) => t.hbNewWeapon,
+    notFound: (t) => [t.hbWeaponNotFound, t.hbWeaponNotFoundBody],
+  },
+  armor: {
+    template: armorNew,
+    list: (c) => c.armor,
+    newTitle: (t) => t.hbNewArmor,
+    notFound: (t) => [t.hbArmorNotFound, t.hbArmorNotFoundBody],
+  },
 };
 
 /** Lo que se edita: la entrada de partida y cómo se llama la pantalla. */
@@ -59,7 +73,7 @@ interface Start {
 }
 
 /**
- * El editor de una dote, especie o trasfondo propio del Homebrew
+ * El editor de una dote, especie, trasfondo, arma o armadura propia del Homebrew
  * (`/dm/homebrew/<categoría>/nueva` y `/dm/homebrew/<categoría>/<id>/editar`).
  * Tres entradas, como las criaturas:
  *
@@ -139,5 +153,7 @@ export function HomebrewEntryEditorView({
   const props = { initial, catalog: data, title, kicker, exitHref: entryEditorExit(category, entryId), onSave: save, leaveRef };
   if (category === 'races') return <RaceForm {...props} />;
   if (category === 'backgrounds') return <BackgroundForm {...props} />;
+  if (category === 'weapons') return <WeaponForm {...props} />;
+  if (category === 'armor') return <ArmorForm {...props} />;
   return <FeatForm {...props} />;
 }
