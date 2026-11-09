@@ -44,8 +44,8 @@ interface Own {
  *
  * Desde acá se **importa y se exporta** todo el homebrew (en la portada), se
  * **borra** cualquier entrada propia (en su ficha) y se **crean, editan y
- * duplican criaturas, dotes, especies y trasfondos**. Crear y editar las otras
- * cuatro categorías siguen en Flutter: los formularios llegan con 7d3 y 7d4.
+ * duplican criaturas, dotes, especies, trasfondos, armas, armaduras y objetos**.
+ * Crear y editar conjuros sigue en Flutter: el formulario llega con 7d4.
  *
  * ponytail: Flutter además lista las entradas inválidas que no pudo cargar
  * (`loadIssues`) para borrarlas; `fetchHomebrew` las descarta al leer y esta
@@ -106,11 +106,16 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
     return <CreatureList creatures={own.creatures} catalog={catalog.data} headerWith={headerWith} />;
   }
   if (category !== null) {
-    // Dotes, especies, trasfondos, armas y armaduras se crean y se duplican desde
-    // acá; las demás categorías, todavía en la aplicación principal (7d3b y 7d4
-    // suman las suyas).
+    // Dotes, especies, trasfondos, armas, armaduras y objetos se crean y se
+    // duplican desde acá; los conjuros, todavía en la aplicación principal (7d4).
+    // «Objetos mágicos» y «Equipo» son dos categorías del Códice pero un solo
+    // editor: `items`.
     const editable =
-      category === 'feats' || category === 'races' || category === 'backgrounds' || category === 'weapons' || category === 'armor' ? category : null;
+      category === 'magicItems' || category === 'gear'
+        ? ('items' as const)
+        : category === 'feats' || category === 'races' || category === 'backgrounds' || category === 'weapons' || category === 'armor'
+          ? category
+          : null;
     const isEditable = editable !== null;
     const labels = {
       feats: { create: t.hbNewFeat, action: 'homebrew-new-feat', empty: t.hbFeatEmpty },
@@ -118,6 +123,7 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
       backgrounds: { create: t.hbNewBackground, action: 'homebrew-new-background', empty: t.hbBackgroundEmpty },
       weapons: { create: t.hbNewWeapon, action: 'homebrew-new-weapon', empty: t.hbWeaponEmpty },
       armor: { create: t.hbNewArmor, action: 'homebrew-new-armor', empty: t.hbArmorEmpty },
+      items: { create: t.hbNewItem, action: 'homebrew-new-item', empty: t.hbItemEmpty },
     };
     const duplicate = (
       <Button tone="secondary" icon={Copy} onClick={() => setPicking(true)} data-action="homebrew-duplicate-catalog">
@@ -187,8 +193,8 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
           header={categoryHeader}
           detailActions={(entry) => (
             // «Editar», «Duplicar» y «Borrar», en el mismo orden y forma que el
-            // perfil de una criatura. Las demás categorías suman las suyas con
-            // cada formulario (7d3b y 7d4).
+            // perfil de una criatura. Los conjuros suman los suyos con su
+            // formulario (7d4).
             <>
               {editable && (
                 <>

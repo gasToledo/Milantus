@@ -217,6 +217,14 @@ export function armorEntry(armor: JsonObject, catalog: Catalog, t: Texts, lang: 
   return new Ctx(catalog, t, lang).armor(armor);
 }
 
+/** La ficha del Códice de un solo objeto: la de equipo si es mundano y la de objeto
+ *  mágico si tiene rareza, igual que las reparte el Códice. Es la vista previa del
+ *  formulario de objetos propios. */
+export function itemEntry(item: JsonObject, catalog: Catalog, t: Texts, lang: Lang): CodexEntry {
+  const ctx = new Ctx(catalog, t, lang);
+  return typeof item.rarity === 'string' ? ctx.magicItem(item) : ctx.gear(item);
+}
+
 class Ctx {
   private readonly pounds: Intl.NumberFormat;
   private readonly coinLabels: Record<string, string>;
@@ -524,19 +532,22 @@ class Ctx {
       attune ? t.codexRarityAttune(rarity) : rarity,
       () => {
         const description = str(i.description);
-        // La primera línea es la de tipo y rareza, que ya está en las placas.
-        const cut = description.indexOf('\n');
+        // En el catálogo oficial la primera línea es la de tipo y rareza, que ya
+        // está en las placas. En un objeto propio es texto de quien lo escribió:
+        // cortarla se llevaba el primer párrafo sin avisar.
+        const cut = i.source === 'homebrew' ? -1 : description.indexOf('\n');
         return {
           facts: [
             [
               { label: t.codexRarity, value: rarity },
               { label: t.codexAttunement, value: attune ? t.codexRequires : t.codexNotRequired },
               ...(typeof i.maxCharges === 'number' ? [{ label: t.codexCharges, value: String(i.maxCharges) }] : []),
+              ...this.baseItemFact(i),
               ...this.weightAndPrice(i),
             ],
           ],
           prose: (cut < 0 ? description : description.slice(cut + 1)) || undefined,
-          sections: [],
+          sections: this.equipped(i),
         };
       },
       rarity,
@@ -617,6 +628,30 @@ class Ctx {
     );
   }
 
+  /** «Al equiparlo»: lo que el objeto aporta a la ficha, con la misma regla que
+   *  dotes y especies (sus rasgos pasivos o, sin ellos, sus efectos uno por línea).
+   *  Sin esto una Capa de protección propia se leía sin decir que suma a la CA. */
+  private equipped(i: Json): CodexDetail['sections'] {
+    const traits = this.traitsOrLines(i.effects);
+    return traits.length > 0 ? [{ title: this.t.codexEquipped, traits }] : [];
+  }
+
+  /** «Objeto base»: la familia, el bonificador si lo hay y, si la restringe a unas
+   *  bases, cuáles (por su nombre en el catálogo, o el id si ya no está). */
+  private baseItemFact(i: Json): CodexFact[] {
+    const kind = str(i.baseItemKind);
+    if (!kind) return [];
+    const t = this.t;
+    const bonus = num(i.magicBonus);
+    const names = new Map([...this.catalog.weapons, ...this.catalog.armor].map((b) => [str(b.id), str(b.name)] as const));
+    const only = strs(i.eligibleBaseItemIds).map((id) => names.get(id) || id);
+    const value = [
+      `${(t.itemKinds as Record<string, string | undefined>)[kind] ?? kind}${bonus !== 0 ? ` ${bonus > 0 ? '+' : ''}${bonus}` : ''}`,
+      ...(only.length > 0 ? [`${t.codexBaseOnly} ${only.join(', ')}`] : []),
+    ].join(' · ');
+    return [{ label: t.codexBaseItem, value }];
+  }
+
   private itemOrder?: string[];
   gear(i: Json): CodexEntry {
     const t = this.t;
@@ -630,11 +665,12 @@ class Ctx {
           [
             { label: t.codexCategory, value: category },
             ...(num(i.bundleSize) > 1 ? [{ label: t.codexPackOf, value: String(num(i.bundleSize)) }] : []),
+            ...this.baseItemFact(i),
             ...this.weightAndPrice(i),
           ],
         ],
         prose: str(i.description) || undefined,
-        sections: [],
+        sections: this.equipped(i),
       }),
       category,
       this.itemOrder.indexOf(str(i.category)),

@@ -69,10 +69,14 @@ const sheetTabIn = (tabs: readonly SheetTab[], segment: string | undefined): She
 
 export const HOMEBREW_CATEGORIES = ['weapons', 'armor', 'magicItems', 'gear', 'feats', 'races', 'backgrounds', 'spells'] as const satisfies readonly CodexCategory[];
 export type HomebrewCategory = (typeof HOMEBREW_CATEGORIES)[number] | 'creatures';
-/** Las categorías del Homebrew que ya se editan desde `/v2`. */
-export const EDITABLE_HOMEBREW = ['creatures', 'feats', 'races', 'backgrounds', 'weapons', 'armor'] as const;
+/** Las categorías del Homebrew que ya se editan desde `/v2`. `items` es la
+ *  colección que guarda el servidor: en pantalla los objetos se parten en
+ *  `magicItems` y `gear` (como en el Códice), pero se crean y se editan en un
+ *  solo editor, `/dm/homebrew/objetos/…`, que no tiene lista propia. */
+export const EDITABLE_HOMEBREW = ['creatures', 'feats', 'races', 'backgrounds', 'weapons', 'armor', 'items'] as const;
 export type EditableHomebrew = (typeof EDITABLE_HOMEBREW)[number];
-const homebrewSegment = (c: HomebrewCategory): string => (c === 'creatures' ? 'criaturas' : CODEX_CATEGORIES[c]);
+const homebrewSegment = (c: HomebrewCategory | EditableHomebrew): string =>
+  c === 'creatures' ? 'criaturas' : c === 'items' ? 'objetos' : CODEX_CATEGORIES[c];
 
 /** Qué muestra el Modo DM. `home` es `/v2/dm` a secas: no muestra nada, redirige
  *  a la primera campaña en curso (o a donde haya algo que ver). */
@@ -372,9 +376,9 @@ export const dmHomebrewHref = (category?: HomebrewCategory, entryId?: string): s
 /** El editor de una entrada propia: la nueva (vacía, o copia de `from`, propia u
  *  oficial) o la que se edita. */
 export const dmHomebrewNewHref = (category: EditableHomebrew, from?: string): string =>
-  `${dmHomebrewHref(category)}/nueva${from ? `?de=${encodeURIComponent(from)}` : ''}`;
+  `${import.meta.env.BASE_URL}dm/homebrew/${homebrewSegment(category)}/nueva${from ? `?de=${encodeURIComponent(from)}` : ''}`;
 export const dmHomebrewEditHref = (category: EditableHomebrew, id: string): string =>
-  `${dmHomebrewHref(category)}/${encodeURIComponent(id)}/editar`;
+  `${import.meta.env.BASE_URL}dm/homebrew/${homebrewSegment(category)}/${encodeURIComponent(id)}/editar`;
 
 export const dmCampaignHref =(id: string, section: DmSection = 'mesa'): string =>
   `${import.meta.env.BASE_URL}dm/campanas/${encodeURIComponent(id)}/${section}`;

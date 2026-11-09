@@ -19,19 +19,26 @@ import { AddEffectDialog } from './AddEffectDialog';
  * se le muestra, pero acá mira quien arma el contenido, y ocultarlo escondería
  * un efecto que igual se guarda.
  *
+ * `hiddenKinds` saca tipos del diálogo «Agregar efecto»: los objetos esconden la
+ * CA y la resistencia, que tienen su campo arriba. Es presentación, no una
+ * regla, y no toca los efectos que ya están en la lista. Tiene que ser una
+ * constante: el diálogo la usa como dependencia.
+ *
  * ponytail: no ofrece los efectos de **elección** ni la maquinaria de clase (un
- * subformulario con su propia lista de opciones), ni esconde tipos por
- * formulario (`hiddenKinds` de Flutter, que usan los objetos: 7d3). Todo eso se
- * sigue cargando por JSON o importando el pack.
+ * subformulario con su propia lista de opciones). Se siguen cargando por JSON o
+ * importando el pack.
  */
 export function EffectEditor({
   effects,
   catalog,
   onChange,
+  hiddenKinds,
 }: {
   effects: JsonObject[];
   catalog: Catalog;
   onChange: (effects: JsonObject[]) => void;
+  /** Ids de tipo de efecto que el diálogo no ofrece. */
+  hiddenKinds?: string[];
 }) {
   const t = useTexts();
   const [adding, setAdding] = useState(false);
@@ -75,7 +82,7 @@ export function EffectEditor({
           {t.effAdd}
         </Button>
       </div>
-      {adding && <AddEffectDialog catalog={catalog} onAdd={(effect) => onChange([...effects, effect])} onClose={() => setAdding(false)} />}
+      {adding && <AddEffectDialog catalog={catalog} hiddenKinds={hiddenKinds} onAdd={(effect) => onChange([...effects, effect])} onClose={() => setAdding(false)} />}
     </div>
   );
 }

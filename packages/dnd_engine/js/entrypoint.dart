@@ -921,6 +921,54 @@ String armorWithCategory(String formJson, String category) {
   return jsonEncode(ArmorDraft.withCategory(form, category));
 }
 
+Item _objeto(String json) =>
+    Item.fromJson((jsonDecode(json) as Map).cast<String, dynamic>());
+
+Map<String, dynamic> _formulario(String json) =>
+    (jsonDecode(json) as Map).cast<String, dynamic>();
+
+/// El formulario (todo texto) de un objeto: `ItemDraft.formOf`.
+String itemForm(String itemJson) =>
+    jsonEncode(ItemDraft.formOf(_objeto(itemJson)));
+
+/// El objeto armado con un formulario sobre su objeto de partida, y los errores
+/// por campo (ver [raceDraft]).
+String itemDraft(String itemJson, String formJson) {
+  final form = _formulario(formJson);
+  return jsonEncode({
+    'item': ItemDraft.build(_objeto(itemJson), form).toJson(),
+    'errors': ItemDraft.errors(form),
+  });
+}
+
+/// La plantilla de «Nuevo objeto» (`ItemDraft.empty`).
+String itemNew() => jsonEncode(ItemDraft.empty().toJson());
+
+/// El formulario con la rareza nueva (`ItemDraft.withRarity`): sin rareza, sin
+/// sintonización.
+String itemWithRarity(String formJson, String rarity) =>
+    jsonEncode(ItemDraft.withRarity(_formulario(formJson), rarity));
+
+/// El formulario con la familia de objeto base nueva y las bases vaciadas
+/// (`ItemDraft.withBaseKind`).
+String itemWithBaseKind(String formJson, String kind) =>
+    jsonEncode(ItemDraft.withBaseKind(_formulario(formJson), kind));
+
+/// Las bases que puede tomar una familia de objeto base, del catálogo
+/// **fusionado** y por nombre (`ItemDraft.baseOptions`).
+String itemBaseOptions(String kind, String catalogJson) => jsonEncode([
+      for (final o in ItemDraft.baseOptions(kind, _repoPara(catalogJson)))
+        {'id': o.id, 'name': o.name},
+    ]);
+
+/// Las familias de objeto base con su rótulo `(es, en)`. «Ninguno» no está: lo
+/// pone el cliente, que es quien decide cómo se ofrece.
+const _baseItemKindLabels = <String, (String, String)>{
+  'weapon': ('Arma', 'Weapon'),
+  'armor': ('Armadura', 'Armor'),
+  'shield': ('Escudo', 'Shield'),
+};
+
 /// Las categorías de arma y de armadura con su rótulo corto `(es, en)`, en el
 /// orden en que se ofrecen. Los ids son los guardados.
 const _weaponCategoryLabels = <String, (String, String)>{
@@ -981,6 +1029,20 @@ String homebrewFormOptions(String catalogJson) {
     ],
     'damageTypes': [
       for (final d in DamageType.values) {'id': d.id, 'label': d.label},
+    ],
+    // Objetos: las familias que se ofrecen (sin `magic`: lo que hace mágico a un
+    // objeto es tener rareza), las rarezas de la más común a la más rara (sin
+    // «mundano», que es no tener) y las familias de objeto base.
+    'itemCategories': [
+      for (final e in itemCategoryLabels.entries)
+        {'id': e.key, 'label': e.value},
+    ],
+    'rarities': [
+      for (final e in itemRarityLabels.entries) {'id': e.key, 'label': e.value},
+    ],
+    'baseItemKinds': [
+      for (final e in _baseItemKindLabels.entries)
+        {'id': e.key, 'label': localized(e.value.$1, e.value.$2)},
     ],
   });
 }
@@ -1524,6 +1586,12 @@ void main() {
   motor['armorDraft'] = armorDraft.toJS;
   motor['armorNew'] = armorNew.toJS;
   motor['armorWithCategory'] = armorWithCategory.toJS;
+  motor['itemForm'] = itemForm.toJS;
+  motor['itemDraft'] = itemDraft.toJS;
+  motor['itemNew'] = itemNew.toJS;
+  motor['itemWithRarity'] = itemWithRarity.toJS;
+  motor['itemWithBaseKind'] = itemWithBaseKind.toJS;
+  motor['itemBaseOptions'] = itemBaseOptions.toJS;
   motor['homebrewFormOptions'] = homebrewFormOptions.toJS;
   motor['effectKinds'] = effectKinds.toJS;
   motor['effectBuild'] = effectBuild.toJS;

@@ -370,9 +370,8 @@ repiten acá.
   otra cuenta no llega (la API es por cuenta) y su URL muestra la categoría
   vacía. Desde 7d1 se **importa y se exporta** todo (portada), se **borra** cualquier
   entrada propia y se **crean, editan y duplican criaturas** y, desde 7d2a y 7d2b,
-  **dotes, especies, trasfondos** y, desde 7d3a, **armas y armaduras**; crear y
-  editar las otras dos categorías (objetos y conjuros) siguen en Flutter hasta
-  7d3b y 7d4.
+  **dotes, especies, trasfondos** y, desde 7d3a y 7d3b, **armas, armaduras y
+  objetos**; crear y editar conjuros sigue en Flutter hasta 7d4.
   **Combate** (`GET /api/campaigns/:id/encounter`, más los miembros, los PNJ de
   la mesa y el Cuaderno): el combate abierto, de solo lectura. Arriba, una placa
   con la ronda, «Turno N de M» y cuántos quedan en pie por bando (o «Armando el
@@ -1114,7 +1113,22 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
        el panel de reglas por campo, editar «a dos manos salvo montado» (se
        conserva) y el precio en monedas (sigue en cobre). Sin cambios en el
        servidor ni en Flutter.
-     - **7d3b · Objetos.**
+     - **7d3b · Objetos** *(existe; con esto la 7d3 queda cerrada)*: el motor suma
+       `ItemDraft` (formulario como texto con los efectos en tres partes —CA,
+       resistencias y «otros»—, que `build` junta en el orden de Flutter; límites de
+       Flutter: CA y bonificador mágico de −5 a 10; `withRarity` apaga la
+       sintonización sin rareza y `withBaseKind` vacía las bases; `baseOptions` por
+       nombre del catálogo fusionado). En el puente: `itemForm`, `itemDraft`,
+       `itemNew`, `itemWithRarity`, `itemWithBaseKind`, `itemBaseOptions`, y
+       `homebrewFormOptions` suma `itemCategories`, `rarities` y `baseItemKinds`. En
+       pantalla: `ItemForm`; `EffectEditor` gana `hiddenKinds` (cierra el `ponytail:`
+       de la 7d2a) y `items` entra a `EDITABLE_HOMEBREW` con la ruta
+       `/dm/homebrew/objetos/…`, un solo editor para las dos categorías del Códice
+       (Objetos mágicos y Equipo). El Códice de objetos —también el del jugador—
+       suma «Al equiparlo» y «Objeto base», y deja de cortar la primera línea de la
+       descripción de un objeto propio. Quedan afuera editar cargas, recarga y
+       paquete (se conservan), el panel de reglas por campo y el precio en monedas.
+       Sin cambios en el servidor ni en Flutter.
      - **7d4 · Conjuros.**
 
    Opcional, sin equivalente en Flutter y sin diseñar todavía:
@@ -1232,8 +1246,8 @@ hace seguro volver atrás es que **no hay nada que deshacer en el formato**:
 
 Para que nadie lo dé por hecho:
 
-- El Compañero Salvaje (invocarlo, que no cobra ni se va con el descanso), los
-  formularios del Homebrew de objetos y conjuros (7d3b y 7d4) y las operaciones
+- El Compañero Salvaje (invocarlo, que no cobra ni se va con el descanso), el
+  formulario del Homebrew de conjuros (7d4) y las operaciones
   del paso 7 que faltan. El detalle está en
   [Orden previsto de pantallas](#orden-previsto-de-pantallas).
 - Control de versión en el servidor para las escrituras (rechazar una copia

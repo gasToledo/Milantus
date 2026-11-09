@@ -6,7 +6,7 @@ import { useLang, useTexts } from '../i18n/context';
 import { AppDialog } from '../ui/AppDialog';
 
 /** Las categorías que se duplican desde el catálogo. */
-export type DuplicableCategory = 'creatures' | 'feats' | 'races' | 'backgrounds' | 'weapons' | 'armor';
+export type DuplicableCategory = 'creatures' | 'feats' | 'races' | 'backgrounds' | 'weapons' | 'armor' | 'items';
 
 /**
  * «Duplicar criatura» / «Duplicar dote» / «Duplicar especie» / «Duplicar
@@ -40,9 +40,20 @@ export function DuplicateFromCatalogDialog({
     backgrounds: t.hbDuplicateBackground,
     weapons: t.hbDuplicateWeapon,
     armor: t.hbDuplicateArmor,
+    items: t.hbDuplicateItem,
   }[category];
 
   const options = useMemo(() => {
+    if (category === 'items') {
+      // Los objetos viven en dos categorías del Códice —equipo y objetos
+      // mágicos— pero son una sola en el Homebrew: se ofrecen los dos, por orden
+      // alfabético. La línea secundaria es la familia si es mundano y la rareza
+      // si es mágico.
+      return [...codexEntries('gear', catalog, t, lang), ...codexEntries('magicItems', catalog, t, lang)]
+        .filter((e) => e.source !== 'homebrew')
+        .map((e) => ({ id: e.id, name: e.name, kind: e.facet ?? e.subtitle }))
+        .sort((a, b) => a.name.localeCompare(b.name, lang));
+    }
     if (category !== 'creatures') {
       // El trasfondo se reconoce por sus características, no por su lema.
       const abilities = new Map(

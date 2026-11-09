@@ -144,3 +144,28 @@ test('el DM crea un arma arrojadiza: sin alcance no se guarda, con alcance sí, 
   const { content } = await api<{ content: { weapons: { name: string }[] } }>(page.request, '/api/homebrew', TOKEN_TRANSFERENCIA);
   expect(content.weapons.map((w) => w.name)).not.toContain(nombre);
 });
+
+test('el DM crea un objeto mágico con bonificador a la CA, lo lee en «Al equiparlo» y lo borra', async ({ context, page, baseURL }) => {
+  const nombre = `Manto de la escarcha ${Date.now().toString(36)}`;
+  await context.addCookies([{ name: 'dnd_session', value: TOKEN_TRANSFERENCIA, url: baseURL! }]);
+  await page.goto('/v2/dm/homebrew/objetos-magicos');
+  await page.getByRole('link', { name: t.hbNewItem, exact: true }).first().click();
+
+  await page.locator('[data-field="item-name"]').fill(nombre);
+  await page.getByRole('combobox', { name: t.codexRarity, exact: true }).click();
+  await page.getByRole('option', { name: 'Infrecuente', exact: true }).click();
+  await page.locator('[data-field="item-ac-bonus"]').fill('1');
+  await page.locator('[data-action="item-save"]').click();
+
+  await expect(page.getByText(t.hbSaved(nombre), { exact: true }).first()).toBeVisible();
+  // El detalle dice que da +1 a la CA: es lo que el Códice no mostraba de un objeto propio.
+  await expect(page.getByText(t.codexEquipped, { exact: true }).first()).toBeVisible();
+  await expect(page.locator('[data-field="codex-detail"]').getByText(/\+1/).first()).toBeVisible();
+
+  await page.getByRole('button', { name: t.hbDeleteTooltip(nombre), exact: true }).click();
+  const borrar = page.getByRole('dialog', { name: t.hbDeleteTitle(t.hbDeleteKinds.items, nombre) });
+  await borrar.getByRole('button', { name: t.cardDelete, exact: true }).click();
+  await expect(page.getByText(t.hbDeleted(nombre), { exact: true }).first()).toBeVisible();
+  const { content } = await api<{ content: { items: { name: string }[] } }>(page.request, '/api/homebrew', TOKEN_TRANSFERENCIA);
+  expect(content.items.map((i) => i.name)).not.toContain(nombre);
+});

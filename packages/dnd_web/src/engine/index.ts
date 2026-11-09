@@ -1,4 +1,4 @@
-import type { AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, CreatureForm, EffectBuild, EffectKindInfo, EffectParts, FeatForm, RaceForm, BackgroundForm, WeaponForm, ArmorForm, ArmorAcExample, HomebrewFormOptions, CreatureFormOptions, EncounterDetails, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
+import type { AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, CreatureForm, EffectBuild, EffectKindInfo, EffectParts, FeatForm, RaceForm, BackgroundForm, WeaponForm, ArmorForm, ArmorAcExample, ItemForm, HomebrewFormOptions, CreatureFormOptions, EncounterDetails, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
 // Lo genera `npm run build:engine` (o la etapa `engine-js` del Dockerfile) y
 // no se versiona. Es un script de dart2js, no un módulo: al cargarse deja
 // `globalThis.dndEngine`, y de ahí lo toma este archivo.
@@ -56,6 +56,12 @@ interface DartEngine {
   armorDraft(armorJson: string, formJson: string): string;
   armorNew(): string;
   armorWithCategory(formJson: string, category: string): string;
+  itemForm(itemJson: string): string;
+  itemDraft(itemJson: string, formJson: string): string;
+  itemNew(): string;
+  itemWithRarity(formJson: string, rarity: string): string;
+  itemWithBaseKind(formJson: string, kind: string): string;
+  itemBaseOptions(kind: string, catalogJson: string): string;
   homebrewFormOptions(catalogJson: string): string;
   effectKinds(catalogJson: string): string;
   effectBuild(kindId: string, valuesJson: string): string;
@@ -974,6 +980,40 @@ export function armorNew(): JsonObject {
  *  el motor (`ArmorDraft.withCategory`). */
 export function armorWithCategory(form: ArmorForm, category: string): ArmorForm {
   return JSON.parse(engine().armorWithCategory(JSON.stringify(form), category)) as ArmorForm;
+}
+
+/** Un objeto como formulario de texto (`ItemDraft.formOf`). */
+export function itemForm(item: JsonObject): ItemForm {
+  return JSON.parse(engine().itemForm(JSON.stringify(item))) as ItemForm;
+}
+
+/** El objeto armado con un formulario y sus errores por campo. */
+export function itemDraft(item: JsonObject, form: ItemForm): { item: JsonObject; errors: Record<string, string> } {
+  return JSON.parse(engine().itemDraft(JSON.stringify(item), JSON.stringify(form))) as {
+    item: JsonObject;
+    errors: Record<string, string>;
+  };
+}
+
+/** La plantilla de «Nuevo objeto». */
+export function itemNew(): JsonObject {
+  return JSON.parse(engine().itemNew()) as JsonObject;
+}
+
+/** El formulario con otra rareza: sin rareza, sin sintonización (`ItemDraft.withRarity`). */
+export function itemWithRarity(form: ItemForm, rarity: string): ItemForm {
+  return JSON.parse(engine().itemWithRarity(JSON.stringify(form), rarity)) as ItemForm;
+}
+
+/** El formulario con otra familia de objeto base y las bases vaciadas (`ItemDraft.withBaseKind`). */
+export function itemWithBaseKind(form: ItemForm, kind: string): ItemForm {
+  return JSON.parse(engine().itemWithBaseKind(JSON.stringify(form), kind)) as ItemForm;
+}
+
+/** Las bases que puede tomar una familia de objeto base, por nombre y del
+ *  catálogo fusionado (`ItemDraft.baseOptions`). */
+export function itemBaseOptions(kind: string, catalog: Catalog): { id: string; name: string }[] {
+  return JSON.parse(engine().itemBaseOptions(kind, catalogJson(catalog))) as { id: string; name: string }[];
 }
 
 /** Los tipos de efecto que el editor ofrece, con sus campos y las opciones del

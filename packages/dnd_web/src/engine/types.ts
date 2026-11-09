@@ -824,6 +824,35 @@ export interface HomebrewFormOptions {
   weaponProperties: { id: string; label: string }[];
   masteries: { id: string; label: string }[];
   damageTypes: { id: string; label: string }[];
+  /** Las familias de objeto que se ofrecen (sin `magic`: eso lo hace la rareza). */
+  itemCategories: { id: string; label: string }[];
+  /** De la más común a la más rara; «Mundano» no está, lo antepone el cliente. */
+  rarities: { id: string; label: string }[];
+  /** Arma, armadura y escudo; «Ninguno» lo pone el cliente. */
+  baseItemKinds: { id: string; label: string }[];
+}
+
+/** Un objeto como texto de formulario (`ItemDraft.formOf`). Los efectos van en
+ *  tres partes —bonificador a la CA, resistencias y el resto— y el motor los
+ *  junta al armar el objeto. `hasCharges` no se edita: solo avisa que se
+ *  conservan. */
+export interface ItemForm {
+  name: string;
+  category: string;
+  weight: string;
+  costCp: string;
+  description: string;
+  /** `''` es «mundano». */
+  rarity: string;
+  requiresAttunement: boolean;
+  acBonus: string;
+  resistances: string[];
+  otherEffects: JsonObject[];
+  /** `'none'` es «sin objeto base». */
+  baseItemKind: string;
+  magicBonus: string;
+  eligibleBaseItemIds: string[];
+  hasCharges: boolean;
 }
 
 /** Un arma como texto de formulario (`WeaponDraft.formOf`): los números van

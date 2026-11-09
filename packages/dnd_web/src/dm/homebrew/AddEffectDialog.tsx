@@ -25,10 +25,12 @@ const startOf = (kind: EffectKindInfo): Values => Object.fromEntries(kind.fields
  */
 export function AddEffectDialog({
   catalog,
+  hiddenKinds,
   onAdd,
   onClose,
 }: {
   catalog: Catalog;
+  hiddenKinds?: string[];
   onAdd: (effect: JsonObject) => void;
   onClose: () => void;
 }) {
@@ -36,7 +38,7 @@ export function AddEffectDialog({
   const lang = useLang();
   // Los rótulos de las opciones siguen al idioma del motor: se piden de nuevo
   // si cambia.
-  const kinds = useMemo(() => effectKinds(catalog), [catalog, lang]);
+  const kinds = useMemo(() => effectKinds(catalog).filter((k) => !hiddenKinds?.includes(k.id)), [catalog, lang, hiddenKinds]);
   const [kindId, setKindId] = useState(kinds[0]!.id);
   const kind = kinds.find((k) => k.id === kindId)!;
   const [values, setValues] = useState<Values>(() => startOf(kind));
