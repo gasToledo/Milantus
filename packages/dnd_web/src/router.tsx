@@ -73,7 +73,7 @@ export type HomebrewCategory = (typeof HOMEBREW_CATEGORIES)[number] | 'creatures
  *  colección que guarda el servidor: en pantalla los objetos se parten en
  *  `magicItems` y `gear` (como en el Códice), pero se crean y se editan en un
  *  solo editor, `/dm/homebrew/objetos/…`, que no tiene lista propia. */
-export const EDITABLE_HOMEBREW = ['creatures', 'feats', 'races', 'backgrounds', 'weapons', 'armor', 'items'] as const;
+export const EDITABLE_HOMEBREW = ['creatures', 'feats', 'races', 'backgrounds', 'weapons', 'armor', 'items', 'spells'] as const;
 export type EditableHomebrew = (typeof EDITABLE_HOMEBREW)[number];
 const homebrewSegment = (c: HomebrewCategory | EditableHomebrew): string =>
   c === 'creatures' ? 'criaturas' : c === 'items' ? 'objetos' : CODEX_CATEGORIES[c];

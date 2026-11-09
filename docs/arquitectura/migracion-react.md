@@ -371,7 +371,7 @@ repiten acá.
   vacía. Desde 7d1 se **importa y se exporta** todo (portada), se **borra** cualquier
   entrada propia y se **crean, editan y duplican criaturas** y, desde 7d2a y 7d2b,
   **dotes, especies, trasfondos** y, desde 7d3a y 7d3b, **armas, armaduras y
-  objetos**; crear y editar conjuros sigue en Flutter hasta 7d4.
+  objetos** y, desde 7d4, **conjuros**: las ocho categorías se editan desde `/v2`.
   **Combate** (`GET /api/campaigns/:id/encounter`, más los miembros, los PNJ de
   la mesa y el Cuaderno): el combate abierto, de solo lectura. Arriba, una placa
   con la ronda, «Turno N de M» y cuántos quedan en pie por bando (o «Armando el
@@ -1129,7 +1129,21 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
        descripción de un objeto propio. Quedan afuera editar cargas, recarga y
        paquete (se conservan), el panel de reglas por campo y el precio en monedas.
        Sin cambios en el servidor ni en Flutter.
-     - **7d4 · Conjuros.**
+     - **7d4 · Conjuros** *(existe; con esto la 7d queda cerrada)*: el motor suma
+       `SpellDraft` (los componentes se guardan como una línea y el motor la separa
+       en letras V, S, M y material, y la vuelve a armar; `castingTimes` y las
+       nueve clases lanzadoras son datos del motor; solo el nombre es obligatorio) y
+       su puente (`spellForm`, `spellDraft`, `spellNew`); `homebrewFormOptions`
+       suma `spellLevels`, `spellSchools`, `castingTimes`, `spellClasses` y
+       `spellComponents`. En pantalla: `SpellForm` sobre `HomebrewFormShell`
+       (un tiempo de lanzamiento que la lista no trae se ofrece con su texto, y una
+       clase de un pack se ve punteada con su id) y `spells` entra a
+       `EDITABLE_HOMEBREW`. La vista previa es la ficha del Códice de conjuros, sin
+       cambios. Se borra la rama «se crea en la aplicación principal» de
+       `HomebrewView` y sus textos: ninguna categoría del Homebrew manda a Flutter.
+       Queda como candidato a un paso propio el **panel de reglas por campo** de
+       Flutter, que ahora sí serviría a los ocho formularios; ninguno de React lo
+       tiene. Sin cambios en el servidor ni en Flutter.
 
    Opcional, sin equivalente en Flutter y sin diseñar todavía:
    acomodar las tarjetas de Combate y Personaje con un modo de edición, guardado
@@ -1246,13 +1260,14 @@ hace seguro volver atrás es que **no hay nada que deshacer en el formato**:
 
 Para que nadie lo dé por hecho:
 
-- El Compañero Salvaje (invocarlo, que no cobra ni se va con el descanso), el
-  formulario del Homebrew de conjuros (7d4) y las operaciones
-  del paso 7 que faltan. El detalle está en
+- El Compañero Salvaje (invocarlo, que no cobra ni se va con el descanso) y las
+  operaciones del paso 7 que faltan. El detalle está en
   [Orden previsto de pantallas](#orden-previsto-de-pantallas).
 - Control de versión en el servidor para las escrituras (rechazar una copia
   vieja con 409): hoy gana el último que guarda, como en Flutter.
 - Enlaces desde Flutter hacia `/v2` o redirección automática por `webV2`.
+- El panel de reglas por campo de los formularios del Homebrew (existe en
+  Flutter; candidato a un paso propio).
 - Tests de componentes y chequeo de literales sueltos en `dnd_web`.
 - Un criterio medido de «paridad visual» con Flutter: hoy es la comparación
   manual.

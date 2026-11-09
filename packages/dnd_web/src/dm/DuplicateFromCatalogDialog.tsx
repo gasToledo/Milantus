@@ -6,7 +6,7 @@ import { useLang, useTexts } from '../i18n/context';
 import { AppDialog } from '../ui/AppDialog';
 
 /** Las categorías que se duplican desde el catálogo. */
-export type DuplicableCategory = 'creatures' | 'feats' | 'races' | 'backgrounds' | 'weapons' | 'armor' | 'items';
+export type DuplicableCategory = 'creatures' | 'feats' | 'races' | 'backgrounds' | 'weapons' | 'armor' | 'items' | 'spells';
 
 /**
  * «Duplicar criatura» / «Duplicar dote» / «Duplicar especie» / «Duplicar
@@ -17,7 +17,7 @@ export type DuplicableCategory = 'creatures' | 'feats' | 'races' | 'backgrounds'
  * Bestiario; el resto, el orden y la línea secundaria del Códice (la categoría
  * de la dote, el lema o el tipo de la especie, las características del
  * trasfondo, la categoría y el daño del arma, la categoría y la CA de la
- * armadura).
+ * armadura, el nivel y la escuela del conjuro).
  */
 export function DuplicateFromCatalogDialog({
   category,
@@ -41,6 +41,7 @@ export function DuplicateFromCatalogDialog({
     weapons: t.hbDuplicateWeapon,
     armor: t.hbDuplicateArmor,
     items: t.hbDuplicateItem,
+    spells: t.hbDuplicateSpell,
   }[category];
 
   const options = useMemo(() => {

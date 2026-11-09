@@ -2,7 +2,7 @@ import { useRef, type MutableRefObject } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { saveHomebrew } from '../../api/homebrew';
 import { queryKeys, useSheetCatalog } from '../../api/queries';
-import { armorNew, backgroundNew, featNew, homebrewCopy, homebrewId, itemNew, raceNew, weaponNew, type Catalog, type JsonObject } from '../../engine';
+import { armorNew, backgroundNew, featNew, homebrewCopy, homebrewId, itemNew, raceNew, spellNew, weaponNew, type Catalog, type JsonObject } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
 import type { Texts } from '../../i18n/texts';
 import { dmHomebrewHref, navigate } from '../../router';
@@ -14,10 +14,11 @@ import { BackgroundForm } from './BackgroundForm';
 import { FeatForm } from './FeatForm';
 import { ItemForm } from './ItemForm';
 import { RaceForm } from './RaceForm';
+import { SpellForm } from './SpellForm';
 import { WeaponForm } from './WeaponForm';
 
 /** Las categorías de entrada propia que se editan con un formulario con vista previa. */
-export type EntryCategory = 'feats' | 'races' | 'backgrounds' | 'weapons' | 'armor' | 'items';
+export type EntryCategory = 'feats' | 'races' | 'backgrounds' | 'weapons' | 'armor' | 'items' | 'spells';
 
 /** Adónde se vuelve al salir: una entrada que se edita, a su detalle; una nueva
  *  (vacía o copia), a la lista de su categoría. Los objetos no tienen lista ni
@@ -66,6 +67,12 @@ const KINDS: Record<
     newTitle: (t) => t.hbNewArmor,
     notFound: (t) => [t.hbArmorNotFound, t.hbArmorNotFoundBody],
   },
+  spells: {
+    template: spellNew,
+    list: (c) => c.spells,
+    newTitle: (t) => t.hbNewSpell,
+    notFound: (t) => [t.hbSpellNotFound, t.hbSpellNotFoundBody],
+  },
   items: {
     template: itemNew,
     list: (c) => c.items,
@@ -82,7 +89,7 @@ interface Start {
 }
 
 /**
- * El editor de una dote, especie, trasfondo, arma, armadura u objeto propio del Homebrew
+ * El editor de una dote, especie, trasfondo, arma, armadura, objeto o conjuro propio del Homebrew
  * (`/dm/homebrew/<categoría>/nueva` y `/dm/homebrew/<categoría>/<id>/editar`).
  * Tres entradas, como las criaturas:
  *
@@ -166,5 +173,6 @@ export function HomebrewEntryEditorView({
   if (category === 'weapons') return <WeaponForm {...props} />;
   if (category === 'armor') return <ArmorForm {...props} />;
   if (category === 'items') return <ItemForm {...props} />;
+  if (category === 'spells') return <SpellForm {...props} />;
   return <FeatForm {...props} />;
 }

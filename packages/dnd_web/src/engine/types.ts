@@ -830,6 +830,36 @@ export interface HomebrewFormOptions {
   rarities: { id: string; label: string }[];
   /** Arma, armadura y escudo; «Ninguno» lo pone el cliente. */
   baseItemKinds: { id: string; label: string }[];
+  /** Truco y Nivel 1…9; el id es el nivel como texto. */
+  spellLevels: { id: string; label: string }[];
+  /** Las escuelas, por su nombre guardado (en español); «Sin escuela» lo antepone el cliente. */
+  spellSchools: { id: string; label: string }[];
+  /** Los tiempos de lanzamiento del catálogo, sin reacciones con disparador. */
+  castingTimes: { id: string; label: string }[];
+  /** Las nueve clases lanzadoras, con su nombre del catálogo. */
+  spellClasses: { id: string; label: string }[];
+  /** V, S y M, con su nombre. */
+  spellComponents: { id: string; label: string }[];
+}
+
+/** Un conjuro como texto de formulario (`SpellDraft.formOf`). Los componentes
+ *  se guardan como una línea («V, S, M (ceniza)»): acá van separados en letras
+ *  (en el orden V, S, M) y material, y el motor los vuelve a armar. */
+export interface SpellForm {
+  name: string;
+  /** `'0'` a `'9'`. */
+  level: string;
+  /** `''` es «sin escuela». */
+  school: string;
+  castingTime: string;
+  range: string;
+  duration: string;
+  components: string[];
+  material: string;
+  concentration: boolean;
+  ritual: boolean;
+  classes: string[];
+  description: string;
 }
 
 /** Un objeto como texto de formulario (`ItemDraft.formOf`). Los efectos van en

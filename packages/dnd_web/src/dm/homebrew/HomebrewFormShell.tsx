@@ -27,7 +27,7 @@ export function EntryPreview({ subtitle, name, detail, note }: { subtitle: strin
 
 /**
  * El armazón de los formularios de una entrada propia del Homebrew con vista
- * previa (dote, especie, trasfondo): cabecera, columna de secciones, vista
+ * previa (las ocho categorías menos las criaturas): cabecera, columna de secciones, vista
  * previa fija al costado (en un diálogo en pantallas chicas), pie con
  * Cancelar / Guardar y su mensaje, y la guardia de salida con cambios sin
  * guardar (el diálogo de descartar y el aviso del navegador al cerrar).

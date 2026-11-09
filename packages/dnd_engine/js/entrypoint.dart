@@ -961,6 +961,34 @@ String itemBaseOptions(String kind, String catalogJson) => jsonEncode([
         {'id': o.id, 'name': o.name},
     ]);
 
+Spell _conjuro(String json) =>
+    Spell.fromJson((jsonDecode(json) as Map).cast<String, dynamic>());
+
+/// El formulario (todo texto) de un conjuro: `SpellDraft.formOf`.
+String spellForm(String spellJson) =>
+    jsonEncode(SpellDraft.formOf(_conjuro(spellJson)));
+
+/// El conjuro armado con un formulario sobre su conjuro de partida, y los
+/// errores por campo (ver [raceDraft]).
+String spellDraft(String spellJson, String formJson) {
+  final form = _formulario(formJson);
+  return jsonEncode({
+    'spell': SpellDraft.build(_conjuro(spellJson), form).toJson(),
+    'errors': SpellDraft.errors(form),
+  });
+}
+
+/// La plantilla de «Nuevo conjuro» (`SpellDraft.empty`).
+String spellNew() => jsonEncode(SpellDraft.empty().toJson());
+
+/// Los componentes de un conjuro con su nombre `(es, en)`, en el orden de la
+/// línea guardada.
+const _spellComponentLabels = <String, (String, String)>{
+  'V': ('Verbal', 'Verbal'),
+  'S': ('Somático', 'Somatic'),
+  'M': ('Material', 'Material'),
+};
+
 /// Las familias de objeto base con su rótulo `(es, en)`. «Ninguno» no está: lo
 /// pone el cliente, que es quien decide cómo se ofrece.
 const _baseItemKindLabels = <String, (String, String)>{
@@ -1042,6 +1070,34 @@ String homebrewFormOptions(String catalogJson) {
     ],
     'baseItemKinds': [
       for (final e in _baseItemKindLabels.entries)
+        {'id': e.key, 'label': localized(e.value.$1, e.value.$2)},
+    ],
+    // Conjuros: los valores guardados son los del catálogo (en español); el
+    // rótulo es el del idioma. «Sin escuela» lo antepone el cliente.
+    'spellLevels': [
+      for (var n = 0; n <= 9; n++)
+        {
+          'id': '$n',
+          'label': n == 0
+              ? localized('Truco', 'Cantrip')
+              : localized('Nivel $n', 'Level $n'),
+        },
+    ],
+    'spellSchools': [
+      for (final s in spellSchoolRules.keys)
+        {'id': s, 'label': vocabularyLabel(VocabularyField.school, s)},
+    ],
+    'castingTimes': [
+      for (final t in SpellDraft.castingTimes)
+        {'id': t, 'label': vocabularyLabel(VocabularyField.castingTime, t)},
+    ],
+    // El nombre de cada clase sale del catálogo, en el idioma activo.
+    'spellClasses': [
+      for (final id in SpellDraft.classIds)
+        {'id': id, 'label': repo.characterClass(id)?.name ?? id},
+    ],
+    'spellComponents': [
+      for (final e in _spellComponentLabels.entries)
         {'id': e.key, 'label': localized(e.value.$1, e.value.$2)},
     ],
   });
@@ -1592,6 +1648,9 @@ void main() {
   motor['itemWithRarity'] = itemWithRarity.toJS;
   motor['itemWithBaseKind'] = itemWithBaseKind.toJS;
   motor['itemBaseOptions'] = itemBaseOptions.toJS;
+  motor['spellForm'] = spellForm.toJS;
+  motor['spellDraft'] = spellDraft.toJS;
+  motor['spellNew'] = spellNew.toJS;
   motor['homebrewFormOptions'] = homebrewFormOptions.toJS;
   motor['effectKinds'] = effectKinds.toJS;
   motor['effectBuild'] = effectBuild.toJS;

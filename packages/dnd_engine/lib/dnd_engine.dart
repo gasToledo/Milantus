@@ -61,6 +61,7 @@ export 'src/engine/background_draft.dart';
 export 'src/engine/weapon_draft.dart';
 export 'src/engine/armor_draft.dart';
 export 'src/engine/item_draft.dart';
+export 'src/engine/spell_draft.dart';
 export 'src/engine/npc_edits.dart';
 export 'src/engine/npc_stats.dart';
 export 'src/engine/npc_import_check.dart';

@@ -44,8 +44,8 @@ interface Own {
  *
  * Desde acá se **importa y se exporta** todo el homebrew (en la portada), se
  * **borra** cualquier entrada propia (en su ficha) y se **crean, editan y
- * duplican criaturas, dotes, especies, trasfondos, armas, armaduras y objetos**.
- * Crear y editar conjuros sigue en Flutter: el formulario llega con 7d4.
+ * duplican las ocho categorías**: criaturas, dotes, especies, trasfondos, armas,
+ * armaduras, objetos y conjuros.
  *
  * ponytail: Flutter además lista las entradas inválidas que no pudo cargar
  * (`loadIssues`) para borrarlas; `fetchHomebrew` las descarta al leer y esta
@@ -106,17 +106,10 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
     return <CreatureList creatures={own.creatures} catalog={catalog.data} headerWith={headerWith} />;
   }
   if (category !== null) {
-    // Dotes, especies, trasfondos, armas, armaduras y objetos se crean y se
-    // duplican desde acá; los conjuros, todavía en la aplicación principal (7d4).
+    // Toda categoría con lista se crea, se edita y se duplica desde acá.
     // «Objetos mágicos» y «Equipo» son dos categorías del Códice pero un solo
     // editor: `items`.
-    const editable =
-      category === 'magicItems' || category === 'gear'
-        ? ('items' as const)
-        : category === 'feats' || category === 'races' || category === 'backgrounds' || category === 'weapons' || category === 'armor'
-          ? category
-          : null;
-    const isEditable = editable !== null;
+    const editable = category === 'magicItems' || category === 'gear' ? ('items' as const) : category;
     const labels = {
       feats: { create: t.hbNewFeat, action: 'homebrew-new-feat', empty: t.hbFeatEmpty },
       races: { create: t.hbNewRace, action: 'homebrew-new-race', empty: t.hbRaceEmpty },
@@ -124,28 +117,25 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
       weapons: { create: t.hbNewWeapon, action: 'homebrew-new-weapon', empty: t.hbWeaponEmpty },
       armor: { create: t.hbNewArmor, action: 'homebrew-new-armor', empty: t.hbArmorEmpty },
       items: { create: t.hbNewItem, action: 'homebrew-new-item', empty: t.hbItemEmpty },
+      spells: { create: t.hbNewSpell, action: 'homebrew-new-spell', empty: t.hbSpellEmpty },
     };
     const duplicate = (
       <Button tone="secondary" icon={Copy} onClick={() => setPicking(true)} data-action="homebrew-duplicate-catalog">
         {t.hbDuplicateFromCatalog}
       </Button>
     );
-    const create = editable && (
+    const create = (
       <ButtonLink internal icon={Plus} href={dmHomebrewNewHref(editable)} data-action={labels[editable].action}>
         {labels[editable].create}
       </ButtonLink>
     );
-    const categoryHeader = isEditable ? (
-      headerWith(
-        <>
-          {duplicate}
-          {create}
-        </>,
-      )
-    ) : (
-      header
+    const categoryHeader = headerWith(
+      <>
+        {duplicate}
+        {create}
+      </>,
     );
-    const picker = editable && picking && (
+    const picker = picking && (
       <DuplicateFromCatalogDialog
         category={editable}
         catalog={catalog.data}
@@ -164,20 +154,16 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
           <BackToHome />
           {categoryHeader}
           {picker}
-          {editable ? (
-            <AppEmptyState
-              kind="empty"
-              message={labels[editable].empty}
-              actions={
-                <>
-                  {create}
-                  {duplicate}
-                </>
-              }
-            />
-          ) : (
-            <AppEmptyState kind="empty" message={t.dmHomebrewEmptyIn(t.codexCategories[category])} hint={t.dmHomebrewCreatedInMain} />
-          )}
+          <AppEmptyState
+            kind="empty"
+            message={labels[editable].empty}
+            actions={
+              <>
+                {create}
+                {duplicate}
+              </>
+            }
+          />
         </div>
       );
     }
@@ -193,27 +179,22 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
           header={categoryHeader}
           detailActions={(entry) => (
             // «Editar», «Duplicar» y «Borrar», en el mismo orden y forma que el
-            // perfil de una criatura. Los conjuros suman los suyos con su
-            // formulario (7d4).
+            // perfil de una criatura.
             <>
-              {editable && (
-                <>
-                  <ButtonLink internal tone="secondary" icon={Pencil} href={dmHomebrewEditHref(editable, entry.id)} data-action="homebrew-edit">
-                    {t.commonEdit}
-                  </ButtonLink>
-                  <Tooltip content={t.hbDuplicateTooltip}>
-                    <button
-                      type="button"
-                      aria-label={t.hbDuplicateTitle(entry.name)}
-                      data-action="homebrew-duplicate"
-                      onClick={() => navigate(dmHomebrewNewHref(editable, entry.id))}
-                      className="inline-flex size-9 items-center justify-center rounded-[var(--radius-nav)] border border-hairline text-on-surface hover:bg-plaque"
-                    >
-                      <Copy size={16} aria-hidden="true" />
-                    </button>
-                  </Tooltip>
-                </>
-              )}
+              <ButtonLink internal tone="secondary" icon={Pencil} href={dmHomebrewEditHref(editable, entry.id)} data-action="homebrew-edit">
+                {t.commonEdit}
+              </ButtonLink>
+              <Tooltip content={t.hbDuplicateTooltip}>
+                <button
+                  type="button"
+                  aria-label={t.hbDuplicateTitle(entry.name)}
+                  data-action="homebrew-duplicate"
+                  onClick={() => navigate(dmHomebrewNewHref(editable, entry.id))}
+                  className="inline-flex size-9 items-center justify-center rounded-[var(--radius-nav)] border border-hairline text-on-surface hover:bg-plaque"
+                >
+                  <Copy size={16} aria-hidden="true" />
+                </button>
+              </Tooltip>
               <Tooltip content={t.cardDelete}>
                 <button
                   type="button"

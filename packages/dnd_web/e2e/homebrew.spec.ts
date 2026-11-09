@@ -169,3 +169,26 @@ test('el DM crea un objeto mágico con bonificador a la CA, lo lee en «Al equip
   const { content } = await api<{ content: { items: { name: string }[] } }>(page.request, '/api/homebrew', TOKEN_TRANSFERENCIA);
   expect(content.items.map((i) => i.name)).not.toContain(nombre);
 });
+
+test('el DM crea un conjuro con componente material, lo lee en el Códice y lo borra', async ({ context, page, baseURL }) => {
+  const nombre = `Égida de escarcha ${Date.now().toString(36)}`;
+  await context.addCookies([{ name: 'dnd_session', value: TOKEN_TRANSFERENCIA, url: baseURL! }]);
+  await page.goto('/v2/dm/homebrew/conjuros');
+  await page.getByRole('link', { name: t.hbNewSpell, exact: true }).first().click();
+
+  await page.locator('[data-field="spell-name"]').fill(nombre);
+  await page.getByRole('button', { name: 'M · Material', exact: true }).click();
+  await page.locator('[data-field="spell-material"]').fill('un copo de nieve');
+  await page.locator('[data-action="spell-save"]').click();
+
+  await expect(page.getByText(t.hbSaved(nombre), { exact: true }).first()).toBeVisible();
+  // El detalle es la ficha del Códice: la línea de componentes lleva el material.
+  await expect(page.locator('[data-field="codex-detail"]').getByText('V, S, M (un copo de nieve)').first()).toBeVisible();
+
+  await page.getByRole('button', { name: t.hbDeleteTooltip(nombre), exact: true }).click();
+  const borrar = page.getByRole('dialog', { name: t.hbDeleteTitle(t.hbDeleteKinds.spells, nombre) });
+  await borrar.getByRole('button', { name: t.cardDelete, exact: true }).click();
+  await expect(page.getByText(t.hbDeleted(nombre), { exact: true }).first()).toBeVisible();
+  const { content } = await api<{ content: { spells: { name: string }[] } }>(page.request, '/api/homebrew', TOKEN_TRANSFERENCIA);
+  expect(content.spells.map((s) => s.name)).not.toContain(nombre);
+});

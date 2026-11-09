@@ -1,4 +1,4 @@
-import type { AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, CreatureForm, EffectBuild, EffectKindInfo, EffectParts, FeatForm, RaceForm, BackgroundForm, WeaponForm, ArmorForm, ArmorAcExample, ItemForm, HomebrewFormOptions, CreatureFormOptions, EncounterDetails, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
+import type { AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, CreatureForm, EffectBuild, EffectKindInfo, EffectParts, FeatForm, RaceForm, BackgroundForm, WeaponForm, ArmorForm, ArmorAcExample, ItemForm, SpellForm, HomebrewFormOptions, CreatureFormOptions, EncounterDetails, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
 // Lo genera `npm run build:engine` (o la etapa `engine-js` del Dockerfile) y
 // no se versiona. Es un script de dart2js, no un módulo: al cargarse deja
 // `globalThis.dndEngine`, y de ahí lo toma este archivo.
@@ -62,6 +62,9 @@ interface DartEngine {
   itemWithRarity(formJson: string, rarity: string): string;
   itemWithBaseKind(formJson: string, kind: string): string;
   itemBaseOptions(kind: string, catalogJson: string): string;
+  spellForm(spellJson: string): string;
+  spellDraft(spellJson: string, formJson: string): string;
+  spellNew(): string;
   homebrewFormOptions(catalogJson: string): string;
   effectKinds(catalogJson: string): string;
   effectBuild(kindId: string, valuesJson: string): string;
@@ -998,6 +1001,24 @@ export function itemDraft(item: JsonObject, form: ItemForm): { item: JsonObject;
 /** La plantilla de «Nuevo objeto». */
 export function itemNew(): JsonObject {
   return JSON.parse(engine().itemNew()) as JsonObject;
+}
+
+/** Un conjuro como formulario de texto (`SpellDraft.formOf`). */
+export function spellForm(spell: JsonObject): SpellForm {
+  return JSON.parse(engine().spellForm(JSON.stringify(spell))) as SpellForm;
+}
+
+/** El conjuro armado con un formulario y sus errores por campo. */
+export function spellDraft(spell: JsonObject, form: SpellForm): { spell: JsonObject; errors: Record<string, string> } {
+  return JSON.parse(engine().spellDraft(JSON.stringify(spell), JSON.stringify(form))) as {
+    spell: JsonObject;
+    errors: Record<string, string>;
+  };
+}
+
+/** La plantilla de «Nuevo conjuro». */
+export function spellNew(): JsonObject {
+  return JSON.parse(engine().spellNew()) as JsonObject;
 }
 
 /** El formulario con otra rareza: sin rareza, sin sintonización (`ItemDraft.withRarity`). */

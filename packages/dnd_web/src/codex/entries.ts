@@ -225,6 +225,11 @@ export function itemEntry(item: JsonObject, catalog: Catalog, t: Texts, lang: La
   return typeof item.rarity === 'string' ? ctx.magicItem(item) : ctx.gear(item);
 }
 
+/** La ficha del Códice de un solo conjuro: la vista previa del formulario. */
+export function spellEntry(spell: JsonObject, catalog: Catalog, t: Texts, lang: Lang): CodexEntry {
+  return new Ctx(catalog, t, lang).spell(spell);
+}
+
 class Ctx {
   private readonly pounds: Intl.NumberFormat;
   private readonly coinLabels: Record<string, string>;
