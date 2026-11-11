@@ -6,6 +6,7 @@ import { useLang, useTexts } from '../i18n/context';
 import { AppDialog } from './AppDialog';
 import { cx } from './cx';
 import { showNotice } from './notices';
+import { recentErrors } from './recentErrors';
 
 /** Desde qué pantalla se abrió el diálogo. Viaja con el mensaje por su nombre:
  *  es un dato para quien lee el correo, no texto de la interfaz. */
@@ -65,6 +66,9 @@ export function FeedbackDialog({
           // Para quien lee el correo: desde qué cliente llegó.
           client: 'v2',
           ...(errorDetail ? { errorDetail } : {}),
+          // Un reporte hecho desde el menú igual trae lo último que falló.
+          // El contexto es solo texto (`Record<string, string>`), por eso JSON.
+          ...(kind === 'bug' && recentErrors().length > 0 ? { recentErrors: JSON.stringify(recentErrors()) } : {}),
         },
       });
       showNotice(t.feedbackSent);

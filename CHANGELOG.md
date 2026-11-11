@@ -1347,7 +1347,9 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
-- Sin cambios.
+- En la versión nueva, un error al dibujar una pantalla ya no la deja en
+  blanco: muestra el aviso con «Reintentar» y «Reportar este error», y el menú
+  sigue funcionando.
 
 ### Eliminado
 

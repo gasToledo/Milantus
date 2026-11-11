@@ -1275,6 +1275,15 @@ Para que nadie lo dé por hecho:
 - Control de versión en el servidor para las escrituras (rechazar una copia
   vieja con 409): hoy gana el último que guarda, como en Flutter.
 - Enlaces desde Flutter hacia `/v2` o redirección automática por `webV2`.
+- Envío automático de errores del cliente. Hoy `ErrorBoundary` y los
+  listeners de `src/ui/recentErrors.ts` solo muestran la pantalla de error y
+  guardan los últimos tres en memoria; un error llega al equipo únicamente si
+  alguien lo reporta. Se decidió hacerlo **junto con la redirección de `/` a
+  `/v2`**, porque hasta entonces Flutter es el respaldo y quien tropieza puede
+  volver a él. Entonces faltan: un `POST /api/client-errors` propio (log del
+  contenedor, límite por usuario, deduplicación por firma, solo ids, nunca la
+  ficha) y servir los source maps, que hoy no se sirven y dejan las trazas
+  ilegibles.
 - Tests de componentes y chequeo de literales sueltos en `dnd_web`.
 - Un criterio medido de «paridad visual» con Flutter: hoy es la comparación
   manual.

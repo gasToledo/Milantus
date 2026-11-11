@@ -22,6 +22,7 @@ import { ThemeProvider, useTheme } from './theme/theme';
 import { ButtonLink } from './ui/Button';
 import { PendingEvents } from './events/PendingEvents';
 import { AppNotices } from './ui/notices';
+import { ErrorBoundary } from './ui/ErrorBoundary';
 import { ToastProvider, ToastViewport, TooltipProvider } from './ui/primitives';
 import { Shell } from './ui/Shell';
 import { AppBusyLabel, AppErrorView, Notice } from './ui/status';
@@ -41,7 +42,10 @@ export function App() {
       <ThemeProvider>
         <LangProvider lang={LANG}>
           <TooltipProvider delayDuration={400}>
-            <Screen />
+            {/* Un fallo de los providers mismos queda sin cubrir: son pocos y estables. */}
+            <ErrorBoundary reload>
+              <Screen />
+            </ErrorBoundary>
           </TooltipProvider>
         </LangProvider>
       </ThemeProvider>
@@ -102,13 +106,17 @@ function Screen() {
 function Enabled({ account }: { account: Account }) {
   const themeMode = useRosterSettings().data?.themeMode;
   const { adoptAccountMode } = useTheme();
+  const { pathname } = useRoute();
   useEffect(() => {
     if (themeMode !== undefined) adoptAccountMode(themeMode);
   }, [themeMode, adoptAccountMode]);
 
   return (
     <ToastProvider>
-      <Routes account={account} />
+      {/* `key` = la ruta: navegar a otra pantalla limpia el error solo. */}
+      <ErrorBoundary key={pathname}>
+        <Routes account={account} />
+      </ErrorBoundary>
       <PendingEvents />
       <AppNotices />
       <ToastViewport />

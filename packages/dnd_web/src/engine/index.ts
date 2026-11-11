@@ -90,10 +90,61 @@ interface DartEngine {
   charactersUsing(contentId: string, charactersJson: string): string;
 }
 
+/**
+ * Quién es el personaje de un argumento, para un reporte: **solo** especie y
+ * clases con nivel, nunca la ficha entera (lleva notas y datos de la mesa).
+ * Los argumentos del motor son texto JSON; si no parsea o no es un personaje,
+ * no hay resumen, y esto nunca lanza: corre mientras ya se está informando
+ * otro error.
+ */
+function characterSummary(args: unknown[]): string {
+  for (const arg of args) {
+    if (typeof arg !== 'string' || !arg.startsWith('{')) continue;
+    try {
+      const c = JSON.parse(arg) as { raceId?: unknown; classId?: unknown; level?: unknown; classHistory?: unknown };
+      if (typeof c.raceId !== 'string' || typeof c.classId !== 'string') continue;
+      // `classHistory` tiene una entrada por nivel: contarlas da el nivel de
+      // cada clase de una multiclase.
+      const levels = new Map<string, number>();
+      if (Array.isArray(c.classHistory)) {
+        for (const id of c.classHistory) levels.set(String(id), (levels.get(String(id)) ?? 0) + 1);
+      }
+      if (levels.size === 0) levels.set(c.classId, typeof c.level === 'number' ? c.level : 1);
+      return `species=${c.raceId} classes=${[...levels].map(([id, n]) => `${id}:${n}`).join(',')}`;
+    } catch {
+      /* no era JSON: sigue con el próximo argumento */
+    }
+  }
+  return '';
+}
+
+/** `engine()` con cada método envuelto: una excepción sale con el nombre del
+ *  método y el personaje, no con un `Bad state` suelto. Se relanza igual. */
+function traced(e: DartEngine): DartEngine {
+  return new Proxy(e, {
+    get(target, prop, receiver) {
+      const value: unknown = Reflect.get(target, prop, receiver);
+      if (typeof value !== 'function') return value;
+      return (...args: unknown[]) => {
+        try {
+          return value.apply(target, args);
+        } catch (cause) {
+          const original = cause instanceof Error ? cause.message : String(cause);
+          const who = characterSummary(args);
+          throw new Error(`${String(prop)}: ${original}${who ? ` (${who})` : ''}`, { cause });
+        }
+      };
+    },
+  });
+}
+
+let tracedEngine: { raw: DartEngine; proxy: DartEngine } | undefined;
+
 function engine(): DartEngine {
   const e = (globalThis as { dndEngine?: DartEngine }).dndEngine;
   if (!e) throw new Error('El motor (dart2js) no se inicializó.');
-  return e;
+  if (tracedEngine?.raw !== e) tracedEngine = { raw: e, proxy: traced(e) };
+  return tracedEngine.proxy;
 }
 
 // El motor guarda el último catálogo que vio y lo reconoce por su texto; si
