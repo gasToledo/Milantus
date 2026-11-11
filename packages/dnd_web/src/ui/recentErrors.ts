@@ -4,6 +4,8 @@
 // tipo «Un error», así uno hecho desde el menú igual trae lo último que falló.
 // Es el gancho que usará el envío automático (ver `migracion-react.md`).
 
+import { reportError } from './reportError';
+
 export interface RecentError {
   message: string;
   /** Primera línea de la traza, si hay. */
@@ -16,6 +18,7 @@ const recent: RecentError[] = [];
 function push(message: string, stack?: string) {
   const trace = stack?.split('\n').find((l, i) => i > 0 && l.trim() !== '')?.trim();
   recent.push({ message, ...(trace ? { trace } : {}) });
+  reportError({ message, stack });
   if (recent.length > MAX) recent.shift();
 }
 

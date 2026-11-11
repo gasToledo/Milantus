@@ -15,6 +15,8 @@ import { Select, Switch } from '../ui/primitives';
 import { AppBusyLabel, AppErrorView } from '../ui/status';
 import { resetTutorials } from '../ui/tutorials';
 
+const LEGACY_COOKIE = 'milantus_v1';
+
 const THEME_MODES = ['dark', 'light', 'system'] as const;
 
 export function SettingsPage() {
@@ -45,6 +47,7 @@ function BrowserCard() {
   const lang = useLang();
   const { browserMode, setMode } = useTheme();
   const [reset, setReset] = useState(false);
+  const [legacy, setLegacy] = useState(() => document.cookie.split(';').some((c) => c.trim() === `${LEGACY_COOKIE}=1`));
   return (
     <Card id="settings-browser" title={t.settingsBrowserTitle} icon={Palette}>
       <div className="flex flex-col items-start gap-3">
@@ -84,6 +87,28 @@ function BrowserCard() {
           <p role="status" className="text-[13px] text-verdant">
             {t.settingsTutorialsResetDone}
           </p>
+        )}
+        {/* La cookie la lee el servidor al servir `/`: por eso no es localStorage. */}
+        <Switch
+          id="settings-legacy-version"
+          label={t.settingsLegacyVersion}
+          checked={legacy}
+          onCheckedChange={(on) => {
+            document.cookie = on
+              ? `${LEGACY_COOKIE}=1; Path=/; SameSite=Lax; Max-Age=31536000`
+              : `${LEGACY_COOKIE}=; Path=/; SameSite=Lax; Max-Age=0`;
+            setLegacy(on);
+          }}
+        />
+        {legacy && (
+          <div role="status" className="flex flex-col gap-2.5" data-field="legacy-version">
+            <p className="text-[13px] leading-normal text-text-muted">{t.settingsLegacyNotice}</p>
+            <div>
+              <Button tone="secondary" onClick={() => window.location.assign('/')}>
+                {t.settingsLegacyGo}
+              </Button>
+            </div>
+          </div>
         )}
       </div>
     </Card>

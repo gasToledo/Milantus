@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { useTexts } from '../i18n/context';
+import { reportError } from './reportError';
 import { Shell } from './Shell';
 import { AppErrorView } from './status';
 
@@ -45,6 +46,7 @@ export class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, info: ErrorInfo) {
     this.setState({ componentStack: info.componentStack ?? undefined });
     console.error(error, info.componentStack);
+    reportError({ message: error.message, stack: error.stack, componentStack: info.componentStack ?? undefined });
   }
 
   render() {
