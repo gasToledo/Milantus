@@ -113,8 +113,8 @@ function Enabled({ account }: { account: Account }) {
 
   return (
     <ToastProvider>
-      {/* `key` = la ruta: navegar a otra pantalla limpia el error solo. */}
-      <ErrorBoundary key={pathname}>
+      {/* `resetKey` y no `key`: navegar limpia el error sin volver a montar las rutas. */}
+      <ErrorBoundary resetKey={pathname}>
         <Routes account={account} />
       </ErrorBoundary>
       <PendingEvents />

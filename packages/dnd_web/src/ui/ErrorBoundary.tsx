@@ -18,19 +18,28 @@ function Fallback({ error, componentStack, onRetry }: { error: Error; componentS
   return <AppErrorView as="h1" title={t.errorScreenTitle} message={t.errorScreenBody} detail={detail} onRetry={onRetry} />;
 }
 
+type Props = { children: ReactNode; reload?: boolean; resetKey?: string };
+type State = { error: Error | null; componentStack?: string; resetKey?: string };
+
 /**
  * [reload]: «Reintentar» recarga la página (el de la raíz, que no tiene una
- * vista que volver a montar). Si no, vuelve a montar los hijos; el de la ruta
- * lleva `key` = la ruta, así que navegar a otra pantalla también lo limpia.
+ * vista que volver a montar). Si no, vuelve a montar los hijos.
+ *
+ * [resetKey]: si cambia, el error se limpia. El de la ruta le pasa la ruta
+ * actual: navegar a otra pantalla lo limpia **sin** usar `key`, porque un `key`
+ * desmontaría todas las rutas a cada navegación y perdería el estado que
+ * sobrevive entre las del mismo personaje (el aviso con «Deshacer» de la
+ * subida de nivel, la ficha entre pestañas).
  */
-export class ErrorBoundary extends Component<
-  { children: ReactNode; reload?: boolean },
-  { error: Error | null; componentStack?: string }
-> {
-  state: { error: Error | null; componentStack?: string } = { error: null };
+export class ErrorBoundary extends Component<Props, State> {
+  state: State = { error: null, resetKey: this.props.resetKey };
 
   static getDerivedStateFromError(error: Error) {
     return { error };
+  }
+
+  static getDerivedStateFromProps(props: Props, state: State): Partial<State> | null {
+    return props.resetKey !== state.resetKey ? { error: null, resetKey: props.resetKey } : null;
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
