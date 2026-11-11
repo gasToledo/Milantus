@@ -1,6 +1,7 @@
-import { useEffect, useState, type MutableRefObject, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type MutableRefObject, type ReactNode } from 'react';
 import { Info } from 'lucide-react';
-import { useTexts } from '../../i18n/context';
+import { homebrewRules, type HomebrewRules } from '../../engine';
+import { useLang, useTexts } from '../../i18n/context';
 import { navigateBack } from '../../router';
 import { AppDialog } from '../../ui/AppDialog';
 import { Button } from '../../ui/Button';
@@ -25,6 +26,44 @@ export function EntryPreview({ subtitle, name, detail, note }: { subtitle: strin
   );
 }
 
+/** Lo que se explica al tocar un campo (`_Explained` de Flutter): el rótulo
+ *  chico, el valor tocado, la regla y, si hay, lo que vale para todo el grupo. */
+export type Explained = { kicker: string; title: string; text: string; note?: string | null };
+
+/** Los textos de regla del motor, en el idioma activo. */
+export function useHomebrewRules(): HomebrewRules {
+  const lang = useLang();
+  return useMemo(() => homebrewRules(), [lang]);
+}
+
+/** La placa de una explicación: hundida, sin borde, con el kicker en oro. */
+function ExplainPlaque({ explained, large }: { explained: Explained; large?: boolean }) {
+  return (
+    <div className="plaque flex flex-col gap-1.5 rounded-[var(--radius-card)] px-4 py-3.5">
+      <span className="text-[12px] text-gold">{explained.kicker}</span>
+      <span className={cx('font-display text-on-surface', large ? 'text-[20px]' : 'text-[18px]')}>{explained.title}</span>
+      <p className="text-[13.5px] leading-[1.55] text-on-surface">{explained.text}</p>
+      {explained.note && <p className="text-[12.5px] leading-[1.5] text-text-muted">{explained.note}</p>}
+    </div>
+  );
+}
+
+/**
+ * La explicación debajo de la sección del campo tocado (`explainHere` de
+ * Flutter), para donde la vista previa vive en un diálogo: se oculta desde
+ * `lg` con CSS, que es donde el armazón la muestra al costado. [always] la deja
+ * a todos los anchos (`CreatureForm`, que no usa el armazón). Sin
+ * [explanation] no dibuja nada.
+ */
+export function ExplainHere({ explanation, always, className }: { explanation: Explained | null; always?: boolean; className?: string }) {
+  if (!explanation) return null;
+  return (
+    <div aria-live="polite" className={cx(!always && 'lg:hidden', className)}>
+      <ExplainPlaque explained={explanation} />
+    </div>
+  );
+}
+
 /**
  * El armazón de los formularios de una entrada propia del Homebrew con vista
  * previa (las ocho categorías menos las criaturas): cabecera, columna de secciones, vista
@@ -36,9 +75,10 @@ export function EntryPreview({ subtitle, name, detail, note }: { subtitle: strin
  * (`dirty`), qué mensaje mostrar y qué hacer al guardar. `CreatureForm` no lo
  * usa: lleva pestañas y su vista previa es otra.
  *
- * ponytail: Flutter abre un panel de reglas al tocar un campo (qué significa
- * ese número en el juego); en React todavía no existe y sirve a todos los
- * formularios, así que pide su propio diseño. Cuando llegue, se suma acá.
+ * El panel de reglas (qué significa lo último que se tocó) va en el `aside`,
+ * debajo de la vista previa; donde la vista previa vive en un diálogo, cada
+ * formulario pone un [ExplainHere] bajo la sección tocada. Lo que se explica lo
+ * arma el formulario con los textos del motor (`useHomebrewRules`).
  */
 export function HomebrewFormShell({
   title,
@@ -53,6 +93,7 @@ export function HomebrewFormShell({
   onSave,
   previewLabel,
   preview,
+  explanation,
   children,
 }: {
   title: string;
@@ -74,6 +115,8 @@ export function HomebrewFormShell({
   /** El rótulo de la vista previa, que además titula su diálogo. */
   previewLabel: string;
   preview: ReactNode;
+  /** Lo que explica el campo tocado, o `null` mientras no se tocó nada. */
+  explanation: Explained | null;
   children: ReactNode;
 }) {
   const t = useTexts();
@@ -118,6 +161,7 @@ export function HomebrewFormShell({
         <aside aria-label={previewLabel} className={cx(WIZARD_ASIDE, 'hidden lg:flex')}>
           <Eyebrow>{previewLabel}</Eyebrow>
           {preview}
+          <div aria-live="polite">{explanation && <ExplainPlaque explained={explanation} large />}</div>
         </aside>
       </div>
       <AppDialog

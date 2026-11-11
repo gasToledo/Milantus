@@ -1303,6 +1303,24 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
+## [0.51.0+1] - 2026-11-11
+
+### Nuevo
+
+- Los formularios del Homebrew (especie, trasfondo, dote, conjuro, arma,
+  armadura, objeto y criatura) explican lo que se toca: al elegir una categoría,
+  marcar una propiedad o entrar a un número con regla, aparece qué significa en
+  el juego. Va al costado, debajo de la vista previa, y en pantalla angosta
+  debajo de la sección tocada. Los textos son los del motor, en español e inglés.
+
+### Modificado
+
+- Sin cambios.
+
+### Eliminado
+
+- Sin cambios.
+
 ## [Unreleased]
 
 ### Nuevo

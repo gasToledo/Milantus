@@ -3,7 +3,7 @@ import { weaponEntry } from '../../codex/entries';
 import { homebrewFormOptions, weaponDraft, weaponForm, type Catalog, type JsonObject, type WeaponForm as Form } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
 import { Select } from '../../ui/primitives';
-import { EntryPreview, HomebrewFormShell } from './HomebrewFormShell';
+import { EntryPreview, ExplainHere, HomebrewFormShell, useHomebrewRules, type Explained } from './HomebrewFormShell';
 import { diceError, EconomySection, FormSection, numberError, PillGroup, TextAreaField, TextField } from './homebrewFields';
 
 /** Radix no admite un valor vacío en un `Select`: «Sin maestría» viaja con este. */
@@ -49,6 +49,9 @@ export function WeaponForm({
   const [tried, setTried] = useState(false);
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState(false);
+  // Lo último que se tocó: la clave que entiende `explain`. Nada hasta el primer toque.
+  const [focus, setFocus] = useState<string | null>(null);
+  const rules = useHomebrewRules();
 
   const draft = useMemo(() => weaponDraft(initial, form), [initial, form]);
   const options = useMemo(() => homebrewFormOptions(catalog), [catalog, lang]);
@@ -98,6 +101,34 @@ export function WeaponForm({
     <EntryPreview subtitle={[entry.subtitle, t.sources.homebrew].filter(Boolean).join(' · ')} name={draft.weapon.name as string} detail={detail} />
   );
 
+  // Qué significa lo tocado (`explain` de Flutter): los textos son del motor.
+  const explain = (key: string): Explained | null => {
+    const label = (list: { id: string; label: string }[], id: string) => list.find((o) => o.id === id)?.label ?? id;
+    switch (key) {
+      case 'category': {
+        const rule = rules.weaponCategory[form.category];
+        return rule ? { kicker: t.codexCategory, title: label(options.weaponCategories, form.category), text: rule } : null;
+      }
+      case 'type': {
+        const type = rules.damageTypes[form.damageType];
+        return type ? { kicker: t.hbDamageType, title: type.label, text: type.description, note: rules.damageTypeRule } : null;
+      }
+      case 'mastery': {
+        if (form.mastery === '') return { kicker: t.codexMastery, title: t.hbNoMastery, text: t.hbxNoMasteryRule };
+        const mastery = rules.weaponMasteries[form.mastery];
+        return mastery ? { kicker: t.codexMastery, title: mastery.name, text: mastery.description, note: rules.weaponMasteryRule } : null;
+      }
+      case 'range': {
+        const normal = form.rangeNormal.trim();
+        return { kicker: t.codexRange, title: normal === '' ? t.hbxNoRange : t.hbxRangeFeet(normal, form.rangeLong.trim()), text: rules.weaponRange };
+      }
+    }
+    const property = rules.weaponProperties[key.slice('prop:'.length)];
+    return property ? { kicker: t.hbxProperty, title: property.name, text: property.description } : null;
+  };
+  const explanation = focus === null ? null : explain(focus);
+  const here = (test: (f: string) => boolean) => (focus !== null && test(focus) ? explanation : null);
+
   const needsRange = form.properties.includes('ranged') || form.properties.includes('thrown');
   const showVersatile = form.properties.includes('versatile') || form.versatileDice.trim() !== '';
   const showRange = needsRange || form.rangeNormal.trim() !== '' || form.rangeLong.trim() !== '';
@@ -116,6 +147,7 @@ export function WeaponForm({
       onSave={() => void save()}
       previewLabel={t.hbFeatPreview}
       preview={preview}
+      explanation={explanation}
     >
       <section className="card grid gap-3.5 p-4 sm:grid-cols-[3fr_2fr_3fr]">
         <TextField
@@ -129,17 +161,25 @@ export function WeaponForm({
         />
         <div className="flex min-w-0 flex-col gap-1.5">
           <span className="text-[12px] text-text-muted">{t.codexCategory}</span>
-          <Select labelAbove className="w-full justify-between" label={t.codexCategory} value={form.category} onValueChange={(category) => set({ category })} options={categories} />
+          <Select labelAbove className="w-full justify-between" label={t.codexCategory} value={form.category} onValueChange={(category) => { set({ category }); setFocus('category'); }} onOpen={() => setFocus('category')} options={categories} />
         </div>
         <TextField numeric label={t.hbDamageDie} dataField="weapon-damage-dice" value={form.damageDice} onChange={(damageDice) => set({ damageDice })} error={diceError(err.damageDice, t)} />
         <div className="flex min-w-0 flex-col gap-1.5">
           <span className="text-[12px] text-text-muted">{t.hbDamageType}</span>
-          <Select labelAbove className="w-full justify-between" label={t.hbDamageType} value={form.damageType} onValueChange={(damageType) => set({ damageType })} options={damageTypes} />
+          <Select labelAbove className="w-full justify-between" label={t.hbDamageType} value={form.damageType} onValueChange={(damageType) => { set({ damageType }); setFocus('type'); }} onOpen={() => setFocus('type')} options={damageTypes} />
         </div>
+        <ExplainHere className="sm:col-span-3" explanation={here((f) => f === 'category' || f === 'type')} />
       </section>
 
       <FormSection title={t.codexProperties}>
-        <PillGroup hideLabel label={t.codexProperties} options={options.weaponProperties} selected={form.properties} onChange={(properties) => set({ properties })} />
+        <PillGroup
+          hideLabel
+          label={t.codexProperties}
+          options={options.weaponProperties}
+          selected={form.properties}
+          onChange={(properties) => set({ properties })}
+          onTouch={(id) => setFocus(`prop:${id}`)}
+        />
         {(showVersatile || showRange) && (
           <div className="grid gap-3.5 sm:grid-cols-3">
             {showVersatile && (
@@ -147,19 +187,21 @@ export function WeaponForm({
             )}
             {showRange && (
               <>
-                <TextField numeric label={t.hbRangeNormal} dataField="weapon-range-normal" value={form.rangeNormal} onChange={(rangeNormal) => set({ rangeNormal })} error={numberError(err.rangeNormal, t)} />
+                <TextField numeric label={t.hbRangeNormal} dataField="weapon-range-normal" value={form.rangeNormal} onChange={(rangeNormal) => set({ rangeNormal })} onFocus={() => setFocus('range')} error={numberError(err.rangeNormal, t)} />
                 <TextField
                   numeric
                   label={t.hbRangeLong}
                   dataField="weapon-range-long"
                   value={form.rangeLong}
                   onChange={(rangeLong) => set({ rangeLong })}
+                  onFocus={() => setFocus('range')}
                   error={err.rangeLong === 'rangeLongMin' ? t.hbRangeLongMin : numberError(err.rangeLong, t)}
                 />
               </>
             )}
           </div>
         )}
+        <ExplainHere explanation={here((f) => f.startsWith('prop:') || f === 'range')} />
       </FormSection>
 
       <section className="card grid gap-3.5 p-4 sm:grid-cols-[3fr_2fr]">
@@ -171,11 +213,16 @@ export function WeaponForm({
             className="w-full justify-between"
             label={t.codexMastery}
             value={form.mastery === '' ? NONE : form.mastery}
-            onValueChange={(v) => set({ mastery: v === NONE ? '' : v })}
+            onValueChange={(v) => {
+              set({ mastery: v === NONE ? '' : v });
+              setFocus('mastery');
+            }}
+            onOpen={() => setFocus('mastery')}
             options={masteries}
           />
         </div>
         <TextField numeric label={t.hbMagicBonus} value={form.magicBonus} onChange={(magicBonus) => set({ magicBonus })} error={numberError(err.magicBonus, t)} />
+        <ExplainHere className="sm:col-span-2" explanation={here((f) => f === 'mastery')} />
       </section>
 
       <EconomySection weight={form.weight} costCp={form.costCp} errors={err} onChange={set} />

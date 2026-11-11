@@ -6,7 +6,7 @@ import { cx } from '../../ui/cx';
 import { Select } from '../../ui/primitives';
 import { Option } from '../../ui/wizard';
 import { EffectEditor } from './EffectEditor';
-import { EntryPreview, HomebrewFormShell } from './HomebrewFormShell';
+import { EntryPreview, ExplainHere, HomebrewFormShell, useHomebrewRules, type Explained } from './HomebrewFormShell';
 
 /**
  * El formulario de una dote propia (`FeatForm` de Flutter). No sabe de reglas:
@@ -46,6 +46,9 @@ export function FeatForm({
   const [tried, setTried] = useState(false);
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState(false);
+  // Lo último que se tocó: la clave que entiende `explain`. Nada hasta el primer toque.
+  const [focus, setFocus] = useState<string | null>(null);
+  const rules = useHomebrewRules();
 
   const draft = useMemo(() => featDraft(initial, form), [initial, form]);
   // También la lista de efectos: Flutter no detectaba que solo cambiaran ellos.
@@ -77,6 +80,20 @@ export function FeatForm({
     return form.category && !ids.includes(form.category) ? [...ids, form.category] : ids;
   }, [form.category, lang]);
 
+  // Qué significa lo tocado (`explain` de Flutter): los textos son del motor.
+  const explain = (key: string): Explained | null => {
+    if (key === 'category') {
+      const rule = rules.featCategory[form.category];
+      return rule ? { kicker: t.codexCategory, title: catalogLabel('featCategory', form.category), text: rule } : null;
+    }
+    if (key === 'repeatable') {
+      return { kicker: t.hbxRepetition, title: form.repeatable ? t.codexRepeatable : t.hbxOnce, text: rules.featRepeatable };
+    }
+    return null;
+  };
+  const explanation = focus === null ? null : explain(focus);
+  const here = (test: (f: string) => boolean) => (focus !== null && test(focus) ? explanation : null);
+
   // La ficha del Códice, armada con lo que se tipea.
   const entry = useMemo(() => featEntry(draft.feat, catalog, t, lang), [draft.feat, catalog, t, lang]);
   const detail = useMemo(() => entry.detail(), [entry]);
@@ -103,6 +120,7 @@ export function FeatForm({
       onSave={() => void save()}
       previewLabel={t.hbFeatPreview}
       preview={preview}
+      explanation={explanation}
     >
       <section className="card grid gap-3.5 p-4 sm:grid-cols-2">
         <label className="flex min-w-0 flex-col gap-1.5">
@@ -131,10 +149,15 @@ export function FeatForm({
             className="w-full justify-between"
             label={t.codexCategory}
             value={form.category}
-            onValueChange={(v) => set({ category: v })}
+            onValueChange={(v) => {
+              set({ category: v });
+              setFocus('category');
+            }}
+            onOpen={() => setFocus('category')}
             options={categories.map((id) => ({ value: id, label: catalogLabel('featCategory', id) }))}
           />
         </div>
+        <ExplainHere className="sm:col-span-2" explanation={here((f) => f === 'category')} />
       </section>
 
       <section className="card flex flex-col gap-2 p-4">
@@ -158,7 +181,12 @@ export function FeatForm({
 
       <section className="card flex flex-col gap-2.5 p-4">
         <h2 className="font-display text-[16px] text-on-surface">{t.hbPrereqRepeat}</h2>
-        <Option id="repeatable" multi selected={form.repeatable} title={t.hbRepeatSwitch} onClick={() => set({ repeatable: !form.repeatable })} />
+        <Option id="repeatable" multi selected={form.repeatable} title={t.hbRepeatSwitch} onClick={() => {
+            set({ repeatable: !form.repeatable });
+            setFocus('repeatable');
+          }}
+        />
+        <ExplainHere explanation={here((f) => f === 'repeatable')} />
         {/* ponytail: el requisito no se edita, solo se conserva; se suma cuando
             alguien arme una dote general propia con requisito. */}
         {form.hasPrerequisite && <p className="text-[13px] text-on-surface-variant">{t.hbKeepPrereq}</p>}

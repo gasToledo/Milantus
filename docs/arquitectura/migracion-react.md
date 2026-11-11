@@ -1104,8 +1104,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
        dotes (`EDITABLE_HOMEBREW` suma `races` y `backgrounds`). El Códice
        —también el del jugador— suma a la especie el dato «Habilidades» y, sin
        rasgos pasivos, sus efectos uno por línea, y al trasfondo una sección
-       «Rasgos» con sus efectos. Quedan afuera el panel de reglas por campo de
-       Flutter, editar el equipo inicial y el emblema, los linajes y esconder
+       «Rasgos» con sus efectos. Quedan afuera editar el equipo inicial y el emblema, los linajes y esconder
        tipos de efecto. Sin cambios en el servidor ni en Flutter.
      - **7d3 · Armas, armaduras y objetos**, partida en dos:
      - **7d3a · Armas y armaduras** *(existe)*: el motor suma `WeaponDraft` y
@@ -1121,7 +1120,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
        `ArmorForm` sobre `HomebrewFormShell`, con `EconomySection` en
        `homebrewFields`; `EDITABLE_HOMEBREW` suma `weapons` y `armor`. El Códice de
        armas —también el del jugador— suma el dato «Mágica» (`+N`). Quedan afuera
-       el panel de reglas por campo, editar «a dos manos salvo montado» (se
+       editar «a dos manos salvo montado» (se
        conserva) y el precio en monedas (sigue en cobre). Sin cambios en el
        servidor ni en Flutter.
      - **7d3b · Objetos** *(existe; con esto la 7d3 queda cerrada)*: el motor suma
@@ -1138,7 +1137,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
        (Objetos mágicos y Equipo). El Códice de objetos —también el del jugador—
        suma «Al equiparlo» y «Objeto base», y deja de cortar la primera línea de la
        descripción de un objeto propio. Quedan afuera editar cargas, recarga y
-       paquete (se conservan), el panel de reglas por campo y el precio en monedas.
+       paquete (se conservan) y el precio en monedas.
        Sin cambios en el servidor ni en Flutter.
      - **7d4 · Conjuros** *(existe; con esto la 7d queda cerrada)*: el motor suma
        `SpellDraft` (los componentes se guardan como una línea y el motor la separa
@@ -1152,9 +1151,9 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
        `EDITABLE_HOMEBREW`. La vista previa es la ficha del Códice de conjuros, sin
        cambios. Se borra la rama «se crea en la aplicación principal» de
        `HomebrewView` y sus textos: ninguna categoría del Homebrew manda a Flutter.
-       Queda como candidato a un paso propio el **panel de reglas por campo** de
-       Flutter, que ahora sí serviría a los ocho formularios; ninguno de React lo
-       tiene. Sin cambios en el servidor ni en Flutter.
+       El **panel de reglas por campo** de Flutter llegó después a los ocho
+       formularios (ver «Arreglos de front», parte F). Sin cambios en el servidor
+       ni en Flutter.
 
    Opcional, sin equivalente en Flutter y sin diseñar todavía:
    acomodar las tarjetas de Combate y Personaje con un modo de edición, guardado
@@ -1274,8 +1273,6 @@ Para que nadie lo dé por hecho:
 - Control de versión en el servidor para las escrituras (rechazar una copia
   vieja con 409): hoy gana el último que guarda, como en Flutter.
 - Enlaces desde Flutter hacia `/v2` o redirección automática por `webV2`.
-- El panel de reglas por campo de los formularios del Homebrew (existe en
-  Flutter; candidato a un paso propio).
 - Tests de componentes y chequeo de literales sueltos en `dnd_web`.
 - Un criterio medido de «paridad visual» con Flutter: hoy es la comparación
   manual.

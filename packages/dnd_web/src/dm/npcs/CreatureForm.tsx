@@ -12,6 +12,7 @@ import {
   type JsonObject,
 } from '../../engine';
 import { useTexts } from '../../i18n/context';
+import { ExplainHere, useHomebrewRules, type Explained } from '../homebrew/HomebrewFormShell';
 import type { Texts } from '../../i18n/texts';
 import { navigateBack } from '../../router';
 import { signed } from '../../sheet/format';
@@ -114,6 +115,9 @@ export function CreatureForm({
   // Las filas abiertas (varias a la vez) y la recién agregada, que toma el foco.
   const [open, setOpen] = useState<Set<string>>(new Set());
   const [added, setAdded] = useState<string | null>(null);
+  // Lo último que se tocó: la clave que entiende `explain`. Nada hasta el primer toque.
+  const [focus, setFocus] = useState<string | null>(null);
+  const rules = useHomebrewRules();
 
   const draft = useMemo(() => creatureDraft(initial, form), [initial, form]);
   const dirty = JSON.stringify(form) !== JSON.stringify(start);
@@ -206,6 +210,47 @@ export function CreatureForm({
     ...options.types.map((o) => ({ value: o.id, label: o.label })),
   ];
 
+  // Qué significa lo tocado (`explain` de Flutter): los textos son del motor.
+  // Claves: `type`, `size`, `hitDice`, `cr` y, por acción, `action:<índice>:bonus|kind|damageType`.
+  const explain = (key: string): Explained | null => {
+    switch (key) {
+      case 'type': {
+        const type = options.types.find((o) => o.id === form.type);
+        return type ? { kicker: t.blockType, title: type.label, text: rules.creatureType, note: form.type === 'beast' ? rules.creatureBeastNote : null } : null;
+      }
+      case 'size': {
+        const rule = rules.creatureSize[form.size];
+        const size = options.sizes.find((o) => o.id === form.size);
+        return rule && size ? { kicker: t.sizeLabel, title: size.label, text: rule, note: rules.size } : null;
+      }
+      case 'hitDice':
+        return { kicker: t.blockHitDice, title: form.hitDice.trim() || t.hbxNotFilled, text: t.hbxHitDiceRule };
+      case 'cr': {
+        const cr = form.cr.trim();
+        return { kicker: t.hbxChallenge, title: cr === '' || draft.errors.cr ? t.hbxNoCr : t.hbxCrValue(cr), text: rules.creatureCr };
+      }
+    }
+    const [, index, part] = key.split(':');
+    // El foco puede apuntar a una acción que ya se quitó.
+    const action = form.actions[Number(index)];
+    if (!action) return null;
+    switch (part) {
+      case 'bonus':
+        return { kicker: t.hbxAction, title: t.hbxAttackBonus, text: rules.creatureAttackBonus };
+      case 'kind': {
+        const rule = rules.creatureActionKind[action.kind];
+        return rule ? { kicker: t.blockWhenUsed, title: options.kinds.find((k) => k.id === action.kind)?.label ?? action.kind, text: rule } : null;
+      }
+      case 'damageType': {
+        const type = rules.damageTypes[action.damageType];
+        return type ? { kicker: t.blockDamageType, title: type.label, text: type.description, note: rules.damageTypeRule } : null;
+      }
+    }
+    return null;
+  };
+  const explanation = focus === null ? null : explain(focus);
+  const here = (test: (f: string) => boolean) => (focus !== null && test(focus) ? explanation : null);
+
   const toggle = (id: string) =>
     setOpen((o) => {
       const next = new Set(o);
@@ -246,7 +291,7 @@ export function CreatureForm({
     label: string,
     value: string,
     onChange: (v: string) => void,
-    opts: { numeric?: boolean; hint?: string; grow?: string; data?: string; focus?: boolean } = {},
+    opts: { numeric?: boolean; hint?: string; grow?: string; data?: string; focus?: boolean; onFocus?: () => void } = {},
   ) => (
     <label className={cx('flex min-w-0 flex-col gap-1.5', opts.grow)}>
       <span className="text-[12px] text-text-muted">{label}</span>
@@ -254,6 +299,7 @@ export function CreatureForm({
         data-field={opts.data ?? `block-${key}`}
         value={value}
         autoFocus={opts.focus}
+        onFocus={opts.onFocus}
         placeholder={opts.hint}
         inputMode={opts.numeric ? 'numeric' : undefined}
         aria-invalid={errors[key] ? true : undefined}
@@ -312,7 +358,11 @@ export function CreatureForm({
                     className="w-full justify-between"
                     label={t.blockType}
                     value={form.type === '' ? BOOK : form.type}
-                    onValueChange={(v) => set({ type: v === BOOK ? '' : v })}
+                    onValueChange={(v) => {
+                      set({ type: v === BOOK ? '' : v });
+                      setFocus('type');
+                    }}
+                    onOpen={() => setFocus('type')}
                     options={typeOptions}
                   />
                 </div>
@@ -324,7 +374,11 @@ export function CreatureForm({
                       className="w-full justify-between"
                       label={t.sizeLabel}
                       value={form.size}
-                      onValueChange={(v) => set({ size: v })}
+                      onValueChange={(v) => {
+                        set({ size: v });
+                        setFocus('size');
+                      }}
+                      onOpen={() => setFocus('size')}
                       options={options.sizes.map((o) => ({ value: o.id, label: o.label }))}
                     />
                   </div>
@@ -337,9 +391,11 @@ export function CreatureForm({
                 {field('hitDice', t.blockHitDice, form.hitDice, (v) => set({ hitDice: v }), {
                   hint: t.blockHitDiceHint,
                   grow: 'flex-[2_1_130px]',
+                  onFocus: () => setFocus('hitDice'),
                 })}
-                {field('cr', t.creatureCr, form.cr, (v) => set({ cr: v }), { hint: t.blockCrHint, grow: 'flex-[1_1_70px]' })}
+                {field('cr', t.creatureCr, form.cr, (v) => set({ cr: v }), { hint: t.blockCrHint, grow: 'flex-[1_1_70px]', onFocus: () => setFocus('cr') })}
               </div>
+              <ExplainHere always explanation={here((f) => ['type', 'size', 'hitDice', 'cr'].includes(f))} />
               <div className="flex flex-col gap-1.5">
                 <Eyebrow>{t.creatureAbilities}</Eyebrow>
                 <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
@@ -454,7 +510,11 @@ export function CreatureForm({
                             className="w-full justify-between"
                             label={t.blockWhenUsed}
                             value={r.kind}
-                            onValueChange={(v) => setAction(i, { kind: v })}
+                            onValueChange={(v) => {
+                              setAction(i, { kind: v });
+                              setFocus(`action:${i}:kind`);
+                            }}
+                            onOpen={() => setFocus(`action:${i}:kind`)}
                             options={options.kinds.map((k) => ({ value: k.id, label: k.label }))}
                           />
                         </div>
@@ -472,6 +532,7 @@ export function CreatureForm({
                               hint: t.blockAttackHint,
                               data: 'block-action-attack',
                               grow: 'flex-[1_1_140px]',
+                              onFocus: () => setFocus(`action:${i}:bonus`),
                             })}
                             {field(`actions.${i}.reach`, t.blockReach, r.reach, (v) => setAction(i, { reach: v }), {
                               hint: t.blockReachHint,
@@ -492,7 +553,11 @@ export function CreatureForm({
                                 className="w-full justify-between"
                                 label={t.blockDamageType}
                                 value={r.damageType === '' ? NO_DAMAGE : r.damageType}
-                                onValueChange={(v) => setAction(i, { damageType: v === NO_DAMAGE ? '' : v })}
+                                onValueChange={(v) => {
+                                  setAction(i, { damageType: v === NO_DAMAGE ? '' : v });
+                                  setFocus(`action:${i}:damageType`);
+                                }}
+                                onOpen={() => setFocus(`action:${i}:damageType`)}
                                 options={[
                                   { value: NO_DAMAGE, label: t.blockNoDamage },
                                   ...options.damageTypes.map((d) => ({ value: d.id, label: d.label })),
@@ -501,6 +566,7 @@ export function CreatureForm({
                             </div>
                           </div>
                           {area(`actions.${i}.description`, t.blockDescription, r.description, (v) => setAction(i, { description: v }), 3, 'block-action-description')}
+                          <ExplainHere always explanation={here((f) => f.startsWith(`action:${i}:`))} />
                         </>
                       )}
                     </Row>

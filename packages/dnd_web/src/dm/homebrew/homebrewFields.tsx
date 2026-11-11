@@ -45,6 +45,7 @@ export function TextField({
   autoFocus,
   numeric,
   className,
+  onFocus,
 }: {
   label: string;
   value: string;
@@ -52,6 +53,8 @@ export function TextField({
   error?: string | null;
   dataField?: string;
   autoFocus?: boolean;
+  /** Entrar al campo: el formulario explica la regla de ese número. */
+  onFocus?: () => void;
   /** Un número: en negrita y con cifras tabulares, para compararlo con el de al lado. */
   numeric?: boolean;
   className?: string;
@@ -63,6 +66,7 @@ export function TextField({
         data-field={dataField}
         value={value}
         autoFocus={autoFocus}
+        onFocus={onFocus}
         inputMode={numeric ? 'numeric' : undefined}
         aria-invalid={error ? true : undefined}
         onChange={(e) => onChange(e.target.value)}
@@ -140,6 +144,7 @@ export function PillGroup({
   max,
   error,
   hideLabel,
+  onTouch,
 }: {
   label: string;
   /** El título de la sección ya lo dice: el rótulo queda solo para lectores de pantalla. */
@@ -149,6 +154,8 @@ export function PillGroup({
   onChange: (selected: string[]) => void;
   max?: number;
   error?: string | null;
+  /** Se llama con el id de la pill tocada, marcada o desmarcada. */
+  onTouch?: (id: string) => void;
 }) {
   const known = new Set(options.map((o) => o.id));
   const rows = [...options.map((o) => ({ ...o, raw: false })), ...selected.filter((id) => !known.has(id)).map((id) => ({ id, label: id, raw: true }))];
@@ -165,7 +172,10 @@ export function PillGroup({
             pressed={selected.includes(o.id)}
             disabled={full && !selected.includes(o.id)}
             dashed={o.raw}
-            onClick={() => toggle(o.id)}
+            onClick={() => {
+              toggle(o.id);
+              onTouch?.(o.id);
+            }}
           />
         ))}
       </div>

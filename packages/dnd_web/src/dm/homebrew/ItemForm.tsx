@@ -2,10 +2,11 @@ import { useMemo, useState, type MutableRefObject } from 'react';
 import { itemEntry } from '../../codex/entries';
 import { homebrewFormOptions, itemBaseOptions, itemDraft, itemForm, itemWithBaseKind, itemWithRarity, type Catalog, type ItemForm as Form, type JsonObject } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
+import { signed } from '../../sheet/format';
 import { Select } from '../../ui/primitives';
 import { Option } from '../../ui/wizard';
 import { EffectEditor } from './EffectEditor';
-import { EntryPreview, HomebrewFormShell } from './HomebrewFormShell';
+import { EntryPreview, ExplainHere, HomebrewFormShell, useHomebrewRules, type Explained } from './HomebrewFormShell';
 import { FormSection, numberError, PillGroup, TextAreaField, TextField, weightError } from './homebrewFields';
 
 /** Radix no admite un valor vacío en un `Select`: «Mundano» viaja con este. */
@@ -58,6 +59,9 @@ export function ItemForm({
   const [tried, setTried] = useState(false);
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState(false);
+  // Lo último que se tocó: la clave que entiende `explain`. Nada hasta el primer toque.
+  const [focus, setFocus] = useState<string | null>(null);
+  const rules = useHomebrewRules();
 
   const draft = useMemo(() => itemDraft(initial, form), [initial, form]);
   const options = useMemo(() => homebrewFormOptions(catalog), [catalog, lang]);
@@ -102,6 +106,40 @@ export function ItemForm({
   ];
   const baseKinds = [{ value: NONE, label: t.hbNoneCap }, ...withCurrent(options.baseItemKinds, form.baseItemKind, (id) => id).filter((o) => o.value !== NONE)];
 
+  // Qué significa lo tocado (`explain` de Flutter): los textos son del motor.
+  const bonus = (text: string) => signed(Number.parseInt(text, 10) || 0);
+  const explain = (key: string): Explained | null => {
+    switch (key) {
+      case 'category': {
+        const rule = rules.itemCategory[form.category];
+        const label = categories.find((o) => o.value === form.category)?.label ?? form.category;
+        return rule ? { kicker: t.codexCategory, title: label, text: rule, note: rules.itemCategoryNote } : null;
+      }
+      case 'rarity':
+        return mundane
+          ? { kicker: t.codexRarity, title: t.hbMundane, text: rules.itemMundane }
+          : { kicker: t.codexRarity, title: rarities.find((o) => o.value === form.rarity)?.label ?? form.rarity, text: rules.itemRarity };
+      case 'attunement':
+        return { kicker: t.hbMagic, title: form.requiresAttunement ? t.codexAttunement : t.hbxNoAttunement, text: rules.itemAttunement };
+      case 'acBonus':
+        return { kicker: t.hbxEffect, title: t.hbxAcValue(bonus(form.acBonus)), text: rules.itemAcBonus };
+      case 'base':
+        return { kicker: t.hbBaseItem, title: baseKinds.find((o) => o.value === form.baseItemKind)?.label ?? form.baseItemKind, text: rules.itemBase };
+      case 'magicBonus':
+        return { kicker: t.hbBaseItem, title: t.hbxBonusValue(bonus(form.magicBonus)), text: rules.itemMagicBonus };
+    }
+    if (!key.startsWith('res:')) return null;
+    const type = key.slice('res:'.length);
+    return {
+      kicker: t.hbxEffect,
+      title: t.hbxResistance(rules.damageTypes[type]?.label ?? type),
+      text: rules.itemResistance,
+      note: rules.damageTypes[type]?.description,
+    };
+  };
+  const explanation = focus === null ? null : explain(focus);
+  const here = (test: (f: string) => boolean) => (focus !== null && test(focus) ? explanation : null);
+
   const entry = useMemo(() => itemEntry(draft.item, catalog, t, lang), [draft.item, catalog, t, lang]);
   const detail = useMemo(() => entry.detail(), [entry]);
   const preview = (
@@ -122,6 +160,7 @@ export function ItemForm({
       onSave={() => void save()}
       previewLabel={t.hbItemPreview}
       preview={preview}
+      explanation={explanation}
     >
       <section className="card grid gap-3.5 p-4 sm:grid-cols-[3fr_2fr_2fr]">
         <TextField
@@ -135,10 +174,18 @@ export function ItemForm({
         />
         <div className="flex min-w-0 flex-col gap-1.5">
           <span className="text-[12px] text-text-muted">{t.codexCategory}</span>
-          <Select labelAbove className="w-full justify-between" label={t.codexCategory} value={form.category} onValueChange={(category) => set({ category })} options={categories} />
+          <Select labelAbove className="w-full justify-between" label={t.codexCategory} value={form.category}
+            onValueChange={(category) => {
+              set({ category });
+              setFocus('category');
+            }}
+            onOpen={() => setFocus('category')}
+            options={categories}
+          />
         </div>
         <TextField numeric label={t.hbWeightShort} dataField="item-weight" value={form.weight} onChange={(weight) => set({ weight })} error={weightError(err.weight, t)} />
         <TextField numeric label={t.hbPriceCp} dataField="item-cost" value={form.costCp} onChange={(costCp) => set({ costCp })} error={numberError(err.costCp, t)} />
+        <ExplainHere className="sm:col-span-3" explanation={here((f) => f === 'category')} />
       </section>
 
       <FormSection title={t.hbMagic}>
@@ -149,7 +196,11 @@ export function ItemForm({
             className="w-full justify-between"
             label={t.codexRarity}
             value={mundane ? MUNDANE : form.rarity}
-            onValueChange={(v) => setForm((f) => itemWithRarity(f, v === MUNDANE ? '' : v))}
+            onValueChange={(v) => {
+              setForm((f) => itemWithRarity(f, v === MUNDANE ? '' : v));
+              setFocus('rarity');
+            }}
+            onOpen={() => setFocus('rarity')}
             options={rarities}
           />
         </div>
@@ -162,10 +213,13 @@ export function ItemForm({
           selected={form.requiresAttunement && !mundane}
           title={t.hbRequiresAttunement}
           onClick={() => {
-            if (!mundane) set({ requiresAttunement: !form.requiresAttunement });
+            if (mundane) return;
+            set({ requiresAttunement: !form.requiresAttunement });
+            setFocus('attunement');
           }}
         />
         {mundane && <p className="text-[12.5px] text-text-muted">{t.hbOnlyMagicAttune}</p>}
+        <ExplainHere explanation={here((f) => f === 'rarity' || f === 'attunement')} />
       </FormSection>
 
       <FormSection title={t.hbEffectsEquipped}>
@@ -176,9 +230,17 @@ export function ItemForm({
           dataField="item-ac-bonus"
           value={form.acBonus}
           onChange={(acBonus) => set({ acBonus })}
+          onFocus={() => setFocus('acBonus')}
           error={numberError(err.acBonus, t)}
         />
-        <PillGroup label={t.hbResistances} options={options.damageTypes} selected={form.resistances} onChange={(resistances) => set({ resistances })} />
+        <PillGroup
+          label={t.hbResistances}
+          options={options.damageTypes}
+          selected={form.resistances}
+          onChange={(resistances) => set({ resistances })}
+          onTouch={(id) => setFocus(`res:${id}`)}
+        />
+        <ExplainHere explanation={here((f) => f === 'acBonus' || f.startsWith('res:'))} />
         <div className="flex flex-col gap-1.5">
           <span className="text-[12px] text-text-muted">{t.hbOtherEffects}</span>
           <EffectEditor effects={form.otherEffects} catalog={catalog} hiddenKinds={HIDDEN_KINDS} onChange={(otherEffects) => set({ otherEffects })} />
@@ -194,11 +256,23 @@ export function ItemForm({
               className="w-full justify-between"
               label={t.hbBaseItem}
               value={form.baseItemKind}
-              onValueChange={(kind) => setForm((f) => itemWithBaseKind(f, kind))}
+              onValueChange={(kind) => {
+                setForm((f) => itemWithBaseKind(f, kind));
+                setFocus('base');
+              }}
+              onOpen={() => setFocus('base')}
               options={baseKinds}
             />
           </div>
-          <TextField numeric label={t.hbMagicBonusShort} dataField="item-magic-bonus" value={form.magicBonus} onChange={(magicBonus) => set({ magicBonus })} error={numberError(err.magicBonus, t)} />
+          <TextField
+            numeric
+            label={t.hbMagicBonusShort}
+            dataField="item-magic-bonus"
+            value={form.magicBonus}
+            onChange={(magicBonus) => set({ magicBonus })}
+            onFocus={() => setFocus('magicBonus')}
+            error={numberError(err.magicBonus, t)}
+          />
         </div>
         {/* Sin familia no hay nada que restringir. */}
         {form.baseItemKind !== NONE && (
@@ -212,6 +286,7 @@ export function ItemForm({
             <p className="text-[12.5px] text-text-muted">{form.eligibleBaseItemIds.length === 0 ? t.hbAnyBase : t.hbOnlyMarked}</p>
           </>
         )}
+        <ExplainHere explanation={here((f) => f === 'base' || f === 'magicBonus')} />
       </FormSection>
 
       <FormSection title={t.hbDescription}>

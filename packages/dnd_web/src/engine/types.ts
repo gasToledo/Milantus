@@ -813,6 +813,65 @@ export interface BackgroundForm {
   hasStartingEquipment: boolean;
 }
 
+/** Los textos de regla del glosario del motor que explican los formularios del
+ *  Homebrew (`homebrewRules`), en el idioma activo. Los `Record` van por id. */
+export interface HomebrewRules {
+  damageTypeRule: string;
+  damageTypes: Record<string, { label: string; description: string }>;
+  weaponCategory: Record<string, string>;
+  weaponRange: string;
+  weaponMasteryRule: string;
+  weaponMasteries: Record<string, { name: string; description: string }>;
+  weaponProperties: Record<string, { name: string; description: string }>;
+  armorCategory: Record<string, string>;
+  armorTraining: string;
+  armorBaseAc: string;
+  shieldBaseAc: string;
+  armorAddDex: string;
+  armorMaxDex: string;
+  armorStrength: string;
+  armorStealth: string;
+  spellCantrip: string;
+  /** El texto de los niveles 1 a 9, en ese orden. */
+  spellLevel: string[];
+  spellSchool: Record<string, string>;
+  spellSchoolNote: string;
+  spellCastingTime: Record<string, string>;
+  spellLongCasting: string;
+  spellComponent: Record<string, string>;
+  spellConcentration: string;
+  spellRitual: string;
+  spellClasses: string;
+  featCategory: Record<string, string>;
+  featRepeatable: string;
+  raceCreatureType: string;
+  raceSize: Record<string, string>;
+  size: string;
+  raceSpeed: string;
+  raceSkillCount: string;
+  raceSkillFrom: string;
+  raceSizeOptions: string;
+  skillProficiency: string;
+  toolProficiency: string;
+  backgroundAbilities: string;
+  backgroundOriginFeat: string;
+  itemCategory: Record<string, string>;
+  itemCategoryNote: string;
+  itemMundane: string;
+  itemRarity: string;
+  itemAttunement: string;
+  itemAcBonus: string;
+  itemResistance: string;
+  itemBase: string;
+  itemMagicBonus: string;
+  creatureType: string;
+  creatureBeastNote: string;
+  creatureSize: Record<string, string>;
+  creatureCr: string;
+  creatureAttackBonus: string;
+  creatureActionKind: Record<string, string>;
+}
+
 /** Las opciones cerradas de los formularios de especie y trasfondo
  *  (`homebrewFormOptions`), con su rótulo en el idioma activo. */
 export interface HomebrewFormOptions {

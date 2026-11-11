@@ -5,7 +5,7 @@ import { useLang, useTexts } from '../../i18n/context';
 import { Eyebrow } from '../../ui/data';
 import { Select } from '../../ui/primitives';
 import { Option } from '../../ui/wizard';
-import { EntryPreview, HomebrewFormShell } from './HomebrewFormShell';
+import { EntryPreview, ExplainHere, HomebrewFormShell, useHomebrewRules, type Explained } from './HomebrewFormShell';
 import { EconomySection, FormSection, numberError, TextAreaField, TextField } from './homebrewFields';
 
 /**
@@ -47,6 +47,9 @@ export function ArmorForm({
   const [tried, setTried] = useState(false);
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState(false);
+  // Lo último que se tocó: la clave que entiende `explain`. Nada hasta el primer toque.
+  const [focus, setFocus] = useState<string | null>(null);
+  const rules = useHomebrewRules();
 
   const draft = useMemo(() => armorDraft(initial, form), [initial, form]);
   const options = useMemo(() => homebrewFormOptions(catalog), [catalog, lang]);
@@ -85,6 +88,34 @@ export function ArmorForm({
     (o) => ({ value: o.id, label: o.label }),
   );
 
+  // Qué significa lo tocado (`explain` de Flutter): los textos son del motor.
+  const explain = (key: string): Explained | null => {
+    switch (key) {
+      case 'category': {
+        const rule = rules.armorCategory[form.category];
+        const label = options.armorCategories.find((o) => o.id === form.category)?.label ?? form.category;
+        return rule ? { kicker: t.codexCategory, title: label, text: rule, note: rules.armorTraining } : null;
+      }
+      case 'baseAc':
+        return { kicker: t.hbArmorBaseAc, title: form.baseAc.trim() || t.hbxNotFilled, text: shield ? rules.shieldBaseAc : rules.armorBaseAc };
+      case 'addDex':
+        return { kicker: t.hbxDexterity, title: form.addDexMod ? t.hbxAddsDex : t.hbxNoDex, text: rules.armorAddDex };
+      case 'maxDex': {
+        const cap = form.maxDexBonus.trim();
+        return { kicker: t.hbxDexCap, title: cap === '' ? t.hbxNoCap : t.hbxUpTo(cap), text: rules.armorMaxDex };
+      }
+      case 'strength': {
+        const str = form.strengthRequirement.trim();
+        return { kicker: t.hbxDemand, title: str === '' ? t.hbxNoStrReq : t.hbxStrength(str), text: rules.armorStrength };
+      }
+      case 'stealth':
+        return { kicker: t.hbxDemand, title: form.stealthDisadvantage ? t.hbxStealthDisadv : t.hbxNoStealthDisadv, text: rules.armorStealth };
+    }
+    return null;
+  };
+  const explanation = focus === null ? null : explain(focus);
+  const here = (test: (f: string) => boolean) => (focus !== null && test(focus) ? explanation : null);
+
   const entry = useMemo(() => armorEntry(draft.armor, catalog, t, lang), [draft.armor, catalog, t, lang]);
   const detail = useMemo(() => entry.detail(), [entry]);
   const preview = (
@@ -120,6 +151,7 @@ export function ArmorForm({
       onSave={() => void save()}
       previewLabel={t.hbFeatPreview}
       preview={preview}
+      explanation={explanation}
     >
       <section className="card grid gap-3.5 p-4 sm:grid-cols-[3fr_2fr]">
         <TextField
@@ -138,16 +170,33 @@ export function ArmorForm({
             className="w-full justify-between"
             label={t.codexCategory}
             value={form.category}
-            onValueChange={(category) => setForm((f) => armorWithCategory(f, category))}
+            onValueChange={(category) => {
+              setForm((f) => armorWithCategory(f, category));
+              setFocus('category');
+            }}
+            onOpen={() => setFocus('category')}
             options={categories}
           />
         </div>
-        <TextField numeric label={shield ? t.hbShieldAc : t.hbArmorBaseAc} dataField="armor-base-ac" value={form.baseAc} onChange={(baseAc) => set({ baseAc })} error={numberError(err.baseAc, t)} />
+        <TextField
+          numeric
+          label={shield ? t.hbShieldAc : t.hbArmorBaseAc}
+          dataField="armor-base-ac"
+          value={form.baseAc}
+          onChange={(baseAc) => set({ baseAc })}
+          onFocus={() => setFocus('baseAc')}
+          error={numberError(err.baseAc, t)}
+        />
+        <ExplainHere className="sm:col-span-2" explanation={here((f) => f === 'category' || f === 'baseAc')} />
       </section>
 
       {!shield && (
         <FormSection title={t.hbHowDex}>
-          <Option multi id="add-dex-mod" selected={form.addDexMod} title={t.hbAddsDexMod} onClick={() => set({ addDexMod: !form.addDexMod })} />
+          <Option multi id="add-dex-mod" selected={form.addDexMod} title={t.hbAddsDexMod} onClick={() => {
+              set({ addDexMod: !form.addDexMod });
+              setFocus('addDex');
+            }}
+          />
           {form.addDexMod && (
             <TextField
               numeric
@@ -155,9 +204,11 @@ export function ArmorForm({
               label={t.hbDexCapLabel}
               value={form.maxDexBonus}
               onChange={(maxDexBonus) => set({ maxDexBonus })}
+              onFocus={() => setFocus('maxDex')}
               error={numberError(err.maxDexBonus, t)}
             />
           )}
+          <ExplainHere explanation={here((f) => f === 'addDex' || f === 'maxDex')} />
         </FormSection>
       )}
 
@@ -168,9 +219,15 @@ export function ArmorForm({
           label={t.hbStrReqLabel}
           value={form.strengthRequirement}
           onChange={(strengthRequirement) => set({ strengthRequirement })}
+          onFocus={() => setFocus('strength')}
           error={numberError(err.strengthRequirement, t)}
         />
-        <Option multi id="stealth-disadvantage" selected={form.stealthDisadvantage} title={t.hbStealthLabel} onClick={() => set({ stealthDisadvantage: !form.stealthDisadvantage })} />
+        <Option multi id="stealth-disadvantage" selected={form.stealthDisadvantage} title={t.hbStealthLabel} onClick={() => {
+            set({ stealthDisadvantage: !form.stealthDisadvantage });
+            setFocus('stealth');
+          }}
+        />
+        <ExplainHere explanation={here((f) => f === 'strength' || f === 'stealth')} />
       </FormSection>
 
       <EconomySection weight={form.weight} costCp={form.costCp} errors={err} onChange={set} />

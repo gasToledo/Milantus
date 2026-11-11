@@ -809,6 +809,75 @@ String creatureFormOptions() => jsonEncode({
       ],
     });
 
+/// Los textos de regla que los formularios del Homebrew explican al tocar un
+/// campo (el panel de reglas de Flutter): los del glosario del motor, en el
+/// idioma de `setLanguage`. Los `String get` viajan como texto y los `Map`
+/// como objeto por id; así ninguna regla se escribe del lado del cliente.
+String homebrewRules() => jsonEncode({
+      'damageTypeRule': damageTypeRule,
+      'damageTypes': {
+        for (final d in DamageType.values)
+          d.id: {'label': d.label, 'description': d.description},
+      },
+      'weaponCategory': weaponCategoryRules,
+      'weaponRange': weaponRangeRule,
+      'weaponMasteryRule': weaponMasteryRule,
+      'weaponMasteries': {
+        for (final e in weaponMasteries.entries)
+          e.key: {'name': e.value.name, 'description': e.value.description},
+      },
+      'weaponProperties': {
+        for (final e in weaponProperties.entries)
+          e.key: {'name': e.value.name, 'description': e.value.description},
+      },
+      'armorCategory': armorCategoryRules,
+      'armorTraining': armorTrainingRule,
+      'armorBaseAc': armorBaseAcRule,
+      'shieldBaseAc': shieldBaseAcRule,
+      'armorAddDex': armorAddDexRule,
+      'armorMaxDex': armorMaxDexRule,
+      'armorStrength': armorStrengthRule,
+      'armorStealth': armorStealthRule,
+      'spellCantrip': spellCantripRule,
+      'spellLevel': [for (var l = 1; l <= 9; l++) spellLevelRule(l)],
+      'spellSchool': spellSchoolRules,
+      'spellSchoolNote': spellSchoolNote,
+      'spellCastingTime': spellCastingTimeRules,
+      'spellLongCasting': spellLongCastingRule,
+      'spellComponent': spellComponentRules,
+      'spellConcentration': spellConcentrationRule,
+      'spellRitual': spellRitualRule,
+      'spellClasses': spellClassesRule,
+      'featCategory': featCategoryRules,
+      'featRepeatable': featRepeatableRule,
+      'raceCreatureType': raceCreatureTypeRule,
+      'raceSize': raceSizeRules,
+      'size': sizeRule,
+      'raceSpeed': raceSpeedRule,
+      'raceSkillCount': raceSkillCountRule,
+      'raceSkillFrom': raceSkillFromRule,
+      'raceSizeOptions': raceSizeOptionsRule,
+      'skillProficiency': skillProficiencyRule,
+      'toolProficiency': toolProficiencyRule,
+      'backgroundAbilities': backgroundAbilitiesRule,
+      'backgroundOriginFeat': backgroundOriginFeatRule,
+      'itemCategory': itemCategoryRules,
+      'itemCategoryNote': itemCategoryNote,
+      'itemMundane': itemMundaneRule,
+      'itemRarity': itemRarityRule,
+      'itemAttunement': itemAttunementRule,
+      'itemAcBonus': itemAcBonusRule,
+      'itemResistance': itemResistanceRule,
+      'itemBase': itemBaseRule,
+      'itemMagicBonus': itemMagicBonusRule,
+      'creatureType': creatureTypeRule,
+      'creatureBeastNote': creatureBeastNote,
+      'creatureSize': creatureSizeRules,
+      'creatureCr': creatureCrRule,
+      'creatureAttackBonus': creatureAttackBonusRule,
+      'creatureActionKind': creatureActionKindRules,
+    });
+
 Feat _dote(String json) =>
     Feat.fromJson((jsonDecode(json) as Map).cast<String, dynamic>());
 
@@ -1652,6 +1721,7 @@ void main() {
   motor['spellDraft'] = spellDraft.toJS;
   motor['spellNew'] = spellNew.toJS;
   motor['homebrewFormOptions'] = homebrewFormOptions.toJS;
+  motor['homebrewRules'] = homebrewRules.toJS;
   motor['effectKinds'] = effectKinds.toJS;
   motor['effectBuild'] = effectBuild.toJS;
   motor['effectParts'] = effectPartsJs.toJS;

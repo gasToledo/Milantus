@@ -4,7 +4,7 @@ import { homebrewFormOptions, raceDraft, raceForm, type Catalog, type JsonObject
 import { useLang, useTexts } from '../../i18n/context';
 import { Select } from '../../ui/primitives';
 import { EffectEditor } from './EffectEditor';
-import { EntryPreview, HomebrewFormShell } from './HomebrewFormShell';
+import { EntryPreview, ExplainHere, HomebrewFormShell, useHomebrewRules, type Explained } from './HomebrewFormShell';
 import { FormSection, numberError, PillGroup, TextAreaField, TextField } from './homebrewFields';
 
 /**
@@ -43,6 +43,9 @@ export function RaceForm({
   const [tried, setTried] = useState(false);
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState(false);
+  // Lo último que se tocó: la clave que entiende `explain`. Nada hasta el primer toque.
+  const [focus, setFocus] = useState<string | null>(null);
+  const rules = useHomebrewRules();
 
   const draft = useMemo(() => raceDraft(initial, form), [initial, form]);
   const options = useMemo(() => homebrewFormOptions(catalog), [catalog, lang]);
@@ -82,6 +85,34 @@ export function RaceForm({
     <EntryPreview subtitle={[entry.subtitle, t.sources.homebrew].filter(Boolean).join(' · ')} name={draft.race.name as string} detail={detail} />
   );
 
+  // Qué significa lo tocado (`explain` de Flutter): los textos son del motor.
+  const explain = (key: string): Explained | null => {
+    switch (key) {
+      case 'type':
+        return { kicker: t.hbCreatureType, title: form.creatureType.trim() || t.hbxNoType, text: rules.raceCreatureType };
+      case 'size': {
+        const rule = rules.raceSize[form.size];
+        return rule ? { kicker: t.codexSize, title: sizes.find((s) => s.id === form.size)?.label ?? form.size, text: rule, note: rules.size } : null;
+      }
+      case 'speed':
+        return { kicker: t.creatureSpeed, title: t.hbxFeet(form.speed.trim()), text: rules.raceSpeed };
+      case 'skillCount':
+        return {
+          kicker: t.creatureSkills,
+          title: t.hbxChoose(String(Number.parseInt(form.skillChoiceCount, 10) || 0)),
+          text: rules.raceSkillCount,
+          note: rules.skillProficiency,
+        };
+      case 'skillFrom':
+        return { kicker: t.creatureSkills, title: t.hbxAmongWhich, text: rules.raceSkillFrom };
+      case 'sizeOptions':
+        return { kicker: t.codexSize, title: t.hbSizeToChoose, text: rules.raceSizeOptions };
+    }
+    return null;
+  };
+  const explanation = focus === null ? null : explain(focus);
+  const here = (test: (f: string) => boolean) => (focus !== null && test(focus) ? explanation : null);
+
   // «Entre cuáles» aparece apenas se elige alguna, o si ya hay marcadas.
   const choosesSkills = (draft.race.skillChoiceCount as number) > 0 || form.skillChoiceFrom.length > 0;
 
@@ -99,6 +130,7 @@ export function RaceForm({
       onSave={() => void save()}
       previewLabel={t.hbFeatPreview}
       preview={preview}
+      explanation={explanation}
     >
       <section className="card grid gap-3.5 p-4 sm:grid-cols-[3fr_2fr_2fr]">
         <TextField
@@ -110,7 +142,7 @@ export function RaceForm({
           onChange={(name) => set({ name })}
           error={err.name ? t.hbReqRaceName : null}
         />
-        <TextField label={t.hbCreatureType} value={form.creatureType} onChange={(creatureType) => set({ creatureType })} />
+        <TextField label={t.hbCreatureType} value={form.creatureType} onChange={(creatureType) => set({ creatureType })} onFocus={() => setFocus('type')} />
         <div className="flex min-w-0 flex-col gap-1.5">
           <span className="text-[12px] text-text-muted">{t.codexSize}</span>
           <Select
@@ -118,11 +150,16 @@ export function RaceForm({
             className="w-full justify-between"
             label={t.codexSize}
             value={form.size}
-            onValueChange={(size) => set({ size })}
+            onValueChange={(size) => {
+              set({ size });
+              setFocus('size');
+            }}
+            onOpen={() => setFocus('size')}
             options={sizes.map((s) => ({ value: s.id, label: s.label }))}
           />
         </div>
-        <TextField numeric label={t.hbSpeedFeet} value={form.speed} onChange={(speed) => set({ speed })} error={numberError(err.speed, t)} />
+        <TextField numeric label={t.hbSpeedFeet} value={form.speed} onChange={(speed) => set({ speed })} onFocus={() => setFocus('speed')} error={numberError(err.speed, t)} />
+        <ExplainHere className="sm:col-span-3" explanation={here((f) => f === 'type' || f === 'size' || f === 'speed')} />
       </section>
 
       <FormSection title={t.hbPresentation}>
@@ -137,15 +174,31 @@ export function RaceForm({
           label={t.hbHowMany}
           value={form.skillChoiceCount}
           onChange={(skillChoiceCount) => set({ skillChoiceCount })}
+          onFocus={() => setFocus('skillCount')}
           error={numberError(err.skillChoiceCount, t)}
         />
         {choosesSkills && (
-          <PillGroup label={t.hbAmongWhich} options={options.skills} selected={form.skillChoiceFrom} onChange={(skillChoiceFrom) => set({ skillChoiceFrom })} />
+          <PillGroup
+            label={t.hbAmongWhich}
+            options={options.skills}
+            selected={form.skillChoiceFrom}
+            onChange={(skillChoiceFrom) => set({ skillChoiceFrom })}
+            onTouch={() => setFocus('skillFrom')}
+          />
         )}
+        <ExplainHere explanation={here((f) => f === 'skillCount' || f === 'skillFrom')} />
       </FormSection>
 
       <FormSection title={t.hbSizeToChoose}>
-        <PillGroup hideLabel label={t.hbSizeToChoose} options={options.sizes} selected={form.sizeOptions} onChange={(sizeOptions) => set({ sizeOptions })} />
+        <PillGroup
+          hideLabel
+          label={t.hbSizeToChoose}
+          options={options.sizes}
+          selected={form.sizeOptions}
+          onChange={(sizeOptions) => set({ sizeOptions })}
+          onTouch={() => setFocus('sizeOptions')}
+        />
+        <ExplainHere explanation={here((f) => f === 'sizeOptions')} />
       </FormSection>
 
       <FormSection title={t.creatureTraits}>

@@ -1,4 +1,4 @@
-import type { AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, CreatureForm, EffectBuild, EffectKindInfo, EffectParts, FeatForm, RaceForm, BackgroundForm, WeaponForm, ArmorForm, ArmorAcExample, ItemForm, SpellForm, HomebrewFormOptions, CreatureFormOptions, EncounterDetails, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
+import type { AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, CreatureForm, EffectBuild, EffectKindInfo, EffectParts, FeatForm, RaceForm, BackgroundForm, WeaponForm, ArmorForm, ArmorAcExample, ItemForm, SpellForm, HomebrewFormOptions, HomebrewRules, CreatureFormOptions, EncounterDetails, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
 // Lo genera `npm run build:engine` (o la etapa `engine-js` del Dockerfile) y
 // no se versiona. Es un script de dart2js, no un módulo: al cargarse deja
 // `globalThis.dndEngine`, y de ahí lo toma este archivo.
@@ -66,6 +66,7 @@ interface DartEngine {
   spellDraft(spellJson: string, formJson: string): string;
   spellNew(): string;
   homebrewFormOptions(catalogJson: string): string;
+  homebrewRules(): string;
   effectKinds(catalogJson: string): string;
   effectBuild(kindId: string, valuesJson: string): string;
   effectParts(effectsJson: string, catalogJson: string): string;
@@ -944,6 +945,13 @@ export function backgroundNew(): JsonObject {
  *  catálogo fusionado, así que incluyen las propias. */
 export function homebrewFormOptions(catalog: Catalog): HomebrewFormOptions {
   return JSON.parse(engine().homebrewFormOptions(catalogJson(catalog))) as HomebrewFormOptions;
+}
+
+/** Los textos de regla que explican los formularios del Homebrew, en el idioma
+ *  fijado con `setEngineLanguage`. Dependen solo del idioma: quien los guarda
+ *  los rearma cuando cambia. */
+export function homebrewRules(): HomebrewRules {
+  return JSON.parse(engine().homebrewRules()) as HomebrewRules;
 }
 
 /** Un arma como formulario de texto (`WeaponDraft.formOf`). */

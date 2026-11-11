@@ -138,10 +138,13 @@ export function Select({
   className,
   labelAbove,
   disabled,
+  onOpen,
 }: {
   label: string;
   value: string;
   onValueChange: (value: string) => void;
+  /** Se llama al abrir el menú (los formularios del Homebrew explican lo que se toca). */
+  onOpen?: () => void;
   options: { value: string; label: string }[];
   /** Sobre el botón: un formulario lo estira a todo el ancho. */
   className?: string;
@@ -152,7 +155,7 @@ export function Select({
   disabled?: boolean;
 }) {
   return (
-    <SelectPrimitive.Root value={value} onValueChange={onValueChange} disabled={disabled}>
+    <SelectPrimitive.Root value={value} onValueChange={onValueChange} disabled={disabled} onOpenChange={onOpen && ((o) => o && onOpen())}>
       <SelectPrimitive.Trigger
         aria-label={label}
         className={cx('plaque inline-flex min-h-9 items-center gap-2 rounded-[var(--radius-nav)] px-3 text-[13px] text-on-surface disabled:opacity-40', className)}

@@ -4,7 +4,7 @@ import { homebrewFormOptions, spellDraft, spellForm, type Catalog, type JsonObje
 import { useLang, useTexts } from '../../i18n/context';
 import { Select } from '../../ui/primitives';
 import { Option } from '../../ui/wizard';
-import { EntryPreview, HomebrewFormShell } from './HomebrewFormShell';
+import { EntryPreview, ExplainHere, HomebrewFormShell, useHomebrewRules, type Explained } from './HomebrewFormShell';
 import { FormSection, PillGroup, TextAreaField, TextField } from './homebrewFields';
 
 /** Radix no admite un valor vacío en un `Select`: «Sin escuela» viaja con este. */
@@ -50,6 +50,9 @@ export function SpellForm({
   const [tried, setTried] = useState(false);
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState(false);
+  // Lo último que se tocó: la clave que entiende `explain`. Nada hasta el primer toque.
+  const [focus, setFocus] = useState<string | null>(null);
+  const rules = useHomebrewRules();
 
   const draft = useMemo(() => spellDraft(initial, form), [initial, form]);
   const options = useMemo(() => homebrewFormOptions(catalog), [catalog, lang]);
@@ -80,6 +83,37 @@ export function SpellForm({
   if (!options.castingTimes.some((o) => o.id === form.castingTime)) times.push({ value: form.castingTime, label: form.castingTime });
   const levels = options.spellLevels.map((o) => ({ value: o.id, label: o.label }));
 
+  // Qué significa lo tocado (`explain` de Flutter): los textos son del motor.
+  const explain = (key: string): Explained | null => {
+    switch (key) {
+      case 'level': {
+        const level = Number.parseInt(form.level, 10) || 0;
+        const text = level === 0 ? rules.spellCantrip : rules.spellLevel[level - 1];
+        return text ? { kicker: t.levelWord, title: level === 0 ? t.cantrip : t.spellLevelShort(level), text } : null;
+      }
+      case 'school': {
+        const rule = rules.spellSchool[form.school];
+        return rule ? { kicker: t.hbSchool, title: form.school, text: rule, note: rules.spellSchoolNote } : null;
+      }
+      case 'time':
+        // Las claves del glosario son los tiempos guardados; todo otro tiempo es largo.
+        return { kicker: t.hbCastingTime, title: form.castingTime, text: rules.spellCastingTime[form.castingTime] ?? rules.spellLongCasting };
+      case 'concentration':
+        return { kicker: t.codexDuration, title: t.concentration, text: rules.spellConcentration };
+      case 'ritual':
+        return { kicker: t.codexCastingTime, title: t.ritual, text: rules.spellRitual };
+      case 'classes': {
+        const names = form.classes.map((id) => options.spellClasses.find((o) => o.id === id)?.label ?? id);
+        return { kicker: t.hbClassLists, title: names.length === 0 ? t.hbxNone : names.join(' · '), text: rules.spellClasses };
+      }
+    }
+    const letter = key.slice('comp:'.length);
+    const rule = rules.spellComponent[letter];
+    return rule ? { kicker: t.hbxComponent, title: options.spellComponents.find((o) => o.id === letter)?.label ?? letter, text: rule } : null;
+  };
+  const explanation = focus === null ? null : explain(focus);
+  const here = (test: (f: string) => boolean) => (focus !== null && test(focus) ? explanation : null);
+
   const entry = useMemo(() => spellEntry(draft.spell, catalog, t, lang), [draft.spell, catalog, t, lang]);
   const detail = useMemo(() => entry.detail(), [entry]);
   const preview = (
@@ -100,6 +134,7 @@ export function SpellForm({
       onSave={() => void save()}
       previewLabel={t.hbSpellPreview}
       preview={preview}
+      explanation={explanation}
     >
       <section className="card grid gap-3.5 p-4 sm:grid-cols-2">
         <TextField
@@ -113,7 +148,14 @@ export function SpellForm({
         />
         <div className="flex min-w-0 flex-col gap-1.5">
           <span className="text-[12px] text-text-muted">{t.levelWord}</span>
-          <Select labelAbove className="w-full justify-between" label={t.levelWord} value={form.level} onValueChange={(level) => set({ level })} options={levels} />
+          <Select labelAbove className="w-full justify-between" label={t.levelWord} value={form.level}
+            onValueChange={(level) => {
+              set({ level });
+              setFocus('level');
+            }}
+            onOpen={() => setFocus('level')}
+            options={levels}
+          />
         </div>
         <div className="flex min-w-0 flex-col gap-1.5">
           <span className="text-[12px] text-text-muted">{t.hbSchool}</span>
@@ -122,30 +164,53 @@ export function SpellForm({
             className="w-full justify-between"
             label={t.hbSchool}
             value={form.school === '' ? NO_SCHOOL : form.school}
-            onValueChange={(school) => set({ school: school === NO_SCHOOL ? '' : school })}
+            onValueChange={(school) => {
+              set({ school: school === NO_SCHOOL ? '' : school });
+              setFocus('school');
+            }}
+            onOpen={() => setFocus('school')}
             options={schools}
           />
         </div>
         <div className="flex min-w-0 flex-col gap-1.5">
           <span className="text-[12px] text-text-muted">{t.hbCastingTime}</span>
-          <Select labelAbove className="w-full justify-between" label={t.hbCastingTime} value={form.castingTime} onValueChange={(castingTime) => set({ castingTime })} options={times} />
+          <Select labelAbove className="w-full justify-between" label={t.hbCastingTime} value={form.castingTime}
+            onValueChange={(castingTime) => {
+              set({ castingTime });
+              setFocus('time');
+            }}
+            onOpen={() => setFocus('time')}
+            options={times}
+          />
         </div>
         <TextField label={t.hbRangeExample} dataField="spell-range" value={form.range} onChange={(range) => set({ range })} />
         <TextField className="sm:col-span-2" label={t.codexDuration} dataField="spell-duration" value={form.duration} onChange={(duration) => set({ duration })} />
+        <ExplainHere className="sm:col-span-2" explanation={here((f) => f === 'level' || f === 'school' || f === 'time')} />
       </section>
 
       <FormSection title={t.codexComponents}>
-        <PillGroup hideLabel label={t.codexComponents} options={options.spellComponents.map((o) => ({ id: o.id, label: `${o.id} · ${o.label}` }))} selected={form.components} onChange={(components) => set({ components })} />
+        <PillGroup hideLabel label={t.codexComponents} options={options.spellComponents.map((o) => ({ id: o.id, label: `${o.id} · ${o.label}` }))} selected={form.components} onChange={(components) => set({ components })} onTouch={(id) => setFocus(`comp:${id}`)} />
+        <ExplainHere explanation={here((f) => f.startsWith('comp:'))} />
         {form.components.includes('M') && <TextField label={t.hbMaterialExample} dataField="spell-material" value={form.material} onChange={(material) => set({ material })} />}
       </FormSection>
 
       <FormSection title={t.hbConcRitual}>
-        <Option multi id="concentration" selected={form.concentration} title={t.concentration} onClick={() => set({ concentration: !form.concentration })} />
-        <Option multi id="ritual" selected={form.ritual} title={t.ritual} onClick={() => set({ ritual: !form.ritual })} />
+        <Option multi id="concentration" selected={form.concentration} title={t.concentration} onClick={() => {
+            set({ concentration: !form.concentration });
+            setFocus('concentration');
+          }}
+        />
+        <Option multi id="ritual" selected={form.ritual} title={t.ritual} onClick={() => {
+            set({ ritual: !form.ritual });
+            setFocus('ritual');
+          }}
+        />
+        <ExplainHere explanation={here((f) => f === 'concentration' || f === 'ritual')} />
       </FormSection>
 
       <FormSection title={t.hbClassLists}>
-        <PillGroup hideLabel label={t.hbClassLists} options={options.spellClasses} selected={form.classes} onChange={(classes) => set({ classes })} />
+        <PillGroup hideLabel label={t.hbClassLists} options={options.spellClasses} selected={form.classes} onChange={(classes) => set({ classes })} onTouch={() => setFocus('classes')} />
+        <ExplainHere explanation={here((f) => f === 'classes')} />
       </FormSection>
 
       <FormSection title={t.hbDescription}>

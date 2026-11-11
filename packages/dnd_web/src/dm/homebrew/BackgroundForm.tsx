@@ -1,10 +1,10 @@
 import { useMemo, useState, type MutableRefObject } from 'react';
-import { backgroundEntry } from '../../codex/entries';
+import { backgroundEntry, featEntry } from '../../codex/entries';
 import { backgroundDraft, backgroundForm, homebrewFormOptions, type BackgroundForm as Form, type Catalog, type JsonObject } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
 import { Select } from '../../ui/primitives';
 import { EffectEditor } from './EffectEditor';
-import { EntryPreview, HomebrewFormShell } from './HomebrewFormShell';
+import { EntryPreview, ExplainHere, HomebrewFormShell, useHomebrewRules, type Explained } from './HomebrewFormShell';
 import { FormSection, PillGroup, TextAreaField, TextField } from './homebrewFields';
 
 /** Radix no admite un valor vacío en un `Select`: «(ninguna)» viaja con este. */
@@ -48,6 +48,9 @@ export function BackgroundForm({
   const [tried, setTried] = useState(false);
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState(false);
+  // Lo último que se tocó: la clave que entiende `explain`. Nada hasta el primer toque.
+  const [focus, setFocus] = useState<string | null>(null);
+  const rules = useHomebrewRules();
 
   const draft = useMemo(() => backgroundDraft(initial, form), [initial, form]);
   const options = useMemo(() => homebrewFormOptions(catalog), [catalog, lang]);
@@ -84,6 +87,29 @@ export function BackgroundForm({
     return [{ value: NONE, label: t.hbNoneParen }, ...list];
   }, [options, form.originFeatId, catalog, t]);
 
+  // Qué significa lo tocado (`explain` de Flutter): los textos son del motor.
+  const explain = (key: string): Explained | null => {
+    const names = (list: { id: string; label: string }[], ids: string[]) => (ids.length === 0 ? t.hbxNone : ids.map((id) => list.find((o) => o.id === id)?.label ?? id).join(' · '));
+    switch (key) {
+      case 'abilities':
+        return { kicker: t.codexAbilities, title: t.hbxAllThree, text: rules.backgroundAbilities };
+      case 'feat': {
+        const feat = catalog.feats.find((f) => f.id === form.originFeatId);
+        if (!feat) return { kicker: t.codexOriginFeat, title: t.hbxNoOriginFeat, text: rules.backgroundOriginFeat };
+        // La misma lectura que el Códice (`featSummary`): la descripción o, sin ella, los rasgos.
+        const prose = featEntry(feat, catalog, t, lang).detail().prose ?? '';
+        return { kicker: t.codexOriginFeat, title: String(feat.name), text: prose, note: rules.backgroundOriginFeat };
+      }
+      case 'skills':
+        return { kicker: t.hbProficiencies, title: names(options.skills, form.skillProficiencies), text: rules.skillProficiency };
+      case 'tools':
+        return { kicker: t.codexTools, title: names(options.tools, form.toolProficiencies), text: rules.toolProficiency };
+    }
+    return null;
+  };
+  const explanation = focus === null ? null : explain(focus);
+  const here = (test: (f: string) => boolean) => (focus !== null && test(focus) ? explanation : null);
+
   const entry = useMemo(() => backgroundEntry(draft.background, catalog, t, lang), [draft.background, catalog, t, lang]);
   const detail = useMemo(() => entry.detail(), [entry]);
   const preview = (
@@ -104,6 +130,7 @@ export function BackgroundForm({
       onSave={() => void save()}
       previewLabel={t.hbFeatPreview}
       preview={preview}
+      explanation={explanation}
     >
       <section className="card flex flex-col gap-3.5 p-4">
         <TextField
@@ -120,6 +147,7 @@ export function BackgroundForm({
           selected={form.abilityOptions}
           max={3}
           onChange={(abilityOptions) => set({ abilityOptions })}
+          onTouch={() => setFocus('abilities')}
           error={err.abilityOptions ? t.hbThreeAbilities : null}
         />
         <div className="flex max-w-[360px] min-w-0 flex-col gap-1.5">
@@ -129,15 +157,33 @@ export function BackgroundForm({
             className="w-full justify-between"
             label={t.codexOriginFeat}
             value={form.originFeatId === '' ? NONE : form.originFeatId}
-            onValueChange={(v) => set({ originFeatId: v === NONE ? '' : v })}
+            onValueChange={(v) => {
+              set({ originFeatId: v === NONE ? '' : v });
+              setFocus('feat');
+            }}
+            onOpen={() => setFocus('feat')}
             options={feats}
           />
         </div>
+        <ExplainHere explanation={here((f) => f === 'abilities' || f === 'feat')} />
       </section>
 
       <FormSection title={t.hbProficiencies}>
-        <PillGroup label={t.creatureSkills} options={options.skills} selected={form.skillProficiencies} onChange={(skillProficiencies) => set({ skillProficiencies })} />
-        <PillGroup label={t.codexTools} options={options.tools} selected={form.toolProficiencies} onChange={(toolProficiencies) => set({ toolProficiencies })} />
+        <PillGroup
+          label={t.creatureSkills}
+          options={options.skills}
+          selected={form.skillProficiencies}
+          onChange={(skillProficiencies) => set({ skillProficiencies })}
+          onTouch={() => setFocus('skills')}
+        />
+        <PillGroup
+          label={t.codexTools}
+          options={options.tools}
+          selected={form.toolProficiencies}
+          onChange={(toolProficiencies) => set({ toolProficiencies })}
+          onTouch={() => setFocus('tools')}
+        />
+        <ExplainHere explanation={here((f) => f === 'skills' || f === 'tools')} />
       </FormSection>
 
       <FormSection title={t.hbPresentation}>
