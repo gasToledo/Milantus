@@ -172,11 +172,7 @@ jobs:
   # catálogo ↔ motor en el navegador.
   web_e2e:
     name: web_e2e
-    # Fijo en 24.04: desde que `ubuntu-latest` empezó a migrar a Ubuntu 26
-    # (2026-10-19), `playwright install --with-deps` cae instalando las
-    # dependencias de Chromium. Volver a `ubuntu-latest` cuando Playwright
-    # soporte esa versión.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - uses: dart-lang/setup-dart@v1
