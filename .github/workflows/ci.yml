@@ -50,7 +50,12 @@ jobs:
       - uses: actions/checkout@v6
       - uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          # Fijo en el minor de producción (el `FROM` de Flutter del
+          # Dockerfile) y no `stable`: la app está congelada, y CI tiene que
+          # analizar con el Flutter que se despliega. El 2026-11-11 `stable`
+          # pasó a 3.47, que marca obsoleto `material.dart`, y `flutter
+          # analyze` cortó por 85 avisos de nivel info en código sin tocar.
+          flutter-version: 3.44.x
           # Sin esto cada corrida vuelve a bajar el SDK entero de Flutter.
           # `cache: true` guarda el SDK y el pub-cache; las claves por defecto
           # ya incluyen canal, versión, arquitectura y el hash de los
@@ -75,7 +80,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          flutter-version: 3.44.x # El mismo que el job `dnd_app`.
           cache: true
       - run: flutter pub get
       - run: flutter test --total-shards=2 --shard-index=${{ matrix.shard }}

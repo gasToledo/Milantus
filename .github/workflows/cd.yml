@@ -88,7 +88,7 @@ jobs:
       - name: Reconstruir y levantar el stack
         # `docker compose up --build` reutiliza cualquier imagen base ya
         # cacheada en el runner para las etapas `FROM` del Dockerfile
-        # (ghcr.io/cirruslabs/flutter:stable, dart:stable), aunque esas
+        # (ghcr.io/cirruslabs/flutter, dart:stable), aunque esas
         # etiquetas floten en el registro. Eso hizo fallar el build cuando
         # `dnd_app` subió su cota de SDK y el `stable` de Flutter cacheado
         # localmente quedó atrás. `--pull` en `up` solo afecta a servicios con

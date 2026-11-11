@@ -13,8 +13,8 @@
 # `CLAUDE.md`; se deja así por simplicidad de un despliegue de una sola
 # cuenta, no por ser la práctica recomendada en un stack con más operadores.
 #
-# `ghcr.io/cirruslabs/flutter` solo publica los *minor* de Flutter: `stable`
-# apunta al mismo digest que `3.44.0` y no existe tag para los hotfix
+# `ghcr.io/cirruslabs/flutter` solo publica los *minor* de Flutter (`3.44.0`)
+# y no existe tag para los hotfix
 # (`3.44.8`). Por eso `environment.sdk` de `dnd_app` no puede llevar una cota
 # de patch aunque el SDK local sí lo tenga: acá nunca va a haber una imagen
 # que la cumpla.
@@ -28,7 +28,11 @@
 # corren en paralelo y no comparten SDK.
 
 # ---- Etapa 1: build del cliente web (Flutter) ----
-FROM ghcr.io/cirruslabs/flutter:stable AS web-build
+# Fijo en 3.44.0 y no `stable`: Flutter está congelado y no se migra a
+# `material_ui`, el paquete al que 3.47 movió Material. Con `stable` el
+# despliegue cambiaría de Flutter sin aviso, y CI (`flutter-version: 3.44.x`)
+# probaría otro distinto del que se despliega.
+FROM ghcr.io/cirruslabs/flutter:3.44.0 AS web-build
 ENV PUB_CACHE=/pub-cache
 WORKDIR /workspace
 COPY packages/dnd_engine ./packages/dnd_engine
