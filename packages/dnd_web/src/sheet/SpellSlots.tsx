@@ -85,7 +85,7 @@ export function SpellSlotGrid({
             aria-pressed={on}
             onClick={() => onSelect(c.key)}
             className={cx(
-              'flex min-h-12 items-center justify-between gap-2 rounded-[var(--radius-card)] border px-2.5 py-1.5 text-left',
+              'pick flex min-h-12 items-center justify-between gap-2 rounded-[var(--radius-card)] border px-2.5 py-1.5 text-left',
               on ? 'border-gold bg-gold-soft' : 'border-hairline bg-plaque',
             )}
           >

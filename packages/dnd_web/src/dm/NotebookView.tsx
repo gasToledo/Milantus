@@ -150,7 +150,7 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
                   data-chapter={p.id === LOOSE ? 'loose' : p.id}
                   onClick={() => setPicked(p.id)}
                   className={cx(
-                    'rounded-[var(--radius-pill)] border px-3.5 py-1.5 text-[13px]',
+                    'pick rounded-[var(--radius-pill)] border px-3.5 py-1.5 text-[13px]',
                     on ? 'border-gold bg-gold-soft text-gold' : 'border-hairline text-on-surface-variant hover:text-on-surface',
                     // Buscando, una pill sin coincidencias se apaga: no hay nada ahí.
                     searching && n === 0 && !on && 'opacity-50',

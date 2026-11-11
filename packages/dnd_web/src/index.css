@@ -167,6 +167,64 @@ body {
   color: var(--text-muted);
 }
 
+/* Toda placa que se toca para elegir (opción de un asistente, celda de espacio,
+   pestaña de nivel, pill del Cuaderno): el borde se dora y el fondo se entibia
+   al pasar el mouse, y al apretar se hunde 1 px como la placa del sistema. La
+   forma de la placa y su reposo los pone quien la usa; esto es solo la reacción.
+   Va sin capa para ganarle a las utilidades de Tailwind de borde y fondo. */
+.pick {
+  cursor: pointer;
+  transition:
+    border-color 120ms ease-out,
+    background-color 120ms ease-out,
+    transform 120ms ease-out;
+}
+.pick:hover {
+  border-color: color-mix(in srgb, var(--gold) 60%, var(--hairline));
+  background-color: color-mix(in srgb, var(--gold-soft) 55%, var(--plaque));
+}
+.pick:active {
+  transform: translateY(1px);
+  background-color: var(--gold-soft);
+}
+.pick:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+/* Una pestaña con algo que corregir no pierde su borde carmesí al pasar. */
+.pick.border-crimson:hover {
+  border-color: var(--crimson);
+}
+.pick:disabled,
+.pick[aria-disabled='true'] {
+  cursor: default;
+}
+.pick:disabled:hover,
+.pick[aria-disabled='true']:hover {
+  border-color: var(--hairline);
+  background-color: var(--plaque);
+  transform: none;
+}
+.pick:disabled:active,
+.pick[aria-disabled='true']:active {
+  transform: none;
+  background-color: var(--plaque);
+}
+/* Lo elegido conserva su oro aunque el mouse pase encima (va al final para
+   ganarle también a lo apagado). */
+.pick[aria-pressed='true'],
+.pick[aria-checked='true'],
+.pick[aria-selected='true'],
+.pick[aria-pressed='true']:hover,
+.pick[aria-checked='true']:hover,
+.pick[aria-selected='true']:hover,
+.pick[aria-pressed='true']:active,
+.pick[aria-checked='true']:active,
+.pick[aria-selected='true']:active {
+  border-color: var(--gold);
+  background-color: var(--gold-soft);
+}
+
 /* El foco siempre se ve: el oro de la marca sobre cualquier fondo del tema. */
 :focus-visible {
   outline: 2px solid var(--gold);
@@ -371,6 +429,9 @@ body {
   }
   .roster-card:hover,
   .roster-card:focus-within {
+    transform: none;
+  }
+  .pick:active {
     transform: none;
   }
 }

@@ -97,7 +97,7 @@ export function Option({
       aria-disabled={blocked || undefined}
       onClick={onClick}
       className={cx(
-        'flex min-h-12 w-full items-center gap-3 rounded-[var(--radius-card)] border px-3.5 py-2.5 text-left text-on-surface transition-colors duration-[120ms] disabled:cursor-default',
+        'pick flex min-h-12 w-full items-center gap-3 rounded-[var(--radius-card)] border px-3.5 py-2.5 text-left text-on-surface',
         selected ? 'border-gold bg-gold-soft' : 'border-hairline bg-plaque',
       )}
     >
@@ -186,7 +186,7 @@ export function SpellTabs({
             data-tab={x.key}
             onClick={() => onSelect(x.key)}
             className={cx(
-              'flex shrink-0 rounded-[var(--radius-card)] border text-left text-on-surface transition-colors duration-[120ms]',
+              'pick flex shrink-0 rounded-[var(--radius-card)] border text-left text-on-surface',
               plain
                 ? 'h-[38px] items-center px-3.5'
                 : 'w-[148px] flex-col items-start gap-1 px-3 py-2.5 sm:w-auto sm:min-w-0 sm:flex-1',

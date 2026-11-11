@@ -265,7 +265,7 @@ export function SpellList({
               data-tab={x.key}
               onClick={() => setPicked(x.key)}
               className={cx(
-                'flex min-h-[52px] min-w-0 flex-col items-center justify-center rounded-[var(--radius-card)] border px-2.5 py-1.5',
+                'pick flex min-h-[52px] min-w-0 flex-col items-center justify-center rounded-[var(--radius-card)] border px-2.5 py-1.5',
                 on ? 'border-gold bg-gold-soft text-gold' : 'border-hairline bg-plaque',
               )}
             >
