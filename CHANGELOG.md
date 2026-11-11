@@ -1261,7 +1261,7 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
-## [Unreleased]
+## [0.49.0+1] - 2026-11-11
 
 ### Nuevo
 
@@ -1277,6 +1277,20 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - El objetivo del capítulo en curso deja de ser exclusivo del DM: lo lee el
   jugador. El de los capítulos cerrados y los pendientes sigue sin llegarle.
+
+### Eliminado
+
+- Sin cambios.
+
+## [Unreleased]
+
+### Nuevo
+
+- Sin cambios.
+
+### Modificado
+
+- Sin cambios.
 
 ### Eliminado
 
