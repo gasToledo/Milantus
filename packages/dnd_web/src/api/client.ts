@@ -330,6 +330,27 @@ async function sendJson(method: 'POST' | 'PUT' | 'DELETE', path: string, body: u
   if (!response.ok) throw new ApiError(response.status, path);
 }
 
+/** Cierra la sesión del servidor (`POST /auth/logout`) y devuelve adónde hay
+ *  que navegar: el cierre de sesión del proveedor, o `null` si el servidor no
+ *  lo pudo calcular (la sesión local igual quedó cerrada). Sin ese segundo salto
+ *  la cookie del proveedor sigue viva y el próximo ingreso entra sin pedir
+ *  contraseña (`ApiClient.logout` de Flutter). */
+export async function logout(): Promise<string | null> {
+  const path = '/auth/logout';
+  const response = await fetch(path, { method: 'POST' });
+  if (!response.ok) throw new ApiError(response.status, path);
+  try {
+    return ((await response.json()) as { logoutUrl?: string | null }).logoutUrl ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** Manda una sugerencia o un reporte de error (`POST /api/feedback`). El
+ *  servidor agrega quién escribe desde la sesión, nunca del cuerpo. */
+export const sendFeedback = (body: { kind: 'idea' | 'bug'; message: string; context: Record<string, string> }) =>
+  sendJson('POST', '/api/feedback', body);
+
 async function remove(path: string): Promise<void> {
   const response = await fetch(path, { method: 'DELETE' });
   if (!response.ok) throw new ApiError(response.status, path);

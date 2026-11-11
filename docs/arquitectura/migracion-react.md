@@ -124,9 +124,11 @@ repiten acá.
   se guardan con `patchSettings` (`src/api/settingsSave.ts`): el documento
   viaja entero, así que hay una cola de un solo guardado a la vez que combina
   los parches. Renombrar y borrar descartan lo pendiente de la ficha
-  (`dropPending`). Ajustes, Sugerencias, Cerrar sesión
-  enlazan a la raíz de Flutter (el Homebrew es del Modo DM y no está en este panel)
-  (`FLUTTER_HOME`, `src/router.tsx`). Cada tarjeta enlaza a la ficha. Las cifras
+  (`dropPending`). Ajustes es una pantalla de /v2; «Sugerencias y errores»
+  abre un diálogo (`src/ui/feedback.tsx`, `POST /api/feedback`) y «Cerrar
+  sesión» hace `POST /auth/logout` y navega al `logoutUrl` que devuelve, o a
+  la raíz (`FLUTTER_HOME`, `src/router.tsx`) si vino `null`: ninguno pasa por
+  Flutter. El Homebrew es del Modo DM y no está en este panel. Cada tarjeta enlaza a la ficha. Las cifras
   (nivel, PG máximos, CA, velocidad, iniciativa) salen de `computeSheet`; los
   PG actuales, de la ficha cruda. Sigue el lienzo aprobado: título, buscador,
   orden y «Crear» en una barra que se envuelve, regla ornamental y tarjetas

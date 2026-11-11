@@ -1,9 +1,11 @@
-import type { ReactNode } from 'react';
-import { CircleAlert, CloudCheck, Inbox, LoaderCircle, RefreshCw, RotateCw, SearchX } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
+import { Bug, CircleAlert, CloudCheck, Inbox, LoaderCircle, RefreshCw, RotateCw, SearchX } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { useAccount } from '../api/queries';
 import { useTexts } from '../i18n/context';
 import { Button } from './Button';
 import { cx } from './cx';
+import { FeedbackDialog } from './feedback';
 
 // Los tres estados que toda pantalla con datos tiene, siempre con los mismos
 // componentes (`diseno-web.md` §8, «Retroalimentación»): si cada pantalla
@@ -43,6 +45,9 @@ export function AppErrorView({
   as?: 'h1' | 'h2';
 }) {
   const t = useTexts();
+  const [reporting, setReporting] = useState(false);
+  // Sin sesión no hay a nombre de quién escribir: «Reportar» no aparece.
+  const canReport = useAccount().data != null;
   return (
     <section role="alert" className="card flex flex-col items-start gap-3 p-6">
       <CircleAlert size={40} aria-hidden="true" className="text-crimson" />
@@ -53,10 +58,30 @@ export function AppErrorView({
           {detail}
         </pre>
       )}
-      {onRetry && (
-        <Button icon={RotateCw} onClick={onRetry}>
-          {t.retry}
-        </Button>
+      {/* «Reportar» va al lado de «Reintentar»: es el momento en que alguien
+          tiene ganas de contarlo. */}
+      {(onRetry || canReport) && (
+        <div className="flex flex-wrap gap-2.5">
+          {onRetry && (
+            <Button icon={RotateCw} onClick={onRetry}>
+              {t.retry}
+            </Button>
+          )}
+          {canReport && (
+            <Button tone="secondary" icon={Bug} data-action="error-report" onClick={() => setReporting(true)}>
+              {t.errorReport}
+            </Button>
+          )}
+        </div>
+      )}
+      {reporting && (
+        <FeedbackDialog
+          origin="errorView"
+          initialKind="bug"
+          // El texto técnico viaja en el correo y no se muestra.
+          errorDetail={[title, message, detail].filter(Boolean).join('\n')}
+          onClose={() => setReporting(false)}
+        />
       )}
     </section>
   );

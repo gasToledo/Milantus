@@ -1321,6 +1321,24 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
+## [0.52.0+1] - 2026-11-11
+
+### Nuevo
+
+- «Reportar este error» en las pantallas de error de `/v2`, al lado de
+  «Reintentar»: abre «Sugerencias y errores» con «Un error» elegido y manda el
+  detalle técnico en el correo.
+
+### Modificado
+
+- «Sugerencias y errores» y «Cerrar sesión» del menú de `/v2` ya no pasan por la
+  versión anterior de la app: la sugerencia se envía desde un diálogo y cerrar
+  la sesión sale por el proveedor, igual que antes.
+
+### Eliminado
+
+- Sin cambios.
+
 ## [Unreleased]
 
 ### Nuevo

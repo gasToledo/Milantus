@@ -159,7 +159,8 @@ conjuro abre su detalle en un diálogo. Sus pasos de elecciones viven en
 | Componente | Qué hace | Regla |
 | --- | --- | --- |
 | `AppBusyLabel` | Spinner + texto, región viva | El texto es obligatorio |
-| `AppErrorView` | Ícono, título, mensaje, detalle copiable y «Reintentar» | `onRetry` siempre que reintentar pueda arreglarlo; `as="h1"` si ocupa la pantalla |
+| `AppErrorView` | Ícono, título, mensaje, detalle copiable, «Reintentar» y «Reportar este error» | `onRetry` siempre que reintentar pueda arreglarlo; `as="h1"` si ocupa la pantalla. «Reportar» abre `FeedbackDialog` con «Un error» elegido y el texto técnico en el correo (no se muestra); no aparece sin cuenta |
+| `FeedbackDialog` (`src/ui/feedback.tsx`) | «Sugerencias y errores» sobre `AppDialog`: «Una idea» / «Un error» (radio), mensaje de hasta 5000 caracteres, «Te respondemos a {correo}.» y Cancelar / Enviar. Si el envío falla queda abierto con el texto intacto y el error en una región viva; si sale, cierra y avisa con `showNotice`. El `context` lleva versión, idioma, tema, tamaño, `origin` y `client: 'v2'` | Quien lo abre lo monta con `{open && <FeedbackDialog origin=… onClose=… />}` para que cada apertura arranque limpia |
 | `AppEmptyState` | «No hay nada» (`empty`) o «nada coincide» (`no-match`), con ícono distinto | Son situaciones distintas y piden acciones distintas |
 | `Notice` | Pantalla de un solo mensaje con su `h1` | Sin sesión, no disponible, no encontrado |
 | `Button`, `ButtonLink` | `primary` (oro lleno, uno por vista), `soft` (oro sobre `goldSoft` con filete: el verbo de una barra de herramientas), `secondary`, `danger` (carmesí, lo irreversible); `shape="pill"` en una fila de pills; `disabled` lo atenúa | `ButtonLink internal` navega sin recargar |
