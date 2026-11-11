@@ -137,7 +137,7 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
 
     body = (
       <>
-        <div className="flex max-w-[900px] flex-wrap items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
           <div role="group" aria-label={t.dmNotebookChapterGroup} className="flex min-w-[min(300px,100%)] flex-[1_1_300px] flex-wrap gap-1.5">
             {pills.map((p) => {
               const on = p.id === current;
@@ -191,7 +191,7 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
           </div>
         </div>
 
-        <p className="flex max-w-[900px] flex-wrap gap-x-[18px] text-[12.5px] text-text-muted" data-field="counts">
+        <p className="flex flex-wrap gap-x-[18px] text-[12.5px] text-text-muted" data-field="counts">
           {shown.length === 0 ? (
             <span>{t.dmNoEntries}</span>
           ) : (
@@ -205,12 +205,12 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
 
         {shown.length === 0 ? (
           searching && (
-            <div className="max-w-[900px]">
+            <div>
               <AppEmptyState kind="no-match" message={t.dmNoEntriesMatch} />
             </div>
           )
         ) : (
-          <ol aria-label={pills.find((p) => p.id === current)?.label} className="flex max-w-[900px] flex-col gap-2.5">
+          <ol aria-label={pills.find((p) => p.id === current)?.label} className="flex flex-col gap-2.5">
             {shown.map((e) => (
               <li
                 key={e.key}
@@ -253,7 +253,7 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
                     </DropdownMenu>
                   )}
                 </div>
-                <div className="mt-1.5 text-[13.5px] leading-relaxed text-on-surface-variant">
+                <div className="mt-1.5 max-w-[620px] text-[13.5px] leading-relaxed text-on-surface-variant">
                   {e.markdown ? (
                     <MarkdownText text={e.body} mentions={mentions} />
                   ) : (
