@@ -61,7 +61,14 @@ La migración es **cuenta por cuenta**, no por porcentaje ni por rasgo: decide
 quién la prueba primero, no el azar (`WebConfig.v2Users`).
 
 - `DND_V2_USERS` (en `.env`: `V2_USERS`) es una lista de ids de cuenta separados
-  por coma; tolera espacios y comas de más; vacía = nadie.
+  por coma; tolera espacios y comas de más; vacía = nadie; `*` = todas las
+  cuentas.
+- `GET /` (el `index.html` de Flutter) responde **302 a `/v2/`** con
+  `Cache-Control: no-store` si la sesión es válida y la cuenta tiene `webV2`
+  (`rootHandler` en `app.dart`, con la misma resolución de sesión que `/api`).
+  Sin sesión, sin flag, o con la cookie `milantus_v1=1`, se sirve Flutter. La
+  cookie la escribe el interruptor «Usar la versión anterior» de Ajustes de
+  `/v2`: es por navegador y solo la lee el servidor.
 - `GET /api/me` devuelve `webV2: true` solo si el `userId` de esa respuesta
   está en la lista. Devuelve el booleano de **quien pregunta**, nunca la lista:
   la lista entera le diría a cualquiera quién más está probando.
@@ -1274,20 +1281,11 @@ Para que nadie lo dé por hecho:
 
 - Control de versión en el servidor para las escrituras (rechazar una copia
   vieja con 409): hoy gana el último que guarda, como en Flutter.
-- Enlaces desde Flutter hacia `/v2` o redirección automática por `webV2`.
-- Envío automático de errores del cliente. Hoy `ErrorBoundary` y los
-  listeners de `src/ui/recentErrors.ts` solo muestran la pantalla de error y
-  guardan los últimos tres en memoria; un error llega al equipo únicamente si
-  alguien lo reporta. Se decidió hacerlo **junto con la redirección de `/` a
-  `/v2`**, porque hasta entonces Flutter es el respaldo y quien tropieza puede
-  volver a él. Entonces faltan: un `POST /api/client-errors` propio (log del
-  contenedor, límite por usuario, deduplicación por firma, solo ids, nunca la
-  ficha) y servir los source maps, que hoy no se sirven y dejan las trazas
-  ilegibles.
+- Enlaces desde Flutter hacia `/v2` (la redirección de `/` ya existe).
 - Tests de componentes y chequeo de literales sueltos en `dnd_web`.
 - Un criterio medido de «paridad visual» con Flutter: hoy es la comparación
   manual.
-- Retiro de Flutter: ver abajo; de los seis criterios solo está cumplido el 4.
+- Retiro de Flutter: ver abajo; de los seis criterios están cumplidos el 4 y el 6.
 
 ## Criterios para retirar Flutter
 
@@ -1305,7 +1303,8 @@ propuestos, no medidos todavía:
 5. Texto, accesibilidad y responsividad cumplen la misma guía de diseño
    ([Diseño web](../desarrollo/diseno-web.md)) que Flutter.
 6. Hay una ventana en la que Flutter sigue sirviéndose en una ruta de reserva
-   antes de borrar `dnd_app`, para poder volver atrás.
+   antes de borrar `dnd_app`, para poder volver atrás. *(Cumplido: el
+   interruptor «Usar la versión anterior» de Ajustes, cookie `milantus_v1`.)*
 
 Retirar Flutter implica además actualizar `CLAUDE.md`, la guía de diseño (cuyo
 destino hoy sigue siendo Flutter) y el pipeline de CI/CD en el mismo cambio.

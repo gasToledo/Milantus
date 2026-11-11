@@ -6,6 +6,9 @@ export default defineConfig({
   // El servidor lo monta bajo `/v2/` (DND_WEB_V2_ROOT): sin esta base, los
   // assets del HTML apuntarían a `/assets/...`, que es del cliente de Flutter.
   base: '/v2/',
+  // Hidden: genera los .map sin el comentario que hace que el navegador los
+  // baje solo; se usan a mano para leer una traza del log (ver despliegue.md).
+  build: { sourcemap: 'hidden' },
   plugins: [react(), tailwindcss()],
   server: {
     // En desarrollo la API vive en el servidor Dart, no acá. Con el proxy el

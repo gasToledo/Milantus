@@ -64,7 +64,7 @@ WORKDIR /workspace
 COPY packages/dnd_engine ./packages/dnd_engine
 WORKDIR /workspace/packages/dnd_engine
 RUN --mount=type=cache,id=pub-dart-js,target=/pub-cache dart pub get
-RUN --mount=type=cache,id=pub-dart-js,target=/pub-cache dart compile js -O2 --no-source-maps -o /workspace/dnd_engine.js js/entrypoint.dart
+RUN --mount=type=cache,id=pub-dart-js,target=/pub-cache dart compile js -O2 -o /workspace/dnd_engine.js js/entrypoint.dart
 
 # ---- Etapa 4: build del cliente React (Node), servido bajo /v2 ----
 # Versión de Node fijada a propósito (a diferencia de las otras etapas): el
@@ -85,6 +85,10 @@ COPY packages/dnd_engine/lib/assets/srd_2024 /workspace/packages/dnd_engine/lib/
 # (`packages/dnd_web/.gitignore`), así que el contexto no lo trae.
 COPY --from=engine-js /workspace/dnd_engine.js ./src/engine/dnd_engine.generated.js
 RUN npm run build
+# El map de dart2js no entra al bundle de Vite (no encadena solo): se publica
+# al lado, en la raíz de /v2, para resolver una traza del motor en dos pasos
+# (ver `docs/operaciones/despliegue.md`).
+COPY --from=engine-js /workspace/dnd_engine.js.map ./dist/dnd_engine.js.map
 
 # ---- Etapa 5: runtime mínimo ----
 # `dart compile exe` produce un binario nativo: no hace falta el SDK de Dart

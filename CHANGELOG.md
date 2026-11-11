@@ -1369,6 +1369,25 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
+- Sin cambios.
+
+### Eliminado
+
+- Sin cambios.
+
+## [1.0.0+1] - 2026-11-11
+
+### Nuevo
+
+- La dirección principal de Milantus lleva a la versión nueva (`/v2`) a las
+  cuentas habilitadas (`V2_USERS=*` habilita a todas).
+- En Ajustes, «Usar la versión anterior» vuelve a abrir la versión anterior al
+  entrar, en ese navegador; se apaga desde la misma pantalla.
+- Los errores de la versión nueva llegan solos al equipo (sin datos de las
+  fichas), con source maps para leer cada traza.
+
+### Modificado
+
 - En la versión nueva, un error al dibujar una pantalla ya no la deja en
   blanco: muestra el aviso con «Reintentar» y «Reportar este error», y el menú
   sigue funcionando.

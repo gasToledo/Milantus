@@ -35,5 +35,5 @@ dart(['pub', 'get']);
 // Relativa a `engineDir` y no absoluta: con `shell` los argumentos llegan sin
 // comillas, y una ruta con espacios (`Proyecto DnD`) se parte en dos.
 const salidaRelativa = relative(engineDir, salida);
-dart(['compile', 'js', '-O2', '--no-source-maps', '-o', salidaRelativa, 'js/entrypoint.dart']);
+dart(['compile', 'js', '-O2', '-o', salidaRelativa, 'js/entrypoint.dart']);
 console.log(`Motor compilado en ${salida}`);
