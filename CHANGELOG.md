@@ -1290,9 +1290,8 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   vez que se entra a su pantalla (bienvenida, ficha propia, las cinco
   secciones de la campaña del DM, Bestiario, Biblioteca de PNJ y Homebrew). En
   Ajustes, «Tutoriales → Volver a verlos» los reinicia. Lo visto se comparte
-  con la versión anterior de la app. «¿Primera vez con D&D?» y «Modo DM» ya no
-  mencionan lo que `/v2` no tiene (el Códice «Primeros pasos» y el selector
-  «Modo»).
+  con la versión anterior de la app. «Modo DM» ya no menciona el selector
+  «Modo», que `/v2` no tiene (el Códice «Primeros pasos» sí existe).
 
 ### Modificado
 
@@ -1334,6 +1333,29 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 - «Sugerencias y errores» y «Cerrar sesión» del menú de `/v2` ya no pasan por la
   versión anterior de la app: la sugerencia se envía desde un diálogo y cerrar
   la sesión sale por el proveedor, igual que antes.
+
+### Eliminado
+
+- Sin cambios.
+
+## [0.52.1+1] - 2026-11-11
+
+### Modificado
+
+- Los tutoriales de `/v2` dicen lo que la app hace de verdad: el combate se arma
+  sumando a los personajes (con «Sumar a todos»), las tiradas de iniciativa se
+  cargan (las de monstruos y PNJ ya vienen tiradas), las recompensas de un
+  capítulo llegan en el aviso y los objetos se suman desde Inventario, y el
+  código para compartir sirve una sola vez y vence en 24 horas. «¿Primera vez
+  con D&D?» vuelve a nombrar el Códice «Primeros pasos». En inglés, el DM
+  *runs* a los PNJ y las mayúsculas siguen a 2024.
+- Las reglas de los estados del Códice y del combate siguen el manual de 2024:
+  Incapacitado ya no impide moverse, Aturdido no frena el movimiento, Agarrado,
+  Invisible, Petrificado, Derribado, Apresado e Inconsciente tienen su texto
+  completo, y los impactos críticos valen para cualquier ataque a 5 pies.
+- La guía «Antes de crear tu personaje» suma los aumentos de característica y la
+  dote de origen del trasfondo, y habla de conjuros en vez de hechizos.
+- Tres rótulos del Homebrew en inglés ajustados a la terminología de 2024.
 
 ### Eliminado
 
