@@ -1003,11 +1003,7 @@ void main() {
             portraitPaths: const ['ajeno/1.png', 'ajeno/2.png'],
             diary: [
               DiaryEntry(entryId: 'e1', title: 'Deudas', body: 'Al herrero.'),
-              DiaryEntry(
-                entryId: 'e2',
-                kind: DiaryEntryKind.image,
-                imageKey: 'ajeno/mapa.png',
-              ),
+              DiaryEntry(entryId: 'e2', imageKey: 'ajeno/mapa.png'),
             ],
           ),
         ],

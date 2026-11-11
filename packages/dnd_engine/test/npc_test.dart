@@ -200,15 +200,13 @@ void main() {
         notes: [
           DiaryEntry(
             entryId: 'i',
-            kind: DiaryEntryKind.image,
             title: 'Retrato de época',
             imageKey: 'a/1.png',
           ),
           DiaryEntry(
             entryId: 'l',
-            kind: DiaryEntryKind.link,
             title: 'Su canción',
-            body: 'https://example.com/cancion',
+            url: 'https://example.com/cancion',
           ),
         ],
       );
@@ -216,11 +214,29 @@ void main() {
       final json = npc.toJson();
       final r = Npc.fromJson(json);
 
-      expect(json['schemaVersion'], 2);
+      expect(json['schemaVersion'], Npc.currentSchemaVersion);
       expect(r.notes[0].kind, DiaryEntryKind.image);
       expect(r.notes[0].imageKey, 'a/1.png');
       expect(r.notes[1].kind, DiaryEntryKind.link);
-      expect(r.notes[1].body, 'https://example.com/cancion');
+      expect(r.notes[1].url, 'https://example.com/cancion');
+    });
+
+    test('una nota v2 de enlace pasa su URL a url', () {
+      final r = Npc.fromJson({
+        ...doc(),
+        'schemaVersion': 2,
+        'notes': [
+          {
+            'entryId': 'l',
+            'kind': 'link',
+            'title': 'Su canción',
+            'body': 'https://example.com/cancion',
+          },
+        ],
+      });
+
+      expect(r.notes.single.url, 'https://example.com/cancion');
+      expect(r.notes.single.body, isEmpty);
     });
 
     test('un tipo desconocido cae en sin estadísticas', () {

@@ -173,7 +173,7 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
     remove(entry) {
       const r = writer.edit({ type: 'removeNote', entry: entry.entryId });
       if (!r) return;
-      if (entry.kind === 'image' && entry.imageKey) {
+      if (entry.imageKey) {
         // Con imagen no se ofrece deshacer: el archivo se va y volvería roto.
         void deletePortrait(entry.imageKey).catch(() => undefined);
         return;
@@ -316,7 +316,6 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
             entries={npc.notes ?? []}
             title={t.npcNotes}
             emptyMessage={t.npcNotesEmpty(npc.name)}
-            minWidth={260}
             edit={noteEditor}
           />
         </div>

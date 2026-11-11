@@ -1233,6 +1233,34 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
+## [0.48.0+1] - 2026-11-11
+
+### Nuevo
+
+- Una entrada del Diario puede combinar texto, imagen y enlace a la vez (con un
+  nombre opcional para el enlace); solo el título es obligatorio. Lo mismo
+  vale para las notas de un PNJ. Esquema de personaje 25 y de PNJ 3
+  (`dnd_engine`): el enlace que antes se guardaba como texto pasa a su propio
+  campo.
+
+### Modificado
+
+- En `/v2`, las entradas del Diario son tarjetas a todo el ancho que muestran
+  su contenido completo: se editan con el lápiz de la tarjeta y la imagen se
+  amplía al tocarla. Desaparece el selector Texto | Imagen | Enlace y el
+  diálogo de lectura.
+- Los botones elegibles de `/v2` (opciones de asistentes, pestañas y celdas de
+  conjuros, Inspiración Heroica, estados, pills de filtro, tarjetas de clase)
+  reaccionan al pasar el mouse y al apretarlos.
+- Capítulos y Cuaderno del DM ocupan todo el ancho del panel; la prosa de cada
+  tarjeta conserva un ancho de lectura.
+- Al importar un personaje exportado como PNJ, las entradas del Diario con
+  imagen pasan con su texto y enlace, sin la imagen.
+
+### Eliminado
+
+- Sin cambios.
+
 ## [Unreleased]
 
 ### Nuevo

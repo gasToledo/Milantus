@@ -121,7 +121,7 @@ class BackupBundleCodec {
       final diaryEntries = <Map<String, String>>[];
       for (final entry in character.diary) {
         final imageKey = entry.imageKey;
-        if (entry.kind != DiaryEntryKind.image || imageKey == null) continue;
+        if (imageKey == null) continue;
         final bytes = await readPortrait(imageKey);
         if (bytes == null) continue;
         if (bytes.length > maxEntryBytes) {

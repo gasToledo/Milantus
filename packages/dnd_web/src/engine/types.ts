@@ -458,13 +458,14 @@ export interface CharacterFields {
 /** Una entrada del Diario (`DiaryEntry.toJson`). */
 export interface DiaryEntry {
   entryId: string;
-  /** Un tipo desconocido se lee como texto, como en el motor. */
-  kind: 'text' | 'image' | 'link' | string;
   title: string;
-  /** La prosa de una entrada de texto, o la URL de una de enlace. */
+  /** Solo la prosa (Markdown). Una entrada combina texto, imagen y enlace. */
   body?: string;
   /** Clave del almacén de retratos (`<personaje>/<archivo>`). */
   imageKey?: string | null;
+  /** El enlace y el nombre con que se muestra; ambos opcionales. */
+  url?: string | null;
+  linkLabel?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
 }

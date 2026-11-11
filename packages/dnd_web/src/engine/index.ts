@@ -826,7 +826,16 @@ export type NpcAction =
   | { type: 'setBackground'; text: string }
   | { type: 'addTag'; tag: string }
   | { type: 'removeTag'; tag: string }
-  | { type: 'saveNote'; entry: string; kind: string; title: string; body: string; imageKey: string | null; at: string }
+  | {
+      type: 'saveNote';
+      entry: string;
+      title: string;
+      body: string;
+      imageKey: string | null;
+      url: string | null;
+      linkLabel: string | null;
+      at: string;
+    }
   | { type: 'removeNote'; entry: string }
   | { type: 'moveNote'; entry: string; to: string }
   | { type: 'setBlock'; block: JsonObject }
@@ -1176,10 +1185,11 @@ export type SheetAction =
   | {
       type: 'saveDiaryEntry';
       entry: string;
-      kind: 'text' | 'image' | 'link';
       title: string;
       body: string;
       imageKey: string | null;
+      url: string | null;
+      linkLabel: string | null;
       at: string;
     }
   | { type: 'removeDiaryEntry'; entry: string }

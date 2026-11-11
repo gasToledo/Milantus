@@ -1074,13 +1074,7 @@ void main() {
             demoSagan().toJson()..['raceId'] = 'hb-especie',
           ).copyWith(
             portraitPaths: [portraitKey],
-            diary: [
-              DiaryEntry(
-                entryId: 'mapa',
-                kind: DiaryEntryKind.image,
-                imageKey: diaryKey,
-              ),
-            ],
+            diary: [DiaryEntry(entryId: 'mapa', imageKey: diaryKey)],
           ),
         );
         await characters.create(

@@ -629,13 +629,15 @@ class _DiaryEntriesCardState extends State<DiaryEntriesCard> {
         // pinta como el resto del texto: si no, la tarjeta promete algo que el
         // modal después no cumple.
         return Text(
-          e.body,
+          e.url ?? '',
           maxLines: 6,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 12.5,
             height: 1.6,
-            color: _openableLink(e.body) == null ? pal.textMuted : pal.gold,
+            color: _openableLink(e.url ?? '') == null
+                ? pal.textMuted
+                : pal.gold,
           ),
         );
       case DiaryEntryKind.text:
@@ -753,13 +755,13 @@ class _DiaryEntriesCardState extends State<DiaryEntriesCard> {
           ),
         );
       case DiaryEntryKind.link:
-        final link = _openableLink(e.body);
+        final link = _openableLink(e.url ?? '');
         if (link == null) {
           // No se finge que es un enlace lo que no se va a poder abrir: queda
           // como texto, y seleccionable para poder copiarlo a mano.
           return readingWidth(
             SelectableText(
-              e.body,
+              e.url ?? '',
               style: TextStyle(
                 fontSize: 14,
                 height: 1.55,
@@ -780,7 +782,7 @@ class _DiaryEntriesCardState extends State<DiaryEntriesCard> {
                 children: [
                   Flexible(
                     child: Text(
-                      e.body,
+                      e.url ?? '',
                       style: TextStyle(
                         fontSize: 14,
                         height: 1.55,
@@ -986,7 +988,13 @@ class _DiaryEntryDialogState extends State<_DiaryEntryDialog> {
   late final _titleCtrl = TextEditingController(
     text: widget.entry?.title ?? '',
   );
-  late final _bodyCtrl = TextEditingController(text: widget.entry?.body ?? '');
+  // En una entrada de enlace el campo de texto lleva la URL, que ya no vive en
+  // `body`.
+  late final _bodyCtrl = TextEditingController(
+    text: widget.entry?.kind == DiaryEntryKind.link
+        ? widget.entry?.url ?? ''
+        : widget.entry?.body ?? '',
+  );
   late DiaryEntryKind _kind = widget.entry?.kind ?? DiaryEntryKind.text;
   late String? _imageKey = widget.entry?.imageKey;
 
@@ -1045,6 +1053,12 @@ class _DiaryEntryDialogState extends State<_DiaryEntryDialog> {
   void _guardar() {
     final ahora = DateTime.now();
     final previa = widget.entry;
+    final texto = _bodyCtrl.text.trim();
+    // ponytail: este diálogo sigue con sus tres tipos y no edita entradas
+    // combinadas (texto + imagen + enlace) que se escriben desde /v2. Lo que no
+    // muestra de la entrada existente lo conserva mientras no se cambie su tipo;
+    // se retira con la migración a React (Flutter está congelado).
+    final conserva = previa != null && previa.kind == _kind;
     final entrada =
         (previa ??
                 DiaryEntry(
@@ -1052,10 +1066,17 @@ class _DiaryEntryDialogState extends State<_DiaryEntryDialog> {
                   createdAt: ahora,
                 ))
             .copyWith(
-              kind: _kind,
               title: _titleCtrl.text.trim(),
-              body: _kind == DiaryEntryKind.image ? '' : _bodyCtrl.text.trim(),
+              body: switch (_kind) {
+                DiaryEntryKind.text => texto,
+                DiaryEntryKind.image => conserva ? previa.body : '',
+                DiaryEntryKind.link => '',
+              },
               imageKey: _kind == DiaryEntryKind.image ? _imageKey : null,
+              url: _kind == DiaryEntryKind.link
+                  ? texto
+                  : (conserva ? previa.url : null),
+              linkLabel: conserva ? previa.linkLabel : null,
               // La fecha de modificación solo tiene sentido si hubo una anterior:
               // en una entrada nueva las dos serían la misma y la tarjeta diría
               // «editada» de algo recién escrito.

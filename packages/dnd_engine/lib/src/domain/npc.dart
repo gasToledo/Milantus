@@ -73,7 +73,9 @@ class Npc {
   ///
   /// - 2: las notas pasan de `{id, date, text}` a [DiaryEntry], las mismas
   ///   tarjetas del Diario del personaje (imagen, enlace y texto).
-  static const int currentSchemaVersion = 2;
+  /// - 3: una nota puede combinar texto, imagen y enlace a la vez: el enlace
+  ///   pasa de `body` a `url` y `kind` deja de guardarse (`DiaryEntry`).
+  static const int currentSchemaVersion = 3;
 
   final String id;
   final String name;
@@ -323,6 +325,14 @@ class Npc {
                 'body': raw['text'],
               if (raw['date'] != null) 'createdAt': raw['date'],
             },
+      ];
+    }
+    if (version < 3) {
+      // v2 → v3: mismo paso que la v25 del Diario del personaje, porque las
+      // notas son las mismas entradas. Se copia cada nota; la entrada no se muta.
+      migrated['notes'] = [
+        for (final n in (migrated['notes'] as List? ?? const []))
+          n is Map ? DiaryEntry.migrateJson(Map<String, dynamic>.from(n)) : n,
       ];
     }
     migrated['schemaVersion'] = currentSchemaVersion;

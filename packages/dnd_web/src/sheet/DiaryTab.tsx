@@ -2,18 +2,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Check,
   Download,
-  ExternalLink,
   Feather,
   GripVertical,
-  Image as ImageIcon,
   Link2,
-  NotebookText,
   Pencil,
   Plus,
   ScrollText,
   TriangleAlert,
   Upload,
-  type LucideIcon,
 } from 'lucide-react';
 import { ApiError } from '../api/client';
 import { deletePortrait, uploadPortrait } from '../api/portraits';
@@ -23,7 +19,6 @@ import { AppDialog } from '../ui/AppDialog';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { cx } from '../ui/cx';
-import { Eyebrow } from '../ui/data';
 import { MarkdownText } from '../ui/MarkdownText';
 import { PortraitViewer } from '../ui/PortraitViewer';
 import { ScrollArea, Tooltip } from '../ui/primitives';
@@ -33,19 +28,24 @@ import { AppBusyLabel, AppEmptyState } from '../ui/status';
 import type { SheetModel } from './model';
 import type { SheetNotify } from './writer';
 
-/** Un tipo desconocido se lee como texto, igual que `DiaryEntryKind.fromJson`. */
-type Kind = 'text' | 'image' | 'link';
-const kindOf = (e: DiaryEntry): Kind => (e.kind === 'image' || e.kind === 'link' ? e.kind : 'text');
-const KIND_ICON: Record<Kind, LucideIcon> = { text: NotebookText, image: ImageIcon, link: Link2 };
-
 /** La imagen de una entrada vive en el almacén de retratos (`imageKey` es
  *  `<personaje>/<archivo>`), que se sirve con la misma cookie de sesión. */
 const imageUrl = portraitUrl;
 
 /** Solo se enlaza lo que es web: un `javascript:` escrito en una entrada no
  *  puede volverse un enlace que se ejecute al tocarlo. */
-const safeUrl = (body: string | undefined): string | null =>
-  body && /^https?:\/\//i.test(body.trim()) ? body.trim() : null;
+const safeUrl = (url: string | null | undefined): string | null =>
+  url && /^https?:\/\//i.test(url.trim()) ? url.trim() : null;
+
+/** El dominio que acompaña al nombre del enlace en su pill. Una URL que no se
+ *  puede leer se muestra tal cual. */
+const domainOf = (url: string): string => {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return url;
+  }
+};
 
 /**
  * Pestaña Diario: el lado creativo del personaje. El **trasfondo** está
@@ -329,8 +329,16 @@ export function BackgroundEditor({
  *  Sin él, la tarjeta es de solo lectura:
  *  sin «+», sin ícono de mover y sin «Editar». */
 export interface DiaryEditor {
-  /** Alta (un `entry` nuevo) o edición. El motor recorta y limpia por tipo. */
-  save(input: { entry: string; kind: Kind; title: string; body: string; imageKey: string | null }): void;
+  /** Alta (un `entry` nuevo) o edición. El motor recorta; un enlace o un nombre
+   *  vacío se guardan como ausentes. */
+  save(input: {
+    entry: string;
+    title: string;
+    body: string;
+    imageKey: string | null;
+    url: string;
+    linkLabel: string;
+  }): void;
   /** Borra, avisa y, sin imagen, ofrece deshacer. */
   remove(entry: DiaryEntry): void;
   move(from: string, to: string): void;
@@ -338,30 +346,26 @@ export interface DiaryEditor {
   upload(file: File): Promise<string>;
 }
 
-const hasImage = (e: DiaryEntry) => kindOf(e) === 'image' && !!e.imageKey;
+const hasImage = (e: DiaryEntry) => !!e.imageKey;
 
 /**
- * Las entradas del Diario: una grilla de tarjetas que se abren en un diálogo.
- * Son las mismas que usan las notas de un PNJ, como en Flutter
- * (`DiaryEntriesCard`): un segundo molde obligaría a mantener dos.
+ * Las entradas del Diario: una columna de tarjetas que muestran todo su
+ * contenido (texto, imagen y enlace). Son las mismas que usan las notas de un
+ * PNJ: un segundo molde obligaría a mantener dos.
  */
 export function DiaryEntries({
   entries,
   title,
   emptyMessage,
-  minWidth = 280,
   edit,
 }: {
   entries: DiaryEntry[];
   title: string;
   emptyMessage: string;
-  /** Ancho mínimo de una tarjeta: una columna lateral pide menos. */
-  minWidth?: number;
   edit?: DiaryEditor;
 }) {
   const t = useTexts();
   const lang = useLang();
-  const [open, setOpen] = useState<DiaryEntry | null>(null);
   // `null` es una entrada nueva; `undefined`, el editor cerrado.
   const [editing, setEditing] = useState<DiaryEntry | null | undefined>(undefined);
   const [deleting, setDeleting] = useState<DiaryEntry | null>(null);
@@ -416,33 +420,21 @@ export function DiaryEntries({
           }
         />
       ) : (
-        // Grilla y no columnas: al reordenar, el orden tiene que leerse de
-        // izquierda a derecha, y en columnas la tarjeta siguiente quedaba
-        // abajo. Las de una misma fila miden lo mismo.
-        <ul
-          className="grid gap-3"
-          style={{ gridTemplateColumns: `repeat(auto-fill, minmax(min(${minWidth}px, 100%), 1fr))` }}
-        >
+        // Una sola columna: cada entrada muestra todo lo que lleva, y el orden
+        // (que el jugador acomoda) se lee de arriba abajo.
+        <ul className="flex flex-col gap-3">
           {entries.map((e) => (
             <EntryCard
               key={e.entryId}
               entry={e}
               dates={dates(e)}
-              onOpen={() => setOpen(e)}
+              onEdit={edit ? () => setEditing(e) : undefined}
               reorder={edit ? reorder : undefined}
             />
           ))}
         </ul>
       )}
 
-      {open && (
-        <EntryReader
-          entry={open}
-          dates={dates(open)}
-          onClose={() => setOpen(null)}
-          onEdit={edit ? () => setEditing(open) : undefined}
-        />
-      )}
       {edit && editing !== undefined && (
         <EntryEditor
           entry={editing}
@@ -484,162 +476,118 @@ export function DiaryEntries({
 function EntryCard({
   entry,
   dates,
-  onOpen,
+  onEdit,
   reorder,
 }: {
   entry: DiaryEntry;
   dates: string;
-  onOpen: () => void;
+  onEdit?: () => void;
   reorder?: ReturnType<typeof useReorder>;
 }) {
   const t = useTexts();
-  const kind = kindOf(entry);
-  const Icon = KIND_ICON[kind];
+  const [viewing, setViewing] = useState(false);
+  const [gone, setGone] = useState(false);
   const title = entry.title || t.diaryUntitled;
-  const link = kind === 'link' ? safeUrl(entry.body) : null;
   const id = entry.entryId;
+  const body = entry.body?.trim() ?? '';
+  const url = entry.url?.trim() ?? '';
+  const link = safeUrl(url);
+  const label = entry.linkLabel?.trim() ?? '';
+  const showImage = !!entry.imageKey;
+  const text = body !== '' && <MarkdownText text={body} className="max-w-[620px] text-[14px] leading-[1.55] text-on-surface" />;
+  const linkNode =
+    url !== '' &&
+    (link ? (
+      <a
+        href={link}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="pick inline-flex h-[30px] max-w-full items-center gap-1.5 self-start rounded-[var(--radius-pill)] border border-hairline px-3 text-[12.5px] text-on-surface"
+      >
+        <Link2 size={14} aria-hidden="true" className="shrink-0 text-gold" />
+        <span className="min-w-0 truncate">{label ? `${label} · ${domainOf(link)}` : domainOf(link)}</span>
+        <span className="sr-only">{` (${t.diaryOpenLink})`}</span>
+      </a>
+    ) : (
+      // Lo que no es web no se enlaza: se ve como texto, para poder copiarlo.
+      <p className="text-[12.5px] break-all text-text-muted">{url}</p>
+    ));
+  const content = (text || linkNode) && <div className="flex min-w-0 flex-col gap-2.5">{text}{linkNode}</div>;
   return (
-    // Un `<li>` con el botón que abre y, como hermano, el pie con el ícono de
-    // mover: un botón no puede ir adentro de otro.
+    // Un `<li>` y no un botón: la tarjeta tiene sus propios controles (editar,
+    // abrir la imagen, el enlace) y un botón no puede ir adentro de otro.
     <li
       {...reorder?.item(id)}
+      data-entry={id}
       className={cx(
-        'flex min-w-0 flex-col overflow-hidden rounded-[var(--radius-card)] border-2 bg-plaque',
+        'plaque flex min-w-0 flex-col gap-2.5 border-2 px-4 py-3.5',
         reorder?.over === id ? 'border-gold' : 'border-hairline',
         reorder?.dragging === id && 'opacity-30',
       )}
     >
-      <button
-        type="button"
-        onClick={onOpen}
-        aria-label={t.diaryOpenEntry(title)}
-        className="flex w-full flex-1 flex-col justify-start text-left"
-        data-entry={id}
-      >
-        {kind === 'image' && entry.imageKey && (
-          <img
-            src={thumbnailUrl(imageUrl(entry.imageKey), 512)}
-            alt=""
-            loading="lazy"
-            className="block h-[120px] w-full object-cover"
-          />
-        )}
-        <span className="block px-[13px] pt-3">
-          <span className="flex items-center gap-[7px]">
-            <Icon size={15} aria-hidden="true" className="shrink-0 text-gold" />
-            <span className="font-display min-w-0 flex-1 text-[15px] leading-[1.3] break-words text-on-surface">{title}</span>
+      <div className="flex items-baseline gap-2.5">
+        <h3 className="font-display min-w-0 flex-1 text-[15px] leading-[1.3] break-words text-on-surface">{title}</h3>
+        {dates && <span className="shrink-0 text-[12px] text-text-muted tabular-nums">{dates}</span>}
+        {(onEdit || reorder) && (
+          <span className="-my-1.5 -mr-2 flex shrink-0 items-center self-center">
+            {onEdit && (
+              <Tooltip content={t.diaryEditAction}>
+                <button
+                  type="button"
+                  aria-label={`${t.diaryEditAction}: ${title}`}
+                  data-action="edit-entry"
+                  onClick={onEdit}
+                  className={ICON_BUTTON}
+                >
+                  <Pencil size={16} aria-hidden="true" />
+                </button>
+              </Tooltip>
+            )}
+            {reorder && (
+              <Tooltip content={t.diaryDragHint}>
+                <button
+                  type="button"
+                  aria-label={t.diaryMoveEntry(title)}
+                  className="inline-flex h-8 w-8 cursor-grab items-center justify-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold"
+                  {...reorder.grip(id)}
+                >
+                  <GripVertical size={16} aria-hidden="true" />
+                </button>
+              </Tooltip>
+            )}
           </span>
-          {kind === 'image' && !entry.imageKey && (
-            <span className="mt-[7px] block text-[12.5px] text-on-surface-variant">{t.diaryNoImage}</span>
-          )}
-          {kind !== 'image' && entry.body && (
-            <span
-              className={cx(
-                'mt-[7px] line-clamp-4 block text-[12.5px] leading-[1.6] [overflow-wrap:anywhere] whitespace-pre-line',
-                link ? 'text-gold' : 'text-on-surface-variant',
-              )}
-            >
-              {entry.body}
-            </span>
-          )}
-        </span>
-      </button>
-      <div className="flex min-h-9 items-center justify-between pr-1 pl-[13px] text-[11.5px] text-text-muted tabular-nums">
-        <span>{dates}</span>
-        {reorder && (
-          <Tooltip content={t.diaryDragHint}>
+        )}
+      </div>
+      {showImage ? (
+        <div className="grid grid-cols-[150px_minmax(0,1fr)] items-start gap-3.5">
+          {gone ? (
+            <p className="text-[12.5px] text-text-muted">{t.diaryImageGone}</p>
+          ) : (
             <button
               type="button"
-              aria-label={t.diaryMoveEntry(title)}
-              className="inline-flex h-8 w-8 cursor-grab items-center justify-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold"
-              {...reorder.grip(id)}
+              aria-label={t.diarySeeFullImage}
+              onClick={() => setViewing(true)}
+              className="block cursor-zoom-in overflow-hidden rounded-[var(--radius-nav)] border border-hairline"
             >
-              <GripVertical size={16} aria-hidden="true" />
+              <img
+                src={thumbnailUrl(imageUrl(entry.imageKey!), 512)}
+                alt={t.diaryImageAlt(entry.title)}
+                loading="lazy"
+                onError={() => setGone(true)}
+                className="block h-[112px] w-full object-cover"
+              />
             </button>
-          </Tooltip>
-        )}
-      </div>
+          )}
+          {content}
+        </div>
+      ) : (
+        content
+      )}
+      {showImage && !gone && (
+        <PortraitViewer src={imageUrl(entry.imageKey!)} name={entry.title} open={viewing} onOpenChange={setViewing} />
+      )}
     </li>
   );
-}
-
-/** Leer una entrada. Editar sale de acá y no de la tarjeta: es chica y un lápiz
- *  ahí competiría con el toque que abre la entrada. */
-function EntryReader({
-  entry,
-  dates,
-  onClose,
-  onEdit,
-}: {
-  entry: DiaryEntry;
-  dates: string;
-  onClose: () => void;
-  onEdit?: () => void;
-}) {
-  const t = useTexts();
-  return (
-    <AppDialog
-      open
-      onOpenChange={(v) => !v && onClose()}
-      title={entry.title || t.diaryUntitled}
-      icon={KIND_ICON[kindOf(entry)]}
-      // 560 y no 480: el cuerpo puede ser una imagen.
-      width={560}
-      actions={[
-        { label: t.close },
-        ...(onEdit ? [{ label: t.diaryEditAction, primary: true, onSelect: onEdit }] : []),
-      ]}
-    >
-      <div className="flex flex-col gap-3">
-        {dates && <p className="text-[12px] text-text-muted tabular-nums">{dates}</p>}
-        <EntryBody entry={entry} />
-      </div>
-    </AppDialog>
-  );
-}
-
-/** La entrada completa, en el diálogo. */
-function EntryBody({ entry }: { entry: DiaryEntry }) {
-  const t = useTexts();
-  const kind = kindOf(entry);
-  const [viewing, setViewing] = useState(false);
-  const [gone, setGone] = useState(false);
-  if (kind === 'image') {
-    if (!entry.imageKey) return <p>{t.diaryEntryNoImage}</p>;
-    if (gone) return <p>{t.diaryImageGone}</p>;
-    const src = imageUrl(entry.imageKey);
-    return (
-      <>
-        <button type="button" aria-label={t.diarySeeFullImage} onClick={() => setViewing(true)} className="block cursor-zoom-in">
-          <img
-            src={src}
-            alt={t.diaryImageAlt(entry.title)}
-            onError={() => setGone(true)}
-            className="w-full rounded-[var(--radius-nav)]"
-          />
-        </button>
-        <PortraitViewer src={src} name={entry.title} open={viewing} onOpenChange={setViewing} />
-      </>
-    );
-  }
-  if (kind === 'link') {
-    const url = safeUrl(entry.body);
-    return url ? (
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 break-all text-gold underline underline-offset-2"
-      >
-        {url}
-        <ExternalLink size={14} aria-hidden="true" className="shrink-0" />
-        <span className="sr-only">{` (${t.diaryOpenLink})`}</span>
-      </a>
-    ) : (
-      <p className="break-words">{entry.body}</p>
-    );
-  }
-  return <MarkdownText text={entry.body ?? ''} className="text-[14px] leading-[1.6] text-on-surface" />;
 }
 
 const FIELD =
@@ -659,16 +607,17 @@ function EntryEditor({
 }) {
   const t = useTexts();
   const [title, setTitle] = useState(entry?.title ?? '');
-  const [kind, setKind] = useState<Kind>(entry ? kindOf(entry) : 'text');
-  // Un solo cuerpo para texto y enlace, como en Flutter: ninguna entrada usa
-  // los dos a la vez.
   const [body, setBody] = useState(entry?.body ?? '');
   const [imageKey, setImageKey] = useState<string | null>(entry?.imageKey ?? null);
+  const [url, setUrl] = useState(entry?.url ?? '');
+  const [linkLabel, setLinkLabel] = useState(entry?.linkLabel ?? '');
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
 
-  const canSave = !uploading && title.trim() !== '' && (kind !== 'image' || imageKey !== null);
+  // Solo el título es obligatorio: texto, imagen y enlace se combinan o no.
+  const canSave = !uploading && title.trim() !== '';
 
   const choose = async (file: File | undefined) => {
     if (fileInput.current) fileInput.current.value = '';
@@ -681,6 +630,7 @@ function EntryEditor({
       // cascada se la lleva). Si algún día molesta el espacio, borrarla acá es
       // una llamada a `deletePortrait`.
       setImageKey(await edit.upload(file));
+      setFileName(file.name);
     } catch (e) {
       // El servidor rechaza con 400 (tipo) o 413 (tamaño) sin decir cuál: el
       // aviso nombra las dos causas.
@@ -693,10 +643,11 @@ function EntryEditor({
   const save = () =>
     edit.save({
       entry: entry?.entryId ?? `diary-${Date.now()}`,
-      kind,
       title,
       body,
-      imageKey: kind === 'image' ? imageKey : null,
+      imageKey,
+      url,
+      linkLabel,
     });
 
   return (
@@ -723,82 +674,72 @@ function EntryEditor({
             className={FIELD}
           />
         </label>
-        <div>
-          <Eyebrow>{t.diaryEntryType}</Eyebrow>
-          <div role="radiogroup" aria-label={t.diaryEntryType} className="mt-2 flex flex-wrap gap-2">
-            {(['text', 'image', 'link'] as const).map((k) => {
-              const Icon = KIND_ICON[k];
-              return (
-                <button
-                  key={k}
-                  type="button"
-                  role="radio"
-                  aria-checked={kind === k}
-                  onClick={() => setKind(k)}
-                  className={cx(
-                    'inline-flex min-h-9 items-center gap-1.5 rounded-[var(--radius-pill)] border px-3.5 text-[13px]',
-                    kind === k ? 'border-gold bg-gold-soft text-gold' : 'border-hairline text-on-surface',
-                  )}
-                >
-                  <Icon size={15} aria-hidden="true" />
-                  {t.diaryKinds[k]}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-        {kind === 'image' ? (
-          <div className="flex flex-col gap-3">
-            {imageKey && (
+        <label className="flex flex-col gap-1.5 text-[12px] text-text-muted">
+          <span>{t.diaryText}</span>
+          <textarea
+            data-field="entry-body"
+            rows={4}
+            value={body}
+            placeholder={t.diaryBodyHint}
+            onChange={(e) => setBody(e.target.value)}
+            className={`${FIELD} resize-y`}
+          />
+        </label>
+        <div className="flex flex-col gap-1.5" data-field="entry-image">
+          <span className="text-[12px] text-text-muted">{t.diaryImageLabel}</span>
+          <input
+            ref={fileInput}
+            type="file"
+            accept=".png,.jpg,.jpeg,.webp,.gif"
+            hidden
+            onChange={(e) => void choose(e.target.files?.[0])}
+          />
+          {uploading ? (
+            <AppBusyLabel label={t.diaryUploading} />
+          ) : imageKey ? (
+            <div className="plaque flex items-center gap-3 p-2.5">
               <img
                 src={thumbnailUrl(imageUrl(imageKey), 512)}
                 alt=""
-                className="block h-[150px] w-full rounded-[var(--radius-nav)] object-cover"
+                className="block h-16 w-[88px] shrink-0 rounded-[var(--radius-nav)] object-cover"
               />
-            )}
-            <input
-              ref={fileInput}
-              type="file"
-              accept=".png,.jpg,.jpeg,.webp,.gif"
-              hidden
-              onChange={(e) => void choose(e.target.files?.[0])}
-            />
-            {uploading ? (
-              <AppBusyLabel label={t.diaryUploading} />
-            ) : (
-              <div>
-                <Button tone="secondary" icon={Upload} onClick={() => fileInput.current?.click()}>
-                  {imageKey ? t.diaryChangeImage : t.diaryChooseImage}
-                </Button>
-              </div>
-            )}
-            <p className="text-[12px] text-text-muted">{t.diaryImageFormats}</p>
-          </div>
-        ) : kind === 'link' ? (
-          <label className="flex flex-col gap-1.5 text-[12px] text-text-muted">
-            <span>{t.diaryKinds.link}</span>
-            <input
-              type="url"
-              data-field="entry-body"
-              value={body}
-              placeholder="https://…"
-              onChange={(e) => setBody(e.target.value)}
-              className={FIELD}
-            />
-          </label>
-        ) : (
-          <label className="flex flex-col gap-1.5 text-[12px] text-text-muted">
-            <span>{t.diaryKinds.text}</span>
-            <textarea
-              data-field="entry-body"
-              rows={6}
-              value={body}
-              placeholder={t.diaryBodyHint}
-              onChange={(e) => setBody(e.target.value)}
-              className={`${FIELD} resize-y`}
-            />
-          </label>
-        )}
+              <span className="min-w-0 flex-1 truncate text-[13px] text-on-surface-variant">{fileName ?? ''}</span>
+              <Button tone="secondary" onClick={() => fileInput.current?.click()}>
+                {t.luChange}
+              </Button>
+              <Button tone="danger" onClick={() => setImageKey(null)}>
+                {t.dmRemoveShort}
+              </Button>
+            </div>
+          ) : (
+            <div>
+              <Button tone="secondary" icon={Upload} onClick={() => fileInput.current?.click()}>
+                {t.diaryChooseImage}
+              </Button>
+            </div>
+          )}
+        </div>
+        <label className="flex flex-col gap-1.5 text-[12px] text-text-muted">
+          <span>{t.diaryLinkLabel}</span>
+          <input
+            type="url"
+            data-field="entry-url"
+            value={url}
+            placeholder="https://…"
+            onChange={(e) => setUrl(e.target.value)}
+            className={FIELD}
+          />
+        </label>
+        <label className="flex flex-col gap-1.5 text-[12px] text-text-muted">
+          <span>{t.diaryLinkName}</span>
+          <input
+            data-field="entry-link-label"
+            value={linkLabel}
+            onChange={(e) => setLinkLabel(e.target.value)}
+            className={FIELD}
+          />
+        </label>
+        <p className="text-[12.5px] text-text-muted">{t.diaryOnlyTitleRequired}</p>
         {error && (
           <p role="alert" className="text-[12.5px] text-crimson">
             {error}

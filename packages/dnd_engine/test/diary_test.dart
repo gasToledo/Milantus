@@ -88,15 +88,14 @@ void main() {
           ),
           const DiaryEntry(
             entryId: 'b',
-            kind: DiaryEntryKind.image,
             title: 'Hoja de personaje',
             imageKey: 'mirna/boceto.png',
           ),
           const DiaryEntry(
             entryId: 'c',
-            kind: DiaryEntryKind.link,
             title: 'La playlist',
-            body: 'https://example.com/pantano',
+            url: 'https://example.com/pantano',
+            linkLabel: 'Playlist',
           ),
         ],
       );
@@ -112,20 +111,8 @@ void main() {
       expect(vuelta.diary[1].kind, DiaryEntryKind.image);
       expect(vuelta.diary[1].imageKey, 'mirna/boceto.png');
       expect(vuelta.diary[2].kind, DiaryEntryKind.link);
-      expect(vuelta.diary[2].body, 'https://example.com/pantano');
-    });
-
-    // Un documento escrito por una versión más nueva puede traer un tipo que
-    // acá todavía no existe; perder la entrada entera sería peor que leerla
-    // como texto, que deja título y cuerpo a la vista.
-    test('un tipo desconocido se lee como texto', () {
-      final entrada = DiaryEntry.fromJson({
-        'entryId': 'x',
-        'kind': 'video',
-        'title': 'Algo',
-      });
-
-      expect(entrada.kind, DiaryEntryKind.text);
+      expect(vuelta.diary[2].url, 'https://example.com/pantano');
+      expect(vuelta.diary[2].linkLabel, 'Playlist');
     });
 
     test('una fecha ilegible no cuesta la entrada', () {

@@ -71,9 +71,8 @@ final _casos = <String, Character>{
       ),
       DiaryEntry(
         entryId: 'diario-b',
-        kind: DiaryEntryKind.link,
         title: 'Segunda',
-        body: 'https://example.org',
+        url: 'https://example.org',
         createdAt: DateTime.utc(2026, 3, 20),
       ),
     ],

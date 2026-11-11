@@ -418,19 +418,20 @@ class InventoryEntry {
       );
 }
 
-/// De qué es una entrada del Diario.
+/// De qué es una entrada del Diario, **derivado** de lo que lleva.
 ///
-/// Tres y no más: el enlace se guarda como texto pelado, sin vista previa ni
-/// miniatura del destino, así que no hace falta distinguir un video de una
-/// playlist. El día que haga falta, se suma un valor acá y no un campo nuevo.
+/// Ya no se guarda: una entrada combina texto, imagen y enlace a la vez (el
+/// jugador pega un mapa, lo describe y le suma la fuente), así que un solo tipo
+/// por entrada obligaba a elegir. Queda como getter [DiaryEntry.kind] para los
+/// lectores que todavía preguntan «de qué es» (Flutter, que sigue con sus tres
+/// tipos) y se decide por lo más visible: imagen, si no enlace sin texto, si no
+/// texto.
 enum DiaryEntryKind {
   text,
   image,
   link;
 
-  /// Un tipo desconocido —documento importado, versión más nueva que escribió
-  /// algo que acá no existe— se lee como texto en vez de costar la entrada: el
-  /// título y el cuerpo siguen siendo legibles.
+  /// Un tipo desconocido se lee como texto.
   static DiaryEntryKind fromJson(Object? value) {
     for (final kind in DiaryEntryKind.values) {
       if (kind.name == value) return kind;
@@ -440,7 +441,8 @@ enum DiaryEntryKind {
 }
 
 /// Una entrada del Diario: arte, una historia corta, una manía, un enlace a la
-/// playlist con la que se escribe al personaje.
+/// playlist con la que se escribe al personaje. **Una sola entrada puede llevar
+/// texto, imagen y enlace** a la vez; solo el título es obligatorio.
 ///
 /// Es lo que el jugador quiera contar y **nada de esto es una regla**: no llega
 /// al `ComputedSheet` ni cambia un número de la ficha.
@@ -449,25 +451,25 @@ class DiaryEntry {
   /// comparten título tocaría la equivocada.
   final String entryId;
 
-  final DiaryEntryKind kind;
-
   /// Siempre lo hay, y es lo que identifica la entrada en la grilla.
   final String title;
 
-  /// La prosa de una entrada de texto, o la URL de una de enlace.
-  ///
-  /// Un campo y no dos: ninguna entrada usa los dos a la vez, así que el
-  /// segundo quedaría vacío en la mitad del diario. Una entrada de imagen lo
-  /// deja vacío.
+  /// Solo la prosa. La URL del enlace vive en [url]: antes compartían campo
+  /// porque ninguna entrada usaba los dos, y ahora una sí.
   final String body;
 
-  /// Clave del almacén de imágenes, solo en las entradas de tipo imagen.
+  /// Clave del almacén de imágenes, si la entrada lleva imagen.
   ///
   /// Es una clave de **retrato**: el Diario reusa ese almacén en vez de
   /// estrenar uno propio. Sale gratis la validación de tipo y tamaño que ya
   /// hace `PortraitBlobStore`, y borrar el personaje ya se lleva sus imágenes
   /// sin que nadie agregue una cascada nueva.
   final String? imageKey;
+
+  /// El enlace de la entrada, guardado como texto pelado (sin vista previa del
+  /// destino), y el nombre con el que se muestra. Ambos son opcionales.
+  final String? url;
+  final String? linkLabel;
 
   /// Cuándo se agregó y cuándo se tocó por última vez.
   ///
@@ -480,56 +482,86 @@ class DiaryEntry {
 
   const DiaryEntry({
     required this.entryId,
-    this.kind = DiaryEntryKind.text,
     this.title = '',
     this.body = '',
     this.imageKey,
+    this.url,
+    this.linkLabel,
     this.createdAt,
     this.updatedAt,
   });
 
+  /// De qué es, para quien todavía distingue tipos (ver [DiaryEntryKind]).
+  DiaryEntryKind get kind {
+    if (imageKey != null) return DiaryEntryKind.image;
+    if (url != null && body.isEmpty) return DiaryEntryKind.link;
+    return DiaryEntryKind.text;
+  }
+
   DiaryEntry copyWith({
-    DiaryEntryKind? kind,
     String? title,
     String? body,
     Object? imageKey = _unset,
+    Object? url = _unset,
+    Object? linkLabel = _unset,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) =>
       DiaryEntry(
         entryId: entryId,
-        kind: kind ?? this.kind,
         title: title ?? this.title,
         body: body ?? this.body,
-        // Centinela: pasar `imageKey: null` sí la suelta, que es lo que hace
-        // falta cuando una entrada de imagen pasa a ser de texto.
+        // Centinela: pasar `null` sí suelta el campo, que es lo que hace falta
+        // cuando se quita la imagen o el enlace de una entrada.
         imageKey:
             identical(imageKey, _unset) ? this.imageKey : imageKey as String?,
+        url: identical(url, _unset) ? this.url : url as String?,
+        linkLabel: identical(linkLabel, _unset)
+            ? this.linkLabel
+            : linkLabel as String?,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
       );
 
   Map<String, dynamic> toJson() => {
         'entryId': entryId,
-        'kind': kind.name,
         'title': title,
         if (body.isNotEmpty) 'body': body,
         if (imageKey != null) 'imageKey': imageKey,
+        if (url != null) 'url': url,
+        if (linkLabel != null) 'linkLabel': linkLabel,
         if (createdAt != null) 'createdAt': createdAt!.toIso8601String(),
         if (updatedAt != null) 'updatedAt': updatedAt!.toIso8601String(),
       };
 
-  factory DiaryEntry.fromJson(Map<String, dynamic> j) => DiaryEntry(
-        entryId: j['entryId'] as String? ?? '',
-        kind: DiaryEntryKind.fromJson(j['kind']),
-        title: j['title'] as String? ?? '',
-        body: j['body'] as String? ?? '',
-        imageKey: j['imageKey'] as String?,
-        // `tryParse` y no `parse`: una fecha ilegible de una importación es un
-        // dato decorativo perdido, no motivo para perder la entrada entera.
-        createdAt: DateTime.tryParse(j['createdAt'] as String? ?? ''),
-        updatedAt: DateTime.tryParse(j['updatedAt'] as String? ?? ''),
-      );
+  /// Lleva una entrada del formato viejo (un `kind` guardado, y la URL del
+  /// enlace en `body`) al actual, sin mutar la entrada. La usan la ficha (v25)
+  /// y las notas del PNJ (v3), que guardan las mismas entradas.
+  static Map<String, dynamic> migrateJson(Map<String, dynamic> source) {
+    final migrated = Map<String, dynamic>.from(source);
+    final kind = migrated.remove('kind');
+    if (kind == 'link') {
+      final body = migrated.remove('body');
+      if (body is String && body.isNotEmpty) migrated['url'] = body;
+    }
+    return migrated;
+  }
+
+  factory DiaryEntry.fromJson(Map<String, dynamic> source) {
+    final j = migrateJson(source);
+    return DiaryEntry(
+      entryId: j['entryId'] as String? ?? '',
+      title: j['title'] as String? ?? '',
+      body: j['body'] as String? ?? '',
+      imageKey: j['imageKey'] as String?,
+      url: j['url'] as String?,
+      linkLabel: j['linkLabel'] as String?,
+      // `tryParse` y no `parse`: una fecha ilegible de una importación es un
+      // dato decorativo perdido, no motivo para perder la entrada entera.
+      createdAt: DateTime.tryParse(j['createdAt'] as String? ?? ''),
+      updatedAt: DateTime.tryParse(j['updatedAt'] as String? ?? ''),
+    );
+  }
 }
 
 /// Centinela para distinguir "no se pasó el argumento" de "se pasó null" en
@@ -539,7 +571,7 @@ const Object _unset = Object();
 /// Personaje con todas las **elecciones resueltas**. Es la fuente de verdad y
 /// también, serializado, el formato de exportación individual.
 class Character {
-  static const int currentSchemaVersion = 24;
+  static const int currentSchemaVersion = 25;
 
   final String id;
   String name;
@@ -1409,7 +1441,6 @@ class Character {
               if (legacy is String && legacy.trim().isNotEmpty)
                 {
                   'entryId': 'nota-migrada',
-                  'kind': DiaryEntryKind.text.name,
                   'title': 'Nota',
                   'body': legacy,
                 },
@@ -1501,6 +1532,21 @@ class Character {
           }
           migrated['combat'] = combat;
           version = 24;
+          migrated['schemaVersion'] = version;
+        case 24:
+          // Una entrada del Diario deja de tener un tipo guardado: el enlace
+          // pasa de `body` a `url` y `kind` se borra (ver `DiaryEntry`). Se
+          // copia cada entrada y no se toca la lista de entrada.
+          final diary = migrated['diary'];
+          if (diary is List) {
+            migrated['diary'] = [
+              for (final e in diary)
+                e is Map
+                    ? DiaryEntry.migrateJson(Map<String, dynamic>.from(e))
+                    : e,
+            ];
+          }
+          version = 25;
           migrated['schemaVersion'] = version;
       }
     }

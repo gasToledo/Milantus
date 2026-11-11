@@ -240,9 +240,8 @@ Future<void> main() async {
         ),
         DiaryEntry(
           entryId: 'd-mapa',
-          kind: DiaryEntryKind.link,
           title: 'Mapa de la Marca',
-          body: 'https://example.org/marca',
+          url: 'https://example.org/marca',
         ),
       ],
     ),

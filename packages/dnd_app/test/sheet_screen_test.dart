@@ -2794,7 +2794,6 @@ void main() {
           diary: const [
             DiaryEntry(
               entryId: 'e1',
-              kind: DiaryEntryKind.image,
               title: 'Boceto',
               imageKey: 'mirna/boceto.png',
             ),
@@ -2819,9 +2818,8 @@ void main() {
           diary: const [
             DiaryEntry(
               entryId: 'e1',
-              kind: DiaryEntryKind.link,
               title: 'La playlist',
-              body: 'https://example.com/pantano',
+              url: 'https://example.com/pantano',
             ),
           ],
         ),
@@ -2845,9 +2843,8 @@ void main() {
           diary: const [
             DiaryEntry(
               entryId: 'e1',
-              kind: DiaryEntryKind.link,
               title: 'Sospechoso',
-              body: 'javascript:alert(1)',
+              url: 'javascript:alert(1)',
             ),
           ],
         ),

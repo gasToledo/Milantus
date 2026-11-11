@@ -48,11 +48,7 @@ void main() {
         final personaje = _character('sagan').copyWith(
           diary: const [
             DiaryEntry(entryId: 'otra', title: 'Manías', body: 'Cuenta pasos.'),
-            DiaryEntry(
-              entryId: 'e1',
-              kind: DiaryEntryKind.image,
-              title: 'Boceto',
-            ),
+            DiaryEntry(entryId: 'e1', title: 'Boceto'),
           ],
         );
         final bundle = BackupBundle(
@@ -104,13 +100,7 @@ void main() {
         characters: [
           BundleCharacter(
             character: _character('sagan').copyWith(
-              diary: const [
-                DiaryEntry(
-                  entryId: 'e1',
-                  kind: DiaryEntryKind.image,
-                  title: 'Boceto',
-                ),
-              ],
+              diary: const [DiaryEntry(entryId: 'e1', title: 'Boceto')],
             ),
           ),
         ],

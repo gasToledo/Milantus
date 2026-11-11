@@ -151,13 +151,14 @@ class SheetActions {
   /// - `setUnarmoredDefense` con `classId`, entre las fórmulas de la ficha.
   /// - `setBackground` con `text`: el trasfondo tal cual, sin recortar, porque
   ///   se manda mientras alguien escribe.
-  /// - Diario: `saveDiaryEntry` con `entry` (el id), `kind`, `title`, `body`,
-  ///   `imageKey` y `at` (fecha ISO que pone quien llama, para que el motor no
-  ///   dependa del reloj). Título y cuerpo se recortan. Un id existente se
+  /// - Diario: `saveDiaryEntry` con `entry` (el id), `title`, `body`,
+  ///   `imageKey`, `url`, `linkLabel` y `at` (fecha ISO que pone quien llama,
+  ///   para que el motor no dependa del reloj). Una entrada combina texto,
+  ///   imagen y enlace; solo el título es obligatorio. Título, cuerpo, enlace y
+  ///   nombre se recortan (enlace o nombre vacío = null). Un id existente se
   ///   reemplaza en su lugar, conserva `createdAt` y pone `updatedAt`; uno nuevo
-  ///   va al final y sin `updatedAt`. Una imagen lleva el cuerpo vacío y los
-  ///   otros tipos no llevan `imageKey`. Sin título, o una imagen sin
-  ///   `imageKey`, la ficha vuelve intacta y `outcome.saved` es false.
+  ///   va al final y sin `updatedAt`. Sin título la ficha vuelve intacta y
+  ///   `outcome.saved` es false.
   ///   `removeDiaryEntry` con `entry`. `moveDiaryEntry` con `entry` y `to` (el
   ///   id del destino). Ids que no existen dejan la ficha como estaba.
   /// - `rename` con `name`: el nombre del personaje, recortado. Vacío (o solo

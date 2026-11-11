@@ -122,7 +122,7 @@ elige algo, sea o no un asistente:
 **Movimiento.** Suave y eficaz, como pide `diseno-web.md` §10: nada aparece de
 golpe, porque lo brusco se siente inacabado. Lo que aparece (un paso, un bloque
 que abre una elección, el detalle) entra con `.step-in` (`index.css`, 160 ms de
-opacidad y 4 px), y las opciones y la tira cambian de color en 120 ms. Solo CSS,
+opacidad y 4 px), y las opciones y la tira cambian de color en 120 ms. Toda placa que se toca para elegir (opción, celda, pestaña, pill de filtro) lleva `.pick` (`index.css`): borde dorado y fondo tibio al pasar el mouse, se hunde 1 px al apretar, y lo elegido (`aria-pressed`/`aria-checked`/`aria-selected`) conserva el oro. Solo CSS,
 y se apaga con «reducir movimiento». Usá estas mismas clases en cualquier
 pantalla nueva. Un paso nuevo tiene que remontar sus bloques: si son del mismo
 tipo, lleva `key` con el paso.
@@ -187,7 +187,7 @@ conjuro abre su detalle en un diálogo. Sus pasos de elecciones viven en
 | `PortraitViewer` | El retrato original entero sobre el velo, con cerrar; `Esc` y clic afuera también cierran | Lo abre `Medallion` con `viewable` y la imagen de una entrada del Diario |
 | `PortraitWorkshop` (`src/sheet/`) | El taller de retratos: generar con IA, subir, volver a uno guardado y borrar. Recibe un `PortraitOwner` (nombre, rótulo del detalle, retratos, `buildPrompt`, `upload`, `saveBase64`, `apply`, `notify`) | Lo arman `PortraitPage` (ficha propia) y `NpcPortraitView` (PNJ). `buildPrompt` va memoizado en quien lo arma; `commitDetails` solo para el PNJ sin ficha |
 | `NpcTableView` (`src/dm/npcs/`) | «Mostrar a la mesa»: retrato y nombre a pantalla completa sobre `bg-scaffold`, con ojo para ocultar el nombre y cerrar | Tapa el panel a propósito; muestra solo retrato y nombre. El marco no cambia de tamaño al ocultar el nombre |
-| `DiaryEntries` (`src/sheet/DiaryTab.tsx`) | Tarjeta de entradas en grilla (`minWidth`, 280 por defecto); con `edit` (un `DiaryEditor`: `save`, `remove`, `move`, `upload`) suma «+», editor, borrado y el ícono de mover | Sin `edit` es de solo lectura (ficha ajena) |
+| `DiaryEntries` (`src/sheet/DiaryTab.tsx`) | Columna de tarjetas a todo el ancho: título y fecha arriba; debajo, la imagen (150 px, abre el visor), el texto en Markdown y el enlace como pill con «nombre · dominio» (solo si pasa `safeUrl`). Una entrada combina texto, imagen y enlace; solo el título es obligatorio. Con `edit` (un `DiaryEditor`: `save`, `remove`, `move`, `upload`) suma «+», el lápiz de cada tarjeta, el editor, el borrado y el ícono de mover | Sin `edit` es de solo lectura (ficha ajena). No hay diálogo de lectura |
 | `useReorder` (`src/ui/reorder.ts`) | Reordenar con el puntero (desde un ícono con `touch-action: none`) o con flechas; da `item(id)`, `grip(id)`, `dragging` y `over` | `onMove(desde, hasta)`; sin dependencias, lo usa el Diario |
 | `useHoldDrag` (`src/ui/holdDrag.ts`) | Reordenar tomando la tarjeta entera, sin ícono: con el mouse, apretando y moviendo 6 px; con el dedo, sosteniendo 350 ms, para que deslizar siga desplazando. La tarjeta sigue al puntero, las demás se corren y la ventana se desplaza cerca de los bordes; `Escape` cancela. Da `item(id)`, `dragging`, `over` y `animated` | `canDrop(desde, hasta)` y `onMove(desde, hasta)`; `group` (la fila lleva `data-reorder-group` y el hook mide solo las de su grupo: sin él, solo las que no tienen grupo, así el panel de música no se mezcla con las tarjetas de la Mesa) y `axis: 'y'` (`dx` queda en 0, para una lista con scroll propio). Con «reducir movimiento» nada sigue al puntero: se atenúa y se marca. Con teclado, `Alt` más una flecha sobre la tarjeta enfocada la mueve al vecino (`canDrop` manda) y no dibuja nada |
 | `RosterCard` (`src/dashboard/`) | La tarjeta de personaje: el nombre es el enlace y se estira con `::after`; a la derecha del nivel, el menú ⋮ de 40 × 40 (favorito, renombrar, rehacer, borrar). Se mueve tomándola entera (`useHoldDrag`) | El ⋮ lleva `relative z-10` o el enlace estirado lo tapa; el favorito y la lista filtrada no se mueven |
@@ -402,7 +402,7 @@ inexistente son la misma pantalla). Desde 6b escribe campañas y la Mesa y desde
   Georgia 28 con su lápiz, la línea de tipo en `Pill` oro y los tags neutros
   con su ✕ y un «Tag» al final, la voz como cita con la comilla en oro y su
   lápiz) y debajo dos columnas: Trasfondo (`Card`) y Notas
-  (`DiaryEntries`, el mismo de la pestaña Diario, a dos columnas) a la izquierda,
+  (`DiaryEntries`, el mismo de la pestaña Diario) a la izquierda,
   Estadísticas y Campañas a la derecha; la tarjeta de un PNJ de bloque termina con
   «Editar bloque» (`soft`, `data-action="edit-block"`), que abre el editor. En Campañas, cada una lleva su
   `NpcStatusSelector` y la tarjeta un «Sumar» (`PickManyDialog` con las campañas

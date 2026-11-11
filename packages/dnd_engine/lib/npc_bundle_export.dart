@@ -50,7 +50,7 @@ List<({String owner, String key})> npcExportImageKeys(
     ];
 
 /// El PNJ con ficha que sale de un personaje exportado: el trasfondo y las
-/// entradas del Diario (sin las de imagen) pasan al PNJ y se vacían en la
+/// entradas del Diario (sin sus imágenes) pasan al PNJ y se vacían en la
 /// ficha; el homebrew se reduce al que la ficha usa.
 ///
 /// Es el personaje retirado de un jugador que vuelve a la mesa en manos del DM.
@@ -58,8 +58,9 @@ List<({String owner, String key})> npcExportImageKeys(
 ({Npc npc, Character sheet, Map<String, List<Map<String, dynamic>>> homebrew})
     adoptCharacterAsNpc(
   Character original,
-  Map<String, List<Map<String, dynamic>>> allHomebrew,
-) {
+  Map<String, List<Map<String, dynamic>>> allHomebrew, {
+  Set<String> imageEntryIds = const {},
+}) {
   final homebrew = homebrewUsedBy(original, allHomebrew);
 
   final npc = Npc(
@@ -68,13 +69,18 @@ List<({String owner, String key})> npcExportImageKeys(
     sheetKind: NpcSheetKind.character,
     background: original.background,
     // Las entradas del Diario son del mismo tipo que las notas del PNJ, así
-    // que pasan tal cual (texto y enlaces). Las de imagen no: su archivo vive
-    // en el respaldo aparte de los retratos y acá no hay a dónde mandarlo.
+    // que pasan (texto y enlaces). Su imagen no: el archivo vive en el respaldo
+    // aparte de los retratos y acá no hay a dónde mandarlo. Una entrada puede
+    // combinar texto, imagen y enlace, así que la imagen se quita y lo demás
+    // queda; si solo era una imagen con título, no queda nada que contar y no
+    // pasa. [imageEntryIds] son las que traían imagen aunque el lector del
+    // respaldo ya les haya soltado la clave.
     notes: [
       for (final e in original.diary)
-        if (e.kind != DiaryEntryKind.image &&
-            [e.title, e.body].any((t) => t.trim().isNotEmpty))
-          e,
+        if (_hasImage(e, imageEntryIds)
+            ? [e.body, e.url ?? ''].any((t) => t.trim().isNotEmpty)
+            : [e.title, e.body, e.url ?? ''].any((t) => t.trim().isNotEmpty))
+          e.copyWith(imageKey: null),
     ],
   );
   // Vaciados en la ficha para que no quede una copia que nadie ve.
@@ -85,6 +91,9 @@ List<({String owner, String key})> npcExportImageKeys(
   );
   return (npc: npc, sheet: sheet, homebrew: homebrew);
 }
+
+bool _hasImage(DiaryEntry e, Set<String> imageEntryIds) =>
+    e.imageKey != null || imageEntryIds.contains(e.entryId);
 
 /// El archivo con que un DM le pasa un PNJ a otro (tipo `dnd_npc`).
 ///

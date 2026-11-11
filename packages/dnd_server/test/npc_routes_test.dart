@@ -563,12 +563,7 @@ void main() {
           'npc': stored
               .copyWith(
                 notes: [
-                  DiaryEntry(
-                    entryId: 'n1',
-                    kind: DiaryEntryKind.image,
-                    title: 'Mapa',
-                    imageKey: key,
-                  ),
+                  DiaryEntry(entryId: 'n1', title: 'Mapa', imageKey: key),
                 ],
               )
               .toJson(),
@@ -1177,13 +1172,11 @@ void main() {
           notes: const [
             DiaryEntry(
               entryId: 'a',
-              kind: DiaryEntryKind.image,
               title: 'Viajó',
               imageKey: 'npc-origen/1.png',
             ),
             DiaryEntry(
               entryId: 'b',
-              kind: DiaryEntryKind.image,
               title: 'No viajó',
               imageKey: 'otra-carpeta/9.png',
             ),
@@ -1399,7 +1392,6 @@ void main() {
                   ...stored.notes,
                   DiaryEntry(
                     entryId: 'img',
-                    kind: DiaryEntryKind.image,
                     title: 'Mapa',
                     imageKey: noteImage,
                   ),
@@ -1573,12 +1565,12 @@ void main() {
         portraitPrompts: withExtras ? {'$id/0.png': 'una guerrera'} : const {},
         background: withExtras ? 'Exiliada del norte.' : '',
         diary: withExtras
-            ? const [
+            ? [
                 DiaryEntry(entryId: 'a', title: 'Cuenta', body: 'Debo oro'),
                 DiaryEntry(
                   entryId: 'b',
-                  kind: DiaryEntryKind.image,
                   title: 'Imagen',
+                  imageKey: '$id/1.png',
                 ),
               ]
             : const [],

@@ -32,7 +32,7 @@ void main() {
     final character = Character.fromJson(source);
 
     expect(jsonEncode(source), original);
-    expect(migrated['schemaVersion'], 24);
+    expect(migrated['schemaVersion'], Character.currentSchemaVersion);
     expect(migrated['classHistory'], ['warlock', 'warlock', 'warlock']);
     expect(migrated['subclassIds'], {'warlock': 'fiend'});
     expect(migrated['classCantripIds'], {
@@ -1106,8 +1106,45 @@ void main() {
       );
     });
 
-    test('la multiclase usa el esquema 24', () {
-      expect(Character.currentSchemaVersion, 24);
+    // El enlace pasa de `body` a `url` y `kind` deja de guardarse: una entrada
+    // puede llevar texto, imagen y enlace a la vez.
+    test('migra v24 a v25: el enlace pasa a url y el tipo se borra', () {
+      final source = {
+        'schemaVersion': 24,
+        'id': 'v24',
+        'name': 'Con diario',
+        'raceId': 'human',
+        'classId': 'fighter',
+        'backgroundId': 'soldier',
+        'assignedScores': const <String, int>{},
+        'diary': [
+          {'entryId': 'a', 'kind': 'text', 'title': 'Texto', 'body': 'hola'},
+          {
+            'entryId': 'b',
+            'kind': 'image',
+            'title': 'Imagen',
+            'imageKey': 'v24/b.png',
+          },
+          {
+            'entryId': 'c',
+            'kind': 'link',
+            'title': 'Enlace',
+            'body': 'https://example.com/x',
+          },
+        ],
+      };
+      final original = jsonEncode(source);
+
+      final migrated = Character.migrateJson(source);
+      final diary = (migrated['diary'] as List).cast<Map<String, dynamic>>();
+
+      expect(migrated['schemaVersion'], 25);
+      expect(diary[0], {'entryId': 'a', 'title': 'Texto', 'body': 'hola'});
+      expect(diary[1],
+          {'entryId': 'b', 'title': 'Imagen', 'imageKey': 'v24/b.png'});
+      expect(diary[2],
+          {'entryId': 'c', 'title': 'Enlace', 'url': 'https://example.com/x'});
+      expect(jsonEncode(source), original, reason: 'no muta la entrada');
     });
   });
 }

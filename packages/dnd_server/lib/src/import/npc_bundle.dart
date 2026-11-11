@@ -118,7 +118,11 @@ class NpcBundleCodec {
       },
     );
 
-    final adopted = adoptCharacterAsNpc(original, backup.homebrew ?? const {});
+    final adopted = adoptCharacterAsNpc(
+      original,
+      backup.homebrew ?? const {},
+      imageEntryIds: {for (final i in entry.diaryImages) i.entryId},
+    );
     if (adopted.npc.name.trim().isEmpty) {
       throw const FormatException('El PNJ no tiene nombre.');
     }

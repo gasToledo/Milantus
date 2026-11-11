@@ -1351,14 +1351,18 @@ void main() {
 
   group('diario', () {
     Map<String, dynamic> guardar(String id, String titulo, String at,
-            {String kind = 'text', String body = '', String? imageKey}) =>
+            {String body = '',
+            String? imageKey,
+            String? url,
+            String? linkLabel}) =>
         {
           'type': 'saveDiaryEntry',
           'entry': id,
-          'kind': kind,
           'title': titulo,
           'body': body,
           'imageKey': imageKey,
+          'url': url,
+          'linkLabel': linkLabel,
           'at': at,
         };
 
@@ -1387,32 +1391,38 @@ void main() {
       expect(f.updatedAt, DateTime.parse('2026-04-02T10:00:00Z'));
     });
 
-    test('sin título, o imagen sin clave, la ficha queda intacta', () {
-      final c = monje();
-      final sinTitulo = act(c, guardar('a', '   ', '2026-03-12T10:00:00Z'));
+    test('sin título la ficha queda intacta', () {
+      final sinTitulo =
+          act(monje(), guardar('a', '   ', '2026-03-12T10:00:00Z'));
       expect(sinTitulo.outcome['saved'], isFalse);
       expect(sinTitulo.character.diary, isEmpty);
-
-      final sinClave =
-          act(c, guardar('a', 'Mapa', '2026-03-12T10:00:00Z', kind: 'image'));
-      expect(sinClave.outcome['saved'], isFalse);
-      expect(sinClave.character.diary, isEmpty);
     });
 
-    test('la imagen no lleva cuerpo y los otros tipos no llevan clave', () {
-      final img = act(
+    test('una entrada con texto, imagen y enlace se guarda con los tres', () {
+      final r = act(
           monje(),
-          guardar('a', 'Mapa', '2026-03-12T10:00:00Z',
-              kind: 'image', body: 'sobra', imageKey: 'k1'));
-      expect(img.character.diary.single.body, '');
-      expect(img.character.diary.single.imageKey, 'k1');
+          guardar('a', 'Faro', '2026-03-12T10:00:00Z',
+              body: ' texto ',
+              imageKey: 'k1',
+              url: ' https://example.com/mapa ',
+              linkLabel: '  Mapa  '));
+      final e = r.character.diary.single;
+      expect(e.body, 'texto');
+      expect(e.imageKey, 'k1');
+      expect(e.url, 'https://example.com/mapa');
+      expect(e.linkLabel, 'Mapa');
 
-      final texto = act(
-          img.character,
-          guardar('a', 'Mapa', '2026-03-13T10:00:00Z',
-              body: 'ahora texto', imageKey: 'k1'));
-      expect(texto.character.diary.single.imageKey, isNull);
-      expect(texto.character.diary.single.body, 'ahora texto');
+      // Quitar el enlace y la imagen los suelta: vacío es null, no cadena vacía.
+      final sin = act(
+              r.character,
+              guardar('a', 'Faro', '2026-03-13T10:00:00Z',
+                  body: 'texto', url: '  ', linkLabel: ''))
+          .character
+          .diary
+          .single;
+      expect(sin.imageKey, isNull);
+      expect(sin.url, isNull);
+      expect(sin.linkLabel, isNull);
     });
 
     test('borrar saca solo esa entrada, y un id que no existe no toca nada',

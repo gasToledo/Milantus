@@ -1,4 +1,4 @@
-import '../domain/character.dart' show DiaryEntry, DiaryEntryKind;
+import '../domain/character.dart' show DiaryEntry;
 
 /// Las reglas de una lista de entradas: el Diario de un personaje y las notas de
 /// un PNJ. Viven acá para que un segundo dueño no repita cómo se recorta el
@@ -6,25 +6,24 @@ import '../domain/character.dart' show DiaryEntry, DiaryEntryKind;
 class DiaryOps {
   const DiaryOps._();
 
-  /// `entry` (el id), `kind`, `title`, `body`, `imageKey` y `at`. Título y cuerpo se
-  /// recortan. Un id existente se reemplaza en su lugar, conserva `createdAt` y pone
-  /// `updatedAt`; uno nuevo va al final y sin `updatedAt`. Una imagen lleva el cuerpo
-  /// vacío y los otros tipos no llevan `imageKey`. `null` si no tiene título, o si es
-  /// una imagen sin `imageKey`.
+  /// `entry` (el id), `title`, `body`, `imageKey`, `url`, `linkLabel` y `at`.
+  /// Título, cuerpo, enlace y nombre se recortan; un enlace o un nombre vacío se
+  /// guardan como null y un cuerpo vacío como vacío. Un id existente se
+  /// reemplaza en su lugar, conserva `createdAt` y pone `updatedAt`; uno nuevo
+  /// va al final y sin `updatedAt`. Una entrada puede llevar texto, imagen y
+  /// enlace a la vez: solo el título es obligatorio, y `null` si falta.
   static List<DiaryEntry>? save(
     List<DiaryEntry> entries,
     Map<String, dynamic> action,
   ) {
-    final kind = DiaryEntryKind.fromJson(action['kind']);
     final title = (action['title'] as String? ?? '').trim();
+    if (title.isEmpty) return null;
     final imageKey = action['imageKey'] as String?;
-    if (title.isEmpty || (kind == DiaryEntryKind.image && imageKey == null)) {
-      return null;
-    }
+    final url = _trimmedOrNull(action['url']);
+    final linkLabel = _trimmedOrNull(action['linkLabel']);
     final id = action['entry'] as String;
     final at = DateTime.parse(action['at'] as String);
-    final isImage = kind == DiaryEntryKind.image;
-    final body = isImage ? '' : (action['body'] as String? ?? '').trim();
+    final body = (action['body'] as String? ?? '').trim();
     final index = entries.indexWhere((e) => e.entryId == id);
     final DiaryEntry entry;
     if (index < 0) {
@@ -32,18 +31,20 @@ class DiaryOps {
       // serían la misma y la tarjeta diría «editada» de algo nuevo.
       entry = DiaryEntry(
         entryId: id,
-        kind: kind,
         title: title,
         body: body,
-        imageKey: isImage ? imageKey : null,
+        imageKey: imageKey,
+        url: url,
+        linkLabel: linkLabel,
         createdAt: at,
       );
     } else {
       entry = entries[index].copyWith(
-        kind: kind,
         title: title,
         body: body,
-        imageKey: isImage ? imageKey : null,
+        imageKey: imageKey,
+        url: url,
+        linkLabel: linkLabel,
         updatedAt: at,
       );
     }
@@ -54,6 +55,11 @@ class DiaryOps {
       list[index] = entry;
     }
     return list;
+  }
+
+  static String? _trimmedOrNull(Object? value) {
+    final text = (value as String? ?? '').trim();
+    return text.isEmpty ? null : text;
   }
 
   static List<DiaryEntry> remove(List<DiaryEntry> entries, String id) => [

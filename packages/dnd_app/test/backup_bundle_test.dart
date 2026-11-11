@@ -181,7 +181,6 @@ void main() {
       diary: const [
         DiaryEntry(
           entryId: 'e1',
-          kind: DiaryEntryKind.image,
           title: 'Hoja de personaje',
           imageKey: 'sagan/boceto.png',
         ),
@@ -214,7 +213,6 @@ void main() {
       diary: const [
         DiaryEntry(
           entryId: 'e1',
-          kind: DiaryEntryKind.image,
           title: 'Borrada',
           imageKey: 'sagan/borrada.png',
         ),
