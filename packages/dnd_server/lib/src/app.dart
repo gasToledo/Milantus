@@ -15,6 +15,7 @@ import 'auth/mcp_token.dart';
 import 'auth/oidc_service.dart';
 import 'auth/session_cookie.dart';
 import 'auth/session_store.dart';
+import 'client_errors.dart';
 import 'feedback/feedback_mail.dart';
 import 'import/backup_bundle.dart';
 import 'import/homebrew_content.dart';
@@ -142,9 +143,14 @@ Handler buildHandler({
   /// Cuentas a las que `/api/me` les dice `webV2: true` (ver
   /// `WebConfig.v2Users`). Vacío: a nadie.
   Set<String> v2Users = const {},
+
+  /// Destino de las líneas de `POST /api/client-errors`. `null`: `print`, que
+  /// es el log del contenedor.
+  void Function(String line)? clientErrorLog,
 }) {
   final authenticated = requireSession(auth.resolveUserId);
   final feedbackLimiter = FeedbackRateLimiter();
+  final clientErrors = ClientErrorSink(log: clientErrorLog ?? print);
   final router = Router()
     ..get('/health', _healthHandler)
     ..get('/auth/login', (request) => _loginHandler(request, auth))
@@ -474,6 +480,13 @@ Handler buildHandler({
       authenticated((request) => _importHandler(request, importBackup)),
     )
     ..post(
+      '/api/client-errors',
+      authenticated((request) async {
+        clientErrors.accept(request.userId, await _readJsonBody(request));
+        return Response(204);
+      }),
+    )
+    ..post(
       '/api/feedback',
       authenticated(
         (request) =>
@@ -534,8 +547,22 @@ Handler buildHandler({
       ? null
       : Cascade().add(router.call).add(webStaticHandler).handler;
   Response notFound() => Response.notFound('Not Found');
-  final Handler rootHandler = (request) {
+  final Handler rootHandler = (request) async {
     final path = request.url.path;
+    // `/` exacto es el `index.html` de Flutter: las cuentas con /v2 pasan
+    // directo, salvo quien prendió «Usar la versión anterior» (cookie
+    // `milantus_v1=1`, que escribe /v2 y lee solo el servidor). Los assets de
+    // Flutter no se redirigen. Es la misma resolución de sesión que `/api`.
+    if (request.method == 'GET' && path.isEmpty && v2Users.isNotEmpty) {
+      final cookies = request.headers['cookie'];
+      final token = readSessionToken(cookies);
+      final userId = token == null ? null : await auth.resolveUserId(token);
+      if (userId != null &&
+          _hasV2(v2Users, userId) &&
+          !_hasCookie(cookies, 'milantus_v1', '1')) {
+        return Response.found('/v2/', headers: {'cache-control': 'no-store'});
+      }
+    }
     if (path == 'v2' || path.startsWith('v2/')) {
       return webV2Handler?.call(request) ?? notFound();
     }
@@ -554,6 +581,9 @@ Handler buildHandler({
       .addMiddleware(errorHandlingMiddleware)
       .addHandler(rootHandler);
 }
+
+bool _hasCookie(String? header, String name, String value) =>
+    (header ?? '').split(';').any((p) => p.trim() == '$name=$value');
 
 Response _healthHandler(Request request) => Response.ok(
   jsonEncode({'status': 'ok'}),
@@ -626,6 +656,10 @@ Future<Response> _logoutHandler(Request request, AuthDependencies auth) async {
   );
 }
 
+/// `*` en la lista habilita a todas las cuentas.
+bool _hasV2(Set<String> v2Users, String userId) =>
+    v2Users.contains('*') || v2Users.contains(userId);
+
 /// La cuenta de la sesión en curso. El `userId` es el id interno; el resto es
 /// lo que el proveedor OIDC afirmó al abrir la sesión, y puede venir en `null`
 /// (ver [SessionProfile]).
@@ -646,7 +680,7 @@ Future<Response> _meHandler(
       'feedbackEnabled': feedbackEnabled,
       // Solo el booleano de *esta* cuenta: la lista entera diría a cualquiera
       // quién más está probando.
-      'webV2': v2Users.contains(request.userId),
+      'webV2': _hasV2(v2Users, request.userId),
     }),
     headers: {'content-type': 'application/json'},
   );
