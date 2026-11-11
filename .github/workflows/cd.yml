@@ -61,7 +61,7 @@ jobs:
               packages/dnd_server packages/dnd_app packages/dnd_engine packages/dnd_web \
               ':(exclude,glob)packages/*/test/**' \
               ':(exclude,glob)packages/*/tool/**' \
-              docker-compose.yml postgres-init .github/workflows/cd.yml; then
+              docker-compose.yml postgres-init login-skin .github/workflows/cd.yml; then
             echo "Nada desplegable cambió desde $base"
             echo "deploy=false" >> "$GITHUB_OUTPUT"
           else

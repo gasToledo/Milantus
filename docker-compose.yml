@@ -145,7 +145,12 @@ services:
     image: alpine:3
     restart: "no"
     user: "0:0"
-    command: ["sh", "-c", "mkdir -p /zitadel/bootstrap && chmod 0777 /zitadel/bootstrap"]
+    command:
+      [
+        "sh",
+        "-c",
+        "mkdir -p /zitadel/bootstrap && chmod 0777 /zitadel/bootstrap",
+      ]
     volumes:
       - zitadel-bootstrap:/zitadel/bootstrap:rw
 
@@ -244,6 +249,35 @@ services:
       retries: 12
       start_period: 20s
 
+  login-proxy:
+    # Proxy chico entre cloudflared y zitadel-login: sirve los estáticos de la
+    # personalización del login y agrega su hoja de estilos al HTML. Por qué
+    # hace falta y qué se puede personalizar: login-skin/README.md.
+    build:
+      context: ./login-skin
+    restart: unless-stopped
+    depends_on:
+      zitadel-login:
+        condition: service_healthy
+    healthcheck:
+      # Chequea nginx y los estáticos, no el login: ese ya tiene su propio
+      # healthcheck, y repetirlo acá solo duplicaría el tiempo de arranque.
+      # 127.0.0.1 y no localhost: en Alpine localhost puede resolver a ::1 y
+      # nginx escucha solo en IPv4.
+      test:
+        [
+          "CMD",
+          "wget",
+          "-q",
+          "-O",
+          "/dev/null",
+          "http://127.0.0.1:8080/ui/v2/login/milantus/login.css",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 5s
+
   server:
     build:
       context: .
@@ -274,7 +308,9 @@ services:
         condition: service_healthy
       zitadel:
         condition: service_healthy
-      zitadel-login:
+      # El túnel manda el login a login-proxy (ver cloudflared/config.example.yml),
+      # que a su vez espera a zitadel-login.
+      login-proxy:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]

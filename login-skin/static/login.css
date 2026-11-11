@@ -1,0 +1,73 @@
+/*
+ * Personalización del login de Zitadel (Login V2) para Milantus.
+ * nginx la agrega a cada página del login (ver ../nginx.conf).
+ *
+ * Los selectores apuntan a clases de Tailwind del login oficial, revisadas
+ * contra el código de v4.20.0 (apps/login/src/app/(login)/layout.tsx y
+ * src/components/dynamic-theme.tsx). No son una API estable: después de cada
+ * actualización de Zitadel, mirá el login y, si algo dejó de aplicarse,
+ * buscá las clases nuevas con las DevTools. Si un selector deja de coincidir,
+ * el login sigue funcionando, solo con el aspecto por defecto en esa parte.
+ *
+ * Los colores de botones, enlaces y el logo siguen saliendo del Branding de la
+ * consola de Zitadel: acá solo va lo que el Branding no puede hacer.
+ */
+
+/* ── Fondo ────────────────────────────────────────────────────────────────
+ * Contenedor de pantalla completa (BackgroundWrapper). El degradado de arriba
+ * oscurece la imagen para que el formulario se lea sobre cualquier
+ * ilustración; el color del final es lo que queda si fondo.webp falta. */
+html.dark body .min-h-screen.justify-center {
+  background:
+    linear-gradient(rgb(12 10 8 / 0.55), rgb(12 10 8 / 0.8)),
+    url("/ui/v2/login/milantus/fondo.webp") center / cover no-repeat,
+    #15110d !important;
+}
+
+html:not(.dark) body .min-h-screen.justify-center {
+  background:
+    linear-gradient(rgb(250 246 238 / 0.45), rgb(250 246 238 / 0.7)),
+    url("/ui/v2/login/milantus/fondo.webp") center / cover no-repeat,
+    #f4ede1 !important;
+}
+
+/* ── Tarjeta del formulario ───────────────────────────────────────────────
+ * Es el primer hijo del contenedor de 440px (diseño `top-to-bottom`, el de la
+ * imagen oficial). Translúcida y con desenfoque para que se vea el fondo. */
+body .min-h-screen .max-w-\[440px\].px-4 > div:first-child {
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 16px !important;
+}
+
+html.dark body .min-h-screen .max-w-\[440px\].px-4 > div:first-child {
+  background: rgb(20 17 14 / 0.6) !important;
+  border: 1px solid rgb(255 255 255 / 0.12) !important;
+  box-shadow: 0 24px 60px rgb(0 0 0 / 0.5);
+}
+
+html:not(.dark) body .min-h-screen .max-w-\[440px\].px-4 > div:first-child {
+  background: rgb(255 255 255 / 0.72) !important;
+  border: 1px solid rgb(0 0 0 / 0.08) !important;
+  box-shadow: 0 24px 60px rgb(60 40 20 / 0.18);
+}
+
+/* ── Tipografía (opcional) ────────────────────────────────────────────────
+ * El Branding de Zitadel acepta una fuente, pero Login V2 no la aplica. Para
+ * usar una propia: copiá el .woff2 a esta carpeta como fuente.woff2 y quitá
+ * el comentario. Tiene que servirse desde acá y no desde Google Fonts u otro
+ * dominio: la CSP del login solo admite fuentes del mismo origen. */
+/*
+@font-face {
+  font-family: "MilantusLogin";
+  src: url("/ui/v2/login/milantus/fuente.woff2") format("woff2");
+  font-display: swap;
+}
+
+html,
+body,
+button,
+input {
+  font-family: "MilantusLogin", system-ui, sans-serif !important;
+}
+*/

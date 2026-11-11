@@ -29,7 +29,7 @@ ingress:
   # el docker-compose oficial de Zitadel.
   - hostname: auth.tu-dominio.com
     path: ^/ui/v2/login(/.*)?$
-    service: http://zitadel-login:3000
+    service: http://login-proxy:8080
   - hostname: auth.tu-dominio.com
     service: http://zitadel:8080
   # Regla de cierre obligatoria: cualquier otro hostname que llegue al túnel
