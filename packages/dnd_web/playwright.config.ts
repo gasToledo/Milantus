@@ -15,6 +15,13 @@ export default defineConfig({
   use: {
     baseURL: `http://127.0.0.1:${PUERTO}`,
     trace: 'retain-on-failure',
+    // Los tutoriales salen la primera vez que se entra a cada pantalla y las
+    // pruebas arrancan con el navegador vacío: sin esto la bienvenida taparía
+    // todas. `*` es «Saltar todos» (ver `src/ui/tutorials.tsx`).
+    storageState: {
+      cookies: [],
+      origins: [{ origin: `http://127.0.0.1:${PUERTO}`, localStorage: [{ name: 'milantus.tutorials', value: '*' }] }],
+    },
     // Solo para quien ya tiene un Chromium instalado y no quiere bajar otro
     // (`npx playwright install chromium` es lo normal, y lo que hace CI).
     launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH },

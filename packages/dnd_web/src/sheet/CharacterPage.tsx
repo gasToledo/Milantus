@@ -17,6 +17,7 @@ import { MagicItemPlans } from './MagicItemPlans';
 import { WildShapeForms } from './WildShapeForms';
 import { ChoicesPage } from './Choices';
 import { PortraitPage } from './PortraitPage';
+import { TutorialGate } from '../ui/tutorials';
 import { SpellEditor } from './SpellEditor';
 import { useSheetWriter, type SheetNotify } from './writer';
 
@@ -155,6 +156,9 @@ export function CharacterPage({
     body = (
       <div className="flex flex-col gap-4">
         {model.write && <TurnBanner characterId={id} />}
+        {/* El de la ficha es del jugador: la de un PNJ o un miembro la abre el
+            DM, que ya tiene el suyo en su sección. */}
+        {model.write && <TutorialGate tutorial="sheet" />}
         <SheetTabs
           model={model}
           tabs={SHEET_TABS}

@@ -41,6 +41,7 @@ export function AppDialog({
   children,
   actions,
   width = 480,
+  bare = false,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -52,6 +53,9 @@ export function AppDialog({
   children?: ReactNode;
   actions: DialogAction[];
   width?: number;
+  /** Sin cabecera propia: el cuerpo dibuja su título (el tutorial lleva el
+   *  medallón arriba). El título queda solo para el lector de pantalla. */
+  bare?: boolean;
 }) {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -61,17 +65,21 @@ export function AppDialog({
           className="card fixed top-1/2 left-1/2 z-50 flex max-h-[min(85vh,720px)] w-[calc(100vw-32px)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden"
           style={{ maxWidth: width }}
         >
-          <div className="flex items-center gap-2.5 px-5 pt-5">
-            {Icon && <Icon size={20} aria-hidden="true" className={cx('shrink-0', iconClassName)} />}
-            <Dialog.Title className="font-display text-[20px] text-on-surface">{title}</Dialog.Title>
-          </div>
+          {bare ? (
+            <Dialog.Title className="sr-only">{title}</Dialog.Title>
+          ) : (
+            <div className="flex items-center gap-2.5 px-5 pt-5">
+              {Icon && <Icon size={20} aria-hidden="true" className={cx('shrink-0', iconClassName)} />}
+              <Dialog.Title className="font-display text-[20px] text-on-surface">{title}</Dialog.Title>
+            </div>
+          )}
           {description ? (
             <Dialog.Description className="px-5 pt-2 text-on-surface-variant">{description}</Dialog.Description>
           ) : (
             // Sin descripción, Radix avisa en consola; se declara a propósito.
             <Dialog.Description className="sr-only">{title}</Dialog.Description>
           )}
-          <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">{children}</div>
+          <div className={cx('min-h-0 flex-1 overflow-y-auto px-5 py-4', bare && 'px-6 pt-6 pb-5')}>{children}</div>
           <div className="flex border-t border-hairline bg-plaque">
             {actions.map((a, i) => {
               const cell = (

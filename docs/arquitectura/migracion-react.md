@@ -199,8 +199,14 @@ repiten acá.
   **En tu cuenta**: modo de inicio, tema y visibilidad de la dificultad del
   encuentro, guardados con `patchSettings`. `/v2/` abre el modo elegido.
   El orden y el favorito se muestran en Ajustes y se editan en la lista de
-  personajes. El proveedor se elige en Retratos. Pantalla encendida y reinicio
-  de los tutoriales quedan en Flutter.
+  personajes. El proveedor se elige en Retratos. **Tutoriales**: la fila
+  «Tutoriales / Volver a verlos» de «En este navegador» borra lo visto. Los diez
+  tutoriales (`src/ui/tutorials.tsx`) salen la primera vez que se entra a su
+  pantalla: `welcome` en la lista de personajes, `sheet` en la ficha propia, y en
+  el Modo DM uno por sección de la campaña y uno por Bestiario, Biblioteca de
+  PNJ y Homebrew. Lo visto se guarda en `localStorage`, `milantus.tutorials`, con
+  el formato de Flutter (nombres separados por coma, o `*`): lo visto en una
+  versión vale para la otra. Pantalla encendida queda en Flutter.
 - **Campañas** en `/v2/campanas` (`src/campaigns/`), **sin enlace en el menú
   de Jugador** (es del Modo DM; ver abajo): las mesas en las que juega la cuenta, de todos sus personajes en
   una lista (cada una con «Con <personaje>», que lleva a la pestaña Campaña de

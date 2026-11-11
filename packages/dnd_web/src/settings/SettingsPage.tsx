@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Globe, Palette } from 'lucide-react';
+import { useState } from 'react';
 import type { RosterSettings } from '../api/client';
 import { queryKeys, useRoster, useRosterSettings } from '../api/queries';
 import { patchSettings } from '../api/settingsSave';
@@ -9,8 +10,10 @@ import { parseSortMode } from '../dashboard/roster';
 import { isThemeMode, useTheme } from '../theme/theme';
 import { Card } from '../ui/Card';
 import { SectionRule } from '../ui/data';
+import { Button } from '../ui/Button';
 import { Select, Switch } from '../ui/primitives';
 import { AppBusyLabel, AppErrorView } from '../ui/status';
+import { resetTutorials } from '../ui/tutorials';
 
 const THEME_MODES = ['dark', 'light', 'system'] as const;
 
@@ -41,6 +44,7 @@ function BrowserCard() {
   const t = useTexts();
   const lang = useLang();
   const { browserMode, setMode } = useTheme();
+  const [reset, setReset] = useState(false);
   return (
     <Card id="settings-browser" title={t.settingsBrowserTitle} icon={Palette}>
       <div className="flex flex-col items-start gap-3">
@@ -63,6 +67,24 @@ function BrowserCard() {
           }}
           options={(['es', 'en'] as const).map((l) => ({ value: l, label: t.languageNames[l] }))}
         />
+        {/* Lo visto es de este navegador, como el tema y el idioma. */}
+        <div className="mt-1 flex w-full flex-wrap items-center justify-between gap-3 border-t border-hairline pt-3" data-field="tutorials">
+          <span className="text-[14px] text-on-surface">{t.settingsTutorials}</span>
+          <Button
+            tone="secondary"
+            onClick={() => {
+              resetTutorials();
+              setReset(true);
+            }}
+          >
+            {t.settingsTutorialsReset}
+          </Button>
+        </div>
+        {reset && (
+          <p role="status" className="text-[13px] text-verdant">
+            {t.settingsTutorialsResetDone}
+          </p>
+        )}
       </div>
     </Card>
   );

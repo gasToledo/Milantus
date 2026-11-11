@@ -108,6 +108,60 @@ const es = {
   settingsLoadError: 'No se pudieron cargar los ajustes',
   settingsBrowserTitle: 'En este navegador',
   settingsAccountTitle: 'En tu cuenta',
+  settingsTutorials: 'Tutoriales',
+  settingsTutorialsReset: 'Volver a verlos',
+  settingsTutorialsResetDone: 'Los tutoriales van a volver a salir en cada sección.',
+  tutSkipAll: 'Saltar todos',
+  tutSkip: 'Saltar',
+  tutNext: 'Siguiente',
+  tutDone: 'Entendido',
+  tutPageOf: (n: number, m: number) => `${n} de ${m}`,
+  tutorials: {
+    welcome: [
+      { title: 'Te damos la bienvenida', body: '¡Qué bueno que estés acá! Milantus te acompaña en tus partidas de D&D: guarda tus personajes y hace las cuentas por vos, así te ocupás de lo divertido, que es jugar. Te mostramos lo básico en un minuto.' },
+      { title: '¿Primera vez con D&D?', body: 'Dungeons & Dragons es un juego de rol: cada jugador lleva un personaje, y una persona, el DM (Dungeon Master), narra la historia y da vida al mundo. No hace falta saberse las reglas: la app te va guiando.' },
+      { title: 'Modo Jugador', body: 'Si vas a jugar, empezá por acá. Creás tu personaje respondiendo unas pocas preguntas, y la ficha calcula sola todo lo demás. Durante la partida anotás ahí el daño que recibís, lo que llevás encima y tus conjuros.' },
+      { title: 'Modo DM', body: 'Si te toca dirigir la partida, este modo es para vos. Armás tu campaña, sumás los personajes de tu grupo y tenés a mano tus notas, los PNJ (los personajes que manejás vos) y los combates. Cambiás de modo cuando quieras con el interruptor Jugador/DM, arriba del panel.' },
+    ],
+    sheet: [
+      { title: 'Tu ficha', body: 'Esta es la hoja de tu personaje, y Milantus la mantiene al día por vos. En el panel lateral la tenés dividida en partes: Personaje (quién es y qué sabe hacer), Combate, Inventario, Campaña y Diario, donde podés escribir lo que va pasando.' },
+      { title: 'Durante la partida', body: 'Casi todo pasa en Combate. Ahí anotás el daño que recibís, ves tus ataques y tus conjuros, y descansás para recuperar puntos de golpe, que son la vida de tu personaje. Si te equivocás, no pasa nada: se corrige en un toque.' },
+      { title: 'Jugar con tu grupo', body: 'Para que tu DM te sume a su campaña, tocá «Compartir» y pasale el código que aparece. Desde ahí te van a llegar sus avisos, por ejemplo cuando te toca subir de nivel.' },
+    ],
+    dmTable: [
+      { title: 'Tu mesa', body: 'Acá se reúne tu grupo. Cada jugador crea su personaje desde su propia cuenta y, para sumarse, te pasa un código que encuentra en su ficha, en «Compartir». Vos lo cargás en «Sumar personaje», y listo.' },
+      { title: 'Seguir a tus jugadores', body: 'Tocá un personaje para ver su ficha completa, siempre al día. La ficha la lleva cada jugador: vos la ves, pero no la cambiás. Si alguien se luce en una escena, desde su menú le podés conceder Inspiración Heroica, que le permite volver a tirar un dado.' },
+    ],
+    dmChapters: [
+      { title: 'Tu historia, en capítulos', body: 'Una campaña suele durar muchas sesiones, así que ayuda partirla en capítulos, como un libro. A cada uno le ponés un nombre y un objetivo, lo que el grupo debería lograr o descubrir, y lo iniciás cuando empiezan a jugarlo.' },
+      { title: 'Cerrar un capítulo', body: 'Cuando el grupo termina un capítulo, cerralo y a cada jugador le llega un aviso. Si al crearlo le pusiste recompensas (subir de nivel, oro u objetos), van en ese mismo aviso, y cada uno las anota en su ficha.' },
+    ],
+    dmNotebook: [
+      { title: 'Tu cuaderno de DM', body: 'Acá va todo lo que no querés olvidarte: ideas, nombres, pistas y lo que pasó en cada sesión. Las notas se ordenan por capítulo, así que necesitás tener al menos uno creado.' },
+      { title: 'Notas que se conectan', body: 'Escribí @ y el nombre de un personaje o PNJ para mencionarlo, y con un toque en la mención abrís su ficha. También podés darle formato: # al principio para un título, **así** para negrita y un guion para hacer una lista.' },
+    ],
+    dmNpcs: [
+      { title: 'Los personajes de tu mundo', body: 'Los PNJ (personajes no jugadores) son todos los que manejás vos: el tabernero, el villano, el aliado que acompaña al grupo. Acá tenés los de esta campaña y, de cada uno, si sigue vivo, si murió o si nadie sabe qué fue de él.' },
+      { title: 'Tan simple o completo como quieras', body: 'Creá uno nuevo o traelo de tu biblioteca. Elegís cuánto detalle lleva: solo un nombre con notas, un bloque de estadísticas como el de los monstruos para que pueda pelear, o una ficha de personaje completa.' },
+    ],
+    dmCombat: [
+      { title: 'Armar una pelea', body: 'Cuando empieza una pelea, tocá «Armar combate». Los personajes de tu mesa ya están adentro; vos sumás a los enemigos, que pueden ser monstruos del Bestiario o tus PNJ.' },
+      { title: 'Turno a turno', body: 'Al empezar, cada uno tira iniciativa, un dado que decide en qué orden actúan, y Milantus los ordena. Después avanzás turno a turno y anotás el daño y estados como envenenado o derribado. Tus jugadores ven en su ficha cuándo les toca.' },
+      { title: 'Música y cierre', body: 'Si le cargaste música de combate a la campaña, Milantus te ofrece ponerla al empezar. Cuando termina la pelea, cerrás el combate y queda un registro de lo que pasó para consultarlo después.' },
+    ],
+    bestiary: [
+      { title: 'Monstruos y criaturas', body: 'Acá están las criaturas del juego, cada una con sus estadísticas listas para usar. Buscalas por nombre, o filtralas por tipo y por VD (valor de desafío), que indica qué tan peligrosa es cada una para tu grupo.' },
+      { title: 'A la pelea, o a tu medida', body: 'Cuando encontrás la que buscás, la sumás al combate de tu campaña con un toque. Si la querés distinta, editá una copia: queda guardada como tuya en Homebrew, y la original no se toca.' },
+    ],
+    npcLibrary: [
+      { title: 'Todos tus PNJ, en un lugar', body: 'Acá viven todos tus PNJ, aparezcan en la campaña que aparezcan. Uno mismo puede estar en varias, y en cada una lleva sus propios puntos de golpe y su estado. Los encontrás por nombre, o filtrándolos por campaña y por etiquetas.' },
+      { title: 'Compartilos con otros DM', body: '¿Armaste un PNJ que te encanta? Exportalo a un archivo y pasáselo a otro DM, o importá los que te compartan a vos. Quien lo recibe se queda con su propia copia.' },
+    ],
+    homebrew: [
+      { title: 'Tu propio contenido', body: 'Homebrew es todo lo que inventás vos: una especie nueva, un conjuro propio, el arma legendaria de tu campaña o un monstruo que no está en ningún libro. Acá lo cargás llenando un formulario, sin programar nada.' },
+      { title: 'Se juega como el oficial', body: 'Lo que creás se usa igual que el contenido del manual: aparece al crear personajes, en el Bestiario y en tus combates. Para compartirlo con tu grupo, exportalo a un archivo y que cada uno lo importe en su cuenta.' },
+    ],
+  },
   settingsLanguage: 'Idioma',
   languageNames: { es: 'Español', en: 'English' },
   settingsStartMode: 'Al abrir Milantus',
@@ -2460,6 +2514,60 @@ const en: Texts = {
   settingsLoadError: "Couldn't load your settings",
   settingsBrowserTitle: 'In this browser',
   settingsAccountTitle: 'In your account',
+  settingsTutorials: 'Tutorials',
+  settingsTutorialsReset: 'Show them again',
+  settingsTutorialsResetDone: 'Tutorials will show up again in each section.',
+  tutSkipAll: 'Skip all',
+  tutSkip: 'Skip',
+  tutNext: 'Next',
+  tutDone: 'Got it',
+  tutPageOf: (n: number, m: number) => `${n} of ${m}`,
+  tutorials: {
+    welcome: [
+      { title: 'Welcome aboard', body: 'We’re so glad you’re here! Milantus keeps you company in your D&D games: it stores your characters and does the math for you, so you can focus on the fun part, which is playing. Here’s the basics in a minute.' },
+      { title: 'New to D&D?', body: 'Dungeons & Dragons is a roleplaying game: each player runs a character, and one person, the DM (Dungeon Master), tells the story and brings the world to life. You don’t need to know the rules: the app guides you along.' },
+      { title: 'Player Mode', body: 'If you’re going to play, start here. You build your character by answering a few questions, and the sheet works out everything else. During the game you track the damage you take, what you carry and your spells right there.' },
+      { title: 'DM Mode', body: 'If you’re running the game, this mode is for you. You set up your campaign, add your group’s characters and keep your notes, your NPCs (the characters you play) and your combats at hand. Switch modes anytime with the Player/DM switch at the top of the panel.' },
+    ],
+    sheet: [
+      { title: 'Your sheet', body: 'This is your character’s sheet, and Milantus keeps it up to date for you. The side panel splits it into parts: Character (who they are and what they can do), Combat, Inventory, Campaign and Journal, where you can write down what happens.' },
+      { title: 'During the game', body: 'Most of the action happens in Combat. That’s where you track the damage you take, see your attacks and spells, and rest to recover hit points, which are your character’s life. Made a mistake? No worries: it’s fixed in a tap.' },
+      { title: 'Playing with your group', body: 'For your DM to add you to their campaign, tap “Share” and send them the code that shows up. From then on you’ll get their notices, like when it’s time to level up.' },
+    ],
+    dmTable: [
+      { title: 'Your table', body: 'This is where your group gathers. Each player builds their character from their own account and, to join, sends you a code they find on their sheet, under “Share”. Enter it in “Add character” and you’re set.' },
+      { title: 'Keeping up with your players', body: 'Tap a character to see their full sheet, always up to date. Each player keeps their own sheet: you can see it, but not change it. If someone shines in a scene, their menu lets you grant Heroic Inspiration, which lets them reroll a die.' },
+    ],
+    dmChapters: [
+      { title: 'Your story, in chapters', body: 'A campaign usually runs for many sessions, so it helps to split it into chapters, like a book. Give each one a name and a goal, what the group should achieve or uncover, and start it when they begin playing it.' },
+      { title: 'Closing a chapter', body: 'When the group finishes a chapter, close it and every player gets a notice. If you gave it rewards when you created it (a level up, gold or items), they come in that same notice, and each player writes them on their sheet.' },
+    ],
+    dmNotebook: [
+      { title: 'Your DM notebook', body: 'Everything you don’t want to forget goes here: ideas, names, clues and what happened each session. Notes are grouped by chapter, so you need at least one created.' },
+      { title: 'Notes that connect', body: 'Type @ and a character’s or NPC’s name to mention them, and tap the mention to open their sheet. You can also format your notes: # at the start for a heading, **like this** for bold and a dash to make a list.' },
+    ],
+    dmNpcs: [
+      { title: 'The people of your world', body: 'NPCs (non-player characters) are everyone you play: the innkeeper, the villain, the ally who travels with the group. Here are this campaign’s, and for each one whether they’re still alive, dead, or nobody knows what became of them.' },
+      { title: 'As simple or detailed as you like', body: 'Create a new one or bring one from your library. You choose how much detail it has: just a name with notes, a stat block like a monster’s so it can fight, or a full character sheet.' },
+    ],
+    dmCombat: [
+      { title: 'Setting up a fight', body: 'When a fight breaks out, tap “Set up combat”. The characters at your table are already in; you add the enemies, which can be monsters from the Bestiary or your NPCs.' },
+      { title: 'Turn by turn', body: 'To start, everyone rolls initiative, a die that decides the order they act in, and Milantus sorts them. Then you go turn by turn tracking damage and conditions like poisoned or prone. Your players see on their sheet when it’s their turn.' },
+      { title: 'Music and wrap-up', body: 'If you added combat music to the campaign, Milantus offers to play it when the fight starts. When it’s over, you close the combat and a log of what happened is kept to look back on later.' },
+    ],
+    bestiary: [
+      { title: 'Monsters and creatures', body: 'Here are the game’s creatures, each with its stats ready to use. Search them by name, or filter them by type and by CR (challenge rating), which tells you how dangerous each one is for your group.' },
+      { title: 'Into the fight, or made your own', body: 'Once you find the one you want, add it to your campaign’s combat with a tap. Want it different? Edit a copy: it’s saved as yours in Homebrew, and the original stays untouched.' },
+    ],
+    npcLibrary: [
+      { title: 'All your NPCs, in one place', body: 'All your NPCs live here, whatever campaign they show up in. The same one can be in several, and in each it keeps its own hit points and status. Find them by name, or filter them by campaign and by tags.' },
+      { title: 'Share them with other DMs', body: 'Made an NPC you love? Export it to a file and send it to another DM, or import the ones others share with you. Whoever gets it keeps their own copy.' },
+    ],
+    homebrew: [
+      { title: 'Your own content', body: 'Homebrew is anything you make up: a new species, your own spell, your campaign’s legendary weapon or a monster that’s in no book. You add it here by filling in a form, no coding needed.' },
+      { title: 'Plays just like the official', body: 'What you create works just like the book’s content: it shows up in character creation, in the Bestiary and in your combats. To share it with your group, export it to a file and have each of them import it into their account.' },
+    ],
+  },
   settingsLanguage: 'Language',
   languageNames: { es: 'Español', en: 'English' },
   settingsStartMode: 'When Milantus opens',

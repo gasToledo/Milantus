@@ -24,6 +24,7 @@ import {
 } from '../ui/primitives';
 import { useHoldDrag } from '../ui/holdDrag';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
+import { TutorialGate } from '../ui/tutorials';
 import { DeleteDialog } from './DeleteDialog';
 import { ImportBackupDialog } from './ImportBackupDialog';
 import { RenameDialog } from './RenameDialog';
@@ -260,6 +261,7 @@ export function DashboardPage() {
   const fallen = entries?.filter(isFallen).length ?? 0;
   return (
     <>
+      <TutorialGate tutorial="welcome" />
       <div className="flex flex-col gap-5">
         {/* La barra de acciones del lienzo: título, buscador, orden y «Crear»
             en una fila que se envuelve sola en un teléfono. */}

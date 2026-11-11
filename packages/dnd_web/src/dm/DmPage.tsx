@@ -29,6 +29,7 @@ import { NpcPortraitView } from './npcs/NpcPortraitView';
 import { NpcDetailView } from './npcs/NpcDetailView';
 import { NpcLibraryView } from './npcs/NpcLibraryView';
 import { NpcSheetView } from './npcs/NpcSheetView';
+import { TutorialGate, type Tutorial } from '../ui/tutorials';
 
 /**
  * El Modo DM (`/v2/dm/...`). Acá el DM crea, edita y borra campañas y suma o
@@ -75,7 +76,12 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
   const musicCampaign = list?.find((c) => c.id === (currentId ?? music?.campaignId));
 
   let body;
+  // El tutorial de la pantalla que se está viendo, si tiene: uno por sección de
+  // la campaña y uno por herramienta de la cuenta (Bestiario, Biblioteca de PNJ
+  // y Homebrew), solo en su lista y no en el detalle o el editor.
+  let tutorial: Tutorial | null = null;
   if (view.kind === 'bestiary') {
+    tutorial = 'bestiary';
     // El Bestiario no depende de las campañas: se abre también sin ninguna y
     // cuando la lista no cargó (el panel lo dice solo).
     const campaign = musicCampaign ?? (list && defaultCampaign(list));
@@ -90,6 +96,7 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
       </div>
     )} />;
   } else if (view.kind === 'npcs') {
+    if (view.npcId === null) tutorial = 'npcLibrary';
     // La Biblioteca tampoco depende de las campañas: sin la lista, los filtros
     // por campaña salen de los vínculos de cada PNJ.
     body = view.npcId === null ? <NpcLibraryView campaigns={list} /> : <NpcDetailView key={view.npcId} npcId={view.npcId} />;
@@ -111,6 +118,7 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
         <HomebrewEntryEditorView key={key} category={view.category} entryId={view.entryId} leaveRef={leave} />
       );
   } else if (view.kind === 'homebrew') {
+    tutorial = 'homebrew';
     // Lo propio es de la cuenta, no de una campaña.
     body = <HomebrewView category={view.category} entryId={view.entryId} />;
   } else if (campaigns.isError) {
@@ -140,6 +148,7 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
   } else if (view.kind === 'member') {
     body = <MemberSheetView key={view.memberId} campaign={current.campaign} memberId={view.memberId} tab={view.tab} />;
   } else if (current.section === 'combate') {
+    tutorial = 'dmCombat';
     body = <CombatView key={current.campaign.id} campaign={current.campaign} onMusicOffer={onMusicOffer} />;
   } else {
     const Section = {
@@ -148,6 +157,7 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
       cuaderno: NotebookView,
       pnj: CampaignNpcsView,
     }[current.section];
+    tutorial = { mesa: 'dmTable', capitulos: 'dmChapters', cuaderno: 'dmNotebook', pnj: 'dmNpcs' }[current.section] as Tutorial;
     body = <Section key={current.campaign.id} campaign={current.campaign} />;
   }
 
@@ -167,6 +177,7 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
       }
       footer={<RosterFooter account={account} dm />}>
       {body}
+      {tutorial && <TutorialGate tutorial={tutorial} />}
       {/* Otra campaña es otro reproductor: lo que sonaba se corta. La clave no
           puede ser el id a secas: la sección hermana ya la usa. */}
       {musicCampaign && (

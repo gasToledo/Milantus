@@ -1282,6 +1282,27 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
+## [0.50.0+1] - 2026-11-11
+
+### Nuevo
+
+- Los tutoriales llegan a `/v2`: diez, con sus páginas, que salen la primera
+  vez que se entra a su pantalla (bienvenida, ficha propia, las cinco
+  secciones de la campaña del DM, Bestiario, Biblioteca de PNJ y Homebrew). En
+  Ajustes, «Tutoriales → Volver a verlos» los reinicia. Lo visto se comparte
+  con la versión anterior de la app. «¿Primera vez con D&D?» y «Modo DM» ya no
+  mencionan lo que `/v2` no tiene (el Códice «Primeros pasos» y el selector
+  «Modo»).
+
+### Modificado
+
+- El interruptor Jugador / DM queda fijo arriba del panel lateral de `/v2`: no
+  se va con el scroll de la lista de campañas.
+
+### Eliminado
+
+- Sin cambios.
+
 ## [Unreleased]
 
 ### Nuevo
@@ -1290,8 +1311,7 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
-- El interruptor Jugador / DM queda fijo arriba del panel lateral de `/v2`: no
-  se va con el scroll de la lista de campañas.
+- Sin cambios.
 
 ### Eliminado
 
