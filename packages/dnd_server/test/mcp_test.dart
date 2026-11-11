@@ -63,6 +63,7 @@ void main() {
     final encounters = InMemoryEncounterRepository(campaigns);
     campaigns
       ..playerChaptersFor = chapters.listFor
+      ..playerNotesFor = notes.listFor
       ..playerBattlesFor = encounters.logsFor;
     final events = InMemoryEventRepository();
     final npcs = InMemoryNpcRepository(campaigns, characters);

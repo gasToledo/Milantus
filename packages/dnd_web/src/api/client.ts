@@ -156,12 +156,26 @@ export async function fetchAppVersion(signal: AbortSignal): Promise<string | nul
 export interface PlayerCampaign {
   memberId: string;
   campaign: { name?: string; premise?: string; state?: string };
+  /** El capítulo en marcha, **con su objetivo** (`summary`): lo único que el
+   *  jugador lee del texto del DM de un capítulo. `null` sin capítulo en marcha. */
+  currentChapter?: (JsonObject & { id: string; name?: string; summary?: string }) | null;
+  /** Las notas que el DM marcó para la mesa, de capítulos en marcha o cerrados. */
+  sharedNotes?: PlayerNote[];
   /** Los otros personajes de la mesa, sin este. */
   party?: string[];
   /** Capítulos cerrados, en el orden de la campaña. */
   chapters?: (JsonObject & { id: string; name?: string })[];
   /** Combates cerrados, del más nuevo al más viejo. */
   battles?: PlayerBattle[];
+}
+
+/** Una nota compartida con la mesa: solo lo que el jugador lee. */
+export interface PlayerNote {
+  id: string;
+  chapterId: string;
+  title: string;
+  body?: string;
+  updatedAt?: string;
 }
 
 export interface PlayerBattle {
@@ -351,6 +365,8 @@ export interface DmNote {
   title: string;
   body?: string;
   updatedAt?: string;
+  /** Si la ven los jugadores de la campaña. Una nota sin el campo es privada. */
+  shared?: boolean;
 }
 
 /** Un combate cerrado, **con** lo que el DM sí ve y el jugador no: los tres

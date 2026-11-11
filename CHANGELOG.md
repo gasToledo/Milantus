@@ -1265,11 +1265,18 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Nuevo
 
-- Sin cambios.
+- El DM puede marcar cada nota del Cuaderno como «Solo DM» o «DM y
+  Jugadores» (por defecto, privada; las existentes quedan privadas). En `/v2`
+  el jugador ve, en la pestaña Campaña, la tarjeta «Capítulo en curso» con su
+  nombre, su objetivo y las notas compartidas de ese capítulo, y «N notas de la
+  mesa» plegadas bajo cada capítulo cerrado. Esquema de nota 2 (`dnd_engine`);
+  el servidor suma `currentChapter` y `sharedNotes` a
+  `GET /api/characters/<id>/campaigns`.
 
 ### Modificado
 
-- Sin cambios.
+- El objetivo del capítulo en curso deja de ser exclusivo del DM: lo lee el
+  jugador. El de los capítulos cerrados y los pendientes sigue sin llegarle.
 
 ### Eliminado
 

@@ -578,6 +578,35 @@ class FakeApiServer {
                       if (c.state == ChapterState.completed)
                         c.toJson()..remove('summary'),
                   ],
+                  // La misma poda que el servidor: el capítulo en marcha va
+                  // con su objetivo, y las notas solo si el DM las compartió y
+                  // su capítulo está en marcha o cerrado.
+                  'currentChapter': [
+                    for (final c
+                        in chapters[entry.value.campaignId] ??
+                            const <Chapter>[])
+                      if (c.state == ChapterState.active) c.toJson(),
+                  ].firstOrNull,
+                  'sharedNotes': [
+                    for (final n
+                        in notes[entry.value.campaignId] ?? const <Note>[])
+                      if (n.shared &&
+                          (chapters[entry.value.campaignId] ??
+                                  const <Chapter>[])
+                              .any(
+                                (c) =>
+                                    c.id == n.chapterId &&
+                                    c.state != ChapterState.planned,
+                              ))
+                        {
+                          'id': n.id,
+                          'chapterId': n.chapterId,
+                          'title': n.title,
+                          'body': n.body,
+                          if (n.updatedAt != null)
+                            'updatedAt': n.updatedAt!.toIso8601String(),
+                        },
+                  ],
                   // La misma poda que el servidor: ningún nombre de PNJ, ni
                   // aliados ni neutrales, llega a la ficha del jugador.
                   'battles': [

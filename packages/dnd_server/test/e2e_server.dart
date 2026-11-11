@@ -444,6 +444,7 @@ Future<void> main() async {
   final encounters = InMemoryEncounterRepository(campaigns);
   campaigns
     ..playerChaptersFor = chapters.listFor
+    ..playerNotesFor = notes.listFor
     ..playerBattlesFor = encounters.logsFor;
 
   // Una mesa para la pestaña Campaña: el jugador comparte a Elsbeth, otra
@@ -542,6 +543,20 @@ Future<void> main() async {
       body:
           'Nota reservada del DM: el herrero traiciona al grupo. '
           '@elsbeth de humo lo sospecha; @Nadie no es nadie.',
+    ),
+  );
+  // La única nota que el DM marcó para la mesa: el jugador la ve en su
+  // pestaña Campaña (`e2e/campanas.spec.ts`). La de arriba, privada por
+  // defecto, no.
+  await notes.create(
+    _smokeDmId,
+    _smokeCampaignId,
+    const Note(
+      id: 'nota-de-la-mesa',
+      chapterId: 'capitulo-en-marcha',
+      title: 'Pista para la mesa',
+      body: 'El farero cobra en monedas viejas.',
+      shared: true,
     ),
   );
   encounters.logs.add((

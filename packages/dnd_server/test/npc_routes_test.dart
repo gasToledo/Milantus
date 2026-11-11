@@ -51,6 +51,7 @@ void main() {
     encounters = _EncounterRepositoryWithFailingSave(campaigns);
     campaigns
       ..playerChaptersFor = chapters.listFor
+      ..playerNotesFor = notes.listFor
       ..playerBattlesFor = encounters.logsFor;
     final events = InMemoryEventRepository();
     npcs = InMemoryNpcRepository(campaigns, characters);

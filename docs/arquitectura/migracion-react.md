@@ -207,9 +207,11 @@ repiten acá.
   esa ficha). Es la **vista del jugador y nada más**: la misma consulta que la
   ficha (`GET /api/characters/:id/campaigns`), que el servidor ya poda con
   `Campaign.playerView()` y `EncounterLog.playerView()` —sin escenas de
-  música, sin capítulos abiertos ni sus resúmenes, sin las notas del DM ni los
-  PNJ—, y el bloque de cada mesa es el mismo componente que la pestaña
-  (`CampaignBlock`). **No hay Cuaderno, notas ni lista de miembros** porque en
+  música, sin los capítulos pendientes ni el objetivo de los cerrados, sin las
+  notas privadas del DM ni los PNJ—, y el bloque de cada mesa es el mismo
+  componente que la pestaña (`CampaignBlock`). Lo que sí trae del DM: la tarjeta
+  **Capítulo en curso** (nombre, objetivo y las notas «DM y Jugadores» de ese
+  capítulo) y, bajo cada capítulo cerrado, «N notas de la mesa» plegado. **No hay Cuaderno, notas ni lista de miembros** porque en
   Flutter son del Modo DM y el jugador no tiene ningún endpoint para leerlos;
   lo más parecido a «miembros» es «En la mesa también juega…», que ya trae
   cada campaña. Leer las campañas *como DM* (`/api/campaigns`) es el Modo DM,

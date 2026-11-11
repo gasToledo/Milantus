@@ -54,12 +54,22 @@ class PlayerCampaignProjection {
   final List<Chapter> chapters;
   final List<EncounterLog> battles;
 
+  /// El capítulo en marcha, **con su objetivo** (`summary`): es lo único que
+  /// el jugador lee del texto del DM de un capítulo. Los cerrados van sin él.
+  final Chapter? currentChapter;
+
+  /// Las notas que el DM marcó para la mesa, solo de capítulos en marcha o
+  /// cerrados. La consulta es quien filtra; el DTO no distingue más.
+  final List<Note> sharedNotes;
+
   const PlayerCampaignProjection({
     required this.memberId,
     required this.campaign,
     this.party = const [],
     this.chapters = const [],
     this.battles = const [],
+    this.currentChapter,
+    this.sharedNotes = const [],
   });
 }
 
@@ -538,16 +548,64 @@ class PostgresCampaignRepository implements CampaignRepository {
             ON encounter.dm_user_id = l.dm_user_id
            AND encounter.campaign_id = l.campaign_id
           GROUP BY l.member_id
+        ),
+        -- El capítulo en marcha, con su objetivo. Un solo capítulo en marcha
+        -- por campaña se comprueba en el handler y no en la base (dos pestañas
+        -- del DM podrían dejar dos): DISTINCT ON garantiza una fila por vínculo
+        -- y no duplica el resto de la consulta.
+        current_chapter AS (
+          SELECT DISTINCT ON (l.member_id)
+                 l.member_id,
+                 chapter.document AS chapter
+          FROM linked l
+          JOIN chapters chapter
+            ON chapter.dm_user_id = l.dm_user_id
+           AND chapter.campaign_id = l.campaign_id
+          WHERE chapter.document ->> 'state' = 'active'
+          ORDER BY l.member_id, chapter.created_at
+        ),
+        -- Las notas marcadas para la mesa, de un capítulo en marcha o cerrado.
+        -- Una nota privada o la de un capítulo pendiente no entra: el filtro
+        -- es esta cláusula y no el handler. Solo viajan los campos que el
+        -- jugador lee (nunca el documento entero).
+        shared_notes AS (
+          SELECT l.member_id,
+                 jsonb_agg(
+                   jsonb_build_object(
+                     'id', note.id,
+                     'chapterId', note.chapter_id,
+                     'title', note.document ->> 'title',
+                     'body', note.document ->> 'body',
+                     'shared', true,
+                     'updatedAt', note.updated_at
+                   )
+                   ORDER BY note.created_at
+                 ) AS notes
+          FROM linked l
+          JOIN notes note
+            ON note.dm_user_id = l.dm_user_id
+           AND note.campaign_id = l.campaign_id
+          JOIN chapters note_chapter
+            ON note_chapter.dm_user_id = note.dm_user_id
+           AND note_chapter.campaign_id = note.campaign_id
+           AND note_chapter.id = note.chapter_id
+          WHERE note.document ->> 'shared' = 'true'
+            AND note_chapter.document ->> 'state' IN ('active', 'completed')
+          GROUP BY l.member_id
         )
         SELECT l.member_id,
                l.campaign_document,
                COALESCE(p.party, '[]'::jsonb) AS party,
                COALESCE(c.chapters, '[]'::jsonb) AS chapters,
-               COALESCE(b.battles, '[]'::jsonb) AS battles
+               COALESCE(b.battles, '[]'::jsonb) AS battles,
+               cc.chapter AS current_chapter,
+               COALESCE(sn.notes, '[]'::jsonb) AS shared_notes
         FROM linked l
         LEFT JOIN party p ON p.member_id = l.member_id
         LEFT JOIN completed_chapters c ON c.member_id = l.member_id
         LEFT JOIN battles b ON b.member_id = l.member_id
+        LEFT JOIN current_chapter cc ON cc.member_id = l.member_id
+        LEFT JOIN shared_notes sn ON sn.member_id = l.member_id
         ORDER BY l.campaign_name
       '''),
       parameters: {
@@ -607,6 +665,14 @@ class PostgresCampaignRepository implements CampaignRepository {
     battles: [
       for (final json in _objectList(columns['battles']))
         EncounterLog.fromJson(json),
+    ],
+    currentChapter: switch (columns['current_chapter']) {
+      final Map chapter => Chapter.fromJson(chapter.cast<String, dynamic>()),
+      _ => null,
+    },
+    sharedNotes: [
+      for (final json in _objectList(columns['shared_notes']))
+        Note.fromJson(json),
     ],
   );
 

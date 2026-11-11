@@ -9,12 +9,9 @@ const ELSBETH = 'elsbeth-de-humo';
 const SOLO_DEL_DM = [
   'Tema secreto del DM',
   'escena-secreta',
-  'Resumen reservado del DM',
   'Nota reservada del DM',
   'Nota privada',
-  'El Valle Hueco',
   'Garrick el Tabernero',
-  'capitulo-en-marcha',
   'El Concilio de Brasas',
   'subió a nivel',
   'levelUps',
@@ -42,6 +39,30 @@ test('nada del DM llega al jugador: ni en lo que manda la API ni en la pantalla 
     expect(crudo, `la API manda «${secreto}»`).not.toContain(secreto);
     expect(texto, `la pantalla muestra «${secreto}»`).not.toContain(secreto);
   }
+});
+
+test('el jugador ve el capítulo en curso y la nota que el DM compartió, y nada de lo privado', async ({
+  context,
+  page,
+  request,
+  baseURL,
+}) => {
+  await context.addCookies([{ name: 'dnd_session', value: TOKEN, url: baseURL! }]);
+  const { campaigns } = await api<{
+    campaigns: { currentChapter: { name: string } | null; sharedNotes: { id: string }[] }[];
+  }>(request, `/api/characters/${ELSBETH}/campaigns`);
+
+  // La API: el capítulo en marcha y solo la nota marcada, no la privada.
+  expect(campaigns[0]!.currentChapter?.name).toBe('El Valle Hueco');
+  expect(campaigns[0]!.sharedNotes.map((n) => n.id)).toEqual(['nota-de-la-mesa']);
+  expect(JSON.stringify(campaigns)).not.toContain('Nota reservada del DM');
+
+  // La pantalla: lo compartido se lee, lo privado no.
+  await page.goto('/v2/campanas');
+  await expect(page.getByText('El Valle Hueco', { exact: true })).toBeVisible();
+  await expect(page.getByText('Pista para la mesa', { exact: true })).toBeVisible();
+  const texto = await page.locator('body').innerText();
+  expect(texto).not.toContain('Nota reservada del DM');
 });
 
 test('lo ajeno y lo inexistente responden igual: 404, y la cuenta sin v2 no ve campañas', async ({

@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { Eye, Lock } from 'lucide-react';
 import type { DmChapter, DmNote } from '../api/client';
 import { useTexts } from '../i18n/context';
 import { AppDialog } from '../ui/AppDialog';
 import { Select } from '../ui/primitives';
+import { Option } from '../ui/wizard';
 
 /**
  * Escribir o editar una nota del Cuaderno (`note_editor_dialog.dart`). Cuelga
@@ -27,6 +29,8 @@ export function NoteEditorDialog({
   const [chapterId, setChapterId] = useState(initial.chapterId);
   const [noteTitle, setNoteTitle] = useState(initial.title);
   const [body, setBody] = useState(initial.body ?? '');
+  // Una nota nueva arranca privada: compartir es un acto explícito.
+  const [shared, setShared] = useState(initial.shared ?? false);
   const [missingTitle, setMissingTitle] = useState(false);
   const [failed, setFailed] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -40,7 +44,7 @@ export function NoteEditorDialog({
     if (trimmed === '') return setMissingTitle(true);
     setBusy(true);
     try {
-      await onSubmit({ ...initial, chapterId, title: trimmed, body: body.trim() });
+      await onSubmit({ ...initial, chapterId, title: trimmed, body: body.trim(), shared });
       onClose();
     } catch {
       setFailed(true);
@@ -96,6 +100,25 @@ export function NoteEditorDialog({
           />
           <span className="text-[12px] text-text-muted">{t.dmNoteMarkdownHint}</span>
         </label>
+        <fieldset className="m-0 flex min-w-0 flex-col gap-1.5 border-0 p-0">
+          <legend className="mb-1.5 p-0 text-[12px] text-text-muted">{t.dmNoteWhoSees}</legend>
+          <div role="radiogroup" aria-label={t.dmNoteWhoSees} className="grid grid-cols-2 gap-2">
+            <Option
+              id="private"
+              selected={!shared}
+              title={t.dmNoteDmOnly}
+              trailing={<Lock size={16} aria-hidden="true" className="shrink-0 text-text-muted" />}
+              onClick={() => setShared(false)}
+            />
+            <Option
+              id="shared"
+              selected={shared}
+              title={t.dmNoteDmAndPlayers}
+              trailing={<Eye size={16} aria-hidden="true" className="shrink-0 text-gold" />}
+              onClick={() => setShared(true)}
+            />
+          </div>
+        </fieldset>
         {failed && (
           <p role="alert" className="text-[13px] text-crimson">
             {t.dmNoteSaveError}

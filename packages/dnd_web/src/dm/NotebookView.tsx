@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { EllipsisVertical, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
+import { EllipsisVertical, Eye, Lock, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
 import {
   queryKeys,
   useCampaignChapters,
@@ -222,6 +222,20 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
                     {e.kind === 'note' ? t.dmEntryNote : e.kind === 'fight' ? t.dmEntryFight : t.dmEntryLevelUp}
                   </span>
                   <h2 className="font-display min-w-0 flex-1 text-[17px] break-words text-on-surface">{e.title}</h2>
+                  {e.note && (
+                    // Quién la ve: solo las notas llevan visibilidad; los
+                    // combates y las subidas de nivel los escribe la app.
+                    <span
+                      data-visibility={e.note.shared ? 'shared' : 'private'}
+                      className={cx(
+                        'inline-flex items-center gap-[5px] rounded-[var(--radius-pill)] border px-2.5 py-0.5 text-[11.5px]',
+                        e.note.shared ? 'border-gold bg-gold-soft text-gold' : 'border-hairline text-text-muted',
+                      )}
+                    >
+                      {e.note.shared ? <Eye size={13} aria-hidden="true" /> : <Lock size={13} aria-hidden="true" />}
+                      {e.note.shared ? t.dmNoteDmAndPlayers : t.dmNoteDmOnly}
+                    </span>
+                  )}
                   <span className="text-[12px] text-text-muted tabular-nums">
                     {[stamp(e.at, now, t), e.rounds !== undefined && t.roundsCount(e.rounds)].filter(Boolean).join(' · ')}
                   </span>

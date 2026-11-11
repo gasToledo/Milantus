@@ -1288,6 +1288,15 @@ Future<Response> _listCharacterSharesHandler(
 Map<String, dynamic> _playerChapterJson(Chapter chapter) =>
     chapter.toJson()..remove('summary');
 
+/// Si un capítulo es de los que un jugador puede leer notas: el que está en
+/// curso o uno cerrado. Se decide con los capítulos de la propia proyección,
+/// así una nota de un capítulo pendiente no sale aunque la consulta cambie.
+bool _isVisibleChapter(PlayerCampaignProjection projection, String chapterId) =>
+    projection.currentChapter?.id == chapterId ||
+    projection.chapters.any(
+      (c) => c.id == chapterId && c.state == ChapterState.completed,
+    );
+
 /// La campaña vista desde la ficha del jugador: en qué mesa está su personaje,
 /// qué capítulos se cerraron y qué batallas se pelearon.
 ///
@@ -1303,9 +1312,15 @@ Map<String, dynamic> _playerChapterJson(Chapter chapter) =>
 /// que ese jugador está vinculado a esa campaña; el handler no necesita
 /// resolver ids ajenos ni repartir la autorización entre otros repositorios.
 ///
-/// Lo que **no** viaja, y no por olvido: el objetivo de los capítulos (ver
-/// [_playerChapterJson]), los capítulos que todavía no se cerraron, las notas
-/// del cuaderno, el id de la campaña y el del DM. La clave de cada bloque es el
+/// Lo que viaja del texto del DM, y es **a propósito**: del capítulo en curso,
+/// su nombre y su objetivo (`currentChapter`); y las notas que el DM marcó
+/// para la mesa (`sharedNotes`), de capítulos en curso o cerrados. El filtro
+/// está en el `WHERE` de la consulta y se repite acá contra los capítulos que
+/// la propia proyección trae.
+///
+/// Lo que **no** viaja, y no por olvido: el objetivo de los capítulos cerrados
+/// (ver [_playerChapterJson]), los capítulos pendientes y sus notas, las notas
+/// privadas, el id de la campaña y el del DM. La clave de cada bloque es el
 /// `memberId`, que ya es el asa que el jugador tiene sobre el vínculo.
 Future<Response> _listPlayerCampaignsHandler(
   Request request,
@@ -1328,6 +1343,25 @@ Future<Response> _listPlayerCampaignsHandler(
     for (final projection in projections)
       {
         'memberId': projection.memberId,
+        // Con su objetivo: es el único capítulo cuyo `summary` llega a un
+        // jugador. Se repite el estado por si la consulta cambia.
+        'currentChapter': switch (projection.currentChapter) {
+          final chapter? when chapter.state == ChapterState.active =>
+            chapter.toJson(),
+          _ => null,
+        },
+        'sharedNotes': [
+          for (final note in projection.sharedNotes)
+            if (note.shared && _isVisibleChapter(projection, note.chapterId))
+              {
+                'id': note.id,
+                'chapterId': note.chapterId,
+                'title': note.title,
+                'body': note.body,
+                if (note.updatedAt != null)
+                  'updatedAt': note.updatedAt!.toIso8601String(),
+              },
+        ],
         // `playerView` y no `toJson`: las escenas de música son del DM. La
         // consulta ya las poda; esto cubre un cambio futuro en ella.
         'campaign': projection.campaign.playerView(),

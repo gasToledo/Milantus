@@ -95,6 +95,7 @@ void main() {
     encounters = InMemoryEncounterRepository(campaigns);
     campaigns
       ..playerChaptersFor = chapters.listFor
+      ..playerNotesFor = notes.listFor
       ..playerBattlesFor = encounters.logsFor;
     events = InMemoryEventRepository();
     npcs = InMemoryNpcRepository(campaigns, characters);
@@ -4680,31 +4681,53 @@ void main() {
         );
       });
 
-      test('los capítulos que todavía no se cerraron no se muestran', () async {
-        final (player, dm) = await table('solo-cerrados');
-        await createChapter(dm, 'camino', 'El camino');
-        await createChapter(dm, 'feria', 'La feria', state: 'active');
+      test(
+        'los capítulos que todavía no se cerraron no van entre los cerrados',
+        () async {
+          final (player, dm) = await table('solo-cerrados');
+          await createChapter(dm, 'camino', 'El camino');
+          await createChapter(dm, 'feria', 'La feria', state: 'active');
 
-        final chapters = (await campaignsOf(player)).single['chapters'] as List;
-        expect(chapters, hasLength(1));
-        expect(chapters.single['name'], 'La cripta sellada');
-      });
+          final chapters =
+              (await campaignsOf(player)).single['chapters'] as List;
+          expect(chapters, hasLength(1));
+          expect(chapters.single['name'], 'La cripta sellada');
+        },
+      );
 
-      test('las notas del cuaderno no viajan', () async {
-        final (player, dm) = await table('sin-notas');
-        await send(
-          'POST',
-          '/api/campaigns/tumba/notes',
-          token: dm,
-          body: {
-            'note': {
-              'schemaVersion': 1,
-              'id': 'n1',
-              'chapterId': 'cripta',
-              'title': 'Los tres sellos',
-              'body': 'El tercero está detrás del tapiz.',
-            },
+      Future<void> createNote(
+        String token,
+        String id,
+        String chapterId,
+        String title,
+        String body, {
+        bool shared = false,
+      }) => send(
+        'POST',
+        '/api/campaigns/tumba/notes',
+        token: token,
+        body: {
+          'note': {
+            'schemaVersion': 2,
+            'id': id,
+            'chapterId': chapterId,
+            'title': title,
+            'body': body,
+            'shared': shared,
           },
+        },
+      );
+
+      // La frontera de las notas: lo privado no sale nunca, y lo compartido
+      // solo de un capítulo en marcha o cerrado. Se mira el cuerpo entero.
+      test('una nota privada no llega al jugador', () async {
+        final (player, dm) = await table('nota-privada');
+        await createNote(
+          dm,
+          'n1',
+          'cripta',
+          'Los tres sellos',
+          'Tras el tapiz.',
         );
 
         final raw = await send(
@@ -4714,6 +4737,95 @@ void main() {
         );
         expect(jsonEncode(raw['body']), isNot(contains('tapiz')));
         expect(jsonEncode(raw['body']), isNot(contains('sellos')));
+        expect(
+          (raw['body']['campaigns'] as List).single['sharedNotes'],
+          isEmpty,
+        );
+      });
+
+      test('una nota compartida de un capítulo pendiente no llega', () async {
+        final (player, dm) = await table('nota-pendiente');
+        await createChapter(dm, 'camino', 'El camino');
+        await createNote(
+          dm,
+          'n1',
+          'camino',
+          'Emboscada',
+          'Cuatro bandidos al vado.',
+          shared: true,
+        );
+
+        final raw = await send(
+          'GET',
+          '/api/characters/sagan/campaigns',
+          token: player,
+        );
+        expect(jsonEncode(raw['body']), isNot(contains('bandidos')));
+        expect(
+          (raw['body']['campaigns'] as List).single['sharedNotes'],
+          isEmpty,
+        );
+      });
+
+      test('el jugador recibe las notas compartidas del capítulo en curso y '
+          'de los cerrados, y solo esas', () async {
+        final (player, dm) = await table('nota-compartida');
+        await createChapter(dm, 'feria', 'La feria', state: 'active');
+        await createNote(
+          dm,
+          'n1',
+          'cripta',
+          'Lo hallado',
+          'Un cáliz.',
+          shared: true,
+        );
+        await createNote(
+          dm,
+          'n2',
+          'feria',
+          'Los puestos',
+          'Hay siete.',
+          shared: true,
+        );
+        await createNote(dm, 'n3', 'feria', 'El soplón', 'Es el herrero.');
+
+        final block =
+            (await campaignsOf(player)).single as Map<String, dynamic>;
+        final notes = block['sharedNotes'] as List;
+        expect([for (final n in notes) n['id']], unorderedEquals(['n1', 'n2']));
+        expect(notes.firstWhere((n) => n['id'] == 'n2')['body'], 'Hay siete.');
+        // Lo privado del mismo capítulo en curso sigue sin salir.
+        expect(jsonEncode(block), isNot(contains('herrero')));
+        // Y la nota no arrastra más que lo que el jugador lee.
+        expect(notes.first.keys, isNot(contains('shared')));
+      });
+
+      // El objetivo del capítulo en curso llega a propósito; el de un cerrado
+      // sigue sin llegar (ver 'la descripción del capítulo no viaja nunca').
+      test('el objetivo llega solo del capítulo en curso', () async {
+        final (player, dm) = await table('objetivo-en-curso');
+        await createChapter(dm, 'feria', 'La feria', state: 'active');
+        await createChapter(dm, 'camino', 'El camino');
+
+        final block =
+            (await campaignsOf(player)).single as Map<String, dynamic>;
+        expect(block['currentChapter']['name'], 'La feria');
+        expect(block['currentChapter']['summary'], summary);
+        // El cerrado, en cambio, va sin objetivo; el pendiente no va.
+        expect(
+          (block['chapters'] as List).single['summary'],
+          anyOf(isNull, ''),
+        );
+        expect(jsonEncode(block['chapters']), isNot(contains('gules')));
+        expect(jsonEncode(block), isNot(contains('El camino')));
+      });
+
+      test('sin capítulo en marcha no hay capítulo en curso', () async {
+        final (player, _) = await table('sin-en-curso');
+
+        final block =
+            (await campaignsOf(player)).single as Map<String, dynamic>;
+        expect(block['currentChapter'], isNull);
       });
 
       test('las escenas de música y el orden de la Mesa no viajan', () async {

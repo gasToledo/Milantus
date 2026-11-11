@@ -142,8 +142,11 @@ Los capítulos (migración `0008_chapters`) viven en su propia tabla, keyeada po
 campaña porque entonces renombrarla reescribiría todos sus capítulos, y ese
 documento crecería sin techo.
 
-**El objetivo de un capítulo no lo lee ningún jugador**, ni siquiera con el
-capítulo cerrado: lo escribe el DM y no viaja a ninguna cuenta ajena.
+**El objetivo de un capítulo cerrado no lo lee ningún jugador**: lo escribe el
+DM y no viaja a ninguna cuenta ajena. La única excepción, decidida a
+propósito, es el **capítulo en curso**: su nombre y su objetivo llegan al
+jugador (ver «La vuelta del vínculo» más abajo). Al cerrarse, el objetivo deja
+de viajar.
 
 Lo que sí cambió: el jugador ahora ve el **nombre** y las recompensas de los
 capítulos ya cerrados de su campaña, desde la pestaña Campaña de su ficha (ver
@@ -292,8 +295,9 @@ Todo lo que hace «rica» a una nota vive en el cliente y **no toca el servidor*
   una mención. Quien se fue —un jugador que cortó el vínculo, un PNJ
   desvinculado— queda como texto, sin una `@` que no lleve a ningún lado.
 
-El Cuaderno es del DM: lo lee solo él, y nada de esto llega al jugador (ver el
-final de «La vuelta del vínculo»).
+El Cuaderno es del DM: lo lee solo él. La única parte que cruza son las notas
+que él marca «DM y Jugadores» (`Note.shared`), que el jugador lee en la pestaña
+Campaña (ver «La vuelta del vínculo»); el resto no llega.
 
 ## El combate y el turno
 
@@ -519,20 +523,34 @@ Ojo con lo que eso implica al probar: es SQL que ningún test ejecuta (los doble
 en memoria lo reimplementan), así que un cambio en esa consulta se revisa a
 mano y contra el stack real.
 
+Lo que la respuesta lleva **del texto del DM**, y es a propósito (decisión del
+2026-11-11):
+
+- **`currentChapter`**: el capítulo en marcha, con su nombre **y su objetivo**.
+  Es el único capítulo cuyo `summary` llega a un jugador. La consulta lo arma en
+  su propio CTE (`current_chapter`, con `DISTINCT ON` por vínculo, porque «un
+  solo capítulo en marcha» se comprueba en el handler de escritura y no en la
+  base) y el handler vuelve a exigir `state = active`.
+- **`sharedNotes`**: las notas que el DM marcó «DM y Jugadores» (`Note.shared`,
+  esquema 2; una nota nueva nace privada y una v1 se lee como privada), solo de
+  capítulos **en marcha o cerrados**. El filtro (`shared = true` y el estado
+  del capítulo de la nota) está en el `WHERE` del CTE `shared_notes`; el
+  handler lo repite contra los capítulos que la propia proyección trae. Viajan
+  `id`, `chapterId`, `title`, `body` y `updatedAt`: nunca el documento entero.
+
 Lo que la respuesta **no** lleva, y no por olvido:
 
-- **El objetivo de los capítulos.** `Chapter.summary` es lo que el DM escribe
-  adentro del capítulo, y su propia documentación dice que no lo ve ningún
-  jugador ni siquiera con el capítulo cerrado. Se poda dos veces:
-  la consulta devuelve `document - 'summary'` y `_playerChapterJson` lo vuelve a
-  quitar. Hay una prueba que busca el texto en el cuerpo entero de la respuesta — no
-  en un campo, para que también agarre el día que alguien lo anide en otro lado.
-- **Los capítulos que todavía no se cerraron**, el que está en marcha incluido
-  (la consulta filtra `state = 'completed'` y el handler lo repite).
-  De lo que están jugando ahora el jugador se entera en la mesa.
-- **Las notas del cuaderno.** Ese repositorio ni se toca en el handler.
-- **El id de la campaña y el del DM.** La clave de cada bloque es el `memberId`,
-  que ya es el asa que el jugador tiene sobre el vínculo.
+- **El objetivo de los capítulos cerrados.** `Chapter.summary` es lo que el DM
+  escribe adentro del capítulo. Se poda dos veces: la consulta devuelve
+  `document - 'summary'` y `_playerChapterJson` lo vuelve a quitar. Hay una
+  prueba que busca el texto en el cuerpo entero de la respuesta — no en un
+  campo, para que también agarre el día que alguien lo anide en otro lado.
+- **Los capítulos pendientes**, ni sus notas, aunque estén marcadas para la
+  mesa. El que está en marcha no va entre los cerrados (viaja aparte
+  como `currentChapter`).
+- **Las notas privadas**, que son las de siempre y el valor por defecto.
+- **El id de la campaña y el del DM.** La clave de cada bloque es el
+  `memberId`, que ya es el asa que el jugador tiene sobre el vínculo.
 
 Dos decisiones de contenido que se ven raras si no se explican:
 
@@ -716,8 +734,11 @@ El subgrupo `campaña vista por el jugador` agrega:
 - **el objetivo del capítulo no aparece en el cuerpo** — y la misma prueba
   comprueba primero que el DM sí lo ve, para no pasar por tener un capítulo sin
   objetivo;
-- los capítulos `planned` y `active` no se devuelven;
-- las notas del cuaderno no se devuelven;
+- los capítulos `planned` y `active` no van entre los cerrados;
+- una nota privada no se devuelve, ni una compartida de un capítulo pendiente;
+  una compartida de un capítulo en marcha o cerrado sí;
+- el objetivo llega solo del capítulo en curso (`currentChapter`), nunca de un
+  cerrado;
 - no viaja el id de la campaña ni el del DM;
 - un personaje sin vínculos devuelve la lista vacía, no un error;
 - preguntar por un personaje ajeno responde 404.

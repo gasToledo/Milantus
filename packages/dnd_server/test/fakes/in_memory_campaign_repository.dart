@@ -36,6 +36,8 @@ class InMemoryCampaignRepository implements CampaignRepository {
   playerChaptersFor;
   Future<List<EncounterLog>> Function(String dmUserId, String campaignId)?
   playerBattlesFor;
+  Future<List<Note>> Function(String dmUserId, String campaignId)?
+  playerNotesFor;
 
   Object snapshot() => (
     byDm: {for (final entry in _byDm.entries) entry.key: Map.of(entry.value)},
@@ -327,9 +329,30 @@ class InMemoryCampaignRepository implements CampaignRepository {
       final battles = playerBattlesFor == null
           ? const <EncounterLog>[]
           : await playerBattlesFor!(share.dmUserId, share.campaignId);
+      // La misma poda que el SQL: el capítulo en marcha, y las notas marcadas
+      // para la mesa de capítulos en marcha o cerrados. Nunca las privadas ni
+      // las de un capítulo pendiente.
+      final current = chapters
+          .where((c) => c.state == ChapterState.active)
+          .firstOrNull;
+      final visibleChapterIds = {
+        for (final c in chapters)
+          if (c.state != ChapterState.planned) c.id,
+      };
+      final notes = playerNotesFor == null
+          ? const <Note>[]
+          : [
+              for (final n in await playerNotesFor!(
+                share.dmUserId,
+                share.campaignId,
+              ))
+                if (n.shared && visibleChapterIds.contains(n.chapterId)) n,
+            ];
       projections.add(
         PlayerCampaignProjection(
           memberId: share.memberId,
+          currentChapter: current,
+          sharedNotes: notes,
           campaign: campaign,
           party: [
             for (final member in members)

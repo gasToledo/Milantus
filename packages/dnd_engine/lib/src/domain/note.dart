@@ -11,7 +11,10 @@ import 'data_version.dart';
 class Note {
   /// Versión del formato de este documento. Mismo contrato que
   /// `Chapter.currentSchemaVersion`.
-  static const int currentSchemaVersion = 1;
+  ///
+  /// - 2: suma [shared]. Una nota v1 se lee como privada: el DM la escribió
+  ///   cuando nada de lo suyo llegaba a la mesa.
+  static const int currentSchemaVersion = 2;
 
   final String id;
 
@@ -37,20 +40,34 @@ class Note {
   /// acá no lo lee nadie.
   final DateTime? updatedAt;
 
+  /// Si la ven los jugadores de la campaña. **Privada por defecto**: lo normal
+  /// en un cuaderno de DM es el secreto, y compartir es un acto explícito. El
+  /// servidor la entrega solo si el capítulo está en marcha o cerrado (la de un
+  /// capítulo pendiente no sale aunque esté marcada).
+  final bool shared;
+
   const Note({
     required this.id,
     required this.chapterId,
     this.title = '',
     this.body = '',
     this.updatedAt,
+    this.shared = false,
   });
 
-  Note copyWith({String? chapterId, String? title, String? body}) => Note(
+  Note copyWith({
+    String? chapterId,
+    String? title,
+    String? body,
+    bool? shared,
+  }) =>
+      Note(
         id: id,
         chapterId: chapterId ?? this.chapterId,
         title: title ?? this.title,
         body: body ?? this.body,
         updatedAt: updatedAt,
+        shared: shared ?? this.shared,
       );
 
   Map<String, dynamic> toJson() => {
@@ -59,6 +76,7 @@ class Note {
         'chapterId': chapterId,
         'title': title,
         'body': body,
+        'shared': shared,
         if (updatedAt != null) 'updatedAt': updatedAt!.toIso8601String(),
       };
 
@@ -70,6 +88,8 @@ class Note {
       title: j['title'] as String? ?? '',
       body: j['body'] as String? ?? '',
       updatedAt: DateTime.tryParse(j['updatedAt'] as String? ?? ''),
+      // Estricto: solo un `true` comparte. Cualquier otra cosa, privada.
+      shared: j['shared'] == true,
     );
   }
 
@@ -95,6 +115,12 @@ class Note {
         supported: currentSchemaVersion,
       );
     }
-    return Map<String, dynamic>.from(source);
+    final migrated = Map<String, dynamic>.from(source);
+    // `putIfAbsent` y no una asignación: un cliente que manda la nota sin
+    // `schemaVersion` (la nota recién escrita) cuenta como v1, y pisar su
+    // `shared` perdería lo que el DM acaba de elegir.
+    if (version < 2) migrated.putIfAbsent('shared', () => false);
+    migrated['schemaVersion'] = currentSchemaVersion;
+    return migrated;
   }
 }
