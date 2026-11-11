@@ -1290,7 +1290,8 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
-- Sin cambios.
+- El interruptor Jugador / DM queda fijo arriba del panel lateral de `/v2`: no
+  se va con el scroll de la lista de campañas.
 
 ### Eliminado
 

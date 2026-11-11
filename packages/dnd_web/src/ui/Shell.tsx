@@ -283,6 +283,11 @@ export function ModeSwitch({ mode, playerHref, dmHref }: { mode: 'player' | 'dm'
   const other =
     'rounded-[var(--radius-pill)] py-1.5 text-on-surface-variant hover:bg-surface hover:text-on-surface';
   return (
+    // Pegado arriba del scroll del panel (`sticky`): el cambio de modo queda
+    // siempre a la vista, por larga que sea la lista de campañas. El `-mx-3`
+    // y su relleno compensan el `px-3` del panel para que el fondo tape a lo
+    // que pasa por debajo de borde a borde.
+    <div className="sticky top-0 z-10 -mx-3 bg-surface px-3 pt-1 pb-1.5">
     <div
       role="group"
       aria-label={t.modeSwitchLabel}
@@ -306,6 +311,7 @@ export function ModeSwitch({ mode, playerHref, dmHref }: { mode: 'player' | 'dm'
           {t.modeDm}
         </Link>
       )}
+    </div>
     </div>
   );
 }
