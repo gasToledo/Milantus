@@ -639,7 +639,7 @@ function ClassCard({
       data-option={entry.id}
       onClick={onClick}
       className={cx(
-        'flex min-h-24 w-[136px] shrink-0 flex-col items-start gap-1.5 rounded-[var(--radius-card)] border p-3 text-left text-on-surface',
+        'pick flex min-h-24 w-[136px] shrink-0 flex-col items-start gap-1.5 rounded-[var(--radius-card)] border p-3 text-left text-on-surface',
         selected ? 'border-gold bg-gold-soft' : 'border-hairline bg-plaque',
       )}
     >

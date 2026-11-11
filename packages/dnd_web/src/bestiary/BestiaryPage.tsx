@@ -225,7 +225,7 @@ function Browser({
               aria-pressed={sortByCr === byCr}
               onClick={() => setSortByCr(byCr)}
               className={cx(
-                'rounded-[var(--radius-pill)] border px-3 py-[5px] text-[12.5px]',
+                'pick rounded-[var(--radius-pill)] border px-3 py-[5px] text-[12.5px]',
                 sortByCr === byCr
                   ? 'border-gold bg-gold-soft font-semibold text-gold'
                   : 'border-hairline text-on-surface-variant hover:text-on-surface',

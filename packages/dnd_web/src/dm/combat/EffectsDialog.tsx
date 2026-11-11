@@ -198,7 +198,7 @@ export function EffectsDialog({
                   aria-pressed={has(id)}
                   onClick={() => toggle(id)}
                   className={cx(
-                    'min-h-8 rounded-[var(--radius-pill)] border px-2.5 text-[12.5px]',
+                    'pick min-h-8 rounded-[var(--radius-pill)] border px-2.5 text-[12.5px]',
                     has(id) ? 'border-gold bg-gold-soft text-gold' : 'border-hairline text-on-surface',
                   )}
                 >

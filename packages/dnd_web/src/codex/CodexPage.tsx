@@ -336,7 +336,7 @@ export function CategoryView({
                   aria-pressed={facet === f}
                   onClick={() => setFacet(f)}
                   className={cx(
-                    'rounded-[var(--radius-pill)] border px-3 py-[5px] text-[12.5px] tabular-nums',
+                    'pick rounded-[var(--radius-pill)] border px-3 py-[5px] text-[12.5px] tabular-nums',
                     facet === f
                       ? 'border-gold bg-gold-soft font-semibold text-gold'
                       : 'border-hairline text-on-surface-variant hover:text-on-surface',

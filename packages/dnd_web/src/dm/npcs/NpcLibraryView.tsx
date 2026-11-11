@@ -223,7 +223,7 @@ export function FilterPill({
       aria-disabled={disabled ? true : undefined}
       onClick={disabled ? undefined : onClick}
       className={cx(
-        'rounded-[var(--radius-pill)] border',
+        'pick rounded-[var(--radius-pill)] border',
         dashed && 'border-dashed',
         disabled && 'opacity-40',
         small ? 'px-[11px] py-[3px] text-[12px]' : 'px-3 py-[5px] text-[12.5px]',

@@ -98,7 +98,7 @@ export function FamilyFilter({
           aria-pressed={family === f}
           onClick={() => onChange(f)}
           className={cx(
-            'shrink-0 rounded-[var(--radius-pill)] border px-3 py-[3px] text-[12px]',
+            'pick shrink-0 rounded-[var(--radius-pill)] border px-3 py-[3px] text-[12px]',
             family === f ? 'border-gold bg-gold-soft text-gold' : 'border-hairline text-on-surface-variant',
           )}
         >

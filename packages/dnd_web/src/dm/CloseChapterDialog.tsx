@@ -169,7 +169,7 @@ export function CloseChapterDialog({
                         aria-pressed={on}
                         onClick={() => toggle(e.key, m.memberId)}
                         className={cx(
-                          'rounded-[var(--radius-pill)] border px-3 py-1 text-[12.5px]',
+                          'pick rounded-[var(--radius-pill)] border px-3 py-1 text-[12.5px]',
                           on ? 'border-gold bg-gold-soft text-gold' : 'border-hairline text-on-surface-variant hover:text-on-surface',
                         )}
                       >

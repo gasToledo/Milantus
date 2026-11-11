@@ -120,7 +120,7 @@ function InspirationToggle({ model }: { model: SheetModel }) {
       aria-pressed={has}
       title={has ? t.inspirationSpend : t.inspirationMark}
       onClick={() => write!.act({ type: 'heroicInspiration', value: !has })}
-      className={`mt-3 flex w-full items-center gap-2.5 rounded-[var(--radius-card)] border px-3 py-2.5 text-left ${
+      className={`pick mt-3 flex w-full items-center gap-2.5 rounded-[var(--radius-card)] border px-3 py-2.5 text-left ${
         has ? 'border-gold bg-gold-soft text-gold' : 'border-hairline bg-plaque text-text-muted'
       }`}
     >
@@ -789,7 +789,7 @@ export function ConditionToggleList({
                 aria-pressed={on}
                 {...{ [attr]: id }}
                 onClick={() => onToggle(id, !on)}
-                className={`inline-flex items-center rounded-[var(--radius-pill)] border px-3 py-1 font-[family-name:var(--font-body)] text-[13px] ${
+                className={`pick inline-flex items-center rounded-[var(--radius-pill)] border px-3 py-1 font-[family-name:var(--font-body)] text-[13px] ${
                   on ? 'border-gold bg-gold-soft text-gold' : 'border-hairline bg-plaque text-on-surface-variant'
                 }`}
               >

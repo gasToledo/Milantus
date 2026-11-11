@@ -96,7 +96,7 @@ function ThumbStrip({
             data-thumb={item.id}
             onClick={() => onSelect(item.id)}
             className={cx(
-              'relative block h-[76px] w-[57px] cursor-pointer overflow-hidden rounded-[8px] bg-plaque p-0',
+              'pick relative block h-[76px] w-[57px] overflow-hidden rounded-[8px] bg-plaque p-0',
               item.selected ? 'border-2 border-gold' : 'border border-hairline',
             )}
           >
