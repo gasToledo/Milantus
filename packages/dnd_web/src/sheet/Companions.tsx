@@ -281,9 +281,9 @@ function SummonDialog({
   const o = view.options.find((x) => x.id === sel.option) ?? view.options[0]!;
   const cells = cellsOf(o);
   const freeLeft = o.free?.left ?? 0;
-  const noPay = o.scales && freeLeft === 0 && cells.length === 0;
+  const noPay = o.paid && freeLeft === 0 && cells.length === 0;
   const cell = cells.find((c) => c.key === sel.pay);
-  const level = !o.scales ? 0 : sel.pay === 'free' ? o.minSpellLevel : (cell?.level ?? o.minSpellLevel);
+  const level = !o.paid ? 0 : sel.pay === 'free' ? o.minSpellLevel : (cell?.level ?? o.minSpellLevel);
   // El perfil de cada forma al nivel elegido: da el detalle de la lista (CA y
   // PG) y el panel del costado. Se recalcula al cambiar de opción o de nivel.
   const previews = useMemo(
@@ -298,7 +298,7 @@ function SummonDialog({
   );
   const preview = previews.get(peek ?? sel.form) ?? null;
   // «con espacio de nivel n» solo cuando el pago es un espacio.
-  const kindNote = o.scales && sel.pay !== 'free' && cell ? t.compWithSlot(cell.level) : undefined;
+  const kindNote = o.paid && sel.pay !== 'free' && cell ? t.compWithSlot(cell.level) : undefined;
 
   const concentrating = character.combat?.concentratingOn ?? null;
   const leaving = view.instances.filter((i) => i.concentration).map((i) => i.name);
@@ -308,7 +308,7 @@ function SummonDialog({
       type: 'summonCompanion',
       option: o.id,
       creature: sel.form,
-      ...(o.scales ? (sel.pay === 'free' ? { free: true } : { level: cell?.level, pact: cell?.pact }) : {}),
+      ...(o.paid ? (sel.pay === 'free' ? { free: true } : { level: cell?.level, pact: cell?.pact }) : {}),
     });
     if (!r) return;
     const out = r.outcome;
@@ -392,7 +392,7 @@ function SummonDialog({
           )}
         </div>
       )}
-      {o.scales && (
+      {o.paid && (
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between gap-2">
             <Eyebrow>{t.compSlot}</Eyebrow>
@@ -418,7 +418,7 @@ function SummonDialog({
           )}
         </div>
       )}
-      {single && !o.scales && <div>{infoButton(single.id, single.name)}</div>}
+      {single && !o.paid && <div>{infoButton(single.id, single.name)}</div>}
     </div>
   );
 

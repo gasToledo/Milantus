@@ -212,6 +212,8 @@ sealed class Effect {
               .toList(),
           maxActive: json['maxActive'] as int? ?? 1,
           requiresSpell: json['requiresSpell'] as String?,
+          payWith: json['payWith'] as String?,
+          untilLongRest: json['untilLongRest'] as bool? ?? false,
         ),
       'wildShapeForms' => WildShapeFormsEffect(
           count: json['count'] as int,
@@ -2373,12 +2375,24 @@ class CompanionEffect extends Effect {
   /// Familiar, Hallar Corcel). Null = lo concede el rasgo por sí solo.
   final String? requiresSpell;
 
+  /// Id de un recurso con que se paga la invocación, como alternativa a un
+  /// espacio de conjuro de nivel 1 o más (Compañero Salvaje: «un espacio o un
+  /// uso de Forma Salvaje»). Null = el rasgo no cobra, o cobra el conjuro de
+  /// [requiresSpell].
+  final String? payWith;
+
+  /// El compañero se va al terminar un descanso largo (el familiar del
+  /// Compañero Salvaje).
+  final bool untilLongRest;
+
   const CompanionEffect({
     required this.id,
     required this.name,
     required this.creatureIds,
     this.maxActive = 1,
     this.requiresSpell,
+    this.payWith,
+    this.untilLongRest = false,
   });
 
   @override
@@ -2389,6 +2403,8 @@ class CompanionEffect extends Effect {
         'creatureIds': creatureIds,
         'maxActive': maxActive,
         if (requiresSpell != null) 'requiresSpell': requiresSpell,
+        if (payWith != null) 'payWith': payWith,
+        if (untilLongRest) 'untilLongRest': true,
       };
 }
 

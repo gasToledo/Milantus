@@ -7,8 +7,8 @@ import 'character_choices.dart';
 import 'character_compiler.dart';
 import 'coin_ops.dart';
 import 'combat_ops.dart';
+import 'companion_view.dart';
 import 'diary_ops.dart';
-import '../domain/spell_slots.dart';
 import 'dice.dart';
 import 'inventory_ops.dart';
 import 'level_up.dart';
@@ -55,7 +55,8 @@ class SheetActions {
   /// - `spendHitDie`; `outcome.healed` son los PG recuperados.
   /// - `shortRest`; `outcome.restored` son los nombres de lo que se recargó.
   /// - `longRest`; `outcome` lleva `exhaustion` (el que queda, solo si había),
-  ///   `inspirationGained` e `itemsRecharged`.
+  ///   `inspirationGained`, `itemsRecharged` y `companionsGone` (los nombres
+  ///   de los compañeros que se van con el descanso).
   /// - `heroicInspiration` con `value`: marcarla o gastarla a mano.
   /// - `concentrate` con `spell` (el nombre, como lo guarda Flutter);
   ///   `outcome.dismissed` son los compañeros que dependían de la concentración
@@ -118,9 +119,10 @@ class SheetActions {
   ///   Anotar respeta el cupo y las opciones del pozo; sacar vale siempre, y
   ///   una forma que dejó de calificar queda guardada hasta que se saque.
   ///   `spendHitDie` transformado cura con la CON de la bestia.
-  /// - `summonCompanion` con `option`, `creature` y, si la opción escala con el
-  ///   espacio, `level` y `pact` (paga ese espacio) o `free: true` (paga el uso
-  ///   gratis del conjuro, con el nivel mínimo). `outcome.summoned` es false si
+  /// - `summonCompanion` con `option`, `creature` y, si la opción cobra
+  ///   (`CompanionOption.paid`), `level` y `pact` (paga ese espacio) o
+  ///   `free: true` (paga el uso gratis del conjuro, o el recurso del rasgo
+  ///   como la Forma Salvaje, con el nivel mínimo). `outcome.summoned` es false si
   ///   la opción o la forma no existen, si el nivel no alcanza, si no queda
   ///   espacio o uso, y la ficha vuelve intacta. Si invoca: `name` (la forma),
   ///   `spentSlot` (el nivel pagado o null), `freeName` (el recurso gratis o
@@ -270,14 +272,9 @@ class SheetActions {
         int? spentSlot;
         String? freeName;
         var paid = true;
-        if (option.scalesWithSpellLevel) {
+        if (option.paid) {
           if (action['free'] == true) {
-            final id = option.spellId == null
-                ? null
-                : innateSpellResourceId(option.spellId!);
-            final r = sheet.resources
-                .where((r) => r.id == id && r.max > 0)
-                .firstOrNull;
+            final r = companionFreeResource(sheet, option);
             final used = r == null ? 0 : combat.resourceUsage[r.key] ?? 0;
             paid = r != null && used < r.max;
             if (paid) {
@@ -376,6 +373,19 @@ class SheetActions {
       case 'longRest':
         final exhaustionBefore = combat.exhaustion;
         final hadInspiration = combat.heroicInspiration;
+        // El familiar del Compañero Salvaje se va al terminar el descanso. Se
+        // decide por la opción de la ficha y no por un dato de la instancia:
+        // así vale también para los que se invocaron antes de este cambio.
+        final untilRest = {
+          for (final o in sheet.companions)
+            if (o.untilLongRest) o.id,
+        };
+        final gone = [
+          for (final i in combat.companions)
+            if (untilRest.contains(i.optionId))
+              repo.creature(i.creatureId)?.name ?? i.creatureId,
+        ];
+        combat.companions.removeWhere((i) => untilRest.contains(i.optionId));
         CombatOps.longRest(
           combat,
           sheet.maxHp,
@@ -398,7 +408,8 @@ class SheetActions {
         outcome
           ..['exhaustion'] = exhaustionBefore > 0 ? combat.exhaustion : null
           ..['inspirationGained'] = !hadInspiration && combat.heroicInspiration
-          ..['itemsRecharged'] = items;
+          ..['itemsRecharged'] = items
+          ..['companionsGone'] = gone;
       case 'heroicInspiration':
         combat.heroicInspiration = action['value'] == true;
       case 'concentrate' || 'endConcentration':

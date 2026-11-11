@@ -592,8 +592,11 @@ repiten acá.
   también al brujo puro: su tabla de pacto ya no se repite como espacios
   normales (`normalSpellSlotsByLevel` queda vacío) y la tarjeta Conjuros le
   muestra solo la celda de pacto. **Siguen en Flutter:** invocar en forma de
-  bestia, el Defensor de Acero, y el Compañero Salvaje, que no cobra ni se va
-  con el descanso.
+  bestia y el Defensor de Acero. El **Compañero Salvaje** cobra desde /v2: el
+  rasgo declara `payWith` (la Forma Salvaje como alternativa a un espacio de
+  nivel 1 o más, que el diálogo ofrece como el uso gratis) y `untilLongRest`,
+  y el descanso largo lo despide (`companionsGone`). Flutter sigue
+  invocándolo gratis y sin despedirlo al descansar, por estar congelado.
   Desde 5e8, la ficha propia **escribe el Diario** (`DiaryTab`). El trasfondo
   tiene editor (el borrador es local y `setBackground` se manda espaciado a
   400 ms, y al terminar, al salir del campo y al desmontar: cada acción
@@ -639,7 +642,7 @@ repiten acá.
   de Flutter. «Cambiar elecciones», en Identidad, abre la misma pantalla para
   revisar lo ya elegido; Defensa elige la fórmula sin armadura (Monje +
   Bárbaro). **Sin botón, como en Flutter:** los avisos de subclase, mejora de
-  nivel y habilidades de clase. El Compañero Salvaje sigue pendiente.
+  nivel y habilidades de clase.
   La banda táctica (PG, Iniciativa,
   Velocidad, Competencia; sin Armadura, que se lee en Defensa) solo va en
   Personaje y Combate, como en Flutter; el modo en curso lo dice su propia franja (con lo que suma), sin cartel aparte. Sin escritura, la ficha ajena
@@ -1006,7 +1009,7 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
    guarda por `PUT /api/characters/:id`: `PUT /api/npcs/:id` solo escribe el
    documento del PNJ, y `_upsertCharacterHandler` ya acepta esa ficha.
 7. Ajustes, transferencias y Homebrew:
-   - **7a · Ajustes de cuenta.** Modo de inicio, tema y dificultad del
+   - **7a · Ajustes de cuenta** *(existe)*. Modo de inicio, tema y dificultad del
      encuentro desde React. La lista de personajes tiene una ruta propia para
      volver a ella desde el Modo DM.
    - **7b · Personajes y respaldos** *(existe)*. Importar y exportar desde Mis
@@ -1260,9 +1263,6 @@ hace seguro volver atrás es que **no hay nada que deshacer en el formato**:
 
 Para que nadie lo dé por hecho:
 
-- El Compañero Salvaje (invocarlo, que no cobra ni se va con el descanso) y las
-  operaciones del paso 7 que faltan. El detalle está en
-  [Orden previsto de pantallas](#orden-previsto-de-pantallas).
 - Control de versión en el servidor para las escrituras (rechazar una copia
   vieja con 409): hoy gana el último que guarda, como en Flutter.
 - Enlaces desde Flutter hacia `/v2` o redirección automática por `webV2`.

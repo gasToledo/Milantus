@@ -924,7 +924,7 @@ void main() {
       final recurso = sheet.resources
           .firstWhere((r) => r.id == innateSpellResourceId('find-steed'));
 
-      expect(o['scales'], isTrue);
+      expect(o['paid'], isTrue);
       expect(o['free'], {
         'name': recurso.name,
         'left': recurso.max,
@@ -965,7 +965,7 @@ void main() {
     test('un compañero que no escala no ofrece pagos', () {
       final c = lanzador('wizard', 3, spells: ['find-familiar']);
       final o = option(companionsView(c, srd), 'familiar');
-      expect(o['scales'], isFalse);
+      expect(o['paid'], isFalse);
       expect(o['slots'], isEmpty);
       expect(o['free'], isNull);
     });

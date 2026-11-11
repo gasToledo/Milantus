@@ -1134,10 +1134,15 @@ class CharacterCompiler {
           maxActive: e.maxActive,
           spellId: e.requiresSpell,
           // El piso sale del conjuro, no del contenido de la criatura: es el
-          // mismo dato y tenerlo dos veces es tenerlo mal una vez.
-          minSpellLevel: e.requiresSpell == null
-              ? 0
-              : repo.spell(e.requiresSpell!)?.level ?? 0,
+          // mismo dato y tenerlo dos veces es tenerlo mal una vez. Un rasgo que
+          // cobra sin conjuro propio acepta cualquier espacio.
+          minSpellLevel: e.requiresSpell != null
+              ? repo.spell(e.requiresSpell!)?.level ?? 0
+              : e.payWith != null
+                  ? 1
+                  : 0,
+          payWith: e.payWith,
+          untilLongRest: e.untilLongRest,
         ),
       );
     }

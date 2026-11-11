@@ -124,6 +124,13 @@ class CompanionOption {
   /// `50 + 15×(1−6)` = −25 puntos de golpe.
   final int minSpellLevel;
 
+  /// Recurso que paga la invocación en lugar de un espacio (ver
+  /// `CompanionEffect.payWith`).
+  final String? payWith;
+
+  /// Se va al terminar un descanso largo.
+  final bool untilLongRest;
+
   const CompanionOption({
     required this.id,
     required this.name,
@@ -132,13 +139,19 @@ class CompanionOption {
     this.maxActive = 1,
     this.spellId,
     this.minSpellLevel = 0,
+    this.payWith,
+    this.untilLongRest = false,
   });
 
-  /// Invocarlo gasta un espacio de conjuro y sus números dependen del nivel.
+  /// Sus números dependen del nivel del espacio con que se lo invocó.
   /// Alcanza con mirar la primera forma: un compañero no mezcla formas que
   /// escalan con formas que no.
   bool get scalesWithSpellLevel =>
       forms.isNotEmpty && forms.first.scalesWithSpellLevel;
+
+  /// Invocarlo cuesta un espacio o un uso: porque escala, o porque el rasgo
+  /// cobra aunque la criatura no escale (Compañero Salvaje).
+  bool get paid => scalesWithSpellLevel || payWith != null;
 
   /// Las fórmulas de las formas viajan sin evaluar, igual que acá: el cliente
   /// las resuelve con los `CreatureVars` del momento.
@@ -151,6 +164,8 @@ class CompanionOption {
         if (spellId != null) 'spellId': spellId,
         'minSpellLevel': minSpellLevel,
         'scalesWithSpellLevel': scalesWithSpellLevel,
+        if (payWith != null) 'payWith': payWith,
+        if (untilLongRest) 'untilLongRest': true,
       };
 
   /// La forma que usa una instancia ya invocada.

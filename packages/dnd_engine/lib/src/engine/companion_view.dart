@@ -17,9 +17,10 @@ import 'combat_ops.dart';
 /// personaje.
 ///
 /// Devuelve `{options, instances, orphans}`:
-/// - `options`, una por compañero que la ficha puede invocar. `free` es el uso
-///   gratis del conjuro (`{name, left, max}`) y `slots` los espacios que
-///   alcanzan, ambos solo si el compañero escala con el nivel del espacio.
+/// - `options`, una por compañero que la ficha puede invocar. `free` es el
+///   recurso que paga sin espacio (`{name, left, max}`: el uso gratis del
+///   conjuro o la Forma Salvaje) y `slots` los espacios que alcanzan, ambos
+///   solo si invocarlo cobra (`paid`).
 ///   `going` es la forma que se va si se invoca otro más.
 /// - `instances`, una por compañero en juego cuya opción sigue existiendo, con
 ///   `index` (su lugar en `combat.companions`, que es lo que piden las
@@ -32,15 +33,10 @@ Map<String, dynamic> companionsView(Character c, ContentRepository repo) {
 
   final options = <Map<String, dynamic>>[];
   for (final o in sheet.companions) {
-    final scales = o.scalesWithSpellLevel;
+    final paid = o.paid;
     final concentrates =
         o.spellId != null && (repo.spell(o.spellId!)?.concentration ?? false);
-
-    CharacterResource? free;
-    if (scales && o.spellId != null) {
-      final id = innateSpellResourceId(o.spellId!);
-      free = sheet.resources.where((r) => r.id == id && r.max > 0).firstOrNull;
-    }
+    final free = companionFreeResource(sheet, o);
 
     // Las que se van por cortar la concentración no ocupan lugar: cuando la
     // opción concentra, `summonCompanion` las retira antes de contar.
@@ -59,7 +55,7 @@ Map<String, dynamic> companionsView(Character c, ContentRepository repo) {
       'maxActive': o.maxActive,
       'spellId': o.spellId,
       'minSpellLevel': o.minSpellLevel,
-      'scales': scales,
+      'paid': paid,
       'concentrates': concentrates,
       'forms': [
         for (final f in o.forms)
@@ -72,7 +68,7 @@ Map<String, dynamic> companionsView(Character c, ContentRepository repo) {
               'left': free.max - (combat.resourceUsage[free.key] ?? 0),
               'max': free.max,
             },
-      'slots': scales
+      'slots': paid
           ? [
               ..._slots(sheet.normalSpellSlotsByLevel, combat.spellSlotsUsed,
                   o.minSpellLevel, false),
@@ -144,6 +140,18 @@ Map<String, dynamic>? companionPreview(
   if (form == null) return null;
   final v = _preview(sheet, form, level);
   return {'profile': v.profile, 'row': v.row};
+}
+
+/// El recurso que paga a [o] sin gastar espacio: el que nombra el rasgo
+/// (Forma Salvaje del Compañero Salvaje) o el uso gratis del conjuro (Corcel
+/// Fiel). Null si no hay, o si no se cobra. Lo comparten la vista y
+/// `summonCompanion` para que el diálogo ofrezca lo mismo que la acción acepta.
+CharacterResource? companionFreeResource(
+    ComputedSheet sheet, CompanionOption o) {
+  if (!o.paid) return null;
+  final id = o.payWith ??
+      (o.spellId == null ? null : innateSpellResourceId(o.spellId!));
+  return sheet.resources.where((r) => r.id == id && r.max > 0).firstOrNull;
 }
 
 String _formName(

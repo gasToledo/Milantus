@@ -1200,6 +1200,8 @@ export interface SheetOutcome {
   exhaustion?: number | null;
   inspirationGained?: boolean;
   itemsRecharged?: number;
+  /** Los compañeros que se fueron con el descanso largo. */
+  companionsGone?: string[];
   dismissed?: string[];
   paid?: boolean;
   added?: boolean;

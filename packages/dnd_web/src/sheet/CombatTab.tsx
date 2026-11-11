@@ -958,12 +958,13 @@ function RestButtons({ write }: { write: SheetWriter }) {
   const long = () => {
     const r = write.act({ type: 'longRest' });
     if (!r) return;
-    const { exhaustion, inspirationGained, itemsRecharged = 0 } = r.outcome;
+    const { exhaustion, inspirationGained, itemsRecharged = 0, companionsGone = [] } = r.outcome;
     const parts = [
       t.longRestBase,
       exhaustion != null ? t.longRestExhaustion(exhaustion) : null,
       inspirationGained ? t.longRestInspiration : null,
       itemsRecharged > 0 ? t.longRestItemsRecharged(itemsRecharged) : null,
+      companionsGone.length > 0 ? t.longRestCompanionsGone(companionsGone.join(', ')) : null,
     ].filter(Boolean);
     write.notify(t.longRestSummary(parts.join('; ')), { undo: () => write.restore(r.before) });
   };

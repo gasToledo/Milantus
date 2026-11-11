@@ -497,14 +497,15 @@ export interface CompanionOptionView {
   maxActive: number;
   spellId: string | null;
   minSpellLevel: number;
-  /** Invocarlo se paga con un espacio y sus números dependen de su nivel. */
-  scales: boolean;
+  /** Invocarlo se paga con un espacio o con `free` (el Corcel, que escala, o el
+   *  Compañero Salvaje, que cobra sin escalar). */
+  paid: boolean;
   /** El conjuro que lo invoca pide concentración. */
   concentrates: boolean;
   forms: { id: string; name: string; kind: string }[];
-  /** El uso gratis del conjuro, si lo tiene. */
+  /** Lo que paga sin espacio: el uso gratis del conjuro o la Forma Salvaje. */
   free: { name: string; left: number; max: number } | null;
-  /** Los espacios libres que alcanzan; vacío si no escala. */
+  /** Los espacios libres que alcanzan; vacío si no cobra. */
   slots: { level: number; pact: boolean; max: number; used: number }[];
   /** La forma que se va si se invoca otro más, o `null` si hay lugar. */
   going: string | null;

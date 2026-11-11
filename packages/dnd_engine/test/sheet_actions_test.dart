@@ -123,6 +123,7 @@ void main() {
       // El humano la gana al descansar (Ingenioso).
       'inspirationGained': sheet.heroicInspirationOnLongRest,
       'itemsRecharged': 1,
+      'companionsGone': <String>[],
     });
   });
 
@@ -731,6 +732,33 @@ void main() {
       final fuera = act(f, {'type': 'dismissCompanion', 'index': 0});
       expect(fuera.character.combat.companions, isEmpty);
       expect(fuera.outcome['name'], grande.name);
+    });
+
+    test(
+        'Compañero Salvaje: se paga con espacio o Forma Salvaje y se va con el '
+        'descanso largo', () {
+      final c = lanzador('druid', 2);
+      final o = opcion(c, 'familiar');
+      final forma = CharacterCompiler(repo)
+          .compile(c)
+          .resources
+          .firstWhere((r) => r.id == CombatOps.wildShapeResourceId);
+
+      final conUso = act(c, invocar(o, free: true));
+      expect(conUso.outcome['summoned'], isTrue);
+      expect(conUso.outcome['freeName'], forma.name);
+      expect(conUso.character.combat.resourceUsage[forma.key], 1);
+      expect(conUso.character.combat.spellSlotsUsed, isEmpty);
+
+      final conEspacio = act(c, invocar(o, level: 1));
+      expect(conEspacio.outcome['spentSlot'], 1);
+
+      // Sin pagar no sale: antes era gratis.
+      expect(act(c, invocar(o)).outcome['summoned'], isFalse);
+
+      final descanso = act(conUso.character, {'type': 'longRest'});
+      expect(descanso.character.combat.companions, isEmpty);
+      expect(descanso.outcome['companionsGone'], [o.forms.first.name]);
     });
   });
 

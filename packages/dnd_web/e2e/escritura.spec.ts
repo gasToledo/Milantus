@@ -609,12 +609,14 @@ test('transformarse en lobo y volver guardan lo que da el motor', async ({ page,
 test('invocar un familiar y despedirlo guardan lo que da el motor', async ({ page, request }) => {
   const DRUIDA = 'druida-de-humo';
   const antes = await ilse(request, DRUIDA);
-  // Su única opción es el familiar, que no cuesta nada: la primera forma es el murciélago.
-  const invocado = segunMotor(antes, { type: 'summonCompanion', option: 'familiar', creature: 'bat' });
+  // Su única opción es el familiar del Compañero Salvaje, la primera forma es el
+  // murciélago, y se paga con un uso de Forma Salvaje (le quedan después del lobo).
+  const invocado = segunMotor(antes, { type: 'summonCompanion', option: 'familiar', creature: 'bat', free: true });
   const despedido = segunMotor(invocado, { type: 'dismissCompanion', index: 0 });
 
   await page.goto(`/v2/personajes/${DRUIDA}/combate`);
   await page.locator('[data-action="summon"]').click();
+  await page.locator('[data-free] button').click();
   const enviado = await proximoGuardado(
     page,
     () => page.getByRole('dialog').getByRole('button', { name: 'Invocar', exact: true }).click(),

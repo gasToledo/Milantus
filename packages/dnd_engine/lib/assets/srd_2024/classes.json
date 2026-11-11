@@ -3060,6 +3060,8 @@
             "type": "companion",
             "id": "familiar",
             "name": "Compañero Salvaje",
+            "payWith": "wild_shape",
+            "untilLongRest": true,
             "creatureIds": [
               "bat",
               "cat",

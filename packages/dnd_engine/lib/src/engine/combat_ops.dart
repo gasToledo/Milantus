@@ -94,7 +94,8 @@ class CombatOps {
   /// se pasa, los compañeros quedan como estaban.
   ///
   /// ponytail: el descanso largo deja a los compañeros activos a tope y no
-  /// despide a ninguno. El Cañón Arcano dura una hora por regla y tendría que
+  /// despide a ninguno (los que se van con el descanso, como el Compañero
+  /// Salvaje, los saca antes `SheetActions`, que tiene la ficha). El Cañón Arcano dura una hora por regla y tendría que
   /// desaparecer solo; queda para el botón Despedir hasta que algún compañero
   /// necesite de verdad una duración modelada.
   static void longRest(
