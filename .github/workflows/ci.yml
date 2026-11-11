@@ -198,7 +198,11 @@ jobs:
         working-directory: packages/dnd_web
       # Sin caché del navegador: son ~150 MB y la descarga tarda menos que
       # restaurar y validar la caché.
-      - run: npx playwright install --with-deps chromium
+      # Sin `--with-deps`: la imagen del runner ya trae todas las bibliotecas
+      # de Chromium y apt solo sumaba fuentes CJK/cirílicas que estas pruebas
+      # no usan. Pasar por apt hacía depender el job de los espejos de Ubuntu,
+      # que el 2026-11-11 no resolvían por DNS y lo tumbaron tres veces.
+      - run: npx playwright install chromium
         working-directory: packages/dnd_web
       - run: npm run test:e2e
         working-directory: packages/dnd_web
