@@ -494,7 +494,7 @@ function EntryCard({
   const link = safeUrl(url);
   const label = entry.linkLabel?.trim() ?? '';
   const showImage = !!entry.imageKey;
-  const text = body !== '' && <MarkdownText text={body} className="max-w-[620px] text-[14px] leading-[1.55] text-on-surface" />;
+  const text = body !== '' && <MarkdownText text={body} className="text-[14px] leading-[1.55] text-on-surface" />;
   const linkNode =
     url !== '' &&
     (link ? (
@@ -764,7 +764,7 @@ function EntryEditor({
 export function BackgroundText({ text, label }: { text: string; label: string }) {
   return (
     <ScrollArea type="auto" label={label} viewportClassName="max-h-[min(420px,60vh)]">
-      <div className="max-w-[620px] pr-3" data-field="background">
+      <div className="pr-3" data-field="background">
         <MarkdownText text={text} className="text-[15px] leading-[1.65] text-on-surface" />
       </div>
     </ScrollArea>

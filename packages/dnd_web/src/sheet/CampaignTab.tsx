@@ -258,7 +258,7 @@ function TableNotes({ notes }: { notes: PlayerNote[] }) {
             </span>
           </div>
           {n.body?.trim() && (
-            <MarkdownText text={n.body} className="max-w-[620px] text-[14px] leading-[1.55] text-on-surface" />
+            <MarkdownText text={n.body} className="text-[14px] leading-[1.55] text-on-surface" />
           )}
         </article>
       ))}
