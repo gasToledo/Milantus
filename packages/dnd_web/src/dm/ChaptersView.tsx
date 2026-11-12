@@ -126,7 +126,7 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
                     {label[status]}
                   </span>
                 </div>
-                <p className="mt-1.5 max-w-[620px] text-[13.5px] leading-normal whitespace-pre-line text-on-surface-variant">
+                <p className="mt-1.5 text-[13.5px] leading-normal whitespace-pre-line text-on-surface-variant">
                   {c.summary?.trim() ? c.summary : t.dmChapterNoGoal}
                 </p>
                 {rewards !== '' && <p className="mt-2 text-[12.5px] text-text-muted">{t.dmChapterRewards(rewards)}</p>}

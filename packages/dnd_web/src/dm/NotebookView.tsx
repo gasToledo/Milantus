@@ -267,7 +267,7 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
                     </DropdownMenu>
                   )}
                 </div>
-                <div className="mt-1.5 max-w-[620px] text-[13.5px] leading-relaxed text-on-surface-variant">
+                <div className="mt-1.5 text-[13.5px] leading-relaxed text-on-surface-variant">
                   {e.markdown ? (
                     <MarkdownText text={e.body} mentions={mentions} />
                   ) : (

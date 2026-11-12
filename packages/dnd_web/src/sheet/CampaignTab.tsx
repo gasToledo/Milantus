@@ -107,7 +107,7 @@ export function CampaignBlock({ pc, catalog, me }: { pc: PlayerCampaign; catalog
           <Pill highlighted={state === 'active'}>{t.campaignStates[state]}</Pill>
         </div>
         {campaign.premise && (
-          <p className="mt-2.5 max-w-[620px] leading-[1.55] whitespace-pre-line text-on-surface-variant">
+          <p className="mt-2.5 leading-[1.55] whitespace-pre-line text-on-surface-variant">
             {campaign.premise}
           </p>
         )}
@@ -129,7 +129,7 @@ export function CampaignBlock({ pc, catalog, me }: { pc: PlayerCampaign; catalog
           <div>
             <p className="font-display text-[20px] break-words text-on-surface">{current.name}</p>
             {current.summary?.trim() && (
-              <p className="mt-1.5 max-w-[620px] text-[14px] leading-[1.55] whitespace-pre-line text-on-surface-variant">
+              <p className="mt-1.5 text-[14px] leading-[1.55] whitespace-pre-line text-on-surface-variant">
                 {current.summary}
               </p>
             )}
