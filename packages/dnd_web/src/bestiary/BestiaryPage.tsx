@@ -287,7 +287,8 @@ function Browser({
           <div className="codex-detail min-w-0">
             {open ? (
               <>
-                <Link back
+                {/* Sin `back`: ver el Atrás del Códice. */}
+                <Link
                   href={hrefOf()}
                   className="codex-back mb-3 inline-flex items-center gap-1.5 text-[13px] text-on-surface-variant hover:text-gold"
                 >

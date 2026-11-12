@@ -494,13 +494,25 @@ function sheetKey(pathname: string): string | undefined {
   if (view.kind === 'npcSheet' && !view.screen) return `npc:${view.npcId}`;
 }
 
+/** Los catálogos de lista y detalle; el editor de homebrew no cuenta. */
+function browseKey(pathname: string): string | undefined {
+  const route = matchRoute(pathname);
+  if (route.name === 'codex' || route.name === 'bestiary') return route.name;
+  if (route.name === 'dm' && (route.view.kind === 'bestiary' || route.view.kind === 'homebrew')) return `dm:${route.view.kind}`;
+}
+
 /** Navega dentro de `/v2` sin recargar. `replace` para las redirecciones:
  *  «atrás» no tiene que volver a una URL que solo redirige. */
 export function navigate(href: string, { replace = false } = {}) {
   const current = getLocation();
   if (href === current) return;
-  if (replace) window.history.replaceState(window.history.state, '', href);
-  else {
+  // Hojear un catálogo (categorías, entradas, anterior/siguiente) no apila
+  // historial: «atrás» vuelve a la pantalla que lo abrió y no recorre cada
+  // entrada leída.
+  const browsing = browseKey(pathnameOf(current));
+  if (replace || (browsing !== undefined && browsing === browseKey(pathnameOf(href)))) {
+    window.history.replaceState(window.history.state, '', href);
+  } else {
     const currentPath = pathnameOf(current);
     const nextPath = pathnameOf(href);
     const sheet = sheetKey(currentPath);

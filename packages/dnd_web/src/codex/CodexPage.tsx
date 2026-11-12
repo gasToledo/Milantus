@@ -379,7 +379,9 @@ export function CategoryView({
           <div className="codex-detail min-w-0">
             {open ? (
               <>
-                <Link back
+                {/* Sin `back`: hojear no apila historial, y la pantalla
+                    anterior ya no es la lista sino la que abrió el catálogo. */}
+                <Link
                   href={hrefOf(category)}
                   className="codex-back mb-3 inline-flex items-center gap-1.5 text-[13px] text-on-surface-variant hover:text-gold"
                 >
