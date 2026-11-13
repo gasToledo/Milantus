@@ -66,11 +66,15 @@ export function ArrangeableColumns({
 
   const drag = useHoldDrag({
     ids: layout.flatMap((col, c) => [...col, `${FIN}${c}`]),
+    shift: false,
     canDrop: (from, to) => !isEnd(from) && to !== from,
+    // Soltar sobre una tarjeta la deja **antes** de ella, venga de arriba o de
+    // abajo: es lo que dibuja la línea dorada. Por eso el índice se cuenta en
+    // la columna ya sin la que se mueve. Al final de la columna, su `__fin`.
     onMove: (from, to) => {
       if (isEnd(to)) return place(from, Number(to.slice(FIN.length)), AT_END);
       const col = layout.findIndex((c) => c.includes(to));
-      place(from, col, layout[col]!.indexOf(to));
+      place(from, col, layout[col]!.filter((x) => x !== from).indexOf(to));
     },
   });
 
@@ -81,10 +85,18 @@ export function ArrangeableColumns({
   if (!arranging) {
     return (
       <>
-        <div className="mb-4 flex justify-end">
-          <Button tone="secondary" shape="pill" icon={LayoutDashboard} onClick={() => setArranging(true)}>
+        {/* Una pill dorada chica y pegada a la regla: es opcional y no tiene que
+            robarle alto a las tarjetas. Sin `Button`: su alto mínimo de 36 px
+            no se puede achicar con una clase más (`cx` no las combina). */}
+        <div className="-mt-2 mb-2 flex justify-end">
+          <button
+            type="button"
+            onClick={() => setArranging(true)}
+            className="inline-flex min-h-7 items-center gap-1.5 rounded-[var(--radius-pill)] border border-gold bg-gold-soft px-3 text-[12.5px] font-medium text-gold hover:bg-plaque"
+          >
+            <LayoutDashboard size={14} aria-hidden="true" />
             {t.arrangeCards}
-          </Button>
+          </button>
         </div>
         <div className="sheet-columns">
           <div>
@@ -155,13 +167,14 @@ export function ArrangeableColumns({
                     }
                     className={cx(
                       'arrange-bar relative box-border flex touch-manipulation items-center gap-1.5 rounded-[var(--radius-card)] bg-surface py-1.5 pr-1.5 pl-2.5 select-none',
-                      held
-                        ? 'cursor-grabbing border-2 border-gold'
-                        : drag.over === id
-                          ? 'cursor-grab border-2 border-dashed border-gold'
-                          : 'cursor-grab border border-hairline',
+                      held ? 'cursor-grabbing border-2 border-gold' : 'cursor-grab border border-hairline',
                     )}
                   >
+                    {/* Dónde cae: una línea en el hueco de arriba, porque se
+                        inserta antes de esta tarjeta (no se intercambia). */}
+                    {drag.over === id && (
+                      <span aria-hidden="true" className="absolute inset-x-1 -top-[7px] h-0.5 rounded-full bg-gold" />
+                    )}
                     <GripVertical size={16} aria-hidden="true" className="shrink-0 text-text-muted" />
                     <span className="font-display min-w-0 flex-1 text-[15px] break-words">{title}</span>
                     {c > 0 && arrow(t.moveCardLeft(title), ArrowLeft, () => place(id, c - 1, index), false, 'arrange-side')}
@@ -186,7 +199,9 @@ export function ArrangeableColumns({
               <div
                 {...drag.item(`${FIN}${c}`)}
                 className={cx(
-                  'box-border min-h-12 grow rounded-[var(--radius-card)]',
+                  // Sin `grow`: el destino se elige por el centro más cercano, y
+                  // un hueco alto tendría el centro lejos de la última barra.
+                  'box-border min-h-12 rounded-[var(--radius-card)]',
                   drag.over === `${FIN}${c}` && 'border-2 border-dashed border-gold',
                 )}
               />

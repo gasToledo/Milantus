@@ -67,12 +67,17 @@ export function useHoldDrag({
   ids,
   group,
   axis,
+  shift = true,
   canDrop,
   onMove,
 }: {
   ids: string[];
   group?: string;
   axis?: 'y';
+  /** `false`: las demás no se corren, solo se marca el destino. Correrlas es
+   *  pensar en una sola lista; en varias columnas haría saltar las tarjetas de
+   *  una columna a otra mientras se arrastra (`ArrangeableColumns`). */
+  shift?: boolean;
   canDrop: (from: string, to: string) => boolean;
   onMove: (from: string, to: string) => void;
 }) {
@@ -282,6 +287,7 @@ export function useHoldDrag({
         zIndex: 20,
       };
     }
+    if (!shift) return undefined;
     const shared = { transition: `transform ${SETTLE_MS}ms ease-out` };
     const from = drag.slots.findIndex((s) => s.id === drag.id);
     const to = drag.slots.findIndex((s) => s.id === drag.over);
