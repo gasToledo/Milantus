@@ -5,13 +5,15 @@
 // estado y no la acción es lo que hace seguro reintentar: repetir un PUT no
 // aplica dos veces el mismo daño.
 //
-// Gana el último que guarda, como entre dos pestañas de Flutter: el servidor
-// no tiene versión ni `updatedAt` con que rechazar una copia vieja. Lo que
-// achica la ventana está en `CharacterPage` (volver a pedir la ficha al
-// volver a la pestaña, solo si no hay nada pendiente).
+// Ya no gana el último: cada PUT lleva la versión que /v2 leyó y, si otra
+// pestaña o dispositivo guardó antes, el servidor responde 409. Entonces se
+// descarta lo pendiente de esa ficha y se avisa por `onStale` (la pantalla
+// vuelve a pedirla). Flutter no manda versión y sigue pisando, así que
+// `CharacterPage` además relee al volver a la pestaña, solo si no hay nada
+// pendiente.
 import { useSyncExternalStore } from 'react';
 import type { CharacterJson } from '../engine';
-import { saveCharacter } from './client';
+import { ApiError, saveCharacter } from './client';
 
 export type SaveState = 'saved' | 'saving' | 'error';
 
@@ -33,6 +35,14 @@ interface Entry {
 const entries = new Map<string, Entry>();
 const listeners = new Set<() => void>();
 const notify = () => listeners.forEach((l) => l());
+
+const staleListeners = new Set<(id: string) => void>();
+
+/** Avisa cuando el servidor rechazó un guardado por copia vieja (409). */
+export function onStale(listener: (id: string) => void): () => void {
+  staleListeners.add(listener);
+  return () => staleListeners.delete(listener);
+}
 
 function entryOf(id: string): Entry {
   let e = entries.get(id);
@@ -69,7 +79,15 @@ async function flush(id: string): Promise<void> {
       try {
         await saveCharacter(doc);
         e.failed = false;
-      } catch {
+      } catch (error) {
+        // Copia vieja: lo local se descarta (sin esperar el vuelo, que es este)
+        // y la pantalla carga la versión del servidor.
+        if (error instanceof ApiError && error.status === 409) {
+          e.pending = null;
+          e.failed = false;
+          staleListeners.forEach((l) => l(id));
+          break;
+        }
         // Lo local se conserva: la copia vuelve a esperar (salvo que ya haya
         // una más nueva) y «Reintentar» la manda. Si la ficha se descartó
         // mientras tanto no hay a qué volver.

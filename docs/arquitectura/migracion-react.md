@@ -759,14 +759,16 @@ repiten acá.
     reintentar. La ficha se actualiza al instante en la caché de
     `/api/characters` (`src/sheet/writer.ts`) y no se vuelve a pedir después de
     guardar.
-  - **Conflictos: gana el último que guarda**, como entre dos pestañas de
-    Flutter; el servidor no tiene versión con qué rechazar una copia vieja. Para
-    no pisar lo hecho en Flutter, la ficha se vuelve a pedir al volver a la
-    pestaña de `/v2`, **solo si no hay nada pendiente**, y una acción cancela el
-    pedido de la lista que esté en vuelo. Lo que no cubre: una pestaña de
-    Flutter abierta desde antes puede pisar lo que hizo React al guardar algo,
-    porque Flutter no vuelve a pedir la lista. Evitarlo pide versión en el
-    servidor (409) y que Flutter la use.
+  - **Conflictos: el servidor rechaza una copia vieja.** La versión es
+    `updated_at` de la ficha en microsegundos (`version` en la lista y en la
+    respuesta del PUT, `expectedVersion` en el cuerpo). Si no coincide, el
+    servidor responde 409 `character_stale` y no escribe; `characterSave.ts`
+    descarta lo pendiente de esa ficha y `CharacterPage` vuelve a pedirla y
+    avisa con un toast, sin diálogo ni «guardar la mía igual». Flutter no manda
+    versión y sigue con «gana el último»: una pestaña de Flutter puede pisar a
+    React, no al revés. Por eso la ficha también se vuelve a pedir al volver a
+    la pestaña de `/v2`, **solo si no hay nada pendiente**, y una acción
+    cancela el pedido de la lista que esté en vuelo.
   - **Qué se ve**: al pie del panel, en vez de «Solo lectura», la pill del
     guardado (`SaveStatusBadge`: Guardando… / Guardado / No se guardó con
     «Reintentar»). Si falla, lo local se conserva; cerrar o recargar con algo
@@ -1279,8 +1281,6 @@ hace seguro volver atrás es que **no hay nada que deshacer en el formato**:
 
 Para que nadie lo dé por hecho:
 
-- Control de versión en el servidor para las escrituras (rechazar una copia
-  vieja con 409): hoy gana el último que guarda, como en Flutter.
 - Enlaces desde Flutter hacia `/v2` (la redirección de `/` ya existe).
 - Tests de componentes y chequeo de literales sueltos en `dnd_web`.
 - Un criterio medido de «paridad visual» con Flutter: hoy es la comparación

@@ -48,6 +48,17 @@ export async function fetchAccount(signal: AbortSignal): Promise<Account | null>
 export interface StoredCharacter {
   character: CharacterJson;
   createdAt: string;
+  /** `updated_at` de la fila en microsegundos: el servidor la compara exacta
+   *  contra `expectedVersion` para rechazar una copia vieja. */
+  version: number;
+}
+
+/** La última versión conocida de cada ficha. `noteVersion` solo sube: una
+ *  lista que llega tarde no puede bajar la que dejó un guardado. */
+const knownVersions = new Map<string, number>();
+
+function noteVersion(id: string, version: number): void {
+  if (version > (knownVersions.get(id) ?? 0)) knownVersions.set(id, version);
 }
 
 /** Todos los personajes de la cuenta, tal como los devuelve la API. */
@@ -56,6 +67,7 @@ export async function fetchRoster(signal: AbortSignal): Promise<StoredCharacter[
     '/api/characters',
     signal,
   );
+  for (const c of characters) noteVersion(String(c.character.id), c.version);
   return characters;
 }
 
@@ -70,14 +82,33 @@ export async function saveCharacter(
   options?: { rebuilt?: boolean },
 ): Promise<void> {
   const path = `/api/characters/${encodeURIComponent(character.id)}`;
+  const expectedVersion = knownVersions.get(character.id);
   const response = await fetch(path, {
     method: 'PUT',
     headers: { 'content-type': 'application/json' },
     // `rebuilt` lo marca quien rehace desde nivel 1 (el servidor no lo deduce):
     // es lo que avisa a los DM que tienen al personaje en una campaña.
-    body: JSON.stringify(options?.rebuilt ? { character, rebuilt: true } : { character }),
+    // `expectedVersion`: si la ficha cambió desde que se leyó, el servidor
+    // responde 409 y no escribe.
+    body: JSON.stringify({
+      character,
+      ...(options?.rebuilt ? { rebuilt: true } : {}),
+      ...(expectedVersion === undefined ? {} : { expectedVersion }),
+    }),
   });
-  if (!response.ok) throw new ApiError(response.status, path);
+  if (!response.ok) {
+    let code: string | undefined;
+    try {
+      const body = (await response.json()) as { code?: unknown };
+      if (typeof body.code === 'string') code = body.code;
+    } catch {
+      code = undefined;
+    }
+    throw new ApiError(response.status, path, code);
+  }
+  // Un cuerpo ilegible no vuelve fallido un guardado que el servidor aceptó.
+  const saved = (await response.json().catch(() => ({}))) as { version?: unknown };
+  if (typeof saved.version === 'number') noteVersion(character.id, saved.version);
 }
 
 /** Borra un personaje propio (`DELETE /api/characters/:id`): el servidor se

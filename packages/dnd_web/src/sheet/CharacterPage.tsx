@@ -1,7 +1,7 @@
 import { canLevelUp, type CharacterJson } from '../engine';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { hasUnsavedChanges, retrySave, useSaveState } from '../api/characterSave';
+import { hasUnsavedChanges, onStale, retrySave, useSaveState } from '../api/characterSave';
 import { queryKeys, useAppVersion, useRoster, useSheetCatalog } from '../api/queries';
 import { useLang, useTexts } from '../i18n/context';
 import { characterHref, navigate, rosterHref, SHEET_TABS, type SheetTab } from '../router';
@@ -96,6 +96,17 @@ export function CharacterPage({
     (message, options) =>
       setToast((prev) => ({ key: (prev?.key ?? 0) + 1, tone: options?.tone ?? 'info', message, undo: options?.undo })),
     [],
+  );
+  // El servidor rechazó un guardado por copia vieja: la relectura trae la ficha
+  // y la versión nuevas, y lo local pendiente ya se descartó.
+  useEffect(
+    () =>
+      onStale((staleId) => {
+        if (staleId !== id) return;
+        void client.invalidateQueries({ queryKey: queryKeys.roster });
+        notify(t.sheetStale);
+      }),
+    [client, id, notify, t.sheetStale],
   );
   const write = useSheetWriter(id, catalog.data, notify, t.actionFailed);
 
