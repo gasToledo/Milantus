@@ -1305,7 +1305,7 @@
     "level": 2,
     "school": "Evocación",
     "castingTime": "Acción",
-    "range": "Personal",
+    "range": "Personal (línea de 60 pies)",
     "components": "V, S, M (la semilla de una legumbre)",
     "duration": "1 minuto",
     "concentration": true,
