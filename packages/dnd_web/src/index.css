@@ -289,6 +289,40 @@ body {
   }
 }
 
+/* Acomodar tarjetas (`ArrangeableColumns`). Las flechas de costado pasan la
+   tarjeta a la columna vecina: con una sola columna (debajo de 616 px, el mismo
+   corte de `.sheet-columns`) no hay vecina a los costados, así que se ocultan
+   por CSS y no midiendo con JS. Ahí mismo los blancos táctiles son de teléfono
+   (barra de 56, flecha de 44); desde 616 px, de escritorio (48 y 32). */
+.arrange-bar {
+  min-height: 56px;
+}
+.arrange-arrow {
+  width: 44px;
+  height: 44px;
+}
+.arrange-side {
+  display: none;
+}
+.arrange-col {
+  min-height: 0;
+}
+@container (min-width: 616px) {
+  .arrange-bar {
+    min-height: 48px;
+  }
+  .arrange-arrow {
+    width: 32px;
+    height: 32px;
+  }
+  .arrange-side {
+    display: inline-flex;
+  }
+  .arrange-col {
+    min-height: 320px;
+  }
+}
+
 /* La banda táctica: columnas fijas y no placas que se reparten el ancho como
    pueden (con `auto-fit` a ciertos anchos quedaba una placa sola y estirada en
    la última fila). Se mide el ancho del contenido, no la ventana: el panel

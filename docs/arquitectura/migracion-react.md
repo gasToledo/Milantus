@@ -1166,11 +1166,18 @@ anterior antes de sumar el siguiente. Es un orden previsto, no un compromiso:
        formularios (ver «Arreglos de front», parte F). Sin cambios en el servidor
        ni en Flutter.
 
-   Opcional, sin equivalente en Flutter y sin diseñar todavía:
-   acomodar las tarjetas de Combate y Personaje con un modo de edición, guardado
-   en la cuenta y no en el personaje, porque es una preferencia de quien mira la
-   ficha. Depende de escribir en `/api/settings`; antes hay que comprobar que un
-   guardado de Flutter, con su lista cerrada de campos, no borre el orden.
+   Acomodar las tarjetas de Combate y Personaje (sin equivalente en Flutter):
+   el botón «Acomodar tarjetas» de cada pestaña abre un modo de edición
+   (`ArrangeableColumns`, `src/sheet/`) donde cada tarjeta es una barra que se
+   mueve arrastrándola o con flechas. El orden es una preferencia de quien mira
+   la ficha, así que vive en los ajustes de la cuenta (`sheetLayout`, tres
+   columnas de ids por pestaña, `null` = el de fábrica) y nunca en el
+   personaje: vale para toda ficha que esa cuenta abra y no escribe ninguna.
+   Para que un guardado de Flutter, con su lista cerrada de campos
+   (`AppSettings.toJson`), no lo borre, el servidor **combina** los ajustes en
+   vez de reemplazarlos (`account_settings.document || excluded.document`, de
+   primer nivel): lo que llega pisa sus claves y las demás quedan. Ningún
+   cliente puede borrar una clave mandando el documento sin ella.
 
 ## Cómo se prueba
 

@@ -34,6 +34,15 @@ const ROW = 'rounded-[var(--radius-card)] border border-hairline bg-plaque px-3 
  * solo se pinta y se anota daño, curación, estados y «Despedir». Sin escritura
  * (la ficha de un miembro, la de un PNJ) no hay ningún control.
  */
+/** Si la tarjeta se dibuja: hay compañeros o, en la ficha propia, algo que
+ *  invocar. Lo pregunta quien arma las columnas (`CombatTab`), para saber si
+ *  la tarjeta existe y poder acomodarla. */
+export function useCompanionsShown(model: SheetModel): boolean {
+  const { character, catalog, write } = model;
+  const view = useMemo(() => companionsView(character as unknown as CharacterJson, catalog), [character, catalog]);
+  return view.instances.length > 0 || view.orphans.length > 0 || (!!write && view.options.length > 0);
+}
+
 export function CompanionsCard({ model }: { model: SheetModel }) {
   const t = useTexts();
   const { character, catalog, write } = model;
@@ -52,8 +61,6 @@ export function CompanionsCard({ model }: { model: SheetModel }) {
     setOpen((cur) => new Set([...cur].filter((i) => i !== index).map((i) => (i > index ? i - 1 : i))));
 
   const { instances, orphans, options } = view;
-  const any = instances.length > 0 || orphans.length > 0;
-  if (!any && (!write || options.length === 0)) return null;
 
   // El índice es el lugar en `combat.companions`: las instancias y las huérfanas
   // comparten esa numeración, así que se muestran juntas y en orden.

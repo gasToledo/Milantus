@@ -145,6 +145,9 @@ export interface RosterSettings {
   startsInDmMode: boolean;
   /** Si el combate que se arma muestra su dificultad y los PX (`AppSettings.showEncounterDifficulty`). */
   showEncounterDifficulty: boolean;
+  /** El orden de las tarjetas de Combate y Personaje: tres columnas de ids, o
+   *  `null`/ausente para el de fábrica. Es de quien mira, no de la ficha. */
+  sheetLayout: Partial<Record<'combate' | 'personaje', string[][] | null>>;
 }
 
 /** Una cuenta que nunca guardó ajustes (`settings: null`) usa los valores por
@@ -165,6 +168,7 @@ export async function fetchRosterSettings(signal: AbortSignal): Promise<RosterSe
     // Prendida por defecto, igual que `AppSettings` de Flutter: solo un `false`
     // explícito la apaga (una cuenta sin ajustes guardados la ve).
     showEncounterDifficulty: settings?.showEncounterDifficulty !== false,
+    sheetLayout: settings?.sheetLayout ?? {},
   };
 }
 

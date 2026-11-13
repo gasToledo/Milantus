@@ -9,9 +9,10 @@ import { Select, Tooltip } from '../ui/primitives';
 import { Button, ButtonLink } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Eyebrow, hpTone, Pill, Pips, ShieldBadge, SpendRecoverButtons, StatPlaque, ThinBar } from '../ui/data';
-import { SheetColumns } from './CharacterTab';
+import { ArrangeableColumns } from './ArrangeableColumns';
+import { COMBAT_DEFAULT } from './cardLayout';
 import { resourceKey, signed } from './format';
-import { CompanionsCard } from './Companions';
+import { CompanionsCard, useCompanionsShown } from './Companions';
 import { InfoName } from './InfoName';
 import { InnateCantripDialog } from './InnateCantripDialog';
 import { SpellList, Tag } from './SpellList';
@@ -36,23 +37,23 @@ import { ABILITIES, isReactionSpell } from './vocabulary';
  * transformarse vive en la banda, no acá.
  */
 export function CombatTab({ model }: { model: SheetModel }) {
+  const t = useTexts();
+  const companions = useCompanionsShown(model);
   return (
-    <SheetColumns>
-      <div className="flex min-w-0 flex-col gap-4">
-        <HitPointsCard model={model} />
-        <DefenseCard model={model} />
-        <CompanionsCard model={model} />
-      </div>
-      <div className="flex min-w-0 flex-col gap-4">
-        <AttacksCard model={model} />
-        <SpellsCard model={model} />
-      </div>
-      <div className="flex min-w-0 flex-col gap-4">
-        <SavesCard model={model} />
-        <ConditionsCard model={model} />
-        <ResourcesCard model={model} />
-      </div>
-    </SheetColumns>
+    <ArrangeableColumns
+      tab="combate"
+      defaults={COMBAT_DEFAULT}
+      cards={{
+        'hit-points': { title: t.hitPoints, node: <HitPointsCard model={model} /> },
+        defense: { title: t.defenseHeading, node: <DefenseCard model={model} /> },
+        ...(companions && { companions: { title: t.compTitle, node: <CompanionsCard model={model} /> } }),
+        attacks: { title: t.attacksHeading, node: <AttacksCard model={model} /> },
+        ...(hasSpellsCard(model.sheet) && { spells: { title: t.spellsHeading, node: <SpellsCard model={model} /> } }),
+        saves: { title: t.savesHeading, node: <SavesCard model={model} /> },
+        conditions: { title: t.conditionsHeading, node: <ConditionsCard model={model} /> },
+        resources: { title: t.resourcesAndRests, node: <ResourcesCard model={model} /> },
+      }}
+    />
   );
 }
 
@@ -413,6 +414,14 @@ function AttacksCard({ model }: { model: SheetModel }) {
  * espacios con lo que queda, y las reacciones. Si el personaje no lanza nada,
  * la tarjeta no aparece.
  */
+/** Si Conjuros se dibuja: hay lanzamiento, conjuros innatos o rasgos con usos.
+ *  Lo pregunta también `CombatTab`, para acomodar solo las tarjetas que hay. */
+function hasSpellsCard(sheet: SheetModel['sheet']): boolean {
+  const blocks = sheet.spellcastingBlocks.length > 0 || !!sheet.spellcasting;
+  const abilities = sheet.passives.some((p) => p.resourceKey && sheet.resources.some((r) => resourceKey(r) === p.resourceKey));
+  return blocks || sheet.innateSpells.length > 0 || abilities;
+}
+
 function SpellsCard({ model }: { model: SheetModel }) {
   const t = useTexts();
   const { character, sheet, catalog, write } = model;
@@ -462,7 +471,7 @@ function SpellsCard({ model }: { model: SheetModel }) {
     const resource = sheet.resources.find((r) => resourceKey(r) === p.resourceKey);
     return resource && p.resourceKey ? [{ ...p, resourceKey: p.resourceKey, resourceName: resource.name, left: resourceLeft(model, resource), max: resource.max }] : [];
   });
-  if (blocks.length === 0 && sheet.innateSpells.length === 0 && abilities.length === 0) return null;
+  if (!hasSpellsCard(sheet)) return null;
   const cell = cells.find((c) => c.key === selected) ?? cells[0];
 
   const innateReactions = sheet.innateSpells.filter((s) => isReactionSpell(spell(s.spellId)));
