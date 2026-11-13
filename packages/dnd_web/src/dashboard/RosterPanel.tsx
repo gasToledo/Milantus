@@ -22,10 +22,10 @@ export function RosterPanel({ current }: { current?: 'roster' | 'quiz' }) {
           <NavItem href={rosterHref()} icon={Users} label={t.navCharacters} active={current === 'roster'} internal />
         </li>
         <li>
-          <NavItem href={codexHref()} icon={BookOpen} label={t.navCodex} internal />
+          <NavItem href={quizHref()} icon={GraduationCap} label={t.navQuiz} active={current === 'quiz'} internal />
         </li>
         <li>
-          <NavItem href={quizHref()} icon={GraduationCap} label={t.navQuiz} active={current === 'quiz'} internal />
+          <NavItem href={codexHref()} icon={BookOpen} label={t.navCodex} internal />
         </li>
       </NavGroup>
     </>

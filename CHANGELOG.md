@@ -1361,16 +1361,55 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
-## [Unreleased]
+## [1.0.0+1] - 2026-11-11
 
 ### Nuevo
 
-- Quiz en /v2: rondas de diez preguntas de opción múltiple sobre uno de tus
-  personajes o sobre las reglas generales, armadas por el motor desde el
-  catálogo. No se guarda nada.
+- La dirección principal de Milantus lleva a la versión nueva (`/v2`) a las
+  cuentas habilitadas (`V2_USERS=*` habilita a todas).
+- En Ajustes, «Usar la versión anterior» vuelve a abrir la versión anterior al
+  entrar, en ese navegador; se apaga desde la misma pantalla.
+- Los errores de la versión nueva llegan solos al equipo (sin datos de las
+  fichas), con source maps para leer cada traza.
 
 ### Modificado
 
+- En la versión nueva, un error al dibujar una pantalla ya no la deja en
+  blanco: muestra el aviso con «Reintentar» y «Reportar este error», y el menú
+  sigue funcionando.
+
+### Eliminado
+
+- Sin cambios.
+
+## [1.1.0+1] - 2026-11-13
+
+### Nuevo
+
+- Quiz: rondas de diez preguntas de opción múltiple sobre uno de tus
+  personajes (rasgos de clase y de especie, trasfondo y conjuros) o sobre las
+  condiciones. El motor las arma desde el catálogo; muestra la respuesta
+  correcta en cada pregunta, el resultado por tema al final y no guarda nada.
+  Tiene su tutorial, y la bienvenida lo presenta.
+- Los conjuros dicen cómo mejoran con un espacio de nivel superior, en la ficha
+  y en el Códice.
+- Las pestañas de conjuros explican qué es cada una, los trucos que dan los
+  rasgos aparecen en «Trucos» y las reacciones tienen su propia pestaña.
+- Las tarjetas de Combate y Personaje se acomodan arrastrándolas, y el orden se
+  guarda en la cuenta.
+- Al cerrar un capítulo, el DM decide el nivel, el oro y los objetos que da.
+- Aviso al tirar iniciativa sin un capítulo en marcha.
+
+### Modificado
+
+- Si la ficha cambió en otra pestaña o dispositivo, la versión nueva no la
+  pisa: carga la última y avisa.
+- El fin de capítulo se avisa en un diálogo, y todas las tostadas se cierran
+  con una X.
+- La subida de nivel muestra los cupos que abre una elección nueva (el truco de
+  Descarga Agónica del brujo, por ejemplo).
+- Las competencias con armas muestran la categoría traducida.
+- Cuaderno, capítulos, notas y trasfondo ocupan todo el ancho.
 - Enredadera agarra a un objetivo Enorme o menor, con CD de escape igual a
   la del conjuro, y con un espacio superior agarra una criatura más.
 - Piedad con los Moribundos estabiliza a una criatura a tu alcance con 0 PG
@@ -1389,22 +1428,15 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
-## [1.0.0+1] - 2026-11-11
+## [Unreleased]
 
 ### Nuevo
 
-- La dirección principal de Milantus lleva a la versión nueva (`/v2`) a las
-  cuentas habilitadas (`V2_USERS=*` habilita a todas).
-- En Ajustes, «Usar la versión anterior» vuelve a abrir la versión anterior al
-  entrar, en ese navegador; se apaga desde la misma pantalla.
-- Los errores de la versión nueva llegan solos al equipo (sin datos de las
-  fichas), con source maps para leer cada traza.
+- Sin cambios.
 
 ### Modificado
 
-- En la versión nueva, un error al dibujar una pantalla ya no la deja en
-  blanco: muestra el aviso con «Reintentar» y «Reportar este error», y el menú
-  sigue funcionando.
+- Sin cambios.
 
 ### Eliminado
 
