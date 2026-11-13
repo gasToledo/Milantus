@@ -133,6 +133,7 @@ jobs:
       - run: npm ci
       - run: npm run build:engine
       - run: npx tsc --noEmit
+      - run: npm test
       - run: npm run build
 
   # Paridad del motor compilado a JS (`dart compile js`, ver `js/entrypoint.dart`

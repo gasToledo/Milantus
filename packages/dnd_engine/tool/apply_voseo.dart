@@ -162,6 +162,8 @@ const _frases = <(String, String)>[
 const _deshacer = <(String, String)>[
   ('bastones o lanzás', 'bastones o lanzas'),
   ('causás dignas', 'causas dignas'),
+  // «tiras» es el sustantivo (tiras de marfil), no «vos tirás».
+  ('tirás de marfil', 'tiras de marfil'),
 ];
 
 /// Sin letra ni guion a los lados. En el archivo los saltos de línea están

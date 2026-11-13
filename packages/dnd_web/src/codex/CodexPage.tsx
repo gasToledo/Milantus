@@ -26,6 +26,7 @@ import { abilityModifier } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import { codexHref, Link, navigate, rosterHref, SHEET_TABS, type CodexCategory } from '../router';
 import { signed } from '../sheet/format';
+import { HigherLevelNote } from '../sheet/HigherLevelNote';
 import { SheetFooter, TAB_ICONS, tabLabel } from '../sheet/SheetPanel';
 import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
@@ -470,7 +471,7 @@ function EntryList({
 }
 
 /** La entrada abierta: la «página» del manual. */
-function EntryDetail({
+export function EntryDetail({
   entry,
   reading,
   actions,
@@ -529,9 +530,11 @@ function EntryDetail({
       )}
 
       {detail.note && (
-        <p className="mt-3 max-w-[620px] text-[16px] leading-[1.65] text-on-surface">
-          <b className="font-semibold">{detail.note.label}</b> {detail.note.text}
-        </p>
+        <HigherLevelNote
+          label={detail.note.label}
+          text={detail.note.text}
+          className="mt-3 max-w-[620px] text-[16px] leading-[1.65] text-on-surface"
+        />
       )}
 
       {detail.sections.map((s) => (

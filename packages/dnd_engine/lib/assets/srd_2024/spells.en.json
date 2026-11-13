@@ -76,9 +76,9 @@
     "components": "S, M (a copper wire)"
   },
   "spare-the-dying": {
-    "_es": "06573916",
+    "_es": "56cd22b5",
     "name": "Spare the Dying",
-    "description": "You touch a creature with 0 HP and stabilize it. Also affects Undead, with a save.",
+    "description": "A creature within range that has 0 HP and isn't dead becomes Stable.",
     "higherLevel": "The range doubles when you reach levels 5 (30 feet), 11 (60 feet), and 17 (120 feet)."
   },
   "shillelagh": {
@@ -476,7 +476,7 @@
     "higherLevel": "The damage increases by 1d10 for each spell slot level above 3."
   },
   "dispel-magic": {
-    "_es": "7c758ad7",
+    "_es": "97482657",
     "name": "Dispel Magic",
     "description": "Ends spells of level 3 or lower on a target; higher levels require an ability check.",
     "higherLevel": "You automatically end a spell on the target if the spell's level is equal to or less than the level of the spell slot you use."
@@ -1068,10 +1068,10 @@
     "higherLevel": "The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8)."
   },
   "mind-sliver": {
-    "_es": "bc500c06",
+    "_es": "5a8c8f84",
     "name": "Mind Sliver",
     "description": "Intelligence saving throw or 1d6 Psychic damage, and the target subtracts 1d4 from its next saving throw before the end of your next turn.",
-    "higherLevel": "Damage becomes 2d6 at level 5, 3d6 at level 11 and 4d6 at level 17."
+    "higherLevel": "The damage increases by 1d6 when you reach levels 5 (2d6), 11 (3d6), and 17 (4d6)."
   },
   "blade-ward": {
     "_es": "2f10dc6d",
@@ -1079,24 +1079,24 @@
     "description": "Anyone who attacks you subtracts 1d4 from the roll while the spell lasts."
   },
   "thorn-whip": {
-    "_es": "6de1b44c",
+    "_es": "af698f3a",
     "name": "Thorn Whip",
     "description": "Melee spell attack: 1d6 Piercing damage and, if the target is Large or smaller, you pull it 10 feet toward you.",
     "components": "V, S, M (the stem of a plant with thorns)",
-    "higherLevel": "Damage becomes 2d6 at level 5, 3d6 at level 11 and 4d6 at level 17."
+    "higherLevel": "The damage increases by 1d6 when you reach levels 5 (2d6), 11 (3d6), and 17 (4d6)."
   },
   "word-of-radiance": {
-    "_es": "ae04b455",
+    "_es": "dcf836bd",
     "name": "Word of Radiance",
     "description": "5-foot Emanation: creatures you choose make a Constitution saving throw or take 1d6 Radiant damage.",
     "components": "V, M (a sunburst token)",
-    "higherLevel": "Damage becomes 2d6 at level 5, 3d6 at level 11 and 4d6 at level 17."
+    "higherLevel": "The damage increases by 1d6 when you reach levels 5 (2d6), 11 (3d6), and 17 (4d6)."
   },
   "thunderclap": {
-    "_es": "89dd8e48",
+    "_es": "24722b96",
     "name": "Thunderclap",
     "description": "5-foot Emanation: Constitution saving throw or 1d6 Thunder damage. The boom can be heard 100 feet away.",
-    "higherLevel": "Damage becomes 2d6 at level 5, 3d6 at level 11 and 4d6 at level 17."
+    "higherLevel": "The damage increases by 1d6 when you reach levels 5 (2d6), 11 (3d6), and 17 (4d6)."
   },
   "alarm": {
     "_es": "55d533e0",
@@ -1105,11 +1105,11 @@
     "components": "V, S, M (a bell and silver wire)"
   },
   "armor-of-agathys": {
-    "_es": "8a893877",
+    "_es": "9d17c862",
     "name": "Armor of Agathys",
-    "description": "5 Temporary Hit Points and 5 Cold damage to anyone who hits you with a melee attack. It ends if you lose the temporary HP.",
+    "description": "5 Temporary Hit Points and 5 Cold damage to anyone who hits you with a melee attack. It ends if you lose the Temporary Hit Points.",
     "components": "V, S, M (a shard of blue glass)",
-    "higherLevel": "The temporary HP and the cold damage both go up by 5 for each slot level above 1."
+    "higherLevel": "The Temporary Hit Points and the Cold damage increase by 5 for each spell slot level above 1."
   },
   "mage-armor": {
     "_es": "80f279ee",
@@ -1118,10 +1118,10 @@
     "components": "V, S, M (a piece of cured leather)"
   },
   "arms-of-hadar": {
-    "_es": "b1c37eef",
+    "_es": "bfefa0b8",
     "name": "Arms of Hadar",
     "description": "10-foot Emanation: Strength saving throw or 2d6 Necrotic damage and no Reactions until its next turn; half damage on a success.",
-    "higherLevel": "Damage goes up by 1d6 for each slot level above 1."
+    "higherLevel": "The damage increases by 1d6 for each spell slot level above 1."
   },
   "searing-smite": {
     "_es": "9461e413",
@@ -1130,10 +1130,10 @@
     "higherLevel": "All the damage increases by 1d6 for each spell slot level above 1."
   },
   "thunderous-smite": {
-    "_es": "cbbc99f3",
+    "_es": "f8aaf194",
     "name": "Thunderous Smite",
     "description": "After you hit: 2d6 extra Thunder damage, and a Strength saving throw or you push it 10 feet and it has the Prone condition.",
-    "higherLevel": "Damage goes up by 1d6 for each slot level above 1."
+    "higherLevel": "The damage increases by 1d6 for each spell slot level above 1."
   },
   "divine-smite": {
     "_es": "c3a8cddd",
@@ -1142,10 +1142,10 @@
     "higherLevel": "The damage increases by 1d8 for each spell slot level above 1."
   },
   "wrathful-smite": {
-    "_es": "42cd36b7",
+    "_es": "4729be12",
     "name": "Wrathful Smite",
     "description": "After you hit: 1d6 extra Necrotic damage, and a Wisdom saving throw or it has the Frightened condition; it repeats the save at the end of each turn.",
-    "higherLevel": "Damage goes up by 1d6 for each slot level above 1."
+    "higherLevel": "The damage increases by 1d6 for each spell slot level above 1."
   },
   "create-or-destroy-water": {
     "_es": "d5d96834",
@@ -1246,11 +1246,11 @@
     "description": "You remove poison and rot from nonmagical food and drink in a 5-foot-radius sphere."
   },
   "witch-bolt": {
-    "_es": "920e6052",
+    "_es": "a1874119",
     "name": "Witch Bolt",
     "description": "Ranged spell attack for 2d12 Lightning damage; afterward, with a Bonus Action each turn, you deal 1d12 automatically again.",
     "components": "V, S, M (a twig struck by lightning)",
-    "higherLevel": "The initial damage goes up by 1d12 for each slot level above 1."
+    "higherLevel": "The initial damage increases by 1d12 for each spell slot level above 1."
   },
   "tashas-hideous-laughter": {
     "_es": "e43bd4a8",
@@ -1291,10 +1291,10 @@
     "components": "S, M (ink worth 10+ GP, which the spell consumes)"
   },
   "hail-of-thorns": {
-    "_es": "2c7f0fc6",
+    "_es": "9e04965d",
     "name": "Hail of Thorns",
     "description": "After you hit with a ranged weapon: the target and creatures within 5 feet of it make a Dexterity saving throw against 1d10 Piercing damage.",
-    "higherLevel": "Damage goes up by 1d10 for each slot level above 1."
+    "higherLevel": "The damage increases by 1d10 for each spell slot level above 1."
   },
   "rope-trick": {
     "_es": "8f3adc88",
@@ -1368,11 +1368,11 @@
     "higherLevel": "The damage increases by 1d8 for each spell slot level above 2."
   },
   "cordon-of-arrows": {
-    "_es": "ac5ee307",
+    "_es": "2a8404b7",
     "name": "Cordon of Arrows",
     "description": "You plant up to four nonmagical arrows or bolts in the ground. When a creature other than you enters a space within 30 feet of them for the first time on a turn, or ends its turn there, one piece of ammunition flies at it: Dexterity saving throw or 2d4 Piercing damage. That piece is destroyed, and the spell ends when none is left planted.",
     "components": "V, S, M (four or more arrows or bolts)",
-    "higherLevel": "You can fire two more pieces of ammunition for each slot level above 2."
+    "higherLevel": "You can fire two more pieces of ammunition for each spell slot level above 2."
   },
   "crown-of-madness": {
     "_es": "9c136001",
@@ -1446,11 +1446,11 @@
     "description": "You create three illusory duplicates; each time an attack hits you, roll 1d6 for each remaining duplicate, and a 3 or higher diverts the hit to one of them."
   },
   "summon-beast": {
-    "_es": "4cb317e7",
+    "_es": "88312a9a",
     "name": "Summon Beast",
     "description": "You summon a bestial spirit of land, sea, or air in an unoccupied space; it uses the Bestial Spirit stat block and vanishes at 0 HP or when the spell ends.",
     "components": "V, S, M (a feather, tuft of fur, and fish tail inside a gilded acorn worth 200+ GP)",
-    "higherLevel": "The slot's level counts as the spell's level in the creature's stat block."
+    "higherLevel": "Use the spell slot's level for the spell's level in the stat block."
   },
   "continual-flame": {
     "_es": "e3e52565",
@@ -1478,11 +1478,11 @@
     "higherLevel": "The spell's duration increases by 48 hours for each spell slot level above 2."
   },
   "cloud-of-daggers": {
-    "_es": "00801341",
+    "_es": "d8e8afec",
     "name": "Cloud of Daggers",
     "description": "5-foot Cube of spinning daggers: 4d4 Slashing damage to anyone who enters it, ends its turn in it, or is reached by the Cube; once per turn.",
     "components": "V, S, M (a sliver of glass)",
-    "higherLevel": "Damage goes up by 2d4 for each slot level above 2."
+    "higherLevel": "The damage increases by 2d4 for each spell slot level above 2."
   },
   "barkskin": {
     "_es": "27a6a149",
@@ -1524,16 +1524,16 @@
     "description": "15-foot sphere: anyone who enters makes a Charisma saving throw or can't deliberately lie while inside."
   },
   "arcane-vigor": {
-    "_es": "937f086c",
+    "_es": "2ea4a98c",
     "name": "Arcane Vigor",
     "description": "You roll one or two unspent Hit Point Dice and regain HP equal to the total plus your spellcasting ability modifier; the dice are expended.",
-    "higherLevel": "You can roll one more Hit Die for each slot level above 2."
+    "higherLevel": "You can roll one more Hit Point Die for each spell slot level above 2."
   },
   "elemental-weapon": {
-    "_es": "fbd5ff6c",
+    "_es": "e7635a96",
     "name": "Elemental Weapon",
     "description": "A nonmagical weapon you touch gains +1 to attack rolls and an extra 1d4 damage of the elemental type you choose while the spell lasts.",
-    "higherLevel": "With a level 5-6 slot the attack bonus is +2 and the extra damage 2d4; with a level 7+ slot, +3 and 3d4."
+    "higherLevel": "With a level 5 or 6 spell slot, the bonus to attack rolls becomes +2 and the extra damage becomes 2d4. With a level 7 or higher spell slot, the bonus becomes +3 and the extra damage becomes 3d4."
   },
   "aura-of-vitality": {
     "_es": "0c284041",
@@ -1547,10 +1547,10 @@
     "components": "V, S, M (a piece of cork)"
   },
   "blinding-smite": {
-    "_es": "8bd70747",
+    "_es": "556a0bc2",
     "name": "Blinding Smite",
     "description": "After you hit: an extra 3d8 Radiant damage, and the target has the Blinded condition until it succeeds on a Constitution saving throw at the end of each turn.",
-    "higherLevel": "The extra damage goes up by 1d8 for each slot level above 3."
+    "higherLevel": "The extra damage increases by 1d8 for each spell slot level above 3."
   },
   "magic-circle": {
     "_es": "5ca54a25",
@@ -1566,11 +1566,11 @@
     "components": "V, S, M (a focus worth 100+ GP, either a jeweled horn for hearing or a glass eye for seeing)"
   },
   "conjure-barrage": {
-    "_es": "53eb58f2",
+    "_es": "e2ac60c9",
     "name": "Conjure Barrage",
     "description": "60-foot Cone of spectral copies of your weapon: Dexterity saving throw against 5d8 Force damage, half damage on a success.",
     "components": "V, S, M (a Melee or Ranged weapon worth at least 1 CP)",
-    "higherLevel": "Damage goes up by 1d8 for each slot level above 3."
+    "higherLevel": "The damage increases by 1d8 for each spell slot level above 3."
   },
   "phantom-steed": {
     "_es": "a0480c08",
@@ -1599,10 +1599,10 @@
     "components": "V, S, M (a pinch of graveyard dirt)"
   },
   "lightning-arrow": {
-    "_es": "38181bf5",
+    "_es": "ca1a5792",
     "name": "Lightning Arrow",
     "description": "After a ranged weapon attack, the projectile becomes lightning: 4d8 damage (half on a miss) and 2d8 to creatures within 10 feet of the target.",
-    "higherLevel": "The damage of both effects goes up by 1d8 for each slot level above 3."
+    "higherLevel": "The damage of both effects increases by 1d8 for each spell slot level above 3."
   },
   "gaseous-form": {
     "_es": "80c2868b",
@@ -1629,11 +1629,11 @@
     "description": "30-foot Emanation: plants gain limited sentience and can tell you what they saw in the last day."
   },
   "hunger-of-hadar": {
-    "_es": "d3ac2549",
+    "_es": "48695e09",
     "name": "Hunger of Hadar",
     "description": "20-foot sphere of Darkness and Difficult Terrain: 2d6 Cold damage when a creature enters or starts its turn there, and another 2d6 Acid damage at the end of its turn.",
     "components": "V, S, M (a pickled tentacle)",
-    "higherLevel": "The cold or acid damage (your choice) goes up by 1d6 for each slot level above 3."
+    "higherLevel": "The Cold or Acid damage, as you choose, increases by 1d6 for each spell slot level above 3."
   },
   "nondetection": {
     "_es": "953778fc",
@@ -1642,18 +1642,18 @@
     "components": "V, S, M (a pinch of diamond dust worth 25+ GP, which the spell consumes)"
   },
   "summon-fey": {
-    "_es": "ed92b548",
+    "_es": "ad7f0cbb",
     "name": "Summon Fey",
     "description": "You summon a Fey spirit with a mirthful, tricksy, or fuming mood in an unoccupied space; it uses the Fey Spirit stat block.",
     "components": "V, S, M (a gilded flower worth 300+ GP)",
-    "higherLevel": "The slot's level counts as the spell's level in the creature's stat block."
+    "higherLevel": "Use the spell slot's level for the spell's level in the stat block."
   },
   "summon-undead": {
-    "_es": "34f60aea",
+    "_es": "602b5e67",
     "name": "Summon Undead",
     "description": "You summon an Undead spirit with a skeletal, ghostly, or putrid form in an unoccupied space; it uses the Undead Spirit stat block.",
     "components": "V, S, M (a gilded skull worth 300+ GP)",
-    "higherLevel": "The slot's level counts as the spell's level in the creature's stat block."
+    "higherLevel": "Use the spell slot's level for the spell's level in the stat block."
   },
   "crusaders-mantle": {
     "_es": "a89dd4b4",
@@ -1700,10 +1700,10 @@
     "description": "30-foot Emanation: you and your allies inside have Resistance to Necrotic damage, and their HP maximums can't be reduced; it heals 1 HP to anyone who starts its turn there with 0 HP."
   },
   "staggering-smite": {
-    "_es": "d112dddd",
+    "_es": "28c39954",
     "name": "Staggering Smite",
     "description": "After you hit: an extra 4d6 Psychic damage, and a Wisdom saving throw or the target has the Stunned condition until the end of your next turn.",
-    "higherLevel": "The extra damage goes up by 1d6 for each slot level above 4."
+    "higherLevel": "The extra damage increases by 1d6 for each spell slot level above 4."
   },
   "leomunds-secret-chest": {
     "_es": "5aca0724",
@@ -1741,10 +1741,10 @@
     "higherLevel": "Your Concentration can last longer with a spell slot of level 5 (up to 10 minutes), 6 (up to 1 hour), or 7+ (up to 8 hours)."
   },
   "grasping-vine": {
-    "_es": "6b56836b",
+    "_es": "d709b843",
     "name": "Grasping Vine",
-    "description": "Melee spell attack: 4d8 Bludgeoning damage, and it pulls the target up to 30 feet toward the vine; it Restrains the target if it is Huge or smaller.",
-    "higherLevel": "The vine can grapple one more creature for each slot level above 4."
+    "description": "Melee spell attack: 4d8 Bludgeoning damage, and it pulls the target up to 30 feet toward the vine; if it is Huge or smaller, it has the Grappled condition (escape DC equal to your spell save DC).",
+    "higherLevel": "The vine can grapple one additional creature for each spell slot level above 4."
   },
   "otilukes-resilient-sphere": {
     "_es": "aecd602c",
@@ -1787,25 +1787,25 @@
     "higherLevel": "Use the spell slot's level for the spell's level in the stat block."
   },
   "summon-aberration": {
-    "_es": "5183c562",
+    "_es": "c901c4a1",
     "name": "Summon Aberration",
     "description": "You summon an aberrant spirit (mind flayer, beholderkin, or slaad) in an unoccupied space; it uses the Aberrant Spirit stat block.",
     "components": "V, S, M (a pickled tentacle and an eyeball in a platinum-inlaid vial worth 400+ GP)",
-    "higherLevel": "The slot's level counts as the spell's level in the creature's stat block."
+    "higherLevel": "Use the spell slot's level for the spell's level in the stat block."
   },
   "summon-construct": {
-    "_es": "12f513b7",
+    "_es": "26d07f52",
     "name": "Summon Construct",
     "description": "You summon a construct spirit of clay, metal, or stone in an unoccupied space; it uses the Construct Spirit stat block.",
     "components": "V, S, M (a lockbox worth 400+ GP)",
-    "higherLevel": "The slot's level counts as the spell's level in the creature's stat block."
+    "higherLevel": "Use the spell slot's level for the spell's level in the stat block."
   },
   "summon-elemental": {
-    "_es": "2665c4b7",
+    "_es": "7387635a",
     "name": "Summon Elemental",
     "description": "You summon an elemental spirit of air, earth, fire, or water in an unoccupied space; it uses the Elemental Spirit stat block.",
     "components": "V, S, M (air, a pebble, ash, and water inside a gold-inlaid vial worth 400+ GP)",
-    "higherLevel": "The slot's level counts as the spell's level in the creature's stat block."
+    "higherLevel": "Use the spell slot's level for the spell's level in the stat block."
   },
   "locate-creature": {
     "_es": "ffe7f1d6",
@@ -1913,7 +1913,7 @@
     "components": "V, S, M (a Melee or Ranged weapon worth at least 1 CP)"
   },
   "legend-lore": {
-    "_es": "9f083cbc",
+    "_es": "720d2d3c",
     "name": "Legend Lore",
     "description": "You name something famous and receive a summary of the relevant lore the DM describes.",
     "components": "V, S, M (incense worth 250+ GP, which the spell consumes, and four ivory strips worth 50+ GP each)"
@@ -1982,11 +1982,11 @@
     "components": "S, M (a Melee weapon worth 1+ SP)"
   },
   "summon-celestial": {
-    "_es": "312a8862",
+    "_es": "c09c1877",
     "name": "Summon Celestial",
     "description": "You summon a defender or avenger celestial spirit in an unoccupied space; it is your ally and acts right after your turn.",
     "components": "V, S, M (a reliquary worth 500+ GP)",
-    "higherLevel": "The slot's level counts as the spell's level in the creature's stat block."
+    "higherLevel": "Use the spell slot's level for the spell's level in the stat block."
   },
   "summon-dragon": {
     "_es": "04cd1533",
@@ -2031,11 +2031,11 @@
     "components": "V, S, M (rare oils worth 1,000+ GP, which the spell consumes)"
   },
   "jallarzis-storm-of-radiance": {
-    "_es": "abaeafa8",
+    "_es": "56ba6d39",
     "name": "Jallarzi's Storm of Radiance",
     "description": "Storm cylinder: creatures have the Blinded and Deafened conditions and can't cast spells with a Verbal component; Constitution saving throw against Radiant and Thunder damage.",
     "components": "V, S, M (a pinch of phosphorus)",
-    "higherLevel": "The radiant and thunder damage go up by 1d10 for each slot level above 5."
+    "higherLevel": "The Radiant damage and the Thunder damage increase by 1d10 for each spell slot level above 5."
   },
   "planar-ally": {
     "_es": "f25a8e00",
@@ -2066,7 +2066,7 @@
     "components": "V, S, M (a gem-encrusted statuette of yourself worth 1,500+ GP)"
   },
   "create-undead": {
-    "_es": "3acf759e",
+    "_es": "9069bbbd",
     "name": "Create Undead",
     "description": "At night only: up to three corpses become Ghouls under your control, which you can direct with a Bonus Action.",
     "components": "V, S, M (one 150+ GP black onyx stone for each corpse)",
@@ -2116,11 +2116,11 @@
     "components": "V, S, M (a sapphire worth 1,000+ GP)"
   },
   "summon-fiend": {
-    "_es": "f41d75ea",
+    "_es": "19e4c597",
     "name": "Summon Fiend",
     "description": "You summon a fiendish spirit (demon, devil, or yugoloth) in an unoccupied space; it uses the Fiendish Spirit stat block.",
     "components": "V, S, M (a bloody vial worth 600+ GP)",
-    "higherLevel": "The slot's level counts as the spell's level in the creature's stat block."
+    "higherLevel": "Use the spell slot's level for the spell's level in the stat block."
   },
   "move-earth": {
     "_es": "828df118",
@@ -2305,7 +2305,7 @@
     "description": "A 300-foot-radius storm cloud: Constitution saving throw against 2d6 Thunder damage and the Deafened condition; each following turn it produces a different effect."
   },
   "modify-memory": {
-    "_es": "4f2a2c0e",
+    "_es": "2c42a15f",
     "name": "Modify Memory",
     "description": "A creature that fails a Wisdom saving throw has the Charmed and Incapacitated conditions while you alter its memory of an event of up to 10 minutes that happened within the last 24 hours.",
     "higherLevel": "You can alter the target's memories of an event that took place up to 7 days ago (level 6 spell slot), 30 days ago (level 7 spell slot), 365 days ago (level 8 spell slot), or any time in the creature's past (level 9 spell slot)."
@@ -2317,16 +2317,16 @@
     "components": "V, S, M (burning incense)"
   },
   "toll-the-dead": {
-    "_es": "6d89337e",
+    "_es": "9240986f",
     "name": "Toll the Dead",
     "description": "A creature that fails a Wisdom saving throw takes 1d8 Necrotic damage, or 1d12 if it is missing any HP.",
-    "higherLevel": "Damage gains one die at level 5 (2d8 or 2d12), level 11 (3d8 or 3d12) and level 17 (4d8 or 4d12)."
+    "higherLevel": "The damage increases by one die when you reach levels 5 (2d8 or 2d12), 11 (3d8 or 3d12), and 17 (4d8 or 4d12)."
   },
   "homunculus-servant": {
-    "_es": "1deca2d4",
+    "_es": "b4bf26fd",
     "name": "Homunculus Servant",
     "description": "You summon a homunculus (Tiny Construct, 5 + 5 per spell slot level HP, AC 13, Fly 30 feet) in an unoccupied space; it shares your Initiative and acts right after you. If you already had one from this spell, it is replaced.",
     "components": "V, S, M (a gem worth 100+ GP)",
-    "higherLevel": "The slot's level counts as the spell's level in the creature's stat block."
+    "higherLevel": "Use the spell slot's level for the spell's level in the stat block."
   }
 }

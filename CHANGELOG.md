@@ -1369,7 +1369,19 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
-- Sin cambios.
+- Enredadera agarra a un objetivo Enorme o menor, con CD de escape igual a
+  la del conjuro, y con un espacio superior agarra una criatura más.
+- Piedad con los Moribundos estabiliza a una criatura a tu alcance con 0 PG
+  que no esté muerta. El alcance de 15 pies y la mejora del truco siguen igual.
+- Saber de Leyendas pide tiras de marfil. Disipar Magia dice «Disipás».
+  Modificar Recuerdo alcanza un suceso de hasta hace 7 días (y los plazos
+  siguientes). Crear Muertos Vivientes remite al Manual de Monstruos.
+- En inglés, Armadura de Agathys dice Temporary Hit Points y Vigor Arcano,
+  Hit Point Die. Las mejoras de los conjuros que no están en el SRD usan la
+  misma frase que los del SRD, con los mismos dados.
+- En la versión nueva, cambiar un truco innato muestra su mejora, con el
+  mismo rótulo que la ficha y el Códice. El formulario de un conjuro propio
+  llama a ese campo mejora de espacio superior o de truco.
 
 ### Eliminado
 

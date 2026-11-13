@@ -5,6 +5,7 @@ import { useTexts } from '../i18n/context';
 import { AppDialog } from '../ui/AppDialog';
 import { Option, SearchableList } from '../ui/wizard';
 import type { SheetModel } from './model';
+import { HigherLevelNote } from './HigherLevelNote';
 import { spellMeta, type SpellJson } from './SpellList';
 import type { SheetWriter } from './writer';
 
@@ -78,6 +79,13 @@ export function InnateCantripDialog({
           <div className="plaque flex min-h-[92px] flex-col gap-1 px-3.5 py-2.5" aria-live="polite">
             <span className="text-[12px] text-on-surface">{spellMeta(shown)}</span>
             <span className="text-[13px] leading-[1.5] text-on-surface-variant">{shown.description}</span>
+            {shown.higherLevel && (
+              <HigherLevelNote
+                level={shown.level}
+                text={shown.higherLevel}
+                className="text-[13px] leading-[1.5] text-on-surface-variant"
+              />
+            )}
           </div>
         )}
       </div>

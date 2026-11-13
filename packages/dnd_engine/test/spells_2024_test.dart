@@ -109,6 +109,54 @@ void main() {
     }
   });
 
+  test('la mejora existe donde el manual de 2024 la publica, y en ningún otro',
+      () {
+    // El fixture no baja 5etools: guarda solo si esa revisión trae
+    // `entriesHigherLevel` o dados que escalan. Homúnculo sirviente no está
+    // en el XPHB; EFA sí le publica la mejora, y el catálogo también.
+    final bloque = (jsonDecode(
+            File('test/fixtures/five_etools_names.json').readAsStringSync())
+        as Map)['spellHigherLevel'] as Map<String, dynamic>;
+    final esperados = {
+      ...(bloque['xphb'] as List).cast<String>(),
+      ...(bloque['efa'] as List).cast<String>(),
+    };
+    expect(bloque['efa'], ['homunculus-servant']);
+    final conMejora = {
+      for (final s in repo.spells.values)
+        if (s.higherLevel.trim().isNotEmpty) s.id,
+    };
+    final faltan = esperados.difference(conMejora).toList()..sort();
+    final deMas = conMejora.difference(esperados).toList()..sort();
+    expect(faltan, isEmpty, reason: 'sin mejora: ${faltan.join(', ')}');
+    expect(deMas, isEmpty, reason: 'mejora de más: ${deMas.join(', ')}');
+  });
+
+  test('la mejora en inglés trae los mismos dados y números que en español',
+      () {
+    // Un «1d6» o un «5» que se pierda al traducir cambia el daño o el nivel
+    // del espacio. El dado se toma entero, para que «2d6» no cuente además
+    // como 2 y como 6.
+    final dado = RegExp(r'\d*d\d+');
+    final numero = RegExp(r'\d+');
+    List<String> tokens(String text) {
+      final dados = [for (final m in dado.allMatches(text)) m[0]!];
+      final resto = text.replaceAll(dado, ' ');
+      final numeros = [for (final m in numero.allMatches(resto)) m[0]!];
+      return [...dados, ...numeros]..sort();
+    }
+
+    final distintos = <String>[];
+    for (final s in repo.spells.values) {
+      if (s.higherLevel.isEmpty) continue;
+      final otra = english.spells[s.id]!;
+      final a = tokens(s.higherLevel).join(',');
+      final b = tokens(otra.higherLevel).join(',');
+      if (a != b) distintos.add('${s.id}: $a ≠ $b');
+    }
+    expect(distintos, isEmpty, reason: distintos.join('\n'));
+  });
+
   test('ningún conjuro comparte nombre con otro', () {
     // Dos conjuros con el mismo nombre son indistinguibles en los selectores
     // de la app.
