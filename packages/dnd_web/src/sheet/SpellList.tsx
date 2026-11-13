@@ -6,6 +6,7 @@ import { cx } from '../ui/cx';
 import { Eyebrow } from '../ui/data';
 import { Accordion } from '../ui/disclosure';
 import { signed } from './format';
+import { HigherLevelNote } from './HigherLevelNote';
 
 /** La aptitud con que se lanza: la de la clase o la de un conjuro innato. */
 export interface CastingStats {
@@ -370,11 +371,7 @@ function SpellDetail({
       {meta && <p className="mb-1.5 text-[12px] text-on-surface">{meta}</p>}
       {castLine && <p className="mb-1.5 text-[12px] text-on-surface">{castLine}</p>}
       {spell.description}
-      {spell.higherLevel && (
-        <p className="mt-2">
-          <b className="font-semibold text-on-surface">{(spell.level ?? 0) === 0 ? t.cantripUpgrade : t.spellHigherLevel}</b> {spell.higherLevel}
-        </p>
-      )}
+      {spell.higherLevel && <HigherLevelNote level={spell.level} text={spell.higherLevel} />}
       {((spell.concentration && onConcentrate) || onSwap) && (
         <div className="mt-2 flex flex-wrap gap-2">
           {spell.concentration && onConcentrate && (
