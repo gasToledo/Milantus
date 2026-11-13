@@ -1,13 +1,17 @@
 import 'dart:math';
 
 import '../data/content_repository.dart';
+import '../domain/ability.dart';
 import '../domain/character.dart';
 import '../domain/content.dart';
 import '../domain/content_language.dart';
 import '../domain/content_vocabulary.dart';
 import '../domain/damage_type.dart';
 import '../domain/effects.dart';
+import '../domain/proficiency_labels.dart';
 import '../domain/skill.dart';
+import '../domain/weapon_mastery.dart';
+import '../domain/weapon_properties.dart';
 import 'character_compiler.dart';
 
 /// Tipos de pregunta del Quiz. El nombre (`name`) es lo que viaja a la UI,
@@ -23,7 +27,14 @@ enum QuizKind {
   spellCastingTime(QuizTopic.spells),
   spellRange(QuizTopic.spells),
   spellSchool(QuizTopic.spells),
-  condition(QuizTopic.rules);
+  condition(QuizTopic.rules),
+  skillAbility(QuizTopic.rules),
+  masteryByText(QuizTopic.equipment),
+  weaponMastery(QuizTopic.equipment),
+  propertyByText(QuizTopic.equipment),
+  weaponDamage(QuizTopic.equipment),
+  armorAc(QuizTopic.equipment),
+  armorCategory(QuizTopic.equipment);
 
   const QuizKind(this.topic);
   final QuizTopic topic;
@@ -36,6 +47,7 @@ enum QuizTopic {
   species('species'),
   background('background'),
   spells('spells'),
+  equipment('equipment'),
   rules('rules');
 
   const QuizTopic(this.wire);
@@ -120,6 +132,7 @@ List<QuizQuestion> quizRound(
   final pools = <QuizKind, List<_Candidate>>{};
   if (character == null) {
     pools[QuizKind.condition] = _conditions();
+    _generalPools(repo, pools);
   } else {
     _characterPools(character, repo, pools);
   }
@@ -218,6 +231,95 @@ List<_Candidate> _conditions() {
         ),
       ),
   ];
+}
+
+/// Lo que vale para cualquier personaje fuera de los estados: habilidades,
+/// maestrías y propiedades de arma, armas y armaduras del catálogo.
+void _generalPools(
+    ContentRepository repo, Map<QuizKind, List<_Candidate>> pools) {
+  List<_Candidate> pool(QuizKind k) => pools.putIfAbsent(k, () => []);
+
+  final abilities = [for (final a in Ability.values) a.label];
+  for (final s in Skill.values) {
+    pool(QuizKind.skillAbility).add(_Candidate(
+      'skill:${s.id}',
+      (rng) => _question(QuizKind.skillAbility, s.ability.label, abilities, rng,
+          subject: s.label, subjectId: s.id),
+    ));
+  }
+
+  // Por texto, como los rasgos: sin la que se nombra a sí misma en su regla.
+  void byText(
+      QuizKind kind, String prefix, Iterable<(String, String, String)> all) {
+    final names = [for (final (_, name, _) in all) name];
+    for (final (id, name, text) in all) {
+      if (text.toLowerCase().contains(name.toLowerCase())) continue;
+      pool(kind).add(_Candidate(
+        '$prefix:$id',
+        (rng) => _question(kind, name, names, rng, subjectId: id, quote: text),
+      ));
+    }
+  }
+
+  byText(QuizKind.masteryByText, 'mastery', [
+    for (final m in weaponMasteries.values) (m.id, m.name, m.description),
+  ]);
+  byText(QuizKind.propertyByText, 'property', [
+    for (final p in weaponProperties.values) (p.id, p.name, p.description),
+  ]);
+
+  // Un arma o una armadura sale una sola vez por ronda, sea cual sea la
+  // pregunta: la clave es la misma.
+  final weapons = repo.weaponsSorted;
+  final masteryNames = [for (final m in weaponMasteries.values) m.name];
+  String damageOf(Weapon w) =>
+      '${w.damageDice} ${DamageType.labelFor(w.damageType).toLowerCase()}';
+  final damages = [
+    for (final w in weapons)
+      if (w.damageDice.contains('d') && w.damageType.isNotEmpty) damageOf(w),
+  ];
+  for (final w in weapons) {
+    final mastery = w.mastery;
+    if (mastery != null && weaponMasteries.containsKey(mastery)) {
+      pool(QuizKind.weaponMastery).add(_Candidate(
+        'weapon:${w.id}',
+        (rng) => _question(QuizKind.weaponMastery, weaponMasteryName(mastery),
+            masteryNames, rng,
+            subject: w.name, subjectId: w.id),
+      ));
+    }
+    if (w.damageDice.contains('d') && w.damageType.isNotEmpty) {
+      pool(QuizKind.weaponDamage).add(_Candidate(
+        'weapon:${w.id}',
+        (rng) => _question(QuizKind.weaponDamage, damageOf(w), damages, rng,
+            subject: w.name, subjectId: w.id),
+      ));
+    }
+  }
+
+  // El escudo no entra: suma +2 en vez de dar una CA base, y su categoría
+  // se regala con el nombre.
+  final armor = [
+    for (final a in repo.armorSorted)
+      if (a.category != 'shield') a
+  ];
+  final acs = [for (final a in armor) '${a.baseAc}'];
+  final categories = [
+    for (final id in armorTrainingIds) armorTrainingLabel(id)
+  ];
+  for (final a in armor) {
+    pool(QuizKind.armorAc).add(_Candidate(
+      'armor:${a.id}',
+      (rng) => _question(QuizKind.armorAc, '${a.baseAc}', acs, rng,
+          subject: a.name, subjectId: a.id),
+    ));
+    pool(QuizKind.armorCategory).add(_Candidate(
+      'armor:${a.id}',
+      (rng) => _question(QuizKind.armorCategory, armorTrainingLabel(a.category),
+          categories, rng,
+          subject: a.name, subjectId: a.id),
+    ));
+  }
 }
 
 // ---------------------------------------------------------------------------

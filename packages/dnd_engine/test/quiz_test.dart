@@ -75,6 +75,27 @@ void main() {
             .where((f) => f.name == q.subject);
         expect(f.map((f) => f.level), contains(q.level));
         expect(correcta, '${q.level}');
+      case QuizKind.skillAbility:
+        expect(correcta, Skill.fromId(q.subjectId!)!.ability.label);
+      case QuizKind.weaponMastery:
+        expect(
+            correcta, weaponMasteryName(repo.weapon(q.subjectId!)!.mastery!));
+      case QuizKind.weaponDamage:
+        final w = repo.weapon(q.subjectId!)!;
+        expect(correcta, startsWith('${w.damageDice} '));
+        expect(correcta,
+            endsWith(DamageType.labelFor(w.damageType).toLowerCase()));
+      case QuizKind.armorAc:
+        expect(correcta, '${repo.armorPiece(q.subjectId!)!.baseAc}');
+      case QuizKind.armorCategory:
+        expect(correcta,
+            armorTrainingLabel(repo.armorPiece(q.subjectId!)!.category));
+      case QuizKind.masteryByText:
+        expect(correcta, weaponMasteries[q.subjectId!]!.name);
+        expect(q.quote, weaponMasteries[q.subjectId!]!.description);
+      case QuizKind.propertyByText:
+        expect(correcta, weaponProperties[q.subjectId!]!.name);
+        expect(q.quote, weaponProperties[q.subjectId!]!.description);
       case QuizKind.classFeatureByText:
       case QuizKind.speciesTraitByText:
         expect(q.quote, isNotEmpty);
@@ -128,11 +149,13 @@ void main() {
     }
   });
 
-  test('la ronda de reglas es de estados y llega a diez', () {
-    final ronda = quizRound(null, repo, seed: 7);
-    expect(ronda, hasLength(10));
-    expect(ronda.every((q) => q.kind == QuizKind.condition), isTrue);
-    verificarRonda(ronda, null);
+  test('la ronda de reglas llega a diez y mezcla temas', () {
+    for (final seed in [7, 8, 9]) {
+      final ronda = quizRound(null, repo, seed: seed);
+      expect(ronda, hasLength(10));
+      expect(ronda.map((q) => q.kind).toSet().length, greaterThan(3));
+      verificarRonda(ronda, null);
+    }
   });
 
   test('la misma semilla da la misma ronda y otra da otra', () {
