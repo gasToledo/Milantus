@@ -86,14 +86,18 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
       }),
     [raw, catalog, fullDraft],
   );
-  const featureGroups = base.featureSlots
-    .filter((s) => s.replaceable || s.chosen.length < s.count)
-    .map((s) => s.groupId);
-  const proficiencyGroups = base.proficiencySlots.filter((s) => s.chosen.length < s.count).map((s) => s.groupId);
-  const featureSlots = view.featureSlots.filter((s) => featureGroups.includes(s.groupId));
-  const proficiencySlots = view.proficiencySlots.filter((s) => proficiencyGroups.includes(s.groupId));
-  const spellGroups = base.spellSlots.filter((s) => s.replaceable || s.chosen.length < s.count).map((s) => s.groupId);
-  const spellSlots = view.spellSlots.filter((s) => spellGroups.includes(s.groupId));
+  // Un cupo se muestra si sin las elecciones de esta subida ya estaba abierto
+  // (o se puede cambiar), **o si no existía**: lo creó algo elegido ahora, como
+  // el truco de Descarga Agónica. Mirar solo `base` lo dejaba sin paso aunque el
+  // motor lo contara pendiente, y «Subir» no se habilitaba nunca.
+  const shown = <S extends { groupId: string }>(baseSlots: S[], viewSlots: S[], open: (s: S) => boolean) => {
+    const known = new Set(baseSlots.map((s) => s.groupId));
+    const groups = new Set(baseSlots.filter(open).map((s) => s.groupId));
+    return viewSlots.filter((s) => !known.has(s.groupId) || groups.has(s.groupId));
+  };
+  const featureSlots = shown(base.featureSlots, view.featureSlots, (s) => s.replaceable || s.chosen.length < s.count);
+  const proficiencySlots = shown(base.proficiencySlots, view.proficiencySlots, (s) => s.chosen.length < s.count);
+  const spellSlots = shown(base.spellSlots, view.spellSlots, (s) => s.replaceable || s.chosen.length < s.count);
   const after = useMemo(() => computeSheet(withoutForm(view.character), catalog), [view, catalog]);
 
   const steps: StepId[] = [
