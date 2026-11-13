@@ -514,11 +514,29 @@ function browseKey(pathname: string): string | undefined {
   if (route.name === 'dm' && (route.view.kind === 'bestiary' || route.view.kind === 'homebrew')) return `dm:${route.view.kind}`;
 }
 
+/** Una pantalla con algo que se perdería al salir (la ronda del Quiz) frena la
+ *  navegación interna: recibe cómo seguir y decide, normalmente con un diálogo.
+ *  ponytail: no frena el «atrás» del navegador ni `navigateBack`, que van por
+ *  `history.go`; frenarlos pide interceptar `popstate`. */
+let leaveGuard: ((proceed: () => void) => void) | null = null;
+
+export function setLeaveGuard(guard: typeof leaveGuard) {
+  leaveGuard = guard;
+}
+
 /** Navega dentro de `/v2` sin recargar. `replace` para las redirecciones:
  *  «atrás» no tiene que volver a una URL que solo redirige. */
 export function navigate(href: string, { replace = false } = {}) {
   const current = getLocation();
   if (href === current) return;
+  // Las redirecciones (`replace`) no preguntan: no las pidió nadie.
+  if (leaveGuard && !replace) {
+    leaveGuard(() => {
+      leaveGuard = null;
+      navigate(href);
+    });
+    return;
+  }
   // Hojear un catálogo (categorías, entradas, anterior/siguiente) no apila
   // historial: «atrás» vuelve a la pantalla que lo abrió y no recorre cada
   // entrada leída.

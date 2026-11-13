@@ -1,12 +1,13 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Sparkles } from 'lucide-react';
 import { useRoster, useSheetCatalog } from '../api/queries';
 import { quizRound, type Catalog, type CharacterJson, type QuizQuestion } from '../engine';
 import { toRosterEntry, type RosterEntry } from '../dashboard/roster';
 import { useLang, useTexts } from '../i18n/context';
 import type { Texts } from '../i18n/texts';
-import { Link, quizHref } from '../router';
+import { Link, navigate, quizHref, setLeaveGuard } from '../router';
 import { spellMeta, type SpellJson } from '../sheet/SpellList';
+import { AppDialog } from '../ui/AppDialog';
 import { Button, ButtonLink } from '../ui/Button';
 import { cx } from '../ui/cx';
 import { Medallion } from '../ui/Medallion';
@@ -123,6 +124,20 @@ function Round({ entry, catalog }: { entry: RosterEntry | null; catalog: Catalog
   const [index, setIndex] = useState(0);
 
   const who = entry?.character.name ?? t.quizRules;
+  // Salir a mitad de ronda pierde lo respondido: se pregunta antes. Sin nada
+  // contestado, o con la ronda terminada, no hay qué perder.
+  const playing = picks.length > 0 && index < questions.length;
+  const [leaving, setLeaving] = useState<(() => void) | null>(null);
+  useEffect(() => {
+    if (!playing) return;
+    setLeaveGuard((proceed) => setLeaving(() => proceed));
+    const warn = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener('beforeunload', warn);
+    return () => {
+      setLeaveGuard(null);
+      window.removeEventListener('beforeunload', warn);
+    };
+  }, [playing]);
   const restart = () => {
     setSeed(newSeed());
     setPicks([]);
@@ -175,12 +190,28 @@ function Round({ entry, catalog }: { entry: RosterEntry | null; catalog: Catalog
         </div>
         {picked !== undefined && <Extra question={question} catalog={catalog} />}
       </section>
-      {/* No avanza solo: leer la respuesta no puede irse de abajo del dedo. */}
-      {picked !== undefined && (
-        <Button className="self-end" onClick={() => setIndex(index + 1)} data-action="quiz-next">
-          {last ? t.quizSeeResult : t.quizNext}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        {/* Abandonar pasa por la misma pregunta que cualquier otra salida. */}
+        <Button tone="secondary" onClick={() => navigate(quizHref())} data-action="quiz-leave">
+          {t.quizLeave}
         </Button>
-      )}
+        {/* No avanza solo: leer la respuesta no puede irse de abajo del dedo. */}
+        {picked !== undefined && (
+          <Button onClick={() => setIndex(index + 1)} data-action="quiz-next">
+            {last ? t.quizSeeResult : t.quizNext}
+          </Button>
+        )}
+      </div>
+      <AppDialog
+        open={leaving !== null}
+        onOpenChange={(open) => !open && setLeaving(null)}
+        title={t.quizLeaveTitle}
+        description={t.quizLeaveBody}
+        actions={[
+          { label: t.quizKeepPlaying },
+          { label: t.quizLeave, primary: true, tone: 'crimson', onSelect: () => leaving?.() },
+        ]}
+      />
     </div>
   );
 }
