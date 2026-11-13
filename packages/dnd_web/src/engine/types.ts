@@ -1017,13 +1017,17 @@ export type QuizKind =
 
 export interface QuizQuestion {
   kind: QuizKind;
+  /** Identidad estable entre idiomas: la misma semilla elige las mismas claves. */
+  key: string;
   topic: 'class' | 'species' | 'background' | 'spells' | 'equipment' | 'rules';
   subject: string | null;
   subjectId: string | null;
   level: number | null;
   quote: string | null;
-  /** Cuatro rótulos distintos, ya en el idioma del catálogo. */
+  /** Rótulos distintos, ya en el idioma del catálogo. Cuatro, o tres si no hay un cuarto honesto. */
   options: string[];
+  /** Identidad de cada opción, en el mismo orden. No cambia con el idioma. */
+  optionIds: string[];
   /** Índice de la correcta en `options`. */
   answer: number;
 }

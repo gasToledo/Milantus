@@ -38,9 +38,9 @@
       {
         "level": 10,
         "name": "Guerrero Heroico",
-        "description": "Al inicio de tu turno en combate ganás Ventaja Heroica (Inspiración) si no la tenés ya.",
+        "description": "Al inicio de tu turno en combate ganás Inspiración Heroica si no la tenés ya.",
         "effects": [
-          { "type": "passiveTrait", "name": "Guerrero Heroico", "description": "En combate, al empezar tu turno ganás Inspiración si no la tenías." }
+          { "type": "passiveTrait", "name": "Guerrero Heroico", "description": "En combate, al empezar tu turno ganás Inspiración Heroica si no la tenías." }
         ]
       },
       {
@@ -56,9 +56,9 @@
       {
         "level": 18,
         "name": "Superviviente",
-        "description": "Al inicio de cada uno de tus turnos recuperás puntos de golpe si te queda menos de la mitad, y tenés ventaja en salvaciones de muerte.",
+        "description": "Al inicio de cada uno de tus turnos, si estás maltrecho, recuperás puntos de golpe, y tenés ventaja en salvaciones de muerte.",
         "effects": [
-          { "type": "passiveTrait", "name": "Superviviente", "description": "Regenerás PG al empezar tu turno si estás por debajo de la mitad; ventaja en salvaciones de muerte." },
+          { "type": "passiveTrait", "name": "Superviviente", "description": "Al empezar tu turno, si estás maltrecho, recuperás puntos de golpe; ventaja en salvaciones de muerte." },
           { "type": "advantage", "roll": "deathSave" }
         ]
       }
@@ -1003,7 +1003,7 @@
       {
         "level": 5,
         "name": "Conjuros del Círculo de la Luna",
-        "description": "Tenés Conjurar Animales siempre preparados. No cuentan contra la cantidad de conjuros que podés preparar.",
+        "description": "Tenés Conjurar Animales siempre preparado. No cuenta contra la cantidad de conjuros que podés preparar.",
         "effects": [
           { "type": "alwaysPreparedSpell", "spellId": "conjure-animals" }
         ]
@@ -1011,7 +1011,7 @@
       {
         "level": 7,
         "name": "Conjuros del Círculo de la Luna",
-        "description": "Tenés Fuente de Luz Lunar siempre preparados. No cuentan contra la cantidad de conjuros que podés preparar.",
+        "description": "Tenés Fuente de Luz Lunar siempre preparado. No cuenta contra la cantidad de conjuros que podés preparar.",
         "effects": [
           { "type": "alwaysPreparedSpell", "spellId": "fount-of-moonlight" }
         ]
@@ -1019,7 +1019,7 @@
       {
         "level": 9,
         "name": "Conjuros del Círculo de la Luna",
-        "description": "Tenés Curar Heridas en Masa siempre preparados. No cuentan contra la cantidad de conjuros que podés preparar.",
+        "description": "Tenés Curar Heridas en Masa siempre preparado. No cuenta contra la cantidad de conjuros que podés preparar.",
         "effects": [
           { "type": "alwaysPreparedSpell", "spellId": "mass-cure-wounds" }
         ]
@@ -1837,7 +1837,7 @@
       {
         "level": 3,
         "name": "Conjuros de Errante Feérico",
-        "description": "Tenés Hechizar Persona siempre preparados. No cuentan contra la cantidad de conjuros que podés preparar.",
+        "description": "Tenés Hechizar Persona siempre preparado. No cuenta contra la cantidad de conjuros que podés preparar.",
         "effects": [
           { "type": "alwaysPreparedSpell", "spellId": "charm-person" }
         ]
@@ -1845,7 +1845,7 @@
       {
         "level": 5,
         "name": "Conjuros de Errante Feérico",
-        "description": "Tenés Paso Brumoso siempre preparados. No cuentan contra la cantidad de conjuros que podés preparar.",
+        "description": "Tenés Paso Brumoso siempre preparado. No cuenta contra la cantidad de conjuros que podés preparar.",
         "effects": [
           { "type": "alwaysPreparedSpell", "spellId": "misty-step" }
         ]
@@ -1853,7 +1853,7 @@
       {
         "level": 9,
         "name": "Conjuros de Errante Feérico",
-        "description": "Tenés Invocar Feérico siempre preparados. No cuentan contra la cantidad de conjuros que podés preparar.",
+        "description": "Tenés Invocar Feérico siempre preparado. No cuenta contra la cantidad de conjuros que podés preparar.",
         "effects": [
           { "type": "alwaysPreparedSpell", "spellId": "summon-fey" }
         ]
@@ -1861,7 +1861,7 @@
       {
         "level": 13,
         "name": "Conjuros de Errante Feérico",
-        "description": "Tenés Puerta Dimensional siempre preparados. No cuentan contra la cantidad de conjuros que podés preparar.",
+        "description": "Tenés Puerta Dimensional siempre preparado. No cuenta contra la cantidad de conjuros que podés preparar.",
         "effects": [
           { "type": "alwaysPreparedSpell", "spellId": "dimension-door" }
         ]
@@ -1869,7 +1869,7 @@
       {
         "level": 17,
         "name": "Conjuros de Errante Feérico",
-        "description": "Tenés Engañar siempre preparados. No cuentan contra la cantidad de conjuros que podés preparar.",
+        "description": "Tenés Engañar siempre preparado. No cuenta contra la cantidad de conjuros que podés preparar.",
         "effects": [
           { "type": "alwaysPreparedSpell", "spellId": "mislead" }
         ]
@@ -1936,7 +1936,7 @@
       {
         "level": 3,
         "name": "Conjuros de Acechador en la Penumbra",
-        "description": "Tenés Disfrazarse siempre preparados. No cuentan contra la cantidad de conjuros que podés preparar.",
+        "description": "Tenés Disfrazarse siempre preparado. No cuenta contra la cantidad de conjuros que podés preparar.",
         "effects": [
           { "type": "alwaysPreparedSpell", "spellId": "disguise-self" }
         ]
@@ -1944,7 +1944,7 @@
       {
         "level": 5,
         "name": "Conjuros de Acechador en la Penumbra",
-        "description": "Tenés Truco de la Cuerda siempre preparados. No cuentan contra la cantidad de conjuros que podés preparar.",
+        "description": "Tenés Truco de la Cuerda siempre preparado. No cuenta contra la cantidad de conjuros que podés preparar.",
         "effects": [
           { "type": "alwaysPreparedSpell", "spellId": "rope-trick" }
         ]
@@ -1952,7 +1952,7 @@
       {
         "level": 9,
         "name": "Conjuros de Acechador en la Penumbra",
-        "description": "Tenés Terror siempre preparados. No cuentan contra la cantidad de conjuros que podés preparar.",
+        "description": "Tenés Terror siempre preparado. No cuenta contra la cantidad de conjuros que podés preparar.",
         "effects": [
           { "type": "alwaysPreparedSpell", "spellId": "fear" }
         ]
@@ -1960,7 +1960,7 @@
       {
         "level": 13,
         "name": "Conjuros de Acechador en la Penumbra",
-        "description": "Tenés Invisibilidad Mejorada siempre preparados. No cuentan contra la cantidad de conjuros que podés preparar.",
+        "description": "Tenés Invisibilidad Mejorada siempre preparado. No cuenta contra la cantidad de conjuros que podés preparar.",
         "effects": [
           { "type": "alwaysPreparedSpell", "spellId": "greater-invisibility" }
         ]
@@ -1968,7 +1968,7 @@
       {
         "level": 17,
         "name": "Conjuros de Acechador en la Penumbra",
-        "description": "Tenés Apariencia siempre preparados. No cuentan contra la cantidad de conjuros que podés preparar.",
+        "description": "Tenés Apariencia siempre preparado. No cuenta contra la cantidad de conjuros que podés preparar.",
         "effects": [
           { "type": "alwaysPreparedSpell", "spellId": "seeming" }
         ]
@@ -2129,7 +2129,7 @@
       {
         "level": 9,
         "name": "Experto en Infiltración",
-        "description": "Imitación Magistral y Puntería Móvil.",
+        "description": "Podés imitar sin fallo el habla o la letra de alguien que hayas estudiado al menos 1 hora, y Puntería Certera no te reduce la velocidad a 0.",
         "effects": [
           { "type": "passiveTrait", "name": "Experto en Infiltración: Imitación Magistral", "description": "Podés imitar sin fallo el habla de otra persona, su letra, o ambas, si pasaste al menos 1 hora estudiándolas." },
           { "type": "passiveTrait", "name": "Experto en Infiltración: Puntería Móvil", "description": "Tu velocidad no se reduce a 0 por usar Puntería Certera." }

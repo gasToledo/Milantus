@@ -170,7 +170,7 @@
     "features.0.effects.2.name": "Rage"
   },
   "rogue": {
-    "_es": "01201da5",
+    "_es": "a233df6a",
     "name": "Rogue",
     "features.0.name": "Expertise",
     "features.0.effects.0.name": "Expertise (level 1)",
@@ -227,7 +227,7 @@
     "features.7.effects.1.description": "You choose two more of your skill proficiencies to gain Expertise.",
     "features.8.description": "You take less damage from area effects that allow a Dexterity saving throw.",
     "features.8.effects.0.description": "When you make a Dexterity saving throw to take only half damage, you take no damage on a success and only half on a failure. It doesn't apply if you have the Incapacitated condition.",
-    "features.9.description": "Your checks with proficiency rarely fail.",
+    "features.9.description": "Whenever you make an ability check that uses one of your skill or tool proficiencies, you can treat a d20 roll of 9 or lower as a 10.",
     "features.9.effects.0.description": "Whenever you make an ability check that uses one of your skill or tool proficiencies, you can treat a d20 roll of 9 or lower as a 10.",
     "features.10.description": "You forgo Sneak Attack dice to add Withdraw, Trip, or Poison.",
     "features.10.effects.0.description": "When you deal Sneak Attack damage, you can forgo dice to add an effect. Withdraw (1d6): you move up to half your Speed without provoking Opportunity Attacks. Trip (1d6): Dexterity saving throw or the target has the Prone condition, if it is Large or smaller. Poison (1d6): Constitution saving throw or the target has the Poisoned condition for 1 minute; you need a Poisoner's Kit. The DC is 8 + your Dexterity modifier + your Proficiency Bonus.",
@@ -247,7 +247,7 @@
     "features.16.effects.1.description": "Stroke of Luck use."
   },
   "monk": {
-    "_es": "a0910e97",
+    "_es": "02bf4701",
     "name": "Monk",
     "features.0.name": "Martial Arts",
     "features.0.effects.0.name": "Martial Arts",
@@ -265,7 +265,7 @@
     "features.7.name": "Extra Attack",
     "features.8.name": "Stunning Strike",
     "features.8.effects.0.name": "Stunning Strike",
-    "features.9.name": "Unarmored Movement (improvement)",
+    "features.9.name": "Unarmored Movement (+15 feet)",
     "features.10.name": "Empowered Strikes",
     "features.10.effects.0.name": "Empowered Strikes",
     "features.11.name": "Evasion",
@@ -304,7 +304,7 @@
     "features.4.effects.1.description": "While you aren't wearing armor or wielding a Shield, your Speed increases (+10 feet at level 2, +15 at level 6, +20 at level 10).",
     "features.5.description": "As a Reaction, you reduce the damage of Bludgeoning, Piercing, or Slashing attacks.",
     "features.5.effects.0.description": "As a Reaction, when an attack that deals Bludgeoning, Piercing, or Slashing damage hits you, you reduce its damage by 1d10 + Dexterity modifier + Monk level. If you reduce it to 0 and spend a Focus Point, you can redirect it.",
-    "features.6.description": "You reduce falling damage as a Reaction.",
+    "features.6.description": "As a Reaction when you fall, you reduce the falling damage by 5 × your Monk level.",
     "features.6.effects.0.description": "As a Reaction when you fall, you reduce the falling damage by 5 × your Monk level.",
     "features.7.description": "You can attack twice when you take the Attack action.",
     "features.8.description": "Once per turn, when you hit with a Monk weapon or an Unarmed Strike, you can spend 1 Focus Point to try to stun the target.",

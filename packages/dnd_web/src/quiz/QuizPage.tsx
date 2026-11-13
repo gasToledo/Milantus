@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { BookOpen, Check, LogOut, RotateCcw, ScrollText, Shield, Sparkles, Swords, User, X, type LucideIcon } from 'lucide-react';
 import { useRoster, useSheetCatalog } from '../api/queries';
-import { quizRound, type Catalog, type CharacterJson, type QuizQuestion } from '../engine';
+import { quizLocalize, quizRound, type Catalog, type CharacterJson, type QuizQuestion } from '../engine';
 import { toRosterEntry, type RosterEntry } from '../dashboard/roster';
 import { useLang, useTexts } from '../i18n/context';
 import type { Texts } from '../i18n/texts';
@@ -19,9 +19,9 @@ import { TutorialGate } from '../ui/tutorials';
 export const RULES_TARGET = 'reglas';
 
 /**
- * El Quiz: rondas de diez preguntas que arma el motor desde el catálogo y la
- * ficha. No se guarda nada: ni puntaje ni historial, y la ronda vive en el
- * estado del componente (recargar arranca otra).
+ * El Quiz: rondas de hasta diez preguntas que arma el motor desde el catálogo
+ * y la ficha. No se guarda nada: ni puntaje ni historial, y la ronda vive en
+ * el estado del componente (recargar arranca otra).
  */
 export function QuizPage({ target }: { target: string | null }) {
   const t = useTexts();
@@ -137,10 +137,24 @@ const TINT_BAD = 'bg-[color-mix(in_srgb,var(--crimson)_9%,var(--plaque))]';
 function Round({ entry, catalog }: { entry: RosterEntry | null; catalog: Catalog }) {
   const t = useTexts();
   const [seed, setSeed] = useState(newSeed);
-  const questions = useMemo(
-    () => quizRound((entry?.character as unknown as CharacterJson | undefined) ?? null, catalog, seed),
-    [entry, catalog, seed],
-  );
+  const character = (entry?.character as unknown as CharacterJson | undefined) ?? null;
+  // La ronda se sortea una sola vez por semilla. El catálogo entra en la
+  // cuenta para armarla la primera vez; si después cambia el idioma, no se
+  // vuelve a sortear: se reescriben los textos de estas mismas preguntas.
+  const roundId = `${entry?.character.id ?? RULES_TARGET}:${seed}`;
+  const [trackedRound, setTrackedRound] = useState(roundId);
+  const [held, setHeld] = useState<QuizQuestion[] | null>(null);
+  if (trackedRound !== roundId) {
+    setTrackedRound(roundId);
+    setHeld(null);
+  }
+  const questions = useMemo(() => {
+    if (held) return quizLocalize(held, catalog);
+    return quizRound(character, catalog, seed);
+  }, [held, catalog, character, seed]);
+  useEffect(() => {
+    if (held == null) setHeld(questions);
+  }, [held, questions]);
   // Qué se contestó en cada pregunta (índice de la opción); `undefined` hasta tocar.
   const [picks, setPicks] = useState<number[]>([]);
   const [index, setIndex] = useState(0);
@@ -169,7 +183,18 @@ function Round({ entry, catalog }: { entry: RosterEntry | null; catalog: Catalog
 
   if (questions.length === 0) return <Notice title={t.quizTitle} body={who} />;
   const results = outcomes(questions, picks);
-  if (index >= questions.length) return <Result entry={entry} questions={questions} picks={picks} results={results} onAgain={restart} />;
+  if (index >= questions.length) {
+    return (
+      <Result
+        entry={entry}
+        questions={questions}
+        picks={picks}
+        results={results}
+        catalog={catalog}
+        onAgain={restart}
+      />
+    );
+  }
 
   const question = questions[index]!;
   const picked = picks[index];
@@ -197,7 +222,7 @@ function Round({ entry, catalog }: { entry: RosterEntry | null; catalog: Catalog
           <TopicIcon size={13} aria-hidden="true" />
           {t.quizTopic[question.topic]}
         </span>
-        <p className="font-display text-[21px] leading-[1.35] text-on-surface">{askOf(t, question)}</p>
+        <p className="font-display text-[21px] leading-[1.35] text-on-surface">{askOf(t, question, catalog, multiclassOf(entry))}</p>
         <Quote question={question} />
         <div className="flex flex-col gap-2">
           {question.options.map((label, i) => (
@@ -302,8 +327,8 @@ function Who({ entry }: { entry: RosterEntry | null }) {
 const subtitleOf = (entry: RosterEntry): string =>
   [entry.raceName, ...entry.classes.map((c) => `${c.name} ${c.level}`)].filter(Boolean).join(' · ');
 
-/** El avance en diez segmentos: aciertos en verde, errores en rojo y la
- *  pregunta actual en dorado. Se ve cómo vas sin esperar al final. */
+/** El avance, un segmento por pregunta: aciertos en verde, errores en rojo y
+ *  la pregunta actual en dorado. Se ve cómo vas sin esperar al final. */
 function Segments({ results, current, label }: { results: Outcome[]; current?: number; label: string }) {
   return (
     <div
@@ -342,12 +367,27 @@ function Dots({ results }: { results: Outcome[] }) {
   );
 }
 
+const multiclassOf = (entry: RosterEntry | null): boolean => (entry?.classes.length ?? 0) > 1;
+
+/** El nombre de la clase que el motor manda en `subjectId`. */
+function classNameOf(catalog: Catalog, id: string | null): string {
+  if (!id) return '';
+  const name = catalog.classes.find((c) => c.id === id)?.name;
+  return typeof name === 'string' ? name : '';
+}
+
 /** El enunciado según el tipo; `s` es el nombre de lo que se pregunta. */
-function askOf(t: Texts, q: QuizQuestion): string {
+function askOf(t: Texts, q: QuizQuestion, catalog: Catalog, multiclass: boolean): string {
   const s = q.subject ?? '';
   switch (q.kind) {
     case 'classFeatureLevel':
-      return t.quizAsk.classFeatureLevel(s);
+      return t.quizAsk.classFeatureLevel(classNameOf(catalog, q.subjectId), s);
+    case 'classFeatureByText':
+      return multiclass && s ? t.quizAsk.classFeatureByTextOf(s) : t.quizAsk.classFeatureByText;
+    case 'hitDie':
+      return t.quizAsk.hitDie(s);
+    case 'savingThrows':
+      return t.quizAsk.savingThrows(s);
     case 'spellCastingTime':
       return t.quizAsk.spellCastingTime(s);
     case 'spellRange':
@@ -360,9 +400,6 @@ function askOf(t: Texts, q: QuizQuestion): string {
     case 'armorAc':
     case 'armorCategory':
       return t.quizAsk[q.kind](s);
-    case 'classFeatureByText':
-    case 'hitDie':
-    case 'savingThrows':
     case 'speciesTraitByText':
     case 'backgroundSkills':
     case 'backgroundFeat':
@@ -468,12 +505,14 @@ function Result({
   questions,
   picks,
   results,
+  catalog,
   onAgain,
 }: {
   entry: RosterEntry | null;
   questions: QuizQuestion[];
   picks: number[];
   results: Outcome[];
+  catalog: Catalog;
   onAgain: () => void;
 }) {
   const t = useTexts();
@@ -529,7 +568,7 @@ function Result({
                     <Icon size={13} />
                   </span>
                   <span className="flex min-w-0 flex-col gap-1">
-                    <span className="text-[14px] text-on-surface">{askOf(t, q)}</span>
+                    <span className="text-[14px] text-on-surface">{askOf(t, q, catalog, multiclassOf(entry))}</span>
                     {pick !== undefined && (
                       <span className="flex items-center gap-1.5 text-[13px] text-crimson">
                         <X size={14} strokeWidth={2.4} aria-label={t.quizYourAnswer} />
