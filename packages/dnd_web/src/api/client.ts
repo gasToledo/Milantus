@@ -687,8 +687,12 @@ export interface Allocation {
 /** Cierra el capítulo y avisa a la mesa. Con [allocations] además reparte
  *  objetos a personajes concretos; el servidor valida todo antes de escribir y
  *  el DM no toca ninguna ficha (`modo-dm.md`). */
-export async function closeChapter(campaignId: string, chapterId: string, allocations?: Allocation[]): Promise<void> {
-  await sendJson('POST', `${chaptersPath(campaignId)}/${encodeURIComponent(chapterId)}/close`, allocations ? { allocations } : {});
+export async function closeChapter(
+  campaignId: string,
+  chapterId: string,
+  body?: { allocations?: Allocation[]; grantsLevel: boolean; grantsGold: number },
+): Promise<void> {
+  await sendJson('POST', `${chaptersPath(campaignId)}/${encodeURIComponent(chapterId)}/close`, body ?? {});
 }
 
 /** Un objeto que el DM le dio a este personaje y que todavía no aceptó

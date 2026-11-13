@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Plus, X } from 'lucide-react';
+import { Minus, Plus, X } from 'lucide-react';
 import { closeChapter, type Allocation, type ChapterItem, type DmChapter } from '../api/client';
 import { queryKeys, useCampaignMembers, useSheetCatalog } from '../api/queries';
 import { useLang, useTexts } from '../i18n/context';
 import { AppDialog } from '../ui/AppDialog';
 import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
-import { Eyebrow, Pill } from '../ui/data';
+import { Eyebrow } from '../ui/data';
+import { StepButton } from './ChapterItemsField';
 import { ItemPicker } from './ItemPicker';
 
 /** Una fila del reparto: un objeto del catálogo o uno de texto libre, y quiénes
@@ -16,15 +17,17 @@ import { ItemPicker } from './ItemPicker';
 type Entry = { key: number; item?: ChapterItem; text?: string; to: Set<string> };
 
 /**
- * Cerrar un capítulo (`Cierre` del Diseño). Sin objetos es una confirmación
- * simple. Con objetos pide **a quién va cada uno**: una fila por objeto con un
- * chip por personaje de la mesa, y nada viene marcado de entrada porque nada se
- * asigna solo. Con un objeto sin nadie no deja cerrar y dice cuál falta.
+ * Cerrar un capítulo (`Cierre` del Diseño). Todo lo que se da se decide acá y no
+ * en el editor: con mesa, siempre, el nivel, el oro para cada personaje y los
+ * objetos con **a quién va cada uno** (una placa por objeto con cantidad y un
+ * chip por personaje; nada viene marcado, porque nada se asigna solo). Con un
+ * objeto sin nadie no deja cerrar y dice cuál falta. Los valores arrancan en lo
+ * que el capítulo traía cargado (uno viejo o planificado en Flutter).
  *
  * Todo es un aviso: el servidor deja el objeto en la bandeja del jugador y el
  * DM no escribe ninguna ficha (`modo-dm.md`). Si cerrar falla el diálogo no se
- * cierra y «Cerrar capítulo» pasa a «Reintentar». Con la mesa vacía se cierra
- * sin repartir ni mandar cuerpo, y el capítulo conserva sus listas.
+ * cierra y «Cerrar capítulo» pasa a «Reintentar». Con la mesa vacía queda la
+ * confirmación simple: se cierra sin recompensas y sin cuerpo.
  */
 export function CloseChapterDialog({
   campaignId,
@@ -50,6 +53,8 @@ export function CloseChapterDialog({
       to: new Set<string>(),
     })),
   ]);
+  const [level, setLevel] = useState(chapter.grantsLevel ?? false);
+  const [gold, setGold] = useState(chapter.grantsGold ? String(chapter.grantsGold) : '');
   const [nextKey, setNextKey] = useState(entries.length);
   const [picking, setPicking] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -60,14 +65,16 @@ export function CloseChapterDialog({
   const emptyTable = members.data !== undefined && table.length === 0;
   const labelOf = (e: Entry) => e.item?.name ?? e.text ?? '';
   const missing = entries.filter((e) => e.to.size === 0);
-  // Sin objetos, o sin nadie a quien dárselos, es la confirmación simple.
-  const simple = entries.length === 0 || emptyTable;
+  // Sin nadie a quien dárselo no hay nada que decidir: confirmación simple.
+  const simple = emptyTable;
   const blocked = loading || (!simple && missing.length > 0);
 
   const add = (entry: Omit<Entry, 'key' | 'to'>) => {
     setEntries((prev) => [...prev, { ...entry, key: nextKey, to: new Set() }]);
     setNextKey(nextKey + 1);
   };
+  const setQuantity = (key: number, quantity: number) =>
+    setEntries((prev) => prev.map((e) => (e.key === key && e.item ? { ...e, item: { ...e.item, quantity } } : e)));
   const toggle = (key: number, memberId: string) =>
     setEntries((prev) =>
       prev.map((e) => {
@@ -82,18 +89,27 @@ export function CloseChapterDialog({
     if (busy || blocked) return;
     setBusy(true);
     try {
-      // Sin objetos, o con la mesa vacía, se cierra sin cuerpo: no hay a quién
-      // repartirle y el capítulo conserva sus listas.
-      const allocations: Allocation[] | undefined = simple
-        ? undefined
-        : table
-            .map((m) => ({
-              memberId: m.memberId,
-              items: entries.flatMap((e) => (e.item && e.to.has(m.memberId) ? [e.item] : [])),
-              freeItems: entries.flatMap((e) => (e.text !== undefined && e.to.has(m.memberId) ? [e.text] : [])),
-            }))
-            .filter((a) => a.items.length > 0 || a.freeItems.length > 0);
-      await closeChapter(campaignId, chapter.id, allocations);
+      // Con la mesa vacía no hay a quién darle nada: se cierra sin cuerpo y el
+      // capítulo conserva lo que traía. Si no, siempre van el nivel y el oro
+      // (vacío = 0) y los objetos solo si los hay.
+      const allocations: Allocation[] = table
+        .map((m) => ({
+          memberId: m.memberId,
+          items: entries.flatMap((e) => (e.item && e.to.has(m.memberId) ? [e.item] : [])),
+          freeItems: entries.flatMap((e) => (e.text !== undefined && e.to.has(m.memberId) ? [e.text] : [])),
+        }))
+        .filter((a) => a.items.length > 0 || a.freeItems.length > 0);
+      await closeChapter(
+        campaignId,
+        chapter.id,
+        simple
+          ? undefined
+          : {
+              ...(entries.length > 0 && { allocations }),
+              grantsLevel: level,
+              grantsGold: Number(gold) || 0,
+            },
+      );
       await Promise.all([
         client.invalidateQueries({ queryKey: queryKeys.campaignChapters(campaignId) }),
         client.invalidateQueries({ queryKey: queryKeys.campaignNotebook(campaignId) }),
@@ -106,7 +122,6 @@ export function CloseChapterDialog({
     }
   };
 
-  const gold = chapter.grantsGold ?? 0;
   return (
     <AppDialog
       open
@@ -128,36 +143,67 @@ export function CloseChapterDialog({
         <p className="text-[14px] text-on-surface-variant">
           {emptyTable ? t.dmCloseEmptyTable(chapter.name) : t.dmCloseChapterBody(chapter.name)}
         </p>
-        {!simple && (gold > 0 || chapter.grantsLevel) && (
-          <p className="flex flex-wrap gap-2">
-            {gold > 0 && <Pill>{t.dmCloseGoldEach(gold)}</Pill>}
-            {chapter.grantsLevel && <Pill>{t.dmOneLevel}</Pill>}
-          </p>
-        )}
         {!simple && (
           <>
+            <Eyebrow className="mt-1">{t.dmOnCloseCarry}</Eyebrow>
+            <label className="flex items-start gap-2.5">
+              <input
+                type="checkbox"
+                checked={level}
+                onChange={(e) => setLevel(e.target.checked)}
+                data-field="chapter-level"
+                className="mt-0.5 size-4 accent-gold"
+              />
+              <span className="flex flex-col">
+                <b className="text-[14px] font-medium text-on-surface">{t.dmOneLevel}</b>
+                <small className="text-[12px] text-text-muted">{t.dmLevelUpNote}</small>
+              </span>
+            </label>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-[12px] text-text-muted">{t.dmGoldEach}</span>
+              <span className="flex items-center gap-2">
+                <input
+                  value={gold}
+                  // Solo dígitos: así el campo no puede producir oro negativo y no
+                  // hace falta ningún mensaje de error explicándolo.
+                  onChange={(e) => setGold(e.target.value.replace(/\D/g, ''))}
+                  inputMode="numeric"
+                  placeholder="0"
+                  data-field="chapter-gold"
+                  className="h-[38px] w-[140px] rounded-[var(--radius-nav)] border border-hairline bg-plaque px-3 text-[14px] text-on-surface"
+                />
+                <em className="text-[13px] text-text-muted not-italic">{t.coinAbbrGold}</em>
+              </span>
+            </label>
             <Eyebrow className="mt-1">{t.dmCloseAssign}</Eyebrow>
             {entries.map((e) => (
               <div key={e.key} className="plaque flex flex-col gap-2 p-3" data-entry={labelOf(e)}>
-                <header className="flex items-center gap-2">
+                <header className="flex items-center gap-1">
                   <b className="min-w-0 flex-1 truncate text-[14px] font-medium text-on-surface">
                     {labelOf(e)}
-                    {e.item && e.item.quantity > 1 && <em className="num ml-2 not-italic text-on-surface-variant">×{e.item.quantity}</em>}
                     {(e.item?.homebrew || e.text !== undefined) && (
                       <i className="ml-2 rounded-[var(--radius-pill)] border border-hairline px-2 text-[11px] font-normal text-text-muted not-italic">
                         {e.text !== undefined ? t.itemFreeTag : t.itemOwnTag}
                       </i>
                     )}
                   </b>
-                  <button
-                    type="button"
-                    aria-label={t.itemRemove(labelOf(e))}
-                    title={t.itemRemove(labelOf(e))}
+                  {e.item && (
+                    <>
+                      <StepButton
+                        label={t.itemQtyLess}
+                        icon={Minus}
+                        disabled={e.item.quantity <= 1}
+                        onClick={() => setQuantity(e.key, e.item!.quantity - 1)}
+                      />
+                      <span className="num w-6 text-center text-[14px]">{e.item.quantity}</span>
+                      <StepButton label={t.itemQtyMore} icon={Plus} onClick={() => setQuantity(e.key, e.item!.quantity + 1)} />
+                    </>
+                  )}
+                  <StepButton
+                    label={t.itemRemove(labelOf(e))}
+                    icon={X}
                     onClick={() => setEntries((prev) => prev.filter((o) => o.key !== e.key))}
-                    className="flex size-8 items-center justify-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold"
-                  >
-                    <X size={15} aria-hidden="true" />
-                  </button>
+                  />
                 </header>
                 <div className="flex flex-wrap gap-1.5">
                   {table.map((m) => {

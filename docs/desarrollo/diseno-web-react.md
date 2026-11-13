@@ -378,14 +378,14 @@ inexistente son la misma pantalla). Desde 6b escribe campañas y la Mesa y desde
   (oro, apagado, neutro) y lo que reparte en `StatPlaque`. Cada tarjeta tiene un
   ⋮ de 40 × 40 (`chapter-actions`: «Editar», salvo cerrado, y «Borrar»), «Empezar»
   o «Cerrar capítulo» según el estado, y el enlace «Ver en el Cuaderno».
-- **Escritura de 6c**: `ChapterEditorDialog` (el estado no se edita: guarda
-  `{ ...capítulo, cambios }` y nunca manda `completed`; lista de objetos con − y +),
+- **Escritura de 6c**: `ChapterEditorDialog` (solo nombre y objetivo; el estado no se edita: guarda
+  `{ ...capítulo, cambios }`, conserva el botín que traía y nunca manda `completed`),
   `NoteEditorDialog` (`Select` de capítulo con el rótulo adentro), `ItemPicker`
   (`AppDialog` con buscador, `FamilyFilter` más «Propios» y filas de `catalogRows`;
   agregar no cierra y la fila pasa a «Agregado»; solo se entrega lo que existe, sin texto libre (los capítulos viejos que lo tienen lo conservan como «Sin catálogo»); una plantilla pide base con el
   `BaseDialog` de `MagicItemPlans`, que acepta `exclude` para no ofrecer el
-  homebrew) y `ChapterItemsField` (la lista de objetos con cantidad, quitar y «Agregar objeto» que comparten el editor de capítulos y `GiveItemDialog`), `GiveItemDialog` («Dar objeto a …» desde el ⋮ de `MemberCard`, con «Dar» apagado sin objetos) y `CloseChapterDialog` (como `ConfirmDialog` pero con el botón en oro
-  y sin ícono de alerta; un chip `aria-pressed` por personaje en cada objeto,
+  homebrew) y `ChapterItemsField` (la lista de objetos con cantidad, quitar y «Agregar objeto» de `GiveItemDialog`), `GiveItemDialog` («Dar objeto a …» desde el ⋮ de `MemberCard`, con «Dar» apagado sin objetos) y `CloseChapterDialog` (como `ConfirmDialog` pero con el botón en oro
+  y sin ícono de alerta; con mesa decide siempre el nivel, el oro y los objetos —cantidad con − y +—; un chip `aria-pressed` por personaje en cada objeto,
   nada marcado de entrada, y apagado con `dmCloseMissing` si falta alguien).
   `ItemGrants` es la tarjeta «El DM te dio» de Inventario (`data-card="item-grants"`),
   solo en la ficha propia. `CatalogRow` (`sheet/ItemCatalog.tsx`) suma `category`

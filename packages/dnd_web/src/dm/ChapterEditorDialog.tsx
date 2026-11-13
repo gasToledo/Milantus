@@ -1,14 +1,11 @@
 import { useState } from 'react';
-import type { ChapterItem, DmChapter } from '../api/client';
+import type { DmChapter } from '../api/client';
 import { useTexts } from '../i18n/context';
 import { AppDialog } from '../ui/AppDialog';
-import { Eyebrow } from '../ui/data';
-import { ChapterItemsField } from './ChapterItemsField';
 
 /**
- * Nombre, objetivo y qué reparte al cerrarse un capítulo
- * (`chapter_editor_dialog.dart`): sirve para crear y para editar. **El estado
- * no se edita acá**: Empezar y Cerrar son las acciones con consecuencias, y por
+ * Nombre y objetivo de un capítulo (`chapter_editor_dialog.dart`): sirve para
+ * crear y para editar. **El estado no se edita acá**: Empezar y Cerrar son las acciones con consecuencias, y por
  * eso el capítulo se guarda como `{ ...capítulo, cambios }` y nunca manda
  * `completed`. Si [onSubmit] falla el diálogo **no se cierra**, lo escrito se
  * conserva y «Guardar» pasa a «Reintentar».
@@ -27,13 +24,6 @@ export function ChapterEditorDialog({
   const t = useTexts();
   const [name, setName] = useState(initial.name);
   const [summary, setSummary] = useState(initial.summary ?? '');
-  const [level, setLevel] = useState(initial.grantsLevel ?? false);
-  const [gold, setGold] = useState(initial.grantsGold ? String(initial.grantsGold) : '');
-  // Lo que se reparte: los objetos del catálogo (con cantidad) y el texto libre
-  // de antes, que aparece como «Sin catálogo». A quién le toca cada uno se
-  // marca al cerrar, no acá.
-  const [items, setItems] = useState<ChapterItem[]>(initial.grantsCatalog ?? []);
-  const [free, setFree] = useState<string[]>(initial.grantsItems ?? []);
   const [missingName, setMissingName] = useState(false);
   const [failed, setFailed] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -48,10 +38,9 @@ export function ChapterEditorDialog({
         ...initial,
         name: trimmed,
         summary: summary.trim(),
-        grantsLevel: level,
-        grantsGold: Number(gold) || 0,
-        grantsItems: free,
-        grantsCatalog: items,
+        // El nivel, el oro y los objetos se deciden al cerrar (`CloseChapterDialog`).
+        // Acá se conservan los de `initial` sin tocarlos: un capítulo viejo, o
+        // uno planificado en Flutter, no los pierde (por eso el spread).
       });
       onClose();
     } catch {
@@ -99,51 +88,9 @@ export function ChapterEditorDialog({
             onChange={(e) => setSummary(e.target.value)}
             placeholder={t.dmChapterGoalHint}
             data-field="chapter-goal"
-            className={`${field} h-[84px] resize-none py-2 placeholder:text-text-muted`}
+            className={`${field} h-[108px] resize-none py-2 placeholder:text-text-muted`}
           />
         </label>
-
-        {/* Lo que sigue es lo que se reparte al cerrar, y nada de esto lo aplica
-            la app: al cerrar solo se les avisa a los jugadores. */}
-        <Eyebrow className="mt-1">{t.dmOnCloseCarry}</Eyebrow>
-        <label className="flex items-start gap-2.5">
-          <input
-            type="checkbox"
-            checked={level}
-            onChange={(e) => setLevel(e.target.checked)}
-            data-field="chapter-level"
-            className="mt-0.5 size-4 accent-gold"
-          />
-          <span className="flex flex-col">
-            <b className="text-[14px] font-medium text-on-surface">{t.dmOneLevel}</b>
-            <small className="text-[12px] text-text-muted">{t.dmLevelUpNote}</small>
-          </span>
-        </label>
-        <label className="flex flex-col gap-1.5">
-          <span className="text-[12px] text-text-muted">{t.dmGoldEach}</span>
-          <span className="flex items-center gap-2">
-            <input
-              value={gold}
-              // Solo dígitos: así el campo no puede producir oro negativo y no
-              // hace falta ningún mensaje de error explicándolo.
-              onChange={(e) => setGold(e.target.value.replace(/\D/g, ''))}
-              inputMode="numeric"
-              placeholder="0"
-              data-field="chapter-gold"
-              className={`${field} h-[38px] min-w-0 flex-1`}
-            />
-            <em className="text-[13px] text-text-muted not-italic">{t.coinAbbrGold}</em>
-          </span>
-          <span className="text-[12px] text-text-muted">{t.dmGoldHelper}</span>
-        </label>
-        <ChapterItemsField
-          label={t.dmItems}
-          help={t.dmItemsAssignHelp}
-          items={items}
-          onItems={setItems}
-          free={free}
-          onFree={setFree}
-        />
         {failed && (
           <p role="alert" className="text-[13px] text-crimson">
             {t.dmChapterSaveError}

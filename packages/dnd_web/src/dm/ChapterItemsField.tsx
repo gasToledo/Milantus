@@ -8,8 +8,8 @@ import { ItemPicker } from './ItemPicker';
 
 /**
  * La lista de objetos que se reparten, con cantidad (− y +), quitar y «Agregar
- * objeto» (`ItemPicker`). La comparten el editor de capítulos y «Dar objeto»
- * de la Mesa. [free] es el texto libre de los capítulos viejos: se lista como
+ * objeto» (`ItemPicker`). La usa «Dar objeto» de la Mesa (el cierre del
+ * capítulo arma sus placas aparte y reusa `StepButton`). [free] es el texto libre de los capítulos viejos: se lista como
  * «Sin catálogo» y se puede quitar, pero no se crea uno nuevo.
  */
 export function ChapterItemsField({
@@ -102,7 +102,7 @@ export function ChapterItemsField({
 }
 
 /** Un botón de ícono de la lista de objetos (− + quitar). */
-function StepButton({
+export function StepButton({
   label,
   icon: Icon,
   disabled,

@@ -815,11 +815,6 @@ test('Capítulos: crear, empezar, escribir una nota y cerrar con un objeto llega
   await page.goto('/v2/dm/campanas/mesa-de-capitulos/capitulos');
   await page.locator('[data-action="new-chapter"]').click();
   await page.locator('[data-field="chapter-name"]').fill('La Puerta de Ceniza');
-  await page.locator('[data-field="chapter-gold"]').fill('50');
-  await page.locator('[data-action="add-chapter-item"]').click();
-  await page.locator('[data-field="item-picker-search"]').fill(nombre);
-  await page.getByRole('button', { name: `Agregar: ${nombre}`, exact: true }).click();
-  await page.getByRole('button', { name: 'Listo', exact: true }).click();
   await page.getByRole('button', { name: 'Guardar', exact: true }).click();
   const capitulo = page.locator('[data-chapter]');
   await expect(capitulo).toHaveAttribute('data-status', 'pending');
@@ -835,6 +830,12 @@ test('Capítulos: crear, empezar, escribir una nota y cerrar con un objeto llega
 
   await page.goto('/v2/dm/campanas/mesa-de-capitulos/capitulos');
   await page.locator('[data-action="close-chapter"]').click();
+  // El oro y los objetos se deciden al cerrar, no al editar el capítulo.
+  await page.locator('[data-field="chapter-gold"]').fill('50');
+  await page.locator('[data-action="add-close-item"]').click();
+  await page.locator('[data-field="item-picker-search"]').fill(nombre);
+  await page.getByRole('button', { name: `Agregar: ${nombre}`, exact: true }).click();
+  await page.getByRole('button', { name: 'Listo', exact: true }).click();
   const cierre = page.getByRole('dialog');
   await cierre.getByRole('button', { name: 'Pj de la Mesa', exact: true }).click();
   await cierre.getByRole('button', { name: 'Cerrar capítulo', exact: true }).click();
