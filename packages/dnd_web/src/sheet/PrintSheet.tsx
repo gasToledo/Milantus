@@ -88,7 +88,10 @@ function Sheet({ model }: { model: SheetModel }) {
 
   const profs = [
     ...s.armorProficiencies.map((id) => catalogLabel('armorTraining', id)),
-    ...s.weaponProficiencies.map((id) => nameOf(catalog.weapons, id) ?? catalogLabel('weaponProficiency', id)),
+    // `nameOf` cae al id, no a null: la categoría se elige preguntando si hay arma.
+    ...s.weaponProficiencies.map((id) =>
+      catalog.weapons.some((w) => w.id === id) ? nameOf(catalog.weapons, id)! : catalogLabel('weaponProficiency', id),
+    ),
     ...s.toolProficiencies.map((id) => catalogLabel('tool', id)),
   ].sort(sortByName);
   const languages = [

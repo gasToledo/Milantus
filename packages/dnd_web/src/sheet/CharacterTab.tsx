@@ -61,7 +61,10 @@ export function CharacterTab({ model }: { model: SheetModel }) {
   // y por la categoría del motor si no («Armas simples»). Los idiomas llevan
   // Común primero, que lo sabe todo personaje, y el resto por nombre
   // (`_languagesCard` de Flutter).
-  const weaponName = (id: string) => nameOf(catalog.weapons, id) ?? catalogLabel('weaponProficiency', id);
+  // `nameOf` cae al id cuando no hay arma, así que el `??` no alcanza para
+  // llegar a la categoría: se pregunta si el arma existe.
+  const weaponName = (id: string) =>
+    catalog.weapons.some((w) => w.id === id) ? nameOf(catalog.weapons, id)! : catalogLabel('weaponProficiency', id);
   const languages = sheet.languages
     .filter((id) => id !== 'common')
     .map((id) => catalogLabel('language', id))
