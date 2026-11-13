@@ -167,6 +167,7 @@ const es = {
       { title: 'Te damos la bienvenida', body: '¡Qué bueno que estés acá! Milantus te acompaña en tus partidas de D&D: guarda tus personajes y hace las cuentas por vos, así te ocupás de lo divertido, que es jugar. Te mostramos lo básico en un minuto.' },
       { title: '¿Primera vez con D&D?', body: 'Dungeons & Dragons es un juego de rol: cada jugador lleva un personaje, y una persona, el DM (Dungeon Master), narra la historia y da vida al mundo. No hace falta saberse las reglas: la app te va guiando, y en el Códice, «Primeros pasos» te explica lo básico.' },
       { title: 'Modo Jugador', body: 'Si vas a jugar, empezá por acá. Creás tu personaje respondiendo unas pocas preguntas, y la ficha calcula sola todo lo demás. Durante la partida anotás ahí el daño que recibís, lo que llevás encima y tus conjuros.' },
+      { title: 'Quiz', body: 'Para practicar las reglas sin abrir el manual: en Quiz, en el panel del Modo Jugador, respondés rondas de diez preguntas sobre tu personaje (su clase, su especie, su trasfondo y sus conjuros) o sobre las condiciones.' },
       { title: 'Modo DM', body: 'Si te toca dirigir la partida, este modo es para vos. Armás tu campaña, sumás los personajes de tu grupo y tenés a mano tus notas, los PNJ (los personajes que manejás vos) y los combates. Cambiás de modo cuando quieras con el interruptor Jugador/DM, arriba del panel.' },
     ],
     sheet: [
@@ -206,6 +207,10 @@ const es = {
     homebrew: [
       { title: 'Tu propio contenido', body: 'Homebrew es todo lo que inventás vos: una especie nueva, un conjuro propio, el arma legendaria de tu campaña o un monstruo que no está en ningún libro. Acá lo cargás llenando un formulario, sin programar nada.' },
       { title: 'Se juega como el contenido oficial', body: 'Lo que creás se usa igual que el contenido del manual: aparece al crear personajes, en el Bestiario y en tus combates. Para compartirlo con tu grupo, exportalo a un archivo y que cada uno lo importe en su cuenta.' },
+    ],
+    quiz: [
+      { title: 'Poné a prueba lo que sabés', body: 'Elegí uno de tus personajes y respondé diez preguntas sobre sus rasgos de clase y de especie, su trasfondo y sus conjuros. Con «Reglas generales» repasás las condiciones, que valen para cualquiera.' },
+      { title: 'Sin apuro ni puntaje guardado', body: 'Cada pregunta te muestra la respuesta correcta antes de seguir, y al final tenés la lista de lo que conviene repasar. No se guarda nada: cada ronda es nueva, así que jugá las que quieras.' },
     ],
   },
   settingsLanguage: 'Idioma',
@@ -2686,6 +2691,7 @@ const en: Texts = {
       { title: 'Welcome aboard', body: 'We’re so glad you’re here! Milantus keeps you company in your D&D games: it stores your characters and does the math for you, so you can focus on the fun part, which is playing. Here are the basics in a minute.' },
       { title: 'New to D&D?', body: 'Dungeons & Dragons is a roleplaying game: each player runs a character, and one person, the DM (Dungeon Master), tells the story and brings the world to life. You don’t need to know the rules: the app guides you along, and in the Codex, “Getting started” explains the basics.' },
       { title: 'Player Mode', body: 'If you’re going to play, start here. You build your character by answering a few questions, and the sheet works out everything else. During the game you track the damage you take, what you carry and your spells right there.' },
+      { title: 'Quiz', body: 'To practice the rules without opening the book: in Quiz, in the Player Mode panel, you answer rounds of ten questions about your character (their class, species, background and spells) or about the conditions.' },
       { title: 'DM Mode', body: 'If you’re running the game, this mode is for you. You set up your campaign, add your group’s characters and keep your notes, your NPCs (the characters you run) and your combats at hand. Switch modes anytime with the Player/DM switch at the top of the panel.' },
     ],
     sheet: [
@@ -2725,6 +2731,10 @@ const en: Texts = {
     homebrew: [
       { title: 'Your own content', body: 'Homebrew is anything you make up: a new species, your own spell, your campaign’s legendary weapon or a monster that’s in no book. You add it here by filling in a form, no coding needed.' },
       { title: 'Plays just like official content', body: 'What you create works just like the book’s content: it shows up in character creation, in the Bestiary and in your combats. To share it with your group, export it to a file and have each of them import it into their account.' },
+    ],
+    quiz: [
+      { title: 'Test what you know', body: 'Pick one of your characters and answer ten questions about their class and species features, their background and their spells. With “General rules” you review the conditions, which apply to everyone.' },
+      { title: 'No rush, no saved score', body: 'Each question shows you the right answer before you move on, and at the end you get a list of what to review. Nothing is saved: every round is new, so play as many as you like.' },
     ],
   },
   settingsLanguage: 'Language',

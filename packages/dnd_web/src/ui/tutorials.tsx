@@ -7,7 +7,9 @@ import {
   Eye,
   Flag,
   Flame,
+  GraduationCap,
   IdCard,
+  ListChecks,
   Music,
   Pencil,
   PawPrint,
@@ -43,11 +45,13 @@ export type Tutorial =
   | 'dmCombat'
   | 'bestiary'
   | 'npcLibrary'
-  | 'homebrew';
+  | 'homebrew'
+  // Solo de /v2: Flutter no tiene Quiz.
+  | 'quiz';
 
 /** Un ícono por página, en el orden de los textos. */
 const ICONS: Record<Tutorial, LucideIcon[]> = {
-  welcome: [Smile, Dices, User, Shield],
+  welcome: [Smile, Dices, User, GraduationCap, Shield],
   sheet: [IdCard, Swords, Share],
   dmTable: [Users, Eye],
   dmChapters: [BookOpen, Flag],
@@ -57,6 +61,7 @@ const ICONS: Record<Tutorial, LucideIcon[]> = {
   bestiary: [PawPrint, Pencil],
   npcLibrary: [Users, ArrowLeftRight],
   homebrew: [Sparkles, Share],
+  quiz: [GraduationCap, ListChecks],
 };
 
 // --- Qué se vio -------------------------------------------------------------

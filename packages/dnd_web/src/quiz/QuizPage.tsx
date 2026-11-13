@@ -12,6 +12,7 @@ import { cx } from '../ui/cx';
 import { Medallion } from '../ui/Medallion';
 import { ownPortrait } from '../ui/portrait';
 import { AppBusyLabel, AppErrorView, Notice } from '../ui/status';
+import { TutorialGate } from '../ui/tutorials';
 
 /** El id de la ronda de reglas generales en la URL (`/v2/quiz/reglas`). */
 export const RULES_TARGET = 'reglas';
@@ -52,6 +53,7 @@ function Picker({ entries }: { entries: RosterEntry[] }) {
   const t = useTexts();
   return (
     <div className="flex flex-col gap-4">
+      <TutorialGate tutorial="quiz" />
       <h1 className="font-display text-[26px] font-normal text-on-surface">{t.quizTitle}</h1>
       <p className="text-[14px] text-on-surface-variant">{t.quizIntro}</p>
       <ul className="grid grid-cols-1 gap-2.5 min-[700px]:grid-cols-2">
