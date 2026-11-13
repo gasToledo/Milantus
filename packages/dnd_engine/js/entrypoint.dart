@@ -1553,6 +1553,16 @@ String quizRoundJs(String? characterJson, String catalogJson, int seed) =>
         q.toJson(),
     ]);
 
+/// La misma ronda, con los textos del idioma activo. No vuelve a sortear:
+/// cambiar de idioma a mitad de ronda no puede cambiar la pregunta.
+String quizLocalizeJs(String questionsJson, String catalogJson) => jsonEncode([
+      for (final q in quizLocalize(
+        (jsonDecode(questionsJson) as List).cast<Map<String, dynamic>>(),
+        _repoPara(catalogJson),
+      ))
+        q.toJson(),
+    ]);
+
 /// El personaje de ejemplo de la cuenta vacía ([demoSagan]).
 String demoCharacter() => jsonEncode(demoSagan().toJson());
 
@@ -1676,6 +1686,7 @@ void main() {
   motor['creation'] = creation.toJS;
   motor['demoCharacter'] = demoCharacter.toJS;
   motor['quizRound'] = quizRoundJs.toJS;
+  motor['quizLocalize'] = quizLocalizeJs.toJS;
   motor['act'] = act.toJS;
   motor['companionsView'] = companionsViewJs.toJS;
   motor['companionPreview'] = companionPreviewJs.toJS;

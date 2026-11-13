@@ -19,7 +19,7 @@ enum VocabularyField {
   duration,
   range,
   size,
-  creatureType
+  creatureType,
 }
 
 /// Qué campos de vocabulario tiene cada catálogo. La superposición no puede
@@ -115,7 +115,8 @@ String? _quantityEnglish(String value) {
   return unit == null ? null : '${m![1]} $unit';
 }
 
-/// Formas de área de los alcances «Personal (cono 30 pies)».
+/// Formas del formato viejo «Personal (cono 30 pies)», sin «de». El homebrew
+/// y el catálogo anterior lo usan; el oficial 2024 va en [_shapesOfficial].
 const _shapes = {
   'cono': 'cone',
   'cubo': 'cube',
@@ -123,6 +124,26 @@ const _shapes = {
   'esfera': 'sphere',
   'aura de': 'aura',
 };
+
+/// «Personal (cono de 15 pies)» → «Self (15-foot Cone)». La mayúscula de la
+/// forma es la del alcance del PHB 2024.
+const _shapesOfficial = {
+  'cono': 'Cone',
+  'cubo': 'Cube',
+  'línea': 'Line',
+  'esfera': 'Sphere',
+  'emanación': 'Emanation',
+};
+
+/// Si [name] es un tipo de criatura (en cualquiera de los dos idiomas). El
+/// catálogo a veces lo guarda como si fuera un rasgo: no es una opción de
+/// «qué rasgo es este».
+bool isCreatureTypeName(String name) {
+  final n = name.toLowerCase();
+  final map = _english[VocabularyField.creatureType]!;
+  return map.keys.any((k) => k.toLowerCase() == n) ||
+      map.values.any((v) => v.toLowerCase() == n);
+}
 
 String? _patternEnglish(VocabularyField field, String value) {
   switch (field) {
@@ -141,7 +162,15 @@ String? _patternEnglish(VocabularyField field, String value) {
       return _quantityEnglish(value);
     case VocabularyField.range:
       final cone = RegExp(r'^Cono de (\d+) pies$').firstMatch(value);
-      if (cone != null) return '${cone[1]}-foot cone';
+      if (cone != null) return '${cone[1]}-foot Cone';
+      // El oficial: «Personal (emanación de 30 pies)». Si la forma no está en
+      // la tabla, se sigue con el formato viejo (homebrew «aura de»).
+      final official = RegExp(r'^Personal \(([a-záéíóúñ]+) de (\d+) pies\)$')
+          .firstMatch(value);
+      if (official != null) {
+        final shape = _shapesOfficial[official[1]];
+        if (shape != null) return 'Self (${official[2]}-foot $shape)';
+      }
       final self =
           RegExp(r'^Personal \((?:(.+?) )?(\d+) pies\)$').firstMatch(value);
       if (self != null) {

@@ -27,6 +27,7 @@ interface DartEngine {
   creationConfirm(catalogJson: string, draftJson: string, unnamed: string, replacingJson?: string): string;
   demoCharacter(): string;
   quizRound(characterJson: string | null, catalogJson: string, seed: number): string;
+  quizLocalize(questionsJson: string, catalogJson: string): string;
   rollDie(sides: number): number;
   coinParts(cp: number): string;
   formatAmount(cp: number, labelsJson: string): string;
@@ -819,6 +820,11 @@ export function quizRound(character: CharacterJson | null, catalog: Catalog, see
   return JSON.parse(
     engine().quizRound(character === null ? null : JSON.stringify(character), catalogJson(catalog), seed),
   ) as QuizQuestion[];
+}
+
+/** La misma ronda, con los textos del idioma activo. No vuelve a sortear. */
+export function quizLocalize(questions: QuizQuestion[], catalog: Catalog): QuizQuestion[] {
+  return JSON.parse(engine().quizLocalize(JSON.stringify(questions), catalogJson(catalog))) as QuizQuestion[];
 }
 
 export function rollDie(sides: number): number {

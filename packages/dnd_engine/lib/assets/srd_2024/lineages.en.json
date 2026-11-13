@@ -49,37 +49,37 @@
     "features.0.effects.2.description": "You can spend 10 minutes casting Prestidigitation to create a Tiny clockwork device (AC 5, 1 HP) that produces one of the spell's effects when you activate it with a touch as a Bonus Action. You can have up to three devices at a time; each falls apart 8 hours after you create it or when you dismantle it with a touch as a Utilize action."
   },
   "tiefling-abyssal": {
-    "_es": "4aca0603",
+    "_es": "a839c435",
     "name": "Abyssal",
     "features.0.name": "Abyssal Legacy",
     "features.1.name": "Legacy Magic (level 3)",
     "features.2.name": "Legacy Magic (level 5)",
     "description": "Abyssal Legacy. Resistance to Poison and the magic of your lineage. You choose Intelligence, Wisdom, or Charisma as your spellcasting ability.",
     "features.0.description": "You gain Resistance to Poison damage and know a cantrip from your legacy.",
-    "features.1.description": "You learn a spell, once per Long Rest without expending a slot.",
-    "features.2.description": "You learn a spell, once per Long Rest without expending a slot."
+    "features.1.description": "You learn Ray of Sickness. Once per Long Rest, without expending a spell slot.",
+    "features.2.description": "You learn Hold Person. Once per Long Rest, without expending a spell slot."
   },
   "tiefling-chthonic": {
-    "_es": "fb709502",
+    "_es": "8026c3ed",
     "name": "Chthonic",
     "features.0.name": "Chthonic Legacy",
     "features.1.name": "Legacy Magic (level 3)",
     "features.2.name": "Legacy Magic (level 5)",
     "description": "Chthonic Legacy. Resistance to Necrotic damage and the magic of your lineage. You choose Intelligence, Wisdom, or Charisma as your spellcasting ability.",
     "features.0.description": "You gain Resistance to Necrotic damage and know a cantrip from your legacy.",
-    "features.1.description": "You learn a spell, once per Long Rest without expending a slot.",
-    "features.2.description": "You learn a spell, once per Long Rest without expending a slot."
+    "features.1.description": "You learn False Life. Once per Long Rest, without expending a spell slot.",
+    "features.2.description": "You learn Ray of Enfeeblement. Once per Long Rest, without expending a spell slot."
   },
   "tiefling-infernal": {
-    "_es": "69f981cc",
+    "_es": "49cb1200",
     "name": "Infernal",
     "features.0.name": "Infernal Legacy",
     "features.1.name": "Legacy Magic (level 3)",
     "features.2.name": "Legacy Magic (level 5)",
     "description": "Infernal Legacy. Resistance to Fire and the magic of your lineage. You choose Intelligence, Wisdom, or Charisma as your spellcasting ability.",
     "features.0.description": "You gain Resistance to Fire damage and know a cantrip from your legacy.",
-    "features.1.description": "You learn a spell, once per Long Rest without expending a slot.",
-    "features.2.description": "You learn a spell, once per Long Rest without expending a slot."
+    "features.1.description": "You learn Hellish Rebuke. Once per Long Rest, without expending a spell slot.",
+    "features.2.description": "You learn Darkness. Once per Long Rest, without expending a spell slot."
   },
   "goliath-cloud": {
     "_es": "8a959456",
@@ -129,7 +129,7 @@
   "goliath-storm": {
     "_es": "fae1215a",
     "name": "Storm Giant",
-    "features.0.name": "Thunderbolt Strike",
+    "features.0.name": "Storm's Thunder",
     "features.0.effects.0.name": "Giant Ancestry",
     "description": "Storm's Thunder. You strike back with a thunderclap, like storm giants.",
     "features.0.description": "When a creature within 60 feet of you deals damage to you, you can take a Reaction to deal 1d8 Thunder damage to it.",

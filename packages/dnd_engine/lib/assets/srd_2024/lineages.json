@@ -240,7 +240,7 @@
       {
         "level": 3,
         "name": "Magia del Legado (nivel 3)",
-        "description": "Aprendés un conjuro, una vez por descanso largo sin gastar espacio.",
+        "description": "Aprendés Rayo Nauseabundo. Una vez por descanso largo, sin gastar un espacio.",
         "effects": [
           {
             "type": "grantSpell",
@@ -253,7 +253,7 @@
       {
         "level": 5,
         "name": "Magia del Legado (nivel 5)",
-        "description": "Aprendés un conjuro, una vez por descanso largo sin gastar espacio.",
+        "description": "Aprendés Inmovilizar Persona. Una vez por descanso largo, sin gastar un espacio.",
         "effects": [
           {
             "type": "grantSpell",
@@ -292,7 +292,7 @@
       {
         "level": 3,
         "name": "Magia del Legado (nivel 3)",
-        "description": "Aprendés un conjuro, una vez por descanso largo sin gastar espacio.",
+        "description": "Aprendés Falsa Vida. Una vez por descanso largo, sin gastar un espacio.",
         "effects": [
           {
             "type": "grantSpell",
@@ -305,7 +305,7 @@
       {
         "level": 5,
         "name": "Magia del Legado (nivel 5)",
-        "description": "Aprendés un conjuro, una vez por descanso largo sin gastar espacio.",
+        "description": "Aprendés Rayo Debilitador. Una vez por descanso largo, sin gastar un espacio.",
         "effects": [
           {
             "type": "grantSpell",
@@ -344,7 +344,7 @@
       {
         "level": 3,
         "name": "Magia del Legado (nivel 3)",
-        "description": "Aprendés un conjuro, una vez por descanso largo sin gastar espacio.",
+        "description": "Aprendés Reprensión Infernal. Una vez por descanso largo, sin gastar un espacio.",
         "effects": [
           {
             "type": "grantSpell",
@@ -357,7 +357,7 @@
       {
         "level": 5,
         "name": "Magia del Legado (nivel 5)",
-        "description": "Aprendés un conjuro, una vez por descanso largo sin gastar espacio.",
+        "description": "Aprendés Oscuridad. Una vez por descanso largo, sin gastar un espacio.",
         "effects": [
           {
             "type": "grantSpell",

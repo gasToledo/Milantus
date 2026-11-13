@@ -1437,7 +1437,13 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
-- Sin cambios.
+- El Quiz corrige preguntas que tenían más de una respuesta o que se
+  delataban: la CA de la armadura incluye el modificador de Destreza, el daño
+  versátil no se ofrece como otra opción, los alcances «Personal» no se mezclan
+  con «Personal (forma)», y un estado que incluye a otro no se usa de
+  distractor. Las preguntas de clase nombran la clase, también en multiclase y
+  para rasgos de niveles que todavía no se tienen. Cambiar de idioma a mitad
+  de ronda no cambia las preguntas, solo el texto.
 
 ### Eliminado
 

@@ -1,6 +1,6 @@
 {
   "champion": {
-    "_es": "6cbd59bb",
+    "_es": "2eff7eb9",
     "name": "Champion",
     "features.0.name": "Improved Critical",
     "features.0.effects.0.name": "Improved Critical",
@@ -22,11 +22,11 @@
     "features.2.description": "You adopt a second Fighting Style as a feat.",
     "features.2.effects.0.description": "You gain a second Fighting Style feat.",
     "features.3.description": "At the start of your turn in combat, you gain Heroic Inspiration if you don't already have it.",
-    "features.3.effects.0.description": "In combat, when your turn starts, you gain Inspiration if you didn't have it.",
+    "features.3.effects.0.description": "In combat, when your turn starts, you gain Heroic Inspiration if you didn't have it.",
     "features.4.description": "Your attack rolls with weapons and Unarmed Strikes score a Critical Hit on a roll of 18–20.",
     "features.4.effects.0.description": "Your attack rolls with weapons and Unarmed Strikes score a Critical Hit on an 18, 19, or 20 on the d20.",
-    "features.5.description": "At the start of each of your turns, you regain Hit Points if you have less than half left, and you have Advantage on Death Saving Throws.",
-    "features.5.effects.0.description": "You regain HP at the start of your turn if you are below half; Advantage on Death Saving Throws.",
+    "features.5.description": "At the start of each of your turns, if you are Bloodied, you regain Hit Points, and you have Advantage on Death Saving Throws.",
+    "features.5.effects.0.description": "If you are Bloodied at the start of your turn, you regain Hit Points; Advantage on Death Saving Throws.",
     "features.2.effects.1.name": "Fighting Style"
   },
   "battle-master": {
@@ -348,8 +348,8 @@
     "features.7.name": "Supreme Healing",
     "features.7.effects.0.name": "Supreme Healing",
     "description": "You channel the positive energy that sustains all life, excelling at healing and protection.",
-    "features.0.description": "When you restore Hit Points with a level 1+ spell, the creature regains an extra 2 HP plus the spell's level.",
-    "features.0.effects.0.description": "Your healing spells add 2 + the spell's level in HP.",
+    "features.0.description": "When you restore Hit Points with a level 1+ spell, the creature regains an extra 2 Hit Points plus the spell's level.",
+    "features.0.effects.0.description": "Your healing spells add 2 Hit Points plus the spell's level.",
     "features.1.description": "You expend Channel Divinity to distribute healing Hit Points among nearby creatures.",
     "features.1.effects.0.description": "Distributes healing HP (5 × Cleric level) among nearby creatures, up to half their maximum.",
     "features.2.description": "You always have Aid, Bless, Cure Wounds, and Lesser Restoration prepared. They don't count against the number of spells you can prepare.",
@@ -481,7 +481,7 @@
     "features.2.effects.1.description": "Natural Recovery use."
   },
   "circle-moon": {
-    "_es": "f15ac1ff",
+    "_es": "29cae6c2",
     "name": "Circle of the Moon",
     "features.0.name": "Circle Forms",
     "features.0.effects.0.name": "Circle Forms",
@@ -872,7 +872,7 @@
     "features.3.effects.0.description": "Your single-target spells can extend to your nearby companion."
   },
   "fey-wanderer": {
-    "_es": "c3584daa",
+    "_es": "ff5ebad5",
     "name": "Fey Wanderer",
     "features.0.name": "Dreadful Strikes",
     "features.0.effects.0.name": "Dreadful Strikes",
@@ -912,7 +912,7 @@
     "features.8.effects.1.description": "Free castings of Misty Step."
   },
   "gloom-stalker": {
-    "_es": "26ccf0db",
+    "_es": "cc3a6a60",
     "name": "Gloom Stalker",
     "features.0.name": "Dread Ambusher / Umbral Sight",
     "features.0.effects.1.name": "Dread Ambusher: Ambusher's Leap",
@@ -995,7 +995,7 @@
     "features.4.effects.0.description": "You react to an enemy spell by negating it and learning it temporarily."
   },
   "assassin": {
-    "_es": "8c79a4c5",
+    "_es": "4a576a47",
     "name": "Assassin",
     "features.0.name": "Assassin's Tools",
     "features.1.name": "Assassinate",
@@ -1013,7 +1013,7 @@
     "features.1.description": "Advantage on Initiative and, in the first round, Advantage against creatures that haven't acted and extra damage equal to your Rogue level.",
     "features.1.effects.0.description": "You have Advantage on Initiative rolls.",
     "features.1.effects.1.description": "During the first round of each combat, you have Advantage on attack rolls against any creature that hasn't taken a turn yet. If your Sneak Attack hits any target during that round, the target takes extra damage of the weapon's type equal to your Rogue level.",
-    "features.2.description": "Masterful Mimicry and Roving Aim.",
+    "features.2.description": "You can unerringly mimic the speech or handwriting of someone you have studied for at least 1 hour, and Steady Aim doesn't reduce your Speed to 0.",
     "features.2.effects.0.description": "You can unerringly mimic another person's speech, handwriting, or both, if you have spent at least 1 hour studying them.",
     "features.2.effects.1.description": "Your Speed isn't reduced to 0 by using Steady Aim.",
     "features.3.description": "You apply poisons more effectively, and your poisoned weapons weaken targets.",
@@ -1188,7 +1188,7 @@
     "features.7.name": "Hurl Through Hell",
     "features.7.effects.0.name": "Hurl Through Hell",
     "description": "You made a pact with a being of the Lower Planes, gaining power in exchange for service.",
-    "features.0.description": "When you reduce an enemy to 0 HP, you gain Temporary Hit Points equal to your Charisma plus your Warlock level.",
+    "features.0.description": "When you reduce an enemy to 0 Hit Points, you gain Temporary Hit Points equal to your Charisma plus your Warlock level.",
     "features.0.effects.0.description": "When you kill an enemy, you gain Temporary Hit Points = CHA + Warlock level.",
     "features.1.description": "You always have Burning Hands, Command, Scorching Ray, and Suggestion prepared. They don't count against the number of spells you can prepare.",
     "features.2.description": "You always have Fireball and Stinking Cloud prepared. They don't count against the number of spells you can prepare.",

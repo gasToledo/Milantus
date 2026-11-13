@@ -1121,12 +1121,12 @@
       },
       {
         "level": 7,
-        "name": "Talentos Fiables",
-        "description": "Tus pruebas con competencia rara vez fallan.",
+        "name": "Talento Fiable",
+        "description": "Cuando hacés una prueba de característica que use una de tus competencias en habilidades o con herramientas, tratás cualquier resultado del d20 de 9 o menos como un 10.",
         "effects": [
           {
             "type": "passiveTrait",
-            "name": "Talentos Fiables",
+            "name": "Talento Fiable",
             "description": "Cuando hacés una prueba de característica que use una de tus competencias en habilidades o con herramientas, tratás cualquier resultado del d20 de 9 o menos como un 10."
           }
         ]
@@ -1795,7 +1795,7 @@
       {
         "level": 4,
         "name": "Caída Lenta",
-        "description": "Reducís el daño por caída como reacción.",
+        "description": "Como reacción al caer, reducís el daño de caída en 5 × tu nivel de Monje.",
         "effects": [
           {
             "type": "passiveTrait",
@@ -1829,7 +1829,7 @@
       },
       {
         "level": 6,
-        "name": "Movimiento sin Armadura (mejora)",
+        "name": "Movimiento sin Armadura (+15 pies)",
         "description": "El bono de velocidad sin armadura aumenta a +15 pies.",
         "effects": [
           {

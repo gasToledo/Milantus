@@ -4,9 +4,9 @@ import 'dart:io';
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:test/test.dart';
 
-List<Map<String, dynamic>> _catalogo(String nombre) =>
-    (jsonDecode(File('lib/assets/srd_2024/$nombre.json').readAsStringSync())
-            as List)
+List<Map<String, dynamic>> _catalogo(String nombre) => (jsonDecode(
+      File('lib/assets/srd_2024/$nombre.json').readAsStringSync(),
+    ) as List)
         .cast<Map<String, dynamic>>();
 
 void main() {
@@ -43,7 +43,18 @@ void main() {
     );
     expect(
       vocabularyEnglish(VocabularyField.range, 'Cono de 15 pies'),
-      '15-foot cone',
+      '15-foot Cone',
+    );
+    expect(
+      vocabularyEnglish(
+        VocabularyField.range,
+        'Personal (emanación de 30 pies)',
+      ),
+      'Self (30-foot Emanation)',
+    );
+    expect(
+      vocabularyEnglish(VocabularyField.range, 'Personal (cono de 15 pies)'),
+      'Self (15-foot Cone)',
     );
     expect(
       vocabularyEnglish(
@@ -78,18 +89,20 @@ void main() {
 
   test('la superposición no puede traducir vocabulario cerrado', () {
     final conjuro = _catalogo('spells').first;
-    final problemas = translationProblems('spells', [
-      conjuro,
-    ], {
-      conjuro['id'] as String: {
-        translationFingerprintKey: contentFingerprint(conjuro, [
-          'name',
-          'school',
-        ]),
-        'name': 'X',
-        'school': 'Y',
+    final problemas = translationProblems(
+      'spells',
+      [conjuro],
+      {
+        conjuro['id'] as String: {
+          translationFingerprintKey: contentFingerprint(conjuro, [
+            'name',
+            'school',
+          ]),
+          'name': 'X',
+          'school': 'Y',
+        },
       },
-    });
+    );
     expect(problemas, [contains('«school» es vocabulario cerrado')]);
   });
 }

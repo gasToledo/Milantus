@@ -175,9 +175,9 @@ void main() {
     expect(dadoDeSuperioridad(18), 'd12');
   });
 
-  test('Pícaro: Talentos Fiables se obtiene a nivel 7, no a nivel 8', () {
-    expect(levelOf('rogue', 'Talentos Fiables'), 7);
-    expect(featureNames('rogue'), isNot(contains('Talento Fiable')));
+  test('Pícaro: Talento Fiable se obtiene a nivel 7, no a nivel 8', () {
+    expect(levelOf('rogue', 'Talento Fiable'), 7);
+    expect(featureNames('rogue'), isNot(contains('Talentos Fiables')));
   });
 
   test('Mago: Adepto en Rituales es un rasgo de nivel 1', () {
