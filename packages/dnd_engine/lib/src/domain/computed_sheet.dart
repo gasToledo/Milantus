@@ -794,6 +794,9 @@ class Spellcasting {
   final Ability ability;
   final CasterProgression progression;
   final SpellPreparation preparation;
+
+  /// Cuándo se cambian los preparados: lo dice la clase, no la pantalla.
+  final PreparedSwap preparedSwap;
   final String spellList;
 
   /// CD de salvación = 8 + competencia + mod. de característica de lanzamiento.
@@ -815,6 +818,7 @@ class Spellcasting {
     required this.ability,
     required this.progression,
     required this.preparation,
+    this.preparedSwap = PreparedSwap.longRestAll,
     required this.spellList,
     required this.saveDc,
     required this.attackBonus,
@@ -828,6 +832,7 @@ class Spellcasting {
     Ability? ability,
     CasterProgression? progression,
     SpellPreparation? preparation,
+    PreparedSwap? preparedSwap,
     String? spellList,
     int? saveDc,
     int? attackBonus,
@@ -839,6 +844,7 @@ class Spellcasting {
         ability: ability ?? this.ability,
         progression: progression ?? this.progression,
         preparation: preparation ?? this.preparation,
+        preparedSwap: preparedSwap ?? this.preparedSwap,
         spellList: spellList ?? this.spellList,
         saveDc: saveDc ?? this.saveDc,
         attackBonus: attackBonus ?? this.attackBonus,
@@ -851,6 +857,7 @@ class Spellcasting {
         'ability': ability.name,
         'progression': progression.toJson(),
         'preparation': preparation.toJson(),
+        'preparedSwap': preparedSwap.toJson(),
         'spellList': spellList,
         'saveDc': saveDc,
         'attackBonus': attackBonus,

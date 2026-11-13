@@ -2161,6 +2161,7 @@
             "ability": "intelligence",
             "progression": "full",
             "preparation": "prepared",
+            "preparedSwap": "longRestAll",
             "spellList": "wizard",
             "cantripsKnown": 3
           },
@@ -2539,6 +2540,7 @@
             "ability": "wisdom",
             "progression": "full",
             "preparation": "prepared",
+            "preparedSwap": "longRestAll",
             "spellList": "cleric",
             "cantripsKnown": 3
           },
@@ -2857,6 +2859,7 @@
             "ability": "wisdom",
             "progression": "full",
             "preparation": "prepared",
+            "preparedSwap": "longRestAll",
             "spellList": "druid",
             "cantripsKnown": 2
           },
@@ -3293,6 +3296,7 @@
             "ability": "charisma",
             "progression": "full",
             "preparation": "prepared",
+            "preparedSwap": "levelUpOne",
             "spellList": "bard",
             "cantripsKnown": 2
           },
@@ -3581,6 +3585,7 @@
             "ability": "charisma",
             "progression": "full",
             "preparation": "prepared",
+            "preparedSwap": "levelUpOne",
             "spellList": "sorcerer",
             "cantripsKnown": 4
           },
@@ -3832,6 +3837,7 @@
             "ability": "charisma",
             "progression": "pact",
             "preparation": "prepared",
+            "preparedSwap": "levelUpOne",
             "spellList": "warlock",
             "cantripsKnown": 2
           },
@@ -4256,6 +4262,7 @@
             "ability": "charisma",
             "progression": "half",
             "preparation": "prepared",
+            "preparedSwap": "longRestOne",
             "spellList": "paladin",
             "cantripsKnown": 0
           },
@@ -4640,6 +4647,7 @@
             "ability": "wisdom",
             "progression": "half",
             "preparation": "prepared",
+            "preparedSwap": "longRestOne",
             "spellList": "ranger",
             "cantripsKnown": 0
           },
@@ -4998,6 +5006,7 @@
             "ability": "intelligence",
             "progression": "half",
             "preparation": "prepared",
+            "preparedSwap": "longRestAll",
             "spellList": "artificer",
             "cantripsKnown": 2,
             "cantripIncreases": [

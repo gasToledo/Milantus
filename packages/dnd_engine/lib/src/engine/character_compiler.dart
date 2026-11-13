@@ -1641,6 +1641,7 @@ class CharacterCompiler {
       ability: sc.ability,
       progression: sc.progression,
       preparation: sc.preparation,
+      preparedSwap: sc.preparedSwap,
       spellList: sc.spellList,
       saveDc: 8 + profBonus + abilityMod,
       attackBonus: profBonus + abilityMod,

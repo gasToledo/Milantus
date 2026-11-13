@@ -82,7 +82,8 @@ enum InnateSpellUse {
 }
 
 enum SpellPreparation {
-  /// Prepara conjuros de toda la lista de clase tras un descanso (Clérigo, Druida, Mago…).
+  /// Prepara conjuros de toda la lista de clase (Clérigo, Druida, Mago…).
+  /// Cuándo se cambian lo dice [PreparedSwap], porque depende de la clase.
   prepared,
 
   /// Conoce un número fijo de conjuros (Hechicero, Bardo, Brujo 2024…).
@@ -90,6 +91,26 @@ enum SpellPreparation {
 
   static SpellPreparation fromJson(String? v) =>
       v == 'known' ? SpellPreparation.known : SpellPreparation.prepared;
+
+  String toJson() => name;
+}
+
+/// Cuándo se cambian los conjuros preparados. Cada clase lo dice distinto
+/// (SRD 5.2.1, «Cambiar los conjuros preparados»), así que es un dato de la
+/// clase y la UI no lo deduce.
+enum PreparedSwap {
+  /// Tras un descanso largo, los que quieras (Clérigo, Druida, Mago, Artífice).
+  longRestAll,
+
+  /// Tras un descanso largo, uno (Explorador, Paladín).
+  longRestOne,
+
+  /// Al subir un nivel de la clase, uno (Bardo, Brujo, Hechicero).
+  levelUpOne;
+
+  /// Desconocido o ausente es [longRestAll]: la regla general.
+  static PreparedSwap fromJson(String? v) => PreparedSwap.values
+      .firstWhere((e) => e.name == v, orElse: () => PreparedSwap.longRestAll);
 
   String toJson() => name;
 }

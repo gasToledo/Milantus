@@ -140,6 +140,7 @@ sealed class Effect {
               CasterProgression.fromJson(json['progression'] as String?),
           preparation:
               SpellPreparation.fromJson(json['preparation'] as String?),
+          preparedSwap: PreparedSwap.fromJson(json['preparedSwap'] as String?),
           spellList: json['spellList'] as String,
           cantripsKnown: json['cantripsKnown'] as int? ?? 0,
           cantripIncreases: (json['cantripIncreases'] as List?)
@@ -2205,6 +2206,9 @@ class SpellcastingEffect extends Effect {
   final CasterProgression progression;
   final SpellPreparation preparation;
 
+  /// Cuándo se cambian los preparados (solo dice algo con `prepared`).
+  final PreparedSwap preparedSwap;
+
   /// Id de la lista de conjuros de la que se nutre (p.ej. 'wizard').
   final String spellList;
 
@@ -2223,6 +2227,7 @@ class SpellcastingEffect extends Effect {
     required this.ability,
     required this.progression,
     required this.preparation,
+    this.preparedSwap = PreparedSwap.longRestAll,
     required this.spellList,
     this.cantripsKnown = 0,
     this.cantripIncreases,
@@ -2234,6 +2239,7 @@ class SpellcastingEffect extends Effect {
         'ability': ability.name,
         'progression': progression.toJson(),
         'preparation': preparation.toJson(),
+        'preparedSwap': preparedSwap.toJson(),
         'spellList': spellList,
         'cantripsKnown': cantripsKnown,
         if (cantripIncreases != null) 'cantripIncreases': cantripIncreases,
