@@ -8,6 +8,7 @@ class InMemorySettingsRepository implements SettingsRepository {
 
   @override
   Future<void> save(String userId, Map<String, dynamic> document) async {
-    _byUser[userId] = document;
+    // La misma regla que el `||` de jsonb del repositorio de Postgres.
+    _byUser[userId] = {...?_byUser[userId], ...document};
   }
 }

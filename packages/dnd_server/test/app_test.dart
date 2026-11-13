@@ -2045,6 +2045,46 @@ void main() {
       expect(response['settings'], {'imageProvider': 'azure'});
     });
 
+    test('un PUT sin sheetLayout conserva el que ya estaba guardado', () async {
+      final token = await login('subject-settings-merge');
+      Future<void> put(Map<String, dynamic> body) async {
+        await handler(
+          Request(
+            'PUT',
+            Uri.parse('http://localhost/api/settings'),
+            headers: {'cookie': 'dnd_session=$token'},
+            body: jsonEncode(body),
+          ),
+        );
+      }
+
+      final layout = {
+        'combate': [
+          ['hit-points'],
+          ['attacks'],
+          ['saves'],
+        ],
+        'personaje': null,
+      };
+      await put({'sheetLayout': layout});
+      // Lo que manda Flutter: su lista cerrada de campos, sin `sheetLayout`.
+      await put({'sortMode': 'manual'});
+
+      final response = jsonDecode(
+        await (await handler(
+          Request(
+            'GET',
+            Uri.parse('http://localhost/api/settings'),
+            headers: {'cookie': 'dnd_session=$token'},
+          ),
+        )).readAsString(),
+      );
+      expect(response['settings'], {
+        'sheetLayout': layout,
+        'sortMode': 'manual',
+      });
+    });
+
     test('los ajustes de dos cuentas no se mezclan', () async {
       final tokenA = await login('subject-settings-a');
       await handler(

@@ -316,7 +316,8 @@ class FakeApiServer {
       return _json({'settings': settings});
     }
     if (method == 'PUT' && path == '/api/settings') {
-      settings = _body(request);
+      // Se combina como en el servidor (`||` de jsonb), no se reemplaza.
+      settings = {...?settings, ..._body(request)};
       return _json({'status': 'ok'});
     }
 

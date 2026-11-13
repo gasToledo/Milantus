@@ -7,6 +7,9 @@ abstract class SettingsRepository {
   /// `null` si la cuenta todavía no guardó ningún ajuste.
   Future<Map<String, dynamic>?> find(String userId);
 
+  /// Combina [document] con lo guardado (primer nivel): lo que llega
+  /// reemplaza sus claves y las demás quedan. Ningún cliente borra una clave
+  /// mandando el documento sin ella.
   Future<void> save(String userId, Map<String, dynamic> document);
 }
 
@@ -35,7 +38,12 @@ class PostgresSettingsRepository implements SettingsRepository {
         INSERT INTO account_settings (user_id, document, updated_at)
         VALUES (@userId, @document, now())
         ON CONFLICT (user_id)
-        DO UPDATE SET document = excluded.document, updated_at = now()
+        DO UPDATE SET
+          -- Se combina y no se reemplaza: Flutter guarda con una lista cerrada
+          -- de campos (`AppSettings.toJson`) y, si reemplazara, cada guardado
+          -- suyo borraría las claves que solo conoce /v2 (`sheetLayout`).
+          document = account_settings.document || excluded.document,
+          updated_at = now()
       '''),
       parameters: {
         'userId': TypedValue(Type.uuid, userId),
