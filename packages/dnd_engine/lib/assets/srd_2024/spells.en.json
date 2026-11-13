@@ -5,30 +5,35 @@
     "description": "Minor natural effect: predict the weather, make a plant bloom, snuff out or light a small fire."
   },
   "vicious-mockery": {
-    "_es": "4196c257",
+    "_es": "dcbd1ae6",
     "name": "Vicious Mockery",
-    "description": "WIS save or the target takes 1d6 Psychic damage and has Disadvantage on its next attack roll. Scales with level."
+    "description": "WIS save or the target takes 1d6 Psychic damage and has Disadvantage on its next attack roll.",
+    "higherLevel": "The damage increases by 1d6 when you reach levels 5 (2d6), 11 (3d6), and 17 (4d6)."
   },
   "shocking-grasp": {
-    "_es": "f7efdb2a",
+    "_es": "57d70c77",
     "name": "Shocking Grasp",
-    "description": "Melee spell attack; 1d8 Lightning damage, and the target can't take Reactions until its next turn. Advantage if it wears metal."
+    "description": "Melee spell attack; 1d8 Lightning damage, and the target can't take Reactions until its next turn. Advantage if it wears metal.",
+    "higherLevel": "The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8)."
   },
   "eldritch-blast": {
-    "_es": "17e61a69",
+    "_es": "c78f19c4",
     "name": "Eldritch Blast",
-    "description": "Ranged spell attack; 1d10 Force damage. Extra beams at levels 5, 11, and 17."
+    "description": "Ranged spell attack; 1d10 Force damage.",
+    "higherLevel": "The spell creates two beams at level 5, three beams at level 11, and four beams at level 17. You can direct the beams at the same target or at different ones. Make a separate attack roll for each beam."
   },
   "starry-wisp": {
-    "_es": "6d86c024",
+    "_es": "f651f7e5",
     "name": "Starry Wisp",
-    "description": "Ranged spell attack for 1d8 Radiant damage; on a hit, the target sheds Dim Light and can't benefit from the Invisible condition."
+    "description": "Ranged spell attack for 1d8 Radiant damage; on a hit, the target sheds Dim Light and can't benefit from the Invisible condition.",
+    "higherLevel": "The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8)."
   },
   "true-strike": {
-    "_es": "b7fd67ca",
+    "_es": "b9cc8770",
     "name": "True Strike",
     "description": "You make an attack with a weapon imbued with radiant energy, using your spellcasting ability for the attack and damage rolls.",
-    "components": "S, M (a weapon with which you have proficiency and that is worth 1+ CP)"
+    "components": "S, M (a weapon with which you have proficiency and that is worth 1+ CP)",
+    "higherLevel": "Whether you deal Radiant damage or the weapon's normal damage type, the attack deals extra Radiant damage when you reach levels 5 (1d6), 11 (2d6), and 17 (3d6)."
   },
   "guidance": {
     "_es": "c656a101",
@@ -42,9 +47,10 @@
     "components": "S, M (a bit of fleece)"
   },
   "sacred-flame": {
-    "_es": "e815a951",
+    "_es": "fff0a84a",
     "name": "Sacred Flame",
-    "description": "The target makes a DEX save or takes 1d8 Radiant damage; ignores cover. Scales with level."
+    "description": "The target makes a DEX save or takes 1d8 Radiant damage; ignores cover.",
+    "higherLevel": "The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8)."
   },
   "dancing-lights": {
     "_es": "f54ea5cd",
@@ -70,15 +76,17 @@
     "components": "S, M (a copper wire)"
   },
   "spare-the-dying": {
-    "_es": "fbd22424",
+    "_es": "06573916",
     "name": "Spare the Dying",
-    "description": "You touch a creature with 0 HP and stabilize it. Also affects Undead, with a save."
+    "description": "You touch a creature with 0 HP and stabilize it. Also affects Undead, with a save.",
+    "higherLevel": "The range doubles when you reach levels 5 (30 feet), 11 (60 feet), and 17 (120 feet)."
   },
   "shillelagh": {
-    "_es": "12c4c53d",
+    "_es": "a6cf095e",
     "name": "Shillelagh",
     "description": "You imbue a club or quarterstaff: use your spellcasting ability instead of Strength for its attack and damage rolls, and its damage die becomes a d8. The damage can be Force or the weapon's normal type, your choice.",
-    "components": "V, S, M (mistletoe)"
+    "components": "V, S, M (mistletoe)",
+    "higherLevel": "The damage die changes when you reach levels 5 (d10), 11 (d12), and 17 (2d6)."
   },
   "prestidigitation": {
     "_es": "c17f9967",
@@ -86,19 +94,22 @@
     "description": "Small minor magical effects: sparks, cleaning or soiling, flavors, and so on."
   },
   "produce-flame": {
-    "_es": "60b063a9",
+    "_es": "04ec730c",
     "name": "Produce Flame",
-    "description": "A flame in your hand sheds light and burns nothing. Until the spell ends, you can take a Magic action to hurl fire at a creature or object within 60 feet: ranged spell attack for 1d8 Fire damage. Scales with character level."
+    "description": "A flame in your hand sheds light and burns nothing. Until the spell ends, you can take a Magic action to hurl fire at a creature or object within 60 feet: ranged spell attack for 1d8 Fire damage.",
+    "higherLevel": "The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8)."
   },
   "ray-of-frost": {
-    "_es": "6e07a304",
+    "_es": "25cf9d0f",
     "name": "Ray of Frost",
-    "description": "Ranged spell attack; 1d8 Cold damage, and the target's Speed is reduced by 10 feet."
+    "description": "Ranged spell attack; 1d8 Cold damage, and the target's Speed is reduced by 10 feet.",
+    "higherLevel": "The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8)."
   },
   "fire-bolt": {
-    "_es": "0922bde2",
+    "_es": "82ff89dd",
     "name": "Fire Bolt",
-    "description": "Ranged spell attack; 1d10 Fire damage. Scales at levels 5, 11, and 17."
+    "description": "Ranged spell attack; 1d10 Fire damage.",
+    "higherLevel": "The damage increases by 1d10 when you reach levels 5 (2d10), 11 (3d10), and 17 (4d10)."
   },
   "mending": {
     "_es": "a9dfa201",
@@ -112,14 +123,16 @@
     "description": "The target adds 1d4 to one saving throw of its choice within the minute. Concentration."
   },
   "poison-spray": {
-    "_es": "44467052",
+    "_es": "0a584211",
     "name": "Poison Spray",
-    "description": "You spray a toxic mist: make a ranged spell attack against the target. On a hit, it takes 1d12 Poison damage. Scales with level."
+    "description": "You spray a toxic mist: make a ranged spell attack against the target. On a hit, it takes 1d12 Poison damage.",
+    "higherLevel": "The damage increases by 1d12 when you reach levels 5 (2d12), 11 (3d12), and 17 (4d12)."
   },
   "acid-splash": {
-    "_es": "24721c79",
+    "_es": "1e8395e4",
     "name": "Acid Splash",
-    "description": "You hurl a bubble of acid; up to two nearby creatures make a DEX save or take 1d6 Acid damage. Scales with level."
+    "description": "You hurl a bubble of acid; up to two nearby creatures make a DEX save or take 1d6 Acid damage.",
+    "higherLevel": "The damage increases by 1d6 when you reach levels 5 (2d6), 11 (3d6), and 17 (4d6)."
   },
   "thaumaturgy": {
     "_es": "60e4c2ba",
@@ -127,9 +140,10 @@
     "description": "You manifest a minor sign of supernatural power: a booming voice, flickering flames, harmless tremors, and so on."
   },
   "chill-touch": {
-    "_es": "6125bcac",
+    "_es": "7fde59f1",
     "name": "Chill Touch",
-    "description": "You channel the chill of the grave and make a melee spell attack against a target within reach. On a hit, it takes 1d10 Necrotic damage and can't regain Hit Points until the end of your next turn. The damage increases to 2d10 at level 5, 3d10 at level 11, and 4d10 at level 17."
+    "description": "You channel the chill of the grave and make a melee spell attack against a target within reach. On a hit, it takes 1d10 Necrotic damage and can't regain Hit Points until the end of your next turn.",
+    "higherLevel": "The damage increases by 1d10 when you reach levels 5 (2d10), 11 (3d10), and 17 (4d10)."
   },
   "goodberry": {
     "_es": "3667f438",
@@ -138,10 +152,11 @@
     "components": "V, S, M (a sprig of mistletoe)"
   },
   "bless": {
-    "_es": "745b09d2",
+    "_es": "9df9e4cd",
     "name": "Bless",
-    "description": "Three creatures add 1d4 to attack rolls and saving throws (+1 target per higher slot).",
-    "components": "V, S, M (a Holy Symbol worth 5+ GP)"
+    "description": "Three creatures add 1d4 to attack rolls and saving throws.",
+    "components": "V, S, M (a Holy Symbol worth 5+ GP)",
+    "higherLevel": "You can target one additional creature for each spell slot level above 1."
   },
   "feather-fall": {
     "_es": "8886e0e2",
@@ -156,9 +171,10 @@
     "components": "V, S, M (a pinch of soot and salt)"
   },
   "cure-wounds": {
-    "_es": "7c183ba9",
+    "_es": "99adc3ce",
     "name": "Cure Wounds",
-    "description": "Restores 2d8 + spellcasting modifier HP (+2d8 per higher slot)."
+    "description": "Restores 2d8 + spellcasting modifier HP.",
+    "higherLevel": "The healing increases by 2d8 for each spell slot level above 1."
   },
   "detect-magic": {
     "_es": "7986c9e2",
@@ -171,9 +187,10 @@
     "description": "You change your appearance (clothing, features, apparent height) for up to 1 hour. Physical contact or careful inspection reveals the ruse."
   },
   "charm-person": {
-    "_es": "341d153b",
+    "_es": "73e93801",
     "name": "Charm Person",
-    "description": "A Humanoid you can see makes a WIS save or has the Charmed condition by you, regarding you as a friendly acquaintance, for up to 1 hour."
+    "description": "A Humanoid you can see makes a WIS save or has the Charmed condition by you, regarding you as a friendly acquaintance, for up to 1 hour.",
+    "higherLevel": "You can target one additional creature for each spell slot level above 1."
   },
   "entangle": {
     "_es": "92579ffc",
@@ -209,39 +226,46 @@
     "components": "V, S, M (a pearl worth 100+ GP)"
   },
   "inflict-wounds": {
-    "_es": "160a2e3b",
+    "_es": "6bc58c2f",
     "name": "Inflict Wounds",
-    "description": "You touch a creature, which makes a CON save: on a failure it takes 2d10 Necrotic damage, or half as much on a success. Scales with level."
+    "description": "You touch a creature, which makes a CON save: on a failure it takes 2d10 Necrotic damage, or half as much on a success.",
+    "higherLevel": "The damage increases by 1d10 for each spell slot level above 1."
   },
   "burning-hands": {
-    "_es": "5eb5f678",
+    "_es": "e7613736",
     "name": "Burning Hands",
-    "description": "Cone of fire; DEX save for half. 3d6 damage (+1d6 per higher slot)."
+    "description": "Cone of fire; DEX save for half. 3d6 damage.",
+    "higherLevel": "The damage increases by 1d6 for each spell slot level above 1."
   },
   "hunters-mark": {
-    "_es": "decd3934",
+    "_es": "3ba13588",
     "name": "Hunter's Mark",
-    "description": "You magically mark a creature you can see within range as your quarry. Until the spell ends, you deal an extra 1d6 Force damage to it whenever you hit it with an attack roll, and you have Advantage on any Wisdom (Perception or Survival) check you make to find it. If its Hit Points drop to 0 before the spell ends, you can take a Bonus Action to move the mark to another creature you can see. With a level 3 or 4 slot, Concentration can last up to 8 hours, and with a level 5 or higher slot, up to 24 hours."
+    "description": "You magically mark a creature you can see within range as your quarry. Until the spell ends, you deal an extra 1d6 Force damage to it whenever you hit it with an attack roll, and you have Advantage on any Wisdom (Perception or Survival) check you make to find it. If its Hit Points drop to 0 before the spell ends, you can take a Bonus Action to move the mark to another creature you can see.",
+    "higherLevel": "Your Concentration can last longer with a spell slot of level 3-4 (up to 8 hours) or 5+ (up to 24 hours)."
   },
   "fog-cloud": {
-    "_es": "f468884a",
+    "_es": "5739a8fe",
     "name": "Fog Cloud",
-    "description": "You create a 20-foot sphere of fog that blocks vision (Heavily Obscured). Concentration."
+    "description": "You create a 20-foot sphere of fog that blocks vision (Heavily Obscured). Concentration.",
+    "higherLevel": "The fog's radius increases by 20 feet for each spell slot level above 1."
   },
   "thunderwave": {
-    "_es": "c180afaf",
+    "_es": "2ff01a57",
     "name": "Thunderwave",
-    "description": "A wave of force in a 15-foot Cube: 2d8 Thunder damage and a 10-foot push (CON save for half and no push). Scales."
+    "description": "A wave of force in a 15-foot Cube: 2d8 Thunder damage and a 10-foot push (CON save for half and no push).",
+    "higherLevel": "The damage increases by 1d8 for each spell slot level above 1."
   },
   "command": {
-    "_es": "d888fced",
+    "_es": "13fa68f8",
     "name": "Command",
-    "description": "You speak a one-word command; the target makes a WIS save or obeys it on its next turn (approach, drop, flee, and so on)."
+    "description": "You speak a one-word command; the target makes a WIS save or obeys it on its next turn (approach, drop, flee, and so on).",
+    "higherLevel": "You can affect one additional creature for each spell slot level above 1."
   },
   "healing-word": {
-    "_es": "5ca58bd5",
+    "_es": "3ac8528e",
     "name": "Healing Word",
-    "description": "Restores 2d4 + spellcasting modifier HP at range (+2d4 per higher slot)."
+    "description": "Restores 2d4 + spellcasting modifier HP at range.",
+    "higherLevel": "The healing increases by 2d4 for each spell slot level above 1."
   },
   "protection-from-evil-and-good": {
     "_es": "38804f48",
@@ -250,14 +274,16 @@
     "components": "V, S, M (a flask of Holy Water worth 25+ GP, which the spell consumes)"
   },
   "magic-missile": {
-    "_es": "f9dd6f10",
+    "_es": "23e42549",
     "name": "Magic Missile",
-    "description": "Three darts that hit automatically for 1d4 + 1 Force damage each. +1 dart per higher slot."
+    "description": "Three darts that hit automatically for 1d4 + 1 Force damage each.",
+    "higherLevel": "The spell creates one more dart for each spell slot level above 1."
   },
   "guiding-bolt": {
-    "_es": "54415cdc",
+    "_es": "003146ba",
     "name": "Guiding Bolt",
-    "description": "Ranged spell attack for 4d6 Radiant damage; the next attack roll against the target has Advantage. Scales."
+    "description": "Ranged spell attack for 4d6 Radiant damage; the next attack roll against the target has Advantage.",
+    "higherLevel": "The damage increases by 1d6 for each spell slot level above 1."
   },
   "expeditious-retreat": {
     "_es": "c2fc5980",
@@ -277,27 +303,31 @@
     "components": "V, S, M (a pinch of sand or rose petals)"
   },
   "longstrider": {
-    "_es": "6dfe3c17",
+    "_es": "4d023943",
     "name": "Longstrider",
     "description": "The target's Speed increases by 10 feet for 1 hour.",
-    "components": "V, S, M (a pinch of dirt)"
+    "components": "V, S, M (a pinch of dirt)",
+    "higherLevel": "You can target one additional creature for each spell slot level above 1."
   },
   "spiritual-weapon": {
-    "_es": "ef858949",
+    "_es": "8eb4bf47",
     "name": "Spiritual Weapon",
-    "description": "A spectral weapon that attacks for 1d8 + spellcasting modifier Force damage; you move it as a Bonus Action."
+    "description": "A spectral weapon that attacks for 1d8 + spellcasting modifier Force damage; you move it as a Bonus Action.",
+    "higherLevel": "The damage increases by 1d8 for every slot level above 2."
   },
   "aid": {
-    "_es": "b6e4da4b",
+    "_es": "f6e9352e",
     "name": "Aid",
-    "description": "Up to three creatures increase their HP maximum and current HP by 5 for 8 hours. Scales with level.",
-    "components": "V, S, M (a strip of white cloth)"
+    "description": "Up to three creatures increase their HP maximum and current HP by 5 for 8 hours.",
+    "components": "V, S, M (a strip of white cloth)",
+    "higherLevel": "Each target's Hit Points increase by 5 for each spell slot level above 2."
   },
   "heat-metal": {
-    "_es": "68ec5355",
+    "_es": "ea074152",
     "name": "Heat Metal",
-    "description": "You make a metal object glow red-hot; whoever holds it takes 2d8 Fire damage and can drop it. Concentration. Scales.",
-    "components": "V, S, M (a piece of iron and a flame)"
+    "description": "You make a metal object glow red-hot; whoever holds it takes 2d8 Fire damage and can drop it. Concentration.",
+    "components": "V, S, M (a piece of iron and a flame)",
+    "higherLevel": "The damage increases by 1d8 for each spell slot level above 2."
   },
   "calm-emotions": {
     "_es": "a6307211",
@@ -310,22 +340,25 @@
     "description": "Your body becomes blurred; attack rolls against you have Disadvantage (unless the attacker doesn't rely on sight). Concentration."
   },
   "flaming-sphere": {
-    "_es": "07a3c1d5",
+    "_es": "a664f250",
     "name": "Flaming Sphere",
-    "description": "A sphere of fire you move each turn; it deals 2d6 Fire damage to whatever it touches. Concentration. Scales.",
-    "components": "V, S, M (a ball of wax)"
+    "description": "A sphere of fire you move each turn; it deals 2d6 Fire damage to whatever it touches. Concentration.",
+    "components": "V, S, M (a ball of wax)",
+    "higherLevel": "The damage increases by 1d6 for each spell slot level above 2."
   },
   "hold-person": {
-    "_es": "44ae356b",
+    "_es": "f5638fe6",
     "name": "Hold Person",
     "description": "A Humanoid makes a WIS save or has the Paralyzed condition; it repeats the save at the end of each turn.",
-    "components": "V, S, M (a straight piece of iron)"
+    "components": "V, S, M (a straight piece of iron)",
+    "higherLevel": "You can target one additional Humanoid for each spell slot level above 2."
   },
   "invisibility": {
-    "_es": "cc5846c8",
+    "_es": "67582cc9",
     "name": "Invisibility",
-    "description": "The target becomes Invisible until it attacks or casts a spell. +1 target per higher slot.",
-    "components": "V, S, M (an eyelash in gum arabic)"
+    "description": "The target becomes Invisible until it attacks or casts a spell.",
+    "components": "V, S, M (an eyelash in gum arabic)",
+    "higherLevel": "You can target one additional creature for each spell slot level above 2."
   },
   "levitate": {
     "_es": "dde972a9",
@@ -351,9 +384,10 @@
     "description": "You teleport up to 30 feet to an unoccupied space you can see."
   },
   "prayer-of-healing": {
-    "_es": "5ee8fbe4",
+    "_es": "0c077188",
     "name": "Prayer of Healing",
-    "description": "Up to six creatures regain 2d8 + your spellcasting ability modifier in HP. Scales."
+    "description": "Up to six creatures regain 2d8 + your spellcasting ability modifier in HP.",
+    "higherLevel": "The healing increases by 1d8 for each spell slot level above 2."
   },
   "gust-of-wind": {
     "_es": "554e8a77",
@@ -362,21 +396,24 @@
     "components": "V, S, M (a legume seed)"
   },
   "scorching-ray": {
-    "_es": "d1f4b04d",
+    "_es": "4e5e9bc1",
     "name": "Scorching Ray",
-    "description": "Three rays; a spell attack for each, 2d6 Fire damage. +1 ray per higher slot."
+    "description": "Three rays; a spell attack for each, 2d6 Fire damage.",
+    "higherLevel": "You create one additional ray for each spell slot level above 2."
   },
   "moonbeam": {
-    "_es": "5bfcdc9b",
+    "_es": "861dffc3",
     "name": "Moonbeam",
-    "description": "A 5-foot beam of silvery light you reposition each turn; 2d10 Radiant damage to anyone who enters it or starts inside. Concentration. Scales.",
-    "components": "V, S, M (a moonseed leaf)"
+    "description": "A 5-foot beam of silvery light you reposition each turn; 2d10 Radiant damage to anyone who enters it or starts inside. Concentration.",
+    "components": "V, S, M (a moonseed leaf)",
+    "higherLevel": "The damage increases by 1d10 for each spell slot level above 2."
   },
   "enhance-ability": {
-    "_es": "73e9c4db",
+    "_es": "a4ff0380",
     "name": "Enhance Ability",
     "description": "The target gains Advantage on checks with one ability (and extra benefits depending on which) for 1 hour. Concentration.",
-    "components": "V, S, M (fur or a feather)"
+    "components": "V, S, M (fur or a feather)",
+    "higherLevel": "You can target one additional creature for each spell slot level above 2. You can choose a different ability for each target."
   },
   "lesser-restoration": {
     "_es": "8fe303ad",
@@ -395,10 +432,11 @@
     "components": "V, S, M (a bit of spiderweb)"
   },
   "spider-climb": {
-    "_es": "4141c5dc",
+    "_es": "a4d2db9f",
     "name": "Spider Climb",
     "description": "The target can climb walls and ceilings with its hands free. Concentration.",
-    "components": "V, S, M (a drop of bitumen and a spider)"
+    "components": "V, S, M (a drop of bitumen and a spider)",
+    "higherLevel": "You can target one additional creature for each spell slot level above 2."
   },
   "see-invisibility": {
     "_es": "87b72148",
@@ -413,16 +451,18 @@
     "components": "V, S, M (a dried carrot)"
   },
   "animate-dead": {
-    "_es": "828a8968",
+    "_es": "07027efd",
     "name": "Animate Dead",
     "description": "You animate a Skeleton or Zombie under your control; you can reassert and extend control every 24 hours.",
-    "components": "V, S, M (a drop of blood, a piece of flesh, and a pinch of bone dust)"
+    "components": "V, S, M (a drop of blood, a piece of flesh, and a pinch of bone dust)",
+    "higherLevel": "You animate or reassert control over two additional Undead creatures for each spell slot level above 3. Each of the creatures must come from a different corpse or pile of bones."
   },
   "fireball": {
-    "_es": "a6e80a64",
+    "_es": "abc0f508",
     "name": "Fireball",
-    "description": "20-foot sphere; DEX save for half. 8d6 Fire damage (+1d6 per higher slot).",
-    "components": "V, S, M (a ball of bat guano and sulfur)"
+    "description": "20-foot sphere; DEX save for half. 8d6 Fire damage.",
+    "components": "V, S, M (a ball of bat guano and sulfur)",
+    "higherLevel": "The damage increases by 1d6 for each spell slot level above 3."
   },
   "counterspell": {
     "_es": "4e456c78",
@@ -430,36 +470,42 @@
     "description": "You attempt to interrupt a creature you can see within 60 feet as it casts a spell with Verbal, Somatic, or Material components. It makes a Constitution saving throw. On a failure, the spell has no effect and the action, Bonus Action, or Reaction used to cast it is wasted. If it used a spell slot, that slot is not expended."
   },
   "conjure-animals": {
-    "_es": "eee63745",
+    "_es": "9a5cd038",
     "name": "Conjure Animals",
-    "description": "You conjure nature spirits that appear as a Large pack of spectral animals in an unoccupied space you can see within range. You have Advantage on Strength saving throws while within 5 feet of the pack, and when you move on your turn you can move the pack up to 30 feet to another unoccupied space. Whenever the pack moves within 10 feet of a creature you can see, or a creature ends its turn there, you can force it to make a Dexterity saving throw: on a failure, it takes 3d10 Slashing damage. A creature makes this save only once per turn. With a higher-level slot, the damage increases by 1d10 for each level above 3."
+    "description": "You conjure nature spirits that appear as a Large pack of spectral animals in an unoccupied space you can see within range. You have Advantage on Strength saving throws while within 5 feet of the pack, and when you move on your turn you can move the pack up to 30 feet to another unoccupied space. Whenever the pack moves within 10 feet of a creature you can see, or a creature ends its turn there, you can force it to make a Dexterity saving throw: on a failure, it takes 3d10 Slashing damage. A creature makes this save only once per turn.",
+    "higherLevel": "The damage increases by 1d10 for each spell slot level above 3."
   },
   "dispel-magic": {
-    "_es": "81bbc4a1",
+    "_es": "7c758ad7",
     "name": "Dispel Magic",
-    "description": "Ends spells of level 3 or lower on a target; higher levels require an ability check."
+    "description": "Ends spells of level 3 or lower on a target; higher levels require an ability check.",
+    "higherLevel": "You automatically end a spell on the target if the spell's level is equal to or less than the level of the spell slot you use."
   },
   "spirit-guardians": {
-    "_es": "d2d98aa5",
+    "_es": "65ef0ed6",
     "name": "Spirit Guardians",
     "description": "Protective spirits; enemies in the aura take 3d8 damage (WIS save for half) and have reduced Speed.",
-    "components": "V, S, M (a prayer scroll)"
+    "components": "V, S, M (a prayer scroll)",
+    "higherLevel": "The damage increases by 1d8 for each spell slot level above 3."
   },
   "major-image": {
-    "_es": "ed533ae2",
+    "_es": "7b328a92",
     "name": "Major Image",
     "description": "You create an illusion with image, sound, smell, and temperature that you can move and alter. Concentration.",
-    "components": "V, S, M (a bit of fleece)"
+    "components": "V, S, M (a bit of fleece)",
+    "higherLevel": "The spell lasts until dispelled, without requiring Concentration, if cast with a level 4+ spell slot."
   },
   "bestow-curse": {
-    "_es": "28c8e05b",
+    "_es": "a7956ea5",
     "name": "Bestow Curse",
-    "description": "You curse a creature (WIS save) with a debilitating effect of your choice. Concentration."
+    "description": "You curse a creature (WIS save) with a debilitating effect of your choice. Concentration.",
+    "higherLevel": "If you cast this spell using a level 4 spell slot, you can maintain Concentration on it for up to 10 minutes. If you use a level 5+ spell slot, the spell doesn't require Concentration, and the duration becomes 8 hours (level 5-6 slot) or 24 hours (level 7-8 slot). If you use a level 9 spell slot, the spell lasts until dispelled."
   },
   "call-lightning": {
-    "_es": "125eb32d",
+    "_es": "f71d6ada",
     "name": "Call Lightning",
-    "description": "A storm cloud; as an action, you call down a bolt for 3d10 Lightning damage (DEX save for half). Concentration. Scales."
+    "description": "A storm cloud; as an action, you call down a bolt for 3d10 Lightning damage (DEX save for half). Concentration.",
+    "higherLevel": "The damage increases by 1d10 for each spell slot level above 3."
   },
   "tongues": {
     "_es": "68331e53",
@@ -485,9 +531,10 @@
     "components": "V, S, M (a rotten egg)"
   },
   "mass-healing-word": {
-    "_es": "5189e957",
+    "_es": "711117c4",
     "name": "Mass Healing Word",
-    "description": "Up to six creatures regain 2d4 + your spellcasting ability modifier in HP. Scales."
+    "description": "Up to six creatures regain 2d4 + your spellcasting ability modifier in HP.",
+    "higherLevel": "The healing increases by 1d4 for each spell slot level above 3."
   },
   "hypnotic-pattern": {
     "_es": "eed56752",
@@ -518,10 +565,11 @@
     "components": "V, S, M (a drop of molasses)"
   },
   "lightning-bolt": {
-    "_es": "c0cae803",
+    "_es": "cd0dc278",
     "name": "Lightning Bolt",
-    "description": "A 100-foot line: 8d6 Lightning damage (DEX save for half). Scales with level.",
-    "components": "V, S, M (a bit of fur and a crystal rod)"
+    "description": "A 100-foot line: 8d6 Lightning damage (DEX save for half).",
+    "components": "V, S, M (a bit of fur and a crystal rod)",
+    "higherLevel": "The damage increases by 1d6 for each spell slot level above 3."
   },
   "water-breathing": {
     "_es": "cd0097a4",
@@ -536,9 +584,10 @@
     "components": "V, S, M (a diamond worth 300+ GP, which the spell consumes)"
   },
   "vampiric-touch": {
-    "_es": "111d3775",
+    "_es": "463cc909",
     "name": "Vampiric Touch",
-    "description": "Melee spell attack for 3d6 Necrotic damage; you regain half as HP. Concentration. Scales."
+    "description": "Melee spell attack for 3d6 Necrotic damage; you regain half as HP. Concentration.",
+    "higherLevel": "The damage increases by 1d6 for each spell slot level above 3."
   },
   "sleet-storm": {
     "_es": "7f090fe6",
@@ -547,27 +596,31 @@
     "components": "V, S, M (a miniature umbrella)"
   },
   "fly": {
-    "_es": "e5eb64bb",
+    "_es": "bdd800d5",
     "name": "Fly",
-    "description": "The target gains a Fly Speed of 60 feet. +1 target per higher slot.",
-    "components": "V, S, M (a feather)"
+    "description": "The target gains a Fly Speed of 60 feet.",
+    "components": "V, S, M (a feather)",
+    "higherLevel": "You can target one additional creature for each spell slot level above 3."
   },
   "phantasmal-killer": {
-    "_es": "f402aa54",
+    "_es": "20a354ce",
     "name": "Phantasmal Killer",
-    "description": "Wisdom saving throw: on a failure, the target takes 4d10 Psychic damage and has Disadvantage on ability checks and attack rolls for the duration; on a success, it takes half as much damage and the spell ends. For the duration, it repeats the save at the end of each of its turns: on a failure it takes the damage again, and on a success the spell ends. Concentration. Scales."
+    "description": "Wisdom saving throw: on a failure, the target takes 4d10 Psychic damage and has Disadvantage on ability checks and attack rolls for the duration; on a success, it takes half as much damage and the spell ends. For the duration, it repeats the save at the end of each of its turns: on a failure it takes the damage again, and on a success the spell ends. Concentration.",
+    "higherLevel": "The damage increases by 1d10 for each spell slot level above 4."
   },
   "confusion": {
-    "_es": "f8ec373e",
+    "_es": "bfc7b39a",
     "name": "Confusion",
-    "description": "Creatures within 10 feet (WIS save) act randomly each turn. Concentration. The area scales.",
-    "components": "V, S, M (three nut shells)"
+    "description": "Creatures within 10 feet (WIS save) act randomly each turn. Concentration.",
+    "components": "V, S, M (three nut shells)",
+    "higherLevel": "The Sphere's radius increases by 5 feet for each spell slot level above 4."
   },
   "banishment": {
-    "_es": "42ed20b0",
+    "_es": "1e5fbe11",
     "name": "Banishment",
     "description": "The target (CHA save) is banished to a demiplane; if it is from another plane and the full minute passes, it doesn't return. Concentration.",
-    "components": "V, S, M (a pentacle)"
+    "components": "V, S, M (a pentacle)",
+    "higherLevel": "You can target one additional creature for each spell slot level above 4."
   },
   "fire-shield": {
     "_es": "d6394d0f",
@@ -581,15 +634,17 @@
     "description": "The target is Invisible even if it attacks or casts spells. Concentration."
   },
   "freedom-of-movement": {
-    "_es": "db987f53",
+    "_es": "ab797642",
     "name": "Freedom of Movement",
     "description": "The target ignores Difficult Terrain and can't be Restrained or Paralyzed; it frees itself from restraints. Lasts 1 hour.",
-    "components": "V, S, M (a leather strap)"
+    "components": "V, S, M (a leather strap)",
+    "higherLevel": "You can target one additional creature for each spell slot level above 4."
   },
   "blight": {
-    "_es": "9b5e3714",
+    "_es": "bc918403",
     "name": "Blight",
-    "description": "You drain a creature's vitality: 8d8 Necrotic damage (CON save for half); devastating against Plants. Scales."
+    "description": "You drain a creature's vitality: 8d8 Necrotic damage (CON save for half); devastating against Plants.",
+    "higherLevel": "The damage increases by 1d8 for each spell slot level above 4."
   },
   "polymorph": {
     "_es": "d935f92f",
@@ -598,10 +653,11 @@
     "components": "V, S, M (a caterpillar cocoon)"
   },
   "wall-of-fire": {
-    "_es": "46f58321",
+    "_es": "d3066b2a",
     "name": "Wall of Fire",
-    "description": "You raise a wall of flames; 5d8 Fire damage to anyone who crosses it or ends near its burning side. Concentration. Scales.",
-    "components": "V, S, M (a piece of charcoal)"
+    "description": "You raise a wall of flames; 5d8 Fire damage to anyone who crosses it or ends near its burning side. Concentration.",
+    "components": "V, S, M (a piece of charcoal)",
+    "higherLevel": "The damage increases by 1d8 for each spell slot level above 4."
   },
   "stoneskin": {
     "_es": "ca0d87ef",
@@ -620,37 +676,43 @@
     "description": "You teleport up to 500 feet to a place you picture, and you can bring one creature with you."
   },
   "ice-storm": {
-    "_es": "e447bc65",
+    "_es": "46928d6c",
     "name": "Ice Storm",
-    "description": "Hail pounds a 20-foot cylinder: Bludgeoning and Cold damage, and it leaves Difficult Terrain. Scales.",
-    "components": "V, S, M (a mitten)"
+    "description": "Hail pounds a 20-foot cylinder: Bludgeoning and Cold damage, and it leaves Difficult Terrain.",
+    "components": "V, S, M (a mitten)",
+    "higherLevel": "The Bludgeoning damage increases by 1d10 for each spell slot level above 4."
   },
   "animate-objects": {
-    "_es": "b412028c",
+    "_es": "83893ed8",
     "name": "Animate Objects",
-    "description": "You bring up to ten objects to life that attack at your command. Concentration. Scales."
+    "description": "You bring up to ten objects to life that attack at your command. Concentration.",
+    "higherLevel": "The creature's Slam damage increases by 1d4 (Medium or smaller), 1d6 (Large), or 1d12 (Huge) for each spell slot level above 5."
   },
   "flame-strike": {
-    "_es": "6c09aaeb",
+    "_es": "e5f3657f",
     "name": "Flame Strike",
-    "description": "A column of fire in a 10-foot-radius, 40-foot-high cylinder: Dexterity saving throw against 5d6 Fire damage plus 5d6 Radiant damage, or half as much on a success. Scales.",
-    "components": "V, S, M (a pinch of sulfur)"
+    "description": "A column of fire in a 10-foot-radius, 40-foot-high cylinder: Dexterity saving throw against 5d6 Fire damage plus 5d6 Radiant damage, or half as much on a success.",
+    "components": "V, S, M (a pinch of sulfur)",
+    "higherLevel": "The Fire damage and the Radiant damage increase by 1d6 for each spell slot level above 5."
   },
   "cone-of-cold": {
-    "_es": "517fd535",
+    "_es": "79371179",
     "name": "Cone of Cold",
-    "description": "A 60-foot Cone: 8d8 Cold damage (CON save for half). Scales.",
-    "components": "V, S, M (a small crystal or glass cone)"
+    "description": "A 60-foot Cone: 8d8 Cold damage (CON save for half).",
+    "components": "V, S, M (a small crystal or glass cone)",
+    "higherLevel": "The damage increases by 1d8 for each spell slot level above 5."
   },
   "mass-cure-wounds": {
-    "_es": "bdf3812b",
+    "_es": "802969c2",
     "name": "Mass Cure Wounds",
-    "description": "Up to six creatures in a 30-foot-radius sphere regain 5d8 + your spellcasting ability modifier in HP. Scales."
+    "description": "Up to six creatures in a 30-foot-radius sphere regain 5d8 + your spellcasting ability modifier in HP.",
+    "higherLevel": "The healing increases by 1d8 for each spell slot level above 5."
   },
   "dominate-person": {
-    "_es": "0d172e69",
+    "_es": "f5f0991d",
     "name": "Dominate Person",
-    "description": "A Humanoid (WIS save) has the Charmed condition and is under your mental control. Concentration. Scales."
+    "description": "A Humanoid (WIS save) has the Charmed condition and is under your mental control. Concentration.",
+    "higherLevel": "Your Concentration can last longer with a spell slot of level 6 (up to 10 minutes), 7 (up to 1 hour), or 8+ (up to 8 hours)."
   },
   "scrying": {
     "_es": "9188f96e",
@@ -659,10 +721,11 @@
     "components": "V, S, M (a focus worth 1,000+ GP, such as a crystal ball, mirror, or water-filled font)"
   },
   "hold-monster": {
-    "_es": "7bfeb2ad",
+    "_es": "c2cc5b26",
     "name": "Hold Monster",
-    "description": "A creature (WIS save) has the Paralyzed condition; it repeats the save each turn. Concentration. Scales.",
-    "components": "V, S, M (a straight piece of iron)"
+    "description": "A creature (WIS save) has the Paralyzed condition; it repeats the save each turn. Concentration.",
+    "components": "V, S, M (a straight piece of iron)",
+    "higherLevel": "You can target one additional creature for each spell slot level above 5."
   },
   "raise-dead": {
     "_es": "ca624114",
@@ -671,9 +734,10 @@
     "components": "V, S, M (a diamond worth 500+ GP, which the spell consumes)"
   },
   "geas": {
-    "_es": "f9102407",
+    "_es": "8837085d",
     "name": "Geas",
-    "description": "You lay a command on a creature for 30 days; if it disobeys, it takes Psychic damage. WIS save."
+    "description": "You lay a command on a creature for 30 days; if it disobeys, it takes Psychic damage. WIS save.",
+    "higherLevel": "If you use a level 7 or 8 spell slot, the duration is 365 days. If you use a level 9 spell slot, the spell lasts until it is ended by one of the spells mentioned above."
   },
   "wall-of-force": {
     "_es": "49126cb9",
@@ -688,15 +752,17 @@
     "components": "V, S, M (a cube of granite)"
   },
   "cloudkill": {
-    "_es": "d5710dff",
+    "_es": "80f9e8ab",
     "name": "Cloudkill",
-    "description": "A drifting 20-foot fog of poison; 5d8 Poison damage (CON save for half). Concentration. Scales."
+    "description": "A drifting 20-foot fog of poison; 5d8 Poison damage (CON save for half). Concentration.",
+    "higherLevel": "The damage increases by 1d8 for each spell slot level above 5."
   },
   "insect-plague": {
-    "_es": "8a2854c3",
+    "_es": "c1b92126",
     "name": "Insect Plague",
-    "description": "A 20-foot sphere of insects: Difficult Terrain, reduced visibility, and 4d10 Piercing damage. Concentration. Scales.",
-    "components": "V, S, M (a locust)"
+    "description": "A 20-foot sphere of insects: Difficult Terrain, reduced visibility, and 4d10 Piercing damage. Concentration.",
+    "components": "V, S, M (a locust)",
+    "higherLevel": "The damage increases by 1d10 for each spell slot level above 5."
   },
   "greater-restoration": {
     "_es": "c90bba6c",
@@ -715,10 +781,11 @@
     "description": "A wall of whirling blades of magical energy: it provides Three-Quarters Cover and its space is Difficult Terrain. A creature in its space, entering it, or ending its turn there makes a Dexterity saving throw against 6d10 Force damage, or half as much on a success. Once per turn. Concentration."
   },
   "circle-of-death": {
-    "_es": "298879b5",
+    "_es": "124ec4f3",
     "name": "Circle of Death",
-    "description": "A wave of negative energy in a 60-foot-radius sphere: Constitution saving throw against 8d8 Necrotic damage, or half as much on a success. Scales.",
-    "components": "V, S, M (the powder of a crushed black pearl worth 500+ GP)"
+    "description": "A wave of negative energy in a 60-foot-radius sphere: Constitution saving throw against 8d8 Necrotic damage, or half as much on a success.",
+    "components": "V, S, M (the powder of a crushed black pearl worth 500+ GP)",
+    "higherLevel": "The damage increases by 2d8 for each spell slot level above 6."
   },
   "harm": {
     "_es": "ed68cc6c",
@@ -726,16 +793,18 @@
     "description": "You deal 14d6 Necrotic damage (CON save for half); it reduces the target's HP maximum until it heals."
   },
   "disintegrate": {
-    "_es": "e3ebe7d9",
+    "_es": "382685fc",
     "name": "Disintegrate",
-    "description": "A green ray; 10d6 + 40 Force damage (DEX save). If it reduces a creature to 0 HP, the creature is reduced to dust. Scales.",
-    "components": "V, S, M (a lodestone and dust)"
+    "description": "A green ray; 10d6 + 40 Force damage (DEX save). If it reduces a creature to 0 HP, the creature is reduced to dust.",
+    "components": "V, S, M (a lodestone and dust)",
+    "higherLevel": "The damage increases by 3d6 for each spell slot level above 6."
   },
   "globe-of-invulnerability": {
-    "_es": "f6a03462",
+    "_es": "58ce2bea",
     "name": "Globe of Invulnerability",
     "description": "A 10-foot barrier blocks spells of level 5 or lower cast from outside. Concentration.",
-    "components": "V, S, M (a glass bead)"
+    "components": "V, S, M (a glass bead)",
+    "higherLevel": "The barrier blocks spells of 1 level higher for each spell slot level above 6."
   },
   "eyebite": {
     "_es": "078417e0",
@@ -749,21 +818,24 @@
     "components": "V, S, M (a magnifying glass)"
   },
   "chain-lightning": {
-    "_es": "7bd31ed0",
+    "_es": "9f3b8aae",
     "name": "Chain Lightning",
-    "description": "A bolt strikes one target and leaps to three others nearby: 10d8 Lightning damage (DEX save for half). Scales.",
-    "components": "V, S, M (three silver pins)"
+    "description": "A bolt strikes one target and leaps to three others nearby: 10d8 Lightning damage (DEX save for half).",
+    "components": "V, S, M (three silver pins)",
+    "higherLevel": "One additional bolt leaps from the first target to another target for each spell slot level above 6."
   },
   "heal": {
-    "_es": "151b6eb3",
+    "_es": "e5bdd481",
     "name": "Heal",
-    "description": "You restore 70 HP to a creature and end blindness, deafness, and diseases. Scales."
+    "description": "You restore 70 HP to a creature and end blindness, deafness, and diseases.",
+    "higherLevel": "The healing increases by 10 for each spell slot level above 6."
   },
   "mass-suggestion": {
-    "_es": "75a7efbd",
+    "_es": "661e0d27",
     "name": "Mass Suggestion",
     "description": "Up to twelve creatures (WIS save) follow a reasonable suggestion for 24 hours.",
-    "components": "V, M (a snake's tongue)"
+    "components": "V, M (a snake's tongue)",
+    "higherLevel": "The duration is longer with a spell slot of level 7 (10 days), 8 (30 days), or 9 (366 days)."
   },
   "true-seeing": {
     "_es": "b4e03b07",
@@ -772,10 +844,11 @@
     "components": "V, S, M (mushroom powder worth 25+ GP, which the spell consumes)"
   },
   "delayed-blast-fireball": {
-    "_es": "523f016f",
+    "_es": "4033534e",
     "name": "Delayed Blast Fireball",
-    "description": "A sphere that builds up fire each turn; when it detonates, it deals 12d6 or more Fire damage in 20 feet. Concentration. Scales.",
-    "components": "V, S, M (a ball of bat guano and sulfur)"
+    "description": "A sphere that builds up fire each turn; when it detonates, it deals 12d6 or more Fire damage in 20 feet. Concentration.",
+    "components": "V, S, M (a ball of bat guano and sulfur)",
+    "higherLevel": "The base damage increases by 1d6 for each spell slot level above 7."
   },
   "plane-shift": {
     "_es": "e7ecab0b",
@@ -789,9 +862,10 @@
     "description": "7d8 + 30 Necrotic damage (CON save for half); if it kills a Humanoid, it rises as a Zombie under your control."
   },
   "etherealness": {
-    "_es": "e5f76aba",
+    "_es": "6186d2d1",
     "name": "Etherealness",
-    "description": "You step into the Border Ethereal and can move through matter. Scales to bring others."
+    "description": "You step into the Border Ethereal and can move through matter.",
+    "higherLevel": "You can target up to three willing creatures (including yourself) for each spell slot level above 7. The creatures must be within 10 feet of you when you cast the spell."
   },
   "reverse-gravity": {
     "_es": "4813f876",
@@ -839,9 +913,10 @@
     "components": "V, S, M (iron filings)"
   },
   "dominate-monster": {
-    "_es": "bfefae96",
+    "_es": "a4a8caf0",
     "name": "Dominate Monster",
-    "description": "Any creature (WIS save) has the Charmed condition and is under your control. Concentration. Scales."
+    "description": "Any creature (WIS save) has the Charmed condition and is under your control. Concentration.",
+    "higherLevel": "Your Concentration can last longer with a level 9 spell slot (up to 8 hours)."
   },
   "sunburst": {
     "_es": "f0999aa9",
@@ -952,15 +1027,17 @@
     "description": "You can comprehend and verbally communicate with Beasts for the duration."
   },
   "ray-of-sickness": {
-    "_es": "ebdac89d",
+    "_es": "9e4c9c54",
     "name": "Ray of Sickness",
-    "description": "You shoot a greenish ray: make a ranged spell attack against the target. On a hit, it takes 2d8 Poison damage and has the Poisoned condition until the end of your next turn. Scales with level."
+    "description": "You shoot a greenish ray: make a ranged spell attack against the target. On a hit, it takes 2d8 Poison damage and has the Poisoned condition until the end of your next turn.",
+    "higherLevel": "The damage increases by 1d8 for each spell slot level above 1."
   },
   "false-life": {
-    "_es": "f844fb7f",
+    "_es": "477cd042",
     "name": "False Life",
-    "description": "You gain 2d4 + 4 Temporary Hit Points. Scales.",
-    "components": "V, S, M (a drop of alcohol)"
+    "description": "You gain 2d4 + 4 Temporary Hit Points.",
+    "components": "V, S, M (a drop of alcohol)",
+    "higherLevel": "You gain 5 additional Temporary Hit Points for each spell slot level above 1."
   },
   "ray-of-enfeeblement": {
     "_es": "74967052",
@@ -968,9 +1045,10 @@
     "description": "Ranged spell attack; on a hit, the target deals half damage with its Strength-based attacks. At the end of each turn, it makes a Constitution saving throw to end the effect. Concentration."
   },
   "hellish-rebuke": {
-    "_es": "36282810",
+    "_es": "9881c84b",
     "name": "Hellish Rebuke",
-    "description": "You engulf in flames the creature that damaged you: 2d10 Fire damage, Dexterity saving throw for half. Scales."
+    "description": "You engulf in flames the creature that damaged you: 2d10 Fire damage, Dexterity saving throw for half.",
+    "higherLevel": "The damage increases by 1d10 for each spell slot level above 1."
   },
   "friends": {
     "_es": "13a55911",
@@ -984,14 +1062,16 @@
     "description": "Minor elemental effect: sculpt earth or fire, create water or a flame, raise dust, or snuff out small fires."
   },
   "sorcerous-burst": {
-    "_es": "51ffb377",
+    "_es": "3aa4e7f4",
     "name": "Sorcerous Burst",
-    "description": "Ranged spell attack: 1d8 damage of a type you choose among Acid, Cold, Fire, Psychic, Lightning, Thunder, or Poison. Each 8 lets you roll another d8, up to your spellcasting ability modifier."
+    "description": "Ranged spell attack: 1d8 damage of a type you choose among Acid, Cold, Fire, Psychic, Lightning, Thunder, or Poison. Each 8 lets you roll another d8, up to your spellcasting ability modifier.",
+    "higherLevel": "The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8)."
   },
   "mind-sliver": {
-    "_es": "5f1e2325",
+    "_es": "bc500c06",
     "name": "Mind Sliver",
-    "description": "Intelligence saving throw or 1d6 Psychic damage, and the target subtracts 1d4 from its next saving throw before the end of your next turn."
+    "description": "Intelligence saving throw or 1d6 Psychic damage, and the target subtracts 1d4 from its next saving throw before the end of your next turn.",
+    "higherLevel": "Damage becomes 2d6 at level 5, 3d6 at level 11 and 4d6 at level 17."
   },
   "blade-ward": {
     "_es": "2f10dc6d",
@@ -999,21 +1079,24 @@
     "description": "Anyone who attacks you subtracts 1d4 from the roll while the spell lasts."
   },
   "thorn-whip": {
-    "_es": "8389d539",
+    "_es": "6de1b44c",
     "name": "Thorn Whip",
     "description": "Melee spell attack: 1d6 Piercing damage and, if the target is Large or smaller, you pull it 10 feet toward you.",
-    "components": "V, S, M (the stem of a plant with thorns)"
+    "components": "V, S, M (the stem of a plant with thorns)",
+    "higherLevel": "Damage becomes 2d6 at level 5, 3d6 at level 11 and 4d6 at level 17."
   },
   "word-of-radiance": {
-    "_es": "6d47a760",
+    "_es": "ae04b455",
     "name": "Word of Radiance",
     "description": "5-foot Emanation: creatures you choose make a Constitution saving throw or take 1d6 Radiant damage.",
-    "components": "V, M (a sunburst token)"
+    "components": "V, M (a sunburst token)",
+    "higherLevel": "Damage becomes 2d6 at level 5, 3d6 at level 11 and 4d6 at level 17."
   },
   "thunderclap": {
-    "_es": "2a8b7e37",
+    "_es": "89dd8e48",
     "name": "Thunderclap",
-    "description": "5-foot Emanation: Constitution saving throw or 1d6 Thunder damage. The boom can be heard 100 feet away."
+    "description": "5-foot Emanation: Constitution saving throw or 1d6 Thunder damage. The boom can be heard 100 feet away.",
+    "higherLevel": "Damage becomes 2d6 at level 5, 3d6 at level 11 and 4d6 at level 17."
   },
   "alarm": {
     "_es": "55d533e0",
@@ -1022,10 +1105,11 @@
     "components": "V, S, M (a bell and silver wire)"
   },
   "armor-of-agathys": {
-    "_es": "31eb3f58",
+    "_es": "8a893877",
     "name": "Armor of Agathys",
     "description": "5 Temporary Hit Points and 5 Cold damage to anyone who hits you with a melee attack. It ends if you lose the temporary HP.",
-    "components": "V, S, M (a shard of blue glass)"
+    "components": "V, S, M (a shard of blue glass)",
+    "higherLevel": "The temporary HP and the cold damage both go up by 5 for each slot level above 1."
   },
   "mage-armor": {
     "_es": "80f279ee",
@@ -1034,41 +1118,48 @@
     "components": "V, S, M (a piece of cured leather)"
   },
   "arms-of-hadar": {
-    "_es": "9a09cd3d",
+    "_es": "b1c37eef",
     "name": "Arms of Hadar",
-    "description": "10-foot Emanation: Strength saving throw or 2d6 Necrotic damage and no Reactions until its next turn; half damage on a success."
+    "description": "10-foot Emanation: Strength saving throw or 2d6 Necrotic damage and no Reactions until its next turn; half damage on a success.",
+    "higherLevel": "Damage goes up by 1d6 for each slot level above 1."
   },
   "searing-smite": {
-    "_es": "2ff0d6c4",
+    "_es": "9461e413",
     "name": "Searing Smite",
-    "description": "After you hit: 1d6 extra Fire damage, and the target burns for 1d6 per turn until it succeeds on a Constitution saving throw."
+    "description": "After you hit: 1d6 extra Fire damage, and the target burns for 1d6 per turn until it succeeds on a Constitution saving throw.",
+    "higherLevel": "All the damage increases by 1d6 for each spell slot level above 1."
   },
   "thunderous-smite": {
-    "_es": "3b7c0369",
+    "_es": "cbbc99f3",
     "name": "Thunderous Smite",
-    "description": "After you hit: 2d6 extra Thunder damage, and a Strength saving throw or you push it 10 feet and it has the Prone condition."
+    "description": "After you hit: 2d6 extra Thunder damage, and a Strength saving throw or you push it 10 feet and it has the Prone condition.",
+    "higherLevel": "Damage goes up by 1d6 for each slot level above 1."
   },
   "divine-smite": {
-    "_es": "fe071bbc",
+    "_es": "c3a8cddd",
     "name": "Divine Smite",
-    "description": "After you hit: 2d8 extra Radiant damage, plus 1d8 if the target is a Fiend or Undead."
+    "description": "After you hit: 2d8 extra Radiant damage, plus 1d8 if the target is a Fiend or Undead.",
+    "higherLevel": "The damage increases by 1d8 for each spell slot level above 1."
   },
   "wrathful-smite": {
-    "_es": "10599af3",
+    "_es": "42cd36b7",
     "name": "Wrathful Smite",
-    "description": "After you hit: 1d6 extra Necrotic damage, and a Wisdom saving throw or it has the Frightened condition; it repeats the save at the end of each turn."
+    "description": "After you hit: 1d6 extra Necrotic damage, and a Wisdom saving throw or it has the Frightened condition; it repeats the save at the end of each turn.",
+    "higherLevel": "Damage goes up by 1d6 for each slot level above 1."
   },
   "create-or-destroy-water": {
-    "_es": "dfe05a39",
+    "_es": "d5d96834",
     "name": "Create or Destroy Water",
     "description": "You create or destroy up to 10 gallons of water, or make rain fall in a 30-foot Cube to put out flames.",
-    "components": "V, S, M (a mix of water and sand)"
+    "components": "V, S, M (a mix of water and sand)",
+    "higherLevel": "You create or destroy 10 additional gallons of water, or the size of the Cube increases by 5 feet, for each spell slot level above 1."
   },
   "ice-knife": {
-    "_es": "fd4f0dee",
+    "_es": "035996ae",
     "name": "Ice Knife",
     "description": "Ranged spell attack for 1d10 Piercing damage; hit or miss, it explodes, and creatures within 5 feet make a Dexterity saving throw against 2d6 Cold damage.",
-    "components": "S, M (a drop of water or a piece of ice)"
+    "components": "S, M (a drop of water or a piece of ice)",
+    "higherLevel": "The Cold damage increases by 1d6 for each spell slot level above 1."
   },
   "detect-evil-and-good": {
     "_es": "ad7f8796",
@@ -1093,10 +1184,11 @@
     "description": "Wisdom saving throw or the target has Disadvantage on attacks against others and can't move more than 30 feet away from you."
   },
   "animal-friendship": {
-    "_es": "95389172",
+    "_es": "4e2c73bd",
     "name": "Animal Friendship",
     "description": "A Beast makes a Wisdom saving throw or has the Charmed condition. It ends if you or your allies damage it.",
-    "components": "V, S, M (a morsel of food)"
+    "components": "V, S, M (a morsel of food)",
+    "higherLevel": "You can target one additional Beast for each spell slot level above 1."
   },
   "find-familiar": {
     "_es": "758b82f7",
@@ -1110,14 +1202,16 @@
     "description": "Your weapon attacks deal an extra 1d4 Radiant damage on a hit."
   },
   "ensnaring-strike": {
-    "_es": "42da86f9",
+    "_es": "36e1d034",
     "name": "Ensnaring Strike",
-    "description": "After you hit: Strength saving throw or the target has the Restrained condition from grasping vines and takes 1d6 Piercing damage each turn."
+    "description": "After you hit: Strength saving throw or the target has the Restrained condition from grasping vines and takes 1d6 Piercing damage each turn.",
+    "higherLevel": "The damage increases by 1d6 for each spell slot level above 1."
   },
   "heroism": {
-    "_es": "03842cf0",
+    "_es": "dedecf70",
     "name": "Heroism",
-    "description": "The creature is immune to the Frightened condition and gains Temporary Hit Points equal to your spellcasting ability modifier at the start of each of its turns."
+    "description": "The creature is immune to the Frightened condition and gains Temporary Hit Points equal to your spellcasting ability modifier at the start of each of its turns.",
+    "higherLevel": "You can target one additional creature for each spell slot level above 1."
   },
   "silent-image": {
     "_es": "18bccbef",
@@ -1126,22 +1220,25 @@
     "components": "V, S, M (a bit of fleece)"
   },
   "hex": {
-    "_es": "493d45d5",
+    "_es": "ea9b93a4",
     "name": "Hex",
     "description": "You curse a creature: an extra 1d6 Necrotic damage when you hit it, and Disadvantage on checks with one ability of your choice.",
-    "components": "V, S, M (the petrified eye of a newt)"
+    "components": "V, S, M (the petrified eye of a newt)",
+    "higherLevel": "Your Concentration can last longer with a spell slot of level 2 (up to 4 hours), 3-4 (up to 8 hours), or 5+ (24 hours)."
   },
   "chromatic-orb": {
-    "_es": "4d3cd56b",
+    "_es": "336ab21b",
     "name": "Chromatic Orb",
     "description": "Ranged spell attack: 3d8 Acid, Cold, Fire, Lightning, Thunder, or Poison damage. If you roll the same number on two of the d8s, the orb leaps to another creature.",
-    "components": "V, S, M (a diamond worth 50+ GP)"
+    "components": "V, S, M (a diamond worth 50+ GP)",
+    "higherLevel": "The damage increases by 1d8 for each spell slot level above 1. The orb can leap a maximum number of times equal to the level of the slot expended, and a creature can be targeted only once by each casting of this spell."
   },
   "bane": {
-    "_es": "271f92ec",
+    "_es": "5e809a6e",
     "name": "Bane",
     "description": "Up to three creatures make a Charisma saving throw; those that fail subtract 1d4 from their attack rolls and saving throws.",
-    "components": "V, S, M (a drop of blood)"
+    "components": "V, S, M (a drop of blood)",
+    "higherLevel": "You can target one additional creature for each spell slot level above 1."
   },
   "purify-food-and-drink": {
     "_es": "4446512d",
@@ -1149,16 +1246,18 @@
     "description": "You remove poison and rot from nonmagical food and drink in a 5-foot-radius sphere."
   },
   "witch-bolt": {
-    "_es": "20671988",
+    "_es": "920e6052",
     "name": "Witch Bolt",
     "description": "Ranged spell attack for 2d12 Lightning damage; afterward, with a Bonus Action each turn, you deal 1d12 automatically again.",
-    "components": "V, S, M (a twig struck by lightning)"
+    "components": "V, S, M (a twig struck by lightning)",
+    "higherLevel": "The initial damage goes up by 1d12 for each slot level above 1."
   },
   "tashas-hideous-laughter": {
-    "_es": "d40a8d6c",
+    "_es": "e43bd4a8",
     "name": "Tasha's Hideous Laughter",
     "description": "Wisdom saving throw or the target has the Prone and Incapacitated conditions, laughing uncontrollably; it repeats the save at the end of each turn and when it takes damage.",
-    "components": "V, S, M (a tart and a feather)"
+    "components": "V, S, M (a tart and a feather)",
+    "higherLevel": "You can target one additional creature for each spell slot level above 1."
   },
   "color-spray": {
     "_es": "abe9a48f",
@@ -1167,10 +1266,11 @@
     "components": "V, S, M (a pinch of colorful sand)"
   },
   "jump": {
-    "_es": "fca5adb0",
+    "_es": "0c609d5a",
     "name": "Jump",
     "description": "The creature can jump up to 30 feet once per turn by spending 10 feet of movement.",
-    "components": "V, S, M (a grasshopper's hind leg)"
+    "components": "V, S, M (a grasshopper's hind leg)",
+    "higherLevel": "You can target one additional creature for each spell slot level above 1."
   },
   "unseen-servant": {
     "_es": "57ba6eb0",
@@ -1179,9 +1279,10 @@
     "components": "V, S, M (a bit of string and of wood)"
   },
   "dissonant-whispers": {
-    "_es": "34425999",
+    "_es": "473c5070",
     "name": "Dissonant Whispers",
-    "description": "Wisdom saving throw or 3d6 Psychic damage, and the target must use its Reaction to move away from you; half damage and no fleeing on a success."
+    "description": "Wisdom saving throw or 3d6 Psychic damage, and the target must use its Reaction to move away from you; half damage and no fleeing on a success.",
+    "higherLevel": "The damage increases by 1d6 for each spell slot level above 1."
   },
   "illusory-script": {
     "_es": "ce23087a",
@@ -1190,9 +1291,10 @@
     "components": "S, M (ink worth 10+ GP, which the spell consumes)"
   },
   "hail-of-thorns": {
-    "_es": "8c339241",
+    "_es": "2c7f0fc6",
     "name": "Hail of Thorns",
-    "description": "After you hit with a ranged weapon: the target and creatures within 5 feet of it make a Dexterity saving throw against 1d10 Piercing damage."
+    "description": "After you hit with a ranged weapon: the target and creatures within 5 feet of it make a Dexterity saving throw against 1d10 Piercing damage.",
+    "higherLevel": "Damage goes up by 1d10 for each slot level above 1."
   },
   "rope-trick": {
     "_es": "8f3adc88",
@@ -1212,10 +1314,11 @@
     "components": "V, S, M (a pinch of powdered iron)"
   },
   "dragons-breath": {
-    "_es": "c8d31d6f",
+    "_es": "7652e153",
     "name": "Dragon's Breath",
     "description": "You touch a willing creature: it can exhale in a 15-foot Cone once per turn to deal 3d6 damage of the chosen type; Dexterity saving throw for half damage.",
-    "components": "V, S, M (a hot pepper)"
+    "components": "V, S, M (a hot pepper)",
+    "higherLevel": "The damage increases by 1d6 for each spell slot level above 2."
   },
   "alter-self": {
     "_es": "b394b444",
@@ -1223,9 +1326,10 @@
     "description": "You choose one option (aquatic adaptation, natural weapons, or change appearance) that lasts until the spell ends; you can switch it with a Magic action."
   },
   "magic-weapon": {
-    "_es": "40e6b2ee",
+    "_es": "64165757",
     "name": "Magic Weapon",
-    "description": "A nonmagical weapon you touch gains +1 to attack and damage rolls until the spell ends."
+    "description": "A nonmagical weapon you touch gains +1 to attack and damage rolls until the spell ends.",
+    "higherLevel": "The bonus increases to +2 with a level 3-5 spell slot. The bonus increases to +3 with a level 6+ spell slot."
   },
   "augury": {
     "_es": "2fc710e3",
@@ -1246,9 +1350,10 @@
     "components": "V, S, M (jade dust worth 10+ GP, which the spell consumes)"
   },
   "shining-smite": {
-    "_es": "9b875801",
+    "_es": "87f35129",
     "name": "Shining Smite",
-    "description": "After you hit: an extra 2d6 Radiant damage, and the target sheds Bright Light in 5 feet and can't benefit from the Invisible condition while the spell lasts."
+    "description": "After you hit: an extra 2d6 Radiant damage, and the target sheds Bright Light in 5 feet and can't benefit from the Invisible condition while the spell lasts.",
+    "higherLevel": "The damage increases by 1d6 for each spell slot level above 2."
   },
   "arcane-lock": {
     "_es": "ad7e838e",
@@ -1257,15 +1362,17 @@
     "components": "V, S, M (gold dust worth 25+ GP, which the spell consumes)"
   },
   "mind-spike": {
-    "_es": "8bbd2b28",
+    "_es": "9ed9bdee",
     "name": "Mind Spike",
-    "description": "Wisdom saving throw or 3d8 Psychic damage; on a failure, you know its location while the spell lasts."
+    "description": "Wisdom saving throw or 3d8 Psychic damage; on a failure, you know its location while the spell lasts.",
+    "higherLevel": "The damage increases by 1d8 for each spell slot level above 2."
   },
   "cordon-of-arrows": {
-    "_es": "73862ce1",
+    "_es": "ac5ee307",
     "name": "Cordon of Arrows",
     "description": "You plant up to four nonmagical arrows or bolts in the ground. When a creature other than you enters a space within 30 feet of them for the first time on a turn, or ends its turn there, one piece of ammunition flies at it: Dexterity saving throw or 2d4 Piercing damage. That piece is destroyed, and the spell ends when none is left planted.",
-    "components": "V, S, M (four or more arrows or bolts)"
+    "components": "V, S, M (four or more arrows or bolts)",
+    "higherLevel": "You can fire two more pieces of ammunition for each slot level above 2."
   },
   "crown-of-madness": {
     "_es": "9c136001",
@@ -1301,10 +1408,11 @@
     "description": "Wisdom saving throw or the chosen creatures have −10 to Perception while you speak; those already fighting you succeed automatically."
   },
   "melfs-acid-arrow": {
-    "_es": "205468ce",
+    "_es": "69726313",
     "name": "Melf's Acid Arrow",
     "description": "Ranged spell attack: 4d4 Acid damage and 2d4 more at the end of its next turn; half the initial damage on a miss.",
-    "components": "V, S, M (powdered rhubarb leaf)"
+    "components": "V, S, M (powdered rhubarb leaf)",
+    "higherLevel": "The damage (both initial and later) increases by 1d4 for each spell slot level above 2."
   },
   "phantasmal-force": {
     "_es": "7efee7f7",
@@ -1313,21 +1421,24 @@
     "components": "V, S, M (a bit of fleece)"
   },
   "shatter": {
-    "_es": "2a904762",
+    "_es": "a119e614",
     "name": "Shatter",
     "description": "10-foot sphere: Constitution saving throw or 3d8 Thunder damage (Disadvantage for Constructs); half damage on a success. It also damages nonmagical objects.",
-    "components": "V, S, M (a chip of mica)"
+    "components": "V, S, M (a chip of mica)",
+    "higherLevel": "The damage increases by 1d8 for each spell slot level above 2."
   },
   "find-steed": {
-    "_es": "833ce3ed",
+    "_es": "6ce4c609",
     "name": "Find Steed",
-    "description": "You summon an otherworldly steed in the form of a Large animal of your choice in an unoccupied space within range."
+    "description": "You summon an otherworldly steed in the form of a Large animal of your choice in an unoccupied space within range.",
+    "higherLevel": "Use the spell slot's level for the spell's level in the stat block."
   },
   "flame-blade": {
-    "_es": "2b389718",
+    "_es": "9c04949c",
     "name": "Flame Blade",
     "description": "You evoke a blade of fire in your hand; melee spell attack for 3d6 plus your spellcasting ability modifier in Fire damage.",
-    "components": "V, S, M (a sumac leaf)"
+    "components": "V, S, M (a sumac leaf)",
+    "higherLevel": "The damage increases by 1d6 for each spell slot level above 2."
   },
   "mirror-image": {
     "_es": "939eda68",
@@ -1335,10 +1446,11 @@
     "description": "You create three illusory duplicates; each time an attack hits you, roll 1d6 for each remaining duplicate, and a 3 or higher diverts the hit to one of them."
   },
   "summon-beast": {
-    "_es": "38e265b4",
+    "_es": "4cb317e7",
     "name": "Summon Beast",
     "description": "You summon a bestial spirit of land, sea, or air in an unoccupied space; it uses the Bestial Spirit stat block and vanishes at 0 HP or when the spell ends.",
-    "components": "V, S, M (a feather, tuft of fur, and fish tail inside a gilded acorn worth 200+ GP)"
+    "components": "V, S, M (a feather, tuft of fur, and fish tail inside a gilded acorn worth 200+ GP)",
+    "higherLevel": "The slot's level counts as the spell's level in the creature's stat block."
   },
   "continual-flame": {
     "_es": "e3e52565",
@@ -1359,16 +1471,18 @@
     "components": "V, S, M (a forked twig)"
   },
   "animal-messenger": {
-    "_es": "1438ddf4",
+    "_es": "bfcae17d",
     "name": "Animal Messenger",
     "description": "A Tiny Beast carries a short message to a place and recipient you describe; Charisma saving throw to accept the task.",
-    "components": "V, S, M (a morsel of food)"
+    "components": "V, S, M (a morsel of food)",
+    "higherLevel": "The spell's duration increases by 48 hours for each spell slot level above 2."
   },
   "cloud-of-daggers": {
-    "_es": "1fc213d9",
+    "_es": "00801341",
     "name": "Cloud of Daggers",
     "description": "5-foot Cube of spinning daggers: 4d4 Slashing damage to anyone who enters it, ends its turn in it, or is reached by the Cube; once per turn.",
-    "components": "V, S, M (a sliver of glass)"
+    "components": "V, S, M (a sliver of glass)",
+    "higherLevel": "Damage goes up by 2d4 for each slot level above 2."
   },
   "barkskin": {
     "_es": "27a6a149",
@@ -1387,9 +1501,10 @@
     "description": "You perceive through the senses of a willing Beast you touch, including any special senses it has."
   },
   "blindness-deafness": {
-    "_es": "326d7fbe",
+    "_es": "06b8fc45",
     "name": "Blindness/Deafness",
-    "description": "Constitution saving throw or the target has the Blinded or Deafened condition, your choice; it repeats the save at the end of each turn."
+    "description": "Constitution saving throw or the target has the Blinded or Deafened condition, your choice; it repeats the save at the end of each turn.",
+    "higherLevel": "You can target one additional creature for each spell slot level above 2."
   },
   "suggestion": {
     "_es": "c020f14d",
@@ -1409,14 +1524,16 @@
     "description": "15-foot sphere: anyone who enters makes a Charisma saving throw or can't deliberately lie while inside."
   },
   "arcane-vigor": {
-    "_es": "328cd580",
+    "_es": "937f086c",
     "name": "Arcane Vigor",
-    "description": "You roll one or two unspent Hit Point Dice and regain HP equal to the total plus your spellcasting ability modifier; the dice are expended."
+    "description": "You roll one or two unspent Hit Point Dice and regain HP equal to the total plus your spellcasting ability modifier; the dice are expended.",
+    "higherLevel": "You can roll one more Hit Die for each slot level above 2."
   },
   "elemental-weapon": {
-    "_es": "5426f415",
+    "_es": "fbd5ff6c",
     "name": "Elemental Weapon",
-    "description": "A nonmagical weapon you touch gains +1 to attack rolls and an extra 1d4 damage of the elemental type you choose while the spell lasts."
+    "description": "A nonmagical weapon you touch gains +1 to attack rolls and an extra 1d4 damage of the elemental type you choose while the spell lasts.",
+    "higherLevel": "With a level 5-6 slot the attack bonus is +2 and the extra damage 2d4; with a level 7+ slot, +3 and 3d4."
   },
   "aura-of-vitality": {
     "_es": "0c284041",
@@ -1430,15 +1547,17 @@
     "components": "V, S, M (a piece of cork)"
   },
   "blinding-smite": {
-    "_es": "2c77a125",
+    "_es": "8bd70747",
     "name": "Blinding Smite",
-    "description": "After you hit: an extra 3d8 Radiant damage, and the target has the Blinded condition until it succeeds on a Constitution saving throw at the end of each turn."
+    "description": "After you hit: an extra 3d8 Radiant damage, and the target has the Blinded condition until it succeeds on a Constitution saving throw at the end of each turn.",
+    "higherLevel": "The extra damage goes up by 1d8 for each slot level above 3."
   },
   "magic-circle": {
-    "_es": "be519fc8",
+    "_es": "5ca54a25",
     "name": "Magic Circle",
     "description": "A 10-foot-radius cylinder blocks, or traps, a chosen type of creature (Celestial, Elemental, Fey, Fiend, or Undead).",
-    "components": "V, S, M (salt and powdered silver worth 100+ GP, which the spell consumes)"
+    "components": "V, S, M (salt and powdered silver worth 100+ GP, which the spell consumes)",
+    "higherLevel": "The duration increases by 1 hour for each spell slot level above 3."
   },
   "clairvoyance": {
     "_es": "51380fdb",
@@ -1447,10 +1566,11 @@
     "components": "V, S, M (a focus worth 100+ GP, either a jeweled horn for hearing or a glass eye for seeing)"
   },
   "conjure-barrage": {
-    "_es": "ae3771ae",
+    "_es": "53eb58f2",
     "name": "Conjure Barrage",
     "description": "60-foot Cone of spectral copies of your weapon: Dexterity saving throw against 5d8 Force damage, half damage on a success.",
-    "components": "V, S, M (a Melee or Ranged weapon worth at least 1 CP)"
+    "components": "V, S, M (a Melee or Ranged weapon worth at least 1 CP)",
+    "higherLevel": "Damage goes up by 1d8 for each slot level above 3."
   },
   "phantom-steed": {
     "_es": "a0480c08",
@@ -1479,15 +1599,17 @@
     "components": "V, S, M (a pinch of graveyard dirt)"
   },
   "lightning-arrow": {
-    "_es": "52151b23",
+    "_es": "38181bf5",
     "name": "Lightning Arrow",
-    "description": "After a ranged weapon attack, the projectile becomes lightning: 4d8 damage (half on a miss) and 2d8 to creatures within 10 feet of the target."
+    "description": "After a ranged weapon attack, the projectile becomes lightning: 4d8 damage (half on a miss) and 2d8 to creatures within 10 feet of the target.",
+    "higherLevel": "The damage of both effects goes up by 1d8 for each slot level above 3."
   },
   "gaseous-form": {
-    "_es": "44a53307",
+    "_es": "80c2868b",
     "name": "Gaseous Form",
     "description": "A willing creature you touch becomes mist: it flies at 10 feet, can slip through gaps, and has Resistance to nonmagical damage except Force.",
-    "components": "V, S, M (a bit of gauze)"
+    "components": "V, S, M (a bit of gauze)",
+    "higherLevel": "You can target one additional creature for each spell slot level above 3."
   },
   "meld-into-stone": {
     "_es": "3d07b3bb",
@@ -1495,10 +1617,11 @@
     "description": "You and your gear merge into a stone surface until the spell ends; you leave no trace detectable without magic."
   },
   "glyph-of-warding": {
-    "_es": "98f8f454",
+    "_es": "f8e4bfdd",
     "name": "Glyph of Warding",
     "description": "You inscribe a glyph that releases a spell of level 3 or lower, or 5d8 damage, when the trigger condition you choose is met.",
-    "components": "V, S, M (powdered diamond worth 200+ GP, which the spell consumes)"
+    "components": "V, S, M (powdered diamond worth 200+ GP, which the spell consumes)",
+    "higherLevel": "The damage of an explosive rune increases by 1d8 for each spell slot level above 3. If you create a spell glyph, you can store any spell of up to the same level as the spell slot you use for the Glyph of Warding."
   },
   "speak-with-plants": {
     "_es": "57e27b35",
@@ -1506,10 +1629,11 @@
     "description": "30-foot Emanation: plants gain limited sentience and can tell you what they saw in the last day."
   },
   "hunger-of-hadar": {
-    "_es": "41516e2b",
+    "_es": "d3ac2549",
     "name": "Hunger of Hadar",
     "description": "20-foot sphere of Darkness and Difficult Terrain: 2d6 Cold damage when a creature enters or starts its turn there, and another 2d6 Acid damage at the end of its turn.",
-    "components": "V, S, M (a pickled tentacle)"
+    "components": "V, S, M (a pickled tentacle)",
+    "higherLevel": "The cold or acid damage (your choice) goes up by 1d6 for each slot level above 3."
   },
   "nondetection": {
     "_es": "953778fc",
@@ -1518,16 +1642,18 @@
     "components": "V, S, M (a pinch of diamond dust worth 25+ GP, which the spell consumes)"
   },
   "summon-fey": {
-    "_es": "dd14a259",
+    "_es": "ed92b548",
     "name": "Summon Fey",
     "description": "You summon a Fey spirit with a mirthful, tricksy, or fuming mood in an unoccupied space; it uses the Fey Spirit stat block.",
-    "components": "V, S, M (a gilded flower worth 300+ GP)"
+    "components": "V, S, M (a gilded flower worth 300+ GP)",
+    "higherLevel": "The slot's level counts as the spell's level in the creature's stat block."
   },
   "summon-undead": {
-    "_es": "312fe793",
+    "_es": "34f60aea",
     "name": "Summon Undead",
     "description": "You summon an Undead spirit with a skeletal, ghostly, or putrid form in an unoccupied space; it uses the Undead Spirit stat block.",
-    "components": "V, S, M (a gilded skull worth 300+ GP)"
+    "components": "V, S, M (a gilded skull worth 300+ GP)",
+    "higherLevel": "The slot's level counts as the spell's level in the creature's stat block."
   },
   "crusaders-mantle": {
     "_es": "a89dd4b4",
@@ -1574,9 +1700,10 @@
     "description": "30-foot Emanation: you and your allies inside have Resistance to Necrotic damage, and their HP maximums can't be reduced; it heals 1 HP to anyone who starts its turn there with 0 HP."
   },
   "staggering-smite": {
-    "_es": "7b9afb3c",
+    "_es": "d112dddd",
     "name": "Staggering Smite",
-    "description": "After you hit: an extra 4d6 Psychic damage, and a Wisdom saving throw or the target has the Stunned condition until the end of your next turn."
+    "description": "After you hit: an extra 4d6 Psychic damage, and a Wisdom saving throw or the target has the Stunned condition until the end of your next turn.",
+    "higherLevel": "The extra damage goes up by 1d6 for each slot level above 4."
   },
   "leomunds-secret-chest": {
     "_es": "5aca0724",
@@ -1590,14 +1717,16 @@
     "description": "Wisdom saving throw or the target has the Charmed condition and, with a Bonus Action of yours, must move in the direction you indicate each turn."
   },
   "conjure-minor-elementals": {
-    "_es": "41bbf919",
+    "_es": "981db8e5",
     "name": "Conjure Minor Elementals",
-    "description": "Elemental spirits surround you in 15 feet: your attacks deal an extra 2d8 damage of the elemental type you choose to anyone inside."
+    "description": "Elemental spirits surround you in 15 feet: your attacks deal an extra 2d8 damage of the elemental type you choose to anyone inside.",
+    "higherLevel": "The damage increases by 1d8 for each spell slot level above 4."
   },
   "conjure-woodland-beings": {
-    "_es": "828c2378",
+    "_es": "861cbdf4",
     "name": "Conjure Woodland Beings",
-    "description": "Nature spirits within 10 feet: Wisdom saving throw against 5d8 Force damage for anyone who enters the Emanation or ends its turn there."
+    "description": "Nature spirits within 10 feet: Wisdom saving throw against 5d8 Force damage for anyone who enters the Emanation or ends its turn there.",
+    "higherLevel": "The damage increases by 1d8 for each spell slot level above 4."
   },
   "control-water": {
     "_es": "157c424d",
@@ -1606,14 +1735,16 @@
     "components": "V, S, M (a mixture of water and dust)"
   },
   "dominate-beast": {
-    "_es": "83d9ad7e",
+    "_es": "ae5858fe",
     "name": "Dominate Beast",
-    "description": "Wisdom saving throw or a Beast has the Charmed condition; you have a telepathic link and can give it orders or command it to attack."
+    "description": "Wisdom saving throw or a Beast has the Charmed condition; you have a telepathic link and can give it orders or command it to attack.",
+    "higherLevel": "Your Concentration can last longer with a spell slot of level 5 (up to 10 minutes), 6 (up to 1 hour), or 7+ (up to 8 hours)."
   },
   "grasping-vine": {
-    "_es": "f1bdf54f",
+    "_es": "6b56836b",
     "name": "Grasping Vine",
-    "description": "Melee spell attack: 4d8 Bludgeoning damage, and it pulls the target up to 30 feet toward the vine; it Restrains the target if it is Huge or smaller."
+    "description": "Melee spell attack: 4d8 Bludgeoning damage, and it pulls the target up to 30 feet toward the vine; it Restrains the target if it is Huge or smaller.",
+    "higherLevel": "The vine can grapple one more creature for each slot level above 4."
   },
   "otilukes-resilient-sphere": {
     "_es": "aecd602c",
@@ -1622,10 +1753,11 @@
     "components": "V, S, M (a glass sphere)"
   },
   "vitriolic-sphere": {
-    "_es": "abba96ea",
+    "_es": "d9c529be",
     "name": "Vitriolic Sphere",
     "description": "20-foot sphere of acid: Dexterity saving throw against 10d4 Acid damage and another 5d4 at the end of its next turn; half the initial damage on a success.",
-    "components": "V, S, M (a drop of bile)"
+    "components": "V, S, M (a drop of bile)",
+    "higherLevel": "The initial damage increases by 2d4 for each spell slot level above 4."
   },
   "fabricate": {
     "_es": "7246f37b",
@@ -1643,32 +1775,37 @@
     "description": "A Large, invulnerable spectral guardian hovers in a space; Dexterity saving throw against 20 Radiant damage for anyone who comes near, up to 60 total damage dealt."
   },
   "charm-monster": {
-    "_es": "50a04653",
+    "_es": "e4c1b724",
     "name": "Charm Monster",
-    "description": "Wisdom saving throw (with Advantage if it is fighting you) or a creature has the Charmed condition and is friendly until the spell ends or it takes damage from you."
+    "description": "Wisdom saving throw (with Advantage if it is fighting you) or a creature has the Charmed condition and is friendly until the spell ends or it takes damage from you.",
+    "higherLevel": "You can target one additional creature for each spell slot level above 4."
   },
   "giant-insect": {
-    "_es": "3cc6cf8b",
+    "_es": "2aad74c7",
     "name": "Giant Insect",
-    "description": "You summon a giant spider, wasp, or centipede in an unoccupied space; it uses the stat block of the chosen giant insect."
+    "description": "You summon a giant spider, wasp, or centipede in an unoccupied space; it uses the stat block of the chosen giant insect.",
+    "higherLevel": "Use the spell slot's level for the spell's level in the stat block."
   },
   "summon-aberration": {
-    "_es": "338dbb75",
+    "_es": "5183c562",
     "name": "Summon Aberration",
     "description": "You summon an aberrant spirit (mind flayer, beholderkin, or slaad) in an unoccupied space; it uses the Aberrant Spirit stat block.",
-    "components": "V, S, M (a pickled tentacle and an eyeball in a platinum-inlaid vial worth 400+ GP)"
+    "components": "V, S, M (a pickled tentacle and an eyeball in a platinum-inlaid vial worth 400+ GP)",
+    "higherLevel": "The slot's level counts as the spell's level in the creature's stat block."
   },
   "summon-construct": {
-    "_es": "9ca83200",
+    "_es": "12f513b7",
     "name": "Summon Construct",
     "description": "You summon a construct spirit of clay, metal, or stone in an unoccupied space; it uses the Construct Spirit stat block.",
-    "components": "V, S, M (a lockbox worth 400+ GP)"
+    "components": "V, S, M (a lockbox worth 400+ GP)",
+    "higherLevel": "The slot's level counts as the spell's level in the creature's stat block."
   },
   "summon-elemental": {
-    "_es": "f3619e4e",
+    "_es": "2665c4b7",
     "name": "Summon Elemental",
     "description": "You summon an elemental spirit of air, earth, fire, or water in an unoccupied space; it uses the Elemental Spirit stat block.",
-    "components": "V, S, M (air, a pebble, ash, and water inside a gold-inlaid vial worth 400+ GP)"
+    "components": "V, S, M (air, a pebble, ash, and water inside a gold-inlaid vial worth 400+ GP)",
+    "higherLevel": "The slot's level counts as the spell's level in the creature's stat block."
   },
   "locate-creature": {
     "_es": "ffe7f1d6",
@@ -1695,10 +1832,11 @@
     "components": "V, S, M (a bit of bat fur)"
   },
   "mordenkainens-private-sanctum": {
-    "_es": "d63570e9",
+    "_es": "7a18af23",
     "name": "Mordenkainen's Private Sanctum",
     "description": "You make an area up to a 100-foot Cube magically secure: you can block sound, sight, teleportation, or scrying.",
-    "components": "V, S, M (a thin sheet of lead)"
+    "components": "V, S, M (a thin sheet of lead)",
+    "higherLevel": "You can increase the size of the Cube by 100 feet for each spell slot level above 4."
   },
   "evards-black-tentacles": {
     "_es": "ad866689",
@@ -1718,10 +1856,11 @@
     "description": "You give the creatures you choose an illusory appearance; Charisma saving throw if unwilling. You can change height, build, and gear."
   },
   "planar-binding": {
-    "_es": "87689b2d",
+    "_es": "7cac9c60",
     "name": "Planar Binding",
     "description": "You force a Celestial, Elemental, Fey, or Fiend to serve you: Charisma saving throw or it is bound to your service until the spell ends.",
-    "components": "V, S, M (a jewel worth 1,000+ GP, which the spell consumes)"
+    "components": "V, S, M (a jewel worth 1,000+ GP, which the spell consumes)",
+    "higherLevel": "The duration increases with a spell slot of level 6 (10 days), 7 (30 days), 8 (180 days), and 9 (366 days)."
   },
   "antilife-shell": {
     "_es": "224ebc23",
@@ -1762,9 +1901,10 @@
     "description": "You commune with nature and gain knowledge of the surrounding terrain within 3 miles outdoors, or 300 feet underground. You choose three facts about the area."
   },
   "conjure-elemental": {
-    "_es": "8aef2695",
+    "_es": "3ca7bbc8",
     "name": "Conjure Elemental",
-    "description": "You conjure a Large elemental spirit of air, earth, fire, or water that attacks according to the chosen element, with its own damage."
+    "description": "You conjure a Large elemental spirit of air, earth, fire, or water that attacks according to the chosen element, with its own damage.",
+    "higherLevel": "The damage increases by 1d8 for each spell slot level above 5."
   },
   "conjure-volley": {
     "_es": "141f7809",
@@ -1773,7 +1913,7 @@
     "components": "V, S, M (a Melee or Ranged weapon worth at least 1 CP)"
   },
   "legend-lore": {
-    "_es": "720d2d3c",
+    "_es": "9f083cbc",
     "name": "Legend Lore",
     "description": "You name something famous and receive a summary of the relevant lore the DM describes.",
     "components": "V, S, M (incense worth 250+ GP, which the spell consumes, and four ivory strips worth 50+ GP each)"
@@ -1795,10 +1935,11 @@
     "description": "Your touch inflicts a magical contagion: Constitution saving throw or 11d8 Necrotic damage and the Poisoned condition, with Disadvantage on saving throws of the chosen ability."
   },
   "creation": {
-    "_es": "c3e4806b",
+    "_es": "79e14b85",
     "name": "Creation",
     "description": "You create an object of vegetable or mineral matter from wisps of shadow; it lasts from one hour to permanently, depending on the material.",
-    "components": "V, S, M (a paintbrush)"
+    "components": "V, S, M (a paintbrush)",
+    "higherLevel": "The Cube increases by 5 feet for each spell slot level above 5."
   },
   "awaken": {
     "_es": "baf51191",
@@ -1841,22 +1982,25 @@
     "components": "S, M (a Melee weapon worth 1+ SP)"
   },
   "summon-celestial": {
-    "_es": "dfc07e93",
+    "_es": "312a8862",
     "name": "Summon Celestial",
     "description": "You summon a defender or avenger celestial spirit in an unoccupied space; it is your ally and acts right after your turn.",
-    "components": "V, S, M (a reliquary worth 500+ GP)"
+    "components": "V, S, M (a reliquary worth 500+ GP)",
+    "higherLevel": "The slot's level counts as the spell's level in the creature's stat block."
   },
   "summon-dragon": {
-    "_es": "b5b6591d",
+    "_es": "04cd1533",
     "name": "Summon Dragon",
     "description": "You summon a draconic spirit in an unoccupied space; it is your ally and acts right after your turn.",
-    "components": "V, S, M (an object with the image of a dragon engraved on it worth 500+ GP)"
+    "components": "V, S, M (an object with the image of a dragon engraved on it worth 500+ GP)",
+    "higherLevel": "Use the spell slot's level for the spell's level in the stat block."
   },
   "bigbys-hand": {
-    "_es": "4dcd80e3",
+    "_es": "4b2c5d37",
     "name": "Bigby's Hand",
     "description": "You create a Large hand of force that obeys your commands: it can push, grasp, interpose itself as a shield, or attack.",
-    "components": "V, S, M (an eggshell and a glove)"
+    "components": "V, S, M (an eggshell and a glove)",
+    "higherLevel": "The damage of the Clenched Fist increases by 2d8 and the damage of the Grasping Hand increases by 2d6 for each spell slot level above 5."
   },
   "destructive-wave": {
     "_es": "f180197a",
@@ -1887,10 +2031,11 @@
     "components": "V, S, M (rare oils worth 1,000+ GP, which the spell consumes)"
   },
   "jallarzis-storm-of-radiance": {
-    "_es": "3f7b5117",
+    "_es": "abaeafa8",
     "name": "Jallarzi's Storm of Radiance",
     "description": "Storm cylinder: creatures have the Blinded and Deafened conditions and can't cast spells with a Verbal component; Constitution saving throw against Radiant and Thunder damage.",
-    "components": "V, S, M (a pinch of phosphorus)"
+    "components": "V, S, M (a pinch of phosphorus)",
+    "higherLevel": "The radiant and thunder damage go up by 1d10 for each slot level above 5."
   },
   "planar-ally": {
     "_es": "f25a8e00",
@@ -1909,9 +2054,10 @@
     "components": "V, S, M (a gilded ladle worth 500+ GP)"
   },
   "conjure-fey": {
-    "_es": "03da2493",
+    "_es": "18ac8cf8",
     "name": "Conjure Fey",
-    "description": "You conjure a Medium spirit from the Feywild in the form of a Fey creature; when it appears, you can make a melee attack for 3d12 Psychic damage."
+    "description": "You conjure a Medium spirit from the Feywild in the form of a Fey creature; when it appears, you can make a melee attack for 3d12 Psychic damage.",
+    "higherLevel": "The damage increases by 1d12 for each spell slot level above 6."
   },
   "contingency": {
     "_es": "a7692427",
@@ -1920,10 +2066,11 @@
     "components": "V, S, M (a gem-encrusted statuette of yourself worth 1,500+ GP)"
   },
   "create-undead": {
-    "_es": "7351365d",
+    "_es": "3acf759e",
     "name": "Create Undead",
     "description": "At night only: up to three corpses become Ghouls under your control, which you can direct with a Bonus Action.",
-    "components": "V, S, M (one 150+ GP black onyx stone for each corpse)"
+    "components": "V, S, M (one 150+ GP black onyx stone for each corpse)",
+    "higherLevel": "If you use a level 7 spell slot, you can animate or reassert control over four Ghouls. If you use a level 8 spell slot, you can animate or reassert control over five Ghouls or two Ghasts or Wights. If you use a level 9 spell slot, you can animate or reassert control over six Ghouls, three Ghasts or Wights, or two Mummies. See the Monster Manual for these stat blocks."
   },
   "flesh-to-stone": {
     "_es": "6735523e",
@@ -1938,10 +2085,11 @@
     "components": "V, S, M (a set of divination tools, such as cards or runes, worth 100+ GP)"
   },
   "otilukes-freezing-sphere": {
-    "_es": "c48a82ac",
+    "_es": "ca361a34",
     "name": "Otiluke's Freezing Sphere",
     "description": "60-foot sphere: Constitution saving throw against 10d6 Cold damage, half damage on a success; it can freeze water in its path.",
-    "components": "V, S, M (a miniature crystal sphere)"
+    "components": "V, S, M (a miniature crystal sphere)",
+    "higherLevel": "The damage increases by 1d6 for each spell slot level above 6."
   },
   "heroes-feast": {
     "_es": "a84ea9ac",
@@ -1968,10 +2116,11 @@
     "components": "V, S, M (a sapphire worth 1,000+ GP)"
   },
   "summon-fiend": {
-    "_es": "c3b841a9",
+    "_es": "f41d75ea",
     "name": "Summon Fiend",
     "description": "You summon a fiendish spirit (demon, devil, or yugoloth) in an unoccupied space; it uses the Fiendish Spirit stat block.",
-    "components": "V, S, M (a bloody vial worth 600+ GP)"
+    "components": "V, S, M (a bloody vial worth 600+ GP)",
+    "higherLevel": "The slot's level counts as the spell's level in the creature's stat block."
   },
   "move-earth": {
     "_es": "828df118",
@@ -1980,16 +2129,18 @@
     "components": "V, S, M (a miniature shovel)"
   },
   "wall-of-thorns": {
-    "_es": "bd4e2dd6",
+    "_es": "f12cb729",
     "name": "Wall of Thorns",
     "description": "You create a wall of thorny brush. When it appears, each creature in its area makes a Dexterity saving throw against 7d8 Piercing damage, or half as much on a success. It can be crossed, but every foot of movement through it costs 4 feet; the first time a creature enters a space of the wall on a turn, or ends its turn there, it makes a Dexterity saving throw against 7d8 Slashing damage, or half as much on a success. It doesn't impose the Restrained condition. Concentration.",
-    "components": "V, S, M (a handful of thorns)"
+    "components": "V, S, M (a handful of thorns)",
+    "higherLevel": "Both types of damage increase by 1d8 for each spell slot level above 6."
   },
   "wall-of-ice": {
-    "_es": "d6c72870",
+    "_es": "add28bf4",
     "name": "Wall of Ice",
     "description": "You create a wall of ice shaped as a dome or flat panels, 1 foot thick; Dexterity saving throw against Cold damage when it appears.",
-    "components": "V, S, M (a piece of quartz)"
+    "components": "V, S, M (a piece of quartz)",
+    "higherLevel": "The damage the wall deals when it appears increases by 2d6 and the damage from passing through the sheet of frigid air increases by 1d6 for each spell slot level above 6."
   },
   "word-of-recall": {
     "_es": "5c880b22",
@@ -2025,9 +2176,10 @@
     "description": "You magically link two Large plants; anyone can enter one and exit the other by spending 5 feet of movement."
   },
   "conjure-celestial": {
-    "_es": "7b9282a4",
+    "_es": "2affe028",
     "name": "Conjure Celestial",
-    "description": "A pillar of light in a 10-foot-radius, 40-foot-high cylinder. For each creature you can see inside, you choose which light bathes it: Healing Light, which restores 4d12 + your spellcasting ability modifier in HP, or Searing Light, which forces a Dexterity saving throw against 6d12 Radiant damage, or half as much on a success. A creature can be affected only once per turn."
+    "description": "A pillar of light in a 10-foot-radius, 40-foot-high cylinder. For each creature you can see inside, you choose which light bathes it: Healing Light, which restores 4d12 + your spellcasting ability modifier in HP, or Searing Light, which forces a Dexterity saving throw against 6d12 Radiant damage, or half as much on a success. A creature can be affected only once per turn.",
+    "higherLevel": "The healing and damage increase by 1d12 for each spell slot level above 7."
   },
   "mordenkainens-sword": {
     "_es": "081a5a95",
@@ -2153,9 +2305,10 @@
     "description": "A 300-foot-radius storm cloud: Constitution saving throw against 2d6 Thunder damage and the Deafened condition; each following turn it produces a different effect."
   },
   "modify-memory": {
-    "_es": "5c8bfe47",
+    "_es": "4f2a2c0e",
     "name": "Modify Memory",
-    "description": "A creature that fails a Wisdom saving throw has the Charmed and Incapacitated conditions while you alter its memory of an event of up to 10 minutes that happened within the last 24 hours. Higher slots let you modify older memories."
+    "description": "A creature that fails a Wisdom saving throw has the Charmed and Incapacitated conditions while you alter its memory of an event of up to 10 minutes that happened within the last 24 hours.",
+    "higherLevel": "You can alter the target's memories of an event that took place up to 7 days ago (level 6 spell slot), 30 days ago (level 7 spell slot), 365 days ago (level 8 spell slot), or any time in the creature's past (level 9 spell slot)."
   },
   "speak-with-dead": {
     "_es": "fb844415",
@@ -2164,14 +2317,16 @@
     "components": "V, S, M (burning incense)"
   },
   "toll-the-dead": {
-    "_es": "43132067",
+    "_es": "6d89337e",
     "name": "Toll the Dead",
-    "description": "A creature that fails a Wisdom saving throw takes 1d8 Necrotic damage, or 1d12 if it is missing any HP. The damage increases at levels 5, 11, and 17."
+    "description": "A creature that fails a Wisdom saving throw takes 1d8 Necrotic damage, or 1d12 if it is missing any HP.",
+    "higherLevel": "Damage gains one die at level 5 (2d8 or 2d12), level 11 (3d8 or 3d12) and level 17 (4d8 or 4d12)."
   },
   "homunculus-servant": {
-    "_es": "666ad629",
+    "_es": "1deca2d4",
     "name": "Homunculus Servant",
     "description": "You summon a homunculus (Tiny Construct, 5 + 5 per spell slot level HP, AC 13, Fly 30 feet) in an unoccupied space; it shares your Initiative and acts right after you. If you already had one from this spell, it is replaced.",
-    "components": "V, S, M (a gem worth 100+ GP)"
+    "components": "V, S, M (a gem worth 100+ GP)",
+    "higherLevel": "The slot's level counts as the spell's level in the creature's stat block."
   }
 }

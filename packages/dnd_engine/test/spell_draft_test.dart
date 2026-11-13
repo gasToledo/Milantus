@@ -22,6 +22,19 @@ void main() {
     expect(SpellDraft.build(spell, form).components, spell.components);
   });
 
+  test('la mejora de nivel superior hace ida y vuelta, y vacía no se guarda',
+      () {
+    final spell = repo.spell('guiding-bolt')!;
+    expect(spell.higherLevel, isNotEmpty);
+    final form = SpellDraft.formOf(spell);
+    expect(form['higherLevel'], spell.higherLevel);
+    expect(SpellDraft.build(spell, form).higherLevel, spell.higherLevel);
+    form['higherLevel'] = '  ';
+    final built = SpellDraft.build(spell, form);
+    expect(built.higherLevel, isEmpty);
+    expect(built.toJson(), isNot(contains('higherLevel')));
+  });
+
   test('sin M marcada el material no queda en la línea', () {
     final spell = withMaterial();
     final form = SpellDraft.formOf(spell);

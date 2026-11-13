@@ -77,6 +77,7 @@ class SpellDraft {
       'ritual': s.ritual,
       'classes': [...s.classes],
       'description': s.description,
+      'higherLevel': s.higherLevel,
     };
   }
 
@@ -95,6 +96,7 @@ class SpellDraft {
         concentration: form['concentration'] == true,
         ritual: form['ritual'] == true,
         description: draftText(form['description']),
+        higherLevel: draftText(form['higherLevel']),
         classes: [
           for (final id in (form['classes'] as List? ?? const []))
             id.toString(),

@@ -929,6 +929,11 @@ class Spell {
   final bool concentration;
   final bool ritual;
   final String description;
+
+  /// Solo el texto de la mejora con un espacio superior (o por nivel de
+  /// personaje, en un truco), sin el rótulo: lo pone la interfaz según el
+  /// nivel. Vacío si el conjuro no mejora.
+  final String higherLevel;
   final List<String> classes;
 
   const Spell({
@@ -944,6 +949,7 @@ class Spell {
     this.concentration = false,
     this.ritual = false,
     this.description = '',
+    this.higherLevel = '',
     this.classes = const [],
   });
 
@@ -972,6 +978,7 @@ class Spell {
         'concentration': concentration,
         'ritual': ritual,
         'description': description,
+        if (higherLevel.isNotEmpty) 'higherLevel': higherLevel,
         'classes': classes,
       };
 
@@ -988,6 +995,7 @@ class Spell {
         concentration: j['concentration'] as bool? ?? false,
         ritual: j['ritual'] as bool? ?? false,
         description: j['description'] as String? ?? '',
+        higherLevel: j['higherLevel'] as String? ?? '',
         classes: (j['classes'] as List? ?? const [])
             .map((e) => e as String)
             .toList(),

@@ -29,7 +29,8 @@
     "classes": [
       "bard"
     ],
-    "description": "Salvación de SAB o el objetivo recibe 1d6 psíquico y desventaja en su próximo ataque. Escala por nivel.",
+    "description": "Salvación de SAB o el objetivo recibe 1d6 psíquico y desventaja en su próximo ataque.",
+    "higherLevel": "El daño aumenta en 1d6 cuando alcanzás los niveles 5 (2d6), 11 (3d6) y 17 (4d6).",
     "concentration": false,
     "ritual": false
   },
@@ -46,6 +47,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Ataque de conjuro cuerpo a cuerpo; 1d8 de relámpago y el objetivo no puede usar reacciones hasta su próximo turno. Ventaja si lleva metal.",
+    "higherLevel": "El daño aumenta en 1d8 cuando alcanzás los niveles 5 (2d8), 11 (3d8) y 17 (4d8).",
     "classes": [
       "wizard",
       "sorcerer",
@@ -65,7 +67,8 @@
     "classes": [
       "warlock"
     ],
-    "description": "Ataque de conjuro a distancia; 1d10 de daño de fuerza. Rayos adicionales a niveles 5, 11 y 17.",
+    "description": "Ataque de conjuro a distancia; 1d10 de daño de fuerza.",
+    "higherLevel": "El conjuro crea dos rayos a nivel 5, tres rayos a nivel 11 y cuatro rayos a nivel 17. Podés dirigir los rayos al mismo objetivo o a objetivos distintos. Realizá una tirada de ataque por separado para cada rayo.",
     "concentration": false,
     "ritual": false
   },
@@ -82,6 +85,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Ataque de conjuro a distancia por 1d8 radiante; si impacta, el objetivo emite luz tenue y no puede beneficiarse de invisibilidad.",
+    "higherLevel": "El daño aumenta en 1d8 cuando alcanzás los niveles 5 (2d8), 11 (3d8) y 17 (4d8).",
     "classes": [
       "druid",
       "bard"
@@ -100,6 +104,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Realizás un ataque con arma imbuida de energía radiante, usando tu característica de conjuro para el ataque y el daño.",
+    "higherLevel": "Independientemente de si hacés daño radiante o del tipo normal del arma, el ataque inflige daño radiante adicional cuando alcanzás los niveles 5 (1d6), 11 (2d6) y 17 (3d6).",
     "classes": [
       "wizard",
       "sorcerer",
@@ -160,7 +165,8 @@
     "classes": [
       "cleric"
     ],
-    "description": "El objetivo hace salvación de DES o recibe 1d8 de daño radiante; ignora cobertura. Escala por nivel.",
+    "description": "El objetivo hace salvación de DES o recibe 1d8 de daño radiante; ignora cobertura.",
+    "higherLevel": "El daño aumenta en 1d8 cuando alcanzás los niveles 5 (2d8), 11 (3d8) y 17 (4d8).",
     "concentration": false,
     "ritual": false
   },
@@ -260,6 +266,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Tocás a una criatura con 0 PG y la estabilizás. También afecta a muertos vivientes con salvación.",
+    "higherLevel": "El alcance se duplica cuando alcanzás los niveles 5 (30 pies), 11 (60 pies) y 17 (120 pies).",
     "classes": [
       "cleric",
       "druid",
@@ -279,6 +286,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Imbuís un bastón o una maza: usás tu característica de conjuro en lugar de Fuerza para atacar con ella, y su dado de daño pasa a ser un d8. El daño puede ser de fuerza o del tipo normal del arma, a tu elección.",
+    "higherLevel": "El dado de daño cambia cuando alcanzás los niveles 5 (d10), 11 (d12) y 17 (2d6).",
     "classes": [
       "druid"
     ]
@@ -316,7 +324,8 @@
     "duration": "10 minutos",
     "concentration": false,
     "ritual": false,
-    "description": "Una llama en tu mano ilumina y no quema nada. Hasta que el conjuro termine podés usar una acción de Magia para arrojar fuego a una criatura u objeto a 60 pies: ataque de conjuro a distancia por 1d8 de fuego. Escala por nivel de personaje.",
+    "description": "Una llama en tu mano ilumina y no quema nada. Hasta que el conjuro termine podés usar una acción de Magia para arrojar fuego a una criatura u objeto a 60 pies: ataque de conjuro a distancia por 1d8 de fuego.",
+    "higherLevel": "El daño aumenta en 1d8 cuando alcanzás los niveles 5 (2d8), 11 (3d8) y 17 (4d8).",
     "classes": [
       "druid"
     ]
@@ -337,6 +346,7 @@
       "artificer"
     ],
     "description": "Ataque de conjuro a distancia; 1d8 de daño por frío y reduce la velocidad del objetivo 10 pies.",
+    "higherLevel": "El daño aumenta en 1d8 cuando alcanzás los niveles 5 (2d8), 11 (3d8) y 17 (4d8).",
     "concentration": false,
     "ritual": false
   },
@@ -355,7 +365,8 @@
       "sorcerer",
       "artificer"
     ],
-    "description": "Ataque de conjuro a distancia; 1d10 de daño por fuego. Escala a niveles 5, 11 y 17.",
+    "description": "Ataque de conjuro a distancia; 1d10 de daño por fuego.",
+    "higherLevel": "El daño aumenta en 1d10 cuando alcanzás los niveles 5 (2d10), 11 (3d10) y 17 (4d10).",
     "concentration": false,
     "ritual": false
   },
@@ -411,7 +422,8 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Lanzás un vaho tóxico; hacés un ataque de conjuro a distancia contra el objetivo. Si acierta, recibe 1d12 de daño de veneno. Escala por nivel.",
+    "description": "Lanzás un vaho tóxico; hacés un ataque de conjuro a distancia contra el objetivo. Si acierta, recibe 1d12 de daño de veneno.",
+    "higherLevel": "El daño aumenta en 1d12 cuando alcanzás los niveles 5 (2d12), 11 (3d12) y 17 (4d12).",
     "classes": [
       "wizard",
       "sorcerer",
@@ -432,7 +444,8 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Arrojás una burbuja ácida; hasta dos criaturas cercanas hacen salvación de DES o reciben 1d6 de ácido. Escala por nivel.",
+    "description": "Arrojás una burbuja ácida; hasta dos criaturas cercanas hacen salvación de DES o reciben 1d6 de ácido.",
+    "higherLevel": "El daño aumenta en 1d6 cuando alcanzás los niveles 5 (2d6), 11 (3d6) y 17 (4d6).",
     "classes": [
       "wizard",
       "sorcerer",
@@ -468,7 +481,8 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Canalizás un frío sepulcral y hacés un ataque de conjuro cuerpo a cuerpo contra un objetivo a tu alcance. Si acertás, recibe 1d10 de daño necrótico y no puede recuperar puntos de golpe hasta el final de tu siguiente turno. El daño sube a 2d10 en el nivel 5, 3d10 en el 11 y 4d10 en el 17.",
+    "description": "Canalizás un frío sepulcral y hacés un ataque de conjuro cuerpo a cuerpo contra un objetivo a tu alcance. Si acertás, recibe 1d10 de daño necrótico y no puede recuperar puntos de golpe hasta el final de tu siguiente turno.",
+    "higherLevel": "El daño aumenta en 1d10 cuando alcanzás los niveles 5 (2d10), 11 (3d10) y 17 (4d10).",
     "classes": [
       "wizard",
       "sorcerer",
@@ -508,7 +522,8 @@
       "cleric",
       "paladin"
     ],
-    "description": "Tres criaturas suman 1d4 a ataques y salvaciones (+1 objetivo por espacio superior).",
+    "description": "Tres criaturas suman 1d4 a ataques y salvaciones.",
+    "higherLevel": "Podés hacer objetivo a una criatura adicional por cada nivel por encima de 1 que tenga el espacio.",
     "ritual": false
   },
   {
@@ -569,7 +584,8 @@
       "ranger",
       "artificer"
     ],
-    "description": "Restaura 2d8 + mod. de lanzamiento PG (+2d8 por espacio superior).",
+    "description": "Restaura 2d8 + mod. de lanzamiento PG.",
+    "higherLevel": "La curación aumenta en 2d8 por cada nivel por encima de 1 que tenga el espacio.",
     "concentration": false,
     "ritual": false
   },
@@ -631,6 +647,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Un humanoide que veas hace salvación de SAB o queda hechizado por vos, tratándote como conocido amistoso, hasta 1 hora.",
+    "higherLevel": "Podés hacer objetivo a una criatura adicional por cada nivel por encima de 1 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer",
@@ -762,7 +779,8 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Tocás a una criatura, que hace una salvación de CON: si la falla, recibe 2d10 de daño necrótico; si la supera, recibe la mitad del daño. Escala por nivel.",
+    "description": "Tocás a una criatura, que hace una salvación de CON: si la falla, recibe 2d10 de daño necrótico; si la supera, recibe la mitad del daño.",
+    "higherLevel": "El daño aumenta en 1d10 por cada nivel por encima de 1 que tenga el espacio.",
     "classes": [
       "cleric"
     ]
@@ -781,7 +799,8 @@
       "wizard",
       "sorcerer"
     ],
-    "description": "Cono de fuego; salvación de DES para mitad. 3d6 de daño (+1d6 por espacio superior).",
+    "description": "Cono de fuego; salvación de DES para mitad. 3d6 de daño.",
+    "higherLevel": "El daño aumenta en 1d6 por cada nivel por encima de 1 que tenga el espacio.",
     "concentration": false,
     "ritual": false
   },
@@ -797,7 +816,8 @@
     "duration": "1 hora",
     "concentration": true,
     "ritual": false,
-    "description": "Marcás mágicamente como tu presa a una criatura que veas a tu alcance. Hasta que el conjuro termine, le infligís 1d6 de daño de fuerza adicional cada vez que le acertás con una tirada de ataque, y tenés ventaja en las pruebas de Sabiduría (Percepción o Supervivencia) que hagas para buscarla. Si sus puntos de golpe llegan a 0 antes de que termine, podés usar una acción adicional para pasar la marca a otra criatura que veas. Con un espacio de nivel 3 o 4 la concentración puede durar hasta 8 horas, y con uno de nivel 5 o más, hasta 24 horas.",
+    "description": "Marcás mágicamente como tu presa a una criatura que veas a tu alcance. Hasta que el conjuro termine, le infligís 1d6 de daño de fuerza adicional cada vez que le acertás con una tirada de ataque, y tenés ventaja en las pruebas de Sabiduría (Percepción o Supervivencia) que hagas para buscarla. Si sus puntos de golpe llegan a 0 antes de que termine, podés usar una acción adicional para pasar la marca a otra criatura que veas.",
+    "higherLevel": "Tu concentración puede durar más si usás un espacio de conjuro de nivel 3 o 4 (hasta 8 horas) o 5 o más (hasta 24 horas).",
     "classes": [
       "ranger"
     ]
@@ -815,6 +835,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Creás una esfera de niebla de 20 pies que bloquea la visión (zona muy oscura). Concentración.",
+    "higherLevel": "El radio de la niebla aumenta en 20 pies por cada nivel por encima de 1 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer",
@@ -834,7 +855,8 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Onda de fuerza en un cubo de 15 pies: 2d8 de trueno y empuje 10 pies (salvación de CON para mitad y no empuje). Escala.",
+    "description": "Onda de fuerza en un cubo de 15 pies: 2d8 de trueno y empuje 10 pies (salvación de CON para mitad y no empuje).",
+    "higherLevel": "El daño aumenta en 1d8 por cada nivel por encima de 1 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer",
@@ -855,6 +877,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Das una orden de una palabra; el objetivo hace salvación de SAB o la obedece en su próximo turno (acércate, suelta, huye, etc.).",
+    "higherLevel": "Podés afectar a una criatura adicional por cada nivel por encima de 1 que tenga el espacio.",
     "classes": [
       "cleric",
       "paladin",
@@ -876,7 +899,8 @@
       "druid",
       "bard"
     ],
-    "description": "Restaura 2d4 + mod. de lanzamiento PG a distancia (+2d4 por espacio superior).",
+    "description": "Restaura 2d4 + mod. de lanzamiento PG a distancia.",
+    "higherLevel": "La curación aumenta en 2d4 por cada nivel por encima de 1 que tenga el espacio.",
     "concentration": false,
     "ritual": false
   },
@@ -915,7 +939,8 @@
       "wizard",
       "sorcerer"
     ],
-    "description": "Tres dardos que impactan automáticamente por 1d4+1 de fuerza cada uno. +1 dardo por espacio superior.",
+    "description": "Tres dardos que impactan automáticamente por 1d4+1 de fuerza cada uno.",
+    "higherLevel": "El conjuro crea un dardo adicional por cada nivel por encima de 1 que tenga el espacio.",
     "concentration": false,
     "ritual": false
   },
@@ -931,7 +956,8 @@
     "duration": "1 asalto",
     "concentration": false,
     "ritual": false,
-    "description": "Ataque de conjuro a distancia por 4d6 radiante; el próximo ataque contra el objetivo tiene ventaja. Escala.",
+    "description": "Ataque de conjuro a distancia por 4d6 radiante; el próximo ataque contra el objetivo tiene ventaja.",
+    "higherLevel": "El daño aumenta en 1d6 por cada nivel por encima de 1 que tenga el espacio.",
     "classes": [
       "cleric"
     ]
@@ -1006,6 +1032,7 @@
     "concentration": false,
     "ritual": false,
     "description": "La velocidad del objetivo aumenta 10 pies durante 1 hora.",
+    "higherLevel": "Podés hacer objetivo a una criatura adicional por cada nivel por encima de 1 que tenga el espacio.",
     "classes": [
       "wizard",
       "bard",
@@ -1029,6 +1056,7 @@
       "cleric"
     ],
     "description": "Arma espectral que ataca por 1d8 + mod. de lanzamiento de daño de fuerza; la movés como acción adicional.",
+    "higherLevel": "El daño aumenta en 1d8 por cada nivel por encima de 2 que tenga el espacio.",
     "ritual": false
   },
   {
@@ -1043,7 +1071,8 @@
     "duration": "8 horas",
     "concentration": false,
     "ritual": false,
-    "description": "Hasta tres criaturas aumentan su PG máximo y actual en 5 durante 8 horas. Escala por nivel.",
+    "description": "Hasta tres criaturas aumentan su PG máximo y actual en 5 durante 8 horas.",
+    "higherLevel": "Los puntos de golpe de cada objetivo aumentan en 5 adicionales por cada nivel por encima de 2 que tenga el espacio.",
     "classes": [
       "cleric",
       "paladin",
@@ -1065,7 +1094,8 @@
     "duration": "1 minuto",
     "concentration": true,
     "ritual": false,
-    "description": "Calentás al rojo un objeto metálico; quien lo porte recibe 2d8 de fuego y puede soltarlo. Concentración. Escala.",
+    "description": "Calentás al rojo un objeto metálico; quien lo porte recibe 2d8 de fuego y puede soltarlo. Concentración.",
+    "higherLevel": "El daño aumenta en 1d8 por cada nivel por encima de 2 que tenga el espacio.",
     "classes": [
       "druid",
       "bard",
@@ -1121,7 +1151,8 @@
     "duration": "1 minuto",
     "concentration": true,
     "ritual": false,
-    "description": "Una esfera de fuego que movés cada turno; inflige 2d6 de fuego a quien toque. Concentración. Escala.",
+    "description": "Una esfera de fuego que movés cada turno; inflige 2d6 de fuego a quien toque. Concentración.",
+    "higherLevel": "El daño aumenta en 1d6 por cada nivel por encima de 2 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer",
@@ -1148,6 +1179,7 @@
       "warlock"
     ],
     "description": "Un humanoide hace salvación de SAB o queda Paralizado; repite al final de cada turno.",
+    "higherLevel": "Podés hacer objetivo a un humanoide adicional por cada nivel por encima de 2 que tenga el espacio.",
     "ritual": false
   },
   {
@@ -1168,7 +1200,8 @@
       "warlock",
       "artificer"
     ],
-    "description": "El objetivo se vuelve invisible hasta que ataque o lance un conjuro. +1 objetivo por espacio superior.",
+    "description": "El objetivo se vuelve invisible hasta que ataque o lance un conjuro.",
+    "higherLevel": "Podés hacer objetivo a una criatura adicional por cada nivel por encima de 2 que tenga el espacio.",
     "ritual": false
   },
   {
@@ -1258,7 +1291,8 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Hasta seis criaturas recuperan 2d8 + tu característica de conjuro en PG. Escala.",
+    "description": "Hasta seis criaturas recuperan 2d8 + tu característica de conjuro en PG.",
+    "higherLevel": "La curación aumenta en 1d8 por cada nivel por encima de 2 que tenga el espacio.",
     "classes": [
       "cleric",
       "paladin"
@@ -1298,7 +1332,8 @@
       "wizard",
       "sorcerer"
     ],
-    "description": "Tres rayos; ataque de conjuro por cada uno, 2d6 de fuego. +1 rayo por espacio superior.",
+    "description": "Tres rayos; ataque de conjuro por cada uno, 2d6 de fuego.",
+    "higherLevel": "Creás un rayo adicional por cada nivel por encima de 2 que tenga el espacio.",
     "concentration": false,
     "ritual": false
   },
@@ -1314,7 +1349,8 @@
     "duration": "1 minuto",
     "concentration": true,
     "ritual": false,
-    "description": "Un haz de luz plateada de 5 pies que reubicás cada turno; 2d10 radiante a quien entre o empiece dentro. Concentración. Escala.",
+    "description": "Un haz de luz plateada de 5 pies que reubicás cada turno; 2d10 radiante a quien entre o empiece dentro. Concentración.",
+    "higherLevel": "El daño aumenta en 1d10 por cada nivel por encima de 2 que tenga el espacio.",
     "classes": [
       "druid"
     ]
@@ -1332,6 +1368,7 @@
     "concentration": true,
     "ritual": false,
     "description": "El objetivo gana ventaja en pruebas de una característica (y beneficios extra según cuál) durante 1 hora. Concentración.",
+    "higherLevel": "Podés hacer objetivo a una criatura adicional por cada nivel por encima de 2 que tenga el espacio. Podés elegir una característica distinta para cada objetivo.",
     "classes": [
       "wizard",
       "sorcerer",
@@ -1415,6 +1452,7 @@
     "concentration": true,
     "ritual": false,
     "description": "El objetivo puede trepar por muros y techos con las manos libres. Concentración.",
+    "higherLevel": "Podés hacer objetivo a una criatura adicional por cada nivel por encima de 2 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer",
@@ -1476,6 +1514,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Reanimás un esqueleto o zombi bajo tu control; podés reafirmar y ampliar el control cada 24 h.",
+    "higherLevel": "Animás o reforzás el control sobre dos criaturas muertas vivientes adicionales por cada nivel de conjuro por encima de 3 que tenga el espacio. Cada una de las criaturas debe proceder de un cadáver o un montón de huesos distinto.",
     "classes": [
       "wizard",
       "cleric"
@@ -1495,7 +1534,8 @@
       "wizard",
       "sorcerer"
     ],
-    "description": "Esfera de 20 pies; salvación de DES para mitad. 8d6 de fuego (+1d6 por espacio superior).",
+    "description": "Esfera de 20 pies; salvación de DES para mitad. 8d6 de fuego.",
+    "higherLevel": "El daño aumenta en 1d6 por cada nivel por encima de 3 que tenga el espacio.",
     "concentration": false,
     "ritual": false
   },
@@ -1530,7 +1570,8 @@
     "duration": "10 minutos",
     "concentration": true,
     "ritual": false,
-    "description": "Conjurás espíritus de la naturaleza, que aparecen como una manada Grande de animales espectrales en un espacio libre que veas a tu alcance. Tenés ventaja en las salvaciones de Fuerza mientras estés a 5 pies o menos de la manada, y al moverte en tu turno podés moverla hasta 30 pies a otro espacio libre. Cuando la manada se acerca a 10 pies o menos de una criatura que veas, o una criatura termina su turno ahí, podés obligarla a hacer una salvación de Destreza: si falla, recibe 3d10 de daño cortante. Cada criatura hace esta tirada una sola vez por turno. Con un espacio de nivel superior, el daño sube 1d10 por nivel por encima del 3.",
+    "description": "Conjurás espíritus de la naturaleza, que aparecen como una manada Grande de animales espectrales en un espacio libre que veas a tu alcance. Tenés ventaja en las salvaciones de Fuerza mientras estés a 5 pies o menos de la manada, y al moverte en tu turno podés moverla hasta 30 pies a otro espacio libre. Cuando la manada se acerca a 10 pies o menos de una criatura que veas, o una criatura termina su turno ahí, podés obligarla a hacer una salvación de Destreza: si falla, recibe 3d10 de daño cortante. Cada criatura hace esta tirada una sola vez por turno.",
+    "higherLevel": "El daño aumenta en 1d10 por cada nivel por encima de 3 que tenga el espacio.",
     "classes": [
       "druid",
       "ranger"
@@ -1558,6 +1599,7 @@
       "artificer"
     ],
     "description": "Termina conjuros de nivel 3 o inferior sobre un objetivo; niveles superiores requieren prueba de característica.",
+    "higherLevel": "Disipas automáticamente un conjuro sobre el objetivo cuyo nivel sea menor o igual al nivel del espacio de conjuro que hayas utilizado.",
     "concentration": false,
     "ritual": false
   },
@@ -1576,6 +1618,7 @@
       "cleric"
     ],
     "description": "Espíritus protectores; los enemigos en el aura sufren 3d8 (salvación de SAB para mitad) y velocidad reducida.",
+    "higherLevel": "El daño aumenta en 1d8 por cada nivel por encima de 3 que tenga el espacio.",
     "ritual": false
   },
   {
@@ -1591,6 +1634,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Creás una ilusión con imagen, sonido, olor y temperatura que podés mover y modificar. Concentración.",
+    "higherLevel": "El conjuro durará hasta que sea disipado y no requerirá concentración si se lanza con un espacio de conjuro de nivel 4 o superior.",
     "classes": [
       "wizard",
       "sorcerer",
@@ -1611,6 +1655,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Maldecís a una criatura (salvación de SAB) con un efecto debilitante a elección. Concentración.",
+    "higherLevel": "Si lanzás este conjuro con un espacio de nivel 4, podés mantener la concentración en él hasta 10 minutos. Si usás un espacio de nivel 5 o superior, el conjuro no requiere concentración y la duración pasará a ser de 8 horas (espacio de nivel 5 o 6) o de 24 horas (espacio de nivel 7 u 8). Si usás un espacio de conjuro de nivel 9, el conjuro durará hasta que sea disipado.",
     "classes": [
       "wizard",
       "cleric",
@@ -1629,7 +1674,8 @@
     "duration": "10 minutos",
     "concentration": true,
     "ritual": false,
-    "description": "Una nube de tormenta; como acción llamas un rayo por 3d10 de relámpago (salvación de DES para mitad). Concentración. Escala.",
+    "description": "Una nube de tormenta; como acción llamas un rayo por 3d10 de relámpago (salvación de DES para mitad). Concentración.",
+    "higherLevel": "El daño aumenta en 1d10 por cada nivel por encima de 3 que tenga el espacio.",
     "classes": [
       "druid"
     ]
@@ -1727,7 +1773,8 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Hasta seis criaturas recuperan 2d4 + tu característica de conjuro en PG. Escala.",
+    "description": "Hasta seis criaturas recuperan 2d4 + tu característica de conjuro en PG.",
+    "higherLevel": "La curación aumenta en 1d4 por cada nivel por encima de 3 que tenga el espacio.",
     "classes": [
       "cleric",
       "bard"
@@ -1845,7 +1892,8 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Una línea de 100 pies: 8d6 de relámpago (salvación de DES para mitad). Escala por nivel.",
+    "description": "Una línea de 100 pies: 8d6 de relámpago (salvación de DES para mitad).",
+    "higherLevel": "El daño aumenta en 1d6 por cada nivel por encima de 3 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer"
@@ -1905,7 +1953,8 @@
     "duration": "1 minuto",
     "concentration": true,
     "ritual": false,
-    "description": "Ataque de conjuro cuerpo a cuerpo por 3d6 necrótico; recuperás la mitad en PG. Concentración. Escala.",
+    "description": "Ataque de conjuro cuerpo a cuerpo por 3d6 necrótico; recuperás la mitad en PG. Concentración.",
+    "higherLevel": "El daño aumenta en 1d6 por cada nivel por encima de 3 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer",
@@ -1948,7 +1997,8 @@
       "warlock",
       "artificer"
     ],
-    "description": "El objetivo gana velocidad de vuelo de 60 pies. +1 objetivo por espacio superior.",
+    "description": "El objetivo gana velocidad de vuelo de 60 pies.",
+    "higherLevel": "Podés hacer objetivo a una criatura adicional por cada nivel por encima de 3 que tenga el espacio.",
     "ritual": false
   },
   {
@@ -1963,7 +2013,8 @@
     "duration": "1 minuto",
     "concentration": true,
     "ritual": false,
-    "description": "Salvación de Sabiduría: si la falla, el objetivo recibe 4d10 de daño psíquico y tiene desventaja en las pruebas de característica y en las tiradas de ataque mientras dure el conjuro; si la supera, recibe la mitad del daño y el conjuro termina. Mientras dure, repite la salvación al final de cada uno de sus turnos: si la falla recibe otra vez el daño, y si la supera el conjuro termina. Concentración. Escala.",
+    "description": "Salvación de Sabiduría: si la falla, el objetivo recibe 4d10 de daño psíquico y tiene desventaja en las pruebas de característica y en las tiradas de ataque mientras dure el conjuro; si la supera, recibe la mitad del daño y el conjuro termina. Mientras dure, repite la salvación al final de cada uno de sus turnos: si la falla recibe otra vez el daño, y si la supera el conjuro termina. Concentración.",
+    "higherLevel": "El daño aumenta en 1d10 por cada nivel por encima de 4 que tenga el espacio.",
     "classes": [
       "wizard",
       "bard"
@@ -1981,7 +2032,8 @@
     "duration": "1 minuto",
     "concentration": true,
     "ritual": false,
-    "description": "Criaturas en 10 pies (salvación de SAB) actúan al azar cada turno. Concentración. Escala el área.",
+    "description": "Criaturas en 10 pies (salvación de SAB) actúan al azar cada turno. Concentración.",
+    "higherLevel": "El radio de la esfera aumenta en 5 pies por cada nivel por encima de 4 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer",
@@ -2002,6 +2054,7 @@
     "concentration": true,
     "ritual": false,
     "description": "El objetivo (salvación de CAR) es desterrado a un semiplano; si es de otro plano y dura el minuto, no regresa. Concentración.",
+    "higherLevel": "Podés hacer objetivo a una criatura adicional por cada nivel por encima de 4 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer",
@@ -2061,6 +2114,7 @@
     "concentration": false,
     "ritual": false,
     "description": "El objetivo ignora terreno difícil y no puede ser apresado ni paralizado; se libera de sujeciones. Dura 1 hora.",
+    "higherLevel": "Podés hacer objetivo a una criatura adicional por cada nivel por encima de 4 que tenga el espacio.",
     "classes": [
       "cleric",
       "druid",
@@ -2081,7 +2135,8 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Drenás la fuerza vital de una criatura: 8d8 necrótico (salvación de CON para mitad); devastador contra plantas. Escala.",
+    "description": "Drenás la fuerza vital de una criatura: 8d8 necrótico (salvación de CON para mitad); devastador contra plantas.",
+    "higherLevel": "El daño aumenta en 1d8 por cada nivel por encima de 4 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer",
@@ -2121,7 +2176,8 @@
     "duration": "1 minuto",
     "concentration": true,
     "ritual": false,
-    "description": "Levantás un muro de llamas; 5d8 de fuego a quien lo cruce o termine cerca del lado ardiente. Concentración. Escala.",
+    "description": "Levantás un muro de llamas; 5d8 de fuego a quien lo cruce o termine cerca del lado ardiente. Concentración.",
+    "higherLevel": "El daño aumenta en 1d8 por cada nivel por encima de 4 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer",
@@ -2199,7 +2255,8 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Granizo golpea un cilindro de 20 pies: daño contundente y de frío, y deja terreno difícil. Escala.",
+    "description": "Granizo golpea un cilindro de 20 pies: daño contundente y de frío, y deja terreno difícil.",
+    "higherLevel": "El daño contundente aumenta en 1d10 por cada nivel por encima de 4 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer",
@@ -2218,7 +2275,8 @@
     "duration": "1 minuto",
     "concentration": true,
     "ritual": false,
-    "description": "Das vida a hasta diez objetos que atacan a tu orden. Concentración. Escala.",
+    "description": "Das vida a hasta diez objetos que atacan a tu orden. Concentración.",
+    "higherLevel": "El daño del golpe de la criatura aumenta en 1d4 (Mediana o más pequeña), 1d6 (Grande) o 1d12 (Enorme) por cada nivel por encima de 5 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer",
@@ -2238,7 +2296,8 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Una columna de fuego en un cilindro de 10 pies de radio y 40 de alto: salvación de Destreza contra 5d6 de fuego más 5d6 radiante, o la mitad si la supera. Escala.",
+    "description": "Una columna de fuego en un cilindro de 10 pies de radio y 40 de alto: salvación de Destreza contra 5d6 de fuego más 5d6 radiante, o la mitad si la supera.",
+    "higherLevel": "El daño de fuego y radiante aumentan en 1d6 por cada nivel por encima de 5 que tenga el espacio.",
     "classes": [
       "cleric"
     ]
@@ -2255,7 +2314,8 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Un cono de 60 pies: 8d8 de frío (salvación de CON para mitad). Escala.",
+    "description": "Un cono de 60 pies: 8d8 de frío (salvación de CON para mitad).",
+    "higherLevel": "El daño aumenta en 1d8 por cada nivel por encima de 5 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer",
@@ -2274,7 +2334,8 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Hasta seis criaturas en una esfera de 30 pies de radio recuperan 5d8 + tu modificador de característica de lanzamiento en PG. Escala.",
+    "description": "Hasta seis criaturas en una esfera de 30 pies de radio recuperan 5d8 + tu modificador de característica de lanzamiento en PG.",
+    "higherLevel": "La curación aumenta en 1d8 por cada nivel por encima de 5 que tenga el espacio.",
     "classes": [
       "cleric",
       "druid",
@@ -2293,7 +2354,8 @@
     "duration": "1 minuto",
     "concentration": true,
     "ritual": false,
-    "description": "Un humanoide (salvación de SAB) queda hechizado y bajo tu control mental. Concentración. Escala.",
+    "description": "Un humanoide (salvación de SAB) queda hechizado y bajo tu control mental. Concentración.",
+    "higherLevel": "Tu concentración puede durar más con un espacio de conjuro de nivel 6 (hasta 10 minutos), 7 (hasta 1 hora) u 8 o más (hasta 8 horas).",
     "classes": [
       "wizard",
       "sorcerer",
@@ -2333,7 +2395,8 @@
     "duration": "1 minuto",
     "concentration": true,
     "ritual": false,
-    "description": "Una criatura (salvación de SAB) queda paralizada; repite la salvación cada turno. Concentración. Escala.",
+    "description": "Una criatura (salvación de SAB) queda paralizada; repite la salvación cada turno. Concentración.",
+    "higherLevel": "Podés hacer objetivo a una criatura adicional por cada nivel por encima de 5 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer",
@@ -2373,6 +2436,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Imponés una orden a una criatura por 30 días; si la desobedece sufre daño psíquico. Salvación de SAB.",
+    "higherLevel": "Si usás un espacio de niveles 7 u 8, la duración será de 365 días. Si usás un espacio de nivel 9, el conjuro durará hasta que se le ponga fin mediante uno de los conjuros mencionados anteriormente.",
     "classes": [
       "wizard",
       "cleric",
@@ -2430,7 +2494,8 @@
     "duration": "10 minutos",
     "concentration": true,
     "ritual": false,
-    "description": "Una niebla venenosa de 20 pies que se desplaza; 5d8 de veneno (salvación de CON para mitad). Concentración. Escala.",
+    "description": "Una niebla venenosa de 20 pies que se desplaza; 5d8 de veneno (salvación de CON para mitad). Concentración.",
+    "higherLevel": "El daño aumenta en 1d8 por cada nivel por encima de 5 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer"
@@ -2448,7 +2513,8 @@
     "duration": "10 minutos",
     "concentration": true,
     "ritual": false,
-    "description": "Una esfera de 20 pies de insectos: terreno difícil, visión reducida y 4d10 de perforante. Concentración. Escala.",
+    "description": "Una esfera de 20 pies de insectos: terreno difícil, visión reducida y 4d10 de perforante. Concentración.",
+    "higherLevel": "El daño aumenta en 1d10 por cada nivel por encima de 5 que tenga el espacio.",
     "classes": [
       "cleric",
       "druid",
@@ -2524,7 +2590,8 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Una onda de energía negativa en una esfera de 60 pies de radio: salvación de Constitución contra 8d8 de daño necrótico, o la mitad si la supera. Escala.",
+    "description": "Una onda de energía negativa en una esfera de 60 pies de radio: salvación de Constitución contra 8d8 de daño necrótico, o la mitad si la supera.",
+    "higherLevel": "El daño aumenta en 2d8 por cada nivel por encima de 6 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer",
@@ -2560,7 +2627,8 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Un rayo verde; 10d6+40 de fuerza (salvación de DES). Si reduce a 0 PG, la criatura queda reducida a polvo. Escala.",
+    "description": "Un rayo verde; 10d6+40 de fuerza (salvación de DES). Si reduce a 0 PG, la criatura queda reducida a polvo.",
+    "higherLevel": "El daño aumenta en 3d6 por cada nivel por encima de 6 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer"
@@ -2579,6 +2647,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Una barrera de 10 pies bloquea conjuros de nivel 5 o inferior lanzados desde fuera. Concentración.",
+    "higherLevel": "La barrera bloquea los conjuros de 1 nivel más por cada nivel por encima de 6 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer"
@@ -2636,7 +2705,8 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Un rayo alcanza a un objetivo y salta a otros tres cercanos: 10d8 de relámpago (salvación de DES para mitad). Escala.",
+    "description": "Un rayo alcanza a un objetivo y salta a otros tres cercanos: 10d8 de relámpago (salvación de DES para mitad).",
+    "higherLevel": "Surge un relámpago adicional del primer objetivo a otro objetivo por cada nivel por encima de 6 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer"
@@ -2654,7 +2724,8 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Restaurás 70 PG a una criatura y le quitás ceguera, sordera y enfermedades. Escala.",
+    "description": "Restaurás 70 PG a una criatura y le quitás ceguera, sordera y enfermedades.",
+    "higherLevel": "La curación aumenta en 10 por cada nivel por encima de 6 que tenga el espacio.",
     "classes": [
       "cleric",
       "druid"
@@ -2673,6 +2744,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Hasta doce criaturas (salvación de SAB) obedecen una sugerencia razonable durante 24 horas.",
+    "higherLevel": "La duración aumenta al usar espacios de nivel 7 (10 días), 8 (30 días) o 9 (366 días).",
     "classes": [
       "wizard",
       "sorcerer",
@@ -2712,7 +2784,8 @@
     "duration": "1 minuto",
     "concentration": true,
     "ritual": false,
-    "description": "Una esfera que acumula fuego cada turno; al detonar inflige hasta 12d6+ de fuego en 20 pies. Concentración. Escala.",
+    "description": "Una esfera que acumula fuego cada turno; al detonar inflige hasta 12d6+ de fuego en 20 pies. Concentración.",
+    "higherLevel": "El daño base aumenta en 1d6 por cada nivel por encima de 7 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer"
@@ -2770,7 +2843,8 @@
     "duration": "8 horas",
     "concentration": false,
     "ritual": false,
-    "description": "Entrás al plano Etéreo fronterizo, pudiendo moverte a través de la materia. Escala para llevar a otros.",
+    "description": "Entrás al plano Etéreo fronterizo, pudiendo moverte a través de la materia.",
+    "higherLevel": "Podés hacer objetivo a hasta tres criaturas voluntarias (incluyéndote a vos) por cada nivel por encima de 7 que tenga el espacio. Estas criaturas deben estar a 10 pies o menos de vos cuando lances el conjuro.",
     "classes": [
       "wizard",
       "cleric",
@@ -2941,7 +3015,8 @@
     "duration": "1 hora",
     "concentration": true,
     "ritual": false,
-    "description": "Cualquier criatura (salvación de SAB) queda hechizada y bajo tu control. Concentración. Escala.",
+    "description": "Cualquier criatura (salvación de SAB) queda hechizada y bajo tu control. Concentración.",
+    "higherLevel": "Tu concentración puede durar más con un espacio de conjuro de nivel 9 (hasta 8 horas).",
     "classes": [
       "wizard",
       "sorcerer",
@@ -3336,7 +3411,8 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Disparás un rayo verduzco; hacés un ataque de conjuro a distancia contra el objetivo. Si acierta, recibe 2d8 de daño de veneno y queda envenenado hasta el final de tu próximo turno. Escala por nivel.",
+    "description": "Disparás un rayo verduzco; hacés un ataque de conjuro a distancia contra el objetivo. Si acierta, recibe 2d8 de daño de veneno y queda envenenado hasta el final de tu próximo turno.",
+    "higherLevel": "El daño aumenta en 1d8 por cada nivel por encima de 1 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer"
@@ -3354,7 +3430,8 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Ganás 2d4 + 4 puntos de golpe temporales. Escala.",
+    "description": "Ganás 2d4 + 4 puntos de golpe temporales.",
+    "higherLevel": "Obtenés 5 puntos de golpe temporales adicionales por cada nivel por encima de 1 que tenga el espacio.",
     "classes": [
       "wizard",
       "sorcerer",
@@ -3391,7 +3468,8 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Envolvés en llamas a quien te dañó: 2d10 de fuego, salvación de Destreza para la mitad. Escala.",
+    "description": "Envolvés en llamas a quien te dañó: 2d10 de fuego, salvación de Destreza para la mitad.",
+    "higherLevel": "El daño aumenta en 1d10 por cada nivel por encima de 1 que tenga el espacio.",
     "classes": [
       "warlock"
     ]
@@ -3449,6 +3527,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Ataque de conjuro a distancia: 1d8 del tipo que elijas entre ácido, frío, fuego, psíquico, relámpago, trueno o veneno. Cada 8 permite tirar otro d8, hasta tu modificador de aptitud mágica.",
+    "higherLevel": "El daño aumenta en 1d8 cuando alcanzás los niveles 5 (2d8), 11 (3d8) y 17 (4d8).",
     "classes": [
       "sorcerer"
     ]
@@ -3466,6 +3545,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Salvación de Inteligencia o 1d6 psíquico y resta 1d4 a su próxima salvación antes del final de tu siguiente turno.",
+    "higherLevel": "El daño sube a 2d6 al llegar al nivel 5, a 3d6 en el 11 y a 4d6 en el 17.",
     "classes": [
       "warlock",
       "sorcerer",
@@ -3505,6 +3585,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Ataque de conjuro cuerpo a cuerpo: 1d6 perforante y, si el objetivo es Grande o menor, lo arrastrás 10 pies hacia vos.",
+    "higherLevel": "El daño sube a 2d6 al llegar al nivel 5, a 3d6 en el 11 y a 4d6 en el 17.",
     "classes": [
       "druid",
       "artificer"
@@ -3523,6 +3604,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Emanación de 5 pies: las criaturas que elijas hacen salvación de Constitución o sufren 1d6 radiante.",
+    "higherLevel": "El daño sube a 2d6 al llegar al nivel 5, a 3d6 en el 11 y a 4d6 en el 17.",
     "classes": [
       "cleric"
     ]
@@ -3540,6 +3622,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Emanación de 5 pies: salvación de Constitución o 1d6 de trueno. El estruendo se oye a 100 pies.",
+    "higherLevel": "El daño sube a 2d6 al llegar al nivel 5, a 3d6 en el 11 y a 4d6 en el 17.",
     "classes": [
       "bard",
       "warlock",
@@ -3581,6 +3664,7 @@
     "concentration": false,
     "ritual": false,
     "description": "5 PG temporales y 5 de daño de frío a quien te acierte cuerpo a cuerpo. Termina si perdés los temporales.",
+    "higherLevel": "Los PG temporales y el daño de frío suben 5 por cada nivel del espacio por encima de 1.",
     "classes": [
       "warlock"
     ]
@@ -3616,6 +3700,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Emanación de 10 pies: salvación de Fuerza o 2d6 necrótico y sin reacciones hasta su siguiente turno; mitad de daño si la supera.",
+    "higherLevel": "El daño sube 1d6 por cada nivel del espacio por encima de 1.",
     "classes": [
       "warlock"
     ]
@@ -3633,6 +3718,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Tras acertar: 1d6 de fuego extra y el objetivo arde 1d6 por turno hasta que supere una salvación de Constitución.",
+    "higherLevel": "Todo el daño aumenta en 1d6 por cada nivel por encima de 1 que tenga el espacio.",
     "classes": [
       "paladin"
     ]
@@ -3650,6 +3736,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Tras acertar: 2d6 de trueno extra y salvación de Fuerza o lo empujás 10 pies y queda derribado.",
+    "higherLevel": "El daño sube 1d6 por cada nivel del espacio por encima de 1.",
     "classes": [
       "paladin"
     ]
@@ -3667,6 +3754,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Tras acertar: 2d8 radiante extra, más 1d8 si el objetivo es infernal o muerto viviente.",
+    "higherLevel": "El daño aumenta en 1d8 por cada nivel por encima de 1 que tenga el espacio.",
     "classes": [
       "paladin"
     ]
@@ -3684,6 +3772,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Tras acertar: 1d6 necrótico extra y salvación de Sabiduría o queda asustado; repite la salvación al final de cada turno.",
+    "higherLevel": "El daño sube 1d6 por cada nivel del espacio por encima de 1.",
     "classes": [
       "paladin"
     ]
@@ -3701,6 +3790,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Creás o destruís hasta 10 galones de agua, o hacés llover en un cubo de 30 pies para apagar llamas.",
+    "higherLevel": "Creás o destruís 10 galones más de agua o el tamaño del cubo aumenta en 5 pies por cada nivel por encima de 1 que tenga el espacio.",
     "classes": [
       "cleric",
       "druid"
@@ -3719,6 +3809,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Ataque de conjuro a distancia por 1d10 perforante; acierte o no, estalla y las criaturas a 5 pies hacen salvación de Destreza contra 2d6 de frío.",
+    "higherLevel": "El daño de frío aumenta en 1d6 por cada nivel por encima de 1 que tenga el espacio.",
     "classes": [
       "druid",
       "sorcerer",
@@ -3810,6 +3901,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Una bestia hace salvación de Sabiduría o queda hechizada. Termina si vos o tus aliados la dañan.",
+    "higherLevel": "Podés hacer objetivo a una bestia adicional por cada nivel por encima de 1 que tenga el espacio.",
     "classes": [
       "bard",
       "druid",
@@ -3863,6 +3955,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Tras acertar: salvación de Fuerza o queda apresado por enredaderas y sufre 1d6 perforante por turno.",
+    "higherLevel": "El daño aumenta en 1d6 por cada nivel por encima de 1 que tenga el espacio.",
     "classes": [
       "ranger"
     ]
@@ -3880,6 +3973,7 @@
     "concentration": true,
     "ritual": false,
     "description": "La criatura es inmune al estado de asustada y gana PG temporales iguales a tu modificador de aptitud mágica al inicio de cada turno.",
+    "higherLevel": "Podés hacer objetivo a una criatura adicional por cada nivel por encima de 1 que tenga el espacio.",
     "classes": [
       "bard",
       "paladin"
@@ -3917,6 +4011,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Maldecís a una criatura: 1d6 necrótico extra cuando le acertás, y desventaja en las pruebas de una característica a elegir.",
+    "higherLevel": "Tu concentración puede durar más si usás un espacio de conjuro de nivel 2 (hasta 4 horas), 3 o 4 (hasta 8 horas) o 5 o más (24 horas).",
     "classes": [
       "warlock"
     ]
@@ -3934,6 +4029,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Ataque de conjuro a distancia: 3d8 de ácido, frío, fuego, relámpago, trueno o veneno. Si repetís número en los d8, el orbe rebota a otra criatura.",
+    "higherLevel": "El daño aumenta en 1d8 por cada nivel por encima de 1 que tenga el espacio. El orbe puede saltar un máximo de veces igual al nivel del espacio gastado. Una criatura solo puede ser el objetivo una vez por cada lanzamiento del conjuro.",
     "classes": [
       "sorcerer",
       "wizard"
@@ -3952,6 +4048,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Hasta tres criaturas hacen salvación de Carisma; las que fallen restan 1d4 a sus ataques y salvaciones.",
+    "higherLevel": "Podés hacer objetivo a una criatura adicional por cada nivel por encima de 1 que tenga el espacio.",
     "classes": [
       "bard",
       "cleric",
@@ -3991,6 +4088,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Ataque de conjuro a distancia por 2d12 de relámpago; después, con una acción adicional por turno, repetís 1d12 automático.",
+    "higherLevel": "El daño inicial sube 1d12 por cada nivel del espacio por encima de 1.",
     "classes": [
       "warlock",
       "sorcerer",
@@ -4010,6 +4108,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Salvación de Sabiduría o queda derribada e incapacitada, riendo sin control; repite la salvación al final de cada turno y con daño.",
+    "higherLevel": "Podés hacer objetivo a una criatura adicional por cada nivel por encima de 1 que tenga el espacio.",
     "classes": [
       "bard",
       "warlock",
@@ -4048,6 +4147,7 @@
     "concentration": false,
     "ritual": false,
     "description": "La criatura puede saltar hasta 30 pies una vez por turno gastando 10 pies de movimiento.",
+    "higherLevel": "Podés hacer objetivo a una criatura adicional por cada nivel por encima de 1 que tenga el espacio.",
     "classes": [
       "druid",
       "ranger",
@@ -4088,6 +4188,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Salvación de Sabiduría o 3d6 psíquico y debe usar su reacción para huir de vos; mitad de daño y sin huida si la supera.",
+    "higherLevel": "El daño aumenta en 1d6 por cada nivel por encima de 1 que tenga el espacio.",
     "classes": [
       "bard"
     ]
@@ -4124,6 +4225,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Tras acertar con un arma a distancia: el objetivo y las criaturas a 5 pies hacen salvación de Destreza contra 1d10 perforante.",
+    "higherLevel": "El daño sube 1d10 por cada nivel del espacio por encima de 1.",
     "classes": [
       "ranger"
     ]
@@ -4199,6 +4301,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Tocás a una criatura voluntaria: puede exhalar en un cono de 15 pies una vez por turno para causar 3d6 del tipo elegido; salvación de Destreza, mitad de daño.",
+    "higherLevel": "El daño aumenta en 1d6 por cada nivel por encima de 2 que tenga el espacio.",
     "classes": [
       "sorcerer",
       "wizard",
@@ -4237,6 +4340,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Un arma no mágica tocada gana +1 a ataque y daño hasta que termine el conjuro.",
+    "higherLevel": "El bonificador aumenta a +2 si utilizás un espacio de niveles 3 a 5. El bonificador aumenta a +3 si utilizás un espacio de nivel 6 o superior.",
     "classes": [
       "ranger",
       "sorcerer",
@@ -4313,6 +4417,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Tras acertar: 2d6 radiante extra y el objetivo emite luz brillante en 5 pies, sin poder beneficiarse de invisibilidad, mientras dure.",
+    "higherLevel": "El daño aumenta en 1d6 por cada nivel por encima de 2 que tenga el espacio.",
     "classes": [
       "paladin"
     ]
@@ -4348,6 +4453,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Salvación de Sabiduría o 3d8 psíquico; si falla, conocés su ubicación mientras dure el conjuro.",
+    "higherLevel": "El daño aumenta en 1d8 por cada nivel por encima de 2 que tenga el espacio.",
     "classes": [
       "warlock",
       "sorcerer",
@@ -4367,6 +4473,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Clavás hasta cuatro flechas o virotes no mágicos en el suelo. Cuando una criatura que no seas vos entra por primera vez en un turno en un espacio a 30 pies o menos, o termina su turno ahí, una sola pieza de munición sale disparada: salvación de Destreza o 2d4 de daño perforante. Esa pieza se destruye, y el conjuro termina cuando no queda ninguna clavada.",
+    "higherLevel": "Podés disparar dos piezas de munición más por cada nivel del espacio por encima de 2.",
     "classes": [
       "ranger"
     ]
@@ -4497,6 +4604,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Ataque de conjuro a distancia: 4d4 de ácido y 2d4 más al final de su siguiente turno; mitad de daño inicial si falla.",
+    "higherLevel": "El daño (tanto el inicial como el posterior) aumenta en 1d4 por cada nivel por encima de 2 que tenga el espacio.",
     "classes": [
       "wizard"
     ]
@@ -4533,6 +4641,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Esfera de 10 pies: salvación de Constitución o 3d8 de trueno (desventaja para autómatas); mitad de daño si la supera. También daña objetos no mágicos.",
+    "higherLevel": "El daño aumenta en 1d8 por cada nivel por encima de 2 que tenga el espacio.",
     "classes": [
       "bard",
       "sorcerer",
@@ -4552,6 +4661,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Invocás un corcel sobrenatural con forma de animal Grande de tu elección en un espacio libre dentro del alcance.",
+    "higherLevel": "Usá el nivel del espacio de conjuro para determinar el nivel del conjuro en el perfil.",
     "classes": [
       "paladin"
     ]
@@ -4569,6 +4679,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Invocás una hoja de fuego en tu mano; ataque de conjuro cuerpo a cuerpo por 3d6 más tu modificador de aptitud mágica en daño de fuego.",
+    "higherLevel": "El daño aumenta en 1d6 por cada nivel por encima de 2 que tenga el espacio.",
     "classes": [
       "druid",
       "sorcerer"
@@ -4607,6 +4718,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Invocás un espíritu bestial de tierra, mar o aire en un espacio libre; usa el perfil del espíritu bestial y desaparece a 0 PG o al terminar el conjuro.",
+    "higherLevel": "El nivel del espacio cuenta como nivel del conjuro en el perfil de la criatura.",
     "classes": [
       "druid",
       "ranger"
@@ -4686,6 +4798,7 @@
     "concentration": false,
     "ritual": true,
     "description": "Una bestia Diminuta lleva un mensaje corto a un lugar y destinatario que describas; salvación de Carisma para aceptar la tarea.",
+    "higherLevel": "La duración del conjuro aumenta en 48 horas por cada nivel por encima de 2 que tenga el espacio.",
     "classes": [
       "bard",
       "druid",
@@ -4705,6 +4818,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Cubo de 5 pies con dagas giratorias: 4d4 cortante a quien entre, termine su turno o sea alcanzado por el cubo; una vez por turno.",
+    "higherLevel": "El daño sube 2d4 por cada nivel del espacio por encima de 2.",
     "classes": [
       "bard",
       "warlock",
@@ -4782,6 +4896,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Salvación de Constitución o queda cegada o ensordecida a tu elección; repite la salvación al final de cada turno.",
+    "higherLevel": "Podés hacer objetivo a una criatura adicional por cada nivel por encima de 2 que tenga el espacio.",
     "classes": [
       "bard",
       "cleric",
@@ -4859,6 +4974,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Tirás uno o dos dados de golpe no gastados y recuperás PG iguales al resultado más tu modificador de aptitud mágica; los dados quedan gastados.",
+    "higherLevel": "Podés tirar un dado de golpe más por cada nivel del espacio por encima de 2.",
     "classes": [
       "sorcerer",
       "wizard",
@@ -4878,6 +4994,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Un arma no mágica tocada gana +1 a ataque y 1d4 extra del tipo elemental que elijas, mientras dure el conjuro.",
+    "higherLevel": "Con un espacio de nivel 5 o 6, el bonificador al ataque es +2 y el daño extra 2d4; con uno de nivel 7 o más, +3 y 3d4.",
     "classes": [
       "druid",
       "ranger",
@@ -4938,6 +5055,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Tras acertar: 3d8 radiante extra y el objetivo queda cegado hasta que supere una salvación de Constitución al final de cada turno.",
+    "higherLevel": "El daño extra sube 1d8 por cada nivel del espacio por encima de 3.",
     "classes": [
       "paladin"
     ]
@@ -4955,6 +5073,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Un cilindro de 10 pies de radio bloquea, o atrapa, a un tipo de criatura elegido (celestial, elemental, feérico, infernal o muerto viviente).",
+    "higherLevel": "La duración aumenta en 1 hora por cada nivel por encima de 3 que tenga el espacio.",
     "classes": [
       "warlock",
       "cleric",
@@ -4995,6 +5114,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Cono de 60 pies de versiones espectrales de tu arma: salvación de Destreza contra 5d8 de fuerza, mitad de daño si la supera.",
+    "higherLevel": "El daño sube 1d8 por cada nivel del espacio por encima de 3.",
     "classes": [
       "ranger"
     ]
@@ -5106,6 +5226,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Tras un ataque a distancia con arma, el proyectil se vuelve relámpago: 4d8 de daño (mitad si falla) y 2d8 a las criaturas a 10 pies del objetivo.",
+    "higherLevel": "El daño de ambos efectos sube 1d8 por cada nivel del espacio por encima de 3.",
     "classes": [
       "ranger"
     ]
@@ -5123,6 +5244,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Una criatura voluntaria tocada se vuelve niebla: vuela a 10 pies, puede colarse por huecos y tiene resistencia al daño no mágico salvo fuerza.",
+    "higherLevel": "Podés hacer objetivo a una criatura adicional por cada nivel por encima de 3 que tenga el espacio.",
     "classes": [
       "warlock",
       "sorcerer",
@@ -5161,6 +5283,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Inscribís un glifo que libera un conjuro de nivel 3 o inferior, o 5d8 de daño, cuando se cumple la condición de activación que elijas.",
+    "higherLevel": "El daño de una runa explosiva aumenta en 1d8 por cada nivel por encima de 3 que tenga el espacio. Si creás un glifo de conjuro, podés almacenar cualquier conjuro de hasta el mismo nivel que el espacio de conjuro que hayas empleado para el glifo custodio.",
     "classes": [
       "bard",
       "cleric",
@@ -5200,6 +5323,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Esfera de 20 pies de oscuridad y terreno difícil: 2d6 de frío al entrar o empezar el turno ahí, y otro 2d6 de ácido al final del turno.",
+    "higherLevel": "El daño de frío o de ácido (a tu elección) sube 1d6 por cada nivel del espacio por encima de 3.",
     "classes": [
       "warlock"
     ]
@@ -5236,6 +5360,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Invocás un espíritu feérico de ánimo alegre, burlón o enfurecido en un espacio libre; usa el perfil del espíritu feérico.",
+    "higherLevel": "El nivel del espacio cuenta como nivel del conjuro en el perfil de la criatura.",
     "classes": [
       "warlock",
       "druid",
@@ -5256,6 +5381,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Invocás un espíritu muerto viviente de forma esquelética, fantasmal o pútrida en un espacio libre; usa el perfil del espíritu muerto viviente.",
+    "higherLevel": "El nivel del espacio cuenta como nivel del conjuro en el perfil de la criatura.",
     "classes": [
       "warlock",
       "wizard"
@@ -5418,6 +5544,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Tras acertar: 4d6 psíquico extra y salvación de Sabiduría o queda aturdido hasta el final de tu siguiente turno.",
+    "higherLevel": "El daño extra sube 1d6 por cada nivel del espacio por encima de 4.",
     "classes": [
       "paladin"
     ]
@@ -5470,6 +5597,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Espíritus elementales te rodean en 15 pies: tus ataques causan 2d8 extra del tipo elemental que elijas a quien esté dentro.",
+    "higherLevel": "El daño aumenta en 1d8 por cada nivel por encima de 4 que tenga el espacio.",
     "classes": [
       "druid",
       "wizard"
@@ -5488,6 +5616,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Espíritus de la naturaleza en 10 pies: salvación de Sabiduría contra 5d8 de fuerza a quien entre en la emanación o termine su turno ahí.",
+    "higherLevel": "El daño aumenta en 1d8 por cada nivel por encima de 4 que tenga el espacio.",
     "classes": [
       "druid",
       "ranger"
@@ -5525,6 +5654,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Salvación de Sabiduría o una bestia queda hechizada; tenés vínculo telepático y podés darle órdenes u ordenarle atacar.",
+    "higherLevel": "Tu concentración puede durar más con un espacio de conjuro de nivel 5 (hasta 10 minutos), 6 (hasta 1 hora) o 7 o más (hasta 8 horas).",
     "classes": [
       "druid",
       "ranger",
@@ -5544,6 +5674,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Ataque de conjuro cuerpo a cuerpo: 4d8 contundente y arrastra hasta 30 pies hacia la enredadera; apresa si el objetivo es Enorme o menor.",
+    "higherLevel": "Podés apresar una criatura más con la enredadera por cada nivel del espacio por encima de 4.",
     "classes": [
       "druid",
       "ranger"
@@ -5580,6 +5711,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Esfera de 20 pies de ácido: salvación de Destreza contra 10d4 de ácido y otros 5d4 al final del siguiente turno; mitad de daño inicial si supera.",
+    "higherLevel": "El daño inicial aumenta en 2d4 por cada nivel por encima de 4 que tenga el espacio.",
     "classes": [
       "sorcerer",
       "wizard"
@@ -5651,6 +5783,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Salvación de Sabiduría (con ventaja si lucha contra vos) o una criatura queda hechizada y amistosa hasta que termine el conjuro o reciba daño de vos.",
+    "higherLevel": "Podés hacer objetivo a una criatura adicional por cada nivel por encima de 4 que tenga el espacio.",
     "classes": [
       "bard",
       "warlock",
@@ -5672,6 +5805,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Invocás una araña, avispa o ciempiés gigante en un espacio libre; usa el perfil del insecto gigante elegido.",
+    "higherLevel": "Usá el nivel del espacio de conjuro para determinar el nivel del conjuro en el perfil.",
     "classes": [
       "druid"
     ]
@@ -5689,6 +5823,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Invocás un espíritu aberrante —azotamentes, contemplador o slaad— en un espacio libre; usa el perfil del espíritu aberrante.",
+    "higherLevel": "El nivel del espacio cuenta como nivel del conjuro en el perfil de la criatura.",
     "classes": [
       "warlock",
       "wizard"
@@ -5707,6 +5842,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Invocás un espíritu de autómata de arcilla, metal o piedra en un espacio libre; usa el perfil del espíritu autómata.",
+    "higherLevel": "El nivel del espacio cuenta como nivel del conjuro en el perfil de la criatura.",
     "classes": [
       "wizard",
       "artificer"
@@ -5725,6 +5861,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Invocás un espíritu elemental de agua, aire, fuego o tierra en un espacio libre; usa el perfil del espíritu elemental.",
+    "higherLevel": "El nivel del espacio cuenta como nivel del conjuro en el perfil de la criatura.",
     "classes": [
       "druid",
       "ranger",
@@ -5822,6 +5959,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Volvés mágicamente segura una zona en cubo de hasta 100 pies: podés bloquear sonido, visión, teletransporte o escrutinio.",
+    "higherLevel": "Podés aumentar el tamaño del cubo en 100 pies por cada nivel por encima de 4 que tenga el espacio.",
     "classes": [
       "wizard",
       "artificer"
@@ -5896,6 +6034,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Obligás a un celestial, elemental, feérico o infernal a servirte: salvación de Carisma o queda a tu servicio hasta que termine el conjuro.",
+    "higherLevel": "La duración aumenta con un espacio de nivel 6 (10 días), 7 (30 días), 8 (180 días) y 9 (366 días).",
     "classes": [
       "bard",
       "warlock",
@@ -6043,6 +6182,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Invocás un espíritu elemental Grande de agua, aire, fuego o tierra que ataca según el elemento elegido, con daño propio de estadísticas.",
+    "higherLevel": "El daño aumenta en 1d8 por cada nivel por encima de 5 que tenga el espacio.",
     "classes": [
       "druid",
       "wizard"
@@ -6073,7 +6213,7 @@
     "school": "Adivinación",
     "castingTime": "10 minutos",
     "range": "Personal",
-    "components": "V, S, M (incienso que valga al menos 250 po, que se consume como parte del conjuro, y cuatro tiras de marfil que valgan al menos 50 po)",
+    "components": "V, S, M (incienso que valga al menos 250 po, que se consume como parte del conjuro, y cuatro tirás de marfil que valgan al menos 50 po)",
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
@@ -6150,6 +6290,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Creás un objeto de materia vegetal o mineral con hebras de sombra; dura de una hora a permanente según el material.",
+    "higherLevel": "El tamaño del cubo aumenta en 5 pies por cada nivel por encima de 5 que tenga el espacio.",
     "classes": [
       "sorcerer",
       "wizard",
@@ -6299,6 +6440,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Invocás un espíritu celestial defensor o vengador en un espacio libre; se considera tu aliado y actúa justo después de tu turno.",
+    "higherLevel": "El nivel del espacio cuenta como nivel del conjuro en el perfil de la criatura.",
     "classes": [
       "cleric",
       "paladin"
@@ -6317,6 +6459,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Invocás un espíritu dracónico en un espacio libre; se considera tu aliado y actúa justo después de tu turno.",
+    "higherLevel": "Usá el nivel del espacio de conjuro para determinar el nivel del conjuro en el perfil.",
     "classes": [
       "wizard"
     ]
@@ -6334,6 +6477,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Creás una mano de fuerza Grande que obedece tus órdenes: puede empujar, agarrar, interponerse como escudo o atacar.",
+    "higherLevel": "El daño del puño cerrado aumenta en 2d8 y el daño de la mano apresadora aumenta en 2d6 por cada nivel por encima de 5 que tenga el espacio.",
     "classes": [
       "sorcerer",
       "wizard",
@@ -6440,6 +6584,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Cilindro de tormenta: cegadas y ensordecidas sin poder lanzar conjuros con componente verbal; salvación de Constitución contra daño radiante y de trueno.",
+    "higherLevel": "El daño radiante y el de trueno suben 1d10 por cada nivel del espacio por encima de 5.",
     "classes": [
       "warlock",
       "wizard"
@@ -6511,6 +6656,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Invocás un espíritu Mediano de los Parajes Feéricos con forma de criatura feérica; al aparecer podés atacar cuerpo a cuerpo por 3d12 psíquico.",
+    "higherLevel": "El daño aumenta en 1d12 por cada nivel por encima de 6 que tenga el espacio.",
     "classes": [
       "druid"
     ]
@@ -6545,6 +6691,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Solo de noche: hasta tres cadáveres se convierten en gules bajo tu control, que podés dirigir con una acción adicional.",
+    "higherLevel": "Si usás un espacio de conjuro de nivel 7, podés animar o reforzar el control sobre cuatro gules. Si usás un espacio de conjuro de nivel 8, podés animar o reforzar el control sobre cinco gules o dos ghasts o tumularios. Si usás un espacio de conjuro de nivel 9, podés animar o reforzar el control sobre seis gules, tres ghasts o tumularios o dos momias. Consultá el capítulo “Monstruos” para ver estos perfiles.",
     "classes": [
       "warlock",
       "cleric",
@@ -6602,6 +6749,7 @@
     "concentration": false,
     "ritual": false,
     "description": "Esfera de 60 pies: salvación de Constitución contra 10d6 de frío, mitad de daño si la supera; puede congelar agua a su paso.",
+    "higherLevel": "El daño aumenta en 1d6 por cada nivel por encima de 6 que tenga el espacio.",
     "classes": [
       "sorcerer",
       "wizard"
@@ -6692,6 +6840,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Invocás un espíritu infernal —demonio, diablo o yugoloth— en un espacio libre; usa el perfil del espíritu infernal.",
+    "higherLevel": "El nivel del espacio cuenta como nivel del conjuro en el perfil de la criatura.",
     "classes": [
       "warlock",
       "wizard"
@@ -6729,6 +6878,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Creás un muro de maleza espinosa. Al aparecer, cada criatura en su área hace una salvación de Destreza contra 7d8 de daño perforante, o la mitad si la supera. Se puede atravesar, pero cada pie de avance cuesta 4 pies de movimiento; la primera vez que una criatura entra en un espacio del muro en un turno, o termina ahí su turno, hace una salvación de Destreza contra 7d8 de daño cortante, o la mitad si la supera. No aplica el estado de apresado. Concentración.",
+    "higherLevel": "Los dos tipos de daño aumentan en 1d8 por cada nivel por encima de 6 que tenga el espacio.",
     "classes": [
       "druid"
     ]
@@ -6746,6 +6896,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Creás un muro de hielo en forma de cúpula o paneles planos, de 1 pie de grosor; salvación de Destreza contra frío al aparecer.",
+    "higherLevel": "El daño que causa el muro al aparecer aumenta en 2d6 y el que se sufre por cruzar la capa de aire gélido aumenta en 1d6 por cada nivel por encima de 6 que tenga el espacio.",
     "classes": [
       "wizard"
     ]
@@ -6867,6 +7018,7 @@
     "concentration": true,
     "ritual": false,
     "description": "Un pilar de luz en un cilindro de 10 pies de radio y 40 de alto. Por cada criatura que veas dentro elegís qué luz la baña: Luz Sanadora, que le devuelve 4d12 + tu modificador de característica de lanzamiento en PG, o Luz Abrasadora, que le exige una salvación de Destreza contra 6d12 de daño radiante, o la mitad si la supera. Una criatura solo puede verse afectada una vez por turno.",
+    "higherLevel": "El daño y la curación aumentan en 1d12 por cada nivel por encima de 7 que tenga el espacio.",
     "classes": [
       "cleric"
     ]
@@ -7277,7 +7429,8 @@
     "duration": "1 minuto",
     "concentration": true,
     "ritual": false,
-    "description": "Una criatura que falle una salvación de Sabiduría queda hechizada e incapacitada mientras alterás el recuerdo de un suceso de hasta 10 minutos ocurrido en las últimas 24 horas. Los espacios superiores permiten modificar recuerdos más antiguos.",
+    "description": "Una criatura que falle una salvación de Sabiduría queda hechizada e incapacitada mientras alterás el recuerdo de un suceso de hasta 10 minutos ocurrido en las últimas 24 horas.",
+    "higherLevel": "Podés alterar recuerdos del objetivo de un suceso que ocurrió hace 7 días (espacio de nivel 6), 30 días (espacio de nivel 7), 365 días (espacio de nivel 8) o en cualquier momento del pasado de la criatura (espacio de nivel 9).",
     "classes": [
       "bard",
       "wizard"
@@ -7314,7 +7467,8 @@
     "duration": "Instantánea",
     "concentration": false,
     "ritual": false,
-    "description": "Una criatura que falle una salvación de Sabiduría recibe 1d8 de daño necrótico, o 1d12 si le falta algún PG. El daño aumenta al alcanzar los niveles 5, 11 y 17.",
+    "description": "Una criatura que falle una salvación de Sabiduría recibe 1d8 de daño necrótico, o 1d12 si le falta algún PG.",
+    "higherLevel": "El daño sube un dado al llegar al nivel 5 (2d8 o 2d12), al 11 (3d8 o 3d12) y al 17 (4d8 o 4d12).",
     "classes": [
       "warlock",
       "cleric",
@@ -7334,6 +7488,7 @@
     "concentration": false,
     "ritual": true,
     "description": "Invocás un homúnculo (construcción diminuta, 5 + 5 por nivel de espacio de PG, CA 13, vuela 30 pies) en un espacio libre; comparte tu iniciativa y actúa justo después. Si ya tenías uno de este conjuro, es reemplazado.",
+    "higherLevel": "El nivel del espacio cuenta como nivel del conjuro en el perfil de la criatura.",
     "classes": [
       "artificer"
     ]
