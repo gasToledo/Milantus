@@ -209,10 +209,18 @@ capítulo entero — no hay nada que un DM pueda arreglar leyendo ese error.
 
 Cerrar dos veces responde 200 y no vuelve a avisar.
 
+**El nivel y el oro se deciden al cerrar.** El cuerpo de `POST .../close` acepta
+además `grantsLevel` (booleano) y `grantsGold` (entero >= 0), los dos opcionales;
+otro tipo o un oro negativo es un 400, validado antes de la primera escritura.
+Si llegan, reemplazan a los del capítulo en el aviso de cada jugador y se guardan
+en el capítulo completado (con y sin reparto de objetos), así que el Cuaderno
+muestra lo que de verdad se dio. Sin ellos (Flutter, MCP) rigen los del capítulo.
+Sigue siendo un aviso: la ficha no se toca.
+
 ### Repartir objetos al cerrar (`item_grants`)
 
 `POST .../close` acepta un cuerpo opcional `{ allocations: [{ memberId, items,
-freeItems }] }` con el que el DM le da cada objeto del catálogo (o de su
+freeItems }], grantsLevel, grantsGold }` con el que el DM le da cada objeto del catálogo (o de su
 homebrew) a personajes concretos. **Sin cuerpo** (Flutter, el conector MCP)
 todo sigue igual: todos reciben los nombres en el aviso y ningún regalo.
 

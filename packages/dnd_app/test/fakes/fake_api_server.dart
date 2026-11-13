@@ -691,7 +691,22 @@ class FakeApiServer {
         final id = path.split('/')[5];
         final at = list.indexWhere((c) => c.id == id);
         if (at < 0) return _json({'error': 'Capítulo no encontrado.'}, 404);
-        list[at] = list[at].copyWith(state: ChapterState.completed);
+        // Como el servidor: el nivel y el oro del pedido reemplazan a los del
+        // capítulo, y otro tipo o un oro negativo es un 400.
+        final body = request.body.isEmpty
+            ? <String, dynamic>{}
+            : _body(request);
+        final level = body['grantsLevel'];
+        final gold = body['grantsGold'];
+        if ((level != null && level is! bool) ||
+            (gold != null && (gold is! int || gold < 0))) {
+          return _json({'error': 'Nivel u oro inválido.'}, 400);
+        }
+        list[at] = list[at].copyWith(
+          state: ChapterState.completed,
+          grantsLevel: level as bool?,
+          grantsGold: gold as int?,
+        );
         return _json({'status': 'ok'});
       }
 

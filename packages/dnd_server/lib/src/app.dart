@@ -1845,6 +1845,9 @@ Future<Response> _grantHeroicInspirationHandler(
 /// personajes concretos: cada uno recibe solo lo suyo en la bandeja de regalos
 /// (`item_grants`) y en su aviso, y **la ficha sigue sin tocarse**: el objeto
 /// lo agrega el jugador cuando acepta. Todo se valida antes de escribir nada.
+///
+/// `grantsLevel` (bool) y `grantsGold` (int >= 0) son opcionales y, si llegan,
+/// reemplazan a los del capítulo en el aviso y en el capítulo completado.
 Future<Response> _closeChapterHandler(
   Request request,
   RepositoryTransactionRunner transactions,
@@ -1891,12 +1894,28 @@ Future<Response> _closeChapterHandler(
             dmUserId: request.userId,
           );
 
+    // El nivel y el oro se deciden al cerrar (cliente React) y, si llegan,
+    // reemplazan a los del capítulo; sin ellos (Flutter, MCP) rigen los de
+    // siempre. Se validan acá, antes de la primera escritura.
+    final rawLevel = body['grantsLevel'];
+    final rawGold = body['grantsGold'];
+    if (rawLevel != null && rawLevel is! bool) {
+      throw const FormatException('"grantsLevel" debe ser un booleano.');
+    }
+    if (rawGold != null && (rawGold is! int || rawGold < 0)) {
+      throw const FormatException(
+        '"grantsGold" debe ser un entero mayor o igual a 0.',
+      );
+    }
+    final grantsLevel = (rawLevel as bool?) ?? chapter.grantsLevel;
+    final grantsGold = (rawGold as int?) ?? chapter.grantsGold;
+
     Map<String, dynamic> grantsOf(CampaignMember member) => {
       'characterName': member.character.name,
       'campaignName': campaign.name,
       'chapterName': chapter.name,
-      'grantsLevel': chapter.grantsLevel,
-      'grantsGold': chapter.grantsGold,
+      'grantsLevel': grantsLevel,
+      'grantsGold': grantsGold,
       // Aditivo: un aviso viejo sin el campo solo no ofrece «Ir a Inventario».
       // Va al dueño de ese personaje (`member.ownerUserId`), no es un dato ajeno.
       'characterId': member.character.id,
@@ -1906,7 +1925,12 @@ Future<Response> _closeChapterHandler(
       await repositories.chapters.upsert(
         request.userId,
         campaignId,
-        chapter.copyWith(state: ChapterState.completed),
+        // Se guarda lo que de verdad se dio, para que el Cuaderno lo muestre.
+        chapter.copyWith(
+          state: ChapterState.completed,
+          grantsLevel: grantsLevel,
+          grantsGold: grantsGold,
+        ),
       );
       for (final member in members) {
         await repositories.events.append(
@@ -1925,6 +1949,8 @@ Future<Response> _closeChapterHandler(
       campaignId,
       chapter.copyWith(
         state: ChapterState.completed,
+        grantsLevel: grantsLevel,
+        grantsGold: grantsGold,
         grantsItems: allocations.unionFree,
         grantsCatalog: allocations.unionCatalog,
       ),

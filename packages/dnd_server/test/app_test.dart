@@ -3708,6 +3708,38 @@ void main() {
         });
 
         test(
+          'cerrar con nivel y oro los deja en el aviso y en el capítulo',
+          () async {
+            final dm = await login('rep-lvlgold-dm');
+            await createCampaign(dm, 'tumba');
+            final a = await login('rep-lvlgold-a');
+            await send(
+              'POST',
+              '/api/campaigns/tumba/members',
+              token: dm,
+              body: {'code': await shareCharacter(a, 'sagan')},
+            );
+            // Un capítulo que no tenía nada cargado.
+            await createChapter(dm, 'tumba', 'cripta');
+
+            final closed = await send(
+              'POST',
+              '/api/campaigns/tumba/chapters/cripta/close',
+              token: dm,
+              body: {'grantsLevel': true, 'grantsGold': 25},
+            );
+            expect(closed['status'], 200);
+
+            final event = await completedEvent(a);
+            expect(event['grantsLevel'], isTrue);
+            expect(event['grantsGold'], 25);
+            final chapter = (await listChapters(dm, 'tumba')).single;
+            expect(chapter['grantsLevel'], isTrue);
+            expect(chapter['grantsGold'], 25);
+          },
+        );
+
+        test(
           'cerrar sin cuerpo sigue igual: los nombres, sin regalos',
           () async {
             final t = await table('rep-nobody');
