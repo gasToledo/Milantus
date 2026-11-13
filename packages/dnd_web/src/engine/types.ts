@@ -1006,11 +1006,18 @@ export type QuizKind =
   | 'spellCastingTime'
   | 'spellRange'
   | 'spellSchool'
-  | 'condition';
+  | 'condition'
+  | 'skillAbility'
+  | 'masteryByText'
+  | 'weaponMastery'
+  | 'propertyByText'
+  | 'weaponDamage'
+  | 'armorAc'
+  | 'armorCategory';
 
 export interface QuizQuestion {
   kind: QuizKind;
-  topic: 'class' | 'species' | 'background' | 'spells' | 'rules';
+  topic: 'class' | 'species' | 'background' | 'spells' | 'equipment' | 'rules';
   subject: string | null;
   subjectId: string | null;
   level: number | null;

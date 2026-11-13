@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { BookOpen, Check, LogOut, RotateCcw, ScrollText, Shield, Sparkles, User, X, type LucideIcon } from 'lucide-react';
+import { BookOpen, Check, LogOut, RotateCcw, ScrollText, Shield, Sparkles, Swords, User, X, type LucideIcon } from 'lucide-react';
 import { useRoster, useSheetCatalog } from '../api/queries';
 import { quizRound, type Catalog, type CharacterJson, type QuizQuestion } from '../engine';
 import { toRosterEntry, type RosterEntry } from '../dashboard/roster';
@@ -119,6 +119,7 @@ const TOPIC_ICON: Record<QuizQuestion['topic'], LucideIcon> = {
   species: User,
   background: BookOpen,
   spells: Sparkles,
+  equipment: Swords,
   rules: ScrollText,
 };
 const TOPICS = Object.keys(TOPIC_ICON) as QuizQuestion['topic'][];
@@ -353,6 +354,12 @@ function askOf(t: Texts, q: QuizQuestion): string {
       return t.quizAsk.spellRange(s);
     case 'spellSchool':
       return t.quizAsk.spellSchool(s);
+    case 'skillAbility':
+    case 'weaponMastery':
+    case 'weaponDamage':
+    case 'armorAc':
+    case 'armorCategory':
+      return t.quizAsk[q.kind](s);
     case 'classFeatureByText':
     case 'hitDie':
     case 'savingThrows':
@@ -360,6 +367,8 @@ function askOf(t: Texts, q: QuizQuestion): string {
     case 'backgroundSkills':
     case 'backgroundFeat':
     case 'condition':
+    case 'masteryByText':
+    case 'propertyByText':
       return t.quizAsk[q.kind];
   }
 }

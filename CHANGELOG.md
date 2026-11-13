@@ -1432,7 +1432,8 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Nuevo
 
-- Sin cambios.
+- Las reglas generales del Quiz suman habilidades, maestrías y propiedades
+  de arma, el daño de las armas y la CA y el tipo de las armaduras.
 
 ### Modificado
 
