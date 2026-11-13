@@ -80,11 +80,16 @@ export interface Attack {
   range?: [number, number];
 }
 
+/** Cuándo se cambian los conjuros preparados; el motor lo carga por clase. */
+export type PreparedSwap = 'longRestAll' | 'longRestOne' | 'levelUpOne';
+
 export interface Spellcasting {
   ability: AbilityId;
   progression: string;
   /** `prepared` (se preparan cada día) o `known` (se aprenden). */
   preparation: 'prepared' | 'known';
+  /** Cuándo se cambian los preparados: lo dice la clase (`PreparedSwap` del motor). */
+  preparedSwap: PreparedSwap;
   spellList: string;
   saveDc: number;
   attackBonus: number;

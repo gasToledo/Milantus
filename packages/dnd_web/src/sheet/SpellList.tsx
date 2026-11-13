@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { vocabularyLabel, type AbilityId, type ByAbility, type InnateSpell, type JsonObject } from '../engine';
+import { vocabularyLabel, type AbilityId, type ByAbility, type InnateSpell, type JsonObject, type PreparedSwap } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
@@ -42,8 +42,10 @@ export interface ResourceAbility {
 
 /**
  * Los conjuros del personaje en **pestañas** (a propósito, la ficha de Flutter
- * los apila): trucos, siempre preparados, preparados (o conocidos) y los que
- * concede un rasgo, y solo las que tienen algo. Las de siempre preparados y
+ * los apila): trucos (los de clase y los que dan los rasgos), siempre
+ * preparados, preparados (o conocidos), los que concede un rasgo y las
+ * reacciones, y solo las que tienen algo. Cada una dice qué es en una línea.
+ * Las de siempre preparados y
  * elegidos siguen a la grilla de espacios (`levelFilter`): un mago de nivel 20
  * llenaba la pantalla con la lista entera. Cada uno se despliega con su ficha
  * (tiempo, alcance, componentes, duración y descripción). No se preparan ni se lanzan acá; en la ficha propia
@@ -61,6 +63,9 @@ export function SpellList({
   alwaysPreparedIds,
   innate,
   preparation,
+  preparedSwap,
+  innateReactions,
+  classReactionIds,
   catalog,
   innateNote,
   onConcentrate,
@@ -92,6 +97,13 @@ export function SpellList({
   alwaysPreparedIds: string[];
   innate: InnateSpell[];
   preparation: 'prepared' | 'known' | null;
+  /** Cuándo se cambian los preparados (lo dice la clase). `null` sin un único
+   *  lanzador: con varias clases no hay una sola regla. */
+  preparedSwap: PreparedSwap | null;
+  /** Las reacciones, ya resueltas por la ficha: las de rasgo y los ids de las
+   *  de clase. Un conjuro de reacción sigue también en su pestaña. */
+  innateReactions: InnateSpell[];
+  classReactionIds: string[];
   catalog: JsonObject[];
   innateNote: (s: InnateSpell) => string;
   /** El nombre del conjuro, como lo guarda Flutter en `concentratingOn`. */
@@ -127,19 +139,33 @@ export function SpellList({
       // Por nivel y después por nombre, en el idioma de la interfaz.
       .sort((a, b) => (a.level ?? 0) - (b.level ?? 0) || (a.name ?? '').localeCompare(b.name ?? '', lang));
 
-  const cantrips = resolve(cantripIds);
+  const ownCantrips = resolve(cantripIds);
   const chosen = new Set(spellIds);
   // Un siempre preparado que además está elegido se muestra una sola vez, en
   // su grupo: no ocupa cupo, que es lo que esa lista explica.
-  const always = resolve(alwaysPreparedIds);
-  const alwaysSet = new Set(always.map((s) => s.id));
+  const alwaysAll = resolve(alwaysPreparedIds);
+  const alwaysSet = new Set(alwaysAll.map((s) => s.id));
+  // Los trucos que dan los rasgos (Iniciado en la Magia, Taumaturgo) también
+  // son siempre preparados, pero la grilla no tiene un nivel 0 que los
+  // muestre: viven en «Trucos», sin repetir los de clase.
+  const ownIds = new Set(ownCantrips.map((s) => s.id));
+  const extraCantrips = alwaysAll.filter((s) => (s.level ?? 0) === 0 && !ownIds.has(s.id));
+  const cantrips = resolve([...cantripIds, ...extraCantrips.map((s) => s.id)]);
+  const always = alwaysAll.filter((s) => (s.level ?? 0) > 0);
+  const classReactions = resolve(classReactionIds);
+  const reactionCount = innateReactions.length + classReactions.length;
   const spells = resolve([...chosen].filter((id) => !alwaysSet.has(id)));
 
   const tabs: { key: TabKey; title: string; count: string }[] = [];
   const num = (n: number, cap: number | null | undefined) =>
     cap ? t.spellsTabCount(n, cap) : String(n);
   if (cantrips.length > 0)
-    tabs.push({ key: 'cantrips', title: t.spellsTabCantrips, count: num(cantrips.length, caps?.cantrips) });
+    tabs.push({
+      key: 'cantrips',
+      title: t.spellsTabCantrips,
+      // Con extras el cupo de la clase ya no alcanza para decir «n de m».
+      count: extraCantrips.length > 0 ? String(cantrips.length) : num(cantrips.length, caps?.cantrips),
+    });
   if (always.length > 0) tabs.push({ key: 'always', title: t.spellsTabAlways, count: String(always.length) });
   if (spells.length > 0)
     tabs.push({
@@ -148,6 +174,7 @@ export function SpellList({
       count: num(spells.length, caps?.spells),
     });
   if (innate.length + abilities.length > 0) tabs.push({ key: 'innate', title: t.spellsTabInnate, count: String(innate.length + abilities.length) });
+  if (reactionCount > 0) tabs.push({ key: 'reactions', title: t.spellsTabReactions, count: String(reactionCount) });
 
   // Local a la lista: elegir una pestaña no mueve nada más. Empieza en los
   // conjuros elegidos (lo que más se consulta) y, si la elegida desaparece
@@ -159,12 +186,28 @@ export function SpellList({
   }
   const tab = tabs.some((x) => x.key === picked) ? picked : tabs[0]!.key;
 
+  // «Nivel 1 · 3 de 5. Elegí otro nivel…»: qué parte de la lista se ve. Si se
+  // ve toda no hay resto que buscar y la ayuda sobra.
+  const levelLine = (shown: number, total: number) => {
+    if (!levelFilter) return undefined;
+    const { level, upTo } = levelFilter;
+    const head = upTo ? t.spellsPactShown(level, shown, total) : t.spellsLevelShown(level, shown, total);
+    return shown === total ? head : `${head} ${upTo ? t.spellsPactHelp(level) : t.spellsLevelHelp}`;
+  };
+
   // `always` y `chosen` siguen a la grilla: un nivel, o hasta él si es pacto.
-  const leveled = (list: SpellJson[], empty: string) => {
+  const leveled = (list: SpellJson[], empty: string, about: string) => {
     const shown = levelFilter
       ? list.filter((s) => (levelFilter.upTo ? (s.level ?? 0) <= levelFilter.level : (s.level ?? 0) === levelFilter.level))
       : list;
-    if (shown.length === 0) return <p className="text-[13px] text-text-muted">{empty}</p>;
+    const intro = <About line={about} level={levelLine(shown.length, list.length)} />;
+    if (shown.length === 0)
+      return (
+        <div className="flex flex-col gap-3">
+          {intro}
+          <p className="text-[13px] text-text-muted">{empty}</p>
+        </div>
+      );
     const items = (l: SpellJson[]) => (
       <Accordion
         headingLevel={4}
@@ -178,77 +221,107 @@ export function SpellList({
       />
     );
     // Una celda normal ya dice el nivel: lista plana, sin rótulo.
-    if (levelFilter && !levelFilter.upTo) return items(shown);
+    if (levelFilter && !levelFilter.upTo)
+      return (
+        <div className="flex flex-col gap-3">
+          {intro}
+          {items(shown)}
+        </div>
+      );
     const byLevel = new Map<number, SpellJson[]>();
     for (const s of shown) byLevel.set(s.level ?? 0, [...(byLevel.get(s.level ?? 0) ?? []), s]);
     return (
-      <div className="max-h-[420px] overflow-y-auto">
-        {[...byLevel].map(([level, l]) => (
-          <div key={level}>
-            <Eyebrow className="mb-1 mt-2 first:mt-0">{t.spellLevelShort(level)}</Eyebrow>
-            {items(l)}
-          </div>
-        ))}
+      <div className="flex flex-col gap-3">
+        {intro}
+        <div className="max-h-[420px] overflow-y-auto">
+          {[...byLevel].map(([level, l]) => (
+            <div key={level}>
+              <Eyebrow className="mb-1 mt-2 first:mt-0">{t.spellLevelShort(level)}</Eyebrow>
+              {items(l)}
+            </div>
+          ))}
+        </div>
       </div>
     );
   };
 
   const level = levelFilter?.level ?? 0;
   let panel: ReactNode;
+  const classRow = (s: SpellJson) => ({
+    id: s.id,
+    title: <SpellTitle spell={s} bonus={bonusOf(s.id)} />,
+    content: (
+      <SpellDetail spell={s} castLine={detail(s, casting)} onConcentrate={onConcentrate && (() => onConcentrate(s.name ?? s.id))} />
+    ),
+  });
+  const innateRow = (i: InnateSpell) => {
+    const s = byId.get(i.spellId);
+    return {
+      // Por el conjuro concedido, único en la lista: con dos filas de la
+      // misma clave React no desmonta la de más y se acumula en las pestañas.
+      id: `innate-${i.grantedSpellId}`,
+      // El nombre que da el motor (puede venir del rasgo) y su uso,
+      // CD y ataque, que son los del rasgo y no los de la clase.
+      title: <SpellTitle spell={s} name={i.name} note={innateNote(i)} bonus={bonusOf(i.spellId)} />,
+      content: s ? (
+        <SpellDetail
+          spell={s}
+          castLine={detail(s, i)}
+          onConcentrate={onConcentrate && (() => onConcentrate(i.name))}
+          onSwap={onSwapInnate && i.replaceableFrom.length > 0 ? () => onSwapInnate(i) : undefined}
+        />
+      ) : null,
+    };
+  };
   if (tab === 'cantrips') {
-    panel = (
-      <Accordion
-        headingLevel={4}
-        items={cantrips.map((s) => ({
-          id: s.id,
-          title: <SpellTitle spell={s} bonus={bonusOf(s.id)} />,
-          content: (
-            <SpellDetail spell={s} castLine={detail(s, casting)} onConcentrate={onConcentrate && (() => onConcentrate(s.name ?? s.id))} />
-          ),
-        }))}
-      />
-    );
+    const list = <Accordion headingLevel={4} items={cantrips.map(classRow)} />;
+    // Sin extras la lista habla sola; con extras hay que decir de dónde salen.
+    panel =
+      extraCantrips.length > 0 && caps ? (
+        <div className="flex flex-col gap-3">
+          <About line={t.spellsCantripsExtra(ownCantrips.length, caps.cantrips, extraCantrips.length)} />
+          {list}
+        </div>
+      ) : (
+        list
+      );
   } else if (tab === 'always') {
-    panel = leveled(always, t.spellsNoAlwaysAtLevel(level));
+    panel = leveled(always, t.spellsNoAlwaysAtLevel(level), t.spellsAboutAlways);
   } else if (tab === 'chosen') {
-    panel = leveled(spells, preparation === 'known' ? t.spellsNoKnownAtLevel(level) : t.spellsNoneAtLevel(level));
+    const about = preparation === 'known' || !preparedSwap ? t.spellsAboutChosenPlain : t.spellsAboutChosen[preparedSwap];
+    panel = leveled(spells, preparation === 'known' ? t.spellsNoKnownAtLevel(level) : t.spellsNoneAtLevel(level), about);
+  } else if (tab === 'reactions') {
+    panel = (
+      <div className="flex flex-col gap-3">
+        <About line={t.spellsAboutReactions} />
+        <Accordion headingLevel={4} items={[...innateReactions.map(innateRow), ...classReactions.map(classRow)]} />
+      </div>
+    );
   } else {
     panel = (
-      <Accordion
-        headingLevel={4}
-        items={[...innate.map((i) => {
-          const s = byId.get(i.spellId);
-          return {
-            // Por el conjuro concedido, único en la lista: con dos filas de la
-            // misma clave React no desmonta la de más y se acumula en las pestañas.
-            id: `innate-${i.grantedSpellId}`,
-            // El nombre que da el motor (puede venir del rasgo) y su uso,
-            // CD y ataque, que son los del rasgo y no los de la clase.
-            title: <SpellTitle spell={s} name={i.name} note={innateNote(i)} bonus={bonusOf(i.spellId)} />,
-            content: s ? (
-              <SpellDetail
-                spell={s}
-                castLine={detail(s, i)}
-                onConcentrate={onConcentrate && (() => onConcentrate(i.name))}
-                onSwap={onSwapInnate && i.replaceableFrom.length > 0 ? () => onSwapInnate(i) : undefined}
-              />
-            ) : null,
-          };
-        }), ...abilities.map((a, index) => ({
-          id: `ability-${index}-${a.name}`,
-          title: <SpellTitle spell={undefined} name={a.name} note={`${a.resourceName} · ${t.poolValue(a.left, a.max)}`} />,
-          content: (
-            <div data-resource-ability={a.resourceKey}>
-              <p>{a.description}</p>
-              {onUseAbility && (
-                <Button className="mt-2" tone="secondary" disabled={a.left === 0} onClick={() => onUseAbility(a.resourceKey)}>
-                  {t.spendResource(a.name)}
-                </Button>
-              )}
-            </div>
-          ),
-        }))]}
-      />
+      <div className="flex flex-col gap-3">
+        <About line={t.spellsAboutInnate} />
+        <Accordion
+          headingLevel={4}
+          items={[
+            ...innate.map(innateRow),
+            ...abilities.map((a, index) => ({
+              id: `ability-${index}-${a.name}`,
+              title: <SpellTitle spell={undefined} name={a.name} note={`${a.resourceName} · ${t.poolValue(a.left, a.max)}`} />,
+              content: (
+                <div data-resource-ability={a.resourceKey}>
+                  <p>{a.description}</p>
+                  {onUseAbility && (
+                    <Button className="mt-2" tone="secondary" disabled={a.left === 0} onClick={() => onUseAbility(a.resourceKey)}>
+                      {t.spendResource(a.name)}
+                    </Button>
+                  )}
+                </div>
+              ),
+            })),
+          ]}
+        />
+      </div>
     );
   }
 
@@ -284,7 +357,18 @@ export function SpellList({
   );
 }
 
-type TabKey = 'cantrips' | 'always' | 'chosen' | 'innate';
+type TabKey = 'cantrips' | 'always' | 'chosen' | 'innate' | 'reactions';
+
+/** Qué es la pestaña (13 px) y, cuando la lista sigue a la grilla de espacios,
+ *  qué parte se ve (12 px). */
+function About({ line, level }: { line: string; level?: string }) {
+  return (
+    <div>
+      <p className="text-[13px] leading-[1.45] text-on-surface-variant">{line}</p>
+      {level && <p className="mt-1 text-[12px] text-text-muted">{level}</p>}
+    </div>
+  );
+}
 
 function SpellTitle({
   spell,

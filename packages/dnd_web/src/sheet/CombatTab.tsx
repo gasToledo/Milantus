@@ -476,9 +476,7 @@ function SpellsCard({ model }: { model: SheetModel }) {
 
   const innateReactions = sheet.innateSpells.filter((s) => isReactionSpell(spell(s.spellId)));
   const innateIds = new Set(sheet.innateSpells.map((s) => s.spellId));
-  const classReactions = [...chosen]
-    .filter((id) => !innateIds.has(id) && isReactionSpell(spell(id)))
-    .map((id) => ({ id, name: nameOf(catalog.spells, id) ?? id, level: Number(spell(id)?.level ?? 0) }));
+  const classReactionIds = [...chosen].filter((id) => !innateIds.has(id) && isReactionSpell(spell(id)));
 
   const previous = character.combat?.concentratingOn ?? null;
   const dependents = (character.combat?.companions ?? [])
@@ -593,34 +591,15 @@ function SpellsCard({ model }: { model: SheetModel }) {
             abilities={abilities}
             onUseAbility={write ? (key) => write.act({ type: 'spendResource', resource: key }) : undefined}
             preparation={sheet.spellcasting?.preparation ?? null}
+            preparedSwap={single?.spellcasting.preparedSwap ?? null}
+            innateReactions={innateReactions}
+            classReactionIds={classReactionIds}
             catalog={catalog.spells}
             innateNote={(s) => innateNote(s, t)}
             onConcentrate={write ? onConcentrate : undefined}
             onSwapInnate={write ? setSwapping : undefined}
           />
         </div>
-
-        {(innateReactions.length > 0 || classReactions.length > 0) && (
-          <div className="border-t border-hairline pt-3">
-            <Eyebrow className="!text-[10px] !tracking-[1.2px]">{t.reactionsHeading}</Eyebrow>
-            <ul className="mt-1.5 flex flex-col gap-2.5">
-              {innateReactions.map((s) => (
-                <li key={`i-${s.spellId}`}>
-                  <p className="font-medium">{s.name}</p>
-                  <p className="mt-0.5 text-[12px] text-text-muted">{innateNote(s, t)}</p>
-                </li>
-              ))}
-              {classReactions.map((s) => (
-                <li key={`c-${s.id}`}>
-                  <p className="font-medium">{s.name}</p>
-                  <p className="mt-0.5 text-[12px] text-text-muted">
-                    {s.level === 0 ? t.cantrip : t.spellLevelShort(s.level)}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
       </div>
       {swapping && write && (
         <InnateCantripDialog model={model} write={write} innate={swapping} onClose={() => setSwapping(null)} />

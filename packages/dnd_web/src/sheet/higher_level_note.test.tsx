@@ -67,6 +67,9 @@ describe('la mejora del conjuro', () => {
         alwaysPreparedIds={[]}
         innate={[]}
         preparation="prepared"
+        preparedSwap={null}
+        innateReactions={[]}
+        classReactionIds={[]}
         catalog={[cantrip, leveled]}
         innateNote={() => ''}
         levelFilter={null}
