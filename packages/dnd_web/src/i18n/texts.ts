@@ -482,6 +482,8 @@ const es = {
   concentration: 'Concentración',
   ritual: 'Ritual',
   cantrip: 'Truco',
+  spellHigherLevel: 'Con un espacio de conjuro de nivel superior.',
+  cantripUpgrade: 'Mejora de truco.',
   spellLevelShort: (n: number) => `Nivel ${n}`,
   innateUses: {
     atWill: 'A voluntad',
@@ -1975,6 +1977,7 @@ Los personajes que los jugadores le compartieron se sueltan, y sus fichas siguen
   hbConcRitual: 'Concentración y ritual',
   hbClassLists: 'Listas de clase',
   hbSpellDoes: 'Qué hace el conjuro',
+  hbSpellHigherLevel: 'Con un espacio de nivel superior',
   codexEquipped: 'Al equiparlo',
   codexBaseItem: 'Objeto base',
   codexBaseOnly: 'solo',
@@ -2932,6 +2935,8 @@ const en: Texts = {
   concentration: 'Concentration',
   ritual: 'Ritual',
   cantrip: 'Cantrip',
+  spellHigherLevel: 'Using a Higher-Level Spell Slot.',
+  cantripUpgrade: 'Cantrip Upgrade.',
   spellLevelShort: (n: number) => `Level ${n}`,
   innateUses: {
     atWill: 'At will',
@@ -4407,6 +4412,7 @@ The characters players shared with it are released, and their sheets remain thei
   hbConcRitual: 'Concentration and ritual',
   hbClassLists: 'Class lists',
   hbSpellDoes: 'What the spell does',
+  hbSpellHigherLevel: 'At higher levels',
   codexEquipped: 'When equipped',
   codexBaseItem: 'Base item',
   codexBaseOnly: 'only',

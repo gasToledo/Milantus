@@ -921,6 +921,8 @@ export interface SpellForm {
   ritual: boolean;
   classes: string[];
   description: string;
+  /** `''` es «sin mejora»: no se guarda. */
+  higherLevel: string;
 }
 
 /** Un objeto como texto de formulario (`ItemDraft.formOf`). Los efectos van en

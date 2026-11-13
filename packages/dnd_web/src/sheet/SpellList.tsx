@@ -27,6 +27,7 @@ export type SpellJson = JsonObject & {
   concentration?: boolean;
   ritual?: boolean;
   description?: string;
+  higherLevel?: string;
 };
 
 export interface ResourceAbility {
@@ -369,6 +370,11 @@ function SpellDetail({
       {meta && <p className="mb-1.5 text-[12px] text-on-surface">{meta}</p>}
       {castLine && <p className="mb-1.5 text-[12px] text-on-surface">{castLine}</p>}
       {spell.description}
+      {spell.higherLevel && (
+        <p className="mt-2">
+          <b className="font-semibold text-on-surface">{(spell.level ?? 0) === 0 ? t.cantripUpgrade : t.spellHigherLevel}</b> {spell.higherLevel}
+        </p>
+      )}
       {((spell.concentration && onConcentrate) || onSwap) && (
         <div className="mt-2 flex flex-wrap gap-2">
           {spell.concentration && onConcentrate && (

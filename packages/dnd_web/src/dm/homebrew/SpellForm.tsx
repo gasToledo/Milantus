@@ -215,6 +215,7 @@ export function SpellForm({
 
       <FormSection title={t.hbDescription}>
         <TextAreaField label={t.hbSpellDoes} dataField="spell-description" value={form.description} onChange={(description) => set({ description })} />
+        <TextAreaField label={t.hbSpellHigherLevel} dataField="spell-higher-level" value={form.higherLevel} onChange={(higherLevel) => set({ higherLevel })} />
       </FormSection>
     </HomebrewFormShell>
   );

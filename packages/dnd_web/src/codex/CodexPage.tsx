@@ -528,6 +528,12 @@ function EntryDetail({
         <p className="mt-5 max-w-[620px] text-[16px] leading-[1.65] whitespace-pre-line text-on-surface">{detail.prose}</p>
       )}
 
+      {detail.note && (
+        <p className="mt-3 max-w-[620px] text-[16px] leading-[1.65] text-on-surface">
+          <b className="font-semibold">{detail.note.label}</b> {detail.note.text}
+        </p>
+      )}
+
       {detail.sections.map((s) => (
         <section key={s.title} className="mt-6 max-w-[680px]">
           <Eyebrow className="mb-2">{s.title}</Eyebrow>

@@ -31,6 +31,9 @@ export interface CodexDetail {
   /** Datos cortos en placas; cada grupo es una fila aparte. */
   facts: CodexFact[][];
   prose?: string;
+  /** Un párrafo con rótulo en negrita después de la prosa: la mejora de un
+   *  conjuro con un espacio superior. */
+  note?: { label: string; text: string };
   /** Rasgos con nombre: por nivel (clases, subclases, linajes), propiedades. */
   sections: { title: string; traits: CodexTrait[] }[];
   /** Una lista de nombres relacionados: linajes de una especie, subclases de
@@ -517,6 +520,7 @@ class Ctx {
             ],
           ],
           prose: str(s.description) || undefined,
+          note: str(s.higherLevel) ? { label: level === 0 ? t.cantripUpgrade : t.spellHigherLevel, text: str(s.higherLevel) } : undefined,
           sections: [],
           related: classes.length > 0 ? { title: t.codexCanPrepare, names: classes } : undefined,
         };
