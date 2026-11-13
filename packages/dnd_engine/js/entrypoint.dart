@@ -1536,6 +1536,23 @@ String creationConfirm(
           .toJson(),
     );
 
+/// Una ronda del Quiz: `(personaje | null, catálogo, semilla)` → lista de
+/// `QuizQuestion.toJson()`. Sin personaje, la de reglas generales. Como
+/// `compute`, el cliente pasa el JSON y el motor arma las preguntas: la UI no
+/// sabe de dónde salen.
+String quizRoundJs(String? characterJson, String catalogJson, int seed) =>
+    jsonEncode([
+      for (final q in quizRound(
+        characterJson == null
+            ? null
+            : Character.fromJson(
+                jsonDecode(characterJson) as Map<String, dynamic>),
+        _repoPara(catalogJson),
+        seed: seed,
+      ))
+        q.toJson(),
+    ]);
+
 /// El personaje de ejemplo de la cuenta vacía ([demoSagan]).
 String demoCharacter() => jsonEncode(demoSagan().toJson());
 
@@ -1658,6 +1675,7 @@ void main() {
   motor['creationConfirm'] = creationConfirm.toJS;
   motor['creation'] = creation.toJS;
   motor['demoCharacter'] = demoCharacter.toJS;
+  motor['quizRound'] = quizRoundJs.toJS;
   motor['act'] = act.toJS;
   motor['companionsView'] = companionsViewJs.toJS;
   motor['companionPreview'] = companionPreviewJs.toJS;

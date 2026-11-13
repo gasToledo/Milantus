@@ -67,3 +67,4 @@ export 'src/engine/npc_stats.dart';
 export 'src/engine/npc_import_check.dart';
 export 'src/engine/portrait_prompt.dart';
 export 'src/engine/demo_character.dart';
+export 'src/engine/quiz.dart';
