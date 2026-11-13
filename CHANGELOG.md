@@ -3,6 +3,14 @@
 Cambios visibles del producto, agrupados por versión. El formato y el flujo de
 actualización están definidos en [Versionado y changelog](docs/desarrollo/versionado-y-changelog.md).
 
+## [Unreleased]
+
+### Nuevo
+
+- Quiz en /v2: rondas de diez preguntas de opción múltiple sobre uno de tus
+  personajes o sobre las reglas generales, armadas por el motor desde el
+  catálogo. No se guarda nada.
+
 ## [0.11.0+1] - 2026-09-22
 
 ### Nuevo

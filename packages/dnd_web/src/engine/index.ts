@@ -1,4 +1,4 @@
-import type { AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, CreatureForm, EffectBuild, EffectKindInfo, EffectParts, FeatForm, RaceForm, BackgroundForm, WeaponForm, ArmorForm, ArmorAcExample, ItemForm, SpellForm, HomebrewFormOptions, HomebrewRules, CreatureFormOptions, EncounterDetails, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
+import type { QuizQuestion, AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, CreatureForm, EffectBuild, EffectKindInfo, EffectParts, FeatForm, RaceForm, BackgroundForm, WeaponForm, ArmorForm, ArmorAcExample, ItemForm, SpellForm, HomebrewFormOptions, HomebrewRules, CreatureFormOptions, EncounterDetails, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
 // Lo genera `npm run build:engine` (o la etapa `engine-js` del Dockerfile) y
 // no se versiona. Es un script de dart2js, no un módulo: al cargarse deja
 // `globalThis.dndEngine`, y de ahí lo toma este archivo.
@@ -26,6 +26,7 @@ interface DartEngine {
   creation(catalogJson: string, draftJson: string, actionJson: string, seed?: number): string;
   creationConfirm(catalogJson: string, draftJson: string, unnamed: string, replacingJson?: string): string;
   demoCharacter(): string;
+  quizRound(characterJson: string | null, catalogJson: string, seed: number): string;
   rollDie(sides: number): number;
   coinParts(cp: number): string;
   formatAmount(cp: number, labelsJson: string): string;
@@ -810,6 +811,14 @@ export function creationConfirm(
 /** El personaje de ejemplo de la cuenta vacía (`demoSagan` del motor). */
 export function demoCharacter(): CharacterJson & { id: string } {
   return JSON.parse(engine().demoCharacter()) as CharacterJson & { id: string };
+}
+
+/** Una ronda de diez preguntas del Quiz (`quizRound` del motor). Sin personaje,
+ *  la de reglas generales; la misma semilla da la misma ronda. */
+export function quizRound(character: CharacterJson | null, catalog: Catalog, seed: number): QuizQuestion[] {
+  return JSON.parse(
+    engine().quizRound(character === null ? null : JSON.stringify(character), catalogJson(catalog), seed),
+  ) as QuizQuestion[];
 }
 
 export function rollDie(sides: number): number {

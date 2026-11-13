@@ -111,6 +111,8 @@ export type Route =
   | { name: 'campaigns' }
   // Sin criatura es la lista con nada abierto.
   | { name: 'bestiary'; entryId: string | null }
+  // `target` es `reglas` (las generales) o el id de un personaje propio; sin él, la elección.
+  | { name: 'quiz'; target: string | null }
   // Sin categoría es la portada; sin entrada, la lista sin nada abierto.
   | { name: 'codex'; category: CodexCategory | null; entryId: string | null }
   // `tab: null` es la ruta sin sufijo, que redirige a la primera pestaña.
@@ -277,6 +279,13 @@ export function matchRoute(pathname: string): Route {
       return { name: 'unknown' };
     }
   }
+  if (section === 'quiz' && tab === undefined && rest.length === 0) {
+    try {
+      return { name: 'quiz', target: id === undefined ? null : decodeURIComponent(id) };
+    } catch {
+      return { name: 'unknown' };
+    }
+  }
   if (section === 'personajes' && id === undefined) return { name: 'roster' };
   if (section === 'personajes' && id === 'nuevo' && tab === undefined) return { name: 'creation' };
   if (section === 'personajes' && id && tab === 'subir-nivel' && rest.length === 0) {
@@ -399,6 +408,10 @@ export const dmNpcSheetHref = (npcId: string, tab: SheetTab = 'personaje'): stri
  */
 export const settingsHref = (desdeDm = false): string =>
   `${import.meta.env.BASE_URL}ajustes${desdeDm ? '?modo=dm' : ''}`;
+
+/** El Quiz: sin destino la elección; `reglas` o un id de personaje, la ronda. */
+export const quizHref = (target?: string): string =>
+  `${import.meta.env.BASE_URL}quiz${target === undefined ? '' : `/${encodeURIComponent(target)}`}`;
 
 /** La portada del Códice, una categoría o una entrada abierta. */
 export const codexHref = (category?: CodexCategory, entryId?: string): string =>

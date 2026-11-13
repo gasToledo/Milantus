@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { BookOpen, LogOut, MessageSquare, Settings, Users } from 'lucide-react';
+import { BookOpen, GraduationCap, LogOut, MessageSquare, Settings, Users } from 'lucide-react';
 import { useAppVersion } from '../api/queries';
 import { logout, type Account } from '../api/client';
 import { useTexts } from '../i18n/context';
-import { codexHref, dmHref, FLUTTER_HOME, rosterHref, settingsHref } from '../router';
+import { codexHref, dmHref, FLUTTER_HOME, quizHref, rosterHref, settingsHref } from '../router';
 import { FeedbackDialog } from '../ui/feedback';
 import { showNotice } from '../ui/notices';
 import { ModeSwitch, NavGroup, NavItem, ThemeMenu, VersionLabel } from '../ui/Shell';
@@ -12,7 +12,7 @@ import { ModeSwitch, NavGroup, NavItem, ThemeMenu, VersionLabel } from '../ui/Sh
  * El menú principal del Modo Jugador (`AppSidebar`): interruptor de modo y la
  * navegación. El Homebrew es herramienta del Modo DM y no está acá.
  */
-export function RosterPanel({ current }: { current?: 'roster' }) {
+export function RosterPanel({ current }: { current?: 'roster' | 'quiz' }) {
   const t = useTexts();
   return (
     <>
@@ -23,6 +23,9 @@ export function RosterPanel({ current }: { current?: 'roster' }) {
         </li>
         <li>
           <NavItem href={codexHref()} icon={BookOpen} label={t.navCodex} internal />
+        </li>
+        <li>
+          <NavItem href={quizHref()} icon={GraduationCap} label={t.navQuiz} active={current === 'quiz'} internal />
         </li>
       </NavGroup>
     </>

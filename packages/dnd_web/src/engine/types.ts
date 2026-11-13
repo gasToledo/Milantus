@@ -992,3 +992,31 @@ export interface ArmorAcExample {
   dex: number;
   ac: number;
 }
+
+/** Una pregunta del Quiz (`QuizQuestion.toJson` del motor). La UI arma el
+ *  enunciado según `kind`; las opciones y la correcta vienen del catálogo. */
+export type QuizKind =
+  | 'classFeatureByText'
+  | 'classFeatureLevel'
+  | 'hitDie'
+  | 'savingThrows'
+  | 'speciesTraitByText'
+  | 'backgroundSkills'
+  | 'backgroundFeat'
+  | 'spellCastingTime'
+  | 'spellRange'
+  | 'spellSchool'
+  | 'condition';
+
+export interface QuizQuestion {
+  kind: QuizKind;
+  topic: 'class' | 'species' | 'background' | 'spells' | 'rules';
+  subject: string | null;
+  subjectId: string | null;
+  level: number | null;
+  quote: string | null;
+  /** Cuatro rótulos distintos, ya en el idioma del catálogo. */
+  options: string[];
+  /** Índice de la correcta en `options`. */
+  answer: number;
+}

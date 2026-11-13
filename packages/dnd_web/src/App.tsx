@@ -14,6 +14,7 @@ import { NpcCreationPage } from './dm/npcs/NpcCreationPage';
 import { dmHref, navigate, rosterHref, useRoute } from './router';
 import { DmPage } from './dm/DmPage';
 import { CodexPage } from './codex/CodexPage';
+import { QuizPage } from './quiz/QuizPage';
 import { BestiaryPage } from './bestiary/BestiaryPage';
 import { CampaignsPage } from './campaigns/CampaignsPage';
 import { CharacterPage } from './sheet/CharacterPage';
@@ -179,6 +180,12 @@ function Routes({ account }: { account: Account }) {
       return <RebuildPage id={route.id} account={account} />;
     case 'codex':
       return <CodexPage category={route.category} entryId={route.entryId} />;
+    case 'quiz':
+      return (
+        <Shell panel={<RosterPanel current="quiz" />} footer={<RosterFooter account={account} />}>
+          <QuizPage target={route.target} />
+        </Shell>
+      );
     case 'unknown':
       return (
         <Shell panel={<RosterPanel />} footer={<RosterFooter account={account} />}>
