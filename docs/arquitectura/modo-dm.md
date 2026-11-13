@@ -178,8 +178,10 @@ Las dos son 400 y no 409 porque en este proyecto "pedido inválido" se escribe
 `POST .../close` marca el capítulo como completado y le deja un `user_event` de
 tipo `chapter_completed` **al dueño** de cada personaje vinculado (nunca al DM,
 que ya vio la respuesta). El `payload` lleva `characterName`, `campaignName`,
-`chapterName`, `grantsLevel`, `grantsGold` y `grantsItems`; el texto lo
-redacta el cliente, como todos los avisos.
+`chapterName`, `grantsLevel`, `grantsGold`, `grantsItems` y `characterId` (el
+personaje de ese dueño, para que el cliente ofrezca «Ir a Inventario»; un aviso
+viejo sin él simplemente no lo ofrece); el texto lo redacta el cliente, como
+todos los avisos.
 
 `grantsLevel` es **solo un aviso**, igual que el oro y los objetos, y no por
 timidez: `Character.level` y

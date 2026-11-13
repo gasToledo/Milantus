@@ -1897,6 +1897,9 @@ Future<Response> _closeChapterHandler(
       'chapterName': chapter.name,
       'grantsLevel': chapter.grantsLevel,
       'grantsGold': chapter.grantsGold,
+      // Aditivo: un aviso viejo sin el campo solo no ofrece «Ir a Inventario».
+      // Va al dueño de ese personaje (`member.ownerUserId`), no es un dato ajeno.
+      'characterId': member.character.id,
     };
 
     if (allocations == null) {
