@@ -15,6 +15,7 @@ import * as SwitchPrimitive from '@radix-ui/react-switch';
 import * as ToastPrimitive from '@radix-ui/react-toast';
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 import { Check, ChevronDown, CircleAlert, CircleCheck, Info, X } from 'lucide-react';
+import { useTexts } from '../i18n/context';
 import { cx } from './cx';
 
 /** Placa flotante: la misma superficie que una tarjeta. Sin sombra: lo que la
@@ -268,7 +269,8 @@ export type ToastTone = 'info' | 'success' | 'error';
 
 const TOAST_ICON = { info: Info, success: CircleCheck, error: CircleAlert } as const;
 const TOAST_COLOR = { info: 'text-gold', success: 'text-verdant', error: 'text-crimson' } as const;
-/** Las duraciones de `showAppMessage`: el error se lee con más calma. */
+/** Las duraciones de `showAppMessage`: el error se lee con más calma. Todas se
+ *  cierran solas, pero ninguna sin X: el aviso se puede descartar antes. */
 const TOAST_MS = { info: 3000, success: 3000, error: 6000 } as const;
 
 export const ToastProvider = ToastPrimitive.Provider;
@@ -283,8 +285,9 @@ export function ToastViewport() {
 /** Un aviso (`showAppMessage`): ícono, color **y** texto, los tres; Radix lo
  *  anuncia como región viva. [action] es el «Deshacer» de `onUndo`: con él
  *  dura lo que un error, para que dé tiempo a tocarlo. [duration] gana sobre
- *  ese cálculo (los avisos de la cola, que se leen con calma); [closeLabel]
- *  dibuja una X para descartarlo sin esperar. */
+ *  ese cálculo (los avisos de la cola, que se leen con calma). **Lleva siempre
+ *  la X** para descartarlo sin esperar: un aviso que solo se cierra solo tapa
+ *  lo que hay debajo. */
 export function Toast({
   tone,
   message,
@@ -292,7 +295,6 @@ export function Toast({
   onOpenChange,
   action,
   duration,
-  closeLabel,
 }: {
   tone: ToastTone;
   message: string;
@@ -300,8 +302,8 @@ export function Toast({
   onOpenChange: (open: boolean) => void;
   action?: { label: string; onSelect: () => void };
   duration?: number;
-  closeLabel?: string;
 }) {
+  const t = useTexts();
   const Icon = TOAST_ICON[tone];
   return (
     <ToastPrimitive.Root
@@ -321,15 +323,13 @@ export function Toast({
           {action.label}
         </ToastPrimitive.Action>
       )}
-      {closeLabel && (
-        <ToastPrimitive.Close
-          aria-label={closeLabel}
-          title={closeLabel}
-          className="-my-1 -mr-2 inline-flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-nav)] text-text-muted hover:bg-plaque"
-        >
-          <X size={16} aria-hidden="true" />
-        </ToastPrimitive.Close>
-      )}
+      <ToastPrimitive.Close
+        aria-label={t.closeNotice}
+        title={t.closeNotice}
+        className="-my-1 -mr-2 inline-flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-nav)] text-text-muted hover:bg-plaque"
+      >
+        <X size={16} aria-hidden="true" />
+      </ToastPrimitive.Close>
     </ToastPrimitive.Root>
   );
 }

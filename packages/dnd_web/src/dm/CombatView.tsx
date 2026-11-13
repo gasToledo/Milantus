@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ArrowDown, ArrowUp, BookOpen, CheckCheck, Dices, ExternalLink, FileText, Flame, Plus, Shield, SkipForward, Tag, X } from 'lucide-react';
-import { useCampaignEncounter, useCampaignMembers, useCampaignNotebook, useCampaignNpcs, useRosterSettings, useSheetCatalog } from '../api/queries';
+import { useCampaignChapters, useCampaignEncounter, useCampaignMembers, useCampaignNotebook, useCampaignNpcs, useRosterSettings, useSheetCatalog } from '../api/queries';
 import type { DmCampaign } from '../api/client';
 import { TurnProfile } from './combat/TurnProfile';
 import { asProfile } from '../bestiary/creature';
@@ -23,7 +23,7 @@ import {
 } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import type { Texts } from '../i18n/texts';
-import { dmMemberHref, dmNpcSheetHref, Link } from '../router';
+import { dmCampaignHref, dmMemberHref, dmNpcSheetHref, Link } from '../router';
 import { AppDialog } from '../ui/AppDialog';
 import { Button, ButtonLink } from '../ui/Button';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
@@ -96,6 +96,15 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
   const encounter = useCampaignEncounter(campaign.id);
   const members = useCampaignMembers(campaign.id, { live: !!encounter.data });
   const npcs = useCampaignNpcs(campaign.id);
+  const chapters = useCampaignChapters(campaign.id);
+  // Sin datos no se avisa: un aviso falso sobre una lista que no cargó es peor que ninguno.
+  const chapterWarning = !chapters.data
+    ? null
+    : chapters.data.length === 0
+      ? ('none' as const)
+      : chapters.data.some((c) => c.state === 'active')
+        ? null
+        : ('noActive' as const);
   const notebook = useCampaignNotebook(campaign.id);
   const catalog = useSheetCatalog(lang);
   const [toast, setToast] = useState<{ key: number; tone: ToastTone; message: string; action?: { label: string; onSelect: () => void } } | null>(null);
@@ -320,6 +329,8 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
           combatants={data.view.encounter.combatants}
           suggested={roll}
           playerModifiers={Object.fromEntries(data.rows.flatMap((r) => (r.c.kind === 'player' && r.member?.sheet ? [[r.c.id, r.member.sheet.initiative] as const] : [])))}
+          chapterWarning={chapterWarning}
+          chaptersHref={dmCampaignHref(campaign.id, 'capitulos')}
           onStart={(initiatives) => writer.act({ type: 'start', initiatives })}
           onClose={() => setRoll(null)}
         />

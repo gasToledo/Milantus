@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { CircleAlert } from 'lucide-react';
 import type { CombatantJson } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
+import { Link } from '../../router';
 import { AppDialog } from '../../ui/AppDialog';
 import { cx } from '../../ui/cx';
 import { Eyebrow } from '../../ui/data';
@@ -21,6 +23,10 @@ import { Eyebrow } from '../../ui/data';
  * tocaba. El que no vino se saca de la mesa y, cuando llega, se suma con su
  * tirada.
  *
+ * **El capítulo no bloquea.** Si no hay uno en marcha (`chapterWarning`), una
+ * nota arriba lo dice con un enlace a Capítulos: el servidor archiva un combate
+ * sin capítulo y el DM no se entera hasta que lo busca. «Empezar» sigue igual.
+ *
  * `suggested` lo calcula quien abre el diálogo **una sola vez**: si se
  * recalculara en cada redibujo, los dados volverían a tirar.
  */
@@ -28,6 +34,8 @@ export function RollInitiativeDialog({
   combatants,
   suggested,
   playerModifiers,
+  chapterWarning,
+  chaptersHref,
   onStart,
   onClose,
 }: {
@@ -35,6 +43,9 @@ export function RollInitiativeDialog({
   suggested: Record<string, number>;
   /** Modificador de iniciativa de cada jugador con ficha, por id de combatiente. */
   playerModifiers: Record<string, number>;
+  chapterWarning: 'none' | 'noActive' | null;
+  /** Adónde lleva «Ir a Capítulos». */
+  chaptersHref: string;
   onStart: (values: Record<string, number>) => void;
   onClose: () => void;
 }) {
@@ -70,6 +81,17 @@ export function RollInitiativeDialog({
       ]}
     >
       <div className="flex flex-col gap-3.5">
+        {chapterWarning && (
+          <div role="note" className="flex items-start gap-2.5 rounded-[var(--radius-card)] border border-gold bg-gold-soft px-3 py-2.5">
+            <CircleAlert size={18} aria-hidden="true" className="mt-px shrink-0 text-gold" />
+            <p className="min-w-0 flex-1 text-[13.5px] leading-[1.45] text-on-surface">
+              {chapterWarning === 'none' ? t.dmNoChapters : t.dmNoActiveChapter}
+            </p>
+            <Link href={chaptersHref} className="shrink-0 px-0.5 text-[13.5px] font-semibold text-gold">
+              {t.dmGoToChapters}
+            </Link>
+          </div>
+        )}
         <div className={cx('grid grid-cols-1 gap-5', sides.length > 1 && 'sm:grid-cols-2')}>
           {sides.map((s) => (
             <div key={s.title} className="min-w-0">

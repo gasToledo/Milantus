@@ -1,3 +1,4 @@
+import { Coins, CircleArrowUp, Package, type LucideIcon } from 'lucide-react';
 import { chapterGrants } from '../engine';
 import type { UserEvent } from '../api/client';
 import type { Texts } from '../i18n/texts';
@@ -11,7 +12,21 @@ import type { ToastTone } from '../ui/primitives';
  * Un `kind` desconocido devuelve `null` en vez de romper: si el servidor se
  * actualiza antes que la pestaña abierta, el aviso se ignora en silencio.
  */
-export function eventMessage(event: UserEvent, t: Texts): { text: string; tone: ToastTone } | null {
+/** El fin de capítulo se dibuja como diálogo y no como tostada: lleva su
+ *  contenido estructurado además del `text` de siempre. */
+export interface ChapterNotice {
+  title: string;
+  campaign: string;
+  /** «{personaje} cerró el capítulo con la mesa.», ya armado: el nombre va sin comillas. */
+  by: string;
+  lines: { icon: LucideIcon; text: string }[];
+  characterId?: string;
+}
+
+export function eventMessage(
+  event: UserEvent,
+  t: Texts,
+): { text: string; tone: ToastTone; chapter?: ChapterNotice } | null {
   const character = quoted(event.payload.characterName, t);
   const campaign = quoted(event.payload.campaignName, t, t.evtSomeCampaign);
 
@@ -69,14 +84,28 @@ function chapterCompleted(event: UserEvent, character: string, campaign: string,
     grantsGold: typeof grantsGold === 'number' && grantsGold > 0 ? grantsGold : undefined,
     grantsItems: Array.isArray(grantsItems) ? grantsItems.filter((i) => typeof i === 'string') : undefined,
   });
-  const lines = [
-    t.evtChapterDone(character, chapter, campaign),
-    ...(rewards ? [t.evtTakes(rewards)] : []),
-    ...(event.payload.grantsLevel === true ? [t.evtCanLevelUp] : []),
+  const details = [
+    ...(rewards ? [{ icon: Coins, text: t.evtTakes(rewards) }] : []),
+    ...(event.payload.grantsLevel === true ? [{ icon: CircleArrowUp, text: t.evtCanLevelUp }] : []),
     // Objetos esperando en la bandeja de Inventario. Flutter no la tiene: ve los nombres.
-    ...(event.payload.hasGrants === true ? [t.evtItemsWaiting] : []),
+    ...(event.payload.hasGrants === true ? [{ icon: Package, text: t.evtItemsWaiting }] : []),
   ];
-  return { text: lines.join(' '), tone: lines.length > 1 ? ('success' as const) : ('info' as const) };
+  const text = [t.evtChapterDone(character, chapter, campaign), ...details.map((d) => d.text)].join(' ');
+  // Sin comillas: el diálogo las pone en el título (es) o no las lleva (en).
+  const plain = (value: unknown, fallback: string) => (typeof value === 'string' && value.trim() !== '' ? value.trim() : fallback);
+  const { characterId } = event.payload;
+  return {
+    text,
+    tone: details.length > 0 ? ('success' as const) : ('info' as const),
+    chapter: {
+      title: t.evtChapterDoneTitle(plain(event.payload.chapterName, t.evtSomeChapter)),
+      campaign: plain(event.payload.campaignName, t.evtSomeCampaign),
+      by: t.evtChapterDoneBy(plain(event.payload.characterName, t.evtSomeCharacter)),
+      lines: details,
+      // Un aviso viejo no lo trae: sin él no se ofrece «Ir a Inventario».
+      ...(typeof characterId === 'string' && characterId !== '' ? { characterId } : {}),
+    },
+  };
 }
 
 /** Nombre entre comillas, o un genérico si vino vacío (lo borraron entre que

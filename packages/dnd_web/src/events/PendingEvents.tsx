@@ -2,14 +2,19 @@ import { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { fetchUnseenEvents, markEventsSeen } from '../api/client';
 import { useTexts } from '../i18n/context';
-import { useRoute } from '../router';
+import { characterHref, navigate, useRoute } from '../router';
+import { AppDialog } from '../ui/AppDialog';
+import { Eyebrow } from '../ui/data';
 import { Toast, type ToastTone } from '../ui/primitives';
-import { eventMessage } from './messages';
+import { eventMessage, type ChapterNotice } from './messages';
 
 interface Notice {
   id: string;
   text: string;
   tone: ToastTone;
+  /** Si viene, el aviso es un diálogo y no una tostada. */
+  chapter?: ChapterNotice;
+  hasGrants?: boolean;
 }
 
 /**
@@ -66,7 +71,7 @@ export function PendingEvents() {
               void client.invalidateQueries({ queryKey: ['itemGrants'] }); // prefijo de `queryKeys.itemGrants`
             }
             const message = eventMessage(event, t);
-            if (message) shown.push({ id: event.id, ...message });
+            if (message) shown.push({ id: event.id, ...message, hasGrants: event.payload.hasGrants === true });
             // Un `kind` desconocido igual se marca visto: dejarlo pendiente lo
             // volvería a traer para siempre.
             else void markEventsSeen([event.id]).catch(() => {});
@@ -96,15 +101,62 @@ export function PendingEvents() {
   }, [current?.id]);
 
   if (!current) return null;
+  const next = () => setQueue((q) => q.slice(1));
+  if (current.chapter) {
+    return <ChapterDoneDialog key={current.id} chapter={current.chapter} hasGrants={current.hasGrants === true} onClose={next} />;
+  }
   return (
     <Toast
       key={current.id}
       tone={current.tone}
       message={current.text}
       open
-      onOpenChange={(open) => !open && setQueue((q) => q.slice(1))}
+      onOpenChange={(open) => !open && next()}
       duration={8000}
-      closeLabel={t.closeNotice}
     />
+  );
+}
+
+/**
+ * El fin de capítulo para el jugador: un diálogo y no una tostada, porque entre
+ * las demás de la cola se perdía. Cerrarlo de cualquier forma (botón, `Esc`,
+ * afuera) pasa al siguiente aviso. «Ir a Inventario» solo si hay objetos
+ * esperando **y** el aviso trae el personaje (uno viejo no lo trae).
+ */
+function ChapterDoneDialog({ chapter, hasGrants, onClose }: { chapter: ChapterNotice; hasGrants: boolean; onClose: () => void }) {
+  const t = useTexts();
+  const { characterId } = chapter;
+  return (
+    <AppDialog
+      open
+      bare
+      onOpenChange={(open) => !open && onClose()}
+      title={chapter.title}
+      actions={[
+        ...(hasGrants && characterId
+          ? [{ label: t.evtGoToInventory, onSelect: () => navigate(characterHref(characterId, 'inventario')) }]
+          : []),
+        { label: t.tutDone, primary: true },
+      ]}
+    >
+      <div data-chapter-done className="flex flex-col items-center gap-2.5 text-center">
+        <span aria-hidden="true" className="mt-1 mb-2 size-[22px] rotate-45 rounded-[var(--radius-mark)] bg-gold" />
+        <Eyebrow>{chapter.campaign}</Eyebrow>
+        <h2 aria-hidden="true" className="font-display text-[22px] leading-tight text-on-surface">
+          {chapter.title}
+        </h2>
+        <p className="text-[14px] text-on-surface-variant">{chapter.by}</p>
+      </div>
+      {chapter.lines.length > 0 && (
+        <ul className="mt-4">
+          {chapter.lines.map((l) => (
+            <li key={l.text} className="flex items-start gap-2.5 border-t border-hairline py-2.5 text-[14px] leading-[1.45] text-on-surface">
+              <l.icon size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-gold" />
+              <span>{l.text}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </AppDialog>
   );
 }

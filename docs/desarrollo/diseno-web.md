@@ -924,7 +924,7 @@ en `src/index.css`.
   --font-display: Georgia, 'Times New Roman', serif;
   --font-body: Roboto, system-ui, sans-serif;
 
-  --radius-card: 12px; --radius-pill: 20px; --radius-nav: 9px;
+  --radius-card: 12px; --radius-pill: 20px; --radius-nav: 9px; --radius-mark: 5px;
   --border-hairline: 1px solid var(--hairline);
   --sidebar-width: 236px; --page-max-width: 760px;
 }
