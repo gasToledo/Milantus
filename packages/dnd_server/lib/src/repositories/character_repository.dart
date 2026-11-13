@@ -10,7 +10,15 @@ class StoredCharacter {
   final Character character;
   final DateTime createdAt;
 
-  const StoredCharacter({required this.character, required this.createdAt});
+  /// La versión de la ficha: cambia en cada guardado, y el cliente la devuelve
+  /// como `expectedVersion` para que el servidor rechace una copia vieja.
+  final DateTime updatedAt;
+
+  const StoredCharacter({
+    required this.character,
+    required this.createdAt,
+    required this.updatedAt,
+  });
 }
 
 /// Contrato de persistencia de personajes: documentos versionados,
@@ -38,7 +46,15 @@ abstract class CharacterRepository {
   /// **Nunca cambia el tipo de la fila**: guardar la ficha de un PNJ por esta
   /// vía la deja como PNJ. Es como la ficha de un PNJ se guarda desde la app,
   /// con la misma pantalla que la de un jugador.
-  Future<void> upsert(String userId, Character character);
+  ///
+  /// Devuelve el `updated_at` que quedó, o `null` si llegó [expectedUpdatedAt]
+  /// y no coincidía con el de la fila (otra pestaña guardó antes): en ese caso
+  /// no se escribe nada. Sin [expectedUpdatedAt] gana el último, como siempre.
+  Future<DateTime?> upsert(
+    String userId,
+    Character character, {
+    DateTime? expectedUpdatedAt,
+  });
 
   /// `null` si no existe, pertenece a otra cuenta o es la ficha de un PNJ: la
   /// ausencia y el acceso cruzado no MUST NOT distinguirse en la respuesta
@@ -124,20 +140,33 @@ class PostgresCharacterRepository implements CharacterRepository {
       );
 
   @override
-  Future<void> upsert(String userId, Character character) async {
-    await _session.execute(
+  Future<DateTime?> upsert(
+    String userId,
+    Character character, {
+    DateTime? expectedUpdatedAt,
+  }) async {
+    // Dos cadenas y no `OR @expected IS NULL`: así el camino sin versión es
+    // exactamente la consulta de siempre. El WHERE del DO UPDATE es la
+    // comparación atómica; si no coincide no hay fila devuelta.
+    final result = await _session.execute(
       Sql.named('''
         INSERT INTO characters (user_id, id, document, updated_at)
         VALUES (@userId, @id, @document, now())
         ON CONFLICT (user_id, id)
         DO UPDATE SET document = excluded.document, updated_at = now()
+        ${expectedUpdatedAt == null ? '' : 'WHERE characters.updated_at = @expected'}
+        RETURNING updated_at
       '''),
       parameters: {
         'userId': TypedValue(Type.uuid, userId),
         'id': TypedValue(Type.text, character.id),
         'document': TypedValue(Type.jsonb, character.toJson()),
+        if (expectedUpdatedAt != null)
+          'expected': TypedValue(Type.timestampTz, expectedUpdatedAt),
       },
     );
+    if (result.isEmpty) return null;
+    return result.first.toColumnMap()['updated_at'] as DateTime;
   }
 
   @override
@@ -170,7 +199,7 @@ class PostgresCharacterRepository implements CharacterRepository {
   Future<List<StoredCharacter>> listForUser(String userId) async {
     final result = await _session.execute(
       Sql.named('''
-        SELECT document, created_at FROM characters
+        SELECT document, created_at, updated_at FROM characters
         WHERE user_id = @userId AND kind = 'player'
         ORDER BY name
       '''),
@@ -183,6 +212,7 @@ class PostgresCharacterRepository implements CharacterRepository {
             (row.toColumnMap()['document'] as Map).cast<String, dynamic>(),
           ),
           createdAt: row.toColumnMap()['created_at'] as DateTime,
+          updatedAt: row.toColumnMap()['updated_at'] as DateTime,
         ),
     ];
   }

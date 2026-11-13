@@ -1484,6 +1484,73 @@ void main() {
       expect(listed['characters'][0]['character']['name'], 'Actualizado');
     });
 
+    group('versión de la ficha', () {
+      Future<Response> put(String token, String name, {int? expected}) async =>
+          await handler(
+            Request(
+              'PUT',
+              Uri.parse('http://localhost/api/characters/sagan'),
+              headers: {'cookie': 'dnd_session=$token'},
+              body: jsonEncode({
+                'character': characterJson('sagan', name: name),
+                'expectedVersion': ?expected,
+              }),
+            ),
+          );
+
+      Future<Map<String, dynamic>> firstListed(String token) async =>
+          (jsonDecode(
+                await (await handler(
+                  Request(
+                    'GET',
+                    Uri.parse('http://localhost/api/characters'),
+                    headers: {'cookie': 'dnd_session=$token'},
+                  ),
+                )).readAsString(),
+              )['characters']
+              as List)[0];
+
+      test('una expectedVersion vieja responde 409 y no escribe', () async {
+        final token = await login('subject-chars-v1');
+        await put(token, 'Primera');
+        final stale = (await firstListed(token))['version'] as int;
+        await put(token, 'Segunda', expected: stale);
+
+        final response = await put(token, 'Pisada', expected: stale);
+        expect(response.statusCode, 409);
+        expect(
+          jsonDecode(await response.readAsString())['code'],
+          'character_stale',
+        );
+        expect((await firstListed(token))['character']['name'], 'Segunda');
+      });
+
+      test('la version del listado guarda y devuelve otra', () async {
+        final token = await login('subject-chars-v2');
+        await put(token, 'Primera');
+        final version = (await firstListed(token))['version'] as int;
+
+        final response = await put(token, 'Segunda', expected: version);
+        expect(response.statusCode, 200);
+        final next = jsonDecode(await response.readAsString())['version'];
+        expect(next, isA<int>());
+        expect(next, isNot(version));
+      });
+
+      test(
+        'sin expectedVersion guarda aunque la ficha haya cambiado',
+        () async {
+          final token = await login('subject-chars-v3');
+          await put(token, 'Primera');
+          await put(token, 'Segunda');
+
+          final response = await put(token, 'Tercera');
+          expect(response.statusCode, 200);
+          expect((await firstListed(token))['character']['name'], 'Tercera');
+        },
+      );
+    });
+
     test(
       'un id de ruta que no coincide con el del cuerpo responde 400',
       () async {

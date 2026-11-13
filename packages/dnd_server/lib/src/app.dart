@@ -861,6 +861,8 @@ Future<Response> _listCharactersHandler(
         {
           'character': stored.character.toJson(),
           'createdAt': stored.createdAt.toUtc().toIso8601String(),
+          // Entero y no ISO: se compara exacto (ver `_upsertCharacterHandler`).
+          'version': stored.updatedAt.microsecondsSinceEpoch,
         },
     ],
   });
@@ -910,13 +912,32 @@ Future<Response> _upsertCharacterHandler(
   if (character.id != id) {
     throw const FormatException('El id del personaje no coincide con la ruta.');
   }
-  await transactions.run<void>((repositories) async {
+  // La versión es `updated_at` en microsegundos. Sin ella (Flutter) gana el
+  // último, como siempre.
+  final expectedVersion = body['expectedVersion'];
+  if (expectedVersion != null && expectedVersion is! int) {
+    throw const FormatException('"expectedVersion" debe ser un entero.');
+  }
+  final version = await transactions.run<int?>((repositories) async {
     // `find` solo ve fichas de jugador: la de un PNJ también se guarda por
     // esta ruta, pero llega acá como `null` y no registra nada — igual que
     // el primer guardado de un personaje, que no subió desde ningún lado.
     final previous = await repositories.characters.find(request.userId, id);
-    await repositories.characters.upsert(request.userId, character);
-    if (previous == null) return;
+    final saved = await repositories.characters.upsert(
+      request.userId,
+      character,
+      expectedUpdatedAt: expectedVersion == null
+          ? null
+          : DateTime.fromMicrosecondsSinceEpoch(
+              expectedVersion as int,
+              isUtc: true,
+            ),
+    );
+    // Rechazada por copia vieja: nada de lo que sigue (avisos de subida de
+    // nivel o de rehecho) debe pasar.
+    if (saved == null) return null;
+    final newVersion = saved.microsecondsSinceEpoch;
+    if (previous == null) return newVersion;
 
     // Rehacerlo desde nivel 1 lo marca el cliente y no se deduce: bajar de
     // nivel no lo distingue (un nivel 1 rehecho sigue en 1) y cambiar de
@@ -935,9 +956,9 @@ Future<Response> _upsertCharacterHandler(
           'campaignName': share.campaignName,
         });
       }
-      return;
+      return newVersion;
     }
-    if (character.totalLevel <= previous.totalLevel) return;
+    if (character.totalLevel <= previous.totalLevel) return newVersion;
 
     // ponytail: dos guardados simultáneos de la misma subida la registrarían
     // dos veces (`find` no bloquea la fila). Hace falta el mismo jugador
@@ -971,8 +992,19 @@ Future<Response> _upsertCharacterHandler(
         );
       }
     }
+    return newVersion;
   });
-  return _jsonOk({'status': 'ok'});
+  if (version == null) {
+    return Response(
+      409,
+      body: _errorBody(
+        'La ficha cambió desde que la abriste.',
+        'character_stale',
+      ),
+      headers: {'content-type': 'application/json'},
+    );
+  }
+  return _jsonOk({'status': 'ok', 'version': version});
 }
 
 /// Borra un personaje de la cuenta y avisa a los DM que lo tenían en su mesa.

@@ -20,6 +20,9 @@ class InMemoryCharacterRepository implements CharacterRepository {
   final Map<String, Map<String, DateTime>> _createdAt = {};
   int _clock = 0;
 
+  /// La versión (`updated_at`) por (cuenta, id): sube en cada `upsert`.
+  final Map<String, Map<String, DateTime>> _updatedAt = {};
+
   /// Lo que la base borra en cascada al borrar un personaje (sus regalos).
   final List<void Function(String ownerUserId, String characterId)>
   onCharacterDeleted = [];
@@ -34,6 +37,9 @@ class InMemoryCharacterRepository implements CharacterRepository {
     createdAt: {
       for (final entry in _createdAt.entries) entry.key: Map.of(entry.value),
     },
+    updatedAt: {
+      for (final entry in _updatedAt.entries) entry.key: Map.of(entry.value),
+    },
     clock: _clock,
   );
 
@@ -44,8 +50,12 @@ class InMemoryCharacterRepository implements CharacterRepository {
               Map<String, Map<String, Character>> byUser,
               Map<String, Set<String>> npcSheets,
               Map<String, Map<String, DateTime>> createdAt,
+              Map<String, Map<String, DateTime>> updatedAt,
               int clock,
             });
+    _updatedAt
+      ..clear()
+      ..addAll(snapshot.updatedAt);
     _byUser
       ..clear()
       ..addAll(snapshot.byUser);
@@ -96,10 +106,28 @@ class InMemoryCharacterRepository implements CharacterRepository {
 
   /// Como en la tabla, guardar no cambia el tipo de la fila.
   @override
-  Future<void> upsert(String userId, Character character) async {
+  Future<DateTime?> upsert(
+    String userId,
+    Character character, {
+    DateTime? expectedUpdatedAt,
+  }) async {
+    final previous = _updatedAt[userId]?[character.id];
+    if (expectedUpdatedAt != null &&
+        previous != null &&
+        previous != expectedUpdatedAt) {
+      return null;
+    }
     _byUser.putIfAbsent(userId, () => {})[character.id] = character;
     // Solo fija la fecha si el personaje no existía: editar no lo vuelve nuevo.
     _stamp(userId, character.id);
+    // Estrictamente creciente: dos guardados en el mismo microsegundo del reloj
+    // real darían la misma versión y una copia vieja pasaría por vigente.
+    final now = DateTime.now().toUtc();
+    final next = previous != null && !now.isAfter(previous)
+        ? previous.add(const Duration(microseconds: 1))
+        : now;
+    _updatedAt.putIfAbsent(userId, () => {})[character.id] = next;
+    return next;
   }
 
   @override
@@ -123,7 +151,12 @@ class InMemoryCharacterRepository implements CharacterRepository {
     chars.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     return [
       for (final c in chars)
-        StoredCharacter(character: c, createdAt: _stamp(userId, c.id)),
+        StoredCharacter(
+          character: c,
+          createdAt: _stamp(userId, c.id),
+          // Una ficha creada y nunca guardada por `upsert` toma su alta.
+          updatedAt: _updatedAt[userId]?[c.id] ?? _stamp(userId, c.id).toUtc(),
+        ),
     ];
   }
 
@@ -131,6 +164,7 @@ class InMemoryCharacterRepository implements CharacterRepository {
   Future<bool> delete(String userId, String id) async {
     if (_isNpc(userId, id)) return false;
     final removed = _byUser[userId]?.remove(id) != null;
+    _updatedAt[userId]?.remove(id);
     // La cascada de la base: lo que cuelga del personaje se va con él.
     if (removed) {
       for (final cascade in onCharacterDeleted) {
