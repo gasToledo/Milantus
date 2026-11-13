@@ -108,6 +108,8 @@ class _SpellFormState extends State<SpellForm> with _GuidedForm {
     concentration: _concentration,
     ritual: _ritual,
     description: _description.text.trim(),
+    // El formulario de Flutter no edita la mejora, pero la conserva al editar.
+    higherLevel: widget.initial?.higherLevel ?? '',
     classes: _classes.toList(),
   );
 
