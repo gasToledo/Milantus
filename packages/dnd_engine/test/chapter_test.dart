@@ -326,4 +326,38 @@ void main() {
       expect(c.copyWith(state: ChapterState.active).grantsCatalog, [potion]);
     });
   });
+
+  group('Chapter.entryOrder', () {
+    // Cerrar o empezar un capítulo pasa por copyWith: perder el orden ahí
+    // desacomodaría el Cuaderno sin que el DM tocara nada.
+    test('sobrevive el round-trip y el copyWith', () {
+      const c = Chapter(
+        id: 'x',
+        name: 'y',
+        entryOrder: ['fight:1', 'note:a'],
+      );
+
+      expect(Chapter.fromJson(c.toJson()).entryOrder, ['fight:1', 'note:a']);
+      expect(
+        c.copyWith(state: ChapterState.completed).entryOrder,
+        ['fight:1', 'note:a'],
+      );
+    });
+
+    test('una clave repetida o que no es texto se descarta', () {
+      final r = Chapter.fromJson({
+        'schemaVersion': Chapter.currentSchemaVersion,
+        'id': 'x',
+        'entryOrder': ['note:a', 3, '', 'note:a', 'fight:1'],
+      });
+
+      expect(r.entryOrder, ['note:a', 'fight:1']);
+    });
+
+    test('un capítulo de la versión 2 se lee sin orden propio', () {
+      final r = Chapter.fromJson({'schemaVersion': 2, 'id': 'x'});
+
+      expect(r.entryOrder, isEmpty);
+    });
+  });
 }

@@ -47,6 +47,21 @@ abstract class EncounterRepository {
   /// combates.
   Future<List<EncounterLog>> logsFor(String dmUserId, String campaignId);
 
+  /// Cuelga el combate [logId] de [chapterId], solo si hoy está suelto: sin
+  /// capítulo, o con uno que ya no figura en [liveChapterIds] (lo borraron).
+  /// El documento del combate no se toca: el capítulo vive en la columna.
+  ///
+  /// `false` si no movió nada: el combate es ajeno, no existe o ya tiene
+  /// capítulo. Los tres casos responden igual. Quien llama comprueba antes que
+  /// [chapterId] sea un capítulo de esta campaña.
+  Future<bool> assignChapter(
+    String dmUserId,
+    String campaignId,
+    String logId,
+    String chapterId, {
+    required List<String> liveChapterIds,
+  });
+
   /// Descarta el combate **sin archivarlo**: no deja ninguna fila en
   /// `encounter_logs`. Es para el que se abrió por error o se armó mal, que
   /// no tiene por qué quedar en el registro de la campaña como si se hubiera
@@ -170,6 +185,39 @@ class PostgresEncounterRepository implements EncounterRepository {
           }),
     ];
   }
+
+  @override
+  Future<bool> assignChapter(
+    String dmUserId,
+    String campaignId,
+    String logId,
+    String chapterId, {
+    required List<String> liveChapterIds,
+  }) async {
+    // El id es UUID: uno mal formado haría fallar el cast en la base y
+    // respondería 500 en vez del 404 de «no existe».
+    if (!_uuid.hasMatch(logId)) return false;
+    final result = await _session.execute(
+      Sql.named('''
+        UPDATE encounter_logs SET chapter_id = @chapterId
+        WHERE dm_user_id = @dmUserId AND campaign_id = @campaignId
+          AND id = @logId::uuid
+          AND (chapter_id IS NULL OR NOT (chapter_id = ANY(@live)))
+      '''),
+      parameters: {
+        'dmUserId': TypedValue(Type.uuid, dmUserId),
+        'campaignId': TypedValue(Type.text, campaignId),
+        'logId': TypedValue(Type.text, logId),
+        'chapterId': TypedValue(Type.text, chapterId),
+        'live': TypedValue(Type.textArray, liveChapterIds),
+      },
+    );
+    return result.affectedRows > 0;
+  }
+
+  static final _uuid = RegExp(
+    r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+  );
 
   @override
   Future<void> restoreMonsters(

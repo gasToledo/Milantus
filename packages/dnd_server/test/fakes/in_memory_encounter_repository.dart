@@ -119,6 +119,34 @@ class InMemoryEncounterRepository implements EncounterRepository {
         }),
   ];
 
+  /// Reproduce el `WHERE` real: el dueño, la campaña y que hoy esté suelto.
+  @override
+  Future<bool> assignChapter(
+    String dmUserId,
+    String campaignId,
+    String logId,
+    String chapterId, {
+    required List<String> liveChapterIds,
+  }) async {
+    final index = int.tryParse(logId.replaceFirst('log-', '')) ?? -1;
+    if (!logId.startsWith('log-') || index < 0 || index >= logs.length) {
+      return false;
+    }
+    final entry = logs[index];
+    final current = entry.document['chapterId'] as String?;
+    if (entry.dmUserId != dmUserId ||
+        entry.campaignId != campaignId ||
+        (current != null && liveChapterIds.contains(current))) {
+      return false;
+    }
+    logs[index] = (
+      dmUserId: entry.dmUserId,
+      campaignId: entry.campaignId,
+      document: {...entry.document, 'chapterId': chapterId},
+    );
+    return true;
+  }
+
   @override
   Future<void> discard(String dmUserId, String campaignId) async {
     _byCampaign.remove(_key(dmUserId, campaignId));

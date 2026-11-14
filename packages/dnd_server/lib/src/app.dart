@@ -270,6 +270,12 @@ Handler buildHandler({
       '/api/campaigns/<id>/chapters/<chapterId>/close',
       authenticated((request) => _closeChapterHandler(request, transactions)),
     )
+    ..put(
+      '/api/campaigns/<id>/chapters/<chapterId>/entry-order',
+      authenticated(
+        (request) => _saveEntryOrderHandler(request, campaigns, chapters),
+      ),
+    )
     ..post(
       '/api/campaigns/<id>/members/<memberId>/heroic-inspiration',
       authenticated(
@@ -307,6 +313,28 @@ Handler buildHandler({
     ..delete(
       '/api/campaigns/<id>/notes/<noteId>',
       authenticated((request) => _deleteNoteHandler(request, campaigns, notes)),
+    )
+    ..put(
+      '/api/campaigns/<id>/encounter-logs/<entryId>/chapter',
+      authenticated(
+        (request) => _assignChapterHandler(
+          request,
+          campaigns,
+          chapters,
+          encounters.assignChapter,
+        ),
+      ),
+    )
+    ..put(
+      '/api/campaigns/<id>/level-ups/<entryId>/chapter',
+      authenticated(
+        (request) => _assignChapterHandler(
+          request,
+          campaigns,
+          chapters,
+          levelUps.assignChapter,
+        ),
+      ),
     )
     ..get(
       '/api/campaigns/<id>/encounter',
@@ -1084,6 +1112,7 @@ const _notFoundMessages = {
   'portrait_not_found': 'Retrato no encontrado.',
   'link_not_found': 'Vínculo no encontrado.',
   'item_grant_not_found': 'Objeto no encontrado.',
+  'entry_not_found': 'Entrada del cuaderno no encontrada.',
 };
 
 Response _notFound(String code) => Response.notFound(
@@ -1351,8 +1380,12 @@ Future<Response> _listCharacterSharesHandler(
 ///
 /// `Chapter.fromJson` la default-ea a vacío, así que del otro lado el campo
 /// llega en blanco sin que nadie tenga que acordarse de limpiarlo.
-Map<String, dynamic> _playerChapterJson(Chapter chapter) =>
-    chapter.toJson()..remove('summary');
+///
+/// Tampoco viaja `entryOrder`: es cómo el DM acomodó su Cuaderno, y nombra
+/// por id notas privadas y combates que el jugador no ve.
+Map<String, dynamic> _playerChapterJson(Chapter chapter) => chapter.toJson()
+  ..remove('summary')
+  ..remove('entryOrder');
 
 /// Si un capítulo es de los que un jugador puede leer notas: el que está en
 /// curso o uno cerrado. Se decide con los capítulos de la propia proyección,
@@ -1410,10 +1443,11 @@ Future<Response> _listPlayerCampaignsHandler(
       {
         'memberId': projection.memberId,
         // Con su objetivo: es el único capítulo cuyo `summary` llega a un
-        // jugador. Se repite el estado por si la consulta cambia.
+        // jugador. Se repite el estado por si la consulta cambia. El orden
+        // del Cuaderno no viaja, igual que en `_playerChapterJson`.
         'currentChapter': switch (projection.currentChapter) {
           final chapter? when chapter.state == ChapterState.active =>
-            chapter.toJson(),
+            chapter.toJson()..remove('entryOrder'),
           _ => null,
         },
         'sharedNotes': [
@@ -1653,6 +1687,59 @@ Future<Response> _deleteNoteHandler(
   return _jsonOk({'status': 'ok'});
 }
 
+/// Cuelga de un capítulo un combate o una subida de nivel que quedó suelta
+/// en el Cuaderno. Los dos son registros que escribe la app y no se editan:
+/// esto cambia solo de qué capítulo cuelgan, y solo si hoy no cuelgan de
+/// ninguno vivo. Lo que ya tiene capítulo no se mueve (`assign` no toca la
+/// fila), así que mover algo mal archivado no es posible por acá.
+///
+/// El destino se busca entre los capítulos del propio DM antes de escribir:
+/// colgar el registro de un id inventado lo dejaría en un capítulo que no se
+/// ve, que es justo lo que esta ruta viene a arreglar.
+Future<Response> _assignChapterHandler(
+  Request request,
+  CampaignRepository campaigns,
+  ChapterRepository chapters,
+  Future<bool> Function(
+    String dmUserId,
+    String campaignId,
+    String entryId,
+    String chapterId, {
+    required List<String> liveChapterIds,
+  })
+  assign,
+) async {
+  final campaignId = requireSafePathSegment(
+    request.params['id']!,
+    label: 'id de campaña',
+  );
+  final entryId = requireSafePathSegment(
+    request.params['entryId']!,
+    label: 'id de la entrada',
+  );
+  if (await campaigns.find(request.userId, campaignId) == null) {
+    return _notFound('campaign_not_found');
+  }
+  final body = await _readJsonBody(request);
+  final chapterId = body['chapterId'];
+  if (chapterId is! String || chapterId.isEmpty) {
+    throw const FormatException('Falta "chapterId".');
+  }
+  final live = [
+    for (final c in await chapters.listFor(request.userId, campaignId)) c.id,
+  ];
+  if (!live.contains(chapterId)) return _notFound('chapter_not_found');
+  final moved = await assign(
+    request.userId,
+    campaignId,
+    entryId,
+    chapterId,
+    liveChapterIds: live,
+  );
+  if (!moved) return _notFound('entry_not_found');
+  return _jsonOk({'status': 'ok'});
+}
+
 Future<Chapter> _validChapterFromBody(
   Request request,
   ChapterRepository chapters,
@@ -1757,6 +1844,51 @@ Future<Response> _upsertChapterHandler(
     throw const FormatException('El id del capítulo no coincide con la ruta.');
   }
   await chapters.upsert(request.userId, campaignId, chapter);
+  return _jsonOk({'status': 'ok'});
+}
+
+/// Guarda solo el orden del Cuaderno de un capítulo (`Chapter.entryOrder`).
+///
+/// Ruta propia y no el `PUT` del capítulo por dos motivos: ese rechaza un
+/// capítulo cerrado (cerrar tiene su acción, que avisa a la mesa), y ordenar
+/// el Cuaderno de uno cerrado es lo más normal; y así un arrastre no reenvía
+/// el capítulo entero, pisando lo que se haya editado en otra pestaña.
+Future<Response> _saveEntryOrderHandler(
+  Request request,
+  CampaignRepository campaigns,
+  ChapterRepository chapters,
+) async {
+  final campaignId = requireSafePathSegment(
+    request.params['id']!,
+    label: 'id de campaña',
+  );
+  final chapterId = requireSafePathSegment(
+    request.params['chapterId']!,
+    label: 'id de capítulo',
+  );
+  if (await campaigns.find(request.userId, campaignId) == null) {
+    return _notFound('campaign_not_found');
+  }
+  final existing = await chapters.find(request.userId, campaignId, chapterId);
+  if (existing == null) return _notFound('chapter_not_found');
+  final body = await _readJsonBody(request);
+  final order = body['entryOrder'];
+  if (order is! List || order.any((key) => key is! String)) {
+    throw const FormatException(
+      '"entryOrder" tiene que ser una lista de texto.',
+    );
+  }
+  // Pasa por `fromJson` para limpiar igual que cualquier otro capítulo
+  // (claves vacías o repetidas fuera).
+  final cleaned = Chapter.fromJson({
+    ...existing.toJson(),
+    'entryOrder': order,
+  }).entryOrder;
+  await chapters.upsert(
+    request.userId,
+    campaignId,
+    existing.copyWith(entryOrder: cleaned),
+  );
   return _jsonOk({'status': 'ok'});
 }
 

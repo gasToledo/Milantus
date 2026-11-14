@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { EllipsisVertical, Eye, Lock, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
+import { EllipsisVertical, Eye, FolderInput, Lock, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
 import {
   queryKeys,
   useCampaignChapters,
@@ -9,7 +9,20 @@ import {
   useCampaignNpcs,
   useSheetCatalog,
 } from '../api/queries';
-import { createNote, deleteNote, saveNote, type DmCampaign, type DmNote } from '../api/client';
+import {
+  assignEntryChapter,
+  createNote,
+  deleteNote,
+  saveEntryOrder,
+  saveNote,
+  type DmCampaign,
+  type DmChapter,
+  type DmNote,
+} from '../api/client';
+import { movedOrder } from '../dashboard/roster';
+import { useHoldDrag } from '../ui/holdDrag';
+import { Toast, type ToastTone } from '../ui/primitives';
+import { MoveToChapterDialog } from './MoveToChapterDialog';
 import { useLang, useTexts } from '../i18n/context';
 import { Button, ButtonLink } from '../ui/Button';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
@@ -23,7 +36,7 @@ import { stateLabel, stateOf } from './campaigns';
 import { CampaignMenu } from './CampaignMenu';
 import { DmHeader } from './DmHeader';
 import { NoteEditorDialog } from './NoteEditorDialog';
-import { buildEntries, matches, stamp, type EntryKind } from './notebook';
+import { buildEntries, inChapterOrder, matches, stamp, type Entry, type EntryKind } from './notebook';
 
 /** Sin capítulo: el valor de la pill que junta lo que no cuelga de ninguno. */
 const LOOSE = '';
@@ -58,6 +71,9 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
   const client = useQueryClient();
   const [editing, setEditing] = useState<DmNote | 'new' | null>(null);
   const [deleting, setDeleting] = useState<DmNote | null>(null);
+  const [moving, setMoving] = useState<Entry | null>(null);
+  const [toast, setToast] = useState<{ key: number; tone: ToastTone; message: string } | null>(null);
+  const notify = (tone: ToastTone, message: string) => setToast((prev) => ({ key: (prev?.key ?? 0) + 1, tone, message }));
   const refresh = () => client.invalidateQueries({ queryKey: queryKeys.campaignNotebook(campaign.id) });
   // A quiénes enlaza una mención: los personajes de la mesa y los PNJ de la
   // campaña. Si no cargan, las menciones se leen como texto y el Cuaderno no
@@ -98,6 +114,42 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
     [notebook.data, chapters.data, catalog.data, t, mentions],
   );
 
+  const chapterList = chapters.data ?? [];
+  // Se abre en el capítulo en marcha; sin uno, en el primero.
+  const initial = chapterList.find((c) => c.state === 'active') ?? chapterList[0];
+  const current = picked ?? initial?.id ?? LOOSE;
+  const searching = query.trim() !== '';
+  const visible = (entries ?? []).filter((e) => matches(e, query));
+  const currentChapter = chapterList.find((c) => c.id === current);
+  const shown = inChapterOrder(
+    visible.filter((e) => (e.chapterId ?? LOOSE) === current),
+    currentChapter?.entryOrder,
+  );
+  // Se ordena dentro de un capítulo y sin búsqueda: con la lista filtrada,
+  // soltar «entre» dos resultados no dice dónde queda respecto de lo oculto
+  // (la misma regla del Dashboard). «Sin capítulo» es una bandeja para
+  // vaciar, y va por fecha.
+  const arrangeable = currentChapter !== undefined && !searching && shown.length > 1;
+  const ids = arrangeable ? shown.map((e) => e.orderKey) : [];
+
+  const moveEntry = (from: string, to: string) => {
+    if (!currentChapter) return;
+    const chapterId = currentChapter.id;
+    const order = movedOrder(ids, from, to);
+    void (async () => {
+      const key = queryKeys.campaignChapters(campaign.id);
+      await client.cancelQueries({ queryKey: key });
+      client.setQueryData<DmChapter[]>(key, (old) => old?.map((c) => (c.id === chapterId ? { ...c, entryOrder: order } : c)));
+      try {
+        await saveEntryOrder(campaign.id, chapterId, order);
+      } catch {
+        notify('error', t.dmOrderSaveError);
+        void client.invalidateQueries({ queryKey: key });
+      }
+    })();
+  };
+  const reorder = useHoldDrag({ ids, axis: 'y', canDrop: () => arrangeable, onMove: moveEntry });
+
   const failed = [notebook, chapters, ...catalog.queries].filter((q) => q.isError);
   const state = stateLabel(t, stateOf(campaign));
   let body;
@@ -121,17 +173,11 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
       />
     );
   } else {
-    // Se abre en el capítulo en marcha; sin uno, en el primero.
-    const initial = chapters.data.find((c) => c.state === 'active') ?? chapters.data[0]!;
-    const current = picked ?? initial.id;
-    const searching = query.trim() !== '';
-    const visible = entries.filter((e) => matches(e, query));
     const pills = [
       ...chapters.data.map((c) => ({ id: c.id, label: c.name })),
       { id: LOOSE, label: t.dmNoChapter },
     ];
     const countIn = (id: string) => visible.filter((e) => (e.chapterId ?? LOOSE) === id).length;
-    const shown = visible.filter((e) => (e.chapterId ?? LOOSE) === current);
     const count = (k: EntryKind) => shown.filter((e) => e.kind === k).length;
     const now = Date.now();
 
@@ -215,7 +261,17 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
               <li
                 key={e.key}
                 data-entry={e.kind}
-                className={cx('card border-l-[3px] px-[18px] py-3.5', ACCENT[e.kind].border)}
+                className={cx(
+                  'card border-l-[3px] px-[18px] py-3.5',
+                  ACCENT[e.kind].border,
+                  // Sostenerla no puede seleccionar el texto ni abrir el menú
+                  // del teléfono. Las clases del arrastre son las de la Mesa.
+                  arrangeable && 'select-none [-webkit-touch-callout:none]',
+                  reorder.dragging === e.orderKey &&
+                    (reorder.animated ? 'cursor-grabbing border-gold [&_*]:cursor-grabbing' : 'opacity-40'),
+                  reorder.over === e.orderKey && !reorder.animated && 'outline-2 outline-offset-1 outline-gold',
+                )}
+                {...(arrangeable ? reorder.item(e.orderKey) : {})}
               >
                 <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
                   <span className={cx('text-[11.5px] font-medium', ACCENT[e.kind].text)}>
@@ -266,6 +322,30 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   )}
+                  {!e.note && e.chapterId === null && e.entryId !== '' && chapterList.length > 0 && (
+                    // Lo suelto se cuelga de un capítulo; lo que ya tiene uno
+                    // no se mueve (el servidor tampoco lo acepta).
+                    <DropdownMenu>
+                      <Tooltip content={e.kind === 'fight' ? t.dmFightActions : t.dmLevelUpActions}>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            type="button"
+                            aria-label={e.kind === 'fight' ? t.dmFightActions : t.dmLevelUpActions}
+                            data-action="entry-actions"
+                            className="-my-2 -mr-2 inline-flex size-10 shrink-0 items-center justify-center self-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold data-[state=open]:bg-gold-soft data-[state=open]:text-gold"
+                          >
+                            <EllipsisVertical size={18} aria-hidden="true" />
+                          </button>
+                        </DropdownMenuTrigger>
+                      </Tooltip>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onSelect={() => setMoving(e)}>
+                          <FolderInput size={15} aria-hidden="true" className="text-text-muted" />
+                          {t.dmMoveToChapterItem}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                 </div>
                 <div className="mt-1.5 text-[13.5px] leading-relaxed text-on-surface-variant">
                   {e.markdown ? (
@@ -286,9 +366,8 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
     );
   }
 
-  const chapterList = chapters.data ?? [];
   // La nota nace en el capítulo en marcha o, si no hay, en el primero.
-  const bornIn = chapterList.find((c) => c.state === 'active') ?? chapterList[0];
+  const bornIn = initial;
 
   const submit = async (note: DmNote) => {
     if (editing === 'new') await createNote(campaign.id, note);
@@ -341,6 +420,20 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
           onClose={() => setDeleting(null)}
         />
       )}
+      {moving && (
+        <MoveToChapterDialog
+          entryTitle={moving.title}
+          chapters={chapterList}
+          onMove={async (chapterId) => {
+            await assignEntryChapter(campaign.id, moving.kind === 'fight' ? 'fight' : 'levelUp', moving.entryId, chapterId);
+            // Llega al final del capítulo: no figura en su orden. Se queda en
+            // «Sin capítulo» para seguir vaciando la bandeja.
+            await refresh();
+          }}
+          onClose={() => setMoving(null)}
+        />
+      )}
+      {toast && <Toast key={toast.key} tone={toast.tone} message={toast.message} open onOpenChange={(open) => !open && setToast(null)} />}
     </div>
   );
 }

@@ -61,6 +61,16 @@ abstract class LevelUpRepository {
   /// De la más nueva a la más vieja. Vacío si la campaña no es de [dmUserId],
   /// sin distinguirlo de una campaña donde nadie subió de nivel.
   Future<List<LevelUpLog>> listFor(String dmUserId, String campaignId);
+
+  /// Mismo contrato que `EncounterRepository.assignChapter`: cuelga la subida
+  /// [id] de [chapterId] solo si hoy está suelta, y `false` si no movió nada.
+  Future<bool> assignChapter(
+    String dmUserId,
+    String campaignId,
+    String id,
+    String chapterId, {
+    required List<String> liveChapterIds,
+  });
 }
 
 class PostgresLevelUpRepository implements LevelUpRepository {
@@ -96,6 +106,35 @@ class PostgresLevelUpRepository implements LevelUpRepository {
         'classLevel': TypedValue(Type.integer, classLevel),
       },
     );
+  }
+
+  @override
+  Future<bool> assignChapter(
+    String dmUserId,
+    String campaignId,
+    String id,
+    String chapterId, {
+    required List<String> liveChapterIds,
+  }) async {
+    // El id es BIGINT: uno que no es número no existe, y no llega a la base.
+    final number = int.tryParse(id);
+    if (number == null) return false;
+    final result = await _session.execute(
+      Sql.named('''
+        UPDATE level_up_logs SET chapter_id = @chapterId
+        WHERE dm_user_id = @dmUserId AND campaign_id = @campaignId
+          AND id = @id
+          AND (chapter_id IS NULL OR NOT (chapter_id = ANY(@live)))
+      '''),
+      parameters: {
+        'dmUserId': TypedValue(Type.uuid, dmUserId),
+        'campaignId': TypedValue(Type.text, campaignId),
+        'id': TypedValue(Type.bigInteger, number),
+        'chapterId': TypedValue(Type.text, chapterId),
+        'live': TypedValue(Type.textArray, liveChapterIds),
+      },
+    );
+    return result.affectedRows > 0;
   }
 
   /// El desempate por `id` no es decorativo: subir dos niveles en un mismo

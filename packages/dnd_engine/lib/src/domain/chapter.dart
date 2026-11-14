@@ -108,7 +108,9 @@ class Chapter {
   ///
   /// 2: suma [grantsCatalog]. Un capítulo de la versión 1 se lee igual, sin
   /// objetos del catálogo.
-  static const int currentSchemaVersion = 2;
+  /// 3: suma [entryOrder]. Uno anterior se lee sin orden propio: el Cuaderno
+  /// lo muestra por fecha, como antes.
+  static const int currentSchemaVersion = 3;
 
   final String id;
   final String name;
@@ -155,6 +157,16 @@ class Chapter {
   /// **no se guarda acá**: el capítulo cerrado dice qué se repartió, no a quién.
   final List<ChapterItem> grantsCatalog;
 
+  /// El orden en que el DM acomodó las entradas de este capítulo en el
+  /// Cuaderno: claves `note:<id>`, `fight:<id>` o `levelUp:<id>`. Lo que no
+  /// figura (lo nuevo, o un capítulo que nunca se ordenó) va después, por
+  /// fecha.
+  ///
+  /// Vive en el capítulo y no en cada fila porque mover una entrada es así una
+  /// sola escritura, como el orden de la Mesa en `Campaign.memberOrder`. Es
+  /// material del DM: **no viaja al jugador** (ver la poda del servidor).
+  final List<String> entryOrder;
+
   const Chapter({
     required this.id,
     required this.name,
@@ -164,6 +176,7 @@ class Chapter {
     this.grantsGold = 0,
     this.grantsItems = const [],
     this.grantsCatalog = const [],
+    this.entryOrder = const [],
   });
 
   /// Si el cierre reparte algo además del aviso de subir de nivel.
@@ -193,6 +206,7 @@ class Chapter {
     int? grantsGold,
     List<String>? grantsItems,
     List<ChapterItem>? grantsCatalog,
+    List<String>? entryOrder,
   }) =>
       Chapter(
         id: id,
@@ -203,6 +217,7 @@ class Chapter {
         grantsGold: grantsGold ?? this.grantsGold,
         grantsItems: grantsItems ?? this.grantsItems,
         grantsCatalog: grantsCatalog ?? this.grantsCatalog,
+        entryOrder: entryOrder ?? this.entryOrder,
       );
 
   Map<String, dynamic> toJson() => {
@@ -215,6 +230,7 @@ class Chapter {
         'grantsGold': grantsGold,
         'grantsItems': grantsItems,
         'grantsCatalog': [for (final item in grantsCatalog) item.toJson()],
+        if (entryOrder.isNotEmpty) 'entryOrder': entryOrder,
       };
 
   factory Chapter.fromJson(Map<String, dynamic> source) {
@@ -241,6 +257,14 @@ class Chapter {
         for (final raw in (j['grantsCatalog'] as List? ?? const []))
           if (ChapterItem.tryFromJson(raw) case final item?) item,
       ],
+      // Mismo criterio que el botín: una clave que no es texto se descarta, y
+      // una repetida también (el orden la dejaría en dos lugares).
+      entryOrder: [
+        ...{
+          for (final key in (j['entryOrder'] as List? ?? const []))
+            if (key is String && key.isNotEmpty) key,
+        },
+      ],
     );
   }
 
@@ -266,7 +290,8 @@ class Chapter {
         supported: currentSchemaVersion,
       );
     }
-    // 1 → 2: solo suma un campo opcional, así que migrar es sellar la versión.
+    // 1 → 2 y 2 → 3: cada una solo suma un campo opcional, así que migrar es
+    // sellar la versión.
     return Map<String, dynamic>.from(source)
       ..['schemaVersion'] = currentSchemaVersion;
   }

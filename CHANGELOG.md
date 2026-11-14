@@ -1428,15 +1428,25 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
-## [Unreleased]
+## [1.2.0+1] - 2026-11-14
 
 ### Nuevo
 
 - Las reglas generales del Quiz suman habilidades, maestrías y propiedades
   de arma, el daño de las armas y la CA y el tipo de las armaduras.
+- En el Cuaderno, el DM acomoda las entradas de cada capítulo arrastrándolas,
+  también en un capítulo cerrado; lo nuevo entra al final. Un combate o una
+  subida de nivel sin capítulo se manda a uno desde su menú.
 
 ### Modificado
 
+- Las acciones de las invocaciones muestran en placas la salvación, la
+  curación, los PG temporales y el área, como ya mostraban el acierto y el
+  daño de un ataque (el Cañón Arcano, el Defensor de Acero, el corcel, los
+  espíritus y el ciempiés gigante).
+- Editar una nota del Cuaderno ya no la manda al final del capítulo cuando el
+  capítulo tiene un orden propio.
+- Los capítulos pasan al esquema 3; los anteriores se leen sin orden propio.
 - El Quiz corrige preguntas que tenían más de una respuesta o que se
   delataban: la CA de la armadura incluye el modificador de Destreza, el daño
   versátil no se ofrece como otra opción, los alcances «Personal» no se mezclan
@@ -1444,6 +1454,20 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   distractor. Las preguntas de clase nombran la clase, también en multiclase y
   para rasgos de niveles que todavía no se tienen. Cambiar de idioma a mitad
   de ronda no cambia las preguntas, solo el texto.
+
+### Eliminado
+
+- Sin cambios.
+
+## [Unreleased]
+
+### Nuevo
+
+- Sin cambios.
+
+### Modificado
+
+- Sin cambios.
 
 ### Eliminado
 

@@ -349,6 +349,10 @@ export interface DmChapter extends JsonObject {
   grantsGold?: number;
   grantsItems?: string[];
   grantsCatalog?: ChapterItem[];
+  /** Cómo acomodó el DM las entradas del capítulo en el Cuaderno (claves
+   *  `note:<id>`, `fight:<id>`, `levelUp:<id>`). Lo que no figura va al final,
+   *  por fecha. */
+  entryOrder?: string[];
 }
 
 /** Los capítulos de la campaña [campaignId], en el orden de la campaña. */
@@ -402,6 +406,10 @@ export const createChapter = (campaignId: string, chapter: DmChapter) => sendJso
 export const saveChapter = (campaignId: string, chapter: DmChapter) =>
   sendJson('PUT', `${chaptersPath(campaignId)}/${encodeURIComponent(chapter.id)}`, { chapter });
 
+/** Guarda solo el orden del Cuaderno de un capítulo, aunque esté cerrado. */
+export const saveEntryOrder = (campaignId: string, chapterId: string, entryOrder: string[]) =>
+  sendJson('PUT', `${chaptersPath(campaignId)}/${encodeURIComponent(chapterId)}/entry-order`, { entryOrder });
+
 export const deleteChapter = (campaignId: string, chapterId: string) =>
   remove(`${chaptersPath(campaignId)}/${encodeURIComponent(chapterId)}`);
 
@@ -412,6 +420,16 @@ export const saveNote = (campaignId: string, note: DmNote) =>
 
 export const deleteNote = (campaignId: string, noteId: string) =>
   remove(`${notesPath(campaignId)}/${encodeURIComponent(noteId)}`);
+
+/** Cuelga de [chapterId] un combate o una subida de nivel que quedó sin
+ *  capítulo. El servidor responde 404 si ya tenía uno: lo archivado no se
+ *  reacomoda por acá. */
+export const assignEntryChapter = (campaignId: string, kind: 'fight' | 'levelUp', entryId: string, chapterId: string) =>
+  sendJson(
+    'PUT',
+    `/api/campaigns/${encodeURIComponent(campaignId)}/${kind === 'fight' ? 'encounter-logs' : 'level-ups'}/${encodeURIComponent(entryId)}/chapter`,
+    { chapterId },
+  );
 
 /** Una nota del DM (`Note.toJson`): texto plano con el Markdown chico de la mesa.
  *  Sin `updatedAt` es una nota que nunca se guardó con fecha. */

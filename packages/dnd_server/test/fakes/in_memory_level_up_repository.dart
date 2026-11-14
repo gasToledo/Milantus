@@ -52,6 +52,41 @@ class InMemoryLevelUpRepository implements LevelUpRepository {
     ));
   }
 
+  /// Reproduce el `WHERE` real: el dueño, la campaña y que hoy esté suelta.
+  @override
+  Future<bool> assignChapter(
+    String dmUserId,
+    String campaignId,
+    String id,
+    String chapterId, {
+    required List<String> liveChapterIds,
+  }) async {
+    final index = _rows.indexWhere(
+      (r) =>
+          r.dmUserId == dmUserId &&
+          r.campaignId == campaignId &&
+          r.log.id == id &&
+          (r.log.chapterId == null ||
+              !liveChapterIds.contains(r.log.chapterId)),
+    );
+    if (index < 0) return false;
+    final r = _rows[index];
+    _rows[index] = (
+      dmUserId: r.dmUserId,
+      campaignId: r.campaignId,
+      log: LevelUpLog(
+        id: r.log.id,
+        chapterId: chapterId,
+        characterName: r.log.characterName,
+        level: r.log.level,
+        classId: r.log.classId,
+        classLevel: r.log.classLevel,
+        at: r.log.at,
+      ),
+    );
+    return true;
+  }
+
   /// Del más nuevo al más viejo: el orden de alta invertido reproduce el
   /// `ORDER BY created_at DESC, id DESC` real sin depender del reloj.
   @override

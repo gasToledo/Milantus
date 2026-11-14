@@ -4522,6 +4522,146 @@ void main() {
         expect(monsters.single['defeated'], 1);
       });
 
+      // Sin capítulo en marcha el combate se archiva suelto; el DM lo cuelga
+      // después. Lo que ya tiene capítulo no se mueve, y lo ajeno no se toca.
+      test(
+        'un combate suelto se cuelga de un capítulo, una sola vez',
+        () async {
+          final token = await tableWithChapter('nota-suelto');
+          await send(
+            'POST',
+            '/api/campaigns/tumba/chapters',
+            token: token,
+            body: {
+              'chapter': {
+                'schemaVersion': 1,
+                'id': 'feria',
+                'name': 'La feria',
+              },
+            },
+          );
+          await send(
+            'PUT',
+            '/api/campaigns/tumba/encounter',
+            token: token,
+            body: {
+              'encounter': {
+                'schemaVersion': 1,
+                'id': 'e1',
+                'round': 1,
+                'turnIndex': 0,
+                'combatants': [
+                  {
+                    'id': 'm1',
+                    'kind': 'monster',
+                    'name': 'Esqueleto',
+                    'initiative': 12,
+                    'creatureId': 'skeleton',
+                    'currentHp': 0,
+                    'maxHp': 13,
+                  },
+                ],
+              },
+            },
+          );
+          await send('DELETE', '/api/campaigns/tumba/encounter', token: token);
+          final log =
+              ((await notebook(token, 'tumba'))['encounterLogs'] as List).single
+                  as Map<String, dynamic>;
+          expect(log['chapterId'], isNull);
+          final path =
+              '/api/campaigns/tumba/encounter-logs/${log['id']}/chapter';
+
+          final other = await login('nota-suelto-otro');
+          await createCampaign(other, 'tumba');
+          final ajeno = await send(
+            'PUT',
+            path,
+            token: other,
+            body: {'chapterId': 'cripta'},
+          );
+          expect(ajeno['status'], 404);
+
+          final inventado = await send(
+            'PUT',
+            path,
+            token: token,
+            body: {'chapterId': 'no-existe'},
+          );
+          expect(inventado['status'], 404);
+
+          final ok = await send(
+            'PUT',
+            path,
+            token: token,
+            body: {'chapterId': 'cripta'},
+          );
+          expect(ok['status'], 200);
+          final logs =
+              (await notebook(token, 'tumba'))['encounterLogs'] as List;
+          expect(logs.single['chapterId'], 'cripta');
+
+          final otraVez = await send(
+            'PUT',
+            path,
+            token: token,
+            body: {'chapterId': 'feria'},
+          );
+          expect(otraVez['status'], 404);
+          final despues =
+              (await notebook(token, 'tumba'))['encounterLogs'] as List;
+          expect(despues.single['chapterId'], 'cripta');
+        },
+      );
+
+      // El orden se guarda aparte del capítulo: tiene que poder ordenarse uno
+      // ya cerrado (el PUT del capítulo lo rechaza) sin tocar nada más de él.
+      test(
+        'el orden del cuaderno se guarda, también en un capítulo cerrado',
+        () async {
+          final token = await tableWithChapter('nota-orden');
+          await send(
+            'POST',
+            '/api/campaigns/tumba/chapters/cripta/close',
+            token: token,
+          );
+          const path = '/api/campaigns/tumba/chapters/cripta/entry-order';
+
+          final other = await login('nota-orden-otro');
+          await createCampaign(other, 'tumba');
+          final ajeno = await send(
+            'PUT',
+            path,
+            token: other,
+            body: {
+              'entryOrder': ['note:x'],
+            },
+          );
+          expect(ajeno['status'], 404);
+
+          final ok = await send(
+            'PUT',
+            path,
+            token: token,
+            body: {
+              'entryOrder': ['fight:1', 'note:a', 'fight:1'],
+            },
+          );
+          expect(ok['status'], 200);
+          final chapter =
+              ((await send(
+                        'GET',
+                        '/api/campaigns/tumba/chapters',
+                        token: token,
+                      ))['body']['chapters']
+                      as List)
+                  .single;
+          expect(chapter['entryOrder'], ['fight:1', 'note:a']);
+          expect(chapter['state'], 'completed');
+          expect(chapter['name'], 'La Cripta');
+        },
+      );
+
       test('un combate descartado no deja entrada', () async {
         final token = await tableWithChapter('nota-descarte');
         await send(
@@ -4818,6 +4958,47 @@ void main() {
               .single['summary'],
           anyOf(isNull, ''),
         );
+      });
+
+      // El orden del Cuaderno nombra por id notas privadas y combates: no
+      // sale ni en el capítulo en curso ni en los cerrados.
+      test('el orden del cuaderno no viaja al jugador', () async {
+        final (player, dm) = await table('sin-orden');
+        Future<void> ordered(String id, String state) => send(
+          'POST',
+          '/api/campaigns/tumba/chapters',
+          token: dm,
+          body: {
+            'chapter': {
+              'schemaVersion': Chapter.currentSchemaVersion,
+              'id': id,
+              'name': id,
+              'state': state,
+              'entryOrder': ['note:orden-secreto-$id'],
+            },
+          },
+        );
+        await ordered('camino', 'planned');
+        await send(
+          'POST',
+          '/api/campaigns/tumba/chapters/camino/close',
+          token: dm,
+        );
+        await ordered('feria', 'active');
+
+        final delDm = await send(
+          'GET',
+          '/api/campaigns/tumba/chapters',
+          token: dm,
+        );
+        expect(jsonEncode(delDm['body']), contains('orden-secreto-feria'));
+
+        final raw = await send(
+          'GET',
+          '/api/characters/sagan/campaigns',
+          token: player,
+        );
+        expect(jsonEncode(raw['body']), isNot(contains('orden-secreto')));
       });
 
       test(

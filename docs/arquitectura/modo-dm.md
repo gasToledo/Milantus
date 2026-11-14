@@ -289,6 +289,19 @@ escriben con `POST/PUT/DELETE /api/campaigns/<id>/notes[/<noteId>]`; el servidor
 solo exige un título y que el capítulo exista en esa campaña (`_validateNote`,
 que comparte con el conector MCP).
 
+Dos rutas acomodan el Cuaderno sin reescribir lo que la app registró:
+
+- `PUT /api/campaigns/<id>/chapters/<chapterId>/entry-order` guarda
+  `Chapter.entryOrder`, el orden en que el DM arrastró las entradas de ese
+  capítulo. Es aparte del `PUT` del capítulo porque ese rechaza uno cerrado, y
+  ordenar un capítulo cerrado es lo normal. El orden **no viaja al jugador**:
+  se poda en `_playerChapterJson` y en el capítulo en curso.
+- `PUT /api/campaigns/<id>/{encounter-logs|level-ups}/<entryId>/chapter`
+  cuelga de un capítulo un combate o una subida que quedó suelta (se jugó sin
+  capítulo en marcha, o se borró el suyo). La regla va en el `WHERE`: la fila
+  es del DM y hoy no cuelga de ningún capítulo vivo; lo que ya tiene capítulo
+  no se mueve. El destino se busca antes entre los capítulos del propio DM.
+
 Todo lo que hace «rica» a una nota vive en el cliente y **no toca el servidor**:
 `Note.body` es texto plano que viaja y se guarda tal cual.
 

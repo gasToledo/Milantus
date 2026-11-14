@@ -395,7 +395,11 @@ inexistente son la misma pantalla). Desde 6b escribe campañas y la Mesa y desde
   capítulo (la selección es estado local, no ruta), buscador en pill como el del
   Bestiario y entradas en `card` con `border-l-[3px]` del color del tipo. Titular,
   redactar un combate y buscar son presentación y viven en `notebook.ts`; los
-  nombres salen del catálogo.
+  nombres salen del catálogo. Dentro de un capítulo y sin búsqueda, las
+  entradas se mueven tomándolas enteras (`useHoldDrag`, clases de la Mesa);
+  `inChapterOrder` aplica `entryOrder` y deja lo no ordenado al final, por
+  fecha. En «Sin capítulo», combates y subidas suman el ⋮ con «Mover a
+  capítulo…» (`MoveToChapterDialog`: abre sin nada elegido).
 - **Bestiario** (`BestiaryPage dm`): la pantalla del jugador montada con el panel
   del DM; no hay un segundo navegador. `dm` cambia la cabecera (`DmHeader`, con
   «Solo lectura» y el conteo) y las URL (`dmBestiaryHref`).

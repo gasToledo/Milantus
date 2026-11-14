@@ -14,6 +14,11 @@ export type EntryKind = 'note' | 'fight' | 'levelUp';
 export interface Entry {
   key: string;
   kind: EntryKind;
+  /** `note:<id>`, `fight:<id>` o `levelUp:<id>`: cómo la nombra
+   *  `DmChapter.entryOrder`. */
+  orderKey: string;
+  /** El id de la fila, para mover un combate o una subida a un capítulo. */
+  entryId: string;
   /** `null` sin capítulo, o de uno que el DM borró: un combate no se borra con
    *  su capítulo y no hay que perderlo. */
   chapterId: string | null;
@@ -107,6 +112,8 @@ export function buildEntries(
       (n): Entry => ({
         key: `note-${n.id}`,
         kind: 'note',
+        orderKey: `note:${n.id}`,
+        entryId: n.id,
         chapterId: chapterOf(n.chapterId),
         at: ms(n.updatedAt),
         title: n.title,
@@ -119,6 +126,8 @@ export function buildEntries(
       (l, i): Entry => ({
         key: `fight-${l.id ?? i}`,
         kind: 'fight',
+        orderKey: `fight:${l.id ?? i}`,
+        entryId: l.id ?? '',
         chapterId: chapterOf(l.chapterId),
         at: ms(l.endedAt),
         title: fightTitle(l, t, catalog),
@@ -131,6 +140,8 @@ export function buildEntries(
       (u: DmLevelUp): Entry => ({
         key: `levelup-${u.id}`,
         kind: 'levelUp',
+        orderKey: `levelUp:${u.id}`,
+        entryId: u.id,
         chapterId: chapterOf(u.chapterId),
         at: ms(u.at),
         title: t.dmLevelUpTitle(u.characterName, u.level),
@@ -144,6 +155,17 @@ export function buildEntries(
     if (a.at === null || b.at === null) return a.at === b.at ? 0 : a.at === null ? -1 : 1;
     return a.at - b.at;
   });
+}
+
+/** Las entradas de un capítulo en el orden en que las acomodó el DM
+ *  (`entryOrder`): primero las ordenadas, y después lo que no figura —lo
+ *  nuevo, o todo si nunca se ordenó— en el orden de fecha que ya traen. Una
+ *  clave de algo que ya no existe (una nota borrada) no ocupa lugar. */
+export function inChapterOrder(entries: readonly Entry[], order: readonly string[] | undefined): Entry[] {
+  if (!order || order.length === 0) return [...entries];
+  const at = new Map(order.map((key, i) => [key, i]));
+  const placed = entries.filter((e) => at.has(e.orderKey)).sort((a, b) => at.get(a.orderKey)! - at.get(b.orderKey)!);
+  return [...placed, ...entries.filter((e) => !at.has(e.orderKey))];
 }
 
 /** Una nota coincide por título o texto; un combate o una subida, por su título
