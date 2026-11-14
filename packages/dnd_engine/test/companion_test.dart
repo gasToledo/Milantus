@@ -418,6 +418,10 @@ void main() {
       expect(
           resolved.actions.first.attackBonus, sheet.spellcasting!.attackBonus);
       expect(resolved.actions.first.damage, '1d8+6');
+      // Reparar devuelve PG con tu INT: no es daño.
+      final repair = resolved.actions[1];
+      expect(repair.damage, isNull);
+      expect(repair.healing, '2d8+4');
     });
 
     test('el Señor de Bestias elige entre tierra, mar y aire', () {

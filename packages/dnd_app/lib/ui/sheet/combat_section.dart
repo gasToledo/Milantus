@@ -1437,14 +1437,18 @@ extension _SheetCombatSection on _SheetScreenState {
   Widget _companionAction(ResolvedCreatureAction a) => CreatureActionRow(
     name: a.name,
     // La salvación salió de la prosa para la placa de React; acá vuelve
-    // adelante del texto, y los PG temporales van donde iba el daño.
+    // adelante del texto, y los PG temporales o la curación van donde iba el
+    // daño (la curación rotulada: sin eso, «2d8+4» se lee como daño).
     description: [
       if (a.saveDc case final dc?)
         context.l10n.saveDcAbility(dc, a.saveAbility!.abbr),
       if (a.description.isNotEmpty) a.description,
     ].join(' · '),
     attackBonus: a.isAttack ? _signed(a.attackBonus!) : null,
-    damage: a.damage ?? a.tempHp,
+    damage:
+        a.damage ??
+        a.tempHp ??
+        (a.healing == null ? null : '${context.l10n.combatHeal} ${a.healing}'),
     damageType: a.damageType,
     reach: a.reach,
     tag: a.kind == CreatureActionKind.action ? null : a.kind.text(context.l10n),

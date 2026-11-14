@@ -882,7 +882,7 @@
     "actions.0.description": "Plus 3 (1d6) Poison damage."
   },
   "otherworldly-steed": {
-    "_es": "e42eecb1",
+    "_es": "039317ff",
     "name": "Otherworldly Steed",
     "kind": "Large Celestial, Fey, or Fiend (Your Choice)",
     "senses": "Passive Perception 11",
@@ -896,9 +896,11 @@
     "actions.0.reach": "5 ft.",
     "traits.0.description": "When you regain Hit Points from a spell of level 1 or higher, the steed regains the same number of Hit Points if you're within 5 feet of it.",
     "actions.0.description": "The damage is Radiant (Celestial), Psychic (Fey), or Necrotic (Fiend), whichever type you chose when you summoned it.",
-    "actions.1.description": "Recharges after a Long Rest. Wisdom Saving Throw: DC equal to your spell save DC ({SPELLDC}), one creature within 60 feet that the steed can see. Failure: The target has the Frightened condition until the end of your next turn.",
+    "actions.1.description": "Recharges after a Long Rest. Failure: The target has the Frightened condition until the end of your next turn.",
     "actions.2.description": "Recharges after a Long Rest. The steed teleports, along with its rider, to an unoccupied space of your choice within 60 feet of itself.",
-    "actions.3.description": "Recharges after a Long Rest. One creature within 5 feet of the steed regains 2d8 + {spellLevel} Hit Points."
+    "actions.3.description": "Recharges after a Long Rest.",
+    "actions.1.reach": "one creature it can see within 60 feet",
+    "actions.3.reach": "one creature within 5 feet"
   },
   "bestial-spirit-air": {
     "_es": "352b5382",
@@ -1152,7 +1154,7 @@
     "defenses": "Resistance to Acid. Immunity to Poison; Exhaustion, Paralyzed, Petrified and Poisoned"
   },
   "celestial-spirit-avenger": {
-    "_es": "629b5df2",
+    "_es": "ebde4548",
     "name": "Celestial Spirit (Avenger)",
     "kind": "Large Celestial, Neutral",
     "senses": "Darkvision 60 ft.; Passive Perception 12",
@@ -1163,11 +1165,11 @@
     "actions.2.name": "Healing Touch (1/Day)",
     "actions.1.reach": "600 ft.",
     "actions.0.description": "It makes {spellLevel/2} attacks.",
-    "actions.2.description": "It touches another creature, which regains 2d8 + {spellLevel} Hit Points.",
+    "actions.2.description": "It touches another creature.",
     "defenses": "Resistance to Radiant. Immunity to Charmed and Frightened"
   },
   "celestial-spirit-defender": {
-    "_es": "c9147c0e",
+    "_es": "697e2c2c",
     "name": "Celestial Spirit (Defender)",
     "kind": "Large Celestial, Neutral",
     "senses": "Darkvision 60 ft.; Passive Perception 12",
@@ -1179,7 +1181,7 @@
     "actions.1.reach": "5 ft.",
     "actions.0.description": "It makes {spellLevel/2} attacks.",
     "actions.1.description": "The spirit chooses itself or another creature it can see within 10 feet of the target. That creature gains 1d10 Temporary Hit Points.",
-    "actions.2.description": "It touches another creature, which regains 2d8 + {spellLevel} Hit Points.",
+    "actions.2.description": "It touches another creature.",
     "defenses": "Resistance to Radiant. Immunity to Charmed and Frightened"
   },
   "fiendish-spirit-demon": {
@@ -1302,7 +1304,7 @@
     "defenses": "Immunity to Poison and Psychic"
   },
   "steel-defender": {
-    "_es": "b262de86",
+    "_es": "4d6d9560",
     "name": "Steel Defender",
     "kind": "Medium Construct, Neutral",
     "senses": "Darkvision 60 ft.; Passive Perception 10",
@@ -1314,7 +1316,7 @@
     "actions.2.name": "Deflect Attack",
     "actions.0.reach": "5 ft.",
     "traits.0.description": "Add your Proficiency Bonus (+{PB}) to any ability check or saving throw the defender makes.",
-    "actions.1.description": "The defender, or one Construct or object it can see within 5 feet of itself, regains 2d8 + {INT} Hit Points.",
+    "actions.1.description": "The defender, or one Construct or object it can see within 5 feet of itself.",
     "actions.2.description": "Trigger: A creature the defender can see within 5 feet of itself makes an attack roll against a creature other than the defender. Response: The triggering creature makes the attack roll with Disadvantage.",
     "defenses": "Immunity to Poison; Charmed, Exhaustion, Poisoned"
   },
@@ -1408,7 +1410,7 @@
     "actions.0.reach": "5 ft."
   },
   "giant-insect-centipede": {
-    "_es": "8a4d816b",
+    "_es": "98bbe29f",
     "name": "Giant Insect (Centipede)",
     "kind": "Large Beast, Unaligned",
     "senses": "Darkvision 60 ft.; Passive Perception 12",
@@ -1421,7 +1423,7 @@
     "actions.1.reach": "10 ft.",
     "traits.0.description": "It can climb difficult surfaces, including along ceilings, without needing to make an ability check.",
     "actions.0.description": "It makes {spellLevel/2} Venomous Sting attacks.",
-    "actions.2.description": "Constitution saving throw (DC {SPELLDC}); on a failure, the target has the Poisoned condition until the start of the insect's next turn.",
+    "actions.2.description": "On a failure, the target has the Poisoned condition until the start of the insect's next turn.",
     "actions.2.reach": "one creature it can see within 10 feet"
   },
   "giant-insect-spider": {

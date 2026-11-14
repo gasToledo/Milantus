@@ -2769,7 +2769,12 @@
       },
       {
         "name": "Mirada siniestra (acción adicional, solo infernal)",
-        "description": "Se recarga tras un descanso largo. Tirada de salvación de Sabiduría CD igual a tu CD de salvación de conjuros ({SPELLDC}), una criatura a 60 pies o menos que el corcel pueda ver. Fallo: el objetivo tiene el estado de asustado hasta el final de tu siguiente turno."
+        "reach": "una criatura visible a 60 pies",
+        "save": {
+          "ability": "wisdom",
+          "dc": "SPELLDC"
+        },
+        "description": "Se recarga tras un descanso largo. Fallo: el objetivo tiene el estado de asustado hasta el final de tu siguiente turno."
       },
       {
         "name": "Paso feérico (acción adicional, solo feérico)",
@@ -2777,7 +2782,9 @@
       },
       {
         "name": "Toque sanador (acción adicional, solo celestial)",
-        "description": "Se recarga tras un descanso largo. Una criatura a 5 pies o menos del corcel recupera 2d8 + {spellLevel} puntos de golpe."
+        "healing": "2d8+{spellLevel}",
+        "reach": "una criatura a 5 pies",
+        "description": "Se recarga tras un descanso largo."
       }
     ]
   },
@@ -3478,7 +3485,8 @@
       },
       {
         "name": "Toque sanador (1/día)",
-        "description": "Toca a otra criatura, que recupera 2d8 + {spellLevel} puntos de golpe."
+        "healing": "2d8+{spellLevel}",
+        "description": "Toca a otra criatura."
       }
     ]
   },
@@ -3517,7 +3525,8 @@
       },
       {
         "name": "Toque sanador (1/día)",
-        "description": "Toca a otra criatura, que recupera 2d8 + {spellLevel} puntos de golpe."
+        "healing": "2d8+{spellLevel}",
+        "description": "Toca a otra criatura."
       }
     ]
   },
@@ -3692,6 +3701,7 @@
         "name": "Ataque de aliento",
         "damage": "2d6",
         "reach": "cono de 30 pies",
+        "area": true,
         "save": {
           "ability": "dexterity",
           "dc": "SPELLDC"
@@ -3731,6 +3741,7 @@
         "damage": "2d8",
         "damageType": "fire",
         "reach": "cono de 15 pies",
+        "area": true,
         "save": {
           "ability": "dexterity",
           "dc": "SPELLDC"
@@ -3749,6 +3760,7 @@
         "name": "Protector",
         "tempHp": "1d8+{INT}",
         "reach": "10 pies desde el cañón",
+        "area": true,
         "description": "Al cañón y a cada criatura que elijas en el área (mínimo 1)."
       }
     ]
@@ -3784,6 +3796,7 @@
         "damage": "3d8",
         "damageType": "fire",
         "reach": "cono de 15 pies",
+        "area": true,
         "save": {
           "ability": "dexterity",
           "dc": "SPELLDC"
@@ -3802,18 +3815,20 @@
         "name": "Protector",
         "tempHp": "2d8+{INT}",
         "reach": "10 pies desde el cañón",
+        "area": true,
         "description": "Al cañón y a cada criatura que elijas en el área (mínimo 1)."
       },
       {
         "name": "Detonar",
-        "reaction": true,
         "damage": "3d10",
         "damageType": "force",
         "reach": "20 pies desde el cañón",
+        "area": true,
         "save": {
           "ability": "dexterity",
           "dc": "SPELLDC"
         },
+        "reaction": true,
         "description": "Detonante: el cañón recibe daño. Respuesta: lo hacés estallar y se destruye. A la mitad si supera la salvación."
       }
     ]
@@ -3853,7 +3868,8 @@
       },
       {
         "name": "Reparar (3/día)",
-        "description": "El defensor, o un constructo u objeto que vea a 5 pies o menos, recupera 2d8 + {INT} puntos de golpe."
+        "healing": "2d8+{INT}",
+        "description": "El defensor, o un constructo u objeto que vea a 5 pies o menos."
       },
       {
         "name": "Desviar ataque",
@@ -4143,7 +4159,11 @@
       {
         "name": "Descarga venenosa (acción adicional)",
         "reach": "una criatura visible a 10 pies",
-        "description": "Salvación de Constitución CD {SPELLDC}; si falla, queda Envenenada hasta el comienzo del siguiente turno del insecto."
+        "save": {
+          "ability": "constitution",
+          "dc": "SPELLDC"
+        },
+        "description": "Si falla, queda Envenenada hasta el comienzo del siguiente turno del insecto."
       }
     ]
   },

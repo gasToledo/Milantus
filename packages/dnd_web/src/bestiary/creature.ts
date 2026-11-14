@@ -24,6 +24,10 @@ export interface CreatureAction {
   save?: { ability: AbilityId; dc: string };
   /** PG temporales que da (el Protector del cañón): no es daño. */
   tempHp?: string;
+  /** PG que recupera el objetivo (Toque sanador, Reparar). */
+  healing?: string;
+  /** El alcance es un área (cono, radio) y no hasta dónde llega a un objetivo. */
+  area?: boolean;
   spellcasting?: {
     ability: AbilityId;
     saveDc?: number;

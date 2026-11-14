@@ -526,6 +526,14 @@ class CreatureAction {
   /// porque la ficha la rotularía como daño.
   final String? tempHp;
 
+  /// Plantilla de los PG que recupera el objetivo (Toque sanador, Reparar).
+  final String? healing;
+
+  /// Si [reach] describe un área (cono, radio desde el cañón) y no hasta dónde
+  /// llega contra un objetivo. Es un dato y no se deduce del texto: «una
+  /// criatura visible a 10 pies» y «10 pies desde el cañón» se leen igual.
+  final bool area;
+
   const CreatureAction({
     required this.name,
     this.description = '',
@@ -537,6 +545,8 @@ class CreatureAction {
     this.spellcasting,
     this.save,
     this.tempHp,
+    this.healing,
+    this.area = false,
   });
 
   bool get isAttack => attackBonus != null;
@@ -558,6 +568,8 @@ class CreatureAction {
         if (spellcasting != null) 'spellcasting': spellcasting!.toJson(),
         if (save != null) 'save': save!.toJson(),
         if (tempHp != null) 'tempHp': tempHp,
+        if (healing != null) 'healing': healing,
+        if (area) 'area': true,
       };
 
   /// El catálogo anterior a [CreatureActionKind] marcaba la reacción con un
@@ -583,6 +595,8 @@ class CreatureAction {
             ? CreatureSave.fromJson((j['save'] as Map).cast<String, dynamic>())
             : null,
         tempHp: j['tempHp'] as String?,
+        healing: j['healing'] as String?,
+        area: j['area'] as bool? ?? false,
       );
 
   ResolvedCreatureAction resolve(CreatureVars vars) => ResolvedCreatureAction(
@@ -598,6 +612,9 @@ class CreatureAction {
         saveAbility: save?.ability,
         saveDc: save == null ? null : resolveCreatureInt(save!.dc, vars),
         tempHp: tempHp == null ? null : resolveCreatureFormula(tempHp!, vars),
+        healing:
+            healing == null ? null : resolveCreatureFormula(healing!, vars),
+        area: area,
       );
 }
 
@@ -629,6 +646,8 @@ class ResolvedCreatureAction {
   final Ability? saveAbility;
   final int? saveDc;
   final String? tempHp;
+  final String? healing;
+  final bool area;
 
   const ResolvedCreatureAction({
     required this.name,
@@ -642,6 +661,8 @@ class ResolvedCreatureAction {
     this.saveAbility,
     this.saveDc,
     this.tempHp,
+    this.healing,
+    this.area = false,
   });
 
   bool get isAttack => attackBonus != null;

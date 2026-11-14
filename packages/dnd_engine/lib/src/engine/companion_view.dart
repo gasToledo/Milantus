@@ -209,6 +209,8 @@ List<Map<String, dynamic>> _slots(
           if (a.saveAbility != null)
             'save': {'ability': a.saveAbility!.name, 'dc': '${a.saveDc}'},
           if (a.tempHp != null) 'tempHp': a.tempHp,
+          if (a.healing != null) 'healing': a.healing,
+          if (a.area) 'area': true,
         },
     ],
   }..remove('hitDice');
