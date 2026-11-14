@@ -127,6 +127,9 @@ class CreatureDraft {
     final damage = _t(r['damage']);
     final damageType = _t(r['damageType']);
     final from = r['from'];
+    final original = from is int && from >= 0 && from < base.actions.length
+        ? base.actions[from]
+        : null;
     return CreatureAction(
       name: _t(r['name']),
       description: _t(r['description']),
@@ -136,11 +139,12 @@ class CreatureDraft {
       damageType: damage.isEmpty || damageType.isEmpty ? null : damageType,
       reach: _t(r['reach']),
       kind: CreatureActionKind.fromJson(_t(r['kind'])),
-      // La lista de conjuros no se edita, y el formulario de Flutter la pierde
-      // al guardar: acá viaja con su acción original.
-      spellcasting: from is int && from >= 0 && from < base.actions.length
-          ? base.actions[from].spellcasting
-          : null,
+      // La lista de conjuros, la salvación y los PG temporales no se editan,
+      // y el formulario de Flutter los pierde al guardar: acá viajan con su
+      // acción original.
+      spellcasting: original?.spellcasting,
+      save: original?.save,
+      tempHp: original?.tempHp,
     );
   }
 

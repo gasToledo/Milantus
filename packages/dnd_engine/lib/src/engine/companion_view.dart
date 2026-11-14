@@ -204,6 +204,11 @@ List<Map<String, dynamic>> _slots(
           'reach': a.reach,
           'kind': a.kind.toJson(),
           if (a.spellcasting != null) 'spellcasting': a.spellcasting!.toJson(),
+          // La CD viaja como texto, igual que el bono de ataque: el perfil del
+          // Bestiario usa las mismas claves y ahí son expresiones.
+          if (a.saveAbility != null)
+            'save': {'ability': a.saveAbility!.name, 'dc': '${a.saveDc}'},
+          if (a.tempHp != null) 'tempHp': a.tempHp,
         },
     ],
   }..remove('hitDice');

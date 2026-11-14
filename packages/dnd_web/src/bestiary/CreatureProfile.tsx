@@ -256,18 +256,25 @@ function Actions({ profile, row, catalog }: { profile: Profile; row: BestiaryRow
   );
 }
 
-/** Una acción, con lo que se tira sacado de la prosa: acierto, daño y alcance
- *  en placas rotuladas, del mismo tamaño. Sin bono de ataque (ataque
- *  múltiple, un aliento) la prosa es el contenido. */
+/** Una acción, con lo que se tira sacado de la prosa: acierto o salvación,
+ *  daño (o PG temporales) y alcance en placas rotuladas, del mismo tamaño.
+ *  Un ataque múltiple, sin nada de eso cargado, es solo prosa. */
 function ActionRow({ action: a, melee, catalog }: { action: CreatureAction; melee: boolean; catalog: Catalog }) {
   const t = useTexts();
   const damageType = a.damageType ? catalogLabel('damageType', a.damageType) : null;
   const plaques: [string, string, boolean?][] = [];
-  if (a.attackBonus != null) {
-    plaques.push([t.creatureToHit, `+${a.attackBonus}`, true]);
+  const attack = a.attackBonus != null;
+  if (attack) plaques.push([t.creatureToHit, `+${a.attackBonus}`, true]);
+  // La salvación ocupa el lugar del acierto, en oro: es lo que define quién
+  // tira. Sin ataque ni salvación no hay placas, como antes: la prosa de un
+  // monstruo sin datos sueltos no se parte.
+  if (a.save) plaques.push([t.creatureSaveLabel, `${t.abilityAbbr[a.save.ability]} ${a.save.dc}`, true]);
+  if (attack || a.save || a.tempHp) {
     const damage = a.damage ?? damageType ?? '';
     if (damage) plaques.push([t.creatureDamage, damage]);
-    if (a.reach) plaques.push([melee ? t.creatureReach : t.creatureRange, a.reach]);
+    if (a.tempHp) plaques.push([t.creatureTempHp, a.tempHp]);
+    // Sin tirada de ataque el alcance es un área (cono, radio desde el cañón).
+    if (a.reach) plaques.push([attack ? (melee ? t.creatureReach : t.creatureRange) : t.creatureArea, a.reach]);
   }
   return (
     <li className="flex flex-wrap items-start gap-x-4 gap-y-2 py-3">

@@ -19,6 +19,11 @@ export interface CreatureAction {
   damageType?: string | null;
   reach?: string;
   kind?: 'action' | 'bonus' | 'reaction' | 'legendary';
+  /** La salvación que pide en lugar de una tirada de ataque. `dc` es un
+   *  número ya resuelto en un compañero y una expresión en el catálogo. */
+  save?: { ability: AbilityId; dc: string };
+  /** PG temporales que da (el Protector del cañón): no es daño. */
+  tempHp?: string;
   spellcasting?: {
     ability: AbilityId;
     saveDc?: number;

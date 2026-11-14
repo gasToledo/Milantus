@@ -3692,7 +3692,11 @@
         "name": "Ataque de aliento",
         "damage": "2d6",
         "reach": "cono de 30 pies",
-        "description": "Salvación de Destreza CD {SPELLDC}; a la mitad si la supera. El daño es de un tipo al que el espíritu tenga resistencia, el que elegiste al lanzar el conjuro."
+        "save": {
+          "ability": "dexterity",
+          "dc": "SPELLDC"
+        },
+        "description": "A la mitad si supera la salvación. El daño es de un tipo al que el espíritu tenga resistencia, el que elegiste al lanzar el conjuro."
       }
     ]
   },
@@ -3727,7 +3731,11 @@
         "damage": "2d8",
         "damageType": "fire",
         "reach": "cono de 15 pies",
-        "description": "Cada criatura en el área hace una salvación de Destreza CD {SPELLDC}; a la mitad si la supera. Los objetos inflamables del cono que nadie lleve encima empiezan a arder."
+        "save": {
+          "ability": "dexterity",
+          "dc": "SPELLDC"
+        },
+        "description": "A la mitad si supera la salvación. Los objetos inflamables del cono que nadie lleve encima empiezan a arder."
       },
       {
         "name": "Ballesta de Fuerza",
@@ -3739,9 +3747,9 @@
       },
       {
         "name": "Protector",
-        "damage": "1d8+{INT}",
+        "tempHp": "1d8+{INT}",
         "reach": "10 pies desde el cañón",
-        "description": "Da esa cantidad de puntos de golpe temporales (mínimo 1) al cañón y a cada criatura que elijas en el área."
+        "description": "Al cañón y a cada criatura que elijas en el área (mínimo 1)."
       }
     ]
   },
@@ -3776,7 +3784,11 @@
         "damage": "3d8",
         "damageType": "fire",
         "reach": "cono de 15 pies",
-        "description": "Cada criatura en el área hace una salvación de Destreza CD {SPELLDC}; a la mitad si la supera. Los objetos inflamables del cono que nadie lleve encima empiezan a arder."
+        "save": {
+          "ability": "dexterity",
+          "dc": "SPELLDC"
+        },
+        "description": "A la mitad si supera la salvación. Los objetos inflamables del cono que nadie lleve encima empiezan a arder."
       },
       {
         "name": "Ballesta de Fuerza",
@@ -3788,9 +3800,9 @@
       },
       {
         "name": "Protector",
-        "damage": "2d8+{INT}",
+        "tempHp": "2d8+{INT}",
         "reach": "10 pies desde el cañón",
-        "description": "Da esa cantidad de puntos de golpe temporales (mínimo 1) al cañón y a cada criatura que elijas en el área."
+        "description": "Al cañón y a cada criatura que elijas en el área (mínimo 1)."
       },
       {
         "name": "Detonar",
@@ -3798,7 +3810,11 @@
         "damage": "3d10",
         "damageType": "force",
         "reach": "20 pies desde el cañón",
-        "description": "Detonante: el cañón recibe daño. Respuesta: lo hacés estallar y se destruye. Cada criatura en el área hace una salvación de Destreza CD {SPELLDC}; a la mitad si la supera."
+        "save": {
+          "ability": "dexterity",
+          "dc": "SPELLDC"
+        },
+        "description": "Detonante: el cañón recibe daño. Respuesta: lo hacés estallar y se destruye. A la mitad si supera la salvación."
       }
     ]
   },

@@ -516,6 +516,16 @@ class CreatureAction {
   /// Lista navegable del bloque de conjuros. Ausente conserva la prosa vieja.
   final CreatureSpellcasting? spellcasting;
 
+  /// La salvación que pide la acción en lugar de una tirada de ataque (un
+  /// aliento, el Lanzallamas del cañón). Va aparte de la prosa para que la
+  /// ficha la ponga en una placa, donde un ataque pone el acierto.
+  final CreatureSave? save;
+
+  /// Plantilla de los PG temporales que da la acción (el Protector del
+  /// cañón), con la misma sintaxis que [damage]. No se carga en [damage]
+  /// porque la ficha la rotularía como daño.
+  final String? tempHp;
+
   const CreatureAction({
     required this.name,
     this.description = '',
@@ -525,6 +535,8 @@ class CreatureAction {
     this.reach = '',
     this.kind = CreatureActionKind.action,
     this.spellcasting,
+    this.save,
+    this.tempHp,
   });
 
   bool get isAttack => attackBonus != null;
@@ -544,6 +556,8 @@ class CreatureAction {
         'reach': reach,
         if (kind != CreatureActionKind.action) 'kind': kind.toJson(),
         if (spellcasting != null) 'spellcasting': spellcasting!.toJson(),
+        if (save != null) 'save': save!.toJson(),
+        if (tempHp != null) 'tempHp': tempHp,
       };
 
   /// El catálogo anterior a [CreatureActionKind] marcaba la reacción con un
@@ -565,6 +579,10 @@ class CreatureAction {
                 (j['spellcasting'] as Map).cast<String, dynamic>(),
               )
             : null,
+        save: j['save'] is Map
+            ? CreatureSave.fromJson((j['save'] as Map).cast<String, dynamic>())
+            : null,
+        tempHp: j['tempHp'] as String?,
       );
 
   ResolvedCreatureAction resolve(CreatureVars vars) => ResolvedCreatureAction(
@@ -577,6 +595,25 @@ class CreatureAction {
         reach: reach,
         kind: kind,
         spellcasting: spellcasting,
+        saveAbility: save?.ability,
+        saveDc: save == null ? null : resolveCreatureInt(save!.dc, vars),
+        tempHp: tempHp == null ? null : resolveCreatureFormula(tempHp!, vars),
+      );
+}
+
+/// Salvación de una acción de criatura: la característica y la CD, que es
+/// una expresión entera como el bono de ataque (`"SPELLDC"`, `"8+INT+PB"`).
+class CreatureSave {
+  final Ability ability;
+  final String dc;
+
+  const CreatureSave({required this.ability, required this.dc});
+
+  Map<String, dynamic> toJson() => {'ability': ability.name, 'dc': dc};
+
+  factory CreatureSave.fromJson(Map<String, dynamic> j) => CreatureSave(
+        ability: Ability.fromKey(j['ability'] as String),
+        dc: j['dc'] as String,
       );
 }
 
@@ -589,6 +626,9 @@ class ResolvedCreatureAction {
   final String reach;
   final CreatureActionKind kind;
   final CreatureSpellcasting? spellcasting;
+  final Ability? saveAbility;
+  final int? saveDc;
+  final String? tempHp;
 
   const ResolvedCreatureAction({
     required this.name,
@@ -599,6 +639,9 @@ class ResolvedCreatureAction {
     required this.reach,
     this.kind = CreatureActionKind.action,
     this.spellcasting,
+    this.saveAbility,
+    this.saveDc,
+    this.tempHp,
   });
 
   bool get isAttack => attackBonus != null;

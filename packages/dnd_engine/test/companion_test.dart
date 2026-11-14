@@ -382,8 +382,15 @@ void main() {
       final byName = {for (final a in resolved.actions) a.name: a};
       expect(byName['Lanzallamas']!.damage, '3d8');
       expect(byName['Ballesta de Fuerza']!.damage, '3d8');
-      expect(byName['Protector']!.damage, '2d8+4');
+      // Lo del Protector son PG temporales, no daño: la ficha los rotula así.
+      expect(byName['Protector']!.damage, isNull);
+      expect(byName['Protector']!.tempHp, '2d8+4');
       expect(byName['Detonar']!.reaction, isTrue);
+      // El Lanzallamas y la detonación piden salvación con tu CD de conjuros.
+      for (final name in ['Lanzallamas', 'Detonar']) {
+        expect(byName[name]!.saveAbility, Ability.dexterity, reason: name);
+        expect(byName[name]!.saveDc, sheet.spellcasting!.saveDc, reason: name);
+      }
     });
 
     test('el Defensor de Acero sale con los números del libro', () {
