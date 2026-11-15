@@ -380,8 +380,30 @@ function classNameOf(catalog: Catalog, id: string | null): string {
 function askOf(t: Texts, q: QuizQuestion, catalog: Catalog, multiclass: boolean): string {
   const s = q.subject ?? '';
   switch (q.kind) {
-    case 'classFeatureLevel':
-      return t.quizAsk.classFeatureLevel(classNameOf(catalog, q.subjectId), s);
+    case 'classFeatureLevel': {
+      const klass = classNameOf(catalog, q.subjectId);
+      const p = q.progress;
+      if (!p) return t.quizAsk.classFeatureLevel(klass, s);
+      const row = t.quizAsk.classFeatureProgress;
+      switch (p.kind) {
+        case 'known':
+          return row.known(klass, s, p.n);
+        case 'uses':
+          return row.uses(klass, s, p.n);
+        case 'forms':
+          return row.forms(klass, s, p.n);
+        case 'feet':
+          return row.feet(klass, s, p.n);
+        case 'weapons':
+          return row.weapons(klass, s, p.n);
+        case 'spellLevel':
+          return row.spellLevel(klass, s, p.n);
+        case 'dice':
+          return row.dice(klass, s, p.dice ?? '');
+        case 'extraSkills':
+          return row.extraSkills(klass, s, p.n);
+      }
+    }
     case 'classFeatureByText':
       return multiclass && s ? t.quizAsk.classFeatureByTextOf(s) : t.quizAsk.classFeatureByText;
     case 'hitDie':
@@ -392,6 +414,8 @@ function askOf(t: Texts, q: QuizQuestion, catalog: Catalog, multiclass: boolean)
       return t.quizAsk.spellCastingTime(s);
     case 'spellRange':
       return t.quizAsk.spellRange(s);
+    case 'spellMoveDistance':
+      return t.quizAsk.spellMoveDistance(s);
     case 'spellSchool':
       return t.quizAsk.spellSchool(s);
     case 'skillAbility':

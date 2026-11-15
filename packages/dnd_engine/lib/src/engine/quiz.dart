@@ -26,6 +26,7 @@ enum QuizKind {
   backgroundFeat(QuizTopic.background),
   spellCastingTime(QuizTopic.spells),
   spellRange(QuizTopic.spells),
+  spellMoveDistance(QuizTopic.spells),
   spellSchool(QuizTopic.spells),
   condition(QuizTopic.rules),
   skillAbility(QuizTopic.rules),
@@ -88,6 +89,11 @@ class QuizQuestion {
   /// Índice de la correcta en [options].
   final int answer;
 
+  /// Contador de una fila de progresión (`classFeatureLevel`). El [subject]
+  /// es el rasgo sin el paréntesis; la UI arma el enunciado con este tipo y
+  /// este número. Null en la primera vez que se obtiene el rasgo.
+  final QuizProgress? progress;
+
   const QuizQuestion({
     required this.kind,
     required this.key,
@@ -98,6 +104,7 @@ class QuizQuestion {
     required this.options,
     required this.optionIds,
     required this.answer,
+    this.progress,
   });
 
   QuizTopic get topic => kind.topic;
@@ -113,6 +120,7 @@ class QuizQuestion {
         'options': options,
         'optionIds': optionIds,
         'answer': answer,
+        'progress': progress?.toJson(),
       };
 
   factory QuizQuestion.fromJson(Map<String, dynamic> j) => QuizQuestion(
@@ -125,7 +133,50 @@ class QuizQuestion {
         options: (j['options'] as List).cast<String>(),
         optionIds: (j['optionIds'] as List).cast<String>(),
         answer: j['answer'] as int,
+        progress: QuizProgress.fromJson(j['progress']),
       );
+}
+
+/// Qué cuenta la fila de progresión. No depende del idioma: la UI elige la
+/// plantilla y el número entra tal cual («7», «+20», «2d10»).
+enum QuizProgressKind {
+  known,
+  uses,
+  forms,
+  feet,
+  weapons,
+  spellLevel,
+  dice,
+  extraSkills,
+}
+
+class QuizProgress {
+  final QuizProgressKind kind;
+  final int n;
+
+  /// Solo [QuizProgressKind.dice]: «2d10», igual en los dos idiomas.
+  final String? dice;
+
+  const QuizProgress({required this.kind, required this.n, this.dice});
+
+  Map<String, dynamic> toJson() => {
+        'kind': kind.name,
+        'n': n,
+        'dice': dice,
+      };
+
+  static QuizProgress? fromJson(Object? raw) {
+    if (raw is! Map) return null;
+    final j = raw.cast<String, dynamic>();
+    final kind = j['kind'];
+    final n = j['n'];
+    if (kind is! String || n is! int) return null;
+    return QuizProgress(
+      kind: QuizProgressKind.values.byName(kind),
+      n: n,
+      dice: j['dice'] as String?,
+    );
+  }
 }
 
 /// Un rótulo largo (el «Reacción, que realizás al recibir daño…» de un solo
@@ -249,6 +300,7 @@ QuizQuestion? _question(
   String? subjectId,
   int? level,
   String? quote,
+  QuizProgress? progress,
 }) {
   final o = _choose(correctId, pool, rng, count: count, allow: allow);
   if (o == null) return null;
@@ -262,6 +314,7 @@ QuizQuestion? _question(
     options: o.$1,
     optionIds: o.$2,
     answer: o.$3,
+    progress: progress,
   );
 }
 
@@ -276,6 +329,82 @@ final _parens = RegExp(r'\s*\(([^)]*)\)');
 
 String _baseName(String name) =>
     name.replaceAll(RegExp(r'\s*\([^)]*\)'), '').trim();
+
+/// El paréntesis de una fila de progresión («7 conocidas», «+20 pies»,
+/// «2d10»), en el idioma del catálogo activo. El nombre sin paréntesis no es
+/// una progresión: es la primera vez que se obtiene el rasgo.
+QuizProgress? _progressOf(String name) {
+  final inner = _parens.firstMatch(name)?.group(1)?.trim().toLowerCase();
+  if (inner == null || inner.isEmpty) return null;
+  if (inner == 'dos usos' || inner == 'two uses') {
+    return const QuizProgress(kind: QuizProgressKind.uses, n: 2);
+  }
+  if (inner == 'dos habilidades más' || inner == 'two more skills') {
+    return const QuizProgress(kind: QuizProgressKind.extraSkills, n: 2);
+  }
+  final dice = RegExp(r'^(\d+)d(\d+)$').firstMatch(inner);
+  if (dice != null) {
+    return QuizProgress(
+      kind: QuizProgressKind.dice,
+      n: int.parse(dice.group(1)!),
+      dice: dice.group(0),
+    );
+  }
+  final feet = RegExp(r'^\+(\d+) (pies|feet)$').firstMatch(inner);
+  if (feet != null) {
+    return QuizProgress(
+      kind: QuizProgressKind.feet,
+      n: int.parse(feet.group(1)!),
+    );
+  }
+  final spell = RegExp(
+    r'^(?:conjuro de nivel|level) (\d+)(?: spell)?$',
+  ).firstMatch(inner);
+  if (spell != null) {
+    return QuizProgress(
+      kind: QuizProgressKind.spellLevel,
+      n: int.parse(spell.group(1)!),
+    );
+  }
+  final counted = RegExp(r'^(\d+) ([a-záéíóúñ ]+)$').firstMatch(inner);
+  if (counted == null) return null;
+  final n = int.parse(counted.group(1)!);
+  final kind = switch (counted.group(2)) {
+    'conocidas' || 'known' => QuizProgressKind.known,
+    'usos' || 'uses' => QuizProgressKind.uses,
+    'formas' || 'forms' => QuizProgressKind.forms,
+    'armas' || 'weapons' => QuizProgressKind.weapons,
+    _ => null,
+  };
+  return kind == null ? null : QuizProgress(kind: kind, n: n);
+}
+
+bool _sameProgress(QuizProgress a, QuizProgress b) =>
+    a.kind == b.kind && a.n == b.n && a.dice == b.dice;
+
+/// El contador de [kind] vigente en [level]: la última fila de ese rasgo y
+/// ese tipo con nivel menor o igual. Las filas no están ordenadas.
+QuizProgress? _progressAt(
+  CharacterClass cls,
+  String base,
+  QuizProgressKind kind,
+  int level,
+) {
+  final key = base.toLowerCase();
+  ClassFeature? best;
+  QuizProgress? progress;
+  for (final f in cls.features) {
+    if (f.level > level) continue;
+    final row = _progressOf(f.name);
+    if (row == null || row.kind != kind) continue;
+    if (_baseName(f.name).toLowerCase() != key) continue;
+    if (best == null || f.level >= best.level) {
+      best = f;
+      progress = row;
+    }
+  }
+  return progress;
+}
 
 /// El nombre sin el paréntesis, o lo de adentro, está en el texto. «Furia
 /// (3 usos)» se nombra como «Furia», y «(+15 pies)» aparece tal cual en el
@@ -685,6 +814,12 @@ void _classFeatures(
   for (var i = 0; i < cls.features.length; i++) {
     final f = cls.features[i];
     if (counts[f.name] != 1) continue;
+    // «Furia (4 usos)» no se obtiene en ese nivel: Furia se obtiene en el 1
+    // y ahí pasan a ser 4 usos. El paréntesis se parte en tipo y número para
+    // que la UI no tenga que leer el nombre. Mientras ese número siga
+    // vigente, el otro nivel también sería correcto: no se ofrece.
+    final progress = _progressOf(f.name);
+    final base = _baseName(f.name);
     pool(QuizKind.classFeatureLevel).add(
       _Candidate(
         // La misma clave que `classFeatureByText`: es el mismo rasgo.
@@ -695,9 +830,18 @@ void _classFeatures(
           '${f.level}',
           allLevels,
           rng,
-          subject: f.name,
+          allow: progress == null
+              ? null
+              : (id) {
+                  final level = int.tryParse(id);
+                  if (level == null || level == f.level) return true;
+                  final at = _progressAt(cls, base, progress.kind, level);
+                  return at == null || !_sameProgress(at, progress);
+                },
+          subject: progress == null ? f.name : base,
           subjectId: cls.id,
           level: f.level,
+          progress: progress,
         ),
       ),
     );
@@ -961,6 +1105,26 @@ void _spells(
   final ranges = values((s) => s.range, range);
   final schools = values((s) => s.school, school);
 
+  // Dos conjuros tienen una distancia fija de movimiento. Los distractores
+  // salen de los alcances «N pies» del catálogo: son distancias del libro, y
+  // con dos valores no alcanza para cuatro opciones.
+  final moves = <_Choice>[];
+  final seenMove = <String>{};
+  void addMove(String raw) {
+    if (!RegExp(r'^\d+ pies$').hasMatch(raw) || raw.length > _maxOptionLength) {
+      return;
+    }
+    if (seenMove.add(raw)) {
+      moves.add(_Choice(raw, vocabularyLabel(VocabularyField.range, raw)));
+    }
+  }
+
+  for (final s in _byId(repo.spells.values, (s) => s.id)) {
+    final feet = s.moveFeet;
+    if (feet != null) addMove('$feet pies');
+    addMove(s.range);
+  }
+
   bool selfAmbiguous(String correct, String other) {
     const bare = 'Personal';
     final correctBare = correct == bare;
@@ -1019,14 +1183,31 @@ void _spells(
     add(QuizKind.spellCastingTime, s, s.castingTime, castingTime(s), times);
   }
   for (final s in spells) {
-    add(
-      QuizKind.spellRange,
-      s,
-      s.range,
-      range(s),
-      ranges,
-      allow: (other) => !selfAmbiguous(s.range, other),
-    );
+    // «¿Cuál es el alcance?» con respuesta «Personal» a secas no distingue
+    // nada: casi cualquier conjuro sobre uno mismo la comparte. Con área
+    // («Personal (emanación de 10 pies)») sí se pregunta, y el distractor
+    // pelado sigue afuera para que no se confundan.
+    if (s.range != 'Personal') {
+      add(
+        QuizKind.spellRange,
+        s,
+        s.range,
+        range(s),
+        ranges,
+        allow: (other) => !selfAmbiguous(s.range, other),
+      );
+    }
+    final feet = s.moveFeet;
+    if (feet != null) {
+      final raw = '$feet pies';
+      add(
+        QuizKind.spellMoveDistance,
+        s,
+        raw,
+        vocabularyLabel(VocabularyField.range, raw),
+        moves,
+      );
+    }
     add(QuizKind.spellSchool, s, s.school, school(s), schools);
   }
 }
@@ -1116,6 +1297,7 @@ QuizQuestion _localize(QuizQuestion q, ContentRepository repo) {
       case QuizKind.spellCastingTime:
         return vocabularyLabel(VocabularyField.castingTime, id);
       case QuizKind.spellRange:
+      case QuizKind.spellMoveDistance:
         return vocabularyLabel(VocabularyField.range, id);
       case QuizKind.spellSchool:
         return vocabularyLabel(VocabularyField.school, id);
@@ -1142,7 +1324,14 @@ QuizQuestion _localize(QuizQuestion q, ContentRepository repo) {
           quote;
     case QuizKind.classFeatureLevel:
       final slot = q.key.startsWith('feature:') ? q.key.substring(8) : '';
-      subject = _featureBySlot(repo, slot)?.name ?? subject;
+      final name = _featureBySlot(repo, slot)?.name;
+      // Con contador, el enunciado usa el rasgo pelado: el número viaja en
+      // [QuizQuestion.progress] y no se relee del nombre traducido.
+      subject = name == null
+          ? subject
+          : q.progress == null
+              ? name
+              : _baseName(name);
     case QuizKind.hitDie:
     case QuizKind.savingThrows:
       subject = repo.characterClass(q.subjectId ?? '')?.name ?? subject;
@@ -1160,6 +1349,7 @@ QuizQuestion _localize(QuizQuestion q, ContentRepository repo) {
       subject = repo.background(q.subjectId ?? '')?.name ?? subject;
     case QuizKind.spellCastingTime:
     case QuizKind.spellRange:
+    case QuizKind.spellMoveDistance:
     case QuizKind.spellSchool:
       subject = repo.spell(q.subjectId ?? '')?.name ?? subject;
     case QuizKind.masteryByText:
@@ -1178,6 +1368,7 @@ QuizQuestion _localize(QuizQuestion q, ContentRepository repo) {
     options: [for (final id in q.optionIds) labelOf(id)],
     optionIds: q.optionIds,
     answer: q.answer,
+    progress: q.progress,
   );
 }
 

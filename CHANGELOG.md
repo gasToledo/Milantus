@@ -1463,11 +1463,21 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Nuevo
 
-- Sin cambios.
+- El Quiz pregunta hasta qué distancia te movés con un conjuro de alcance
+  Personal que te teletransporta una distancia fija: Paso Brumoso (30 pies) y
+  Paso Arbóreo (500 pies).
 
 ### Modificado
 
-- Sin cambios.
+- Las preguntas de nivel de una progresión preguntan el contador («¿En qué
+  nivel de Brujo conocés 7 Invocaciones Sobrenaturales?», «¿En qué nivel de
+  Bárbaro tenés 4 usos de Furia?») en vez del nombre con paréntesis. «¿En qué
+  nivel obtenés X?» queda para la primera vez que se obtiene el rasgo.
+- El Quiz ya no pregunta el alcance cuando la respuesta es «Personal» sin
+  área.
+- Varios conjuros de 2024 con alcance Personal declaran el área que trae el
+  manual: emanación, cono, línea, cubo o esfera. Controlar el Clima es una
+  esfera de 5 millas.
 
 ### Eliminado
 

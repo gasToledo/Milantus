@@ -57,6 +57,18 @@ void main() {
       'Self (15-foot Cone)',
     );
     expect(
+      vocabularyEnglish(VocabularyField.range, 'Personal (esfera de 30 pies)'),
+      'Self (30-foot Sphere)',
+    );
+    expect(
+      vocabularyEnglish(VocabularyField.range, 'Personal (esfera de 5 millas)'),
+      'Self (5-mile Sphere)',
+    );
+    expect(
+      vocabularyEnglish(VocabularyField.range, 'Personal (cubo de 10 pies)'),
+      'Self (10-foot Cube)',
+    );
+    expect(
       vocabularyEnglish(
         VocabularyField.duration,
         'Concentración, hasta 10 minutos',

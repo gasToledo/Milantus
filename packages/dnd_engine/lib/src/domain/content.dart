@@ -924,6 +924,12 @@ class Spell {
   final String school;
   final String castingTime;
   final String range;
+
+  /// Pies a los que el conjuro te mueve o te teletransporta, cuando el alcance
+  /// es Personal y el texto 2024 da una sola distancia. Null si no hay un
+  /// desplazamiento fijo: Puerta Dimensional ya lo dice el alcance, y
+  /// Teletransporte no tiene una distancia única.
+  final int? moveFeet;
   final String components;
   final String duration;
   final bool concentration;
@@ -944,6 +950,7 @@ class Spell {
     this.school = '',
     this.castingTime = 'Acción',
     this.range = '',
+    this.moveFeet,
     this.components = '',
     this.duration = '',
     this.concentration = false,
@@ -973,6 +980,7 @@ class Spell {
         'school': school,
         'castingTime': castingTime,
         'range': range,
+        if (moveFeet != null) 'moveFeet': moveFeet,
         'components': components,
         'duration': duration,
         'concentration': concentration,
@@ -990,6 +998,7 @@ class Spell {
         school: j['school'] as String? ?? '',
         castingTime: j['castingTime'] as String? ?? 'Acción',
         range: j['range'] as String? ?? '',
+        moveFeet: j['moveFeet'] as int?,
         components: j['components'] as String? ?? '',
         duration: j['duration'] as String? ?? '',
         concentration: j['concentration'] as bool? ?? false,
