@@ -163,13 +163,19 @@ String? _patternEnglish(VocabularyField field, String value) {
     case VocabularyField.range:
       final cone = RegExp(r'^Cono de (\d+) pies$').firstMatch(value);
       if (cone != null) return '${cone[1]}-foot Cone';
-      // El oficial: «Personal (emanación de 30 pies)». Si la forma no está en
-      // la tabla, se sigue con el formato viejo (homebrew «aura de»).
-      final official = RegExp(r'^Personal \(([a-záéíóúñ]+) de (\d+) pies\)$')
-          .firstMatch(value);
+      // El oficial: «Personal (emanación de 30 pies)» o, si el XPHB mide en
+      // millas, «Personal (esfera de 5 millas)». El compuesto inglés va en
+      // singular («5-mile», «30-foot»), como el resto de las áreas. Si la
+      // forma no está en la tabla, se sigue con el formato viejo.
+      final official = RegExp(
+        r'^Personal \(([a-záéíóúñ]+) de (\d+) (pies|millas)\)$',
+      ).firstMatch(value);
       if (official != null) {
         final shape = _shapesOfficial[official[1]];
-        if (shape != null) return 'Self (${official[2]}-foot $shape)';
+        if (shape != null) {
+          final unit = official[3] == 'millas' ? 'mile' : 'foot';
+          return 'Self (${official[2]}-$unit $shape)';
+        }
       }
       final self =
           RegExp(r'^Personal \((?:(.+?) )?(\d+) pies\)$').firstMatch(value);

@@ -101,7 +101,10 @@ void main() {
         );
       case QuizKind.spellRange:
         final s = fuente.spell(q.subjectId!)!;
+        expect(s.range, isNot('Personal'));
         expect(correcta, vocabularyLabel(VocabularyField.range, s.range));
+        expect(correcta, isNot('Personal'));
+        expect(correcta, isNot('Self'));
         final rango = s.range;
         if (rango == 'Personal' || rango.startsWith('Personal (')) {
           final pelado = q.options.any((o) => o == 'Personal' || o == 'Self');
@@ -110,6 +113,14 @@ void main() {
           );
           expect(pelado && conForma, isFalse, reason: q.options.join(' | '));
         }
+      case QuizKind.spellMoveDistance:
+        final mover = fuente.spell(q.subjectId!)!;
+        expect(mover.moveFeet, isNotNull);
+        expect(mover.range, 'Personal');
+        expect(
+          correcta,
+          vocabularyLabel(VocabularyField.range, '${mover.moveFeet} pies'),
+        );
       case QuizKind.spellSchool:
         final s = fuente.spell(q.subjectId!)!;
         expect(correcta, vocabularyLabel(VocabularyField.school, s.school));
@@ -130,8 +141,37 @@ void main() {
         expect(correcta, fuente.feat(b.originFeatId!)!.name);
       case QuizKind.classFeatureLevel:
         final cls = fuente.characterClass(q.subjectId!)!;
-        final f = cls.features.where((f) => f.name == q.subject);
-        expect(f.map((f) => f.level), contains(q.level));
+        expect(q.subject, isNot(contains('(')));
+        final rasgos = cls.features.where(
+          (f) =>
+              f.level == q.level &&
+              (f.name == q.subject || f.name.startsWith('${q.subject} (')),
+        );
+        expect(
+          rasgos,
+          isNotEmpty,
+          reason: '${cls.id} ${q.subject} ${q.level}',
+        );
+        final progreso = q.progress;
+        if (progreso == null) {
+          expect(rasgos.any((f) => f.name == q.subject), isTrue);
+        } else {
+          final conParentesis = rasgos.where((f) => f.name.contains('('));
+          expect(conParentesis, isNotEmpty);
+          final adentro = RegExp(r'\(([^)]+)\)')
+              .firstMatch(conParentesis.first.name)!
+              .group(1)!;
+          if (progreso.dice != null) {
+            expect(adentro, progreso.dice);
+          } else if (adentro.startsWith('dos ') || adentro.startsWith('two ')) {
+            expect(progreso.n, 2);
+          } else {
+            expect(
+              int.parse(RegExp(r'\d+').firstMatch(adentro)!.group(0)!),
+              progreso.n,
+            );
+          }
+        }
         expect(correcta, '${q.level}');
       case QuizKind.skillAbility:
         expect(correcta, Skill.fromId(q.subjectId!)!.ability.label);
@@ -219,7 +259,7 @@ void main() {
                 q.kind == QuizKind.speciesTraitByText
             ? q.options[q.answer]
             : q.kind == QuizKind.classFeatureLevel
-                ? q.subject
+                ? '${q.subject}|${q.progress?.kind.name}|${q.progress?.n}|${q.progress?.dice}'
                 : q.topic == QuizTopic.spells
                     ? q.subjectId
                     : '${q.kind.name}:${q.subjectId}',
@@ -415,5 +455,243 @@ void main() {
         reason: id,
       );
     }
+  });
+
+  List<QuizQuestion> nivelesDe(CharacterClass cls, {int seed = 1}) => [
+        for (final q in quizRound(
+          personaje(cls, 20, 'human', 'soldier'),
+          repo,
+          seed: seed,
+          count: 400,
+        ))
+          if (q.kind == QuizKind.classFeatureLevel) q,
+      ];
+
+  QuizQuestion fila(
+    List<QuizQuestion> preguntas,
+    String subject,
+    QuizProgressKind kind,
+    int n,
+  ) =>
+      preguntas.firstWhere(
+        (q) =>
+            q.subject == subject &&
+            q.progress?.kind == kind &&
+            q.progress?.n == n,
+      );
+
+  test('las progresiones preguntan el contador y no otro nivel vigente', () {
+    final vistos = <String>{};
+    for (final cls in fuente.classesSorted) {
+      // Arcanum y la Pericia del pícaro también tienen pregunta por texto, y
+      // la ronda no repite el rasgo: hay que mirar más de una semilla para
+      // ver la de nivel.
+      final semillas = cls.id == 'warlock' || cls.id == 'rogue'
+          ? List.generate(16, (i) => i + 1)
+          : const [1];
+      for (final seed in semillas) {
+        for (final q in nivelesDe(cls, seed: seed)) {
+          expect(q.subject, isNot(contains('(')), reason: q.subject);
+          final p = q.progress;
+          if (p == null) continue;
+          vistos
+              .add('${q.subjectId}|${q.level}|${p.kind.name}|${p.n}|${p.dice}');
+          // Un nivel donde ese número sigue vigente no puede ser distractor.
+          final clsRepo = fuente.characterClass(q.subjectId!)!;
+          final siguientes = clsRepo.features.where((f) {
+            if (f.level <= q.level!) return false;
+            if (!f.name.startsWith('${q.subject} (')) return false;
+            final adentro =
+                RegExp(r'\(([^)]+)\)').firstMatch(f.name)!.group(1)!;
+            if (p.dice != null) return adentro != p.dice;
+            final numero = RegExp(r'\d+').firstMatch(adentro);
+            if (adentro.startsWith('dos ') || adentro.startsWith('two ')) {
+              return 2 != p.n;
+            }
+            return numero == null || int.parse(numero.group(0)!) != p.n;
+          }).map((f) => f.level);
+          final hasta = siguientes.isEmpty
+              ? 21
+              : siguientes.reduce((a, b) => a < b ? a : b);
+          for (final nivel in {for (final f in clsRepo.features) f.level}) {
+            if (nivel <= q.level! || nivel >= hasta) continue;
+            expect(
+              q.options,
+              isNot(contains('$nivel')),
+              reason: '${q.subjectId} ${q.subject} ${p.kind.name} ${p.n}',
+            );
+          }
+        }
+      }
+    }
+    expect(vistos, hasLength(37));
+
+    final brujo = nivelesDe(fuente.characterClass('warlock')!);
+    final conocidas = fila(
+      brujo,
+      'Invocaciones Sobrenaturales',
+      QuizProgressKind.known,
+      7,
+    );
+    expect(conocidas.level, 9);
+    expect(conocidas.options, isNot(contains('11')));
+    QuizQuestion enAlgunaSemilla(
+      CharacterClass cls,
+      bool Function(QuizQuestion q) pred,
+    ) {
+      for (final seed in List.generate(16, (i) => i + 1)) {
+        for (final q in nivelesDe(cls, seed: seed)) {
+          if (pred(q)) return q;
+        }
+      }
+      fail('no apareció ${cls.id}');
+    }
+
+    final arcanum = enAlgunaSemilla(
+      fuente.characterClass('warlock')!,
+      (q) =>
+          q.subject == 'Arcanum Místico' &&
+          q.progress?.kind == QuizProgressKind.spellLevel &&
+          q.progress?.n == 7,
+    );
+    expect(arcanum.level, 13);
+    // La primera vez, sin contador, sigue siendo «¿en qué nivel obtenés X?».
+    // Comparte clave con la pregunta por texto, así que no sale en toda semilla.
+    final primera = enAlgunaSemilla(
+      fuente.characterClass('warlock')!,
+      (q) => q.subject == 'Invocaciones Sobrenaturales' && q.progress == null,
+    );
+    expect(primera.level, 1);
+
+    final barbaro = nivelesDe(fuente.characterClass('barbarian')!);
+    final furia = fila(barbaro, 'Furia', QuizProgressKind.uses, 4);
+    expect(furia.level, 6);
+    expect(furia.options, isNot(contains('7')));
+    expect(furia.options, isNot(contains('9')));
+    expect(furia.options, isNot(contains('11')));
+    final golpe =
+        fila(barbaro, 'Golpe Brutal Mejorado', QuizProgressKind.dice, 2);
+    expect(golpe.level, 17);
+    expect(golpe.progress!.dice, '2d10');
+
+    final monje = nivelesDe(fuente.characterClass('monk')!);
+    final paso =
+        fila(monje, 'Movimiento sin Armadura', QuizProgressKind.feet, 20);
+    expect(paso.level, 10);
+    expect(paso.options, isNot(contains('13')));
+
+    final druida = nivelesDe(fuente.characterClass('druid')!);
+    final formas = fila(druida, 'Forma Salvaje', QuizProgressKind.forms, 6);
+    expect(formas.level, 4);
+    expect(formas.options, isNot(contains('6')));
+    final usos = fila(druida, 'Forma Salvaje', QuizProgressKind.uses, 3);
+    expect(usos.level, 6);
+    expect(usos.options, isNot(contains('8')));
+
+    final guerrero = nivelesDe(fuente.characterClass('fighter')!);
+    final subita = fila(guerrero, 'Acción Súbita', QuizProgressKind.uses, 2);
+    expect(subita.level, 17);
+    expect(subita.options, isNot(contains('19')));
+    final pericia = enAlgunaSemilla(
+      fuente.characterClass('rogue')!,
+      (q) =>
+          q.subject == 'Pericia' &&
+          q.progress?.kind == QuizProgressKind.extraSkills &&
+          q.progress?.n == 2,
+    );
+    expect(pericia.level, 6);
+  });
+
+  test('en inglés la progresión usa el rasgo pelado y el mismo contador',
+      () async {
+    final en = await ContentRepository.loadFromDirectory(
+      'lib/assets/srd_2024',
+      translation: 'en',
+    );
+    addTearDown(() => ContentLanguage.current = ContentLanguage.es);
+    ContentLanguage.current = ContentLanguage.en;
+    final preguntas = [
+      for (final q in quizRound(
+        personaje(fuente.characterClass('warlock')!, 20, 'human', 'soldier'),
+        en,
+        seed: 1,
+        count: 400,
+      ))
+        if (q.kind == QuizKind.classFeatureLevel &&
+            q.progress?.kind == QuizProgressKind.known &&
+            q.progress?.n == 7)
+          q,
+    ];
+    expect(preguntas, isNotEmpty);
+    expect(preguntas.first.subject, 'Eldritch Invocations');
+    expect(preguntas.first.level, 9);
+    expect(preguntas.first.subject, isNot(contains('(')));
+
+    // Cambiar de idioma reescribe el rasgo y deja el contador: la UI no
+    // vuelve a leer el paréntesis.
+    ContentLanguage.current = ContentLanguage.es;
+    final esRonda = quizRound(
+      personaje(fuente.characterClass('warlock')!, 20, 'human', 'soldier'),
+      repo,
+      seed: 1,
+      count: 400,
+    );
+    final original = esRonda.firstWhere(
+      (q) => q.progress?.kind == QuizProgressKind.known && q.progress?.n == 7,
+    );
+    ContentLanguage.current = ContentLanguage.en;
+    final localizada = quizLocalize([original.toJson()], en).single;
+    expect(localizada.subject, 'Eldritch Invocations');
+    expect(localizada.progress?.kind, QuizProgressKind.known);
+    expect(localizada.progress?.n, 7);
+    expect(localizada.level, original.level);
+    expect(localizada.optionIds, original.optionIds);
+    ContentLanguage.current = ContentLanguage.es;
+  });
+
+  test('no se pregunta el alcance Personal y sí la distancia de movimiento',
+      () {
+    expect(fuente.spell('misty-step')!.moveFeet, 30);
+    expect(fuente.spell('misty-step')!.range, 'Personal');
+    expect(fuente.spell('tree-stride')!.moveFeet, 500);
+    expect(fuente.spell('dimension-door')!.moveFeet, isNull);
+    expect(fuente.spell('teleport')!.moveFeet, isNull);
+    expect(fuente.spell('arms-of-hadar')!.range,
+        'Personal (emanación de 10 pies)');
+    expect(
+      fuente.spell('control-weather')!.range,
+      'Personal (esfera de 5 millas)',
+    );
+    expect(fuente.spell('gust-of-wind')!.range, 'Personal (línea de 60 pies)');
+
+    final c = personaje(
+      fuente.characterClass('wizard')!,
+      5,
+      'human',
+      'sage',
+    ).copyWith(
+      spellIds: [
+        for (final s in fuente.spells.values) s.id,
+      ],
+    );
+    final movidas = <String, QuizQuestion>{};
+    for (final seed in List.generate(40, (i) => i + 1)) {
+      for (final q in quizRound(c, repo, seed: seed)) {
+        if (q.kind == QuizKind.spellRange) {
+          expect(q.options[q.answer], isNot('Personal'));
+          expect(fuente.spell(q.subjectId!)!.range, isNot('Personal'));
+        }
+        if (q.kind == QuizKind.spellMoveDistance) {
+          movidas[q.subjectId!] = q;
+        }
+      }
+    }
+    expect(movidas.keys, containsAll(['misty-step', 'tree-stride']));
+    expect(movidas.keys, isNot(contains('dimension-door')));
+    expect(movidas.keys, isNot(contains('teleport')));
+    expect(movidas['misty-step']!.options[movidas['misty-step']!.answer],
+        '30 pies');
+    expect(movidas['tree-stride']!.options[movidas['tree-stride']!.answer],
+        '500 pies');
   });
 }

@@ -91,6 +91,9 @@ class SpellDraft {
         school: draftText(form['school']),
         castingTime: draftText(form['castingTime']),
         range: draftText(form['range']),
+        // El formulario no edita la distancia de movimiento: se conserva, como
+        // el resto de lo que el borrador no muestra.
+        moveFeet: original.moveFeet,
         components: _componentsText(form),
         duration: draftText(form['duration']),
         concentration: form['concentration'] == true,

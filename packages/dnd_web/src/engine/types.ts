@@ -1005,6 +1005,7 @@ export type QuizKind =
   | 'backgroundFeat'
   | 'spellCastingTime'
   | 'spellRange'
+  | 'spellMoveDistance'
   | 'spellSchool'
   | 'condition'
   | 'skillAbility'
@@ -1030,4 +1031,15 @@ export interface QuizQuestion {
   optionIds: string[];
   /** Índice de la correcta en `options`. */
   answer: number;
+  /** Fila de progresión: el `subject` es el rasgo sin el paréntesis y la UI
+   *  elige la plantilla según `kind`. Ausente la primera vez que se obtiene. */
+  progress?: QuizProgress | null;
+}
+
+/** Contador que el motor saca del paréntesis de una progresión. `dice` solo
+ *  viene en `dice` («2d10»). */
+export interface QuizProgress {
+  kind: 'known' | 'uses' | 'forms' | 'feet' | 'weapons' | 'spellLevel' | 'dice' | 'extraSkills';
+  n: number;
+  dice?: string | null;
 }
