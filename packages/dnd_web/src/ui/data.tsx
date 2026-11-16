@@ -141,9 +141,12 @@ export function ShieldBadge({ value, label, height = 64 }: { value: number; labe
 
 /** Regla ornamental: filete con un rombo dorado de 7 px al centro. Decorativa:
  *  el lector la ignora. */
+/** [className] es su margen y reemplaza al de 18 px: `cx` no resuelve
+ *  conflictos, y con las dos clases manda el orden del CSS de Tailwind, no el
+ *  del atributo (el `my-0` de las cabeceras perdía y quedaba un hueco). */
 export function SectionRule({ className }: { className?: string }) {
   return (
-    <div aria-hidden="true" className={cx('my-[18px] flex items-center gap-2', className)}>
+    <div aria-hidden="true" className={cx(className ?? 'my-[18px]', 'flex items-center gap-2')}>
       <span className="h-px flex-1 bg-hairline" />
       <span className="h-[7px] w-[7px] rotate-45 bg-gold" />
       <span className="h-px flex-1 bg-hairline" />

@@ -157,7 +157,7 @@ export function EffectsDialog({
           </div>
         </div>
 
-        <SectionRule className="my-0.5!" />
+        <SectionRule className="my-0.5" />
 
         <div className="flex items-center gap-1.5">
           <input
