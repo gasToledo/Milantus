@@ -324,6 +324,9 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
             )}
           </>
         )}
+        {/* Con un combate abierto (armándose o en curso) los pasados sobran: la
+            pantalla es la planilla. Vuelven cuando no hay ninguno. */}
+        {!view && (
         <section aria-labelledby="past-combats" className="flex flex-col gap-2.5">
           <h2 id="past-combats" className="font-display mt-2 text-[20px] text-on-surface">
             {t.encPast}
@@ -344,6 +347,7 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
             </ul>
           )}
         </section>
+        )}
       </>
     );
   }
@@ -387,7 +391,10 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
           campaignNpcs={npcs.data}
           encounter={encounter.data ?? null}
           running={!!data?.view && !data.view.preparing}
-          act={act}
+          // Sin animar: el diálogo queda abierto para sumar más, y la
+          // transición dibuja las filas en una capa por encima de todo,
+          // diálogo incluido. Con la planilla tapada no hay nada que ver.
+          act={(a) => void writer.act(a)}
           onClose={() => setDialog(null)}
         />
       )}
