@@ -127,15 +127,21 @@ body {
 /* Componentes del Apéndice B de `diseno-web.md`. Tres niveles de fondo y no
    más (scaffold → surface → plaque): la placa se hunde, nada se eleva, así
    que no hay `box-shadow` salvo el hover de la tarjeta. */
-.card {
-  background: var(--surface);
-  border: var(--border-hairline);
-  border-radius: var(--radius-card);
-}
-.plaque {
-  background: var(--plaque);
-  border: var(--border-hairline);
-  border-radius: var(--radius-card);
+/* En la capa `components`, debajo de las utilidades: sin capa le ganaban a
+   todo `border-*`, `hover:border-gold` o `rounded-*` que se les sumara, y el
+   hover dorado de las tarjetas, el borde del capítulo actual o el acento del
+   Cuaderno nunca se veían. */
+@layer components {
+  .card {
+    background: var(--surface);
+    border: var(--border-hairline);
+    border-radius: var(--radius-card);
+  }
+  .plaque {
+    background: var(--plaque);
+    border: var(--border-hairline);
+    border-radius: var(--radius-card);
+  }
 }
 .eyebrow {
   font-size: 11px;
