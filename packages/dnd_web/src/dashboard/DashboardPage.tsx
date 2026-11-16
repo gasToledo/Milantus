@@ -347,7 +347,7 @@ export function DashboardPage() {
                 <DropdownMenuTrigger asChild>
                   <button
                     type="button"
-                    className="flex h-9 items-center rounded-[var(--radius-pill)] border border-hairline pr-3 pl-4 text-[13px] text-on-surface data-[state=open]:border-gold"
+                    className="flex h-9 items-center rounded-[var(--radius-pill)] border border-hairline pr-3 pl-4 text-[13px] text-on-surface transition duration-[120ms] ease-out hover:border-gold hover:bg-plaque motion-safe:active:translate-y-px data-[state=open]:border-gold"
                   >
                     <span className="text-text-muted">{t.sortLabel}:&nbsp;</span>
                     <span data-field="sort">{t.sortModes[sort]}</span>

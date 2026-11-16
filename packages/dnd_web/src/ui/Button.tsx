@@ -12,15 +12,18 @@ import { cx } from './cx';
  */
 export type ButtonTone = 'primary' | 'soft' | 'secondary' | 'danger';
 
+// El `secondary` dora el filete al pasar: su fondo `plaque` solo apenas se
+// distingue del `scaffold` de la barra y el botón parecía no responder.
 const TONES: Record<ButtonTone, string> = {
   primary: 'bg-gold text-on-primary font-semibold hover:opacity-90',
   soft: 'border border-gold bg-gold-soft text-gold font-medium hover:bg-plaque',
-  secondary: 'border border-hairline text-on-surface hover:bg-plaque',
+  secondary: 'border border-hairline text-on-surface hover:border-gold hover:bg-plaque',
   danger: 'border border-crimson text-crimson hover:bg-plaque',
 };
 
+// Al apretar se hunde 1 px, como `.pick`; con «reducir movimiento», no.
 const BASE =
-  'inline-flex min-h-9 items-center justify-center gap-2 px-4 py-2 text-[14px] no-underline disabled:pointer-events-none disabled:opacity-40';
+  'inline-flex min-h-9 items-center justify-center gap-2 px-4 py-2 text-[14px] no-underline transition duration-[120ms] ease-out motion-safe:active:translate-y-px disabled:pointer-events-none disabled:opacity-40';
 
 /** Radio 9 (el de los controles) o 20: una pill en una barra de pills. */
 const SHAPES = { nav: 'rounded-[var(--radius-nav)]', pill: 'rounded-[var(--radius-pill)]' } as const;
