@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { BookOpen, Check, LogOut, RotateCcw, ScrollText, Shield, Sparkles, Swords, User, X, type LucideIcon } from 'lucide-react';
 import { useRoster, useSheetCatalog } from '../api/queries';
 import { quizLocalize, quizRound, type Catalog, type CharacterJson, type QuizQuestion } from '../engine';
@@ -175,11 +175,55 @@ function Round({ entry, catalog }: { entry: RosterEntry | null; catalog: Catalog
     };
   }, [playing]);
 
+  // «Otra ronda» viene del resultado, que desaparece: la primera pregunta de
+  // esa ronda sí toma el foco.
+  const focusFirst = useRef(false);
   const restart = () => {
+    focusFirst.current = true;
     setSeed(newSeed());
     setPicks([]);
     setIndex(0);
   };
+
+  const pick = (i: number) => setPicks((prev) => Object.assign([...prev], { [index]: i }));
+  const picked = picks[index];
+
+  // El foco no se pierde: al responder, las opciones se apagan (un botón
+  // apagado suelta el foco al documento) y al avanzar «Siguiente» desaparece.
+  // Respondida, el foco va a «Siguiente»; en la pregunta nueva, a la primera
+  // opción. La primera de la ronda no lo toma al entrar: nadie pidió nada
+  // todavía.
+  const roundRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const first = index > 0 || focusFirst.current;
+    const target = picked !== undefined ? '[data-action="quiz-next"]' : first ? '[data-option="A"]' : null;
+    const el = target ? roundRef.current?.querySelector<HTMLElement>(target) : null;
+    if (el) {
+      el.focus();
+      focusFirst.current = false;
+    }
+  }, [picked, index, seed]);
+
+  // Con el teclado se responde con la letra o el número de la opción. Enter
+  // no hace falta: el foco ya está en «Siguiente». Un diálogo o un campo de
+  // texto se quedan con sus teclas.
+  const options = questions[index]?.options.length ?? 0;
+  useEffect(() => {
+    if (picked !== undefined || options === 0) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+      const el = e.target as HTMLElement;
+      if (el.closest('[role="dialog"], input, textarea, select, [contenteditable="true"]')) return;
+      if (e.key.length !== 1) return;
+      const key = e.key.toUpperCase();
+      const i = Math.max('ABCD'.indexOf(key), '1234'.indexOf(key));
+      if (i < 0 || i >= options) return;
+      e.preventDefault();
+      pick(i);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  });
 
   if (questions.length === 0) return <Notice title={t.quizTitle} body={who} />;
   const results = outcomes(questions, picks);
@@ -197,12 +241,17 @@ function Round({ entry, catalog }: { entry: RosterEntry | null; catalog: Catalog
   }
 
   const question = questions[index]!;
-  const picked = picks[index];
   const last = index === questions.length - 1;
   const TopicIcon = TOPIC_ICON[question.topic];
   const answered = results.filter(Boolean).length;
   return (
-    <div className="mx-auto flex w-full max-w-[640px] flex-col gap-4">
+    <div ref={roundRef} className="mx-auto flex w-full max-w-[640px] flex-col gap-4">
+      {/* El veredicto para el lector de pantalla. La región está siempre y
+          cambia solo su texto: una que aparece ya escrita (la del veredicto
+          visible) varios lectores no la anuncian. */}
+      <p className="sr-only" aria-live="polite">
+        {picked === undefined ? '' : picked === question.answer ? t.quizRight : t.quizWrong}
+      </p>
       <div className="flex items-center gap-3">
         <Who entry={entry} />
         <span className="ml-auto font-display text-[20px] text-gold tabular-nums" data-quiz="progress">
@@ -233,7 +282,7 @@ function Round({ entry, catalog }: { entry: RosterEntry | null; catalog: Catalog
               state={
                 picked === undefined ? 'open' : i === question.answer ? 'correct' : i === picked ? 'wrong' : 'dim'
               }
-              onPick={() => setPicks((prev) => Object.assign([...prev], { [index]: i }))}
+              onPick={() => pick(i)}
             />
           ))}
         </div>
@@ -253,7 +302,7 @@ function Round({ entry, catalog }: { entry: RosterEntry | null; catalog: Catalog
         </button>
         {/* No avanza solo: leer la respuesta no puede irse de abajo del dedo. */}
         {picked !== undefined && (
-          <Button shape="pill" onClick={() => setIndex(index + 1)} data-action="quiz-next">
+          <Button shape="pill" className="step-in" onClick={() => setIndex(index + 1)} data-action="quiz-next">
             {last ? t.quizSeeResult : t.quizNext}
           </Button>
         )}
@@ -329,7 +378,18 @@ const subtitleOf = (entry: RosterEntry): string =>
 
 /** El avance, un segmento por pregunta: aciertos en verde, errores en rojo y
  *  la pregunta actual en dorado. Se ve cómo vas sin esperar al final. */
-function Segments({ results, current, label }: { results: Outcome[]; current?: number; label: string }) {
+function Segments({
+  results,
+  current,
+  label,
+  stagger = false,
+}: {
+  results: Outcome[];
+  current?: number;
+  label: string;
+  /** En el resultado, los segmentos aparecen de a uno (`.stagger-in`). */
+  stagger?: boolean;
+}) {
   return (
     <div
       role="progressbar"
@@ -337,14 +397,15 @@ function Segments({ results, current, label }: { results: Outcome[]; current?: n
       aria-valuemax={results.length}
       aria-valuenow={(current ?? results.length - 1) + 1}
       aria-label={label}
-      className="grid gap-1"
+      className={cx('grid gap-1', stagger && 'stagger-in')}
       style={{ gridTemplateColumns: `repeat(${results.length}, minmax(0, 1fr))` }}
     >
       {results.map((r, i) => (
         <span
           key={i}
+          style={staggerIndex(i)}
           className={cx(
-            'h-1.5 rounded-full',
+            'h-1.5 rounded-full transition-colors duration-[160ms] ease-out',
             r === 'ok' ? 'bg-verdant' : r === 'bad' ? 'bg-crimson' : i === current ? 'bg-gold' : 'bg-hairline',
           )}
         />
@@ -352,6 +413,11 @@ function Segments({ results, current, label }: { results: Outcome[]; current?: n
     </div>
   );
 }
+
+/** El lugar de un hijo de `.stagger-in`, que retrasa su entrada según él.
+ *  `sibling-index()` lo diría solo, pero recién es Baseline desde 2026-08 y acá
+ *  React ya sabe el índice. */
+const staggerIndex = (i: number) => ({ '--sibling-index': i + 1 }) as CSSProperties;
 
 /** Los mismos resultados en puntos, para el aviso de abandonar. */
 function Dots({ results }: { results: Outcome[] }) {
@@ -464,7 +530,7 @@ function Verdict({ right, question, catalog }: { right: boolean; question: QuizQ
     question.topic === 'spells' ? (catalog.spells.find((s) => s.id === spellId) as SpellJson | undefined) : undefined;
   const Icon = right ? Check : X;
   return (
-    <div className="flex items-start gap-2.5 rounded-[var(--radius-card)] border border-hairline bg-plaque px-3.5 py-3" aria-live="polite">
+    <div className="step-in flex items-start gap-2.5 rounded-[var(--radius-card)] border border-hairline bg-plaque px-3.5 py-3">
       <span
         className={cx(
           'flex size-6 shrink-0 items-center justify-center rounded-full text-on-primary',
@@ -493,8 +559,12 @@ function OptionButton({ letter, label, state, onPick }: { letter: string; label:
       onClick={onPick}
       data-option={letter}
       data-state={state}
+      // La letra y el número que la eligen (ver `Round`): el lector los anuncia.
+      aria-keyshortcuts={`${letter} ${'ABCD'.indexOf(letter) + 1}`}
+      // Al responder, el verde, el rojo y lo apagado llegan en 160 ms en vez de
+      // saltar. Mientras está abierta manda la transición de `.pick`.
       className={cx(
-        'flex min-h-[52px] w-full items-center gap-3 rounded-[var(--radius-card)] border px-3.5 py-2.5 text-left text-[15px] text-on-surface',
+        'flex min-h-[52px] w-full items-center gap-3 rounded-[var(--radius-card)] border px-3.5 py-2.5 text-left text-[15px] text-on-surface transition duration-[160ms] ease-out',
         state === 'open' && 'pick border-hairline bg-plaque hover:border-gold',
         state === 'correct' && cx('border-verdant', TINT_OK),
         state === 'wrong' && cx('border-crimson', TINT_BAD),
@@ -504,7 +574,7 @@ function OptionButton({ letter, label, state, onPick }: { letter: string; label:
       <span
         aria-hidden="true"
         className={cx(
-          'flex size-7 shrink-0 items-center justify-center rounded-lg border text-[13px] font-semibold',
+          'flex size-7 shrink-0 items-center justify-center rounded-lg border text-[13px] font-semibold transition-colors duration-[160ms] ease-out',
           state === 'correct'
             ? 'border-verdant bg-verdant text-on-primary'
             : state === 'wrong'
@@ -547,6 +617,8 @@ function Result({
   onAgain: () => void;
 }) {
   const t = useTexts();
+  const scoreRef = useRef<HTMLParagraphElement>(null);
+  useEffect(() => scoreRef.current?.focus(), []);
   const right = results.filter((r) => r === 'ok').length;
   const missed = questions.map((q, i) => ({ q, pick: picks[i] })).filter(({ q, pick }) => pick !== q.answer);
   // Los aciertos de cada tema que salió en la ronda: dicen qué conviene
@@ -557,21 +629,29 @@ function Result({
   }).filter(({ total }) => total > 0);
   return (
     <div className="mx-auto flex w-full max-w-[640px] flex-col gap-4">
-      <section className="card flex flex-col items-center gap-3 p-6">
+      <section className="card step-in flex flex-col items-center gap-3 p-6">
         <Who entry={entry} />
-        <p className="font-display text-[56px] leading-none text-gold tabular-nums" data-quiz="score">
+        {/* El foco llega acá al terminar: «Ver resultado» desaparece y, si
+            no, quedaría en el documento. */}
+        <p
+          ref={scoreRef}
+          tabIndex={-1}
+          className="font-display text-[56px] leading-none text-gold tabular-nums outline-none"
+          data-quiz="score"
+        >
           {right}
           <span className="text-[26px] text-text-muted"> / {questions.length}</span>
         </p>
         <div className="w-full">
-          <Segments results={results} label={t.quizProgress(right, questions.length)} />
+          <Segments results={results} label={t.quizProgress(right, questions.length)} stagger />
         </div>
-        <ul className="mt-1 grid w-full grid-cols-1 gap-2 min-[480px]:grid-cols-2">
-          {byTopic.map(({ topic, total, ok }) => {
+        <ul className="stagger-in mt-1 grid w-full grid-cols-1 gap-2 min-[480px]:grid-cols-2">
+          {byTopic.map(({ topic, total, ok }, i) => {
             const Icon = TOPIC_ICON[topic];
             return (
               <li
                 key={topic}
+                style={staggerIndex(i)}
                 className="flex items-center gap-2 rounded-[var(--radius-card)] border border-hairline bg-plaque px-3 py-2.5"
               >
                 <Icon size={13} aria-hidden="true" className="text-gold" />

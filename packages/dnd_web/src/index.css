@@ -548,6 +548,17 @@ body {
   animation: step-in 160ms ease-out;
 }
 
+/* Los hijos entran de a uno, 40 ms después del anterior (el resultado del
+   Quiz). Cada hijo trae su lugar en `--sibling-index`. Solo sin «reducir
+   movimiento»: con la duración en cero, el retraso igual los dejaría ocultos
+   un momento. */
+@media (prefers-reduced-motion: no-preference) {
+  .stagger-in > * {
+    animation: step-in 160ms ease-out both;
+    animation-delay: calc(var(--sibling-index, 1) * 40ms);
+  }
+}
+
 /* Toda duración se apaga si el sistema pide menos movimiento: lo animado
    nunca lleva información que no esté ya en su valor final. */
 @media (prefers-reduced-motion: reduce) {
