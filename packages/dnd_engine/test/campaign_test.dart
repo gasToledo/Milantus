@@ -131,13 +131,13 @@ void main() {
     });
 
     // Lo que recibe un jugador vinculado: las escenas son del DM.
-    test('la vista del jugador no incluye ids, escenas ni el orden de la Mesa',
-        () {
+    test('la vista del jugador no incluye ids, escenas ni el orden del DM', () {
       const c = Campaign(
         id: 'x',
         name: 'Y',
         musicScenes: [MusicScene(id: 'a', name: 'Taberna', url: 'u')],
         memberOrder: ['m2', 'm1'],
+        npcOrder: ['p2', 'p1'],
       );
 
       final view = c.playerView();
@@ -145,20 +145,31 @@ void main() {
       expect(view.containsKey('id'), isFalse);
       expect(view.containsKey('musicScenes'), isFalse);
       expect(view.containsKey('memberOrder'), isFalse);
+      expect(view.containsKey('npcOrder'), isFalse);
       expect(view['name'], 'Y');
     });
 
-    test('el orden de la Mesa sobrevive el round-trip y se limpia al leer', () {
-      const c = Campaign(id: 'x', name: 'Y', memberOrder: ['m2', 'm1']);
+    test('el orden de la Mesa y de los PNJ sobrevive el round-trip y se limpia',
+        () {
+      const c = Campaign(
+        id: 'x',
+        name: 'Y',
+        memberOrder: ['m2', 'm1'],
+        npcOrder: ['p2', 'p1'],
+      );
 
-      expect(Campaign.fromJson(c.toJson()).memberOrder, ['m2', 'm1']);
-      expect(c.copyWith(name: 'Z').memberOrder, ['m2', 'm1']);
+      final r = Campaign.fromJson(c.toJson());
+      expect(r.memberOrder, ['m2', 'm1']);
+      expect(r.npcOrder, ['p2', 'p1']);
+      expect(c.copyWith(name: 'Z').npcOrder, ['p2', 'p1']);
       final dirty = Campaign.fromJson({
         'schemaVersion': Campaign.currentSchemaVersion,
         'id': 'x',
         'memberOrder': ['m1', '', 7, null, 'm1', 'm2'],
+        'npcOrder': ['p1', '', 7, 'p1'],
       });
       expect(dirty.memberOrder, ['m1', 'm2']);
+      expect(dirty.npcOrder, ['p1']);
     });
 
     test('una campaña de la versión 2 migra a la actual sin orden', () {
@@ -166,6 +177,18 @@ void main() {
 
       expect(migrated['schemaVersion'], Campaign.currentSchemaVersion);
       expect(migrated['memberOrder'], isEmpty);
+      expect(migrated['npcOrder'], isEmpty);
+    });
+
+    test('una campaña de la versión 3 conserva el orden de la Mesa', () {
+      final migrated = Campaign.migrateJson({
+        'schemaVersion': 3,
+        'id': 'x',
+        'memberOrder': ['m1'],
+      });
+
+      expect(migrated['memberOrder'], ['m1']);
+      expect(migrated['npcOrder'], isEmpty);
     });
 
     test('migrar no modifica el mapa de entrada', () {

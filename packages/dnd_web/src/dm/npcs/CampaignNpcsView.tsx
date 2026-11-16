@@ -1,7 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { EllipsisVertical, LibraryBig, Plus, ScrollText, UserMinus } from 'lucide-react';
-import { useCampaignNpcs, useSheetCatalog } from '../../api/queries';
+import { queryKeys, useCampaignNpcs, useSheetCatalog } from '../../api/queries';
 import type { DmCampaign } from '../../api/client';
+import { movedOrder } from '../../dashboard/roster';
+import { useHoldDrag } from '../../ui/holdDrag';
+import { useListTransition } from '../../ui/listTransition';
+import { editCampaign } from '../campaigns';
 import { npcViews, type NpcView } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
 import { dmNpcsHref, Link, navigate } from '../../router';
@@ -46,7 +51,8 @@ export function CampaignNpcsView({ campaign }: { campaign: DmCampaign }) {
   const [creating, setCreating] = useState(false);
   const [removing, setRemoving] = useState<{ id: string; name: string } | null>(null);
   const [toast, setToast] = useState<{ key: number; message: string } | null>(null);
-  const links = useNpcLinks(() => setToast((prev) => ({ key: (prev?.key ?? 0) + 1, message: t.npcSaveFailed })));
+  const notifyError = (message: string) => setToast((prev) => ({ key: (prev?.key ?? 0) + 1, message }));
+  const links = useNpcLinks(() => notifyError(t.npcSaveFailed));
   const bringButton = (
     <Button tone="soft" icon={LibraryBig} data-action="bring-npcs" onClick={() => setBringing(true)}>
       {t.dmBringFromLibrary}
@@ -58,10 +64,57 @@ export function CampaignNpcsView({ campaign }: { campaign: DmCampaign }) {
     </Button>
   );
 
-  const views = useMemo(
-    () => (npcs.data && catalog.data ? npcViews(npcs.data, catalog.data) : null),
-    [npcs.data, catalog.data],
-  );
+  // En el orden del DM (`Campaign.npcOrder`, como la Mesa): lo que no figura
+  // va al final en el orden del servidor y un id que ya no está se ignora.
+  const npcOrder = campaign.npcOrder;
+  const views = useMemo(() => {
+    if (!npcs.data || !catalog.data) return null;
+    const rank = (id: string) => {
+      const i = npcOrder?.indexOf(id) ?? -1;
+      return i < 0 ? Number.MAX_SAFE_INTEGER : i;
+    };
+    return npcViews(npcs.data, catalog.data).sort((a, b) => rank(a.npc.id) - rank(b.npc.id));
+  }, [npcs.data, catalog.data, npcOrder]);
+
+  const client = useQueryClient();
+  const visible = useMemo(() => views && (tag === null ? views : views.filter((v) => hasTag(v, tag))), [views, tag]);
+  const visibleIds = useMemo(() => (visible ?? []).map((v) => v.npc.id), [visible]);
+  // Filtrar, quitar o traer PNJ anima la grilla, como las otras listas.
+  const animateList = useListTransition(visibleIds);
+
+  // Moverlos se guarda en la campaña, igual que la Mesa: la caché cambia al
+  // instante y el documento se relee antes de escribir (`editCampaign`). Con
+  // un tag elegido no se mueven: soltar entre dos filtrados no dice dónde
+  // quedan respecto de los ocultos (la regla del dashboard).
+  const canMove = tag === null;
+  const moveNpc = (from: string, to: string) => {
+    const order = movedOrder(visibleIds, from, to);
+    void (async () => {
+      await client.cancelQueries({ queryKey: queryKeys.dmCampaigns });
+      client.setQueryData<DmCampaign[]>(queryKeys.dmCampaigns, (old) =>
+        old?.map((c) => (c.id === campaign.id ? { ...c, npcOrder: order } : c)),
+      );
+      try {
+        await editCampaign(client, campaign.id, (latest) => ({ ...latest, npcOrder: order }));
+      } catch {
+        notifyError(t.dmOrderSaveError);
+        void client.invalidateQueries({ queryKey: queryKeys.dmCampaigns });
+      }
+    })();
+  };
+  const reorder = useHoldDrag({ ids: canMove ? visibleIds : [], canDrop: () => canMove, onMove: moveNpc });
+
+  // Quitar un PNJ se lleva su ⋮: el foco va al título de la sección cuando el
+  // diálogo terminó de devolverlo a su botón.
+  const [focusTitle, setFocusTitle] = useState(false);
+  useEffect(() => {
+    if (!focusTitle) return;
+    const id = window.setTimeout(() => {
+      document.querySelector<HTMLElement>('[data-dm-title]')?.focus();
+      setFocusTitle(false);
+    }, 0);
+    return () => window.clearTimeout(id);
+  }, [focusTitle]);
 
   const portraits = useMemo(() => new Map((npcs.data ?? []).map((e) => [e.npc.id, npcPortrait(e)])), [npcs.data]);
 
@@ -84,7 +137,7 @@ export function CampaignNpcsView({ campaign }: { campaign: DmCampaign }) {
   } else {
     const count = (s: NpcView['status']) => views.filter((v) => v.status === s).length;
     const tags = normalizeTags(views.flatMap((v) => v.npc.tags ?? []));
-    const visible = tag === null ? views : views.filter((v) => hasTag(v, tag));
+    const shown = visible ?? views;
     body = (
       <>
         <div className="flex flex-wrap items-center gap-1.5">
@@ -103,30 +156,40 @@ export function CampaignNpcsView({ campaign }: { campaign: DmCampaign }) {
                   label={g}
                   count={views.filter((v) => hasTag(v, g)).length}
                   pressed={tag?.toLowerCase() === g.toLowerCase()}
-                  onClick={() => setTag(tag?.toLowerCase() === g.toLowerCase() ? null : g)}
+                  onClick={() => animateList(() => setTag(tag?.toLowerCase() === g.toLowerCase() ? null : g))}
                 />
               ))}
             </div>
           )}
         </div>
-        {visible.length === 0 ? (
+        {shown.length === 0 ? (
           // Solo el tag puede dejarla vacía: hay PNJ, ninguno con ese tag.
           <AppEmptyState
             kind="no-match"
             message={t.dmNoNpcWithTag}
             actions={
-              <Button tone="secondary" onClick={() => setTag(null)}>
+              <Button tone="secondary" onClick={() => animateList(() => setTag(null))}>
                 {t.dmClearFilter}
               </Button>
             }
           />
         ) : (
           <ul aria-label={t.dmCampaignNpcs} className="grid gap-3.5 [grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr))]">
-            {visible.map((v) => (
+            {shown.map((v) => (
               <TableNpcCard
                 key={v.npc.id}
                 view={v}
                 portrait={portraits.get(v.npc.id) ?? null}
+                reorder={
+                  canMove
+                    ? {
+                        item: reorder.item(v.npc.id),
+                        dragging: reorder.dragging === v.npc.id,
+                        over: reorder.over === v.npc.id,
+                        animated: reorder.animated,
+                      }
+                    : undefined
+                }
                 onStatus={(s) => links.setStatus(campaign.id, v.npc.id, s)}
                 onRemove={() => setRemoving({ id: v.npc.id, name: v.npc.name })}
               />
@@ -150,14 +213,23 @@ export function CampaignNpcsView({ campaign }: { campaign: DmCampaign }) {
       />
       {body}
       {creating && <NewNpcDialog campaignId={campaign.id} onClose={() => setCreating(false)} />}
-      {bringing && <BringNpcsDialog campaignId={campaign.id} onLink={links.linkMany} onClose={() => setBringing(false)} />}
+      {bringing && (
+        <BringNpcsDialog
+          campaignId={campaign.id}
+          onLink={(pairs) => links.linkMany(pairs, animateList)}
+          onClose={() => setBringing(false)}
+        />
+      )}
       {removing && (
         <ConfirmDialog
           title={t.dmRemoveFromCampaignTitle(removing.name)}
           body={t.dmRemoveFromCampaignBody}
           confirmLabel={t.dmRemoveShort}
           errorText={t.dmRemoveFromCampaignError}
-          onConfirm={() => links.unlink(campaign.id, removing.id)}
+          onConfirm={async () => {
+            await links.unlink(campaign.id, removing.id, animateList);
+            setFocusTitle(true);
+          }}
           onClose={() => setRemoving(null)}
         />
       )}
@@ -171,11 +243,15 @@ export function CampaignNpcsView({ campaign }: { campaign: DmCampaign }) {
 function TableNpcCard({
   view,
   portrait,
+  reorder,
   onStatus,
   onRemove,
 }: {
   view: NpcView;
   portrait: string | null;
+  /** Mover la tarjeta tomándola entera (`useHoldDrag`), con las mismas clases
+   *  que la Mesa. Sin esto no se mueve (con un tag elegido). */
+  reorder?: { item: Record<string, unknown>; dragging: boolean; over: boolean; animated: boolean };
   onStatus: (status: NpcStatus) => void;
   onRemove: () => void;
 }) {
@@ -185,11 +261,33 @@ function TableNpcCard({
   // El selector queda afuera: un control que responde no puede verse apagado.
   const dead = status === 'dead';
   return (
-    <li className="card flex min-w-0 flex-col gap-2.5 px-3.5 pt-3 pb-3.5" data-npc={npc.id}>
+    <li
+      className={cx(
+        'card flex min-w-0 flex-col gap-2.5 px-3.5 pt-3 pb-3.5',
+        // Sostenerla no puede seleccionar el texto ni abrir el menú del teléfono.
+        reorder && 'select-none [-webkit-touch-callout:none]',
+        reorder?.dragging && (reorder.animated ? 'cursor-grabbing border-gold [&_*]:cursor-grabbing' : 'opacity-40'),
+        reorder?.over && !reorder.animated && 'outline-2 outline-offset-1 outline-gold',
+      )}
+      data-npc={npc.id}
+      data-vt-card
+      {...reorder?.item}
+      // Después del `item`, que trae su `style` para el arrastre. El nombre
+      // identifica la tarjeta en las transiciones de la grilla.
+      style={{
+        viewTransitionName: `npc-${npc.id.replace(/[^\w-]/g, '_')}`,
+        ...(reorder?.item.style as CSSProperties | undefined),
+      }}
+    >
       <div className="flex items-start gap-1">
+        {/* Muerto se atenúa en 160 ms, como cambia el selector de abajo. */}
         <Link
           href={dmNpcsHref(npc.id)}
-          className={cx('flex min-w-0 flex-1 items-center gap-3 rounded-[var(--radius-nav)] hover:text-gold', dead && 'opacity-70')}
+          draggable={false}
+          className={cx(
+            'flex min-w-0 flex-1 items-center gap-3 rounded-[var(--radius-nav)] transition duration-[160ms] ease-out hover:text-gold',
+            dead && 'opacity-70',
+          )}
         >
           <Medallion name={npc.name} accent={null} size={36} portrait={portrait} />
           <span className="min-w-0 flex-1">
@@ -228,7 +326,7 @@ function TableNpcCard({
         </DropdownMenu>
       </div>
       {(npc.tags ?? []).length > 0 && (
-        <span className={cx('flex flex-wrap gap-1.5', dead && 'opacity-70')}>
+        <span className={cx('flex flex-wrap gap-1.5 transition-opacity duration-[160ms] ease-out', dead && 'opacity-70')}>
           {npc.tags!.map((tag) => (
             <span key={tag} className="rounded-[var(--radius-pill)] border border-hairline px-[9px] py-px text-[11.5px] text-on-surface-variant">
               {tag}

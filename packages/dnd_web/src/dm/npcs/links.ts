@@ -2,9 +2,12 @@
 // tres tienen que releer lo mismo: la lista de la mesa, la biblioteca y la ficha.
 import { useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { linkCampaignNpc, unlinkCampaignNpc, type CampaignNpc, type StoredNpc } from '../../api/client';
+import { fetchCampaignNpcs, linkCampaignNpc, unlinkCampaignNpc, type CampaignNpc, type StoredNpc } from '../../api/client';
 import { queryKeys } from '../../api/queries';
 import type { NpcStatus } from './npc';
+
+/** `useListTransition`: corre el cambio de la caché dentro de la animación. */
+type Animate = (update: () => unknown) => void;
 
 export function useNpcLinks(onStatusError: () => void) {
   const client = useQueryClient();
@@ -48,18 +51,37 @@ export function useNpcLinks(onStatusError: () => void) {
   };
 
   /** Uno por vez, y si uno falla los demás ya quedaron: reintentar no duplica
-   *  nada, porque sumar sin estado no toca un vínculo existente. */
-  const linkMany = async (pairs: { campaignId: string; npcId: string }[]) => {
+   *  nada, porque sumar sin estado no toca un vínculo existente.
+   *
+   *  Con [animate] (la sección PNJ de la campaña, `useListTransition`) la
+   *  lista de la mesa se relee antes y entra a la caché dentro de la
+   *  transición, que no puede esperar a la red. */
+  const linkMany = async (pairs: { campaignId: string; npcId: string }[], animate?: Animate) => {
     try {
       for (const { campaignId, npcId } of pairs) await linkCampaignNpc(campaignId, npcId);
     } finally {
-      await Promise.all([...new Set(pairs.map((p) => p.campaignId))].map(refresh));
+      const ids = [...new Set(pairs.map((p) => p.campaignId))];
+      if (animate && ids.length === 1) {
+        const key = queryKeys.campaignNpcs(ids[0]!);
+        await client.cancelQueries({ queryKey: key });
+        const fresh = await fetchCampaignNpcs(ids[0]!, new AbortController().signal);
+        animate(() => client.setQueryData(key, fresh));
+        void client.invalidateQueries({ queryKey: queryKeys.npcs });
+      } else {
+        await Promise.all(ids.map(refresh));
+      }
     }
   };
 
-  const unlink = async (campaignId: string, npcId: string) => {
+  /** Con [animate], el PNJ sale de la caché dentro de la transición y la
+   *  relectura va después. */
+  const unlink = async (campaignId: string, npcId: string, animate?: Animate) => {
     await unlinkCampaignNpc(campaignId, npcId);
-    await refresh(campaignId);
+    if (!animate) return void (await refresh(campaignId));
+    const key = queryKeys.campaignNpcs(campaignId);
+    await client.cancelQueries({ queryKey: key });
+    animate(() => client.setQueryData<CampaignNpc[]>(key, (old) => old?.filter((e) => e.npc.id !== npcId)));
+    void refresh(campaignId);
   };
 
   return { setStatus, linkMany, unlink };

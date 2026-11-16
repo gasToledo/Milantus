@@ -46,7 +46,9 @@ class Campaign {
   /// que un servidor viejo rechace la campaña en vez de guardarla sin escenas.
   ///
   /// 3: suma [memberOrder], también del DM y también opcional.
-  static const int currentSchemaVersion = 3;
+  ///
+  /// 4: suma [npcOrder], con el mismo contrato que [memberOrder].
+  static const int currentSchemaVersion = 4;
 
   final String id;
   final String name;
@@ -68,6 +70,11 @@ class Campaign {
   /// obliga a limpiarlo. Es solo del DM: [playerView] no lo incluye.
   final List<String> memberOrder;
 
+  /// El orden en que el DM acomodó a los PNJ de la campaña: ids de PNJ. Mismo
+  /// contrato que [memberOrder]: lo que no figura va al final, un id que ya no
+  /// está se ignora y [playerView] no lo incluye.
+  final List<String> npcOrder;
+
   const Campaign({
     required this.id,
     required this.name,
@@ -75,6 +82,7 @@ class Campaign {
     this.state = CampaignState.active,
     this.musicScenes = const [],
     this.memberOrder = const [],
+    this.npcOrder = const [],
   });
 
   Campaign copyWith({
@@ -83,6 +91,7 @@ class Campaign {
     CampaignState? state,
     List<MusicScene>? musicScenes,
     List<String>? memberOrder,
+    List<String>? npcOrder,
   }) =>
       Campaign(
         id: id,
@@ -91,6 +100,7 @@ class Campaign {
         state: state ?? this.state,
         musicScenes: musicScenes ?? this.musicScenes,
         memberOrder: memberOrder ?? this.memberOrder,
+        npcOrder: npcOrder ?? this.npcOrder,
       );
 
   Map<String, dynamic> toJson() => {
@@ -101,15 +111,17 @@ class Campaign {
         'state': state.toJson(),
         'musicScenes': [for (final s in musicScenes) s.toJson()],
         'memberOrder': memberOrder,
+        'npcOrder': npcOrder,
       };
 
   /// Lo que un jugador vinculado puede leer de la campaña: sin los ids, que
-  /// son internos, ni las escenas de música ni el orden de la Mesa, que son del
-  /// DM.
+  /// son internos, ni las escenas de música ni el orden de la Mesa y de los
+  /// PNJ, que son del DM.
   Map<String, dynamic> playerView() => toJson()
     ..remove('id')
     ..remove('musicScenes')
-    ..remove('memberOrder');
+    ..remove('memberOrder')
+    ..remove('npcOrder');
 
   factory Campaign.fromJson(Map<String, dynamic> source) {
     final j = migrateJson(source);
@@ -122,13 +134,16 @@ class Campaign {
         for (final s in j['musicScenes'] as List? ?? const [])
           MusicScene.fromJson((s as Map).cast<String, dynamic>()),
       ],
-      // Lo escrito afuera se limpia acá: solo ids de texto, sin repetir.
-      memberOrder: {
-        for (final id in j['memberOrder'] as List? ?? const [])
-          if (id is String && id.isNotEmpty) id,
-      }.toList(),
+      memberOrder: _ids(j['memberOrder']),
+      npcOrder: _ids(j['npcOrder']),
     );
   }
+
+  /// Lo escrito afuera se limpia acá: solo ids de texto, sin repetir.
+  static List<String> _ids(Object? raw) => {
+        for (final id in raw as List? ?? const [])
+          if (id is String && id.isNotEmpty) id,
+      }.toList();
 
   static int schemaVersionOf(Map<String, dynamic> json) {
     final value = json['schemaVersion'] ?? 1;
@@ -160,6 +175,8 @@ class Campaign {
     if (version < 2) j['musicScenes'] = const <Object>[];
     // 2 → 3: las campañas anteriores no tienen orden de la Mesa.
     if (version < 3) j['memberOrder'] = const <Object>[];
+    // 3 → 4: ni orden de los PNJ.
+    if (version < 4) j['npcOrder'] = const <Object>[];
     j['schemaVersion'] = currentSchemaVersion;
     return j;
   }

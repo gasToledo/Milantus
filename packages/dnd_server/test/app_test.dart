@@ -5148,48 +5148,58 @@ void main() {
         expect(block['currentChapter'], isNull);
       });
 
-      test('las escenas de música y el orden de la Mesa no viajan', () async {
-        final (player, dm) = await table('sin-musica');
-        await send(
-          'PUT',
-          '/api/campaigns/tumba',
-          token: dm,
-          body: {
-            'campaign': {
-              ...campaignJson('tumba'),
-              'schemaVersion': 3,
-              'memberOrder': ['orden-secreto-del-dm'],
-              'musicScenes': [
-                {
-                  'id': 's1',
-                  'name': 'Lamento del dragón',
-                  'url': 'https://youtu.be/dQw4w9WgXcQ',
-                  'offerOnCombat': true,
-                },
-              ],
+      test(
+        'las escenas de música y el orden de la Mesa y de los PNJ no viajan',
+        () async {
+          final (player, dm) = await table('sin-musica');
+          await send(
+            'PUT',
+            '/api/campaigns/tumba',
+            token: dm,
+            body: {
+              'campaign': {
+                ...campaignJson('tumba'),
+                'schemaVersion': 4,
+                'memberOrder': ['orden-secreto-del-dm'],
+                'npcOrder': ['pnj-secreto-del-dm'],
+                'musicScenes': [
+                  {
+                    'id': 's1',
+                    'name': 'Lamento del dragón',
+                    'url': 'https://youtu.be/dQw4w9WgXcQ',
+                    'offerOnCombat': true,
+                  },
+                ],
+              },
             },
-          },
-        );
-        // Que las escenas se hayan guardado de verdad, o la prueba de abajo
-        // pasaría igual sin probar nada.
-        final delDm = await send('GET', '/api/campaigns', token: dm);
-        expect(jsonEncode(delDm['body']), contains('Lamento'));
-        expect(jsonEncode(delDm['body']), contains('orden-secreto-del-dm'));
+          );
+          // Que las escenas se hayan guardado de verdad, o la prueba de abajo
+          // pasaría igual sin probar nada.
+          final delDm = await send('GET', '/api/campaigns', token: dm);
+          expect(jsonEncode(delDm['body']), contains('Lamento'));
+          expect(jsonEncode(delDm['body']), contains('orden-secreto-del-dm'));
+          expect(jsonEncode(delDm['body']), contains('pnj-secreto-del-dm'));
 
-        final raw = await send(
-          'GET',
-          '/api/characters/sagan/campaigns',
-          token: player,
-        );
-        expect(jsonEncode(raw['body']), isNot(contains('Lamento')));
-        expect(jsonEncode(raw['body']), isNot(contains('youtu')));
-        expect(jsonEncode(raw['body']), isNot(contains('musicScenes')));
-        expect(jsonEncode(raw['body']), isNot(contains('memberOrder')));
-        expect(
-          jsonEncode(raw['body']),
-          isNot(contains('orden-secreto-del-dm')),
-        );
-      });
+          final raw = await send(
+            'GET',
+            '/api/characters/sagan/campaigns',
+            token: player,
+          );
+          expect(jsonEncode(raw['body']), isNot(contains('Lamento')));
+          expect(jsonEncode(raw['body']), isNot(contains('youtu')));
+          expect(jsonEncode(raw['body']), isNot(contains('musicScenes')));
+          expect(jsonEncode(raw['body']), isNot(contains('memberOrder')));
+          expect(
+            jsonEncode(raw['body']),
+            isNot(contains('orden-secreto-del-dm')),
+          );
+          expect(jsonEncode(raw['body']), isNot(contains('npcOrder')));
+          expect(
+            jsonEncode(raw['body']),
+            isNot(contains('pnj-secreto-del-dm')),
+          );
+        },
+      );
 
       test('las batallas cerradas viajan con la mesa', () async {
         final (player, dm) = await table('batallas');

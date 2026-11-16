@@ -246,6 +246,8 @@ export interface DmCampaign {
   musicScenes?: MusicScene[];
   /** El orden de la Mesa: ids de vínculo. Es del DM (`Campaign.playerView` lo saca). */
   memberOrder?: string[];
+  /** El orden de los PNJ de la campaña: ids de PNJ. También del DM. */
+  npcOrder?: string[];
 }
 
 export interface MusicScene {

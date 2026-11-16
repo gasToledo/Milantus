@@ -1459,10 +1459,15 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
-## [Unreleased]
+## [1.3.0+1] - 2026-11-16
 
 ### Nuevo
 
+- En la sección PNJ de una campaña, el DM acomoda los PNJ arrastrándolos
+  (o con Alt más una flecha), como los personajes de la Mesa. El orden se
+  guarda en la campaña (esquema 4 en `dnd_engine`) y el servidor lo poda de
+  lo que recibe el jugador.
+- El Quiz se responde con las teclas A–D o 1–4.
 - El Quiz pregunta hasta qué distancia te movés con un conjuro de alcance
   Personal que te teletransporta una distancia fija: Paso Brumoso (30 pies) y
   Paso Arbóreo (500 pies).
@@ -1478,6 +1483,34 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 - Varios conjuros de 2024 con alcance Personal declaran el área que trae el
   manual: emanación, cono, línea, cubo o esfera. Controlar el Clima es una
   esfera de 5 millas.
+- En /v2, las listas de tarjetas se acomodan con una animación en vez de
+  saltar: los personajes, la Mesa, los capítulos, las entradas del Cuaderno y
+  los PNJ de la campaña al ordenar, filtrar, sumar o quitar.
+- Abrir y cerrar la ficha desde el dashboard, y cambiar de campaña o de
+  sección en el Modo DM, es un fundido corto; el selector de modo desliza su
+  fondo; los menús se abren desde su botón; botones y tarjetas responden al
+  pasar el mouse y al apretar. Con «reducir movimiento», nada se mueve.
+- El foco del teclado ya no se pierde al borrar, echar, quitar, empezar o
+  cerrar algo, al responder el Quiz ni al abrir una entrada del Códice en el
+  teléfono, y el veredicto del Quiz se anuncia al lector de pantalla.
+- En el Códice, con la lista y la entrada lado a lado, la página queda fija y
+  cada columna tiene su propio scroll.
+- Corregido: el hover dorado de varias tarjetas, el borde del capítulo en
+  curso y los acentos del Cuaderno no se veían.
+
+### Eliminado
+
+- Sin cambios.
+
+## [Unreleased]
+
+### Nuevo
+
+- Sin cambios.
+
+### Modificado
+
+- Sin cambios.
 
 ### Eliminado
 
