@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { EllipsisVertical, Eye, FolderInput, Lock, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
 import {
@@ -13,6 +13,7 @@ import {
   assignEntryChapter,
   createNote,
   deleteNote,
+  fetchCampaignNotebook,
   saveEntryOrder,
   saveNote,
   type DmCampaign,
@@ -21,6 +22,7 @@ import {
 } from '../api/client';
 import { movedOrder } from '../dashboard/roster';
 import { useHoldDrag } from '../ui/holdDrag';
+import { useListTransition } from '../ui/listTransition';
 import { Toast, type ToastTone } from '../ui/primitives';
 import { MoveToChapterDialog } from './MoveToChapterDialog';
 import { useLang, useTexts } from '../i18n/context';
@@ -66,7 +68,11 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
   const notebook = useCampaignNotebook(campaign.id);
   const chapters = useCampaignChapters(campaign.id);
   const catalog = useSheetCatalog(lang);
+  // El buscador escribe en `query` al instante y la lista filtra con
+  // `listQuery`, que cambia dentro de la transición (como en el dashboard: un
+  // input controlado que esperara al cuadro siguiente perdería teclas).
   const [query, setQuery] = useState('');
+  const [listQuery, setListQuery] = useState('');
   const [picked, setPicked] = useState<string | null>(() => new URLSearchParams(window.location.search).get('capitulo'));
   const client = useQueryClient();
   const [editing, setEditing] = useState<DmNote | 'new' | null>(null);
@@ -74,7 +80,6 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
   const [moving, setMoving] = useState<Entry | null>(null);
   const [toast, setToast] = useState<{ key: number; tone: ToastTone; message: string } | null>(null);
   const notify = (tone: ToastTone, message: string) => setToast((prev) => ({ key: (prev?.key ?? 0) + 1, tone, message }));
-  const refresh = () => client.invalidateQueries({ queryKey: queryKeys.campaignNotebook(campaign.id) });
   // A quiénes enlaza una mención: los personajes de la mesa y los PNJ de la
   // campaña. Si no cargan, las menciones se leen como texto y el Cuaderno no
   // se cae por eso.
@@ -118,8 +123,8 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
   // Se abre en el capítulo en marcha; sin uno, en el primero.
   const initial = chapterList.find((c) => c.state === 'active') ?? chapterList[0];
   const current = picked ?? initial?.id ?? LOOSE;
-  const searching = query.trim() !== '';
-  const visible = (entries ?? []).filter((e) => matches(e, query));
+  const searching = listQuery.trim() !== '';
+  const visible = (entries ?? []).filter((e) => matches(e, listQuery));
   const currentChapter = chapterList.find((c) => c.id === current);
   const shown = inChapterOrder(
     visible.filter((e) => (e.chapterId ?? LOOSE) === current),
@@ -131,6 +136,46 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
   // vaciar, y va por fecha.
   const arrangeable = currentChapter !== undefined && !searching && shown.length > 1;
   const ids = arrangeable ? shown.map((e) => e.orderKey) : [];
+
+  // Cambiar de capítulo, buscar, guardar, borrar o mover anima la lista
+  // (`useListTransition`). Se le pasan las claves y no `shown`, que es otro
+  // arreglo en cada dibujo y soltaría la transición antes de tiempo. Arrastrar
+  // no pasa por acá: `useHoldDrag` ya anima lo suyo.
+  const animateList = useListTransition(shown.map((e) => e.key).join('\n'));
+  const search = (value: string) => {
+    setQuery(value);
+    animateList(() => setListQuery(value));
+  };
+  const pick = (id: string) => animateList(() => setPicked(id));
+  // La red queda afuera de la transición, que congela la pantalla: el
+  // Cuaderno se relee antes y la caché cambia adentro.
+  const notebookKey = queryKeys.campaignNotebook(campaign.id);
+  const reloadAnimated = async (alsoInside?: () => void) => {
+    await client.cancelQueries({ queryKey: notebookKey });
+    const fresh = await fetchCampaignNotebook(campaign.id, new AbortController().signal);
+    animateList(() => {
+      client.setQueryData(notebookKey, fresh);
+      alsoInside?.();
+    });
+  };
+
+  // Borrar una nota o mover una entrada se lleva su ⋮ (la entrada deja la
+  // vista): el foco va al título de la sección. Una nota guardada lo recibe
+  // ella, y la vista baja hasta donde quedó. Se mueve cuando la lista nueva
+  // se dibujó y el diálogo terminó de devolver el foco a su botón.
+  const [focusTarget, setFocusTarget] = useState<string | null>(null);
+  useEffect(() => {
+    if (!focusTarget) return;
+    const id = window.setTimeout(() => {
+      const el = document.querySelector<HTMLElement>(focusTarget);
+      if (!el) return;
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      el.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
+      el.focus({ preventScroll: true });
+      setFocusTarget(null);
+    }, 0);
+    return () => window.clearTimeout(id);
+  }, [focusTarget, entries]);
 
   const moveEntry = (from: string, to: string) => {
     if (!currentChapter) return;
@@ -194,7 +239,7 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
                   type="button"
                   aria-pressed={on}
                   data-chapter={p.id === LOOSE ? 'loose' : p.id}
-                  onClick={() => setPicked(p.id)}
+                  onClick={() => pick(p.id)}
                   className={cx(
                     'pick rounded-[var(--radius-pill)] border px-3.5 py-1.5 text-[13px]',
                     on ? 'border-gold bg-gold-soft text-gold' : 'border-hairline text-on-surface-variant hover:text-on-surface',
@@ -218,7 +263,7 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
               type="search"
               autoComplete="off"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => search(e.target.value)}
               placeholder={t.dmSearchNotebook}
               className="h-9 w-full rounded-[var(--radius-pill)] border border-hairline bg-plaque pr-8 pl-9 text-[13px] text-on-surface placeholder:text-text-muted"
             />
@@ -227,7 +272,7 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
                 <button
                   type="button"
                   aria-label={t.rosterClearSearch}
-                  onClick={() => setQuery('')}
+                  onClick={() => search('')}
                   className="absolute inset-y-0 right-1 flex w-7 items-center justify-center text-text-muted hover:text-on-surface"
                 >
                   <X size={14} aria-hidden="true" />
@@ -261,6 +306,8 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
               <li
                 key={e.key}
                 data-entry={e.kind}
+                data-entry-key={e.key}
+                data-vt-card
                 className={cx(
                   'card border-l-[3px] px-[18px] py-3.5',
                   ACCENT[e.kind].border,
@@ -272,12 +319,21 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
                   reorder.over === e.orderKey && !reorder.animated && 'outline-2 outline-offset-1 outline-gold',
                 )}
                 {...(arrangeable ? reorder.item(e.orderKey) : {})}
+                // Después del `item`, que trae su `style` para el arrastre. El
+                // nombre identifica la entrada en las transiciones de la lista.
+                style={{
+                  viewTransitionName: `nb-${e.key.replace(/[^\w-]/g, '_')}`,
+                  ...(arrangeable ? (reorder.item(e.orderKey).style as CSSProperties | undefined) : undefined),
+                }}
               >
                 <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
                   <span className={cx('text-[11.5px] font-medium', ACCENT[e.kind].text)}>
                     {e.kind === 'note' ? t.dmEntryNote : e.kind === 'fight' ? t.dmEntryFight : t.dmEntryLevelUp}
                   </span>
-                  <h2 className="font-display min-w-0 flex-1 text-[17px] break-words text-on-surface">{e.title}</h2>
+                  {/* `tabIndex`: el foco viene acá al guardar la nota. */}
+                  <h2 tabIndex={-1} className="font-display min-w-0 flex-1 text-[17px] break-words text-on-surface outline-none">
+                    {e.title}
+                  </h2>
                   {e.note && (
                     // Quién la ve: solo las notas llevan visibilidad; los
                     // combates y las subidas de nivel los escribe la app.
@@ -372,8 +428,8 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
   const submit = async (note: DmNote) => {
     if (editing === 'new') await createNote(campaign.id, note);
     else await saveNote(campaign.id, note);
-    await refresh();
-    setPicked(note.chapterId);
+    await reloadAnimated(() => setPicked(note.chapterId));
+    setFocusTarget(`[data-entry-key="${CSS.escape(`note-${note.id}`)}"] h2`);
   };
 
   return (
@@ -415,7 +471,8 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
           errorText={t.dmNoteDeleteError}
           onConfirm={async () => {
             await deleteNote(campaign.id, deleting.id);
-            await refresh();
+            await reloadAnimated();
+            setFocusTarget('[data-dm-title]');
           }}
           onClose={() => setDeleting(null)}
         />
@@ -428,7 +485,8 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
             await assignEntryChapter(campaign.id, moving.kind === 'fight' ? 'fight' : 'levelUp', moving.entryId, chapterId);
             // Llega al final del capítulo: no figura en su orden. Se queda en
             // «Sin capítulo» para seguir vaciando la bandeja.
-            await refresh();
+            await reloadAnimated();
+            setFocusTarget('[data-dm-title]');
           }}
           onClose={() => setMoving(null)}
         />
