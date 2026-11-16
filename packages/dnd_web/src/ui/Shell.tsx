@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode, type MouseEventHandler } f
 import * as Dialog from '@radix-ui/react-dialog';
 import { ArrowLeft, ExternalLink, Menu, Monitor, Moon, Sun, X, type LucideIcon } from 'lucide-react';
 import { useTexts } from '../i18n/context';
+import { fadeNavigate } from './fadeNavigate';
 import { Link, useRoute } from '../router';
 import { useTheme, type ThemeMode } from '../theme/theme';
 import { cx } from './cx';
@@ -156,7 +157,11 @@ export function NavItem({
   disabled = false,
   accent = false,
   onSelect,
+  fadeTo,
 }: {
+  /** Navega con el fundido de pantalla (`fadeNavigate`); es el selector del
+   *  título del destino, que recibe el foco. Solo con `internal`. */
+  fadeTo?: string;
   href?: string;
   icon: LucideIcon;
   label: string;
@@ -180,7 +185,7 @@ export function NavItem({
 }) {
   const t = useTexts();
   const className = cx(
-    'flex min-h-9 items-center gap-2.5 rounded-[var(--radius-nav)] px-3 py-2 text-[14px]',
+    'flex min-h-9 items-center gap-2.5 rounded-[var(--radius-nav)] px-3 py-2 text-[14px] transition-colors duration-[120ms] ease-out',
     active
       ? 'bg-gold-soft font-semibold text-gold'
       : accent
@@ -223,7 +228,12 @@ export function NavItem({
     );
   }
   return internal ? (
-    <Link href={href} aria-current={active ? 'page' : undefined} className={className}>
+    <Link
+      href={href}
+      aria-current={active ? 'page' : undefined}
+      className={className}
+      onClick={fadeTo ? (e) => fadeNavigate(e, fadeTo) : undefined}
+    >
       {body}
     </Link>
   ) : (

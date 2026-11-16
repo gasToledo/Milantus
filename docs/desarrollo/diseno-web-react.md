@@ -23,7 +23,7 @@ el código.
   del primer cuadro para que no destelle.
 - El breakpoint de marco es `shell:` (900 px). Todo lo demás se resuelve con
   grillas que se adaptan solas (`auto-fill`, `minmax`), no con más breakpoints.
-- La única sombra es el hover de la tarjeta de personaje (`.roster-card`).
+- La única sombra es el hover de la tarjeta de personaje (`.roster-card`: la del dashboard y la de la Mesa del Modo DM).
 
 ## Primitivas
 

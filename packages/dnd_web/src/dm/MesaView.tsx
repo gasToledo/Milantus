@@ -3,7 +3,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { UserPlus } from 'lucide-react';
 import { deleteCampaignLink, grantHeroicInspiration } from '../api/client';
 import { queryKeys, useCampaignChapters, useCampaignEncounter, useCampaignMembers, useSheetCatalog } from '../api/queries';
-import type { DmCampaign } from '../api/client';
+import type { CampaignMember, DmCampaign } from '../api/client';
+import { useListTransition } from '../ui/listTransition';
 import { movedOrder, toRosterEntry } from '../dashboard/roster';
 import { useLang, useTexts } from '../i18n/context';
 import { dmMemberHref } from '../router';
@@ -58,10 +59,18 @@ export function MesaView({ campaign }: { campaign: DmCampaign }) {
     }
   };
 
+  // Echar a alguien saca su tarjeta de la caché dentro de la transición (la
+  // red queda afuera: adentro la pantalla no se pinta) y después relee.
+  const membersKey = queryKeys.campaignMembers(campaign.id);
   const remove = async ({ memberId, name }: { memberId: string; name: string }) => {
     await deleteCampaignLink(memberId);
-    await client.invalidateQueries({ queryKey: queryKeys.campaignMembers(campaign.id) });
+    await client.cancelQueries({ queryKey: membersKey });
+    animateList(() => client.setQueryData<CampaignMember[]>(membersKey, (old) => old?.filter((m) => m.memberId !== memberId)));
+    void client.invalidateQueries({ queryKey: membersKey });
     notify('info', t.dmMemberLeft(name));
+    // El ⋮ que abrió el diálogo ya no existe y el diálogo le devolvería el
+    // foco: va al título, después de que el diálogo termine de cerrarse.
+    setTimeout(() => document.querySelector<HTMLElement>('[data-dm-title]')?.focus(), 0);
   };
 
   const memberOrder = campaign.memberOrder;
@@ -80,6 +89,8 @@ export function MesaView({ campaign }: { campaign: DmCampaign }) {
   }, [members.data, catalog.data, memberOrder]);
 
   const ids = useMemo(() => (entries ?? []).map((e) => e.memberId), [entries]);
+  // Sumar o echar a alguien se anima como la lista del dashboard.
+  const animateList = useListTransition(entries);
   // Guarda el orden nuevo: la caché cambia al instante y el documento se relee
   // antes de escribir (`editCampaign`) para no pisar las escenas de música.
   const moveMember = (from: string, to: string) => {
@@ -163,7 +174,10 @@ export function MesaView({ campaign }: { campaign: DmCampaign }) {
       {adding && (
         <AddMemberDialog
           campaign={campaign}
-          onAdded={(name) => notify('success', t.dmMemberAdded(name, campaign.name))}
+          onAdded={(name, fresh) => {
+            animateList(() => client.setQueryData(membersKey, fresh));
+            notify('success', t.dmMemberAdded(name, campaign.name));
+          }}
           onClose={() => setAdding(false)}
         />
       )}

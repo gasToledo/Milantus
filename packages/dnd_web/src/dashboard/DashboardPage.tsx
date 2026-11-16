@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { ArrowDownUp, ChevronDown, Download, Plus, Upload, X } from 'lucide-react';
 import { dropPending, flushCharacterWrites } from '../api/characterSave';
@@ -23,6 +23,7 @@ import {
   Tooltip,
 } from '../ui/primitives';
 import { useHoldDrag } from '../ui/holdDrag';
+import { useListTransition } from '../ui/listTransition';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { TutorialGate } from '../ui/tutorials';
 import { DeleteDialog } from './DeleteDialog';
@@ -98,31 +99,8 @@ export function DashboardPage() {
   );
 
   // Lo que cambia el orden o el contenido de la lista (orden, favorito,
-  // buscador, borrar) se anima con View Transitions: cada tarjeta se desliza a
-  // su lugar en vez de saltar. La lista nueva no se pinta al volver de
-  // `update`: react-query avisa del `setQueryData` en otra vuelta del bucle.
-  // Por eso la transición espera al commit de `visible`, con un tope para no
-  // dejar la pantalla congelada si la lista no llega a cambiar. Arrastrar no
-  // pasa por acá: `useHoldDrag` ya anima lo suyo.
-  const listCommitted = useRef<(() => void) | null>(null);
-  useLayoutEffect(() => {
-    listCommitted.current?.();
-    listCommitted.current = null;
-  }, [visible]);
-  const animateList = (update: () => unknown) => {
-    if (!document.startViewTransition) {
-      void update();
-      return;
-    }
-    document.startViewTransition(
-      () =>
-        new Promise<void>((resolve) => {
-          listCommitted.current = resolve;
-          window.setTimeout(resolve, 300);
-          void update();
-        }),
-    );
-  };
+  // buscador, borrar) se anima: cada tarjeta se desliza a su lugar.
+  const animateList = useListTransition(visible);
   const search = (value: string) => {
     setQuery(value);
     animateList(() => setListQuery(value));

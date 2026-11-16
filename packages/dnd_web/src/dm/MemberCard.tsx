@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { EllipsisVertical, Gift, Sparkles, UserMinus } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, Tooltip } from '../ui/primitives';
 import { HP_CRITICAL_RATIO, hpTone, Pill, StatPlaque, ThinBar } from '../ui/data';
@@ -74,8 +75,10 @@ export function MemberCard({
   const exhaustion = character.combat?.exhaustion ?? 0;
 
   return (
+    // `roster-card`: la misma tarjeta de personaje que el dashboard, con su
+    // hover, su presión, su foco y su animación de lista (`index.css`).
     <li
-      className={`card relative flex min-w-0 flex-col p-4 hover:border-gold ${
+      className={`roster-card card relative flex min-w-0 flex-col p-4 ${
         // Sostenerla no puede seleccionar el texto ni abrir el menú del teléfono.
         reorder ? 'select-none [-webkit-touch-callout:none]' : ''
       } ${
@@ -87,6 +90,10 @@ export function MemberCard({
       } ${reorder?.over && !reorder.animated ? 'outline-2 outline-offset-1 outline-gold' : ''}`}
       data-member={character.id}
       {...reorder?.item}
+      // Después del `item`, que trae su `style` para el arrastre. El nombre
+      // identifica la tarjeta en las transiciones de la Mesa: único y un
+      // identificador CSS válido.
+      style={{ viewTransitionName: `mc-${character.id.replace(/[^\w-]/g, '_')}`, ...(reorder?.item.style as CSSProperties | undefined) }}
     >
       <div className="flex items-center gap-3">
         <Medallion name={character.name} accent={entry.accent} size={54} muted={fallen} portrait={portrait} />

@@ -15,8 +15,10 @@ import { navigate } from '../router';
  */
 export function fadeNavigate(e: MouseEvent<HTMLAnchorElement>, target: string) {
   if (!document.startViewTransition || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-  e.preventDefault();
   const href = e.currentTarget.getAttribute('href')!;
+  // El ítem activo del panel lleva adonde ya se está: no hay nada que fundir.
+  if (href === window.location.pathname + window.location.search + window.location.hash) return;
+  e.preventDefault();
   // Le devuelve el nombre a la raíz (`.page-fade` en `index.css`) y se lo saca
   // a las tarjetas del dashboard, que si no se animarían aparte.
   document.documentElement.classList.add('page-fade');
@@ -25,8 +27,13 @@ export function fadeNavigate(e: MouseEvent<HTMLAnchorElement>, target: string) {
       new Promise<void>((resolve) => {
         // El destino sale de la caché y se dibuja enseguida, pero no en esta
         // misma vuelta: se espera a su título, con un tope para no dejar la
-        // pantalla congelada si tarda.
-        const ready = () => document.querySelector(target) !== null;
+        // pantalla congelada si tarda. Entre secciones del Modo DM el título
+        // de antes tiene la misma marca: vale uno que no sea ese.
+        const before = document.querySelector(target);
+        const ready = () => {
+          const now = document.querySelector(target);
+          return now !== null && now !== before;
+        };
         const observer = new MutationObserver(() => ready() && done());
         const timer = window.setTimeout(() => done(), 300);
         const done = () => {

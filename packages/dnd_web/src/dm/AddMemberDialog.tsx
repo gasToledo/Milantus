@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { addCampaignMember, ApiError, type DmCampaign } from '../api/client';
+import { addCampaignMember, ApiError, fetchCampaignMembers, type CampaignMember, type DmCampaign } from '../api/client';
 import { queryKeys } from '../api/queries';
 import { useTexts } from '../i18n/context';
 import { AppDialog } from '../ui/AppDialog';
@@ -10,7 +10,9 @@ import { AppDialog } from '../ui/AppDialog';
  * como se escribió: el servidor lo normaliza. Un código que no sirve (404) deja
  * el campo como estaba, para corregirlo, y el botón sigue diciendo «Sumar»; cualquier
  * otro error es de la red o del servidor y pasa a «Reintentar». [onAdded]
- * recibe el nombre del personaje para avisar en la pantalla de atrás.
+ * recibe el nombre del personaje para avisar en la pantalla de atrás, y la
+ * Mesa ya releída: la pantalla la pone en la caché dentro de su transición
+ * (`useListTransition`), que no puede esperar a la red.
  */
 export function AddMemberDialog({
   campaign,
@@ -18,7 +20,7 @@ export function AddMemberDialog({
   onClose,
 }: {
   campaign: DmCampaign;
-  onAdded: (characterName: string) => void;
+  onAdded: (characterName: string, members: CampaignMember[]) => void;
   onClose: () => void;
 }) {
   const t = useTexts();
@@ -34,8 +36,11 @@ export function AddMemberDialog({
     setError(null);
     try {
       const member = await addCampaignMember(campaign.id, code.trim());
-      await client.invalidateQueries({ queryKey: queryKeys.campaignMembers(campaign.id) });
-      onAdded(String(member.character?.name ?? t.evtSomeCharacter));
+      // Un pedido en vuelo de la Mesa (la relectura del combate) traería la
+      // lista de antes encima de la nueva.
+      await client.cancelQueries({ queryKey: queryKeys.campaignMembers(campaign.id) });
+      const members = await fetchCampaignMembers(campaign.id, new AbortController().signal);
+      onAdded(String(member.character?.name ?? t.evtSomeCharacter), members);
       onClose();
     } catch (e) {
       setError(e instanceof ApiError && e.status === 404 ? 'invalid' : 'failed');
