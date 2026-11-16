@@ -222,7 +222,7 @@ function Round({ entry, catalog }: { entry: RosterEntry | null; catalog: Catalog
           <TopicIcon size={13} aria-hidden="true" />
           {t.quizTopic[question.topic]}
         </span>
-        <p className="font-display text-[21px] leading-[1.35] text-on-surface">{askOf(t, question, catalog, multiclassOf(entry))}</p>
+        <p className="font-display text-[21px] leading-[1.35] text-on-surface">{askOf(t, question, catalog)}</p>
         <Quote question={question} />
         <div className="flex flex-col gap-2">
           {question.options.map((label, i) => (
@@ -367,8 +367,6 @@ function Dots({ results }: { results: Outcome[] }) {
   );
 }
 
-const multiclassOf = (entry: RosterEntry | null): boolean => (entry?.classes.length ?? 0) > 1;
-
 /** El nombre de la clase que el motor manda en `subjectId`. */
 function classNameOf(catalog: Catalog, id: string | null): string {
   if (!id) return '';
@@ -377,7 +375,7 @@ function classNameOf(catalog: Catalog, id: string | null): string {
 }
 
 /** El enunciado según el tipo; `s` es el nombre de lo que se pregunta. */
-function askOf(t: Texts, q: QuizQuestion, catalog: Catalog, multiclass: boolean): string {
+function askOf(t: Texts, q: QuizQuestion, catalog: Catalog): string {
   const s = q.subject ?? '';
   switch (q.kind) {
     case 'classFeatureLevel': {
@@ -404,31 +402,29 @@ function askOf(t: Texts, q: QuizQuestion, catalog: Catalog, multiclass: boolean)
           return row.extraSkills(klass, s, p.n);
       }
     }
+    // Todo sujeto va nombrado: «tu trasfondo» o «tu especie» solo se
+    // contesta mirando la ficha, y la pregunta es de la regla, no de qué
+    // eligió el personaje (docs/desarrollo/quiz.md, regla 2).
     case 'classFeatureByText':
-      return multiclass && s ? t.quizAsk.classFeatureByTextOf(s) : t.quizAsk.classFeatureByText;
     case 'hitDie':
-      return t.quizAsk.hitDie(s);
     case 'savingThrows':
-      return t.quizAsk.savingThrows(s);
+    case 'armorTraining':
+    case 'classSkillChoice':
+    case 'speciesTraitByText':
     case 'spellCastingTime':
-      return t.quizAsk.spellCastingTime(s);
     case 'spellRange':
-      return t.quizAsk.spellRange(s);
     case 'spellMoveDistance':
-      return t.quizAsk.spellMoveDistance(s);
     case 'spellSchool':
-      return t.quizAsk.spellSchool(s);
     case 'skillAbility':
     case 'weaponMastery':
     case 'weaponDamage':
     case 'armorAc':
     case 'armorCategory':
-    // El trasfondo va nombrado: «tu trasfondo» solo se contesta mirando la
-    // ficha, y la pregunta es del trasfondo, no de qué eligió el personaje.
     case 'backgroundSkills':
     case 'backgroundFeat':
+    case 'backgroundAbilities':
+    case 'backgroundTool':
       return t.quizAsk[q.kind](s);
-    case 'speciesTraitByText':
     case 'condition':
     case 'masteryByText':
     case 'propertyByText':
@@ -594,7 +590,7 @@ function Result({
                     <Icon size={13} />
                   </span>
                   <span className="flex min-w-0 flex-col gap-1">
-                    <span className="text-[14px] text-on-surface">{askOf(t, q, catalog, multiclassOf(entry))}</span>
+                    <span className="text-[14px] text-on-surface">{askOf(t, q, catalog)}</span>
                     {pick !== undefined && (
                       <span className="flex items-center gap-1.5 text-[13px] text-crimson">
                         <X size={14} strokeWidth={2.4} aria-label={t.quizYourAnswer} />

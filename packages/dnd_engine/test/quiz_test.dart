@@ -139,6 +139,40 @@ void main() {
       case QuizKind.backgroundFeat:
         final b = fuente.background(q.subjectId!)!;
         expect(correcta, fuente.feat(b.originFeatId!)!.name);
+      case QuizKind.backgroundAbilities:
+        final b = fuente.background(q.subjectId!)!;
+        for (final a in b.abilityOptions) {
+          expect(correcta, contains(a.label));
+        }
+      case QuizKind.backgroundTool:
+        final b = fuente.background(q.subjectId!)!;
+        expect(correcta, toolProficiencyLabel(b.toolProficiencies.single));
+      case QuizKind.armorTraining:
+        final k = fuente.characterClass(q.subjectId!)!;
+        const palabras = {
+          'light': ['ligera', 'light'],
+          'medium': ['media', 'medium'],
+          'heavy': ['pesada', 'heavy'],
+          'shield': ['escudos', 'shields'],
+        };
+        final texto = correcta.toLowerCase();
+        for (final MapEntry(:key, :value) in palabras.entries) {
+          expect(
+            value.any(texto.contains),
+            k.armorProficiencies.contains(key),
+            reason: '${k.id} $correcta',
+          );
+        }
+        if (k.armorProficiencies.isEmpty) {
+          expect(correcta, anyOf('Ninguna', 'None'));
+        }
+      case QuizKind.classSkillChoice:
+        final k = fuente.characterClass(q.subjectId!)!;
+        final propias = [
+          for (final o in q.options)
+            if (k.skillChoiceFrom.any((s) => Skill.labelFor(s) == o)) o,
+        ];
+        expect(propias, [correcta], reason: k.id);
       case QuizKind.classFeatureLevel:
         final cls = fuente.characterClass(q.subjectId!)!;
         expect(q.subject, isNot(contains('(')));
@@ -265,6 +299,21 @@ void main() {
                     : '${q.kind.name}:${q.subjectId}',
     ];
     expect(temas.toSet(), hasLength(temas.length));
+    // Los números se muestran de menor a mayor.
+    for (final q in ronda) {
+      if (!const {
+        QuizKind.classFeatureLevel,
+        QuizKind.hitDie,
+        QuizKind.armorAc,
+      }.contains(q.kind)) {
+        continue;
+      }
+      final primeros = [
+        for (final o in q.options)
+          int.parse(RegExp(r'\d+').firstMatch(o)!.group(0)!),
+      ];
+      expect(primeros, [...primeros]..sort(), reason: q.options.join(' | '));
+    }
     final respuestas = [
       for (final q in ronda) '${q.kind.name}:${q.optionIds[q.answer]}',
     ];

@@ -150,10 +150,13 @@ discrepa con el libro, se corrige el catálogo, no el Quiz.
 
 ## Pendientes
 
-- `classFeatureByText` y `speciesTraitByText` todavía dicen «tu clase» y «tu
-  especie» (`quizAsk` en `packages/dnd_web/src/i18n/texts.ts`). No cumplen la
-  regla 2.
-- `_choose` en `quiz.dart` baraja todas las opciones, también las numéricas.
-  No cumple la regla 3 (los números de menor a mayor).
-- Un pícaro de nivel 3 y un guerrero de nivel 1 generan 27 preguntas
-  distintas, lejos de las 50 de la regla 4.
+- Un pícaro de nivel 3 genera 45 preguntas distintas y un guerrero de nivel 1,
+  41: todavía no llegan a las 50 de la regla 4. Se cuenta como pregunta
+  distinta cada par sujeto–respuesta, con 30 semillas y `count: 400`.
+- Las competencias con armas no se preguntan: las del monje en
+  `classes.json` (espada corta, cimitarra, ballesta de mano) no coinciden con
+  la regla de 2024 (marciales con la propiedad Ligera).
+- Las duraciones de los conjuros con concentración están escritas de dos
+  formas en `spells.json` («Hasta 1 minuto» en Inmovilizar Persona, «10
+  minutos» en Oscuridad). Una pregunta de duración delataría la
+  concentración.

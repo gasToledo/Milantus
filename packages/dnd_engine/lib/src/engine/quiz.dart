@@ -22,9 +22,13 @@ enum QuizKind {
   classFeatureLevel(QuizTopic.classTopic),
   hitDie(QuizTopic.classTopic),
   savingThrows(QuizTopic.classTopic),
+  armorTraining(QuizTopic.classTopic),
+  classSkillChoice(QuizTopic.classTopic),
   speciesTraitByText(QuizTopic.species),
   backgroundSkills(QuizTopic.background),
   backgroundFeat(QuizTopic.background),
+  backgroundAbilities(QuizTopic.background),
+  backgroundTool(QuizTopic.background),
   spellCastingTime(QuizTopic.spells),
   spellRange(QuizTopic.spells),
   spellMoveDistance(QuizTopic.spells),
@@ -303,6 +307,7 @@ const _easy = {QuizKind.skillAbility, QuizKind.hitDie, QuizKind.savingThrows};
   Random rng, {
   int count = 4,
   bool Function(String id)? allow,
+  bool numeric = false,
 }) {
   final labels = <String, String>{};
   for (final c in pool) {
@@ -320,11 +325,29 @@ const _easy = {QuizKind.skillAbility, QuizKind.hitDie, QuizKind.savingThrows};
   ]..shuffle(rng);
   if (ids.length < count - 1) return null;
   final picked = [correctId, ...ids.take(count - 1)]..shuffle(rng);
+  // Niveles, CA, dados y distancias se leen de menor a mayor: buscar el valor
+  // no tiene que costar más que saberlo. Se ordena por id, no por rótulo, así
+  // la correcta queda en el mismo lugar en los dos idiomas.
+  if (numeric && picked.every((id) => _digits.hasMatch(id))) {
+    picked.sort(_byNumbers);
+  }
   return (
     [for (final id in picked) labels[id]!],
     picked,
     picked.indexOf(correctId),
   );
+}
+
+final _digits = RegExp(r'\d+');
+
+/// «dex:12:max:2» antes que «flat:16», «1d6|piercing» antes que «1d8|…».
+int _byNumbers(String a, String b) {
+  final x = [for (final m in _digits.allMatches(a)) int.parse(m.group(0)!)];
+  final y = [for (final m in _digits.allMatches(b)) int.parse(m.group(0)!)];
+  for (var i = 0; i < min(x.length, y.length); i++) {
+    if (x[i] != y[i]) return x[i].compareTo(y[i]);
+  }
+  return x.length != y.length ? x.length.compareTo(y.length) : a.compareTo(b);
 }
 
 QuizQuestion? _question(
@@ -335,13 +358,21 @@ QuizQuestion? _question(
   Random rng, {
   int count = 4,
   bool Function(String id)? allow,
+  bool numeric = false,
   String? subject,
   String? subjectId,
   int? level,
   String? quote,
   QuizProgress? progress,
 }) {
-  final o = _choose(correctId, pool, rng, count: count, allow: allow);
+  final o = _choose(
+    correctId,
+    pool,
+    rng,
+    count: count,
+    allow: allow,
+    numeric: numeric,
+  );
   if (o == null) return null;
   return QuizQuestion(
     kind: kind,
@@ -361,8 +392,47 @@ QuizQuestion? _question(
 /// [Skill.values] para las habilidades). Ordenar alfabético cambia con el
 /// idioma: «Constitución y Fuerza» en español y «Constitution and Strength»
 /// no son el mismo par escrito al revés, y además no es como las lista el
-/// libro.
-String _join(List<String> labels) => labels.join(localized(' y ', ' and '));
+/// libro. Con tres, «Fuerza, Destreza y Constitución»; ante «i» o «hi» la
+/// conjunción es «e» («Destreza e Inteligencia», «Arcanos e Historia»).
+String _join(List<String> labels) {
+  if (labels.length < 2) return labels.join();
+  final last = labels.last;
+  final lower = last.toLowerCase();
+  final e = (lower.startsWith('i') || lower.startsWith('hi')) &&
+      !lower.startsWith('hie') &&
+      !lower.startsWith('hia');
+  final and = localized(e ? ' e ' : ' y ', ' and ');
+  return '${labels.sublist(0, labels.length - 1).join(', ')}$and$last';
+}
+
+/// Entrenamiento con armadura de una clase: `light+medium+shield`, o `none`.
+/// El rótulo es corto («Ligera, media y escudos») porque el enunciado ya dice
+/// «armaduras»; los de la ficha («Armadura ligera») se repetirían tres veces.
+const _armorTrainingOrder = ['light', 'medium', 'heavy', 'shield'];
+
+String _armorTrainingId(List<String> categories) {
+  final ids = [
+    for (final c in _armorTrainingOrder)
+      if (categories.contains(c)) c,
+  ];
+  return ids.isEmpty ? 'none' : ids.join('+');
+}
+
+String _armorTrainingLabel(String id) {
+  if (id == 'none') return localized('Ninguna', 'None');
+  final words = [
+    for (final c in id.split('+'))
+      switch (c) {
+        'light' => localized('ligera', 'light'),
+        'medium' => localized('media', 'medium'),
+        'heavy' => localized('pesada', 'heavy'),
+        'shield' => localized('escudos', 'shields'),
+        _ => c,
+      },
+  ];
+  final text = _join(words);
+  return text[0].toUpperCase() + text.substring(1);
+}
 
 final _parens = RegExp(r'\s*\(([^)]*)\)');
 
@@ -631,6 +701,7 @@ void _generalPools(
         _Candidate(
           'weapon:${w.id}',
           (rng) => _question(
+            numeric: true,
             QuizKind.weaponDamage,
             'weapon:${w.id}',
             correct,
@@ -667,6 +738,7 @@ void _generalPools(
       _Candidate(
         'armor:${a.id}',
         (rng) => _question(
+          numeric: true,
           QuizKind.armorAc,
           'armor:${a.id}',
           _acId(a),
@@ -864,6 +936,7 @@ void _classFeatures(
         // La misma clave que `classFeatureByText`: es el mismo rasgo.
         'feature:${cls.id}:c$i',
         (rng) => _question(
+          numeric: true,
           QuizKind.classFeatureLevel,
           'feature:${cls.id}:c$i',
           '${f.level}',
@@ -897,6 +970,7 @@ void _classBasics(
     _Candidate(
       'hitDie:${cls.id}',
       (rng) => _question(
+        numeric: true,
         QuizKind.hitDie,
         'hitDie:${cls.id}',
         'd${cls.hitDie}',
@@ -909,6 +983,56 @@ void _classBasics(
       ),
     ),
   );
+
+  // Cinco combinaciones en todo el catálogo: alcanzan para cuatro opciones.
+  final armorChoices = <_Choice>[];
+  final seenArmor = <String>{};
+  for (final k in _byId(repo.classes.values, (k) => k.id)) {
+    final id = _armorTrainingId(k.armorProficiencies);
+    if (seenArmor.add(id)) {
+      armorChoices.add(_Choice(id, _armorTrainingLabel(id)));
+    }
+  }
+  pool(QuizKind.armorTraining).add(
+    _Candidate(
+      'armorTraining:${cls.id}',
+      (rng) => _question(
+        QuizKind.armorTraining,
+        'armorTraining:${cls.id}',
+        _armorTrainingId(cls.armorProficiencies),
+        armorChoices,
+        rng,
+        subject: cls.name,
+        subjectId: cls.id,
+      ),
+    ),
+  );
+
+  // Al revés: una habilidad de su lista contra tres de afuera. Un candidato
+  // por habilidad, todos con la misma clave: sale una por ronda, pero cada
+  // ronda puede preguntar por otra. El bardo elige entre todas y no entra.
+  final from = cls.skillChoiceFrom.toSet();
+  if (from.isNotEmpty && from.length < Skill.values.length - 2) {
+    final skills = [for (final s in Skill.values) _Choice(s.id, s.label)];
+    for (final s in Skill.values) {
+      if (!from.contains(s.id)) continue;
+      pool(QuizKind.classSkillChoice).add(
+        _Candidate(
+          'classSkills:${cls.id}',
+          (rng) => _question(
+            QuizKind.classSkillChoice,
+            'classSkills:${cls.id}',
+            s.id,
+            skills,
+            rng,
+            allow: (id) => id == s.id || !from.contains(id),
+            subject: cls.name,
+            subjectId: cls.id,
+          ),
+        ),
+      );
+    }
+  }
 
   String? saveId(CharacterClass k) {
     final ids = [
@@ -1097,7 +1221,82 @@ void _background(
       ),
     );
   }
+
+  String? abilitiesId(Background b) => b.abilityOptions.length != 3
+      ? null
+      : [
+          for (final a in Ability.values)
+            if (b.abilityOptions.contains(a)) a.name,
+        ].join('+');
+  final abilities = abilitiesId(bg);
+  if (abilities != null) {
+    final trios = <_Choice>[];
+    final seen = <String>{};
+    for (final b in _byId(repo.backgrounds.values, (b) => b.id)) {
+      final id = abilitiesId(b);
+      if (id != null && seen.add(id)) {
+        trios.add(_Choice(id, _pairLabel(id, _abilityLabel)));
+      }
+    }
+    final mine = abilities.split('+').toSet();
+    pool(QuizKind.backgroundAbilities).add(
+      _Candidate('bgAbilities:${bg.id}', (rng) {
+        QuizQuestion? ask(bool Function(String id)? allow) => _question(
+              QuizKind.backgroundAbilities,
+              'bgAbilities:${bg.id}',
+              abilities,
+              trios,
+              rng,
+              allow: allow,
+              subject: bg.name,
+              subjectId: bg.id,
+            );
+        // Distractores que comparten dos de las tres: uno al azar se descarta
+        // sabiendo una sola característica.
+        return ask(
+              (id) => id.split('+').where(mine.contains).length >= 2,
+            ) ??
+            ask(null);
+      }),
+    );
+  }
+
+  // `gaming-set`, `musical-instrument` y `artisans-tools` son «uno a tu
+  // elección», no una herramienta: «Juego» como respuesta no enseña nada, y
+  // como distractor sería la única opción genérica.
+  const generic = {'gaming-set', 'musical-instrument', 'artisans-tools'};
+  String? toolOf(Background b) => b.toolProficiencies.length == 1 &&
+          !generic.contains(b.toolProficiencies.first)
+      ? b.toolProficiencies.first
+      : null;
+  final tool = toolOf(bg);
+  if (tool != null) {
+    final tools = <_Choice>[];
+    final seen = <String>{};
+    for (final b in _byId(repo.backgrounds.values, (b) => b.id)) {
+      final id = toolOf(b);
+      if (id != null && seen.add(id)) {
+        tools.add(_Choice(id, toolProficiencyLabel(id)));
+      }
+    }
+    pool(QuizKind.backgroundTool).add(
+      _Candidate(
+        'bgTool:${bg.id}',
+        (rng) => _question(
+          QuizKind.backgroundTool,
+          'bgTool:${bg.id}',
+          tool,
+          tools,
+          rng,
+          subject: bg.name,
+          subjectId: bg.id,
+        ),
+      ),
+    );
+  }
 }
+
+String _abilityLabel(String name) => Ability.values.byName(name).label;
 
 void _spells(
   Character c,
@@ -1180,6 +1379,7 @@ void _spells(
     String label,
     List<_Choice> choices, {
     bool Function(String id)? allow,
+    bool numeric = false,
   }) {
     if (raw.isEmpty || raw.length > _maxOptionLength) return;
     if (!choices.any((c) => c.id == raw)) return;
@@ -1193,6 +1393,7 @@ void _spells(
           choices,
           rng,
           allow: allow,
+          numeric: numeric,
           subject: s.name,
           subjectId: s.id,
         ),
@@ -1234,6 +1435,7 @@ void _spells(
         range(s),
         ranges,
         allow: (other) => !selfAmbiguous(s.range, other),
+        numeric: true,
       );
     }
     final feet = s.moveFeet;
@@ -1245,6 +1447,7 @@ void _spells(
         raw,
         vocabularyLabel(VocabularyField.range, raw),
         moves,
+        numeric: true,
       );
     }
     add(QuizKind.spellSchool, s, s.school, school(s), schools);
@@ -1333,6 +1536,14 @@ QuizQuestion _localize(QuizQuestion q, ContentRepository repo) {
         return _pairLabel(id, (name) => Skill.values.byName(name).label);
       case QuizKind.backgroundFeat:
         return repo.feat(id)?.name ?? id;
+      case QuizKind.armorTraining:
+        return _armorTrainingLabel(id);
+      case QuizKind.classSkillChoice:
+        return Skill.labelFor(id);
+      case QuizKind.backgroundAbilities:
+        return _pairLabel(id, _abilityLabel);
+      case QuizKind.backgroundTool:
+        return toolProficiencyLabel(id);
       case QuizKind.spellCastingTime:
         return vocabularyLabel(VocabularyField.castingTime, id);
       case QuizKind.spellRange:
@@ -1385,7 +1596,12 @@ QuizQuestion _localize(QuizQuestion q, ContentRepository repo) {
           quote;
     case QuizKind.backgroundSkills:
     case QuizKind.backgroundFeat:
+    case QuizKind.backgroundAbilities:
+    case QuizKind.backgroundTool:
       subject = repo.background(q.subjectId ?? '')?.name ?? subject;
+    case QuizKind.armorTraining:
+    case QuizKind.classSkillChoice:
+      subject = repo.characterClass(q.subjectId ?? '')?.name ?? subject;
     case QuizKind.spellCastingTime:
     case QuizKind.spellRange:
     case QuizKind.spellMoveDistance:
