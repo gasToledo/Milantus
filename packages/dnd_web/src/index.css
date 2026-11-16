@@ -278,28 +278,31 @@ body {
   outline: none;
 }
 
-/* Cuando la lista cambia (orden, favorito, buscador, borrar) cada tarjeta se
-   desliza a su lugar; la que entra aparece y la que se va se desvanece. Solo
-   se animan las tarjetas: la raíz no lleva nombre, así que el resto de la
-   pantalla cambia de una y sigue respondiendo. */
+/* Cuando una lista de tarjetas cambia (`useListTransition`: el dashboard, la
+   Mesa, los capítulos) cada tarjeta se desliza a su lugar; la que entra
+   aparece y la que se va se desvanece. Son las tarjetas de personaje
+   (`.roster-card`) y las que llevan `data-vt-card`. Solo se animan ellas: la
+   raíz no lleva nombre, así que el resto de la pantalla cambia de una y sigue
+   respondiendo. */
 :root {
   view-transition-name: none;
 }
 ::view-transition {
   pointer-events: none;
 }
-.roster-card {
-  view-transition-class: roster-card;
+.roster-card,
+[data-vt-card] {
+  view-transition-class: list-card;
 }
-::view-transition-group(.roster-card) {
+::view-transition-group(.list-card) {
   animation-duration: 220ms;
   animation-timing-function: ease-in-out;
 }
-::view-transition-new(.roster-card):only-child {
-  animation: roster-card-in 180ms ease-out both;
+::view-transition-new(.list-card):only-child {
+  animation: list-card-in 180ms ease-out both;
 }
-::view-transition-old(.roster-card):only-child {
-  animation: roster-card-out 150ms ease-in both;
+::view-transition-old(.list-card):only-child {
+  animation: list-card-out 150ms ease-in both;
 }
 /* Entre el dashboard y la ficha (`fadeNavigate`) la pantalla entera se funde:
    la raíz recupera su nombre y las tarjetas lo pierden, para no aparecer ni
@@ -307,20 +310,21 @@ body {
 :root.page-fade {
   view-transition-name: root;
 }
-.page-fade .roster-card {
+.page-fade .roster-card,
+.page-fade [data-vt-card] {
   view-transition-name: none !important;
 }
 .page-fade::view-transition-old(root),
 .page-fade::view-transition-new(root) {
   animation-duration: 150ms;
 }
-@keyframes roster-card-in {
+@keyframes list-card-in {
   from {
     opacity: 0;
     scale: 0.96;
   }
 }
-@keyframes roster-card-out {
+@keyframes list-card-out {
   to {
     opacity: 0;
     scale: 0.96;
