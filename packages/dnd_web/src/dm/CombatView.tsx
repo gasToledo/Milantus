@@ -32,6 +32,7 @@ import { Eyebrow } from '../ui/data';
 import { MarkdownText } from '../ui/MarkdownText';
 import { Toast, Tooltip, type ToastTone } from '../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
+import { useListTransition } from '../ui/listTransition';
 import { AddCombatantDialog } from './combat/AddCombatantDialog';
 import { ConvertNpcDialog } from './combat/ConvertNpcDialog';
 import { tagLabel } from './combat/conditions';
@@ -54,6 +55,9 @@ import { npcTypeLine } from './npcs/npc';
  *  planilla; debajo, la cabecera no se dibuja y cada fila se parte (`ROW`). */
 // La última columna es de 208 px y no de los 186 de la lámina: con el botón de
 // efectos (44 × 44 como pide el brief) «Abrir ficha» + efectos + ✕ no entran en 186.
+/** Las acciones que cambian el orden de la planilla: se animan (`act`). */
+const REORDERS = new Set<EncounterAction['type']>(['start', 'addPlayer', 'addMonsters', 'addNpc', 'remove', 'setInitiative']);
+
 const LEDGER = 'grid grid-cols-[46px_minmax(0,1fr)_132px_64px_150px_208px] gap-x-3';
 /** La fila: la grilla de [LEDGER] desde 760 px, y debajo la de la lámina
  *  «Teléfono» (tres columnas, con los PG, los efectos y las acciones en líneas
@@ -186,6 +190,46 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
     return { view, rows, past, cat, pending, details, levels };
   }, [encounter.data, members.data, npcs.data, notebook.data, catalog.data, t]);
 
+  // Lo que cambia el orden de la planilla (empezar, sumar, sacar, corregir una
+  // iniciativa) se anima como las otras listas. `writer.act` escribe la caché
+  // al instante, así que entra entero en la transición. Lo demás (daño,
+  // efectos, el turno) no reordena y va directo.
+  const animateList = useListTransition(data?.rows.map((r) => r.c.id).join('\n') ?? '');
+  const act = useCallback(
+    (a: EncounterAction) => {
+      if (REORDERS.has(a.type)) animateList(() => writer.act(a));
+      else writer.act(a);
+    },
+    [animateList, writer],
+  );
+
+  // Sacar a alguien se lleva su ✕, y descartar o terminar el combate se lleva
+  // la planilla entera: el foco caería al documento. Va al ✕ de la fila que
+  // quedó en su lugar, a «Agregar al combate» si no queda nadie, o al título.
+  // Se mueve cuando la planilla nueva se dibujó y el diálogo terminó de
+  // devolver el foco a su botón.
+  const [focusTarget, setFocusTarget] = useState<string | null>(null);
+  useEffect(() => {
+    if (!focusTarget) return;
+    const id = window.setTimeout(() => {
+      const el = document.querySelector<HTMLElement>(focusTarget);
+      if (!el) return;
+      el.focus();
+      setFocusTarget(null);
+    }, 0);
+    return () => window.clearTimeout(id);
+  }, [focusTarget, data]);
+  const removeCombatant = (row: Row) => {
+    const rows = data?.rows ?? [];
+    const at = rows.findIndex((r) => r.c.id === row.c.id);
+    const neighbor = rows[at + 1] ?? rows[at - 1];
+    act({ type: 'remove', combatantId: row.c.id });
+    setFocusTarget(
+      neighbor ? `[data-combatant="${CSS.escape(neighbor.c.id)}"] [data-action="remove-combatant"]` : '[data-action="add-combatant"]',
+    );
+  };
+  const focusTitle = () => setFocusTarget('[data-dm-title]');
+
   const failed = [encounter, members, npcs, notebook, ...catalog.queries].filter((q) => q.isError);
   const effectsRow = effectsId ? data?.rows.find((r) => r.c.id === effectsId) : undefined;
   const kicker = data?.view ? (data.view.preparing ? t.encPreparing : `${t.encRunning} · ${campaign.name}`) : campaign.name;
@@ -204,14 +248,14 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
             kind="empty"
             message={t.encNone}
             actions={
-              <Button icon={Flame} data-action="setup-combat" onClick={() => writer.act({ type: 'open' })}>
+              <Button icon={Flame} data-action="setup-combat" onClick={() => act({ type: 'open' })}>
                 {t.dmSetUpCombat}
               </Button>
             }
           />
         ) : (
           <>
-            <ControlBar view={view} onAdd={() => setDialog('add')} onDiscard={() => setDialog('discard')} onFinish={() => setDialog('finish')} onNext={() => writer.act({ type: 'next' })} />
+            <ControlBar view={view} onAdd={() => setDialog('add')} onDiscard={() => setDialog('discard')} onFinish={() => setDialog('finish')} onNext={() => act({ type: 'next' })} />
             {view.preparing && showDifficulty && rows.length > 0 && details && <DifficultyBand difficulty={details.difficulty} />}
             {!view.preparing && <SideWipedBanner standing={view.standing} onFinish={() => setDialog('finish')} />}
             {rows.length === 0 ? (
@@ -227,13 +271,14 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
                   rowExtras={(r) =>
                     rowParts(r, {
                       campaignId: campaign.id,
-                      act: writer.act,
+                      act: act,
                       t,
                       running: !view.preparing,
                       amount: Number(amount) || 0,
                       readAmount: () => Number(amountRef.current) || 0,
                       onFix: (row) => setFix({ id: row.c.id, name: row.c.name, initiative: row.c.initiative }),
                       onEffects: (row) => setEffectsId(row.c.id),
+                      onRemove: removeCombatant,
                       onConvert: (row) => {
                         if (!row.c.creatureId) return;
                         setConversion({ encounterId: view.encounter.id, combatantId: row.c.id, creatureId: row.c.creatureId, name: row.c.name });
@@ -241,7 +286,7 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
                     })
                   }
                 />
-                {!view.preparing && <TurnPanel row={rows.find((r) => r.c.id === view.currentId)} rows={rows} catalog={cat} campaignId={campaign.id} act={writer.act} />}
+                {!view.preparing && <TurnPanel row={rows.find((r) => r.c.id === view.currentId)} rows={rows} catalog={cat} campaignId={campaign.id} act={act} />}
               </div>
             )}
             {pending.length > 0 && (
@@ -252,7 +297,7 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
                     <button
                       type="button"
                       className="min-h-9 px-1.5 text-[13px] text-gold"
-                      onClick={() => pending.forEach((m) => writer.act({ type: 'addPlayer', memberId: m.memberId, name: String(m.character.name), initiative: 0 }))}
+                      onClick={() => pending.forEach((m) => act({ type: 'addPlayer', memberId: m.memberId, name: String(m.character.name), initiative: 0 }))}
                     >
                       {t.encAddAll}
                     </button>
@@ -267,7 +312,7 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
                       // En curso entra con lo que tiró en la mesa: se pregunta.
                       onClick={() =>
                         view.preparing
-                          ? writer.act({ type: 'addPlayer', memberId: m.memberId, name: String(m.character.name), initiative: 0 })
+                          ? act({ type: 'addPlayer', memberId: m.memberId, name: String(m.character.name), initiative: 0 })
                           : setLate({ memberId: m.memberId, name: String(m.character.name) })
                       }
                     >
@@ -331,7 +376,7 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
           playerModifiers={Object.fromEntries(data.rows.flatMap((r) => (r.c.kind === 'player' && r.member?.sheet ? [[r.c.id, r.member.sheet.initiative] as const] : [])))}
           chapterWarning={chapterWarning}
           chaptersHref={dmCampaignHref(campaign.id, 'capitulos')}
-          onStart={(initiatives) => writer.act({ type: 'start', initiatives })}
+          onStart={(initiatives) => act({ type: 'start', initiatives })}
           onClose={() => setRoll(null)}
         />
       )}
@@ -342,7 +387,7 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
           campaignNpcs={npcs.data}
           encounter={encounter.data ?? null}
           running={!!data?.view && !data.view.preparing}
-          act={writer.act}
+          act={act}
           onClose={() => setDialog(null)}
         />
       )}
@@ -376,7 +421,7 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
             if (!next) return effectsRow.detail?.acTotal ?? null;
             return encounterDetails(cat, next, data.levels, npcs.data!).rows.find((r) => r.id === effectsRow.c.id)?.acTotal ?? null;
           }}
-          act={writer.act}
+          act={act}
           onClose={() => setEffectsId(null)}
         />
       )}
@@ -385,7 +430,7 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
           title={t.encInitiativeOf(fix.name)}
           label={t.initiative}
           initial={fix.initiative}
-          onSubmit={(n) => writer.act({ type: 'setInitiative', combatantId: fix.id, initiative: n })}
+          onSubmit={(n) => act({ type: 'setInitiative', combatantId: fix.id, initiative: n })}
           onClose={() => setFix(null)}
         />
       )}
@@ -393,7 +438,7 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
         <NumberPromptDialog
           title={t.encInitiativeOf(late.name)}
           label={t.encWhatTheyRolled}
-          onSubmit={(n) => writer.act({ type: 'addPlayer', memberId: late.memberId, name: late.name, initiative: n })}
+          onSubmit={(n) => act({ type: 'addPlayer', memberId: late.memberId, name: late.name, initiative: n })}
           onClose={() => setLate(null)}
         />
       )}
@@ -403,7 +448,10 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
           body={t.encDiscardBody}
           confirmLabel={t.encDiscardShort}
           errorText={t.dmSaveCombatFailed}
-          onConfirm={writer.discard}
+          onConfirm={async () => {
+            await writer.discard();
+            focusTitle();
+          }}
           onClose={() => setDialog(null)}
         />
       )}
@@ -412,8 +460,14 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
           fallen={data.rows.flatMap(({ c, derived }) => c.kind === 'npc' && c.npcId && derived.down
             ? [{ npcId: c.npcId, name: c.name, side: c.side }]
             : [])}
-          onFinish={writer.close}
-          onDiscard={writer.discard}
+          onFinish={async (...args: Parameters<typeof writer.close>) => {
+            await writer.close(...args);
+            focusTitle();
+          }}
+          onDiscard={async () => {
+            await writer.discard();
+            focusTitle();
+          }}
           onClose={() => setDialog(null)}
         />
       )}
@@ -594,8 +648,15 @@ function AmountControl({ value, onChange, field, narrow = false }: { value: stri
           key={n}
           type="button"
           aria-label={t.encSetAmount(n)}
+          // El atajo que coincide con la cifra se ve elegido: dice de un
+          // vistazo cuánto resta o suma cada botón de la fila.
+          aria-pressed={value === String(n)}
           onClick={() => onChange(String(n))}
-          className={cx('rounded-[var(--radius-pill)] border border-hairline px-2 text-[12.5px] tracking-normal text-on-surface normal-case', narrow ? 'min-h-10 min-w-11' : 'min-h-[30px] min-w-[34px]')}
+          className={cx(
+            'rounded-[var(--radius-pill)] border px-2 text-[12.5px] tracking-normal normal-case transition-colors duration-[120ms] ease-out',
+            value === String(n) ? 'border-gold bg-gold-soft text-gold' : 'border-hairline text-on-surface hover:border-gold',
+            narrow ? 'min-h-10 min-w-11' : 'min-h-[30px] min-w-[34px]',
+          )}
         >
           {n}
         </button>
@@ -703,6 +764,17 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
   const bonus = c.acBonus ?? 0;
   const adv = advantageOf(c);
   const hp = derived.hp;
+  // Pegar o curar marca la cifra con un pulso corto, rojo al bajar y verde al
+  // subir (`.hp-pulse` en `index.css`): confirma que el golpe entró y a quién.
+  // También cuando un jugador cambia sus PG en su ficha y la relectura los trae.
+  const lastHp = useRef(hp?.current);
+  const [pulse, setPulse] = useState<{ up: boolean; n: number } | null>(null);
+  useEffect(() => {
+    const before = lastHp.current;
+    lastHp.current = hp?.current;
+    if (before === undefined || hp === null || hp === undefined || before === hp.current) return;
+    setPulse((p) => ({ up: hp.current > before, n: (p?.n ?? 0) + 1 }));
+  }, [hp?.current]);
   // Solo en curso: mientras se arma no hay nada que gastar.
   const legendary = hasLegendary(row);
   // Lo que ya jugó esta ronda se atenúa en sus datos y **no en sus botones**: al
@@ -732,6 +804,10 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
       )}
       aria-current={active ? 'true' : undefined}
       data-combatant={c.id}
+      // Su nombre en las transiciones de la planilla (`act`): único y un
+      // identificador CSS válido.
+      data-vt-card
+      style={{ viewTransitionName: `cb-${c.id.replace(/[^\w-]/g, '_')}` }}
     >
       <div className={cx('order-1 text-center', faded)}>
         {fixInitiative ? (
@@ -782,7 +858,11 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
         {hp ? (
           <>
             <div className="flex items-baseline gap-2">
-              <span className="num text-[13.5px] text-crimson" data-field="hp-value">
+              <span
+                key={pulse?.n ?? 0}
+                className={cx('num inline-block text-[13.5px] text-crimson', pulse && (pulse.up ? 'hp-pulse-up' : 'hp-pulse-down'))}
+                data-field="hp-value"
+              >
                 {hp.current}/{hp.max}
               </span>
               {derived.temp > 0 && (
@@ -869,6 +949,7 @@ interface RowCtx {
   readAmount: () => number;
   onFix: (row: Row) => void;
   onEffects: (row: Row) => void;
+  onRemove: (row: Row) => void;
   onConvert: (row: Row) => void;
 }
 
@@ -892,7 +973,7 @@ function OpenSheetLink({ campaignId, memberId }: { campaignId: string; memberId:
  *  curar (menos un jugador y un PNJ sin estadísticas), abrir la ficha de un
  *  jugador y sacar a cualquiera. Sacar no confirma, como en Flutter: volver a
  *  sumarlo es un toque. */
-function rowParts(row: Row, { campaignId, act, t, running, amount, readAmount, onFix, onEffects, onConvert }: RowCtx): RowExtras {
+function rowParts(row: Row, { campaignId, act, t, running, amount, readAmount, onFix, onEffects, onRemove, onConvert }: RowCtx): RowExtras {
   const { c, detail, member } = row;
   const removeTag = (tag: string) => act({ type: 'setTags', combatantId: c.id, tags: (c.tags ?? []).filter((x) => x !== tag) });
   // Dorado y relleno si el combatiente lleva algo; apagado si no.
@@ -916,7 +997,7 @@ function rowParts(row: Row, { campaignId, act, t, running, amount, readAmount, o
         type="button"
         aria-label={t.encRemoveFromCombat}
         data-action="remove-combatant"
-        onClick={() => act({ type: 'remove', combatantId: c.id })}
+        onClick={() => onRemove(row)}
         className="flex h-12 w-12 items-center justify-center rounded-[var(--radius-nav)] text-on-surface-variant hover:text-on-surface @[760px]:h-11 @[760px]:w-11"
       >
         <X size={18} aria-hidden="true" />
@@ -942,7 +1023,9 @@ function rowParts(row: Row, { campaignId, act, t, running, amount, readAmount, o
     const n = readAmount();
     if (n > 0) act({ type: 'adjustHp', combatantId: c.id, delta: sign * n });
   };
-  const pill = 'num min-h-12 min-w-16 rounded-[var(--radius-pill)] border-[1.5px] px-[7px] text-[13px] @[760px]:min-h-[34px] @[760px]:min-w-[46px]';
+  // Responden como los demás botones: se entibian al pasar y se hunden al apretar.
+  const pill =
+    'num min-h-12 min-w-16 rounded-[var(--radius-pill)] border-[1.5px] px-[7px] text-[13px] transition duration-[120ms] ease-out hover:bg-plaque motion-safe:active:translate-y-px @[760px]:min-h-[34px] @[760px]:min-w-[46px]';
   return {
     fixInitiative,
     removeTag,

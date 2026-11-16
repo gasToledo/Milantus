@@ -523,6 +523,45 @@ body {
   }
 }
 
+/* El combate: el turno pasa de una fila a la otra en 200 ms (el fondo, el
+   borde verde y lo atenuado de quien ya jugó), así el ojo lo sigue. */
+[data-combatant],
+[data-combatant] > * {
+  transition:
+    background-color 200ms ease-out,
+    border-color 200ms ease-out,
+    opacity 200ms ease-out;
+}
+/* Un golpe o una cura marcan la cifra de PG (`LedgerRow`): crece apenas y
+   vuelve, en rojo o en verde. Sin movimiento, solo el color. */
+@keyframes hp-pulse {
+  from {
+    scale: 1.25;
+    color: var(--hp-pulse);
+  }
+}
+@keyframes hp-tint {
+  from {
+    color: var(--hp-pulse);
+  }
+}
+.hp-pulse-down {
+  --hp-pulse: var(--crimson);
+}
+.hp-pulse-up {
+  --hp-pulse: var(--verdant);
+}
+.hp-pulse-down,
+.hp-pulse-up {
+  animation: hp-tint 600ms ease-out;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hp-pulse-down,
+  .hp-pulse-up {
+    animation: hp-pulse 360ms ease-out;
+  }
+}
+
 /* La barra de PG recorre el tramo (`ThinBar`, 220 ms easeOut). */
 .thin-bar-fill {
   transition: width 220ms ease-out;
