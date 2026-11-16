@@ -262,6 +262,15 @@ body {
 .roster-card:active:not(:has(button:active)) {
   translate: 0;
 }
+/* El enlace del nombre se estira sobre toda la tarjeta: el contorno de foco
+   rodea lo que se clickea, no solo el texto. El del ⋮ queda en el botón. */
+.roster-card:has(h2 a:focus-visible) {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+.roster-card h2 a:focus-visible {
+  outline: none;
+}
 
 /* Cuando la lista cambia (orden, favorito, buscador, borrar) cada tarjeta se
    desliza a su lugar; la que entra aparece y la que se va se desvanece. Solo
