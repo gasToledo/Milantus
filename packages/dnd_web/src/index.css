@@ -503,25 +503,19 @@ body {
   .codex-split[data-open] .codex-detail {
     display: block;
   }
-  /* La lista tiene su propio scroll y queda a la vista mientras se lee el
-     detalle: con 392 conjuros, estirar la página la volvía una pared. Su alto
-     se cuenta desde donde empieza (`useListFitsViewport`) y no desde arriba
-     de la ventana: si no, el final quedaba abajo de la pantalla. */
-  .codex-split .codex-list {
-    position: sticky;
-    top: 24px;
+  /* Lado a lado, la página queda fija y cada columna tiene su propio scroll:
+     con 392 conjuros, estirar la página la volvía una pared, y con la entrada
+     larga, bajar la página se llevaba el título y el buscador. El alto se
+     cuenta desde donde empiezan las columnas (`useListFitsViewport`) y no
+     desde arriba de la ventana: si no, su final quedaba abajo de la pantalla.
+     Los 24 px son el relleno de abajo de `main`. */
+  .codex-split .codex-list,
+  .codex-split .codex-detail > article {
     max-height: calc(100dvh - var(--codex-list-top, 24px) - 24px);
     overflow-y: auto;
   }
   .codex-back {
     display: none;
-  }
-}
-/* Con la barra de arriba (sin panel), anclada en 24 px la lista quedaba con
-   sus primeras entradas tapadas por la barra. */
-@media (max-width: 899.98px) {
-  .codex-split .codex-list {
-    top: calc(var(--topbar-height) + 16px);
   }
 }
 

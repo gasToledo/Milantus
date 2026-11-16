@@ -146,6 +146,9 @@ function Browser({
   useListFitsViewport(listRef);
   useEffect(() => {
     listRef.current?.querySelector('[aria-current="true"]')?.scrollIntoView({ block: 'nearest' });
+    // El perfil scrollea solo lado a lado (`.codex-detail > article`) y es el
+    // mismo elemento: la criatura nueva arrancaría donde quedó la anterior.
+    listRef.current?.parentElement?.querySelector('.codex-detail > article')?.scrollTo({ top: 0 });
   }, [open?.row.id]);
 
   // Un rango invertido no se muestra como lista vacía: el extremo que no se

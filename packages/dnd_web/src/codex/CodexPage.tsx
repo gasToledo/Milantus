@@ -509,6 +509,9 @@ export function EntryDetail({
   // «Siguiente» mientras se lee de corrido.
   const articleRef = useRef<HTMLElement>(null);
   useEffect(() => {
+    // Lado a lado la ficha scrollea sola y es el mismo elemento: la entrada
+    // nueva arrancaría a la altura donde quedó la anterior.
+    articleRef.current?.scrollTo({ top: 0 });
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     articleRef.current?.animate(
       [
