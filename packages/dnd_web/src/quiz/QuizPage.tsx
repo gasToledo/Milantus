@@ -423,10 +423,12 @@ function askOf(t: Texts, q: QuizQuestion, catalog: Catalog, multiclass: boolean)
     case 'weaponDamage':
     case 'armorAc':
     case 'armorCategory':
-      return t.quizAsk[q.kind](s);
-    case 'speciesTraitByText':
+    // El trasfondo va nombrado: «tu trasfondo» solo se contesta mirando la
+    // ficha, y la pregunta es del trasfondo, no de qué eligió el personaje.
     case 'backgroundSkills':
     case 'backgroundFeat':
+      return t.quizAsk[q.kind](s);
+    case 'speciesTraitByText':
     case 'condition':
     case 'masteryByText':
     case 'propertyByText':

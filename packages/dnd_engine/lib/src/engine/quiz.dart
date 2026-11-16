@@ -208,9 +208,13 @@ class _Choice {
 /// los recorridos van por id (no por el nombre traducido) y las opciones se
 /// eligen por id antes de escribir el rótulo.
 ///
-/// No repite tema (el mismo rasgo o conjuro no sale dos veces) y mezcla los
-/// tipos: hasta 3 del mismo, salvo que haya pocos tipos y no alcancen para
-/// llegar a [count].
+/// No repite tema (el mismo rasgo o conjuro no sale dos veces) ni la misma
+/// respuesta en un mismo tipo, y mezcla los tipos: hasta 3 del mismo, salvo
+/// que haya pocos tipos y no alcancen para llegar a [count].
+///
+/// El sorteo elige primero el tema del chip y después el tipo: si sorteara
+/// parejo por tipo, Equipo (seis de los ocho tipos de Reglas generales) se
+/// quedaba con tres de cada cuatro preguntas.
 List<QuizQuestion> quizRound(
   Character? character,
   ContentRepository repo, {
@@ -226,31 +230,65 @@ List<QuizQuestion> quizRound(
     _characterPools(character, repo, pools, rng);
   }
   pools.removeWhere((_, c) => c.isEmpty);
+  if (pools.isEmpty) return [];
   for (final c in pools.values) {
     c.shuffle(rng);
   }
-  final cap = max(3, pools.isEmpty ? 3 : (count / pools.length).ceil());
+  final cap = max(3, (count / pools.length).ceil());
+  final topicCap =
+      (count / {for (final k in pools.keys) k.topic}.length).ceil();
 
   final used = <String>{};
+  final answers = <String>{};
   final taken = <QuizKind, int>{};
+  final byTopic = <QuizTopic, int>{};
+  var easyTaken = false;
+  QuizTopic? last;
   final out = <QuizQuestion>[];
   while (out.length < count) {
-    final eligible = [
+    final open = [
       for (final e in pools.entries)
-        if (e.value.isNotEmpty && (taken[e.key] ?? 0) < cap) e.key,
+        if (e.value.isNotEmpty &&
+            (taken[e.key] ?? 0) < cap &&
+            !(easyTaken && _easy.contains(e.key)))
+          e.key,
     ];
-    if (eligible.isEmpty) break;
-    final kind = eligible[rng.nextInt(eligible.length)];
+    if (open.isEmpty) break;
+    // Dos por tipo y el tema repartido son preferencias, no reglas: si
+    // dejarlos afuera corta la ronda antes de [count], se ignoran.
+    final balanced = [
+      for (final k in open)
+        if ((taken[k] ?? 0) < 2 && (byTopic[k.topic] ?? 0) < topicCap) k,
+    ];
+    final pick = balanced.isEmpty ? open : balanced;
+    final topics = {for (final k in pick) k.topic}.toList();
+    if (topics.length > 1) topics.remove(last);
+    final topic = topics[rng.nextInt(topics.length)];
+    final kinds = [
+      for (final k in pick)
+        if (k.topic == topic) k,
+    ];
+    final kind = kinds[rng.nextInt(kinds.length)];
     final cand = pools[kind]!.removeLast();
     if (used.contains(cand.key)) continue;
     final q = cand.build(rng);
     if (q == null) continue;
+    // «Conjuración» dos veces, o «nivel 1» para dos rasgos, se contesta la
+    // segunda por descarte.
+    if (!answers.add('${kind.name}:${q.optionIds[q.answer]}')) continue;
     used.add(cand.key);
     taken[kind] = (taken[kind] ?? 0) + 1;
+    byTopic[kind.topic] = (byTopic[kind.topic] ?? 0) + 1;
+    if (_easy.contains(kind)) easyTaken = true;
+    last = kind.topic;
     out.add(q);
   }
   return out;
 }
+
+/// Se contestan casi sin pensar (Acrobacias → Destreza, el dado de golpe, las
+/// salvaciones de la clase): una por ronda entre todas.
+const _easy = {QuizKind.skillAbility, QuizKind.hitDie, QuizKind.savingThrows};
 
 // ---------------------------------------------------------------------------
 // Armado de opciones

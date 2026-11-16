@@ -265,6 +265,20 @@ void main() {
                     : '${q.kind.name}:${q.subjectId}',
     ];
     expect(temas.toSet(), hasLength(temas.length));
+    final respuestas = [
+      for (final q in ronda) '${q.kind.name}:${q.optionIds[q.answer]}',
+    ];
+    expect(respuestas.toSet(), hasLength(respuestas.length));
+    expect(
+      ronda.where(
+        (q) => const {
+          QuizKind.skillAbility,
+          QuizKind.hitDie,
+          QuizKind.savingThrows,
+        }.contains(q.kind),
+      ),
+      hasLength(lessThanOrEqualTo(1)),
+    );
     if (c != null) {
       final porTipo = <QuizKind, int>{};
       for (final q in ronda) {
@@ -304,6 +318,12 @@ void main() {
       final ronda = quizRound(null, repo, seed: seed);
       expect(ronda, hasLength(10));
       expect(ronda.map((q) => q.kind).toSet().length, greaterThan(3));
+      // Equipo tiene seis de los ocho tipos: sorteando por tipo se llevaba
+      // casi toda la ronda.
+      expect(
+        ronda.where((q) => q.topic == QuizTopic.equipment).length,
+        lessThanOrEqualTo(6),
+      );
       verificarRonda(ronda, null);
     }
   });
@@ -457,14 +477,17 @@ void main() {
     }
   });
 
-  List<QuizQuestion> nivelesDe(CharacterClass cls, {int seed = 1}) => [
-        for (final q in quizRound(
-          personaje(cls, 20, 'human', 'soldier'),
-          repo,
-          seed: seed,
-          count: 400,
-        ))
-          if (q.kind == QuizKind.classFeatureLevel) q,
+  /// Sin [seed], las de dieciséis semillas: la ronda no repite el nivel que
+  /// responde, así que una sola no recorre todas las filas.
+  List<QuizQuestion> nivelesDe(CharacterClass cls, {int? seed}) => [
+        for (final s in seed == null ? List.generate(16, (i) => i + 1) : [seed])
+          for (final q in quizRound(
+            personaje(cls, 20, 'human', 'soldier'),
+            repo,
+            seed: s,
+            count: 400,
+          ))
+            if (q.kind == QuizKind.classFeatureLevel) q,
       ];
 
   QuizQuestion fila(
@@ -483,44 +506,34 @@ void main() {
   test('las progresiones preguntan el contador y no otro nivel vigente', () {
     final vistos = <String>{};
     for (final cls in fuente.classesSorted) {
-      // Arcanum y la Pericia del pícaro también tienen pregunta por texto, y
-      // la ronda no repite el rasgo: hay que mirar más de una semilla para
-      // ver la de nivel.
-      final semillas = cls.id == 'warlock' || cls.id == 'rogue'
-          ? List.generate(16, (i) => i + 1)
-          : const [1];
-      for (final seed in semillas) {
-        for (final q in nivelesDe(cls, seed: seed)) {
-          expect(q.subject, isNot(contains('(')), reason: q.subject);
-          final p = q.progress;
-          if (p == null) continue;
-          vistos
-              .add('${q.subjectId}|${q.level}|${p.kind.name}|${p.n}|${p.dice}');
-          // Un nivel donde ese número sigue vigente no puede ser distractor.
-          final clsRepo = fuente.characterClass(q.subjectId!)!;
-          final siguientes = clsRepo.features.where((f) {
-            if (f.level <= q.level!) return false;
-            if (!f.name.startsWith('${q.subject} (')) return false;
-            final adentro =
-                RegExp(r'\(([^)]+)\)').firstMatch(f.name)!.group(1)!;
-            if (p.dice != null) return adentro != p.dice;
-            final numero = RegExp(r'\d+').firstMatch(adentro);
-            if (adentro.startsWith('dos ') || adentro.startsWith('two ')) {
-              return 2 != p.n;
-            }
-            return numero == null || int.parse(numero.group(0)!) != p.n;
-          }).map((f) => f.level);
-          final hasta = siguientes.isEmpty
-              ? 21
-              : siguientes.reduce((a, b) => a < b ? a : b);
-          for (final nivel in {for (final f in clsRepo.features) f.level}) {
-            if (nivel <= q.level! || nivel >= hasta) continue;
-            expect(
-              q.options,
-              isNot(contains('$nivel')),
-              reason: '${q.subjectId} ${q.subject} ${p.kind.name} ${p.n}',
-            );
+      for (final q in nivelesDe(cls)) {
+        expect(q.subject, isNot(contains('(')), reason: q.subject);
+        final p = q.progress;
+        if (p == null) continue;
+        vistos.add('${q.subjectId}|${q.level}|${p.kind.name}|${p.n}|${p.dice}');
+        // Un nivel donde ese número sigue vigente no puede ser distractor.
+        final clsRepo = fuente.characterClass(q.subjectId!)!;
+        final siguientes = clsRepo.features.where((f) {
+          if (f.level <= q.level!) return false;
+          if (!f.name.startsWith('${q.subject} (')) return false;
+          final adentro = RegExp(r'\(([^)]+)\)').firstMatch(f.name)!.group(1)!;
+          if (p.dice != null) return adentro != p.dice;
+          final numero = RegExp(r'\d+').firstMatch(adentro);
+          if (adentro.startsWith('dos ') || adentro.startsWith('two ')) {
+            return 2 != p.n;
           }
+          return numero == null || int.parse(numero.group(0)!) != p.n;
+        }).map((f) => f.level);
+        final hasta = siguientes.isEmpty
+            ? 21
+            : siguientes.reduce((a, b) => a < b ? a : b);
+        for (final nivel in {for (final f in clsRepo.features) f.level}) {
+          if (nivel <= q.level! || nivel >= hasta) continue;
+          expect(
+            q.options,
+            isNot(contains('$nivel')),
+            reason: '${q.subjectId} ${q.subject} ${p.kind.name} ${p.n}',
+          );
         }
       }
     }
