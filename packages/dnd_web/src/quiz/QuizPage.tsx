@@ -416,6 +416,7 @@ function askOf(t: Texts, q: QuizQuestion, catalog: Catalog): string {
     case 'spellMoveDistance':
     case 'spellSchool':
     case 'spellLevel':
+    case 'spellDuration':
     case 'classSpellList':
     case 'skillAbility':
     case 'weaponMastery':

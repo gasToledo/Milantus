@@ -130,6 +130,18 @@ void main() {
         for (final id in q.optionIds) {
           expect((int.parse(id) - s.level).abs(), lessThanOrEqualTo(3));
         }
+      case QuizKind.spellDuration:
+        final s = fuente.spell(q.subjectId!)!;
+        expect(q.optionIds[q.answer], s.duration);
+        expect(s.duration, isNot('Instantánea'));
+        expect(q.optionIds, isNot(contains('Especial')));
+        expect(q.optionIds, isNot(contains('Hasta 1 hora')));
+        if (const {'24 horas', '1 día'}.contains(s.duration)) {
+          expect(
+            q.optionIds.where((d) => d == '24 horas' || d == '1 día'),
+            hasLength(1),
+          );
+        }
       case QuizKind.spellFlag:
         // Exactamente una de las cuatro tiene la marca que se pregunta.
         final conMarca = [

@@ -34,6 +34,7 @@ enum QuizKind {
   spellMoveDistance(QuizTopic.spells),
   spellSchool(QuizTopic.spells),
   spellLevel(QuizTopic.spells),
+  spellDuration(QuizTopic.spells),
   spellFlag(QuizTopic.spells),
   classSpellList(QuizTopic.spells),
   condition(QuizTopic.rules),
@@ -311,6 +312,7 @@ const _easy = {QuizKind.skillAbility, QuizKind.hitDie, QuizKind.savingThrows};
   int count = 4,
   bool Function(String id)? allow,
   bool numeric = false,
+  Comparator<String>? order,
 }) {
   final labels = <String, String>{};
   for (final c in pool) {
@@ -331,7 +333,9 @@ const _easy = {QuizKind.skillAbility, QuizKind.hitDie, QuizKind.savingThrows};
   // Niveles, CA, dados y distancias se leen de menor a mayor: buscar el valor
   // no tiene que costar más que saberlo. Se ordena por id, no por rótulo, así
   // la correcta queda en el mismo lugar en los dos idiomas.
-  if (numeric && picked.every((id) => _digits.hasMatch(id))) {
+  if (order != null) {
+    picked.sort(order);
+  } else if (numeric && picked.every((id) => _digits.hasMatch(id))) {
     picked.sort(_byNumbers);
   }
   return (
@@ -362,6 +366,7 @@ QuizQuestion? _question(
   int count = 4,
   bool Function(String id)? allow,
   bool numeric = false,
+  Comparator<String>? order,
   String? subject,
   String? subjectId,
   int? level,
@@ -375,6 +380,7 @@ QuizQuestion? _question(
     count: count,
     allow: allow,
     numeric: numeric,
+    order: order,
   );
   if (o == null) return null;
   return QuizQuestion(
@@ -1375,6 +1381,22 @@ void _spells(
     for (var n = 0; n <= 9; n++) _Choice('$n', _spellLevelLabel('$n')),
   ];
 
+  // Las duraciones del catálogo de la más corta a la más larga. Quedan
+  // afuera «Especial», que no se compara, y «Hasta 1 hora» (Prestidigitación),
+  // que al lado de «1 hora» parecería el mismo valor.
+  final durationRaw = {
+    for (final s in repo.spells.values)
+      if (_durationRank(s.duration) != null) s.duration,
+  }.toList()
+    ..sort((a, b) => _durationRank(a)!.compareTo(_durationRank(b)!));
+  final durationIndex = {
+    for (var i = 0; i < durationRaw.length; i++) durationRaw[i]: i,
+  };
+  final durations = [
+    for (final d in durationRaw)
+      _Choice(d, vocabularyLabel(VocabularyField.duration, d)),
+  ];
+
   // Dos conjuros tienen una distancia fija de movimiento. Los distractores
   // salen de los alcances «N pies» del catálogo: son distancias del libro, y
   // con dos valores no alcanza para cuatro opciones.
@@ -1494,6 +1516,33 @@ void _spells(
       allow: (id) => (int.parse(id) - s.level).abs() <= 3,
       numeric: true,
     );
+    // «Instantánea» como respuesta sale casi sola (todo conjuro de daño):
+    // se pregunta lo que dura algo, y la instantánea queda de distractor.
+    final at = durationIndex[s.duration];
+    if (at != null && s.duration != 'Instantánea') {
+      pool(QuizKind.spellDuration).add(
+        _Candidate(
+          'spell:${s.id}',
+          (rng) => _question(
+            QuizKind.spellDuration,
+            'spell:${s.id}:${QuizKind.spellDuration.name}',
+            s.duration,
+            durations,
+            rng,
+            // Tres puestos o menos en la escala: «30 días» al lado de
+            // «1 asalto» se descarta sin saber nada.
+            // «24 horas» y «1 día» son la misma duración: no van juntas.
+            allow: (id) =>
+                id == s.duration ||
+                ((durationIndex[id]! - at).abs() <= 3 &&
+                    _durationRank(id) != _durationRank(s.duration)),
+            order: (a, b) => durationIndex[a]!.compareTo(durationIndex[b]!),
+            subject: s.name,
+            subjectId: s.id,
+          ),
+        ),
+      );
+    }
   }
 
   // Concentración, ritual y lista de la clase miran la lista entera de cada
@@ -1576,6 +1625,23 @@ void _spells(
       );
     }
   }
+}
+
+/// La duración en asaltos (seis segundos), para ordenarlas. Null si no se
+/// compara con las demás.
+int? _durationRank(String raw) {
+  if (raw == 'Instantánea') return 0;
+  if (raw == 'Hasta disipar') return 1 << 30;
+  final m = RegExp(r'^(\d+) (\p{L}+)$', unicode: true).firstMatch(raw);
+  if (m == null) return null;
+  final per = switch (m[2]) {
+    'asalto' || 'asaltos' => 1,
+    'minuto' || 'minutos' => 10,
+    'hora' || 'horas' => 600,
+    'día' || 'días' => 14400,
+    _ => null,
+  };
+  return per == null ? null : int.parse(m[1]!) * per;
 }
 
 String _spellLevelLabel(String id) =>
@@ -1680,6 +1746,8 @@ QuizQuestion _localize(QuizQuestion q, ContentRepository repo) {
         return vocabularyLabel(VocabularyField.school, id);
       case QuizKind.spellLevel:
         return _spellLevelLabel(id);
+      case QuizKind.spellDuration:
+        return vocabularyLabel(VocabularyField.duration, id);
       case QuizKind.spellFlag:
       case QuizKind.classSpellList:
         return repo.spell(id)?.name ?? id;
@@ -1739,6 +1807,7 @@ QuizQuestion _localize(QuizQuestion q, ContentRepository repo) {
     case QuizKind.spellMoveDistance:
     case QuizKind.spellSchool:
     case QuizKind.spellLevel:
+    case QuizKind.spellDuration:
       subject = repo.spell(q.subjectId ?? '')?.name ?? subject;
     case QuizKind.spellFlag:
       break;

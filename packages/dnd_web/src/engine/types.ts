@@ -1012,6 +1012,7 @@ export type QuizKind =
   | 'spellMoveDistance'
   | 'spellSchool'
   | 'spellLevel'
+  | 'spellDuration'
   | 'spellFlag'
   | 'classSpellList'
   | 'condition'

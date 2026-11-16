@@ -121,6 +121,7 @@ las saca de los distractores:
 | Alcance «Personal» | Lo comparten casi todos los conjuros sobre uno mismo | `selfAmbiguous` |
 | Fila de progresión | En el nivel 7 todavía tenés 3 usos de Furia | `_progressAt` |
 | Dos rasgos con el mismo texto | Magia del Legado antes de nombrar el conjuro | `allow` de `classFeatureByText` |
+| Dos duraciones iguales | «24 horas» y «1 día» | `_durationRank` en `spellDuration` |
 | Dos valores con el mismo rótulo | Dos armaduras con la misma cuenta de CA | ids por valor (`_acId`) |
 
 Los datos se cargan con la procedencia que pide
