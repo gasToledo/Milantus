@@ -80,6 +80,10 @@ export function RosterCard({
       data-character={character.id}
       data-favorite={favorite}
       {...reorder?.item}
+      // Va después del `item`, que trae su propio `style` para el arrastre. El
+      // nombre identifica la tarjeta en las transiciones de la lista; tiene
+      // que ser un identificador CSS válido y único.
+      style={{ viewTransitionName: `rc-${character.id.replace(/[^\w-]/g, '_')}`, ...reorder?.item.style }}
     >
       <div className="flex items-start gap-3">
         <Medallion name={character.name} accent={entry.accent} size={64} muted={fallen} portrait={ownPortrait(character)} />

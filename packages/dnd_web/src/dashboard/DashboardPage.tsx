@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { ArrowDownUp, ChevronDown, Download, Plus, Upload, X } from 'lucide-react';
 import { dropPending, flushCharacterWrites } from '../api/characterSave';
@@ -54,7 +54,11 @@ export function DashboardPage() {
   // Con el homebrew encima, como la ficha: si no, una tarjeta mostraría otra
   // CA que la ficha del mismo personaje.
   const catalog = useSheetCatalog(lang);
+  // El buscador escribe en `query` al instante y la lista filtra con `listQuery`,
+  // que se cambia dentro de la transición: un input controlado que esperara al
+  // cuadro siguiente perdería teclas y movería el cursor.
   const [query, setQuery] = useState('');
+  const [listQuery, setListQuery] = useState('');
   const client = useQueryClient();
   const [toast, setToast] = useState<{ key: number; message: string; tone: 'error' | 'success' } | null>(null);
   const showToast = useCallback(
@@ -89,12 +93,43 @@ export function DashboardPage() {
 
   const sort = parseSortMode(settings.data?.sortMode ?? 'name');
   const visible = useMemo(
-    () => (entries && settings.data ? visibleRoster(entries, query, settings.data, sort) : []),
-    [entries, settings.data, query, sort],
+    () => (entries && settings.data ? visibleRoster(entries, listQuery, settings.data, sort) : []),
+    [entries, settings.data, listQuery, sort],
   );
 
+  // Lo que cambia el orden o el contenido de la lista (orden, favorito,
+  // buscador, borrar) se anima con View Transitions: cada tarjeta se desliza a
+  // su lugar en vez de saltar. La lista nueva no se pinta al volver de
+  // `update`: react-query avisa del `setQueryData` en otra vuelta del bucle.
+  // Por eso la transición espera al commit de `visible`, con un tope para no
+  // dejar la pantalla congelada si la lista no llega a cambiar. Arrastrar no
+  // pasa por acá: `useHoldDrag` ya anima lo suyo.
+  const listCommitted = useRef<(() => void) | null>(null);
+  useLayoutEffect(() => {
+    listCommitted.current?.();
+    listCommitted.current = null;
+  }, [visible]);
+  const animateList = (update: () => unknown) => {
+    if (!document.startViewTransition) {
+      void update();
+      return;
+    }
+    document.startViewTransition(
+      () =>
+        new Promise<void>((resolve) => {
+          listCommitted.current = resolve;
+          window.setTimeout(resolve, 300);
+          void update();
+        }),
+    );
+  };
+  const search = (value: string) => {
+    setQuery(value);
+    animateList(() => setListQuery(value));
+  };
+
   // Mover con la lista filtrada perdería el lugar de las tarjetas ocultas.
-  const canMove = query.trim() === '';
+  const canMove = listQuery.trim() === '';
   const favoriteId = settings.data?.favoriteCharacterId ?? null;
   const entryById = useMemo(() => new Map((entries ?? []).map((e) => [e.character.id, e])), [entries]);
   const visibleIds = useMemo(() => visible.map((e) => e.character.id), [visible]);
@@ -156,7 +191,9 @@ export function DashboardPage() {
   const remove = async (id: string) => {
     await dropPending(id);
     await deleteCharacter(id);
-    await replaceInRoster((list) => list.filter((s) => s.character.id !== id));
+    // Solo la caché va dentro de la transición: el pedido al servidor dejaría
+    // la pantalla congelada lo que tarde la red.
+    animateList(() => replaceInRoster((list) => list.filter((s) => s.character.id !== id)));
     void client.invalidateQueries({ queryKey: queryKeys.roster });
     // El botón que abrió el diálogo ya no existe: el foco pasa al título.
     setTimeout(() => titleRef.current?.focus(), 0);
@@ -211,7 +248,7 @@ export function DashboardPage() {
             message={t.rosterNoMatch(query.trim())}
             hint={t.rosterNoMatchHint}
             actions={
-              <Button tone="secondary" icon={X} onClick={() => setQuery('')}>
+              <Button tone="secondary" icon={X} onClick={() => search('')}>
                 {t.rosterClearSearch}
               </Button>
             }
@@ -233,7 +270,7 @@ export function DashboardPage() {
                   key={id}
                   entry={entry}
                   favorite={favorite}
-                  onToggleFavorite={() => void saveSettings({ favoriteCharacterId: favorite ? null : id })}
+                  onToggleFavorite={() => animateList(() => saveSettings({ favoriteCharacterId: favorite ? null : id }))}
                   onRename={() => setRenaming(id)}
                   onRebuild={() => setRebuilding(id)}
                   onExport={() => void exportZip(id)}
@@ -289,7 +326,7 @@ export function DashboardPage() {
                   type="search"
                   autoComplete="off"
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => search(e.target.value)}
                   placeholder={t.rosterSearchHint}
                   className="h-9 w-full rounded-[var(--radius-pill)] border border-hairline bg-plaque px-4 pr-9 text-[13px] text-on-surface placeholder:text-text-muted"
                 />
@@ -298,7 +335,7 @@ export function DashboardPage() {
                     <button
                       type="button"
                       aria-label={t.rosterClearSearch}
-                      onClick={() => setQuery('')}
+                      onClick={() => search('')}
                       className="absolute inset-y-0 right-1 flex w-8 items-center justify-center text-text-muted hover:text-on-surface"
                     >
                       <X size={16} aria-hidden="true" />
@@ -320,7 +357,7 @@ export function DashboardPage() {
                 <DropdownMenuContent align="end">
                   <DropdownMenuRadioGroup
                     value={sort}
-                    onValueChange={(mode) => void saveSettings({ sortMode: parseSortMode(mode) })}
+                    onValueChange={(mode) => animateList(() => saveSettings({ sortMode: parseSortMode(mode) }))}
                   >
                     {SORT_MODES.map((mode) => (
                       <DropdownMenuRadioItem key={mode} value={mode}>

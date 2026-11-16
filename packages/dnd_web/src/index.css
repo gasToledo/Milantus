@@ -251,6 +251,73 @@ body {
   transform: translateY(-2px);
   box-shadow: var(--shadow-card-hover);
 }
+/* Al apretarla baja a su lugar: el hover levanta y el clic se tiene que
+   distinguir. No cuando lo apretado es el ⋮, que es otro control. */
+.roster-card:active:not(:has(button:active)) {
+  transform: translateY(0);
+}
+
+/* Cuando la lista cambia (orden, favorito, buscador, borrar) cada tarjeta se
+   desliza a su lugar; la que entra aparece y la que se va se desvanece. Solo
+   se animan las tarjetas: la raíz no lleva nombre, así que el resto de la
+   pantalla cambia de una y sigue respondiendo. */
+:root {
+  view-transition-name: none;
+}
+::view-transition {
+  pointer-events: none;
+}
+.roster-card {
+  view-transition-class: roster-card;
+}
+::view-transition-group(.roster-card) {
+  animation-duration: 220ms;
+  animation-timing-function: ease-in-out;
+}
+::view-transition-new(.roster-card):only-child {
+  animation: roster-card-in 180ms ease-out both;
+}
+::view-transition-old(.roster-card):only-child {
+  animation: roster-card-out 150ms ease-in both;
+}
+@keyframes roster-card-in {
+  from {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+@keyframes roster-card-out {
+  to {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+
+/* Los menús se abren desde su botón: Radix da la esquina que lo toca. Con
+   «reducir movimiento» solo aparecen, sin crecer. */
+.menu-pop {
+  transform-origin: var(--radix-dropdown-menu-content-transform-origin);
+}
+.menu-pop[data-state='open'] {
+  animation: menu-fade 150ms ease-out;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .menu-pop[data-state='open'] {
+    animation:
+      menu-grow 150ms ease-out,
+      menu-fade 150ms ease-out;
+  }
+}
+@keyframes menu-grow {
+  from {
+    scale: 0.95;
+  }
+}
+@keyframes menu-fade {
+  from {
+    opacity: 0;
+  }
+}
 
 /* Las tres columnas de las pestañas de la ficha. Con `auto-fit` a dos columnas
    la tercera bajaba a otra fila de la grilla, que empieza debajo de la más
@@ -468,6 +535,12 @@ body {
   }
   .pick:active {
     transform: none;
+  }
+  /* La regla de arriba no alcanza a los pseudoelementos de la transición. */
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }
 

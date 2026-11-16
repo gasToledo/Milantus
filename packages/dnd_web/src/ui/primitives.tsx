@@ -55,7 +55,7 @@ export const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
 export function DropdownMenuContent(props: ComponentProps<typeof DropdownMenuPrimitive.Content>) {
   return (
     <DropdownMenuPrimitive.Portal>
-      <DropdownMenuPrimitive.Content sideOffset={6} {...props} className={cx(FLOATING, 'min-w-[180px]', props.className)} />
+      <DropdownMenuPrimitive.Content sideOffset={6} {...props} className={cx(FLOATING, 'menu-pop min-w-[180px]', props.className)} />
     </DropdownMenuPrimitive.Portal>
   );
 }
