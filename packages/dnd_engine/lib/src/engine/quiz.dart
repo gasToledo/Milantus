@@ -15,7 +15,8 @@ import '../domain/weapon_properties.dart';
 import 'character_compiler.dart';
 
 /// Tipos de pregunta del Quiz. El nombre (`name`) es lo que viaja a la UI,
-/// que arma el enunciado con una plantilla por tipo.
+/// que arma el enunciado con una plantilla por tipo. Un tipo nuevo cumple el
+/// estándar de `docs/desarrollo/quiz.md`.
 enum QuizKind {
   classFeatureByText(QuizTopic.classTopic),
   classFeatureLevel(QuizTopic.classTopic),

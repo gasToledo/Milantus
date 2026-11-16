@@ -429,6 +429,7 @@ mismo cambio.
   catálogo de componentes.
 - `docs/desarrollo/textos.md` — glosario y convenciones de los textos visibles,
   en español e inglés.
+- `docs/desarrollo/quiz.md` — estándar de calidad de las preguntas del Quiz.
 - `docs/desarrollo/versionado-y-changelog.md` — versión visible y `CHANGELOG.md`.
 - `docs/operaciones/despliegue.md` — runbook del stack y CI/CD.
 
