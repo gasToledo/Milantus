@@ -124,6 +124,33 @@ void main() {
       case QuizKind.spellSchool:
         final s = fuente.spell(q.subjectId!)!;
         expect(correcta, vocabularyLabel(VocabularyField.school, s.school));
+      case QuizKind.spellLevel:
+        final s = fuente.spell(q.subjectId!)!;
+        expect(q.optionIds[q.answer], '${s.level}');
+        for (final id in q.optionIds) {
+          expect((int.parse(id) - s.level).abs(), lessThanOrEqualTo(3));
+        }
+      case QuizKind.spellFlag:
+        // Exactamente una de las cuatro tiene la marca que se pregunta.
+        final conMarca = [
+          for (final id in q.optionIds)
+            if (q.subjectId == 'ritual'
+                ? fuente.spell(id)!.ritual
+                : fuente.spell(id)!.concentration)
+              id,
+        ];
+        expect(conMarca, [q.optionIds[q.answer]],
+            reason: q.options.join(' | '));
+      case QuizKind.classSpellList:
+        final enLista = [
+          for (final id in q.optionIds)
+            if (fuente.spell(id)!.classes.contains(q.subjectId)) id,
+        ];
+        expect(enLista, [q.optionIds[q.answer]], reason: q.options.join(' | '));
+        expect(
+          {for (final id in q.optionIds) fuente.spell(id)!.level},
+          hasLength(1),
+        );
       case QuizKind.hitDie:
         expect(correcta, 'd${fuente.characterClass(q.subjectId!)!.hitDie}');
       case QuizKind.savingThrows:
@@ -290,11 +317,13 @@ void main() {
     final temas = [
       for (final q in ronda)
         q.kind == QuizKind.classFeatureByText ||
-                q.kind == QuizKind.speciesTraitByText
+                q.kind == QuizKind.speciesTraitByText ||
+                q.kind == QuizKind.spellFlag
             ? q.options[q.answer]
             : q.kind == QuizKind.classFeatureLevel
                 ? '${q.subject}|${q.progress?.kind.name}|${q.progress?.n}|${q.progress?.dice}'
-                : q.topic == QuizTopic.spells
+                : q.topic == QuizTopic.spells &&
+                        q.kind != QuizKind.classSpellList
                     ? q.subjectId
                     : '${q.kind.name}:${q.subjectId}',
     ];

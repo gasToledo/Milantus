@@ -415,6 +415,8 @@ function askOf(t: Texts, q: QuizQuestion, catalog: Catalog): string {
     case 'spellRange':
     case 'spellMoveDistance':
     case 'spellSchool':
+    case 'spellLevel':
+    case 'classSpellList':
     case 'skillAbility':
     case 'weaponMastery':
     case 'weaponDamage':
@@ -425,6 +427,8 @@ function askOf(t: Texts, q: QuizQuestion, catalog: Catalog): string {
     case 'backgroundAbilities':
     case 'backgroundTool':
       return t.quizAsk[q.kind](s);
+    case 'spellFlag':
+      return q.subjectId === 'ritual' ? t.quizAsk.spellRitual : t.quizAsk.spellConcentration;
     case 'condition':
     case 'masteryByText':
     case 'propertyByText':
@@ -451,8 +455,12 @@ function Quote({ question }: { question: QuizQuestion }) {
 /** El veredicto y, en un conjuro, su línea de lanzamiento: la misma de la ficha. */
 function Verdict({ right, question, catalog }: { right: boolean; question: QuizQuestion; catalog: Catalog }) {
   const t = useTexts();
+  // En «¿cuál de estos conjuros…?» el sujeto es la marca o la clase: la línea
+  // que explica la respuesta es la del conjuro correcto.
+  const spellId =
+    question.kind === 'spellFlag' || question.kind === 'classSpellList' ? question.optionIds[question.answer] : question.subjectId;
   const spell =
-    question.topic === 'spells' ? (catalog.spells.find((s) => s.id === question.subjectId) as SpellJson | undefined) : undefined;
+    question.topic === 'spells' ? (catalog.spells.find((s) => s.id === spellId) as SpellJson | undefined) : undefined;
   const Icon = right ? Check : X;
   return (
     <div className="flex items-start gap-2.5 rounded-[var(--radius-card)] border border-hairline bg-plaque px-3.5 py-3" aria-live="polite">

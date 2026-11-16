@@ -33,6 +33,9 @@ enum QuizKind {
   spellRange(QuizTopic.spells),
   spellMoveDistance(QuizTopic.spells),
   spellSchool(QuizTopic.spells),
+  spellLevel(QuizTopic.spells),
+  spellFlag(QuizTopic.spells),
+  classSpellList(QuizTopic.spells),
   condition(QuizTopic.rules),
   skillAbility(QuizTopic.rules),
   masteryByText(QuizTopic.equipment),
@@ -1342,6 +1345,9 @@ void _spells(
   final times = values((s) => s.castingTime, castingTime);
   final ranges = values((s) => s.range, range);
   final schools = values((s) => s.school, school);
+  final levels = [
+    for (var n = 0; n <= 9; n++) _Choice('$n', _spellLevelLabel('$n')),
+  ];
 
   // Dos conjuros tienen una distancia fija de movimiento. Los distractores
   // salen de los alcances «N pies» del catálogo: son distancias del libro, y
@@ -1451,8 +1457,103 @@ void _spells(
       );
     }
     add(QuizKind.spellSchool, s, s.school, school(s), schools);
+    // Niveles a tres o menos del correcto: «9» como distractor de un conjuro
+    // de nivel 1 se descarta sin saber nada.
+    add(
+      QuizKind.spellLevel,
+      s,
+      '${s.level}',
+      _spellLevelLabel('${s.level}'),
+      levels,
+      allow: (id) => (int.parse(id) - s.level).abs() <= 3,
+      numeric: true,
+    );
+  }
+
+  // Concentración, ritual y lista de la clase miran la lista entera de cada
+  // clase con la que lanza, no solo lo que conoce: con lo suyo no alcanza
+  // para tres distractores. Hasta el nivel más alto que ya conoce, para no
+  // preguntar por conjuros que todavía no puede lanzar.
+  if (spells.isEmpty) return;
+  final maxLevel = spells.fold(0, (m, s) => max(m, s.level));
+  final classIds = {...c.classHistory, c.classId};
+  final listed = <String, List<Spell>>{
+    for (final id in classIds)
+      id: [
+        for (final s in _byId(repo.spells.values, (s) => s.id))
+          if (s.classes.contains(id) &&
+              s.level <= maxLevel &&
+              s.name.length <= _maxOptionLength)
+            s,
+      ],
+  }..removeWhere((_, l) => l.isEmpty);
+  List<_Choice> names(Iterable<Spell> l) =>
+      [for (final s in l) _Choice(s.id, s.name)];
+
+  // Concentración y ritual son un solo tipo: si fueran dos, la ronda podía
+  // traer tres «¿cuál de estos conjuros…?» seguidos con la lista de la clase.
+  for (final l in listed.values) {
+    final choices = names(l);
+    final byId = {for (final s in l) s.id: s};
+    for (final (flag, has) in [
+      ('concentration', (Spell s) => s.concentration),
+      ('ritual', (Spell s) => s.ritual),
+    ]) {
+      for (final s in l) {
+        if (!has(s)) continue;
+        pool(QuizKind.spellFlag).add(
+          _Candidate(
+            'spell:${s.id}',
+            (rng) => _question(
+              QuizKind.spellFlag,
+              'spell:${s.id}:${QuizKind.spellFlag.name}',
+              s.id,
+              choices,
+              rng,
+              allow: (id) => id == s.id || !has(byId[id]!),
+              subjectId: flag,
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  // Al revés: un conjuro de la lista contra tres del mismo nivel que no
+  // están. Los que el personaje tiene por otra vía (el patrón, la especie)
+  // no se ofrecen: no son de la lista, pero los ve en su ficha.
+  for (final MapEntry(key: classId, value: l) in listed.entries) {
+    final cls = repo.characterClass(classId);
+    if (cls == null) continue;
+    for (final s in l) {
+      final others = [
+        for (final o in _byId(repo.spells.values, (o) => o.id))
+          if (o.level == s.level &&
+              !o.classes.contains(classId) &&
+              !ids.contains(o.id) &&
+              o.name.length <= _maxOptionLength)
+            o,
+      ];
+      pool(QuizKind.classSpellList).add(
+        _Candidate(
+          'spellList:$classId',
+          (rng) => _question(
+            QuizKind.classSpellList,
+            'spellList:$classId',
+            s.id,
+            names([s, ...others]),
+            rng,
+            subject: cls.name,
+            subjectId: classId,
+          ),
+        ),
+      );
+    }
   }
 }
+
+String _spellLevelLabel(String id) =>
+    id == '0' ? localized('Truco', 'Cantrip') : id;
 
 /// Reescribe una ronda ya armada en el idioma activo. No sortea de nuevo: al
 /// cambiar de idioma a mitad de ronda las preguntas siguen siendo las mismas
@@ -1551,6 +1652,11 @@ QuizQuestion _localize(QuizQuestion q, ContentRepository repo) {
         return vocabularyLabel(VocabularyField.range, id);
       case QuizKind.spellSchool:
         return vocabularyLabel(VocabularyField.school, id);
+      case QuizKind.spellLevel:
+        return _spellLevelLabel(id);
+      case QuizKind.spellFlag:
+      case QuizKind.classSpellList:
+        return repo.spell(id)?.name ?? id;
     }
   }
 
@@ -1606,7 +1712,12 @@ QuizQuestion _localize(QuizQuestion q, ContentRepository repo) {
     case QuizKind.spellRange:
     case QuizKind.spellMoveDistance:
     case QuizKind.spellSchool:
+    case QuizKind.spellLevel:
       subject = repo.spell(q.subjectId ?? '')?.name ?? subject;
+    case QuizKind.spellFlag:
+      break;
+    case QuizKind.classSpellList:
+      subject = repo.characterClass(q.subjectId ?? '')?.name ?? subject;
     case QuizKind.masteryByText:
       quote = weaponMasteries[q.subjectId]?.description ?? quote;
     case QuizKind.propertyByText:
