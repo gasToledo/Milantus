@@ -57,7 +57,12 @@ export function SheetPanel({ model, tab }: { model: SheetModel; tab: SheetTab })
 
       {/* La tarjeta no es un enlace: ya se está en la ficha. */}
       <div className="plaque flex items-center gap-2.5 px-2.5 py-2">
-        <Medallion name={character.name} accent={accentFor(model)} size={38} portrait={ownPortrait(character)} viewable />
+        {/* El medallón de la tarjeta del dashboard se convierte en este al
+            abrir la ficha. Un solo panel se ve a la vez (fijo o cajón), así
+            que el nombre no se repite. */}
+        <div className="shrink-0" style={{ viewTransitionName: 'sheet-medallion' }}>
+          <Medallion name={character.name} accent={accentFor(model)} size={38} portrait={ownPortrait(character)} viewable />
+        </div>
         <div className="min-w-0">
           <p className="truncate text-[13.5px] font-medium text-on-surface">{character.name}</p>
           <p className="mt-0.5 truncate text-[11px] text-text-muted">{t.miniClassLine(classes, sheet.level)}</p>

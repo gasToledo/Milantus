@@ -295,6 +295,11 @@ body {
 ::view-transition-old(.roster-card):only-child {
   animation: roster-card-out 150ms ease-in both;
 }
+/* Al abrir la ficha desde una tarjeta solo viajan su medallón y su nombre
+   (`openSheet`): las demás tarjetas no se desvanecen encima de la ficha. */
+.opening-sheet .roster-card {
+  view-transition-name: none !important;
+}
 @keyframes roster-card-in {
   from {
     opacity: 0;

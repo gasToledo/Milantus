@@ -1,6 +1,7 @@
 import { Download, EllipsisVertical, Pencil, RotateCcw, Star, Trash2 } from 'lucide-react';
 import { useTexts } from '../i18n/context';
-import { characterHref, Link } from '../router';
+import type { MouseEvent } from 'react';
+import { characterHref, Link, navigate } from '../router';
 import { signed } from '../sheet/format';
 import { HP_CRITICAL_RATIO, hpTone, StatPlaque, ThinBar } from '../ui/data';
 import { Medallion } from '../ui/Medallion';
@@ -86,7 +87,9 @@ export function RosterCard({
       style={{ viewTransitionName: `rc-${character.id.replace(/[^\w-]/g, '_')}`, ...reorder?.item.style }}
     >
       <div className="flex items-start gap-3">
-        <Medallion name={character.name} accent={entry.accent} size={64} muted={fallen} portrait={ownPortrait(character)} />
+        <div data-medallion className="shrink-0">
+          <Medallion name={character.name} accent={entry.accent} size={64} muted={fallen} portrait={ownPortrait(character)} />
+        </div>
         <div className="min-w-0 flex-1">
           <h2 className="flex items-center gap-1.5 font-display text-[18px] leading-tight">
             {favorite && (
@@ -96,6 +99,7 @@ export function RosterCard({
             )}
             <Link
               href={characterHref(character.id)}
+              onClick={openSheet}
               draggable={false}
               className={`truncate after:absolute after:inset-0 after:rounded-[var(--radius-card)] after:content-[''] ${
                 fallen ? 'text-on-surface-variant' : 'text-on-surface'
@@ -218,6 +222,50 @@ export function RosterCard({
       )}
     </li>
   );
+}
+
+/**
+ * Abre la ficha con el medallón y el nombre de la tarjeta convirtiéndose en los
+ * de la ficha (View Transitions): se ve de dónde salió lo que se abrió. Los
+ * nombres se ponen recién al hacer clic porque tienen que ser únicos en la
+ * pantalla; la ficha los lleva fijos (`SheetPanel`, `SheetHeader`). Sin soporte,
+ * o con modificadores (abrir en otra pestaña), sigue de largo y navega `Link`.
+ */
+function openSheet(e: MouseEvent<HTMLAnchorElement>) {
+  if (!document.startViewTransition || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  e.preventDefault();
+  const link = e.currentTarget;
+  const href = link.getAttribute('href')!;
+  const medallion = link.closest('li')?.querySelector<HTMLElement>('[data-medallion]');
+  if (medallion) medallion.style.viewTransitionName = 'sheet-medallion';
+  link.style.viewTransitionName = 'sheet-name';
+  // Las demás tarjetas no se animan al irse: cambian de una con el resto.
+  document.documentElement.classList.add('opening-sheet');
+  const transition = document.startViewTransition(
+    () =>
+      new Promise<void>((resolve) => {
+        // La ficha sale de la caché de la lista y se dibuja enseguida, pero no
+        // en esta misma vuelta: se espera a que esté su nombre, con un tope
+        // para no dejar la pantalla congelada si tarda.
+        const ready = () => document.querySelector('[data-sheet-title]') !== null;
+        const observer = new MutationObserver(() => ready() && done());
+        const timer = window.setTimeout(() => done(), 300);
+        const done = () => {
+          observer.disconnect();
+          window.clearTimeout(timer);
+          resolve();
+        };
+        observer.observe(document.body, { childList: true, subtree: true });
+        navigate(href);
+        if (ready()) done();
+      }),
+  );
+  // La transición no mueve el foco: el enlace ya no existe y quedaría en el
+  // documento. Va al título de la ficha, como el dashboard tras borrar.
+  void transition.finished.finally(() => {
+    document.documentElement.classList.remove('opening-sheet');
+    document.querySelector<HTMLElement>('[data-sheet-title]')?.focus({ preventScroll: true });
+  });
 }
 
 function Abbr({ short, full }: { short: string; full: string }) {

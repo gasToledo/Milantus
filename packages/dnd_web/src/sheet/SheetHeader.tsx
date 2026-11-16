@@ -59,8 +59,11 @@ export function SheetHeader({
         {leading}
         <div className="flex min-w-0 flex-1 flex-col gap-2.5">
           <div className="flex flex-wrap items-baseline gap-x-3.5 gap-y-1">
-            <h1 className="font-display text-[28px] leading-[1.1] break-words text-on-surface">
-              {character.name}
+            {/* `tabIndex` y la marca: al abrir la ficha desde el dashboard el foco
+                viene acá. El nombre va en su propio `span` para que la
+                transición lleve solo el texto, sin el lápiz. */}
+            <h1 data-sheet-title tabIndex={-1} className="font-display text-[28px] leading-[1.1] break-words text-on-surface outline-none">
+              <span style={{ viewTransitionName: 'sheet-name' }}>{character.name}</span>
               {/* Solo en la ficha propia: sin `write` (la de otra cuenta) no hay ni
                   el control, y el nombre de un PNJ se cambia en su pantalla, que
                   lo escribe también en la ficha. */}
