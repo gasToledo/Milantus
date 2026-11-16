@@ -87,9 +87,7 @@ export function RosterCard({
       style={{ viewTransitionName: `rc-${character.id.replace(/[^\w-]/g, '_')}`, ...reorder?.item.style }}
     >
       <div className="flex items-start gap-3">
-        <div data-medallion className="shrink-0">
-          <Medallion name={character.name} accent={entry.accent} size={64} muted={fallen} portrait={ownPortrait(character)} />
-        </div>
+        <Medallion name={character.name} accent={entry.accent} size={64} muted={fallen} portrait={ownPortrait(character)} />
         <div className="min-w-0 flex-1">
           <h2 className="flex items-center gap-1.5 font-display text-[18px] leading-tight">
             {favorite && (
@@ -225,21 +223,17 @@ export function RosterCard({
 }
 
 /**
- * Abre la ficha con el medallón y el nombre de la tarjeta convirtiéndose en los
- * de la ficha (View Transitions): se ve de dónde salió lo que se abrió. Los
- * nombres se ponen recién al hacer clic porque tienen que ser únicos en la
- * pantalla; la ficha los lleva fijos (`SheetPanel`, `SheetHeader`). Sin soporte,
- * o con modificadores (abrir en otra pestaña), sigue de largo y navega `Link`.
+ * Abre la ficha con un fundido corto de la pantalla entera (View Transitions)
+ * en vez de un corte. Se probó que el medallón y el nombre viajaran hasta la
+ * ficha y no gustó: distraía más de lo que orientaba. Sin soporte, o con
+ * modificadores (abrir en otra pestaña), sigue de largo y navega `Link`.
  */
 function openSheet(e: MouseEvent<HTMLAnchorElement>) {
   if (!document.startViewTransition || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
   e.preventDefault();
-  const link = e.currentTarget;
-  const href = link.getAttribute('href')!;
-  const medallion = link.closest('li')?.querySelector<HTMLElement>('[data-medallion]');
-  if (medallion) medallion.style.viewTransitionName = 'sheet-medallion';
-  link.style.viewTransitionName = 'sheet-name';
-  // Las demás tarjetas no se animan al irse: cambian de una con el resto.
+  const href = e.currentTarget.getAttribute('href')!;
+  // Le devuelve el nombre a la raíz (`.opening-sheet` en `index.css`) y se lo
+  // saca a las tarjetas, que si no se desvanecerían aparte.
   document.documentElement.classList.add('opening-sheet');
   const transition = document.startViewTransition(
     () =>

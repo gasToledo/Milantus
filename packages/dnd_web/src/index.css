@@ -295,10 +295,18 @@ body {
 ::view-transition-old(.roster-card):only-child {
   animation: roster-card-out 150ms ease-in both;
 }
-/* Al abrir la ficha desde una tarjeta solo viajan su medallón y su nombre
-   (`openSheet`): las demás tarjetas no se desvanecen encima de la ficha. */
+/* Al abrir la ficha desde una tarjeta (`openSheet`) la pantalla entera se
+   funde con la ficha: la raíz recupera su nombre y las tarjetas lo pierden,
+   para no desvanecerse aparte encima. */
+:root.opening-sheet {
+  view-transition-name: root;
+}
 .opening-sheet .roster-card {
   view-transition-name: none !important;
+}
+.opening-sheet::view-transition-old(root),
+.opening-sheet::view-transition-new(root) {
+  animation-duration: 150ms;
 }
 @keyframes roster-card-in {
   from {
