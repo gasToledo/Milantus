@@ -654,70 +654,7 @@ void _generalPools(
     for (final p in weaponProperties.values) (p.id, p.name, p.description),
   ]);
 
-  // Un arma o una armadura sale una sola vez por ronda, sea cual sea la
-  // pregunta: la clave es la misma.
-  final weapons = _byId(repo.weapons.values, (w) => w.id);
-  final masteryChoices = [
-    for (final m in weaponMasteries.values) _Choice(m.id, m.name),
-  ]..sort((a, b) => a.id.compareTo(b.id));
-  String damageId(String dice, String type) => '$dice|$type';
-  String damageLabel(String id) {
-    final parts = id.split('|');
-    return '${parts[0]} ${DamageType.labelFor(parts[1]).toLowerCase()}';
-  }
-
-  final damages = <_Choice>[];
-  final seenDamage = <String>{};
-  for (final w in weapons) {
-    if (!w.damageDice.contains('d') || w.damageType.isEmpty) continue;
-    final id = damageId(w.damageDice, w.damageType);
-    if (seenDamage.add(id)) damages.add(_Choice(id, damageLabel(id)));
-  }
-  for (final w in weapons) {
-    final mastery = w.mastery;
-    if (mastery != null && weaponMasteries.containsKey(mastery)) {
-      pool(QuizKind.weaponMastery).add(
-        _Candidate(
-          'weapon:${w.id}',
-          (rng) => _question(
-            QuizKind.weaponMastery,
-            'weapon:${w.id}',
-            mastery,
-            masteryChoices,
-            rng,
-            subject: w.name,
-            subjectId: w.id,
-          ),
-        ),
-      );
-    }
-    if (w.damageDice.contains('d') && w.damageType.isNotEmpty) {
-      final correct = damageId(w.damageDice, w.damageType);
-      // El dado versátil es también un daño de esta arma. Si entra como
-      // distractor (porque otra arma lo tiene de base), las dos opciones
-      // son correctas. Se lo saca del pool en vez de escribir «1d8 (1d10 a
-      // dos manos)»: ese paréntesis sería el único y delataría la respuesta.
-      final versatile = w.versatileDice == null
-          ? null
-          : damageId(w.versatileDice!, w.damageType);
-      pool(QuizKind.weaponDamage).add(
-        _Candidate(
-          'weapon:${w.id}',
-          (rng) => _question(
-            numeric: true,
-            QuizKind.weaponDamage,
-            'weapon:${w.id}',
-            correct,
-            damages,
-            rng,
-            allow: (id) => id != versatile,
-            subject: w.name,
-            subjectId: w.id,
-          ),
-        ),
-      );
-    }
-  }
+  _weapons(repo, pool, (_) => true, withMastery: true);
 
   // El escudo no entra: suma +2 en vez de dar una CA, y su categoría se
   // regala con el nombre. La categoría se pregunta con las tres que hay
@@ -774,6 +711,83 @@ void _generalPools(
   rng.nextBool();
 }
 
+/// Maestría y daño de las armas que cumplen [include]. Los distractores de
+/// daño salen de todas las armas del catálogo, no solo de esas: con las de un
+/// pícaro no alcanzan para cuatro opciones distintas. Un arma o una armadura
+/// sale una sola vez por ronda, sea cual sea la pregunta: la clave es la misma.
+void _weapons(
+  ContentRepository repo,
+  List<_Candidate> Function(QuizKind) pool,
+  bool Function(Weapon w) include, {
+  required bool withMastery,
+}) {
+  final weapons = _byId(repo.weapons.values, (w) => w.id);
+  final masteryChoices = [
+    for (final m in weaponMasteries.values) _Choice(m.id, m.name),
+  ]..sort((a, b) => a.id.compareTo(b.id));
+  String damageId(String dice, String type) => '$dice|$type';
+  String damageLabel(String id) {
+    final parts = id.split('|');
+    return '${parts[0]} ${DamageType.labelFor(parts[1]).toLowerCase()}';
+  }
+
+  final damages = <_Choice>[];
+  final seenDamage = <String>{};
+  for (final w in weapons) {
+    if (!w.damageDice.contains('d') || w.damageType.isEmpty) continue;
+    final id = damageId(w.damageDice, w.damageType);
+    if (seenDamage.add(id)) damages.add(_Choice(id, damageLabel(id)));
+  }
+  for (final w in weapons) {
+    if (!include(w)) continue;
+    final mastery = w.mastery;
+    if (withMastery &&
+        mastery != null &&
+        weaponMasteries.containsKey(mastery)) {
+      pool(QuizKind.weaponMastery).add(
+        _Candidate(
+          'weapon:${w.id}',
+          (rng) => _question(
+            QuizKind.weaponMastery,
+            'weapon:${w.id}',
+            mastery,
+            masteryChoices,
+            rng,
+            subject: w.name,
+            subjectId: w.id,
+          ),
+        ),
+      );
+    }
+    if (w.damageDice.contains('d') && w.damageType.isNotEmpty) {
+      final correct = damageId(w.damageDice, w.damageType);
+      // El dado versátil es también un daño de esta arma. Si entra como
+      // distractor (porque otra arma lo tiene de base), las dos opciones
+      // son correctas. Se lo saca del pool en vez de escribir «1d8 (1d10 a
+      // dos manos)»: ese paréntesis sería el único y delataría la respuesta.
+      final versatile = w.versatileDice == null
+          ? null
+          : damageId(w.versatileDice!, w.damageType);
+      pool(QuizKind.weaponDamage).add(
+        _Candidate(
+          'weapon:${w.id}',
+          (rng) => _question(
+            numeric: true,
+            QuizKind.weaponDamage,
+            'weapon:${w.id}',
+            correct,
+            damages,
+            rng,
+            allow: (id) => id != versatile,
+            subject: w.name,
+            subjectId: w.id,
+          ),
+        ),
+      );
+    }
+  }
+}
+
 /// `flat:18`, `dex:11` o `dex:14:max:2`. El rótulo se arma después, así dos
 /// armaduras con la misma cuenta no son dos opciones.
 String _acId(Armor a) {
@@ -811,27 +825,38 @@ void _characterPools(
 ) {
   List<_Candidate> pool(QuizKind k) => pools.putIfAbsent(k, () => []);
 
-  // Clases en el orden en que el personaje las tomó, con su nivel en cada una.
-  final levels = <String, int>{};
-  for (final id in c.classHistory) {
-    levels[id] = (levels[id] ?? 0) + 1;
-  }
-  if (levels.isEmpty) levels[c.classId] = c.totalLevel < 1 ? 1 : c.totalLevel;
-  final classes = <(CharacterClass, int, Subclass?)>[];
-  for (final e in levels.entries) {
-    final cls = repo.characterClass(e.key);
+  // Clases en el orden en que el personaje las tomó.
+  final classIds = c.classHistory.isEmpty ? {c.classId} : {...c.classHistory};
+  final classes = <(CharacterClass, Subclass?)>[];
+  for (final id in classIds) {
+    final cls = repo.characterClass(id);
     if (cls == null) continue;
-    final subId =
-        c.subclassIds[e.key] ?? (e.key == c.classId ? c.subclassId : null);
-    classes.add((cls, e.value, subId == null ? null : repo.subclass(subId)));
+    final subId = c.subclassIds[id] ?? (id == c.classId ? c.subclassId : null);
+    classes.add((cls, subId == null ? null : repo.subclass(subId)));
   }
 
-  for (final (cls, level, sub) in classes) {
-    _classFeatures(cls, level, sub, pool);
+  for (final (cls, sub) in classes) {
+    _classFeatures(cls, sub, pool);
     // El dado y las salvaciones son de esa clase, no «de tu clase»: en
     // multiclase la primera no responde por las otras.
     _classBasics(cls, repo, pool);
   }
+
+  // Las armas con las que es competente por clase. La maestría, solo si
+  // alguna de sus clases la usa: al mago no le sirve saberla.
+  final proficient = {
+    for (final (cls, _) in classes) ...cls.weaponProficiencies,
+  };
+  _weapons(
+    repo,
+    pool,
+    (w) => proficient.contains(w.category) || proficient.contains(w.id),
+    withMastery: classes.any(
+      (e) => e.$1.features.any(
+        (f) => f.effects.any((x) => x is WeaponMasterySlotsEffect),
+      ),
+    ),
+  );
 
   final race = repo.race(c.raceId);
   if (race != null) {
@@ -856,7 +881,6 @@ bool _readable(ClassFeature f) =>
 
 void _classFeatures(
   CharacterClass cls,
-  int level,
   Subclass? sub,
   List<_Candidate> Function(QuizKind) pool,
 ) {
@@ -881,7 +905,9 @@ void _classFeatures(
   };
 
   for (final (slot, f) in indexed) {
-    if (f.level > level || !_readable(f)) continue;
+    // Toda la progresión, no solo lo que ya tiene: saber qué viene después
+    // también es saber la clase, y un nivel bajo se queda sin preguntas.
+    if (!_readable(f)) continue;
     final id = slot;
     pool(QuizKind.classFeatureByText).add(
       _Candidate(

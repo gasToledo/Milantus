@@ -103,8 +103,9 @@ al sumar el tipo y al jugar).
   tiene un solo formato se nota a la tercera pregunta. *Revisión.*
 - **Alcanza para varias rondas.** Cada clase de ronda (Reglas generales, o un
   personaje de nivel bajo) genera al menos **50 preguntas distintas**: con 27,
-  en tres rondas ya salió todo. *Revisión:* se mide con varias semillas y
-  `count` alto.
+  en tres rondas ya salió todo. *Revisión:* se cuenta cada par
+  sujeto–respuesta con 30 semillas y `count: 400`. Hoy el pícaro 3 da 95 y el
+  guerrero 1 da 123.
 - **La misma semilla da la misma ronda,** en los dos idiomas. *Test.*
 
 ## 5. Una sola correcta
@@ -150,10 +151,8 @@ discrepa con el libro, se corrige el catálogo, no el Quiz.
 
 ## Pendientes
 
-- Un pícaro de nivel 3 genera 45 preguntas distintas y un guerrero de nivel 1,
-  41: todavía no llegan a las 50 de la regla 4. Se cuenta como pregunta
-  distinta cada par sujeto–respuesta, con 30 semillas y `count: 400`.
-- Las competencias con armas no se preguntan: las del monje en
+- Las competencias con armas no se preguntan, y el daño de las armas del
+  monje sale de datos sin revisar: las del monje en
   `classes.json` (espada corta, cimitarra, ballesta de mano) no coinciden con
   la regla de 2024 (marciales con la propiedad Ligera).
 - Las duraciones de los conjuros con concentración están escritas de dos
