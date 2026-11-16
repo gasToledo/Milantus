@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode, type MouseEventHandler } from 'react';
+import { useEffect, useRef, useState, type ReactNode, type MouseEventHandler } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { ArrowLeft, ExternalLink, Menu, Monitor, Moon, Sun, X, type LucideIcon } from 'lucide-react';
 import { useTexts } from '../i18n/context';
@@ -279,9 +279,23 @@ export function SidebarBack({
  */
 export function ModeSwitch({ mode, playerHref, dmHref }: { mode: 'player' | 'dm'; playerHref: string; dmHref: string }) {
   const t = useTexts();
-  const current = 'rounded-[var(--radius-pill)] bg-gold-soft py-1.5 font-medium text-gold';
+  // El fondo dorado es una pieza aparte que se desliza al lado elegido. Cambiar
+  // de modo cambia de pantalla y el panel se monta de nuevo, así que no hay
+  // transición CSS que valga: se recuerda el último modo dibujado y, si era el
+  // otro, el fondo arranca de aquel lado.
+  const pillRef = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const from = lastMode;
+    lastMode = mode;
+    if (from === null || from === mode || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    pillRef.current?.animate([{ translate: SLIDE[from] }, { translate: SLIDE[mode] }], {
+      duration: 220,
+      easing: 'ease-out',
+    });
+  }, [mode]);
+  const current = 'relative rounded-[var(--radius-pill)] py-1.5 font-medium text-gold';
   const other =
-    'rounded-[var(--radius-pill)] py-1.5 text-on-surface-variant hover:bg-surface hover:text-on-surface';
+    'relative rounded-[var(--radius-pill)] py-1.5 text-on-surface-variant transition-colors duration-[120ms] hover:bg-surface hover:text-on-surface';
   return (
     // Pegado arriba del scroll del panel (`sticky`): el cambio de modo queda
     // siempre a la vista, por larga que sea la lista de campañas. El `-mx-3`
@@ -291,8 +305,15 @@ export function ModeSwitch({ mode, playerHref, dmHref }: { mode: 'player' | 'dm'
     <div
       role="group"
       aria-label={t.modeSwitchLabel}
-      className="grid grid-cols-2 gap-1 rounded-[var(--radius-pill)] border border-hairline bg-plaque p-[3px] text-center text-[12px]"
+      className="relative grid grid-cols-2 gap-1 rounded-[var(--radius-pill)] border border-hairline bg-plaque p-[3px] text-center text-[12px]"
     >
+      {/* Media columna: el ancho menos el relleno (3 + 3) y el hueco (4). */}
+      <span
+        ref={pillRef}
+        aria-hidden="true"
+        className="absolute inset-y-[3px] left-[3px] w-[calc(50%-5px)] rounded-[var(--radius-pill)] bg-gold-soft"
+        style={{ translate: SLIDE[mode] }}
+      />
       {mode === 'player' ? (
         <span aria-current="true" className={current}>
           {t.modePlayer}
@@ -315,6 +336,11 @@ export function ModeSwitch({ mode, playerHref, dmHref }: { mode: 'player' | 'dm'
     </div>
   );
 }
+
+/** Dónde va el fondo del modo: la otra columna está a su ancho más el hueco. */
+const SLIDE = { player: '0 0', dm: 'calc(100% + 4px) 0' } as const;
+/** El modo del último `ModeSwitch` dibujado, de dónde arranca el deslizamiento. */
+let lastMode: 'player' | 'dm' | null = null;
 
 const THEME_ICON: Record<ThemeMode, LucideIcon> = { dark: Moon, light: Sun, system: Monitor };
 
