@@ -518,10 +518,16 @@ void main() {
     }
   });
 
-  test('un conjuro con concentración no puede ser instantáneo', () {
+  test(
+      'un conjuro con concentración no es instantáneo ni repite «Hasta» '
+      'en la duración', () {
     for (final s in repo.spells.values.where((s) => s.concentration)) {
       expect(s.duration, isNot('Instantánea'),
           reason: '${s.id}: concentración con duración instantánea');
+      // El «hasta» lo dice la marca de concentración. Escrito en algunos y
+      // no en otros, dos conjuros de 1 minuto parecían de duraciones
+      // distintas, y en el Quiz delataba cuál era de concentración.
+      expect(s.duration, isNot(startsWith('Hasta ')), reason: s.id);
     }
   });
 

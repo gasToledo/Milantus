@@ -148,14 +148,3 @@ discrepa con el libro, se corrige el catálogo, no el Quiz.
 5. Medí cuántas preguntas distintas suma a una ronda de nivel bajo.
 6. Jugá tres rondas en `/v2/quiz` con un personaje de nivel bajo y anotá lo
    que encuentres según este estándar.
-
-## Pendientes
-
-- Las competencias con armas no se preguntan, y el daño de las armas del
-  monje sale de datos sin revisar: las del monje en
-  `classes.json` (espada corta, cimitarra, ballesta de mano) no coinciden con
-  la regla de 2024 (marciales con la propiedad Ligera).
-- Las duraciones de los conjuros con concentración están escritas de dos
-  formas en `spells.json` («Hasta 1 minuto» en Inmovilizar Persona, «10
-  minutos» en Oscuridad). Una pregunta de duración delataría la
-  concentración.

@@ -89,7 +89,7 @@ const _english = <VocabularyField, Map<String, String>>{
 
 /// Unidades de tiempo y distancia, en singular y plural, para los valores que
 /// llevan número («1 minuto», «Concentración, hasta 10 minutos», «Personal
-/// (cono 30 pies)»). «dia» sin tilde está así en el catálogo.
+/// (cono 30 pies)»). «dia» sin tilde lo puede traer un homebrew.
 const _units = {
   'asalto': 'round',
   'asaltos': 'rounds',
