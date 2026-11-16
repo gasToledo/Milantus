@@ -306,7 +306,7 @@ export function DashboardPage() {
           <div className="min-w-0 flex-[1_1_220px]">
             {/* El título está siempre, también mientras carga: un h1 por
                 pantalla y el lector sabe dónde está desde el primer momento. */}
-            <h1 ref={titleRef} tabIndex={-1} className="font-display text-[30px] leading-tight text-on-surface outline-none">{t.rosterTitle}</h1>
+            <h1 ref={titleRef} data-roster-title tabIndex={-1} className="font-display text-[30px] leading-tight text-on-surface outline-none">{t.rosterTitle}</h1>
             {entries && (
               <p className="mt-1 text-[13px] text-on-surface-variant tabular-nums">
                 {fallen === 0

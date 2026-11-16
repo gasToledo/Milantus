@@ -1,7 +1,7 @@
 import { Download, EllipsisVertical, Pencil, RotateCcw, Star, Trash2 } from 'lucide-react';
 import { useTexts } from '../i18n/context';
-import type { MouseEvent } from 'react';
-import { characterHref, Link, navigate } from '../router';
+import { characterHref, Link } from '../router';
+import { fadeNavigate } from '../ui/fadeNavigate';
 import { signed } from '../sheet/format';
 import { HP_CRITICAL_RATIO, hpTone, StatPlaque, ThinBar } from '../ui/data';
 import { Medallion } from '../ui/Medallion';
@@ -97,7 +97,7 @@ export function RosterCard({
             )}
             <Link
               href={characterHref(character.id)}
-              onClick={openSheet}
+              onClick={(e) => fadeNavigate(e, '[data-sheet-title]')}
               draggable={false}
               className={`truncate after:absolute after:inset-0 after:rounded-[var(--radius-card)] after:content-[''] ${
                 fallen ? 'text-on-surface-variant' : 'text-on-surface'
@@ -220,46 +220,6 @@ export function RosterCard({
       )}
     </li>
   );
-}
-
-/**
- * Abre la ficha con un fundido corto de la pantalla entera (View Transitions)
- * en vez de un corte. Se probó que el medallón y el nombre viajaran hasta la
- * ficha y no gustó: distraía más de lo que orientaba. Sin soporte, o con
- * modificadores (abrir en otra pestaña), sigue de largo y navega `Link`.
- */
-function openSheet(e: MouseEvent<HTMLAnchorElement>) {
-  if (!document.startViewTransition || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-  e.preventDefault();
-  const href = e.currentTarget.getAttribute('href')!;
-  // Le devuelve el nombre a la raíz (`.opening-sheet` en `index.css`) y se lo
-  // saca a las tarjetas, que si no se desvanecerían aparte.
-  document.documentElement.classList.add('opening-sheet');
-  const transition = document.startViewTransition(
-    () =>
-      new Promise<void>((resolve) => {
-        // La ficha sale de la caché de la lista y se dibuja enseguida, pero no
-        // en esta misma vuelta: se espera a que esté su nombre, con un tope
-        // para no dejar la pantalla congelada si tarda.
-        const ready = () => document.querySelector('[data-sheet-title]') !== null;
-        const observer = new MutationObserver(() => ready() && done());
-        const timer = window.setTimeout(() => done(), 300);
-        const done = () => {
-          observer.disconnect();
-          window.clearTimeout(timer);
-          resolve();
-        };
-        observer.observe(document.body, { childList: true, subtree: true });
-        navigate(href);
-        if (ready()) done();
-      }),
-  );
-  // La transición no mueve el foco: el enlace ya no existe y quedaría en el
-  // documento. Va al título de la ficha, como el dashboard tras borrar.
-  void transition.finished.finally(() => {
-    document.documentElement.classList.remove('opening-sheet');
-    document.querySelector<HTMLElement>('[data-sheet-title]')?.focus({ preventScroll: true });
-  });
 }
 
 function Abbr({ short, full }: { short: string; full: string }) {

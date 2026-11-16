@@ -60,7 +60,7 @@ export function SheetHeader({
         <div className="flex min-w-0 flex-1 flex-col gap-2.5">
           <div className="flex flex-wrap items-baseline gap-x-3.5 gap-y-1">
             {/* `tabIndex` y la marca: al abrir la ficha desde el dashboard el foco
-                viene acá (`openSheet`). */}
+                viene acá (`fadeNavigate`). */}
             <h1 data-sheet-title tabIndex={-1} className="font-display text-[28px] leading-[1.1] break-words text-on-surface outline-none">
               {character.name}
               {/* Solo en la ficha propia: sin `write` (la de otra cuenta) no hay ni

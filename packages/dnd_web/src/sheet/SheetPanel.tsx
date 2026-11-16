@@ -17,6 +17,7 @@ import { useItemGrants } from '../api/queries';
 import { useTexts } from '../i18n/context';
 import { characterHref, levelUpHref, portraitHref, rosterHref, SHEET_TABS, type SheetTab } from '../router';
 import type { Texts } from '../i18n/texts';
+import { fadeNavigate } from '../ui/fadeNavigate';
 import { Medallion } from '../ui/Medallion';
 import { PrintSheet, usePrintSheet } from './PrintSheet';
 import { ownPortrait } from '../ui/portrait';
@@ -53,7 +54,7 @@ export function SheetPanel({ model, tab }: { model: SheetModel; tab: SheetTab })
 
   return (
     <>
-      <SidebarBack href={rosterHref()} back={false} />
+      <SidebarBack href={rosterHref()} back={false} onClick={(e) => fadeNavigate(e, '[data-roster-title]')} />
 
       {/* La tarjeta no es un enlace: ya se está en la ficha. */}
       <div className="plaque flex items-center gap-2.5 px-2.5 py-2">
