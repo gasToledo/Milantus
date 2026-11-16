@@ -207,7 +207,7 @@ function Home({ entries }: { entries: Map<CodexCategory, CodexEntry[]> }) {
                 <li key={c}>
                   <Link
                     href={codexHref(c)}
-                    className="card block px-4 py-[15px] hover:border-gold"
+                    className="card block px-4 py-[15px] transition duration-[120ms] ease-out hover:border-gold motion-safe:active:translate-y-px"
                     data-category={c}
                   >
                     <span className="flex items-center gap-2.5">
@@ -292,8 +292,27 @@ export function CategoryView({
   // Bola de Fuego, estaría tres niveles más abajo.
   const listRef = useRef<HTMLElement>(null);
   useListFitsViewport(listRef);
+  const lastOpen = useRef<string | null>(null);
   useEffect(() => {
-    listRef.current?.querySelector('[aria-current="true"]')?.scrollIntoView({ block: 'nearest' });
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    listRef.current
+      ?.querySelector('[aria-current="true"]')
+      ?.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
+    // Debajo de 760 px se ve la lista o la entrada: lo que tenía el foco
+    // (el enlace de la lista, o «Volver») se oculta y el foco caería al
+    // documento. Al abrir va al título; al volver, a la entrada que estaba
+    // abierta. En escritorio no se oculta nada y el foco se queda donde está.
+    const active = document.activeElement as HTMLElement | null;
+    const lost = !active || active === document.body || active.getClientRects().length === 0;
+    if (lost) {
+      const target = open
+        ? document.getElementById('codex-entry-title')
+        : lastOpen.current
+          ? listRef.current?.querySelector<HTMLElement>(`[data-entry="${CSS.escape(lastOpen.current)}"]`)
+          : null;
+      target?.focus();
+    }
+    lastOpen.current = open?.id ?? null;
   }, [open?.id]);
 
   return (
@@ -428,7 +447,7 @@ function EntryList({
           href={hrefOf(category, e.id)}
           aria-current={on ? 'true' : undefined}
           className={cx(
-            'block rounded-[var(--radius-nav)] px-3 py-2',
+            'block rounded-[var(--radius-nav)] px-3 py-2 transition-colors duration-[120ms] ease-out',
             n !== null && 'flex items-baseline gap-2.5',
             on ? 'bg-gold-soft text-gold' : 'text-on-surface hover:bg-plaque',
           )}
@@ -485,8 +504,22 @@ export function EntryDetail({
   const t = useTexts();
   const detail = useMemo(() => entry.detail(), [entry]);
   const source = (t.sources as Record<string, string>)[entry.source];
+  // Cada entrada nueva entra suave, como un paso de asistente. Se anima el
+  // mismo elemento en vez de remontarlo con `key`: así el foco sigue en
+  // «Siguiente» mientras se lee de corrido.
+  const articleRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    articleRef.current?.animate(
+      [
+        { opacity: 0, translate: '0 4px' },
+        { opacity: 1, translate: '0 0' },
+      ],
+      { duration: 160, easing: 'ease-out' },
+    );
+  }, [entry.id]);
   return (
-    <article aria-labelledby="codex-entry-title" className="card px-5 py-6 sm:px-8 sm:py-7" data-field="codex-detail">
+    <article ref={articleRef} aria-labelledby="codex-entry-title" className="card px-5 py-6 sm:px-8 sm:py-7" data-field="codex-detail">
       {reading &&
         (reading.category === 'guides' ? (
           <Pill highlighted={false}>
@@ -503,7 +536,12 @@ export function EntryDetail({
               <span className="sr-only">{t.sourceLabel(source)}</span>
             </Pill>
           )}
-          <h2 id="codex-entry-title" className="font-display mt-3.5 text-[34px] leading-[1.1] break-words text-on-surface">
+          {/* `tabIndex`: en teléfono el foco viene acá al abrir la entrada. */}
+          <h2
+            id="codex-entry-title"
+            tabIndex={-1}
+            className="font-display mt-3.5 text-[34px] leading-[1.1] break-words text-on-surface outline-none"
+          >
             {entry.name}
           </h2>
           {!reading && entry.subtitle && <p className="mt-1.5 text-[15px] text-on-surface-variant">{entry.subtitle}</p>}
@@ -747,7 +785,7 @@ function ReadingSteps({
   const prev = entries[at - 1];
   const next = entries[at + 1];
   const step =
-    'block rounded-[var(--radius-card)] border border-hairline px-3.5 py-2.5 text-on-surface hover:border-gold';
+    'block rounded-[var(--radius-card)] border border-hairline px-3.5 py-2.5 text-on-surface transition duration-[120ms] ease-out hover:border-gold motion-safe:active:translate-y-px';
   return (
     <nav
       aria-label={t.codexKeepReading}
@@ -824,7 +862,7 @@ function SearchResults({
             <ul>
               {list.slice(0, SEARCH_PREVIEW).map((e) => (
                 <li key={e.id} className="border-t border-hairline">
-                  <Link href={codexHref(c, e.id)} className="flex flex-wrap items-baseline gap-x-2.5 px-1 py-2 hover:text-gold">
+                  <Link href={codexHref(c, e.id)} className="flex flex-wrap items-baseline gap-x-2.5 px-1 py-2 transition-colors duration-[120ms] ease-out hover:text-gold">
                     <span className="text-[14px] text-on-surface">{e.name}</span>
                     {e.subtitle && <span className="text-[12px] text-text-muted">{e.subtitle}</span>}
                   </Link>
