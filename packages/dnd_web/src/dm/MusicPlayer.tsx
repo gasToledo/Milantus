@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode, type Ref } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type Ref } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChevronDown, EllipsisVertical, ExternalLink, ListMusic, Music, Pause, Pencil, Play, Plus, Trash2 } from 'lucide-react';
 import type { DmCampaign, MusicScene } from '../api/client';
@@ -232,6 +232,41 @@ export function MusicPlayer({ campaignId, scenes, offerCombat, onDismissOffer }:
     }
   }, [expanded]);
 
+  // Las escenas se pliegan y despliegan midiendo su alto en píxeles con WAAPI:
+  // `interpolate-size` haría lo mismo en CSS, pero solo existe en Chrome. El
+  // recorte va solo durante la animación, para no comerse el foco de adentro.
+  const sceneList = useRef<HTMLDivElement>(null);
+  const opening = useRef(false);
+  const slide = (el: HTMLElement, from: number, to: number) => {
+    el.style.overflow = 'hidden';
+    const animation = el.animate(
+      [
+        { height: `${from}px`, opacity: from === 0 ? 0 : 1 },
+        { height: `${to}px`, opacity: to === 0 ? 0 : 1 },
+      ],
+      { duration: 180, easing: 'ease-in-out' },
+    );
+    void animation.finished.finally(() => (el.style.overflow = ''));
+    return animation;
+  };
+  const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const toggleList = () => {
+    const el = sceneList.current;
+    if (el?.getAnimations().length) return;
+    if (showList && el && !reduceMotion()) {
+      void slide(el, el.offsetHeight, 0).finished.then(() => setShowList(false), () => setShowList(false));
+      return;
+    }
+    opening.current = !showList;
+    setShowList((v) => !v);
+  };
+  useLayoutEffect(() => {
+    const el = sceneList.current;
+    if (!opening.current || !el) return;
+    opening.current = false;
+    if (!reduceMotion()) slide(el, 0, el.offsetHeight);
+  }, [showList]);
+
   // YouTube exige su reproductor a la vista: minimizado, se pausa.
   const minimize = () => {
     command('pauseVideo');
@@ -271,7 +306,7 @@ export function MusicPlayer({ campaignId, scenes, offerCombat, onDismissOffer }:
             {current && <p className="truncate text-[14px] font-semibold text-on-surface">{current.name}</p>}
           </div>
           {current && (
-            <IconAction label={t.dmMusicScenes} onClick={() => setShowList((v) => !v)} pressed={showList}>
+            <IconAction label={t.dmMusicScenes} onClick={toggleList} pressed={showList}>
               <ListMusic size={18} aria-hidden="true" />
             </IconAction>
           )}
@@ -316,7 +351,8 @@ export function MusicPlayer({ campaignId, scenes, offerCombat, onDismissOffer }:
         )}
 
         {(showList || !current) && (
-          <div className="mt-2.5">
+          // `pt` y no `mt`: el margen quedaría afuera del alto que se anima.
+          <div ref={sceneList} className="pt-2.5">
             {current && <Eyebrow className="mb-1.5">{t.dmMusicScenes}</Eyebrow>}
             {/* Adentro del panel y no un `Toast`: el aviso flotante sale en la
                 misma esquina y taparía el reproductor. */}
