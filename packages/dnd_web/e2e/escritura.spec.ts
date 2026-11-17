@@ -350,7 +350,11 @@ test('la subida de nivel pasa por PG, subclase y mejora, guarda lo del motor y s
   await page.getByRole('button', { name: 'Continuar' }).click();
   const enviado = await proximoGuardado(
     page,
-    () => page.getByRole('button', { name: 'Subir a nivel 4' }).click(),
+    // «Subir a nivel 4» abre la celebración; la subida se aplica con «Confirmar».
+    async () => {
+      await page.getByRole('button', { name: 'Subir a nivel 4' }).click();
+      await page.getByRole('dialog').getByRole('button', { name: 'Confirmar', exact: true }).click();
+    },
     BRUNA,
   );
   expect(enviado).toEqual(esperado);
@@ -403,9 +407,12 @@ test('la clériga sube eligiendo Orden Divina, los conjuros de su dote y los de 
   await continuar();
   for (const id of [...trucos, ...conjuros]) await tocar(id);
   await continuar();
-  expect(await proximoGuardado(page, () => page.getByRole('button', { name: 'Subir a nivel 4' }).click())).toEqual(
-    esperado,
-  );
+  expect(
+    await proximoGuardado(page, async () => {
+      await page.getByRole('button', { name: 'Subir a nivel 4' }).click();
+      await page.getByRole('dialog').getByRole('button', { name: 'Confirmar', exact: true }).click();
+    }),
+  ).toEqual(esperado);
 });
 
 test('la Furia, los estados y el cansancio guardan lo del motor y se releen al recargar', async ({ page, request }) => {
@@ -1104,7 +1111,10 @@ test('Ficha de un PNJ: subir de nivel guarda lo que da el motor y vuelve a la ru
   await page.getByRole('button', { name: 'Continuar' }).click();
   const enviado = await proximoGuardado(
     page,
-    () => page.getByRole('button', { name: 'Subir a nivel 4' }).click(),
+    async () => {
+      await page.getByRole('button', { name: 'Subir a nivel 4' }).click();
+      await page.getByRole('dialog').getByRole('button', { name: 'Confirmar', exact: true }).click();
+    },
     npc.characterId,
   );
   expect(enviado).toEqual(esperado);

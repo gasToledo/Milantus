@@ -1,5 +1,5 @@
 import { Flame } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ActiveMode } from '../engine';
 import { useTexts } from '../i18n/context';
 import { labelOf } from '../i18n/texts';
@@ -69,6 +69,18 @@ export function ActiveModeTile({ model, mode: m }: { model: SheetModel; mode: Ac
     const r = write!.act({ type: 'activateMode', mode: m.id, ...choice });
     if (r && r.outcome.activated === false) write!.notify(t.modeFailed, { tone: 'error' });
   };
+  // «Ignición»: al prenderse (no al cargar la ficha ya prendido) la franja
+  // juega una vez la animación de `.mode-ignite` en `index.css`.
+  const wasActive = useRef(m.active);
+  const [igniting, setIgniting] = useState(false);
+  useEffect(() => {
+    const was = wasActive.current;
+    wasActive.current = m.active;
+    if (!m.active || was) return;
+    setIgniting(true);
+    const timer = window.setTimeout(() => setIgniting(false), 700);
+    return () => window.clearTimeout(timer);
+  }, [m.active]);
   const action = m.active ? `${t.modeOn} · ${t.modeEnd}` : (blocked ?? t.modeActivate);
   const off = !m.active && blocked !== null;
   // Los usos y, con el modo en curso, lo que le suma a la ficha (resistencias,
@@ -78,7 +90,7 @@ export function ActiveModeTile({ model, mode: m }: { model: SheetModel; mode: Ac
     .join(' · ');
   const body = (
     <>
-      <Flame size={22} aria-hidden="true" className={cx('shrink-0', off ? 'text-text-muted' : 'text-gold')} />
+      <Flame size={22} aria-hidden="true" className={cx('mode-flame shrink-0', off ? 'text-text-muted' : 'text-gold')} />
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className={cx('text-[15px] font-semibold', m.active ? 'text-gold' : 'text-on-surface')}>{titleOf(m)}</span>
         {meta && <span className="text-[12.5px] text-on-surface-variant">{meta}</span>}
@@ -89,8 +101,9 @@ export function ActiveModeTile({ model, mode: m }: { model: SheetModel; mode: Ac
   // Una franja a todo el ancho de la banda y no una quinta placa: con las
   // cuatro de arriba, quedaba sola en la segunda fila. Toda ella es el botón.
   const strip = cx(
-    'plaque flex min-h-[60px] w-full items-center gap-3.5 px-4 py-2.5 text-left font-[family-name:var(--font-body)]',
-    m.active && '!border-gold bg-gold-soft',
+    'mode-strip plaque flex min-h-[60px] w-full items-center gap-3.5 px-4 py-2.5 text-left font-[family-name:var(--font-body)] transition-colors duration-[400ms] ease-out',
+    m.active && 'mode-on !border-gold bg-gold-soft',
+    igniting && 'mode-ignite',
     off && 'opacity-60',
   );
   return (

@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import * as Dialog from '@radix-ui/react-dialog';
 import {
   computeSheet,
   levelUpView,
@@ -166,7 +167,11 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
   const pick = (kind: 'featurePicks' | 'proficiencyPicks' | 'spellPicks', groupId: string, ids: string[]) =>
     setDraft((d) => ({ ...d, [kind]: { ...d[kind], [groupId]: ids } }));
 
+  // «Subir a nivel n» abre la celebración; la subida se aplica recién con su
+  // «Confirmar». «Deshacer» la cierra sin aplicar nada y deja la revisión.
+  const [celebrating, setCelebrating] = useState(false);
   const confirm = () => {
+    setCelebrating(false);
     const r = write.act({ type: 'levelUp', draft: fullDraft });
     if (!r) return;
     navigate(write.routes.sheet());
@@ -486,6 +491,18 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
         </aside>
       </div>
 
+      {celebrating && (
+        <Celebration
+          level={view.newLevel}
+          subtitle={`${character.name} · ${t.classLevel(className(draft.classId), view.newClassLevel)}`}
+          rows={afterRows(sheet, after, t).filter((r) => r.from !== r.to && r.label !== t.luRowLevel)}
+          features={view.gainedFeatures.map((f) => f.name)}
+          t={t}
+          onUndo={() => setCelebrating(false)}
+          onConfirm={confirm}
+        />
+      )}
+
       <WizardFooter message={pending ?? (current === 'revision' ? t.luConfirmHint : null)}>
         {index === 0 ? (
           <ButtonLink tone="secondary" href={write.routes.sheet()} internal back className="flex-1 sm:flex-none">
@@ -502,7 +519,7 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
           <Button
             className="flex-[2] aria-disabled:opacity-40 sm:flex-none"
             aria-disabled={!view.complete || undefined}
-            onClick={view.complete ? confirm : undefined}
+            onClick={view.complete ? () => setCelebrating(true) : undefined}
           >
             {t.luConfirm(view.newLevel)}
           </Button>
@@ -818,8 +835,10 @@ function DetailPanel({
 
 /** A la derecha, abajo: lo que cambia en la ficha, de las dos fichas del
  *  motor. Solo se comparan números; ninguno se calcula acá. */
-function AfterPanel({ before, after, t }: { before: ComputedSheet; after: ComputedSheet; t: Texts }) {
-  const rows: { label: string; from: number; to: number }[] = [
+/** Lo que cambia de la ficha con la subida: lo usan «Cómo queda» y la
+ *  celebración. Las cifras son del motor (`before` y `after`). */
+function afterRows(before: ComputedSheet, after: ComputedSheet, t: Texts): { label: string; from: number; to: number }[] {
+  return [
     { label: t.luRowLevel, from: before.level, to: after.level },
     { label: t.luRowMaxHp, from: before.maxHp, to: after.maxHp },
     ...ABILITIES.filter((a) => before.abilityScores[a] !== after.abilityScores[a]).map((a) => ({
@@ -840,7 +859,108 @@ function AfterPanel({ before, after, t }: { before: ComputedSheet; after: Comput
         ]
       : []),
   ];
-  return <AfterCard rows={rows} heading={t.luAfterHeading} field="level-up-after" />;
+}
+
+function AfterPanel({ before, after, t }: { before: ComputedSheet; after: ComputedSheet; t: Texts }) {
+  return <AfterCard rows={afterRows(before, after, t)} heading={t.luAfterHeading} field="level-up-after" />;
+}
+
+/**
+ * La celebración del final (el lienzo «Subida de nivel completada», opción A):
+ * la ficha se oscurece, el rombo de la marca cae girando con el nivel nuevo, el
+ * número late, un anillo dorado se abre y lo que cambia entra de a uno. Es el
+ * último paso: «Confirmar» aplica la subida y «Deshacer» cierra sin aplicar.
+ * Un `Dialog` de Radix: el foco queda adentro y `Escape` es «Deshacer».
+ */
+function Celebration({
+  level,
+  subtitle,
+  rows,
+  features,
+  t,
+  onUndo,
+  onConfirm,
+}: {
+  level: number;
+  subtitle: string;
+  rows: { label: string; from: number; to: number }[];
+  features: string[];
+  t: Texts;
+  onUndo: () => void;
+  onConfirm: () => void;
+}) {
+  // El escalonado sigue después del anillo: filas y rasgos en una sola cuenta.
+  const delay = (i: number) => ({ animationDelay: `${620 + i * 60}ms` }) as CSSProperties;
+  return (
+    <Dialog.Root open onOpenChange={(open) => !open && onUndo()}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="lv-scrim fixed inset-0 z-50 bg-scrim" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <Dialog.Content
+            data-level-up-celebration
+            className="lv-card flex max-h-full w-[500px] max-w-full flex-col items-center overflow-y-auto rounded-[var(--radius-card)] border border-hairline bg-surface px-8 pt-8 pb-6 text-center outline-none"
+          >
+            <div aria-hidden="true" className="relative flex size-24 items-center justify-center">
+              <span className="lv-ring absolute size-6 rounded-full border-2 border-gold" />
+              <span className="lv-rombo absolute size-[62px] rounded-[var(--radius-mark)] border-2 border-gold bg-gold-soft" />
+              <span className="lv-num font-display relative text-[40px] leading-none text-gold">{level}</span>
+            </div>
+            <Dialog.Title className="font-display mt-[18px] text-[28px] text-on-surface">{t.luCelebrateTitle(level)}</Dialog.Title>
+            <Dialog.Description className="mt-1.5 text-[14px] text-on-surface-variant">{subtitle}</Dialog.Description>
+
+            <div className="mt-[22px] w-full text-left">
+              {rows.length > 0 && (
+                <>
+                  <p className="flex items-center gap-3">
+                    <span className="eyebrow shrink-0">{t.luChanged}</span>
+                    <span aria-hidden="true" className="h-px flex-1 bg-hairline" />
+                  </p>
+                  <dl className="plaque mt-2.5 divide-y divide-hairline px-3.5 py-0.5 text-[13.5px]">
+                    {rows.map((r, i) => (
+                      <div key={r.label} className="lv-up flex justify-between gap-3 py-[9px]" style={delay(i)}>
+                        <dt>{r.label}</dt>
+                        <dd className="num font-bold tabular-nums">
+                          {r.from} → <span className="text-gold">{r.to}</span>
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </>
+              )}
+              {features.length > 0 && (
+                <>
+                  <p className="mt-[18px] flex items-center gap-3">
+                    <span className="eyebrow shrink-0">{t.luNewFeatures}</span>
+                    <span aria-hidden="true" className="h-px flex-1 bg-hairline" />
+                  </p>
+                  <ul className="mt-2.5 flex flex-wrap gap-1.5">
+                    {features.map((f, i) => (
+                      <li
+                        key={f}
+                        className="lv-up rounded-[var(--radius-pill)] border border-hairline bg-gold-soft px-3 py-1 text-[12.5px] text-gold"
+                        style={delay(rows.length + i)}
+                      >
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </div>
+
+            <div className="mt-[26px] flex w-full gap-2.5">
+              <Button tone="secondary" className="min-h-11 flex-1" onClick={onUndo} data-action="level-up-undo">
+                {t.undo}
+              </Button>
+              <Button className="min-h-11 flex-[2]" onClick={onConfirm} data-action="level-up-confirm">
+                {t.luConfirmShort}
+              </Button>
+            </div>
+          </Dialog.Content>
+        </div>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
 }
 
 /** Un cupo de elección de rasgo (`_FeatureChoiceGroup` de Flutter). Lo que
