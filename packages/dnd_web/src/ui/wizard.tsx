@@ -1,4 +1,4 @@
-import { Fragment, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Check, CircleAlert } from 'lucide-react';
 import { fold, type CodexDetail } from '../codex/entries';
 import type { Texts } from '../i18n/texts';
@@ -524,14 +524,15 @@ export function AfterList({ rows }: { rows: AfterRow[] }) {
   return (
     <dl className="plaque divide-y divide-hairline px-3.5 py-0.5 text-[13px]">
       {rows.map((r) => (
-        <div key={r.label} className="flex items-baseline justify-between gap-3 py-2">
+        // Una fila nueva (una característica que recién sube) entra con un fundido.
+        <div key={r.label} className="step-in flex items-baseline justify-between gap-3 py-2">
           <dt className="shrink-0">{r.label}</dt>
           <dd className="num text-right font-bold tabular-nums">
             {r.from === undefined || r.from === r.to ? (
-              <span className={cx(r.gold && 'text-gold')}>{r.to}</span>
+              <AfterValue value={r.to} className={cx(r.gold && 'text-gold')} />
             ) : (
               <>
-                {r.from} → <span className="text-gold">{r.to}</span>
+                {r.from} → <AfterValue value={r.to} className="text-gold" />
               </>
             )}
             {r.note && <span className="ml-1.5 font-normal text-text-muted">{r.note}</span>}
@@ -539,6 +540,23 @@ export function AfterList({ rows }: { rows: AfterRow[] }) {
         </div>
       ))}
     </dl>
+  );
+}
+
+/** Una cifra de «Cómo queda» que late cuando cambia por algo que se eligió
+ *  (+2 a FUE): se ve qué movió la elección. La primera vez no late. */
+function AfterValue({ value, className }: { value: ReactNode; className?: string }) {
+  const text = typeof value === 'number' || typeof value === 'string' ? String(value) : null;
+  const last = useRef(text);
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    if (text !== null && last.current !== null && last.current !== text) setN((x) => x + 1);
+    last.current = text;
+  }, [text]);
+  return (
+    <span key={n} className={cx('inline-block', className, n > 0 && 'change-pulse')}>
+      {value}
+    </span>
   );
 }
 

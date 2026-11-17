@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
   computeSheet,
   levelUpView,
@@ -62,6 +62,13 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
   const [draft, setDraft] = useState<LevelUpDraft>({ classId: character.classId });
   const [hpMode, setHpMode] = useState<'average' | 'roll'>('average');
   const [rolled, setRolled] = useState<number | null>(null);
+  // Cuántas veces se tiró: cada tirada hace latir la cifra, aunque salga el
+  // mismo número.
+  const [rolls, setRolls] = useState(0);
+  const roll = () => {
+    setRolled(rollDie(view.hitDie));
+    setRolls((n) => n + 1);
+  };
   const [stepId, setStepId] = useState<StepId>('resumen');
   const [focus, setFocus] = useState<Focus>(null);
   const [featQuery, setFeatQuery] = useState('');
@@ -166,6 +173,22 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
     write.notify(t.luDone(character.name, view.newLevel), { tone: 'success', undo: () => write.restore(r.before) });
   };
 
+  // Al cambiar de paso el foco va al título del primer bloque: si se quedaba en
+  // «Continuar», quien usa teclado o lector no se enteraba de qué paso abrió.
+  // No al entrar: ahí manda el título de la pantalla.
+  const stepRef = useRef<HTMLDivElement>(null);
+  const firstStep = useRef(true);
+  useEffect(() => {
+    if (firstStep.current) {
+      firstStep.current = false;
+      return;
+    }
+    const heading = stepRef.current?.querySelector<HTMLElement>('h2');
+    if (!heading) return;
+    heading.tabIndex = -1;
+    heading.focus();
+  }, [current]);
+
   let main: ReactNode;
   switch (current) {
     case 'resumen':
@@ -191,17 +214,25 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
             <BigOption
               selected={hpMode === 'roll'}
               title={t.luRoll}
-              value={view.hpIfRoll === null ? t.luRange(...view.hpRange) : `+${view.hpIfRoll}`}
+              value={
+                view.hpIfRoll === null ? (
+                  t.luRange(...view.hpRange)
+                ) : (
+                  <span key={rolls} className={cx('inline-block', rolls > 0 && 'hp-pulse-up')}>
+                    +{view.hpIfRoll}
+                  </span>
+                )
+              }
               muted={view.hpIfRoll === null}
               detail={rolled === null ? t.luRollPending(view.hitDie) : t.luRollDetail(rolled)}
               onSelect={() => {
                 setHpMode('roll');
-                if (rolled === null) setRolled(rollDie(view.hitDie));
+                if (rolled === null) roll();
               }}
             >
               {hpMode === 'roll' && (
                 <div className="flex flex-wrap items-center gap-2.5 border-t border-hairline pt-3">
-                  <Button tone="secondary" onClick={() => setRolled(rollDie(view.hitDie))}>
+                  <Button tone="secondary" onClick={roll}>
                     {t.luReroll}
                   </Button>
                   <label className="flex items-center gap-2 text-[12.5px] text-on-surface-variant">
@@ -229,7 +260,8 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
     case 'subclase':
       main = (
         <Block title={t.luSubclassTitle} status={<Status ready={!!draft.subclassId} t={t} />}>
-          <div className="flex max-h-[420px] flex-col gap-2 overflow-y-auto pr-1" role="radiogroup" aria-label={t.luSubclassTitle}>
+          {/* Sin scroll propio: crece con la página y el pie sigue fijo. */}
+          <div className="flex flex-col gap-2" role="radiogroup" aria-label={t.luSubclassTitle}>
             {view.subclassOptions.map((s) => (
               <Option
                 key={s.id}
@@ -447,7 +479,7 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
       </header>
 
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <div key={current} className="flex min-w-0 flex-col gap-4">{main}</div>
+        <div key={current} ref={stepRef} className="flex min-w-0 flex-col gap-4">{main}</div>
         <aside className={WIZARD_ASIDE}>
           <DetailPanel focus={focus} view={view} catalog={catalog} lang={lang} t={t} />
           <AfterPanel before={sheet} after={after} t={t} />
@@ -465,14 +497,20 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
           </Button>
         )}
         {current === 'revision' ? (
-          <Button className="flex-[2] sm:flex-none" disabled={!view.complete} onClick={confirm}>
+          // `aria-disabled` y no `disabled`: sigue en el orden de tabulación y el
+          // pie dice qué falta.
+          <Button
+            className="flex-[2] aria-disabled:opacity-40 sm:flex-none"
+            aria-disabled={!view.complete || undefined}
+            onClick={view.complete ? confirm : undefined}
+          >
             {t.luConfirm(view.newLevel)}
           </Button>
         ) : (
           <Button
-            className="flex-[2] sm:flex-none"
-            disabled={pending !== null}
-            onClick={() => setStepId(steps[index + 1]!)}
+            className="flex-[2] aria-disabled:opacity-40 sm:flex-none"
+            aria-disabled={pending !== null || undefined}
+            onClick={pending === null ? () => setStepId(steps[index + 1]!) : undefined}
           >
             {index === 0 ? t.luStart : t.luContinue}
           </Button>
@@ -676,7 +714,7 @@ function AsiStep({
             {feats.length === 0 ? (
               <p className="py-4 text-[13px] text-text-muted">{t.luNoFeatMatch(featQuery.trim())}</p>
             ) : (
-              <div className="flex h-[300px] flex-col gap-2 overflow-y-auto pr-1" role="radiogroup" aria-label={t.luFeatTitle}>
+              <div className="flex flex-col gap-2" role="radiogroup" aria-label={t.luFeatTitle}>
                 {feats.map((f) => (
                   <Option
                     key={f.id}
@@ -836,7 +874,7 @@ function FeatureSlotBlock({
   return (
     <Block title={slot.name} status={<Status ready={full} count={[chosen.length, count]} t={t} />}>
       <div
-        className="flex max-h-[420px] flex-col gap-2 overflow-y-auto pr-1"
+        className="flex flex-col gap-2"
         role={single ? 'radiogroup' : 'group'}
         aria-label={slot.name}
       >
@@ -876,7 +914,7 @@ function BigOption({
 }: {
   selected: boolean;
   title: string;
-  value: string;
+  value: ReactNode;
   detail: string;
   muted?: boolean;
   onSelect: () => void;

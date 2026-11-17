@@ -555,13 +555,20 @@ body {
 .hp-pulse-up {
   --hp-pulse: var(--verdant);
 }
+/* Una cifra que cambió por una elección (`AfterValue` del asistente): el
+   mismo pulso, en oro. */
+.change-pulse {
+  --hp-pulse: var(--gold);
+}
 .hp-pulse-down,
-.hp-pulse-up {
+.hp-pulse-up,
+.change-pulse {
   animation: hp-tint 600ms ease-out;
 }
 @media (prefers-reduced-motion: no-preference) {
   .hp-pulse-down,
-  .hp-pulse-up {
+  .hp-pulse-up,
+  .change-pulse {
     animation: hp-pulse 360ms ease-out;
   }
 }
