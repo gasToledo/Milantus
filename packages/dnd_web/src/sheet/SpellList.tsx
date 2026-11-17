@@ -328,7 +328,9 @@ export function SpellList({
   return (
     <div className="flex flex-col gap-3">
       {/* Local a este archivo: `SpellTabs` lleva estados de cupo que acá no van. */}
-      <div role="tablist" className="grid auto-cols-fr grid-flow-col gap-1.5">
+      {/* Pasan a otra fila cuando no entran: en una sola, «Siempre
+          preparados» se partía y los números quedaban pegados. */}
+      <div role="tablist" className="grid gap-2 [grid-template-columns:repeat(auto-fit,minmax(104px,1fr))]">
         {tabs.map((x) => {
           const on = x.key === tab;
           return (
@@ -340,11 +342,11 @@ export function SpellList({
               data-tab={x.key}
               onClick={() => setPicked(x.key)}
               className={cx(
-                'pick flex min-h-[52px] min-w-0 flex-col items-center justify-center rounded-[var(--radius-card)] border px-2.5 py-1.5',
+                'pick flex min-h-[56px] min-w-0 flex-col items-center justify-center gap-0.5 rounded-[var(--radius-card)] border px-3 py-2 text-center',
                 on ? 'border-gold bg-gold-soft text-gold' : 'border-hairline bg-plaque',
               )}
             >
-              <span className="text-[12.5px]">{x.title}</span>
+              <span className="text-[12.5px] leading-tight">{x.title}</span>
               <b className="text-[13px] font-bold tabular-nums">{x.count}</b>
             </button>
           );

@@ -73,7 +73,9 @@ export function SpellSlotGrid({
   const t = useTexts();
   if (cells.length === 0) return null;
   return (
-    <div className={cx('grid gap-1.5', cells.length === 1 ? 'grid-cols-1' : 'grid-cols-3')}>
+    // Las columnas se acomodan al ancho: en tres fijas, con cuatro espacios los
+    // puntos se amontonaban contra el número.
+    <div className={cx('grid gap-2', cells.length === 1 ? 'grid-cols-1' : '[grid-template-columns:repeat(auto-fill,minmax(120px,1fr))]')}>
       {cells.map((c) => {
         const on = c.key === selected;
         const n = left(c);
@@ -85,17 +87,18 @@ export function SpellSlotGrid({
             aria-pressed={on}
             onClick={() => onSelect(c.key)}
             className={cx(
-              'pick flex min-h-12 items-center justify-between gap-2 rounded-[var(--radius-card)] border px-2.5 py-1.5 text-left',
+              // El nivel arriba y los puntos debajo, alineados a la izquierda.
+              'pick flex min-h-[60px] flex-col items-start justify-center gap-1.5 rounded-[var(--radius-card)] border px-3 py-2 text-left [&>[role=img]]:justify-start',
               on ? 'border-gold bg-gold-soft' : 'border-hairline bg-plaque',
             )}
           >
             <b
               className={cx(
-                'text-[14px] font-bold tabular-nums',
-                on ? 'text-gold' : n === 0 && c.max > 0 && 'text-text-muted',
+                'text-[10.5px] font-semibold tracking-[1.1px] uppercase tabular-nums',
+                on ? 'text-gold' : n === 0 && c.max > 0 ? 'text-text-muted' : 'text-on-surface-variant',
               )}
             >
-              {c.pact ? t.slotCellPact(c.level) : c.level}
+              {c.pact ? t.slotCellPact(c.level) : t.spellLevelShort(c.level)}
             </b>
             {c.max > 0 ? (
               <Pips max={c.max} left={n} label={t.slotsLabel(n, c.max, String(c.level))} />

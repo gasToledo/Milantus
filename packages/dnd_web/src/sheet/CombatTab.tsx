@@ -805,9 +805,10 @@ export function ConditionToggleList({
   );
 }
 
-/** El Cansancio con la anatomía de un recurso (`_exhaustionRow`): el nombre
- *  abre la regla, los pips debajo y el par −/+, que acá es al revés: bajar es
- *  lo bueno. Los números penalizados ya los trae el motor; el «−4 a las
+/** El Cansancio (`_exhaustionRow`): una fila con el nombre (abre la regla), el
+ *  nivel y el par −/+, que acá es al revés: bajar es lo bueno; debajo, una
+ *  barra de seis tramos que se lee de un vistazo, y la penalización. La barra
+ *  va arriba de la penalización: que esta aparezca no corre nada. Los números penalizados ya los trae el motor; el «−4 a las
  *  tiradas» es solo el aviso de cuánto. Al nivel 6 la ficha no hace nada (esa
  *  decisión es de la mesa), pero lo dice. */
 function ExhaustionRow({ model }: { model: SheetModel }) {
@@ -820,34 +821,45 @@ function ExhaustionRow({ model }: { model: SheetModel }) {
     if (r?.outcome.died) write!.notify(t.exhaustionDeath(MAX_EXHAUSTION), { tone: 'error' });
   };
   return (
-    <div className="mt-4 border-t border-hairline pt-4" data-field="exhaustion">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <button
-            type="button"
-            onClick={() => setRule(true)}
-            aria-label={t.exhaustionRuleOpen}
-            className="inline-flex items-center gap-1.5 font-[family-name:var(--font-body)] text-[16px] font-medium text-on-surface"
-          >
-            {t.exhaustionTitle}
-            <Info size={16} aria-hidden="true" className="text-text-muted" />
-          </button>
-          {/* La línea de la penalización siempre ocupa su lugar: si apareciera
-              recién en el nivel 1, subir el cansancio movería los pips. */}
-          <p className="mt-1 min-h-[20px] text-[13px] text-crimson">{n >= 1 ? t.exhaustionPenalty(2 * n, 5 * n) : ''}</p>
-          {/* Pips alinea a la derecha (como en los recursos); acá la columna mide
-              lo que el texto de arriba, y con otro nivel los puntos se correrían. */}
-          <div className="mt-2 [&>[role=img]]:justify-start">
-            <Pips max={MAX_EXHAUSTION} left={n} label={t.exhaustionLevelOf(n, MAX_EXHAUSTION)} tone="crimson" />
-          </div>
-        </div>
-        <SpendRecoverButtons
-          spendLabel={t.exhaustionLower}
-          recoverLabel={t.exhaustionRaise}
-          onSpend={n > 0 ? () => set(n - 1) : undefined}
-          onRecover={n < MAX_EXHAUSTION ? () => set(n + 1) : undefined}
-        />
+    <div className="mt-4 border-t border-hairline pt-3.5" data-field="exhaustion">
+      <div className="flex items-center justify-between gap-3">
+        <button
+          type="button"
+          onClick={() => setRule(true)}
+          aria-label={t.exhaustionRuleOpen}
+          className="inline-flex min-w-0 items-center gap-1.5 font-[family-name:var(--font-body)] text-[14px] font-medium text-on-surface transition-colors duration-[120ms] ease-out hover:text-gold"
+        >
+          {t.exhaustionTitle}
+          <Info size={15} aria-hidden="true" className="text-text-muted" />
+        </button>
+        <span className="flex shrink-0 items-center gap-2">
+          {/* El nivel en cifras; el lector lo tiene en la barra. */}
+          <span aria-hidden="true" className="num text-[15px]">
+            <span className={n > 0 ? 'text-crimson' : 'text-text-muted'}>{n}</span>
+            <span className="text-text-muted"> / {MAX_EXHAUSTION}</span>
+          </span>
+          <SpendRecoverButtons
+            spendLabel={t.exhaustionLower}
+            recoverLabel={t.exhaustionRaise}
+            onSpend={n > 0 ? () => set(n - 1) : undefined}
+            onRecover={n < MAX_EXHAUSTION ? () => set(n + 1) : undefined}
+          />
+        </span>
       </div>
+      <span role="img" aria-label={t.exhaustionLevelOf(n, MAX_EXHAUSTION)} className="mt-2 grid grid-cols-6 gap-1">
+        {Array.from({ length: MAX_EXHAUSTION }, (_, i) => (
+          <span
+            key={i}
+            aria-hidden="true"
+            className={cx('h-1.5 rounded-full transition-colors duration-[160ms] ease-out', i < n ? 'bg-crimson' : 'bg-hairline')}
+          />
+        ))}
+      </span>
+      {n >= 1 && (
+        <p key={n} className="step-in mt-2 text-[13px] text-crimson">
+          {t.exhaustionPenalty(2 * n, 5 * n)}
+        </p>
+      )}
       {n >= MAX_EXHAUSTION - 1 && (
         <p className="mt-2.5 flex items-start gap-2 text-[12.5px] text-crimson">
           <TriangleAlert size={18} aria-hidden="true" className="shrink-0" />
