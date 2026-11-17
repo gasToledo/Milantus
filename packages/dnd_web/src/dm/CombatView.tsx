@@ -739,7 +739,7 @@ function HpBar({ current, max, temp, label }: { current: number; max: number; te
       className="flex h-[5px] w-full overflow-hidden rounded-[3px] bg-hairline"
     >
       <div className="thin-bar-fill h-full bg-crimson" style={{ width: `${pct(current)}%` }} />
-      {temp > 0 && <div className="thin-bar-fill ml-px h-full bg-gold" style={{ width: `${pct(temp)}%` }} />}
+      {temp > 0 && <div className="temp-stripes thin-bar-fill ml-px h-full" style={{ width: `${pct(temp)}%` }} />}
     </div>
   );
 }

@@ -291,7 +291,7 @@ export function ThinBar({
       <div className={cx('thin-bar-fill h-full', colorClassName)} style={{ width: `${ratio * 100}%`, borderRadius: height / 2 }} />
       {/* Siempre montado (en cero sin temporales): así crece y se achica con la
           misma transición que los PG, en vez de aparecer de golpe. */}
-      <div className="thin-bar-fill ml-px h-full bg-gold" style={{ width: `${share(temp) * 100}%`, borderRadius: height / 2 }} />
+      <div className="temp-stripes thin-bar-fill ml-px h-full" style={{ width: `${share(temp) * 100}%`, borderRadius: height / 2 }} />
     </div>
   );
 }

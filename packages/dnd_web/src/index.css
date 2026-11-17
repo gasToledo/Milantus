@@ -573,6 +573,14 @@ body {
   }
 }
 
+/* El tramo de los PG temporales en una barra de PG: rayado en dorado y no
+   dorado liso. Los PG entre la mitad y un cuarto también son dorados, y liso
+   se confundía con ellos; el rayado se distingue por la textura, no solo por
+   el color. */
+.temp-stripes {
+  background: repeating-linear-gradient(-45deg, var(--gold) 0 3px, var(--gold-soft) 3px 5px);
+}
+
 /* La barra de PG recorre el tramo (`ThinBar`, 220 ms easeOut). */
 .thin-bar-fill {
   transition: width 220ms ease-out;
