@@ -14,10 +14,12 @@ import {
   HOMEBREW_CATEGORIES,
   Link,
   navigate,
+  navigateBack,
   type HomebrewCategory,
 } from '../router';
 import { Button, ButtonLink } from '../ui/Button';
 import { cx } from '../ui/cx';
+import { fadeNavigate } from '../ui/fadeNavigate';
 import { showNotice } from '../ui/notices';
 import { Tooltip } from '../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
@@ -190,7 +192,7 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
                   aria-label={t.hbDuplicateTitle(entry.name)}
                   data-action="homebrew-duplicate"
                   onClick={() => navigate(dmHomebrewNewHref(editable, entry.id))}
-                  className="inline-flex size-9 items-center justify-center rounded-[var(--radius-nav)] border border-hairline text-on-surface hover:bg-plaque"
+                  className="inline-flex size-9 items-center justify-center rounded-[var(--radius-nav)] border border-hairline text-on-surface transition-colors duration-[120ms] ease-out hover:bg-plaque"
                 >
                   <Copy size={16} aria-hidden="true" />
                 </button>
@@ -201,7 +203,7 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
                   aria-label={t.hbDeleteTooltip(entry.name)}
                   data-action="homebrew-delete"
                   onClick={() => setDeleting({ category, id: entry.id, name: entry.name })}
-                  className="inline-flex size-9 items-center justify-center rounded-[var(--radius-nav)] border border-hairline text-crimson hover:bg-plaque"
+                  className="inline-flex size-9 items-center justify-center rounded-[var(--radius-nav)] border border-hairline text-crimson transition-colors duration-[120ms] ease-out hover:bg-plaque"
                 >
                   <Trash2 size={16} aria-hidden="true" />
                 </button>
@@ -225,10 +227,19 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
   return <Home own={own} total={total} headerWith={headerWith} />;
 }
 
+/** El título de cada pantalla del Modo DM: adonde va el foco tras el fundido. */
+const DM_TITLE = '[data-dm-title]';
+
 function BackToHome() {
   const t = useTexts();
   return (
-    <Link back href={dmHomebrewHref()} className="inline-flex items-center gap-1.5 self-start text-[13px] text-on-surface-variant hover:text-gold">
+    // Vuelve a la portada con el fundido con que se entró a la categoría.
+    <Link
+      back
+      href={dmHomebrewHref()}
+      onClick={(e) => fadeNavigate(e, DM_TITLE, () => navigateBack(dmHomebrewHref()))}
+      className="inline-flex items-center gap-1.5 self-start text-[13px] text-on-surface-variant transition-colors duration-[120ms] ease-out hover:text-gold"
+    >
       <ArrowLeft size={16} aria-hidden="true" className="text-gold" />
       {t.luBack}
     </Link>
@@ -302,7 +313,7 @@ function Home({
       <ul aria-label={t.dmHomebrewSearch} className="card max-w-[720px] p-1.5">
         {hits.map(({ c, label, e }) => (
           <li key={`${c}/${e.id}`}>
-            <Link href={href(c, e.id)} className="flex flex-wrap items-baseline gap-x-2.5 rounded-[var(--radius-nav)] px-3 py-2 hover:bg-plaque" data-entry={e.id}>
+            <Link href={href(c, e.id)} className="flex flex-wrap items-baseline gap-x-2.5 rounded-[var(--radius-nav)] px-3 py-2 transition-colors duration-[120ms] ease-out hover:bg-plaque" data-entry={e.id}>
               <span className="text-[14px] text-on-surface">{e.name}</span>
               <span className="text-[12px] text-text-muted">{label}</span>
             </Link>
@@ -317,7 +328,14 @@ function Home({
           const empty = list.length === 0;
           return (
             <li key={c}>
-              <Link href={dmHomebrewHref(c)} className="card block px-4 py-[15px] hover:border-gold" data-category={c}>
+              {/* Responde como las tarjetas de la portada del Códice, y entrar a la
+                  categoría funde la pantalla, como cambiar de sección. */}
+              <Link
+                href={dmHomebrewHref(c)}
+                onClick={(e) => fadeNavigate(e, DM_TITLE)}
+                className="card block px-4 py-[15px] transition duration-[120ms] ease-out hover:border-gold motion-safe:active:translate-y-px"
+                data-category={c}
+              >
                 <span className="flex items-center gap-2.5">
                   <Icon size={20} aria-hidden="true" className={cx('shrink-0', empty ? 'text-text-muted' : 'text-gold')} />
                   <span className={cx('font-display flex-1 text-[17px]', empty ? 'text-text-muted' : 'text-on-surface')}>{label}</span>
@@ -447,7 +465,7 @@ function CreatureList({
         <ul aria-label={t.dmHomebrewCreatures} className="card max-w-[720px] p-1.5">
           {creatures.map((c) => (
             <li key={c.id}>
-              <Link href={dmBestiaryHref(c.id)} className="block rounded-[var(--radius-nav)] px-3 py-2 hover:bg-plaque" data-entry={c.id}>
+              <Link href={dmBestiaryHref(c.id)} className="block rounded-[var(--radius-nav)] px-3 py-2 transition-colors duration-[120ms] ease-out hover:bg-plaque" data-entry={c.id}>
                 <span className="block text-[14px] text-on-surface">{c.name}</span>
                 <span className="mt-0.5 block truncate text-[12px] text-text-muted">{c.subtitle}</span>
               </Link>

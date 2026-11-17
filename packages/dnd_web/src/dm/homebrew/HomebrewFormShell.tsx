@@ -36,10 +36,14 @@ export function useHomebrewRules(): HomebrewRules {
   return useMemo(() => homebrewRules(), [lang]);
 }
 
+/** Quien monta una explicación le pone esta `key`: otra explicación entra con
+ *  su fundido en vez de cambiar el texto de golpe. */
+const explainedKey = (e: Explained) => `${e.kicker}\n${e.title}`;
+
 /** La placa de una explicación: hundida, sin borde, con el kicker en oro. */
 function ExplainPlaque({ explained, large }: { explained: Explained; large?: boolean }) {
   return (
-    <div className="plaque flex flex-col gap-1.5 rounded-[var(--radius-card)] px-4 py-3.5">
+    <div className="plaque step-in flex flex-col gap-1.5 rounded-[var(--radius-card)] px-4 py-3.5">
       <span className="text-[12px] text-gold">{explained.kicker}</span>
       <span className={cx('font-display text-on-surface', large ? 'text-[20px]' : 'text-[18px]')}>{explained.title}</span>
       <p className="text-[13.5px] leading-[1.55] text-on-surface">{explained.text}</p>
@@ -59,7 +63,7 @@ export function ExplainHere({ explanation, always, className }: { explanation: E
   if (!explanation) return null;
   return (
     <div aria-live="polite" className={cx(!always && 'lg:hidden', className)}>
-      <ExplainPlaque explained={explanation} />
+      <ExplainPlaque key={explainedKey(explanation)} explained={explanation} />
     </div>
   );
 }
@@ -153,7 +157,15 @@ export function HomebrewFormShell({
             <Button tone="secondary" onClick={requestLeave}>
               {t.cancel}
             </Button>
-            <Button data-action={saveAction} disabled={saving} onClick={onSave}>
+            {/* Mientras guarda no responde, pero no se deshabilita: un botón
+                deshabilitado pierde el foco y, si el guardado falla, el aviso
+                aparecería con el foco en ninguna parte. */}
+            <Button
+              data-action={saveAction}
+              aria-disabled={saving || undefined}
+              onClick={saving ? undefined : onSave}
+              className="aria-disabled:opacity-40"
+            >
               {failed ? t.retry : t.blockSave}
             </Button>
           </WizardFooter>
@@ -161,7 +173,7 @@ export function HomebrewFormShell({
         <aside aria-label={previewLabel} className={cx(WIZARD_ASIDE, 'hidden lg:flex')}>
           <Eyebrow>{previewLabel}</Eyebrow>
           {preview}
-          <div aria-live="polite">{explanation && <ExplainPlaque explained={explanation} large />}</div>
+          <div aria-live="polite">{explanation && <ExplainPlaque key={explainedKey(explanation)} explained={explanation} large />}</div>
         </aside>
       </div>
       <AppDialog
