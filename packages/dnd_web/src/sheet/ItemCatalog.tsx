@@ -181,44 +181,58 @@ export function ItemCatalogDialog({
             {matches.map((r) => {
               const missing = r.costCp - purse.purseCp;
               return (
-                <li key={r.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2" data-item={r.id}>
-                  <span className="min-w-0 flex-[1_1_200px]">
+                // Una sola línea por objeto: nombre y tipo, peso, precio y las dos
+                // acciones compactas. Lo que falta para comprarlo no se repite en
+                // cada fila: el precio se atenúa y «Comprar» lo dice al pasar.
+                <li key={r.id} className="flex items-center gap-3 py-2" data-item={r.id}>
+                  <span className="min-w-0 flex-1">
                     <span className="block truncate text-[14px] text-on-surface">{r.name}</span>
-                    <span className="block text-[11.5px] text-on-surface-variant">
-                      {[r.detail, missing > 0 ? t.catalogMissing(formatAmount(missing, labels)) : null]
-                        .filter(Boolean)
-                        .join(' · ')}
-                    </span>
+                    <span className="block truncate text-[11.5px] text-on-surface-variant">{r.detail}</span>
                   </span>
-                  <span className="w-14 text-right text-[12.5px] text-on-surface-variant tabular-nums">
+                  <span className="hidden w-12 shrink-0 text-right text-[12.5px] text-on-surface-variant tabular-nums sm:block">
                     {r.weight === 0 ? '—' : `${pounds.format(r.weight)} ${t.pounds}`}
                   </span>
-                  <span className="w-16 text-right text-[12.5px] text-gold tabular-nums">
+                  <span className={cx('w-14 shrink-0 text-right text-[12.5px] tabular-nums', missing > 0 ? 'text-text-muted' : 'text-gold')}>
                     {formatCost(r.costCp, labels)}
                   </span>
-                  <span className="ml-auto flex items-center gap-1">
-                    <Button
-                      tone="secondary"
+                  <span className="flex shrink-0 items-center gap-1">
+                    <button
+                      type="button"
                       aria-label={t.catalogAddFreeLabel(r.name)}
                       onClick={() => onAdd(r)}
+                      className="inline-flex h-8 items-center rounded-[var(--radius-nav)] border px-2.5 text-[12.5px] font-medium transition-colors duration-[120ms] ease-out border-hairline text-on-surface hover:border-gold"
                     >
                       {t.catalogAddFree}
-                    </Button>
-                    <Button
-                      tone="soft"
-                      aria-label={t.catalogBuyLabel(r.name)}
-                      disabled={missing > 0}
-                      onClick={() => onBuy(r)}
-                    >
-                      {t.catalogBuy}
-                    </Button>
+                    </button>
+                    {/* Sin plata no se apaga del todo (`aria-disabled`): sigue en el
+                        orden de tabulación y su tooltip dice cuánto falta. */}
+                    <Tooltip content={missing > 0 ? t.catalogMissing(formatAmount(missing, labels)) : t.catalogBuyLabel(r.name)}>
+                      <button
+                        type="button"
+                        aria-label={t.catalogBuyLabel(r.name)}
+                        aria-disabled={missing > 0 || undefined}
+                        onClick={missing > 0 ? undefined : () => onBuy(r)}
+                        className={cx(
+                          'inline-flex h-8 items-center rounded-[var(--radius-nav)] border px-2.5 text-[12.5px] font-medium transition-colors duration-[120ms] ease-out',
+                          missing > 0 ? 'cursor-default border-hairline text-text-muted opacity-60' : 'border-gold bg-gold-soft text-gold hover:bg-plaque',
+                        )}
+                      >
+                        {t.catalogBuy}
+                      </button>
+                    </Tooltip>
                   </span>
                 </li>
               );
             })}
           </ul>
         )}
-        <p className="text-[12px] text-on-surface-variant">{added === 0 ? t.catalogHint : t.catalogAdded(added)}</p>
+        {/* Sin explicación al pie: «Agregar» y «Comprar» ya dicen qué hacen. Solo
+            el aviso de lo que se fue sumando. */}
+        {added > 0 && (
+          <p key={added} role="status" className="step-in text-[12px] text-on-surface-variant">
+            {t.catalogAdded(added)}
+          </p>
+        )}
       </div>
     </AppDialog>
   );
