@@ -35,11 +35,15 @@ export function Status({
   auto = false,
   count,
   label,
+  keepCount = false,
   t,
 }: {
   ready?: boolean;
   auto?: boolean;
   count?: [number, number];
+  /** Completo, sigue diciendo la cuenta («4 de 4», en oro) en vez de «Listo»:
+   *  donde el cupo es lo que se mira (los planos del Artífice). */
+  keepCount?: boolean;
   /** Lo que falta dicho con palabras («Faltan 2»), cuando no es una cuenta de
    *  n de m. */
   label?: string;
@@ -51,7 +55,7 @@ export function Status({
     return (
       <span className={cx(pill, 'bg-gold-soft text-gold')}>
         <Check size={11} strokeWidth={3} aria-hidden="true" />
-        {t.luReady}
+        {keepCount && count ? t.luCount(count[0], count[1]) : t.luReady}
       </span>
     );
   return (
@@ -164,6 +168,8 @@ export function SpellTabs({
     badge?: number;
     /** La pestaña tiene algo que corregir: borde rojo e ícono. */
     alert?: boolean;
+    /** Completa, sigue diciendo la cuenta (ver `Status`). */
+    keepCount?: boolean;
   }[];
   current: string;
   onSelect: (key: string) => void;
@@ -201,7 +207,7 @@ export function SpellTabs({
                 <span className={cx('text-[13px] tabular-nums', on ? 'text-gold' : 'text-text-muted')}>{x.badge}</span>
               )}
             </span>
-            {!plain && <Status ready={x.ready} count={x.count} label={x.label} t={t} />}
+            {!plain && <Status ready={x.ready} count={x.count} label={x.label} keepCount={x.keepCount} t={t} />}
           </button>
         );
       })}

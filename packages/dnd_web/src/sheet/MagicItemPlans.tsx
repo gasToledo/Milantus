@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ArrowLeft, Info, X } from 'lucide-react';
+import { ArrowLeft, Info } from 'lucide-react';
 import { codexEntries } from '../codex/entries';
 import {
   catalogLabel,
@@ -139,7 +139,9 @@ function Plans({ model, write, view }: { model: SheetModel; write: SheetWriter; 
         : null
       : replicaHint || (view.chosen.length > 0 && free > 0 ? t.mpSlotsLeft(free) : null);
 
-  const focused = focus ? details.find((e) => e.id === focus) : undefined;
+  // Al entrar, el panel muestra el primer plano elegido: vacío era un hueco.
+  const focusId = focus ?? view.chosen[0]?.id ?? null;
+  const focused = focusId ? details.find((e) => e.id === focusId) : undefined;
   const sheetEntry = sheetId ? details.find((e) => e.id === sheetId) : undefined;
   const back = write.routes.sheet('inventario');
 
@@ -172,7 +174,8 @@ function Plans({ model, write, view }: { model: SheetModel; write: SheetWriter; 
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
         <section className="card flex min-w-0 flex-col gap-3 p-4">
           <SpellTabs
-            tabs={tabs.map((x) => ({ key: x.key, title: x.title, ready: x.n >= x.cap, count: [x.n, x.cap] }))}
+            // La cuenta a la vista («4 de 4»), también completa: es lo que se mira.
+            tabs={tabs.map((x) => ({ key: x.key, title: x.title, ready: x.n >= x.cap, count: [x.n, x.cap], keepCount: true }))}
             current={tab}
             onSelect={(k) => {
               setTab(k as TabKey);
@@ -185,23 +188,10 @@ function Plans({ model, write, view }: { model: SheetModel; write: SheetWriter; 
 
           {tab === 'plans' ? (
             <>
-              <ul aria-label={t.mpChosenLabel} className="flex min-h-9 flex-wrap items-center gap-1.5">
-                {view.chosen.length === 0 && <li className="text-[12.5px] text-on-surface-variant">{t.crNoneYet}</li>}
-                {view.chosen.map((c) => (
-                  <li key={c.id}>
-                    <button
-                      type="button"
-                      data-chip={c.id}
-                      aria-label={t.mpRemovePlan(c.name)}
-                      onClick={() => removePlan(c.id)}
-                      className="inline-flex h-9 items-center gap-1.5 rounded-[var(--radius-pill)] border border-gold bg-gold-soft pr-2 pl-3 text-[12.5px] whitespace-nowrap text-on-surface"
-                    >
-                      {c.name}
-                      <X size={14} strokeWidth={2.5} aria-hidden="true" className="text-gold" />
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              {/* Sin chips de lo elegido: la lista ya lo muestra marcado y se
+                  destilda ahí. Con el cupo lleno lo dice siempre, no recién al
+                  tocar un plano apagado. */}
+              {full && <p className="text-[13px] text-on-surface-variant">{t.mpFullHint(view.count)}</p>}
               <SearchableList
                 items={options}
                 textOf={(o) => o.name}
@@ -209,7 +199,9 @@ function Plans({ model, write, view }: { model: SheetModel; write: SheetWriter; 
                 count={t.mpCount(options.length)}
                 columns={2}
                 multi
-                height="max-h-[396px]"
+                // Crece con la página: con scroll propio la última fila quedaba
+                // cortada y abajo sobraba pantalla. El pie sigue fijo.
+                height=""
                 groupOf={(o) => catalogLabel('rarity', o.rarity)}
               >
                 {(o) => {
@@ -277,6 +269,11 @@ function Plans({ model, write, view }: { model: SheetModel; write: SheetWriter; 
         </section>
 
         <aside className={WIZARD_ASIDE}>
+          {!focused && (
+            <section className="card p-4">
+              <p className="text-[13px] text-on-surface-variant">{t.mpPickToSee}</p>
+            </section>
+          )}
           {focused && (
             <section className="card flex flex-col gap-3 p-4">
               <div>
