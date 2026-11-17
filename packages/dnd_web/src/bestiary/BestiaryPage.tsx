@@ -148,7 +148,18 @@ function Browser({
     listRef.current?.querySelector('[aria-current="true"]')?.scrollIntoView({ block: 'nearest' });
     // El perfil scrollea solo lado a lado (`.codex-detail > article`) y es el
     // mismo elemento: la criatura nueva arrancaría donde quedó la anterior.
-    listRef.current?.parentElement?.querySelector('.codex-detail > article')?.scrollTo({ top: 0 });
+    const article = listRef.current?.parentElement?.querySelector('.codex-detail > article');
+    article?.scrollTo({ top: 0 });
+    // Y entra suave, como una entrada del Códice. Se anima el mismo elemento
+    // en vez de remontarlo: el foco no se mueve.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    article?.animate(
+      [
+        { opacity: 0, translate: '0 4px' },
+        { opacity: 1, translate: '0 0' },
+      ],
+      { duration: 160, easing: 'ease-out' },
+    );
   }, [open?.row.id]);
 
   // Un rango invertido no se muestra como lista vacía: el extremo que no se
@@ -194,7 +205,7 @@ function Browser({
                 type="button"
                 aria-label={t.rosterClearSearch}
                 onClick={() => setQuery('')}
-                className="absolute inset-y-0 right-1 flex w-7 items-center justify-center text-text-muted hover:text-on-surface"
+                className="absolute inset-y-0 right-1 flex w-7 items-center justify-center text-text-muted transition-colors duration-[120ms] ease-out hover:text-on-surface"
               >
                 <X size={14} aria-hidden="true" />
               </button>
@@ -266,7 +277,7 @@ function Browser({
                         aria-current={on ? 'true' : undefined}
                         data-entry={row.id}
                         className={cx(
-                          'flex items-center gap-2.5 rounded-[var(--radius-nav)] px-3 py-2',
+                          'flex items-center gap-2.5 rounded-[var(--radius-nav)] px-3 py-2 transition-colors duration-[120ms] ease-out',
                           on ? 'bg-gold-soft text-gold' : 'text-on-surface hover:bg-plaque',
                         )}
                       >
@@ -293,7 +304,7 @@ function Browser({
                 {/* Sin `back`: ver el Atrás del Códice. */}
                 <Link
                   href={hrefOf()}
-                  className="codex-back mb-3 inline-flex items-center gap-1.5 text-[13px] text-on-surface-variant hover:text-gold"
+                  className="codex-back mb-3 inline-flex items-center gap-1.5 text-[13px] text-on-surface-variant transition-colors duration-[120ms] ease-out hover:text-gold"
                 >
                   <ArrowLeft size={16} aria-hidden="true" className="text-gold" />
                   {t.luBack}

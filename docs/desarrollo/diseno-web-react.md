@@ -331,11 +331,16 @@ Reutiliza el marco lista + detalle del Códice (`.codex-split`, `.codex-list`,
 `.codex-detail`, `.codex-back`), pero con su propia barra de herramientas: búsqueda
 en pill, tres `Select` con rótulo visible (tipo, VD desde, VD hasta) y un
 par de botones `aria-pressed` para el orden, que no es un filtro y por eso
-«Limpiar filtros» no lo toca. El perfil (`CreatureProfile`) arma las cifras en
-placas con `.plaque-label` y `.num` (carmesí los PG, oro el VD), las
+«Limpiar filtros» no lo toca. El perfil (`CreatureProfile`) abre como un bloque
+de estadísticas: nombre y tipo en cursiva a la izquierda y el VD en su placa
+dorada a la derecha (compacto, el VD va en la banda). Arma las cifras en
+placas con `.plaque-label` y `.num` (carmesí los PG), las
 características en seis celdas con su salvación reservando el alto, los datos de
-línea como lista de definición y las acciones agrupadas con acierto, daño y
-alcance en placas. Una criatura nueva en el catálogo no pide código: sale sola.
+línea como lista de definición y las secciones (rasgos, acciones) con un filete
+que corre hasta el borde. Todos los bloques comparten un ancho y la prosa va en
+el gris de lectura a 68ch. Las acciones de un grupo comparten dos columnas
+(`subgrid`): acierto, daño y alcance en placas alineadas, debajo del texto en
+menos de 560 px. Una criatura nueva en el catálogo no pide código: sale sola.
 Lo que el perfil necesita y no es un dato del catálogo se agrega a `bestiary()`
 del motor, nunca se calcula acá.
 
