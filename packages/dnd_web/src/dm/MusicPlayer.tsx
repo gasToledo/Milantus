@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode, type Ref } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChevronDown, EllipsisVertical, ExternalLink, ListMusic, Music, Pause, Pencil, Play, Plus, Trash2 } from 'lucide-react';
 import type { DmCampaign, MusicScene } from '../api/client';
@@ -59,6 +59,9 @@ export function MusicPlayer({ campaignId, scenes, offerCombat, onDismissOffer }:
   const [editing, setEditing] = useState<MusicScene | 'new' | null>(null);
   const [notice, setNotice] = useState<Notice | null>(null);
   const frame = useRef<HTMLIFrameElement>(null);
+  const root = useRef<HTMLDivElement>(null);
+  const panel = useRef<HTMLElement>(null);
+  const pill = useRef<HTMLButtonElement>(null);
   const noticeTimer = useRef<number | undefined>(undefined);
   useEffect(() => () => window.clearTimeout(noticeTimer.current), []);
 
@@ -214,6 +217,21 @@ export function MusicPlayer({ campaignId, scenes, offerCombat, onDismissOffer }:
     setShowList(false);
   };
 
+  // Al desplegar o minimizar, lo que tenía el foco desaparece o queda inerte:
+  // pasa al panel (no a su primer botón, que abriría su tooltip) o a la pill. Solo si el foco estaba en el
+  // reproductor (o en ninguna parte), para no robárselo a la pantalla.
+  const mounted = useRef(false);
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+      return;
+    }
+    const active = document.activeElement;
+    if (active === null || active === document.body || root.current?.contains(active)) {
+      (expanded ? panel.current : pill.current)?.focus({ preventScroll: true });
+    }
+  }, [expanded]);
+
   // YouTube exige su reproductor a la vista: minimizado, se pausa.
   const minimize = () => {
     command('pauseVideo');
@@ -221,9 +239,9 @@ export function MusicPlayer({ campaignId, scenes, offerCombat, onDismissOffer }:
   };
 
   return (
-    <div className={cx('fixed right-4 bottom-4 z-40 flex max-w-[calc(100vw-32px)] flex-col items-end', showOffer && 'max-h-[calc(100dvh-32px)] overflow-y-auto')} data-music-player>
+    <div ref={root} className={cx('fixed right-4 bottom-4 z-40 flex max-w-[calc(100vw-32px)] flex-col items-end', showOffer && 'max-h-[calc(100dvh-32px)] overflow-y-auto')} data-music-player>
       {showOffer && (
-        <section aria-label={t.dmMusicCombatStarted} className="card mb-2 w-[360px] max-w-full shrink-0 p-3" data-music-offer>
+        <section aria-label={t.dmMusicCombatStarted} className="card music-pop mb-2 w-[360px] max-w-full shrink-0 p-3" data-music-offer>
           <Eyebrow>{t.dmMusicCombatStarted}</Eyebrow>
           <p className="font-display text-[17px] wrap-anywhere text-on-surface">
             {marked.length === 1 ? t.dmMusicOfferOne(marked[0]!.name) : t.dmMusicOfferMany}
@@ -242,7 +260,9 @@ export function MusicPlayer({ campaignId, scenes, offerCombat, onDismissOffer }:
         aria-label={t.dmMusic}
         // Minimizado queda montado (el iframe sigue ahí) pero fuera del foco.
         inert={!expanded}
-        className={cx('card w-[360px] max-w-full p-3', !expanded && 'sr-only')}
+        ref={panel}
+        tabIndex={-1}
+        className={cx('card w-[360px] max-w-full p-3 outline-none', expanded ? 'music-pop' : 'sr-only')}
         data-expanded={expanded}
       >
         <div className="flex items-center gap-2">
@@ -300,19 +320,20 @@ export function MusicPlayer({ campaignId, scenes, offerCombat, onDismissOffer }:
             {current && <Eyebrow className="mb-1.5">{t.dmMusicScenes}</Eyebrow>}
             {/* Adentro del panel y no un `Toast`: el aviso flotante sale en la
                 misma esquina y taparía el reproductor. */}
+            {/* Lo lee la región viva de abajo, que está siempre montada: un
+                `role` que se monta junto con su texto no siempre se anuncia. */}
             {notice && (
               <div
-                role={notice.kind === 'error' ? 'alert' : 'status'}
-                className="mb-2 flex items-center gap-2 rounded-[var(--radius-nav)] bg-plaque py-2 pr-2 pl-3 text-[13px]"
+                className="step-in mb-2 flex items-center gap-2 rounded-[var(--radius-nav)] bg-plaque py-2 pr-2 pl-3 text-[13px]"
               >
-                <span className={cx('min-w-0 flex-1', notice.kind === 'error' && 'text-crimson')}>
+                <span aria-hidden="true" className={cx('min-w-0 flex-1', notice.kind === 'error' && 'text-crimson')}>
                   {notice.kind === 'error' ? t.dmMusicSaveError : t.dmMusicDeleted(notice.scene.name)}
                 </span>
                 {notice.kind === 'deleted' && (
                   <button
                     type="button"
                     onClick={() => undo(notice.scene, notice.index)}
-                    className="shrink-0 px-2 py-1 font-semibold text-gold"
+                    className="shrink-0 rounded-[var(--radius-nav)] px-2 py-1 font-semibold text-gold transition-colors duration-[120ms] hover:bg-gold-soft"
                   >
                     {t.undo}
                   </button>
@@ -336,15 +357,18 @@ export function MusicPlayer({ campaignId, scenes, offerCombat, onDismissOffer }:
                       {...reorder.item(scene.id)}
                       className={cx(
                         // Sostenerla no puede seleccionar el texto ni abrir el menú del teléfono.
-                        'flex items-center gap-1 rounded-[var(--radius-nav)] py-1 pr-1 pl-3 select-none [-webkit-touch-callout:none]',
+                        'flex items-center gap-1 rounded-[var(--radius-nav)] py-1 pr-1 pl-3 transition-colors duration-[120ms] select-none [-webkit-touch-callout:none]',
                         reorder.dragging === scene.id && reorder.animated ? 'bg-surface outline-1 outline-gold [&_*]:cursor-grabbing'
-                          : isCurrent ? 'bg-gold-soft' : 'bg-plaque',
+                          : isCurrent ? 'bg-gold-soft' : 'bg-plaque hover:bg-gold-soft/50',
                         reorder.dragging === scene.id && !reorder.animated && 'opacity-40',
                         reorder.over === scene.id && !reorder.animated && 'outline-2 outline-offset-1 outline-gold',
                       )}
                     >
                       <div className="min-w-0 flex-1">
-                        <p className={cx('truncate text-[14px] font-semibold', isCurrent ? 'text-gold' : 'text-on-surface')}>{scene.name}</p>
+                        <p className={cx('flex items-center gap-1.5 text-[14px] font-semibold', isCurrent ? 'text-gold' : 'text-on-surface')}>
+                          {isPlaying && <Equalizer />}
+                          <span className="truncate">{scene.name}</span>
+                        </p>
                         <p className="text-[12px] text-text-muted">
                           {[s ? kindLabel(t, s) : t.dmMusicUnsupported, scene.offerOnCombat ? t.dmMusicOnCombatTag : null]
                             .filter(Boolean)
@@ -430,15 +454,21 @@ export function MusicPlayer({ campaignId, scenes, offerCombat, onDismissOffer }:
         />
       )}
 
+      {/* Fuera del panel: minimizado está inerte y no anunciaría nada. */}
+      <p className="sr-only" aria-live={notice?.kind === 'error' ? 'assertive' : 'polite'}>
+        {notice && (notice.kind === 'error' ? t.dmMusicSaveError : t.dmMusicDeleted(notice.scene.name))}
+      </p>
+
       {!expanded && (
-        <div className="card flex items-center gap-1 rounded-[var(--radius-pill)] py-1 pr-1 pl-1">
+        <div className="card music-pop flex items-center gap-1 rounded-[var(--radius-pill)] py-1 pr-1 pl-1">
           <button
+            ref={pill}
             type="button"
             onClick={() => setExpanded(true)}
             aria-expanded={false}
-            className="inline-flex min-h-9 items-center gap-2 rounded-[var(--radius-pill)] px-3 text-[14px] text-on-surface hover:bg-plaque"
+            className="inline-flex min-h-9 items-center gap-2 rounded-[var(--radius-pill)] px-3 text-[14px] text-on-surface transition-colors duration-[120ms] hover:bg-plaque"
           >
-            <Music size={16} aria-hidden="true" className="text-gold" />
+            {playing ? <Equalizer /> : <Music size={16} aria-hidden="true" className="text-gold" />}
             {current ? (
               <span className="max-w-[180px] truncate">
                 {current.name}
@@ -460,6 +490,18 @@ export function MusicPlayer({ campaignId, scenes, offerCombat, onDismissOffer }:
   );
 }
 
+/** Lo que suena: tres barras animadas (`.eq` en `index.css`). Decorativo: el
+ *  botón de pausa y el rótulo ya dicen que está sonando. */
+function Equalizer() {
+  return (
+    <span aria-hidden="true" className="eq shrink-0">
+      <span />
+      <span />
+      <span />
+    </span>
+  );
+}
+
 function kindLabel(t: ReturnType<typeof useTexts>, s: MusicSource): string {
   return s.kind === 'playlist' ? t.dmMusicKindPlaylist : t.dmMusicKindVideo;
 }
@@ -472,6 +514,7 @@ function post(frame: HTMLIFrameElement | null, source: MusicSource, message: obj
 
 /** Un botón de solo ícono: su nombre accesible y el tooltip para quien ve. */
 function IconAction({
+  ref,
   label,
   tooltip,
   onClick,
@@ -479,6 +522,7 @@ function IconAction({
   pressed,
   children,
 }: {
+  ref?: Ref<HTMLButtonElement>;
   label: string;
   tooltip?: string;
   onClick: () => void;
@@ -489,12 +533,13 @@ function IconAction({
   return (
     <Tooltip content={tooltip ?? label}>
       <button
+        ref={ref}
         type="button"
         aria-label={label}
         aria-pressed={pressed}
         disabled={disabled}
         onClick={onClick}
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-nav)] text-on-surface-variant hover:bg-plaque hover:text-on-surface disabled:opacity-40 disabled:hover:bg-transparent"
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-nav)] text-on-surface-variant transition-colors duration-[120ms] hover:bg-plaque hover:text-on-surface disabled:opacity-40 disabled:hover:bg-transparent"
       >
         {children}
       </button>

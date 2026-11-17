@@ -591,6 +591,53 @@ body {
   animation: step-in 160ms ease-out;
 }
 
+/* El panel de música crece desde su esquina, la de la pill que lo despliega;
+   la pill y la oferta de combate entran igual. Arranca cuando se pone la
+   clase: el panel la lleva solo desplegado. */
+.music-pop {
+  transform-origin: bottom right;
+  animation: music-pop 160ms ease-out;
+}
+@keyframes music-pop {
+  from {
+    opacity: 0;
+    scale: 0.94;
+    translate: 0 8px;
+  }
+}
+
+/* Lo que suena: tres barras que suben y bajan a destiempo. Con «reducir
+   movimiento» la duración en cero las deja quietas, a media altura. */
+.eq {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+.eq > span {
+  width: 3px;
+  height: 100%;
+  border-radius: 1px;
+  background: var(--gold);
+  transform-origin: bottom;
+  scale: 1 0.5;
+  animation: eq 900ms ease-in-out infinite alternate;
+}
+.eq > span:nth-child(2) {
+  animation-delay: -300ms;
+}
+.eq > span:nth-child(3) {
+  animation-delay: -600ms;
+}
+@keyframes eq {
+  from {
+    scale: 1 0.25;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+
 /* Los hijos entran de a uno, 40 ms después del anterior (el resultado del
    Quiz). Cada hijo trae su lugar en `--sibling-index`. Solo sin «reducir
    movimiento»: con la duración en cero, el retraso igual los dejaría ocultos
