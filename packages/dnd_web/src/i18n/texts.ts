@@ -25,6 +25,7 @@ const es = {
   opensFlutter: 'se abre en la aplicación principal',
   themeLabel: 'Tema',
   themeModes: { dark: 'Oscuro', light: 'Claro', system: 'Sistema' },
+  themeSystemNow: (light: boolean): string => (light ? 'Sistema (ahora claro)' : 'Sistema (ahora oscuro)'),
   backToCharacters: 'Mis personajes',
   sheetNavLabel: 'Secciones de la ficha',
 
@@ -2596,6 +2597,7 @@ const en: Texts = {
   opensFlutter: 'opens in the main app',
   themeLabel: 'Theme',
   themeModes: { dark: 'Dark', light: 'Light', system: 'System' },
+  themeSystemNow: (light: boolean) => (light ? 'System (currently light)' : 'System (currently dark)'),
   backToCharacters: 'My characters',
   sheetNavLabel: 'Sheet sections',
 

@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Globe, Palette } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { RosterSettings } from '../api/client';
 import { queryKeys, useRoster, useRosterSettings } from '../api/queries';
 import { patchSettings } from '../api/settingsSave';
 import { useLang, useTexts } from '../i18n/context';
 import { storeLang, type Lang } from '../i18n/texts';
 import { parseSortMode } from '../dashboard/roster';
-import { isThemeMode, useTheme } from '../theme/theme';
+import { isThemeMode, useSystemLight, useTheme, type ThemeMode } from '../theme/theme';
 import { Card } from '../ui/Card';
 import { SectionRule } from '../ui/data';
 import { Button } from '../ui/Button';
@@ -18,6 +18,14 @@ import { resetTutorials } from '../ui/tutorials';
 const LEGACY_COOKIE = 'milantus_v1';
 
 const THEME_MODES = ['dark', 'light', 'system'] as const;
+
+/** Los tres modos; «Sistema» dice qué tema da ahora, para elegirlo sabiendo
+ *  qué va a quedar. */
+function useThemeOptions() {
+  const t = useTexts();
+  const light = useSystemLight();
+  return THEME_MODES.map((m: ThemeMode) => ({ value: m, label: m === 'system' ? t.themeSystemNow(light) : t.themeModes[m] }));
+}
 
 export function SettingsPage() {
   const t = useTexts();
@@ -46,6 +54,7 @@ function BrowserCard() {
   const t = useTexts();
   const lang = useLang();
   const { browserMode, setMode } = useTheme();
+  const themeOptions = useThemeOptions();
   const [reset, setReset] = useState(false);
   const [legacy, setLegacy] = useState(() => document.cookie.split(';').some((c) => c.trim() === `${LEGACY_COOKIE}=1`));
   return (
@@ -57,7 +66,7 @@ function BrowserCard() {
           onValueChange={(v) => setMode(isThemeMode(v) ? v : null)}
           options={[
             { value: 'account', label: t.settingsUseAccountTheme },
-            ...THEME_MODES.map((m) => ({ value: m, label: t.themeModes[m] })),
+            ...themeOptions,
           ]}
         />
         <Select
@@ -83,11 +92,11 @@ function BrowserCard() {
             {t.settingsTutorialsReset}
           </Button>
         </div>
-        {reset && (
-          <p role="status" className="text-[13px] text-verdant">
-            {t.settingsTutorialsResetDone}
-          </p>
-        )}
+        {/* Siempre montado: un `role` que aparece junto con su texto no siempre
+            se anuncia. */}
+        <p role="status" className="text-[13px] text-verdant empty:hidden">
+          {reset && <span className="step-in inline-block">{t.settingsTutorialsResetDone}</span>}
+        </p>
         {/* La cookie la lee el servidor al servir `/`: por eso no es localStorage. */}
         <Switch
           id="settings-legacy-version"
@@ -101,7 +110,7 @@ function BrowserCard() {
           }}
         />
         {legacy && (
-          <div role="status" className="flex flex-col gap-2.5" data-field="legacy-version">
+          <div role="status" className="step-in flex flex-col gap-2.5" data-field="legacy-version">
             <p className="text-[13px] leading-normal text-text-muted">{t.settingsLegacyNotice}</p>
             <div>
               <Button tone="secondary" onClick={() => window.location.assign('/')}>
@@ -118,13 +127,30 @@ function BrowserCard() {
 function AccountCard({ settings }: { settings: RosterSettings }) {
   const t = useTexts();
   const client = useQueryClient();
+  const themeOptions = useThemeOptions();
+  // Lo elegido se ve al instante y se guarda después; si falla, vuelve lo que
+  // había. Antes el `fieldset` se deshabilitaba mientras guardaba y el control
+  // tocado perdía el foco. Solo se revierten las claves de este cambio: otro
+  // guardado que llegó en el medio no se pisa.
   const save = useMutation({
     mutationFn: (patch: Pick<Partial<RosterSettings>, 'startsInDmMode' | 'themeMode' | 'showEncounterDifficulty'>) => patchSettings(patch),
-    onSuccess: async (_, patch) => {
+    onMutate: async (patch) => {
       await client.cancelQueries({ queryKey: queryKeys.rosterSettings });
+      const before = client.getQueryData<RosterSettings>(queryKeys.rosterSettings);
       client.setQueryData<RosterSettings>(queryKeys.rosterSettings, (current) => current && { ...current, ...patch });
+      return before && (Object.fromEntries(Object.keys(patch).map((k) => [k, before[k as keyof RosterSettings]])) as Partial<RosterSettings>);
+    },
+    onError: (_, __, undo) => {
+      if (undo) client.setQueryData<RosterSettings>(queryKeys.rosterSettings, (current) => current && { ...current, ...undo });
     },
   });
+  // «Guardado» se va solo; el error queda hasta el próximo cambio.
+  const { isSuccess, submittedAt, reset } = save;
+  useEffect(() => {
+    if (!isSuccess) return;
+    const timer = window.setTimeout(reset, 3000);
+    return () => window.clearTimeout(timer);
+  }, [isSuccess, submittedAt, reset]);
   // El favorito se guarda por id: para nombrarlo hace falta la lista. Si
   // todavía no llegó (o falla), la fila dice «Ninguno» antes que un id crudo.
   const roster = useRoster();
@@ -136,7 +162,7 @@ function AccountCard({ settings }: { settings: RosterSettings }) {
   ];
   return (
     <Card id="settings-account" title={t.settingsAccountTitle} icon={Globe}>
-      <fieldset disabled={save.isPending} className="flex min-w-0 flex-col items-start gap-3">
+      <fieldset className="flex min-w-0 flex-col items-start gap-3">
         <Select
           label={t.settingsStartMode}
           value={settings.startsInDmMode ? 'dm' : 'player'}
@@ -147,7 +173,7 @@ function AccountCard({ settings }: { settings: RosterSettings }) {
           label={t.settingsAccountTheme}
           value={isThemeMode(settings.themeMode) ? settings.themeMode : 'dark'}
           onValueChange={(themeMode) => save.mutate({ themeMode })}
-          options={THEME_MODES.map((m) => ({ value: m, label: t.themeModes[m] }))}
+          options={themeOptions}
         />
         <Switch
           id="settings-encounter-difficulty"
@@ -156,9 +182,15 @@ function AccountCard({ settings }: { settings: RosterSettings }) {
           onCheckedChange={(showEncounterDifficulty) => save.mutate({ showEncounterDifficulty })}
         />
       </fieldset>
-      {save.isPending && <p role="status" className="mt-2 text-[13px] text-text-muted">{t.settingsSaving}</p>}
-      {save.isSuccess && <p role="status" className="mt-2 text-[13px] text-verdant">{t.settingsSaved}</p>}
-      {save.isError && <p role="alert" className="mt-2 text-[13px] text-crimson">{t.settingsSaveError}</p>}
+      {/* Una línea con su lugar reservado: el aviso no empuja lo de abajo. Las
+          dos regiones están siempre montadas para que se anuncien. */}
+      <div className="mt-2 min-h-5 text-[13px]">
+        <p role="status">
+          {save.isPending && <span className="step-in inline-block text-text-muted">{t.settingsSaving}</span>}
+          {save.isSuccess && <span className="step-in inline-block text-verdant">{t.settingsSaved}</span>}
+        </p>
+        <p role="alert">{save.isError && <span className="step-in inline-block text-crimson">{t.settingsSaveError}</span>}</p>
+      </div>
       <dl className="mt-3 flex flex-col">
         {rows.map(([field, label, value]) => (
           <div

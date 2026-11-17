@@ -4,7 +4,9 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from 'react';
 
@@ -38,11 +40,34 @@ function writeStored(mode: ThemeMode | null) {
   }
 }
 
-const prefersLight = () => window.matchMedia('(prefers-color-scheme: light)').matches;
+const LIGHT_QUERY = '(prefers-color-scheme: light)';
+const prefersLight = () => window.matchMedia(LIGHT_QUERY).matches;
 
-function apply(mode: ThemeMode) {
-  const light = mode === 'light' || (mode === 'system' && prefersLight());
-  document.documentElement.dataset.theme = light ? 'light' : 'dark';
+/** Si el sistema pide tema claro, en vivo: «Sistema» dice qué tema da ahora. */
+export function useSystemLight(): boolean {
+  return useSyncExternalStore((onChange) => {
+    const query = window.matchMedia(LIGHT_QUERY);
+    query.addEventListener('change', onChange);
+    return () => query.removeEventListener('change', onChange);
+  }, prefersLight);
+}
+
+/** Pone el tema; con [fade], fundiendo la pantalla entera (`.page-fade` en
+ *  `index.css`) en vez de cambiar los colores de golpe. Si el tema que queda
+ *  es el mismo (oscuro → sistema oscuro), no hay nada que fundir. */
+function apply(mode: ThemeMode, fade = false) {
+  const theme = mode === 'light' || (mode === 'system' && prefersLight()) ? 'light' : 'dark';
+  const root = document.documentElement;
+  if (root.dataset.theme === theme) return;
+  const set = () => {
+    root.dataset.theme = theme;
+  };
+  if (!fade || !document.startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    set();
+    return;
+  }
+  root.classList.add('page-fade');
+  void document.startViewTransition(set).finished.finally(() => root.classList.remove('page-fade'));
 }
 
 interface ThemeState {
@@ -66,12 +91,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [account, setAccount] = useState<ThemeMode | null>(null);
   const mode: ThemeMode = stored ?? account ?? 'dark';
 
+  // Al cargar, el tema ya lo puso el script de `index.html`: el fundido es
+  // solo para los cambios de después.
+  const loaded = useRef(false);
   useEffect(() => {
-    apply(mode);
+    apply(mode, loaded.current);
+    loaded.current = true;
     if (mode !== 'system') return;
     // «Sistema» sigue al sistema también en vivo, no solo al cargar.
-    const query = window.matchMedia('(prefers-color-scheme: light)');
-    const onChange = () => apply('system');
+    const query = window.matchMedia(LIGHT_QUERY);
+    const onChange = () => apply('system', true);
     query.addEventListener('change', onChange);
     return () => query.removeEventListener('change', onChange);
   }, [mode]);
