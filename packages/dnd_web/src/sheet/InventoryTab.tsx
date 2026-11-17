@@ -1,22 +1,5 @@
 import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import {
-  ArrowUpRight,
-  Backpack,
-  Box,
-  Check,
-  CircleHelp,
-  EllipsisVertical,
-  Luggage,
-  Package,
-  Plus,
-  Shield,
-  Sparkles,
-  Sword,
-  WandSparkles,
-  Wrench,
-  X,
-  type LucideIcon,
-} from 'lucide-react';
+import { Backpack, Check, EllipsisVertical, Plus, X } from 'lucide-react';
 import { formatCost, inventoryOf, magicPlansView, type CharacterJson, type InventoryLine } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import type { Texts } from '../i18n/texts';
@@ -53,21 +36,6 @@ const GROUP_ORDER = [
   'missing',
 ] as const;
 type Group = (typeof GROUP_ORDER)[number];
-
-/** Ícono por familia: es lo único que distingue el tipo dentro de un grupo
- *  (`_itemIcon` en Flutter; §8.7 no permite un color por tipo). */
-const GROUP_ICON: Record<Group, LucideIcon> = {
-  weapon: Sword,
-  armor: Shield,
-  ammunition: ArrowUpRight,
-  focus: Sparkles,
-  magic: WandSparkles,
-  tool: Wrench,
-  container: Package,
-  pack: Luggage,
-  gear: Box,
-  missing: CircleHelp,
-};
 
 /** La familia de una línea, como `itemKindLabel` de Flutter. Es agrupación y
  *  no regla: qué es arma, armadura o mágico ya lo resolvió el motor. */
@@ -310,7 +278,7 @@ export function InventoryTab({ model }: { model: SheetModel }) {
                   <span className="eyebrow shrink-0">{t.invInUse}</span>
                   <span aria-hidden="true" className="h-px flex-1 bg-hairline" />
                 </h3>
-                <ul className="grid gap-2.5 [grid-template-columns:repeat(auto-fill,minmax(min(180px,100%),1fr))]">
+                <ul className="grid gap-2.5 [grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr))]">
                   {inUse.map((line) => (
                     <InUseCard
                       key={line.entryId}
@@ -666,21 +634,15 @@ function PackRow({
   onTransmute: () => void;
   onAsk: (kind: Ask['kind']) => void;
 }) {
-  const Icon = GROUP_ICON[group];
   const entry = line.entryId;
   const notes = [...slotLabels, line.needsBase ? t.invNoBase : null, line.note || null].filter(Boolean);
   return (
     // Se resalta al pasar: ayuda a seguir con la vista la fila entera.
     <li
-      className="flex items-center gap-3 rounded-[var(--radius-nav)] border-t border-hairline px-2 py-2.5 transition-colors duration-[120ms] ease-out hover:bg-plaque/60"
+      className="group/row flex items-center gap-3 rounded-[var(--radius-nav)] border-t border-hairline px-2 py-2.5 transition-colors duration-[120ms] ease-out hover:bg-plaque/60"
       data-entry={entry}
+      data-group={group}
     >
-      <span
-        aria-hidden="true"
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-nav)] border border-hairline bg-plaque"
-      >
-        <Icon size={16} className="text-on-surface-variant" />
-      </span>
       <span className="min-w-0 flex-1">
         <span className="flex flex-wrap items-center gap-1.5 text-[14px] text-on-surface">
           <InfoName title={line.name} description={line.description}>
@@ -696,23 +658,25 @@ function PackRow({
       </span>
       {write && line.equippable && <EquipToggle line={line} t={t} write={write} />}
       <span className="num shrink-0 text-[14px]" data-field="quantity">
-        {write ? (
-          // − y + en la fila: sumar una flecha es el caso frecuente. El − se
-          // apaga en 1; quitar la línea está en el menú.
-          <span className="inline-flex items-center gap-0.5">
-            <SpendRecoverButtons
-              spendLabel={t.invRemoveOne(line.name)}
-              recoverLabel={t.invAddOne(line.name)}
-              onSpend={
-                line.quantity > 1 ? () => write.act({ type: 'setQuantity', entry, value: line.quantity - 1 }) : undefined
-              }
-              onRecover={() => write.act({ type: 'setQuantity', entry, value: line.quantity + 1 })}
-            />
-            <span className="min-w-6 text-center">{line.quantity}</span>
-          </span>
-        ) : (
-          <>×{line.quantity}</>
-        )}
+        {/* La cantidad es «×20»; − y + aparecen al pasar o al llegar con el
+            teclado (siguen en el orden de tabulación). Sin mouse se ven
+            siempre: un control invisible no se toca. El − se apaga en 1;
+            quitar la línea está en el menú. */}
+        <span className="inline-flex items-center gap-1">
+          {write && (
+            <span className="transition-opacity duration-[120ms] ease-out [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within/row:opacity-100 [@media(hover:hover)]:group-hover/row:opacity-100">
+              <SpendRecoverButtons
+                spendLabel={t.invRemoveOne(line.name)}
+                recoverLabel={t.invAddOne(line.name)}
+                onSpend={
+                  line.quantity > 1 ? () => write.act({ type: 'setQuantity', entry, value: line.quantity - 1 }) : undefined
+                }
+                onRecover={() => write.act({ type: 'setQuantity', entry, value: line.quantity + 1 })}
+              />
+            </span>
+          )}
+          <span className="min-w-9 text-right">×{line.quantity}</span>
+        </span>
       </span>
       <span className="hidden w-14 shrink-0 text-right text-[13px] text-on-surface-variant tabular-nums @xl:block">
         {format(line.weight)} {t.pounds}
@@ -778,7 +742,7 @@ function Charges({ line, t, write }: { line: InventoryLine; t: Texts; write: She
 }
 
 /** Lo que el personaje lleva puesto o sintonizado, en una placa: qué es, el
- *  nombre y la cifra que se mira en el turno. Ninguna cifra se calcula acá:
+ *  nombre y la cifra que se mira en el turno. Quitárselo está en su ⋮. Ninguna cifra se calcula acá:
  *  el ataque y el daño son de `sheet.attacks`, la CA de `sheet.armorClass`. Un
  *  escudo no lleva cifra propia: su aporte ya está en la CA de la armadura. */
 function InUseCard({
@@ -804,7 +768,16 @@ function InUseCard({
         sheet.attacks.find((a) => a.weaponId === line.itemId && !a.offHand))
       : undefined;
   const shield = line.kind === 'armor' && catalog.armor.find((a) => a.id === line.itemId)?.category === 'shield';
-  const label = line.attuned ? t.attunedNote : t.itemGroups[groupOf(line)];
+  // Qué lugar ocupa, en singular: «Arma», «Armadura», «Escudo».
+  const label = line.attuned
+    ? t.attunedNote
+    : shield
+      ? t.invSlot.shield
+      : line.kind === 'weapon' || line.kind === 'armor'
+        ? t.invSlot[line.kind]
+        : line.magic
+          ? t.invSlot.magic
+          : t.invSlot.item;
   return (
     <li className="plaque flex min-w-0 flex-col gap-1.5 px-3.5 py-3" data-entry={line.entryId}>
       <span className="flex items-start gap-2">
@@ -840,11 +813,6 @@ function InUseCard({
       )}
       <Charges line={line} t={t} write={write} />
       {line.note && <span className="text-[12px] text-text-muted">{line.note}</span>}
-      {write && line.equippable && (
-        <span className="mt-1">
-          <EquipToggle line={line} t={t} write={write} />
-        </span>
-      )}
     </li>
   );
 }
@@ -888,6 +856,11 @@ function ItemMenu({
         </DropdownMenuTrigger>
       </Tooltip>
       <DropdownMenuContent align="end">
+        {line.equipped && line.equippable && (
+          <DropdownMenuItem onSelect={() => write.act({ type: 'equip', entry: line.entryId, value: false })}>
+            {t.invUnequip}
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem onSelect={() => onAsk('quantity')}>{t.invExactQuantity}</DropdownMenuItem>
         <DropdownMenuItem onSelect={() => onAsk('note')}>{t.invNote}</DropdownMenuItem>
         {line.requiresAttunement &&
