@@ -14,7 +14,6 @@ import {
   HOMEBREW_CATEGORIES,
   Link,
   navigate,
-  navigateBack,
   type HomebrewCategory,
 } from '../router';
 import { Button, ButtonLink } from '../ui/Button';
@@ -233,11 +232,12 @@ const DM_TITLE = '[data-dm-title]';
 function BackToHome() {
   const t = useTexts();
   return (
-    // Vuelve a la portada con el fundido con que se entró a la categoría.
+    // Va a la portada, no «atrás»: hojear el Homebrew no apila historial
+    // (`browseKey` del router), así que atrás es la pantalla de antes de
+    // entrar. Con el mismo fundido con que se entró a la categoría.
     <Link
-      back
       href={dmHomebrewHref()}
-      onClick={(e) => fadeNavigate(e, DM_TITLE, () => navigateBack(dmHomebrewHref()))}
+      onClick={(e) => fadeNavigate(e, DM_TITLE)}
       className="inline-flex items-center gap-1.5 self-start text-[13px] text-on-surface-variant transition-colors duration-[120ms] ease-out hover:text-gold"
     >
       <ArrowLeft size={16} aria-hidden="true" className="text-gold" />
