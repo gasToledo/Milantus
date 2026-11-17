@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
   ArrowUpRight,
   Backpack,
@@ -29,6 +29,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { AppEmptyState } from '../ui/status';
 import { ItemGrants } from './ItemGrants';
 import { InfoName } from './InfoName';
+import { signed } from './format';
 import { EffectTargetDialog } from './EffectTargetDialog';
 import { BaseDialog } from './MagicItemPlans';
 import { coinLabels, ItemCatalogDialog, TradeDialog, type CatalogRow, type Trade } from './ItemCatalog';
@@ -80,7 +81,7 @@ function groupOf(line: InventoryLine): Group {
 /** Monedas de mayor a menor, como se leen en la mesa. */
 const COINS = ['pp', 'gp', 'ep', 'sp', 'cp'] as const;
 
-type Filter = 'all' | 'equipped' | 'magic';
+type Filter = 'all' | 'magic';
 
 /** El diálogo de una línea que está abierto: cantidad exacta o nota. */
 type Ask = { kind: 'quantity' | 'note' | 'sell' | 'base'; line: InventoryLine };
@@ -166,11 +167,14 @@ export function InventoryTab({ model }: { model: SheetModel }) {
   const number = useMemo(() => new Intl.NumberFormat(lang, { maximumFractionDigits: 2 }), [lang]);
   const attuned = lines.filter((l) => l.attuned).length;
 
+  // En uso: lo equipado y lo sintonizado. Lo demás va en la mochila, que es
+  // lo único que se busca y se filtra.
+  const isInUse = (l: InventoryLine) => l.equipped || l.attuned;
+  const inUse = lines.filter(isInUse);
+  const rest = lines.filter((l) => !isInUse(l));
   const needle = query.trim().toLowerCase();
-  const visible = lines.filter(
-    (l) =>
-      (needle === '' || l.name.toLowerCase().includes(needle)) &&
-      (filter === 'all' || (filter === 'equipped' ? l.equipped : l.magic)),
+  const visible = rest.filter(
+    (l) => (needle === '' || l.name.toLowerCase().includes(needle)) && (filter === 'all' || l.magic),
   );
   const groups = GROUP_ORDER.map((g) => ({ group: g, lines: visible.filter((l) => groupOf(l) === g) })).filter(
     (g) => g.lines.length > 0,
@@ -258,9 +262,7 @@ export function InventoryTab({ model }: { model: SheetModel }) {
       </Card>
 
       <section aria-labelledby="h-pack" className="card @container min-w-0 px-5 pt-[18px] pb-2.5" data-card="pack">
-        {/* Dos renglones: arriba el título y lo que se hace; abajo lo que sirve
-            para encontrar. En una sola fila se partía donde podía. */}
-        <div className="mb-5 flex flex-col gap-3">
+        <div className="mb-4 flex flex-col gap-3">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
             <h2 id="h-pack" className="flex min-w-0 flex-[1_1_140px] items-center gap-2">
               <Backpack size={18} aria-hidden="true" className="shrink-0 text-gold" />
@@ -291,132 +293,133 @@ export function InventoryTab({ model }: { model: SheetModel }) {
                 </Button>
               ))}
           </div>
-            {lines.length > 0 && (
-              <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
-                <div role="search" className="relative min-w-[min(200px,100%)] flex-[1_1_200px] @xl:max-w-[260px]">
-                  <label htmlFor="pack-search" className="sr-only">
-                    {t.packSearchLabel}
-                  </label>
-                  <input
-                    id="pack-search"
-                    type="search"
-                    autoComplete="off"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder={t.packSearchHint}
-                    className="h-9 w-full rounded-[var(--radius-pill)] border border-hairline bg-plaque px-4 pr-9 text-[13px] text-on-surface placeholder:text-text-muted"
-                  />
-                  {query !== '' && (
-                    <Tooltip content={t.rosterClearSearch}>
-                      <button
-                        type="button"
-                        aria-label={t.rosterClearSearch}
-                        onClick={() => setQuery('')}
-                        className="absolute inset-y-0 right-1 flex w-8 items-center justify-center text-text-muted transition-colors duration-[120ms] ease-out hover:text-on-surface"
-                      >
-                        <X size={16} aria-hidden="true" />
-                      </button>
-                    </Tooltip>
-                  )}
-                </div>
-                <div
-                  role="group"
-                  aria-label={t.packFilterLabel}
-                  className="flex gap-1 rounded-[var(--radius-pill)] border border-hairline bg-plaque p-[3px]"
-                >
-                  {(['all', 'equipped', 'magic'] as const).map((f) => (
-                    <button
-                      key={f}
-                      type="button"
-                      aria-pressed={filter === f}
-                      onClick={() => setFilter(f)}
-                      className={cx(
-                        'rounded-[var(--radius-pill)] px-3 py-[5px] text-[12px] transition-colors duration-[120ms] ease-out',
-                        filter === f ? 'bg-gold-soft font-semibold text-gold' : 'text-on-surface-variant hover:text-on-surface',
-                      )}
-                    >
-                      {t.packFilters[f]}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
         </div>
 
         {lines.length === 0 ? (
           <div className="pb-2.5">
             <AppEmptyState kind="empty" message={t.packEmpty} />
           </div>
-        ) : visible.length === 0 ? (
-          <div className="pb-2.5">
-            <AppEmptyState
-              kind="no-match"
-              message={needle ? t.packNoMatch(query.trim()) : t.packNoMatchHint}
-              hint={needle ? t.packNoMatchHint : undefined}
-              actions={
-                <Button
-                  tone="secondary"
-                  onClick={() => {
-                    setQuery('');
-                    setFilter('all');
-                  }}
-                >
-                  {t.packShowAll}
-                </Button>
-              }
-            />
-          </div>
         ) : (
-          // Una tabla de verdad: las columnas Cantidad, Equipado y Peso no se
-          // mueven entre filas y se leen en vertical (§8.7). Debajo de 576 px
-          // de tarjeta el peso se oculta para que el resto no quede apretado.
-          <table className="w-full border-collapse text-left" data-field="pack">
-            <thead>
-              <tr className="border-b border-hairline text-[10px] tracking-[1.2px] text-text-muted uppercase">
-                <th scope="col" className="px-2 pb-2.5 font-normal">
-                  {t.colItem}
-                </th>
-                <th scope="col" className="w-12 px-2 pb-2.5 text-right font-normal @xl:w-16">
-                  {t.colQuantity}
-                </th>
-                <th scope="col" className="w-16 px-2 pb-2.5 text-center font-normal @xl:w-24">
-                  {t.colEquipped}
-                </th>
-                <th scope="col" className="hidden w-[72px] px-2 pb-2.5 text-right font-normal @xl:table-cell">
-                  {t.colWeight}
-                </th>
-                {write && <td className="w-10 pb-2.5" />}
-              </tr>
-            </thead>
-            {groups.map(({ group, lines: rows }) => (
-              <tbody key={group} data-group={group}>
-                <tr>
-                  {/* Con el filete hasta el borde, como las secciones del Códice.
-                      No es `SectionHeading`: un `th` no admite títulos. */}
-                  <th scope="colgroup" colSpan={write ? 5 : 4} className="px-2 pt-[22px] pb-2 font-normal">
-                    <span className="flex items-center gap-3">
-                      <span className="eyebrow shrink-0">{t.itemGroups[group]}</span>
-                      <span aria-hidden="true" className="h-px flex-1 bg-hairline" />
-                    </span>
-                  </th>
-                </tr>
-                {rows.map((line) => (
-                  <PackRow
-                    key={line.entryId}
-                    line={line}
-                    group={group}
-                    t={t}
-                    format={number.format}
-                    write={write}
-                    slotLabels={sheet.targetChoiceSlots.filter((s) => s.chosenEntryIds.includes(line.entryId)).map((s) => s.name)}
-                    canTransmute={plans !== null && plans.chosen.some((c) => c.id !== line.itemId)}
-                    onTransmute={() => setTransmuting(line)}
-                    onAsk={(kind) => setAsk({ kind, line })}
+          <>
+            {/* Lo que el personaje lleva puesto o sintonizado, aparte y arriba:
+                es lo que se mira en el turno (con qué pega, cuánta CA). Los
+                números son del motor (`sheet.attacks`, `sheet.armorClass`). */}
+            {inUse.length > 0 && (
+              <section aria-labelledby="h-in-use" className="pb-2">
+                <h3 id="h-in-use" className="mb-2.5 flex items-center gap-3">
+                  <span className="eyebrow shrink-0">{t.invInUse}</span>
+                  <span aria-hidden="true" className="h-px flex-1 bg-hairline" />
+                </h3>
+                <ul className="grid gap-2.5 [grid-template-columns:repeat(auto-fill,minmax(min(180px,100%),1fr))]">
+                  {inUse.map((line) => (
+                    <InUseCard
+                      key={line.entryId}
+                      line={line}
+                      model={model}
+                      write={write}
+                      canTransmute={plans !== null && plans.chosen.some((c) => c.id !== line.itemId)}
+                      onTransmute={() => setTransmuting(line)}
+                      onAsk={(kind) => setAsk({ kind, line })}
+                    />
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            <section aria-labelledby="h-in-pack" className="pt-3">
+              {/* Buscar y filtrar miran solo la mochila: lo que está en uso
+                  siempre está a la vista. */}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+                <h3 id="h-in-pack" className="flex min-w-[160px] flex-[1_1_160px] items-center gap-3">
+                  <span className="eyebrow shrink-0">{t.invInPack}</span>
+                  <span aria-hidden="true" className="h-px flex-1 bg-hairline" />
+                </h3>
+                {rest.length > 0 && (
+                  <>
+                    <div role="search" className="relative min-w-[min(180px,100%)] flex-[0_1_240px]">
+                      <label htmlFor="pack-search" className="sr-only">
+                        {t.packSearchLabel}
+                      </label>
+                      <input
+                        id="pack-search"
+                        type="search"
+                        autoComplete="off"
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        placeholder={t.packSearchHint}
+                        className="h-9 w-full rounded-[var(--radius-pill)] border border-hairline bg-plaque px-4 pr-9 text-[13px] text-on-surface placeholder:text-text-muted"
+                      />
+                      {query !== '' && (
+                        <Tooltip content={t.rosterClearSearch}>
+                          <button
+                            type="button"
+                            aria-label={t.rosterClearSearch}
+                            onClick={() => setQuery('')}
+                            className="absolute inset-y-0 right-1 flex w-8 items-center justify-center text-text-muted transition-colors duration-[120ms] ease-out hover:text-on-surface"
+                          >
+                            <X size={16} aria-hidden="true" />
+                          </button>
+                        </Tooltip>
+                      )}
+                    </div>
+                    <PackFilter filter={filter} onChange={setFilter} />
+                  </>
+                )}
+              </div>
+
+              {rest.length === 0 ? (
+                <p className="py-4 text-[13px] text-text-muted">{t.packAllInUse}</p>
+              ) : visible.length === 0 ? (
+                <div className="pb-2.5">
+                  <AppEmptyState
+                    kind="no-match"
+                    message={needle ? t.packNoMatch(query.trim()) : t.packNoMatchHint}
+                    hint={needle ? t.packNoMatchHint : undefined}
+                    actions={
+                      <Button
+                        tone="secondary"
+                        onClick={() => {
+                          setQuery('');
+                          setFilter('all');
+                        }}
+                      >
+                        {t.packShowAll}
+                      </Button>
+                    }
                   />
-                ))}
-              </tbody>
-            ))}
-          </table>
+                </div>
+              ) : (
+                // Una lista por familia, sin encabezado de columnas: cada fila
+                // dice su cantidad (×20) y su peso, y lo demás va en el ⋮.
+                <div data-field="pack">
+                  {groups.map(({ group, lines: rows }) => (
+                    <div key={group} data-group={group}>
+                      <p className="flex items-baseline gap-2 px-2 pt-4 pb-1.5 text-[12.5px] text-on-surface-variant">
+                        {t.itemGroups[group]}
+                        <span className="text-[12px] text-text-muted tabular-nums">{rows.length}</span>
+                      </p>
+                      <ul>
+                        {rows.map((line) => (
+                          <PackRow
+                            key={line.entryId}
+                            line={line}
+                            group={group}
+                            t={t}
+                            format={number.format}
+                            write={write}
+                            slotLabels={sheet.targetChoiceSlots.filter((s) => s.chosenEntryIds.includes(line.entryId)).map((s) => s.name)}
+                            canTransmute={plans !== null && plans.chosen.some((c) => c.id !== line.itemId)}
+                            onTransmute={() => setTransmuting(line)}
+                            onAsk={(kind) => setAsk({ kind, line })}
+                          />
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          </>
         )}
       </section>
       {ask && write && (ask.kind === 'quantity' || ask.kind === 'note') && <EntryDialog ask={ask} write={write} onClose={() => setAsk(null)} />}
@@ -505,6 +508,55 @@ export function InventoryTab({ model }: { model: SheetModel }) {
   );
 }
 
+/** Todo / Mágico, como el selector Jugador/DM: el fondo dorado es
+ *  una pieza aparte que se desliza al botón elegido. Los botones miden
+ *  distinto, así que se mide el elegido y el fondo recorre `left` y `width`
+ *  con una transición (el selector no se desmonta). Sin transición la primera
+ *  vez, para que no entre deslizándose desde la izquierda. */
+function PackFilter({ filter, onChange }: { filter: Filter; onChange: (f: Filter) => void }) {
+  const t = useTexts();
+  const group = useRef<HTMLDivElement>(null);
+  const [pill, setPill] = useState<{ left: number; width: number; animate: boolean } | null>(null);
+  useLayoutEffect(() => {
+    const on = group.current?.querySelector<HTMLElement>('[aria-pressed="true"]');
+    if (!on) return;
+    setPill((prev) => ({ left: on.offsetLeft, width: on.offsetWidth, animate: prev !== null }));
+  }, [filter, t]);
+  return (
+    <div
+      ref={group}
+      role="group"
+      aria-label={t.packFilterLabel}
+      className="relative flex gap-1 rounded-[var(--radius-pill)] border border-hairline bg-plaque p-[3px]"
+    >
+      {pill && (
+        <span
+          aria-hidden="true"
+          className={cx(
+            'absolute inset-y-[3px] rounded-[var(--radius-pill)] bg-gold-soft',
+            pill.animate && 'transition-[left,width] duration-[220ms] ease-out',
+          )}
+          style={{ left: pill.left, width: pill.width }}
+        />
+      )}
+      {(['all', 'magic'] as const).map((f) => (
+        <button
+          key={f}
+          type="button"
+          aria-pressed={filter === f}
+          onClick={() => onChange(f)}
+          className={cx(
+            'relative rounded-[var(--radius-pill)] px-3 py-[5px] text-[12px] transition-colors duration-[120ms] ease-out',
+            filter === f ? 'font-semibold text-gold' : 'text-on-surface-variant hover:text-on-surface',
+          )}
+        >
+          {t.packFilters[f]}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 /** Una moneda escrita a mano. Se guarda al salir del campo o con Enter, como
  *  en Flutter: guardar con cada tecla mandaría «1», «12», «120». */
 function CoinInput({ value, label, onCommit }: { value: number; label: string; onCommit: (v: number) => void }) {
@@ -524,7 +576,11 @@ function CoinInput({ value, label, onCommit }: { value: number; label: string; o
       onChange={(e) => setText(e.target.value)}
       onBlur={commit}
       onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
-      className="w-full bg-transparent text-center tabular-nums outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+      className="w-full bg-transparent text-center tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+      // El foco lo dice el borde dorado de la placa (`focus-within`): el contorno
+      // global de `:focus-visible` dibujaba un segundo recuadro adentro. Va en
+      // línea porque esa regla está fuera de las capas y le gana a `outline-none`.
+      style={{ outline: 'none' }}
     />
   );
 }
@@ -611,64 +667,35 @@ function PackRow({
   onAsk: (kind: Ask['kind']) => void;
 }) {
   const Icon = GROUP_ICON[group];
-  const max = line.maxCharges;
-  const charges = max === null ? null : (line.charges ?? max);
-  const notes = [
-    ...slotLabels,
-    line.needsBase ? t.invNoBase : null,
-    line.attuned ? t.attunedNote : null,
-    max !== null && charges !== null ? t.chargesNote(charges, max) : null,
-    line.note || null,
-  ].filter(Boolean);
   const entry = line.entryId;
+  const notes = [...slotLabels, line.needsBase ? t.invNoBase : null, line.note || null].filter(Boolean);
   return (
     // Se resalta al pasar: ayuda a seguir con la vista la fila entera.
-    <tr className="border-t border-hairline transition-colors duration-[120ms] ease-out hover:bg-plaque/60" data-entry={line.entryId}>
-      <th scope="row" className="px-2 py-3 text-left font-normal">
-        <span className="flex min-w-0 items-center gap-3.5">
-          <span
-            aria-hidden="true"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-nav)] border border-hairline bg-plaque"
-          >
-            <Icon size={16} className="text-on-surface-variant" />
-          </span>
-          <span className="min-w-0">
-            <span className="flex flex-wrap items-center gap-1.5 text-[14px] text-on-surface">
-              <InfoName title={line.name} description={line.description}>
-                <span className="break-words" data-field="name">
-                  {line.name}
-                </span>
-              </InfoName>
-              {line.replica && (
-                <span className="rounded-[var(--radius-pill)] border border-hairline px-1.5 text-[10px] text-on-surface-variant">
-                  {t.invReplica}
-                </span>
-              )}
-              {line.homebrew && (
-                <span className="rounded-[var(--radius-pill)] border border-hairline px-1.5 text-[10px] text-on-surface-variant">
-                  {t.homebrewTag}
-                </span>
-              )}
+    <li
+      className="flex items-center gap-3 rounded-[var(--radius-nav)] border-t border-hairline px-2 py-2.5 transition-colors duration-[120ms] ease-out hover:bg-plaque/60"
+      data-entry={entry}
+    >
+      <span
+        aria-hidden="true"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-nav)] border border-hairline bg-plaque"
+      >
+        <Icon size={16} className="text-on-surface-variant" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="flex flex-wrap items-center gap-1.5 text-[14px] text-on-surface">
+          <InfoName title={line.name} description={line.description}>
+            <span className="break-words" data-field="name">
+              {line.name}
             </span>
-            {notes.length > 0 && <span className="mt-1 block text-[12px] text-text-muted">{notes.join(' · ')}</span>}
-            {write && max !== null && charges !== null && (
-              // Con máximo 0 (cargas tiradas al aparecer) no hay techo; el
-              // tope lo pone el motor y acá solo se apaga lo que no cambiaría.
-              <SpendRecoverButtons
-                spendLabel={t.invSpendCharge(line.name)}
-                recoverLabel={t.invRecoverCharge(line.name)}
-                onSpend={charges > 0 ? () => write.act({ type: 'setCharges', entry, value: charges - 1 }) : undefined}
-                onRecover={
-                  max !== 0 && charges >= max
-                    ? undefined
-                    : () => write.act({ type: 'setCharges', entry, value: charges + 1 })
-                }
-              />
-            )}
-          </span>
+          </InfoName>
+          {line.replica && <MiniTag>{t.invReplica}</MiniTag>}
+          {line.homebrew && <MiniTag>{t.homebrewTag}</MiniTag>}
         </span>
-      </th>
-      <td className="num px-2 py-3 text-right text-[14px]" data-field="quantity">
+        {notes.length > 0 && <span className="mt-0.5 block text-[12px] text-text-muted">{notes.join(' · ')}</span>}
+        <Charges line={line} t={t} write={write} />
+      </span>
+      {write && line.equippable && <EquipToggle line={line} t={t} write={write} />}
+      <span className="num shrink-0 text-[14px]" data-field="quantity">
         {write ? (
           // − y + en la fila: sumar una flecha es el caso frecuente. El − se
           // apaga en 1; quitar la línea está en el menú.
@@ -677,50 +704,148 @@ function PackRow({
               spendLabel={t.invRemoveOne(line.name)}
               recoverLabel={t.invAddOne(line.name)}
               onSpend={
-                line.quantity > 1
-                  ? () => write.act({ type: 'setQuantity', entry, value: line.quantity - 1 })
-                  : undefined
+                line.quantity > 1 ? () => write.act({ type: 'setQuantity', entry, value: line.quantity - 1 }) : undefined
               }
               onRecover={() => write.act({ type: 'setQuantity', entry, value: line.quantity + 1 })}
             />
             <span className="min-w-6 text-center">{line.quantity}</span>
           </span>
         ) : (
-          line.quantity
+          <>×{line.quantity}</>
         )}
-      </td>
-      <td className="px-2 py-3 text-center text-[12px]" data-field="equipped">
-        {write && line.equippable ? (
-          <input
-            type="checkbox"
-            aria-label={t.invEquip(line.name)}
-            checked={line.equipped}
-            onChange={(e) => write.act({ type: 'equip', entry, value: e.target.checked })}
-            className="check"
-          />
-        ) : line.equipped ? (
-          <span className="inline-flex items-center gap-1 text-gold">
-            <Check size={14} aria-hidden="true" />
-            {t.equippedYes}
-          </span>
-        ) : (
-          <>
-            <span aria-hidden="true" className="text-text-muted">
-              —
-            </span>
-            <span className="sr-only">{write && !line.equippable ? t.invNotEquippable : t.equippedNo}</span>
-          </>
-        )}
-      </td>
-      <td className="hidden px-2 py-3 text-right text-[13px] text-on-surface-variant tabular-nums @xl:table-cell">
+      </span>
+      <span className="hidden w-14 shrink-0 text-right text-[13px] text-on-surface-variant tabular-nums @xl:block">
         {format(line.weight)} {t.pounds}
-      </td>
+      </span>
       {write && (
-        <td className="py-3 text-right">
-          <ItemMenu line={line} t={t} write={write} onAsk={onAsk} canTransmute={canTransmute && line.replica} onTransmute={onTransmute} />
-        </td>
+        <ItemMenu line={line} t={t} write={write} onAsk={onAsk} canTransmute={canTransmute && line.replica} onTransmute={onTransmute} />
       )}
-    </tr>
+    </li>
+  );
+}
+
+/** Una marca chica junto al nombre (réplica, homebrew). */
+function MiniTag({ children }: { children: ReactNode }) {
+  return (
+    <span className="rounded-[var(--radius-pill)] border border-hairline px-1.5 text-[10px] text-on-surface-variant">{children}</span>
+  );
+}
+
+/** Equipar o quitarse un objeto: una pill que se dora cuando está puesto. Es
+ *  un botón con `aria-pressed` y el mismo nombre en los dos estados. */
+function EquipToggle({ line, t, write }: { line: InventoryLine; t: Texts; write: SheetWriter }) {
+  return (
+    <button
+      type="button"
+      aria-pressed={line.equipped}
+      aria-label={t.invEquip(line.name)}
+      onClick={() => write.act({ type: 'equip', entry: line.entryId, value: !line.equipped })}
+      className={cx(
+        'pick inline-flex h-7 shrink-0 items-center self-center rounded-[var(--radius-pill)] border px-2.5 text-[12px]',
+        line.equipped ? 'border-gold bg-gold-soft font-semibold text-gold' : 'border-hairline text-on-surface-variant',
+      )}
+    >
+      {line.equipped ? t.colEquipped : t.invEquipShort}
+    </button>
+  );
+}
+
+/** Las cargas de un objeto: los puntos y, en la ficha propia, gastar y
+ *  recuperar. Con máximo 0 (cargas tiradas al aparecer) no hay techo. */
+function Charges({ line, t, write }: { line: InventoryLine; t: Texts; write: SheetWriter | undefined }) {
+  const max = line.maxCharges;
+  if (max === null) return null;
+  const charges = line.charges ?? max;
+  return (
+    <span className="mt-1 flex items-center gap-2">
+      {max > 0 ? (
+        <span className="[&>[role=img]]:justify-start">
+          <Pips max={max} left={charges} label={t.chargesNote(charges, max)} />
+        </span>
+      ) : (
+        <span className="text-[12px] text-text-muted">{t.chargesNote(charges, max)}</span>
+      )}
+      {write && (
+        <SpendRecoverButtons
+          spendLabel={t.invSpendCharge(line.name)}
+          recoverLabel={t.invRecoverCharge(line.name)}
+          onSpend={charges > 0 ? () => write.act({ type: 'setCharges', entry: line.entryId, value: charges - 1 }) : undefined}
+          onRecover={max !== 0 && charges >= max ? undefined : () => write.act({ type: 'setCharges', entry: line.entryId, value: charges + 1 })}
+        />
+      )}
+    </span>
+  );
+}
+
+/** Lo que el personaje lleva puesto o sintonizado, en una placa: qué es, el
+ *  nombre y la cifra que se mira en el turno. Ninguna cifra se calcula acá:
+ *  el ataque y el daño son de `sheet.attacks`, la CA de `sheet.armorClass`. Un
+ *  escudo no lleva cifra propia: su aporte ya está en la CA de la armadura. */
+function InUseCard({
+  line,
+  model,
+  write,
+  canTransmute,
+  onTransmute,
+  onAsk,
+}: {
+  line: InventoryLine;
+  model: SheetModel;
+  write: SheetWriter | undefined;
+  canTransmute: boolean;
+  onTransmute: () => void;
+  onAsk: (kind: Ask['kind']) => void;
+}) {
+  const t = useTexts();
+  const { sheet, catalog } = model;
+  const attack =
+    line.kind === 'weapon'
+      ? (sheet.attacks.find((a) => a.sourceEntryId === line.entryId && !a.offHand) ??
+        sheet.attacks.find((a) => a.weaponId === line.itemId && !a.offHand))
+      : undefined;
+  const shield = line.kind === 'armor' && catalog.armor.find((a) => a.id === line.itemId)?.category === 'shield';
+  const label = line.attuned ? t.attunedNote : t.itemGroups[groupOf(line)];
+  return (
+    <li className="plaque flex min-w-0 flex-col gap-1.5 px-3.5 py-3" data-entry={line.entryId}>
+      <span className="flex items-start gap-2">
+        <span className="plaque-label min-w-0 flex-1 pt-1">
+          {label}
+          {line.quantity > 1 && <span className="tabular-nums"> ×{line.quantity}</span>}
+        </span>
+        {write && (
+          <span className="-mt-1 -mr-1.5">
+            <ItemMenu line={line} t={t} write={write} onAsk={onAsk} canTransmute={canTransmute && line.replica} onTransmute={onTransmute} />
+          </span>
+        )}
+      </span>
+      <InfoName title={line.name} description={line.description}>
+        <span className="font-display text-[16px] leading-[1.25] break-words text-on-surface" data-field="name">
+          {line.name}
+        </span>
+      </InfoName>
+      {attack && (
+        <span className="flex flex-wrap items-baseline gap-x-1.5">
+          <span className="num text-[20px] leading-none text-gold">
+            <span aria-hidden="true">{signed(attack.attackBonus)}</span>
+            <span className="sr-only">{t.attackBonusLabel(signed(attack.attackBonus))}</span>
+          </span>
+          {attack.damageText && <span className="text-[12px] text-on-surface-variant">{attack.damageText}</span>}
+        </span>
+      )}
+      {line.kind === 'armor' && !shield && (
+        <span className="flex items-baseline gap-1.5">
+          <span className="num text-[20px] leading-none text-gold">{sheet.armorClass}</span>
+          <span className="text-[12px] text-on-surface-variant">{t.acShort}</span>
+        </span>
+      )}
+      <Charges line={line} t={t} write={write} />
+      {line.note && <span className="text-[12px] text-text-muted">{line.note}</span>}
+      {write && line.equippable && (
+        <span className="mt-1">
+          <EquipToggle line={line} t={t} write={write} />
+        </span>
+      )}
+    </li>
   );
 }
 

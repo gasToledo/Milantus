@@ -238,12 +238,12 @@ test('la Inspiración Heroica y la concentración se marcan a mano y guardan lo 
 
 test('la mochila se edita desde la fila y quitar se deshace', async ({ page, request }) => {
   await page.goto(`/v2/personajes/${ILSE}/inventario`);
-  const fila = page.locator('tr[data-entry="e-baston"]');
+  // Fila de la mochila o placa de «En uso»: equiparlo lo pasa de una a otra.
+  const fila = page.locator('[data-entry="e-baston"]');
   const baston = String(catalogo().items.find((i) => i.id === 'baston-de-curacion')!.name);
   const entry = 'e-baston';
 
   const pasos: [() => Promise<void>, SheetAction][] = [
-    [() => fila.getByRole('checkbox', { name: `Equipar ${baston}` }).click(), { type: 'equip', entry, value: true }],
     [
       () => fila.getByRole('button', { name: `Agregar una unidad de ${baston}` }).click(),
       { type: 'setQuantity', entry, value: 2 },
@@ -257,6 +257,7 @@ test('la mochila se edita desde la fila y quitar se deshace', async ({ page, req
       },
       { type: 'note', entry, text: 'Del templo' },
     ],
+    [() => fila.getByRole('button', { name: `Equipar ${baston}` }).click(), { type: 'equip', entry, value: true }],
   ];
   for (const [tocar, accion] of pasos) {
     const esperado = segunMotor(await ilse(request), accion);
@@ -317,7 +318,7 @@ test('comprar del catálogo y vender pagan con la cuenta del motor, y vender se 
   };
   expect(
     await proximoGuardado(page, async () => {
-      await page.locator(`tr[data-entry="${linea.entryId}"]`).getByRole('button', { name: `Acciones de ${nombre}` }).click();
+      await page.locator(`[data-entry="${linea.entryId}"]`).getByRole('button', { name: `Acciones de ${nombre}` }).click();
       await page.getByRole('menuitem', { name: 'Vender…' }).click();
       await page.getByRole('button', { name: 'Vender', exact: true }).click();
     }),
