@@ -5,7 +5,8 @@ import { catalogLabel, vocabularyLabel, type AbilityId } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import { labelOf } from '../i18n/texts';
 import { Card } from '../ui/Card';
-import { Eyebrow, Pill } from '../ui/data';
+import { cx } from '../ui/cx';
+import { Eyebrow, Pill, PLAQUE_BUTTON } from '../ui/data';
 import { Accordion } from '../ui/disclosure';
 import { ArrangeableColumns } from './ArrangeableColumns';
 import { CHARACTER_DEFAULT } from './cardLayout';
@@ -107,7 +108,7 @@ export function CharacterTab({ model }: { model: SheetModel }) {
                       type="button"
                       data-ability={ability}
                       onClick={() => setBreakdown(ability)}
-                      className="plaque flex w-full min-w-0 cursor-pointer flex-col items-center px-1 py-2.5 text-center"
+                      className={cx('plaque flex w-full min-w-0 flex-col items-center px-1 py-2.5 text-center', PLAQUE_BUTTON)}
                     >
                       {/* La abreviatura se ve; el nombre completo se lee. */}
                       <span className="plaque-label" aria-hidden="true">

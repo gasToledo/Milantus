@@ -111,7 +111,9 @@ export function WarningsStrip({ model, view }: { model: SheetModel; view: Choice
         data-action="review-warnings"
         onClick={() => setOpen(true)}
         className={cx(
-          'plaque flex min-h-[60px] w-full cursor-pointer items-center gap-3.5 px-4 py-2.5 text-left font-[family-name:var(--font-body)]',
+          // El borde ya es de color (el aviso): de la placa que se toca le
+          // queda hundirse al apretarla.
+          'plaque flex min-h-[60px] w-full cursor-pointer items-center gap-3.5 px-4 py-2.5 text-left font-[family-name:var(--font-body)] transition duration-[120ms] ease-out motion-safe:active:translate-y-px',
           serious > 0 ? '!border-crimson' : '!border-gold',
         )}
       >

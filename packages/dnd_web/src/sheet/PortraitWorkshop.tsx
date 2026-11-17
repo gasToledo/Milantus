@@ -17,7 +17,7 @@ import type { Texts } from '../i18n/texts';
 import { Link } from '../router';
 import { AppDialog } from '../ui/AppDialog';
 import { cx } from '../ui/cx';
-import { Eyebrow } from '../ui/data';
+import { Eyebrow, PLAQUE_BUTTON } from '../ui/data';
 import { Medallion } from '../ui/Medallion';
 import { portraitUrl, thumbnailUrl } from '../ui/portrait';
 import { AppBusyLabel, AppErrorView } from '../ui/status';
@@ -652,7 +652,7 @@ export function PortraitWorkshop({ owner }: { owner: PortraitOwner }) {
                       type="button"
                       disabled={busy}
                       onClick={() => fileInput.current?.click()}
-                      className="plaque flex min-h-[210px] w-full cursor-pointer flex-col items-center justify-center gap-2 p-6 text-center"
+                      className={cx('plaque flex min-h-[210px] w-full flex-col items-center justify-center gap-2 p-6 text-center', PLAQUE_BUTTON)}
                     >
                       <Upload size={34} aria-hidden="true" className="text-gold" />
                       <b className="font-display text-[16px] font-normal text-on-surface">{t.portraitImportTitle}</b>

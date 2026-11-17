@@ -7,6 +7,11 @@ import { Tooltip } from './primitives';
 // el valor ya resuelto por el motor (`computeSheet`) y solo deciden cómo se ve
 // y cómo lo anuncia un lector de pantalla.
 
+/** Una placa que se toca (abre un desglose, elige un archivo): el mismo aviso
+ *  que las tarjetas que se tocan, el borde dorado al pasar y hundirse 1 px al
+ *  apretarla. Sin fondo distinto: la placa ya es el fondo hundido. */
+export const PLAQUE_BUTTON = 'cursor-pointer transition duration-[120ms] ease-out hover:border-gold motion-safe:active:translate-y-px';
+
 /** Rótulo de sección en mayúsculas espaciadas (`Eyebrow`). */
 export function Eyebrow({ children, className }: { children: ReactNode; className?: string }) {
   return <p className={cx('eyebrow', className)}>{children}</p>;
@@ -54,11 +59,7 @@ export function StatTile({
   return (
     <Root
       {...(onClick ? { type: 'button' as const, onClick } : {})}
-      // Con acción, avisa que se toca: se dora al pasar y baja al apretarla.
-      className={cx(
-        'plaque flex min-h-[96px] min-w-0 flex-col items-center px-4 py-3.5 text-center',
-        onClick && 'cursor-pointer transition duration-[120ms] ease-out hover:bg-gold-soft motion-safe:active:translate-y-px',
-      )}
+      className={cx('plaque flex min-h-[96px] min-w-0 flex-col items-center px-4 py-3.5 text-center', onClick && PLAQUE_BUTTON)}
       data-stat={id}
     >
       <Label className="flex max-w-full items-center justify-center gap-1.5 text-[11px] tracking-[1.1px] text-text-muted uppercase">
