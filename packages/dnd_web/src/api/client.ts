@@ -140,6 +140,10 @@ export interface RosterSettings {
   sortMode: string;
   favoriteCharacterId: string | null;
   characterOrder: string[];
+  /** El orden de la Biblioteca de PNJ, como `characterOrder` el del
+   *  dashboard. Solo lo escribe `/v2`: Flutter no lo conoce y el servidor
+   *  combina el primer nivel de los ajustes, así que no lo pisa. */
+  npcOrder: string[];
   themeMode: string;
   /** Si la cuenta abre en el Modo DM (`AppSettings.startsInDmMode`). */
   startsInDmMode: boolean;
@@ -163,6 +167,7 @@ export async function fetchRosterSettings(signal: AbortSignal): Promise<RosterSe
     sortMode: settings?.sortMode ?? 'name',
     favoriteCharacterId: settings?.favoriteCharacterId ?? null,
     characterOrder: settings?.characterOrder ?? [],
+    npcOrder: settings?.npcOrder ?? [],
     themeMode: settings?.themeMode ?? 'dark',
     startsInDmMode: settings?.startsInDmMode === true,
     // Prendida por defecto, igual que `AppSettings` de Flutter: solo un `false`

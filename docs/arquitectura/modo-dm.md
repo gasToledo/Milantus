@@ -702,7 +702,10 @@ limpiarlo. Como el `PUT` reemplaza el documento entero, quien lo cambia relee la
 campaña antes de escribir (`editCampaign`) para no pisar las escenas.
 
 `Campaign.npcOrder` (esquema 4) hace lo mismo con los PNJ de la sección PNJ de
-la campaña: ids de PNJ, el mismo contrato y la misma doble poda.
+la campaña: ids de PNJ, el mismo contrato y la misma doble poda. El orden de
+la Biblioteca de PNJ, en cambio, no es de ninguna campaña: va en los ajustes de
+la cuenta (`npcOrder`, junto al `characterOrder` del dashboard), que nunca
+viajan a otra.
 
 Milantus no guarda audio: cada escena es un enlace de YouTube o YouTube Music,
 y suena el reproductor embebido de YouTube (`lib/web/music_embed*.dart`).

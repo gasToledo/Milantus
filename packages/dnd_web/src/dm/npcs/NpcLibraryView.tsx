@@ -1,7 +1,11 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Plus, Search, Upload } from 'lucide-react';
-import { useNpcs, useSheetCatalog } from '../../api/queries';
-import type { DmCampaign } from '../../api/client';
+import { queryKeys, useNpcs, useRosterSettings, useSheetCatalog } from '../../api/queries';
+import { patchSettings } from '../../api/settingsSave';
+import { movedOrder } from '../../dashboard/roster';
+import { useHoldDrag } from '../../ui/holdDrag';
+import type { DmCampaign, RosterSettings } from '../../api/client';
 import { npcViews, type NpcView } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
 import { dmNpcsHref, Link } from '../../router';
@@ -46,6 +50,7 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
   const [creating, setCreating] = useState(false);
   const [importing, setImporting] = useState(false);
   const [imported, setImported] = useState<{ key: number; message: string } | null>(null);
+  const [orderFailed, setOrderFailed] = useState(0);
   // Importar es secundario (filete y texto): «Nuevo PNJ» sigue siendo el único
   // oro de la vista.
   const actions = (
@@ -59,16 +64,27 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
     </>
   );
 
-  // El motor migra cada PNJ y le saca los números una vez por respuesta.
+  const settings = useRosterSettings();
+  const client = useQueryClient();
+  // El motor migra cada PNJ y le saca los números una vez por respuesta. Van
+  // en el orden del DM (`npcOrder` de los ajustes, como el dashboard): lo que
+  // no figura va al final en el orden del servidor.
+  const npcOrder = settings.data?.npcOrder;
   const entries = useMemo(() => {
     const stored = npcs.data;
     if (!stored || !catalog.data) return null;
-    return npcViews(stored, catalog.data).map((view, i) => ({
-      view,
-      links: stored[i]?.campaigns ?? [],
-      portrait: stored[i] ? npcPortrait(stored[i]) : null,
-    }));
-  }, [npcs.data, catalog.data]);
+    const rank = (id: string) => {
+      const i = npcOrder?.indexOf(id) ?? -1;
+      return i < 0 ? Number.MAX_SAFE_INTEGER : i;
+    };
+    return npcViews(stored, catalog.data)
+      .map((view, i) => ({
+        view,
+        links: stored[i]?.campaigns ?? [],
+        portrait: stored[i] ? npcPortrait(stored[i]) : null,
+      }))
+      .sort((a, b) => rank(a.view.npc.id) - rank(b.view.npc.id));
+  }, [npcs.data, catalog.data, npcOrder]);
 
   const visible = useMemo(
     () =>
@@ -81,7 +97,34 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
   // Filtrar anima la grilla, como las otras listas de tarjetas.
   const animateList = useListTransition(visibleIds);
 
-  const failed = [npcs, ...catalog.queries].filter((q) => q.isError);
+  // Con un filtro puesto no se mueven: soltar entre dos filtrados no dice dónde
+  // quedan respecto de los ocultos (la regla del dashboard). Se ve al instante
+  // y se guarda después; si falla, se relee lo guardado.
+  const canMove = listQuery.trim() === '' && campaign === null && tag === null;
+  const moveNpc = (from: string, to: string) => {
+    const order = movedOrder(
+      visible.map(({ view }) => view.npc.id),
+      from,
+      to,
+    );
+    void (async () => {
+      await client.cancelQueries({ queryKey: queryKeys.rosterSettings });
+      client.setQueryData<RosterSettings>(queryKeys.rosterSettings, (old) => old && { ...old, npcOrder: order });
+      try {
+        await patchSettings({ npcOrder: order });
+      } catch {
+        setOrderFailed((n) => n + 1);
+        void client.invalidateQueries({ queryKey: queryKeys.rosterSettings });
+      }
+    })();
+  };
+  const reorder = useHoldDrag({
+    ids: canMove ? visible.map(({ view }) => view.npc.id) : [],
+    canDrop: () => canMove,
+    onMove: moveNpc,
+  });
+
+  const failed = [npcs, settings, ...catalog.queries].filter((q) => q.isError);
   const kicker = entries ? t.dmLibraryCount(entries.length) : undefined;
 
   let body;
@@ -190,7 +233,22 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
         ) : (
           <ul aria-label={t.dmNpcLibrary} className="grid gap-3.5 [grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr))]">
             {visible.map(({ view, links, portrait }) => (
-              <NpcCard key={view.npc.id} view={view} campaigns={links.map((l) => l.campaignName)} portrait={portrait} />
+              <NpcCard
+                key={view.npc.id}
+                view={view}
+                campaigns={links.map((l) => l.campaignName)}
+                portrait={portrait}
+                reorder={
+                  canMove
+                    ? {
+                        item: reorder.item(view.npc.id),
+                        dragging: reorder.dragging === view.npc.id,
+                        over: reorder.over === view.npc.id,
+                        animated: reorder.animated,
+                      }
+                    : undefined
+                }
+              />
             ))}
           </ul>
         )}
@@ -209,6 +267,9 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
           onClose={() => setImporting(false)}
           onImported={(name) => setImported((prev) => ({ key: (prev?.key ?? 0) + 1, message: t.npcImported(name) }))}
         />
+      )}
+      {orderFailed > 0 && (
+        <Toast key={orderFailed} tone="error" message={t.dmOrderSaveError} open onOpenChange={(open) => !open && setOrderFailed(0)} />
       )}
       {imported && (
         <Toast key={imported.key} tone="success" message={imported.message} open onOpenChange={(open) => !open && setImported(null)} />
@@ -262,20 +323,47 @@ export function FilterPill({
 
 /** Un PNJ de la biblioteca: identidad, tags y en qué campañas está. La tarjeta
  *  entera lleva a su ficha. */
-function NpcCard({ view, campaigns, portrait }: { view: NpcView; campaigns: string[]; portrait: string | null }) {
+function NpcCard({
+  view,
+  campaigns,
+  portrait,
+  reorder,
+}: {
+  view: NpcView;
+  campaigns: string[];
+  portrait: string | null;
+  /** Mover la tarjeta tomándola entera (`useHoldDrag`), con las mismas clases
+   *  que los PNJ de la campaña. Sin esto no se mueve (con un filtro puesto). */
+  reorder?: { item: Record<string, unknown>; dragging: boolean; over: boolean; animated: boolean };
+}) {
   const t = useTexts();
   const { npc } = view;
   const tags = npc.tags ?? [];
   return (
-    <li className="min-w-0" data-npc={npc.id}>
-      {/* Se levanta y se aprieta como las del dashboard (`.roster-card`), y el
-          nombre la sigue en las transiciones de la grilla. Abrir la ficha funde
-          la pantalla, como tarjeta → ficha en el modo jugador. */}
+    // Se levanta y se aprieta como las del dashboard (`.roster-card`), y el
+    // nombre la sigue en las transiciones de la grilla. El enlace ocupa toda la
+    // tarjeta; arrastrarla es de la tarjeta, no del enlace.
+    <li
+      className={cx(
+        'card roster-card min-w-0',
+        reorder && 'select-none [-webkit-touch-callout:none]',
+        reorder?.dragging && (reorder.animated ? 'cursor-grabbing border-gold [&_*]:cursor-grabbing' : 'opacity-40'),
+        reorder?.over && !reorder.animated && 'outline-2 outline-offset-1 outline-gold',
+      )}
+      data-npc={npc.id}
+      {...reorder?.item}
+      // Después del `item`, que trae su `style` para el arrastre.
+      style={{
+        viewTransitionName: `lib-${npc.id.replace(/[^\w-]/g, '_')}`,
+        ...(reorder?.item.style as CSSProperties | undefined),
+      }}
+    >
+      {/* Abrir la ficha funde la pantalla, como tarjeta → ficha en el modo jugador. */}
       <Link
         href={dmNpcsHref(npc.id)}
+        draggable={false}
         onClick={(e) => fadeNavigate(e, '[data-npc-title]')}
-        className="card roster-card flex h-full min-h-[150px] flex-col gap-2.5 p-3.5"
-        style={{ viewTransitionName: `lib-${npc.id.replace(/[^\w-]/g, '_')}` }}
+        className="flex h-full min-h-[150px] flex-col gap-2.5 rounded-[inherit] p-3.5"
       >
         <span className="flex items-center gap-3">
           <Medallion name={npc.name} accent={null} size={44} portrait={portrait} />
