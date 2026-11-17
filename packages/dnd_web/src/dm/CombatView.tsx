@@ -780,10 +780,12 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
   const legendary = hasLegendary(row);
   // Lo que ya jugó esta ronda se atenúa en sus datos y **no en sus botones**: al
   // goblin que ya actuó se le sigue pegando, y un botón gris se lee como apagado.
-  // Un caído se atenúa entero: ahí sí terminó (a pedido del usuario). Una fila con
-  // marcas o con legendarias **no se atenúa** aunque ya haya jugado, porque lo que lleva (ventaja,
-  // temporales, bono a la CA) se usa en turnos ajenos; un caído sí, siempre.
-  const faded = (derived.down || (acted && !hasMarks(row) && !(legendary && !preparing))) && 'opacity-60';
+  // Un caído se atenúa entero: ahí sí terminó. Y todo el que ya jugó se atenúa
+  // siempre, lleve lo que lleve (a pedido del usuario): antes una fila con
+  // ventaja, temporales, bono a la CA o legendarias quedaba encendida porque
+  // eso se usa en turnos ajenos, y se leía como un error. Las marcas siguen a
+  // la vista, solo más tenues, y los botones no se atenúan.
+  const faded = (derived.down || acted) && 'opacity-60';
   const fadedActions = derived.down && 'opacity-60';
   const initiativeCell = (
     <>
