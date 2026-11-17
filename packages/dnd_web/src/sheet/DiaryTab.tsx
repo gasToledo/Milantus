@@ -19,6 +19,8 @@ import { AppDialog } from '../ui/AppDialog';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { cx } from '../ui/cx';
+import { READ_PROSE } from '../ui/data';
+import { useListTransition } from '../ui/listTransition';
 import { MarkdownText } from '../ui/MarkdownText';
 import { PortraitViewer } from '../ui/PortraitViewer';
 import { ScrollArea, Tooltip } from '../ui/primitives';
@@ -118,7 +120,7 @@ export function DiaryTab({ model }: { model: SheetModel }) {
 }
 
 const ICON_BUTTON =
-  'inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius-nav)] hover:bg-plaque disabled:pointer-events-none disabled:opacity-40';
+  'inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius-nav)] transition-colors duration-[120ms] ease-out hover:bg-plaque disabled:pointer-events-none disabled:opacity-40';
 
 /** Igual que `_fileSlug` de Flutter: lo que se baja tiene que poder guardarse
  *  en cualquier sistema de archivos. */
@@ -369,9 +371,24 @@ export function DiaryEntries({
   // `null` es una entrada nueva; `undefined`, el editor cerrado.
   const [editing, setEditing] = useState<DiaryEntry | null | undefined>(undefined);
   const [deleting, setDeleting] = useState<DiaryEntry | null>(null);
-  const reorder = useReorder({ ids: entries.map((e) => e.entryId), onMove: (from, to) => edit?.move(from, to) });
-  const date = useMemo(() => new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'numeric' }), [lang]);
-  // «12/3», o «12/3 · editada 2/4» si se tocó después. Sin fecha (la entrada
+  // Agregar, borrar y mover cambian la lista: lo anima la misma transición de
+  // las otras listas de tarjetas. Editar el texto no la cambia y no espera.
+  const animateList = useListTransition(entries.map((e) => e.entryId).join('\n'));
+  const animated = useMemo<DiaryEditor | undefined>(
+    () =>
+      edit && {
+        ...edit,
+        save: (input) =>
+          entries.some((e) => e.entryId === input.entry) ? edit.save(input) : animateList(() => edit.save(input)),
+        remove: (entry) => animateList(() => edit.remove(entry)),
+        move: (from, to) => animateList(() => edit.move(from, to)),
+      },
+    [edit, entries, animateList],
+  );
+  const reorder = useReorder({ ids: entries.map((e) => e.entryId), onMove: (from, to) => animated?.move(from, to) });
+  const date = useMemo(() => new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'short' }), [lang]);
+  // «12 mar», o «12 mar · editada 2 abr» si se tocó después: es el rótulo de
+  // la entrada en la línea de tiempo. Sin fecha (la entrada
   // que salió de las notas viejas) no se inventa una.
   const dates = (e: DiaryEntry): string => {
     const created = e.createdAt ? new Date(e.createdAt) : null;
@@ -420,9 +437,10 @@ export function DiaryEntries({
           }
         />
       ) : (
-        // Una sola columna: cada entrada muestra todo lo que lleva, y el orden
-        // (que el jugador acomoda) se lee de arriba abajo.
-        <ul className="flex flex-col gap-3">
+        // Una línea de tiempo: un filete vertical con un rombo por entrada (el
+        // motivo del `SectionRule`). Una sola columna: cada entrada muestra todo
+        // lo que lleva, y el orden (que el jugador acomoda) se lee de arriba abajo.
+        <ul className="relative flex flex-col gap-3 pl-6 before:absolute before:top-3 before:bottom-3 before:left-[7px] before:w-px before:bg-hairline before:content-['']">
           {entries.map((e) => (
             <EntryCard
               key={e.entryId}
@@ -435,10 +453,10 @@ export function DiaryEntries({
         </ul>
       )}
 
-      {edit && editing !== undefined && (
+      {animated && editing !== undefined && (
         <EntryEditor
           entry={editing}
-          edit={edit}
+          edit={animated}
           onClose={() => setEditing(undefined)}
           onDelete={(e) => setDeleting(e)}
         />
@@ -456,7 +474,7 @@ export function DiaryEntries({
               label: t.diaryDeleteAction,
               primary: true,
               tone: 'crimson',
-              onSelect: () => edit.remove(deleting),
+              onSelect: () => animated!.remove(deleting),
             },
           ]}
         >
@@ -519,17 +537,24 @@ function EntryCard({
     <li
       {...reorder?.item(id)}
       data-entry={id}
+      data-vt-card
+      // El nombre la sigue en las transiciones de la lista.
+      style={{ viewTransitionName: `dy-${id.replace(/[^\w-]/g, '_')}` }}
       className={cx(
-        'plaque flex min-w-0 flex-col gap-2.5 border-2 px-4 py-3.5',
-        reorder?.over === id ? 'border-gold' : 'border-hairline',
+        'diary-entry plaque relative flex min-w-0 flex-col gap-2.5 px-4 py-3.5',
+        reorder?.over === id && 'outline-2 outline-offset-1 outline-gold',
         reorder?.dragging === id && 'opacity-30',
       )}
     >
-      <div className="flex items-baseline gap-2.5">
-        <h3 className="font-display min-w-0 flex-1 text-[15px] leading-[1.3] break-words text-on-surface">{title}</h3>
-        {dates && <span className="shrink-0 text-[12px] text-text-muted tabular-nums">{dates}</span>}
+      {/* El rombo de la línea de tiempo, sobre el filete de la lista. */}
+      <span aria-hidden="true" className="absolute top-[19px] -left-[21px] size-[7px] rotate-45 bg-gold" />
+      <div className="flex items-start gap-2.5">
+        <div className="min-w-0 flex-1">
+          {dates && <p className="mb-1 text-[11px] font-medium tracking-[1.4px] text-gold uppercase tabular-nums">{dates}</p>}
+          <h3 className="font-display text-[16px] leading-[1.3] break-words text-on-surface">{title}</h3>
+        </div>
         {(onEdit || reorder) && (
-          <span className="-my-1.5 -mr-2 flex shrink-0 items-center self-center">
+          <span className="-my-1.5 -mr-2 flex shrink-0 items-center">
             {onEdit && (
               <Tooltip content={t.diaryEditAction}>
                 <button
@@ -548,7 +573,7 @@ function EntryCard({
                 <button
                   type="button"
                   aria-label={t.diaryMoveEntry(title)}
-                  className="inline-flex h-8 w-8 cursor-grab items-center justify-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold"
+                  className="inline-flex h-8 w-8 cursor-grab items-center justify-center rounded-[var(--radius-nav)] text-text-muted transition-colors duration-[120ms] ease-out hover:text-gold"
                   {...reorder.grip(id)}
                 >
                   <GripVertical size={16} aria-hidden="true" />
@@ -558,31 +583,27 @@ function EntryCard({
           </span>
         )}
       </div>
-      {showImage ? (
-        <div className="grid grid-cols-[150px_minmax(0,1fr)] items-start gap-3.5">
-          {gone ? (
-            <p className="text-[12.5px] text-text-muted">{t.diaryImageGone}</p>
-          ) : (
-            <button
-              type="button"
-              aria-label={t.diarySeeFullImage}
-              onClick={() => setViewing(true)}
-              className="block cursor-zoom-in overflow-hidden rounded-[var(--radius-nav)] border border-hairline"
-            >
-              <img
-                src={thumbnailUrl(imageUrl(entry.imageKey!), 512)}
-                alt={t.diaryImageAlt(entry.title)}
-                loading="lazy"
-                onError={() => setGone(true)}
-                className="block h-[112px] w-full object-cover"
-              />
-            </button>
-          )}
-          {content}
-        </div>
-      ) : (
-        content
-      )}
+      {/* La imagen arriba y a todo el ancho: quien la sube quiere que se vea. */}
+      {showImage &&
+        (gone ? (
+          <p className="text-[12.5px] text-text-muted">{t.diaryImageGone}</p>
+        ) : (
+          <button
+            type="button"
+            aria-label={t.diarySeeFullImage}
+            onClick={() => setViewing(true)}
+            className="block cursor-zoom-in overflow-hidden rounded-[var(--radius-nav)] border border-hairline"
+          >
+            <img
+              src={thumbnailUrl(imageUrl(entry.imageKey!), 1024)}
+              alt={t.diaryImageAlt(entry.title)}
+              loading="lazy"
+              onError={() => setGone(true)}
+              className="block aspect-video w-full object-cover"
+            />
+          </button>
+        ))}
+      {content}
       {showImage && !gone && (
         <PortraitViewer src={imageUrl(entry.imageKey!)} name={entry.title} open={viewing} onOpenChange={setViewing} />
       )}
@@ -765,7 +786,7 @@ export function BackgroundText({ text, label }: { text: string; label: string })
   return (
     <ScrollArea type="auto" label={label} viewportClassName="max-h-[min(420px,60vh)]">
       <div className="pr-3" data-field="background">
-        <MarkdownText text={text} className="text-[15px] leading-[1.65] text-on-surface" />
+        <MarkdownText text={text} className={cx('drop-cap text-[15px] leading-[1.65] text-on-surface', READ_PROSE)} />
       </div>
     </ScrollArea>
   );

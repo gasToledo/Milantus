@@ -675,6 +675,38 @@ body {
   }
 }
 
+/* El trasfondo como un manuscrito: la primera letra en capitular, Georgia en
+   oro y tres renglones de alto. Con `float`, que anda en todos lados
+   (`initial-letter` no). Solo si arranca con un párrafo: un título no lleva. */
+.drop-cap > p:first-child::first-letter {
+  float: left;
+  margin: 0.06em 0.12em 0 0;
+  font-family: var(--font-display);
+  font-size: 3.5em;
+  line-height: 0.8;
+  color: var(--gold);
+}
+
+/* Las entradas del Diario entran al hacer scroll: suben y se funden al
+   aparecer. Decorativo: sin soporte, o con «reducir movimiento», se ven
+   quietas (mejora progresiva, sin código de respaldo). Solo `from`: el `to`
+   es lo que la entrada ya tenga (la que se arrastra está atenuada). */
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    .diary-entry {
+      animation: diary-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+  }
+}
+@keyframes diary-in {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+  }
+}
+
 /* El panel de música crece desde su esquina, la de la pill que lo despliega;
    la pill y la oferta de combate entran igual. Arranca cuando se pone la
    clase: el panel la lleva solo desplegado. */
