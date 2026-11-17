@@ -27,14 +27,23 @@ const AT_END = Number.MAX_SAFE_INTEGER;
  * [cards] lleva solo las tarjetas presentes en esta ficha. Acomodando, el
  * contenido no se dibuja: cada tarjeta es una barra con su título.
  */
+/** La pill dorada chica de la barra de la pestaña («Acomodar tarjetas»,
+ *  «Cambiar elecciones»). Sin `Button`: su alto mínimo de 36 px no se puede
+ *  achicar con una clase más (`cx` no las combina). */
+export const SHEET_PILL =
+  'inline-flex min-h-7 items-center gap-1.5 rounded-[var(--radius-pill)] border border-gold bg-gold-soft px-3 text-[12.5px] font-medium text-gold transition-colors duration-[120ms] ease-out hover:bg-plaque';
+
 export function ArrangeableColumns({
   tab,
   defaults,
   cards,
+  leading,
 }: {
   tab: Tab;
   defaults: CardLayout;
   cards: Record<string, { title: string; node: ReactNode }>;
+  /** Otra pill de la barra, en la otra punta (izquierda) de «Acomodar». */
+  leading?: ReactNode;
 }) {
   const t = useTexts();
   const client = useQueryClient();
@@ -85,15 +94,11 @@ export function ArrangeableColumns({
   if (!arranging) {
     return (
       <>
-        {/* Una pill dorada chica y pegada a la regla: es opcional y no tiene que
-            robarle alto a las tarjetas. Sin `Button`: su alto mínimo de 36 px
-            no se puede achicar con una clase más (`cx` no las combina). */}
-        <div className="-mt-2 mb-2 flex justify-end">
-          <button
-            type="button"
-            onClick={() => setArranging(true)}
-            className="inline-flex min-h-7 items-center gap-1.5 rounded-[var(--radius-pill)] border border-gold bg-gold-soft px-3 text-[12.5px] font-medium text-gold hover:bg-plaque"
-          >
+        {/* Pills doradas chicas y pegadas a la regla: son opcionales y no tienen
+            que robarle alto a las tarjetas. «Acomodar» siempre a la derecha. */}
+        <div className="-mt-2 mb-2 flex flex-wrap items-center justify-between gap-2">
+          {leading ?? <span />}
+          <button type="button" onClick={() => setArranging(true)} className={SHEET_PILL}>
             <LayoutDashboard size={14} aria-hidden="true" />
             {t.arrangeCards}
           </button>

@@ -121,30 +121,26 @@ function HitPointsCard({ model }: { model: SheetModel }) {
   );
 }
 
-/** El casillero de la Inspiración Heroica (`_heroicInspirationTile` de
- *  Flutter): se toca para marcarla o gastarla. Con ella se pinta del dorado
- *  suave de lo activo; sin ella se hunde a la placa. */
+/** El casillero de la Inspiración Heroica: se toca para marcarla o gastarla.
+ *  Con ella se pinta del dorado suave de lo activo y la estrella se llena; sin
+ *  ella se hunde a la placa. Solo la estrella y el nombre: el estado ya lo
+ *  dicen el color, la estrella y `aria-pressed`. */
 function InspirationToggle({ model }: { model: SheetModel }) {
   const t = useTexts();
-  const { character, sheet, write } = model;
+  const { character, write } = model;
   const has = Boolean(character.combat?.heroicInspiration);
-  const help = has ? t.inspirationUse : sheet.heroicInspirationOnLongRest ? t.inspirationLongRest : t.inspirationGrant;
   return (
     <button
       type="button"
       aria-pressed={has}
       title={has ? t.inspirationSpend : t.inspirationMark}
       onClick={() => write!.act({ type: 'heroicInspiration', value: !has })}
-      className={`pick mt-3 flex w-full items-center gap-2.5 rounded-[var(--radius-card)] border px-3 py-2.5 text-left ${
+      className={`pick mt-3 flex w-full items-center gap-2.5 rounded-[var(--radius-card)] border px-3 py-2 text-left ${
         has ? 'border-gold bg-gold-soft text-gold' : 'border-hairline bg-plaque text-text-muted'
       }`}
     >
-      <Star size={22} aria-hidden="true" fill={has ? 'currentColor' : 'none'} className="shrink-0" />
-      <span className="min-w-0 flex-1">
-        <span className="block font-medium">{t.heroicInspiration}</span>
-        <span className="mt-0.5 block text-[11px] text-on-surface-variant">{help}</span>
-      </span>
-      <span className="text-[11px] font-medium tracking-[1.2px]">{has ? t.inspirationHave : t.inspirationSpent}</span>
+      <Star size={20} aria-hidden="true" fill={has ? 'currentColor' : 'none'} className="shrink-0" />
+      <span className="min-w-0 flex-1 font-medium">{t.heroicInspiration}</span>
     </button>
   );
 }

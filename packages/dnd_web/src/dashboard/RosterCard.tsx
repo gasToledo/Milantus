@@ -57,6 +57,7 @@ export function RosterCard({
   const hp = character.combat?.currentHp ?? 0;
   const maxHp = sheet?.maxHp ?? 0;
   const ratio = maxHp === 0 ? 0 : Math.min(1, Math.max(0, hp / maxHp));
+  const tempHp = character.combat?.tempHp ?? 0;
   // Un cuarto de los PG: a partir de ahí el rótulo lo dice con todas las
   // letras en vez de dejarlo librado a lo corta que se ve la barra.
   const critical = !fallen && ratio <= HP_CRITICAL_RATIO;
@@ -180,6 +181,13 @@ export function RosterCard({
             <p className="num text-[14px]" data-stat="hp">
               <span className={fallen || critical ? 'text-crimson' : 'text-on-surface'}>{hp}</span>
               <span className="font-normal text-text-muted"> / {maxHp}</span>
+              {/* Los temporales en oro, como en la ficha y el Combate del DM. */}
+              {tempHp > 0 && (
+                <span key={tempHp} className="step-in ml-1 inline-block text-gold" data-field="hp-temp">
+                  <span aria-hidden="true">+{tempHp}</span>
+                  <span className="sr-only">{t.encTempAria(tempHp)}</span>
+                </span>
+              )}
             </p>
           </div>
           {/* Recorre el tramo y cambia de color como en Flutter (verde, oro,
@@ -192,6 +200,7 @@ export function RosterCard({
               valueText={`${hp} / ${maxHp}`}
               colorClassName={hpTone(ratio).bar}
               height={6}
+              temp={fallen ? 0 : tempHp}
             />
           </div>
 

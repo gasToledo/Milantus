@@ -1,5 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react';
-import { ArrowLeft, Info, TriangleAlert } from 'lucide-react';
+import { ArrowLeft, Info, ListChecks, TriangleAlert } from 'lucide-react';
+import { SHEET_PILL } from './ArrangeableColumns';
 import { nameOf } from '../api/catalog';
 import { codexEntries } from '../codex/entries';
 import { choicesView, type AbilityId, type Catalog, type CharacterJson, type ChoicesView, type SheetWarning } from '../engine';
@@ -180,12 +181,15 @@ function WarningsDialog({
 
 /** «Cambiar elecciones» en la tarjeta Identidad: lo ya elegido que el juego
  *  deja cambiar (`replaceable` del motor), aunque no quede nada pendiente. */
+/** «Cambiar elecciones»: una pill de la barra de la pestaña Personaje, a la
+ *  izquierda de «Acomodar tarjetas» y con su mismo estilo. */
 export function ChangeChoicesButton({ href }: { href: string }) {
   const t = useTexts();
   return (
-    <Button tone="secondary" data-action="change-choices" onClick={() => navigate(href)}>
+    <button type="button" data-action="change-choices" onClick={() => navigate(href)} className={SHEET_PILL}>
+      <ListChecks size={14} aria-hidden="true" />
       {t.chChangeChoices}
-    </Button>
+    </button>
   );
 }
 

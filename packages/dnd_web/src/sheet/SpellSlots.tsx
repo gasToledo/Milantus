@@ -112,37 +112,35 @@ export function SpellSlotGrid({
   );
 }
 
-/** Lo que queda del espacio elegido y, en la ficha propia, gastarlo o
- *  recuperarlo: las mismas acciones del motor que tenían las filas. */
+/** En la ficha propia, gastar o recuperar el espacio elegido: las mismas
+ *  acciones del motor que tenían las filas. Lo que queda no se repite en
+ *  texto: ya lo dicen los puntos de la celda (y su rótulo, al lector). */
 export function SpellSlotAction({ cell, write }: { cell: SlotCell | undefined; write?: SheetWriter }) {
   const t = useTexts();
-  if (!cell) return null;
+  if (!cell || !write) return null;
   const n = left(cell);
   const act = (type: 'spendSlot' | 'recoverSlot') => () =>
-    write!.act({ type, level: cell.level, pact: cell.pact });
+    write.act({ type, level: cell.level, pact: cell.pact });
   return (
-    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
-      <span className="text-[13px] tabular-nums">{t.slotCellLeft(cell.level, n, cell.max, cell.pact)}</span>
-      {write && (
-        <span data-controls="spend-recover" className="flex gap-2">
-          <Button
-            tone="secondary"
-            aria-label={t.spendSlot(String(cell.level))}
-            disabled={n === 0 || cell.max === 0}
-            onClick={act('spendSlot')}
-          >
-            {t.spendPoints}
-          </Button>
-          <Button
-            tone="secondary"
-            aria-label={t.recoverSlot(String(cell.level))}
-            disabled={cell.used === 0 || cell.max === 0}
-            onClick={act('recoverSlot')}
-          >
-            {t.recoverPoints}
-          </Button>
-        </span>
-      )}
+    <div className="flex justify-end">
+      <span data-controls="spend-recover" className="flex gap-2">
+        <Button
+          tone="secondary"
+          aria-label={t.spendSlot(String(cell.level))}
+          disabled={n === 0 || cell.max === 0}
+          onClick={act('spendSlot')}
+        >
+          {t.spendPoints}
+        </Button>
+        <Button
+          tone="secondary"
+          aria-label={t.recoverSlot(String(cell.level))}
+          disabled={cell.used === 0 || cell.max === 0}
+          onClick={act('recoverSlot')}
+        >
+          {t.recoverPoints}
+        </Button>
+      </span>
     </div>
   );
 }

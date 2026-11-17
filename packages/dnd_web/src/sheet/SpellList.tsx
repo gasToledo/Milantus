@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { vocabularyLabel, type AbilityId, type ByAbility, type InnateSpell, type JsonObject, type PreparedSwap } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import { Button } from '../ui/Button';
@@ -181,6 +181,32 @@ export function SpellList({
   // (se desprepara el último), cae en la primera.
   const [picked, setPicked] = useState<TabKey>(() => (tabs.some((x) => x.key === 'chosen') ? 'chosen' : (tabs[0]?.key ?? 'chosen')));
 
+  // Cambiar de pestaña cambia el alto de la lista (seis trucos, una reacción)
+  // y lo de abajo saltaba. El panel recorre de su alto anterior al nuevo con
+  // WAAPI, medido en píxeles: `interpolate-size` solo existe en Chrome. El
+  // recorte va en los cuadros, así no queda puesto al terminar.
+  const panelRef = useRef<HTMLDivElement>(null);
+  const fromHeight = useRef<number | null>(null);
+  const pick = (key: TabKey) => {
+    fromHeight.current = panelRef.current?.offsetHeight ?? null;
+    setPicked(key);
+  };
+  useLayoutEffect(() => {
+    const el = panelRef.current;
+    const from = fromHeight.current;
+    fromHeight.current = null;
+    if (!el || from === null || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const to = el.offsetHeight;
+    if (from === to) return;
+    el.animate(
+      [
+        { height: `${from}px`, overflow: 'hidden' },
+        { height: `${to}px`, overflow: 'hidden' },
+      ],
+      { duration: 200, easing: 'ease-in-out' },
+    );
+  }, [picked]);
+
   if (tabs.length === 0) {
     return <p className="text-[13px] text-text-muted">{t.spellsNoneChosen}</p>;
   }
@@ -340,7 +366,7 @@ export function SpellList({
               role="tab"
               aria-selected={on}
               data-tab={x.key}
-              onClick={() => setPicked(x.key)}
+              onClick={() => pick(x.key)}
               className={cx(
                 'pick flex min-h-[56px] min-w-0 flex-col items-center justify-center gap-0.5 rounded-[var(--radius-card)] border px-3 py-2 text-center',
                 on ? 'border-gold bg-gold-soft text-gold' : 'border-hairline bg-plaque',
@@ -352,8 +378,12 @@ export function SpellList({
           );
         })}
       </div>
-      <div role="tabpanel" data-spell-group={tab}>
-        {panel}
+      <div ref={panelRef} role="tabpanel" data-spell-group={tab}>
+        {/* `key`: lo de la pestaña nueva entra con un fundido mientras el alto
+            recorre. */}
+        <div key={tab} className="step-in">
+          {panel}
+        </div>
       </div>
     </div>
   );

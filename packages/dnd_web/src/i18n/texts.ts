@@ -547,11 +547,6 @@ const es = {
   spellDcCard: 'CD',
   slotCellPact: (level: number) => `Pacto, nivel ${level}`,
   slotCellNone: 'Sin espacios',
-  slotCellLeft: (level: number, left: number, max: number, pact: boolean) => {
-    const who = pact ? 'Pacto' : `Nivel ${level}`;
-    if (max === 0) return `${who}: sin espacios`;
-    return `${who}: ${left === 1 ? 'queda' : 'quedan'} ${left} de ${max}`;
-  },
   spellsTabCantrips: 'Trucos',
   spellsTabAlways: 'Siempre preparados',
   spellsTabChosen: 'Preparados',
@@ -654,13 +649,8 @@ Un descanso largo baja un nivel.`,
   longRestItemsRecharged: (n: number) =>
     n === 1 ? '1 objeto mágico recuperó cargas' : `${n} objetos mágicos recuperaron cargas`,
   longRestCompanionsGone: (names: string) => `se fue ${names}`,
-  inspirationUse: 'Repetí un dado apenas lo tirás y quedate con el resultado nuevo',
-  inspirationLongRest: 'La recuperás al terminar un descanso largo',
-  inspirationGrant: 'Marcala cuando el DM te la dé',
   inspirationSpend: 'Gastar la Inspiración Heroica',
   inspirationMark: 'Marcar que la tenés',
-  inspirationHave: 'LA TENÉS',
-  inspirationSpent: 'GASTADA',
   spellsConcentrate: 'Concentrar',
   spellsConcentratingOn: (spell: string) => `Concentrándote en ${spell}`,
   spellsEndConcentration: 'Terminar',
@@ -3103,11 +3093,6 @@ const en: Texts = {
   spellDcCard: 'DC',
   slotCellPact: (level: number) => `Pact, level ${level}`,
   slotCellNone: 'No slots',
-  slotCellLeft: (level: number, left: number, max: number, pact: boolean) => {
-    const who = pact ? 'Pact' : `Level ${level}`;
-    if (max === 0) return `${who}: no slots`;
-    return `${who}: ${left} of ${max} left`;
-  },
   spellsTabCantrips: 'Cantrips',
   spellsTabAlways: 'Always prepared',
   spellsTabChosen: 'Prepared',
@@ -3208,13 +3193,8 @@ A long rest lowers it by one level.`,
   longRestItemsRecharged: (n: number) =>
     n === 1 ? '1 magic item regained charges' : `${n} magic items regained charges`,
   longRestCompanionsGone: (names: string) => `${names} left`,
-  inspirationUse: 'Reroll a die right after rolling it and keep the new result',
-  inspirationLongRest: 'You regain it when you finish a long rest',
-  inspirationGrant: 'Mark it when the DM gives it to you',
   inspirationSpend: 'Spend Heroic Inspiration',
   inspirationMark: 'Mark that you have it',
-  inspirationHave: 'YOU HAVE IT',
-  inspirationSpent: 'SPENT',
   spellsConcentrate: 'Concentrate',
   spellsConcentratingOn: (spell: string) => `Concentrating on ${spell}`,
   spellsEndConcentration: 'End',

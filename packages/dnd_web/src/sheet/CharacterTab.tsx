@@ -73,6 +73,7 @@ export function CharacterTab({ model }: { model: SheetModel }) {
     <ArrangeableColumns
       tab="personaje"
       defaults={CHARACTER_DEFAULT}
+      leading={choices?.replaceable ? <ChangeChoicesButton href={model.write!.routes.choices()} /> : undefined}
       cards={{
         identity: {
           title: t.identityHeading,
@@ -82,7 +83,6 @@ export function CharacterTab({ model }: { model: SheetModel }) {
               title={t.identityHeading}
               icon={IdCard}
               collapsible
-              trailing={choices?.replaceable ? <ChangeChoicesButton href={model.write!.routes.choices()} /> : undefined}
             >
               <dl className="divide-y divide-hairline border-t border-hairline">
                 {identity.map((row) => (

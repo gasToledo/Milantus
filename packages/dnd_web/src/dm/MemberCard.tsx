@@ -51,6 +51,7 @@ export function MemberCard({
   const hp = character.combat?.currentHp ?? 0;
   const maxHp = sheet?.maxHp ?? 0;
   const ratio = maxHp === 0 ? 0 : Math.min(1, Math.max(0, hp / maxHp));
+  const tempHp = character.combat?.tempHp ?? 0;
   const critical = !fallen && ratio <= HP_CRITICAL_RATIO;
   const classes = entry.classes
     .map((c) => (entry.classes.length > 1 ? `${c.name} ${c.level}` : c.name))
@@ -161,6 +162,13 @@ export function MemberCard({
             <p className="num text-[14px]" data-stat="hp">
               <span className={fallen || critical ? 'text-crimson' : 'text-on-surface'}>{hp}</span>
               <span className="font-normal text-text-muted"> / {maxHp}</span>
+              {/* Los temporales en oro, como en la ficha y el Combate del DM. */}
+              {tempHp > 0 && (
+                <span key={tempHp} className="step-in ml-1 inline-block text-gold" data-field="hp-temp">
+                  <span aria-hidden="true">+{tempHp}</span>
+                  <span className="sr-only">{t.encTempAria(tempHp)}</span>
+                </span>
+              )}
             </p>
           </div>
           <div className="mt-1.5">
@@ -171,6 +179,7 @@ export function MemberCard({
               valueText={`${hp} / ${maxHp}`}
               colorClassName={hpTone(ratio).bar}
               height={6}
+              temp={fallen ? 0 : tempHp}
             />
           </div>
 
