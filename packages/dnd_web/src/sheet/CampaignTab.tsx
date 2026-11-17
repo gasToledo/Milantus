@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import * as Collapsible from '@radix-ui/react-collapsible';
 import { BookOpen, ChevronRight, Coins, Flag, Share2, Swords } from 'lucide-react';
 import type { PlayerBattle, PlayerCampaign, PlayerNote } from '../api/client';
 import { usePlayerCampaigns } from '../api/queries';
@@ -9,7 +10,8 @@ import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { stamp } from '../dm/notebook';
 import { MarkdownText } from '../ui/MarkdownText';
-import { Eyebrow, Pill } from '../ui/data';
+import { Eyebrow, Pill, READ_PROSE, SectionHeading } from '../ui/data';
+import { cx } from '../ui/cx';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import type { SheetModel } from './model';
 import { ShareDialog } from './ShareDialog';
@@ -107,7 +109,7 @@ export function CampaignBlock({ pc, catalog, me }: { pc: PlayerCampaign; catalog
           <Pill highlighted={state === 'active'}>{t.campaignStates[state]}</Pill>
         </div>
         {campaign.premise && (
-          <p className="mt-2.5 leading-[1.55] whitespace-pre-line text-on-surface-variant">
+          <p className={cx('mt-2.5 leading-[1.55] whitespace-pre-line text-on-surface-variant', READ_PROSE)}>
             {campaign.premise}
           </p>
         )}
@@ -122,14 +124,18 @@ export function CampaignBlock({ pc, catalog, me }: { pc: PlayerCampaign; catalog
           data-card="current-chapter"
           className="card flex flex-col gap-3 border-2 border-gold px-[18px] py-4"
         >
-          <h2 id={`h-current-${id}`} className="flex items-center gap-2.5">
-            <BookOpen size={18} aria-hidden="true" className="shrink-0 text-gold" />
-            <span className="font-display text-[16px] text-on-surface">{t.campaignCurrentChapter}</span>
-          </h2>
+          {/* Un solo título: «Capítulo en curso» es el rótulo y el nombre es el
+              encabezado, así el lector oye qué capítulo es. */}
           <div>
-            <p className="font-display text-[20px] break-words text-on-surface">{current.name}</p>
+            <p className="flex items-center gap-1.5 text-[11px] font-medium tracking-[1.6px] text-gold uppercase">
+              <BookOpen size={14} aria-hidden="true" className="shrink-0" />
+              {t.campaignCurrentChapter}
+            </p>
+            <h2 id={`h-current-${id}`} className="font-display mt-1.5 text-[20px] break-words text-on-surface">
+              {current.name}
+            </h2>
             {current.summary?.trim() && (
-              <p className="mt-1.5 text-[14px] leading-[1.55] whitespace-pre-line text-on-surface-variant">
+              <p className={cx('mt-1.5 text-[14px] leading-[1.55] whitespace-pre-line text-on-surface-variant', READ_PROSE)}>
                 {current.summary}
               </p>
             )}
@@ -156,7 +162,7 @@ export function CampaignBlock({ pc, catalog, me }: { pc: PlayerCampaign; catalog
             <div className="flex flex-col gap-4">
               {groups.map((g) => (
                 <div key={g.key}>
-                  <Eyebrow className="mb-2">{g.title}</Eyebrow>
+                  <SectionHeading>{g.title}</SectionHeading>
                   <ul className="flex flex-col gap-2.5">
                     {g.list.map((b, i) => (
                       <BattleRow key={b.id ?? i} battle={b} me={me} catalog={catalog} />
@@ -284,22 +290,23 @@ function ChapterRow({ chapter, notes }: { chapter: JsonObject & { id: string; na
         <p className="mt-1.5 text-[13px] text-text-muted">{t.campaignNoRewards}</p>
       )}
       {notes.length > 0 && (
-        <>
-          <button
-            type="button"
-            aria-expanded={open}
-            onClick={() => setOpen((v) => !v)}
-            className="mt-1 flex h-8 items-center gap-1.5 text-[13px] text-gold"
-          >
-            <ChevronRight size={14} aria-hidden="true" className={open ? 'rotate-90' : ''} />
-            {t.campaignTableNotesCount(notes.length)}
-          </button>
-          {open && (
-            <div className="mt-1.5">
+        // El plegado de Radix con la animación de alto de todo lo plegable.
+        <Collapsible.Root open={open} onOpenChange={setOpen}>
+          <Collapsible.Trigger asChild>
+            <button
+              type="button"
+              className="mt-1 flex h-8 items-center gap-1.5 text-[13px] text-gold transition-colors duration-[120ms] ease-out hover:text-on-surface"
+            >
+              <ChevronRight size={14} aria-hidden="true" className={cx('transition-transform', open && 'rotate-90')} />
+              {t.campaignTableNotesCount(notes.length)}
+            </button>
+          </Collapsible.Trigger>
+          <Collapsible.Content className="fold-content">
+            <div className="pt-1.5">
               <TableNotes notes={notes} />
             </div>
-          )}
-        </>
+          </Collapsible.Content>
+        </Collapsible.Root>
       )}
     </li>
   );
