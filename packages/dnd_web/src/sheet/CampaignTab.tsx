@@ -86,10 +86,12 @@ export function CampaignBlock({ pc, catalog, me }: { pc: PlayerCampaign; catalog
   // capítulos y de la más vieja a la más nueva (`battlesOf` en Flutter). Un
   // capítulo sin batallas no aporta un encabezado vacío; las que no caen en
   // ninguno van al final.
+  // El capítulo en curso también agrupa: sus batallas no son «sin capítulo».
   const oldestFirst = [...battles].reverse();
-  const shown = new Set(chapters.map((c) => c.id));
+  const withCurrent = current && !chapters.some((c) => c.id === current.id) ? [...chapters, current] : chapters;
+  const shown = new Set(withCurrent.map((c) => c.id));
   const groups = [
-    ...chapters.map((c) => ({
+    ...withCurrent.map((c) => ({
       key: c.id,
       title: c.name ?? '',
       list: oldestFirst.filter((b) => b.chapterId === c.id),

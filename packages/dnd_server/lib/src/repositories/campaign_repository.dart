@@ -537,10 +537,17 @@ class PostgresCampaignRepository implements CampaignRepository {
            AND chapter.campaign_id = l.campaign_id
           GROUP BY l.member_id
         ),
+        -- El capítulo, el id y la fecha de cierre viven en columnas y no en el
+        -- documento (como en `logsFor`): sin sumarlos, toda batalla le llegaba
+        -- al jugador «sin capítulo».
         battles AS (
           SELECT l.member_id,
                  jsonb_agg(
-                   encounter.document
+                   encounter.document || jsonb_strip_nulls(jsonb_build_object(
+                     'id', encounter.id::text,
+                     'chapterId', encounter.chapter_id,
+                     'endedAt', encounter.ended_at
+                   ))
                    ORDER BY encounter.ended_at DESC
                  ) FILTER (WHERE encounter.id IS NOT NULL) AS battles
           FROM linked l
