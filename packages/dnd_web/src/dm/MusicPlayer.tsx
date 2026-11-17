@@ -244,9 +244,14 @@ export function MusicPlayer({ campaignId, scenes, offerCombat, onDismissOffer }:
         { height: `${from}px`, opacity: from === 0 ? 0 : 1 },
         { height: `${to}px`, opacity: to === 0 ? 0 : 1 },
       ],
-      { duration: 180, easing: 'ease-in-out' },
+      // Al plegar queda en el último cuadro hasta que React la desmonta: sin
+      // `fill`, entre el fin de la animación y el desmontaje la lista vuelve un
+      // cuadro a su alto entero y el panel parpadea.
+      { duration: 180, easing: 'ease-in-out', fill: to === 0 ? 'forwards' : 'none' },
     );
-    void animation.finished.finally(() => (el.style.overflow = ''));
+    // Plegada, sigue recortada hasta desmontarse: si no, lo de adentro se
+    // vería un cuadro por encima del alto cero.
+    if (to !== 0) void animation.finished.finally(() => (el.style.overflow = ''));
     return animation;
   };
   const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
