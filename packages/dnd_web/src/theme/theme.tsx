@@ -9,6 +9,7 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from 'react';
+import { prefersReducedMotion } from '../ui/motion';
 
 /** Los tres modos de `ThemeMode` en Flutter (`AppSettings.themeMode`). */
 export type ThemeMode = 'dark' | 'light' | 'system';
@@ -62,7 +63,7 @@ function apply(mode: ThemeMode, fade = false) {
   const set = () => {
     root.dataset.theme = theme;
   };
-  if (!fade || !document.startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  if (!fade || !document.startViewTransition || prefersReducedMotion()) {
     set();
     return;
   }

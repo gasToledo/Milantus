@@ -7,6 +7,7 @@ import { Eyebrow } from '../ui/data';
 import { Accordion } from '../ui/disclosure';
 import { signed } from './format';
 import { HigherLevelNote } from './HigherLevelNote';
+import { prefersReducedMotion } from '../ui/motion';
 
 /** La aptitud con que se lanza: la de la clase o la de un conjuro innato. */
 export interface CastingStats {
@@ -195,7 +196,7 @@ export function SpellList({
     const el = panelRef.current;
     const from = fromHeight.current;
     fromHeight.current = null;
-    if (!el || from === null || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!el || from === null || prefersReducedMotion()) return;
     const to = el.offsetHeight;
     if (from === to) return;
     el.animate(

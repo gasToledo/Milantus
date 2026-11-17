@@ -203,18 +203,21 @@ export function Switch({
   label,
   checked,
   onCheckedChange,
+  disabled = false,
 }: {
   id: string;
   label: string;
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
+  disabled?: boolean;
 }) {
   return (
-    <span className="inline-flex items-center gap-2.5">
+    <span className={`inline-flex items-center gap-2.5 ${disabled ? 'opacity-60' : ''}`}>
       <SwitchPrimitive.Root
         id={id}
         checked={checked}
         onCheckedChange={onCheckedChange}
+        disabled={disabled}
         className="relative h-6 w-11 shrink-0 rounded-[var(--radius-pill)] border border-hairline bg-plaque data-[state=checked]:border-gold data-[state=checked]:bg-gold-soft"
       >
         <SwitchPrimitive.Thumb className="block h-[18px] w-[18px] translate-x-[2px] rounded-full bg-text-muted transition-transform data-[state=checked]:translate-x-[22px] data-[state=checked]:bg-gold" />

@@ -17,6 +17,7 @@ import {
   Tooltip,
 } from './primitives';
 import { Seal } from './Seal';
+import { prefersReducedMotion } from './motion';
 
 /**
  * El marco de toda pantalla (`diseno-web.md` §7.1): panel lateral de 236 px
@@ -297,7 +298,7 @@ export function ModeSwitch({ mode, playerHref, dmHref }: { mode: 'player' | 'dm'
   useEffect(() => {
     const from = lastMode;
     lastMode = mode;
-    if (from === null || from === mode || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (from === null || from === mode || prefersReducedMotion()) return;
     pillRef.current?.animate([{ translate: SLIDE[from] }, { translate: SLIDE[mode] }], {
       duration: 220,
       easing: 'ease-out',

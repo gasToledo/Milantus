@@ -36,6 +36,7 @@ import { NavGroup, NavItem, Shell, SidebarBack } from '../ui/Shell';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { CATEGORY_GROUPS, codexEntries, fold, type CodexEntry } from './entries';
 import { useListFitsViewport } from './listHeight';
+import { prefersReducedMotion } from '../ui/motion';
 
 /** Ícono por categoría (los de `CodexCategory` en Flutter, en lucide). */
 export const ICONS: Record<CodexCategory, LucideIcon> = {
@@ -294,7 +295,7 @@ export function CategoryView({
   useListFitsViewport(listRef);
   const lastOpen = useRef<string | null>(null);
   useEffect(() => {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reduce = prefersReducedMotion();
     listRef.current
       ?.querySelector('[aria-current="true"]')
       ?.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
@@ -512,7 +513,7 @@ export function EntryDetail({
     // Lado a lado la ficha scrollea sola y es el mismo elemento: la entrada
     // nueva arrancaría a la altura donde quedó la anterior.
     articleRef.current?.scrollTo({ top: 0 });
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (prefersReducedMotion()) return;
     articleRef.current?.animate(
       [
         { opacity: 0, translate: '0 4px' },

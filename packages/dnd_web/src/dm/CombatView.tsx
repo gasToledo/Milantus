@@ -48,6 +48,7 @@ import { DmHeader } from './DmHeader';
 import { useHpPulse } from '../ui/hpPulse';
 import { buildEntries } from './notebook';
 import { npcTypeLine } from './npcs/npc';
+import { prefersReducedMotion } from '../ui/motion';
 
 /** Las seis columnas de la planilla de la lámina, **las mismas armando y en
  *  curso**, para que no cambie de forma al empezar: iniciativa, combatiente, PG,
@@ -758,7 +759,7 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
       return;
     }
     if (!active || preparing) return;
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reduced = prefersReducedMotion();
     ref.current?.scrollIntoView?.({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
   }, [active, preparing]);
   // Los PX van primero: la línea se recorta por el final.

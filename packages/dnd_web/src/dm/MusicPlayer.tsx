@@ -20,6 +20,7 @@ import {
 } from '../ui/primitives';
 import { editCampaign } from './campaigns';
 import { MusicSceneDialog } from './MusicSceneDialog';
+import { prefersReducedMotion } from '../ui/motion';
 
 /** El sitio del reproductor: un nombre de marca, igual en los dos idiomas. */
 const SITE = 'YouTube';
@@ -254,7 +255,7 @@ export function MusicPlayer({ campaignId, scenes, offerCombat, onDismissOffer }:
     if (to !== 0) void animation.finished.finally(() => (el.style.overflow = ''));
     return animation;
   };
-  const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduceMotion = () => prefersReducedMotion();
   const toggleList = () => {
     const el = sceneList.current;
     if (el?.getAnimations().length) return;

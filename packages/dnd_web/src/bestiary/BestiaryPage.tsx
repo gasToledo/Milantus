@@ -14,6 +14,7 @@ import { Select, Tooltip } from '../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { asProfile, type CreatureProfile as Profile } from './creature';
 import { CreatureProfile } from './CreatureProfile';
+import { prefersReducedMotion } from '../ui/motion';
 
 const ALL = '*';
 
@@ -152,7 +153,7 @@ function Browser({
     article?.scrollTo({ top: 0 });
     // Y entra suave, como una entrada del Códice. Se anima el mismo elemento
     // en vez de remontarlo: el foco no se mueve.
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (prefersReducedMotion()) return;
     article?.animate(
       [
         { opacity: 0, translate: '0 4px' },

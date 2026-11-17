@@ -1001,6 +1001,32 @@ body {
   }
 }
 
+/* Lo mismo cuando se apagan las animaciones en Ajustes (`data-motion` en la
+   raíz, de este navegador). Además de las duraciones apaga los retrasos y
+   las animaciones atadas al scroll, que no tienen duración: con la regla del
+   sistema esos casos ya estaban fuera de `prefers-reduced-motion:
+   no-preference`, y acá no hay media query que los deje afuera. */
+:root[data-motion='reduce'] *,
+:root[data-motion='reduce'] *::before,
+:root[data-motion='reduce'] *::after {
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  animation-timeline: auto !important;
+  transition-duration: 0s !important;
+}
+:root[data-motion='reduce'] .roster-card:hover,
+:root[data-motion='reduce'] .roster-card:focus-within {
+  translate: 0;
+}
+:root[data-motion='reduce'] .pick:active {
+  transform: none;
+}
+:root[data-motion='reduce']::view-transition-group(*),
+:root[data-motion='reduce']::view-transition-old(*),
+:root[data-motion='reduce']::view-transition-new(*) {
+  animation: none !important;
+}
+
 /* ── La hoja impresa ───────────────────────────────────────────────────────
    `PrintSheet` la monta al pie de `body` solo mientras se imprime. En papel
    se ve ella sola; en pantalla, nunca. Es la `_printCss` de Flutter. */

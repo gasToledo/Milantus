@@ -39,6 +39,7 @@ import { CampaignMenu } from './CampaignMenu';
 import { DmHeader } from './DmHeader';
 import { NoteEditorDialog } from './NoteEditorDialog';
 import { buildEntries, inChapterOrder, matches, stamp, type Entry, type EntryKind } from './notebook';
+import { prefersReducedMotion } from '../ui/motion';
 
 /** Sin capítulo: el valor de la pill que junta lo que no cuelga de ninguno. */
 const LOOSE = '';
@@ -169,7 +170,7 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
     const id = window.setTimeout(() => {
       const el = document.querySelector<HTMLElement>(focusTarget);
       if (!el) return;
-      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const reduce = prefersReducedMotion();
       el.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
       el.focus({ preventScroll: true });
       setFocusTarget(null);

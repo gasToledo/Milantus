@@ -14,6 +14,7 @@ import { Button } from '../ui/Button';
 import { Select, Switch } from '../ui/primitives';
 import { AppBusyLabel, AppErrorView } from '../ui/status';
 import { resetTutorials } from '../ui/tutorials';
+import { setAnimationsOff, systemReducesMotion, useAnimationsOff } from '../ui/motion';
 
 const LEGACY_COOKIE = 'milantus_v1';
 
@@ -56,6 +57,10 @@ function BrowserCard() {
   const { browserMode, setMode } = useTheme();
   const themeOptions = useThemeOptions();
   const [reset, setReset] = useState(false);
+  const animationsOff = useAnimationsOff();
+  // Con el sistema pidiendo menos movimiento ya están apagadas: el interruptor
+  // lo muestra y no se puede prender desde acá.
+  const systemOff = systemReducesMotion();
   const [legacy, setLegacy] = useState(() => document.cookie.split(';').some((c) => c.trim() === `${LEGACY_COOKIE}=1`));
   return (
     <Card id="settings-browser" title={t.settingsBrowserTitle} icon={Palette}>
@@ -79,6 +84,18 @@ function BrowserCard() {
           }}
           options={(['es', 'en'] as const).map((l) => ({ value: l, label: t.languageNames[l] }))}
         />
+        {/* Las animaciones, de este navegador como el tema: apagarlas deja
+            cada cambio de golpe, como con «reducir movimiento» del sistema. */}
+        <div className="flex flex-col gap-1">
+          <Switch
+            id="settings-animations"
+            label={t.settingsAnimations}
+            checked={!animationsOff && !systemOff}
+            disabled={systemOff}
+            onCheckedChange={(on) => setAnimationsOff(!on)}
+          />
+          {systemOff && <p className="text-[12.5px] text-text-muted">{t.settingsAnimationsSystem}</p>}
+        </div>
         {/* Lo visto es de este navegador, como el tema y el idioma. */}
         <div className="mt-1 flex w-full flex-wrap items-center justify-between gap-3 border-t border-hairline pt-3" data-field="tutorials">
           <span className="text-[14px] text-on-surface">{t.settingsTutorials}</span>

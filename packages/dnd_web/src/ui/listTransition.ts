@@ -1,4 +1,5 @@
 import { useCallback, useLayoutEffect, useRef } from 'react';
+import { prefersReducedMotion } from './motion';
 
 /**
  * Anima con View Transitions lo que cambia el orden o el contenido de una
@@ -20,7 +21,7 @@ export function useListTransition(list: unknown) {
     committed.current = null;
   }, [list]);
   return useCallback((update: () => unknown) => {
-    if (!document.startViewTransition) {
+    if (!document.startViewTransition || prefersReducedMotion()) {
       void update();
       return;
     }

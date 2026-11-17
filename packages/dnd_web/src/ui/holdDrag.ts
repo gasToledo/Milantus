@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type DragEvent, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent, type PointerEvent } from 'react';
+import { prefersReducedMotion } from './motion';
 
 /** Cuánto hay que sostener el dedo: menos se confunde con desplazar, y a los
  *  500 ms ya saltaría el menú propio del teléfono sobre el enlace. */
@@ -162,7 +163,7 @@ export function useHoldDrag({
           height: r.height,
         };
       });
-      const animated = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const animated = !prefersReducedMotion();
       setDrag({ id: p.id, slots, dx: 0, dy: 0, over: null, settling: false, animated });
       // Sin esto, en un teléfono no se nota que la tarjeta ya se levantó.
       if (!p.mouse) navigator.vibrate?.(10);

@@ -19,6 +19,9 @@
         var m = localStorage.getItem('milantus.v2.theme');
         if (m === 'system') m = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
         if (m === 'light' || m === 'dark') document.documentElement.dataset.theme = m;
+        // Las animaciones apagadas en Ajustes (`src/ui/motion.ts`), también
+        // antes del primer cuadro: si no, la primera pantalla entraría animada.
+        if (localStorage.getItem('milantus.v2.motion') === 'reduce') document.documentElement.dataset.motion = 'reduce';
       } catch (e) {}
     </script>
   </head>

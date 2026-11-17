@@ -1,5 +1,6 @@
 import type { MouseEvent } from 'react';
 import { navigate } from '../router';
+import { prefersReducedMotion } from './motion';
 
 /**
  * Navega con un fundido corto de la pantalla entera (View Transitions) en vez
@@ -15,7 +16,7 @@ import { navigate } from '../router';
  * animarlo pide envolver el `popstate` del router.
  */
 export function fadeNavigate(e: MouseEvent<HTMLAnchorElement>, target: string, go?: () => void) {
-  if (!document.startViewTransition || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  if (!document.startViewTransition || prefersReducedMotion() || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
   const href = e.currentTarget.getAttribute('href')!;
   // El ítem activo del panel lleva adonde ya se está: no hay nada que fundir.
   if (href === window.location.pathname + window.location.search + window.location.hash) return;
