@@ -36,8 +36,9 @@ test('Ajustes guarda en la cuenta y el modo de inicio respeta la navegación', a
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
   await page.getByRole('combobox', { name: t.settingsStartMode }).click();
   await page.getByRole('option', { name: t.settingsStartModes.dm }).click();
-  await expect(page.getByRole('status').filter({ hasText: t.settingsSaved })).toBeVisible();
-  expect(settings).toEqual({
+  // Se espera a lo guardado y no al «Guardado»: el del cambio anterior (el
+  // tema) puede seguir a la vista cuando todavía no llegó este.
+  await expect.poll(() => settings).toEqual({
     imageProvider: 'pollinations', sortMode: 'name', showEncounterDifficulty: false, themeMode: 'light', startsInDmMode: true,
   });
 
