@@ -351,6 +351,10 @@ body {
     scale: 0.95;
   }
 }
+/* Un cambio de imagen que se funde en vez de saltar (el retrato grande). */
+.fade-in {
+  animation: menu-fade 180ms ease-out;
+}
 @keyframes menu-fade {
   from {
     opacity: 0;

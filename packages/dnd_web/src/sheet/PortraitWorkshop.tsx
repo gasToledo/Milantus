@@ -1,6 +1,7 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import * as Collapsible from '@radix-ui/react-collapsible';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Check, History, Image as ImageIcon, Sparkles, Trash2, Upload, X } from 'lucide-react';
+import { ArrowLeft, Check, ChevronDown, History, Image as ImageIcon, Sparkles, Trash2, Upload, X } from 'lucide-react';
 import { ApiError } from '../api/client';
 import {
   deletePortrait,
@@ -66,7 +67,9 @@ function Corner({ at }: { at: 'tl' | 'tr' | 'bl' | 'br' }) {
 }
 
 /**
- * Una tira horizontal de miniaturas de 57×76. Tocar una **solo la mira**: no
+ * Una grilla de miniaturas en 3:4, cuatro por fila (antes, una tira de 57×76
+ * con scroll de costado). Se doran al pasar y se hunden al tocarlas, como lo
+ * demás que se toca. Con [stagger], entran de a una (los resultados nuevos). Tocar una **solo la mira**: no
  * guarda ni cambia nada (el retrato del personaje se compromete con «Usar» o
  * «Volver»). Una imagen que no carga deja la celda vacía —la clave puede ser
  * de un retrato borrado— en vez de un ícono roto.
@@ -76,6 +79,7 @@ function ThumbStrip({
   items,
   onSelect,
   inline = false,
+  stagger = false,
 }: {
   label: string;
   items: { id: string; src: string; label: string; selected: boolean; current?: boolean }[];
@@ -83,12 +87,13 @@ function ThumbStrip({
   /** Las imágenes son `data:` (resultados recién generados): no hay
    *  miniatura del servidor que pedir. */
   inline?: boolean;
+  stagger?: boolean;
 }) {
   const [failed, setFailed] = useState<ReadonlySet<string>>(new Set());
   return (
-    <ul aria-label={label} className="m-0 flex list-none gap-2 overflow-x-auto p-0 pb-1">
-      {items.map((item) => (
-        <li key={item.id} className="shrink-0">
+    <ul aria-label={label} className={cx('m-0 grid list-none grid-cols-4 gap-2 p-0', stagger && 'stagger-in')}>
+      {items.map((item, i) => (
+        <li key={item.id} className="min-w-0" style={{ '--sibling-index': i + 1 } as CSSProperties}>
           <button
             type="button"
             aria-label={item.label}
@@ -96,13 +101,13 @@ function ThumbStrip({
             data-thumb={item.id}
             onClick={() => onSelect(item.id)}
             className={cx(
-              'pick relative block h-[76px] w-[57px] overflow-hidden rounded-[8px] bg-plaque p-0',
-              item.selected ? 'border-2 border-gold' : 'border border-hairline',
+              'relative block aspect-[3/4] w-full overflow-hidden rounded-[8px] bg-plaque p-0 transition duration-[120ms] ease-out motion-safe:active:translate-y-px',
+              item.selected ? 'border-2 border-gold' : 'border border-hairline hover:border-gold',
             )}
           >
             {!failed.has(item.src) && (
               <img
-                src={inline ? item.src : thumbnailUrl(item.src, 57)}
+                src={inline ? item.src : thumbnailUrl(item.src, 160)}
                 alt=""
                 onError={() => setFailed((prev) => new Set(prev).add(item.src))}
                 className="h-full w-full object-cover"
@@ -120,6 +125,25 @@ function ThumbStrip({
         </li>
       ))}
     </ul>
+  );
+}
+
+/** El texto del prompt, plegado detrás de su rótulo: ocupaba mucho alto en la
+ *  columna del retrato. Se abre con la animación de todo lo plegable. */
+function PromptFold({ title, children }: { title: string; children: ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Collapsible.Root open={open} onOpenChange={setOpen} className="plaque px-3.5 py-2">
+      <Collapsible.Trigger asChild>
+        <button type="button" className="flex min-h-8 w-full items-center gap-2 text-left">
+          <span className="eyebrow flex-1">{title}</span>
+          <ChevronDown size={14} aria-hidden="true" className={cx('shrink-0 text-text-muted transition-transform', open && 'rotate-180')} />
+        </button>
+      </Collapsible.Trigger>
+      <Collapsible.Content className="fold-content">
+        <div className="pt-1 pb-1.5">{children}</div>
+      </Collapsible.Content>
+    </Collapsible.Root>
   );
 }
 
@@ -155,6 +179,8 @@ export interface PortraitOwner {
  */
 export function PortraitWorkshop({ owner }: { owner: PortraitOwner }) {
   const t = useTexts();
+  // Un archivo arrastrado sobre «Subir imagen».
+  const [dropping, setDropping] = useState(false);
   const { paths, prompts } = owner;
 
   const client = useQueryClient();
@@ -371,12 +397,14 @@ export function PortraitWorkshop({ owner }: { owner: PortraitOwner }) {
           <figure className="m-0 flex flex-col gap-2">
             <div className="relative flex aspect-[3/4] items-center justify-center overflow-hidden rounded-[var(--radius-card)] border border-hairline bg-plaque">
               {heroSrc && heroFailed !== heroSrc ? (
+                // `key`: otra imagen entra con un fundido en vez de saltar.
                 <img
+                  key={heroSrc}
                   src={heroSrc}
                   alt={t.portraitOf(owner.name)}
                   data-portrait
                   onError={() => setHeroFailed(heroSrc)}
-                  className="h-full w-full object-cover"
+                  className="fade-in h-full w-full object-cover"
                 />
               ) : (
                 <Medallion name={owner.name} accent={owner.accent} size={120} />
@@ -409,6 +437,7 @@ export function PortraitWorkshop({ owner }: { owner: PortraitOwner }) {
             <>
               <ThumbStrip
                 inline
+                stagger
                 label={t.portraitResults}
                 items={results.map((b64, i) => ({
                   id: String(i),
@@ -467,12 +496,9 @@ export function PortraitWorkshop({ owner }: { owner: PortraitOwner }) {
                 </Button>
               )}
               {shownPrompt && (
-                <section className="plaque px-3.5 py-3">
-                  <Eyebrow>{t.portraitUsedPrompt}</Eyebrow>
-                  <p className="mt-[7px] text-[12.5px] leading-[1.5] break-words text-on-surface-variant select-text">
-                    {shownPrompt}
-                  </p>
-                </section>
+                <PromptFold title={t.portraitUsedPrompt}>
+                  <p className="text-[12.5px] leading-[1.5] break-words text-on-surface-variant select-text">{shownPrompt}</p>
+                </PromptFold>
               )}
               <button
                 type="button"
@@ -490,11 +516,10 @@ export function PortraitWorkshop({ owner }: { owner: PortraitOwner }) {
           {/* La lámina del guardado mirado no la lleva: ahí el panel es el del
               prompt usado, y dos prompts a la vez no se sabrían distinguir. */}
           {shownMode === 'ai' && !viewKey && (
-            <section className="plaque px-3.5 py-3">
-              <Eyebrow>{t.portraitBaseDescription}</Eyebrow>
+            <PromptFold title={t.portraitBaseDescription}>
               <p
                 data-field="portrait-prompt"
-                className="mt-[7px] text-[12.5px] leading-[1.5] break-words text-on-surface-variant select-text"
+                className="text-[12.5px] leading-[1.5] break-words text-on-surface-variant select-text"
               >
                 {at < 0 ? (
                   prompt
@@ -506,7 +531,7 @@ export function PortraitWorkshop({ owner }: { owner: PortraitOwner }) {
                   </>
                 )}
               </p>
-            </section>
+            </PromptFold>
           )}
         </div>
 
@@ -648,11 +673,28 @@ export function PortraitWorkshop({ owner }: { owner: PortraitOwner }) {
                   {importing ? (
                     <AppBusyLabel label={t.portraitImporting} />
                   ) : (
+                    // También se suelta un archivo encima: el borde se dora y se
+                    // punta mientras se arrastra.
                     <button
                       type="button"
                       disabled={busy}
                       onClick={() => fileInput.current?.click()}
-                      className={cx('plaque flex min-h-[210px] w-full flex-col items-center justify-center gap-2 p-6 text-center', PLAQUE_BUTTON)}
+                      onDragOver={(e) => {
+                        if (busy || !e.dataTransfer.types.includes('Files')) return;
+                        e.preventDefault();
+                        setDropping(true);
+                      }}
+                      onDragLeave={() => setDropping(false)}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        setDropping(false);
+                        if (!busy) void onFile(e.dataTransfer.files[0]);
+                      }}
+                      className={cx(
+                        'plaque flex min-h-[210px] w-full flex-col items-center justify-center gap-2 p-6 text-center',
+                        PLAQUE_BUTTON,
+                        dropping && '!border-dashed !border-gold',
+                      )}
                     >
                       <Upload size={34} aria-hidden="true" className="text-gold" />
                       <b className="font-display text-[16px] font-normal text-on-surface">{t.portraitImportTitle}</b>

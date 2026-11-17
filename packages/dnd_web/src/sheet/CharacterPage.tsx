@@ -9,7 +9,7 @@ import { Toast, type ToastTone } from '../ui/primitives';
 import { Shell, SidebarBack } from '../ui/Shell';
 import { AppBusyLabel, AppErrorView, Notice, SaveStatusBadge } from '../ui/status';
 import { computeModel, type ComputedModel } from './compute';
-import { SheetFooter, SheetPanel } from './SheetPanel';
+import { SheetFooter, SheetPanel, type SheetPanelActive } from './SheetPanel';
 import { SheetTabs } from './SheetTabs';
 import { TurnBanner } from './TurnBanner';
 import { LevelUpWizard } from '../levelup/LevelUpWizard';
@@ -130,6 +130,22 @@ export function CharacterPage({
     if (levelUp && atMaxLevel) navigate(characterHref(id), { replace: true });
   }, [id, levelUp, atMaxLevel]);
 
+  // Lo que el panel marca: el retrato y la subida de nivel tienen su ítem; las
+  // demás pantallas cuelgan de una pestaña (los planos, de Inventario; los
+  // conjuros y las formas, de Combate; las elecciones, de Personaje). Antes
+  // marcaba siempre la pestaña, y en el retrato decía «Personaje».
+  const panelActive: SheetPanelActive = portrait
+    ? 'portrait'
+    : levelUp
+      ? 'levelUp'
+      : magicPlans
+        ? 'inventario'
+        : spellEdit !== undefined || wildShapeForms
+          ? 'combate'
+          : choices
+            ? 'personaje'
+            : activeTab;
+
   let body;
   if (failed.length > 0) {
     body = (
@@ -185,7 +201,7 @@ export function CharacterPage({
   return (
     <>
       <Shell
-        panel={model ? <SheetPanel model={model} tab={activeTab} /> : <SidebarBack href={rosterHref()} back={false} />}
+        panel={model ? <SheetPanel model={model} tab={panelActive} /> : <SidebarBack href={rosterHref()} back={false} />}
         footer={
           <SheetFooter
             version={version.data}

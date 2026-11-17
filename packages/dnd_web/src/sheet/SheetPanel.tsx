@@ -40,7 +40,11 @@ export const TAB_ICONS: Record<SheetTab, LucideIcon> = {
  * subir de nivel y el retrato son pantallas de `/v2` (`LevelUpWizard`,
  * `PortraitPage`); compartir abre `ShareDialog`, que emite el código.
  */
-export function SheetPanel({ model, tab }: { model: SheetModel; tab: SheetTab }) {
+/** Lo que el panel marca como activo: una pestaña, o el retrato o la subida
+ *  de nivel, que son pantallas propias con su ítem. */
+export type SheetPanelActive = SheetTab | 'portrait' | 'levelUp';
+
+export function SheetPanel({ model, tab }: { model: SheetModel; tab: SheetPanelActive }) {
   const t = useTexts();
   const { character, sheet } = model;
   const classes = classesOf(model)
@@ -82,12 +86,12 @@ export function SheetPanel({ model, tab }: { model: SheetModel; tab: SheetTab })
 
       <NavGroup label={t.sheetActionsLabel}>
         <li>
-          <NavItem href={portraitHref(id)} icon={Image} label={t.actionPortrait} internal />
+          <NavItem href={portraitHref(id)} icon={Image} label={t.actionPortrait} active={tab === 'portrait'} internal />
         </li>
         <li>
           {/* En el nivel máximo no hay a dónde ir: el tope lo dice el motor. */}
           {canLevelUp(character as unknown as CharacterJson) ? (
-            <NavItem href={levelUpHref(id)} icon={ArrowUpCircle} label={t.actionLevelUp} internal />
+            <NavItem href={levelUpHref(id)} icon={ArrowUpCircle} label={t.actionLevelUp} active={tab === 'levelUp'} internal />
           ) : (
             <NavItem icon={ArrowUpCircle} label={t.levelMaxReached} disabled />
           )}
