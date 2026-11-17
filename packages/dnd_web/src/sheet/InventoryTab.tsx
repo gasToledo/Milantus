@@ -187,13 +187,20 @@ export function InventoryTab({ model }: { model: SheetModel }) {
               {COINS.map((c) => {
                 const n = character.coins?.[c] ?? 0;
                 return (
-                  <div key={c} className="plaque px-1.5 pt-3 pb-2.5 text-center" data-coin={c}>
+                  // Escribibles, avisan como lo que se toca: el borde se dora al
+                  // pasar y mientras se escribe.
+                  <div
+                    key={c}
+                    className={cx('plaque px-1.5 pt-3 pb-2.5 text-center', write && 'transition-colors duration-[120ms] ease-out focus-within:border-gold hover:border-gold')}
+                    data-coin={c}
+                  >
                     <dt className="text-[10px] tracking-[1.2px] text-text-muted uppercase">
                       <span aria-hidden="true">{t.coins[c].abbr}</span>
                       <span className="sr-only">{t.coins[c].name}</span>
                     </dt>
                     {/* Las que están en cero se atenúan: lo que hay se ve primero. */}
-                    <dd className={cx('font-display mt-[7px] text-[22px] leading-none tabular-nums', n > 0 ? 'text-gold' : 'text-text-muted')}>
+                    {/* `key`: un valor nuevo entra con su fundido. */}
+                    <dd key={n} className={cx('font-display step-in mt-[7px] text-[22px] leading-none tabular-nums', n > 0 ? 'text-gold' : 'text-text-muted')}>
                       {write ? (
                         <CoinInput
                           // La clave reinicia el campo cuando el motor guarda
@@ -251,85 +258,89 @@ export function InventoryTab({ model }: { model: SheetModel }) {
       </Card>
 
       <section aria-labelledby="h-pack" className="card @container min-w-0 px-5 pt-[18px] pb-2.5" data-card="pack">
-        <div className="mb-5 flex flex-wrap items-center gap-x-4 gap-y-3">
-          <h2 id="h-pack" className="flex min-w-0 flex-[1_1_140px] items-center gap-2">
-            <Backpack size={18} aria-hidden="true" className="shrink-0 text-gold" />
-            <span className="font-display text-[16px] text-on-surface">{t.packHeading}</span>
-            <span className="text-[12px] text-text-muted tabular-nums">{t.itemsCount(lines.length)}</span>
-          </h2>
-          {write && (
-            <Button
-              tone="soft"
-              icon={Plus}
-              onClick={() => {
-                setAdded(0);
-                setCatalogOpen(true);
-              }}
-            >
-              {t.catalogAddTitle}
-            </Button>
-          )}
-          {write && plans && (
-            <ButtonLink tone="soft" internal href={write.routes.plans()} data-action="magic-plans">
-              {t.invPlansButton(plans.chosen.length, plans.count)}
-            </ButtonLink>
-          )}
-          {write &&
-            sheet.targetChoiceSlots.map((slot) => (
-              <Button key={slot.groupId} tone="soft" data-action={`target-${slot.groupId}`} onClick={() => setTargetGroup(slot.groupId)}>
-                {t.invTargetButton(slot.name, slot.chosenEntryIds.length, slot.count)}
-              </Button>
-            ))}
-          {lines.length > 0 && (
-            <>
-              <div role="search" className="relative min-w-[min(200px,100%)] flex-[1_1_200px] @xl:max-w-[260px]">
-                <label htmlFor="pack-search" className="sr-only">
-                  {t.packSearchLabel}
-                </label>
-                <input
-                  id="pack-search"
-                  type="search"
-                  autoComplete="off"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={t.packSearchHint}
-                  className="h-9 w-full rounded-[var(--radius-pill)] border border-hairline bg-plaque px-4 pr-9 text-[13px] text-on-surface placeholder:text-text-muted"
-                />
-                {query !== '' && (
-                  <Tooltip content={t.rosterClearSearch}>
-                    <button
-                      type="button"
-                      aria-label={t.rosterClearSearch}
-                      onClick={() => setQuery('')}
-                      className="absolute inset-y-0 right-1 flex w-8 items-center justify-center text-text-muted hover:text-on-surface"
-                    >
-                      <X size={16} aria-hidden="true" />
-                    </button>
-                  </Tooltip>
-                )}
-              </div>
-              <div
-                role="group"
-                aria-label={t.packFilterLabel}
-                className="flex gap-1 rounded-[var(--radius-pill)] border border-hairline bg-plaque p-[3px]"
+        {/* Dos renglones: arriba el título y lo que se hace; abajo lo que sirve
+            para encontrar. En una sola fila se partía donde podía. */}
+        <div className="mb-5 flex flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+            <h2 id="h-pack" className="flex min-w-0 flex-[1_1_140px] items-center gap-2">
+              <Backpack size={18} aria-hidden="true" className="shrink-0 text-gold" />
+              <span className="font-display text-[16px] text-on-surface">{t.packHeading}</span>
+              <span className="text-[12px] text-text-muted tabular-nums">{t.itemsCount(lines.length)}</span>
+            </h2>
+            {write && (
+              <Button
+                tone="soft"
+                icon={Plus}
+                onClick={() => {
+                  setAdded(0);
+                  setCatalogOpen(true);
+                }}
               >
-                {(['all', 'equipped', 'magic'] as const).map((f) => (
-                  <button
-                    key={f}
-                    type="button"
-                    aria-pressed={filter === f}
-                    onClick={() => setFilter(f)}
-                    className={cx(
-                      'rounded-[var(--radius-pill)] px-3 py-[5px] text-[12px]',
-                      filter === f ? 'bg-gold-soft font-semibold text-gold' : 'text-on-surface-variant hover:text-on-surface',
-                    )}
-                  >
-                    {t.packFilters[f]}
-                  </button>
-                ))}
+                {t.catalogAddTitle}
+              </Button>
+            )}
+            {write && plans && (
+              <ButtonLink tone="soft" internal href={write.routes.plans()} data-action="magic-plans">
+                {t.invPlansButton(plans.chosen.length, plans.count)}
+              </ButtonLink>
+            )}
+            {write &&
+              sheet.targetChoiceSlots.map((slot) => (
+                <Button key={slot.groupId} tone="soft" data-action={`target-${slot.groupId}`} onClick={() => setTargetGroup(slot.groupId)}>
+                  {t.invTargetButton(slot.name, slot.chosenEntryIds.length, slot.count)}
+                </Button>
+              ))}
+          </div>
+            {lines.length > 0 && (
+              <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+                <div role="search" className="relative min-w-[min(200px,100%)] flex-[1_1_200px] @xl:max-w-[260px]">
+                  <label htmlFor="pack-search" className="sr-only">
+                    {t.packSearchLabel}
+                  </label>
+                  <input
+                    id="pack-search"
+                    type="search"
+                    autoComplete="off"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder={t.packSearchHint}
+                    className="h-9 w-full rounded-[var(--radius-pill)] border border-hairline bg-plaque px-4 pr-9 text-[13px] text-on-surface placeholder:text-text-muted"
+                  />
+                  {query !== '' && (
+                    <Tooltip content={t.rosterClearSearch}>
+                      <button
+                        type="button"
+                        aria-label={t.rosterClearSearch}
+                        onClick={() => setQuery('')}
+                        className="absolute inset-y-0 right-1 flex w-8 items-center justify-center text-text-muted transition-colors duration-[120ms] ease-out hover:text-on-surface"
+                      >
+                        <X size={16} aria-hidden="true" />
+                      </button>
+                    </Tooltip>
+                  )}
+                </div>
+                <div
+                  role="group"
+                  aria-label={t.packFilterLabel}
+                  className="flex gap-1 rounded-[var(--radius-pill)] border border-hairline bg-plaque p-[3px]"
+                >
+                  {(['all', 'equipped', 'magic'] as const).map((f) => (
+                    <button
+                      key={f}
+                      type="button"
+                      aria-pressed={filter === f}
+                      onClick={() => setFilter(f)}
+                      className={cx(
+                        'rounded-[var(--radius-pill)] px-3 py-[5px] text-[12px] transition-colors duration-[120ms] ease-out',
+                        filter === f ? 'bg-gold-soft font-semibold text-gold' : 'text-on-surface-variant hover:text-on-surface',
+                      )}
+                    >
+                      {t.packFilters[f]}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </>
-          )}
+            )}
         </div>
 
         {lines.length === 0 ? (
@@ -380,8 +391,13 @@ export function InventoryTab({ model }: { model: SheetModel }) {
             {groups.map(({ group, lines: rows }) => (
               <tbody key={group} data-group={group}>
                 <tr>
+                  {/* Con el filete hasta el borde, como las secciones del Códice.
+                      No es `SectionHeading`: un `th` no admite títulos. */}
                   <th scope="colgroup" colSpan={write ? 5 : 4} className="px-2 pt-[22px] pb-2 font-normal">
-                    <Eyebrow>{t.itemGroups[group]}</Eyebrow>
+                    <span className="flex items-center gap-3">
+                      <span className="eyebrow shrink-0">{t.itemGroups[group]}</span>
+                      <span aria-hidden="true" className="h-px flex-1 bg-hairline" />
+                    </span>
                   </th>
                 </tr>
                 {rows.map((line) => (
@@ -606,7 +622,8 @@ function PackRow({
   ].filter(Boolean);
   const entry = line.entryId;
   return (
-    <tr className="border-t border-hairline" data-entry={line.entryId}>
+    // Se resalta al pasar: ayuda a seguir con la vista la fila entera.
+    <tr className="border-t border-hairline transition-colors duration-[120ms] ease-out hover:bg-plaque/60" data-entry={line.entryId}>
       <th scope="row" className="px-2 py-3 text-left font-normal">
         <span className="flex min-w-0 items-center gap-3.5">
           <span
@@ -679,7 +696,7 @@ function PackRow({
             aria-label={t.invEquip(line.name)}
             checked={line.equipped}
             onChange={(e) => write.act({ type: 'equip', entry, value: e.target.checked })}
-            className="h-4 w-4 accent-[var(--gold)]"
+            className="check"
           />
         ) : line.equipped ? (
           <span className="inline-flex items-center gap-1 text-gold">
@@ -739,7 +756,7 @@ function ItemMenu({
           <button
             type="button"
             aria-label={t.invActions(line.name)}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius-nav)] text-on-surface-variant hover:bg-plaque hover:text-gold"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius-nav)] text-on-surface-variant transition-colors duration-[120ms] ease-out hover:bg-plaque hover:text-gold"
           >
             <EllipsisVertical size={18} aria-hidden="true" />
           </button>

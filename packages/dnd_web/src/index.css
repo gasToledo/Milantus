@@ -629,6 +629,52 @@ body {
   }
 }
 
+/* La casilla del sistema (`.check`, sobre el `<input type="checkbox">` de
+   verdad): la nativa teñida se veía distinta en cada navegador. Sin
+   `appearance` el input sigue siendo el control (teclado, lector,
+   `:checked`); el ✓ es una máscara que entra con una escala. */
+.check {
+  appearance: none;
+  display: inline-grid;
+  place-content: center;
+  inline-size: 18px;
+  aspect-ratio: 1;
+  margin: 0;
+  border: 1.5px solid var(--text-muted);
+  border-radius: var(--radius-mark);
+  background: var(--plaque);
+  cursor: pointer;
+  vertical-align: middle;
+  transition:
+    background-color 120ms ease-out,
+    border-color 120ms ease-out;
+}
+.check::before {
+  content: '';
+  inline-size: 12px;
+  aspect-ratio: 1;
+  background-color: var(--on-primary);
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>")
+    no-repeat center / contain;
+  scale: 0;
+  transition: scale 150ms ease-out;
+}
+.check:hover {
+  border-color: var(--gold);
+}
+.check:checked {
+  border-color: var(--gold);
+  background: var(--gold);
+}
+.check:checked::before {
+  scale: 1;
+}
+@media (forced-colors: active) {
+  .check::before {
+    background-color: CanvasText;
+  }
+}
+
 /* El panel de música crece desde su esquina, la de la pill que lo despliega;
    la pill y la oferta de combate entran igual. Arranca cuando se pone la
    clase: el panel la lleva solo desplegado. */
