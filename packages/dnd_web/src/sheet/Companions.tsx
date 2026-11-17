@@ -198,6 +198,14 @@ function CompanionRow({
         <span className="shrink-0 whitespace-nowrap tabular-nums">
           <b className={cx('num text-[18px]', tone.text)}>{c.currentHp}</b>
           <small className="ml-1 text-[12px] text-text-muted">{t.compHpMax(max)}</small>
+          {/* Los temporales en oro junto a la cifra, como en la ficha y el Combate del DM. */}
+          {c.tempHp > 0 && (
+            // `key`: cada valor nuevo entra con su fundido.
+            <span key={c.tempHp} className="num step-in ml-1 inline-block text-gold">
+              <span aria-hidden="true">+{c.tempHp}</span>
+              <span className="sr-only">{t.encTempAria(c.tempHp)}</span>
+            </span>
+          )}
         </span>
         <ChevronDown
           size={16}
@@ -212,9 +220,9 @@ function CompanionRow({
           label={t.compHpLabel(c.name)}
           valueText={t.hpValueText(c.currentHp, max)}
           colorClassName={tone.bar}
+          temp={c.tempHp}
         />
       </div>
-      {c.tempHp > 0 && <p className="mt-1 text-[12.5px] text-on-surface-variant">{t.tempHp(c.tempHp)}</p>}
       {open && (
         <div id={bodyId} className="mt-3 flex flex-col gap-3">
           {write && (

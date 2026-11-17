@@ -253,6 +253,9 @@ export function Pips({
  * `aria-label`, `aria-valuenow` y el texto del valor: así el lector la lee
  * aunque la cifra de al lado no esté. Recorre el tramo al cambiar (220 ms,
  * apagado si el sistema pide menos movimiento).
+ *
+ * Con [temp] (PG temporales) la barra mide máximo + temporales y suma un tramo
+ * dorado después de los PG, como la fila del Combate del DM.
  */
 export function ThinBar({
   value,
@@ -261,6 +264,7 @@ export function ThinBar({
   valueText,
   colorClassName = 'bg-gold',
   height = 5,
+  temp = 0,
 }: {
   value: number;
   max: number;
@@ -268,8 +272,11 @@ export function ThinBar({
   valueText?: string;
   colorClassName?: string;
   height?: number;
+  temp?: number;
 }) {
-  const ratio = max <= 0 ? 0 : Math.min(1, Math.max(0, value / max));
+  const total = max + Math.max(0, temp);
+  const share = (n: number) => (total <= 0 ? 0 : Math.min(1, Math.max(0, n / total)));
+  const ratio = share(value);
   return (
     <div
       role="meter"
@@ -278,10 +285,13 @@ export function ThinBar({
       aria-valuemax={max}
       aria-valuenow={Math.max(0, Math.min(value, max))}
       aria-valuetext={valueText}
-      className="w-full overflow-hidden bg-hairline"
+      className="flex w-full overflow-hidden bg-hairline"
       style={{ height, borderRadius: height / 2 }}
     >
       <div className={cx('thin-bar-fill h-full', colorClassName)} style={{ width: `${ratio * 100}%`, borderRadius: height / 2 }} />
+      {/* Siempre montado (en cero sin temporales): así crece y se achica con la
+          misma transición que los PG, en vez de aparecer de golpe. */}
+      <div className="thin-bar-fill ml-px h-full bg-gold" style={{ width: `${share(temp) * 100}%`, borderRadius: height / 2 }} />
     </div>
   );
 }

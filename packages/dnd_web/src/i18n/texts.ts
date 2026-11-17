@@ -345,7 +345,6 @@ const es = {
   levelWord: 'Nivel',
 
   hp: 'PG',
-  tempHp: (n: number) => `+${n} temporales`,
   ac: 'CA',
   initiative: 'Iniciativa',
   speed: 'Velocidad',
@@ -2913,7 +2912,6 @@ const en: Texts = {
   levelWord: 'Level',
 
   hp: 'HP',
-  tempHp: (n: number) => `+${n} temporary`,
   ac: 'AC',
   initiative: 'Initiative',
   speed: 'Speed',

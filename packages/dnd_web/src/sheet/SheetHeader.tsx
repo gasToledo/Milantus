@@ -117,7 +117,19 @@ export function SheetHeader({
               </span>
             }
             valueClassName={tone.text}
-            suffix={`/ ${sheet.maxHp}`}
+            suffix={
+              <>
+                / {sheet.maxHp}
+                {/* Los temporales, en oro junto a la cifra, como en el Combate del DM. */}
+                {tempHp > 0 && (
+                  // `key`: cada valor nuevo entra con su fundido.
+                  <span key={tempHp} className="num step-in ml-1.5 inline-block text-[18px] text-gold" data-field="hp-temp">
+                    <span aria-hidden="true">+{tempHp}</span>
+                    <span className="sr-only">{t.encTempAria(tempHp)}</span>
+                  </span>
+                )}
+              </>
+            }
             footer={
               <>
                 <ThinBar
@@ -126,8 +138,8 @@ export function SheetHeader({
                   label={t.hitPoints}
                   valueText={t.hpValueText(currentHp, sheet.maxHp)}
                   colorClassName={tone.bar}
+                  temp={tempHp}
                 />
-                {tempHp > 0 && <p className="step-in mt-1.5 text-[11px] text-on-surface-variant">{t.tempHp(tempHp)}</p>}
               </>
             }
           />

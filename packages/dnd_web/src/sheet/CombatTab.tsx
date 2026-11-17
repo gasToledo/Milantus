@@ -80,6 +80,14 @@ function HitPointsCard({ model }: { model: SheetModel }) {
           {current}
         </span>
         <span className="text-[15px] text-text-muted">{t.hpMaxSuffix(sheet.maxHp)}</span>
+        {/* Los temporales, en oro junto a la cifra, como en el Combate del DM. */}
+        {temp > 0 && (
+          // `key`: cada valor nuevo entra con su fundido.
+          <span key={temp} className="num step-in ml-1 inline-block text-[22px] leading-none text-gold" data-field="hp-temp">
+            <span aria-hidden="true">+{temp}</span>
+            <span className="sr-only">{t.encTempAria(temp)}</span>
+          </span>
+        )}
       </p>
       <div className="mt-3">
         <ThinBar
@@ -89,11 +97,9 @@ function HitPointsCard({ model }: { model: SheetModel }) {
           valueText={t.hpValueText(current, sheet.maxHp)}
           colorClassName={tone.bar}
           height={6}
+          temp={temp}
         />
       </div>
-      {/* Lo que aparece en medio de la tarjeta entra con un fundido: si no, el
-          resto salta de golpe. */}
-      {temp > 0 && <p className="step-in mt-2 text-[13px] text-on-surface-variant">{t.tempHp(temp)}</p>}
       {model.write && <HitPointControls model={model} />}
       {current <= 0 && <DeathSaves model={model} />}
       <dl className="mt-3 divide-y divide-hairline border-t border-hairline text-[13px]">
