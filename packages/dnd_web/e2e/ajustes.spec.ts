@@ -32,7 +32,7 @@ test('Ajustes guarda en la cuenta y el modo de inicio respeta la navegación', a
   await expect(difficulty).not.toBeChecked();
 
   await page.getByRole('combobox', { name: t.settingsAccountTheme }).click();
-  await page.getByRole('option', { name: t.themeModes.light }).click();
+  await page.getByRole('option', { name: t.themeModes.light, exact: true }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
   await page.getByRole('combobox', { name: t.settingsStartMode }).click();
   await page.getByRole('option', { name: t.settingsStartModes.dm }).click();
