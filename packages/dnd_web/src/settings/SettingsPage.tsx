@@ -34,7 +34,7 @@ export function SettingsPage() {
   return (
     <div className="flex flex-col gap-5">
       <header>
-        <h1 className="font-display text-[30px] leading-tight text-on-surface">{t.settings}</h1>
+        <h1 data-page-title tabIndex={-1} className="font-display text-[30px] leading-tight text-on-surface outline-none">{t.settings}</h1>
       </header>
       <SectionRule className="my-0" />
       <div className="grid items-start gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr))]">

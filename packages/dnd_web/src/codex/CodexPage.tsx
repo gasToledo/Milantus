@@ -24,7 +24,8 @@ import {
 import { useAppVersion, useSheetCatalog } from '../api/queries';
 import { abilityModifier } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
-import { codexHref, Link, navigate, rosterHref, SHEET_TABS, type CodexCategory } from '../router';
+import { codexHref, Link, navigate, navigateBack, rosterHref, SHEET_TABS, type CodexCategory } from '../router';
+import { fadeNavigate } from '../ui/fadeNavigate';
 import { signed } from '../sheet/format';
 import { HigherLevelNote } from '../sheet/HigherLevelNote';
 import { SheetFooter, TAB_ICONS, tabLabel } from '../sheet/SheetPanel';
@@ -117,7 +118,8 @@ export function CodexPage({ category, entryId }: { category: CodexCategory | nul
     <Shell
       panel={
         <>
-          <SidebarBack href={rosterHref()} />
+          {/* Vuelve a Personajes con el mismo fundido con que se entró. */}
+          <SidebarBack href={rosterHref()} onClick={(e) => fadeNavigate(e, '[data-page-title]', () => navigateBack(rosterHref()))} />
           <div role="search" className="relative">
             <label htmlFor="codex-search" className="sr-only">
               {t.codexSearchAll}
@@ -189,7 +191,7 @@ function Home({ entries }: { entries: Map<CodexCategory, CodexEntry[]> }) {
   return (
     <div className="flex flex-col gap-6">
       <header>
-        <h1 className="font-display text-[30px] leading-tight text-on-surface">{t.codexTitle}</h1>
+        <h1 data-page-title tabIndex={-1} className="font-display text-[30px] leading-tight text-on-surface outline-none">{t.codexTitle}</h1>
         <p className="mt-1.5 text-on-surface-variant">{t.codexIntro}</p>
       </header>
       {CATEGORY_GROUPS.map(({ group, categories }) => (
@@ -320,7 +322,7 @@ export function CategoryView({
     <div className="flex flex-col gap-4">
       {header ?? (
         <header className="flex flex-wrap items-baseline gap-x-3.5 gap-y-1">
-          <h1 className="font-display text-[30px] leading-tight text-on-surface">{label}</h1>
+          <h1 data-page-title tabIndex={-1} className="font-display text-[30px] leading-tight text-on-surface outline-none">{label}</h1>
           <span className="text-text-muted tabular-nums">
             {category === 'glossary'
               ? t.codexTerms(entries.length)
@@ -852,7 +854,7 @@ function SearchResults({
   return (
     <div className="flex flex-col gap-4">
       <header className="flex flex-wrap items-baseline gap-x-3.5 gap-y-1">
-        <h1 className="font-display text-[30px] leading-tight text-on-surface">{t.codexResultsTitle(query)}</h1>
+        <h1 data-page-title tabIndex={-1} className="font-display text-[30px] leading-tight text-on-surface outline-none">{t.codexResultsTitle(query)}</h1>
         <span role="status" className="text-text-muted tabular-nums">
           {t.codexResultsCount(total, groups.length)}
         </span>

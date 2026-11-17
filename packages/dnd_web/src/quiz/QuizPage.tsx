@@ -55,7 +55,7 @@ function Picker({ entries }: { entries: RosterEntry[] }) {
   return (
     <div className="flex flex-col gap-4">
       <TutorialGate tutorial="quiz" />
-      <h1 className="font-display text-[26px] font-normal text-on-surface">{t.quizTitle}</h1>
+      <h1 data-page-title tabIndex={-1} className="font-display text-[26px] font-normal text-on-surface outline-none">{t.quizTitle}</h1>
       <p className="text-[14px] text-on-surface-variant">{t.quizIntro}</p>
       <ul className="grid grid-cols-1 gap-2.5 min-[700px]:grid-cols-2">
         {entries.map((entry) => (
