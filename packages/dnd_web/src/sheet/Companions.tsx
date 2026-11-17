@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import * as Collapsible from '@radix-ui/react-collapsible';
 import { ChevronDown, Info, PawPrint } from 'lucide-react';
 import { asProfile } from '../bestiary/creature';
 import { CreatureProfile } from '../bestiary/CreatureProfile';
@@ -16,7 +17,7 @@ import { AppDialog } from '../ui/AppDialog';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { cx } from '../ui/cx';
-import { Eyebrow, hpTone, Pill, ThinBar } from '../ui/data';
+import { Eyebrow, hpTone, Pill, SectionHeading, ThinBar } from '../ui/data';
 import { Select } from '../ui/primitives';
 import { Option, SearchableList } from '../ui/wizard';
 import { AmountControls, ConditionToggleList } from './CombatTab';
@@ -160,7 +161,6 @@ function CompanionRow({
   const max = c.maxHp ?? 0;
   const ratio = max <= 0 ? 0 : Math.min(1, Math.max(0, c.currentHp / max));
   const tone = hpTone(ratio);
-  const bodyId = `companion-${c.index}-body`;
 
   const run = (type: 'damage' | 'heal' | 'tempHp', amount: number) => {
     const action = { damage: 'damageCompanion', heal: 'healCompanion', tempHp: 'companionTempHp' } as const;
@@ -171,89 +171,131 @@ function CompanionRow({
     }
   };
 
+  // El plegado de Radix: `aria-expanded` y `aria-controls` vienen solos, y la
+  // ficha se abre y se cierra con la animación de alto de todo lo plegable
+  // (`.fold-content`). La fila avisa que se toca: el nombre y el borde se doran.
   return (
-    <li data-companion={c.index} className={ROW}>
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-controls={bodyId}
-        onClick={onToggle}
-        className="flex w-full items-center gap-2 text-left"
-      >
-        <span className="min-w-0 flex-1">
-          <span className="block font-medium break-words">{c.name}</span>
-          {(c.spellLevel > 0 || c.concentration || c.conditions.length > 0) && (
-            <span className="mt-0.5 flex flex-wrap items-center gap-1">
-              {c.spellLevel > 0 && <Tag>{t.compSlotLevel(c.spellLevel)}</Tag>}
-              {c.concentration && <Tag>{t.compConcentration}</Tag>}
-              {c.conditions.map((id) => (
-                <Pill key={id} highlighted={false}>
-                  {labelOf(t.conditions, id)}
-                </Pill>
-              ))}
+    <Collapsible.Root asChild open={open} onOpenChange={onToggle}>
+      <li data-companion={c.index} className={cx(ROW, 'group/row transition-colors duration-[120ms] ease-out hover:border-gold')}>
+        <Collapsible.Trigger asChild>
+          <button type="button" className="flex w-full items-center gap-2 text-left">
+            <span className="min-w-0 flex-1">
+              <span className="block font-medium break-words transition-colors duration-[120ms] ease-out group-hover/row:text-gold">{c.name}</span>
+              {(c.spellLevel > 0 || c.concentration || c.conditions.length > 0) && (
+                <span className="mt-0.5 flex flex-wrap items-center gap-1">
+                  {c.spellLevel > 0 && <Tag>{t.compSlotLevel(c.spellLevel)}</Tag>}
+                  {c.concentration && <Tag>{t.compConcentration}</Tag>}
+                  {c.conditions.map((id) => (
+                    <Pill key={id} highlighted={false}>
+                      {labelOf(t.conditions, id)}
+                    </Pill>
+                  ))}
+                </span>
+              )}
             </span>
-          )}
-        </span>
-        <span className="shrink-0 text-[12.5px] text-on-surface-variant">{t.compAc(c.armorClass ?? '')}</span>
-        <span className="shrink-0 whitespace-nowrap tabular-nums">
-          <b className={cx('num text-[18px]', tone.text)}>{c.currentHp}</b>
-          <small className="ml-1 text-[12px] text-text-muted">{t.compHpMax(max)}</small>
-          {/* Los temporales en oro junto a la cifra, como en la ficha y el Combate del DM. */}
-          {c.tempHp > 0 && (
-            // `key`: cada valor nuevo entra con su fundido.
-            <span key={c.tempHp} className="num step-in ml-1 inline-block text-gold">
-              <span aria-hidden="true">+{c.tempHp}</span>
-              <span className="sr-only">{t.encTempAria(c.tempHp)}</span>
+            <span className="shrink-0 text-[12.5px] text-on-surface-variant">{t.compAc(c.armorClass ?? '')}</span>
+            <span className="shrink-0 whitespace-nowrap tabular-nums">
+              <b className={cx('num text-[18px]', tone.text)}>{c.currentHp}</b>
+              <small className="ml-1 text-[12px] text-text-muted">{t.compHpMax(max)}</small>
+              {/* Los temporales en oro junto a la cifra, como en la ficha y el Combate del DM. */}
+              {c.tempHp > 0 && (
+                // `key`: cada valor nuevo entra con su fundido.
+                <span key={c.tempHp} className="num step-in ml-1 inline-block text-gold">
+                  <span aria-hidden="true">+{c.tempHp}</span>
+                  <span className="sr-only">{t.encTempAria(c.tempHp)}</span>
+                </span>
+              )}
             </span>
-          )}
-        </span>
-        <ChevronDown
-          size={16}
-          aria-hidden="true"
-          className={cx('shrink-0 text-text-muted transition-transform', open && 'rotate-180')}
-        />
-      </button>
-      <div className="mt-1.5">
-        <ThinBar
-          value={c.currentHp}
-          max={max}
-          label={t.compHpLabel(c.name)}
-          valueText={t.hpValueText(c.currentHp, max)}
-          colorClassName={tone.bar}
-          temp={c.tempHp}
-        />
-      </div>
-      {open && (
-        <div id={bodyId} className="mt-3 flex flex-col gap-3">
-          {write && (
-            <>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <AmountControls
-                  id={`companion-${c.index}-amount`}
-                  dataControls="companion-hp"
-                  className=""
-                  onRun={run}
-                />
+            <ChevronDown
+              size={16}
+              aria-hidden="true"
+              className={cx('shrink-0 text-text-muted transition-transform', open && 'rotate-180')}
+            />
+          </button>
+        </Collapsible.Trigger>
+        <div className="mt-1.5">
+          <ThinBar
+            value={c.currentHp}
+            max={max}
+            label={t.compHpLabel(c.name)}
+            valueText={t.hpValueText(c.currentHp, max)}
+            colorClassName={tone.bar}
+            temp={c.tempHp}
+          />
+        </div>
+        <Collapsible.Content className="fold-content">
+          {/* Tres secciones con título: PG, condiciones y perfil. «Despedir» va
+              al pie y solo: pegado a «Curar» se prestaba a un toque equivocado. */}
+          <div className="flex flex-col gap-4 pt-3">
+            {write && (
+              <section>
+                <SectionHeading>{t.hitPoints}</SectionHeading>
+                <AmountControls id={`companion-${c.index}-amount`} dataControls="companion-hp" className="" onRun={run} />
+              </section>
+            )}
+            {write && <CompanionConditions c={c} write={write} />}
+            {c.profile && c.row && (
+              <section>
+                <SectionHeading>{t.compProfile}</SectionHeading>
+                <CreatureProfile profile={asProfile(c.profile)} row={c.row} catalog={catalog} compact summary />
+              </section>
+            )}
+            {write && (
+              <div className="flex justify-end border-t border-hairline pt-3">
                 <Button tone="secondary" onClick={onDismiss}>
                   {t.compDismiss}
                 </Button>
               </div>
-              <div role="group" aria-label={t.compConditionsOf(c.name)}>
-                <ConditionToggleList
-                  controls="companion-conditions"
-                  attr="data-companion-condition"
-                  active={c.conditions}
-                  onToggle={(id, value) =>
-                    write.act({ type: 'setCompanionCondition', index: c.index, condition: id, value })
-                  }
-                />
-              </div>
-            </>
+            )}
+          </div>
+        </Collapsible.Content>
+      </li>
+    </Collapsible.Root>
+  );
+}
+
+/** Las condiciones de un compañero: las que tiene, como pills, y los 13 chips
+ *  plegados detrás de «Cambiar condiciones». Siempre a la vista eran lo que
+ *  más ocupaba de la ficha. */
+function CompanionConditions({ c, write }: { c: CompanionInstanceView; write: SheetWriter }) {
+  const t = useTexts();
+  const [editing, setEditing] = useState(false);
+  return (
+    <section>
+      <SectionHeading>{t.conditionsHeading}</SectionHeading>
+      <Collapsible.Root open={editing} onOpenChange={setEditing}>
+        <div className="flex flex-wrap items-center gap-1.5">
+          {c.conditions.length > 0 ? (
+            c.conditions.map((id) => (
+              <Pill key={id} highlighted={false}>
+                {labelOf(t.conditions, id)}
+              </Pill>
+            ))
+          ) : (
+            <span className="text-[13px] text-text-muted">{t.noConditions}</span>
           )}
-          {c.profile && c.row && <CreatureProfile profile={asProfile(c.profile)} row={c.row} catalog={catalog} compact summary />}
+          <Collapsible.Trigger asChild>
+            <button
+              type="button"
+              className="ml-auto inline-flex items-center gap-1 text-[12.5px] font-medium text-gold transition-colors duration-[120ms] ease-out hover:text-on-surface"
+            >
+              {t.compEditConditions}
+              <ChevronDown size={14} aria-hidden="true" className={cx('transition-transform', editing && 'rotate-180')} />
+            </button>
+          </Collapsible.Trigger>
         </div>
-      )}
-    </li>
+        <Collapsible.Content className="fold-content">
+          <div role="group" aria-label={t.compConditionsOf(c.name)} className="pt-2.5">
+            <ConditionToggleList
+              controls="companion-conditions"
+              attr="data-companion-condition"
+              active={c.conditions}
+              onToggle={(id, value) => write.act({ type: 'setCompanionCondition', index: c.index, condition: id, value })}
+            />
+          </div>
+        </Collapsible.Content>
+      </Collapsible.Root>
+    </section>
   );
 }
 
