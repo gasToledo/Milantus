@@ -9,11 +9,12 @@ import { navigate } from '../router';
  * con modificadores (abrir en otra pestaña), sigue de largo y navega `Link`.
  *
  * [target] es el selector del título de la pantalla de destino: la transición
- * espera a que aparezca y después le pasa el foco.
+ * espera a que aparezca y después le pasa el foco. [go] reemplaza al
+ * `navigate(href)`: un «Volver» retrocede en el historial (`navigateBack`).
  * ponytail: el «atrás» del navegador no pasa por acá y cambia de una;
  * animarlo pide envolver el `popstate` del router.
  */
-export function fadeNavigate(e: MouseEvent<HTMLAnchorElement>, target: string) {
+export function fadeNavigate(e: MouseEvent<HTMLAnchorElement>, target: string, go?: () => void) {
   if (!document.startViewTransition || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
   const href = e.currentTarget.getAttribute('href')!;
   // El ítem activo del panel lleva adonde ya se está: no hay nada que fundir.
@@ -42,7 +43,8 @@ export function fadeNavigate(e: MouseEvent<HTMLAnchorElement>, target: string) {
           resolve();
         };
         observer.observe(document.body, { childList: true, subtree: true });
-        navigate(href);
+        if (go) go();
+        else navigate(href);
         if (ready()) done();
       }),
   );

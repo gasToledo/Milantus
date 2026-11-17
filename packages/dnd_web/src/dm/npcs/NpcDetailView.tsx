@@ -9,13 +9,14 @@ import { queryKeys, useDmCampaigns, useNpc, useSheetCatalog } from '../../api/qu
 import { actOn, npcViews, type CharacterJson, type NpcView } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
 import { RenameDialog } from '../../dashboard/RenameDialog';
-import { dmNpcBlockHref, dmNpcPortraitHref, dmNpcSheetHref, dmNpcsHref, Link, navigate } from '../../router';
+import { dmNpcBlockHref, dmNpcPortraitHref, dmNpcSheetHref, dmNpcsHref, Link, navigate, navigateBack } from '../../router';
 import { signed } from '../../sheet/format';
 import { BackgroundEditor, DiaryEntries, type DiaryEditor } from '../../sheet/DiaryTab';
 import { type SheetNotify } from '../../sheet/writer';
 import { Button, ButtonLink } from '../../ui/Button';
 import { ConfirmDialog } from '../../ui/ConfirmDialog';
 import { cx } from '../../ui/cx';
+import { fadeNavigate } from '../../ui/fadeNavigate';
 import { Pill, StatPlaque } from '../../ui/data';
 import { Medallion } from '../../ui/Medallion';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Toast, Tooltip, type ToastTone } from '../../ui/primitives';
@@ -86,7 +87,12 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
   );
 
   const back = (
-    <Link back href={dmNpcsHref()} className="inline-flex items-center gap-1.5 self-start text-[13px] text-on-surface-variant hover:text-gold">
+    // Vuelve con el mismo fundido con que se entró desde la Biblioteca.
+    <Link
+      back
+      href={dmNpcsHref()}
+      onClick={(e) => fadeNavigate(e, '[data-dm-title]', () => navigateBack(dmNpcsHref()))}
+      className="inline-flex items-center gap-1.5 self-start text-[13px] text-on-surface-variant hover:text-gold">
       <ArrowLeft size={16} aria-hidden="true" className="text-gold" />
       {t.luBack}
     </Link>
@@ -208,7 +214,9 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
         </div>
         <div className="col-span-2 row-start-2 flex min-w-0 flex-col gap-2 @[504px]:col-span-1 @[504px]:col-start-2 @[504px]:row-start-1">
           <div className="flex items-start gap-1">
-            <h1 className="font-display min-w-0 text-[28px] leading-tight break-words text-on-surface">{npc.name}</h1>
+            <h1 data-npc-title tabIndex={-1} className="font-display min-w-0 text-[28px] leading-tight break-words text-on-surface outline-none">
+              {npc.name}
+            </h1>
             <Tooltip content={t.renameTitle}>
               <button type="button" aria-label={t.renameTitle} data-action="npc-rename" onClick={() => setDialog('name')} className={ICON_BUTTON}>
                 <Pencil size={18} aria-hidden="true" />

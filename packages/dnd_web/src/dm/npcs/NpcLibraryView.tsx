@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Plus, Search, Upload } from 'lucide-react';
 import { useNpcs, useSheetCatalog } from '../../api/queries';
 import type { DmCampaign } from '../../api/client';
@@ -7,6 +7,8 @@ import { useLang, useTexts } from '../../i18n/context';
 import { dmNpcsHref, Link } from '../../router';
 import { Button } from '../../ui/Button';
 import { cx } from '../../ui/cx';
+import { fadeNavigate } from '../../ui/fadeNavigate';
+import { useListTransition } from '../../ui/listTransition';
 import { Toast } from '../../ui/primitives';
 import { Medallion } from '../../ui/Medallion';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../../ui/status';
@@ -17,6 +19,8 @@ import { hasTag, kindOf, nameMatches, normalizeTags, npcPortrait, npcTypeLine } 
 
 /** El filtro «sin campaña»: los PNJ que no están en ninguna. `null` es todas. */
 const NO_CAMPAIGN = '';
+const inCampaign = (links: readonly { campaignId: string }[], id: string | null) =>
+  id === null ? true : id === NO_CAMPAIGN ? links.length === 0 : links.some((l) => l.campaignId === id);
 
 /**
  * La Biblioteca de PNJ (`npc_library_view.dart`): todos los de la cuenta,
@@ -32,9 +36,13 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
   const lang = useLang();
   const npcs = useNpcs();
   const catalog = useSheetCatalog(lang);
+  // El buscador escribe en `query` al instante y la grilla filtra con
+  // `listQuery` dentro de la transición, como el dashboard.
   const [query, setQuery] = useState('');
+  const [listQuery, setListQuery] = useState('');
   const [campaign, setCampaign] = useState<string | null>(null);
   const [tag, setTag] = useState<string | null>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
   const [creating, setCreating] = useState(false);
   const [importing, setImporting] = useState(false);
   const [imported, setImported] = useState<{ key: number; message: string } | null>(null);
@@ -62,6 +70,17 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
     }));
   }, [npcs.data, catalog.data]);
 
+  const visible = useMemo(
+    () =>
+      entries?.filter(
+        ({ view, links }) => inCampaign(links, campaign) && (tag === null || hasTag(view, tag)) && nameMatches(view, listQuery),
+      ) ?? [],
+    [entries, campaign, tag, listQuery],
+  );
+  const visibleIds = useMemo(() => visible.map(({ view }) => view.npc.id).join('\n'), [visible]);
+  // Filtrar anima la grilla, como las otras listas de tarjetas.
+  const animateList = useListTransition(visibleIds);
+
   const failed = [npcs, ...catalog.queries].filter((q) => q.isError);
   const kicker = entries ? t.dmLibraryCount(entries.length) : undefined;
 
@@ -73,11 +92,6 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
   } else if (entries.length === 0) {
     body = <AppEmptyState kind="empty" message={t.dmLibraryEmpty} actions={<div className="flex flex-wrap justify-center gap-2">{actions}</div>} />;
   } else {
-    const inCampaign = (links: { campaignId: string }[], id: string | null) =>
-      id === null ? true : id === NO_CAMPAIGN ? links.length === 0 : links.some((l) => l.campaignId === id);
-    const visible = entries.filter(
-      ({ view, links }) => inCampaign(links, campaign) && (tag === null || hasTag(view, tag)) && nameMatches(view, query),
-    );
     // Las campañas del panel que tienen algún PNJ, en el orden del panel; una
     // que no está en la lista (la lista todavía no cargó) sale de los vínculos.
     const known = campaigns ?? [];
@@ -89,10 +103,15 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
         .map((l) => ({ id: l.campaignId, name: l.campaignName })),
     ];
     const tags = normalizeTags(entries.flatMap(({ view }) => view.npc.tags ?? []));
+    // El botón desaparece al tocarlo: el foco pasa al buscador.
     const clear = () => {
       setQuery('');
-      setCampaign(null);
-      setTag(null);
+      searchRef.current?.focus();
+      animateList(() => {
+        setListQuery('');
+        setCampaign(null);
+        setTag(null);
+      });
     };
 
     body = (
@@ -106,30 +125,35 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
               <Search size={16} aria-hidden="true" className="pointer-events-none absolute top-2.5 left-3 text-text-muted" />
               <input
                 id="npc-search"
+                ref={searchRef}
                 type="search"
                 autoComplete="off"
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setQuery(value);
+                  animateList(() => setListQuery(value));
+                }}
                 placeholder={t.dmSearchByName}
                 className="h-9 w-full rounded-[var(--radius-pill)] border border-hairline bg-plaque pr-3 pl-9 text-[13px] text-on-surface placeholder:text-text-muted"
               />
             </div>
             <div role="group" aria-label={t.dmCampaignFilter} className="flex flex-wrap gap-1.5">
-              <FilterPill label={t.dmAllF} count={entries.length} pressed={campaign === null} onClick={() => setCampaign(null)} />
+              <FilterPill label={t.dmAllF} count={entries.length} pressed={campaign === null} onClick={() => animateList(() => setCampaign(null))} />
               {campaignOptions.map((c) => (
                 <FilterPill
                   key={c.id}
                   label={c.name}
                   count={entries.filter(({ links }) => inCampaign(links, c.id)).length}
                   pressed={campaign === c.id}
-                  onClick={() => setCampaign(c.id)}
+                  onClick={() => animateList(() => setCampaign(c.id))}
                 />
               ))}
               <FilterPill
                 label={t.dmNoCampaign}
                 count={entries.filter(({ links }) => links.length === 0).length}
                 pressed={campaign === NO_CAMPAIGN}
-                onClick={() => setCampaign(NO_CAMPAIGN)}
+                onClick={() => animateList(() => setCampaign(NO_CAMPAIGN))}
               />
             </div>
           </div>
@@ -146,7 +170,7 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
                   count={entries.filter(({ view }) => hasTag(view, g)).length}
                   pressed={tag?.toLowerCase() === g.toLowerCase()}
                   // Tocar el elegido lo suelta, como el `FilterChip` de Flutter.
-                  onClick={() => setTag(tag?.toLowerCase() === g.toLowerCase() ? null : g)}
+                  onClick={() => animateList(() => setTag(tag?.toLowerCase() === g.toLowerCase() ? null : g))}
                 />
               ))}
             </div>
@@ -244,7 +268,15 @@ function NpcCard({ view, campaigns, portrait }: { view: NpcView; campaigns: stri
   const tags = npc.tags ?? [];
   return (
     <li className="min-w-0" data-npc={npc.id}>
-      <Link href={dmNpcsHref(npc.id)} className="card flex h-full min-h-[150px] flex-col gap-2.5 p-3.5 hover:border-gold">
+      {/* Se levanta y se aprieta como las del dashboard (`.roster-card`), y el
+          nombre la sigue en las transiciones de la grilla. Abrir la ficha funde
+          la pantalla, como tarjeta → ficha en el modo jugador. */}
+      <Link
+        href={dmNpcsHref(npc.id)}
+        onClick={(e) => fadeNavigate(e, '[data-npc-title]')}
+        className="card roster-card flex h-full min-h-[150px] flex-col gap-2.5 p-3.5"
+        style={{ viewTransitionName: `lib-${npc.id.replace(/[^\w-]/g, '_')}` }}
+      >
         <span className="flex items-center gap-3">
           <Medallion name={npc.name} accent={null} size={44} portrait={portrait} />
           <span className="min-w-0 flex-1">
