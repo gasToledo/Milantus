@@ -622,9 +622,8 @@ repiten acá.
   `moveDiaryEntry`; la fecha la pone el cliente (`at`). Las imágenes suben al
   almacén de retratos (`src/api/portraits.ts`, bajo el id del personaje) y un
   rechazo 400 o 413 dice las dos causas posibles, porque el servidor no
-  distingue. Reordenar es `useReorder` (`src/ui/reorder.ts`): arrastre desde el
-  ícono de mover o flechas del teclado, sin quitarle el desplazamiento a la
-  pantalla táctil. `DiaryEntries` recibe `edit` desde `DiaryTab`; sin él (ficha
+  distingue. Reordenar es `useHoldDrag`, como en la Mesa y el Cuaderno: se toma la
+  entrada entera (con el dedo, sosteniéndola) o `Alt` + flecha. `DiaryEntries` recibe `edit` desde `DiaryTab`; sin él (ficha
   ajena, notas del PNJ) no tiene ni un control, y las notas del PNJ se
   escriben recién en el paso 6.
   Desde 5e9, la ficha propia **maneja sus retratos** en `/personajes/:id/retrato`

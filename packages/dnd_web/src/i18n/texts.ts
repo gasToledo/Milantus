@@ -2229,8 +2229,6 @@ Los personajes que los jugadores le compartieron se sueltan, y sus fichas siguen
   diaryDeleteBodyImage: (title: string) =>
     `«${title}» se borra, y la imagen que subiste también. No hay forma de recuperarla.`,
   diaryUntitled: 'Sin título',
-  diaryDragHint: 'Arrastrá para reordenar',
-  diaryMoveEntry: (title: string) => `Mover ${title}`,
   diaryEditedOn: (date: string, edited: string) => `${date} · editada ${edited}`,
   diarySeeFullImage: 'Ver la imagen completa',
   diaryImageGone: 'La imagen ya no está en el almacén.',
@@ -4757,8 +4755,6 @@ The characters players shared with it are released, and their sheets remain thei
   diaryDeleteBodyImage: (title: string) =>
     `“${title}” will be deleted, along with the image you uploaded. There is no way to recover it.`,
   diaryUntitled: 'Untitled',
-  diaryDragHint: 'Drag to reorder',
-  diaryMoveEntry: (title: string) => `Move ${title}`,
   diaryEditedOn: (date: string, edited: string) => `${date} · edited ${edited}`,
   diarySeeFullImage: 'See the full image',
   diaryImageGone: 'The image is no longer in storage.',

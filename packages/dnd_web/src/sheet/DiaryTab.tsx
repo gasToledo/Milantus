@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import {
   Check,
   Download,
   Feather,
-  GripVertical,
   Link2,
   Pencil,
   Plus,
@@ -25,7 +24,7 @@ import { MarkdownText } from '../ui/MarkdownText';
 import { PortraitViewer } from '../ui/PortraitViewer';
 import { ScrollArea, Tooltip } from '../ui/primitives';
 import { portraitUrl, thumbnailUrl } from '../ui/portrait';
-import { useReorder } from '../ui/reorder';
+import { useHoldDrag } from '../ui/holdDrag';
 import { AppBusyLabel, AppEmptyState } from '../ui/status';
 import type { SheetModel } from './model';
 import type { SheetNotify } from './writer';
@@ -371,7 +370,7 @@ export function DiaryEntries({
   // `null` es una entrada nueva; `undefined`, el editor cerrado.
   const [editing, setEditing] = useState<DiaryEntry | null | undefined>(undefined);
   const [deleting, setDeleting] = useState<DiaryEntry | null>(null);
-  // Agregar, borrar y mover cambian la lista: lo anima la misma transición de
+  // Agregar y borrar cambian la lista: lo anima la misma transición de
   // las otras listas de tarjetas. Editar el texto no la cambia y no espera.
   const animateList = useListTransition(entries.map((e) => e.entryId).join('\n'));
   const animated = useMemo<DiaryEditor | undefined>(
@@ -381,11 +380,13 @@ export function DiaryEntries({
         save: (input) =>
           entries.some((e) => e.entryId === input.entry) ? edit.save(input) : animateList(() => edit.save(input)),
         remove: (entry) => animateList(() => edit.remove(entry)),
-        move: (from, to) => animateList(() => edit.move(from, to)),
       },
     [edit, entries, animateList],
   );
-  const reorder = useReorder({ ids: entries.map((e) => e.entryId), onMove: (from, to) => animated?.move(from, to) });
+  // Moverlas es como en el Cuaderno y la Mesa: se toma la entrada entera (o Alt
+  // + flecha) y las demás se corren. Arrastrar no pasa por la transición de la
+  // lista: `useHoldDrag` ya anima lo suyo.
+  const reorder = useHoldDrag({ ids: entries.map((e) => e.entryId), axis: 'y', canDrop: () => true, onMove: (from, to) => edit?.move(from, to) });
   const date = useMemo(() => new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'short' }), [lang]);
   // «12 mar», o «12 mar · editada 2 abr» si se tocó después: es el rótulo de
   // la entrada en la línea de tiempo. Sin fecha (la entrada
@@ -500,7 +501,7 @@ function EntryCard({
   entry: DiaryEntry;
   dates: string;
   onEdit?: () => void;
-  reorder?: ReturnType<typeof useReorder>;
+  reorder?: ReturnType<typeof useHoldDrag>;
 }) {
   const t = useTexts();
   const [viewing, setViewing] = useState(false);
@@ -535,16 +536,22 @@ function EntryCard({
     // Un `<li>` y no un botón: la tarjeta tiene sus propios controles (editar,
     // abrir la imagen, el enlace) y un botón no puede ir adentro de otro.
     <li
-      {...reorder?.item(id)}
       data-entry={id}
       data-vt-card
-      // El nombre la sigue en las transiciones de la lista.
-      style={{ viewTransitionName: `dy-${id.replace(/[^\w-]/g, '_')}` }}
       className={cx(
-        'diary-entry plaque relative flex min-w-0 flex-col gap-2.5 px-4 py-3.5',
-        reorder?.over === id && 'outline-2 outline-offset-1 outline-gold',
-        reorder?.dragging === id && 'opacity-30',
+        'diary-entry plaque @container relative flex min-w-0 flex-col gap-2.5 px-4 py-3.5',
+        // Las clases del arrastre son las de la Mesa y el Cuaderno.
+        reorder && 'select-none [-webkit-touch-callout:none]',
+        reorder?.dragging === id && (reorder.animated ? 'cursor-grabbing border-gold [&_*]:cursor-grabbing' : 'opacity-40'),
+        reorder?.over === id && !reorder.animated && 'outline-2 outline-offset-1 outline-gold',
       )}
+      {...reorder?.item(id)}
+      // Después del `item`, que trae su `style` para el arrastre. El nombre la
+      // sigue en las transiciones de la lista.
+      style={{
+        viewTransitionName: `dy-${id.replace(/[^\w-]/g, '_')}`,
+        ...(reorder?.item(id).style as CSSProperties | undefined),
+      }}
     >
       {/* El rombo de la línea de tiempo, sobre el filete de la lista. */}
       <span aria-hidden="true" className="absolute top-[19px] -left-[21px] size-[7px] rotate-45 bg-gold" />
@@ -553,37 +560,25 @@ function EntryCard({
           {dates && <p className="mb-1 text-[11px] font-medium tracking-[1.4px] text-gold uppercase tabular-nums">{dates}</p>}
           <h3 className="font-display text-[16px] leading-[1.3] break-words text-on-surface">{title}</h3>
         </div>
-        {(onEdit || reorder) && (
+        {onEdit && (
           <span className="-my-1.5 -mr-2 flex shrink-0 items-center">
-            {onEdit && (
-              <Tooltip content={t.diaryEditAction}>
-                <button
-                  type="button"
-                  aria-label={`${t.diaryEditAction}: ${title}`}
-                  data-action="edit-entry"
-                  onClick={onEdit}
-                  className={ICON_BUTTON}
-                >
-                  <Pencil size={16} aria-hidden="true" />
-                </button>
-              </Tooltip>
-            )}
-            {reorder && (
-              <Tooltip content={t.diaryDragHint}>
-                <button
-                  type="button"
-                  aria-label={t.diaryMoveEntry(title)}
-                  className="inline-flex h-8 w-8 cursor-grab items-center justify-center rounded-[var(--radius-nav)] text-text-muted transition-colors duration-[120ms] ease-out hover:text-gold"
-                  {...reorder.grip(id)}
-                >
-                  <GripVertical size={16} aria-hidden="true" />
-                </button>
-              </Tooltip>
-            )}
+            <Tooltip content={t.diaryEditAction}>
+              <button
+                type="button"
+                aria-label={`${t.diaryEditAction}: ${title}`}
+                data-action="edit-entry"
+                onClick={onEdit}
+                className={ICON_BUTTON}
+              >
+                <Pencil size={16} aria-hidden="true" />
+              </button>
+            </Tooltip>
           </span>
         )}
       </div>
-      {/* La imagen arriba y a todo el ancho: quien la sube quiere que se vea. */}
+      {/* La imagen al lado del texto, en 4:3 y de 200 px: a todo el ancho
+          tapaba el texto. En una tarjeta angosta va arriba. */}
+      <div className={cx(showImage && 'grid items-start gap-3.5 @[460px]:grid-cols-[200px_minmax(0,1fr)]')}>
       {showImage &&
         (gone ? (
           <p className="text-[12.5px] text-text-muted">{t.diaryImageGone}</p>
@@ -595,15 +590,16 @@ function EntryCard({
             className="block cursor-zoom-in overflow-hidden rounded-[var(--radius-nav)] border border-hairline"
           >
             <img
-              src={thumbnailUrl(imageUrl(entry.imageKey!), 1024)}
+              src={thumbnailUrl(imageUrl(entry.imageKey!), 512)}
               alt={t.diaryImageAlt(entry.title)}
               loading="lazy"
               onError={() => setGone(true)}
-              className="block aspect-video w-full object-cover"
+              className="block aspect-[4/3] w-full object-cover"
             />
           </button>
         ))}
       {content}
+      </div>
       {showImage && !gone && (
         <PortraitViewer src={imageUrl(entry.imageKey!)} name={entry.title} open={viewing} onOpenChange={setViewing} />
       )}
