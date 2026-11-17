@@ -111,8 +111,11 @@ export function Accordion({
           <AccordionPrimitive.Header asChild>
             {headingLevel === 3 ? <h3 className="flex">{trigger}</h3> : <h4 className="flex">{trigger}</h4>}
           </AccordionPrimitive.Header>
-          <AccordionPrimitive.Content className="pb-2.5 text-[13px] whitespace-pre-line text-on-surface-variant">
-            {item.content}
+          {/* Se despliega y se pliega animando el alto (`.fold-content` en
+              `index.css`). El margen va adentro: en el `Content` quedaría fuera
+              del alto que se anima y saltaría al final. */}
+          <AccordionPrimitive.Content className="fold-content text-[13px] whitespace-pre-line text-on-surface-variant">
+            <div className="pb-2.5">{item.content}</div>
           </AccordionPrimitive.Content>
         </AccordionPrimitive.Item>
         );
@@ -146,7 +149,7 @@ export function NavCollapsible({
           className="shrink-0 text-text-muted transition-transform group-data-[state=open]:rotate-180"
         />
       </CollapsiblePrimitive.Trigger>
-      <CollapsiblePrimitive.Content>{children}</CollapsiblePrimitive.Content>
+      <CollapsiblePrimitive.Content className="fold-content">{children}</CollapsiblePrimitive.Content>
     </CollapsiblePrimitive.Root>
   );
 }

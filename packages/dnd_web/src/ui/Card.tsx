@@ -77,7 +77,11 @@ export function Card({
           </H>
           {trailing}
         </div>
-        <Collapsible.Content className="mt-3">{children}</Collapsible.Content>
+        {/* Se pliega animando el alto (`.fold-content`). El margen va
+            adentro: afuera quedaría fuera del alto animado y saltaría. */}
+        <Collapsible.Content className="fold-content">
+          <div className="pt-3">{children}</div>
+        </Collapsible.Content>
       </section>
     </Collapsible.Root>
   );

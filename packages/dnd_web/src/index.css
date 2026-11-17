@@ -591,6 +591,44 @@ body {
   animation: step-in 160ms ease-out;
 }
 
+/* Todo lo que se pliega (las tarjetas, los rasgos y dotes del `Accordion`, el
+   grupo plegable del panel) se abre y se cierra recorriendo su alto, que Radix
+   mide en `--radix-collapsible-content-height` (el `Accordion` también la
+   pone); Radix espera al fin de la animación para desmontar lo cerrado. El
+   recorte va en los cuadros de la animación y no en la regla: abierto, no le
+   come el contorno de foco a los controles del borde. Con «reducir movimiento»
+   la duración en cero lo deja de golpe. */
+.fold-content[data-state='open'] {
+  animation: fold-down 180ms ease-out;
+}
+.fold-content[data-state='closed'] {
+  animation: fold-up 160ms ease-in;
+}
+@keyframes fold-down {
+  from {
+    overflow: hidden;
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    overflow: hidden;
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+  }
+}
+@keyframes fold-up {
+  from {
+    overflow: hidden;
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+  }
+  to {
+    overflow: hidden;
+    height: 0;
+    opacity: 0;
+  }
+}
+
 /* El panel de música crece desde su esquina, la de la pill que lo despliega;
    la pill y la oferta de combate entran igual. Arranca cuando se pone la
    clase: el panel la lleva solo desplegado. */
