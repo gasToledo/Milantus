@@ -139,6 +139,24 @@ export function ShieldBadge({ value, label, height = 64 }: { value: number; labe
   );
 }
 
+/** El rótulo de una sección de lectura (rasgos, acciones) con un filete que
+ *  corre hasta el borde del bloque, como las secciones de un bloque de
+ *  estadísticas del libro. Lo comparten el Códice y el perfil de criatura. */
+export function SectionHeading({ children }: { children: ReactNode }) {
+  return (
+    <h3 className="mb-1.5 flex items-center gap-3">
+      <span className="eyebrow shrink-0">{children}</span>
+      <span aria-hidden="true" className="h-px flex-1 bg-hairline" />
+    </h3>
+  );
+}
+
+/** El ancho de cada bloque de una ficha de lectura (Códice, perfil de
+ *  criatura): uno solo, para que filetes y placas terminen en el mismo borde. */
+export const READ_BLOCK = 'max-w-[760px]';
+/** El largo de línea de la prosa de lectura, sin palabras sueltas al final. */
+export const READ_PROSE = 'max-w-[68ch] text-pretty';
+
 /** Regla ornamental: filete con un rombo dorado de 7 px al centro. Decorativa:
  *  el lector la ignora. */
 /** [className] es su margen y reemplaza al de 18 px: `cx` no resuelve

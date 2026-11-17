@@ -30,7 +30,7 @@ import { HigherLevelNote } from '../sheet/HigherLevelNote';
 import { SheetFooter, TAB_ICONS, tabLabel } from '../sheet/SheetPanel';
 import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
-import { Eyebrow, Pill, SectionRule } from '../ui/data';
+import { Eyebrow, Pill, READ_BLOCK, READ_PROSE, SectionHeading, SectionRule } from '../ui/data';
 import { Tooltip } from '../ui/primitives';
 import { NavGroup, NavItem, Shell, SidebarBack } from '../ui/Shell';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
@@ -543,20 +543,23 @@ export function EntryDetail({
           <h2
             id="codex-entry-title"
             tabIndex={-1}
-            className="font-display mt-3.5 text-[34px] leading-[1.1] break-words text-on-surface outline-none"
+            className="font-display mt-3.5 text-[34px] leading-[1.1] text-balance break-words text-on-surface outline-none"
           >
             {entry.name}
           </h2>
-          {!reading && entry.subtitle && <p className="mt-1.5 text-[15px] text-on-surface-variant">{entry.subtitle}</p>}
+          {!reading && entry.subtitle && <p className="mt-1.5 text-[15px] text-on-surface-variant italic">{entry.subtitle}</p>}
         </div>
         {actions && <div className="flex shrink-0 gap-2">{actions}</div>}
       </div>
       <SectionRule className="my-[22px]" />
 
+      {/* Todos los bloques comparten un ancho (`READ_BLOCK`) y la prosa, un
+          largo de línea (`READ_PROSE`): en pantalla ancha las placas ya no se
+          estiran más allá del texto. Las placas de una fila, a la misma altura. */}
       {detail.facts
         .filter((g) => g.length > 0)
         .map((group, i) => (
-          <dl key={i} className="mb-2.5 grid items-start gap-2.5 [grid-template-columns:repeat(auto-fill,minmax(min(120px,100%),1fr))]">
+          <dl key={i} className={cx('mb-2.5 grid gap-2.5 [grid-template-columns:repeat(auto-fill,minmax(min(120px,100%),1fr))]', READ_BLOCK)}>
             {group.map((f) => (
               <div key={f.label} className="plaque px-3.5 py-[11px]">
                 <dt className="plaque-label">{f.label}</dt>
@@ -567,26 +570,26 @@ export function EntryDetail({
         ))}
 
       {detail.prose && (
-        <p className="mt-5 max-w-[620px] text-[16px] leading-[1.65] whitespace-pre-line text-on-surface">{detail.prose}</p>
+        <p className={cx('mt-5 text-[16px] leading-[1.65] whitespace-pre-line text-on-surface', READ_PROSE)}>{detail.prose}</p>
       )}
 
       {detail.note && (
         <HigherLevelNote
           label={detail.note.label}
           text={detail.note.text}
-          className="mt-3 max-w-[620px] text-[16px] leading-[1.65] text-on-surface"
+          className={cx('mt-3 text-[16px] leading-[1.65] text-on-surface', READ_PROSE)}
         />
       )}
 
       {detail.sections.map((s) => (
-        <section key={s.title} className="mt-6 max-w-[680px]">
-          <Eyebrow className="mb-2">{s.title}</Eyebrow>
-          <ul className="divide-y divide-hairline border-t border-hairline">
+        <section key={s.title} className={cx('mt-6', READ_BLOCK)}>
+          <SectionHeading>{s.title}</SectionHeading>
+          <ul className="divide-y divide-hairline">
             {s.traits.map((tr, i) => (
               <li key={`${tr.name}-${i}`} className="py-2.5">
                 <p className="font-medium text-on-surface">{tr.name}</p>
                 {tr.description && (
-                  <p className="mt-1 text-[14px] leading-[1.55] whitespace-pre-line text-on-surface-variant">{tr.description}</p>
+                  <p className={cx('mt-1 text-[14px] leading-[1.55] whitespace-pre-line text-on-surface-variant', READ_PROSE)}>{tr.description}</p>
                 )}
               </li>
             ))}
@@ -655,9 +658,9 @@ function ReadingTrack({ entry, entries }: { entry: CodexEntry; entries: CodexEnt
 function GlossaryBody({ glossary }: { glossary: NonNullable<ReturnType<CodexEntry['detail']>['glossary']> }) {
   const t = useTexts();
   return (
-    <div className="flex max-w-[640px] flex-col gap-4">
+    <div className={cx('flex flex-col gap-4', READ_BLOCK)}>
       {glossary.paragraphs.map((p, i) => (
-        <p key={i} className="text-[16px] leading-[1.65] text-on-surface">
+        <p key={i} className={cx('text-[16px] leading-[1.65] text-on-surface', READ_PROSE)}>
           {p}
         </p>
       ))}
@@ -725,9 +728,9 @@ function GlossaryBody({ glossary }: { glossary: NonNullable<ReturnType<CodexEntr
 function GuideBody({ guide }: { guide: NonNullable<ReturnType<CodexEntry['detail']>['guide']> }) {
   const t = useTexts();
   return (
-    <div className="flex max-w-[640px] flex-col gap-4">
+    <div className={cx('flex flex-col gap-4', READ_BLOCK)}>
       {guide.paragraphs.map((p, i) => (
-        <p key={i} className="text-[16px] leading-[1.7] text-on-surface">
+        <p key={i} className={cx('text-[16px] leading-[1.7] text-on-surface', READ_PROSE)}>
           {p}
         </p>
       ))}
@@ -743,7 +746,7 @@ function GuideBody({ guide }: { guide: NonNullable<ReturnType<CodexEntry['detail
               </div>
               <div className="pt-1 pb-5">
                 <p className="text-[16px] font-semibold text-on-surface">{s.title}</p>
-                <p className="mt-1 text-[15px] leading-[1.65] text-on-surface">{s.text}</p>
+                <p className={cx('mt-1 text-[15px] leading-[1.65] text-on-surface', READ_PROSE)}>{s.text}</p>
               </div>
             </li>
           ))}

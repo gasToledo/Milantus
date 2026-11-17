@@ -63,6 +63,7 @@ una regla: reciben el número ya resuelto por `computeSheet`.
 | `ThemeMenu`, `VersionLabel` | Selector de tema y versión, al pie del panel | Los dos pies |
 | `Card` | Tarjeta de sección (`sheetCard`): ícono dorado, título Georgia 16, `trailing`; `collapsible` la pliega | Toda sección de la ficha. `id` único por pantalla |
 | `SectionRule` | Filete con rombo dorado | Separar bloques dentro de una tarjeta |
+| `SectionHeading` | `h3` en mayúsculas espaciadas con un filete hasta el borde; va con `READ_BLOCK` (el ancho de los bloques) y `READ_PROSE` (68ch y `text-wrap: pretty`) | Las secciones de una ficha de lectura: el Códice y el perfil de criatura |
 | `Eyebrow` | Rótulo de sección en mayúsculas espaciadas | — |
 
 ### Asistentes (`src/ui/wizard.tsx`)

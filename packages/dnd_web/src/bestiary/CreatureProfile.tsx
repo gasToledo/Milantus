@@ -3,16 +3,15 @@ import { abilityModifier, catalogLabel, type BestiaryRow, type Catalog } from '.
 import { useTexts } from '../i18n/context';
 import { codexHref, Link } from '../router';
 import { signed } from '../sheet/format';
-import { Pill, SectionRule } from '../ui/data';
+import { Pill, READ_BLOCK, READ_PROSE, SectionHeading, SectionRule } from '../ui/data';
 import { cx } from '../ui/cx';
 import { ABILITY_KEYS, type CreatureAction, type CreatureProfile as Profile } from './creature';
 
-/** El ancho de cada bloque del perfil (datos, rasgos, acciones): uno solo, para
- *  que los filetes de las secciones terminen todos en el mismo borde. */
-const BLOCK = 'max-w-[760px]';
-/** La prosa de rasgos y acciones: el gris de lectura y no el tenue, con
- *  interlineado y largo de línea de lectura, sin palabras sueltas al final. */
-const PROSE = 'max-w-[68ch] text-[13.5px] leading-[1.55] text-pretty text-on-surface-variant';
+/** Los bloques del perfil (datos, rasgos, acciones) comparten el ancho de
+ *  lectura del Códice. */
+const BLOCK = READ_BLOCK;
+/** La prosa de rasgos y acciones: el gris de lectura y no el tenue. */
+const PROSE = `${READ_PROSE} text-[13.5px] leading-[1.55] text-on-surface-variant`;
 
 /**
  * El perfil de una criatura, como `creatureProfileStats` y
@@ -228,17 +227,6 @@ function Traits({ profile }: { profile: Profile }) {
         ))}
       </ul>
     </section>
-  );
-}
-
-/** El rótulo de una sección del perfil con un filete que corre hasta el borde
- *  del bloque, como las secciones de un bloque de estadísticas del libro. */
-function SectionHeading({ children }: { children: ReactNode }) {
-  return (
-    <h3 className="mb-1.5 flex items-center gap-3">
-      <span className="eyebrow shrink-0">{children}</span>
-      <span aria-hidden="true" className="h-px flex-1 bg-hairline" />
-    </h3>
   );
 }
 
