@@ -48,7 +48,9 @@ export function SheetTabs({
         listClassName={listClassName}
         tabs={tabs.map((tabId) => ({ value: tabId, label: tabLabel(t, tabId), href: hrefOf(tabId), icon: TAB_ICONS[tabId] }))}
       >
-        <TabPanel value={active} className={panelClassName}>
+        {/* `key`: cada pestaña entra con su fundido (`step-in`) en vez de
+            aparecer de golpe. El foco queda en la pestaña elegida. */}
+        <TabPanel key={active} value={active} className={`step-in ${panelClassName}`}>
           <TabBody tab={active} model={model} />
         </TabPanel>
       </LinkTabs>

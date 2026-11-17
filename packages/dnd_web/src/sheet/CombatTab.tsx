@@ -9,6 +9,8 @@ import { Select, Tooltip } from '../ui/primitives';
 import { Button, ButtonLink } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Eyebrow, hpTone, Pill, Pips, ShieldBadge, SpendRecoverButtons, StatPlaque, ThinBar } from '../ui/data';
+import { cx } from '../ui/cx';
+import { useHpPulse } from '../ui/hpPulse';
 import { ArrangeableColumns } from './ArrangeableColumns';
 import { COMBAT_DEFAULT } from './cardLayout';
 import { resourceKey, signed } from './format';
@@ -69,10 +71,14 @@ function HitPointsCard({ model }: { model: SheetModel }) {
   const ratio = sheet.maxHp <= 0 ? 0 : Math.min(1, Math.max(0, current / sheet.maxHp));
   const tone = hpTone(ratio);
   const used = character.combat?.hitDiceUsed ?? {};
+  // Daño o curación: la cifra late, como en el Combate del DM.
+  const pulse = useHpPulse(current);
   return (
     <Card id="hit-points" title={t.hitPoints} icon={Heart}>
       <p className="flex items-baseline gap-1.5">
-        <span className={`num text-[34px] leading-none ${tone.text}`}>{current}</span>
+        <span key={pulse.key} className={cx('num inline-block text-[34px] leading-none', tone.text, pulse.className)}>
+          {current}
+        </span>
         <span className="text-[15px] text-text-muted">{t.hpMaxSuffix(sheet.maxHp)}</span>
       </p>
       <div className="mt-3">
@@ -85,7 +91,9 @@ function HitPointsCard({ model }: { model: SheetModel }) {
           height={6}
         />
       </div>
-      {temp > 0 && <p className="mt-2 text-[13px] text-on-surface-variant">{t.tempHp(temp)}</p>}
+      {/* Lo que aparece en medio de la tarjeta entra con un fundido: si no, el
+          resto salta de golpe. */}
+      {temp > 0 && <p className="step-in mt-2 text-[13px] text-on-surface-variant">{t.tempHp(temp)}</p>}
       {model.write && <HitPointControls model={model} />}
       {current <= 0 && <DeathSaves model={model} />}
       <dl className="mt-3 divide-y divide-hairline border-t border-hairline text-[13px]">
@@ -204,7 +212,7 @@ export function AmountControls({
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
         placeholder={t.hpAmount}
-        className="num h-9 w-[110px] rounded-[var(--radius-nav)] border border-hairline bg-plaque px-3 text-[14px] text-on-surface placeholder:font-normal placeholder:text-text-muted"
+        className="num h-9 w-[110px] rounded-[var(--radius-nav)] border border-hairline bg-plaque px-3 text-[14px] text-on-surface transition-colors duration-[120ms] ease-out placeholder:font-normal placeholder:text-text-muted hover:border-on-surface-variant"
       />
       <Button tone="danger" icon={Minus} onClick={() => run('damage')}>
         {t.hpDamage}
@@ -233,7 +241,7 @@ function DeathSaves({ model }: { model: SheetModel }) {
     if (r?.outcome.deathSave === 'dead') write!.notify(t.characterDied, { tone: 'error' });
   };
   return (
-    <div className="mt-4" data-death-saves>
+    <div className="step-in mt-4" data-death-saves>
       <Eyebrow>{t.deathSaves}</Eyebrow>
       <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2">
         <span className="flex items-center gap-2" data-field="death-successes">

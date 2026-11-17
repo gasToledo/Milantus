@@ -50,7 +50,7 @@ export function LinkTabs({
           <TabsPrimitive.Trigger key={v} value={v} asChild>
             <Link
               href={href}
-              className="flex shrink-0 items-center gap-2 border-b-2 border-transparent px-3 py-2.5 text-[14px] text-on-surface-variant hover:text-on-surface data-[state=active]:border-gold data-[state=active]:font-semibold data-[state=active]:text-gold"
+              className="flex shrink-0 items-center gap-2 border-b-2 border-transparent px-3 py-2.5 text-[14px] text-on-surface-variant transition-colors duration-[120ms] ease-out hover:text-on-surface data-[state=active]:border-gold data-[state=active]:font-semibold data-[state=active]:text-gold"
             >
               {Icon && <Icon size={16} aria-hidden="true" />}
               {l}

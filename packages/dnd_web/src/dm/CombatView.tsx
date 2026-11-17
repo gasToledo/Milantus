@@ -45,6 +45,7 @@ import { retryEncounterSave, useEncounterWriter } from './combat/encounterWriter
 import { RollInitiativeDialog } from './combat/RollInitiativeDialog';
 import { SIDE_TONE, SideMenu } from './combat/SideMenu';
 import { DmHeader } from './DmHeader';
+import { useHpPulse } from '../ui/hpPulse';
 import { buildEntries } from './notebook';
 import { npcTypeLine } from './npcs/npc';
 
@@ -774,14 +775,7 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
   // Pegar o curar marca la cifra con un pulso corto, rojo al bajar y verde al
   // subir (`.hp-pulse` en `index.css`): confirma que el golpe entró y a quién.
   // También cuando un jugador cambia sus PG en su ficha y la relectura los trae.
-  const lastHp = useRef(hp?.current);
-  const [pulse, setPulse] = useState<{ up: boolean; n: number } | null>(null);
-  useEffect(() => {
-    const before = lastHp.current;
-    lastHp.current = hp?.current;
-    if (before === undefined || hp === null || hp === undefined || before === hp.current) return;
-    setPulse((p) => ({ up: hp.current > before, n: (p?.n ?? 0) + 1 }));
-  }, [hp?.current]);
+  const pulse = useHpPulse(hp?.current);
   // Solo en curso: mientras se arma no hay nada que gastar.
   const legendary = hasLegendary(row);
   // Lo que ya jugó esta ronda se atenúa en sus datos y **no en sus botones**: al
@@ -866,8 +860,8 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
           <>
             <div className="flex items-baseline gap-2">
               <span
-                key={pulse?.n ?? 0}
-                className={cx('num inline-block text-[13.5px] text-crimson', pulse && (pulse.up ? 'hp-pulse-up' : 'hp-pulse-down'))}
+                key={pulse.key}
+                className={cx('num inline-block text-[13.5px] text-crimson', pulse.className)}
                 data-field="hp-value"
               >
                 {hp.current}/{hp.max}

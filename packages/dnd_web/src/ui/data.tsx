@@ -54,7 +54,11 @@ export function StatTile({
   return (
     <Root
       {...(onClick ? { type: 'button' as const, onClick } : {})}
-      className={cx('plaque flex min-h-[96px] min-w-0 flex-col items-center px-4 py-3.5 text-center', onClick && 'cursor-pointer')}
+      // Con acción, avisa que se toca: se dora al pasar y baja al apretarla.
+      className={cx(
+        'plaque flex min-h-[96px] min-w-0 flex-col items-center px-4 py-3.5 text-center',
+        onClick && 'cursor-pointer transition duration-[120ms] ease-out hover:bg-gold-soft motion-safe:active:translate-y-px',
+      )}
       data-stat={id}
     >
       <Label className="flex max-w-full items-center justify-center gap-1.5 text-[11px] tracking-[1.1px] text-text-muted uppercase">
@@ -229,7 +233,8 @@ export function Pips({
           key={i}
           aria-hidden="true"
           className={cx(
-            'h-3 w-3 rounded-full border',
+            // Marcar o gastar uno se ve: el color cambia en 160 ms.
+            'h-3 w-3 rounded-full border transition-colors duration-[160ms] ease-out',
             i >= left
               ? 'border-text-muted bg-transparent'
               : tone === 'crimson'

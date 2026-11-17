@@ -5,6 +5,7 @@ import { useTexts } from '../i18n/context';
 import { labelOf } from '../i18n/texts';
 import { RenameDialog } from '../dashboard/RenameDialog';
 import { hpTone, Pill, SectionRule, StatTile, ThinBar } from '../ui/data';
+import { useHpPulse } from '../ui/hpPulse';
 import { Tooltip } from '../ui/primitives';
 import { BreakdownDialog } from './BreakdownDialog';
 import { signed } from './format';
@@ -49,6 +50,8 @@ export function SheetHeader({
   const tempHp = character.combat?.tempHp ?? 0;
   const ratio = sheet.maxHp <= 0 ? 0 : Math.min(1, Math.max(0, currentHp / sheet.maxHp));
   const tone = hpTone(ratio);
+  // Daño o curación: la cifra de la banda late, como en el Combate del DM.
+  const pulse = useHpPulse(currentHp);
   const origin = [nameOf(catalog.races, character.raceId), nameOf(catalog.backgrounds, character.backgroundId)]
     .filter(Boolean)
     .join(' · ');
@@ -72,7 +75,7 @@ export function SheetHeader({
                     type="button"
                     aria-label={t.renameTitle}
                     onClick={() => setRenaming(true)}
-                    className="ml-0.5 inline-flex h-7 w-7 items-center justify-center rounded-[var(--radius-nav)] align-middle text-text-muted hover:text-gold"
+                    className="ml-0.5 inline-flex h-7 w-7 items-center justify-center rounded-[var(--radius-nav)] align-middle text-text-muted transition-colors duration-[120ms] ease-out hover:text-gold"
                   >
                     <Pencil size={15} aria-hidden="true" />
                   </button>
@@ -108,7 +111,11 @@ export function SheetHeader({
             icon={Heart}
             label={t.hitPoints}
             caption={t.hpPercent(Math.round(ratio * 100))}
-            value={currentHp}
+            value={
+              <span key={pulse.key} className={pulse.className && `inline-block ${pulse.className}`}>
+                {currentHp}
+              </span>
+            }
             valueClassName={tone.text}
             suffix={`/ ${sheet.maxHp}`}
             footer={
@@ -120,7 +127,7 @@ export function SheetHeader({
                   valueText={t.hpValueText(currentHp, sheet.maxHp)}
                   colorClassName={tone.bar}
                 />
-                {tempHp > 0 && <p className="mt-1.5 text-[11px] text-on-surface-variant">{t.tempHp(tempHp)}</p>}
+                {tempHp > 0 && <p className="step-in mt-1.5 text-[11px] text-on-surface-variant">{t.tempHp(tempHp)}</p>}
               </>
             }
           />
