@@ -139,7 +139,9 @@ ficha y hojear un catálogo no cuentan como otra pantalla. Una redirección
 (`navigate(href, { replace: true })`) cambia de una. **Abrir y cerrar** también
 está resuelto en las piezas de `src/ui/`: el diálogo entra creciendo apenas
 (`pop-dialog`, `pop-overlay`), las listas y los popovers caen desde su botón
-(`float-pop`, `menu-pop`), la tostada sube, y todo sale en 120 ms. Un
+(`float-pop`, `menu-pop`) y la tostada sube. Diálogos y tostadas salen en
+120 ms; menús y listas se cierran de una, porque reabrirlos durante la salida
+no respondía. Un
 `Dialog` de Radix armado a mano lleva esas mismas clases, salvo que tenga su
 propia animación (las celebraciones y los avisos con pantalla propia).
 

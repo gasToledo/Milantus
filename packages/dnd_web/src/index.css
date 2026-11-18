@@ -390,10 +390,11 @@ body {
     menu-fade 160ms ease-out,
     pop-grow 160ms ease-out;
 }
+/* Menús, listas y popovers se cierran de una: con salida animada, Radix deja
+   el menú montado esos 120 ms y volver a abrirlo enseguida (elegir una acción
+   y abrirlo otra vez) no respondía. */
 .pop-overlay[data-state='closed'],
-.pop-dialog[data-state='closed'],
-.menu-pop[data-state='closed'],
-.float-pop[data-state='closed'] {
+.pop-dialog[data-state='closed'] {
   animation: pop-out 120ms ease-in both;
 }
 .float-pop[data-state='open'] {
