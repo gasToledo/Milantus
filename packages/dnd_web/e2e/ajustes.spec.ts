@@ -31,9 +31,12 @@ test('Ajustes guarda en la cuenta y el modo de inicio respeta la navegación', a
   await difficulty.click();
   await expect(difficulty).not.toBeChecked();
 
-  await page.getByRole('radio', { name: t.themeModes.light, exact: true }).click();
+  // Los radios van ocultos (`sr-only`) dentro de su rótulo: el clic va al
+  // rótulo, que es lo que se ve; sobre el radio de 1 px Playwright espera sin fin.
+  const opcion = (name: string) => page.locator('label').filter({ has: page.getByRole('radio', { name, exact: true }) });
+  await opcion(t.themeModes.light).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
-  await page.getByRole('radio', { name: t.settingsStartModes.dm, exact: true }).click();
+  await opcion(t.settingsStartModes.dm).click();
   // Se espera a lo guardado y no al «Guardado»: el del cambio anterior (el
   // tema) puede seguir a la vista cuando todavía no llegó este.
   await expect.poll(() => settings).toEqual({
