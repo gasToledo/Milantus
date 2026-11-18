@@ -9,7 +9,6 @@ import { cx } from '../../ui/cx';
 import { Eyebrow } from '../../ui/data';
 import type { CodexDetail } from '../../codex/entries';
 import { DetailBody, WIZARD_ASIDE, WizardFooter } from '../../ui/wizard';
-import { DmHeader } from '../DmHeader';
 
 /** La ficha del Códice de lo que se está armando: es la vista previa de los
  *  tres formularios, la misma que lee el jugador. */
@@ -146,11 +145,22 @@ export function HomebrewFormShell({
 
   return (
     <>
-      <DmHeader title={title} kicker={kicker} />
+      <header className="flex flex-col gap-1">
+        {kicker && <Eyebrow>{kicker}</Eyebrow>}
+        {/* `tabIndex` y la marca: el foco viene acá al cambiar de sección
+            (`fadeNavigate`), igual que en `DmHeader`. */}
+        <h1 data-dm-title tabIndex={-1} className="font-display text-[28px] leading-tight font-normal break-words text-on-surface outline-none">
+          {title}
+        </h1>
+      </header>
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="flex min-w-0 flex-col gap-3">
           {children}
-          <WizardFooter message={message} danger={message !== null}>
+          <WizardFooter
+            message={message}
+            danger={message !== null}
+            status={dirty ? { text: t.hbUnsaved, tone: 'gold' } : { text: t.hbNoChanges, tone: 'muted' }}
+          >
             <Button tone="secondary" icon={Info} className="lg:hidden" onClick={() => setPreviewing(true)}>
               {t.blockPreview}
             </Button>
@@ -171,7 +181,13 @@ export function HomebrewFormShell({
           </WizardFooter>
         </div>
         <aside aria-label={previewLabel} className={cx(WIZARD_ASIDE, 'hidden lg:flex')}>
-          <Eyebrow>{previewLabel}</Eyebrow>
+          <div className="flex items-center justify-between gap-2">
+            <Eyebrow>{previewLabel}</Eyebrow>
+            <span className="inline-flex h-5 items-center gap-1.5 rounded-[var(--radius-pill)] border border-hairline px-2 text-[11px] text-on-surface-variant">
+              <span aria-hidden="true" className="size-1.5 rounded-full bg-verdant" />
+              {t.hbLivePreview}
+            </span>
+          </div>
           {preview}
           <div aria-live="polite">{explanation && <ExplainPlaque key={explainedKey(explanation)} explained={explanation} large />}</div>
         </aside>

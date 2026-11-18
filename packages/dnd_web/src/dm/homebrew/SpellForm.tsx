@@ -59,8 +59,8 @@ export function SpellForm({
   const dirty = JSON.stringify(form) !== JSON.stringify(start);
   const set = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));
 
-  const err = tried ? draft.errors : {};
-  const message = failed ? t.hbSaveError : err.name !== undefined ? t.blockFix(t.hbName) : null;
+  const err = draft.errors;
+  const message = failed ? t.hbSaveError : tried && err.name !== undefined ? t.blockFix(t.hbName) : null;
 
   const save = async () => {
     if (Object.keys(draft.errors).length > 0) {
@@ -136,7 +136,7 @@ export function SpellForm({
       preview={preview}
       explanation={explanation}
     >
-      <section className="card grid gap-3.5 p-4 sm:grid-cols-2">
+      <FormSection n={1} title={t.hbIdentity} className="grid gap-x-3.5 gap-y-3 sm:grid-cols-2">
         <TextField
           className="sm:col-span-2"
           label={t.hbName}
@@ -145,9 +145,10 @@ export function SpellForm({
           value={form.name}
           onChange={(name) => set({ name })}
           error={err.name ? t.hbReqSpellName : null}
+          showError={tried}
         />
         <div className="flex min-w-0 flex-col gap-1.5">
-          <span className="text-[12px] text-text-muted">{t.levelWord}</span>
+          <span className="text-[12.5px] text-on-surface-variant">{t.levelWord}</span>
           <Select labelAbove className="w-full justify-between" label={t.levelWord} value={form.level}
             onValueChange={(level) => {
               set({ level });
@@ -158,7 +159,7 @@ export function SpellForm({
           />
         </div>
         <div className="flex min-w-0 flex-col gap-1.5">
-          <span className="text-[12px] text-text-muted">{t.hbSchool}</span>
+          <span className="text-[12.5px] text-on-surface-variant">{t.hbSchool}</span>
           <Select
             labelAbove
             className="w-full justify-between"
@@ -173,7 +174,7 @@ export function SpellForm({
           />
         </div>
         <div className="flex min-w-0 flex-col gap-1.5">
-          <span className="text-[12px] text-text-muted">{t.hbCastingTime}</span>
+          <span className="text-[12.5px] text-on-surface-variant">{t.hbCastingTime}</span>
           <Select labelAbove className="w-full justify-between" label={t.hbCastingTime} value={form.castingTime}
             onValueChange={(castingTime) => {
               set({ castingTime });
@@ -186,15 +187,15 @@ export function SpellForm({
         <TextField label={t.hbRangeExample} dataField="spell-range" value={form.range} onChange={(range) => set({ range })} />
         <TextField className="sm:col-span-2" label={t.codexDuration} dataField="spell-duration" value={form.duration} onChange={(duration) => set({ duration })} />
         <ExplainHere className="sm:col-span-2" explanation={here((f) => f === 'level' || f === 'school' || f === 'time')} />
-      </section>
+      </FormSection>
 
-      <FormSection title={t.codexComponents}>
+      <FormSection n={2} title={t.codexComponents}>
         <PillGroup hideLabel label={t.codexComponents} options={options.spellComponents.map((o) => ({ id: o.id, label: `${o.id} · ${o.label}` }))} selected={form.components} onChange={(components) => set({ components })} onTouch={(id) => setFocus(`comp:${id}`)} />
         <ExplainHere explanation={here((f) => f.startsWith('comp:'))} />
         {form.components.includes('M') && <TextField label={t.hbMaterialExample} dataField="spell-material" value={form.material} onChange={(material) => set({ material })} />}
       </FormSection>
 
-      <FormSection title={t.hbConcRitual}>
+      <FormSection n={3} title={t.hbConcRitual}>
         <Option multi id="concentration" selected={form.concentration} title={t.concentration} onClick={() => {
             set({ concentration: !form.concentration });
             setFocus('concentration');
@@ -208,12 +209,12 @@ export function SpellForm({
         <ExplainHere explanation={here((f) => f === 'concentration' || f === 'ritual')} />
       </FormSection>
 
-      <FormSection title={t.hbClassLists}>
+      <FormSection n={4} title={t.hbClassLists}>
         <PillGroup hideLabel label={t.hbClassLists} options={options.spellClasses} selected={form.classes} onChange={(classes) => set({ classes })} onTouch={() => setFocus('classes')} />
         <ExplainHere explanation={here((f) => f === 'classes')} />
       </FormSection>
 
-      <FormSection title={t.hbDescription}>
+      <FormSection n={5} title={t.hbDescription}>
         <TextAreaField label={t.hbSpellDoes} dataField="spell-description" value={form.description} onChange={(description) => set({ description })} />
         <TextAreaField label={t.hbSpellHigherLevel} dataField="spell-higher-level" value={form.higherLevel} onChange={(higherLevel) => set({ higherLevel })} />
       </FormSection>

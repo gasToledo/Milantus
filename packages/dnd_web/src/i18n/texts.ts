@@ -1919,6 +1919,11 @@ Los personajes que los jugadores le compartieron se sueltan, y sus fichas siguen
   hbFeatNotFoundBody: 'No existe, o no es una dote propia.',
   hbFeatName: 'Nombre',
   hbFeatNameRequired: 'Escribí el nombre de la dote.',
+  hbIdentity: 'Identidad',
+  hbLivePreview: 'En vivo',
+  hbUnsaved: 'Cambios sin guardar',
+  hbNoChanges: 'Sin cambios',
+  error: 'Error',
   hbFeatPreview: 'Así la ve el jugador',
   hbFeatNoDescription:
     'Sin descripción, el jugador solo ve lo que concede. Una línea que diga qué la hace distinta ayuda a elegirla.',
@@ -4457,6 +4462,11 @@ The characters players shared with it are released, and their sheets remain thei
   hbFeatNotFoundBody: 'It does not exist, or it is not one of your own feats.',
   hbFeatName: 'Name',
   hbFeatNameRequired: 'Enter the feat name.',
+  hbIdentity: 'Identity',
+  hbLivePreview: 'Live',
+  hbUnsaved: 'Unsaved changes',
+  hbNoChanges: 'No changes',
+  error: 'Error',
   hbFeatPreview: 'How the player sees it',
   hbFeatNoDescription:
     'Without a description the player only sees what it grants. A line saying what makes it different helps to choose it.',

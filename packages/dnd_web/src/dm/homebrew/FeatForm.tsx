@@ -2,11 +2,10 @@ import { useMemo, useState, type MutableRefObject } from 'react';
 import { featEntry } from '../../codex/entries';
 import { catalogLabel, catalogLabelOrder, featDraft, featForm, type Catalog, type FeatForm as Form, type JsonObject } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
-import { cx } from '../../ui/cx';
 import { Select } from '../../ui/primitives';
-import { Option } from '../../ui/wizard';
 import { EffectEditor } from './EffectEditor';
 import { EntryPreview, ExplainHere, HomebrewFormShell, useHomebrewRules, type Explained } from './HomebrewFormShell';
+import { FormSection, SwitchRow, TextAreaField, TextField } from './homebrewFields';
 
 /**
  * El formulario de una dote propia (`FeatForm` de Flutter). No sabe de reglas:
@@ -55,7 +54,6 @@ export function FeatForm({
   const dirty = JSON.stringify(form) !== JSON.stringify(start);
 
   const set = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));
-  const nameInvalid = tried && draft.errors.name !== undefined;
 
   const save = async () => {
     if (Object.keys(draft.errors).length > 0) {
@@ -71,7 +69,7 @@ export function FeatForm({
     }
   };
 
-  const message = failed ? t.hbSaveError : nameInvalid ? t.blockFix(t.hbFeatName) : null;
+  const message = failed ? t.hbSaveError : tried && draft.errors.name !== undefined ? t.blockFix(t.hbFeatName) : null;
 
   // Las categorías en el orden del motor; la de una dote importada con una
   // categoría que no conoce se conserva como opción para no cambiarla.
@@ -122,28 +120,18 @@ export function FeatForm({
       preview={preview}
       explanation={explanation}
     >
-      <section className="card grid gap-3.5 p-4 sm:grid-cols-2">
-        <label className="flex min-w-0 flex-col gap-1.5">
-          <span className="text-[12px] text-text-muted">{t.hbFeatName}</span>
-          <input
-            data-field="feat-name"
-            value={form.name}
-            autoFocus
-            aria-invalid={nameInvalid ? true : undefined}
-            onChange={(e) => set({ name: e.target.value })}
-            className={cx(
-              'h-[38px] w-full min-w-0 rounded-[var(--radius-input)] border bg-plaque px-3 text-[14px] text-on-surface',
-              nameInvalid ? 'border-crimson' : 'border-hairline',
-            )}
-          />
-          {nameInvalid && (
-            <span role="alert" className="text-[12.5px] text-crimson">
-              {t.hbFeatNameRequired}
-            </span>
-          )}
-        </label>
+      <FormSection n={1} title={t.hbIdentity} className="grid gap-x-3.5 gap-y-3 sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+        <TextField
+          label={t.hbFeatName}
+          dataField="feat-name"
+          autoFocus
+          value={form.name}
+          onChange={(name) => set({ name })}
+          error={draft.errors.name !== undefined ? t.hbFeatNameRequired : null}
+          showError={tried}
+        />
         <div className="flex min-w-0 flex-col gap-1.5">
-          <span className="text-[12px] text-text-muted">{t.codexCategory}</span>
+          <span className="text-[12.5px] text-on-surface-variant">{t.codexCategory}</span>
           <Select
             labelAbove
             className="w-full justify-between"
@@ -158,31 +146,22 @@ export function FeatForm({
           />
         </div>
         <ExplainHere className="sm:col-span-2" explanation={here((f) => f === 'category')} />
-      </section>
+      </FormSection>
 
-      <section className="card flex flex-col gap-2 p-4">
-        <h2 className="font-display text-[16px] text-on-surface">{t.hbDescription}</h2>
-        <label className="flex flex-col gap-1.5">
-          <span className="text-[12px] text-text-muted">{t.hbFeatDistinct}</span>
-          <textarea
-            rows={4}
-            data-field="feat-description"
-            value={form.description}
-            onChange={(e) => set({ description: e.target.value })}
-            className="min-w-0 rounded-[var(--radius-input)] border border-hairline bg-plaque px-3 py-2 text-[14px] text-on-surface"
-          />
-        </label>
-      </section>
+      <FormSection n={2} title={t.hbDescription}>
+        <TextAreaField label={t.hbFeatDistinct} dataField="feat-description" value={form.description} onChange={(description) => set({ description })} />
+      </FormSection>
 
-      <section className="card flex flex-col gap-2.5 p-4">
-        <h2 className="font-display text-[16px] text-on-surface">{t.hbGrants}</h2>
+      <FormSection n={3} title={t.hbGrants}>
         <EffectEditor effects={form.effects} catalog={catalog} onChange={(effects) => set({ effects })} />
-      </section>
+      </FormSection>
 
-      <section className="card flex flex-col gap-2.5 p-4">
-        <h2 className="font-display text-[16px] text-on-surface">{t.hbPrereqRepeat}</h2>
-        <Option id="repeatable" multi selected={form.repeatable} title={t.hbRepeatSwitch} onClick={() => {
-            set({ repeatable: !form.repeatable });
+      <FormSection n={4} title={t.hbPrereqRepeat}>
+        <SwitchRow
+          label={t.hbRepeatSwitch}
+          checked={form.repeatable}
+          onChange={(repeatable) => {
+            set({ repeatable });
             setFocus('repeatable');
           }}
         />
@@ -190,7 +169,7 @@ export function FeatForm({
         {/* ponytail: el requisito no se edita, solo se conserva; se suma cuando
             alguien arme una dote general propia con requisito. */}
         {form.hasPrerequisite && <p className="text-[13px] text-on-surface-variant">{t.hbKeepPrereq}</p>}
-      </section>
+      </FormSection>
     </HomebrewFormShell>
   );
 }

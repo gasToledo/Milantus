@@ -1,7 +1,9 @@
-import type { ReactNode } from 'react';
+import { useId, useState, type ReactNode } from 'react';
+import { CircleAlert } from 'lucide-react';
 import { useTexts } from '../../i18n/context';
 import type { Texts } from '../../i18n/texts';
 import { cx } from '../../ui/cx';
+import { Switch } from '../../ui/primitives';
 import { FilterPill } from '../npcs/NpcLibraryView';
 
 // Las piezas que los formularios de especie y trasfondo comparten: un campo con
@@ -33,14 +35,35 @@ export function diceError(code: string | undefined, t: Texts): string | null {
   return code === 'required' ? t.hbDiceRequired : t.hbDiceInvalid;
 }
 
-const INPUT = 'h-[38px] w-full min-w-0 rounded-[var(--radius-input)] border bg-plaque px-3 text-[14px] text-on-surface';
+// Un campo de 40 px, radio 8. El borde se oscurece hacia el oro al pasar el
+// puntero y, con el foco, el contorno dorado lo rodea con 1 px de separación.
+const INPUT =
+  'w-full min-w-0 rounded-[8px] border bg-plaque px-3 text-[14px] text-on-surface transition-colors duration-[120ms] hover:border-[color-mix(in_srgb,var(--gold)_35%,var(--hairline))] focus-visible:border-gold focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gold';
+const LABEL = 'text-[12.5px] text-on-surface-variant';
 
-/** Un campo de texto con su rótulo y, si hay, su error en carmesí debajo. */
+/** El error de un campo: ícono y texto en carmesí, que entra con `step-in`. */
+function FieldError({ message }: { message: string }) {
+  const t = useTexts();
+  return (
+    <span role="alert" className="step-in flex items-center gap-1.5 text-[12.5px] text-crimson">
+      <CircleAlert size={14} aria-label={t.error} role="img" className="shrink-0" />
+      {message}
+    </span>
+  );
+}
+
+/**
+ * Un campo de texto con su rótulo y, si hay, su error en carmesí debajo. El
+ * error se muestra **después de interactuar**: cuando el campo ya perdió el foco
+ * una vez o cuando el formulario pide mostrarlos todos (`showError`, que pasa a
+ * ser cierto al intentar guardar). El formulario le da siempre el error del motor.
+ */
 export function TextField({
   label,
   value,
   onChange,
   error,
+  showError,
   dataField,
   autoFocus,
   numeric,
@@ -51,6 +74,8 @@ export function TextField({
   value: string;
   onChange: (value: string) => void;
   error?: string | null;
+  /** Mostrar el error aunque el campo no haya perdido el foco todavía. */
+  showError?: boolean;
   dataField?: string;
   autoFocus?: boolean;
   /** Entrar al campo: el formulario explica la regla de ese número. */
@@ -59,24 +84,23 @@ export function TextField({
   numeric?: boolean;
   className?: string;
 }) {
+  const [left, setLeft] = useState(false);
+  const shown = error && (left || showError) ? error : null;
   return (
     <label className={cx('flex min-w-0 flex-col gap-1.5', className)}>
-      <span className="text-[12px] text-text-muted">{label}</span>
+      <span className={LABEL}>{label}</span>
       <input
         data-field={dataField}
         value={value}
         autoFocus={autoFocus}
         onFocus={onFocus}
+        onBlur={() => setLeft(true)}
         inputMode={numeric ? 'numeric' : undefined}
-        aria-invalid={error ? true : undefined}
+        aria-invalid={shown ? true : undefined}
         onChange={(e) => onChange(e.target.value)}
-        className={cx(INPUT, numeric && 'font-bold tabular-nums', error ? 'border-crimson' : 'border-hairline')}
+        className={cx(INPUT, 'h-10', numeric && 'font-bold tabular-nums', shown ? 'border-crimson' : 'border-hairline')}
       />
-      {error && (
-        <span role="alert" className="text-[12.5px] text-crimson">
-          {error}
-        </span>
-      )}
+      {shown && <FieldError message={shown} />}
     </label>
   );
 }
@@ -85,25 +109,62 @@ export function TextField({
 export function TextAreaField({ label, value, onChange, dataField }: { label: string; value: string; onChange: (value: string) => void; dataField?: string }) {
   return (
     <label className="flex min-w-0 flex-col gap-1.5">
-      <span className="text-[12px] text-text-muted">{label}</span>
+      <span className={LABEL}>{label}</span>
       <textarea
-        rows={3}
         data-field={dataField}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="min-w-0 rounded-[var(--radius-input)] border border-hairline bg-plaque px-3 py-2 text-[14px] leading-[1.5] text-on-surface"
+        className={cx(INPUT, 'min-h-24 resize-y border-hairline py-2.5 leading-[1.5]')}
       />
     </label>
   );
 }
 
-/** Una sección del formulario: siempre abierta, con su título en Georgia. */
-export function FormSection({ title, children }: { title: string; children: ReactNode }) {
+/** Una sección del formulario: siempre abierta, con su número y su título en
+ *  Georgia. [className] cambia cómo se acomoda el contenido (una grilla). */
+export function FormSection({ n, title, children, className }: { n: number; title: string; children: ReactNode; className?: string }) {
   return (
-    <section className="card flex flex-col gap-2.5 p-4">
-      <h2 className="font-display text-[16px] text-on-surface">{title}</h2>
+    <section className={cx('card p-4', className ?? 'flex flex-col gap-3')}>
+      <h2 className="font-display col-span-full flex items-center gap-2.5 text-[16px] text-on-surface">
+        <span
+          aria-hidden="true"
+          className="flex size-[22px] shrink-0 items-center justify-center rounded-full border border-hairline bg-plaque font-sans text-[11.5px] font-bold text-text-muted"
+        >
+          {n}
+        </span>
+        {title}
+      </h2>
       {children}
     </section>
+  );
+}
+
+/** Un sí/no suelto: el rótulo a la izquierda y el interruptor a la derecha.
+ *  Apagado (`disabled`), el motivo va debajo. */
+export function SwitchRow({
+  label,
+  checked,
+  onChange,
+  disabled,
+  reason,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  disabled?: boolean;
+  reason?: string | null;
+}) {
+  const id = useId();
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-center justify-between gap-3">
+        <span id={`${id}-label`} className="text-[14px] text-on-surface">
+          {label}
+        </span>
+        <Switch id={id} label={label} labelledBy={`${id}-label`} checked={checked} onCheckedChange={onChange} disabled={disabled} />
+      </div>
+      {reason && <p className="text-[12.5px] text-text-muted">{reason}</p>}
+    </div>
   );
 }
 
@@ -112,20 +173,23 @@ export function EconomySection({
   weight,
   costCp,
   errors,
+  showError,
+  n,
   onChange,
 }: {
   weight: string;
   costCp: string;
   errors: Record<string, string>;
+  showError: boolean;
+  n: number;
   onChange: (patch: { weight?: string; costCp?: string }) => void;
 }) {
   const t = useTexts();
   return (
-    <section className="card grid gap-3.5 p-4 sm:grid-cols-2">
-      <h2 className="font-display text-[16px] text-on-surface sm:col-span-2">{t.hbEconomy}</h2>
-      <TextField numeric label={t.hbWeightLabel} value={weight} onChange={(weight) => onChange({ weight })} error={weightError(errors.weight, t)} />
-      <TextField numeric label={t.hbPriceLabel} value={costCp} onChange={(costCp) => onChange({ costCp })} error={numberError(errors.costCp, t)} />
-    </section>
+    <FormSection n={n} title={t.hbEconomy} className="grid gap-x-3.5 gap-y-3 sm:grid-cols-2">
+      <TextField numeric label={t.hbWeightLabel} value={weight} onChange={(weight) => onChange({ weight })} error={weightError(errors.weight, t)} showError={showError} />
+      <TextField numeric label={t.hbPriceLabel} value={costCp} onChange={(costCp) => onChange({ costCp })} error={numberError(errors.costCp, t)} showError={showError} />
+    </FormSection>
   );
 }
 
@@ -163,7 +227,7 @@ export function PillGroup({
   const toggle = (id: string) => onChange(selected.includes(id) ? selected.filter((x) => x !== id) : [...selected, id]);
   return (
     <div role="group" aria-label={label} className="flex flex-col gap-1.5">
-      <span className={cx('text-[12px] text-text-muted', hideLabel && 'sr-only')}>{label}</span>
+      <span className={cx(LABEL, hideLabel && 'sr-only')}>{label}</span>
       <div className="flex flex-wrap gap-1.5">
         {rows.map((o) => (
           <FilterPill
@@ -179,11 +243,7 @@ export function PillGroup({
           />
         ))}
       </div>
-      {error && (
-        <span role="alert" className="text-[12.5px] text-crimson">
-          {error}
-        </span>
-      )}
+      {error && <FieldError message={error} />}
     </div>
   );
 }

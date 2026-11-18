@@ -3,7 +3,6 @@ import { Plus, Trash2 } from 'lucide-react';
 import { describeEffectParts } from '../../codex/effectText';
 import { effectParts, type Catalog, type JsonObject } from '../../engine';
 import { useTexts } from '../../i18n/context';
-import { Button } from '../../ui/Button';
 import { Tooltip } from '../../ui/primitives';
 import { AddEffectDialog } from './AddEffectDialog';
 
@@ -56,9 +55,12 @@ export function EffectEditor({
       {rows.length === 0 ? (
         <p className="text-[14px] text-on-surface-variant">{t.effNone}</p>
       ) : (
-        <ul className="rounded-[var(--radius-card)] border border-hairline bg-plaque" data-field="effects-list">
+        <ul className="rounded-[var(--radius-card)] border border-hairline bg-plaque py-0.5" data-field="effects-list">
           {rows.map((row, i) => (
-            <li key={i} className="flex min-h-10 items-center gap-2.5 border-t border-hairline py-1 pr-1.5 pl-3.5 first:border-t-0">
+            // La clave no es solo el índice: al quitar uno, los de abajo no
+            // repiten la entrada de los que siguen siendo los mismos.
+            <li key={`${i}|${row.type}|${row.text}`} className="step-in flex min-h-11 items-center gap-2.5 border-t border-hairline py-1 pr-1.5 pl-3 first:border-t-0">
+              <span aria-hidden="true" className="size-[7px] shrink-0 rotate-45 rounded-[1px] bg-gold" />
               <span className="min-w-0 flex-1 text-[14px] text-on-surface" data-effect={row.type}>
                 {row.text ?? row.type}
               </span>
@@ -68,7 +70,7 @@ export function EffectEditor({
                   type="button"
                   aria-label={t.effRemove}
                   onClick={() => onChange(effects.filter((_, j) => j !== i))}
-                  className="inline-flex size-9 shrink-0 items-center justify-center rounded-[var(--radius-nav)] text-on-surface-variant hover:text-crimson"
+                  className="inline-flex size-[34px] shrink-0 items-center justify-center rounded-[var(--radius-nav)] text-on-surface-variant hover:text-crimson"
                 >
                   <Trash2 size={16} aria-hidden="true" />
                 </button>
@@ -77,11 +79,15 @@ export function EffectEditor({
           ))}
         </ul>
       )}
-      <div>
-        <Button tone="secondary" icon={Plus} data-action="effect-add" onClick={() => setAdding(true)}>
-          {t.effAdd}
-        </Button>
-      </div>
+      <button
+        type="button"
+        data-action="effect-add"
+        onClick={() => setAdding(true)}
+        className="flex min-h-[42px] w-full items-center justify-center gap-2 rounded-[var(--radius-card)] border border-dashed border-[color-mix(in_srgb,var(--gold)_35%,var(--hairline))] text-[13.5px] text-on-surface-variant transition-colors duration-[120ms] hover:border-gold hover:text-gold"
+      >
+        <Plus size={16} aria-hidden="true" />
+        {t.effAdd}
+      </button>
       {adding && <AddEffectDialog catalog={catalog} hiddenKinds={hiddenKinds} onAdd={(effect) => onChange([...effects, effect])} onClose={() => setAdding(false)} />}
     </div>
   );

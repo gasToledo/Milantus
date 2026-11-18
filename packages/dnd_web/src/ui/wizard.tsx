@@ -517,9 +517,12 @@ export function WizardFooter({
   message,
   above,
   danger = false,
+  status,
   children,
 }: {
   message?: string | null;
+  /** Sin mensaje, a la izquierda: un punto y qué pasa con lo editado. */
+  status?: { text: string; tone: 'gold' | 'muted' };
   above?: ReactNode;
   /** El mensaje es un error (no se pudo guardar, falta corregir algo). */
   danger?: boolean;
@@ -534,6 +537,12 @@ export function WizardFooter({
           role="status"
         >
           {message}
+        </span>
+      )}
+      {!message && status && (
+        <span role="status" className={cx('flex min-w-0 flex-[1_1_240px] items-center gap-2 text-[13px]', status.tone === 'gold' ? 'text-gold' : 'text-text-muted')}>
+          <span aria-hidden="true" className="size-2 shrink-0 rounded-full bg-current" />
+          {status.text}
         </span>
       )}
       <span className="ml-auto flex w-full gap-2 sm:w-auto">{children}</span>

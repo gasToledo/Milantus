@@ -4,10 +4,9 @@ import { homebrewFormOptions, itemBaseOptions, itemDraft, itemForm, itemWithBase
 import { useLang, useTexts } from '../../i18n/context';
 import { signed } from '../../sheet/format';
 import { Select } from '../../ui/primitives';
-import { Option } from '../../ui/wizard';
 import { EffectEditor } from './EffectEditor';
 import { EntryPreview, ExplainHere, HomebrewFormShell, useHomebrewRules, type Explained } from './HomebrewFormShell';
-import { FormSection, numberError, PillGroup, TextAreaField, TextField, weightError } from './homebrewFields';
+import { FormSection, numberError, PillGroup, SwitchRow, TextAreaField, TextField, weightError } from './homebrewFields';
 
 /** Radix no admite un valor vacío en un `Select`: «Mundano» viaja con este. */
 const MUNDANE = '__mundane__';
@@ -70,7 +69,7 @@ export function ItemForm({
   const set = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));
 
   const mundane = form.rarity === '';
-  const err = tried ? draft.errors : {};
+  const err = draft.errors;
   const fields: [string, string][] = [
     ['name', t.hbName],
     ['weight', t.hbWeightShort],
@@ -79,7 +78,7 @@ export function ItemForm({
     ['magicBonus', t.hbMagicBonusShort],
   ];
   const wrong = fields.filter(([k]) => err[k] !== undefined).map(([, label]) => label);
-  const message = failed ? t.hbSaveError : wrong.length > 0 ? t.blockFix(wrong.join(', ')) : null;
+  const message = failed ? t.hbSaveError : tried && wrong.length > 0 ? t.blockFix(wrong.join(', ')) : null;
 
   const save = async () => {
     if (Object.keys(draft.errors).length > 0) {
@@ -162,7 +161,7 @@ export function ItemForm({
       preview={preview}
       explanation={explanation}
     >
-      <section className="card grid gap-3.5 p-4 sm:grid-cols-[3fr_2fr_2fr]">
+      <FormSection n={1} title={t.hbIdentity} className="grid gap-x-3.5 gap-y-3 sm:grid-cols-[3fr_2fr_2fr]">
         <TextField
           className="sm:col-span-3"
           label={t.hbName}
@@ -171,9 +170,10 @@ export function ItemForm({
           value={form.name}
           onChange={(name) => set({ name })}
           error={err.name ? t.hbReqItemName : null}
+          showError={tried}
         />
         <div className="flex min-w-0 flex-col gap-1.5">
-          <span className="text-[12px] text-text-muted">{t.codexCategory}</span>
+          <span className="text-[12.5px] text-on-surface-variant">{t.codexCategory}</span>
           <Select labelAbove className="w-full justify-between" label={t.codexCategory} value={form.category}
             onValueChange={(category) => {
               set({ category });
@@ -183,14 +183,14 @@ export function ItemForm({
             options={categories}
           />
         </div>
-        <TextField numeric label={t.hbWeightShort} dataField="item-weight" value={form.weight} onChange={(weight) => set({ weight })} error={weightError(err.weight, t)} />
-        <TextField numeric label={t.hbPriceCp} dataField="item-cost" value={form.costCp} onChange={(costCp) => set({ costCp })} error={numberError(err.costCp, t)} />
+        <TextField numeric label={t.hbWeightShort} dataField="item-weight" value={form.weight} onChange={(weight) => set({ weight })} error={weightError(err.weight, t)} showError={tried} />
+        <TextField numeric label={t.hbPriceCp} dataField="item-cost" value={form.costCp} onChange={(costCp) => set({ costCp })} error={numberError(err.costCp, t)} showError={tried} />
         <ExplainHere className="sm:col-span-3" explanation={here((f) => f === 'category')} />
-      </section>
+      </FormSection>
 
-      <FormSection title={t.hbMagic}>
+      <FormSection n={2} title={t.hbMagic}>
         <div className="flex max-w-[300px] min-w-0 flex-col gap-1.5">
-          <span className="text-[12px] text-text-muted">{t.codexRarity}</span>
+          <span className="text-[12.5px] text-on-surface-variant">{t.codexRarity}</span>
           <Select
             labelAbove
             className="w-full justify-between"
@@ -204,25 +204,21 @@ export function ItemForm({
             options={rarities}
           />
         </div>
-        {/* Un objeto mundano no se sintoniza: la fila queda apagada y no responde,
-            pero se deja tocar para que `aria-disabled` diga por qué. */}
-        <Option
-          multi
-          id="requires-attunement"
-          blocked={mundane}
-          selected={form.requiresAttunement && !mundane}
-          title={t.hbRequiresAttunement}
-          onClick={() => {
-            if (mundane) return;
-            set({ requiresAttunement: !form.requiresAttunement });
+        {/* Un objeto mundano no se sintoniza: el interruptor queda apagado y dice por qué. */}
+        <SwitchRow
+          label={t.hbRequiresAttunement}
+          checked={form.requiresAttunement && !mundane}
+          disabled={mundane}
+          reason={mundane ? t.hbOnlyMagicAttune : null}
+          onChange={(requiresAttunement) => {
+            set({ requiresAttunement });
             setFocus('attunement');
           }}
         />
-        {mundane && <p className="text-[12.5px] text-text-muted">{t.hbOnlyMagicAttune}</p>}
         <ExplainHere explanation={here((f) => f === 'rarity' || f === 'attunement')} />
       </FormSection>
 
-      <FormSection title={t.hbEffectsEquipped}>
+      <FormSection n={3} title={t.hbEffectsEquipped}>
         <TextField
           numeric
           className="w-[300px] max-w-full"
@@ -232,6 +228,7 @@ export function ItemForm({
           onChange={(acBonus) => set({ acBonus })}
           onFocus={() => setFocus('acBonus')}
           error={numberError(err.acBonus, t)}
+          showError={tried}
         />
         <PillGroup
           label={t.hbResistances}
@@ -242,15 +239,15 @@ export function ItemForm({
         />
         <ExplainHere explanation={here((f) => f === 'acBonus' || f.startsWith('res:'))} />
         <div className="flex flex-col gap-1.5">
-          <span className="text-[12px] text-text-muted">{t.hbOtherEffects}</span>
+          <span className="text-[12.5px] text-on-surface-variant">{t.hbOtherEffects}</span>
           <EffectEditor effects={form.otherEffects} catalog={catalog} hiddenKinds={HIDDEN_KINDS} onChange={(otherEffects) => set({ otherEffects })} />
         </div>
       </FormSection>
 
-      <FormSection title={t.hbBaseItem}>
+      <FormSection n={4} title={t.hbBaseItem}>
         <div className="grid gap-3.5 sm:grid-cols-[3fr_2fr]">
           <div className="flex min-w-0 flex-col gap-1.5">
-            <span className="text-[12px] text-text-muted">{t.hbBaseItem}</span>
+            <span className="text-[12.5px] text-on-surface-variant">{t.hbBaseItem}</span>
             <Select
               labelAbove
               className="w-full justify-between"
@@ -272,6 +269,7 @@ export function ItemForm({
             onChange={(magicBonus) => set({ magicBonus })}
             onFocus={() => setFocus('magicBonus')}
             error={numberError(err.magicBonus, t)}
+            showError={tried}
           />
         </div>
         {/* Sin familia no hay nada que restringir. */}
@@ -289,7 +287,7 @@ export function ItemForm({
         <ExplainHere explanation={here((f) => f === 'base' || f === 'magicBonus')} />
       </FormSection>
 
-      <FormSection title={t.hbDescription}>
+      <FormSection n={5} title={t.hbDescription}>
         <TextAreaField label={t.hbDescription} dataField="item-description" value={form.description} onChange={(description) => set({ description })} />
         {form.hasCharges && <p className="text-[13px] text-on-surface-variant">{t.hbKeepCharges}</p>}
       </FormSection>

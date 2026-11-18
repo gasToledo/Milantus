@@ -57,9 +57,9 @@ export function BackgroundForm({
   const dirty = JSON.stringify(form) !== JSON.stringify(start);
   const set = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));
 
-  const err = tried ? draft.errors : {};
+  const err = draft.errors;
   const wrong = [...(err.name ? [t.hbName] : []), ...(err.abilityOptions ? [t.codexAbilities] : [])];
-  const message = failed ? t.hbSaveError : wrong.length > 0 ? t.blockFix(wrong.join(', ')) : null;
+  const message = failed ? t.hbSaveError : tried && wrong.length > 0 ? t.blockFix(wrong.join(', ')) : null;
 
   const save = async () => {
     if (Object.keys(draft.errors).length > 0) {
@@ -132,7 +132,7 @@ export function BackgroundForm({
       preview={preview}
       explanation={explanation}
     >
-      <section className="card flex flex-col gap-3.5 p-4">
+      <FormSection n={1} title={t.hbIdentity}>
         <TextField
           label={t.hbName}
           dataField="background-name"
@@ -140,6 +140,7 @@ export function BackgroundForm({
           value={form.name}
           onChange={(name) => set({ name })}
           error={err.name ? t.hbReqBgName : null}
+          showError={tried}
         />
         <PillGroup
           label={t.hbPick3}
@@ -148,10 +149,10 @@ export function BackgroundForm({
           max={3}
           onChange={(abilityOptions) => set({ abilityOptions })}
           onTouch={() => setFocus('abilities')}
-          error={err.abilityOptions ? t.hbThreeAbilities : null}
+          error={tried && err.abilityOptions ? t.hbThreeAbilities : null}
         />
         <div className="flex max-w-[360px] min-w-0 flex-col gap-1.5">
-          <span className="text-[12px] text-text-muted">{t.codexOriginFeat}</span>
+          <span className="text-[12.5px] text-on-surface-variant">{t.codexOriginFeat}</span>
           <Select
             labelAbove
             className="w-full justify-between"
@@ -166,9 +167,9 @@ export function BackgroundForm({
           />
         </div>
         <ExplainHere explanation={here((f) => f === 'abilities' || f === 'feat')} />
-      </section>
+      </FormSection>
 
-      <FormSection title={t.hbProficiencies}>
+      <FormSection n={2} title={t.hbProficiencies}>
         <PillGroup
           label={t.creatureSkills}
           options={options.skills}
@@ -186,12 +187,12 @@ export function BackgroundForm({
         <ExplainHere explanation={here((f) => f === 'skills' || f === 'tools')} />
       </FormSection>
 
-      <FormSection title={t.hbPresentation}>
+      <FormSection n={3} title={t.hbPresentation}>
         <TextField label={t.hbTaglineLabelM} value={form.tagline} onChange={(tagline) => set({ tagline })} />
         <TextAreaField label={t.hbDescription} value={form.description} onChange={(description) => set({ description })} />
       </FormSection>
 
-      <FormSection title={t.hbExtraEffects}>
+      <FormSection n={4} title={t.hbExtraEffects}>
         <EffectEditor effects={form.effects} catalog={catalog} onChange={(effects) => set({ effects })} />
         {form.hasStartingEquipment && <p className="text-[13px] text-on-surface-variant">{t.hbKeepEquipment}</p>}
       </FormSection>

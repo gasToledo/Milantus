@@ -59,7 +59,7 @@ export function WeaponForm({
   const set = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));
 
   // Los errores se muestran después del primer intento de guardar.
-  const err = tried ? draft.errors : {};
+  const err = draft.errors;
   const fields: [string[], string][] = [
     [['name'], t.hbName],
     [['damageDice'], t.hbDamageDie],
@@ -71,7 +71,7 @@ export function WeaponForm({
     [['costCp'], t.hbPriceLabel],
   ];
   const wrong = fields.filter(([keys]) => keys.some((k) => err[k] !== undefined)).map(([, label]) => label);
-  const message = failed ? t.hbSaveError : wrong.length > 0 ? t.blockFix(wrong.join(', ')) : null;
+  const message = failed ? t.hbSaveError : tried && wrong.length > 0 ? t.blockFix(wrong.join(', ')) : null;
 
   const save = async () => {
     if (Object.keys(draft.errors).length > 0) {
@@ -149,7 +149,7 @@ export function WeaponForm({
       preview={preview}
       explanation={explanation}
     >
-      <section className="card grid gap-3.5 p-4 sm:grid-cols-[3fr_2fr_3fr]">
+      <FormSection n={1} title={t.hbIdentity} className="grid gap-x-3.5 gap-y-3 sm:grid-cols-[3fr_2fr_3fr]">
         <TextField
           className="sm:col-span-3"
           label={t.hbName}
@@ -158,20 +158,21 @@ export function WeaponForm({
           value={form.name}
           onChange={(name) => set({ name })}
           error={err.name ? t.hbReqWeaponName : null}
+          showError={tried}
         />
         <div className="flex min-w-0 flex-col gap-1.5">
-          <span className="text-[12px] text-text-muted">{t.codexCategory}</span>
+          <span className="text-[12.5px] text-on-surface-variant">{t.codexCategory}</span>
           <Select labelAbove className="w-full justify-between" label={t.codexCategory} value={form.category} onValueChange={(category) => { set({ category }); setFocus('category'); }} onOpen={() => setFocus('category')} options={categories} />
         </div>
-        <TextField numeric label={t.hbDamageDie} dataField="weapon-damage-dice" value={form.damageDice} onChange={(damageDice) => set({ damageDice })} error={diceError(err.damageDice, t)} />
+        <TextField numeric label={t.hbDamageDie} dataField="weapon-damage-dice" value={form.damageDice} onChange={(damageDice) => set({ damageDice })} error={diceError(err.damageDice, t)} showError={tried} />
         <div className="flex min-w-0 flex-col gap-1.5">
-          <span className="text-[12px] text-text-muted">{t.hbDamageType}</span>
+          <span className="text-[12.5px] text-on-surface-variant">{t.hbDamageType}</span>
           <Select labelAbove className="w-full justify-between" label={t.hbDamageType} value={form.damageType} onValueChange={(damageType) => { set({ damageType }); setFocus('type'); }} onOpen={() => setFocus('type')} options={damageTypes} />
         </div>
         <ExplainHere className="sm:col-span-3" explanation={here((f) => f === 'category' || f === 'type')} />
-      </section>
+      </FormSection>
 
-      <FormSection title={t.codexProperties}>
+      <FormSection n={2} title={t.codexProperties}>
         <PillGroup
           hideLabel
           label={t.codexProperties}
@@ -183,11 +184,11 @@ export function WeaponForm({
         {(showVersatile || showRange) && (
           <div className="grid gap-3.5 sm:grid-cols-3">
             {showVersatile && (
-              <TextField numeric label={t.hbVersatile} value={form.versatileDice} onChange={(versatileDice) => set({ versatileDice })} error={diceError(err.versatileDice, t)} />
+              <TextField numeric label={t.hbVersatile} value={form.versatileDice} onChange={(versatileDice) => set({ versatileDice })} error={diceError(err.versatileDice, t)} showError={tried} />
             )}
             {showRange && (
               <>
-                <TextField numeric label={t.hbRangeNormal} dataField="weapon-range-normal" value={form.rangeNormal} onChange={(rangeNormal) => set({ rangeNormal })} onFocus={() => setFocus('range')} error={numberError(err.rangeNormal, t)} />
+                <TextField numeric label={t.hbRangeNormal} dataField="weapon-range-normal" value={form.rangeNormal} onChange={(rangeNormal) => set({ rangeNormal })} onFocus={() => setFocus('range')} error={numberError(err.rangeNormal, t)} showError={tried} />
                 <TextField
                   numeric
                   label={t.hbRangeLong}
@@ -196,6 +197,7 @@ export function WeaponForm({
                   onChange={(rangeLong) => set({ rangeLong })}
                   onFocus={() => setFocus('range')}
                   error={err.rangeLong === 'rangeLongMin' ? t.hbRangeLongMin : numberError(err.rangeLong, t)}
+                  showError={tried}
                 />
               </>
             )}
@@ -204,10 +206,9 @@ export function WeaponForm({
         <ExplainHere explanation={here((f) => f.startsWith('prop:') || f === 'range')} />
       </FormSection>
 
-      <section className="card grid gap-3.5 p-4 sm:grid-cols-[3fr_2fr]">
-        <h2 className="font-display text-[16px] text-on-surface sm:col-span-2">{t.hbMasteryMagic}</h2>
+      <FormSection n={3} title={t.hbMasteryMagic} className="grid gap-x-3.5 gap-y-3 sm:grid-cols-[3fr_2fr]">
         <div className="flex min-w-0 flex-col gap-1.5">
-          <span className="text-[12px] text-text-muted">{t.codexMastery}</span>
+          <span className="text-[12.5px] text-on-surface-variant">{t.codexMastery}</span>
           <Select
             labelAbove
             className="w-full justify-between"
@@ -221,13 +222,13 @@ export function WeaponForm({
             options={masteries}
           />
         </div>
-        <TextField numeric label={t.hbMagicBonus} value={form.magicBonus} onChange={(magicBonus) => set({ magicBonus })} error={numberError(err.magicBonus, t)} />
+        <TextField numeric label={t.hbMagicBonus} value={form.magicBonus} onChange={(magicBonus) => set({ magicBonus })} error={numberError(err.magicBonus, t)} showError={tried} />
         <ExplainHere className="sm:col-span-2" explanation={here((f) => f === 'mastery')} />
-      </section>
+      </FormSection>
 
-      <EconomySection weight={form.weight} costCp={form.costCp} errors={err} onChange={set} />
+      <EconomySection n={4} weight={form.weight} costCp={form.costCp} errors={err} showError={tried} onChange={set} />
 
-      <FormSection title={t.hbLegend}>
+      <FormSection n={5} title={t.hbLegend}>
         <TextAreaField label={t.hbLegendWeapon} value={form.description} onChange={(description) => set({ description })} />
       </FormSection>
     </HomebrewFormShell>

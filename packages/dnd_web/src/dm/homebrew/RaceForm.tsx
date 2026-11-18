@@ -53,14 +53,14 @@ export function RaceForm({
   const set = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));
 
   // Los errores se muestran después del primer intento de guardar.
-  const err = tried ? draft.errors : {};
+  const err = draft.errors;
   const fields: [keyof Form, string][] = [
     ['name', t.hbName],
     ['speed', t.hbSpeedFeet],
     ['skillChoiceCount', t.hbHowMany],
   ];
   const wrong = fields.filter(([k]) => err[k] !== undefined).map(([, label]) => label);
-  const message = failed ? t.hbSaveError : wrong.length > 0 ? t.blockFix(wrong.join(', ')) : null;
+  const message = failed ? t.hbSaveError : tried && wrong.length > 0 ? t.blockFix(wrong.join(', ')) : null;
 
   const save = async () => {
     if (Object.keys(draft.errors).length > 0) {
@@ -132,7 +132,7 @@ export function RaceForm({
       preview={preview}
       explanation={explanation}
     >
-      <section className="card grid gap-3.5 p-4 sm:grid-cols-[3fr_2fr_2fr]">
+      <FormSection n={1} title={t.hbIdentity} className="grid gap-x-3.5 gap-y-3 sm:grid-cols-[3fr_2fr_2fr]">
         <TextField
           className="sm:col-span-3"
           label={t.hbName}
@@ -141,10 +141,11 @@ export function RaceForm({
           value={form.name}
           onChange={(name) => set({ name })}
           error={err.name ? t.hbReqRaceName : null}
+          showError={tried}
         />
         <TextField label={t.hbCreatureType} value={form.creatureType} onChange={(creatureType) => set({ creatureType })} onFocus={() => setFocus('type')} />
         <div className="flex min-w-0 flex-col gap-1.5">
-          <span className="text-[12px] text-text-muted">{t.codexSize}</span>
+          <span className="text-[12.5px] text-on-surface-variant">{t.codexSize}</span>
           <Select
             labelAbove
             className="w-full justify-between"
@@ -158,16 +159,16 @@ export function RaceForm({
             options={sizes.map((s) => ({ value: s.id, label: s.label }))}
           />
         </div>
-        <TextField numeric label={t.hbSpeedFeet} value={form.speed} onChange={(speed) => set({ speed })} onFocus={() => setFocus('speed')} error={numberError(err.speed, t)} />
+        <TextField numeric label={t.hbSpeedFeet} value={form.speed} onChange={(speed) => set({ speed })} onFocus={() => setFocus('speed')} error={numberError(err.speed, t)} showError={tried} />
         <ExplainHere className="sm:col-span-3" explanation={here((f) => f === 'type' || f === 'size' || f === 'speed')} />
-      </section>
+      </FormSection>
 
-      <FormSection title={t.hbPresentation}>
+      <FormSection n={2} title={t.hbPresentation}>
         <TextField label={t.hbTaglineLabel} value={form.tagline} onChange={(tagline) => set({ tagline })} />
         <TextAreaField label={t.hbDescription} value={form.description} onChange={(description) => set({ description })} />
       </FormSection>
 
-      <FormSection title={t.creatureSkills}>
+      <FormSection n={3} title={t.creatureSkills}>
         <TextField
           numeric
           className="w-[140px]"
@@ -176,6 +177,7 @@ export function RaceForm({
           onChange={(skillChoiceCount) => set({ skillChoiceCount })}
           onFocus={() => setFocus('skillCount')}
           error={numberError(err.skillChoiceCount, t)}
+          showError={tried}
         />
         {choosesSkills && (
           <PillGroup
@@ -189,7 +191,7 @@ export function RaceForm({
         <ExplainHere explanation={here((f) => f === 'skillCount' || f === 'skillFrom')} />
       </FormSection>
 
-      <FormSection title={t.hbSizeToChoose}>
+      <FormSection n={4} title={t.hbSizeToChoose}>
         <PillGroup
           hideLabel
           label={t.hbSizeToChoose}
@@ -201,7 +203,7 @@ export function RaceForm({
         <ExplainHere explanation={here((f) => f === 'sizeOptions')} />
       </FormSection>
 
-      <FormSection title={t.creatureTraits}>
+      <FormSection n={5} title={t.creatureTraits}>
         <EffectEditor effects={form.effects} catalog={catalog} onChange={(effects) => set({ effects })} />
       </FormSection>
     </HomebrewFormShell>

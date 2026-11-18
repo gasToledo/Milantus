@@ -4,9 +4,8 @@ import { armorDraft, armorForm, armorWithCategory, homebrewFormOptions, type Arm
 import { useLang, useTexts } from '../../i18n/context';
 import { Eyebrow } from '../../ui/data';
 import { Select } from '../../ui/primitives';
-import { Option } from '../../ui/wizard';
 import { EntryPreview, ExplainHere, HomebrewFormShell, useHomebrewRules, type Explained } from './HomebrewFormShell';
-import { EconomySection, FormSection, numberError, TextAreaField, TextField } from './homebrewFields';
+import { EconomySection, FormSection, numberError, SwitchRow, TextAreaField, TextField } from './homebrewFields';
 
 /**
  * El formulario de una armadura propia (`ArmorForm` de Flutter). Mismo patrón
@@ -57,7 +56,7 @@ export function ArmorForm({
   const set = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));
 
   const shield = form.category === 'shield';
-  const err = tried ? draft.errors : {};
+  const err = draft.errors;
   const fields: [string, string][] = [
     ['name', t.hbName],
     ['baseAc', shield ? t.hbShieldAc : t.hbArmorBaseAc],
@@ -67,7 +66,7 @@ export function ArmorForm({
     ['costCp', t.hbPriceLabel],
   ];
   const wrong = fields.filter(([k]) => err[k] !== undefined).map(([, label]) => label);
-  const message = failed ? t.hbSaveError : wrong.length > 0 ? t.blockFix(wrong.join(', ')) : null;
+  const message = failed ? t.hbSaveError : tried && wrong.length > 0 ? t.blockFix(wrong.join(', ')) : null;
 
   const save = async () => {
     if (Object.keys(draft.errors).length > 0) {
@@ -153,7 +152,7 @@ export function ArmorForm({
       preview={preview}
       explanation={explanation}
     >
-      <section className="card grid gap-3.5 p-4 sm:grid-cols-[3fr_2fr]">
+      <FormSection n={1} title={t.hbIdentity} className="grid gap-x-3.5 gap-y-3 sm:grid-cols-[3fr_2fr]">
         <TextField
           className="sm:col-span-2"
           label={t.hbName}
@@ -162,9 +161,10 @@ export function ArmorForm({
           value={form.name}
           onChange={(name) => set({ name })}
           error={err.name ? t.hbReqArmorName : null}
+          showError={tried}
         />
         <div className="flex min-w-0 flex-col gap-1.5">
-          <span className="text-[12px] text-text-muted">{t.codexCategory}</span>
+          <span className="text-[12.5px] text-on-surface-variant">{t.codexCategory}</span>
           <Select
             labelAbove
             className="w-full justify-between"
@@ -186,14 +186,18 @@ export function ArmorForm({
           onChange={(baseAc) => set({ baseAc })}
           onFocus={() => setFocus('baseAc')}
           error={numberError(err.baseAc, t)}
+          showError={tried}
         />
         <ExplainHere className="sm:col-span-2" explanation={here((f) => f === 'category' || f === 'baseAc')} />
-      </section>
+      </FormSection>
 
       {!shield && (
-        <FormSection title={t.hbHowDex}>
-          <Option multi id="add-dex-mod" selected={form.addDexMod} title={t.hbAddsDexMod} onClick={() => {
-              set({ addDexMod: !form.addDexMod });
+        <FormSection n={2} title={t.hbHowDex}>
+          <SwitchRow
+            label={t.hbAddsDexMod}
+            checked={form.addDexMod}
+            onChange={(addDexMod) => {
+              set({ addDexMod });
               setFocus('addDex');
             }}
           />
@@ -206,13 +210,14 @@ export function ArmorForm({
               onChange={(maxDexBonus) => set({ maxDexBonus })}
               onFocus={() => setFocus('maxDex')}
               error={numberError(err.maxDexBonus, t)}
+              showError={tried}
             />
           )}
           <ExplainHere explanation={here((f) => f === 'addDex' || f === 'maxDex')} />
         </FormSection>
       )}
 
-      <FormSection title={t.hbDemands}>
+      <FormSection n={shield ? 2 : 3} title={t.hbDemands}>
         <TextField
           numeric
           className="w-[260px] max-w-full"
@@ -221,18 +226,22 @@ export function ArmorForm({
           onChange={(strengthRequirement) => set({ strengthRequirement })}
           onFocus={() => setFocus('strength')}
           error={numberError(err.strengthRequirement, t)}
+          showError={tried}
         />
-        <Option multi id="stealth-disadvantage" selected={form.stealthDisadvantage} title={t.hbStealthLabel} onClick={() => {
-            set({ stealthDisadvantage: !form.stealthDisadvantage });
+        <SwitchRow
+          label={t.hbStealthLabel}
+          checked={form.stealthDisadvantage}
+          onChange={(stealthDisadvantage) => {
+            set({ stealthDisadvantage });
             setFocus('stealth');
           }}
         />
         <ExplainHere explanation={here((f) => f === 'strength' || f === 'stealth')} />
       </FormSection>
 
-      <EconomySection weight={form.weight} costCp={form.costCp} errors={err} onChange={set} />
+      <EconomySection n={shield ? 3 : 4} weight={form.weight} costCp={form.costCp} errors={err} showError={tried} onChange={set} />
 
-      <FormSection title={t.hbLegend}>
+      <FormSection n={shield ? 4 : 5} title={t.hbLegend}>
         <TextAreaField label={t.hbLegendArmor} value={form.description} onChange={(description) => set({ description })} />
       </FormSection>
     </HomebrewFormShell>
