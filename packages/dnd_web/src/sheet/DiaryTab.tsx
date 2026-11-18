@@ -18,7 +18,6 @@ import { AppDialog } from '../ui/AppDialog';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { cx } from '../ui/cx';
-import { READ_PROSE } from '../ui/data';
 import { useListTransition } from '../ui/listTransition';
 import { MarkdownText } from '../ui/MarkdownText';
 import { PortraitViewer } from '../ui/PortraitViewer';
@@ -768,13 +767,14 @@ function EntryEditor({
 }
 
 /**
- * Un trasfondo: la prosa a medida de lectura (unos 66 caracteres; estirada a
- * todo el ancho no se lee) y con un alto máximo. Uno de diez páginas no
+ * Un trasfondo: la prosa a todo el ancho de la tarjeta (con la medida de
+ * lectura quedaba media tarjeta vacía y el usuario lo pidió así) y con un alto
+ * máximo. Uno de diez páginas no
  * empuja todo lo demás fuera de la pantalla: scrollea adentro de su tarjeta.
  * Lo comparten la ficha (Diario) y la ficha del PNJ.
  *
  * La zona que scrollea ocupa toda la tarjeta, así la barra va contra su borde
- * y no flota al lado del texto; la medida de lectura es del texto, adentro. Es
+ * y no flota al lado del texto. Es
  * el `ScrollArea` del sistema (la barra del navegador es un bloque gris en el
  * tema oscuro), enfocable y con nombre para quien usa el teclado.
  */
@@ -782,7 +782,7 @@ export function BackgroundText({ text, label }: { text: string; label: string })
   return (
     <ScrollArea type="auto" label={label} viewportClassName="max-h-[min(420px,60vh)]">
       <div className="pr-3" data-field="background">
-        <MarkdownText text={text} className={cx('drop-cap text-[15px] leading-[1.65] text-on-surface', READ_PROSE)} />
+        <MarkdownText text={text} className="drop-cap text-[15px] leading-[1.65] text-on-surface" />
       </div>
     </ScrollArea>
   );
