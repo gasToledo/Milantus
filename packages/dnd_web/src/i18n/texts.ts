@@ -1923,6 +1923,7 @@ Los personajes que los jugadores le compartieron se sueltan, y sus fichas siguen
   hbLivePreview: 'En vivo',
   hbUnsaved: 'Cambios sin guardar',
   hbNoChanges: 'Sin cambios',
+  hbSpeedShort: 'Vel.',
   error: 'Error',
   hbFeatPreview: 'Así la ve el jugador',
   hbFeatNoDescription:
@@ -4466,6 +4467,7 @@ The characters players shared with it are released, and their sheets remain thei
   hbLivePreview: 'Live',
   hbUnsaved: 'Unsaved changes',
   hbNoChanges: 'No changes',
+  hbSpeedShort: 'Spd.',
   error: 'Error',
   hbFeatPreview: 'How the player sees it',
   hbFeatNoDescription:

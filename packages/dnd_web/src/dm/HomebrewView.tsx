@@ -35,6 +35,16 @@ interface Own {
   subtitle: string;
 }
 
+/** Una criatura propia con lo que dice su tarjeta: son datos del perfil (JSON
+ *  del catálogo), no un cálculo. */
+interface OwnCreature extends Own {
+  crText: string | null;
+  ac: string;
+  hp: string;
+  /** Solo el primer modo de movimiento: «10 pies, volar 60 pies» → «10 pies». */
+  speed: string;
+}
+
 /**
  * El Homebrew de la cuenta (`homebrew_screen.dart`): lo propio de cada
  * categoría, con la misma lista y la misma ficha del Códice (la vista es
@@ -74,9 +84,22 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
     // El motor da el orden y la línea de tipo; lo propio lo dice el catálogo.
     const mine = new Set(cat.creatures.filter((c) => c.source === 'homebrew').map((c) => c.id));
     const names = new Map(cat.creatures.map((c) => [c.id, typeof c.name === 'string' ? c.name : String(c.id)] as const));
-    const creatures: Own[] = bestiary(cat)
+    const profiles = new Map(cat.creatures.map((c) => [c.id, c] as const));
+    const shown = (v: unknown) => (v === undefined || v === null || v === '' ? '—' : String(v));
+    const creatures: OwnCreature[] = bestiary(cat)
       .filter((r) => mine.has(r.id))
-      .map((r) => ({ id: r.id, name: names.get(r.id) ?? r.id, subtitle: r.kind }));
+      .map((r) => {
+        const p = profiles.get(r.id);
+        return {
+          id: r.id,
+          name: names.get(r.id) ?? r.id,
+          subtitle: r.kind,
+          crText: r.crText,
+          ac: shown(p?.ac),
+          hp: shown(p?.hp),
+          speed: shown(String(p?.speed ?? '').split(',')[0]?.trim()),
+        };
+      });
     return { codex, creatures };
   }, [catalog.data, t, lang]);
 
@@ -310,7 +333,7 @@ function Home({
     );
   } else if (hits) {
     body = (
-      <ul aria-label={t.dmHomebrewSearch} className="card max-w-[720px] p-1.5">
+      <ul aria-label={t.dmHomebrewSearch} className="card p-1.5">
         {hits.map(({ c, label, e }) => (
           <li key={`${c}/${e.id}`}>
             <Link href={href(c, e.id)} className="flex flex-wrap items-baseline gap-x-2.5 rounded-[var(--radius-nav)] px-3 py-2 transition-colors duration-[120ms] ease-out hover:bg-plaque" data-entry={e.id}>
@@ -414,7 +437,7 @@ function CreatureList({
   catalog,
   headerWith,
 }: {
-  creatures: Own[];
+  creatures: OwnCreature[];
   catalog: Catalog;
   headerWith: (actions?: ReactNode) => ReactNode;
 }) {
@@ -462,13 +485,45 @@ function CreatureList({
           }
         />
       ) : (
-        <ul aria-label={t.dmHomebrewCreatures} className="card max-w-[720px] p-1.5">
+        <ul aria-label={t.dmHomebrewCreatures} className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr))]">
           {creatures.map((c) => (
-            <li key={c.id}>
-              <Link href={dmBestiaryHref(c.id)} className="block rounded-[var(--radius-nav)] px-3 py-2 transition-colors duration-[120ms] ease-out hover:bg-plaque" data-entry={c.id}>
-                <span className="block text-[14px] text-on-surface">{c.name}</span>
-                <span className="mt-0.5 block truncate text-[12px] text-text-muted">{c.subtitle}</span>
-              </Link>
+            // El enlace del nombre se estira sobre toda la tarjeta (`after`): el
+            // foco rodea la tarjeta entera, no solo el texto.
+            <li
+              key={c.id}
+              className="card relative flex min-w-0 flex-col gap-2.5 px-4 py-3.5 transition-colors duration-[120ms] hover:border-gold has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-gold"
+            >
+              <div className="flex items-start justify-between gap-2.5">
+                <h2 className="font-display min-w-0 text-[18px] leading-tight break-words text-on-surface">
+                  <Link
+                    href={dmBestiaryHref(c.id)}
+                    className="outline-none after:absolute after:inset-0 after:rounded-[var(--radius-card)] after:content-['']"
+                    data-entry={c.id}
+                  >
+                    {c.name}
+                  </Link>
+                </h2>
+                {c.crText && (
+                  <span className="inline-flex h-[22px] shrink-0 items-center rounded-[var(--radius-pill)] bg-gold-soft px-[9px] text-[11.5px] text-gold">
+                    {t.bestiaryCr(c.crText)}
+                  </span>
+                )}
+              </div>
+              <p className="-mt-1 text-[12.5px] text-on-surface-variant">{c.subtitle}</p>
+              <dl className="grid grid-cols-3 gap-1.5">
+                {(
+                  [
+                    [t.creatureAc, c.ac],
+                    [t.creatureHp, c.hp],
+                    [t.hbSpeedShort, c.speed],
+                  ] as const
+                ).map(([label, value]) => (
+                  <div key={label} className="min-w-0 rounded-[var(--radius-nav)] bg-plaque px-1 py-1.5 text-center">
+                    <dt className="text-[9.5px] tracking-[1.1px] text-text-muted uppercase">{label}</dt>
+                    <dd className="mt-0.5 font-bold tabular-nums">{value}</dd>
+                  </div>
+                ))}
+              </dl>
             </li>
           ))}
         </ul>
