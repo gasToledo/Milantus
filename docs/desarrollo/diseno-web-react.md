@@ -21,6 +21,9 @@ el código.
   (`localStorage`, clave `milantus.v2.theme`) antes que lo de la cuenta
   (`themeMode` de `/api/settings`). Un script en `index.html` lo aplica antes
   del primer cuadro para que no destelle.
+- `data-theme-preview="dark" | "light"` redeclara esos mismos tokens en un
+  elemento suelto, sea cual sea el tema activo: sirve para dibujar una vista
+  previa de un tema (Ajustes) con las utilidades de siempre y sin hex.
 - El breakpoint de marco es `shell:` (900 px). Todo lo demás se resuelve con
   grillas que se adaptan solas (`auto-fill`, `minmax`), no con más breakpoints.
 - La única sombra es el hover de la tarjeta de personaje (`.roster-card`: la del dashboard y la de la Mesa del Modo DM).
@@ -40,7 +43,7 @@ Radix directo salvo para algo que esos envoltorios no cubran.
 | `DropdownMenu*` | Menú de opciones (el selector de tema) | `RadioItem` con tilde dorado para opciones excluyentes |
 | `Popover*` | Contenido flotante que se lee y se cierra | Topeado al ancho de la ventana |
 | `Select` | Selección única con rótulo visible | El rótulo no desaparece al elegir; `className` sobre el botón (un formulario lo estira con `w-full justify-between`); `labelAbove` no lo repite adentro (lo pone quien lo usa arriba, el `aria-label` queda) |
-| `Switch` | Encendido/apagado con rótulo | El pulgar se mueve: el estado no depende solo del color |
+| `Switch` | Encendido/apagado con rótulo | El pulgar se mueve: el estado no depende solo del color. `labelledBy` (el id de un rótulo que ya dibuja quien lo usa, como una fila de Ajustes) evita repetir su `<label>` y lo nombra por `aria-labelledby` |
 | `ScrollArea` | Zona con scroll propio y barra fina (las nativas toman el mismo tema desde `index.css`: `scrollbar-color` con el filete) | La usa el panel lateral; un texto que crece hasta un tope lo lleva en `viewportClassName`, con `label` para que se enfoque con el teclado y `type="auto"` para que la barra avise que hay más (el trasfondo) |
 | `Toast` / `ToastViewport` | Avisos (`showAppMessage`) | Ícono, color y texto; error 6 s, el resto 3 s. **Siempre lleva X** (`closeNotice`): se cierra sola, pero también se descarta. `action` es el «Deshacer» (`onUndo`) y alarga a 6 s. `duration` gana sobre ese cálculo. **Una sola columna, en `Enabled`**: ninguna pantalla monta su `ToastProvider` ni su viewport (dos fijos en la misma esquina se pisan); solo dibuja su `<Toast>` |
 | `LinkTabs` / `TabPanel` | Pestañas **que son URLs** | Flechas para moverse, Enter para abrir; cada pestaña es un enlace real |
@@ -305,11 +308,16 @@ La pantalla de referencia de cómo se arma una vista con la biblioteca:
 
 ## Ajustes (`src/settings/`)
 
-Dos `Card` en una grilla que se adapta sola (`auto-fit`). «En este navegador»
-usa `Select` para el tema local y el idioma. «En tu cuenta» usa `Select` para
-el modo de inicio y el tema, y `Switch` para la dificultad del encuentro.
-Cada cambio de cuenta muestra el estado del guardado. El orden y el favorito
-se muestran en una lista de definición (`dl`) y se editan en Mis personajes.
+Seis `Card` por tema, en dos columnas desde 880 px de ancho del contenedor
+(Apariencia, Idioma e inicio | Modo DM, Tu lista, Ayuda, Versión anterior) y
+apiladas debajo. Cada fila (`SettingRow`, local) lleva una etiqueta de si se
+guarda en la cuenta o en este navegador, y se acomoda al ancho de su tarjeta
+(`@container`). El tema de la cuenta se elige con tarjetas que lo muestran
+(`ThemeTiles`, radios reales con una vista previa por `data-theme-preview`); el
+idioma y el modo de inicio, con `SegmentedRadios`; el tema del navegador, con
+`Select`; los interruptores, con `Switch labelledBy`. El aviso de guardado va en
+el encabezado. El orden y el favorito se muestran en una lista de definición
+(`dl`) y se editan en Mis personajes.
 
 ### Compartir, avisos y turno
 

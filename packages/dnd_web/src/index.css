@@ -8,8 +8,14 @@
    Ningún componente lleva un hex: todo color sale de acá, como variable o
    como utilidad de Tailwind (`bg-surface`, `text-gold`). La única excepción
    es el acento de clase, que es un dato del catálogo y no del diseño
-   (`diseno-web.md` §3.3). */
-:root {
+   (`diseno-web.md` §3.3).
+
+   `[data-theme-preview]` redeclara los mismos tokens en un elemento suelto:
+   las vistas previas de Ajustes muestran el tema oscuro y el claro a la vez,
+   sin hex y sin importar cuál esté activo (las utilidades son `inline`, así
+   que siguen a las variables del elemento más cercano). */
+:root,
+[data-theme-preview='dark'] {
   --scaffold: #151210;
   --surface: #1e1915;
   --on-surface: #efe7da;
@@ -54,7 +60,8 @@
   color-scheme: dark;
 }
 
-:root[data-theme='light'] {
+:root[data-theme='light'],
+[data-theme-preview='light'] {
   --scaffold: #f3ecdd;
   --surface: #fbf7ec;
   --on-surface: #2a2118;

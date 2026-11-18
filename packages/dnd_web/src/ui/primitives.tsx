@@ -204,17 +204,22 @@ export function Switch({
   checked,
   onCheckedChange,
   disabled = false,
+  labelledBy,
 }: {
   id: string;
   label: string;
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
   disabled?: boolean;
+  /** El id de un rótulo que ya dibuja quien lo usa (una fila de Ajustes):
+   *  el interruptor no repite su `<label>` y lo nombra por `aria-labelledby`. */
+  labelledBy?: string;
 }) {
   return (
     <span className={`inline-flex items-center gap-2.5 ${disabled ? 'opacity-60' : ''}`}>
       <SwitchPrimitive.Root
         id={id}
+        aria-labelledby={labelledBy}
         checked={checked}
         onCheckedChange={onCheckedChange}
         disabled={disabled}
@@ -222,9 +227,11 @@ export function Switch({
       >
         <SwitchPrimitive.Thumb className="block h-[18px] w-[18px] translate-x-[2px] rounded-full bg-text-muted transition-transform data-[state=checked]:translate-x-[22px] data-[state=checked]:bg-gold" />
       </SwitchPrimitive.Root>
-      <label htmlFor={id} className="text-[14px] text-on-surface">
-        {label}
-      </label>
+      {!labelledBy && (
+        <label htmlFor={id} className="text-[14px] text-on-surface">
+          {label}
+        </label>
+      )}
     </span>
   );
 }

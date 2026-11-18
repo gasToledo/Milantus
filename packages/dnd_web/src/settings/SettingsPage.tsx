@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Globe, Palette } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Check, CircleHelp, Globe, History, Palette, Sword, Users, type LucideIcon } from 'lucide-react';
+import { useEffect, useState, type ReactNode } from 'react';
 import type { RosterSettings } from '../api/client';
 import { queryKeys, useRoster, useRosterSettings } from '../api/queries';
 import { patchSettings } from '../api/settingsSave';
@@ -9,8 +9,8 @@ import { storeLang, type Lang } from '../i18n/texts';
 import { parseSortMode } from '../dashboard/roster';
 import { isThemeMode, useSystemLight, useTheme, type ThemeMode } from '../theme/theme';
 import { Card } from '../ui/Card';
-import { SectionRule } from '../ui/data';
 import { Button } from '../ui/Button';
+import { cx } from '../ui/cx';
 import { Select, Switch } from '../ui/primitives';
 import { AppBusyLabel, AppErrorView } from '../ui/status';
 import { resetTutorials } from '../ui/tutorials';
@@ -20,137 +20,26 @@ const LEGACY_COOKIE = 'milantus_v1';
 
 const THEME_MODES = ['dark', 'light', 'system'] as const;
 
-/** Los tres modos; «Sistema» dice qué tema da ahora, para elegirlo sabiendo
- *  qué va a quedar. */
+/** Los tres modos para el `Select` del navegador; «Sistema» dice qué tema da
+ *  ahora, para elegirlo sabiendo qué va a quedar. */
 function useThemeOptions() {
   const t = useTexts();
   const light = useSystemLight();
   return THEME_MODES.map((m: ThemeMode) => ({ value: m, label: m === 'system' ? t.themeSystemNow(light) : t.themeModes[m] }));
 }
 
-export function SettingsPage() {
-  const t = useTexts();
-  const settings = useRosterSettings();
-  return (
-    <div className="flex flex-col gap-5">
-      <header>
-        <h1 data-page-title tabIndex={-1} className="font-display text-[30px] leading-tight text-on-surface outline-none">{t.settings}</h1>
-      </header>
-      <SectionRule className="my-0" />
-      <div className="grid items-start gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr))]">
-        <BrowserCard />
-        {settings.isError ? (
-          <AppErrorView title={t.settingsLoadError} message={t.errorBody} onRetry={() => settings.refetch()} />
-        ) : settings.data ? (
-          <AccountCard settings={settings.data} />
-        ) : (
-          <AppBusyLabel label={t.settingsLoading} />
-        )}
-      </div>
-    </div>
-  );
-}
+type AccountPatch = Pick<Partial<RosterSettings>, 'startsInDmMode' | 'themeMode' | 'showEncounterDifficulty'>;
 
-function BrowserCard() {
-  const t = useTexts();
-  const lang = useLang();
-  const { browserMode, setMode } = useTheme();
-  const themeOptions = useThemeOptions();
-  const [reset, setReset] = useState(false);
-  const animationsOff = useAnimationsOff();
-  // Con el sistema pidiendo menos movimiento ya están apagadas: el interruptor
-  // lo muestra y no se puede prender desde acá.
-  const systemOff = systemReducesMotion();
-  const [legacy, setLegacy] = useState(() => document.cookie.split(';').some((c) => c.trim() === `${LEGACY_COOKIE}=1`));
-  return (
-    <Card id="settings-browser" title={t.settingsBrowserTitle} icon={Palette}>
-      <div className="flex flex-col items-start gap-3">
-        <Select
-          label={t.themeLabel}
-          value={browserMode ?? 'account'}
-          onValueChange={(v) => setMode(isThemeMode(v) ? v : null)}
-          options={[
-            { value: 'account', label: t.settingsUseAccountTheme },
-            ...themeOptions,
-          ]}
-        />
-        <Select
-          label={t.settingsLanguage}
-          value={lang}
-          onValueChange={(next) => {
-            // El idioma se resuelve una sola vez al cargar (también el del
-            // motor): cambiarlo es guardarlo y recargar.
-            if (next !== lang && storeLang(next as Lang)) window.location.reload();
-          }}
-          options={(['es', 'en'] as const).map((l) => ({ value: l, label: t.languageNames[l] }))}
-        />
-        {/* Las animaciones, de este navegador como el tema: apagarlas deja
-            cada cambio de golpe, como con «reducir movimiento» del sistema. */}
-        <div className="flex flex-col gap-1">
-          <Switch
-            id="settings-animations"
-            label={t.settingsAnimations}
-            checked={!animationsOff && !systemOff}
-            disabled={systemOff}
-            onCheckedChange={(on) => setAnimationsOff(!on)}
-          />
-          {systemOff && <p className="text-[12.5px] text-text-muted">{t.settingsAnimationsSystem}</p>}
-        </div>
-        {/* Lo visto es de este navegador, como el tema y el idioma. */}
-        <div className="mt-1 flex w-full flex-wrap items-center justify-between gap-3 border-t border-hairline pt-3" data-field="tutorials">
-          <span className="text-[14px] text-on-surface">{t.settingsTutorials}</span>
-          <Button
-            tone="secondary"
-            onClick={() => {
-              resetTutorials();
-              setReset(true);
-            }}
-          >
-            {t.settingsTutorialsReset}
-          </Button>
-        </div>
-        {/* Siempre montado: un `role` que aparece junto con su texto no siempre
-            se anuncia. */}
-        <p role="status" className="text-[13px] text-verdant empty:hidden">
-          {reset && <span className="step-in inline-block">{t.settingsTutorialsResetDone}</span>}
-        </p>
-        {/* La cookie la lee el servidor al servir `/`: por eso no es localStorage. */}
-        <Switch
-          id="settings-legacy-version"
-          label={t.settingsLegacyVersion}
-          checked={legacy}
-          onCheckedChange={(on) => {
-            document.cookie = on
-              ? `${LEGACY_COOKIE}=1; Path=/; SameSite=Lax; Max-Age=31536000`
-              : `${LEGACY_COOKIE}=; Path=/; SameSite=Lax; Max-Age=0`;
-            setLegacy(on);
-          }}
-        />
-        {legacy && (
-          <div role="status" className="step-in flex flex-col gap-2.5" data-field="legacy-version">
-            <p className="text-[13px] leading-normal text-text-muted">{t.settingsLegacyNotice}</p>
-            <div>
-              <Button tone="secondary" onClick={() => window.location.assign('/')}>
-                {t.settingsLegacyGo}
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
-    </Card>
-  );
-}
-
-function AccountCard({ settings }: { settings: RosterSettings }) {
-  const t = useTexts();
+/** El guardado de la cuenta, uno solo para toda la página: el aviso vive en el
+ *  encabezado y las filas que escriben están repartidas en varias tarjetas. */
+function useAccountSave() {
   const client = useQueryClient();
-  const themeOptions = useThemeOptions();
   // Lo elegido se ve al instante y se guarda después; si falla, vuelve lo que
   // había. Antes el `fieldset` se deshabilitaba mientras guardaba y el control
   // tocado perdía el foco. Solo se revierten las claves de este cambio: otro
   // guardado que llegó en el medio no se pisa.
   const save = useMutation({
-    mutationFn: (patch: Pick<Partial<RosterSettings>, 'startsInDmMode' | 'themeMode' | 'showEncounterDifficulty'>) => patchSettings(patch),
+    mutationFn: (patch: AccountPatch) => patchSettings(patch),
     onMutate: async (patch) => {
       await client.cancelQueries({ queryKey: queryKeys.rosterSettings });
       const before = client.getQueryData<RosterSettings>(queryKeys.rosterSettings);
@@ -168,6 +57,351 @@ function AccountCard({ settings }: { settings: RosterSettings }) {
     const timer = window.setTimeout(reset, 3000);
     return () => window.clearTimeout(timer);
   }, [isSuccess, submittedAt, reset]);
+  return save;
+}
+
+type AccountSave = ReturnType<typeof useAccountSave>;
+
+const SAVE_PILL =
+  'step-in inline-flex h-[26px] items-center gap-1.5 rounded-[var(--radius-pill)] border border-hairline bg-plaque px-[11px] text-[12.5px]';
+
+export function SettingsPage() {
+  const t = useTexts();
+  const settings = useRosterSettings();
+  const save = useAccountSave();
+  // Lo que depende de la cuenta se resuelve acá: con los ajustes caídos o
+  // cargando, el aviso ocupa el lugar de esas tarjetas. Ayuda y Versión
+  // anterior no la esperan.
+  const withAccount = (render: (s: RosterSettings) => ReactNode) =>
+    settings.isError ? (
+      <AppErrorView title={t.settingsLoadError} message={t.errorBody} onRetry={() => settings.refetch()} />
+    ) : settings.data ? (
+      render(settings.data)
+    ) : (
+      <AppBusyLabel label={t.settingsLoading} />
+    );
+  return (
+    <div className="flex flex-col gap-4">
+      <header className="flex min-h-11 items-center justify-between gap-4">
+        <h1 data-page-title tabIndex={-1} className="font-display text-[30px] leading-tight text-on-surface outline-none">{t.settings}</h1>
+        {/* Lugar reservado de 26 px: el aviso no mueve nada. Las dos regiones
+            están siempre montadas para que se anuncien. */}
+        <div className="flex min-h-[26px] shrink-0 items-center">
+          <p role="status">
+            {save.isPending && <span className={cx(SAVE_PILL, 'text-text-muted')}>{t.settingsSaving}</span>}
+            {save.isSuccess && (
+              <span className={cx(SAVE_PILL, 'text-verdant')}>
+                <Check size={13} strokeWidth={3} aria-hidden="true" />
+                {t.settingsSavedAccount}
+              </span>
+            )}
+          </p>
+          <p role="alert">{save.isError && <span className={cx(SAVE_PILL, 'text-crimson')}>{t.settingsSaveError}</span>}</p>
+        </div>
+      </header>
+      <div className="@container">
+        <div className="grid items-start gap-4 @[880px]:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+          <div className="flex min-w-0 flex-col gap-4">
+            {withAccount((s) => (
+              <>
+                <LookCard settings={s} save={save} />
+                <StartCard settings={s} save={save} />
+              </>
+            ))}
+          </div>
+          <div className="flex min-w-0 flex-col gap-4">
+            {withAccount((s) => (
+              <>
+                <DmCard settings={s} save={save} />
+                <ListCard settings={s} />
+              </>
+            ))}
+            <HelpCard />
+            <LegacyCard />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Piezas locales ─────────────────────────────────────────────────────────
+
+type Scope = 'account' | 'browser';
+type Layout = 'inline' | 'wide' | 'stack';
+
+// Cada tarjeta es un `@container`: la fila se acomoda al ancho de su tarjeta
+// (que depende del panel y de las columnas), no al de la ventana.
+const ROW_LAYOUT: Record<Layout, string> = {
+  inline: 'flex items-center justify-between gap-4',
+  wide: 'flex flex-col gap-2.5 @[420px]:flex-row @[420px]:items-center @[420px]:justify-between @[420px]:gap-4',
+  stack: 'flex flex-col gap-3',
+};
+const CONTROL_LAYOUT: Record<Layout, string> = {
+  inline: 'shrink-0',
+  wide: 'w-full @[420px]:w-auto @[420px]:shrink-0',
+  stack: 'w-full',
+};
+
+/** Una fila de ajustes: el rótulo, la etiqueta de dónde se guarda y el control.
+ *  [note] va debajo, dentro de la misma fila. */
+function SettingRow({
+  label,
+  labelId,
+  scope,
+  layout,
+  dataField,
+  note,
+  children,
+}: {
+  label: string;
+  labelId: string;
+  scope: Scope;
+  layout: Layout;
+  dataField?: string;
+  note?: ReactNode;
+  children: ReactNode;
+}) {
+  const t = useTexts();
+  return (
+    <div className="border-t border-hairline py-3.5" data-field={dataField}>
+      <div className={ROW_LAYOUT[layout]}>
+        <div className="flex min-w-0 flex-col items-start gap-1 @[420px]:flex-row @[420px]:items-center @[420px]:gap-2">
+          <span id={labelId} className="text-[14px] text-on-surface">{label}</span>
+          <span className="inline-flex h-5 shrink-0 items-center rounded-[var(--radius-pill)] border border-hairline bg-plaque px-2 text-[11px] text-text-muted">
+            {scope === 'account' ? t.settingsScopeAccount : t.settingsScopeBrowser}
+          </span>
+        </div>
+        <div className={CONTROL_LAYOUT[layout]}>{children}</div>
+      </div>
+      {note}
+    </div>
+  );
+}
+
+/** La tarjeta de una sección: `Card` con su ícono y `@container` para sus filas. */
+function Section({ id, title, icon, children }: { id: string; title: string; icon: LucideIcon; children: ReactNode }) {
+  return (
+    <Card id={id} title={title} icon={icon} className="@container">
+      {children}
+    </Card>
+  );
+}
+
+const FOCUS_RING = 'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-gold';
+
+/** Un tema dibujado en miniatura: fondo, barra, placa y rombo. Los colores
+ *  salen de las utilidades de siempre; `data-theme-preview` (`index.css`) les
+ *  cambia el tema solo a este elemento. */
+function ThemeMini({ theme, className }: { theme: 'dark' | 'light'; className?: string }) {
+  return (
+    <span data-theme-preview={theme} className={cx('absolute inset-0 bg-scaffold', className)}>
+      <span className="absolute top-2.5 right-2.5 left-2.5 h-[18px] rounded-[var(--radius-mark)] border border-hairline bg-surface" />
+      <span className="absolute top-[34px] left-2.5 h-[18px] w-[42%] rounded-[var(--radius-mark)] border border-hairline bg-plaque" />
+      <span className="absolute top-[38px] right-3 h-2.5 w-2.5 rotate-45 rounded-[2px] bg-gold" />
+    </span>
+  );
+}
+
+/** El círculo de radio de `Option` (`ui/wizard.tsx`). */
+function RadioDot({ on }: { on: boolean }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={cx('flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border-[1.5px]', on ? 'border-gold' : 'border-text-muted')}
+    >
+      {on && <span className="h-2 w-2 rounded-full bg-gold" />}
+    </span>
+  );
+}
+
+/** El tema de la cuenta, a elegir mirándolo. Cada opción es un radio de
+ *  verdad (flechas y foco gratis) con la tarjeta como su rótulo. */
+function ThemeTiles({ value, onChange, labelledBy }: { value: ThemeMode; onChange: (m: ThemeMode) => void; labelledBy: string }) {
+  const t = useTexts();
+  const light = useSystemLight();
+  return (
+    <div role="radiogroup" aria-labelledby={labelledBy} className="grid grid-cols-3 gap-2.5">
+      {THEME_MODES.map((m) => {
+        const on = value === m;
+        return (
+          <label
+            key={m}
+            className={cx(
+              'pick relative flex min-w-0 flex-col gap-2 rounded-[var(--radius-card)] border p-2',
+              FOCUS_RING,
+              // Con `!` para que el oro de lo elegido gane también al hover de `.pick`.
+              on ? 'border-gold! bg-gold-soft!' : 'border-hairline bg-plaque',
+            )}
+          >
+            <input type="radio" name="account-theme" value={m} checked={on} onChange={() => onChange(m)} className="sr-only" />
+            <span aria-hidden="true" className="relative block h-16 overflow-hidden rounded-[var(--radius-nav)] border border-hairline">
+              {m === 'system' ? (
+                // Dos mitades, cada una con su tema, partidas en diagonal.
+                <>
+                  <ThemeMini theme="dark" className="[clip-path:polygon(0_0,100%_0,0_100%)]" />
+                  <ThemeMini theme="light" className="[clip-path:polygon(100%_0,100%_100%,0_100%)]" />
+                </>
+              ) : (
+                <ThemeMini theme={m} />
+              )}
+            </span>
+            <span className="flex items-center justify-between gap-1.5 px-0.5 pb-0.5 text-[13px] text-on-surface">
+              <span className="min-w-0">
+                {t.themeModes[m]}
+                {m === 'system' && <span className="ml-1 text-text-muted">{t.themeSystemNowShort(light)}</span>}
+              </span>
+              <RadioDot on={on} />
+            </span>
+          </label>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Pocas opciones en una pastilla: radios de verdad, así las flechas del
+ *  teclado andan solas. Angosto ocupa todo el ancho con las opciones repartidas. */
+function SegmentedRadios<T extends string>({
+  name,
+  value,
+  options,
+  onChange,
+  labelledBy,
+}: {
+  name: string;
+  value: T;
+  options: { value: T; label: string }[];
+  onChange: (value: T) => void;
+  labelledBy: string;
+}) {
+  return (
+    <div
+      role="radiogroup"
+      aria-labelledby={labelledBy}
+      className="flex w-full gap-1 rounded-[var(--radius-pill)] border border-hairline bg-plaque p-[3px] @[420px]:inline-flex @[420px]:w-auto"
+    >
+      {options.map((o) => {
+        const on = o.value === value;
+        return (
+          <label
+            key={o.value}
+            className={cx(
+              'relative flex min-h-[38px] flex-1 cursor-pointer items-center justify-center rounded-[var(--radius-pill)] px-3.5 text-[13px] transition-colors @[420px]:min-h-8 @[420px]:flex-none',
+              FOCUS_RING,
+              on ? 'bg-gold-soft font-medium text-gold' : 'text-on-surface-variant hover:text-on-surface',
+            )}
+          >
+            <input type="radio" name={name} value={o.value} checked={on} onChange={() => onChange(o.value)} className="sr-only" />
+            {o.label}
+          </label>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Las seis tarjetas ──────────────────────────────────────────────────────
+
+function LookCard({ settings, save }: { settings: RosterSettings; save: AccountSave }) {
+  const t = useTexts();
+  const { browserMode, setMode } = useTheme();
+  const themeOptions = useThemeOptions();
+  const animationsOff = useAnimationsOff();
+  // Con el sistema pidiendo menos movimiento ya están apagadas: el interruptor
+  // lo muestra y no se puede prender desde acá.
+  const systemOff = systemReducesMotion();
+  return (
+    <Section id="settings-look" title={t.settingsSectionLook} icon={Palette}>
+      <SettingRow label={t.themeLabel} labelId="settings-account-theme-label" scope="account" layout="stack">
+        <ThemeTiles
+          value={isThemeMode(settings.themeMode) ? settings.themeMode : 'dark'}
+          onChange={(themeMode) => save.mutate({ themeMode })}
+          labelledBy="settings-account-theme-label"
+        />
+      </SettingRow>
+      <SettingRow label={t.settingsBrowserTheme} labelId="settings-browser-theme-label" scope="browser" layout="wide">
+        <Select
+          label={t.settingsBrowserTheme}
+          labelAbove
+          className="w-full justify-between @[420px]:w-auto @[420px]:min-w-[220px]"
+          value={browserMode ?? 'account'}
+          onValueChange={(v) => setMode(isThemeMode(v) ? v : null)}
+          options={[{ value: 'account', label: t.settingsUseAccountTheme }, ...themeOptions]}
+        />
+      </SettingRow>
+      {/* Las animaciones, de este navegador como el tema: apagarlas deja cada
+          cambio de golpe, como con «reducir movimiento» del sistema. */}
+      <SettingRow
+        label={t.settingsAnimations}
+        labelId="settings-animations-label"
+        scope="browser"
+        layout="inline"
+        note={systemOff && <p className="mt-2 text-[12.5px] text-text-muted">{t.settingsAnimationsSystem}</p>}
+      >
+        <Switch
+          id="settings-animations"
+          label={t.settingsAnimations}
+          labelledBy="settings-animations-label"
+          checked={!animationsOff && !systemOff}
+          disabled={systemOff}
+          onCheckedChange={(on) => setAnimationsOff(!on)}
+        />
+      </SettingRow>
+    </Section>
+  );
+}
+
+function StartCard({ settings, save }: { settings: RosterSettings; save: AccountSave }) {
+  const t = useTexts();
+  const lang = useLang();
+  return (
+    <Section id="settings-start" title={t.settingsSectionStart} icon={Globe}>
+      <SettingRow label={t.settingsLanguage} labelId="settings-language-label" scope="browser" layout="wide">
+        <SegmentedRadios
+          name="language"
+          labelledBy="settings-language-label"
+          value={lang}
+          options={(['es', 'en'] as const).map((l) => ({ value: l, label: t.languageNames[l] }))}
+          onChange={(next) => {
+            // El idioma se resuelve una sola vez al cargar (también el del
+            // motor): cambiarlo es guardarlo y recargar.
+            if (next !== lang && storeLang(next as Lang)) window.location.reload();
+          }}
+        />
+      </SettingRow>
+      <SettingRow label={t.settingsStartMode} labelId="settings-start-mode-label" scope="account" layout="wide">
+        <SegmentedRadios
+          name="start-mode"
+          labelledBy="settings-start-mode-label"
+          value={settings.startsInDmMode ? 'dm' : 'player'}
+          options={(['player', 'dm'] as const).map((m) => ({ value: m, label: t.settingsStartModes[m] }))}
+          onChange={(m) => save.mutate({ startsInDmMode: m === 'dm' })}
+        />
+      </SettingRow>
+    </Section>
+  );
+}
+
+function DmCard({ settings, save }: { settings: RosterSettings; save: AccountSave }) {
+  const t = useTexts();
+  return (
+    <Section id="settings-dm" title={t.settingsSectionDm} icon={Sword}>
+      <SettingRow label={t.settingsShowEncounterDifficulty} labelId="settings-encounter-difficulty-label" scope="account" layout="inline">
+        <Switch
+          id="settings-encounter-difficulty"
+          label={t.settingsShowEncounterDifficulty}
+          labelledBy="settings-encounter-difficulty-label"
+          checked={settings.showEncounterDifficulty}
+          onCheckedChange={(showEncounterDifficulty) => save.mutate({ showEncounterDifficulty })}
+        />
+      </SettingRow>
+    </Section>
+  );
+}
+
+function ListCard({ settings }: { settings: RosterSettings }) {
+  const t = useTexts();
   // El favorito se guarda por id: para nombrarlo hace falta la lista. Si
   // todavía no llegó (o falla), la fila dice «Ninguno» antes que un id crudo.
   const roster = useRoster();
@@ -178,48 +412,89 @@ function AccountCard({ settings }: { settings: RosterSettings }) {
     ['favorite', t.favorite, favorite ?? t.settingsNoFavorite],
   ];
   return (
-    <Card id="settings-account" title={t.settingsAccountTitle} icon={Globe}>
-      <fieldset className="flex min-w-0 flex-col items-start gap-3">
-        <Select
-          label={t.settingsStartMode}
-          value={settings.startsInDmMode ? 'dm' : 'player'}
-          onValueChange={(value) => save.mutate({ startsInDmMode: value === 'dm' })}
-          options={(['player', 'dm'] as const).map((m) => ({ value: m, label: t.settingsStartModes[m] }))}
-        />
-        <Select
-          label={t.settingsAccountTheme}
-          value={isThemeMode(settings.themeMode) ? settings.themeMode : 'dark'}
-          onValueChange={(themeMode) => save.mutate({ themeMode })}
-          options={themeOptions}
-        />
-        <Switch
-          id="settings-encounter-difficulty"
-          label={t.settingsShowEncounterDifficulty}
-          checked={settings.showEncounterDifficulty}
-          onCheckedChange={(showEncounterDifficulty) => save.mutate({ showEncounterDifficulty })}
-        />
-      </fieldset>
-      {/* Una línea con su lugar reservado: el aviso no empuja lo de abajo. Las
-          dos regiones están siempre montadas para que se anuncien. */}
-      <div className="mt-2 min-h-5 text-[13px]">
-        <p role="status">
-          {save.isPending && <span className="step-in inline-block text-text-muted">{t.settingsSaving}</span>}
-          {save.isSuccess && <span className="step-in inline-block text-verdant">{t.settingsSaved}</span>}
-        </p>
-        <p role="alert">{save.isError && <span className="step-in inline-block text-crimson">{t.settingsSaveError}</span>}</p>
-      </div>
-      <dl className="mt-3 flex flex-col">
+    <Section id="settings-list" title={t.settingsSectionRoster} icon={Users}>
+      {/* Solo se muestran: se editan en Mis personajes, así que sin etiqueta de alcance. */}
+      <dl>
         {rows.map(([field, label, value]) => (
-          <div
-            key={field}
-            data-field={field}
-            className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-t border-hairline py-2.5 first:border-t-0 first:pt-0"
-          >
-            <dt className="text-[14px] text-on-surface-variant">{label}</dt>
-            <dd className="min-w-0 text-[14px] break-words text-on-surface">{value}</dd>
+          <div key={field} data-field={field} className="flex items-center justify-between gap-4 border-t border-hairline py-3.5">
+            <dt className="text-[14px] text-on-surface">{label}</dt>
+            <dd className="min-w-0 text-[14px] break-words text-on-surface-variant">{value}</dd>
           </div>
         ))}
       </dl>
-    </Card>
+    </Section>
+  );
+}
+
+function HelpCard() {
+  const t = useTexts();
+  const [reset, setReset] = useState(false);
+  return (
+    <Section id="settings-help" title={t.settingsSectionHelp} icon={CircleHelp}>
+      {/* Lo visto es de este navegador, como el tema y el idioma. */}
+      <SettingRow
+        label={t.settingsTutorials}
+        labelId="settings-tutorials-label"
+        scope="browser"
+        layout="inline"
+        dataField="tutorials"
+        note={
+          // Siempre montado: un `role` que aparece junto con su texto no
+          // siempre se anuncia.
+          <p role="status" className="mt-2 text-[13px] text-verdant empty:hidden">
+            {reset && <span className="step-in inline-block">{t.settingsTutorialsResetDone}</span>}
+          </p>
+        }
+      >
+        <Button
+          tone="secondary"
+          onClick={() => {
+            resetTutorials();
+            setReset(true);
+          }}
+        >
+          {t.settingsTutorialsReset}
+        </Button>
+      </SettingRow>
+    </Section>
+  );
+}
+
+function LegacyCard() {
+  const t = useTexts();
+  const [legacy, setLegacy] = useState(() => document.cookie.split(';').some((c) => c.trim() === `${LEGACY_COOKIE}=1`));
+  return (
+    <Section id="settings-legacy" title={t.settingsSectionLegacy} icon={History}>
+      <SettingRow
+        label={t.settingsLegacyVersion}
+        labelId="settings-legacy-version-label"
+        scope="browser"
+        layout="inline"
+        note={
+          legacy && (
+            <div role="status" className="step-in mt-3 flex flex-col items-start gap-2.5" data-field="legacy-version">
+              <p className="text-[13px] leading-normal text-text-muted">{t.settingsLegacyNotice}</p>
+              <Button tone="secondary" onClick={() => window.location.assign('/')}>
+                {t.settingsLegacyGo}
+              </Button>
+            </div>
+          )
+        }
+      >
+        {/* La cookie la lee el servidor al servir `/`: por eso no es localStorage. */}
+        <Switch
+          id="settings-legacy-version"
+          label={t.settingsLegacyVersion}
+          labelledBy="settings-legacy-version-label"
+          checked={legacy}
+          onCheckedChange={(on) => {
+            document.cookie = on
+              ? `${LEGACY_COOKIE}=1; Path=/; SameSite=Lax; Max-Age=31536000`
+              : `${LEGACY_COOKIE}=; Path=/; SameSite=Lax; Max-Age=0`;
+            setLegacy(on);
+          }}
+        />
+      </SettingRow>
+    </Section>
   );
 }
