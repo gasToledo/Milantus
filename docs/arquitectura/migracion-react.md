@@ -112,11 +112,13 @@ repiten acá.
 - Sesión: `/api/me`, con los estados cargando, sin sesión, error con
   «Reintentar» y no disponible. Una cuenta sin `webV2` no pide nada más a la
   API.
-- Tema: oscuro por defecto. El selector al pie del panel cambia el tema de
-  este navegador (`localStorage`). En Ajustes se puede cambiar el tema de la
-  cuenta (`themeMode`) y quitar la preferencia local para usar el de la cuenta.
-- Idioma: español o inglés, resuelto una vez al cargar (clave `milantus.locale`
-  de `localStorage`, luego `navigator.language`, luego español). Es el mismo
+- Tema: oscuro por defecto. Es de la cuenta (`themeMode`): lo cambian Ajustes y
+  el selector al pie del panel, que lo guarda en los ajustes. La copia local
+  (`localStorage`) deja el primer cuadro bien antes de que lleguen; con la
+  cuenta sin tema guardado rige la copia.
+- Idioma: español o inglés, resuelto una vez al cargar (la copia local, clave
+  `milantus.locale`, luego `navigator.language`, luego español; la cuenta
+  guarda `language` y `AccountPrefsSync` lo copia y recarga si difiere). Es el mismo
   criterio para los rótulos del motor.
 - **El dashboard** en `/v2/personajes` (`src/dashboard/`) es la primera de las
   pantallas de lectura, y desde 5f también escribe: la lista de personajes con
@@ -200,16 +202,20 @@ repiten acá.
   descripción no muestran sus efectos: el texto de
   cada efecto (`describeEffect`) vive en Flutter (ver su `ponytail:`).
 - **Ajustes** en `/v2/ajustes` (`src/settings/`), a la que lleva «Ajustes» del
-  pie del panel. Dos tarjetas con una diferencia que importa. **En este
-  navegador**: el tema y el idioma, que son preferencias locales
-  (`localStorage`, las mismas claves que Flutter: `milantus.v2.theme` y
-  `milantus.locale`) y se cambian ahí mismo; cambiar el idioma recarga la
-  página, porque se resuelve una sola vez al cargar (también el del motor).
-  **En tu cuenta**: modo de inicio, tema y visibilidad de la dificultad del
-  encuentro, guardados con `patchSettings`. `/v2/` abre el modo elegido.
+  pie del panel. Seis tarjetas por tema y todo es **de la cuenta**: tema,
+  idioma, animaciones, tutoriales vistos, versión anterior, modo de inicio y
+  dificultad del encuentro, guardados con `patchSettings`. Cambiar el idioma
+  recarga la página (se resuelve una sola vez al cargar, también el del
+  motor) cuando el guardado termina bien. Lo local (`localStorage`: las mismas
+  claves que Flutter, `milantus.v2.theme`, `milantus.locale`,
+  `milantus.v2.motion`, `milantus.tutorials`, y la cookie `milantus_v1`) es la
+  copia que `AccountPrefsSync` deja al llegar los ajustes, para el primer
+  cuadro y para que el servidor sirva la versión anterior en `/`. Una clave que
+  la cuenta no guardó (`null`) no se escribe al cargar: rige lo local.
+  `/v2/` abre el modo elegido.
   El orden y el favorito se muestran en Ajustes y se editan en la lista de
   personajes. El proveedor se elige en Retratos. **Tutoriales**: la fila
-  «Tutoriales / Volver a verlos» de «En este navegador» borra lo visto. Los diez
+  «Tutoriales / Volver a verlos» de Ayuda vacía lo visto (`tutorialsSeen`). Los diez
   tutoriales (`src/ui/tutorials.tsx`) salen la primera vez que se entra a su
   pantalla: `welcome` en la lista de personajes, `sheet` en la ficha propia, y en
   el Modo DM uno por sección de la campaña y uno por Bestiario, Biblioteca de

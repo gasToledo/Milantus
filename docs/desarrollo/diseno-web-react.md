@@ -17,10 +17,10 @@ el código.
   un color por fuera del sistema. Los radios van como
   `rounded-[var(--radius-card)]` (12), `--radius-pill` (20) y `--radius-nav` (9).
 - El tema claro es `data-theme="light"` en `<html>`. Lo maneja
-  `src/theme/theme.tsx`: oscuro por defecto, lo elegido en el navegador
-  (`localStorage`, clave `milantus.v2.theme`) antes que lo de la cuenta
-  (`themeMode` de `/api/settings`). Un script en `index.html` lo aplica antes
-  del primer cuadro para que no destelle.
+  `src/theme/theme.tsx`: oscuro por defecto; el tema es el de la cuenta
+  (`themeMode` de `/api/settings`) y, mientras no llega o no lo guardó, la
+  copia local (`localStorage`, clave `milantus.v2.theme`). Un script en
+  `index.html` la aplica antes del primer cuadro para que no destelle.
 - `data-theme-preview="dark" | "light"` redeclara esos mismos tokens en un
   elemento suelto, sea cual sea el tema activo: sirve para dibujar una vista
   previa de un tema (Ajustes) con las utilidades de siempre y sin hex.
@@ -198,7 +198,7 @@ conjuro abre su detalle en un diálogo. Sus pasos de elecciones viven en
 | `DiaryEntries` (`src/sheet/DiaryTab.tsx`) | Columna de tarjetas a todo el ancho: título y fecha arriba; debajo, la imagen (150 px, abre el visor), el texto en Markdown y el enlace como pill con «nombre · dominio» (solo si pasa `safeUrl`). Una entrada combina texto, imagen y enlace; solo el título es obligatorio. Con `edit` (un `DiaryEditor`: `save`, `remove`, `move`, `upload`) suma «+», el lápiz de cada tarjeta, el editor, el borrado y el ícono de mover | Sin `edit` es de solo lectura (ficha ajena). No hay diálogo de lectura |
 | `useHoldDrag` (`src/ui/holdDrag.ts`) | Reordenar tomando la tarjeta entera, sin ícono: con el mouse, apretando y moviendo 6 px; con el dedo, sosteniendo 350 ms, para que deslizar siga desplazando. La tarjeta sigue al puntero, las demás se corren y la ventana se desplaza cerca de los bordes; `Escape` cancela. Da `item(id)`, `dragging`, `over` y `animated` | `canDrop(desde, hasta)` y `onMove(desde, hasta)`; `group` (la fila lleva `data-reorder-group` y el hook mide solo las de su grupo: sin él, solo las que no tienen grupo, así el panel de música no se mezcla con las tarjetas de la Mesa; lo usan también el Cuaderno y las entradas del Diario) y `axis: 'y'` (`dx` queda en 0, para una lista con scroll propio). Con «reducir movimiento» nada sigue al puntero: se atenúa y se marca. Con teclado, `Alt` más una flecha sobre la tarjeta enfocada la mueve al vecino (`canDrop` manda) y no dibuja nada |
 | `ArrangeableColumns` (`src/sheet/`) | Las tres columnas de Combate y Personaje con su modo «Acomodar tarjetas»: cada tarjeta es una barra que se mueve con `useHoldDrag` o con flechas, y el orden (`sheetLayout`, `cardLayout.ts`) se guarda en los ajustes de la cuenta | `cards` lleva solo las tarjetas presentes en esa ficha; una pestaña nueva con columnas fijas lo usa en vez de armarlas a mano |
-| `TutorialGate` (`src/ui/tutorials.tsx`) | `<TutorialGate tutorial="dmChapters" />` muestra el tutorial de esa pantalla la primera vez que se monta, sobre `AppDialog` con `bare` (medallón de 48, título, párrafo, puntos de página y «N de M»; «Saltar todos \| Saltar \| Siguiente», y en la última «Saltar todos \| Entendido»). Uno a la vez. Cerrarlo de cualquier forma lo marca visto; «Saltar todos» guarda `*`. `resetTutorials()` lo usa Ajustes | Una pantalla nueva con tutorial suma su nombre al tipo `Tutorial` **con el mismo nombre que Flutter**, sus páginas a `texts.ts` (`tutorials`) y su ícono a `ICONS`. Las pruebas de Playwright siembran `milantus.tutorials = '*'` (`playwright.config.ts`) o la bienvenida taparía todas |
+| `TutorialGate` (`src/ui/tutorials.tsx`) | `<TutorialGate tutorial="dmChapters" />` muestra el tutorial de esa pantalla la primera vez que se monta, sobre `AppDialog` con `bare` (medallón de 48, título, párrafo, puntos de página y «N de M»; «Saltar todos \| Saltar \| Siguiente», y en la última «Saltar todos \| Entendido»). Uno a la vez. Cerrarlo de cualquier forma lo marca visto y lo manda a la cuenta (`tutorialsSeen`); «Saltar todos» guarda `*`. `adoptSeen()` lo usa `AccountPrefsSync` | Una pantalla nueva con tutorial suma su nombre al tipo `Tutorial` **con el mismo nombre que Flutter**, sus páginas a `texts.ts` (`tutorials`) y su ícono a `ICONS`. Las pruebas de Playwright siembran `milantus.tutorials = '*'` (`playwright.config.ts`) o la bienvenida taparía todas |
 | `RosterCard` (`src/dashboard/`) | La tarjeta de personaje: el nombre es el enlace y se estira con `::after`; a la derecha del nivel, el menú ⋮ de 40 × 40 (favorito, renombrar, rehacer, borrar). Se mueve tomándola entera (`useHoldDrag`) | El ⋮ lleva `relative z-10` o el enlace estirado lo tapa; el favorito y la lista filtrada no se mueven |
 | `MusicSceneDialog` (`src/dm/`) | Crear o editar una escena de música sobre `AppDialog`: nombre, enlace y `Switch` «Ofrecerla al iniciar un combate». Con cada tecla, `musicSource` dice qué reconoció (tilde verde y «Video/Lista de YouTube») | Los errores aparecen al guardar y se apagan al escribir; un enlace no reconocido no se guarda. Enter en el enlace guarda; si `onSubmit` falla no se cierra y pasa a «Reintentar» |
 | `AddCombatantDialog` (`src/dm/combat/`) | «Sumar al combate» sobre `AppDialog` de 820: `Segmented` PNJ / Bestiario y dos columnas (`lg:grid-cols-[minmax(0,1fr)_300px]`; en teléfono se apilan). Elegir solo llena el panel (`.plaque`); el botón de sumar está en la barra del diálogo (`closes: false`) y queda abierto, con una línea verde `role="status"` de lo último sumado. Las dos pestañas viven siempre: cambiar no pierde lo elegido | Un PNJ de la biblioteca o «Volvió» vinculan primero; si falla no se suma y el botón pasa a «Reintentar». El bando de un PNJ no tiene valor por defecto; sin estadísticas es neutral y fijo |
@@ -310,12 +310,12 @@ La pantalla de referencia de cómo se arma una vista con la biblioteca:
 
 Seis `Card` por tema, en dos columnas desde 880 px de ancho del contenedor
 (Apariencia, Idioma e inicio | Modo DM, Tu lista, Ayuda, Versión anterior) y
-apiladas debajo. Cada fila (`SettingRow`, local) lleva una etiqueta de si se
-guarda en la cuenta o en este navegador, y se acomoda al ancho de su tarjeta
-(`@container`). El tema de la cuenta se elige con tarjetas que lo muestran
+apiladas debajo. Todo es de la cuenta: cada fila (`SettingRow`, local) se
+acomoda al ancho de su tarjeta (`@container`) y guarda con `useAccountSave`, la
+misma mutación optimista que usa el selector de tema del panel; los cambios
+llegan a este navegador por `AccountPrefsSync`. El tema de la cuenta se elige con tarjetas que lo muestran
 (`ThemeTiles`, radios reales con una vista previa por `data-theme-preview`); el
-idioma y el modo de inicio, con `SegmentedRadios`; el tema del navegador, con
-`Select`; los interruptores, con `Switch labelledBy`. El aviso de guardado va en
+idioma y el modo de inicio, con `SegmentedRadios`; los interruptores, con `Switch labelledBy`. El aviso de guardado va en
 el encabezado. El orden y el favorito se muestran en una lista de definición
 (`dl`) y se editan en Mis personajes.
 

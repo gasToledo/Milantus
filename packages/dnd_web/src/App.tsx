@@ -19,7 +19,8 @@ import { BestiaryPage } from './bestiary/BestiaryPage';
 import { CampaignsPage } from './campaigns/CampaignsPage';
 import { CharacterPage } from './sheet/CharacterPage';
 import { SettingsPage } from './settings/SettingsPage';
-import { ThemeProvider, useTheme } from './theme/theme';
+import { AccountPrefsSync } from './settings/AccountPrefsSync';
+import { ThemeProvider } from './theme/theme';
 import { ButtonLink } from './ui/Button';
 import { PendingEvents } from './events/PendingEvents';
 import { AppNotices } from './ui/notices';
@@ -100,20 +101,16 @@ function Screen() {
   return <Enabled account={account.data} />;
 }
 
-/** Solo para cuentas con `webV2`: el tema de la cuenta, las rutas y la única
+/** Solo para cuentas con `webV2`: los ajustes de la cuenta, las rutas y la única
  *  columna de avisos. Los avisos viven acá y no en cada pantalla: dos
  *  viewports fijos en la misma esquina se pisarían, y los de la cola
  *  (`PendingEvents`) tienen que compartir el lugar con los de las acciones. */
 function Enabled({ account }: { account: Account }) {
-  const themeMode = useRosterSettings().data?.themeMode;
-  const { adoptAccountMode } = useTheme();
   const { pathname } = useRoute();
-  useEffect(() => {
-    if (themeMode !== undefined) adoptAccountMode(themeMode);
-  }, [themeMode, adoptAccountMode]);
 
   return (
     <ToastProvider>
+      <AccountPrefsSync />
       {/* `resetKey` y no `key`: navegar limpia el error sin volver a montar las rutas. */}
       <ErrorBoundary resetKey={pathname}>
         <Routes account={account} />

@@ -21,8 +21,8 @@ const STORAGE_KEY = 'milantus.v2.theme';
 export const isThemeMode = (v: unknown): v is ThemeMode =>
   v === 'dark' || v === 'light' || v === 'system';
 
-/** El modo que eligió este navegador, o `null`. El almacenamiento bloqueado
- *  (modo privado, sitio sin permisos) equivale a «no eligió». */
+/** La copia local del tema de la cuenta, o `null`. El almacenamiento
+ *  bloqueado (modo privado, sitio sin permisos) equivale a «no hay copia». */
 function readStored(): ThemeMode | null {
   try {
     const v = window.localStorage.getItem(STORAGE_KEY);
@@ -73,24 +73,25 @@ function apply(mode: ThemeMode, fade = false) {
 
 interface ThemeState {
   mode: ThemeMode;
-  browserMode: ThemeMode | null;
-  /** Elige el modo y lo recuerda en este navegador. */
-  setMode: (mode: ThemeMode | null) => void;
-  /** El de la cuenta (`/api/settings`), si este navegador no eligió uno. */
+  /** Aplica el modo ya y lo copia en este navegador. Guardarlo en la cuenta es
+   *  de quien lo llama (Ajustes y el menú del panel pasan por `useAccountSave`). */
+  setMode: (mode: ThemeMode) => void;
+  /** El de la cuenta (`/api/settings`): manda sobre la copia local. */
   adoptAccountMode: (mode: string) => void;
 }
 
 const ThemeContext = createContext<ThemeState | null>(null);
 
 /**
- * El tema arranca oscuro. Precedencia: lo elegido en este navegador; si no hay
- * nada, el de los ajustes de la cuenta (lo que Flutter guarda); si tampoco,
- * oscuro. La preferencia local se puede quitar desde Ajustes.
+ * El tema es el de la cuenta. Mientras no llegan los ajustes (y si la cuenta
+ * todavía no lo guardó) rige la copia local que dejó la última vez, y si
+ * tampoco hay, oscuro. La copia sirve para que el primer cuadro salga bien
+ * (`index.html` la lee antes de que cargue React).
  */
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [stored, setStored] = useState<ThemeMode | null>(readStored);
+  const [local] = useState<ThemeMode | null>(readStored);
   const [account, setAccount] = useState<ThemeMode | null>(null);
-  const mode: ThemeMode = stored ?? account ?? 'dark';
+  const mode: ThemeMode = account ?? local ?? 'dark';
 
   // Al cargar, el tema ya lo puso el script de `index.html`: el fundido es
   // solo para los cambios de después.
@@ -106,18 +107,19 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return () => query.removeEventListener('change', onChange);
   }, [mode]);
 
-  const setMode = useCallback((next: ThemeMode | null) => {
+  const setMode = useCallback((next: ThemeMode) => {
     writeStored(next);
-    setStored(next);
+    setAccount(next);
   }, []);
-  const adoptAccountMode = useCallback((value: string) => {
-    setAccount(isThemeMode(value) ? value : null);
-  }, []);
-
-  const value = useMemo(
-    () => ({ mode, browserMode: stored, setMode, adoptAccountMode }),
-    [mode, stored, setMode, adoptAccountMode],
+  // Adoptar es lo mismo que elegir: aplica y deja la copia local al día.
+  const adoptAccountMode = useCallback(
+    (value: string) => {
+      if (isThemeMode(value)) setMode(value);
+    },
+    [setMode],
   );
+
+  const value = useMemo(() => ({ mode, setMode, adoptAccountMode }), [mode, setMode, adoptAccountMode]);
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 

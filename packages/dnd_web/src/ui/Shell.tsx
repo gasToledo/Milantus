@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState, type ReactNode, type MouseEventHandler } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { ArrowLeft, ExternalLink, Menu, Monitor, Moon, Sun, X, type LucideIcon } from 'lucide-react';
+import { useAccount } from '../api/queries';
 import { useTexts } from '../i18n/context';
+import { useAccountSave } from '../settings/useAccountSave';
 import { fadeNavigate } from './fadeNavigate';
 import { Link, useRoute } from '../router';
 import { useTheme, type ThemeMode } from '../theme/theme';
@@ -356,13 +358,16 @@ let lastMode: 'player' | 'dm' | null = null;
 const THEME_ICON: Record<ThemeMode, LucideIcon> = { dark: Moon, light: Sun, system: Monitor };
 
 /**
- * El tema (oscuro, claro, sistema), recordado en este navegador. Botón de
+ * El tema (oscuro, claro, sistema), de la cuenta: con sesión se guarda en sus
+ * ajustes (la copia local la deja `setMode`); sin sesión solo se aplica. Botón de
  * ícono con su nombre accesible completo («Tema: Oscuro») y un menú de
  * opciones excluyentes.
  */
 export function ThemeMenu() {
   const t = useTexts();
   const { mode, setMode } = useTheme();
+  const account = useAccount();
+  const save = useAccountSave();
   const Icon = THEME_ICON[mode];
   const label = `${t.themeLabel}: ${t.themeModes[mode]}`;
   return (
@@ -380,7 +385,10 @@ export function ThemeMenu() {
       </Tooltip>
       <DropdownMenuContent align="start" side="top">
         <DropdownMenuLabel>{t.themeLabel}</DropdownMenuLabel>
-        <DropdownMenuRadioGroup value={mode} onValueChange={(v) => setMode(v as ThemeMode)}>
+        <DropdownMenuRadioGroup value={mode} onValueChange={(v) => {
+          setMode(v as ThemeMode);
+          if (account.data) save.mutate({ themeMode: v });
+        }}>
           {(['dark', 'light', 'system'] as const).map((m) => {
             const ItemIcon = THEME_ICON[m];
             return (

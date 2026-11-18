@@ -24,6 +24,7 @@ import {
   Users,
   type LucideIcon,
 } from 'lucide-react';
+import { patchSettings } from '../api/settingsSave';
 import { useTexts } from '../i18n/context';
 import { AppDialog } from './AppDialog';
 import { cx } from './cx';
@@ -65,8 +66,10 @@ const ICONS: Record<Tutorial, LucideIcon[]> = {
 };
 
 // --- Qué se vio -------------------------------------------------------------
-// En el navegador y no en la cuenta, como el idioma, y con la clave y el formato
-// de Flutter: los nombres separados por coma, o `*` si se eligió «Saltar todos».
+// Lo visto es de la cuenta (`tutorialsSeen` en los ajustes); acá queda la copia
+// local, para saber qué mostrar antes de que lleguen los ajustes y cuando no hay
+// sesión. Clave y formato de Flutter: los nombres separados por coma, o `*` si
+// se eligió «Saltar todos».
 const KEY = 'milantus.tutorials';
 const ALL = '*';
 
@@ -95,8 +98,19 @@ function save(change: (s: Set<string>) => void) {
 
 const isPending = (tutorial: Tutorial) => !loaded().has(ALL) && !loaded().has(tutorial);
 
-/** Lo que ofrece Ajustes: vuelven a salir todos, cada uno en su sección. */
-export const resetTutorials = () => save((s) => s.clear());
+/** Lo que llega de la cuenta reemplaza a lo visto local (también la copia). */
+export function adoptSeen(list: string[]) {
+  save((s) => {
+    s.clear();
+    list.forEach((n) => s.add(n));
+  });
+}
+
+/** Cerrar un tutorial lo manda a la cuenta, sin aviso: si falla queda local y
+ *  sale en el próximo cierre (que manda la lista entera). */
+function pushSeen() {
+  patchSettings({ tutorialsSeen: [...loaded()] }).catch(() => {});
+}
 
 /** Uno a la vez: si ya hay uno abierto, el otro espera a la próxima entrada.
  *  Guarda quién lo tiene para que soltarlo no libere el de otro. */
@@ -150,6 +164,7 @@ function TutorialDialog({ tutorial, onClose }: { tutorial: Tutorial; onClose: ()
         if (open) return;
         if (skipAll.current) save((s) => s.add(ALL));
         else save((s) => s.add(tutorial));
+        pushSeen();
         onClose();
       }}
       title={page.title}

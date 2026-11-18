@@ -144,9 +144,20 @@ export interface RosterSettings {
    *  dashboard. Solo lo escribe `/v2`: Flutter no lo conoce y el servidor
    *  combina el primer nivel de los ajustes, así que no lo pisa. */
   npcOrder: string[];
-  themeMode: string;
+  /** `null`: la cuenta todavía no lo guardó y rige la copia de este navegador. */
+  themeMode: string | null;
   /** Si la cuenta abre en el Modo DM (`AppSettings.startsInDmMode`). */
   startsInDmMode: boolean;
+  /** Idioma, animaciones y tutoriales vistos son de la cuenta, y `null` es
+   *  «todavía no los guardó»: en ese caso rige lo que tenga este navegador y
+   *  no se escribe nada al cargar. Flutter no los conoce y el servidor combina
+   *  el primer nivel, así que no los pisa. */
+  language: 'es' | 'en' | null;
+  animationsOff: boolean | null;
+  /** Los nombres de los tutoriales vistos (o `*`), como el formato local. */
+  tutorialsSeen: string[] | null;
+  /** Si `/` sirve la versión anterior (la cookie la pone `AccountPrefsSync`). */
+  legacyVersion: boolean;
   /** Si el combate que se arma muestra su dificultad y los PX (`AppSettings.showEncounterDifficulty`). */
   showEncounterDifficulty: boolean;
   /** El orden de las tarjetas de Combate y Personaje: tres columnas de ids, o
@@ -168,8 +179,12 @@ export async function fetchRosterSettings(signal: AbortSignal): Promise<RosterSe
     favoriteCharacterId: settings?.favoriteCharacterId ?? null,
     characterOrder: settings?.characterOrder ?? [],
     npcOrder: settings?.npcOrder ?? [],
-    themeMode: settings?.themeMode ?? 'dark',
+    themeMode: settings?.themeMode ?? null,
     startsInDmMode: settings?.startsInDmMode === true,
+    language: settings?.language === 'es' || settings?.language === 'en' ? settings.language : null,
+    animationsOff: typeof settings?.animationsOff === 'boolean' ? settings.animationsOff : null,
+    tutorialsSeen: Array.isArray(settings?.tutorialsSeen) ? settings.tutorialsSeen.filter((n) => typeof n === 'string') : null,
+    legacyVersion: settings?.legacyVersion === true,
     // Prendida por defecto, igual que `AppSettings` de Flutter: solo un `false`
     // explícito la apaga (una cuenta sin ajustes guardados la ve).
     showEncounterDifficulty: settings?.showEncounterDifficulty !== false,

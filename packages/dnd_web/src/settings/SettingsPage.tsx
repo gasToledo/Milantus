@@ -1,66 +1,19 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Check, CircleHelp, Globe, History, Palette, Sword, Users, type LucideIcon } from 'lucide-react';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import type { RosterSettings } from '../api/client';
-import { queryKeys, useRoster, useRosterSettings } from '../api/queries';
-import { patchSettings } from '../api/settingsSave';
+import { useRoster, useRosterSettings } from '../api/queries';
 import { useLang, useTexts } from '../i18n/context';
-import { storeLang, type Lang } from '../i18n/texts';
 import { parseSortMode } from '../dashboard/roster';
-import { isThemeMode, useSystemLight, useTheme, type ThemeMode } from '../theme/theme';
+import { useSystemLight, useTheme, type ThemeMode } from '../theme/theme';
+import { useAccountSave, type AccountSave } from './useAccountSave';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
-import { Select, Switch } from '../ui/primitives';
+import { Switch } from '../ui/primitives';
 import { AppBusyLabel, AppErrorView } from '../ui/status';
-import { resetTutorials } from '../ui/tutorials';
-import { setAnimationsOff, systemReducesMotion, useAnimationsOff } from '../ui/motion';
-
-const LEGACY_COOKIE = 'milantus_v1';
+import { systemReducesMotion, useAnimationsOff } from '../ui/motion';
 
 const THEME_MODES = ['dark', 'light', 'system'] as const;
-
-/** Los tres modos para el `Select` del navegador; «Sistema» dice qué tema da
- *  ahora, para elegirlo sabiendo qué va a quedar. */
-function useThemeOptions() {
-  const t = useTexts();
-  const light = useSystemLight();
-  return THEME_MODES.map((m: ThemeMode) => ({ value: m, label: m === 'system' ? t.themeSystemNow(light) : t.themeModes[m] }));
-}
-
-type AccountPatch = Pick<Partial<RosterSettings>, 'startsInDmMode' | 'themeMode' | 'showEncounterDifficulty'>;
-
-/** El guardado de la cuenta, uno solo para toda la página: el aviso vive en el
- *  encabezado y las filas que escriben están repartidas en varias tarjetas. */
-function useAccountSave() {
-  const client = useQueryClient();
-  // Lo elegido se ve al instante y se guarda después; si falla, vuelve lo que
-  // había. Antes el `fieldset` se deshabilitaba mientras guardaba y el control
-  // tocado perdía el foco. Solo se revierten las claves de este cambio: otro
-  // guardado que llegó en el medio no se pisa.
-  const save = useMutation({
-    mutationFn: (patch: AccountPatch) => patchSettings(patch),
-    onMutate: async (patch) => {
-      await client.cancelQueries({ queryKey: queryKeys.rosterSettings });
-      const before = client.getQueryData<RosterSettings>(queryKeys.rosterSettings);
-      client.setQueryData<RosterSettings>(queryKeys.rosterSettings, (current) => current && { ...current, ...patch });
-      return before && (Object.fromEntries(Object.keys(patch).map((k) => [k, before[k as keyof RosterSettings]])) as Partial<RosterSettings>);
-    },
-    onError: (_, __, undo) => {
-      if (undo) client.setQueryData<RosterSettings>(queryKeys.rosterSettings, (current) => current && { ...current, ...undo });
-    },
-  });
-  // «Guardado» se va solo; el error queda hasta el próximo cambio.
-  const { isSuccess, submittedAt, reset } = save;
-  useEffect(() => {
-    if (!isSuccess) return;
-    const timer = window.setTimeout(reset, 3000);
-    return () => window.clearTimeout(timer);
-  }, [isSuccess, submittedAt, reset]);
-  return save;
-}
-
-type AccountSave = ReturnType<typeof useAccountSave>;
 
 const SAVE_PILL =
   'step-in inline-flex h-[26px] items-center gap-1.5 rounded-[var(--radius-pill)] border border-hairline bg-plaque px-[11px] text-[12.5px]';
@@ -71,7 +24,7 @@ export function SettingsPage() {
   const save = useAccountSave();
   // Lo que depende de la cuenta se resuelve acá: con los ajustes caídos o
   // cargando, el aviso ocupa el lugar de esas tarjetas. Ayuda y Versión
-  // anterior no la esperan.
+  // anterior se dibujan igual (la segunda apaga su interruptor hasta que llegan).
   const withAccount = (render: (s: RosterSettings) => ReactNode) =>
     settings.isError ? (
       <AppErrorView title={t.settingsLoadError} message={t.errorBody} onRetry={() => settings.refetch()} />
@@ -104,7 +57,7 @@ export function SettingsPage() {
           <div className="flex min-w-0 flex-col gap-4">
             {withAccount((s) => (
               <>
-                <LookCard settings={s} save={save} />
+                <LookCard save={save} />
                 <StartCard settings={s} save={save} />
               </>
             ))}
@@ -116,8 +69,8 @@ export function SettingsPage() {
                 <ListCard settings={s} />
               </>
             ))}
-            <HelpCard />
-            <LegacyCard />
+            <HelpCard save={save} />
+            <LegacyCard save={save} />
           </div>
         </div>
       </div>
@@ -127,7 +80,6 @@ export function SettingsPage() {
 
 // ── Piezas locales ─────────────────────────────────────────────────────────
 
-type Scope = 'account' | 'browser';
 type Layout = 'inline' | 'wide' | 'stack';
 
 // Cada tarjeta es un `@container`: la fila se acomoda al ancho de su tarjeta
@@ -148,7 +100,6 @@ const CONTROL_LAYOUT: Record<Layout, string> = {
 function SettingRow({
   label,
   labelId,
-  scope,
   layout,
   dataField,
   note,
@@ -156,22 +107,15 @@ function SettingRow({
 }: {
   label: string;
   labelId: string;
-  scope: Scope;
   layout: Layout;
   dataField?: string;
   note?: ReactNode;
   children: ReactNode;
 }) {
-  const t = useTexts();
   return (
     <div className="border-t border-hairline py-3.5" data-field={dataField}>
       <div className={ROW_LAYOUT[layout]}>
-        <div className="flex min-w-0 flex-col items-start gap-1 @[420px]:flex-row @[420px]:items-center @[420px]:gap-2">
-          <span id={labelId} className="text-[14px] text-on-surface">{label}</span>
-          <span className="inline-flex h-5 shrink-0 items-center rounded-[var(--radius-pill)] border border-hairline bg-plaque px-2 text-[11px] text-text-muted">
-            {scope === 'account' ? t.settingsScopeAccount : t.settingsScopeBrowser}
-          </span>
-        </div>
+        <span id={labelId} className="min-w-0 text-[14px] text-on-surface">{label}</span>
         <div className={CONTROL_LAYOUT[layout]}>{children}</div>
       </div>
       {note}
@@ -303,39 +247,28 @@ function SegmentedRadios<T extends string>({
 
 // ── Las seis tarjetas ──────────────────────────────────────────────────────
 
-function LookCard({ settings, save }: { settings: RosterSettings; save: AccountSave }) {
+function LookCard({ save }: { save: AccountSave }) {
   const t = useTexts();
-  const { browserMode, setMode } = useTheme();
-  const themeOptions = useThemeOptions();
+  // El modo efectivo: el de la cuenta, o la copia local si todavía no lo guardó.
+  const { mode } = useTheme();
   const animationsOff = useAnimationsOff();
   // Con el sistema pidiendo menos movimiento ya están apagadas: el interruptor
   // lo muestra y no se puede prender desde acá.
   const systemOff = systemReducesMotion();
   return (
     <Section id="settings-look" title={t.settingsSectionLook} icon={Palette}>
-      <SettingRow label={t.themeLabel} labelId="settings-account-theme-label" scope="account" layout="stack">
+      <SettingRow label={t.themeLabel} labelId="settings-account-theme-label" layout="stack">
         <ThemeTiles
-          value={isThemeMode(settings.themeMode) ? settings.themeMode : 'dark'}
+          value={mode}
           onChange={(themeMode) => save.mutate({ themeMode })}
           labelledBy="settings-account-theme-label"
         />
       </SettingRow>
-      <SettingRow label={t.settingsBrowserTheme} labelId="settings-browser-theme-label" scope="browser" layout="wide">
-        <Select
-          label={t.settingsBrowserTheme}
-          labelAbove
-          className="w-full justify-between @[420px]:w-auto @[420px]:min-w-[220px]"
-          value={browserMode ?? 'account'}
-          onValueChange={(v) => setMode(isThemeMode(v) ? v : null)}
-          options={[{ value: 'account', label: t.settingsUseAccountTheme }, ...themeOptions]}
-        />
-      </SettingRow>
-      {/* Las animaciones, de este navegador como el tema: apagarlas deja cada
-          cambio de golpe, como con «reducir movimiento» del sistema. */}
+      {/* Apagarlas deja cada cambio de golpe, como con «reducir movimiento»
+          del sistema. */}
       <SettingRow
         label={t.settingsAnimations}
         labelId="settings-animations-label"
-        scope="browser"
         layout="inline"
         note={systemOff && <p className="mt-2 text-[12.5px] text-text-muted">{t.settingsAnimationsSystem}</p>}
       >
@@ -345,7 +278,7 @@ function LookCard({ settings, save }: { settings: RosterSettings; save: AccountS
           labelledBy="settings-animations-label"
           checked={!animationsOff && !systemOff}
           disabled={systemOff}
-          onCheckedChange={(on) => setAnimationsOff(!on)}
+          onCheckedChange={(on) => save.mutate({ animationsOff: !on })}
         />
       </SettingRow>
     </Section>
@@ -357,7 +290,7 @@ function StartCard({ settings, save }: { settings: RosterSettings; save: Account
   const lang = useLang();
   return (
     <Section id="settings-start" title={t.settingsSectionStart} icon={Globe}>
-      <SettingRow label={t.settingsLanguage} labelId="settings-language-label" scope="browser" layout="wide">
+      <SettingRow label={t.settingsLanguage} labelId="settings-language-label" layout="wide">
         <SegmentedRadios
           name="language"
           labelledBy="settings-language-label"
@@ -365,12 +298,13 @@ function StartCard({ settings, save }: { settings: RosterSettings; save: Account
           options={(['es', 'en'] as const).map((l) => ({ value: l, label: t.languageNames[l] }))}
           onChange={(next) => {
             // El idioma se resuelve una sola vez al cargar (también el del
-            // motor): cambiarlo es guardarlo y recargar.
-            if (next !== lang && storeLang(next as Lang)) window.location.reload();
+            // motor): cambiarlo es guardarlo en la cuenta, y cuando el guardado
+            // termina bien `AccountPrefsSync` lo copia y recarga.
+            if (next !== lang) save.mutate({ language: next });
           }}
         />
       </SettingRow>
-      <SettingRow label={t.settingsStartMode} labelId="settings-start-mode-label" scope="account" layout="wide">
+      <SettingRow label={t.settingsStartMode} labelId="settings-start-mode-label" layout="wide">
         <SegmentedRadios
           name="start-mode"
           labelledBy="settings-start-mode-label"
@@ -387,7 +321,7 @@ function DmCard({ settings, save }: { settings: RosterSettings; save: AccountSav
   const t = useTexts();
   return (
     <Section id="settings-dm" title={t.settingsSectionDm} icon={Sword}>
-      <SettingRow label={t.settingsShowEncounterDifficulty} labelId="settings-encounter-difficulty-label" scope="account" layout="inline">
+      <SettingRow label={t.settingsShowEncounterDifficulty} labelId="settings-encounter-difficulty-label" layout="inline">
         <Switch
           id="settings-encounter-difficulty"
           label={t.settingsShowEncounterDifficulty}
@@ -426,16 +360,15 @@ function ListCard({ settings }: { settings: RosterSettings }) {
   );
 }
 
-function HelpCard() {
+function HelpCard({ save }: { save: AccountSave }) {
   const t = useTexts();
   const [reset, setReset] = useState(false);
   return (
     <Section id="settings-help" title={t.settingsSectionHelp} icon={CircleHelp}>
-      {/* Lo visto es de este navegador, como el tema y el idioma. */}
+      {/* Lo visto es de la cuenta: vaciar la lista hace que vuelvan a salir. */}
       <SettingRow
         label={t.settingsTutorials}
         labelId="settings-tutorials-label"
-        scope="browser"
         layout="inline"
         dataField="tutorials"
         note={
@@ -449,7 +382,7 @@ function HelpCard() {
         <Button
           tone="secondary"
           onClick={() => {
-            resetTutorials();
+            save.mutate({ tutorialsSeen: [] });
             setReset(true);
           }}
         >
@@ -460,15 +393,15 @@ function HelpCard() {
   );
 }
 
-function LegacyCard() {
+function LegacyCard({ save }: { save: AccountSave }) {
   const t = useTexts();
-  const [legacy, setLegacy] = useState(() => document.cookie.split(';').some((c) => c.trim() === `${LEGACY_COOKIE}=1`));
+  const settings = useRosterSettings().data;
+  const legacy = settings?.legacyVersion === true;
   return (
     <Section id="settings-legacy" title={t.settingsSectionLegacy} icon={History}>
       <SettingRow
         label={t.settingsLegacyVersion}
         labelId="settings-legacy-version-label"
-        scope="browser"
         layout="inline"
         note={
           legacy && (
@@ -481,18 +414,15 @@ function LegacyCard() {
           )
         }
       >
-        {/* La cookie la lee el servidor al servir `/`: por eso no es localStorage. */}
+        {/* La cookie que lee el servidor al servir `/` la pone `AccountPrefsSync`
+            cuando cambia lo que dice la cuenta. */}
         <Switch
           id="settings-legacy-version"
           label={t.settingsLegacyVersion}
           labelledBy="settings-legacy-version-label"
           checked={legacy}
-          onCheckedChange={(on) => {
-            document.cookie = on
-              ? `${LEGACY_COOKIE}=1; Path=/; SameSite=Lax; Max-Age=31536000`
-              : `${LEGACY_COOKIE}=; Path=/; SameSite=Lax; Max-Age=0`;
-            setLegacy(on);
-          }}
+          disabled={!settings}
+          onCheckedChange={(on) => save.mutate({ legacyVersion: on })}
         />
       </SettingRow>
     </Section>
