@@ -39,7 +39,7 @@ export function NpcTableView({
       <Dialog.Portal>
         <Dialog.Content
           data-npc-table
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 overflow-y-auto bg-scaffold p-4 outline-none"
+          className="pop-overlay fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 overflow-y-auto bg-scaffold p-4 outline-none"
           // Igual que `PortraitViewer`: sin esto el foco cae en un botón y su
           // tooltip se abriría solo.
           onOpenAutoFocus={(e) => {

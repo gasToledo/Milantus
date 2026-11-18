@@ -27,9 +27,9 @@ export function PortraitViewer({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-40 bg-scrim" />
+        <Dialog.Overlay className="pop-overlay fixed inset-0 z-40 bg-scrim" />
         <Dialog.Content
-          className="fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 outline-none"
+          className="pop-dialog fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 outline-none"
           data-portrait-viewer
           // El foco va al visor y no al botón de cerrar: si no, su tooltip se
           // abriría solo encima del retrato.

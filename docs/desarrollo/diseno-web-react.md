@@ -132,6 +132,17 @@ y se apaga con «reducir movimiento». Usá estas mismas clases en cualquier
 pantalla nueva. Un paso nuevo tiene que remontar sus bloques: si son del mismo
 tipo, lleva `key` con el paso.
 
+**Entrar y salir de una pantalla** no se pide: el router funde la pantalla
+entera en todo cambio de pantalla, incluido el «atrás» del navegador, y deja el
+foco en su título (`withPageFade`, `src/ui/pageFade.ts`). Las pestañas de una
+ficha y hojear un catálogo no cuentan como otra pantalla. Una redirección
+(`navigate(href, { replace: true })`) cambia de una. **Abrir y cerrar** también
+está resuelto en las piezas de `src/ui/`: el diálogo entra creciendo apenas
+(`pop-dialog`, `pop-overlay`), las listas y los popovers caen desde su botón
+(`float-pop`, `menu-pop`), la tostada sube, y todo sale en 120 ms. Un
+`Dialog` de Radix armado a mano lleva esas mismas clases, salvo que tenga su
+propia animación (las celebraciones y los avisos con pantalla propia).
+
 El creador (`src/creation/CreationWizard.tsx`) suma dos piezas propias, que por
 ahora solo usa él: la grilla de clases (`PickCard`, las trece a la vista) y la
 matriz de características (`ScoreMatrix`: una columna por dado, así dos 14 son

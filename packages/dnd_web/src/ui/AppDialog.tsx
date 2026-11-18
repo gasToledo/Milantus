@@ -60,9 +60,9 @@ export function AppDialog({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-40 bg-scrim" />
+        <Dialog.Overlay className="pop-overlay fixed inset-0 z-40 bg-scrim" />
         <Dialog.Content
-          className="card fixed top-1/2 left-1/2 z-50 flex max-h-[min(85vh,720px)] w-[calc(100vw-32px)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden"
+          className="pop-dialog card fixed top-1/2 left-1/2 z-50 flex max-h-[min(85vh,720px)] w-[calc(100vw-32px)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden"
           style={{ maxWidth: width }}
         >
           {bare ? (

@@ -4,6 +4,7 @@ import {
   type AnchorHTMLAttributes,
   type MouseEvent,
 } from 'react';
+import { withPageFade } from './ui/pageFade';
 
 // Un router mínimo a propósito: tres o cuatro rutas y nada de rutas anidadas
 // ni cargadores. Lo único que hacía falta respecto del anterior es navegar
@@ -481,15 +482,34 @@ const notify = () => listeners.forEach((l) => l());
 
 function subscribe(listener: () => void) {
   listeners.add(listener);
-  window.addEventListener('popstate', listener);
   return () => {
     listeners.delete(listener);
-    window.removeEventListener('popstate', listener);
   };
 }
 
 const getLocation = () => window.location.pathname + window.location.search + window.location.hash;
 const pathnameOf = (href: string) => href.split(/[?#]/, 1)[0]!;
+
+/** Qué cuenta como la misma pantalla para el fundido: las pestañas de una
+ *  ficha y hojear un catálogo cambian adentro, sin fundir la pantalla entera
+ *  (tienen su propia transición o ninguna). */
+const screenOf = (pathname: string) => sheetKey(pathname) ?? browseKey(pathname) ?? pathname;
+const isScreenChange = (from: string, to: string) => screenOf(pathnameOf(from)) !== screenOf(pathnameOf(to));
+
+// El «atrás» y el «adelante» del navegador: la ubicación ya cambió cuando llega
+// el evento, pero la pantalla todavía es la vieja, así que funde igual que un
+// enlace. Uno solo para todos: con uno por suscriptor, cada uno abriría su
+// propia transición.
+let shown = typeof window === 'undefined' ? '' : getLocation();
+if (typeof window !== 'undefined') {
+  window.addEventListener('popstate', () => {
+    const next = getLocation();
+    const change = isScreenChange(shown, next);
+    shown = next;
+    if (change) withPageFade(notify);
+    else notify();
+  });
+}
 
 type ScreenBack = { href: string; steps: number };
 const screenBack = (): ScreenBack | undefined => window.history.state?.milantusBack;
@@ -521,8 +541,11 @@ export function setLeaveGuard(guard: typeof leaveGuard) {
 }
 
 /** Navega dentro de `/v2` sin recargar. `replace` para las redirecciones:
- *  «atrás» no tiene que volver a una URL que solo redirige. */
-export function navigate(href: string, { replace = false } = {}) {
+ *  «atrás» no tiene que volver a una URL que solo redirige. Cambiar de
+ *  pantalla funde (`withPageFade`); una redirección no, salvo que lo pida
+ *  [fade] (el «Volver» de una URL abierta directamente). */
+export function navigate(href: string, options: { replace?: boolean; fade?: boolean } = {}) {
+  const { replace = false, fade = !replace } = options;
   const current = getLocation();
   if (href === current) return;
   // Las redirecciones (`replace`) no preguntan: no las pidió nadie.
@@ -536,29 +559,34 @@ export function navigate(href: string, { replace = false } = {}) {
   // Hojear un catálogo (categorías, entradas, anterior/siguiente) no apila
   // historial: «atrás» vuelve a la pantalla que lo abrió y no recorre cada
   // entrada leída.
-  const browsing = browseKey(pathnameOf(current));
-  if (replace || (browsing !== undefined && browsing === browseKey(pathnameOf(href)))) {
-    window.history.replaceState(window.history.state, '', href);
-  } else {
-    const currentPath = pathnameOf(current);
-    const nextPath = pathnameOf(href);
-    const sheet = sheetKey(currentPath);
-    // Las pestañas quedan en el historial del navegador. El «Atrás» de la
-    // ficha salta esas entradas para regresar a la pantalla que la abrió.
-    const withinScreen = currentPath === nextPath || (sheet !== undefined && sheet === sheetKey(nextPath));
-    const previous = withinScreen ? screenBack() : { href: current, steps: 0 };
-    const milantusBack = previous && { ...previous, steps: previous.steps + 1 };
-    window.history.pushState({ milantusBack }, '', href);
-  }
-  window.scrollTo(0, 0);
-  notify();
+  const go = () => {
+    const browsing = browseKey(pathnameOf(current));
+    if (replace || (browsing !== undefined && browsing === browseKey(pathnameOf(href)))) {
+      window.history.replaceState(window.history.state, '', href);
+    } else {
+      const currentPath = pathnameOf(current);
+      const nextPath = pathnameOf(href);
+      const sheet = sheetKey(currentPath);
+      // Las pestañas quedan en el historial del navegador. El «Atrás» de la
+      // ficha salta esas entradas para regresar a la pantalla que la abrió.
+      const withinScreen = currentPath === nextPath || (sheet !== undefined && sheet === sheetKey(nextPath));
+      const previous = withinScreen ? screenBack() : { href: current, steps: 0 };
+      const milantusBack = previous && { ...previous, steps: previous.steps + 1 };
+      window.history.pushState({ milantusBack }, '', href);
+    }
+    shown = getLocation();
+    window.scrollTo(0, 0);
+    notify();
+  };
+  if (fade && isScreenChange(current, href)) withPageFade(go);
+  else go();
 }
 
 /** Una URL abierta directamente conserva el destino habitual de la pantalla. */
 export function navigateBack(fallback: string) {
   const back = screenBack();
   if (back) window.history.go(-back.steps);
-  else navigate(fallback, { replace: true });
+  else navigate(fallback, { replace: true, fade: true });
 }
 
 /** La ruta actual, y vuelve a dibujar cuando cambia. */

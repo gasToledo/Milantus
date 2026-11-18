@@ -376,6 +376,61 @@ body {
   }
 }
 
+/* Entrar y salir, igual en toda la app: lo que se abre entra con un fundido
+   (los diálogos crecen apenas, las listas caen desde su botón) y al cerrarse
+   sale más rápido de lo que entró. Radix espera a que termine la animación de
+   `data-state='closed'` para desmontar. Las celebraciones y los avisos con
+   pantalla propia tienen la suya y no llevan estas clases. Con las animaciones
+   apagadas, la regla global deja todo en 0 s. */
+.pop-overlay[data-state='open'] {
+  animation: menu-fade 160ms ease-out;
+}
+.pop-dialog[data-state='open'] {
+  animation:
+    menu-fade 160ms ease-out,
+    pop-grow 160ms ease-out;
+}
+.pop-overlay[data-state='closed'],
+.pop-dialog[data-state='closed'],
+.menu-pop[data-state='closed'],
+.float-pop[data-state='closed'] {
+  animation: pop-out 120ms ease-in both;
+}
+.float-pop[data-state='open'] {
+  animation:
+    menu-fade 120ms ease-out,
+    float-drop 120ms ease-out;
+}
+/* Cae desde el botón: hacia abajo si se abre debajo, hacia arriba si arriba. */
+.float-pop {
+  --float-from: -4px;
+}
+.float-pop[data-side='top'] {
+  --float-from: 4px;
+}
+/* La tostada entra subiendo, como los avisos, y se va fundiéndose. */
+.toast-root[data-state='open'] {
+  animation: notice-in 200ms ease-out both;
+}
+.toast-root[data-state='closed'] {
+  animation: pop-out 120ms ease-in both;
+}
+@keyframes pop-grow {
+  from {
+    scale: 0.97;
+  }
+}
+@keyframes float-drop {
+  from {
+    translate: 0 var(--float-from);
+  }
+}
+@keyframes pop-out {
+  to {
+    opacity: 0;
+  }
+}
+
 /* Las tres columnas de las pestañas de la ficha. Con `auto-fit` a dos columnas
    la tercera bajaba a otra fila de la grilla, que empieza debajo de la más
    alta (Conjuros, Habilidades) y dejaba un hueco del alto de esa columna bajo

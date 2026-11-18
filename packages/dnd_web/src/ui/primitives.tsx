@@ -121,7 +121,7 @@ export function PopoverContent(props: ComponentProps<typeof PopoverPrimitive.Con
         sideOffset={6}
         collisionPadding={16}
         {...props}
-        className={cx(FLOATING, 'max-w-[min(360px,calc(100vw-32px))] p-3', props.className)}
+        className={cx(FLOATING, 'float-pop max-w-[min(360px,calc(100vw-32px))] p-3', props.className)}
       />
     </PopoverPrimitive.Portal>
   );
@@ -176,7 +176,7 @@ export function Select({
         <SelectPrimitive.Content
           position="popper"
           sideOffset={6}
-          className={cx(FLOATING, 'max-h-[min(var(--radix-select-content-available-height),22rem)]')}
+          className={cx(FLOATING, 'float-pop max-h-[min(var(--radix-select-content-available-height),22rem)]')}
         >
           <SelectPrimitive.Viewport>
             {options.map((o) => (
