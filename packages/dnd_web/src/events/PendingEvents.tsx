@@ -1,27 +1,30 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState, type CSSProperties } from 'react';
+import * as Dialog from '@radix-ui/react-dialog';
 import { useQueryClient } from '@tanstack/react-query';
+import { Sparkles, X } from 'lucide-react';
 import { fetchUnseenEvents, markEventsSeen } from '../api/client';
 import { useTexts } from '../i18n/context';
 import { characterHref, navigate, useRoute } from '../router';
 import { AppDialog } from '../ui/AppDialog';
+import { Button } from '../ui/Button';
 import { Eyebrow } from '../ui/data';
-import { Toast, type ToastTone } from '../ui/primitives';
-import { eventMessage, type ChapterNotice } from './messages';
+import { ICON_TONE, Toast } from '../ui/primitives';
+import { eventMessage, type ChapterNotice, type EventMessage, type InspirationNotice, type ItemNotice } from './messages';
 
-interface Notice {
-  id: string;
-  text: string;
-  tone: ToastTone;
-  /** Si viene, el aviso es un diálogo y no una tostada. */
-  chapter?: ChapterNotice;
-  hasGrants?: boolean;
-}
+type Notice = EventMessage & { id: string; hasGrants?: boolean };
+
+/** Lo que está a la vista: una pantalla, una tostada suelta o la bandeja. */
+type Active = { kind: 'screen' | 'toast'; notice: Notice } | { kind: 'tray'; notices: Notice[] };
 
 /**
- * Pide los avisos pendientes de la cuenta y los muestra de a uno
- * (`PendingEventsGate` de Flutter). Son una cola durable de «esto pasó mientras
- * no mirabas»; el turno es lo otro, y por eso no viaja por acá
- * (`useTurnStatus`).
+ * Pide los avisos pendientes de la cuenta y los muestra (`PendingEventsGate` de
+ * Flutter). Son una cola durable de «esto pasó mientras no mirabas»; el turno
+ * es lo otro, y por eso no viaja por acá (`useTurnStatus`).
+ *
+ * Cada aviso toma la forma que le toca (`display`): el fin de capítulo, la
+ * Inspiración Heroica y un objeto del DM tienen su pantalla y van primero, de a
+ * uno; las tostadas se juntan en una bandeja si son 2 o más, y salen sueltas si
+ * es una. Lo que llega con algo abierto espera su turno.
  *
  * Se piden al entrar a un lugar concreto (la lista, el Modo DM y una ficha; las
  * subrutas de la ficha no cuentan), al volver a la pestaña y **cada 30 s con la
@@ -46,7 +49,9 @@ export function PendingEvents() {
           ? `character:${route.id}`
           : null;
 
+  // `queue` espera su turno; `active` es lo que está a la vista.
   const [queue, setQueue] = useState<Notice[]>([]);
+  const [active, setActive] = useState<Active | null>(null);
   // Evita pedidos duplicados: `StrictMode` monta dos veces en desarrollo, y un
   // cambio de ruta no debe volver a pedir lo que ya está en cola.
   const running = useRef(false);
@@ -94,34 +99,254 @@ export function PendingEvents() {
     // Solo la clave de entrada: el idioma no cambia con la página abierta.
   }, [key]);
 
-  const current = queue[0];
-  // Se marca visto al mostrarlo y no al pedirlo: el que no llegó a verse vuelve.
+  // Con la vista libre pasa lo que sigue: una pantalla (la primera que llegó) o,
+  // si no hay ninguna, todas las tostadas juntas.
   useEffect(() => {
-    if (current) void markEventsSeen([current.id]).catch(() => {});
-  }, [current?.id]);
+    if (active || queue.length === 0) return;
+    const screen = queue.find((n) => n.display !== 'toast');
+    if (screen) {
+      setActive({ kind: 'screen', notice: screen });
+      setQueue((q) => q.filter((n) => n !== screen));
+    } else {
+      setActive(queue.length === 1 ? { kind: 'toast', notice: queue[0]! } : { kind: 'tray', notices: queue });
+      setQueue([]);
+    }
+  }, [active, queue]);
 
-  if (!current) return null;
-  const next = () => setQueue((q) => q.slice(1));
-  if (current.chapter) {
-    return <ChapterDoneDialog key={current.id} chapter={current.chapter} hasGrants={current.hasGrants === true} onClose={next} />;
+  // Se marca visto al mostrarlo y no al pedirlo: el que no llegó a verse vuelve.
+  // La bandeja marca todos juntos cuando aparece.
+  useEffect(() => {
+    if (!active) return;
+    const ids = active.kind === 'tray' ? active.notices.map((n) => n.id) : [active.notice.id];
+    void markEventsSeen(ids).catch(() => {});
+  }, [active]);
+
+  if (!active) return null;
+  const close = () => setActive(null);
+  if (active.kind === 'tray') return <PendingTray key={active.notices[0]!.id} notices={active.notices} onClose={close} />;
+  const { notice } = active;
+  if (notice.display === 'chapter' && notice.chapter) {
+    return <ChapterDoneDialog key={notice.id} chapter={notice.chapter} hasGrants={notice.hasGrants === true} onClose={close} />;
+  }
+  if (notice.display === 'inspiration' && notice.inspiration) {
+    return <InspirationCelebration key={notice.id} notice={notice.inspiration} onClose={close} />;
+  }
+  if (notice.display === 'item' && notice.item) {
+    return <ItemGrantDialog key={notice.id} notice={notice.item} onClose={close} />;
   }
   return (
     <Toast
-      key={current.id}
-      tone={current.tone}
-      message={current.text}
+      key={notice.id}
+      tone={notice.tone}
+      message={notice.text}
+      icon={notice.icon}
+      iconTone={notice.iconTone}
+      progress
       open
-      onOpenChange={(open) => !open && next()}
+      onOpenChange={(open) => !open && close()}
       duration={8000}
     />
   );
 }
 
+/** Retraso en línea, como el escalonado de `.lv-up`. */
+const delay = (ms: number) => ({ animationDelay: `${ms}ms` }) as CSSProperties;
+
 /**
- * El fin de capítulo para el jugador: un diálogo y no una tostada, porque entre
- * las demás de la cola se perdía. Cerrarlo de cualquier forma (botón, `Esc`,
- * afuera) pasa al siguiente aviso. «Ir a Inventario» solo si hay objetos
- * esperando **y** el aviso trae el personaje (uno viejo no lo trae).
+ * «Mientras no estabas» (lámina A): varios avisos sueltos en un solo lugar, en
+ * vez de una tostada tras otra. No se cierra sola; «Entendido» los descarta
+ * todos y cada fila se puede sacar sola (al sacar la última, se cierra).
+ */
+function PendingTray({ notices, onClose }: { notices: Notice[]; onClose: () => void }) {
+  const t = useTexts();
+  const titleId = useId();
+  const [rows, setRows] = useState(notices);
+  useEffect(() => {
+    if (rows.length === 0) onClose();
+  }, [rows.length]);
+  if (rows.length === 0) return null;
+  return (
+    <section
+      role="region"
+      aria-labelledby={titleId}
+      className="card notice-in fixed right-4 bottom-4 z-50 flex w-[min(400px,calc(100vw-32px))] flex-col gap-2.5 px-3.5 pt-3.5 pb-3"
+    >
+      <div className="flex items-center justify-between gap-2.5 px-0.5">
+        <h2 id={titleId} className="eyebrow">
+          {t.evtTrayTitle}
+        </h2>
+        <span className="num text-[12px] text-text-muted tabular-nums">{t.evtTrayCount(rows.length)}</span>
+      </div>
+      <ul className="rounded-[var(--radius-card)] border border-hairline bg-plaque">
+        {rows.map((n) => (
+          <li key={n.id} className="step-in flex items-start gap-2.5 border-t border-hairline py-2.5 pr-2 pl-2.5 first:border-t-0">
+            <span aria-hidden="true" className="inline-flex size-[30px] shrink-0 items-center justify-center rounded-[9px] bg-plaque">
+              <n.icon size={16} className={ICON_TONE[n.iconTone]} />
+            </span>
+            <span className="min-w-0 flex-1 pt-1 text-[13.5px] leading-[1.45] text-on-surface">{n.text}</span>
+            <button
+              type="button"
+              aria-label={t.closeNotice}
+              title={t.closeNotice}
+              onClick={() => setRows((r) => r.filter((x) => x !== n))}
+              className="inline-flex size-[30px] shrink-0 items-center justify-center rounded-[9px] text-text-muted hover:bg-surface hover:text-on-surface"
+            >
+              <X size={14} aria-hidden="true" />
+            </button>
+          </li>
+        ))}
+      </ul>
+      <div className="flex justify-end">
+        <Button className="min-h-[38px] px-4 text-[13.5px] font-bold" onClick={onClose}>
+          {t.tutDone}
+        </Button>
+      </div>
+    </section>
+  );
+}
+
+/** Las chispas de la Inspiración: hacia dónde salen (px) y con qué retraso (ms). */
+const SPARKS = [
+  [0, -120, 620],
+  [85, -85, 640],
+  [120, 0, 680],
+  [85, 85, 620],
+  [0, 120, 660],
+  [-85, 85, 700],
+  [-120, 0, 630],
+  [-85, -85, 670],
+] as const;
+
+/**
+ * La Inspiración Heroica a pantalla completa (lámina D): es rara y es un regalo
+ * del DM. `Dialog` de Radix atrapa el foco; `Esc` y «Entendido» cierran. «Ir a
+ * la ficha» solo navega: marcarla es del jugador.
+ */
+function InspirationCelebration({ notice, onClose }: { notice: InspirationNotice; onClose: () => void }) {
+  const t = useTexts();
+  const { characterId } = notice;
+  return (
+    <Dialog.Root open onOpenChange={(open) => !open && onClose()}>
+      <Dialog.Portal>
+        <Dialog.Content
+          data-inspiration-celebration
+          className="ih-veil fixed inset-0 z-50 flex flex-col items-center justify-center overflow-y-auto bg-scrim-strong px-4 text-center outline-none"
+        >
+          <div aria-hidden="true" className="relative flex size-[220px] shrink-0 items-center justify-center">
+            <span
+              className="ih-glow absolute -inset-10 rounded-full"
+              style={{
+                background:
+                  'radial-gradient(circle, color-mix(in srgb, var(--gold) 45%, transparent) 0%, color-mix(in srgb, var(--gold) 12%, transparent) 45%, transparent 70%)',
+              }}
+            />
+            <span className="ih-ring absolute size-[90px] rounded-full border-2 border-gold" />
+            {SPARKS.map(([dx, dy, ms]) => (
+              <span key={`${dx},${dy}`} className="ih-spark" style={{ '--dx': `${dx}px`, '--dy': `${dy}px`, animationDelay: `${ms}ms` } as CSSProperties} />
+            ))}
+            <Sparkles className="ih-star" size={112} strokeWidth={0.6} fill="var(--gold)" stroke="var(--gold-light)" strokeLinejoin="round" />
+          </div>
+          <p className="ih-rise mt-[22px] text-[12px] font-medium tracking-[2.4px] text-gold uppercase" style={delay(900)}>
+            {notice.campaign}
+          </p>
+          <Dialog.Title className="ih-rise font-display mt-2.5 text-[44px] leading-[1.1] text-on-surface" style={delay(980)}>
+            {t.evtInspirationTitle}
+          </Dialog.Title>
+          <Dialog.Description className="ih-rise mt-3.5 max-w-[440px] text-[16px] leading-[1.55] text-on-surface-variant" style={delay(1060)}>
+            {t.evtInspirationBody(notice.character)}
+          </Dialog.Description>
+          <div className="ih-rise mt-[30px] flex flex-wrap justify-center gap-2.5" style={delay(1200)}>
+            {characterId && (
+              <Button
+                tone="secondary"
+                className="min-h-[46px] px-[22px] text-[14.5px]"
+                onClick={() => {
+                  navigate(characterHref(characterId));
+                  onClose();
+                }}
+              >
+                {t.evtGoToSheet}
+              </Button>
+            )}
+            <Button data-action="inspiration-close" className="min-h-[46px] px-[26px] text-[14.5px] font-bold" onClick={onClose}>
+              {t.tutDone}
+            </Button>
+          </div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}
+
+/**
+ * Un objeto que mandó el DM (lámina E): el cofre cae, la tapa se abre y lo que
+ * trae sube de a uno. Los objetos esperan en la bandeja de Inventario: el aviso
+ * no escribe la ficha. «Ir a Inventario» solo si el aviso trae el personaje.
+ */
+function ItemGrantDialog({ notice, onClose }: { notice: ItemNotice; onClose: () => void }) {
+  const t = useTexts();
+  const { characterId, items } = notice;
+  const title = t.evtItemTitle(notice.character);
+  return (
+    <AppDialog
+      open
+      bare
+      onOpenChange={(open) => !open && onClose()}
+      title={title}
+      width={460}
+      actions={[
+        ...(characterId ? [{ label: t.evtGoToInventory, onSelect: () => navigate(characterHref(characterId, 'inventario')) }] : []),
+        { label: t.tutDone, primary: true },
+      ]}
+    >
+      <div data-item-grant className="flex flex-col items-center text-center">
+        <div aria-hidden="true" className="relative h-[86px] w-24">
+          <span
+            className="ob-shine absolute top-1.5 left-1/2 -ml-[35px] h-10 w-[70px] rounded-full"
+            style={{ background: 'radial-gradient(ellipse, color-mix(in srgb, var(--gold) 55%, transparent), transparent 70%)' }}
+          />
+          <svg className="ob-chest absolute inset-0" width="96" height="86" viewBox="0 0 96 86" fill="none" stroke="var(--gold)" strokeWidth="2.4" strokeLinejoin="round">
+            <rect x="14" y="40" width="68" height="38" rx="5" fill="var(--gold-soft)" />
+            <path d="M14 54h68" />
+            <rect x="42" y="48" width="12" height="12" rx="2" fill="var(--gold)" stroke="none" />
+            <g className="ob-lid">
+              <path d="M14 40v-8a10 10 0 0 1 10-10h48a10 10 0 0 1 10 10v8z" fill="var(--gold-soft)" />
+            </g>
+          </svg>
+        </div>
+        <Eyebrow className="mt-3.5">{notice.campaign}</Eyebrow>
+        <h2 aria-hidden="true" className="font-display mt-1.5 text-[26px] leading-[1.2] text-on-surface">
+          {title}
+        </h2>
+        {items.length > 0 && (
+          <ul className="mt-[18px] w-full rounded-[var(--radius-card)] border border-hairline bg-plaque px-3.5 py-0.5 text-left">
+            {items.map((item, i) => (
+              <li
+                key={`${i}:${item}`}
+                className="lv-up flex items-center gap-2.5 border-t border-hairline py-2.5 text-[14.5px] text-on-surface first:border-t-0"
+                style={delay(900 + i * 60)}
+              >
+                <span aria-hidden="true" className="size-[7px] shrink-0 rotate-45 bg-gold" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        )}
+        <p className="lv-up mt-3 text-[13px] text-on-surface-variant" style={delay(900 + items.length * 60)}>
+          {t.evtItemsWaiting}
+        </p>
+      </div>
+    </AppDialog>
+  );
+}
+
+/**
+ * El fin de capítulo para el jugador (lámina C): un diálogo y no una tostada,
+ * porque entre las demás de la cola se perdía. Cerrarlo de cualquier forma
+ * (botón, `Esc`, afuera) pasa al siguiente aviso. «Ir a Inventario» solo si hay
+ * objetos esperando **y** el aviso trae el personaje (uno viejo no lo trae).
+ * Entra como la subida de nivel: el rombo cae girando, un anillo se abre y lo
+ * que trae el capítulo sube de a uno.
  */
 function ChapterDoneDialog({ chapter, hasGrants, onClose }: { chapter: ChapterNotice; hasGrants: boolean; onClose: () => void }) {
   const t = useTexts();
@@ -140,7 +365,10 @@ function ChapterDoneDialog({ chapter, hasGrants, onClose }: { chapter: ChapterNo
       ]}
     >
       <div data-chapter-done className="flex flex-col items-center gap-2.5 text-center">
-        <span aria-hidden="true" className="mt-1 mb-2 size-[22px] rotate-45 rounded-[var(--radius-mark)] bg-gold" />
+        <div aria-hidden="true" className="relative flex size-[72px] items-center justify-center">
+          <span className="lv-ring absolute size-[15px] rounded-full border-2 border-gold" />
+          <span className="lv-rombo absolute size-[30px] rounded-[var(--radius-mark)] bg-gold" />
+        </div>
         <Eyebrow>{chapter.campaign}</Eyebrow>
         <h2 aria-hidden="true" className="font-display text-[22px] leading-tight text-on-surface">
           {chapter.title}
@@ -148,9 +376,13 @@ function ChapterDoneDialog({ chapter, hasGrants, onClose }: { chapter: ChapterNo
         <p className="text-[14px] text-on-surface-variant">{chapter.by}</p>
       </div>
       {chapter.lines.length > 0 && (
-        <ul className="mt-4">
-          {chapter.lines.map((l) => (
-            <li key={l.text} className="flex items-start gap-2.5 border-t border-hairline py-2.5 text-[14px] leading-[1.45] text-on-surface">
+        <ul className="mt-4 rounded-[var(--radius-card)] border border-hairline bg-plaque px-3.5 py-0.5">
+          {chapter.lines.map((l, i) => (
+            <li
+              key={l.text}
+              className="lv-up flex items-start gap-2.5 border-t border-hairline py-2.5 text-[14px] leading-[1.45] text-on-surface first:border-t-0"
+              style={delay(620 + i * 60)}
+            >
               <l.icon size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-gold" />
               <span>{l.text}</span>
             </li>

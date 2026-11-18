@@ -2287,6 +2287,13 @@ Los personajes que los jugadores le compartieron se sueltan, y sus fichas siguen
   evtChapterDoneTitle: (chapter: string) => `Terminó «${chapter}»`,
   evtChapterDoneBy: (character: string) => `${character} cerró el capítulo con la mesa.`,
   evtGoToInventory: 'Ir a Inventario',
+  evtInspirationTitle: 'Inspiración Heroica',
+  evtInspirationBody: (character: string) =>
+    `El DM te la concedió. Marcala en la ficha de ${character} y usala cuando la tirada importe.`,
+  evtGoToSheet: 'Ir a la ficha',
+  evtTrayTitle: 'Mientras no estabas',
+  evtTrayCount: (n: number) => (n === 1 ? '1 aviso' : `${n} avisos`),
+  evtItemTitle: (character: string) => `El DM le dio algo a ${character}`,
   shareTitle: (name: string) => `Compartir a ${name}`,
   shareIntro: 'Generá un código y pasáselo a tu DM. Lo pega en su campaña y ve tu ficha; nunca puede editarla.',
   shareGenerate: 'Generar código',
@@ -4829,6 +4836,13 @@ The characters players shared with it are released, and their sheets remain thei
   evtChapterDoneTitle: (chapter: string) => `“${chapter}” is over`,
   evtChapterDoneBy: (character: string) => `${character} finished the chapter with the table.`,
   evtGoToInventory: 'Go to Inventory',
+  evtInspirationTitle: 'Heroic Inspiration',
+  evtInspirationBody: (character: string) =>
+    `Your DM granted it. Mark it on ${character}'s sheet and use it when the roll matters.`,
+  evtGoToSheet: 'Go to the sheet',
+  evtTrayTitle: 'While you were away',
+  evtTrayCount: (n: number) => (n === 1 ? '1 notice' : `${n} notices`),
+  evtItemTitle: (character: string) => `Your DM gave ${character} something`,
   shareTitle: (name: string) => `Share ${name}`,
   shareIntro:
     'Generate a code and give it to your DM. They paste it into their campaign and see your sheet; they can never edit it.',

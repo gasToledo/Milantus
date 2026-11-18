@@ -1,4 +1,16 @@
-import { Coins, CircleArrowUp, Package, type LucideIcon } from 'lucide-react';
+import {
+  BookOpen,
+  CircleArrowUp,
+  Coins,
+  Package,
+  RotateCcw,
+  Sparkles,
+  Swords,
+  UserMinus,
+  UserPlus,
+  UserX,
+  type LucideIcon,
+} from 'lucide-react';
 import { chapterGrants } from '../engine';
 import type { UserEvent } from '../api/client';
 import type { Texts } from '../i18n/texts';
@@ -23,30 +35,77 @@ export interface ChapterNotice {
   characterId?: string;
 }
 
-export function eventMessage(
-  event: UserEvent,
-  t: Texts,
-): { text: string; tone: ToastTone; chapter?: ChapterNotice } | null {
+/** La Inspiración Heroica ocupa la pantalla: «es raro y es un regalo del DM». */
+export interface InspirationNotice {
+  campaign: string;
+  character: string;
+  characterId?: string;
+}
+
+/** Un objeto que mandó el DM: el cofre con lo que trae. */
+export interface ItemNotice {
+  campaign: string;
+  character: string;
+  items: string[];
+  characterId?: string;
+}
+
+/** Cómo se muestra un aviso: los tres con pantalla propia van de a uno; las
+ *  tostadas se juntan en una bandeja si son varias. */
+export type EventDisplay = 'toast' | 'chapter' | 'inspiration' | 'item';
+export type IconTone = 'gold' | 'verdant' | 'muted';
+
+export interface EventMessage {
+  text: string;
+  tone: ToastTone;
+  display: EventDisplay;
+  /** El ícono de la tostada y de la fila de la bandeja. */
+  icon: LucideIcon;
+  iconTone: IconTone;
+  chapter?: ChapterNotice;
+  inspiration?: InspirationNotice;
+  item?: ItemNotice;
+}
+
+export function eventMessage(event: UserEvent, t: Texts): EventMessage | null {
   const character = quoted(event.payload.characterName, t);
   const campaign = quoted(event.payload.campaignName, t, t.evtSomeCampaign);
+  const toast = (text: string, tone: ToastTone, icon: LucideIcon, iconTone: IconTone): EventMessage => ({
+    text,
+    tone,
+    display: 'toast',
+    icon,
+    iconTone,
+  });
 
   switch (event.kind) {
     case 'character_linked':
-      return { text: t.evtLinked(character, campaign), tone: 'success' };
+      return toast(t.evtLinked(character, campaign), 'success', UserPlus, 'verdant');
     case 'character_unlinked_by_dm':
-      return { text: t.evtUnlinkedByDm(character, campaign), tone: 'info' };
+      return toast(t.evtUnlinkedByDm(character, campaign), 'info', UserMinus, 'muted');
     case 'character_unlinked_by_owner':
-      return { text: t.evtUnlinkedByOwner(character, campaign), tone: 'info' };
+      return toast(t.evtUnlinkedByOwner(character, campaign), 'info', UserMinus, 'muted');
     case 'character_deleted_by_owner':
-      return { text: t.evtDeletedByOwner(character, campaign), tone: 'info' };
+      return toast(t.evtDeletedByOwner(character, campaign), 'info', UserX, 'muted');
     // Informativo y no de alerta: el personaje sigue en la mesa, solo que con
     // otra ficha.
     case 'character_rebuilt':
-      return { text: t.evtRebuiltByOwner(character, campaign), tone: 'info' };
+      return toast(t.evtRebuiltByOwner(character, campaign), 'info', RotateCcw, 'muted');
     // El DM no le marcó nada en la ficha: el mensaje tiene que decirlo, o el
     // jugador espera encontrar la estrella ya prendida.
     case 'heroic_inspiration_granted':
-      return { text: t.evtInspiration(campaign, character), tone: 'success' };
+      return {
+        text: t.evtInspiration(campaign, character),
+        tone: 'success',
+        display: 'inspiration',
+        icon: Sparkles,
+        iconTone: 'gold',
+        inspiration: {
+          campaign: plain(event.payload.campaignName, t.evtSomeCampaign),
+          character: plain(event.payload.characterName, t.evtSomeCharacter),
+          ...ownerSheet(event),
+        },
+      };
     case 'chapter_completed':
       return chapterCompleted(event, character, campaign, t);
     // Solo quién y dónde: lo que pasó en el combate es del Cuaderno del DM.
@@ -60,10 +119,22 @@ export function eventMessage(
       ]
         .filter(Boolean)
         .join(' ');
-      return { text, tone: 'success' };
+      return {
+        text,
+        tone: 'success',
+        display: 'item',
+        icon: Package,
+        iconTone: 'verdant',
+        item: {
+          campaign: plain(event.payload.campaignName, t.evtSomeCampaign),
+          character: plain(event.payload.characterName, t.evtSomeCharacter),
+          items,
+          ...ownerSheet(event),
+        },
+      };
     }
     case 'encounter_finished':
-      return { text: t.evtCombatDone(character, campaign), tone: 'info' };
+      return toast(t.evtCombatDone(character, campaign), 'info', Swords, 'muted');
     default:
       return null;
   }
@@ -73,7 +144,7 @@ export function eventMessage(
  *  lo único accionable que trae. Y traerlo es todo lo que hace: la app no sube
  *  a nadie de nivel ni le suma nada a la bolsa, es la nota del DM para que el
  *  jugador use su propio asistente. */
-function chapterCompleted(event: UserEvent, character: string, campaign: string, t: Texts) {
+function chapterCompleted(event: UserEvent, character: string, campaign: string, t: Texts): EventMessage {
   const chapter = quoted(event.payload.chapterName, t, t.evtSomeChapter);
   // Un aviso viejo no trae botín y uno de un servidor más nuevo podría traerlo
   // con otra forma: lo que no sea lo esperado se lee como que no hubo. El nivel
@@ -91,21 +162,33 @@ function chapterCompleted(event: UserEvent, character: string, campaign: string,
     ...(event.payload.hasGrants === true ? [{ icon: Package, text: t.evtItemsWaiting }] : []),
   ];
   const text = [t.evtChapterDone(character, chapter, campaign), ...details.map((d) => d.text)].join(' ');
-  // Sin comillas: el diálogo las pone en el título (es) o no las lleva (en).
-  const plain = (value: unknown, fallback: string) => (typeof value === 'string' && value.trim() !== '' ? value.trim() : fallback);
-  const { characterId } = event.payload;
   return {
     text,
-    tone: details.length > 0 ? ('success' as const) : ('info' as const),
+    tone: details.length > 0 ? 'success' : 'info',
+    display: 'chapter',
+    icon: BookOpen,
+    iconTone: 'gold',
     chapter: {
       title: t.evtChapterDoneTitle(plain(event.payload.chapterName, t.evtSomeChapter)),
       campaign: plain(event.payload.campaignName, t.evtSomeCampaign),
       by: t.evtChapterDoneBy(plain(event.payload.characterName, t.evtSomeCharacter)),
       lines: details,
       // Un aviso viejo no lo trae: sin él no se ofrece «Ir a Inventario».
-      ...(typeof characterId === 'string' && characterId !== '' ? { characterId } : {}),
+      ...ownerSheet(event),
     },
   };
+}
+
+/** Sin comillas: las pantallas las ponen en el título (es) o no las llevan (en). */
+function plain(value: unknown, fallback: string): string {
+  return typeof value === 'string' && value.trim() !== '' ? value.trim() : fallback;
+}
+
+/** La ficha **del dueño del aviso**, que mandó el servidor desde un vínculo ya
+ *  autorizado. Un aviso viejo no la trae: sin ella no se ofrece ir a la ficha. */
+function ownerSheet(event: UserEvent): { characterId?: string } {
+  const { characterId } = event.payload;
+  return typeof characterId === 'string' && characterId !== '' ? { characterId } : {};
 }
 
 /** Nombre entre comillas, o un genérico si vino vacío (lo borraron entre que

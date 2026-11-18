@@ -118,6 +118,17 @@ así que corregir una redacción es cambiar una línea y no migrar la base. Un
 `kind` que el cliente no conozca se ignora en silencio: el servidor puede ser
 más nuevo que la pestaña abierta.
 
+**Cinco formas en el cliente de `/v2`** (`events/PendingEvents.tsx`, el campo
+`display` de `events/messages.ts`): la Inspiración Heroica ocupa la pantalla
+completa; un objeto del DM se abre como un cofre; el fin de capítulo es un
+diálogo animado; y los demás avisos salen como tostada con su ícono si viene uno
+solo, o juntos en la bandeja «Mientras no estabas» si son 2 o más. Las tres
+pantallas van primero y de a uno. Ninguna escribe la ficha: «Ir a la ficha» e «Ir
+a Inventario» solo navegan, y para ofrecerlos el `payload` de
+`heroic_inspiration_granted`, de `item_granted` y de `chapter_completed` lleva
+`characterId` (la ficha **del dueño del aviso**, de un vínculo ya autorizado);
+un aviso viejo sin él no ofrece el botón.
+
 La Inspiración Heroica sigue el mismo molde: `POST
 /api/campaigns/<id>/members/<memberId>/heroic-inspiration` solo deja un
 `heroic_inspiration_granted` en la bandeja del dueño del personaje, resuelto a

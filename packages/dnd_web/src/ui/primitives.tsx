@@ -6,7 +6,7 @@
 //
 // Lo que no se importa no entra al bundle (Vite descarta los módulos de Radix
 // que nadie usa), así que tener la pieza lista no cuesta nada hasta usarla.
-import type { ComponentProps, ReactNode } from 'react';
+import type { ComponentProps, CSSProperties, ReactNode } from 'react';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area';
@@ -14,7 +14,7 @@ import * as SelectPrimitive from '@radix-ui/react-select';
 import * as SwitchPrimitive from '@radix-ui/react-switch';
 import * as ToastPrimitive from '@radix-ui/react-toast';
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
-import { Check, ChevronDown, CircleAlert, CircleCheck, Info, X } from 'lucide-react';
+import { Check, ChevronDown, CircleAlert, CircleCheck, Info, X, type LucideIcon } from 'lucide-react';
 import { useTexts } from '../i18n/context';
 import { cx } from './cx';
 
@@ -278,6 +278,8 @@ export function ScrollArea({
 export type ToastTone = 'info' | 'success' | 'error';
 
 const TOAST_ICON = { info: Info, success: CircleCheck, error: CircleAlert } as const;
+/** El tono del ícono de un aviso de la cola: `muted` para lo que solo informa. */
+export const ICON_TONE = { gold: 'text-gold', verdant: 'text-verdant', muted: 'text-on-surface-variant' } as const;
 const TOAST_COLOR = { info: 'text-gold', success: 'text-verdant', error: 'text-crimson' } as const;
 /** Las duraciones de `showAppMessage`: el error se lee con más calma. Todas se
  *  cierran solas, pero ninguna sin X: el aviso se puede descartar antes. */
@@ -305,6 +307,9 @@ export function Toast({
   onOpenChange,
   action,
   duration,
+  icon,
+  iconTone = 'gold',
+  progress,
 }: {
   tone: ToastTone;
   message: string;
@@ -312,34 +317,57 @@ export function Toast({
   onOpenChange: (open: boolean) => void;
   action?: { label: string; onSelect: () => void };
   duration?: number;
+  /** El ícono de lo que pasó, en un cuadro de 30 px: reemplaza al del tono
+   *  (los avisos de la cola, `events/messages.ts`). */
+  icon?: LucideIcon;
+  iconTone?: 'gold' | 'verdant' | 'muted';
+  /** Una barra al pie que se vacía en lo que dura el aviso; con el puntero
+   *  encima se frena, igual que el cierre. Sin animaciones no se dibuja. */
+  progress?: boolean;
 }) {
   const t = useTexts();
   const Icon = TOAST_ICON[tone];
+  const ms = duration ?? (action ? TOAST_MS.error : TOAST_MS[tone]);
+  const Custom = icon;
   return (
     <ToastPrimitive.Root
       open={open}
       onOpenChange={onOpenChange}
-      duration={duration ?? (action ? TOAST_MS.error : TOAST_MS[tone])}
-      className="card flex items-center gap-2.5 px-4 py-3"
+      duration={ms}
+      className={cx('card toast-root overflow-hidden', progress && 'notice-in')}
     >
-      <Icon size={20} aria-hidden="true" className={cx('shrink-0', TOAST_COLOR[tone])} />
-      <ToastPrimitive.Description className="min-w-0 flex-1 text-[14px] text-on-surface">{message}</ToastPrimitive.Description>
-      {action && (
-        <ToastPrimitive.Action
-          altText={action.label}
-          onClick={action.onSelect}
-          className="shrink-0 rounded-[var(--radius-nav)] px-2 py-1 text-[14px] font-semibold text-gold hover:bg-plaque"
+      <div className={cx('flex gap-2.5 px-4 py-3', Custom ? 'items-start' : 'items-center')}>
+        {Custom ? (
+          <span aria-hidden="true" className="inline-flex size-[30px] shrink-0 items-center justify-center rounded-[9px] bg-plaque">
+            <Custom size={16} className={ICON_TONE[iconTone]} />
+          </span>
+        ) : (
+          <Icon size={20} aria-hidden="true" className={cx('shrink-0', TOAST_COLOR[tone])} />
+        )}
+        <ToastPrimitive.Description className={cx('min-w-0 flex-1 text-[14px] text-on-surface', Custom && 'pt-1 leading-[1.45]')}>
+          {message}
+        </ToastPrimitive.Description>
+        {action && (
+          <ToastPrimitive.Action
+            altText={action.label}
+            onClick={action.onSelect}
+            className="shrink-0 rounded-[var(--radius-nav)] px-2 py-1 text-[14px] font-semibold text-gold hover:bg-plaque"
+          >
+            {action.label}
+          </ToastPrimitive.Action>
+        )}
+        <ToastPrimitive.Close
+          aria-label={t.closeNotice}
+          title={t.closeNotice}
+          className={cx(
+            'inline-flex shrink-0 items-center justify-center rounded-[var(--radius-nav)] text-text-muted hover:bg-plaque',
+            Custom ? '-my-0.5 -mr-1.5 size-[30px]' : '-my-1 -mr-2 size-8',
+          )}
         >
-          {action.label}
-        </ToastPrimitive.Action>
-      )}
-      <ToastPrimitive.Close
-        aria-label={t.closeNotice}
-        title={t.closeNotice}
-        className="-my-1 -mr-2 inline-flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-nav)] text-text-muted hover:bg-plaque"
-      >
-        <X size={16} aria-hidden="true" />
-      </ToastPrimitive.Close>
+          <X size={16} aria-hidden="true" />
+        </ToastPrimitive.Close>
+      </div>
+      {progress && <div aria-hidden="true" className="toast-bar" style={{ '--toast-ms': `${ms}ms` } as CSSProperties} />}
     </ToastPrimitive.Root>
   );
 }
