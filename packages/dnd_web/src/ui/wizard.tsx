@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { Check, CircleAlert } from 'lucide-react';
 import { fold, type CodexDetail } from '../codex/entries';
 import type { Texts } from '../i18n/texts';
@@ -353,9 +353,10 @@ export function SpellPickBlock({
   );
 }
 
-/** La tira de pasos. Se llega a un paso solo si los anteriores están
- *  completos; [progress] la cambia en un teléfono por «Paso n de m» y una barra,
- *  para que nueve pasos no ocupen media pantalla. */
+/** La tira de pasos: una línea que se llena hasta el paso actual y, sobre ella,
+ *  un círculo por paso con su rótulo debajo. Se llega a un paso solo si los
+ *  anteriores están completos; [progress] la cambia en un teléfono por «Paso n
+ *  de m» y una barra nativa, para que nueve pasos no ocupen media pantalla. */
 export function StepRail({
   steps,
   index,
@@ -371,50 +372,72 @@ export function StepRail({
   label: string;
   progress?: string;
 }) {
+  const n = steps.length;
+  const barId = useId();
   return (
     <>
       {progress && (
         <div className="flex flex-col gap-2 sm:hidden">
-          <span className="text-[12.5px] text-on-surface-variant">{progress}</span>
-          <div aria-hidden="true" className="flex gap-[3px]">
-            {steps.map((s, i) => (
-              <span key={s.id} className={cx('h-1 flex-1 rounded-[2px]', i <= index ? 'bg-gold' : 'bg-hairline')} />
-            ))}
-          </div>
+          <label htmlFor={barId} className="text-[12.5px] text-on-surface-variant">
+            {progress}
+          </label>
+          <progress id={barId} className="step-progress" max={n} value={index + 1} />
         </div>
       )}
       <nav aria-label={label} className={cx(progress && 'hidden sm:block')}>
-        <ol className="flex flex-wrap gap-1.5">
-          {steps.map((s, i) => {
-            const done = i < index;
-            const cur = i === index;
-            return (
-              <li key={s.id}>
-                <button
-                  type="button"
-                  aria-current={cur ? 'step' : undefined}
-                  disabled={!reachable(i)}
-                  onClick={() => onSelect(s.id)}
-                  className={cx(
-                    'flex items-center gap-2 rounded-[var(--radius-pill)] border py-1.5 pr-3 pl-1.5 text-[13px] transition-colors duration-[120ms] disabled:cursor-default',
-                    cur ? 'border-gold bg-gold-soft font-medium text-gold' : 'border-hairline text-on-surface-variant',
-                  )}
-                >
-                  <span
-                    aria-hidden="true"
+        <div className="relative">
+          {/* La pista va del centro del primer círculo al del último: cada
+              columna mide 100%/n, así que el centro del primero está a la mitad
+              de una. El relleno se estira con `scaleX` y no con el ancho, para
+              que la transición sea de compositor. */}
+          <span
+            aria-hidden="true"
+            className="absolute top-3 h-0.5 rounded-[2px] bg-hairline"
+            style={{ left: `calc(100% / ${2 * n})`, right: `calc(100% / ${2 * n})` }}
+          >
+            <span
+              className="absolute inset-0 origin-left rounded-[2px] bg-gold transition-transform duration-200 ease-out"
+              style={{ transform: `scaleX(${n > 1 ? index / (n - 1) : 0})` }}
+            />
+          </span>
+          <ol className="relative grid" style={{ gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))` }}>
+            {steps.map((s, i) => {
+              const done = i < index;
+              const cur = i === index;
+              const can = reachable(i);
+              return (
+                <li key={s.id} className="flex min-w-0 justify-center">
+                  <button
+                    type="button"
+                    aria-current={cur ? 'step' : undefined}
+                    disabled={!can}
+                    onClick={() => onSelect(s.id)}
                     className={cx(
-                      'flex h-[22px] w-[22px] items-center justify-center rounded-full text-[12px] font-bold',
-                      cur ? 'bg-gold text-on-primary' : done ? 'bg-gold-soft text-gold' : 'border border-hairline bg-plaque',
+                      'group flex min-w-0 flex-col items-center gap-1.5 rounded-[var(--radius-nav)] text-[12px] disabled:cursor-default',
+                      cur ? 'font-medium text-gold' : done ? 'text-on-surface-variant' : 'text-text-muted',
                     )}
                   >
-                    {done ? <Check size={12} strokeWidth={3} /> : i + 1}
-                  </span>
-                  {s.label}
-                </button>
-              </li>
-            );
-          })}
-        </ol>
+                    <span
+                      aria-hidden="true"
+                      className={cx(
+                        'flex h-[26px] w-[26px] items-center justify-center rounded-full border text-[12px] font-bold transition-colors duration-200',
+                        cur
+                          ? 'border-gold bg-gold text-on-primary ring-4 ring-gold-soft'
+                          : done
+                            ? 'border-gold bg-gold-soft text-gold'
+                            : 'border-hairline bg-plaque text-text-muted',
+                        can && !cur && 'group-hover:border-gold',
+                      )}
+                    >
+                      {done ? <Check size={12} strokeWidth={3.5} /> : i + 1}
+                    </span>
+                    {s.label}
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
       </nav>
     </>
   );
