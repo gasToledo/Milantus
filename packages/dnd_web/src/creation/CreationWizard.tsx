@@ -1,29 +1,42 @@
-import { useRef, useMemo, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useRef, useMemo, useState, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
+  Baby,
   BookOpen,
+  Bot,
+  Brain,
   Church,
   Cog,
   Crosshair,
+  Drama,
+  Dumbbell,
   Eye,
+  FlaskConical,
   Flame,
+  FlameKindling,
   Hand,
+  Handshake,
   Leaf,
   Minus,
+  Mountain,
+  MountainSnow,
   Music,
+  PawPrint,
   Plus,
   Shield,
   ShieldCheck,
   Sparkles,
   Sword,
+  TreePine,
   User,
+  Users,
   type LucideIcon,
 } from 'lucide-react';
 import { accentOf, nameOf } from '../api/catalog';
 import { dropPending } from '../api/characterSave';
 import { createCharacter, createNpc, linkCampaignNpc, saveCharacter } from '../api/client';
 import { queryKeys, useSheetCatalog } from '../api/queries';
-import { codexEntries, type CodexEntry } from '../codex/entries';
+import { codexEntries } from '../codex/entries';
 import { RosterFooter } from '../dashboard/RosterPanel';
 import {
   abilityModifier,
@@ -55,6 +68,7 @@ import { ABILITIES } from '../sheet/vocabulary';
 import { AppDialog } from '../ui/AppDialog';
 import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
+import { Medallion } from '../ui/Medallion';
 import { Eyebrow } from '../ui/data';
 import { Shell, SidebarBack } from '../ui/Shell';
 import { AppBusyLabel, AppErrorView } from '../ui/status';
@@ -64,6 +78,8 @@ import {
   Block,
   DetailBody,
   Option,
+  PICK_GRID,
+  PickCard,
   SearchableList,
   Status,
   StepRail,
@@ -117,6 +133,29 @@ const CLASS_ICONS: Record<string, LucideIcon> = {
   oath: ShieldCheck,
   bow: Crosshair,
   gear: Cog,
+};
+
+/** El ícono de cada especie: el catálogo trae `iconId` con nombres de Material
+ *  (los que usa Flutter) y acá se traducen a lucide. Tiefling usa `masks` →
+ *  `Drama` y no `Flame`: Draconato (`local_fire_department`) ya la tiene y dos
+ *  tarjetas iguales no se distinguen. Una especie propia, sin `iconId` o con uno
+ *  que no está acá, cae en `Users`. */
+const SPECIES_ICONS: Record<string, LucideIcon> = {
+  person: User,
+  terrain: Mountain,
+  child_care: Baby,
+  fitness_center: Dumbbell,
+  park: TreePine,
+  local_fire_department: Flame,
+  science: FlaskConical,
+  whatshot: FlameKindling,
+  landscape: MountainSnow,
+  auto_awesome: Sparkles,
+  masks: Drama,
+  psychology: Brain,
+  handshake: Handshake,
+  pets: PawPrint,
+  smart_toy: Bot,
 };
 
 /** La página del creador: el marco de siempre y salir pasa por la misma
@@ -203,7 +242,10 @@ function CreationWizard({
     const old = replacing as unknown as { name: string; alignment?: string | null; personalityTrait?: string };
     return { name: old.name, alignment: old.alignment ?? null, personalityTrait: old.personalityTrait ?? '' };
   });
-  const [stepId, setStepId] = useState<StepId>('especie');
+  // La dirección viaja con el paso: el contenido entra desde el lado hacia donde
+  // se fue. `null` al abrir, que no anima.
+  const [nav, setNav] = useState<{ id: StepId; dir: 'fwd' | 'back' | null }>({ id: 'especie', dir: null });
+  const stepId = nav.id;
   const [focus, setFocus] = useState<Focus>(null);
   const view = useMemo(() => creationView(catalog, draft), [catalog, draft]);
   const sheet = useMemo(() => computeSheet(view.character, catalog), [view, catalog]);
@@ -274,8 +316,24 @@ function CreationWizard({
   const reachable = (i: number) => steps.slice(0, i).every((s) => pendingOf(s).length === 0);
   const pending = pendingOf(stepId);
 
+  // Al cambiar de paso el foco va al título del primer bloque: si se quedaba en
+  // «Continuar», quien usa teclado o lector no se enteraba de qué paso abrió.
+  // No al entrar: ahí manda el título de la pantalla.
+  const stepRef = useRef<HTMLDivElement>(null);
+  const firstStep = useRef(true);
+  useEffect(() => {
+    if (firstStep.current) {
+      firstStep.current = false;
+      return;
+    }
+    const heading = stepRef.current?.querySelector<HTMLElement>('h2');
+    if (!heading) return;
+    heading.tabIndex = -1;
+    heading.focus();
+  }, [stepId]);
+
   const go = (s: StepId) => {
-    setStepId(s);
+    setNav({ id: s, dir: steps.indexOf(s) < index ? 'back' : 'fwd' });
     // Al entrar, el panel explica lo que el paso ya tiene elegido.
     const d = view.draft;
     setFocus(
@@ -307,10 +365,13 @@ function CreationWizard({
 
   return (
     <div className="flex min-h-full flex-col gap-4" data-page="creation">
-      <header className="flex flex-col gap-3">
-        <h1 className="font-display text-[24px] text-on-surface">
-          {replacing ? t.rebuildTitle((replacing as unknown as { name: string }).name) : npc ? t.wizardCreateNpc : t.rosterCreate}
-        </h1>
+      <header className="flex flex-col gap-5">
+        <CreationHeader
+          draft={view.draft}
+          catalog={catalog}
+          t={t}
+          title={replacing ? t.rebuildTitle((replacing as unknown as { name: string }).name) : npc ? t.wizardCreateNpc : t.rosterCreate}
+        />
         <StepRail
           steps={steps.map((id) => ({ id, label: t.crSteps[id] }))}
           index={index}
@@ -322,7 +383,11 @@ function CreationWizard({
       </header>
 
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
-        <div className="flex min-w-0 flex-col gap-4">
+        <div
+          key={stepId}
+          ref={stepRef}
+          className={cx('flex min-w-0 flex-col gap-4', nav.dir === 'fwd' && 'step-fwd', nav.dir === 'back' && 'step-back')}
+        >
           {stepId === 'especie' && <SpeciesStep {...props} />}
           {stepId === 'clase' && <ClassStep {...props} />}
           {stepId === 'trasfondo' && <BackgroundStep {...props} />}
@@ -385,6 +450,74 @@ function CreationWizard({
   );
 }
 
+/** La cabecera que va armando al personaje: el medallón toma el color de la
+ *  clase y la línea de identidad suma cada pieza al elegirla (con un fundido,
+ *  `key` = el valor). Lo que falta es un hueco punteado con el nombre del paso.
+ *  Todo sale del borrador y del catálogo: ninguna regla. */
+function CreationHeader({ draft: d, catalog, t, title }: { draft: CreationDraftJson; catalog: Catalog; t: Texts; title: string }) {
+  const race = nameOf(catalog.races, d.raceId);
+  const lineage = nameOf(catalog.lineages, d.lineageId);
+  const cls = nameOf(catalog.classes, d.classId);
+  const bg = nameOf(catalog.backgrounds, d.backgroundId);
+  const initial = d.name?.trim() || cls || race || t.crUnnamed;
+  const accent = d.classId ? accentOf(catalog, d.classId) : null;
+  const sep = (
+    <span className="text-text-muted" aria-hidden="true">
+      ·
+    </span>
+  );
+  const hole = (label: string) => (
+    <span className="inline-flex h-5 items-center rounded-[var(--radius-pill)] border border-dashed border-hairline px-2 text-[12px] text-text-muted sm:h-[22px] sm:px-[9px] sm:text-[12.5px]">
+      {label}
+    </span>
+  );
+  const piece = (value: string) => (
+    <span key={value} className="step-in">
+      {value}
+    </span>
+  );
+  // Las piezas que hay, o su hueco, separadas por el punto.
+  const join = (parts: ReactNode[]) =>
+    parts.map((p, i) => (
+      <Fragment key={i}>
+        {i > 0 && sep}
+        {p}
+      </Fragment>
+    ));
+  const line = 'm-0 flex flex-wrap items-center gap-1.5 text-on-surface sm:gap-2';
+  return (
+    <div className="flex items-center gap-3 sm:gap-4">
+      <span className="hidden sm:flex">
+        <Medallion name={initial} accent={accent} size={64} />
+      </span>
+      <span className="flex sm:hidden">
+        <Medallion name={initial} accent={accent} size={44} />
+      </span>
+      <div className="flex min-w-0 flex-col gap-1 sm:gap-1.5">
+        <h1 className="font-display text-[20px] leading-[1.2] text-on-surface sm:text-[24px]">{title}</h1>
+        <p className={cx(line, 'hidden text-[13.5px] sm:flex')}>
+          {join([
+            race ? piece(race) : hole(t.crSteps.especie),
+            ...(lineage ? [piece(lineage)] : []),
+            cls ? piece(cls) : hole(t.crSteps.clase),
+            bg ? piece(bg) : hole(t.crSteps.trasfondo),
+            <span key="lv" className="text-on-surface-variant">
+              {t.crLevelOne}
+            </span>,
+          ])}
+        </p>
+        <p className={cx(line, 'text-[12.5px] sm:hidden')}>
+          {join([
+            lineage ? piece(lineage) : race ? piece(race) : hole(t.crSteps.especie),
+            cls ? piece(cls) : hole(t.crSteps.clase),
+            bg ? piece(bg) : hole(t.crSteps.trasfondo),
+          ])}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function pendingText(p: CreationPending, t: Texts): string {
   return t.crPending[p.kind]({ ...p, amount: formatAmount(p.need, coinLabels(t)) });
 }
@@ -407,15 +540,15 @@ function SpeciesStep({ t, lang, catalog, view, act, setFocus }: StepProps) {
           textOf={(e) => `${e.name} ${e.subtitle}`}
           label={t.crSearchSpecies}
           count={t.crCountSpecies(species.length)}
+          layout="cards"
         >
           {(e) => (
-            <Option
+            <PickCard
               key={e.id}
               id={e.id}
-              selected={d.raceId === e.id}
+              icon={SPECIES_ICONS[String(catalog.races.find((r) => r.id === e.id)?.iconId)] ?? Users}
               title={e.name}
-              detail={e.subtitle}
-              trailing={<SourceTag source={e.source} t={t} />}
+              selected={d.raceId === e.id}
               onClick={() => {
                 act({ type: 'selectRace', id: e.id });
                 setFocus({ kind: 'race', id: e.id });
@@ -511,20 +644,24 @@ function ClassStep({ t, lang, catalog, view, act, setFocus }: StepProps) {
   return (
     <>
       <Block title={t.crSteps.clase} status={<Status ready={!!d.classId} t={t} />}>
-        <div role="radiogroup" aria-label={t.crSteps.clase} className="flex gap-2 overflow-x-auto pb-2.5">
-          {classes.map((c) => (
-            <ClassCard
-              key={c.id}
-              entry={c}
-              icon={CLASS_ICONS[String(catalog.classes.find((k) => k.id === c.id)?.iconId)] ?? User}
-              color={accentOf(catalog, c.id)}
-              selected={d.classId === c.id}
-              onClick={() => {
-                act({ type: 'selectClass', id: c.id });
-                setFocus({ kind: 'class', id: c.id });
-              }}
-            />
-          ))}
+        <div className="@container">
+          <div role="radiogroup" aria-label={t.crSteps.clase} className={PICK_GRID}>
+            {classes.map((c) => (
+              <PickCard
+                key={c.id}
+                id={c.id}
+                icon={CLASS_ICONS[String(catalog.classes.find((k) => k.id === c.id)?.iconId)] ?? User}
+                color={accentOf(catalog, c.id)}
+                title={c.name}
+                detail={c.subtitle}
+                selected={d.classId === c.id}
+                onClick={() => {
+                  act({ type: 'selectClass', id: c.id });
+                  setFocus({ kind: 'class', id: c.id });
+                }}
+              />
+            ))}
+          </div>
         </div>
       </Block>
 
@@ -613,40 +750,6 @@ function ClassStep({ t, lang, catalog, view, act, setFocus }: StepProps) {
         </Block>
       )}
     </>
-  );
-}
-
-/** Una clase en la fila: elegida se comporta como una opción. El acento de
- *  clase pinta solo el ícono, como en toda la app. */
-function ClassCard({
-  entry,
-  icon: Icon,
-  color,
-  selected,
-  onClick,
-}: {
-  entry: CodexEntry;
-  icon: LucideIcon;
-  color: string | null;
-  selected: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      role="radio"
-      aria-checked={selected}
-      data-option={entry.id}
-      onClick={onClick}
-      className={cx(
-        'pick flex min-h-24 w-[136px] shrink-0 flex-col items-start gap-1.5 rounded-[var(--radius-card)] border p-3 text-left text-on-surface',
-        selected ? 'border-gold bg-gold-soft' : 'border-hairline bg-plaque',
-      )}
-    >
-      <Icon size={20} aria-hidden="true" style={color ? { color } : undefined} />
-      <span className="font-medium">{entry.name}</span>
-      <span className="text-[12.5px] text-on-surface-variant">{entry.subtitle}</span>
-    </button>
   );
 }
 

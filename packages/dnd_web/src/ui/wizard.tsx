@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useId, useRef, useState, type ReactNode } from 'react';
-import { Check, CircleAlert } from 'lucide-react';
+import { Check, CircleAlert, type LucideIcon } from 'lucide-react';
 import { fold, type CodexDetail } from '../codex/entries';
 import type { Texts } from '../i18n/texts';
 import { Button } from './Button';
@@ -215,6 +215,61 @@ export function SpellTabs({
   );
 }
 
+/** La grilla de `PickCard`: dos columnas y, desde 560 px del contenedor, cuatro.
+ *  Se mide el contenedor y no la ventana: el panel lateral le come ancho y
+ *  `MediaQuery` no lo ve. Va dentro de un elemento `@container` (una consulta no
+ *  alcanza al propio elemento que la declara). */
+export const PICK_GRID = 'grid grid-cols-2 gap-2 @[560px]:grid-cols-4';
+
+/** Una tarjeta de elección única para grillas (clases, especies). En fila
+ *  debajo de 560 px de contenedor y con el ícono arriba desde ahí. [color] es el
+ *  acento de la clase y pinta **solo** el ícono; sin él (las especies) el ícono
+ *  va apagado y, elegido, en oro. */
+export function PickCard({
+  id,
+  icon: Icon,
+  color,
+  title,
+  detail,
+  selected,
+  onClick,
+}: {
+  id: string;
+  icon: LucideIcon;
+  color?: string | null;
+  title: string;
+  detail?: string;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={selected}
+      data-option={id}
+      onClick={onClick}
+      className={cx(
+        'pick flex items-center gap-2.5 rounded-[var(--radius-card)] border px-3 py-2.5 text-left text-on-surface',
+        '@[560px]:flex-col @[560px]:items-start @[560px]:gap-1.5 @[560px]:p-3',
+        detail ? 'min-h-14 @[560px]:min-h-[88px]' : 'min-h-12 @[560px]:min-h-[76px]',
+        selected ? 'border-gold bg-gold-soft' : 'border-hairline bg-plaque',
+      )}
+    >
+      <Icon
+        size={20}
+        aria-hidden="true"
+        className={cx('size-[18px] shrink-0 @[560px]:size-5', !color && (selected ? 'text-gold' : 'text-on-surface-variant'))}
+        style={color ? { color } : undefined}
+      />
+      <span className="flex min-w-0 flex-col @[560px]:gap-1.5">
+        <span className="font-medium">{title}</span>
+        {detail && <span className="text-[12.5px] text-on-surface-variant">{detail}</span>}
+      </span>
+    </button>
+  );
+}
+
 /** Una lista larga: buscador, cuenta y scroll propio. [children] arma cada fila
  *  de lo que deja pasar el filtro. */
 export function SearchableList<T>({
@@ -225,6 +280,7 @@ export function SearchableList<T>({
   columns = 1,
   multi = false,
   height = 'max-h-[300px]',
+  layout = 'list',
   groupOf,
   empty,
   children,
@@ -244,6 +300,9 @@ export function SearchableList<T>({
   columns?: 1 | 2;
   multi?: boolean;
   height?: string;
+  /** `cards`: las filas son `PickCard` en la grilla de `PickGrid`; ignora
+   *  `columns` y `height` y no scrollea (son pocas: las especies). */
+  layout?: 'list' | 'cards';
   children: (item: T) => ReactNode;
 }) {
   const [query, setQuery] = useState('');
@@ -262,24 +321,30 @@ export function SearchableList<T>({
         />
         {count && <span className="text-[12.5px] whitespace-nowrap text-on-surface-variant">{count}</span>}
       </div>
-      <div
-        role={multi ? 'group' : 'radiogroup'}
-        aria-label={label}
-        className={cx('grid auto-rows-max gap-2 overflow-y-auto pr-1', height, columns === 2 && 'sm:grid-cols-2')}
-      >
-        {visible.length === 0 && empty && <p className="text-[13px] text-on-surface-variant">{empty}</p>}
-        {visible.map((item, i) => {
-          const group = groupOf?.(item);
-          const head = group !== undefined && (i === 0 || group !== groupOf!(visible[i - 1]!));
-          return head ? (
-            <Fragment key={group}>
-              <Eyebrow className="col-span-full pt-0.5">{group}</Eyebrow>
-              {children(item)}
-            </Fragment>
-          ) : (
-            children(item)
-          );
-        })}
+      <div className={cx(layout === 'cards' && '@container')}>
+        <div
+          role={multi ? 'group' : 'radiogroup'}
+          aria-label={label}
+          className={
+            layout === 'cards'
+              ? PICK_GRID
+              : cx('grid auto-rows-max gap-2 overflow-y-auto pr-1', height, columns === 2 && 'sm:grid-cols-2')
+          }
+        >
+          {visible.length === 0 && empty && <p className="col-span-full text-[13px] text-on-surface-variant">{empty}</p>}
+          {visible.map((item, i) => {
+            const group = groupOf?.(item);
+            const head = group !== undefined && (i === 0 || group !== groupOf!(visible[i - 1]!));
+            return head ? (
+              <Fragment key={group}>
+                <Eyebrow className="col-span-full pt-0.5">{group}</Eyebrow>
+                {children(item)}
+              </Fragment>
+            ) : (
+              children(item)
+            );
+          })}
+        </div>
       </div>
     </>
   );

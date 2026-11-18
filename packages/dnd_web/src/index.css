@@ -610,6 +610,29 @@ body {
   animation: step-in 160ms ease-out;
 }
 
+/* El contenido de un paso del creador entra desde el lado hacia donde se fue:
+   de la derecha al avanzar, de la izquierda al volver. Se hace con la animación
+   de entrada y no con View Transitions: se ve igual y no pide soporte del
+   navegador. «Reducir movimiento» lo cubre la regla global de duraciones. */
+@keyframes step-fwd {
+  from {
+    opacity: 0;
+    translate: 16px 0;
+  }
+}
+@keyframes step-back {
+  from {
+    opacity: 0;
+    translate: -16px 0;
+  }
+}
+.step-fwd {
+  animation: step-fwd 180ms ease-out;
+}
+.step-back {
+  animation: step-back 180ms ease-out;
+}
+
 /* La barra de pasos del teléfono: un `<progress>` nativo con la marca, como
    pide la guía de `progress`. Las dos reglas del relleno van separadas: agrupadas,
    un navegador que no entiende un selector descarta la regla entera. */

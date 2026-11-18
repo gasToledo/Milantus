@@ -85,7 +85,8 @@ un control a un asistente, buscá acá.
 | `AmountControls` | El campo de cantidad con Daño, Curar y PG temp (`sheet/CombatTab.tsx`); recibe `id` y `dataControls` para que el personaje y cada compañero tengan el suyo. `ConditionToggleList` es lo mismo para los estados (`data-condition` o `data-companion-condition`) | PG de la ficha y de cada compañero |
 | `CreatureProfile` con `compact` | La misma ficha de criatura sin tarjeta propia ni píldoras y con título de panel (`font-display text-[16px]`): para el panel derecho y el diálogo de Forma Salvaje. Se mide con `@container` y no con la ventana (las seis características van en una fila desde 520 px de su lugar) | Mostrar una criatura dentro de otra superficie |
 | `WIZARD_ASIDE` | Las clases de la columna derecha: sigue a la vista al bajar y, si no entra, se desplaza sola | Panel derecho de cada asistente |
-| `SearchableList` | Buscador sin tildes y por palabras (`matchesQuery`), cuenta y scroll propio; `groupOf` pinta un `Eyebrow` a todo el ancho al cambiar de grupo (los conjuros por nivel, sin grupos vacíos al buscar) y `empty` dice qué pasa si el filtro no deja nada | Listas largas: especies, trasfondos, armas |
+| `SearchableList` | Buscador sin tildes y por palabras (`matchesQuery`), cuenta y scroll propio (con `layout="cards"` las filas son `PickCard` en su grilla, sin tope de alto ni scroll); `groupOf` pinta un `Eyebrow` a todo el ancho al cambiar de grupo (los conjuros por nivel, sin grupos vacíos al buscar) y `empty` dice qué pasa si el filtro no deja nada | Listas largas: especies, trasfondos, armas |
+| `PickCard`, `PICK_GRID` | Tarjeta de elección única para una grilla (`role="radio"`, `data-option`): ícono de 20, título y `detail` opcional. Desde 560 px **del contenedor** va con el ícono arriba y en cuatro columnas; debajo, en fila y dos columnas (la grilla es `PICK_GRID` dentro de un `@container`, no la ventana). `color` es el acento de la clase y pinta solo el ícono; sin él (especies) el ícono va apagado y, elegido, en oro | Clases y especies del creador |
 | `StepRail` | La tira de pasos: una línea que se llena hasta el paso actual (`scaleX`, 200 ms) con un círculo por paso y el rótulo debajo (hecho, actual, pendiente); `progress` la cambia en un teléfono por «Paso n de m» y un `<progress>` nativo (`.step-progress`) | Arriba de cada asistente |
 | `WizardFooter` | El pie: lo que falta y Atrás/Continuar, como tarjeta flotante; `above` a todo el ancho; `danger` pinta el mensaje en carmesí | Abajo de cada asistente |
 | `DetailBody`, `TraitList` | La ficha del Códice (`CodexDetail`) y una lista de rasgos, para el panel derecho | Explicar lo último que se tocó |
@@ -129,7 +130,7 @@ pantalla nueva. Un paso nuevo tiene que remontar sus bloques: si son del mismo
 tipo, lleva `key` con el paso.
 
 El creador (`src/creation/CreationWizard.tsx`) suma dos piezas propias, que por
-ahora solo usa él: la fila de clases (`ClassCard`, scroll horizontal) y la
+ahora solo usa él: la grilla de clases (`PickCard`, las trece a la vista) y la
 matriz de características (`ScoreMatrix`: una columna por dado, así dos 14 son
 dos columnas; una fila es una elección de una; la cabecera dice qué queda libre
 y quién tiene cada dado; tocar uno ocupado los intercambia y el propio lo suelta;
