@@ -248,6 +248,8 @@ Future<Response> _giveItemsHandler(
     await repositories.events.append(member.ownerUserId, 'item_granted', {
       'characterName': member.character.name,
       'campaignName': campaign.name,
+      // La ficha del dueño (ver `chapter_completed`): habilita «Ir a Inventario».
+      'characterId': member.character.id,
       'grantsItems': [for (final item in items) item.item.label],
       'hasGrants': true,
     });

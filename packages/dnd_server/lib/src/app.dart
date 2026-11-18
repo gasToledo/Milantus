@@ -1953,6 +1953,9 @@ Future<Response> _grantHeroicInspirationHandler(
   await events.append(member.ownerUserId, 'heroic_inspiration_granted', {
     'characterName': member.character.name,
     'campaignName': campaign.name,
+    // La ficha del dueño del aviso, para que el cliente ofrezca «Ir a la ficha»:
+    // salió de un vínculo que `findMember` ya autorizó.
+    'characterId': member.character.id,
   });
   return _jsonOk({'status': 'ok'});
 }
