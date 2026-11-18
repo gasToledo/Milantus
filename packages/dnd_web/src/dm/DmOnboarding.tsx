@@ -27,7 +27,9 @@ export function DmOnboarding() {
   ];
 
   return (
-    <div className="@container">
+    // El margen de arriba lo tenía la tarjeta de antes: sin él queda pegada a la
+    // regla del título.
+    <div className="@container mt-6">
       <section className="card grid items-center gap-6 px-[18px] py-[22px] @[760px]:grid-cols-2 @[760px]:gap-12 @[760px]:px-10 @[760px]:py-9">
         <div className="flex flex-col items-start gap-3.5">
           {/* El escudo en el medallón de la marca: el aro dorado y el degradado
