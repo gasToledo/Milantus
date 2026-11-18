@@ -117,7 +117,6 @@ const es = {
   quizLeaveSummary: (n: number, ok: number) => `${n} ${n === 1 ? 'respondida' : 'respondidas'} · ${ok} ${ok === 1 ? 'correcta' : 'correctas'}`,
   quizRight: '¡Correcto!',
   quizWrong: 'No era esa',
-  navCampaigns: 'Campañas',
   navBestiary: 'Bestiario',
   bestiaryTitle: 'Bestiario',
   bestiaryCount: (n: number) => (n === 1 ? '1 criatura' : `${n} criaturas`),
@@ -1217,12 +1216,6 @@ Un descanso largo baja un nivel.`,
 
   // Pestaña Campaña (las cadenas salen de `app_es.arb`).
   campaignsLoading: 'Cargando tus campañas…',
-  campaignsPageTitle: 'Campañas',
-  campaignsPageCount: (n: number) => (n === 1 ? '1 campaña' : `${n} campañas`),
-  campaignsPageErrorTitle: 'No se pudieron cargar tus campañas',
-  campaignsPageEmpty: 'Ninguno de tus personajes está en una campaña.',
-  campaignsPageEmptyHint: 'Abrí uno y tocá «Compartir» para pasarle el código a tu DM.',
-  campaignsWith: (name: string) => `Con ${name}`,
   campaignsLoadError: 'No se pudieron leer tus campañas.',
 
   // Modo DM (las cadenas salen de `app_es.arb`: `dm*` y `campaignState*`).
@@ -2307,7 +2300,6 @@ Los personajes que los jugadores le compartieron se sueltan, y sus fichas siguen
     `El DM de «${campaign}» deja de ver a ${character}. Tu ficha no se toca.`,
   shareStopError: 'No se pudo dejar de compartir.',
   shareStopped: (campaign: string) => `Ya no se comparte con ${campaign}.`,
-  campaignsPageGoToCharacters: 'Ir a Personajes',
   turnNext: 'Preparate, seguís vos.',
   turnActive: 'Es tu turno.',
 
@@ -2694,7 +2686,6 @@ const en: Texts = {
   quizLeaveSummary: (n: number, ok: number) => `${n} answered · ${ok} correct`,
   quizRight: 'Correct!',
   quizWrong: 'Not that one',
-  navCampaigns: 'Campaigns',
   navBestiary: 'Bestiary',
   bestiaryTitle: 'Bestiary',
   bestiaryCount: (n: number) => (n === 1 ? '1 creature' : `${n} creatures`),
@@ -3776,12 +3767,6 @@ A long rest lowers it by one level.`,
   packShowAll: 'Show all',
 
   campaignsLoading: 'Loading your campaigns…',
-  campaignsPageTitle: 'Campaigns',
-  campaignsPageCount: (n: number) => (n === 1 ? '1 campaign' : `${n} campaigns`),
-  campaignsPageErrorTitle: 'Could not load your campaigns',
-  campaignsPageEmpty: 'None of your characters is in a campaign.',
-  campaignsPageEmptyHint: 'Open one and tap “Share” to give the code to your DM.',
-  campaignsWith: (name: string) => `With ${name}`,
   campaignsLoadError: 'Could not read your campaigns.',
 
   // DM mode (strings come from `app_en.arb`: `dm*` and `campaignState*`).
@@ -4852,7 +4837,6 @@ The characters players shared with it are released, and their sheets remain thei
     `The DM of “${campaign}” can no longer see ${character}. Your sheet is not touched.`,
   shareStopError: 'Could not stop sharing.',
   shareStopped: (campaign: string) => `No longer shared with ${campaign}.`,
-  campaignsPageGoToCharacters: 'Go to Characters',
   turnNext: 'Get ready, you’re up next.',
   turnActive: 'It’s your turn.',
 

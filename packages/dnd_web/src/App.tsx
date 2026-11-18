@@ -16,7 +16,6 @@ import { DmPage } from './dm/DmPage';
 import { CodexPage } from './codex/CodexPage';
 import { QuizPage } from './quiz/QuizPage';
 import { BestiaryPage } from './bestiary/BestiaryPage';
-import { CampaignsPage } from './campaigns/CampaignsPage';
 import { CharacterPage } from './sheet/CharacterPage';
 import { SettingsPage } from './settings/SettingsPage';
 import { AccountPrefsSync } from './settings/AccountPrefsSync';
@@ -141,12 +140,6 @@ function Routes({ account }: { account: Account }) {
       return (
         <Shell panel={<RosterPanel />} footer={<RosterFooter account={account} />}>
           <BestiaryPage entryId={route.entryId} />
-        </Shell>
-      );
-    case 'campaigns':
-      return (
-        <Shell panel={<RosterPanel />} footer={<RosterFooter account={account} />}>
-          <CampaignsPage />
         </Shell>
       );
     case 'settings':

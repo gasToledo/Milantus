@@ -4,6 +4,8 @@ import { api, TOKEN, TOKEN_DM, TOKEN_SIN_V2 } from './helpers';
 test.use({ locale: 'es-AR' });
 
 const ELSBETH = 'elsbeth-de-humo';
+// Lo que el jugador ve de sus campañas: la pestaña Campaña de su ficha.
+const FICHA = `/v2/personajes/${ELSBETH}/campana`;
 
 // Lo que el DM sembró y el jugador no tiene que ver (ver `e2e_server.dart`).
 const SOLO_DEL_DM = [
@@ -18,7 +20,7 @@ const SOLO_DEL_DM = [
   'encounterLogs',
 ];
 
-test('nada del DM llega al jugador: ni en lo que manda la API ni en la pantalla de Campañas', async ({
+test('nada del DM llega al jugador: ni en lo que manda la API ni en la pestaña Campaña', async ({
   context,
   page,
   request,
@@ -30,7 +32,7 @@ test('nada del DM llega al jugador: ni en lo que manda la API ni en la pantalla 
     `/api/characters/${ELSBETH}/campaigns`,
   );
 
-  await page.goto('/v2/campanas');
+  await page.goto(FICHA);
   await expect(page.getByRole('heading', { level: 2, name: campaigns[0]!.campaign.name })).toBeVisible();
 
   const crudo = JSON.stringify(campaigns);
@@ -58,7 +60,7 @@ test('el jugador ve el capítulo en curso y la nota que el DM compartió, y nada
   expect(JSON.stringify(campaigns)).not.toContain('Nota reservada del DM');
 
   // La pantalla: lo compartido se lee, lo privado no.
-  await page.goto('/v2/campanas');
+  await page.goto(FICHA);
   await expect(page.getByText('El Valle Hueco', { exact: true })).toBeVisible();
   await expect(page.getByText('Pista para la mesa', { exact: true })).toBeVisible();
   const texto = await page.locator('body').innerText();
@@ -90,7 +92,7 @@ test('lo ajeno y lo inexistente responden igual: 404, y la cuenta sin v2 no ve c
   page.on('request', (r) => {
     if (new URL(r.url()).pathname.includes('/campaigns')) pedidos.push(r.url());
   });
-  await page.goto('/v2/campanas');
+  await page.goto(FICHA);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('No disponible');
   expect(pedidos).toEqual([]);
 });

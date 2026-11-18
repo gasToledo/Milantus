@@ -108,7 +108,6 @@ export type Route =
   | { name: 'roster' }
   | { name: 'dm'; view: DmView }
   | { name: 'settings' }
-  | { name: 'campaigns' }
   // Sin criatura es la lista con nada abierto.
   | { name: 'bestiary'; entryId: string | null }
   // `target` es `reglas` (las generales) o el id de un personaje propio; sin él, la elección.
@@ -261,7 +260,6 @@ export function matchRoute(pathname: string): Route {
     return { name: 'unknown' };
   }
   if (section === 'ajustes' && id === undefined) return { name: 'settings' };
-  if (section === 'campanas' && id === undefined) return { name: 'campaigns' };
   if (section === 'bestiario' && tab === undefined) {
     try {
       return { name: 'bestiary', entryId: id === undefined ? null : decodeURIComponent(id) };
@@ -354,8 +352,6 @@ export const rosterHref = (): string => `${import.meta.env.BASE_URL}personajes`;
 /** El Bestiario, o una criatura abierta. */
 export const bestiaryHref = (entryId?: string): string =>
   `${import.meta.env.BASE_URL}bestiario` + (entryId ? `/${encodeURIComponent(entryId)}` : '');
-
-export const campaignsHref = (): string => `${import.meta.env.BASE_URL}campanas`;
 
 /** El Modo DM: sin campaña es `/v2/dm`, que redirige a la primera. */
 export const dmHref = (): string => `${import.meta.env.BASE_URL}dm`;
