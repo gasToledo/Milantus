@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { Info, Minus, Plus, type LucideIcon } from 'lucide-react';
 import { cx } from './cx';
 import { Tooltip } from './primitives';
@@ -94,6 +94,8 @@ export function StatPlaque({
   value,
   dense = false,
   valueClassName = 'text-gold',
+  className,
+  style,
 }: {
   id?: string;
   /** Texto, o un nodo cuando el rótulo visible es una abreviatura y el lector
@@ -102,9 +104,16 @@ export function StatPlaque({
   value: ReactNode;
   dense?: boolean;
   valueClassName?: string;
+  /** Para animar la placa desde afuera (la presentación al crear). */
+  className?: string;
+  style?: CSSProperties;
 }) {
   return (
-    <div className={cx('plaque flex min-w-0 flex-col items-center text-center', dense ? 'px-2 py-1.5' : 'px-3 py-2.5')} data-stat={id}>
+    <div
+      className={cx('plaque flex min-w-0 flex-col items-center text-center', dense ? 'px-2 py-1.5' : 'px-3 py-2.5', className)}
+      style={style}
+      data-stat={id}
+    >
       <dt className={cx('text-text-muted uppercase', dense ? 'text-[8.5px] tracking-[0.5px]' : 'text-[10px] tracking-[1.2px]')}>
         {label}
       </dt>

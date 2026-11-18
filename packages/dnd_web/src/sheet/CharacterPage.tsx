@@ -1,5 +1,6 @@
 import { canLevelUp, type CharacterJson } from '../engine';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { clearCreated, CreatedCelebration, createdFor } from '../creation/CreatedCelebration';
 import { useQueryClient } from '@tanstack/react-query';
 import { hasUnsavedChanges, onStale, retrySave, useSaveState } from '../api/characterSave';
 import { queryKeys, useAppVersion, useRoster, useSheetCatalog } from '../api/queries';
@@ -69,6 +70,9 @@ export function CharacterPage({
   const version = useAppVersion(true);
   const client = useQueryClient();
   const saveState = useSaveState(id);
+  // La presentación de un personaje recién creado (viene del creador por la
+  // memoria del módulo); cerrarla la borra.
+  const [created, setCreated] = useState(() => createdFor(id));
 
   // La ruta sin pestaña es la primera: se reemplaza en el historial para que
   // «atrás» no vuelva a una URL que solo redirige.
@@ -211,6 +215,15 @@ export function CharacterPage({
       >
         {body}
       </Shell>
+      {created && (
+        <CreatedCelebration
+          data={created}
+          onClose={() => {
+            clearCreated();
+            setCreated(null);
+          }}
+        />
+      )}
       {toast && (
         <Toast
           key={toast.key}

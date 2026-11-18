@@ -90,6 +90,7 @@ import {
   type AfterRow,
 } from '../ui/wizard';
 import type { Account } from '../api/client';
+import { announceCreated, type CreatedData } from './CreatedCelebration';
 import { DetailsStep, EquipmentStep, ProficienciesStep, ReviewStep, SpellsStep, type Focus, type StepProps } from './ChoiceSteps';
 
 const STEPS = [
@@ -291,6 +292,9 @@ function CreationWizard({
       } else {
         // El servidor puede reasignar el id si choca: se navega con el suyo.
         id = await createCharacter(toCreate.current);
+        // La presentación sale sobre la ficha: se anota antes de navegar. Solo
+        // un personaje nuevo; rehacer y crear un PNJ navegan como siempre.
+        announceCreated(id, createdData(catalog, view, sheet, t));
       }
       // Se espera a tener la lista nueva: la ficha se lee de ahí.
       await client.invalidateQueries({ queryKey: queryKeys.roster });
@@ -516,6 +520,42 @@ function CreationHeader({ draft: d, catalog, t, title }: { draft: CreationDraftJ
       </div>
     </div>
   );
+}
+
+/** Lo que cuenta la presentación al crear, de la ficha que ya calculó el motor
+ *  (`sheet`) y de lo elegido (`view`): ningún número se saca acá. */
+function createdData(catalog: Catalog, view: CreationView, sheet: ComputedSheet, t: Texts): CreatedData {
+  const d = view.draft;
+  const cls = nameOf(catalog.classes, d.classId);
+  const race = nameOf(catalog.races, d.raceId);
+  const lineage = nameOf(catalog.lineages, d.lineageId);
+  const bg = nameOf(catalog.backgrounds, d.backgroundId);
+  const name = d.name?.trim() || t.crUnnamed;
+  // La característica clave: la de lanzamiento y, sin ella, la más alta (la
+  // primera de `ABILITIES` si empatan).
+  const score = (a: AbilityId) => sheet.abilityScores[a] ?? 0;
+  const key = sheet.spellcasting?.ability ?? ABILITIES.reduce((best, a) => (score(a) > score(best) ? a : best), ABILITIES[0]!);
+  const originFeat = catalog.backgrounds.find((b) => b.id === d.backgroundId)?.originFeatId;
+  const features = [
+    ...view.class.features.map((f) => f.name),
+    ...(typeof originFeat === 'string' ? [nameOf(catalog.feats, originFeat) ?? originFeat] : []),
+    ...sheet.innateSpells.map((s) => s.name),
+  ];
+  return {
+    name,
+    subtitle: [lineage ?? race, cls ? `${cls} 1` : null, bg].filter(Boolean).join(' · '),
+    initial: d.name?.trim() || cls || race || t.crUnnamed,
+    accent: d.classId ? accentOf(catalog, d.classId) : null,
+    stats: [
+      { label: t.hp, value: sheet.maxHp },
+      { label: t.ac, value: sheet.armorClass },
+      { label: t.abilityAbbr[key], value: score(key), key: true },
+      sheet.spellcasting
+        ? { label: t.spellDcCard, value: sheet.spellcasting.saveDc }
+        : { label: t.crStatInit, value: signed(sheet.initiative) },
+    ],
+    features: [...new Set(features)],
+  };
 }
 
 function pendingText(p: CreationPending, t: Texts): string {

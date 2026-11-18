@@ -904,14 +904,48 @@ body {
 .lv-up {
   animation: lv-up 260ms ease-out both;
 }
+/* La presentación al crear un personaje (lámina C de «Creador: el personaje
+   toma forma»): el medallón cae desde más grande hasta su lugar y un aro del
+   color de su clase se abre detrás. Comparte el escalonado de `.lv-up`. */
+.cr-med {
+  animation: cr-med 600ms 160ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.cr-ring {
+  animation: cr-ring 800ms 520ms ease-out both;
+}
 @media (prefers-reduced-motion: reduce) {
   .lv-scrim,
   .lv-card,
   .lv-rombo,
   .lv-ring,
   .lv-num,
-  .lv-up {
+  .lv-up,
+  .cr-med,
+  .cr-ring {
     animation-delay: 0s !important;
+  }
+}
+@keyframes cr-med {
+  0% {
+    opacity: 0;
+    scale: 1.8;
+  }
+  60% {
+    opacity: 1;
+    scale: 0.94;
+  }
+  to {
+    scale: 1;
+  }
+}
+@keyframes cr-ring {
+  from {
+    opacity: 0.9;
+    scale: 1;
+  }
+  to {
+    opacity: 0;
+    scale: 2.6;
   }
 }
 @keyframes lv-card {
