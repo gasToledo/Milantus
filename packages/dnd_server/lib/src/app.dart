@@ -23,6 +23,7 @@ import 'import/import_service.dart';
 import 'import/npc_bundle.dart';
 import 'mcp/mcp_handler.dart';
 import 'portraits/portrait_blob_store.dart';
+import 'portraits/portrait_image_type.dart';
 import 'repositories/campaign_repository.dart';
 import 'repositories/chapter_repository.dart';
 import 'repositories/character_repository.dart';
@@ -36,12 +37,14 @@ import 'repositories/mcp_audit_repository.dart';
 import 'repositories/note_repository.dart';
 import 'repositories/npc_repository.dart';
 import 'repositories/repository_transaction_runner.dart';
+import 'repositories/scenario_repository.dart';
 import 'repositories/settings_repository.dart';
 import 'util/safe_path.dart';
 
 part 'app_item_grants.dart';
 part 'app_mcp.dart';
 part 'app_npcs.dart';
+part 'app_scenarios.dart';
 part 'app_transfer.dart';
 
 /// Ejecuta la importación ya decodificada para [userId]. Se recibe como
@@ -118,6 +121,7 @@ Handler buildHandler({
   required LevelUpRepository levelUps,
   required ItemGrantRepository itemGrants,
   required SettingsRepository settings,
+  ScenarioRepository? scenarios,
 
   /// Sirve el build web (`flutter build web`) para todo lo que el enrutado de
   /// arriba no reconozca. `null` lo deshabilita (pruebas, o correr la API
@@ -564,6 +568,10 @@ Handler buildHandler({
       ..get('/.well-known/oauth-protected-resource', metadata)
       // El Bearer se acepta solo acá: `/api` sigue siendo de la cookie.
       ..all('/mcp', mcpPipeline);
+  }
+
+  if (scenarios != null) {
+    _mountScenarioRoutes(router, authenticated, scenarios, portraits.maxBytes);
   }
 
   // El router va primero y solo cae al build web estático ante un 404. Pero
@@ -1107,6 +1115,8 @@ const _notFoundMessages = {
   'no_active_combat': 'No hay ningún combate en curso.',
   'note_not_found': 'Nota no encontrada.',
   'npc_not_found': 'PNJ no encontrado.',
+  'scenario_not_found': 'Escenario no encontrado.',
+  'scenario_image_not_found': 'Imagen del escenario no encontrada.',
   'npc_or_campaign_not_found': 'PNJ o campaña no encontrados.',
   'character_not_found': 'Personaje no encontrado.',
   'portrait_not_found': 'Retrato no encontrado.',

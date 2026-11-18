@@ -56,7 +56,7 @@ export function DmPanel({
           <NavItem href={dmBestiaryHref()} icon={PawPrint} label={t.navBestiary} active={tool === 'bestiary'} internal />
         </li>
         <li>
-          <NavItem href={dmNpcsHref()} icon={Contact} label={t.dmNpcLibrary} active={tool === 'npcs'} internal />
+          <NavItem href={dmNpcsHref()} icon={Contact} label={t.dmLibrary} active={tool === 'npcs'} internal />
         </li>
         <li>
           <NavItem href={dmHomebrewHref()} icon={FlaskConical} label={t.navHomebrew} active={tool === 'homebrew'} internal />

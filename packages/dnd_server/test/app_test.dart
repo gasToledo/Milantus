@@ -31,6 +31,7 @@ import 'fakes/in_memory_item_grant_repository.dart';
 import 'fakes/in_memory_level_up_repository.dart';
 import 'fakes/in_memory_portrait_blob_store.dart';
 import 'fakes/in_memory_repository_transaction_runner.dart';
+import 'fakes/in_memory_scenario_repository.dart';
 import 'fakes/in_memory_settings_repository.dart';
 
 Map<String, dynamic> _homebrewWeapon(
@@ -147,10 +148,165 @@ void main() {
       levelUps: levelUps,
       itemGrants: itemGrants,
       settings: settingsRepo,
+      scenarios: InMemoryScenarioRepository(campaigns, npcs),
     );
   });
 
   group('/health', () {});
+
+  group('Biblioteca de escenarios', () {
+    const url = '/api/scenarios';
+
+    Future<Response> send(
+      String method,
+      String path, {
+      String? token,
+      Map<String, dynamic>? data,
+    }) => Future.sync(
+      () => handler(
+        Request(
+          method,
+          Uri.parse('http://localhost' + path),
+          headers: {if (token != null) 'cookie': 'dnd_session=' + token},
+          body: data == null ? null : jsonEncode(data),
+        ),
+      ),
+    );
+
+    Future<String> login(String subject) async {
+      fakeAuth.nextVerifiedSubject = subject;
+      final response = await send('GET', '/auth/callback?code=c&state=x');
+      return _extractToken(response.headers['set-cookie']!);
+    }
+
+    Future<Map<String, dynamic>> json(Response response) async =>
+        (jsonDecode(await response.readAsString()) as Map)
+            .cast<String, dynamic>();
+
+    test(
+      'solo el DM accede al escenario, sus personajes y su portada',
+      () async {
+        final owner = await login('dm-escenarios');
+        final player = await login('jugador-escenarios');
+        await npcs.insert(
+          fakeAuth.accountsBySubject['dm-escenarios']!,
+          Npc(id: 'verloren', name: 'Verloren', sheetKind: NpcSheetKind.none),
+        );
+
+        expect((await send('GET', url)).statusCode, 401);
+        final created = await json(
+          await send(
+            'POST',
+            url,
+            token: owner,
+            data: {'name': '  Taller Ausfall  '},
+          ),
+        );
+        expect(created['name'], 'Taller Ausfall');
+        expect(created['hasImage'], isFalse);
+        final id = created['id'] as String;
+        final detail = url + '/' + id;
+        final cover = detail + '/image';
+
+        final bytes = Uint8List.fromList(
+          img.encodePng(img.Image(width: 1, height: 1)),
+        );
+        final edited = await send(
+          'PUT',
+          detail,
+          token: owner,
+          data: {
+            'name': 'Taller Ausfall',
+            'description': 'Taller familiar.',
+            'characterKeys': ['npc:verloren', 'npc:verloren'],
+            'image': base64Encode(bytes),
+          },
+        );
+        expect(edited.statusCode, 200);
+        expect((await json(edited))['characterKeys'], ['npc:verloren']);
+        final image = await send('GET', cover, token: owner);
+        expect(image.headers['content-type'], 'image/png');
+        expect(image.headers['cache-control'], 'private, no-store');
+        expect(await image.read().expand((chunk) => chunk).toList(), bytes);
+
+        expect(
+          (await json(await send('GET', url, token: player)))['scenarios'],
+          isEmpty,
+        );
+        expect(
+          (await json(
+            await send('GET', url + '/characters', token: player),
+          ))['characters'],
+          isEmpty,
+        );
+        expect((await send('GET', detail, token: player)).statusCode, 404);
+        expect((await send('GET', cover, token: player)).statusCode, 404);
+        expect(
+          (await send(
+            'PUT',
+            detail,
+            token: player,
+            data: {'name': 'Otro'},
+          )).statusCode,
+          404,
+        );
+        expect((await send('DELETE', detail, token: player)).statusCode, 404);
+
+        final renamed = await json(
+          await send(
+            'PUT',
+            detail,
+            token: owner,
+            data: {'name': 'Taller de las Montañas'},
+          ),
+        );
+        expect(renamed['characterKeys'], ['npc:verloren']);
+        expect(renamed['hasImage'], isTrue);
+
+        expect((await send('DELETE', detail, token: owner)).statusCode, 204);
+        expect((await send('GET', detail, token: owner)).statusCode, 404);
+        expect((await send('GET', cover, token: owner)).statusCode, 404);
+      },
+    );
+
+    test(
+      'rechaza nombres vacíos, personajes ajenos e imágenes inválidas',
+      () async {
+        final owner = await login('dm-validacion');
+        final other = await login('dm-ajeno');
+        await npcs.insert(
+          fakeAuth.accountsBySubject['dm-ajeno']!,
+          Npc(id: 'ajeno', name: 'Ajeno', sheetKind: NpcSheetKind.none),
+        );
+        for (final data in <Map<String, dynamic>>[
+          {'name': ' '},
+          {
+            'name': 'Taller',
+            'characterKeys': ['npc:ajeno'],
+          },
+          {
+            'name': 'Taller',
+            'image': base64Encode([0, 1, 2]),
+          },
+        ]) {
+          expect(
+            (await send('POST', url, token: owner, data: data)).statusCode,
+            400,
+          );
+        }
+        expect(
+          (await json(await send('GET', url, token: owner)))['scenarios'],
+          isEmpty,
+        );
+        expect(
+          (await json(
+            await send('GET', url + '/characters', token: other),
+          ))['characters'],
+          hasLength(1),
+        );
+      },
+    );
+  });
 
   test('una ruta desconocida responde 404', () async {
     final response = await handler(

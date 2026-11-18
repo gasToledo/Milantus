@@ -23,6 +23,7 @@ import { MemberSheetView } from './MemberSheetView';
 import { MesaView } from './MesaView';
 import { MusicPlayer } from './MusicPlayer';
 import { NotebookView } from './NotebookView';
+import { ScenarioLibraryView } from './scenarios/ScenarioLibraryView';
 import { CampaignNpcsView } from './npcs/CampaignNpcsView';
 import { NpcBlockBack, NpcBlockView } from './npcs/NpcBlockView';
 import { NpcPortraitView } from './npcs/NpcPortraitView';
@@ -100,6 +101,8 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
     // La Biblioteca tampoco depende de las campañas: sin la lista, los filtros
     // por campaña salen de los vínculos de cada PNJ.
     body = view.npcId === null ? <NpcLibraryView campaigns={list} /> : <NpcDetailView key={view.npcId} npcId={view.npcId} />;
+  } else if (view.kind === 'scenarios') {
+    body = <ScenarioLibraryView key={view.scenarioId} scenarioId={view.scenarioId} />;
   } else if (view.kind === 'npcBlock') {
     body = <NpcBlockView key={view.npcId} npcId={view.npcId} leaveRef={leave} />;
   } else if (view.kind === 'npcPortrait') {
@@ -172,7 +175,7 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
             leaveRef={leave}
           />
         ) : (
-          <DmPanel campaigns={list} current={current} tool={view.kind === 'npcSheet' || view.kind === 'npcPortrait' ? 'npcs' : view.kind === 'bestiary' || view.kind === 'npcs' || view.kind === 'homebrew' ? view.kind : undefined} />
+          <DmPanel campaigns={list} current={current} tool={view.kind === 'npcSheet' || view.kind === 'npcPortrait' || view.kind === 'scenarios' ? 'npcs' : view.kind === 'bestiary' || view.kind === 'npcs' || view.kind === 'homebrew' ? view.kind : undefined} />
         )
       }
       footer={<RosterFooter account={account} dm />}>

@@ -1502,6 +1502,22 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
+## [1.4.0+1] - 2026-11-18
+
+### Nuevo
+
+- En la Biblioteca del DM de /v2 podés crear escenarios privados con un nombre,
+  una imagen, una descripción y enlaces a fichas de personajes.
+
+### Modificado
+
+- La Biblioteca de PNJ ahora se llama Biblioteca y tiene pestañas para PNJ y
+  Escenarios.
+
+### Eliminado
+
+- Sin cambios.
+
 ## [Unreleased]
 
 ### Nuevo
