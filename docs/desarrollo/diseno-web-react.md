@@ -433,7 +433,9 @@ inexistente son la misma pantalla). Desde 6b escribe campañas y la Mesa y desde
   Bestiario y entradas en `card` con `border-l-[3px]` del color del tipo. Titular,
   redactar un combate y buscar son presentación y viven en `notebook.ts`; los
   nombres salen del catálogo. Dentro de un capítulo y sin búsqueda, las
-  entradas se mueven tomándolas enteras (`useHoldDrag`, clases de la Mesa);
+  entradas se mueven tomándolas enteras (`useHoldDrag` con `scroller`, clases
+  de la Mesa). La página no scrollea: solo la lista de entradas, con el alto
+  medido desde donde empieza (como el Códice);
   `inChapterOrder` aplica `entryOrder` y deja lo no ordenado al final, por
   fecha. En «Sin capítulo», combates y subidas suman el ⋮ con «Mover a
   capítulo…» (`MoveToChapterDialog`: abre sin nada elegido).

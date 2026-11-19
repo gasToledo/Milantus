@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type DragEvent, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent, type PointerEvent } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type RefObject, type DragEvent, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent, type PointerEvent } from 'react';
 import { prefersReducedMotion } from './motion';
 
 /** Cuánto hay que sostener el dedo: menos se confunde con desplazar, y a los
@@ -62,12 +62,15 @@ interface Press {
  * [group] separa listas que conviven en pantalla (la música flota sobre la
  * Mesa): cada una mide solo sus propias filas. Quien no lo pasa mide las
  * suyas, las que no tienen grupo. [axis] `'y'` deja la fila en su columna: una
- * lista con scroll propio recortaría lo que se va de costado.
+ * lista con scroll propio recortaría lo que se va de costado. [scroller] es esa
+ * lista, si scrollea ella y no la ventana: las posiciones suman su desplazamiento
+ * y el borde que desplaza mientras se arrastra es el suyo.
  */
 export function useHoldDrag({
   ids,
   group,
   axis,
+  scroller,
   shift = true,
   canDrop,
   onMove,
@@ -75,6 +78,7 @@ export function useHoldDrag({
   ids: string[];
   group?: string;
   axis?: 'y';
+  scroller?: RefObject<HTMLElement | null>;
   /** `false`: las demás no se corren, solo se marca el destino. Correrlas es
    *  pensar en una sola lista; en varias columnas haría saltar las tarjetas de
    *  una columna a otra mientras se arrastra (`ArrangeableColumns`). */
@@ -95,8 +99,10 @@ export function useHoldDrag({
   const startRef = useRef<() => void>(() => {});
   const callbacks = useRef({ canDrop, onMove });
   callbacks.current = { canDrop, onMove };
-  const options = useRef({ group, axis });
-  options.current = { group, axis };
+  const options = useRef({ group, axis, scroller });
+  options.current = { group, axis, scroller };
+  // Cuánto se bajó: la ventana más la lista, si scrollea sola.
+  const scrolledY = () => window.scrollY + (options.current.scroller?.current?.scrollTop ?? 0);
 
   // Al soltar, el orden nuevo llega un momento después (lo guarda quien usa
   // esto). Se limpia recién al recibirlo y antes de pintar: limpiar primero
@@ -118,7 +124,7 @@ export function useHoldDrag({
       const p = press.current;
       if (!current || !p || current.settling) return;
       const dx = options.current.axis === 'y' ? 0 : p.clientX + window.scrollX - p.startX;
-      const dy = p.clientY + window.scrollY - p.startY;
+      const dy = p.clientY + scrolledY() - p.startY;
       const self = current.slots.find((s) => s.id === current.id)!;
       const cx = self.x + self.width / 2 + dx;
       const cy = self.y + self.height / 2 + dy;
@@ -138,10 +144,11 @@ export function useHoldDrag({
     const autoscroll = () => {
       const p = press.current;
       if (!dragRef.current || dragRef.current.settling || !p) return;
-      const speed =
-        p.clientY < EDGE ? -EDGE_SPEED : p.clientY > window.innerHeight - EDGE ? EDGE_SPEED : 0;
+      const box = options.current.scroller?.current;
+      const { top, bottom } = box?.getBoundingClientRect() ?? { top: 0, bottom: window.innerHeight };
+      const speed = p.clientY < top + EDGE ? -EDGE_SPEED : p.clientY > bottom - EDGE ? EDGE_SPEED : 0;
       if (speed !== 0) {
-        window.scrollBy(0, speed);
+        (box ?? window).scrollBy(0, speed);
         follow();
       }
       requestAnimationFrame(autoscroll);
@@ -158,7 +165,7 @@ export function useHoldDrag({
         return {
           id: el.getAttribute('data-reorder-id')!,
           x: r.left + window.scrollX,
-          y: r.top + window.scrollY,
+          y: r.top + scrolledY(),
           width: r.width,
           height: r.height,
         };
@@ -181,7 +188,7 @@ export function useHoldDrag({
       p.clientX = e.clientX;
       p.clientY = e.clientY;
       if (dragRef.current) return follow();
-      const moved = Math.hypot(e.clientX + window.scrollX - p.startX, e.clientY + window.scrollY - p.startY);
+      const moved = Math.hypot(e.clientX + window.scrollX - p.startX, e.clientY + scrolledY() - p.startY);
       if (p.mouse && moved > MOUSE_SLOP) start();
       else if (!p.mouse && moved > TOUCH_SLOP) clearPress();
     };
@@ -270,7 +277,7 @@ export function useHoldDrag({
       pointerId: e.pointerId,
       mouse,
       startX: e.clientX + window.scrollX,
-      startY: e.clientY + window.scrollY,
+      startY: e.clientY + scrolledY(),
       clientX: e.clientX,
       clientY: e.clientY,
     };

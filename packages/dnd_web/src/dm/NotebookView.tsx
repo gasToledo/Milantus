@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { EllipsisVertical, Eye, FolderInput, Lock, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
 import {
@@ -167,7 +167,24 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
       }
     })();
   };
-  const reorder = useHoldDrag({ ids, axis: 'y', canDrop: () => arrangeable, onMove: moveEntry });
+  // La página queda fija y solo las entradas scrollean: con un capítulo largo,
+  // bajar se llevaba las pills, el buscador y el objetivo. El alto se cuenta
+  // desde donde empieza la lista, que cambia con el objetivo del capítulo y con
+  // el ancho (las pills se parten); los 24 px son el relleno de abajo de `main`,
+  // como en el Códice (`useListFitsViewport`).
+  const listRef = useRef<HTMLDivElement>(null);
+  const [listTop, setListTop] = useState(0);
+  const hasList = shown.length > 0;
+  useLayoutEffect(() => {
+    const el = listRef.current;
+    if (!el) return;
+    const measure = () => setListTop(el.getBoundingClientRect().top + window.scrollY);
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [hasList, current, searching, currentChapter?.summary, chapters.data, entries === null]);
+
+  const reorder = useHoldDrag({ ids, axis: 'y', scroller: listRef, canDrop: () => arrangeable, onMove: moveEntry });
 
   const failed = [notebook, chapters, ...catalog.queries].filter((q) => q.isError);
   const state = stateLabel(t, stateOf(campaign));
@@ -286,122 +303,132 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
             </div>
           )
         ) : (
-          <ol aria-label={pills.find((p) => p.id === current)?.label} className="flex flex-col gap-2.5">
-            {shown.map((e) => (
-              <li
-                key={e.key}
-                data-entry={e.kind}
-                data-entry-key={e.key}
-                data-vt-card
-                className={cx(
-                  'card border-l-[3px] px-[18px] py-3.5',
-                  ACCENT[e.kind].border,
-                  // Sostenerla no puede seleccionar el texto ni abrir el menú
-                  // del teléfono. Las clases del arrastre son las de la Mesa.
-                  arrangeable && 'select-none [-webkit-touch-callout:none]',
-                  reorder.dragging === e.orderKey &&
-                    (reorder.animated ? 'cursor-grabbing border-gold [&_*]:cursor-grabbing' : 'opacity-40'),
-                  reorder.over === e.orderKey && !reorder.animated && 'outline-2 outline-offset-1 outline-gold',
-                )}
-                {...(arrangeable ? reorder.item(e.orderKey) : {})}
-                // Después del `item`, que trae su `style` para el arrastre. El
-                // nombre identifica la entrada en las transiciones de la lista.
-                style={{
-                  viewTransitionName: `nb-${e.key.replace(/[^\w-]/g, '_')}`,
-                  ...(arrangeable ? (reorder.item(e.orderKey).style as CSSProperties | undefined) : undefined),
-                }}
-              >
-                <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
-                  <span className={cx('text-[11.5px] font-medium', ACCENT[e.kind].text)}>
-                    {e.kind === 'note' ? t.dmEntryNote : e.kind === 'fight' ? t.dmEntryFight : t.dmEntryLevelUp}
-                  </span>
-                  {/* `tabIndex`: el foco viene acá al guardar la nota. */}
-                  <h2 tabIndex={-1} className="font-display min-w-0 flex-1 text-[17px] break-words text-on-surface outline-none">
-                    {e.title}
-                  </h2>
-                  {e.note && (
-                    // Quién la ve: solo las notas llevan visibilidad; los
-                    // combates y las subidas de nivel los escribe la app.
-                    <span
-                      data-visibility={e.note.shared ? 'shared' : 'private'}
-                      className={cx(
-                        'inline-flex items-center gap-[5px] rounded-[var(--radius-pill)] border px-2.5 py-0.5 text-[11.5px]',
-                        e.note.shared ? 'border-gold bg-gold-soft text-gold' : 'border-hairline text-text-muted',
-                      )}
-                    >
-                      {e.note.shared ? <Eye size={13} aria-hidden="true" /> : <Lock size={13} aria-hidden="true" />}
-                      {e.note.shared ? t.dmNoteDmAndPlayers : t.dmNoteDmOnly}
+          // El relleno de 4 px deja ver el contorno del destino al arrastrar,
+          // que `overflow` recortaría. `min-h-60`: en un teléfono la cabecera
+          // ocupa casi todo, y una lista de dos dedos no se puede leer.
+          <div
+            ref={listRef}
+            data-field="notebook-list"
+            className="-m-1 min-h-60 overflow-y-auto p-1"
+            style={{ maxHeight: `calc(100dvh - ${listTop}px - 24px)` }}
+          >
+            <ol aria-label={pills.find((p) => p.id === current)?.label} className="flex flex-col gap-2.5">
+              {shown.map((e) => (
+                <li
+                  key={e.key}
+                  data-entry={e.kind}
+                  data-entry-key={e.key}
+                  data-vt-card
+                  className={cx(
+                    'card border-l-[3px] px-[18px] py-3.5',
+                    ACCENT[e.kind].border,
+                    // Sostenerla no puede seleccionar el texto ni abrir el menú
+                    // del teléfono. Las clases del arrastre son las de la Mesa.
+                    arrangeable && 'select-none [-webkit-touch-callout:none]',
+                    reorder.dragging === e.orderKey &&
+                      (reorder.animated ? 'cursor-grabbing border-gold [&_*]:cursor-grabbing' : 'opacity-40'),
+                    reorder.over === e.orderKey && !reorder.animated && 'outline-2 outline-offset-1 outline-gold',
+                  )}
+                  {...(arrangeable ? reorder.item(e.orderKey) : {})}
+                  // Después del `item`, que trae su `style` para el arrastre. El
+                  // nombre identifica la entrada en las transiciones de la lista.
+                  style={{
+                    viewTransitionName: `nb-${e.key.replace(/[^\w-]/g, '_')}`,
+                    ...(arrangeable ? (reorder.item(e.orderKey).style as CSSProperties | undefined) : undefined),
+                  }}
+                >
+                  <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                    <span className={cx('text-[11.5px] font-medium', ACCENT[e.kind].text)}>
+                      {e.kind === 'note' ? t.dmEntryNote : e.kind === 'fight' ? t.dmEntryFight : t.dmEntryLevelUp}
                     </span>
-                  )}
-                  <span className="text-[12px] text-text-muted tabular-nums">
-                    {[stamp(e.at, now, t), e.rounds !== undefined && t.roundsCount(e.rounds)].filter(Boolean).join(' · ')}
-                  </span>
-                  {e.note && (
-                    // Solo las notas se tocan: lo demás lo escribió la app.
-                    <DropdownMenu>
-                      <Tooltip content={t.dmNoteActions}>
-                        <DropdownMenuTrigger asChild>
-                          <button
-                            type="button"
-                            aria-label={t.dmNoteActions}
-                            data-action="note-actions"
-                            className="-my-2 -mr-2 inline-flex size-10 shrink-0 items-center justify-center self-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold data-[state=open]:bg-gold-soft data-[state=open]:text-gold"
-                          >
-                            <EllipsisVertical size={18} aria-hidden="true" />
-                          </button>
-                        </DropdownMenuTrigger>
-                      </Tooltip>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onSelect={() => setEditing(e.note!)}>
-                          <Pencil size={15} aria-hidden="true" className="text-text-muted" />
-                          {t.commonEdit}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setDeleting(e.note!)} className="text-crimson">
-                          <Trash2 size={15} aria-hidden="true" />
-                          {t.commonDelete}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
-                  {!e.note && e.chapterId === null && e.entryId !== '' && chapterList.length > 0 && (
-                    // Lo suelto se cuelga de un capítulo; lo que ya tiene uno
-                    // no se mueve (el servidor tampoco lo acepta).
-                    <DropdownMenu>
-                      <Tooltip content={e.kind === 'fight' ? t.dmFightActions : t.dmLevelUpActions}>
-                        <DropdownMenuTrigger asChild>
-                          <button
-                            type="button"
-                            aria-label={e.kind === 'fight' ? t.dmFightActions : t.dmLevelUpActions}
-                            data-action="entry-actions"
-                            className="-my-2 -mr-2 inline-flex size-10 shrink-0 items-center justify-center self-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold data-[state=open]:bg-gold-soft data-[state=open]:text-gold"
-                          >
-                            <EllipsisVertical size={18} aria-hidden="true" />
-                          </button>
-                        </DropdownMenuTrigger>
-                      </Tooltip>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onSelect={() => setMoving(e)}>
-                          <FolderInput size={15} aria-hidden="true" className="text-text-muted" />
-                          {t.dmMoveToChapterItem}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
-                </div>
-                <div className="mt-1.5 text-[13.5px] leading-relaxed text-on-surface-variant">
-                  {e.markdown ? (
-                    <MarkdownText text={e.body} mentions={mentions} />
-                  ) : (
-                    e.body.split('\n\n').map((p, i) => (
-                      <p key={i} className="mb-2 last:mb-0">
-                        {withMentions(p, mentions)}
-                      </p>
-                    ))
-                  )}
-                </div>
-              </li>
-            ))}
-          </ol>
+                    {/* `tabIndex`: el foco viene acá al guardar la nota. */}
+                    <h2 tabIndex={-1} className="font-display min-w-0 flex-1 text-[17px] break-words text-on-surface outline-none">
+                      {e.title}
+                    </h2>
+                    {e.note && (
+                      // Quién la ve: solo las notas llevan visibilidad; los
+                      // combates y las subidas de nivel los escribe la app.
+                      <span
+                        data-visibility={e.note.shared ? 'shared' : 'private'}
+                        className={cx(
+                          'inline-flex items-center gap-[5px] rounded-[var(--radius-pill)] border px-2.5 py-0.5 text-[11.5px]',
+                          e.note.shared ? 'border-gold bg-gold-soft text-gold' : 'border-hairline text-text-muted',
+                        )}
+                      >
+                        {e.note.shared ? <Eye size={13} aria-hidden="true" /> : <Lock size={13} aria-hidden="true" />}
+                        {e.note.shared ? t.dmNoteDmAndPlayers : t.dmNoteDmOnly}
+                      </span>
+                    )}
+                    <span className="text-[12px] text-text-muted tabular-nums">
+                      {[stamp(e.at, now, t), e.rounds !== undefined && t.roundsCount(e.rounds)].filter(Boolean).join(' · ')}
+                    </span>
+                    {e.note && (
+                      // Solo las notas se tocan: lo demás lo escribió la app.
+                      <DropdownMenu>
+                        <Tooltip content={t.dmNoteActions}>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              type="button"
+                              aria-label={t.dmNoteActions}
+                              data-action="note-actions"
+                              className="-my-2 -mr-2 inline-flex size-10 shrink-0 items-center justify-center self-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold data-[state=open]:bg-gold-soft data-[state=open]:text-gold"
+                            >
+                              <EllipsisVertical size={18} aria-hidden="true" />
+                            </button>
+                          </DropdownMenuTrigger>
+                        </Tooltip>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onSelect={() => setEditing(e.note!)}>
+                            <Pencil size={15} aria-hidden="true" className="text-text-muted" />
+                            {t.commonEdit}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => setDeleting(e.note!)} className="text-crimson">
+                            <Trash2 size={15} aria-hidden="true" />
+                            {t.commonDelete}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                    {!e.note && e.chapterId === null && e.entryId !== '' && chapterList.length > 0 && (
+                      // Lo suelto se cuelga de un capítulo; lo que ya tiene uno
+                      // no se mueve (el servidor tampoco lo acepta).
+                      <DropdownMenu>
+                        <Tooltip content={e.kind === 'fight' ? t.dmFightActions : t.dmLevelUpActions}>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              type="button"
+                              aria-label={e.kind === 'fight' ? t.dmFightActions : t.dmLevelUpActions}
+                              data-action="entry-actions"
+                              className="-my-2 -mr-2 inline-flex size-10 shrink-0 items-center justify-center self-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold data-[state=open]:bg-gold-soft data-[state=open]:text-gold"
+                            >
+                              <EllipsisVertical size={18} aria-hidden="true" />
+                            </button>
+                          </DropdownMenuTrigger>
+                        </Tooltip>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onSelect={() => setMoving(e)}>
+                            <FolderInput size={15} aria-hidden="true" className="text-text-muted" />
+                            {t.dmMoveToChapterItem}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </div>
+                  <div className="mt-1.5 text-[13.5px] leading-relaxed text-on-surface-variant">
+                    {e.markdown ? (
+                      <MarkdownText text={e.body} mentions={mentions} />
+                    ) : (
+                      e.body.split('\n\n').map((p, i) => (
+                        <p key={i} className="mb-2 last:mb-0">
+                          {withMentions(p, mentions)}
+                        </p>
+                      ))
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
         )}
       </>
     );
