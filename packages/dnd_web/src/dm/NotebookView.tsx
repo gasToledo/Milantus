@@ -303,14 +303,16 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
             </div>
           )
         ) : (
-          // El relleno de 4 px deja ver el contorno del destino al arrastrar,
-          // que `overflow` recortaría. `min-h-60`: en un teléfono la cabecera
+          // `overflow` recorta lo que sale de la lista, y al arrastrar la
+          // tarjeta crece un 2 % (`useHoldDrag`) y se marca el destino: los
+          // 16 px de los costados, más angostos que la cabecera, le dejan lugar
+          // hasta unos 1600 px de ancho. `min-h-60`: en un teléfono la cabecera
           // ocupa casi todo, y una lista de dos dedos no se puede leer.
           <div
             ref={listRef}
             data-field="notebook-list"
             data-vt-clip
-            className="-m-1 min-h-60 overflow-y-auto p-1"
+            className="-m-1 min-h-60 overflow-y-auto px-4 py-1"
             style={{ maxHeight: `calc(100dvh - ${listTop}px - 24px)` }}
           >
             <ol aria-label={pills.find((p) => p.id === current)?.label} className="flex flex-col gap-2.5">
