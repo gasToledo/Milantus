@@ -319,6 +319,19 @@ body {
 ::view-transition-old(.list-card):only-child {
   animation: list-card-out 150ms ease-in both;
 }
+/* Una lista con scroll propio (`data-vt-clip`, el Cuaderno) anida las tarjetas
+   en su grupo y lo recorta: sin esto, las que el scroll dejó afuera se dibujan
+   en la capa de la transición, encima de la cabecera, mientras dura. */
+[data-vt-clip] {
+  view-transition-name: vt-clip;
+  view-transition-group: contain;
+}
+::view-transition-group-children(vt-clip) {
+  overflow: clip;
+}
+.page-fade [data-vt-clip] {
+  view-transition-name: none !important;
+}
 /* Entre el dashboard y la ficha (`fadeNavigate`) la pantalla entera se funde:
    la raíz recupera su nombre y las tarjetas lo pierden, para no aparecer ni
    desvanecerse aparte encima. */

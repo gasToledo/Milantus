@@ -309,6 +309,7 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
           <div
             ref={listRef}
             data-field="notebook-list"
+            data-vt-clip
             className="-m-1 min-h-60 overflow-y-auto p-1"
             style={{ maxHeight: `calc(100dvh - ${listTop}px - 24px)` }}
           >
