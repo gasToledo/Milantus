@@ -24,6 +24,7 @@ import 'fakes/in_memory_note_repository.dart';
 import 'fakes/in_memory_npc_repository.dart';
 import 'fakes/in_memory_portrait_blob_store.dart';
 import 'fakes/in_memory_repository_transaction_runner.dart';
+import 'fakes/in_memory_scenario_repository.dart';
 import 'fakes/in_memory_settings_repository.dart';
 
 class _Audit implements McpAuditRepository {
@@ -102,6 +103,7 @@ void main() {
       levelUps: levelUps,
       itemGrants: itemGrants,
       settings: InMemorySettingsRepository(),
+      scenarios: InMemoryScenarioRepository(campaigns, npcs),
       mcp: McpDependencies(
         verifier: McpTokenVerifier(
           issuer: issuer,

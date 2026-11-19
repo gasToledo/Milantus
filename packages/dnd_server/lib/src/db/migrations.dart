@@ -490,4 +490,19 @@ CREATE INDEX item_grants_owner_idx
   ON item_grants (owner_user_id, character_id, created_at);
 ''',
   ),
+  Migration(
+    id: '0016_scenarios',
+    sql: '''
+CREATE TABLE scenarios (
+  dm_user_id UUID NOT NULL REFERENCES accounts (id) ON DELETE CASCADE,
+  id UUID NOT NULL DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL CHECK (length(btrim(name)) > 0),
+  description TEXT NOT NULL DEFAULT '',
+  character_keys TEXT[] NOT NULL DEFAULT '{}',
+  image BYTEA,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+  PRIMARY KEY (dm_user_id, id)
+);
+''',
+  ),
 ];

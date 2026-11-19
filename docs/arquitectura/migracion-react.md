@@ -358,6 +358,14 @@ repiten acá.
   importar, desde 7c (menú «⋯» de la ficha y botón de la Biblioteca; el ZIP lo arma y lo lee
   el servidor; el estado por campaña se escribe desde 6e1; crear
   sin ficha y borrar, desde 6e2; crear con ficha de personaje, desde 6f1; nombre, voz, tags, trasfondo y notas, desde 6e3; el bloque, desde 6e4; el retrato, desde 6e5).
+  Desde 1.4.0 la entrada del panel se llama **Biblioteca** y tiene dos
+  pestañas (`LibraryTabs`): PNJ (`/v2/dm/pnj`) y **Escenarios**
+  (`/v2/dm/escenarios`, `GET/POST /api/scenarios`, `GET/PUT/DELETE
+  /api/scenarios/:id`, la portada en `/api/scenarios/:id/image`). Un escenario
+  tiene nombre, descripción, portada y enlaces a PNJ de la biblioteca o a
+  miembros de las campañas del DM, que abren su ficha. Es solo de `/v2`: Flutter
+  no tiene la pantalla ni las rutas en su `FakeApiServer`. Seguridad y formato
+  de los enlaces: `modo-dm.md` §Escenarios.
   **PNJ de la mesa** (`GET /api/campaigns/:id/npcs`): los PNJ vinculados a la
   campaña con su estado **en esa** campaña. Arriba, el conteo («2 PNJ · 1 vivo ·
   0 muertos · 1 desconocido») y las pills de tag; cada tarjeta lleva la

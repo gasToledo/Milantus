@@ -689,6 +689,29 @@ que abre el ZIP sin límites. Flutter lo sigue adoptando en el cliente
 jugador entrega un archivo, nadie lee su cuenta. Al revés no hay camino — un
 PNJ nunca se traspasa a un jugador.
 
+## Escenarios
+
+Los lugares del DM (nombre, descripción, una portada y enlaces a personajes)
+viven en `scenarios` (migración `0016_scenarios`), una tabla de un solo dueño
+como `npcs`: toda consulta filtra por `dm_user_id` en el `WHERE` y ningún
+jugador los lee por ninguna ruta. Solo existen en `/v2`, como pestaña de la
+Biblioteca (`/v2/dm/escenarios`); Flutter no los tiene.
+
+Los enlaces se guardan como claves de texto, `npc:<id>` o
+`member:<campaign_members.id>`, y no como claves foráneas: un escenario puede
+apuntar a un PNJ de la biblioteca o a un personaje de una mesa. Al guardar, el
+servidor compara cada clave contra `GET /api/scenarios/characters` —los PNJ
+del DM y los miembros de **sus** campañas—, así que un escenario no puede
+apuntar a una ficha que el DM no alcanza. Si después el PNJ se borra o el
+jugador corta el vínculo, la clave queda y simplemente deja de aparecer: la
+lectura cruza contra esa misma lista. El cliente solo manda `characterKeys`
+cuando el DM tocó la selección, y entonces ya sin las vencidas.
+
+La portada va en la fila (`BYTEA`), no en el almacén de retratos: es una por
+escenario, del DM y sin variantes de tamaño. Tiene el mismo límite y la misma
+validación de formato que un retrato, y se pide con `?v=<updatedAt>`, por lo
+que se cachea como inmutable.
+
 ## Música
 
 Las escenas de música viven **dentro del documento de la campaña**

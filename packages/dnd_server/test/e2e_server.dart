@@ -38,6 +38,7 @@ import 'fakes/in_memory_note_repository.dart';
 import 'fakes/in_memory_npc_repository.dart';
 import 'fakes/in_memory_portrait_blob_store.dart';
 import 'fakes/in_memory_repository_transaction_runner.dart';
+import 'fakes/in_memory_scenario_repository.dart';
 import 'fakes/in_memory_settings_repository.dart';
 
 /// Cookie que el test de Playwright instala en el navegador, y el nombre que
@@ -739,6 +740,7 @@ Future<void> main() async {
 
   final handler = buildHandler(
     auth: auth.dependencies,
+    scenarios: InMemoryScenarioRepository(campaigns, npcs),
     portraits: portraits,
     generation: PortraitGenerationService([
       FakePortraitProvider(id: 'pollinations', name: 'Pollinations'),

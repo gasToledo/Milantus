@@ -26,6 +26,7 @@ import 'fakes/in_memory_note_repository.dart';
 import 'fakes/in_memory_npc_repository.dart';
 import 'fakes/in_memory_portrait_blob_store.dart';
 import 'fakes/in_memory_repository_transaction_runner.dart';
+import 'fakes/in_memory_scenario_repository.dart';
 import 'fakes/in_memory_settings_repository.dart';
 
 /// Rutas de PNJ del Modo DM y las fronteras que las rodean: que la ficha de un
@@ -89,6 +90,7 @@ void main() {
       levelUps: levelUps,
       itemGrants: itemGrants,
       settings: InMemorySettingsRepository(),
+      scenarios: InMemoryScenarioRepository(campaigns, npcs),
     );
   });
 

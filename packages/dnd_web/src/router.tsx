@@ -94,6 +94,7 @@ export type DmView =
   | { kind: 'bestiary'; entryId: string | null }
   // La Biblioteca de PNJ también: sin PNJ es la lista.
   | { kind: 'npcs'; npcId: string | null }
+  | { kind: 'scenarios'; scenarioId: string | null }
   // El editor del bloque de un PNJ de bloque.
   | { kind: 'npcBlock'; npcId: string }
   | { kind: 'npcPortrait'; npcId: string }
@@ -211,6 +212,13 @@ export function matchRoute(pathname: string): Route {
     if (id === 'pnj' && rest.length === 0) {
       try {
         return { name: 'dm', view: { kind: 'npcs', npcId: tab === undefined ? null : decodeURIComponent(tab) } };
+      } catch {
+        return { name: 'unknown' };
+      }
+    }
+    if (id === 'escenarios' && rest.length === 0) {
+      try {
+        return { name: 'dm', view: { kind: 'scenarios', scenarioId: tab === undefined ? null : decodeURIComponent(tab) } };
       } catch {
         return { name: 'unknown' };
       }
@@ -364,6 +372,10 @@ export const dmBestiaryHref = (entryId?: string): string =>
 /** La Biblioteca de PNJ del Modo DM, o la ficha de un PNJ. */
 export const dmNpcsHref = (npcId?: string): string =>
   `${import.meta.env.BASE_URL}dm/pnj` + (npcId ? `/${encodeURIComponent(npcId)}` : '');
+
+/** La pestaña de Escenarios o la ficha de un lugar. */
+export const dmScenariosHref = (scenarioId?: string): string =>
+  dmHref() + '/escenarios' + (scenarioId ? '/' + encodeURIComponent(scenarioId) : '');
 
 /** El creador de personajes para un PNJ con ficha. Los datos viajan en la URL
  *  para que recargar no los pierda (mismo patrón que `?capitulo=`). */

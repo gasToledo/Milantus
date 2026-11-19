@@ -23,6 +23,7 @@ import 'fakes/in_memory_note_repository.dart';
 import 'fakes/in_memory_npc_repository.dart';
 import 'fakes/in_memory_portrait_blob_store.dart';
 import 'fakes/in_memory_repository_transaction_runner.dart';
+import 'fakes/in_memory_scenario_repository.dart';
 import 'fakes/in_memory_settings_repository.dart';
 
 Handler _handler(FakeAuthDependencies auth, SendFeedbackFn? sendFeedback) {
@@ -64,6 +65,7 @@ Handler _handler(FakeAuthDependencies auth, SendFeedbackFn? sendFeedback) {
     levelUps: levelUps,
     itemGrants: itemGrants,
     settings: InMemorySettingsRepository(),
+    scenarios: InMemoryScenarioRepository(campaigns, npcs),
     sendFeedback: sendFeedback,
   );
 }

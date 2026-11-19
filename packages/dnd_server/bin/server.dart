@@ -26,6 +26,7 @@ import 'package:dnd_server/src/repositories/level_up_repository.dart';
 import 'package:dnd_server/src/repositories/mcp_audit_repository.dart';
 import 'package:dnd_server/src/repositories/npc_repository.dart';
 import 'package:dnd_server/src/repositories/repository_transaction_runner.dart';
+import 'package:dnd_server/src/repositories/scenario_repository.dart';
 import 'package:dnd_server/src/repositories/settings_repository.dart';
 import 'package:dnd_server/src/web/cache_headers.dart';
 import 'package:dnd_server/src/web/web_v2.dart';
@@ -125,6 +126,7 @@ Future<void> main() async {
       levelUps: PostgresLevelUpRepository(pool),
       itemGrants: PostgresItemGrantRepository(pool),
       settings: PostgresSettingsRepository(pool),
+      scenarios: PostgresScenarioRepository(pool),
       webStaticHandler: webStaticHandler,
       webV2Handler: webV2Handler,
       mcp: mcp,

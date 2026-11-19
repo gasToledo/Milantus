@@ -17,6 +17,7 @@ import { Toast } from '../../ui/primitives';
 import { Medallion } from '../../ui/Medallion';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../../ui/status';
 import { DmHeader } from '../DmHeader';
+import { LibraryTabs } from '../LibraryTabs';
 import { ImportNpcDialog } from './ImportNpcDialog';
 import { NewNpcDialog } from './NewNpcDialog';
 import { hasTag, kindOf, nameMatches, normalizeTags, npcPortrait, npcTypeLine } from './npc';
@@ -258,8 +259,8 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
 
   return (
     <div className="flex flex-col gap-5">
-      <DmHeader title={t.dmNpcLibrary} kicker={kicker} actions={entries && entries.length > 0 ? actions : undefined} />
-      {body}
+      <DmHeader title={t.dmLibrary} kicker={kicker} actions={entries && entries.length > 0 ? actions : undefined} />
+      <LibraryTabs active="npcs">{body}</LibraryTabs>
       {creating && <NewNpcDialog onClose={() => setCreating(false)} />}
       {importing && (
         <ImportNpcDialog
