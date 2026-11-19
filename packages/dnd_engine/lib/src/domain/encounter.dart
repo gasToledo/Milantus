@@ -399,13 +399,31 @@ class Encounter {
   /// [EncounterStage.running], y esa asimetría es deliberada.
   final EncounterStage stage;
 
+  /// El escenario de la Biblioteca donde se pelea, o `null`. Es solo del DM:
+  /// al cerrar, el servidor lo resuelve a su nombre en el registro, y el
+  /// jugador nunca lo ve. Opcional y sin subir [currentSchemaVersion], con el
+  /// criterio de `Combatant.tags`: un cliente que no lo conoce lo pierde al
+  /// guardar, nada más.
+  final String? scenarioId;
+
   const Encounter({
     required this.id,
     this.round = 1,
     this.turnIndex = 0,
     this.combatants = const [],
     this.stage = EncounterStage.preparing,
+    this.scenarioId,
   });
+
+  /// El mismo combate en [scenarioId] (`null`: sin lugar).
+  Encounter withScenario(String? scenarioId) => Encounter(
+        id: id,
+        scenarioId: scenarioId,
+        round: round,
+        turnIndex: turnIndex,
+        combatants: combatants,
+        stage: stage,
+      );
 
   bool get isPreparing => stage == EncounterStage.preparing;
 
@@ -469,6 +487,7 @@ class Encounter {
     final wrapped = position >= combatants.length;
     return Encounter(
       id: id,
+      scenarioId: scenarioId,
       round: wrapped ? round + 1 : round,
       turnIndex: position % combatants.length,
       combatants: combatants,
@@ -529,6 +548,7 @@ class Encounter {
         currentId == null ? 0 : next.indexWhere((c) => c.id == currentId);
     return Encounter(
       id: id,
+      scenarioId: scenarioId,
       round: round,
       turnIndex: newIndex < 0 ? 0 : newIndex,
       combatants: next,
@@ -558,6 +578,7 @@ class Encounter {
 
     return Encounter(
       id: id,
+      scenarioId: scenarioId,
       round: 1,
       turnIndex: 0,
       combatants: [for (final e in withIndex) e.combatant],
@@ -582,6 +603,7 @@ class Encounter {
     if (next.isEmpty) {
       return Encounter(
         id: id,
+        scenarioId: scenarioId,
         round: round,
         turnIndex: 0,
         combatants: next,
@@ -592,6 +614,7 @@ class Encounter {
       final wraps = removedIndex >= next.length;
       return Encounter(
         id: id,
+        scenarioId: scenarioId,
         round: wraps ? round + 1 : round,
         turnIndex: wraps ? 0 : removedIndex,
         combatants: next,
@@ -603,6 +626,7 @@ class Encounter {
         : next.indexWhere((c) => c.id == currentId);
     return Encounter(
       id: id,
+      scenarioId: scenarioId,
       round: round,
       turnIndex: newIndex < 0 ? 0 : newIndex,
       combatants: next,
@@ -619,6 +643,7 @@ class Encounter {
   /// caído le devolvería el turno a mitad del de otro.
   Encounter withHp(String combatantId, int hp) => Encounter(
         id: id,
+        scenarioId: scenarioId,
         round: round,
         turnIndex:
             combatants.isEmpty || isPreparing ? turnIndex : _currentIndex,
@@ -642,6 +667,7 @@ class Encounter {
   /// se agregaron— para que no haga falta acordarse de hacerlo en la pantalla.
   Encounter withTags(String combatantId, List<String> tags) => Encounter(
         id: id,
+        scenarioId: scenarioId,
         round: round,
         turnIndex: turnIndex,
         combatants: [
@@ -671,6 +697,7 @@ class Encounter {
   }) =>
       Encounter(
         id: id,
+        scenarioId: scenarioId,
         round: round,
         turnIndex: turnIndex,
         combatants: [
@@ -691,6 +718,7 @@ class Encounter {
           String combatantId, Combatant Function(Combatant) f) =>
       Encounter(
         id: id,
+        scenarioId: scenarioId,
         round: round,
         turnIndex: turnIndex,
         combatants: [
@@ -728,6 +756,7 @@ class Encounter {
   /// [Combatant.canChangeSide]) ni con un id que no está.
   Encounter withSide(String combatantId, CombatantSide side) => Encounter(
         id: id,
+        scenarioId: scenarioId,
         round: round,
         turnIndex: turnIndex,
         combatants: [
@@ -748,6 +777,7 @@ class Encounter {
   /// perder su turno por eso.
   Encounter withReplaced(Combatant combatant) => Encounter(
         id: id,
+        scenarioId: scenarioId,
         round: round,
         turnIndex: turnIndex,
         combatants: [
@@ -828,6 +858,7 @@ class Encounter {
         'turnIndex': turnIndex,
         'combatants': [for (final c in combatants) c.toJson()],
         'stage': stage.toJson(),
+        if (scenarioId != null) 'scenarioId': scenarioId,
       };
 
   factory Encounter.fromJson(Map<String, dynamic> source) {
@@ -841,6 +872,7 @@ class Encounter {
           Combatant.fromJson((c as Map).cast<String, dynamic>()),
       ],
       stage: EncounterStage.fromJson(j['stage'] as String?),
+      scenarioId: j['scenarioId'] as String?,
     );
   }
 

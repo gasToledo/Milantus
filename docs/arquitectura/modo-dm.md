@@ -396,6 +396,15 @@ manda al jugador el documento del combate, solo esa proyección de cuatro
 estados. Es la misma frontera que ya separaba Modo DM del resto de la app,
 aplicada a una superficie nueva.
 
+El **lugar** del combate (`Encounter.scenarioId`, un escenario de la
+Biblioteca) también es solo del DM. Al cerrar, el servidor lo busca entre los
+escenarios de quien cierra —con el `WHERE` de siempre, así que un id ajeno o
+borrado queda como «sin lugar»— y guarda en el registro el id y el **nombre de
+ese momento** (`EncounterLog.scenarioName`), como el `publicName` de un PNJ:
+borrar el escenario después no le quita el lugar a un combate jugado.
+`EncounterLog.playerView()` saca los dos, y el aviso de combate terminado no lo
+nombra.
+
 ### Por qué el turno es casi-en-vivo, y los avisos también (en `/v2`)
 
 Flutter se refresca al entrar a una pantalla o después de una acción propia,

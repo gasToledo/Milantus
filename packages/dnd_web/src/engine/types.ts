@@ -620,7 +620,7 @@ export interface CombatantJson extends JsonObject {
  *  `js/entrypoint.dart`). */
 export interface EncounterView {
   /** El `Encounter` migrado al esquema actual. */
-  encounter: { id: string; round: number; turnIndex: number; stage: string; combatants: CombatantJson[] };
+  encounter: { id: string; round: number; turnIndex: number; stage: string; combatants: CombatantJson[]; scenarioId?: string | null };
   /** Mientras se arma no hay ronda ni turno. */
   preparing: boolean;
   /** De quién es el turno (salta a los caídos), o `null`. */

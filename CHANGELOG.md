@@ -1540,6 +1540,23 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
+## [1.6.0+1] - 2026-11-19
+
+### Nuevo
+
+- El combate tiene lugar: bajo el título de Combate se elige un escenario de la
+  Biblioteca, primero los usados en la campaña, o se crea uno. Al terminar, el
+  Cuaderno dice dónde se peleó y el lugar abre su ficha en el panel.
+
+### Modificado
+
+- Los escenarios que ya fueron lugar de un combate cuentan como usados en la
+  campaña al nombrarlos con @.
+
+### Eliminado
+
+- Sin cambios.
+
 ## [Unreleased]
 
 ### Nuevo

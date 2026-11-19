@@ -485,6 +485,9 @@ export interface DmEncounterLog {
     creatureId?: string | null;
   }[];
   endedAt?: string;
+  /** Dónde se peleó: el escenario y su nombre al cerrar (solo del DM). */
+  scenarioId?: string | null;
+  scenarioName?: string | null;
 }
 
 /** Un nivel que ganó un personaje vinculado, anotado por el servidor al guardar

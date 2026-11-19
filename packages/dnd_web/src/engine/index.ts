@@ -1156,6 +1156,7 @@ export type EncounterAction =
   | { type: 'addMonsters'; creatureId: string; count: number; rollHp?: boolean; side?: 'ally' | 'enemy' | 'neutral' }
   | { type: 'addNpc'; entry: NpcEntryJson; initiative: number; side?: 'ally' | 'enemy' | 'neutral'; revive?: boolean }
   | { type: 'setSide'; combatantId: string; side: 'ally' | 'enemy' | 'neutral' }
+  | { type: 'setScenario'; scenarioId: string | null }
   | { type: 'convertToNpc'; combatantId: string; name: string; npcId: string }
   | { type: 'start'; initiatives: Record<string, number> }
   | { type: 'next' }

@@ -4688,6 +4688,58 @@ void main() {
         expect(monsters.single['defeated'], 1);
       });
 
+      // El lugar se resuelve al cerrar con los escenarios de quien cierra: el
+      // id de un escenario ajeno no le muestra su nombre al DM.
+      test(
+        'el combate cerrado guarda su lugar, si el escenario es propio',
+        () async {
+          final token = await tableWithChapter('lugar-propio');
+          final other = await login('lugar-ajeno');
+          Future<String> scenario(String owner, String name) async =>
+              ((await send(
+                        'POST',
+                        '/api/scenarios',
+                        token: owner,
+                        body: {'name': name},
+                      ))['body']
+                      as Map)['id']
+                  as String;
+          Future<List> closeAt(String scenarioId) async {
+            await send(
+              'PUT',
+              '/api/campaigns/tumba/encounter',
+              token: token,
+              body: {
+                'encounter': {
+                  'schemaVersion': 2,
+                  'id': 'e-$scenarioId',
+                  'scenarioId': scenarioId,
+                  'combatants': [],
+                },
+              },
+            );
+            await send(
+              'DELETE',
+              '/api/campaigns/tumba/encounter',
+              token: token,
+            );
+            return (await notebook(token, 'tumba'))['encounterLogs'] as List;
+          }
+
+          final own = await scenario(token, 'La torre de Vhalun');
+          final foreign = await scenario(other, 'Guarida ajena');
+
+          final first = await closeAt(own);
+          expect(first.single['scenarioId'], own);
+          expect(first.single['scenarioName'], 'La torre de Vhalun');
+
+          final both = await closeAt(foreign);
+          expect(both, hasLength(2));
+          expect(jsonEncode(both), isNot(contains('Guarida ajena')));
+          expect(jsonEncode(both), isNot(contains(foreign)));
+        },
+      );
+
       // Sin capítulo en marcha el combate se archiva suelto; el DM lo cuelga
       // después. Lo que ya tiene capítulo no se mueve, y lo ajeno no se toca.
       test(

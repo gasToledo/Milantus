@@ -356,8 +356,13 @@ Handler buildHandler({
     ..delete(
       '/api/campaigns/<id>/encounter',
       authenticated(
-        (request) =>
-            _endEncounterHandler(request, campaigns, encounters, transactions),
+        (request) => _endEncounterHandler(
+          request,
+          campaigns,
+          encounters,
+          transactions,
+          scenarios,
+        ),
       ),
     )
     ..put(
@@ -2229,6 +2234,7 @@ Future<Response> _endEncounterHandler(
   CampaignRepository campaigns,
   EncounterRepository encounters,
   RepositoryTransactionRunner transactions,
+  ScenarioRepository scenarios,
 ) async {
   final campaignId = requireSafePathSegment(
     request.params['id']!,
@@ -2288,10 +2294,17 @@ Future<Response> _endEncounterHandler(
             !dead.contains(c.npcId))
           c.npcId!: c.currentHp >= c.maxHp ? null : max(0, c.currentHp),
     });
+    // El lugar se busca entre los escenarios de **este** DM (el `WHERE` del
+    // repositorio): un id ajeno, borrado o mal formado queda como «sin lugar»
+    // y no traba el cierre. Es una lectura, fuera de la transacción.
+    final scenarioId = encounter.scenarioId;
+    final place = scenarioId != null && isUuid(scenarioId)
+        ? await scenarios.find(request.userId, scenarioId)
+        : null;
     await repositories.encounters.close(
       request.userId,
       campaignId,
-      _buildEncounterLog(encounter, npcs),
+      _buildEncounterLog(encounter, npcs, place),
       chapterId: active?.id,
     );
     // Les avisa a quienes pelearon, para que la ficha abierta en la mesa se
@@ -2328,6 +2341,7 @@ Future<Response> _endEncounterHandler(
 Map<String, dynamic> _buildEncounterLog(
   Encounter encounter,
   Map<String, Npc?> npcs,
+  StoredScenario? place,
 ) {
   final players = [
     for (final c in encounter.combatants)
@@ -2353,6 +2367,8 @@ Map<String, dynamic> _buildEncounterLog(
   return EncounterLog(
     rounds: encounter.round,
     players: players,
+    scenarioId: place?.id,
+    scenarioName: place?.name,
     monsters: [
       for (final group in monsterGroups.values)
         EncounterLogMonsters(

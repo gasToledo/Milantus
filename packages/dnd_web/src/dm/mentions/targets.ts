@@ -35,7 +35,8 @@ export type MentionTarget =
  * los PNJ y escenarios de la campaña, y después el resto de la Biblioteca.
  *
  * Un escenario es «de la campaña» si ya se lo nombra en una nota o en el
- * objetivo de un capítulo, o si tiene personajes de esa mesa. Lo que no carga
+ * objetivo de un capítulo, si fue el lugar de un combate o si tiene
+ * personajes de esa mesa. Lo que no carga
  * no se ofrece ni se enlaza: el texto se lee igual.
  */
 export function useMentionTargets(campaignId: string): MentionTarget[] {
@@ -91,6 +92,8 @@ export function useMentionTargets(campaignId: string): MentionTarget[] {
       ...(chapters.data ?? []).map((c) => c.summary ?? ''),
     ];
     const used = new Set(texts.flatMap((text) => mentionedNames(text, sceneNames)));
+    // También cuenta el lugar de un combate ya jugado en la campaña.
+    const fought = new Set((notebook.data?.encounterLogs ?? []).flatMap((l) => (l.scenarioId ? [l.scenarioId] : [])));
     const withCampaign = new Set(
       (characters.data ?? []).filter((c) => c.campaigns.some((x) => x.id === campaignId)).map((c) => c.key),
     );
@@ -99,7 +102,7 @@ export function useMentionTargets(campaignId: string): MentionTarget[] {
       key: `scene:${scenario.id}`,
       name: scenario.name,
       sub: t.mentionScene,
-      near: used.has(scenario.name) || scenario.characterKeys.some((k) => withCampaign.has(k)),
+      near: used.has(scenario.name) || fought.has(scenario.id) || scenario.characterKeys.some((k) => withCampaign.has(k)),
       portrait: null,
       href: dmScenariosHref(scenario.id),
       scenario,

@@ -123,6 +123,20 @@ void main() {
     expect(ally.combatants.single.side, CombatantSide.ally);
   });
 
+  test('el lugar sigue con el combate hasta que se lo quita', () {
+    final placed =
+        act(withGoblin(), {'type': 'setScenario', 'scenarioId': 'sc-1'})!;
+    final id = placed.combatants.single.id;
+    final started = act(placed, {
+      'type': 'start',
+      'initiatives': {id: 12}
+    })!;
+    final played = act(started, {'type': 'next'})!;
+    expect(played.scenarioId, 'sc-1');
+    expect(act(played, {'type': 'setScenario', 'scenarioId': 'sc-1'}), isNull);
+    expect(act(played, {'type': 'setScenario'})!.scenarioId, isNull);
+  });
+
   test('un jugador y un PNJ no entran dos veces', () {
     final player = {
       'type': 'addPlayer',

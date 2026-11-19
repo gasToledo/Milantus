@@ -6,8 +6,11 @@ import { SectionRule } from '../ui/data';
  * que dice en qué está (el estado de la campaña, «Solo lectura»), a su derecha
  * las `actions` de la pantalla (menú de la campaña, «Sumar personaje») y
  * debajo la regla ornamental. El `h1` es el título: uno por pantalla.
+ *
+ * [below] es una línea pegada al título, antes de la regla (el lugar del
+ * combate): dice algo del título, no es otra acción.
  */
-export function DmHeader({ title, kicker, actions }: { title: string; kicker?: string; actions?: ReactNode }) {
+export function DmHeader({ title, kicker, actions, below }: { title: string; kicker?: string; actions?: ReactNode; below?: ReactNode }) {
   return (
     <>
       <header className="flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -27,6 +30,7 @@ export function DmHeader({ title, kicker, actions }: { title: string; kicker?: s
         )}
         {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
       </header>
+      {below && <div className="-mt-3 flex">{below}</div>}
       <SectionRule className="my-0" />
     </>
   );

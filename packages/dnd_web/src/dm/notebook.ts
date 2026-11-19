@@ -75,13 +75,20 @@ function fightBody(log: DmEncounterLog, t: Texts, catalog: Catalog, mark: Mark):
     ...(neutrals.length > 0 ? [t.dmLogNeutrals(logNames(neutrals, ', ', catalog, mark))] : []),
   ];
   const enemies = side(log, 'enemy');
-  if (enemies.length === 0) return [t.dmLogNoEnemies(who), ...extra].join('\n\n');
+  const place = log.scenarioName?.trim() || null;
+  if (enemies.length === 0) {
+    return [place ? `${t.dmLogNoEnemies(who)} ${t.dmLogAt(mark(place))}` : t.dmLogNoEnemies(who), ...extra].join('\n\n');
+  }
   const total = enemies.reduce((n, m) => n + (m.count ?? 1), 0);
   const down = enemies.reduce((n, m) => n + (m.defeated ?? 0), 0);
   // El sujeto va siempre explícito: «cayeron todos» a secas, al lado de
   // «Sagan contra Goblin ×3», se leería como que cayó el grupo.
   const fell = down === 0 ? t.dmLogNoneFell : down === total ? t.dmLogAllFell : t.dmLogSomeFell(down, total);
-  return [t.dmLogAgainst(who, logNames(enemies, ` ${t.wordAnd} `, catalog, mark), fell), ...extra].join('\n\n');
+  const against = logNames(enemies, ` ${t.wordAnd} `, catalog, mark);
+  // El lugar va con el nombre que tenía al cerrar; si el escenario sigue en
+  // la Biblioteca, `mark` lo vuelve mención y se abre en el panel.
+  const lead = place ? t.dmLogAgainstAt(who, against, mark(place), fell) : t.dmLogAgainst(who, against, fell);
+  return [lead, ...extra].join('\n\n');
 }
 
 const ms = (iso: string | undefined): number | null => {

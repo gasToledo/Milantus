@@ -327,7 +327,10 @@ repiten acá.
   en el objetivo del capítulo (`MentionTextarea`): también nombran escenarios y PNJ
   de toda la Biblioteca, y tocar una abre su ficha corta en un panel lateral
   (`MentionPanel`) en vez de cambiar de pantalla. Siguen guardándose como texto
-  `@Nombre`; el jugador lee el nombre sin la `@` (`withoutMentionMarks`). **Bestiario del DM**: es el mismo `BestiaryPage` del jugador
+  `@Nombre`; el jugador lee el nombre sin la `@` (`withoutMentionMarks`).
+  Desde 1.6 el combate lleva su lugar: se elige bajo el título de Combate
+  (`PlacePicker`, armando o en curso) y el registro del Cuaderno dice «… contra
+  … en @Lugar», con el nombre que tenía al cerrar. **Bestiario del DM**: es el mismo `BestiaryPage` del jugador
   (`/v2/bestiario`, ya completo) montado bajo `/v2/dm/bestiario` con el panel del
   DM (`dm` en `BestiaryPage`): igual navegador, filtros y perfil, con la
   cabecera del Modo DM y sus propias URL. Es una herramienta de la cuenta y no de

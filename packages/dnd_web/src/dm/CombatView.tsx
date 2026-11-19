@@ -45,6 +45,7 @@ import { retryEncounterSave, useEncounterWriter } from './combat/encounterWriter
 import { RollInitiativeDialog } from './combat/RollInitiativeDialog';
 import { SIDE_TONE, SideMenu } from './combat/SideMenu';
 import { DmHeader } from './DmHeader';
+import { PlacePicker } from './combat/PlacePicker';
 import { useHpPulse } from '../ui/hpPulse';
 import { buildEntries } from './notebook';
 import { npcTypeLine } from './npcs/npc';
@@ -359,6 +360,16 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
       <DmHeader
         title={t.dmSectionCombat}
         kicker={kicker}
+        // Dónde se pelea, armando o en curso: queda en el registro del Cuaderno.
+        below={
+          data?.view && (
+            <PlacePicker
+              campaignId={campaign.id}
+              scenarioId={data.view.encounter.scenarioId ?? null}
+              onChange={(scenarioId) => act({ type: 'setScenario', scenarioId })}
+            />
+          )
+        }
         actions={
           // En curso, «Siguiente turno» va en la placa de la ronda (`ControlBar`),
           // al lado de lo que cuenta: a pedido del usuario, que lo buscaba ahí.

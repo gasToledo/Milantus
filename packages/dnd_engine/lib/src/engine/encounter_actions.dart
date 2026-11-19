@@ -22,6 +22,7 @@ import 'npc_stats.dart';
 ///   El bando es obligatorio salvo para un PNJ sin estadísticas. Vincular el
 ///   PNJ a la campaña es tarea del cliente.
 /// - `setSide` con `combatantId`, `side`.
+/// - `setScenario` con `scenarioId` (`null` para quitar el lugar).
 /// - `convertToNpc` con `combatantId`, `name`, `npcId`.
 /// - `start` con `initiatives` (id → valor).
 /// - `next`.
@@ -129,6 +130,12 @@ class EncounterActions {
             side: side,
           ),
         );
+      case 'setScenario':
+        if (current == null) return null;
+        final raw = action['scenarioId'] as String?;
+        final scenarioId = raw == null || raw.isEmpty ? null : raw;
+        if (scenarioId == current.scenarioId) return null;
+        return current.withScenario(scenarioId);
       case 'setSide':
         if (find() == null) return null;
         // Sin bando, o con uno desconocido, no hay nada que guardar: caer a

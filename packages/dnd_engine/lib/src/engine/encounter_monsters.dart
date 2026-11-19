@@ -66,6 +66,7 @@ extension EncounterMonsters on Encounter {
         ? this
         : Encounter(
             id: id,
+            scenarioId: scenarioId,
             round: round,
             turnIndex: turnIndex,
             stage: stage,

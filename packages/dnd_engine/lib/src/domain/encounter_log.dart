@@ -108,6 +108,14 @@ class EncounterLog {
   /// Cuándo se cerró. La pone la base, igual que en [Note].
   final DateTime? endedAt;
 
+  /// Dónde se peleó: el escenario del DM y su nombre **al cerrar**, como el
+  /// `publicName` de un PNJ, para que borrar el escenario después no le quite
+  /// el lugar a un combate que ya pasó. Opcionales y sin subir
+  /// [currentSchemaVersion]: un registro viejo simplemente no tiene lugar.
+  /// Son del DM: [playerView] los saca.
+  final String? scenarioId;
+  final String? scenarioName;
+
   const EncounterLog({
     this.id = '',
     this.chapterId,
@@ -115,6 +123,8 @@ class EncounterLog {
     this.players = const [],
     this.monsters = const [],
     this.endedAt,
+    this.scenarioId,
+    this.scenarioName,
   });
 
   List<EncounterLogMonsters> _bySide(CombatantSide side) => [
@@ -135,7 +145,8 @@ class EncounterLog {
 
   /// Lo que de este combate puede ver un jugador.
   ///
-  /// **Ningún nombre de PNJ sale de acá.** Los aliados y los neutrales que no
+  /// **Ningún nombre de PNJ sale de acá, ni el lugar** (los escenarios son
+  /// del DM). Los aliados y los neutrales que no
   /// son jugadores desaparecen, y un PNJ enemigo se muestra con el nombre de la
   /// criatura de la que partió ([EncounterLogMonsters.publicName]) o, si no
   /// partió de ninguna, con el nombre vacío: la pantalla del jugador lo dice
@@ -198,6 +209,8 @@ class EncounterLog {
             ),
         ],
         endedAt: endedAt,
+        scenarioId: scenarioId,
+        scenarioName: scenarioName,
       );
 
   Map<String, dynamic> toJson() => {
@@ -208,6 +221,8 @@ class EncounterLog {
         'players': players,
         'monsters': [for (final m in monsters) m.toJson()],
         if (endedAt != null) 'endedAt': endedAt!.toIso8601String(),
+        if (scenarioId != null) 'scenarioId': scenarioId,
+        if (scenarioName != null) 'scenarioName': scenarioName,
       };
 
   factory EncounterLog.fromJson(Map<String, dynamic> source) {
@@ -224,6 +239,8 @@ class EncounterLog {
           EncounterLogMonsters.fromJson((m as Map).cast<String, dynamic>()),
       ],
       endedAt: DateTime.tryParse(j['endedAt'] as String? ?? ''),
+      scenarioId: j['scenarioId'] as String?,
+      scenarioName: j['scenarioName'] as String?,
     );
   }
 

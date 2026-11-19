@@ -73,6 +73,17 @@ void main() {
     final view = log.playerView();
     final body = jsonEncode(view.toJson());
 
+    test('no dice dónde se peleó: los escenarios son del DM', () {
+      const placed = EncounterLog(
+        players: ['Sagan'],
+        scenarioId: 'sc-1',
+        scenarioName: 'La torre de Vhalun',
+      );
+      final seen = jsonEncode(placed.playerView().toJson());
+      expect(seen, isNot(contains('sc-1')));
+      expect(seen, isNot(contains('Vhalun')));
+    });
+
     test('no contiene el nombre de ningún PNJ', () {
       for (final name in [
         'Garrick',
