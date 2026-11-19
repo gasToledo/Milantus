@@ -363,7 +363,9 @@ repiten acá.
   (`/v2/dm/escenarios`, `GET/POST /api/scenarios`, `GET/PUT/DELETE
   /api/scenarios/:id`, la portada en `/api/scenarios/:id/image`). Un escenario
   tiene nombre, descripción, portada y enlaces a PNJ de la biblioteca o a
-  miembros de las campañas del DM, que abren su ficha. Es solo de `/v2`: Flutter
+  miembros de las campañas del DM, que abren su ficha. La pantalla copia la de
+  PNJ: tarjetas que se levantan y se ordenan arrastrando (`scenarioOrder` en los
+  ajustes, como `npcOrder`) y ficha con ícono para editar y ⋮ para borrar. Es solo de `/v2`: Flutter
   no tiene la pantalla ni las rutas en su `FakeApiServer`. Seguridad y formato
   de los enlaces: `modo-dm.md` §Escenarios.
   **PNJ de la mesa** (`GET /api/campaigns/:id/npcs`): los PNJ vinculados a la

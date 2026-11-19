@@ -144,6 +144,8 @@ export interface RosterSettings {
    *  dashboard. Solo lo escribe `/v2`: Flutter no lo conoce y el servidor
    *  combina el primer nivel de los ajustes, así que no lo pisa. */
   npcOrder: string[];
+  /** El orden de los escenarios de la Biblioteca, igual que `npcOrder`. */
+  scenarioOrder: string[];
   /** `null`: la cuenta todavía no lo guardó y rige la copia de este navegador. */
   themeMode: string | null;
   /** Si la cuenta abre en el Modo DM (`AppSettings.startsInDmMode`). */
@@ -179,6 +181,7 @@ export async function fetchRosterSettings(signal: AbortSignal): Promise<RosterSe
     favoriteCharacterId: settings?.favoriteCharacterId ?? null,
     characterOrder: settings?.characterOrder ?? [],
     npcOrder: settings?.npcOrder ?? [],
+    scenarioOrder: settings?.scenarioOrder ?? [],
     themeMode: settings?.themeMode ?? null,
     startsInDmMode: settings?.startsInDmMode === true,
     language: settings?.language === 'es' || settings?.language === 'en' ? settings.language : null,
