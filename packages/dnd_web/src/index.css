@@ -345,23 +345,6 @@ body {
     scale: 0.96;
   }
 }
-/* La portada de un escenario pasa de la tarjeta a la ficha creciendo, en vez
-   de fundirse con el resto de la pantalla: las dos llevan el mismo
-   `view-transition-name` (`ScenarioLibraryView`). Cambia de proporción en el
-   camino (16:9 a la franja ancha), así que la imagen llena el grupo en lugar
-   de estirarse. */
-.scenario-cover {
-  view-transition-class: scenario-cover;
-}
-::view-transition-group(.scenario-cover) {
-  animation-duration: 260ms;
-  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-::view-transition-old(.scenario-cover),
-::view-transition-new(.scenario-cover) {
-  height: 100%;
-  object-fit: cover;
-}
 
 /* Los menús se abren desde su botón: Radix da la esquina que lo toca. Con
    «reducir movimiento» solo aparecen, sin crecer. */

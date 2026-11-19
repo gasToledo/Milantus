@@ -146,10 +146,11 @@ no respondía. Un
 propia animación (las celebraciones y los avisos con pantalla propia).
 
 Lo que se suma a una selección visible (los personajes de un escenario) entra
-con `.chip-in`, el mismo fundido que crece de los diálogos. Una imagen que
-existe en la lista y en la ficha (la portada de un escenario) lleva el mismo
-`view-transition-name` en las dos y la clase `.scenario-cover`: el fundido de
-pantalla la hace crecer de una a otra en vez de cruzarlas.
+con `.chip-in`, el mismo fundido que crece de los diálogos. Entre una lista y
+su ficha no se hace viajar ninguna imagen: se probó con la portada de un
+escenario y, encima del fundido de pantalla, se leía como dos animaciones a la
+vez. La pantalla nueva tiene que llegar dibujada al fundido (con lo que ya
+trae la lista en caché, `initialData`), no en «Cargando…».
 
 El creador (`src/creation/CreationWizard.tsx`) suma dos piezas propias, que por
 ahora solo usa él: la grilla de clases (`PickCard`, las trece a la vista) y la

@@ -24,11 +24,6 @@ export function ScenarioLibraryView({ scenarioId }: { scenarioId: string | null 
   return scenarioId === null ? <ScenarioList /> : <ScenarioPage id={scenarioId} />;
 }
 
-/** La portada de la tarjeta y la de la ficha comparten nombre: al abrir un
- *  escenario, el fundido de pantalla la hace crecer de una a otra en vez de
- *  cruzarlas (`.scenario-cover` en `index.css`). */
-const coverName = (id: string) => `scover-${id.replace(/[^\w-]/g, '_')}`;
-
 /** Los personajes de cada escenario que todavía existen. Una clave vencida (el
  *  PNJ se borró, el jugador cortó el vínculo) simplemente no aparece. */
 function useLinked(scenarios: readonly Scenario[] | undefined) {
@@ -163,8 +158,7 @@ function ScenarioCard({ scenario, people }: { scenario: Scenario; people: readon
             src={scenarioImageHref(scenario)}
             alt=""
             loading="lazy"
-            className="scenario-cover aspect-video w-full border-b border-hairline bg-plaque object-cover"
-            style={{ viewTransitionName: coverName(scenario.id) }}
+            className="aspect-video w-full border-b border-hairline bg-plaque object-cover"
           />
         ) : (
           <div className="flex aspect-video items-center justify-center border-b border-hairline bg-plaque text-text-muted">
@@ -201,7 +195,14 @@ function ScenarioCard({ scenario, people }: { scenario: Scenario; people: readon
 function ScenarioPage({ id }: { id: string }) {
   const t = useTexts();
   const client = useQueryClient();
-  const query = useQuery(scenarioQuery(id));
+  const query = useQuery({
+    ...scenarioQuery(id),
+    // Al llegar desde la lista el escenario ya está en caché: con él la ficha
+    // se dibuja dentro del fundido de pantalla, en vez de fundirse a
+    // «Cargando…» y saltar a la ficha un momento después.
+    initialData: () => client.getQueryData(scenariosQuery.queryKey)?.find((entry) => entry.id === id),
+    initialDataUpdatedAt: () => client.getQueryState(scenariosQuery.queryKey)?.dataUpdatedAt,
+  });
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -280,8 +281,7 @@ function ScenarioDetails({ scenario }: { scenario: Scenario }) {
             src={cover}
             alt={t.dmScenarioCoverOf(scenario.name)}
             fetchPriority="high"
-            className="scenario-cover h-full w-full object-cover"
-            style={{ viewTransitionName: coverName(scenario.id) }}
+            className="h-full w-full object-cover"
           />
           <button
             type="button"
