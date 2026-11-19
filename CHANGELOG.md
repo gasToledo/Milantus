@@ -1526,7 +1526,9 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
-- Sin cambios.
+- Los escenarios de la Biblioteca muestran su portada, sus personajes con
+  retrato y se filtran por campaña; el editor deja la lista de personajes a la
+  vista y acepta soltar la imagen.
 
 ### Eliminado
 

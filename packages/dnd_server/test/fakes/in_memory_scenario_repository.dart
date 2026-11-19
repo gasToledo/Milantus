@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:dnd_engine/dnd_engine.dart';
+
 import 'package:dnd_server/src/repositories/scenario_repository.dart';
 
 import 'in_memory_campaign_repository.dart';
@@ -68,6 +70,13 @@ class InMemoryScenarioRepository implements ScenarioRepository {
         name: entry.npc.name,
         campaignId: null,
         campaignName: null,
+        portraitKey: entry.npc.sheetKind == NpcSheetKind.character
+            ? entry.sheet?.portraitPaths.firstOrNull
+            : entry.npc.portraitPaths.firstOrNull,
+        campaigns: [
+          for (final link in entry.campaigns)
+            (id: link.campaignId, name: link.campaignName),
+        ],
       ),
     for (final campaign in await campaigns.listForDm(userId))
       for (final member in await campaigns.listMembers(userId, campaign.id))
@@ -76,6 +85,8 @@ class InMemoryScenarioRepository implements ScenarioRepository {
           name: member.character.name,
           campaignId: campaign.id,
           campaignName: campaign.name,
+          portraitKey: member.character.portraitPaths.firstOrNull,
+          campaigns: [(id: campaign.id, name: campaign.name)],
         ),
   ];
 }

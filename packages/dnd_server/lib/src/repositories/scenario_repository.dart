@@ -43,6 +43,15 @@ typedef ScenarioCharacter = ({
   String name,
   String? campaignId,
   String? campaignName,
+
+  // El primer retrato de la ficha (o del PNJ), para el medallón. La de un
+  // miembro es una clave de otra cuenta: el cliente la pide por la ruta del
+  // vínculo, que solo usa el nombre del archivo.
+  String? portraitKey,
+
+  // Las campañas donde aparece, para filtrar la lista por campaña: la del
+  // vínculo en un miembro y las de `campaign_npcs` en un PNJ.
+  List<({String id, String name})> campaigns,
 });
 
 class ScenarioDraft {
@@ -176,11 +185,23 @@ class PostgresScenarioRepository implements ScenarioRepository {
     final rows = await _session.execute(
       Sql.named('''
         SELECT 'npc:' || n.id AS key, n.name,
-               NULL::text AS campaign_id, NULL::text AS campaign_name
+               NULL::text AS campaign_id, NULL::text AS campaign_name,
+               CASE WHEN n.document ->> 'sheetKind' = 'character'
+                    THEN nc.document -> 'portraitPaths' ->> 0
+                    ELSE n.document -> 'portraitPaths' ->> 0 END AS portrait_key,
+               COALESCE((
+                 SELECT jsonb_agg(jsonb_build_object('id', c.id, 'name', c.name) ORDER BY c.name)
+                 FROM campaign_npcs cn
+                 JOIN campaigns c ON c.dm_user_id = cn.dm_user_id AND c.id = cn.campaign_id
+                 WHERE cn.dm_user_id = n.dm_user_id AND cn.npc_id = n.id
+               ), '[]'::jsonb) AS campaigns
         FROM npcs n
+        LEFT JOIN characters nc ON nc.user_id = n.dm_user_id AND nc.id = n.character_id
         WHERE n.dm_user_id = @dmUserId
         UNION ALL
-        SELECT 'member:' || m.id::text, ch.name, c.id, c.name
+        SELECT 'member:' || m.id::text, ch.name, c.id, c.name,
+               ch.document -> 'portraitPaths' ->> 0,
+               jsonb_build_array(jsonb_build_object('id', c.id, 'name', c.name))
         FROM campaign_members m
         JOIN characters ch ON ch.user_id = m.owner_user_id AND ch.id = m.character_id
         JOIN campaigns c ON c.dm_user_id = m.dm_user_id AND c.id = m.campaign_id
@@ -196,6 +217,11 @@ class PostgresScenarioRepository implements ScenarioRepository {
           name: row['name'] as String,
           campaignId: row['campaign_id'] as String?,
           campaignName: row['campaign_name'] as String?,
+          portraitKey: row['portrait_key'] as String?,
+          campaigns: [
+            for (final c in (row['campaigns'] as List).cast<Map>())
+              (id: c['id'] as String, name: c['name'] as String),
+          ],
         ),
     ];
   }

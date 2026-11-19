@@ -707,6 +707,13 @@ jugador corta el vínculo, la clave queda y simplemente deja de aparecer: la
 lectura cruza contra esa misma lista. El cliente solo manda `characterKeys`
 cuando el DM tocó la selección, y entonces ya sin las vencidas.
 
+Esa misma lista trae, para cada personaje, la clave de su primer retrato y las
+campañas donde aparece (la del vínculo en un miembro, las de `campaign_npcs` en
+un PNJ): con eso se dibujan los medallones y se filtra la Biblioteca por
+campaña. La clave del retrato de un miembro es de la otra cuenta y no abre
+nada por sí sola: el cliente la pide por la ruta del vínculo, que la resuelve
+desde `campaign_members`.
+
 La portada va en la fila (`BYTEA`), no en el almacén de retratos: es una por
 escenario, del DM y sin variantes de tamaño. Tiene el mismo límite y la misma
 validación de formato que un retrato, y se pide con `?v=<updatedAt>`, por lo

@@ -28,6 +28,11 @@ void _mountScenarioRoutes(
                 'name': character.name,
                 'campaignId': character.campaignId,
                 'campaignName': character.campaignName,
+                'portraitKey': character.portraitKey,
+                'campaigns': [
+                  for (final c in character.campaigns)
+                    {'id': c.id, 'name': c.name},
+                ],
               },
           ],
         });

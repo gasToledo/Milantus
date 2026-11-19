@@ -145,6 +145,12 @@ no respondía. Un
 `Dialog` de Radix armado a mano lleva esas mismas clases, salvo que tenga su
 propia animación (las celebraciones y los avisos con pantalla propia).
 
+Lo que se suma a una selección visible (los personajes de un escenario) entra
+con `.chip-in`, el mismo fundido que crece de los diálogos. Una imagen que
+existe en la lista y en la ficha (la portada de un escenario) lleva el mismo
+`view-transition-name` en las dos y la clase `.scenario-cover`: el fundido de
+pantalla la hace crecer de una a otra en vez de cruzarlas.
+
 El creador (`src/creation/CreationWizard.tsx`) suma dos piezas propias, que por
 ahora solo usa él: la grilla de clases (`PickCard`, las trece a la vista) y la
 matriz de características (`ScoreMatrix`: una columna por dado, así dos 14 son

@@ -1,5 +1,6 @@
 import { queryOptions } from '@tanstack/react-query';
 import { ApiError } from './client';
+import { memberPortraitUrl, portraitUrl } from '../ui/portrait';
 
 export interface Scenario {
   id: string;
@@ -15,6 +16,22 @@ export interface ScenarioCharacter {
   name: string;
   campaignId: string | null;
   campaignName: string | null;
+  portraitKey: string | null;
+  campaigns: { id: string; name: string }[];
+}
+
+/** El id de lo que enlaza la clave: el PNJ o el vínculo del miembro. */
+export const scenarioCharacterId = (character: ScenarioCharacter): string =>
+  character.key.slice(character.key.indexOf(':') + 1);
+
+/** El retrato para el medallón: el de un PNJ es de esta cuenta; el de un
+ *  miembro va por la ruta del vínculo. */
+export function scenarioCharacterPortrait(character: ScenarioCharacter): string | null {
+  const key = character.portraitKey;
+  if (key === null) return null;
+  return character.campaignId === null
+    ? portraitUrl(key)
+    : memberPortraitUrl(character.campaignId, scenarioCharacterId(character), key);
 }
 
 const base = '/api/scenarios';
