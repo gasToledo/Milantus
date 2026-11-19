@@ -25,6 +25,8 @@ import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { stateLabel, stateOf } from './campaigns';
 import { CampaignMenu } from './CampaignMenu';
 import { ChapterEditorDialog } from './ChapterEditorDialog';
+import { useMentionReader } from './mentions/reader';
+import { withMentions } from '../ui/mentions';
 import { CloseChapterDialog } from './CloseChapterDialog';
 import { DmHeader } from './DmHeader';
 
@@ -46,6 +48,8 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
   const t = useTexts();
   const chapters = useCampaignChapters(campaign.id);
   const client = useQueryClient();
+  // Las menciones del objetivo abren el panel lateral, como en el Cuaderno.
+  const { mentions, panel, readingClass } = useMentionReader(campaign.id);
   const [editing, setEditing] = useState<DmChapter | 'new' | null>(null);
   const [deleting, setDeleting] = useState<DmChapter | null>(null);
   const [closing, setClosing] = useState<DmChapter | null>(null);
@@ -172,7 +176,7 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
                   </span>
                 </div>
                 <p className="mt-1.5 text-[13.5px] leading-normal whitespace-pre-line text-on-surface-variant">
-                  {c.summary?.trim() ? c.summary : t.dmChapterNoGoal}
+                  {c.summary?.trim() ? withMentions(c.summary, mentions) : t.dmChapterNoGoal}
                 </p>
                 {rewards !== '' && <p className="mt-2 text-[12.5px] text-text-muted">{t.dmChapterRewards(rewards)}</p>}
               </div>
@@ -237,7 +241,7 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className={cx('flex flex-col gap-5', readingClass)}>
       <DmHeader
         title={t.dmSectionChapters}
         kicker={kicker}
@@ -255,6 +259,7 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
       {editing && (
         <ChapterEditorDialog
           title={editing === 'new' ? t.dmNewChapter : t.dmEditChapter}
+          campaignId={campaign.id}
           initial={editing === 'new' ? { id: `chapter-${Date.now()}`, name: '' } : editing}
           onSubmit={submit}
           onClose={() => setEditing(null)}
@@ -270,6 +275,7 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
           onClose={() => setDeleting(null)}
         />
       )}
+      {panel}
       {closing && (
         <CloseChapterDialog
           campaignId={campaign.id}

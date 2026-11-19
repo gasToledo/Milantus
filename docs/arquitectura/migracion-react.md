@@ -323,7 +323,11 @@ repiten acá.
   distinguir mayúsculas ni tildes, gana el nombre más largo y tiene que
   terminar ahí; una `@` que no es de nadie queda como texto, y el que se fue
   de la campaña también. Si esas dos listas no cargan, las menciones se leen
-  como texto y el Cuaderno no se cae. **Bestiario del DM**: es el mismo `BestiaryPage` del jugador
+  como texto y el Cuaderno no se cae. Desde 1.5 se escriben con `@` en la nota y
+  en el objetivo del capítulo (`MentionTextarea`): también nombran escenarios y PNJ
+  de toda la Biblioteca, y tocar una abre su ficha corta en un panel lateral
+  (`MentionPanel`) en vez de cambiar de pantalla. Siguen guardándose como texto
+  `@Nombre`; el jugador lee el nombre sin la `@` (`withoutMentionMarks`). **Bestiario del DM**: es el mismo `BestiaryPage` del jugador
   (`/v2/bestiario`, ya completo) montado bajo `/v2/dm/bestiario` con el panel del
   DM (`dm` en `BestiaryPage`): igual navegador, filtros y perfil, con la
   cabecera del Modo DM y sus propias URL. Es una herramienta de la cuenta y no de

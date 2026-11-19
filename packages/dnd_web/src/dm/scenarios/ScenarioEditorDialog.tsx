@@ -46,15 +46,17 @@ function useObjectUrl(file: File | null | undefined): string | null {
 const field =
   'w-full rounded-[var(--radius-input)] border border-hairline bg-plaque px-3 py-2 text-[14px] text-on-surface placeholder:text-text-muted';
 
-export function ScenarioEditorDialog({ initial, onClose, onSaved }: {
+export function ScenarioEditorDialog({ initial, initialName = '', onClose, onSaved }: {
   initial?: Scenario;
+  /** El nombre de un escenario nuevo, cuando se crea desde una mención. */
+  initialName?: string;
   onClose: () => void;
   onSaved?: (scenario: Scenario) => void;
 }) {
   const t = useTexts();
   const client = useQueryClient();
   const coverId = useId();
-  const [name, setName] = useState(initial?.name ?? '');
+  const [name, setName] = useState(initial?.name ?? initialName);
   const [description, setDescription] = useState(initial?.description ?? '');
   // `undefined`: la portada no se tocó; `null`: se quitó; un archivo: se cambió.
   const [image, setImage] = useState<File | null | undefined>();

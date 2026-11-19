@@ -50,3 +50,24 @@ export function withMentions(text: string, mentions: Mentions | undefined, keyPr
   if (loose < text.length) out.push(text.slice(loose));
   return out;
 }
+
+/** Los nombres de [names] que [text] menciona, con el mismo corte que
+ *  [withMentions] (para mostrar las menciones de un borrador). */
+export function mentionedNames(text: string, names: readonly string[]): string[] {
+  const found = new Set<string>();
+  withMentions(text, {
+    names,
+    render: (name) => {
+      found.add(name);
+      return null;
+    },
+  });
+  return [...found];
+}
+
+/**
+ * El texto sin la `@` de las menciones, para quien no las puede abrir (el
+ * jugador lee las notas compartidas y el objetivo del capítulo en curso). Solo
+ * la `@` que empieza una palabra: la de un correo queda.
+ */
+export const withoutMentionMarks = (text: string): string => text.replace(/(^|[\s(«"'¡¿])@(?=[\p{L}\p{N}])/gu, '$1');

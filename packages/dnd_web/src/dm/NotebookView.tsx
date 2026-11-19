@@ -4,9 +4,7 @@ import { EllipsisVertical, Eye, FolderInput, Lock, Pencil, Plus, Search, Trash2,
 import {
   queryKeys,
   useCampaignChapters,
-  useCampaignMembers,
   useCampaignNotebook,
-  useCampaignNpcs,
   useSheetCatalog,
 } from '../api/queries';
 import {
@@ -30,14 +28,15 @@ import { Button, ButtonLink } from '../ui/Button';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { cx } from '../ui/cx';
 import { MarkdownText } from '../ui/MarkdownText';
-import { withMentions, type Mentions } from '../ui/mentions';
-import { dmCampaignHref, dmMemberHref, dmNpcsHref, Link } from '../router';
+import { withMentions } from '../ui/mentions';
+import { dmCampaignHref } from '../router';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Tooltip } from '../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { stateLabel, stateOf } from './campaigns';
 import { CampaignMenu } from './CampaignMenu';
 import { DmHeader } from './DmHeader';
 import { NoteEditorDialog } from './NoteEditorDialog';
+import { useMentionReader } from './mentions/reader';
 import { buildEntries, inChapterOrder, matches, stamp, type Entry, type EntryKind } from './notebook';
 import { prefersReducedMotion } from '../ui/motion';
 
@@ -81,36 +80,10 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
   const [moving, setMoving] = useState<Entry | null>(null);
   const [toast, setToast] = useState<{ key: number; tone: ToastTone; message: string } | null>(null);
   const notify = (tone: ToastTone, message: string) => setToast((prev) => ({ key: (prev?.key ?? 0) + 1, tone, message }));
-  // A quiénes enlaza una mención: los personajes de la mesa y los PNJ de la
-  // campaña. Si no cargan, las menciones se leen como texto y el Cuaderno no
-  // se cae por eso.
-  const members = useCampaignMembers(campaign.id);
-  const npcs = useCampaignNpcs(campaign.id);
-
-  const mentions = useMemo((): Mentions => {
-    const players = (members.data ?? []).map((m) => ({ name: String(m.character.name ?? ''), href: dmMemberHref(campaign.id, m.memberId) }));
-    const people = (npcs.data ?? []).map((e) => ({ name: e.npc.name ?? '', href: dmNpcsHref(e.npc.id) }));
-    // Un jugador y un PNJ con el mismo nombre: gana el jugador, que es de la
-    // mesa. Entre dos del mismo tipo, el primero, igual que en la lista.
-    const target = (name: string) => players.find((p) => p.name === name) ?? people.find((p) => p.name === name);
-    return {
-      names: [...players, ...people].map((p) => p.name),
-      render: (name, key) => {
-        const player = players.some((p) => p.name === name);
-        return (
-          <Tooltip key={key} content={player ? t.dmOpenSheet(name) : t.dmViewNpc(name)}>
-            <Link
-              href={target(name)!.href}
-              data-mention={player ? 'player' : 'npc'}
-              className="font-semibold text-gold underline decoration-gold underline-offset-2"
-            >
-              {name}
-            </Link>
-          </Tooltip>
-        );
-      },
-    };
-  }, [members.data, npcs.data, campaign.id, t]);
+  // A quiénes enlaza una mención: la mesa, los PNJ y los escenarios (ver
+  // `useMentionTargets`). Tocar una abre el panel lateral sin dejar el
+  // Cuaderno. Si no cargan, las menciones se leen como texto.
+  const { mentions, panel, readingClass } = useMentionReader(campaign.id);
 
   const entries = useMemo(
     () =>
@@ -283,6 +256,17 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
           </div>
         </div>
 
+        {/* El objetivo del capítulo abierto, con sus menciones: lo que la mesa
+            tiene que lograr se lee junto a lo que va pasando. */}
+        {currentChapter?.summary?.trim() && !searching && (
+          <section aria-labelledby="notebook-goal" className="flex flex-col gap-1.5">
+            <h2 id="notebook-goal" className="font-display text-[20px] break-words text-on-surface">{currentChapter.name}</h2>
+            <p className="text-[13.5px] leading-[1.55] whitespace-pre-line text-on-surface-variant" data-field="chapter-goal">
+              {withMentions(currentChapter.summary, mentions)}
+            </p>
+          </section>
+        )}
+
         <p className="flex flex-wrap gap-x-[18px] text-[12.5px] text-text-muted" data-field="counts">
           {shown.length === 0 ? (
             <span>{t.dmNoEntries}</span>
@@ -434,7 +418,7 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
   };
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className={cx('flex flex-col gap-5', readingClass)}>
       <DmHeader
         title={t.dmSectionNotebook}
         kicker={state}
@@ -458,6 +442,7 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
       {editing && bornIn && (
         <NoteEditorDialog
           title={editing === 'new' ? t.dmWriteNote : t.dmEditNote}
+          campaignId={campaign.id}
           initial={editing === 'new' ? { id: `note-${Date.now()}`, chapterId: bornIn.id, title: '' } : editing}
           chapters={chapterList}
           onSubmit={submit}
@@ -493,6 +478,7 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
         />
       )}
       {toast && <Toast key={toast.key} tone={toast.tone} message={toast.message} open onOpenChange={(open) => !open && setToast(null)} />}
+      {panel}
     </div>
   );
 }

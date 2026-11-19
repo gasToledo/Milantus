@@ -2,6 +2,9 @@ import { useState } from 'react';
 import type { DmChapter } from '../api/client';
 import { useTexts } from '../i18n/context';
 import { AppDialog } from '../ui/AppDialog';
+import { MentionPanel } from './mentions/MentionPanel';
+import { MentionTextarea } from './mentions/MentionTextarea';
+import { useMentionTargets, type MentionTarget } from './mentions/targets';
 
 /**
  * Nombre y objetivo de un capítulo (`chapter_editor_dialog.dart`): sirve para
@@ -12,11 +15,13 @@ import { AppDialog } from '../ui/AppDialog';
  */
 export function ChapterEditorDialog({
   title,
+  campaignId,
   initial,
   onSubmit,
   onClose,
 }: {
   title: string;
+  campaignId: string;
   initial: DmChapter;
   onSubmit: (chapter: DmChapter) => Promise<void>;
   onClose: () => void;
@@ -27,6 +32,8 @@ export function ChapterEditorDialog({
   const [missingName, setMissingName] = useState(false);
   const [failed, setFailed] = useState(false);
   const [busy, setBusy] = useState(false);
+  const targets = useMentionTargets(campaignId);
+  const [panel, setPanel] = useState<MentionTarget | null>(null);
 
   const save = async () => {
     if (busy) return;
@@ -81,22 +88,28 @@ export function ChapterEditorDialog({
             {t.dmChapterNameRequired}
           </p>
         )}
-        <label className="flex flex-col gap-1.5">
-          <span className="text-[12px] text-text-muted">{t.dmChapterGoal}</span>
-          <textarea
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="chapter-goal" className="text-[12px] text-text-muted">{t.dmChapterGoal}</label>
+          <MentionTextarea
+            id="chapter-goal"
             value={summary}
-            onChange={(e) => setSummary(e.target.value)}
+            onChange={setSummary}
+            targets={targets}
+            campaignId={campaignId}
+            onOpenMention={(target) => setPanel((open) => (open?.key === target.key ? null : target))}
+            openKey={panel?.key ?? null}
             placeholder={t.dmChapterGoalHint}
             data-field="chapter-goal"
-            className={`${field} h-[108px] resize-none py-2 placeholder:text-text-muted`}
+            className={`${field} h-[108px] w-full resize-none py-2 placeholder:text-text-muted`}
           />
-        </label>
+        </div>
         {failed && (
           <p role="alert" className="text-[13px] text-crimson">
             {t.dmChapterSaveError}
           </p>
         )}
       </div>
+      <MentionPanel target={panel} inEditor onClose={() => setPanel(null)} />
     </AppDialog>
   );
 }

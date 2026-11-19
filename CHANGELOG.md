@@ -1518,6 +1518,28 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
+## [1.5.0+1] - 2026-11-19
+
+### Nuevo
+
+- En las notas del Cuaderno y en el objetivo de un capítulo, escribir @ abre la
+  lista de personajes, PNJ y escenarios para nombrarlos, primero los de la
+  campaña. Si no existe, se puede crear ahí mismo y la mención entra sola.
+- Tocar una mención abre su ficha corta en un panel lateral, sin dejar la
+  pantalla ni perder el borrador.
+- El Cuaderno muestra el objetivo del capítulo abierto arriba de sus entradas.
+
+### Modificado
+
+- Los escenarios de la Biblioteca muestran su portada, sus personajes con
+  retrato y se filtran por campaña; las tarjetas se ordenan arrastrando y la
+  ficha sigue a la de un PNJ.
+- El jugador lee las menciones de las notas compartidas sin la @.
+
+### Eliminado
+
+- Sin cambios.
+
 ## [Unreleased]
 
 ### Nuevo
@@ -1526,9 +1548,7 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
-- Los escenarios de la Biblioteca muestran su portada, sus personajes con
-  retrato y se filtran por campaña; el editor deja la lista de personajes a la
-  vista y acepta soltar la imagen.
+- Sin cambios.
 
 ### Eliminado
 

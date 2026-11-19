@@ -18,12 +18,20 @@ import { Option, SearchableList } from '../../ui/wizard';
  * no se crea acá: el diálogo sigue al creador (`/dm/pnj/nuevo`), que lo crea al
  * terminar, con su ficha.
  */
-export function NewNpcDialog({ campaignId, onClose }: { campaignId?: string; onClose: () => void }) {
+export function NewNpcDialog({ campaignId, initialName = '', onCreated, onClose }: {
+  campaignId?: string;
+  initialName?: string;
+  /** Desde una mención (`MentionTextarea`): en vez de abrir el PNJ, avisa su
+   *  nombre para insertarlo, y no ofrece la ficha de personaje, que sigue en
+   *  el creador y se llevaría el borrador. */
+  onCreated?: (name: string) => void;
+  onClose: () => void;
+}) {
   const t = useTexts();
   const lang = useLang();
   const client = useQueryClient();
   const catalog = useSheetCatalog(lang);
-  const [name, setName] = useState('');
+  const [name, setName] = useState(initialName);
   const [kind, setKind] = useState<'none' | 'block' | 'character'>('none');
   const [base, setBase] = useState<string | null>(null);
   const [missingName, setMissingName] = useState(false);
@@ -63,7 +71,8 @@ export function NewNpcDialog({ campaignId, onClose }: { campaignId?: string; onC
       await client.invalidateQueries({ queryKey: queryKeys.npcs });
       if (campaignId) await client.invalidateQueries({ queryKey: queryKeys.campaignNpcs(campaignId) });
       onClose();
-      navigate(dmNpcsHref(id));
+      if (onCreated) onCreated(trimmed);
+      else navigate(dmNpcsHref(id));
     } catch {
       setFailed(true);
       setBusy(false);
@@ -110,7 +119,9 @@ export function NewNpcDialog({ campaignId, onClose }: { campaignId?: string; onC
           <div role="radiogroup" aria-label={t.npcWhichSheet} className="grid gap-2">
             <Option id="kind-none" selected={kind === 'none'} title={t.npcNewNone} detail={t.npcNewNoneHint} onClick={() => setKind('none')} />
             <Option id="kind-block" selected={kind === 'block'} title={t.npcNewBlock} detail={t.npcNewBlockHint} onClick={() => setKind('block')} />
-            <Option id="kind-character" selected={kind === 'character'} title={t.npcNewCharacter} detail={t.npcNewCharacterHint} onClick={() => setKind('character')} />
+            {!onCreated && (
+              <Option id="kind-character" selected={kind === 'character'} title={t.npcNewCharacter} detail={t.npcNewCharacterHint} onClick={() => setKind('character')} />
+            )}
           </div>
         </div>
 

@@ -10,6 +10,8 @@ import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { stamp } from '../dm/notebook';
 import { MarkdownText } from '../ui/MarkdownText';
+// El jugador no abre fichas del DM: las menciones se leen como nombres.
+import { withoutMentionMarks } from '../ui/mentions';
 import { Eyebrow, Pill, READ_PROSE, SectionHeading } from '../ui/data';
 import { cx } from '../ui/cx';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
@@ -138,7 +140,7 @@ export function CampaignBlock({ pc, catalog, me }: { pc: PlayerCampaign; catalog
             </h2>
             {current.summary?.trim() && (
               <p className={cx('mt-1.5 text-[14px] leading-[1.55] whitespace-pre-line text-on-surface-variant', READ_PROSE)}>
-                {current.summary}
+                {withoutMentionMarks(current.summary)}
               </p>
             )}
           </div>
@@ -266,7 +268,7 @@ function TableNotes({ notes }: { notes: PlayerNote[] }) {
             </span>
           </div>
           {n.body?.trim() && (
-            <MarkdownText text={n.body} className="text-[14px] leading-[1.55] text-on-surface" />
+            <MarkdownText text={withoutMentionMarks(n.body)} className="text-[14px] leading-[1.55] text-on-surface" />
           )}
         </article>
       ))}

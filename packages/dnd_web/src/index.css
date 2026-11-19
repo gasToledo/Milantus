@@ -675,6 +675,21 @@ body {
   animation: drawer-in 180ms ease-out;
 }
 
+/* El panel de una mención entra desde la derecha, como el cajón desde la
+   izquierda, y se va fundiéndose como los diálogos. */
+@keyframes panel-in {
+  from {
+    translate: 24px 0;
+    opacity: 0;
+  }
+}
+.mention-panel[data-state='open'] {
+  animation: panel-in 180ms ease-out;
+}
+.mention-panel[data-state='closed'] {
+  animation: pop-out 120ms ease-in both;
+}
+
 /* Lo que aparece en un asistente (el paso nuevo, un bloque que abre una
    elección, el detalle de la derecha) entra suave en vez de saltar. Corto y sin
    rellenar: al terminar no queda ninguna capa ni transformación encima. */

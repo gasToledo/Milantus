@@ -5,6 +5,9 @@ import { useTexts } from '../i18n/context';
 import { AppDialog } from '../ui/AppDialog';
 import { Select } from '../ui/primitives';
 import { Option } from '../ui/wizard';
+import { MentionPanel } from './mentions/MentionPanel';
+import { MentionTextarea } from './mentions/MentionTextarea';
+import { useMentionTargets, type MentionTarget } from './mentions/targets';
 
 /**
  * Escribir o editar una nota del Cuaderno (`note_editor_dialog.dart`). Cuelga
@@ -14,12 +17,14 @@ import { Option } from '../ui/wizard';
  */
 export function NoteEditorDialog({
   title,
+  campaignId,
   initial,
   chapters,
   onSubmit,
   onClose,
 }: {
   title: string;
+  campaignId: string;
   initial: DmNote;
   chapters: readonly DmChapter[];
   onSubmit: (note: DmNote) => Promise<void>;
@@ -34,6 +39,8 @@ export function NoteEditorDialog({
   const [missingTitle, setMissingTitle] = useState(false);
   const [failed, setFailed] = useState(false);
   const [busy, setBusy] = useState(false);
+  const targets = useMentionTargets(campaignId);
+  const [panel, setPanel] = useState<MentionTarget | null>(null);
 
   const stateWord = (c: DmChapter) =>
     c.state === 'completed' ? t.dmChapterClosed : c.state === 'active' ? t.dmChapterOpen : t.dmChapterPending;
@@ -90,16 +97,21 @@ export function NoteEditorDialog({
             {t.dmNoteTitleRequired}
           </p>
         )}
-        <label className="flex flex-col gap-1.5">
-          <span className="text-[12px] text-text-muted">{t.invNoteTitle}</span>
-          <textarea
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="note-body" className="text-[12px] text-text-muted">{t.invNoteTitle}</label>
+          <MentionTextarea
+            id="note-body"
             value={body}
-            onChange={(e) => setBody(e.target.value)}
+            onChange={setBody}
+            targets={targets}
+            campaignId={campaignId}
+            onOpenMention={(target) => setPanel((open) => (open?.key === target.key ? null : target))}
+            openKey={panel?.key ?? null}
+            hint={<span className="text-[12px] text-text-muted">{t.dmNoteMarkdownHint}</span>}
             data-field="note-body"
-            className={`${field} h-[130px] resize-none py-2`}
+            className={`${field} h-[130px] w-full resize-none py-2`}
           />
-          <span className="text-[12px] text-text-muted">{t.dmNoteMarkdownHint}</span>
-        </label>
+        </div>
         <fieldset className="m-0 flex min-w-0 flex-col gap-1.5 border-0 p-0">
           <legend className="mb-1.5 p-0 text-[12px] text-text-muted">{t.dmNoteWhoSees}</legend>
           <div role="radiogroup" aria-label={t.dmNoteWhoSees} className="grid grid-cols-2 gap-2">
@@ -125,6 +137,7 @@ export function NoteEditorDialog({
           </p>
         )}
       </div>
+      <MentionPanel target={panel} inEditor onClose={() => setPanel(null)} />
     </AppDialog>
   );
 }

@@ -65,6 +65,8 @@ una regla: reciben el número ya resuelto por `computeSheet`.
 | `NavCollapsible` (`ui/disclosure.tsx`) | Grupo del panel que se pliega: el rótulo es el botón | Campañas terminadas del Modo DM |
 | `ThemeMenu`, `VersionLabel` | Selector de tema y versión, al pie del panel | Los dos pies |
 | `Card` | Tarjeta de sección (`sheetCard`): ícono dorado, título Georgia 16, `trailing`; `collapsible` la pliega | Toda sección de la ficha. `id` único por pantalla |
+| `MentionTextarea` | `textarea` que nombra con `@` (`src/dm/mentions/`): lista junto al cursor con lo de la campaña primero y la Biblioteca después, flechas/Enter/Tab/Esc, «Crear PNJ/escenario «nombre»» y las menciones del borrador como pills | Todo texto del DM que pueda nombrar a alguien o un lugar (nota, objetivo del capítulo). Guarda `@Nombre` como texto |
+| `MentionPanel` / `useMentionReader` | La ficha corta de una mención en un panel a la derecha. Leyendo no es modal y la pantalla le deja lugar (`readingClass`); desde un editor es un diálogo encima y la ficha completa abre otra pestaña | Toda pantalla que dibuja menciones: el clic simple abre el panel, con modificador sigue siendo enlace |
 | `SectionRule` | Filete con rombo dorado | Separar bloques dentro de una tarjeta |
 | `SectionHeading` | `h3` en mayúsculas espaciadas con un filete hasta el borde; va con `READ_BLOCK` (el ancho de los bloques) y `READ_PROSE` (68ch y `text-wrap: pretty`) | Las secciones de una ficha de lectura: el Códice y el perfil de criatura |
 | `Eyebrow` | Rótulo de sección en mayúsculas espaciadas | — |
