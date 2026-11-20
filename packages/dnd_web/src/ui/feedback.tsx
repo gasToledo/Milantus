@@ -57,7 +57,7 @@ export function FeedbackDialog({
         // Lo que la app sabe y el servidor no, leído al enviar y no al abrir:
         // si cambia el tema con el diálogo abierto, vale el del momento.
         context: {
-          version: APP_VERSION,
+          ...(APP_VERSION ? { version: APP_VERSION } : {}),
           language: lang,
           theme: document.documentElement.dataset.theme === 'light' ? 'light' : 'dark',
           viewport: `${window.innerWidth}x${window.innerHeight}`,

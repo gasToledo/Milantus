@@ -21,7 +21,7 @@ export function reportError(error: { message: string; stack?: string; componentS
         body: JSON.stringify({
           ...error,
           route: window.location.pathname,
-          version: APP_VERSION,
+          ...(APP_VERSION ? { version: APP_VERSION } : {}),
           userAgent: navigator.userAgent,
         }),
       });

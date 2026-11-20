@@ -191,8 +191,9 @@ export async function fetchRosterSettings(signal: AbortSignal): Promise<RosterSe
 }
 
 /** La versión de `package.json`, fijada al construir (`define` en
- *  `vite.config.ts`). */
-export const APP_VERSION: string = __APP_VERSION__;
+ *  `vite.config.ts`). Vitest y Playwright cargan este archivo sin ese
+ *  reemplazo: ahí queda vacía, y la pantalla no muestra ninguna. */
+export const APP_VERSION: string = typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '';
 
 /** Lo que `GET /api/characters/:id/campaigns` devuelve por cada campaña en la
  *  que está el personaje. El servidor ya podó lo que el jugador no ve: sin id
