@@ -8,11 +8,6 @@ import { ModeSwitch, NavGroup, NavItem } from '../ui/Shell';
 import { CampaignEditorDialog } from './CampaignEditorDialog';
 import { groupCampaigns, stateOf, useCreateCampaign } from './campaigns';
 
-/** El título de toda sección (`DmHeader`): cambiar de campaña o de sección se
- *  funde en vez de cortar, y el foco llega ahí. Las herramientas de la cuenta
- *  (Bestiario, PNJ, Homebrew) no lo llevan: no todas tienen ese título. */
-const DM_TITLE = '[data-dm-title]';
-
 /**
  * El panel del Modo DM (`_sidebar` de `dm_mode_screen.dart`): el interruptor
  * con «DM» activo, las herramientas de la cuenta, las campañas agrupadas por
@@ -43,7 +38,6 @@ export function DmPanel({
         label={c.name}
         active={c.id === current?.campaign.id}
         internal
-        fadeTo={DM_TITLE}
       />
     </li>
   );
@@ -114,7 +108,6 @@ export function DmPanel({
                 label={t.dmSectionTable}
                 active={current.section === 'mesa'}
                 internal
-                fadeTo={DM_TITLE}
               />
             </li>
             <li>
@@ -124,7 +117,6 @@ export function DmPanel({
                 label={t.dmSectionChapters}
                 active={current.section === 'capitulos'}
                 internal
-                fadeTo={DM_TITLE}
               />
             </li>
             <li>
@@ -134,7 +126,6 @@ export function DmPanel({
                 label={t.dmSectionNotebook}
                 active={current.section === 'cuaderno'}
                 internal
-                fadeTo={DM_TITLE}
               />
             </li>
             <li>
@@ -144,7 +135,6 @@ export function DmPanel({
                 label={t.dmSectionNpcs}
                 active={current.section === 'pnj'}
                 internal
-                fadeTo={DM_TITLE}
               />
             </li>
             <li>
@@ -154,7 +144,6 @@ export function DmPanel({
                 label={t.dmSectionCombat}
                 active={current.section === 'combate'}
                 internal
-                fadeTo={DM_TITLE}
               />
             </li>
           </NavGroup>

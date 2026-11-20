@@ -56,7 +56,14 @@ export function DmOnboarding() {
           {/* La línea que une los pasos, del centro del primero al del último. */}
           <span aria-hidden="true" className="absolute top-4 bottom-4 left-[15px] w-0.5 bg-hairline @[760px]:top-[18px] @[760px]:bottom-[18px] @[760px]:left-[17px]" />
           {steps.map(([title, detail], i) => (
-            <li key={title} className="step-in relative flex items-start gap-3.5 @[760px]:gap-4" style={{ animationDelay: `${i * 70}ms` }}>
+            // `backwards`: durante el retraso el paso queda en el `from`
+            // (invisible). `.step-in` no trae fill-mode y, sin esto, se ve
+            // un instante antes de entrar.
+            <li
+              key={title}
+              className="step-in relative flex items-start gap-3.5 @[760px]:gap-4"
+              style={{ animationDelay: `${i * 70}ms`, animationFillMode: 'backwards' }}
+            >
               <span
                 aria-hidden="true"
                 className={cx(

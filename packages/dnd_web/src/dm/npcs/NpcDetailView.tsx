@@ -16,7 +16,7 @@ import { type SheetNotify } from '../../sheet/writer';
 import { Button, ButtonLink } from '../../ui/Button';
 import { ConfirmDialog } from '../../ui/ConfirmDialog';
 import { cx } from '../../ui/cx';
-import { fadeNavigate } from '../../ui/fadeNavigate';
+import { backClick } from '../../ui/backClick';
 import { Pill, StatPlaque } from '../../ui/data';
 import { Medallion } from '../../ui/Medallion';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Toast, Tooltip, type ToastTone } from '../../ui/primitives';
@@ -91,7 +91,7 @@ export function NpcDetailView({ npcId }: { npcId: string }) {
     <Link
       back
       href={dmNpcsHref()}
-      onClick={(e) => fadeNavigate(e, '[data-dm-title]', () => navigateBack(dmNpcsHref()))}
+      onClick={(e) => backClick(e, () => navigateBack(dmNpcsHref()))}
       className="inline-flex items-center gap-1.5 self-start text-[13px] text-on-surface-variant hover:text-gold">
       <ArrowLeft size={16} aria-hidden="true" className="text-gold" />
       {t.luBack}

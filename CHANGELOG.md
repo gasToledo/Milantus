@@ -1565,7 +1565,12 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
-- Sin cambios.
+- Con «Animaciones» apagadas en Ajustes, los botones y las placas de /v2 ya no
+  se hunden al apretarlos.
+- Si se apaga un modo de la ficha antes de que termine el destello, la próxima
+  vez que se prende vuelve a animarse.
+- Los pasos de la bienvenida del Modo DM ya no parpadean al aparecer.
+- Al cambiar de pantalla sin animación, el foco llega igual al título.
 
 ### Eliminado
 

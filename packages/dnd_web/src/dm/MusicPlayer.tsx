@@ -255,11 +255,10 @@ export function MusicPlayer({ campaignId, scenes, offerCombat, onDismissOffer }:
     if (to !== 0) void animation.finished.finally(() => (el.style.overflow = ''));
     return animation;
   };
-  const reduceMotion = () => prefersReducedMotion();
   const toggleList = () => {
     const el = sceneList.current;
     if (el?.getAnimations().length) return;
-    if (showList && el && !reduceMotion()) {
+    if (showList && el && !prefersReducedMotion()) {
       void slide(el, el.offsetHeight, 0).finished.then(() => setShowList(false), () => setShowList(false));
       return;
     }
@@ -270,7 +269,7 @@ export function MusicPlayer({ campaignId, scenes, offerCombat, onDismissOffer }:
     const el = sceneList.current;
     if (!opening.current || !el) return;
     opening.current = false;
-    if (!reduceMotion()) slide(el, 0, el.offsetHeight);
+    if (!prefersReducedMotion()) slide(el, 0, el.offsetHeight);
   }, [showList]);
 
   // YouTube exige su reproductor a la vista: minimizado, se pausa.

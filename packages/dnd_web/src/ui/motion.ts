@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from 'react';
+import { useSyncExternalStore, type CSSProperties } from 'react';
 
 /** La misma clave la lee el script de `index.html` antes del primer cuadro. */
 const STORAGE_KEY = 'milantus.v2.motion';
@@ -43,3 +43,8 @@ export function useAnimationsOff(): boolean {
     () => document.documentElement.dataset.motion === 'reduce',
   );
 }
+
+/** El lugar de un hijo de `.stagger-in`, que retrasa su entrada según él.
+ *  `sibling-index()` lo diría solo, pero recién es Baseline desde 2026-08 y acá
+ *  React ya sabe el índice. */
+export const staggerIndex = (i: number) => ({ '--sibling-index': i + 1 }) as CSSProperties;

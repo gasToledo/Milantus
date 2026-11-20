@@ -70,13 +70,19 @@ export function ActiveModeTile({ model, mode: m }: { model: SheetModel; mode: Ac
     if (r && r.outcome.activated === false) write!.notify(t.modeFailed, { tone: 'error' });
   };
   // «Ignición»: al prenderse (no al cargar la ficha ya prendido) la franja
-  // juega una vez la animación de `.mode-ignite` en `index.css`.
+  // juega una vez la animación de `.mode-ignite` en `index.css`. Si se apaga
+  // antes de los 700 ms, cancelar el timer no alcanza: `igniting` se queda
+  // en true, la clase no se va y la próxima vez no se anima.
   const wasActive = useRef(m.active);
   const [igniting, setIgniting] = useState(false);
   useEffect(() => {
     const was = wasActive.current;
     wasActive.current = m.active;
-    if (!m.active || was) return;
+    if (!m.active) {
+      setIgniting(false);
+      return;
+    }
+    if (was) return;
     setIgniting(true);
     const timer = window.setTimeout(() => setIgniting(false), 700);
     return () => window.clearTimeout(timer);

@@ -32,10 +32,9 @@ function readStored(): ThemeMode | null {
   }
 }
 
-function writeStored(mode: ThemeMode | null) {
+function writeStored(mode: ThemeMode) {
   try {
-    if (mode === null) window.localStorage.removeItem(STORAGE_KEY);
-    else window.localStorage.setItem(STORAGE_KEY, mode);
+    window.localStorage.setItem(STORAGE_KEY, mode);
   } catch {
     // Sin almacenamiento el tema dura lo que la pestaña: no es un error.
   }

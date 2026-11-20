@@ -14,7 +14,7 @@ import {
 import { chapterGrants } from '../engine';
 import type { UserEvent } from '../api/client';
 import type { Texts } from '../i18n/texts';
-import type { ToastTone } from '../ui/primitives';
+import type { IconTone, ToastTone } from '../ui/primitives';
 
 /**
  * Catálogo de los mensajes de aviso (`messageForEvent` de Flutter). El servidor
@@ -53,7 +53,6 @@ export interface ItemNotice {
 /** Cómo se muestra un aviso: los tres con pantalla propia van de a uno; las
  *  tostadas se juntan en una bandeja si son varias. */
 export type EventDisplay = 'toast' | 'chapter' | 'inspiration' | 'item';
-export type IconTone = 'gold' | 'verdant' | 'muted';
 
 export interface EventMessage {
   text: string;
