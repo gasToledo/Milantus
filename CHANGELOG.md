@@ -1594,6 +1594,8 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - En la ficha de un escenario, los «@Nombre» de la descripción llevan a la
   ficha del personaje, PNJ o escenario nombrado.
+- Al cerrar sesión, o al entrar sin sesión, la aplicación lleva directo al
+  inicio de sesión en vez de mostrar un aviso con un botón.
 
 ### Eliminado
 

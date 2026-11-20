@@ -44,8 +44,8 @@ export function RosterFooter({ account, current, dm = false }: { account: Accoun
 
   // Cierra la sesión del servidor y navega a donde este indique: ese destino es
   // el cierre de sesión del proveedor, y sin pasar por ahí su cookie sigue viva
-  // y el próximo ingreso no pide contraseña. Sin destino, la raíz, que redirige
-  // al login. Si falla se avisa: la página no cambia y, sin aviso, quien quiso
+  // y el próximo ingreso no pide contraseña. Sin destino, la raíz, que sin
+  // sesión navega sola al login (`Screen`, en `App.tsx`). Si falla se avisa: la página no cambia y, sin aviso, quien quiso
   // salir se queda creyendo que salió.
   const signOut = async () => {
     setLeaving(true);

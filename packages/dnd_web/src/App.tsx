@@ -61,6 +61,15 @@ export function App() {
 function Screen() {
   const t = useTexts();
   const account = useAccount();
+  const signedOut = account.data === null;
+
+  // Sin sesión no hay nada que mostrar: se va directo al login, que es a
+  // donde lleva también cerrar sesión (el proveedor vuelve a `/`). `replace`
+  // para que «atrás» desde el login no caiga de nuevo acá. El cartel de abajo
+  // queda por si la navegación tarda o falla.
+  useEffect(() => {
+    if (signedOut) window.location.replace('/auth/login');
+  }, [signedOut]);
 
   if (account.isPending) {
     return (
