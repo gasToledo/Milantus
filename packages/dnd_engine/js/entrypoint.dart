@@ -1536,22 +1536,67 @@ String creationConfirm(
           .toJson(),
     );
 
-/// Una ronda del Quiz: `(personaje | null, catálogo, semilla)` → lista de
-/// `QuizQuestion.toJson()`. Sin personaje, la de reglas generales. Como
-/// `compute`, el cliente pasa el JSON y el motor arma las preguntas: la UI no
-/// sabe de dónde salen.
-String quizRoundJs(String? characterJson, String catalogJson, int seed) =>
-    jsonEncode([
-      for (final q in quizRound(
-        characterJson == null
-            ? null
-            : Character.fromJson(
-                jsonDecode(characterJson) as Map<String, dynamic>),
-        _repoPara(catalogJson),
-        seed: seed,
-      ))
-        q.toJson(),
-    ]);
+/// Una ronda del Quiz: `(personaje | null, catálogo, semilla[, historial])` →
+/// lista de `QuizQuestion.toJson()`. Sin personaje, la de reglas generales.
+/// [historyJson] es opcional: sin él, vacío o ilegible, el sorteo es el de
+/// siempre. Como `compute`, el cliente pasa el JSON y el motor arma las
+/// preguntas: la UI no sabe de dónde salen.
+String quizRoundJs(
+  String? characterJson,
+  String catalogJson,
+  int seed, [
+  String? historyJson,
+]) {
+  QuizHistory? history;
+  if (historyJson != null && historyJson.isNotEmpty) {
+    try {
+      history = QuizHistory.fromJson(jsonDecode(historyJson));
+    } on FormatException {
+      history = null;
+    }
+  }
+  return jsonEncode([
+    for (final q in quizRound(
+      characterJson == null
+          ? null
+          : Character.fromJson(
+              jsonDecode(characterJson) as Map<String, dynamic>,
+            ),
+      _repoPara(catalogJson),
+      seed: seed,
+      history: history,
+    ))
+      q.toJson(),
+  ]);
+}
+
+/// Anota respuestas en el historial del Quiz y devuelve el historial nuevo.
+/// Las claves que esta ronda no tocó se conservan.
+String quizRecordAnswersJs(String historyJson, String answersJson) {
+  QuizHistory history;
+  try {
+    history = QuizHistory.fromJson(jsonDecode(historyJson));
+  } on FormatException {
+    history = QuizHistory.empty;
+  }
+  final answers = <QuizAnswer>[];
+  try {
+    final raw = jsonDecode(answersJson);
+    if (raw is List) {
+      for (final item in raw) {
+        if (item is! Map) continue;
+        final id = item['cardId'];
+        final correct = item['correct'];
+        if (id is String && correct is bool) {
+          answers.add(QuizAnswer(cardId: id, correct: correct));
+        }
+      }
+    }
+  } on FormatException {
+    // Sin respuestas legibles el historial vuelve como estaba.
+  }
+  return jsonEncode(quizRecordAnswers(history, answers).toJson());
+}
 
 /// La misma ronda, con los textos del idioma activo. No vuelve a sortear:
 /// cambiar de idioma a mitad de ronda no puede cambiar la pregunta.
@@ -1686,6 +1731,7 @@ void main() {
   motor['creation'] = creation.toJS;
   motor['demoCharacter'] = demoCharacter.toJS;
   motor['quizRound'] = quizRoundJs.toJS;
+  motor['quizRecordAnswers'] = quizRecordAnswersJs.toJS;
   motor['quizLocalize'] = quizLocalizeJs.toJS;
   motor['act'] = act.toJS;
   motor['companionsView'] = companionsViewJs.toJS;

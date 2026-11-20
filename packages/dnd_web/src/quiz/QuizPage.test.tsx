@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState, type ReactNode } from 'react';
-import { describe, expect, it, vi } from 'vitest';
-import type { Catalog, QuizQuestion } from '../engine';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Catalog, QuizHistory, QuizQuestion } from '../engine';
 import { LangProvider } from '../i18n/context';
 import { textsFor, type Lang } from '../i18n/texts';
 import { QuizPage } from './QuizPage';
@@ -10,7 +10,7 @@ import { QuizPage } from './QuizPage';
 // El motor no entra: la prueba mira la pantalla. `quizRound` arma la ronda una
 // vez; al cambiar de idioma `quizLocalize` reescribe el texto y no se sortea.
 const langBox = vi.hoisted(() => ({ current: 'es' as Lang }));
-const calls = vi.hoisted(() => ({ round: 0 }));
+const calls = vi.hoisted(() => ({ round: 0, histories: [] as unknown[] }));
 const mode = vi.hoisted(() => ({ current: 'base' as 'base' | 'plantillas' }));
 
 function question(lang: Lang, index: number): QuizQuestion {
@@ -79,9 +79,23 @@ function plantillas(lang: Lang): QuizQuestion[] {
 const round = (lang: Lang) => (mode.current === 'plantillas' ? plantillas(lang) : [question(lang, 0), question(lang, 1)]);
 
 vi.mock('../engine', () => ({
-  quizRound: () => {
+  quizRound: (_character: unknown, _catalog: unknown, _seed: number, history?: QuizHistory) => {
     calls.round += 1;
+    calls.histories.push(history);
     return round('es');
+  },
+  quizRecordAnswers: (history: QuizHistory, answers: { cardId: string; correct: boolean }[]) => {
+    const cards = { ...history.cards };
+    for (const answer of answers) {
+      const prev = cards[answer.cardId];
+      cards[answer.cardId] = {
+        box: answer.correct ? Math.min(5, (prev?.box ?? 1) + 1) : 1,
+        lastRound: history.round,
+        correct: (prev?.correct ?? 0) + (answer.correct ? 1 : 0),
+        wrong: (prev?.wrong ?? 0) + (answer.correct ? 0 : 1),
+      };
+    }
+    return { ...history, cards };
   },
   quizLocalize: () => round(langBox.current),
   computeSheet: () => ({ classLevels: { fighter: 1 } }),
@@ -147,6 +161,11 @@ function Harness() {
 }
 
 describe('el Quiz', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    calls.histories = [];
+  });
+
   it('muestra la pregunta, traba la respuesta, cuenta el puntaje y no rearma la ronda al cambiar de idioma', async () => {
     const user = userEvent.setup();
     mode.current = 'base';
@@ -221,5 +240,72 @@ describe('el Quiz', () => {
     expect(en.spellMoveDistance('Misty Step')).toBe('How far does Misty Step let you move?');
     expect(es.spellMoveDistance('Paso Brumoso')).toBe('¿Hasta qué distancia te permite moverte Paso Brumoso?');
     mode.current = 'base';
+  });
+
+  it('al responder guarda el progreso y otra ronda lo sigue', async () => {
+    const user = userEvent.setup();
+    mode.current = 'base';
+    calls.round = 0;
+    render(<Harness />);
+    // El cuarto argumento es el historial: la ronda que empieza ya sumó uno.
+    expect(calls.histories.at(-1)).toMatchObject({ version: 1, round: 1, cards: {} });
+    const roundsAtStart = calls.round;
+
+    await user.click(screen.getByRole('button', { name: '1d6 cortante' }));
+    const saved = JSON.parse(localStorage.getItem('milantus.v2.quizHistory') ?? '');
+    expect(saved.round).toBe(1);
+    expect(saved.cards['weapon:dagger']).toMatchObject({ box: 1, wrong: 1 });
+
+    await user.click(screen.getByRole('button', { name: 'Siguiente' }));
+    await user.click(screen.getByRole('button', { name: 'Cegado' }));
+    await user.click(screen.getByRole('button', { name: 'Ver resultado' }));
+    expect(screen.getByText('En la próxima ronda va a aparecer primero 1 pregunta para repasar.')).toBeTruthy();
+
+    await user.click(screen.getByRole('button', { name: 'Otra ronda' }));
+    expect(calls.round).toBeGreaterThan(roundsAtStart);
+    expect(calls.histories.at(-1)).toMatchObject({ round: 2 });
+  });
+
+  it('borrar el progreso pide confirmación y recién ahí lo limpia', async () => {
+    const user = userEvent.setup();
+    mode.current = 'base';
+    localStorage.setItem(
+      'milantus.v2.quizHistory',
+      JSON.stringify({ version: 1, round: 4, cards: { 'weapon:dagger': { box: 1, lastRound: 4, correct: 0, wrong: 1 } } }),
+    );
+    render(<Harness />);
+    await user.click(screen.getByRole('button', { name: '1d4 perforante' }));
+    await user.click(screen.getByRole('button', { name: 'Siguiente' }));
+    await user.click(screen.getByRole('button', { name: 'Cegado' }));
+    await user.click(screen.getByRole('button', { name: 'Ver resultado' }));
+
+    await user.click(screen.getByRole('button', { name: 'Borrar el progreso' }));
+    expect(screen.getByRole('dialog', { name: '¿Borrar el progreso del Quiz?' })).toBeTruthy();
+    expect(localStorage.getItem('milantus.v2.quizHistory')).toBeTruthy();
+    await user.click(screen.getByRole('button', { name: 'Cancelar' }));
+    expect(localStorage.getItem('milantus.v2.quizHistory')).toBeTruthy();
+
+    await user.click(screen.getByRole('button', { name: 'Borrar el progreso' }));
+    await user.click(screen.getByRole('button', { name: /^Borrar$/ }));
+    expect(localStorage.getItem('milantus.v2.quizHistory')).toBeNull();
+  });
+
+  it('en la elección, borrar el progreso también pide confirmación', async () => {
+    const user = userEvent.setup();
+    localStorage.setItem('milantus.v2.quizHistory', JSON.stringify({ version: 1, round: 2, cards: {} }));
+    render(
+      <LangProvider lang="es">
+        <QuizPage target={null} />
+      </LangProvider>,
+    );
+    // La primera vez el tutorial tapa la elección.
+    const skip = screen.queryByRole('button', { name: 'Saltar todos' });
+    if (skip) await user.click(skip);
+    await user.click(screen.getByRole('button', { name: 'Borrar el progreso' }));
+    await user.click(screen.getByRole('button', { name: 'Cancelar' }));
+    expect(localStorage.getItem('milantus.v2.quizHistory')).toBeTruthy();
+    await user.click(screen.getByRole('button', { name: 'Borrar el progreso' }));
+    await user.click(screen.getByRole('button', { name: /^Borrar$/ }));
+    expect(localStorage.getItem('milantus.v2.quizHistory')).toBeNull();
   });
 });

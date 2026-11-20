@@ -1561,7 +1561,8 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Nuevo
 
-- Sin cambios.
+- El Quiz repasa primero lo que fallaste. El progreso queda en este dispositivo
+  y se puede borrar.
 
 ### Modificado
 
@@ -1571,6 +1572,7 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
   vez que se prende vuelve a animarse.
 - Los pasos de la bienvenida del Modo DM ya no parpadean al aparecer.
 - Al cambiar de pantalla sin animación, el foco llega igual al título.
+- En el Quiz, los tipos con más preguntas salen más seguido.
 
 ### Eliminado
 

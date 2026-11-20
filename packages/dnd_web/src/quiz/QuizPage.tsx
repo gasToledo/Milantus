@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { BookOpen, Check, LogOut, RotateCcw, ScrollText, Shield, Sparkles, Swords, User, X, type LucideIcon } from 'lucide-react';
+import { BookOpen, Check, LogOut, RotateCcw, ScrollText, Shield, Sparkles, Swords, Trash2, User, X, type LucideIcon } from 'lucide-react';
 import { useRoster, useSheetCatalog } from '../api/queries';
-import { quizLocalize, quizRound, type Catalog, type CharacterJson, type QuizQuestion } from '../engine';
+import { quizLocalize, quizRecordAnswers, quizRound, type Catalog, type CharacterJson, type QuizHistory, type QuizQuestion } from '../engine';
 import { toRosterEntry, type RosterEntry } from '../dashboard/roster';
 import { useLang, useTexts } from '../i18n/context';
 import type { Texts } from '../i18n/texts';
@@ -15,14 +15,16 @@ import { ownPortrait } from '../ui/portrait';
 import { AppBusyLabel, AppErrorView, Notice } from '../ui/status';
 import { staggerIndex } from '../ui/motion';
 import { TutorialGate } from '../ui/tutorials';
+import { emptyQuizHistory, loadQuizHistory, quizDueNext, resetQuizHistory, saveQuizHistory } from './history';
 
 /** El id de la ronda de reglas generales en la URL (`/v2/quiz/reglas`). */
 export const RULES_TARGET = 'reglas';
 
 /**
  * El Quiz: rondas de hasta diez preguntas que arma el motor desde el catálogo
- * y la ficha. No se guarda nada: ni puntaje ni historial, y la ronda vive en
- * el estado del componente (recargar arranca otra).
+ * y la ficha. El progreso (qué conviene repasar) queda en este dispositivo y
+ * se puede borrar. El puntaje de la ronda vive en el estado del componente:
+ * recargar arranca otra.
  */
 export function QuizPage({ target }: { target: string | null }) {
   const t = useTexts();
@@ -94,6 +96,7 @@ function Picker({ entries }: { entries: RosterEntry[] }) {
           </PickLink>
         </li>
       </ul>
+      <ResetProgress />
     </div>
   );
 }
@@ -138,6 +141,12 @@ const TINT_BAD = 'bg-[color-mix(in_srgb,var(--crimson)_9%,var(--plaque))]';
 function Round({ entry, catalog }: { entry: RosterEntry | null; catalog: Catalog }) {
   const t = useTexts();
   const [seed, setSeed] = useState(newSeed);
+  // La ronda que empieza ahora es la siguiente: el número se sube al
+  // arrancar, no al responder, para que lo ya contestado sepa cuándo vence.
+  const [history, setHistory] = useState<QuizHistory>(() => {
+    const loaded = loadQuizHistory();
+    return { ...loaded, round: loaded.round + 1, cards: { ...loaded.cards } };
+  });
   const character = (entry?.character as unknown as CharacterJson | undefined) ?? null;
   // La ronda se sortea una sola vez por semilla. El catálogo entra en la
   // cuenta para armarla la primera vez; si después cambia el idioma, no se
@@ -151,8 +160,8 @@ function Round({ entry, catalog }: { entry: RosterEntry | null; catalog: Catalog
   }
   const questions = useMemo(() => {
     if (held) return quizLocalize(held, catalog);
-    return quizRound(character, catalog, seed);
-  }, [held, catalog, character, seed]);
+    return quizRound(character, catalog, seed, history);
+  }, [held, catalog, character, seed, history]);
   useEffect(() => {
     if (held == null) setHeld(questions);
   }, [held, questions]);
@@ -184,9 +193,17 @@ function Round({ entry, catalog }: { entry: RosterEntry | null; catalog: Catalog
     setSeed(newSeed());
     setPicks([]);
     setIndex(0);
+    setHistory((prev) => ({ ...prev, round: prev.round + 1 }));
   };
 
-  const pick = (i: number) => setPicks((prev) => Object.assign([...prev], { [index]: i }));
+  const pick = (i: number) => {
+    const question = questions[index];
+    setPicks((prev) => Object.assign([...prev], { [index]: i }));
+    if (!question || picks[index] !== undefined) return;
+    const next = quizRecordAnswers(history, [{ cardId: question.key, correct: i === question.answer }]);
+    saveQuizHistory(next);
+    setHistory(next);
+  };
   const picked = picks[index];
 
   // El foco no se pierde: al responder, las opciones se apagan (un botón
@@ -236,7 +253,9 @@ function Round({ entry, catalog }: { entry: RosterEntry | null; catalog: Catalog
         picks={picks}
         results={results}
         catalog={catalog}
+        dueNext={quizDueNext(history)}
         onAgain={restart}
+        onReset={() => setHistory(emptyQuizHistory())}
       />
     );
   }
@@ -603,14 +622,18 @@ function Result({
   picks,
   results,
   catalog,
+  dueNext,
   onAgain,
+  onReset,
 }: {
   entry: RosterEntry | null;
   questions: QuizQuestion[];
   picks: number[];
   results: Outcome[];
   catalog: Catalog;
+  dueNext: number;
   onAgain: () => void;
+  onReset: () => void;
 }) {
   const t = useTexts();
   const scoreRef = useRef<HTMLParagraphElement>(null);
@@ -693,14 +716,64 @@ function Result({
           </ul>
         </section>
       )}
+      {dueNext > 0 && <p className="text-center text-[14px] text-on-surface-variant">{t.quizDueHint(dueNext)}</p>}
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <ButtonLink tone="secondary" shape="pill" href={quizHref()} internal>
-          {t.quizPickOther}
-        </ButtonLink>
+        <div className="flex flex-wrap items-center gap-2">
+          <ButtonLink tone="secondary" shape="pill" href={quizHref()} internal>
+            {t.quizPickOther}
+          </ButtonLink>
+          <ResetProgress onReset={onReset} />
+        </div>
         <Button shape="pill" icon={RotateCcw} onClick={onAgain} data-action="quiz-again">
           {t.quizAgain}
         </Button>
       </div>
     </div>
+  );
+}
+
+/** Borra el progreso de este dispositivo. La pregunta es la misma que al
+ *  abandonar: el botón que salta a la vista no es el que borra. */
+function ResetProgress({ onReset }: { onReset?: () => void }) {
+  const t = useTexts();
+  const [open, setOpen] = useState(false);
+  const confirm = () => {
+    resetQuizHistory();
+    onReset?.();
+  };
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        data-action="quiz-reset"
+        className="flex min-h-10 items-center gap-1.5 rounded-[var(--radius-pill)] px-2.5 text-[14px] text-on-surface-variant hover:text-on-surface"
+      >
+        <Trash2 size={16} aria-hidden="true" />
+        {t.quizResetProgress}
+      </button>
+      <AppDialog
+        open={open}
+        onOpenChange={setOpen}
+        title={t.quizResetTitle}
+        bare
+        actions={[
+          { label: t.quizResetConfirm, tone: 'crimson', onSelect: confirm },
+          { label: t.cancel, primary: true },
+        ]}
+      >
+        <div className="flex flex-col items-center gap-3.5 text-center">
+          <span className="flex size-12 items-center justify-center rounded-full border border-crimson bg-plaque text-crimson">
+            <Trash2 size={24} strokeWidth={1.8} aria-hidden="true" />
+          </span>
+          <div className="flex flex-col gap-1.5">
+            <h2 aria-hidden="true" className="font-display text-[20px] text-on-surface">
+              {t.quizResetTitle}
+            </h2>
+            <p className="text-[14px] leading-normal text-on-surface-variant">{t.quizResetBody}</p>
+          </div>
+        </div>
+      </AppDialog>
+    </>
   );
 }
