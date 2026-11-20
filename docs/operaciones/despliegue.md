@@ -239,8 +239,8 @@ Dos workflows en `.github/workflows/`:
 
 `packages/dnd_web` (Vite + React + TypeScript) es el cliente, servido en la
 raíz del mismo origen que la API, así que comparte la cookie de sesión.
-Reemplazó al de Flutter el 2026-11-20 (historia en
-[Migración a React](../arquitectura/migracion-react.md)).
+Reemplazó al de Flutter el 2026-11-20; cómo funciona por dentro, en
+[El cliente web](../arquitectura/cliente-web.md).
 
 - `DND_WEB_ROOT` apunta al `dist` del build. La imagen lo fija en `/app/web`;
   sin la variable el servidor responde solo la API, y si el directorio no

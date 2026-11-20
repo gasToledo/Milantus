@@ -2,105 +2,50 @@
 
 Estado: guía vigente de la aplicación web.
 
-Sistema de diseño del cliente web de **Milantus**. Documenta la composición de
-la interfaz, la paleta, la tipografía, la forma y el comportamiento.
+El **lenguaje visual** de Milantus: dirección de arte, marca, color,
+tipografía, forma, layout, movimiento y accesibilidad. Cómo se aplica en
+`packages/dnd_web` y cuál es la pieza de `src/ui/` para cada cosa está en
+[Diseño web en React](diseno-web-react.md); esta guía no lo repite.
 
-> Se escribió sobre el cliente de Flutter (`packages/dnd_app`, borrado el
-> 2026-11-20): los nombres de widgets y archivos de Dart son de ese cliente.
-> El lenguaje visual sigue vigente; cómo se aplica en React y su catálogo de
-> componentes están en [diseno-web-react.md](diseno-web-react.md).
-
-> **Regla de oro de este documento**: cada valor de acá sale del código. Si el
-> código y esta guía discrepan, gana el código y la guía se corrige. Los
-> archivos fuente de cada sección están citados para que se pueda verificar.
+> **Regla de oro**: cada valor de acá sale del código (`src/index.css` para los
+> tokens). Si el código y esta guía discrepan, gana el código y la guía se
+> corrige.
 
 ## Cómo usar esta guía
 
-**Si sos una persona diseñando o revisando pantallas**: leé
-[Dirección de arte](#2-dirección-de-arte) (con [la marca](#la-marca-el-sello)), [Color](#3-color),
-[Tipografía](#4-tipografía) y el
-[Catálogo de componentes](#8-catálogo-de-componentes). El resto es referencia.
+**Si diseñás o revisás pantallas**: leé [Dirección de arte](#2-dirección-de-arte),
+[Color](#3-color), [Tipografía](#4-tipografía) y
+[Anti-patrones](#12-anti-patrones), y después el catálogo de componentes de
+[Diseño web en React](diseno-web-react.md).
 
-**Si sos un modelo de IA generando propuestas de diseño o código de UI**:
+**Si generás propuestas o código de UI**: los tokens están en el
+[Apéndice B](#apéndice-b--equivalencia-en-css). Usá esos valores literales; no
+inventes intermedios ni «aproximaciones de marca». Las prohibiciones duras están
+en [Anti-patrones](#12-anti-patrones).
 
-1. Los tokens legibles por máquina están en el
-   [Apéndice A](#apéndice-a--tokens-en-json) (JSON) y el
-   [Apéndice B](#apéndice-b--equivalencia-en-css) (CSS custom properties).
-   Usá esos valores literales; no inventes intermedios ni "aproximaciones de
-   marca".
-2. Las prohibiciones duras están en [Anti-patrones](#12-anti-patrones). Son
-   restricciones de arquitectura, no preferencias estéticas: violarlas rompe
-   pruebas o el build.
-3. El destino real es **Flutter/Dart**, no HTML/CSS. *(Durante la migración
-   a React hay un segundo destino, `packages/dnd_web`: ver la nota de
-   [Stack](#1-stack-tecnológico-del-frontend). Los tokens son los mismos.)* Si producís un mockup en
-   HTML, marcá explícitamente que es un mockup y traducí los tokens a los
-   nombres Dart de la tabla de [Color](#3-color).
-
-### Flujo de diseño e implementación
-
-La web desplegada es la única superficie real de validación visual. Por eso el
-proceso completo para un cambio visible es:
+### Flujo de un cambio visible
 
 1. Leer la pantalla, los componentes compartidos y las pruebas afectadas antes
    de proponer el cambio.
-2. Contrastar la propuesta con Dirección de arte, Color, Tipografía, Layout,
-   Accesibilidad y Anti-patrones de esta guía; reutilizar componentes y tokens
+2. Contrastar la propuesta con esta guía y reutilizar componentes y tokens
    existentes antes de crear otros.
-3. Mantener las reglas de D&D en `dnd_engine`. La UI recibe resultados de
-   `ComputedSheet` y se limita a presentación y orquestación.
-4. Implementar la pantalla en Flutter (o, si ya se migró, en `dnd_web`; ver
-   [Migración a React](../arquitectura/migracion-react.md)) contemplando tema oscuro y claro, estado
-   vacío, texto largo y los anchos definidos en Layout y responsividad.
-5. Agregar pruebas de regresión del comportamiento y de la interacción visible.
-6. Formatear, analizar, ejecutar las suites afectadas y generar
-   `flutter build web --release` antes del commit.
-7. Commitear y pushear directamente a `main`, el único tronco activo. El push
-   ejecuta CI y, cuando toca rutas desplegables, CD.
-8. Seguir ambas ejecuciones hasta el final y comprobar manualmente el cambio en
-   la web desplegada. Un build local exitoso no sustituye esta revisión visual.
+3. Mantener las reglas de D&D en `dnd_engine`: la UI recibe resultados de
+   `computeSheet` y se limita a presentación y orquestación.
+4. Contemplar tema oscuro y claro, estado vacío, texto largo y los anchos de
+   [Layout](#7-layout-y-responsividad), desde un teléfono de 360 px.
+5. Validar como pide `CLAUDE.md` (tipos, build, e2e afectadas) y pushear a
+   `main`.
+6. Seguir CI y CD hasta el final y mirar el cambio en la web desplegada: un
+   build local exitoso no sustituye la revisión visual.
 
 ---
 
-## 1. Stack tecnológico del frontend
+## 1. Stack del frontend
 
-> **Nota durante la migración a React.** Esta tabla describe el cliente de
-> Flutter (`packages/dnd_app`), que sigue siendo el que sirve `/`. Junto a él
-> existe `packages/dnd_web` (React + Vite + TypeScript + Tailwind, bajo `/v2`),
-> que **sí** usa CSS. Mientras convivan, esta guía sigue siendo la fuente de
-> verdad visual de los dos: los tokens del
-> [Apéndice B](#apéndice-b--equivalencia-en-css) son los que `dnd_web` carga
-> en `src/index.css`, y no se cambia ningún valor sin cambiarlo en ambos
-> clientes. Qué hay migrado y cómo conviven:
-> [Migración a React](../arquitectura/migracion-react.md).
-
-| Capa | Tecnología | Detalle |
-| --- | --- | --- |
-| Framework de UI | **Flutter** (canal estable, SDK Dart `^3.12.0`) | `packages/dnd_app/pubspec.yaml` |
-| Plataforma objetivo | **Web** (`flutter build web --release`) | Única plataforma mantenida activamente |
-| Lenguaje | **Dart** | Nada de JS/TS de aplicación: no hay capa web propia salvo `lib/web/` |
-| Sistema de diseño base | **Material 3** (`useMaterial3: true`) | Con `ColorScheme` y `ThemeExtension` propios |
-| Renderizado | Motor web de Flutter (CanvasKit / skwasm según build) | El DOM no es una superficie de estilado: **no hay CSS de aplicación** |
-| Shell HTML | `web/index.html` + `web/manifest.json` | Solo metadatos, favicon, PWA e iconos |
-| Estado | `StatefulWidget` + controladores propios (`CharactersController`) | Sin Redux/Bloc/Riverpod ni ninguna dependencia de estado |
-| Red | `package:http` contra el mismo origen | `lib/api/api_client.dart`, `baseUrl` vacío, cookie de sesión `httpOnly` |
-| Reglas de negocio | `packages/dnd_engine` (Dart puro) | **La UI nunca recalcula reglas** |
-
-**Consecuencia de diseño más importante del stack**: la aplicación se dibuja
-sobre un lienzo, no sobre el DOM. No existen hojas de estilo, clases CSS,
-selectores ni cascada. Todo el estilado es **léxico**, vía `ThemeData` y widgets.
-Un cambio "global" de apariencia se hace en `lib/theme/app_theme.dart` o no se
-hace.
-
-### Dependencias que afectan la interfaz
-
-`file_picker` (importar retrato), `archive` (respaldo ZIP),
-`package_info_plus` (versión en el pie del panel), `font_awesome_flutter` (los
-tres íconos de tipo de acción, ver [Iconografía](#9-iconografía)), y `intl` con
-`flutter_localizations` (los textos en español e inglés, ver
-[Textos](textos.md)). Nada más. **Sumar un plugin
-nativo es una decisión de arquitectura, no de diseño**: obliga a que toda
-máquina que compile tenga el Modo Desarrollador de Windows activo.
+React + Vite + TypeScript + Tailwind en `packages/dnd_web`, con primitivas
+accesibles de Radix UI e íconos de `lucide-react`. El detalle (versiones,
+envoltorios, datos) está en [Diseño web en React](diseno-web-react.md). Las
+reglas de D&D no viven en el cliente: llegan del motor compilado a JS.
 
 ---
 
@@ -117,12 +62,11 @@ góticas.
 Los cuatro compromisos que definen el estilo:
 
 1. **El oscuro es el tema prioritario y el que arranca.** El claro existe y es
-   completo, pero es la variante. `AppThemeController` arranca en
-   `ThemeMode.dark` (`theme/app_theme.dart`).
-2. **Superficies planas, jerarquía por borde.** `Card` tiene `elevation: 0`. La
-   profundidad se comunica con una línea de 1 px (`hairline`) y con un fondo
-   más hundido (`plaque`), no con sombras. La única sombra del sistema es la de
-   *hover* de la tarjeta de personaje.
+   completo, pero es la variante.
+2. **Superficies planas, jerarquía por borde.** La profundidad se comunica con
+   una línea de 1 px (`hairline`) y con un fondo más hundido (`plaque`), no con
+   sombras. La única sombra del sistema es la de *hover* de la tarjeta de
+   personaje.
 3. **El oro es información, no decoración.** Marca lo activo, lo seleccionado y
    los números clave (CA, características, recursos). Si algo está en oro y no
    es ninguna de esas tres cosas, está mal.
@@ -131,22 +75,20 @@ Los cuatro compromisos que definen el estilo:
 
 ### Vocabulario visual propietario
 
-Cuatro formas son marca registrada del producto y hay que reusarlas en vez de
-inventar equivalentes:
+Cuatro formas son marca del producto y hay que reusarlas en vez de inventar
+equivalentes:
 
-- **El sello**: el logotipo. Tiene su propia sección,
-  [La marca](#la-marca-el-sello), justo abajo.
-- **El rombo** (cuadrado rotado 45°, `angle: 0.785398`): centro de
-  `SectionRule` y los cuatro puntos cardinales del sello.
-- **El escudo**: silueta recortada con `_ShieldClipper` que contiene la Clase de
-  Armadura, y solo la CA.
+- **El sello**: el logotipo, en [La marca](#la-marca-el-sello).
+- **El rombo** (cuadrado rotado 45°): separador ornamental y los cuatro puntos
+  cardinales del sello.
+- **El escudo**: silueta que contiene la Clase de Armadura, y solo la CA.
 - **El medallón**: círculo con aro dorado de 2 px para retratos y emblemas. El
   sello no es un medallón: los rombos del aro son lo que los distingue.
 
 ### La marca: el sello
 
-El logotipo de Milantus es **el sello**: un doble aro de oro con un rombo en
-cada punto cardinal y una M de esquinas vivas adentro. Junto al nombre y al
+El logotipo de Milantus es **el sello**: un aro de oro con un rombo en cada
+punto cardinal y una M de esquinas vivas adentro. Junto al nombre y al
 subtítulo forma el logotipo completo de la cabecera del panel.
 
 **Por qué esta forma.** Salió de relevar las marcas de las herramientas de
@@ -154,117 +96,87 @@ D&D (D&D Beyond, Roll20, Foundry, Nivel20, World Anvil, LegendKeeper y otras).
 Casi todas se apoyan en un d20, en el rojo, o en los dos; el rojo además es el
 de D&D, y acercarse a él es acercarse a una marca ajena. Las que no, se reparten
 entre la estética de software con colores eléctricos y la fantasía recargada de
-pergamino. La heráldica sobria en oro sobre carbón, que es la dirección de arte
-de esta guía, estaba libre. El sello la ocupa sin inventar nada: está hecho
-del rombo y del aro que la app ya usaba.
+pergamino. La heráldica sobria en oro sobre carbón estaba libre. El sello la
+ocupa sin inventar nada: está hecho del rombo y del aro que la app ya usaba.
 
 #### Anatomía
 
-Las coordenadas son sobre un lienzo de 120 × 120, el mismo en el código, el
-SVG y el generador de íconos.
+Las coordenadas son sobre un lienzo de 120 × 120 (`src/ui/Seal.tsx`).
 
 | Parte | Geometría | Por qué |
 | --- | --- | --- |
-| Aro | Círculo de radio 53, trazo 5 | El doble aro de los bocetos se redujo a uno: a 30 px el interior se pegaba al exterior |
+| Aro | Círculo de radio 53, trazo 5 | Un aro y no dos: a 30 px el interior se pegaba al exterior |
 | Rombos cardinales | Centro en (60, 7), (113, 60), (60, 113), (7, 60); semidiagonal 7 | Lo que distingue al sello del medallón de retrato |
 | Filete de los rombos | Trazo 3 **del color del fondo** | Corta el aro en vez de apoyarse encima: el rombo se lee como pieza, no como bulto |
 | M | Polilínea (37, 82) → (37, 38) → (60, 62) → (83, 38) → (83, 82), trazo 9 | Esquinas en inglete y remate cuadrado: una M dibujada, no la de una fuente |
 
 #### Las dos versiones
 
-| Versión | Dónde | Tamaño | Implementación |
-| --- | --- | --- | --- |
-| **Sello de línea** | Cabecera del panel (`SidebarBrand`) | 38 px | `_SealPainter` en `ui/app_sidebar.dart` |
-| | Barra de arriba en ventana angosta (`AppBarBrandTitle`) | 30 px | ídem |
-| | Pantalla de carga | 56 px, late en opacidad | SVG en línea en `web/index.html` |
-| **Disco** | Favicon | 32 px, disco a sangre, M de trazo 16 | `web/favicon.png` |
-| | Íconos de la PWA | 192 y 512, disco al 94 % sobre transparente | `web/icons/Icon-*.png` |
-| | Íconos *maskable* | 192 y 512, disco al 72 % sobre `scaffold` | `web/icons/Icon-maskable-*.png` |
-
-El disco es oro macizo con la M en `plaque`. La M va **rellena y no calada**:
-calada, en una pestaña de tema claro quedaría blanca sobre oro, que no
-contrasta. El disco de los *maskable* va al 72 % porque la zona segura es un
-círculo del 80 %, y así sobrevive a cualquier recorte que aplique el sistema.
-
-Los PNG no se editan a mano: salen de
-`packages/dnd_app/tool/generate_seal_icons.dart`, que es Dart puro y
-determinista.
-
-```bash
-cd packages/dnd_app && dart run tool/generate_seal_icons.dart
-```
+- **Sello de línea** (`Seal`): en la cabecera del panel y en la barra de arriba
+  en ventana angosta. Su color es `--gold`, así que cambia con el tema.
+- **Disco**: oro macizo con la M rellena en el color de la placa, para el
+  favicon y el ícono de inicio (`public/favicon.png`,
+  `public/apple-touch-icon.png`). La M va **rellena y no calada**: calada, en
+  una pestaña de tema claro quedaría blanca sobre oro, que no contrasta. Son
+  archivos fijos: el generador vivía en el cliente de Flutter, y un cambio de
+  marca los vuelve a dibujar con la anatomía de arriba.
 
 #### Reglas de uso
 
-- **El color es siempre `gold` de la paleta**, así que el sello de la app
-  cambia con el tema. Los PNG y la pantalla de carga usan el oro del tema
-  oscuro porque viven fuera de la app y no tienen tema.
-- **El filete de los rombos es el color del fondo** sobre el que se dibuja
-  (`colorScheme.surface` en la cabecera y la barra, `scaffold` en la pantalla
-  de carga). Si el sello va sobre otro fondo, el filete se cambia con él.
+- **El filete de los rombos es el color del fondo** sobre el que se dibuja. Si
+  el sello va sobre otro fondo, el filete se cambia con él.
 - **Por debajo de 24 px se usa el disco.** El sello de línea a ese tamaño
   pierde los rombos y el aro se vuelve una mancha.
 - **El logotipo completo** es el sello, el nombre en Georgia 18 y el subtítulo
-  en sans 11 dorada, separados 12 px en el panel y 10 px en la barra.
+  en sans 11 dorada.
 - No lleva texto alrededor del aro, ni sombra, ni degradado, ni rotación. Esas
   son las formas en que se parecería a cualquier otro sello.
-- No se usa como medallón de personaje ni el medallón como logo: son dos
-  piezas con significados distintos.
+- No se usa como medallón de personaje ni el medallón como logo.
 
 ---
 
 ## 3. Color
 
-Fuente: `lib/theme/app_theme.dart`. Los tokens propios viven en `AppPalette`,
-un `ThemeExtension`, y se leen con `context.palette`. Los tokens estándar viven
-en el `ColorScheme` de Material y se leen con `Theme.of(context).colorScheme`.
+### 3.1 Tokens
 
-### 3.1 Tokens propios — `AppPalette`
+Viven en `src/index.css` como variables CSS y como utilidades de Tailwind
+(`bg-surface`, `text-gold`).
 
 | Token | Oscuro | Claro | Qué significa |
 | --- | --- | --- | --- |
-| `gold` | `#C9A24B` | `#8A6A1E` | Acento heráldico: activo, seleccionado, números clave, reglas ornamentales |
-| `crimson` | `#D4665A` | `#A6392E` | Puntos de golpe, daño y acción destructiva |
-| `verdant` | `#6FA85C` | `#3E7A33` | Verde heráldico: la acción principal del turno |
+| `scaffold` | `#151210` | `#F3ECDD` | Fondo de página |
+| `surface` | `#1E1915` | `#FBF7EC` | Tarjetas, panel lateral, diálogos |
 | `plaque` | `#12100C` | `#EBE0C9` | Fondo de placas: **más hundido** que `surface` |
+| `on-surface` | `#EFE7DA` | `#2A2118` | Texto principal |
+| `on-surface-variant` | `#A2937E` | `#6E5F49` | Texto secundario |
+| `text-muted` | `#9C8B6E` | `#6E6047` | Rótulos, eyebrows, hints, pips vacíos |
+| `gold` | `#C9A24B` | `#8A6A1E` | Acento heráldico: activo, seleccionado, números clave |
+| `gold-soft` | `#2E2617` | `#EEE1BF` | Relleno suave de pills doradas y del ítem de navegación activo |
+| `crimson` | `#D4665A` | `#A6392E` | Puntos de golpe, daño, error y acción destructiva |
+| `verdant` | `#6FA85C` | `#3E7A33` | La salida esperada que conserva algo; PG que sobran |
 | `hairline` | `#3A2F25` | `#D9C9A8` | Bordes finos de 1 px; toda la jerarquía estructural |
-| `goldSoft` | `#2E2617` | `#EEE1BF` | Relleno suave de pills doradas y del ítem de navegación activo |
-| `textMuted` | `#9C8B6E` | `#6E6047` | Rótulos, eyebrows, hints, pips vacíos |
+| `on-primary` | `#201A10` | `#FFFFFF` | Texto sobre oro y sobre carmesí |
 
 Los que llevan texto están elegidos para llegar a **4.5:1 contra los dos fondos
-sobre los que se dibujan**, `surface` y `plaque` — el segundo es el exigente,
-porque es el más cercano al color del texto. El carmesí oscuro es más claro que
-el rojo de marca original (`#C24A3E`, 3.6:1) justamente por eso: lleva los PG de
-la tarjeta, que son texto chico. La consecuencia es que sobre ese carmesí el
-blanco ya no contrasta, así que `onError` / `onSecondary` en tema oscuro son el
-mismo casi-negro que va sobre el oro.
+sobre los que se dibujan**, `surface` y `plaque`. El carmesí oscuro es más claro
+que el rojo de marca original (`#C24A3E`, 3.6:1) justamente por eso: lleva los
+PG, que son texto chico. La consecuencia es que sobre ese carmesí el blanco ya
+no contrasta, así que en el tema oscuro lo que va encima es el mismo casi-negro
+que va sobre el oro.
 
-### 3.2 Tokens de Material — `ColorScheme`
-
-| Rol | Oscuro | Claro | Uso |
-| --- | --- | --- | --- |
-| `scaffoldBackgroundColor` | `#151210` | `#F3ECDD` | Fondo de página (no es parte del `ColorScheme`) |
-| `surface` | `#1E1915` | `#FBF7EC` | Tarjetas, panel lateral, `AppBar` |
-| `onSurface` | `#EFE7DA` | `#2A2118` | Texto principal |
-| `onSurfaceVariant` | `#A2937E` | `#6E5F49` | Texto secundario |
-| `primary` | = `gold` | = `gold` | Acento del sistema |
-| `onPrimary` | `#201A10` | `#FFFFFF` | Texto sobre `primary`; se invierte con el tema, como lo que va sobre carmesí (ver [nota de accesibilidad](#11-accesibilidad)) |
-| `secondary` | = `crimson` | = `crimson` | |
-| `error` | = `crimson` | = `crimson` | El error usa el carmesí de la paleta, no un rojo ajeno |
-| `outline` | = `hairline` | = `hairline` | |
-| `surfaceContainerHighest` | = `plaque` | = `plaque` | |
+### 3.2 Los tres fondos
 
 **Hay tres niveles de fondo y no más**: `scaffold` (página) → `surface`
-(tarjeta) → `plaque` (placa dentro de tarjeta). En oscuro `plaque` es *más
-oscuro* que `surface`; en claro es *más oscuro* también. La placa siempre se
-hunde, nunca se eleva.
+(tarjeta) → `plaque` (placa dentro de tarjeta). La placa siempre se hunde,
+nunca se eleva, en los dos temas.
 
 ### 3.3 Acentos de contenido (colores de clase)
 
-Cada clase declara su `accentColor` **en el JSON del pack**, no en el código:
-`packages/dnd_engine/lib/assets/srd_2024/classes.json`. Se parsea con
-`classAccent()` (`lib/theme/class_visuals.dart`) y cae a `gold` si falta o es
-inválido. Por eso el homebrew accede al mismo mecanismo.
+Cada clase declara su `accentColor` **en el JSON del catálogo**, no en el
+código (`packages/dnd_engine/lib/assets/srd_2024/classes.json`). El cliente lo
+lee con `accentOf` (`src/api/catalog.ts`) y cae al oro si falta o no es
+`#RRGGBB`. Por eso el homebrew usa el mismo mecanismo, y es la única excepción
+a «ningún hex fuera de `index.css`»: es un dato, no un color de diseño.
 
 | Clase | Hex | | Clase | Hex |
 | --- | --- | --- | --- | --- |
@@ -276,27 +188,25 @@ inválido. Por eso el homebrew accede al mismo mecanismo.
 | Clérigo | `#CBB26A` | | Artífice | `#B08D57` |
 | Druida | `#4C8B3F` | | | |
 
-**Alcance del acento de clase**: aro y degradado radial del medallón sin
-retrato, y el ícono de clase en la línea "especie · clase" de la tarjeta. No
-tiñe fondos, botones ni texto de cuerpo. Una clase no reemplaza el oro del
-sistema.
+**Alcance del acento de clase**: el aro y el fondo del medallón sin retrato, y
+el ícono de clase. No tiñe fondos, botones ni texto de cuerpo. Una clase no
+reemplaza el oro del sistema.
 
 ### 3.4 Semántica de estado
 
 | Estado | Tratamiento |
 | --- | --- |
-| Activo / seleccionado | Texto y/o ícono en `gold`; fondo `goldSoft` si es un ítem de navegación |
-| Hover (tarjeta) | Borde `gold` de 1 px + traslación −2 px + sombra `black @ alpha 70`, `blur 26`, `offset (0,10)` |
-| Hover (nav) | Fondo `plaque` |
+| Activo / seleccionado | Texto y/o ícono en `gold`; fondo `gold-soft` si es un ítem de navegación |
+| Hover (tarjeta de personaje) | Borde `gold` de 1 px + traslación −2 px + la única sombra (`--shadow-card-hover`) |
+| Hover (placa que se elige) | Borde dorado y fondo tibio (`.pick`) |
 | Favorito | Borde `gold` de **2 px** + estrella dorada junto al nombre |
-| Deshabilitado | Comportamiento por defecto de Material (`onSelected: null`) |
-| Error | `colorScheme.error` (= `crimson`) + `Icons.error_outline` |
-| Éxito | `verdant` + `Icons.check_circle_outline` — el verde de «la salida esperada», que cambia con el tema como el resto |
-| Info | `colorScheme.primary` + `Icons.info_outline` |
+| Error | `crimson` + ícono de error |
+| Éxito | `verdant` + ícono de tilde |
+| Info | `gold` + ícono de información |
 
 **El color nunca es el único portador de significado.** El favorito lleva borde
-*y* estrella; el guardado lleva color *y* ícono *y* texto. Es una regla, no una
-casualidad: quien no distingue el oro del gris tiene que poder usar la app.
+*y* estrella; el guardado lleva color *y* ícono *y* texto. Quien no distingue el
+oro del gris tiene que poder usar la app.
 
 ---
 
@@ -304,65 +214,41 @@ casualidad: quien no distingue el oro del gris tiene que poder usar la app.
 
 ### 4.1 Las dos familias
 
-| Rol | Familia | Declaración |
+| Rol | Familia | Variable |
 | --- | --- | --- |
-| **Display / títulos / números** | `Georgia` (serif) | Constante `_displayFont` en `app_theme.dart` |
-| **Cuerpo / interfaz** | Default de Material (Roboto) | Sin declarar: se hereda del `TextTheme` base |
+| **Display / títulos / valores de plaqueta** | Georgia (serif) | `--font-display` |
+| **Cuerpo / interfaz** | Roboto, con la sans del sistema detrás | `--font-body` |
 
-Georgia no se empaqueta como asset: se pide por nombre y **el navegador cae al
-serif genérico del sistema si no está**. Está presente en Windows y macOS; en
-Linux y Android típicamente no. Es una decisión consciente (cero peso de fuente
-descargada) con una consecuencia real: la ficha se ve distinta en Linux. Ver
-[Deuda conocida](#13-deuda-conocida).
+Georgia no se descarga: se pide por nombre y **el navegador cae al serif
+genérico si no está**. Está en Windows y macOS; en Linux y Android típicamente
+no. Ver [Deuda conocida](#13-deuda-conocida).
 
 **Georgia se usa para exactamente cuatro cosas**: el nombre del personaje, los
-títulos de tarjeta y pantalla, los valores de `StatPlaque` / `ShieldBadge`, y la
-marca en la cabecera del panel. Todo lo demás es la sans por defecto.
+títulos de tarjeta y pantalla, los valores de plaqueta y de escudo, y la marca
+en la cabecera del panel. Todo lo demás es la sans.
 
 **Un número que se compara con el de al lado va en sans negrita, no en
-Georgia.** Es lo que separa a `StatTile` de `StatPlaque`: en la banda táctica de
-la ficha, en las plaquetas de característica y en la columna de habilidades, las
-cifras se leen en columna y de un vistazo, y el serif —pensado para títulos— las
-vuelve más lentas de barrer. Georgia queda para el número que *es* el título de
-su caja, que es el caso de las tiras cortas dentro de una tarjeta.
+Georgia** (`.num`). En la banda táctica de la ficha, en las características y
+en la columna de habilidades, las cifras se leen en columna y de un vistazo, y
+el serif las vuelve más lentas de barrer. Georgia queda para el número que *es*
+el título de su caja (`.stat-value`).
 
-### 4.2 Escala implementada
+### 4.2 Medidas de referencia
 
-| Uso | Familia | Tamaño | Otros | Dónde |
-| --- | --- | --- | --- | --- |
-| Título de `AppBar` | Georgia | 20 | — | `appBarTheme` |
-| Marca del panel | Georgia | 18 | `height: 1.25` | `app_sidebar.dart` |
-| Subtítulo de marca | sans | 11 | `letterSpacing: 0.3`, `gold` | ídem |
-| Nombre en tarjeta | Georgia | 18 × escala | — | `dashboard_widgets.dart` |
-| Título de `sheetCard` | Georgia | 16 | — | `sheet_navigation.dart` |
-| Valor de `StatTile` | sans | 28 | `w700`, `height: 1.05`, cifras tabulares | `app_widgets.dart` |
-| Modificador de `AbilityPlaque` | sans | 26 | `w700`, `height: 1`, cifras tabulares | ídem |
-| Modificador de habilidad | sans | 16 | `w700`, cifras tabulares | `general_section.dart` |
-| Valor de `StatPlaque` | Georgia | 24 (16 en `dense`) | `height: 1`, cifras tabulares | `app_widgets.dart` |
-| Valor de `ShieldBadge` | Georgia | 20 × `k` | cifras tabulares | ídem |
-| Rótulo de `StatTile` | sans | 11 | `MAYÚSCULAS`, `letterSpacing: 1.1`, `textMuted` | ídem |
-| Cuerpo | sans | 14 (default) | — | — |
-| Ítem de navegación | sans | 14 | `w600` si activo | `app_widgets.dart` |
-| Metadatos de tarjeta | sans | 12.5 × escala | `onSurfaceVariant` | `dashboard_widgets.dart` |
-| **Eyebrow** | sans | 11 | `MAYÚSCULAS`, `letterSpacing: 1.6`, `w500`, `textMuted` | `Eyebrow` |
-| Texto de pill | sans | 11 | — | `GoldPill` |
-| Rótulo de `StatPlaque` | sans | 10 (8.5 en `dense`) | `MAYÚSCULAS`, `letterSpacing: 1.2` (0.5 dense) | `StatPlaque` |
-| Rótulo "NIVEL" | sans | 8.5 × escala | `MAYÚSCULAS`, `letterSpacing: 1` | `dashboard_widgets.dart` |
+Cuerpo 14 px. Eyebrow 11 px en mayúsculas con 1.6 px de espaciado, peso 500,
+`text-muted` (`.eyebrow`). Rótulo de plaqueta 10 px con 1.2 px (`.plaque-label`).
+Valor de plaqueta Georgia 24 px. Nombre de marca Georgia 18 y subtítulo sans 11
+dorada. La escala no es modular: los tamaños se eligieron por caso, y no hay
+ratio que derivar.
 
 ### 4.3 Reglas tipográficas
 
-- **Todo número que se compara en columna lleva `FontFeature.tabularFigures()`.**
-  Sin eso, un `18` y un `11` no alinean y la ficha parece temblar al cambiar de
-  personaje. Aplica a características, CA, PG, velocidad, iniciativa.
-- **Los rótulos van en mayúsculas con `letterSpacing` positivo**, y el
-  espaciado crece cuando el tamaño baja (1.6 a 11 px, 1.2 a 10 px, 1 a 8.5 px).
-  Nunca mayúsculas sin espaciado.
+- **Todo número que se compara en columna lleva cifras tabulares**
+  (`font-variant-numeric: tabular-nums`). Sin eso, un `18` y un `11` no
+  alinean y la ficha parece temblar al cambiar de personaje.
+- **Los rótulos van en mayúsculas con espaciado positivo**, y el espaciado
+  crece cuando el tamaño baja. Nunca mayúsculas sin espaciado.
 - **Los modificadores se firman siempre** (`+3`, `−1`), nunca `3`.
-- **La escala tipográfica no es modular.** Los tamaños se eligieron por caso.
-  No hay ratio; no intentes derivar uno.
-- **Los tamaños con `× k` / `× scale` son intencionales**: la tarjeta de
-  personaje crece proporcionalmente hasta 1.3× cuando la grilla le da más ancho
-  (ver [Layout](#7-layout-y-responsividad)).
 
 ---
 
@@ -370,61 +256,44 @@ su caja, que es el caso de las tiras cortas dentro de una tarjeta.
 
 ### 5.1 Radios
 
-| Radio | Aplicación |
-| --- | --- |
-| `5` | Tecla dibujada junto a un rótulo (`_KeyCap`) |
-| `8` | Campos de texto (`inputDecorationTheme`) |
-| `9` | Ítems de navegación, indicador de guardado, `StatPlaque` densa |
-| `12` | **Tarjetas** (`cardTheme`), placas, `DenseRows` |
-| `14` | Tarjeta de personaje del dashboard |
-| `20` | Pills, chips, cápsula del modificador |
-| circular | Medallones, pip de salvación |
+| Radio | Variable | Aplicación |
+| --- | --- | --- |
+| `5` | `--radius-mark` | Tecla dibujada junto a un rótulo, rombos |
+| `9` | `--radius-nav` | Ítems de navegación, placas densas |
+| `12` | `--radius-card` | **Tarjetas**, placas, diálogos |
+| `20` | `--radius-pill` | Pills, chips |
+| circular | — | Medallones, pips |
 
-El radio por defecto para una superficie nueva es **12**. El 14 de la tarjeta de
-personaje es deliberado: esa tarjeta es más grande y más importante.
+El radio por defecto para una superficie nueva es **12**.
 
 ### 5.2 Bordes
 
 - **1 px de `hairline` es el borde estándar.** Toda tarjeta, placa, pill, chip,
   contenedor de filas y separación de paneles lo usa.
-- **2 px de `gold` significa "esto es especial"**: favorito, aro del medallón,
-  destino de arrastre.
-- Los divisores internos son `Divider(height: 1, color: hairline)` o un
-  `Container(height: 1)` — nunca un `Divider` con altura implícita, porque mete
-  espacio que no se pidió.
+- **2 px de `gold` significa «esto es especial»**: favorito, aro del medallón,
+  destino de arrastre, estado encendido.
 
 ### 5.3 Elevación
 
-`elevation: 0` en tarjetas y `surfaceTintColor: Colors.transparent` en la
-`AppBar`: Material 3 tiñe las superficies elevadas con el color primario, y acá
-eso metería oro en fondos que deben quedar neutros.
-
-**La única sombra del sistema** es la de hover de la tarjeta de personaje:
-`BoxShadow(color: black.withAlpha(70), blurRadius: 26, offset: (0, 10))`.
+No hay elevación: **la única sombra del sistema** es la de hover de la tarjeta
+de personaje (`--shadow-card-hover`). Lo que separa un diálogo del fondo es el
+velo (`--scrim`), no una sombra.
 
 ---
 
 ## 6. Espaciado
 
-El espaciado **no sigue una escala estricta de 4** en el código actual; se usan
-valores ajustados a ojo por componente (2, 3, 5, 6, 7, 10, 11, 13…).
-
-**Regla para trabajo nuevo**: usar el subconjunto canónico y desviarse solo con
-motivo.
+Subconjunto canónico, y desviarse solo con motivo:
 
 | Paso | Uso típico |
 | --- | --- |
 | `4` | Separación intra-elemento (ícono ↔ texto muy junto) |
-| `8` | `spacing` / `runSpacing` de todos los `Wrap` de chips |
-| `12` | Padding vertical de placas, separación de bloques cortos |
-| `16` | **Espacio entre tarjetas y padding interno de tarjeta** — el valor más común |
-| `20` | Padding horizontal de `PageBody`, padding vertical del panel |
-| `24` | Padding de estados vacíos y de error |
-| `32` | Padding horizontal del dashboard en pantalla ancha; pie de grilla |
-
-Padding de referencia por componente: tarjeta de personaje `16`, cabecera de
-`sheetCard` `16 h / 13 v`, ítem de navegación `12 h / 10 v`, `StatPlaque`
-`12/11/12/11` (`8/6` densa), pill `9 h / 2 v`.
+| `8` | Separación entre chips |
+| `12` | Padding vertical de placas, bloques cortos |
+| `16` | **Espacio entre tarjetas y padding interno de tarjeta** — el más común |
+| `20` | Padding horizontal del cuerpo de página |
+| `24` | Estados vacíos y de error |
+| `32` | Márgenes de página en pantalla ancha |
 
 ---
 
@@ -447,225 +316,97 @@ Padding de referencia por componente: tarjeta de personaje `16`, cabecera de
 └──────────────┴────────────────────────────────────────────┘
 ```
 
-El **panel lateral mide 236 px fijos** en las pantallas con shell
-(dashboard, Modo DM, ficha, wizard de creación). No es flexible: los textos
-que no entran se recortan con `ellipsis`.
+El **panel lateral mide 236 px fijos** (`--sidebar-width`, `Shell`). No es
+flexible: los textos que no entran se recortan con elipsis.
 
-El dashboard y el Modo DM comparten **el mismo marco** (`AppSidebar`): marca,
-interruptor de modo, y al pie Ajustes, sugerencias, la cuenta con «Cerrar
-sesión» y la versión. Lo único propio de cada modo es la navegación del
-medio. El pie no se rediseña por modo: quien solo dirige tiene que poder
-salir de su cuenta sin pasar por una pantalla que no usa.
+El Modo Jugador y el Modo DM comparten **el mismo marco**: marca, interruptor de
+modo, y al pie Ajustes, sugerencias, la cuenta con «Cerrar sesión» y la
+versión. Lo único propio de cada modo es la navegación del medio. El pie no se
+rediseña por modo: quien solo dirige tiene que poder salir de su cuenta sin
+pasar por una pantalla que no usa.
 
-Las pantallas de adentro —ficha, Códice y creación— usan el mismo arranque
-(`SidebarBrand`) y ponen su «volver» (`SidebarBackButton`) donde el menú
-principal tiene el interruptor. Su pie es el liviano (`SidebarLightFooter`):
-la versión y nada más. Ajustes y la cuenta quedan a un «volver» de distancia.
-
-El costo es de alto: la navegación del DM (herramientas, campañas y las cinco
-secciones de la campaña) ya no entra entera por debajo de unos 890 px de
-ventana, y se desplaza. Si eso molesta, el camino es compactar el pie de la
-cuenta en una fila con menú, no volver a separar los paneles.
+Las pantallas de adentro —ficha, Códice, creación— ponen su «volver» donde el
+menú principal tiene el interruptor, con la misma forma, para que la salida
+esté siempre en el mismo sitio.
 
 ### 7.2 Breakpoints
 
-| Ancho | Efecto | Constante |
-| --- | --- | --- |
-| **≥ 900** | Panel lateral fijo. Debajo: `AppBar` + `Drawer` con el **mismo widget** de panel | `_kWideBreakpoint` / `_kSheetWideBreakpoint` |
-| ≥ 860 / ≥ 560 | 3 / 2 columnas en secciones de subida de nivel | `level_up_sections.dart` |
-| ≥ 780 / ≥ 520 | 3 / 2 columnas en el paso de puntuaciones | `scores_step.dart` |
-| ≥ 760 | `PageBody` deja de crecer (`maxWidth: 760`) | `app_widgets.dart` |
-| ≥ 640 | La ficha pasa de una columna a columnas lado a lado | `responsiveColumns` |
-| < 720 / < 700 / < 600 | Variantes compactas del wizard de subida de nivel | `levelup/` |
-| < 560 | Padding horizontal del dashboard baja de 32 a 16 | `dashboard_content.dart` |
-
-**El breakpoint de shell es 900 y es el único que importa recordar.** El resto
-son decisiones locales de contenido y se resuelven con `LayoutBuilder`, no con
-`MediaQuery`: se mide el espacio *que el padre te dio*, no la ventana.
+**Hay uno solo de marco: 900 px** (`shell:` en Tailwind). Desde ahí el panel
+lateral queda fijo; debajo, barra superior y cajón con el mismo panel. Todo lo
+demás se resuelve con grillas que se adaptan solas (`auto-fill`, `minmax`), no
+con más breakpoints. El piso es un teléfono de 360 px: nada puede empujar un
+scroll horizontal.
 
 ### 7.3 La grilla del dashboard
 
-```dart
-const _kCardBaseWidth  = 420.0;  // diseño de referencia
-const _kCardMaxExtent  = 560.0;  // ancho máximo por columna
-const _kCardSpacing    =  16.0;
-```
-
-`_grid` reparte el ancho en columnas de a lo sumo 560 px. La tarjeta **se
-escala en proporción** (`scale` entre 1.0 y 1.3) según el ancho real que le
-tocó; por eso todas las medidas internas de la tarjeta llevan `× k`. El alto
-no es fijo: cada fila es una `CardGridRow` (la fila de `CardGrid`) armada de
-a una en un `ListView.builder`, y se iguala a su tarjeta más alta. Un alto
-de celda fijo se calibraba para un contenido que cambia con el ancho y
-dejaba aire bajo la fila CA/VEL/INIC.
-
-Consecuencia: **subir `_kCardMaxExtent` no ensancha la tarjeta** si con ese
-valor entra una columna más. Los dos parámetros están acoplados.
+Columnas de al menos 300 px que llenan todo el ancho, tantas como entren
+(`repeat(auto-fill, minmax(min(300px, 100%), 1fr))`), con 16 px de separación.
+El `min(…, 100%)` es lo que deja una sola columna en un teléfono sin
+desbordar. Las listas de tarjetas del Modo DM siguen la misma idea.
 
 ### 7.4 Reordenamiento
 
-El roster se reordena con `Draggable` + `DragTarget` propios, no con un paquete
-de grilla reordenable. El arrastre **arranca con pulsación larga**: la tarjeta
-entera ya es un botón, y en pantalla táctil desplazar la grilla no puede
-terminar moviendo personajes.
+Las tarjetas se reordenan arrastrando (`src/ui/holdDrag.ts`). En pantalla
+táctil el arrastre **arranca al sostener el dedo**: la tarjeta entera ya es un
+enlace, y desplazar la grilla no puede terminar moviendo personajes. Con el
+mouse alcanza con moverse unos píxeles.
 
 ---
 
-## 8. Catálogo de componentes
+## 8. Principios de componentes
 
-Todos en `lib/theme/app_widgets.dart` salvo indicación (los del panel lateral, en
-`ui/app_sidebar.dart`). Son la biblioteca
-compartida: **antes de crear un widget visual nuevo, buscar acá**.
-
-### Estructura
-
-| Componente | Qué es | API |
-| --- | --- | --- |
-| `PageBody` | Cuerpo centrado con ancho máximo (760 por defecto) para que el contenido no se estire de borde a borde | `children`, `maxWidth`, `padding` |
-| `DenseRows` | Contenedor de filas densas con divisores internos, en vez de tarjetas sueltas | `children` |
-| `CardGrid` | Tarjetas de **alto variable** en columnas iguales que llenan el ancho (tantas como entren con `minCardWidth`, hasta `maxColumns`); cada fila se iguala a su tarjeta más alta, y la fila incompleta deja su hueco. No hace scroll: va adentro de la lista de la pantalla. La usan Capítulos y PNJ de una campaña. Su fila suelta es `CardGridRow`, que la Mesa arma de a una adentro de un `ListView.builder` para seguir siendo perezosa | `children`, `minCardWidth` (360), `maxColumns` (3), `spacing` (12); `CardGridRow`: `children`, `columns`, `spacing` |
-| `SectionRule` | Regla ornamental: línea `hairline` con rombo dorado de 7 px al centro, 18 px de margen vertical | — |
-| `Eyebrow` | Rótulo de sección en mayúsculas espaciadas | `text` |
-| `sheetCard(…)` (`ui/sheet/sheet_navigation.dart`) | Tarjeta plegable con cabecera (ícono dorado 18 px + título Georgia 16 + acción) | `icon`, `title`, `trailing`, `child`, y `collapseKey` cuando el título se repite en la misma pantalla (dos campañas apiladas tienen dos tarjetas «Batallas») |
-| `responsiveColumns(…)` (`ui/sheet/sheet_navigation.dart`) | Columnas lado a lado ≥ 640, apiladas debajo | `List<List<Widget>>` |
-| `appNavItem(…)` | Ítem del panel lateral | `icon`, `label`, `active`, `onTap`, y `count` para la cifra al final de la fila (en cifras tabulares: los ítems se apilan y la columna de números tiene que leerse como columna) |
-| `LanguageSelector`, `ThemeModeSelector` | El idioma (pill con menú) y el tema (grupo de tres). Viven solo en Ajustes: ningún panel lateral los repite | El tema recibe su `AppThemeController`; el idioma lee el `AppLocaleScope` |
-| `SidebarBrand` | La marca en lo alto de todo panel: sello, nombre y subtítulo | — |
-| `SidebarBackButton` | El «volver» de una pantalla de adentro (ficha, Códice, creación). Ocupa el lugar que en el menú principal tiene el interruptor de modo, con la misma forma, para que la salida esté siempre en el mismo sitio | `label`, `onPressed` |
-| `SidebarLightFooter` | El pie de una pantalla de adentro: la versión y, si hace falta, algo propio a la izquierda (la ficha pone su cartel de guardado). **No repite el pie del menú principal**: con Ajustes, la cuenta y «Cerrar sesión» encima, la ficha no entra en una ventana de laptop | `leading` |
-| `AppSidebar` | El marco del panel lateral que comparten el Modo Jugador y el Modo DM: marca, interruptor de modo, la navegación propia y el pie de la cuenta | `mode`, `onModeChanged`, `navigation` (si puede no entrar, trae su propio scroll), `api`, `account`, `appVersion`, `settingsActive`, `onOpenSettings`, `inDrawer` |
-| `SettingsView` (`ui/settings_view.dart`) | Los ajustes de la cuenta como sección del área de contenido: grupos con rótulo, filas de rótulo + control que se apilan por debajo de 520 px | Sin botón de guardar: cada cambio se guarda al tocarlo y el cartel de arriba dice si llegó |
-
-### Datos de personaje
-
-| Componente | Qué es | Notas |
-| --- | --- | --- |
-| `StatTile` | Placa de la **banda táctica** de la ficha: rótulo con ícono arriba y cifra grande en sans negrita, todo alineado a la izquierda | `icon`, `labelTrailing`, `suffix` (unidad atenuada), `valueColor`, `footer`, `highlighted` (estado encendido, como la Furia: relleno `goldSoft` y borde `gold` de 2 px; es la única placa de la banda que cambia de fondo) |
-| `StatPlaque` | Rótulo en mayúsculas + valor grande en Georgia sobre `plaque`, centrado | Variante `dense` para tarjetas apretadas. `valueColor` cae a `gold`. Es la de las **tiras cortas dentro de una tarjeta** (carga, sintonizados, CD de salvación) |
-| `AbilityPlaque` | Característica con el **modificador como cifra principal**, la puntuación rotulada debajo (`Punt. 20`) y la salvación competente nombrada (`SALV` con escudo) | Reserva el alto de la marca aunque no haya salvación, para que las seis alineen. Es **de la ficha**: marca *si* hay competencia, porque el número lo calcula el motor y se lee en Salvaciones. El perfil de criatura no la usa — una criatura trae la salvación ya impresa y ahí se muestra el valor (ver `creatureProfileBody`) |
-| `ShieldBadge` | La CA dentro de la silueta de escudo, borde dorado de 1.5 px | Escala con `height / 52`; **solo para CA**, y solo donde la CA es el tema (Defensa, Inventario) |
-| `Medallion` | Círculo con aro dorado: retrato, emblema o inicial | Ver [Retratos](#9-retratos-y-medallones) |
-| `ClassMedallion` | `Medallion` que resuelve solo el emblema y el acento de la clase | `class_visuals.dart` |
-| `ThinBar` | Barra de PG que recorre el tramo al cambiar; 5 px por defecto, `height: 8` en la tarjeta de la ficha | Radio de la mitad del alto |
-| `ChangeFlash` | Fondo que destella detrás de un número al cambiar: carmesí si bajó, verde si subió | Para PG; se dibuja por fuera del hijo y no lo mueve |
-| `UsagePips` | Tira de íconos para usos restantes: llenos en `gold`, gastados en `textMuted` | Recursos de clase, espacios de conjuro |
-| `GoldPill` | Cápsula dorada suave; `highlighted: false` la vuelve neutra | Radio 20 |
-| `OutlinedTag` | Rótulo chico en mayúsculas con borde dorado, sin fondo, al lado de un nombre en una fila densa: «PERICIA» en una habilidad, «VENTAJA» en una salvación | Más liviano que `GoldPill` para no competir con el número de la fila. Si explica algo, va dentro de un `Tooltip` |
-| `MarkdownText` (`ui/diary_cards.dart`) | Texto con el Markdown que usa una mesa: títulos, viñetas, **negrita**, *itálica* y, si se le pasan `mentions`, `@Nombre` como enlace (`mentionBuilder`) | Subconjunto a mano, sin enlaces, código ni tablas (ver su `ponytail:`). Lo usan el trasfondo del Diario y las notas del Cuaderno |
-| `SourceBadge` | `GoldPill` con la procedencia del contenido | Solo el SRD 5.2.1 va resaltado |
-| `ActionTypeIcon` / `ActionTypeLegend` | Ícono del tipo de acción (acción, adicional, reacción) y su leyenda | La leyenda va una sola vez por pantalla, no por fila |
-| `CreatureActionRow` | Una acción de criatura: nombre, bonificador con signo en Georgia dorado, daño con su tipo, alcance y descripción | Toma **primitivos** y no un `CreatureAction`. Hoy la usa **solo la ficha** para los compañeros invocados (vía `ResolvedCreatureAction`): el perfil del Bestiario dejó de usarla cuando el daño pasó a placas rotuladas |
-| `creatureProfileBody(…)` | El perfil de una criatura del bloque de cifras para abajo: banda de cifras (CA, PG con sus dados, iniciativa, desafío, percepción pasiva), banda de las seis características con la salvación adentro, líneas como lista de definición con las defensas en chips, rasgos y acciones agrupadas por tipo, con acierto/daño/alcance en placas rotuladas | Devuelve `List<Widget>`, no un `Column`: cada llamador lo mete en su propio `ListView` con su encabezado (el nombre y el tipo **no** van adentro). Lo leen la columna «Del turno» de Combate y la vista previa del formulario de criaturas de Homebrew. **El Bestiario no lo usa de corrido**: arma el perfil en tarjetas de superficie con las mismas piezas, expuestas aparte — `creatureProfileNumbers` (cifras sin el desafío, que ahí va como pastilla junto al tipo, y sin placa cuando van acostadas), `creatureProfileStats` (características y líneas) y `creatureProfileActions` (rasgos y acciones) —, en un encabezado y dos columnas desde 760 px. **Dos ejes distintos, y conviene no confundirlos**: `dense: true` decide *contenido* —saca CA, PG e iniciativa, que en Combate los lleva el encuentro y no el catálogo— mientras que la *forma* la decide un `LayoutBuilder` con el ancho medido (`_profileWideWidth`, 520): por debajo se apila todo, que es lo que necesitan la columna «Del turno» de 300 px y el Bestiario en un teléfono. La prosa va topeada a `kReadingWidth` (620, con `readingWidth(child)`, que también usa el Diario) porque el panel del Bestiario mide unos 855 px |
-| `EncounterDifficultyBand` (`ui/dm/encounter_difficulty_band.dart`) | La dificultad del combate que se está armando: el veredicto en Georgia (Baja, Moderada, Alta o Extrema), la regla del presupuesto con sus tres techos, los PX de enfrente y, debajo, los avisos del SRD que apliquen | Sobre `plaque`, como la barra de Combate: es un dato calculado, no editable. **Solo «Extrema» va en `crimson`**; las otras tres son dificultades que el DM elige a propósito y quedan en `gold`. Dos umbrales medidos con `LayoutBuilder`: desde 620 px todo va en una línea, y desde 360 px de regla los techos se rotulan bajo su marca (con menos pasan a una leyenda, porque a nivel 1 «Moderada» y «Alta» quedan a un 20 % de la regla y se pisan). Recibe un `EncounterDifficulty` ya calculado: los números son del motor |
-
-### Selección
-
-| Componente | Qué es |
-| --- | --- |
-| `CappedChipSelect` | Multiselección de `FilterChip` con tope; al llegar al máximo, las no elegidas se deshabilitan |
-| `_SingleSelect` | Selección única con `ChoiceChip`, con `SourceBadge` opcional por opción |
-| `_WeaponSelect` / `_WeaponChecklist` | Pickers de armas con búsqueda y agrupación Simples/Marciales, **acotados a 300 px de alto con scroll propio** |
-| `SpendRecoverButtons` | Par −/+ para gastar y restaurar un uso |
-
-### Formularios homebrew
-
-En `lib/homebrew/forms/form_widgets.dart`, para los ocho formularios de contenido propio. Todos siguen la misma forma: arriba lo que hace falta para guardar, la regla «Lo demás es opcional» y el resto en secciones plegadas; al costado, cómo va a quedar y qué significa lo que se está tocando.
-
-| Componente | Qué es | Regla |
-| --- | --- | --- |
-| `_GuidedForm` | Mixin del estado de cada formulario: foco, secciones abiertas y panel lateral (`guidePanel`) | Cada formulario solo pone `explain` (qué significa cada clave) y `chosenKeys`; los controladores van por `watch`, que redibuja la vista previa y los libera |
-| `_FormScaffold` | El armazón: `Form` con Guardar siempre habilitado y, con `panel`, dos columnas desde 900 px (campos a la izquierda, panel de 400 a la derecha) | Por debajo de 900 no hay panel; la explicación va debajo del campo con `explainHere` |
-| `_FormSection` | Sección plegable con la forma de `sheetCard` y el resumen de lo ya cargado en la cabecera | Plegada **no desmonta** su contenido, para que sus campos sigan validando. Si Guardar falla, el formulario las abre (`openAllSections`) |
-| `_Explanation` | Qué significa lo que se está eligiendo: rótulo dorado, título Georgia 20, regla y nota atenuada, sobre `plaque` | Los textos salen de glosarios del motor (`weaponProperties`, `weaponMasteries`, `DamageType.description`, `rules_glossary.dart`), nunca de la pantalla |
-| `_rowPreview` | La vista previa de lo que se ve como fila de la lista (arma, armadura, objeto) | Usa las mismas pills y cifras que la lista (`_weaponPills`, `_armorStats`…): si se separan, la vista previa miente. El resto muestra lo que de verdad lo lee: el detalle de conjuro, la creación de personaje, el perfil del Bestiario |
-| `_ChosenList` | «Lo que ya elegiste»: cada elección con su explicación corta | No repite lo que ya está explicando `_Explanation` |
-| `_fieldRow` | Campos en una fila hasta 520 px, apilados por debajo | Mismo corte que las filas de la lista (`_rowWideWidth`) |
+El catálogo de piezas (`src/ui/`) está en
+[Diseño web en React](diseno-web-react.md): **antes de crear un componente
+visual nuevo, buscá ahí**. Acá van las reglas que valen para todos.
 
 ### Retroalimentación
 
-| Componente | Qué es | Regla |
-| --- | --- | --- |
-| `showAppMessage(…)` | `SnackBar` con tono `info` / `success` / `error`, y «Deshacer» opcional con `onUndo` | El error dura **6 s**, con `onUndo` **8 s**, el resto 3 s. `onUndo` solo si se restaura entero con lo que hay en memoria. Siempre `Semantics(liveRegion: true)` |
-| `AppBusyLabel` | Spinner de 18 px + texto, como región viva | El texto es obligatorio: un spinner solo no dice qué está pasando |
-| `SaveStatusIndicator` (`ui/save_status_indicator.dart`) | Píldora de estado del guardado con `AnimatedSwitcher` de 180 ms | Ícono + texto + color, los tres |
-| `AppHelpCallout` | Ayuda breve del ancho de su contenedor, donde hay que decidir algo: ícono, título opcional y mensaje, en `surface` con filete | Informa y nada más: sin botón, sin cierre, sin «Más información». No es un error ni pide una acción |
-| `AppEmptyState` | Ícono 40 px `onSurfaceVariant` + mensaje centrado + acciones opcionales | El mensaje es región viva. Distinguir **«no hay nada»** de **«nada coincide con la búsqueda»**: son situaciones distintas y piden acciones distintas |
-| `AppErrorView` | Ícono de error + mensaje + `SelectableText` del detalle + botón "Reintentar" | El detalle técnico se puede copiar. `onRetry` es lo que lo separa de un cartel muerto. Con un `FeedbackScope` con canal suma «Reportar este error», que manda el mensaje y el detalle |
-| `showFeedbackDialog(…)` (`ui/feedback.dart`) | Diálogo «Sugerencias y errores»: idea o error, el mensaje y «Enviar» | Se abre desde el último ítem de navegación del panel lateral (`AppSidebar`) y desde «Reportar este error». Necesita el canal de `FeedbackScope`, que el arranque abre al cargar la cuenta |
-| `TutorialGate` / `showTutorialIfPending(…)` (`ui/tutorials.dart`) | Tutorial de una vez: `AppDialog` con páginas y «Saltar todos», «Saltar», «Siguiente» / «Entendido» | Uno por sección (`Tutorial`), sale al entrar por primera vez y se recuerda en el navegador. `TutorialGate` va con `key` por tutorial. Ajustes los restituye |
-| `showTextPromptDialog(…)` / `showRenameDialog(…)` | Diálogo de un solo campo de texto | Para más de un campo, diálogo propio (ver `chapter_editor_dialog.dart`) |
-| `AppDialog` | **El molde de diálogo**: placa del sistema con la barra de acciones a lo ancho | `title`, `icon`, `iconColor`, `titleTrailing`, `content`, `actions`, `width` (480), `scrollable` |
-| `DialogAction` | Una celda de esa barra | `label`, `onPressed`, `color`, `primary`, `keyHint` |
+- Un aviso lleva ícono, color y texto; el error dura más que el resto, y
+  «Deshacer» solo se ofrece si se restaura entero con lo que hay en memoria.
+- Lo que cambia solo se anuncia solo (región viva).
+- Un spinner nunca va solo: el texto de qué está pasando es obligatorio.
+- Un error de carga ofrece **Reintentar**; el detalle técnico se puede copiar.
+- Un estado vacío distingue **«no hay nada»** de **«nada coincide con la
+  búsqueda»**: son situaciones distintas y piden acciones distintas.
+- Una ayuda en pantalla informa y nada más: sin botón, sin cierre, sin «Más
+  información».
 
 ### El molde de diálogo
 
 Un diálogo es **una placa del sistema**, no una superficie nueva: `surface`,
-filete `hairline` de 1 px, radio 12 y cero elevación. Eso lo pone `dialogTheme`
-en `app_theme.dart` y lo hereda todo `Dialog` / `AlertDialog` de la aplicación
-sin pedir nada. Lo que separa del fondo es el velo, no una sombra.
-
-`AppDialog` agrega las dos cosas que un tema no puede decidir:
+filete `hairline` de 1 px, radio 12 y cero elevación. Lo que separa del fondo
+es el velo, no una sombra.
 
 - **La medida de lectura.** Sin tope, un párrafo largo estira el diálogo hasta
-  el ancho de la ventana. 480 px por defecto (unos 66 caracteres); 560 cuando el
-  cuerpo es una ficha y no prosa, como el detalle de un conjuro. El ancho **no**
-  se topea en el tema porque varios diálogos ya traen el suyo
-  (`roll_initiative_dialog` mide 620).
+  el ancho de la ventana: 480 px por defecto (unos 66 caracteres), más ancho
+  solo cuando el cuerpo es una ficha y no prosa.
 - **La barra de acciones.** Celdas de 48 px sobre `plaque`, separadas por
   filete, que llegan al borde del diálogo. Cancelar primero, el verbo de la
-  acción último y en negrita (`primary: true`). El cuerpo scrollea solo y el pie
-  queda fijo; `scrollable: false` para un cuerpo que ya resuelve su propio alto
-  (una lista con buscador, una columna con `Expanded`).
+  acción último y en negrita. El cuerpo scrollea solo y el pie queda fijo.
+- **La tecla dibujada** junto a un rótulo se pone solo cuando es cierta (`Esc`
+  donde el diálogo se cierra con Escape, `↵` donde alguien la ató).
+- **En la barra solo van celdas que se tocan.** Un texto suelto entre botones
+  —«Falta elegir 2», «Al confirmar arranca la ronda 1»— va al final del cuerpo:
+  en una fila de celdas se lee como un botón muerto.
 
-`keyHint` dibuja la tecla al lado del rótulo, y **se pone solo cuando es
-cierta**: `Esc` lo es siempre que el diálogo se abra con el
-`barrierDismissible: true` de fábrica, porque de eso se ocupa la ruta modal —el
-de «La sesión terminó» lo abre en `false` y por eso no la lleva—; `↵` solo donde
-alguien la ató, que hoy es el campo de una línea de `showTextPromptDialog`.
+#### Color de las acciones
 
-**En la barra solo van celdas que se tocan.** Un texto suelto entre botones —el
-contador de objetos agregados, «Falta elegir 2», «Al confirmar arranca la ronda
-1»— va al final del cuerpo: en una fila de celdas se lee como un botón muerto.
-
-**Color de las acciones**: el carmesí queda para el camino irreversible y nada
-más; `verdant` para la salida esperada que conserva algo (terminar un combate
-guardando el registro, empezar la ronda); oro —el que pone `primary` sin
-`color`— para todo lo demás. Un diálogo destructivo además abre con
-`icon: Icons.warning_amber_rounded` en carmesí.
-
-No quedan `AlertDialog` en `lib/`: los ~35 que había están todos pasados al
-molde. En los tests, la celda del pie se busca con `dialogAction('…')`
-(`test/dialog_finders.dart`) y no por el tipo del botón, porque varios rótulos
-se repiten a propósito entre la pantalla y el diálogo.
+El carmesí queda para el camino irreversible y nada más; `verdant` para la
+salida esperada que conserva algo (terminar un combate guardando el registro,
+empezar la ronda); oro para todo lo demás. Un diálogo destructivo además abre
+con un ícono de advertencia en carmesí.
 
 ---
 
 ## 9. Iconografía
 
-**Material Icons**, con una sola excepción: los tres íconos de tipo de acción
-(`actionTypeBadge` en `app_widgets.dart`: acción, acción adicional, reacción)
-salen de Font Awesome (`font_awesome_flutter`). Material no tiene con qué
-representar «acción principal», y mezclar familias en tres íconos que se leen
-juntos se nota. Fuera de ese trío, nada de Font Awesome. No hay set propio ni
-SVG sueltos.
+**`lucide-react`**, sin set propio ni SVG sueltos (salvo el sello). El
+contenido declara su ícono con un **id de texto** (`iconId` en el JSON) que el
+cliente traduce a un ícono con un mapa fijo; un id que no está en el mapa cae a
+un ícono genérico del dominio, distinto para clase y para especie.
 
-El contenido declara su ícono con un **id de texto** (`iconId` en el JSON) que
-`class_visuals.dart` mapea a un `IconData` **const**. Nunca se construye un
-`IconData` desde un codepoint variable: eso rompe el *tree-shaking* de íconos
-de `flutter build` y mete la fuente entera en el bundle.
-
-Cada dominio tiene su fallback y son distintos a propósito:
-
-| Dominio | Fallback |
-| --- | --- |
-| Clase | `Icons.person_outline` |
-| Especie | `Icons.groups` |
-| Trasfondo | `Icons.badge_outlined` — **a propósito fuera del registro**, para que "sin ícono" se distinga de un ícono real |
-| Genérico | `Icons.circle_outlined` |
-
-Tamaños en uso: `14` (inline en metadatos), `17–18` (cabeceras, indicadores,
-navegación), `20` (`SnackBar`, prefijos de campo), `40–44` (estados vacíos y de
-error).
+Tamaños en uso: 14 (en línea con metadatos), 16–18 (cabeceras, navegación),
+20 (avisos, prefijos de campo), 40–44 (estados vacíos y de error).
 
 ---
 
@@ -673,301 +414,153 @@ error).
 
 Las animaciones son **suaves y eficaces**: evitan la brusquedad y la sensación de
 cosa inacabada que da una pantalla donde todo aparece de golpe, sin cobrarle
-espera ni memoria a una herramienta que se abre cincuenta veces por sesión. Lo
-que aparece o cambia entra con una transición corta (hasta unos 200 ms), con
-opacidad, color o un desplazamiento mínimo. Las principales:
+espera a una herramienta que se abre cincuenta veces por sesión. Lo que aparece
+o cambia entra con una transición corta (hasta unos 200 ms), con opacidad,
+color o un desplazamiento mínimo:
 
-| Animación | Duración | Curva |
-| --- | --- | --- |
-| Hover de tarjeta (traslación + sombra + borde) | 120 ms | default de `AnimatedContainer` |
-| Cambio de estado de guardado | 180 ms | `AnimatedSwitcher` |
-| Arrastre de tarjeta | — | `opacity: 0.85` en el feedback, `0.3` en el hueco |
-| Barra de PG (`ThinBar`, dashboard, ficha y combate) | 220 ms | `easeOut` |
-| Destello de un cambio de PG (`ChangeFlash`): carmesí si bajó, verde si subió | 600 ms | aparece de golpe y se apaga con `easeIn` |
-| Marca de turno en la planilla del combate | 180 ms | `AnimatedContainer` + `AnimatedOpacity` |
-| Desplazamiento hasta la fila del turno, solo si estaba fuera de vista | 200 ms | `easeOut` |
+| Animación | Duración |
+| --- | --- |
+| Hover de tarjeta (traslación, sombra, borde) | 120 ms |
+| Lo que aparece (`.step-in`) | 160 ms |
+| Barra de PG al cambiar | 220 ms |
 
-Toda duración pasa por `context.motion(...)`, que devuelve cero cuando el
-sistema pide menos movimiento. Lo animado nunca lleva información que no esté
-ya en su valor final: el número de PG cambia en el primer cuadro y el destello
-solo dice para qué lado fue.
+Todo se apaga con «reducir movimiento», del sistema o de Ajustes
+(`src/ui/motion.ts`). Lo animado nunca lleva información que no esté ya en su
+valor final: el número de PG cambia en el primer cuadro y la barra solo
+acompaña.
 
-**Sin parallax ni efectos largos o decorativos,** y nada que recalcule la página
-o trabe la respuesta al toque: una entrada de 300 ms ya es un peaje. Lo que hoy
-entra sin transición en Flutter es deuda de esta regla, no un ejemplo a seguir.
+**Sin parallax ni efectos largos o decorativos,** y nada que trabe la respuesta
+al toque: una entrada de 300 ms ya es un peaje.
 
 ---
 
 ## 11. Accesibilidad
 
-### 11.1 Lo que ya está resuelto
+### 11.1 Lo que se exige
 
-- **Etiquetas semánticas en todos los widgets de datos**, con
-  `excludeSemantics: true` para que el lector no lea el número suelto sin
-  contexto: `AbilityPlaque` anuncia "FUE: modificador +3, puntuación 16,
-  competente en salvación" —en ese orden, el mismo en que la plaqueta los
-  muestra—; `ShieldBadge`, "Clase de armadura: 17"; `UsagePips`, "3 de 5 usos
-  disponibles"; `StatTile`, "Velocidad: 30 pies".
-- **Regiones vivas** en `SnackBar` y `AppBusyLabel`: lo que cambia solo se
-  anuncia solo.
+- **Los datos se anuncian con su contexto**: una característica dice «FUE:
+  modificador +3, puntuación 16, competente en salvación», en el orden en que
+  se ve; la CA, «Clase de armadura: 17»; los usos, «3 de 5 usos disponibles».
+- **Regiones vivas** en avisos y en lo que carga: lo que cambia solo se anuncia
+  solo.
 - **El color nunca va solo** (ver [3.4](#34-semántica-de-estado)).
-- **`tooltip` en todo `IconButton`** sin etiqueta visible.
-- Los retratos anuncian "Retrato de X" o "Emblema de X" según corresponda.
-- Un 404 de retrato no rompe la pantalla: el medallón queda sin imagen
-  (`onError` vacío deliberado).
+- **Todo botón de ícono lleva nombre** (`aria-label`) y, si hace falta, un
+  `Tooltip`; el tooltip no reemplaza el nombre.
+- Los retratos anuncian «Retrato de X» o «Emblema de X». Un retrato que no
+  carga deja el medallón sin imagen y no rompe la pantalla.
+- Los objetivos táctiles no bajan de 44 px.
 
 ### 11.2 Contraste medido (WCAG 2.1)
 
-Ratios calculados sobre los tokens reales. **Verde** = AA para texto normal
-(≥ 4.5). **Ámbar** = solo AA para texto grande o elementos no textuales
-(≥ 3.0). **Rojo** = insuficiente.
+Ratios calculados sobre los tokens de [3.1](#31-tokens). ✅ = AA para texto
+normal (≥ 4.5); ⚠️ = solo texto grande o elementos no textuales (≥ 3.0).
 
 **Tema oscuro**
 
 | Combinación | Ratio | |
 | --- | --- | --- |
-| `onSurface` sobre `surface` | 14.20 | ✅ |
+| `on-surface` sobre `surface` | 14.20 | ✅ |
 | `gold` sobre `plaque` | 7.92 | ✅ |
 | `gold` sobre `surface` | 7.26 | ✅ |
-| `onPrimary` sobre `gold` | 7.19 | ✅ |
+| `on-primary` sobre `gold` | 7.19 | ✅ |
 | `verdant` sobre `surface` | 6.17 | ✅ |
-| `onSurfaceVariant` sobre `surface` | 5.82 | ✅ |
-| `textMuted` sobre `plaque` | 5.73 | ✅ |
+| `on-surface-variant` sobre `surface` | 5.82 | ✅ |
+| `text-muted` sobre `plaque` | 5.73 | ✅ |
 | `crimson` sobre `plaque` | 5.29 | ✅ |
-| `textMuted` sobre `surface` | 5.25 | ✅ |
+| `text-muted` sobre `surface` | 5.25 | ✅ |
 | `crimson` sobre `surface` | 4.85 | ✅ |
-| `onError` sobre `crimson` | 4.81 | ✅ |
+| `on-primary` sobre `crimson` | 4.81 | ✅ |
 
 **Tema claro**
 
 | Combinación | Ratio | |
 | --- | --- | --- |
-| `onSurface` sobre `surface` | 14.76 | ✅ |
-| `onError` sobre `crimson` | 6.47 | ✅ |
-| `onPrimary` sobre `gold` | 5.05 | ✅ |
+| `on-surface` sobre `surface` | 14.76 | ✅ |
+| `on-primary` sobre `crimson` | 6.47 | ✅ |
 | `crimson` sobre `surface` | 6.04 | ✅ |
-| `onSurfaceVariant` sobre `surface` | 5.78 | ✅ |
-| `textMuted` sobre `surface` | 5.72 | ✅ |
+| `on-surface-variant` sobre `surface` | 5.78 | ✅ |
+| `text-muted` sobre `surface` | 5.72 | ✅ |
+| `on-primary` sobre `gold` | 5.05 | ✅ |
 | `crimson` sobre `plaque` | 4.94 | ✅ |
 | `verdant` sobre `surface` | 4.86 | ✅ |
 | `gold` sobre `surface` | 4.71 | ✅ |
-| `textMuted` sobre `plaque` | 4.68 | ✅ |
+| `text-muted` sobre `plaque` | 4.68 | ✅ |
 | `gold` sobre `plaque` | 3.85 | ⚠️ solo texto grande |
 
-Los tokens que llevan texto se retocaron para llegar a AA **contra los dos
-fondos** sobre los que se dibujan. Una versión anterior de esta guía documentaba
-`textMuted` y `crimson` como insuficientes; eso dejó de ser cierto y el motivo
-está en los comentarios de `AppPalette`.
+### 11.3 Reglas que se derivan
 
-### 11.3 Reglas que se derivan de lo anterior
-
-1. **`gold` sobre `plaque` en tema claro solo vale a 24 px o más.** Por eso la
-   `StatPlaque` normal pasa y la variante `dense` (16 px) no.
+1. **`gold` sobre `plaque` en tema claro solo vale a 24 px o más.** El valor de
+   plaqueta normal pasa; uno chico, no.
 2. **Lo que va sobre un acento se invierte con el tema.** En el oscuro, oro y
    carmesí son claros y llevan casi-negro encima; en el claro son oscuros y
-   llevan blanco. Con el casi-negro en los dos temas, el texto de todo
-   `FilledButton` quedaba en 3.42 en el claro. `onPrimary`, `onSecondary` y
-   `onError` salen del mismo valor en `AppTheme`, y la prueba de contraste
-   cubre los dos acentos en los dos temas.
-3. Los objetivos táctiles siguen los mínimos de Material (48 px); los
-   `IconButton` no se achican por debajo de eso.
+   llevan blanco (`on-primary`).
 
 ---
 
 ## 12. Anti-patrones
 
-Prohibiciones duras. Las primeras tres rompen pruebas o el build.
-
 | ❌ No hacer | ✅ En su lugar | Por qué |
 | --- | --- | --- |
-| Calcular una regla de D&D en un widget | Leerla de `ComputedSheet` | El motor es la fuente de verdad; la UI que recalcula se desincroniza |
-| Recorrer `klass.features` desde la UI | Preguntar a `ComputedSheet.featureChoiceSlots` | Contrato explícito entre motor y app |
-| `IconData` desde un codepoint variable | Mapa `const` en `class_visuals.dart` | Rompe el tree-shaking de íconos |
-| Color hexadecimal literal en un widget | `context.palette` o `colorScheme` | El tema claro deja de funcionar |
-| `Colors.red` / `Colors.grey` | `colorScheme.error` / `onSurfaceVariant` | La paleta es el contrato |
+| Calcular una regla de D&D en un componente | Leerla de `computeSheet` | El motor es la fuente de verdad; la UI que recalcula se desincroniza |
+| Un hex suelto o un color de la paleta de Tailwind | Una variable de `index.css` o su utilidad (`bg-surface`) | El tema claro deja de funcionar; la paleta por defecto ni existe |
 | Sombra para separar superficies | Borde `hairline` de 1 px | El sistema es plano por decisión |
-| Widget visual nuevo dentro de una pestaña | Extraerlo a `theme/app_widgets.dart` si se repite | Es la biblioteca compartida |
-| `MediaQuery.of(context).size` para decidir layout | `LayoutBuilder` | El panel lateral resta 236 px que `MediaQuery` no sabe |
-| `elevation` > 0 en `Card` | `elevation: 0` + borde | Material 3 tiñe de oro las superficies elevadas |
-| Sumar un plugin nativo por comodidad | Verificar si se puede sin él | Obliga al Modo Desarrollador en toda máquina que compile |
-| Texto largo sin `maxLines` en el panel | `maxLines: 1` + `TextOverflow.ellipsis` | El panel mide 236 px fijos |
-| Un logo propio en una pantalla nueva, o el rombo como logo | `SidebarBrand` / `AppBarBrandTitle` | El sello es uno solo; un segundo emblema parte la marca |
+| Un cuarto nivel de fondo | `scaffold` → `surface` → `plaque` | La placa se hunde; nada se eleva |
+| Un componente visual nuevo dentro de una pantalla | Buscar en `src/ui/` y, si se repite, sumarlo ahí | Es la biblioteca compartida |
+| Medir la ventana para decidir layout | Grillas `auto-fill` / `minmax`, o el breakpoint `shell:` | El panel lateral resta 236 px que la ventana no sabe |
+| Texto largo sin recorte en el panel | Elipsis en una línea | El panel mide 236 px fijos |
+| Un logo propio en una pantalla nueva, o el rombo como logo | `Seal` | El sello es uno solo; un segundo emblema parte la marca |
 | Rojo o un d20 en una pieza de marca | El sello en `gold` | Es lo que usa toda la competencia, y el rojo es el de D&D |
-| Editar a mano los PNG de `web/` | `tool/generate_seal_icons.dart` | Un retoque a mano se pierde en la próxima regeneración |
 
 ---
 
 ## 13. Deuda conocida
 
-Cosas ciertas hoy, documentadas para que no se re-descubran:
-
-1. **Georgia no se empaqueta.** En sistemas sin la fuente, toda la capa display
-   cae al serif genérico y la métrica cambia. Empaquetarla tiene costo de
-   licencia y de peso; la alternativa sería una serif libre servida como asset.
-2. **La escala de espaciado no es sistemática.** Conviven 2, 3, 5, 6, 7, 11 y
-   13 con la escala canónica.
-3. **El nombre del logotipo no tiene letra propia.** «Milantus» va en Georgia,
-   que no es exclusiva y es la misma deuda del punto 1. El camino es un
-   lettering en versalitas sobre una serif libre empaquetada (no Cinzel: es la
-   de casi todo el contenido de fans de D&D).
-4. **El login no lleva la marca.** La pantalla de Zitadel es la genérica. Se
-   configura en la consola de Zitadel (logo, ícono y colores), no en este
-   repositorio.
-
-Tres deudas que esta lista traía y **ya están saldadas**, anotadas para que no
-se vuelvan a abrir: la marca vieja "Fichas / D&D 5e" del wizard de creación (hoy
-no queda ninguna aparición de "Fichas" en `lib/`), el `orientation:
-portrait-primary` del `manifest.json`, que hoy es `any`, y `onPrimary` sobre el
-oro del tema claro (3.42), que con blanco llega a 5.05.
+1. **Georgia no se descarga.** En sistemas sin la fuente, toda la capa display
+   cae al serif genérico y la métrica cambia. La alternativa sería una serif
+   libre servida como asset.
+2. **El nombre del logotipo no tiene letra propia.** «Milantus» va en Georgia,
+   que no es exclusiva. El camino es un lettering en versalitas sobre una serif
+   libre empaquetada (no Cinzel: es la de casi todo el contenido de fans de
+   D&D).
+3. **El favicon y el ícono de inicio son archivos fijos**: su generador se fue
+   con el cliente de Flutter. Si la marca cambia, se vuelven a dibujar.
 
 ---
 
-## Apéndice A — Tokens en JSON
-
-Para herramientas de diseño y generación asistida. Los nombres coinciden
-exactamente con los del código Dart.
-
-```json
-{
-  "$schema": "milantus.design-tokens.v1",
-  "brand": {
-    "name": "Milantus",
-    "subtitle": "Asistente de Aventuras",
-    "defaultTheme": "dark",
-    "seal": {
-      "canvas": 120,
-      "ring": { "radius": 53, "stroke": 5 },
-      "diamonds": { "centers": [[60, 7], [113, 60], [60, 113], [7, 60]], "halfDiagonal": 7, "cutStroke": 3 },
-      "m": { "points": [[37, 82], [37, 38], [60, 62], [83, 38], [83, 82]], "stroke": 9, "join": "miter", "cap": "square" },
-      "color": "gold",
-      "minLineSize": 24
-    }
-  },
-  "color": {
-    "dark": {
-      "scaffold": "#151210",
-      "surface": "#1E1915",
-      "onSurface": "#EFE7DA",
-      "onSurfaceVariant": "#A2937E",
-      "gold": "#C9A24B",
-      "crimson": "#D4665A",
-      "verdant": "#6FA85C",
-      "plaque": "#12100C",
-      "hairline": "#3A2F25",
-      "goldSoft": "#2E2617",
-      "textMuted": "#9C8B6E",
-      "onPrimary": "#201A10"
-    },
-    "light": {
-      "scaffold": "#F3ECDD",
-      "surface": "#FBF7EC",
-      "onSurface": "#2A2118",
-      "onSurfaceVariant": "#6E5F49",
-      "gold": "#8A6A1E",
-      "crimson": "#A6392E",
-      "plaque": "#EBE0C9",
-      "verdant": "#3E7A33",
-      "hairline": "#D9C9A8",
-      "goldSoft": "#EEE1BF",
-      "textMuted": "#6E6047",
-      "onPrimary": "#FFFFFF"
-    },
-    "classAccent": {
-      "fighter": "#B0413E", "barbarian": "#C0552B", "rogue": "#7D6B99",
-      "monk": "#2E86AB", "wizard": "#4A6FA5", "cleric": "#CBB26A",
-      "druid": "#4C8B3F", "bard": "#D98E48", "sorcerer": "#C13B5A",
-      "warlock": "#7E57C2", "paladin": "#C8A13A", "ranger": "#5B8C5A",
-      "artificer": "#B08D57"
-    }
-  },
-  "typography": {
-    "display": { "family": "Georgia", "fallback": "serif" },
-    "body": { "family": "Roboto", "fallback": "sans-serif" },
-    "numericFeature": "tnum",
-    "scale": {
-      "appBarTitle": 20, "brand": 18, "cardName": 18, "cardTitle": 16,
-      "abilityValue": 26, "statValue": 24, "statValueDense": 16,
-      "shieldValue": 20, "body": 14, "navItem": 14, "meta": 12.5,
-      "eyebrow": 11, "pill": 11, "statLabel": 10, "statLabelDense": 8.5
-    },
-    "letterSpacing": { "eyebrow": 1.6, "statLabel": 1.2, "tiny": 1.0 }
-  },
-  "radius": { "mark": 5, "input": 8, "nav": 9, "card": 12, "characterCard": 14, "pill": 20 },
-  "border": { "hairline": 1, "accent": 2, "shield": 1.5 },
-  "spacing": { "xs": 4, "sm": 8, "md": 12, "lg": 16, "xl": 20, "2xl": 24, "3xl": 32 },
-  "layout": {
-    "sidebarWidth": 236,
-    "pageMaxWidth": 760,
-    "shellBreakpoint": 900,
-    "sheetColumnsBreakpoint": 640,
-    "grid": { "cardBaseWidth": 420, "cardMaxExtent": 560, "spacing": 16, "maxScale": 1.3 }
-  },
-  "motion": { "hover": 120, "stateSwitch": 180 },
-  "elevation": {
-    "cardHover": { "color": "#00000046", "blur": 26, "offsetY": 10 }
-  }
-}
-```
-
 ## Apéndice B — Equivalencia en CSS
 
-**Para mockups y prototipos, y para `packages/dnd_web`.** El cliente de
-Flutter no usa CSS: estos valores existen para que una maqueta HTML se vea como
-el producto. El cliente React (`/v2`) sí los usa, tal cual, como variables CSS
-en `src/index.css`.
+Los tokens viven en `packages/dnd_web/src/index.css`, que es la fuente: este
+bloque los resume para una maqueta HTML que tenga que verse como el producto.
 
 ```css
 :root {
-  --scaffold: #151210;  --surface: #1E1915;
-  --on-surface: #EFE7DA; --on-surface-variant: #A2937E;
-  --gold: #C9A24B; --crimson: #D4665A; --plaque: #12100C;
-  --hairline: #3A2F25; --gold-soft: #2E2617; --text-muted: #9C8B6E;
-  --on-primary: #201A10;
+  --scaffold: #151210;  --surface: #1E1915;  --plaque: #12100C;
+  --on-surface: #EFE7DA; --on-surface-variant: #A2937E; --text-muted: #9C8B6E;
+  --gold: #C9A24B; --gold-soft: #2E2617; --crimson: #D4665A; --verdant: #6FA85C;
+  --hairline: #3A2F25; --on-primary: #201A10;
 
   --font-display: Georgia, 'Times New Roman', serif;
   --font-body: Roboto, system-ui, sans-serif;
 
   --radius-card: 12px; --radius-pill: 20px; --radius-nav: 9px; --radius-mark: 5px;
   --border-hairline: 1px solid var(--hairline);
-  --sidebar-width: 236px; --page-max-width: 760px;
+  --sidebar-width: 236px;
+  --shadow-card-hover: 0 10px 26px #00000046;
 }
 
 :root[data-theme="light"] {
-  --scaffold: #F3ECDD;  --surface: #FBF7EC;
-  --on-surface: #2A2118; --on-surface-variant: #6E5F49;
-  --gold: #8A6A1E; --crimson: #A6392E; --plaque: #EBE0C9;
-  --hairline: #D9C9A8; --gold-soft: #EEE1BF; --text-muted: #6E6047;
-  --on-primary: #FFFFFF;
+  --scaffold: #F3ECDD;  --surface: #FBF7EC;  --plaque: #EBE0C9;
+  --on-surface: #2A2118; --on-surface-variant: #6E5F49; --text-muted: #6E6047;
+  --gold: #8A6A1E; --gold-soft: #EEE1BF; --crimson: #A6392E; --verdant: #3E7A33;
+  --hairline: #D9C9A8; --on-primary: #FFFFFF;
 }
 
-.card { background: var(--surface); border: var(--border-hairline);
-        border-radius: var(--radius-card); box-shadow: none; }
+.card   { background: var(--surface); border: var(--border-hairline);
+          border-radius: var(--radius-card); }
 .plaque { background: var(--plaque); border: var(--border-hairline);
           border-radius: var(--radius-card); }
-.stat-value { font-family: var(--font-display); font-size: 24px;
-              line-height: 1; color: var(--gold); font-variant-numeric: tabular-nums; }
+.stat-value { font-family: var(--font-display); font-size: 24px; line-height: 1;
+              color: var(--gold); font-variant-numeric: tabular-nums; }
 .eyebrow { font-size: 11px; letter-spacing: 1.6px; font-weight: 500;
            text-transform: uppercase; color: var(--text-muted); }
-.pill { background: var(--gold-soft); border: var(--border-hairline);
-        border-radius: var(--radius-pill); padding: 2px 9px;
-        font-size: 11px; color: var(--gold); }
 ```
-
----
-
-## Referencias de código
-
-| Tema | Archivo |
-| --- | --- |
-| Tokens y `ThemeData` | `packages/dnd_app/lib/theme/app_theme.dart` |
-| Biblioteca de componentes | `packages/dnd_app/lib/theme/app_widgets.dart` |
-| Íconos y acentos de contenido | `packages/dnd_app/lib/theme/class_visuals.dart` |
-| Shell y grilla del dashboard | `packages/dnd_app/lib/ui/dashboard_screen.dart` + `ui/dashboard/` |
-| Shell y tarjetas de la ficha | `packages/dnd_app/lib/ui/sheet_screen.dart` + `ui/sheet/` |
-| Wizard de creación | `packages/dnd_app/lib/creation/` |
-| Subida de nivel | `packages/dnd_app/lib/levelup/` |
-| Shell HTML y PWA | `packages/dnd_app/web/index.html`, `web/manifest.json` |
-| El sello | `packages/dnd_app/lib/ui/app_sidebar.dart` (`_SealPainter`), `tool/generate_seal_icons.dart` |
-| Colores de clase | `packages/dnd_engine/lib/assets/srd_2024/classes.json` |
-
-Arquitectura general, comandos y criterios de contribución: `CLAUDE.md`.

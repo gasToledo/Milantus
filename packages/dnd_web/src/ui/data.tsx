@@ -305,7 +305,7 @@ export function ThinBar({
   );
 }
 
-/** El color de los PG según cuánto queda (`AppPalette.hpColor`): verde con
+/** El color de los PG según cuánto queda: verde con
  *  más de la mitad, oro hasta un cuarto, carmesí debajo. */
 export const HP_CRITICAL_RATIO = 0.25;
 export function hpTone(ratio: number): { bar: string; text: string } {

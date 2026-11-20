@@ -1,8 +1,8 @@
-# Recorrido visual de Milantus v2
+# Recorrido visual de Milantus
 
 [Volver al README](../README.md)
 
-Estas capturas recorren la interfaz web v2 con una campaña y personajes de ejemplo.
+Estas capturas recorren la interfaz web con una campaña y personajes de ejemplo.
 Cada sección sigue un flujo de uso. Abrí una imagen para verla en su tamaño original.
 
 - [Crear tu personaje](#crear-tu-personaje)

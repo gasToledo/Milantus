@@ -7,11 +7,11 @@
 # largo sobre por qué el arranque de Zitadel va partido), el volumen de retratos
 # y `cloudflared`.
 #
-# Ningún servicio publica puertos al host: `cloudflared` es el único punto de
-# salida hacia internet (un túnel saliente, no un puerto entrante) y llega al
-# resto por la red interna de Docker usando el nombre del servicio. La base de
-# datos y los retratos nunca son alcanzables desde fuera de esta red (ver
-# requisito "Publicación sin puertos entrantes").
+# Salvo el `5432` de `db`, ningún servicio publica puertos al host:
+# `cloudflared` es el único punto de salida hacia internet (un túnel saliente,
+# no un puerto entrante) y llega al resto por la red interna de Docker usando el
+# nombre del servicio. Los retratos nunca son alcanzables desde fuera de esta
+# red.
 #
 # Variables de entorno: copiar `.env.example` a `.env` y completarlo. Ninguna
 # credencial real vive en este archivo ni en las imágenes construidas (ver

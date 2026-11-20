@@ -1,5 +1,4 @@
-// El guardado de la ficha propia: la misma forma que `CharactersController` de
-// Flutter. Una espera corta junta los toques seguidos (tres «+Fallo» son un
+// El guardado de la ficha propia. Una espera corta junta los toques seguidos (tres «+Fallo» son un
 // solo PUT), una cola por personaje evita que un guardado viejo llegue después
 // de uno nuevo, y siempre se manda **la última** copia entera. Mandar el
 // estado y no la acción es lo que hace seguro reintentar: repetir un PUT no
@@ -8,16 +7,15 @@
 // Ya no gana el último: cada PUT lleva la versión que leyó y, si otra
 // pestaña o dispositivo guardó antes, el servidor responde 409. Entonces se
 // descarta lo pendiente de esa ficha y se avisa por `onStale` (la pantalla
-// vuelve a pedirla). Flutter no manda versión y sigue pisando, así que
-// `CharacterPage` además relee al volver a la pestaña, solo si no hay nada
-// pendiente.
+// vuelve a pedirla). `CharacterPage` además relee al volver a la pestaña,
+// solo si no hay nada pendiente, para no esperar al 409.
 import { useSyncExternalStore } from 'react';
 import type { CharacterJson } from '../engine';
 import { ApiError, saveCharacter } from './client';
 
 export type SaveState = 'saved' | 'saving' | 'error';
 
-/** La espera de Flutter (`CharactersController._debounce`). */
+/** Cuánto se esperan más toques antes de guardar. */
 const DEBOUNCE_MS = 400;
 
 interface Entry {

@@ -12,7 +12,8 @@
   }
 }
 
-/* Tokens de `docs/desarrollo/diseno-web.md` Apéndice B, tal cual: no se
+/* Los tokens del sistema: este archivo es la fuente, y
+   `docs/desarrollo/diseno-web.md` (§3 y Apéndice B) los documenta. No se
    inventan valores intermedios. El tema claro se activa con
    `data-theme="light"` en <html> (lo pone `src/theme/theme.tsx`, y antes del
    primer cuadro el script de `index.html`); por defecto es el oscuro.
@@ -34,8 +35,7 @@
   --on-surface-variant: #a2937e;
   --gold: #c9a24b;
   --crimson: #d4665a;
-  /* `verdant` no está en el Apéndice B pero sí en §3.1 (`AppPalette`): el
-     verde de «la salida esperada», y el de la barra de PG cuando sobran. */
+  /* El verde de «la salida esperada», y el de la barra de PG cuando sobran. */
   --verdant: #6fa85c;
   --plaque: #12100c;
   --hairline: #3a2f25;

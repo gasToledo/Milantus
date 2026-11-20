@@ -19,7 +19,7 @@
   &nbsp; · &nbsp; Español e inglés &nbsp; · &nbsp; Web &nbsp; · &nbsp; Autoalojamiento
 </p>
 
-[![Ficha de Ains Maguss en Milantus v2, con puntos de golpe, características, habilidades y rasgos](docs/assets/readme/v2/personaje-ficha.png)](docs/assets/readme/v2/personaje-ficha.png)
+[![Ficha de Ains Maguss en Milantus, con puntos de golpe, características, habilidades y rasgos](docs/assets/readme/v2/personaje-ficha.png)](docs/assets/readme/v2/personaje-ficha.png)
 
 *Capturas de la interfaz web v2 con personajes y una campaña de ejemplo. Abrí cada imagen para verla en detalle.*
 
@@ -97,7 +97,7 @@ propias, como Zynismus, el mosquete de Verloren Ausfall.
 
 [![Homebrew de Zynismus, con su historia, daño, alcance, maestría y propiedades](docs/assets/readme/v2/homebrew-zynismus.png)](docs/assets/readme/v2/homebrew-zynismus.png)
 
-**[Recorré Milantus v2 en imágenes →](docs/recorrido-visual.md)**  
+**[Recorré Milantus en imágenes →](docs/recorrido-visual.md)**  
 Creación, subida de nivel, inventario, Diario, campañas, PNJ, combate, música
 y catálogos, organizados por recorrido.
 
@@ -121,10 +121,6 @@ y catálogos, organizados por recorrido.
    Para dirigir, pasá al Modo DM y creá tu primera campaña.
 3. **Reuní a la mesa.** Desde la ficha, usá «Compartir» para generar un código.
    El DM lo agrega a su campaña desde «Sumar personaje».
-
-> Milantus abre la interfaz v2, la de las capturas de este README, en todas las
-> cuentas. Mientras dura la migración, la versión anterior sigue disponible desde
-> Ajustes, con «Usar la versión anterior». Consultá el [estado de la migración](docs/arquitectura/migracion-react.md).
 
 <p align="center">
   <a href="https://app.milantus.com.ar/"><strong>Abrir Milantus →</strong></a>

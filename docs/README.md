@@ -10,9 +10,9 @@ trabajar en el repositorio. Los detalles viven acá, una sola vez.
   campañas, capítulos, combate y PNJ.
 - [MCP](arquitectura/mcp.md): el conector de Claude, su autorización con
   Zitadel y sus herramientas.
-- [Migración a React](arquitectura/migracion-react.md): cómo el cliente
-  `packages/dnd_web` reemplazó al de Flutter, pantalla por pantalla, y las
-  decisiones de cada paso. Terminó el 2026-11-20.
+- [El cliente web](arquitectura/cliente-web.md): cómo `packages/dnd_web` usa
+  el motor compilado a JS, cómo carga el catálogo, cómo escribe y cómo se
+  prueba.
 - [dnd_engine](../packages/dnd_engine/README.md): motor de reglas, modelos y
   catálogo dirigido por datos.
 
@@ -20,8 +20,8 @@ trabajar en el repositorio. Los detalles viven acá, una sola vez.
 
 - [Contenido y reglas](desarrollo/contenido-y-reglas.md): fuentes válidas,
   precedencia, estructura del catálogo, generadores y verificaciones.
-- [Diseño web](desarrollo/diseno-web.md): lenguaje visual, componentes,
-  responsividad y accesibilidad.
+- [Diseño web](desarrollo/diseno-web.md): lenguaje visual, marca, color,
+  tipografía, layout, movimiento y accesibilidad.
 - [Diseño web en React](desarrollo/diseno-web-react.md): cómo se aplica ese
   lenguaje en `packages/dnd_web` y el catálogo de componentes de `src/ui/`.
 - [Textos de la interfaz](desarrollo/textos.md): voz, glosario de términos,

@@ -1,7 +1,7 @@
 /**
  * El sello de la marca (`diseno-web.md` §2, «La marca»): aro de radio 53 con
  * trazo 5, un rombo en cada punto cardinal y una M de esquinas vivas. Lienzo
- * de 120 × 120, el mismo del código de Flutter. El filete de los rombos es del
+ * de 120 × 120. El filete de los rombos es del
  * color del fondo sobre el que se dibuja (`--surface` en el panel) y corta el
  * aro en vez de apoyarse encima.
  */

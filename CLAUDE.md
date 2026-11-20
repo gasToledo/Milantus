@@ -75,7 +75,7 @@ El hook solo toca los `.dart` preparados, y a los preparados a medias no los
 formatea: los revisa y corta el commit. CI mira `lib bin test` en el servidor
 y todo el paquete en el engine (incluido `tool/`).
 
-`dnd_web` (el cliente web; su historia en `docs/arquitectura/migracion-react.md`)
+`dnd_web` (el cliente web, ver `docs/arquitectura/cliente-web.md`)
 necesita Node 22 y, para el motor, el SDK de Dart en el `PATH`. Es el orden
 exacto de CI:
 
@@ -171,7 +171,7 @@ La dirección es estricta: **el engine no depende del cliente ni del servidor**.
 (`packages/dnd_engine/js/entrypoint.dart`, vía `src/engine/index.ts`) y nunca
 tiene reglas propias. Una regla que falte se agrega al engine con su test, no
 en TypeScript. Reemplazó al cliente de Flutter, que se borró el 2026-11-20;
-la historia está en `docs/arquitectura/migracion-react.md`.
+cómo funciona por dentro está en `docs/arquitectura/cliente-web.md`.
 Los modelos y las reglas no usan `dart:io`. La única excepción de
 entrada/salida es `lib/src/data/content_pack_loader_io.dart`: carga catálogos
 desde un directorio y se importa condicionalmente. En el navegador, el
@@ -193,7 +193,7 @@ de escribir un `if` para un rasgo nuevo, fijate si se puede expresar como efecto
 ### La UI nunca recalcula una regla
 
 Todo número que se muestra sale de `ComputedSheet`. Si una pantalla necesita un
-cálculo que no está ahí, el cálculo va al engine con su test, no al widget.
+cálculo que no está ahí, el cálculo va al engine con su test, no al componente.
 
 ### `schemaVersion` es solo para documentos de usuario
 
@@ -290,8 +290,8 @@ nuevo se registra además en `PACKS` de `dnd_web/src/api/catalog.ts`.
 
 ## Frontend (`packages/dnd_web`)
 
-La guía visual es `docs/desarrollo/diseno-web.md` (nació con Flutter: sus
-tokens, en el Apéndice B, son los de `src/index.css`), y el catálogo de
+El lenguaje visual es `docs/desarrollo/diseno-web.md` (sus tokens son los de
+`src/index.css`), y el catálogo de
 componentes de `src/ui/` está en `docs/desarrollo/diseno-web-react.md`:
 **antes de crear un componente nuevo, buscá ahí**.
 
@@ -368,8 +368,10 @@ mismo cambio.
 
 - `docs/arquitectura/modo-dm.md` — seguridad y contratos del Modo DM.
 - `docs/arquitectura/mcp.md` — el conector de Claude: autorización y herramientas.
+- `docs/arquitectura/cliente-web.md` — el cliente: motor en JS, catálogo,
+  escrituras y pruebas.
 - `docs/desarrollo/contenido-y-reglas.md` — fuentes, catálogo y validación.
-- `docs/desarrollo/diseno-web.md` — sistema visual y componentes.
+- `docs/desarrollo/diseno-web.md` — lenguaje visual: color, tipografía, layout.
 - `docs/desarrollo/diseno-web-react.md` — el mismo sistema en `dnd_web` y su
   catálogo de componentes.
 - `docs/desarrollo/textos.md` — glosario y convenciones de los textos visibles,

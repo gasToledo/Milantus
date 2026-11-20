@@ -73,8 +73,8 @@ export function nameOf(list: JsonObject[], id: string | null | undefined): strin
 
 /** El acento de una clase viene del JSON del catálogo (`accentColor`), no del
  *  código: así el homebrew usa el mismo mecanismo (`diseno-web.md` §3.3). Es un
- *  dato y no un color de diseño. Un valor que no sea `#RRGGBB` se descarta
- *  (como `classAccent` de Flutter) y quien llama cae al oro. */
+ *  dato y no un color de diseño. Un valor que no sea `#RRGGBB` se descarta y
+ *  quien llama cae al oro. */
 export function accentOf(catalog: Catalog, classId: string): string | null {
   const hex = catalog.classes.find((c) => c.id === classId)?.accentColor;
   return typeof hex === 'string' && /^#[0-9a-fA-F]{6}$/.test(hex) ? hex : null;

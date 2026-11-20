@@ -2,7 +2,6 @@
 // mostrar nada: los de extensiones del navegador y el ruido de terceros no
 // tienen que aparecer en pantalla. `FeedbackDialog` los suma a un reporte de
 // tipo «Un error», así uno hecho desde el menú igual trae lo último que falló.
-// Es el gancho que usará el envío automático (ver `migracion-react.md`).
 
 import { reportError } from './reportError';
 

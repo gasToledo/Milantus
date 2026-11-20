@@ -97,7 +97,7 @@ El detalle técnico, cuando sirve, va en «Ver detalles» de `AppErrorView`.
 - En un diálogo o una lista chica dentro de un paso: `Sin coincidencias.`
 
 Nunca «Sin resultados». Y «no hay nada todavía» es otro estado, con otra
-acción: ver `AppEmptyState` en [Diseño web](diseno-web.md).
+acción: ver `AppEmptyState` en [Diseño web en React](diseno-web-react.md).
 
 ## Tipografía
 
@@ -204,7 +204,7 @@ cada rótulo tenga su inglés.
 Nada de lo que muestra la app. El catálogo tiene su inglés en los
 `X.en.json` (ver [Contenido y reglas](contenido-y-reglas.md) §Traducción al
 inglés); los avisos de validación, el diario, las recompensas y los errores
-sin contexto de interfaz (`api_client.dart`, `lib/data/*`) se arman con
+sin contexto de interfaz se arman con
 `localized(es, en)` en el idioma activo; los errores del servidor traen un
 `code` que el cliente traduce. El prompt de retratos va siempre en inglés,
 con cualquier idioma de interfaz.
@@ -215,6 +215,6 @@ combate y las líneas del diario escritas antes del cambio. Se traducen al
 mostrarlos, o quedan como se escribieron.
 
 El vocabulario del motor está en los dos idiomas: se lee con `label`
-(sigue a `ContentLanguage.current`) y nunca con un texto copiado en un widget.
+(sigue a `ContentLanguage.current`) y nunca con un texto copiado en un componente.
 Lo que una persona escribe —homebrew, notas, nombres— se muestra tal como se
 escribió, en cualquier idioma.

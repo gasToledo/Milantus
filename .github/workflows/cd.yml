@@ -96,8 +96,8 @@ jobs:
           docker compose up -d
 
       - name: Esperar a que el servicio quede saludable
-        # No hay puertos publicados al host (ver capacidad
-        # self-hosted-deployment), así que no se puede pedir /health por HTTP
+        # El servidor no publica su puerto al host (solo `db` publica el
+        # suyo), así que no se puede pedir /health por HTTP
         # desde afuera del contenedor. En vez de reimplementar ese chequeo,
         # se lee el resultado del healthcheck que docker-compose.yml ya
         # define sobre ese mismo endpoint.

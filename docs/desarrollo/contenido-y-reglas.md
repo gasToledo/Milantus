@@ -195,8 +195,8 @@ npm run build
 
 Si cambió un documento persistido, probar su round-trip, la migración desde la
 versión anterior y el rechazo de versiones futuras. Si cambió una experiencia
-web, agregar la prueba de widget correspondiente y verificarla en navegador
-cuando el riesgo lo justifique.
+web, verificarla en el navegador; una prueba de Playwright solo si cumple el
+listón de `CLAUDE.md` §Tests.
 
 Una prueba automatizada o un build no demuestran una conexión real a
 PostgreSQL, OIDC o servicios externos. Toda capa no ejecutada se declara como

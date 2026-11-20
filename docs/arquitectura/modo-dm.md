@@ -321,8 +321,8 @@ Todo lo que hace «rica» a una nota vive en el cliente y **no toca el servidor*
   itálica— y nada más; sus límites y la salida si hace falta más están en su
   `ponytail:`. Lo comparte con el trasfondo del Diario.
 - **Menciones.** `@Nombre` enlaza al personaje de la mesa o al PNJ de la
-  campaña con ese nombre, y tocarlo abre su ficha (`_Mention`, en
-  `ui/dm/notebook_view.dart`). Se resuelve por nombre exacto en el cliente; si
+  campaña con ese nombre, y tocarlo abre su ficha (`withMentions`, en
+  `packages/dnd_web/src/ui/mentions.tsx`). Se resuelve por nombre exacto en el cliente; si
   un jugador y un PNJ se llaman igual, gana el jugador.
 - **Registros de combate.** Los nombres de quienes pelearon se escriben con
   `@` solos cuando siguen en la campaña (`_mark`), así que enlazan igual que
@@ -449,10 +449,9 @@ escrito en el lugar donde alguien iría a buscar el control.
 planilla con una columna a la derecha de dos solapas:
 
 - **Del turno** — el perfil del monstruo que está jugando, con la iniciativa,
-  los PG y la CA arriba y debajo el mismo perfil que imprime el Bestiario. No
-  es una copia: las dos pantallas llaman a `creatureProfileBody`
-  (`theme/app_widgets.dart`), justamente para que una corrección de datos no
-  quede arreglada en una sola. Los PG de esa tira salen del **encuentro** y no
+  los PG y la CA arriba y debajo el perfil de la criatura, armado con las
+  mismas piezas que el Bestiario (`bestiary/CreatureProfile.tsx`), justamente
+  para que una corrección de datos no quede arreglada en una sola. Los PG de esa tira salen del **encuentro** y no
   del catálogo, porque bajan a golpes y el máximo del libro dejaría de ser
   cierto en el primer ataque.
 - **Efectos** — todas las anotaciones de la mesa en una sola lista, con de
@@ -487,9 +486,8 @@ calcula sobre lo que dejó su escritura anterior; el Bestiario, que no tiene el
 combate en memoria, lo lee (`GET`) recién cuando le toca el turno en la fila.
 Entre dos pestañas abiertas sigue ganando la última escritura, igual que antes.
 
-El buscador de criaturas también es uno solo (`filterCreatures`, en
-`bestiary_view.dart`): sin acentos ni mayúsculas en los dos lugares, y con el
-rango de VD y el orden solo en el Bestiario.
+El buscador de criaturas compara sin acentos ni mayúsculas (`fold`, en
+`codex/entries.ts`), con el rango de VD y el orden solo en el Bestiario.
 
 ### La dificultad del encuentro
 
@@ -656,7 +654,7 @@ deja **solo a los enemigos**, y un PNJ se nombra por su criatura de base
 («Bandido») o por nada, que la pantalla lee como «un enemigo». Un aliado con
 nombre propio que el grupo todavía no conoce no puede filtrarse por el
 historial de batallas. La poda está en el engine para que el servidor y
-`FakeApiServer` no puedan implementarla distinto.
+el conector MCP no puedan implementarla distinto.
 
 Terminar y guardar un combate acepta `deadNpcIds`: el servidor marca muertos,
 en la misma transacción que cierra el combate, solo a los que además estaban
@@ -735,8 +733,7 @@ El costo es que la campaña ya no es entera del jugador. La proyección de
 `GET /api/characters/<id>/campaigns` las poda dos veces: la consulta lee
 `c.document - 'musicScenes' - 'memberOrder' - 'npcOrder'` y el handler
 serializa con `Campaign.playerView()`. La prueba «las escenas de música y el
-orden de la Mesa y de los PNJ no viajan» lo fija, y `FakeApiServer` usa la
-misma función.
+orden de la Mesa y de los PNJ no viajan» lo fija.
 
 ### El orden de la Mesa
 
@@ -754,7 +751,7 @@ la cuenta (`npcOrder`, junto al `characterOrder` del dashboard), que nunca
 viajan a otra.
 
 Milantus no guarda audio: cada escena es un enlace de YouTube o YouTube Music,
-y suena el reproductor embebido de YouTube (`lib/web/music_embed*.dart`).
+y suena el reproductor embebido de YouTube (`dm/MusicPlayer.tsx`).
 El reproductor vive en la pantalla del Modo DM, no en una sección: cambiar de
 sección no lo desmonta y salir del Modo DM lo descarta, que es lo que corta la
 música. YouTube exige su reproductor a la vista, así que minimizarlo lo pausa.
