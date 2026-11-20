@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useMemo, useRef, useState, type ReactNode } from 'react';
 import * as Collapsible from '@radix-ui/react-collapsible';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Check, ChevronDown, History, Image as ImageIcon, Sparkles, Trash2, Upload, X } from 'lucide-react';
@@ -18,6 +18,7 @@ import type { Texts } from '../i18n/texts';
 import { Link } from '../router';
 import { AppDialog } from '../ui/AppDialog';
 import { cx } from '../ui/cx';
+import { staggerIndex } from '../ui/motion';
 import { Eyebrow, PLAQUE_BUTTON } from '../ui/data';
 import { Medallion } from '../ui/Medallion';
 import { portraitUrl, thumbnailUrl } from '../ui/portrait';
@@ -93,7 +94,7 @@ function ThumbStrip({
   return (
     <ul aria-label={label} className={cx('m-0 grid list-none grid-cols-4 gap-2 p-0', stagger && 'stagger-in')}>
       {items.map((item, i) => (
-        <li key={item.id} className="min-w-0" style={{ '--sibling-index': i + 1 } as CSSProperties}>
+        <li key={item.id} className="min-w-0" style={staggerIndex(i)}>
           <button
             type="button"
             aria-label={item.label}

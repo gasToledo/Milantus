@@ -4,7 +4,6 @@ import { ArrowLeft, ExternalLink, Menu, Monitor, Moon, Sun, X, type LucideIcon }
 import { useAccount } from '../api/queries';
 import { useTexts } from '../i18n/context';
 import { useAccountSave } from '../settings/useAccountSave';
-import { fadeNavigate } from './fadeNavigate';
 import { Link, useRoute } from '../router';
 import { useTheme, type ThemeMode } from '../theme/theme';
 import { cx } from './cx';
@@ -160,11 +159,7 @@ export function NavItem({
   disabled = false,
   accent = false,
   onSelect,
-  fadeTo,
 }: {
-  /** Navega con el fundido de pantalla (`fadeNavigate`); es el selector del
-   *  título del destino, que recibe el foco. Solo con `internal`. */
-  fadeTo?: string;
   href?: string;
   icon: LucideIcon;
   label: string;
@@ -231,12 +226,7 @@ export function NavItem({
     );
   }
   return internal ? (
-    <Link
-      href={href}
-      aria-current={active ? 'page' : undefined}
-      className={className}
-      onClick={fadeTo ? (e) => fadeNavigate(e, fadeTo) : undefined}
-    >
+    <Link href={href} aria-current={active ? 'page' : undefined} className={className}>
       {body}
     </Link>
   ) : (

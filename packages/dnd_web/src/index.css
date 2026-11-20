@@ -1,5 +1,17 @@
 @import 'tailwindcss';
 
+/* `motion-safe` de Tailwind solo mira `prefers-reduced-motion`. Ajustes apaga
+   las animaciones con `data-motion="reduce"` en la raíz, y el hundido al
+   apretar (`motion-safe:active:translate-y-px`) tiene que respetarlo igual
+   que el resto del CSS. */
+@custom-variant motion-safe {
+  @media (prefers-reduced-motion: no-preference) {
+    :root:not([data-motion='reduce']) & {
+      @slot;
+    }
+  }
+}
+
 /* Tokens de `docs/desarrollo/diseno-web.md` Apéndice B, tal cual: no se
    inventan valores intermedios. El tema claro se activa con
    `data-theme="light"` en <html> (lo pone `src/theme/theme.tsx`, y antes del
@@ -332,7 +344,7 @@ body {
 .page-fade [data-vt-clip] {
   view-transition-name: none !important;
 }
-/* Entre el dashboard y la ficha (`fadeNavigate`) la pantalla entera se funde:
+/* Entre el dashboard y la ficha (`withPageFade`) la pantalla entera se funde:
    la raíz recupera su nombre y las tarjetas lo pierden, para no aparecer ni
    desvanecerse aparte encima. */
 :root.page-fade {
@@ -360,19 +372,14 @@ body {
 }
 
 /* Los menús se abren desde su botón: Radix da la esquina que lo toca. Con
-   «reducir movimiento» solo aparecen, sin crecer. */
+   «reducir movimiento» la duración en cero los deja quietos. */
 .menu-pop {
   transform-origin: var(--radix-dropdown-menu-content-transform-origin);
 }
 .menu-pop[data-state='open'] {
-  animation: menu-fade 150ms ease-out;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .menu-pop[data-state='open'] {
-    animation:
-      menu-grow 150ms ease-out,
-      menu-fade 150ms ease-out;
-  }
+  animation:
+    menu-grow 150ms ease-out,
+    menu-fade 150ms ease-out;
 }
 @keyframes menu-grow {
   from {
@@ -628,15 +635,11 @@ body {
     opacity 200ms ease-out;
 }
 /* Un golpe o una cura marcan la cifra de PG (`LedgerRow`): crece apenas y
-   vuelve, en rojo o en verde. Sin movimiento, solo el color. */
+   vuelve, en rojo o en verde. Con «reducir movimiento» la duración en cero
+   la deja quieta: el tinte de color sin escala no llegaba a verse. */
 @keyframes hp-pulse {
   from {
     scale: 1.25;
-    color: var(--hp-pulse);
-  }
-}
-@keyframes hp-tint {
-  from {
     color: var(--hp-pulse);
   }
 }
@@ -654,14 +657,7 @@ body {
 .hp-pulse-down,
 .hp-pulse-up,
 .change-pulse {
-  animation: hp-tint 600ms ease-out;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .hp-pulse-down,
-  .hp-pulse-up,
-  .change-pulse {
-    animation: hp-pulse 360ms ease-out;
-  }
+  animation: hp-pulse 360ms ease-out;
 }
 
 /* El tramo de los PG temporales en una barra de PG: rayado en dorado y no
@@ -991,7 +987,7 @@ body {
    cae girando hasta su 45°, el número late, un anillo dorado se abre y lo que
    cambió entra de a uno (`.lv-up`, con su retraso en línea). Con «reducir
    movimiento» todo aparece quieto: la regla general apaga las duraciones y
-   acá también los retrasos. */
+   los retrasos. */
 .lv-scrim {
   animation: menu-fade 220ms ease-out both;
 }
@@ -1018,18 +1014,6 @@ body {
 }
 .cr-ring {
   animation: cr-ring 800ms 520ms ease-out both;
-}
-@media (prefers-reduced-motion: reduce) {
-  .lv-scrim,
-  .lv-card,
-  .lv-rombo,
-  .lv-ring,
-  .lv-num,
-  .lv-up,
-  .cr-med,
-  .cr-ring {
-    animation-delay: 0s !important;
-  }
 }
 @keyframes cr-med {
   0% {
@@ -1139,7 +1123,7 @@ body {
    resplandor dorado late desde el centro, la estrella entra girando y las
    chispas salen hacia afuera; después el texto y por último los botones. */
 .ih-veil {
-  animation: ih-veil 300ms ease-out both;
+  animation: menu-fade 300ms ease-out both;
 }
 .ih-glow {
   animation:
@@ -1166,11 +1150,6 @@ body {
 }
 .ih-rise {
   animation: ih-rise 360ms ease-out both;
-}
-@keyframes ih-veil {
-  from {
-    opacity: 0;
-  }
 }
 @keyframes ih-glow {
   0% {
@@ -1289,32 +1268,14 @@ body {
   }
 }
 
-/* Con las animaciones apagadas (sistema o Ajustes) todo aparece de una vez:
-   sin chispas, sin latido y sin barra, y sin retrasos que dejen algo oculto. */
+/* Chispas y la barra de la tostada no se congelan: se ocultan. Con la
+   duración en cero igual se verían un cuadro (la chispa en el centro, la
+   barra llena). Los retrasos los apaga la regla general. */
 @media (prefers-reduced-motion: reduce) {
-  .ih-veil,
-  .ih-glow,
-  .ih-star,
-  .ih-ring,
-  .ih-rise,
-  .ob-chest,
-  .ob-lid,
-  .ob-shine,
-  .notice-in {
-    animation-delay: 0s !important;
-    animation-iteration-count: 1 !important;
-  }
   .ih-spark,
   .toast-bar {
     display: none;
   }
-}
-:root[data-motion='reduce'] .ih-glow,
-:root[data-motion='reduce'] .ih-star,
-:root[data-motion='reduce'] .ih-ring,
-:root[data-motion='reduce'] .ih-rise,
-:root[data-motion='reduce'] .ob-lid {
-  animation-iteration-count: 1 !important;
 }
 :root[data-motion='reduce'] .ih-spark,
 :root[data-motion='reduce'] .toast-bar {
@@ -1379,13 +1340,15 @@ body {
   }
 }
 
-/* Toda duración se apaga si el sistema pide menos movimiento: lo animado
-   nunca lleva información que no esté ya en su valor final. */
+/* Toda duración y todo retraso se apagan si el sistema pide menos
+   movimiento: lo animado nunca lleva información que no esté ya en su valor
+   final, y un retraso con duración cero dejaría algo oculto un instante. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0s !important;
+    animation-delay: 0s !important;
     transition-duration: 0s !important;
   }
   .roster-card:hover,
@@ -1404,10 +1367,10 @@ body {
 }
 
 /* Lo mismo cuando se apagan las animaciones en Ajustes (`data-motion` en la
-   raíz, de este navegador). Además de las duraciones apaga los retrasos y
-   las animaciones atadas al scroll, que no tienen duración: con la regla del
-   sistema esos casos ya estaban fuera de `prefers-reduced-motion:
-   no-preference`, y acá no hay media query que los deje afuera. */
+   raíz). Además de las duraciones y los retrasos (que la regla del sistema
+   también apaga) anula las animaciones atadas al scroll, que no tienen
+   duración: viven dentro de `prefers-reduced-motion: no-preference` y acá no
+   hay media query que las deje afuera. */
 :root[data-motion='reduce'] *,
 :root[data-motion='reduce'] *::before,
 :root[data-motion='reduce'] *::after {
@@ -1416,6 +1379,9 @@ body {
   animation-timeline: auto !important;
   transition-duration: 0s !important;
 }
+/* El levantado de `.roster-card` y el hundido de `.pick` no son utilidades
+   `motion-safe`. La duración en cero solo quita la transición: sin anular el
+   desplazamiento, saltan igual con las animaciones apagadas en Ajustes. */
 :root[data-motion='reduce'] .roster-card:hover,
 :root[data-motion='reduce'] .roster-card:focus-within {
   translate: 0;

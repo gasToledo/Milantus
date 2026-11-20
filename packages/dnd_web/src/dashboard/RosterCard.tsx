@@ -1,7 +1,6 @@
 import { Download, EllipsisVertical, Pencil, RotateCcw, Star, Trash2 } from 'lucide-react';
 import { useTexts } from '../i18n/context';
 import { characterHref, Link } from '../router';
-import { fadeNavigate } from '../ui/fadeNavigate';
 import { signed } from '../sheet/format';
 import { HP_CRITICAL_RATIO, hpTone, StatPlaque, ThinBar } from '../ui/data';
 import { Medallion } from '../ui/Medallion';
@@ -98,7 +97,6 @@ export function RosterCard({
             )}
             <Link
               href={characterHref(character.id)}
-              onClick={(e) => fadeNavigate(e, '[data-sheet-title]')}
               draggable={false}
               className={`truncate after:absolute after:inset-0 after:rounded-[var(--radius-card)] after:content-[''] ${
                 fallen ? 'text-on-surface-variant' : 'text-on-surface'

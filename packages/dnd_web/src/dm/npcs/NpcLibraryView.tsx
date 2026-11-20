@@ -11,7 +11,6 @@ import { useLang, useTexts } from '../../i18n/context';
 import { dmNpcsHref, Link } from '../../router';
 import { Button } from '../../ui/Button';
 import { cx } from '../../ui/cx';
-import { fadeNavigate } from '../../ui/fadeNavigate';
 import { useListTransition } from '../../ui/listTransition';
 import { Toast } from '../../ui/primitives';
 import { Medallion } from '../../ui/Medallion';
@@ -363,7 +362,6 @@ function NpcCard({
       <Link
         href={dmNpcsHref(npc.id)}
         draggable={false}
-        onClick={(e) => fadeNavigate(e, '[data-npc-title]')}
         className="flex h-full min-h-[150px] flex-col gap-2.5 rounded-[inherit] p-3.5"
       >
         <span className="flex items-center gap-3">

@@ -25,7 +25,7 @@ import { useAppVersion, useSheetCatalog } from '../api/queries';
 import { abilityModifier } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import { codexHref, Link, navigate, navigateBack, rosterHref, SHEET_TABS, type CodexCategory } from '../router';
-import { fadeNavigate } from '../ui/fadeNavigate';
+import { backClick } from '../ui/backClick';
 import { signed } from '../sheet/format';
 import { HigherLevelNote } from '../sheet/HigherLevelNote';
 import { SheetFooter, TAB_ICONS, tabLabel } from '../sheet/SheetPanel';
@@ -119,7 +119,7 @@ export function CodexPage({ category, entryId }: { category: CodexCategory | nul
       panel={
         <>
           {/* Vuelve a Personajes con el mismo fundido con que se entró. */}
-          <SidebarBack href={rosterHref()} onClick={(e) => fadeNavigate(e, '[data-page-title]', () => navigateBack(rosterHref()))} />
+          <SidebarBack href={rosterHref()} onClick={(e) => backClick(e, () => navigateBack(rosterHref()))} />
           <div role="search" className="relative">
             <label htmlFor="codex-search" className="sr-only">
               {t.codexSearchAll}

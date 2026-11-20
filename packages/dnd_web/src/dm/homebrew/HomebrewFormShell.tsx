@@ -148,7 +148,7 @@ export function HomebrewFormShell({
       <header className="flex flex-col gap-1">
         {kicker && <Eyebrow>{kicker}</Eyebrow>}
         {/* `tabIndex` y la marca: el foco viene acá al cambiar de sección
-            (`fadeNavigate`), igual que en `DmHeader`. */}
+            (`withPageFade`), igual que en `DmHeader`. */}
         <h1 data-dm-title tabIndex={-1} className="font-display text-[28px] leading-tight font-normal break-words text-on-surface outline-none">
           {title}
         </h1>

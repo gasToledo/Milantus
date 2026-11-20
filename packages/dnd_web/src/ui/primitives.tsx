@@ -280,6 +280,7 @@ export type ToastTone = 'info' | 'success' | 'error';
 const TOAST_ICON = { info: Info, success: CircleCheck, error: CircleAlert } as const;
 /** El tono del ícono de un aviso de la cola: `muted` para lo que solo informa. */
 export const ICON_TONE = { gold: 'text-gold', verdant: 'text-verdant', muted: 'text-on-surface-variant' } as const;
+export type IconTone = keyof typeof ICON_TONE;
 const TOAST_COLOR = { info: 'text-gold', success: 'text-verdant', error: 'text-crimson' } as const;
 /** Las duraciones de `showAppMessage`: el error se lee con más calma. Todas se
  *  cierran solas, pero ninguna sin X: el aviso se puede descartar antes. */
@@ -320,7 +321,7 @@ export function Toast({
   /** El ícono de lo que pasó, en un cuadro de 30 px: reemplaza al del tono
    *  (los avisos de la cola, `events/messages.ts`). */
   icon?: LucideIcon;
-  iconTone?: 'gold' | 'verdant' | 'muted';
+  iconTone?: IconTone;
   /** Una barra al pie que se vacía en lo que dura el aviso; con el puntero
    *  encima se frena, igual que el cierre. Sin animaciones no se dibuja. */
   progress?: boolean;

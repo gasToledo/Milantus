@@ -8,10 +8,6 @@ import { FeedbackDialog } from '../ui/feedback';
 import { showNotice } from '../ui/notices';
 import { ModeSwitch, NavGroup, NavItem, ThemeMenu, VersionLabel } from '../ui/Shell';
 
-/** El título de cada pantalla del modo Jugador: cambiar de sección funde la
- *  pantalla y deja el foco ahí, como el panel del Modo DM (`fadeNavigate`). */
-const PAGE_TITLE = '[data-page-title]';
-
 /**
  * El menú principal del Modo Jugador (`AppSidebar`): interruptor de modo y la
  * navegación. El Homebrew es herramienta del Modo DM y no está acá.
@@ -23,13 +19,13 @@ export function RosterPanel({ current }: { current?: 'roster' | 'quiz' }) {
       <ModeSwitch mode="player" playerHref={rosterHref()} dmHref={dmHref()} />
       <NavGroup label={t.navLabel}>
         <li>
-          <NavItem href={rosterHref()} icon={Users} label={t.navCharacters} active={current === 'roster'} fadeTo={PAGE_TITLE} internal />
+          <NavItem href={rosterHref()} icon={Users} label={t.navCharacters} active={current === 'roster'} internal />
         </li>
         <li>
-          <NavItem href={quizHref()} icon={GraduationCap} label={t.navQuiz} active={current === 'quiz'} fadeTo={PAGE_TITLE} internal />
+          <NavItem href={quizHref()} icon={GraduationCap} label={t.navQuiz} active={current === 'quiz'} internal />
         </li>
         <li>
-          <NavItem href={codexHref()} icon={BookOpen} label={t.navCodex} fadeTo={PAGE_TITLE} internal />
+          <NavItem href={codexHref()} icon={BookOpen} label={t.navCodex} internal />
         </li>
       </NavGroup>
     </>
@@ -65,7 +61,7 @@ export function RosterFooter({ account, current, dm = false }: { account: Accoun
     <div className="flex flex-col gap-1">
       <ul className="flex flex-col gap-0.5">
         <li>
-          <NavItem href={settingsHref(dm)} icon={Settings} label={t.settings} active={current === 'settings'} fadeTo={PAGE_TITLE} internal />
+          <NavItem href={settingsHref(dm)} icon={Settings} label={t.settings} active={current === 'settings'} internal />
         </li>
         <li>
           <NavItem icon={MessageSquare} label={t.feedback} onSelect={() => setReporting(true)} />

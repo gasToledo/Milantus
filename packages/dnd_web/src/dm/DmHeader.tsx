@@ -15,7 +15,7 @@ export function DmHeader({ title, kicker, actions, below }: { title: string; kic
     <>
       <header className="flex flex-wrap items-center gap-x-3 gap-y-2">
         {/* `tabIndex` y la marca: el foco viene acá al cambiar de campaña o de
-            sección (`fadeNavigate`) y cuando lo que lo tenía desaparece. */}
+            sección (`withPageFade`) y cuando lo que lo tenía desaparece. */}
         <h1
           data-dm-title
           tabIndex={-1}

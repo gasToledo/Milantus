@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { BookOpen, Check, LogOut, RotateCcw, ScrollText, Shield, Sparkles, Swords, User, X, type LucideIcon } from 'lucide-react';
 import { useRoster, useSheetCatalog } from '../api/queries';
 import { quizLocalize, quizRound, type Catalog, type CharacterJson, type QuizQuestion } from '../engine';
@@ -13,6 +13,7 @@ import { cx } from '../ui/cx';
 import { Medallion } from '../ui/Medallion';
 import { ownPortrait } from '../ui/portrait';
 import { AppBusyLabel, AppErrorView, Notice } from '../ui/status';
+import { staggerIndex } from '../ui/motion';
 import { TutorialGate } from '../ui/tutorials';
 
 /** El id de la ronda de reglas generales en la URL (`/v2/quiz/reglas`). */
@@ -413,11 +414,6 @@ function Segments({
     </div>
   );
 }
-
-/** El lugar de un hijo de `.stagger-in`, que retrasa su entrada según él.
- *  `sibling-index()` lo diría solo, pero recién es Baseline desde 2026-08 y acá
- *  React ya sabe el índice. */
-const staggerIndex = (i: number) => ({ '--sibling-index': i + 1 }) as CSSProperties;
 
 /** Los mismos resultados en puntos, para el aviso de abandonar. */
 function Dots({ results }: { results: Outcome[] }) {

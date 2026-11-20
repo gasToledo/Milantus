@@ -18,7 +18,6 @@ import {
 } from '../router';
 import { Button, ButtonLink } from '../ui/Button';
 import { cx } from '../ui/cx';
-import { fadeNavigate } from '../ui/fadeNavigate';
 import { showNotice } from '../ui/notices';
 import { Tooltip } from '../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
@@ -249,9 +248,6 @@ export function HomebrewView({ category, entryId }: { category: HomebrewCategory
   return <Home own={own} total={total} headerWith={headerWith} />;
 }
 
-/** El título de cada pantalla del Modo DM: adonde va el foco tras el fundido. */
-const DM_TITLE = '[data-dm-title]';
-
 function BackToHome() {
   const t = useTexts();
   return (
@@ -260,7 +256,6 @@ function BackToHome() {
     // entrar. Con el mismo fundido con que se entró a la categoría.
     <Link
       href={dmHomebrewHref()}
-      onClick={(e) => fadeNavigate(e, DM_TITLE)}
       className="inline-flex items-center gap-1.5 self-start text-[13px] text-on-surface-variant transition-colors duration-[120ms] ease-out hover:text-gold"
     >
       <ArrowLeft size={16} aria-hidden="true" className="text-gold" />
@@ -355,7 +350,6 @@ function Home({
                   categoría funde la pantalla, como cambiar de sección. */}
               <Link
                 href={dmHomebrewHref(c)}
-                onClick={(e) => fadeNavigate(e, DM_TITLE)}
                 className="card block px-4 py-[15px] transition duration-[120ms] ease-out hover:border-gold motion-safe:active:translate-y-px"
                 data-category={c}
               >
