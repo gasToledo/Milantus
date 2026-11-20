@@ -19,8 +19,8 @@ interface Beast {
 }
 
 /**
- * Las formas anotadas de Forma Salvaje (`_editWildShapeForms` de Flutter, con
- * el circuito de los asistentes y la ruta propia de `MagicItemPlans`). Se
+ * Las formas anotadas de Forma Salvaje (el circuito de los asistentes y la
+ * ruta propia de `MagicItemPlans`). Se
  * guarda al tocar: anotar o sacar una forma es la acción `setWildShapeForm`, y
  * no lleva «Deshacer» porque se revierte tocando de nuevo. Cuántas formas y de
  * qué bestias lo dice el motor (`sheet.wildShape`); acá no hay regla.

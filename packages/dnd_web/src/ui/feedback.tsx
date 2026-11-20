@@ -18,7 +18,7 @@ type Kind = 'idea' | 'bug';
 const MAX_CHARS = 5000;
 
 /**
- * «Sugerencias y errores» (`showFeedbackDialog` de Flutter). Quien lo abre lo
+ * «Sugerencias y errores». Quien lo abre lo
  * monta y lo desmonta con [onClose]: así cada apertura arranca limpia.
  *
  * Si el envío falla, el diálogo **queda abierto con el texto intacto**: perder

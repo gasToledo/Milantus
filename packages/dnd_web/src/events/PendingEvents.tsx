@@ -17,8 +17,8 @@ type Notice = EventMessage & { id: string; hasGrants?: boolean };
 type Active = { kind: 'screen' | 'toast'; notice: Notice } | { kind: 'tray'; notices: Notice[] };
 
 /**
- * Pide los avisos pendientes de la cuenta y los muestra (`PendingEventsGate` de
- * Flutter). Son una cola durable de «esto pasó mientras no mirabas»; el turno
+ * Pide los avisos pendientes de la cuenta y los muestra. Son una cola durable
+ * de «esto pasó mientras no mirabas»; el turno
  * es lo otro, y por eso no viaja por acá (`useTurnStatus`).
  *
  * Cada aviso toma la forma que le toca (`display`): el fin de capítulo, la
@@ -30,7 +30,7 @@ type Active = { kind: 'screen' | 'toast'; notice: Notice } | { kind: 'tray'; not
  * subrutas de la ficha no cuentan), al volver a la pestaña y **cada 30 s con la
  * página visible**. El timer es decisión del usuario (2026-11-04): el jugador
  * deja la ficha abierta en la mesa, y sin él el aviso de un capítulo cerrado o
- * de un combate terminado no le llega hasta que navegue. Flutter no lo tiene.
+ * de un combate terminado no le llega hasta que navegue.
  *
  * Un fallo al pedirlos o al marcarlos se traga en silencio, por dos motivos:
  * no poder mostrar un aviso no es razón para interrumpir lo que la persona vino

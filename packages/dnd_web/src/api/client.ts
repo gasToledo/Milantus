@@ -71,10 +71,10 @@ export async function fetchRoster(signal: AbortSignal): Promise<StoredCharacter[
 }
 
 /**
- * Guarda una ficha propia entera (`PUT /api/characters/:id`), como
- * `upsertCharacter` de Flutter. [character] es siempre lo que devolvió el
- * motor (`actOn`), nunca un documento armado acá; el servidor lo vuelve a
- * leer con `Character.fromJson`, que rechaza una versión futura.
+ * Guarda una ficha propia entera (`PUT /api/characters/:id`). [character] es
+ * siempre lo que devolvió el motor (`actOn`), nunca un documento armado acá; el
+ * servidor lo vuelve a leer con `Character.fromJson`, que rechaza una versión
+ * futura.
  */
 export async function saveCharacter(
   character: CharacterJson & { id: string },
@@ -133,8 +133,9 @@ export async function createCharacter(character: CharacterJson & { id: string })
   return ((await response.json()) as { character: { id: string } }).character.id;
 }
 
-/** Lo que el dashboard lee de los ajustes de la cuenta (`AppSettings` en
- *  Flutter). Crudo: `sortMode` es el nombre del modo tal como se guardó. */
+/** Lo que el dashboard lee de los ajustes de la cuenta. Crudo: `sortMode`
+ *  es el nombre del modo tal como se guardó, también el de la versión
+ *  anterior. */
 export interface RosterSettings {
   sortMode: string;
   favoriteCharacterId: string | null;
@@ -386,7 +387,7 @@ async function sendJson(method: 'POST' | 'PUT' | 'DELETE', path: string, body: u
  *  que navegar: el cierre de sesión del proveedor, o `null` si el servidor no
  *  lo pudo calcular (la sesión local igual quedó cerrada). Sin ese segundo salto
  *  la cookie del proveedor sigue viva y el próximo ingreso entra sin pedir
- *  contraseña (`ApiClient.logout` de Flutter). */
+ *  contraseña. */
 export async function logout(): Promise<string | null> {
   const path = '/auth/logout';
   const response = await fetch(path, { method: 'POST' });
@@ -496,8 +497,8 @@ export interface DmNotebook {
   levelUps: DmLevelUp[];
 }
 
-/** El Cuaderno entero de la campaña en un solo pedido, como en Flutter: las
- *  notas, los combates y las subidas de nivel se intercalan por capítulo. */
+/** El Cuaderno entero de la campaña en un solo pedido: las notas, los
+ *  combates y las subidas de nivel se intercalan por capítulo. */
 export async function fetchCampaignNotebook(campaignId: string, signal: AbortSignal): Promise<DmNotebook> {
   return getJson<DmNotebook>(`/api/campaigns/${encodeURIComponent(campaignId)}/notebook`, signal);
 }

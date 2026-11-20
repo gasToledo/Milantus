@@ -1,8 +1,7 @@
 // La frase de un efecto. El motor resuelve qué es cada efecto y nombra lo que
 // menciona (`effectParts`: la habilidad, el conjuro o la dote por su nombre, o
 // el id crudo si ya no existe); acá solo se arma la frase con los textos de
-// este cliente. Es la traducción literal de `describeEffect` de Flutter, y los
-// dos tienen que moverse juntos.
+// este cliente.
 import type { EffectParts } from '../engine';
 import type { Texts } from '../i18n/texts';
 

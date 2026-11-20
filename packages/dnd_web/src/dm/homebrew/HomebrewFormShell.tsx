@@ -25,7 +25,7 @@ export function EntryPreview({ subtitle, name, detail, note }: { subtitle: strin
   );
 }
 
-/** Lo que se explica al tocar un campo (`_Explained` de Flutter): el rótulo
+/** Lo que se explica al tocar un campo: el rótulo
  *  chico, el valor tocado, la regla y, si hay, lo que vale para todo el grupo. */
 export type Explained = { kicker: string; title: string; text: string; note?: string | null };
 
@@ -59,8 +59,8 @@ function ExplainPlaque({ explained, large }: { explained: Explained; large?: boo
 }
 
 /**
- * La explicación debajo de la sección del campo tocado (`explainHere` de
- * Flutter), para donde la vista previa vive en un diálogo: se oculta desde
+ * La explicación debajo de la sección del campo tocado, para donde la vista
+ * previa vive en un diálogo: se oculta desde
  * `lg` con CSS, que es donde el armazón la muestra al costado. [always] la deja
  * a todos los anchos (`CreatureForm`, que no usa el armazón). Sin
  * [explanation] no dibuja nada.

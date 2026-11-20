@@ -41,14 +41,14 @@ type Focus = { kind: 'class' | 'subclass' | 'feat' | 'feature' | 'option' | 'spe
 
 
 /**
- * El asistente de subida de nivel de la ficha propia (`LevelUpScreen` de
- * Flutter, con el circuito rediseñado: una sola forma de elegir, un contador
- * por bloque y a la derecha qué es lo elegido y cómo queda la ficha).
+ * El asistente de subida de nivel de la ficha propia: una sola forma de
+ * elegir, un contador por bloque y a la derecha qué es lo elegido y cómo queda
+ * la ficha.
  *
  * Toda regla es del motor (`levelUpView`, sobre `LevelUp`): acá solo se juntan
  * las decisiones en un borrador. Confirmar es la acción `levelUp`, que el
- * motor rechaza si la subida está incompleta. Los conjuros todavía se eligen
- * en Flutter: si esta subida los pide, el resumen lo dice y manda allá.
+ * motor rechaza si la subida está incompleta. Los conjuros de la clase, si esta
+ * subida los pide, se eligen en su paso.
  */
 export function LevelUpWizard({ model, write }: { model: SheetModel; write: SheetWriter }) {
   const t = useTexts();
@@ -80,8 +80,7 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
   );
   const view = useMemo(() => levelUpView(raw, catalog, fullDraft), [raw, catalog, fullDraft]);
   // Qué cupos pone delante esta subida se decide sin lo elegido en ella: si
-  // no, un cupo resuelto desaparecería (y su paso con él) a mitad de camino,
-  // como pasaba en Flutter antes de `_shownSteps`.
+  // no, un cupo resuelto desaparecería (y su paso con él) a mitad de camino.
   const base = useMemo(
     () =>
       levelUpView(raw, catalog, {
@@ -113,11 +112,11 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
     'pg',
     ...(view.needsSubclass ? (['subclase'] as const) : []),
     ...(view.isAsi ? (['mejora'] as const) : []),
-    // Después de la mejora, como en Flutter: una dote recién elegida puede
+    // Después de la mejora: una dote recién elegida puede
     // sumar cupos, y la Pericia mira competencias que esa dote puede dar.
     ...(featureSlots.length > 0 ? (['elecciones'] as const) : []),
     ...(proficiencySlots.length > 0 ? (['competencias'] as const) : []),
-    // Los conjuros al final, como en Flutter: el editor esconde lo que ya está
+    // Los conjuros al final: el editor esconde lo que ya está
     // siempre preparado, y lo elegido en un rasgo entra en esa lista.
     ...(spellSlots.length > 0 ? (['conjurosRasgo'] as const) : []),
     ...(view.classSpells ? (['conjuros'] as const) : []),
@@ -150,7 +149,7 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
         return null;
     }
   };
-  // Se llega a un paso si los de antes están completos, como en Flutter.
+  // Se llega a un paso si los de antes están completos.
   const reachable = (i: number) => steps.slice(0, i).every((s) => pendingOf(s) === null);
   const pending = pendingOf(current);
 
@@ -382,8 +381,8 @@ export function LevelUpWizard({ model, write }: { model: SheetModel; write: Shee
             note={cs.grantedSpells.length > 0 ? t.luGrantedNote(cs.grantedSpells.join(', ')) : undefined}
             options={cs.spells}
             chosen={cs.chosenSpells}
-            // Un lanzador que prepara tiene tope; el que conoce, no (como en
-            // Flutter): lo que falta lo cuenta el motor.
+            // Un lanzador que prepara tiene tope; el que conoce, no: lo que
+            // falta lo cuenta el motor.
             cap={cs.prepared ? cs.preparedCount : null}
             ready={view.open.classSpells === 0}
             t={t}
@@ -939,7 +938,7 @@ function Celebration({
   );
 }
 
-/** Un cupo de elección de rasgo (`_FeatureChoiceGroup` de Flutter). Lo que
+/** Un cupo de elección de rasgo. Lo que
  *  el personaje ya traía en un cupo que no se revisa queda fijo: lo elegido
  *  en esta subida, no. Con un solo lugar, tocar otra opción la cambia. */
 function FeatureSlotBlock({

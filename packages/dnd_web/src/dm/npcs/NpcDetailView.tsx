@@ -32,8 +32,8 @@ import { NpcSpeechDialog, NpcTagDialog } from './NpcTextDialogs';
 import { useNpcWriter } from './npcWriter';
 import { PickManyDialog } from './PickManyDialog';
 
-/** Cuántas acciones del bloque se ven en la tarjeta, como en Flutter: el perfil
- *  entero es del editor de bloques. */
+/** Cuántas acciones del bloque se ven en la tarjeta: el perfil entero es del
+ *  editor de bloques. */
 const BLOCK_ACTIONS = 4;
 
 const ICON_BUTTON = 'inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-nav)] text-text-muted hover:text-gold';
@@ -459,8 +459,8 @@ function Stats({ view }: { view: NpcView }) {
   return (
     <section className={cx('card px-4 pt-3 pb-4', sheet && 'relative hover:border-gold')} data-card="stats">
       <h2 className="font-display text-[17px] text-on-surface">
-        {/* Como en Flutter, la tarjeta entera abre la ficha completa. Una que
-            el motor no pudo leer no lleva a ningún lado. */}
+        {/* La tarjeta entera abre la ficha completa. Una que el motor no pudo
+            leer no lleva a ningún lado. */}
         {sheet ? (
           <Link
             href={dmNpcSheetHref(view.npc.id)}

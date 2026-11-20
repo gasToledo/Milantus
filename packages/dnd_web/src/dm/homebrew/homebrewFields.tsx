@@ -11,7 +11,7 @@ import { FilterPill } from '../npcs/NpcLibraryView';
 // de reglas: qué es un error y cuántas se pueden marcar lo dice el motor.
 
 /** El texto de un código de error numérico del motor (`number`, `integer`,
- *  `range:a:b`): los de Flutter, sin el rango reescrito acá. */
+ *  `range:a:b`), sin el rango reescrito acá. */
 export function numberError(code: string | undefined, t: Texts): string | null {
   if (code === undefined) return null;
   if (code === 'number') return t.hbNumberRequired;

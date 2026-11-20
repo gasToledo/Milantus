@@ -37,7 +37,7 @@ export function CharacterTab({ model }: { model: SheetModel }) {
   const identity = [
     { label: t.alignmentLabel, value: character.alignment ? labelOf(t.alignments, character.alignment) : null },
     // Tipo y tamaño son vocabulario del catálogo en español: los traduce el
-    // motor, igual que en Flutter.
+    // motor.
     { label: t.creatureTypeLabel, value: creatureType ? vocabularyLabel('creatureType', creatureType) : null },
     { label: t.sizeLabel, value: vocabularyLabel('size', sheet.size) },
     { label: t.backgroundLabel, value: nameOf(catalog.backgrounds, character.backgroundId) },
@@ -52,8 +52,7 @@ export function CharacterTab({ model }: { model: SheetModel }) {
 
   // Competencias. Las armas se nombran por el catálogo si son un arma concreta
   // y por la categoría del motor si no («Armas simples»). Los idiomas llevan
-  // Común primero, que lo sabe todo personaje, y el resto por nombre
-  // (`_languagesCard` de Flutter).
+  // Común primero, que lo sabe todo personaje, y el resto por nombre.
   // `nameOf` cae al id cuando no hay arma, así que el `??` no alcanza para
   // llegar a la categoría: se pregunta si el arma existe.
   const weaponName = (id: string) =>

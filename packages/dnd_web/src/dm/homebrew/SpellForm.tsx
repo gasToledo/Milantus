@@ -11,7 +11,7 @@ import { FormSection, PillGroup, TextAreaField, TextField } from './homebrewFiel
 const NO_SCHOOL = '__none__';
 
 /**
- * El formulario de un conjuro propio (`SpellForm` de Flutter). Mismo patrón que
+ * El formulario de un conjuro propio. Mismo patrón que
  * `ItemForm`: el motor arma el conjuro y los errores (`spellDraft`) con cada
  * cambio, y la vista previa es la ficha del Códice de conjuros en vivo, la misma
  * que lee el jugador. El armazón es `HomebrewFormShell`.
@@ -83,7 +83,7 @@ export function SpellForm({
   if (!options.castingTimes.some((o) => o.id === form.castingTime)) times.push({ value: form.castingTime, label: form.castingTime });
   const levels = options.spellLevels.map((o) => ({ value: o.id, label: o.label }));
 
-  // Qué significa lo tocado (`explain` de Flutter): los textos son del motor.
+  // Qué significa lo tocado: los textos son del motor.
   const explain = (key: string): Explained | null => {
     switch (key) {
       case 'level': {

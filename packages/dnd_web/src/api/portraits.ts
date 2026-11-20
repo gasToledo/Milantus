@@ -64,7 +64,7 @@ export async function deletePortrait(key: string): Promise<void> {
 export class PortraitGenerateError extends Error {}
 
 /** Pide candidatos a [providerId] (`POST /api/portraits/generate`) y devuelve
- *  las imágenes en base64. No manda `count`: el servidor elige, como Flutter.
+ *  las imágenes en base64. No manda `count`: el servidor elige cuántas.
  *  Un `TypeError` de `fetch` es que no hay conexión, y lo resuelve quien llama. */
 export async function generatePortraits(args: {
   providerId: string;

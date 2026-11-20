@@ -32,7 +32,7 @@ export function stateOf(campaign: DmCampaign): CampaignState {
 }
 
 /** Las campañas por estado, cada grupo en el orden en que las devuelve el
- *  servidor (el mismo que Flutter). */
+ *  servidor. */
 export function groupCampaigns(campaigns: readonly DmCampaign[]): Record<CampaignState, DmCampaign[]> {
   return {
     active: campaigns.filter((c) => stateOf(c) === 'active'),
@@ -42,7 +42,7 @@ export function groupCampaigns(campaigns: readonly DmCampaign[]): Record<Campaig
 }
 
 /** A qué campaña lleva `/dm` a secas: la primera en curso y, si no hay,
- *  la primera que haya (Flutter abre la primera en vez de un panel vacío). */
+ *  la primera que haya, en vez de un panel vacío. */
 export function defaultCampaign(campaigns: readonly DmCampaign[]): DmCampaign | undefined {
   return campaigns.find((c) => stateOf(c) === 'active') ?? campaigns[0];
 }

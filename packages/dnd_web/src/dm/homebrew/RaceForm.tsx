@@ -8,7 +8,7 @@ import { EntryPreview, ExplainHere, HomebrewFormShell, readWithLang, useHomebrew
 import { FormSection, numberError, PillGroup, TextAreaField, TextField } from './homebrewFields';
 
 /**
- * El formulario de una especie propia (`RaceForm` de Flutter). No sabe de
+ * El formulario de una especie propia. No sabe de
  * reglas: el motor arma la especie y los errores (`raceDraft`) con cada cambio, y
  * la vista previa es la ficha del Códice de esa especie armada en vivo, la que
  * lee el jugador. El armazón (pie, guardia de salida, vista previa en diálogo) es
@@ -85,7 +85,7 @@ export function RaceForm({
     <EntryPreview subtitle={[entry.subtitle, t.sources.homebrew].filter(Boolean).join(' · ')} name={draft.race.name as string} detail={detail} />
   );
 
-  // Qué significa lo tocado (`explain` de Flutter): los textos son del motor.
+  // Qué significa lo tocado: los textos son del motor.
   const explain = (key: string): Explained | null => {
     switch (key) {
       case 'type':

@@ -57,8 +57,8 @@ interface OwnCreature extends Own {
  * duplican las ocho categorías**: criaturas, dotes, especies, trasfondos, armas,
  * armaduras, objetos y conjuros.
  *
- * ponytail: Flutter además lista las entradas inválidas que no pudo cargar
- * (`loadIssues`) para borrarlas; `fetchHomebrew` las descarta al leer y esta
+ * ponytail: las entradas inválidas no se listan para borrarlas; `fetchHomebrew`
+ * las descarta al leer y esta
  * pantalla no las ve. El servidor valida al guardar, así que no debería haber.
  * Si aparece una, el camino es exponer la validación por entrada en el puente
  * (`js/entrypoint.dart`) y listarla acá.
@@ -266,7 +266,7 @@ function BackToHome() {
 
 /** La portada: una tarjeta por categoría con lo propio que tiene, y un
  *  buscador que mira todas a la vez: con lo propio uno se acuerda del nombre,
- *  no de en qué categoría lo guardó (como en Flutter). Acá también se importa
+ *  no de en qué categoría lo guardó. Acá también se importa
  *  y se exporta todo. */
 function Home({
   own,
@@ -288,7 +288,9 @@ function Home({
   const exportAll = () => {
     const content = homebrew.data;
     if (!content) return;
-    // Lo que viaja lo arma el motor, en el formato `dnd_homebrew` de Flutter.
+    // Lo que viaja lo arma el motor, en el formato `dnd_homebrew` (el mismo
+    // que exportaba la versión anterior).
+
     const count = CATEGORIES.reduce((n, c) => n + (content[c]?.length ?? 0), 0);
     const { fileName, text } = homebrewExport(content, new Date());
     downloadText(fileName, text);

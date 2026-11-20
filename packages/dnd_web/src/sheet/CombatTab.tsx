@@ -30,8 +30,8 @@ import { ABILITIES, isReactionSpell } from './vocabulary';
  * (`model.write`), lo que se anota en él: daño, curación, PG temporales,
  * salvaciones de muerte, dados de golpe, espacios de conjuro, usos de
  * recursos, los descansos, la Inspiración Heroica y la concentración. Cada acción la hace el motor (`actOn`); acá no se
- * suma ni se resta nada. Preparar conjuros y cambiar el truco innato llevan a su editor; el resto de la edición sigue en
- * Flutter. Desde 5e6 muestra también maestrías, ventajas, dados de rasgos y
+ * suma ni se resta nada. Preparar conjuros y cambiar el truco innato llevan a
+ * su editor. Desde 5e6 muestra también maestrías, ventajas, dados de rasgos y
  * el texto de recursos (solo lectura). Los números son del motor; de la mesa (lo crudo) solo los PG
  * actuales, lo gastado y las condiciones. Transformado (Forma Salvaje), el
  * motor ya trae la ficha de la bestia: Ataques muestra los suyos con sus
@@ -146,7 +146,7 @@ function InspirationToggle({ model }: { model: SheetModel }) {
 }
 
 /** Gastar un dado de golpe para curarse: la tirada y el mod. de CON los pone
- *  el motor, que dice cuánto curó. Sin dados, deshabilitado (como Flutter). */
+ *  el motor, que dice cuánto curó. Sin dados, deshabilitado. */
 function HitDieButton({ model }: { model: SheetModel }) {
   const t = useTexts();
   const { character, sheet, write } = model;
@@ -169,8 +169,8 @@ function HitDieButton({ model }: { model: SheetModel }) {
   );
 }
 
-/** Cantidad, Daño, Curar y PG temp, como `_hpControls` de Flutter: un campo
- *  y tres verbos. Un campo vacío o inválido cuenta 0, como allá. */
+/** Cantidad, Daño, Curar y PG temp: un campo y tres verbos. Un campo vacío
+ *  o inválido cuenta 0. */
 function HitPointControls({ model }: { model: SheetModel }) {
   return (
     <AmountControls
@@ -229,7 +229,7 @@ export function AmountControls({
   );
 }
 
-/** A 0 PG, los éxitos y fallos (`_deathSaves` de Flutter). Se leen en
+/** A 0 PG, los éxitos y fallos. Se leen en
  *  cualquier ficha; marcarlos, solo en la propia. Que tres éxitos estabilicen
  *  y tres fallos maten lo dice el motor. */
 function DeathSaves({ model }: { model: SheetModel }) {
@@ -436,7 +436,7 @@ function SpellsCard({ model }: { model: SheetModel }) {
   const t = useTexts();
   const { character, sheet, catalog, write } = model;
   // El conjuro que se quiere empezar mientras hay compañeros que dependen de
-  // la concentración actual: se pregunta antes de despedirlos, como Flutter.
+  // la concentración actual: se pregunta antes de despedirlos.
   const [cutFor, setCutFor] = useState<string | null>(null);
   const [swapping, setSwapping] = useState<InnateSpell | null>(null);
   const form = activeForm(model);
@@ -447,7 +447,7 @@ function SpellsCard({ model }: { model: SheetModel }) {
         ? [{ classId: character.classId, classLevel: sheet.level, spellcasting: sheet.spellcasting }]
         : [];
 
-  // Lo elegido, como lo junta Flutter (`_spellsCard`): la lista vieja y las de
+  // Lo elegido se junta así: la lista vieja y las de
   // cada clase, sin repetir. Contar lo elegido no es una regla; el tope sí, y
   // ese es del motor (`preparedCount`, `cantripsKnown`).
   const spellIdsFor = (classId: string) =>
@@ -642,9 +642,8 @@ function innateNote(s: InnateSpell, t: ReturnType<typeof useTexts>): string {
   ].join(' · ');
 }
 
-/** Una ventaja que no cabe en una fila dicha en una frase
- *  (`_conditionalAdvantageText` de Flutter). Los estados salen del glosario del
- *  motor; en español van en minúscula dentro de la frase («contra
+/** Una ventaja que no cabe en una fila, dicha en una frase. Los estados salen
+ *  del glosario del motor; en español van en minúscula dentro de la frase («contra
  *  envenenado») y en inglés 2024 se escriben con mayúscula. */
 function conditionalAdvantageText(v: Advantage, t: Texts, lang: Lang): string {
   const conditions = v.conditions
@@ -739,7 +738,7 @@ function ConditionsCard({ model }: { model: SheetModel }) {
   );
 }
 
-/** Los 13 estados como chips que se marcan (`_conditionChips` de Flutter), con
+/** Los 13 estados como chips que se marcan, con
  *  la regla de cada uno al pasar el mouse. Marcar uno que incapacita termina
  *  la concentración y los modos activos: lo hace el motor, y avisa quién se
  *  fue con la concentración. */
@@ -888,7 +887,7 @@ function ResourcesCard({ model }: { model: SheetModel }) {
   const t = useTexts();
   const { sheet, write, character } = model;
   const [ask, setAsk] = useState<PointsAsk | null>(null);
-  // Una reserva pide cuántos puntos (como `_askPoints` de Flutter); lo demás
+  // Una reserva pide cuántos puntos; lo demás
   // gasta de a uno. Pasarse de lo que queda no es un error: el motor lo
   // deja entre cero y el máximo.
   const controls = (r: CharacterResource, left: number) => {
@@ -949,7 +948,7 @@ function ResourcesCard({ model }: { model: SheetModel }) {
 }
 
 /**
- * Los descansos, con el aviso de Flutter y su «Deshacer»: un toque de más en
+ * Los descansos, con el aviso y su «Deshacer»: un toque de más en
  * plena sesión devuelve PG, espacios y recursos ya gastados, y volver a
  * marcarlos a mano es justo lo que nadie recuerda bien. Deshacer vuelve a
  * guardar la ficha entera de antes, con la mochila de antes del amanecer.
@@ -991,7 +990,7 @@ function RestButtons({ write }: { write: SheetWriter }) {
 }
 
 /** Cuántos puntos de una reserva gastar o recuperar. Un número vacío o que no
- *  es positivo no hace nada, como en Flutter. */
+ *  es positivo no hace nada. */
 function PointsDialog({ ask, onClose, model }: { ask: PointsAsk; onClose: () => void; model: SheetModel }) {
   const t = useTexts();
   const [value, setValue] = useState('');

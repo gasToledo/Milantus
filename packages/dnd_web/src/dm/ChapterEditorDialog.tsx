@@ -47,7 +47,7 @@ export function ChapterEditorDialog({
         summary: summary.trim(),
         // El nivel, el oro y los objetos se deciden al cerrar (`CloseChapterDialog`).
         // Acá se conservan los de `initial` sin tocarlos: un capítulo viejo, o
-        // uno planificado en Flutter, no los pierde (por eso el spread).
+        // uno planificado en la versión anterior, no los pierde (por eso el spread).
       });
       onClose();
     } catch {

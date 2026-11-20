@@ -20,8 +20,8 @@ import type { SheetModel } from './model';
 import { TransmuteDialog } from './TransmuteDialog';
 import type { SheetWriter } from './writer';
 
-/** Las familias en que se agrupa la mochila, en el orden de `itemGroupOrder`
- *  de Flutter: primero lo que se empuña, después lo que se gasta y al final
+/** Las familias en que se agrupa la mochila: primero lo que se empuña,
+ *  después lo que se gasta y al final
  *  lo que solo se lleva encima. */
 const GROUP_ORDER = [
   'weapon',
@@ -37,7 +37,7 @@ const GROUP_ORDER = [
 ] as const;
 type Group = (typeof GROUP_ORDER)[number];
 
-/** La familia de una línea, como `itemKindLabel` de Flutter. Es agrupación y
+/** La familia de una línea. Es agrupación y
  *  no regla: qué es arma, armadura o mágico ya lo resolvió el motor. */
 function groupOf(line: InventoryLine): Group {
   if (line.kind === null) return 'missing';
@@ -67,8 +67,8 @@ function today(): string {
  * agrupada por familia. Cada entrada la resolvió el motor (`inventoryOf`):
  * nombre, peso, si cuenta como equipada, si es mágica, si se equipa. La carga
  * y la capacidad son de `ComputedSheet`. En la ficha propia (`model.write`)
- * se escriben las monedas y, por fila, equipar, cantidad, cargas y el menú de
- * Flutter (cantidad exacta, nota, sintonizar, mano secundaria, a dos manos,
+ * se escriben las monedas y, por fila, equipar, cantidad, cargas y el menú
+ * (cantidad exacta, nota, sintonizar, mano secundaria, a dos manos,
  * vender, quitar), más «Agregar objeto» con el catálogo (`ItemCatalog.tsx`);
  * cada cambio lo hace el motor.
  */
@@ -105,7 +105,7 @@ export function InventoryTab({ model }: { model: SheetModel }) {
       write!.notify(t.tradeNotPaid, { tone: 'error' });
       return;
     }
-    // El catálogo se cierra para que «Deshacer» quede a mano, como en Flutter.
+    // El catálogo se cierra para que «Deshacer» quede a mano.
     setCatalogOpen(false);
     write!.notify(t.invBought(trade.quantity, row.name, trade.total), { undo: () => write!.restore(r.before) });
   };
@@ -525,8 +525,8 @@ function PackFilter({ filter, onChange }: { filter: Filter; onChange: (f: Filter
   );
 }
 
-/** Una moneda escrita a mano. Se guarda al salir del campo o con Enter, como
- *  en Flutter: guardar con cada tecla mandaría «1», «12», «120». */
+/** Una moneda escrita a mano. Se guarda al salir del campo o con Enter:
+ *  guardar con cada tecla mandaría «1», «12», «120». */
 function CoinInput({ value, label, onCommit }: { value: number; label: string; onCommit: (v: number) => void }) {
   const [text, setText] = useState(String(value));
   const commit = () => {
@@ -553,7 +553,7 @@ function CoinInput({ value, label, onCommit }: { value: number; label: string; o
   );
 }
 
-/** Cantidad exacta o nota de una línea (`showTextPromptDialog` de Flutter). */
+/** Cantidad exacta o nota de una línea. */
 function EntryDialog({ ask, write, onClose }: { ask: Ask; write: SheetWriter; onClose: () => void }) {
   const t = useTexts();
   const { kind, line } = ask;
@@ -817,8 +817,8 @@ function InUseCard({
   );
 }
 
-/** Las acciones secundarias de una línea, en menú como pide §8.7 (`_itemMenu`
- *  de Flutter). Equipar y la cantidad quedan en la fila porque son las
+/** Las acciones secundarias de una línea, en menú como pide §8.7. Equipar y
+ *  la cantidad quedan en la fila porque son las
  *  frecuentes. Quitar no pregunta: avisa con «Deshacer». */
 function ItemMenu({
   line,

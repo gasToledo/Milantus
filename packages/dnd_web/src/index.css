@@ -583,7 +583,7 @@ body {
 }
 
 /* El Códice: lista y detalle lado a lado cuando el contenido mide 760 px o
-   más (el corte del Bestiario en Flutter, medido sin el panel). Debajo, una
+   más (el mismo corte que el Bestiario, medido sin el panel). Debajo, una
    cosa por vez: la lista sin entrada abierta, el detalle con ella. */
 .codex-split {
   container-type: inline-size;
@@ -1397,7 +1397,7 @@ body {
 
 /* ── La hoja impresa ───────────────────────────────────────────────────────
    `PrintSheet` la monta al pie de `body` solo mientras se imprime. En papel
-   se ve ella sola; en pantalla, nunca. Es la `_printCss` de Flutter. */
+   se ve ella sola; en pantalla, nunca. */
 .print-sheet {
   display: none;
 }

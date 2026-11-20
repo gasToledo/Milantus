@@ -1,8 +1,6 @@
-// El contenido homebrew de la cuenta y su fusión con el catálogo oficial. Es el
-// mismo camino que Flutter (`HomebrewStore.load` + `ContentRepository.addAll`
-// en `dnd_app/lib/main.dart`): sin esto, un personaje que equipa un arma propia
-// no tiene ese ataque y su CA, PG o rasgos pueden salir distintos a los de la
-// aplicación principal.
+// El contenido homebrew de la cuenta y su fusión con el catálogo oficial. Sin
+// esto, un personaje que equipa un arma propia no tiene ese ataque y su CA, PG
+// o rasgos salen sin ella.
 import type { Catalog, JsonObject } from '../engine';
 import { ApiError } from './client';
 
@@ -40,8 +38,7 @@ function isValidEntry(e: unknown): e is JsonObject {
  * `Map.addAll` de `ContentRepository.addAll`). No muta [official]: el mismo
  * objeto sigue en la caché para otra cuenta o idioma.
  *
- * ponytail: Flutter además descarta una entrada que su `fromJson` no puede
- * leer; acá solo se filtra id y origen, y una entrada malformada llega al
+ * ponytail: solo se filtra id y origen, y una entrada malformada llega al
  * motor, que lanza y la ficha muestra «No se pudo calcular». El servidor
  * valida al guardar, así que no debería pasar; si pasa, el camino es exponer
  * una validación por entrada en `js/entrypoint.dart`.

@@ -11,7 +11,7 @@ import { AppBusyLabel, AppErrorView } from '../../ui/status';
 import { Option, SearchableList } from '../../ui/wizard';
 
 /**
- * «Nuevo PNJ» (`_NewNpcDialog` de Flutter): nombre, qué ficha lleva y, si es un
+ * «Nuevo PNJ»: nombre, qué ficha lleva y, si es un
  * bloque, de qué criatura parte. El documento lo arma el motor (`newNpc`). Crear
  * abre la ficha: el diálogo solo pidió nombre y tipo, y lo que sigue se hace ahí.
  * Con [campaignId] además lo suma a esa campaña. El PNJ con ficha de personaje

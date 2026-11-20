@@ -1,7 +1,6 @@
-// Orden y filtro de la lista de personajes. Es presentación, no reglas: repite
-// el criterio de `_visible` en `dashboard_screen.dart` de Flutter para que la
-// misma cuenta vea la misma lista en los dos clientes. Todos los números que
-// intervienen (nivel) salen del motor.
+// Orden y filtro de la lista de personajes. Es presentación, no reglas: el
+// mismo criterio que la versión anterior, para que una cuenta siga viendo la
+// misma lista. Todos los números que intervienen (nivel) salen del motor.
 import { accentOf, nameOf } from '../api/catalog';
 import { computeSheet, type Catalog, type CharacterFields, type CharacterJson, type ComputedSheet } from '../engine';
 import type { RosterSettings } from '../api/client';
@@ -11,8 +10,8 @@ export type SortMode = 'manual' | 'dateAdded' | 'name' | 'level' | 'klass';
 
 export const SORT_MODES: readonly SortMode[] = ['manual', 'dateAdded', 'name', 'level', 'klass'];
 
-/** Los nombres son los que Flutter guarda en `AppSettings.sortMode`; uno
- *  desconocido cae a `name`, igual que allá. */
+/** Los nombres son los que guarda `AppSettings.sortMode`, también los de la
+ *  versión anterior; uno desconocido cae a `name`. */
 export function parseSortMode(value: string): SortMode {
   return SORT_MODES.find((m) => m === value) ?? 'name';
 }
@@ -60,16 +59,15 @@ export function toRosterEntry(raw: CharacterJson, createdAt: string, catalog: Ca
   };
 }
 
-/** Sin PG. No es un estado guardado aparte: es lo que dicen los PG, como en
- *  Flutter (`_isFallen`). */
+/** Sin PG. No es un estado guardado aparte: es lo que dicen los PG. */
 export const isFallen = (e: RosterEntry): boolean => (e.character.combat?.currentHp ?? 0) <= 0;
 
 /** Nombres de clase juntos, para ordenar y buscar. */
 const classText = (e: RosterEntry): string => e.classes.map((c) => c.name).join(' ');
 
-// Comparación por unidades de código y no `localeCompare`: es la de Dart
-// (`String.compareTo`), y la cuenta tiene que ver el mismo orden en los dos
-// clientes aunque «Álvaro» quede después de la «Z».
+// Comparación por unidades de código y no `localeCompare`: es la de la
+// versión anterior (`String.compareTo` de Dart), y así la cuenta conserva el
+// orden que ya veía aunque «Álvaro» quede después de la «Z».
 const cmp = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
 
 /** El grupo en el que `visibleRoster` deja a una tarjeta: favorito arriba,

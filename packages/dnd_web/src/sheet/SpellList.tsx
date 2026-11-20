@@ -42,17 +42,17 @@ export interface ResourceAbility {
 }
 
 /**
- * Los conjuros del personaje en **pestañas** (a propósito, la ficha de Flutter
- * los apila): trucos (los de clase y los que dan los rasgos), siempre
+ * Los conjuros del personaje en **pestañas**: trucos (los de clase y los que
+ * dan los rasgos), siempre
  * preparados, preparados (o conocidos), los que concede un rasgo y las
  * reacciones, y solo las que tienen algo. Cada una dice qué es en una línea.
  * Las de siempre preparados y
  * elegidos siguen a la grilla de espacios (`levelFilter`): un mago de nivel 20
  * llenaba la pantalla con la lista entera. Cada uno se despliega con su ficha
  * (tiempo, alcance, componentes, duración y descripción). No se preparan ni se lanzan acá; en la ficha propia
- * ([onConcentrate]) los de concentración llevan «Concentrar», como Flutter.
+ * ([onConcentrate]) los de concentración llevan «Concentrar».
  *
- * Lo elegido se junta como en Flutter: la lista vieja y las de cada clase,
+ * Lo elegido se junta así: la lista vieja y las de cada clase,
  * sin repetir. Nada de esto es una regla: qué está siempre preparado y qué
  * conceden los rasgos lo dice el motor (`alwaysPreparedSpellIds`,
  * `innateSpells`). Las opciones mágicas de recursos compartidos llegan como
@@ -107,7 +107,7 @@ export function SpellList({
   classReactionIds: string[];
   catalog: JsonObject[];
   innateNote: (s: InnateSpell) => string;
-  /** El nombre del conjuro, como lo guarda Flutter en `concentratingOn`. */
+  /** El nombre del conjuro, tal como queda guardado en `concentratingOn`. */
   onConcentrate?: (name: string) => void;
   /** Abre el cambio del truco innato (el del rasgo, `grantedSpellId`). Solo en
    *  la ficha propia; solo lo llevan los que el rasgo deja reemplazar. */

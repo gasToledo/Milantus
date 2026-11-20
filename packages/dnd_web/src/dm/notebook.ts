@@ -1,7 +1,7 @@
 // Las entradas del Cuaderno: notas, combates cerrados y subidas de nivel,
 // intercaladas por capítulo. Es presentación (agrupar, titular, buscar), no
-// reglas: repite el criterio de `notebook_view.dart` de Flutter para que el DM
-// lea lo mismo en los dos clientes. Nombres de criaturas y de clases salen del
+// reglas: el mismo criterio que la versión anterior, para que el DM siga
+// leyendo el cuaderno como lo leía. Nombres de criaturas y de clases salen del
 // catálogo, en el idioma activo.
 import type { DmChapter, DmEncounterLog, DmLevelUp, DmNote, DmNotebook } from '../api/client';
 import { nameOf } from '../api/catalog';
@@ -22,7 +22,7 @@ export interface Entry {
   /** `null` sin capítulo, o de uno que el DM borró: un combate no se borra con
    *  su capítulo y no hay que perderlo. */
   chapterId: string | null;
-  /** Milisegundos, o `null` si no trae fecha (van primero, como en Flutter). */
+  /** Milisegundos, o `null` si no trae fecha (van primero). */
   at: number | null;
   title: string;
   /** Una nota es Markdown; lo demás lo escribió la app y va en párrafos. */
@@ -100,7 +100,7 @@ const ms = (iso: string | undefined): number | null => {
  *  un diario. `sort` es estable: las que no traen fecha van primero en el orden
  *  en que las devolvió el servidor. */
 /** Le pone la `@` a un nombre de un registro de combate si es de alguien que
- *  sigue en la campaña (`_mark` de Flutter): así el Cuaderno lo enlaza a su
+ *  sigue en la campaña: así el Cuaderno lo enlaza a su
  *  ficha. El que se fue queda como texto, sin una `@` suelta que no lleva a
  *  ningún lado. Un monstruo del bestiario no es nadie a quien abrirle la ficha. */
 export type Mark = (name: string) => string;
@@ -183,7 +183,7 @@ export function matches(entry: Entry, query: string): boolean {
   return fold(entry.title).includes(q) || (entry.kind === 'note' && fold(entry.body).includes(q));
 }
 
-/** «hoy», «ayer», «hace 5 días» o la fecha, como `_stamp` de Flutter. */
+/** «hoy», «ayer», «hace 5 días» o la fecha. */
 export function stamp(at: number | null, now: number, t: Texts): string {
   if (at === null) return '';
   const days = Math.floor((now - at) / 86_400_000);

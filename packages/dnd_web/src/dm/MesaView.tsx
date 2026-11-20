@@ -26,7 +26,7 @@ import { MemberCard } from './MemberCard';
  * compartió el jugador) y echarlo cortan o crean el vínculo; conceder
  * Inspiración Heroica es un aviso. Ninguna acción escribe una ficha ajena. Cada ficha
  * se lee en vivo de la cuenta del jugador y se calcula con el motor y el
- * catálogo del DM (SRD más **su** homebrew, como Flutter): un objeto propio del
+ * catálogo del DM (SRD más **su** homebrew): un objeto propio del
  * jugador que el DM no tiene no se resuelve, y la tarjeta lo dice con la CA
  * que da el motor, no con una inventada.
  */

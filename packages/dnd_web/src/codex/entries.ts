@@ -1,6 +1,5 @@
-// Las entradas del Códice, una función por categoría como `codex_entries.dart`
-// de Flutter, para que el mismo contenido se lea igual en los dos clientes.
-// Todo sale del catálogo (oficial + homebrew) tal cual o del motor: los
+// Las entradas del Códice, una función por categoría. Todo sale del catálogo
+// (oficial + homebrew) tal cual o del motor: los
 // rótulos (`catalogLabel`, `vocabularyLabel`) y los precios (`formatCost`).
 // Nada de esto calcula una regla: el Códice muestra el contenido, no lo aplica.
 import {
@@ -74,8 +73,8 @@ export const CATEGORY_GROUPS: { group: 'start' | 'character' | 'gear'; categorie
 ];
 
 /**
- * El glosario en orden de lectura —de los dados al DM—, como `_glossary` de
- * Flutter: quien empieza lo recorre de arriba abajo y cada término se apoya en
+ * El glosario en orden de lectura —de los dados al DM—: quien empieza lo
+ * recorre de arriba abajo y cada término se apoya en
  * los de antes. Por eso no va alfabético.
  */
 const GLOSSARY: [keyof Texts['glossaryGroups'], (keyof Texts['glossary'])[]][] = [
@@ -112,8 +111,8 @@ function glossaryEntries(t: Texts): CodexEntry[] {
   );
 }
 
-/** Las guías en el orden en que le sirven a quien empieza, como en Flutter:
- *  qué es una partida, armar el personaje, la primera pelea y leer la ficha. */
+/** Las guías en el orden en que le sirven a quien empieza: qué es una
+ *  partida, armar el personaje, la primera pelea y leer la ficha. */
 const GUIDES: { id: string; key: keyof Texts['guides'] }[] = [
   { id: 'session', key: 'session' },
   { id: 'creation', key: 'creation' },
@@ -277,9 +276,9 @@ class Ctx {
       .map((e) => ({ name: str(e.name), description: str(e.description) }));
   }
 
-  /** Los efectos de [effects] que se pueden leer, uno por línea (`readableTraits`
-   *  de Flutter sin rasgos): la frase la arma `describeEffectParts` con lo que el
-   *  motor resolvió. Lo que el motor no describe no se muestra. */
+  /** Los efectos de [effects] que se pueden leer, uno por línea: la frase la
+   *  arma `describeEffectParts` con lo que el motor resolvió. Lo que el motor no
+   *  describe no se muestra. */
   private effectLines(effects: unknown): string {
     return effectParts(objs(effects), this.catalog)
       .map((r) => (r.parts ? describeEffectParts(r.parts, this.t) : null))
@@ -299,7 +298,7 @@ class Ctx {
       .map((line) => ({ name: line, description: '' }));
   }
 
-  /** Rasgos agrupados por nivel, como `_features` de Flutter. */
+  /** Rasgos agrupados por nivel. */
   private features(list: unknown): CodexDetail['sections'] {
     const byLevel = new Map<number, CodexTrait[]>();
     for (const f of objs(list)) {
@@ -470,7 +469,7 @@ class Ctx {
     );
   }
 
-  /** Los requisitos de una dote en una línea (`_prerequisite` de Flutter). */
+  /** Los requisitos de una dote en una línea. */
   private prerequisite(p: unknown): string | null {
     if (typeof p !== 'object' || p === null) return null;
     const pre = p as Json;

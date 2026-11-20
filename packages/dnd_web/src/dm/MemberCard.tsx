@@ -22,8 +22,7 @@ import { Link } from '../router';
  *
  * Una cosa que el diseño traía y acá no está: el nombre del jugador. La API
  * de miembros devuelve la ficha y nada de la cuenta de su dueño, y sumarlo
- * sería abrir una puerta más entre cuentas (`modo-dm.md`); Flutter tampoco lo
- * muestra.
+ * sería abrir una puerta más entre cuentas (`modo-dm.md`).
  */
 export function MemberCard({
   entry,

@@ -137,7 +137,7 @@ const CLASS_ICONS: Record<string, LucideIcon> = {
 };
 
 /** El ícono de cada especie: el catálogo trae `iconId` con nombres de Material
- *  (los que usa Flutter) y acá se traducen a lucide. Tiefling usa `masks` →
+ *  y acá se traducen a lucide. Tiefling usa `masks` →
  *  `Drama` y no `Flame`: Draconato (`local_fire_department`) ya la tiene y dos
  *  tarjetas iguales no se distinguen. Una especie propia, sin `iconId` o con uno
  *  que no está acá, cae en `Users`. */
@@ -159,8 +159,8 @@ const SPECIES_ICONS: Record<string, LucideIcon> = {
   smart_toy: Bot,
 };
 
-/** La página del creador: el marco de siempre y salir pasa por la misma
- *  confirmación que en Flutter, porque hay un borrador que se puede perder. */
+/** La página del creador: el marco de siempre, y salir pide confirmación
+ *  porque hay un borrador que se puede perder. */
 export function CreationPage({
   account,
   replacing,
@@ -214,8 +214,8 @@ export function CreationPage({
 }
 
 /**
- * El creador de personajes (`CreationWizard` de Flutter, con el circuito del
- * lienzo «Creador de personajes»: las mismas piezas que la subida de nivel).
+ * El creador de personajes (el circuito del lienzo «Creador de personajes»:
+ * las mismas piezas que la subida de nivel).
  *
  * Toda regla es del motor (`creationView`, sobre `CreationDraft`): acá solo se
  * manda qué tocó el jugador y se dibuja lo que vuelve, incluido qué falta.

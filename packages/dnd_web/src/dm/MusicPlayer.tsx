@@ -30,15 +30,15 @@ const NOTICE_MS = 8000;
 type Notice = { kind: 'deleted'; scene: MusicScene; index: number } | { kind: 'error' };
 
 /**
- * La música del Modo DM (`dm/music/` de Flutter): las escenas de la campaña y
+ * La música del Modo DM: las escenas de la campaña y
  * el reproductor de YouTube embebido. El DM también las crea, edita y borra
  * (6d), y marca cuáles ofrecer al iniciar un combate. Esas escrituras releen la
  * campaña antes del PUT (`editCampaign`) y van en fila: ver `updateScenes`. La
  * oferta llega cuando se confirmó el primer guardado del combate.
  *
  * Vive en la pantalla del Modo DM y no en una sección: cambiar de sección no lo
- * desmonta, así que la música sigue; cambiar de campaña sí (va con `key`), como
- * en Flutter, donde una escena que no está en la campaña nueva se corta.
+ * desmonta, así que la música sigue; cambiar de campaña sí (va con `key`),
+ * porque una escena que no está en la campaña nueva se corta.
  *
  * El enlace lo interpreta el motor (`musicSource`): esta pantalla nunca arma la
  * dirección del iframe con lo que pegó el DM.

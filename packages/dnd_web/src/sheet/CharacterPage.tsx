@@ -31,8 +31,8 @@ interface ToastState {
 }
 
 /**
- * La ficha propia de [id] en la pestaña [tab]. La API no tiene `GET` por id
- * (el cliente de Flutter tampoco: carga la lista), así que se busca en
+ * La ficha propia de [id] en la pestaña [tab]. La API no tiene `GET` por id,
+ * así que se busca en
  * `/api/characters`; con la caché, si se viene del dashboard ni siquiera se
  * vuelve a pedir. Lo ajeno y lo inexistente son lo mismo para la API; acá
  * también.
@@ -82,8 +82,8 @@ export function CharacterPage({
     }
   }, [id, tab, levelUp, spellEdit, magicPlans, wildShapeForms, portrait, choices]);
 
-  // Al volver a la pestaña se pide la ficha de nuevo, por si se tocó en
-  // Flutter mientras tanto: así la próxima acción parte de esa copia y no la
+  // Al volver a la pestaña se pide la ficha de nuevo, por si cambió en otra
+  // pestaña o dispositivo: así la próxima acción parte de esa copia y no la
   // pisa con una vieja. Nunca con algo pendiente, que se perdería.
   useEffect(() => {
     const refresh = () => {

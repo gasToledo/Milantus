@@ -13,7 +13,7 @@ import { Tooltip } from '../ui/primitives';
 const FAMILIES = ['weapon', 'armor', 'ammunition', 'focus', 'magic', 'tool', 'container', 'pack', 'gear'] as const;
 export type Family = (typeof FAMILIES)[number];
 
-/** Una fila del catálogo (`CatalogRow` de Flutter). */
+/** Una fila del catálogo. */
 export interface CatalogRow {
   id: string;
   name: string;
@@ -110,7 +110,7 @@ export function FamilyFilter({
 }
 
 /**
- * «Agregar objeto» (`ItemCatalogDialog` de Flutter): buscador y pills de
+ * «Agregar objeto»: buscador y pills de
  * familia sobre el catálogo. Cada fila tiene «Gratis» (botín: suma sin pagar y
  * el catálogo sigue abierto) y «Comprar», que se apaga y dice cuánto falta si
  * la bolsa no alcanza. La bolsa la cuenta el motor; lo único que se resta acá
@@ -249,7 +249,7 @@ export interface Trade {
 const PRICE_COINS = ['gp', 'sp', 'cp'] as const;
 
 /**
- * Comprar o vender (`TradeDialog` de Flutter): cantidad con − y +, precio por
+ * Comprar o vender: cantidad con − y +, precio por
  * unidad en po, pp y pc que se puede corregir (regateo, otra ciudad) y la
  * cuenta del motor: qué sale de la bolsa, el vuelto y cómo queda, o cuánto
  * falta. Tres campos y no número + moneda: la mitad de 15 po son 7 po 5 pp.

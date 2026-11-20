@@ -167,8 +167,8 @@ export function SheetHeader({
               otherSpeeds.length > 0 || exhaustion > 0 ? (
                 <>
                   {otherSpeeds.length > 0 && <p className="text-[11px] text-on-surface-variant">{otherSpeeds.join(' · ')}</p>}
-                  {/* El motor ya restó la velocidad; esto solo dice cuánto. El 5
-                      es el de Flutter (`5 * exhaustion`): la ficha no trae la
+                  {/* El motor ya restó la velocidad; esto solo dice cuánto.
+                      Cada nivel de cansancio son 5 pies y la ficha no trae la
                       cifra aparte. */}
                   {exhaustion > 0 && <p className="text-[11px] text-crimson">{t.exhaustionSpeed(5 * exhaustion)}</p>}
                 </>

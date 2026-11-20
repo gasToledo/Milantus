@@ -38,8 +38,8 @@ export function createQueryClient(): QueryClient {
         retry: (failures, error) =>
           !(error instanceof ApiError && error.status < 500) && failures < 2,
         // Solo lectura y una sola pestaña: volver a la ventana no tiene por
-        // qué disparar pedidos. Lo que cambie en Flutter se ve al recargar o
-        // al pasar el minuto de `staleTime`.
+        // qué disparar pedidos. Lo que cambie en el servidor se ve al recargar
+        // o al pasar el minuto de `staleTime`.
         refetchOnWindowFocus: false,
         staleTime: 60_000,
       },
@@ -138,8 +138,8 @@ export const useDmCampaigns = ({ enabled = true }: { enabled?: boolean } = {}) =
 
 /** La Mesa: las fichas vinculadas a [campaignId], leídas en vivo del jugador.
  *  Con [live] se vuelven a leer cada 5 s: con un combate abierto el jugador
- *  anota su daño en su ficha y el DM lo tiene que ver sin recargar (como
- *  `_CampaignDetail` de Flutter). `refetchIntervalInBackground` queda apagado:
+ *  anota su daño en su ficha y el DM lo tiene que ver sin recargar.
+ *  `refetchIntervalInBackground` queda apagado:
  *  con la pestaña oculta no se pide nada. */
 export const useCampaignMembers = (campaignId: string, { live = false }: { live?: boolean } = {}) =>
   useQuery({
@@ -195,7 +195,7 @@ export const useHomebrew = () =>
 
 /**
  * El catálogo con el que se calcula una ficha: el SRD en [lang] con el
- * homebrew de la cuenta encima, como en Flutter. Toda pantalla que llame a
+ * homebrew de la cuenta encima. Toda pantalla que llame a
  * `computeSheet` usa este y no `useCatalog`: con el oficial solo, un
  * personaje con un arma propia pierde ese ataque. La fusión se hace una vez
  * por par de datos (ver `merged`).

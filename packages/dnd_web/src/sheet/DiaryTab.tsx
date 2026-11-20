@@ -120,8 +120,8 @@ export function DiaryTab({ model }: { model: SheetModel }) {
 const ICON_BUTTON =
   'inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius-nav)] transition-colors duration-[120ms] ease-out hover:bg-plaque disabled:pointer-events-none disabled:opacity-40';
 
-/** Igual que `_fileSlug` de Flutter: lo que se baja tiene que poder guardarse
- *  en cualquier sistema de archivos. */
+/** Lo que se baja tiene que poder guardarse en cualquier sistema de
+ *  archivos. */
 const fileSlug = (name: string, fallback: string) =>
   name
     .toLowerCase()
@@ -130,7 +130,7 @@ const fileSlug = (name: string, fallback: string) =>
 
 /**
  * El trasfondo de la ficha **propia** y el de un PNJ: lectura con Markdown,
- * editor, importar y exportar un `.md` (`DiaryBackgroundCard` de Flutter). No
+ * editor, importar y exportar un `.md`. No
  * sabe de quién es: recibe el texto guardado y `onSave`, y cada dueño lo
  * escribe a su manera.
  *

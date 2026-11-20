@@ -1,4 +1,4 @@
-// Las direcciones del almacén de retratos (`portrait_image.dart` de Flutter).
+// Las direcciones del almacén de retratos.
 // Todas van al mismo origen y las autoriza la cookie de sesión; la clave es
 // opaca (`<dueño>/<archivo>`) y se resuelve siempre: no hay forma barata de
 // saber antes si existe, así que un 404 (retrato borrado, cuenta ajena) lo
@@ -27,7 +27,7 @@ export const firstPortrait = (character: { portraitPaths?: unknown }): string | 
 
 /**
  * Anchos de miniatura que genera el servidor (`portrait_thumbnail.dart`). La
- * escalera está duplicada a propósito, como en Flutter: no se puede consultar
+ * escalera está duplicada a propósito: no se puede consultar
  * antes de pintar el primer medallón, y un desajuste no rompe nada —ante un
  * ancho que no conoce, el servidor manda el original—, solo baja de más.
  */

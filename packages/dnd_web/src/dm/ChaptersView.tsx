@@ -90,8 +90,8 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
   };
 
   // Un solo capítulo en marcha por campaña. Se mira la lista antes de pedirle
-  // al servidor, que igual lo comprueba (Flutter puede haber empezado uno): en
-  // ese caso el 400 se dice con el aviso genérico.
+  // al servidor, que igual lo comprueba (otra sesión puede haber empezado uno):
+  // en ese caso el 400 se dice con el aviso genérico.
   const start = async (c: DmChapter) => {
     const running = chapters.data?.find((o) => o.state === 'active');
     if (running) return notify('error', t.dmChapterAlreadyRunning(running.name));

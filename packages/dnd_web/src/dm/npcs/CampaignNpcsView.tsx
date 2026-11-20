@@ -37,8 +37,8 @@ import { hasTag, normalizeTags, npcPortrait, npcTypeLine, type NpcStatus } from 
  * Los PNJ de la campaña (`campaign_npcs_view.dart`), con su estado **en esta**
  * campaña: se cambia con el selector, se traen más de la biblioteca y se
  * quitan de la mesa (solo el vínculo: el PNJ sigue en la biblioteca). Se crea
- * uno nuevo y queda vinculado a esta mesa; borrarlo se hace desde su ficha y
- * editarlo sigue en Flutter. Los PG de un herido son los que
+ * uno nuevo y queda vinculado a esta mesa; borrarlo y editarlo se hacen desde
+ * su ficha. Los PG de un herido son los que
  * guardó el último combate de esta mesa, y los resuelve el motor (`npcViews`)
  * con el resto de la línea.
  */

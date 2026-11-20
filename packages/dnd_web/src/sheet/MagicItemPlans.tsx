@@ -21,8 +21,8 @@ import type { SheetModel } from './model';
 import type { SheetWriter } from './writer';
 
 /**
- * Los planos del Artífice y sus réplicas (`_manageMagicItemPlans` de Flutter,
- * con el circuito de los asistentes y la ruta propia de `SpellEditor`). Se
+ * Los planos del Artífice y sus réplicas (el circuito de los asistentes y la
+ * ruta propia de `SpellEditor`). Se
  * guarda al tocar, como el resto de la ficha: elegir un plano es la acción
  * `setMagicItemPlan`, crear una réplica es `replicateItem` y quitarla es
  * `removeItem`. Qué planos se ofrecen, los topes y qué réplicas hay lo dice el

@@ -10,7 +10,7 @@ export type DuplicableCategory = 'creatures' | 'feats' | 'races' | 'backgrounds'
 
 /**
  * «Duplicar criatura» / «Duplicar dote» / «Duplicar especie» / «Duplicar
- * trasfondo» (`_CatalogPicker` de Flutter): elegir una
+ * trasfondo»: elegir una
  * del catálogo para abrirla como copia propia. Salen solo las que **no** son
  * tuyas, porque para lo propio está «Duplicar» en su perfil. Las criaturas
  * llevan el orden y la línea de tipo del motor (`bestiary`), igual que el

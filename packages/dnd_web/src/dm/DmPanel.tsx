@@ -9,11 +9,10 @@ import { CampaignEditorDialog } from './CampaignEditorDialog';
 import { groupCampaigns, stateOf, useCreateCampaign } from './campaigns';
 
 /**
- * El panel del Modo DM (`_sidebar` de `dm_mode_screen.dart`): el interruptor
- * con «DM» activo, las herramientas de la cuenta, las campañas agrupadas por
- * estado y, de la campaña elegida, sus secciones. El panel solo escribe para
- * crear una campaña («Nueva campaña»); capítulos, cuaderno, PNJ y combate
- * siguen en Flutter, desde cada pantalla.
+ * El panel del Modo DM: el interruptor con «DM» activo, las herramientas de la
+ * cuenta, las campañas agrupadas por estado y, de la campaña elegida, sus
+ * secciones. El panel solo escribe para crear una campaña («Nueva campaña»);
+ * capítulos, cuaderno, PNJ y combate se abren desde cada pantalla.
  */
 export function DmPanel({
   campaigns,

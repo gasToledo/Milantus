@@ -8,7 +8,7 @@ import { EntryPreview, ExplainHere, HomebrewFormShell, readWithLang, useHomebrew
 import { FormSection, SwitchRow, TextAreaField, TextField } from './homebrewFields';
 
 /**
- * El formulario de una dote propia (`FeatForm` de Flutter). No sabe de reglas:
+ * El formulario de una dote propia. No sabe de reglas:
  * el motor arma la dote y los errores (`featDraft`) con cada cambio, y la vista
  * previa es la ficha del Códice de esa dote armada en vivo, la misma que lee el
  * jugador.
@@ -50,7 +50,7 @@ export function FeatForm({
   const rules = useHomebrewRules();
 
   const draft = useMemo(() => featDraft(initial, form), [initial, form]);
-  // También la lista de efectos: Flutter no detectaba que solo cambiaran ellos.
+  // También la lista de efectos: un cambio solo ahí también ensucia el formulario.
   const dirty = JSON.stringify(form) !== JSON.stringify(start);
 
   const set = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));
@@ -82,7 +82,7 @@ export function FeatForm({
     [form.category, lang],
   );
 
-  // Qué significa lo tocado (`explain` de Flutter): los textos son del motor.
+  // Qué significa lo tocado: los textos son del motor.
   const explain = (key: string): Explained | null => {
     if (key === 'category') {
       const rule = rules.featCategory[form.category];

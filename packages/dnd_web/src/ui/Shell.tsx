@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode, type MouseEventHandler } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
-import { ArrowLeft, ExternalLink, Menu, Monitor, Moon, Sun, X, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, Menu, Monitor, Moon, Sun, X, type LucideIcon } from 'lucide-react';
 import { useAccount } from '../api/queries';
 import { useTexts } from '../i18n/context';
 import { useAccountSave } from '../settings/useAccountSave';
@@ -152,7 +152,6 @@ export function NavItem({
   label,
   active = false,
   internal = false,
-  external = false,
   count,
   badge,
   muted = false,
@@ -178,10 +177,7 @@ export function NavItem({
   /** En oro aunque no esté activo: el verbo del panel («Nueva campaña»). */
   accent?: boolean;
   onSelect?: () => void;
-  /** Lleva a Flutter: se marca para que no sorprenda el cambio de cliente. */
-  external?: boolean;
 }) {
-  const t = useTexts();
   const className = cx(
     'flex min-h-9 items-center gap-2.5 rounded-[var(--radius-nav)] px-3 py-2 text-[14px] transition-colors duration-[120ms] ease-out',
     active
@@ -202,12 +198,6 @@ export function NavItem({
         <span className="inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-[9px] bg-gold px-[5px] text-[12px] leading-none font-bold text-on-primary tabular-nums">
           {badge}
         </span>
-      )}
-      {external && (
-        <>
-          <ExternalLink size={13} aria-hidden="true" className="shrink-0 opacity-60" />
-          <span className="sr-only">{` (${t.opensFlutter})`}</span>
-        </>
       )}
     </>
   );

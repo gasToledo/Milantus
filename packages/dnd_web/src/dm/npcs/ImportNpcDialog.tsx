@@ -16,7 +16,7 @@ import { npcTypeLine } from './npc';
 const NONE = '__none__';
 
 /**
- * «Importar PNJ» (`ImportNpcDialog` de Flutter): elegir el archivo muestra
+ * «Importar PNJ»: elegir el archivo muestra
  * enseguida qué trae —sin botón «Leer»—, y recién «Importar» escribe algo.
  * El servidor lee el ZIP (`POST /api/npcs/import/preview`, que no guarda nada)
  * y sirve igual para el de un PNJ y para el de **un** personaje exportado
@@ -78,7 +78,7 @@ export function ImportNpcDialog({
     }
   };
 
-  // La línea de tipo y lo que falta salen del motor, igual que en Flutter: el
+  // La línea de tipo y lo que falta salen del motor: el
   // PNJ del archivo se mira con la misma maquinaria que uno de la Biblioteca.
   const view = useMemo<NpcView | null>(() => {
     if (!preview || !catalog.data) return null;

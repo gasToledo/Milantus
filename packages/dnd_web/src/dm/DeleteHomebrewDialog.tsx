@@ -15,7 +15,7 @@ import { AppBusyLabel } from '../ui/status';
  * Dice **qué fichas de Mis personajes la usan** (`charactersUsing` del motor,
  * sobre los documentos completos): es lo que vuelve el aviso una decisión y no
  * una amenaza en abstracto. Borrar no toca esas fichas: quedan con una
- * advertencia, como en Flutter.
+ * advertencia.
  *
  * Si la lista de personajes todavía carga, el diálogo espera; si no se pudo
  * leer, lo dice y deja borrar igual (el borrado no depende de ella). Si el
