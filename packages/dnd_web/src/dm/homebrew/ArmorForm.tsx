@@ -4,7 +4,7 @@ import { armorDraft, armorForm, armorWithCategory, homebrewFormOptions, type Arm
 import { useLang, useTexts } from '../../i18n/context';
 import { Eyebrow } from '../../ui/data';
 import { Select } from '../../ui/primitives';
-import { EntryPreview, ExplainHere, HomebrewFormShell, useHomebrewRules, type Explained } from './HomebrewFormShell';
+import { EntryPreview, ExplainHere, HomebrewFormShell, readWithLang, useHomebrewRules, type Explained } from './HomebrewFormShell';
 import { EconomySection, FormSection, numberError, SwitchRow, TextAreaField, TextField } from './homebrewFields';
 
 /**
@@ -51,7 +51,7 @@ export function ArmorForm({
   const rules = useHomebrewRules();
 
   const draft = useMemo(() => armorDraft(initial, form), [initial, form]);
-  const options = useMemo(() => homebrewFormOptions(catalog), [catalog, lang]);
+  const options = useMemo(() => readWithLang(lang, () => homebrewFormOptions(catalog)), [catalog, lang]);
   const dirty = JSON.stringify(form) !== JSON.stringify(start);
   const set = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));
 

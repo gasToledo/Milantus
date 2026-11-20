@@ -83,6 +83,9 @@ jobs:
           cache: npm
           cache-dependency-path: packages/dnd_web/package-lock.json
       - run: npm ci
+      # Antes del motor: una dependencia vieja de un hook no necesita
+      # compilar Dart para verse.
+      - run: npm run lint
       - run: npm run build:engine
       - run: npx tsc --noEmit
       - run: npm test

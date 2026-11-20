@@ -5,7 +5,7 @@ import { useLang, useTexts } from '../../i18n/context';
 import { signed } from '../../sheet/format';
 import { Select } from '../../ui/primitives';
 import { EffectEditor } from './EffectEditor';
-import { EntryPreview, ExplainHere, HomebrewFormShell, useHomebrewRules, type Explained } from './HomebrewFormShell';
+import { EntryPreview, ExplainHere, HomebrewFormShell, readWithLang, useHomebrewRules, type Explained } from './HomebrewFormShell';
 import { FormSection, numberError, PillGroup, SwitchRow, TextAreaField, TextField, weightError } from './homebrewFields';
 
 /** Radix no admite un valor vacío en un `Select`: «Mundano» viaja con este. */
@@ -63,8 +63,11 @@ export function ItemForm({
   const rules = useHomebrewRules();
 
   const draft = useMemo(() => itemDraft(initial, form), [initial, form]);
-  const options = useMemo(() => homebrewFormOptions(catalog), [catalog, lang]);
-  const bases = useMemo(() => (form.baseItemKind === NONE ? [] : itemBaseOptions(form.baseItemKind, catalog)), [form.baseItemKind, catalog, lang]);
+  const options = useMemo(() => readWithLang(lang, () => homebrewFormOptions(catalog)), [catalog, lang]);
+  const bases = useMemo(
+    () => readWithLang(lang, () => (form.baseItemKind === NONE ? [] : itemBaseOptions(form.baseItemKind, catalog))),
+    [form.baseItemKind, catalog, lang],
+  );
   const dirty = JSON.stringify(form) !== JSON.stringify(start);
   const set = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));
 

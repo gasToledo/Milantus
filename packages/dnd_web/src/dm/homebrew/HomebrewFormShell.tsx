@@ -29,10 +29,17 @@ export function EntryPreview({ subtitle, name, detail, note }: { subtitle: strin
  *  chico, el valor tocado, la regla y, si hay, lo que vale para todo el grupo. */
 export type Explained = { kicker: string; title: string; text: string; note?: string | null };
 
+/** El motor lee el idioma activo por su cuenta: [lang] no entra en la cuenta,
+ *  pero es lo que avisa que hay que pedir los textos de nuevo. */
+export function readWithLang<T>(lang: string, read: () => T): T {
+  void lang;
+  return read();
+}
+
 /** Los textos de regla del motor, en el idioma activo. */
 export function useHomebrewRules(): HomebrewRules {
   const lang = useLang();
-  return useMemo(() => homebrewRules(), [lang]);
+  return useMemo(() => readWithLang(lang, homebrewRules), [lang]);
 }
 
 /** Quien monta una explicación le pone esta `key`: otra explicación entra con

@@ -132,6 +132,10 @@ export function MentionTextarea({
   const flat = [...rows.near, ...rows.far, ...rows.create];
   const current = Math.min(active, Math.max(0, flat.length - 1));
 
+  // En cada commit: el cursor pendiente vive en un ref (no rearma un efecto) y
+  // se escribe en el mismo turno que el texto o el diálogo. Con dependencias
+  // vacías no se movería al insertar; las corridas de más no hacen nada.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useLayoutEffect(() => {
     const at = pendingCaret.current;
     if (at === null || !area.current) return;
