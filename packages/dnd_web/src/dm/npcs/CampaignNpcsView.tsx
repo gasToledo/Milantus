@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { useMemo, useState, type CSSProperties } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { EllipsisVertical, LibraryBig, Plus, ScrollText, UserMinus } from 'lucide-react';
 import { queryKeys, useCampaignNpcs, useSheetCatalog } from '../../api/queries';
 import type { DmCampaign } from '../../api/client';
 import { movedOrder } from '../../dashboard/roster';
 import { useHoldDrag } from '../../ui/holdDrag';
-import { useListTransition } from '../../ui/listTransition';
+import { useDeferredFocus } from '../../ui/focus';
+import { useListTransition, vtName } from '../../ui/listTransition';
 import { editCampaign } from '../campaigns';
 import { npcViews, type NpcView } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
@@ -106,15 +107,7 @@ export function CampaignNpcsView({ campaign }: { campaign: DmCampaign }) {
 
   // Quitar un PNJ se lleva su ⋮: el foco va al título de la sección cuando el
   // diálogo terminó de devolverlo a su botón.
-  const [focusTitle, setFocusTitle] = useState(false);
-  useEffect(() => {
-    if (!focusTitle) return;
-    const id = window.setTimeout(() => {
-      document.querySelector<HTMLElement>('[data-dm-title]')?.focus();
-      setFocusTitle(false);
-    }, 0);
-    return () => window.clearTimeout(id);
-  }, [focusTitle]);
+  const setFocusTarget = useDeferredFocus();
 
   const portraits = useMemo(() => new Map((npcs.data ?? []).map((e) => [e.npc.id, npcPortrait(e)])), [npcs.data]);
 
@@ -228,7 +221,7 @@ export function CampaignNpcsView({ campaign }: { campaign: DmCampaign }) {
           errorText={t.dmRemoveFromCampaignError}
           onConfirm={async () => {
             await links.unlink(campaign.id, removing.id, animateList);
-            setFocusTitle(true);
+            setFocusTarget('[data-dm-title]');
           }}
           onClose={() => setRemoving(null)}
         />
@@ -275,7 +268,7 @@ function TableNpcCard({
       // Después del `item`, que trae su `style` para el arrastre. El nombre
       // identifica la tarjeta en las transiciones de la grilla.
       style={{
-        viewTransitionName: `npc-${npc.id.replace(/[^\w-]/g, '_')}`,
+        viewTransitionName: vtName('npc', npc.id),
         ...(reorder?.item.style as CSSProperties | undefined),
       }}
     >

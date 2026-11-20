@@ -1,10 +1,11 @@
-import { Fragment, useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { Fragment, useId, useState, type ReactNode } from 'react';
 import { Check, CircleAlert, type LucideIcon } from 'lucide-react';
 import { fold, type CodexDetail } from '../codex/entries';
 import type { Texts } from '../i18n/texts';
 import { Button } from './Button';
 import { cx } from './cx';
 import { Eyebrow } from './data';
+import { usePulseOnChange } from './pulse';
 
 // Las piezas del circuito de los asistentes (subida de nivel y creador). El
 // catálogo y cuándo usar cada una están en `docs/desarrollo/diseno-web-react.md`.
@@ -643,15 +644,12 @@ export function AfterList({ rows }: { rows: AfterRow[] }) {
 /** Una cifra de «Cómo queda» que late cuando cambia por algo que se eligió
  *  (+2 a FUE): se ve qué movió la elección. La primera vez no late. */
 function AfterValue({ value, className }: { value: ReactNode; className?: string }) {
+  // Solo las cifras (y un texto suelto) laten: un nodo no tiene un «antes»
+  // comparable. La primera lectura no late.
   const text = typeof value === 'number' || typeof value === 'string' ? String(value) : null;
-  const last = useRef(text);
-  const [n, setN] = useState(0);
-  useEffect(() => {
-    if (text !== null && last.current !== null && last.current !== text) setN((x) => x + 1);
-    last.current = text;
-  }, [text]);
+  const { key } = usePulseOnChange(text);
   return (
-    <span key={n} className={cx('inline-block', className, n > 0 && 'change-pulse')}>
+    <span key={key} className={cx('inline-block', className, key > 0 && 'change-pulse')}>
       {value}
     </span>
   );

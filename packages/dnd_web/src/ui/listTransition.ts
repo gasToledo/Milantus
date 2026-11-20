@@ -1,6 +1,12 @@
 import { useCallback, useLayoutEffect, useRef } from 'react';
 import { prefersReducedMotion } from './motion';
 
+/** Nombre de view-transition de una tarjeta de lista: el prefijo la distingue
+ *  de las otras listas y el id queda como identificador CSS válido. */
+export function vtName(prefix: string, id: string): string {
+  return `${prefix}-${id.replace(/[^\w-]/g, '_')}`;
+}
+
 /**
  * Anima con View Transitions lo que cambia el orden o el contenido de una
  * lista de tarjetas (`.roster-card`, ver `index.css`): cada una se desliza a

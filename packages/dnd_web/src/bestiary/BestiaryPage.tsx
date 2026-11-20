@@ -14,7 +14,7 @@ import { Select, Tooltip } from '../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { asProfile, type CreatureProfile as Profile } from './creature';
 import { CreatureProfile } from './CreatureProfile';
-import { prefersReducedMotion } from '../ui/motion';
+import { softEnter } from '../ui/motion';
 
 const ALL = '*';
 
@@ -153,14 +153,7 @@ function Browser({
     article?.scrollTo({ top: 0 });
     // Y entra suave, como una entrada del Códice. Se anima el mismo elemento
     // en vez de remontarlo: el foco no se mueve.
-    if (prefersReducedMotion()) return;
-    article?.animate(
-      [
-        { opacity: 0, translate: '0 4px' },
-        { opacity: 1, translate: '0 0' },
-      ],
-      { duration: 160, easing: 'ease-out' },
-    );
+    softEnter(article);
   }, [open?.row.id]);
 
   // Un rango invertido no se muestra como lista vacía: el extremo que no se
