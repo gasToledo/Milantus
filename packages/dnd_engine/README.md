@@ -1,6 +1,6 @@
 # dnd_engine
 
-Núcleo **Dart puro** (sin Flutter) de la app de fichas de D&D 5e: motor de
+Núcleo **Dart puro** de la app de fichas de D&D 5e: motor de
 reglas dirigido por datos, modelos de contenido y validación no bloqueante.
 Reglas de 2024: **SRD 5.2.1 (CC-BY-4.0)** y contenido ampliado identificado
 por origen; ver [reglas y licencia](../../README.md#reglas-y-licencia).
@@ -23,8 +23,8 @@ JSON, no programar**.
   combate e inventario, dados y Forma Salvaje.
 - `lib/src/data/content_repository.dart` — repositorio en memoria + carga de packs.
 - `lib/assets/srd_2024/` — clases, subclases, especies, linajes, trasfondos,
-  dotes, equipo, objetos mágicos, conjuros y criaturas. Bajo `lib/` para usarlo como
-  asset de Flutter vía `packages/dnd_engine/assets/srd_2024/...`. Su
+  dotes, equipo, objetos mágicos, conjuros y criaturas. El cliente web los copia a su
+  build y los pide a `/content/`. Su
   `manifest.json` declara el formato y el reglamento antes de cargar los datos.
 - `test/` — reglas, serialización, migraciones e integridad del catálogo;
   `content_integrity_test.dart` fija reglas del contenido (referencias,
@@ -33,7 +33,7 @@ JSON, no programar**.
   descritos en
   [Contenido y reglas](../../docs/desarrollo/contenido-y-reglas.md).
 
-Los modelos y las reglas no dependen de Flutter ni de `dart:io`. El cargador
+Los modelos y las reglas no dependen de `dart:io`. El cargador
 de directorios usa una importación condicional para aislar `dart:io`; el
 cliente web carga los assets y llama a `ContentRepository.fromJsonPacks`.
 
@@ -43,7 +43,7 @@ el documento.
 
 ## Correr los tests
 
-Requiere el SDK de Dart (o Flutter, que lo incluye):
+Requiere el SDK de Dart:
 
 ```sh
 cd packages/dnd_engine

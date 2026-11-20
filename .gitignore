@@ -8,12 +8,6 @@ build/
 .pub/
 *.g.dart
 
-# Windows desktop build artifacts (generados por flutter, no versionar)
-packages/dnd_app/windows/flutter/ephemeral/
-packages/dnd_app/windows/flutter/generated_plugin_registrant.cc
-packages/dnd_app/windows/flutter/generated_plugin_registrant.h
-packages/dnd_app/windows/flutter/generated_plugins.cmake
-
 # IDE
 .idea/
 *.iml
@@ -55,16 +49,6 @@ docs.zip
 .env
 cloudflared/config.yml
 cloudflared/creds.json
-
-# Arranque de desarrollo con el doble en memoria
-# (`flutter run -t test/main_dev.dart -d chrome`). Es el andamio de una
-# máquina, no del producto: vive en `test/` porque enchufa `FakeApiServer`, y
-# `flutter test` no lo levanta porque no termina en `_test.dart`.
-#
-# Ojo: el enganche que este archivo necesita —el `ApiClient?` opcional de
-# `lib/main.dart`— no se puede ignorar acá, porque `main.dart` ya está
-# trackeado y esta lista solo alcanza a lo que git todavía no sigue.
-packages/dnd_app/test/main_dev.dart
 
 # Borradores de documentación que todavía no son guía vigente (ver
 # `docs/README.md`). Solo alcanza a lo que git todavía no sigue: si alguno se

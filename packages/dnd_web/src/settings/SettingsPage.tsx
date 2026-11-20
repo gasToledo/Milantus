@@ -1,4 +1,4 @@
-import { Check, CircleHelp, Globe, History, Palette, Sword, Users, type LucideIcon } from 'lucide-react';
+import { Check, CircleHelp, Globe, Palette, Sword, Users, type LucideIcon } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import type { RosterSettings } from '../api/client';
 import { useRoster, useRosterSettings } from '../api/queries';
@@ -70,7 +70,6 @@ export function SettingsPage() {
               </>
             ))}
             <HelpCard save={save} />
-            <LegacyCard save={save} />
           </div>
         </div>
       </div>
@@ -388,42 +387,6 @@ function HelpCard({ save }: { save: AccountSave }) {
         >
           {t.settingsTutorialsReset}
         </Button>
-      </SettingRow>
-    </Section>
-  );
-}
-
-function LegacyCard({ save }: { save: AccountSave }) {
-  const t = useTexts();
-  const settings = useRosterSettings().data;
-  const legacy = settings?.legacyVersion === true;
-  return (
-    <Section id="settings-legacy" title={t.settingsSectionLegacy} icon={History}>
-      <SettingRow
-        label={t.settingsLegacyVersion}
-        labelId="settings-legacy-version-label"
-        layout="inline"
-        note={
-          legacy && (
-            <div role="status" className="step-in mt-3 flex flex-col items-start gap-2.5" data-field="legacy-version">
-              <p className="text-[13px] leading-normal text-text-muted">{t.settingsLegacyNotice}</p>
-              <Button tone="secondary" onClick={() => window.location.assign('/')}>
-                {t.settingsLegacyGo}
-              </Button>
-            </div>
-          )
-        }
-      >
-        {/* La cookie que lee el servidor al servir `/` la pone `AccountPrefsSync`
-            cuando cambia lo que dice la cuenta. */}
-        <Switch
-          id="settings-legacy-version"
-          label={t.settingsLegacyVersion}
-          labelledBy="settings-legacy-version-label"
-          checked={legacy}
-          disabled={!settings}
-          onCheckedChange={(on) => save.mutate({ legacyVersion: on })}
-        />
       </SettingRow>
     </Section>
   );

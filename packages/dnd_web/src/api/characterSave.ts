@@ -5,7 +5,7 @@
 // estado y no la acción es lo que hace seguro reintentar: repetir un PUT no
 // aplica dos veces el mismo daño.
 //
-// Ya no gana el último: cada PUT lleva la versión que /v2 leyó y, si otra
+// Ya no gana el último: cada PUT lleva la versión que leyó y, si otra
 // pestaña o dispositivo guardó antes, el servidor responde 409. Entonces se
 // descarta lo pendiente de esa ficha y se avisa por `onStale` (la pantalla
 // vuelve a pedirla). Flutter no manda versión y sigue pisando, así que

@@ -1,11 +1,13 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
+import pkg from './package.json' with { type: 'json' };
 
 export default defineConfig({
-  // El servidor lo monta bajo `/v2/` (DND_WEB_V2_ROOT): sin esta base, los
-  // assets del HTML apuntarían a `/assets/...`, que es del cliente de Flutter.
-  base: '/v2/',
+  base: '/',
+  // La versión visible sale de `package.json` y entra al bundle al construir:
+  // es la del despliegue que sirvió este HTML, sin un pedido más.
+  define: { __APP_VERSION__: JSON.stringify(pkg.version) },
   // Hidden: genera los .map sin el comentario que hace que el navegador los
   // baje solo; se usan a mano para leer una traza del log (ver despliegue.md).
   build: { sourcemap: 'hidden' },

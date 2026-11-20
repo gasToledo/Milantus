@@ -7,7 +7,7 @@ import { patchSettings } from '../api/settingsSave';
 /** Las claves que se cambian desde la interfaz (Ajustes y el menú de tema). */
 export type AccountPatch = Pick<
   Partial<RosterSettings>,
-  'startsInDmMode' | 'themeMode' | 'showEncounterDifficulty' | 'language' | 'animationsOff' | 'tutorialsSeen' | 'legacyVersion'
+  'startsInDmMode' | 'themeMode' | 'showEncounterDifficulty' | 'language' | 'animationsOff' | 'tutorialsSeen'
 >;
 
 /** El guardado de la cuenta: uno solo para toda la pantalla, porque las filas

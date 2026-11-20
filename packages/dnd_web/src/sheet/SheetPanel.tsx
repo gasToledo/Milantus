@@ -35,8 +35,8 @@ export const TAB_ICONS: Record<SheetTab, LucideIcon> = {
 /**
  * El panel de una pantalla de adentro (`SidebarBackButton` + navegación de la
  * ficha): «volver», la tarjeta del personaje, las secciones y las acciones.
- * Las cinco secciones son pestañas de `/v2`. Imprimir es de acá (`PrintSheet`);
- * subir de nivel y el retrato son pantallas de `/v2` (`LevelUpWizard`,
+ * Las cinco secciones son pestañas. Imprimir es de acá (`PrintSheet`);
+ * subir de nivel y el retrato son pantallas propias (`LevelUpWizard`,
  * `PortraitPage`); compartir abre `ShareDialog`, que emite el código.
  */
 /** Lo que el panel marca como activo: una pestaña, o el retrato o la subida

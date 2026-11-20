@@ -6,7 +6,7 @@ import 'package:archive/archive.dart';
 import 'package:dnd_engine/dnd_engine.dart';
 import 'package:dnd_server/src/app.dart';
 import 'package:dnd_server/src/auth/oidc_service.dart';
-import 'package:dnd_server/src/web/web_v2.dart';
+import 'package:dnd_server/src/web/web.dart';
 import 'package:image/image.dart' as img;
 import 'package:shelf/shelf.dart';
 import 'package:test/test.dart';
@@ -448,51 +448,6 @@ void main() {
       expect(body['name'], 'Ada Lovelace');
       expect(body['email'], 'ada@example.org');
       expect(body['pictureUrl'], 'https://idp.example/ada.png');
-    });
-
-    test('/api/me dice webV2 solo a las cuentas de DND_V2_USERS', () async {
-      Handler conLista(Set<String> v2Users) => buildHandler(
-        auth: fakeAuth.dependencies,
-        portraits: portraits,
-        generation: generation,
-        importBackup: importBackup,
-        importHomebrew: importHomebrew,
-        characters: characters,
-        campaigns: campaigns,
-        chapters: chapters,
-        notes: notes,
-        encounters: encounters,
-        events: events,
-        npcs: npcs,
-        transactions: transactions,
-        homebrew: homebrewRepo,
-        levelUps: levelUps,
-        itemGrants: itemGrants,
-        settings: settingsRepo,
-        scenarios: InMemoryScenarioRepository(campaigns, npcs),
-        v2Users: v2Users,
-      );
-      Future<Map<String, dynamic>> me(Handler h, String token) async {
-        final response = await h(
-          Request(
-            'GET',
-            Uri.parse('http://localhost/api/me'),
-            headers: {'cookie': 'dnd_session=$token'},
-          ),
-        );
-        return jsonDecode(await response.readAsString());
-      }
-
-      // El primer login de cada prueba crea `account-1` (ver el fake).
-      final token = await _login(handler);
-      final userId = (await me(handler, token))['userId'] as String;
-
-      expect((await me(handler, token))['webV2'], isFalse);
-      expect((await me(conLista({'otra-cuenta'}), token))['webV2'], isFalse);
-      final habilitada = await me(conLista({userId, 'otra-cuenta'}), token);
-      expect(habilitada['webV2'], isTrue);
-      // La lista no se filtra: solo el booleano de quien pregunta.
-      expect(habilitada.values, isNot(contains('otra-cuenta')));
     });
 
     // Una cuenta del proveedor sin nombre ni correo cargados no puede romper
@@ -2272,112 +2227,11 @@ void main() {
     });
   });
 
-  group('webStaticHandler', () {
-    test('una ruta que el enrutado no reconoce cae al build web', () async {
-      final withStatic = buildHandler(
-        auth: fakeAuth.dependencies,
-        portraits: portraits,
-        generation: generation,
-        importBackup: importBackup,
-        importHomebrew: importHomebrew,
-        characters: characters,
-        campaigns: campaigns,
-        chapters: chapters,
-        notes: notes,
-        encounters: encounters,
-        events: events,
-        npcs: npcs,
-        transactions: transactions,
-        homebrew: homebrewRepo,
-        levelUps: levelUps,
-        itemGrants: itemGrants,
-        settings: settingsRepo,
-        scenarios: InMemoryScenarioRepository(campaigns, npcs),
-        webStaticHandler: (request) =>
-            Response.ok('build web', headers: {'x-fuente': 'estatico'}),
-      );
-
-      final response = await withStatic(
-        Request('GET', Uri.parse('http://localhost/')),
-      );
-
-      expect(response.statusCode, 200);
-      expect(response.headers['x-fuente'], 'estatico');
-    });
-
-    test('una ruta de la API nunca cae al build web', () async {
-      final withStatic = buildHandler(
-        auth: fakeAuth.dependencies,
-        portraits: portraits,
-        generation: generation,
-        importBackup: importBackup,
-        importHomebrew: importHomebrew,
-        characters: characters,
-        campaigns: campaigns,
-        chapters: chapters,
-        notes: notes,
-        encounters: encounters,
-        events: events,
-        npcs: npcs,
-        transactions: transactions,
-        homebrew: homebrewRepo,
-        levelUps: levelUps,
-        itemGrants: itemGrants,
-        settings: settingsRepo,
-        scenarios: InMemoryScenarioRepository(campaigns, npcs),
-        webStaticHandler: (request) =>
-            Response.ok('build web', headers: {'x-fuente': 'estatico'}),
-      );
-
-      final response = await withStatic(
-        Request('GET', Uri.parse('http://localhost/api/characters')),
-      );
-
-      expect(response.headers['x-fuente'], isNull);
-    });
-
-    // La Cascade pasa al siguiente handler ante cualquier 404, también los de
-    // la API a propósito («Código inválido o vencido.»): el build web
-    // contestaba «Not Found» en texto plano y el mensaje se perdía.
-    test('un 404 de la API no cae al build web', () async {
-      final withStatic = buildHandler(
-        auth: fakeAuth.dependencies,
-        portraits: portraits,
-        generation: generation,
-        importBackup: importBackup,
-        importHomebrew: importHomebrew,
-        characters: characters,
-        campaigns: campaigns,
-        chapters: chapters,
-        notes: notes,
-        encounters: encounters,
-        events: events,
-        npcs: npcs,
-        transactions: transactions,
-        homebrew: homebrewRepo,
-        levelUps: levelUps,
-        itemGrants: itemGrants,
-        settings: settingsRepo,
-        scenarios: InMemoryScenarioRepository(campaigns, npcs),
-        webStaticHandler: (request) =>
-            Response.ok('build web', headers: {'x-fuente': 'estatico'}),
-      );
-
-      for (final path in ['/api/no-existe', '/auth/no-existe']) {
-        final response = await withStatic(
-          Request('GET', Uri.parse('http://localhost$path')),
-        );
-        expect(response.statusCode, 404, reason: path);
-        expect(response.headers['x-fuente'], isNull, reason: path);
-      }
-    });
-  });
-
-  group('/v2 (cliente React)', () {
+  group('cliente web', () {
     late Directory dist;
 
     setUp(() {
-      dist = Directory.systemTemp.createTempSync('dnd_web_v2_');
+      dist = Directory.systemTemp.createTempSync('dnd_web_');
       File('${dist.path}/index.html').writeAsStringSync('<html>spa</html>');
       Directory('${dist.path}/assets').createSync();
       File('${dist.path}/assets/index-abc123.js').writeAsStringSync('js');
@@ -2385,7 +2239,7 @@ void main() {
 
     tearDown(() => dist.deleteSync(recursive: true));
 
-    Handler build({Handler? v2, Handler? flutter}) => buildHandler(
+    Handler build() => buildHandler(
       auth: fakeAuth.dependencies,
       portraits: portraits,
       generation: generation,
@@ -2404,33 +2258,15 @@ void main() {
       itemGrants: itemGrants,
       settings: settingsRepo,
       scenarios: InMemoryScenarioRepository(campaigns, npcs),
-      webStaticHandler: flutter,
-      webV2Handler: v2,
+      webHandler: buildWebHandler(dist.path),
     );
 
     Future<Response> get(Handler h, String path) =>
         Future.value(h(Request('GET', Uri.parse('http://localhost$path'))));
 
-    test(
-      'sin DND_WEB_V2_ROOT responde 404, haya o no build de Flutter',
-      () async {
-        final flutter = (Request r) => Response.ok('flutter');
-        for (final h in [build(), build(flutter: flutter)]) {
-          expect((await get(h, '/v2/')).statusCode, 404);
-          expect((await get(h, '/v2')).statusCode, 404);
-          expect((await get(h, '/v2/personajes')).statusCode, 404);
-        }
-        // Lo que no empieza con el segmento `v2` sigue siendo de Flutter.
-        expect(
-          await (await get(build(flutter: flutter), '/v22')).readAsString(),
-          'flutter',
-        );
-      },
-    );
-
     test('una ruta de cliente cae a index.html y no se cachea', () async {
-      final h = build(v2: buildWebV2Handler(dist.path));
-      for (final path in ['/v2/', '/v2/index.html', '/v2/personajes/3']) {
+      final h = build();
+      for (final path in ['/', '/index.html', '/personajes/3']) {
         final response = await get(h, path);
         expect(response.statusCode, 200, reason: path);
         expect(await response.readAsString(), '<html>spa</html>', reason: path);
@@ -2441,24 +2277,50 @@ void main() {
     test(
       'los archivos con hash de assets/ son immutable; uno que falta es 404',
       () async {
-        final h = build(v2: buildWebV2Handler(dist.path));
-        final hit = await get(h, '/v2/assets/index-abc123.js');
+        final h = build();
+        final hit = await get(h, '/assets/index-abc123.js');
         expect(hit.statusCode, 200);
         expect(
           hit.headers['cache-control'],
           'public, max-age=31536000, immutable',
         );
-        final miss = await get(h, '/v2/assets/viejo-zzz.js');
+        final miss = await get(h, '/assets/viejo-zzz.js');
         expect(miss.statusCode, 404);
         expect(miss.headers['cache-control'], isNot(contains('immutable')));
       },
     );
 
-    test('/api no se toca aunque /v2 esté montado', () async {
-      final h = build(v2: buildWebV2Handler(dist.path));
-      final response = await get(h, '/api/me');
-      expect(response.headers['cache-control'], isNull);
-      expect(await response.readAsString(), isNot(contains('spa')));
+    // Los marcadores de cuando React convivía con Flutter bajo `/v2`.
+    test('/v2 redirige para siempre a la misma ruta sin el prefijo', () async {
+      final h = build();
+      for (final (from, to) in [
+        ('/v2', '/'),
+        ('/v2/', '/'),
+        ('/v2/personajes/3/combate', '/personajes/3/combate'),
+        ('/v2/dm/pnj/nuevo?nombre=Ana', '/dm/pnj/nuevo?nombre=Ana'),
+      ]) {
+        final response = await get(h, from);
+        expect(response.statusCode, 301, reason: from);
+        expect(response.headers['location'], to, reason: from);
+      }
+      // Solo el segmento `v2`, no cualquier cosa que empiece igual.
+      expect((await get(h, '/v22')).statusCode, 200);
+    });
+
+    // La Cascade pasa al siguiente handler ante cualquier 404, también los de
+    // la API a propósito («Código inválido o vencido.»): el build web
+    // contestaba «Not Found» en texto plano y el mensaje se perdía.
+    test('la API nunca cae al build web, tampoco con un 404', () async {
+      final h = build();
+      for (final path in ['/api/me', '/api/no-existe', '/auth/no-existe']) {
+        final response = await get(h, path);
+        expect(response.headers['cache-control'], isNull, reason: path);
+        expect(
+          await response.readAsString(),
+          isNot(contains('spa')),
+          reason: path,
+        );
+      }
     });
   });
 

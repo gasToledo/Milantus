@@ -2,7 +2,7 @@
 /// `packages/dnd_web/e2e/`): el `buildHandler` real, con los repositorios en
 /// memoria de `test/fakes/` y una sesión ya abierta.
 ///
-///     DND_WEB_V2_ROOT=../dnd_web/dist DND_SERVER_PORT=8787 \
+///     DND_WEB_ROOT=../dnd_web/dist DND_SERVER_PORT=8787 \
 ///       dart run test/e2e_server.dart
 ///
 /// Vive en `test/` y no en `bin/` porque enchufa dobles de prueba, y no se
@@ -10,7 +10,7 @@
 /// y lo analiza igual que el resto, y el Dockerfile no lo ve (`.dockerignore`).
 ///
 /// La sesión falsa evita el login OIDC, que necesita Zitadel; lo que se prueba
-/// es el camino cookie → `/api/me` → `/v2`, no el proveedor de identidad.
+/// es el camino cookie → `/api/me` → cliente, no el proveedor de identidad.
 library;
 
 import 'dart:io';
@@ -20,7 +20,7 @@ import 'package:dnd_server/src/ai/portrait_generation_service.dart';
 import 'package:dnd_server/src/app.dart';
 import 'package:dnd_server/src/auth/session_store.dart';
 import 'package:dnd_server/src/import/import_service.dart';
-import 'package:dnd_server/src/web/web_v2.dart';
+import 'package:dnd_server/src/web/web.dart';
 import 'package:image/image.dart' as img;
 import 'package:shelf/shelf_io.dart' as shelf_io;
 
@@ -58,8 +58,7 @@ const smokeFavoriteId = 'zelda-de-humo';
 /// El clérigo sembrado, con trucos y conjuros preparados.
 const smokeClericId = 'elsbeth-de-humo';
 
-/// La cuenta del DM de la mesa sembrada, y su campaña. Está en `v2Users`: el
-/// Modo DM de /v2 (`e2e/dm.spec.ts`) es de las cuentas con `webV2`.
+/// La cuenta del DM de la mesa sembrada, y su campaña (`e2e/dm.spec.ts`).
 const _smokeDmId = 'dm-de-humo';
 const smokeDmToken = 'sesion-del-dm=';
 const _smokeCampaignId = 'marca-del-cuervo';
@@ -68,7 +67,7 @@ const _smokeCampaignId = 'marca-del-cuervo';
 /// de una ficha vinculada.
 const _smokeSecondPlayerId = 'segundo-jugador-de-humo';
 
-/// Un arma homebrew de la cuenta, que Aldric lleva equipada: la ficha de /v2
+/// Un arma homebrew de la cuenta, que Aldric lleva equipada: la ficha
 /// tiene que fusionar `/api/homebrew` con el catálogo oficial para que su
 /// ataque aparezca (`e2e/ficha.spec.ts`).
 const smokeHomebrewWeaponId = 'hacha-de-humo';
@@ -80,10 +79,10 @@ const smokeHomebrewCreatureId = 'sombra-de-humo';
 /// Una dote homebrew de la cuenta (`e2e/homebrew.spec.ts`).
 const smokeHomebrewFeatId = 'paso-de-humo';
 
-/// Una segunda sesión, de una cuenta que **no** está en `v2Users`: /v2 le
-/// responde «No disponible» sin pedir nada más a la API.
-const smokeNoV2Token = 'sesion-sin-v2=';
-const smokeNoV2UserId = 'cuenta-sin-v2';
+/// Una cuenta que las pruebas usan solo por API, nunca desde una pantalla:
+/// hace de «otra cuenta» y sus avisos no chocan con las pruebas en paralelo.
+const apiOnlyToken = 'sesion-solo-api=';
+const apiOnlyUserId = 'cuenta-solo-api';
 
 /// La cuenta de las pruebas de escritura (`e2e/escritura.spec.ts`), aparte de
 /// la de humo a propósito: lo que esas pruebas guardan no cambia los números
@@ -95,12 +94,12 @@ const transferToken = 'sesion-de-transferencia=';
 const transferUserId = 'cuenta-de-transferencia';
 
 Future<void> main() async {
-  final root = Platform.environment['DND_WEB_V2_ROOT'] ?? '';
+  final root = Platform.environment['DND_WEB_ROOT'] ?? '';
   final port = int.parse(Platform.environment['DND_SERVER_PORT'] ?? '8787');
-  final v2 = root.isEmpty ? null : buildWebV2Handler(root);
-  if (v2 == null) {
+  final web = root.isEmpty ? null : buildWebHandler(root);
+  if (web == null) {
     stderr.writeln(
-      'DND_WEB_V2_ROOT="$root" no existe: hace falta `npm run build`.',
+      'DND_WEB_ROOT="$root" no existe: hace falta `npm run build`.',
     );
     exit(1);
   }
@@ -123,10 +122,10 @@ Future<void> main() async {
     name: 'Ilse de Humo',
     email: 'escritura@example.org',
   );
-  auth.sessionsByToken[smokeNoV2Token] = smokeNoV2UserId;
-  auth.profilesByToken[smokeNoV2Token] = const SessionProfile(
-    name: 'Sin Humo',
-    email: 'sin-v2@example.org',
+  auth.sessionsByToken[apiOnlyToken] = apiOnlyUserId;
+  auth.profilesByToken[apiOnlyToken] = const SessionProfile(
+    name: 'Solo API',
+    email: 'solo-api@example.org',
   );
   auth.sessionsByToken[transferToken] = transferUserId;
   auth.profilesByToken[transferToken] = const SessionProfile(
@@ -134,7 +133,7 @@ Future<void> main() async {
     email: 'transferencia@example.org',
   );
 
-  // Un retrato de Elsbeth, para los medallones de /v2: su ficha lo pide con
+  // Un retrato de Elsbeth, para los medallones: su ficha lo pide con
   // la clave, y el DM de su mesa por el vínculo (`e2e/dm.spec.ts`).
   final portraits = InMemoryPortraitBlobStore();
   final elsbethPortrait = await portraits.save(
@@ -288,7 +287,7 @@ Future<void> main() async {
       ),
     ),
   );
-  // La que sube de nivel en `/v2`: sin conjuros (lo que pide elegir un
+  // La que sube de nivel: sin conjuros (lo que pide elegir un
   // lanzador todavía se elige en Flutter) y sin senda, así la subida a 4 pasa
   // por PG, subclase y mejora de característica.
   await characters.create(
@@ -800,9 +799,7 @@ Future<void> main() async {
     levelUps: levelUps,
     itemGrants: itemGrants,
     settings: settings,
-    webV2Handler: v2,
-    // El DM también: el Modo DM de /v2 es de las cuentas con `webV2`.
-    v2Users: {smokeUserId, _smokeDmId, writerUserId, transferUserId},
+    webHandler: web,
   );
 
   final server = await shelf_io.serve(

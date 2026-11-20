@@ -21,7 +21,8 @@ import {
   ArrowLeft,
   type LucideIcon,
 } from 'lucide-react';
-import { useAppVersion, useSheetCatalog } from '../api/queries';
+import { APP_VERSION } from '../api/client';
+import { useSheetCatalog } from '../api/queries';
 import { abilityModifier } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
 import { codexHref, Link, navigate, navigateBack, rosterHref, SHEET_TABS, type CodexCategory } from '../router';
@@ -72,14 +73,13 @@ const TABLE_SCORES = [8, 10, 12, 14, 16, 18, 20];
  * en Flutter: el Códice lo abre cualquier jugador y los perfiles de los
  * monstruos son del DM (el Bestiario del Modo DM).
  *
- * Portada, categoría y entrada son URLs (`/v2/codice/conjuros/fireball`); la
+ * Portada, categoría y entrada son URLs (`/codice/conjuros/fireball`); la
  * búsqueda general vive en el panel y no cambia la URL.
  */
 export function CodexPage({ category, entryId }: { category: CodexCategory | null; entryId: string | null }) {
   const t = useTexts();
   const lang = useLang();
   const catalog = useSheetCatalog(lang);
-  const version = useAppVersion(true);
   const [query, setQuery] = useState('');
 
   // Las entradas de cada categoría, armadas una vez por catálogo e idioma; el
@@ -179,7 +179,7 @@ export function CodexPage({ category, entryId }: { category: CodexCategory | nul
           </NavGroup>
         </>
       }
-      footer={<SheetFooter version={version.data} />}
+      footer={<SheetFooter version={APP_VERSION} />}
     >
       {body}
     </Shell>

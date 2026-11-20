@@ -1,8 +1,12 @@
-# Migración del cliente a React (`/v2`)
+# Migración del cliente a React
 
-Estado: guía vigente. Describe lo que **existe hoy en `main`**; lo que todavía
-no existe está marcado como tal en la sección [Lo que todavía no existe](#lo-que-todavía-no-existe).
-Si el código y esta guía discrepan, manda el código.
+Estado: **terminada el 2026-11-20** (versión 2.0.0). El cliente de Flutter
+(`packages/dnd_app`) se borró, el de React se sirve en la raíz y `/v2/*`
+redirige (301) a la misma ruta sin el prefijo. Lo que sigue es el registro de
+cómo se hizo, paso por paso: las menciones a `/v2`, al flag `webV2`, a «sigue
+en Flutter» y a archivos de `dnd_app` describen ese momento y no el código de
+hoy. Lo único que quedó sin portar fue mantener la pantalla encendida, que se
+descartó. Si el código y esta guía discrepan, manda el código.
 
 ## Por qué se migra
 

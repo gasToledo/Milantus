@@ -6,7 +6,7 @@ import { api, TOKEN, TOKEN_DM } from './helpers';
 test.use({ locale: 'es-AR' });
 
 const t = textsFor('es');
-const BIBLIOTECA = '/v2/dm/pnj';
+const BIBLIOTECA = '/dm/pnj';
 
 // Lo que el DM escribió de sus PNJ (ver `_seedNpcs` en `e2e_server.dart`) y
 // no tiene que llegarle a ninguna otra cuenta.
@@ -44,7 +44,7 @@ test('los PNJ del DM no llegan a otra cuenta: lo ajeno responde igual que lo ine
     await page.goto(`${BIBLIOTECA}/${id}/ficha/personaje`);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(t.npcNotFound);
   }
-  await page.goto('/v2/dm/campanas/marca-del-cuervo/pnj');
+  await page.goto('/dm/campanas/marca-del-cuervo/pnj');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(t.dmCampaignNotFound);
   for (const secreto of SOLO_DEL_DM) await expect(page.getByText(secreto)).toHaveCount(0);
 });

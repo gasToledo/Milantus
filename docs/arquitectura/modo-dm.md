@@ -113,12 +113,12 @@ La regla es simple: **quien ejecuta recibe respuesta en el momento; quien no
 estaba mirando recibe un aviso persistido.**
 
 El servidor guarda qué pasó (`kind` más los datos del `payload`), nunca la frase
-armada. El texto en español vive en `packages/dnd_app/lib/ui/user_event_messages.dart`,
+armada. El texto vive en el cliente (`packages/dnd_web/src/events/messages.ts`),
 así que corregir una redacción es cambiar una línea y no migrar la base. Un
 `kind` que el cliente no conozca se ignora en silencio: el servidor puede ser
 más nuevo que la pestaña abierta.
 
-**Cinco formas en el cliente de `/v2`** (`events/PendingEvents.tsx`, el campo
+**Cinco formas en el cliente** (`events/PendingEvents.tsx`, el campo
 `display` de `events/messages.ts`): la Inspiración Heroica ocupa la pantalla
 completa; un objeto del DM se abre como un cofre; el fin de capítulo es un
 diálogo animado; y los demás avisos salen como tostada con su ícono si viene uno
@@ -225,14 +225,14 @@ además `grantsLevel` (booleano) y `grantsGold` (entero >= 0), los dos opcionale
 otro tipo o un oro negativo es un 400, validado antes de la primera escritura.
 Si llegan, reemplazan a los del capítulo en el aviso de cada jugador y se guardan
 en el capítulo completado (con y sin reparto de objetos), así que el Cuaderno
-muestra lo que de verdad se dio. Sin ellos (Flutter, MCP) rigen los del capítulo.
+muestra lo que de verdad se dio. Sin ellos (MCP) rigen los del capítulo.
 Sigue siendo un aviso: la ficha no se toca.
 
 ### Repartir objetos al cerrar (`item_grants`)
 
 `POST .../close` acepta un cuerpo opcional `{ allocations: [{ memberId, items,
 freeItems }], grantsLevel, grantsGold }` con el que el DM le da cada objeto del catálogo (o de su
-homebrew) a personajes concretos. **Sin cuerpo** (Flutter, el conector MCP)
+homebrew) a personajes concretos. **Sin cuerpo** (el conector MCP)
 todo sigue igual: todos reciben los nombres en el aviso y ningún regalo.
 
 Con cuerpo, el servidor valida **antes de escribir nada**: un `memberId` que no
@@ -316,7 +316,7 @@ Dos rutas acomodan el Cuaderno sin reescribir lo que la app registró:
 Todo lo que hace «rica» a una nota vive en el cliente y **no toca el servidor**:
 `Note.body` es texto plano que viaja y se guarda tal cual.
 
-- **Markdown.** `MarkdownText` (`packages/dnd_app/lib/ui/diary_cards.dart`) es
+- **Markdown.** `MarkdownText` (`packages/dnd_web/src/ui/MarkdownText.tsx`) es
   un subconjunto escrito a mano —títulos, viñetas, párrafos, negrita e
   itálica— y nada más; sus límites y la salida si hace falta más están en su
   `ponytail:`. Lo comparte con el trasfondo del Diario.
@@ -405,23 +405,21 @@ borrar el escenario después no le quita el lugar a un combate jugado.
 `EncounterLog.playerView()` saca los dos, y el aviso de combate terminado no lo
 nombra.
 
-### Por qué el turno es casi-en-vivo, y los avisos también (en `/v2`)
+### Por qué el turno es casi-en-vivo, y los avisos también
 
-Flutter se refresca al entrar a una pantalla o después de una acción propia,
-sin timers, salvo el turno. `/v2` suma un segundo timer a propósito (decisión
-del 2026-11-04): `PendingEvents` pide los avisos cada 30 s con la página visible
+El cliente se refresca al entrar a una pantalla o después de una acción propia,
+y tiene dos timers a propósito. Uno es el de los avisos (decisión del
+2026-11-04): `PendingEvents` pide los avisos cada 30 s con la página visible
 y al volver a la pestaña, porque el jugador deja la ficha abierta en la mesa y
 sin eso el aviso de un capítulo cerrado o de un combate terminado no le llega
 hasta que navegue. Sigue siendo una cola durable y de una sola entrega; el
-turno es lo otro. El turno es la excepción en Flutter a propósito: el
-aviso "preparate, seguís vos" solo sirve si llega mientras la ficha está
-abierta, así que `SheetScreen._pollTurn` sondea cada 5 segundos con combate
-abierto (20 si no hay ninguno), con un `Timer` que se reprograma solo y se
-cancela en `dispose`. No usa la cola de avisos (`user_events`): esa cola es
+turno es lo otro. El otro timer es el del turno: el aviso "preparate, seguís
+vos" solo sirve si llega mientras la ficha está abierta, así que `useTurnStatus`
+(`src/api/queries.ts`) sondea cada 5 segundos con combate abierto (20 si no hay
+ninguno) y se pausa con la pestaña oculta. No usa la cola de avisos (`user_events`): esa cola es
 para "esto pasó mientras no mirabas" y se entrega una sola vez; el turno es
 "esto es verdad ahora", y si viajara por la misma vía se acumularían avisos de
-rondas viejas sin vencer nunca. Ver el comentario de
-`packages/dnd_app/lib/ui/pending_events_gate.dart` para la distinción completa.
+rondas viejas sin vencer nunca.
 
 Del lado del DM pasa lo mismo con los PG de los jugadores: mientras hay
 combate abierto, `_CampaignDetail` vuelve a pedir `listCampaignMembers` cada 5
@@ -447,7 +445,7 @@ escrito en el lugar donde alguien iría a buscar el control.
 
 ### La columna del turno
 
-`EncounterView` (`packages/dnd_app/lib/ui/dm/encounter_view.dart`) es una
+`CombatView` (`packages/dnd_web/src/dm/CombatView.tsx`) es una
 planilla con una columna a la derecha de dos solapas:
 
 - **Del turno** — el perfil del monstruo que está jugando, con la iniciativa,
@@ -544,7 +542,7 @@ migración, y no apareció el caso de quererla en una mesa y no en otra.
 
 Hasta acá el vínculo era de una sola vía. El jugador compartía su ficha, el DM
 la miraba, y lo único que volvía eran avisos sueltos en la bandeja. La pestaña
-**Campaña** de la ficha (`packages/dnd_app/lib/ui/sheet/campaign_section.dart`)
+**Campaña** de la ficha (`packages/dnd_web/src/sheet/CampaignTab.tsx`)
 es la vuelta, y la sirve **`GET /api/characters/<id>/campaigns`**.
 
 Cuelga de `/api/characters/<id>/…` y no de `/api/campaigns/<id>/…` como todo el
@@ -681,7 +679,7 @@ sola. El archivo nunca lleva en qué campañas estaba ni su estado en cada una;
 las notas viajan solo si quien exporta las marca.
 
 El ZIP lo arma el servidor (`GET /api/npcs/<id>/export`, con el escritor del
-motor que usa también Flutter) y la autorización vive en el `WHERE` de
+motor) y la autorización vive en el `WHERE` de
 `npcs.find`: un PNJ ajeno responde igual que uno inexistente. Qué viaja lo
 decide quien exporta —`background`, `tags` y `notes` valen `true` solo con
 `=1`—. La vista previa (`POST /api/npcs/import/preview`) pasa por la misma
@@ -692,9 +690,7 @@ un solo personaje) también entra como PNJ con ficha, y la misma ruta de
 importación lo adopta **en el servidor** (`NpcBundleCodec.decodeForImport`),
 así que sigue habiendo una sola puerta. Se lee con el decodificador validado
 del respaldo, con sus límites de tamaño y de rutas, y no con el del cliente,
-que abre el ZIP sin límites. Flutter lo sigue adoptando en el cliente
-(`NpcBundleCodec.adoptCharacterExport`), con la misma conversión
-(`adoptCharacterAsNpc`, en el motor). Es el mismo criterio que el resto: el
+que abre el ZIP sin límites. Es el mismo criterio que el resto: el
 jugador entrega un archivo, nadie lee su cuenta. Al revés no hay camino — un
 PNJ nunca se traspasa a un jugador.
 
@@ -703,8 +699,8 @@ PNJ nunca se traspasa a un jugador.
 Los lugares del DM (nombre, descripción, una portada y enlaces a personajes)
 viven en `scenarios` (migración `0016_scenarios`), una tabla de un solo dueño
 como `npcs`: toda consulta filtra por `dm_user_id` en el `WHERE` y ningún
-jugador los lee por ninguna ruta. Solo existen en `/v2`, como pestaña de la
-Biblioteca (`/v2/dm/escenarios`); Flutter no los tiene.
+jugador los lee por ninguna ruta. Son una pestaña de la Biblioteca
+(`/dm/escenarios`).
 
 Los enlaces se guardan como claves de texto, `npc:<id>` o
 `member:<campaign_members.id>`, y no como claves foráneas: un escenario puede

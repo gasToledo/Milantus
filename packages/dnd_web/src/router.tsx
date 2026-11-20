@@ -70,7 +70,7 @@ const sheetTabIn = (tabs: readonly SheetTab[], segment: string | undefined): She
 
 export const HOMEBREW_CATEGORIES = ['weapons', 'armor', 'magicItems', 'gear', 'feats', 'races', 'backgrounds', 'spells'] as const satisfies readonly CodexCategory[];
 export type HomebrewCategory = (typeof HOMEBREW_CATEGORIES)[number] | 'creatures';
-/** Las categorías del Homebrew que ya se editan desde `/v2`. `items` es la
+/** Las categorías del Homebrew que se editan desde la web. `items` es la
  *  colección que guarda el servidor: en pantalla los objetos se parten en
  *  `magicItems` y `gear` (como en el Códice), pero se crean y se editan en un
  *  solo editor, `/dm/homebrew/objetos/…`, que no tiene lista propia. */
@@ -79,7 +79,7 @@ export type EditableHomebrew = (typeof EDITABLE_HOMEBREW)[number];
 const homebrewSegment = (c: HomebrewCategory | EditableHomebrew): string =>
   c === 'creatures' ? 'criaturas' : c === 'items' ? 'objetos' : CODEX_CATEGORIES[c];
 
-/** Qué muestra el Modo DM. `home` es `/v2/dm` a secas: no muestra nada, redirige
+/** Qué muestra el Modo DM. `home` es `/dm` a secas: no muestra nada, redirige
  *  a la primera campaña en curso (o a donde haya algo que ver). */
 export type DmView =
   | { kind: 'home' }
@@ -137,15 +137,11 @@ export type Route =
   | { name: 'rebuild'; id: string }
   | { name: 'unknown' };
 
-/** Adónde mandan los enlaces a lo que todavía vive solo en Flutter (crear,
- *  Códice, Ajustes, el Modo DM…): su raíz, que sirve el cliente de `/`. */
-export const FLUTTER_HOME = '/';
-
-/** `/v2/` (el inicio), `/v2/personajes` (la lista) y sus fichas, con o sin barra final.
+/** `/` (el inicio), `/personajes` (la lista) y sus fichas, con o sin barra final.
  *  El prefijo lo pone Vite (`base`), y es el mismo con el que el servidor
  *  monta el build. */
 export function matchRoute(pathname: string): Route {
-  const base = import.meta.env.BASE_URL; // `/v2/`
+  const base = import.meta.env.BASE_URL; // `/`
   if (pathname === base.slice(0, -1)) return { name: 'start' };
   if (!pathname.startsWith(base)) return { name: 'unknown' };
   const parts = pathname.slice(base.length).split('/').filter(Boolean);
@@ -362,7 +358,7 @@ export const rosterHref = (): string => `${import.meta.env.BASE_URL}personajes`;
 export const bestiaryHref = (entryId?: string): string =>
   `${import.meta.env.BASE_URL}bestiario` + (entryId ? `/${encodeURIComponent(entryId)}` : '');
 
-/** El Modo DM: sin campaña es `/v2/dm`, que redirige a la primera. */
+/** El Modo DM: sin campaña es `/dm`, que redirige a la primera. */
 export const dmHref = (): string => `${import.meta.env.BASE_URL}dm`;
 
 /** El Bestiario del Modo DM, o una criatura abierta. */
@@ -552,7 +548,7 @@ export function setLeaveGuard(guard: typeof leaveGuard) {
   leaveGuard = guard;
 }
 
-/** Navega dentro de `/v2` sin recargar. `replace` para las redirecciones:
+/** Navega dentro de la aplicación sin recargar. `replace` para las redirecciones:
  *  «atrás» no tiene que volver a una URL que solo redirige. Cambiar de
  *  pantalla funde (`withPageFade`); una redirección no, salvo que lo pida
  *  [fade] (el «Volver» de una URL abierta directamente). */

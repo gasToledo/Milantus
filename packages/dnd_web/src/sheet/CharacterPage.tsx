@@ -3,7 +3,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { clearCreated, CreatedCelebration, createdFor } from '../creation/CreatedCelebration';
 import { useQueryClient } from '@tanstack/react-query';
 import { hasUnsavedChanges, onStale, retrySave, useSaveState } from '../api/characterSave';
-import { queryKeys, useAppVersion, useRoster, useSheetCatalog } from '../api/queries';
+import { APP_VERSION } from '../api/client';
+import { queryKeys, useRoster, useSheetCatalog } from '../api/queries';
 import { useLang, useTexts } from '../i18n/context';
 import { characterHref, navigate, rosterHref, SHEET_TABS, type SheetTab } from '../router';
 import { Toast, type ToastTone } from '../ui/primitives';
@@ -67,7 +68,6 @@ export function CharacterPage({
   const lang = useLang();
   const roster = useRoster();
   const catalog = useSheetCatalog(lang);
-  const version = useAppVersion(true);
   const client = useQueryClient();
   const saveState = useSaveState(id);
   // La presentación de un personaje recién creado (viene del creador por la
@@ -208,7 +208,7 @@ export function CharacterPage({
         panel={model ? <SheetPanel model={model} tab={panelActive} /> : <SidebarBack href={rosterHref()} back={false} />}
         footer={
           <SheetFooter
-            version={version.data}
+            version={APP_VERSION}
             status={model ? <SaveStatusBadge state={saveState} onRetry={() => retrySave(id)} /> : undefined}
           />
         }

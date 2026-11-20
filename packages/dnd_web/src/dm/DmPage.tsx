@@ -33,7 +33,7 @@ import { NpcSheetView } from './npcs/NpcSheetView';
 import { TutorialGate, type Tutorial } from '../ui/tutorials';
 
 /**
- * El Modo DM (`/v2/dm/...`). Acá el DM crea, edita y borra campañas y suma o
+ * El Modo DM (`/dm/...`). Acá el DM crea, edita y borra campañas y suma o
  * echa personajes de la mesa, edita capítulos, notas y escenas de música, y
  * arma, juega y termina el combate (`combat/`). Cada pedido pasa por la API de
  * campañas, cuya autorización va adentro del `WHERE`: una campaña ajena y una
@@ -44,7 +44,7 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
   const campaigns = useDmCampaigns();
   const list = campaigns.data;
 
-  // `/v2/dm` a secas no es una pantalla: lleva a la primera campaña. Con
+  // `/dm` a secas no es una pantalla: lleva a la primera campaña. Con
   // `replace` para que «atrás» no vuelva a una URL que solo redirige.
   const target = view.kind === 'home' && list ? defaultCampaign(list) : undefined;
   useEffect(() => {

@@ -158,5 +158,5 @@ discrepa con el libro, se corrige el catálogo, no el Quiz.
    cubre sujeto y respuesta repetidos, el tope de fáciles y el tope por tipo:
    no hace falta un test aparte.
 5. Medí cuántas preguntas distintas suma a una ronda de nivel bajo.
-6. Jugá tres rondas en `/v2/quiz` con un personaje de nivel bajo y anotá lo
+6. Jugá tres rondas en `/quiz` con un personaje de nivel bajo y anotá lo
    que encuentres según este estándar.

@@ -6,7 +6,7 @@ test.use({ locale: 'es-AR' });
 
 const t = textsFor('es');
 const MESA = '/api/campaigns/marca-del-cuervo';
-const COMBATE = '/v2/dm/campanas/marca-del-cuervo/combate';
+const COMBATE = '/dm/campanas/marca-del-cuervo/combate';
 
 // Lo que el DM anotó en el combate sembrado (`e2e_server.dart`) y que el
 // jugador no tiene que recibir por ningún lado.
@@ -23,8 +23,8 @@ test('el DM suma desde el perfil del Bestiario y reintenta sin duplicar la tanda
   expect(creada.ok()).toBe(true);
   const { campaign } = (await creada.json()) as { campaign: { id: string } };
   const ruta = `/api/campaigns/${campaign.id}/encounter`;
-  const combate = `/v2/dm/campanas/${campaign.id}/combate`;
-  const perfil = '/v2/dm/bestiario/goblin-minion';
+  const combate = `/dm/campanas/${campaign.id}/combate`;
+  const perfil = '/dm/bestiario/goblin-minion';
   const nombre = String(catalogo().creatures.find((c) => c.id === 'goblin-minion')!.name);
   type Encuentro = { id: string; stage: string; combatants: { id: string; name: string; side: string }[] };
   const leer = async () => (await api<{ encounter: Encuentro }>(page.request, ruta, TOKEN_DM)).encounter;
@@ -57,7 +57,7 @@ test('el DM suma desde el perfil del Bestiario y reintenta sin duplicar la tanda
   expect(await leer()).toEqual(primero);
   await expect(page).toHaveURL(`${baseURL}${perfil}`);
 
-  await page.locator(`a[href="/v2/dm/campanas/${campaign.id}/mesa"]`).click();
+  await page.locator(`a[href="/dm/campanas/${campaign.id}/mesa"]`).click();
   await page.getByRole('link', { name: t.dmSectionCombat, exact: true }).click();
   await page.locator('[data-action="roll-initiative"]').click();
   await page.getByRole('button', { name: t.dmStart, exact: true }).click();
@@ -96,7 +96,7 @@ test('la música se ofrece una vez que se guarda un combate y solo suena si el D
     } else await route.continue();
   });
 
-  await page.goto(`/v2/dm/campanas/${campaign.id}/combate`);
+  await page.goto(`/dm/campanas/${campaign.id}/combate`);
   const armar = page.locator('[data-action="setup-combat"]');
   const oferta = page.locator('[data-music-offer]');
   const reproductor = page.locator('[data-music-player] iframe');
@@ -179,7 +179,7 @@ test('el DM convierte un monstruo en PNJ, lo recupera al borrarlo y termina el c
   const { campaign } = (await creada.json()) as { campaign: { id: string } };
   const ruta = `/api/campaigns/${campaign.id}/encounter`;
 
-  await page.goto(`/v2/dm/campanas/${campaign.id}/combate`);
+  await page.goto(`/dm/campanas/${campaign.id}/combate`);
   await page.locator('[data-action="setup-combat"]').click();
   await page.locator('[data-action="add-combatant"]').click();
   // Sin PNJ en la campaña, el diálogo abre en el Bestiario.
@@ -287,8 +287,8 @@ test('el DM convierte un monstruo en PNJ, lo recupera al borrarlo y termina el c
   await page.getByRole('button', { name: t.npcMoreActions, exact: true }).click();
   await page.getByRole('menuitem', { name: t.npcDelete, exact: true }).click();
   await page.getByRole('dialog').getByRole('button', { name: t.npcDelete, exact: true }).click();
-  await expect(page).toHaveURL(`${baseURL}/v2/dm/pnj`);
-  await page.locator(`a[href="/v2/dm/campanas/${campaign.id}/mesa"]`).click();
+  await expect(page).toHaveURL(`${baseURL}/dm/pnj`);
+  await page.locator(`a[href="/dm/campanas/${campaign.id}/mesa"]`).click();
   await page.getByRole('link', { name: t.dmSectionCombat, exact: true }).click();
   await expect(fila.getByText(original.name, { exact: true })).toBeVisible();
   expect((await api<{ encounter: Combate }>(page.request, ruta, TOKEN_DM)).encounter).toEqual(antes);

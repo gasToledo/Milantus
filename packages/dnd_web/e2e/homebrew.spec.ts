@@ -16,14 +16,14 @@ test('el Homebrew es de la cuenta: otra cuenta no ve nada de lo ajeno, ni por UR
   for (const id of [hacha.id, content.feats[0]!.id, content.creatures[0]!.id]) expect(ajeno).not.toContain(String(id));
 
   await context.addCookies([{ name: 'dnd_session', value: TOKEN_DM, url: baseURL! }]);
-  await page.goto('/v2/dm/homebrew');
+  await page.goto('/dm/homebrew');
   await expect(page.getByText(t.dmHomebrewEmpty)).toBeVisible();
   // La entrada ajena por su URL no se abre: la lista de esta cuenta no la tiene.
-  await page.goto(`/v2/dm/homebrew/armas/${hacha.id}`);
+  await page.goto(`/dm/homebrew/armas/${hacha.id}`);
   await expect(page.getByText(t.hbWeaponEmpty)).toBeVisible();
   await expect(page.getByText(String(hacha.name))).toHaveCount(0);
   // En el Bestiario, solo el catálogo oficial: la criatura propia no está.
-  await page.goto('/v2/dm/bestiario');
+  await page.goto('/dm/bestiario');
   await expect(page.locator('[data-field="bestiary-list"] [data-entry]')).toHaveCount(bestiary(catalogo()).length);
   await expect(page.locator(`[data-entry="${content.creatures[0]!.id}"]`)).toHaveCount(0);
 });
@@ -42,7 +42,7 @@ test('el DM importa una criatura propia desde un archivo y la borra desde su per
     content: { creatures: [{ id, name: nombre, source: 'homebrew', ac: '13', hp: '11' }] },
   });
   await context.addCookies([{ name: 'dnd_session', value: TOKEN_TRANSFERENCIA, url: baseURL! }]);
-  await page.goto('/v2/dm/homebrew');
+  await page.goto('/dm/homebrew');
 
   // Importar: elegir el archivo muestra qué trae, y recién «Importar» escribe.
   await page.locator('[data-field="homebrew-import-file"]').setInputFiles({
@@ -72,7 +72,7 @@ test('el DM importa una criatura propia desde un archivo y la borra desde su per
 test('el DM crea una dote propia con un efecto, la lee en su detalle y la borra', async ({ context, page, baseURL }) => {
   const nombre = `Mano firme ${Date.now().toString(36)}`;
   await context.addCookies([{ name: 'dnd_session', value: TOKEN_TRANSFERENCIA, url: baseURL! }]);
-  await page.goto('/v2/dm/homebrew/dotes');
+  await page.goto('/dm/homebrew/dotes');
   await page.getByRole('link', { name: t.hbNewFeat, exact: true }).first().click();
 
   await page.locator('[data-field="feat-name"]').fill(nombre);
@@ -97,7 +97,7 @@ test('el DM crea una dote propia con un efecto, la lee en su detalle y la borra'
 test('el DM crea un trasfondo propio con tres características, lo lee en su detalle y lo borra', async ({ context, page, baseURL }) => {
   const nombre = `Contrabandista ${Date.now().toString(36)}`;
   await context.addCookies([{ name: 'dnd_session', value: TOKEN_TRANSFERENCIA, url: baseURL! }]);
-  await page.goto('/v2/dm/homebrew/trasfondos');
+  await page.goto('/dm/homebrew/trasfondos');
   await page.getByRole('link', { name: t.hbNewBackground, exact: true }).first().click();
 
   await page.locator('[data-field="background-name"]').fill(nombre);
@@ -120,7 +120,7 @@ test('el DM crea un trasfondo propio con tres características, lo lee en su det
 test('el DM crea un arma arrojadiza: sin alcance no se guarda, con alcance sí, y la borra', async ({ context, page, baseURL }) => {
   const nombre = `Hacha de lanzar ${Date.now().toString(36)}`;
   await context.addCookies([{ name: 'dnd_session', value: TOKEN_TRANSFERENCIA, url: baseURL! }]);
-  await page.goto('/v2/dm/homebrew/armas');
+  await page.goto('/dm/homebrew/armas');
   await page.getByRole('link', { name: t.hbNewWeapon, exact: true }).first().click();
 
   await page.locator('[data-field="weapon-name"]').fill(nombre);
@@ -148,7 +148,7 @@ test('el DM crea un arma arrojadiza: sin alcance no se guarda, con alcance sí, 
 test('el DM crea un objeto mágico con bonificador a la CA, lo lee en «Al equiparlo» y lo borra', async ({ context, page, baseURL }) => {
   const nombre = `Manto de la escarcha ${Date.now().toString(36)}`;
   await context.addCookies([{ name: 'dnd_session', value: TOKEN_TRANSFERENCIA, url: baseURL! }]);
-  await page.goto('/v2/dm/homebrew/objetos-magicos');
+  await page.goto('/dm/homebrew/objetos-magicos');
   await page.getByRole('link', { name: t.hbNewItem, exact: true }).first().click();
 
   await page.locator('[data-field="item-name"]').fill(nombre);
@@ -173,7 +173,7 @@ test('el DM crea un objeto mágico con bonificador a la CA, lo lee en «Al equip
 test('el DM crea un conjuro con componente material, lo lee en el Códice y lo borra', async ({ context, page, baseURL }) => {
   const nombre = `Égida de escarcha ${Date.now().toString(36)}`;
   await context.addCookies([{ name: 'dnd_session', value: TOKEN_TRANSFERENCIA, url: baseURL! }]);
-  await page.goto('/v2/dm/homebrew/conjuros');
+  await page.goto('/dm/homebrew/conjuros');
   await page.getByRole('link', { name: t.hbNewSpell, exact: true }).first().click();
 
   await page.locator('[data-field="spell-name"]').fill(nombre);

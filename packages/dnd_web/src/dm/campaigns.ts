@@ -41,7 +41,7 @@ export function groupCampaigns(campaigns: readonly DmCampaign[]): Record<Campaig
   };
 }
 
-/** A qué campaña lleva `/v2/dm` a secas: la primera en curso y, si no hay,
+/** A qué campaña lleva `/dm` a secas: la primera en curso y, si no hay,
  *  la primera que haya (Flutter abre la primera en vez de un panel vacío). */
 export function defaultCampaign(campaigns: readonly DmCampaign[]): DmCampaign | undefined {
   return campaigns.find((c) => stateOf(c) === 'active') ?? campaigns[0];

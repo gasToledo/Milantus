@@ -5,7 +5,7 @@ import type { Catalog, JsonObject } from '../src/engine';
 
 // Mismos valores que `test/e2e_server.dart` en dnd_server.
 export const TOKEN = 'sesion-de-humo=';
-export const TOKEN_SIN_V2 = 'sesion-sin-v2=';
+export const TOKEN_SOLO_API = 'sesion-solo-api=';
 export const TOKEN_DM = 'sesion-del-dm=';
 export const TOKEN_ESCRITURA = 'sesion-de-escritura=';
 
@@ -44,7 +44,8 @@ export async function personajes(request: APIRequestContext): Promise<PersonajeA
 }
 
 /** Las escrituras que la página le hace a la API (cualquier método que no sea
- *  GET). `/v2` es de solo lectura: la lista tiene que quedar vacía. */
+ *  GET). Donde se mira, la pantalla es de solo lectura: la lista tiene que
+ *  quedar vacía. */
 export function vigilarEscrituras(page: Page): string[] {
   const escrituras: string[] = [];
   page.on('request', (r) => {

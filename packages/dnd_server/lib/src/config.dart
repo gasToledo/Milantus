@@ -18,13 +18,6 @@ String requireEnv(Map<String, String> env, String name) {
 String envOr(Map<String, String> env, String name, String fallback) =>
     env[name] ?? fallback;
 
-/// Lista separada por comas a conjunto de ids. Tolera espacios y comas de más
-/// (`"a, b,,"`), porque la variable se edita a mano en un `.env`.
-Set<String> parseIdList(String raw) => {
-  for (final id in raw.split(','))
-    if (id.trim().isNotEmpty) id.trim(),
-};
-
 int envIntOr(Map<String, String> env, String name, int fallback) {
   final raw = env[name];
   if (raw == null) return fallback;
@@ -169,41 +162,18 @@ class FeedbackConfig {
   }
 }
 
-/// Raíz del build web servido en el mismo origen que la API para compartir
-/// la cookie de sesión. Una cadena vacía deshabilita el servido estático
-/// en pruebas o cuando se ejecuta la API sola.
+/// Raíz del build web (`packages/dnd_web`), servido en el mismo origen que la
+/// API para compartir la cookie de sesión. Una cadena vacía deshabilita el
+/// servido estático en pruebas o cuando se ejecuta la API sola.
 class WebConfig {
   final String root;
 
-  /// Build del cliente React (`packages/dnd_web`), servido bajo `/v2`. Vacío
-  /// lo deshabilita: `/v2` responde 404 y nada más cambia. Es independiente
-  /// de [root] a propósito, para migrar pantalla por pantalla sin tocar el
-  /// cliente de Flutter.
-  final String v2Root;
-
-  /// Ids de cuenta (los de `/api/me`) a los que el servidor les avisa que ya
-  /// pueden usar el cliente React (`webV2: true`). Vacía por defecto: nadie
-  /// migra hasta que se lo anota. Es una lista de ids y no un porcentaje ni un
-  /// indicador por rasgo a propósito: la migración es pantalla por pantalla y
-  /// la decisión es de quién la prueba primero, no de un azar.
-  final Set<String> v2Users;
-
-  const WebConfig({
-    required this.root,
-    this.v2Root = '',
-    this.v2Users = const {},
-  });
+  const WebConfig({required this.root});
 
   bool get enabled => root.isNotEmpty;
 
-  bool get v2Enabled => v2Root.isNotEmpty;
-
   factory WebConfig.fromEnvironment(Map<String, String> env) {
-    return WebConfig(
-      root: envOr(env, 'DND_WEB_ROOT', ''),
-      v2Root: envOr(env, 'DND_WEB_V2_ROOT', ''),
-      v2Users: parseIdList(envOr(env, 'DND_V2_USERS', '')),
-    );
+    return WebConfig(root: envOr(env, 'DND_WEB_ROOT', ''));
   }
 }
 

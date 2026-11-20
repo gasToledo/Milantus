@@ -37,54 +37,6 @@ jobs:
       - run: dart analyze
       - run: dart test
 
-  # La app es el camino largo de CI, y CD lo espera entero. Por eso las
-  # pruebas van en dos mitades y el build web en paralelo con ellas: el tiempo
-  # pasa a ser el de la mitad más lenta y no la suma de todo.
-  dnd_app:
-    name: dnd_app
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/dnd_app
-    steps:
-      - uses: actions/checkout@v6
-      - uses: subosito/flutter-action@v2
-        with:
-          # Fijo en el minor de producción (el `FROM` de Flutter del
-          # Dockerfile) y no `stable`: la app está congelada, y CI tiene que
-          # analizar con el Flutter que se despliega. El 2026-11-11 `stable`
-          # pasó a 3.47, que marca obsoleto `material.dart`, y `flutter
-          # analyze` cortó por 85 avisos de nivel info en código sin tocar.
-          flutter-version: 3.44.x
-          # Sin esto cada corrida vuelve a bajar el SDK entero de Flutter.
-          # `cache: true` guarda el SDK y el pub-cache; las claves por defecto
-          # ya incluyen canal, versión, arquitectura y el hash de los
-          # `pubspec`, así que una subida de cota de SDK invalida la entrada
-          # sola y no hay clave que mantener a mano.
-          cache: true
-      - run: flutter pub get
-      - run: dart format --output=none --set-exit-if-changed lib test
-      - run: flutter analyze
-      - run: flutter build web --release
-
-  dnd_app_test:
-    name: dnd_app test (${{ matrix.shard }}/2)
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        shard: [0, 1]
-    defaults:
-      run:
-        working-directory: packages/dnd_app
-    steps:
-      - uses: actions/checkout@v6
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: 3.44.x # El mismo que el job `dnd_app`.
-          cache: true
-      - run: flutter pub get
-      - run: flutter test --total-shards=2 --shard-index=${{ matrix.shard }}
-
   dnd_server:
     name: dnd_server
     runs-on: ubuntu-latest
@@ -104,7 +56,7 @@ jobs:
       - run: dart analyze
       - run: dart test
 
-  # Cliente React (`/v2`, ver `docs/operaciones/despliegue.md`). El build ya
+  # Cliente web (ver `docs/operaciones/despliegue.md`). El build ya
   # corre `tsc --noEmit`; se deja el paso aparte para que un error de tipos
   # se lea como tal y no enterrado en la salida de Vite.
   dnd_web:
@@ -171,10 +123,9 @@ jobs:
 
   # Prueba de humo del cliente React contra el servidor de verdad (el
   # `buildHandler` real con repositorios en memoria y una sesión falsa, ver
-  # `packages/dnd_server/test/e2e_server.dart`): sirve el build de `/v2` con un
-  # personaje sembrado y las pruebas verifican que la ficha y el dashboard
-  # muestren los números del motor (también con homebrew) y el acceso por
-  # `webV2`. Pocas a propósito: cubren el cableado servidor ↔ build ↔ cookie ↔
+  # `packages/dnd_server/test/e2e_server.dart`): sirve el build con un personaje
+  # sembrado y las pruebas verifican que la ficha y el dashboard muestren los
+  # números del motor (también con homebrew). Pocas a propósito: cubren el cableado servidor ↔ build ↔ cookie ↔
   # catálogo ↔ motor en el navegador.
   web_e2e:
     name: web_e2e

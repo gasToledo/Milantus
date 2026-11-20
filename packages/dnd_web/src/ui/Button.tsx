@@ -54,7 +54,7 @@ export function Button({
 }
 
 /**
- * Lo mismo, como enlace. `internal` navega dentro de `/v2` sin recargar; sin
+ * Lo mismo, como enlace. `internal` navega dentro de la aplicación sin recargar; sin
  * él es un enlace común (a Flutter, a `/auth/login`); `newTab` lo abre en otra
  * pestaña (un sitio ajeno).
  */

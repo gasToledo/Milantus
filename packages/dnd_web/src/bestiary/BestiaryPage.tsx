@@ -27,11 +27,11 @@ interface Creature {
  * El Bestiario: buscar una criatura y leer su perfil, de solo lectura. Salen
  * las del catálogo y las homebrew de la cuenta (el catálogo ya viene fusionado),
  * menos las invocaciones por fórmula, que el motor deja afuera. Lista y perfil
- * son URLs (`/v2/bestiario/goblin`). A diferencia de Flutter, donde es una
+ * son URLs (`/bestiario/goblin`). A diferencia de Flutter, donde es una
  * sección del Modo DM, la vista de jugador solo muestra el perfil. El Modo DM
  * agrega la acción de sumar al combate desde su propia pantalla.
  *
- * Con [dm] es la misma pantalla montada en el Modo DM (`/v2/dm/bestiario`, con
+ * Con [dm] es la misma pantalla montada en el Modo DM (`/dm/bestiario`, con
  * el panel del DM): igual navegador y perfil, con la cabecera del Modo DM y sus
  * propias URL. No es otra pantalla: una criatura nueva sale en las dos.
  */

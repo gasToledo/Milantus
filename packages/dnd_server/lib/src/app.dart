@@ -123,16 +123,11 @@ Handler buildHandler({
   required SettingsRepository settings,
   required ScenarioRepository scenarios,
 
-  /// Sirve el build web (`flutter build web`) para todo lo que el enrutado de
+  /// Sirve el cliente web (`buildWebHandler`) para todo lo que el enrutado de
   /// arriba no reconozca. `null` lo deshabilita (pruebas, o correr la API
   /// suelta): las rutas de arriba siguen funcionando igual, simplemente no
   /// hay nada detrás para el resto de las peticiones.
-  Handler? webStaticHandler,
-
-  /// Sirve el cliente React bajo `/v2` (ver `buildWebV2Handler`). `null`: `/v2`
-  /// responde 404, también cuando [webStaticHandler] existe, para que Flutter
-  /// no conteste algo en una ruta que todavía no es de nadie.
-  Handler? webV2Handler,
+  Handler? webHandler,
 
   /// Manda las sugerencias y reportes de error. `null` cuando el servidor no
   /// tiene proveedor de correo configurado: `/api/me` lo avisa y la app
@@ -143,10 +138,6 @@ Handler buildHandler({
   /// las pruebas que no lo miran no tienen que armarlo, y un despliegue sin
   /// proyecto en Zitadel arranca igual.
   McpDependencies? mcp,
-
-  /// Cuentas a las que `/api/me` les dice `webV2: true` (ver
-  /// `WebConfig.v2Users`). Vacío: a nadie.
-  Set<String> v2Users = const {},
 
   /// Destino de las líneas de `POST /api/client-errors`. `null`: `print`, que
   /// es el log del contenedor.
@@ -163,7 +154,7 @@ Handler buildHandler({
     ..get(
       '/api/me',
       authenticated(
-        (request) => _meHandler(request, auth, sendFeedback != null, v2Users),
+        (request) => _meHandler(request, auth, sendFeedback != null),
       ),
     )
     ..get(
@@ -582,28 +573,18 @@ Handler buildHandler({
   // distingue una ruta desconocida de un 404 a propósito («Código inválido o
   // vencido.»), y el build web lo reemplazaba por un «Not Found» en texto
   // plano que el cliente no puede mostrar.
-  final withStatic = webStaticHandler == null
+  final withStatic = webHandler == null
       ? null
-      : Cascade().add(router.call).add(webStaticHandler).handler;
-  Response notFound() => Response.notFound('Not Found');
+      : Cascade().add(router.call).add(webHandler).handler;
   final Handler rootHandler = (request) async {
     final path = request.url.path;
-    // `/` exacto es el `index.html` de Flutter: las cuentas con /v2 pasan
-    // directo, salvo quien prendió «Usar la versión anterior» (cookie
-    // `milantus_v1=1`, que escribe /v2 y lee solo el servidor). Los assets de
-    // Flutter no se redirigen. Es la misma resolución de sesión que `/api`.
-    if (request.method == 'GET' && path.isEmpty && v2Users.isNotEmpty) {
-      final cookies = request.headers['cookie'];
-      final token = readSessionToken(cookies);
-      final userId = token == null ? null : await auth.resolveUserId(token);
-      if (userId != null &&
-          _hasV2(v2Users, userId) &&
-          !_hasCookie(cookies, 'milantus_v1', '1')) {
-        return Response.found('/v2/', headers: {'cache-control': 'no-store'});
-      }
-    }
+    // El cliente React vivió bajo `/v2` mientras convivió con Flutter: los
+    // marcadores y enlaces de esa época llevan a la misma pantalla sin el
+    // prefijo. Permanente, para que el navegador no vuelva a preguntar.
     if (path == 'v2' || path.startsWith('v2/')) {
-      return webV2Handler?.call(request) ?? notFound();
+      final rest = path == 'v2' ? '' : path.substring(3);
+      final query = request.url.hasQuery ? '?${request.url.query}' : '';
+      return Response.movedPermanently('/$rest$query');
     }
     final isApi =
         path.startsWith('api/') ||
@@ -620,9 +601,6 @@ Handler buildHandler({
       .addMiddleware(errorHandlingMiddleware)
       .addHandler(rootHandler);
 }
-
-bool _hasCookie(String? header, String name, String value) =>
-    (header ?? '').split(';').any((p) => p.trim() == '$name=$value');
 
 Response _healthHandler(Request request) => Response.ok(
   jsonEncode({'status': 'ok'}),
@@ -695,10 +673,6 @@ Future<Response> _logoutHandler(Request request, AuthDependencies auth) async {
   );
 }
 
-/// `*` en la lista habilita a todas las cuentas.
-bool _hasV2(Set<String> v2Users, String userId) =>
-    v2Users.contains('*') || v2Users.contains(userId);
-
 /// La cuenta de la sesión en curso. El `userId` es el id interno; el resto es
 /// lo que el proveedor OIDC afirmó al abrir la sesión, y puede venir en `null`
 /// (ver [SessionProfile]).
@@ -706,7 +680,6 @@ Future<Response> _meHandler(
   Request request,
   AuthDependencies auth,
   bool feedbackEnabled,
-  Set<String> v2Users,
 ) async {
   final token = readSessionToken(request.headers['cookie']);
   final profile = token == null ? null : await auth.sessionProfile(token);
@@ -717,9 +690,6 @@ Future<Response> _meHandler(
       'email': profile?.email,
       'pictureUrl': profile?.pictureUrl,
       'feedbackEnabled': feedbackEnabled,
-      // Solo el booleano de *esta* cuenta: la lista entera diría a cualquiera
-      // quién más está probando.
-      'webV2': _hasV2(v2Users, request.userId),
     }),
     headers: {'content-type': 'application/json'},
   );
@@ -951,8 +921,8 @@ Future<Response> _upsertCharacterHandler(
   if (character.id != id) {
     throw const FormatException('El id del personaje no coincide con la ruta.');
   }
-  // La versión es `updated_at` en microsegundos. Sin ella (Flutter) gana el
-  // último, como siempre.
+  // La versión es `updated_at` en microsegundos. Sin ella gana el último,
+  // como siempre.
   final expectedVersion = body['expectedVersion'];
   if (expectedVersion != null && expectedVersion is! int) {
     throw const FormatException('"expectedVersion" debe ser un entero.');
@@ -1988,7 +1958,7 @@ Future<Response> _grantHeroicInspirationHandler(
 /// Este handler es el único punto del servidor que le escribe algo a otra
 /// cuenta, y lo que le escribe es un aviso en su bandeja, nunca su ficha.
 ///
-/// El cuerpo es opcional. Sin él (Flutter, el conector MCP) todos reciben los
+/// El cuerpo es opcional. Sin él (el conector MCP) todos reciben los
 /// mismos nombres y ningún regalo. Con `allocations` el DM reparte objetos a
 /// personajes concretos: cada uno recibe solo lo suyo en la bandeja de regalos
 /// (`item_grants`) y en su aviso, y **la ficha sigue sin tocarse**: el objeto
@@ -2043,7 +2013,7 @@ Future<Response> _closeChapterHandler(
           );
 
     // El nivel y el oro se deciden al cerrar (cliente React) y, si llegan,
-    // reemplazan a los del capítulo; sin ellos (Flutter, MCP) rigen los de
+    // reemplazan a los del capítulo; sin ellos (MCP) rigen los de
     // siempre. Se validan acá, antes de la primera escritura.
     final rawLevel = body['grantsLevel'];
     final rawGold = body['grantsGold'];

@@ -2,10 +2,13 @@
 
 Estado: guía vigente de la aplicación web.
 
-Sistema de diseño del cliente web de **Milantus**. Documenta la tecnología, la
-composición de la interfaz, la paleta, la tipografía, la forma y el
-comportamiento tal como están **implementados hoy** en
-`packages/dnd_app/lib/`, no como aspiración.
+Sistema de diseño del cliente web de **Milantus**. Documenta la composición de
+la interfaz, la paleta, la tipografía, la forma y el comportamiento.
+
+> Se escribió sobre el cliente de Flutter (`packages/dnd_app`, borrado el
+> 2026-11-20): los nombres de widgets y archivos de Dart son de ese cliente.
+> El lenguaje visual sigue vigente; cómo se aplica en React y su catálogo de
+> componentes están en [diseno-web-react.md](diseno-web-react.md).
 
 > **Regla de oro de este documento**: cada valor de acá sale del código. Si el
 > código y esta guía discrepan, gana el código y la guía se corrige. Los

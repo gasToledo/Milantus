@@ -47,7 +47,6 @@ export type Tutorial =
   | 'bestiary'
   | 'npcLibrary'
   | 'homebrew'
-  // Solo de /v2: Flutter no tiene Quiz.
   | 'quiz';
 
 /** Un ícono por página, en el orden de los textos. */

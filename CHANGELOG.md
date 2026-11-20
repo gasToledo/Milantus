@@ -1557,7 +1557,7 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - Sin cambios.
 
-## [Unreleased]
+## [2.0.0] - 2026-11-20
 
 ### Nuevo
 
@@ -1566,13 +1566,33 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
-- Con «Animaciones» apagadas en Ajustes, los botones y las placas de /v2 ya no
-  se hunden al apretarlos.
+- La aplicación nueva es la única: se abre en la dirección de siempre, sin
+  `/v2` (por ejemplo, `/personajes`). Los enlaces y marcadores viejos con
+  `/v2` llevan a la misma pantalla.
+- Con «Animaciones» apagadas en Ajustes, los botones y las placas ya no se
+  hunden al apretarlos.
 - Si se apaga un modo de la ficha antes de que termine el destello, la próxima
   vez que se prende vuelve a animarse.
 - Los pasos de la bienvenida del Modo DM ya no parpadean al aparecer.
 - Al cambiar de pantalla sin animación, el foco llega igual al título.
 - En el Quiz, los tipos con más preguntas salen más seguido.
+
+### Eliminado
+
+- La versión anterior de la aplicación (Flutter) y el ajuste «Usar la versión
+  anterior».
+- La opción de mantener la pantalla encendida, que solo existía en la versión
+  anterior.
+
+## [Unreleased]
+
+### Nuevo
+
+- Sin cambios.
+
+### Modificado
+
+- Sin cambios.
 
 ### Eliminado
 

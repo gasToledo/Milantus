@@ -13,12 +13,12 @@ import {
   type SheetAction,
 } from '../src/engine';
 import { resourceKey, signed } from '../src/sheet/format';
-import { api, catalogo, TOKEN_ESCRITURA, TOKEN_SIN_V2, vigilarEscrituras, type PersonajeApi } from './helpers';
+import { api, catalogo, TOKEN_ESCRITURA, TOKEN_SOLO_API, vigilarEscrituras, type PersonajeApi } from './helpers';
 
 // La ficha que escriben estas pruebas es de una cuenta propia (`e2e_server.dart`):
 // lo que guardan no cambia los números que leen las otras pruebas.
 const ILSE = 'ilse-de-humo';
-const COMBATE = `/v2/personajes/${ILSE}/combate`;
+const COMBATE = `/personajes/${ILSE}/combate`;
 const PUT_ILSE = `PUT /api/characters/${ILSE}`;
 
 test.use({ locale: 'es-AR' });
@@ -67,7 +67,7 @@ test('Canalizar Divinidad aparece en De rasgos y sus opciones gastan la misma re
   });
   expect(created.ok()).toBe(true);
   const id = ((await created.json()) as { character: { id: string } }).character.id;
-  await page.goto(`/v2/personajes/${id}/combate`);
+  await page.goto(`/personajes/${id}/combate`);
   const magic = page.locator('[data-card="spells"]');
   await magic.locator('[data-tab="innate"]').click();
   const panel = magic.locator('[data-spell-group="innate"]');
@@ -237,7 +237,7 @@ test('la Inspiración Heroica y la concentración se marcan a mano y guardan lo 
 });
 
 test('la mochila se edita desde la fila y quitar se deshace', async ({ page, request }) => {
-  await page.goto(`/v2/personajes/${ILSE}/inventario`);
+  await page.goto(`/personajes/${ILSE}/inventario`);
   // Fila de la mochila o placa de «En uso»: equiparlo lo pasa de una a otra.
   const fila = page.locator('[data-entry="e-baston"]');
   const baston = String(catalogo().items.find((i) => i.id === 'baston-de-curacion')!.name);
@@ -293,7 +293,7 @@ test('comprar del catálogo y vender pagan con la cuenta del motor, y vender se 
   const nombre = String(daga.name);
   const d = new Date();
   const hoy = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  await page.goto(`/v2/personajes/${ILSE}/inventario`);
+  await page.goto(`/personajes/${ILSE}/inventario`);
 
   const compra: SheetAction = { type: 'buy', item: 'dagger', quantity: 1, unitPriceCp: Number(daga.costCp), at: hoy };
   const comprada = segunMotor(await ilse(request), compra);
@@ -340,7 +340,7 @@ test('la subida de nivel pasa por PG, subclase y mejora, guarda lo del motor y s
     type: 'levelUp',
     draft: { classId: 'barbarian', subclassId: senda.id, abilityA: 'strength' },
   });
-  await page.goto(`/v2/personajes/${BRUNA}/subir-nivel`);
+  await page.goto(`/personajes/${BRUNA}/subir-nivel`);
 
   await page.getByRole('button', { name: 'Empezar' }).click();
   await page.getByRole('button', { name: 'Continuar' }).click();
@@ -395,7 +395,7 @@ test('la clériga sube eligiendo Orden Divina, los conjuros de su dote y los de 
   const esperado = segunMotor(antes, { type: 'levelUp', draft: d });
   const tocar = (id: string) => page.locator(`[data-option="${id}"]`).first().click();
   const continuar = () => page.getByRole('button', { name: 'Continuar' }).click();
-  await page.goto(`/v2/personajes/${ILSE}/subir-nivel`);
+  await page.goto(`/personajes/${ILSE}/subir-nivel`);
 
   await page.getByRole('button', { name: 'Empezar' }).click();
   await continuar();
@@ -417,7 +417,7 @@ test('la clériga sube eligiendo Orden Divina, los conjuros de su dote y los de 
 
 test('la Furia, los estados y el cansancio guardan lo del motor y se releen al recargar', async ({ page, request }) => {
   const BRUNA = 'bruna-de-humo';
-  await page.goto(`/v2/personajes/${BRUNA}/combate`);
+  await page.goto(`/personajes/${BRUNA}/combate`);
   const furia = page.locator('[data-stat="mode-rage"]');
   const pasos: [() => Promise<void>, SheetAction][] = [
     [() => furia.getByRole('button', { name: 'Activar' }).click(), { type: 'activateMode', mode: 'rage' }],
@@ -469,7 +469,7 @@ test('la Furia, los estados y el cansancio guardan lo del motor y se releen al r
   await expect(page.locator('[data-save-state="saved"]')).toBeVisible();
 });
 
-const EDITOR = `/v2/personajes/${ILSE}/conjuros/cleric`;
+const EDITOR = `/personajes/${ILSE}/conjuros/cleric`;
 
 test('preparar conjuros desde la ficha guarda lo del motor y «Deshacer» vuelve a guardar la de antes', async ({
   page,
@@ -519,7 +519,7 @@ test('cambiar el truco innato se confirma con «Cambiar» y guarda lo del motor'
   const esperado = segunMotor(antes, { type: 'setInnateCantrip', granted: innato.grantedSpellId, spell: otro.id });
   const escrituras = vigilarEscrituras(page);
 
-  await page.goto(`/v2/personajes/${ELFO}/combate`);
+  await page.goto(`/personajes/${ELFO}/combate`);
   await page.locator('[data-tab="innate"]').click();
   await page.locator('[data-spell-group="innate"]').getByRole('button', { name: innato.name }).click();
   await page.locator('[data-action="swap-innate"]').click();
@@ -544,7 +544,7 @@ test('vincular el arma de pacto la crea con lo del motor y se relee al recargar'
   const esperado = segunMotor(antes, { type: 'createEffectTarget', group: cupo.groupId, weapon: arma });
   const escrituras = vigilarEscrituras(page);
 
-  await page.goto(`/v2/personajes/${BRUJO}/inventario`);
+  await page.goto(`/personajes/${BRUJO}/inventario`);
   const boton = page.locator(`[data-action="target-${cupo.groupId}"]`);
   await expect(boton).toContainText('(0/1)');
   await boton.click();
@@ -576,7 +576,7 @@ test('elegir un plano, replicarlo y quitar la réplica guardan lo del motor, y �
   const entrada = (replicado.inventory as { entryId: string }[])[0]!.entryId;
   const sinReplica = segunMotor(replicado, { type: 'removeItem', entry: entrada });
 
-  await page.goto(`/v2/personajes/${ARTIFICE}/planos`);
+  await page.goto(`/personajes/${ARTIFICE}/planos`);
   expect(await proximoGuardado(page, () => page.locator(`[data-option="${plan.id}"]`).click(), ARTIFICE)).toEqual(elegido);
   expect(await ilse(request, ARTIFICE)).toEqual(elegido);
 
@@ -599,7 +599,7 @@ test('transformarse en lobo y volver guardan lo que da el motor', async ({ page,
   const transformado = segunMotor(antes, { type: 'enterWildShape', creature: 'wolf' });
   const vuelta = segunMotor(transformado, { type: 'leaveWildShape' });
 
-  await page.goto(`/v2/personajes/${DRUIDA}/combate`);
+  await page.goto(`/personajes/${DRUIDA}/combate`);
   await page.locator('[data-stat="wild-shape"] button').click();
   const enviado = await proximoGuardado(
     page,
@@ -622,7 +622,7 @@ test('invocar un familiar y despedirlo guardan lo que da el motor', async ({ pag
   const invocado = segunMotor(antes, { type: 'summonCompanion', option: 'familiar', creature: 'bat', free: true });
   const despedido = segunMotor(invocado, { type: 'dismissCompanion', index: 0 });
 
-  await page.goto(`/v2/personajes/${DRUIDA}/combate`);
+  await page.goto(`/personajes/${DRUIDA}/combate`);
   await page.locator('[data-action="summon"]').click();
   await page.locator('[data-free] button').click();
   const enviado = await proximoGuardado(
@@ -645,7 +645,7 @@ test('un aviso del motor lleva a la pantalla de elecciones, y elegir guarda lo q
   const ELFA = 'elfa-de-humo';
   const antes = await ilse(request, ELFA);
 
-  await page.goto(`/v2/personajes/${ELFA}/personaje`);
+  await page.goto(`/personajes/${ELFA}/personaje`);
   await page.locator('[data-action="review-warnings"]').click();
   await page.locator('[data-resolve="lineage_pending"]').click();
 
@@ -657,7 +657,7 @@ test('escribir el trasfondo guarda lo que da el motor', async ({ page, request }
   const antes = await ilse(request);
   const text = '## Antes del pacto\n\nCopiaba manuscritos en la biblioteca de Lenn.';
 
-  await page.goto(`/v2/personajes/${ILSE}/diario`);
+  await page.goto(`/personajes/${ILSE}/diario`);
   await page.locator('[data-action="edit-background"]').click();
   const enviado = await proximoGuardado(page, async () => {
     await page.locator('[data-field="background-input"]').fill(text);
@@ -674,7 +674,7 @@ test('subir un retrato guarda lo que da el motor', async ({ page, request }) => 
     'base64',
   );
 
-  await page.goto(`/v2/personajes/${ILSE}/retrato`);
+  await page.goto(`/personajes/${ILSE}/retrato`);
   // Con proveedores la pantalla abre en Generar: se pasa a Subir.
   await page.locator('[data-tab="upload"]').click();
   const enviado = await proximoGuardado(page, () =>
@@ -699,7 +699,7 @@ test('renombrar desde la lista guarda lo que da el motor', async ({ page, reques
     return enviado;
   }
 
-  await page.goto('/v2/');
+  await page.goto('/');
   const enviado = await renombrar(antes.name, nuevo);
   expect(enviado).toEqual(segunMotor(antes, { type: 'rename', name: nuevo }));
   expect((await ilse(request)).name).toBe(nuevo);
@@ -712,14 +712,14 @@ test('renombrar desde la lista guarda lo que da el motor', async ({ page, reques
 test('compartir: el código se canjea, el aviso llega y dejar de compartir avisa al DM', async ({ page, request }) => {
   const { name } = await ilse(request);
 
-  await page.goto(`/v2/personajes/${ILSE}/personaje`);
+  await page.goto(`/personajes/${ILSE}/personaje`);
   await page.getByRole('button', { name: 'Compartir' }).click();
   await page.getByRole('button', { name: 'Generar código' }).click();
   const code = (await page.locator('[data-field="share-code"]').textContent())!;
 
-  // El DM es la cuenta sin /v2 y solo por API: sus avisos no aparecen en
+  // El DM es la cuenta que solo se usa por API: sus avisos no aparecen en
   // ninguna pantalla ni chocan con las pruebas que corren en paralelo.
-  const comoDm = { headers: { cookie: `dnd_session=${TOKEN_SIN_V2}` } };
+  const comoDm = { headers: { cookie: `dnd_session=${TOKEN_SOLO_API}` } };
   await request.post('/api/campaigns', { ...comoDm, data: { campaign: { id: 'mesa-de-compartir', name: 'Mesa de Compartir' } } });
   await request.post('/api/campaigns/mesa-de-compartir/members', { ...comoDm, data: { code } });
 
@@ -735,14 +735,14 @@ test('compartir: el código se canjea, el aviso llega y dejar de compartir avisa
   await page.getByRole('button', { name: 'Dejar de compartir', exact: true }).click();
   await expect(page.getByText('Ya no se comparte con Mesa de Compartir.', { exact: true })).toBeVisible();
 
-  const { events } = await api<{ events: { kind: string }[] }>(request, '/api/events', TOKEN_SIN_V2);
+  const { events } = await api<{ events: { kind: string }[] }>(request, '/api/events', TOKEN_SOLO_API);
   expect(events.map((e) => e.kind)).toContain('character_unlinked_by_owner');
 });
 
 test('Mesa: crear campaña, sumar con un código, conceder, echar y borrar sin tocar la ficha del jugador', async ({ page, request }) => {
-  // El jugador es la cuenta sin /v2 y solo por API: sus avisos no aparecen en
+  // El jugador es la cuenta que solo se usa por API: sus avisos no aparecen en
   // ninguna pantalla ni chocan con las pruebas que corren en paralelo.
-  const comoJugador = { headers: { cookie: `dnd_session=${TOKEN_SIN_V2}` } };
+  const comoJugador = { headers: { cookie: `dnd_session=${TOKEN_SOLO_API}` } };
   const creado = await request.post('/api/characters', {
     ...comoJugador,
     data: { character: { ...(await ilse(request)), id: 'pj-de-la-mesa', name: 'Pj de la Mesa' } },
@@ -751,15 +751,15 @@ test('Mesa: crear campaña, sumar con un código, conceder, echar y borrar sin t
   const { code } = (await (await request.post(`/api/characters/${pjId}/share`, comoJugador)).json()) as { code: string };
   const fichaDelJugador = async () =>
     JSON.stringify(
-      (await api<{ characters: { character: PersonajeApi }[] }>(request, '/api/characters', TOKEN_SIN_V2)).characters.find(
+      (await api<{ characters: { character: PersonajeApi }[] }>(request, '/api/characters', TOKEN_SOLO_API)).characters.find(
         (c) => c.character.id === pjId,
       ),
     );
   const antes = await fichaDelJugador();
   const eventos = async () =>
-    (await api<{ events: { kind: string }[] }>(request, '/api/events', TOKEN_SIN_V2)).events.map((e) => e.kind);
+    (await api<{ events: { kind: string }[] }>(request, '/api/events', TOKEN_SOLO_API)).events.map((e) => e.kind);
 
-  await page.goto('/v2/dm');
+  await page.goto('/dm');
   await page.getByRole('button', { name: 'Crear campaña', exact: true }).click();
   await page.locator('[data-field="campaign-name"]').fill('Mesa de la Prueba');
   await page.getByRole('button', { name: 'Guardar', exact: true }).click();
@@ -791,13 +791,13 @@ test('Mesa: crear campaña, sumar con un código, conceder, echar y borrar sin t
 });
 
 test('Capítulos: crear, empezar, escribir una nota y cerrar con un objeto llega al jugador sin tocar su ficha', async ({ page, request }) => {
-  // El jugador es la cuenta sin /v2 y solo por API. Esa cuenta no puede abrir
+  // El jugador es la cuenta que solo se usa por API. Esa cuenta no puede abrir
   // la pantalla de la bandeja, así que acepta por las mismas rutas que usa la
   // pantalla (`claim` y `DELETE`); la tarjeta «El DM te dio» no se prueba acá.
-  const comoJugador = { headers: { cookie: `dnd_session=${TOKEN_SIN_V2}` } };
+  const comoJugador = { headers: { cookie: `dnd_session=${TOKEN_SOLO_API}` } };
   const comoDm = { headers: { cookie: `dnd_session=${TOKEN_ESCRITURA}` } };
   const fichasDelJugador = () =>
-    api<{ characters: { character: PersonajeApi }[] }>(request, '/api/characters', TOKEN_SIN_V2);
+    api<{ characters: { character: PersonajeApi }[] }>(request, '/api/characters', TOKEN_SOLO_API);
   // La ficha que dejó la prueba de la Mesa, o una nueva si corre sola.
   let pjId = 'pj-de-la-mesa';
   if (!(await fichasDelJugador()).characters.some((c) => c.character.id === pjId)) {
@@ -820,7 +820,7 @@ test('Capítulos: crear, empezar, escribir una nota y cerrar con un objeto llega
   )!;
   const nombre = objeto.name as string;
 
-  await page.goto('/v2/dm/campanas/mesa-de-capitulos/capitulos');
+  await page.goto('/dm/campanas/mesa-de-capitulos/capitulos');
   await page.locator('[data-action="new-chapter"]').click();
   await page.locator('[data-field="chapter-name"]').fill('La Puerta de Ceniza');
   await page.getByRole('button', { name: 'Guardar', exact: true }).click();
@@ -836,7 +836,7 @@ test('Capítulos: crear, empezar, escribir una nota y cerrar con un objeto llega
   await page.getByRole('button', { name: 'Guardar', exact: true }).click();
   await expect(page.locator('[data-entry="note"]')).toContainText('Lo que Garrick no dijo');
 
-  await page.goto('/v2/dm/campanas/mesa-de-capitulos/capitulos');
+  await page.goto('/dm/campanas/mesa-de-capitulos/capitulos');
   await page.locator('[data-action="close-chapter"]').click();
   // El oro y los objetos se deciden al cerrar, no al editar el capítulo.
   await page.locator('[data-field="chapter-gold"]').fill('50');
@@ -855,7 +855,7 @@ test('Capítulos: crear, empezar, escribir una nota y cerrar con un objeto llega
       const { events } = await api<{ events: { kind: string; payload: { grantsGold?: number; hasGrants?: boolean } }[] }>(
         request,
         '/api/events',
-        TOKEN_SIN_V2,
+        TOKEN_SOLO_API,
       );
       return events.some((e) => e.kind === 'chapter_completed' && e.payload.grantsGold === 50 && e.payload.hasGrants === true);
     })
@@ -869,13 +869,13 @@ test('Capítulos: crear, empezar, escribir una nota y cerrar con un objeto llega
   const { grants } = await api<{ grants: { id: string; name: string }[] }>(
     request,
     `/api/characters/${pjId}/item-grants`,
-    TOKEN_SIN_V2,
+    TOKEN_SOLO_API,
   );
   expect(grants.map((g) => g.name)).toEqual([nombre]);
   const aceptado = await request.post(`/api/item-grants/${grants[0]!.id}/claim`, comoJugador);
   expect(((await aceptado.json()) as { itemId: string }).itemId).toBe(objeto.id);
   expect((await request.delete(`/api/item-grants/${grants[0]!.id}`, comoJugador)).ok()).toBe(true);
-  expect((await api<{ grants: unknown[] }>(request, `/api/characters/${pjId}/item-grants`, TOKEN_SIN_V2)).grants).toEqual([]);
+  expect((await api<{ grants: unknown[] }>(request, `/api/characters/${pjId}/item-grants`, TOKEN_SOLO_API)).grants).toEqual([]);
 
   // La prueba de la Mesa espera que esta cuenta no tenga campañas.
   await request.delete('/api/campaigns/mesa-de-capitulos', comoDm);
@@ -888,7 +888,7 @@ test('escenas de música: el enlace ajeno no se guarda, y crear, borrar y deshac
     (await api<{ campaigns: { id: string; musicScenes?: { name: string; offerOnCombat?: boolean }[] }[] }>(request, '/api/campaigns', TOKEN_ESCRITURA))
       .campaigns.find((c) => c.id === 'mesa-de-musica')?.musicScenes ?? [];
 
-  await page.goto('/v2/dm/campanas/mesa-de-musica/mesa');
+  await page.goto('/dm/campanas/mesa-de-musica/mesa');
   await page.getByRole('button', { name: 'Música', exact: true }).click();
   await page.locator('[data-action="new-scene"]').click();
   const dialogo = page.getByRole('dialog');
@@ -925,7 +925,7 @@ test('PNJ de la mesa: traer de la biblioteca, cambiar el estado y quitar', async
       (e) => e.npc.id === npc.id,
     );
 
-  await page.goto('/v2/dm/campanas/mesa-de-pnj/pnj');
+  await page.goto('/dm/campanas/mesa-de-pnj/pnj');
   await page.locator('[data-action="bring-npcs"]').click();
   const dialogo = page.getByRole('dialog');
   await dialogo.locator(`[data-option="${npc.id}"]`).click();
@@ -951,7 +951,7 @@ test('Nuevo PNJ: guarda el bloque que da el motor, abre la ficha y se puede borr
   const comoDm = { headers: { cookie: `dnd_session=${TOKEN_ESCRITURA}` } };
   const criatura = catalogo().creatures.find((c) => /^\d+$/.test(String(c.ac)) && /^\d+$/.test(String(c.hp)))!;
 
-  await page.goto('/v2/dm/pnj');
+  await page.goto('/dm/pnj');
   await page.locator('[data-action="new-npc"]').click();
   const dialogo = page.getByRole('dialog');
   await dialogo.locator('[data-field="npc-name"]').fill('Bruna la Barquera');
@@ -960,7 +960,7 @@ test('Nuevo PNJ: guarda el bloque que da el motor, abre la ficha y se puede borr
   await dialogo.locator(`[data-option="${criatura.id as string}"]`).click();
   await dialogo.getByRole('button', { name: 'Crear', exact: true }).click();
 
-  await page.waitForURL(/\/v2\/dm\/pnj\/npc-/);
+  await page.waitForURL(/\/dm\/pnj\/npc-/);
   const id = new URL(page.url()).pathname.split('/').pop()!;
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Bruna la Barquera');
 
@@ -973,7 +973,7 @@ test('Nuevo PNJ: guarda el bloque que da el motor, abre la ficha y se puede borr
   await page.locator('[data-action="npc-menu"]').click();
   await page.getByRole('menuitem', { name: 'Borrar PNJ', exact: true }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Borrar PNJ', exact: true }).click();
-  await page.waitForURL(/\/v2\/dm\/pnj$/);
+  await page.waitForURL(/\/dm\/pnj$/);
   expect((await request.get(`/api/npcs/${id}`, comoDm)).status()).toBe(404);
 });
 
@@ -984,7 +984,7 @@ test('Ficha de un PNJ: nombre, voz, tag, trasfondo y nota se guardan en su docum
   const guardado = async () =>
     (await api<{ npc: { name: string; speech?: string; tags?: string[]; background?: string; notes?: { title: string }[] } }>(request, `/api/npcs/${npc.id}`, TOKEN_ESCRITURA)).npc;
 
-  await page.goto(`/v2/dm/pnj/${npc.id}`);
+  await page.goto(`/dm/pnj/${npc.id}`);
 
   await page.locator('[data-action="npc-rename"]').click();
   await page.locator('[data-field="rename"]').fill('Bruna la Barquera');
@@ -1025,7 +1025,7 @@ test('subir el retrato de un PNJ lo guarda en su documento', async ({ page, requ
     'base64',
   );
 
-  await page.goto(`/v2/dm/pnj/${npc.id}/retrato`);
+  await page.goto(`/dm/pnj/${npc.id}/retrato`);
   // Con proveedores la pantalla abre en Generar: se pasa a Subir.
   await page.locator('[data-tab="upload"]').click();
   await page.locator('[data-field="portrait-file"]').setInputFiles({ name: 'retrato.png', mimeType: 'image/png', buffer: png });
@@ -1044,11 +1044,11 @@ test('Bloque de un PNJ: guarda lo que da el motor y conserva lo que no se edita'
   const creado = await request.post('/api/npcs', { ...comoDm, data: { npc: { id: 'nuevo', name: 'Oriel', sheetKind: 'block', block: criatura } } });
   const { npc } = (await creado.json()) as { npc: { id: string } };
 
-  await page.goto(`/v2/dm/pnj/${npc.id}`);
+  await page.goto(`/dm/pnj/${npc.id}`);
   await page.locator('[data-action="edit-block"]').click();
   await page.locator('[data-field="block-hp"]').fill('99');
   await page.locator('[data-action="block-save"]').click();
-  await page.waitForURL(new RegExp(`/v2/dm/pnj/${npc.id}$`));
+  await page.waitForURL(new RegExp(`/dm/pnj/${npc.id}$`));
 
   const { npc: guardado } = await api<{ npc: { block: { hp: string; kind: string; actions: { spellcasting?: unknown }[] } } }>(request, `/api/npcs/${npc.id}`, TOKEN_ESCRITURA);
   expect(guardado.block.hp).toBe('99');
@@ -1066,7 +1066,7 @@ test('Ficha de un PNJ: los PG guardan lo que da el motor en su ficha', async ({ 
   });
   const { npc, character } = (await creado.json()) as { npc: { id: string; characterId: string }; character: CharacterJson };
 
-  await page.goto(`/v2/dm/pnj/${npc.id}/ficha/combate`);
+  await page.goto(`/dm/pnj/${npc.id}/ficha/combate`);
   const accion = { type: 'damage', amount: 5 } as const;
   const enviado = await proximoGuardado(
     page,
@@ -1101,7 +1101,7 @@ test('Ficha de un PNJ: subir de nivel guarda lo que da el motor y vuelve a la ru
     draft: { classId: 'barbarian', subclassId: senda.id, abilityA: 'strength' },
   });
 
-  await page.goto(`/v2/dm/pnj/${npc.id}/ficha`);
+  await page.goto(`/dm/pnj/${npc.id}/ficha`);
   await page.locator('[data-action="npc-level-up"]').click();
   await page.getByRole('button', { name: 'Empezar' }).click();
   await page.getByRole('button', { name: 'Continuar' }).click();
@@ -1118,7 +1118,7 @@ test('Ficha de un PNJ: subir de nivel guarda lo que da el motor y vuelve a la ru
     npc.characterId,
   );
   expect(enviado).toEqual(esperado);
-  await expect(page).toHaveURL(new RegExp(`/v2/dm/pnj/${npc.id}/ficha/personaje$`));
+  await expect(page).toHaveURL(new RegExp(`/dm/pnj/${npc.id}/ficha/personaje$`));
 
   await request.delete(`/api/npcs/${npc.id}`, comoDm);
 });

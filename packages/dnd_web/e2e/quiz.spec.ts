@@ -11,7 +11,7 @@ test.beforeEach(async ({ context, baseURL }) => {
 
 test('una ronda de reglas muestra una pregunta y traba la respuesta', async ({ page }) => {
   const t = textsFor('es');
-  await page.goto('/v2/quiz');
+  await page.goto('/quiz');
   // La primera vez sale el tutorial, después del primer render. Saltarlo es lo
   // que hace quien ya lo vio; si no aparece, la ronda sigue igual.
   const skip = page.getByRole('button', { name: t.tutSkipAll, exact: true });

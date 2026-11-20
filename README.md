@@ -132,16 +132,14 @@ y catálogos, organizados por recorrido.
 
 ## Desarrollo y autoalojamiento
 
-La interfaz se ofrece en español e inglés. El cliente React de v2 convive con
-Flutter durante la migración; ambos usan el mismo motor de reglas en Dart,
-compilado a JavaScript para React.
+La interfaz se ofrece en español e inglés. El cliente es React y usa el motor
+de reglas en Dart compilado a JavaScript.
 
 | Paquete | Responsabilidad |
 | --- | --- |
-| [`dnd_web`](packages/dnd_web) | Cliente React, TypeScript y Vite, servido bajo `/v2`. |
+| [`dnd_web`](packages/dnd_web) | Cliente React, TypeScript y Vite, servido en la raíz. |
 | [`dnd_engine`](packages/dnd_engine) | Motor de reglas y catálogo dirigido por datos. |
 | [`dnd_server`](packages/dnd_server) | API con Shelf y PostgreSQL: sesiones, persistencia y permisos. |
-| [`dnd_app`](packages/dnd_app) | Cliente Flutter Web, disponible durante la migración. |
 
 - **[Documentación](docs/README.md):** arquitectura, contenido y guías de desarrollo.
 - **[Autoalojamiento](docs/operaciones/despliegue.md):** instalación y operación del stack.

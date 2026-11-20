@@ -1,8 +1,8 @@
 import { applyTranslation, type Catalog, type JsonObject } from '../engine';
 import type { Lang } from '../i18n/texts';
 
-// Los catálogos que `loadOfficialContent` (dnd_app, asset_content_loader.dart)
-// pide, con los mismos nombres de archivo. `items` junta tres.
+// Los catálogos del SRD que se piden a `/content/`, con los nombres de
+// archivo de `dnd_engine/lib/assets/srd_2024`. `items` junta tres.
 const PACKS = [
   'races',
   'classes',

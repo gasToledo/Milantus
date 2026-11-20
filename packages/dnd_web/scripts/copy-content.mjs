@@ -1,5 +1,5 @@
 // Copia el catálogo SRD del motor a `dist/content/`, para que el navegador lo
-// pida por `/v2/content/<archivo>.json`:
+// pida por `/content/<archivo>.json`:
 //
 //     npm run build   (lo corre después de `vite build`)
 //
@@ -12,7 +12,7 @@
 //
 // Solo van los catálogos y sus traducciones: `manifest.json` y los
 // `expected_*.json` son de las pruebas del motor. La imagen de Docker pone el
-// mismo directorio en esta ruta relativa (etapa `web-v2-build`).
+// mismo directorio en esta ruta relativa (etapa `web-build`).
 import { cpSync, mkdirSync, readdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';

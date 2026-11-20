@@ -29,7 +29,7 @@ export function CampaignMenu({ campaign }: { campaign: DmCampaign }) {
     await deleteCampaign(campaign.id);
     // Primero se sale de la campaña y después se relee la lista: al revés, la
     // pantalla buscaría una campaña que ya no está y diría «No se encontró».
-    // La borrada también se saca de la caché antes de salir: `/v2/dm` abre la
+    // La borrada también se saca de la caché antes de salir: `/dm` abre la
     // primera en curso de la lista, y con la copia vieja podía ser esta.
     client.setQueryData<DmCampaign[]>(queryKeys.dmCampaigns, (old) => old?.filter((c) => c.id !== campaign.id));
     navigate(dmHref(), { replace: true });

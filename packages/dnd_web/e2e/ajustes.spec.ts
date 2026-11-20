@@ -20,8 +20,8 @@ test('Ajustes guarda en la cuenta y el modo de inicio respeta la navegación', a
     await route.fulfill({ json: { settings } });
   });
 
-  await page.goto('/v2/');
-  await expect(page).toHaveURL('/v2/personajes');
+  await page.goto('/');
+  await expect(page).toHaveURL('/personajes');
   await page.getByRole('link', { name: t.settings, exact: true }).click();
   const difficulty = page.getByRole('switch', { name: t.settingsShowEncounterDifficulty });
   await expect(difficulty).toBeChecked();
@@ -44,9 +44,9 @@ test('Ajustes guarda en la cuenta y el modo de inicio respeta la navegación', a
   });
 
   await page.goBack();
-  await expect(page).toHaveURL('/v2/personajes');
-  await page.goto('/v2/');
-  await expect(page).toHaveURL(/\/v2\/dm(?:\/|$)/);
-  await page.goto('/v2/personajes');
-  await expect(page).toHaveURL('/v2/personajes');
+  await expect(page).toHaveURL('/personajes');
+  await page.goto('/');
+  await expect(page).toHaveURL(/\/dm(?:\/|$)/);
+  await page.goto('/personajes');
+  await expect(page).toHaveURL('/personajes');
 });

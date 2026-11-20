@@ -2,12 +2,11 @@
 // `httpOnly` viaja sola y no hay `baseUrl`.
 import type { CharacterJson, JsonObject } from '../engine';
 
-/** Lo que `GET /api/me` devuelve. `webV2` lo decide el servidor por cuenta. */
+/** Lo que `GET /api/me` devuelve. */
 export interface Account {
   userId: string;
   name?: string | null;
   email?: string | null;
-  webV2?: boolean;
 }
 
 /** `unauthorized` (401) no es un fallo: es el estado «sin sesión». Todo lo
@@ -141,8 +140,7 @@ export interface RosterSettings {
   favoriteCharacterId: string | null;
   characterOrder: string[];
   /** El orden de la Biblioteca de PNJ, como `characterOrder` el del
-   *  dashboard. Solo lo escribe `/v2`: Flutter no lo conoce y el servidor
-   *  combina el primer nivel de los ajustes, así que no lo pisa. */
+   *  dashboard. El servidor combina el primer nivel de los ajustes, así que no lo pisa. */
   npcOrder: string[];
   /** El orden de los escenarios de la Biblioteca, igual que `npcOrder`. */
   scenarioOrder: string[];
@@ -152,14 +150,12 @@ export interface RosterSettings {
   startsInDmMode: boolean;
   /** Idioma, animaciones y tutoriales vistos son de la cuenta, y `null` es
    *  «todavía no los guardó»: en ese caso rige lo que tenga este navegador y
-   *  no se escribe nada al cargar. Flutter no los conoce y el servidor combina
-   *  el primer nivel, así que no los pisa. */
+   *  no se escribe nada al cargar. El servidor combina el primer nivel, así que
+   *  guardar una clave no pisa las demás. */
   language: 'es' | 'en' | null;
   animationsOff: boolean | null;
   /** Los nombres de los tutoriales vistos (o `*`), como el formato local. */
   tutorialsSeen: string[] | null;
-  /** Si `/` sirve la versión anterior (la cookie la pone `AccountPrefsSync`). */
-  legacyVersion: boolean;
   /** Si el combate que se arma muestra su dificultad y los PX (`AppSettings.showEncounterDifficulty`). */
   showEncounterDifficulty: boolean;
   /** El orden de las tarjetas de Combate y Personaje: tres columnas de ids, o
@@ -187,25 +183,16 @@ export async function fetchRosterSettings(signal: AbortSignal): Promise<RosterSe
     language: settings?.language === 'es' || settings?.language === 'en' ? settings.language : null,
     animationsOff: typeof settings?.animationsOff === 'boolean' ? settings.animationsOff : null,
     tutorialsSeen: Array.isArray(settings?.tutorialsSeen) ? settings.tutorialsSeen.filter((n) => typeof n === 'string') : null,
-    legacyVersion: settings?.legacyVersion === true,
-    // Prendida por defecto, igual que `AppSettings` de Flutter: solo un `false`
+    // Prendida por defecto: solo un `false`
     // explícito la apaga (una cuenta sin ajustes guardados la ve).
     showEncounterDifficulty: settings?.showEncounterDifficulty !== false,
     sheetLayout: settings?.sheetLayout ?? {},
   };
 }
 
-/** La versión del cliente de Flutter, que publica su propio build en
- *  `/version.json` (es la que lee `package_info_plus`). Es un adorno del panel:
- *  si no está (en desarrollo, en las pruebas), simplemente no se muestra. */
-export async function fetchAppVersion(signal: AbortSignal): Promise<string | null> {
-  try {
-    const { version } = await getJson<{ version?: string }>('/version.json', signal);
-    return version ?? null;
-  } catch {
-    return null;
-  }
-}
+/** La versión de `package.json`, fijada al construir (`define` en
+ *  `vite.config.ts`). */
+export const APP_VERSION: string = __APP_VERSION__;
 
 /** Lo que `GET /api/characters/:id/campaigns` devuelve por cada campaña en la
  *  que está el personaje. El servidor ya podó lo que el jugador no ve: sin id

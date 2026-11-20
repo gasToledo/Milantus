@@ -169,9 +169,8 @@ sentido cambió, se corrige la traducción.
 
 El mismo comando va después de **agregar o corregir a mano** una ruta de la
 superposición: la huella cubre las rutas traducidas, así que sumar una la
-cambia aunque el español sea el mismo. Un catálogo con superposición se
-registra además en los assets de `packages/dnd_app/pubspec.yaml`; lo verifica
-`asset_content_loader_test`.
+cambia aunque el español sea el mismo. Un catálogo nuevo se
+registra además en `PACKS` de `packages/dnd_web/src/api/catalog.ts`.
 
 ## Verificación
 
@@ -189,11 +188,9 @@ dart format --output=none --set-exit-if-changed bin lib test
 dart analyze
 dart test
 
-cd ../dnd_app
-dart format --output=none --set-exit-if-changed lib test
-flutter analyze
-flutter test
-flutter build web --release
+cd ../dnd_web
+npx tsc --noEmit
+npm run build
 ```
 
 Si cambió un documento persistido, probar su round-trip, la migración desde la

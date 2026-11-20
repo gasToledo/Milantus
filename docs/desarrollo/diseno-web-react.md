@@ -1,6 +1,6 @@
 # Diseño web en React — `packages/dnd_web`
 
-Estado: guía vigente del cliente React (`/v2`). El lenguaje visual es el mismo
+Estado: guía vigente del cliente web. El lenguaje visual es el mismo
 de [Diseño web](diseno-web.md): esta guía no lo repite, dice **cómo se aplica
 en React** y cuál es la pieza de `src/ui/` para cada cosa. Antes de crear un
 componente visual nuevo, buscá acá; si el código y esta guía discrepan, manda
@@ -59,7 +59,7 @@ una regla: reciben el número ya resuelto por `computeSheet`.
 | Componente | Qué hace | Cuándo |
 | --- | --- | --- |
 | `Shell` | El marco: panel de 236 px fijo desde 900 px, barra con cajón debajo; el contenido ocupa todo el ancho (sin máximo). `panel` y `footer` son de cada pantalla | Toda pantalla. Sin `panel` ni `footer`, solo la marca (sin sesión, no disponible) |
-| `NavGroup`, `NavItem` | Grupo con nombre (`nav`) e ítem del panel: ícono, rótulo, activo en oro sobre `goldSoft` con `aria-current` | `internal` navega sin recargar; `external` avisa al lector que abre Flutter y muestra el ícono de enlace externo; `count` lleva la cifra tabular a la derecha (oro si está activo), `badge` es el aviso que pide atención (objetos esperando en Inventario): círculo de oro de 18 px que con dos cifras se estira a píldora, `muted` atenúa la categoría sin coincidencias en el Códice y `onSelect` en vez de `href` lo vuelve un botón para una acción de la pantalla (Imprimir) |
+| `NavGroup`, `NavItem` | Grupo con nombre (`nav`) e ítem del panel: ícono, rótulo, activo en oro sobre `goldSoft` con `aria-current` | `internal` navega sin recargar; `external` avisa al lector que sale de la aplicación y muestra el ícono de enlace externo; `count` lleva la cifra tabular a la derecha (oro si está activo), `badge` es el aviso que pide atención (objetos esperando en Inventario): círculo de oro de 18 px que con dos cifras se estira a píldora, `muted` atenúa la categoría sin coincidencias en el Códice y `onSelect` en vez de `href` lo vuelve un botón para una acción de la pantalla (Imprimir) |
 | `SidebarBack` | El «Atrás» de una pantalla de adentro, con la forma del interruptor de modo. `onClick` con `preventDefault` frena la salida para confirmar | Ficha, creador |
 | `ModeSwitch` | «Jugador / DM»: el modo actual es un `span` con `aria-current` y el otro un enlace interno (`mode`, `playerHref`, `dmHref`) | Panel de cada modo |
 | `NavCollapsible` (`ui/disclosure.tsx`) | Grupo del panel que se pliega: el rótulo es el botón | Campañas terminadas del Modo DM |
@@ -258,7 +258,7 @@ origen y deja cada pestaña en el historial del navegador. Si se entró por URL
 directa, el `href` del enlace indica el destino de respaldo.
 
 `src/router.tsx`: `useRoute()` y `Link` (un `<a href>` de verdad que, con
-clic simple, navega sin recargar). Los enlaces a Flutter son `<a>` comunes.
+clic simple, navega sin recargar). Los enlaces fuera de la aplicación son `<a>` comunes.
 Una pestaña que el usuario querría compartir o recargar es una ruta
 (`/personajes/:id/combate`), no estado de React.
 
@@ -390,7 +390,7 @@ y botones que se envuelven. Con una escena el botón dice «Poner», con varias
 cada botón lleva el nombre de la escena. «Ahora no» es secundario. La oferta
 no toma el foco ni bloquea el combate.
 
-Cada sección es una ruta bajo `/v2/dm/campanas/:id/` (el Bestiario, la Biblioteca de PNJ y el Homebrew, herramientas de la cuenta, bajo `/v2/dm/bestiario`, `/v2/dm/pnj` y `/v2/dm/homebrew`) y comparte tres piezas:
+Cada sección es una ruta bajo `/dm/campanas/:id/` (el Bestiario, la Biblioteca de PNJ y el Homebrew, herramientas de la cuenta, bajo `/dm/bestiario`, `/dm/pnj` y `/dm/homebrew`) y comparte tres piezas:
 `DmPanel` (el panel: interruptor, herramientas, campañas, secciones),
 `DmHeader` (título Georgia 30, pill con el estado, `actions` a su derecha y la regla ornamental; el
 `h1` es el título) y `DmPage`, que resuelve la campaña por id y es la única que

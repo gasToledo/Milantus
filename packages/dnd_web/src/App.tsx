@@ -87,21 +87,11 @@ function Screen() {
       </Shell>
     );
   }
-  // Sin `webV2` la ruta no existe: no hay pista de que haya algo detrás. Es
-  // la misma pantalla para cualquier ruta, conocida o no, y no pide nada más
-  // a la API (ni ajustes, ni personajes).
-  if (account.data.webV2 !== true) {
-    return (
-      <Shell>
-        <Notice title={t.unavailableTitle} body={t.unavailableBody} />
-      </Shell>
-    );
-  }
   return <Enabled account={account.data} />;
 }
 
-/** Solo para cuentas con `webV2`: los ajustes de la cuenta, las rutas y la única
- *  columna de avisos. Los avisos viven acá y no en cada pantalla: dos
+/** Con sesión: los ajustes de la cuenta, las rutas y la única columna de
+ *  avisos. Los avisos viven acá y no en cada pantalla: dos
  *  viewports fijos en la misma esquina se pisarían, y los de la cola
  *  (`PendingEvents`) tienen que compartir el lugar con los de las acciones. */
 function Enabled({ account }: { account: Account }) {

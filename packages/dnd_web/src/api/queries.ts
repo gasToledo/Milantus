@@ -12,7 +12,6 @@ import { fetchHomebrew, mergeHomebrew, type HomebrewContent } from './homebrew';
 import {
   ApiError,
   fetchAccount,
-  fetchAppVersion,
   fetchCampaignChapters,
   fetchCharacterShares,
   fetchItemGrants,
@@ -61,7 +60,6 @@ export const queryKeys = {
   // No empieza con 'characters': `roster` es ese prefijo y lo invalida todo.
   itemGrants: (characterId: string) => ['itemGrants', characterId] as const,
   turn: (characterId: string) => ['turn', characterId] as const,
-  appVersion: ['app-version'] as const,
   dmCampaigns: ['dm', 'campaigns'] as const,
   campaignMembers: (campaignId: string) => ['dm', 'campaigns', campaignId, 'members'] as const,
   campaignNotebook: (campaignId: string) => ['dm', 'campaigns', campaignId, 'notebook'] as const,
@@ -92,16 +90,6 @@ export const useCatalog = (lang: Lang) =>
     queryKey: queryKeys.catalog(lang),
     queryFn: ({ signal }) => loadCatalog(lang, signal),
     staleTime: Infinity,
-  });
-
-/** La versión del panel: adorno, sin reintentos ni error a la vista. */
-export const useAppVersion = (enabled: boolean) =>
-  useQuery({
-    queryKey: queryKeys.appVersion,
-    queryFn: ({ signal }) => fetchAppVersion(signal),
-    enabled,
-    staleTime: Infinity,
-    retry: false,
   });
 
 /** Solo se pide al abrir la pestaña Campaña: es lo único que la usa. */

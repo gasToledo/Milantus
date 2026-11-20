@@ -10,9 +10,8 @@ import 'character_compiler.dart';
 ///
 /// Vive en el motor y no en el cliente porque cada respuesta es una regla —
 /// resolver la fórmula de PG de un bloque, compilar la ficha de un PNJ
-/// jugable—, y los dos clientes (Flutter y React) tienen que dar el mismo
-/// número. Es la cuenta de `npcMaxHp`/`npcArmorClass`/`npcStoredHp` de
-/// `dnd_app/lib/ui/dm/npcs/npc_shared.dart`, que todavía la repite.
+/// jugable—, y el cliente web y el conector MCP tienen que dar el mismo
+/// número.
 class NpcStats {
   /// PG máximos con los que entra a un combate, o 0 si no tiene con qué
   /// pelear. Un bloque recién creado y todavía vacío cuenta como sin PG.

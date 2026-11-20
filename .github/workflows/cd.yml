@@ -54,11 +54,9 @@ jobs:
             echo "deploy=true" >> "$GITHUB_OUTPUT"; exit 0
           fi
           # test/ y tool/ no entran a la imagen (ver .dockerignore): un commit
-          # que solo los toca no cambia nada en producción. dnd_web sí entra
-          # (etapa `web-v2-build` del Dockerfile): sin listarlo, un cambio solo
-          # de React pasaba CI y nunca llegaba a /v2.
+          # que solo los toca no cambia nada en producción.
           if git diff --quiet "$base" HEAD -- \
-              packages/dnd_server packages/dnd_app packages/dnd_engine packages/dnd_web \
+              packages/dnd_server packages/dnd_engine packages/dnd_web \
               ':(exclude,glob)packages/*/test/**' \
               ':(exclude,glob)packages/*/tool/**' \
               docker-compose.yml postgres-init login-skin .github/workflows/cd.yml; then
@@ -88,18 +86,11 @@ jobs:
       - name: Reconstruir y levantar el stack
         # `docker compose up --build` reutiliza cualquier imagen base ya
         # cacheada en el runner para las etapas `FROM` del Dockerfile
-        # (ghcr.io/cirruslabs/flutter, dart:stable), aunque esas
-        # etiquetas floten en el registro. Eso hizo fallar el build cuando
-        # `dnd_app` subió su cota de SDK y el `stable` de Flutter cacheado
-        # localmente quedó atrás. `--pull` en `up` solo afecta a servicios con
-        # `image:`, no a las etapas de build; `compose build --pull` es lo que
-        # fuerza a repreguntar el registro por esas imágenes base antes de
-        # construir.
-        #
-        # Repreguntar no alcanza si la cota de SDK exige un hotfix de Flutter:
-        # cirruslabs no publica esos tags (ver el Dockerfile), así que el
-        # `stable` más nuevo sigue quedando corto. Ese caso se arregla en el
-        # `pubspec.yaml`, no acá.
+        # (dart:stable), aunque esa etiqueta flote en el registro: un SDK
+        # cacheado viejo hizo fallar el build cuando un paquete subió su cota.
+        # `--pull` en `up` solo afecta a servicios con `image:`, no a las
+        # etapas de build; `compose build --pull` es lo que fuerza a
+        # repreguntar el registro por esas imágenes base antes de construir.
         run: |
           docker compose build --pull
           docker compose up -d

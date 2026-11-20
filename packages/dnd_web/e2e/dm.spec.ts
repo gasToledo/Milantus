@@ -1,21 +1,21 @@
 import { expect, test } from '@playwright/test';
-import { api, TOKEN, TOKEN_DM, TOKEN_SIN_V2, type PersonajeApi } from './helpers';
+import { api, TOKEN, TOKEN_DM, TOKEN_SOLO_API, type PersonajeApi } from './helpers';
 
 test.use({ locale: 'es-AR' });
 
 const CAMPANA = 'marca-del-cuervo';
-const MESA = `/v2/dm/campanas/${CAMPANA}/mesa`;
+const MESA = `/dm/campanas/${CAMPANA}/mesa`;
 
 // Lo que el DM sembró y no tiene que llegarle a ninguna otra cuenta (ver
 // `e2e_server.dart`).
 const SOLO_DEL_DM = ['La Marca del Cuervo', 'Tema secreto del DM', 'Resumen reservado del DM', 'Nota reservada del DM'];
 
-test('otra cuenta recibe 404 al pedir la campaña, idéntico al de una inexistente, y no ve nada del DM en /v2', async ({
+test('otra cuenta recibe 404 al pedir la campaña, idéntico al de una inexistente', async ({
   context,
   page,
   baseURL,
 }) => {
-  for (const token of [TOKEN, TOKEN_SIN_V2]) {
+  for (const token of [TOKEN, TOKEN_SOLO_API]) {
     for (const ruta of ['members', 'chapters', 'notebook']) {
       const ajena = await page.request.get(`/api/campaigns/${CAMPANA}/${ruta}`, {
         headers: { cookie: `dnd_session=${token}` },
@@ -48,22 +48,22 @@ test('otra cuenta recibe 404 al pedir la campaña, idéntico al de una inexisten
   ).toBe(200);
   expect((await pedirComoDm(`/api/portraits/${clave}`)).status()).toBe(404);
 
-  // Con webV2 pero sin esa campaña: la pantalla responde lo mismo que ante un
+  // Una cuenta sin esa campaña: la pantalla responde lo mismo que ante un
   // id inexistente, y ni el nombre ni los jugadores aparecen.
   await context.addCookies([{ name: 'dnd_session', value: TOKEN, url: baseURL! }]);
   for (const id of [CAMPANA, 'no-existe']) {
-    await page.goto(`/v2/dm/campanas/${id}/mesa`);
+    await page.goto(`/dm/campanas/${id}/mesa`);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('No se encontró la campaña');
   }
   // Tampoco la ficha de un miembro: la URL con un vínculo real no abre nada.
-  await page.goto(`/v2/dm/campanas/${CAMPANA}/mesa/${members[0]!.memberId}/personaje`);
+  await page.goto(`/dm/campanas/${CAMPANA}/mesa/${members[0]!.memberId}/personaje`);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('No se encontró la campaña');
   const texto = await page.locator('body').innerText();
   for (const secreto of SOLO_DEL_DM) expect(texto, `la pantalla muestra «${secreto}»`).not.toContain(secreto);
   await expect(page.locator('[data-member]')).toHaveCount(0);
 
   // Sin campañas propias, «DM» no tiene a dónde llevar: lo dice.
-  await page.goto('/v2/dm');
+  await page.goto('/dm');
   await expect(page.getByText('Todavía no dirigís ninguna campaña.')).toBeVisible();
 
   // Para el propio DM, un vínculo que no existe dice lo mismo que uno cortado.

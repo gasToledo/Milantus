@@ -84,11 +84,9 @@ Adicional» como tiempo de lanzamiento) se muestran tal como están ahí.
 
 Todo error empieza con **«No se pudo …»**, nunca con «Error al …».
 
-Cuando el aviso nace de una excepción, se arma con `failureMessage(qué, error)`
-(`packages/dnd_app/lib/theme/app_widgets.dart`) y nunca interpolando `$e`.
-Así solo aparece un motivo si la excepción trae un texto en castellano
-(`ApiException`, `FormatException`, `UnsupportedDataVersionException`), y
-cualquier otro error queda en la frase sola, sin jerga ni nombres de clases.
+Cuando el aviso nace de una excepción, nunca se interpola el error crudo: solo
+aparece un motivo si trae un texto pensado para la persona, y cualquier otro
+error queda en la frase sola, sin jerga ni nombres de clases.
 
 El detalle técnico, cuando sirve, va en «Ver detalles» de `AppErrorView`.
 
@@ -118,37 +116,26 @@ uno de los dos, el español.
 
 ### Dónde viven los textos
 
-- `packages/dnd_app/lib/l10n/app_es.arb` (plantilla) y `app_en.arb`. Toda clave
-  existe en los dos, con los mismos marcadores: `test/l10n_parity_test.dart` lo
-  verifica.
-- En un widget se lee con `context.l10n.clave`. Una función sin contexto recibe
-  `AppLocalizations l10n` como parámetro; no guarda textos en constantes.
-- Un texto con datos lleva marcadores (`{name}`) y se declara en `app_es.arb`
-  con su metadato `@clave`; un plural usa la sintaxis ICU
-  (`{count, plural, =1{1 nota} other{{count} notas}}`), nunca `n == 1 ? …`.
-- En un mensaje con marcadores no se usa el apóstrofo recto (`'`): en ICU es
-  un escape. En inglés se escribe `’` (por ejemplo «{name}’s turn»).
+- `packages/dnd_web/src/i18n/texts.ts`: el objeto `es` es la plantilla y `en`
+  tiene su mismo tipo (`Texts`), así que `tsc` falla si falta una clave en un
+  idioma.
+- En un componente se lee con `const t = useTexts()` y `t.clave`. Un texto con
+  datos es una función (`(name: string) => …`), y un plural se resuelve ahí
+  mismo con los dos casos escritos, nunca con `n == 1 ? …` armado afuera.
 - Los ids que viajan como datos (tipos, bandos, estilos guardados) **no** se
   traducen: se traducen al mostrarlos.
 
 ### Cómo agregar un texto
 
-1. Agregá la clave a `app_es.arb` y a `app_en.arb`, en el mismo commit.
-2. Usala con `context.l10n.clave`. `flutter pub get` o cualquier build
-   regenera `lib/l10n/app_localizations*.dart`.
-3. Corré `flutter test test/l10n_parity_test.dart test/l10n_no_literals_test.dart`.
+1. Agregá la clave a `es` y a `en` en `texts.ts`, en el mismo commit.
+2. Usala con `t.clave`.
+3. Corré el chequeo de tipos de `dnd_web`.
 
-`test/l10n_no_literals_test.dart` recorre `lib/` y falla ante cualquier texto
-visible suelto en un widget. Si el detector se equivoca por sobrar (un id, una
-tipografía, un prompt), se marca el renglón con `// l10n-ignore: motivo`; un
-archivo entero de datos o errores técnicos, con `// l10n-ignore-file: motivo`
-al principio. El motivo es obligatorio. Para ver qué detecta:
-`dart run tool/l10n_literals.dart -v`.
+**No hay test que cace literales sueltos**: lo cuida la revisión.
 
-Un idioma nuevo es agregar su código a `supportedLanguageCodes` y su nombre a
-`languageNames` (`lib/l10n/app_locale.dart`) y un `app_xx.arb`: el selector lo
-ofrece solo. Cada idioma se muestra **con su propio nombre**, fuera del
-catálogo.
+Un idioma nuevo es agregar su código a `Lang`, su objeto con el tipo `Texts` y
+su nombre a `languageNames`: el selector lo ofrece solo. Cada idioma se
+muestra **con su propio nombre**, fuera del catálogo.
 
 ### Voz en inglés
 

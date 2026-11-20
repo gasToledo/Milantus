@@ -27,12 +27,12 @@ export default defineConfig({
     launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH },
   },
   // El servidor real con repositorios en memoria y una sesión falsa, sirviendo
-  // el `dist` de /v2 con un personaje sembrado: ver `packages/dnd_server/test/e2e_server.dart`. Requiere
+  // el `dist` con un personaje sembrado: ver `packages/dnd_server/test/e2e_server.dart`. Requiere
   // `npm run build` antes. `/health` no pide sesión.
   webServer: {
     command: 'dart run test/e2e_server.dart',
     cwd: servidor,
-    env: { DND_WEB_V2_ROOT: dist, DND_SERVER_PORT: String(PUERTO) },
+    env: { DND_WEB_ROOT: dist, DND_SERVER_PORT: String(PUERTO) },
     url: `http://127.0.0.1:${PUERTO}/health`,
     timeout: 120_000,
     reuseExistingServer: false,

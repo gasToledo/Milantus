@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Bug, Lightbulb, type LucideIcon } from 'lucide-react';
-import { sendFeedback } from '../api/client';
-import { useAccount, useAppVersion } from '../api/queries';
+import { APP_VERSION, sendFeedback } from '../api/client';
+import { useAccount } from '../api/queries';
 import { useLang, useTexts } from '../i18n/context';
 import { AppDialog } from './AppDialog';
 import { cx } from './cx';
@@ -41,7 +41,6 @@ export function FeedbackDialog({
   const lang = useLang();
   // Las dos ya están en caché casi siempre: el panel las pide para dibujarse.
   const email = useAccount().data?.email;
-  const version = useAppVersion(true).data;
   const [kind, setKind] = useState<Kind>(initialKind);
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
@@ -58,7 +57,7 @@ export function FeedbackDialog({
         // Lo que la app sabe y el servidor no, leído al enviar y no al abrir:
         // si cambia el tema con el diálogo abierto, vale el del momento.
         context: {
-          ...(version ? { version } : {}),
+          version: APP_VERSION,
           language: lang,
           theme: document.documentElement.dataset.theme === 'light' ? 'light' : 'dark',
           viewport: `${window.innerWidth}x${window.innerHeight}`,

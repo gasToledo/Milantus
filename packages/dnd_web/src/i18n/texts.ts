@@ -35,8 +35,6 @@ const es = {
   signedOutTitle: 'No hay sesión iniciada',
   signedOutBody: 'Iniciá sesión para ver tus personajes.',
   signIn: 'Iniciar sesión',
-  unavailableTitle: 'No disponible',
-  unavailableBody: 'Esta página no está disponible.',
   errorTitle: 'No se pudo cargar la ficha',
   sessionErrorTitle: 'No se pudo comprobar la sesión',
   computeErrorTitle: 'No se pudo calcular la ficha',
@@ -203,13 +201,9 @@ const es = {
   settingsSectionDm: 'Modo DM',
   settingsSectionRoster: 'Tu lista de personajes',
   settingsSectionHelp: 'Ayuda',
-  settingsSectionLegacy: 'Versión anterior',
   settingsTutorials: 'Tutoriales',
   settingsTutorialsReset: 'Volver a verlos',
   settingsTutorialsResetDone: 'Los tutoriales van a volver a salir en cada sección.',
-  settingsLegacyVersion: 'Usar la versión anterior',
-  settingsLegacyNotice: 'Al entrar a Milantus vas a ver la versión anterior. Para volver, entrá a esta pantalla y apagalo.',
-  settingsLegacyGo: 'Ir a la versión anterior',
   tutSkipAll: 'Saltar todos',
   tutSkip: 'Saltar',
   tutNext: 'Siguiente',
@@ -1788,7 +1782,7 @@ Los personajes que los jugadores le compartieron se sueltan, y sus fichas siguen
   encConvertFailed: 'No se pudo convertir el combatiente en PNJ.',
   encConvertGone: 'El combatiente ya no está disponible en este combate.',
   // Efectos y defensas (6g5): copiados de las claves homónimas de Flutter, salvo
-  // las que nacieron acá (ventaja, temporales y bono a la CA solo existen en /v2).
+  // las que nacieron acá (ventaja, temporales y bono a la CA no existían en Flutter).
   dmEffectsOf: (name: string) => `Efectos de ${name}`,
   dmNoteEffect: 'Anotar un efecto',
   dmNoteEffectHint: 'Marcado por el pícaro…',
@@ -2690,8 +2684,6 @@ const en: Texts = {
   signedOutTitle: 'You are signed out',
   signedOutBody: 'Sign in to see your characters.',
   signIn: 'Sign in',
-  unavailableTitle: 'Not available',
-  unavailableBody: 'This page is not available.',
   errorTitle: 'Could not load the sheet',
   sessionErrorTitle: 'Could not check the session',
   computeErrorTitle: 'Could not compute the sheet',
@@ -2855,13 +2847,9 @@ const en: Texts = {
   settingsSectionDm: 'DM Mode',
   settingsSectionRoster: 'Your character list',
   settingsSectionHelp: 'Help',
-  settingsSectionLegacy: 'Previous version',
   settingsTutorials: 'Tutorials',
   settingsTutorialsReset: 'Show them again',
   settingsTutorialsResetDone: 'Tutorials will show up again in each section.',
-  settingsLegacyVersion: 'Use the previous version',
-  settingsLegacyNotice: 'When you open Milantus you will see the previous version. To come back, go to this screen and turn it off.',
-  settingsLegacyGo: 'Go to the previous version',
   tutSkipAll: 'Skip all',
   tutSkip: 'Skip',
   tutNext: 'Next',
@@ -5322,7 +5310,7 @@ export function storeLang(lang: Lang): boolean {
 /** El idioma de la interfaz, resuelto como `resolveLocale` de Flutter
  *  (`l10n/app_locale.dart`): el guardado si es válido; si no, el del
  *  navegador si lo soportamos (`en-US` vale `en`); si no, español. Flutter lo
- *  guarda en `localStorage`, y `/v2` comparte origen, así que es el mismo. */
+ *  guarda en `localStorage`, y el origen es uno solo. */
 export function resolveLang(): Lang {
   const base = (tag: string | null | undefined): Lang | null => {
     const code = tag?.toLowerCase().split(/[-_]/)[0];

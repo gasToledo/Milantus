@@ -22,11 +22,7 @@ import 'fakes/in_memory_repository_transaction_runner.dart';
 import 'fakes/in_memory_scenario_repository.dart';
 import 'fakes/in_memory_settings_repository.dart';
 
-Handler _handler(
-  FakeAuthDependencies auth, {
-  Set<String> v2Users = const {},
-  List<String>? lines,
-}) {
+Handler _handler(FakeAuthDependencies auth, {List<String>? lines}) {
   final characters = InMemoryCharacterRepository();
   final campaigns = InMemoryCampaignRepository(characters);
   final chapters = InMemoryChapterRepository(campaigns);
@@ -66,9 +62,7 @@ Handler _handler(
     itemGrants: itemGrants,
     settings: InMemorySettingsRepository(),
     scenarios: InMemoryScenarioRepository(campaigns, npcs),
-    v2Users: v2Users,
     clientErrorLog: lines?.add,
-    webStaticHandler: (_) => Response.ok('flutter'),
   );
 }
 
@@ -146,50 +140,6 @@ void main() {
         expect((await _post(h, token, {'message': 'e$i'})).statusCode, 204);
       }
       expect(lines, hasLength(20));
-    });
-  });
-
-  group('GET / con /v2', () {
-    Future<Response> root(Handler h, {String? token, String? extra}) async => h(
-      Request(
-        'GET',
-        Uri.parse('http://localhost/'),
-        headers: {
-          'cookie': [
-            if (token != null) 'dnd_session=$token',
-            ?extra,
-          ].join('; '),
-        },
-      ),
-    );
-
-    test('redirige a /v2/ a la cuenta habilitada, también con *', () async {
-      for (final lista in [
-        {'account-1'},
-        {'*'},
-      ]) {
-        final h = _handler(FakeAuthDependencies(), v2Users: lista);
-        final token = await _login(h);
-        final r = await root(h, token: token);
-        expect(r.statusCode, 302);
-        expect(r.headers['location'], '/v2/');
-        expect(r.headers['cache-control'], 'no-store');
-      }
-    });
-
-    test('sirve Flutter sin sesión, sin flag o con milantus_v1=1', () async {
-      final h = _handler(auth, v2Users: {'account-1'});
-      final token = await _login(h);
-      final otra = _handler(FakeAuthDependencies(), v2Users: {'nadie'});
-      final tokenOtra = await _login(otra);
-      for (final r in [
-        await root(h),
-        await root(otra, token: tokenOtra),
-        await root(h, token: token, extra: 'milantus_v1=1'),
-      ]) {
-        expect(r.statusCode, 200);
-        expect(await r.readAsString(), 'flutter');
-      }
     });
   });
 }

@@ -8,7 +8,7 @@ Runbook operativo del stack de contenedores.
 > sin Docker: se armó por lectura, incluido el `docker-compose.yml` oficial de
 > Zitadel v4 para que los nombres de variable y el healthcheck fueran los
 > reales. Desde entonces el stack se levantó de verdad y se corrigieron sobre
-> la marcha el bucle de `cloudflared` y la imagen de Flutter del despliegue.
+> la marcha el bucle de `cloudflared` y las imágenes base del despliegue.
 >
 > O sea que ya no es un ensayo, pero tampoco se reescribió paso por paso
 > contra la ejecución real: si algo no coincide, manda lo que hace el stack y
@@ -223,11 +223,10 @@ cuenta.
 
 Dos workflows en `.github/workflows/`:
 
-- `ci.yml`: formato, análisis y pruebas de los tres paquetes Dart/Flutter (más el tipado
-  y el build de `dnd_web`) en runners alojados por GitHub, en cada push y cada pull request (y a mano, con
-  `workflow_dispatch`). Las pruebas de la app van en dos mitades en paralelo con
-  el build web, para que CD, que espera a CI entero, no cargue con la suma. No
-  necesita configuración en el host.
+- `ci.yml`: formato, análisis y pruebas de los paquetes Dart (más el tipado,
+  el build y Playwright de `dnd_web`) en runners alojados por GitHub, en cada
+  push y cada pull request (y a mano, con `workflow_dispatch`). No necesita
+  configuración en el host.
 - `cd.yml`: reconstruye y levanta el stack (`docker compose build --pull` y
   después `docker compose up -d`; el `--pull` fuerza a repreguntar el registro por
   las imágenes base, que si no se reutilizan aunque queden viejas) en el
@@ -236,42 +235,31 @@ Dos workflows en `.github/workflows/`:
   ninguna ruta desplegable desde el último CD exitoso no despliega (lo decide el job
   `gate`, en un runner de GitHub). Necesita el runner de esta sección.
 
-### El cliente React bajo `/v2`
+### El cliente web
 
-`packages/dnd_web` (Vite + React + TypeScript) es el cliente que va a
-reemplazar al de Flutter pantalla por pantalla. Por ahora tiene pantallas de
-solo lectura (el dashboard, la ficha en cinco pestañas, el Bestiario, el Códice, Ajustes y el Modo DM en `/v2/dm`, con la Biblioteca de PNJ en `/v2/dm/pnj` los PNJ y el combate de cada mesa en `/v2/dm/campanas/<id>/pnj|combate` y el Homebrew en `/v2/dm/homebrew`), sin
-enlaces desde el cliente actual; el estado completo está en
-[Migración a React](../arquitectura/migracion-react.md). Se sirve en el mismo origen que Flutter (`/`) y la API, así que
-comparte la cookie de sesión.
+`packages/dnd_web` (Vite + React + TypeScript) es el cliente, servido en la
+raíz del mismo origen que la API, así que comparte la cookie de sesión.
+Reemplazó al de Flutter el 2026-11-20 (historia en
+[Migración a React](../arquitectura/migracion-react.md)).
 
-- `DND_WEB_V2_ROOT` apunta al `dist` del build. La imagen lo fija en
-  `/app/web-v2`; sin la variable (o si el directorio no existe) `/v2` responde
-  404 y nada más cambia.
-- Las rutas de cliente (`/v2/lo-que-sea`) devuelven `index.html`; un archivo
-  que falta es 404.
+- `DND_WEB_ROOT` apunta al `dist` del build. La imagen lo fija en `/app/web`;
+  sin la variable el servidor responde solo la API, y si el directorio no
+  existe lo avisa en el log al arrancar.
+- Las rutas de cliente (`/lo-que-sea`) devuelven `index.html`; un archivo que
+  falta es 404.
+- `/v2` y todo lo que cuelga de él redirige (301) a la misma ruta sin el
+  prefijo: son los enlaces de cuando React convivía con Flutter.
 - Caché: `index.html` con `private, no-cache`, y los archivos de `assets/`
   (con hash en el nombre) `public, max-age=31536000, immutable`.
-- `/api`, `/auth` y `/mcp` no pasan por este camino.
-- `DND_V2_USERS` (en `.env` como `V2_USERS`) lista los ids de cuenta, separados
-  por coma, a quienes `GET /api/me` les responde `webV2: true`; al resto,
-  `false`. Vacía por defecto: nadie; `*` habilita a todas las cuentas. El id es el `userId` de esa misma
-  respuesta (se ve en las herramientas de red del navegador con la sesión
-  iniciada). La respuesta trae solo el booleano de la cuenta que pregunta,
-  nunca la lista. Además, `GET /` redirige (302 a `/v2/`) a las cuentas
-  habilitadas, salvo a quien tenga la cookie `milantus_v1=1` (la escribe el
-  interruptor «Usar la versión anterior» de Ajustes de `/v2`; borrarla en el
-  navegador equivale a apagarlo). Cambiarla pide
-  `docker compose up -d` para recrear el contenedor del servidor. El flag es de
-  **quien mira**: para probar el Modo DM de `/v2` alcanza con habilitar la
-  cuenta del DM; los jugadores de su mesa no necesitan estar en la lista, porque
-  lo que el DM lee es la ficha de ellos por la API de siempre.
-- El motor de reglas llega al cliente React compilado a JS (`dart compile js`,
+- `/api`, `/auth`, `/mcp` y `/health` no pasan por este camino.
+- La versión visible es la de `packages/dnd_web/package.json`, fijada al
+  construir.
+- El motor de reglas llega al cliente compilado a JS (`dart compile js`,
   `packages/dnd_engine/js/entrypoint.dart`): la imagen lo hace en la etapa
   `engine-js` del Dockerfile y para desarrollar se corre `npm run build:engine`
   en `packages/dnd_web` (hace falta el SDK de Dart en el PATH). CI verifica que
-  dé los mismos resultados que Dart (`engine_js`) y que `/v2` sirva con sesión
-  contra el servidor real (`web_e2e`, Playwright).
+  dé los mismos resultados que Dart (`engine_js`) y que el cliente sirva con
+  sesión contra el servidor real (`web_e2e`, Playwright).
 - **Errores del cliente.** `POST /api/client-errors` (con sesión) escribe una
   línea `client-error {json}` en el log del contenedor
   (`docker compose logs server | grep client-error`): `userId`, `message`,
@@ -279,17 +267,17 @@ comparte la cookie de sesión.
   hora por cuenta, y la misma firma (mensaje + primera línea de la traza) no se
   repite durante 10 minutos. Nunca incluye la ficha.
 - **Leer una traza.** Los source maps se generan y se sirven (el repo es
-  público). El de Vite (`/v2/assets/<archivo>.js.map`) lleva hasta el `.tsx`;
+  público). El de Vite (`/assets/<archivo>.js.map`) lleva hasta el `.tsx`;
   si la línea cae en el motor (`dnd_engine.generated.js`), no encadena solo con
-  el de dart2js, que se sirve en `/v2/dnd_engine.js.map`: se resuelve en dos
+  el de dart2js, que se sirve en `/dnd_engine.js.map`: se resuelve en dos
   pasos. Con una herramienta conocida y sin sumar dependencias:
   `npx -y source-map-cli resolve <archivo>.js.map <línea> <columna>`, y se
   repite con el resultado sobre `dnd_engine.js.map`.
 
 Para probarlo sin Docker: `npm ci && npm run build` en `packages/dnd_web`, y
-levantar el servidor con `DND_WEB_V2_ROOT=$PWD/packages/dnd_web/dist`. Para
+levantar el servidor con `DND_WEB_ROOT=$PWD/packages/dnd_web/dist`. Para
 desarrollar con recarga en caliente, `npm run dev` (puerto 5173, proxy de `/api`
-y `/auth` al servidor en `localhost:8080`; entrar por `/v2/`).
+y `/auth` al servidor en `localhost:8080`).
 
 ### Registrar el runner autoalojado
 

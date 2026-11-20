@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { BookOpen, GraduationCap, LogOut, MessageSquare, Settings, Users } from 'lucide-react';
-import { useAppVersion } from '../api/queries';
-import { logout, type Account } from '../api/client';
+import { APP_VERSION, logout, type Account } from '../api/client';
 import { useTexts } from '../i18n/context';
-import { codexHref, dmHref, FLUTTER_HOME, quizHref, rosterHref, settingsHref } from '../router';
+import { codexHref, dmHref, quizHref, rosterHref, settingsHref } from '../router';
 import { FeedbackDialog } from '../ui/feedback';
 import { showNotice } from '../ui/notices';
 import { ModeSwitch, NavGroup, NavItem, ThemeMenu, VersionLabel } from '../ui/Shell';
@@ -39,7 +38,6 @@ export function RosterPanel({ current }: { current?: 'roster' | 'quiz' }) {
  */
 export function RosterFooter({ account, current, dm = false }: { account: Account; current?: 'settings'; dm?: boolean }) {
   const t = useTexts();
-  const version = useAppVersion(true);
   const [reporting, setReporting] = useState(false);
   const [leaving, setLeaving] = useState(false);
 
@@ -51,7 +49,7 @@ export function RosterFooter({ account, current, dm = false }: { account: Accoun
   const signOut = async () => {
     setLeaving(true);
     try {
-      window.location.assign((await logout()) ?? FLUTTER_HOME);
+      window.location.assign((await logout()) ?? '/');
     } catch {
       setLeaving(false);
       showNotice(t.signOutError, 'error');
@@ -85,7 +83,7 @@ export function RosterFooter({ account, current, dm = false }: { account: Accoun
       {reporting && <FeedbackDialog origin="dashboard" onClose={() => setReporting(false)} />}
       <div className="mt-2 flex items-center justify-between gap-2">
         <ThemeMenu />
-        <VersionLabel version={version.data} />
+        <VersionLabel version={APP_VERSION} />
       </div>
     </div>
   );

@@ -22,7 +22,7 @@ test('de Especie a la ficha: cada paso frena hasta completarse y solo el final g
   const opcion = (id: string) => page.locator(`[data-option="${id}"]`);
   const seguir = page.getByRole('button', { name: 'Continuar', exact: true });
   const detalle = page.locator('[data-field="creation-detail"]');
-  await page.goto('/v2/personajes/nuevo');
+  await page.goto('/personajes/nuevo');
 
   // Especie: el linaje y su aptitud aparecen al elegir la especie.
   await expect(seguir).toBeDisabled();
@@ -154,7 +154,7 @@ test('de Especie a la ficha: cada paso frena hasta completarse y solo el final g
   const hecho = page.waitForResponse((r) => r.request().method() === 'POST' && r.url().endsWith('/api/characters'));
   await page.getByRole('button', { name: 'Crear personaje', exact: true }).click();
   expect((await hecho).ok()).toBe(true);
-  await expect(page).toHaveURL(/\/v2\/personajes\/[^/]+\/personaje$/);
+  await expect(page).toHaveURL(/\/personajes\/[^/]+\/personaje$/);
   expect(escrituras).toEqual(['POST /api/characters']);
 
   const { characters } = await api<{ characters: { character: PersonajeApi }[] }>(request, '/api/characters', TOKEN_ESCRITURA);
@@ -175,7 +175,7 @@ test('Nuevo PNJ con ficha: el alta manda lo que da el motor y no entra en Mis pe
   const opcion = (id: string) => page.locator(`[data-option="${id}"]`);
   const seguir = page.getByRole('button', { name: 'Continuar', exact: true });
 
-  await page.goto('/v2/dm/pnj');
+  await page.goto('/dm/pnj');
   await page.locator('[data-action="new-npc"]').click();
   const dialogo = page.getByRole('dialog');
   await dialogo.locator('[data-field="npc-name"]').fill('Bruna de la ficha');
@@ -261,7 +261,7 @@ test('Nuevo PNJ con ficha: el alta manda lo que da el motor y no entra en Mis pe
   const cuerpo = (await pedido).postDataJSON() as { npc: unknown; character: { name: string } };
   expect(cuerpo.npc).toEqual(newNpc(catalog, 'Bruna de la ficha', 'character', null));
   expect(cuerpo.character.name).toBe('Bruna de la ficha');
-  await expect(page).toHaveURL(/\/v2\/dm\/pnj\/npc-/);
+  await expect(page).toHaveURL(/\/dm\/pnj\/npc-/);
   const id = new URL(page.url()).pathname.split('/').pop()!;
 
   // La ficha de un PNJ no es un personaje del jugador.

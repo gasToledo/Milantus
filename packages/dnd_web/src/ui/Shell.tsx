@@ -142,7 +142,7 @@ function SidebarBrand() {
 /**
  * Un ítem del panel (`appNavItem`): ícono, rótulo y, si hace falta, una cifra
  * al final. Activo: oro sobre `goldSoft` y `aria-current="page"`. Con
- * `internal` navega dentro de `/v2`; sin él es un enlace común (a Flutter).
+ * `internal` navega dentro de la aplicación; sin él es un enlace común.
  * Con `onSelect` en vez de `href` es una acción de esta pantalla (imprimir):
  * un botón, porque no lleva a ningún lado.
  */
@@ -277,7 +277,7 @@ export function SidebarBack({
 
 /**
  * «Jugador / DM»: el modo actual es un `span` con `aria-current` y el otro un
- * enlace. Los dos viven en `/v2`, así que navegan sin recargar; los hrefs los
+ * enlace. Los dos son de la aplicación, así que navegan sin recargar; los hrefs los
  * pone cada panel (el de Jugador no sabe nada del Modo DM más que adónde ir).
  */
 export function ModeSwitch({ mode, playerHref, dmHref }: { mode: 'player' | 'dm'; playerHref: string; dmHref: string }) {

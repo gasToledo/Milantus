@@ -8,7 +8,7 @@ test.use({ locale: 'es-AR' });
 test('descarga un personaje e importa el ZIP en otra cuenta con su retrato', async ({ context, page, baseURL }) => {
   const t = textsFor('es');
   await context.addCookies([{ name: 'dnd_session', value: TOKEN, url: baseURL! }]);
-  await page.goto('/v2/personajes');
+  await page.goto('/personajes');
   const name = 'Elsbeth de Humo';
   await page.getByRole('button', { name: t.cardActionsTooltip(name), exact: true }).click();
   const downloadPromise = page.waitForEvent('download');

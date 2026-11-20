@@ -17,7 +17,7 @@ import { staggerIndex } from '../ui/motion';
 import { TutorialGate } from '../ui/tutorials';
 import { emptyQuizHistory, loadQuizHistory, quizDueNext, resetQuizHistory, saveQuizHistory } from './history';
 
-/** El id de la ronda de reglas generales en la URL (`/v2/quiz/reglas`). */
+/** El id de la ronda de reglas generales en la URL (`/quiz/reglas`). */
 export const RULES_TARGET = 'reglas';
 
 /**

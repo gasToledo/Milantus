@@ -11,11 +11,12 @@ con el mismo formato en todas las versiones.
 La versión visible del cliente web se define en:
 
 ```text
-packages/dnd_app/pubspec.yaml → version
+packages/dnd_web/package.json → version
 ```
 
-El formato es `major.minor.patch+build`, por ejemplo `0.10.0+1`. El número
-completo se conserva en el encabezado del changelog, incluido `+build`.
+El formato es `major.minor.patch`, por ejemplo `2.0.0`, y es el mismo del
+encabezado del changelog. Hasta la 1.6.0 la versión vivía en el `pubspec.yaml`
+de Flutter y llevaba `+build`: esos encabezados quedan como se publicaron.
 
 `dnd_engine` y `dnd_server` tienen versiones propias porque son paquetes del
 monorepo. Si se modifica alguna de ellas, el mismo release debe mencionarlo en
@@ -24,7 +25,7 @@ changelog por paquete.
 
 ## Cuándo se actualiza
 
-Una modificación de `version` en cualquier `pubspec.yaml` exige actualizar
+Una modificación de `version` en `package.json` o en un `pubspec.yaml` exige actualizar
 `CHANGELOG.md` en el mismo cambio. El changelog no se completa después del
 release: la entrada debe estar lista antes del commit que cambia la versión.
 
@@ -37,7 +38,8 @@ preparar una versión:
    mecánica.
 3. Cambiar `[Unreleased]` por la versión exacta y la fecha ISO (`YYYY-MM-DD`).
 4. Crear debajo una nueva sección `[Unreleased]` vacía, con las tres categorías.
-5. Cambiar la versión en el `pubspec.yaml` correspondiente.
+5. Cambiar la versión en `packages/dnd_web/package.json` (o en el
+   `pubspec.yaml` del paquete, si es la de `dnd_engine` o `dnd_server`).
 6. Ejecutar las validaciones afectadas y revisar que el changelog esté incluido
    en el mismo commit.
 
@@ -134,7 +136,7 @@ resultado.
 
 Antes de commitear una versión, comprobar que:
 
-- la versión del `pubspec.yaml` y el encabezado publicado coinciden;
+- la versión de `package.json` y el encabezado publicado coinciden;
 - las tres categorías existen y están en el orden establecido;
 - las entradas describen cambios para la persona usuaria;
 - no se mezclaron cambios de otra versión;

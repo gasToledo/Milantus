@@ -28,12 +28,9 @@ import 'package:dnd_server/src/repositories/npc_repository.dart';
 import 'package:dnd_server/src/repositories/repository_transaction_runner.dart';
 import 'package:dnd_server/src/repositories/scenario_repository.dart';
 import 'package:dnd_server/src/repositories/settings_repository.dart';
-import 'package:dnd_server/src/web/cache_headers.dart';
-import 'package:dnd_server/src/web/web_v2.dart';
+import 'package:dnd_server/src/web/web.dart';
 import 'package:postgres/postgres.dart';
-import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
-import 'package:shelf_static/shelf_static.dart';
 
 Future<void> main() async {
   final config = ServerConfig.fromEnvironment(Platform.environment);
@@ -86,13 +83,15 @@ Future<void> main() async {
     buildProviders(config.aiProviders),
   );
 
-  final webStaticHandler = _buildWebStaticHandler(config.web);
-  final webV2Handler = config.web.v2Enabled
-      ? buildWebV2Handler(config.web.v2Root)
+  final webHandler = config.web.enabled
+      ? buildWebHandler(config.web.root)
       : null;
-  if (config.web.v2Enabled && webV2Handler == null) {
+  // Sin `DND_WEB_ROOT` es a propósito (la API suelta); con una ruta que no
+  // existe, es un despliegue roto y conviene que el log lo diga.
+  if (config.web.enabled && webHandler == null) {
     print(
-      'DND_WEB_V2_ROOT="${config.web.v2Root}" no existe: /v2 responderá 404.',
+      'DND_WEB_ROOT="${config.web.root}" no existe: el servidor no servirá el '
+      'cliente web.',
     );
   }
 
@@ -127,10 +126,8 @@ Future<void> main() async {
       itemGrants: PostgresItemGrantRepository(pool),
       settings: PostgresSettingsRepository(pool),
       scenarios: PostgresScenarioRepository(pool),
-      webStaticHandler: webStaticHandler,
-      webV2Handler: webV2Handler,
+      webHandler: webHandler,
       mcp: mcp,
-      v2Users: config.web.v2Users,
       sendFeedback: config.feedback.enabled
           ? workerFeedbackSender(
               url: Uri.parse(config.feedback.workerUrl),
@@ -186,27 +183,4 @@ Future<void> _runMigrationsWithRetry(
       await Future<void>.delayed(delay);
     }
   }
-}
-
-/// `null` si `config.web` está deshabilitado (sin `DND_WEB_ROOT`): el
-/// servidor sigue respondiendo `/api` y `/auth` igual, simplemente no hay
-/// build web detrás para el resto de las rutas. Cuando está habilitado, se
-/// espera que el directorio ya contenga el resultado de
-/// `flutter build web --base-href /` copiado por la imagen del contenedor.
-Handler? _buildWebStaticHandler(WebConfig web) {
-  if (!web.enabled) return null;
-  if (!Directory(web.root).existsSync()) {
-    print(
-      'DND_WEB_ROOT="${web.root}" no existe: el servidor no servirá el '
-      'cliente web.',
-    );
-    return null;
-  }
-  final rawHandler = createStaticHandler(
-    web.root,
-    defaultDocument: 'index.html',
-  );
-  return const Pipeline()
-      .addMiddleware(webCacheHeadersMiddleware)
-      .addHandler(rawHandler);
 }

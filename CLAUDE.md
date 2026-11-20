@@ -14,14 +14,10 @@ seguí ese registro y sumale el tuyo cuando tomes una decisión no obvia.
 
 ## Comandos
 
-Los cuatro paquetes se prueban por separado. No hay comando raíz.
+Los tres paquetes se prueban por separado. No hay comando raíz.
 
 ```bash
 cd packages/dnd_engine && dart pub get && dart analyze && dart test
-```
-
-```bash
-cd packages/dnd_app && flutter pub get && flutter analyze && flutter test
 ```
 
 ```bash
@@ -34,23 +30,11 @@ Un archivo suelto, o un test por nombre:
 cd packages/dnd_engine && dart test test/wild_shape_test.dart
 ```
 
-```bash
-cd packages/dnd_app && flutter test test/sheet_screen_test.dart --plain-name "Campaña"
-```
-
 Antes de cualquier commit, y obligatorio para que pase CI:
 
 ```bash
 dart format .
 ```
-
-```bash
-cd packages/dnd_app && flutter build web --release
-```
-
-El build no es un trámite: lo que vive en `packages/dnd_app/lib/web/*_web.dart`
-(iframes, `postMessage`, la pantalla encendida) se exporta condicionalmente, y
-`flutter test` corre con el `*_stub.dart`. Ese código solo se compila acá.
 
 **Obligatorio antes de commitear y de pushear un cambio en `dnd_web`**, también
 en las máquinas donde `tsc`, el build y Playwright no corren (ver la trampa del
@@ -88,10 +72,10 @@ git config core.hooksPath .githooks
 ```
 
 El hook solo toca los `.dart` preparados, y a los preparados a medias no los
-formatea: los revisa y corta el commit. CI mira `lib test` en la app, `lib bin
-test` en el servidor y todo el paquete en el engine (incluido `tool/`).
+formatea: los revisa y corta el commit. CI mira `lib bin test` en el servidor
+y todo el paquete en el engine (incluido `tool/`).
 
-`dnd_web` (cliente React en migración, ver `docs/arquitectura/migracion-react.md`)
+`dnd_web` (el cliente web; su historia en `docs/arquitectura/migracion-react.md`)
 necesita Node 22 y, para el motor, el SDK de Dart en el `PATH`. Es el orden
 exacto de CI:
 
@@ -113,7 +97,7 @@ cd ../dnd_web && npm run test:parity -- /tmp/parity
 
 `npm run build:engine` genera `src/engine/dnd_engine.generated.js`, que no se
 versiona y que `tsc` y Vite importan: sin él nada compila. Un cambio en
-`dnd_web` que toque el `Dockerfile` (etapas `engine-js` y `web-v2-build`) o
+`dnd_web` que toque el `Dockerfile` (etapas `engine-js` y `web-build`) o
 `.dockerignore` se valida además con `docker build -f packages/dnd_server/Dockerfile .`
 desde la raíz: ni `tsc` ni Vite ven esa etapa.
 
@@ -134,9 +118,6 @@ El stack completo (Postgres + Zitadel + servidor + cloudflared) se levanta con
 
 - `feedback-worker/` (Worker de Cloudflare, solo Node) tiene su `npm test` y
   **CI no lo ejecuta**.
-- `lib/l10n/app_localizations*.dart` **está versionado**: al tocar un `.arb`,
-  `flutter pub get` (o cualquier build) lo regenera y los tres archivos van en
-  el mismo commit.
 - El esquema de Postgres vive en `packages/dnd_server/lib/src/db/migrations.dart`:
   solo se **agregan** migraciones al final, nunca se edita una publicada, y
   corren solas en cada arranque del servidor.
@@ -145,30 +126,28 @@ El stack completo (Postgres + Zitadel + servidor + cloudflared) se levanta con
 
 `main` es el único tronco activo: se valida local, se commitea y se pushea
 directo. Los mensajes siguen `tipo(paquete): resumen` en español
-(`feat(dnd_app): los descansos se pueden deshacer`, `fix`, `test`, `ci`, `build`,
+(`feat(dnd_web): los descansos se pueden deshacer`, `fix`, `test`, `ci`, `build`,
 `docs`; sin paquete cuando cruza varios).
 
-Cambiar `version` en un `pubspec.yaml` exige actualizar `CHANGELOG.md` en el
-mismo commit, y un cambio grande (capacidad visible, esquema persistido, o que
+Cambiar `version` en `packages/dnd_web/package.json` (la versión visible) o en
+un `pubspec.yaml` exige actualizar `CHANGELOG.md` en el mismo commit, y un cambio grande (capacidad visible, esquema persistido, o que
 cruza engine, cliente y servidor) sube la versión. El criterio y el formato
 están en `docs/desarrollo/versionado-y-changelog.md`.
 
 El push dispara CI (`.github/workflows/ci.yml`, en cualquier rama y en los pull
-requests): formato, análisis y pruebas de los tres paquetes, con las pruebas de
-la app en dos mitades en paralelo con el build web. CD (`cd.yml`) arranca por el
+requests): formato, análisis y pruebas de los tres paquetes, el build web y
+Playwright. CD (`cd.yml`) arranca por el
 mismo push a `main`, en paralelo y sin esperar a CI: **CI en rojo llega igual a
 producción** (se decidió que tardar es peor que explotar; se arregla con otro
 commit). Su job `gate` despliega solo
 si cambió algo desplegable desde el último CD exitoso — `packages/dnd_server`,
-`packages/dnd_app`, `packages/dnd_engine` o `packages/dnd_web`, `docker-compose.yml`,
+`packages/dnd_engine` o `packages/dnd_web`, `docker-compose.yml`,
 `postgres-init/**` o el propio `cd.yml`, sin contar `packages/*/test/` ni
 `packages/*/tool/`, que tampoco entran a la imagen (`.dockerignore`). Un commit de solo docs no despliega.
 
-Dos cosas que muerden en el despliegue: la imagen base de Flutter solo publica
-*minor* (`3.44.0`, nunca `3.44.8`), así que `environment.sdk` de `dnd_app` no
-puede llevar una cota de patch; y `cd.yml` usa `clean: false` porque el `.env`
+Algo que muerde en el despliegue: `cd.yml` usa `clean: false` porque el `.env`
 y las credenciales de cloudflared viven sin versionar en el directorio del
-runner. Ambas razones están escritas en el `Dockerfile` y en `cd.yml`.
+runner. La razón está escrita en `cd.yml`.
 
 **El mapeo `"5432:5432"` del servicio `db` en `docker-compose.yml` no se toca:**
 no se quita, no se cambia y no se propone sacarlo. Si un comentario o una guía
@@ -179,25 +158,24 @@ prueba a mano en producción y se anota en
 `docs/operaciones/pruebas-en-produccion.md`, un registro privado que Git ignora:
 puede no existir en otra máquina.
 
-## Los cuatro paquetes
+## Los tres paquetes
 
 ```
-packages/dnd_engine   Dart puro. Cero dependencias de runtime, cero Flutter.
-packages/dnd_app      Flutter web. Depende del engine.
+packages/dnd_engine   Dart puro. Cero dependencias de runtime.
 packages/dnd_server   shelf + Postgres. Depende del engine.
-packages/dnd_web      React + Vite + TypeScript + Tailwind, servido en /v2.
+packages/dnd_web      React + Vite + TypeScript + Tailwind, servido en la raíz.
 ```
 
 La dirección es estricta: **el engine no depende del cliente ni del servidor**.
 `dnd_web` tampoco importa Dart: usa el motor **compilado a JS**
 (`packages/dnd_engine/js/entrypoint.dart`, vía `src/engine/index.ts`) y nunca
 tiene reglas propias. Una regla que falte se agrega al engine con su test, no
-en TypeScript. Convive con Flutter y se habilita por cuenta; el porqué y el
-estado real están en `docs/arquitectura/migracion-react.md`.
-Los modelos y las reglas no usan Flutter ni `dart:io`. La única excepción de
+en TypeScript. Reemplazó al cliente de Flutter, que se borró el 2026-11-20;
+la historia está en `docs/arquitectura/migracion-react.md`.
+Los modelos y las reglas no usan `dart:io`. La única excepción de
 entrada/salida es `lib/src/data/content_pack_loader_io.dart`: carga catálogos
-desde un directorio y se importa condicionalmente. En web, el cliente carga
-los assets con `loadOfficialContent` y usa el mismo `ContentRepository`.
+desde un directorio y se importa condicionalmente. En el navegador, el
+cliente pide los catálogos a `/content/` (`dnd_web/src/api/catalog.ts`).
 
 ## Lo que hay que entender antes de tocar nada
 
@@ -308,51 +286,27 @@ se **corrige a mano**: es la excepción a no editar lo generado. Regenerar el
 español deja huellas desfasadas que el test señala; cómo completarlo y
 cuándo correr `translate_content.dart --refresh` está en
 `docs/desarrollo/contenido-y-reglas.md` §Traducción al inglés. Un catálogo
-nuevo se registra además en los assets de `packages/dnd_app/pubspec.yaml`.
+nuevo se registra además en `PACKS` de `dnd_web/src/api/catalog.ts`.
 
-## Frontend
+## Frontend (`packages/dnd_web`)
 
-La guía completa es `docs/desarrollo/diseno-web.md`, y su §8 es el catálogo de
-componentes: **antes de crear un widget visual nuevo, buscá ahí**.
-
-Lo que más se olvida:
-
-- Los colores salen de `context.palette` (`AppPalette`, un `ThemeExtension`).
-  **Nunca un hex literal**, nunca `Colors.red` / `Colors.grey`.
-- Hay **tres niveles de fondo y no más**: `scaffold` → `surface` → `plaque`. La
-  placa siempre se hunde, nunca se eleva. Sin `elevation`, sin sombras para
-  separar superficies.
-- Georgia solo para títulos y valores de plaqueta. Un número pensado para
-  comparar contra el de al lado va en sans negrita con
-  `FontFeature.tabularFigures()`.
-- Radio 12 por defecto (tarjetas, placas) y 20 para pills; el resto de la
-  escala está en `diseno-web.md` §5.1.
-- Para medir el ancho disponible, `LayoutBuilder` y **nunca `MediaQuery.size`**:
-  el panel lateral de 236 px es invisible para `MediaQuery`.
-- Todo `IconButton` lleva `tooltip`.
-- Los diálogos usan `AppDialog`, no `AlertDialog` ni `SimpleDialog`.
-- **Subtítulos y explicaciones, los mínimos**: solo cuando sin ellos no se
-  entiende qué hace la acción. El rótulo tiene que alcanzar solo. Ver
-  `docs/desarrollo/textos.md` §Subtítulos y explicaciones.
-- **Todo texto visible sale de `context.l10n`** (`lib/l10n/app_es.arb` y
-  `app_en.arb`, las dos claves en el mismo commit): la interfaz se ofrece en
-  español e inglés. Nunca un literal suelto en un widget:
-  `test/l10n_no_literals_test.dart` falla, y `l10n_parity_test.dart` si falta
-  una clave en un idioma. Cómo agregar un texto y el glosario en inglés:
-  `docs/desarrollo/textos.md`.
-- Los rótulos del motor (`label`) siguen a `ContentLanguage.current`, un estado
-  global: un test que lo cambia lo restaura en `tearDown`.
-
-### Frontend React (`packages/dnd_web`)
-
-Las reglas de arriba valen igual, traducidas. Los tokens de
-`diseno-web.md` (Apéndice B) viven en `src/index.css`, y el catálogo de
+La guía visual es `docs/desarrollo/diseno-web.md` (nació con Flutter: sus
+tokens, en el Apéndice B, son los de `src/index.css`), y el catálogo de
 componentes de `src/ui/` está en `docs/desarrollo/diseno-web-react.md`:
 **antes de crear un componente nuevo, buscá ahí**.
 
 - Colores, radios y fuentes **solo como variables CSS** (`var(--gold)`) o sus
   utilidades de Tailwind (`bg-surface`): nunca un hex suelto ni un color de
-  la paleta por defecto de Tailwind. Mismos tres fondos y sin sombras.
+  la paleta por defecto de Tailwind.
+- Hay **tres niveles de fondo y no más**: `scaffold` → `surface` → `plaque`. La
+  placa siempre se hunde, nunca se eleva. Sin sombras para separar superficies.
+- Georgia solo para títulos y valores de plaqueta. Un número pensado para
+  comparar contra el de al lado va en sans negrita con cifras tabulares.
+- Radio 12 por defecto (tarjetas, placas) y 20 para pills; el resto de la
+  escala está en `diseno-web.md` §5.1.
+- **Subtítulos y explicaciones, los mínimos**: solo cuando sin ellos no se
+  entiende qué hace la acción. El rótulo tiene que alcanzar solo. Ver
+  `docs/desarrollo/textos.md` §Subtítulos y explicaciones.
 - La UI no recalcula reglas: todo número sale de `computeSheet`
   (`src/engine/index.ts`). Del personaje crudo solo se lee lo que no es un
   resultado de reglas (PG actuales, usos gastados).
@@ -360,14 +314,15 @@ componentes de `src/ui/` está en `docs/desarrollo/diseno-web-react.md`:
   nueva con elecciones** de `diseno-web-react.md`: nada se pliega ni avanza
   solo, y el detalle de lo que se toca queda siempre a la vista.
 - Todo texto visible sale de `useTexts()` (`src/i18n/texts.ts`, es y en del
-  mismo tipo: `tsc` falla si falta una clave). Nunca un literal en un
-  componente. **No hay test que cace literales sueltos** como en Flutter:
-  lo cuida la revisión.
+  mismo tipo: `tsc` falla si falta una clave): la interfaz se ofrece en
+  español e inglés. Nunca un literal en un componente. **No hay test que cace
+  literales sueltos**: lo cuida la revisión. Glosario en inglés:
+  `docs/desarrollo/textos.md`.
 
-Los widgets de estado ya existen y se usan siempre los mismos: `AppErrorView`
-(con `onRetry`), `AppBusyLabel` (el texto es obligatorio) y `AppEmptyState`,
-que distingue «no hay nada» de «nada coincide con la búsqueda» — son
-situaciones distintas y piden acciones distintas.
+Los componentes de estado ya existen (`src/ui/status.tsx`) y se usan siempre
+los mismos: `AppErrorView` (con `onRetry`), `AppBusyLabel` (el texto es
+obligatorio) y `AppEmptyState`, que distingue «no hay nada» de «nada coincide
+con la búsqueda» — son situaciones distintas y piden acciones distintas.
 
 ## Tests
 
@@ -389,16 +344,9 @@ lo que da el motor y que la ficha ajena no tenga controles. Una regla va en el
 test del motor, que corre en todas las máquinas, y no se repite en Playwright.
 Un detalle de pantalla (un aviso, un estado apagado) no justifica una prueba.
 
-Los tests de widget montan el árbol real contra `FakeApiServer`
-(`packages/dnd_app/test/fakes/fake_api_server.dart`), un doble en memoria que
-reproduce el **contrato observable** de cada endpoint. Cuando agregues una ruta
-al servidor, agregala también ahí — y con las mismas podas, porque un doble más
-permisivo deja pasar una pantalla que muestra lo que no debe.
-
 Convenciones del repositorio: nombres de test en español, contenido SRD real
-cargado en `setUpAll` con `ContentRepository.loadFromDirectory`, valores
-esperados **derivados del catálogo** (`repo.creature('...')!`) y no literales, y
-`expect(tester.takeException(), isNull)` al cierre.
+cargado en `setUpAll` con `ContentRepository.loadFromDirectory` y valores
+esperados **derivados del catálogo** (`repo.creature('...')!`) y no literales.
 
 ## Deuda marcada
 
@@ -406,13 +354,10 @@ Buscá `ponytail:` en el código: son simplificaciones deliberadas, cada una con
 su techo y su camino de salida escritos al lado. Antes de "arreglar" una,
 leela — puede ser una decisión y no un olvido. Las que más se tropiezan:
 
-- Los formularios de homebrew (`lib/homebrew/forms/`) **no editan** todos los
-  campos —prerrequisito de una dote, cargas de un objeto, salvaciones de una
-  criatura, equipo de un trasfondo—: los conservan del original. Un campo nuevo
-  en esos modelos no aparece en el formulario por sí solo.
-- `tool/l10n_literals.dart` es una heurística sobre el texto fuente: no ve
-  cadenas multilínea ni texto armado por partes, así que un `flutter test` en
-  verde no prueba que no haya texto suelto. Si sobra, `// l10n-ignore: motivo`.
+- Los formularios de homebrew (`dnd_web/src/dm/homebrew/`) **no editan**
+  todos los campos —requisito de una dote, cargas de un objeto, equipo de un
+  trasfondo—: los conservan del original. Un campo nuevo en esos modelos no
+  aparece en el formulario por sí solo.
 
 ## Documentación
 

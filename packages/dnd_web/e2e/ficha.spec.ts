@@ -19,7 +19,7 @@ test.beforeEach(async ({ context, baseURL }) => {
 
 test('el retrato vuelve a la pestaña de la ficha desde la que se abrió', async ({ page }) => {
   const t = textsFor('es');
-  const combate = `/v2/personajes/${BRUNILDA}/combate`;
+  const combate = `/personajes/${BRUNILDA}/combate`;
   await page.goto(combate);
   await page.getByRole('link', { name: t.actionPortrait, exact: true }).click();
   await page.getByRole('main').getByRole('link', { name: t.luBack, exact: true }).click();
@@ -29,12 +29,12 @@ test('el retrato vuelve a la pestaña de la ficha desde la que se abrió', async
 test('Atrás del panel vuelve a Mis personajes al cambiar del retrato a otra pestaña', async ({ page }) => {
   const t = textsFor('es');
   const panel = page.getByRole('complementary', { name: t.panelLabel });
-  await page.goto(`/v2/personajes/${BRUNILDA}/combate`);
+  await page.goto(`/personajes/${BRUNILDA}/combate`);
   await panel.getByRole('link', { name: t.actionPortrait, exact: true }).click();
   await panel.getByRole('link', { name: t.navInventory, exact: true }).click();
-  await expect(page).toHaveURL(`/v2/personajes/${BRUNILDA}/inventario`);
+  await expect(page).toHaveURL(`/personajes/${BRUNILDA}/inventario`);
   await panel.getByRole('link', { name: t.luBack, exact: true }).click();
-  await expect(page).toHaveURL('/v2/personajes');
+  await expect(page).toHaveURL('/personajes');
 });
 
 test('la ficha muestra los números que da el motor para el personaje sembrado', async ({ page, request }) => {
@@ -44,8 +44,8 @@ test('la ficha muestra los números que da el motor para el personaje sembrado',
   const ficha = computeSheet(personaje, catalogo());
 
   // La ruta sin pestaña es la de Personaje.
-  await page.goto(`/v2/personajes/${BRUNILDA}`);
-  await expect(page).toHaveURL(`/v2/personajes/${BRUNILDA}/personaje`);
+  await page.goto(`/personajes/${BRUNILDA}`);
+  await expect(page).toHaveURL(`/personajes/${BRUNILDA}/personaje`);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Brunilda de Humo');
 
   const cifra = (id: string) => page.locator(`[data-stat="${id}"] [data-field="value"]`);
@@ -78,7 +78,7 @@ test('el ataque de un arma homebrew aparece, con el bonificador del motor sobre 
   expect(ataque).toBeDefined();
   expect(computeSheet(personaje, oficial).attacks.some((a) => a.weaponId === HACHA)).toBe(false);
 
-  await page.goto(`/v2/personajes/${ALDRIC}/combate`);
+  await page.goto(`/personajes/${ALDRIC}/combate`);
   const fila = page.locator(`[data-attack="${HACHA}"]`);
   await expect(fila).toContainText('Hacha de Humo');
   await expect(fila.locator('[data-field="attack-bonus"] [aria-hidden="true"]')).toHaveText(signed(ataque!.attackBonus));
