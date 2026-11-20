@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { EllipsisVertical, Eye, FolderInput, Lock, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
 import {
@@ -20,7 +20,8 @@ import {
 } from '../api/client';
 import { movedOrder } from '../dashboard/roster';
 import { useHoldDrag } from '../ui/holdDrag';
-import { useListTransition } from '../ui/listTransition';
+import { useDeferredFocus } from '../ui/focus';
+import { useListTransition, vtName } from '../ui/listTransition';
 import { Toast, type ToastTone } from '../ui/primitives';
 import { MoveToChapterDialog } from './MoveToChapterDialog';
 import { useLang, useTexts } from '../i18n/context';
@@ -38,8 +39,6 @@ import { DmHeader } from './DmHeader';
 import { NoteEditorDialog } from './NoteEditorDialog';
 import { useMentionReader } from './mentions/reader';
 import { buildEntries, inChapterOrder, matches, stamp, type Entry, type EntryKind } from './notebook';
-import { prefersReducedMotion } from '../ui/motion';
-
 /** Sin capítulo: el valor de la pill que junta lo que no cuelga de ninguno. */
 const LOOSE = '';
 
@@ -137,19 +136,7 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
   // vista): el foco va al título de la sección. Una nota guardada lo recibe
   // ella, y la vista baja hasta donde quedó. Se mueve cuando la lista nueva
   // se dibujó y el diálogo terminó de devolver el foco a su botón.
-  const [focusTarget, setFocusTarget] = useState<string | null>(null);
-  useEffect(() => {
-    if (!focusTarget) return;
-    const id = window.setTimeout(() => {
-      const el = document.querySelector<HTMLElement>(focusTarget);
-      if (!el) return;
-      const reduce = prefersReducedMotion();
-      el.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
-      el.focus({ preventScroll: true });
-      setFocusTarget(null);
-    }, 0);
-    return () => window.clearTimeout(id);
-  }, [focusTarget, entries]);
+  const setFocusTarget = useDeferredFocus(entries, { retry: true, scroll: true });
 
   const moveEntry = (from: string, to: string) => {
     if (!currentChapter) return;
@@ -175,6 +162,7 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
   const listRef = useRef<HTMLDivElement>(null);
   const [listTop, setListTop] = useState(0);
   const hasList = shown.length > 0;
+  const entriesMissing = entries === null;
   useLayoutEffect(() => {
     const el = listRef.current;
     if (!el) return;
@@ -182,7 +170,7 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
     measure();
     window.addEventListener('resize', measure);
     return () => window.removeEventListener('resize', measure);
-  }, [hasList, current, searching, currentChapter?.summary, chapters.data, entries === null]);
+  }, [hasList, current, searching, currentChapter?.summary, chapters.data, entriesMissing]);
 
   const reorder = useHoldDrag({ ids, axis: 'y', scroller: listRef, canDrop: () => arrangeable, onMove: moveEntry });
 
@@ -336,7 +324,7 @@ export function NotebookView({ campaign }: { campaign: DmCampaign }) {
                   // Después del `item`, que trae su `style` para el arrastre. El
                   // nombre identifica la entrada en las transiciones de la lista.
                   style={{
-                    viewTransitionName: `nb-${e.key.replace(/[^\w-]/g, '_')}`,
+                    viewTransitionName: vtName('nb', e.key),
                     ...(arrangeable ? (reorder.item(e.orderKey).style as CSSProperties | undefined) : undefined),
                   }}
                 >

@@ -4,7 +4,7 @@ import { backgroundDraft, backgroundForm, homebrewFormOptions, type BackgroundFo
 import { useLang, useTexts } from '../../i18n/context';
 import { Select } from '../../ui/primitives';
 import { EffectEditor } from './EffectEditor';
-import { EntryPreview, ExplainHere, HomebrewFormShell, useHomebrewRules, type Explained } from './HomebrewFormShell';
+import { EntryPreview, ExplainHere, HomebrewFormShell, readWithLang, useHomebrewRules, type Explained } from './HomebrewFormShell';
 import { FormSection, PillGroup, TextAreaField, TextField } from './homebrewFields';
 
 /** Radix no admite un valor vacío en un `Select`: «(ninguna)» viaja con este. */
@@ -53,7 +53,7 @@ export function BackgroundForm({
   const rules = useHomebrewRules();
 
   const draft = useMemo(() => backgroundDraft(initial, form), [initial, form]);
-  const options = useMemo(() => homebrewFormOptions(catalog), [catalog, lang]);
+  const options = useMemo(() => readWithLang(lang, () => homebrewFormOptions(catalog)), [catalog, lang]);
   const dirty = JSON.stringify(form) !== JSON.stringify(start);
   const set = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));
 

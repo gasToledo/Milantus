@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useEffectEvent, useId, useRef, useState, type CSSProperties } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { useQueryClient } from '@tanstack/react-query';
 import { Sparkles, X } from 'lucide-react';
@@ -57,37 +57,39 @@ export function PendingEvents() {
   const running = useRef(false);
   const queued = useRef(new Set<string>());
 
+  // Los textos y el cliente se leen al pedir, no al suscribir: el timer queda
+  // atado a la pantalla (`key`) y no se rearma si cambia la identidad de `t`.
+  const pull = useEffectEvent(() => {
+    if (running.current) return;
+    running.current = true;
+    void (async () => {
+      try {
+        const events = await fetchUnseenEvents();
+        const shown: Notice[] = [];
+        for (const event of events) {
+          // Con el timer, uno en cola que todavía no se mostró (y por eso no
+          // está visto) volvería a llegar en cada pedido.
+          if (queued.current.has(event.id)) continue;
+          queued.current.add(event.id);
+          // Un cierre con objetos, o uno dado desde la Mesa, deja regalos en la bandeja de Inventario.
+          if ((event.kind === 'chapter_completed' || event.kind === 'item_granted') && event.payload.hasGrants === true) {
+            void client.invalidateQueries({ queryKey: ['itemGrants'] }); // prefijo de `queryKeys.itemGrants`
+          }
+          const message = eventMessage(event, t);
+          if (message) shown.push({ id: event.id, ...message, hasGrants: event.payload.hasGrants === true });
+          // Un `kind` desconocido igual se marca visto: dejarlo pendiente lo
+          // volvería a traer para siempre.
+          else void markEventsSeen([event.id]).catch(() => {});
+        }
+        if (shown.length > 0) setQueue((q) => [...q, ...shown]);
+      } catch {
+        // Ver el comentario del componente.
+      }
+      running.current = false;
+    })();
+  });
   useEffect(() => {
     if (key === null) return;
-    const pull = () => {
-      if (running.current) return;
-      running.current = true;
-      void (async () => {
-        try {
-          const events = await fetchUnseenEvents();
-          const shown: Notice[] = [];
-          for (const event of events) {
-            // Con el timer, uno en cola que todavía no se mostró (y por eso no
-            // está visto) volvería a llegar en cada pedido.
-            if (queued.current.has(event.id)) continue;
-            queued.current.add(event.id);
-            // Un cierre con objetos, o uno dado desde la Mesa, deja regalos en la bandeja de Inventario.
-            if ((event.kind === 'chapter_completed' || event.kind === 'item_granted') && event.payload.hasGrants === true) {
-              void client.invalidateQueries({ queryKey: ['itemGrants'] }); // prefijo de `queryKeys.itemGrants`
-            }
-            const message = eventMessage(event, t);
-            if (message) shown.push({ id: event.id, ...message, hasGrants: event.payload.hasGrants === true });
-            // Un `kind` desconocido igual se marca visto: dejarlo pendiente lo
-            // volvería a traer para siempre.
-            else void markEventsSeen([event.id]).catch(() => {});
-          }
-          if (shown.length > 0) setQueue((q) => [...q, ...shown]);
-        } catch {
-          // Ver el comentario del componente.
-        }
-        running.current = false;
-      })();
-    };
     pull();
     const onVisible = () => document.visibilityState === 'visible' && pull();
     const timer = setInterval(onVisible, 30_000);
@@ -96,7 +98,6 @@ export function PendingEvents() {
       clearInterval(timer);
       document.removeEventListener('visibilitychange', onVisible);
     };
-    // Solo la clave de entrada: el idioma no cambia con la página abierta.
   }, [key]);
 
   // Con la vista libre pasa lo que sigue: una pantalla (la primera que llegó) o,
@@ -161,8 +162,9 @@ function PendingTray({ notices, onClose }: { notices: Notice[]; onClose: () => v
   const t = useTexts();
   const titleId = useId();
   const [rows, setRows] = useState(notices);
+  const close = useEffectEvent(onClose);
   useEffect(() => {
-    if (rows.length === 0) onClose();
+    if (rows.length === 0) close();
   }, [rows.length]);
   if (rows.length === 0) return null;
   return (

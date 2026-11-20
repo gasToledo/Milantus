@@ -18,7 +18,7 @@ import { AppDialog } from '../ui/AppDialog';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { cx } from '../ui/cx';
-import { useListTransition } from '../ui/listTransition';
+import { useListTransition, vtName } from '../ui/listTransition';
 import { MarkdownText } from '../ui/MarkdownText';
 import { PortraitViewer } from '../ui/PortraitViewer';
 import { ScrollArea, Tooltip } from '../ui/primitives';
@@ -548,7 +548,7 @@ function EntryCard({
       // Después del `item`, que trae su `style` para el arrastre. El nombre la
       // sigue en las transiciones de la lista.
       style={{
-        viewTransitionName: `dy-${id.replace(/[^\w-]/g, '_')}`,
+        viewTransitionName: vtName('dy', id),
         ...(reorder?.item(id).style as CSSProperties | undefined),
       }}
     >

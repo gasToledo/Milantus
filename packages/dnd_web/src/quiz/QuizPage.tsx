@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useEffectEvent, useMemo, useRef, useState, type ReactNode } from 'react';
 import { BookOpen, Check, LogOut, RotateCcw, ScrollText, Shield, Sparkles, Swords, Trash2, User, X, type LucideIcon } from 'lucide-react';
 import { useRoster, useSheetCatalog } from '../api/queries';
 import { quizLocalize, quizRecordAnswers, quizRound, type Catalog, type CharacterJson, type QuizHistory, type QuizQuestion } from '../engine';
@@ -224,24 +224,27 @@ function Round({ entry, catalog }: { entry: RosterEntry | null; catalog: Catalog
 
   // Con el teclado se responde con la letra o el número de la opción. Enter
   // no hace falta: el foco ya está en «Siguiente». Un diálogo o un campo de
-  // texto se quedan con sus teclas.
+  // texto se quedan con sus teclas. El listener se suscribe una sola vez:
+  // `useEffectEvent` lee la pregunta de ahora, así no se rearma en cada
+  // render ni se queda con un `pick` de la pregunta anterior.
   const options = questions[index]?.options.length ?? 0;
-  useEffect(() => {
+  const onQuizKey = useEffectEvent((e: KeyboardEvent) => {
     if (picked !== undefined || options === 0) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
-      const el = e.target as HTMLElement;
-      if (el.closest('[role="dialog"], input, textarea, select, [contenteditable="true"]')) return;
-      if (e.key.length !== 1) return;
-      const key = e.key.toUpperCase();
-      const i = Math.max('ABCD'.indexOf(key), '1234'.indexOf(key));
-      if (i < 0 || i >= options) return;
-      e.preventDefault();
-      pick(i);
-    };
+    if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+    const el = e.target as HTMLElement;
+    if (el.closest('[role="dialog"], input, textarea, select, [contenteditable="true"]')) return;
+    if (e.key.length !== 1) return;
+    const key = e.key.toUpperCase();
+    const i = Math.max('ABCD'.indexOf(key), '1234'.indexOf(key));
+    if (i < 0 || i >= options) return;
+    e.preventDefault();
+    pick(i);
+  });
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => onQuizKey(e);
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  });
+  }, []);
 
   if (questions.length === 0) return <Notice title={t.quizTitle} body={who} />;
   const results = outcomes(questions, picks);

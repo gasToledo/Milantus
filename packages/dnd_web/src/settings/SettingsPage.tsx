@@ -11,7 +11,7 @@ import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
 import { Switch } from '../ui/primitives';
 import { AppBusyLabel, AppErrorView } from '../ui/status';
-import { systemReducesMotion, useAnimationsOff } from '../ui/motion';
+import { useAnimationsOff, useSystemReducesMotion } from '../ui/motion';
 
 const THEME_MODES = ['dark', 'light', 'system'] as const;
 
@@ -253,7 +253,7 @@ function LookCard({ save }: { save: AccountSave }) {
   const animationsOff = useAnimationsOff();
   // Con el sistema pidiendo menos movimiento ya están apagadas: el interruptor
   // lo muestra y no se puede prender desde acá.
-  const systemOff = systemReducesMotion();
+  const systemOff = useSystemReducesMotion();
   return (
     <Section id="settings-look" title={t.settingsSectionLook} icon={Palette}>
       <SettingRow label={t.themeLabel} labelId="settings-account-theme-label" layout="stack">

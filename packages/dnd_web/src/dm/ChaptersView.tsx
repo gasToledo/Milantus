@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { BookOpen, CheckCheck, EllipsisVertical, Pencil, Play, Plus, Trash2 } from 'lucide-react';
 import { createChapter, deleteChapter, fetchCampaignChapters, saveChapter } from '../api/client';
-import { useListTransition } from '../ui/listTransition';
+import { useDeferredFocus } from '../ui/focus';
+import { useListTransition, vtName } from '../ui/listTransition';
 import type { DmCampaign, DmChapter } from '../api/client';
 import { queryKeys, useCampaignChapters } from '../api/queries';
 import { chapterGrants } from '../engine';
@@ -72,15 +73,7 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
   // lleva su ⋮: el foco caería al documento. Va al título del capítulo que
   // cambió (o al de la sección, si ya no está) cuando la lista nueva se dibuja
   // y el diálogo terminó de devolver el foco a su botón.
-  const [focusTarget, setFocusTarget] = useState<string | null>(null);
-  useEffect(() => {
-    if (!focusTarget) return;
-    const id = window.setTimeout(() => {
-      document.querySelector<HTMLElement>(focusTarget)?.focus();
-      setFocusTarget(null);
-    }, 0);
-    return () => window.clearTimeout(id);
-  }, [focusTarget, chapters.data]);
+  const setFocusTarget = useDeferredFocus(chapters.data);
   const focusChapter = (id: string) => setFocusTarget(`[data-chapter="${CSS.escape(id)}"] h2`);
 
   const submit = async (chapter: DmChapter) => {
@@ -151,7 +144,7 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
               // Su nombre en las transiciones de la lista: único y un
               // identificador CSS válido.
               data-vt-card
-              style={{ viewTransitionName: `ch-${c.id.replace(/[^\w-]/g, '_')}` }}
+              style={{ viewTransitionName: vtName('ch', c.id) }}
               // El abierto es el que se está jugando: borde oro más grueso.
               // Empezarlo o cerrarlo dora o apaga el borde en 160 ms, para que
               // se note cuál cambió.

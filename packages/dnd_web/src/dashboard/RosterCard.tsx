@@ -6,6 +6,7 @@ import { HP_CRITICAL_RATIO, hpTone, StatPlaque, ThinBar } from '../ui/data';
 import { Medallion } from '../ui/Medallion';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, Tooltip } from '../ui/primitives';
 import type { useHoldDrag } from '../ui/holdDrag';
+import { vtName } from '../ui/listTransition';
 import { ownPortrait } from '../ui/portrait';
 import { isFallen, type RosterEntry } from './roster';
 
@@ -84,7 +85,7 @@ export function RosterCard({
       // Va después del `item`, que trae su propio `style` para el arrastre. El
       // nombre identifica la tarjeta en las transiciones de la lista; tiene
       // que ser un identificador CSS válido y único.
-      style={{ viewTransitionName: `rc-${character.id.replace(/[^\w-]/g, '_')}`, ...reorder?.item.style }}
+      style={{ viewTransitionName: vtName('rc', character.id), ...reorder?.item.style }}
     >
       <div className="flex items-start gap-3">
         <Medallion name={character.name} accent={entry.accent} size={64} muted={fallen} portrait={ownPortrait(character)} />

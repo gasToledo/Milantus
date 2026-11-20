@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useEffectEvent, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Gift } from 'lucide-react';
 import { claimItemGrant, resolveItemGrant, type ItemGrant } from '../api/client';
@@ -58,12 +58,15 @@ export function ItemGrants({ model }: { model: SheetModel }) {
   // ponytail: si el catálogo nunca lo trae (el homebrew no cargó) el regalo
   // queda esperando con el botón apagado hasta recargar; el servidor conserva la
   // fila, así que no se pierde nada. Sumar un tope de tiempo si molesta.
+  // `finish` se arma en cada render: meterlo en las dependencias reintentaría
+  // el alta en cada una. Se lee al disparar, cuando el catálogo ya trajo el objeto.
+  const finishWaiting = useEffectEvent(finish);
   useEffect(() => {
     if (!waiting || !write) return;
     const list = catalog[waiting.grant.category] as { id?: unknown }[];
     if (!list.some((e) => e.id === waiting.itemId)) return;
     setWaiting(null);
-    void finish(write, waiting.grant, waiting.itemId, waiting.base);
+    void finishWaiting(write, waiting.grant, waiting.itemId, waiting.base);
   }, [waiting, catalog, write]);
 
   if (!own || !write || !grants.data || grants.data.length === 0) return null;

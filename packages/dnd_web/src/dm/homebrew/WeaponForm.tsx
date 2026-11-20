@@ -3,7 +3,7 @@ import { weaponEntry } from '../../codex/entries';
 import { homebrewFormOptions, weaponDraft, weaponForm, type Catalog, type JsonObject, type WeaponForm as Form } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
 import { Select } from '../../ui/primitives';
-import { EntryPreview, ExplainHere, HomebrewFormShell, useHomebrewRules, type Explained } from './HomebrewFormShell';
+import { EntryPreview, ExplainHere, HomebrewFormShell, readWithLang, useHomebrewRules, type Explained } from './HomebrewFormShell';
 import { diceError, EconomySection, FormSection, numberError, PillGroup, TextAreaField, TextField } from './homebrewFields';
 
 /** Radix no admite un valor vacío en un `Select`: «Sin maestría» viaja con este. */
@@ -54,7 +54,7 @@ export function WeaponForm({
   const rules = useHomebrewRules();
 
   const draft = useMemo(() => weaponDraft(initial, form), [initial, form]);
-  const options = useMemo(() => homebrewFormOptions(catalog), [catalog, lang]);
+  const options = useMemo(() => readWithLang(lang, () => homebrewFormOptions(catalog)), [catalog, lang]);
   const dirty = JSON.stringify(form) !== JSON.stringify(start);
   const set = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));
 

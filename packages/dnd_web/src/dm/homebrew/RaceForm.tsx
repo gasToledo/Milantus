@@ -4,7 +4,7 @@ import { homebrewFormOptions, raceDraft, raceForm, type Catalog, type JsonObject
 import { useLang, useTexts } from '../../i18n/context';
 import { Select } from '../../ui/primitives';
 import { EffectEditor } from './EffectEditor';
-import { EntryPreview, ExplainHere, HomebrewFormShell, useHomebrewRules, type Explained } from './HomebrewFormShell';
+import { EntryPreview, ExplainHere, HomebrewFormShell, readWithLang, useHomebrewRules, type Explained } from './HomebrewFormShell';
 import { FormSection, numberError, PillGroup, TextAreaField, TextField } from './homebrewFields';
 
 /**
@@ -48,7 +48,7 @@ export function RaceForm({
   const rules = useHomebrewRules();
 
   const draft = useMemo(() => raceDraft(initial, form), [initial, form]);
-  const options = useMemo(() => homebrewFormOptions(catalog), [catalog, lang]);
+  const options = useMemo(() => readWithLang(lang, () => homebrewFormOptions(catalog)), [catalog, lang]);
   const dirty = JSON.stringify(form) !== JSON.stringify(start);
   const set = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));
 

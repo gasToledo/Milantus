@@ -11,7 +11,7 @@ import { useLang, useTexts } from '../../i18n/context';
 import { dmNpcsHref, Link } from '../../router';
 import { Button } from '../../ui/Button';
 import { cx } from '../../ui/cx';
-import { useListTransition } from '../../ui/listTransition';
+import { useListTransition, vtName } from '../../ui/listTransition';
 import { Toast } from '../../ui/primitives';
 import { Medallion } from '../../ui/Medallion';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../../ui/status';
@@ -354,7 +354,7 @@ function NpcCard({
       {...reorder?.item}
       // Después del `item`, que trae su `style` para el arrastre.
       style={{
-        viewTransitionName: `lib-${npc.id.replace(/[^\w-]/g, '_')}`,
+        viewTransitionName: vtName('lib', npc.id),
         ...(reorder?.item.style as CSSProperties | undefined),
       }}
     >

@@ -4,7 +4,7 @@ import { homebrewFormOptions, spellDraft, spellForm, type Catalog, type JsonObje
 import { useLang, useTexts } from '../../i18n/context';
 import { Select } from '../../ui/primitives';
 import { Option } from '../../ui/wizard';
-import { EntryPreview, ExplainHere, HomebrewFormShell, useHomebrewRules, type Explained } from './HomebrewFormShell';
+import { EntryPreview, ExplainHere, HomebrewFormShell, readWithLang, useHomebrewRules, type Explained } from './HomebrewFormShell';
 import { FormSection, PillGroup, TextAreaField, TextField } from './homebrewFields';
 
 /** Radix no admite un valor vacío en un `Select`: «Sin escuela» viaja con este. */
@@ -55,7 +55,7 @@ export function SpellForm({
   const rules = useHomebrewRules();
 
   const draft = useMemo(() => spellDraft(initial, form), [initial, form]);
-  const options = useMemo(() => homebrewFormOptions(catalog), [catalog, lang]);
+  const options = useMemo(() => readWithLang(lang, () => homebrewFormOptions(catalog)), [catalog, lang]);
   const dirty = JSON.stringify(form) !== JSON.stringify(start);
   const set = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));
 

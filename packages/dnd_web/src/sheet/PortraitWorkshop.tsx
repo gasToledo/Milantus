@@ -332,7 +332,7 @@ export function PortraitWorkshop({ owner }: { owner: PortraitOwner }) {
 
   // Guarda el resultado mirado como retrato, con el prompt que lo produjo. El
   // usado **sale de la tira**: dejarlo permitiría guardarlo dos veces.
-  const useResult = async () => {
+  const saveResult = async () => {
     if (resultIndex === null) return;
     const index = resultIndex;
     setSaving(true);
@@ -455,7 +455,7 @@ export function PortraitWorkshop({ owner }: { owner: PortraitOwner }) {
                 icon={Check}
                 data-action="use-portrait"
                 disabled={busy || resultIndex === null}
-                onClick={() => void useResult()}
+                onClick={() => void saveResult()}
                 className="min-h-11 w-full"
               >
                 {t.portraitUseThis}

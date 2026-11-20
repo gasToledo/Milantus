@@ -32,7 +32,8 @@ import { Eyebrow } from '../ui/data';
 import { MarkdownText } from '../ui/MarkdownText';
 import { Toast, Tooltip, type ToastTone } from '../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
-import { useListTransition } from '../ui/listTransition';
+import { useDeferredFocus } from '../ui/focus';
+import { useListTransition, vtName } from '../ui/listTransition';
 import { AddCombatantDialog } from './combat/AddCombatantDialog';
 import { ConvertNpcDialog } from './combat/ConvertNpcDialog';
 import { tagLabel } from './combat/conditions';
@@ -211,17 +212,7 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
   // quedó en su lugar, a «Agregar al combate» si no queda nadie, o al título.
   // Se mueve cuando la planilla nueva se dibujó y el diálogo terminó de
   // devolver el foco a su botón.
-  const [focusTarget, setFocusTarget] = useState<string | null>(null);
-  useEffect(() => {
-    if (!focusTarget) return;
-    const id = window.setTimeout(() => {
-      const el = document.querySelector<HTMLElement>(focusTarget);
-      if (!el) return;
-      el.focus();
-      setFocusTarget(null);
-    }, 0);
-    return () => window.clearTimeout(id);
-  }, [focusTarget, data]);
+  const setFocusTarget = useDeferredFocus(data, { retry: true });
   const removeCombatant = (row: Row) => {
     const rows = data?.rows ?? [];
     const at = rows.findIndex((r) => r.c.id === row.c.id);
@@ -822,7 +813,7 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
       // Su nombre en las transiciones de la planilla (`act`): único y un
       // identificador CSS válido.
       data-vt-card
-      style={{ viewTransitionName: `cb-${c.id.replace(/[^\w-]/g, '_')}` }}
+      style={{ viewTransitionName: vtName('cb', c.id) }}
     >
       <div className={cx('order-1 text-center', faded)}>
         {fixInitiative ? (

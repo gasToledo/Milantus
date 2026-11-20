@@ -132,7 +132,6 @@ export function TutorialGate({ tutorial }: { tutorial: Tutorial }) {
     owner = me.current;
     setOpen(true);
     return release;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tutorial]);
   if (!open) return null;
   return (

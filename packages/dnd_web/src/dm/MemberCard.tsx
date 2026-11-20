@@ -7,6 +7,7 @@ import { labelOf } from '../i18n/texts';
 import { Medallion } from '../ui/Medallion';
 import { signed } from '../sheet/format';
 import { isFallen, type RosterEntry } from '../dashboard/roster';
+import { vtName } from '../ui/listTransition';
 import { Link } from '../router';
 
 /**
@@ -94,7 +95,7 @@ export function MemberCard({
       // Después del `item`, que trae su `style` para el arrastre. El nombre
       // identifica la tarjeta en las transiciones de la Mesa: único y un
       // identificador CSS válido.
-      style={{ viewTransitionName: `mc-${character.id.replace(/[^\w-]/g, '_')}`, ...(reorder?.item.style as CSSProperties | undefined) }}
+      style={{ viewTransitionName: vtName('mc', character.id), ...(reorder?.item.style as CSSProperties | undefined) }}
     >
       <div className="flex items-center gap-3">
         <Medallion name={character.name} accent={entry.accent} size={54} muted={fallen} portrait={portrait} />

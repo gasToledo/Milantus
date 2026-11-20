@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useEffectEvent, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
   Axe,
   BookMarked,
@@ -38,7 +38,7 @@ import { NavGroup, NavItem, Shell, SidebarBack } from '../ui/Shell';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 import { CATEGORY_GROUPS, codexEntries, fold, type CodexEntry } from './entries';
 import { useListFitsViewport } from './listHeight';
-import { prefersReducedMotion } from '../ui/motion';
+import { prefersReducedMotion, softEnter } from '../ui/motion';
 
 /** Ícono por categoría (los de `CodexCategory` en Flutter, en lucide). */
 export const ICONS: Record<CodexCategory, LucideIcon> = {
@@ -296,7 +296,9 @@ export function CategoryView({
   const listRef = useRef<HTMLElement>(null);
   useListFitsViewport(listRef);
   const lastOpen = useRef<string | null>(null);
-  useEffect(() => {
+  // Solo cuando cambia qué entrada está abierta. `open` en sí es el objeto de
+  // la lista: rearmar el efecto con él robaría el foco al recargar el catálogo.
+  const placeOpen = useEffectEvent(() => {
     const reduce = prefersReducedMotion();
     listRef.current
       ?.querySelector('[aria-current="true"]')
@@ -316,6 +318,9 @@ export function CategoryView({
       target?.focus();
     }
     lastOpen.current = open?.id ?? null;
+  });
+  useEffect(() => {
+    placeOpen();
   }, [open?.id]);
 
   return (
@@ -515,14 +520,7 @@ export function EntryDetail({
     // Lado a lado la ficha scrollea sola y es el mismo elemento: la entrada
     // nueva arrancaría a la altura donde quedó la anterior.
     articleRef.current?.scrollTo({ top: 0 });
-    if (prefersReducedMotion()) return;
-    articleRef.current?.animate(
-      [
-        { opacity: 0, translate: '0 4px' },
-        { opacity: 1, translate: '0 0' },
-      ],
-      { duration: 160, easing: 'ease-out' },
-    );
+    softEnter(articleRef.current);
   }, [entry.id]);
   return (
     <article ref={articleRef} aria-labelledby="codex-entry-title" className="card px-5 py-6 sm:px-8 sm:py-7" data-field="codex-detail">

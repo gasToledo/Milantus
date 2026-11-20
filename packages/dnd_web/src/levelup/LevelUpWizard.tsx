@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import * as Dialog from '@radix-ui/react-dialog';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
   computeSheet,
   levelUpView,
@@ -22,6 +21,7 @@ import type { SheetWriter } from '../sheet/writer';
 import { Button, ButtonLink } from '../ui/Button';
 import { cx } from '../ui/cx';
 import { MarkdownText } from '../ui/MarkdownText';
+import { CelebrationHeading, CelebrationPills, CelebrationShell, celebrationDelay } from '../ui/celebration';
 import { AfterCard, Block, DetailBody, matchesQuery, Option, ReviewRow, SpellPickBlock, Status, StepRail, Tag, WIZARD_ASIDE, WizardFooter } from '../ui/wizard';
 
 type StepId =
@@ -889,77 +889,53 @@ function Celebration({
   onUndo: () => void;
   onConfirm: () => void;
 }) {
-  // El escalonado sigue después del anillo: filas y rasgos en una sola cuenta.
-  const delay = (i: number) => ({ animationDelay: `${620 + i * 60}ms` }) as CSSProperties;
   return (
-    <Dialog.Root open onOpenChange={(open) => !open && onUndo()}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="lv-scrim fixed inset-0 z-50 bg-scrim" />
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <Dialog.Content
-            data-level-up-celebration
-            className="lv-card flex max-h-full w-[500px] max-w-full flex-col items-center overflow-y-auto rounded-[var(--radius-card)] border border-hairline bg-surface px-8 pt-8 pb-6 text-center outline-none"
-          >
-            <div aria-hidden="true" className="relative flex size-24 items-center justify-center">
-              <span className="lv-ring absolute size-6 rounded-full border-2 border-gold" />
-              <span className="lv-rombo absolute size-[62px] rounded-[var(--radius-mark)] border-2 border-gold bg-gold-soft" />
-              <span className="lv-num font-display relative text-[40px] leading-none text-gold">{level}</span>
-            </div>
-            <Dialog.Title className="font-display mt-[18px] text-[28px] text-on-surface">{t.luCelebrateTitle(level)}</Dialog.Title>
-            <Dialog.Description className="mt-1.5 text-[14px] text-on-surface-variant">{subtitle}</Dialog.Description>
-
-            <div className="mt-[22px] w-full text-left">
-              {rows.length > 0 && (
-                <>
-                  <p className="flex items-center gap-3">
-                    <span className="eyebrow shrink-0">{t.luChanged}</span>
-                    <span aria-hidden="true" className="h-px flex-1 bg-hairline" />
-                  </p>
-                  <dl className="plaque mt-2.5 divide-y divide-hairline px-3.5 py-0.5 text-[13.5px]">
-                    {rows.map((r, i) => (
-                      <div key={r.label} className="lv-up flex justify-between gap-3 py-[9px]" style={delay(i)}>
-                        <dt>{r.label}</dt>
-                        <dd className="num font-bold tabular-nums">
-                          {r.from} → <span className="text-gold">{r.to}</span>
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
-                </>
-              )}
-              {features.length > 0 && (
-                <>
-                  <p className="mt-[18px] flex items-center gap-3">
-                    <span className="eyebrow shrink-0">{t.luNewFeatures}</span>
-                    <span aria-hidden="true" className="h-px flex-1 bg-hairline" />
-                  </p>
-                  <ul className="mt-2.5 flex flex-wrap gap-1.5">
-                    {features.map((f, i) => (
-                      <li
-                        key={f}
-                        className="lv-up rounded-[var(--radius-pill)] border border-hairline bg-gold-soft px-3 py-1 text-[12.5px] text-gold"
-                        style={delay(rows.length + i)}
-                      >
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-            </div>
-
-            <div className="mt-[26px] flex w-full gap-2.5">
-              <Button tone="secondary" className="min-h-11 flex-1" onClick={onUndo} data-action="level-up-undo">
-                {t.undo}
-              </Button>
-              <Button className="min-h-11 flex-[2]" onClick={onConfirm} data-action="level-up-confirm">
-                {t.luConfirmShort}
-              </Button>
-            </div>
-          </Dialog.Content>
+    <CelebrationShell
+      kind="level-up"
+      onDismiss={onUndo}
+      title={t.luCelebrateTitle(level)}
+      subtitle={subtitle}
+      hero={
+        <>
+          <span className="lv-ring absolute size-6 rounded-full border-2 border-gold" />
+          <span className="lv-rombo absolute size-[62px] rounded-[var(--radius-mark)] border-2 border-gold bg-gold-soft" />
+          <span className="lv-num font-display relative text-[40px] leading-none text-gold">{level}</span>
+        </>
+      }
+      actions={
+        <div className="mt-[26px] flex w-full gap-2.5">
+          <Button tone="secondary" className="min-h-11 flex-1" onClick={onUndo} data-action="level-up-undo">
+            {t.undo}
+          </Button>
+          <Button className="min-h-11 flex-[2]" onClick={onConfirm} data-action="level-up-confirm">
+            {t.luConfirmShort}
+          </Button>
         </div>
-      </Dialog.Portal>
-    </Dialog.Root>
+      }
+    >
+      {/* El escalonado sigue después del anillo: filas y rasgos en una sola cuenta. */}
+      {rows.length > 0 && (
+        <>
+          <CelebrationHeading label={t.luChanged} />
+          <dl className="plaque mt-2.5 divide-y divide-hairline px-3.5 py-0.5 text-[13.5px]">
+            {rows.map((r, i) => (
+              <div key={r.label} className="lv-up flex justify-between gap-3 py-[9px]" style={celebrationDelay(i)}>
+                <dt>{r.label}</dt>
+                <dd className="num font-bold tabular-nums">
+                  {r.from} → <span className="text-gold">{r.to}</span>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </>
+      )}
+      {features.length > 0 && (
+        <>
+          <CelebrationHeading label={t.luNewFeatures} spaced />
+          <CelebrationPills items={features} start={rows.length} />
+        </>
+      )}
+    </CelebrationShell>
   );
 }
 

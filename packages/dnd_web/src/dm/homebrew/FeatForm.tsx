@@ -4,7 +4,7 @@ import { catalogLabel, catalogLabelOrder, featDraft, featForm, type Catalog, typ
 import { useLang, useTexts } from '../../i18n/context';
 import { Select } from '../../ui/primitives';
 import { EffectEditor } from './EffectEditor';
-import { EntryPreview, ExplainHere, HomebrewFormShell, useHomebrewRules, type Explained } from './HomebrewFormShell';
+import { EntryPreview, ExplainHere, HomebrewFormShell, readWithLang, useHomebrewRules, type Explained } from './HomebrewFormShell';
 import { FormSection, SwitchRow, TextAreaField, TextField } from './homebrewFields';
 
 /**
@@ -73,10 +73,14 @@ export function FeatForm({
 
   // Las categorías en el orden del motor; la de una dote importada con una
   // categoría que no conoce se conserva como opción para no cambiarla.
-  const categories = useMemo(() => {
-    const ids = catalogLabelOrder('featCategory');
-    return form.category && !ids.includes(form.category) ? [...ids, form.category] : ids;
-  }, [form.category, lang]);
+  const categories = useMemo(
+    () =>
+      readWithLang(lang, () => {
+        const ids = catalogLabelOrder('featCategory');
+        return form.category && !ids.includes(form.category) ? [...ids, form.category] : ids;
+      }),
+    [form.category, lang],
+  );
 
   // Qué significa lo tocado (`explain` de Flutter): los textos son del motor.
   const explain = (key: string): Explained | null => {

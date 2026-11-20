@@ -17,7 +17,7 @@ import { Card } from '../../ui/Card';
 import { ConfirmDialog } from '../../ui/ConfirmDialog';
 import { cx } from '../../ui/cx';
 import { useHoldDrag } from '../../ui/holdDrag';
-import { useListTransition } from '../../ui/listTransition';
+import { useListTransition, vtName } from '../../ui/listTransition';
 import { Medallion } from '../../ui/Medallion';
 import { PortraitViewer } from '../../ui/PortraitViewer';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Toast, Tooltip } from '../../ui/primitives';
@@ -222,7 +222,7 @@ function ScenarioCard({ scenario, people, reorder }: {
       {...reorder?.item}
       // Después del `item`, que trae su `style` para el arrastre.
       style={{
-        viewTransitionName: `sc-${scenario.id.replace(/[^\w-]/g, '_')}`,
+        viewTransitionName: vtName('sc', scenario.id),
         ...(reorder?.item.style as CSSProperties | undefined),
       }}
     >
