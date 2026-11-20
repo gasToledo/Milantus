@@ -722,6 +722,12 @@ escenario, del DM y sin variantes de tamaño. Tiene el mismo límite y la misma
 validación de formato que un retrato, y se pide con `?v=<updatedAt>`, por lo
 que se cachea como inmutable.
 
+En la ficha del escenario, cada `@Nombre` de la descripción que coincide con un
+personaje de esa lista u otro escenario es un enlace a su ficha. A diferencia
+del Cuaderno, no abre el panel lateral ni ofrece el selector de `@` al
+escribir: la descripción no es de una campaña. En la tarjeta de la lista se
+muestra sin la `@`.
+
 ## Música
 
 Las escenas de música viven **dentro del documento de la campaña**

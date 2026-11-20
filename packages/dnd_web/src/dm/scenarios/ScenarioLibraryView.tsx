@@ -19,6 +19,7 @@ import { cx } from '../../ui/cx';
 import { useHoldDrag } from '../../ui/holdDrag';
 import { useListTransition, vtName } from '../../ui/listTransition';
 import { Medallion } from '../../ui/Medallion';
+import { withMentions, withoutMentionMarks, type Mentions } from '../../ui/mentions';
 import { PortraitViewer } from '../../ui/PortraitViewer';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Toast, Tooltip } from '../../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../../ui/status';
@@ -46,6 +47,47 @@ function useLinked(scenarios: readonly Scenario[] | undefined) {
   const linked = (scenario: Scenario) =>
     scenario.characterKeys.map((key) => byKey.get(key)).filter((c): c is ScenarioCharacter => c !== undefined);
   return { characters, linked };
+}
+
+/**
+ * Las menciones de la descripción: cada `@Nombre` de un jugador de tus mesas,
+ * un PNJ u otro escenario es un enlace a su ficha. Es de la Biblioteca y no de
+ * una campaña, así que no abre el panel lateral del Cuaderno: lleva a la
+ * ficha. Si dos se llaman igual gana el jugador, después el PNJ, como en el
+ * Cuaderno. Solo pide los datos si el texto tiene alguna `@`.
+ */
+function useDescriptionMentions(scenario: Scenario): Mentions | undefined {
+  const enabled = scenario.description.includes('@');
+  const characters = useQuery({ ...scenarioCharactersQuery, enabled });
+  const scenarios = useQuery({ ...scenariosQuery, enabled });
+  return useMemo(() => {
+    if (!characters.data && !scenarios.data) return undefined;
+    const people = characters.data ?? [];
+    const targets = [
+      ...people
+        .filter((c) => c.campaignId !== null)
+        .map((c) => ({ name: c.name, href: dmMemberHref(c.campaignId!, scenarioCharacterId(c)) })),
+      ...people.filter((c) => c.campaignId === null).map((c) => ({ name: c.name, href: dmNpcsHref(scenarioCharacterId(c)) })),
+      ...(scenarios.data ?? []).filter((x) => x.id !== scenario.id).map((x) => ({ name: x.name, href: dmScenariosHref(x.id) })),
+    ];
+    const byName = new Map<string, string>();
+    for (const target of targets) {
+      const key = fold(target.name.trim());
+      if (key !== '' && !byName.has(key)) byName.set(key, target.href);
+    }
+    return {
+      names: targets.map((target) => target.name),
+      render: (name, key) => (
+        <Link
+          key={key}
+          href={byName.get(fold(name.trim()))!}
+          className="rounded-[3px] font-semibold text-gold underline decoration-gold underline-offset-2"
+        >
+          {name}
+        </Link>
+      ),
+    };
+  }, [characters.data, scenarios.data, scenario.id]);
 }
 
 function ScenarioList() {
@@ -248,7 +290,9 @@ function ScenarioCard({ scenario, people, reorder }: {
           <span className="flex flex-col gap-1">
             <span className="font-display block text-[17px] leading-tight break-words text-on-surface">{scenario.name}</span>
             {scenario.description && (
-              <span className="line-clamp-2 text-[13px] leading-normal break-words text-on-surface-variant">{scenario.description}</span>
+              <span className="line-clamp-2 text-[13px] leading-normal break-words text-on-surface-variant">
+                {withoutMentionMarks(scenario.description)}
+              </span>
             )}
           </span>
           <span
@@ -379,6 +423,7 @@ function ScenarioDetails({ scenario }: { scenario: Scenario }) {
   const t = useTexts();
   const { characters, linked } = useLinked([scenario]);
   const people = linked(scenario);
+  const mentions = useDescriptionMentions(scenario);
   const [viewing, setViewing] = useState(false);
   const cover = scenarioImageHref(scenario);
 
@@ -405,7 +450,9 @@ function ScenarioDetails({ scenario }: { scenario: Scenario }) {
       <div className="flex flex-wrap items-start gap-4">
         {scenario.description && (
           <Card id="scenario-description" title={t.dmScenarioDescription} icon={ScrollText} className="flex-[999_1_420px]">
-            <p className="text-[14.5px] leading-[1.65] break-words whitespace-pre-wrap text-on-surface">{scenario.description}</p>
+            <p className="text-[14.5px] leading-[1.65] break-words whitespace-pre-wrap text-on-surface">
+              {withMentions(scenario.description, mentions)}
+            </p>
           </Card>
         )}
         <Card

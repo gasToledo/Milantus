@@ -1592,7 +1592,8 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
-- Sin cambios.
+- En la ficha de un escenario, los «@Nombre» de la descripción llevan a la
+  ficha del personaje, PNJ o escenario nombrado.
 
 ### Eliminado
 
