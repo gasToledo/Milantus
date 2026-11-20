@@ -32,9 +32,10 @@ export function RosterPanel({ current }: { current?: 'roster' | 'quiz' }) {
 }
 
 /**
- * El pie del menú principal: Ajustes (de solo lectura en React), sugerencias, la cuenta con «Cerrar
- * sesión» (que cierra la del servidor y la del proveedor, como Flutter), el tema y la versión. No se rediseña por pantalla: quien entra
- * tiene que poder salir de su cuenta sin buscar.
+ * El pie del menú principal: Ajustes, sugerencias, la cuenta con «Cerrar
+ * sesión» (cierra la del servidor y la del proveedor), el tema y la versión.
+ * No se rediseña por pantalla: quien entra tiene que poder salir de su cuenta
+ * sin buscar.
  */
 export function RosterFooter({ account, current, dm = false }: { account: Account; current?: 'settings'; dm?: boolean }) {
   const t = useTexts();

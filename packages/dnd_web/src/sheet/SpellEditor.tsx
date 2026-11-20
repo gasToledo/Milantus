@@ -15,8 +15,8 @@ import type { SpellJson } from './SpellList';
 import type { SheetWriter } from './writer';
 
 /**
- * El editor de conjuros de una clase de la ficha propia (`SpellEditScreen` de
- * Flutter, con el circuito de los asistentes): trucos y conjuros en pestañas,
+ * El editor de conjuros de una clase de la ficha propia (el circuito de los
+ * asistentes): trucos y conjuros en pestañas,
  * lo elegido en una bandeja de chips que se sacan con ✕ y, a la derecha, qué
  * es lo último que se tocó. Qué se puede elegir, lo concedido por rasgos y
  * los topes lo dice el motor (`spellEditView`); guardar es una sola acción
@@ -89,7 +89,7 @@ function Editor({
     {
       key: 'spells' as const,
       title: view.prepared ? t.luPreparedTitle : t.luKnownTitle,
-      // Quien conoce conjuros no tiene tope (como en Flutter).
+      // Quien conoce conjuros no tiene tope.
       cap: (view.prepared ? view.preparedCount : null) as number | null,
       list: chosen.spells,
       // Por nivel, y dentro del nivel como los trae el motor.

@@ -11,7 +11,7 @@ import {
 } from 'react';
 import { prefersReducedMotion } from '../ui/motion';
 
-/** Los tres modos de `ThemeMode` en Flutter (`AppSettings.themeMode`). */
+/** Los tres modos del tema: oscuro, claro o el del sistema. */
 export type ThemeMode = 'dark' | 'light' | 'system';
 
 // La misma clave la lee el script de `index.html` antes del primer cuadro: si

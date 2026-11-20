@@ -3,7 +3,7 @@ import { useTurnStatus } from '../api/queries';
 import { useTexts } from '../i18n/context';
 
 /**
- * El cartel de turno de la ficha propia (`_turnBanner` de Flutter): «Preparate,
+ * El cartel de turno de la ficha propia: «Preparate,
  * seguís vos» o «Es tu turno».
  *
  * Deliberadamente no dice nada más: nunca el orden, nunca cuántos faltan,

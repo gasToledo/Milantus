@@ -189,8 +189,8 @@ export function RosterCard({
               )}
             </p>
           </div>
-          {/* Recorre el tramo y cambia de color como en Flutter (verde, oro,
-              carmesí); su `aria-label` dice lo mismo que la cifra de arriba. */}
+          {/* Recorre el tramo y cambia de color (verde, oro, carmesí); su
+              `aria-label` dice lo mismo que la cifra de arriba. */}
           <div className="mt-1.5">
             <ThinBar
               value={fallen ? 0 : hp}

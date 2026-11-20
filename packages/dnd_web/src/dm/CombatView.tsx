@@ -697,7 +697,7 @@ const hasLegendary = ({ detail }: Row) => (detail?.legendaryActions ?? 0) > 0 ||
 /** Las marcas de acciones (círculos) o resistencias (rombos) legendarias, para
  *  tacharlas tocándolas. Tocar una disponible la gasta junto con las anteriores y
  *  tocar una gastada la devuelve junto con las que le siguen: así se corrige un
- *  toque de más sin un botón aparte (`_LegendaryPips` de Flutter). Con la fila
+ *  toque de más sin un botón aparte. Con la fila
  *  partida (teléfono) el área tocable es de 40 px y el rótulo va arriba y entero:
  *  a 28 px las marcas quedaban pegadas y se tachaba la de al lado. */
 function LegendaryPips({ kind, max, spent, onChange }: { kind: 'actions' | 'resistances'; max: number; spent: number; onChange: (value: number) => void }) {
@@ -751,8 +751,8 @@ function LedgerRow({ row, catalog, active, acted, preparing, showXp, sideControl
   const t = useTexts();
   const lang = useLang();
   // El turno que pasa se lleva la vista con él: en una mesa con muchos
-  // combatientes la fila activa queda fuera de pantalla (`_RevealWhenActive` de
-  // Flutter). No en el primer dibujado, para no mover la página al entrar.
+  // combatientes la fila activa queda fuera de pantalla. No en el primer
+  // dibujado, para no mover la página al entrar.
   const ref = useRef<HTMLLIElement>(null);
   const first = useRef(true);
   useEffect(() => {
@@ -977,7 +977,7 @@ function OpenSheetLink({ campaignId, memberId }: { campaignId: string; memberId:
 
 /** Lo que una fila lleva: el bando (menos un jugador, que no tiene), dañar y
  *  curar (menos un jugador y un PNJ sin estadísticas), abrir la ficha de un
- *  jugador y sacar a cualquiera. Sacar no confirma, como en Flutter: volver a
+ *  jugador y sacar a cualquiera. Sacar no confirma: volver a
  *  sumarlo es un toque. */
 function rowParts(row: Row, { campaignId, act, t, running, amount, readAmount, onFix, onEffects, onRemove, onConvert }: RowCtx): RowExtras {
   const { c, detail, member } = row;

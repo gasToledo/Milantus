@@ -2,9 +2,8 @@ import type { ReactNode } from 'react';
 import { withMentions, type Mentions } from './mentions';
 
 /**
- * El Markdown que usa una mesa (`MarkdownText` de Flutter, en
- * `ui/diary_cards.dart`), con el mismo subconjunto para que un trasfondo se
- * lea igual en los dos clientes: títulos (`#`, `##`, `###`), viñetas (`-`,
+ * El Markdown que usa una mesa. El subconjunto es chico, para que un
+ * trasfondo se lea siempre igual: títulos (`#`, `##`, `###`), viñetas (`-`,
  * `*`), párrafos separados por una línea en blanco, y **negrita** e *itálica*
  * dentro de la línea.
  *
@@ -14,9 +13,9 @@ import { withMentions, type Mentions } from './mentions';
  * Arma elementos de React y nunca HTML: el texto lo escribe una persona y
  * viaja tal cual, así que no hay forma de que una etiqueta suya llegue al DOM.
  *
- * ponytail: subconjunto a mano, como en Flutter. No entiende enlaces, código,
- * citas, tablas ni listas anidadas; si un día hacen falta, la salida es una
- * librería de Markdown con el HTML apagado, en los dos clientes a la vez.
+ * ponytail: subconjunto a mano. No entiende enlaces, código, citas, tablas ni
+ * listas anidadas; si un día hacen falta, la salida es una librería de
+ * Markdown con el HTML apagado.
  */
 export function MarkdownText({ text, className, mentions }: { text: string; className?: string; mentions?: Mentions }) {
   const blocks: ReactNode[] = [];

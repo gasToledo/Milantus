@@ -11,9 +11,9 @@ import type { SheetWriter } from './writer';
 
 /**
  * El cambio del truco innato (el del rasgo de la especie, tras un descanso
- * largo): `_openInnateCantripPicker` de Flutter, pero elegir una opción no
- * guarda nada; se confirma con «Cambiar». Qué trucos entran y en qué orden lo
- * dice el motor (`innateCantripOptions`); lo guardado es la acción
+ * largo). Elegir una opción no guarda nada; se confirma con «Cambiar». Qué
+ * trucos entran y en qué orden lo dice el motor (`innateCantripOptions`); lo
+ * guardado es la acción
  * `setInnateCantrip`, que además lo vuelve a comprobar.
  */
 export function InnateCantripDialog({

@@ -69,7 +69,7 @@ export function DashboardPage() {
   );
 
   // Lo elegido se ve al instante y el guardado va después. Si falla, el cambio
-  // queda en pantalla hasta la próxima carga, como en Flutter: revertirlo
+  // queda en pantalla hasta la próxima carga: revertirlo
   // desordenaría la lista bajo las manos de quien la está usando.
   const saveSettings = useCallback(
     async (patch: Partial<RosterSettings>) => {
@@ -165,7 +165,7 @@ export function DashboardPage() {
     await replaceInRoster((list) => list.map((s) => (s.character.id === id ? { ...s, character } : s)));
   };
 
-  // Favorito y orden no se tocan: se reconcilian al mostrar, como en Flutter.
+  // Favorito y orden no se tocan: se reconcilian al mostrar.
   const remove = async (id: string) => {
     await dropPending(id);
     await deleteCharacter(id);

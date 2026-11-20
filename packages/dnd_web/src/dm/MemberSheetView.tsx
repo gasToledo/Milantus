@@ -12,13 +12,13 @@ import { memberPortrait } from '../ui/portrait';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
 
 /**
- * La ficha completa de un jugador de la Mesa (`MemberSheetScreen` de Flutter),
- * de solo lectura: la misma ficha que ve el jugador, con las pestañas que
+ * La ficha completa de un jugador de la Mesa, de solo lectura: la misma ficha
+ * que ve el jugador, con las pestañas que
  * sirven en combate. El DM no escribe la ficha de otra cuenta: no hay ningún
  * control, y la ficha se lee de la misma consulta que la Mesa (`GET
  * /api/campaigns/:id/members`), sin otra puerta entre cuentas.
  *
- * Como en Flutter, se lee al entrar y no se sondea: un espacio de conjuro que
+ * Se lee al entrar y no se sondea: un espacio de conjuro que
  * cambia solo, sin que pase nada delante del DM, se lee como un error.
  */
 export function MemberSheetView({
@@ -40,7 +40,7 @@ export function MemberSheetView({
   }, [campaign.id, memberId, tab]);
 
   const raw = members.data?.find((m) => m.memberId === memberId)?.character ?? null;
-  // El catálogo del DM (SRD más **su** homebrew), como la Mesa y Flutter.
+  // El catálogo del DM (SRD más **su** homebrew), el mismo de la Mesa.
   const computed = useMemo(() => (raw && catalog.data ? computeModel(raw, catalog.data) : null), [raw, catalog.data]);
 
   const back = (

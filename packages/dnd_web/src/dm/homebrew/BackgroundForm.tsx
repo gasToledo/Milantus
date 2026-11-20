@@ -11,7 +11,7 @@ import { FormSection, PillGroup, TextAreaField, TextField } from './homebrewFiel
 const NONE = '__none__';
 
 /**
- * El formulario de un trasfondo propio (`BackgroundForm` de Flutter). Mismo
+ * El formulario de un trasfondo propio. Mismo
  * patrón que `RaceForm`: el motor arma el trasfondo y los errores
  * (`backgroundDraft`), la vista previa es la ficha del Códice en vivo y el
  * armazón es `HomebrewFormShell`.
@@ -87,7 +87,7 @@ export function BackgroundForm({
     return [{ value: NONE, label: t.hbNoneParen }, ...list];
   }, [options, form.originFeatId, catalog, t]);
 
-  // Qué significa lo tocado (`explain` de Flutter): los textos son del motor.
+  // Qué significa lo tocado: los textos son del motor.
   const explain = (key: string): Explained | null => {
     const names = (list: { id: string; label: string }[], ids: string[]) => (ids.length === 0 ? t.hbxNone : ids.map((id) => list.find((o) => o.id === id)?.label ?? id).join(' · '));
     switch (key) {

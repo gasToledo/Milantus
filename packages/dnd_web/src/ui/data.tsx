@@ -20,8 +20,8 @@ export function Eyebrow({ children, className }: { children: ReactNode; classNam
 /**
  * Placa de la **banda táctica**: ícono y rótulo arriba, la cifra grande en
  * sans negrita con cifras tabulares (se compara con la de al lado), y todo
- * **centrado**. A la izquierda, como `StatTile` de Flutter, una placa ancha con
- * «−1» quedaba casi vacía (se ajustó en el lienzo de diseño). `suffix` es la
+ * **centrado**. A la izquierda, una placa ancha con «−1» quedaba casi vacía
+ * (se ajustó en el lienzo de diseño). `suffix` es la
  * unidad atenuada («pies», «/ 24»), en la misma línea y sobre la misma base
  * que la cifra; `footer` va abajo a todo el ancho (la barra de PG) y
  * `caption`, debajo de él (el porcentaje). Es un par `dt`/`dd`: va adentro de
@@ -315,7 +315,7 @@ export function hpTone(ratio: number): { bar: string; text: string } {
 }
 
 /**
- * Gastar y recuperar un uso (`SpendRecoverButtons` de Flutter): dos botones de
+ * Gastar y recuperar un uso: dos botones de
  * ícono con su rótulo para el lector y su tooltip. Sin `onSpend` u
  * `onRecover` el botón queda deshabilitado (no quedan usos, o no hay nada
  * gastado): no desaparece, para que la fila no salte.

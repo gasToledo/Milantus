@@ -30,10 +30,10 @@ const inCampaign = (links: readonly { campaignId: string }[], id: string | null)
  * La Biblioteca de PNJ (`npc_library_view.dart`): todos los de la cuenta,
  * estén o no en alguna campaña. El filtro principal es **por campaña** y los
  * tags van debajo, más chicos: en la mesa la pregunta es «¿quién está en esta
- * campaña?», y el tag afina dentro de eso. Acá se crea un PNJ (sin ficha de
- * personaje: eso sigue en Flutter), se importa un ZIP (de un PNJ o de un
- * personaje exportado) y se borra desde su ficha; editar sigue en Flutter. Nada de esto viaja a un jugador: la API de PNJ es
- * del DM y de nadie más.
+ * campaña?», y el tag afina dentro de eso. Acá se crea un PNJ (el de ficha de
+ * personaje lo termina el creador, en `/dm/pnj/nuevo`), se importa un ZIP (de
+ * un PNJ o de un personaje exportado) y se borra y se edita desde su ficha.
+ * Nada de esto viaja a un jugador: la API de PNJ es del DM y de nadie más.
  */
 export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[] | undefined }) {
   const t = useTexts();
@@ -212,7 +212,7 @@ export function NpcLibraryView({ campaigns }: { campaigns: readonly DmCampaign[]
                   label={g}
                   count={entries.filter(({ view }) => hasTag(view, g)).length}
                   pressed={tag?.toLowerCase() === g.toLowerCase()}
-                  // Tocar el elegido lo suelta, como el `FilterChip` de Flutter.
+                  // Tocar el elegido lo suelta.
                   onClick={() => animateList(() => setTag(tag?.toLowerCase() === g.toLowerCase() ? null : g))}
                 />
               ))}

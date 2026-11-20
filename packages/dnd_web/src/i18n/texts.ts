@@ -22,7 +22,6 @@ const es = {
   skipToContent: 'Saltar al contenido',
   panelLabel: 'Panel lateral',
   closeMenu: 'Cerrar el menú',
-  opensFlutter: 'se abre en la aplicación principal',
   themeLabel: 'Tema',
   themeModes: { dark: 'Oscuro', light: 'Claro', system: 'Sistema' },
   themeSystemNow: (light: boolean): string => (light ? 'Sistema (ahora claro)' : 'Sistema (ahora oscuro)'),
@@ -45,7 +44,7 @@ const es = {
   notFoundBody: 'No existe o no es tuyo.',
   notFoundTitleRoute: 'Página no encontrada',
 
-  // Panel lateral (las cadenas salen de `app_es.arb` de dnd_app).
+  // Panel lateral.
   menu: 'Menú',
   modeSwitchLabel: 'Modo',
   modePlayer: 'Jugador',
@@ -480,7 +479,7 @@ const es = {
     pageOf: (page: string, total: string) => `Hoja ${page} de ${total}`,
   },
   readOnly: 'Solo lectura',
-  // El guardado de la ficha propia (`SaveStatusIndicator` de Flutter).
+  // El guardado de la ficha propia.
   saveStateLabel: 'Estado del guardado: ',
   saveSaving: 'Guardando…',
   saveSaved: 'Guardado',
@@ -601,7 +600,7 @@ const es = {
   noConditions: 'Sin condiciones activas.',
   exhaustion: (n: number) => `Agotamiento ${n}`,
   concentrating: (name: string) => `Concentración: ${name}`,
-  // Cansancio y modos activos (5e1); los textos son los de Flutter.
+  // Cansancio y modos activos.
   exhaustionTitle: 'Cansancio',
   exhaustionRules: (max: number) =>
     `Cada nivel resta 2 a las pruebas de característica, salvaciones, tiradas de ataque e iniciativa, y 5 pies a la velocidad. Al nivel ${max} el personaje muere.
@@ -1781,8 +1780,7 @@ Los personajes que los jugadores le compartieron se sueltan, y sus fichas siguen
   encConvert: 'Convertir',
   encConvertFailed: 'No se pudo convertir el combatiente en PNJ.',
   encConvertGone: 'El combatiente ya no está disponible en este combate.',
-  // Efectos y defensas (6g5): copiados de las claves homónimas de Flutter, salvo
-  // las que nacieron acá (ventaja, temporales y bono a la CA no existían en Flutter).
+  // Efectos y defensas del combate.
   dmEffectsOf: (name: string) => `Efectos de ${name}`,
   dmNoteEffect: 'Anotar un efecto',
   dmNoteEffectHint: 'Marcado por el pícaro…',
@@ -2419,8 +2417,8 @@ Los personajes que los jugadores le compartieron se sueltan, y sus fichas siguen
   },
   sources: { srd_2024: 'SRD 5.2.1', phb_2024: 'PHB 2024', foa_2025: 'Forge 2025', srd_2014: 'SRD 5.1', homebrew: 'Propio' },
   sourceLabel: (source: string) => `Procedencia: ${source}`,
-  // El glosario de Flutter (`gl*` de `app_es.arb`), con el ejemplo en cursiva
-  // aparte: el detalle lo hunde en una placa. Es texto propio, no del manual.
+  // El glosario: el ejemplo va en cursiva aparte, porque el detalle lo hunde
+  // en una placa. Es texto propio, no del manual.
   codexExample: 'Ejemplo',
   codexScore: 'Puntuación',
   codexModifier: 'Modificador',
@@ -2429,8 +2427,8 @@ Los personajes que los jugadores le compartieron se sueltan, y sus fichas siguen
   codexKeepReading: 'Seguir leyendo',
   codexPrevious: 'Anterior',
   codexNext: 'Siguiente',
-  // Las guías de Flutter (`guide*` de `app_es.arb`), ya partidas: el primer
-  // combate en pasos y la ficha por pestaña, que el detalle dibuja aparte.
+  // Las guías, ya partidas: el primer combate en pasos y la ficha por pestaña,
+  // que el detalle dibuja aparte.
   codexGuidesIntro: 'Para tu primera partida',
   codexGuideOf: (n: number, total: number) => `Guía ${n} de ${total}`,
   codexTip: 'Un consejo',
@@ -2508,8 +2506,8 @@ Los personajes que los jugadores le compartieron se sueltan, y sus fichas siguen
     npcs: { title: 'PNJ', body: ['Los personajes no jugadores son todos los que habitan el mundo y no lleva ningún jugador: el tabernero, el guardia, el villano, el aliado que acompaña al grupo. Los manejás vos, el DM, y les das voz, intenciones y, si hace falta, estadísticas para pelear. En Milantus los guardás en tu biblioteca y los sumás a cada campaña.'] },
     difficulty: { title: 'Dificultad de un encuentro', body: ['Antes de una pelea conviene saber si va a ser un trámite o una masacre. Cada personaje aporta un presupuesto de PX según su nivel, y los enemigos lo consumen según su VD. Según cuánto usen, la pelea es Baja, Moderada o Alta, y por encima de Alta, Extrema. Milantus hace la cuenta sola mientras armás el combate, y te avisa si hay una criatura demasiado fuerte para tu grupo o demasiadas criaturas por personaje. Si preferís armar las peleas a tu criterio, lo apagás en Ajustes, con «Mostrar la dificultad del encuentro».'] },
   },
-  // Los estados con su regla, del libro (`ui/conditions.dart` de Flutter).
-  // Aparte de `conditions` porque suma Invisible, que no se marca en la ficha.
+  // Los estados con su regla, del libro. Aparte de `conditions` porque suma
+  // Invisible, que no se marca en la ficha.
   conditionRules: {
     blinded: { label: 'Cegado', rule: 'No podés ver y fallás automáticamente cualquier prueba que requiera vista. Los ataques contra vos tienen ventaja, y tus ataques tienen desventaja.' },
     charmed: { label: 'Hechizado', rule: 'No podés atacar a quien te hechizó ni dirigirle capacidades o efectos mágicos dañinos. Esa criatura tiene ventaja en pruebas sociales contra vos.' },
@@ -2671,7 +2669,6 @@ const en: Texts = {
   skipToContent: 'Skip to content',
   panelLabel: 'Side panel',
   closeMenu: 'Close the menu',
-  opensFlutter: 'opens in the main app',
   themeLabel: 'Theme',
   themeModes: { dark: 'Dark', light: 'Light', system: 'System' },
   themeSystemNow: (light: boolean) => (light ? 'System (currently light)' : 'System (currently dark)'),
@@ -5294,10 +5291,10 @@ export function innateUseLabel(t: Texts, s: { use: string; freeUses: number }): 
 
 const STORAGE_KEY = 'milantus.locale';
 
-/** Recuerda el idioma elegido, con la misma clave que Flutter: el cambio vale
- *  en los dos clientes. Devuelve si pudo guardarlo: el idioma se resuelve
- *  una sola vez al cargar, así que sin almacenamiento (modo privado) recargar
- *  no lo cambiaría y la pantalla no recarga. */
+/** Recuerda el idioma elegido, con la misma clave que la versión anterior:
+ *  un idioma ya guardado sigue valiendo. Devuelve si pudo guardarlo: el idioma
+ *  se resuelve una sola vez al cargar, así que sin almacenamiento (modo privado)
+ *  recargar no lo cambiaría y la pantalla no recarga. */
 export function storeLang(lang: Lang): boolean {
   try {
     window.localStorage.setItem(STORAGE_KEY, lang);
@@ -5307,10 +5304,9 @@ export function storeLang(lang: Lang): boolean {
   }
 }
 
-/** El idioma de la interfaz, resuelto como `resolveLocale` de Flutter
- *  (`l10n/app_locale.dart`): el guardado si es válido; si no, el del
- *  navegador si lo soportamos (`en-US` vale `en`); si no, español. Flutter lo
- *  guarda en `localStorage`, y el origen es uno solo. */
+/** El idioma de la interfaz: el guardado si es válido; si no, el del
+ *  navegador si lo soportamos (`en-US` vale `en`); si no, español. Vive en
+ *  `localStorage`, con la misma clave de la versión anterior. */
 export function resolveLang(): Lang {
   const base = (tag: string | null | undefined): Lang | null => {
     const code = tag?.toLowerCase().split(/[-_]/)[0];

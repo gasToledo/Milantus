@@ -1,5 +1,5 @@
 // Presentación de un PNJ, la misma en la Biblioteca, en su ficha y en la mesa
-// de una campaña (`npc_shared.dart` de Flutter). Ningún número se calcula acá:
+// de una campaña. Ningún número se calcula acá:
 // PG, CA, si viene herido, la especie y las clases los da el motor
 // (`npcViews`); esto solo los pone en palabras.
 import type { JsonObject, NpcView } from '../../engine';
@@ -18,7 +18,7 @@ export const kindOf = (v: NpcView): NpcKind =>
  * La línea que dice qué es un PNJ, bajo su nombre: «Sin estadísticas»,
  * «Caballero · CA 18 · PG 52» o «Elfa · Mago 7». Con [withHurt], los PG
  * guardados de un herido en la campaña: un bloque muestra «PG 7/11» en lugar
- * del máximo y una ficha los suma al final (`npcTypeLine` de Flutter).
+ * del máximo y una ficha los suma al final.
  */
 export function npcTypeLine(v: NpcView, t: Texts, { withHurt = false } = {}): string {
   const hurt = withHurt ? v.hurt : null;
@@ -69,7 +69,7 @@ export const NPC_STATUSES: readonly NpcStatus[] = ['alive', 'dead', 'unknown'];
 /**
  * El relleno del estado elegido en el selector. Es una excepción consciente a
  * «ningún chip seleccionable va en carmesí»: el color del estado es la
- * información (como en Flutter), y la palabra va siempre al lado para quien no
+ * información, y la palabra va siempre al lado para quien no
  * distingue el verde del rojo.
  */
 export const STATUS_FILL: Record<NpcStatus, string> = {

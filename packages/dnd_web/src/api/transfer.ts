@@ -41,7 +41,9 @@ async function postZip(path: string, file: File, extra: Record<string, string> =
   return response;
 }
 
-/** La API valida el ZIP. El navegador solo lo envía en el formato de Flutter. */
+/** La API valida el ZIP, también el de un respaldo de la versión anterior.
+ *  El navegador solo lo envía. */
+
 export async function importBackup(file: File): Promise<{ charactersImported: number; portraitsImported: number }> {
   const path = '/api/import';
   if (file.size > MAX_BACKUP_BYTES) throw new ApiError(413, path);

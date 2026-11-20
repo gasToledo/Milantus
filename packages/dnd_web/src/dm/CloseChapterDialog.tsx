@@ -22,7 +22,7 @@ type Entry = { key: number; item?: ChapterItem; text?: string; to: Set<string> }
  * objetos con **a quién va cada uno** (una placa por objeto con cantidad y un
  * chip por personaje; nada viene marcado, porque nada se asigna solo). Con un
  * objeto sin nadie no deja cerrar y dice cuál falta. Los valores arrancan en lo
- * que el capítulo traía cargado (uno viejo o planificado en Flutter).
+ * que el capítulo traía cargado (uno viejo o planificado en la versión anterior).
  *
  * Todo es un aviso: el servidor deja el objeto en la bandeja del jugador y el
  * DM no escribe ninguna ficha (`modo-dm.md`). Si cerrar falla el diálogo no se

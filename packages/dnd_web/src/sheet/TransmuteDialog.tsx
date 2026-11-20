@@ -8,8 +8,8 @@ import type { SheetModel } from './model';
 import type { SheetWriter } from './writer';
 
 /**
- * Transmutar una réplica en otro de los planos elegidos (`_transmuteReplica`
- * de Flutter, en un solo diálogo): radios con los planos menos el propio y, si
+ * Transmutar una réplica en otro de los planos elegidos, en un solo diálogo:
+ * radios con los planos menos el propio y, si
  * el elegido pide objeto base, debajo la lista de bases. Elegir no guarda;
  * «Transmutar» manda la acción `transmuteReplica`, que el motor vuelve a
  * comprobar.

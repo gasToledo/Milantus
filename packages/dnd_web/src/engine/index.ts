@@ -165,8 +165,8 @@ function catalogJson(catalog: Catalog): string {
 }
 
 /**
- * Calcula la ficha con el mismo motor que el servidor y Flutter, compilado a
- * JS: ninguna regla se reimplementa en TypeScript. Migra la ficha si viene de
+ * Calcula la ficha con el mismo motor que el servidor, compilado a JS: ninguna
+ * regla se reimplementa en TypeScript. Migra la ficha si viene de
  * un esquema viejo; una versión futura lanza en vez de calcular a medias.
  */
 export function computeSheet(
@@ -268,7 +268,7 @@ export function migrateCharacter(character: CharacterJson): CharacterJson {
 
 /**
  * Idioma de los rótulos que el motor arma al calcular («Mediano»). Es estado
- * global del motor, igual que en Flutter: se fija **antes** de `computeSheet`.
+ * global del motor: se fija **antes** de `computeSheet`.
  */
 export function setEngineLanguage(code: 'es' | 'en'): void {
   engine().setLanguage(code);
@@ -479,7 +479,7 @@ export interface LevelUpView {
     grantedCantrips: string[];
     grantedSpells: string[];
   } | null;
-  /** Lo que la subida obliga a elegir y todavía se elige en Flutter. */
+  /** Lo que esta subida todavía obliga a elegir. */
   open: { features: number; proficiencies: number; spellChoices: number; classSpells: number };
   /** El personaje como quedaría, para comparar las dos fichas. */
   character: CharacterJson;
@@ -1351,7 +1351,7 @@ export function actOn(
 export type HomebrewCategoryKey = "weapons" | "armor" | "items" | "feats" | "races" | "backgrounds" | "spells" | "creatures";
 
 /** El archivo `dnd_homebrew` de todo lo propio: lo arma el motor, el mismo
- *  formato que exporta Flutter. [now] es la hora del archivo. */
+ *  formato que exportaba la versión anterior. [now] es la hora del archivo. */
 export function homebrewExport(
   content: Partial<Record<HomebrewCategoryKey, readonly JsonObject[]>>,
   now: Date,

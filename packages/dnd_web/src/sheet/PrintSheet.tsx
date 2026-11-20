@@ -10,14 +10,13 @@ import { classesOf, type SheetModel } from './model';
 import { ABILITIES, SKILL_ABILITY } from './vocabulary';
 
 /** El idioma que el motor tiene por universal (`Language.universal`): va
- *  primero, como en Flutter, y el resto por nombre. */
+ *  primero, y el resto por nombre. */
 const UNIVERSAL_LANGUAGE = 'common';
 
 /**
- * La ficha para imprimir (`print_sheet.dart`): una hoja propia que solo se ve
- * en papel. Acá, a diferencia de Flutter, la pantalla es DOM y se podría
- * imprimir tal cual, pero saldría con los fondos oscuros, las pestañas y el
- * panel; esta hoja es la misma de Flutter, en blanco y negro.
+ * La ficha para imprimir: una hoja propia que solo se ve en papel. La pantalla
+ * es DOM y se podría imprimir tal cual, pero saldría con los fondos oscuros,
+ * las pestañas y el panel; esta hoja va en blanco y negro.
  *
  * Es papel para jugar con lápiz: lo que cambia en la mesa (PG actuales,
  * espacios gastados, usos de recursos, monedas) sale **en blanco**, con el
@@ -65,7 +64,7 @@ function Sheet({ model }: { model: SheetModel }) {
   const t = useTexts();
   const lang = useLang();
   const { character, catalog } = model;
-  // La hoja impresa es la del personaje, no la de la bestia (como la de Flutter).
+  // La hoja impresa es la del personaje, no la de la bestia.
   const s = useMemo(() => computeSheet(withoutForm(character as unknown as CharacterJson), catalog), [character, catalog]);
   const p = t.print;
   const sortByName = (a: string, b: string) => a.localeCompare(b, lang);

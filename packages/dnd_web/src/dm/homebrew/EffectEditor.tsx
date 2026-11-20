@@ -7,7 +7,7 @@ import { Tooltip } from '../../ui/primitives';
 import { AddEffectDialog } from './AddEffectDialog';
 
 /**
- * La lista de efectos de una entrada propia (`EffectEditor` de Flutter): los
+ * La lista de efectos de una entrada propia: los
  * lista con su frase, quita y agrega. Un efecto **no se edita en el lugar**: se
  * quita y se vuelve a agregar.
  *

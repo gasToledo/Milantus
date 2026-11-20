@@ -263,8 +263,8 @@ export function SpellsStep({ t, lang, catalog, view, act, setFocus }: StepProps)
           {
             key: 'spells',
             title: cs.prepared ? t.luPreparedTitle : t.luKnownTitle,
-            // Un lanzador que prepara tiene tope; el que conoce, no (como en
-            // Flutter): lo que falta lo cuenta el motor.
+            // Un lanzador que prepara tiene tope; el que conoce, no: lo que
+            // falta lo cuenta el motor.
             cap: cs.prepared ? cs.preparedCount : null,
             count: cs.prepared ? ([cs.chosenSpells.length, cs.preparedCount] as [number, number]) : undefined,
             ready: !missingSpells,
@@ -751,7 +751,7 @@ export function EquipmentStep({ t, lang, catalog, view, act, setFocus }: StepPro
 
 /** El catálogo de compras, en el lugar del paso: se arma el equipo entero sin
  *  volver a abrirlo y el panel derecho sigue explicando lo que se toca. Sin
- *  objetos mágicos, como en Flutter, y al precio del manual: todavía no hay DM
+ *  objetos mágicos, y al precio del manual: todavía no hay DM
  *  con quien regatear. */
 function ShopBlock({ t, lang, catalog, view, act, setFocus, onDone }: StepProps & { onDone: () => void }) {
   const labels = coinLabels(t);

@@ -8,8 +8,8 @@ import { Tooltip } from './primitives';
  * entera, sobre el velo. Se cierra con `Esc`, con un clic afuera o con el
  * botón; Radix pone el foco atrapado y el título como nombre accesible.
  *
- * ponytail: sin zoom ni arrastre propios (Flutter tiene `InteractiveViewer`);
- * el original llega entero y el navegador ya acerca con el gesto de la
+ * ponytail: sin zoom ni arrastre propios; el original llega entero y el
+ * navegador ya acerca con el gesto de la
  * pantalla. Si hace falta mirar un detalle, se suma acá.
  */
 export function PortraitViewer({

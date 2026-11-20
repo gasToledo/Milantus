@@ -4,7 +4,7 @@ import { ChevronDown, type LucideIcon } from 'lucide-react';
 import { cx } from './cx';
 
 /**
- * La tarjeta de sección (`sheetCard` en Flutter): superficie con filete,
+ * La tarjeta de sección: superficie con filete,
  * cabecera con ícono dorado, título en Georgia 16 y, a la derecha, lo que
  * haga falta (`trailing`: un contador, una acción).
  *

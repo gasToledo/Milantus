@@ -10,7 +10,7 @@ import { Option } from '../../ui/wizard';
 import type { NpcKind } from './npc';
 
 /**
- * «Exportar PNJ» (`ExportNpcDialog` de Flutter): qué viaja en el archivo. Se
+ * «Exportar PNJ»: qué viaja en el archivo. Se
  * abre con trasfondo y tags marcados y las notas no, porque son de las mesas
  * del DM: que salgan tiene que ser una decisión. El ZIP lo arma el servidor
  * (`GET /api/npcs/:id/export`); acá solo se espera a que lo último que se

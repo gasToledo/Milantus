@@ -11,11 +11,11 @@ import { showNotice } from '../ui/notices';
 import { AppBusyLabel } from '../ui/status';
 
 /**
- * «Importar homebrew» (`_importHomebrew` de Flutter), con vista previa. Elegir el
+ * «Importar homebrew», con vista previa. Elegir el
  * archivo abre esto: el motor lo lee y lo valida en el navegador contra el
  * catálogo fusionado (`homebrewImportCheck`), sin pedirle nada al servidor, y
  * recién «Importar» escribe algo. Si el archivo pisa entradas propias, la
- * pregunta de Flutter («¿Sobrescribir?») queda dentro del mismo diálogo: el aviso
+ * pregunta de si sobrescribir queda dentro del mismo diálogo: el aviso
  * y el botón pasan a carmesí. Un archivo inválido muestra el mensaje del motor y
  * no ofrece importar.
  *

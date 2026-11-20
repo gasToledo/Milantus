@@ -10,7 +10,7 @@ import { diceError, EconomySection, FormSection, numberError, PillGroup, TextAre
 const NONE = '__none__';
 
 /**
- * El formulario de un arma propia (`WeaponForm` de Flutter). Mismo patrón que
+ * El formulario de un arma propia. Mismo patrón que
  * `RaceForm`: el motor arma el arma y los errores (`weaponDraft`) con cada
  * cambio, y la vista previa es la ficha del Códice de armas en vivo, la misma
  * que lee el jugador (y que ya explica cada propiedad marcada). El armazón es
@@ -101,7 +101,7 @@ export function WeaponForm({
     <EntryPreview subtitle={[entry.subtitle, t.sources.homebrew].filter(Boolean).join(' · ')} name={draft.weapon.name as string} detail={detail} />
   );
 
-  // Qué significa lo tocado (`explain` de Flutter): los textos son del motor.
+  // Qué significa lo tocado: los textos son del motor.
   const explain = (key: string): Explained | null => {
     const label = (list: { id: string; label: string }[], id: string) => list.find((o) => o.id === id)?.label ?? id;
     switch (key) {

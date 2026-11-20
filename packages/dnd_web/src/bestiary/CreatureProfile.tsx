@@ -14,8 +14,7 @@ const BLOCK = READ_BLOCK;
 const PROSE = `${READ_PROSE} text-[13.5px] leading-[1.55] text-on-surface-variant`;
 
 /**
- * El perfil de una criatura, como `creatureProfileStats` y
- * `creatureProfileActions` de Flutter: encabezado, banda de cifras,
+ * El perfil de una criatura: encabezado, banda de cifras,
  * características, datos de línea, rasgos y acciones agrupadas por tipo y en
  * el orden del libro. Ninguna regla se calcula acá: el modificador es de
  * `abilityModifier`, y la iniciativa, el desafío y la percepción pasiva llegan
@@ -166,8 +165,8 @@ function Abilities({ profile }: { profile: Profile }) {
   );
 }
 
-/** Los sentidos sin la percepción pasiva, que ya tiene su placa: el patrón es
- *  el de `_sensesWithoutPassive` de Flutter, sobre el texto del catálogo. */
+/** Los sentidos sin la percepción pasiva, que ya tiene su placa: se recorta
+ *  del texto del catálogo. */
 function sensesWithoutPassive(senses: string, hasPassive: boolean): string {
   if (!hasPassive) return senses;
   return senses

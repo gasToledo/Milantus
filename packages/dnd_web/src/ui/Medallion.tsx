@@ -6,7 +6,7 @@ import { PortraitViewer } from './PortraitViewer';
 /**
  * El medallón del personaje: aro del color de su clase y, adentro, el retrato
  * si lo tiene o la inicial si no (o si el retrato no carga: uno borrado, uno de
- * otra cuenta). Es el `ClassMedallion` de Flutter.
+ * otra cuenta).
  *
  * [size] en píxeles; la inicial escala con él para que el aro y la letra
  * mantengan la proporción de la ficha (64 → 28).
@@ -22,7 +22,7 @@ export function Medallion({
   name: string;
   accent: string | null;
   size: number;
-  /** Un caído se atenúa y pierde el color, como el retrato de Flutter. */
+  /** Un caído se atenúa y pierde el color. */
   muted?: boolean;
   /** La dirección del retrato original (`portraitUrl`, `memberPortraitUrl`);
    *  el medallón pide la miniatura de su tamaño. */

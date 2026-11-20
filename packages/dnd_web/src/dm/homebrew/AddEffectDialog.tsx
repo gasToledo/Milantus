@@ -17,7 +17,7 @@ const INPUT = 'h-[38px] min-w-0 rounded-[var(--radius-input)] border bg-plaque p
 const startOf = (kind: EffectKindInfo): Values => Object.fromEntries(kind.fields.map((f) => [f.id, f.default]));
 
 /**
- * «Agregar efecto» (`_AddEffectDialog` de Flutter). El motor dice qué tipos hay,
+ * «Agregar efecto». El motor dice qué tipos hay,
  * qué campos pide cada uno y con qué opciones (`effectKinds`); el diálogo los
  * dibuja y manda el tipo con los valores a `effectBuild`, que devuelve el
  * efecto armado o el campo que falta. React no escribe el JSON de un efecto.

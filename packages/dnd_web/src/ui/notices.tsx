@@ -16,7 +16,7 @@ let nextId = 0;
 const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((l) => l());
 
-/** Muestra un aviso (`showAppMessage` de Flutter) desde cualquier lugar. */
+/** Muestra un aviso desde cualquier lugar. */
 export function showNotice(message: string, tone: ToastTone = 'success'): void {
   queue = [...queue, { id: ++nextId, message, tone }];
   emit();

@@ -6,7 +6,7 @@ import { Tooltip } from '../ui/primitives';
 import { signed } from './format';
 import { Tag } from './SpellList';
 
-/** De dónde sale cada ventaja, sin repetir (`_advantageSources` de Flutter).
+/** De dónde sale cada ventaja, sin repetir.
  *  Una fuente vacía es un rasgo sin nombre. */
 export function advantageSources(advantages: Advantage[], t: Texts): string {
   return [...new Set(advantages.map((v) => v.source || t.advantageOtherTrait))].join(', ');

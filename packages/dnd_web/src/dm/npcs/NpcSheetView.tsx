@@ -33,8 +33,8 @@ import { AppBusyLabel, AppErrorView, Notice, SaveStatusBadge } from '../../ui/st
 import { useNpcSheetWriter, type SheetNotify } from '../../sheet/writer';
 
 /**
- * La ficha completa de un PNJ con ficha de personaje (Flutter abre
- * `SheetScreen` en `npcMode`): la misma ficha que la de un jugador, que el DM
+ * La ficha completa de un PNJ con ficha de personaje: la misma ficha que la de
+ * un jugador, que el DM
  * escribe (PG, usos, descansos, inventario) por la cola de guardado de la
  * ficha propia. Sin Campaña ni Diario, que en un PNJ son su trasfondo y sus
  * notas y ya están en su ficha de la Biblioteca; sin compartir, sin regalos,
@@ -89,7 +89,7 @@ export function NpcSheetView({ npcId, tab, screen }: { npcId: string; tab: Sheet
   }, [client, npcId]);
 
   // Al salir se guarda primero y recién después se relee (la biblioteca y las
-  // campañas): releer antes traería la copia vieja. Es lo que hace Flutter.
+  // campañas): releer antes traería la copia vieja.
   useEffect(() => {
     if (!sheetId) return;
     return () => {

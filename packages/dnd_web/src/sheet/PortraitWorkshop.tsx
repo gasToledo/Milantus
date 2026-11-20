@@ -28,8 +28,8 @@ import { Select, Tooltip } from '../ui/primitives';
 import { Option, SpellTabs } from '../ui/wizard';
 import type { SheetNotify } from './writer';
 
-/** El retrato que el servidor acepta al subir: lo mismo que el `accept` de
- *  Flutter. El servidor valida el contenido de verdad (`sniffPortraitImageType`);
+/** El retrato que el servidor acepta al subir. El servidor valida el
+ *  contenido de verdad (`sniffPortraitImageType`);
  *  esto solo filtra el selector. */
 const IMPORT_ACCEPT = '.png,.jpg,.jpeg,.webp,.gif';
 
@@ -171,9 +171,8 @@ export interface PortraitOwner {
 }
 
 /**
- * El taller de retratos (`PortraitScreen` de Flutter): subir un archivo, generar
- * con IA, volver a un retrato guardado y borrarlo. Cada acción **deja la
- * pantalla abierta** y avisa: Flutter cerraba sola al terminar, y acá nada
+ * El taller de retratos: subir un archivo, generar con IA, volver a un retrato
+ * guardado y borrarlo. Cada acción **deja la pantalla abierta** y avisa: nada
  * avanza solo (ver las reglas de `diseno-web-react.md`). Lo que se escribe pasa
  * por el motor (`addPortrait`, `restorePortrait`, `removePortrait`); este
  * archivo no decide nada del orden.

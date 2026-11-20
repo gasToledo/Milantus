@@ -85,7 +85,7 @@ export function CampaignBlock({ pc, catalog, me }: { pc: PlayerCampaign; catalog
   const notes = pc.sharedNotes ?? [];
 
   // Agrupadas por el capítulo en que se pelearon, en el orden de los
-  // capítulos y de la más vieja a la más nueva (`battlesOf` en Flutter). Un
+  // capítulos y de la más vieja a la más nueva. Un
   // capítulo sin batallas no aporta un encabezado vacío; las que no caen en
   // ninguno van al final.
   // El capítulo en curso también agrupa: sus batallas no son «sin capítulo».
@@ -236,8 +236,7 @@ function BattleRow({ battle, me, catalog }: { battle: PlayerBattle; me: string; 
 
 /** «Contra 3 lobos y un ogro». Un PNJ sin criatura de base llega sin nombre:
  *  el jugador no tiene por qué saberlo, se lee «un enemigo». El nombre de una
- *  criatura del catálogo sale del catálogo, en el idioma activo
- *  (`logGroupName` en Flutter). */
+ *  criatura del catálogo sale del catálogo, en el idioma activo. */
 function battleTitle(t: Texts, monsters: NonNullable<PlayerBattle['monsters']>, catalog: Catalog): string {
   if (monsters.length === 0) return t.battleGeneric;
   const names = monsters.map((m) => {

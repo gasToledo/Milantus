@@ -17,7 +17,7 @@ import type { Texts } from '../i18n/texts';
 import type { IconTone, ToastTone } from '../ui/primitives';
 
 /**
- * Catálogo de los mensajes de aviso (`messageForEvent` de Flutter). El servidor
+ * Catálogo de los mensajes de aviso. El servidor
  * guarda **qué pasó** (`kind` y el `payload`) y esto decide **cómo se dice**:
  * corregir una redacción es cambiar una línea acá, no migrar lo guardado.
  *
@@ -157,7 +157,7 @@ function chapterCompleted(event: UserEvent, character: string, campaign: string,
   const details = [
     ...(rewards ? [{ icon: Coins, text: t.evtTakes(rewards) }] : []),
     ...(event.payload.grantsLevel === true ? [{ icon: CircleArrowUp, text: t.evtCanLevelUp }] : []),
-    // Objetos esperando en la bandeja de Inventario. Flutter no la tiene: ve los nombres.
+    // Objetos esperando en la bandeja de Inventario: el aviso manda a agregarlos ahí.
     ...(event.payload.hasGrants === true ? [{ icon: Package, text: t.evtItemsWaiting }] : []),
   ];
   const text = [t.evtChapterDone(character, chapter, campaign), ...details.map((d) => d.text)].join(' ');

@@ -30,10 +30,10 @@ import { AppDialog } from './AppDialog';
 import { cx } from './cx';
 
 /**
- * Los tutoriales (`packages/dnd_app/lib/ui/tutorials.dart`). El nombre de cada
- * uno es lo que se guarda para recordar que ya se vio, **el mismo que usa
- * Flutter**: lo visto en una versión vale para la otra, así que renombrarlo lo
- * vuelve a mostrar. `welcome` sale al entrar a la app; el resto, la primera vez
+ * Los tutoriales. El nombre de cada uno es lo que se guarda para recordar que
+ * ya se vio, **el mismo que usaba la versión anterior**: lo visto entonces
+ * sigue contando, así que renombrarlo lo vuelve a mostrar. `welcome` sale al
+ * entrar a la app; el resto, la primera vez
  * que se abre su sección. Los textos viven en `texts.ts` (`tutorials`).
  */
 export type Tutorial =
@@ -67,7 +67,8 @@ const ICONS: Record<Tutorial, LucideIcon[]> = {
 // --- Qué se vio -------------------------------------------------------------
 // Lo visto es de la cuenta (`tutorialsSeen` en los ajustes); acá queda la copia
 // local, para saber qué mostrar antes de que lleguen los ajustes y cuando no hay
-// sesión. Clave y formato de Flutter: los nombres separados por coma, o `*` si
+// sesión. Clave y formato de la versión anterior: los nombres separados por
+// coma, o `*` si
 // se eligió «Saltar todos».
 const KEY = 'milantus.tutorials';
 const ALL = '*';

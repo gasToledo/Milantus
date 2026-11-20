@@ -8,7 +8,7 @@ import { EntryPreview, ExplainHere, HomebrewFormShell, readWithLang, useHomebrew
 import { EconomySection, FormSection, numberError, SwitchRow, TextAreaField, TextField } from './homebrewFields';
 
 /**
- * El formulario de una armadura propia (`ArmorForm` de Flutter). Mismo patrón
+ * El formulario de una armadura propia. Mismo patrón
  * que `WeaponForm`: el motor arma la armadura y los errores (`armorDraft`), y
  * la vista previa es la ficha del Códice en vivo.
  *
@@ -87,7 +87,7 @@ export function ArmorForm({
     (o) => ({ value: o.id, label: o.label }),
   );
 
-  // Qué significa lo tocado (`explain` de Flutter): los textos son del motor.
+  // Qué significa lo tocado: los textos son del motor.
   const explain = (key: string): Explained | null => {
     switch (key) {
       case 'category': {

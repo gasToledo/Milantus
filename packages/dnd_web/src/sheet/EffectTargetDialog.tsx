@@ -17,8 +17,8 @@ interface Row {
 }
 
 /**
- * El arma vinculada a un rasgo (el arma de pacto): `_manageTargetChoice` de
- * Flutter, pero elegir no guarda nada; se confirma con «Vincular». Qué
+ * El arma vinculada a un rasgo (el arma de pacto). Elegir no guarda nada; se
+ * confirma con «Vincular». Qué
  * ejemplares y qué armas entran lo dice el cupo del motor
  * (`targetChoiceSlots`); lo guardado son las acciones `setEffectTarget` y
  * `createEffectTarget`, que además lo vuelven a comprobar.

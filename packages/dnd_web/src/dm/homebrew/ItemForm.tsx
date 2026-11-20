@@ -19,7 +19,7 @@ const NONE = 'none';
 const HIDDEN_KINDS = ['acBonus', 'resistance'];
 
 /**
- * El formulario de un objeto propio (`ItemForm` de Flutter). Mismo patrón que
+ * El formulario de un objeto propio. Mismo patrón que
  * `WeaponForm`: el motor arma el objeto y los errores (`itemDraft`) con cada
  * cambio, y la vista previa es la ficha del Códice —la de equipo si es mundano,
  * la de objeto mágico si tiene rareza— en vivo, la misma que lee el jugador.
@@ -108,7 +108,7 @@ export function ItemForm({
   ];
   const baseKinds = [{ value: NONE, label: t.hbNoneCap }, ...withCurrent(options.baseItemKinds, form.baseItemKind, (id) => id).filter((o) => o.value !== NONE)];
 
-  // Qué significa lo tocado (`explain` de Flutter): los textos son del motor.
+  // Qué significa lo tocado: los textos son del motor.
   const bonus = (text: string) => signed(Number.parseInt(text, 10) || 0);
   const explain = (key: string): Explained | null => {
     switch (key) {

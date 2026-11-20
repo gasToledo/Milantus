@@ -40,7 +40,7 @@ import { CATEGORY_GROUPS, codexEntries, fold, type CodexEntry } from './entries'
 import { useListFitsViewport } from './listHeight';
 import { prefersReducedMotion, softEnter } from '../ui/motion';
 
-/** Ícono por categoría (los de `CodexCategory` en Flutter, en lucide). */
+/** Ícono por categoría, en lucide. */
 export const ICONS: Record<CodexCategory, LucideIcon> = {
   glossary: Lightbulb,
   guides: MapIcon,
@@ -69,8 +69,8 @@ const TABLE_SCORES = [8, 10, 12, 14, 16, 18, 20];
 /**
  * El Códice: todo el contenido del juego para leer, sin crear un personaje ni
  * editar nada. Es de **solo lectura** a propósito: agregar algo a una ficha
- * tiene su lugar y editar contenido es Homebrew. Las criaturas no están, como
- * en Flutter: el Códice lo abre cualquier jugador y los perfiles de los
+ * tiene su lugar y editar contenido es Homebrew. Las criaturas no están: el
+ * Códice lo abre cualquier jugador y los perfiles de los
  * monstruos son del DM (el Bestiario del Modo DM).
  *
  * Portada, categoría y entrada son URLs (`/codice/conjuros/fireball`); la
@@ -95,8 +95,8 @@ export function CodexPage({ category, entryId }: { category: CodexCategory | nul
     return new Map(ALL_CATEGORIES.map((c) => [c, entries.get(c)!.filter((e) => fold(e.name).includes(needle))] as const));
   }, [entries, needle]);
 
-  // Elegir una categoría o una entrada cancela la búsqueda general, como en
-  // Flutter: pedir una categoría y seguir viendo resultados mezclados sería
+  // Elegir una categoría o una entrada cancela la búsqueda general: pedir
+  // una categoría y seguir viendo resultados mezclados sería
   // contestar otra cosa.
   useEffect(() => setQuery(''), [category, entryId]);
 

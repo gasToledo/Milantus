@@ -44,12 +44,11 @@ export type CodexCategory = keyof typeof CODEX_CATEGORIES;
 export const DM_SECTIONS = ['mesa', 'capitulos', 'cuaderno', 'pnj', 'combate'] as const;
 export type DmSection = (typeof DM_SECTIONS)[number];
 
-/** Las categorías del Códice que pueden tener homebrew, en el orden del
- *  Homebrew de Flutter (los objetos se parten en mágicos y equipo, como en el
- *  Códice). Las criaturas no son del Códice: van aparte (`creatures`). */
-/** Las pestañas de la ficha de un miembro de la Mesa: lo que sirve en combate,
- *  como `MemberSheetScreen` de Flutter. Inventario, campañas y diario son del
- *  jugador. */
+/** Las categorías del Códice que pueden tener homebrew (los objetos se parten
+ *  en mágicos y equipo, como en el Códice). Las criaturas no son del Códice:
+ *  van aparte (`creatures`). */
+/** Las pestañas de la ficha de un miembro de la Mesa: lo que sirve en combate.
+ *  Inventario, campañas y diario son del jugador. */
 /** Las pantallas de edición de la ficha de un PNJ: las mismas que las de la
  *  ficha propia, bajo `/dm/pnj/:pnj/ficha/`. */
 export type NpcSheetScreen =
@@ -61,8 +60,8 @@ export type NpcSheetScreen =
 
 export const MEMBER_SHEET_TABS = ['personaje', 'combate'] as const satisfies readonly SheetTab[];
 
-/** Las de un PNJ con ficha, como `SheetScreen` en `npcMode`: sin campañas «de
- *  jugador» ni Diario, porque su trasfondo y sus notas son de la ficha del PNJ. */
+/** Las de un PNJ con ficha: sin campañas «de jugador» ni Diario, porque su
+ *  trasfondo y sus notas son de la ficha del PNJ. */
 export const NPC_SHEET_TABS = ['personaje', 'combate', 'inventario'] as const satisfies readonly SheetTab[];
 /** `undefined` es «no es una pestaña de esa ficha»; `null`, la ruta sin sufijo. */
 const sheetTabIn = (tabs: readonly SheetTab[], segment: string | undefined): SheetTab | null | undefined =>

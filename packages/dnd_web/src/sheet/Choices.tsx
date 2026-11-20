@@ -30,12 +30,12 @@ export function useChoicesView(model: SheetModel): ChoicesView | null {
 /**
  * A dónde lleva «Resolver» cada aviso, o `null` si no hay nada que abrir.
  *
- * El mapa vive en la pantalla y no en el motor, igual que `_resolverFor` de
- * Flutter: `code` ya es el identificador estable —lo fijan los tests del
- * motor— y agregarle un campo sería un segundo identificador paralelo, con el
- * motor opinando sobre pantallas que no conoce. Un código nuevo no trae botón
+ * El mapa vive en la pantalla y no en el motor: `code` ya es el identificador
+ * estable —lo fijan los tests del motor— y agregarle un campo sería un segundo
+ * identificador paralelo, con el motor opinando sobre pantallas que no conoce.
+ * Un código nuevo no trae botón
  * hasta que se le escriba uno. Los avisos de subclase, mejora de nivel y
- * habilidades de clase tampoco lo tienen: en Flutter tampoco.
+ * habilidades de clase tampoco lo tienen.
  */
 function destinationOf(code: string, model: SheetModel, view: ChoicesView): string | null {
   const routes = model.write?.routes;
@@ -262,8 +262,8 @@ function layoutOf(v: ChoicesView, kept: Set<string>) {
   return { features, proficiencies, spells, langSlots, showOrigin, showSize, showLineage, showSpecies, feats, tabs };
 }
 
-/** Elegir lo que el motor deja elegir o revisar de la ficha propia
- *  (`_resolveFeatureChoices` y compañía, de Flutter): cada toque es una
+/** Elegir lo que el motor deja elegir o revisar de la ficha propia: cada
+ *  toque es una
  *  acción del motor que se guarda en el momento. No hay «Guardar» ni
  *  «Deshacer»: todo se revierte tocando de nuevo. Qué opciones hay, cuántas y
  *  cuáles están bloqueadas lo dice `choicesView`; acá no hay regla. */

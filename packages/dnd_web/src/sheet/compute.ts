@@ -3,8 +3,8 @@ import type { SheetModel } from './model';
 
 /**
  * El personaje sin la forma de bestia puesta. El tablero, la subida de nivel y
- * la impresión miran al personaje y no a la bestia (`print_sheet.dart` de
- * Flutter hace lo mismo): un druida transformado no sube de nivel con los PG
+ * la impresión miran al personaje y no a la bestia: un druida transformado no
+ * sube de nivel con los PG
  * del lobo ni imprime la CA del oso.
  */
 export function withoutForm(raw: CharacterJson): CharacterJson {
@@ -25,8 +25,8 @@ export function computeModel(raw: CharacterJson, catalog: Catalog): ComputedMode
     // la forma actual y la pantalla lee los mismos campos (el PG actual, los
     // espacios gastados) sin conocer esquemas viejos.
     const migrated = migrateCharacter(raw);
-    // El motor de Dart compilado a JS, el mismo que usan el servidor y
-    // Flutter: acá no se recalcula ninguna regla.
+    // El motor de Dart compilado a JS, el mismo que usa el servidor: acá no
+    // se recalcula ninguna regla.
     const sheet = computeSheet(migrated, catalog);
     // `CharacterFields` es el subconjunto que la pantalla lee de un
     // `Character.toJson` que el servidor ya validó al guardarlo.

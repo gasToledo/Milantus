@@ -11,8 +11,7 @@ import { advantageSources } from './rows';
 import { SKILL_ABILITY } from './vocabulary';
 
 /**
- * De dónde sale una cifra de la ficha (`_showAbilityBreakdown` y
- * `_showInitiativeBreakdown` de Flutter): cada renglón es lo que ya trae
+ * De dónde sale una cifra de la ficha: cada renglón es lo que ya trae
  * `sheet`, y el diálogo no suma nada. Nació de una pregunta de mesa («¿por qué
  * Inteligencia da +7?»): el resultado estaba y el camino no. Es de lectura, así
  * que se abre también en la ficha ajena.

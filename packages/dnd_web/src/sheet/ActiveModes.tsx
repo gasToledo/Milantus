@@ -10,9 +10,9 @@ import { resourceLeft, type SheetModel } from './model';
 import { ABILITIES } from './vocabulary';
 
 /**
- * Lo que el estado activo le suma a la ficha, dicho en una línea
- * (`_activeModeSummary` de Flutter): las resistencias que trajo, el daño, las
- * ventajas. Todo sale del `ActiveMode` que arma el motor; acá no se deduce.
+ * Lo que el estado activo le suma a la ficha, dicho en una línea: las
+ * resistencias que trajo, el daño, las ventajas. Todo sale del `ActiveMode`
+ * que arma el motor; acá no se deduce.
  */
 function summaryOf(t: ReturnType<typeof useTexts>, m: ActiveMode): string {
   const types = m.resistances.map((r) => labelOf(t.damageTypes, r).toLowerCase());

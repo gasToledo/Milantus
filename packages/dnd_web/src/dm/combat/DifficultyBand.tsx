@@ -21,8 +21,8 @@ function tierLabel(t: Texts, tier: string): string {
 }
 
 /**
- * Qué tan difícil es el combate que se está armando (`EncounterDifficultyBand`
- * de Flutter). Va sobre `plaque`, como la barra de arriba: es un dato que la app
+ * Qué tan difícil es el combate que se está armando. Va sobre `plaque`, como
+ * la barra de arriba: es un dato que la app
  * calculó, no algo que el DM edite. Solo «Extrema» cambia de color; las otras
  * tres son dificultades que el DM elige a propósito y ninguna es una alarma.
  * **No calcula nada**: todo número sale de `encounterDetails`.

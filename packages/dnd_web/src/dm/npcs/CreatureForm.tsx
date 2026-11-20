@@ -210,7 +210,7 @@ export function CreatureForm({
     ...options.types.map((o) => ({ value: o.id, label: o.label })),
   ];
 
-  // Qué significa lo tocado (`explain` de Flutter): los textos son del motor.
+  // Qué significa lo tocado: los textos son del motor.
   // Claves: `type`, `size`, `hitDice`, `cr` y, por acción, `action:<índice>:bonus|kind|damageType`.
   const explain = (key: string): Explained | null => {
     switch (key) {
