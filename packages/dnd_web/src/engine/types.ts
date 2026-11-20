@@ -1051,3 +1051,24 @@ export interface QuizProgress {
   n: number;
   dice?: string | null;
 }
+
+/** Una tarjeta del repaso (`QuizCardState` del motor). La caja no se muestra. */
+export interface QuizCardState {
+  box: number;
+  lastRound: number;
+  correct: number;
+  wrong: number;
+}
+
+/** Lo que queda en el dispositivo entre rondas (`QuizHistory` del motor). */
+export interface QuizHistory {
+  version: number;
+  round: number;
+  cards: Record<string, QuizCardState>;
+}
+
+/** Una respuesta ya cerrada (`QuizAnswer` del motor). `cardId` es `key`. */
+export interface QuizAnswer {
+  cardId: string;
+  correct: boolean;
+}

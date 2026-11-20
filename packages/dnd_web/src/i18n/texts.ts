@@ -112,7 +112,15 @@ const es = {
   quizPickOther: 'Elegir otro',
   quizLeave: 'Abandonar',
   quizLeaveTitle: '¿Abandonar la ronda?',
-  quizLeaveBody: 'Se pierde lo que respondiste hasta ahora.',
+  quizLeaveBody: 'Lo que ya respondiste queda guardado para las próximas rondas. Se pierde el puntaje de esta ronda.',
+  quizResetProgress: 'Borrar el progreso',
+  quizResetTitle: '¿Borrar el progreso del Quiz?',
+  quizResetBody: 'Las próximas rondas vuelven a elegir las preguntas al azar, como si no hubieras respondido ninguna.',
+  quizResetConfirm: 'Borrar',
+  quizDueHint: (n: number) =>
+    n === 1
+      ? 'En la próxima ronda va a aparecer primero 1 pregunta para repasar.'
+      : `En la próxima ronda van a aparecer primero ${n} preguntas para repasar.`,
   quizKeepPlaying: 'Seguir jugando',
   quizLeaveSummary: (n: number, ok: number) => `${n} ${n === 1 ? 'respondida' : 'respondidas'} · ${ok} ${ok === 1 ? 'correcta' : 'correctas'}`,
   quizRight: '¡Correcto!',
@@ -255,7 +263,7 @@ const es = {
     ],
     quiz: [
       { title: 'Poné a prueba lo que sabés', body: 'Elegí uno de tus personajes y respondé hasta diez preguntas sobre sus rasgos de clase y de especie, su trasfondo y sus conjuros. Con «Reglas generales» repasás lo que vale para cualquiera: estados, habilidades, armas y armaduras.' },
-      { title: 'Sin apuro ni puntaje guardado', body: 'Cada pregunta te muestra la respuesta correcta antes de seguir, y al final tenés la lista de lo que conviene repasar. No se guarda nada: cada ronda es nueva, así que jugá las que quieras.' },
+      { title: 'Sin apuro ni puntaje guardado', body: 'Cada pregunta te muestra la respuesta correcta antes de seguir, y al final tenés la lista de lo que conviene repasar. El progreso queda en este dispositivo y lo podés borrar.' },
     ],
   },
   settingsLanguage: 'Idioma',
@@ -2756,7 +2764,15 @@ const en: Texts = {
   quizPickOther: 'Pick another',
   quizLeave: 'Leave',
   quizLeaveTitle: 'Leave the round?',
-  quizLeaveBody: 'Your answers so far will be lost.',
+  quizLeaveBody: 'What you’ve already answered is kept for upcoming rounds. This round’s score is lost.',
+  quizResetProgress: 'Clear progress',
+  quizResetTitle: 'Clear Quiz progress?',
+  quizResetBody: 'Upcoming rounds will pick questions at random again, as if you hadn’t answered any.',
+  quizResetConfirm: 'Clear',
+  quizDueHint: (n: number) =>
+    n === 1
+      ? 'The next round will show 1 question to review first.'
+      : `The next round will show ${n} questions to review first.`,
   quizKeepPlaying: 'Keep playing',
   quizLeaveSummary: (n: number, ok: number) => `${n} answered · ${ok} correct`,
   quizRight: 'Correct!',
@@ -2899,7 +2915,7 @@ const en: Texts = {
     ],
     quiz: [
       { title: 'Test what you know', body: 'Pick one of your characters and answer up to ten questions about their class and species features, their background and their spells. With “General rules” you review what applies to everyone: conditions, skills, weapons and armor.' },
-      { title: 'No rush, no saved score', body: 'Each question shows you the right answer before you move on, and at the end you get a list of what to review. Nothing is saved: every round is new, so play as many as you like.' },
+      { title: 'No rush, no saved score', body: 'Each question shows you the right answer before you move on, and at the end you get a list of what to review. Progress is kept on this device, and you can clear it.' },
     ],
   },
   settingsLanguage: 'Language',

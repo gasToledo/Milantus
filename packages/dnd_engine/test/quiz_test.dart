@@ -797,4 +797,270 @@ void main() {
     expect(movidas['tree-stride']!.options[movidas['tree-stride']!.answer],
         '500 pies');
   });
+
+  group('el repaso del Quiz', () {
+    QuizCardState caja(int box, int lastRound,
+            {int correct = 0, int wrong = 0}) =>
+        QuizCardState(
+          box: box,
+          lastRound: lastRound,
+          correct: correct,
+          wrong: wrong,
+        );
+
+    Character mago(int level) {
+      final c = personaje(
+        fuente.characterClass('wizard')!,
+        level,
+        'human',
+        'sage',
+      );
+      return c.copyWith(spellIds: [...c.spellIds, 'misty-step']);
+    }
+
+    test('la primera respuesta entra en la caja 1 y después se aplica', () {
+      const inicial = QuizHistory(round: 4);
+      final acierto = quizRecordAnswers(inicial, const [
+        QuizAnswer(cardId: 'weapon:dagger:weaponDamage', correct: true),
+      ]);
+      final tarjeta = acierto.cards['weapon:dagger:weaponDamage']!;
+      expect(tarjeta.box, 2);
+      expect(tarjeta.lastRound, 4);
+      expect(tarjeta.correct, 1);
+      expect(tarjeta.wrong, 0);
+      // El resto del historial no se toca, y la ronda no avanza acá.
+      expect(acierto.round, 4);
+      expect(inicial.cards, isEmpty);
+
+      final error = quizRecordAnswers(inicial, const [
+        QuizAnswer(cardId: 'weapon:dagger:weaponMastery', correct: false),
+      ]);
+      expect(error.cards['weapon:dagger:weaponMastery']!.box, 1);
+      expect(error.cards['weapon:dagger:weaponMastery']!.wrong, 1);
+
+      final alta = QuizHistory(
+        round: 6,
+        cards: {'x': caja(4, 1, correct: 3)},
+      );
+      final sube = quizRecordAnswers(alta, const [
+        QuizAnswer(cardId: 'x', correct: true),
+      ]);
+      expect(sube.cards['x']!.box, 5);
+      expect(sube.cards['x']!.correct, 4);
+      final tope = quizRecordAnswers(sube, const [
+        QuizAnswer(cardId: 'x', correct: true),
+      ]);
+      expect(tope.cards['x']!.box, 5);
+      expect(tope.cards['x']!.correct, 5);
+      expect(tope.cards['x']!.lastRound, 6);
+      final cae = quizRecordAnswers(tope, const [
+        QuizAnswer(cardId: 'x', correct: false),
+      ]);
+      expect(cae.cards['x']!.box, 1);
+      expect(cae.cards['x']!.wrong, 1);
+      expect(cae.cards['x']!.correct, 5);
+    });
+
+    test('la caja 2 de la ronda 1 vence en la 3, no en la 2, y sale primera',
+        () {
+      final c = mago(5);
+      final clave = quizRound(c, repo, seed: 1).first.key;
+      final tarjeta = caja(2, 1, correct: 1);
+      final enDos = quizRound(
+        c,
+        repo,
+        seed: 4,
+        history: QuizHistory(round: 2, cards: {clave: tarjeta}),
+      );
+      expect(enDos.map((q) => q.key), isNot(contains(clave)));
+      final enTres = quizRound(
+        c,
+        repo,
+        seed: 4,
+        history: QuizHistory(round: 3, cards: {clave: tarjeta}),
+      );
+      expect(enTres.first.key, clave);
+    });
+
+    test('la misma semilla y el mismo historial dan la misma ronda', () async {
+      final en = await ContentRepository.loadFromDirectory(
+        'lib/assets/srd_2024',
+        translation: 'en',
+      );
+      addTearDown(() => ContentLanguage.current = ContentLanguage.es);
+      String firma(QuizQuestion q) =>
+          '${q.kind.name}|${q.key}|${q.answer}|${q.optionIds.join(',')}';
+
+      // Una ronda ya armada se reescribe al cambiar de idioma: no se vuelve a
+      // sortear. El texto traducido puede dejar afuera un candidato (la cita
+      // nombra otro nombre) y eso movería el azar si se armara de nuevo.
+      final c = mago(5);
+      final clave = quizRound(c, repo, seed: 2).first.key;
+      final history = QuizHistory(
+        round: 3,
+        cards: {clave: caja(1, 0, wrong: 1)},
+      );
+      final es = quizRound(c, repo, seed: 8, history: history);
+      expect(
+        quizRound(c, repo, seed: 8, history: history).map(firma).toList(),
+        es.map(firma).toList(),
+      );
+      ContentLanguage.current = ContentLanguage.en;
+      expect(
+        quizLocalize([for (final q in es) q.toJson()], en).map(firma).toList(),
+        es.map(firma).toList(),
+      );
+      final enRonda = quizRound(c, en, seed: 8, history: history);
+      expect(
+        quizRound(c, en, seed: 8, history: history).map(firma).toList(),
+        enRonda.map(firma).toList(),
+      );
+      ContentLanguage.current = ContentLanguage.es;
+    });
+
+    test('con historial no se repite el tema y sigue el techo', () {
+      final c = mago(5);
+      final muestra = quizRound(c, repo, seed: 1, count: 40);
+      final history = QuizHistory(
+        round: 5,
+        cards: {
+          for (final q in muestra) q.key: caja(1, 0, wrong: 1),
+        },
+      );
+      final ronda = quizRound(c, repo, seed: 6, history: history);
+      verificarRonda(ronda, c);
+      expect(ronda.first.key, isIn(history.cards.keys));
+    });
+
+    test('sin historial la ronda llega a diez y es la de un historial vacío',
+        () {
+      final reglas = quizRound(null, repo, seed: 7);
+      expect(reglas, hasLength(10));
+      expect(
+        quizRound(null, repo, seed: 7).map((q) => q.toJson()).toList(),
+        reglas.map((q) => q.toJson()).toList(),
+      );
+      final c = mago(5);
+      final sin = quizRound(c, repo, seed: 9);
+      expect(sin, hasLength(10));
+      expect(
+        quizRound(c, repo, seed: 9, history: QuizHistory.empty)
+            .map((q) => q.toJson())
+            .toList(),
+        sin.map((q) => q.toJson()).toList(),
+      );
+      final huerfano = QuizHistory(
+        round: 4,
+        cards: {'nadie': caja(1, 0, wrong: 1)},
+      );
+      expect(
+        quizRound(c, repo, seed: 9, history: huerfano)
+            .map((q) => q.toJson())
+            .toList(),
+        sin.map((q) => q.toJson()).toList(),
+      );
+    });
+
+    test(
+      'un mago de nivel 20 sigue viendo la distancia y el dado, sin que se los lleven',
+      () {
+        final c = mago(20);
+        var distancia = 0;
+        var dado = 0;
+        const n = 2000;
+        for (var seed = 0; seed < n; seed++) {
+          for (final q in quizRound(c, repo, seed: seed)) {
+            if (q.kind == QuizKind.spellMoveDistance) distancia++;
+            if (q.kind == QuizKind.hitDie) dado++;
+          }
+        }
+        expect(distancia / n, greaterThan(0.10));
+        expect(distancia / n, lessThan(0.70));
+        expect(dado / n, greaterThan(0.10));
+        expect(dado / n, lessThan(0.70));
+      },
+      timeout: const Timeout(Duration(minutes: 3)),
+    );
+
+    test('una clave que el mazo no tiene se ignora y no se borra', () {
+      final c = mago(5);
+      final history = QuizHistory(
+        round: 2,
+        cards: {'ya-no-esta': caja(3, 0, correct: 2)},
+      );
+      final ronda = quizRound(c, repo, seed: 3, history: history);
+      expect(ronda, isNotEmpty);
+      final despues = quizRecordAnswers(history, [
+        QuizAnswer(cardId: ronda.first.key, correct: true),
+      ]);
+      expect(despues.cards['ya-no-esta']!.box, 3);
+      expect(despues.cards['ya-no-esta']!.correct, 2);
+      expect(despues.cards.containsKey(ronda.first.key), isTrue);
+    });
+
+    test('el daño y la maestría de la misma arma no comparten clave', () {
+      final porArma = <String, Set<QuizKind>>{};
+      for (var seed = 1; seed <= 12; seed++) {
+        for (final q in quizRound(null, repo, seed: seed, count: 80)) {
+          if (q.kind == QuizKind.weaponDamage ||
+              q.kind == QuizKind.weaponMastery) {
+            expect(q.key, quizCardId(q.kind, 'weapon:${q.subjectId}'));
+            porArma.putIfAbsent(q.subjectId!, () => {}).add(q.kind);
+          }
+          if (q.kind == QuizKind.armorAc || q.kind == QuizKind.armorCategory) {
+            expect(q.key, quizCardId(q.kind, 'armor:${q.subjectId}'));
+          }
+        }
+      }
+      final ambas = porArma.entries.where((e) => e.value.length == 2);
+      expect(ambas, isNotEmpty);
+      final arma = ambas.first.key;
+      expect(
+        quizCardId(QuizKind.weaponDamage, 'weapon:$arma'),
+        isNot(quizCardId(QuizKind.weaponMastery, 'weapon:$arma')),
+      );
+      final c = mago(5);
+      final rasgos = quizRound(c, repo, seed: 1, count: 80);
+      expect(
+        rasgos.where(
+          (q) =>
+              q.kind == QuizKind.classFeatureByText ||
+              q.kind == QuizKind.classFeatureLevel,
+        ),
+        isNotEmpty,
+      );
+      for (final q in rasgos) {
+        if (q.kind == QuizKind.classFeatureByText ||
+            q.kind == QuizKind.classFeatureLevel) {
+          expect(q.key, endsWith(':${q.kind.name}'));
+          expect(q.key, startsWith('feature:'));
+        }
+      }
+    });
+
+    test('un JSON inválido o de otra versión es un historial vacío', () {
+      expect(QuizHistory.fromJson(null).toJson(), QuizHistory.empty.toJson());
+      expect(QuizHistory.fromJson('no').cards, isEmpty);
+      expect(QuizHistory.fromJson(['x']).round, 0);
+      expect(
+        QuizHistory.fromJson({'version': 2, 'round': 9, 'cards': {}}).round,
+        0,
+      );
+      expect(
+          QuizHistory.fromJson({'version': '1', 'round': 1, 'cards': {}}).cards,
+          isEmpty);
+      final roto = QuizHistory.fromJson({
+        'version': 1,
+        'round': 3,
+        'cards': {
+          'ok': {'box': 2, 'lastRound': 1, 'correct': 1, 'wrong': 0},
+          'mal': {'box': 9, 'lastRound': 1, 'correct': 0, 'wrong': 1},
+        },
+      });
+      expect(roto.round, 3);
+      expect(roto.cards.keys, ['ok']);
+      expect(roto.cards['ok']!.box, 2);
+      expect(roto.toJson(), QuizHistory.fromJson(roto.toJson()).toJson());
+    });
+  });
 }

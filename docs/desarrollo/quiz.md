@@ -97,7 +97,18 @@ al sumar el tipo y al jugar).
 - **El sorteo reparte por tema, no por tipo.** Primero elige el tema (Clase,
   Especie, Trasfondo, Conjuros, Equipo, Reglas) y después el tipo, sin repetir
   el tema de la pregunta anterior si hay otro disponible. Si no, gana el tema
-  que tiene más tipos. *Test:* Equipo no pasa de 6 en Reglas generales.
+  que tiene más tipos. Dentro del tema, el tipo pesa la raíz de cuántas
+  preguntas suyas todavía entran en la ronda (el techo y la clave de tema): un
+  tipo con más preguntas sale más, sin que uno de cientos se lleve la ronda.
+  *Test:* Equipo no pasa de 6 en Reglas generales.
+- **La clave de la pregunta distingue el tipo.** La del candidato es el tema
+  (`weapon:dagger`), para no repetirlo. La de la pregunta suma el tipo
+  (`weapon:dagger:weaponDamage`): el historial no mezcla el daño con la
+  maestría. *Test.*
+- **Con historial, primero lo que toca repasar**, después lo que no se
+  respondió y al final lo que todavía no vence. Si lo vencido llena la ronda
+  y queda algo nuevo, se reservan dos lugares. Sin historial, o si nada de lo
+  guardado está en estos mazos, el sorteo es el de siempre. *Test.*
 - **Se mezclan los formatos:** por nombre («¿qué escuela es X?»), por texto
   («¿qué rasgo se describe acá?») y al revés («¿cuál de estos…?»). Un tema que
   tiene un solo formato se nota a la tercera pregunta. *Revisión.*

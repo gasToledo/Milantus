@@ -13,6 +13,7 @@ import '../domain/skill.dart';
 import '../domain/weapon_mastery.dart';
 import '../domain/weapon_properties.dart';
 import 'character_compiler.dart';
+import 'quiz_history.dart';
 
 /// Tipos de pregunta del Quiz. El nombre (`name`) es lo que viaja a la UI,
 /// que arma el enunciado con una plantilla por tipo. Un tipo nuevo cumple el
@@ -49,6 +50,13 @@ enum QuizKind {
   const QuizKind(this.topic);
   final QuizTopic topic;
 }
+
+/// Identidad de una tarjeta: el tema más el tipo.
+///
+/// El tema solo (`weapon:dagger`) se comparte entre preguntas para que el
+/// mismo objeto no salga dos veces en la ronda. La tarjeta no puede
+/// compartirse: el daño y la maestría de esa daga se repasan por separado.
+String quizCardId(QuizKind kind, String key) => '$key:${kind.name}';
 
 /// El chip de la pregunta. `class` es palabra reservada: el id que viaja es
 /// `class` (ver [wire]).
@@ -195,12 +203,19 @@ class QuizProgress {
 /// descartaría otros conjuros que la de español.
 const _maxOptionLength = 40;
 
-/// Una pregunta posible: su tema (para no repetirlo en la ronda) y cómo
-/// armarla. Armar puede fallar (`null`) si no hay opciones distintas.
+/// Una pregunta posible. [key] es el tema (el mismo objeto no se repite en la
+/// ronda, sea cual sea el tipo). [cardId] es la clave de la pregunta, la que
+/// guarda el historial: cuando el tema se comparte, suma el tipo.
+///
+/// Armar puede fallar (`null`) si no hay opciones distintas.
 class _Candidate {
   final String key;
+  final String cardId;
   final QuizQuestion? Function(Random rng) build;
-  const _Candidate(this.key, this.build);
+
+  const _Candidate(String key, this.build, {String? cardId})
+      : key = key,
+        cardId = cardId ?? key;
 }
 
 /// Una opción antes de traducirse: el [id] no depende del idioma y el
@@ -215,20 +230,35 @@ class _Choice {
 /// Arma una ronda de [count] preguntas. Sin [character], de reglas generales.
 /// La misma [seed] da la misma ronda: todo el azar sale de un `Random(seed)`,
 /// los recorridos van por id (no por el nombre traducido) y las opciones se
-/// eligen por id antes de escribir el rótulo.
+/// eligen por id antes de escribir el rótulo. Con el mismo [history], también:
+/// partir los mazos no consume azar.
 ///
 /// No repite tema (el mismo rasgo o conjuro no sale dos veces) ni la misma
 /// respuesta en un mismo tipo, y mezcla los tipos: hasta 3 del mismo, salvo
 /// que haya pocos tipos y no alcancen para llegar a [count].
 ///
-/// El sorteo elige primero el tema del chip y después el tipo: si sorteara
-/// parejo por tipo, Equipo (seis de los ocho tipos de Reglas generales) se
-/// quedaba con tres de cada cuatro preguntas.
+/// El sorteo elige primero el tema del chip y después el tipo. El tema sigue
+/// parejo: si se sorteara parejo por tipo, Equipo (seis de los ocho tipos de
+/// Reglas generales) se quedaba con tres de cada cuatro preguntas. El tipo, en
+/// cambio, pesa la raíz de cuántas de sus preguntas todavía entran en la
+/// ronda. Parejo, el dado de golpe o la distancia de un conjuro salían tan
+/// seguido como un tipo con cientos de candidatos; contar esos cientos los
+/// hacía desaparecer, porque el techo y la clave de tema no dejan preguntar
+/// más que unas pocas.
+///
+/// Con [history], cada mazo se parte en lo que ya toca repasar, lo que nunca
+/// se respondió y lo que todavía no vence (eso, lo más próximo primero). Se
+/// llena en ese orden. Si lo vencido alcanza para la ronda y queda algo nuevo,
+/// se reservan dos lugares: si no, una ronda podía no traer nada que no se
+/// hubiera visto. Sin historial, o si ninguna tarjeta cae en estos mazos, el
+/// sorteo es el de siempre. Una clave del historial que no está en los mazos
+/// no se sortea y no se borra.
 List<QuizQuestion> quizRound(
   Character? character,
   ContentRepository repo, {
   required int seed,
   int count = 10,
+  QuizHistory? history,
 }) {
   final rng = Random(seed);
   final pools = <QuizKind, List<_Candidate>>{};
@@ -247,6 +277,100 @@ List<QuizQuestion> quizRound(
   final topicCap =
       (count / {for (final k in pools.keys) k.topic}.length).ceil();
 
+  // Todo nuevo es el mismo sorteo que sin historial: partir los mazos y
+  // volver a juntarlos consumiría otro orden. Una clave huérfana tampoco
+  // cuenta, porque no hay candidato que la lleve.
+  if (history == null || !_historyTouches(history, pools)) {
+    return _draw(pools, rng, count, cap, topicCap).out;
+  }
+
+  final due = <QuizKind, List<_Candidate>>{};
+  final fresh = <QuizKind, List<_Candidate>>{};
+  final later = <QuizKind, List<_Candidate>>{};
+  for (final entry in pools.entries) {
+    final split = _splitPool(entry.value, history);
+    if (split.due.isNotEmpty) due[entry.key] = split.due;
+    if (split.fresh.isNotEmpty) fresh[entry.key] = split.fresh;
+    if (split.later.isNotEmpty) later[entry.key] = split.later;
+  }
+
+  final dueCount = due.values.fold<int>(0, (n, list) => n + list.length);
+  // Dos lugares para lo que no se vio, solo cuando lo vencido llenaría la
+  // ronda sola. Si no hay nada nuevo, no se reserva un hueco vacío.
+  final dueLimit =
+      dueCount >= count && fresh.isNotEmpty ? max(0, count - 2) : count;
+  final state = _draw(due, rng, dueLimit, cap, topicCap);
+  if (state.out.length < count) {
+    _drawInto(fresh, rng, state, count, cap, topicCap);
+  }
+  if (state.out.length < count) {
+    _drawInto(later, rng, state, count, cap, topicCap);
+  }
+  return state.out;
+}
+
+/// Rondas que tienen que pasar desde la última respuesta. La caja 1 vuelve en
+/// la siguiente; cada acierto duplica la espera.
+int _quizInterval(int box) => switch (box) {
+      1 => 1,
+      2 => 2,
+      3 => 4,
+      4 => 8,
+      5 => 16,
+      _ => 16,
+    };
+
+bool _isDue(QuizHistory history, QuizCardState state) =>
+    history.round - state.lastRound >= _quizInterval(state.box);
+
+bool _historyTouches(
+  QuizHistory history,
+  Map<QuizKind, List<_Candidate>> pools,
+) {
+  if (history.cards.isEmpty) return false;
+  for (final list in pools.values) {
+    for (final candidate in list) {
+      if (history.cards.containsKey(candidate.cardId)) return true;
+    }
+  }
+  return false;
+}
+
+({List<_Candidate> due, List<_Candidate> fresh, List<_Candidate> later})
+    _splitPool(List<_Candidate> pool, QuizHistory history) {
+  final due = <_Candidate>[];
+  final fresh = <_Candidate>[];
+  // `until` es cuántas rondas faltan; `index` desempata con el orden ya
+  // barajado, porque el sort de Dart no es estable.
+  final waiting = <({_Candidate c, int until, int index})>[];
+  for (var i = 0; i < pool.length; i++) {
+    final candidate = pool[i];
+    final state = history.cards[candidate.cardId];
+    if (state == null) {
+      fresh.add(candidate);
+    } else if (_isDue(history, state)) {
+      due.add(candidate);
+    } else {
+      final until =
+          _quizInterval(state.box) - (history.round - state.lastRound);
+      waiting.add((c: candidate, until: until, index: i));
+    }
+  }
+  // `removeLast` saca el último: lo que vence antes queda al final, y entre
+  // iguales gana el que el barajado había dejado más atrás.
+  waiting.sort((a, b) {
+    final byUntil = b.until.compareTo(a.until);
+    if (byUntil != 0) return byUntil;
+    return a.index.compareTo(b.index);
+  });
+  return (
+    due: due,
+    fresh: fresh,
+    later: [for (final item in waiting) item.c],
+  );
+}
+
+class _Draw {
   final used = <String>{};
   final answers = <String>{};
   final taken = <QuizKind, int>{};
@@ -254,45 +378,125 @@ List<QuizQuestion> quizRound(
   var easyTaken = false;
   QuizTopic? last;
   final out = <QuizQuestion>[];
-  while (out.length < count) {
+}
+
+_Draw _draw(
+  Map<QuizKind, List<_Candidate>> pools,
+  Random rng,
+  int count,
+  int cap,
+  int topicCap,
+) {
+  final state = _Draw();
+  _drawInto(pools, rng, state, count, cap, topicCap);
+  return state;
+}
+
+void _drawInto(
+  Map<QuizKind, List<_Candidate>> pools,
+  Random rng,
+  _Draw state,
+  int limit,
+  int cap,
+  int topicCap,
+) {
+  while (state.out.length < limit) {
     final open = [
       for (final e in pools.entries)
         if (e.value.isNotEmpty &&
-            (taken[e.key] ?? 0) < cap &&
-            !(easyTaken && _easy.contains(e.key)))
+            (state.taken[e.key] ?? 0) < cap &&
+            !(state.easyTaken && _easy.contains(e.key)))
           e.key,
     ];
     if (open.isEmpty) break;
     // Dos por tipo y el tema repartido son preferencias, no reglas: si
-    // dejarlos afuera corta la ronda antes de [count], se ignoran.
+    // dejarlos afuera corta la ronda antes del límite, se ignoran.
     final balanced = [
       for (final k in open)
-        if ((taken[k] ?? 0) < 2 && (byTopic[k.topic] ?? 0) < topicCap) k,
+        if ((state.taken[k] ?? 0) < 2 &&
+            (state.byTopic[k.topic] ?? 0) < topicCap)
+          k,
     ];
     final pick = balanced.isEmpty ? open : balanced;
+    // Primero el tema, parejo: si se sorteara por tipo, Equipo se quedaba con
+    // la ronda de reglas. El tema de la pregunta anterior se saltea si hay
+    // otro. El tipo, dentro del tema, pesa la raíz de cuántas preguntas suyas
+    // todavía entran.
     final topics = {for (final k in pick) k.topic}.toList();
-    if (topics.length > 1) topics.remove(last);
+    if (topics.length > 1) topics.remove(state.last);
     final topic = topics[rng.nextInt(topics.length)];
     final kinds = [
       for (final k in pick)
         if (k.topic == topic) k,
     ];
-    final kind = kinds[rng.nextInt(kinds.length)];
+    final kind = _weightedKind(kinds, pools, state, cap, rng);
     final cand = pools[kind]!.removeLast();
-    if (used.contains(cand.key)) continue;
+    if (state.used.contains(cand.key)) continue;
     final q = cand.build(rng);
     if (q == null) continue;
     // «Conjuración» dos veces, o «nivel 1» para dos rasgos, se contesta la
     // segunda por descarte.
-    if (!answers.add('${kind.name}:${q.optionIds[q.answer]}')) continue;
-    used.add(cand.key);
-    taken[kind] = (taken[kind] ?? 0) + 1;
-    byTopic[kind.topic] = (byTopic[kind.topic] ?? 0) + 1;
-    if (_easy.contains(kind)) easyTaken = true;
-    last = kind.topic;
-    out.add(q);
+    if (!state.answers.add('${kind.name}:${q.optionIds[q.answer]}')) continue;
+    state.used.add(cand.key);
+    state.taken[kind] = (state.taken[kind] ?? 0) + 1;
+    state.byTopic[kind.topic] = (state.byTopic[kind.topic] ?? 0) + 1;
+    if (_easy.contains(kind)) state.easyTaken = true;
+    state.last = kind.topic;
+    state.out.add(q);
   }
-  return out;
+}
+
+/// Cuántas preguntas de [kind] todavía pueden entrar en la ronda.
+///
+/// No se cuentan las copias que la clave de tema descarta (la lista de la
+/// clase son cientos de candidatos y una sola pregunta) ni las que pasarían
+/// el techo del tipo: pesarlas hundía el dado de golpe y la distancia de un
+/// conjuro, que tienen una o dos.
+int _askable(
+  QuizKind kind,
+  List<_Candidate> pool,
+  _Draw state,
+  int cap,
+) {
+  final room = cap - (state.taken[kind] ?? 0);
+  if (room <= 0) return 0;
+  final seen = <String>{};
+  var n = 0;
+  for (final candidate in pool) {
+    if (state.used.contains(candidate.key) || !seen.add(candidate.key)) {
+      continue;
+    }
+    n++;
+    if (n >= room) return n;
+  }
+  return n;
+}
+
+/// El tipo dentro del tema, con peso `sqrt` de [_askable]. Una pregunta pesa
+/// 1; las que llenan el techo pesan su raíz, no el tamaño del catálogo. El
+/// último tipo se queda con el resto del redondeo.
+QuizKind _weightedKind(
+  List<QuizKind> kinds,
+  Map<QuizKind, List<_Candidate>> pools,
+  _Draw state,
+  int cap,
+  Random rng,
+) {
+  var total = 0.0;
+  final weights = <double>[];
+  for (final kind in kinds) {
+    final n = _askable(kind, pools[kind]!, state, cap);
+    final weight = n <= 0 ? 0.0 : sqrt(n);
+    weights.add(weight);
+    total += weight;
+  }
+  if (total == 0) return kinds[rng.nextInt(kinds.length)];
+  var roll = rng.nextDouble() * total;
+  for (var i = 0; i < kinds.length; i++) {
+    roll -= weights[i];
+    if (roll < 0) return kinds[i];
+  }
+  return kinds.last;
 }
 
 /// Se contestan casi sin pensar (Acrobacias → Destreza, el dado de golpe, las
@@ -680,28 +884,32 @@ void _generalPools(
     for (final id in categories) _Choice(id, armorTrainingLabel(id)),
   ];
   for (final a in armor) {
+    final topic = 'armor:${a.id}';
+    final acCard = quizCardId(QuizKind.armorAc, topic);
     pool(QuizKind.armorAc).add(
       _Candidate(
-        'armor:${a.id}',
+        topic,
         (rng) => _question(
           numeric: true,
           QuizKind.armorAc,
-          'armor:${a.id}',
+          acCard,
           _acId(a),
           acs,
           rng,
           subject: a.name,
           subjectId: a.id,
         ),
+        cardId: acCard,
       ),
     );
     if (!categories.contains(a.category)) continue;
+    final categoryCard = quizCardId(QuizKind.armorCategory, topic);
     pool(QuizKind.armorCategory).add(
       _Candidate(
-        'armor:${a.id}',
+        topic,
         (rng) => _question(
           QuizKind.armorCategory,
-          'armor:${a.id}',
+          categoryCard,
           a.category,
           categoryChoices,
           rng,
@@ -709,6 +917,7 @@ void _generalPools(
           subject: a.name,
           subjectId: a.id,
         ),
+        cardId: categoryCard,
       ),
     );
   }
@@ -719,8 +928,9 @@ void _generalPools(
 
 /// Maestría y daño de las armas que cumplen [include]. Los distractores de
 /// daño salen de todas las armas del catálogo, no solo de esas: con las de un
-/// pícaro no alcanzan para cuatro opciones distintas. Un arma o una armadura
-/// sale una sola vez por ronda, sea cual sea la pregunta: la clave es la misma.
+/// pícaro no alcanzan para cuatro opciones distintas. Un arma sale una sola
+/// vez por ronda, sea cual sea la pregunta: la clave del candidato es el tema.
+/// La de la pregunta suma el tipo, para que el historial no las confunda.
 void _weapons(
   ContentRepository repo,
   List<_Candidate> Function(QuizKind) pool,
@@ -750,18 +960,21 @@ void _weapons(
     if (withMastery &&
         mastery != null &&
         weaponMasteries.containsKey(mastery)) {
+      final topic = 'weapon:${w.id}';
+      final card = quizCardId(QuizKind.weaponMastery, topic);
       pool(QuizKind.weaponMastery).add(
         _Candidate(
-          'weapon:${w.id}',
+          topic,
           (rng) => _question(
             QuizKind.weaponMastery,
-            'weapon:${w.id}',
+            card,
             mastery,
             masteryChoices,
             rng,
             subject: w.name,
             subjectId: w.id,
           ),
+          cardId: card,
         ),
       );
     }
@@ -774,13 +987,15 @@ void _weapons(
       final versatile = w.versatileDice == null
           ? null
           : damageId(w.versatileDice!, w.damageType);
+      final topic = 'weapon:${w.id}';
+      final card = quizCardId(QuizKind.weaponDamage, topic);
       pool(QuizKind.weaponDamage).add(
         _Candidate(
-          'weapon:${w.id}',
+          topic,
           (rng) => _question(
             numeric: true,
             QuizKind.weaponDamage,
-            'weapon:${w.id}',
+            card,
             correct,
             damages,
             rng,
@@ -788,6 +1003,7 @@ void _weapons(
             subject: w.name,
             subjectId: w.id,
           ),
+          cardId: card,
         ),
       );
     }
@@ -915,12 +1131,14 @@ void _classFeatures(
     // también es saber la clase, y un nivel bajo se queda sin preguntas.
     if (!_readable(f)) continue;
     final id = slot;
+    final topic = 'feature:$id';
+    final card = quizCardId(QuizKind.classFeatureByText, topic);
     pool(QuizKind.classFeatureByText).add(
       _Candidate(
-        'feature:$id',
+        topic,
         (rng) => _question(
           QuizKind.classFeatureByText,
-          'feature:$id',
+          card,
           id,
           choices,
           rng,
@@ -941,6 +1159,7 @@ void _classFeatures(
           subjectId: cls.id,
           quote: f.description,
         ),
+        cardId: card,
       ),
     );
   }
@@ -966,14 +1185,17 @@ void _classFeatures(
     // vigente, el otro nivel también sería correcto: no se ofrece.
     final progress = _progressOf(f.name);
     final base = _baseName(f.name);
+    // La misma clave de tema que `classFeatureByText`: es el mismo rasgo y
+    // no se repite en la ronda. La pregunta suma el tipo.
+    final topic = 'feature:${cls.id}:c$i';
+    final card = quizCardId(QuizKind.classFeatureLevel, topic);
     pool(QuizKind.classFeatureLevel).add(
       _Candidate(
-        // La misma clave que `classFeatureByText`: es el mismo rasgo.
-        'feature:${cls.id}:c$i',
+        topic,
         (rng) => _question(
           numeric: true,
           QuizKind.classFeatureLevel,
-          'feature:${cls.id}:c$i',
+          card,
           '${f.level}',
           allLevels,
           rng,
@@ -990,6 +1212,7 @@ void _classFeatures(
           level: f.level,
           progress: progress,
         ),
+        cardId: card,
       ),
     );
   }
@@ -1437,12 +1660,14 @@ void _spells(
   }) {
     if (raw.isEmpty || raw.length > _maxOptionLength) return;
     if (!choices.any((c) => c.id == raw)) return;
+    final topic = 'spell:${s.id}';
+    final card = quizCardId(kind, topic);
     pool(kind).add(
       _Candidate(
-        'spell:${s.id}',
+        topic,
         (rng) => _question(
           kind,
-          'spell:${s.id}:${kind.name}',
+          card,
           raw,
           choices,
           rng,
@@ -1451,6 +1676,7 @@ void _spells(
           subject: s.name,
           subjectId: s.id,
         ),
+        cardId: card,
       ),
     );
   }
@@ -1520,12 +1746,14 @@ void _spells(
     // se pregunta lo que dura algo, y la instantánea queda de distractor.
     final at = durationIndex[s.duration];
     if (at != null && s.duration != 'Instantánea') {
+      final topic = 'spell:${s.id}';
+      final card = quizCardId(QuizKind.spellDuration, topic);
       pool(QuizKind.spellDuration).add(
         _Candidate(
-          'spell:${s.id}',
+          topic,
           (rng) => _question(
             QuizKind.spellDuration,
-            'spell:${s.id}:${QuizKind.spellDuration.name}',
+            card,
             s.duration,
             durations,
             rng,
@@ -1540,6 +1768,7 @@ void _spells(
             subject: s.name,
             subjectId: s.id,
           ),
+          cardId: card,
         ),
       );
     }
@@ -1576,18 +1805,21 @@ void _spells(
     ]) {
       for (final s in l) {
         if (!has(s)) continue;
+        final topic = 'spell:${s.id}';
+        final card = quizCardId(QuizKind.spellFlag, topic);
         pool(QuizKind.spellFlag).add(
           _Candidate(
-            'spell:${s.id}',
+            topic,
             (rng) => _question(
               QuizKind.spellFlag,
-              'spell:${s.id}:${QuizKind.spellFlag.name}',
+              card,
               s.id,
               choices,
               rng,
               allow: (id) => id == s.id || !has(byId[id]!),
               subjectId: flag,
             ),
+            cardId: card,
           ),
         );
       }
@@ -1655,6 +1887,20 @@ List<QuizQuestion> quizLocalize(
   ContentRepository repo,
 ) =>
     [for (final raw in questions) _localize(QuizQuestion.fromJson(raw), repo)];
+
+/// El slot `clase:cN` que nombra la clave de una pregunta de nivel. La
+/// tarjeta suma el tipo al final para no compartir historial con la pregunta
+/// por texto del mismo rasgo; sin sacarlo, el slot no se puede releer.
+String _featureSlot(String key) {
+  const prefix = 'feature:';
+  if (!key.startsWith(prefix)) return '';
+  var slot = key.substring(prefix.length);
+  final suffix = ':${QuizKind.classFeatureLevel.name}';
+  if (slot.endsWith(suffix)) {
+    slot = slot.substring(0, slot.length - suffix.length);
+  }
+  return slot;
+}
 
 ClassFeature? _featureBySlot(ContentRepository repo, String slot) {
   final cut = slot.indexOf(':');
@@ -1773,8 +2019,7 @@ QuizQuestion _localize(QuizQuestion q, ContentRepository repo) {
               ?.description ??
           quote;
     case QuizKind.classFeatureLevel:
-      final slot = q.key.startsWith('feature:') ? q.key.substring(8) : '';
-      final name = _featureBySlot(repo, slot)?.name;
+      final name = _featureBySlot(repo, _featureSlot(q.key))?.name;
       // Con contador, el enunciado usa el rasgo pelado: el número viaja en
       // [QuizQuestion.progress] y no se relee del nombre traducido.
       subject = name == null

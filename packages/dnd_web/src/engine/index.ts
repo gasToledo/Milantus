@@ -1,4 +1,4 @@
-import type { QuizQuestion, AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, CreatureForm, EffectBuild, EffectKindInfo, EffectParts, FeatForm, RaceForm, BackgroundForm, WeaponForm, ArmorForm, ArmorAcExample, ItemForm, SpellForm, HomebrewFormOptions, HomebrewRules, CreatureFormOptions, EncounterDetails, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
+import type { QuizQuestion, QuizHistory, QuizAnswer, AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, CreatureForm, EffectBuild, EffectKindInfo, EffectParts, FeatForm, RaceForm, BackgroundForm, WeaponForm, ArmorForm, ArmorAcExample, ItemForm, SpellForm, HomebrewFormOptions, HomebrewRules, CreatureFormOptions, EncounterDetails, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
 // Lo genera `npm run build:engine` (o la etapa `engine-js` del Dockerfile) y
 // no se versiona. Es un script de dart2js, no un módulo: al cargarse deja
 // `globalThis.dndEngine`, y de ahí lo toma este archivo.
@@ -26,7 +26,8 @@ interface DartEngine {
   creation(catalogJson: string, draftJson: string, actionJson: string, seed?: number): string;
   creationConfirm(catalogJson: string, draftJson: string, unnamed: string, replacingJson?: string): string;
   demoCharacter(): string;
-  quizRound(characterJson: string | null, catalogJson: string, seed: number): string;
+  quizRound(characterJson: string | null, catalogJson: string, seed: number, historyJson?: string): string;
+  quizRecordAnswers(historyJson: string, answersJson: string): string;
   quizLocalize(questionsJson: string, catalogJson: string): string;
   rollDie(sides: number): number;
   coinParts(cp: number): string;
@@ -815,11 +816,27 @@ export function demoCharacter(): CharacterJson & { id: string } {
 }
 
 /** Una ronda de diez preguntas del Quiz (`quizRound` del motor). Sin personaje,
- *  la de reglas generales; la misma semilla da la misma ronda. */
-export function quizRound(character: CharacterJson | null, catalog: Catalog, seed: number): QuizQuestion[] {
+ *  la de reglas generales; la misma semilla da la misma ronda. [history] es el
+ *  repaso guardado en el dispositivo: sin él, el sorteo es el de siempre. */
+export function quizRound(
+  character: CharacterJson | null,
+  catalog: Catalog,
+  seed: number,
+  history?: QuizHistory | null,
+): QuizQuestion[] {
   return JSON.parse(
-    engine().quizRound(character === null ? null : JSON.stringify(character), catalogJson(catalog), seed),
+    engine().quizRound(
+      character === null ? null : JSON.stringify(character),
+      catalogJson(catalog),
+      seed,
+      history == null ? undefined : JSON.stringify(history),
+    ),
   ) as QuizQuestion[];
+}
+
+/** Anota respuestas en el historial del Quiz (`quizRecordAnswers` del motor). */
+export function quizRecordAnswers(history: QuizHistory, answers: readonly QuizAnswer[]): QuizHistory {
+  return JSON.parse(engine().quizRecordAnswers(JSON.stringify(history), JSON.stringify(answers))) as QuizHistory;
 }
 
 /** La misma ronda, con los textos del idioma activo. No vuelve a sortear. */
