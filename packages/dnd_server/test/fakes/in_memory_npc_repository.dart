@@ -79,6 +79,9 @@ class InMemoryNpcRepository implements NpcRepository {
       sheet: sheetId == null
           ? null
           : await _characters.findNpcSheet(dmUserId, sheetId),
+      sheetVersion: sheetId == null
+          ? null
+          : _characters.versionOf(dmUserId, sheetId),
     );
   }
 

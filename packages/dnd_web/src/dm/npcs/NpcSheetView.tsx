@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, ArrowUpCircle, Printer } from 'lucide-react';
-import { flushSave, hasUnsavedChanges, retrySave, useSaveState } from '../../api/characterSave';
+import { flushSave, hasUnsavedChanges, onStale, retrySave, useSaveState } from '../../api/characterSave';
 import { ApiError } from '../../api/client';
 import { canLevelUp, type CharacterJson } from '../../engine';
 import { queryKeys, useNpc, useSheetCatalog } from '../../api/queries';
@@ -87,6 +87,18 @@ export function NpcSheetView({ npcId, tab, screen }: { npcId: string; tab: Sheet
     document.addEventListener('visibilitychange', refresh);
     return () => document.removeEventListener('visibilitychange', refresh);
   }, [client, npcId]);
+
+  // Copia vieja (otra pestaña guardó antes): como en la ficha propia, lo
+  // pendiente ya se descartó y la relectura trae la ficha y su versión.
+  useEffect(
+    () =>
+      onStale((staleId) => {
+        if (staleId !== sheetId) return;
+        void client.invalidateQueries({ queryKey: queryKeys.npc(npcId) });
+        notify(t.sheetStale);
+      }),
+    [client, npcId, sheetId, notify, t.sheetStale],
+  );
 
   // Al salir se guarda primero y recién después se relee (la biblioteca y las
   // campañas): releer antes traería la copia vieja.

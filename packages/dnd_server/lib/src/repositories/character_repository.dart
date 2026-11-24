@@ -49,7 +49,9 @@ abstract class CharacterRepository {
   ///
   /// Devuelve el `updated_at` que quedó, o `null` si llegó [expectedUpdatedAt]
   /// y no coincidía con el de la fila (otra pestaña guardó antes): en ese caso
-  /// no se escribe nada. Sin [expectedUpdatedAt] gana el último, como siempre.
+  /// no se escribe nada. Sin [expectedUpdatedAt] gana el último: la ruta HTTP
+  /// siempre la exige, y solo escribe sin ella el conector MCP, que lee y
+  /// guarda en el mismo pedido.
   Future<DateTime?> upsert(
     String userId,
     Character character, {

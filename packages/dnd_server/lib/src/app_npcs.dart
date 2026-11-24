@@ -10,6 +10,8 @@ Map<String, dynamic> _storedNpcJson(StoredNpc stored) => {
   'npc': stored.npc.toJson(),
   'campaigns': [for (final c in stored.campaigns) c.toJson()],
   if (stored.sheet != null) 'character': stored.sheet!.toJson(),
+  if (stored.sheetVersion != null)
+    'version': stored.sheetVersion!.microsecondsSinceEpoch,
 };
 
 Npc _npcFromRequestJson(Object? json) {

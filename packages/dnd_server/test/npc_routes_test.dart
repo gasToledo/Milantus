@@ -225,6 +225,37 @@ void main() {
       );
     });
 
+    // La ficha se guarda por `PUT /api/characters/:id`, que exige la versión:
+    // si `/api/npcs/:id` no la trajera, el DM no podría guardarla.
+    test('se guarda con la versión que trae el PNJ', () async {
+      final token = await login('dm');
+      final created = await createNpc(
+        token,
+        'Maerith',
+        kind: NpcSheetKind.character,
+      );
+      final npcId = created['npc']['id'] as String;
+      final sheetId = created['npc']['characterId'] as String;
+      Future<Map<String, dynamic>> read() async =>
+          decode((await send('GET', '/api/npcs/$npcId', token: token)).body);
+
+      final before = await read();
+      final saved = await send(
+        'PUT',
+        '/api/characters/$sheetId',
+        token: token,
+        body: {
+          'character': {...before['character'], 'name': 'Maerith la Gris'},
+          'expectedVersion': before['version'],
+        },
+      );
+      expect(saved.status, 200, reason: saved.body);
+
+      final after = await read();
+      expect(after['character']['name'], 'Maerith la Gris');
+      expect(after['version'], isNot(before['version']));
+    });
+
     test('borrarla por la ruta de personajes no la toca', () async {
       final token = await login('dm');
       final created = await createNpc(

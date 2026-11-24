@@ -87,12 +87,13 @@ export async function saveCharacter(
     headers: { 'content-type': 'application/json' },
     // `rebuilt` lo marca quien rehace desde nivel 1 (el servidor no lo deduce):
     // es lo que avisa a los DM que tienen al personaje en una campaña.
-    // `expectedVersion`: si la ficha cambió desde que se leyó, el servidor
-    // responde 409 y no escribe.
+    // `expectedVersion` (obligatoria): si la ficha cambió desde que se leyó,
+    // el servidor responde 409 y no escribe. Se conoce siempre, porque solo
+    // se guarda una ficha que se leyó del listado o de su PNJ.
     body: JSON.stringify({
       character,
       ...(options?.rebuilt ? { rebuilt: true } : {}),
-      ...(expectedVersion === undefined ? {} : { expectedVersion }),
+      expectedVersion,
     }),
   });
   if (!response.ok) {
@@ -520,11 +521,19 @@ export interface StoredNpc {
   npc: JsonObject & { id: string; name?: string };
   campaigns: NpcCampaignLink[];
   character?: CharacterJson;
+  /** La versión de la ficha, como `StoredCharacter.version`. */
+  version?: number;
+}
+
+function noteNpcVersion(stored: StoredNpc): void {
+  const id = stored.character?.id;
+  if (typeof id === 'string' && stored.version !== undefined) noteVersion(id, stored.version);
 }
 
 /** La biblioteca entera de la cuenta, estén o no en alguna campaña. */
 export async function fetchNpcs(signal: AbortSignal): Promise<StoredNpc[]> {
   const { npcs } = await getJson<{ npcs: StoredNpc[] }>('/api/npcs', signal);
+  npcs.forEach(noteNpcVersion);
   return npcs;
 }
 
@@ -590,7 +599,9 @@ export async function fetchCampaignNpcs(campaignId: string, signal: AbortSignal)
 
 /** Un PNJ de la cuenta. Uno ajeno y uno inexistente responden igual (404). */
 export async function fetchNpc(id: string, signal: AbortSignal): Promise<StoredNpc> {
-  return getJson<StoredNpc>(`/api/npcs/${encodeURIComponent(id)}`, signal);
+  const stored = await getJson<StoredNpc>(`/api/npcs/${encodeURIComponent(id)}`, signal);
+  noteNpcVersion(stored);
+  return stored;
 }
 
 const campaignNpcPath = (campaignId: string, npcId: string) =>

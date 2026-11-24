@@ -29,7 +29,16 @@ class StoredNpc {
   final List<NpcCampaignLink> campaigns;
   final Character? sheet;
 
-  const StoredNpc({required this.npc, this.campaigns = const [], this.sheet});
+  /// El `updated_at` de la ficha: el cliente lo manda como `expectedVersion`
+  /// al guardarla, igual que con la de un jugador.
+  final DateTime? sheetVersion;
+
+  const StoredNpc({
+    required this.npc,
+    this.campaigns = const [],
+    this.sheet,
+    this.sheetVersion,
+  });
 }
 
 /// Un PNJ visto desde una campaña: con su estado **en esa** campaña.
@@ -126,6 +135,7 @@ class PostgresNpcRepository implements NpcRepository {
       Sql.named('''
         SELECT n.document,
                sheet.document AS sheet,
+               sheet.updated_at AS sheet_version,
                COALESCE(
                  jsonb_agg(
                    jsonb_build_object(
@@ -147,7 +157,8 @@ class PostgresNpcRepository implements NpcRepository {
         LEFT JOIN campaigns c
           ON c.dm_user_id = cn.dm_user_id AND c.id = cn.campaign_id
         WHERE n.dm_user_id = @dmUserId
-        GROUP BY n.dm_user_id, n.id, n.name, n.document, sheet.document
+        GROUP BY n.dm_user_id, n.id, n.name, n.document, sheet.document,
+                 sheet.updated_at
         ORDER BY n.name
       '''),
       parameters: {'dmUserId': TypedValue(Type.uuid, dmUserId)},
@@ -161,6 +172,7 @@ class PostgresNpcRepository implements NpcRepository {
       Sql.named('''
         SELECT n.document,
                sheet.document AS sheet,
+               sheet.updated_at AS sheet_version,
                COALESCE(
                  jsonb_agg(
                    jsonb_build_object(
@@ -182,7 +194,8 @@ class PostgresNpcRepository implements NpcRepository {
         LEFT JOIN campaigns c
           ON c.dm_user_id = cn.dm_user_id AND c.id = cn.campaign_id
         WHERE n.dm_user_id = @dmUserId AND n.id = @id
-        GROUP BY n.dm_user_id, n.id, n.document, sheet.document
+        GROUP BY n.dm_user_id, n.id, n.document, sheet.document,
+                 sheet.updated_at
       '''),
       parameters: {
         'dmUserId': TypedValue(Type.uuid, dmUserId),
@@ -397,6 +410,7 @@ class PostgresNpcRepository implements NpcRepository {
   StoredNpc _storedOf(Map<String, dynamic> columns) => StoredNpc(
     npc: Npc.fromJson(_object(columns['document'])!),
     sheet: _sheetOf(columns['sheet']),
+    sheetVersion: columns['sheet_version'] as DateTime?,
     campaigns: [
       for (final json in _objectList(columns['campaigns']))
         NpcCampaignLink(

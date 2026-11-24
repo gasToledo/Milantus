@@ -130,6 +130,12 @@ class InMemoryCharacterRepository implements CharacterRepository {
     return next;
   }
 
+  /// La columna `updated_at` de una fila, como la lee el `JOIN` de los PNJ.
+  DateTime? versionOf(String userId, String id) {
+    if (_byUser[userId]?.containsKey(id) != true) return null;
+    return _updatedAt[userId]?[id] ?? _stamp(userId, id).toUtc();
+  }
+
   @override
   Future<Character?> find(String userId, String id) async {
     if (_isNpc(userId, id)) return null;

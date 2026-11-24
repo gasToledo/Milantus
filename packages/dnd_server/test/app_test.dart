@@ -1582,8 +1582,10 @@ void main() {
           'PUT',
           Uri.parse('http://localhost/api/characters/sagan'),
           headers: {'cookie': 'dnd_session=$token'},
+          // Nada que pisar: cualquier versión sirve para el alta.
           body: jsonEncode({
             'character': characterJson('sagan', name: 'Actualizado'),
+            'expectedVersion': 0,
           }),
         ),
       );
@@ -1629,7 +1631,7 @@ void main() {
 
       test('una expectedVersion vieja responde 409 y no escribe', () async {
         final token = await login('subject-chars-v1');
-        await put(token, 'Primera');
+        await put(token, 'Primera', expected: 0);
         final stale = (await firstListed(token))['version'] as int;
         await put(token, 'Segunda', expected: stale);
 
@@ -1644,7 +1646,7 @@ void main() {
 
       test('la version del listado guarda y devuelve otra', () async {
         final token = await login('subject-chars-v2');
-        await put(token, 'Primera');
+        await put(token, 'Primera', expected: 0);
         final version = (await firstListed(token))['version'] as int;
 
         final response = await put(token, 'Segunda', expected: version);
@@ -1654,18 +1656,14 @@ void main() {
         expect(next, isNot(version));
       });
 
-      test(
-        'sin expectedVersion guarda aunque la ficha haya cambiado',
-        () async {
-          final token = await login('subject-chars-v3');
-          await put(token, 'Primera');
-          await put(token, 'Segunda');
+      test('sin expectedVersion responde 400 y no escribe', () async {
+        final token = await login('subject-chars-v3');
+        await put(token, 'Primera', expected: 0);
 
-          final response = await put(token, 'Tercera');
-          expect(response.statusCode, 200);
-          expect((await firstListed(token))['character']['name'], 'Tercera');
-        },
-      );
+        final response = await put(token, 'Pisada');
+        expect(response.statusCode, 400);
+        expect((await firstListed(token))['character']['name'], 'Primera');
+      });
     });
 
     test(
@@ -1812,6 +1810,7 @@ void main() {
             headers: {'cookie': 'dnd_session=$tokenA'},
             body: jsonEncode({
               'character': characterJson('sagan', name: 'Intento de A'),
+              'expectedVersion': 0,
             }),
           ),
         );
@@ -2371,6 +2370,15 @@ void main() {
       };
     }
 
+    /// La versión vigente de una ficha propia: todo `PUT` la exige.
+    Future<int> versionOf(String token, String characterId) async {
+      final listed = await send('GET', '/api/characters', token: token);
+      return (listed['body']['characters'] as List).firstWhere(
+            (c) => c['character']['id'] == characterId,
+          )['version']
+          as int;
+    }
+
     /// Deja un personaje creado y devuelve un código para compartirlo.
     Future<String> shareCharacter(
       String token,
@@ -2652,7 +2660,10 @@ void main() {
           'PUT',
           '/api/characters/sagan',
           token: tokenA,
-          body: {'character': characterJson('sagan', name: 'Sagan el Rojo')},
+          body: {
+            'character': characterJson('sagan', name: 'Sagan el Rojo'),
+            'expectedVersion': await versionOf(tokenA, 'sagan'),
+          },
         );
 
         final members = await send(
@@ -3011,7 +3022,10 @@ void main() {
           'PUT',
           '/api/characters/sagan',
           token: tokenA,
-          body: {'character': characterJson('sagan', name: 'Sagan')},
+          body: {
+            'character': characterJson('sagan', name: 'Sagan'),
+            'expectedVersion': await versionOf(tokenA, 'sagan'),
+          },
         );
         expect(await pending(tokenB), isEmpty);
 
@@ -3022,6 +3036,7 @@ void main() {
           body: {
             'character': characterJson('sagan', name: 'Sagan'),
             'rebuilt': true,
+            'expectedVersion': await versionOf(tokenA, 'sagan'),
           },
         );
 
@@ -4809,7 +4824,7 @@ void main() {
         Future<Map<String, dynamic>> saveSheet(
           String owner,
           List<String> classHistory,
-        ) => send(
+        ) async => send(
           'PUT',
           '/api/characters/sagan',
           token: owner,
@@ -4818,6 +4833,7 @@ void main() {
               ...characterJson('sagan'),
               'classHistory': classHistory,
             },
+            'expectedVersion': await versionOf(owner, 'sagan'),
           },
         );
 

@@ -95,9 +95,9 @@ List<McpTool> _mcpTools({
   /// Guarda un cambio de combate de un personaje propio. `upsert` lleva la
   /// cuenta en la clave: no hay forma de escribir la ficha de otra.
   ///
-  /// ponytail: pisa el documento entero, como la app. Si la ficha está
-  /// abierta en el navegador, el próximo guardado de la app pisa este cambio;
-  /// si molesta, versionar el documento y rechazar el guardado viejo.
+  /// Pisa el documento entero y le cambia la versión: si la ficha está
+  /// abierta en el navegador, su próximo guardado llega con la versión vieja,
+  /// recibe 409 y la app relee este cambio en vez de pisarlo.
   Future<McpResult> saveCombat(
     String userId,
     Character c,

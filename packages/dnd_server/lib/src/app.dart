@@ -921,11 +921,13 @@ Future<Response> _upsertCharacterHandler(
   if (character.id != id) {
     throw const FormatException('El id del personaje no coincide con la ruta.');
   }
-  // La versión es `updated_at` en microsegundos. Sin ella gana el último,
-  // como siempre.
+  // La versión es `updated_at` en microsegundos, y es obligatoria: sin ella
+  // una pestaña vieja pisaría en silencio lo que guardó otra. El cliente la
+  // conoce siempre, porque solo guarda fichas que leyó (las altas van por
+  // `POST`).
   final expectedVersion = body['expectedVersion'];
-  if (expectedVersion != null && expectedVersion is! int) {
-    throw const FormatException('"expectedVersion" debe ser un entero.');
+  if (expectedVersion is! int) {
+    throw const FormatException('Falta "expectedVersion" (entero).');
   }
   final version = await transactions.run<int?>((repositories) async {
     // `find` solo ve fichas de jugador: la de un PNJ también se guarda por
@@ -935,12 +937,10 @@ Future<Response> _upsertCharacterHandler(
     final saved = await repositories.characters.upsert(
       request.userId,
       character,
-      expectedUpdatedAt: expectedVersion == null
-          ? null
-          : DateTime.fromMicrosecondsSinceEpoch(
-              expectedVersion as int,
-              isUtc: true,
-            ),
+      expectedUpdatedAt: DateTime.fromMicrosecondsSinceEpoch(
+        expectedVersion,
+        isUtc: true,
+      ),
     );
     // Rechazada por copia vieja: nada de lo que sigue (avisos de subida de
     // nivel o de rehecho) debe pasar.
