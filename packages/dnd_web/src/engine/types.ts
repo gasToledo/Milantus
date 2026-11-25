@@ -424,6 +424,10 @@ export interface CharacterFields {
   portraitPaths?: string[];
   /** Prompt con que se generó cada retrato: clave → texto. */
   portraitPrompts?: Record<string, string>;
+  /** Encuadre circular de cada retrato en el medallón: clave → `[x, y, s]`
+   *  (centro como fracción del ancho y el alto, diámetro como fracción del lado
+   *  más corto). Sin entrada, el medallón centra la imagen. */
+  portraitFrames?: Record<string, number[]>;
   cantripIds?: string[];
   spellIds?: string[];
   /** Clase → trucos y conjuros elegidos con ella. */

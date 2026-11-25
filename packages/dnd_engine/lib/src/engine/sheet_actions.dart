@@ -170,6 +170,9 @@ class SheetActions {
   ///   mueve al frente; si no está o ya es la primera, la ficha vuelve intacta.
   ///   `removePortrait` con `key` la saca de las dos estructuras, y si no está
   ///   no toca nada. Borrar el archivo del servidor lo hace quien llama.
+  ///   `framePortrait` con `key`, `x`, `y` y `s` guarda el encuadre circular de
+  ///   ese retrato (ver `Character.portraitFrames`); una clave que no está o
+  ///   un valor que no es número deja la ficha como estaba.
   ///
   /// Una acción desconocida lanza [FormatException]: un cliente desfasado no
   /// tiene que guardar una ficha que el motor no tocó creyendo que sí.
@@ -742,7 +745,16 @@ class SheetActions {
           c = c.copyWith(
             portraitPaths: [...c.portraitPaths.where((k) => k != key)],
             portraitPrompts: {...c.portraitPrompts}..remove(key),
+            portraitFrames: {...c.portraitFrames}..remove(key),
           );
+        }
+      case 'framePortrait':
+        final key = action['key'] as String? ?? '';
+        final frame =
+            Character.normalizeFrame([action['x'], action['y'], action['s']]);
+        // Un retrato que no está o un encuadre torcido dejan la ficha igual.
+        if (frame != null && c.portraitPaths.contains(key)) {
+          c = c.copyWith(portraitFrames: {...c.portraitFrames, key: frame});
         }
       default:
         throw FormatException('Acción de ficha desconocida: ${action['type']}');

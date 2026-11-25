@@ -1138,7 +1138,7 @@ void main() {
       final migrated = Character.migrateJson(source);
       final diary = (migrated['diary'] as List).cast<Map<String, dynamic>>();
 
-      expect(migrated['schemaVersion'], 25);
+      expect(migrated['schemaVersion'], Character.currentSchemaVersion);
       expect(diary[0], {'entryId': 'a', 'title': 'Texto', 'body': 'hola'});
       expect(diary[1],
           {'entryId': 'b', 'title': 'Imagen', 'imageKey': 'v24/b.png'});

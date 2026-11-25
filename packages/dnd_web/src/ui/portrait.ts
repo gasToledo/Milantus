@@ -43,14 +43,49 @@ export function thumbnailUrl(url: string, size: number): string {
   return width === undefined ? url : `${url}?w=${width}`;
 }
 
+/** El encuadre circular de un retrato: centro `x`, `y` como fracción del ancho y
+ *  del alto de la imagen, y diámetro `s` como fracción de su lado más corto
+ *  (`Character.portraitFrames`). */
+export type PortraitFrame = readonly [x: number, y: number, s: number];
+
+/** El encuadre guardado de [key], o `null` si no hay o no es de tres números
+ *  finitos: el documento viene de afuera y un valor torcido solo centra. */
+export function frameOf(character: { portraitFrames?: unknown }, key: string): PortraitFrame | null {
+  const frames = character.portraitFrames;
+  const raw = frames && typeof frames === 'object' ? (frames as Record<string, unknown>)[key] : undefined;
+  return Array.isArray(raw) && raw.length === 3 && raw.every((n) => typeof n === 'number' && Number.isFinite(n))
+    ? (raw as unknown as PortraitFrame)
+    : null;
+}
+
+// ponytail: el encuadre viaja en el fragmento de la dirección (`…#x,y,s`) para que
+// los ~20 sitios que le pasan `portrait` string al medallón no cambien. El fragmento
+// nunca llega al servidor. Techo: un segundo dato por retrato obliga a pasar a un
+// objeto `{ url, frame }`.
+/** [url] con su [frame] pegado, listo para el medallón. */
+export const withFrame = (url: string, frame: PortraitFrame | null): string => (frame ? `${url}#${frame.join(',')}` : url);
+
+/** Lo inverso de [withFrame]: la dirección sola y su encuadre, si lo trae. */
+export function splitFrame(portrait: string): { url: string; frame: PortraitFrame | null } {
+  const at = portrait.indexOf('#');
+  if (at < 0) return { url: portrait, frame: null };
+  const parts = portrait.slice(at + 1).split(',').map(Number);
+  const ok = parts.length === 3 && parts.every(Number.isFinite) && parts[2]! > 0;
+  return { url: portrait.slice(0, at), frame: ok ? (parts as unknown as PortraitFrame) : null };
+}
+
 /** El retrato de un personaje de esta cuenta, listo para el medallón. */
-export const ownPortrait = (character: { portraitPaths?: unknown }): string | null => {
+export const ownPortrait = (character: { portraitPaths?: unknown; portraitFrames?: unknown }): string | null => {
   const key = firstPortrait(character);
-  return key ? portraitUrl(key) : null;
+  return key ? withFrame(portraitUrl(key), frameOf(character, key)) : null;
 };
 
 /** El retrato de un miembro de la Mesa, por su vínculo. */
-export const memberPortrait = (campaignId: string, memberId: string, character: { portraitPaths?: unknown }): string | null => {
+export const memberPortrait = (
+  campaignId: string,
+  memberId: string,
+  character: { portraitPaths?: unknown; portraitFrames?: unknown },
+): string | null => {
   const key = firstPortrait(character);
-  return key ? memberPortraitUrl(campaignId, memberId, key) : null;
+  return key ? withFrame(memberPortraitUrl(campaignId, memberId, key), frameOf(character, key)) : null;
 };

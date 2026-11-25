@@ -571,7 +571,7 @@ const Object _unset = Object();
 /// Personaje con todas las **elecciones resueltas**. Es la fuente de verdad y
 /// también, serializado, el formato de exportación individual.
 class Character {
-  static const int currentSchemaVersion = 25;
+  static const int currentSchemaVersion = 26;
 
   final String id;
   String name;
@@ -821,6 +821,16 @@ class Character {
   /// efecto, no un error.
   final Map<String, String> portraitPrompts;
 
+  /// El encuadre circular de cada retrato (el que recortan los medallones):
+  /// clave de [portraitPaths] → `[x, y, s]`, con el centro del círculo `x`, `y`
+  /// como fracción del ancho y del alto de la imagen, y su diámetro `s` como
+  /// fracción del lado **más corto**. Se guarda el encuadre y no una imagen
+  /// recortada para poder reencuadrar sin perder resolución; y por clave, para
+  /// que volver a un retrato anterior traiga también su encuadre. Sin entrada,
+  /// el medallón centra la imagen. Como [portraitPrompts], una clave que ya no
+  /// está en [portraitPaths] es un resto sin efecto.
+  final Map<String, List<double>> portraitFrames;
+
   /// El trasfondo del personaje, en Markdown.
   ///
   /// Es lo único del Diario que está siempre: un personaje sin entradas igual
@@ -897,6 +907,7 @@ class Character {
     this.coins = const {},
     this.portraitPaths = const [],
     this.portraitPrompts = const {},
+    this.portraitFrames = const {},
     this.background = '',
     this.diary = const [],
     this.alignment,
@@ -987,6 +998,7 @@ class Character {
         'weaponOffHand': weaponOffHand,
         'portraitPaths': portraitPaths,
         'portraitPrompts': portraitPrompts,
+        'portraitFrames': portraitFrames,
         'background': background,
         'diary': [for (final e in diary) e.toJson()],
         'alignment': alignment?.toJson(),
@@ -1006,6 +1018,17 @@ class Character {
 
   /// Monedas por denominación, descartando claves desconocidas y cantidades
   /// negativas: una bolsa con −3 piezas de oro no se puede mostrar ni gastar.
+  /// Un encuadre `[x, y, s]` válido, o null si [raw] no son tres números
+  /// finitos. El centro cae en 0..1 y el diámetro en 0.1..1: lo que el cliente
+  /// no pueda verificar (si el círculo cabe en la imagen) lo acota quien lo
+  /// dibuja, que es el único que conoce la proporción de la imagen.
+  static List<double>? normalizeFrame(dynamic raw) {
+    if (raw is! List || raw.length != 3) return null;
+    final v = [for (final e in raw) e is num ? e.toDouble() : double.nan];
+    if (v.any((e) => !e.isFinite)) return null;
+    return [v[0].clamp(0.0, 1.0), v[1].clamp(0.0, 1.0), v[2].clamp(0.1, 1.0)];
+  }
+
   static Map<String, int> _coinMap(dynamic raw) => {
         if (raw is Map)
           for (final e in raw.entries)
@@ -1548,6 +1571,13 @@ class Character {
           }
           version = 25;
           migrated['schemaVersion'] = version;
+        case 25:
+          // `portraitFrames` (el encuadre de cada retrato) es opcional y sin
+          // entradas el medallón centra la imagen: no hay nada que migrar.
+          // El número sube para que un motor anterior rechace esta ficha en
+          // vez de guardarla de vuelta sin los encuadres.
+          version = 26;
+          migrated['schemaVersion'] = version;
       }
     }
     return migrated;
@@ -1661,6 +1691,13 @@ class Character {
           if (e.key is String && e.value is String)
             e.key as String: e.value as String,
       },
+      portraitFrames: {
+        // Tolera basura: un encuadre torcido vuelve a centrar, no cuesta la ficha.
+        for (final e in (j['portraitFrames'] as Map? ?? const {}).entries)
+          if (e.key is String)
+            if (normalizeFrame(e.value) case final frame?)
+              e.key as String: frame,
+      },
       background: j['background'] as String? ?? '',
       diary: [
         for (final e in (j['diary'] as List? ?? const []))
@@ -1773,6 +1810,7 @@ class Character {
     Map<String, bool>? weaponOffHand,
     List<String>? portraitPaths,
     Map<String, String>? portraitPrompts,
+    Map<String, List<double>>? portraitFrames,
     String? background,
     List<DiaryEntry>? diary,
     Object? alignment = _unset,
@@ -1845,6 +1883,7 @@ class Character {
       weaponOffHand: weaponOffHand ?? this.weaponOffHand,
       portraitPaths: portraitPaths ?? this.portraitPaths,
       portraitPrompts: portraitPrompts ?? this.portraitPrompts,
+      portraitFrames: portraitFrames ?? this.portraitFrames,
       background: background ?? this.background,
       diary: diary ?? this.diary,
       // Centinela: pasar `alignment: null` sí lo limpia.

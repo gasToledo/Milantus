@@ -1,7 +1,17 @@
 import { useState, type CSSProperties } from 'react';
 import { useTexts } from '../i18n/context';
-import { thumbnailUrl } from './portrait';
+import { splitFrame, thumbnailUrl } from './portrait';
 import { PortraitViewer } from './PortraitViewer';
+
+/** Dónde va la imagen dentro del círculo para que el recorte [x, y, s] lo llene.
+ *  `s` es el diámetro como fracción del lado más corto, así que ese lado mide
+ *  `100 / s` % del medallón y el otro sale de la proporción. Todo en %: el
+ *  mismo cálculo vale para cualquier tamaño de medallón. */
+function frameStyle([x, y, s]: readonly [number, number, number], ratio: number): CSSProperties {
+  const width = ((ratio >= 1 ? ratio : 1) / s) * 100;
+  const height = ((ratio >= 1 ? 1 : 1 / ratio) / s) * 100;
+  return { width: `${width}%`, height: `${height}%`, left: `${50 - x * width}%`, top: `${50 - y * height}%` };
+}
 
 /**
  * El medallón del personaje: aro del color de su clase y, adentro, el retrato
@@ -37,6 +47,11 @@ export function Medallion({
   const [failed, setFailed] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const shown = portrait !== null && failed !== portrait ? portrait : null;
+  // El encuadre viaja pegado a la dirección (`splitFrame`). La proporción de la
+  // imagen se conoce recién al cargar, y es lo que hace falta para ubicarla.
+  const { url: shownUrl, frame } = shown ? splitFrame(shown) : { url: null, frame: null };
+  const [ratio, setRatio] = useState<{ src: string; value: number } | null>(null);
+  const framed = frame && shownUrl && ratio?.src === shownUrl ? { frame, ratio: ratio.value } : null;
 
   // `--accent` es el único color que no sale de los tokens: viene del catálogo.
   // El degradado es el de `ClassMedallion` sin retrato: el acento arriba, que
@@ -53,16 +68,23 @@ export function Medallion({
     <div
       aria-hidden="true"
       style={style}
-      className={`font-display flex shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[var(--accent)] text-on-surface ${
+      className={`font-display relative flex shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[var(--accent)] text-on-surface ${
         muted ? 'opacity-55 grayscale' : ''
       }`}
     >
-      {shown ? (
+      {shown && shownUrl ? (
         <img
-          src={thumbnailUrl(shown, size)}
+          // Con encuadre se pide más resolución: la imagen se agranda para que
+          // el círculo recortado llene el medallón.
+          src={thumbnailUrl(shownUrl, frame ? size / frame[2] : size)}
           alt=""
           onError={() => setFailed(shown)}
-          className="h-full w-full object-cover"
+          onLoad={(e) => {
+            const { naturalWidth: w, naturalHeight: h } = e.currentTarget;
+            if (w > 0 && h > 0) setRatio({ src: shownUrl, value: w / h });
+          }}
+          className={framed ? 'absolute max-w-none' : 'h-full w-full object-cover'}
+          style={framed ? frameStyle(framed.frame, framed.ratio) : undefined}
           data-portrait
         />
       ) : (
@@ -82,7 +104,7 @@ export function Medallion({
       >
         {circle}
       </button>
-      <PortraitViewer src={shown} name={name} open={open} onOpenChange={setOpen} />
+      <PortraitViewer src={shownUrl ?? shown} name={name} open={open} onOpenChange={setOpen} />
     </>
   );
 }

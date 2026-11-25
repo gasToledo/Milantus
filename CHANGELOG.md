@@ -1592,6 +1592,26 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
+- Sin cambios.
+
+### Eliminado
+
+- Sin cambios.
+
+## [2.1.0] - 2026-11-25
+
+### Nuevo
+
+- Encuadre del medallón: en el retrato de la ficha, «Encuadrar el medallón»
+  deja mover y agrandar un círculo sobre la imagen, como en los avatares de
+  Discord. Cada retrato guarda su encuadre, y el medallón de la ficha, de
+  Mis personajes, de la Mesa y del Quiz lo respeta.
+
+### Modificado
+
+- La ficha de personaje pasa al esquema 26 por el encuadre de los retratos; las
+  fichas anteriores se leen sin cambios y la migración es automática. Los
+  respaldos todavía no incluyen el encuadre.
 - En la ficha de un escenario, los «@Nombre» de la descripción llevan a la
   ficha del personaje, PNJ o escenario nombrado.
 - Al cerrar sesión, o al entrar sin sesión, la aplicación lleva directo al

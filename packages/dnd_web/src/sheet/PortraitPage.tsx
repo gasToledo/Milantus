@@ -37,6 +37,7 @@ export function PortraitPage({ model, write }: { model: SheetModel; write: Sheet
     backHref: characterHref(character.id),
     paths: character.portraitPaths ?? [],
     prompts: character.portraitPrompts ?? {},
+    framing: { source: character, save: (key, x, y, s) => write.act({ type: 'framePortrait', key, x, y, s }) },
     detailsLabel: t.portraitExtraDetails,
     initialDetails: '',
     buildPrompt,

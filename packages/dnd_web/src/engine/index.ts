@@ -1288,6 +1288,7 @@ export type SheetAction =
   | { type: 'moveDiaryEntry'; entry: string; to: string }
   | { type: 'addPortrait'; key: string; prompt?: string }
   | { type: 'restorePortrait' | 'removePortrait'; key: string }
+  | { type: 'framePortrait'; key: string; x: number; y: number; s: number }
   | { type: 'summonCompanion'; option: string; creature: string; level?: number; pact?: boolean; free?: boolean }
   | { type: 'damageCompanion' | 'healCompanion' | 'companionTempHp'; index: number; amount: number }
   | { type: 'dismissCompanion'; index: number }

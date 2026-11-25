@@ -1503,6 +1503,38 @@ void main() {
       expect(igual.portraitPaths, ['a', 'b']);
       expect(igual.portraitPrompts, {'a': 'pa', 'b': 'pb'});
     });
+
+    test('encuadrar guarda el círculo por retrato, acotado; borrar lo limpia',
+        () {
+      final c = con(['a', 'b']);
+      Character encuadrar(Character from, String key, List<Object?> v) =>
+          act(from, {
+            'type': 'framePortrait',
+            'key': key,
+            'x': v[0],
+            'y': v[1],
+            's': v[2],
+          }).character;
+
+      final a = encuadrar(c, 'a', [0.4, 0.3, 0.6]);
+      expect(a.portraitFrames, {
+        'a': [0.4, 0.3, 0.6]
+      });
+      // Fuera de rango se acota; un retrato que no está o un valor que no es
+      // número no tocan nada.
+      expect(encuadrar(a, 'a', [2, -1, 0.01]).portraitFrames['a'],
+          [1.0, 0.0, 0.1]);
+      expect(encuadrar(a, 'zzz', [0.5, 0.5, 0.5]).portraitFrames,
+          a.portraitFrames);
+      expect(
+          encuadrar(a, 'a', ['x', 0.5, 0.5]).portraitFrames, a.portraitFrames);
+
+      // Viaja en el JSON y sobrevive a releerlo.
+      expect(Character.fromJson(a.toJson()).portraitFrames, a.portraitFrames);
+
+      final sin = act(a, {'type': 'removePortrait', 'key': 'a'}).character;
+      expect(sin.portraitFrames, isEmpty);
+    });
   });
 
   group('Renombrar', () {

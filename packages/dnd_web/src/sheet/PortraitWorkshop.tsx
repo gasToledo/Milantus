@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState, type ReactNode } from 'react';
 import * as Collapsible from '@radix-ui/react-collapsible';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Check, ChevronDown, History, Image as ImageIcon, Sparkles, Trash2, Upload, X } from 'lucide-react';
+import { ArrowLeft, Check, ChevronDown, Crop, History, Image as ImageIcon, Sparkles, Trash2, Upload, X } from 'lucide-react';
 import { ApiError } from '../api/client';
 import {
   deletePortrait,
@@ -21,7 +21,8 @@ import { cx } from '../ui/cx';
 import { staggerIndex } from '../ui/motion';
 import { Eyebrow, PLAQUE_BUTTON } from '../ui/data';
 import { Medallion } from '../ui/Medallion';
-import { portraitUrl, thumbnailUrl } from '../ui/portrait';
+import { frameOf, portraitUrl, thumbnailUrl } from '../ui/portrait';
+import { PortraitFrameDialog } from './PortraitFrameDialog';
 import { AppBusyLabel, AppErrorView } from '../ui/status';
 import { Button } from '../ui/Button';
 import { Select, Tooltip } from '../ui/primitives';
@@ -167,6 +168,10 @@ export interface PortraitOwner {
   upload(file: File): Promise<string>;
   saveBase64(base64: string): Promise<string>;
   apply(action: { type: 'addPortrait'; key: string; prompt?: string } | { type: 'restorePortrait' | 'removePortrait'; key: string }): void;
+  /** El encuadre del medallón de cada retrato. Solo la ficha lo guarda: sin
+   *  esto el taller no ofrece encuadrar. `source` es el documento con
+   *  `portraitFrames` (se lee con `frameOf`). */
+  framing?: { source: { portraitFrames?: unknown }; save(key: string, x: number, y: number, s: number): void };
   notify: SheetNotify;
 }
 
@@ -231,6 +236,7 @@ export function PortraitWorkshop({ owner }: { owner: PortraitOwner }) {
   const [importing, setImporting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [framing, setFraming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const busy = importing || deleting || generating || saving;
@@ -500,6 +506,18 @@ export function PortraitWorkshop({ owner }: { owner: PortraitOwner }) {
                   <p className="text-[12.5px] leading-[1.5] break-words text-on-surface-variant select-text">{shownPrompt}</p>
                 </PromptFold>
               )}
+              {owner.framing && (
+                <button
+                  type="button"
+                  data-action="frame-portrait"
+                  disabled={busy}
+                  onClick={() => setFraming(true)}
+                  className="inline-flex min-h-9 items-center gap-2 self-start px-1 text-[14px] text-gold disabled:pointer-events-none disabled:opacity-40"
+                >
+                  <Crop size={16} aria-hidden="true" />
+                  {t.portraitFrame}
+                </button>
+              )}
               <button
                 type="button"
                 data-action="delete-portrait"
@@ -712,6 +730,20 @@ export function PortraitWorkshop({ owner }: { owner: PortraitOwner }) {
           )}
         </div>
       </div>
+
+      {framing && shownKey && owner.framing && (
+        <PortraitFrameDialog
+          src={portraitUrl(shownKey)}
+          name={owner.name}
+          accent={owner.accent}
+          initial={frameOf(owner.framing.source, shownKey)}
+          onClose={() => setFraming(false)}
+          onSave={([x, y, s]) => {
+            owner.framing?.save(shownKey, x, y, s);
+            owner.notify(t.portraitFrameSaved, { tone: 'success' });
+          }}
+        />
+      )}
 
       <AppDialog
         open={confirmDelete}
