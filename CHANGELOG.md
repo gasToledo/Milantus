@@ -1592,8 +1592,7 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
-- Los adornos de clase se vuelven a animar cada vez que se abre la ficha, y no
-  solo después de recargar la página.
+- Sin cambios.
 
 ### Eliminado
 
@@ -1639,3 +1638,27 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 ### Eliminado
 
 - Sin cambios.
+
+## [2.3.0] - 2026-11-26
+
+### Nuevo
+
+- «Personalizar ficha»: un panel donde se prenden o apagan los adornos y se
+  elige, para cada esquina, la clase y el color. El estilo se guarda con el
+  personaje y el DM lo ve igual.
+- En multiclase, cada esquina es de una clase y el borde de las placas pasa en
+  diagonal de un color al otro.
+
+### Modificado
+
+- «Acomodar tarjetas» pasa a «Personalizar ficha»: las tarjetas se acomodan y
+  su orden se restaura con ese panel abierto.
+- El medallón de la ficha toma el color de la esquina de arriba.
+- Los adornos de clase se vuelven a animar cada vez que se abre la ficha, y no
+  solo después de recargar la página.
+- La ficha de personaje pasa al esquema 27 por el estilo (`dnd_engine`); las
+  anteriores se leen sin cambios.
+
+### Eliminado
+
+- La barra «Acomodando las tarjetas».

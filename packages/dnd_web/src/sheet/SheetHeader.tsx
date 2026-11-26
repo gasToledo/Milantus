@@ -13,8 +13,9 @@ import { signed } from './format';
 import { ActiveModeTile } from './ActiveModes';
 import { useChoicesView, WarningsStrip } from './Choices';
 import { WildShapeTile } from './WildShape';
-import { accentFor, classesOf, type SheetModel } from './model';
+import { classesOf, type SheetModel } from './model';
 import { advantageSources } from './rows';
+import { resolveSheetStyle } from './sheetStyle';
 
 /**
  * La cabecera de la ficha: nombre (el `h1` de la pantalla) con especie y
@@ -62,19 +63,25 @@ export function SheetHeader({
   useEffect(() => {
     if (showBand) animatedBands.add(character.id);
   }, [animatedBands, showBand, character.id]);
-  // Los adornos de clase; Puntos de golpe lleva solo el de arriba, más grande:
-  // la vida es el número que más se lee.
-  const accent = accentFor(model);
-  const decor = (big = false) => ({
-    accent,
-    still,
-    ornament: character.classId && (
-      <>
-        <ClassOrnament classId={character.classId} corner="tl" big={big} />
-        {!big && <ClassOrnament classId={character.classId} corner="br" />}
-      </>
-    ),
-  });
+  // Los adornos de clase, uno por esquina; Puntos de golpe lleva solo el de
+  // arriba, más grande: la vida es el número que más se lee. Apagados, la placa
+  // es la de siempre.
+  const { on, tl, br } = resolveSheetStyle(model);
+  const decor = (big = false) =>
+    on && tl && br
+      ? {
+          accent: tl.accent,
+          accent2: br.accent,
+          still,
+          // `key`: otra clase elegida es otro dibujo, y se monta de cero.
+          ornament: (
+            <>
+              <ClassOrnament key={`tl-${tl.classId}`} classId={tl.classId} corner="tl" big={big} />
+              {!big && <ClassOrnament key={`br-${br.classId}`} classId={br.classId} corner="br" accent={br.accent} />}
+            </>
+          ),
+        }
+      : {};
   const origin = [nameOf(catalog.races, character.raceId), nameOf(catalog.backgrounds, character.backgroundId)]
     .filter(Boolean)
     .join(' · ');

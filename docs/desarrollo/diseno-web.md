@@ -192,7 +192,11 @@ a «ningún hex fuera de `index.css`»: es un dato, no un color de diseño.
 ícono de clase, y el borde y los adornos de las cuatro placas de la banda
 táctica (Puntos de golpe, Iniciativa, Velocidad y Competencia). En el tema
 claro, el borde y los adornos mezclan el acento con `on-surface`
-(`--class-ink`): varios acentos son pálidos. No tiñe fondos, botones ni texto
+(`--class-ink`): varios acentos son pálidos. En la ficha, el color puede venir
+del estilo del personaje, por esquina: la clase elegida o una de la paleta de
+adornos (`--orn-crimson`, `sky`, `violet`, `teal`, `green`, `silver`, `ember`);
+el borde va en diagonal del color de arriba al de abajo, y el medallón toma el de
+arriba. No tiñe fondos, botones ni texto
 de cuerpo. Una clase no reemplaza el oro del sistema.
 
 ### 3.4 Semántica de estado

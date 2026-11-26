@@ -1,5 +1,6 @@
 import type { Catalog, CharacterFields, ComputedSheet } from '../engine';
-import { accentOf, nameOf } from '../api/catalog';
+import { nameOf } from '../api/catalog';
+import { resolveSheetStyle } from './sheetStyle';
 import { resourceKey } from './format';
 import type { SheetWriter } from './writer';
 
@@ -29,7 +30,9 @@ export function classesOf({ character, sheet, catalog }: SheetModel) {
   });
 }
 
-export const accentFor = ({ character, catalog }: SheetModel) => accentOf(catalog, character.classId);
+/** El color de la ficha (el medallón): el de la esquina de arriba de su
+ *  estilo, que de fábrica es el de la clase principal. */
+export const accentFor = (model: SheetModel) => resolveSheetStyle(model).tl?.accent ?? null;
 
 /** Usos de [r] que quedan: el máximo es del motor; lo gastado, de la mesa.
  *  La clave es la de `CharacterResource.key`, con la que se guarda el uso. */

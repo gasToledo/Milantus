@@ -1,16 +1,16 @@
-import { Fragment, useState, type ReactNode } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, GripVertical, LayoutDashboard, type LucideIcon } from 'lucide-react';
-import { patchSettings } from '../api/settingsSave';
-import { queryKeys, useRosterSettings } from '../api/queries';
-import type { RosterSettings } from '../api/client';
+import { Fragment, useContext, useEffect, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, GripVertical, SlidersHorizontal, type LucideIcon } from 'lucide-react';
+import { useRosterSettings } from '../api/queries';
 import { useTexts } from '../i18n/context';
-import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
 import { useHoldDrag } from '../ui/holdDrag';
-import { Toast, Tooltip } from '../ui/primitives';
+import { Tooltip } from '../ui/primitives';
 import { moveCard, resolveLayout, type CardLayout } from './cardLayout';
-import { tabLabel } from './SheetPanel';
+import { CustomizePanel } from './CustomizePanel';
+import type { SheetModel } from './model';
+import { SheetCustomizeContext } from './sheetCustomize';
+import { useCardLayoutSaver } from './useCardLayoutSaver';
 
 type Tab = 'combate' | 'personaje';
 
@@ -18,58 +18,48 @@ const FIN = '__fin-';
 const isEnd = (id: string) => id.startsWith(FIN);
 const AT_END = Number.MAX_SAFE_INTEGER;
 
+const PILL_SHAPE =
+  'inline-flex min-h-7 items-center gap-1.5 rounded-[var(--radius-pill)] border border-gold px-3 text-[12.5px] font-medium transition-colors duration-[120ms] ease-out';
+/** La pill dorada chica de la barra de la pestaña («Personalizar ficha»,
+ *  «Cambiar elecciones»). Sin `Button`: su alto mínimo de 36 px no se puede
+ *  achicar con una clase más (`cx` no las combina). */
+export const SHEET_PILL = cx(PILL_SHAPE, 'bg-gold-soft text-gold hover:bg-plaque');
+/** La misma, apretada: el panel está abierto. */
+const SHEET_PILL_PRESSED = cx(PILL_SHAPE, 'bg-gold text-on-primary');
+
 /**
- * Las tres columnas de una pestaña de la ficha, con su modo «Acomodar
- * tarjetas». El orden es una preferencia de **quien mira** (los ajustes de la
- * cuenta, `sheetLayout`) y nunca del personaje: vale para toda ficha que esa
- * cuenta abra, propia, ajena o de PNJ, y no escribe ninguna.
+ * Las tres columnas de una pestaña de la ficha, con «Personalizar ficha»:
+ * abierto, se dibuja su panel y las tarjetas se acomodan. El orden es una
+ * preferencia de **quien mira** (los ajustes de la cuenta, `sheetLayout`) y
+ * nunca del personaje: vale para toda ficha que esa cuenta abra, propia, ajena
+ * o de PNJ, y no escribe ninguna.
  *
  * [cards] lleva solo las tarjetas presentes en esta ficha. Acomodando, el
  * contenido no se dibuja: cada tarjeta es una barra con su título.
  */
-/** La pill dorada chica de la barra de la pestaña («Acomodar tarjetas»,
- *  «Cambiar elecciones»). Sin `Button`: su alto mínimo de 36 px no se puede
- *  achicar con una clase más (`cx` no las combina). */
-export const SHEET_PILL =
-  'inline-flex min-h-7 items-center gap-1.5 rounded-[var(--radius-pill)] border border-gold bg-gold-soft px-3 text-[12.5px] font-medium text-gold transition-colors duration-[120ms] ease-out hover:bg-plaque';
-
 export function ArrangeableColumns({
+  model,
   tab,
   defaults,
   cards,
   leading,
 }: {
+  model: SheetModel;
   tab: Tab;
   defaults: CardLayout;
   cards: Record<string, { title: string; node: ReactNode }>;
-  /** Otra pill de la barra, en la otra punta (izquierda) de «Acomodar». */
+  /** Otra pill de la barra, en la otra punta (izquierda) de «Personalizar». */
   leading?: ReactNode;
 }) {
   const t = useTexts();
-  const client = useQueryClient();
   const settings = useRosterSettings();
-  const [arranging, setArranging] = useState(false);
-  const [toast, setToast] = useState<number | null>(null);
+  const { open, setOpen, slot } = useContext(SheetCustomizeContext);
+  const { save, toast } = useCardLayoutSaver(tab);
+  // Cambiar de pestaña (o salir de la ficha) cierra el panel.
+  useEffect(() => () => setOpen(false), [setOpen]);
 
   const layout = resolveLayout(settings.data?.sheetLayout?.[tab], defaults, Object.keys(cards));
   const last = layout.length - 1;
-
-  // Cada movimiento se guarda en el momento. Siempre viaja el objeto entero
-  // (las dos pestañas): el servidor combina solo el primer nivel de los ajustes.
-  const save = async (next: CardLayout | null) => {
-    await client.cancelQueries({ queryKey: queryKeys.rosterSettings });
-    const current = client.getQueryData<RosterSettings>(queryKeys.rosterSettings)?.sheetLayout ?? {};
-    const sheetLayout = { combate: current.combate ?? null, personaje: current.personaje ?? null, [tab]: next };
-    client.setQueryData<RosterSettings>(queryKeys.rosterSettings, (old) => old && { ...old, sheetLayout });
-    try {
-      await patchSettings({ sheetLayout });
-    } catch {
-      // Vuelve lo que quedó en el servidor. Sin `write.notify`: en la ficha
-      // ajena no existe.
-      void client.invalidateQueries({ queryKey: queryKeys.rosterSettings });
-      setToast((n) => (n ?? 0) + 1);
-    }
-  };
 
   const place = (id: string, col: number, index: number) => void save(moveCard(layout, id, col, index));
 
@@ -87,39 +77,6 @@ export function ArrangeableColumns({
     },
   });
 
-  const toastNode = toast !== null && (
-    <Toast key={toast} tone="error" message={t.layoutSaveFailed} open onOpenChange={(open) => !open && setToast(null)} />
-  );
-
-  if (!arranging) {
-    return (
-      <>
-        {/* Pills doradas chicas y pegadas a la regla: son opcionales y no tienen
-            que robarle alto a las tarjetas. «Acomodar» siempre a la derecha. */}
-        <div className="-mt-2 mb-2 flex flex-wrap items-center justify-between gap-2">
-          {leading ?? <span />}
-          <button type="button" onClick={() => setArranging(true)} className={SHEET_PILL}>
-            <LayoutDashboard size={14} aria-hidden="true" />
-            {t.arrangeCards}
-          </button>
-        </div>
-        <div className="sheet-columns">
-          <div>
-            {layout.map((col, c) => (
-              <div key={c} className="flex min-w-0 flex-col gap-4">
-                {col.map((id) => (
-                  <Fragment key={id}>{cards[id]!.node}</Fragment>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-        {toastNode}
-      </>
-    );
-  }
-
-  const name = tabLabel(t, tab);
   const arrow = (label: string, Icon: LucideIcon, onClick: () => void, disabled = false, className?: string) => (
     <Tooltip content={label}>
       <button
@@ -139,82 +96,103 @@ export function ArrangeableColumns({
 
   return (
     <>
-      <div className="card mb-4 flex items-center gap-2 py-2.5 pr-2.5 pl-4 sm:gap-3">
-        <p className="min-w-0 flex-1 text-[14px]">
-          <span className="sm:hidden">{t.arrangingTitleShort(name)}</span>
-          <span className="hidden sm:inline">{t.arrangingTitle(name)}</span>
-        </p>
-        <Button tone="secondary" shape="pill" className="max-sm:min-h-11" onClick={() => void save(null)}>
-          {t.arrangeRestore}
-        </Button>
-        <Button tone="primary" shape="pill" className="max-sm:min-h-11" onClick={() => setArranging(false)}>
-          {t.arrangeDone}
-        </Button>
+      {/* Pills doradas chicas y pegadas a la regla: son opcionales y no tienen
+          que robarle alto a las tarjetas. «Personalizar» siempre a la derecha. */}
+      <div className="-mt-2 mb-2 flex flex-wrap items-center justify-between gap-2">
+        {leading ?? <span />}
+        <button type="button" aria-pressed={open} onClick={() => setOpen(!open)} className={open ? SHEET_PILL_PRESSED : SHEET_PILL}>
+          <SlidersHorizontal size={14} aria-hidden="true" />
+          {t.customizeSheet}
+        </button>
       </div>
-      <div className="sheet-columns">
-        <div>
-          {layout.map((col, c) => (
-            <div key={c} className="arrange-col flex min-w-0 flex-col gap-2.5 rounded-[var(--radius-card)] bg-plaque p-2">
-              {col.map((id, index) => {
-                const title = cards[id]!.title;
-                const item = drag.item(id);
-                const held = drag.dragging === id;
-                return (
-                  <div
-                    key={id}
-                    {...item}
-                    tabIndex={0}
-                    data-arrange-card={id}
-                    style={
-                      held && drag.animated && item.style?.transform
-                        ? { ...item.style, transform: `${item.style.transform} rotate(-1.5deg)` }
-                        : item.style
-                    }
-                    className={cx(
-                      'arrange-bar relative box-border flex touch-manipulation items-center gap-1.5 rounded-[var(--radius-card)] bg-surface py-1.5 pr-1.5 pl-2.5 select-none',
-                      held ? 'cursor-grabbing border-2 border-gold' : 'cursor-grab border border-hairline',
-                    )}
-                  >
-                    {/* Dónde cae: una línea en el hueco de arriba, porque se
-                        inserta antes de esta tarjeta (no se intercambia). */}
-                    {drag.over === id && (
-                      <span aria-hidden="true" className="absolute inset-x-1 -top-[7px] h-0.5 rounded-full bg-gold" />
-                    )}
-                    <GripVertical size={16} aria-hidden="true" className="shrink-0 text-text-muted" />
-                    <span className="font-display min-w-0 flex-1 text-[15px] break-words">{title}</span>
-                    {c > 0 && arrow(t.moveCardLeft(title), ArrowLeft, () => place(id, c - 1, index), false, 'arrange-side')}
-                    {arrow(
-                      t.moveCardUp(title),
-                      ArrowUp,
-                      () => (index > 0 ? place(id, c, index - 1) : place(id, c - 1, AT_END)),
-                      c === 0 && index === 0,
-                    )}
-                    {arrow(
-                      t.moveCardDown(title),
-                      ArrowDown,
-                      () => (index < col.length - 1 ? place(id, c, index + 1) : place(id, c + 1, 0)),
-                      c === last && index === col.length - 1,
-                    )}
-                    {c < last && arrow(t.moveCardRight(title), ArrowRight, () => place(id, c + 1, index), false, 'arrange-side')}
-                  </div>
-                );
-              })}
-              {/* El espacio que queda bajo la última barra: dónde soltar al final
-                  de la columna, también si está vacía. */}
-              <div
-                {...drag.item(`${FIN}${c}`)}
-                className={cx(
-                  // Sin `grow`: el destino se elige por el centro más cercano, y
-                  // un hueco alto tendría el centro lejos de la última barra.
-                  'box-border min-h-12 rounded-[var(--radius-card)]',
-                  drag.over === `${FIN}${c}` && 'border-2 border-dashed border-gold',
-                )}
-              />
-            </div>
-          ))}
+      {open && (
+        <>
+          {/* Desde 1280 px el panel es la columna derecha del `Shell`; debajo,
+              va acá, arriba de las tarjetas. */}
+          <div className="card mb-4 p-6 min-[1280px]:hidden">
+            <CustomizePanel model={model} tab={tab} />
+          </div>
+          {slot && createPortal(<CustomizePanel model={model} tab={tab} />, slot)}
+        </>
+      )}
+      {!open ? (
+        <div className="sheet-columns">
+          <div>
+            {layout.map((col, c) => (
+              <div key={c} className="flex min-w-0 flex-col gap-4">
+                {col.map((id) => (
+                  <Fragment key={id}>{cards[id]!.node}</Fragment>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-      {toastNode}
+      ) : (
+        <div className="sheet-columns">
+          <div>
+            {layout.map((col, c) => (
+              <div key={c} className="arrange-col flex min-w-0 flex-col gap-2.5 rounded-[var(--radius-card)] bg-plaque p-2">
+                {col.map((id, index) => {
+                  const title = cards[id]!.title;
+                  const item = drag.item(id);
+                  const held = drag.dragging === id;
+                  return (
+                    <div
+                      key={id}
+                      {...item}
+                      tabIndex={0}
+                      data-arrange-card={id}
+                      style={
+                        held && drag.animated && item.style?.transform
+                          ? { ...item.style, transform: `${item.style.transform} rotate(-1.5deg)` }
+                          : item.style
+                      }
+                      className={cx(
+                        'arrange-bar relative box-border flex touch-manipulation items-center gap-1.5 rounded-[var(--radius-card)] bg-surface py-1.5 pr-1.5 pl-2.5 select-none',
+                        held ? 'cursor-grabbing border-2 border-gold' : 'cursor-grab border border-hairline',
+                      )}
+                    >
+                      {/* Dónde cae: una línea en el hueco de arriba, porque se
+                          inserta antes de esta tarjeta (no se intercambia). */}
+                      {drag.over === id && (
+                        <span aria-hidden="true" className="absolute inset-x-1 -top-[7px] h-0.5 rounded-full bg-gold" />
+                      )}
+                      <GripVertical size={16} aria-hidden="true" className="shrink-0 text-text-muted" />
+                      <span className="font-display min-w-0 flex-1 text-[15px] break-words">{title}</span>
+                      {c > 0 && arrow(t.moveCardLeft(title), ArrowLeft, () => place(id, c - 1, index), false, 'arrange-side')}
+                      {arrow(
+                        t.moveCardUp(title),
+                        ArrowUp,
+                        () => (index > 0 ? place(id, c, index - 1) : place(id, c - 1, AT_END)),
+                        c === 0 && index === 0,
+                      )}
+                      {arrow(
+                        t.moveCardDown(title),
+                        ArrowDown,
+                        () => (index < col.length - 1 ? place(id, c, index + 1) : place(id, c + 1, 0)),
+                        c === last && index === col.length - 1,
+                      )}
+                      {c < last && arrow(t.moveCardRight(title), ArrowRight, () => place(id, c + 1, index), false, 'arrange-side')}
+                    </div>
+                  );
+                })}
+                {/* El espacio que queda bajo la última barra: dónde soltar al final
+                    de la columna, también si está vacía. */}
+                <div
+                  {...drag.item(`${FIN}${c}`)}
+                  className={cx(
+                    // Sin `grow`: el destino se elige por el centro más cercano, y
+                    // un hueco alto tendría el centro lejos de la última barra.
+                    'box-border min-h-12 rounded-[var(--radius-card)]',
+                    drag.over === `${FIN}${c}` && 'border-2 border-dashed border-gold',
+                  )}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {toast}
     </>
   );
 }

@@ -32,9 +32,10 @@ export function Eyebrow({ children, className }: { children: ReactNode; classNam
  * `dt`/`dd` —un botón no es hijo válido de `dl`—, y el botón ya se anuncia
  * con rótulo y valor.
  *
- * Con [accent] (el color de clase) el borde se tiñe y [ornament] se dibuja
- * detrás del texto; `still` deja el adorno quieto en su estado final. Sin
- * [accent] la placa es la de siempre.
+ * Con [accent] (el color de la esquina de arriba) el borde se tiñe, en diagonal
+ * hasta [accent2] (el de abajo), y [ornament] se dibuja detrás del texto;
+ * `still` deja el adorno quieto en su estado final. Sin [accent] la placa es
+ * la de siempre.
  */
 export function StatTile({
   id,
@@ -48,6 +49,7 @@ export function StatTile({
   onClick,
   ornament,
   accent,
+  accent2,
   still = false,
 }: {
   id: string;
@@ -61,6 +63,7 @@ export function StatTile({
   onClick?: () => void;
   ornament?: ReactNode;
   accent?: string | null;
+  accent2?: string | null;
   still?: boolean;
 }) {
   const Root = onClick ? 'button' : 'div';
@@ -75,7 +78,7 @@ export function StatTile({
         accent && 'orn-tile',
         still && 'orn-still',
       )}
-      style={accent ? ({ '--class-accent': accent } as CSSProperties) : undefined}
+      style={accent ? ({ '--class-accent': accent, '--class-accent-2': accent2 ?? accent } as CSSProperties) : undefined}
       data-stat={id}
     >
       {accent && ornament}

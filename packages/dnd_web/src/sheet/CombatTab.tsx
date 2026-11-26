@@ -43,6 +43,7 @@ export function CombatTab({ model }: { model: SheetModel }) {
   const companions = useCompanionsShown(model);
   return (
     <ArrangeableColumns
+      model={model}
       tab="combate"
       defaults={COMBAT_DEFAULT}
       cards={{

@@ -31,6 +31,7 @@ import { NpcDetailView } from './npcs/NpcDetailView';
 import { NpcLibraryView } from './npcs/NpcLibraryView';
 import { NpcSheetView } from './npcs/NpcSheetView';
 import { TutorialGate, type Tutorial } from '../ui/tutorials';
+import { SheetCustomizeContext, useSheetCustomizeHost } from '../sheet/sheetCustomize';
 
 /**
  * El Modo DM (`/dm/...`). Acá el DM crea, edita y borra campañas y suma o
@@ -41,6 +42,8 @@ import { TutorialGate, type Tutorial } from '../ui/tutorials';
  */
 export function DmPage({ view, account }: { view: DmView; account: Account }) {
   const t = useTexts();
+  // Para las fichas de un miembro y de un PNJ, que se dibujan acá adentro.
+  const customize = useSheetCustomizeHost();
   const campaigns = useDmCampaigns();
   const list = campaigns.data;
 
@@ -165,33 +168,36 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
   }
 
   return (
-    <Shell
-      panel={
-        view.kind === 'npcBlock' ? (
-          <NpcBlockBack npcId={view.npcId} leaveRef={leave} />
-        ) : view.kind === 'homebrewEditor' ? (
-          <HomebrewEditorBack
-            exitHref={view.category === 'creatures' ? creatureEditorExit(view.entryId) : entryEditorExit(view.category, view.entryId)}
-            leaveRef={leave}
+    <SheetCustomizeContext.Provider value={customize.value}>
+      <Shell
+        aside={customize.aside}
+        panel={
+          view.kind === 'npcBlock' ? (
+            <NpcBlockBack npcId={view.npcId} leaveRef={leave} />
+          ) : view.kind === 'homebrewEditor' ? (
+            <HomebrewEditorBack
+              exitHref={view.category === 'creatures' ? creatureEditorExit(view.entryId) : entryEditorExit(view.category, view.entryId)}
+              leaveRef={leave}
+            />
+          ) : (
+            <DmPanel campaigns={list} current={current} tool={view.kind === 'npcSheet' || view.kind === 'npcPortrait' || view.kind === 'scenarios' ? 'npcs' : view.kind === 'bestiary' || view.kind === 'npcs' || view.kind === 'homebrew' ? view.kind : undefined} />
+          )
+        }
+        footer={<RosterFooter account={account} dm />}>
+        {body}
+        {tutorial && <TutorialGate tutorial={tutorial} />}
+        {/* Otra campaña es otro reproductor: lo que sonaba se corta. La clave no
+            puede ser el id a secas: la sección hermana ya la usa. */}
+        {musicCampaign && (
+          <MusicPlayer
+            key={`music:${musicCampaign.id}`}
+            campaignId={musicCampaign.id}
+            scenes={musicCampaign.musicScenes ?? []}
+            offerCombat={music?.campaignId === musicCampaign.id && music.offer}
+            onDismissOffer={() => onMusicOffer(musicCampaign.id, false)}
           />
-        ) : (
-          <DmPanel campaigns={list} current={current} tool={view.kind === 'npcSheet' || view.kind === 'npcPortrait' || view.kind === 'scenarios' ? 'npcs' : view.kind === 'bestiary' || view.kind === 'npcs' || view.kind === 'homebrew' ? view.kind : undefined} />
-        )
-      }
-      footer={<RosterFooter account={account} dm />}>
-      {body}
-      {tutorial && <TutorialGate tutorial={tutorial} />}
-      {/* Otra campaña es otro reproductor: lo que sonaba se corta. La clave no
-          puede ser el id a secas: la sección hermana ya la usa. */}
-      {musicCampaign && (
-        <MusicPlayer
-          key={`music:${musicCampaign.id}`}
-          campaignId={musicCampaign.id}
-          scenes={musicCampaign.musicScenes ?? []}
-          offerCombat={music?.campaignId === musicCampaign.id && music.offer}
-          onDismissOffer={() => onMusicOffer(musicCampaign.id, false)}
-        />
-      )}
-    </Shell>
+        )}
+      </Shell>
+    </SheetCustomizeContext.Provider>
   );
 }

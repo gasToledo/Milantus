@@ -30,14 +30,20 @@ import { prefersReducedMotion } from './motion';
  * [panel] es lo propio de cada pantalla (navegación, la tarjeta del personaje)
  * y [footer] su pie. Sin ninguno de los dos (sin sesión, no disponible) el
  * panel es solo la marca: ni un enlace delata qué hay detrás.
+ *
+ * [aside] es una columna a la derecha del contenido («Personalizar ficha»), que
+ * solo se ve desde 1280 px: debajo, quien la usa dibuja lo mismo en el
+ * contenido.
  */
 export function Shell({
   panel,
   footer,
+  aside,
   children,
 }: {
   panel?: ReactNode;
   footer?: ReactNode;
+  aside?: ReactNode;
   children: ReactNode;
 }) {
   const t = useTexts();
@@ -60,7 +66,12 @@ export function Shell({
   );
 
   return (
-    <div className="min-h-screen shell:grid shell:grid-cols-[var(--sidebar-width)_minmax(0,1fr)]">
+    <div
+      className={cx(
+        'min-h-screen shell:grid shell:grid-cols-[var(--sidebar-width)_minmax(0,1fr)]',
+        aside !== undefined && 'min-[1280px]:grid-cols-[var(--sidebar-width)_minmax(0,1fr)_424px]',
+      )}
+    >
       <a
         href="#contenido"
         className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-[var(--radius-nav)] focus:bg-surface focus:p-2 focus:text-gold"
@@ -121,6 +132,11 @@ export function Shell({
       <main id="contenido" tabIndex={-1} className="min-w-0 px-4 py-4 shell:px-6 shell:py-6 min-[1400px]:px-8">
         {children}
       </main>
+      {aside !== undefined && (
+        <div className="hidden border-l border-hairline bg-surface min-[1280px]:block">
+          <aside className="sticky top-0 h-dvh overflow-y-auto p-6">{aside}</aside>
+        </div>
+      )}
     </div>
   );
 }

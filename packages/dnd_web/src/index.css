@@ -497,7 +497,7 @@ body {
   }
 }
 
-/* Acomodar tarjetas (`ArrangeableColumns`). Las flechas de costado pasan la
+/* Acomodar tarjetas con «Personalizar ficha» abierto (`ArrangeableColumns`). Las flechas de costado pasan la
    tarjeta a la columna vecina: con una sola columna (debajo de 616 px, el mismo
    corte de `.sheet-columns`) no hay vecina a los costados, así que se ocultan
    por CSS y no midiendo con JS. Ahí mismo los blancos táctiles son de teléfono
@@ -1396,23 +1396,52 @@ body {
 }
 
 /* ── Adornos de clase de la banda táctica (`ui/ClassOrnament.tsx`) ─────────
-   Copiados del lienzo aprobado con el prefijo `orn-`. El color sale del
-   catálogo: la placa define `--class-accent` y de ahí sale `--class-ink`, que
-   pinta el borde y los dibujos. En el tema claro se mezcla con el texto porque
+   Copiados del lienzo aprobado con el prefijo `orn-`. La placa define
+   `--class-accent` (la esquina de arriba) y `--class-accent-2` (la de abajo,
+   que su `svg` repite como propio); de ahí salen los `--class-ink`, que pintan
+   el borde y los dibujos. En el tema claro se mezclan con el texto porque
    varios acentos son pálidos y la placa también. */
+
+/* La paleta cerrada de «Personalizar ficha» (`sheet/sheetStyle.ts`). Vale en
+   los dos temas: el `--class-ink` ya la oscurece en el claro. */
+:root {
+  --orn-crimson: #d4665a;
+  --orn-sky: #5fa3c7;
+  --orn-violet: #a78bd6;
+  --orn-teal: #4fb3a5;
+  --orn-green: #6fa85c;
+  --orn-silver: #b8bec8;
+  --orn-ember: #d9834a;
+}
 .orn-tile {
   --class-ink: var(--class-accent);
+  --class-ink-2: var(--class-accent-2);
   position: relative;
   overflow: hidden;
 }
+.orn-deco.orn-br {
+  --class-ink: var(--class-accent);
+}
 :root[data-theme='light'] .orn-tile {
   --class-ink: color-mix(in oklab, var(--class-accent) 55%, var(--on-surface));
+  --class-ink-2: color-mix(in oklab, var(--class-accent-2) 55%, var(--on-surface));
 }
-/* En `components`, como `.plaque`: el borde dorado al pasar por la Iniciativa
+:root[data-theme='light'] .orn-deco.orn-br {
+  --class-ink: color-mix(in oklab, var(--class-accent) 55%, var(--on-surface));
+}
+/* El borde es un degradé de la clase de arriba a la izquierda a la de abajo a la
+   derecha. «to bottom right» hace que la mitad caiga justo en la diagonal que une
+   las otras dos esquinas, sea cual sea el ancho de la placa; el tramo del medio
+   funde un color en el otro en vez de cortarlo. Con una sola clase los dos son
+   iguales y el borde queda liso.
+   En `components`, como `.plaque`: el borde dorado al pasar por la Iniciativa
    (una utilidad) tiene que seguir ganando. */
 @layer components {
   .plaque.orn-tile {
-    border-color: var(--class-ink);
+    border-color: transparent;
+    background:
+      linear-gradient(var(--plaque), var(--plaque)) padding-box,
+      linear-gradient(to bottom right, var(--class-ink) 38%, var(--class-ink-2) 62%) border-box;
   }
 }
 .orn-tile > :not(.orn-deco) {

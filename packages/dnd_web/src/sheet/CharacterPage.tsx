@@ -13,6 +13,7 @@ import { AppBusyLabel, AppErrorView, Notice, SaveStatusBadge } from '../ui/statu
 import { computeModel, type ComputedModel } from './compute';
 import { SheetFooter, SheetPanel, type SheetPanelActive } from './SheetPanel';
 import { SheetTabs } from './SheetTabs';
+import { SheetCustomizeContext, useSheetCustomizeHost } from './sheetCustomize';
 import { TurnBanner } from './TurnBanner';
 import { LevelUpWizard } from '../levelup/LevelUpWizard';
 import { MagicItemPlans } from './MagicItemPlans';
@@ -70,6 +71,7 @@ export function CharacterPage({
   const catalog = useSheetCatalog(lang);
   const client = useQueryClient();
   const saveState = useSaveState(id);
+  const customize = useSheetCustomizeHost();
   // La presentación de un personaje recién creado (viene del creador por la
   // memoria del módulo); cerrarla la borra.
   const [created, setCreated] = useState(() => createdFor(id));
@@ -203,8 +205,9 @@ export function CharacterPage({
   }
 
   return (
-    <>
+    <SheetCustomizeContext.Provider value={customize.value}>
       <Shell
+        aside={customize.aside}
         panel={model ? <SheetPanel model={model} tab={panelActive} /> : <SidebarBack href={rosterHref()} back={false} />}
         footer={
           <SheetFooter
@@ -234,6 +237,6 @@ export function CharacterPage({
           action={toast.undo ? { label: t.undo, onSelect: toast.undo } : undefined}
         />
       )}
-    </>
+    </SheetCustomizeContext.Provider>
   );
 }

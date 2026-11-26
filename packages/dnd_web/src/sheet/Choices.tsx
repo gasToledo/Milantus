@@ -182,7 +182,7 @@ function WarningsDialog({
 /** «Cambiar elecciones» en la tarjeta Identidad: lo ya elegido que el juego
  *  deja cambiar (`replaceable` del motor), aunque no quede nada pendiente. */
 /** «Cambiar elecciones»: una pill de la barra de la pestaña Personaje, a la
- *  izquierda de «Acomodar tarjetas» y con su mismo estilo. */
+ *  izquierda de «Personalizar ficha» y con su mismo estilo. */
 export function ChangeChoicesButton({ href }: { href: string }) {
   const t = useTexts();
   return (

@@ -1,4 +1,4 @@
-import { useId, type CSSProperties, type ReactNode } from 'react';
+import { cloneElement, useId, type CSSProperties, type ReactElement, type ReactNode } from 'react';
 
 // Los adornos de las cuatro placas de la banda táctica, uno por clase. Los
 // dibujos están copiados tal cual del lienzo aprobado («Ficha personalizada»):
@@ -25,7 +25,7 @@ const GEAR_CORNER = gear(26, 26, 8, 11, 15);
 
 export type OrnamentCorner = 'tl' | 'br';
 
-const ART: Record<string, { tl: (uid: string, big: string) => ReactNode; br: (uid: string) => ReactNode }> = {
+const ART: Record<string, { tl: (uid: string, big: string) => ReactNode; br: (uid: string) => ReactElement<{ style?: CSSProperties }> }> = {
   druid: {
     tl: (_uid, big) => (
       <svg className={`orn-deco orn-tl${big}`} preserveAspectRatio="xMinYMin meet" viewBox="0 0 84 52" fill="none" stroke="var(--class-ink)" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
@@ -849,11 +849,24 @@ const ART: Record<string, { tl: (uid: string, big: string) => ReactNode; br: (ui
 };
 
 /** El dibujo de [classId] para una esquina, o `null` si la clase no tiene
- *  estilo (homebrew). [big] es la variante de Puntos de golpe. */
-export function ClassOrnament({ classId, corner, big = false }: { classId: string; corner: OrnamentCorner; big?: boolean }) {
+ *  estilo (homebrew). [big] es la variante de Puntos de golpe. [accent] es el
+ *  color propio de la esquina de abajo, que puede no ser el de la placa. */
+export function ClassOrnament({
+  classId,
+  corner,
+  big = false,
+  accent,
+}: {
+  classId: string;
+  corner: OrnamentCorner;
+  big?: boolean;
+  accent?: string;
+}) {
   // Sin los signos que `useId` pone alrededor: el id va dentro de un `url(#…)`.
   const uid = useId().replace(/[^\w-]/g, '');
   if (!Object.hasOwn(ART, classId)) return null;
   const art = ART[classId]!;
-  return corner === 'tl' ? art.tl(uid, big ? ' orn-big' : '') : art.br(uid);
+  if (corner === 'tl') return art.tl(uid, big ? ' orn-big' : '');
+  const br = art.br(uid);
+  return accent ? cloneElement(br, { style: { ...br.props.style, '--class-accent': accent } as CSSProperties }) : br;
 }

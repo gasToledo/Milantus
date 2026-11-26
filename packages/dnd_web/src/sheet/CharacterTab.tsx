@@ -70,6 +70,7 @@ export function CharacterTab({ model }: { model: SheetModel }) {
 
   return (
     <ArrangeableColumns
+      model={model}
       tab="personaje"
       defaults={CHARACTER_DEFAULT}
       leading={choices?.replaceable ? <ChangeChoicesButton href={model.write!.routes.choices()} /> : undefined}
